@@ -1,0 +1,787 @@
+/**
+ * STYLE.CSS – Bocholt erleben (MVP frozen)
+ * Ziel: ruhig, modern, funktional, konsistent
+ * Architektur: Single Source of Truth
+ */
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* 2026 UI Tokens */
+  --color-primary: #8BCF4A;
+  --color-primary-muted: #EAF6DB;
+  --color-background: #F9FBF6;
+  --color-surface: #FFFFFF;
+
+  --color-text-primary: #1F2933;
+  --color-text-secondary: #5F6B73;
+  --color-text-muted: #8A949B;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  --radius-card: 16px;
+  --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+
+  /* Backward compat (damit bestehende Styles nicht brechen) */
+  --bg: var(--color-background);
+  --surface: var(--color-surface);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+
+  --border: rgba(31,41,51,0.10);
+
+  --primary: var(--color-primary);
+  --accent: var(--color-primary);
+
+  --focus-ring: rgba(139,207,74,.25);
+  --hero-surface: var(--color-primary-muted);
+
+  --radius: var(--radius-card);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-card);
+
+  --space-1: var(--space-xs);
+  --space-2: var(--space-sm);
+  --space-3: var(--space-md);
+  --space-4: var(--space-lg);
+  --space-5: var(--space-xl);
+}
+
+body {
+ body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+}
+
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+/* Accessibility */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border-bottom: 0;
+  padding: 8px 0; /* kompakt, kein Luftpolster */
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.logo {
+  font-size: 1rem;
+  font-weight: 400; /* normaler Schriftschnitt */
+  letter-spacing: 0;
+  color: var(--color-text-primary);
+}
+
+/* Install Button (Utility, bewusst unaufdringlich) */
+.pwa-install-button {
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(139,207,74,.35);
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pwa-install-button:hover {
+  background: rgba(139,207,74,.18);
+}
+
+/* ============================================
+   Intro
+   ============================================ */
+.intro {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px 8px; /* sehr kompakt */
+}
+
+.intro h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.intro p {
+  font-size: .9rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 44px 20px;
+}
+
+/* ============================================
+   LOADING & MESSAGES
+   ============================================ */
+.loading-container {
+  min-height: 240px;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid #e5e7eb;
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+  margin-bottom: 14px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message,
+.info-message {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 22px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.info-message {
+  background: #fff3cd;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+}
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state{
+  padding: 18px 0 8px;
+}
+
+.empty-state__card{
+  background: var(--color-surface);
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  max-width: 520px;
+}
+
+.empty-state__title{
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--color-text-primary);
+}
+
+.empty-state__text{
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.empty-state__btn{
+  width: 100%;
+  border: 1px solid rgba(139,207,74,.45);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ============================================
+   EVENTS LIST
+   ============================================ */
+.events-section {
+  padding-top: 10px;
+  padding-bottom: 18px;
+}
+
+.events-group-title {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.event-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-lg); /* 16px */
+}
+
+/* Card */
+.event-card {
+  background: var(--color-surface);
+  border: 0; /* keine border */
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 14px var(--space-lg);
+  transition: box-shadow .12s ease, transform .12s ease;
+}
+
+/* press feedback */
+.event-card:active {
+  transform: scale(0.98);
+}
+
+/* Desktop hover: nur Shadow minimal stärker, keine Bewegung */
+@media (hover: hover) and (pointer: fine) {
+  .event-card:hover {
+    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
+  }
+}
+
+/* open-state wird nicht mehr genutzt (keine Expand-Card) */
+.event-card.is-open {
+  box-shadow: var(--shadow-card);
+  border: 0;
+}
+
+.event-card-content {
+  padding: var(--space-lg);
+}
+
+.event-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta */
+.event-meta-inline {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.event-meta {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-location,
+.event-description {
+  font-size: .95rem;
+  color: var(--color-text-secondary);
+}
+
+.event-description {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Expand */
+.event-card-button {
+  width: 100%;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-collapsible.collapsed {
+  display: block;
+}
+
+.event-collapsible.collapsed .event-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.event-collapsible.collapsed .event-details-btn {
+  display: none;
+}
+
+/* CTA */
+.event-details-btn {
+  display: inline-block;
+  margin-top: 8px;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: .95rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.event-details-btn:hover {
+  background: #0f3d24;
+}
+
+/* Location als Link (mobil zuverlässig tappable) */
+.event-location-link{
+  display: inline-block;
+  position: relative;
+  z-index: 2;                 /* liegt über Card-Click-Fläche */
+  pointer-events: auto;       /* wichtig für iOS */
+  touch-action: manipulation; /* schneller Tap */
+  
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.event-location-link:hover{
+  text-decoration: underline;
+}
+
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+  background: #0b1220;
+  color: #e5e7eb;
+  padding: 34px 20px;
+  text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .event-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding: 28px 16px;
+  }
+
+  /* vorher war hier .hero h1 – Intro ist korrekt */
+  .intro h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Filters / Search */
+.events-filter {
+  margin: 10px 0 16px;
+}
+
+#location-filter {
+  width: 100%;
+  max-width: 320px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: .9rem;
+}
+
+.top-stack{
+  position: sticky;
+  top: 60px; /* Header-Höhe + etwas Luft (kompakt) */
+  z-index: 40;
+  background: var(--color-background);
+  padding: 8px 20px 8px;
+}
+
+.events-filter{
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.events-filter--secondary{
+  margin-top: 6px;
+}
+
+#search-filter{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(31,41,51,0.12);
+  background: var(--color-surface);
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+#search-filter::placeholder{
+  color: var(--color-text-muted);
+}
+
+#search-filter:focus{
+  outline: none;
+  border-color: rgba(139,207,74,.60); /* feiner Rahmen */
+  box-shadow: 0 0 0 3px rgba(139,207,74,.14);
+}
+
+#location-filter{
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(31,41,51,0.12);
+  background: var(--color-surface);
+  font-size: .95rem;
+  color: var(--color-text-primary);
+}
+
+.quick-interests,
+.time-chips{
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--space-md);
+
+  /* „Anlauf“ links, ohne dass die Leiste optisch nach rechts rutscht */
+  padding-left: var(--space-md);
+  margin-left: calc(-1 * var(--space-md));
+
+  /* rechts wenig Innenabstand => letzter Chip wirkt „angeschnitten“ */
+  padding-right: 2px;
+
+  scrollbar-width: none;
+
+  /* Rechter Scroll-Hinweis: deutlich, aber dezent */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 78%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 78%,
+    transparent 100%
+  );
+}
+
+.quick-interests::-webkit-scrollbar,
+.time-chips::-webkit-scrollbar{
+  display: none; /* WebKit */
+}
+
+.chip{
+  appearance: none;
+  border: 1px solid rgba(31,41,51,0.12);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: .9rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.chip:hover{
+  border-color: rgba(139,207,74,.35);
+}
+
+.chip:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139,207,74,.14);
+  border-color: rgba(139,207,74,.60);
+}
+
+/* Zeit-Chips aktiver Zustand */
+.chip--time.is-active{
+  background: var(--color-primary-muted);
+  border-color: rgba(139,207,74,.55);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* =========================================================
+   BEGIN: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
+   Single Source of Truth – konsolidiert (kein Patch-Stack)
+   ========================================================= */
+
+body.is-panel-open { overflow: hidden; }
+
+#event-detail-panel.detail-panel{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: block;
+}
+
+#event-detail-panel.detail-panel.hidden{ display: none; }
+
+/* Overlay (Blur nur hier, Panel bleibt crisp) */
+#event-detail-panel .detail-panel-overlay{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background: rgba(17, 24, 39, 0.32);
+
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Sheet */
+#event-detail-panel .detail-panel-content{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+
+  max-height: 80vh;
+
+  /* OPAK! (wichtig gegen "milchig/weg") */
+  background: var(--color-surface);
+
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+
+  border-top: 1px solid rgba(139, 207, 74, 0.18);
+  box-shadow:
+    0 -24px 70px rgba(0,0,0,0.16),
+    0 1px 0 rgba(255,255,255,0.7) inset;
+
+  overflow: hidden;
+  padding: 14px 14px 16px;
+
+  transform: translateY(110%);
+  transition: transform 220ms ease;
+  overscroll-behavior: contain;
+}
+
+#event-detail-panel.detail-panel.active .detail-panel-content{
+  transform: translateY(0);
+}
+
+/* Grabber */
+#event-detail-panel .detail-panel-content::before{
+  content: "";
+  display: block;
+  width: 52px;
+  height: 5px;
+  border-radius: 999px;
+  margin: 6px auto 10px;
+  background: rgba(139, 207, 74, 0.35);
+}
+
+/* Close */
+#event-detail-panel .detail-panel-close{
+  position: absolute;
+  right: 12px;
+  top: 10px;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(31,41,51,0.10);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+
+  font-size: 22px;
+  line-height: 34px;
+  color: rgba(31,41,51,0.70);
+  cursor: pointer;
+  z-index: 10;
+}
+
+#event-detail-panel .detail-panel-close:active{
+  transform: scale(0.96);
+}
+
+/* Scroll-Container */
+#event-detail-panel #detail-content{
+  padding-top: 28px;
+  max-height: calc(80vh - 16px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Sticky Mini Header (spürbar erst bei langen Texten) */
+#event-detail-panel .detail-header{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  background: var(--color-surface);
+  padding-right: 44px;
+  padding-top: 6px;
+  padding-bottom: 10px;
+
+  margin-top: -4px;
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
+#event-detail-panel .detail-header h2{
+  margin: 0 0 6px;
+  font-size: 19px;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  font-weight: 650;
+  color: var(--color-text-primary);
+}
+
+/* Location Badge */
+#event-detail-panel .detail-location{
+  display: inline-flex;
+  align-items: center;
+
+  margin-top: 6px;
+  padding: 4px 10px;
+
+  border-radius: 999px;
+  background: rgba(139, 207, 74, 0.14);
+  border: 1px solid rgba(139, 207, 74, 0.32);
+
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: rgba(31,41,51,0.92);
+}
+
+/* Meta Box (lime-tint statt grau) */
+#event-detail-panel .detail-meta{
+  margin: 14px 0 12px;
+  padding: 12px 14px;
+
+  background: rgba(139, 207, 74, 0.10);
+  border: 1px solid rgba(139, 207, 74, 0.22);
+  border-radius: 16px;
+
+  display: grid;
+  gap: 6px;
+
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+#event-detail-panel .detail-meta strong{
+  font-weight: 650;
+  color: var(--color-text-primary);
+}
+
+/* Description */
+#event-detail-panel .detail-description p{
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(31,41,51,0.78);
+}
+
+/* CTA */
+#event-detail-panel .detail-actions{ margin-top: 0; }
+
+#event-detail-panel .detail-link-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  padding: 14px;
+
+  border-radius: 16px;
+
+  background: var(--color-primary-muted);
+  border: 1px solid rgba(139, 207, 74, 0.45);
+
+  color: var(--color-text-primary);
+  font-weight: 800;
+  text-decoration: none;
+
+  box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+}
+
+#event-detail-panel .detail-link-btn:active{
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.09);
+}
+
+/* iOS Safe Area */
+@supports (padding: max(0px)){
+  #event-detail-panel .detail-panel-content{
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* =========================================================
+   END: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
+   ========================================================= */

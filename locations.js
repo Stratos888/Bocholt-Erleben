@@ -1,0 +1,8 @@
+{
+  "Kulturort Alte Molkerei": "https://alte-molkerei.info/",
+  "Textilwerk Bocholt (Weberei)": "https://textilwerk.lwl.org/",
+  "LWL-Museum Textilwerk (Spinnerei), Industriestraße 5": "https://textilwerk.lwl.org/",
+  "Veranstaltungssaal im LernWerk, Industriestr. 1": "https://www.stadttheater-bocholt.de/",
+  "Aula im August-Vetter-Berufskolleg, Dinxperloer Straße 56": "https://www.stadttheater-bocholt.de/",
+  "Städtische Gesamtschule Bocholt": "https://www.bocholt.de/"
+}
