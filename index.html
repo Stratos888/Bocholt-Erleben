@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="canonical" href="https://bocholt-erleben.de/">   
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aktuelle Veranstaltungen in Bocholt: Konzerte, Kultur, Kneipen-Events und mehr. Alle Termine übersichtlich – mit Link zur Location.">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#8BCF4A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apevple-mobile-web-app-title" content="Bocholt erleben">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <title>Veranstaltungen in Bocholt – aktuelle Events & Termine</title>
+    
+        <!-- Custom CSS -->
+   <link rel="stylesheet" href="css/style.css?v=dev-20">
+
+
+</head>
+<body>
+    <!-- HEADER -->
+  <header class="app-header">
+  <div class="header-content">
+    <div class="logo">Bocholt erleben</div>
+
+    <button type="button" class="pwa-install-button">
+      App installieren
+    </button>
+  </div>
+</header>
+
+
+
+
+    <!-- HERO SECTION -->
+   <section class="intro">
+  <h1>Events in Bocholt</h1>
+  <p>Heute · Diese Woche · Demnächst</p>
+</section>
+
+
+    <!-- LOADING INDICATOR -->
+    <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Events werden geladen...</p>
+    </div>
+
+<div class="top-stack">
+  <div class="events-filter">
+    <input
+      id="search-filter"
+      type="search"
+      placeholder="Suche Events oder Orte"
+      aria-label="Events durchsuchen"
+    />
+  </div>
+
+  <div class="quick-interests" aria-label="Schnellinteressen">
+    <button type="button" class="chip" data-q="Party">Party</button>
+    <button type="button" class="chip" data-q="Kneipe">Kneipe</button>
+    <button type="button" class="chip" data-q="Kinder">Kinder</button>
+    <button type="button" class="chip" data-q="Quiz">Quiz</button>
+    <button type="button" class="chip" data-q="Musik">Musik</button>
+    <button type="button" class="chip" data-q="Kultur">Kultur</button>
+  </div>
+
+  <div class="time-chips" aria-label="Zeitfilter">
+    <button type="button" class="chip chip--time is-active" data-time="all">Alle</button>
+    <button type="button" class="chip chip--time" data-time="today">Heute</button>
+    <button type="button" class="chip chip--time" data-time="weekend">Wochenende</button>
+    <button type="button" class="chip chip--time" data-time="soon">Demnächst</button>
+  </div>
+
+   <!-- Location-Dropdown entfernt (Freitext + Chips reichen) -->
+
+</div>
+
+
+   <!-- EVENT CARDS SECTION -->
+<section class="events-section">
+    <div id="event-cards" class="event-cards-grid">
+        <!-- Event cards werden hier dynamisch eingefügt -->
+    </div>
+</section>
+
+
+   
+    <!-- EVENT DETAIL PANEL (hidden by default) -->
+    <div id="event-detail-panel" class="detail-panel hidden">
+        <div class="detail-panel-overlay"></div>
+        <div class="detail-panel-content">
+            <button class="detail-panel-close">&times;</button>
+            <div id="detail-content">
+                <!-- Event details werden hier dynamisch eingefügt -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FÜR LOCATIONS -->
+    <section>
+        <h2>Für Locations: Einfach. Automatisch. Kostenlos.</h2>
+        <div class="features">
+            <div class="feature-card">
+                <h3>⚡ Zero Aufwand</h3>
+                <p>Schick uns deine Events per E-Mail, WhatsApp oder Foto. Wir kümmern uns um den Rest. Kein Login, kein kompliziertes Backend.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎯 Mehr Sichtbarkeit</h3>
+                <p>Deine Events erreichen alle Bocholt-Besucher auf einer zentralen Plattform. Keine Events gehen mehr unter.</p>
+            </div>
+            <div class="feature-card">
+                <h3>💰 100% Kostenlos</h3>
+                <p>Keine Gebühren, keine versteckten Kosten. Wir wollen Bocholts Event-Szene sichtbarer machen – für alle.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-it-works">
+        <h2>So funktioniert's</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Event einreichen</h3>
+                <p>Schick uns dein Event in beliebigem Format per E-Mail</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Wir veröffentlichen</h3>
+                <p>Dein Event erscheint automatisch im Kalender</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Besucher kommen</h3>
+                <p>Bocholter finden dein Event auf einen Blick</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact">
+        <h2>Location werden?</h2>
+        <div class="contact-info">
+            <p>Interessiert deine Events hier zu listen?<br>Meld dich einfach bei uns:</p>
+            <a href="mailto:mathias@bocholt-erleben.de" class="contact-email">mathias@bocholt-erleben.de</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2025 Bocholt Events Hub | <a href="#impressum">Impressum</a> | <a href="#datenschutz">Datenschutz</a></p>
+        <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for Bocholt</p>
+        
+        <!-- IMPRESSUM -->
+        <div id="impressum" style="margin-top: 30px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 0.9rem; opacity: 0.8;">
+            <h3>Impressum</h3>
+            <p>
+                <strong>Angaben gemäß § 5 TMG:</strong><br>
+                Mathias Stöckert<br>
+                Gildhaus-Esch 18a<br>
+                46399 Bocholt<br><br>
+                
+                <strong>Kontakt:</strong><br>
+                E-Mail: mathias@bocholt-erleben.de<br><br>
+                
+                <strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong><br>
+                Mathias Stöckert<br>
+                Gildhaus-Esch 18a
+            </p>
+        </div>
+    </footer>
+
+    <!-- EXTERNAL LIBRARIES -->
+    <!-- Alpine.js for reactive UI components -->
+   
+        <!-- CUSTOM JAVASCRIPT MODULES -->
+    <script src="js/config.js"></script>
+<script src="js/locations.js"></script>
+          <script src="js/events.js"></script>
+    <script src="js/details.js"></script>
+        <script src="js/pwa-install.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Veranstaltungen in Bocholt",
+  "url": "https://bocholt-erleben.de/",
+  "inLanguage": "de-DE"
+}
+</script>
+
+<script src="js/seo-schema.js"></script>
+</body>
+</html>
