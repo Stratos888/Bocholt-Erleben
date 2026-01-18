@@ -11,9 +11,24 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Prepare deploy folder
+        run: |
+          rm -rf deploy
+          mkdir -p deploy
+          shopt -s dotglob
+
+          # Kopiere alles außer .git und .github in /deploy
+          for item in * .*; do
+            case "$item" in
+              .|..|.git|.github) continue ;;
+            esac
+            cp -R "$item" deploy/
+          done
 
       - name: Deploy via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.6
@@ -24,8 +39,5 @@ jobs:
           port: 22
           sftp_only: true
 
-          local_path: "./"
+          local_path: "./deploy/*"
           remote_path: ${{ secrets.STRATO_SFTP_REMOTE_PATH }}
-
-          # Nicht auf Webspace deployen:
-          exclude: ".git/**,.github/**,README.md"
