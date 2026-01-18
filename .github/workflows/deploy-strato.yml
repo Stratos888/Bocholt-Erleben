@@ -27,10 +27,10 @@ jobs:
       - name: Validate required secrets
         shell: bash
         run: |
-          test -n "${{ secrets.STRATO_SFTP_SERVER }}" || (echo "Missing STRATO_SFTP_SERVER" && exit 1)
-          test -n "${{ secrets.STRATO_SFTP_USERNAME }}" || (echo "Missing STRATO_SFTP_USERNAME" && exit 1)
-          test -n "${{ secrets.STRATO_SFTP_PASSWORD }}" || (echo "Missing STRATO_SFTP_PASSWORD" && exit 1)
-          test -n "${{ secrets.STRATO_SFTP_REMOTE_PATH }}" || (echo "Missing STRATO_SFTP_REMOTE_PATH" && exit 1)
+          test -n "${{ secrets.STRATO_FTP_SERVER }}" || (echo "Missing STRATO_FTP_SERVER" && exit 1)
+          test -n "${{ secrets.STRATO_FTP_USERNAME }}" || (echo "Missing STRATO_FTP_USERNAME" && exit 1)
+          test -n "${{ secrets.STRATO_FTP_PASSWORD }}" || (echo "Missing STRATO_FTP_PASSWORD" && exit 1)
+          test -n "${{ secrets.STRATO_FTP_REMOTE_PATH }}" || (echo "Missing STRATO_FTP_REMOTE_PATH" && exit 1)
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -38,12 +38,12 @@ jobs:
       - name: Deploy via SFTP
         shell: bash
         run: |
-          lftp -u "${{ secrets.STRATO_SFTP_USERNAME }}","${{ secrets.STRATO_SFTP_PASSWORD }}" \
-          sftp://${{ secrets.STRATO_SFTP_SERVER }} \
+          lftp -u "${{ secrets.STRATO_FTP_USERNAME }}","${{ secrets.STRATO_FTP_PASSWORD }}" \
+          sftp://${{ secrets.STRATO_FTP_SERVER }} \
           -e "
             set sftp:auto-confirm yes;
-            mkdir -p ${{ secrets.STRATO_SFTP_REMOTE_PATH }};
-            cd ${{ secrets.STRATO_SFTP_REMOTE_PATH }};
+            mkdir -p ${{ secrets.STRATO_FTP_REMOTE_PATH }};
+            cd ${{ secrets.STRATO_FTP_REMOTE_PATH }};
             mirror -R --verbose --only-newer deploy/ .;
             bye
           "
