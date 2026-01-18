@@ -1,8 +1,8 @@
-name: Deploy to STRATO (SFTP)
+name: Deploy to STRATO via SFTP
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 concurrency:
   group: deploy-strato
@@ -16,27 +16,87 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Optional: falls ihr mal build steps hattet – aktuell statisch, daher nur Copy.
       - name: Prepare deploy folder
         shell: bash
         run: |
+          set -euo pipefail
           rm -rf deploy
           mkdir -p deploy
-          shopt -s dotglob
 
-          for item in * .*; do
-            case "$item" in
-              .|..|.git|.github|deploy) continue ;;
-            esac
-            cp -R "$item" deploy/
-          done
+          # Alles ins deploy/ kopieren, aber .git/.github nie deployen
+          rsync -a \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="deploy" \
+            ./ deploy/
 
-      - name: Deploy via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-        with:
-          server: ${{ secrets.STRATO_SFTP_SERVER }}
-          username: ${{ secrets.STRATO_SFTP_USERNAME }}
-          password: ${{ secrets.STRATO_SFTP_PASSWORD }}
-          port: 22
-          sftp_only: true
-          local_path: "./deploy/*"
-          remote_path: ${{ secrets.STRATO_SFTP_REMOTE_PATH }}
+          echo "Prepared deploy folder:"
+          ls -la deploy | head -n 200
+
+      - name: Validate required secrets
+        shell: bash
+        env:
+          SFTP_SERVER: ${{ secrets.STRATO_SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.STRATO_SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.STRATO_SFTP_PASSWORD }}
+          SFTP_REMOTE_PATH: ${{ secrets.STRATO_SFTP_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${SFTP_SERVER:-}" ]]; then echo "Missing secret: STRATO_SFTP_SERVER" >&2; exit 1; fi
+          if [[ -z "${SFTP_USERNAME:-}" ]]; then echo "Missing secret: STRATO_SFTP_USERNAME" >&2; exit 1; fi
+          if [[ -z "${SFTP_PASSWORD:-}" ]]; then echo "Missing secret: STRATO_SFTP_PASSWORD" >&2; exit 1; fi
+          if [[ -z "${SFTP_REMOTE_PATH:-}" ]]; then
+            echo "Missing/empty secret: STRATO_SFTP_REMOTE_PATH (this is the cause of 'remote_path is empty')" >&2
+            exit 1
+          fi
+
+          echo "Secrets look non-empty. Remote path set to: '${SFTP_REMOTE_PATH}'"
+
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Probe remote and deploy
+        shell: bash
+        env:
+          SFTP_SERVER: ${{ secrets.STRATO_SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.STRATO_SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.STRATO_SFTP_PASSWORD }}
+          SFTP_REMOTE_PATH: ${{ secrets.STRATO_SFTP_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+
+          echo "Connecting to ${SFTP_SERVER} ..."
+          lftp -u "${SFTP_USERNAME}","${SFTP_PASSWORD}" "sftp://${SFTP_SERVER}" <<LFTP
+          set sftp:auto-confirm yes
+          set net:max-retries 2
+          set net:timeout 20
+          set cmd:fail-exit yes
+
+          echo "=== Remote PWD / LS (before) ==="
+          pwd
+          ls -la
+
+          echo "=== Ensure remote path exists ==="
+          mkdir -p "${SFTP_REMOTE_PATH}"
+          cd "${SFTP_REMOTE_PATH}"
+          pwd
+          ls -la
+
+          echo "=== Upload deploy/ -> remote ==="
+          mirror -R \
+            --verbose \
+            --only-newer \
+            --parallel=2 \
+            --exclude-glob .git/ \
+            --exclude-glob .github/ \
+            deploy/ .
+
+          echo "=== Remote LS (after) ==="
+          ls -la
+
+          bye
+LFTP
