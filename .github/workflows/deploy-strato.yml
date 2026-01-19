@@ -47,10 +47,17 @@ jobs:
           STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
         run: |
           set -euo pipefail
-
           echo "REMOTE_PATH length: ${#STRATO_FTP_REMOTE_PATH}"
           echo "REMOTE_PATH endswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == */ ]] && echo yes || echo no)"
           echo "REMOTE_PATH startswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == /* ]] && echo yes || echo no)"
+
+          # Ensure ssh exists where we expect it (GitHub runners sometimes have it under /usr/bin or /bin)
+          SSH_BIN="$(command -v ssh || true)"
+          if [ -z "$SSH_BIN" ]; then
+            echo "ssh not found even after installing openssh-client"
+            exit 1
+          fi
+          echo "Using SSH_BIN=$SSH_BIN"
 
           lftp -u "${STRATO_FTP_USERNAME}","${STRATO_FTP_PASSWORD}" "sftp://${STRATO_FTP_SERVER}" -e "
             set cmd:fail-exit yes;
@@ -58,7 +65,7 @@ jobs:
             set net:reconnect-interval-base 2;
 
             set sftp:auto-confirm yes;
-            set sftp:connect-program \"/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
+            set sftp:connect-program \"$SSH_BIN -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
 
             echo '--- SERVER ROOT (pwd/ls) ---';
             pwd;
@@ -86,12 +93,19 @@ jobs:
         run: |
           set -e
 
+          SSH_BIN="$(command -v ssh || true)"
+          if [ -z "$SSH_BIN" ]; then
+            echo "ssh not found even after installing openssh-client"
+            exit 1
+          fi
+          echo "Using SSH_BIN=$SSH_BIN"
+
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             "sftp://$STRATO_FTP_SERVER" \
             -e "
               set cmd:fail-exit yes;
               set sftp:auto-confirm yes;
-              set sftp:connect-program \"/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
+              set sftp:connect-program \"$SSH_BIN -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
 
               pwd;
               mirror -R --verbose --only-newer deploy/ .;
