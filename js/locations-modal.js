@@ -1,15 +1,19 @@
-/* === BEGIN BLOCK: LOCATIONS MODAL + OVERFLOW MENU LOGIC ===
-Zweck: Steuert Overflow-Menü im Header und öffnet/schließt das Locations-Modal.
-Umfang: Komplette Datei js/locations-modal.js.
+/* === BEGIN BLOCK: LOCATIONS MODAL + OVERFLOW MENU LOGIC (CONSOLIDATED) ===
+Zweck: Steuert Overflow-Menü im Header und öffnet/schließt das Locations-Modal robust.
+Umfang: Komplette Datei js/locations-modal.js (ersetzt alles).
 === */
 (function () {
-  function $(id) {
+  function byId(id) {
     return document.getElementById(id);
   }
 
-  const menuBtn = $("header-menu-button");
-  const menu = $("header-menu");
-  const openLocationsBtn = $("open-locations-modal");
+  // Header overflow menu (optional – funktioniert auch wenn nicht vorhanden)
+  const menuBtn = byId("header-menu-button");
+  const menu = byId("header-menu");
+
+  // IMPORTANT: In index.html gab es zeitweise doppelte IDs ("open-locations-modal").
+  // getElementById() würde nur das erste Element finden -> deshalb querySelectorAll.
+  const openLocationsBtns = Array.from(document.querySelectorAll("#open-locations-modal"));
 
   function closeMenu() {
     if (!menuBtn || !menu) return;
@@ -31,6 +35,9 @@ Umfang: Komplette Datei js/locations-modal.js.
   }
 
   function openLocationsModal() {
+    // Prevent duplicates
+    if (document.querySelector("[data-modal-overlay]")) return;
+
     const tpl = document.getElementById("locations-modal-template");
     if (!tpl) return;
 
@@ -38,9 +45,21 @@ Umfang: Komplette Datei js/locations-modal.js.
     const overlay = node.querySelector("[data-modal-overlay]");
     const closeBtn = node.querySelector("[data-modal-close]");
 
-    function closeModal() {
+    // Basic scroll lock (restore on close)
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function cleanup() {
       document.removeEventListener("keydown", onKeyDown);
-      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      document.body.style.overflow = prevOverflow || "";
+    }
+
+    function closeModal() {
+      cleanup();
+      const existingOverlay = document.querySelector("[data-modal-overlay]");
+      if (existingOverlay && existingOverlay.parentNode) {
+        existingOverlay.parentNode.removeChild(existingOverlay);
+      }
     }
 
     function onKeyDown(e) {
@@ -49,16 +68,24 @@ Umfang: Komplette Datei js/locations-modal.js.
 
     if (overlay) {
       overlay.addEventListener("click", (e) => {
+        // close only if user clicks outside the card
         if (e.target === overlay) closeModal();
       });
     }
 
-    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (closeBtn) {
+      closeBtn.addEventListener("click", closeModal);
+    }
 
     document.addEventListener("keydown", onKeyDown);
     document.body.appendChild(node);
+
+    // Focus close button for accessibility
+    const liveCloseBtn = document.querySelector("[data-modal-close]");
+    if (liveCloseBtn) liveCloseBtn.focus();
   }
 
+  // Menu toggle
   if (menuBtn) {
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -66,15 +93,18 @@ Umfang: Komplette Datei js/locations-modal.js.
     });
   }
 
-  if (openLocationsBtn) {
-    openLocationsBtn.addEventListener("click", () => {
+  // Open modal (supports multiple triggers)
+  openLocationsBtns.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
       closeMenu();
       openLocationsModal();
     });
-  }
+  });
 
+  // Click outside closes menu (if menu exists)
   document.addEventListener("click", () => {
     closeMenu();
   });
 })();
-/* === END BLOCK: LOCATIONS MODAL + OVERFLOW MENU LOGIC === */
+/* === END BLOCK: LOCATIONS MODAL + OVERFLOW MENU LOGIC (CONSOLIDATED) === */
