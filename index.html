@@ -48,13 +48,18 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
       App installieren
     </button>
 
-    <button
-      type="button"
-      class="pwa-install-button"
-      id="open-locations-modal"
-    >
-      Events veröffentlichen
-    </button>
+   <!-- === BEGIN BLOCK: HEADER PUBLISH CTA (link to publish page) ===
+Zweck: Primärer CTA führt direkt zur Aktionsseite (kein Modal).
+Umfang: Ersetzt nur den bisherigen "Events veröffentlichen"-Button im Header.
+=== -->
+<a
+  class="pwa-install-button"
+  href="/events-veroeffentlichen/"
+>
+  Events veröffentlichen
+</a>
+<!-- === END BLOCK: HEADER PUBLISH CTA (link to publish page) === -->
+
   </div>
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
@@ -127,65 +132,39 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
         </div>
     </div>
 
-  <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (FINAL CONTENT) ===
-Zweck: Finaler Modal-Content "Events veröffentlichen" (kurz, scanbar, ohne Tariftabelle).
+  <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (REDUCED / ACTION-FIRST) ===
+Zweck: Modal ist optional; führt sofort zur Aktionsseite + bietet nur sekundäre Links.
 Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</template> Block.
 === -->
 <template id="locations-modal-template">
   <div class="modal-overlay" data-modal-overlay>
     <div class="modal-card" role="dialog" aria-modal="true" aria-label="Events veröffentlichen">
       <div class="modal-header">
-        <h2 class="modal-title">Events veröffentlichen auf Bocholt erleben</h2>
+        <h2 class="modal-title">Events veröffentlichen</h2>
         <button type="button" class="modal-close" data-modal-close aria-label="Schließen">×</button>
       </div>
 
       <div class="modal-body">
-        <!-- Intro -->
         <p>
-          Bocholt erleben ist eine lokale Plattform für Veranstaltungen in Bocholt. Besucher finden hier aktuelle Events
-          aus Gastronomie, Kultur, Vereinen und Initiativen – übersichtlich, aktuell und ohne Werbechaos.
+          Starte hier direkt mit der Veröffentlichung deiner Events.
         </p>
 
-        <!-- Mehrwert (bullets statt Textwand) -->
-        <ul class="locations-benefits" aria-label="Vorteile für Locations">
-          <li>Lokale Sichtbarkeit für deine Events in Bocholt</li>
-          <li>Übersichtliche Darstellung statt Social-Media-Rauschen</li>
-          <li>Gleichwertige Darstellung aller Events</li>
-          <li>Gepflegt, aktuell und qualitativ hochwertig</li>
-        </ul>
-
-        <!-- Prinzip -->
-        <p>
-          So funktioniert’s: Du reichst deine Events ein – wir veröffentlichen sie im Event-Feed. Alle Events erscheinen
-          gleichwertig und übersichtlich.
-        </p>
-
-        <!-- Kosten-Prinzip (ohne Tariftabelle) -->
-        <p>
-          Die Nutzung ist kostenpflichtig, damit die Plattform dauerhaft gepflegt, aktuell und hochwertig bleibt.
-          Der Einstieg ist <strong>ab 9,99&nbsp;€ pro Monat</strong> möglich und richtet sich danach, wie viele Events ihr veröffentlicht.
-        </p>
-
-        <!-- Fairness-Statement -->
-        <p>
-          Es gibt <strong>keine Werbung</strong>, <strong>keine bezahlten Hervorhebungen</strong> und <strong>keine Bevorzugung durch Design</strong>.
-          Alle Events erscheinen gleichwertig und übersichtlich.
-        </p>
-
-        <!-- CTA -->
         <div class="modal-cta">
-          <a
-            class="modal-cta-button"
-            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Events%20ver%C3%B6ffentlichen"
-          >
+          <a class="modal-cta-button" href="/events-veroeffentlichen/">
             Events veröffentlichen
           </a>
         </div>
+
+        <p style="margin-top: 14px; opacity: 0.85;">
+          <a href="/fuer-veranstalter/">Wie funktioniert das?</a><br>
+          <a href="/ueber/">Mehr über Bocholt erleben</a>
+        </p>
       </div>
     </div>
   </div>
 </template>
-<!-- === END BLOCK: LOCATIONS MODAL TEMPLATE (FINAL CONTENT) === -->
+<!-- === END BLOCK: LOCATIONS MODAL TEMPLATE (REDUCED / ACTION-FIRST) === -->
+
 
 
 
@@ -254,6 +233,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
