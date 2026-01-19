@@ -73,6 +73,92 @@ body {
 }
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 
+/* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) ===
+Zweck: Links nicht mehr "Default-Lila", bessere Lesbarkeit auf Textseiten, konsistente CTAs.
+Umfang: Neue globale Styles + .page Layout + CTA Basis, ohne HTML ändern zu müssen.
+=== */
+
+/* Links: konsistent, nicht lila, klarer Hover/Focus */
+a{
+  color: var(--color-primary);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
+a:visited{
+  color: var(--color-primary); /* kein Default-Lila */
+}
+
+/* Textseiten (ueber, fuer-veranstalter, datenschutz, impressum, events-veroeffentlichen) */
+.page{
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page h1{
+  font-size: 1.35rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 6px 0 10px;
+}
+
+.page h2{
+  font-size: 1.05rem;
+  line-height: 1.25;
+  margin: 18px 0 8px;
+}
+
+.page p{
+  color: var(--color-text-secondary);
+}
+
+.page ul{
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--color-text-secondary);
+}
+
+.page li{
+  margin: 6px 0;
+}
+
+/* CTA Basis: wir verwenden das auf den neuen Seiten über .modal-cta-button */
+.modal-cta-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 14px;
+  border-radius: 12px;
+
+  background: var(--color-primary-muted);
+  border: 1px solid rgba(139,207,74,.45);
+
+  color: var(--color-text-primary);
+  font-weight: 800;
+  text-decoration: none;
+
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.modal-cta-button:hover{
+  text-decoration: none;
+  filter: brightness(0.98);
+}
+
+.modal-cta-button:active{
+  transform: translateY(1px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.08);
+}
+
+/* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) === */
+
+
 /* === BEGIN BLOCK: GLOBAL HEADINGS TYPOGRAPHY ===
 Zweck: Überschriften nutzen dieselbe Schrift wie der Rest der App (keine Serif-Anmutung).
 Umfang: Erzwingt system-ui für h1–h6.
@@ -121,21 +207,41 @@ header {
   color: var(--color-text-primary);
 }
 
-/* Install Button (Utility, bewusst unaufdringlich) */
-.pwa-install-button {
+/* === BEGIN BLOCK: PWA INSTALL BUTTON (button + link compatible) ===
+Zweck: .pwa-install-button ist bei euch Button UND Link; optisch/UX konsistent.
+Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
+=== */
+.pwa-install-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
   background: var(--color-primary-muted);
   color: var(--color-text-primary);
+
   border: 1px solid rgba(139,207,74,.35);
   padding: 7px 10px;
   border-radius: 10px;
+
   font-size: .85rem;
-  font-weight: 600;
+  font-weight: 700;
+
   cursor: pointer;
+  text-decoration: none; /* wichtig für <a> */
+  white-space: nowrap;
 }
 
-.pwa-install-button:hover {
+.pwa-install-button:hover{
   background: rgba(139,207,74,.18);
+  text-decoration: none;
 }
+
+.pwa-install-button:active{
+  transform: translateY(1px);
+}
+/* === END BLOCK: PWA INSTALL BUTTON (button + link compatible) === */
+
 
 /* ============================================
    Intro
@@ -387,9 +493,15 @@ section {
   text-decoration: none;
 }
 
-.event-details-btn:hover {
-  background: #0f3d24;
+/* === BEGIN BLOCK: EVENT CTA HOVER (consistent with primary) ===
+Zweck: Hover bleibt im gleichen Farbsystem (kein Fremd-Dunkelgrün).
+Umfang: Ersetzt nur .event-details-btn:hover.
+=== */
+.event-details-btn:hover{
+  filter: brightness(0.92);
 }
+/* === END BLOCK: EVENT CTA HOVER (consistent with primary) === */
+
 
 /* Location als Link (mobil zuverlässig tappable) */
 .event-location-link{
@@ -906,14 +1018,18 @@ Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
   justify-content: flex-end;
 }
 
-.modal-cta-button {
-  display: inline-block;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  text-decoration: none;
+/* === BEGIN BLOCK: MODAL CTA BUTTON (delegates to global CTA) ===
+Zweck: Verhindert Style-Konflikte; CTA-Design ist global definiert.
+Umfang: Ersetzt nur die lokale .modal-cta-button Definition im Modal-Block.
+=== */
+.modal-cta-button{
+  /* bewusst leer: globale Definition oben ist Single Source of Truth */
+}
+/* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
+
 }
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
