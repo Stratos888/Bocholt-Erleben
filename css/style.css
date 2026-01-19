@@ -785,3 +785,24 @@ body.is-panel-open { overflow: hidden; }
 /* =========================================================
    END: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
    ========================================================= */
+.app-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-logo {
+  width: 28px;
+  height: 28px;
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
