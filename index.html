@@ -170,27 +170,15 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 
     <!-- FOOTER -->
     <footer>
-        <p>© 2025 Bocholt Events Hub | <a href="#impressum">Impressum</a> | <a href="#datenschutz">Datenschutz</a></p>
+        <!-- === BEGIN BLOCK: FOOTER LEGAL LINKS (pages, not anchors) ===
+Zweck: Rechtliches auf eigene Seiten verlinken (stabil, teilbar, professionell).
+Umfang: Ersetzt nur die Linkzeile im Footer.
+=== -->
+<p>© 2025 Bocholt Events Hub | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></p>
+<!-- === END BLOCK: FOOTER LEGAL LINKS (pages, not anchors) === -->
+
         <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for Bocholt</p>
         
-        <!-- IMPRESSUM -->
-        <div id="impressum" style="margin-top: 30px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; font-size: 0.9rem; opacity: 0.8;">
-            <h3>Impressum</h3>
-            <p>
-                <strong>Angaben gemäß § 5 TMG:</strong><br>
-                Mathias Stöckert<br>
-                Gildhaus-Esch 18a<br>
-                46399 Bocholt<br><br>
-                
-                <strong>Kontakt:</strong><br>
-                E-Mail: mathias@bocholt-erleben.de<br><br>
-                
-                <strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</strong><br>
-                Mathias Stöckert<br>
-                Gildhaus-Esch 18a
-            </p>
-        </div>
-    </footer>
 
     <!-- EXTERNAL LIBRARIES -->
     <!-- Alpine.js for reactive UI components -->
@@ -233,6 +221,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
