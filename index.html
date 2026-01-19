@@ -127,46 +127,66 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
         </div>
     </div>
 
-   <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (content moved out of feed) ===
-Zweck: Locations-Mehrwert nicht unter Events verstecken; Anzeige via Modal/Panel.
-Umfang: Ersetzt den bisherigen sichtbaren "FÜR LOCATIONS" <section>-Block im Content.
+  <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (FINAL CONTENT) ===
+Zweck: Finaler Modal-Content "Events veröffentlichen" (kurz, scanbar, ohne Tariftabelle).
+Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</template> Block.
 === -->
 <template id="locations-modal-template">
   <div class="modal-overlay" data-modal-overlay>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Für Locations">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Events veröffentlichen">
       <div class="modal-header">
         <h2 class="modal-title">Events veröffentlichen auf Bocholt erleben</h2>
         <button type="button" class="modal-close" data-modal-close aria-label="Schließen">×</button>
       </div>
 
       <div class="modal-body">
-        <div class="features">
-          <div class="feature-card">
-            <p>Bocholt erleben ist eine lokale Plattform für Veranstaltungen in Bocholt.
-Hier finden Besucher aktuelle Events aus Gastronomie, Kultur, Vereinen und Initiativen – übersichtlich, aktuell und ohne Werbechaos.
+        <!-- Intro -->
+        <p>
+          Bocholt erleben ist eine lokale Plattform für Veranstaltungen in Bocholt. Besucher finden hier aktuelle Events
+          aus Gastronomie, Kultur, Vereinen und Initiativen – übersichtlich, aktuell und ohne Werbechaos.
+        </p>
 
-Locations und Veranstalter können ihre Events bei uns veröffentlichen und sichtbar machen.
-Die Nutzung ist kostenpflichtig, damit die Plattform gepflegt, aktuell und qualitativ hochwertig bleibt.
+        <!-- Mehrwert (bullets statt Textwand) -->
+        <ul class="locations-benefits" aria-label="Vorteile für Locations">
+          <li>Lokale Sichtbarkeit für deine Events in Bocholt</li>
+          <li>Übersichtliche Darstellung statt Social-Media-Rauschen</li>
+          <li>Gleichwertige Darstellung aller Events</li>
+          <li>Gepflegt, aktuell und qualitativ hochwertig</li>
+        </ul>
 
-Der Einstieg ist ab 9,99 € pro Monat möglich und richtet sich danach, wie viele Events ihr veröffentlicht.
-So bleibt das System fair: Wer viele Events veranstaltet, nutzt die Plattform intensiver – wer weniger Events hat, zahlt entsprechend weniger.
+        <!-- Prinzip -->
+        <p>
+          So funktioniert’s: Du reichst deine Events ein – wir veröffentlichen sie im Event-Feed. Alle Events erscheinen
+          gleichwertig und übersichtlich.
+        </p>
 
-Keine Werbung, keine Hervorhebungen, keine Bevorzugung durch Design.
-Alle Events erscheinen gleichwertig und übersichtlich.</p>
-          </div>
-        </div>
+        <!-- Kosten-Prinzip (ohne Tariftabelle) -->
+        <p>
+          Die Nutzung ist kostenpflichtig, damit die Plattform dauerhaft gepflegt, aktuell und hochwertig bleibt.
+          Der Einstieg ist <strong>ab 9,99&nbsp;€ pro Monat</strong> möglich und richtet sich danach, wie viele Events ihr veröffentlicht.
+        </p>
 
+        <!-- Fairness-Statement -->
+        <p>
+          Es gibt <strong>keine Werbung</strong>, <strong>keine bezahlten Hervorhebungen</strong> und <strong>keine Bevorzugung durch Design</strong>.
+          Alle Events erscheinen gleichwertig und übersichtlich.
+        </p>
+
+        <!-- CTA -->
         <div class="modal-cta">
-         <a class="modal-cta-button" href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Location%20werden">
-
-            Location werden
+          <a
+            class="modal-cta-button"
+            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Events%20ver%C3%B6ffentlichen"
+          >
+            Events veröffentlichen
           </a>
         </div>
       </div>
     </div>
   </div>
 </template>
-<!-- === END BLOCK: LOCATIONS MODAL TEMPLATE (content moved out of feed) === -->
+<!-- === END BLOCK: LOCATIONS MODAL TEMPLATE (FINAL CONTENT) === -->
+
 
 
     <!-- FOOTER -->
@@ -234,6 +254,7 @@ Alle Events erscheinen gleichwertig und übersichtlich.</p>
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
