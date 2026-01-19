@@ -1,23 +1,28 @@
-- name: Deploy via SFTP
-  shell: bash
-  env:
-    STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
-    STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
-    STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
-    STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
-  run: |
-    set -e
+name: Deploy to STRATO via SFTP
 
-    lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
-      sftp://$STRATO_FTP_SERVER \
-      -e "
-        set sftp:auto-confirm yes;
-        mkdir -p \"$STRATO_FTP_REMOTE_PATH\";
-        cd \"$STRATO_FTP_REMOTE_PATH\";
-        mirror -R --verbose --only-newer deploy/ .;
-        bye
-      "
+on:
+  push:
+    branches: [ "main" ]
 
+concurrency:
+  group: deploy-strato
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare deploy folder
+        shell: bash
+        run: |
+          set -e
+          rm -rf deploy
+          mkdir -p deploy
+          rsync -a --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/
 
       - name: Validate required secrets
         shell: bash
@@ -71,6 +76,24 @@
 
       - name: Deploy via SFTP
         shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
         run: |
-          lftp -u "${{ secrets.STRATO_FTP_USERNAME }}","${{ secrets.STRATO_FTP_PASSWORD }}" \
-          sftp://${{ secrets.STRATO
+          set -e
+
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
+            "sftp://$STRATO_FTP_SERVER" \
+            -e "
+              set cmd:fail-exit yes;
+              set sftp:auto-confirm yes;
+
+              mkdir -p \"$STRATO_FTP_REMOTE_PATH\";
+              cd \"$STRATO_FTP_REMOTE_PATH\";
+
+              mirror -R --verbose --only-newer deploy/ .;
+
+              bye;
+            "
