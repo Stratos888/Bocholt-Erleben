@@ -146,23 +146,25 @@ const EventCards = {
       });
     });
 
-    // Quick interests: setzen/ergänzen Suche
-    this.quickChips = Array.from(document.querySelectorAll(".quick-interests .chip"));
-    this.quickChips.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const q = (btn.getAttribute("data-q") || "").trim();
-        if (!q) return;
+    /* === BEGIN BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) ===
+   Zweck: Bei Klick auf Quick-Interest-Chip wird die Suche geleert und NUR der Chip-Begriff gesetzt.
+   Umfang: Ersetzt den kompletten Quick-Interests-Click-Handler in ensureFilters().
+=== */
+this.quickChips = Array.from(document.querySelectorAll(".quick-interests .chip"));
+this.quickChips.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const q = (btn.getAttribute("data-q") || "").trim();
+    if (!q) return;
 
-        // Wenn leer: setzen. Wenn schon Text: anhängen (mit Leerzeichen)
-        const current = (this.searchQuery || "").trim();
-        const next = current ? `${current} ${q}` : q;
+    // Immer ersetzen (nicht anhängen)
+    this.searchQuery = q;
+    if (this.searchInput) this.searchInput.value = q;
 
-        this.searchQuery = next;
-        if (this.searchInput) this.searchInput.value = next;
+    this.applyFiltersAndRender();
+  });
+});
+/* === END BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) === */
 
-        this.applyFiltersAndRender();
-      });
-    });
 
     // Initial UI state
     this.updateTimeChipUI();
@@ -359,3 +361,4 @@ const EventCards = {
 };
 
 debugLog("EventCards loaded successfully");
+
