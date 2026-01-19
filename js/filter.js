@@ -183,6 +183,19 @@ const FilterModule = {
         }
     },
 
+    setSearchText(text) {
+    const searchInput = document.getElementById('search-input');
+    const normalized = (text || '').trim();
+
+    this.filters.searchText = normalized.toLowerCase();
+
+    if (searchInput) {
+        searchInput.value = normalized; // ersetzt komplett
+    }
+
+    this.applyFilters();
+},
+
     /**
      * Filter zurücksetzen
      */
