@@ -806,3 +806,116 @@ body.is-panel-open { overflow: hidden; }
   font-weight: 600;
 }
 
+/* === BEGIN BLOCK: HEADER MENU + MODAL STYLES ===
+Zweck: Overflow-Menü und Modal optisch sauber und mobil-tauglich.
+Umfang: Neue Styles für .header-right/.header-menu/* und Modal-Klassen.
+=== */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-menu-button {
+  width: 40px;
+  height: 36px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.header-menu {
+  position: absolute;
+  right: 16px;
+  top: 58px;
+  min-width: 180px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  padding: 6px;
+  display: none;
+  z-index: 50;
+}
+
+.header-menu.is-open {
+  display: block;
+}
+
+.header-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.header-menu-item:hover {
+  background: #f4f4f4;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  z-index: 100;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 680px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 18px;
+  margin: 0;
+}
+
+.modal-close {
+  width: 40px;
+  height: 36px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 14px 16px 18px;
+}
+
+.modal-cta {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-cta-button {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  text-decoration: none;
+}
+/* === END BLOCK: HEADER MENU + MODAL STYLES === */
+
