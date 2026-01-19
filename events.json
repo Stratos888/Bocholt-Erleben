@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "generated_at": "2026-01-14T10:00:00Z",
+    "source": "internal",
+    "count": 12
+  },
+  "events": [
+    {
+      "id": "super-samstag-textilwerk-2026-02-07",
+      "title": "Super-Samstag im Textilwerk Bocholt",
+      "date": "2026-02-07",
+      "time": "15:00–17:00",
+      "location": "Textilwerk Bocholt (Weberei)",
+      "description": "Offene Mitmach-Werkstatt am Samstagnachmittag.",
+      "url": "https://www.bocholt.de/veranstaltungskalender/super-samstag-im-textilwerk-bocholt"
+    },
+    {
+      "id": "bretagne-land-im-meer-2026-02-04",
+      "title": "BRETAGNE – Land im Meer",
+      "date": "2026-02-04",
+      "time": "19:30–22:00",
+      "location": "Städtische Gesamtschule Bocholt",
+      "description": "Multivisionsvortrag über die Bretagne mit Bild, Musik und Live-Kommentar.",
+      "url": "https://www.bocholt.de/veranstaltungskalender/bretagne-land-im-meer"
+    },
+    {
+      "id": "livehautnah-martin-kroner-2026-02-04",
+      "title": "LIVE&HAUTNAH: Martin Kroner",
+      "date": "2026-02-04",
+      "time": "20:00–22:00",
+      "location": "Kulturort Alte Molkerei",
+      "description": "Konzertabend im Rahmen „Live & Hautnah“.",
+      "url": "https://alte-molkerei.info/event/livehautnah-martin-kroner/"
+    },
+    {
+      "id": "violine-und-cello-im-dialog-2026-02-05",
+      "title": "Violine und Cello im Dialog",
+      "date": "2026-02-05",
+      "time": "19:30",
+      "location": "Veranstaltungssaal im LernWerk, Industriestr. 1",
+      "description": "Kammermusikabend für Violine und Violoncello.",
+      "url": "https://www.stadttheater-bocholt.de/programm/violine-und-cello-im-dialog/"
+    },
+    {
+      "id": "die-mitsinger-2026-02-07",
+      "title": "„Die Mitsinger“ – Sing Musikgeschichte!",
+      "date": "2026-02-07",
+      "time": "20:00",
+      "location": "Kulturort Alte Molkerei",
+      "description": "Mitsing-Abend mit bekannten Songs quer durch die Jahrzehnte.",
+      "url": "https://alte-molkerei.info/event/die-mitsinger-sing-musikgeschichte/"
+    },
+    {
+      "id": "behind-beauty-kuratorinnenfuehrung-2026-02-12",
+      "title": "Behind Beauty: Kurator:innenführung durch die Sonderausstellung",
+      "date": "2026-02-12",
+      "time": "18:00",
+      "location": "LWL-Museum Textilwerk (Spinnerei), Industriestraße 5",
+      "description": "Führung durch die Sonderausstellung „Behind Beauty“.",
+      "url": "https://textilwerk.lwl.org/de/veranstaltungen/?id=1096471"
+    },
+    {
+      "id": "super-samstag-textilwerk-2026-02-14",
+      "title": "Super-Samstag im Textilwerk Bocholt",
+      "date": "2026-02-14",
+      "time": "15:00–17:00",
+      "location": "Textilwerk Bocholt (Weberei)",
+      "description": "Offene Mitmach-Werkstatt am Samstagnachmittag.",
+      "url": "https://www.bocholt.de/veranstaltungskalender/super-samstag-im-textilwerk-bocholt"
+    },
+    {
+      "id": "der-kleine-haewelmann-2026-02-20-1500",
+      "title": "Der kleine Häwelmann",
+      "date": "2026-02-20",
+      "time": "15:00",
+      "location": "Aula im August-Vetter-Berufskolleg, Dinxperloer Straße 56",
+      "description": "Kinder- und Jugendtheater (ab 4 Jahren).",
+      "url": "https://www.stadttheater-bocholt.de/programm/der-kleine-haewelmann/"
+    },
+    {
+      "id": "super-samstag-textilwerk-2026-02-21",
+      "title": "Super-Samstag im Textilwerk Bocholt",
+      "date": "2026-02-21",
+      "time": "15:00–17:00",
+      "location": "Textilwerk Bocholt (Weberei)",
+      "description": "Offene Mitmach-Werkstatt am Samstagnachmittag.",
+      "url": "https://www.bocholt.de/veranstaltungskalender/super-samstag-im-textilwerk-bocholt"
+    },
+    {
+      "id": "alternative-night-kaenk-monashee-2026-02-21",
+      "title": "Alternative Night: KÄNK + MONASHEE",
+      "date": "2026-02-21",
+      "time": "20:00",
+      "location": "Kulturort Alte Molkerei",
+      "description": "Alternative-Rock/Metal-Abend mit zwei Bands.",
+      "url": "https://alte-molkerei.info/event/alternative-night-kaenk-monashee/"
+    },
+    {
+      "id": "ungestalten-2026-02-27",
+      "title": "UNGESTALTEN (Politik & Poesie) – Kabarett",
+      "date": "2026-02-27",
+      "time": "20:00–22:00",
+      "location": "Kulturort Alte Molkerei",
+      "description": "Kabarettabend mit Politik & Poesie.",
+      "url": "https://alte-molkerei.info/event/ungestalten-politik-poesie-kabarett-von-sunna-huygen/"
+    },
+    {
+      "id": "super-samstag-textilwerk-2026-02-28",
+      "title": "Super-Samstag im Textilwerk Bocholt",
+      "date": "2026-02-28",
+      "time": "15:00–17:00",
+      "location": "Textilwerk Bocholt (Weberei)",
+      "description": "Offene Mitmach-Werkstatt am Samstagnachmittag.",
+      "url": "https://www.bocholt.de/veranstaltungskalender/super-samstag-im-textilwerk-bocholt"
+    }
+  ]
+}
