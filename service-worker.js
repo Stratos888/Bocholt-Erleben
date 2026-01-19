@@ -46,7 +46,7 @@ self.addEventListener("activate", (event) => {
           }
         })
       );
-      await self.clients.claim();
+      self.clients.claim();
     })()
   );
 });
@@ -125,5 +125,6 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
 
 
