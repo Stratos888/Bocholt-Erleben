@@ -6,7 +6,7 @@
    - Cache Cleanup bei Aktivierung
    ========================================================= */
 
-const VERSION = "2026-01-17-04"; // <-- bei Deployments hochzählen
+const VERSION = "2026-01-17-05"; // <-- bei Deployments hochzählen
 const STATIC_CACHE = `be-static-${VERSION}`;
 const RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
@@ -125,4 +125,5 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
 
