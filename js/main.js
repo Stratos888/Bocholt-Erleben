@@ -1,8 +1,14 @@
+/* === BEGIN BLOCK: MAIN MODULE HEADER (encoding fixed) ===
+Zweck: Lesbare Kommentare/Strings (UTF-8 korrekt).
+Umfang: Ersetzt nur den Dateikopf-Kommentar.
+=== */
 /**
- * MAIN.JS - Haupt-Einstiegspunkt
- * 
- * LÃ¤dt Events und initialisiert alle Module.
+ * MAIN.JS – Haupt-Einstiegspunkt
+ *
+ * Lädt Events und initialisiert alle Module.
  */
+/* === END BLOCK: MAIN MODULE HEADER (encoding fixed) === */
+
 
 const App = {
     events: [],
@@ -13,17 +19,18 @@ const App = {
     async init() {
         debugLog('=== BOCHOLT EVENTS HUB - APP START ===');
 
-        // Check: Ist Airtable konfiguriert?
-        //if (!this.checkConfig()) {
-          //  return;
-        //}
-
         // Detail Panel init
-        if (typeof DetailPanel !== "undefined" && DetailPanel.init) {
-    DetailPanel.init();
+       /* === BEGIN BLOCK: DETAILPANEL INIT (defensive) ===
+Zweck: DetailPanel wird genau einmal initialisiert, wenn verfügbar.
+Umfang: Ersetzt nur den DetailPanel-init Abschnitt.
+=== */
+if (typeof DetailPanel !== "undefined" && typeof DetailPanel.init === "function") {
+  DetailPanel.init();
 } else {
-    console.warn("DetailPanel not available – details.js not loaded or has an error.");
+  console.warn("DetailPanel not available – details.js not loaded or has an error.");
 }
+/* === END BLOCK: DETAILPANEL INIT (defensive) === */
+
 
 
         // Loading anzeigen
@@ -31,9 +38,20 @@ const App = {
 
         // Events von Airtable laden
         try {
-            const response = await fetch('/data/events.json');
+            /* === BEGIN BLOCK: EVENTS FETCH (robust) ===
+Zweck: Sauberes Error-Handling bei fehlender/kaputter events.json.
+Umfang: Ersetzt nur den fetch/parse Block in App.init().
+=== */
+const response = await fetch('/data/events.json', { cache: "no-store" });
+
+if (!response.ok) {
+  throw new Error(`events.json load failed: ${response.status} ${response.statusText}`);
+}
+
 const data = await response.json();
-this.events = data.events;
+this.events = Array.isArray(data?.events) ? data.events : [];
+/* === END BLOCK: EVENTS FETCH (robust) === */
+
 
 
             if (this.events.length === 0) {
@@ -78,40 +96,6 @@ this.events = data.events;
     },
 
     /**
-     * Config-Check: Sind API Keys gesetzt?
-     */
-    checkConfig() {
-        const { apiKey, baseId } = CONFIG.airtable;
-
-        if (apiKey === 'YOUR_AIRTABLE_API_KEY' || baseId === 'YOUR_BASE_ID') {
-            this.showConfigError();
-            return false;
-        }
-
-        return true;
-    },
-
-    /**
-     * Config-Fehler anzeigen
-     */
-    showConfigError() {
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.innerHTML = `
-                <div class="error-message">
-                    <h3>âš™ï¸ Konfiguration fehlt!</h3>
-                    <p>Bitte trage deine Airtable API-Zugangsdaten in <code>js/config.js</code> ein:</p>
-                    <ul style="text-align: left; margin: 20px auto; max-width: 400px;">
-                        <li>Airtable API Key</li>
-                        <li>Base ID</li>
-                    </ul>
-                    <p><small>Siehe Anleitung in der README.md</small></p>
-                </div>
-            `;
-        }
-    },
-
-    /**
      * Loading Indicator
      */
     showLoading(show) {
@@ -129,7 +113,7 @@ this.events = data.events;
         if (loadingEl) {
             loadingEl.innerHTML = `
                 <div class="info-message">
-                    <p>ðŸ“­ Aktuell sind keine Events verfÃ¼gbar.</p>
+                    <p>📭­ Aktuell sind keine Events verfÃ¼gbar.</p>
                     <p><small>Bald gibt es hier spannende Events aus Bocholt!</small></p>
                 </div>
             `;
@@ -145,7 +129,7 @@ this.events = data.events;
         if (loadingEl) {
             loadingEl.innerHTML = `
                 <div class="error-message">
-                    <p>âš ï¸ ${message}</p>
+                    <p>⚠️ ${message}</p>
                 </div>
             `;
             loadingEl.style.display = 'flex';
@@ -161,3 +145,4 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
