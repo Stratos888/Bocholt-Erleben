@@ -5,7 +5,7 @@
  * - Location-Dropdown entfernt
  * - Location-Klick führt zur Homepage (via Locations mapping), Fallback Maps
  * - Zeit-Chips: all / today / weekend / soon
- * - Quick-Interests: setzen/ergänzen Suche
+ * - Quick-Interests: setzen/ersetzen Suche (kein Append)
  */
 
 /* ---------- Date Helpers ---------- */
@@ -45,13 +45,17 @@ function isSameDay(a, b) {
   );
 }
 
+/* === BEGIN BLOCK: WEEKEND RANGE (next weekend, robust) ===
+Zweck: Wochenende-Chip zeigt das nächste anstehende Wochenende (Sa+So).
+Umfang: Ersetzt getNextWeekendRange().
+=== */
 function getNextWeekendRange(today) {
-  // Weekend = Samstag+Sonntag der aktuellen Woche (oder nächstes, falls vorbei)
   const d = new Date(today);
   d.setHours(0, 0, 0, 0);
 
   const day = d.getDay(); // 0 So ... 6 Sa
   const daysUntilSat = (6 - day + 7) % 7;
+
   const saturday = addDays(d, daysUntilSat);
   const sunday = addDays(saturday, 1);
 
@@ -61,9 +65,9 @@ function getNextWeekendRange(today) {
   const end = new Date(sunday);
   end.setHours(23, 59, 59, 999);
 
-  // Wenn heute Sonntag und schon vorbei? (eigentlich nicht relevant bei 00:00)
   return { start, end };
 }
+/* === END BLOCK: WEEKEND RANGE (next weekend, robust) === */
 
 /* ---------- Bucketing (für Gruppenüberschriften) ---------- */
 function getEventBucket(event) {
@@ -85,9 +89,41 @@ function getEventBucket(event) {
   return "later";
 }
 
-function sortByDateAsc(a, b) {
-  return parseISODateLocal(a.date) - parseISODateLocal(b.date);
+/* === BEGIN BLOCK: SORT (date + time) ===
+Zweck: Stabile Sortierung nach Datum und optional Uhrzeit (besseres UX).
+Umfang: Ersetzt sortByDateAsc().
+=== */
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr) return null;
+  const m = String(timeStr).trim().match(/^(\d{1,2})[:.](\d{2})/);
+  if (!m) return null;
+  const hh = Number(m[1]);
+  const mm = Number(m[2]);
+  if (!Number.isFinite(hh) || !Number.isFinite(mm)) return null;
+  return hh * 60 + mm;
 }
+
+function sortByDateAsc(a, b) {
+  const da = parseISODateLocal(a?.date);
+  const db = parseISODateLocal(b?.date);
+  if (!da && !db) return 0;
+  if (!da) return 1;
+  if (!db) return -1;
+
+  const diff = da - db;
+  if (diff !== 0) return diff;
+
+  // Same day: sort by time if present
+  const ta = parseTimeToMinutes(a?.time);
+  const tb = parseTimeToMinutes(b?.time);
+
+  if (ta == null && tb == null) return 0;
+  if (ta == null) return 1; // events without time go after timed ones
+  if (tb == null) return -1;
+
+  return ta - tb;
+}
+/* === END BLOCK: SORT (date + time) === */
 
 /* ---------- Event Cards ---------- */
 const EventCards = {
@@ -131,6 +167,12 @@ const EventCards = {
     if (this.searchInput) {
       this.searchInput.addEventListener("input", () => {
         this.searchQuery = this.searchInput.value.trim();
+
+        // If user types manually, clear quick-chip pressed state
+        if (this.quickChips?.length) {
+          this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
+        }
+
         this.applyFiltersAndRender();
       });
     }
@@ -146,25 +188,30 @@ const EventCards = {
       });
     });
 
-    /* === BEGIN BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) ===
-   Zweck: Bei Klick auf Quick-Interest-Chip wird die Suche geleert und NUR der Chip-Begriff gesetzt.
-   Umfang: Ersetzt den kompletten Quick-Interests-Click-Handler in ensureFilters().
+    /* === BEGIN BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) + PRESSED STATE ===
+Zweck: Quick-Interest-Chip ersetzt die Suche (kein Append) und setzt pressed-state (A11y/UX).
+Umfang: Ersetzt den kompletten Quick-Interests-Click-Handler in ensureFilters().
 === */
-this.quickChips = Array.from(document.querySelectorAll(".quick-interests .chip"));
-this.quickChips.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const q = (btn.getAttribute("data-q") || "").trim();
-    if (!q) return;
+    this.quickChips = Array.from(document.querySelectorAll(".quick-interests .chip"));
+    this.quickChips.forEach((btn) => {
+      btn.setAttribute("aria-pressed", "false");
 
-    // Immer ersetzen (nicht anhängen)
-    this.searchQuery = q;
-    if (this.searchInput) this.searchInput.value = q;
+      btn.addEventListener("click", () => {
+        const q = (btn.getAttribute("data-q") || "").trim();
+        if (!q) return;
 
-    this.applyFiltersAndRender();
-  });
-});
-/* === END BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) === */
+        // pressed-state (nur einer aktiv)
+        this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
 
+        // Immer ersetzen (nicht anhängen)
+        this.searchQuery = q;
+        if (this.searchInput) this.searchInput.value = q;
+
+        this.applyFiltersAndRender();
+      });
+    });
+/* === END BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) + PRESSED STATE === */
 
     // Initial UI state
     this.updateTimeChipUI();
@@ -229,11 +276,35 @@ this.quickChips.forEach((btn) => {
   },
 
   /* ---------- Groups ---------- */
+
+  /* === BEGIN BLOCK: GROUP RENDERING (filter-aware, cleaner UX) ===
+Zweck: Gruppentitel passen zum aktiven Zeitfilter; weniger visuelles Rauschen.
+Umfang: Ersetzt renderGroups(events).
+=== */
   renderGroups(events) {
+    this.container.innerHTML = "";
+
+    // Wenn ein Zeitfilter aktiv ist (nicht "all"), rendere eine einzige Gruppe
+    if (this.activeTime && this.activeTime !== "all") {
+      const titleMap = {
+        today: "Heute",
+        weekend: "Wochenende",
+        soon: "Demnächst"
+      };
+      const title = titleMap[this.activeTime] || "Events";
+
+      if (events.length) {
+        this.renderGroup(title, events);
+        return;
+      }
+
+      this.renderEmptyState();
+      return;
+    }
+
+    // Default: All -> Bucket groups
     const groups = { today: [], week: [], upcoming: [], later: [] };
     events.forEach((e) => groups[getEventBucket(e)]?.push(e));
-
-    this.container.innerHTML = "";
 
     this.renderGroup("Heute", groups.today);
     this.renderGroup("Diese Woche", groups.week);
@@ -241,29 +312,10 @@ this.quickChips.forEach((btn) => {
     this.renderGroup("Später", groups.later);
 
     if (!this.container.children.length) {
-      const wrap = document.createElement("div");
-      wrap.className = "empty-state";
-
-      wrap.innerHTML = `
-        <div class="empty-state__card">
-          <h3 class="empty-state__title">Keine Treffer</h3>
-          <p class="empty-state__text">
-            Probier einen anderen Suchbegriff oder setz die Filter zurück.
-          </p>
-          <button type="button" class="empty-state__btn" id="reset-filters-btn">
-            Filter zurücksetzen
-          </button>
-        </div>
-      `;
-
-      this.container.appendChild(wrap);
-
-      const btn = wrap.querySelector("#reset-filters-btn");
-      if (btn) {
-        btn.addEventListener("click", () => this.resetFilters());
-      }
+      this.renderEmptyState();
     }
   },
+  /* === END BLOCK: GROUP RENDERING (filter-aware, cleaner UX) === */
 
   renderGroup(title, list) {
     if (!list.length) return;
@@ -278,13 +330,54 @@ this.quickChips.forEach((btn) => {
     });
   },
 
+  /* === BEGIN BLOCK: EMPTY STATE (reusable) ===
+Zweck: Empty State zentral, damit renderGroups sauber bleibt.
+Umfang: Neue Methode renderEmptyState() im EventCards-Objekt.
+=== */
+  renderEmptyState() {
+    const wrap = document.createElement("div");
+    wrap.className = "empty-state";
+
+    wrap.innerHTML = `
+      <div class="empty-state__card">
+        <h3 class="empty-state__title">Keine Treffer</h3>
+        <p class="empty-state__text">
+          Probier einen anderen Suchbegriff oder setz die Filter zurück.
+        </p>
+        <button type="button" class="empty-state__btn" id="reset-filters-btn">
+          Filter zurücksetzen
+        </button>
+      </div>
+    `;
+
+    this.container.appendChild(wrap);
+
+    const btn = wrap.querySelector("#reset-filters-btn");
+    if (btn) {
+      btn.addEventListener("click", () => this.resetFilters());
+    }
+  },
+  /* === END BLOCK: EMPTY STATE (reusable) === */
+
   resetFilters() {
     this.searchQuery = "";
     this.activeTime = "all";
 
     if (this.searchInput) this.searchInput.value = "";
     this.updateTimeChipUI();
+
+    if (this.quickChips?.length) {
+      this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
+    }
+
     this.applyFiltersAndRender();
+
+    // UX: nach Reset wieder nach oben (fühlt sich "fertig" an)
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
   },
 
   /* ---------- Card ---------- */
@@ -292,6 +385,10 @@ this.quickChips.forEach((btn) => {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
+
+    // A11y/UX: Card ist interaktiv
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Event anzeigen: ${event.title || ""}`);
 
     const dateLabel = event.date ? formatDate(event.date) : "";
     const timeLabel = event.time ? ` · ${this.escape(event.time)}` : "";
@@ -320,7 +417,6 @@ this.quickChips.forEach((btn) => {
              </a>`
           : ""
       }
-
     `;
 
     // Card → DetailPanel (außer beim Klick auf den Location-Link)
@@ -356,5 +452,3 @@ this.quickChips.forEach((btn) => {
 };
 
 debugLog("EventCards loaded successfully");
-
-
