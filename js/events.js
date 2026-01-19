@@ -321,11 +321,6 @@ this.quickChips.forEach((btn) => {
           : ""
       }
 
-      ${
-        event.description
-          ? `<p class="event-description">${this.escape(event.description)}</p>`
-          : ""
-      }
     `;
 
     // Card → DetailPanel (außer beim Klick auf den Location-Link)
@@ -361,4 +356,5 @@ this.quickChips.forEach((btn) => {
 };
 
 debugLog("EventCards loaded successfully");
+
 
