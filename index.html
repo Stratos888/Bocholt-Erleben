@@ -29,9 +29,9 @@
 
 </head>
 <body>
-    <!-- === BEGIN BLOCK: HEADER WITH OVERFLOW MENU (logo/title + install + menu) ===
-Zweck: Header sauber halten (nur Install sichtbar), weitere Aktionen ins Overflow-Menü.
-Umfang: Ersetzt den kompletten <header class="app-header">...</header> Block.
+<!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
+Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
+Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Menü.
 === -->
 <header class="app-header">
   <div class="header-left">
@@ -50,20 +50,14 @@ Umfang: Ersetzt den kompletten <header class="app-header">...</header> Block.
 
     <button
       type="button"
-      class="locations-cta-button"
+      class="pwa-install-button"
       id="open-locations-modal"
     >
       Events veröffentlichen
     </button>
-
-    <div class="header-menu" id="header-menu" role="menu" aria-hidden="true">
-      <button type="button" class="header-menu-item" id="open-locations-modal" role="menuitem">
-        Für Locations
-      </button>
-    </div>
   </div>
 </header>
-<!-- === END BLOCK: HEADER WITH OVERFLOW MENU (logo/title + install + menu) === -->
+<!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
 
 
 
@@ -238,6 +232,7 @@ Umfang: Ersetzt den bisherigen sichtbaren "FÜR LOCATIONS" <section>-Block im Co
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
