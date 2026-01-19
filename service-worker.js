@@ -13,9 +13,13 @@ const RUNTIME_CACHE = `be-runtime-${VERSION}`;
 // Minimal: Manifest + Icons (App-Shell kommt über SWR)
 const STATIC_ASSETS = [
   "/manifest.json",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png"
+  "/icons/app/icon-192.png",
+  "/icons/app/icon-512.png",
+  "/icons/app/icon-180.png",
+  "/icons/favicon/icon-32.png",
+  "/icons/favicon/favicon.ico"
 ];
+
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -121,3 +125,4 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
