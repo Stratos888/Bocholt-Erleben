@@ -52,13 +52,17 @@ jobs:
           echo "REMOTE_PATH endswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == */ ]] && echo yes || echo no)"
           echo "REMOTE_PATH startswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == /* ]] && echo yes || echo no)"
 
+command -v ssh
+ls -l /usr/bin/ssh
+
           lftp -u "${STRATO_FTP_USERNAME}","${STRATO_FTP_PASSWORD}" "sftp://${STRATO_FTP_SERVER}" -e "
             set cmd:fail-exit yes;
             set net:max-retries 1;
             set net:reconnect-interval-base 2;
 
             set sftp:auto-confirm yes;
-            set sftp:connect-program \"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
+           set sftp:connect-program "/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
+
 
             echo '--- SERVER ROOT (pwd/ls) ---';
             pwd;
@@ -87,12 +91,16 @@ jobs:
         run: |
           set -e
 
+command -v ssh
+ls -l /usr/bin/ssh
+
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             "sftp://$STRATO_FTP_SERVER" \
             -e "
               set cmd:fail-exit yes;
               set sftp:auto-confirm yes;
-              set sftp:connect-program \"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
+              set sftp:connect-program "/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
+
 
               mkdir -p \"$STRATO_FTP_REMOTE_PATH\";
               cd \"$STRATO_FTP_REMOTE_PATH\";
