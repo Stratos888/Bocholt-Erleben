@@ -89,7 +89,7 @@ hide() {
              target="_blank"
              rel="noopener noreferrer"
              class="detail-link-btn">
-            Zur Website
+            Zum Event
           </a>
         </div>
       ` : ""}
@@ -104,3 +104,4 @@ hide() {
 };
 
 debugLog("DetailPanel loaded");
+
