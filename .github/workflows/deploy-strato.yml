@@ -7,41 +7,6 @@ on:
 concurrency:
   group: deploy-strato
   cancel-in-progress: true
-- name: Debug remote path (SFTP)
-  shell: bash
-  env:
-    STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
-    STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
-    STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
-    STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
-  run: |
-    set -euo pipefail
-
-    echo "REMOTE_PATH length: ${#STRATO_FTP_REMOTE_PATH}"
-    echo "REMOTE_PATH endswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == */ ]] && echo yes || echo no)"
-    echo "REMOTE_PATH startswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == /* ]] && echo yes || echo no)"
-
-    lftp -u "${STRATO_FTP_USERNAME}","${STRATO_FTP_PASSWORD}" "sftp://${STRATO_FTP_SERVER}" -e "
-      set cmd:fail-exit yes;
-      set net:max-retries 1;
-      set net:reconnect-interval-base 2;
-
-      echo '--- SERVER ROOT (pwd/ls) ---';
-      pwd;
-      cls -la;
-
-      echo '--- TRY cd to REMOTE_PATH ---';
-      cd \"${STRATO_FTP_REMOTE_PATH}\";
-      pwd;
-      cls -la;
-
-      echo '--- CHECK entries css/data/js (type hints) ---';
-      cls -la css || true;
-      cls -la data || true;
-      cls -la js || true;
-
-      bye;
-    "
 
 jobs:
   deploy:
@@ -68,17 +33,49 @@ jobs:
           test -n "${{ secrets.STRATO_FTP_REMOTE_PATH }}" || (echo "Missing STRATO_FTP_REMOTE_PATH" && exit 1)
 
       - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Debug remote path (SFTP)
+        shell: bash
+        env:
+          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+
+          echo "REMOTE_PATH length: ${#STRATO_FTP_REMOTE_PATH}"
+          echo "REMOTE_PATH endswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == */ ]] && echo yes || echo no)"
+          echo "REMOTE_PATH startswith '/': $([[ "${STRATO_FTP_REMOTE_PATH}" == /* ]] && echo yes || echo no)"
+
+          lftp -u "${STRATO_FTP_USERNAME}","${STRATO_FTP_PASSWORD}" "sftp://${STRATO_FTP_SERVER}" -e "
+            set cmd:fail-exit yes;
+            set net:max-retries 1;
+            set net:reconnect-interval-base 2;
+
+            echo '--- SERVER ROOT (pwd/ls) ---';
+            pwd;
+            cls -la;
+
+            echo '--- TRY cd to REMOTE_PATH ---';
+            cd \"${STRATO_FTP_REMOTE_PATH}\";
+            pwd;
+            cls -la;
+
+            echo '--- CHECK entries css/data/js (type hints) ---';
+            cls -la css || true;
+            cls -la data || true;
+            cls -la js || true;
+
+            bye;
+          "
 
       - name: Deploy via SFTP
         shell: bash
         run: |
           lftp -u "${{ secrets.STRATO_FTP_USERNAME }}","${{ secrets.STRATO_FTP_PASSWORD }}" \
-          sftp://${{ secrets.STRATO_FTP_SERVER }} \
-          -e "
-            set sftp:auto-confirm yes;
-            mkdir -p ${{ secrets.STRATO_FTP_REMOTE_PATH }};
-            cd ${{ secrets.STRATO_FTP_REMOTE_PATH }};
-            mirror -R --verbose --only-newer deploy/ .;
-            bye
-          "
+          sftp://${{ secrets.STRATO
