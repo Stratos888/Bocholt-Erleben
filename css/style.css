@@ -60,7 +60,7 @@
   --space-5: var(--space-xl);
 }
 
-body {
+
 /* === BEGIN BLOCK: GLOBAL TYPOGRAPHY BASE ===
 Zweck: Einheitliche System-Schrift für die gesamte App (App-Standard 2025).
 Umfang: Ersetzt fehlerhafte body-Definition inkl. font-family.
@@ -73,11 +73,16 @@ body {
 }
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 
-
-  line-height: 1.55;
-  color: var(--color-text-primary);
-  background: var(--color-background);
+/* === BEGIN BLOCK: GLOBAL HEADINGS TYPOGRAPHY ===
+Zweck: Überschriften nutzen dieselbe Schrift wie der Rest der App (keine Serif-Anmutung).
+Umfang: Erzwingt system-ui für h1–h6.
+=== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  font-weight: 600;
 }
+/* === END BLOCK: GLOBAL HEADINGS TYPOGRAPHY === */
+
 
 /* Accessibility */
 :focus-visible {
@@ -909,6 +914,7 @@ Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
   text-decoration: none;
 }
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
