@@ -1,6 +1,6 @@
 {
   "name": "Bocholt erleben",
-  "short_name": "Bocholt",
+  "short_name": "Bocholt erleben",
   "description": "Aktuelle Veranstaltungen in Bocholt: Konzerte, Kultur, Kneipen-Events und mehr.",
   "start_url": "/",
   "display": "standalone",
