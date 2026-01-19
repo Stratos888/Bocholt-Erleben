@@ -57,6 +57,9 @@ jobs:
             set net:max-retries 1;
             set net:reconnect-interval-base 2;
 
+            set sftp:auto-confirm yes;
+            set sftp:connect-program \"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
+
             echo '--- SERVER ROOT (pwd/ls) ---';
             pwd;
             cls -la;
@@ -89,6 +92,7 @@ jobs:
             -e "
               set cmd:fail-exit yes;
               set sftp:auto-confirm yes;
+              set sftp:connect-program \"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\";
 
               mkdir -p \"$STRATO_FTP_REMOTE_PATH\";
               cd \"$STRATO_FTP_REMOTE_PATH\";
