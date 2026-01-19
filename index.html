@@ -29,21 +29,45 @@
 
 </head>
 <body>
-    <!-- HEADER -->
-  <header class="app-header">
-   <div class="header-left">
+    <!-- === BEGIN BLOCK: HEADER WITH OVERFLOW MENU (logo/title + install + menu) ===
+Zweck: Header sauber halten (nur Install sichtbar), weitere Aktionen ins Overflow-Menü.
+Umfang: Ersetzt den kompletten <header class="app-header">...</header> Block.
+=== -->
+<header class="app-header">
+  <div class="header-left">
     <img
       src="/icons/app/icon-192.png"
       alt="Bocholt erleben Logo"
       class="app-logo"
     >
     <span class="app-title">Bocholt erleben</span>
+  </div>
 
+  <div class="header-right">
     <button type="button" class="pwa-install-button">
       App installieren
     </button>
+
+    <button
+      type="button"
+      class="header-menu-button"
+      id="header-menu-button"
+      aria-label="Menü"
+      aria-haspopup="menu"
+      aria-expanded="false"
+    >
+      ⋯
+    </button>
+
+    <div class="header-menu" id="header-menu" role="menu" aria-hidden="true">
+      <button type="button" class="header-menu-item" id="open-locations-modal" role="menuitem">
+        Für Locations
+      </button>
+    </div>
   </div>
 </header>
+<!-- === END BLOCK: HEADER WITH OVERFLOW MENU (logo/title + install + menu) === -->
+
 
 
 
@@ -112,55 +136,45 @@
         </div>
     </div>
 
-    <!-- FÜR LOCATIONS -->
-    <section>
-        <h2>Für Locations: Einfach. Automatisch. Kostenlos.</h2>
+   <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (content moved out of feed) ===
+Zweck: Locations-Mehrwert nicht unter Events verstecken; Anzeige via Modal/Panel.
+Umfang: Ersetzt den bisherigen sichtbaren "FÜR LOCATIONS" <section>-Block im Content.
+=== -->
+<template id="locations-modal-template">
+  <div class="modal-overlay" data-modal-overlay>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Für Locations">
+      <div class="modal-header">
+        <h2 class="modal-title">Für Locations: Einfach. Automatisch. Kostenlos.</h2>
+        <button type="button" class="modal-close" data-modal-close aria-label="Schließen">×</button>
+      </div>
+
+      <div class="modal-body">
         <div class="features">
-            <div class="feature-card">
-                <h3>⚡ Zero Aufwand</h3>
-                <p>Schick uns deine Events per E-Mail, WhatsApp oder Foto. Wir kümmern uns um den Rest. Kein Login, kein kompliziertes Backend.</p>
-            </div>
-            <div class="feature-card">
-                <h3>🎯 Mehr Sichtbarkeit</h3>
-                <p>Deine Events erreichen alle Bocholt-Besucher auf einer zentralen Plattform. Keine Events gehen mehr unter.</p>
-            </div>
-            <div class="feature-card">
-                <h3>💰 100% Kostenlos</h3>
-                <p>Keine Gebühren, keine versteckten Kosten. Wir wollen Bocholts Event-Szene sichtbarer machen – für alle.</p>
-            </div>
+          <div class="feature-card">
+            <h3>⚡ Zero Aufwand</h3>
+            <p>Schick uns deine Events per E-Mail, WhatsApp oder Foto. Wir kümmern uns um den Rest. Kein Login, kein kompliziertes Backend.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🎯 Mehr Sichtbarkeit</h3>
+            <p>Deine Events erreichen alle Bocholt-Besucher auf einer zentralen Plattform. Keine Events gehen mehr unter.</p>
+          </div>
+          <div class="feature-card">
+            <h3>💰 100% Kostenlos</h3>
+            <p>Keine Gebühren, keine versteckten Kosten. Wir wollen Bocholts Event-Szene sichtbarer machen – für alle.</p>
+          </div>
         </div>
-    </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="how-it-works">
-        <h2>So funktioniert's</h2>
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Event einreichen</h3>
-                <p>Schick uns dein Event in beliebigem Format per E-Mail</p>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Wir veröffentlichen</h3>
-                <p>Dein Event erscheint automatisch im Kalender</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Besucher kommen</h3>
-                <p>Bocholter finden dein Event auf einen Blick</p>
-            </div>
+        <div class="modal-cta">
+          <a class="modal-cta-button" href="mailto:DEINE-EMAIL@DOMAIN.DE?subject=Bocholt%20erleben%20-%20Location%20werden">
+            Location werden
+          </a>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</template>
+<!-- === END BLOCK: LOCATIONS MODAL TEMPLATE (content moved out of feed) === -->
 
-    <!-- CONTACT -->
-    <section class="contact">
-        <h2>Location werden?</h2>
-        <div class="contact-info">
-            <p>Interessiert deine Events hier zu listen?<br>Meld dich einfach bei uns:</p>
-            <a href="mailto:mathias@bocholt-erleben.de" class="contact-email">mathias@bocholt-erleben.de</a>
-        </div>
-    </section>
 
     <!-- FOOTER -->
     <footer>
@@ -197,6 +211,7 @@
 <script src="/js/pwa-install.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/seo-schema.js"></script>
+<script src="/js/locations-modal.js" defer></script>
 
 
     <!-- PWA Service Worker Registration -->
@@ -226,6 +241,7 @@
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
