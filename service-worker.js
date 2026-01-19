@@ -6,19 +6,24 @@
    - Cache Cleanup bei Aktivierung
    ========================================================= */
 
-const VERSION = "2026-01-17-05"; // <-- bei Deployments hochzählen
+const VERSION = "2026-01-17-06"; // <-- bei Deployments hochzählen
 const STATIC_CACHE = `be-static-${VERSION}`;
 const RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
 // Minimal: Manifest + Icons (App-Shell kommt über SWR)
 const STATIC_ASSETS = [
-  "/manifest.json",
-  "/icons/app/icon-192.png",
-  "/icons/app/icon-512.png",
-  "/icons/app/icon-180.png",
-  "/icons/favicon/icon-32.png",
-  "/icons/favicon/favicon.ico"
+  '/',
+  '/index.html',
+  '/manifest.json',
+
+  '/icons/app/icon-180.png',
+  '/icons/app/icon-192.png',
+  '/icons/app/icon-512.png',
+
+  '/icons/favicon/favicon.ico',
+  '/icons/favicon/icon-32.png'
 ];
+
 
 
 self.addEventListener("install", (event) => {
@@ -125,6 +130,7 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
 
 
 
