@@ -32,12 +32,11 @@ jobs:
           test -n "${{ secrets.STRATO_FTP_PASSWORD }}" || (echo "Missing STRATO_FTP_PASSWORD" && exit 1)
           test -n "${{ secrets.STRATO_FTP_REMOTE_PATH }}" || (echo "Missing STRATO_FTP_REMOTE_PATH" && exit 1)
 
-            - name: Install lftp + ssh client
+      - name: Install lftp + ssh client
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp openssh-client
-
 
       - name: Debug remote path (SFTP)
         shell: bash
