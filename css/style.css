@@ -785,15 +785,36 @@ body.is-panel-open { overflow: hidden; }
 /* =========================================================
    END: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
    ========================================================= */
+
+/* === BEGIN BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) ===
+Zweck: Header: Mobile 2 Zeilen (Inhalt oben, Aktionen unten), Desktop 1 Zeile. Modal bleibt.
+Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
+=== */
 .app-header {
   padding: 10px 16px;
   border-bottom: 1px solid #e0e0e0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap; /* Mobile: erlaubt zweite Zeile */
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1 1 auto;
+  min-width: 240px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 100%;   /* Mobile: zweite Zeile */
+  justify-content: flex-start;
 }
 
 .app-logo {
@@ -806,58 +827,19 @@ body.is-panel-open { overflow: hidden; }
   font-weight: 600;
 }
 
-/* === BEGIN BLOCK: HEADER MENU + MODAL STYLES ===
-Zweck: Overflow-Menü und Modal optisch sauber und mobil-tauglich.
-Umfang: Neue Styles für .header-right/.header-menu/* und Modal-Klassen.
-=== */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Desktop/Tablet: alles in einer Zeile */
+@media (min-width: 768px) {
+  .app-header {
+    flex-wrap: nowrap;
+  }
+
+  .header-right {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
 }
 
-.header-menu-button {
-  width: 40px;
-  height: 36px;
-  border: 1px solid #e0e0e0;
-  background: #fff;
-  border-radius: 10px;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.header-menu {
-  position: absolute;
-  right: 16px;
-  top: 58px;
-  min-width: 180px;
-  border: 1px solid #e0e0e0;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-  padding: 6px;
-  display: none;
-  z-index: 50;
-}
-
-.header-menu.is-open {
-  display: block;
-}
-
-.header-menu-item {
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border: 0;
-  background: transparent;
-  border-radius: 10px;
-  font-size: 14px;
-}
-
-.header-menu-item:hover {
-  background: #f4f4f4;
-}
-
+/* --- Modal (Locations) --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -917,5 +899,7 @@ Umfang: Neue Styles für .header-right/.header-menu/* und Modal-Klassen.
   border: 1px solid #e0e0e0;
   text-decoration: none;
 }
-/* === END BLOCK: HEADER MENU + MODAL STYLES === */
+/* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
+
 
