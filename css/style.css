@@ -177,35 +177,26 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 10px;
 }
 
-/* ============================================
-   HEADER
-   ============================================ */
+/* === BEGIN BLOCK: GLOBAL HEADER BASE (sticky container only) ===
+Zweck: Sticky-Header-Container, ohne Layout/Spacing festzulegen (Layout macht .app-header).
+Umfang: Ersetzt den kompletten bisherigen HEADER-Basisblock (header / .header-content / .logo).
+=== */
 header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--color-surface);
-  border-bottom: 0;
-  padding: 8px 0; /* kompakt, kein Luftpolster */
+
+  /* Layout/Spacing bewusst NICHT hier – das macht .app-header */
+  background: transparent;
+  padding: 0;
+  border: 0;
 }
 
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 44px;
-}
+/* legacy header helpers (aktuell nicht genutzt, aber harmlos beibehalten) */
+.header-content,
+.logo { display: none; }
+/* === END BLOCK: GLOBAL HEADER BASE (sticky container only) === */
 
-.logo {
-  font-size: 1rem;
-  font-weight: 400; /* normaler Schriftschnitt */
-  letter-spacing: 0;
-  color: var(--color-text-primary);
-}
 
 /* === BEGIN BLOCK: PWA INSTALL BUTTON (button + link compatible) ===
 Zweck: .pwa-install-button ist bei euch Button UND Link; optisch/UX konsistent.
@@ -916,54 +907,127 @@ body.is-panel-open { overflow: hidden; }
 Zweck: Header: Mobile 2 Zeilen (Inhalt oben, Aktionen unten), Desktop 1 Zeile. Modal bleibt.
 Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
 === */
+/* === BEGIN BLOCK: APP HEADER (EVENTSITE DNA: modern, calm, recognizable) ===
+Zweck: Header als Eventseiten-Branding (ruhig) + klare CTA-Hierarchie + kompakter Sticky-Header.
+Umfang: Ersetzt NUR die .app-header / .header-left/right / .app-logo/title + Media Query (bis vor Modal).
+=== */
 .app-header {
-  padding: 10px 16px;
-  border-bottom: 1px solid #e0e0e0;
+  /* “tinted” statt reinem Weiß -> moderner + wiedererkennbar */
+  background: rgba(255, 255, 255, 0.90);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 
+  /* einzeilig + kompakt */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap; /* Mobile: erlaubt zweite Zeile */
+  gap: 12px;
+
+  padding: 10px 16px;
+  min-height: 64px;
+
+  /* keine Schatten – nur ruhige Kante */
+  border-bottom: 0;
+  position: relative;
+}
+
+/* Signatur: 2px Akzentlinie unten (Design-DNA für Chips/Cards später) */
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(139, 207, 74, 0.85);
 }
 
 .header-left {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  flex: 1 1 auto;
-  min-width: 240px;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1 1 100%;   /* Mobile: zweite Zeile */
-  justify-content: flex-start;
+  min-width: 0;
 }
 
 .app-logo {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 8px;
 }
 
 .app-title {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Desktop/Tablet: alles in einer Zeile */
-@media (min-width: 768px) {
-  .app-header {
-    flex-wrap: nowrap;
-  }
+.header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
 
-  .header-right {
-    flex: 0 0 auto;
-    justify-content: flex-end;
+/* CTA Hierarchie ohne HTML-Änderung:
+   1. Element (App installieren) = Secondary
+   2. Element (Events veröffentlichen Link) = Primary
+*/
+.header-right > .pwa-install-button {
+  /* Secondary (default) */
+  background: rgba(139, 207, 74, 0.10);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(139, 207, 74, 0.35);
+  font-weight: 650;
+  padding: 9px 12px;
+  border-radius: 12px;
+}
+
+.header-right > .pwa-install-button:hover {
+  background: rgba(139, 207, 74, 0.16);
+}
+
+.header-right > .pwa-install-button:last-child {
+  /* Primary */
+  background: rgba(139, 207, 74, 0.92);
+  border: 1px solid rgba(139, 207, 74, 0.95);
+  color: #0c1a05;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+.header-right > .pwa-install-button:last-child:hover {
+  background: rgba(139, 207, 74, 1);
+}
+
+/* Kompakt-Zustand (wird später per JS bei Scroll gesetzt) */
+.app-header.is-compact {
+  min-height: 48px;
+  padding: 6px 16px;
+}
+
+.app-header.is-compact .app-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+
+.app-header.is-compact .app-title {
+  font-size: 0.98rem;
+}
+
+/* Mobile: Titel darf umbrechen? Nein -> dafür Buttons etwas kompakter */
+@media (max-width: 420px) {
+  .header-right > .pwa-install-button {
+    padding: 8px 10px;
+    font-size: 0.82rem;
   }
 }
+/* === END BLOCK: APP HEADER (EVENTSITE DNA: modern, calm, recognizable) === */
+
 
 /* --- Modal (Locations) --- */
 .modal-overlay {
@@ -1029,6 +1093,7 @@ Umfang: Ersetzt nur die lokale .modal-cta-button Definition im Modal-Block.
 
 }
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
