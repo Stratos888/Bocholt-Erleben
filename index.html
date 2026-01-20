@@ -23,7 +23,12 @@
     <title>Veranstaltungen in Bocholt – aktuelle Events & Termine</title>
     
         <!-- Custom CSS -->
-  <link rel="stylesheet" href="/css/style.css?v=dev-21">
+  <!-- === BEGIN BLOCK: CSS CACHE BUSTING (forces SW/PWA update) ===
+Zweck: Umgeht aggressives Caching von style.css durch Service Worker / PWA.
+Umfang: Ersetzt nur den stylesheet-link.
+=== -->
+<link rel="stylesheet" href="/css/style.css?v=2026-02-04-1">
+<!-- === END BLOCK: CSS CACHE BUSTING (forces SW/PWA update) === -->
 
 
 
@@ -221,6 +226,7 @@ Umfang: Ersetzt nur die Linkzeile im Footer.
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
