@@ -58,6 +58,9 @@
   --space-3: var(--space-md);
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
+
+  /* Layout tokens */
+  --header-h: 64px;  /* Single Source of Truth für Sticky-Offset */
 }
 
 
@@ -179,11 +182,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* === BEGIN BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) ===
 Zweck: <header> wird bei euch direkt als .app-header gestylt. Keine konkurrierenden Position-Styles hier.
-Umfang: Ersetzt den bisherigen GLOBAL HEADER BASE Block vollständig.
+Umfang: Kein sticky hier – sticky sitzt auf .app-header (gleiches Element).
 === */
-header {
-  /* absichtlich leer – Sticky sitzt auf .app-header (gleiches Element) */
-}
+header { /* intentionally empty */ }
 
 /* legacy header helpers (aktuell nicht genutzt, aber harmlos beibehalten) */
 .header-content,
@@ -191,11 +192,9 @@ header {
 /* === END BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) === */
 
 
-
-
 /* === BEGIN BLOCK: PWA INSTALL BUTTON (button + link compatible) ===
 Zweck: .pwa-install-button ist bei euch Button UND Link; optisch/UX konsistent.
-Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
+Umfang: Konsolidierte Basis (wird im Header als Secondary/Primary variiert).
 === */
 .pwa-install-button{
   display: inline-flex;
@@ -207,8 +206,8 @@ Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
   color: var(--color-text-primary);
 
   border: 1px solid rgba(139,207,74,.35);
-  padding: 7px 10px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
 
   font-size: .85rem;
   font-weight: 700;
@@ -216,6 +215,9 @@ Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
   cursor: pointer;
   text-decoration: none; /* wichtig für <a> */
   white-space: nowrap;
+
+  /* wertiger “Button-Film” */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pwa-install-button:hover{
@@ -230,26 +232,29 @@ Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
 
 
 /* ============================================
-   Intro
+   INTRO
    ============================================ */
 .intro {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 20px 8px; /* sehr kompakt */
+
+  /* etwas mehr Luft + klarer Rhythmus */
+  padding: 14px 20px 10px;
 }
 
 .intro h1 {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
   color: var(--color-text-primary);
   margin-bottom: 2px;
 }
 
 .intro p {
-  font-size: .9rem;
+  font-size: .92rem;
   color: var(--color-text-muted);
 }
+
 
 /* ============================================
    SECTIONS
@@ -257,8 +262,11 @@ Umfang: Ersetzt den kompletten .pwa-install-button + hover Block.
 section {
   max-width: 1200px;
   margin: 0 auto;
+
+  /* Default großzügig – spezielle Sektionen überschreiben */
   padding: 44px 20px;
 }
+
 
 /* ============================================
    LOADING & MESSAGES
@@ -304,6 +312,8 @@ section {
   background: #f8d7da;
   color: #721c24;
 }
+
+
 /* ============================================
    EMPTY STATE
    ============================================ */
@@ -344,25 +354,23 @@ section {
   cursor: pointer;
 }
 
+
 /* ============================================
    EVENTS LIST
    ============================================ */
-/* === BEGIN BLOCK: EVENTS SECTION SPACING (accounts for sticky controls) ===
-Zweck: Inhalt startet sichtbar unter Sticky-Header + Sticky-Top-Stack (kein "durchschieben").
-Umfang: Ersetzt nur den .events-section Block.
-=== */
 .events-section {
-  padding-top: 14px;
+  /* enger, weil oben bereits Intro + Top-Stack liegen */
+  padding-top: 12px;
   padding-bottom: 18px;
 }
-/* === END BLOCK: EVENTS SECTION SPACING (accounts for sticky controls) === */
 
 .events-group-title {
-  margin-top: 24px;
+  margin-top: 22px;
   margin-bottom: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--color-text-secondary);
+  letter-spacing: 0.01em;
 }
 
 .event-cards-grid {
@@ -374,7 +382,7 @@ Umfang: Ersetzt nur den .events-section Block.
 /* Card */
 .event-card {
   background: var(--color-surface);
-  border: 0; /* keine border */
+  border: 0;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   padding: 14px var(--space-lg);
@@ -386,14 +394,13 @@ Umfang: Ersetzt nur den .events-section Block.
   transform: scale(0.98);
 }
 
-/* Desktop hover: nur Shadow minimal stärker, keine Bewegung */
+/* Desktop hover */
 @media (hover: hover) and (pointer: fine) {
   .event-card:hover {
     box-shadow: 0 8px 26px rgba(0,0,0,0.08);
   }
 }
 
-/* open-state wird nicht mehr genutzt (keine Expand-Card) */
 .event-card.is-open {
   box-shadow: var(--shadow-card);
   border: 0;
@@ -405,7 +412,7 @@ Umfang: Ersetzt nur den .events-section Block.
 
 .event-title {
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.3;
   color: var(--color-text-primary);
   display: -webkit-box;
@@ -476,12 +483,13 @@ Umfang: Ersetzt nur den .events-section Block.
   display: inline-block;
   margin-top: 8px;
   background: var(--accent);
-  color: #fff;
+  color: #0c1a05;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: .95rem;
-  font-weight: 700;
+  font-weight: 800;
   text-decoration: none;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
 
 /* === BEGIN BLOCK: EVENT CTA HOVER (consistent with primary) ===
@@ -489,7 +497,12 @@ Zweck: Hover bleibt im gleichen Farbsystem (kein Fremd-Dunkelgrün).
 Umfang: Ersetzt nur .event-details-btn:hover.
 === */
 .event-details-btn:hover{
-  filter: brightness(0.92);
+  filter: brightness(0.96);
+  text-decoration: none;
+}
+.event-details-btn:active{
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
 /* === END BLOCK: EVENT CTA HOVER (consistent with primary) === */
 
@@ -498,10 +511,10 @@ Umfang: Ersetzt nur .event-details-btn:hover.
 .event-location-link{
   display: inline-block;
   position: relative;
-  z-index: 2;                 /* liegt über Card-Click-Fläche */
-  pointer-events: auto;       /* wichtig für iOS */
-  touch-action: manipulation; /* schneller Tap */
-  
+  z-index: 2;
+  pointer-events: auto;
+  touch-action: manipulation;
+
   background: none;
   border: 0;
   padding: 0;
@@ -510,7 +523,7 @@ Umfang: Ersetzt nur .event-details-btn:hover.
   font: inherit;
   margin-top: 5px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--color-primary);
   text-decoration: none;
 }
@@ -530,6 +543,7 @@ footer {
   text-align: center;
 }
 
+
 /* ============================================
    RESPONSIVE
    ============================================ */
@@ -544,52 +558,17 @@ footer {
     padding: 28px 16px;
   }
 
-  /* vorher war hier .hero h1 – Intro ist korrekt */
   .intro h1 {
-    font-size: 1.25rem;
+    font-size: 1.22rem;
   }
 }
 
-/* Filters / Search */
-.events-filter {
-  margin: 10px 0 16px;
-}
 
-#location-filter {
-  width: 100%;
-  max-width: 320px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-size: .9rem;
-}
+/* ============================================
+   FILTERS / SEARCH / TOP STACK (Discovery Zone)
+   ============================================ */
 
-/* === BEGIN BLOCK: TOP STACK (search + chips) – no overlap with header ===
-Zweck: Suchfeld/Chips bleiben sauber unter dem Header, ohne dass Cards darunter durchlaufen.
-Umfang: Ersetzt nur den .top-stack Block.
-=== */
-:root{
-  --header-h: 64px; /* sichere Default-Höhe für Sticky-Offset */
-}
-
-/* === BEGIN BLOCK: TOP STACK (sticky under header, no content bleed) ===
-Zweck: Suche/Chips bleiben unter dem Header sticky; Cards dürfen nicht "drunter durch" sichtbar werden.
-Umfang: Ersetzt nur den .top-stack Block.
-=== */
-.top-stack{
-  position: sticky;
-  top: var(--header-h);
-  z-index: 900; /* unter header (1000), über content */
-
-  background: var(--color-background); /* opak */
-  padding: 10px 20px 12px;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
-}
-/* === END BLOCK: TOP STACK (sticky under header, no content bleed) === */
-
-
-
+/* (konsolidiert) events-filter ist der Stack-Container */
 .events-filter{
   display: grid;
   gap: 10px;
@@ -617,7 +596,7 @@ Umfang: Ersetzt nur den .top-stack Block.
 
 #search-filter:focus{
   outline: none;
-  border-color: rgba(139,207,74,.60); /* feiner Rahmen */
+  border-color: rgba(139,207,74,.60);
   box-shadow: 0 0 0 3px rgba(139,207,74,.14);
 }
 
@@ -632,6 +611,23 @@ Umfang: Ersetzt nur den .top-stack Block.
   color: var(--color-text-primary);
 }
 
+/* === BEGIN BLOCK: TOP STACK (sticky under header, unified surface) ===
+Zweck: Suche/Chips als ein zusammenhängender Discovery-Block; kein Drunterrutschen von Cards.
+Umfang: Konsolidiert und ersetzt den bisherigen .top-stack Block.
+=== */
+.top-stack{
+  position: sticky;
+  top: var(--header-h);
+  z-index: 900; /* unter header, über content */
+
+  /* optisch als zusammenhängender Bereich */
+  background: var(--color-background);
+  padding: 12px 20px 14px;
+
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+/* === END BLOCK: TOP STACK (sticky under header, unified surface) === */
+
 .quick-interests,
 .time-chips{
   display: flex;
@@ -644,16 +640,12 @@ Umfang: Ersetzt nur den .top-stack Block.
   scroll-snap-type: x mandatory;
   scroll-padding-left: var(--space-md);
 
-  /* „Anlauf“ links, ohne dass die Leiste optisch nach rechts rutscht */
   padding-left: var(--space-md);
   margin-left: calc(-1 * var(--space-md));
 
-  /* rechts wenig Innenabstand => letzter Chip wirkt „angeschnitten“ */
   padding-right: 2px;
-
   scrollbar-width: none;
 
-  /* Rechter Scroll-Hinweis: deutlich, aber dezent */
   -webkit-mask-image: linear-gradient(
     to right,
     #000 0%,
@@ -670,7 +662,7 @@ Umfang: Ersetzt nur den .top-stack Block.
 
 .quick-interests::-webkit-scrollbar,
 .time-chips::-webkit-scrollbar{
-  display: none; /* WebKit */
+  display: none;
 }
 
 .chip{
@@ -681,7 +673,7 @@ Umfang: Ersetzt nur den .top-stack Block.
   padding: 8px 10px;
   border-radius: 999px;
   font-size: .9rem;
-  font-weight: 500;
+  font-weight: 550;
   cursor: pointer;
   flex: 0 0 auto;
   scroll-snap-align: start;
@@ -702,8 +694,9 @@ Umfang: Ersetzt nur den .top-stack Block.
   background: var(--color-primary-muted);
   border-color: rgba(139,207,74,.55);
   color: var(--color-text-primary);
-  font-weight: 600;
+  font-weight: 650;
 }
+
 
 /* =========================================================
    BEGIN: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
@@ -721,7 +714,7 @@ body.is-panel-open { overflow: hidden; }
 
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
-/* Overlay (Blur nur hier, Panel bleibt crisp) */
+/* Overlay */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
@@ -743,7 +736,6 @@ body.is-panel-open { overflow: hidden; }
 
   max-height: 80vh;
 
-  /* OPAK! (wichtig gegen "milchig/weg") */
   background: var(--color-surface);
 
   border-top-left-radius: 20px;
@@ -811,7 +803,7 @@ body.is-panel-open { overflow: hidden; }
   overscroll-behavior: contain;
 }
 
-/* Sticky Mini Header (spürbar erst bei langen Texten) */
+/* Sticky Mini Header */
 #event-detail-panel .detail-header{
   position: sticky;
   top: 0;
@@ -852,7 +844,7 @@ body.is-panel-open { overflow: hidden; }
   color: rgba(31,41,51,0.92);
 }
 
-/* Meta Box (lime-tint statt grau) */
+/* Meta Box */
 #event-detail-panel .detail-meta{
   margin: 14px 0 12px;
   padding: 12px 14px;
@@ -920,44 +912,39 @@ body.is-panel-open { overflow: hidden; }
    END: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
    ========================================================= */
 
-/* === BEGIN BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) ===
-Zweck: Header: Mobile 2 Zeilen (Inhalt oben, Aktionen unten), Desktop 1 Zeile. Modal bleibt.
-Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
-=== */
-/* === BEGIN BLOCK: APP HEADER (REAL sticky + readable + stable stacking) ===
-Zweck: Header ist wirklich sticky (nicht rausschiebbar), gut lesbar und über allen Inhalten.
-Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
-=== */
-:root{
-  --header-h: 64px; /* Single Source of Truth für den Offset darunter */
-}
 
-.app-header {
-  position: sticky;     /* <- WICHTIG: überschreibt das bisherige relative */
+/* === BEGIN BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) ===
+Zweck: Header ist sticky + wertig; Buttons konsistent; Modal bleibt.
+Umfang: Konsolidiert Header + Modal Styles.
+=== */
+
+/* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
+Zweck: Header bleibt sichtbar, Branding bleibt erkennbar, Buttons drängen nicht den Titel weg.
+Umfang: Single Source of Truth für Header-Layout.
+=== */
+.app-header{
+  position: sticky;
   top: 0;
   z-index: 1000;
-  isolation: isolate;   /* stabiler Stacking Context */
+  isolation: isolate;
 
-  background: rgba(249, 251, 246, 0.96); /* var(--color-background) */
+  background: rgba(249, 251, 246, 0.96);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 
   padding: 10px 16px;
   min-height: var(--header-h);
 
   border-bottom: 1px solid rgba(31,41,51,0.06);
-
-  /* fix für „flacky“ sticky in manchen Composited-Layern */
   transform: translateZ(0);
 }
 
-/* Signatur: Akzentlinie unten */
-.app-header::after {
+.app-header::after{
   content: "";
   position: absolute;
   left: 0;
@@ -967,54 +954,48 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
   background: rgba(139, 207, 74, 0.85);
 }
 
-.header-left {
-  display: inline-flex;
+.header-left{
+  display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
-.app-logo {
+.app-logo{
   width: 30px;
   height: 30px;
   flex: 0 0 auto;
   border-radius: 8px;
 }
 
-.app-title {
-  color: var(--color-text-primary); /* <- Lesbarkeit erzwingen */
+.app-title{
+  color: var(--color-text-primary);
   font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.012em;
   line-height: 1.1;
 
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.header-right {
-  display: inline-flex;
+.header-right{
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
 }
 
-/* Buttons: gleiche Basis, nur Primary/Secondary unterscheidet sich */
+/* Secondary (Installieren) */
 .header-right > .pwa-install-button{
   background: var(--color-primary-muted);
-  color: var(--color-text-primary);
-  border: 1px solid rgba(139,207,74,.35);
-  font-weight: 700;
-  padding: 8px 12px;
-  border-radius: 12px;
+  border-color: rgba(139,207,74,.35);
 }
 
-.header-right > .pwa-install-button:hover{
-  background: rgba(139,207,74,.18);
-}
-
-/* Primary = letzter Button (Events veröffentlichen) */
+/* Primary (Veröffentlichen) */
 .header-right > .pwa-install-button:last-child{
   background: var(--color-primary);
   border-color: rgba(139,207,74,.95);
@@ -1022,25 +1003,17 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
   box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
 
-.header-right > .pwa-install-button:last-child:hover{
-  filter: brightness(0.98);
-}
-
-/* Optionaler Kompaktzustand */
-.app-header.is-compact{
-  --header-h: 52px;
-  padding: 6px 16px;
-}
-
-@media (max-width: 420px){
-  .header-right > .pwa-install-button{
+/* Sehr kleine Screens: Buttons etwas kompakter, Branding bleibt */
+@media (max-width: 360px){
+  .pwa-install-button{
     padding: 8px 10px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+  }
+  .app-title{
+    font-size: 1.0rem;
   }
 }
-/* === END BLOCK: APP HEADER (REAL sticky + readable + stable stacking) === */
-
-
+/* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
 
 
 /* --- Modal (Locations) --- */
@@ -1098,20 +1071,11 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
 
 /* === BEGIN BLOCK: MODAL CTA BUTTON (delegates to global CTA) ===
 Zweck: Verhindert Style-Konflikte; CTA-Design ist global definiert.
-Umfang: Ersetzt nur die lokale .modal-cta-button Definition im Modal-Block.
+Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 === */
 .modal-cta-button{
   /* bewusst leer: globale Definition oben ist Single Source of Truth */
+}
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
-}
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
-
-
-
-
-
-
-
-
-
