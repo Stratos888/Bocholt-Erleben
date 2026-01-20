@@ -177,24 +177,19 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 10px;
 }
 
-/* === BEGIN BLOCK: GLOBAL HEADER BASE (sticky, safe stacking context) ===
-Zweck: Header ist echte Sticky-Ebene und darf nicht "weggeschoben" werden.
+/* === BEGIN BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) ===
+Zweck: <header> wird bei euch direkt als .app-header gestylt. Keine konkurrierenden Position-Styles hier.
 Umfang: Ersetzt den bisherigen GLOBAL HEADER BASE Block vollständig.
 === */
 header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;              /* über allem Inhalt */
-  background: transparent;
-
-  /* wichtig gegen "sticky bricht": keine unerwarteten Layout-Effekte */
-  isolation: isolate;         /* eigener Stacking Context */
+  /* absichtlich leer – Sticky sitzt auf .app-header (gleiches Element) */
 }
 
 /* legacy header helpers (aktuell nicht genutzt, aber harmlos beibehalten) */
 .header-content,
 .logo { display: none; }
-/* === END BLOCK: GLOBAL HEADER BASE (sticky, safe stacking context) === */
+/* === END BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) === */
+
 
 
 
@@ -578,17 +573,21 @@ Umfang: Ersetzt nur den .top-stack Block.
   --header-h: 64px; /* sichere Default-Höhe für Sticky-Offset */
 }
 
+/* === BEGIN BLOCK: TOP STACK (sticky under header, no content bleed) ===
+Zweck: Suche/Chips bleiben unter dem Header sticky; Cards dürfen nicht "drunter durch" sichtbar werden.
+Umfang: Ersetzt nur den .top-stack Block.
+=== */
 .top-stack{
   position: sticky;
   top: var(--header-h);
   z-index: 900; /* unter header (1000), über content */
-  background: var(--color-background);
 
-  /* optische Trennung + "kein Durchscheinen" */
+  background: var(--color-background); /* opak */
   padding: 10px 20px 12px;
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
-/* === END BLOCK: TOP STACK (search + chips) – no overlap with header === */
+/* === END BLOCK: TOP STACK (sticky under header, no content bleed) === */
+
 
 
 .events-filter{
@@ -925,13 +924,21 @@ body.is-panel-open { overflow: hidden; }
 Zweck: Header: Mobile 2 Zeilen (Inhalt oben, Aktionen unten), Desktop 1 Zeile. Modal bleibt.
 Umfang: Ersetzt den bisherigen "HEADER MENU + MODAL STYLES"-Block vollständig.
 === */
-/* === BEGIN BLOCK: APP HEADER (sticky stable + readable + consistent CTAs) ===
-Zweck: Header ist stabil sticky, lesbar, mit konsistenter Button-Komponente (Primary/Secondary).
+/* === BEGIN BLOCK: APP HEADER (REAL sticky + readable + stable stacking) ===
+Zweck: Header ist wirklich sticky (nicht rausschiebbar), gut lesbar und über allen Inhalten.
 Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
 === */
+:root{
+  --header-h: 64px; /* Single Source of Truth für den Offset darunter */
+}
+
 .app-header {
-  /* echte Fläche (nicht "milchig"): Lesbarkeit + keine Durchscheineffekte */
-  background: rgba(249, 251, 246, 0.96);  /* var(--color-background) mit leichtem Tint */
+  position: sticky;     /* <- WICHTIG: überschreibt das bisherige relative */
+  top: 0;
+  z-index: 1000;
+  isolation: isolate;   /* stabiler Stacking Context */
+
+  background: rgba(249, 251, 246, 0.96); /* var(--color-background) */
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
@@ -941,13 +948,11 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
   gap: 12px;
 
   padding: 10px 16px;
-  min-height: 64px;
+  min-height: var(--header-h);
 
-  /* klare Trennung statt Schatten */
   border-bottom: 1px solid rgba(31,41,51,0.06);
-  position: relative;
 
-  /* Fix für manche Browser/Layouts: sticky darf nicht "springen" */
+  /* fix für „flacky“ sticky in manchen Composited-Layern */
   transform: translateZ(0);
 }
 
@@ -977,8 +982,7 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
 }
 
 .app-title {
-  /* Lesbarkeit explizit erzwingen */
-  color: var(--color-text-primary);
+  color: var(--color-text-primary); /* <- Lesbarkeit erzwingen */
   font-size: 1.05rem;
   font-weight: 650;
   letter-spacing: -0.01em;
@@ -996,10 +1000,8 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
   flex: 0 0 auto;
 }
 
-/* Konsistenz: beide Header-Actions nutzen exakt die gleiche Button-Base (.pwa-install-button)
-   Unterschied nur über Primary/Secondary Farben. */
-.header-right > .pwa-install-button {
-  /* Secondary (Base) – bewusst identisch zu globaler .pwa-install-button */
+/* Buttons: gleiche Basis, nur Primary/Secondary unterscheidet sich */
+.header-right > .pwa-install-button{
   background: var(--color-primary-muted);
   color: var(--color-text-primary);
   border: 1px solid rgba(139,207,74,.35);
@@ -1008,46 +1010,36 @@ Umfang: Ersetzt den kompletten APP HEADER Block vollständig.
   border-radius: 12px;
 }
 
-.header-right > .pwa-install-button:hover {
+.header-right > .pwa-install-button:hover{
   background: rgba(139,207,74,.18);
 }
 
-/* Primary = "Events veröffentlichen" (typisch 2. Button) */
-.header-right > .pwa-install-button:last-child {
+/* Primary = letzter Button (Events veröffentlichen) */
+.header-right > .pwa-install-button:last-child{
   background: var(--color-primary);
   border-color: rgba(139,207,74,.95);
   color: #0c1a05;
   box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
 
-.header-right > .pwa-install-button:last-child:hover {
+.header-right > .pwa-install-button:last-child:hover{
   filter: brightness(0.98);
 }
 
-/* Kompakt-Zustand (optional, wenn später via JS genutzt) */
-.app-header.is-compact {
-  min-height: 52px;
+/* Optionaler Kompaktzustand */
+.app-header.is-compact{
+  --header-h: 52px;
   padding: 6px 16px;
 }
 
-.app-header.is-compact .app-logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-}
-
-.app-header.is-compact .app-title {
-  font-size: 1.0rem;
-}
-
-/* Mobile: Buttons kompakter, aber gleiche Form */
-@media (max-width: 420px) {
-  .header-right > .pwa-install-button {
+@media (max-width: 420px){
+  .header-right > .pwa-install-button{
     padding: 8px 10px;
     font-size: 0.82rem;
   }
 }
-/* === END BLOCK: APP HEADER (sticky stable + readable + consistent CTAs) === */
+/* === END BLOCK: APP HEADER (REAL sticky + readable + stable stacking) === */
+
 
 
 
@@ -1114,6 +1106,7 @@ Umfang: Ersetzt nur die lokale .modal-cta-button Definition im Modal-Block.
 
 }
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
