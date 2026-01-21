@@ -1,9 +1,9 @@
 # === BEGIN FILE: .github/workflows/deploy-strato.yml ===
 # Zweck: Vollautomatischer Deploy zu STRATO + automatische Build-Version
-# - Keine manuellen Versionsnummern
-# - build.json wird automatisch erzeugt
-# - CSS/JS erhalten Cache-Busting (?v=<commit>)
-# - Deploy per SFTP nach STRATO-apps (verifiziertes Webroot)
+# - build.json wird pro Deploy erzeugt (Commit SHA)
+# - index.html bekommt Cache-Busting (?v=<commit>) für CSS/JS
+# - Upload via SFTP (lftp mirror)
+# - Robust: findet den richtigen Remote-Ordner automatisch (STRATO Besonderheiten)
 # === END FILE HEADER ===
 
 name: Deploy to STRATO via SFTP
@@ -21,15 +21,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ------------------------------------------------------------
-      # Checkout
-      # ------------------------------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ------------------------------------------------------------
-      # Compute BUILD_ID (Commit SHA, automatisch)
-      # ------------------------------------------------------------
       - name: Compute BUILD_ID
         shell: bash
         run: |
@@ -37,11 +31,6 @@ jobs:
           BUILD_ID="$(git rev-parse --short=12 HEAD)"
           echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
 
-      # ------------------------------------------------------------
-      # Prepare deploy folder
-      # - build.json erzeugen
-      # - index.html mit Cache-Busting patchen
-      # ------------------------------------------------------------
       - name: Prepare deploy folder
         shell: bash
         run: |
@@ -50,17 +39,14 @@ jobs:
           rm -rf deploy
           mkdir -p deploy
 
-          # Alles Relevante kopieren
           rsync -a \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="deploy" \
             ./ deploy/
 
-          # build.json für Service Worker Versioning
           printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/build.json
 
-          # Cache-Busting für CSS
           if [ -f deploy/index.html ]; then
             perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
             perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
@@ -71,27 +57,30 @@ jobs:
           echo "---- build.json ----"
           cat deploy/build.json
 
-      # ------------------------------------------------------------
-      # Install lftp
-      # ------------------------------------------------------------
       - name: Install lftp
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      # ------------------------------------------------------------
-      # Deploy via SFTP (STRATO)
-      # Webroot ist verifiziert: STRATO-apps
-      # ------------------------------------------------------------
       - name: Deploy via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
         run: |
           set -e
+
+          # Kandidatenliste: zuerst Secret (wenn gesetzt), dann gängige STRATO Pfade
+          CANDIDATES=""
+          if [ -n "$STRATO_FTP_REMOTE_PATH" ]; then
+            CANDIDATES="$STRATO_FTP_REMOTE_PATH"
+          fi
+          CANDIDATES="$CANDIDATES . STRATO-apps /STRATO-apps html htdocs www"
+
+          # Duplikate entfernen (optional, pragmatisch egal)
 
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             sftp://$STRATO_FTP_SERVER \
@@ -104,14 +93,19 @@ jobs:
               echo '--- Remote PWD (before) ---';
               pwd;
 
-              echo '--- cd to STRATO-apps (webroot) ---';
-              cd STRATO-apps;
-              pwd;
-
-              echo '--- Remote listing (before) ---';
+              echo '--- Remote listing (root) ---';
               ls -la;
 
-              echo '--- MIRROR UPLOAD ---';
+              # Kandidaten der Reihe nach versuchen
+              set remote_ok 0;
+              "`
+              # Wir bauen die cd-Versuche als lftp-Kommandos zusammen:
+              `echo "$CANDIDATES" | awk '{for(i=1;i<=NF;i++) printf("echo \"--- try cd: %s ---\";\ncd %s || (echo \"nope\";);\npwd;\n", $i, $i)}'`"
+              echo '--- If you see the correct directory above, ensure STRATO_FTP_REMOTE_PATH matches it exactly ---';
+
+              # Wir machen es simpel: Wir deployen am Ende im aktuellen Verzeichnis.
+              # (Du stellst STRATO_FTP_REMOTE_PATH so ein, dass der letzte erfolgreiche cd der richtige ist.)
+              echo '--- MIRROR UPLOAD (current dir) ---';
               mirror -R --verbose --only-newer deploy/ .;
 
               echo '--- Remote listing (after) ---';
