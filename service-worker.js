@@ -18,7 +18,7 @@ let RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
 async function resolveBuildVersion() {
   try {
-    const res = await fetch("/build.json", { cache: "no-store" });
+    const res = await fetch("/meta/build.json", { cache: "no-store" });
     if (!res.ok) throw new Error("build.json not ok");
     const data = await res.json();
     if (data && typeof data.version === "string" && data.version.trim()) {
@@ -186,3 +186,4 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
