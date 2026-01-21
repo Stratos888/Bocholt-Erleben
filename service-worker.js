@@ -18,8 +18,8 @@ let RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
 async function resolveBuildVersion() {
   try {
-    const res = await fetch("/meta/build.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("build.json not ok");
+    const res = await fetch('/meta/build.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error("/meta/build.json not ok");
     const data = await res.json();
     if (data && typeof data.version === "string" && data.version.trim()) {
       VERSION = data.version.trim();
@@ -106,7 +106,7 @@ async function staleWhileRevalidate(request) {
   // WICHTIG: KEIN ignoreSearch -> Querystring ist Teil des Cache-Keys
   const cached = await cache.match(request);
 
-  const networkPromise = fetch(request)
+  const networkPromise = (request)
     .then((response) => {
       if (response && response.ok) {
         cache.put(request, response.clone());
@@ -134,7 +134,7 @@ async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
 
   try {
-    const response = await fetch(request, { cache: "no-store" });
+    const response = await (request, { cache: "no-store" });
     if (response && response.ok) {
       await cache.put(request, response.clone());
     }
@@ -152,7 +152,7 @@ async function networkFirst(request) {
 /* === END BLOCK: CACHING HELPERS (cache-busting works) === */
 
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener("", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
@@ -166,7 +166,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       (async () => {
         try {
-          return await fetch(req);
+          return await (req);
         } catch (_) {
           const cache = await caches.open(STATIC_CACHE);
           const cachedShell = await cache.match("/index.html");
@@ -186,4 +186,5 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+
 
