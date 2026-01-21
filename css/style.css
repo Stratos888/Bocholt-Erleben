@@ -208,8 +208,8 @@ Umfang: Konsolidierte Basis (wird im Header als Secondary/Primary variiert).
 .pwa-install-button{
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 2px;
 
   background: var(--color-primary-muted);
   color: var(--color-text-primary);
@@ -978,8 +978,8 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 }
 
 .app-logo{
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   flex: 0 0 auto;
 
   /* ruhig, nicht „App-Icon-Kachel“ */
@@ -990,7 +990,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.016em;
   line-height: 1.2;
@@ -1016,7 +1016,10 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 .header-right > .pwa-install-button{
   display: inline-flex;
   align-items: center;
-
+justify-content: flex-start;
+   gap: 3px;
+   width: auto;
+   flex: 0 0 auto;
   /* keine Flächen-Optik */
   padding: 6px 0;
   min-height: 0;
@@ -1060,7 +1063,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   content: "⬇︎";
   font-size: 14px;
   opacity: 0.85;
-  margin-right: 4px;
+  margin-right: 2px;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
@@ -1071,7 +1074,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   content: "＋";
   font-size: 14px;
   opacity: 0.85;
-  margin-right: 4px;
+  margin-right: 2px;
 }
 .header-right > a.pwa-install-button::after{
   content: "Event";
@@ -1161,6 +1164,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
