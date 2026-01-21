@@ -1,7 +1,7 @@
 # =========================================================
 # Deploy to STRATO (bocholt-erleben.de)
-# Webroot ist /STRATO-apps (Domain-Umleitung intern)
-# build.json wird unter /meta/build.json erzeugt (Root-JSON kann geblockt werden)
+# Webroot: /STRATO-apps (Domain-Umleitung intern)
+# Version File: /meta/build.txt (STRATO blockt .json Requests per Connection Reset)
 # =========================================================
 
 name: Deploy to STRATO
@@ -43,20 +43,14 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
-          # build.json -> /meta/build.json
+          # Version file (TXT instead of JSON)
           mkdir -p deploy/meta
-          printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/meta/build.json
-
-          # Cache-Busting für CSS/JS in index.html
-          if [ -f deploy/index.html ]; then
-            perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
-            perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
-          fi
+          printf '%s\n' "$BUILD_ID" > deploy/meta/build.txt
 
           echo "=== DEPLOY CONTENTS ==="
           ls -la deploy
-          echo "=== meta/build.json ==="
-          cat deploy/meta/build.json
+          echo "=== meta/build.txt ==="
+          cat deploy/meta/build.txt
 
       - name: Install lftp
         shell: bash
