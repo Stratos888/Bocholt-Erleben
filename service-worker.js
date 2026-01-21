@@ -9,20 +9,21 @@
    ========================================================= */
 
 /* === BEGIN BLOCK: BUILD VERSION RESOLUTION (no manual bump) ===
-Zweck: Version kommt automatisch aus /build.json (vom Deploy), kein händisches Hochzählen.
+Zweck: Version kommt automatisch aus /meta/build.txt (vom Deploy), kein händisches Hochzählen.
 Umfang: Version/Cache-Namen werden zur Laufzeit initialisiert.
 === */
-let VERSION = "dev"; // Fallback, falls build.json fehlt
+let VERSION = "dev"; // Fallback, falls build.txt fehlt
 let STATIC_CACHE = `be-static-${VERSION}`;
 let RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
 async function resolveBuildVersion() {
   try {
-    const res = await fetch('/meta/build.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error("/meta/build.json not ok");
-    const data = await res.json();
-    if (data && typeof data.version === "string" && data.version.trim()) {
-      VERSION = data.version.trim();
+    const res = await fetch('/meta/build.txt', { cache: 'no-store' });
+    if (!res.ok) throw new Error("/meta/build.txt not ok");
+    const v = (await res.text()).trim();
+
+    if (v) {
+      VERSION = v;
       STATIC_CACHE = `be-static-${VERSION}`;
       RUNTIME_CACHE = `be-runtime-${VERSION}`;
     }
@@ -31,6 +32,7 @@ async function resolveBuildVersion() {
   }
 }
 /* === END BLOCK: BUILD VERSION RESOLUTION (no manual bump) === */
+
 
 
 /* === BEGIN BLOCK: STATIC ASSETS (minimal shell) ===
@@ -99,6 +101,9 @@ self.addEventListener("message", (event) => {
 /* === BEGIN BLOCK: CACHING HELPERS (cache-busting works) ===
 Zweck: Cache-Busting darf NICHT durch ignoreSearch ausgehebelt werden.
 Umfang: cache.match ohne ignoreSearch, damit ?v=... wirklich neue Assets erzwingt.
+Fixes:
+- staleWhileRevalidate: fetch(request) statt request.then(...)
+- networkFirst: fetch(request, ...) statt (request, {...})
 === */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
@@ -106,7 +111,7 @@ async function staleWhileRevalidate(request) {
   // WICHTIG: KEIN ignoreSearch -> Querystring ist Teil des Cache-Keys
   const cached = await cache.match(request);
 
-  const networkPromise = (request)
+  const networkPromise = fetch(request)
     .then((response) => {
       if (response && response.ok) {
         cache.put(request, response.clone());
@@ -134,7 +139,7 @@ async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
 
   try {
-    const response = await (request, { cache: "no-store" });
+    const response = await fetch(request, { cache: "no-store" });
     if (response && response.ok) {
       await cache.put(request, response.clone());
     }
@@ -152,7 +157,17 @@ async function networkFirst(request) {
 /* === END BLOCK: CACHING HELPERS (cache-busting works) === */
 
 
-self.addEventListener("", (event) => {
+
+/* === BEGIN BLOCK: FETCH HANDLER (routing + offline shell) ===
+Zweck: Einheitliche Fetch-Strategien:
+- navigate: network first, fallback auf cached /index.html
+- /data/*.json: network-first (immer aktuell)
+- restliche Assets: stale-while-revalidate
+Fixes:
+- Event heißt "fetch" (nicht leer)
+- fetch(req) statt await(req)
+=== */
+self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
@@ -166,7 +181,7 @@ self.addEventListener("", (event) => {
     event.respondWith(
       (async () => {
         try {
-          return await (req);
+          return await fetch(req);
         } catch (_) {
           const cache = await caches.open(STATIC_CACHE);
           const cachedShell = await cache.match("/index.html");
@@ -186,5 +201,8 @@ self.addEventListener("", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
+/* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
+
 
 
