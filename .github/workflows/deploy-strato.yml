@@ -1,11 +1,11 @@
-# === BEGIN FILE: .github/workflows/deploy-strato.yml ===
-# Zweck: Vollautomatischer Deploy zu STRATO + automatische Build-Version
-# - build.json wird pro Deploy erzeugt (Commit SHA)
-# - index.html bekommt Cache-Busting (?v=<commit>) für CSS/JS
-# - Upload via SFTP (lftp mirror) ohne Heredocs/EOF (YAML-sicher)
-# === END FILE HEADER ===
+# =========================================================
+# Deploy to STRATO (bocholt-erleben.de)
+# - Webroot: /STRATO-apps
+# - build.json wird automatisch erzeugt
+# - kein manuelles Versionieren
+# =========================================================
 
-name: Deploy to STRATO via SFTP
+name: Deploy to STRATO
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Compute BUILD_ID
+      - name: Compute build version
         shell: bash
         run: |
           set -e
@@ -36,7 +36,7 @@ jobs:
           set -e
 
           rm -rf deploy
-          mkdir -p deploy
+          mkdir deploy
 
           rsync -a \
             --exclude=".git" \
@@ -44,47 +44,38 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
-          # build.json für Service Worker Versioning
-          printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/build.json
+          echo "{ \"version\": \"$BUILD_ID\" }" > deploy/build.json
 
-          # Cache-Busting für CSS/JS in index.html
-          if [ -f deploy/index.html ]; then
-            perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
-            perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
-          fi
-
-          echo "---- DEPLOY CONTENTS ----"
+          echo "=== DEPLOY CONTENTS ==="
           ls -la deploy
-          echo "---- build.json ----"
+          echo "=== build.json ==="
           cat deploy/build.json
 
       - name: Install lftp
-        shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Deploy via SFTP
-        shell: bash
+      - name: Upload to STRATO via SFTP
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+        shell: bash
         run: |
           set -e
 
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit yes;
-            set net:timeout 20;
-            set net:max-retries 2;
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
+            sftp://$STRATO_FTP_SERVER \
+            -e "
+              set sftp:auto-confirm yes
+              set cmd:fail-exit yes
 
-            pwd;
-            ls -la;
+              pwd
+              ls -la
 
-            mirror -R --verbose --only-newer deploy/ .;
+              mirror -R --only-newer deploy/ .
 
-            ls -la;
-            bye;
-          "
-# === END FILE: .github/workflows/deploy-strato.yml ===
+              ls -la
+              bye
+            "
