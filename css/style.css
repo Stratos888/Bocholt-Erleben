@@ -936,6 +936,7 @@ Zweck: Linear-like Topbar-Optik ohne klassische Buttons: Logo links, Titel, rech
 Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-install-button (nur Header-Optik).
 === */
 .app-header{
+   color: var(--color-text-primary);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -945,7 +946,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   min-height: 56px;
   padding: 0 16px;
 
-  background: var(--header-bg);
+  background: var(--color-primary-muted);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
@@ -954,10 +955,11 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   gap: 12px;
 
   /* keine harte Trennlinie; nur subtile „Schwebe“-Trennung */
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(31, 41, 51, 0.04);
   box-shadow:
-    0 1px 0 color-mix(in srgb, currentColor 8%, transparent),
-    0 10px 30px color-mix(in srgb, #000 8%, transparent);
+  0 1px 0 rgba(31, 41, 51, 0.06),
+  0 8px 24px rgba(31, 41, 51, 0.08);
+
 
   transform: translateZ(0);
 }
@@ -976,8 +978,8 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 }
 
 .app-logo{
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
 
   /* ruhig, nicht „App-Icon-Kachel“ */
@@ -988,9 +990,9 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.016em;
   line-height: 1.2;
 
   min-width: 0;
@@ -1058,7 +1060,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   content: "⬇︎";
   font-size: 14px;
   opacity: 0.85;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
@@ -1069,7 +1071,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   content: "＋";
   font-size: 14px;
   opacity: 0.85;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 .header-right > a.pwa-install-button::after{
   content: "Event";
@@ -1159,5 +1161,6 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
