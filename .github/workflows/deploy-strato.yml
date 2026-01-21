@@ -1,3 +1,12 @@
+# === BEGIN FILE: .github/workflows/deploy-strato.yml ===
+# Zweck: Vollautomatischer Deploy zu STRATO + automatische Build-Version (keine manuelle Hochzählung)
+# Umfang:
+# - BUILD_ID aus Git Commit SHA
+# - build.json automatisch erzeugen und deployen
+# - index.html automatisch mit Cache-Busting für CSS/JS versehen
+# - Upload via SFTP (lftp mirror)
+# === END FILE HEADER ===
+
 name: Deploy to STRATO via SFTP
 
 on:
@@ -16,13 +25,53 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # === BEGIN BLOCK: BUILD ID (automatic version, no manual bumps) ===
+      # Zweck: Eindeutige Version pro Deploy (Commit SHA). Diese Version nutzen wir für build.json & Cache-Busting.
+      # Umfang: Schreibt BUILD_ID nach $GITHUB_ENV.
+      # ===
+      - name: Compute BUILD_ID
+        shell: bash
+        run: |
+          set -e
+          BUILD_ID="$(git rev-parse --short=12 HEAD)"
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+      # === END BLOCK: BUILD ID (automatic version, no manual bumps) ===
+
+      # === BEGIN BLOCK: PREPARE DEPLOY (build.json + cache-busting) ===
+      # Zweck:
+      # - Stellt deploy/ Ordner zusammen
+      # - Erzeugt /build.json mit Version
+      # - Patcht deploy/index.html automatisch: style.css + js/*.js bekommen ?v=$BUILD_ID
+      # Umfang: Ersetzt/erstellt nur Dateien im deploy/ Ordner, Repo bleibt unverändert.
+      # ===
       - name: Prepare deploy folder
         shell: bash
         run: |
           set -e
+
           rm -rf deploy
-          mkdir deploy
-          rsync -a --exclude=".git" --exclude=".github" --exclude="deploy" ./ deploy/
+          mkdir -p deploy
+
+          # Kopiere alles, was wirklich live gehen soll
+          rsync -a \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="deploy" \
+            ./ deploy/
+
+          # 1) build.json für den Service Worker (keine manuelle Version mehr)
+          printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/build.json
+
+          # 2) Cache-Busting für CSS/JS in index.html (damit User sofort die neuen Assets bekommen)
+          #    Wichtig: nur die Fälle ohne vorhandenes Query ergänzen.
+          if [ -f deploy/index.html ]; then
+            # CSS
+            perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
+
+            # JS: alle /js/*.js (ohne bestehendes ?)
+            perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
+          fi
+      # === END BLOCK: PREPARE DEPLOY (build.json + cache-busting) ===
 
       - name: Install lftp
         shell: bash
@@ -30,6 +79,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
+      # === BEGIN BLOCK: DEPLOY VIA SFTP (STRATO) ===
+      # Zweck: Upload deploy/ nach STRATO per SFTP.
+      # Umfang: Mirror nach Webroot (.) – nur neuere Dateien werden übertragen.
+      # ===
       - name: Deploy via SFTP
         shell: bash
         env:
@@ -50,3 +103,4 @@ jobs:
 
               bye
             "
+      # === END BLOCK: DEPLOY VIA SFTP (STRATO) ===
