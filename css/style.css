@@ -59,8 +59,17 @@
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
 
-  /* Layout tokens */
-  --header-h: 64px;  /* Single Source of Truth für Sticky-Offset */
+   /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
+  Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
+  Umfang: Header-Höhe + Abstand + Farben für Header/Divider.
+  === */
+  --header-h: 64px;           /* Header-Höhe (Sticky-Offset) */
+  --stack-gap: 8px;           /* Abstand zwischen Header und Top-Stack */
+  --header-bg: rgba(249, 251, 246, 0.96);  /* leicht getönt, nicht hart weiß */
+  --header-border: rgba(31,41,51,0.06);
+  --brand-line: rgba(139, 207, 74, 0.85);
+  /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
+
 }
 
 
@@ -612,21 +621,25 @@ footer {
 }
 
 /* === BEGIN BLOCK: TOP STACK (sticky under header, unified surface) ===
-Zweck: Suche/Chips als ein zusammenhängender Discovery-Block; kein Drunterrutschen von Cards.
-Umfang: Konsolidiert und ersetzt den bisherigen .top-stack Block.
+Zweck: Suche/Chips als zusammenhängender Discovery-Block; Cards dürfen NICHT drunter rutschen.
+Umfang: Ersetzt .top-stack vollständig (Sticky-Top + visuelle Trennung + Stabilität).
 === */
 .top-stack{
   position: sticky;
-  top: var(--header-h);
-  z-index: 900; /* unter header, über content */
+  top: calc(var(--header-h) + var(--stack-gap));
+  z-index: 900; /* unter Header, über Content */
 
-  /* optisch als zusammenhängender Bereich */
   background: var(--color-background);
   padding: 12px 20px 14px;
 
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.04);
+
+  /* Stabilität gegen “durchflackern” auf Mobile/Chromium */
+  transform: translateZ(0);
 }
 /* === END BLOCK: TOP STACK (sticky under header, unified surface) === */
+
 
 .quick-interests,
 .time-chips{
@@ -919,8 +932,8 @@ Umfang: Konsolidiert Header + Modal Styles.
 === */
 
 /* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Header bleibt sichtbar, Branding bleibt erkennbar, Buttons drängen nicht den Titel weg.
-Umfang: Single Source of Truth für Header-Layout.
+Zweck: Header bleibt sichtbar, Branding bleibt erkennbar, Buttons konsistent (Secondary/Primary).
+Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title + small-screen Anpassung.
 === */
 .app-header{
   position: sticky;
@@ -928,7 +941,7 @@ Umfang: Single Source of Truth für Header-Layout.
   z-index: 1000;
   isolation: isolate;
 
-  background: rgba(249, 251, 246, 0.96);
+  background: var(--header-bg);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
@@ -940,7 +953,7 @@ Umfang: Single Source of Truth für Header-Layout.
   padding: 10px 16px;
   min-height: var(--header-h);
 
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  border-bottom: 1px solid var(--header-border);
   transform: translateZ(0);
 }
 
@@ -951,7 +964,7 @@ Umfang: Single Source of Truth für Header-Layout.
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: rgba(139, 207, 74, 0.85);
+  background: var(--brand-line);
 }
 
 .header-left{
@@ -963,16 +976,18 @@ Umfang: Single Source of Truth für Header-Layout.
 }
 
 .app-logo{
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(31,41,51,0.10);
+  background: #fff;
 }
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.02rem;
+  font-weight: 800;
   letter-spacing: -0.012em;
   line-height: 1.1;
 
@@ -980,6 +995,9 @@ Umfang: Single Source of Truth für Header-Layout.
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  /* verhindert “Titel verschwindet” durch Buttons */
+  max-width: 44vw;
 }
 
 .header-right{
@@ -989,31 +1007,46 @@ Umfang: Single Source of Truth für Header-Layout.
   flex: 0 0 auto;
 }
 
-/* Secondary (Installieren) */
+/* Baseline: beide Header-Buttons exakt gleich (Form/Typo/Höhe) */
 .header-right > .pwa-install-button{
-  background: var(--color-primary-muted);
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: .85rem;
+  font-weight: 800;
+  line-height: 1;
+  min-height: 36px;
+}
+
+/* Secondary (Installieren) */
+.header-right > .pwa-install-button:first-child{
+  background: rgba(139,207,74,0.10);
   border-color: rgba(139,207,74,.35);
+  color: var(--color-text-primary);
 }
 
 /* Primary (Veröffentlichen) */
 .header-right > .pwa-install-button:last-child{
-  background: var(--color-primary);
+  background: rgba(139,207,74,0.95);
   border-color: rgba(139,207,74,.95);
   color: #0c1a05;
   box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
 
-/* Sehr kleine Screens: Buttons etwas kompakter, Branding bleibt */
+/* Sehr kleine Screens: Buttons kompakter, Title-Width kleiner */
 @media (max-width: 360px){
-  .pwa-install-button{
+  .header-right > .pwa-install-button{
     padding: 8px 10px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
+    min-height: 34px;
   }
+
   .app-title{
     font-size: 1.0rem;
+    max-width: 38vw;
   }
 }
 /* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
+
 
 
 /* --- Modal (Locations) --- */
@@ -1079,3 +1112,4 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
