@@ -45,10 +45,8 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
-          # build.json für Service Worker Versioning (vollautomatisch)
           printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/build.json
 
-          # Cache-Busting für CSS/JS in index.html
           if [ -f deploy/index.html ]; then
             perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
             perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
@@ -75,13 +73,11 @@ jobs:
         run: |
           set -e
 
-          # Fallback, falls Secret leer ist
           REMOTE_PATH="${STRATO_FTP_REMOTE_PATH:-.}"
-
           echo "Using REMOTE_PATH='$REMOTE_PATH'"
 
-          # lftp liest Kommandos stabil via STDIN (kein Quoting-Chaos)
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<EOF
+          # lftp script file (YAML-safe, quoting-safe)
+          cat > lftp-deploy.txt <<'LFTP_CMDS'
 set cmd:fail-exit yes
 set sftp:auto-confirm yes
 set net:timeout 20
@@ -93,8 +89,8 @@ echo "--- Remote listing (root) ---"
 ls -la
 
 echo "--- cd to REMOTE_PATH ---"
-cd $REMOTE_PATH
-pwd
+# placeholder (replaced below)
+
 echo "--- Remote listing (target) ---"
 ls -la
 
@@ -105,5 +101,12 @@ echo "--- Remote listing (after) ---"
 ls -la
 
 bye
-EOF
+LFTP_CMDS
+
+          # REMOTE_PATH in die Script-Datei einfügen (ohne YAML/Quote-Probleme)
+          # Wir ersetzen die Platzhalter-Zeile durch ein echtes cd
+          sed -i "s|# placeholder (replaced below)|cd ${REMOTE_PATH}|" lftp-deploy.txt
+
+          # Ausführen
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" -f lftp-deploy.txt
 # === END FILE: .github/workflows/deploy-strato.yml ===
