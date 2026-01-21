@@ -198,10 +198,44 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // alles andere: SWR
-  event.respondWith(staleWhileRevalidate(req));
+  /* === BEGIN BLOCK: MANIFEST FETCH SAFETY (prevent 503 spam) ===
+Zweck: manifest.json darf niemals als 503 "Offline" enden,
+       da Browser/PWA es regelmäßig und aggressiv anfragt.
+Umfang: Cache-first Fallback speziell für /manifest.json,
+        alles andere bleibt unverändert (SWR).
+=== */
+if (url.pathname === "/manifest.json") {
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(STATIC_CACHE);
+      const cached = await cache.match("/manifest.json");
+
+      try {
+        const response = await fetch(req);
+        if (response && response.ok) {
+          await cache.put("/manifest.json", response.clone());
+        }
+        return response;
+      } catch (err) {
+        if (cached) return cached;
+
+        return new Response("Manifest unavailable", {
+          status: 503,
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      }
+    })()
+  );
+  return;
+}
+/* === END BLOCK: MANIFEST FETCH SAFETY (prevent 503 spam) === */
+
+// alles andere: SWR
+event.respondWith(staleWhileRevalidate(req));
 });
+
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
