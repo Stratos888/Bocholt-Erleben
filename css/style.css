@@ -932,8 +932,8 @@ Umfang: Konsolidiert Header + Modal Styles.
 === */
 
 /* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Header bleibt sichtbar, Branding bleibt erkennbar, Buttons konsistent (Secondary/Primary).
-Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title + small-screen Anpassung.
+Zweck: Linear-like Topbar-Optik ohne klassische Buttons: Logo links, Titel, rechts Inline-Actions mit Icon+Text.
+Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-install-button (nur Header-Optik).
 === */
 .app-header{
   position: sticky;
@@ -941,111 +941,158 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title + small-scree
   z-index: 1000;
   isolation: isolate;
 
+  /* Linear-like: ruhig, clean, kein CTA-Look */
+  min-height: 56px;
+  padding: 0 16px;
+
   background: var(--header-bg);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 
-  padding: 10px 16px;
-  min-height: var(--header-h);
+  /* keine harte Trennlinie; nur subtile „Schwebe“-Trennung */
+  border-bottom: 0;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, currentColor 8%, transparent),
+    0 10px 30px color-mix(in srgb, #000 8%, transparent);
 
-  border-bottom: 1px solid var(--header-border);
   transform: translateZ(0);
 }
 
+/* Die bisherige Brand-Line entfernen (Linear: sehr zurückhaltend) */
 .app-header::after{
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--brand-line);
+  content: none;
 }
 
 .header-left{
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;          /* Logo ↔ Titel */
   min-width: 0;
   flex: 1 1 auto;
 }
 
 .app-logo{
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   flex: 0 0 auto;
-  border-radius: 10px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: #fff;
+
+  /* ruhig, nicht „App-Icon-Kachel“ */
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
 }
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 1.02rem;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 600;
   letter-spacing: -0.012em;
-  line-height: 1.1;
+  line-height: 1.2;
 
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
-  /* verhindert “Titel verschwindet” durch Buttons */
-  max-width: 44vw;
+  /* Titel bleibt sichtbar – Buttons dürfen ihn nicht verdrängen */
+  max-width: 56vw;
 }
 
 .header-right{
-  display: flex;
+  margin-left: auto;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;          /* Abstand zwischen Actions */
   flex: 0 0 auto;
 }
 
-/* Baseline: beide Header-Buttons exakt gleich (Form/Typo/Höhe) */
+/* Actions: als Inline-Tools (keine Buttons/Pills) */
 .header-right > .pwa-install-button{
-  padding: 9px 12px;
-  border-radius: 12px;
-  font-size: .85rem;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+
+  /* keine Flächen-Optik */
+  padding: 6px 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+
+  /* Typo wie „Topbar Action“ */
+  font-family: inherit;
+  font-weight: 500;
   line-height: 1;
-  min-height: 36px;
+  text-decoration: none;
+
+  /* Icon+Text per Pseudo-Elemente, Originaltext bleibt für Screenreader */
+  font-size: 0;          /* visuell Text ersetzen */
+  color: color-mix(in srgb, currentColor 78%, transparent);
+  cursor: pointer;
+
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Secondary (Installieren) */
-.header-right > .pwa-install-button:first-child{
-  background: rgba(139,207,74,0.10);
-  border-color: rgba(139,207,74,.35);
-  color: var(--color-text-primary);
+/* Fokus: sichtbar, aber nicht wie Button */
+.header-right > .pwa-install-button:focus-visible{
+  outline: 2px solid color-mix(in srgb, currentColor 18%, transparent);
+  outline-offset: 3px;
+  border-radius: 10px;
 }
 
-/* Primary (Veröffentlichen) */
-.header-right > .pwa-install-button:last-child{
-  background: rgba(139,207,74,0.95);
-  border-color: rgba(139,207,74,.95);
-  color: #0c1a05;
-  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+@media (hover: hover){
+  .header-right > .pwa-install-button:hover{
+    color: color-mix(in srgb, currentColor 92%, transparent);
+  }
 }
 
-/* Sehr kleine Screens: Buttons kompakter, Title-Width kleiner */
+/* ---- ICON + LABEL MAPPING (ohne HTML-Änderung) ----
+   Installieren-Button (button) -> [⬇︎] App
+   Veröffentlichen-Link (a)     -> [＋] Event
+*/
+.header-right > button.pwa-install-button::before{
+  content: "⬇︎";
+  font-size: 14px;
+  opacity: 0.85;
+  margin-right: 6px;
+}
+.header-right > button.pwa-install-button::after{
+  content: "App";
+  font-size: 14px;
+}
+
+.header-right > a.pwa-install-button::before{
+  content: "＋";
+  font-size: 14px;
+  opacity: 0.85;
+  margin-right: 6px;
+}
+.header-right > a.pwa-install-button::after{
+  content: "Event";
+  font-size: 14px;
+}
+
+/* Sehr kleine Screens: minimal kompakter */
 @media (max-width: 360px){
-  .header-right > .pwa-install-button{
-    padding: 8px 10px;
-    font-size: 0.82rem;
-    min-height: 34px;
+  .app-header{
+    padding: 0 14px;
+    min-height: 56px;
+  }
+
+  .header-right{
+    gap: 12px;
   }
 
   .app-title{
-    font-size: 1.0rem;
-    max-width: 38vw;
+    max-width: 50vw;
   }
 }
 /* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
+
 
 
 
@@ -1112,4 +1159,5 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
