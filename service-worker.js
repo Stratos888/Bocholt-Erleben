@@ -1,40 +1,70 @@
 /* =========================================================
    SERVICE WORKER – Bocholt erleben (2026)
+   Ziel: Deploys ohne Cache-Probleme (voll automatisch)
    Strategie:
    - /data/*.json => Network-First (Events/Locations stets aktuell)
-   - same-origin Assets (css/js/html/icons) => Stale-While-Revalidate
+   - same-origin Assets (css/js/icons/html) => Stale-While-Revalidate
+   - Cache Version automatisch über /build.json (vom Deploy erzeugt)
    - Cache Cleanup bei Aktivierung
    ========================================================= */
 
-const VERSION = "2026-01-17-11"; // <-- bei Deployments hochzählen
-const STATIC_CACHE = `be-static-${VERSION}`;
-const RUNTIME_CACHE = `be-runtime-${VERSION}`;
+/* === BEGIN BLOCK: BUILD VERSION RESOLUTION (no manual bump) ===
+Zweck: Version kommt automatisch aus /build.json (vom Deploy), kein händisches Hochzählen.
+Umfang: Version/Cache-Namen werden zur Laufzeit initialisiert.
+=== */
+let VERSION = "dev"; // Fallback, falls build.json fehlt
+let STATIC_CACHE = `be-static-${VERSION}`;
+let RUNTIME_CACHE = `be-runtime-${VERSION}`;
 
-// Minimal: Manifest + Icons (App-Shell kommt über SWR)
+async function resolveBuildVersion() {
+  try {
+    const res = await fetch("/build.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("build.json not ok");
+    const data = await res.json();
+    if (data && typeof data.version === "string" && data.version.trim()) {
+      VERSION = data.version.trim();
+      STATIC_CACHE = `be-static-${VERSION}`;
+      RUNTIME_CACHE = `be-runtime-${VERSION}`;
+    }
+  } catch (_) {
+    // Fallback bleibt "dev"
+  }
+}
+/* === END BLOCK: BUILD VERSION RESOLUTION (no manual bump) === */
+
+
+/* === BEGIN BLOCK: STATIC ASSETS (minimal shell) ===
+Zweck: Minimal offline shell. Rest kommt über SWR aus Runtime-Cache.
+Umfang: Liste bewusst klein gehalten.
+=== */
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  "/",
+  "/index.html",
+  "/manifest.json",
 
-  '/icons/app/icon-180.png',
-  '/icons/app/icon-192.png',
-  '/icons/app/icon-512.png',
+  "/icons/app/icon-180.png",
+  "/icons/app/icon-192.png",
+  "/icons/app/icon-512.png",
 
-  '/icons/favicon/favicon.ico',
-  '/icons/favicon/icon-32.png'
+  "/icons/favicon/favicon.ico",
+  "/icons/favicon/icon-32.png"
 ];
-
+/* === END BLOCK: STATIC ASSETS (minimal shell) === */
 
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
+      // Version vor dem Caching auflösen (wichtig!)
+      await resolveBuildVersion();
+
       const cache = await caches.open(STATIC_CACHE);
       try {
         await cache.addAll(STATIC_ASSETS);
       } catch (e) {
         console.warn("SW install: STATIC_ASSETS caching failed", e);
       }
+
       self.skipWaiting();
     })()
   );
@@ -43,6 +73,9 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
+      // Auch hier Version auflösen, falls install übersprungen wurde
+      await resolveBuildVersion();
+
       const keys = await caches.keys();
       await Promise.all(
         keys.map((key) => {
@@ -51,6 +84,7 @@ self.addEventListener("activate", (event) => {
           }
         })
       );
+
       self.clients.claim();
     })()
   );
@@ -62,11 +96,15 @@ self.addEventListener("message", (event) => {
   }
 });
 
+/* === BEGIN BLOCK: CACHING HELPERS (cache-busting works) ===
+Zweck: Cache-Busting darf NICHT durch ignoreSearch ausgehebelt werden.
+Umfang: cache.match ohne ignoreSearch, damit ?v=... wirklich neue Assets erzwingt.
+=== */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
 
-  // ignoreSearch, weil du Dateien mit ?v=... lädst.
-  const cached = await cache.match(request, { ignoreSearch: true });
+  // WICHTIG: KEIN ignoreSearch -> Querystring ist Teil des Cache-Keys
+  const cached = await cache.match(request);
 
   const networkPromise = fetch(request)
     .then((response) => {
@@ -102,7 +140,7 @@ async function networkFirst(request) {
     }
     return response;
   } catch (e) {
-    const cached = await cache.match(request, { ignoreSearch: true });
+    const cached = await cache.match(request);
     if (cached) return cached;
 
     return new Response("Offline", {
@@ -111,6 +149,8 @@ async function networkFirst(request) {
     });
   }
 }
+/* === END BLOCK: CACHING HELPERS (cache-busting works) === */
+
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
@@ -121,6 +161,22 @@ self.addEventListener("fetch", (event) => {
   // nur same-origin
   if (url.origin !== self.location.origin) return;
 
+  // Navigations-Fallback: Wenn offline, nimm index.html aus STATIC cache
+  if (req.mode === "navigate") {
+    event.respondWith(
+      (async () => {
+        try {
+          return await fetch(req);
+        } catch (_) {
+          const cache = await caches.open(STATIC_CACHE);
+          const cachedShell = await cache.match("/index.html");
+          return cachedShell || new Response("Offline", { status: 503 });
+        }
+      })()
+    );
+    return;
+  }
+
   // Daten: Network-First
   if (url.pathname.startsWith("/data/") && url.pathname.endsWith(".json")) {
     event.respondWith(networkFirst(req));
@@ -130,12 +186,3 @@ self.addEventListener("fetch", (event) => {
   // alles andere: SWR
   event.respondWith(staleWhileRevalidate(req));
 });
-
-
-
-
-
-
-
-
-
