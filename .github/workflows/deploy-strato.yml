@@ -1,8 +1,7 @@
 # =========================================================
 # Deploy to STRATO (bocholt-erleben.de)
-# - Webroot: /STRATO-apps
-# - build.json wird automatisch erzeugt
-# - kein manuelles Versionieren
+# Webroot ist /STRATO-apps (Domain-Umleitung intern)
+# build.json wird unter /meta/build.json erzeugt (Root-JSON kann geblockt werden)
 # =========================================================
 
 name: Deploy to STRATO
@@ -36,7 +35,7 @@ jobs:
           set -e
 
           rm -rf deploy
-          mkdir deploy
+          mkdir -p deploy
 
           rsync -a \
             --exclude=".git" \
@@ -44,39 +43,49 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
+          # build.json -> /meta/build.json
           mkdir -p deploy/meta
-          echo "{ \"version\": \"$BUILD_ID\" }" > deploy/meta/build.json
+          printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/meta/build.json
+
+          # Cache-Busting für CSS/JS in index.html
+          if [ -f deploy/index.html ]; then
+            perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
+            perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
+          fi
 
           echo "=== DEPLOY CONTENTS ==="
           ls -la deploy
-          echo "=== build.json ==="
-          cat deploy/build.json
+          echo "=== meta/build.json ==="
+          cat deploy/meta/build.json
 
       - name: Install lftp
+        shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
       - name: Upload to STRATO via SFTP
+        shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
-        shell: bash
         run: |
           set -e
 
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             sftp://$STRATO_FTP_SERVER \
             -e "
-              set sftp:auto-confirm yes
-              set cmd:fail-exit yes
+              set sftp:auto-confirm yes;
+              set cmd:fail-exit yes;
+              set net:timeout 20;
+              set net:max-retries 2;
 
-              pwd
-              ls -la
+              pwd;
+              ls -la;
 
-              mirror -R --only-newer deploy/ .
+              mirror -R --only-newer deploy/ .;
 
-              ls -la
-              bye
+              ls -la;
+              bye;
             "
