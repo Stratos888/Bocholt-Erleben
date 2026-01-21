@@ -44,7 +44,8 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
-          echo "{ \"version\": \"$BUILD_ID\" }" > deploy/build.json
+          mkdir -p deploy/meta
+          echo "{ \"version\": \"$BUILD_ID\" }" > deploy/meta/build.json
 
           echo "=== DEPLOY CONTENTS ==="
           ls -la deploy
