@@ -88,10 +88,11 @@ jobs:
         run: |
           set -e
 
-          if [ -z "$STRATO_REMOTE_DIR" ]; then
-            echo "ERROR: Missing secret STRATO_REMOTE_DIR (e.g. html, htdocs, /)."
+          if [ -z "$STRATO_FTP_REMOTE_PATH" ]; then
+            echo "ERROR: Missing secret STRATO_FTP_REMOTE_PATH (target directory on STRATO)."
             exit 1
           fi
+
 
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             sftp://$STRATO_FTP_SERVER \
