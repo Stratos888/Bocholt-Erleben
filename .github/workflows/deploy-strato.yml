@@ -4,7 +4,8 @@
 # - BUILD_ID aus Git Commit SHA
 # - build.json automatisch erzeugen und deployen
 # - index.html automatisch mit Cache-Busting für CSS/JS versehen
-# - Upload via SFTP (lftp mirror)
+# - Upload via SFTP (lftp mirror) in konfigurierbares Remote-Verzeichnis
+# - Debug-Ausgaben, damit sofort klar ist, WO deployed wurde und WAS erzeugt wurde
 # === END FILE HEADER ===
 
 name: Deploy to STRATO via SFTP
@@ -26,9 +27,6 @@ jobs:
         uses: actions/checkout@v4
 
       # === BEGIN BLOCK: BUILD ID (automatic version, no manual bumps) ===
-      # Zweck: Eindeutige Version pro Deploy (Commit SHA). Diese Version nutzen wir für build.json & Cache-Busting.
-      # Umfang: Schreibt BUILD_ID nach $GITHUB_ENV.
-      # ===
       - name: Compute BUILD_ID
         shell: bash
         run: |
@@ -38,12 +36,6 @@ jobs:
       # === END BLOCK: BUILD ID (automatic version, no manual bumps) ===
 
       # === BEGIN BLOCK: PREPARE DEPLOY (build.json + cache-busting) ===
-      # Zweck:
-      # - Stellt deploy/ Ordner zusammen
-      # - Erzeugt /build.json mit Version
-      # - Patcht deploy/index.html automatisch: style.css + js/*.js bekommen ?v=$BUILD_ID
-      # Umfang: Ersetzt/erstellt nur Dateien im deploy/ Ordner, Repo bleibt unverändert.
-      # ===
       - name: Prepare deploy folder
         shell: bash
         run: |
@@ -59,17 +51,23 @@ jobs:
             --exclude="deploy" \
             ./ deploy/
 
-          # 1) build.json für den Service Worker (keine manuelle Version mehr)
+          # build.json für Service Worker Versioning (vollautomatisch)
           printf '{ "version": "%s" }\n' "$BUILD_ID" > deploy/build.json
 
-          # 2) Cache-Busting für CSS/JS in index.html (damit User sofort die neuen Assets bekommen)
-          #    Wichtig: nur die Fälle ohne vorhandenes Query ergänzen.
+          # Cache-Busting für CSS/JS in index.html
           if [ -f deploy/index.html ]; then
-            # CSS
             perl -0777 -pi -e 's/href="\/css\/style\.css"/href="\/css\/style.css?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
-
-            # JS: alle /js/*.js (ohne bestehendes ?)
             perl -0777 -pi -e 's/src="(\/js\/[^"?]+\.js)"/src="$1?v='"$ENV{BUILD_ID}"'"/g' deploy/index.html
+          fi
+
+          echo "---- DEPLOY DIR CONTENTS ----"
+          ls -la deploy
+          echo "---- build.json ----"
+          cat deploy/build.json
+          echo "---- index.html (grep for ?v=) ----"
+          if [ -f deploy/index.html ]; then
+            grep -n "style.css?v=" -n deploy/index.html || true
+            grep -n "/js/.*\.js?v=" -n deploy/index.html || true
           fi
       # === END BLOCK: PREPARE DEPLOY (build.json + cache-busting) ===
 
@@ -80,26 +78,44 @@ jobs:
           sudo apt-get install -y lftp
 
       # === BEGIN BLOCK: DEPLOY VIA SFTP (STRATO) ===
-      # Zweck: Upload deploy/ nach STRATO per SFTP.
-      # Umfang: Mirror nach Webroot (.) – nur neuere Dateien werden übertragen.
-      # ===
       - name: Deploy via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          STRATO_REMOTE_DIR: ${{ secrets.STRATO_REMOTE_DIR }}
         run: |
           set -e
+
+          if [ -z "$STRATO_REMOTE_DIR" ]; then
+            echo "ERROR: Missing secret STRATO_REMOTE_DIR (e.g. html, htdocs, /)."
+            exit 1
+          fi
 
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
             sftp://$STRATO_FTP_SERVER \
             -e "
               set cmd:fail-exit yes;
               set sftp:auto-confirm yes;
+              set net:timeout 20;
+              set net:max-retries 2;
 
+              echo '--- Remote PWD (before) ---';
               pwd;
+
+              echo '--- cd to remote dir ---';
+              cd $STRATO_REMOTE_DIR;
+              pwd;
+
+              echo '--- Remote listing (before) ---';
+              ls -la;
+
+              echo '--- MIRROR UPLOAD ---';
               mirror -R --verbose --only-newer deploy/ .;
+
+              echo '--- Remote listing (after) ---';
+              ls -la;
 
               bye
             "
