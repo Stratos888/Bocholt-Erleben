@@ -81,10 +81,11 @@ jobs:
       - name: Deploy via SFTP
         shell: bash
         env:
-          STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
-          STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
-          STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
-          STRATO_REMOTE_DIR: ${{ secrets.STRATO_REMOTE_DIR }}
+            STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
+            STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
+            STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+            STRATO_FTP_REMOTE_PATH: ${{ secrets.STRATO_FTP_REMOTE_PATH }}
+
         run: |
           set -e
 
@@ -106,7 +107,7 @@ jobs:
               pwd;
 
               echo '--- cd to remote dir ---';
-              cd $STRATO_REMOTE_DIR;
+              cd $STRATO_FTP_REMOTE_PATH;
               pwd;
 
               echo '--- Remote listing (before) ---';
