@@ -98,25 +98,66 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     />
   </div>
 
-  <div class="quick-interests" aria-label="Schnellinteressen">
-    <button type="button" class="chip" data-q="Party">Party</button>
-    <button type="button" class="chip" data-q="Kneipe">Kneipe</button>
-    <button type="button" class="chip" data-q="Kinder">Kinder</button>
-    <button type="button" class="chip" data-q="Quiz">Quiz</button>
-    <button type="button" class="chip" data-q="Musik">Musik</button>
-    <button type="button" class="chip" data-q="Kultur">Kultur</button>
+  <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
+  Zweck: Ersetzt Chip-Teppich durch 2 strukturierte Filter-Pills (Zeit + Kategorie) mit Bottom-Sheet Auswahl.
+  Umfang: Entfernt quick-interests/time-chips; führt Filter-Bar + zwei Sheets ein (Zeit/Kategorie).
+  === -->
+  <div class="filters-bar" aria-label="Filter">
+    <button type="button" class="filter-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+      <span class="filter-pill__label">Zeit</span>
+      <span class="filter-pill__value" id="filter-time-value">Alle</span>
+    </button>
+
+    <button type="button" class="filter-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
+      <span class="filter-pill__label">Kategorie</span>
+      <span class="filter-pill__value" id="filter-category-value">Alle</span>
+    </button>
+
+    <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" hidden>
+      Zurücksetzen
+    </button>
   </div>
 
-  <div class="time-chips" aria-label="Zeitfilter">
-    <button type="button" class="chip chip--time is-active" data-time="all">Alle</button>
-    <button type="button" class="chip chip--time" data-time="today">Heute</button>
-    <button type="button" class="chip chip--time" data-time="weekend">Wochenende</button>
-    <button type="button" class="chip chip--time" data-time="soon">Demnächst</button>
+  <!-- Zeit Sheet -->
+  <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Zeit</div>
+        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      </div>
+      <div class="filter-sheet__body">
+        <button type="button" class="filter-option is-active" data-time="all">Alle</button>
+        <button type="button" class="filter-option" data-time="today">Heute</button>
+        <button type="button" class="filter-option" data-time="weekend">Wochenende</button>
+        <button type="button" class="filter-option" data-time="soon">Demnächst</button>
+      </div>
+    </div>
   </div>
 
-   <!-- Location-Dropdown entfernt (Freitext + Chips reichen) -->
-
+  <!-- Kategorie Sheet (Single) -->
+  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Kategorie</div>
+        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      </div>
+      <div class="filter-sheet__body">
+        <button type="button" class="filter-option is-active" data-category="">Alle</button>
+        <button type="button" class="filter-option" data-category="Party">Party</button>
+        <button type="button" class="filter-option" data-category="Kneipe">Kneipe</button>
+        <button type="button" class="filter-option" data-category="Kinder">Kinder</button>
+        <button type="button" class="filter-option" data-category="Quiz">Quiz</button>
+        <button type="button" class="filter-option" data-category="Musik">Musik</button>
+        <button type="button" class="filter-option" data-category="Kultur">Kultur</button>
+      </div>
+    </div>
+  </div>
+  <!-- === END BLOCK: FILTER PILLS (Top-App level, category single, location later) === -->
 </div>
+
+
 
 
    <!-- EVENT CARDS SECTION -->
@@ -228,6 +269,7 @@ Umfang: Ersetzt nur die Linkzeile im Footer.
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
