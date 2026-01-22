@@ -88,25 +88,107 @@ this.events = Array.isArray(data?.events) ? data.events : [];
         }
 
         // Filter (NEU!)
-       /* === BEGIN BLOCK: FILTER INIT (robust + verified) ===
-Zweck: FilterModule muss nach Event-Load sicher initialisiert werden; verhindert “init nie gelaufen”.
+     /* === BEGIN BLOCK: FILTER INIT (self-healing retries) ===
+Zweck: FilterModule muss zuverlässig initialisieren (Listener müssen sicher dran sein),
+       auch wenn der erste Versuch zu früh/abgebrochen passiert.
 Umfang: Ersetzt nur den Filter-Init Abschnitt in initModules(events).
 === */
 if (CONFIG.features.showFilters) {
-  if (typeof FilterModule !== "undefined" && typeof FilterModule.init === "function") {
-    debugLog("Initializing FilterModule with events:", Array.isArray(events) ? events.length : "not-array");
-    FilterModule.init(events);
+  const MAX_TRIES = 4;
+  let tries = 0;
 
-    // Harte Verifikation: wenn allEvents leer bleibt, nochmal mit App.events probieren (sicherer Fallback)
-    if ((FilterModule.allEvents?.length || 0) === 0 && (this.events?.length || 0) > 0) {
-      console.warn("FilterModule.init got no events – retrying with App.events");
-      FilterModule.init(this.events);
+  const hasFilterUI = () => {
+    // Minimal-Check: wenn diese fehlen, kann FilterModule.init nur scheitern/abbrechen
+    return !!(
+      document.getElementById("search-filter") &&
+      document.getElementById("filter-time-pill") &&
+      document.getElementById("filter-time-value") &&
+      document.getElementById("sheet-time") &&
+      document.getElementById("filter-category-pill") &&
+      document.getElementById("filter-category-value") &&
+      document.getElementById("sheet-category") &&
+      document.getElementById("filter-reset-pill")
+    );
+  };
+
+  const tryInitFilters = (label, evts) => {
+    tries += 1;
+
+    if (typeof FilterModule === "undefined" || typeof FilterModule.init !== "function") {
+      console.warn(`[FilterInit] (${label}) FilterModule not ready (try ${tries}/${MAX_TRIES})`);
+      return false;
     }
-  } else {
-    console.warn("FilterModule not available – filter.js not loaded or has an error.");
-  }
+
+    if (!hasFilterUI()) {
+      console.warn(`[FilterInit] (${label}) Filter UI not ready (try ${tries}/${MAX_TRIES})`);
+      return false;
+    }
+
+    try {
+      const count = Array.isArray(evts) ? evts.length : 0;
+      debugLog(`[FilterInit] (${label}) calling FilterModule.init with events: ${count}`);
+      FilterModule.init(evts);
+
+      // Verifikation: Listener-Init ist nur sinnvoll, wenn allEvents auch wirklich gesetzt wurde
+      const ok = (FilterModule.allEvents?.length || 0) > 0 || (count === 0);
+      if (ok) {
+        FilterModule.__initialized = true;
+        FilterModule.__initLabel = label;
+        FilterModule.__initTries = tries;
+        debugLog(`[FilterInit] initialized OK (${label})`, {
+          tries,
+          allEvents: FilterModule.allEvents?.length || 0
+        });
+        return true;
+      }
+
+      console.warn(`[FilterInit] (${label}) init ran but allEvents still empty (try ${tries}/${MAX_TRIES})`);
+      return false;
+    } catch (err) {
+      console.error(`[FilterInit] (${label}) init crashed (try ${tries}/${MAX_TRIES})`, err);
+      return false;
+    }
+  };
+
+  const boot = () => {
+    if (FilterModule?.__initialized) return;
+
+    // 1) sofort mit dem übergebenen events versuchen
+    if (tryInitFilters("immediate", events)) return;
+
+    // 2) fallback: mit App.events versuchen
+    if (tryInitFilters("fallback-App.events", this.events)) return;
+
+    // 3) retries mit Lifecycle-Ticks (ohne Endlosschleife)
+    if (tries < MAX_TRIES) {
+      requestAnimationFrame(() => {
+        if (FilterModule?.__initialized) return;
+        if (tryInitFilters("rAF", this.events)) return;
+
+        setTimeout(() => {
+          if (FilterModule?.__initialized) return;
+          if (tryInitFilters("timeout-200ms", this.events)) return;
+        }, 200);
+      });
+    }
+
+    // 4) final: nach window.load (wenn wirklich alles da ist)
+    if (tries < MAX_TRIES) {
+      window.addEventListener(
+        "load",
+        () => {
+          if (FilterModule?.__initialized) return;
+          tryInitFilters("window-load", this.events);
+        },
+        { once: true }
+      );
+    }
+  };
+
+  boot();
 }
-/* === END BLOCK: FILTER INIT (robust + verified) === */
+/* === END BLOCK: FILTER INIT (self-healing retries) === */
+
 
 
         debugLog('All modules initialized');
@@ -162,5 +244,6 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
