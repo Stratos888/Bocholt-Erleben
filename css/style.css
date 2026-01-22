@@ -979,8 +979,8 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 }
 
 .app-logo{
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
 
   /* ruhig, nicht „App-Icon-Kachel“ */
@@ -992,7 +992,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 .app-title{
   color: var(--color-text-primary);
   font-size: 22px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.2;
 
@@ -1183,6 +1183,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
