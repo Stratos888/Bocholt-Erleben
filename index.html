@@ -263,6 +263,67 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
             });
         }
     </script>
+        <!-- === BEGIN BLOCK: FILTER SHEETS UI WIRING (guaranteed open/close) ===
+Zweck: Bottom-Sheets (Zeit/Kategorie) öffnen/schließen unabhängig von FilterModule.init().
+Umfang: Fügt ausschließlich robuste Click/ESC-Handler für #filter-time-pill/#filter-category-pill und Sheets hinzu.
+=== -->
+<script>
+  (function wireFilterSheetsUI() {
+    const byId = (id) => document.getElementById(id);
+
+    const timePill = byId("filter-time-pill");
+    const catPill  = byId("filter-category-pill");
+    const timeSheet = byId("sheet-time");
+    const catSheet  = byId("sheet-category");
+
+    // Wenn UI nicht existiert: nichts tun (aber NICHT abbrechen mit Fehler)
+    if (!timePill || !catPill || !timeSheet || !catSheet) return;
+
+    const openSheet = (sheetEl, pillEl) => {
+      // alle Sheets schließen
+      closeAllSheets();
+      sheetEl.hidden = false;
+      pillEl.setAttribute("aria-expanded", "true");
+      document.documentElement.classList.add("is-sheet-open");
+    };
+
+    const closeSheet = (sheetEl, pillEl) => {
+      sheetEl.hidden = true;
+      pillEl.setAttribute("aria-expanded", "false");
+      document.documentElement.classList.remove("is-sheet-open");
+    };
+
+    const closeAllSheets = () => {
+      closeSheet(timeSheet, timePill);
+      closeSheet(catSheet, catPill);
+    };
+
+    // Öffnen
+    timePill.addEventListener("click", () => openSheet(timeSheet, timePill));
+    catPill.addEventListener("click", () => openSheet(catSheet, catPill));
+
+    // Schließen per Overlay/Close-Button (data-close-sheet)
+    [timeSheet, catSheet].forEach((sheetEl) => {
+      sheetEl.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target && target.hasAttribute && target.hasAttribute("data-close-sheet")) {
+          closeAllSheets();
+        }
+      });
+    });
+
+    // Schließen per ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeAllSheets();
+    });
+
+    // Initial state
+    timePill.setAttribute("aria-expanded", "false");
+    catPill.setAttribute("aria-expanded", "false");
+  })();
+</script>
+<!-- === END BLOCK: FILTER SHEETS UI WIRING (guaranteed open/close) === -->
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -276,6 +337,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
