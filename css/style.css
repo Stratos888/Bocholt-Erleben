@@ -197,7 +197,7 @@ header { /* intentionally empty */ }
 
 /* legacy header helpers (aktuell nicht genutzt, aber harmlos beibehalten) */
 .header-content,
-.logo { display: none; }
+. { display: none; }
 /* === END BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) === */
 
 
@@ -932,7 +932,7 @@ Umfang: Konsolidiert Header + Modal Styles.
 === */
 
 /* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Linear-like Topbar-Optik ohne klassische Buttons: Logo links, Titel, rechts Inline-Actions mit Icon+Text.
+Zweck: Linear-like Topbar-Optik ohne klassische Buttons:  links, Titel, rechts Inline-Actions mit Icon+Text.
 Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-install-button (nur Header-Optik).
 === */
 .app-header{
@@ -991,7 +991,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 .app-title{
   color: var(--color-text-primary);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.016em;
   line-height: 1.2;
 
@@ -1061,24 +1061,24 @@ justify-content: flex-start;
 */
 .header-right > button.pwa-install-button::before{
   content: "⬇︎";
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.85;
   margin-right: 0px;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .header-right > a.pwa-install-button::before{
   content: "＋";
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.85;
   margin-right: 0px;
 }
 .header-right > a.pwa-install-button::after{
   content: "Event";
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /* Sehr kleine Screens: minimal kompakter */
@@ -1164,6 +1164,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
