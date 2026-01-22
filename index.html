@@ -98,7 +98,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     />
   </div>
 
-  <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
+ <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
   Zweck: Ersetzt Chip-Teppich durch 2 strukturierte Filter-Pills (Zeit + Kategorie) mit Bottom-Sheet Auswahl.
   Umfang: Entfernt quick-interests/time-chips; führt Filter-Bar + zwei Sheets ein (Zeit/Kategorie).
   === -->
@@ -127,10 +127,10 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
       </div>
       <div class="filter-sheet__body">
-        <button type="button" class="filter-option is-active" data-time="all">Alle</button>
-        <button type="button" class="filter-option" data-time="today">Heute</button>
-        <button type="button" class="filter-option" data-time="weekend">Wochenende</button>
-        <button type="button" class="filter-option" data-time="soon">Demnächst</button>
+        <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
+        <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
+        <button type="button" class="filter-sheet-option" data-time="weekend">Wochenende</button>
+        <button type="button" class="filter-sheet-option" data-time="soon">Demnächst</button>
       </div>
     </div>
   </div>
@@ -144,17 +144,18 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
       </div>
       <div class="filter-sheet__body">
-        <button type="button" class="filter-option is-active" data-category="">Alle</button>
-        <button type="button" class="filter-option" data-category="Party">Party</button>
-        <button type="button" class="filter-option" data-category="Kneipe">Kneipe</button>
-        <button type="button" class="filter-option" data-category="Kinder">Kinder</button>
-        <button type="button" class="filter-option" data-category="Quiz">Quiz</button>
-        <button type="button" class="filter-option" data-category="Musik">Musik</button>
-        <button type="button" class="filter-option" data-category="Kultur">Kultur</button>
+        <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+        <button type="button" class="filter-sheet-option" data-category="Party">Party</button>
+        <button type="button" class="filter-sheet-option" data-category="Kneipe">Kneipe</button>
+        <button type="button" class="filter-sheet-option" data-category="Kinder">Kinder</button>
+        <button type="button" class="filter-sheet-option" data-category="Quiz">Quiz</button>
+        <button type="button" class="filter-sheet-option" data-category="Musik">Musik</button>
+        <button type="button" class="filter-sheet-option" data-category="Kultur">Kultur</button>
       </div>
     </div>
   </div>
   <!-- === END BLOCK: FILTER PILLS (Top-App level, category single, location later) === -->
+
 </div>
 
 
@@ -337,6 +338,7 @@ Umfang: Fügt ausschließlich robuste Click/ESC-Handler für #filter-time-pill/#
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
