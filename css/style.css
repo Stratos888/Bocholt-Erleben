@@ -956,9 +956,10 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 
   /* keine harte Trennlinie; nur subtile „Schwebe“-Trennung */
   border-bottom: 1px solid rgba(31, 41, 51, 0.04);
-  box-shadow:
-  0 1px 0 rgba(31, 41, 51, 0.06),
-  0 8px 24px rgba(31, 41, 51, 0.08);
+ box-shadow:
+  0 1px 0 rgba(31, 41, 51, 0.04),
+  0 6px 20px rgba(31, 41, 51, 0.06);
+
 
 
   transform: translateZ(0);
@@ -978,8 +979,8 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 }
 
 .app-logo{
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   flex: 0 0 auto;
 
   /* ruhig, nicht „App-Icon-Kachel“ */
@@ -991,8 +992,8 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 .app-title{
   color: var(--color-text-primary);
   font-size: 22px;
-  font-weight: 400;
-  letter-spacing: -0.016em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 1.2;
 
   min-width: 0;
@@ -1035,7 +1036,7 @@ justify-content: flex-start;
 
   /* Icon+Text per Pseudo-Elemente, Originaltext bleibt für Screenreader */
   font-size: 0;          /* visuell Text ersetzen */
-  color: color-mix(in srgb, currentColor 78%, transparent);
+   color: var(--color-text-secondary);
   cursor: pointer;
 
   white-space: nowrap;
@@ -1164,6 +1165,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
