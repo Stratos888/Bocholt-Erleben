@@ -361,59 +361,61 @@ const FilterModule = {
   }
 };
 
-/* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (self-healing init) ===
-Zweck: Init sicherstellen, auch wenn main.js den Call verpasst/zu früh ist.
-Umfang: Ersetzt den bisherigen "Filter module loaded" Tail durch Auto-Init + Logging.
+/* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (ES-module safe) ===
+Zweck: Initialisiert Filter zuverlässig, auch bei ES-Module-Scope.
+Umfang: Ersetzt bisherigen Auto-Bootstrap vollständig.
 === */
 debugLog("Filter module loaded");
 
 (function autoInitFilters() {
-  // nur wenn Feature aktiv
-  if (typeof CONFIG === "undefined" || !CONFIG?.features?.showFilters) return;
-
-  const MAX_TRIES = 30;      // ~3 Sekunden bei 100ms
+  const MAX_TRIES = 30;
   const INTERVAL_MS = 100;
   let tries = 0;
 
   const tick = () => {
     tries += 1;
 
-    // Schon initialisiert? fertig.
     if (FilterModule._isInit) return;
 
-    // App/events vorhanden?
-    const appReady = typeof App !== "undefined" && Array.isArray(App?.events) && App.events.length > 0;
+    // ES-Module-safe Zugriff
+    const app = window.App;
+    const config = window.CONFIG;
 
-    if (appReady) {
-      debugLog(`[FilterAutoInit] trying init with App.events (${App.events.length})`);
-      FilterModule.init(App.events);
+    if (!config?.features?.showFilters) return;
 
-      // wenn init erfolgreich -> stop
+    const eventsReady =
+      app &&
+      Array.isArray(app.events) &&
+      app.events.length > 0;
+
+    if (eventsReady) {
+      debugLog(`[FilterAutoInit] init with App.events (${app.events.length})`);
+      FilterModule.init(app.events);
+
       if (FilterModule._isInit) {
         debugLog("[FilterAutoInit] OK");
         return;
       }
     } else {
-      debugLog(`[FilterAutoInit] waiting for App.events... try ${tries}/${MAX_TRIES}`);
+      debugLog(`[FilterAutoInit] waiting for App.events (${tries}/${MAX_TRIES})`);
     }
 
-    // Limit erreicht -> harte Fehlermeldung (Beweis statt Rätselraten)
     if (tries >= MAX_TRIES) {
-      console.error("[FilterAutoInit] FAILED: App.events not ready or init did not complete.");
+      console.error("[FilterAutoInit] FAILED – App.events never became ready");
       return;
     }
 
-    window.setTimeout(tick, INTERVAL_MS);
+    setTimeout(tick, INTERVAL_MS);
   };
 
-  // Start nach DOM ready (UI muss existieren)
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => window.setTimeout(tick, 0), { once: true });
+    document.addEventListener("DOMContentLoaded", () => setTimeout(tick, 0), { once: true });
   } else {
-    window.setTimeout(tick, 0);
+    setTimeout(tick, 0);
   }
 })();
-/* === END BLOCK: FILTER AUTO-BOOTSTRAP (self-healing init) === */
+/* === END BLOCK: FILTER AUTO-BOOTSTRAP (ES-module safe) === */
+
 
 /* === END BLOCK: FILTER.JS (Top-App Pills + Sheets, Single Category) === */
 
