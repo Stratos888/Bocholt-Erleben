@@ -40,10 +40,20 @@ init(events) {
   const resetPill = document.getElementById('filter-reset-pill');
 
   // Minimal-Guard: Filter UI muss existieren
-  if (!searchInput || !timePill || !timeValue || !timeSheet || !catPill || !catValue || !catSheet || !resetPill) {
-    console.error('Filter UI elements not found (search-filter / filter pills / sheets).');
-    return;
-  }
+if (!searchInput || !timePill || !timeValue || !timeSheet || !catPill || !catValue || !catSheet || !resetPill) {
+  console.error('Filter UI elements not found:', {
+    searchInput: !!searchInput,
+    timePill: !!timePill,
+    timeValue: !!timeValue,
+    timeSheet: !!timeSheet,
+    catPill: !!catPill,
+    catValue: !!catValue,
+    catSheet: !!catSheet,
+    resetPill: !!resetPill
+  });
+  return;
+}
+
 
   // Legacy-Felder neutralisieren (Ort später)
   this.filters.location = '';
