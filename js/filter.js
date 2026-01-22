@@ -47,15 +47,15 @@ const FilterModule = {
     const resetPill = document.getElementById("filter-reset-pill");
 
     // Guard
-    if (
+ if (
   !searchInput ||
   !timePill || !timeValue || !timeSheet ||
   !catPill || !catValue || !catSheet ||
   !resetPill
 ) {
-  alert("Filter init failed: missing UI elements. Check console for details.");
+  alert("❌ Filter konnten nicht initialisiert werden. Öffne die Konsole (F12).");
 
-  console.error("Filter init failed – missing UI elements:", {
+  console.error("❌ Filter init failed – missing UI elements:", {
     "search-filter": !!searchInput,
     "filter-time-pill": !!timePill,
     "filter-time-value": !!timeValue,
@@ -68,6 +68,7 @@ const FilterModule = {
 
   return;
 }
+
 
 
     // Defaults (konsistent)
