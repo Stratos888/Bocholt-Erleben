@@ -48,23 +48,27 @@ const FilterModule = {
 
     // Guard
     if (
-      !searchInput ||
-      !timePill || !timeValue || !timeSheet ||
-      !catPill || !catValue || !catSheet ||
-      !resetPill
-    ) {
-      console.error("Filter UI elements not found:", {
-        searchInput: !!searchInput,
-        timePill: !!timePill,
-        timeValue: !!timeValue,
-        timeSheet: !!timeSheet,
-        catPill: !!catPill,
-        catValue: !!catValue,
-        catSheet: !!catSheet,
-        resetPill: !!resetPill
-      });
-      return;
-    }
+  !searchInput ||
+  !timePill || !timeValue || !timeSheet ||
+  !catPill || !catValue || !catSheet ||
+  !resetPill
+) {
+  alert("Filter init failed: missing UI elements. Check console for details.");
+
+  console.error("Filter init failed – missing UI elements:", {
+    "search-filter": !!searchInput,
+    "filter-time-pill": !!timePill,
+    "filter-time-value": !!timeValue,
+    "sheet-time": !!timeSheet,
+    "filter-category-pill": !!catPill,
+    "filter-category-value": !!catValue,
+    "sheet-category": !!catSheet,
+    "filter-reset-pill": !!resetPill
+  });
+
+  return;
+}
+
 
     // Defaults (konsistent)
     this.filters.searchText = "";
