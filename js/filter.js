@@ -64,32 +64,55 @@ const FilterModule = {
 
     const resetPill = document.getElementById("filter-reset-pill");
 
-    // Guard
- if (
-  !searchInput ||
-  !timePill || !timeValue || !timeSheet ||
-  !catPill || !catValue || !catSheet ||
-  !resetPill
-) {
-  alert("❌ Filter konnten nicht initialisiert werden. Öffne die Konsole (F12).");
+  /* === BEGIN BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) ===
+Zweck: Schließt Fehlkonfigurationen aus (falscher DOM-Stand, falsche Klassen, fehlende Sheet-Bodies/Optionen).
+Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI-Elemente.
+=== */
+    const timeBody = timeSheet?.querySelector(".filter-sheet__body");
+    const catBody  = catSheet?.querySelector(".filter-sheet__body");
 
-  console.error("❌ Filter init failed – missing UI elements:", {
-    "search-filter": !!searchInput,
-    "filter-time-pill": !!timePill,
-    "filter-time-value": !!timeValue,
-    "sheet-time": !!timeSheet,
-    "filter-category-pill": !!catPill,
-    "filter-category-value": !!catValue,
-    "sheet-category": !!catSheet,
-    "filter-reset-pill": !!resetPill
-  });
+    const timeOptions = timeSheet?.querySelectorAll(".filter-sheet-option[data-time]");
+    const catOptions  = catSheet?.querySelectorAll(".filter-sheet-option[data-category]");
 
-  return;
-}
+    const hasTimeClose = !!timeSheet?.querySelector("[data-close-sheet]");
+    const hasCatClose  = !!catSheet?.querySelector("[data-close-sheet]");
 
+    if (
+      !searchInput ||
+      !timePill || !timeValue || !timeSheet ||
+      !catPill  || !catValue  || !catSheet  ||
+      !resetPill ||
+      !timeBody || !catBody ||
+      !timeOptions || timeOptions.length === 0 ||
+      !catOptions  || catOptions.length === 0 ||
+      !hasTimeClose || !hasCatClose
+    ) {
+      console.error("❌ [FilterContract] init failed – missing/invalid UI:", {
+        "search-filter": !!searchInput,
 
+        "filter-time-pill": !!timePill,
+        "filter-time-value": !!timeValue,
+        "sheet-time": !!timeSheet,
+        "sheet-time .filter-sheet__body": !!timeBody,
+        "sheet-time .filter-sheet-option[data-time]": (timeOptions?.length ?? 0),
+        "sheet-time [data-close-sheet]": hasTimeClose,
+
+        "filter-category-pill": !!catPill,
+        "filter-category-value": !!catValue,
+        "sheet-category": !!catSheet,
+        "sheet-category .filter-sheet__body": !!catBody,
+        "sheet-category .filter-sheet-option[data-category]": (catOptions?.length ?? 0),
+        "sheet-category [data-close-sheet]": hasCatClose,
+
+        "filter-reset-pill": !!resetPill
+      });
+
+      return;
+    }
+/* === END BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) === */
 
     // Defaults (konsistent)
+
     this.filters.searchText = "";
     this.filters.location = "";
     this.filters.kategorie = "";
@@ -292,9 +315,10 @@ const FilterModule = {
   === */
   setActiveOption(sheetEl, activeBtn) {
     if (!sheetEl) return;
-    sheetEl.querySelectorAll(".filter-option").forEach((b) => b.classList.remove("is-active"));
+    sheetEl.querySelectorAll(".filter-sheet-option").forEach((b) => b.classList.remove("is-active"));
     if (activeBtn) activeBtn.classList.add("is-active");
   },
+
 
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
     const timeMap = {
