@@ -232,15 +232,21 @@ Umfang: Ersetzt nur die Linkzeile im Footer.
     <!-- Alpine.js for reactive UI components -->
    
         <!-- CUSTOM JAVASCRIPT MODULES -->
-<script src="/js/config.js"></script>
-<script src="/js/locations.js"></script>
-<script src="/js/events.js"></script>
-<script src="/js/details.js"></script>
-<script src="/js/pwa-install.js"></script>
-        <script src="/js/filter.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/seo-schema.js"></script>
-<script src="/js/locations-modal.js" defer></script>
+<!-- === BEGIN BLOCK: CACHE-BUSTED JS INCLUDES ===
+Zweck: Erzwingt das Laden der aktuellen JS-Dateien (um SW/Browser-Cache zu umgehen).
+Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
+=== -->
+<script src="/js/config.js?v=2026-02-04-1"></script>
+<script src="/js/locations.js?v=2026-02-04-1"></script>
+<script src="/js/events.js?v=2026-02-04-1"></script>
+<script src="/js/details.js?v=2026-02-04-1"></script>
+<script src="/js/pwa-install.js?v=2026-02-04-1"></script>
+<script src="/js/filter.js?v=2026-02-04-1"></script>
+<script src="/js/main.js?v=2026-02-04-1"></script>
+<script src="/js/seo-schema.js?v=2026-02-04-1"></script>
+<script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<!-- === END BLOCK: CACHE-BUSTED JS INCLUDES === -->
+
 
 
     <!-- PWA Service Worker Registration -->
@@ -270,6 +276,7 @@ Umfang: Ersetzt nur die Linkzeile im Footer.
 <script src="js/seo-schema.js"></script>
 </body>
 </html>
+
 
 
 
