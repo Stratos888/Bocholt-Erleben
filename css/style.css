@@ -651,53 +651,13 @@ box-shadow: 0 4px 10px rgba(0,0,0,0.04);
   font-size: .95rem;
   color: var(--color-text-primary);
 }
-/* === BEGIN BLOCK: FILTER SHEET CLOSE BUTTON (always visible)
-Zweck: Close-Button (✕) im Filter-Sheet immer sichtbar & klickbar machen (Position, Kontrast, Z-Index).
-Umfang: Styles für .filter-sheet, .filter-sheet-header, .sheet-close (nur Filter-Sheets).
+/* === BEGIN BLOCK: FILTER SHEET CLOSE BUTTON (delegated) ===
+Zweck: Close-Button wird zentral im Block "FILTER BAR + SHEETS (Top-App level)" gestylt.
+Umfang: Verhindert doppelte/konkurrierende Definitionen.
 === */
+/* intentionally empty */
+/* === END BLOCK: FILTER SHEET CLOSE BUTTON (delegated) === */
 
-.filter-sheet {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 1000;
-  overflow: visible;
-}
-
-.filter-sheet-header {
-  position: relative;
-  padding-right: 3rem;
-}
-
-.sheet-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-
-  width: 2.25rem;
-  height: 2.25rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 1.4rem;
-  line-height: 1;
-  font-weight: 600;
-
-  color: #2f3a2f;
-  background: rgba(255, 255, 255, 0.85);
-
-  border-radius: 999px;
-  cursor: pointer;
-
-  z-index: 1001;
-}
-
-.sheet-close:hover {
-  background: rgba(255, 255, 255, 1);
-}
-
-/* === END BLOCK: FILTER SHEET CLOSE BUTTON (always visible) === */
 
 
 /* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
@@ -1431,6 +1391,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
