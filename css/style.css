@@ -86,10 +86,13 @@ body {
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 /* === BEGIN BLOCK: FILTER SHEET SCROLL LOCK ===
 Zweck: Beim offenen Filter-Sheet darf der Hintergrund nicht scrollen (Top-App Pattern).
-Umfang: Aktiviert Scroll-Lock über body.is-sheet-open.
+Umfang: Scroll-Lock greift für body UND html (egal ob JS die Klasse auf <body> oder <html> setzt).
 === */
 body.is-sheet-open { overflow: hidden; }
+html.is-sheet-open { overflow: hidden; }
+html.is-sheet-open body { overflow: hidden; }
 /* === END BLOCK: FILTER SHEET SCROLL LOCK === */
+
 
 /* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) ===
 Zweck: Links nicht mehr "Default-Lila", bessere Lesbarkeit auf Textseiten, konsistente CTAs.
@@ -724,77 +727,239 @@ border-bottom: 1px solid rgba(31,41,51,0.05);
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
 
-.quick-interests,
-.time-chips{
+/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
+Zweck: Zeit/Kategorie als hochwertige Controls + Bottom-Sheet Auswahl (Top-App Niveau).
+Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.filter-pill/.filter-sheet/.filter-option inkl. hidden-Guard.
+=== */
+
+.filters-bar{
   display: flex;
-  flex-wrap: nowrap;
-  gap: var(--space-sm);
-  margin-top: var(--space-sm);
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  scroll-padding-left: var(--space-md);
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 
-  padding-left: var(--space-md);
-  margin-left: calc(-1 * var(--space-md));
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
 
-  padding-right: 2px;
-  scrollbar-width: none;
-
-  -webkit-mask-image: linear-gradient(
-    to right,
-    #000 0%,
-    #000 78%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    #000 0%,
-    #000 78%,
-    transparent 100%
-  );
+  flex-wrap: wrap;
 }
 
-.quick-interests::-webkit-scrollbar,
-.time-chips::-webkit-scrollbar{
-  display: none;
-}
-
-.chip{
+/* Pills */
+.filter-pill{
+  -webkit-appearance: none;
   appearance: none;
-  border: 1px solid rgba(31,41,51,0.12);
-  background: var(--color-surface);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 12px;
+  min-height: 40px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.88);
+
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1;
+
   color: var(--color-text-primary);
-  padding: 8px 10px;
-  border-radius: 999px;
-  font-size: .9rem;
-  font-weight: 550;
   cursor: pointer;
-  flex: 0 0 auto;
-  scroll-snap-align: start;
+
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
-.chip:hover{
-  border-color: rgba(139,207,74,.35);
+#filter-time-pill,
+#filter-category-pill{
+  flex: 1 1 0;
+  min-width: 0;
 }
 
-.chip:focus{
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(139,207,74,.14);
-  border-color: rgba(139,207,74,.60);
-}
-
-/* Zeit-Chips aktiver Zustand */
-.chip--time.is-active{
-  background: var(--color-primary-muted);
-  border-color: rgba(139,207,74,.55);
-  color: var(--color-text-primary);
+.filter-pill__label{
+  color: var(--color-text-muted);
   font-weight: 650;
 }
 
+.filter-pill__value{
+  color: var(--color-text-primary);
+  font-weight: 750;
+}
+
+/* Reset (ruhig) */
+.filter-pill--reset{
+  flex: 0 0 auto;
+  margin-left: auto;
+
+  background: transparent;
+  border-color: rgba(31,41,51,0.08);
+  color: var(--color-text-secondary);
+  font-weight: 650;
+}
+
+@media (hover: hover){
+  .filter-pill:hover{
+    border-color: rgba(139,207,74,.30);
+    background: rgba(255,255,255,0.96);
+  }
+  .filter-pill--reset:hover{
+    color: var(--color-text-primary);
+  }
+}
+
+.filter-pill:active{ transform: translateY(1px); }
+
+.filter-pill:focus-visible{
+  outline: 3px solid rgba(139,207,74,.18);
+  outline-offset: 2px;
+  border-radius: 14px;
+}
+
+/* Bottom Sheets */
+.filter-sheet{
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+
+.filter-sheet__overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.32);
+
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.filter-sheet__card{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  max-height: 72vh;
+
+  background: var(--color-surface);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+
+  border-top: 1px solid rgba(139, 207, 74, 0.18);
+  box-shadow:
+    0 -24px 70px rgba(0,0,0,0.16),
+    0 1px 0 rgba(255,255,255,0.7) inset;
+
+  overflow: hidden;
+}
+
+.filter-sheet__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
+.filter-sheet__title{
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+/* Close (×) */
+.filter-sheet__close{
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(31,41,51,0.10);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+
+  font-size: 22px;
+  line-height: 1;
+  color: rgba(31,41,51,0.78);
+
+  cursor: pointer;
+}
+
+.filter-sheet__close:active{ transform: scale(0.96); }
+
+.filter-sheet__body{
+  padding: 10px 12px 14px;
+  display: grid;
+  gap: 8px;
+
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(72vh - 62px);
+}
+
+/* Options */
+.filter-option{
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 12px;
+  border-radius: 14px;
+
+  background: rgba(139, 207, 74, 0.06);
+  border: 1px solid rgba(31,41,51,0.08);
+
+  font: inherit;
+  font-weight: 650;
+  color: rgba(31,41,51,0.92);
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.filter-option.is-active{
+  background: rgba(139, 207, 74, 0.14);
+  border-color: rgba(139,207,74,.38);
+}
+
+.filter-option.is-active::after{
+  content: "✓";
+  color: rgba(31,41,51,0.85);
+  font-weight: 800;
+}
+
+@media (hover: hover){
+  .filter-option:hover{
+    border-color: rgba(139,207,74,.30);
+  }
+}
+
+/* hidden muss immer wirken */
+.filter-pill[hidden]{ display: none !important; }
+.filter-sheet[hidden]{ display: none !important; }
+
+@media (max-width: 360px){
+  .filters-bar{ gap: 8px; }
+  .filter-pill{ padding: 9px 10px; min-height: 38px; }
+}
+
+/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
 
 /* =========================================================
+
    BEGIN: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
    Single Source of Truth – konsolidiert (kein Patch-Stack)
    ========================================================= */
@@ -1266,6 +1431,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
