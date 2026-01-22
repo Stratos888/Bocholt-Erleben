@@ -852,6 +852,18 @@ Umfang: Neue Styles für .filters-bar, .filter-pill, .filter-sheet, .filter-opti
   .filters-bar{ gap: 8px; }
   .filter-pill{ padding: 7px 9px; min-height: 34px; }
 }
+/* === BEGIN BLOCK: HIDDEN ATTRIBUTE GUARD (do not override) ===
+Zweck: hidden muss IMMER display:none sein (Author CSS darf das nicht aus Versehen überschreiben).
+Umfang: Erzwingt hidden für Pills + Sheets.
+=== */
+.filter-pill[hidden]{
+  display: none !important;
+}
+.filter-sheet[hidden]{
+  display: none !important;
+}
+/* === END BLOCK: HIDDEN ATTRIBUTE GUARD (do not override) === */
+
 /* === END BLOCK: FILTER PILLS + SHEETS (Top-App level) === */
 
 /* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
@@ -1423,6 +1435,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
