@@ -18,53 +18,121 @@ const FilterModule = {
     /**
      * Init: Event Listeners registrieren
      */
-    init(events) {
-        this.allEvents = events;
-        this.filteredEvents = events;
-        
-        // Input Elements
-        const searchInput = document.getElementById('search-input');
-        const locationSelect = document.getElementById('location-filter');
-        const kategorieSelect = document.getElementById('kategorie-filter');
-        const zeitraumSelect = document.getElementById('zeitraum-filter');
-        const resetBtn = document.getElementById('reset-filters');
+    /* === BEGIN BLOCK: FILTER INIT (Top-App Pills + Sheets, search-filter id) ===
+Zweck: Umstellung von Dropdowns/legacy IDs auf Search + strukturierte Filter-Pills (Zeit/Kategorie).
+Umfang: Ersetzt FilterModule.init(events) vollständig.
+=== */
+init(events) {
+  this.allEvents = events;
+  this.filteredEvents = events;
 
-        if (!searchInput || !locationSelect || !kategorieSelect || !zeitraumSelect) {
-            console.error('Filter elements not found!');
-            return;
-        }
+  // Neue UI-Elemente (HTML)
+  const searchInput = document.getElementById('search-filter');
 
-        // Dropdowns befüllen
-        this.populateLocationFilter(locationSelect);
-        this.populateKategorieFilter(kategorieSelect);
+  const timePill = document.getElementById('filter-time-pill');
+  const timeValue = document.getElementById('filter-time-value');
+  const timeSheet = document.getElementById('sheet-time');
 
-        // Event Listeners
-        searchInput.addEventListener('input', (e) => {
-            this.filters.searchText = e.target.value.toLowerCase();
-            this.applyFilters();
-        });
+  const catPill = document.getElementById('filter-category-pill');
+  const catValue = document.getElementById('filter-category-value');
+  const catSheet = document.getElementById('sheet-category');
 
-        locationSelect.addEventListener('change', (e) => {
-            this.filters.location = e.target.value;
-            this.applyFilters();
-        });
+  const resetPill = document.getElementById('filter-reset-pill');
 
-        kategorieSelect.addEventListener('change', (e) => {
-            this.filters.kategorie = e.target.value;
-            this.applyFilters();
-        });
+  // Minimal-Guard: Filter UI muss existieren
+  if (!searchInput || !timePill || !timeValue || !timeSheet || !catPill || !catValue || !catSheet || !resetPill) {
+    console.error('Filter UI elements not found (search-filter / filter pills / sheets).');
+    return;
+  }
 
-        zeitraumSelect.addEventListener('change', (e) => {
-            this.filters.zeitraum = e.target.value;
-            this.applyFilters();
-        });
+  // Legacy-Felder neutralisieren (Ort später)
+  this.filters.location = '';
 
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => this.resetFilters());
-        }
+  // Search
+  searchInput.addEventListener('input', (e) => {
+    this.filters.searchText = (e.target.value || '').toLowerCase();
+    this.applyFilters();
+    this.updateFilterBarUI(timeValue, catValue, resetPill);
+  });
 
-        debugLog('Filter module initialized');
-    },
+  // Öffnen der Sheets
+  const openSheet = (sheetEl) => {
+    sheetEl.hidden = false;
+    document.body.classList.add('is-sheet-open');
+  };
+  const closeSheet = (sheetEl) => {
+    sheetEl.hidden = true;
+    // Wenn beide Sheets zu sind, Scroll lock entfernen
+    if (timeSheet.hidden && catSheet.hidden) {
+      document.body.classList.remove('is-sheet-open');
+    }
+  };
+
+  timePill.addEventListener('click', () => openSheet(timeSheet));
+  catPill.addEventListener('click', () => openSheet(catSheet));
+
+  // Close-Handler (Overlay + X)
+  const wireSheetClose = (sheetEl) => {
+    sheetEl.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t && t.hasAttribute && t.hasAttribute('data-close-sheet')) closeSheet(sheetEl);
+    });
+  };
+  wireSheetClose(timeSheet);
+  wireSheetClose(catSheet);
+
+  // ESC schließen (Top-App expected)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!timeSheet.hidden) closeSheet(timeSheet);
+    if (!catSheet.hidden) closeSheet(catSheet);
+  });
+
+  // Zeit-Auswahl (mapping auf neue Werte)
+  timeSheet.querySelectorAll('[data-time]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.getAttribute('data-time') || 'all';
+      this.filters.zeitraum = v; // 'all' | 'today' | 'weekend' | 'soon'
+      this.applyFilters();
+      this.setActiveOption(timeSheet, btn);
+      this.updateFilterBarUI(timeValue, catValue, resetPill);
+      closeSheet(timeSheet);
+    });
+  });
+
+  // Kategorie-Auswahl (Single)
+  catSheet.querySelectorAll('[data-category]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.getAttribute('data-category'); // '' = Alle
+      this.filters.kategorie = (v ?? '');
+      this.applyFilters();
+      this.setActiveOption(catSheet, btn);
+      this.updateFilterBarUI(timeValue, catValue, resetPill);
+      closeSheet(catSheet);
+    });
+  });
+
+  // Reset
+  resetPill.addEventListener('click', () => {
+    this.resetFilters();
+    // UI zurücksetzen
+    searchInput.value = '';
+    this.setActiveOption(timeSheet, timeSheet.querySelector('[data-time="all"]'));
+    this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
+    this.updateFilterBarUI(timeValue, catValue, resetPill);
+  });
+
+  // Initial UI State
+  this.filters.searchText = '';
+  this.filters.kategorie = '';
+  this.filters.zeitraum = 'all';
+  this.applyFilters();
+  this.updateFilterBarUI(timeValue, catValue, resetPill);
+
+  debugLog('Filter module initialized (Top-App pills + sheets)');
+},
+/* === END BLOCK: FILTER INIT (Top-App Pills + Sheets, search-filter id) === */
+
 
     /**
      * Location-Dropdown befüllen
@@ -121,38 +189,54 @@ const FilterModule = {
                 return false;
             }
 
-            // Zeitraum Filter
-            if (this.filters.zeitraum !== 'alle') {
-                const eventDate = new Date(event.datum);
-                const now = new Date();
-                now.setHours(0, 0, 0, 0);
+            /* === BEGIN BLOCK: ZEITFILTER MAPPING (all/today/weekend/soon) ===
+Zweck: Neue Zeitwerte aus UI-Sheet sauber filtern.
+Umfang: Ersetzt nur den Zeitraum-Filter-Block in applyFilters().
+=== */
+// Zeitraum Filter (neue Werte)
+if ((this.filters.zeitraum || 'all') !== 'all') {
+  const eventDate = new Date(event.datum);
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
 
-                switch (this.filters.zeitraum) {
-                    case 'diese-woche':
-                        const weekEnd = new Date(now);
-                        weekEnd.setDate(weekEnd.getDate() + 7);
-                        if (eventDate < now || eventDate > weekEnd) return false;
-                        break;
-                    
-                    case 'dieses-wochenende':
-                        const dayOfWeek = now.getDay();
-                        const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-                        const friday = new Date(now);
-                        friday.setDate(now.getDate() + daysUntilFriday);
-                        const sunday = new Date(friday);
-                        sunday.setDate(friday.getDate() + 2);
-                        if (eventDate < friday || eventDate > sunday) return false;
-                        break;
-                    
-                    case 'naechster-monat':
-                        const nextMonth = new Date(now);
-                        nextMonth.setMonth(nextMonth.getMonth() + 1);
-                        const monthAfter = new Date(nextMonth);
-                        monthAfter.setMonth(monthAfter.getMonth() + 1);
-                        if (eventDate < nextMonth || eventDate > monthAfter) return false;
-                        break;
-                }
-            }
+  // Ungültige Daten raus
+  if (Number.isNaN(eventDate.getTime())) return false;
+
+  const endOfToday = new Date(now);
+  endOfToday.setDate(endOfToday.getDate() + 1);
+
+  switch (this.filters.zeitraum) {
+    case 'today': {
+      // heute: [now, morgen 00:00)
+      if (eventDate < now || eventDate >= endOfToday) return false;
+      break;
+    }
+
+    case 'weekend': {
+      // nächstes Wochenende: Fr 00:00 bis Mo 00:00
+      const day = now.getDay(); // 0=So ... 6=Sa
+      const daysUntilFriday = (5 - day + 7) % 7;
+      const friday = new Date(now);
+      friday.setDate(now.getDate() + daysUntilFriday);
+
+      const monday = new Date(friday);
+      monday.setDate(friday.getDate() + 3);
+
+      if (eventDate < friday || eventDate >= monday) return false;
+      break;
+    }
+
+    case 'soon': {
+      // demnächst: nächste 14 Tage (inkl. heute)
+      const soonEnd = new Date(now);
+      soonEnd.setDate(now.getDate() + 14);
+      if (eventDate < now || eventDate >= soonEnd) return false;
+      break;
+    }
+  }
+}
+/* === END BLOCK: ZEITFILTER MAPPING (all/today/weekend/soon) === */
+
 
             return true;
         });
@@ -167,6 +251,40 @@ const FilterModule = {
      * UI aktualisieren
      */
     updateUI() {
+
+        /* === BEGIN BLOCK: FILTER UI HELPERS (active state + pill labels) ===
+Zweck: UI-State sauber halten: aktive Option markieren, Pill-Labels updaten, Reset nur bei aktiven Filtern zeigen.
+Umfang: Fügt setActiveOption() + updateFilterBarUI() hinzu.
+=== */
+setActiveOption(sheetEl, activeBtn){
+  if (!sheetEl) return;
+  sheetEl.querySelectorAll('.filter-option').forEach(b => b.classList.remove('is-active'));
+  if (activeBtn) activeBtn.classList.add('is-active');
+},
+
+updateFilterBarUI(timeValueEl, catValueEl, resetEl){
+  const timeMap = {
+    all: 'Alle',
+    today: 'Heute',
+    weekend: 'Wochenende',
+    soon: 'Demnächst'
+  };
+
+  const timeKey = this.filters.zeitraum || 'all';
+  const cat = (this.filters.kategorie || '').trim();
+
+  if (timeValueEl) timeValueEl.textContent = timeMap[timeKey] || 'Alle';
+  if (catValueEl) catValueEl.textContent = cat ? cat : 'Alle';
+
+  const hasActive =
+    (this.filters.searchText && this.filters.searchText.trim().length > 0) ||
+    (timeKey !== 'all') ||
+    (cat.length > 0);
+
+  if (resetEl) resetEl.hidden = !hasActive;
+},
+/* === END BLOCK: FILTER UI HELPERS (active state + pill labels) === */
+
         // Counter aktualisieren
         const counter = document.getElementById('filter-counter');
         if (counter) {
@@ -184,7 +302,8 @@ const FilterModule = {
     },
 
     setSearchText(text) {
-    const searchInput = document.getElementById('search-input');
+   const searchInput = document.getElementById('search-filter');
+
     const normalized = (text || '').trim();
 
     this.filters.searchText = normalized.toLowerCase();
@@ -199,25 +318,25 @@ const FilterModule = {
     /**
      * Filter zurücksetzen
      */
-    resetFilters() {
-        this.filters = {
-            searchText: '',
-            location: '',
-            kategorie: '',
-            zeitraum: 'alle'
-        };
+   /* === BEGIN BLOCK: RESET FILTERS (Top-App pills) ===
+Zweck: Reset ohne Dropdowns; setzt interne Defaults zurück.
+Umfang: Ersetzt FilterModule.resetFilters() vollständig.
+=== */
+resetFilters() {
+  this.filters = {
+    searchText: '',
+    location: '',
+    kategorie: '',
+    zeitraum: 'all'
+  };
 
-        // Inputs zurücksetzen
-        document.getElementById('search-input').value = '';
-        document.getElementById('location-filter').value = '';
-        document.getElementById('kategorie-filter').value = '';
-        document.getElementById('zeitraum-filter').value = 'alle';
+  this.filteredEvents = this.allEvents;
+  this.updateUI();
 
-        this.filteredEvents = this.allEvents;
-        this.updateUI();
+  debugLog('Filters reset');
+},
+/* === END BLOCK: RESET FILTERS (Top-App pills) === */
 
-        debugLog('Filters reset');
-    },
 
     /**
      * Events neu laden (z.B. nach Airtable-Update)
