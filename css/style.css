@@ -84,6 +84,12 @@ body {
   background: var(--color-background);
 }
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
+/* === BEGIN BLOCK: FILTER SHEET SCROLL LOCK ===
+Zweck: Beim offenen Filter-Sheet darf der Hintergrund nicht scrollen (Top-App Pattern).
+Umfang: Aktiviert Scroll-Lock über body.is-sheet-open.
+=== */
+body.is-sheet-open { overflow: hidden; }
+/* === END BLOCK: FILTER SHEET SCROLL LOCK === */
 
 /* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) ===
 Zweck: Links nicht mehr "Default-Lila", bessere Lesbarkeit auf Textseiten, konsistente CTAs.
@@ -642,6 +648,211 @@ box-shadow: 0 4px 10px rgba(0,0,0,0.04);
   font-size: .95rem;
   color: var(--color-text-primary);
 }
+/* === BEGIN BLOCK: FILTER PILLS + SHEETS (Top-App level) ===
+Zweck: Strukturierte Filter (Zeit/Kategorie) als kompakte Pills + Bottom-Sheet Auswahl.
+Umfang: Neue Styles für .filters-bar, .filter-pill, .filter-sheet, .filter-option.
+=== */
+
+/* Filter-Bar: kompakt, nimmt wenig Höhe ein */
+.filters-bar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+
+  /* Desktop: Pills nicht unendlich strecken */
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pill: wirkt wie systemischer Control, nicht wie Button */
+.filter-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 10px;
+  min-height: 36px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.72);
+
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 550;
+  line-height: 1;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.filter-pill__label{
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.filter-pill__value{
+  color: var(--color-text-primary);
+  font-weight: 650;
+}
+
+/* Reset-Pill: zurückhaltend */
+.filter-pill--reset{
+  margin-left: auto;
+  background: transparent;
+  border-color: rgba(31,41,51,0.08);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+@media (hover: hover){
+  .filter-pill:hover{
+    border-color: rgba(139,207,74,.35);
+    background: rgba(255,255,255,0.86);
+  }
+  .filter-pill--reset:hover{
+    color: var(--color-text-primary);
+  }
+}
+
+.filter-pill:active{
+  transform: translateY(1px);
+}
+
+.filter-pill:focus-visible{
+  outline: 3px solid rgba(139,207,74,.18);
+  outline-offset: 2px;
+}
+
+/* ----- Bottom Sheet (Top-App) ----- */
+.filter-sheet{
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+
+.filter-sheet__overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.32);
+
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.filter-sheet__card{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  max-height: 72vh;
+
+  background: var(--color-surface);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+
+  border-top: 1px solid rgba(139, 207, 74, 0.18);
+  box-shadow:
+    0 -24px 70px rgba(0,0,0,0.16),
+    0 1px 0 rgba(255,255,255,0.7) inset;
+
+  overflow: hidden;
+}
+
+/* Header */
+.filter-sheet__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
+.filter-sheet__title{
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.filter-sheet__close{
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(31,41,51,0.10);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+
+  font-size: 22px;
+  line-height: 34px;
+  color: rgba(31,41,51,0.70);
+  cursor: pointer;
+}
+
+.filter-sheet__close:active{
+  transform: scale(0.96);
+}
+
+/* Body: Optionen als Liste */
+.filter-sheet__body{
+  padding: 10px 12px 14px;
+  display: grid;
+  gap: 8px;
+
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(72vh - 62px);
+}
+
+/* Option: groß tappable, aber nicht “Button-CTA” */
+.filter-option{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 12px;
+  border-radius: 14px;
+
+  background: rgba(139, 207, 74, 0.06);
+  border: 1px solid rgba(31,41,51,0.08);
+
+  font: inherit;
+  font-weight: 650;
+  color: rgba(31,41,51,0.90);
+  cursor: pointer;
+  text-align: left;
+}
+
+.filter-option.is-active{
+  background: rgba(139, 207, 74, 0.14);
+  border-color: rgba(139,207,74,.38);
+}
+
+.filter-option.is-active::after{
+  content: "✓";
+  color: rgba(31,41,51,0.85);
+  font-weight: 800;
+}
+
+@media (hover: hover){
+  .filter-option:hover{
+    border-color: rgba(139,207,74,.30);
+  }
+}
+
+/* Sehr kleine Screens: Pills enger */
+@media (max-width: 360px){
+  .filters-bar{ gap: 8px; }
+  .filter-pill{ padding: 7px 9px; min-height: 34px; }
+}
+/* === END BLOCK: FILTER PILLS + SHEETS (Top-App level) === */
 
 /* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
 Zweck: Nach Entfernung des Intros wird Search zur “Hero”-Interaktion direkt unter dem Header.
@@ -658,7 +869,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
 
 
   /* näher an Header: App-Gefühl */
-  padding: 10px 20px 12px;
+  padding: 8px 20px 10px;
 
   /* nur eine sehr subtile Trennung zum Content */
 border-bottom: 1px solid rgba(31,41,51,0.05);
@@ -1212,6 +1423,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
