@@ -129,21 +129,29 @@ if (CONFIG.features.showFilters) {
       debugLog(`[FilterInit] (${label}) calling FilterModule.init with events: ${count}`);
       FilterModule.init(evts);
 
-      // Verifikation: Listener-Init ist nur sinnvoll, wenn allEvents auch wirklich gesetzt wurde
-      const ok = (FilterModule.allEvents?.length || 0) > 0 || (count === 0);
+          /* === BEGIN BLOCK: FILTER INIT VERIFICATION (require listener-wiring) ===
+      Zweck: Init gilt nur als erfolgreich, wenn FilterModule._isInit wirklich true ist
+             (wird in filter.js erst nach dem Listener-Wiring gesetzt).
+      Umfang: Ersetzt ausschließlich die bisherige allEvents-basierte Verifikation.
+      === */
+      const ok = FilterModule._isInit === true;
+
       if (ok) {
         FilterModule.__initialized = true;
         FilterModule.__initLabel = label;
         FilterModule.__initTries = tries;
         debugLog(`[FilterInit] initialized OK (${label})`, {
           tries,
-          allEvents: FilterModule.allEvents?.length || 0
+          allEvents: FilterModule.allEvents?.length || 0,
+          isInit: FilterModule._isInit === true
         });
         return true;
       }
 
-      console.warn(`[FilterInit] (${label}) init ran but allEvents still empty (try ${tries}/${MAX_TRIES})`);
+      console.warn(`[FilterInit] (${label}) init ran but listeners not wired yet (_isInit=false) (try ${tries}/${MAX_TRIES})`);
       return false;
+      /* === END BLOCK: FILTER INIT VERIFICATION (require listener-wiring) === */
+
     } catch (err) {
       console.error(`[FilterInit] (${label}) init crashed (try ${tries}/${MAX_TRIES})`, err);
       return false;
@@ -244,6 +252,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
