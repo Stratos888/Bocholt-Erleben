@@ -1052,19 +1052,37 @@ justify-content: flex-start;
 
 @media (hover: hover){
   .header-right > .pwa-install-button:hover{
-    color: color-mix(in srgb, currentColor 92%, transparent);
+    color: var(--color-text-primary);
+  }
+
+  /* Hover muss explizit auch die sichtbaren Pseudo-Elemente treffen */
+  .header-right > .pwa-install-button:hover::before,
+  .header-right > .pwa-install-button:hover::after{
+    color: var(--color-text-primary);
   }
 }
+
 
 /* ---- ICON + LABEL MAPPING (ohne HTML-Änderung) ----
    Installieren-Button (button) -> [⬇︎] App
    Veröffentlichen-Link (a)     -> [＋] Event
 */
+/* === BEGIN BLOCK: HEADER ACTIONS VISUAL COLOR (pseudo elements) ===
+Zweck: Icon + Label erben nicht zuverlässig aus Parent-Regel (font-size:0 etc.) → daher explizit.
+Umfang: Setzt Grundfarbe für ::before/::after im Normalzustand.
+=== */
+.header-right > .pwa-install-button::before,
+.header-right > .pwa-install-button::after{
+  color: var(--color-text-secondary);
+}
+/* === END BLOCK: HEADER ACTIONS VISUAL COLOR (pseudo elements) === */
+
+
 .header-right > button.pwa-install-button::before{
   content: "⬇︎";
   font-size: 14px;
-  opacity: 0.85;
-  margin-right: 0px;
+  opacity: 0.95;
+  margin-right: 2px;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
@@ -1074,8 +1092,8 @@ justify-content: flex-start;
 .header-right > a.pwa-install-button::before{
   content: "＋";
   font-size: 14px;
-  opacity: 0.85;
-  margin-right: 0px;
+  opacity: 0.95;
+  margin-right: 2px;
 }
 .header-right > a.pwa-install-button::after{
   content: "Event";
@@ -1165,6 +1183,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
