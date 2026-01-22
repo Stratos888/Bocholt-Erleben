@@ -15,9 +15,16 @@ Hinweis: Erwartet HTML-IDs: search-filter, filter-time-pill, filter-time-value, 
  * - Reset nur bei aktiven Filtern
  */
 
+/* === BEGIN BLOCK: FILTER MODULE STATE (init flag) ===
+Zweck: Stabiler Zustand für Auto-Bootstrap + Schutz gegen doppelte Init.
+Umfang: Ersetzt nur die ersten Properties im FilterModule-Objekt.
+=== */
 const FilterModule = {
+  _isInit: false,
   allEvents: [],
   filteredEvents: [],
+/* === END BLOCK: FILTER MODULE STATE (init flag) === */
+
 
   filters: {
     searchText: "",
@@ -29,9 +36,20 @@ const FilterModule = {
   /**
    * Init: Event Listeners registrieren
    */
+   /* === BEGIN BLOCK: FILTER INIT GUARD (single init) ===
+  Zweck: Verhindert doppelte Initialisierung (Listener-Stacking) und macht init idempotent.
+  Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zuweisung.
+  === */
   init(events) {
+    if (this._isInit) {
+      debugLog("FilterModule.init skipped (already initialized)");
+      return;
+    }
+
     this.allEvents = Array.isArray(events) ? events : [];
     this.filteredEvents = this.allEvents;
+  /* === END BLOCK: FILTER INIT GUARD (single init) === */
+
 
     // UI-Elemente
     const searchInput = document.getElementById("search-filter");
@@ -161,8 +179,15 @@ const FilterModule = {
     this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
     this.updateFilterBarUI(timeValue, catValue, resetPill);
 
+        /* === BEGIN BLOCK: FILTER INIT FINALIZE (set init flag) ===
+    Zweck: Markiert erfolgreiche Initialisierung, damit Auto-Bootstrap nicht erneut init() ausführt.
+    Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
+    === */
+    this._isInit = true;
     debugLog("Filter module initialized (Top-App pills + sheets)");
   },
+  /* === END BLOCK: FILTER INIT FINALIZE (set init flag) === */
+
 
   /**
    * Filter anwenden
@@ -336,6 +361,59 @@ const FilterModule = {
   }
 };
 
+/* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (self-healing init) ===
+Zweck: Init sicherstellen, auch wenn main.js den Call verpasst/zu früh ist.
+Umfang: Ersetzt den bisherigen "Filter module loaded" Tail durch Auto-Init + Logging.
+=== */
 debugLog("Filter module loaded");
 
+(function autoInitFilters() {
+  // nur wenn Feature aktiv
+  if (typeof CONFIG === "undefined" || !CONFIG?.features?.showFilters) return;
+
+  const MAX_TRIES = 30;      // ~3 Sekunden bei 100ms
+  const INTERVAL_MS = 100;
+  let tries = 0;
+
+  const tick = () => {
+    tries += 1;
+
+    // Schon initialisiert? fertig.
+    if (FilterModule._isInit) return;
+
+    // App/events vorhanden?
+    const appReady = typeof App !== "undefined" && Array.isArray(App?.events) && App.events.length > 0;
+
+    if (appReady) {
+      debugLog(`[FilterAutoInit] trying init with App.events (${App.events.length})`);
+      FilterModule.init(App.events);
+
+      // wenn init erfolgreich -> stop
+      if (FilterModule._isInit) {
+        debugLog("[FilterAutoInit] OK");
+        return;
+      }
+    } else {
+      debugLog(`[FilterAutoInit] waiting for App.events... try ${tries}/${MAX_TRIES}`);
+    }
+
+    // Limit erreicht -> harte Fehlermeldung (Beweis statt Rätselraten)
+    if (tries >= MAX_TRIES) {
+      console.error("[FilterAutoInit] FAILED: App.events not ready or init did not complete.");
+      return;
+    }
+
+    window.setTimeout(tick, INTERVAL_MS);
+  };
+
+  // Start nach DOM ready (UI muss existieren)
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => window.setTimeout(tick, 0), { once: true });
+  } else {
+    window.setTimeout(tick, 0);
+  }
+})();
+/* === END BLOCK: FILTER AUTO-BOOTSTRAP (self-healing init) === */
+
 /* === END BLOCK: FILTER.JS (Top-App Pills + Sheets, Single Category) === */
+
