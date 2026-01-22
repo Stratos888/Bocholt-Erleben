@@ -41,7 +41,7 @@ const CONFIG = {
         showCalendar: false,             // Kalender-Ansicht zeigen
         showEventCards: true,           // Event-Cards zeigen
         showDetailPanel: true,          // Detail-Panel bei Click
-        showFilters: false               // Such- und Filter-Funktionen (NEU!)
+        showFilters: true               // Such- und Filter-Funktionen (NEU!)
     },
 
     // Debug Mode (fÃ¼r Entwicklung)
@@ -74,3 +74,4 @@ function isUpcoming(dateString) {
 }
 
 debugLog('Config loaded successfully', CONFIG);
+
