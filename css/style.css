@@ -990,7 +990,7 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 600;
   letter-spacing: -0.016em;
   line-height: 1.2;
@@ -1164,6 +1164,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
