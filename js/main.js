@@ -88,9 +88,26 @@ this.events = Array.isArray(data?.events) ? data.events : [];
         }
 
         // Filter (NEU!)
-        if (CONFIG.features.showFilters) {
-            FilterModule.init(events);
-        }
+       /* === BEGIN BLOCK: FILTER INIT (robust + verified) ===
+Zweck: FilterModule muss nach Event-Load sicher initialisiert werden; verhindert “init nie gelaufen”.
+Umfang: Ersetzt nur den Filter-Init Abschnitt in initModules(events).
+=== */
+if (CONFIG.features.showFilters) {
+  if (typeof FilterModule !== "undefined" && typeof FilterModule.init === "function") {
+    debugLog("Initializing FilterModule with events:", Array.isArray(events) ? events.length : "not-array");
+    FilterModule.init(events);
+
+    // Harte Verifikation: wenn allEvents leer bleibt, nochmal mit App.events probieren (sicherer Fallback)
+    if ((FilterModule.allEvents?.length || 0) === 0 && (this.events?.length || 0) > 0) {
+      console.warn("FilterModule.init got no events – retrying with App.events");
+      FilterModule.init(this.events);
+    }
+  } else {
+    console.warn("FilterModule not available – filter.js not loaded or has an error.");
+  }
+}
+/* === END BLOCK: FILTER INIT (robust + verified) === */
+
 
         debugLog('All modules initialized');
     },
@@ -145,4 +162,5 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
