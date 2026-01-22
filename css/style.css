@@ -688,8 +688,8 @@ border-bottom: 1px solid rgba(31,41,51,0.05);
 
 
 /* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
-Zweck: Zeit/Kategorie als hochwertige Controls + Bottom-Sheet Auswahl (Top-App Niveau).
-Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.filter-pill/.filter-sheet/.filter-option inkl. hidden-Guard.
+Zweck: Filter-UI im selben ruhigen „Tool“-Look wie der Header (dezent, funktional, Top-App).
+Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen + hidden-Guard.
 === */
 
 .filters-bar{
@@ -705,7 +705,7 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   flex-wrap: wrap;
 }
 
-/* Pills */
+/* Pills: „Tools“ statt Buttons (ruhig, dünne Linie, kaum Fläche) */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -719,12 +719,12 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   min-height: 40px;
 
   border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(255,255,255,0.55);
 
   font: inherit;
   font-size: 0.95rem;
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1;
 
   color: var(--color-text-primary);
@@ -741,45 +741,67 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
 }
 
 .filter-pill__label{
-  color: var(--color-text-muted);
-  font-weight: 650;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  opacity: 0.9;
 }
 
 .filter-pill__value{
   color: var(--color-text-primary);
-  font-weight: 750;
+  font-weight: 650;
 }
 
-/* Reset (ruhig) */
-.filter-pill--reset{
-  flex: 0 0 auto;
-  margin-left: auto;
-
-  background: transparent;
-  border-color: rgba(31,41,51,0.08);
-  color: var(--color-text-secondary);
-  font-weight: 650;
+/* Active: sehr subtil (kein „grüner Button“) */
+.filter-pill.is-active{
+  background: rgba(139,207,74,0.10);
+  border-color: rgba(139,207,74,0.30);
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    border-color: rgba(139,207,74,.30);
-    background: rgba(255,255,255,0.96);
+    background: rgba(255,255,255,0.72);
+    border-color: rgba(31,41,51,0.12);
   }
-  .filter-pill--reset:hover{
-    color: var(--color-text-primary);
+  .filter-pill.is-active:hover{
+    background: rgba(139,207,74,0.12);
+    border-color: rgba(139,207,74,0.34);
   }
 }
 
 .filter-pill:active{ transform: translateY(1px); }
 
 .filter-pill:focus-visible{
-  outline: 3px solid rgba(139,207,74,.18);
-  outline-offset: 2px;
+  outline: 2px solid rgba(139,207,74,0.18);
+  outline-offset: 3px;
   border-radius: 14px;
 }
 
-/* Bottom Sheets */
+/* Reset: als Tool-Text (wie Header-Actions) */
+.filter-pill--reset{
+  flex: 0 0 auto;
+  margin-left: auto;
+
+  padding: 10px 0;
+  background: transparent;
+  border: 0;
+
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+@media (hover: hover){
+  .filter-pill--reset:hover{
+    color: var(--color-text-primary);
+  }
+}
+
+.filter-pill--reset:focus-visible{
+  outline: 2px solid rgba(139,207,74,0.18);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* Bottom Sheet: Premium (Overlay + Card + Grabber) */
 .filter-sheet{
   position: fixed;
   inset: 0;
@@ -801,18 +823,29 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   right: 0;
   bottom: 0;
 
-  max-height: 72vh;
+  max-height: 76vh;
 
   background: var(--color-surface);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 
-  border-top: 1px solid rgba(139, 207, 74, 0.18);
+  border-top: 1px solid rgba(31,41,51,0.06);
   box-shadow:
     0 -24px 70px rgba(0,0,0,0.16),
     0 1px 0 rgba(255,255,255,0.7) inset;
 
   overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.filter-sheet__card::before{
+  content: "";
+  display: block;
+  width: 52px;
+  height: 5px;
+  border-radius: 999px;
+  margin: 10px auto 8px;
+  background: rgba(31,41,51,0.14);
 }
 
 .filter-sheet__header{
@@ -820,17 +853,18 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   align-items: center;
   justify-content: space-between;
 
-  padding: 14px 14px 10px;
+  padding: 10px 14px 12px;
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
 .filter-sheet__title{
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: 0.98rem;
+  font-weight: 650;
   letter-spacing: -0.01em;
+  color: var(--color-text-primary);
 }
 
-/* Close (×) */
+/* Close: identisches Muster wie Detail-Panel (ruhig, rund, klar) */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
@@ -843,13 +877,13 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   align-items: center;
   justify-content: center;
 
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.90);
   border: 1px solid rgba(31,41,51,0.10);
   box-shadow: 0 6px 16px rgba(0,0,0,0.10);
 
   font-size: 22px;
   line-height: 1;
-  color: rgba(31,41,51,0.78);
+  color: rgba(31,41,51,0.72);
 
   cursor: pointer;
 }
@@ -857,16 +891,13 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
 .filter-sheet__close:active{ transform: scale(0.96); }
 
 .filter-sheet__body{
-  padding: 10px 12px 14px;
-  display: grid;
-  gap: 8px;
-
+  padding: 8px 12px 14px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(72vh - 62px);
+  max-height: calc(76vh - 74px);
 }
 
-/* Options */
+/* Optionen: Liste statt Karten (ruhiger, „iOS Settings“-Feeling) */
 .filter-option{
   -webkit-appearance: none;
   appearance: none;
@@ -876,14 +907,14 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
   align-items: center;
   justify-content: space-between;
 
-  padding: 12px 12px;
+  padding: 12px 10px;
   border-radius: 14px;
 
-  background: rgba(139, 207, 74, 0.06);
+  background: rgba(255,255,255,0.70);
   border: 1px solid rgba(31,41,51,0.08);
 
   font: inherit;
-  font-weight: 650;
+  font-weight: 600;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
@@ -891,19 +922,31 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
 }
 
 .filter-option.is-active{
-  background: rgba(139, 207, 74, 0.14);
-  border-color: rgba(139,207,74,.38);
+  background: rgba(139,207,74,0.12);
+  border-color: rgba(139,207,74,0.28);
 }
 
 .filter-option.is-active::after{
   content: "✓";
-  color: rgba(31,41,51,0.85);
+  color: rgba(31,41,51,0.78);
   font-weight: 800;
 }
 
 @media (hover: hover){
   .filter-option:hover{
-    border-color: rgba(139,207,74,.30);
+    border-color: rgba(31,41,51,0.12);
+    background: rgba(255,255,255,0.86);
+  }
+  .filter-option.is-active:hover{
+    background: rgba(139,207,74,0.14);
+    border-color: rgba(139,207,74,0.32);
+  }
+}
+
+/* Safe Area */
+@supports (padding: max(0px)){
+  .filter-sheet__card{
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 }
 
@@ -917,6 +960,7 @@ Umfang: Ersetzt die alte Chip-Scroll-Leiste vollständig; stylt .filters-bar/.fi
 }
 
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
+
 
 /* =========================================================
 
@@ -1391,6 +1435,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
