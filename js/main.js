@@ -1,13 +1,26 @@
-/* === BEGIN BLOCK: MAIN MODULE HEADER (encoding fixed) ===
-Zweck: Lesbare Kommentare/Strings (UTF-8 korrekt).
-Umfang: Ersetzt nur den Dateikopf-Kommentar.
-=== */
-/**
- * MAIN.JS – Haupt-Einstiegspunkt
- *
- * Lädt Events und initialisiert alle Module.
- */
-/* === END BLOCK: MAIN MODULE HEADER (encoding fixed) === */
+// BEGIN: FILE_HEADER_MAIN
+// Datei: js/main.js
+// Zweck:
+// - App-Einstiegspunkt (Bootstrapping)
+// - Lädt Event-Daten (Quelle/Fetch) und hält die vollständige Event-Liste
+// - Initialisiert Module in definierter Reihenfolge (Details, Filter, Cards, SEO/PWA…)
+// - Verdrahtet Datenfluss: vollständige Events → Filter → gefilterte Events → EventCards
+//
+// Verantwortlich für:
+// - App-Start & Initialisierungsreihenfolge
+// - Daten laden + Fehlerbehandlung (Loading/Empty/Error UI)
+// - Übergabe der Daten an Module (keine eigene Fachlogik)
+//
+// Nicht verantwortlich für:
+// - Filter-State / Filterlogik (liegt in js/filter.js)
+// - Rendering der Event Cards (liegt in js/events.js)
+// - DetailPanel-Logik (liegt in js/details.js)
+//
+// Contract:
+// - hält `App.events` als vollständige Quelle
+// - ruft FilterModule/ EventCards nur über deren öffentliche API auf
+// END: FILE_HEADER_MAIN
+
 
 
 const App = {
@@ -252,6 +265,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
