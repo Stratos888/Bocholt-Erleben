@@ -223,70 +223,68 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
   /**
    * Filter anwenden
    */
-  applyFilters() {
+    applyFilters() {
     debugLog("Applying filters:", this.filters);
 
-    this.filteredEvents = this.allEvents.filter((event) => {
+    const timeKey = (this.filters.zeitraum || "all").trim();
+    const searchNeedle = (this.filters.searchText || "").trim().toLowerCase();
+    const catNeedle = (this.filters.kategorie || "").trim();
+
+    this.filteredEvents = (this.allEvents || []).filter((event) => {
+      const title = (event?.eventName || event?.title || "").toLowerCase();
+      const desc = (event?.beschreibung || "").toLowerCase();
+      const loc = (event?.location || "").toLowerCase();
+
       // Textsuche
-      if (this.filters.searchText) {
-        const searchableText = `${event.eventName || ""} ${event.beschreibung || ""} ${event.location || ""}`.toLowerCase();
-        if (!searchableText.includes(this.filters.searchText)) {
-          return false;
-        }
+      if (searchNeedle) {
+        const searchable = `${title} ${desc} ${loc}`;
+        if (!searchable.includes(searchNeedle)) return false;
       }
 
       // Kategorie Filter (Single)
-      if (this.filters.kategorie && event.kategorie !== this.filters.kategorie) {
-        return false;
+      if (catNeedle) {
+        const evCat = (event?.kategorie || "").trim();
+        if (evCat !== catNeedle) return false;
       }
 
-      /* === BEGIN BLOCK: ZEITFILTER MAPPING (all/today/weekend/soon) ===
-      Zweck: Neue Zeitwerte aus UI-Sheet sauber filtern.
-      Umfang: Zeitraum-Filter-Logik in applyFilters().
+      /* === BEGIN BLOCK: ZEITFILTER (uses events.js date helpers + robust weekend) ===
+      Zweck: Zeitfilter nutzt gemeinsame Helper/Formats, vermeidet event.datum vs event.date Mix.
+      Umfang: Zeitraum-Filter-Logik in applyFilters(), ohne Duplikate.
       === */
-      if ((this.filters.zeitraum || "all") !== "all") {
-        const eventDate = new Date(event.datum);
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
+      if (timeKey !== "all") {
+        // Erwartetes Feld: event.date (ISO YYYY-MM-DD). Fallback: event.datum.
+        const iso = (event?.date || event?.datum || "").trim();
+        const day = parseISODateLocal(iso);
+        if (!day) return false;
 
-        // Ungültige Daten raus
-        if (Number.isNaN(eventDate.getTime())) return false;
+        const today = startOfToday();
+        const endToday = addDays(today, 1);
 
-        const endOfToday = new Date(now);
-        endOfToday.setDate(endOfToday.getDate() + 1);
-
-        switch (this.filters.zeitraum) {
+        switch (timeKey) {
           case "today": {
-            // heute: [now, morgen 00:00)
-            if (eventDate < now || eventDate >= endOfToday) return false;
+            if (day < today || day >= endToday) return false;
             break;
           }
 
           case "weekend": {
-            // nächstes Wochenende: Fr 00:00 bis Mo 00:00
-            const day = now.getDay(); // 0=So ... 6=Sa
-            const daysUntilFriday = (5 - day + 7) % 7;
-
-            const friday = new Date(now);
-            friday.setDate(now.getDate() + daysUntilFriday);
-
-            const monday = new Date(friday);
-            monday.setDate(friday.getDate() + 3);
-
-            if (eventDate < friday || eventDate >= monday) return false;
+            const { start, end } = getNextWeekendRange(today);
+            if (day < start || day > end) return false;
             break;
           }
 
           case "soon": {
-            // demnächst: nächste 14 Tage (inkl. heute)
-            const soonEnd = new Date(now);
-            soonEnd.setDate(now.getDate() + 14);
-            if (eventDate < now || eventDate >= soonEnd) return false;
+            // Demnächst: nächste 14 Tage inkl. heute
+            const soonEnd = addDays(today, 14);
+            soonEnd.setHours(23, 59, 59, 999);
+            if (day < today || day > soonEnd) return false;
             break;
           }
+
+          default:
+            break;
         }
       }
-      /* === END BLOCK: ZEITFILTER MAPPING (all/today/weekend/soon) === */
+      /* === END BLOCK: ZEITFILTER (uses events.js date helpers + robust weekend) === */
 
       return true;
     });
@@ -294,8 +292,9 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
     // UI aktualisieren
     this.updateUI();
 
-    debugLog(`Filtered: ${this.filteredEvents.length} of ${this.allEvents.length} events`);
+    debugLog(`Filtered: ${this.filteredEvents.length} of ${(this.allEvents || []).length} events`);
   },
+
 
   /**
    * UI aktualisieren
