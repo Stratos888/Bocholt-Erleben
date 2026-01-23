@@ -83,6 +83,12 @@ jobs:
               set net:timeout 20;
               set net:max-retries 2;
 
+                           # === BEGIN BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
+              pwd;
+              ls -la;
+
+              mkdir -p STRATO-apps;
+              cd STRATO-apps;
               pwd;
               ls -la;
 
@@ -90,4 +96,6 @@ jobs:
 
               ls -la;
               bye;
+              # === END BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
+
             "
