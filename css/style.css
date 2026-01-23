@@ -688,8 +688,8 @@ border-bottom: 1px solid rgba(31,41,51,0.05);
 
 
 /* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
-Zweck: Filter-UI im selben ruhigen „Tool“-Look wie der Header (text-first, flach, hochwertig).
-Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen + hidden-Guard.
+Zweck: Top-App-UX für Suche + Pills + Bottom-Sheets (klarer Header, volle Sichtbarkeit, schöne Liste).
+Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen + hidden-Guard.
 === */
 
 .filters-bar{
@@ -705,7 +705,7 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
   flex-wrap: wrap;
 }
 
-/* Pills: flach wie Header-Tools (keine „Button“-Fläche), aber mit guter Touch-Area */
+/* Pills: wie ruhige “Tools” */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -719,15 +719,15 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
   gap: 10px;
 
   padding: 10px 12px;
-  min-height: 42px;
+  min-height: 44px;
 
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.06);
-  background: rgba(255,255,255,0.40);
+  border-radius: 16px;
+  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(255,255,255,0.68);
 
   font: inherit;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1;
 
   color: var(--color-text-primary);
@@ -735,20 +735,21 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
 
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
-/* Label/Value: wie „Tool“ (sekundär/primär) */
 .filter-pill__label{
   color: var(--color-text-secondary);
-  font-weight: 500;
+  font-weight: 550;
 }
 
 .filter-pill__value{
   color: var(--color-text-primary);
-  font-weight: 650;
+  font-weight: 750;
 }
 
-/* Dezent „chevron“ ohne HTML-Änderung */
+/* Chevron */
 .filter-pill::after{
   content: "›";
   margin-left: 2px;
@@ -758,15 +759,18 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
   transform: translateY(-1px);
 }
 
-/* Active: nur leichte Betonung (Header-like), keine „grüne Kachel“ */
+/* Active (dezent, wertig) */
 .filter-pill.is-active{
-  background: rgba(255,255,255,0.58);
-  border-color: rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.85);
+  border-color: rgba(139,207,74,0.28);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.08),
+    0 0 0 4px rgba(139,207,74,0.10);
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.62);
+    background: rgba(255,255,255,0.85);
     border-color: rgba(31,41,51,0.12);
   }
 }
@@ -776,44 +780,44 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
 }
 
 .filter-pill:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.16);
+  outline: 2px solid rgba(139,207,74,0.18);
   outline-offset: 3px;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
-/* Reset: echtes Tool (wie Header-Actions), kein „Pill“-Button */
+/* Reset: echte Action */
 .filter-pill--reset{
   flex: 0 0 auto;
   margin-left: auto;
 
-  padding: 10px 0;
-  min-height: 42px;
+  padding: 10px 8px;
+  min-height: 44px;
 
-  border: 0;
-  background: transparent;
+  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(255,255,255,0.45);
+  border-radius: 14px;
 
   font: inherit;
-  font-weight: 500;
+  font-weight: 650;
   color: var(--color-text-secondary);
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
-.filter-pill--reset::after{
-  content: none;
-}
+.filter-pill--reset::after{ content: none; }
 
 @media (hover: hover){
   .filter-pill--reset:hover{
+    background: rgba(255,255,255,0.72);
     color: var(--color-text-primary);
   }
 }
 
-.filter-pill--reset:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.16);
-  outline-offset: 3px;
-  border-radius: 10px;
+.filter-pill--reset:active{
+  transform: translateY(1px);
 }
 
-/* Bottom Sheet: identisches Grundgefühl wie Detail-Panel (Overlay + Card + Grabber) */
+/* ===== Bottom Sheet (Top-App) ===== */
 .filter-sheet{
   position: fixed;
   inset: 0;
@@ -823,75 +827,87 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
 .filter-sheet__overlay{
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.32);
+  background: rgba(17, 24, 39, 0.36);
 
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
+/* Card: höher + safe area + schöner Radius */
 .filter-sheet__card{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  max-height: 78vh;
+  max-height: 88vh;
 
   background: var(--color-surface);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
 
-  border-top: 1px solid rgba(31,41,51,0.06);
+  border-top: 1px solid rgba(31,41,51,0.08);
   box-shadow:
-    0 -24px 70px rgba(0,0,0,0.16),
-    0 1px 0 rgba(255,255,255,0.7) inset;
+    0 -34px 90px rgba(0,0,0,0.22),
+    0 1px 0 rgba(255,255,255,0.75) inset;
 
   overflow: hidden;
   overscroll-behavior: contain;
+
+  /* Safe area padding */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Grabber */
 .filter-sheet__card::before{
   content: "";
   display: block;
-  width: 52px;
+  width: 54px;
   height: 5px;
   border-radius: 999px;
   margin: 10px auto 8px;
-  background: rgba(31,41,51,0.14);
+  background: rgba(31,41,51,0.16);
 }
 
+/* Header: sticky damit immer sichtbar */
 .filter-sheet__header{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   padding: 10px 14px 12px;
+  background: var(--color-surface);
+
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
 .filter-sheet__title{
-  font-size: 0.98rem;
-  font-weight: 650;
+  font-size: 1rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
-/* Close: wie Detail-Panel */
+/* Close: wertiger, klarer */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
 
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 999px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(255,255,255,0.90);
-  border: 1px solid rgba(31,41,51,0.10);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(31,41,51,0.12);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
 
   font-size: 22px;
   line-height: 1;
@@ -904,20 +920,16 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
   transform: scale(0.96);
 }
 
+/* Body: mehr Höhe, mehr Luft */
 .filter-sheet__body{
   padding: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(78vh - 74px);
+  max-height: calc(88vh - 78px);
 }
 
-/* === BEGIN BLOCK: FILTER SHEET OPTIONS (Top-App, robust selectors) ===
-Zweck: Optionen im Sheet sehen wie native App-Listen aus (keine Browser-Button-Styles),
-       egal ob HTML .filter-option oder .filter-sheet-option nutzt.
-Umfang: Ersetzt den bisherigen Optionen-Block inkl. Active/Hover.
-=== */
-
-/* Base: beide Klassennamen unterstützen */
+/* ===== Optionen: iOS-like List ===== */
+/* Unterstützt beide Klassennamen */
 .filter-option,
 .filter-sheet-option{
   -webkit-appearance: none;
@@ -928,40 +940,39 @@ Umfang: Ersetzt den bisherigen Optionen-Block inkl. Active/Hover.
   align-items: center;
   justify-content: space-between;
 
-  padding: 14px 14px;
-  background: transparent;
+  padding: 16px 14px;
 
+  background: transparent;
   border: 0;
+
   border-bottom: 1px solid rgba(31,41,51,0.06);
 
   font: inherit;
-  font-weight: 650;
+  font-weight: 750;
+  font-size: 1rem;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-align: left;
 
-  /* verhindert “inline button look” */
-  border-radius: 0;
   box-shadow: none;
 }
 
-/* Last item: keine Linie */
 .filter-option:last-child,
 .filter-sheet-option:last-child{
   border-bottom: 0;
 }
 
-/* Active */
+/* Active: klar erkennbar */
 .filter-option.is-active,
 .filter-sheet-option.is-active{
-  background: rgba(139,207,74,0.10);
+  background: rgba(139,207,74,0.12);
 }
 
 .filter-option.is-active::after,
 .filter-sheet-option.is-active::after{
   content: "✓";
-  color: rgba(31,41,51,0.78);
+  color: rgba(31,41,51,0.80);
   font-weight: 900;
 }
 
@@ -971,21 +982,30 @@ Umfang: Ersetzt den bisherigen Optionen-Block inkl. Active/Hover.
   .filter-sheet-option:hover{
     background: rgba(31,41,51,0.03);
   }
-
   .filter-option.is-active:hover,
   .filter-sheet-option.is-active:hover{
-    background: rgba(139,207,74,0.12);
+    background: rgba(139,207,74,0.14);
   }
 }
 
 /* Focus */
 .filter-option:focus-visible,
 .filter-sheet-option:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.16);
+  outline: 2px solid rgba(139,207,74,0.18);
   outline-offset: -2px;
 }
 
-/* === END BLOCK: FILTER SHEET OPTIONS (Top-App, robust selectors) === */
+/* hidden muss immer wirken */
+.filter-pill[hidden]{ display: none !important; }
+.filter-sheet[hidden]{ display: none !important; }
+
+@media (max-width: 360px){
+  .filters-bar{ gap: 10px; }
+  .filter-pill{ padding: 10px 11px; min-height: 44px; }
+}
+
+/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
+
 
 
 /* Safe Area */
@@ -1505,6 +1525,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
