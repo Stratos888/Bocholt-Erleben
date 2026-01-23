@@ -123,18 +123,29 @@ const DetailPanel = {
     }, ms);
   },
 
-  renderContent(event) {
-    const title = event.title || "";
-    const date = event.date ? formatDate(event.date) : "";
-    const time = event.time || "";
-    const location = event.location || "";
-    const description = event.description || "";
-    const url = event.url || "";
+   renderContent(event) {
+    /* === BEGIN BLOCK: DETAIL RENDER (canonical fields, defensive) ===
+    Zweck: Render-only. Nutzt kanonische Felder (title/date/time/location/beschreibung/kategorie/url).
+    Umfang: Ersetzt renderContent(event) komplett.
+    === */
+    const e = event && typeof event === "object" ? event : {};
+
+    const title = e.title || e.eventName || "";
+    const date = e.date ? formatDate(e.date) : "";
+    const time = e.time || "";
+    const location = e.location || "";
+    const description = e.beschreibung || e.description || "";
+    const kategorie = e.kategorie || "";
+    const url = e.url || "";
+
+    const safeUrl = url ? String(url) : "";
+    const isHttpUrl = /^https?:\/\//i.test(safeUrl);
 
     this.content.innerHTML = `
       <div class="detail-header">
         <h2>${this.escape(title)}</h2>
         ${location ? `<div class="detail-location">${this.escape(location)}</div>` : ""}
+        ${kategorie ? `<div class="detail-category">${this.escape(kategorie)}</div>` : ""}
       </div>
 
       <div class="detail-meta">
@@ -148,9 +159,9 @@ const DetailPanel = {
         </div>
       ` : ""}
 
-      ${url ? `
+      ${isHttpUrl ? `
         <div class="detail-actions">
-          <a href="${this.escape(url)}"
+          <a href="${this.escape(safeUrl)}"
              target="_blank"
              rel="noopener noreferrer"
              class="detail-link-btn">
@@ -159,7 +170,9 @@ const DetailPanel = {
         </div>
       ` : ""}
     `;
+    /* === END BLOCK: DETAIL RENDER (canonical fields, defensive) === */
   },
+
 
   escape(text) {
     const div = document.createElement("div");
@@ -170,5 +183,6 @@ const DetailPanel = {
 
 debugLog("DetailPanel loaded");
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
