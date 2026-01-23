@@ -8,7 +8,7 @@ name: Deploy to STRATO
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 concurrency:
   group: deploy-strato
@@ -37,11 +37,13 @@ jobs:
           rm -rf deploy
           mkdir -p deploy
 
-                    rsync -a \
+          # === BEGIN BLOCK: SYNC REPO TO deploy/ (clean staging) ===
+          rsync -a \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="deploy" \
             ./ deploy/
+          # === END BLOCK: SYNC REPO TO deploy/ (clean staging) ===
 
           # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
           # Zweck: Jede Deploy-Version bekommt automatisch neue Asset-URLs (?v=BUILD_ID),
@@ -49,7 +51,6 @@ jobs:
           # Umfang: Ersetzt nur ?v=... in *.html innerhalb des deploy/ Ordners.
           find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/$1'"$BUILD_ID"'/g'
           # === END BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
-
 
           # Version file (TXT instead of JSON)
           mkdir -p deploy/meta
@@ -75,36 +76,32 @@ jobs:
         run: |
           set -e
 
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" \
-            sftp://$STRATO_FTP_SERVER \
-            -e "
-              set sftp:auto-confirm yes;
-              set cmd:fail-exit yes;
-              set net:timeout 20;
-              set net:max-retries 2;
+          # === BEGIN BLOCK: LFTP DEPLOY (ROOT + /STRATO-apps) ===
+          # Zweck: Deploy in beide Kandidaten-Verzeichnisse, um Webroot-Mismatch sicher zu eliminieren.
+          # Umfang: Mirror deploy/ nach "." und zusätzlich nach "STRATO-apps/".
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<'LFTP'
+          set sftp:auto-confirm yes
+          set cmd:fail-exit yes
+          set net:timeout 20
+          set net:max-retries 2
 
-                           # === BEGIN BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
-                      
-              pwd;
-              ls -l;
+          pwd
+          cls -l
 
-              # 1) Deploy to current directory (this is what the domain is serving)
-              rm -f index.html;
-              mirror -R --delete deploy/ .;
+          # 1) Deploy to current directory
+          mirror -R --only-newer deploy/ .
 
-              echo "REMOTE (ROOT) index.html style.css line:";
-              cat index.html | head -n 80 | sed -n '1,80p' | grep -n "style.css" || true;
+          cls -l
 
-              # 2) Optional: also deploy to STRATO-apps (keeps it in sync)
-              mkdir -p STRATO-apps;
-              cd STRATO-apps;
-              mirror -R --delete ../deploy/ .;
+          # 2) Deploy to STRATO-apps as well
+          mkdir -p STRATO-apps
+          cd STRATO-apps
+          pwd
+          cls -l
 
-              echo "REMOTE (STRATO-apps) index.html style.css line:";
-              cat index.html | head -n 80 | sed -n '1,80p' | grep -n "style.css" || true;
+          mirror -R --only-newer ../deploy/ .
 
-              bye;
-          
-              # === END BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
-
-            "
+          cls -l
+          bye
+          LFTP
+          # === END BLOCK: LFTP DEPLOY (ROOT + /STRATO-apps) ===
