@@ -238,12 +238,13 @@ const EventCards = {
     });
 
     return card;
-   }
+  }
 };
-
- // END: EVENT_CARDS
+// END: EVENT_CARDS
 
 debugLog("EventCards loaded successfully");
+
+
 
 
 
