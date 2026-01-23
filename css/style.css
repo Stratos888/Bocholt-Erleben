@@ -1107,6 +1107,10 @@ body.is-panel-open { overflow: hidden; }
   color: var(--color-text-primary);
 }
 
+/* === BEGIN BLOCK: DETAIL BADGES (location + category) ===
+Zweck: DetailPanel-Badges konsistent darstellen (Location + Kategorie).
+Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-category.
+=== */
 /* Location Badge */
 #event-detail-panel .detail-location{
   display: inline-flex;
@@ -1123,6 +1127,26 @@ body.is-panel-open { overflow: hidden; }
   font-weight: 650;
   color: rgba(31,41,51,0.92);
 }
+
+/* Category Badge (leicht neutraler als Location) */
+#event-detail-panel .detail-category{
+  display: inline-flex;
+  align-items: center;
+
+  margin-top: 6px;
+  margin-left: 8px;
+  padding: 4px 10px;
+
+  border-radius: 999px;
+  background: rgba(31,41,51,0.04);
+  border: 1px solid rgba(31,41,51,0.10);
+
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: rgba(31,41,51,0.82);
+}
+/* === END BLOCK: DETAIL BADGES (location + category) === */
+
 
 /* Meta Box */
 #event-detail-panel .detail-meta{
@@ -1450,6 +1474,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
