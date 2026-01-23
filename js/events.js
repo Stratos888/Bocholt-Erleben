@@ -135,57 +135,19 @@ function sortByDateAsc(a, b) {
 
 /* ---------- Event Cards ---------- */
 // BEGIN: EVENT_CARDS
-const EventCards = {
-  events: [],
-  container: null,
+/* === BEGIN BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) ===
+Zweck: DOM-Rendering der Event Cards + Interaktion (öffnet DetailPanel).
+Umfang: Reines Anzeige-Modul. Erwartet bereits gefilterte Events von js/filter.js.
+API: EventCards.render(events), EventCards.refresh(events)
+=== */
+const EventCards = (() => {
+  let container = null;
 
-  render(events) {
-    if (!CONFIG?.features?.showEventCards) return;
-
-    this.container = document.getElementById("event-cards");
-    if (!this.container) return;
-
-    // Renderer ist bewusst "dumm": keine eigene Filter-UI/State mehr.
-    // Minimaler Schutz: keine Past/Invalid Events anzeigen (wie bisher).
-    this.events = (events || [])
-      .filter((e) => {
-        const bucket = getEventBucket(e);
-        return bucket !== "past" && bucket !== "invalid";
-      })
-      .sort(sortByDateAsc);
-
-    this.renderList(this.events);
-  },
-
-  refresh(events) {
-    this.render(events);
-  },
-
-  renderList(list) {
-    if (!this.container) return;
-
-    this.container.innerHTML = "";
-
-    if (!list || list.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "events-empty";
-      empty.textContent = "Keine passenden Events gefunden.";
-      this.container.appendChild(empty);
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    for (const ev of list) {
-      frag.appendChild(this.createCard(ev));
-    }
-    this.container.appendChild(frag);
-  },
-
-  /* === BEGIN BLOCK: HTML_ESCAPE (EventCards.escape) ===
+  /* === BEGIN BLOCK: HTML_ESCAPE (pure helper) ===
   Zweck: XSS-sicheres Escaping für Text, der via innerHTML gesetzt wird.
-  Umfang: Stellt this.escape() bereit (wird von createCard() genutzt).
+  Umfang: Lokaler Helper (kein this-Binding-Risiko).
   === */
-  escape(value) {
+  function escapeHtml(value) {
     const s = value == null ? "" : String(value);
     return s.replace(/[&<>"']/g, (ch) => {
       switch (ch) {
@@ -203,26 +165,30 @@ const EventCards = {
           return ch;
       }
     });
-  },
-  /* === END BLOCK: HTML_ESCAPE (EventCards.escape) === */
+  }
+  /* === END BLOCK: HTML_ESCAPE (pure helper) === */
 
-  /* ---------- Card ---------- */
-  createCard(event) {
+  function ensureContainer() {
+    if (!container) container = document.getElementById("event-cards");
+    return container;
+  }
+
+  function createCard(event) {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
 
     // A11y/UX: Card ist interaktiv
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Event anzeigen: ${event.title || ""}`);
+    card.setAttribute("aria-label", `Event anzeigen: ${event?.title || ""}`);
 
-    const dateLabel = event.date ? formatDate(event.date) : "";
-    const timeLabel = event.time ? ` · ${this.escape(event.time)}` : "";
+    const dateLabel = event?.date ? formatDate(event.date) : "";
+    const timeLabel = event?.time ? ` · ${escapeHtml(event.time)}` : "";
 
     // Title
     const h3 = document.createElement("h3");
     h3.className = "event-title";
-    h3.innerHTML = this.escape(event.title || "Event");
+    h3.innerHTML = escapeHtml(event?.title || "Event");
 
     // Meta (date/time)
     const meta = document.createElement("div");
@@ -233,14 +199,14 @@ const EventCards = {
     const location = document.createElement("div");
     location.className = "event-location";
 
-    const loc = (event.location || "").trim();
+    const loc = (event?.location || "").trim();
     if (loc) {
       const a = document.createElement("a");
       a.className = "event-location-link";
       a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
       a.target = "_blank";
       a.rel = "noopener";
-      a.innerHTML = this.escape(loc);
+      a.innerHTML = escapeHtml(loc);
       location.appendChild(a);
     }
 
@@ -263,9 +229,52 @@ const EventCards = {
     });
 
     return card;
-  },
-};
+  }
+
+  function renderList(list) {
+    const c = ensureContainer();
+    if (!c) return;
+
+    c.innerHTML = "";
+
+    if (!list || list.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "events-empty";
+      empty.textContent = "Keine passenden Events gefunden.";
+      c.appendChild(empty);
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    for (const ev of list) frag.appendChild(createCard(ev));
+    c.appendChild(frag);
+  }
+
+  function normalizeEvents(events) {
+    return (events || [])
+      .filter((e) => {
+        const bucket = getEventBucket(e);
+        return bucket !== "past" && bucket !== "invalid";
+      })
+      .sort(sortByDateAsc);
+  }
+
+  function render(events) {
+    if (!CONFIG?.features?.showEventCards) return;
+    const list = normalizeEvents(events);
+    renderList(list);
+  }
+
+  function refresh(events) {
+    render(events);
+  }
+
+  return { render, refresh };
+})();
+/* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
+
 
 
 
