@@ -1,12 +1,24 @@
-/* === BEGIN BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) ===
-Zweck: Detailpanel robust & appig: kein Listener-Stacking, ESC/Overlay close, Focus-Restore,
-       sauberes Timing zur CSS-Transition.
-Umfang: Ersetzt den kompletten bisherigen Inhalt von js/details.js.
-=== */
+// BEGIN: FILE_HEADER_DETAILS
+// Datei: js/details.js
+// Zweck:
+// - Anzeige eines einzelnen Events im Detail-Panel
+// - Öffnen/Schließen des Panels (Overlay, ESC, Close)
+// - Darstellung aller Event-Details (Text, Meta, Links)
+//
+// Verantwortlich für:
+// - Detail-Panel DOM
+// - Panel-Interaktion (Open/Close)
+// - Darstellung eines Events
+//
+// Nicht verantwortlich für:
+// - Event-Listen oder Event-Filter
+// - Filter-State oder Filter-UI
+// - Laden von Event-Daten
+//
+// Contract:
+// - erhält ein einzelnes Event-Objekt (z. B. DetailPanel.show(event))
+// END: FILE_HEADER_DETAILS
 
-/**
- * DETAILS.JS – Detail-Panel Modul
- * Zeigt Event-Details in einem Slide-in Panel
  */
 const DetailPanel = {
   panel: null,
@@ -157,3 +169,4 @@ const DetailPanel = {
 
 debugLog("DetailPanel loaded");
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
