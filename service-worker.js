@@ -118,6 +118,8 @@ Umfang: cache.match ohne ignoreSearch, damit ?v=... wirklich neue Assets erzwing
 Fixes:
 - staleWhileRevalidate: fetch(request) statt request.then(...)
 - networkFirst: fetch(request, ...) statt (request, {...})
+Ergänzung:
+- staleWhileRevalidate: fetch(..., { cache: "reload" }) damit Browser-HTTP-Cache (z.B. max-age/immutable) Änderungen nicht „unsichtbar“ macht.
 === */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
@@ -125,7 +127,9 @@ async function staleWhileRevalidate(request) {
   // WICHTIG: KEIN ignoreSearch -> Querystring ist Teil des Cache-Keys
   const cached = await cache.match(request);
 
-  const networkPromise = fetch(request)
+  // WICHTIG: "reload" erzwingt ein Re-Fetch (bypasst aggressiven HTTP-Cache),
+  // damit Deploy-Änderungen an CSS/JS auch bei gleichbleibender URL sichtbar werden.
+  const networkPromise = fetch(request, { cache: "reload" })
     .then((response) => {
       if (response && response.ok) {
         cache.put(request, response.clone());
@@ -169,6 +173,7 @@ async function networkFirst(request) {
   }
 }
 /* === END BLOCK: CACHING HELPERS (cache-busting works) === */
+
 
 
 
@@ -249,6 +254,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
