@@ -19,7 +19,8 @@
 // - erhält ein einzelnes Event-Objekt (z. B. DetailPanel.show(event))
 // END: FILE_HEADER_DETAILS
 
- */
+ // (removed stray comment terminator)
+
 const DetailPanel = {
   panel: null,
   overlay: null,
@@ -169,4 +170,5 @@ const DetailPanel = {
 
 debugLog("DetailPanel loaded");
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
