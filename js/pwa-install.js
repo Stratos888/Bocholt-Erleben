@@ -1,9 +1,24 @@
-/**
- * pwa-install.js
- * Steuert ausschließlich die Sichtbarkeit und Aktion
- * des vorhandenen .pwa-install-button aus index.html
- * Erzeugt KEINE DOM-Elemente.
- */
+// BEGIN: FILE_HEADER_PWA_INSTALL
+// Datei: js/pwa-install.js
+// Zweck:
+// - Behandlung der PWA-Installationslogik
+// - Anzeigen / Ausblenden des „App installieren“-Buttons
+// - Reaktion auf beforeinstallprompt / appinstalled
+//
+// Verantwortlich für:
+// - PWA-Install-UX
+// - Button-State (sichtbar / nicht sichtbar)
+//
+// Nicht verantwortlich für:
+// - App-Layout oder Header-Struktur
+// - Event-Daten oder Filter
+// - Service-Worker-Logik
+//
+// Contract:
+// - reagiert ausschließlich auf Browser-PWA-Events
+// - beeinflusst keine anderen Module
+// END: FILE_HEADER_PWA_INSTALL
+
 
 (() => {
   const installButton = document.querySelector(".pwa-install-button");
@@ -52,3 +67,4 @@
     deferredPrompt = null;
   });
 })();
+
