@@ -89,131 +89,39 @@ this.events = Array.isArray(data?.events) ? data.events : [];
     /**
      * Alle Module mit Events initialisieren
      */
+      /* === BEGIN BLOCK: INITMODULES ORCHESTRATION (single flow, no retries) ===
+    Zweck: Deterministische Modul-Initialisierung ohne Retry-Magie.
+    Umfang: Ersetzt initModules(events) komplett (Kalender/Filter/EventCards-Orchestrierung).
+    Contract:
+    - Wenn Filters aktiv sind: FilterModule ist Orchestrator (ruft refresh der Module).
+    - Wenn Filters aus sind: main.js rendert direkt EventCards/Calendar.
+    === */
     initModules(events) {
-        // Kalender
-        if (CONFIG.features.showCalendar) {
-            CalendarModule.init(events);
+        const evts = Array.isArray(events) ? events : [];
+
+        // Kalender: initialisieren, wenn vorhanden
+        if (CONFIG?.features?.showCalendar && typeof CalendarModule?.init === "function") {
+            CalendarModule.init(evts);
         }
 
-        // Event Cards
-        if (CONFIG.features.showEventCards) {
-            EventCards.render(events);
+        // Filter: wenn aktiv, übernimmt FilterModule den Datenfluss (applyFilters -> updateUI -> refresh)
+        if (CONFIG?.features?.showFilters && typeof FilterModule?.init === "function") {
+            FilterModule.init(evts);
+        } else {
+            // Ohne Filter: direkt rendern/refreshen
+            if (CONFIG?.features?.showEventCards && typeof EventCards?.render === "function") {
+                EventCards.render(evts);
+            }
+
+            if (CONFIG?.features?.showCalendar && typeof CalendarModule?.refresh === "function") {
+                CalendarModule.refresh(evts);
+            }
         }
 
-        // Filter (NEU!)
-     /* === BEGIN BLOCK: FILTER INIT (self-healing retries) ===
-Zweck: FilterModule muss zuverlässig initialisieren (Listener müssen sicher dran sein),
-       auch wenn der erste Versuch zu früh/abgebrochen passiert.
-Umfang: Ersetzt nur den Filter-Init Abschnitt in initModules(events).
-=== */
-if (CONFIG.features.showFilters) {
-  const MAX_TRIES = 4;
-  let tries = 0;
-
-  const hasFilterUI = () => {
-    // Minimal-Check: wenn diese fehlen, kann FilterModule.init nur scheitern/abbrechen
-    return !!(
-      document.getElementById("search-filter") &&
-      document.getElementById("filter-time-pill") &&
-      document.getElementById("filter-time-value") &&
-      document.getElementById("sheet-time") &&
-      document.getElementById("filter-category-pill") &&
-      document.getElementById("filter-category-value") &&
-      document.getElementById("sheet-category") &&
-      document.getElementById("filter-reset-pill")
-    );
-  };
-
-  const tryInitFilters = (label, evts) => {
-    tries += 1;
-
-    if (typeof FilterModule === "undefined" || typeof FilterModule.init !== "function") {
-      console.warn(`[FilterInit] (${label}) FilterModule not ready (try ${tries}/${MAX_TRIES})`);
-      return false;
-    }
-
-    if (!hasFilterUI()) {
-      console.warn(`[FilterInit] (${label}) Filter UI not ready (try ${tries}/${MAX_TRIES})`);
-      return false;
-    }
-
-    try {
-      const count = Array.isArray(evts) ? evts.length : 0;
-      debugLog(`[FilterInit] (${label}) calling FilterModule.init with events: ${count}`);
-      FilterModule.init(evts);
-
-          /* === BEGIN BLOCK: FILTER INIT VERIFICATION (require listener-wiring) ===
-      Zweck: Init gilt nur als erfolgreich, wenn FilterModule._isInit wirklich true ist
-             (wird in filter.js erst nach dem Listener-Wiring gesetzt).
-      Umfang: Ersetzt ausschließlich die bisherige allEvents-basierte Verifikation.
-      === */
-      const ok = FilterModule._isInit === true;
-
-      if (ok) {
-        FilterModule.__initialized = true;
-        FilterModule.__initLabel = label;
-        FilterModule.__initTries = tries;
-        debugLog(`[FilterInit] initialized OK (${label})`, {
-          tries,
-          allEvents: FilterModule.allEvents?.length || 0,
-          isInit: FilterModule._isInit === true
-        });
-        return true;
-      }
-
-      console.warn(`[FilterInit] (${label}) init ran but listeners not wired yet (_isInit=false) (try ${tries}/${MAX_TRIES})`);
-      return false;
-      /* === END BLOCK: FILTER INIT VERIFICATION (require listener-wiring) === */
-
-    } catch (err) {
-      console.error(`[FilterInit] (${label}) init crashed (try ${tries}/${MAX_TRIES})`, err);
-      return false;
-    }
-  };
-
-  const boot = () => {
-    if (FilterModule?.__initialized) return;
-
-    // 1) sofort mit dem übergebenen events versuchen
-    if (tryInitFilters("immediate", events)) return;
-
-    // 2) fallback: mit App.events versuchen
-    if (tryInitFilters("fallback-App.events", this.events)) return;
-
-    // 3) retries mit Lifecycle-Ticks (ohne Endlosschleife)
-    if (tries < MAX_TRIES) {
-      requestAnimationFrame(() => {
-        if (FilterModule?.__initialized) return;
-        if (tryInitFilters("rAF", this.events)) return;
-
-        setTimeout(() => {
-          if (FilterModule?.__initialized) return;
-          if (tryInitFilters("timeout-200ms", this.events)) return;
-        }, 200);
-      });
-    }
-
-    // 4) final: nach window.load (wenn wirklich alles da ist)
-    if (tries < MAX_TRIES) {
-      window.addEventListener(
-        "load",
-        () => {
-          if (FilterModule?.__initialized) return;
-          tryInitFilters("window-load", this.events);
-        },
-        { once: true }
-      );
-    }
-  };
-
-  boot();
-}
-/* === END BLOCK: FILTER INIT (self-healing retries) === */
-
-
-
-        debugLog('All modules initialized');
+        debugLog("All modules initialized");
     },
+    /* === END BLOCK: INITMODULES ORCHESTRATION (single flow, no retries) === */
+
 
     /**
      * Loading Indicator
@@ -265,6 +173,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
