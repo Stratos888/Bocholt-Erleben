@@ -1,8 +1,24 @@
-/**
- * CALENDAR.JS - Kalender-Modul
- * 
- * Rendert den Event-Kalender mit FullCalendar.js
- */
+// BEGIN: FILE_HEADER_CALENDAR
+// Datei: js/calendar.js
+// Zweck:
+// - Kalenderansicht für Events (FullCalendar)
+// - Nimmt Event-Liste entgegen und rendert sie im Kalender
+// - Optional: Interaktion im Kalender (z. B. Klick → DetailPanel)
+//
+// Verantwortlich für:
+// - Kalender-Initialisierung und -Rendering
+// - Mapping: Event-Daten → Kalender-Events
+//
+// Nicht verantwortlich für:
+// - Filter-State / Filter-UI
+// - Event-Cards Rendering
+// - Laden der Daten
+//
+// Contract:
+// - init(events) bekommt vollständige oder bereits gefilterte Events (je nach main.js)
+// - darf DetailPanel öffnen, aber nicht filtern
+// END: FILE_HEADER_CALENDAR
+
 
 const CalendarModule = {
     calendar: null,
