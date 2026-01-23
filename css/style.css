@@ -395,9 +395,9 @@ footer {
   margin: 0;
 }
 
-/* === BEGIN BLOCK: TOP STACK (Top-App glass) ===
-Zweck: Suche+Chips wirken wie Top-App Toolbar (sticky + glass + divider).
-Umfang: .top-stack komplett.
+/* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
+Zweck: Nach Entfernung des Intros wird Search zur “Hero”-Interaktion direkt unter dem Header.
+Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu ändern.
 === */
 .top-stack{
   position: sticky;
@@ -406,20 +406,23 @@ Umfang: .top-stack komplett.
 
   padding: 10px 20px 12px;
 
-  background: var(--stack-bg);
+  background: rgba(249, 251, 246, 0.92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 
-  border-bottom: 1px solid rgba(31,41,51,0.05);
-  box-shadow: 0 10px 26px rgba(31,41,51,0.06);
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.75) inset,
+    0 10px 26px rgba(31,41,51,0.06);
 
   transform: translateZ(0);
 }
-/* === END BLOCK: TOP STACK (Top-App glass) === */
+/* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
-/* === BEGIN BLOCK: SEARCH BAR (Top-App input) ===
-Zweck: Premium-Suche wie App-Search (Radius, Shadow, Focus-Ring, Icon-Padding optional).
-Umfang: #search-filter.
+
+/* === BEGIN BLOCK: SEARCH BAR (functional hero, top-app level) ===
+Zweck: Search ist der Einstiegspunkt (ersetzt Intro/Hero); wirkt wie Premium App Input, nicht wie Formularfeld.
+Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 === */
 #search-filter{
   width: 100%;
@@ -430,61 +433,74 @@ Umfang: #search-filter.
   min-height: 48px;
 
   border-radius: 16px;
-  border: 1px solid rgba(31,41,51,0.10);
+  border: 1px solid rgba(31,41,51,0.12);
   background: rgba(255,255,255,0.92);
 
   font-size: 1rem;
-  font-weight: 520;
+  font-weight: 600;
   color: var(--color-text-primary);
-
-  box-shadow:
-    0 12px 28px rgba(0,0,0,0.07),
-    0 1px 0 rgba(255,255,255,0.8) inset;
 
   -webkit-appearance: none;
   appearance: none;
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.80) inset;
 }
-#search-filter::placeholder{ color: var(--color-text-muted); }
+
+#search-filter::placeholder{
+  color: rgba(138,148,155,0.95);
+  font-weight: 550;
+}
+
 #search-filter:focus{
   outline: none;
   border-color: rgba(139,207,74,.55);
+  background: rgba(255,255,255,0.98);
   box-shadow:
-    0 16px 38px rgba(0,0,0,0.10),
-    0 0 0 4px rgba(139,207,74,.14);
+    0 16px 36px rgba(0,0,0,0.08),
+    0 0 0 4px rgba(139,207,74,.12),
+    0 1px 0 rgba(255,255,255,0.82) inset;
 }
-/* === END BLOCK: SEARCH BAR (Top-App input) === */
+/* === END BLOCK: SEARCH BAR (functional hero, top-app level) === */
 
-/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App) ===
-Zweck: Chips wie Top-App Tools + Sheet wie iOS/Material Bottom Sheet.
-Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
+
+/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
+Zweck: Top-App-UX für Suche + Pills + Bottom-Sheets (klarer Header, volle Sichtbarkeit, schöne Liste).
+Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke).
 === */
+
 .filters-bar{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-
   max-width: 820px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 10px auto 0;
 
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
 }
 
+/* Reset rechts aus der Reihe ziehen */
+.filter-pill--reset{
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+/* Pills: wertig, “Control”-Look */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
 
-  flex: 1 1 0;
   min-width: 0;
+  width: 100%;
 
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 
-  padding: 10px 12px;
-  min-height: 44px;
+  padding: 12px 12px;
+  min-height: 46px;
 
   border-radius: 16px;
   border: 1px solid rgba(31,41,51,0.10);
@@ -501,12 +517,22 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 
-  box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+  box-shadow:
+    0 14px 30px rgba(0,0,0,0.07),
+    0 1px 0 rgba(255,255,255,0.75) inset;
 }
 
-.filter-pill__label{ color: var(--color-text-secondary); font-weight: 550; }
-.filter-pill__value{ color: var(--color-text-primary); font-weight: 850; }
+.filter-pill__label{
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
 
+.filter-pill__value{
+  color: var(--color-text-primary);
+  font-weight: 850;
+}
+
+/* Chevron */
 .filter-pill::after{
   content: "›";
   margin-left: 2px;
@@ -516,85 +542,99 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
   transform: translateY(-1px);
 }
 
+/* Active: klar, aber nicht “Kachel-grün” */
 .filter-pill.is-active{
-  background: rgba(255,255,255,0.95);
   border-color: rgba(139,207,74,0.34);
+  background: rgba(255,255,255,0.94);
   box-shadow:
-    0 18px 40px rgba(0,0,0,0.11),
-    0 0 0 4px rgba(139,207,74,0.10);
+    0 16px 36px rgba(0,0,0,0.09),
+    0 0 0 4px rgba(139,207,74,0.10),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.94);
     border-color: rgba(31,41,51,0.14);
   }
 }
+
 .filter-pill:active{ transform: translateY(1px); }
+
 .filter-pill:focus-visible{
   outline: 2px solid rgba(139,207,74,0.18);
   outline-offset: 3px;
   border-radius: 16px;
 }
 
-/* Reset-Pill */
+/* Reset: echte, aber ruhige Action */
 .filter-pill--reset{
-  flex: 0 0 auto;
-  margin-left: auto;
+  -webkit-appearance: none;
+  appearance: none;
 
-  padding: 10px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 12px;
   min-height: 44px;
 
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.70);
   border-radius: 14px;
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.60);
 
   font: inherit;
   font-weight: 750;
   color: var(--color-text-secondary);
 
-  box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+  cursor: pointer;
+  box-shadow:
+    0 12px 26px rgba(0,0,0,0.07),
+    0 1px 0 rgba(255,255,255,0.70) inset;
 }
 .filter-pill--reset::after{ content: none; }
+
 @media (hover: hover){
   .filter-pill--reset:hover{
-    background: rgba(255,255,255,0.90);
+    background: rgba(255,255,255,0.82);
     color: var(--color-text-primary);
   }
 }
 .filter-pill--reset:active{ transform: translateY(1px); }
 
-/* Sheet */
+/* ===== Bottom Sheet ===== */
 .filter-sheet{
   position: fixed;
   inset: 0;
   z-index: 9998;
 }
+
 .filter-sheet__overlay{
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.46);
+  background: rgba(17, 24, 39, 0.44);
 
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
+/* Card: fast full-screen, damit “nicht alles zu sehen” weg ist */
 .filter-sheet__card{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  max-height: 90vh;
+  max-height: 92vh;
 
-  background: var(--color-surface);
+  background: rgba(255,255,255,0.98);
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
 
   border-top: 1px solid rgba(31,41,51,0.10);
   box-shadow:
-    0 -40px 120px rgba(0,0,0,0.28),
-    0 1px 0 rgba(255,255,255,0.75) inset;
+    0 -42px 130px rgba(0,0,0,0.28),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
   overscroll-behavior: contain;
@@ -602,16 +642,18 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
   padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
+/* Grabber */
 .filter-sheet__card::before{
   content: "";
   display: block;
-  width: 56px;
+  width: 58px;
   height: 5px;
   border-radius: 999px;
   margin: 10px auto 8px;
   background: rgba(31,41,51,0.18);
 }
 
+/* Header: sticky, “Top-App” */
 .filter-sheet__header{
   position: sticky;
   top: 0;
@@ -621,9 +663,9 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
   align-items: center;
   justify-content: space-between;
 
-  padding: 12px 14px 12px;
-
+  padding: 12px 14px;
   background: rgba(255,255,255,0.92);
+
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 
@@ -631,12 +673,13 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
 }
 
 .filter-sheet__title{
-  font-size: 1.02rem;
+  font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
+/* Close */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
@@ -661,14 +704,15 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
 }
 .filter-sheet__close:active{ transform: scale(0.96); }
 
+/* Body: Padding, damit Liste “App-like” wirkt */
 .filter-sheet__body{
-  padding: 0;
+  padding: 10px 12px 14px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(90vh - 82px);
+  max-height: calc(92vh - 86px);
 }
 
-/* Option rows */
+/* Optionen: als “List Cards” statt billiger Textzeilen */
 .filter-sheet-option,
 .filter-option{
   -webkit-appearance: none;
@@ -679,11 +723,12 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
   align-items: center;
   justify-content: space-between;
 
-  padding: 16px 14px;
+  padding: 14px 14px;
+  margin: 0 0 10px;
 
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  background: rgba(31,41,51,0.03);
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 16px;
 
   font: inherit;
   font-weight: 850;
@@ -692,35 +737,49 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
 
   cursor: pointer;
   text-align: left;
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.70) inset;
 }
 
 .filter-sheet-option:last-child,
 .filter-option:last-child{
-  border-bottom: 0;
+  margin-bottom: 0;
 }
 
+/* Active */
 .filter-sheet-option.is-active,
 .filter-option.is-active{
   background: rgba(139,207,74,0.14);
+  border-color: rgba(139,207,74,0.26);
 }
+
 .filter-sheet-option.is-active::after,
 .filter-option.is-active::after{
   content: "✓";
-  color: rgba(31,41,51,0.84);
+  color: rgba(31,41,51,0.82);
   font-weight: 950;
+  margin-left: 12px;
 }
 
+/* Hover */
 @media (hover: hover){
   .filter-sheet-option:hover,
-  .filter-option:hover{ background: rgba(31,41,51,0.035); }
+  .filter-option:hover{
+    background: rgba(31,41,51,0.045);
+  }
   .filter-sheet-option.is-active:hover,
-  .filter-option.is-active:hover{ background: rgba(139,207,74,0.16); }
+  .filter-option.is-active:hover{
+    background: rgba(139,207,74,0.16);
+  }
 }
 
+/* Focus */
 .filter-sheet-option:focus-visible,
 .filter-option:focus-visible{
   outline: 2px solid rgba(139,207,74,0.18);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
 /* hidden muss immer wirken */
@@ -729,9 +788,11 @@ Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
 
 @media (max-width: 360px){
   .filters-bar{ gap: 10px; }
-  .filter-pill{ padding: 10px 11px; min-height: 44px; }
+  .filter-pill{ padding: 11px 11px; min-height: 46px; }
 }
-/* === END BLOCK: FILTER BAR + SHEETS (Top-App) === */
+
+/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
+
 
 /* ============================================
    DETAIL PANEL (BOTTOM SHEET) – FINAL
@@ -1132,3 +1193,4 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
