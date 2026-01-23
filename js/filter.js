@@ -396,10 +396,15 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
 Zweck: Entfernt doppeltes Initialisieren (Race-Conditions vermeiden).
 Umfang: Kein Auto-Init mehr in filter.js. Initialisierung erfolgt ausschließlich über main.js.
 === */
-debugLog("Filter module loaded (no auto-init; main.js controls initialization)");
-/* === END BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) === */
+/* === BEGIN BLOCK: FILTER GLOBAL EXPORT (explicit) ===
+Zweck: FilterModule muss global verfügbar sein (für main.js + Console + Debug).
+Umfang: Setzt window.FilterModule explizit und loggt den Status.
+=== */
+window.FilterModule = FilterModule;
+debugLog("Filter module loaded (global export OK; main.js controls initialization)", {
+  hasFilterModule: typeof window.FilterModule !== "undefined",
+  isInit: window.FilterModule?._isInit === true
+});
+/* === END BLOCK: FILTER GLOBAL EXPORT (explicit) === */
 
-
-
-/* === END BLOCK: FILTER.JS (Top-App Pills + Sheets, Single Category) === */
 
