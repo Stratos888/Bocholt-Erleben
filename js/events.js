@@ -194,19 +194,9 @@ const EventCards = {
     const dateLabel = event.date ? formatDate(event.date) : "";
     const timeLabel = event.time ? ` · ${this.escape(event.time)}` : "";
 
-    const loc = (event.location || "").trim();
+       const loc = (event.location || "").trim();
     const locName = this.escape(loc);
-    const locUrl = loc ? getLocationUrl(loc) : "";
-
-    // Title
-    const h3 = document.createElement("h3");
-    h3.className = "event-title";
-    h3.innerHTML = this.escape(event.title || "Event");
-
-    // Meta (date/time)
-    const meta = document.createElement("div");
-    meta.className = "event-meta";
-    meta.innerHTML = `${dateLabel}${timeLabel}`;
+    const mapsUrl = loc ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}` : "";
 
     // Location (link)
     const location = document.createElement("div");
@@ -215,12 +205,13 @@ const EventCards = {
     if (loc) {
       const a = document.createElement("a");
       a.className = "event-location-link";
-      a.href = locUrl || getMapsUrl(loc);
+      a.href = mapsUrl;
       a.target = "_blank";
       a.rel = "noopener";
       a.innerHTML = locName;
       location.appendChild(a);
     }
+
 
     card.appendChild(h3);
     card.appendChild(meta);
@@ -256,5 +247,6 @@ const EventCards = {
 // END: EVENT_CARDS
 
 debugLog("EventCards loaded successfully");
+
 
 
