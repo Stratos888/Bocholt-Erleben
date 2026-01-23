@@ -33,16 +33,25 @@ const App = {
         debugLog('=== BOCHOLT EVENTS HUB - APP START ===');
 
         // Detail Panel init
-       /* === BEGIN BLOCK: DETAILPANEL INIT (defensive) ===
-Zweck: DetailPanel wird genau einmal initialisiert, wenn verfügbar.
+             /* === BEGIN BLOCK: DETAILPANEL INIT (defensive + verify) ===
+Zweck: DetailPanel wird genau einmal initialisiert und MUSS danach "ready" sein (panel gesetzt),
+       sonst werden Card-Interaktionen bewusst deaktiviert (kein Silent-Fail).
 Umfang: Ersetzt nur den DetailPanel-init Abschnitt.
 === */
-if (typeof DetailPanel !== "undefined" && typeof DetailPanel.init === "function") {
-  DetailPanel.init();
-} else {
-  console.warn("DetailPanel not available – details.js not loaded or has an error.");
-}
-/* === END BLOCK: DETAILPANEL INIT (defensive) === */
+        if (typeof DetailPanel !== "undefined" && typeof DetailPanel.init === "function") {
+            DetailPanel.init();
+
+            const panelEl = document.getElementById("event-detail-panel");
+            const ready = !!(DetailPanel.panel || panelEl);
+
+            if (!ready) {
+                console.warn("DetailPanel init ran, but panel not ready. Card clicks will not open details.");
+            }
+        } else {
+            console.warn("DetailPanel not available – details.js not loaded or has an error.");
+        }
+        /* === END BLOCK: DETAILPANEL INIT (defensive + verify) === */
+
 
 
 
@@ -200,6 +209,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
