@@ -51,19 +51,46 @@ if (typeof DetailPanel !== "undefined" && typeof DetailPanel.init === "function"
 
         // Events von Airtable laden
         try {
-            /* === BEGIN BLOCK: EVENTS FETCH (robust) ===
-Zweck: Sauberes Error-Handling bei fehlender/kaputter events.json.
+                      /* === BEGIN BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) ===
+Zweck: Sauberes Error-Handling bei events.json + Normalisierung auf kanonische Felder,
+       damit alle Module stabil mit { title, date, time, location, kategorie, beschreibung } arbeiten.
 Umfang: Ersetzt nur den fetch/parse Block in App.init().
 === */
-const response = await fetch('/data/events.json', { cache: "no-store" });
+            const response = await fetch("/data/events.json", { cache: "no-store" });
 
-if (!response.ok) {
-  throw new Error(`events.json load failed: ${response.status} ${response.statusText}`);
-}
+            if (!response.ok) {
+                throw new Error(`events.json load failed: ${response.status} ${response.statusText}`);
+            }
 
-const data = await response.json();
-this.events = Array.isArray(data?.events) ? data.events : [];
-/* === END BLOCK: EVENTS FETCH (robust) === */
+            const data = await response.json();
+            const rawEvents = Array.isArray(data?.events) ? data.events : [];
+
+            const normalizeEvent = (e) => {
+                const obj = e && typeof e === "object" ? e : {};
+
+                const title = (obj.title ?? obj.eventName ?? "").toString().trim();
+                const date = (obj.date ?? obj.datum ?? "").toString().trim(); // ISO YYYY-MM-DD erwartet
+                const time = (obj.time ?? obj.uhrzeit ?? obj.startzeit ?? "").toString().trim();
+                const location = (obj.location ?? obj.ort ?? "").toString().trim();
+                const kategorie = (obj.kategorie ?? obj.category ?? "").toString().trim();
+                const beschreibung = (obj.beschreibung ?? obj.description ?? "").toString().trim();
+
+                return {
+                    ...obj,
+                    title,
+                    eventName: (obj.eventName ?? title).toString().trim(),
+                    date,
+                    datum: (obj.datum ?? date).toString().trim(),
+                    time,
+                    location,
+                    kategorie,
+                    beschreibung
+                };
+            };
+
+            this.events = rawEvents.map(normalizeEvent);
+            /* === END BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) === */
+
 
 
 
@@ -173,6 +200,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
