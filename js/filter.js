@@ -393,60 +393,13 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
   }
 };
 
-/* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (ES-module safe) ===
-Zweck: Initialisiert Filter zuverlässig, auch bei ES-Module-Scope.
-Umfang: Ersetzt bisherigen Auto-Bootstrap vollständig.
+/* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) ===
+Zweck: Entfernt doppeltes Initialisieren (Race-Conditions vermeiden).
+Umfang: Kein Auto-Init mehr in filter.js. Initialisierung erfolgt ausschließlich über main.js.
 === */
-debugLog("Filter module loaded");
+debugLog("Filter module loaded (no auto-init; main.js controls initialization)");
+/* === END BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) === */
 
-(function autoInitFilters() {
-  const MAX_TRIES = 30;
-  const INTERVAL_MS = 100;
-  let tries = 0;
-
-  const tick = () => {
-    tries += 1;
-
-    if (FilterModule._isInit) return;
-
-    // ES-Module-safe Zugriff
-    const app = window.App;
-    const config = window.CONFIG;
-
-    if (!config?.features?.showFilters) return;
-
-    const eventsReady =
-      app &&
-      Array.isArray(app.events) &&
-      app.events.length > 0;
-
-    if (eventsReady) {
-      debugLog(`[FilterAutoInit] init with App.events (${app.events.length})`);
-      FilterModule.init(app.events);
-
-      if (FilterModule._isInit) {
-        debugLog("[FilterAutoInit] OK");
-        return;
-      }
-    } else {
-      debugLog(`[FilterAutoInit] waiting for App.events (${tries}/${MAX_TRIES})`);
-    }
-
-    if (tries >= MAX_TRIES) {
-      console.error("[FilterAutoInit] FAILED – App.events never became ready");
-      return;
-    }
-
-    setTimeout(tick, INTERVAL_MS);
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => setTimeout(tick, 0), { once: true });
-  } else {
-    setTimeout(tick, 0);
-  }
-})();
-/* === END BLOCK: FILTER AUTO-BOOTSTRAP (ES-module safe) === */
 
 
 /* === END BLOCK: FILTER.JS (Top-App Pills + Sheets, Single Category) === */
