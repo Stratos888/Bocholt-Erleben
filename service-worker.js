@@ -1,12 +1,26 @@
-/* =========================================================
-   SERVICE WORKER – Bocholt erleben (2026)
-   Ziel: Deploys ohne Cache-Probleme (voll automatisch)
-   Strategie:
-   - /data/*.json => Network-First (Events/Locations stets aktuell)
-   - same-origin Assets (css/js/icons/html) => Stale-While-Revalidate
-   - Cache Version automatisch über /build.json (vom Deploy erzeugt)
-   - Cache Cleanup bei Aktivierung
-   ========================================================= */
+// BEGIN: FILE_HEADER_SERVICE_WORKER
+// Datei: service-worker.js
+// Zweck:
+// - Caching & Offline-Fähigkeit der App (PWA)
+// - Versioniertes Cache-Handling pro Deploy
+// - Kontrolle über Fetch-Strategien (Cache / Network)
+//
+// Verantwortlich für:
+// - Installation / Aktivierung des Service Workers
+// - Cache-Aufbau und -Bereinigung
+// - Abfangen von Fetch-Requests
+//
+// Nicht verantwortlich für:
+// - UI-Logik oder Darstellung
+// - Event-Daten, Filter oder Rendering
+// - App-Initialisierung (main.js)
+//
+// Contract:
+// - Cache-Version kommt aus /meta/build.json
+// - darf niemals DOM manipulieren
+// - Änderungen hier wirken global → mit Vorsicht ändern
+// END: FILE_HEADER_SERVICE_WORKER
+
 
 /* === BEGIN BLOCK: BUILD VERSION RESOLUTION (no manual bump) ===
 Zweck: Version kommt automatisch aus /meta/build.txt (vom Deploy), kein händisches Hochzählen.
@@ -235,6 +249,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
