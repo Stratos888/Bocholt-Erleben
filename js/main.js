@@ -246,13 +246,18 @@ Contract:
 };
 
 // App starten sobald DOM ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => App.init());
-} else {
+/* === BEGIN BLOCK: APP BOOTSTRAP (DOM first, deterministic) ===
+Zweck: UI-abhängige Module (Filter) dürfen erst nach DOMReady initialisiert werden.
+Umfang: Ersetzt den App-Start am Dateiende.
+=== */
+document.addEventListener("DOMContentLoaded", () => {
     App.init();
-}
+});
+/* === END BLOCK: APP BOOTSTRAP (DOM first, deterministic) === */
+
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
