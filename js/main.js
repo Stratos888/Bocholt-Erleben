@@ -125,13 +125,14 @@ Umfang: Ersetzt nur den fetch/parse Block in App.init().
     /**
      * Alle Module mit Events initialisieren
      */
-      /* === BEGIN BLOCK: INITMODULES ORCHESTRATION (single flow, no retries) ===
-    Zweck: Deterministische Modul-Initialisierung ohne Retry-Magie.
-    Umfang: Ersetzt initModules(events) komplett (Kalender/Filter/EventCards-Orchestrierung).
-    Contract:
-    - Wenn Filters aktiv sind: FilterModule ist Orchestrator (ruft refresh der Module).
-    - Wenn Filters aus sind: main.js rendert direkt EventCards/Calendar.
-    === */
+       /* === BEGIN BLOCK: INITMODULES ORCHESTRATION (single flow, no retries) ===
+Zweck: Deterministische Modul-Initialisierung ohne Retry-Magie.
+       Wenn Filters aktiv sind, muss FilterModule.init() erfolgreich sein – kein Silent-Fail.
+Umfang: Ersetzt initModules(events) komplett (Kalender/Filter/EventCards-Orchestrierung).
+Contract:
+- showFilters=true => FilterModule.init(evts) muss _isInit=true setzen, sonst sichtbarer Fehler + Fallback.
+- showFilters=false => main.js rendert direkt EventCards/Calendar.
+=== */
     initModules(events) {
         const evts = Array.isArray(events) ? events : [];
 
@@ -140,23 +141,66 @@ Umfang: Ersetzt nur den fetch/parse Block in App.init().
             CalendarModule.init(evts);
         }
 
-        // Filter: wenn aktiv, übernimmt FilterModule den Datenfluss (applyFilters -> updateUI -> refresh)
-        if (CONFIG?.features?.showFilters && typeof FilterModule?.init === "function") {
-            FilterModule.init(evts);
-        } else {
-            // Ohne Filter: direkt rendern/refreshen
-            if (CONFIG?.features?.showEventCards && typeof EventCards?.render === "function") {
-                EventCards.render(evts);
+        const wantsFilters = CONFIG?.features?.showFilters === true;
+
+        if (wantsFilters) {
+            if (typeof window.FilterModule === "undefined" || typeof FilterModule?.init !== "function") {
+                console.error("❌ [InitModules] showFilters=true but FilterModule.init is missing");
+                this.showError("Filter konnten nicht geladen werden. Bitte Seite neu laden.");
+                // Fallback: Seite bleibt nutzbar (ohne Filter)
+                if (CONFIG?.features?.showEventCards && typeof EventCards?.render === "function") {
+                    EventCards.render(evts);
+                }
+                if (CONFIG?.features?.showCalendar && typeof CalendarModule?.refresh === "function") {
+                    CalendarModule.refresh(evts);
+                }
+                return;
             }
 
-            if (CONFIG?.features?.showCalendar && typeof CalendarModule?.refresh === "function") {
-                CalendarModule.refresh(evts);
+            // Filter muss erfolgreich initialisieren (kein Silent-Fail)
+            FilterModule.init(evts);
+
+            if (FilterModule._isInit !== true) {
+                console.error("❌ [InitModules] FilterModule.init() did not complete (_isInit=false). UI will be non-interactive.", {
+                    showFilters: CONFIG?.features?.showFilters,
+                    hasSearch: !!document.getElementById("search-filter"),
+                    hasTimePill: !!document.getElementById("filter-time-pill"),
+                    hasCatPill: !!document.getElementById("filter-category-pill"),
+                    hasTimeSheet: !!document.getElementById("sheet-time"),
+                    hasCatSheet: !!document.getElementById("sheet-category"),
+                    hasReset: !!document.getElementById("filter-reset-pill")
+                });
+
+                this.showError("Filter-UI konnte nicht initialisiert werden. Bitte Seite neu laden.");
+
+                // Fallback: Seite bleibt nutzbar (ohne Filter)
+                if (CONFIG?.features?.showEventCards && typeof EventCards?.render === "function") {
+                    EventCards.render(evts);
+                }
+                if (CONFIG?.features?.showCalendar && typeof CalendarModule?.refresh === "function") {
+                    CalendarModule.refresh(evts);
+                }
+                return;
             }
+
+            debugLog("[InitModules] FilterModule initialized OK");
+            debugLog("All modules initialized");
+            return;
+        }
+
+        // Ohne Filter: direkt rendern/refreshen
+        if (CONFIG?.features?.showEventCards && typeof EventCards?.render === "function") {
+            EventCards.render(evts);
+        }
+
+        if (CONFIG?.features?.showCalendar && typeof CalendarModule?.refresh === "function") {
+            CalendarModule.refresh(evts);
         }
 
         debugLog("All modules initialized");
     },
     /* === END BLOCK: INITMODULES ORCHESTRATION (single flow, no retries) === */
+
 
 
     /**
@@ -209,6 +253,7 @@ if (document.readyState === 'loading') {
 }
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
