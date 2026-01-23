@@ -35,7 +35,7 @@
   --radius-card: 16px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
 
-  /* Backward compat (damit bestehende Styles nicht brechen) */
+  /* Backward compat */
   --bg: var(--color-background);
   --surface: var(--color-surface);
   --text: var(--color-text-primary);
@@ -47,7 +47,6 @@
   --accent: var(--color-primary);
 
   --focus-ring: rgba(139,207,74,.25);
-  --hero-surface: var(--color-primary-muted);
 
   --radius: var(--radius-card);
   --shadow-sm: var(--shadow-card);
@@ -59,23 +58,20 @@
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
 
-   /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
+  /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
   Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
   Umfang: Header-Höhe + Abstand + Farben für Header/Divider.
   === */
-    --header-h: 56px;           /* Header-Höhe (Sticky-Offset) – entspricht .app-header min-height */
-  --stack-gap: 0px;           /* Abstand zwischen Header und Top-Stack */
-  --header-bg: rgba(249, 251, 246, 0.96);  /* leicht getönt, nicht hart weiß */
-  --header-border: rgba(31,41,51,0.06);
-  --brand-line: rgba(139, 207, 74, 0.85);
+  --header-h: 56px;                  /* entspricht .app-header min-height */
+  --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
+  --stack-bg: rgba(249, 251, 246, 0.86);
+  --divider: rgba(31,41,51,0.06);
   /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
-
 }
 
-
 /* === BEGIN BLOCK: GLOBAL TYPOGRAPHY BASE ===
-Zweck: Einheitliche System-Schrift für die gesamte App (App-Standard 2025).
-Umfang: Ersetzt fehlerhafte body-Definition inkl. font-family.
+Zweck: Einheitliche System-Schrift für die gesamte App.
+Umfang: body Basis.
 === */
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
@@ -84,71 +80,45 @@ body {
   background: var(--color-background);
 }
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
-/* === BEGIN BLOCK: FILTER SHEET SCROLL LOCK ===
-Zweck: Beim offenen Filter-Sheet darf der Hintergrund nicht scrollen (Top-App Pattern).
-Umfang: Scroll-Lock greift für body UND html (egal ob JS die Klasse auf <body> oder <html> setzt).
+
+/* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) ===
+Zweck: Links konsistent, Textseiten lesbar, CTA konsistent.
+Umfang: a + .page + .modal-cta-button.
 === */
-body.is-sheet-open { overflow: hidden; }
-html.is-sheet-open { overflow: hidden; }
-html.is-sheet-open body { overflow: hidden; }
-/* === END BLOCK: FILTER SHEET SCROLL LOCK === */
-
-
-/* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) ===
-Zweck: Links nicht mehr "Default-Lila", bessere Lesbarkeit auf Textseiten, konsistente CTAs.
-Umfang: Neue globale Styles + .page Layout + CTA Basis, ohne HTML ändern zu müssen.
-=== */
-
-/* Links: konsistent, nicht lila, klarer Hover/Focus */
 a{
   color: var(--color-primary);
   text-decoration: none;
   text-underline-offset: 3px;
 }
+a:hover{ text-decoration: underline; }
+a:visited{ color: var(--color-primary); }
 
-a:hover{
-  text-decoration: underline;
-}
-
-a:visited{
-  color: var(--color-primary); /* kein Default-Lila */
-}
-
-/* Textseiten (ueber, fuer-veranstalter, datenschutz, impressum, events-veroeffentlichen) */
 .page{
   max-width: 820px;
   margin: 0 auto;
   padding: 20px;
 }
-
 .page h1{
   font-size: 1.35rem;
   line-height: 1.2;
   letter-spacing: -0.015em;
   margin: 6px 0 10px;
 }
-
 .page h2{
   font-size: 1.05rem;
   line-height: 1.25;
   margin: 18px 0 8px;
 }
-
-.page p{
+.page p,
+.page ul{
   color: var(--color-text-secondary);
 }
-
 .page ul{
   margin: 10px 0 0;
   padding-left: 18px;
-  color: var(--color-text-secondary);
 }
+.page li{ margin: 6px 0; }
 
-.page li{
-  margin: 6px 0;
-}
-
-/* CTA Basis: wir verwenden das auf den neuen Seiten über .modal-cta-button */
 .modal-cta-button{
   display: inline-flex;
   align-items: center;
@@ -166,30 +136,25 @@ a:visited{
 
   box-shadow: 0 8px 18px rgba(0,0,0,0.08);
 }
-
 .modal-cta-button:hover{
   text-decoration: none;
-  filter: brightness(0.98);
+  filter: brightness(0.985);
 }
-
 .modal-cta-button:active{
   transform: translateY(1px);
   box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
-
-/* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish 2026) === */
-
+/* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) === */
 
 /* === BEGIN BLOCK: GLOBAL HEADINGS TYPOGRAPHY ===
-Zweck: Überschriften nutzen dieselbe Schrift wie der Rest der App (keine Serif-Anmutung).
-Umfang: Erzwingt system-ui für h1–h6.
+Zweck: Überschriften ohne Serif-Anmutung.
+Umfang: h1–h6.
 === */
 h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   font-weight: 600;
 }
 /* === END BLOCK: GLOBAL HEADINGS TYPOGRAPHY === */
-
 
 /* Accessibility */
 :focus-visible {
@@ -198,93 +163,14 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 10px;
 }
 
-/* === BEGIN BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) ===
-Zweck: <header> wird bei euch direkt als .app-header gestylt. Keine konkurrierenden Position-Styles hier.
-Umfang: Kein sticky hier – sticky sitzt auf .app-header (gleiches Element).
+/* === BEGIN BLOCK: FILTER SHEET SCROLL LOCK ===
+Zweck: Beim offenen Filter-Sheet darf der Hintergrund nicht scrollen.
+Umfang: html+body.
 === */
-header { /* intentionally empty */ }
-
-/* legacy header helpers (aktuell nicht genutzt, aber harmlos beibehalten) */
-.header-content,
-. { display: none; }
-/* === END BLOCK: GLOBAL HEADER BASE (no-op, header is .app-header) === */
-
-
-/* === BEGIN BLOCK: PWA INSTALL BUTTON (button + link compatible) ===
-Zweck: .pwa-install-button ist bei euch Button UND Link; optisch/UX konsistent.
-Umfang: Konsolidierte Basis (wird im Header als Secondary/Primary variiert).
-=== */
-.pwa-install-button{
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 2px;
-
-  background: var(--color-primary-muted);
-  color: var(--color-text-primary);
-
-  border: 1px solid rgba(139,207,74,.35);
-  padding: 8px 12px;
-  border-radius: 12px;
-
-  font-size: .85rem;
-  font-weight: 700;
-
-  cursor: pointer;
-  text-decoration: none; /* wichtig für <a> */
-  white-space: nowrap;
-
-  /* wertiger “Button-Film” */
-  -webkit-tap-highlight-color: transparent;
-}
-
-.pwa-install-button:hover{
-  background: rgba(139,207,74,.18);
-  text-decoration: none;
-}
-
-.pwa-install-button:active{
-  transform: translateY(1px);
-}
-/* === END BLOCK: PWA INSTALL BUTTON (button + link compatible) === */
-
-
-/* ============================================
-   INTRO
-   ============================================ */
-.intro {
-  max-width: 1200px;
-  margin: 0 auto;
-
-  /* etwas mehr Luft + klarer Rhythmus */
-  padding: 14px 20px 10px;
-}
-
-.intro h1 {
-  font-size: 1.25rem;
-  font-weight: 650;
-  letter-spacing: -0.015em;
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-}
-
-.intro p {
-  font-size: .92rem;
-  color: var(--color-text-muted);
-}
-
-
-/* ============================================
-   SECTIONS
-   ============================================ */
-section {
-  max-width: 1200px;
-  margin: 0 auto;
-
-  /* Default großzügig – spezielle Sektionen überschreiben */
-  padding: 44px 20px;
-}
-
+body.is-sheet-open { overflow: hidden; }
+html.is-sheet-open { overflow: hidden; }
+html.is-sheet-open body { overflow: hidden; }
+/* === END BLOCK: FILTER SHEET SCROLL LOCK === */
 
 /* ============================================
    LOADING & MESSAGES
@@ -307,10 +193,7 @@ section {
   animation: spin 1s linear infinite;
   margin-bottom: 14px;
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .error-message,
 .info-message {
@@ -321,24 +204,13 @@ section {
   text-align: center;
   border: 1px solid rgba(0,0,0,.06);
 }
-
-.info-message {
-  background: #fff3cd;
-}
-
-.error-message {
-  background: #f8d7da;
-  color: #721c24;
-}
-
+.info-message { background: #fff3cd; }
+.error-message { background: #f8d7da; color: #721c24; }
 
 /* ============================================
    EMPTY STATE
    ============================================ */
-.empty-state{
-  padding: 18px 0 8px;
-}
-
+.empty-state{ padding: 18px 0 8px; }
 .empty-state__card{
   background: var(--color-surface);
   border: 1px solid rgba(31,41,51,0.08);
@@ -347,20 +219,17 @@ section {
   padding: 16px;
   max-width: 520px;
 }
-
 .empty-state__title{
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 6px;
   color: var(--color-text-primary);
 }
-
 .empty-state__text{
   font-size: 14px;
   color: var(--color-text-secondary);
   margin-bottom: 12px;
 }
-
 .empty-state__btn{
   width: 100%;
   border: 1px solid rgba(139,207,74,.45);
@@ -372,12 +241,10 @@ section {
   cursor: pointer;
 }
 
-
 /* ============================================
    EVENTS LIST
    ============================================ */
 .events-section {
-  /* enger, weil oben bereits Intro + Top-Stack liegen */
   padding-top: 12px;
   padding-bottom: 18px;
 }
@@ -394,7 +261,7 @@ section {
 .event-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-lg); /* 16px */
+  gap: var(--space-lg);
 }
 
 /* Card */
@@ -406,27 +273,12 @@ section {
   padding: 14px var(--space-lg);
   transition: box-shadow .12s ease, transform .12s ease;
 }
-
-/* press feedback */
-.event-card:active {
-  transform: scale(0.98);
-}
-
-/* Desktop hover */
+.event-card:active { transform: scale(0.985); }
 @media (hover: hover) and (pointer: fine) {
-  .event-card:hover {
-    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
-  }
+  .event-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.09); }
 }
 
-.event-card.is-open {
-  box-shadow: var(--shadow-card);
-  border: 0;
-}
-
-.event-card-content {
-  padding: var(--space-lg);
-}
+.event-card-content { padding: var(--space-lg); }
 
 .event-title {
   font-size: 17px;
@@ -439,16 +291,13 @@ section {
   overflow: hidden;
 }
 
-/* Meta */
-.event-meta-inline {
-  font-size: 12.5px;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-xs);
-}
-
+.event-meta-inline,
 .event-meta {
   font-size: 12.5px;
   color: var(--color-text-muted);
+}
+.event-meta-inline { margin-bottom: var(--space-xs); }
+.event-meta {
   margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -472,7 +321,6 @@ section {
   overflow: hidden;
 }
 
-/* Expand */
 .event-card-button {
   width: 100%;
   background: none;
@@ -481,22 +329,6 @@ section {
   cursor: pointer;
 }
 
-.event-collapsible.collapsed {
-  display: block;
-}
-
-.event-collapsible.collapsed .event-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.event-collapsible.collapsed .event-details-btn {
-  display: none;
-}
-
-/* CTA */
 .event-details-btn {
   display: inline-block;
   margin-top: 8px;
@@ -509,21 +341,11 @@ section {
   text-decoration: none;
   box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
-
-/* === BEGIN BLOCK: EVENT CTA HOVER (consistent with primary) ===
-Zweck: Hover bleibt im gleichen Farbsystem (kein Fremd-Dunkelgrün).
-Umfang: Ersetzt nur .event-details-btn:hover.
-=== */
-.event-details-btn:hover{
-  filter: brightness(0.96);
-  text-decoration: none;
-}
+.event-details-btn:hover{ filter: brightness(0.96); text-decoration: none; }
 .event-details-btn:active{
   transform: translateY(1px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
-/* === END BLOCK: EVENT CTA HOVER (consistent with primary) === */
-
 
 /* Location als Link (mobil zuverlässig tappable) */
 .event-location-link{
@@ -545,11 +367,7 @@ Umfang: Ersetzt nur .event-details-btn:hover.
   color: var(--color-primary);
   text-decoration: none;
 }
-
-.event-location-link:hover{
-  text-decoration: underline;
-}
-
+.event-location-link:hover{ text-decoration: underline; }
 
 /* ============================================
    FOOTER
@@ -561,137 +379,85 @@ footer {
   text-align: center;
 }
 
-
 /* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
-  .event-cards-grid {
-    grid-template-columns: 1fr;
-  }
+  .event-cards-grid { grid-template-columns: 1fr; }
 }
-
-@media (max-width: 480px) {
-  section {
-    padding: 28px 16px;
-  }
-
-  .intro h1 {
-    font-size: 1.22rem;
-  }
-}
-
 
 /* ============================================
-   FILTERS / SEARCH / TOP STACK (Discovery Zone)
+   FILTERS / SEARCH / TOP STACK (Top-App)
    ============================================ */
-
-/* (konsolidiert) events-filter ist der Stack-Container */
 .events-filter{
   display: grid;
-  gap: 10px;
+  gap: 12px;
   margin: 0;
 }
 
-.events-filter--secondary{
-  margin-top: 6px;
-}
-
-/* === BEGIN BLOCK: SEARCH BAR (functional hero, top-app level) ===
-Zweck: Search ist der Einstiegspunkt (ersetzt Intro/Hero); wirkt wie Premium App Input, nicht wie Formularfeld.
-Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
-=== */
-#search-filter{
-  width: 100%;
-
-  /* “Hero”-Presence: höher + großzügiger */
-  padding: 12px 14px;
-  min-height: 46px;
-
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: var(--color-surface);
-
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-
- /* ruhiger, mehr „Input“, weniger „Hero“ */
-box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-
-  /* Desktop-kompatibel: wirkt nicht endlos breit */
-  max-width: 820px;
-  margin: 0 auto;
-
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-#search-filter::placeholder{
-  color: var(--color-text-muted);
-}
-
-#search-filter:focus{
-  outline: none;
-  border-color: rgba(139,207,74,.60);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.06),
-    0 0 0 3px rgba(139,207,74,.14);
-}
-/* === END BLOCK: SEARCH BAR (functional hero, top-app level) === */
-
-
-#location-filter{
-  width: 100%;
-  max-width: 420px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(31,41,51,0.12);
-  background: var(--color-surface);
-  font-size: .95rem;
-  color: var(--color-text-primary);
-}
-/* === BEGIN BLOCK: FILTER SHEET CLOSE BUTTON (delegated) ===
-Zweck: Close-Button wird zentral im Block "FILTER BAR + SHEETS (Top-App level)" gestylt.
-Umfang: Verhindert doppelte/konkurrierende Definitionen.
-=== */
-/* intentionally empty */
-/* === END BLOCK: FILTER SHEET CLOSE BUTTON (delegated) === */
-
-
-
-/* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
-Zweck: Nach Entfernung des Intros wird Search zur “Hero”-Interaktion direkt unter dem Header.
-Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu ändern.
+/* === BEGIN BLOCK: TOP STACK (Top-App glass) ===
+Zweck: Suche+Chips wirken wie Top-App Toolbar (sticky + glass + divider).
+Umfang: .top-stack komplett.
 === */
 .top-stack{
   position: sticky;
   top: calc(var(--header-h) + var(--stack-gap));
-  z-index: 900; /* unter Header, über Content */
+  z-index: 900;
 
-  /* ruhiger Hintergrund (kein eigener “Hero-Block”) */
- background: var(--color-background);
+  padding: 10px 20px 12px;
 
+  background: var(--stack-bg);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 
-
-  /* näher an Header: App-Gefühl */
-  padding: 8px 20px 10px;
-
-  /* nur eine sehr subtile Trennung zum Content */
-border-bottom: 1px solid rgba(31,41,51,0.05);
- box-shadow: none;
-
+  border-bottom: 1px solid rgba(31,41,51,0.05);
+  box-shadow: 0 10px 26px rgba(31,41,51,0.06);
 
   transform: translateZ(0);
 }
-/* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
+/* === END BLOCK: TOP STACK (Top-App glass) === */
 
-
-/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
-Zweck: Top-App-UX für Suche + Pills + Bottom-Sheets (klarer Header, volle Sichtbarkeit, schöne Liste).
-Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke).
+/* === BEGIN BLOCK: SEARCH BAR (Top-App input) ===
+Zweck: Premium-Suche wie App-Search (Radius, Shadow, Focus-Ring, Icon-Padding optional).
+Umfang: #search-filter.
 === */
+#search-filter{
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
 
+  padding: 12px 14px;
+  min-height: 48px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.92);
+
+  font-size: 1rem;
+  font-weight: 520;
+  color: var(--color-text-primary);
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.07),
+    0 1px 0 rgba(255,255,255,0.8) inset;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+#search-filter::placeholder{ color: var(--color-text-muted); }
+#search-filter:focus{
+  outline: none;
+  border-color: rgba(139,207,74,.55);
+  box-shadow:
+    0 16px 38px rgba(0,0,0,0.10),
+    0 0 0 4px rgba(139,207,74,.14);
+}
+/* === END BLOCK: SEARCH BAR (Top-App input) === */
+
+/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App) ===
+Zweck: Chips wie Top-App Tools + Sheet wie iOS/Material Bottom Sheet.
+Umfang: .filters-bar / .filter-pill / .filter-sheet__* / .filter-sheet-option.
+=== */
 .filters-bar{
   display: flex;
   align-items: center;
@@ -705,7 +471,6 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   flex-wrap: wrap;
 }
 
-/* Pills: ruhige Tools mit wertiger Fläche */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -723,11 +488,11 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
 
   border-radius: 16px;
   border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.86);
 
   font: inherit;
   font-size: 0.95rem;
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1;
 
   color: var(--color-text-primary);
@@ -736,20 +501,12 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 
-  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.08);
 }
 
-.filter-pill__label{
-  color: var(--color-text-secondary);
-  font-weight: 550;
-}
+.filter-pill__label{ color: var(--color-text-secondary); font-weight: 550; }
+.filter-pill__value{ color: var(--color-text-primary); font-weight: 850; }
 
-.filter-pill__value{
-  color: var(--color-text-primary);
-  font-weight: 800;
-}
-
-/* Chevron */
 .filter-pill::after{
   content: "›";
   margin-left: 2px;
@@ -759,33 +516,28 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   transform: translateY(-1px);
 }
 
-/* Active: klar aber ruhig */
 .filter-pill.is-active{
-  background: rgba(255,255,255,0.92);
-  border-color: rgba(139,207,74,0.30);
+  background: rgba(255,255,255,0.95);
+  border-color: rgba(139,207,74,0.34);
   box-shadow:
-    0 14px 34px rgba(0,0,0,0.10),
+    0 18px 40px rgba(0,0,0,0.11),
     0 0 0 4px rgba(139,207,74,0.10);
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.95);
     border-color: rgba(31,41,51,0.14);
   }
 }
-
-.filter-pill:active{
-  transform: translateY(1px);
-}
-
+.filter-pill:active{ transform: translateY(1px); }
 .filter-pill:focus-visible{
   outline: 2px solid rgba(139,207,74,0.18);
   outline-offset: 3px;
   border-radius: 16px;
 }
 
-/* Reset: echte Action */
+/* Reset-Pill */
 .filter-pill--reset{
   flex: 0 0 auto;
   margin-left: auto;
@@ -794,42 +546,39 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   min-height: 44px;
 
   border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.60);
+  background: rgba(255,255,255,0.70);
   border-radius: 14px;
 
   font: inherit;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--color-text-secondary);
 
-  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.08);
 }
 .filter-pill--reset::after{ content: none; }
-
 @media (hover: hover){
   .filter-pill--reset:hover{
-    background: rgba(255,255,255,0.84);
+    background: rgba(255,255,255,0.90);
     color: var(--color-text-primary);
   }
 }
 .filter-pill--reset:active{ transform: translateY(1px); }
 
-/* ===== Bottom Sheet ===== */
+/* Sheet */
 .filter-sheet{
   position: fixed;
   inset: 0;
   z-index: 9998;
 }
-
 .filter-sheet__overlay{
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.42);
+  background: rgba(17, 24, 39, 0.46);
 
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
-/* Card: hoch genug, sauber gerundet, safe-area */
 .filter-sheet__card{
   position: absolute;
   left: 0;
@@ -844,7 +593,7 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
 
   border-top: 1px solid rgba(31,41,51,0.10);
   box-shadow:
-    0 -38px 110px rgba(0,0,0,0.26),
+    0 -40px 120px rgba(0,0,0,0.28),
     0 1px 0 rgba(255,255,255,0.75) inset;
 
   overflow: hidden;
@@ -853,7 +602,6 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
-/* Grabber */
 .filter-sheet__card::before{
   content: "";
   display: block;
@@ -864,7 +612,6 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   background: rgba(31,41,51,0.18);
 }
 
-/* Header sticky: immer sichtbar (wirkt direkt “App”) */
 .filter-sheet__header{
   position: sticky;
   top: 0;
@@ -875,22 +622,21 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   justify-content: space-between;
 
   padding: 12px 14px 12px;
-  background: rgba(255,255,255,0.92);
 
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
 .filter-sheet__title{
   font-size: 1.02rem;
-  font-weight: 850;
+  font-weight: 900;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
-/* Close */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
@@ -905,7 +651,7 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
 
   background: rgba(255,255,255,0.96);
   border: 1px solid rgba(31,41,51,0.14);
-  box-shadow: 0 12px 26px rgba(0,0,0,0.16);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.16);
 
   font-size: 22px;
   line-height: 1;
@@ -915,7 +661,6 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
 }
 .filter-sheet__close:active{ transform: scale(0.96); }
 
-/* Body: genug Platz (damit “nicht alles zu sehen” weg ist) */
 .filter-sheet__body{
   padding: 0;
   overflow: auto;
@@ -923,7 +668,7 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   max-height: calc(90vh - 82px);
 }
 
-/* Optionen: iOS/Top-App List (HTML nutzt .filter-sheet-option) */
+/* Option rows */
 .filter-sheet-option,
 .filter-option{
   -webkit-appearance: none;
@@ -941,15 +686,12 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   border-bottom: 1px solid rgba(31,41,51,0.06);
 
   font: inherit;
-  font-weight: 800;
+  font-weight: 850;
   font-size: 1rem;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-align: left;
-
-  border-radius: 0;
-  box-shadow: none;
 }
 
 .filter-sheet-option:last-child,
@@ -964,19 +706,15 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
 .filter-sheet-option.is-active::after,
 .filter-option.is-active::after{
   content: "✓";
-  color: rgba(31,41,51,0.82);
+  color: rgba(31,41,51,0.84);
   font-weight: 950;
 }
 
 @media (hover: hover){
   .filter-sheet-option:hover,
-  .filter-option:hover{
-    background: rgba(31,41,51,0.035);
-  }
+  .filter-option:hover{ background: rgba(31,41,51,0.035); }
   .filter-sheet-option.is-active:hover,
-  .filter-option.is-active:hover{
-    background: rgba(139,207,74,0.16);
-  }
+  .filter-option.is-active:hover{ background: rgba(139,207,74,0.16); }
 }
 
 .filter-sheet-option:focus-visible,
@@ -993,17 +731,11 @@ Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke
   .filters-bar{ gap: 10px; }
   .filter-pill{ padding: 10px 11px; min-height: 44px; }
 }
+/* === END BLOCK: FILTER BAR + SHEETS (Top-App) === */
 
-/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
-
-
-
-/* =========================================================
-
-   BEGIN: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
-   Single Source of Truth – konsolidiert (kein Patch-Stack)
-   ========================================================= */
-
+/* ============================================
+   DETAIL PANEL (BOTTOM SHEET) – FINAL
+   ============================================ */
 body.is-panel-open { overflow: hidden; }
 
 #event-detail-panel.detail-panel{
@@ -1012,22 +744,17 @@ body.is-panel-open { overflow: hidden; }
   z-index: 9999;
   display: block;
 }
-
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
-/* Overlay */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
   z-index: 0;
-
   background: rgba(17, 24, 39, 0.32);
-
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
-/* Sheet */
 #event-detail-panel .detail-panel-content{
   position: absolute;
   left: 0;
@@ -1038,7 +765,6 @@ body.is-panel-open { overflow: hidden; }
   max-height: 80vh;
 
   background: var(--color-surface);
-
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 
@@ -1059,7 +785,6 @@ body.is-panel-open { overflow: hidden; }
   transform: translateY(0);
 }
 
-/* Grabber */
 #event-detail-panel .detail-panel-content::before{
   content: "";
   display: block;
@@ -1070,7 +795,6 @@ body.is-panel-open { overflow: hidden; }
   background: rgba(139, 207, 74, 0.35);
 }
 
-/* Close */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: 12px;
@@ -1090,12 +814,8 @@ body.is-panel-open { overflow: hidden; }
   cursor: pointer;
   z-index: 10;
 }
+#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
-#event-detail-panel .detail-panel-close:active{
-  transform: scale(0.96);
-}
-
-/* Scroll-Container */
 #event-detail-panel #detail-content{
   padding-top: 28px;
   max-height: calc(80vh - 16px);
@@ -1104,7 +824,6 @@ body.is-panel-open { overflow: hidden; }
   overscroll-behavior: contain;
 }
 
-/* Sticky Mini Header */
 #event-detail-panel .detail-header{
   position: sticky;
   top: 0;
@@ -1128,15 +847,10 @@ body.is-panel-open { overflow: hidden; }
   color: var(--color-text-primary);
 }
 
-/* === BEGIN BLOCK: DETAIL BADGES (location + category) ===
-Zweck: DetailPanel-Badges konsistent darstellen (Location + Kategorie).
-Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-category.
-=== */
-/* Location Badge */
+/* Badges */
 #event-detail-panel .detail-location{
   display: inline-flex;
   align-items: center;
-
   margin-top: 6px;
   padding: 4px 10px;
 
@@ -1148,12 +862,9 @@ Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-categ
   font-weight: 650;
   color: rgba(31,41,51,0.92);
 }
-
-/* Category Badge (leicht neutraler als Location) */
 #event-detail-panel .detail-category{
   display: inline-flex;
   align-items: center;
-
   margin-top: 6px;
   margin-left: 8px;
   padding: 4px 10px;
@@ -1166,10 +877,7 @@ Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-categ
   font-weight: 650;
   color: rgba(31,41,51,0.82);
 }
-/* === END BLOCK: DETAIL BADGES (location + category) === */
 
-
-/* Meta Box */
 #event-detail-panel .detail-meta{
   margin: 14px 0 12px;
   padding: 12px 14px;
@@ -1184,13 +892,11 @@ Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-categ
   font-size: 0.9rem;
   color: var(--color-text-secondary);
 }
-
 #event-detail-panel .detail-meta strong{
   font-weight: 650;
   color: var(--color-text-primary);
 }
 
-/* Description */
 #event-detail-panel .detail-description p{
   margin: 0 0 20px;
   font-size: 0.95rem;
@@ -1198,7 +904,6 @@ Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-categ
   color: rgba(31,41,51,0.78);
 }
 
-/* CTA */
 #event-detail-panel .detail-actions{ margin-top: 0; }
 
 #event-detail-panel .detail-link-btn{
@@ -1220,41 +925,32 @@ Umfang: Ersetzt den bisherigen "Location Badge"-Block und ergänzt .detail-categ
 
   box-shadow: 0 10px 22px rgba(0,0,0,0.10);
 }
-
 #event-detail-panel .detail-link-btn:active{
   transform: translateY(1px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.09);
 }
 
-/* iOS Safe Area */
 @supports (padding: max(0px)){
   #event-detail-panel .detail-panel-content{
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
 
-/* =========================================================
-   END: DETAIL PANEL (BOTTOM SHEET) – FINAL (2026)
-   ========================================================= */
-
-
-/* === BEGIN BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) ===
-Zweck: Header ist sticky + wertig; Buttons konsistent; Modal bleibt.
-Umfang: Konsolidiert Header + Modal Styles.
-=== */
+/* ============================================
+   HEADER + MODAL (NO OVERFLOW MENU)
+   ============================================ */
 
 /* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Linear-like Topbar-Optik ohne klassische Buttons:  links, Titel, rechts Inline-Actions mit Icon+Text.
-Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-install-button (nur Header-Optik).
+Zweck: Sticky Topbar mit ruhiger Optik; rechts Inline-Actions.
+Umfang: .app-header + Brand + Actions.
 === */
 .app-header{
-   color: var(--color-text-primary);
+  color: var(--color-text-primary);
   position: sticky;
   top: 0;
   z-index: 1000;
   isolation: isolate;
 
-  /* Linear-like: ruhig, clean, kein CTA-Look */
   min-height: 56px;
   padding: 0 16px;
 
@@ -1266,26 +962,20 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   align-items: center;
   gap: 12px;
 
-  /* keine harte Trennlinie; nur subtile „Schwebe“-Trennung */
   border-bottom: 1px solid rgba(31, 41, 51, 0.04);
- box-shadow:
-  0 1px 0 rgba(31, 41, 51, 0.04),
-  0 6px 20px rgba(31, 41, 51, 0.06);
-
-
+  box-shadow:
+    0 1px 0 rgba(31, 41, 51, 0.04),
+    0 6px 20px rgba(31, 41, 51, 0.06);
 
   transform: translateZ(0);
 }
 
-/* Die bisherige Brand-Line entfernen (Linear: sehr zurückhaltend) */
-.app-header::after{
-  content: none;
-}
+.app-header::after{ content: none; }
 
 .header-left{
   display: inline-flex;
   align-items: center;
-  gap: 10px;          /* Logo ↔ Titel */
+  gap: 10px;
   min-width: 0;
   flex: 1 1 auto;
 }
@@ -1294,8 +984,6 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   width: 30px;
   height: 30px;
   flex: 0 0 auto;
-
-  /* ruhig, nicht „App-Icon-Kachel“ */
   border-radius: 6px;
   border: 0;
   background: transparent;
@@ -1312,8 +1000,6 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  /* Titel bleibt sichtbar – Buttons dürfen ihn nicht verdrängen */
   max-width: 56vw;
 }
 
@@ -1321,41 +1007,42 @@ Umfang: Ersetzt .app-header / .header-left/right / .app-logo/title / .pwa-instal
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 18px;          /* Abstand zwischen Actions */
+  gap: 18px;
   flex: 0 0 auto;
 }
 
-/* Actions: als Inline-Tools (keine Buttons/Pills) */
 .header-right > .pwa-install-button{
   display: inline-flex;
   align-items: center;
-justify-content: flex-start;
-   gap: 3px;
-   width: auto;
-   flex: 0 0 auto;
-  /* keine Flächen-Optik */
+  justify-content: flex-start;
+  gap: 3px;
+
+  width: auto;
+  flex: 0 0 auto;
+
   padding: 6px 0;
-  min-height: 0;
   border: 0;
   background: transparent;
   border-radius: 0;
 
-  /* Typo wie „Topbar Action“ */
   font-family: inherit;
   font-weight: 500;
   line-height: 1;
   text-decoration: none;
 
-  /* Icon+Text per Pseudo-Elemente, Originaltext bleibt für Screenreader */
-  font-size: 0;          /* visuell Text ersetzen */
-   color: var(--color-text-secondary);
+  font-size: 0;
+  color: var(--color-text-secondary);
   cursor: pointer;
 
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Fokus: sichtbar, aber nicht wie Button */
+.header-right > .pwa-install-button::before,
+.header-right > .pwa-install-button::after{
+  color: var(--color-text-secondary);
+}
+
 .header-right > .pwa-install-button:focus-visible{
   outline: 2px solid color-mix(in srgb, currentColor 18%, transparent);
   outline-offset: 3px;
@@ -1363,32 +1050,12 @@ justify-content: flex-start;
 }
 
 @media (hover: hover){
-  .header-right > .pwa-install-button:hover{
-    color: var(--color-text-primary);
-  }
-
-  /* Hover muss explizit auch die sichtbaren Pseudo-Elemente treffen */
+  .header-right > .pwa-install-button:hover{ color: var(--color-text-primary); }
   .header-right > .pwa-install-button:hover::before,
   .header-right > .pwa-install-button:hover::after{
     color: var(--color-text-primary);
   }
 }
-
-
-/* ---- ICON + LABEL MAPPING (ohne HTML-Änderung) ----
-   Installieren-Button (button) -> [⬇︎] App
-   Veröffentlichen-Link (a)     -> [＋] Event
-*/
-/* === BEGIN BLOCK: HEADER ACTIONS VISUAL COLOR (pseudo elements) ===
-Zweck: Icon + Label erben nicht zuverlässig aus Parent-Regel (font-size:0 etc.) → daher explizit.
-Umfang: Setzt Grundfarbe für ::before/::after im Normalzustand.
-=== */
-.header-right > .pwa-install-button::before,
-.header-right > .pwa-install-button::after{
-  color: var(--color-text-secondary);
-}
-/* === END BLOCK: HEADER ACTIONS VISUAL COLOR (pseudo elements) === */
-
 
 .header-right > button.pwa-install-button::before{
   content: "⬇︎";
@@ -1412,25 +1079,12 @@ Umfang: Setzt Grundfarbe für ::before/::after im Normalzustand.
   font-size: 14px;
 }
 
-/* Sehr kleine Screens: minimal kompakter */
 @media (max-width: 360px){
-  .app-header{
-    padding: 0 14px;
-    min-height: 56px;
-  }
-
-  .header-right{
-    gap: 12px;
-  }
-
-  .app-title{
-    max-width: 50vw;
-  }
+  .app-header{ padding: 0 14px; min-height: 56px; }
+  .header-right{ gap: 12px; }
+  .app-title{ max-width: 50vw; }
 }
 /* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
-
-
-
 
 /* --- Modal (Locations) --- */
 .modal-overlay {
@@ -1460,10 +1114,7 @@ Umfang: Setzt Grundfarbe für ::before/::after im Normalzustand.
   border-bottom: 1px solid #eee;
 }
 
-.modal-title {
-  font-size: 18px;
-  margin: 0;
-}
+.modal-title { font-size: 18px; margin: 0; }
 
 .modal-close {
   width: 40px;
@@ -1475,49 +1126,9 @@ Umfang: Setzt Grundfarbe für ::before/::after im Normalzustand.
   line-height: 1;
 }
 
-.modal-body {
-  padding: 14px 16px 18px;
-}
-
+.modal-body { padding: 14px 16px 18px; }
 .modal-cta {
   margin-top: 14px;
   display: flex;
   justify-content: flex-end;
 }
-
-/* === BEGIN BLOCK: MODAL CTA BUTTON (delegates to global CTA) ===
-Zweck: Verhindert Style-Konflikte; CTA-Design ist global definiert.
-Umfang: Delegiert lokale Definition an globale .modal-cta-button.
-=== */
-.modal-cta-button{
-  /* bewusst leer: globale Definition oben ist Single Source of Truth */
-}
-/* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
-
-/* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
