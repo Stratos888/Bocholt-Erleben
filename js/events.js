@@ -1,12 +1,20 @@
-/**
- * EVENTS.JS – Event Cards + Suche + Chips (Zeit / Quick)
- * Stabil, schema-korrekt, DetailPanel-kompatibel
- *
- * - Location-Dropdown entfernt
- * - Location-Klick führt zur Homepage (via Locations mapping), Fallback Maps
- * - Zeit-Chips: all / today / weekend / soon
- * - Quick-Interests: setzen/ersetzen Suche (kein Append)
- */
+// BEGIN: FILE_HEADER_EVENTS
+// Datei: js/events.js
+// Zweck: Event Cards anzeigen (Rendering = Anzeigen)
+// Verantwortlich für:
+// - Aus einer Event-Liste DOM-Karten bauen und im Container anzeigen
+// - Interaktion (Klick/Enter/Space) → DetailPanel öffnen
+//
+// Nicht verantwortlich für:
+// - Filter-State (Zeit/Kategorie/Suche)
+// - Filter-UI (Pills/Sheets/Reset)
+// - Filterlogik (anwenden/zusammenführen)
+//
+// Contract:
+// - bekommt bereits gefilterte Events von js/filter.js
+// - öffentliche API: EventCards.render(events) / EventCards.refresh(events)
+// END: FILE_HEADER_EVENTS
+
 
 /* ---------- Date Helpers ---------- */
 function parseISODateLocal(isoDate) {
@@ -248,4 +256,5 @@ const EventCards = {
 // END: EVENT_CARDS
 
 debugLog("EventCards loaded successfully");
+
 
