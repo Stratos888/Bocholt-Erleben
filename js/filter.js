@@ -86,18 +86,20 @@ Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zu
 
     const resetPill = document.getElementById("filter-reset-pill");
 
-  /* === BEGIN BLOCK: FILTER CONTRACT GUARD (robust selectors) ===
-Zweck: Init darf nur abbrechen, wenn UI wirklich fehlt – Selector-Mismatch vermeiden.
-Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI-Elemente.
+   /* === BEGIN BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) ===
+Zweck: Schließt Fehlkonfigurationen aus, aber ohne Selector-Mismatch (alt/neu) zu killen.
+Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
 === */
     const timeBody = timeSheet?.querySelector(".filter-sheet__body");
     const catBody  = catSheet?.querySelector(".filter-sheet__body");
 
     // Optionen: akzeptiere beide Klassennamen (alt/neu)
-    const timeOptions =
-      timeSheet?.querySelectorAll('.filter-option[data-time], .filter-sheet-option[data-time]');
-    const catOptions =
-      catSheet?.querySelectorAll('.filter-option[data-category], .filter-sheet-option[data-category]');
+    const timeOptions = timeSheet?.querySelectorAll(
+      '.filter-option[data-time], .filter-sheet-option[data-time], .filter-sheet-option[data-time], [data-time].filter-option, [data-time].filter-sheet-option'
+    );
+    const catOptions = catSheet?.querySelectorAll(
+      '.filter-option[data-category], .filter-sheet-option[data-category], .filter-sheet-option[data-category], [data-category].filter-option, [data-category].filter-sheet-option'
+    );
 
     const hasTimeClose = !!timeSheet?.querySelector("[data-close-sheet]");
     const hasCatClose  = !!catSheet?.querySelector("[data-close-sheet]");
@@ -134,7 +136,8 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
 
       return;
     }
-  /* === END BLOCK: FILTER CONTRACT GUARD (robust selectors) === */
+  /* === END BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) === */
+
 
 
     // Defaults (konsistent)
