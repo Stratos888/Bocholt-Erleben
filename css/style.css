@@ -911,8 +911,15 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
   max-height: calc(78vh - 74px);
 }
 
-/* Optionen: ruhige Liste (keine Karten) */
-.filter-option{
+/* === BEGIN BLOCK: FILTER SHEET OPTIONS (Top-App, robust selectors) ===
+Zweck: Optionen im Sheet sehen wie native App-Listen aus (keine Browser-Button-Styles),
+       egal ob HTML .filter-option oder .filter-sheet-option nutzt.
+Umfang: Ersetzt den bisherigen Optionen-Block inkl. Active/Hover.
+=== */
+
+/* Base: beide Klassennamen unterstützen */
+.filter-option,
+.filter-sheet-option{
   -webkit-appearance: none;
   appearance: none;
 
@@ -923,39 +930,63 @@ Umfang: .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen 
 
   padding: 14px 14px;
   background: transparent;
+
   border: 0;
   border-bottom: 1px solid rgba(31,41,51,0.06);
 
   font: inherit;
-  font-weight: 600;
+  font-weight: 650;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-align: left;
+
+  /* verhindert “inline button look” */
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.filter-option:last-child{
+/* Last item: keine Linie */
+.filter-option:last-child,
+.filter-sheet-option:last-child{
   border-bottom: 0;
 }
 
-.filter-option.is-active{
+/* Active */
+.filter-option.is-active,
+.filter-sheet-option.is-active{
   background: rgba(139,207,74,0.10);
 }
 
-.filter-option.is-active::after{
+.filter-option.is-active::after,
+.filter-sheet-option.is-active::after{
   content: "✓";
   color: rgba(31,41,51,0.78);
-  font-weight: 800;
+  font-weight: 900;
 }
 
+/* Hover */
 @media (hover: hover){
-  .filter-option:hover{
+  .filter-option:hover,
+  .filter-sheet-option:hover{
     background: rgba(31,41,51,0.03);
   }
-  .filter-option.is-active:hover{
+
+  .filter-option.is-active:hover,
+  .filter-sheet-option.is-active:hover{
     background: rgba(139,207,74,0.12);
   }
 }
+
+/* Focus */
+.filter-option:focus-visible,
+.filter-sheet-option:focus-visible{
+  outline: 2px solid rgba(139,207,74,0.16);
+  outline-offset: -2px;
+}
+
+/* === END BLOCK: FILTER SHEET OPTIONS (Top-App, robust selectors) === */
+
 
 /* Safe Area */
 @supports (padding: max(0px)){
@@ -1474,6 +1505,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
