@@ -1,8 +1,23 @@
-/**
- * seo-schema.js
- * Baut JSON-LD Event Schema aus /data/events.json
- * MVP: nur Felder aus dem MVP-Schema verwenden.
- */
+// BEGIN: FILE_HEADER_SEO_SCHEMA
+// Datei: js/seo-schema.js
+// Zweck:
+// - Erzeugt JSON-LD (SEO Schema) für Events
+// - Injiziert strukturierte Daten basierend auf /data/events.json
+//
+// Verantwortlich für:
+// - Aufbau und Einfügen von Event-Schema (JSON-LD)
+// - Defensive Checks (leere Daten → nichts injizieren)
+//
+// Nicht verantwortlich für:
+// - Event-Rendering (Cards/Kalender)
+// - Filter-State / Filter-UI
+// - Laden/Boot der App (main.js)
+//
+// Contract:
+// - liest /data/events.json (no-store) und erzeugt daraus JSON-LD
+// - verändert keine UI, nur <script type="application/ld+json"> im DOM
+// END: FILE_HEADER_SEO_SCHEMA
+
 
 (async function injectEventSchema() {
   try {
@@ -87,3 +102,4 @@
     // bewusst still
   }
 })();
+
