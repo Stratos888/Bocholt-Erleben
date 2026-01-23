@@ -1,7 +1,25 @@
-/**
- * LOCATIONS.JS – Location → Homepage Mapping
- * Lädt /data/locations.json und liefert URLs für Location-Namen.
- */
+// BEGIN: FILE_HEADER_LOCATIONS_MODAL
+// Datei: js/locations-modal.js
+// Zweck:
+// - Anzeige des Locations-Info-Modals
+// - Erklärt Mehrwert & Einstieg für Locations
+// - Modal-Interaktion (Open/Close, Overlay, ESC)
+//
+// Verantwortlich für:
+// - Modal-DOM (Locations)
+// - Öffnen/Schließen inkl. Scroll-Lock
+// - Mehrere Trigger sauber unterstützen
+//
+// Nicht verantwortlich für:
+// - Event-Filter oder Event-Darstellung
+// - DetailPanel
+// - Tariflogik oder Abrechnung
+//
+// Contract:
+// - wird über definierte Trigger geöffnet
+// - verhält sich mental identisch zum Detail-Panel
+// END: FILE_HEADER_LOCATIONS_MODAL
+
 
 const Locations = {
   map: {},
@@ -41,3 +59,4 @@ const Locations = {
 
 // Auto-init (kein Framework, kein Build)
 Locations.init();
+
