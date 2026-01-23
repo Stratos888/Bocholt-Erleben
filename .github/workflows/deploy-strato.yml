@@ -84,7 +84,7 @@ jobs:
               set net:max-retries 2;
 
                            # === BEGIN BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
-                           # === BEGIN BLOCK: DEPLOY INTO REAL WEBROOT + DIAGNOSTICS ===
+                      
               pwd;
               ls -l;
 
@@ -104,8 +104,7 @@ jobs:
               cat index.html | head -n 80 | sed -n '1,80p' | grep -n "style.css" || true;
 
               bye;
-              # === END BLOCK: DEPLOY INTO REAL WEBROOT + DIAGNOSTICS ===
-
+          
               # === END BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
 
             "
