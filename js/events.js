@@ -126,20 +126,10 @@ function sortByDateAsc(a, b) {
 /* === END BLOCK: SORT (date + time) === */
 
 /* ---------- Event Cards ---------- */
+// BEGIN: EVENT_CARDS
 const EventCards = {
   events: [],
-  filteredEvents: [],
   container: null,
-
-  // Filter-State
-  searchQuery: "",
-  activeTime: "all", // all | today | weekend | soon
-
-  // DOM refs
-  searchInput: null,
-  timeChips: [],
-  quickChips: [],
-  filterReady: false,
 
   render(events) {
     if (!CONFIG?.features?.showEventCards) return;
@@ -147,6 +137,8 @@ const EventCards = {
     this.container = document.getElementById("event-cards");
     if (!this.container) return;
 
+    // Renderer ist bewusst "dumm": keine eigene Filter-UI/State mehr.
+    // Minimaler Schutz: keine Past/Invalid Events anzeigen (wie bisher).
     this.events = (events || [])
       .filter((e) => {
         const bucket = getEventBucket(e);
@@ -154,230 +146,31 @@ const EventCards = {
       })
       .sort(sortByDateAsc);
 
-    this.ensureFilters();
-    this.applyFiltersAndRender();
+    this.renderList(this.events);
   },
 
-  /* ---------- Filters wiring ---------- */
-  ensureFilters() {
-    if (this.filterReady) return;
-
-    // Search
-    this.searchInput = document.getElementById("search-filter");
-    if (this.searchInput) {
-      this.searchInput.addEventListener("input", () => {
-        this.searchQuery = this.searchInput.value.trim();
-
-        // If user types manually, clear quick-chip pressed state
-        if (this.quickChips?.length) {
-          this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
-        }
-
-        this.applyFiltersAndRender();
-      });
-    }
-
-    // Time chips
-    this.timeChips = Array.from(document.querySelectorAll(".chip--time"));
-    this.timeChips.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const t = btn.getAttribute("data-time") || "all";
-        this.activeTime = t;
-        this.updateTimeChipUI();
-        this.applyFiltersAndRender();
-      });
-    });
-
-    /* === BEGIN BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) + PRESSED STATE ===
-Zweck: Quick-Interest-Chip ersetzt die Suche (kein Append) und setzt pressed-state (A11y/UX).
-Umfang: Ersetzt den kompletten Quick-Interests-Click-Handler in ensureFilters().
-=== */
-    this.quickChips = Array.from(document.querySelectorAll(".quick-interests .chip"));
-    this.quickChips.forEach((btn) => {
-      btn.setAttribute("aria-pressed", "false");
-
-      btn.addEventListener("click", () => {
-        const q = (btn.getAttribute("data-q") || "").trim();
-        if (!q) return;
-
-        // pressed-state (nur einer aktiv)
-        this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
-        btn.setAttribute("aria-pressed", "true");
-
-        // Immer ersetzen (nicht anhängen)
-        this.searchQuery = q;
-        if (this.searchInput) this.searchInput.value = q;
-
-        this.applyFiltersAndRender();
-      });
-    });
-/* === END BLOCK: QUICK-CHIPS REPLACE SEARCH (no append) + PRESSED STATE === */
-
-    // Initial UI state
-    this.updateTimeChipUI();
-
-    this.filterReady = true;
+  refresh(events) {
+    this.render(events);
   },
 
-  updateTimeChipUI() {
-    this.timeChips.forEach((btn) => {
-      const t = btn.getAttribute("data-time") || "all";
-      btn.classList.toggle("is-active", t === this.activeTime);
-    });
-  },
+  renderList(list) {
+    if (!this.container) return;
 
-  matchesSearch(event) {
-    if (!this.searchQuery) return true;
-    const q = this.searchQuery.toLowerCase();
-    return [event.title, event.location, event.description]
-      .join(" ")
-      .toLowerCase()
-      .includes(q);
-  },
-
-  matchesTime(event) {
-    if (this.activeTime === "all") return true;
-
-    const eventDate = parseISODateLocal(event?.date);
-    if (!eventDate) return false;
-
-    const today = startOfToday();
-
-    if (this.activeTime === "today") {
-      return isSameDay(eventDate, today);
-    }
-
-    if (this.activeTime === "weekend") {
-      const { start, end } = getNextWeekendRange(today);
-      const d = new Date(eventDate);
-      d.setHours(12, 0, 0, 0); // robust
-      return d >= start && d <= end;
-    }
-
-    if (this.activeTime === "soon") {
-      // "Demnächst" = nächste 7 Tage inkl. heute
-      const end = addDays(today, 7);
-      end.setHours(23, 59, 59, 999);
-
-      const d = new Date(eventDate);
-      d.setHours(12, 0, 0, 0);
-      return d >= today && d <= end;
-    }
-
-    return true;
-  },
-
-  applyFiltersAndRender() {
-    this.filteredEvents = this.events
-      .filter((e) => this.matchesTime(e))
-      .filter((e) => this.matchesSearch(e));
-
-    this.renderGroups(this.filteredEvents);
-  },
-
-  /* ---------- Groups ---------- */
-
-  /* === BEGIN BLOCK: GROUP RENDERING (filter-aware, cleaner UX) ===
-Zweck: Gruppentitel passen zum aktiven Zeitfilter; weniger visuelles Rauschen.
-Umfang: Ersetzt renderGroups(events).
-=== */
-  renderGroups(events) {
     this.container.innerHTML = "";
 
-    // Wenn ein Zeitfilter aktiv ist (nicht "all"), rendere eine einzige Gruppe
-    if (this.activeTime && this.activeTime !== "all") {
-      const titleMap = {
-        today: "Heute",
-        weekend: "Wochenende",
-        soon: "Demnächst"
-      };
-      const title = titleMap[this.activeTime] || "Events";
-
-      if (events.length) {
-        this.renderGroup(title, events);
-        return;
-      }
-
-      this.renderEmptyState();
+    if (!list || list.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "events-empty";
+      empty.textContent = "Keine passenden Events gefunden.";
+      this.container.appendChild(empty);
       return;
     }
 
-    // Default: All -> Bucket groups
-    const groups = { today: [], week: [], upcoming: [], later: [] };
-    events.forEach((e) => groups[getEventBucket(e)]?.push(e));
-
-    this.renderGroup("Heute", groups.today);
-    this.renderGroup("Diese Woche", groups.week);
-    this.renderGroup("Kommende Events", groups.upcoming);
-    this.renderGroup("Später", groups.later);
-
-    if (!this.container.children.length) {
-      this.renderEmptyState();
+    const frag = document.createDocumentFragment();
+    for (const ev of list) {
+      frag.appendChild(this.createCard(ev));
     }
-  },
-  /* === END BLOCK: GROUP RENDERING (filter-aware, cleaner UX) === */
-
-  renderGroup(title, list) {
-    if (!list.length) return;
-
-    const h = document.createElement("h3");
-    h.className = "events-group-title";
-    h.textContent = title;
-    this.container.appendChild(h);
-
-    list.forEach((event) => {
-      this.container.appendChild(this.createCard(event));
-    });
-  },
-
-  /* === BEGIN BLOCK: EMPTY STATE (reusable) ===
-Zweck: Empty State zentral, damit renderGroups sauber bleibt.
-Umfang: Neue Methode renderEmptyState() im EventCards-Objekt.
-=== */
-  renderEmptyState() {
-    const wrap = document.createElement("div");
-    wrap.className = "empty-state";
-
-    wrap.innerHTML = `
-      <div class="empty-state__card">
-        <h3 class="empty-state__title">Keine Treffer</h3>
-        <p class="empty-state__text">
-          Probier einen anderen Suchbegriff oder setz die Filter zurück.
-        </p>
-        <button type="button" class="empty-state__btn" id="reset-filters-btn">
-          Filter zurücksetzen
-        </button>
-      </div>
-    `;
-
-    this.container.appendChild(wrap);
-
-    const btn = wrap.querySelector("#reset-filters-btn");
-    if (btn) {
-      btn.addEventListener("click", () => this.resetFilters());
-    }
-  },
-  /* === END BLOCK: EMPTY STATE (reusable) === */
-
-  resetFilters() {
-    this.searchQuery = "";
-    this.activeTime = "all";
-
-    if (this.searchInput) this.searchInput.value = "";
-    this.updateTimeChipUI();
-
-    if (this.quickChips?.length) {
-      this.quickChips.forEach((b) => b.setAttribute("aria-pressed", "false"));
-    }
-
-    this.applyFiltersAndRender();
-
-    // UX: nach Reset wieder nach oben (fühlt sich "fertig" an)
-    try {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch {
-      window.scrollTo(0, 0);
-    }
+    this.container.appendChild(frag);
   },
 
   /* ---------- Card ---------- */
@@ -394,39 +187,46 @@ Umfang: Neue Methode renderEmptyState() im EventCards-Objekt.
     const timeLabel = event.time ? ` · ${this.escape(event.time)}` : "";
 
     const loc = (event.location || "").trim();
-    const homepage =
-      (window.Locations && Locations.getHomepage && Locations.getHomepage(loc)) || "";
-    const href =
-      homepage ||
-      ((window.Locations && Locations.getMapsFallback && Locations.getMapsFallback(loc)) ||
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          (loc ? loc + " " : "") + "Bocholt"
-        )}`);
+    const locName = this.escape(loc);
+    const locUrl = loc ? getLocationUrl(loc) : "";
 
-    card.innerHTML = `
-      <h3 class="event-title">${this.escape(event.title || "")}</h3>
-      <div class="event-meta">${dateLabel}${timeLabel}</div>
+    // Title
+    const h3 = document.createElement("h3");
+    h3.className = "event-title";
+    h3.innerHTML = this.escape(event.title || "Event");
 
-      ${
-        loc
-          ? `<a class="event-location event-location-link"
-                href="${this.escape(href)}"
-                target="_blank"
-                rel="noopener noreferrer">
-               ${this.escape(loc)}
-             </a>`
-          : ""
-      }
-    `;
+    // Meta (date/time)
+    const meta = document.createElement("div");
+    meta.className = "event-meta";
+    meta.innerHTML = `${dateLabel}${timeLabel}`;
 
-    // Card → DetailPanel (außer beim Klick auf den Location-Link)
+    // Location (link)
+    const location = document.createElement("div");
+    location.className = "event-location";
+
+    if (loc) {
+      const a = document.createElement("a");
+      a.className = "event-location-link";
+      a.href = locUrl || getMapsUrl(loc);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.innerHTML = locName;
+      location.appendChild(a);
+    }
+
+    card.appendChild(h3);
+    card.appendChild(meta);
+    card.appendChild(location);
+
+    // Click: DetailPanel
     card.addEventListener("click", (e) => {
       if (e.target.closest(".event-location-link")) return;
-      if (typeof DetailPanel !== "undefined" && DetailPanel.show) {
+      if (window.DetailPanel?.show) {
         DetailPanel.show(event);
       }
     });
 
+    // Keyboard: Enter/Space
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
       if (e.target.closest(".event-location-link")) return;
@@ -443,12 +243,9 @@ Umfang: Neue Methode renderEmptyState() im EventCards-Objekt.
     const div = document.createElement("div");
     div.textContent = String(text ?? "");
     return div.innerHTML;
-  },
-
-  refresh(events) {
-    this.filterReady = false;
-    this.render(events);
   }
 };
+// END: EVENT_CARDS
 
 debugLog("EventCards loaded successfully");
+
