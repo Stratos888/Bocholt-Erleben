@@ -1,19 +1,27 @@
-/* === BEGIN BLOCK: FILTER.JS (Top-App Pills + Sheets, Single Category) ===
-Zweck: Zentrale Filter-Logik für Suche + strukturierte Filter-Pills (Zeit + Kategorie als Single).
-Umfang: Gesamte Datei js/filter.js vollständig (konsolidiert, ohne Legacy-Dropdowns/Chip-Teppich).
-Hinweis: Erwartet HTML-IDs: search-filter, filter-time-pill, filter-time-value, sheet-time,
-         filter-category-pill, filter-category-value, sheet-category, filter-reset-pill.
-=== */
+// BEGIN: FILE_HEADER_FILTER
+// Datei: js/filter.js
+// Zweck:
+// - Zentrale Filter-Steuerung (Single Source of Truth)
+// - Verwaltet Filter-State (Zeit, Kategorie, Suche)
+// - Steuert Filter-UI (Pills + Sheets öffnen/schließen)
+// - Wendet Filter auf Event-Daten an
+//
+// Verantwortlich für:
+// - Filter-State halten und ändern
+// - Sheet-Logik (Zeit/Kategorie)
+// - Reset-Logik
+// - Übergabe gefilterter Events an EventCards
+//
+// Nicht verantwortlich für:
+// - Darstellung der Event Cards
+// - Aufbau von Event-DOM
+// - DetailPanel oder Locations-Modal
+//
+// Contract:
+// - erhält vollständige Event-Liste von main.js
+// - ruft EventCards.render(...) / refresh(...) mit gefilterten Events auf
+// END: FILE_HEADER_FILTER
 
-/**
- * FILTER.JS – Such- und Filter-Modul (konsolidiert)
- *
- * Unterstützt:
- * - Freitextsuche (#search-filter)
- * - Zeitfilter via Bottom-Sheet (all/today/weekend/soon)
- * - Kategoriefilter (Single) via Bottom-Sheet
- * - Reset nur bei aktiven Filtern
- */
 
 /* === BEGIN BLOCK: FILTER MODULE STATE (init flag) ===
 Zweck: Stabiler Zustand für Auto-Bootstrap + Schutz gegen doppelte Init.
