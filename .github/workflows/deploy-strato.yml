@@ -84,18 +84,28 @@ jobs:
               set net:max-retries 2;
 
                            # === BEGIN BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
+                           # === BEGIN BLOCK: DEPLOY INTO REAL WEBROOT + DIAGNOSTICS ===
               pwd;
-              ls -la;
+              ls -l;
 
+              # 1) Deploy to current directory (this is what the domain is serving)
+              rm -f index.html;
+              mirror -R --delete deploy/ .;
+
+              echo "REMOTE (ROOT) index.html style.css line:";
+              cat index.html | head -n 80 | sed -n '1,80p' | grep -n "style.css" || true;
+
+              # 2) Optional: also deploy to STRATO-apps (keeps it in sync)
               mkdir -p STRATO-apps;
               cd STRATO-apps;
-              pwd;
-              ls -la;
+              mirror -R --delete ../deploy/ .;
 
-              mirror -R --only-newer deploy/ .;
+              echo "REMOTE (STRATO-apps) index.html style.css line:";
+              cat index.html | head -n 80 | sed -n '1,80p' | grep -n "style.css" || true;
 
-              ls -la;
               bye;
+              # === END BLOCK: DEPLOY INTO REAL WEBROOT + DIAGNOSTICS ===
+
               # === END BLOCK: DEPLOY INTO /STRATO-apps (correct webroot) ===
 
             "
