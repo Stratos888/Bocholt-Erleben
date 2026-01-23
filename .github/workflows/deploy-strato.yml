@@ -37,11 +37,19 @@ jobs:
           rm -rf deploy
           mkdir -p deploy
 
-          rsync -a \
+                    rsync -a \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="deploy" \
             ./ deploy/
+
+          # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
+          # Zweck: Jede Deploy-Version bekommt automatisch neue Asset-URLs (?v=BUILD_ID),
+          #        damit Browser/SW/Proxies nie "alte" CSS/JS unter gleichem Cache-Key behalten.
+          # Umfang: Ersetzt nur ?v=... in *.html innerhalb des deploy/ Ordners.
+          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/$1'"$BUILD_ID"'/g'
+          # === END BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
+
 
           # Version file (TXT instead of JSON)
           mkdir -p deploy/meta
