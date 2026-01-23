@@ -44,19 +44,33 @@ const FilterModule = {
   /**
    * Init: Event Listeners registrieren
    */
-   /* === BEGIN BLOCK: FILTER INIT GUARD (single init) ===
-  Zweck: Verhindert doppelte Initialisierung (Listener-Stacking) und macht init idempotent.
-  Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zuweisung.
-  === */
+     /* === BEGIN BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) ===
+Zweck: Harter Beweis, ob init() wirklich läuft und wo es ggf. abbricht.
+Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zuweisung.
+=== */
   init(events) {
+    console.log("[PROOF][FilterModule] init() entered", {
+      alreadyInit: this._isInit === true,
+      showFilters: CONFIG?.features?.showFilters,
+      hasDOM_search: !!document.getElementById("search-filter"),
+      hasDOM_timePill: !!document.getElementById("filter-time-pill"),
+      hasDOM_catPill: !!document.getElementById("filter-category-pill")
+    });
+
     if (this._isInit) {
+      console.log("[PROOF][FilterModule] init() SKIP (_isInit already true)");
       debugLog("FilterModule.init skipped (already initialized)");
       return;
     }
 
     this.allEvents = Array.isArray(events) ? events : [];
     this.filteredEvents = this.allEvents;
-  /* === END BLOCK: FILTER INIT GUARD (single init) === */
+
+    console.log("[PROOF][FilterModule] init() after event assignment", {
+      allEvents: this.allEvents.length
+    });
+  /* === END BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) === */
+
 
 
     // UI-Elemente
@@ -214,14 +228,16 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
     this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
     this.updateFilterBarUI(timeValue, catValue, resetPill);
 
-        /* === BEGIN BLOCK: FILTER INIT FINALIZE (set init flag) ===
-    Zweck: Markiert erfolgreiche Initialisierung, damit Auto-Bootstrap nicht erneut init() ausführt.
-    Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
-    === */
+         /* === BEGIN BLOCK: FILTER INIT FINALIZE + PROOF LOGS ===
+Zweck: Harter Beweis, dass init() wirklich bis zum Ende kommt und _isInit setzt.
+Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
+=== */
     this._isInit = true;
+    console.log("[PROOF][FilterModule] init() COMPLETED -> _isInit=true");
     debugLog("Filter module initialized (Top-App pills + sheets)");
   },
-  /* === END BLOCK: FILTER INIT FINALIZE (set init flag) === */
+  /* === END BLOCK: FILTER INIT FINALIZE + PROOF LOGS === */
+
 
 
   /**
