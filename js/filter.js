@@ -270,44 +270,76 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         if (evCat !== catNeedle) return false;
       }
 
-      /* === BEGIN BLOCK: ZEITFILTER (uses events.js date helpers + robust weekend) ===
-      Zweck: Zeitfilter nutzt gemeinsame Helper/Formats, vermeidet event.datum vs event.date Mix.
-      Umfang: Zeitraum-Filter-Logik in applyFilters(), ohne Duplikate.
+            /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
+      Zweck: Zeitfilter ohne Abhängigkeit von events.js-Helpern (kein parseISODateLocal/startOfToday/...).
+      Umfang: Ersetzt Zeitraum-Filter-Logik in applyFilters().
       === */
       if (timeKey !== "all") {
-        // Erwartetes Feld: event.date (ISO YYYY-MM-DD). Fallback: event.datum.
         const iso = (event?.date || event?.datum || "").trim();
-        const day = parseISODateLocal(iso);
+
+        // ISO YYYY-MM-DD robust lokal parsen
+        const toLocalDay = (s) => {
+          const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (!m) return null;
+          const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+          if (!y || !mo || !d) return null;
+          const dt = new Date(y, mo - 1, d);
+          dt.setHours(0, 0, 0, 0);
+          return dt;
+        };
+
+        const day = toLocalDay(iso);
         if (!day) return false;
 
-        const today = startOfToday();
-        const endToday = addDays(today, 1);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const addDaysLocal = (base, n) => {
+          const t = new Date(base);
+          t.setDate(t.getDate() + n);
+          t.setHours(0, 0, 0, 0);
+          return t;
+        };
+
+        const endToday = addDaysLocal(today, 1);
+
+        // nächstes Wochenende (Sa+So)
+        const nextWeekendRange = (base) => {
+          const b = new Date(base);
+          b.setHours(0, 0, 0, 0);
+          const dow = b.getDay(); // 0 So ... 6 Sa
+          const daysUntilSat = (6 - dow + 7) % 7;
+          const sat = addDaysLocal(b, daysUntilSat);
+          const sun = addDaysLocal(sat, 1);
+          const start = new Date(sat);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(sun);
+          end.setHours(23, 59, 59, 999);
+          return { start, end };
+        };
 
         switch (timeKey) {
           case "today": {
             if (day < today || day >= endToday) return false;
             break;
           }
-
           case "weekend": {
-            const { start, end } = getNextWeekendRange(today);
+            const { start, end } = nextWeekendRange(today);
             if (day < start || day > end) return false;
             break;
           }
-
           case "soon": {
-            // Demnächst: nächste 14 Tage inkl. heute
-            const soonEnd = addDays(today, 14);
+            const soonEnd = addDaysLocal(today, 14);
             soonEnd.setHours(23, 59, 59, 999);
             if (day < today || day > soonEnd) return false;
             break;
           }
-
           default:
             break;
         }
       }
-      /* === END BLOCK: ZEITFILTER (uses events.js date helpers + robust weekend) === */
+      /* === END BLOCK: ZEITFILTER (self-contained, no external helpers) === */
+
 
       return true;
     });
