@@ -242,7 +242,7 @@ const EventCards = {
 };
 // END: EVENT_CARDS
 
-debugLog("EventCards loaded successfully");
+
 
 
 
