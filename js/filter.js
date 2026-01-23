@@ -72,15 +72,18 @@ const FilterModule = {
 
     const resetPill = document.getElementById("filter-reset-pill");
 
-  /* === BEGIN BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) ===
-Zweck: Schließt Fehlkonfigurationen aus (falscher DOM-Stand, falsche Klassen, fehlende Sheet-Bodies/Optionen).
+  /* === BEGIN BLOCK: FILTER CONTRACT GUARD (robust selectors) ===
+Zweck: Init darf nur abbrechen, wenn UI wirklich fehlt – Selector-Mismatch vermeiden.
 Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI-Elemente.
 === */
     const timeBody = timeSheet?.querySelector(".filter-sheet__body");
     const catBody  = catSheet?.querySelector(".filter-sheet__body");
 
-    const timeOptions = timeSheet?.querySelectorAll(".filter-sheet-option[data-time]");
-    const catOptions  = catSheet?.querySelectorAll(".filter-sheet-option[data-category]");
+    // Optionen: akzeptiere beide Klassennamen (alt/neu)
+    const timeOptions =
+      timeSheet?.querySelectorAll('.filter-option[data-time], .filter-sheet-option[data-time]');
+    const catOptions =
+      catSheet?.querySelectorAll('.filter-option[data-category], .filter-sheet-option[data-category]');
 
     const hasTimeClose = !!timeSheet?.querySelector("[data-close-sheet]");
     const hasCatClose  = !!catSheet?.querySelector("[data-close-sheet]");
@@ -102,14 +105,14 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
         "filter-time-value": !!timeValue,
         "sheet-time": !!timeSheet,
         "sheet-time .filter-sheet__body": !!timeBody,
-        "sheet-time .filter-sheet-option[data-time]": (timeOptions?.length ?? 0),
+        "sheet-time options(data-time)": (timeOptions?.length ?? 0),
         "sheet-time [data-close-sheet]": hasTimeClose,
 
         "filter-category-pill": !!catPill,
         "filter-category-value": !!catValue,
         "sheet-category": !!catSheet,
         "sheet-category .filter-sheet__body": !!catBody,
-        "sheet-category .filter-sheet-option[data-category]": (catOptions?.length ?? 0),
+        "sheet-category options(data-category)": (catOptions?.length ?? 0),
         "sheet-category [data-close-sheet]": hasCatClose,
 
         "filter-reset-pill": !!resetPill
@@ -117,7 +120,8 @@ Umfang: Ersetzt den kompletten Guard-Abschnitt direkt nach dem Einsammeln der UI
 
       return;
     }
-/* === END BLOCK: FILTER CONTRACT GUARD (hard-fail, no silent render) === */
+  /* === END BLOCK: FILTER CONTRACT GUARD (robust selectors) === */
+
 
     // Defaults (konsistent)
 
