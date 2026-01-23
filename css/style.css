@@ -689,7 +689,7 @@ border-bottom: 1px solid rgba(31,41,51,0.05);
 
 /* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
 Zweck: Top-App-UX für Suche + Pills + Bottom-Sheets (klarer Header, volle Sichtbarkeit, schöne Liste).
-Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + Optionen + hidden-Guard.
+Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke).
 === */
 
 .filters-bar{
@@ -705,7 +705,7 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   flex-wrap: wrap;
 }
 
-/* Pills: wie ruhige “Tools” */
+/* Pills: ruhige Tools mit wertiger Fläche */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -722,8 +722,8 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   min-height: 44px;
 
   border-radius: 16px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.68);
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.78);
 
   font: inherit;
   font-size: 0.95rem;
@@ -736,7 +736,7 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
 }
 
 .filter-pill__label{
@@ -746,7 +746,7 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
 
 .filter-pill__value{
   color: var(--color-text-primary);
-  font-weight: 750;
+  font-weight: 800;
 }
 
 /* Chevron */
@@ -759,19 +759,19 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   transform: translateY(-1px);
 }
 
-/* Active (dezent, wertig) */
+/* Active: klar aber ruhig */
 .filter-pill.is-active{
-  background: rgba(255,255,255,0.85);
-  border-color: rgba(139,207,74,0.28);
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(139,207,74,0.30);
   box-shadow:
-    0 10px 24px rgba(0,0,0,0.08),
+    0 14px 34px rgba(0,0,0,0.10),
     0 0 0 4px rgba(139,207,74,0.10);
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.85);
-    border-color: rgba(31,41,51,0.12);
+    background: rgba(255,255,255,0.92);
+    border-color: rgba(31,41,51,0.14);
   }
 }
 
@@ -790,34 +790,30 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   flex: 0 0 auto;
   margin-left: auto;
 
-  padding: 10px 8px;
+  padding: 10px 10px;
   min-height: 44px;
 
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.60);
   border-radius: 14px;
 
   font: inherit;
-  font-weight: 650;
+  font-weight: 700;
   color: var(--color-text-secondary);
 
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
 }
-
 .filter-pill--reset::after{ content: none; }
 
 @media (hover: hover){
   .filter-pill--reset:hover{
-    background: rgba(255,255,255,0.72);
+    background: rgba(255,255,255,0.84);
     color: var(--color-text-primary);
   }
 }
+.filter-pill--reset:active{ transform: translateY(1px); }
 
-.filter-pill--reset:active{
-  transform: translateY(1px);
-}
-
-/* ===== Bottom Sheet (Top-App) ===== */
+/* ===== Bottom Sheet ===== */
 .filter-sheet{
   position: fixed;
   inset: 0;
@@ -827,49 +823,48 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
 .filter-sheet__overlay{
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.36);
+  background: rgba(17, 24, 39, 0.42);
 
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
-/* Card: höher + safe area + schöner Radius */
+/* Card: hoch genug, sauber gerundet, safe-area */
 .filter-sheet__card{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  max-height: 88vh;
+  max-height: 90vh;
 
   background: var(--color-surface);
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
 
-  border-top: 1px solid rgba(31,41,51,0.08);
+  border-top: 1px solid rgba(31,41,51,0.10);
   box-shadow:
-    0 -34px 90px rgba(0,0,0,0.22),
+    0 -38px 110px rgba(0,0,0,0.26),
     0 1px 0 rgba(255,255,255,0.75) inset;
 
   overflow: hidden;
   overscroll-behavior: contain;
 
-  /* Safe area padding */
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
 /* Grabber */
 .filter-sheet__card::before{
   content: "";
   display: block;
-  width: 54px;
+  width: 56px;
   height: 5px;
   border-radius: 999px;
   margin: 10px auto 8px;
-  background: rgba(31,41,51,0.16);
+  background: rgba(31,41,51,0.18);
 }
 
-/* Header: sticky damit immer sichtbar */
+/* Header sticky: immer sichtbar (wirkt direkt “App”) */
 .filter-sheet__header{
   position: sticky;
   top: 0;
@@ -879,26 +874,29 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   align-items: center;
   justify-content: space-between;
 
-  padding: 10px 14px 12px;
-  background: var(--color-surface);
+  padding: 12px 14px 12px;
+  background: rgba(255,255,255,0.92);
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
 .filter-sheet__title{
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.02rem;
+  font-weight: 850;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
-/* Close: wertiger, klarer */
+/* Close */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
 
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
 
   display: inline-flex;
@@ -906,8 +904,8 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
   justify-content: center;
 
   background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(31,41,51,0.12);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+  border: 1px solid rgba(31,41,51,0.14);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.16);
 
   font-size: 22px;
   line-height: 1;
@@ -915,23 +913,19 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
 
   cursor: pointer;
 }
+.filter-sheet__close:active{ transform: scale(0.96); }
 
-.filter-sheet__close:active{
-  transform: scale(0.96);
-}
-
-/* Body: mehr Höhe, mehr Luft */
+/* Body: genug Platz (damit “nicht alles zu sehen” weg ist) */
 .filter-sheet__body{
   padding: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(88vh - 78px);
+  max-height: calc(90vh - 82px);
 }
 
-/* ===== Optionen: iOS-like List ===== */
-/* Unterstützt beide Klassennamen */
-.filter-option,
-.filter-sheet-option{
+/* Optionen: iOS/Top-App List (HTML nutzt .filter-sheet-option) */
+.filter-sheet-option,
+.filter-option{
   -webkit-appearance: none;
   appearance: none;
 
@@ -944,53 +938,49 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
 
   background: transparent;
   border: 0;
-
   border-bottom: 1px solid rgba(31,41,51,0.06);
 
   font: inherit;
-  font-weight: 750;
+  font-weight: 800;
   font-size: 1rem;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-align: left;
 
+  border-radius: 0;
   box-shadow: none;
 }
 
-.filter-option:last-child,
-.filter-sheet-option:last-child{
+.filter-sheet-option:last-child,
+.filter-option:last-child{
   border-bottom: 0;
 }
 
-/* Active: klar erkennbar */
-.filter-option.is-active,
-.filter-sheet-option.is-active{
-  background: rgba(139,207,74,0.12);
+.filter-sheet-option.is-active,
+.filter-option.is-active{
+  background: rgba(139,207,74,0.14);
 }
-
-.filter-option.is-active::after,
-.filter-sheet-option.is-active::after{
+.filter-sheet-option.is-active::after,
+.filter-option.is-active::after{
   content: "✓";
-  color: rgba(31,41,51,0.80);
-  font-weight: 900;
+  color: rgba(31,41,51,0.82);
+  font-weight: 950;
 }
 
-/* Hover */
 @media (hover: hover){
-  .filter-option:hover,
-  .filter-sheet-option:hover{
-    background: rgba(31,41,51,0.03);
+  .filter-sheet-option:hover,
+  .filter-option:hover{
+    background: rgba(31,41,51,0.035);
   }
-  .filter-option.is-active:hover,
-  .filter-sheet-option.is-active:hover{
-    background: rgba(139,207,74,0.14);
+  .filter-sheet-option.is-active:hover,
+  .filter-option.is-active:hover{
+    background: rgba(139,207,74,0.16);
   }
 }
 
-/* Focus */
-.filter-option:focus-visible,
-.filter-sheet-option:focus-visible{
+.filter-sheet-option:focus-visible,
+.filter-option:focus-visible{
   outline: 2px solid rgba(139,207,74,0.18);
   outline-offset: -2px;
 }
@@ -1002,26 +992,6 @@ Umfang: Ersetzt .filters-bar/.filter-pill + Bottom-Sheets (.filter-sheet__*) + O
 @media (max-width: 360px){
   .filters-bar{ gap: 10px; }
   .filter-pill{ padding: 10px 11px; min-height: 44px; }
-}
-
-/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
-
-
-
-/* Safe Area */
-@supports (padding: max(0px)){
-  .filter-sheet__card{
-    padding-bottom: max(0px, env(safe-area-inset-bottom));
-  }
-}
-
-/* hidden muss immer wirken */
-.filter-pill[hidden]{ display: none !important; }
-.filter-sheet[hidden]{ display: none !important; }
-
-@media (max-width: 360px){
-  .filters-bar{ gap: 10px; }
-  .filter-pill{ padding: 9px 10px; min-height: 40px; }
 }
 
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
@@ -1525,6 +1495,7 @@ Umfang: Delegiert lokale Definition an globale .modal-cta-button.
 /* === END BLOCK: MODAL CTA BUTTON (delegates to global CTA) === */
 
 /* === END BLOCK: HEADER ACTIONS + MODAL STYLES (NO OVERFLOW MENU) === */
+
 
 
 
