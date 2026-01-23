@@ -182,7 +182,7 @@ const EventCards = {
   },
 
   /* ---------- Card ---------- */
-  createCard(event) {
+   createCard(event) {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
@@ -194,24 +194,30 @@ const EventCards = {
     const dateLabel = event.date ? formatDate(event.date) : "";
     const timeLabel = event.time ? ` · ${this.escape(event.time)}` : "";
 
-       const loc = (event.location || "").trim();
-    const locName = this.escape(loc);
-    const mapsUrl = loc ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}` : "";
+    // Title
+    const h3 = document.createElement("h3");
+    h3.className = "event-title";
+    h3.innerHTML = this.escape(event.title || "Event");
 
-    // Location (link)
+    // Meta (date/time)
+    const meta = document.createElement("div");
+    meta.className = "event-meta";
+    meta.innerHTML = `${dateLabel}${timeLabel}`;
+
+    // Location (link -> Google Maps Suche)
     const location = document.createElement("div");
     location.className = "event-location";
 
+    const loc = (event.location || "").trim();
     if (loc) {
       const a = document.createElement("a");
       a.className = "event-location-link";
-      a.href = mapsUrl;
+      a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
       a.target = "_blank";
       a.rel = "noopener";
-      a.innerHTML = locName;
+      a.innerHTML = this.escape(loc);
       location.appendChild(a);
     }
-
 
     card.appendChild(h3);
     card.appendChild(meta);
@@ -220,9 +226,7 @@ const EventCards = {
     // Click: DetailPanel
     card.addEventListener("click", (e) => {
       if (e.target.closest(".event-location-link")) return;
-      if (window.DetailPanel?.show) {
-        DetailPanel.show(event);
-      }
+      if (window.DetailPanel?.show) DetailPanel.show(event);
     });
 
     // Keyboard: Enter/Space
@@ -230,23 +234,15 @@ const EventCards = {
       if (e.key !== "Enter" && e.key !== " ") return;
       if (e.target.closest(".event-location-link")) return;
       e.preventDefault();
-      if (window.DetailPanel?.show) {
-        DetailPanel.show(event);
-      }
+      if (window.DetailPanel?.show) DetailPanel.show(event);
     });
 
     return card;
   },
 
-  escape(text) {
-    const div = document.createElement("div");
-    div.textContent = String(text ?? "");
-    return div.innerHTML;
-  }
-};
-// END: EVENT_CARDS
 
 debugLog("EventCards loaded successfully");
+
 
 
 
