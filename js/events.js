@@ -238,13 +238,9 @@ const EventCards = {
     });
 
     return card;
-  }
+      }
 };
 // END: EVENT_CARDS
-
-
-
-
 
 
 
