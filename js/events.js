@@ -181,8 +181,33 @@ const EventCards = {
     this.container.appendChild(frag);
   },
 
+  /* === BEGIN BLOCK: HTML_ESCAPE (EventCards.escape) ===
+  Zweck: XSS-sicheres Escaping für Text, der via innerHTML gesetzt wird.
+  Umfang: Stellt this.escape() bereit (wird von createCard() genutzt).
+  === */
+  escape(value) {
+    const s = value == null ? "" : String(value);
+    return s.replace(/[&<>"']/g, (ch) => {
+      switch (ch) {
+        case "&":
+          return "&amp;";
+        case "<":
+          return "&lt;";
+        case ">":
+          return "&gt;";
+        case '"':
+          return "&quot;";
+        case "'":
+          return "&#39;";
+        default:
+          return ch;
+      }
+    });
+  },
+  /* === END BLOCK: HTML_ESCAPE (EventCards.escape) === */
+
   /* ---------- Card ---------- */
-   createCard(event) {
+  createCard(event) {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
@@ -238,9 +263,11 @@ const EventCards = {
     });
 
     return card;
-      }
+  },
 };
 // END: EVENT_CARDS
+
+
 
 
 
