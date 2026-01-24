@@ -67,7 +67,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-           - name: Upload to STRATO via SFTP
+      - name: Upload to STRATO via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
