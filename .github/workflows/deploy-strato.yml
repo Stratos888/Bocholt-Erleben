@@ -67,7 +67,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Upload to STRATO via SFTP
+           - name: Upload to STRATO via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
@@ -76,9 +76,9 @@ jobs:
         run: |
           set -e
 
-          # === BEGIN BLOCK: LFTP DEPLOY (ROOT + /STRATO-apps) ===
-          # Zweck: Deploy in beide Kandidaten-Verzeichnisse, um Webroot-Mismatch sicher zu eliminieren.
-          # Umfang: Mirror deploy/ nach "." und zusätzlich nach "STRATO-apps/".
+          # === BEGIN BLOCK: LFTP DEPLOY (ROOT ONLY) ===
+          # Zweck: Stabiler Deploy ohne Permission-Fehler; STRATO-apps wird nicht angefasst.
+          # Umfang: Mirror deploy/ nach "." (Webroot).
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<'LFTP'
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
@@ -88,20 +88,10 @@ jobs:
           pwd
           cls -l
 
-          # 1) Deploy to current directory
           mirror -R --only-newer deploy/ .
-
-          cls -l
-
-          # 2) Deploy to STRATO-apps as well
-          mkdir -p STRATO-apps
-          cd STRATO-apps
-          pwd
-          cls -l
-
-          mirror -R --only-newer ../deploy/ .
 
           cls -l
           bye
           LFTP
-          # === END BLOCK: LFTP DEPLOY (ROOT + /STRATO-apps) ===
+          # === END BLOCK: LFTP DEPLOY (ROOT ONLY) ===
+
