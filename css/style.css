@@ -916,9 +916,15 @@ body.is-sheet-open .top-stack{
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
 
 
-/* ============================================
-   DETAIL PANEL (BOTTOM SHEET) – FINAL
-   ============================================ */
+/* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
+Zweck:
+- DetailPanel zieht komplett in die Header-DNA (hell, ruhig, hairline, soft shadow).
+- Close wirkt weniger “heavy” und passt zu Cards/Pills.
+- Meta-Box bleibt leicht grün (Header-orientiert), aber nicht “primary-laut”.
+- Typo/Abstände ruhiger & konsistent.
+Umfang: Komplettblock DetailPanel Styles (overlay/content/header/badges/meta/cta).
+=== */
+
 body.is-panel-open { overflow: hidden; }
 
 #event-detail-panel.detail-panel{
@@ -934,8 +940,8 @@ body.is-panel-open { overflow: hidden; }
   inset: 0;
   z-index: 0;
   background: rgba(17, 24, 39, 0.32);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 #event-detail-panel .detail-panel-content{
@@ -947,14 +953,14 @@ body.is-panel-open { overflow: hidden; }
 
   max-height: 80vh;
 
-  background: var(--color-surface);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  background: rgba(255,255,255,0.98);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
 
-  border-top: 1px solid rgba(139, 207, 74, 0.18);
+  border-top: 1px solid rgba(31,41,51,0.08);
   box-shadow:
-    0 -24px 70px rgba(0,0,0,0.16),
-    0 1px 0 rgba(255,255,255,0.7) inset;
+    0 -30px 110px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
   padding: 14px 14px 16px;
@@ -975,7 +981,7 @@ body.is-panel-open { overflow: hidden; }
   height: 5px;
   border-radius: 999px;
   margin: 6px auto 10px;
-  background: rgba(139, 207, 74, 0.35);
+  background: rgba(31,41,51,0.16);
 }
 
 #event-detail-panel .detail-panel-close{
@@ -987,20 +993,22 @@ body.is-panel-open { overflow: hidden; }
   height: 36px;
   border-radius: 999px;
 
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.94);
   border: 1px solid rgba(31,41,51,0.10);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 22px;
   line-height: 34px;
-  color: rgba(31,41,51,0.70);
+  color: rgba(31,41,51,0.68);
   cursor: pointer;
   z-index: 10;
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
 #event-detail-panel #detail-content{
-  padding-top: 28px;
+  padding-top: 30px;
   max-height: calc(80vh - 16px);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1012,72 +1020,70 @@ body.is-panel-open { overflow: hidden; }
   top: 0;
   z-index: 5;
 
-  background: var(--color-surface);
+  background: rgba(255,255,255,0.98);
   padding-right: 44px;
-  padding-top: 6px;
+  padding-top: 8px;
   padding-bottom: 10px;
 
   margin-top: -4px;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  border-bottom: 1px solid rgba(31,41,51,0.05);
 }
 
 #event-detail-panel .detail-header h2{
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 19px;
   line-height: 1.22;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.012em;
   font-weight: 650;
   color: var(--color-text-primary);
 }
 
-/* Badges */
-#event-detail-panel .detail-location{
-  display: inline-flex;
-  align-items: center;
-  margin-top: 6px;
-  padding: 4px 10px;
-
-  border-radius: 999px;
-  background: rgba(139, 207, 74, 0.14);
-  border: 1px solid rgba(139, 207, 74, 0.32);
-
-  font-size: 0.85rem;
-  font-weight: 650;
-  color: rgba(31,41,51,0.92);
-}
+/* Badges: ruhige UI-Pills (keine “visited”/Link-Semantik) */
+#event-detail-panel .detail-location,
 #event-detail-panel .detail-category{
   display: inline-flex;
   align-items: center;
   margin-top: 6px;
-  margin-left: 8px;
-  padding: 4px 10px;
+  padding: 5px 10px;
 
   border-radius: 999px;
-  background: rgba(31,41,51,0.04);
-  border: 1px solid rgba(31,41,51,0.10);
 
   font-size: 0.85rem;
   font-weight: 650;
-  color: rgba(31,41,51,0.82);
+  line-height: 1;
+}
+
+#event-detail-panel .detail-location{
+  background: rgba(139,207,74,0.10);
+  border: 1px solid rgba(31,41,51,0.08);
+  color: rgba(31,41,51,0.90);
+}
+
+#event-detail-panel .detail-category{
+  margin-left: 8px;
+  background: rgba(31,41,51,0.03);
+  border: 1px solid rgba(31,41,51,0.08);
+  color: rgba(31,41,51,0.78);
 }
 
 #event-detail-panel .detail-meta{
   margin: 14px 0 12px;
   padding: 12px 14px;
 
-  background: rgba(139, 207, 74, 0.10);
-  border: 1px solid rgba(139, 207, 74, 0.22);
+  /* leicht grün, header-orientiert (nicht “aktiv”) */
+  background: rgba(139,207,74,0.08);
+  border: 1px solid rgba(31,41,51,0.08);
   border-radius: 16px;
 
   display: grid;
   gap: 6px;
 
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: rgba(95,107,115,0.82);
 }
 #event-detail-panel .detail-meta strong{
   font-weight: 650;
-  color: var(--color-text-primary);
+  color: rgba(31,41,51,0.90);
 }
 
 #event-detail-panel .detail-description p{
@@ -1100,17 +1106,21 @@ body.is-panel-open { overflow: hidden; }
   border-radius: 16px;
 
   background: var(--color-primary-muted);
-  border: 1px solid rgba(139, 207, 74, 0.45);
+  border: 1px solid rgba(31,41,51,0.10);
 
   color: var(--color-text-primary);
-  font-weight: 800;
+  font-weight: 750;
   text-decoration: none;
 
-  box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 }
 #event-detail-panel .detail-link-btn:active{
   transform: translateY(1px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.09);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.07),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 }
 
 @supports (padding: max(0px)){
@@ -1118,6 +1128,9 @@ body.is-panel-open { overflow: hidden; }
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
+
+/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
+
 
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
@@ -1315,6 +1328,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
