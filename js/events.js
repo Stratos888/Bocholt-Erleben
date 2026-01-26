@@ -220,11 +220,20 @@ location.appendChild(a);
 
     }
 
-    card.appendChild(h3);
-    card.appendChild(meta);
-    card.appendChild(location);
+   card.appendChild(h3);
+card.appendChild(meta);
+card.appendChild(location);
 
-   card.addEve
+/* === BEGIN BLOCK: EVENTCARD CLICK HANDLER (open detail) ===
+Zweck: Klick auf die Card öffnet das DetailPanel deterministisch.
+Umfang: Fügt den fehlenden Click-Listener wieder ein (ersetzt kaputtes 'card.addEve').
+=== */
+card.addEventListener("click", (e) => {
+  if (e.target.closest(".event-location-link")) return;
+  if (window.DetailPanel?.show) window.DetailPanel.show(event);
+});
+/* === END BLOCK: EVENTCARD CLICK HANDLER (open detail) === */
+
 
    // Keyboard: Enter/Space
 card.addEventListener("keydown", (e) => {
@@ -293,6 +302,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
