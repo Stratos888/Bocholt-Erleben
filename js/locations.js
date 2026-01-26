@@ -56,7 +56,14 @@ const Locations = {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
 };
+/* === BEGIN BLOCK: LOCATIONS GLOBAL EXPORT ===
+Zweck: Locations API global verfügbar machen (für EventCards Location-Link).
+Umfang: Exportiert Locations nach window.
+=== */
+window.Locations = Locations;
+/* === END BLOCK: LOCATIONS GLOBAL EXPORT === */
 
 // Auto-init (kein Framework, kein Build)
 Locations.init();
+
 
