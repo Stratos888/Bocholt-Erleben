@@ -88,7 +88,9 @@ jobs:
           pwd
           cls -l
 
-          mirror -R --only-newer deploy/ .
+          rm -f index.html
+          mirror -R --delete deploy/ .
+
 
           cls -l
           bye
