@@ -72,26 +72,41 @@ const DetailPanel = {
     debugLog("DetailPanel initialized");
   },
 
-  show(event) {
-    if (!this.panel || !this.content) return;
+ show(event) {
+  /* === BEGIN BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) ===
+  Zweck: Systematisch öffnen: init() sicherstellen + sowohl class "hidden" als auch HTML-Attribut [hidden] entfernen.
+  Umfang: Ersetzt show(event) komplett.
+  === */
+  if (!this._isInit) this.init();
 
-    // remember focus for restore
-    this._lastFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    this.renderContent(event);
-
-    // make visible
-    this.panel.classList.remove("hidden");
-
-    // ensure button can be focused (optional, but helps keyboard users)
-    requestAnimationFrame(() => {
-      this.panel.classList.add("active");
-      document.body.classList.add("is-panel-open");
-
-      // focus close button if available
-      if (this.closeBtn) this.closeBtn.focus();
+  // Wenn init fehlgeschlagen ist, hart abbrechen (kein stilles Fail)
+  if (!this.panel || !this.content) {
+    console.error("❌ DetailPanel.show aborted: panel/content missing", {
+      hasPanel: !!this.panel,
+      hasContent: !!this.content,
+      isInit: this._isInit
     });
-  },
+    return;
+  }
+
+  // remember focus for restore
+  this._lastFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+  this.renderContent(event);
+
+  // make visible (beide Mechaniken unterstützen: class + [hidden])
+  this.panel.classList.remove("hidden");
+  this.panel.removeAttribute("hidden");
+
+  requestAnimationFrame(() => {
+    this.panel.classList.add("active");
+    document.body.classList.add("is-panel-open");
+
+    if (this.closeBtn) this.closeBtn.focus();
+  });
+  /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
+},
+
 
   hide() {
     if (!this.panel) return;
@@ -193,6 +208,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
