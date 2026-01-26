@@ -45,12 +45,48 @@ jobs:
             ./ deploy/
           # === END BLOCK: SYNC REPO TO deploy/ (clean staging) ===
 
-          # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
-          # Zweck: Jede Deploy-Version bekommt automatisch neue Asset-URLs (?v=BUILD_ID),
-          #        damit Browser/SW/Proxies nie "alte" CSS/JS unter gleichem Cache-Key behalten.
-          # Umfang: Ersetzt nur ?v=... in *.html innerhalb des deploy/ Ordners.
+                  # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+          # Zweck:
+          #  1) Setzt ?v=BUILD_ID konsistent in allen HTML-Dateien.
+          #  2) Normalisiert kaputte Asset-Links wie "style.css<hash>" zurück zu "style.css?v=<hash>".
+          #  3) Bricht den Deploy HARD ab, wenn danach noch kaputte Muster vorkommen.
+          #
+          # Umfang:
+          #  - Bearbeitet nur *.html in deploy/
+          #  - Betrifft nur unsere lokalen Assets: /css/style.css, /config.js, /js/*.js
+          #  - Keine Änderungen an externen URLs
+          #
+          # 1) Cache-Busting: vorhandene ?v= Werte aktualisieren
           find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/$1'"$BUILD_ID"'/g'
-          # === END BLOCK: BUILD_ID CACHE-BUSTING (rewrite ?v= in HTML) ===
+
+          # 2) Normalisieren: kaputte Suffix-Links (…css<hash> / …js<hash>) zurück auf ?v=
+          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e '
+            s#(/css/style\.css)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/config\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/js/[A-Za-z0-9._/-]+\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
+          '
+
+          # 3) Guard: Wenn immer noch kaputte Muster existieren -> Deploy stoppen
+          if grep -RInE '\.css[0-9a-f]{6,}(\b|")|\.js[0-9a-f]{6,}(\b|")' deploy/*.html deploy/**/*.html 2>/dev/null; then
+            echo "❌ GUARD FAILED: Found hashed asset links without ?v= in deploy HTML. Aborting deploy."
+            exit 1
+          fi
+
+          # 4) Guard: Mindestanforderung – index.html muss unsere Assets mit ?v= referenzieren
+          if ! grep -qE '/css/style\.css\?v=' deploy/index.html; then
+            echo "❌ GUARD FAILED: deploy/index.html does not contain style.css?v=..."
+            exit 1
+          fi
+          if ! grep -qE '/js/main\.js\?v=' deploy/index.html; then
+            echo "❌ GUARD FAILED: deploy/index.html does not contain main.js?v=..."
+            exit 1
+          fi
+          if ! grep -qE '/config\.js\?v=' deploy/index.html; then
+            echo "❌ GUARD FAILED: deploy/index.html does not contain config.js?v=..."
+            exit 1
+          fi
+          # === END BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+
 
           # Version file (TXT instead of JSON)
           mkdir -p deploy/meta
