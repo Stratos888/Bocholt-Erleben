@@ -270,9 +270,11 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         if (evCat !== catNeedle) return false;
       }
 
-            /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
+                 /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
       Zweck: Zeitfilter ohne Abhängigkeit von events.js-Helpern (kein parseISODateLocal/startOfToday/...).
-      Umfang: Ersetzt Zeitraum-Filter-Logik in applyFilters().
+      + Zusatzzweck: Filter-Bar-UI (inkl. Reset-X) wird immer aus dem State abgeleitet (Single Source of Truth),
+        damit Reset-X wirklich nur bei aktiven B/C/D (Search/Zeit/Kategorie) sichtbar ist – auch nach refresh()/applyFilters().
+      Umfang: Ersetzt Zeitraum-Filter-Logik in applyFilters() (inkl. UI-Sync nach dem Filtern).
       === */
       if (timeKey !== "all") {
         const iso = (event?.date || event?.datum || "").trim();
@@ -338,17 +340,36 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
             break;
         }
       }
+
+      // Wichtig: Reset-X/Labels dürfen nicht nur an UI-Events hängen -> immer aus State syncen.
+      // (B/C/D aktiv = SearchText != "" ODER Zeitraum != "all" ODER Kategorie != "")
+      // So bleibt die Sichtbarkeit korrekt auch nach refresh() / applyFilters() Aufrufen ohne User-Interaction.
       /* === END BLOCK: ZEITFILTER (self-contained, no external helpers) === */
+
 
 
       return true;
     });
 
+    // BEGIN: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
+// Zweck: UI-Status (Labels + Reset-X) wird nach jedem applyFilters() aus dem State synchronisiert.
+// Umfang: Ersetzt den UI-Update-Abschnitt am Ende von applyFilters().
+// END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
     // UI aktualisieren
     this.updateUI();
 
+    // Reset-X/Labels immer aus State ableiten (nicht nur aus UI-Events),
+    // damit Sichtbarkeit nur bei B/C/D aktiv ist – auch nach refresh()/initial apply.
+    this.updateFilterBarUI(
+      document.getElementById("filter-time-value"),
+      document.getElementById("filter-category-value"),
+      document.getElementById("filter-reset-pill")
+    );
+
     debugLog(`Filtered: ${this.filteredEvents.length} of ${(this.allEvents || []).length} events`);
   },
+// END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
+
 
 
   /**
