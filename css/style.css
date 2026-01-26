@@ -621,6 +621,16 @@ Umfang: Neutralisiert transform nur im Zustand body.is-sheet-open.
 body.is-sheet-open .top-stack{
   transform: none !important;
 }
+/* === BEGIN BLOCK: SHEET OPEN - DISABLE TOP-STACK BACKDROP FILTER (prevents fixed containment) ===
+Zweck: iOS/Safari/Chromium Mobile: backdrop-filter auf sticky Element erzeugt Containing Block → fixed Sheet wird abgeschnitten/versetzt.
+Umfang: Deaktiviert backdrop-filter nur während body.is-sheet-open.
+=== */
+body.is-sheet-open .top-stack{
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* === END BLOCK: SHEET OPEN - DISABLE TOP-STACK BACKDROP FILTER (prevents fixed containment) === */
+
 /* === END BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) === */
 
 .filter-sheet__overlay{
@@ -1213,6 +1223,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
