@@ -224,19 +224,29 @@ location.appendChild(a);
     card.appendChild(meta);
     card.appendChild(location);
 
-    // Click: DetailPanel
-    card.addEventListener("click", (e) => {
-      if (e.target.closest(".event-location-link")) return;
-      if (window.DetailPanel?.show) DetailPanel.show(event);
-    });
+   card.addEve
 
-    // Keyboard: Enter/Space
-    card.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      if (e.target.closest(".event-location-link")) return;
-      e.preventDefault();
-      if (window.DetailPanel?.show) DetailPanel.show(event);
+   // Keyboard: Enter/Space
+card.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  if (e.target.closest(".event-location-link")) return;
+  e.preventDefault();
+
+  /* === BEGIN BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) ===
+  Zweck: Öffnet DetailPanel auch per Keyboard deterministisch über window.DetailPanel.
+  Umfang: Ersetzt nur den Panel-Aufruf im Keydown-Handler.
+  === */
+  if (window.DetailPanel?.show) {
+    window.DetailPanel.show(event);
+  } else {
+    console.error("❌ DetailPanel.show not available on window.DetailPanel (kbd)", {
+      hasWindowDetailPanel: typeof window.DetailPanel !== "undefined",
+      typeOfShow: typeof window.DetailPanel?.show
     });
+  }
+  /* === END BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) === */
+});
+
 
     return card;
   }
@@ -283,6 +293,7 @@ location.appendChild(a);
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
