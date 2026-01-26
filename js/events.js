@@ -201,13 +201,23 @@ const EventCards = (() => {
 
     const loc = (event?.location || "").trim();
     if (loc) {
-      const a = document.createElement("a");
-      a.className = "event-location-link";
-      a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.innerHTML = escapeHtml(loc);
-      location.appendChild(a);
+     const a = document.createElement("a");
+a.className = "event-location-link";
+a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
+a.target = "_blank";
+a.rel = "noopener";
+a.innerHTML = escapeHtml(loc);
+
+/* === BEGIN BLOCK: STOP LINK CLICK FROM BLOCKING CARD CLICK ===
+Zweck: Klick auf Location-Link darf NICHT das Card-Click-Event verhindern.
+=== */
+a.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+/* === END BLOCK: STOP LINK CLICK FROM BLOCKING CARD CLICK === */
+
+location.appendChild(a);
+
     }
 
     card.appendChild(h3);
@@ -273,6 +283,7 @@ const EventCards = (() => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
