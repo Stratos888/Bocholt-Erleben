@@ -203,20 +203,26 @@ const EventCards = (() => {
     if (loc) {
      const a = document.createElement("a");
 a.className = "event-location-link";
-a.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
+/* === BEGIN BLOCK: LOCATION LINK (homepage primary, maps fallback) ===
+Zweck: Location-Link in der Card führt primär zur Location-Homepage, sonst Google Maps Fallback.
+Umfang: Ersetzt ausschließlich href/target/rel/innerHTML + stopPropagation + appendChild für den Location-Link.
+=== */
+const homepage = (window.Locations?.getHomepage && window.Locations.getHomepage(loc)) || "";
+const href = homepage || (window.Locations?.getMapsFallback ? window.Locations.getMapsFallback(loc) : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`);
+
+a.href = href;
 a.target = "_blank";
-a.rel = "noopener";
+a.rel = "noopener noreferrer";
 a.innerHTML = escapeHtml(loc);
 
-/* === BEGIN BLOCK: STOP LINK CLICK FROM BLOCKING CARD CLICK ===
-Zweck: Klick auf Location-Link darf NICHT das Card-Click-Event verhindern.
-=== */
+/* Klick auf Location-Link darf Card-Klick nicht blockieren */
 a.addEventListener("click", (e) => {
   e.stopPropagation();
 });
-/* === END BLOCK: STOP LINK CLICK FROM BLOCKING CARD CLICK === */
 
 location.appendChild(a);
+/* === END BLOCK: LOCATION LINK (homepage primary, maps fallback) === */
+
 
     }
 
@@ -302,6 +308,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
