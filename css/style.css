@@ -265,33 +265,51 @@ html.is-sheet-open body { overflow: hidden; }
   gap: var(--space-lg);
 }
 
-/* === BEGIN BLOCK: EVENT CARDS POLISH (Top-App density + scan + location pill) ===
+/* === BEGIN BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) ===
 Zweck:
-- Titel bleibt primär (dominant).
-- Meta wird scanbarer (ruhiger, kompakter).
-- Location-Link wird “App-like” als Pill/Badge (kein Web-Link-Look).
-- Kleine Density-Optimierung ohne Layout-Bruch.
-Umfang: Ersetzt Card + Title + Meta + Location-Link Styles im Events-Bereich.
+- Eventcards übernehmen die helle “Header”-Material-DNA (soft surface + hairline + sehr subtiler Shadow).
+- Kompakte Dichte (A) ohne gequetscht zu wirken.
+- Press-State ist hell/soft (primary-muted), nicht “billig grau”.
+- Location bleibt sekundär, wirkt wie UI-Pill (nicht Web-Link).
+Umfang: Ersetzt Card + Title + Meta + Location-Pill Styles im Events-Bereich.
 === */
 
-/* Card */
+/* Card: ruhig, hell, hairline + ultra-subtiler shadow */
 .event-card{
-  background: var(--color-surface);
-  border: 0;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(31,41,51,0.08);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
 
-  /* etwas dichter als vorher */
+  /* Dichte A (kompakt) */
   padding: 12px 14px;
 
-  transition: box-shadow .12s ease, transform .12s ease;
-}
-.event-card:active{ transform: scale(0.99); }
-@media (hover: hover) and (pointer: fine){
-  .event-card:hover{ box-shadow: 0 10px 30px rgba(0,0,0,0.09); }
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.86) inset,
+    0 6px 18px rgba(31,41,51,0.05);
+
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, transform .12s ease;
 }
 
-/* Title bleibt klar primär */
+/* Press: Header-DNA (primary-muted), kein hartes Scale */
+.event-card:active{
+  background: var(--color-primary-muted);
+  border-color: rgba(139,207,74,0.26);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.86) inset,
+    0 4px 14px rgba(31,41,51,0.05);
+  transform: translateY(1px);
+}
+
+@media (hover: hover) and (pointer: fine){
+  .event-card:hover{
+    border-color: rgba(31,41,51,0.10);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.86) inset,
+      0 10px 26px rgba(31,41,51,0.07);
+  }
+}
+
+/* Title: bleibt primär, wirkt “clean” statt “billig fett” */
 .event-title{
   font-size: 17px;
   font-weight: 700;
@@ -307,7 +325,7 @@ Umfang: Ersetzt Card + Title + Meta + Location-Link Styles im Events-Bereich.
   margin-bottom: 6px;
 }
 
-/* Meta: scanbarer, ruhiger, kompakt */
+/* Meta: scanbar, ruhig, kompakt */
 .event-meta{
   font-size: 12.5px;
   font-weight: 650;
@@ -321,22 +339,19 @@ Umfang: Ersetzt Card + Title + Meta + Location-Link Styles im Events-Bereich.
   text-overflow: ellipsis;
 }
 
-/* Location: als “Pill/Badge” statt Web-Link */
-.event-location{
-  margin-top: 0;
-}
+/* Location: UI-Pill im Header-Stil (soft primary-muted) */
+.event-location{ margin-top: 0; }
 
 .event-location-link{
   display: inline-flex;
   align-items: center;
   gap: 6px;
 
-  /* Tap target & App-Feeling */
   padding: 7px 10px;
   border-radius: 999px;
 
-  background: rgba(31,41,51,0.04);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(139,207,74,0.10);
+  border: 1px solid rgba(139,207,74,0.22);
 
   font: inherit;
   font-size: 13px;
@@ -357,18 +372,19 @@ Umfang: Ersetzt Card + Title + Meta + Location-Link Styles im Events-Bereich.
 
 @media (hover: hover){
   .event-location-link:hover{
-    background: rgba(31,41,51,0.06);
-    border-color: rgba(31,41,51,0.10);
+    background: rgba(139,207,74,0.14);
+    border-color: rgba(139,207,74,0.26);
     text-decoration: none;
   }
 }
 
 .event-location-link:active{
-  background: rgba(31,41,51,0.08);
+  background: rgba(139,207,74,0.18);
   transform: translateY(1px);
 }
 
-/* === END BLOCK: EVENT CARDS POLISH (Top-App density + scan + location pill) === */
+/* === END BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) === */
+
 
 
 /* ============================================
@@ -1255,6 +1271,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
