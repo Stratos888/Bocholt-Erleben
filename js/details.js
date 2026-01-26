@@ -181,8 +181,19 @@ const DetailPanel = {
   }
 };
 
-debugLog("DetailPanel loaded");
+/* === BEGIN BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) ===
+Zweck: DetailPanel für EventCards global verfügbar machen (window.DetailPanel), sonst bleibt Card-Klick wirkungslos.
+Umfang: Ersetzt nur den finalen Load-Log durch Export + Proof-Log.
+=== */
+window.DetailPanel = DetailPanel;
+debugLog("DetailPanel loaded (global export OK)", {
+  hasDetailPanel: typeof window.DetailPanel !== "undefined",
+  hasShow: typeof window.DetailPanel?.show === "function"
+});
+/* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
+
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
