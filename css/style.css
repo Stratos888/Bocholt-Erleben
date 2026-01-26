@@ -613,6 +613,14 @@ Umfang: Ersetzt den kompletten Bottom-Sheet Basisblock inkl. overlay/card/grabbe
   inset: 0;
   z-index: 9998;
 }
+/* === BEGIN BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) ===
+Zweck: Verhindert, dass ein transformierter Parent (.top-stack) das position:fixed Overlay “entkoppelt”.
+Umfang: Neutralisiert transform nur im Zustand body.is-sheet-open.
+=== */
+body.is-sheet-open .top-stack{
+  transform: none !important;
+}
+/* === END BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) === */
 
 .filter-sheet__overlay{
   position: absolute;
@@ -1204,5 +1212,6 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
