@@ -141,7 +141,8 @@ a:visited{ color: var(--color-primary); }
   filter: brightness(0.985);
 }
 .modal-cta-button:active{
-  transform: translateY(1px);
+   /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
+
   box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
 /* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) === */
@@ -1212,6 +1213,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
