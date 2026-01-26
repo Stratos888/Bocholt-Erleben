@@ -67,24 +67,27 @@ jobs:
           '
 
           # 3) Guard: Wenn immer noch kaputte Muster existieren -> Deploy stoppen
+          # (erlaubt optionalen führenden Slash)
           if grep -RInE '\.css[0-9a-f]{6,}(\b|")|\.js[0-9a-f]{6,}(\b|")' deploy/*.html deploy/**/*.html 2>/dev/null; then
             echo "❌ GUARD FAILED: Found hashed asset links without ?v= in deploy HTML. Aborting deploy."
             exit 1
           fi
 
           # 4) Guard: Mindestanforderung – index.html muss unsere Assets mit ?v= referenzieren
-          if ! grep -qE '/css/style\.css\?v=' deploy/index.html; then
+          # (optional führender Slash + toleriert /config.js oder /js/config.js)
+          if ! grep -qE '["'\''( ]/?css/style\.css\?v=' deploy/index.html; then
             echo "❌ GUARD FAILED: deploy/index.html does not contain style.css?v=..."
             exit 1
           fi
-          if ! grep -qE '/js/main\.js\?v=' deploy/index.html; then
+          if ! grep -qE '["'\''( ]/?js/main\.js\?v=' deploy/index.html; then
             echo "❌ GUARD FAILED: deploy/index.html does not contain main.js?v=..."
             exit 1
           fi
-          if ! grep -qE '/config\.js\?v=' deploy/index.html; then
+          if ! grep -qE '["'\''( ]/?(js/)?config\.js\?v=' deploy/index.html; then
             echo "❌ GUARD FAILED: deploy/index.html does not contain config.js?v=..."
             exit 1
           fi
+
           # === END BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
 
 
