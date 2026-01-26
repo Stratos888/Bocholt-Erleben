@@ -466,14 +466,12 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 /* === END BLOCK: SEARCH BAR (functional hero, top-app level) === */
 
 
-/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
-Zweck: Top-App-UX für Suche + Pills + Bottom-Sheets (klarer Header, volle Sichtbarkeit, schöne Liste).
-Umfang: Konsolidiert Filter-Bar + Sheets + Options (keine doppelten Folgeblöcke).
-=== */
-
 /* === BEGIN BLOCK: FILTER BAR (compact single-row + inline reset X) ===
-Zweck: Filter-Leiste auf eine Zeile verdichten (Zeit/Kategorie links, Reset als X rechts), ohne Layout-Shift.
-Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill / .filter-pill--reset (keine Sheet-Styles).
+Zweck: Visuelles Polish auf Top-App-Niveau:
+- Filter sekundär zur Suche (weniger Präsenz)
+- Reset-X wirkt wie Tool (tertiär), nicht wie dritter Button
+- Aktive Filter subtil erkennbar, ohne “Badge-Drama”
+Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill / .filter-pill--reset.
 === */
 
 .filters-bar{
@@ -484,10 +482,10 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   align-items: stretch;
   gap: 10px;
 
-  flex-wrap: nowrap;           /* verhindert 2. Zeile */
+  flex-wrap: nowrap;
 }
 
-/* Pills: kompakter, aber weiterhin “Control”-Look */
+/* Pills: etwas softer (weniger Rahmen/Schatten), kompakt */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -504,8 +502,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   min-height: 40px;
 
   border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(255,255,255,0.82);
 
   font: inherit;
   font-size: 0.92rem;
@@ -519,17 +517,18 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   white-space: nowrap;
 
   box-shadow:
-    0 12px 26px rgba(0,0,0,0.07),
-    0 1px 0 rgba(255,255,255,0.75) inset;
+    0 10px 22px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 .filter-pill__label{
-  color: var(--color-text-secondary);
+  color: rgba(95,107,115,0.92);
   font-weight: 650;
 }
 
+/* Wert: leicht betont, aber nicht “schreit” */
 .filter-pill__value{
-  color: var(--color-text-primary);
+  color: rgba(31,41,51,0.94);
   font-weight: 850;
 
   min-width: 0;
@@ -537,48 +536,53 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   text-overflow: ellipsis;
 }
 
-/* Chevron */
+/* Chevron: ruhiger */
 .filter-pill::after{
   content: "›";
   margin-left: 2px;
-  color: rgba(31,41,51,0.55);
+  color: rgba(31,41,51,0.42);
   font-size: 18px;
   line-height: 1;
   transform: translateY(-1px);
 }
 
-/* Active: klar, aber ruhig */
+/* Active: subtiler, klarer (weniger “Glow”), aber sofort erkennbar */
 .filter-pill.is-active{
-  border-color: rgba(139,207,74,0.34);
-  background: rgba(255,255,255,0.94);
+  border-color: rgba(139,207,74,0.28);
+  background: rgba(255,255,255,0.92);
   box-shadow:
-    0 14px 30px rgba(0,0,0,0.09),
-    0 0 0 4px rgba(139,207,74,0.10),
+    0 12px 26px rgba(0,0,0,0.07),
+    0 0 0 3px rgba(139,207,74,0.10),
     0 1px 0 rgba(255,255,255,0.78) inset;
+}
+
+/* Optional: aktiver Text minimal “grüner” (ruhig) */
+.filter-pill.is-active .filter-pill__value{
+  color: color-mix(in srgb, var(--color-text-primary) 86%, var(--color-primary));
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.94);
-    border-color: rgba(31,41,51,0.14);
+    background: rgba(255,255,255,0.90);
+    border-color: rgba(31,41,51,0.12);
   }
 }
 
 .filter-pill:active{ transform: translateY(1px); }
 
 .filter-pill:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.18);
+  outline: 2px solid rgba(139,207,74,0.16);
   outline-offset: 3px;
   border-radius: 14px;
 }
 
-/* Reset als X (inline rechts), keine extra Zeile */
+/* Reset: Tool-Charakter (weniger Button) */
 .filter-pill--reset{
   -webkit-appearance: none;
   appearance: none;
 
   flex: 0 0 auto;
-  width: 40px;
+  width: 38px;
   min-height: 40px;
   padding: 0;
 
@@ -587,8 +591,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   justify-content: center;
 
   border-radius: 12px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.60);
+  border: 1px solid rgba(31,41,51,0.06);
+  background: transparent;
 
   font: inherit;
   font-weight: 800;
@@ -596,37 +600,38 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 
   cursor: pointer;
 
-  box-shadow:
-    0 12px 26px rgba(0,0,0,0.07),
-    0 1px 0 rgba(255,255,255,0.70) inset;
+  box-shadow: none;
 }
 
 .filter-pill--reset::after{ content: none; }
 
 /* Text “Zurücksetzen” visuell ausblenden, Icon liefern */
-.filter-pill--reset{
-  font-size: 0;                /* versteckt Text */
-}
+.filter-pill--reset{ font-size: 0; }
 .filter-pill--reset::before{
   content: "×";
   font-size: 22px;
   line-height: 1;
-  color: rgba(31,41,51,0.62);
+  color: rgba(31,41,51,0.46);
   transform: translateY(-1px);
 }
 
 @media (hover: hover){
   .filter-pill--reset:hover{
-    background: rgba(255,255,255,0.82);
+    background: rgba(31,41,51,0.04);
+    border-color: rgba(31,41,51,0.08);
   }
   .filter-pill--reset:hover::before{
-    color: rgba(31,41,51,0.82);
+    color: rgba(31,41,51,0.76);
   }
 }
 
-.filter-pill--reset:active{ transform: translateY(1px); }
+.filter-pill--reset:active{
+  transform: translateY(1px);
+  background: rgba(31,41,51,0.06);
+}
 
 /* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
+
 
 
 /* === BEGIN BLOCK: FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) ===
@@ -1249,6 +1254,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
