@@ -242,12 +242,14 @@ html.is-sheet-open body { overflow: hidden; }
   cursor: pointer;
 }
 
-/* ============================================
-   EVENTS LIST
-   ============================================ */
+/* === BEGIN BLOCK: EVENTS LIST LAYOUT (fix initial mobile zoom via overflow-proof grid) ===
+Zweck: Verhindert initialen Mobile-“Zoom/Fit”-Effekt durch horizontales Overflow; aligned Cards mit Header/Top-Stack Innenkanten.
+Umfang: .events-section + .events-group-title + .event-cards-grid Layout-Regeln (nur CSS).
+=== */
+
+/* Events-Bereich bekommt die gleiche ruhige Innenkante wie .top-stack */
 .events-section {
-  padding-top: 12px;
-  padding-bottom: 18px;
+  padding: 12px 20px 18px;
 }
 
 .events-group-title {
@@ -259,11 +261,25 @@ html.is-sheet-open body { overflow: hidden; }
   letter-spacing: 0.01em;
 }
 
+/* Grid wird overflow-proof: keine harte 320px-Min-Breite mehr, aber weiterhin “kompakt A” */
 .event-cards-grid {
+  max-width: 820px;
+  margin: 0 auto;
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-lg);
 }
+
+/* Ultra-schmal: garantiert niemals horizontal overflow */
+@media (max-width: 360px) {
+  .event-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === END BLOCK: EVENTS LIST LAYOUT (fix initial mobile zoom via overflow-proof grid) === */
+
 
 /* === BEGIN BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) ===
 Zweck:
@@ -1271,6 +1287,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
