@@ -84,12 +84,16 @@ jobs:
           set cmd:fail-exit yes
           set net:timeout 20
           set net:max-retries 2
+          set net:reconnect-interval-base 2
+          set net:reconnect-interval-max 10
+          set net:persist-retries 0
 
           pwd
           cls -l
 
           rm -f index.html
-          mirror -R --delete deploy/ .
+          mirror -R --delete --verbose deploy/ .
+
 
 
           cls -l
