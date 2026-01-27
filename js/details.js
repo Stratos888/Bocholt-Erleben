@@ -144,6 +144,7 @@ const DetailPanel = {
     - Top-App Zielzustand: keine Info-Pills im Panel.
     - Datum/Uhrzeit als ruhige Textzeile (nicht klickbar, keine Box).
     - Location als klare Action (klickbar): Homepage primär, Maps fallback.
+    - Kategorie-Icon (ohne Text) im Header rechts oben.
     Umfang: Ersetzt renderContent(event) komplett.
     === */
     const e = event && typeof event === "object" ? event : {};
@@ -153,15 +154,26 @@ const DetailPanel = {
     const time = e.time || "";
     const locationRaw = (e.location || "").trim();
     const description = e.beschreibung || e.description || "";
-    const kategorie = (e.kategorie || "").trim();
+    const kategorieRaw = (e.kategorie || "").trim();
     const url = e.url || "";
 
     const safeUrl = url ? String(url) : "";
     const isHttpUrl = /^https?:\/\//i.test(safeUrl);
 
-    // Secondary info line (text-only): date/time + category (no pills)
+    // Secondary info line (text-only): date/time (+ optional category text, optional)
     const dateTimeText = [date, time ? this.escape(time) : ""].filter(Boolean).join(" · ");
-    const sublineText = [dateTimeText, kategorie ? this.escape(kategorie) : ""].filter(Boolean).join(" · ");
+    const sublineText = [dateTimeText].filter(Boolean).join(" · ");
+
+    // Kategorie-Icon (ohne Text)
+    const iconMap = {
+      Party: "🎉",
+      Kneipe: "🍺",
+      Kinder: "🧒",
+      Quiz: "❓",
+      Musik: "🎵",
+      Kultur: "🎭"
+    };
+    const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
 
     // Location action (homepage primary, maps fallback)
     let locationHref = "";
@@ -178,6 +190,12 @@ const DetailPanel = {
     this.content.innerHTML = `
       <div class="detail-header">
         <h2>${this.escape(title)}</h2>
+
+        ${categoryIcon ? `
+          <span class="detail-category-icon" role="img" aria-label="Kategorie: ${this.escape(kategorieRaw)}">
+            ${categoryIcon}
+          </span>
+        ` : ""}
 
         ${sublineText ? `
           <div class="detail-subline">
@@ -216,6 +234,7 @@ const DetailPanel = {
       ` : ""}
     `;
     /* === END BLOCK: DETAIL RENDER (canonical fields, defensive) === */
+
   },
 
 
@@ -239,6 +258,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
