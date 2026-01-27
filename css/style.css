@@ -1168,6 +1168,16 @@ Fix:
 Umfang:
 - Nur #event-detail-panel .detail-link-btn
 === */
+/* === BEGIN PATCH: DETAIL CTA – HARD CLIP TO PREVENT CORNER AA BLEED (PROOF-BASED)
+Proof:
+- background transparent => corners gone
+- background white (even w/o border) => corners return
+- clip-path test on CTA => corners gone
+Fix:
+- Hard-clip the rounded shape so Chromium can't AA-blend against parent.
+Umfang:
+- Nur #event-detail-panel .detail-link-btn (keine Layout-/Design-Änderung beabsichtigt).
+=== */
 #event-detail-panel .detail-link-btn{
   display: flex;
   align-items: center;
@@ -1179,6 +1189,7 @@ Umfang:
   border-radius: 18px;
 
   overflow: hidden;
+  clip-path: inset(0 round 18px);
 
   background: #FFFFFF;
   border: 1px solid rgba(31,41,51,0.10);
@@ -1187,14 +1198,13 @@ Umfang:
   font-weight: 700;
   text-decoration: none;
 
-  /* remove outer box-shadow (cause), keep only inset highlight */
   box-shadow: 0 1px 0 rgba(255,255,255,0.78) inset;
-
-  /* outer shadow via alpha-mask to avoid corner halo */
   filter: drop-shadow(0 12px 26px rgba(0,0,0,0.08));
 
   -webkit-tap-highlight-color: transparent;
 }
+/* === END PATCH: DETAIL CTA – HARD CLIP TO PREVENT CORNER AA BLEED (PROOF-BASED) === */
+
 /* === END PATCH: DETAIL CTA – SHADOW VIA DROP-SHADOW (ROOTCAUSE PROVEN) === */
 
 
@@ -1205,8 +1215,8 @@ Umfang:
   opacity: 0.65;
 }
 
-/* === BEGIN PATCH: DETAIL CTA – ACTIVE STATE (MATCH DROP-SHADOW)
-Zweck: Active-State ohne Rückkehr zum box-shadow outer (würde Halo zurückbringen).
+/* === BEGIN PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP
+Zweck: Verhindert, dass der Effekt im :active State zurückkommt.
 Umfang: Nur #event-detail-panel .detail-link-btn:active
 === */
 #event-detail-panel .detail-link-btn:active{
@@ -1214,8 +1224,10 @@ Umfang: Nur #event-detail-panel .detail-link-btn:active
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(255,255,255,0.78) inset;
   filter: drop-shadow(0 8px 18px rgba(0,0,0,0.07));
+  clip-path: inset(0 round 18px);
 }
-/* === END PATCH: DETAIL CTA – ACTIVE STATE (MATCH DROP-SHADOW) === */
+/* === END PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP === */
+
 
 
 /* Kategorie-Icon Hook (ohne Text) – Platz rechts oben im Header */
@@ -1467,6 +1479,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
