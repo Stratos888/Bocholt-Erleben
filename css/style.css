@@ -892,10 +892,11 @@ body.is-sheet-open .top-stack{
 
 /* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
 Zweck:
-- DetailPanel ist visuell konsistent zur Header-DNA (hell, ruhig, hairline, soft shadow).
-- Meta-Box bleibt leicht grün (header-orientiert), aber nicht “primary-laut”.
-- Vorbereitete Styles für klickbare Location im Panel (Link-Stati neutralisiert).
-Umfang: Komplettblock DetailPanel Styles (overlay/content/header/badges/meta/cta).
+- DetailPanel wirkt „Top-App“: mehr Luft, klare Hierarchie, keine Info-Pills.
+- Datum/Uhrzeit als Textzeile (nicht boxed).
+- Location ist Action-Zeile (klickbar) – optisch ruhig, aber eindeutig interaktiv.
+- Kategorie-Icon (ohne Text) kann im Header rechts oben angezeigt werden (ohne Close zu überdecken).
+Umfang: Komplettblock DetailPanel Styles (overlay/content/header/meta/cta + icon hooks).
 === */
 
 body.is-panel-open { overflow: hidden; }
@@ -924,7 +925,7 @@ body.is-panel-open { overflow: hidden; }
   bottom: 0;
   z-index: 1;
 
-  max-height: 80vh;
+  max-height: 82vh;
 
   background: rgba(255,255,255,0.98);
   border-top-left-radius: 22px;
@@ -932,11 +933,13 @@ body.is-panel-open { overflow: hidden; }
 
   border-top: 1px solid rgba(31,41,51,0.08);
   box-shadow:
-    0 -30px 110px rgba(0,0,0,0.18),
+    0 -34px 130px rgba(0,0,0,0.18),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
-  padding: 14px 14px 16px;
+
+  /* mehr Luft */
+  padding: 16px 16px 18px;
 
   transform: translateY(110%);
   transition: transform 220ms ease;
@@ -950,10 +953,10 @@ body.is-panel-open { overflow: hidden; }
 #event-detail-panel .detail-panel-content::before{
   content: "";
   display: block;
-  width: 52px;
+  width: 54px;
   height: 5px;
   border-radius: 999px;
-  margin: 6px auto 10px;
+  margin: 6px auto 12px;
   background: rgba(31,41,51,0.16);
 }
 
@@ -981,90 +984,117 @@ body.is-panel-open { overflow: hidden; }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
 #event-detail-panel #detail-content{
-  padding-top: 30px;
-  max-height: calc(80vh - 16px);
+  /* mehr Abstand unter dem Handle + Close */
+  padding-top: 40px;
+
+  max-height: calc(82vh - 18px);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 
 #event-detail-panel .detail-header{
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  position: relative;
+  padding-right: 90px; /* Platz für Icon + Close rechts */
+  padding-top: 10px;
+  padding-bottom: 14px;
 
-  background: rgba(255,255,255,0.98);
-  padding-right: 44px;
-  padding-top: 8px;
-  padding-bottom: 10px;
-
-  margin-top: -4px;
-  border-bottom: 1px solid rgba(31,41,51,0.05);
+  margin-top: -6px;
 }
 
 #event-detail-panel .detail-header h2{
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 19px;
-  line-height: 1.22;
+  line-height: 1.24;
   letter-spacing: -0.012em;
   font-weight: 650;
   color: var(--color-text-primary);
 }
 
-/* Badges: ruhige UI-Pills (Semantik: Info, nicht History-Link) */
-#event-detail-panel .detail-location,
-#event-detail-panel .detail-category{
-  display: inline-flex;
+/* Text-Subline (Datum/Uhrzeit/Kategorie-Text falls vorhanden) */
+#event-detail-panel .detail-subline{
+  margin: 0 0 14px;
+
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: rgba(95,107,115,0.80);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Location Action Row (klickbar, ruhig, eindeutig) */
+#event-detail-panel .detail-location-action,
+#event-detail-panel .detail-location-action:link,
+#event-detail-panel .detail-location-action:visited{
+  display: flex;
   align-items: center;
-  margin-top: 6px;
-  padding: 5px 10px;
+  gap: 10px;
 
-  border-radius: 999px;
+  width: 100%;
+  padding: 12px 12px;
 
-  font-size: 0.85rem;
+  border-radius: 16px;
+
+  background: rgba(31,41,51,0.03);
+  border: 1px solid rgba(31,41,51,0.08);
+
+  color: rgba(31,41,51,0.92);
+  text-decoration: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-location-icon{
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+#event-detail-panel .detail-location-text{
+  min-width: 0;
+  flex: 1 1 auto;
+
+  font-size: 14px;
   font-weight: 650;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#event-detail-panel .detail-location-chev{
+  flex: 0 0 auto;
+  opacity: 0.65;
+  font-size: 18px;
   line-height: 1;
 }
 
-#event-detail-panel .detail-location{
-  background: rgba(139,207,74,0.10);
-  border: 1px solid rgba(31,41,51,0.08);
-  color: rgba(31,41,51,0.90);
+#event-detail-panel .detail-location-action:active{
+  background: var(--color-primary-muted);
+  transform: translateY(1px);
 }
 
+/* Legacy: falls irgendwo noch vorhanden -> nicht als Pill darstellen */
+#event-detail-panel .detail-location,
 #event-detail-panel .detail-category{
-  margin-left: 8px;
-  background: rgba(31,41,51,0.03);
-  border: 1px solid rgba(31,41,51,0.08);
-  color: rgba(31,41,51,0.78);
+  display: none !important;
 }
 
-/* Vorbereitet für klickbare Location im Panel */
-#event-detail-panel .detail-location-link,
-#event-detail-panel .detail-location-link:link,
-#event-detail-panel .detail-location-link:visited{
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-@media (hover: hover){
-  #event-detail-panel .detail-location-link:hover{ text-decoration: none; }
-}
-
+/* Meta (Datum/Uhrzeit) – nicht boxed */
 #event-detail-panel .detail-meta{
-  margin: 14px 0 12px;
-  padding: 12px 14px;
+  margin: 16px 0 14px;
+  padding: 0;
 
-  /* leicht grün, header-orientiert (Info-Surface, nicht “aktiv”) */
-  background: rgba(139,207,74,0.08);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 16px;
+  background: transparent;
+  border: 0;
 
   display: grid;
-  gap: 6px;
+  gap: 8px;
 
-  font-size: 0.9rem;
+  font-size: 13.5px;
   color: rgba(95,107,115,0.82);
 }
 #event-detail-panel .detail-meta strong{
@@ -1072,50 +1102,87 @@ body.is-panel-open { overflow: hidden; }
   color: rgba(31,41,51,0.90);
 }
 
+#event-detail-panel .detail-description{
+  margin-top: 10px;
+}
 #event-detail-panel .detail-description p{
-  margin: 0 0 20px;
+  margin: 0 0 22px;
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: rgba(31,41,51,0.78);
 }
 
-#event-detail-panel .detail-actions{ margin-top: 0; }
+/* CTA: weniger „Button“, mehr Top-App Action-Surface */
+#event-detail-panel .detail-actions{ margin-top: 8px; }
 
 #event-detail-panel .detail-link-btn{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  padding: 14px 14px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(31,41,51,0.10);
+
+  color: rgba(31,41,51,0.92);
+  font-weight: 700;
+  text-decoration: none;
+
+  box-shadow:
+    0 12px 26px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.78) inset;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-link-btn::after{
+  content: "›";
+  font-size: 18px;
+  opacity: 0.65;
+}
+
+#event-detail-panel .detail-link-btn:active{
+  background: var(--color-primary-muted);
+  transform: translateY(1px);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.07),
+    0 1px 0 rgba(255,255,255,0.78) inset;
+}
+
+/* Kategorie-Icon Hook (ohne Text) – Platz rechts oben im Header */
+#event-detail-panel .detail-category-icon{
+  position: absolute;
+  right: 56px; /* neben Close */
+  top: 12px;
+
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  width: 100%;
-  padding: 14px;
+  background: rgba(31,41,51,0.03);
+  border: 1px solid rgba(31,41,51,0.08);
 
-  border-radius: 16px;
-
-  background: var(--color-primary-muted);
-  border: 1px solid rgba(31,41,51,0.10);
-
-  color: var(--color-text-primary);
-  font-weight: 750;
-  text-decoration: none;
-
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.08),
-    0 1px 0 rgba(255,255,255,0.78) inset;
-}
-#event-detail-panel .detail-link-btn:active{
-  transform: translateY(1px);
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.07),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(31,41,51,0.78);
 }
 
 @supports (padding: max(0px)){
   #event-detail-panel .detail-panel-content{
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
   }
 }
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
+
 
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
@@ -1317,6 +1384,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
