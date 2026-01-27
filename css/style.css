@@ -286,22 +286,20 @@ Zweck:
 - Eventcards übernehmen die helle “Header”-Material-DNA (soft surface + hairline + sehr subtiler Shadow).
 - Kompakte Dichte (A) ohne gequetscht zu wirken.
 - Press-State ist hell/soft (primary-muted), nicht “billig grau”.
-- Titel minimal weniger „assertiv“ (wirkt ruhiger/top-app).
-- Meta-Zeile leiser (bessere Hierarchie).
-- Location ist reine Info-Zeile (Text, nicht klickbar) + Ellipsis.
-- FIX: verhindert “zu breite Cards” auf Mobile durch CSS-Grid min-content Overflow (nowrap + min-width:auto).
+- Location ist reine Info (Text) – keine Pill-Semantik.
+- Kategorie-Icon sitzt oben rechts (ohne Rahmen/Shadow) und beeinflusst das Layout nicht.
 Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 === */
 
 /* Card: ruhig, hell, hairline + ultra-subtiler shadow */
 .event-card{
-  min-width: 0; /* overflow-proof in CSS grid (allows shrinking below min-content) */
+  position: relative; /* anchor for category icon */
+  min-width: 0;
 
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(31,41,51,0.08);
   border-radius: var(--radius-card);
 
-  /* Dichte A (kompakt) */
   padding: 12px 14px;
 
   box-shadow:
@@ -311,10 +309,9 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, transform .12s ease;
 }
 
-/* Press: Header-DNA (primary-muted), kein hartes Scale */
 .event-card:active{
   background: var(--color-primary-muted);
-  border-color: rgba(139,207,74,0.24);
+  border-color: rgba(139,207,74,0.26);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.86) inset,
     0 4px 14px rgba(31,41,51,0.05);
@@ -330,14 +327,27 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   }
 }
 
-/* Title: ruhiger (minimal weniger fett) */
+/* Kategorie-Icon: oben rechts, ohne Rahmen */
+.event-category-icon{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.78;
+
+  pointer-events: none; /* Card bleibt komplett klickbar */
+}
+
+/* Title */
 .event-title{
   min-width: 0;
 
   font-size: 17px;
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.28;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
   display: -webkit-box;
@@ -348,47 +358,40 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   margin-bottom: 6px;
 }
 
-/* Meta: leiser, bleibt scanbar */
+/* Meta */
 .event-meta{
   min-width: 0;
 
   font-size: 12.5px;
-  font-weight: 600;
-  color: rgba(95,107,115,0.78);
+  font-weight: 650;
+  color: rgba(95,107,115,0.92);
 
   margin-top: 0;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Location: reine Info-Zeile (Text, nicht klickbar) */
-.event-location{ margin-top: 0; min-width: 0; }
+/* Location: reine Info-Zeile (kein Pill) */
+.event-location{
+  margin-top: 0;
+  min-width: 0;
+}
 
 .event-location-text{
-  min-width: 0;
-
-  display: block;
-
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: rgba(31,41,51,0.70);
+  font-weight: 650;
+  color: rgba(31,41,51,0.78);
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.event-location-text::before{
-  content: "📍";
-  margin-right: 6px;
-  opacity: 0.75;
 }
 
 /* === END BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) === */
+
 
 
 
@@ -1159,21 +1162,26 @@ body.is-panel-open { overflow: hidden; }
   right: 56px; /* neben Close */
   top: 12px;
 
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(31,41,51,0.03);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+
+  width: auto;
+  height: auto;
+  padding: 0;
 
   font-size: 16px;
   line-height: 1;
+  opacity: 0.78;
   color: rgba(31,41,51,0.78);
+
+  pointer-events: none;
 }
+
 
 @supports (padding: max(0px)){
   #event-detail-panel .detail-panel-content{
@@ -1384,6 +1392,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
