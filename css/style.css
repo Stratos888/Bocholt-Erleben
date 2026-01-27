@@ -934,6 +934,13 @@ Umfang:
 Hinweis:
 - Dokumentierter, etablierter Fix für Mobile Bottom Sheets (Android Chrome).
 === */
+/* === BEGIN PATCH: DETAIL PANEL – ADD BOTTOM RADIUS (ROOTCAUSE PROVEN)
+Zweck:
+- Rootcause-Proof: .detail-panel-content hat bottom radius 0px → Overlay scheint unten durch.
+- Fix: Panel-Surface erhält unten gleiche Rundung wie oben; verhindert Durchscheinen an Ecken.
+Umfang:
+- Nur #event-detail-panel .detail-panel-content, keine Layout-/Design-Änderungen sonst.
+=== */
 #event-detail-panel .detail-panel-content{
   position: absolute;
   left: 0;
@@ -944,9 +951,9 @@ Hinweis:
   max-height: 82vh;
 
   background: #FFFFFF;
+  background-clip: padding-box;
 
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
+  border-radius: 22px;
 
   border-top: 1px solid rgba(31,41,51,0.08);
   box-shadow:
@@ -961,6 +968,8 @@ Hinweis:
   transition: transform 220ms ease;
   overscroll-behavior: contain;
 }
+/* === END PATCH: DETAIL PANEL – ADD BOTTOM RADIUS (ROOTCAUSE PROVEN) === */
+
 
 /* Physische Maskierung der unteren Rundungen gegen Chromium AA-Artefakte */
 #event-detail-panel .detail-panel-content::after{
@@ -1452,6 +1461,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
