@@ -925,6 +925,15 @@ body.is-panel-open { overflow: hidden; }
   backdrop-filter: blur(8px);
 }
 
+/* === BEGIN PATCH: DETAIL PANEL – CHROMIUM ROUNDED-CORNER MASK FIX
+Zweck:
+- Behebt graue Corner-Artefakte (Chromium Anti-Aliasing Bug) bei fixed + radius + transform.
+- Physische Maskierung der unteren Ecken, ohne Layout-/Optik-Änderungen.
+Umfang:
+- Nur #event-detail-panel .detail-panel-content (+ ::after Maske).
+Hinweis:
+- Dokumentierter, etablierter Fix für Mobile Bottom Sheets (Android Chrome).
+=== */
 #event-detail-panel .detail-panel-content{
   position: absolute;
   left: 0;
@@ -935,6 +944,7 @@ body.is-panel-open { overflow: hidden; }
   max-height: 82vh;
 
   background: #FFFFFF;
+
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
 
@@ -945,13 +955,32 @@ body.is-panel-open { overflow: hidden; }
 
   overflow: hidden;
 
-  /* mehr Luft */
   padding: 16px 16px 18px;
 
   transform: translateY(110%);
   transition: transform 220ms ease;
   overscroll-behavior: contain;
 }
+
+/* Physische Maskierung der unteren Rundungen gegen Chromium AA-Artefakte */
+#event-detail-panel .detail-panel-content::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px; /* deckt Subpixel-AA sicher ab */
+
+  height: 24px; /* >= Radius */
+
+  background: #FFFFFF;
+
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
+
+  pointer-events: none;
+}
+/* === END PATCH: DETAIL PANEL – CHROMIUM ROUNDED-CORNER MASK FIX === */
+
 
 #event-detail-panel.detail-panel.active .detail-panel-content{
   transform: translateY(0);
@@ -1423,6 +1452,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
