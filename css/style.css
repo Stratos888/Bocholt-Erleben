@@ -288,9 +288,9 @@ Zweck:
 - Press-State ist hell/soft (primary-muted), nicht “billig grau”.
 - Titel minimal weniger „assertiv“ (wirkt ruhiger/top-app).
 - Meta-Zeile leiser (bessere Hierarchie).
-- Location-Pill Fine-Tuning + FIX: kein :visited-Farbwechsel (Pill bleibt UI-Control, nicht Link-Historie).
+- Location ist reine Info-Zeile (Text, nicht klickbar) + Ellipsis.
 - FIX: verhindert “zu breite Cards” auf Mobile durch CSS-Grid min-content Overflow (nowrap + min-width:auto).
-Umfang: Ersetzt Card + Title + Meta + Location-Pill Styles im Events-Bereich.
+Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 === */
 
 /* Card: ruhig, hell, hairline + ultra-subtiler shadow */
@@ -357,65 +357,39 @@ Umfang: Ersetzt Card + Title + Meta + Location-Pill Styles im Events-Bereich.
   color: rgba(95,107,115,0.78);
 
   margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Location: UI-Pill im Header-Stil (soft primary-muted) */
+/* Location: reine Info-Zeile (Text, nicht klickbar) */
 .event-location{ margin-top: 0; min-width: 0; }
 
-/* Pill: als UI-Control behandeln (kein visited-state) */
-.event-location-link,
-.event-location-link:link,
-.event-location-link:visited{
+.event-location-text{
   min-width: 0;
 
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: block;
 
-  padding: 7px 10px;
-  border-radius: 999px;
-
-  /* Fine-Tuning: etwas mehr “surface”, weniger Outline */
-  background: rgba(139,207,74,0.09);
-  border: 1px solid rgba(31,41,51,0.08);
-
-  font: inherit;
   font-size: 13px;
-  font-weight: 650;
-  line-height: 1;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(31,41,51,0.70);
 
-  color: rgba(31,41,51,0.90);
-  text-decoration: none;
-
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-
-  max-width: 100%;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-@media (hover: hover){
-  .event-location-link:hover{
-    background: rgba(139,207,74,0.12);
-    border-color: rgba(31,41,51,0.10);
-    text-decoration: none;
-  }
-}
-
-.event-location-link:active{
-  background: rgba(139,207,74,0.16);
-  border-color: rgba(31,41,51,0.12);
-  transform: translateY(1px);
+.event-location-text::before{
+  content: "📍";
+  margin-right: 6px;
+  opacity: 0.75;
 }
 
 /* === END BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) === */
+
 
 
 
@@ -1328,6 +1302,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
