@@ -350,6 +350,9 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
+  /* Reserve space for top-right category icon */
+  padding-right: 26px;
+
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -357,6 +360,7 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 
   margin-bottom: 6px;
 }
+
 
 /* Meta */
 .event-meta{
@@ -1037,18 +1041,19 @@ body.is-panel-open { overflow: hidden; }
   gap: 10px;
 
   width: 100%;
-  padding: 12px 12px;
+  padding: 10px 2px; /* list-row feel */
 
-  border-radius: 16px;
+  border-radius: 12px;
 
-  background: rgba(31,41,51,0.03);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: transparent;
+  border: 0;
 
-  color: rgba(31,41,51,0.92);
+  color: rgba(31,41,51,0.90);
   text-decoration: none;
 
   -webkit-tap-highlight-color: transparent;
 }
+
 
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
@@ -1076,9 +1081,13 @@ body.is-panel-open { overflow: hidden; }
 }
 
 #event-detail-panel .detail-location-action:active{
-  background: var(--color-primary-muted);
+  background: rgba(31,41,51,0.03);
   transform: translateY(1px);
 }
+#event-detail-panel .detail-location-action{
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
 
 /* Legacy: falls irgendwo noch vorhanden -> nicht als Pill darstellen */
 #event-detail-panel .detail-location,
@@ -1116,7 +1125,10 @@ body.is-panel-open { overflow: hidden; }
 }
 
 /* CTA: weniger „Button“, mehr Top-App Action-Surface */
-#event-detail-panel .detail-actions{ margin-top: 8px; }
+#event-detail-panel .detail-actions{
+  margin-top: 8px;
+  background: transparent;
+}
 
 #event-detail-panel .detail-link-btn{
   display: flex;
@@ -1127,6 +1139,9 @@ body.is-panel-open { overflow: hidden; }
   padding: 14px 14px;
 
   border-radius: 18px;
+
+  overflow: hidden;
+  background-clip: padding-box;
 
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(31,41,51,0.10);
@@ -1141,6 +1156,7 @@ body.is-panel-open { overflow: hidden; }
 
   -webkit-tap-highlight-color: transparent;
 }
+
 
 #event-detail-panel .detail-link-btn::after{
   content: "›";
@@ -1191,9 +1207,6 @@ body.is-panel-open { overflow: hidden; }
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
 
-
-
-/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
 
 
 /* ============================================
@@ -1392,6 +1405,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
