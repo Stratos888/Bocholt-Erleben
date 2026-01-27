@@ -217,9 +217,37 @@ location.appendChild(span);
 
     }
 
-   card.appendChild(h3);
+/* === BEGIN BLOCK: EVENTCARD APPEND CONTENT (title/meta/location + category icon) ===
+Zweck: Fügt Kategorie-Icon (ohne Text) in jede Eventcard ein.
+Umfang: Ersetzt ausschließlich das Anhängen von Title/Meta/Location und ergänzt Icon-Append.
+=== */
+card.appendChild(h3);
 card.appendChild(meta);
 card.appendChild(location);
+
+/* Kategorie-Icon (ohne Text) */
+const cat = (event?.kategorie || "").trim();
+if (cat) {
+  const icon = document.createElement("span");
+  icon.className = "event-category-icon";
+  icon.setAttribute("role", "img");
+  icon.setAttribute("aria-label", `Kategorie: ${cat}`);
+
+  /* Minimal robust: Emoji-Mapping */
+  const iconMap = {
+    Party: "🎉",
+    Kneipe: "🍺",
+    Kinder: "🧒",
+    Quiz: "❓",
+    Musik: "🎵",
+    Kultur: "🎭"
+  };
+  icon.textContent = iconMap[cat] || "🗓️";
+
+  card.appendChild(icon);
+}
+/* === END BLOCK: EVENTCARD APPEND CONTENT (title/meta/location + category icon) === */
+
 
 /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER (open detail) ===
 Zweck: Klick auf die Card öffnet das DetailPanel deterministisch.
@@ -300,6 +328,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
