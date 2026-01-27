@@ -925,21 +925,14 @@ body.is-panel-open { overflow: hidden; }
   backdrop-filter: blur(8px);
 }
 
-/* === BEGIN PATCH: DETAIL PANEL – CHROMIUM ROUNDED-CORNER MASK FIX
-Zweck:
-- Behebt graue Corner-Artefakte (Chromium Anti-Aliasing Bug) bei fixed + radius + transform.
-- Physische Maskierung der unteren Ecken, ohne Layout-/Optik-Änderungen.
+/* === BEGIN PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED)
+Proof:
+- bottom radius ist 22px/22px (ok)
+- ::after ist aktiv (content "", height 24px, bg white) → verursacht weißen Balken
+Fix:
+- Panel bleibt unverändert, Radius bleibt, keine zusätzlichen Masken/Overlays.
 Umfang:
-- Nur #event-detail-panel .detail-panel-content (+ ::after Maske).
-Hinweis:
-- Dokumentierter, etablierter Fix für Mobile Bottom Sheets (Android Chrome).
-=== */
-/* === BEGIN PATCH: DETAIL PANEL – ADD BOTTOM RADIUS (ROOTCAUSE PROVEN)
-Zweck:
-- Rootcause-Proof: .detail-panel-content hat bottom radius 0px → Overlay scheint unten durch.
-- Fix: Panel-Surface erhält unten gleiche Rundung wie oben; verhindert Durchscheinen an Ecken.
-Umfang:
-- Nur #event-detail-panel .detail-panel-content, keine Layout-/Design-Änderungen sonst.
+- Nur #event-detail-panel .detail-panel-content
 === */
 #event-detail-panel .detail-panel-content{
   position: absolute;
@@ -968,27 +961,24 @@ Umfang:
   transition: transform 220ms ease;
   overscroll-behavior: contain;
 }
+/* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
+
 /* === END PATCH: DETAIL PANEL – ADD BOTTOM RADIUS (ROOTCAUSE PROVEN) === */
 
 
-/* Physische Maskierung der unteren Rundungen gegen Chromium AA-Artefakte */
+/* === BEGIN PATCH: DETAIL PANEL – DISABLE PREVIOUS ::after MASK STRIP (PROOF-BASED)
+Proof:
+- getComputedStyle(::after).content == "" und height == 24px und bg == white → sichtbarer weißer Balken.
+Fix:
+- Pseudo-Element deaktivieren.
+Umfang:
+- Nur #event-detail-panel .detail-panel-content::after
+=== */
 #event-detail-panel .detail-panel-content::after{
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px; /* deckt Subpixel-AA sicher ab */
-
-  height: 24px; /* >= Radius */
-
-  background: #FFFFFF;
-
-  border-bottom-left-radius: 22px;
-  border-bottom-right-radius: 22px;
-
-  pointer-events: none;
+  content: none;
 }
-/* === END PATCH: DETAIL PANEL – CHROMIUM ROUNDED-CORNER MASK FIX === */
+/* === END PATCH: DETAIL PANEL – DISABLE PREVIOUS ::after MASK STRIP (PROOF-BASED) === */
+
 
 
 #event-detail-panel.detail-panel.active .detail-panel-content{
@@ -1461,6 +1451,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
