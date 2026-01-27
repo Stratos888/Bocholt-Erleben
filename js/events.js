@@ -204,24 +204,15 @@ const EventCards = (() => {
      const a = document.createElement("a");
 a.className = "event-location-link";
 /* === BEGIN BLOCK: LOCATION LINK (homepage primary, maps fallback) ===
-Zweck: Location-Link in der Card führt primär zur Location-Homepage, sonst Google Maps Fallback.
-Umfang: Ersetzt ausschließlich href/target/rel/innerHTML + stopPropagation + appendChild für den Location-Link.
+Zweck: Location wird in der Card als reine Info (Text) angezeigt, nicht klickbar (Pill-Semantik entfernt).
+Umfang: Ersetzt ausschließlich das Rendering der Location innerhalb der Card.
 === */
-const homepage = (window.Locations?.getHomepage && window.Locations.getHomepage(loc)) || "";
-const href = homepage || (window.Locations?.getMapsFallback ? window.Locations.getMapsFallback(loc) : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`);
-
-a.href = href;
-a.target = "_blank";
-a.rel = "noopener noreferrer";
-a.innerHTML = escapeHtml(loc);
-
-/* Klick auf Location-Link darf Card-Klick nicht blockieren */
-a.addEventListener("click", (e) => {
-  e.stopPropagation();
-});
-
-location.appendChild(a);
+const span = document.createElement("div");
+span.className = "event-location-text";
+span.textContent = loc;
+location.appendChild(span);
 /* === END BLOCK: LOCATION LINK (homepage primary, maps fallback) === */
+
 
 
     }
@@ -232,13 +223,13 @@ card.appendChild(location);
 
 /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER (open detail) ===
 Zweck: Klick auf die Card öffnet das DetailPanel deterministisch.
-Umfang: Fügt den fehlenden Click-Listener wieder ein (ersetzt kaputtes 'card.addEve').
+Umfang: Card ist vollflächig klickbar (Location in Card ist nur Text, kein Sonderfall nötig).
 === */
-card.addEventListener("click", (e) => {
-  if (e.target.closest(".event-location-link")) return;
+card.addEventListener("click", () => {
   if (window.DetailPanel?.show) window.DetailPanel.show(event);
 });
 /* === END BLOCK: EVENTCARD CLICK HANDLER (open detail) === */
+
 
 
    // Keyboard: Enter/Space
@@ -247,9 +238,9 @@ card.addEventListener("keydown", (e) => {
   if (e.target.closest(".event-location-link")) return;
   e.preventDefault();
 
-  /* === BEGIN BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) ===
+    /* === BEGIN BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) ===
   Zweck: Öffnet DetailPanel auch per Keyboard deterministisch über window.DetailPanel.
-  Umfang: Ersetzt nur den Panel-Aufruf im Keydown-Handler.
+  Umfang: Card ist vollflächig aktivierbar (Location in Card ist nur Text).
   === */
   if (window.DetailPanel?.show) {
     window.DetailPanel.show(event);
@@ -260,6 +251,7 @@ card.addEventListener("keydown", (e) => {
     });
   }
   /* === END BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) === */
+
 });
 
 
@@ -308,6 +300,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
