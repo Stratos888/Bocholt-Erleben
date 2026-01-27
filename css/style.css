@@ -1046,12 +1046,16 @@ body.is-panel-open { overflow: hidden; }
   gap: 10px;
 
   width: 100%;
-  padding: 10px 2px; /* list-row feel */
+  padding: 10px 2px;
 
   border-radius: 12px;
-  overflow: hidden; /* verhindert Corner-Artefakte bei Tap-Feedback */
 
   background: transparent;
+  background-clip: padding-box;
+
+  overflow: hidden;
+  isolation: isolate;
+
   border: 0;
 
   color: rgba(31,41,51,0.90);
@@ -1059,6 +1063,7 @@ body.is-panel-open { overflow: hidden; }
 
   -webkit-tap-highlight-color: transparent;
 }
+
 
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
@@ -1135,9 +1140,12 @@ body.is-panel-open { overflow: hidden; }
 
   border-radius: 18px;
 
-  overflow: hidden;
-
   background: #FFFFFF;
+  background-clip: padding-box;
+
+  overflow: hidden;
+  isolation: isolate;
+
   border: 1px solid rgba(31,41,51,0.10);
 
   color: rgba(31,41,51,0.92);
@@ -1150,6 +1158,7 @@ body.is-panel-open { overflow: hidden; }
 
   -webkit-tap-highlight-color: transparent;
 }
+
 
 #event-detail-panel .detail-link-btn::after{
   content: "›";
@@ -1414,6 +1423,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
