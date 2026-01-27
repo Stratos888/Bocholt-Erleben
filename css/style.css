@@ -82,8 +82,8 @@ body {
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 
 /* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) ===
-Zweck: Links konsistent, Textseiten lesbar, CTA konsistent.
-Umfang: a + .page + .modal-cta-button.
+Zweck: Links konsistent, Textseiten lesbar, CTA konsistent + Referenz-Infoseiten (Content-Blueprint UI).
+Umfang: a + .page + .modal-cta-button + Content-Komponenten (.content-*)
 === */
 a{
   color: var(--color-primary);
@@ -110,14 +110,122 @@ a:visited{ color: var(--color-primary); }
   margin: 18px 0 8px;
 }
 .page p,
-.page ul{
+.page ul,
+.page ol{
   color: var(--color-text-secondary);
 }
-.page ul{
+.page ul,
+.page ol{
   margin: 10px 0 0;
   padding-left: 18px;
 }
 .page li{ margin: 6px 0; }
+
+/* === BEGIN BLOCK: CONTENT PAGE COMPONENTS (reference pages) ===
+Zweck: Wiederverwendbare Bausteine für ruhige, appige Inhaltsseiten (Blueprint).
+Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locations-benefits.
+=== */
+.content-hero{
+  margin: 4px 0 14px;
+}
+.content-kicker{
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0 0 6px;
+}
+.content-lead{
+  margin-top: 8px;
+  color: var(--color-text-secondary);
+}
+
+.content-card{
+  background: var(--color-surface);
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 14px 14px;
+  margin-top: 12px;
+}
+.content-card--primary{
+  border-color: rgba(139,207,74,.35);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.07);
+}
+.content-card h2{
+  margin-top: 0;
+}
+
+.content-steps{
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+  counter-reset: step;
+}
+.content-steps li{
+  counter-increment: step;
+  margin: 10px 0;
+  padding-left: 34px;
+  position: relative;
+  color: var(--color-text-secondary);
+}
+.content-steps li::before{
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  background: var(--color-primary-muted);
+  border: 1px solid rgba(139,207,74,.45);
+}
+
+.locations-benefits{
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+.locations-benefits li{
+  position: relative;
+  padding-left: 30px;
+  margin: 10px 0;
+  color: var(--color-text-secondary);
+}
+.locations-benefits li::before{
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  background: var(--color-primary-muted);
+  border: 1px solid rgba(139,207,74,.35);
+}
+
+.content-actions{
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.content-cta{
+  width: 100%;
+}
+.content-back{
+  display: inline-block;
+  color: var(--color-text-muted);
+}
+/* === END BLOCK: CONTENT PAGE COMPONENTS (reference pages) === */
 
 .modal-cta-button{
   display: inline-flex;
@@ -146,6 +254,7 @@ a:visited{ color: var(--color-primary); }
   box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
 /* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) === */
+
 
 /* === BEGIN BLOCK: GLOBAL HEADINGS TYPOGRAPHY ===
 Zweck: Überschriften ohne Serif-Anmutung.
@@ -1479,6 +1588,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
