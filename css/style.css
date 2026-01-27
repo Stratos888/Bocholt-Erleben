@@ -892,10 +892,9 @@ body.is-sheet-open .top-stack{
 
 /* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
 Zweck:
-- DetailPanel zieht komplett in die Header-DNA (hell, ruhig, hairline, soft shadow).
-- Close wirkt weniger “heavy” und passt zu Cards/Pills.
-- Meta-Box bleibt leicht grün (Header-orientiert), aber nicht “primary-laut”.
-- Typo/Abstände ruhiger & konsistent.
+- DetailPanel ist visuell konsistent zur Header-DNA (hell, ruhig, hairline, soft shadow).
+- Meta-Box bleibt leicht grün (header-orientiert), aber nicht “primary-laut”.
+- Vorbereitete Styles für klickbare Location im Panel (Link-Stati neutralisiert).
 Umfang: Komplettblock DetailPanel Styles (overlay/content/header/badges/meta/cta).
 === */
 
@@ -1012,7 +1011,7 @@ body.is-panel-open { overflow: hidden; }
   color: var(--color-text-primary);
 }
 
-/* Badges: ruhige UI-Pills (keine “visited”/Link-Semantik) */
+/* Badges: ruhige UI-Pills (Semantik: Info, nicht History-Link) */
 #event-detail-panel .detail-location,
 #event-detail-panel .detail-category{
   display: inline-flex;
@@ -1040,11 +1039,24 @@ body.is-panel-open { overflow: hidden; }
   color: rgba(31,41,51,0.78);
 }
 
+/* Vorbereitet für klickbare Location im Panel */
+#event-detail-panel .detail-location-link,
+#event-detail-panel .detail-location-link:link,
+#event-detail-panel .detail-location-link:visited{
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover){
+  #event-detail-panel .detail-location-link:hover{ text-decoration: none; }
+}
+
 #event-detail-panel .detail-meta{
   margin: 14px 0 12px;
   padding: 12px 14px;
 
-  /* leicht grün, header-orientiert (nicht “aktiv”) */
+  /* leicht grün, header-orientiert (Info-Surface, nicht “aktiv”) */
   background: rgba(139,207,74,0.08);
   border: 1px solid rgba(31,41,51,0.08);
   border-radius: 16px;
@@ -1102,6 +1114,9 @@ body.is-panel-open { overflow: hidden; }
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
+
+/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
+
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
 
@@ -1302,6 +1317,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
