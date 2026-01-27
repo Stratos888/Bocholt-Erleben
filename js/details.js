@@ -138,9 +138,12 @@ const DetailPanel = {
     }, ms);
   },
 
-   renderContent(event) {
+     renderContent(event) {
     /* === BEGIN BLOCK: DETAIL RENDER (canonical fields, defensive) ===
-    Zweck: Render-only. Nutzt kanonische Felder (title/date/time/location/beschreibung/kategorie/url).
+    Zweck:
+    - Top-App Zielzustand: keine Info-Pills im Panel.
+    - Datum/Uhrzeit als ruhige Textzeile (nicht klickbar, keine Box).
+    - Location als klare Action (klickbar): Homepage primär, Maps fallback.
     Umfang: Ersetzt renderContent(event) komplett.
     === */
     const e = event && typeof event === "object" ? event : {};
@@ -148,24 +151,51 @@ const DetailPanel = {
     const title = e.title || e.eventName || "";
     const date = e.date ? formatDate(e.date) : "";
     const time = e.time || "";
-    const location = e.location || "";
+    const locationRaw = (e.location || "").trim();
     const description = e.beschreibung || e.description || "";
-    const kategorie = e.kategorie || "";
+    const kategorie = (e.kategorie || "").trim();
     const url = e.url || "";
 
     const safeUrl = url ? String(url) : "";
     const isHttpUrl = /^https?:\/\//i.test(safeUrl);
 
+    // Secondary info line (text-only): date/time + category (no pills)
+    const dateTimeText = [date, time ? this.escape(time) : ""].filter(Boolean).join(" · ");
+    const sublineText = [dateTimeText, kategorie ? this.escape(kategorie) : ""].filter(Boolean).join(" · ");
+
+    // Location action (homepage primary, maps fallback)
+    let locationHref = "";
+    if (locationRaw) {
+      const homepage =
+        (window.Locations?.getHomepage && window.Locations.getHomepage(locationRaw)) || "";
+      locationHref =
+        homepage ||
+        (window.Locations?.getMapsFallback
+          ? window.Locations.getMapsFallback(locationRaw)
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationRaw)}`);
+    }
+
     this.content.innerHTML = `
       <div class="detail-header">
         <h2>${this.escape(title)}</h2>
-        ${location ? `<div class="detail-location">${this.escape(location)}</div>` : ""}
-        ${kategorie ? `<div class="detail-category">${this.escape(kategorie)}</div>` : ""}
-      </div>
 
-      <div class="detail-meta">
-        ${date ? `<div><strong>Datum:</strong> ${date}</div>` : ""}
-        ${time ? `<div><strong>Uhrzeit:</strong> ${this.escape(time)}</div>` : ""}
+        ${sublineText ? `
+          <div class="detail-subline">
+            ${sublineText}
+          </div>
+        ` : ""}
+
+        ${locationRaw && locationHref ? `
+          <a class="detail-location-action detail-location-link"
+             href="${this.escape(locationHref)}"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="Ort öffnen: ${this.escape(locationRaw)}">
+            <span class="detail-location-icon" aria-hidden="true">📍</span>
+            <span class="detail-location-text">${this.escape(locationRaw)}</span>
+            <span class="detail-location-chev" aria-hidden="true">›</span>
+          </a>
+        ` : ""}
       </div>
 
       ${description ? `
@@ -189,6 +219,7 @@ const DetailPanel = {
   },
 
 
+
   escape(text) {
     const div = document.createElement("div");
     div.textContent = String(text);
@@ -208,6 +239,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
