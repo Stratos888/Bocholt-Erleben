@@ -1244,7 +1244,6 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
   opacity: 0.85;
@@ -1252,7 +1251,11 @@ Umfang:
 
 #event-detail-panel .detail-location-text{
   min-width: 0;
-  flex: 1 1 auto;
+
+  /* Pfeil soll bei kurzen Namen direkt “am Text” sitzen.
+     Bei langen Namen: so viel wie möglich zeigen, aber immer 1 Zeile + Ellipsis. */
+  flex: 0 1 auto;
+  max-width: calc(100% - 44px);
 
   font-size: 14px;
   font-weight: 650;
@@ -1265,6 +1268,7 @@ Umfang:
 
 #event-detail-panel .detail-location-chev{
   flex: 0 0 auto;
+  margin-left: 8px;
   opacity: 0.65;
   font-size: 18px;
   line-height: 1;
@@ -1274,7 +1278,11 @@ Umfang:
   background: rgba(31,41,51,0.03);
   transform: translateY(1px);
 }
+
 #event-detail-panel .detail-location-action{
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
@@ -1332,13 +1340,16 @@ Umfang:
 === */
 /* === BEGIN BLOCK: DETAIL CTA – BORDERLESS ACTION SURFACE (premium, consistent) ===
 Zweck: "Zum Event" als hochwertige Action-Surface ohne sichtbaren Rahmen (kein billiger Button-Look),
-       Anti-Aliasing-Fix bleibt (clip-path hard clip).
+       Anti-Aliasing-Fix bleibt (clip-path hard clip). Pfeil sitzt näher am Text (klickbar erkennbar).
 Umfang: Nur #event-detail-panel .detail-link-btn inkl. ::after und :active.
 === */
 #event-detail-panel .detail-link-btn{
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+
+  /* Pfeil sitzt “am Text”, nicht am rechten Rand */
+  justify-content: flex-start;
+  gap: 10px;
 
   width: 100%;
   padding: 14px 14px;
@@ -1365,6 +1376,7 @@ Umfang: Nur #event-detail-panel .detail-link-btn inkl. ::after und :active.
   content: "›";
   font-size: 18px;
   opacity: 0.65;
+  margin-left: 2px;
 }
 
 /* === BEGIN PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP
@@ -1380,6 +1392,7 @@ Umfang: Nur #event-detail-panel .detail-link-btn:active
 }
 /* === END PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP === */
 /* === END BLOCK: DETAIL CTA – BORDERLESS ACTION SURFACE (premium, consistent) === */
+
 
 
 
@@ -1633,6 +1646,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
