@@ -124,6 +124,568 @@
       "description": "Offene Mitmach-Werkstatt am Samstognachmittag.",
       "kategorie": "Kinder",
       "url": "https://www.bocholt.de/veranstaltungskalender/super-samstag-im-textilwerk-bocholt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-03",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-03",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-05",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-05",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-06",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-06",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-07",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-07",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-10",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-10",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-12",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-12",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-13",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-13",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-14",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-14",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-17",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-17",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-19",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-19",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-20",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-20",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-21",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-21",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-24",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-24",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-26",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-26",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-27",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-27",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-02-28",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-02-28",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-03",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-03",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-05",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-05",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-06",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-06",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-07",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-07",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-10",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-10",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-12",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-12",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-13",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-13",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-14",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-14",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-17",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-17",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-19",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-19",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-20",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-20",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-21",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-21",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-24",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-24",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-26",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-26",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-27",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-27",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-28",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-28",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-03-31",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-03-31",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-02",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-02",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-03",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-03",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-04",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-04",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-07",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-07",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-09",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-09",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-10",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-10",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-11",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-11",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-14",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-14",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-16",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-16",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-17",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-17",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-18",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-18",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-21",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-21",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-23",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-23",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-24",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-24",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-25",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-25",
+      "time": "08:00â€“14:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-28",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-28",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "wochenmarkt-bocholt-2026-04-30",
+      "title": "Bocholter Wochenmarkt",
+      "date": "2026-04-30",
+      "time": "08:00â€“13:00",
+      "location": "Markt / Gasthausplatz (Innenstadt)",
+      "description": "Wochenmarkt mit regionalen HÃ¤ndlern (Obst/GemÃ¼se, Brot, KÃ¤se, Fisch u. a.).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "rosenmontagszug-bocholt-2026-02-16",
+      "title": "Rosenmontagszug",
+      "date": "2026-02-16",
+      "time": "14:00â€“17:00",
+      "location": "Innenstadt",
+      "description": "Karnevalsumzug durch die Innenstadt.",
+      "kategorie": "Highlights",
+      "url": "https://www.bocholt.de/rosenmontagszug"
+    },
+    {
+      "id": "markterschliessung-niederlande-2026-03-05",
+      "title": "MarkterschlieÃŸung Niederlande (kostenloser Workshop)",
+      "date": "2026-03-05",
+      "time": "09:00â€“12:00",
+      "location": "LernWerk Bocholt, IndustriestraÃŸe 1",
+      "description": "Kostenfreier Workshop fÃ¼r Unternehmen (Anmeldung erforderlich, PlÃ¤tze begrenzt).",
+      "kategorie": "Wirtschaft",
+      "url": "https://www.bocholt.de/veranstaltungskalender/markterschliessung-niederlande"
+    },
+    {
+      "id": "krammarkt-bocholt-2026-03-04",
+      "title": "Bocholter Krammarkt",
+      "date": "2026-03-04",
+      "time": "09:00â€“18:30",
+      "location": "Innenstadt",
+      "description": "GroÃŸer Krammarkt in der Innenstadt (Bummeln & StÃ¶bern).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "stoffmarkt-bocholt-2026-03-22",
+      "title": "Stoffmarkt Bocholt",
+      "date": "2026-03-22",
+      "time": "11:00â€“16:30",
+      "location": "Innenstadt",
+      "description": "Stoff- & NÃ¤hzubehÃ¶r-Markt in der Innenstadt.",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/freizeit-und-tourismus/veranstaltungen"
+    },
+    {
+      "id": "krammarkt-bocholt-2026-04-01",
+      "title": "Bocholter Krammarkt",
+      "date": "2026-04-01",
+      "time": "09:00â€“18:30",
+      "location": "Innenstadt",
+      "description": "GroÃŸer Krammarkt in der Innenstadt (Bummeln & StÃ¶bern).",
+      "kategorie": "Markt",
+      "url": "https://www.bocholt.de/markt"
+    },
+    {
+      "id": "bocholt-blueht-oldtimerfestival-2026-04-26",
+      "title": "Bocholt BlÃ¼ht mit groÃŸem Oldtimerfestival 2026",
+      "date": "2026-04-26",
+      "time": "13:00â€“18:00",
+      "location": "Innenstadt",
+      "description": "Verkaufsoffener Sonntag mit Oldtimer-Treffen, Aktionen und Musik in der City.",
+      "kategorie": "Highlights",
+      "url": "https://www.bocholt.de/veranstaltungskalender/bocholt-blueht-mit-grossem-oldtimerfestival-2026"
     }
+
   ]
 }
+
