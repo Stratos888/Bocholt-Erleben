@@ -1527,7 +1527,7 @@ Umfang: .app-header + Brand + Actions.
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 0px;
+  gap: 1px;
 
   width: auto;
   flex: 0 0 auto;
@@ -1646,6 +1646,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
