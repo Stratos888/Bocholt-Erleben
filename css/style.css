@@ -226,14 +226,14 @@ Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locatio
   color: var(--color-text-muted);
 }
 
-/* === BEGIN BLOCK: CONTENT LINKS (standardized navigation list inside cards) ===
-Zweck: Ruhige, appige Navigationsliste (keine CTA-Buttons).
+/* === BEGIN BLOCK: CONTENT LINKS (top-pwa navigation list, borderless) ===
+Zweck: Ruhige, hochwertige Navigationsliste ohne Button- oder Rahmen-Anmutung.
 Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
 === */
 .content-links{
   margin-top: 6px;
   display: grid;
-  gap: 6px;
+  gap: 2px;
 }
 
 .content-link{
@@ -241,11 +241,11 @@ Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
   align-items: center;
   justify-content: space-between;
 
-  padding: 10px 12px;
+  padding: 12px 8px;
   border-radius: 10px;
 
-  background: var(--color-surface);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: transparent;
+  border: none;
 
   color: var(--color-text-primary);
   font-weight: 600;
@@ -259,14 +259,14 @@ Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
 }
 
 .content-link:hover{
-  text-decoration: none;
   background: rgba(31,41,51,0.04);
+  text-decoration: none;
 }
 
 .content-link:visited{
   color: var(--color-text-primary);
 }
-/* === END BLOCK: CONTENT LINKS (standardized navigation list inside cards) === */
+/* === END BLOCK: CONTENT LINKS (top-pwa navigation list, borderless) === */
 
 
 
@@ -1631,6 +1631,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
