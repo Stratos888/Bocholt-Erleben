@@ -1575,7 +1575,7 @@ Umfang: .app-header + Brand + Actions.
   content: "⬇︎";
   font-size: 14px;
   opacity: 0.95;
-  margin-right: 2px;
+  margin-right: 0px;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
@@ -1586,7 +1586,7 @@ Umfang: .app-header + Brand + Actions.
   content: "＋";
   font-size: 14px;
   opacity: 0.95;
-  margin-right: 2px;
+  margin-right: 0px;
 }
 .header-right > a.pwa-install-button::after{
   content: "Event";
@@ -1646,6 +1646,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
