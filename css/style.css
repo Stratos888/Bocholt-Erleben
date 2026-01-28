@@ -1330,6 +1330,11 @@ Fix:
 Umfang:
 - Nur #event-detail-panel .detail-link-btn (keine Layout-/Design-Änderung beabsichtigt).
 === */
+/* === BEGIN BLOCK: DETAIL CTA – BORDERLESS ACTION SURFACE (premium, consistent) ===
+Zweck: "Zum Event" als hochwertige Action-Surface ohne sichtbaren Rahmen (kein billiger Button-Look),
+       Anti-Aliasing-Fix bleibt (clip-path hard clip).
+Umfang: Nur #event-detail-panel .detail-link-btn inkl. ::after und :active.
+=== */
 #event-detail-panel .detail-link-btn{
   display: flex;
   align-items: center;
@@ -1343,8 +1348,8 @@ Umfang:
   overflow: hidden;
   clip-path: inset(0 round 18px);
 
-  background: #FFFFFF;
-  border: 1px solid rgba(31,41,51,0.10);
+  background: var(--color-surface);
+  border: 0;
 
   color: rgba(31,41,51,0.92);
   font-weight: 700;
@@ -1355,11 +1360,6 @@ Umfang:
 
   -webkit-tap-highlight-color: transparent;
 }
-/* === END PATCH: DETAIL CTA – HARD CLIP TO PREVENT CORNER AA BLEED (PROOF-BASED) === */
-
-/* === END PATCH: DETAIL CTA – SHADOW VIA DROP-SHADOW (ROOTCAUSE PROVEN) === */
-
-
 
 #event-detail-panel .detail-link-btn::after{
   content: "›";
@@ -1368,17 +1368,19 @@ Umfang:
 }
 
 /* === BEGIN PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP
-Zweck: Verhindert, dass der Effekt im :active State zurückkommt.
+Zweck: Ruhiger Active-State ohne Rahmen, Hard-Clip bleibt aktiv.
 Umfang: Nur #event-detail-panel .detail-link-btn:active
 === */
 #event-detail-panel .detail-link-btn:active{
-  background: var(--color-primary-muted);
+  background: rgba(31,41,51,0.04);
   transform: translateY(1px);
   box-shadow: 0 1px 0 rgba(255,255,255,0.78) inset;
   filter: drop-shadow(0 8px 18px rgba(0,0,0,0.07));
   clip-path: inset(0 round 18px);
 }
 /* === END PATCH: DETAIL CTA – ACTIVE STATE KEEP HARD CLIP === */
+/* === END BLOCK: DETAIL CTA – BORDERLESS ACTION SURFACE (premium, consistent) === */
+
 
 
 
@@ -1631,6 +1633,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
