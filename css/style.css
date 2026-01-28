@@ -236,11 +236,17 @@ Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
   gap: 2px;
 }
 
+/* === BEGIN BLOCK: CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) ===
+Zweck: Pfeil sitzt direkt am Text (klar klickbar), nicht am rechten Rand.
+Umfang: Alle .content-link Navigationseinträge.
+=== */
 .content-link{
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 6px;
 
+  width: 100%;
   padding: 12px 8px;
   border-radius: 10px;
 
@@ -256,7 +262,10 @@ Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
   content: "›";
   color: var(--color-text-muted);
   font-weight: 700;
+  transform: translateY(1px);
 }
+/* === END BLOCK: CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) === */
+
 
 .content-link:hover{
   background: rgba(31,41,51,0.04);
@@ -1646,6 +1655,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
