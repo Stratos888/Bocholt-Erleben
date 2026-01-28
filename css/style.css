@@ -226,14 +226,14 @@ Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locatio
   color: var(--color-text-muted);
 }
 
-/* === BEGIN BLOCK: CONTENT LINKS (standardized “mini menu” inside cards) ===
-Zweck: Links unter "Mehr Infos" wie ruhige, appige Link-Liste (kein Fließtext).
-Umfang: .content-links + .content-link (nur dort wirksam).
+/* === BEGIN BLOCK: CONTENT LINKS (standardized navigation list inside cards) ===
+Zweck: Ruhige, appige Navigationsliste (keine CTA-Buttons).
+Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
 === */
 .content-links{
-  margin-top: 8px;
+  margin-top: 6px;
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .content-link{
@@ -241,33 +241,33 @@ Umfang: .content-links + .content-link (nur dort wirksam).
   align-items: center;
   justify-content: space-between;
 
-  padding: 12px 12px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
 
-  background: var(--color-primary-muted);
-  border: 1px solid rgba(139,207,74,.35);
+  background: var(--color-surface);
+  border: 1px solid rgba(31,41,51,0.08);
 
   color: var(--color-text-primary);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
 .content-link::after{
   content: "›";
   color: var(--color-text-muted);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .content-link:hover{
   text-decoration: none;
-  filter: brightness(0.99);
+  background: rgba(31,41,51,0.04);
 }
 
 .content-link:visited{
   color: var(--color-text-primary);
 }
-/* === END BLOCK: CONTENT LINKS (standardized “mini menu” inside cards) === */
-/* === END BLOCK: CONTENT PAGE COMPONENTS (reference pages) === */
+/* === END BLOCK: CONTENT LINKS (standardized navigation list inside cards) === */
+
 
 
 .modal-cta-button{
@@ -1631,6 +1631,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
