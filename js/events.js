@@ -173,118 +173,89 @@ const EventCards = (() => {
     return container;
   }
 
-  function createCard(event) {
+    function createCard(event) {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
 
-    // A11y/UX: Card ist interaktiv
+    // A11y/UX
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Event anzeigen: ${event?.title || ""}`);
 
+    /* === BEGIN BLOCK: EVENT CITY RESOLUTION ===
+    Zweck: Stellt sicher, dass jedes Event eine Stadt hat.
+    Reihenfolge:
+    1) event.city (explizit)
+    2) aus event.location ableiten
+    3) Fallback: "Bocholt"
+    Umfang: Lokal in createCard, kein globaler State.
+    === */
+    const resolveCity = (ev) => {
+      if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
+
+      const loc = String(ev?.location || "").toLowerCase();
+
+      if (loc.includes("rhede")) return "Rhede";
+      if (loc.includes("isselburg")) return "Isselburg";
+      if (loc.includes("borken")) return "Borken";
+      if (loc.includes("bocholt")) return "Bocholt";
+
+      return "Bocholt";
+    };
+    const city = resolveCity(event);
+    /* === END BLOCK: EVENT CITY RESOLUTION === */
+
     const dateLabel = event?.date ? formatDate(event.date) : "";
     const timeLabel = event?.time ? ` · ${escapeHtml(event.time)}` : "";
+
+    /* === BEGIN BLOCK: EVENT META LINE (city + date + time) ===
+    Zweck: Meta-Zeile integriert die Stadt als Kontextinformation.
+    Umfang: Ersetzt die bisherige Meta-Zeile.
+    === */
+    const meta = document.createElement("div");
+    meta.className = "event-meta";
+    meta.innerHTML = `${escapeHtml(city)} · ${dateLabel}${timeLabel}`;
+    /* === END BLOCK: EVENT META LINE (city + date + time) === */
 
     // Title
     const h3 = document.createElement("h3");
     h3.className = "event-title";
     h3.innerHTML = escapeHtml(event?.title || "Event");
 
-    // Meta (date/time)
-    const meta = document.createElement("div");
-    meta.className = "event-meta";
-    meta.innerHTML = `${dateLabel}${timeLabel}`;
-
-    // Location (link -> Google Maps Suche)
+    // Location (ruhig, sekundär)
     const location = document.createElement("div");
     location.className = "event-location";
 
     const loc = (event?.location || "").trim();
     if (loc) {
-     const a = document.createElement("a");
-a.className = "event-location-link";
-/* === BEGIN BLOCK: LOCATION LINK (homepage primary, maps fallback) ===
-Zweck: Location wird in der Card als reine Info (Text) angezeigt, nicht klickbar (Pill-Semantik entfernt).
-Umfang: Ersetzt ausschließlich das Rendering der Location innerhalb der Card.
-=== */
-const span = document.createElement("div");
-span.className = "event-location-text";
-span.textContent = loc;
-location.appendChild(span);
-/* === END BLOCK: LOCATION LINK (homepage primary, maps fallback) === */
-
-
-
+      const span = document.createElement("div");
+      span.className = "event-location-text";
+      span.textContent = loc;
+      location.appendChild(span);
     }
 
-/* === BEGIN BLOCK: EVENTCARD APPEND CONTENT (title/meta/location + category icon) ===
-Zweck: Fügt Kategorie-Icon (ohne Text) in jede Eventcard ein.
-Umfang: Ersetzt ausschließlich das Anhängen von Title/Meta/Location und ergänzt Icon-Append.
-=== */
-card.appendChild(h3);
-card.appendChild(meta);
-card.appendChild(location);
+    /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT === */
+    card.appendChild(h3);
+    card.appendChild(meta);
+    card.appendChild(location);
+    /* === END BLOCK: EVENTCARD APPEND CONTENT === */
 
-/* Kategorie-Icon (ohne Text) */
-const cat = (event?.kategorie || "").trim();
-if (cat) {
-  const icon = document.createElement("span");
-  icon.className = "event-category-icon";
-  icon.setAttribute("role", "img");
-  icon.setAttribute("aria-label", `Kategorie: ${cat}`);
-
-  /* Minimal robust: Emoji-Mapping */
-  const iconMap = {
-    Party: "🎉",
-    Kneipe: "🍺",
-    Kinder: "🧒",
-    Quiz: "❓",
-    Musik: "🎵",
-    Kultur: "🎭"
-  };
-  icon.textContent = iconMap[cat] || "🗓️";
-
-  card.appendChild(icon);
-}
-/* === END BLOCK: EVENTCARD APPEND CONTENT (title/meta/location + category icon) === */
-
-
-/* === BEGIN BLOCK: EVENTCARD CLICK HANDLER (open detail) ===
-Zweck: Klick auf die Card öffnet das DetailPanel deterministisch.
-Umfang: Card ist vollflächig klickbar (Location in Card ist nur Text, kein Sonderfall nötig).
-=== */
-card.addEventListener("click", () => {
-  if (window.DetailPanel?.show) window.DetailPanel.show(event);
-});
-/* === END BLOCK: EVENTCARD CLICK HANDLER (open detail) === */
-
-
-
-   // Keyboard: Enter/Space
-card.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  if (e.target.closest(".event-location-link")) return;
-  e.preventDefault();
-
-    /* === BEGIN BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) ===
-  Zweck: Öffnet DetailPanel auch per Keyboard deterministisch über window.DetailPanel.
-  Umfang: Card ist vollflächig aktivierbar (Location in Card ist nur Text).
-  === */
-  if (window.DetailPanel?.show) {
-    window.DetailPanel.show(event);
-  } else {
-    console.error("❌ DetailPanel.show not available on window.DetailPanel (kbd)", {
-      hasWindowDetailPanel: typeof window.DetailPanel !== "undefined",
-      typeOfShow: typeof window.DetailPanel?.show
+    /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER === */
+    card.addEventListener("click", () => {
+      if (window.DetailPanel?.show) window.DetailPanel.show(event);
     });
-  }
-  /* === END BLOCK: EVENTCARD OPEN DETAILS (kbd -> window.DetailPanel) === */
+    /* === END BLOCK: EVENTCARD CLICK HANDLER === */
 
-});
-
+    // Keyboard: Enter/Space
+    card.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      if (window.DetailPanel?.show) window.DetailPanel.show(event);
+    });
 
     return card;
   }
+
 
     /* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
   Zweck: Lange Listen ohne aktive Filter durch dynamische Zeit-Sektionen gliedern.
@@ -398,6 +369,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
