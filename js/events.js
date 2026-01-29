@@ -234,11 +234,42 @@ const EventCards = (() => {
       location.appendChild(span);
     }
 
-    /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT === */
+        /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT ===
+    Zweck:
+    - Kategorie-Icon auf Event Cards wieder anzeigen (oben rechts).
+    - Icon ist rein visuell, Card bleibt komplett klickbar.
+    Umfang:
+    - Erzeugt optional .event-category-icon und hängt sie an die Card.
+    - Danach wie gehabt Title/Meta/Location.
+    === */
+
+    // Kategorie-Icon (ohne Text) – passend zu style.css (.event-category-icon)
+    const kategorieRaw = (event?.kategorie || "").trim();
+    const iconMap = {
+      Party: "🎉",
+      Kneipe: "🍺",
+      Kinder: "🧒",
+      Quiz: "❓",
+      Musik: "🎵",
+      Kultur: "🎭"
+    };
+    const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
+
+    if (categoryIcon) {
+      const icon = document.createElement("span");
+      icon.className = "event-category-icon";
+      icon.setAttribute("role", "img");
+      icon.setAttribute("aria-label", `Kategorie: ${kategorieRaw}`);
+      icon.textContent = categoryIcon;
+      card.appendChild(icon);
+    }
+
     card.appendChild(h3);
     card.appendChild(meta);
     card.appendChild(location);
+
     /* === END BLOCK: EVENTCARD APPEND CONTENT === */
+
 
     /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER === */
     card.addEventListener("click", () => {
@@ -369,6 +400,7 @@ const EventCards = (() => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
