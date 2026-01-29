@@ -264,11 +264,67 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         if (!searchable.includes(searchNeedle)) return false;
       }
 
-      // Kategorie Filter (Single)
+           /* === BEGIN BLOCK: CATEGORY FILTER (normalized, 100% coverage) ===
+      Zweck: Kategorie-Filter robust machen (Canonical-Mapping), damit kein Event “unsichtbar” wird,
+            auch wenn Event-Kategorien granular/uneinheitlich sind.
+      Umfang: Ersetzt nur die Single-Kategorie-Filterlogik in applyFilters().
+      === */
       if (catNeedle) {
-        const evCat = (event?.kategorie || "").trim();
-        if (evCat !== catNeedle) return false;
+        const normalizeCategory = (raw) => {
+          const s = String(raw || "").trim();
+          if (!s) return "";
+
+          const v = s.toLowerCase();
+
+          // Märkte & Feste
+          if (v.includes("markt") || v.includes("festival") || v.includes("parade") || v.includes("stadtfest") || v.includes("krammarkt")) {
+            return "Märkte & Feste";
+          }
+
+          // Kinder & Familie
+          if (v.includes("kinder") || v.includes("familie")) {
+            return "Kinder & Familie";
+          }
+
+          // Musik & Bühne
+          if (v.includes("musik") || v.includes("theater") || v.includes("bühne") || v.includes("kabarett") || v.includes("comedy")) {
+            return "Musik & Bühne";
+          }
+
+          // Kultur & Kunst
+          if (v.includes("kultur") || v.includes("kunst") || v.includes("ausstellung") || v.includes("führung") || v.includes("vortrag") || v.includes("film")) {
+            return "Kultur & Kunst";
+          }
+
+          // Sport & Bewegung
+          if (v.includes("sport") || v.includes("bewegung")) {
+            return "Sport & Bewegung";
+          }
+
+          // Natur & Draußen
+          if (v.includes("outdoor") || v.includes("draußen") || v.includes("freizeit") || v.includes("wand") || v.includes("natur")) {
+            return "Natur & Draußen";
+          }
+
+          // Innenstadt & Leben
+          if (v.includes("innenstadt") || v.includes("urban")) {
+            return "Innenstadt & Leben";
+          }
+
+          return "Sonstiges";
+        };
+
+        const evCatRaw = (event?.kategorie || "").trim();
+        const filterRaw = catNeedle;
+
+        const evCat = normalizeCategory(evCatRaw);
+        const filterCat = normalizeCategory(filterRaw) || filterRaw; // falls Filter bereits canonical ist
+
+        // Match, wenn canonical übereinstimmt ODER (für Abwärtskompatibilität) raw exakt passt
+        if (evCat !== filterCat && evCatRaw !== filterRaw) return false;
       }
+      /* === END BLOCK: CATEGORY FILTER (normalized, 100% coverage) === */
+
 
                  /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
       Zweck: Zeitfilter ohne Abhängigkeit von events.js-Helpern (kein parseISODateLocal/startOfToday/...).
