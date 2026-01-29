@@ -976,6 +976,14 @@ body.is-sheet-open .top-stack{
   max-height: calc(92vh - 86px);
 }
 
+/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
+Zweck:
+- Filter-Optionen als “List Cards”
+- Active-State + Hover + Focus
+- Disabled-State (0 Treffer) sichtbar, klar ausgegraut, nicht klickbar, ohne “Bug-Gefühl”
+Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Active/Hover/Focus/Hidden/Small-Screens.
+=== */
+
 /* Optionen: als “List Cards” statt billiger Textzeilen */
 .filter-sheet-option,
 .filter-option{
@@ -1012,6 +1020,25 @@ body.is-sheet-open .top-stack{
   margin-bottom: 0;
 }
 
+/* Disabled (0 Treffer): sichtbar, aber eindeutig inaktiv */
+.filter-sheet-option[disabled],
+.filter-option[disabled],
+.filter-sheet-option.is-disabled,
+.filter-option.is-disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Disabled soll nicht “hoverbar” wirken */
+@media (hover: hover){
+  .filter-sheet-option[disabled]:hover,
+  .filter-option[disabled]:hover,
+  .filter-sheet-option.is-disabled:hover,
+  .filter-option.is-disabled:hover{
+    background: rgba(31,41,51,0.03);
+  }
+}
+
 /* Active */
 .filter-sheet-option.is-active,
 .filter-option.is-active{
@@ -1025,6 +1052,21 @@ body.is-sheet-open .top-stack{
   color: rgba(31,41,51,0.82);
   font-weight: 950;
   margin-left: 12px;
+}
+
+/* Active soll nicht möglich sein, wenn disabled (Sicherheitsnetz) */
+.filter-sheet-option.is-active[disabled],
+.filter-option.is-active[disabled],
+.filter-sheet-option.is-active.is-disabled,
+.filter-option.is-active.is-disabled{
+  background: rgba(31,41,51,0.03);
+  border-color: rgba(31,41,51,0.08);
+}
+.filter-sheet-option.is-active[disabled]::after,
+.filter-option.is-active[disabled]::after,
+.filter-sheet-option.is-active.is-disabled::after,
+.filter-option.is-active.is-disabled::after{
+  content: "";
 }
 
 /* Hover */
@@ -1056,6 +1098,7 @@ body.is-sheet-open .top-stack{
 }
 
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
+
 
 
 /* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
@@ -1655,6 +1698,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
