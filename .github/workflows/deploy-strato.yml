@@ -22,12 +22,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # === BEGIN BLOCK: BUILD EVENTS (TSV -> JSON, fail-fast) ===
+      # Zweck:
+      # - events.tsv ist die einzige Quelle.
+      # - events.json wird in der Action generiert (kein lokales Script nötig).
+      # - Fail-Fast: Bei Fehlern KEIN Deploy.
+      # Umfang:
+      # - Führt scripts/build-events-from-tsv.py aus und erzeugt data/events.json
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build events.json from events.tsv
+        shell: bash
+        run: |
+          set -e
+          python scripts/build-events-from-tsv.py
+
+          echo "=== events.json (head) ==="
+          head -n 40 data/events.json || true
+      # === END BLOCK: BUILD EVENTS (TSV -> JSON, fail-fast) ===
+
       - name: Compute build version
         shell: bash
         run: |
           set -e
           BUILD_ID="$(git rev-parse --short=12 HEAD)"
           echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+
 
       - name: Prepare deploy folder
         shell: bash
