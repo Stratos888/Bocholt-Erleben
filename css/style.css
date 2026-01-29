@@ -1506,12 +1506,61 @@ Umfang: Nur #event-detail-panel .detail-link-btn:active
   pointer-events: none;
 }
 
+/* === BEGIN BLOCK: DETAIL PANEL – DESKTOP MODAL (CSS-only, mobile unchanged) ===
+Zweck:
+- Desktop: DetailPanel als zentriertes Modal (nicht Bottom-Sheet).
+- Mobile/PWA: unverändert (nur min-width Overrides).
+Umfang:
+- Nur #event-detail-panel DetailPanel Position/Animation + Handle ausblenden + Content-Scroll anpassen.
+=== */
+@media (min-width: 900px){
+  #event-detail-panel .detail-panel-content{
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+
+    width: min(620px, calc(100vw - 64px));
+    max-height: calc(100vh - 64px);
+
+    padding: 18px 18px 20px;
+
+    transform: translate(-50%, calc(-50% + 24px));
+    opacity: 0;
+    transition: transform 220ms ease, opacity 220ms ease;
+  }
+
+  #event-detail-panel.detail-panel.active .detail-panel-content{
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+
+  #event-detail-panel .detail-panel-content::before{
+    display: none; /* Handle auf Desktop ausblenden */
+  }
+
+  #event-detail-panel #detail-content{
+    padding-top: 18px; /* kein Handle/Close-Overlap nötig */
+    max-height: calc(100vh - 180px);
+  }
+}
+/* === END BLOCK: DETAIL PANEL – DESKTOP MODAL (CSS-only, mobile unchanged) === */
+
 /* Small screens */
 @media (max-width: 360px){
   #event-detail-panel .detail-panel-content{
     max-height: 85vh;
     padding: 14px 14px 16px;
   }
+  #event-detail-panel #detail-content{
+    padding-top: 38px;
+    max-height: calc(85vh - 16px);
+  }
+  #event-detail-panel .detail-header h2{
+    font-size: 18px;
+  }
+}
+
   #event-detail-panel #detail-content{
     padding-top: 38px;
     max-height: calc(85vh - 16px);
@@ -1731,6 +1780,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
