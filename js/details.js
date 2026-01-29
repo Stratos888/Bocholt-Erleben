@@ -139,10 +139,9 @@ const DetailPanel = {
   },
 
      renderContent(event) {
-       /* === BEGIN BLOCK: DETAIL RENDER (canonical fields, defensive) ===
+           /* === BEGIN BLOCK: DETAIL RENDER (canonical fields, defensive) ===
     Zweck:
     - Top-App Zielzustand: keine Info-Pills im Panel.
-    - Datum/Uhrzeit als ruhige Textzeile (nicht klickbar, keine Box).
     - Stadt + Datum/Uhrzeit als Meta-Zeile (wie Card): Stadt · Datum · Uhrzeit
     - Location als klare Action (klickbar): Homepage primär, Maps fallback.
     - Kategorie-Icon (ohne Text) im Header rechts oben.
@@ -151,7 +150,6 @@ const DetailPanel = {
     const e = event && typeof event === "object" ? event : {};
 
     const title = e.title || e.eventName || "";
-    const cityRaw = (e.city || "").trim();
     const date = e.date ? formatDate(e.date) : "";
     const time = e.time || "";
     const locationRaw = (e.location || "").trim();
@@ -162,9 +160,32 @@ const DetailPanel = {
     const safeUrl = url ? String(url) : "";
     const isHttpUrl = /^https?:\/\//i.test(safeUrl);
 
+    /* === BEGIN BLOCK: DETAIL CITY RESOLUTION ===
+    Zweck: Stadt im Detailpanel konsistent zu den Event Cards auflösen.
+    Reihenfolge:
+    1) event.city (falls vorhanden)
+    2) aus event.location ableiten
+    3) Fallback: "Bocholt"
+    Umfang: Lokal in renderContent.
+    === */
+    const resolveCity = (ev) => {
+      if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
+
+      const loc = String(ev?.location || "").toLowerCase();
+
+      if (loc.includes("rhede")) return "Rhede";
+      if (loc.includes("isselburg")) return "Isselburg";
+      if (loc.includes("borken")) return "Borken";
+      if (loc.includes("bocholt")) return "Bocholt";
+
+      return "Bocholt";
+    };
+    const city = resolveCity(e);
+    /* === END BLOCK: DETAIL CITY RESOLUTION === */
+
     // Meta line (text-only): city · date · time
     const dateTimeText = [date, time ? this.escape(time) : ""].filter(Boolean).join(" · ");
-    const sublineText = [cityRaw ? this.escape(cityRaw) : "", dateTimeText].filter(Boolean).join(" · ");
+    const sublineText = [city ? this.escape(city) : "", dateTimeText].filter(Boolean).join(" · ");
 
     // Kategorie-Icon (ohne Text)
     const iconMap = {
@@ -238,6 +259,7 @@ const DetailPanel = {
     /* === END BLOCK: DETAIL RENDER (canonical fields, defensive) === */
 
 
+
   },
 
 
@@ -261,6 +283,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
