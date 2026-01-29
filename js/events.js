@@ -286,6 +286,12 @@ card.addEventListener("keydown", (e) => {
     return card;
   }
 
+    /* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
+  Zweck: Lange Listen ohne aktive Filter durch dynamische Zeit-Sektionen gliedern.
+         Keine leeren Trenner: Überschrift nur, wenn es Events in der Sektion gibt.
+         Sektionen konsistent zu den Filter-Begriffen: Heute / Dieses Wochenende / Demnächst / Später.
+  Umfang: Ersetzt ausschließlich renderList(list).
+  === */
   function renderList(list) {
     const c = ensureContainer();
     if (!c) return;
@@ -300,10 +306,74 @@ card.addEventListener("keydown", (e) => {
       return;
     }
 
+    // --- helpers (lokal, self-contained) ---
+    const toLocalDay = (iso) => {
+      const dt = parseISODateLocal(iso);
+      if (!dt) return null;
+      const d = new Date(dt);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+
+    const addDaysLocal = (base, n) => {
+      const t = new Date(base);
+      t.setDate(t.getDate() + n);
+      t.setHours(0, 0, 0, 0);
+      return t;
+    };
+
+    const sectionLabel = {
+      today: "Heute",
+      weekend: "Dieses Wochenende",
+      soon: "Demnächst",
+      later: "Später"
+    };
+
+    const getSectionKey = (event) => {
+      const day = toLocalDay(event?.date);
+      if (!day) return "later";
+
+      const today = startOfToday();
+
+      // Heute
+      if (day.getTime() === today.getTime()) return "today";
+
+      // Dieses Wochenende (nächstes Sa+So)
+      const { start, end } = getNextWeekendRange(today);
+      if (day >= start && day <= end) return "weekend";
+
+      // Demnächst = nächste 14 Tage (inkl.)
+      const soonEnd = addDaysLocal(today, 14);
+      soonEnd.setHours(23, 59, 59, 999);
+      if (day >= today && day <= soonEnd) return "soon";
+
+      return "later";
+    };
+
+    const createSectionHeader = (key) => {
+      const h = document.createElement("div");
+      h.className = "events-section-title";
+      h.textContent = sectionLabel[key] || "Demnächst";
+      return h;
+    };
+
+    // --- render with dynamic headers (no empty sections) ---
     const frag = document.createDocumentFragment();
-    for (const ev of list) frag.appendChild(createCard(ev));
+    let lastSection = null;
+
+    for (const ev of list) {
+      const key = getSectionKey(ev);
+      if (key !== lastSection) {
+        frag.appendChild(createSectionHeader(key));
+        lastSection = key;
+      }
+      frag.appendChild(createCard(ev));
+    }
+
     c.appendChild(frag);
   }
+  /* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
+
 
   function normalizeEvents(events) {
     return (events || [])
@@ -328,6 +398,7 @@ card.addEventListener("keydown", (e) => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
