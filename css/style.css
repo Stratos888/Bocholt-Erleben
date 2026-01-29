@@ -73,12 +73,34 @@
 Zweck: Einheitliche System-Schrift für die gesamte App.
 Umfang: body Basis.
 === */
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
-  line-height: 1.55;
-  color: var(--color-text-primary);
-  background: var(--color-background);
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f4f6ef; /* Basis: mobile & desktop gleich */
+  color: #111827;
 }
+
+/* === BEGIN BLOCK: DESKTOP BACKDROP POLISH ===
+Zweck:
+- Desktop: Außenfläche minimal absetzen.
+- App-Frame bleibt hell und ruhig.
+- Mobile/PWA unverändert.
+Umfang:
+- Nur Hintergrundfarben via Media Query.
+=== */
+@media (min-width: 900px){
+  body{
+    background: #eef1e6; /* leicht dunkler als App-Fläche */
+  }
+
+  .top-stack,
+  .events-section{
+    background: #f7f9f2;
+    border-radius: 18px;
+  }
+}
+/* === END BLOCK: DESKTOP BACKDROP POLISH === */
+
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 
 /* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) ===
@@ -1780,6 +1802,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
