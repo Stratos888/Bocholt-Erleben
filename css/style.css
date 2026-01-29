@@ -572,12 +572,45 @@ footer {
   text-align: center;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/* === BEGIN BLOCK: RESPONSIVE (mobile unchanged + desktop frame) ===
+Zweck:
+- Mobile/PWA bleibt unverändert.
+- Desktop: zentrierter App-Frame + ruhiges Grid.
+Umfang:
+- Ergänzt nur Desktop-Overrides via Media Queries.
+=== */
+
+/* Mobile: bleibt wie bisher */
 @media (max-width: 768px) {
   .event-cards-grid { grid-template-columns: 1fr; }
 }
+
+/* Desktop: Frame zentrieren + Grid angenehmer skalieren */
+@media (min-width: 900px) {
+  .top-stack,
+  .events-section{
+    max-width: 1040px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .top-stack{
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .events-section{
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .event-cards-grid{
+    max-width: 1040px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+/* === END BLOCK: RESPONSIVE (mobile unchanged + desktop frame) === */
+
 
 /* ============================================
    FILTERS / SEARCH / TOP STACK (Top-App)
@@ -1698,6 +1731,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
