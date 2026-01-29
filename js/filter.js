@@ -140,12 +140,23 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
 
 
 
-    // Defaults (konsistent)
+      // BEGIN: FILTER_UI_REFS_STORE
+    // Zweck: UI-Referenzen persistent im Modul speichern, damit Facet-Counts/Disabled-States nach applyFilters() aktualisiert werden können.
+    // Umfang: Ersetzt nur den Default-Reset-Abschnitt und ergänzt UI-Refs.
+    // END: FILTER_UI_REFS_STORE
+    this._ui = {
+      searchInput,
+      timePill, timeValue, timeSheet,
+      catPill,  catValue,  catSheet,
+      resetPill
+    };
 
+    // Defaults (konsistent)
     this.filters.searchText = "";
     this.filters.location = "";
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
+
 
     // Sheet helper
     const openSheet = (sheetEl) => {
@@ -264,66 +275,23 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         if (!searchable.includes(searchNeedle)) return false;
       }
 
-           /* === BEGIN BLOCK: CATEGORY FILTER (normalized, 100% coverage) ===
-      Zweck: Kategorie-Filter robust machen (Canonical-Mapping), damit kein Event “unsichtbar” wird,
+               /* === BEGIN BLOCK: CATEGORY FILTER (normalized, canonical) ===
+      Zweck: Kategorie-Filter robust via Canonical-Mapping, damit keine Events “unsichtbar” werden,
             auch wenn Event-Kategorien granular/uneinheitlich sind.
       Umfang: Ersetzt nur die Single-Kategorie-Filterlogik in applyFilters().
       === */
       if (catNeedle) {
-        const normalizeCategory = (raw) => {
-          const s = String(raw || "").trim();
-          if (!s) return "";
-
-          const v = s.toLowerCase();
-
-          // Märkte & Feste
-          if (v.includes("markt") || v.includes("festival") || v.includes("parade") || v.includes("stadtfest") || v.includes("krammarkt")) {
-            return "Märkte & Feste";
-          }
-
-          // Kinder & Familie
-          if (v.includes("kinder") || v.includes("familie")) {
-            return "Kinder & Familie";
-          }
-
-          // Musik & Bühne
-          if (v.includes("musik") || v.includes("theater") || v.includes("bühne") || v.includes("kabarett") || v.includes("comedy")) {
-            return "Musik & Bühne";
-          }
-
-          // Kultur & Kunst
-          if (v.includes("kultur") || v.includes("kunst") || v.includes("ausstellung") || v.includes("führung") || v.includes("vortrag") || v.includes("film")) {
-            return "Kultur & Kunst";
-          }
-
-          // Sport & Bewegung
-          if (v.includes("sport") || v.includes("bewegung")) {
-            return "Sport & Bewegung";
-          }
-
-          // Natur & Draußen
-          if (v.includes("outdoor") || v.includes("draußen") || v.includes("freizeit") || v.includes("wand") || v.includes("natur")) {
-            return "Natur & Draußen";
-          }
-
-          // Innenstadt & Leben
-          if (v.includes("innenstadt") || v.includes("urban")) {
-            return "Innenstadt & Leben";
-          }
-
-          return "Sonstiges";
-        };
-
         const evCatRaw = (event?.kategorie || "").trim();
         const filterRaw = catNeedle;
 
-        const evCat = normalizeCategory(evCatRaw);
-        const filterCat = normalizeCategory(filterRaw) || filterRaw; // falls Filter bereits canonical ist
+        const evCat = this.normalizeCategory(evCatRaw);
+        const filterCat = this.normalizeCategory(filterRaw) || filterRaw; // falls Filter bereits canonical ist
 
-        // Match, wenn canonical übereinstimmt ODER (für Abwärtskompatibilität) raw exakt passt
+        // Match, wenn canonical übereinstimmt ODER (Fallback) raw exakt passt
         if (evCat !== filterCat && evCatRaw !== filterRaw) return false;
       }
-      /* === END BLOCK: CATEGORY FILTER (normalized, 100% coverage) === */
+      /* === END BLOCK: CATEGORY FILTER (normalized, canonical) === */
+
 
 
                  /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
@@ -416,13 +384,22 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
     // Reset-X/Labels immer aus State ableiten (nicht nur aus UI-Events),
     // damit Sichtbarkeit nur bei B/C/D aktiv ist – auch nach refresh()/initial apply.
-    this.updateFilterBarUI(
+       this.updateFilterBarUI(
       document.getElementById("filter-time-value"),
       document.getElementById("filter-category-value"),
       document.getElementById("filter-reset-pill")
     );
 
+    /* === BEGIN BLOCK: FACETS UPDATE (counts + disabled, time + category) ===
+    Zweck: Zeit- und Kategorieoptionen mit Counts versehen und 0-Treffer-Optionen disabled anzeigen.
+           Disabled bleibt sichtbar (transparente UX), aber verhindert Sackgassen.
+    Umfang: Wird nach jedem applyFilters() ausgeführt.
+    === */
+    this.updateFacetOptionStates();
+    /* === END BLOCK: FACETS UPDATE (counts + disabled, time + category) === */
+
     debugLog(`Filtered: ${this.filteredEvents.length} of ${(this.allEvents || []).length} events`);
+
   },
 // END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
 
@@ -448,16 +425,88 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     }
   },
 
-  /* === BEGIN BLOCK: FILTER UI HELPERS (active state + pill labels) ===
-  Zweck: UI-State sauber halten: aktive Option markieren, Pill-Labels updaten, Reset nur bei aktiven Filtern zeigen.
-  Umfang: setActiveOption() + updateFilterBarUI() als Methoden.
+  /* === BEGIN BLOCK: FILTER UI HELPERS + FACETS (canonical + counts + disabled) ===
+  Zweck:
+  - UI-State sauber halten: aktive Option markieren, Pill-Labels updaten, Reset nur bei aktiven Filtern zeigen.
+  - Canonical-Kategorien zentral definieren (Single Source of Truth).
+  - Facet-Counts anzeigen + 0-Treffer-Optionen disabled anzeigen (Zeit + Kategorie).
+  - Kategorien nach Count sortieren (Stufe B), ohne „Alle“ zu verschieben.
+  Umfang: Ersetzt setActiveOption() + updateFilterBarUI() und ergänzt normalizeCategory() + updateFacetOptionStates().
   === */
+
+  canonicalCategories: [
+    "Märkte & Feste",
+    "Kultur & Kunst",
+    "Musik & Bühne",
+    "Kinder & Familie",
+    "Sport & Bewegung",
+    "Natur & Draußen",
+    "Innenstadt & Leben",
+    "Sonstiges"
+  ],
+
+  normalizeCategory(raw) {
+    const s = String(raw || "").trim();
+    if (!s) return "";
+    const v = s.toLowerCase();
+
+    // Märkte & Feste
+    if (
+      v.includes("markt") ||
+      v.includes("festival") ||
+      v.includes("parade") ||
+      v.includes("stadtfest") ||
+      v.includes("krammarkt") ||
+      v.includes("karneval") ||
+      v.includes("umzug")
+    ) return "Märkte & Feste";
+
+    // Kinder & Familie
+    if (v.includes("kinder") || v.includes("familie")) return "Kinder & Familie";
+
+    // Musik & Bühne
+    if (
+      v.includes("musik") ||
+      v.includes("konzert") ||
+      v.includes("theater") ||
+      v.includes("bühne") ||
+      v.includes("kabarett") ||
+      v.includes("comedy")
+    ) return "Musik & Bühne";
+
+    // Kultur & Kunst
+    if (
+      v.includes("kultur") ||
+      v.includes("kunst") ||
+      v.includes("ausstellung") ||
+      v.includes("führung") ||
+      v.includes("vortrag") ||
+      v.includes("film")
+    ) return "Kultur & Kunst";
+
+    // Sport & Bewegung
+    if (v.includes("sport") || v.includes("bewegung") || v.includes("lauf") || v.includes("wandern")) {
+      return "Sport & Bewegung";
+    }
+
+    // Natur & Draußen
+    if (v.includes("outdoor") || v.includes("draußen") || v.includes("natur") || v.includes("freizeit")) {
+      return "Natur & Draußen";
+    }
+
+    // Innenstadt & Leben
+    if (v.includes("innenstadt") || v.includes("urban") || v.includes("city")) {
+      return "Innenstadt & Leben";
+    }
+
+    return "Sonstiges";
+  },
+
   setActiveOption(sheetEl, activeBtn) {
     if (!sheetEl) return;
     sheetEl.querySelectorAll(".filter-sheet-option").forEach((b) => b.classList.remove("is-active"));
-    if (activeBtn) activeBtn.classList.add("is-active");
+    if (activeBtn && !activeBtn.disabled) activeBtn.classList.add("is-active");
   },
-
 
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
     const timeMap = {
@@ -480,7 +529,202 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
     if (resetEl) resetEl.hidden = !hasActive;
   },
-  /* === END BLOCK: FILTER UI HELPERS (active state + pill labels) === */
+
+  updateFacetOptionStates() {
+    const ui = this._ui;
+    if (!ui?.timeSheet || !ui?.catSheet) return;
+
+    const timeKey = (this.filters.zeitraum || "all").trim();
+    const catNeedle = (this.filters.kategorie || "").trim();
+    const searchNeedle = (this.filters.searchText || "").trim().toLowerCase();
+
+    // --- Zeit-Helfer (identisch zur applyFilters Logik) ---
+    const toLocalDay = (s) => {
+      const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return null;
+      const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+      if (!y || !mo || !d) return null;
+      const dt = new Date(y, mo - 1, d);
+      dt.setHours(0, 0, 0, 0);
+      return dt;
+    };
+
+    const addDaysLocal = (base, n) => {
+      const t = new Date(base);
+      t.setDate(t.getDate() + n);
+      t.setHours(0, 0, 0, 0);
+      return t;
+    };
+
+    const nextWeekendRange = (base) => {
+      const b = new Date(base);
+      b.setHours(0, 0, 0, 0);
+      const dow = b.getDay(); // 0 So ... 6 Sa
+      const daysUntilSat = (6 - dow + 7) % 7;
+      const sat = addDaysLocal(b, daysUntilSat);
+      const sun = addDaysLocal(sat, 1);
+      const start = new Date(sat);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(sun);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    };
+
+    const matchesTimeKey = (event, key) => {
+      if (key === "all") return true;
+
+      const iso = (event?.date || event?.datum || "").trim();
+      const day = toLocalDay(iso);
+      if (!day) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const endToday = addDaysLocal(today, 1);
+
+      if (key === "today") return (day >= today && day < endToday);
+
+      if (key === "weekend") {
+        const { start, end } = nextWeekendRange(today);
+        return (day >= start && day <= end);
+      }
+
+      if (key === "soon") {
+        const soonEnd = addDaysLocal(today, 14);
+        soonEnd.setHours(23, 59, 59, 999);
+        return (day >= today && day <= soonEnd);
+      }
+
+      return true;
+    };
+
+    // --- Base-Listen: Für Zeit-Facets zählt Search + aktive Kategorie.
+    const baseForTime = (this.allEvents || []).filter((event) => {
+      if (searchNeedle) {
+        const title = (event?.eventName || event?.title || "").toLowerCase();
+        const desc = (event?.beschreibung || "").toLowerCase();
+        const loc = (event?.location || "").toLowerCase();
+        const searchable = `${title} ${desc} ${loc}`;
+        if (!searchable.includes(searchNeedle)) return false;
+      }
+      if (catNeedle) {
+        const evCatRaw = (event?.kategorie || "").trim();
+        const evCat = this.normalizeCategory(evCatRaw);
+        const filterCat = this.normalizeCategory(catNeedle) || catNeedle;
+        if (evCat !== filterCat && evCatRaw !== catNeedle) return false;
+      }
+      return true;
+    });
+
+    // --- Base-Listen: Für Kategorie-Facets zählt Search + aktiver Zeitfilter.
+    const baseForCat = (this.allEvents || []).filter((event) => {
+      if (searchNeedle) {
+        const title = (event?.eventName || event?.title || "").toLowerCase();
+        const desc = (event?.beschreibung || "").toLowerCase();
+        const loc = (event?.location || "").toLowerCase();
+        const searchable = `${title} ${desc} ${loc}`;
+        if (!searchable.includes(searchNeedle)) return false;
+      }
+      if (timeKey !== "all" && !matchesTimeKey(event, timeKey)) return false;
+      return true;
+    });
+
+    // --- Counts berechnen ---
+    const timeCounts = { all: baseForTime.length, today: 0, weekend: 0, soon: 0 };
+    for (const ev of baseForTime) {
+      if (matchesTimeKey(ev, "today")) timeCounts.today++;
+      if (matchesTimeKey(ev, "weekend")) timeCounts.weekend++;
+      if (matchesTimeKey(ev, "soon")) timeCounts.soon++;
+    }
+
+    const catCounts = {};
+    for (const c of this.canonicalCategories) catCounts[c] = 0;
+    for (const ev of baseForCat) {
+      const evCatRaw = (ev?.kategorie || "").trim();
+      const c = this.normalizeCategory(evCatRaw);
+      catCounts[c] = (catCounts[c] ?? 0) + 1;
+    }
+
+    // --- Auto-Healing: aktiver Filter darf nicht in 0 Ergebnissen „stecken bleiben“ ---
+    const activeTimeOk = (timeKey === "all") ? true : ((timeCounts[timeKey] ?? 0) > 0);
+    if (!activeTimeOk) {
+      this.filters.zeitraum = "all";
+      return this.applyFilters();
+    }
+
+    if (catNeedle) {
+      const canon = this.normalizeCategory(catNeedle) || catNeedle;
+      const activeCatOk = (catCounts[canon] ?? 0) > 0;
+      if (!activeCatOk) {
+        this.filters.kategorie = "";
+        return this.applyFilters();
+      }
+    }
+
+    // --- UI helper: Label + (count) + disabled ---
+    const setBtnState = (btn, enabled, count) => {
+      if (!btn) return;
+
+      if (!btn.hasAttribute("data-label")) {
+        const raw = (btn.textContent || "").trim();
+        btn.setAttribute("data-label", raw.replace(/\s*\(\d+\)\s*$/, ""));
+      }
+      const baseLabel = btn.getAttribute("data-label") || (btn.textContent || "").trim();
+      btn.textContent = `${baseLabel} (${count})`;
+
+      btn.disabled = !enabled;
+      btn.setAttribute("aria-disabled", (!enabled).toString());
+      btn.classList.toggle("is-disabled", !enabled);
+
+      if (!enabled) btn.classList.remove("is-active");
+    };
+
+    // Zeitbuttons (disabled sichtbar)
+    ui.timeSheet.querySelectorAll("[data-time]").forEach((btn) => {
+      const key = (btn.getAttribute("data-time") || "all").trim();
+      const cnt = timeCounts[key] ?? 0;
+      const enabled = (key === "all") ? true : cnt > 0;
+      setBtnState(btn, enabled, cnt);
+    });
+
+    // Kategoriebuttons (disabled sichtbar)
+    ui.catSheet.querySelectorAll("[data-category]").forEach((btn) => {
+      const raw = (btn.getAttribute("data-category") ?? "").trim();
+
+      // "Alle"
+      if (!raw) {
+        setBtnState(btn, true, baseForCat.length);
+        return;
+      }
+
+      const canon = this.normalizeCategory(raw) || raw;
+      const cnt = catCounts[canon] ?? 0;
+      setBtnState(btn, cnt > 0, cnt);
+    });
+
+    // Kategorie-Sortierung (Stufe B): nach Count absteigend, "Alle" bleibt oben
+    const catBody = ui.catSheet.querySelector(".filter-sheet__body");
+    if (catBody) {
+      const allBtn = catBody.querySelector('[data-category=""]');
+      const catBtns = Array.from(catBody.querySelectorAll('[data-category]'))
+        .filter((b) => (b.getAttribute("data-category") || "").trim().length > 0);
+
+      catBtns.sort((a, b) => {
+        const ac = this.normalizeCategory(a.getAttribute("data-category")) || a.getAttribute("data-category");
+        const bc = this.normalizeCategory(b.getAttribute("data-category")) || b.getAttribute("data-category");
+        const ca = catCounts[ac] ?? 0;
+        const cb = catCounts[bc] ?? 0;
+        if (cb !== ca) return cb - ca;
+        return (this.canonicalCategories.indexOf(ac) - this.canonicalCategories.indexOf(bc));
+      });
+
+      if (allBtn) catBody.appendChild(allBtn);
+      for (const b of catBtns) catBody.appendChild(b);
+    }
+  },
+
+  /* === END BLOCK: FILTER UI HELPERS + FACETS (canonical + counts + disabled) === */
+
 
   /**
    * Extern: Search Text setzen (optional nutzbar)
