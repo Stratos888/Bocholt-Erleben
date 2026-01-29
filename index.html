@@ -135,26 +135,33 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
   </div>
 
-  <!-- Kategorie Sheet (Single) -->
-  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
-    <div class="filter-sheet__overlay" data-close-sheet></div>
-    <div class="filter-sheet__card">
-      <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Kategorie</div>
-        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
-      </div>
-      <div class="filter-sheet__body">
-        <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
-        <button type="button" class="filter-sheet-option" data-category="Party">Party</button>
-        <button type="button" class="filter-sheet-option" data-category="Kneipe">Kneipe</button>
-        <button type="button" class="filter-sheet-option" data-category="Kinder">Kinder</button>
-        <button type="button" class="filter-sheet-option" data-category="Quiz">Quiz</button>
-        <button type="button" class="filter-sheet-option" data-category="Musik">Musik</button>
-        <button type="button" class="filter-sheet-option" data-category="Kultur">Kultur</button>
-      </div>
+<!-- === BEGIN BLOCK: FILTER SHEET CATEGORY OPTIONS (canonical categories) ===
+Zweck: Kategorie-Optionen auf Canonical-Kategorien umstellen, passend zum normalisierten Filter in js/filter.js.
+Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + Optionen).
+=== -->
+<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
+  <div class="filter-sheet__overlay" data-close-sheet></div>
+  <div class="filter-sheet__card">
+    <div class="filter-sheet__header">
+      <div class="filter-sheet__title">Kategorie</div>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+    </div>
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+
+      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
+      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
+      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
+      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
+      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
+      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
+      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
+      <button type="button" class="filter-sheet-option" data-category="Sonstiges">Sonstiges</button>
     </div>
   </div>
-  <!-- === END BLOCK: FILTER PILLS (Top-App level, category single, location later) === -->
+</div>
+<!-- === END BLOCK: FILTER SHEET CATEGORY OPTIONS (canonical categories) === -->
+
 
 </div>
 
@@ -292,6 +299,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
