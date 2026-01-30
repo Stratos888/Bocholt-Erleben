@@ -111,9 +111,35 @@ function parseTimeToMinutes(timeStr) {
   return hh * 60 + mm;
 }
 
+/* === BEGIN BLOCK: RANGE-AWARE SORT (laufende Events oben halten) ===
+Zweck:
+- Events mit endDate gelten während der Laufzeit als "heute"
+- dadurch bleiben sie sichtbar/oben
+Umfang:
+- ersetzt alte sortByDateAsc komplett
+=== */
+
+function getEffectiveDate(event) {
+  const start = parseISODateLocal(event?.date);
+  const end = parseISODateLocal(event?.endDate);
+
+  if (!start) return null;
+
+  if (!end) return start;
+
+  const today = startOfToday();
+
+  if (today >= start && today <= end) {
+    return today; // läuft gerade → wie heute behandeln
+  }
+
+  return start;
+}
+
 function sortByDateAsc(a, b) {
-  const da = parseISODateLocal(a?.date);
-  const db = parseISODateLocal(b?.date);
+  const da = getEffectiveDate(a);
+  const db = getEffectiveDate(b);
+
   if (!da && !db) return 0;
   if (!da) return 1;
   if (!db) return -1;
@@ -121,16 +147,17 @@ function sortByDateAsc(a, b) {
   const diff = da - db;
   if (diff !== 0) return diff;
 
-  // Same day: sort by time if present
   const ta = parseTimeToMinutes(a?.time);
   const tb = parseTimeToMinutes(b?.time);
 
   if (ta == null && tb == null) return 0;
-  if (ta == null) return 1; // events without time go after timed ones
+  if (ta == null) return 1;
   if (tb == null) return -1;
 
   return ta - tb;
 }
+/* === END BLOCK: RANGE-AWARE SORT (laufende Events oben halten) === */
+
 /* === END BLOCK: SORT (date + time) === */
 
 /* ---------- Event Cards ---------- */
@@ -205,7 +232,19 @@ const EventCards = (() => {
     const city = resolveCity(event);
     /* === END BLOCK: EVENT CITY RESOLUTION === */
 
-    const dateLabel = event?.date ? formatDate(event.date) : "";
+   /* === BEGIN BLOCK: RANGE DATE LABEL ===
+Zweck:
+- Mehrtägige Events als Zeitraum anzeigen (20.11 – 10.01)
+=== */
+let dateLabel = "";
+
+if (event?.date && event?.endDate && event.endDate !== event.date) {
+  dateLabel = `${formatDate(event.date)} – ${formatDate(event.endDate)}`;
+} else if (event?.date) {
+  dateLabel = formatDate(event.date);
+}
+/* === END BLOCK: RANGE DATE LABEL === */
+
     const timeLabel = event?.time ? ` · ${escapeHtml(event.time)}` : "";
 
     /* === BEGIN BLOCK: EVENT META LINE (city + date + time) ===
@@ -332,7 +371,10 @@ const EventCards = (() => {
     };
 
     const getSectionKey = (event) => {
-      const day = toLocalDay(event?.date);
+      const day = toLocalDay(
+  (event?.endDate && getEffectiveDate(event)?.toISOString().slice(0,10)) || event?.date
+);
+
       if (!day) return "later";
 
       const today = startOfToday();
@@ -400,6 +442,7 @@ const EventCards = (() => {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
