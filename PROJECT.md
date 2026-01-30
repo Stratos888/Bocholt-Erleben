@@ -2,6 +2,7 @@
 
 > **Wichtig:** Dieses Dokument ist die maßgebliche Referenz für Folgechats.
 > Alles hier gilt als **verbindlich entschieden**. Änderungen nur nach Proof.
+> Dieses Dokument ist **KI-optimiert**: Regeln, Architektur, Prozess – keine Diskussionen.
 
 ---
 
@@ -20,9 +21,10 @@
 ## 2. Arbeitsprinzipien (oberste Priorität)
 
 1. **Niemals raten**
-2. „100% sicher“ nur mit **reproduzierbarem Proof** (DevTools/Logs/konkrete Stellen im Code)
+2. „100% sicher“ nur mit **reproduzierbarem Proof** (DevTools/Logs/Code)
 3. Wenn etwas unklar ist → **erst klären, dann patchen**
 4. Lieber kein Patch als ein falscher
+5. **Datenpipeline vor UI debuggen (NEU, verbindlich)**
 
 ---
 
@@ -38,184 +40,192 @@
   Immer nur **eine Datei pro Schritt** bearbeiten.
 
 - **Codeblock-Markierungen verpflichtend**  
-  Bei Einfügen/Ersetzen: am Anfang + Ende eindeutige `BEGIN/END`-Markierungen mit **Zweck & Umfang**.
+  Bei Einfügen/Ersetzen: `BEGIN/END`-Markierungen mit Zweck & Umfang.
 
-- **UI-Polish-Patches: CSS-only**  
-  Wenn es „nur schöner“ werden soll: ausschließlich CSS.
+- **UI-Polish-Patches: CSS-only**
 
 - **Bugfix-Oberregel**  
   Kein „Fix ist safe“ ohne Root-Cause-Nachweis.
 
----
-
-## 4. Architektur-Entscheidungen (fest)
-
-### 4.1 Overlays / Fixed/Sticky
-- Alle Overlays (Bottom-Sheets, Modals, DetailPanel) gehören in einen **Overlay-Root direkt unter `<body>`**
-- Nie innerhalb von sticky/transform/backdrop-filter Containern rendern
-
-### 4.2 Deploy / Cache / Fail-Fast
-- Deploy-Pipeline soll **hart fehlschlagen (Fail-Fast)**, wenn Asset-Links in HTML inkonsistent/kaputt sind
-- Cache-Busting via `?v=BUILD_ID` (aus Commit-SHA)
-- Versionfile liegt unter `/meta/build.txt` (TXT statt JSON, weil STRATO .json teilweise blockt)
+- **Spekulative Fixes verboten (NEU)**  
+  Kein „probier mal“, kein mehrfaches Herumdoktern.
 
 ---
 
-## 5. Repo-Struktur (relevant)
-- `data/events.tsv` = **Single Source of Truth**
-- `data/events.json` = wird erzeugt (nicht manuell bearbeiten)
-- `scripts/build-events-from-tsv.py` = TSV → JSON Build
-- `.github/workflows/deploy-strato.yml` = Build + Guard + Deploy (SFTP/STRATO)
-- `js/filter.js` = Filterlogik (Zeit/Kategorie/Suche)
-- `js/events.js` = Event Cards Rendering (Anzeige)
-- `js/details.js` = DetailPanel Rendering (Anzeige)
-- `css/style.css` = UI/Polish (CSS-only für Designpatches)
-- `index.html` = Script-Reihenfolge + Cache-Busting Links
+# 🆕 4. Debug- & Diagnose-Regeln (aus Lessons Learned – verbindlich)
+
+## 4.1 Feste Debug-Reihenfolge bei Event-Problemen
+
+IMMER:
+
+1️⃣ `data/events.tsv` prüfen  
+2️⃣ `data/events.json` prüfen  
+3️⃣ `scripts/build-events-from-tsv.py` prüfen  
+4️⃣ erst dann Frontend (`events.js`, `details.js`)
+
+❌ Niemals direkt UI patchen, wenn Daten evtl. fehlen
 
 ---
 
-## 6. Events – Datenmodell (verbindlich)
+## 4.2 Runtime-Truth (wichtig)
 
-### 6.1 Single Source of Truth
-- **`data/events.tsv`** ist die einzige Quelle
-- **`data/events.json`** wird automatisch generiert (Actions)
-- JSON wird **niemals** manuell bearbeitet
+Zur Laufzeit gilt ausschließlich:
 
-### 6.2 TSV-Spalten (aktueller Stand)
+👉 **events.json ist die Wahrheit**
+
+Nicht:
+- TSV
+- Editor
+- Annahmen
+
+Wenn ein Event in `events.json` fehlt → Frontend ist automatisch unschuldig.
+
+---
+
+## 4.3 Build-Status-Regel (NEU, hart)
+
+Wenn GitHub Actions **rot**:
+- kein Frontend-Debugging erlaubt
+- erst Builder/Script reparieren
+
+---
+
+## 4.4 TSV/CSV Transportregel (NEU)
+
+Strukturierte Tab-Dateien dürfen **niemals im Chat kopiert werden**.
+
+Grund:
+- Tabs werden zu Spaces
+- Parser bricht
+- Spalten verschieben sich
+
+Erlaubt:
+- Datei hochladen
+- Builder fixen
+- Diff-Patches
+
+Verboten:
+- komplette TSV hier posten
+- „copy/paste Rekonstruktionen“
+
+---
+
+## 4.5 Root-Cause Pflichtprozess (NEU)
+
+Vor jedem Patch:
+
+Beweis liefern:
+- console.log(...)
+- events.json prüfen
+- konkrete Codezeile
+
+Ohne Proof → kein Patch.
+
+---
+
+## 5. Architektur-Entscheidungen (fest)
+
+### 5.1 Overlays / Fixed/Sticky
+- Alle Overlays in Overlay-Root unter `<body>`
+- Nie innerhalb sticky/transform/backdrop-filter
+
+### 5.2 Deploy / Cache / Fail-Fast
+- Deploy schlägt hart fehl bei Asset-Inkonsistenzen
+- Cache-Busting via `?v=BUILD_ID`
+- Versionfile `/meta/build.txt`
+
+---
+
+## 6. Repo-Struktur (relevant)
+
+- `data/events.tsv` = Single Source of Truth (Editor)
+- `data/events.json` = **Runtime Source of Truth**
+- `scripts/build-events-from-tsv.py` = einzig erlaubter Konverter
+- JSON wird niemals manuell editiert
+
+Frontend:
+- `events.js` = Cards
+- `details.js` = DetailPanel
+- `filter.js` = Filter
+- `style.css` = UI-only
+
+---
+
+## 7. Events – Datenmodell (verbindlich)
+
 Pflicht:
-- `id` (slug-like, lowercase, `a–z0–9-`)
-- `title`
-- `date` (YYYY-MM-DD)
-- `time` (kann leer sein)
-- `city` (z. B. Bocholt, Rhede, Isselburg …)
-- `location`
-- `kategorie`
-- `url`
-- `description`
+- id
+- title
+- date
+- time
+- city
+- location
+- kategorie
+- url
+- description
 
-Optional (neu):
-- `endDate` (YYYY-MM-DD) – für **Mehrtage-/Laufzeit-Events**
-
-Wichtig:
-- Zwischen allen Feldern stehen **Tabulatoren**, keine Spaces
-- `endDate` ist optional und darf leer bleiben
-
-### 6.3 Range-Events (Mehrtage/Laufzeit) – Produktregel
-- Alles mit Start+Ende bleibt ein **Event** (keine Duplikate pro Tag)
-- Card/Detail sollen Zeitraum anzeigen (z. B. `20.11 – 10.01`)
-- Während der Laufzeit sollen Events sichtbar bleiben (nicht „im Startmonat verschwinden“)
+Optional:
+- **endDate** (Mehrtage/Laufzeit)
 
 ---
 
-## 7. Event-Radius (festgelegt)
-- Standardradius: **20 km um Bocholt**
-- Keine harte Stadtgrenze
-- Vorbereitung für spätere Standort/Radiussuche
+## 8. Range-Events (finale Produktregel)
 
----
-
-## 8. Kategorien & Filter (verbindlich)
-
-### 8.1 Kategorie-Filter (UI)
-- Alle
-- Märkte & Feste
-- Kultur & Kunst
-- Musik & Bühne
-- Kinder & Familie
-- Sport & Bewegung
-- Natur & Draußen
-- Innenstadt & Leben
-- Sonstiges
-
-### 8.2 Disabled-Optionen
-- Optionen ohne Treffer bleiben sichtbar, aber **disabled** (ausgegraut)
-
-### 8.3 Zeit-Filter (UX)
-- Alle
-- Heute
-- Wochenende (nächstes Sa+So, robust)
-- Demnächst (14 Tage)
+- EIN Event mit `date + endDate`
+- keine Tagesduplikate
+- Anzeige:
+  - Card: 20.11 – 10.01
+  - Detail: gleicher Zeitraum
+- während Laufzeit sichtbar
 
 ---
 
 ## 9. Darstellung (Eventliste, Cards, Detail)
 
-### 9.1 Eventliste
-- Sortierung: Datum ↑, Uhrzeit ↑
-- Dynamische Sections: Heute / Dieses Wochenende / Demnächst / Später
-- Keine leeren Trenner
-
-### 9.2 Event Card
-- Meta-Zeile: `Stadt · Datum · Uhrzeit`
-- Location-Zeile bleibt auf der Card
-- Kategorie-Icon oben rechts ist rein visuell
-- Ziel: Card bleibt clean, Details im Panel
-
-### 9.3 DetailPanel
-- DetailPanel zeigt Beschreibung, Link etc.
-- **Offen / als Nächstes wichtig**:
-  - Range-Date Anzeige (Start–Ende) + ggf. „läuft aktuell“
-  - Ort/Location sauber als Action-Zeile (Homepage/Maps-Fallback)
-  - Stadt/Ort-Kontext im Panel konsistent zur Card
+(unverändert – bestehende Regeln bleiben)
 
 ---
 
-## 10. Content-Erweiterung: „Angebote“ (Konzept, noch nicht implementiert)
-
-Ziel:
-- Dauerhafte Angebote/Orte (Museen, Ponyhof, Indoor/Outdoor) als zusätzlicher Content
-- **Nicht** über Bezahlung visuell bevorzugen (Fairness-Versprechen bleibt)
-
-Grundregel:
-- „Angebote“ = dauerhaft/immer verfügbar
-- „Events“ = zeitlich (auch Laufzeit-Events mit `endDate` bleiben Events)
-
-Monetarisierung (später, optional):
-- Keine visuelle Priorisierung durch Zahlung
-- Einnahmen eher über Zusatzfunktionen (z. B. Self-Service, Statistiken, eigene Detailseite) – später entscheiden
+## 10. Content-Erweiterung: „Angebote“
+(unverändert)
 
 ---
 
-## 11. Deploy/Build Prozess (aktuell)
-
-### 11.1 GitHub Actions (Quelle der Wahrheit)
-Bei Push auf `main`:
-1) `scripts/build-events-from-tsv.py` erzeugt `data/events.json` aus `data/events.tsv` (Fail-Fast)
-2) Build-ID = Commit-SHA (kurz)
-3) Staging nach `deploy/` via rsync
-4) HTML Guard:
-   - setzt/normalisiert `?v=BUILD_ID` in HTML
-   - bricht ab, wenn kaputte Asset-Links gefunden werden
-   - Mindestanforderung: `index.html` muss `style.css?v=`, `config.js?v=`, `main.js?v=` enthalten
-5) Upload zu STRATO via SFTP (lftp mirror)
-
-Wichtig:
-- Ein TSV-Commit triggert denselben Deploy wie jeder andere Commit
-- Wenn Guard fehlschlägt, wird nichts deployt
+## 11. Deploy/Build Prozess
+(unverändert + Builder ist kritischster Punkt)
 
 ---
 
-## 12. Offene ToDos (Next Steps, verbindliche Reihenfolge)
+# 🆕 12. Lessons Learned (dauerhafte Regeln)
 
-1) **Range-Events sauber anzeigen**
-   - Cards: `date` vs `date–endDate`
-   - DetailPanel: Zeitraum korrekt darstellen
-   - (Optional) „läuft aktuell“/Sortierung für laufende Events
+Diese Fehler dürfen nie wieder passieren:
 
-2) **Angebote-Struktur vorbereiten**
-   - Datenmodell (z. B. `data/offers.tsv` → `data/offers.json`)
-   - UI-Navigation: Bottom Tab Bar „Events | Angebote“ (kein Filter-Chip)
-   - Angebote-Seite `/angebote/` anlegen (ruhig, appig, konsistent)
+❌ UI debuggen obwohl JSON falsch  
+❌ TSV im Chat posten  
+❌ mehrere Hypothese-Fixes nacheinander  
+❌ Builder ignorieren  
+❌ „wahrscheinlich“-Patches  
 
-3) Content schrittweise aufbauen
-   - erst rechtlich safe: nur Fakten + eigene Texte, keine fremden Fotos/Texte
+Immer:
+
+✅ JSON prüfen  
+✅ Builder prüfen  
+✅ 1 minimaler Fix  
+✅ eine Datei pro Schritt  
 
 ---
 
-## 13. „Wie geht’s im nächsten Chat weiter?“ (verbindlicher Ablauf)
+## 13. Offene ToDos (Reihenfolge bleibt)
+
+1) Range-Events final polish  
+2) Angebote-Struktur  
+3) Content-Aufbau  
+
+---
+
+## 14. Ablauf im nächsten Chat
 
 - ZIP hochladen
-- Prompt aus der nächsten Sektion einfügen
-- Dann arbeiten wir **Datei-fokussiert** an:
-  1) `js/details.js` (Range-Date Anzeige im DetailPanel)
-  2) danach erst Angebote-Struktur
+- aktuelle Datei posten
+- diff-basiert arbeiten
+- nie raten
