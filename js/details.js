@@ -159,9 +159,19 @@ const DetailPanel = {
     const title = e.title || e.eventName || "";
 
     const time = e.time || "";
+        /* === BEGIN BLOCK: restore city extraction (fix ReferenceError) ===
+    Zweck:
+    - city wieder definieren (wurde im Range-Patch versehentlich entfernt)
+    - bestehendes Verhalten beibehalten
+    Umfang:
+    - nur Variable ergänzen, keine Logikänderung
+    === */
     const locationRaw = (e.location || "").trim();
+    const city = (e.city || e.ort || "").trim();
     const description = e.beschreibung || e.description || "";
     const kategorieRaw = (e.kategorie || "").trim();
+    /* === END BLOCK: restore city extraction (fix ReferenceError) === */
+
     const url = e.url || "";
 
     const startIso = e.date || "";
@@ -292,6 +302,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
