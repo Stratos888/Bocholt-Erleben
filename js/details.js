@@ -159,28 +159,21 @@ const DetailPanel = {
     const title = e.title || e.eventName || "";
 
     const time = e.time || "";
-        /* === BEGIN BLOCK: restore city extraction (fix ReferenceError) ===
-    Zweck:
-    - city wieder definieren (wurde im Range-Patch versehentlich entfernt)
-    - bestehendes Verhalten beibehalten
-    Umfang:
-    - nur Variable ergänzen, keine Logikänderung
-    === */
-    const locationRaw = (e.location || "").trim();
-    const city = (e.city || e.ort || "").trim();
-    const description = e.beschreibung || e.description || "";
-    const kategorieRaw = (e.kategorie || "").trim();
-    /* === END BLOCK: restore city extraction (fix ReferenceError) === */
+        /* === BEGIN BLOCK: detail meta inputs (use event consistently) === */
+    const locationRaw = (event.location || "").trim();
+    const city = (event.city || event.ort || "").trim();
+    const description = event.beschreibung || event.description || "";
+    const kategorieRaw = (event.kategorie || "").trim();
 
-        const url = e.url || "";
+    const url = event.url || "";
 
-    /* fix: restore missing url helpers */
     const isHttpUrl = (u) => /^https?:\/\//i.test(u || "");
     const safeUrl = (u) => (isHttpUrl(u) ? u : "");
 
-        /* fix: use correct param name */
     const startIso = event.date || "";
     const endIso = event.endDate || event.end_date || event.enddate || "";
+    /* === END BLOCK: detail meta inputs (use event consistently) === */
+
 
 
     const formatShortDate = (iso) => {
@@ -308,6 +301,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
