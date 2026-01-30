@@ -172,9 +172,13 @@ const DetailPanel = {
     const kategorieRaw = (e.kategorie || "").trim();
     /* === END BLOCK: restore city extraction (fix ReferenceError) === */
 
-    const url = e.url || "";
+      const url = e.url || "";
+
+    /* fix: restore missing helper */
+    const isHttpUrl = (u) => /^https?:\/\//i.test(u || "");
 
     const startIso = e.date || "";
+
     const endIso = e.endDate || e.end_date || e.enddate || "";
 
     const formatShortDate = (iso) => {
@@ -302,6 +306,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
