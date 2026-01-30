@@ -21,6 +21,8 @@
 
 const OffersApp = {
   offers: [],
+  filteredOffers: [],
+  activeCategory: "",
 
   async init() {
     debugLog?.("=== OFFERS - APP START ===");
@@ -28,16 +30,16 @@ const OffersApp = {
     this.showLoading(true);
 
     try {
-           /* === BEGIN BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) ===
+      /* === BEGIN BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) ===
 Zweck:
 - Lädt /data/offers.json (no-store)
 - Unterstützt beide Root-Formate:
   (A) Array-Root: [ {...}, {...} ]
   (B) Objekt-Root: { offers: [ {...}, {...} ] }
 - Normalisiert Felder konsistent zu Events:
-  - kategorie (statt category)
+  - kategorie
   - description Pflicht
-  - url Pflicht (Fallback wird im Renderer ergänzt, aber url bleibt Pflicht in Datenmodell)
+  - url Pflicht
 Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
 === */
       const response = await fetch("/data/offers.json", { cache: "no-store" });
@@ -77,7 +79,7 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
 
       this.offers = rawOffers.map(normalizeOffer);
 
-      // Pflichtfelder prüfen (wie bei Events: sauberer Fail-Fast im UI)
+      // Pflichtfelder prüfen (Fail-Fast)
       const invalid = this.offers.filter((o) => !o.title || !o.kategorie || !o.description || !o.url);
       if (invalid.length > 0) {
         console.error("Invalid offers (missing required fields):", invalid);
@@ -86,20 +88,17 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
       }
       /* === END BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) === */
 
-
       if (this.offers.length === 0) {
         this.showNoOffers();
         return;
       }
 
-      // Rendering
-      if (typeof window.OfferCards?.render !== "function") {
-        console.error("❌ OfferCards.render missing – js/offers.js not loaded or has an error.");
-        this.showError("Angebote konnten nicht angezeigt werden (Render-Modul fehlt).");
-        return;
-      }
+      // Kategorie-Filter initialisieren
+      this.bindCategoryFilter();
+      this.populateCategoryOptions();
 
-      OfferCards.render(this.offers);
+      // Initial render (ohne Filter)
+      this.applyFilterAndRender();
 
       this.showLoading(false);
 
@@ -109,6 +108,66 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
       this.showError("Fehler beim Laden der Angebote. Bitte Seite neu laden.");
     }
   },
+
+  /* === BEGIN BLOCK: FILTER_BIND (category) ===
+Zweck: Dropdown-Change → State setzen → neu rendern.
+Umfang: Nur Kategorie-Filter.
+=== */
+  bindCategoryFilter() {
+    const select = document.getElementById("offer-category");
+    if (!select) return;
+
+    select.addEventListener("change", () => {
+      this.activeCategory = (select.value || "").toString();
+      this.applyFilterAndRender();
+    });
+  },
+  /* === END BLOCK: FILTER_BIND (category) === */
+
+  /* === BEGIN BLOCK: FILTER_OPTIONS (category) ===
+Zweck: Dropdown aus Angeboten befüllen (einmal beim Init).
+Umfang: Sortierte Unique-Liste.
+=== */
+  populateCategoryOptions() {
+    const select = document.getElementById("offer-category");
+    if (!select) return;
+
+    // Optionen (außer "Alle") resetten
+    while (select.options.length > 1) select.remove(1);
+
+    const categories = Array.from(
+      new Set(this.offers.map((o) => o.kategorie).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b, "de"));
+
+    for (const cat of categories) {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      select.appendChild(opt);
+    }
+  },
+  /* === END BLOCK: FILTER_OPTIONS (category) === */
+
+  /* === BEGIN BLOCK: FILTER_APPLY + RENDER ===
+Zweck: Filter anwenden und OfferCards rendern.
+Umfang: Kategorie-Filter; Empty-State bei 0 Treffern.
+=== */
+  applyFilterAndRender() {
+    const cat = (this.activeCategory || "").trim();
+
+    this.filteredOffers = !cat
+      ? [...this.offers]
+      : this.offers.filter((o) => o.kategorie === cat);
+
+    if (typeof window.OfferCards?.render !== "function") {
+      console.error("❌ OfferCards.render missing – js/offers.js not loaded or has an error.");
+      this.showError("Angebote konnten nicht angezeigt werden (Render-Modul fehlt).");
+      return;
+    }
+
+    OfferCards.render(this.filteredOffers);
+  },
+  /* === END BLOCK: FILTER_APPLY + RENDER === */
 
   showLoading(show) {
     const loadingEl = document.getElementById("loading");
@@ -142,6 +201,7 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
     }
   }
 };
+
 
 // App starten sobald DOM ready
 /* === BEGIN BLOCK: OFFERS APP BOOTSTRAP (DOM first, deterministic) ===
