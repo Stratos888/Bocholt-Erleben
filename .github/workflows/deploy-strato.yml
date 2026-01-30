@@ -88,6 +88,10 @@ jobs:
             s#(/config\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
             s#(/js/[A-Za-z0-9._/-]+\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
           '
+          echo "=== DEBUG index.html: style.css lines ==="
+          grep -n "style.css" deploy/index.html || true
+          echo "=== DEBUG index.html: first 120 lines ==="
+          nl -ba deploy/index.html | sed -n '1,120p' || true
 
           # 3) Guard: Wenn immer noch kaputte Muster existieren -> Deploy stoppen
           # (erlaubt optionalen führenden Slash)
