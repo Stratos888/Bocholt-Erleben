@@ -63,6 +63,9 @@ Umfang: Ersetzt nur den DetailPanel-init Abschnitt.
                       /* === BEGIN BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) ===
 Zweck: Sauberes Error-Handling bei events.json + Normalisierung auf kanonische Felder,
        damit alle Module stabil mit { title, date, time, location, kategorie, beschreibung } arbeiten.
+       Unterstützt beide JSON-Formate:
+       (A) Array-Root: [ {...}, {...} ]
+       (B) Objekt-Root: { events: [ {...}, {...} ] }
 Umfang: Ersetzt nur den fetch/parse Block in App.init().
 === */
             const response = await fetch("/data/events.json", { cache: "no-store" });
@@ -72,7 +75,10 @@ Umfang: Ersetzt nur den fetch/parse Block in App.init().
             }
 
             const data = await response.json();
-            const rawEvents = Array.isArray(data?.events) ? data.events : [];
+
+            const rawEvents = Array.isArray(data)
+                ? data
+                : (Array.isArray(data?.events) ? data.events : []);
 
             const normalizeEvent = (e) => {
                 const obj = e && typeof e === "object" ? e : {};
@@ -99,6 +105,7 @@ Umfang: Ersetzt nur den fetch/parse Block in App.init().
 
             this.events = rawEvents.map(normalizeEvent);
             /* === END BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) === */
+
 
 
 
@@ -257,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
