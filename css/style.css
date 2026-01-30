@@ -594,7 +594,7 @@ Zweck:
 - iOS Safe-Area korrekt (Home-Indicator).
 - Verhindert, dass Inhalte/Overlays verdeckt werden (Content bekommt Bottom-Padding).
 Umfang:
-- Fügt nur Styles für .bottom-tabbar hinzu + sicheres Bottom-Padding für Hauptbereiche.
+- Styles für .bottom-tabbar + sicheres Bottom-Padding für Hauptbereiche.
 - Keine Änderungen an bestehenden Komponenten-Styles.
 === */
 
@@ -602,13 +602,19 @@ Umfang:
   --tabbar-h: 62px;
 }
 
-/* Content muss Platz lassen, damit Tabbar nichts überdeckt */
+/* Content muss Platz lassen, damit Tabbar nichts überdeckt (Events + Pages + Footer) */
 .events-section{
   padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
-.top-stack{
-  /* Sticky Search/Filter bleibt unverändert; zusätzlicher Platz unten, falls man bis ans Ende scrollt */
-  padding-bottom: calc(12px + 0px);
+
+/* Inhaltsseiten (z.B. /angebote/) dürfen unten nicht unter die Tabbar laufen */
+.page{
+  padding-bottom: calc(20px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+}
+
+/* Footer braucht ebenfalls Abstand, sonst sitzt er hinter der Tabbar */
+footer{
+  padding-bottom: calc(34px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
 
 /* Tabbar */
@@ -708,9 +714,18 @@ Umfang:
   .events-section{
     padding-bottom: calc(18px + var(--tabbar-h) + 18px);
   }
+
+  .page{
+    padding-bottom: calc(20px + var(--tabbar-h) + 18px);
+  }
+
+  footer{
+    padding-bottom: calc(34px + var(--tabbar-h) + 18px);
+  }
 }
 
 /* === END BLOCK: BOTTOM TAB BAR (Top-App, safe-area, non-invasive) === */
+
 
 footer {
   background: #0b1220;
@@ -1934,6 +1949,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
