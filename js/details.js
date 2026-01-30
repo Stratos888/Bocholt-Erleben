@@ -178,10 +178,10 @@ const DetailPanel = {
     const isHttpUrl = (u) => /^https?:\/\//i.test(u || "");
     const safeUrl = (u) => (isHttpUrl(u) ? u : "");
 
-    const startIso = e.date || "";
+        /* fix: use correct param name */
+    const startIso = event.date || "";
+    const endIso = event.endDate || event.end_date || event.enddate || "";
 
-
-    const endIso = e.endDate || e.end_date || e.enddate || "";
 
     const formatShortDate = (iso) => {
       if (!iso) return "";
@@ -308,6 +308,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
