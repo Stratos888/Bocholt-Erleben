@@ -370,12 +370,14 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
       later: "Später"
     };
 
-    const getSectionKey = (event) => {
-      const day = toLocalDay(
-  (event?.endDate && getEffectiveDate(event)?.toISOString().slice(0,10)) || event?.date
-);
+       const getSectionKey = (event) => {
+      // Wichtig: KEIN toISOString() verwenden, sonst kippt "heute" je nach Zeitzone auf gestern.
+      const effective = event?.endDate ? getEffectiveDate(event) : parseISODateLocal(event?.date);
 
-      if (!day) return "later";
+      if (!effective) return "later";
+
+      const day = new Date(effective);
+      day.setHours(0, 0, 0, 0);
 
       const today = startOfToday();
 
@@ -393,6 +395,7 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
 
       return "later";
     };
+
 
     const createSectionHeader = (key) => {
       const h = document.createElement("div");
@@ -442,6 +445,7 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
