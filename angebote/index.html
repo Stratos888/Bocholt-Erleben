@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="canonical" href="https://bocholt-erleben.de/angebote/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dauerhafte Angebote in Bocholt & Umgebung: Museen, Ausflugsziele, Kinderangebote und mehr – übersichtlich und schnell.">
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#8BCF4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+<link rel="manifest" href="/manifest.json">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+<link rel="icon" type="image/x-icon" href="/icons/favicon/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/app/icon-180.png">
+
+<title>Angebote in Bocholt – dauerhaft geöffnet & Freizeitideen</title>
+
+<!-- === BEGIN BLOCK: CSS CACHE BUSTING (forces SW/PWA update) ===
+Zweck: Umgeht aggressives Caching von style.css durch Service Worker / PWA.
+Umfang: Ersetzt nur den stylesheet-link.
+=== -->
+<link rel="stylesheet" href="/css/style.css?v=2026-02-04-1">
+<!-- === END BLOCK: CSS CACHE BUSTING (forces SW/PWA update) === -->
+</head>
+
+<body>
+<!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
+Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
+Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Menü.
+=== -->
+<header class="app-header">
+  <div class="header-left">
+    <img
+      src="/icons/app/icon-192.png"
+      alt="Bocholt erleben Logo"
+      class="app-logo"
+    >
+    <span class="app-title">Bocholt erleben</span>
+  </div>
+
+  <div class="header-right">
+    <button type="button" class="pwa-install-button">
+      Installieren
+    </button>
+
+    <!-- === BEGIN BLOCK: HEADER PUBLISH CTA (link to publish page) ===
+Zweck: Primärer CTA führt direkt zur Aktionsseite (kein Modal).
+Umfang: Ersetzt nur den bisherigen "Events veröffentlichen"-Button im Header.
+=== -->
+    <a
+      class="pwa-install-button"
+      href="/events-veroeffentlichen/"
+    >
+      Veröffentlichen
+    </a>
+    <!-- === END BLOCK: HEADER PUBLISH CTA (link to publish page) === -->
+  </div>
+</header>
+<!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
+
+<!-- === BEGIN BLOCK: OFFERS PLACEHOLDER (prepared, UX-consistent) ===
+Zweck: Angebots-Seite als eigenständige, SEO-fähige View; UI konsistent zur App.
+Umfang: Statischer Platzhalter-Inhalt (kein Events-JS), vorbereitet für späteres offers.json.
+=== -->
+<main class="page">
+  <div class="content-hero">
+    <p class="content-kicker">Dauerhafte Ideen</p>
+    <h1>Angebote in Bocholt</h1>
+    <p class="content-lead">
+      Hier kommen dauerhaft geöffnete Angebote hin – z. B. Museen, Kinderangebote, Indoor-Ideen und Ausflugsziele.
+    </p>
+  </div>
+
+  <section class="content-card content-card--primary" aria-label="Angebote demnächst">
+    <h2>Demnächst verfügbar</h2>
+    <p>
+      Wir bereiten diese Ansicht gerade vor. Inhalte werden später als eigene Datenquelle gepflegt (ähnlich wie Events),
+      damit sie sauber filterbar und langfristig stabil sind.
+    </p>
+  </section>
+
+  <section class="content-card" aria-label="Was hier später drin ist">
+    <h2>Was hier später drin ist</h2>
+    <ul class="locations-benefits">
+      <li>Museen &amp; Ausstellungen</li>
+      <li>Kinder &amp; Familie (z. B. Ponyhof, Spielangebote)</li>
+      <li>Indoor bei Regen</li>
+      <li>Sport &amp; Freizeit</li>
+    </ul>
+  </section>
+</main>
+<!-- === END BLOCK: OFFERS PLACEHOLDER (prepared, UX-consistent) === -->
+
+<!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
+Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar, ohne Filter-Pills.
+Umfang: Bottom Tab Bar direkt vor dem Footer.
+=== -->
+<nav class="bottom-tabbar" aria-label="Hauptnavigation">
+  <a class="bottom-tabbar__item" href="/">
+    <span class="bottom-tabbar__icon" aria-hidden="true">
+      <!-- Calendar icon -->
+      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
+        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 6H4.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5ZM6 6h12V5H6v1Z"/>
+      </svg>
+    </span>
+    <span class="bottom-tabbar__label">Events</span>
+  </a>
+
+  <a class="bottom-tabbar__item is-active" href="/angebote/" aria-current="page">
+    <span class="bottom-tabbar__icon" aria-hidden="true">
+      <!-- Compass/Map icon -->
+      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
+        <path d="M12 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm3.8 4.7a1 1 0 0 1 1.3 1.3l-2.1 5.2a1 1 0 0 1-.6.6l-5.2 2.1a1 1 0 0 1-1.3-1.3l2.1-5.2a1 1 0 0 1 .6-.6l5.2-2.1Zm-4.1 2.8-1.3 3.2 3.2-1.3 1.3-3.2-3.2 1.3Z"/>
+      </svg>
+    </span>
+    <span class="bottom-tabbar__label">Angebote</span>
+  </a>
+</nav>
+<!-- === END BLOCK: BOTTOM TAB BAR (Events/Angebote) === -->
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Bocholt Events Hub | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></p>
+  <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for Bocholt</p>
+</footer>
+
+<!-- === BEGIN BLOCK: MINIMAL JS INCLUDES (offers page) ===
+Zweck: PWA/Install + Modal + SW bleiben aktiv; keine Events-Module auf Angebotsseite laden.
+Umfang: Nur config + pwa + modal + sw. Keine main/events/filter/details.
+=== -->
+<script src="/config.js?v=2026-02-04-1"></script>
+<script src="/js/pwa-install.js?v=2026-02-04-1"></script>
+<script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<!-- === END BLOCK: MINIMAL JS INCLUDES (offers page) === -->
+
+<!-- PWA Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then((registration) => {
+          console.log('✅ Service Worker registered:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('❌ Service Worker registration failed:', error);
+        });
+    });
+  }
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Angebote in Bocholt",
+  "url": "https://bocholt-erleben.de/angebote/",
+  "inLanguage": "de-DE"
+}
+</script>
+
+</body>
+</html>
