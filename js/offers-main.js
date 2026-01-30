@@ -28,13 +28,17 @@ const OffersApp = {
     this.showLoading(true);
 
     try {
-      /* === BEGIN BLOCK: OFFERS FETCH + NORMALIZE (robust, canonical fields) ===
-Zweck: Sauberes Error-Handling bei offers.json + Normalisierung auf kanonische Felder,
-       damit OfferCards stabil mit { title, category, location, hint, url } arbeiten.
-       Unterstützt beide JSON-Formate:
-       (A) Array-Root: [ {...}, {...} ]
-       (B) Objekt-Root: { offers: [ {...}, {...} ] }
-Umfang: Gesamter fetch/parse/normalize Block in OffersApp.init().
+           /* === BEGIN BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) ===
+Zweck:
+- Lädt /data/offers.json (no-store)
+- Unterstützt beide Root-Formate:
+  (A) Array-Root: [ {...}, {...} ]
+  (B) Objekt-Root: { offers: [ {...}, {...} ] }
+- Normalisiert Felder konsistent zu Events:
+  - kategorie (statt category)
+  - description Pflicht
+  - url Pflicht (Fallback wird im Renderer ergänzt, aber url bleibt Pflicht in Datenmodell)
+Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
 === */
       const response = await fetch("/data/offers.json", { cache: "no-store" });
 
@@ -51,24 +55,37 @@ Umfang: Gesamter fetch/parse/normalize Block in OffersApp.init().
       const normalizeOffer = (o) => {
         const obj = o && typeof o === "object" ? o : {};
 
+        const id = (obj.id ?? "").toString().trim();
         const title = (obj.title ?? obj.name ?? "").toString().trim();
-        const category = (obj.category ?? obj.kategorie ?? "").toString().trim();
+        const kategorie = (obj.kategorie ?? obj.category ?? "").toString().trim();
         const location = (obj.location ?? obj.ort ?? "").toString().trim();
         const hint = (obj.hint ?? obj.zeit ?? obj.note ?? "").toString().trim();
+        const description = (obj.description ?? "").toString().trim();
         const url = (obj.url ?? obj.link ?? "").toString().trim();
 
         return {
           ...obj,
+          id,
           title,
-          category,
+          kategorie,
           location,
           hint,
+          description,
           url
         };
       };
 
       this.offers = rawOffers.map(normalizeOffer);
-      /* === END BLOCK: OFFERS FETCH + NORMALIZE (robust, canonical fields) === */
+
+      // Pflichtfelder prüfen (wie bei Events: sauberer Fail-Fast im UI)
+      const invalid = this.offers.filter((o) => !o.title || !o.kategorie || !o.description || !o.url);
+      if (invalid.length > 0) {
+        console.error("Invalid offers (missing required fields):", invalid);
+        this.showError("Angebote-Daten sind unvollständig (Pflichtfelder fehlen).");
+        return;
+      }
+      /* === END BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) === */
+
 
       if (this.offers.length === 0) {
         this.showNoOffers();
