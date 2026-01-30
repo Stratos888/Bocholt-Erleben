@@ -1,7 +1,7 @@
 # Projekt „Bocholt erleben“ – Verbindlicher Stand (Single Source of Truth)
 
 > **Wichtig:** Dieses Dokument ist die maßgebliche Referenz für Folgechats.
-> Alle hier festgehaltenen Punkte gelten als **verbindlich entschieden**.
+> Alles hier gilt als **verbindlich entschieden**. Änderungen nur nach Proof.
 
 ---
 
@@ -9,235 +9,213 @@
 
 **Bocholt erleben** ist eine **PWA-first Eventplattform**, keine klassische Stadt-Website.
 
-* Home-Screen = **Events-Übersicht**
-* Fokus: *Was ist wann los?*
-* Ruhige, sachliche UI
-* Keine Werbung, keine Hervorhebung einzelner Anbieter
-* Vertrauen durch Klarheit, Ordnung und Neutralität
+- Home/Start = **Events-Übersicht**
+- Fokus: „Was ist wann los?“
+- Ruhige, moderne, sachliche UI
+- **Keine Werbung, keine Hervorhebung einzelner Anbieter**
+- Vertrauen durch Klarheit, Ordnung, Neutralität
 
 ---
 
 ## 2. Arbeitsprinzipien (oberste Priorität)
 
 1. **Niemals raten**
-2. „100 % sicher“ nur mit reproduzierbarem Proof
-3. Wenn etwas unklar ist → **erst klären, dann handeln**
-4. Lieber keine Änderung als eine falsche
+2. „100% sicher“ nur mit **reproduzierbarem Proof** (DevTools/Logs/konkrete Stellen im Code)
+3. Wenn etwas unklar ist → **erst klären, dann patchen**
+4. Lieber kein Patch als ein falscher
 
 ---
 
-## 3. Technischer Arbeitsmodus (streng)
+## 3. Technischer Arbeitsmodus (streng / verbindlich)
 
-* **Konsolidierungs‑Modus**
-  → Der zuletzt gepostete Stand einer Datei gilt vollständig
+- **Konsolidierungs-Modus**  
+  Der zuletzt gepostete Stand einer Datei gilt als vollständig. Keine Änderungen ohne sichtbaren Code.
 
-* **Diff statt Snippet**
-  → Nur gezielte Ersetzungen bestehender Blöcke
+- **Diff statt Snippet**  
+  Änderungen nur als gezieltes **Ersetzen/Löschen/Verschieben** konkreter Blöcke.
 
-* **Eine Datei pro Schritt**
+- **Datei-fokussiert**  
+  Immer nur **eine Datei pro Schritt** bearbeiten.
 
-* **Codeblock‑Markierungen verpflichtend**
-  (`BEGIN / END`, Zweck & Umfang)
+- **Codeblock-Markierungen verpflichtend**  
+  Bei Einfügen/Ersetzen: am Anfang + Ende eindeutige `BEGIN/END`-Markierungen mit **Zweck & Umfang**.
 
-* **Kein ungefragtes Refactoring**
+- **UI-Polish-Patches: CSS-only**  
+  Wenn es „nur schöner“ werden soll: ausschließlich CSS.
 
-* **Kein neuer Code, wenn Analyse gefragt ist**
-
----
-
-## 4. Architektur‑Entscheidungen (fest)
-
-### 4.1 Overlays
-
-Alle Overlays (DetailPanel, Filter‑Sheet, Modals):
-
-* liegen **im Overlay‑Root direkt unter `<body>`**
-* **nie** in sticky / transform / backdrop‑Containern
-
-### 4.2 Deploy / Cache
-
-* **Fail‑Fast‑Deploy**
-* Asset‑Links müssen korrekt sein
-* Cache‑Chaos aktiv verhindern
-* `build.json` / `build.txt` ist die gültige Build‑Quelle
+- **Bugfix-Oberregel**  
+  Kein „Fix ist safe“ ohne Root-Cause-Nachweis.
 
 ---
 
-## 5. Events – Datenmodell (verbindlich)
+## 4. Architektur-Entscheidungen (fest)
 
-### 5.1 Single Source of Truth
+### 4.1 Overlays / Fixed/Sticky
+- Alle Overlays (Bottom-Sheets, Modals, DetailPanel) gehören in einen **Overlay-Root direkt unter `<body>`**
+- Nie innerhalb von sticky/transform/backdrop-filter Containern rendern
 
-* **`data/events.tsv`** ist die **einzige** Quelle
-* **`data/events.json`** wird **automatisch generiert**
-* JSON **niemals manuell bearbeiten**
-
-### 5.2 Build‑Workflow (lokal)
-
-```bash
-python scripts/build-events-from-tsv.py
-```
-
-Eigenschaften:
-
-* Fail‑Fast (bricht bei Fehlern sofort ab)
-* Validiert:
-
-  * eindeutige IDs (slug‑like)
-  * Pflichtfelder
-  * Kategorien
-  * Sonderzeichen
-  * Dubletten
-
-### 5.3 Pflichtfelder je Event
-
-* `id` (slug‑like, lowercase, `a–z0–9-`)
-* `title`
-* `date` (YYYY‑MM‑DD)
-* `time`
-* `location` (Ort/Location)
-* **`city` (z. B. Bocholt, Rhede, Isselburg)**
-* `kategorie`
-* `description`
-* `url`
-
-> **Wichtig:** Stadt ist **verpflichtend** und wird UI‑seitig genutzt.
+### 4.2 Deploy / Cache / Fail-Fast
+- Deploy-Pipeline soll **hart fehlschlagen (Fail-Fast)**, wenn Asset-Links in HTML inkonsistent/kaputt sind
+- Cache-Busting via `?v=BUILD_ID` (aus Commit-SHA)
+- Versionfile liegt unter `/meta/build.txt` (TXT statt JSON, weil STRATO .json teilweise blockt)
 
 ---
 
-## 6. Event‑Radius (festgelegt)
-
-* Standard‑Suchradius: **20 km um Bocholt**
-* Keine harte Stadtgrenze
-* Vorbereitung für spätere Radius‑/Ort‑Filter
-
----
-
-## 7. Kategorien – Filter‑Logik (Stufe B)
-
-### 7.1 Prinzip
-
-* Kategorien sind **normalisiert** (Canonical Mapping)
-* Events dürfen granular sein, Filter bleibt stabil
-* Kein Event darf „unsichtbar“ werden
-
-### 7.2 Aktive Filterkategorien (UI)
-
-* Alle
-* Kinder & Familie
-* Musik & Bühne
-* Kultur & Kunst
-* Märkte & Feste
-* Sport & Bewegung
-* Innenstadt & Leben
-* Sonstiges
-
-### 7.3 Deaktivierte Optionen
-
-* Filteroptionen ohne Treffer werden **disabled & ausgegraut angezeigt**
-* Nutzer sehen bewusst: *„Hier ist aktuell nichts“*
+## 5. Repo-Struktur (relevant)
+- `data/events.tsv` = **Single Source of Truth**
+- `data/events.json` = wird erzeugt (nicht manuell bearbeiten)
+- `scripts/build-events-from-tsv.py` = TSV → JSON Build
+- `.github/workflows/deploy-strato.yml` = Build + Guard + Deploy (SFTP/STRATO)
+- `js/filter.js` = Filterlogik (Zeit/Kategorie/Suche)
+- `js/events.js` = Event Cards Rendering (Anzeige)
+- `js/details.js` = DetailPanel Rendering (Anzeige)
+- `css/style.css` = UI/Polish (CSS-only für Designpatches)
+- `index.html` = Script-Reihenfolge + Cache-Busting Links
 
 ---
 
-## 8. Zeit‑Filter – UX‑Regeln
+## 6. Events – Datenmodell (verbindlich)
 
-* Optionen:
+### 6.1 Single Source of Truth
+- **`data/events.tsv`** ist die einzige Quelle
+- **`data/events.json`** wird automatisch generiert (Actions)
+- JSON wird **niemals** manuell bearbeitet
 
-  * Alle
-  * Heute
-  * Wochenende
-  * Demnächst (14 Tage)
+### 6.2 TSV-Spalten (aktueller Stand)
+Pflicht:
+- `id` (slug-like, lowercase, `a–z0–9-`)
+- `title`
+- `date` (YYYY-MM-DD)
+- `time` (kann leer sein)
+- `city` (z. B. Bocholt, Rhede, Isselburg …)
+- `location`
+- `kategorie`
+- `url`
+- `description`
 
-* Optionen ohne Treffer:
+Optional (neu):
+- `endDate` (YYYY-MM-DD) – für **Mehrtage-/Laufzeit-Events**
 
-  * bleiben sichtbar
-  * sind disabled
+Wichtig:
+- Zwischen allen Feldern stehen **Tabulatoren**, keine Spaces
+- `endDate` ist optional und darf leer bleiben
 
----
-
-## 9. Preis‑Filter (vorbereitet, noch nicht sichtbar)
-
-* Events können künftig sein:
-
-  * kostenlos
-  * kostenpflichtig
-
-* Filterlogik ist vorbereitet
-
-* UI wird **erst später aktiviert**
-
----
-
-## 10. Event‑Liste – Darstellung
-
-* Sortierung:
-
-  * Datum ↑
-  * Uhrzeit ↑
-
-* Dynamische Trenner:
-
-  * nur anzeigen, wenn Events vorhanden sind
+### 6.3 Range-Events (Mehrtage/Laufzeit) – Produktregel
+- Alles mit Start+Ende bleibt ein **Event** (keine Duplikate pro Tag)
+- Card/Detail sollen Zeitraum anzeigen (z. B. `20.11 – 10.01`)
+- Während der Laufzeit sollen Events sichtbar bleiben (nicht „im Startmonat verschwinden“)
 
 ---
 
-## 11. Event Card – aktueller Stand
-
-**Meta‑Zeile:**
-
-```
-Stadt · Datum · Uhrzeit
-```
-
-* Stadt ist **immer sichtbar**
-* Location bleibt Bestandteil der Card
-* Kategorie wird als Icon dargestellt
+## 7. Event-Radius (festgelegt)
+- Standardradius: **20 km um Bocholt**
+- Keine harte Stadtgrenze
+- Vorbereitung für spätere Standort/Radiussuche
 
 ---
 
-## 12. DetailPanel – offener Punkt
+## 8. Kategorien & Filter (verbindlich)
 
-❗ **Fehlt aktuell:** Anzeige der **Stadt** im DetailPanel
+### 8.1 Kategorie-Filter (UI)
+- Alle
+- Märkte & Feste
+- Kultur & Kunst
+- Musik & Bühne
+- Kinder & Familie
+- Sport & Bewegung
+- Natur & Draußen
+- Innenstadt & Leben
+- Sonstiges
 
-→ Muss ergänzt werden (gleiches Datenfeld wie Card)
+### 8.2 Disabled-Optionen
+- Optionen ohne Treffer bleiben sichtbar, aber **disabled** (ausgegraut)
 
----
-
-## 13. Infoseiten – Blueprint (verbindlich)
-
-Struktur (für alle Infoseiten):
-
-* `content-hero`
-* 2–4 `content-card`
-* **GENAU ein Navigationselement am Ende**
-
-```html
-<nav class="content-links">
-  <a class="content-link" href="/">Zurück zu den Events</a>
-</nav>
-```
-
-❌ keine CTA‑Buttons
-❌ keine Querverlinkung zwischen Infoseiten
+### 8.3 Zeit-Filter (UX)
+- Alle
+- Heute
+- Wochenende (nächstes Sa+So, robust)
+- Demnächst (14 Tage)
 
 ---
 
-## 14. Aktueller Projektstand
+## 9. Darstellung (Eventliste, Cards, Detail)
 
-* Events bis **April** gepflegt
-* Wochenmärkte als Serienevents enthalten
-* Script läuft grün (68 Events validiert)
-* Filter & UI konsistent
+### 9.1 Eventliste
+- Sortierung: Datum ↑, Uhrzeit ↑
+- Dynamische Sections: Heute / Dieses Wochenende / Demnächst / Später
+- Keine leeren Trenner
+
+### 9.2 Event Card
+- Meta-Zeile: `Stadt · Datum · Uhrzeit`
+- Location-Zeile bleibt auf der Card
+- Kategorie-Icon oben rechts ist rein visuell
+- Ziel: Card bleibt clean, Details im Panel
+
+### 9.3 DetailPanel
+- DetailPanel zeigt Beschreibung, Link etc.
+- **Offen / als Nächstes wichtig**:
+  - Range-Date Anzeige (Start–Ende) + ggf. „läuft aktuell“
+  - Ort/Location sauber als Action-Zeile (Homepage/Maps-Fallback)
+  - Stadt/Ort-Kontext im Panel konsistent zur Card
 
 ---
 
-## 15. Nächste sinnvolle Aufgaben
+## 10. Content-Erweiterung: „Angebote“ (Konzept, noch nicht implementiert)
 
-1. Stadt im **DetailPanel** ergänzen
-2. Preisfeld im TSV finalisieren
-3. Serien‑Events eleganter modellieren
-4. GitHub Action für automatischen TSV‑Build
-5. SEO / Sichtbarkeit (Google, KI‑Suche)
+Ziel:
+- Dauerhafte Angebote/Orte (Museen, Ponyhof, Indoor/Outdoor) als zusätzlicher Content
+- **Nicht** über Bezahlung visuell bevorzugen (Fairness-Versprechen bleibt)
+
+Grundregel:
+- „Angebote“ = dauerhaft/immer verfügbar
+- „Events“ = zeitlich (auch Laufzeit-Events mit `endDate` bleiben Events)
+
+Monetarisierung (später, optional):
+- Keine visuelle Priorisierung durch Zahlung
+- Einnahmen eher über Zusatzfunktionen (z. B. Self-Service, Statistiken, eigene Detailseite) – später entscheiden
 
 ---
 
-**Ende – dieses Dokument ist die verbindliche Übergabe für Folgechats.**
+## 11. Deploy/Build Prozess (aktuell)
+
+### 11.1 GitHub Actions (Quelle der Wahrheit)
+Bei Push auf `main`:
+1) `scripts/build-events-from-tsv.py` erzeugt `data/events.json` aus `data/events.tsv` (Fail-Fast)
+2) Build-ID = Commit-SHA (kurz)
+3) Staging nach `deploy/` via rsync
+4) HTML Guard:
+   - setzt/normalisiert `?v=BUILD_ID` in HTML
+   - bricht ab, wenn kaputte Asset-Links gefunden werden
+   - Mindestanforderung: `index.html` muss `style.css?v=`, `config.js?v=`, `main.js?v=` enthalten
+5) Upload zu STRATO via SFTP (lftp mirror)
+
+Wichtig:
+- Ein TSV-Commit triggert denselben Deploy wie jeder andere Commit
+- Wenn Guard fehlschlägt, wird nichts deployt
+
+---
+
+## 12. Offene ToDos (Next Steps, verbindliche Reihenfolge)
+
+1) **Range-Events sauber anzeigen**
+   - Cards: `date` vs `date–endDate`
+   - DetailPanel: Zeitraum korrekt darstellen
+   - (Optional) „läuft aktuell“/Sortierung für laufende Events
+
+2) **Angebote-Struktur vorbereiten**
+   - Datenmodell (z. B. `data/offers.tsv` → `data/offers.json`)
+   - UI-Navigation: Bottom Tab Bar „Events | Angebote“ (kein Filter-Chip)
+   - Angebote-Seite `/angebote/` anlegen (ruhig, appig, konsistent)
+
+3) Content schrittweise aufbauen
+   - erst rechtlich safe: nur Fakten + eigene Texte, keine fremden Fotos/Texte
+
+---
+
+## 13. „Wie geht’s im nächsten Chat weiter?“ (verbindlicher Ablauf)
+
+- ZIP hochladen
+- Prompt aus der nächsten Sektion einfügen
+- Dann arbeiten wir **Datei-fokussiert** an:
+  1) `js/details.js` (Range-Date Anzeige im DetailPanel)
+  2) danach erst Angebote-Struktur
