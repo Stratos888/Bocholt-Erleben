@@ -63,38 +63,34 @@ Umfang: Ersetzt nur den bisherigen "Events veröffentlichen"-Button im Header.
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
 
-<!-- === BEGIN BLOCK: OFFERS PLACEHOLDER (prepared, UX-consistent) ===
-Zweck: Angebots-Seite als eigenständige, SEO-fähige View; UI konsistent zur App.
-Umfang: Statischer Platzhalter-Inhalt (kein Events-JS), vorbereitet für späteres offers.json.
+<!-- === BEGIN BLOCK: OFFERS VIEW (data-driven, cards) ===
+Zweck: Angebotsliste dynamisch aus /data/offers.json rendern; Card-Design identisch zu Events.
+Umfang: Ersetzt den kompletten bisherigen Placeholder-Main-Content.
 === -->
 <main class="page">
   <div class="content-hero">
     <p class="content-kicker">Dauerhafte Ideen</p>
     <h1>Angebote in Bocholt</h1>
     <p class="content-lead">
-      Hier kommen dauerhaft geöffnete Angebote hin – z. B. Museen, Kinderangebote, Indoor-Ideen und Ausflugsziele.
+      Museen, Ausflugsziele, Kinderangebote und mehr – übersichtlich als Karten.
     </p>
   </div>
 
-  <section class="content-card content-card--primary" aria-label="Angebote demnächst">
-    <h2>Demnächst verfügbar</h2>
-    <p>
-      Wir bereiten diese Ansicht gerade vor. Inhalte werden später als eigene Datenquelle gepflegt (ähnlich wie Events),
-      damit sie sauber filterbar und langfristig stabil sind.
-    </p>
-  </section>
+  <!-- LOADING / EMPTY / ERROR (wird von js/offers-main.js befüllt) -->
+  <div id="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Angebote werden geladen...</p>
+  </div>
 
-  <section class="content-card" aria-label="Was hier später drin ist">
-    <h2>Was hier später drin ist</h2>
-    <ul class="locations-benefits">
-      <li>Museen &amp; Ausstellungen</li>
-      <li>Kinder &amp; Familie (z. B. Ponyhof, Spielangebote)</li>
-      <li>Indoor bei Regen</li>
-      <li>Sport &amp; Freizeit</li>
-    </ul>
+  <!-- OFFER CARDS SECTION -->
+  <section class="events-section" aria-label="Angebote">
+    <div id="offer-cards" class="event-cards-grid">
+      <!-- Offer cards werden hier dynamisch eingefügt -->
+    </div>
   </section>
 </main>
-<!-- === END BLOCK: OFFERS PLACEHOLDER (prepared, UX-consistent) === -->
+<!-- === END BLOCK: OFFERS VIEW (data-driven, cards) === -->
+
 
 <!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
 Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar, ohne Filter-Pills.
@@ -129,14 +125,18 @@ Umfang: Bottom Tab Bar direkt vor dem Footer.
   <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for Bocholt</p>
 </footer>
 
-<!-- === BEGIN BLOCK: MINIMAL JS INCLUDES (offers page) ===
-Zweck: PWA/Install + Modal + SW bleiben aktiv; keine Events-Module auf Angebotsseite laden.
-Umfang: Nur config + pwa + modal + sw. Keine main/events/filter/details.
+<!-- === BEGIN BLOCK: JS INCLUDES (offers page + offers modules) ===
+Zweck: PWA/Install + Modal + SW bleiben aktiv; Angebote laden/rendere über offers.json.
+Umfang: Ersetzt den kompletten JS-Includes-Block auf der Angebotsseite.
 === -->
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
-<!-- === END BLOCK: MINIMAL JS INCLUDES (offers page) === -->
+
+<script src="/js/offers.js?v=2026-02-04-1" defer></script>
+<script src="/js/offers-main.js?v=2026-02-04-1" defer></script>
+<!-- === END BLOCK: JS INCLUDES (offers page + offers modules) === -->
+
 
 <!-- PWA Service Worker Registration -->
 <script>
