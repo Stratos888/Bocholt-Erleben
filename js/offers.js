@@ -69,24 +69,24 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: CATEGORY_ICON (optional, neutral) === */
 
-  /* === BEGIN BLOCK: CREATE_CARD (offers → event-card DNA) ===
-  Zweck: Cards nutzen exakt die bestehenden Event-Card CSS-Klassen für konsistentes Design.
-  Umfang: Erzeugt .event-card mit .event-title/.event-meta/.event-location-text.
+    /* === BEGIN BLOCK: CREATE_CARD (offers → event-card DNA) ===
+  Zweck: Cards nutzen bestehende Event-Card CSS-Klassen für konsistentes Design.
+  Zusätzlich:
+  - description ist Pflicht (kurz & prägnant)
+  - url ist Pflicht → Button "Zur Location"
+  - Fallback: Google Maps (oder Locations.getMapsFallback), falls url fehlt/leer ist
+  Umfang: Erzeugt .event-card mit .event-title + .event-meta + Action-Button.
   === */
   function createCard(offer) {
     const card = document.createElement("div");
     card.className = "event-card";
-    card.tabIndex = 0;
 
     const title = (offer?.title || "").toString().trim();
-    const category = (offer?.category || "").toString().trim();
+    const category = (offer?.kategorie || offer?.category || "").toString().trim();
     const location = (offer?.location || "").toString().trim();
-    const hint = (offer?.hint || "").toString().trim(); // z.B. "Dauerhaft" / "Sa–So" / "mit Anmeldung"
+    const hint = (offer?.hint || "").toString().trim();
+    const description = (offer?.description || "").toString().trim();
     const url = (offer?.url || "").toString().trim();
-
-    // A11y/UX
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", title ? `Angebot anzeigen: ${title}` : "Angebot anzeigen");
 
     const icon = getCategoryIcon(category);
     if (icon) {
@@ -104,46 +104,70 @@ const OfferCards = (() => {
 
     const metaEl = document.createElement("div");
     metaEl.className = "event-meta";
-
     const metaParts = [];
     if (category) metaParts.push(category);
     if (hint) metaParts.push(hint);
-
     metaEl.textContent = metaParts.join(" · ");
     card.appendChild(metaEl);
 
-    const locWrap = document.createElement("div");
-    locWrap.className = "event-location";
+    // Kurzbeschreibung (Pflicht) – bewusst kompakt
+    if (description) {
+      const descEl = document.createElement("div");
+      descEl.className = "event-meta";
+      descEl.textContent = description;
+      card.appendChild(descEl);
+    }
 
-    const locText = document.createElement("div");
-    locText.className = "event-location-text";
-    locText.textContent = location;
-    locWrap.appendChild(locText);
+    if (location) {
+      const locWrap = document.createElement("div");
+      locWrap.className = "event-location";
 
-    card.appendChild(locWrap);
+      const locText = document.createElement("div");
+      locText.className = "event-location-text";
+      locText.textContent = location;
+      locWrap.appendChild(locText);
 
-    // Interaktion: Wenn URL vorhanden → öffnen (neutral, kein Detailpanel nötig)
-    const activate = () => {
-      if (!url) return;
-      window.open(url, "_blank", "noopener,noreferrer");
-    };
+      card.appendChild(locWrap);
+    }
 
-    card.addEventListener("click", activate);
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        activate();
-      }
-    });
+    // Action: "Zur Location" – url primär, Maps als Fallback (wie in js/details.js)
+    let locationHref = "";
+    if (location) {
+      const homepage =
+        (window.Locations?.getHomepage && window.Locations.getHomepage(location)) || "";
+      locationHref =
+        homepage ||
+        (window.Locations?.getMapsFallback
+          ? window.Locations.getMapsFallback(location)
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`);
+    }
 
-    // Wenn kein Link vorhanden, bleibt Card trotzdem konsistent sichtbar (nur ohne Aktion)
-    if (!url) {
-      card.setAttribute("aria-disabled", "true");
+    const primaryHref = url || locationHref;
+
+    if (primaryHref) {
+      const actions = document.createElement("div");
+      actions.className = "detail-actions";
+
+      const a = document.createElement("a");
+      a.className = "detail-link-btn";
+      a.href = primaryHref;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", `Zur Location: ${title || location || "öffnen"}`);
+
+      // Inhalt (kein innerHTML nötig)
+      const label = document.createElement("span");
+      label.textContent = "Zur Location";
+      a.appendChild(label);
+
+      actions.appendChild(a);
+      card.appendChild(actions);
     }
 
     return card;
   }
   /* === END BLOCK: CREATE_CARD (offers → event-card DNA) === */
+
 
   /* === BEGIN BLOCK: RENDER (offers) ===
   Zweck: Rendert komplette Angebotsliste in #offer-cards inkl. Empty-State.
