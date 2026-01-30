@@ -64,12 +64,14 @@ class EventRow:
     id: str
     title: str
     date: str
+    endDate: str
     time: str
     city: str
     location: str
     kategorie: str
     url: str
     description: str
+
 
 
 def fail(msg: str) -> None:
@@ -190,8 +192,11 @@ def main() -> None:
             fail(f"Zeile {idx}: duplicate id: {ev_id!r}")
         seen_ids.add(ev_id)
 
-        validate_date(data["date"], idx)
+                validate_date(data["date"], idx)
+        if data.get("endDate", ""):
+            validate_date(data["endDate"], idx)
         validate_time(data.get("time", ""), idx)
+
 
         cat = normalize_category(data["kategorie"])
         if cat not in CANONICAL_CATEGORIES:
@@ -215,11 +220,12 @@ def main() -> None:
             )
         seen_fingerprints.add(fp)
 
-        events.append(
+                events.append(
             EventRow(
                 id=ev_id,
                 title=data["title"],
                 date=data["date"],
+                endDate=data.get("endDate", ""),
                 time=data.get("time", ""),
                 city=data["city"],
                 location=data["location"],
@@ -228,6 +234,7 @@ def main() -> None:
                 description=data.get("description", ""),
             )
         )
+
 
     # Sortierung (Datum + optionale Uhrzeit)
     def sort_key(e: EventRow) -> Tuple[str, int]:
@@ -238,7 +245,7 @@ def main() -> None:
 
     out = []
     for e in events:
-        item = {
+                item = {
             "id": e.id,
             "title": e.title,
             "date": e.date,
@@ -247,6 +254,9 @@ def main() -> None:
             "location": e.location,
             "kategorie": e.kategorie,
         }
+        if e.endDate:
+            item["endDate"] = e.endDate
+
         if e.url:
             item["url"] = e.url
         if e.description:
