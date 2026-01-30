@@ -149,43 +149,52 @@ const DetailPanel = {
     === */
     const e = event && typeof event === "object" ? event : {};
 
+      /* === BEGIN BLOCK: DETAIL DATE/TIME (support endDate range in subline) ===
+    Zweck:
+    - Range-Events im DetailPanel korrekt anzeigen: Start–Ende (endDate) in der Meta-Zeile.
+    - Bestehendes Verhalten unverändert lassen, wenn kein endDate vorhanden ist.
+    Umfang:
+    - Ersetzt die lokale Datum/Uhrzeit-Aufbereitung in renderContent(event) (title/date/time/meta line).
+    === */
     const title = e.title || e.eventName || "";
-    const date = e.date ? formatDate(e.date) : "";
+
     const time = e.time || "";
     const locationRaw = (e.location || "").trim();
     const description = e.beschreibung || e.description || "";
     const kategorieRaw = (e.kategorie || "").trim();
     const url = e.url || "";
 
-    const safeUrl = url ? String(url) : "";
-    const isHttpUrl = /^https?:\/\//i.test(safeUrl);
+    const startIso = e.date || "";
+    const endIso = e.endDate || e.end_date || e.enddate || "";
 
-    /* === BEGIN BLOCK: DETAIL CITY RESOLUTION ===
-    Zweck: Stadt im Detailpanel konsistent zu den Event Cards auflösen.
-    Reihenfolge:
-    1) event.city (falls vorhanden)
-    2) aus event.location ableiten
-    3) Fallback: "Bocholt"
-    Umfang: Lokal in renderContent.
-    === */
-    const resolveCity = (ev) => {
-      if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
-
-      const loc = String(ev?.location || "").toLowerCase();
-
-      if (loc.includes("rhede")) return "Rhede";
-      if (loc.includes("isselburg")) return "Isselburg";
-      if (loc.includes("borken")) return "Borken";
-      if (loc.includes("bocholt")) return "Bocholt";
-
-      return "Bocholt";
+    const formatShortDate = (iso) => {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return "";
+      return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
     };
-    const city = resolveCity(e);
-    /* === END BLOCK: DETAIL CITY RESOLUTION === */
+
+    const dateLabel = (() => {
+      if (!startIso) return "";
+      const start = formatShortDate(startIso);
+      const end = formatShortDate(endIso);
+
+      if (end && endIso !== startIso) {
+        // Produktregel: Zeitraum anzeigen (z. B. 20.11 – 10.01)
+        return `${start} – ${end}`.trim();
+      }
+
+      // Fallback: bestehendes Verhalten (inkl. Jahr)
+      return formatDate(startIso);
+    })();
 
     // Meta line (text-only): city · date · time
-    const dateTimeText = [date, time ? this.escape(time) : ""].filter(Boolean).join(" · ");
+    const dateTimeText = [dateLabel ? this.escape(dateLabel) : "", time ? this.escape(time) : ""]
+      .filter(Boolean)
+      .join(" · ");
     const sublineText = [city ? this.escape(city) : "", dateTimeText].filter(Boolean).join(" · ");
+    /* === END BLOCK: DETAIL DATE/TIME (support endDate range in subline) === */
+
 
     // Kategorie-Icon (ohne Text)
     const iconMap = {
@@ -283,6 +292,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
