@@ -1,3 +1,89 @@
 {
-  "offers": []
+  "meta": {
+    "generatedAt": "manual",
+    "note": "Nicht-kommerzielle Outdoor- und Naturaktivitäten im Umkreis von ca. 20 km um Bocholt"
+  },
+  "offers": [
+    {
+      "id": "aasee-bocholt",
+      "title": "Aasee Bocholt",
+      "kategorie": "Wasser & Badeseen",
+      "location": "Aasee Bocholt, Bocholt",
+      "description": "Badesee mit Rundweg zum Spazieren, Joggen und Entspannen.",
+      "hint": "Badestelle · 3 km Rundweg",
+      "url": "https://www.bocholt.de/freizeit-und-tourismus/erleben-und-entdecken/aasee-und-stadtwald"
+    },
+    {
+      "id": "stadtwald-bocholt",
+      "title": "Bocholter Stadtwald",
+      "kategorie": "Wandern & Natur",
+      "location": "Stadtwald Bocholt",
+      "description": "Waldgebiet mit ruhigen Spazier- und Wanderwegen direkt am Aasee.",
+      "hint": "Natur · Waldwege",
+      "url": "https://www.bocholt.de/freizeit-und-tourismus/erleben-und-entdecken/aasee-und-stadtwald"
+    },
+    {
+      "id": "proebstingsee",
+      "title": "Pröbstingsee",
+      "kategorie": "Wasser & Badeseen",
+      "location": "Pröbstingsee, Borken-Hoxfeld",
+      "description": "Großer Freizeitsee mit Badestelle und Rundwegen am Ufer.",
+      "hint": "Badesee · Spaziergänge",
+      "url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/badeseen/proebstingsee/"
+    },
+    {
+      "id": "zwillbrocker-venn",
+      "title": "Zwillbrocker Venn",
+      "kategorie": "Wandern & Natur",
+      "location": "Zwillbrock, Vreden",
+      "description": "Naturschutzgebiet mit Stegen und Wegen durch Moor- und Vogelwelt.",
+      "hint": "Naturpfade · Vogelbeobachtung",
+      "url": "https://www.naturschutzinformationen.nrw.de/nsg/de/fachinfo/gebiete/gesamt/BOR_001"
+    },
+    {
+      "id": "hohe-mark-wanderwege",
+      "title": "Naturpark Hohe Mark Wanderwege",
+      "kategorie": "Wandern & Natur",
+      "location": "Region Isselburg / Rhede / Borken",
+      "description": "Weitläufiges Netz aus markierten Wanderwegen durch Wälder und Heide.",
+      "hint": "Wanderrouten · Tagesausflüge",
+      "url": "https://naturpark-hohe-mark.de"
+    },
+    {
+      "id": "diersfordter-wald",
+      "title": "Diersfordter Wald",
+      "kategorie": "Wandern & Natur",
+      "location": "Diersfordt / Wesel",
+      "description": "Großes Waldgebiet mit ruhigen Wegen und Naturpfaden.",
+      "hint": "Waldspaziergänge",
+      "url": "https://www.wesel.de/de/tourismus-freizeit/diersfordter-wald/"
+    },
+    {
+      "id": "bocholter-aa-radwege",
+      "title": "Radwege entlang der Bocholter Aa",
+      "kategorie": "Freizeit & Sport",
+      "location": "Bocholt und Umgebung",
+      "description": "Flache Radstrecken entlang des Flusses durch Natur und Felder.",
+      "hint": "Radfahren · familienfreundlich",
+      "url": "https://www.muensterland.com/tourismus/themen/radfahren/"
+    },
+    {
+      "id": "hilgelo",
+      "title": "’t Hilgelo",
+      "kategorie": "Wasser & Badeseen",
+      "location": "Winterswijk (NL)",
+      "description": "Natursee mit Strandbereichen zum Baden und Entspannen nahe der Grenze.",
+      "hint": "Badesee · Sommerziel",
+      "url": "https://www.winterswijk.nl"
+    },
+    {
+      "id": "reeser-meer",
+      "title": "Reeser Meer",
+      "kategorie": "Wasser & Badeseen",
+      "location": "Mehrhoog / Rees",
+      "description": "Großer See mit ruhigen Uferwegen für Spaziergänge und Naturgenuss.",
+      "hint": "Spaziergänge · Natur",
+      "url": "https://www.stadt-rees.de/de/tourismus-freizeit/"
+    }
+  ]
 }
