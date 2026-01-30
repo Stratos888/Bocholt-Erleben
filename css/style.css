@@ -523,7 +523,14 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   pointer-events: none; /* Card bleibt komplett klickbar */
 }
 
-/* Title */
+/* === BEGIN BLOCK: EVENT TITLE (single-line + icon-safe ellipsis) ===
+Zweck:
+- Titel immer exakt 1 Zeile (gleich hohe Cards)
+- Ellipsis bei Überlänge
+- Fester Sicherheitsabstand zum Kategorie-Icon oben rechts
+Umfang:
+- ersetzt ausschließlich .event-title{...}
+=== */
 .event-title{
   min-width: 0;
 
@@ -533,16 +540,18 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
-  /* Reserve space for top-right category icon */
-  padding-right: 26px;
+  /* Reserve space for top-right category icon (icon + breathing room) */
+  padding-right: 44px;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  /* Single-line ellipsis */
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 
   margin-bottom: 6px;
 }
+/* === END BLOCK: EVENT TITLE (single-line + icon-safe ellipsis) === */
+
 
 
 /* Meta */
@@ -1949,6 +1958,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
