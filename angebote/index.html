@@ -63,18 +63,31 @@ Umfang: Ersetzt nur den bisherigen "Events veröffentlichen"-Button im Header.
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
 
-<!-- === BEGIN BLOCK: OFFERS VIEW (data-driven, cards) ===
-Zweck: Angebotsliste dynamisch aus /data/offers.json rendern; Card-Design identisch zu Events.
-Umfang: Ersetzt den kompletten bisherigen Placeholder-Main-Content.
+<!-- === BEGIN BLOCK: OFFERS VIEW (data-driven, cards + filter + detail host) ===
+Zweck:
+- Angebotsliste dynamisch aus /data/offers.json rendern (Cards)
+- Kategorie-Filter analog zu Events (minimal, mobile-first)
+- Host für Detailansicht (Overlay wird später über JS befüllt / geöffnet)
+Umfang: Ersetzt den kompletten bisherigen Main-Content der Angebotsseite.
 === -->
 <main class="page">
   <div class="content-hero">
-    <p class="content-kicker">Dauerhafte Ideen</p>
+    <p class="content-kicker">Ideen für draußen</p>
     <h1>Angebote in Bocholt</h1>
     <p class="content-lead">
-      Museen, Ausflugsziele, Kinderangebote und mehr – übersichtlich als Karten.
+      Badeseen, Natur und Wege – als schnelle Ideenliste.
     </p>
   </div>
+
+  <!-- FILTER (minimal, Kategorie) -->
+  <section class="filter-bar" aria-label="Filter">
+    <div class="filter-row">
+      <label class="filter-label" for="offer-category">Kategorie</label>
+      <select id="offer-category" class="filter-select">
+        <option value="">Alle</option>
+      </select>
+    </div>
+  </section>
 
   <!-- LOADING / EMPTY / ERROR (wird von js/offers-main.js befüllt) -->
   <div id="loading" class="loading-container">
@@ -89,7 +102,11 @@ Umfang: Ersetzt den kompletten bisherigen Placeholder-Main-Content.
     </div>
   </section>
 </main>
-<!-- === END BLOCK: OFFERS VIEW (data-driven, cards) === -->
+
+<!-- DETAIL HOST (wird später per JS als Overlay/Panel verwendet) -->
+<div id="offer-detail-root"></div>
+<!-- === END BLOCK: OFFERS VIEW (data-driven, cards + filter + detail host) === -->
+
 
 
 <!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
