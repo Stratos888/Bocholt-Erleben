@@ -587,6 +587,138 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 /* ============================================
    FOOTER
    ============================================ */
+
+/* === BEGIN BLOCK: BOTTOM TAB BAR (Top-App, safe-area, non-invasive) ===
+Zweck:
+- App-like Bottom Tab Bar für primäre Navigation (Events/Angebote).
+- iOS Safe-Area korrekt (Home-Indicator).
+- Verhindert, dass Inhalte/Overlays verdeckt werden (Content bekommt Bottom-Padding).
+Umfang:
+- Fügt nur Styles für .bottom-tabbar hinzu + sicheres Bottom-Padding für Hauptbereiche.
+- Keine Änderungen an bestehenden Komponenten-Styles.
+=== */
+
+:root{
+  --tabbar-h: 62px;
+}
+
+/* Content muss Platz lassen, damit Tabbar nichts überdeckt */
+.events-section{
+  padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+}
+.top-stack{
+  /* Sticky Search/Filter bleibt unverändert; zusätzlicher Platz unten, falls man bis ans Ende scrollt */
+  padding-bottom: calc(12px + 0px);
+}
+
+/* Tabbar */
+.bottom-tabbar{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 950; /* unter Sheets/Panel (9998/9999), über Content */
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  padding: 8px 10px calc(8px + max(0px, env(safe-area-inset-bottom)));
+
+  background: rgba(249, 251, 246, 0.92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+
+  border-top: 1px solid rgba(31,41,51,0.08);
+  box-shadow:
+    0 -10px 30px rgba(31,41,51,0.08),
+    0 1px 0 rgba(255,255,255,0.75) inset;
+
+  transform: translateZ(0);
+}
+
+.bottom-tabbar__item{
+  -webkit-tap-highlight-color: transparent;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  min-height: var(--tabbar-h);
+
+  text-decoration: none;
+
+  border-radius: 16px;
+
+  color: rgba(95,107,115,0.92);
+  font-weight: 800;
+}
+
+.bottom-tabbar__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.88;
+}
+
+.bottom-tabbar__icon svg{
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.bottom-tabbar__label{
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+/* Active State: ruhig, aber klar */
+.bottom-tabbar__item.is-active,
+.bottom-tabbar__item[aria-current="page"]{
+  color: rgba(31,41,51,0.96);
+  background: rgba(139,207,74,0.14);
+  border: 1px solid rgba(139,207,74,0.20);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.70) inset;
+}
+
+.bottom-tabbar__item:active{
+  transform: translateY(1px);
+}
+
+/* Desktop: Tabbar nicht “mobile-only” wirken lassen */
+@media (min-width: 900px){
+  :root{ --tabbar-h: 56px; }
+
+  .bottom-tabbar{
+    left: 50%;
+    right: auto;
+    width: min(1040px, calc(100vw - 40px));
+    transform: translateX(-50%) translateZ(0);
+
+    border-radius: 18px 18px 0 0;
+  }
+
+  .events-section{
+    padding-bottom: calc(18px + var(--tabbar-h) + 18px);
+  }
+}
+
+/* === END BLOCK: BOTTOM TAB BAR (Top-App, safe-area, non-invasive) === */
+
+footer {
+  background: #0b1220;
+  color: #e5e7eb;
+  padding: 34px 20px;
+  text-align: center;
+}
+
 footer {
   background: #0b1220;
   color: #e5e7eb;
@@ -1802,6 +1934,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
