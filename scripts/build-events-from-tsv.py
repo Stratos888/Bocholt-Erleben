@@ -192,7 +192,7 @@ def main() -> None:
             fail(f"Zeile {idx}: duplicate id: {ev_id!r}")
         seen_ids.add(ev_id)
 
-                validate_date(data["date"], idx)
+        validate_date(data["date"], idx)
         if data.get("endDate", ""):
             validate_date(data["endDate"], idx)
         validate_time(data.get("time", ""), idx)
