@@ -5,6 +5,7 @@
 # - Output: data/events.json (Single Source of Truth für die App)
 # - Fail-Fast: bricht mit Exit 1 ab, wenn Validierung fehlschlägt
 # - Validierung: Pflichtfelder, eindeutige IDs, Duplikate, Datumsformat, Kategorien, Steuerzeichen
+# - Optional: endDate (YYYY-MM-DD) wird übernommen, wenn vorhanden
 # Umfang:
 # - Liest TSV (Tab-separated) mit Headerzeile
 # - Schreibt JSON (UTF-8, ensure_ascii=False, pretty)
@@ -31,7 +32,6 @@ RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")  # slug-like
 RE_TIME = re.compile(r"^\s*(\d{1,2})[:.](\d{2})(?:\s*[-–]\s*(\d{1,2})[:.](\d{2}))?\s*$")
 
-
 CANONICAL_CATEGORIES = [
     "Märkte & Feste",
     "Kultur & Kunst",
@@ -55,7 +55,6 @@ CATEGORY_MAP = {
     "markt": "Märkte & Feste",
 }
 
-
 REQUIRED_FIELDS = ["id", "title", "date", "city", "location", "kategorie"]
 
 
@@ -71,7 +70,6 @@ class EventRow:
     kategorie: str
     url: str
     description: str
-
 
 
 def fail(msg: str) -> None:
@@ -150,7 +148,7 @@ def read_tsv(path: Path) -> List[Dict[str, str]]:
         reader = csv.DictReader(f, delimiter="\t")
         if not reader.fieldnames:
             fail("TSV hat keine Headerzeile.")
-        rows = []
+        rows: List[Dict[str, str]] = []
         for row in reader:
             rows.append({k: (v if v is not None else "") for k, v in row.items()})
         return rows
@@ -197,7 +195,6 @@ def main() -> None:
             validate_date(data["endDate"], idx)
         validate_time(data.get("time", ""), idx)
 
-
         cat = normalize_category(data["kategorie"])
         if cat not in CANONICAL_CATEGORIES:
             fail(
@@ -220,7 +217,7 @@ def main() -> None:
             )
         seen_fingerprints.add(fp)
 
-                events.append(
+        events.append(
             EventRow(
                 id=ev_id,
                 title=data["title"],
@@ -235,7 +232,6 @@ def main() -> None:
             )
         )
 
-
     # Sortierung (Datum + optionale Uhrzeit)
     def sort_key(e: EventRow) -> Tuple[str, int]:
         tm = parse_time_minutes(e.time)
@@ -245,7 +241,7 @@ def main() -> None:
 
     out = []
     for e in events:
-                item = {
+        item = {
             "id": e.id,
             "title": e.title,
             "date": e.date,
@@ -256,7 +252,6 @@ def main() -> None:
         }
         if e.endDate:
             item["endDate"] = e.endDate
-
         if e.url:
             item["url"] = e.url
         if e.description:
