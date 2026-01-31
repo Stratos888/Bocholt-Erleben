@@ -79,7 +79,13 @@ Umfang: Ersetzt den kompletten bisherigen Main-Content der Angebotsseite.
     </p>
   </div>
 
-  <!-- FILTER (minimal, Kategorie) -->
+   <!-- === BEGIN BLOCK: OFFERS FILTER BAR (category + tag) ===
+Zweck:
+- Zwei Filter wie State of the Art: Kategorie (Haupt) + Aktivität (Tag/Intent)
+- Mobile-first, ruhig, keine Pills auf Cards
+Umfang:
+- ersetzt ausschließlich den bisherigen Filter-Section-Block
+=== -->
   <section class="filter-bar" aria-label="Filter">
     <div class="filter-row">
       <label class="filter-label" for="offer-category">Kategorie</label>
@@ -87,7 +93,16 @@ Umfang: Ersetzt den kompletten bisherigen Main-Content der Angebotsseite.
         <option value="">Alle</option>
       </select>
     </div>
+
+    <div class="filter-row">
+      <label class="filter-label" for="offer-tag">Aktivität</label>
+      <select id="offer-tag" class="filter-select">
+        <option value="">Alle</option>
+      </select>
+    </div>
   </section>
+  <!-- === END BLOCK: OFFERS FILTER BAR (category + tag) === -->
+
 
   <!-- LOADING / EMPTY / ERROR (wird von js/offers-main.js befüllt) -->
   <div id="loading" class="loading-container">
