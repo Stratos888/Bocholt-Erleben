@@ -53,7 +53,7 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: CONTAINER_LOOKUP (offers) === */
 
-    /* === BEGIN BLOCK: CATEGORY_ICON (optional, neutral) ===
+      /* === BEGIN BLOCK: CATEGORY_ICON (optional, neutral) ===
   Zweck: Kategorie-Icon-Zuordnung für die finalen Hauptkategorien (rein dekorativ).
   Umfang: Feste Map; unbekannt => leer.
   === */
@@ -73,29 +73,27 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: CATEGORY_ICON (optional, neutral) === */
 
-
-      /* === BEGIN BLOCK: CREATE_CARD (offers → event-card DNA) ===
+  /* === BEGIN BLOCK: CREATE_CARD (offers → event-card DNA) ===
   Zweck: Offer-Cards minimal nach PROJECT.md:
   - Titel
   - Hauptkategorie
   - Location
   - Kategorie-Icon
   Interaktion:
-  - Klick/Enter/Space → Offer-Detailpanel (Hook wie Events; Panel folgt separat)
+  - Klick/Enter/Space → Offer-Detailpanel (window.OfferDetailPanel.show)
   Umfang: Erzeugt .event-card mit .event-title + .event-meta + .event-location.
   === */
   function createCard(offer) {
     const card = document.createElement("div");
     card.className = "event-card";
     card.tabIndex = 0;
-
-    // A11y/UX
-    const title = (offer?.title || "").toString().trim();
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Angebot anzeigen: ${title || ""}`);
 
-    const category = (offer?.kategorie || offer?.category || "").toString().trim();
+    const title = (offer?.title || "").toString().trim();
+    const category = (offer?.kategorie || "").toString().trim();
     const location = (offer?.location || "").toString().trim();
+
+    card.setAttribute("aria-label", `Angebot anzeigen: ${title || "Ohne Titel"}`);
 
     const icon = getCategoryIcon(category);
     if (icon) {
@@ -129,22 +127,23 @@ const OfferCards = (() => {
       card.appendChild(locWrap);
     }
 
-    /* === BEGIN BLOCK: OFFERCARD CLICK HANDLER === */
-    card.addEventListener("click", () => {
+    /* === BEGIN BLOCK: OFFERCARD OPEN DETAILPANEL === */
+    const open = () => {
       if (window.OfferDetailPanel?.show) window.OfferDetailPanel.show(offer);
-    });
-    /* === END BLOCK: OFFERCARD CLICK HANDLER === */
+    };
 
-    // Keyboard: Enter/Space
+    card.addEventListener("click", open);
     card.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();
-      if (window.OfferDetailPanel?.show) window.OfferDetailPanel.show(offer);
+      open();
     });
+    /* === END BLOCK: OFFERCARD OPEN DETAILPANEL === */
 
     return card;
   }
   /* === END BLOCK: CREATE_CARD (offers → event-card DNA) === */
+
 
 
 
