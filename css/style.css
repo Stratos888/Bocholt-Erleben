@@ -475,53 +475,56 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 === */
 
 /* Card: ruhig, hell, hairline + ultra-subtiler shadow */
-.event-card{
-  position: relative; /* anchor for category icon */
-  min-width: 0;
+.event-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 
-  background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  border-radius: 16px;
 
-  padding: 12px 14px;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
 
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.86) inset,
-    0 6px 18px rgba(31,41,51,0.05);
-
-  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.event-card:active{
-  background: var(--color-primary-muted);
-  border-color: rgba(139,207,74,0.26);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.86) inset,
-    0 4px 14px rgba(31,41,51,0.05);
-  transform: translateY(1px);
+.event-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--card-shadow-hover);
 }
 
-@media (hover: hover) and (pointer: fine){
-  .event-card:hover{
-    border-color: rgba(31,41,51,0.10);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.86) inset,
-      0 10px 26px rgba(31,41,51,0.07);
-  }
+.event-card:active {
+  transform: translateY(0);
 }
 
-/* Kategorie-Icon: oben rechts, ohne Rahmen */
-.event-category-icon{
+.event-title {
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.event-meta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.event-location {
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+/* Kategorie-Icon immer oben rechts fixieren */
+.event-category-icon {
   position: absolute;
-  top: 12px;
+  top: 10px;
   right: 12px;
-
-  font-size: 16px;
-  line-height: 1;
-  opacity: 0.78;
-
-  pointer-events: none; /* Card bleibt komplett klickbar */
+  font-size: 1.2rem;
+  pointer-events: none;
 }
+
 
 /* === BEGIN BLOCK: EVENT TITLE (single-line + icon-safe ellipsis) ===
 Zweck:
@@ -1958,6 +1961,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
