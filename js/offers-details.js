@@ -200,19 +200,19 @@ const OfferDetailPanel = {
 
       ${description ? `<div class="detail-description">${this.escape(description)}</div>` : ""}
 
-           ${hint ? `
+               ${hint ? `
         <div class="detail-meta">
           <div class="detail-hint">${this.escape(hint)}</div>
         </div>
       ` : ""}
 
-
       <div class="detail-actions">
         ${safeUrl(url) ? `
           <a class="detail-link-btn" href="${safeUrl(url)}" target="_blank" rel="noopener">
-            Zur Info
+            Zur Location
           </a>
         ` : ""}
+
 
         ${mapsHref ? `
           <a class="detail-link-btn" href="${mapsHref}" target="_blank" rel="noopener">
