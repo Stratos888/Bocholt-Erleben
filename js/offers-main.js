@@ -23,6 +23,7 @@ const OffersApp = {
   offers: [],
   filteredOffers: [],
   activeCategory: "",
+  activeTag: "",
 
   async init() {
     debugLog?.("=== OFFERS - APP START ===");
@@ -40,6 +41,7 @@ Zweck:
   - kategorie
   - description Pflicht
   - url Pflicht
+  - tags optional (Array)
 Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
 === */
       const response = await fetch("/data/offers.json", { cache: "no-store" });
@@ -65,6 +67,11 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
         const description = (obj.description ?? "").toString().trim();
         const url = (obj.url ?? obj.link ?? "").toString().trim();
 
+        const rawTags = Array.isArray(obj.tags) ? obj.tags : [];
+        const tags = rawTags
+          .map((t) => (t == null ? "" : String(t)).trim())
+          .filter(Boolean);
+
         return {
           ...obj,
           id,
@@ -73,7 +80,8 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
           location,
           hint,
           description,
-          url
+          url,
+          tags
         };
       };
 
@@ -93,9 +101,10 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
         return;
       }
 
-      // Kategorie-Filter initialisieren
-      this.bindCategoryFilter();
+      // Filter initialisieren
+      this.bindFilters();
       this.populateCategoryOptions();
+      this.populateTagOptions(); // initial (alle Tags)
 
       // Initial render (ohne Filter)
       this.applyFilterAndRender();
@@ -109,30 +118,51 @@ Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
     }
   },
 
-  /* === BEGIN BLOCK: FILTER_BIND (category) ===
-Zweck: Dropdown-Change → State setzen → neu rendern.
-Umfang: Nur Kategorie-Filter.
+  /* === BEGIN BLOCK: FILTER_BIND (category + tag) ===
+Zweck:
+- Kategorie/Tag Dropdowns binden
+- Bei Kategorie-Wechsel: Tag-Optionen facettieren + ggf. ungültigen Tag resetten
+- Re-render nach jeder Änderung
+Umfang: Nur Filter-Logik.
 === */
-  bindCategoryFilter() {
-    const select = document.getElementById("offer-category");
-    if (!select) return;
+  bindFilters() {
+    const catSelect = document.getElementById("offer-category");
+    const tagSelect = document.getElementById("offer-tag");
 
-    select.addEventListener("change", () => {
-      this.activeCategory = (select.value || "").toString();
-      this.applyFilterAndRender();
-    });
+    if (catSelect) {
+      catSelect.addEventListener("change", () => {
+        this.activeCategory = (catSelect.value || "").toString();
+
+        // Tag-Optionen abhängig von Kategorie aktualisieren
+        this.populateTagOptions();
+
+        // Falls aktiver Tag in dieser Kategorie nicht vorkommt → reset
+        if (this.activeTag && !this.getAvailableTagsForCurrentCategory().includes(this.activeTag)) {
+          this.activeTag = "";
+          if (tagSelect) tagSelect.value = "";
+        }
+
+        this.applyFilterAndRender();
+      });
+    }
+
+    if (tagSelect) {
+      tagSelect.addEventListener("change", () => {
+        this.activeTag = (tagSelect.value || "").toString();
+        this.applyFilterAndRender();
+      });
+    }
   },
-  /* === END BLOCK: FILTER_BIND (category) === */
+  /* === END BLOCK: FILTER_BIND (category + tag) === */
 
   /* === BEGIN BLOCK: FILTER_OPTIONS (category) ===
-Zweck: Dropdown aus Angeboten befüllen (einmal beim Init).
+Zweck: Kategorie-Dropdown aus Angeboten befüllen (einmal beim Init).
 Umfang: Sortierte Unique-Liste.
 === */
   populateCategoryOptions() {
     const select = document.getElementById("offer-category");
     if (!select) return;
 
-    // Optionen (außer "Alle") resetten
     while (select.options.length > 1) select.remove(1);
 
     const categories = Array.from(
@@ -148,16 +178,68 @@ Umfang: Sortierte Unique-Liste.
   },
   /* === END BLOCK: FILTER_OPTIONS (category) === */
 
-  /* === BEGIN BLOCK: FILTER_APPLY + RENDER ===
-Zweck: Filter anwenden und OfferCards rendern.
-Umfang: Kategorie-Filter; Empty-State bei 0 Treffern.
+  /* === BEGIN BLOCK: FILTER_OPTIONS (tag, faceted) ===
+Zweck:
+- Aktivitäts-Dropdown aus offers[].tags befüllen
+- Facettierung: Wenn Kategorie aktiv ist, nur Tags zeigen, die in dieser Kategorie vorkommen
+Umfang: Sortierte Unique-Liste, inkl. "Alle".
+=== */
+  populateTagOptions() {
+    const select = document.getElementById("offer-tag");
+    if (!select) return;
+
+    while (select.options.length > 1) select.remove(1);
+
+    const tags = this.getAvailableTagsForCurrentCategory()
+      .slice()
+      .sort((a, b) => a.localeCompare(b, "de"));
+
+    for (const tag of tags) {
+      const opt = document.createElement("option");
+      opt.value = tag;
+      opt.textContent = tag;
+      select.appendChild(opt);
+    }
+  },
+  /* === END BLOCK: FILTER_OPTIONS (tag, faceted) === */
+
+  /* === BEGIN BLOCK: TAGS_AVAILABLE (helper) ===
+Zweck: Liefert die verfügbaren Tags abhängig von der aktiven Kategorie.
+Umfang: Helper für Facettierung + Validierung.
+=== */
+  getAvailableTagsForCurrentCategory() {
+    const cat = (this.activeCategory || "").trim();
+
+    const base = !cat
+      ? this.offers
+      : this.offers.filter((o) => o.kategorie === cat);
+
+    const all = [];
+    for (const o of base) {
+      if (Array.isArray(o.tags)) {
+        for (const t of o.tags) all.push(t);
+      }
+    }
+
+    return Array.from(new Set(all.filter(Boolean)));
+  },
+  /* === END BLOCK: TAGS_AVAILABLE (helper) === */
+
+  /* === BEGIN BLOCK: FILTER_APPLY + RENDER (AND) ===
+Zweck:
+- Filter anwenden und OfferCards rendern
+- Logik: Kategorie AND Tag (wenn gesetzt)
+Umfang: Nur Filter + Render.
 === */
   applyFilterAndRender() {
     const cat = (this.activeCategory || "").trim();
+    const tag = (this.activeTag || "").trim();
 
-    this.filteredOffers = !cat
-      ? [...this.offers]
-      : this.offers.filter((o) => o.kategorie === cat);
+    this.filteredOffers = this.offers.filter((o) => {
+      if (cat && o.kategorie !== cat) return false;
+      if (tag && !(Array.isArray(o.tags) && o.tags.includes(tag))) return false;
+      return true;
+    });
 
     if (typeof window.OfferCards?.render !== "function") {
       console.error("❌ OfferCards.render missing – js/offers.js not loaded or has an error.");
@@ -167,7 +249,7 @@ Umfang: Kategorie-Filter; Empty-State bei 0 Treffern.
 
     OfferCards.render(this.filteredOffers);
   },
-  /* === END BLOCK: FILTER_APPLY + RENDER === */
+  /* === END BLOCK: FILTER_APPLY + RENDER (AND) === */
 
   showLoading(show) {
     const loadingEl = document.getElementById("loading");
@@ -201,6 +283,7 @@ Umfang: Kategorie-Filter; Empty-State bei 0 Treffern.
     }
   }
 };
+
 
 
 // App starten sobald DOM ready
