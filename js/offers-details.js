@@ -159,7 +159,7 @@ const OfferDetailPanel = {
     const o = offer && typeof offer === "object" ? offer : {};
 
     const title = (o.title || "").toString().trim() || "Ohne Titel";
-    const category = (o.kategorie || o.category || "").toString().trim();
+    const category = (o.kategorie || "").toString().trim();
     const location = (o.location || "").toString().trim();
     const description = (o.description || "").toString().trim();
     const hint = (o.hint || "").toString().trim();
