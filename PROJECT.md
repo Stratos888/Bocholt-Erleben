@@ -1,231 +1,228 @@
-# Projekt „Bocholt erleben“ – Verbindlicher Stand (Single Source of Truth)
+# PROJECT.md – Bocholt erleben
+Single Source of Truth (Architektur + Regeln + Arbeitsweise)
 
-> **Wichtig:** Dieses Dokument ist die maßgebliche Referenz für Folgechats.
-> Alles hier gilt als **verbindlich entschieden**. Änderungen nur nach Proof.
-> Dieses Dokument ist **KI-optimiert**: Regeln, Architektur, Prozess – keine Diskussionen.
+Ziel:
+Eine mobile-first Event- und Freizeit-Ideenplattform für Bocholt.
+Fokus: schnell inspirieren („Was kann ich heute machen?“), nicht Datenbank oder Spezial-App.
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GRUNDPRINZIP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## 1. Projektziel & Grundverständnis
+Die Seite ist KEINE:
+- Tourenplaner-App (Komoot etc.)
+- Sporttracking-App
+- Spezialistenplattform
 
-**Bocholt erleben** ist eine **PWA-first Eventplattform**, keine klassische Stadt-Website.
+Die Seite IST:
+→ ein schneller Ideenfinder für Freizeit & Ausflüge
 
-- Home/Start = **Events-Übersicht**
-- Fokus: „Was ist wann los?“
-- Ruhige, moderne, sachliche UI
-- **Keine Werbung, keine Hervorhebung einzelner Anbieter**
-- Vertrauen durch Klarheit, Ordnung, Neutralität
+Designziel:
+- ruhig
+- hochwertig
+- wenig visuelle Unruhe
+- scannbar in Sekunden
+- möglichst wenig Text auf Cards
+- Details erst im Panel
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VERBINDLICHE ARBEITSREGELN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## 2. Arbeitsprinzipien (oberste Priorität)
+Diese Regeln gelten IMMER.
 
-1. **Niemals raten**
-2. „100% sicher“ nur mit **reproduzierbarem Proof** (DevTools/Logs/Code)
-3. Wenn etwas unklar ist → **erst klären, dann patchen**
-4. Lieber kein Patch als ein falscher
-5. **Datenpipeline vor UI debuggen (NEU, verbindlich)**
+1. Konsolidierungs-Modus
+   Der zuletzt gepostete Stand einer Datei ist vollständig und korrekt.
+   Niemals raten oder Teile rekonstruieren.
 
----
+2. Diff statt Snippet
+   Nur Replace-Blöcke oder klare Änderungen.
+   Keine kompletten Dateien neu erfinden.
 
-## 3. Technischer Arbeitsmodus (streng / verbindlich)
+3. Datei-fokussiert
+   Immer nur 1 Datei pro Schritt ändern.
 
-- **Konsolidierungs-Modus**  
-  Der zuletzt gepostete Stand einer Datei gilt als vollständig. Keine Änderungen ohne sichtbaren Code.
+4. BEGIN/END Marker
+   Jeder Patch enthält klar markierte Blöcke.
 
-- **Diff statt Snippet**  
-  Änderungen nur als gezieltes **Ersetzen/Löschen/Verschieben** konkreter Blöcke.
+5. Niemals spekulieren
+   Erst Root Cause beweisen, dann fixen.
 
-- **Datei-fokussiert**  
-  Immer nur **eine Datei pro Schritt** bearbeiten.
+6. Datenpipeline vor UI debuggen
 
-- **Codeblock-Markierungen verpflichtend**  
-  Bei Einfügen/Ersetzen: `BEGIN/END`-Markierungen mit Zweck & Umfang.
+7. events.json / offers.json = Runtime Truth
+   Keine TSV/CSV im Client rekonstruieren.
 
-- **UI-Polish-Patches: CSS-only**
+8. UI-Polish nur CSS
 
-- **Bugfix-Oberregel**  
-  Kein „Fix ist safe“ ohne Root-Cause-Nachweis.
+9. Overlay-Root unter <body>
+   Alle Modals/Sheets/Details außerhalb sticky/transform Container.
 
-- **Spekulative Fixes verboten (NEU)**  
-  Kein „probier mal“, kein mehrfaches Herumdoktern.
+10. Fail-Fast Deploy
+   Build darf bei kaputten Assets hart fehlschlagen.
 
----
+11. 100%-Regel für Fixes
+   Änderungen vollständig und korrekt liefern.
 
-# 🆕 4. Debug- & Diagnose-Regeln (aus Lessons Learned – verbindlich)
+12. ❗ NEU – Systemstabilität (verbindlich)
+   Neue Features oder Änderungen dürfen:
+   - nichts anderes kaputt machen
+   - keine Seiteneffekte erzeugen
+   - bestehende Patterns wiederverwenden
+   - keine Sonderlogik einführen
+   - immer ganzheitlich das System berücksichtigen
 
-## 4.1 Feste Debug-Reihenfolge bei Event-Problemen
+   → Evolution statt Workarounds
 
-IMMER:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARCHITEKTUR – EVENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1️⃣ `data/events.tsv` prüfen  
-2️⃣ `data/events.json` prüfen  
-3️⃣ `scripts/build-events-from-tsv.py` prüfen  
-4️⃣ erst dann Frontend (`events.js`, `details.js`)
+Datenfluss:
+data/events.json
+→ js/main.js (load)
+→ js/events.js (render)
+→ js/details.js (detail panel)
 
-❌ Niemals direkt UI patchen, wenn Daten evtl. fehlen
+Regeln:
+- Cards minimal
+- keine Beschreibung auf Card
+- Details im Panel
+- URL im Panel
+- Kategorie-Icon oben rechts
+- dynamische Zeitsektionen (Heute/Demnächst/Später)
+- Multi-Day Events gelten während Laufzeit als "Heute"
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARCHITEKTUR – ANGEBOTE (NEU)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## 4.2 Runtime-Truth (wichtig)
+Zweck:
+Nicht-kommerzielle Freizeit-Ideen (Seen, Natur, Spielplätze, etc.)
 
-Zur Laufzeit gilt ausschließlich:
+KEINE:
+- kommerziellen Anbieter (z.B. Erlebnisbäder)
+- bezahlpflichtige Locations
 
-👉 **events.json ist die Wahrheit**
+Datenfluss (identisch zu Events):
+data/offers.json
+→ js/offers-main.js (load + filter)
+→ js/offers.js (render)
+→ js/offers-details.js (detail panel)
 
-Nicht:
-- TSV
-- Editor
-- Annahmen
+WICHTIG:
+Keine Sonderlösung gegenüber Events.
+Gleiche Patterns wiederverwenden.
 
-Wenn ein Event in `events.json` fehlt → Frontend ist automatisch unschuldig.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OFFERS – DATENMODELL (final)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
----
+Root:
+{
+  meta: {},
+  offers: []
+}
 
-## 4.3 Build-Status-Regel (NEU, hart)
+Offer:
+{
+  id: string,
+  title: string,
+  kategorie: string,   // Pflicht – Hauptkategorie
+  tags: string[],      // optional – Aktivitäten/Intents
+  location: string,
+  description: string, // Pflicht – nur im Detailpanel
+  hint: string,
+  url: string          // Pflicht – offizielle Info
+}
 
-Wenn GitHub Actions **rot**:
-- kein Frontend-Debugging erlaubt
-- erst Builder/Script reparieren
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OFFERS – UI REGELN (final)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
----
+Card zeigt NUR:
+- Titel
+- Hauptkategorie
+- Location
+- Kategorie-Icon
 
-## 4.4 TSV/CSV Transportregel (NEU)
-
-Strukturierte Tab-Dateien dürfen **niemals im Chat kopiert werden**.
-
-Grund:
-- Tabs werden zu Spaces
-- Parser bricht
-- Spalten verschieben sich
-
-Erlaubt:
-- Datei hochladen
-- Builder fixen
-- Diff-Patches
-
-Verboten:
-- komplette TSV hier posten
-- „copy/paste Rekonstruktionen“
-
----
-
-## 4.5 Root-Cause Pflichtprozess (NEU)
-
-Vor jedem Patch:
-
-Beweis liefern:
-- console.log(...)
-- events.json prüfen
-- konkrete Codezeile
-
-Ohne Proof → kein Patch.
-
----
-
-## 5. Architektur-Entscheidungen (fest)
-
-### 5.1 Overlays / Fixed/Sticky
-- Alle Overlays in Overlay-Root unter `<body>`
-- Nie innerhalb sticky/transform/backdrop-filter
-
-### 5.2 Deploy / Cache / Fail-Fast
-- Deploy schlägt hart fehl bei Asset-Inkonsistenzen
-- Cache-Busting via `?v=BUILD_ID`
-- Versionfile `/meta/build.txt`
-
----
-
-## 6. Repo-Struktur (relevant)
-
-- `data/events.tsv` = Single Source of Truth (Editor)
-- `data/events.json` = **Runtime Source of Truth**
-- `scripts/build-events-from-tsv.py` = einzig erlaubter Konverter
-- JSON wird niemals manuell editiert
-
-Frontend:
-- `events.js` = Cards
-- `details.js` = DetailPanel
-- `filter.js` = Filter
-- `style.css` = UI-only
-
----
-
-## 7. Events – Datenmodell (verbindlich)
-
-Pflicht:
-- id
-- title
-- date
-- time
-- city
-- location
-- kategorie
-- url
+Card zeigt NICHT:
 - description
+- Links
+- mehrere Tags
 
-Optional:
-- **endDate** (Mehrtage/Laufzeit)
+Card-Klick:
+→ Detailpanel öffnen
 
----
+Detailpanel zeigt:
+- vollständige Beschreibung
+- Zur Location (url)
+- Maps-Fallback
 
-## 8. Range-Events (finale Produktregel)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KATEGORIEN & TAGS (festgelegt)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- EIN Event mit `date + endDate`
-- keine Tagesduplikate
-- Anzeige:
-  - Card: 20.11 – 10.01
-  - Detail: gleicher Zeitraum
-- während Laufzeit sichtbar
+Hauptkategorien (ein Wort, ruhig):
+- Baden
+- Natur
+- Familie
+- Freizeit
+- Kultur
 
----
+Tags (nur Aktivitäten/Intents, keine Details):
+- Wandern
+- Radfahren
+- Spazieren
+- Baden
+- Spielen
+- Picknick
+- Familie
+- Hundegeeignet
+- Entspannen
 
-## 9. Darstellung (Eventliste, Cards, Detail)
+KEINE Tags:
+- Uferweg
+- Kurzweg
+- Moor
+- Vogelbeobachtung
+- technische Eigenschaften
 
-(unverändert – bestehende Regeln bleiben)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILTERLOGIK (OFFERS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
----
+2 Filter (State of the Art):
 
-## 10. Content-Erweiterung: „Angebote“
-(unverändert)
+1. Kategorie (Hauptkategorie)
+2. Aktivität (Tags)
 
----
+Logik:
+AND-Verknüpfung
 
-## 11. Deploy/Build Prozess
-(unverändert + Builder ist kritischster Punkt)
+UX:
+Tag-Filter ist facettiert (zeigt nur passende Tags der gewählten Kategorie)
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CARD DESIGN REGELN (global)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# 🆕 12. Lessons Learned (dauerhafte Regeln)
+- immer gleiche Höhe
+- Titel 1 Zeile + Ellipsis
+- fester Abstand zum Kategorie-Icon
+- keine Label-Flut
+- minimalistische Meta-Zeile
 
-Diese Fehler dürfen nie wieder passieren:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARBEITSWEISE FÜR NEUE FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❌ UI debuggen obwohl JSON falsch  
-❌ TSV im Chat posten  
-❌ mehrere Hypothese-Fixes nacheinander  
-❌ Builder ignorieren  
-❌ „wahrscheinlich“-Patches  
+Bevor ein Feature gebaut wird:
 
-Immer:
+1. Passt es zur Produktvision (Ideenfinder)?
+2. Ist es minimal?
+3. Wiederverwendet es bestehende Patterns?
+4. Bricht es nichts Bestehendes?
+5. Kann es ohne Sonderlogik integriert werden?
 
-✅ JSON prüfen  
-✅ Builder prüfen  
-✅ 1 minimaler Fix  
-✅ eine Datei pro Schritt  
-
----
-
-## 13. Offene ToDos (Reihenfolge bleibt)
-
-1) Range-Events final polish  
-2) Angebote-Struktur  
-3) Content-Aufbau  
-
----
-
-## 14. Ablauf im nächsten Chat
-
-- ZIP hochladen
-- aktuelle Datei posten
-- diff-basiert arbeiten
-- nie raten
+Wenn NEIN → nicht bauen oder vereinfachen.
