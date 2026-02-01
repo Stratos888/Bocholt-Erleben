@@ -1023,23 +1023,23 @@ Umfang: Ersetzt den kompletten Bottom-Sheet Basisblock inkl. overlay/card/grabbe
 }
 
 /* === BEGIN BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) ===
-Zweck: Verhindert, dass ein transformierter Parent (.top-stack) das position:fixed Overlay “entkoppelt”.
-Umfang: Neutralisiert transform nur im Zustand body.is-sheet-open.
+Zweck:
+- Verhindert, dass .top-stack (sticky/transform/backdrop-filter) das position:fixed Sheet “einsperrt”.
+- Stellt sicher, dass das Sheet nicht unter der Bottom-Tabbar liegt (Stacking Context: top-stack < tabbar).
+Umfang:
+- Nur aktiv während body.is-sheet-open.
+- Neutralisiert transform + backdrop-filter und hebt z-index der .top-stack Ebene über die Tabbar.
 === */
 body.is-sheet-open .top-stack{
   transform: none !important;
-}
-/* === BEGIN BLOCK: SHEET OPEN - DISABLE TOP-STACK BACKDROP FILTER (prevents fixed containment) ===
-Zweck: iOS/Safari/Chromium Mobile: backdrop-filter auf sticky Element erzeugt Containing Block → fixed Sheet wird abgeschnitten/versetzt.
-Umfang: Deaktiviert backdrop-filter nur während body.is-sheet-open.
-=== */
-body.is-sheet-open .top-stack{
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-}
-/* === END BLOCK: SHEET OPEN - DISABLE TOP-STACK BACKDROP FILTER (prevents fixed containment) === */
 
+  /* Wichtig: .top-stack (900) muss > .bottom-tabbar (950) liegen, sonst wird das Sheet darunter gerendert */
+  z-index: 9997 !important;
+}
 /* === END BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) === */
+
 
 .filter-sheet__overlay{
   position: absolute;
@@ -1929,6 +1929,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
