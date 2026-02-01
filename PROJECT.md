@@ -37,10 +37,11 @@ Diese Regeln gelten IMMER.
 
 2. Diff statt Snippet
    Nur Replace-Blöcke oder klare Änderungen.
-   Keine kompletten Dateien neu erfinden.
+   Keine kompletten Dateien neu erfinden (außer ausdrücklich “neu anlegen”).
 
 3. Datei-fokussiert
    Immer nur 1 Datei pro Schritt ändern.
+   Ziel: 1 Commit pro Schritt.
 
 4. BEGIN/END Marker
    Jeder Patch enthält klar markierte Blöcke.
@@ -54,6 +55,7 @@ Diese Regeln gelten IMMER.
    Keine TSV/CSV im Client rekonstruieren.
 
 8. UI-Polish nur CSS
+   (JS nur bei Funktionsbedarf, niemals für “nur schöner”.)
 
 9. Overlay-Root unter <body>
    Alle Modals/Sheets/Details außerhalb sticky/transform Container.
@@ -62,17 +64,39 @@ Diese Regeln gelten IMMER.
    Build darf bei kaputten Assets hart fehlschlagen.
 
 11. 100%-Regel für Fixes
-   Änderungen vollständig und korrekt liefern.
+   Änderungen vollständig und korrekt liefern (keine halben Patches).
 
-12. ❗ NEU – Systemstabilität (verbindlich)
+12. Systemstabilität (verbindlich)
    Neue Features oder Änderungen dürfen:
    - nichts anderes kaputt machen
    - keine Seiteneffekte erzeugen
    - bestehende Patterns wiederverwenden
    - keine Sonderlogik einführen
    - immer ganzheitlich das System berücksichtigen
-
    → Evolution statt Workarounds
+
+13. NEU – Replace-Anker-Regel (verbindlich)
+   Replace-Blöcke dürfen nur über Textbereiche/Selector/Marker erfolgen,
+   die nachweislich exakt so im aktuellen Stand existieren.
+   Wenn der Block nicht 1:1 verifizierbar ist → erst Proof liefern, dann patchen.
+
+14. NEU – Proof-First Patch Protocol (P3) für Layout/CSS (verbindlich)
+   Für Layout-/CSS-Fixes (Overflow, Grid, Container, Cards, Tabbar) gilt:
+   A) Pre-Proof:
+      - scrollWidth - clientWidth
+      - Top-Offender (Element + Breite)
+      - Computed Styles des Offenders (width/min/max/boxSizing/whiteSpace/transform/grid)
+   B) Token-Check:
+      - jede genutzte var(--...) ist in :root definiert ODER bewusst ergänzt
+   C) Post-Proof:
+      - scrollWidth - clientWidth == 0
+      - visuelle Kontrolle: Cards + Tabbar sichtbar, keine Miniatur-Zoom-Effekte
+
+15. NEU – CSS Token Discipline (verbindlich)
+   - Keine neuen Token-Namen “einfach verwenden”.
+   - Card-Background/Shadow müssen auf bestehende Tokens mappen
+     (z.B. --surface, --shadow-sm, --shadow-md).
+   - Neue Tokens nur als eigener, bewusster Schritt in :root.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ARCHITEKTUR – EVENTS
@@ -94,7 +118,7 @@ Regeln:
 - Multi-Day Events gelten während Laufzeit als "Heute"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ARCHITEKTUR – ANGEBOTE (NEU)
+ARCHITEKTUR – ANGEBOTE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Zweck:
@@ -192,7 +216,7 @@ KEINE Tags:
 FILTERLOGIK (OFFERS)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2 Filter (State of the Art):
+2 Filter:
 
 1. Kategorie (Hauptkategorie)
 2. Aktivität (Tags)
