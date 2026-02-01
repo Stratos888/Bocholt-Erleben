@@ -78,12 +78,19 @@ function getNextWeekendRange(today) {
 /* === END BLOCK: WEEKEND RANGE (next weekend, robust) === */
 
 /* ---------- Bucketing (für Gruppenüberschriften) ---------- */
+/* === BEGIN BLOCK: EVENT BUCKET (range-aware via endDate) ===
+Zweck:
+- Bucketing (today/week/upcoming/...) muss bei Events mit endDate die Laufzeit berücksichtigen.
+- Laufende Events (start <= heute <= endDate) dürfen nicht als "past" rausfallen.
+Umfang:
+- Ersetzt ausschließlich getEventBucket(event).
+=== */
 function getEventBucket(event) {
-  const eventDate = parseISODateLocal(event?.date);
-  if (!eventDate) return "invalid";
+  const effective = getEffectiveDate(event); // nutzt endDate: laufende Events -> today
+  if (!effective) return "invalid";
 
   const today = startOfToday();
-  const day = new Date(eventDate);
+  const day = new Date(effective);
   day.setHours(0, 0, 0, 0);
 
   if (day < today) return "past";
@@ -96,6 +103,8 @@ function getEventBucket(event) {
 
   return "later";
 }
+/* === END BLOCK: EVENT BUCKET (range-aware via endDate) === */
+
 
 /* === BEGIN BLOCK: SORT (date + time) ===
 Zweck: Stabile Sortierung nach Datum und optional Uhrzeit (besseres UX).
@@ -445,6 +454,7 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
