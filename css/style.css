@@ -1855,7 +1855,7 @@ Umfang: .app-header + Brand + Actions.
 /* Icons + Labels (Buttons sind absichtlich textleer via font-size:0) */
 .header-right > button.pwa-install-button::before{
   content: "⬇︎";
-  font-size: 14px;
+  font-size: 12px;
   opacity: 0.95;
   transform: translateX(1px);
 }
@@ -1929,6 +1929,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
