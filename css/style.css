@@ -144,7 +144,7 @@ a:visited{ color: var(--color-primary); }
 .page li{ margin: 6px 0; }
 
 /* === BEGIN BLOCK: CONTENT PAGE COMPONENTS (reference pages) ===
-Zweck: Wiederverwendbare Bausteine für ruhige, appige Inhaltsseiten (Blueprint).
+Zweck: Wiederverwendbare Bausteine für ruhige, ige Inhaltsseiten (Blueprint).
 Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locations-benefits, .content-links/.content-link.
 === */
 .content-hero{
@@ -795,8 +795,8 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
 
-/* === BEGIN BLOCK: SEARCH BAR (functional hero, top-app level) ===
-Zweck: Search ist der Einstiegspunkt (ersetzt Intro/Hero); wirkt wie Premium App Input, nicht wie Formularfeld.
+/* === BEGIN BLOCK: SEARCH BAR (functional hero, top- level) ===
+Zweck: Search ist der Einstiegspunkt (ersetzt Intro/Hero); wirkt wie Premium  Input, nicht wie Formularfeld.
 Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 === */
 #search-filter{
@@ -815,8 +815,8 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   font-weight: 600;
   color: var(--color-text-primary);
 
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-earance: none;
+  earance: none;
 
   box-shadow:
     0 12px 30px rgba(0,0,0,0.06),
@@ -837,11 +837,11 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
     0 0 0 4px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
-/* === END BLOCK: SEARCH BAR (functional hero, top-app level) === */
+/* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
 
 
 /* === BEGIN BLOCK: FILTER BAR (compact single-row + inline reset X) ===
-Zweck: Visuelles Polish auf Top-App-Niveau:
+Zweck: Visuelles Polish auf Top--Niveau:
 - Filter sekundär zur Suche (weniger Präsenz)
 - Reset-X wirkt wie Tool (tertiär), nicht wie dritter Button
 - Aktive Filter subtil erkennbar, ohne “Badge-Drama”
@@ -861,8 +861,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 
 /* Pills: etwas softer (weniger Rahmen/Schatten), kompakt */
 .filter-pill{
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-earance: none;
+  earance: none;
 
   flex: 1 1 0;
   min-width: 0;
@@ -1011,7 +1011,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 /* === BEGIN BLOCK: FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) ===
 Zweck:
 - Bottom-Sheet wird auf Mobile nicht unten abgeschnitten; Inhalt scrollt im Body, Header bleibt sticky.
-- FIX UI: Titel links + Close rechts oben (Top-App Konsistenz).
+- FIX UI: Titel links + Close rechts oben (Top- Konsistenz).
 Umfang: Ersetzt den kompletten Bottom-Sheet Basisblock inkl. overlay/card/grabber/header/body.
 === */
 
@@ -1865,13 +1865,13 @@ Umfang: .app-header + Brand + Actions.
 }
 
 .header-right > a.pwa-install-button::before{
-  content: "＋";
+  content: "ⓘ";
   font-size: 14px;
   opacity: 0.95;
   transform: translateX(1px);
 }
 .header-right > a.pwa-install-button::after{
-  content: "Event";
+  content: "Info";
   font-size: 14px;
 }
 
@@ -1929,6 +1929,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
