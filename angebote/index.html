@@ -129,6 +129,31 @@ Umfang:
 <div id="offer-detail-root"></div>
 <!-- === END BLOCK: OVERLAY ROOTS (offers) === -->
 
+<!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
+Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar, ohne Filter-Pills.
+Umfang: Fügt eine Bottom Tab Bar direkt vor den Script-Includes ein.
+=== -->
+<nav class="bottom-tabbar" aria-label="Hauptnavigation">
+  <a class="bottom-tabbar__item" href="/">
+    <span class="bottom-tabbar__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
+        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 6H4.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5ZM6 6h12V5H6v1Z"/>
+      </svg>
+    </span>
+    <span class="bottom-tabbar__label">Events</span>
+  </a>
+
+  <a class="bottom-tabbar__item is-active" href="/angebote/" aria-current="page">
+    <span class="bottom-tabbar__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
+        <path d="M12 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm3.8 4.7a1 1 0 0 1 1.3 1.3l-2.1 5.2a1 1 0 0 1-.6.6l-5.2 2.1a1 1 0 0 1-1.3-1.3l2.1-5.2a1 1 0 0 1 .6-.6l5.2-2.1Zm-4.1 2.8-1.3 3.2 3.2-1.3 1.3-3.2-3.2 1.3Z"/>
+      </svg>
+    </span>
+    <span class="bottom-tabbar__label">Angebote</span>
+  </a>
+</nav>
+<!-- === END BLOCK: BOTTOM TAB BAR (Events/Angebote) === -->
+
 <!-- === BEGIN BLOCK: JS INCLUDES (offers page final order) ===
 Zweck:
 - Reihenfolge garantiert:
@@ -146,6 +171,7 @@ Zweck:
 <script src="/js/offers.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers-main.js?v=2026-02-04-1" defer></script>
 <!-- === END BLOCK: JS INCLUDES (offers page final order) === -->
+
 
 </body>
 
