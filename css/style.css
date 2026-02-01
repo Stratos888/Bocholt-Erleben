@@ -436,66 +436,6 @@ Umfang: .events-section + .events-section-title + .events-group-title + .event-c
 .events-group-title,
 .event-cards-grid,
 .event-card {
-  max-width: 100vw;
-  box-sizing: border-box;
-  overflow-x: clip;
-}
-
-/* Events-Bereich bekommt die gleiche ruhige Innenkante wie .top-stack */
-.events-section {
-  padding: 12px 20px 18px;
-  width: 100%;
-}
-
-/* Titelzeile: niemals über Viewport hinaus */
-.events-section-title {
-  width: 100%;
-}
-
-/* Group titles bleiben ruhig/kompakt */
-.events-group-title {
-  margin-top: 22px;
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 650;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.01em;
-}
-
-/* Grid bleibt responsive, aber overflow-proof */
-.event-cards-grid {
-  width: 100%;
-  max-width: 820px;
-  margin: 0 auto;
-
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-lg);
-}
-
-/* Ultra-schmal: garantiert 1 Spalte */
-@media (max-width: 360px) {
-  .event-cards-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* === END BLOCK: EVENTS LIST LAYOUT (fix initial mobile zoom via overflow-proof grid) === */
-
-
-
-/* === BEGIN BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) ===
-Zweck:
-- Eventcards übernehmen die helle “Header”-Material-DNA (soft surface + hairline + sehr subtiler Shadow).
-- Kompakte Dichte (A) ohne gequetscht zu wirken.
-- Press-State ist hell/soft (primary-muted), nicht “billig grau”.
-- Location ist reine Info (Text) – keine Pill-Semantik.
-- Kategorie-Icon sitzt oben rechts (ohne Rahmen/Shadow) und beeinflusst das Layout nicht.
-Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
-=== */
-
-/* Card: ruhig, hell, hairline + ultra-subtiler shadow */
-.event-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -504,8 +444,8 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
   padding: 14px 16px;
   border-radius: 16px;
 
-  background: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease;
@@ -513,12 +453,13 @@ Umfang: Ersetzt Card + Title + Meta + Location Styles im Events-Bereich.
 
 .event-card:hover {
   transform: translateY(-1px);
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .event-card:active {
   transform: translateY(0);
 }
+
 
 .event-title {
   font-weight: 600;
@@ -1988,6 +1929,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
