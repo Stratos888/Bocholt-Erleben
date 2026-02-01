@@ -294,16 +294,17 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
 
 
-                 /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
+                                 /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
       Zweck: Zeitfilter ohne Abhängigkeit von events.js-Helpern (kein parseISODateLocal/startOfToday/...).
       + Zusatzzweck: Filter-Bar-UI (inkl. Reset-X) wird immer aus dem State abgeleitet (Single Source of Truth),
         damit Reset-X wirklich nur bei aktiven B/C/D (Search/Zeit/Kategorie) sichtbar ist – auch nach refresh()/applyFilters().
       Umfang: Ersetzt Zeitraum-Filter-Logik in applyFilters() (inkl. UI-Sync nach dem Filtern).
       === */
       if (timeKey !== "all") {
-        const iso = (event?.date || event?.datum || "").trim();
+        const isoStart = (event?.date || event?.datum || "").trim();
+        const isoEnd = (event?.endDate || event?.endDatum || "").trim(); // optional
 
-        // ISO YYYY-MM-DD robust lokal parsen
+        // ISO YYYY-MM-DD robust lokal parsen (00:00 lokal)
         const toLocalDay = (s) => {
           const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
           if (!m) return null;
@@ -314,8 +315,15 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
           return dt;
         };
 
-        const day = toLocalDay(iso);
-        if (!day) return false;
+        const startDay = toLocalDay(isoStart);
+        if (!startDay) return false;
+
+        // Wenn kein endDate: same-day Event
+        const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
+        if (!endBase) return false;
+
+        const endDay = new Date(endBase);
+        endDay.setHours(23, 59, 59, 999); // inkl. Endtag
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -327,7 +335,8 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
           return t;
         };
 
-        const endToday = addDaysLocal(today, 1);
+        // Overlap-Check: Event [startDay..endDay] muss Fenster [ws..we] schneiden
+        const overlaps = (ws, we) => !(endDay < ws || startDay > we);
 
         // nächstes Wochenende (Sa+So)
         const nextWeekendRange = (base) => {
@@ -346,18 +355,22 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
         switch (timeKey) {
           case "today": {
-            if (day < today || day >= endToday) return false;
+            const ws = new Date(today);
+            const we = new Date(today);
+            we.setHours(23, 59, 59, 999);
+            if (!overlaps(ws, we)) return false;
             break;
           }
           case "weekend": {
             const { start, end } = nextWeekendRange(today);
-            if (day < start || day > end) return false;
+            if (!overlaps(start, end)) return false;
             break;
           }
           case "soon": {
-            const soonEnd = addDaysLocal(today, 14);
-            soonEnd.setHours(23, 59, 59, 999);
-            if (day < today || day > soonEnd) return false;
+            const ws = new Date(today);
+            const we = addDaysLocal(today, 14);
+            we.setHours(23, 59, 59, 999);
+            if (!overlaps(ws, we)) return false;
             break;
           }
           default:
@@ -369,6 +382,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       // (B/C/D aktiv = SearchText != "" ODER Zeitraum != "all" ODER Kategorie != "")
       // So bleibt die Sichtbarkeit korrekt auch nach refresh() / applyFilters() Aufrufen ohne User-Interaction.
       /* === END BLOCK: ZEITFILTER (self-contained, no external helpers) === */
+
 
 
 
