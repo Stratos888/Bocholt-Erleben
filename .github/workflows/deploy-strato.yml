@@ -34,6 +34,22 @@ jobs:
         with:
           python-version: "3.11"
 
+      # === BEGIN BLOCK: GOOGLE SHEET → events.tsv (non-breaking source override) ===
+      # Zweck:
+      #   - Events künftig aus Google Sheet beziehen
+      #   - bestehender TSV/JSON/Build/Deploy Prozess bleibt UNVERÄNDERT
+      #   - überschreibt lediglich data/events.tsv vor dem Builder
+      # Sicherheit:
+      #   - Fail-Fast bei Download-Fehler
+      #   - keinerlei Änderung am restlichen Workflow
+      - name: Download events from Google Sheet
+        run: |
+          set -e
+          SHEET_URL="https://docs.google.com/spreadsheets/d/REPLACE_WITH_SHEET_ID/export?format=tsv"
+          curl -L --fail "$SHEET_URL" -o data/events.tsv
+          test -s data/events.tsv
+      # === END BLOCK: GOOGLE SHEET → events.tsv (non-breaking source override) ===
+
       - name: Build events.json from events.tsv
         shell: bash
         run: |
