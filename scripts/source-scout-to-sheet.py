@@ -166,33 +166,32 @@ def domain_of(url: str) -> str:
 
 
 def main() -> None:
-    sheet_id = os.environ.get("SHEET_ID", "")
+    spreadsheet_id = os.environ.get("SHEET_ID", "")
     service = get_sheet_service()
 
-    info("Lese Source_Seeds + Source_Candidates …")
-    seeds_values = read_tab(service, sheet_id, TAB_SEEDS)
-    cand_values = read_tab(service, sheet_id, TAB_CANDIDATES)
+    info("Lese Source_Seeds + Source_Candidates + Source_Blocklist …")
+
+    seeds_values = read_tab(service, spreadsheet_id, TAB_SEEDS)
+    cand_values = read_tab(service, spreadsheet_id, TAB_CANDIDATES)
+    block_values = read_tab(service, spreadsheet_id, "Source_Blocklist")
 
     seeds_header = sheet_header(seeds_values)
     cand_header = sheet_header(cand_values)
+    block_header = sheet_header(block_values)
 
-    if not seeds_header:
-        fail("Tab 'Source_Seeds' hat keine Headerzeile.")
-    if not cand_header:
-        fail("Tab 'Source_Candidates' hat keine Headerzeile.")
+    # Blocklist laden
+    patterns = []
+    if block_values:
+        pat_idx = block_header.index("pattern")
+        for row in block_values[1:]:
+            if pat_idx < len(row):
+                p = norm(row[pat_idx])
+                if p:
+                    patterns.append(p.lower())
 
-    # Required columns
-    for col in ("enabled", "seed_url"):
-        if col not in seeds_header:
-            fail(f"Source_Seeds: Spalte '{col}' fehlt.")
-    for col in ("status", "candidate_url", "source_domain", "found_on", "hint", "confidence", "notes", "created_at"):
-        if col not in cand_header:
-            fail(f"Source_Candidates: Spalte '{col}' fehlt.")
+    info(f"Blocklist patterns: {len(patterns)}")
 
-    enabled_idx = seeds_header.index("enabled")
-    url_idx = seeds_header.index("seed_url")
-
-    # existing candidates for dedupe
+    # bestehende URLs merken
     cand_url_idx = cand_header.index("candidate_url")
     existing = set()
     for row in cand_values[1:]:
@@ -200,6 +199,9 @@ def main() -> None:
             u = norm(row[cand_url_idx])
             if u:
                 existing.add(norm_key(u))
+
+    enabled_idx = seeds_header.index("enabled")
+    url_idx = seeds_header.index("seed_url")
 
     seeds = []
     for row in seeds_values[1:]:
@@ -211,13 +213,8 @@ def main() -> None:
         if u:
             seeds.append(u)
 
-    info(f"Seeds enabled: {len(seeds)}")
-    if not seeds:
-        info("✅ Keine Seeds aktiv. Abbruch ohne Änderungen.")
-        return
+    out_rows = []
 
-    # Candidate rows to append
-    out_rows: list[list[str]] = []
     status_col = cand_header.index("status")
     domain_col = cand_header.index("source_domain")
     found_on_col = cand_header.index("found_on")
@@ -226,43 +223,34 @@ def main() -> None:
     notes_col = cand_header.index("notes")
     created_col = cand_header.index("created_at")
 
-    def mk_row(candidate_url: str, found_on: str, hint: str, conf: float) -> list[str]:
+    def is_blocked(url: str) -> bool:
+        lu = url.lower()
+        return any(p in lu for p in patterns)
+
+    def mk_row(candidate_url: str, found_on: str, hint: str, conf: float):
         row = [""] * len(cand_header)
-        row[status_col] = "neu"
+
+        if is_blocked(candidate_url):
+            row[status_col] = "blockiert"
+            row[notes_col] = "auto-blocked by pattern"
+        else:
+            row[status_col] = "neu"
+
         row[cand_url_idx] = candidate_url
         row[domain_col] = domain_of(candidate_url)
         row[found_on_col] = found_on
         row[hint_col] = hint
         row[conf_col] = f"{conf:.2f}"
-        row[notes_col] = ""
         row[created_col] = now_iso()
+
         return row
 
     for seed in seeds:
         info(f"Fetch seed: {seed}")
-        try:
-            html = fetch_html(seed)
-        except Exception as e:
-            info(f"Skip (fetch failed): {seed} ({e})")
-            time.sleep(1)
-            continue
+        html = fetch_html(seed)
+        links = extract_links(html)
 
-        if not html:
-            info(f"Skip (no html): {seed}")
-            time.sleep(1)
-            continue
-
-        raw_links = extract_links(html)
-        if not raw_links:
-            info(f"No links found: {seed}")
-            time.sleep(1)
-            continue
-
-        for href in raw_links:
-            href = norm(href)
-            if not href or href.startswith("#") or href.startswith("mailto:") or href.startswith("tel:"):
-                continue
-
+        for href in links:
             abs_url = urljoin(seed, href)
 
             ok, hint, conf = is_candidate_url(abs_url)
@@ -276,17 +264,12 @@ def main() -> None:
             existing.add(key)
             out_rows.append(mk_row(abs_url, seed, hint, conf))
 
-        # very conservative rate limit
         time.sleep(1)
 
     info(f"Neue Kandidaten: {len(out_rows)}")
-    if not out_rows:
-        info("✅ Keine neuen Kandidaten gefunden.")
-        return
 
-    append_rows(service, sheet_id, TAB_CANDIDATES, out_rows)
-    info("✅ Source_Candidates: Kandidaten appended.")
-
-
-if __name__ == "__main__":
-    main()
+    if out_rows:
+        append_rows(service, spreadsheet_id, TAB_CANDIDATES, out_rows)
+        info("✅ Kandidaten gespeichert.")
+    else:
+        info("✅ Keine neuen Kandidaten.")
