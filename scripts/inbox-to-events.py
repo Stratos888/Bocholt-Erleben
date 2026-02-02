@@ -122,12 +122,63 @@ def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[s
     return (header, dicts)
 
 
+# === BEGIN BLOCK: EXISTING EVENT INDEXES (dedupe safety, v1) ===
+# Datei: scripts/inbox-to-events.py
+# Zweck:
+# - baut Indexe aus bestehendem Events-Tab, um Dubletten beim Import zu verhindern
+# - bevorzugt URL-match, sonst (title+date+time+city+location)
+# Umfang:
+# - nur Leselogik/Indexe, keine Änderung an bestehenden Spalten oder Workflows
+# === END BLOCK: EXISTING EVENT INDEXES (dedupe safety, v1) ===
+
 def build_existing_ids(events: List[Dict[str, str]]) -> set:
     s = set()
     for e in events:
         if e.get("id"):
             s.add(norm_key(e["id"]))
     return s
+
+
+def event_fingerprint(title: str, d: str, t: str, city: str, location: str, url: str) -> str:
+    """
+    Stabiler Vergleichsschlüssel:
+    1) Wenn URL vorhanden -> URL dominiert (Tracking sollte idealerweise vorher schon gecleant sein).
+    2) Sonst: title+date+time+city+location.
+    """
+    url = norm(url)
+    if url:
+        return f"url|{norm_key(url)}"
+    return "|".join(
+        [
+            "txt",
+            norm_key(title),
+            norm(d),
+            norm(t),
+            norm_key(city),
+            norm_key(location),
+        ]
+    )
+
+
+def build_existing_fingerprint_map(events: List[Dict[str, str]]) -> Dict[str, str]:
+    """
+    return: fingerprint -> event_id (erste gefundene ID)
+    """
+    m: Dict[str, str] = {}
+    for e in events:
+        eid = norm(e.get("id", ""))
+        fp = event_fingerprint(
+            title=e.get("title", ""),
+            d=e.get("date", ""),
+            t=e.get("time", ""),
+            city=e.get("city", ""),
+            location=e.get("location", ""),
+            url=e.get("url", ""),
+        )
+        if fp and fp not in m and eid:
+            m[fp] = eid
+    return m
+
 
 
 def generate_unique_id(title: str, d: str, existing_ids: set) -> str:
@@ -164,6 +215,9 @@ def main() -> None:
         fail("Inbox: Spalten 'title' und/oder 'date' fehlen.")
 
     existing_ids = build_existing_ids(events_rows)
+    existing_fp_to_id = build_existing_fingerprint_map(events_rows)
+    existing_fps = set(existing_fp_to_id.keys())
+
 
     # Build mapping from Inbox -> Events columns if present
     # Events columns are authoritative order.
@@ -213,11 +267,34 @@ def main() -> None:
         status = norm_key(inb.get("status", ""))
         if status != "übernehmen":
             continue
+               # Dedupe-Safety: verhindert Doppelimporte, falls gleicher Event bereits im Events-Tab existiert.
+        fp = event_fingerprint(
+            title=inb.get("title", ""),
+            d=inb.get("date", ""),
+            t=inb.get("time", ""),
+            city=inb.get("city", ""),
+            location=inb.get("location", ""),
+            url=inb.get("source_url", "") or inb.get("url", ""),
+        )
+
+        if fp in existing_fps:
+            # Merken für Status-Update (duplikat), aber NICHT importieren.
+            # Wir aktualisieren später in einem batchUpdate.
+            if "___duplicate_rows" not in locals():
+                ___duplicate_rows = []  # type: ignore[var-annotated]
+            ___duplicate_rows.append((idx, existing_fp_to_id.get(fp, "")))  # type: ignore[name-defined]
+            continue
+
         event_row = build_event_row_from_inbox(inb)
         if not event_row:
             continue
+
+        # innerhalb des gleichen Runs ebenfalls Dubletten vermeiden
+        existing_fps.add(fp)
+
         import_indices.append(idx)  # 0-based within inbox_rows (excluding header)
         import_rows.append(event_row)
+
 
     info(f"Import-Kandidaten (status=übernehmen): {len(import_rows)}")
 
@@ -230,20 +307,35 @@ def main() -> None:
     info("✅ Events: neue Zeilen appended.")
 
     # Mark inbox rows as imported: set status="übernommen" and add note timestamp
-    # Find column index for 'status' and 'notes' if present
+    # Additionally: mark detected duplicates as status="duplikat"
     status_col = inbox_header.index("status")
     notes_col = inbox_header.index("notes") if "notes" in inbox_header else None
+    matched_col = inbox_header.index("matched_event_id") if "matched_event_id" in inbox_header else None
 
     updates: List[Tuple[str, List[List[str]]]] = []
+
+    # 1) imported rows
     for idx in import_indices:
         sheet_row_number = idx + 2  # +1 for header, +1 because sheet rows are 1-based
-        # Update status cell
         status_a1 = f"{TAB_INBOX}!{col_to_a1(status_col)}{sheet_row_number}"
         updates.append((status_a1, [["übernommen"]]))
-        # Update notes cell (optional)
         if notes_col is not None:
             notes_a1 = f"{TAB_INBOX}!{col_to_a1(notes_col)}{sheet_row_number}"
             updates.append((notes_a1, [[f"imported {now_iso()}"]]))
+
+    # 2) duplicate rows (if any)
+    duplicate_rows = locals().get("___duplicate_rows", [])
+    for (idx, existing_id) in duplicate_rows:
+        sheet_row_number = idx + 2
+        status_a1 = f"{TAB_INBOX}!{col_to_a1(status_col)}{sheet_row_number}"
+        updates.append((status_a1, [["duplikat"]]))
+        if matched_col is not None and existing_id:
+            matched_a1 = f"{TAB_INBOX}!{col_to_a1(matched_col)}{sheet_row_number}"
+            updates.append((matched_a1, [[existing_id]]))
+        if notes_col is not None:
+            notes_a1 = f"{TAB_INBOX}!{col_to_a1(notes_col)}{sheet_row_number}"
+            updates.append((notes_a1, [[f"skipped duplicate {now_iso()}"]]))
+
 
     update_cells(service, sheet_id, updates)
     info("✅ Inbox: importierte Zeilen als 'übernommen' markiert.")
