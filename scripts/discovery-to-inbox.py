@@ -81,6 +81,7 @@ def norm_key(s: str) -> str:
 # === BEGIN BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
 # Zweck: robustes Dedupe (slug) + stabile id_suggestion + URL-Normalisierung (utm/v/fbclid etc.)
 # Umfang: reine Hilfsfunktionen, keine Side-Effects
+
 import hashlib
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
@@ -118,6 +119,7 @@ def canonical_url(u: str) -> str:
     # keep only non-tracking query params; also drop build/cache params
     drop_prefixes = ("utm_",)
     drop_keys = {"fbclid", "gclid", "yclid", "mc_cid", "mc_eid", "ref", "source", "v"}
+
     q = []
     for k, v in parse_qsl(p.query, keep_blank_values=True):
         lk = (k or "").lower()
@@ -156,6 +158,7 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
     key = f"{norm_key(canonical_url(source_url))}|{st}|{norm(d)}|{norm(t)}"
     return f"{st[:60]}-{ymd}-{short_hash(key, 4)}"
 # === END BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
+
 
 
 def safe_fetch(url: str, timeout: int = 20) -> str:
