@@ -162,10 +162,6 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
 
 
 def safe_fetch(url: str, timeout: int = 20) -> str:
-
-
-
-def safe_fetch(url: str, timeout: int = 20) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "BocholtErlebenDiscovery/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         charset = resp.headers.get_content_charset() or "utf-8"
