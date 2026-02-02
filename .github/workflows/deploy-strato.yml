@@ -6,9 +6,20 @@
 
 name: Deploy to STRATO
 
+# === BEGIN BLOCK: WORKFLOW TRIGGERS (push + daily + manual) ===
 on:
   push:
     branches: ["main"]
+
+  # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow)
+  workflow_dispatch:
+
+  # Täglich, damit events.json automatisch “aktuell” bleibt (Sheet → JSON)
+  # GitHub cron ist UTC. 05:15 UTC ≈ 06:15 Europe/Berlin (Winterzeit).
+  schedule:
+    - cron: "15 5 * * *"
+# === END BLOCK: WORKFLOW TRIGGERS (push + daily + manual) ===
+
 
 concurrency:
   group: deploy-strato
