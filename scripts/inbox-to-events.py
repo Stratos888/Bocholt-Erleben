@@ -249,7 +249,8 @@ def main() -> None:
             "location": norm(inb.get("location", "")),
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
             "kategorie": norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", "")),
-            "url": norm(inb.get("url", "")),
+            "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
+
             "description": norm(inb.get("description", "")),
         }
 
@@ -267,17 +268,19 @@ def main() -> None:
         status = norm_key(inb.get("status", ""))
         if status != "übernehmen":
             continue
-               # Dedupe-Safety: verhindert Doppelimporte, falls gleicher Event bereits im Events-Tab existiert.
+
+        # Dedupe-Safety: verhindert Doppelimporte, falls gleicher Event bereits im Events-Tab existiert.
         fp = event_fingerprint(
             title=inb.get("title", ""),
             d=inb.get("date", ""),
             t=inb.get("time", ""),
             city=inb.get("city", ""),
             location=inb.get("location", ""),
-            url=inb.get("source_url", "") or inb.get("url", ""),
+            url=inb.get("url", "") or inb.get("source_url", ""),
         )
 
         if fp in existing_fps:
+
             # Merken für Status-Update (duplikat), aber NICHT importieren.
             # Wir aktualisieren später in einem batchUpdate.
             if "___duplicate_rows" not in locals():
