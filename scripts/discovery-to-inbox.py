@@ -78,6 +78,90 @@ def norm_key(s: str) -> str:
     return re.sub(r"\s+", " ", norm(s)).lower()
 
 
+# === BEGIN BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
+# Zweck: robustes Dedupe (slug) + stabile id_suggestion + URL-Normalisierung (utm/v/fbclid etc.)
+# Umfang: reine Hilfsfunktionen, keine Side-Effects
+import hashlib
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+
+
+def slugify(s: str) -> str:
+    s = norm_key(s)
+
+    # de-umlaut (konservativ)
+    s = (
+        s.replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
+
+    # nur [a-z0-9-]
+    s = re.sub(r"[^a-z0-9]+", "-", s)
+    s = re.sub(r"-{2,}", "-", s).strip("-")
+    return s
+
+
+def canonical_url(u: str) -> str:
+    u = norm(u)
+    if not u:
+        return ""
+
+    try:
+        p = urlparse(u)
+    except Exception:
+        return u
+
+    # drop fragment
+    fragment = ""
+
+    # keep only non-tracking query params; also drop build/cache params
+    drop_prefixes = ("utm_",)
+    drop_keys = {"fbclid", "gclid", "yclid", "mc_cid", "mc_eid", "ref", "source", "v"}
+    q = []
+    for k, v in parse_qsl(p.query, keep_blank_values=True):
+        lk = (k or "").lower()
+        if any(lk.startswith(pref) for pref in drop_prefixes):
+            continue
+        if lk in drop_keys:
+            continue
+        q.append((k, v))
+
+    query = urlencode(q, doseq=True)
+
+    # normalize scheme/host casing
+    netloc = (p.netloc or "").lower()
+    scheme = (p.scheme or "").lower()
+
+    return urlunparse((scheme, netloc, p.path, p.params, query, fragment))
+
+
+def short_hash(s: str, n: int = 4) -> str:
+    return hashlib.md5(s.encode("utf-8")).hexdigest()[:n]
+
+
+def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
+    """
+    Stable, collision-resistant ID:
+      <slug(title)>-<yyyymmdd>-<hash4>
+    """
+    st = slugify(title)
+    if not st:
+        st = "event"
+
+    ymd = re.sub(r"[^0-9]", "", norm(d))  # "2026-03-15" -> "20260315"
+    if len(ymd) != 8:
+        ymd = "00000000"
+
+    key = f"{norm_key(canonical_url(source_url))}|{st}|{norm(d)}|{norm(t)}"
+    return f"{st[:60]}-{ymd}-{short_hash(key, 4)}"
+# === END BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
+
+
+def safe_fetch(url: str, timeout: int = 20) -> str:
+
+
+
 def safe_fetch(url: str, timeout: int = 20) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "BocholtErlebenDiscovery/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -325,28 +409,41 @@ def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[s
 # Dedupe / matching (v0)
 # -------------------------
 
+# === BEGIN BLOCK: DEDUPE INDEXES (canonical url + slug+date) ===
 def build_live_index(live_events: List[Dict[str, str]]) -> Tuple[Dict[str, str], Dict[Tuple[str, str], str]]:
     by_url: Dict[str, str] = {}
-    by_title_date: Dict[Tuple[str, str], str] = {}
+    by_slug_date: Dict[Tuple[str, str], str] = {}
+
     for ev in live_events:
         ev_id = ev.get("id", "")
-        url = norm(ev.get("url", ""))
+        url = canonical_url(ev.get("url", ""))
         title = norm(ev.get("title", ""))
         d = norm(ev.get("date", ""))
 
         if url:
             by_url[norm_key(url)] = ev_id
         if title and d:
-            by_title_date[(norm_key(title), d)] = ev_id
-    return by_url, by_title_date
+            by_slug_date[(slugify(title), d)] = ev_id
+
+    return by_url, by_slug_date
 
 
 def inbox_fingerprint(row: Dict[str, str]) -> Tuple[str, str, str]:
-    return (norm_key(row.get("source_url", "")), norm_key(row.get("title", "")), norm(row.get("date", "")))
+    return (
+        norm_key(canonical_url(row.get("source_url", ""))),
+        slugify(row.get("title", "")),
+        norm(row.get("date", "")),
+    )
 
 
 def make_candidate_fingerprint(c: Dict[str, str], source_url: str) -> Tuple[str, str, str]:
-    return (norm_key(source_url), norm_key(c.get("title", "")), norm(c.get("date", "")))
+    return (
+        norm_key(canonical_url(source_url)),
+        slugify(c.get("title", "")),
+        norm(c.get("date", "")),
+    )
+# === END BLOCK: DEDUPE INDEXES (canonical url + slug+date) ===
+
 
 
 # -------------------------
@@ -483,7 +580,9 @@ else:
             if not title or not d:
                 continue
 
-            c_url = norm(c.get("url", ""))
+                       c_url_raw = norm(c.get("url", ""))
+            c_url = canonical_url(c_url_raw)
+
             matched_id = ""
             score = 0.0
 
@@ -491,10 +590,11 @@ else:
                 matched_id = live_by_url[norm_key(c_url)]
                 score = 1.0
             else:
-                key = (norm_key(title), d)
+                key = (slugify(title), d)
                 if key in live_by_title_date:
                     matched_id = live_by_title_date[key]
                     score = 0.95
+
 
             # Already live -> ignore
             if matched_id:
@@ -508,7 +608,7 @@ else:
             # Write to inbox as suggestion
             row = {
                 "status": "neu",
-                "id_suggestion": "",
+                "id_suggestion": make_id_suggestion(title, d, norm(c.get("time", "")), url),
                 "title": title,
                 "date": d,
                 "endDate": norm(c.get("endDate", "")),
