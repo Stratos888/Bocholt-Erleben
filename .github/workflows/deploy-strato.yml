@@ -95,7 +95,7 @@ jobs:
             ./ deploy/
           # === END BLOCK: SYNC REPO TO deploy/ (clean staging) ===
 
-                  # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+                           # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
           # Zweck:
           #  1) Setzt ?v=BUILD_ID konsistent in allen HTML-Dateien.
           #  2) Normalisiert kaputte Asset-Links wie "style.css<hash>" zurück zu "style.css?v=<hash>".
@@ -110,11 +110,13 @@ jobs:
           find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/$1'"$BUILD_ID"'/g'
 
           # 2) Normalisieren: kaputte Suffix-Links (…css<hash> / …js<hash>) zurück auf ?v=
+          #    NOTE: Hash-Längen in der Praxis variieren (z.B. 5 Zeichen), daher {5,} und [0-9a-z]
           find deploy -name "*.html" -print0 | xargs -0 perl -pi -e '
-            s#(/css/style\.css)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
-            s#(/config\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
-            s#(/js/[A-Za-z0-9._/-]+\.js)[0-9a-f]{6,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/css/style\.css)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/config\.js)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/js/[A-Za-z0-9._/-]+\.js)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
           '
+
           echo "=== DEBUG index.html: style.css lines ==="
           grep -n "style.css" deploy/index.html || true
           echo "=== DEBUG index.html: first 120 lines ==="
@@ -122,7 +124,7 @@ jobs:
 
           # 3) Guard: Wenn immer noch kaputte Muster existieren -> Deploy stoppen
           # (erlaubt optionalen führenden Slash)
-          if grep -RInE '\.css[0-9a-f]{6,}(\b|")|\.js[0-9a-f]{6,}(\b|")' deploy/*.html deploy/**/*.html 2>/dev/null; then
+          if grep -RInE '\.css[0-9a-z]{5,}(\b|")|\.js[0-9a-z]{5,}(\b|")' deploy/*.html deploy/**/*.html 2>/dev/null; then
             echo "❌ GUARD FAILED: Found hashed asset links without ?v= in deploy HTML. Aborting deploy."
             exit 1
           fi
@@ -143,6 +145,7 @@ jobs:
           fi
 
           # === END BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+
 
 
           # Version file (TXT instead of JSON)
