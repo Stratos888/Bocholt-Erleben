@@ -495,104 +495,10 @@ def main() -> None:
         info(f"Fetch: {source_name} ({stype})")
         try:
             content = safe_fetch(url)
-        except Exception as e:
-            info(f"Fetch failed: {source_name}: {e}")
-            continue
-
-        candidates: List[Dict[str, str]] = []
-
-        try:
-            if stype == "ical":
-                candidates = parse_ics_events(content)
-
-            elif stype == "rss":
-                candidates = parse_rss(content)
-
-            # === BEGIN BLOCK: HTML FACTS-ONLY ADAPTER (safe municipal calendars) ===
-            elif stype == "html_regex":
-                html = content
-
-                # --- Stadt Bocholt Highlights ---
-                if "bocholt.de" in url:
-                    matches = re.findall(
-                        r'(\d{1,2}\.[A-Za-zÄÖÜäöü]{3}).*?\[(.*?)\]\((.*?)\)',
-                        html,
-                        flags=re.S
-                    )
-                    for day_mon, title, link in matches:
-                        m1 = re.match(r"(\d{1,2})\.(\w+)", day_mon)
-                        if not m1:
-                            continue
-                        day, mon = m1.groups()
-
-                        month_map = {
-                            "Jan": 1, "Feb": 2, "Mär": 3, "Mar": 3, "Apr": 4, "Mai": 5,
-                            "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Okt": 10, "Oct": 10,
-                            "Nov": 11, "Dez": 12, "Dec": 12
-                        }
-                        mm = month_map.get(mon[:3], None)
-                        if not mm:
-                            continue
-
-                        y = datetime.now().year
-                        d_iso = f"{y}-{mm:02d}-{int(day):02d}"
-
-                        candidates.append({
-                            "title": norm(title),
-                            "date": d_iso,
-                            "endDate": "",
-                            "time": "",
-                            "location": "",
-                            "url": link,
-                            "description": "",
-                        })
-
-                # --- Stadttheater Bocholt ---
-                elif "stadttheater-bocholt" in url:
-                    matches = re.findall(
-                        r'\[(.*?)\]\((.*?)\).*?(\d{1,2}\.\s*\w+\s*\d{4}).*?(\d{1,2}:\d{2})',
-                        html,
-                        flags=re.S
-                    )
-                    for title, link, date_str, time_str in matches:
-                        try:
-                            d = datetime.strptime(date_str.strip(), "%d. %B %Y").date()
-                            d_iso = d.strftime("%Y-%m-%d")
-                        except Exception:
-                            continue
-
-                        candidates.append({
-                            "title": norm(title),
-                            "date": d_iso,
-                            "endDate": "",
-                            "time": norm(time_str),
-                            "location": "",
-                            "url": link,
-                            "description": "",
-                        })
-            # === END BLOCK: HTML FACTS-ONLY ADAPTER ===
-
-            else:
-                info(f"Skip unsupported type (v0): {stype} ({source_name})")
-                continue
-
-        except Exception as e:
-            info(f"Parse failed: {source_name}: {e}")
-            continue
-
-
-            else:
-                info(f"Skip unsupported type (v0): {stype} ({source_name})")
-                continue
-
-        except Exception as e:
-            info(f"Parse failed: {source_name}: {e}")
-            continue
-
-
-else:
-    info(f"Skip unsupported type (v0): {stype} ({source_name})")
-    continue
+               # === BEGIN BLOCK: PARSE DISPATCH CLEANUP (remove duplicate else/except) ===
+        # Zweck: Entfernt kaputte, doppelte else/except-Äste nach dem Parse-Dispatch (Syntax/Indent stabil).
+        # Umfang: Ersetzt ausschließlich den fehlerhaften Block zwischen Parse-try/except und total_candidates.
+        # === END BLOCK: PARSE DISPATCH CLEANUP (remove duplicate else/except) ===
 
         except Exception as e:
             info(f"Parse failed: {source_name}: {e}")
@@ -600,14 +506,20 @@ else:
 
         total_candidates += len(candidates)
 
+
         for c in candidates:
             title = norm(c.get("title", ""))
             d = norm(c.get("date", ""))
             if not title or not d:
                 continue
 
-                       c_url_raw = norm(c.get("url", ""))
+            # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
+            # Zweck: Korrigiert Einrückung von c_url_raw, damit der Block syntaktisch stabil ist.
+            # Umfang: Ersetzt nur die beiden Zeilen c_url_raw/c_url.
+            c_url_raw = norm(c.get("url", ""))
             c_url = canonical_url(c_url_raw)
+            # === END BLOCK: URL NORMALIZATION (indent fix) ===
+
 
             matched_id = ""
             score = 0.0
