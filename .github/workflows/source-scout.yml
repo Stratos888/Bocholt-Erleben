@@ -1,0 +1,40 @@
+# === BEGIN BLOCK: SOURCE SCOUT WORKFLOW (weekly) ===
+name: Source Scout (Weekly Candidates)
+
+on:
+  workflow_dispatch:
+
+  # 1x pro Woche (Sonntag)
+  # GitHub cron ist UTC
+  # 06:15 Berlin ≈ 05:15 UTC
+  schedule:
+    - cron: "15 5 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+
+      - name: Run Source Scout
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python scripts/source-scout-to-sheet.py
+# === END BLOCK: SOURCE SCOUT WORKFLOW (weekly) ===
