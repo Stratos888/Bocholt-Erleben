@@ -95,40 +95,44 @@ jobs:
             ./ deploy/
           # === END BLOCK: SYNC REPO TO deploy/ (clean staging) ===
 
-                                    # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+                 # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
           # Zweck:
-          #  1) Setzt ?v=BUILD_ID konsistent in allen HTML-Dateien.
-          #  2) Normalisiert kaputte Asset-Links wie "style.css<hash>" zurück zu "style.css?v=<build_id>".
-          #  3) Bricht den Deploy HARD ab, wenn danach noch kaputte Muster vorkommen.
+          #  - PROOF-Instrumentation: zeigt exakt, in welchem Schritt deploy/index.html kaputt wird.
+          #  - Keine inhaltliche Änderung am Verhalten außer zusätzlichen Debug-Ausgaben.
           #
           # Umfang:
-          #  - Bearbeitet nur *.html in deploy/
-          #  - Betrifft nur unsere lokalen Assets: /css/style.css, /config.js, /js/*.js
-          #  - Keine Änderungen an externen URLs
+          #  - Debug-Ausgaben vor/nach jedem Rewrite-Schritt
+          #  - Guard bleibt unverändert
           #
-          # 1) Cache-Busting: vorhandene ?v= Werte aktualisieren (robuste Quotes; kein Perl-Quote-Juggling)
-          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e "s/(\\?v=)[^\"'\\s>]+/\\\$1$BUILD_ID/g"
-
-          # 2) Normalisieren: kaputte Suffix-Links (…css<hash> / …js<hash>) zurück auf ?v=
-          #    NOTE: Hash-Längen variieren, daher {5,} und [0-9a-z]
-          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e "s#(/css/style\\.css)[0-9a-z]{5,}#\\\$1?v=$BUILD_ID#gi"
-          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e "s#(/config\\.js)[0-9a-z]{5,}#\\\$1?v=$BUILD_ID#gi"
-          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e "s#(/js/[A-Za-z0-9._/-]+\\.js)[0-9a-z]{5,}#\\\$1?v=$BUILD_ID#gi"
-
-          echo "=== DEBUG index.html: style.css lines ==="
+          echo "=== PROOF A: after rsync (raw deploy/index.html style.css line) ==="
           grep -n "style.css" deploy/index.html || true
-          echo "=== DEBUG index.html: first 120 lines ==="
+
+          echo "=== STEP 1: replace existing ?v=... with BUILD_ID (no-op if no ?v= present) ==="
+          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/$1'"$BUILD_ID"'/g'
+
+          echo "=== PROOF B: after STEP 1 (deploy/index.html style.css line) ==="
+          grep -n "style.css" deploy/index.html || true
+
+          echo "=== STEP 2: normalize hashed suffix links back to ?v=BUILD_ID ==="
+          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e '
+            s#(/css/style\.css)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/config\.js)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
+            s#(/js/[A-Za-z0-9._/-]+\.js)[0-9a-z]{5,}#$1?v='"$BUILD_ID"'#gi;
+          '
+
+          echo "=== PROOF C: after STEP 2 (deploy/index.html style.css line) ==="
+          grep -n "style.css" deploy/index.html || true
+
+          echo "=== DEBUG index.html: first 120 lines (final before guard) ==="
           nl -ba deploy/index.html | sed -n '1,120p' || true
 
           # 3) Guard: Wenn immer noch kaputte Muster existieren -> Deploy stoppen
-          # (erlaubt optionalen führenden Slash)
           if grep -RInE '\.css[0-9a-z]{5,}(\b|")|\.js[0-9a-z]{5,}(\b|")' deploy/*.html deploy/**/*.html 2>/dev/null; then
             echo "❌ GUARD FAILED: Found hashed asset links without ?v= in deploy HTML. Aborting deploy."
             exit 1
           fi
 
           # 4) Guard: Mindestanforderung – index.html muss unsere Assets mit ?v= referenzieren
-          # (optional führender Slash + toleriert /config.js oder /js/config.js)
           if ! grep -qE '["'\''( ]/?css/style\.css\?v=' deploy/index.html; then
             echo "❌ GUARD FAILED: deploy/index.html does not contain style.css?v=..."
             exit 1
@@ -142,6 +146,7 @@ jobs:
             exit 1
           fi
           # === END BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
+
 
 
 
