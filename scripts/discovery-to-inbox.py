@@ -70,12 +70,51 @@ def now_iso() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+# === BEGIN BLOCK: TEXT NORMALIZATION HELPERS (clean v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck: Saubere, stabile Textwerte in Inbox schreiben (Whitespace, HTML-Tags, Entities).
+# Umfang: Nur Helper-Funktionen, keine Verhaltensänderung bei Status/Import-Flow.
+# === END BLOCK: TEXT NORMALIZATION HELPERS (clean v1) ===
+
 def norm(s: str) -> str:
     return (s or "").strip()
 
 
 def norm_key(s: str) -> str:
     return re.sub(r"\s+", " ", norm(s)).lower()
+
+
+# === BEGIN BLOCK: CLEAN TEXT (strip html + normalize spaces) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck: Entfernt HTML-Tags, decodiert Entities, normalisiert Whitespace.
+# Umfang: Reine Helferfunktionen (facts-only), keine Side-Effects.
+# === END BLOCK: CLEAN TEXT (strip html + normalize spaces) ===
+import html as _html
+
+
+def strip_html(s: str) -> str:
+    s = norm(s)
+    if not s:
+        return ""
+    # Tags raus
+    s = re.sub(r"<[^>]+>", " ", s)
+    return s
+
+
+def normalize_ws(s: str) -> str:
+    s = norm(s)
+    if not s:
+        return ""
+    s = re.sub(r"\s+", " ", s)
+    return s.strip()
+
+
+def clean_text(s: str) -> str:
+    s = strip_html(s)
+    s = _html.unescape(s)
+    s = normalize_ws(s)
+    return s
+
 
 
 # === BEGIN BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
@@ -508,10 +547,11 @@ def main() -> None:
 
 
         for c in candidates:
-            title = norm(c.get("title", ""))
+            title = clean_text(c.get("title", ""))
             d = norm(c.get("date", ""))
             if not title or not d:
                 continue
+
 
             # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
             # Zweck: Korrigiert Einrückung von c_url_raw, damit der Block syntaktisch stabil ist.
@@ -552,10 +592,11 @@ def main() -> None:
                 "endDate": norm(c.get("endDate", "")),
                 "time": norm(c.get("time", "")),
                 "city": default_city,
-                "location": norm(c.get("location", "")),
+                "location": clean_text(c.get("location", "")),
                 "kategorie_suggestion": default_cat,
                 "url": c_url,
-                "description": norm(c.get("description", "")),
+                "description": clean_text(c.get("description", "")),
+
                 "source_name": source_name,
                 "source_url": url,
                 "match_score": f"{score:.2f}",
