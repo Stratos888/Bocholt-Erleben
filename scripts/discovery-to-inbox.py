@@ -499,7 +499,7 @@ def main() -> None:
             info(f"Fetch failed: {source_name}: {e}")
             continue
 
-               candidates: List[Dict[str, str]] = []
+                     candidates: List[Dict[str, str]] = []
         try:
             if stype == "ical":
                 candidates = parse_ics_events(content)
@@ -570,6 +570,15 @@ def main() -> None:
                             "description": "",
                         })
             # === END BLOCK: HTML FACTS-ONLY ADAPTER ===
+
+            else:
+                info(f"Skip unsupported type (v0): {stype} ({source_name})")
+                continue
+
+        except Exception as e:
+            info(f"Parse failed: {source_name}: {e}")
+            continue
+
 
             else:
                 info(f"Skip unsupported type (v0): {stype} ({source_name})")
