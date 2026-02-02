@@ -9,6 +9,10 @@ on:
   schedule:
     - cron: "50 5 * * *"
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   import:
     runs-on: ubuntu-latest
@@ -28,9 +32,32 @@ jobs:
           pip install google-api-python-client google-auth
 
       - name: Run Inbox → Events import
+        id: import
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          python scripts/inbox-to-events.py
+          set -e
+          python scripts/inbox-to-events.py | tee import.log
+          if grep -q "Events: neue Zeilen appended" import.log; then
+            echo "did_import=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "did_import=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Deploy to STRATO (only if import happened)
+        if: steps.import.outputs.did_import == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -e
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/deploy-strato.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "✅ Deploy workflow dispatched."
 # === END BLOCK: INBOX TO EVENTS WORKFLOW (manual + scheduled) ===
+
