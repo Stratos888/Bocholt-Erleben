@@ -108,7 +108,7 @@ jobs:
           grep -n "style.css" deploy/index.html || true
 
           echo "=== STEP 1: replace existing ?v=... with BUILD_ID (no-op if no ?v= present) ==="
-          find deploy -name "*.html" -print0 | xargs -0 perl -pi -e 's/(\?v=)[^"'\''\s>]+/\1'"$BUILD_ID"'/g
+          find deploy -name "*.html" -print0 | xargs -0 sed -i "s/\?v=[^\"' >]*/?v=$BUILD_ID/g"
 
           echo "=== PROOF B: after STEP 1 (deploy/index.html style.css line) ==="
           grep -n "style.css" deploy/index.html || true
