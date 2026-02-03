@@ -531,7 +531,7 @@ def main() -> None:
             info(f"Skip source (missing type/url): {source_name}")
             continue
 
-              info(f"Fetch: {source_name} ({stype})")
+        info(f"Fetch: {source_name} ({stype})")
 
         # === BEGIN BLOCK: FETCH + PARSE DISPATCH (candidates defined, v1) ===
         # Datei: scripts/discovery-to-inbox.py
