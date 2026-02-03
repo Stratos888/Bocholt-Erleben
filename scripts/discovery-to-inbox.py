@@ -531,19 +531,33 @@ def main() -> None:
             info(f"Skip source (missing type/url): {source_name}")
             continue
 
-        info(f"Fetch: {source_name} ({stype})")
+              info(f"Fetch: {source_name} ({stype})")
+
+        # === BEGIN BLOCK: FETCH + PARSE DISPATCH (candidates defined, v1) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - candidates ist IMMER definiert (verhindert NameError)
+        # - Fetch + Parse Dispatch nach Source-Typ (rss/ical)
+        # Umfang:
+        # - ersetzt ausschließlich den defekten try/except-Block vor total_candidates
+        # === END BLOCK: FETCH + PARSE DISPATCH (candidates defined, v1) ===
+
+        candidates: List[Dict[str, str]] = []
         try:
             content = safe_fetch(url)
-               # === BEGIN BLOCK: PARSE DISPATCH CLEANUP (remove duplicate else/except) ===
-        # Zweck: Entfernt kaputte, doppelte else/except-Äste nach dem Parse-Dispatch (Syntax/Indent stabil).
-        # Umfang: Ersetzt ausschließlich den fehlerhaften Block zwischen Parse-try/except und total_candidates.
-        # === END BLOCK: PARSE DISPATCH CLEANUP (remove duplicate else/except) ===
-
+            if stype in ("ical", "ics"):
+                candidates = parse_ics_events(content)
+            elif stype == "rss":
+                candidates = parse_rss(content)
+            else:
+                info(f"Skip source (unsupported type): {source_name} ({stype})")
+                candidates = []
         except Exception as e:
             info(f"Parse failed: {source_name}: {e}")
-            continue
+            candidates = []
 
         total_candidates += len(candidates)
+
 
 
         for c in candidates:
