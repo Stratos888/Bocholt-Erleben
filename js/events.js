@@ -348,26 +348,33 @@ Umfang:
     - Danach Badge + Body.
     === */
 
-    // Kategorie-Icon (ohne Text) – passend zu style.css (.event-category-icon)
-    const kategorieRaw = (event?.kategorie || "").trim();
-    const iconMap = {
-      Party: "🎉",
-      Kneipe: "🍺",
-      Kinder: "🧒",
-      Quiz: "❓",
-      Musik: "🎵",
-      Kultur: "🎭"
-    };
-    const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
+    // === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (scan-friendly, calm) ===
+// Zweck: Kategorie-Icon nicht mehr als schwebendes Element, sondern inline in der Titelzeile.
+// Umfang: Icon wird an <h3 class="event-title"> angehängt (nicht an die Card).
+// ===
+const kategorieRaw = (event?.kategorie || "").trim();
+const iconMap = {
+  Party: "🎉",
+  Kneipe: "🍺",
+  Kinder: "🧒",
+  Quiz: "❓",
+  Musik: "🎵",
+  Kultur: "🎭"
+};
+const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
 
-    if (categoryIcon) {
-      const icon = document.createElement("span");
-      icon.className = "event-category-icon";
-      icon.setAttribute("role", "img");
-      icon.setAttribute("aria-label", `Kategorie: ${kategorieRaw}`);
-      icon.textContent = categoryIcon;
-      card.appendChild(icon);
-    }
+if (categoryIcon) {
+  const icon = document.createElement("span");
+  icon.className = "event-category-icon";
+  icon.setAttribute("role", "img");
+  icon.setAttribute("aria-label", `Kategorie: ${kategorieRaw}`);
+  icon.textContent = categoryIcon;
+
+  // Icon INLINE in die Titelzeile
+  h3.appendChild(icon);
+}
+// === END BLOCK: CATEGORY ICON INLINE WITH TITLE (scan-friendly, calm) ===
+
 
     body.appendChild(h3);
     if (metaParts.length) body.appendChild(meta);
@@ -517,6 +524,7 @@ Umfang:
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
