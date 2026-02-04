@@ -503,25 +503,25 @@ Umfang:
 
 /* === BEGIN BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) ===
 Zweck:
-- Ruhiges Top-App Layout
-- Links kompakter Date-Chip
-- Rechts nur 2 Zeilen (Title + Meta)
-- Kategorie-Icon inline, NICHT floating
+- Zielzustand stabil erzwingen: links Date-Chip, rechts Content (2 Zeilen).
+- Grid statt Flex, damit nichts “zurück” in column kippt.
+- Titeltext clamp 2 Zeilen, Icon bleibt immer sichtbar.
 Umfang:
-- überschreibt nur Card/Badge/Body/Icon Styles
+- Nur Eventcard-Layout/Badge/Body/Title/Icon innerhalb dieses Blocks.
 === */
 
-/* --- Card Grid --- */
+/* --- Card: 2 Spalten (Date-Chip | Content) --- */
 .event-card{
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  column-gap: 14px;
   align-items: center;
-  gap: 14px;
+
   padding: 12px 14px;
 }
 
-/* --- Date Chip (ruhig & schmal) --- */
+/* --- Date Chip (ruhig & kompakt) --- */
 .event-date-badge{
-  flex: 0 0 auto;
   width: 46px;
 
   display: flex;
@@ -557,9 +557,8 @@ Umfang:
   opacity: 0.7;
 }
 
-/* --- Content Area --- */
+/* --- Content Area: 2 Zeilen --- */
 .event-card-body{
-  flex: 1 1 auto;
   min-width: 0;
 
   display: flex;
@@ -567,17 +566,7 @@ Umfang:
   gap: 4px;
 }
 
-/* Title bekommt maximalen Platz (2 Zeilen) */
-/* === BEGIN BLOCK: TITLE TEXT CLAMP + INLINE ICON (stable scan layout) ===
-Zweck:
-- Nur der Titeltext wird geclampt (2 Zeilen)
-- Icon bleibt IMMER sichtbar und rutscht nie raus
-- Titel + Icon stehen sauber in einer Zeile nebeneinander
-Umfang:
-- ersetzt nur .event-title Styling
-=== */
-
-/* Title = Layout-Container */
+/* Title-Zeile: Text + Icon getrennt */
 .event-title{
   margin: 0;
 
@@ -590,7 +579,6 @@ Umfang:
   line-height: 1.25;
 }
 
-/* Nur der Text wird gekürzt */
 .event-title__text{
   flex: 1 1 auto;
   min-width: 0;
@@ -601,57 +589,42 @@ Umfang:
   overflow: hidden;
 }
 
-/* Icon bleibt stabil sichtbar */
+/* Icon bleibt IMMER sichtbar, nie floating */
 .event-title .event-category-icon{
   flex: 0 0 auto;
-  margin-left: 2px;
+  position: static;
 
   font-size: 0.95rem;
   opacity: 0.9;
   transform: none;
 }
 
-/* === END BLOCK: TITLE TEXT CLAMP + INLINE ICON (stable scan layout) === */
-
-
-/* Kategorie-Icon INLINE statt floating */
-.event-title .event-category-icon{
-  position: static;
-  margin-left: 6px;
-
-  font-size: 0.95rem;
-  opacity: 0.85;
-
-  transform: none;
-}
-
-/* Meta-Zeile: ruhig + kompakt */
+/* Meta-Zeile: 1 Zeile, ruhig */
 .event-meta{
+  margin: 0;
   font-size: 0.85rem;
   opacity: 0.75;
-  margin: 0;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* alte absolute/floating Styles neutralisieren (falls vorhanden) */
+/* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
 .event-card > .event-category-icon{
-  position: static;
+  display: none;
 }
 
-/* Mobile Feinjustierung */
+/* Mobile fein */
 @media (max-width: 360px){
+  .event-card{
+    grid-template-columns: 42px minmax(0, 1fr);
+    column-gap: 12px;
+  }
   .event-date-badge{ width: 42px; }
-  .event-card{ gap: 12px; }
 }
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
-
-
-
-
 
 .event-title {
   font-weight: 600;
@@ -2125,6 +2098,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
