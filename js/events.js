@@ -388,9 +388,14 @@ if (categoryIcon) {
 // === END BLOCK: CATEGORY ICON INLINE WITH TITLE (scan-friendly, calm) ===
 
 
+        // === BEGIN BLOCK: BODY APPEND (2 lines only: title + meta) ===
+    // Zweck: Zielzustand 2 Zeilen rechts (Titel + Meta), keine Location-Node mehr anhängen.
+    // Umfang: Ersetzt nur das Anhängen der Body-Children.
+    // ===
     body.appendChild(h3);
-    if (metaParts.length) body.appendChild(meta);
-    body.appendChild(location);
+    if (meta.textContent) body.appendChild(meta);
+    // === END BLOCK: BODY APPEND (2 lines only: title + meta) ===
+
 
     card.appendChild(badge);
     card.appendChild(body);
@@ -536,6 +541,7 @@ if (categoryIcon) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
