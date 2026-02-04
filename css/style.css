@@ -460,81 +460,79 @@ Umfang: .events-section + .events-section-title + .events-group-title + .event-c
   transform: translateY(0);
 }
 
-/* === BEGIN BLOCK: EVENT CARD DATE BADGE LAYOUT (Top-app scan, calm) ===
-Zweck: Mehr Title-Platz + weniger gedrungen: Badge kompakter, Body ruhiger, Title 2 Zeilen.
-Umfang: Nur Layout/Typo für Badge + Card Body (CSS-only).
+/* === BEGIN BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) ===
+Zweck:
+- Ruhiges Top-App Layout
+- Links kompakter Date-Chip
+- Rechts nur 2 Zeilen (Title + Meta)
+- Kategorie-Icon inline, NICHT floating
+Umfang:
+- überschreibt nur Card/Badge/Body/Icon Styles
 === */
 
+/* --- Card Grid --- */
 .event-card{
   flex-direction: row;
   align-items: center;
-  gap: 12px;
-
+  gap: 14px;
   padding: 12px 14px;
 }
 
-/* Badge kompakter: weniger Breite, weniger Innenabstand */
+/* --- Date Chip (ruhig & schmal) --- */
 .event-date-badge{
   flex: 0 0 auto;
-  width: 52px;
+  width: 46px;
 
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
 
-  padding: 8px 6px;
-  border-radius: 14px;
+  padding: 6px 4px;
 
   background: var(--color-primary-muted);
-  border: 1px solid rgba(31, 41, 51, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(31,41,51,0.06);
 
+  line-height: 1;
   text-align: center;
-  line-height: 1.05;
 }
 
-/* Typo leicht reduzieren -> mehr Ruhe */
 .event-date-badge__wday{
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  opacity: 0.85;
+  opacity: 0.75;
 }
 
 .event-date-badge__day{
-  font-size: 1.28rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
 }
 
 .event-date-badge__month{
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  opacity: 0.72;
+  opacity: 0.7;
 }
 
-.event-date-badge__time{
-  margin-top: 4px;
-  font-size: 0.66rem;
-  font-weight: 700;
-  opacity: 0.76;
-}
-
-/* Body: ruhiger, Title bekommt Raum */
+/* --- Content Area --- */
 .event-card-body{
-  min-width: 0;
   flex: 1 1 auto;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-/* Title darf 2 Zeilen wie in Top-Apps */
-.event-card-body .event-title{
+/* Title bekommt maximalen Platz (2 Zeilen) */
+.event-title{
   margin: 0;
-  line-height: 1.2;
+
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -542,37 +540,41 @@ Umfang: Nur Layout/Typo für Badge + Card Body (CSS-only).
   overflow: hidden;
 }
 
-/* Meta & Location kompakter, aber gut lesbar */
-.event-card-body .event-meta{
-  margin: 0;
-  opacity: 0.82;
-}
+/* Kategorie-Icon INLINE statt floating */
+.event-title .event-category-icon{
+  position: static;
+  margin-left: 6px;
 
-.event-card-body .event-location{
-  margin: 0;
-  opacity: 0.92;
-}
+  font-size: 0.95rem;
+  opacity: 0.85;
 
-/* Kategorie-Icon nicht dominieren lassen */
-.event-card .event-category-icon{
-  top: 10px;
-  right: 10px;
-  opacity: 0.78;
   transform: none;
 }
 
-@media (max-width: 360px){
-  .event-card{
-    gap: 10px;
-    padding: 12px 12px;
-  }
-  .event-date-badge{
-    width: 50px;
-    padding: 8px 6px;
-  }
+/* Meta-Zeile: ruhig + kompakt */
+.event-meta{
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* === END BLOCK: EVENT CARD DATE BADGE LAYOUT (Top-app scan, calm) === */
+/* alte absolute/floating Styles neutralisieren (falls vorhanden) */
+.event-card > .event-category-icon{
+  position: static;
+}
+
+/* Mobile Feinjustierung */
+@media (max-width: 360px){
+  .event-date-badge{ width: 42px; }
+  .event-card{ gap: 12px; }
+}
+
+/* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
+
 
 
 
@@ -2049,6 +2051,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
