@@ -296,14 +296,15 @@ Umfang:
     bMonth.className = "event-date-badge__month";
     bMonth.textContent = monthShort;
 
-    const bTime = document.createElement("div");
-    bTime.className = "event-date-badge__time";
-    bTime.textContent = event?.time ? String(event.time).trim() : "";
+    // === BEGIN BLOCK: DATE BADGE WITHOUT TIME (clean scan) ===
+// Zweck: Badge zeigt nur Wochentag/Tag/Monat (Zeit kommt in Meta-Zeile).
+// Umfang: Entfernt nur das Zeit-Element aus dem Badge.
+// ===
+badge.appendChild(bWday);
+badge.appendChild(bDay);
+badge.appendChild(bMonth);
+// === END BLOCK: DATE BADGE WITHOUT TIME (clean scan) ===
 
-    badge.appendChild(bWday);
-    badge.appendChild(bDay);
-    badge.appendChild(bMonth);
-    if (bTime.textContent) badge.appendChild(bTime);
 
     /* --- Card body (right) --- */
     const body = document.createElement("div");
@@ -524,6 +525,7 @@ if (categoryIcon) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
