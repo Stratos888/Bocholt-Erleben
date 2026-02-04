@@ -624,6 +624,14 @@ footer{
 }
 
 
+/* === BEGIN BLOCK: TABBAR LINK UNDERLINE FIX (no underline on hover/focus/active) ===
+Zweck:
+- Verhindert das kurzzeitige Unterstreichen der Tabbar-Links (Browser-Default via a:hover).
+- Erhält gleichzeitig einen klaren Tastatur-Fokus (a11y) ohne Text-Underline.
+Umfang:
+- Nur .bottom-tabbar__item Hover/Focus/Active Verhalten.
+=== */
+
 .bottom-tabbar__item{
   -webkit-tap-highlight-color: transparent;
 
@@ -643,27 +651,20 @@ footer{
   font-weight: 800;
 }
 
-.bottom-tabbar__icon{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.88;
+/* Wichtig: globales a:hover { text-decoration: underline; } darf hier NICHT greifen */
+.bottom-tabbar__item:hover,
+.bottom-tabbar__item:active,
+.bottom-tabbar__item:focus,
+.bottom-tabbar__item:focus-visible{
+  text-decoration: none;
 }
 
-.bottom-tabbar__icon svg{
-  display: block;
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
+/* Tastatur-Fokus sichtbar, aber ohne Unterstreichung */
+.bottom-tabbar__item:focus-visible{
+  outline: 2px solid rgba(139,207,74,0.55);
+  outline-offset: 2px;
 }
 
-.bottom-tabbar__label{
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.01em;
-}
-
-/* Active State: ruhig, aber klar */
 .bottom-tabbar__item.is-active,
 .bottom-tabbar__item[aria-current="page"]{
   color: rgba(31,41,51,0.96);
@@ -677,6 +678,9 @@ footer{
 .bottom-tabbar__item:active{
   transform: translateY(1px);
 }
+
+/* === END BLOCK: TABBAR LINK UNDERLINE FIX (no underline on hover/focus/active) === */
+
 
 /* Desktop: Tabbar nicht “mobile-only” wirken lassen */
 @media (min-width: 900px){
@@ -1929,6 +1933,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
