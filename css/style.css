@@ -425,31 +425,72 @@ html.is-sheet-open body { overflow: hidden; }
   cursor: pointer;
 }
 
-/* === BEGIN BLOCK: EVENTS LIST LAYOUT (fix initial mobile zoom via overflow-proof grid) ===
-Zweck: Verhindert initialen Mobile-“Zoom/Fit”-Effekt durch horizontales Overflow; aligned Cards mit Header/Top-Stack Innenkanten.
-Umfang: .events-section + .events-section-title + .events-group-title + .event-cards-grid Layout-Regeln (nur CSS).
+/* === BEGIN BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) ===
+Zweck:
+- Mehr nutzbare Breite (kein “Card-in-Card-in-Card” Look).
+- Abschnittsüberschriften („Heute“, „Demnächst“) als ruhige Labels ohne Rahmen.
+- Guardrail gegen horizontales Overflow bleibt erhalten.
+Umfang:
+- Nur .events-section / .events-section-title / .event-cards-grid / .event-card Basis-Layout (CSS-only).
 === */
 
-/* Guardrail: Nichts im Events/Offers-Flow darf jemals breiter als der Viewport sein */
+/* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
 .events-section-title,
 .events-group-title,
 .event-cards-grid,
-.event-card {
-  position: relative;
+.event-card{
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Feed-Container: full-bleed, keine eigene “Surface” */
+.events-section{
+  padding: 0 16px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
+.events-section-title{
+  margin: 10px 0 8px;
+  padding: 6px 2px;
+
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+/* Grid/Stack: nur Abstand, keine eigene Surface */
+.event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Nur die echte Card ist klickbar und “Surface” */
+.event-card{
+  position: relative;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  border-radius: 16px;
 }
+
+/* === END BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) === */
+
 
 .event-card:hover {
   transform: translateY(-1px);
@@ -2051,6 +2092,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
