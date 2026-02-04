@@ -1829,7 +1829,7 @@ Umfang: .app-header + Brand + Actions.
   line-height: 1;
   text-decoration: none;
 
-  font-size: 14px;
+  font-size: 0;
   color: var(--color-text-secondary);
   cursor: pointer;
 
@@ -1933,6 +1933,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
