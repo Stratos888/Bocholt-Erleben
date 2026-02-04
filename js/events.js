@@ -310,35 +310,46 @@ badge.appendChild(bMonth);
     const body = document.createElement("div");
     body.className = "event-card-body";
 
-    /* Meta (ruhig) */
-    const metaParts = [];
-    if (city && city !== "Bocholt") metaParts.push(escapeHtml(city));
+        /* === BEGIN BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) ===
+    Zweck:
+    - Zielzustand: 2 Zeilen rechts (Title + Meta), keine 3. Zeile mehr.
+    - Icon darf nie “rausrutschen”: Titeltext und Icon werden getrennt gerendert.
+    - Meta-Zeile: Zeit • Location (optional Stadt/Range davor), 1 Zeile.
+    Umfang:
+    - Ersetzt Meta/Title/Location-Erzeugung in createCard (nur Rendering, keine Logik außenrum).
+    === */
 
-    // Bei Range-Events ist dateLabel wichtig (Badge zeigt nur Starttag)
+    /* Meta (1 Zeile): Stadt (optional) • Range (optional) • Zeit (optional) • Location */
+    const metaParts = [];
+
+    if (city && city !== "Bocholt") metaParts.push(city);
+
     if (event?.date && event?.endDate && event.endDate !== event.date) {
       metaParts.push(dateLabel);
     }
 
+    const timeText = event?.time ? String(event.time).trim() : "";
+    if (timeText) metaParts.push(timeText);
+
+    const locText = (event?.location || "").trim();
+    if (locText) metaParts.push(locText);
+
     const meta = document.createElement("div");
     meta.className = "event-meta";
-    meta.innerHTML = metaParts.join(" · ");
+    meta.textContent = metaParts.join(" • ");
 
-    /* Title */
+    /* Title: Text + Icon getrennt (Icon bleibt immer sichtbar) */
     const h3 = document.createElement("h3");
     h3.className = "event-title";
-    h3.innerHTML = escapeHtml(event?.title || "Event");
 
-    /* Location (ruhig, sekundär) */
-    const location = document.createElement("div");
-    location.className = "event-location";
+    const titleText = document.createElement("span");
+    titleText.className = "event-title__text";
+    titleText.textContent = event?.title ? String(event.title) : "Event";
 
-    const loc = (event?.location || "").trim();
-    if (loc) {
-      const span = document.createElement("div");
-      span.className = "event-location-text";
-      span.textContent = loc;
-      location.appendChild(span);
-    }
+    h3.appendChild(titleText);
+
+    /* === END BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) === */
+
 
     /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT ===
     Zweck:
@@ -525,6 +536,7 @@ if (categoryIcon) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
