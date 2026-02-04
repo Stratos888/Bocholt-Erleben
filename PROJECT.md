@@ -48,6 +48,12 @@ Diese Punkte sind feste Systemgesetze. Sie dürfen NICHT umgangen oder „verein
    → Ungültige Daten, Duplikate oder fehlende Pflichtfelder müssen den Build stoppen,
       niemals „still durchrutschen“.
 
+6. PWA/Installierbarkeit ist ein System-Contract (Manifest + SW).
+   → index.html MUSS <link rel="manifest" href="/manifest.json"> enthalten.
+   → /manifest.json muss im Deploy erreichbar sein (200, JSON).
+   → Der Install-Button wird per JS standardmäßig versteckt und nur bei beforeinstallprompt gezeigt.
+
+
 Diese Architektur sorgt für:
 - einfache Redaktion (Sheet)
 - stabile PWA/Cache (statische JSON)
@@ -131,6 +137,24 @@ Keine „Nebenbei-Fixes“ im gleichen Schritt.
      (z.B. --surface, --shadow-sm, --shadow-md).
    - Neue Tokens nur als eigener, bewusster Schritt in :root.
 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RECENT LEARNINGS & FALLSTRICKE (Feb 2026)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1) PWA/Install-Button „verschwindet“ ist fast nie CSS:
+   - Wenn Chrome DevTools „No manifest detected“ zeigt, fehlt der Manifest-Link im <head>
+     oder /manifest.json ist nicht erreichbar.
+   - Dann feuert beforeinstallprompt nicht → pwa-install.js versteckt den Button dauerhaft.
+
+2) UI-Polish Regressionen vermeiden:
+   - Schönheitsfixes dürfen nicht “nebenbei” HTML/<head>/Script-Includes ändern.
+   - Minimal-Diff + 1-Datei-Schritte sind der Default, insbesondere bei CSS.
+
+3) Event Cards: Scan-Layout ist ein System-Pattern (nicht „nur CSS“):
+   - Date-Chip links + 2 Zeilen rechts + Icon inline ist das verbindliche Feed-Pattern.
+   - „Sektionen“ sind Labels, nicht zusätzliche Card-Container (kein Card-in-Card).
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ARCHITEKTUR – EVENTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -142,13 +166,16 @@ data/events.json
 → js/details.js (detail panel)
 
 Regeln:
-- Cards minimal
-- keine Beschreibung auf Card
-- Details im Panel
-- URL im Panel
-- Kategorie-Icon oben rechts
-- dynamische Zeitsektionen (Heute/Demnächst/Später)
-- Multi-Day Events gelten während Laufzeit als "Heute" (UI/Filter/Sortierung müssen range-aware sein)
+- Cards sind „scan-first“ und bleiben minimal (keine Beschreibung auf der Card).
+- Details (Beschreibung, Links) ausschließlich im Detailpanel.
+- Event Cards Layout (final, Top-App Pattern):
+  - 2-Spalten Grid: links Date-Chip, rechts Content.
+  - Date-Chip zeigt nur Wochentag/Tag/Monat (KEINE Zeit im Chip).
+  - Rechts exakt 2 Zeilen:
+    1) Titel (2-zeilig clamp) + Kategorie-Icon inline am Zeilenende (Icon muss immer sichtbar bleiben).
+    2) Meta (1 Zeile): Zeit • Location (Bocholt als Stadt nicht redundant anzeigen).
+- Zeitsektionen („Heute“, „Demnächst“, …) sind Labels ohne Rahmen (keine zusätzliche „Card-in-Card“ Surface).
+- Multi-Day Events gelten während Laufzeit als "Heute" (UI/Filter/Sortierung müssen range-aware sein).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EVENTS – DATENQUELLE & PUBLISHING (final)
@@ -403,4 +430,3 @@ D) Prozess: tägliche Event-Recherche
 E) TSV-Entfernung (späterer finaler Schritt)
 - [ ] Wenn Pipeline stabil ist: events.tsv nicht mehr als Repo-Quelle behandeln
 - [ ] Abschließend: TSV als Prozess-/Repo-Abhängigkeit entfernen (nur wenn alle Schritte oben stabil sind)
-
