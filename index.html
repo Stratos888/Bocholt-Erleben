@@ -3,7 +3,15 @@
 <head>
 <link rel="canonical" href="https://bocholt-erleben.de/">   
 <meta charset="UTF-8">
+<!-- === BEGIN BLOCK: PWA MANIFEST LINK (required for install prompt) ===
+Zweck: Stellt sicher, dass Chrome das Manifest findet (DevTools: Application → Manifest).
+Umfang: Fügt NUR den Manifest-Link ein (kein weiteres Refactoring).
+=== -->
+<link rel="manifest" href="/manifest.json">
+<!-- === END BLOCK: PWA MANIFEST LINK (required for install prompt) === -->
+
 <!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
+
 Zweck: Optimiert Google-Snippet (Title/Description) + Social/AI Preview (Open Graph).
 Umfang: Ersetzt viewport/description/title und ergänzt OG-Metadaten.
 === -->
@@ -325,6 +333,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
