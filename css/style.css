@@ -737,38 +737,6 @@ Umfang: Nur .event-title__text + kleines @media Override innerhalb EVENT CARD FI
   pointer-events: none;
 }
 
-
-/* === BEGIN BLOCK: EVENT TITLE (single-line + icon-safe ellipsis) ===
-Zweck:
-- Titel immer exakt 1 Zeile (gleich hohe Cards)
-- Ellipsis bei Überlänge
-- Fester Sicherheitsabstand zum Kategorie-Icon oben rechts
-Umfang:
-- ersetzt ausschließlich .event-title{...}
-=== */
-.event-title{
-  min-width: 0;
-
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.28;
-  letter-spacing: -0.01em;
-  color: var(--color-text-primary);
-
-  /* Reserve space for top-right category icon (icon + breathing room) */
-  padding-right: 44px;
-
-  /* Single-line ellipsis */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  margin-bottom: 6px;
-}
-/* === END BLOCK: EVENT TITLE (single-line + icon-safe ellipsis) === */
-
-
-
 /* Meta */
 .event-meta{
   min-width: 0;
@@ -2184,69 +2152,33 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, authoritative, non-overridable) ===
+Zweck:
+- Max 2 Zeilen wie Top Apps
+- kein Single-line ellipsis
+- sauberes Wrapping
+- letzter Block → gewinnt Cascade garantiert
+- !important verhindert spätere Überschreibungen
+Umfang: nur Titeltext
+=== */
+
+.event-title{
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  padding-right: 0 !important;
+}
+
+.event-title__text{
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+
+  overflow: hidden !important;
+
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* === END BLOCK: EVENT TITLE FINAL (2-line clamp, authoritative, non-overridable) === */
 
