@@ -510,6 +510,11 @@ Umfang:
 - Nur Eventcard-Layout/Badge/Body/Title/Icon innerhalb dieses Blocks.
 === */
 
+/* === BEGIN BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow) ===
+Zweck: Premium-Feeling durch mehr Luft + subtilen Shadow, ohne Layout/JS zu ändern.
+Umfang: Nur .event-card + .event-card:hover im FINAL LAYOUT Block.
+=== */
+
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
 .event-card{
   display: grid;
@@ -517,21 +522,23 @@ Umfang:
   column-gap: 14px;
   align-items: center;
 
-  padding: 12px 14px;
+  padding: 14px 16px;
 
-  /* Stil 1: clean surface */
   background: var(--surface);
   border: 1px solid rgba(31,41,51,0.08);
   border-radius: 14px;
-  box-shadow: none;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Stil 1 Hover: kein “schwebender” Lift, nur dezente Kante */
+/* Stil 1 Hover: kein Lift, nur minimal stärkerer Shadow + Kante */
 .event-card:hover{
   transform: none;
-  box-shadow: none;
+  box-shadow: var(--shadow-md);
   border-color: rgba(31,41,51,0.14);
 }
+
+/* === END BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow) === */
+
 
 /* --- Date Chip (ruhig & kompakt) --- */
 .event-date-badge{
@@ -2114,6 +2121,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
