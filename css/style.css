@@ -585,21 +585,35 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   text-align: center;
 }
 
+/* === BEGIN BLOCK: EVENT DATE BADGE PREMIUM TYPO HIERARCHY (weekday/month quieter) ===
+Zweck: Premium-Hierarchie im Date-Chip → Zahl dominiert, Labels ruhig
+Umfang: Nur Typo der drei Date-Badge Zeilen
+=== */
+
+/* === BEGIN BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy + meta color) ===
+Zweck: Premium-Hierarchie im Date-Chip + ruhigere, besser lesbare Meta-Zeile (ohne Layoutänderung)
+Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Block
+=== */
+
 .event-date-badge__wday{
-  font-size: 0.65rem;
-  font-weight: 800;
-  opacity: 0.72;
+  font-size: 0.62rem;
+  font-weight: 700;
+  opacity: 0.62;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .event-date-badge__day{
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
 }
 
 .event-date-badge__month{
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  opacity: 0.68;
+  opacity: 0.58;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* --- Content Area: 2 Zeilen --- */
@@ -644,16 +658,20 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   transform: none;
 }
 
-/* Meta-Zeile: 1 Zeile, ruhig */
+/* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 .event-meta{
   margin: 0;
   font-size: 0.85rem;
-  opacity: 0.72;
+  line-height: 1.3;
+  color: var(--muted);
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* === END BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy + meta color) === */
+
 
 /* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
 .event-card > .event-category-icon{
@@ -2144,6 +2162,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
