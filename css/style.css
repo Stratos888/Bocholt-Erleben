@@ -515,6 +515,11 @@ Zweck: Premium-Feeling durch mehr Luft + subtilen Shadow, ohne Layout/JS zu änd
 Umfang: Nur .event-card + .event-card:hover im FINAL LAYOUT Block.
 === */
 
+/* === BEGIN BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) ===
+Zweck: Premium-Feeling durch subtilen Shadow + klares Press-Feedback + sichtbaren Fokus
+Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML/JS)
+=== */
+
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
 .event-card{
   display: grid;
@@ -528,14 +533,32 @@ Umfang: Nur .event-card + .event-card:hover im FINAL LAYOUT Block.
   border: 1px solid rgba(31,41,51,0.08);
   border-radius: 14px;
   box-shadow: var(--shadow-sm);
+
+  transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
-/* Stil 1 Hover: kein Lift, nur minimal stärkerer Shadow + Kante */
+/* Hover: minimal stärkerer Shadow + Kante (kein Lift) */
 .event-card:hover{
   transform: none;
   box-shadow: var(--shadow-md);
   border-color: rgba(31,41,51,0.14);
 }
+
+/* Press: kleines “Eindrücken” (App-Feeling) */
+.event-card:active{
+  transform: scale(0.99);
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(31,41,51,0.18);
+}
+
+/* Keyboard/Accessibility: sichtbarer Fokus ohne Layoutsprung */
+.event-card:focus-visible{
+  outline: 2px solid rgba(31, 123, 73, 0.35);
+  outline-offset: 2px;
+}
+
+/* === END BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) === */
+
 
 /* === END BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow) === */
 
@@ -2121,6 +2144,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
