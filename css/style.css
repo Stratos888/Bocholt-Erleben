@@ -638,15 +638,37 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
   line-height: 1.25;
 }
 
+/* === BEGIN BLOCK: EVENT TITLE PREMIUM (Option B: clamp only on very small screens) ===
+Zweck: Kurze Titel nicht unnötig abschneiden; Clamp nur auf Mini-Screens zur Layout-Kontrolle.
+Umfang: Nur .event-title__text + kleines @media Override innerhalb EVENT CARD FINAL LAYOUT Block.
+=== */
+
 .event-title__text{
   flex: 1 1 auto;
   min-width: 0;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  /* Default: NICHT clampen → Titel darf sauber umbrechen */
+  display: block;
+  overflow: visible;
+
+  /* Robust wrapping für lange Wörter/Orte */
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
 }
+
+/* Clamp nur auf sehr kleinen Screens */
+@media (max-width: 360px){
+  .event-title__text{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* === END BLOCK: EVENT TITLE PREMIUM (Option B: clamp only on very small screens) === */
+
 
 /* Icon bleibt IMMER sichtbar, ruhig */
 .event-title .event-category-icon{
@@ -2162,6 +2184,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
