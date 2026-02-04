@@ -456,7 +456,6 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     "Sport & Bewegung",
     "Natur & Draußen",
     "Innenstadt & Leben",
-    "Sonstiges"
   ],
 
   normalizeCategory(raw) {
