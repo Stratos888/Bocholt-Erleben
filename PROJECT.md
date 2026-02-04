@@ -64,9 +64,16 @@ Diese Regeln gelten IMMER.
    Der zuletzt gepostete Stand einer Datei ist vollständig und korrekt.
    Niemals raten oder Teile rekonstruieren.
 
-2. Diff statt Snippet
-   Nur Replace-Blöcke oder klare Änderungen.
-   Keine kompletten Dateien neu erfinden (außer ausdrücklich “neu anlegen”).
+2. Diff statt Snippet (präzisiert)
+Nur Replace-Blöcke oder klar benannte, lokale Änderungen.
+Keine kompletten Dateien neu erfinden (außer ausdrücklich „neu anlegen“).
+Replace immer nur über verifizierbare Anker (siehe Regel 13).
+
+2a. Minimal-Diff-Regel (NEU, verbindlich)
+Änderungen dürfen nur die minimal notwendigen Zeilen betreffen.
+Keine Block-Replacements für UI-/Schönheitsänderungen.
+Wenn eine Änderung mehr als ca. 10–20 Zeilen oder mehrere Bereiche betrifft, ist es kein UI-Polish mehr → als eigener Task behandeln (mit Proof/Scope).
+Keine „Nebenbei-Fixes“ im gleichen Schritt.
 
 3. Datei-fokussiert
    Immer nur 1 Datei pro Schritt ändern.
@@ -93,17 +100,13 @@ Diese Regeln gelten IMMER.
    Build darf bei kaputten Assets hart fehlschlagen.
    Zusätzlich: wenn Datenquelle (Events) nicht erreichbar/ungültig ist → Deploy bricht ab.
 
-11. 100%-Regel für Fixes
+11. 100%-Regel für Fixes (Klarstellung)
    Änderungen vollständig und korrekt liefern (keine halben Patches).
+   Klarstellung: „vollständig“ bedeutet: alle für das konkret angegebene Problem notwendigen Änderungen im definierten    Scope (1 Datei / Minimal-Diff). Keine zusätzlichen Optimierungen.
 
-12. Systemstabilität (verbindlich)
-   Neue Features oder Änderungen dürfen:
-   - nichts anderes kaputt machen
-   - keine Seiteneffekte erzeugen
-   - bestehende Patterns wiederverwenden
-   - keine Sonderlogik einführen
-   - immer ganzheitlich das System berücksichtigen
-   → Evolution statt Workarounds
+12. Systemstabilität (Klarstellung, ohne Abschwächung)
+   Neue Features oder Änderungen dürfen keine unbeabsichtigten Seiteneffekte erzeugen.
+   Klarstellung: Bei CSS gilt „Seiteneffekt“ = Änderung außerhalb der betroffenen Komponente/Selektoren, außer sie ist    explizit Teil des Fix-Scopes und begründet/proved.
 
 13. Replace-Anker-Regel (verbindlich)
    Replace-Blöcke dürfen nur über Textbereiche/Selector/Marker erfolgen,
