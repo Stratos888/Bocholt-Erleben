@@ -21,7 +21,7 @@
 
 
 (() => {
-  const installButton = document.querySelector(".pwa-install-button");
+  const installButton = document.querySelector("button.pwa-install-button");
   if (!installButton) return;
 
   // Button ist standardmäßig verborgen
@@ -67,4 +67,5 @@
     deferredPrompt = null;
   });
 })();
+
 
