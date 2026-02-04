@@ -511,8 +511,6 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     if (v.includes("innenstadt") || v.includes("urban") || v.includes("city")) {
       return "Innenstadt & Leben";
     }
-
-    return "Sonstiges";
   },
 
   setActiveOption(sheetEl, activeBtn) {
