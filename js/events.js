@@ -256,21 +256,78 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
 
     const timeLabel = event?.time ? ` · ${escapeHtml(event.time)}` : "";
 
-    /* === BEGIN BLOCK: EVENT META LINE (city + date + time) ===
-    Zweck: Meta-Zeile integriert die Stadt als Kontextinformation.
-    Umfang: Ersetzt die bisherige Meta-Zeile.
-    === */
+   /* === BEGIN BLOCK: EVENT META LINE (badge-ready, calm meta) ===
+Zweck:
+- Vorbereitung Date-Badge Layout (Top-App Pattern): Datum/Uhrzeit als linke Badge, Content rechts.
+- Meta-Zeile wird ruhiger: kein permanentes "Bocholt", Stadt nur wenn != Bocholt.
+Umfang:
+- Ersetzt Meta-Erzeugung + Append-Reihenfolge (h3/meta/location) durch Badge + Body-Wrapper.
+=== */
+
+    /* --- Date Badge (left) --- */
+    const startDateObj = parseISODateLocal(event?.date);
+    const weekdayShort = startDateObj
+      ? new Intl.DateTimeFormat("de-DE", { weekday: "short" })
+          .format(startDateObj)
+          .replace(".", "")
+          .toUpperCase()
+      : "";
+    const dayNum = startDateObj ? String(startDateObj.getDate()).padStart(2, "0") : "";
+    const monthShort = startDateObj
+      ? new Intl.DateTimeFormat("de-DE", { month: "short" })
+          .format(startDateObj)
+          .replace(".", "")
+          .toUpperCase()
+      : "";
+
+    const badge = document.createElement("div");
+    badge.className = "event-date-badge";
+    badge.setAttribute("aria-hidden", "true");
+
+    const bWday = document.createElement("div");
+    bWday.className = "event-date-badge__wday";
+    bWday.textContent = weekdayShort;
+
+    const bDay = document.createElement("div");
+    bDay.className = "event-date-badge__day";
+    bDay.textContent = dayNum;
+
+    const bMonth = document.createElement("div");
+    bMonth.className = "event-date-badge__month";
+    bMonth.textContent = monthShort;
+
+    const bTime = document.createElement("div");
+    bTime.className = "event-date-badge__time";
+    bTime.textContent = event?.time ? String(event.time).trim() : "";
+
+    badge.appendChild(bWday);
+    badge.appendChild(bDay);
+    badge.appendChild(bMonth);
+    if (bTime.textContent) badge.appendChild(bTime);
+
+    /* --- Card body (right) --- */
+    const body = document.createElement("div");
+    body.className = "event-card-body";
+
+    /* Meta (ruhig) */
+    const metaParts = [];
+    if (city && city !== "Bocholt") metaParts.push(escapeHtml(city));
+
+    // Bei Range-Events ist dateLabel wichtig (Badge zeigt nur Starttag)
+    if (event?.date && event?.endDate && event.endDate !== event.date) {
+      metaParts.push(dateLabel);
+    }
+
     const meta = document.createElement("div");
     meta.className = "event-meta";
-    meta.innerHTML = `${escapeHtml(city)} · ${dateLabel}${timeLabel}`;
-    /* === END BLOCK: EVENT META LINE (city + date + time) === */
+    meta.innerHTML = metaParts.join(" · ");
 
-    // Title
+    /* Title */
     const h3 = document.createElement("h3");
     h3.className = "event-title";
     h3.innerHTML = escapeHtml(event?.title || "Event");
 
-    // Location (ruhig, sekundär)
+    /* Location (ruhig, sekundär) */
     const location = document.createElement("div");
     location.className = "event-location";
 
@@ -282,13 +339,13 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
       location.appendChild(span);
     }
 
-        /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT ===
+    /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT ===
     Zweck:
     - Kategorie-Icon auf Event Cards wieder anzeigen (oben rechts).
     - Icon ist rein visuell, Card bleibt komplett klickbar.
     Umfang:
     - Erzeugt optional .event-category-icon und hängt sie an die Card.
-    - Danach wie gehabt Title/Meta/Location.
+    - Danach Badge + Body.
     === */
 
     // Kategorie-Icon (ohne Text) – passend zu style.css (.event-category-icon)
@@ -312,11 +369,17 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
       card.appendChild(icon);
     }
 
-    card.appendChild(h3);
-    card.appendChild(meta);
-    card.appendChild(location);
+    body.appendChild(h3);
+    if (metaParts.length) body.appendChild(meta);
+    body.appendChild(location);
+
+    card.appendChild(badge);
+    card.appendChild(body);
 
     /* === END BLOCK: EVENTCARD APPEND CONTENT === */
+
+/* === END BLOCK: EVENT META LINE (badge-ready, calm meta) === */
+
 
 
     /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER === */
@@ -454,6 +517,7 @@ if (event?.date && event?.endDate && event.endDate !== event.date) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
