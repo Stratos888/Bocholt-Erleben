@@ -503,9 +503,9 @@ Umfang:
 
 /* === BEGIN BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) ===
 Zweck:
-- Zielzustand stabil erzwingen: links Date-Chip, rechts Content (2 Zeilen).
-- Grid statt Flex, damit nichts “zurück” in column kippt.
-- Titeltext clamp 2 Zeilen, Icon bleibt immer sichtbar.
+- Stil 1 (Apple/Google clean): weniger “schwebend”, mehr Liste.
+- Cards: Border statt Shadow; ruhiger Hover ohne Lift.
+- Date-Chip: integrierter, weniger “Sticker”.
 Umfang:
 - Nur Eventcard-Layout/Badge/Body/Title/Icon innerhalb dieses Blocks.
 === */
@@ -518,6 +518,19 @@ Umfang:
   align-items: center;
 
   padding: 12px 14px;
+
+  /* Stil 1: clean surface */
+  background: var(--surface);
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+/* Stil 1 Hover: kein “schwebender” Lift, nur dezente Kante */
+.event-card:hover{
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(31,41,51,0.14);
 }
 
 /* --- Date Chip (ruhig & kompakt) --- */
@@ -534,7 +547,9 @@ Umfang:
 
   background: var(--color-primary-muted);
   border-radius: 12px;
-  border: 1px solid rgba(31,41,51,0.06);
+
+  /* weniger Sticker: Border sehr subtil */
+  border: 1px solid rgba(31,41,51,0.04);
 
   line-height: 1;
   text-align: center;
@@ -543,7 +558,7 @@ Umfang:
 .event-date-badge__wday{
   font-size: 0.65rem;
   font-weight: 800;
-  opacity: 0.75;
+  opacity: 0.72;
 }
 
 .event-date-badge__day{
@@ -554,7 +569,7 @@ Umfang:
 .event-date-badge__month{
   font-size: 0.65rem;
   font-weight: 700;
-  opacity: 0.7;
+  opacity: 0.68;
 }
 
 /* --- Content Area: 2 Zeilen --- */
@@ -589,13 +604,13 @@ Umfang:
   overflow: hidden;
 }
 
-/* Icon bleibt IMMER sichtbar, nie floating */
+/* Icon bleibt IMMER sichtbar, ruhig */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
 
-  font-size: 0.95rem;
-  opacity: 0.9;
+  font-size: 0.9rem;
+  opacity: 0.75;
   transform: none;
 }
 
@@ -603,7 +618,7 @@ Umfang:
 .event-meta{
   margin: 0;
   font-size: 0.85rem;
-  opacity: 0.75;
+  opacity: 0.72;
 
   white-space: nowrap;
   overflow: hidden;
@@ -625,6 +640,7 @@ Umfang:
 }
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
+
 
 .event-title {
   font-weight: 600;
@@ -2098,6 +2114,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
+
 
 
 
