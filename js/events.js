@@ -360,32 +360,42 @@ badge.appendChild(bMonth);
     - Danach Badge + Body.
     === */
 
-    // === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (scan-friendly, calm) ===
-// Zweck: Kategorie-Icon nicht mehr als schwebendes Element, sondern inline in der Titelzeile.
-// Umfang: Icon wird an <h3 class="event-title"> angehängt (nicht an die Card).
+ // === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
+// Zweck: Icons konsistent zu Canonical Categories (Sheet/Filter/Builder) via FilterModule.normalizeCategory().
+// Umfang: Ersetzt nur Icon-Ermittlung; DOM-Anhängung bleibt inline an <h3 class="event-title">.
 // ===
-const kategorieRaw = (event?.kategorie || "").trim();
+const kategorieRaw = (event?.kategorie || "").toString().trim();
+
+// Canonical-Kategorie (Single Source of Truth: FilterModule)
+const canonicalCategory =
+  (window.FilterModule?.normalizeCategory ? window.FilterModule.normalizeCategory(kategorieRaw) : "") ||
+  kategorieRaw;
+
 const iconMap = {
-  Party: "🎉",
-  Kneipe: "🍺",
-  Kinder: "🧒",
-  Quiz: "❓",
-  Musik: "🎵",
-  Kultur: "🎭"
+  "Märkte & Feste": "🧺",
+  "Kultur & Kunst": "🎭",
+  "Musik & Bühne": "🎵",
+  "Kinder & Familie": "🧒",
+  "Sport & Bewegung": "🏃",
+  "Natur & Draußen": "🌿",
+  "Innenstadt & Leben": "🏙️",
 };
-const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
+
+const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️") : "";
 
 if (categoryIcon) {
   const icon = document.createElement("span");
   icon.className = "event-category-icon";
   icon.setAttribute("role", "img");
-  icon.setAttribute("aria-label", `Kategorie: ${kategorieRaw}`);
+  icon.setAttribute("aria-label", `Kategorie: ${canonicalCategory}`);
   icon.textContent = categoryIcon;
 
   // Icon INLINE in die Titelzeile
   h3.appendChild(icon);
 }
-// === END BLOCK: CATEGORY ICON INLINE WITH TITLE (scan-friendly, calm) ===
+// === END BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
+
+
 
 
         // === BEGIN BLOCK: BODY APPEND (2 lines only: title + meta) ===
@@ -541,6 +551,7 @@ if (categoryIcon) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
