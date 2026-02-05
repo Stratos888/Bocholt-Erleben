@@ -338,20 +338,31 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         // Overlap-Check: Event [startDay..endDay] muss Fenster [ws..we] schneiden
         const overlaps = (ws, we) => !(endDay < ws || startDay > we);
 
-        // nächstes Wochenende (Sa+So)
+               // nächstes/aktuelles Wochenende (Fr+Sa+So)
         const nextWeekendRange = (base) => {
           const b = new Date(base);
           b.setHours(0, 0, 0, 0);
           const dow = b.getDay(); // 0 So ... 6 Sa
-          const daysUntilSat = (6 - dow + 7) % 7;
-          const sat = addDaysLocal(b, daysUntilSat);
-          const sun = addDaysLocal(sat, 1);
-          const start = new Date(sat);
+
+          let fri;
+          if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
+          else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
+          else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
+          else {
+            const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
+            fri = addDaysLocal(b, daysUntilFri);
+          }
+
+          const start = new Date(fri);
           start.setHours(0, 0, 0, 0);
+
+          const sun = addDaysLocal(fri, 2);
           const end = new Date(sun);
           end.setHours(23, 59, 59, 999);
+
           return { start, end };
         };
+
 
         switch (timeKey) {
           case "today": {
@@ -567,19 +578,30 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       return t;
     };
 
-    const nextWeekendRange = (base) => {
+       const nextWeekendRange = (base) => {
       const b = new Date(base);
       b.setHours(0, 0, 0, 0);
       const dow = b.getDay(); // 0 So ... 6 Sa
-      const daysUntilSat = (6 - dow + 7) % 7;
-      const sat = addDaysLocal(b, daysUntilSat);
-      const sun = addDaysLocal(sat, 1);
-      const start = new Date(sat);
+
+      let fri;
+      if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
+      else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
+      else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
+      else {
+        const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
+        fri = addDaysLocal(b, daysUntilFri);
+      }
+
+      const start = new Date(fri);
       start.setHours(0, 0, 0, 0);
+
+      const sun = addDaysLocal(fri, 2);
       const end = new Date(sun);
       end.setHours(23, 59, 59, 999);
+
       return { start, end };
     };
+
 
     const matchesTimeKey = (event, key) => {
       if (key === "all") return true;
