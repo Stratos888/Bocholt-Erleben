@@ -455,7 +455,7 @@ Umfang:
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
 .events-section-title{
-  margin: 6px 0 4px;
+  margin: 5px 0 4px;
   padding: 2px 2px;
 
   background: transparent;
@@ -491,6 +491,7 @@ Umfang:
 
 
 /* === END BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) === */
+
 
 
 
@@ -686,22 +687,16 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 
 /* Mobile fein */
 @media (max-width: 360px){
-  .filters-bar{ gap: 8px; }
-
-  /* Exakt gleiche Höhe wie #search-filter (36px) */
-  .filter-pill{
-    height: 36px;
-    min-height: 36px;
-    padding: 0 12px;
+  .event-card{
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 9px;
+    padding: 10px 11px;
   }
-
-  .filter-pill--reset{
-    height: 36px;
-  }
+  .event-date-badge{ width: 40px; }
 }
 
-
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
+
 
 
 
@@ -955,7 +950,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   top: calc(var(--header-h) + var(--stack-gap));
   z-index: 900;
 
-  padding: 4px 12px 6px;
+  padding: 4px 14px 6px;
 
   background: rgba(249, 251, 246, 0.90);
   -webkit-backdrop-filter: blur(12px);
@@ -973,17 +968,16 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
 
 
 
+
 /* === BEGIN BLOCK: SEARCH BAR (functional hero, top- level) ===
-Zweck: Exakt gleiche Control-Höhe wie Filter-Pills (wirklich identisch, nicht nur „ähnlich“).
+Zweck: Exakt gleiche Control-Höhe wie Filter-Pills (wirklich identisch).
 Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 === */
-
 #search-filter{
   width: 100%;
   max-width: 820px;
   margin: 0 auto;
 
-  /* Exakt-Höhe (kein min-height), damit Search & Pills identisch wirken */
   box-sizing: border-box;
   height: 36px;
   padding: 0 12px;
@@ -1021,8 +1015,8 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
     0 0 0 3px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
-
 /* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
+
 
 
 
@@ -1143,7 +1137,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   appearance: none;
 
   flex: 0 0 auto;
-  width: 30px;
+  width: 34px;
   height: 36px;
   padding: 0;
 
@@ -1191,6 +1185,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 }
 
 /* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
+
 
 
 
@@ -1468,7 +1463,7 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 @media (max-width: 360px){
   .filters-bar{ gap: 8px; }
 
-  /* Konsistenz: exakt gleiche Höhe wie die Search-Bar */
+  /* bleibt identisch zur Search-Bar */
   .filter-pill{
     height: 36px;
     min-height: 36px;
@@ -1479,6 +1474,7 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
     height: 36px;
   }
 }
+
 
 
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
@@ -2123,6 +2119,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
