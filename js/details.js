@@ -60,13 +60,62 @@ const DetailPanel = {
     };
     this.overlay.addEventListener("click", this._onOverlayClick);
 
-    // ESC closes only when open
+        // ESC closes only when open + Focus-Trap (Tab)
     this._onKeyDown = (e) => {
-      if (e.key !== "Escape") return;
-      if (!this.panel.classList.contains("active")) return;
-      this.hide();
+      if (!this.panel || !this.panel.classList.contains("active")) return;
+
+      // ESC
+      if (e.key === "Escape") {
+        this.hide();
+        return;
+      }
+
+      // Focus trap (Tab)
+      if (e.key !== "Tab") return;
+
+      const sheet = this.panel.querySelector(".detail-panel-content");
+      if (!sheet) return;
+
+      const focusable = Array.from(
+        sheet.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => el instanceof HTMLElement && el.offsetParent !== null);
+
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey) {
+        if (active === first || !sheet.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", this._onKeyDown);
+
+    // A11y: Dialog semantics
+    this.panel.setAttribute("role", "dialog");
+    this.panel.setAttribute("aria-modal", "true");
+    this.panel.setAttribute("aria-hidden", "true");
+    if (this.closeBtn) this.closeBtn.setAttribute("aria-label", "Schließen");
+
+    // Back-Button: schließt Panel (History-State)
+    this._onPopState = () => {
+      if (!this.panel || !this.panel.classList.contains("active")) return;
+      this._isClosingViaPopState = false;
+      this._hideNow();
+    };
+    window.addEventListener("popstate", this._onPopState);
+
 
     this._isInit = true;
     debugLog("DetailPanel initialized");
@@ -74,7 +123,11 @@ const DetailPanel = {
 
  show(event) {
   /* === BEGIN BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) ===
-  Zweck: Systematisch öffnen: init() sicherstellen + sowohl class "hidden" als auch HTML-Attribut [hidden] entfernen.
+  Zweck:
+  - Systematisch öffnen: init() sicherstellen
+  - sowohl class "hidden" als auch HTML-Attribut [hidden] entfernen
+  - History-State pushen, damit Android/Browser-Back das Panel schließt
+  - aria-hidden korrekt setzen
   Umfang: Ersetzt show(event) komplett.
   === */
   if (!this._isInit) this.init();
@@ -97,6 +150,14 @@ const DetailPanel = {
   // make visible (beide Mechaniken unterstützen: class + [hidden])
   this.panel.classList.remove("hidden");
   this.panel.removeAttribute("hidden");
+  this.panel.setAttribute("aria-hidden", "false");
+
+  // Push a history marker so "Back" closes the panel first
+  try {
+    if (!history.state || history.state.__detailPanelOpen !== true) {
+      history.pushState({ ...(history.state || {}), __detailPanelOpen: true }, "", location.href);
+    }
+  } catch (_) {}
 
   requestAnimationFrame(() => {
     this.panel.classList.add("active");
@@ -107,24 +168,41 @@ const DetailPanel = {
   /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
 },
 
+},
 
-  hide() {
+
+    hide() {
+    if (!this.panel) return;
+
+    // If the top history entry is our marker, go back first (popstate will close)
+    try {
+      if (history.state && history.state.__detailPanelOpen === true) {
+        this._isClosingViaPopState = true;
+        history.back();
+        return;
+      }
+    } catch (_) {}
+
+    this._hideNow();
+  },
+
+  _hideNow() {
     if (!this.panel) return;
 
     this.panel.classList.remove("active");
     document.body.classList.remove("is-panel-open");
+    this.panel.setAttribute("aria-hidden", "true");
 
     // Use transition duration from CSS if possible; fallback 260ms
     const sheet = this.panel.querySelector(".detail-panel-content");
     let ms = 260;
     if (sheet) {
       const dur = getComputedStyle(sheet).transitionDuration || "";
-      // handle "0.22s, 0s" -> take first
       const first = dur.split(",")[0].trim();
       if (first.endsWith("ms")) ms = Math.max(0, parseFloat(first));
       if (first.endsWith("s")) ms = Math.max(0, parseFloat(first) * 1000);
       if (!Number.isFinite(ms) || ms <= 0) ms = 260;
-      ms = Math.round(ms + 40); // small buffer for rAF/layout
+      ms = Math.round(ms + 40);
     }
 
     window.setTimeout(() => {
@@ -137,6 +215,7 @@ const DetailPanel = {
       this._lastFocusEl = null;
     }, ms);
   },
+
 
      renderContent(event) {
            /* === BEGIN BLOCK: DETAIL RENDER (canonical fields, defensive) ===
@@ -291,16 +370,57 @@ const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️
         </div>
       ` : ""}
 
-            ${hasEventUrl ? `
-        <div class="detail-actions">
-          <a href="${this.escape(eventUrl)}"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="detail-link-btn">
-            Zum Event
-          </a>
-        </div>
-      ` : ""}
+                 ${(() => {
+        if (!eventUrl) return "";
+
+        // bocholt.de "Veranstaltung*" Pfade sind oft instabil/404 → nicht anbieten
+        let isUnstableBocholt = false;
+        try {
+          const u = new URL(eventUrl);
+          const host = (u.hostname || "").toLowerCase();
+          const path = (u.pathname || "").toLowerCase();
+
+          if (host.endsWith("bocholt.de")) {
+            isUnstableBocholt =
+              path.startsWith("/veranstaltungskalender") ||
+              path.startsWith("/veranstaltung") ||
+              path.startsWith("/veranstaltungen");
+          }
+        } catch (_) {
+          return "";
+        }
+        if (isUnstableBocholt) return "";
+
+        // Redundanz: Event-URL == Location-URL → nicht doppelt anbieten
+        const normalizeForCompare = (href) => {
+          try {
+            const u = new URL(href);
+            u.hash = "";
+            u.search = "";
+            const s = u.toString();
+            return s.endsWith("/") ? s.slice(0, -1) : s;
+          } catch (_) {
+            return "";
+          }
+        };
+
+        const a = normalizeForCompare(eventUrl);
+        const b = normalizeForCompare(locationHref);
+        if (a && b && a === b) return "";
+
+        return `
+          <div class="detail-actions">
+            <a href="${this.escape(eventUrl)}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="detail-secondary-link"
+               aria-label="Website öffnen">
+              Website
+            </a>
+          </div>
+        `;
+      })()}
+
 
     `;
     /* === END BLOCK: DETAIL RENDER (canonical fields, defensive) === */
@@ -330,6 +450,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
