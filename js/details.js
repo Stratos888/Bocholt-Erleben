@@ -205,16 +205,31 @@ const DetailPanel = {
     /* === END BLOCK: DETAIL DATE/TIME (support endDate range in subline) === */
 
 
-    // Kategorie-Icon (ohne Text)
-    const iconMap = {
-      Party: "🎉",
-      Kneipe: "🍺",
-      Kinder: "🧒",
-      Quiz: "❓",
-      Musik: "🎵",
-      Kultur: "🎭"
-    };
-    const categoryIcon = kategorieRaw ? (iconMap[kategorieRaw] || "🗓️") : "";
+    /* === BEGIN BLOCK: CATEGORY ICON (canonical + consistent with filter/sheet) ===
+Zweck:
+- Icons nutzen dieselben Canonical Categories wie Filter & Google Sheet
+- Single Source of Truth: FilterModule.normalizeCategory()
+- kein Legacy-Mapping mehr
+=== */
+
+const canonicalCategory =
+  (window.FilterModule?.normalizeCategory ? window.FilterModule.normalizeCategory(kategorieRaw) : "") ||
+  kategorieRaw;
+
+const iconMap = {
+  "Märkte & Feste": "🧺",
+  "Kultur & Kunst": "🎭",
+  "Musik & Bühne": "🎵",
+  "Kinder & Familie": "🧒",
+  "Sport & Bewegung": "🏃",
+  "Natur & Draußen": "🌿",
+  "Innenstadt & Leben": "🏙️",
+};
+
+const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️") : "";
+
+/* === END BLOCK: CATEGORY ICON (canonical + consistent with filter/sheet) === */
+
 
     // Location action (homepage primary, maps fallback)
     let locationHref = "";
@@ -301,6 +316,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
