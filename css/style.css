@@ -478,28 +478,18 @@ Umfang:
   box-shadow: none;
 }
 
-/* Nur die echte Card ist klickbar und “Surface” */
+/* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
   position: relative;
   cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease;
-
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  border-radius: 16px;
 }
+
 
 /* === END BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) === */
 
 
-.event-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
 
-.event-card:active {
-  transform: translateY(0);
-}
 
 /* === BEGIN BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) ===
 Zweck:
@@ -638,36 +628,28 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
   line-height: 1.25;
 }
 
-/* === BEGIN BLOCK: EVENT TITLE PREMIUM (Option B: clamp only on very small screens) ===
-Zweck: Kurze Titel nicht unnötig abschneiden; Clamp nur auf Mini-Screens zur Layout-Kontrolle.
-Umfang: Nur .event-title__text + kleines @media Override innerhalb EVENT CARD FINAL LAYOUT Block.
+/* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, single source) ===
+Zweck: Titel max. 2 Zeilen, ohne spätere Overrides/!important.
+Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 === */
 
 .event-title__text{
   flex: 1 1 auto;
   min-width: 0;
 
-  /* Default: NICHT clampen → Titel darf sauber umbrechen */
-  display: block;
-  overflow: visible;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 
-  /* Robust wrapping für lange Wörter/Orte */
+  overflow: hidden;
+
   overflow-wrap: anywhere;
   word-break: normal;
   hyphens: auto;
 }
 
-/* Clamp nur auf sehr kleinen Screens */
-@media (max-width: 360px){
-  .event-title__text{
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
+/* === END BLOCK: EVENT TITLE FINAL (2-line clamp, single source) === */
 
-/* === END BLOCK: EVENT TITLE PREMIUM (Option B: clamp only on very small screens) === */
 
 
 /* Icon bleibt IMMER sichtbar, ruhig */
@@ -712,46 +694,8 @@ Umfang: Nur .event-title__text + kleines @media Override innerhalb EVENT CARD FI
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
 
 
-.event-title {
-  font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.25;
-}
+/* (removed) legacy event title/meta/icon/location overrides to avoid contradictions */
 
-.event-meta {
-  font-size: 0.85rem;
-  opacity: 0.75;
-}
-
-.event-location {
-  font-size: 0.85rem;
-  opacity: 0.65;
-}
-
-/* Kategorie-Icon immer oben rechts fixieren */
-.event-category-icon {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  font-size: 1.2rem;
-  pointer-events: none;
-}
-
-/* Meta */
-.event-meta{
-  min-width: 0;
-
-  font-size: 12.5px;
-  font-weight: 650;
-  color: rgba(95,107,115,0.92);
-
-  margin-top: 0;
-  margin-bottom: 8px;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* Location: reine Info-Zeile (kein Pill) */
 .event-location{
@@ -937,12 +881,6 @@ footer {
   text-align: center;
 }
 
-footer {
-  background: #0b1220;
-  color: #e5e7eb;
-  padding: 34px 20px;
-  text-align: center;
-}
 
 /* === BEGIN BLOCK: RESPONSIVE (mobile unchanged + desktop frame) ===
 Zweck:
@@ -1038,8 +976,9 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   font-weight: 600;
   color: var(--color-text-primary);
 
-  -webkit-earance: none;
-  earance: none;
+   -webkit-appearance: none;
+  appearance: none;
+
 
   box-shadow:
     0 12px 30px rgba(0,0,0,0.06),
@@ -1084,8 +1023,9 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 
 /* Pills: etwas softer (weniger Rahmen/Schatten), kompakt */
 .filter-pill{
-  -webkit-earance: none;
-  earance: none;
+   -webkit-appearance: none;
+  appearance: none;
+
 
   flex: 1 1 0;
   min-width: 0;
@@ -1933,14 +1873,6 @@ Umfang:
   }
 }
 
-  #event-detail-panel #detail-content{
-    padding-top: 38px;
-    max-height: calc(85vh - 16px);
-  }
-  #event-detail-panel .detail-header h2{
-    font-size: 18px;
-  }
-}
 
 /* Safe-area bottom padding (iOS) */
 @supports (padding: max(0px)){
@@ -2152,33 +2084,7 @@ Umfang: .app-header + Brand + Actions.
   display: flex;
   justify-content: flex-end;
 }
-/* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, authoritative, non-overridable) ===
-Zweck:
-- Max 2 Zeilen wie Top Apps
-- kein Single-line ellipsis
-- sauberes Wrapping
-- letzter Block → gewinnt Cascade garantiert
-- !important verhindert spätere Überschreibungen
-Umfang: nur Titeltext
-=== */
+/* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 
-.event-title{
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-  padding-right: 0 !important;
-}
 
-.event-title__text{
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-
-  overflow: hidden !important;
-
-  overflow-wrap: anywhere;
-  hyphens: auto;
-}
-
-/* === END BLOCK: EVENT TITLE FINAL (2-line clamp, authoritative, non-overridable) === */
 
