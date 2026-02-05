@@ -159,20 +159,33 @@ const DetailPanel = {
     const title = e.title || e.eventName || "";
 
     const time = e.time || "";
-        /* === BEGIN BLOCK: detail meta inputs (use event consistently) === */
+            /* === BEGIN BLOCK: detail meta inputs (use event consistently) === */
     const locationRaw = (event.location || "").trim();
     const city = (event.city || event.ort || "").trim();
     const description = event.beschreibung || event.description || "";
     const kategorieRaw = (event.kategorie || "").trim();
 
-    const url = event.url || "";
+    // Event-URL robust normalisieren (inkl. "www." ohne Scheme)
+    const rawUrl = String(event.url || "").trim();
 
-    const isHttpUrl = (u) => /^https?:\/\//i.test(u || "");
-    const safeUrl = (u) => (isHttpUrl(u) ? u : "");
+    const normalizeExternalUrl = (u) => {
+      if (!u) return "";
+      // already absolute
+      if (/^https?:\/\//i.test(u)) return u;
+      // protocol-relative
+      if (/^\/\//.test(u)) return `https:${u}`;
+      // common "www." case
+      if (/^www\./i.test(u)) return `https://${u}`;
+      return "";
+    };
+
+    const eventUrl = normalizeExternalUrl(rawUrl);
+    const hasEventUrl = !!eventUrl;
 
     const startIso = event.date || "";
     const endIso = event.endDate || event.end_date || event.enddate || "";
     /* === END BLOCK: detail meta inputs (use event consistently) === */
+
 
 
 
@@ -278,9 +291,9 @@ const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️
         </div>
       ` : ""}
 
-      ${isHttpUrl ? `
+            ${hasEventUrl ? `
         <div class="detail-actions">
-          <a href="${this.escape(safeUrl)}"
+          <a href="${this.escape(eventUrl)}"
              target="_blank"
              rel="noopener noreferrer"
              class="detail-link-btn">
@@ -288,6 +301,7 @@ const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️
           </a>
         </div>
       ` : ""}
+
     `;
     /* === END BLOCK: DETAIL RENDER (canonical fields, defensive) === */
 
@@ -316,6 +330,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
