@@ -1466,9 +1466,20 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 .filter-sheet[hidden]{ display: none !important; }
 
 @media (max-width: 360px){
-  .filters-bar{ gap: 10px; }
-  .filter-pill{ padding: 11px 11px; min-height: 46px; }
+  .filters-bar{ gap: 8px; }
+
+  /* Konsistenz: exakt gleiche Höhe wie die Search-Bar */
+  .filter-pill{
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+  }
+
+  .filter-pill--reset{
+    height: 36px;
+  }
 }
+
 
 /* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
 
@@ -2112,6 +2123,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
