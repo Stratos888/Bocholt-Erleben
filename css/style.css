@@ -1542,13 +1542,23 @@ Umfang:
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
-
   padding: 16px 16px 18px;
 
-  transform: translateY(110%);
+  /* === BEGIN BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) ===
+     Zweck: Keine Transform-Kämpfe mehr zwischen CSS-Open/Close und JS-Drag.
+     Modell:
+     - --dp-base-y: 110% (geschlossen) bzw. 0px (offen)
+     - --dp-drag-y: 0px..npx (Drag nach unten)
+     === */
+  --dp-base-y: 110%;
+  --dp-drag-y: 0px;
+
+  transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
   transition: transform 220ms ease;
   overscroll-behavior: contain;
+  /* === END BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) === */
 }
+
 /* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
 
 /* === END PATCH: DETAIL PANEL – ADD BOTTOM RADIUS (ROOTCAUSE PROVEN) === */
@@ -1570,8 +1580,9 @@ Umfang:
 
 
 #event-detail-panel.detail-panel.active .detail-panel-content{
-  transform: translateY(0);
+  --dp-base-y: 0px;
 }
+
 
 #event-detail-panel .detail-panel-content::before{
   content: "";
@@ -1582,6 +1593,23 @@ Umfang:
   margin: 6px auto 12px;
   background: rgba(31,41,51,0.16);
 }
+/* === BEGIN BLOCK: DETAILPANEL DRAG HIT AREA (invisible, prevents scroll fight) ===
+Zweck: Swipe-to-close nur über definierte Zone, ohne Scroll-Konflikte.
+Umfang: Nur Styles für die JS-injizierte Hit-Area.
+=== */
+#event-detail-panel .detail-panel-drag-hit{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 52px;
+  z-index: 3;
+  background: transparent;
+
+  /* Wichtig: erlaubt preventDefault im Pointer-Move */
+  touch-action: none;
+}
+/* === END BLOCK: DETAILPANEL DRAG HIT AREA (invisible, prevents scroll fight) === */
 
 #event-detail-panel .detail-panel-close{
   position: absolute;
@@ -2175,6 +2203,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
