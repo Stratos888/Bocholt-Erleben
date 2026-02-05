@@ -967,7 +967,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
 
 
 /* === BEGIN BLOCK: SEARCH BAR (functional hero, top- level) ===
-Zweck: Search wirkt wie native Input-Bar: kompakt, ruhig, klare Fokus-Ring.
+Zweck: Exakt gleiche Control-Höhe wie Filter-Pills (wirklich identisch, nicht nur „ähnlich“).
 Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 === */
 
@@ -976,10 +976,11 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   max-width: 820px;
   margin: 0 auto;
 
-  /* Konsistenz: gleiche Control-Höhe wie Filter-Pills */
+  /* Exakt-Höhe (kein min-height), damit Search & Pills identisch wirken */
   box-sizing: border-box;
-  min-height: 36px;
-  padding: 8px 12px;
+  height: 36px;
+  padding: 0 12px;
+  line-height: 36px;
 
   border-radius: 14px;
   border: 1px solid rgba(31,41,51,0.10);
@@ -1020,8 +1021,9 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 
 
 
+
 /* === BEGIN BLOCK: FILTER BAR (compact single-row + inline reset X) ===
-Zweck: Filter noch sekundärer/kompakter (Feed-first), weiterhin gut tappbar.
+Zweck: Exakt gleiche Control-Höhe wie Search-Bar (wirklich identisch).
 Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill / .filter-pill--reset.
 === */
 
@@ -1036,7 +1038,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   flex-wrap: nowrap;
 }
 
-/* Pills: minimal niedriger, weniger Schatten */
+/* Pills: exakte Höhe, Padding vertikal = 0 */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -1050,8 +1052,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   justify-content: space-between;
   gap: 10px;
 
-  padding: 8px 12px;
-  min-height: 36px;
+  height: 36px;
+  padding: 0 12px;
 
   border-radius: 14px;
   border: 1px solid rgba(31,41,51,0.08);
@@ -1128,14 +1130,14 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   border-radius: 14px;
 }
 
-/* Reset */
+/* Reset: exakt gleiche Höhe wie die anderen Controls */
 .filter-pill--reset{
   -webkit-appearance: none;
   appearance: none;
 
   flex: 0 0 auto;
   width: 30px;
-  min-height: 34px;
+  height: 36px;
   padding: 0;
 
   display: inline-flex;
@@ -1182,6 +1184,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 }
 
 /* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
+
 
 
 
@@ -2102,6 +2105,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
