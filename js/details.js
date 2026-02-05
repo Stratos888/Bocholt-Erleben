@@ -33,275 +33,144 @@ const DetailPanel = {
   _onOverlayClick: null,
   _onCloseClick: null,
 
-  init() {
-    if (this._isInit) return;
+ init() {
+  if (this._isInit) return;
 
-    this.panel = document.getElementById("event-detail-panel");
-    this.overlay = this.panel?.querySelector(".detail-panel-overlay");
-    this.content = document.getElementById("detail-content");
-    this.closeBtn = this.panel?.querySelector(".detail-panel-close");
+  this.panel = document.getElementById("event-detail-panel");
+  if (!this.panel) return;
 
-    if (!this.panel || !this.overlay || !this.content) {
-      console.warn("DetailPanel: elements not found");
+  this.overlay = this.panel.querySelector(".detail-panel-overlay");
+  this.content = this.panel.querySelector("#detail-content");
+  this.closeBtn = this.panel.querySelector(".detail-close-btn");
+
+  /* ===============================
+     A11y / Dialog semantics
+  =============================== */
+  this.panel.setAttribute("role", "dialog");
+  this.panel.setAttribute("aria-modal", "true");
+  this.panel.setAttribute("aria-hidden", "true");
+  if (this.closeBtn) this.closeBtn.setAttribute("aria-label", "Schließen");
+
+  /* ===============================
+     Close interactions
+  =============================== */
+  this.overlay?.addEventListener("click", (e) => {
+    if (e.target === this.overlay) this.hide();
+  });
+
+  this.closeBtn?.addEventListener("click", () => this.hide());
+
+  /* ===============================
+     ESC + Focus Trap
+  =============================== */
+  document.addEventListener("keydown", (e) => {
+    if (!this.panel.classList.contains("active")) return;
+
+    if (e.key === "Escape") {
+      this.hide();
       return;
     }
 
-    // Close button
-    this._onCloseClick = (e) => {
+    if (e.key !== "Tab") return;
+
+    const focusables = [...this.panel.querySelectorAll(
+      'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
+    )];
+
+    if (!focusables.length) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
-      this.hide();
-    };
-    if (this.closeBtn) this.closeBtn.addEventListener("click", this._onCloseClick);
-
-        // Overlay closes (but clicks inside the sheet do not bubble to overlay anyway)
-    this._onOverlayClick = (e) => {
-      // only close when actually clicking the overlay element
-      if (e.target === this.overlay) this.hide();
-    };
-    this.overlay.addEventListener("click", this._onOverlayClick);
-
-    /* === BEGIN BLOCK: DETAILPANEL SWIPE-TO-CLOSE (mobile, safe with scroll) ===
-    Zweck:
-    - Top-App Feeling: Sheet kann per Drag nach unten geschlossen werden.
-    - Nur wenn Content ganz oben ist (scrollTop==0) und Drag im oberen Bereich startet.
-    - Desktop-Modal (>=900px) bleibt unverändert (kein Drag).
-    Umfang:
-    - Fügt Pointer-Handler in init() hinzu, ohne HTML zu ändern.
-    === */
-    const sheet = this.panel.querySelector(".detail-panel-content");
-    const scrollEl = this.panel.querySelector("#detail-content");
-
-    this._drag = {
-      active: false,
-      startY: 0,
-      lastY: 0,
-      startT: 0,
-      dy: 0
-    };
-
-    const isDesktopModal = () => window.matchMedia && window.matchMedia("(min-width: 900px)").matches;
-
-    const setSheetOffset = (y) => {
-      // keep existing base transform (CSS open/close) and only add temporary offset
-      sheet.style.transition = "none";
-      sheet.style.transform = `translateY(${Math.max(0, y)}px)`;
-    };
-
-    const resetSheetOffset = () => {
-      sheet.style.transition = "";
-      sheet.style.transform = "";
-    };
-
-    this._onPointerDown = (e) => {
-      if (!this.panel.classList.contains("active")) return;
-      if (!sheet || !scrollEl) return;
-      if (isDesktopModal()) return;
-
-      // only primary pointer
-      if (e.isPrimary === false) return;
-
-      // don’t start drag on close button
-      if (e.target && this.closeBtn && (e.target === this.closeBtn || this.closeBtn.contains(e.target))) return;
-
-      // start zone: top area of the sheet (handle region) to avoid fighting scroll
-      const r = sheet.getBoundingClientRect();
-      const inTopZone = (e.clientY - r.top) <= 56;
-      if (!inTopZone) return;
-
-      // only when scroll is at top
-      if (scrollEl.scrollTop > 0) return;
-
-      this._drag.active = true;
-      this._drag.startY = e.clientY;
-      this._drag.lastY = e.clientY;
-      this._drag.startT = performance.now();
-      this._drag.dy = 0;
-
-      try { sheet.setPointerCapture(e.pointerId); } catch (_) {}
-    };
-
-    this._onPointerMove = (e) => {
-      if (!this._drag.active) return;
-      if (!sheet) return;
-
-      const y = e.clientY;
-      const dy = y - this._drag.startY;
-
-      // only drag down
-      if (dy <= 0) {
-        this._drag.dy = 0;
-        setSheetOffset(0);
-        return;
-      }
-
-      this._drag.lastY = y;
-      this._drag.dy = dy;
-
-      // prevent page scroll / rubber band while dragging
+      last.focus();
+    }
+    if (!e.shiftKey && document.activeElement === last) {
       e.preventDefault();
-      setSheetOffset(dy);
-    };
+      first.focus();
+    }
+  });
 
-    this._onPointerUp = (e) => {
-      if (!this._drag.active) return;
-      if (!sheet) return;
-
-      this._drag.active = false;
-
-      const dt = Math.max(1, performance.now() - this._drag.startT);
-      const dy = this._drag.dy;
-      const v = dy / dt; // px/ms
-
-      // close threshold: distance or velocity
-      const shouldClose = dy > 96 || v > 0.85;
-
-      if (shouldClose) {
-        // let CSS close animation handle it (remove temp transform)
-        resetSheetOffset();
-        this.hide();
-      } else {
-        // animate back to open state
-        sheet.style.transition = "transform 180ms ease";
-        sheet.style.transform = "translateY(0)";
-        window.setTimeout(() => {
-          resetSheetOffset();
-        }, 200);
-      }
-
-      try { sheet.releasePointerCapture(e.pointerId); } catch (_) {}
-    };
-
-    sheet.addEventListener("pointerdown", this._onPointerDown, { passive: true });
-    sheet.addEventListener("pointermove", this._onPointerMove, { passive: false });
-    sheet.addEventListener("pointerup", this._onPointerUp, { passive: true });
-    sheet.addEventListener("pointercancel", this._onPointerUp, { passive: true });
-    /* === END BLOCK: DETAILPANEL SWIPE-TO-CLOSE (mobile, safe with scroll) === */
-
-
-        // ESC closes only when open + Focus-Trap (Tab)
-    this._onKeyDown = (e) => {
-      if (!this.panel || !this.panel.classList.contains("active")) return;
-
-      // ESC
-      if (e.key === "Escape") {
-        this.hide();
-        return;
-      }
-
-      // Focus trap (Tab)
-      if (e.key !== "Tab") return;
-
-      const sheet = this.panel.querySelector(".detail-panel-content");
-      if (!sheet) return;
-
-      const focusable = Array.from(
-        sheet.querySelectorAll(
-          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter((el) => el instanceof HTMLElement && el.offsetParent !== null);
-
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
-
-      if (e.shiftKey) {
-        if (active === first || !sheet.contains(active)) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (active === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", this._onKeyDown);
-
-    // A11y: Dialog semantics
-    this.panel.setAttribute("role", "dialog");
-    this.panel.setAttribute("aria-modal", "true");
-    this.panel.setAttribute("aria-hidden", "true");
-    if (this.closeBtn) this.closeBtn.setAttribute("aria-label", "Schließen");
-
-    // Back-Button: schließt Panel (History-State)
-    this._onPopState = () => {
-      if (!this.panel || !this.panel.classList.contains("active")) return;
-      this._isClosingViaPopState = false;
+  /* ===============================
+     Back button closes panel
+  =============================== */
+  window.addEventListener("popstate", () => {
+    if (this.panel.classList.contains("active")) {
       this._hideNow();
-    };
-    window.addEventListener("popstate", this._onPopState);
+    }
+  });
+
+  /* ===============================
+     Swipe to close (mobile)
+  =============================== */
+  const sheet = this.panel.querySelector(".detail-panel-content");
+  const scroll = this.panel.querySelector("#detail-content");
+
+  let startY = 0;
+  let dy = 0;
+  let dragging = false;
+
+  sheet?.addEventListener("pointerdown", (e) => {
+    if (scroll.scrollTop > 0) return;
+    startY = e.clientY;
+    dragging = true;
+  });
+
+  sheet?.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    dy = e.clientY - startY;
+    if (dy <= 0) return;
+    sheet.style.transform = `translateY(${dy}px)`;
+  });
+
+  sheet?.addEventListener("pointerup", () => {
+    dragging = false;
+    sheet.style.transform = "";
+    if (dy > 90) this.hide();
+  });
+
+  this._isInit = true;
+},
 
 
-    this._isInit = true;
-    debugLog("DetailPanel initialized");
-  },
-
- show(event) {
-  /* === BEGIN BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) ===
-  Zweck:
-  - Systematisch öffnen: init() sicherstellen
-  - sowohl class "hidden" als auch HTML-Attribut [hidden] entfernen
-  - History-State pushen, damit Android/Browser-Back das Panel schließt
-  - aria-hidden korrekt setzen
-  Umfang: Ersetzt show(event) komplett.
-  === */
+show(event) {
   if (!this._isInit) this.init();
 
-  // Wenn init fehlgeschlagen ist, hart abbrechen (kein stilles Fail)
-  if (!this.panel || !this.content) {
-    console.error("❌ DetailPanel.show aborted: panel/content missing", {
-      hasPanel: !!this.panel,
-      hasContent: !!this.content,
-      isInit: this._isInit
-    });
-    return;
-  }
-
-  // remember focus for restore
-  this._lastFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  this._lastFocusEl = document.activeElement;
 
   this.renderContent(event);
 
-  // make visible (beide Mechaniken unterstützen: class + [hidden])
   this.panel.classList.remove("hidden");
-  this.panel.removeAttribute("hidden");
+  this.panel.classList.add("active");
   this.panel.setAttribute("aria-hidden", "false");
 
-  // Push a history marker so "Back" closes the panel first
-  try {
-    if (!history.state || history.state.__detailPanelOpen !== true) {
-      history.pushState({ ...(history.state || {}), __detailPanelOpen: true }, "", location.href);
-    }
-  } catch (_) {}
+  document.body.classList.add("is-panel-open");
 
-  requestAnimationFrame(() => {
-    this.panel.classList.add("active");
-    document.body.classList.add("is-panel-open");
+  history.pushState({ detailOpen: true }, "");
 
-    if (this.closeBtn) this.closeBtn.focus();
-  });
-     /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
+  this.closeBtn?.focus();
 },
 
+
   hide() {
+  if (history.state?.detailOpen) {
+    history.back();
+    return;
+  }
+  this._hideNow();
+},
 
+_hideNow() {
+  this.panel.classList.remove("active");
+  this.panel.classList.add("hidden");
+  this.panel.setAttribute("aria-hidden", "true");
 
-    if (!this.panel) return;
+  document.body.classList.remove("is-panel-open");
 
-    // If the top history entry is our marker, go back first (popstate will close)
-    try {
-      if (history.state && history.state.__detailPanelOpen === true) {
-        this._isClosingViaPopState = true;
-        history.back();
-        return;
-      }
-    } catch (_) {}
+  this._lastFocusEl?.focus();
+},
 
-    this._hideNow();
-  },
 
   _hideNow() {
     if (!this.panel) return;
@@ -567,6 +436,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
