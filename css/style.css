@@ -1746,11 +1746,44 @@ Umfang:
 }
 #event-detail-panel .detail-description:empty{ display: none; }
 
-/* CTA / Event-Link – kein klassischer „Button“, mehr Top-App Action-Surface */
+/* CTA / Event-Link – sekundär (Top-App Pattern): als Link, nicht als 2. gleichwertiger Button */
 #event-detail-panel .detail-actions{
   margin-top: 8px;
   background: transparent;
 }
+
+/* Secondary Website Link (ersetzt "Zum Event"-Button als Primary) */
+#event-detail-panel .detail-secondary-link,
+#event-detail-panel .detail-secondary-link:link,
+#event-detail-panel .detail-secondary-link:visited{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 2px;
+  border-radius: 12px;
+
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+  color: rgba(31,41,51,0.82);
+
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-secondary-link::after{
+  content: "↗";
+  font-size: 12px;
+  opacity: 0.65;
+  transform: translateY(-1px);
+}
+
+#event-detail-panel .detail-secondary-link:active{
+  background: rgba(31,41,51,0.04);
+  transform: translateY(1px);
+}
+
 
 /* === BEGIN PATCH: DETAIL CTA – SHADOW VIA DROP-SHADOW (ROOTCAUSE PROVEN)
 Proof:
@@ -2123,6 +2156,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
