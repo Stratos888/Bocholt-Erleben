@@ -475,13 +475,14 @@ Umfang:
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px; /* vorher 10px */
 
   padding: 0;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 }
+
 
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
@@ -524,7 +525,7 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   column-gap: 10px;
   align-items: center;
 
-  padding: 10px 12px;
+  padding: 8px 12px; /* vorher 10px */
 
   background: var(--surface);
   border: 1px solid rgba(31,41,51,0.08);
@@ -533,6 +534,7 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
+
 
 /* Hover: minimal stärkerer Shadow + Kante (kein Lift) */
 .event-card:hover{
@@ -742,13 +744,15 @@ Umfang:
 === */
 
 :root{
-  --tabbar-h: 52px;
+  --tabbar-h: 44px; /* vorher 52px – kompakter, App-typischer */
 }
+
 
 /* Content muss Platz lassen, damit Tabbar nichts überdeckt (Events + Pages + Footer) */
 .events-section{
-  padding-bottom: calc(14px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(6px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
+
 
 /* Inhaltsseiten (z.B. /angebote/) dürfen unten nicht unter die Tabbar laufen */
 .page{
@@ -2119,6 +2123,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
