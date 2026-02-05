@@ -1752,6 +1752,25 @@ Umfang:
   background: transparent;
 }
 
+/* Secondary Website link (kein 2. Button) */
+#event-detail-panel .detail-secondary-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  padding:8px 2px;
+  font-size:13px;
+  font-weight:700;
+  color:rgba(31,41,51,.75);
+  text-decoration:none;
+}
+
+#event-detail-panel .detail-secondary-link::after{
+  content:"↗";
+  opacity:.6;
+}
+
+
 /* Secondary Website Link (ersetzt "Zum Event"-Button als Primary) */
 #event-detail-panel .detail-secondary-link,
 #event-detail-panel .detail-secondary-link:link,
@@ -2156,6 +2175,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
