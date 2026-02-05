@@ -62,11 +62,12 @@
   Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
   Umfang: Header-Höhe + Abstand + Farben für Header/Divider.
   === */
-  --header-h: 56px;                  /* entspricht .app-header min-height */
+  --header-h: 48px;                  /* entspricht .app-header min-height */
   --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
   /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
+
 }
 
 /* === BEGIN BLOCK: GLOBAL TYPOGRAPHY BASE ===
@@ -454,18 +455,18 @@ Umfang:
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
 .events-section-title{
-  margin: 7px 0 6px;
-  padding: 3px 2px;
+  margin: 6px 0 4px;
+  padding: 2px 2px;
 
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 
   font-weight: 750;
-  font-size: 0.80rem;
-  letter-spacing: 0.07em;
+  font-size: 0.78rem;
+  letter-spacing: 0.075em;
   text-transform: uppercase;
-  color: rgba(95,107,115,0.80);
+  color: rgba(95,107,115,0.78);
 }
 
 
@@ -474,7 +475,7 @@ Umfang:
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 
   padding: 0;
   background: transparent;
@@ -490,6 +491,7 @@ Umfang:
 
 
 /* === END BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) === */
+
 
 
 /* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
@@ -517,11 +519,11 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
 .event-card{
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  column-gap: 14px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 12px;
   align-items: center;
 
-  padding: 14px 16px;
+  padding: 12px 14px;
 
   background: var(--surface);
   border: 1px solid rgba(31,41,51,0.08);
@@ -551,15 +553,11 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   outline-offset: 2px;
 }
 
-/* === END BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) === */
-
-
-/* === END BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow) === */
 
 
 /* --- Date Chip (ruhig & kompakt) --- */
 .event-date-badge{
-  width: 46px;
+  width: 44px;
 
   display: flex;
   flex-direction: column;
@@ -567,10 +565,10 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   justify-content: center;
   gap: 2px;
 
-  padding: 6px 4px;
+  padding: 5px 3px;
 
   background: var(--color-primary-muted);
-  border-radius: 12px;
+  border-radius: 11px;
 
   /* weniger Sticker: Border sehr subtil */
   border: 1px solid rgba(31,41,51,0.04);
@@ -598,7 +596,7 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
 }
 
 .event-date-badge__day{
-  font-size: 1.35rem;
+  font-size: 1.32rem;
   font-weight: 800;
 }
 
@@ -616,7 +614,7 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
 
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 /* Title-Zeile: Text + Icon getrennt */
@@ -627,9 +625,9 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
   align-items: flex-start;
   gap: 6px;
 
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.22;
 }
 
 /* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, single source) ===
@@ -669,8 +667,8 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 .event-meta{
   margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.3;
+  font-size: 0.82rem;
+  line-height: 1.28;
   color: var(--muted);
 
   white-space: nowrap;
@@ -689,13 +687,15 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 /* Mobile fein */
 @media (max-width: 360px){
   .event-card{
-    grid-template-columns: 42px minmax(0, 1fr);
-    column-gap: 12px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 11px 12px;
   }
-  .event-date-badge{ width: 42px; }
+  .event-date-badge{ width: 40px; }
 }
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
+
 
 
 /* (removed) legacy event title/meta/icon/location overrides to avoid contradictions */
@@ -739,22 +739,22 @@ Umfang:
 === */
 
 :root{
-  --tabbar-h: 62px;
+  --tabbar-h: 56px;
 }
 
 /* Content muss Platz lassen, damit Tabbar nichts überdeckt (Events + Pages + Footer) */
 .events-section{
-  padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(14px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
 
 /* Inhaltsseiten (z.B. /angebote/) dürfen unten nicht unter die Tabbar laufen */
 .page{
-  padding-bottom: calc(20px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
 
 /* Footer braucht ebenfalls Abstand, sonst sitzt er hinter der Tabbar */
 footer{
-  padding-bottom: calc(34px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(32px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
 }
 
 /* Tabbar */
@@ -775,7 +775,7 @@ footer{
   grid-template-columns: 1fr 1fr;
   gap: 0;
 
-  padding: 8px 10px calc(8px + max(0px, env(safe-area-inset-bottom)));
+  padding: 6px 10px calc(6px + max(0px, env(safe-area-inset-bottom)));
 
   background: rgba(249, 251, 246, 0.92);
   -webkit-backdrop-filter: blur(14px);
@@ -783,7 +783,7 @@ footer{
 
   border-top: 1px solid rgba(31,41,51,0.08);
   box-shadow:
-    0 -10px 30px rgba(31,41,51,0.08),
+    0 -10px 26px rgba(31,41,51,0.075),
     0 1px 0 rgba(255,255,255,0.75) inset;
 
   /* kein transform auf mobile → reduziert Risiko für Containing-Block/Width-Bugs */
@@ -806,7 +806,7 @@ Umfang:
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 
   min-height: var(--tabbar-h);
 
@@ -838,7 +838,7 @@ Umfang:
   background: rgba(139,207,74,0.16);
   border: 1px solid rgba(139,207,74,0.18);
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.05),
+    0 7px 16px rgba(0,0,0,0.045),
     0 1px 0 rgba(255,255,255,0.70) inset;
 }
 
@@ -852,7 +852,7 @@ Umfang:
 
 /* Desktop: Tabbar nicht “mobile-only” wirken lassen */
 @media (min-width: 900px){
-  :root{ --tabbar-h: 56px; }
+  :root{ --tabbar-h: 52px; }
 
   .bottom-tabbar{
     left: 50%;
@@ -864,19 +864,20 @@ Umfang:
   }
 
   .events-section{
-    padding-bottom: calc(18px + var(--tabbar-h) + 18px);
+    padding-bottom: calc(14px + var(--tabbar-h) + 16px);
   }
 
   .page{
-    padding-bottom: calc(20px + var(--tabbar-h) + 18px);
+    padding-bottom: calc(18px + var(--tabbar-h) + 16px);
   }
 
   footer{
-    padding-bottom: calc(34px + var(--tabbar-h) + 18px);
+    padding-bottom: calc(32px + var(--tabbar-h) + 16px);
   }
 }
 
 /* === END BLOCK: BOTTOM TAB BAR (Top-App, safe-area, non-invasive) === */
+
 
 
 footer {
@@ -945,7 +946,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   top: calc(var(--header-h) + var(--stack-gap));
   z-index: 900;
 
-  padding: 6px 14px 8px;
+  padding: 4px 12px 6px;
 
   background: rgba(249, 251, 246, 0.90);
   -webkit-backdrop-filter: blur(12px);
@@ -972,14 +973,14 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   max-width: 820px;
   margin: 0 auto;
 
-  padding: 10px 14px;
-  min-height: 42px;
+  padding: 8px 12px;
+  min-height: 38px;
 
-  border-radius: 16px;
+  border-radius: 14px;
   border: 1px solid rgba(31,41,51,0.11);
   background: rgba(255,255,255,0.92);
 
-  font-size: 0.96rem;
+  font-size: 0.95rem;
   font-weight: 650;
   color: var(--color-text-primary);
 
@@ -987,7 +988,7 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   appearance: none;
 
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.045),
+    0 6px 14px rgba(0,0,0,0.040),
     0 1px 0 rgba(255,255,255,0.80) inset;
 
   transition: box-shadow 140ms ease, border-color 140ms ease, background 140ms ease;
@@ -1003,12 +1004,11 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   border-color: rgba(139,207,74,.55);
   background: rgba(255,255,255,0.98);
   box-shadow:
-    0 10px 22px rgba(0,0,0,0.06),
+    0 8px 18px rgba(0,0,0,0.055),
     0 0 0 4px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
 /* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
-
 
 
 
@@ -1020,11 +1020,11 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 
 .filters-bar{
   max-width: 820px;
-  margin: 7px auto 0;
+  margin: 6px auto 0;
 
   display: flex;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
 
   flex-wrap: nowrap;
 }
@@ -1042,15 +1042,15 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   justify-content: space-between;
   gap: 10px;
 
-  padding: 8px 12px;
-  min-height: 36px;
+  padding: 7px 10px;
+  min-height: 34px;
 
-  border-radius: 14px;
+  border-radius: 13px;
   border: 1px solid rgba(31,41,51,0.08);
   background: rgba(255,255,255,0.82);
 
   font: inherit;
-  font-size: 0.90rem;
+  font-size: 0.88rem;
   font-weight: 750;
   line-height: 1;
 
@@ -1061,7 +1061,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   white-space: nowrap;
 
   box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
+    0 5px 12px rgba(0,0,0,0.040),
     0 1px 0 rgba(255,255,255,0.72) inset;
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -1094,7 +1094,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   border-color: rgba(139,207,74,0.26);
   background: rgba(255,255,255,0.92);
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.055),
+    0 7px 16px rgba(0,0,0,0.050),
     0 0 0 3px rgba(139,207,74,0.09),
     0 1px 0 rgba(255,255,255,0.78) inset;
 }
@@ -1107,7 +1107,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
     background: rgba(255,255,255,0.90);
     border-color: rgba(31,41,51,0.12);
     box-shadow:
-      0 8px 18px rgba(0,0,0,0.055),
+      0 7px 16px rgba(0,0,0,0.050),
       0 1px 0 rgba(255,255,255,0.72) inset;
   }
 }
@@ -1126,8 +1126,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   appearance: none;
 
   flex: 0 0 auto;
-  width: 34px;
-  min-height: 36px;
+  width: 32px;
+  min-height: 34px;
   padding: 0;
 
   display: inline-flex;
@@ -1174,6 +1174,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 }
 
 /* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
+
 
 
 
@@ -1909,8 +1910,8 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   z-index: 1000;
   isolation: isolate;
 
-  min-height: 52px;
-  padding: 0 14px;
+  min-height: 48px;
+  padding: 0 12px;
 
   background: var(--color-primary-muted);
   -webkit-backdrop-filter: blur(10px);
@@ -1918,7 +1919,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 
   border-bottom: 1px solid rgba(31, 41, 51, 0.04);
   box-shadow:
@@ -1933,14 +1934,14 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 .header-left{
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-width: 0;
   flex: 1 1 auto;
 }
 
 .app-logo{
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   flex: 0 0 auto;
   border-radius: 6px;
   border: 0;
@@ -1949,7 +1950,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 650;
   letter-spacing: -0.02em;
   line-height: 1.15;
@@ -1958,14 +1959,14 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 58vw;
+  max-width: 60vw;
 }
 
 .header-right{
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex: 0 0 auto;
 }
 
@@ -2037,11 +2038,12 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 }
 
 @media (max-width: 360px){
-  .app-header{ padding: 0 12px; min-height: 52px; }
-  .header-right{ gap: 12px; }
-  .app-title{ max-width: 52vw; }
+  .app-header{ padding: 0 10px; min-height: 48px; }
+  .header-right{ gap: 10px; }
+  .app-title{ max-width: 56vw; }
 }
 /* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
+
 
 
 /* --- Modal (Locations) --- */
@@ -2091,6 +2093,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
