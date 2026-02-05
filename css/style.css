@@ -454,17 +454,20 @@ Umfang:
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
 .events-section-title{
-  margin: 10px 0 8px;
-  padding: 6px 2px;
+  margin: 8px 0 6px;
+  padding: 4px 2px;
 
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(95,107,115,0.82);
 }
+
 
 /* Grid/Stack: nur Abstand, keine eigene Surface */
 .event-cards-grid{
@@ -932,7 +935,7 @@ Umfang:
 }
 
 /* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
-Zweck: Nach Entfernung des Intros wird Search zur “Hero”-Interaktion direkt unter dem Header.
+Zweck: Kompakter Top-Stack (Feed-first), weniger “Formularfläche”, dennoch sticky & premium.
 Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu ändern.
 === */
 .top-stack{
@@ -940,7 +943,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   top: calc(var(--header-h) + var(--stack-gap));
   z-index: 900;
 
-  padding: 10px 20px 12px;
+  padding: 8px 16px 10px;
 
   background: rgba(249, 251, 246, 0.92);
   -webkit-backdrop-filter: blur(14px);
@@ -949,15 +952,16 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   border-bottom: 1px solid rgba(31,41,51,0.06);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.75) inset,
-    0 10px 26px rgba(31,41,51,0.06);
+    0 8px 18px rgba(31,41,51,0.05);
 
   transform: translateZ(0);
 }
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
 
+
 /* === BEGIN BLOCK: SEARCH BAR (functional hero, top- level) ===
-Zweck: Search ist der Einstiegspunkt (ersetzt Intro/Hero); wirkt wie Premium  Input, nicht wie Formularfeld.
+Zweck: Premium-Search, aber kompakter (Feed-first). Weniger Schatten, gleicher Fokus.
 Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 === */
 #search-filter{
@@ -965,23 +969,22 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   max-width: 820px;
   margin: 0 auto;
 
-  padding: 12px 14px;
-  min-height: 48px;
+  padding: 11px 14px;
+  min-height: 44px;
 
   border-radius: 16px;
   border: 1px solid rgba(31,41,51,0.12);
   background: rgba(255,255,255,0.92);
 
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.98rem;
+  font-weight: 650;
   color: var(--color-text-primary);
 
-   -webkit-appearance: none;
+  -webkit-appearance: none;
   appearance: none;
 
-
   box-shadow:
-    0 12px 30px rgba(0,0,0,0.06),
+    0 10px 22px rgba(0,0,0,0.05),
     0 1px 0 rgba(255,255,255,0.80) inset;
 }
 
@@ -995,24 +998,22 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   border-color: rgba(139,207,74,.55);
   background: rgba(255,255,255,0.98);
   box-shadow:
-    0 16px 36px rgba(0,0,0,0.08),
+    0 14px 30px rgba(0,0,0,0.07),
     0 0 0 4px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
 /* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
 
 
+
 /* === BEGIN BLOCK: FILTER BAR (compact single-row + inline reset X) ===
-Zweck: Visuelles Polish auf Top--Niveau:
-- Filter sekundär zur Suche (weniger Präsenz)
-- Reset-X wirkt wie Tool (tertiär), nicht wie dritter Button
-- Aktive Filter subtil erkennbar, ohne “Badge-Drama”
+Zweck: Filter sekundär zur Suche, kompakter & tooliger (Top-App). Weniger Schatten, weniger Höhe.
 Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill / .filter-pill--reset.
 === */
 
 .filters-bar{
   max-width: 820px;
-  margin: 10px auto 0;
+  margin: 8px auto 0;
 
   display: flex;
   align-items: stretch;
@@ -1021,11 +1022,10 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   flex-wrap: nowrap;
 }
 
-/* Pills: etwas softer (weniger Rahmen/Schatten), kompakt */
+/* Pills: kompakter, weniger “buttony” */
 .filter-pill{
-   -webkit-appearance: none;
+  -webkit-appearance: none;
   appearance: none;
-
 
   flex: 1 1 0;
   min-width: 0;
@@ -1035,15 +1035,15 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   justify-content: space-between;
   gap: 10px;
 
-  padding: 10px 12px;
-  min-height: 40px;
+  padding: 9px 12px;
+  min-height: 38px;
 
   border-radius: 14px;
   border: 1px solid rgba(31,41,51,0.08);
   background: rgba(255,255,255,0.82);
 
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   font-weight: 750;
   line-height: 1;
 
@@ -1054,16 +1054,18 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   white-space: nowrap;
 
   box-shadow:
-    0 10px 22px rgba(0,0,0,0.06),
+    0 8px 18px rgba(0,0,0,0.05),
     0 1px 0 rgba(255,255,255,0.72) inset;
+
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
 .filter-pill__label{
-  color: rgba(95,107,115,0.92);
+  color: rgba(95,107,115,0.90);
   font-weight: 650;
 }
 
-/* Wert: leicht betont, aber nicht “schreit” */
+/* Wert: leicht betont, aber ruhig */
 .filter-pill__value{
   color: rgba(31,41,51,0.94);
   font-weight: 850;
@@ -1077,23 +1079,21 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 .filter-pill::after{
   content: "›";
   margin-left: 2px;
-  color: rgba(31,41,51,0.42);
+  color: rgba(31,41,51,0.40);
   font-size: 18px;
   line-height: 1;
   transform: translateY(-1px);
 }
 
-/* Active: subtiler, klarer (weniger “Glow”), aber sofort erkennbar */
+/* Active: subtil, aber klar */
 .filter-pill.is-active{
-  border-color: rgba(139,207,74,0.28);
+  border-color: rgba(139,207,74,0.26);
   background: rgba(255,255,255,0.92);
   box-shadow:
-    0 12px 26px rgba(0,0,0,0.07),
-    0 0 0 3px rgba(139,207,74,0.10),
+    0 10px 22px rgba(0,0,0,0.06),
+    0 0 0 3px rgba(139,207,74,0.09),
     0 1px 0 rgba(255,255,255,0.78) inset;
 }
-
-/* Optional: aktiver Text minimal “grüner” (ruhig) */
 .filter-pill.is-active .filter-pill__value{
   color: color-mix(in srgb, var(--color-text-primary) 86%, var(--color-primary));
 }
@@ -1102,6 +1102,9 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   .filter-pill:hover{
     background: rgba(255,255,255,0.90);
     border-color: rgba(31,41,51,0.12);
+    box-shadow:
+      0 10px 22px rgba(0,0,0,0.06),
+      0 1px 0 rgba(255,255,255,0.72) inset;
   }
 }
 
@@ -1113,14 +1116,14 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   border-radius: 14px;
 }
 
-/* Reset: Tool-Charakter (weniger Button) */
+/* Reset: Tool-Charakter */
 .filter-pill--reset{
   -webkit-appearance: none;
   appearance: none;
 
   flex: 0 0 auto;
-  width: 38px;
-  min-height: 40px;
+  width: 36px;
+  min-height: 38px;
   padding: 0;
 
   display: inline-flex;
@@ -1138,6 +1141,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   cursor: pointer;
 
   box-shadow: none;
+
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
 .filter-pill--reset::after{ content: none; }
@@ -1158,7 +1163,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
     border-color: rgba(31,41,51,0.08);
   }
   .filter-pill--reset:hover::before{
-    color: rgba(31,41,51,0.76);
+    color: rgba(31,41,51,0.74);
   }
 }
 
@@ -1168,6 +1173,7 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
 }
 
 /* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
+
 
 
 
@@ -1891,8 +1897,8 @@ Umfang:
    ============================================ */
 
 /* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Sticky Topbar mit ruhiger Optik; rechts Inline-Actions.
-Umfang: .app-header + Brand + Actions.
+Zweck: Flacher, appiger Header (weniger “Website”), Brand bleibt sichtbar, Actions ruhig.
+Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 === */
 .app-header{
   color: var(--color-text-primary);
@@ -1901,8 +1907,8 @@ Umfang: .app-header + Brand + Actions.
   z-index: 1000;
   isolation: isolate;
 
-  min-height: 56px;
-  padding: 0 16px;
+  min-height: 52px;
+  padding: 0 14px;
 
   background: var(--color-primary-muted);
   -webkit-backdrop-filter: blur(10px);
@@ -1910,12 +1916,12 @@ Umfang: .app-header + Brand + Actions.
 
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 
   border-bottom: 1px solid rgba(31, 41, 51, 0.04);
   box-shadow:
-    0 1px 0 rgba(31, 41, 51, 0.04),
-    0 6px 20px rgba(31, 41, 51, 0.06);
+    0 1px 0 rgba(31, 41, 51, 0.03),
+    0 4px 14px rgba(31, 41, 51, 0.05);
 
   transform: translateZ(0);
 }
@@ -1925,14 +1931,14 @@ Umfang: .app-header + Brand + Actions.
 .header-left{
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
   flex: 1 1 auto;
 }
 
 .app-logo{
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   flex: 0 0 auto;
   border-radius: 6px;
   border: 0;
@@ -1941,23 +1947,23 @@ Umfang: .app-header + Brand + Actions.
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 650;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
 
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 56vw;
+  max-width: 58vw;
 }
 
 .header-right{
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   flex: 0 0 auto;
 }
 
@@ -1965,7 +1971,7 @@ Umfang: .app-header + Brand + Actions.
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 1px;
+  gap: 2px;
 
   width: auto;
   flex: 0 0 auto;
@@ -1976,7 +1982,7 @@ Umfang: .app-header + Brand + Actions.
   border-radius: 0;
 
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 550;
   line-height: 1;
   text-decoration: none;
 
@@ -2011,32 +2017,30 @@ Umfang: .app-header + Brand + Actions.
 .header-right > button.pwa-install-button::before{
   content: "⬇︎";
   font-size: 12px;
-  opacity: 0.95;
-  transform: translateX(1px);
+  opacity: 0.9;
 }
 .header-right > button.pwa-install-button::after{
   content: "App";
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .header-right > a.pwa-install-button::before{
   content: "ⓘ";
   font-size: 14px;
-  opacity: 0.95;
-  transform: translateX(1px);
+  opacity: 0.9;
 }
 .header-right > a.pwa-install-button::after{
   content: "Info";
-  font-size: 14px;
+  font-size: 13px;
 }
 
 @media (max-width: 360px){
-
-  .app-header{ padding: 0 14px; min-height: 56px; }
+  .app-header{ padding: 0 12px; min-height: 52px; }
   .header-right{ gap: 12px; }
-  .app-title{ max-width: 50vw; }
+  .app-title{ max-width: 52vw; }
 }
 /* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
+
 
 /* --- Modal (Locations) --- */
 .modal-overlay {
@@ -2085,6 +2089,7 @@ Umfang: .app-header + Brand + Actions.
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
