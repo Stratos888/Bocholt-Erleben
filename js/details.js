@@ -53,12 +53,130 @@ const DetailPanel = {
     };
     if (this.closeBtn) this.closeBtn.addEventListener("click", this._onCloseClick);
 
-    // Overlay closes (but clicks inside the sheet do not bubble to overlay anyway)
+        // Overlay closes (but clicks inside the sheet do not bubble to overlay anyway)
     this._onOverlayClick = (e) => {
       // only close when actually clicking the overlay element
       if (e.target === this.overlay) this.hide();
     };
     this.overlay.addEventListener("click", this._onOverlayClick);
+
+    /* === BEGIN BLOCK: DETAILPANEL SWIPE-TO-CLOSE (mobile, safe with scroll) ===
+    Zweck:
+    - Top-App Feeling: Sheet kann per Drag nach unten geschlossen werden.
+    - Nur wenn Content ganz oben ist (scrollTop==0) und Drag im oberen Bereich startet.
+    - Desktop-Modal (>=900px) bleibt unverändert (kein Drag).
+    Umfang:
+    - Fügt Pointer-Handler in init() hinzu, ohne HTML zu ändern.
+    === */
+    const sheet = this.panel.querySelector(".detail-panel-content");
+    const scrollEl = this.panel.querySelector("#detail-content");
+
+    this._drag = {
+      active: false,
+      startY: 0,
+      lastY: 0,
+      startT: 0,
+      dy: 0
+    };
+
+    const isDesktopModal = () => window.matchMedia && window.matchMedia("(min-width: 900px)").matches;
+
+    const setSheetOffset = (y) => {
+      // keep existing base transform (CSS open/close) and only add temporary offset
+      sheet.style.transition = "none";
+      sheet.style.transform = `translateY(${Math.max(0, y)}px)`;
+    };
+
+    const resetSheetOffset = () => {
+      sheet.style.transition = "";
+      sheet.style.transform = "";
+    };
+
+    this._onPointerDown = (e) => {
+      if (!this.panel.classList.contains("active")) return;
+      if (!sheet || !scrollEl) return;
+      if (isDesktopModal()) return;
+
+      // only primary pointer
+      if (e.isPrimary === false) return;
+
+      // don’t start drag on close button
+      if (e.target && this.closeBtn && (e.target === this.closeBtn || this.closeBtn.contains(e.target))) return;
+
+      // start zone: top area of the sheet (handle region) to avoid fighting scroll
+      const r = sheet.getBoundingClientRect();
+      const inTopZone = (e.clientY - r.top) <= 56;
+      if (!inTopZone) return;
+
+      // only when scroll is at top
+      if (scrollEl.scrollTop > 0) return;
+
+      this._drag.active = true;
+      this._drag.startY = e.clientY;
+      this._drag.lastY = e.clientY;
+      this._drag.startT = performance.now();
+      this._drag.dy = 0;
+
+      try { sheet.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    this._onPointerMove = (e) => {
+      if (!this._drag.active) return;
+      if (!sheet) return;
+
+      const y = e.clientY;
+      const dy = y - this._drag.startY;
+
+      // only drag down
+      if (dy <= 0) {
+        this._drag.dy = 0;
+        setSheetOffset(0);
+        return;
+      }
+
+      this._drag.lastY = y;
+      this._drag.dy = dy;
+
+      // prevent page scroll / rubber band while dragging
+      e.preventDefault();
+      setSheetOffset(dy);
+    };
+
+    this._onPointerUp = (e) => {
+      if (!this._drag.active) return;
+      if (!sheet) return;
+
+      this._drag.active = false;
+
+      const dt = Math.max(1, performance.now() - this._drag.startT);
+      const dy = this._drag.dy;
+      const v = dy / dt; // px/ms
+
+      // close threshold: distance or velocity
+      const shouldClose = dy > 96 || v > 0.85;
+
+      if (shouldClose) {
+        // let CSS close animation handle it (remove temp transform)
+        resetSheetOffset();
+        this.hide();
+      } else {
+        // animate back to open state
+        sheet.style.transition = "transform 180ms ease";
+        sheet.style.transform = "translateY(0)";
+        window.setTimeout(() => {
+          resetSheetOffset();
+        }, 200);
+      }
+
+      try { sheet.releasePointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    sheet.addEventListener("pointerdown", this._onPointerDown, { passive: true });
+    sheet.addEventListener("pointermove", this._onPointerMove, { passive: false });
+    sheet.addEventListener("pointerup", this._onPointerUp, { passive: true });
+    sheet.addEventListener("pointercancel", this._onPointerUp, { passive: true });
+    /* === END BLOCK: DETAILPANEL SWIPE-TO-CLOSE (mobile, safe with scroll) === */
+
 
         // ESC closes only when open + Focus-Trap (Tab)
     this._onKeyDown = (e) => {
@@ -165,10 +283,11 @@ const DetailPanel = {
 
     if (this.closeBtn) this.closeBtn.focus();
   });
-   /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
+     /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
 },
 
   hide() {
+
 
     if (!this.panel) return;
 
@@ -448,6 +567,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
