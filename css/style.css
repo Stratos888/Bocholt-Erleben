@@ -686,13 +686,20 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 
 /* Mobile fein */
 @media (max-width: 360px){
-  .event-card{
-    grid-template-columns: 38px minmax(0, 1fr);
-    column-gap: 9px;
-    padding: 10px 11px;
+  .filters-bar{ gap: 8px; }
+
+  /* Exakt gleiche Höhe wie #search-filter (36px) */
+  .filter-pill{
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
   }
-  .event-date-badge{ width: 38px; }
+
+  .filter-pill--reset{
+    height: 36px;
+  }
 }
+
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
 
@@ -2105,6 +2112,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
