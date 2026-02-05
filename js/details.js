@@ -165,13 +165,11 @@ const DetailPanel = {
 
     if (this.closeBtn) this.closeBtn.focus();
   });
-  /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
+   /* === END BLOCK: DETAILPANEL SHOW (ensure init + handle hidden attribute) === */
 },
 
-},
+  hide() {
 
-
-    hide() {
     if (!this.panel) return;
 
     // If the top history entry is our marker, go back first (popstate will close)
@@ -450,6 +448,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
