@@ -54,28 +54,37 @@ function isSameDay(a, b) {
 }
 
 /* === BEGIN BLOCK: WEEKEND RANGE (next weekend, robust) ===
-Zweck: Wochenende-Chip zeigt das nächste anstehende Wochenende (Sa+So).
+Zweck: Wochenende-Bereich als Fr+Sa+So (aktuelles oder kommendes Wochenende, relativ zu heute).
 Umfang: Ersetzt getNextWeekendRange().
 === */
 function getNextWeekendRange(today) {
   const d = new Date(today);
   d.setHours(0, 0, 0, 0);
 
-  const day = d.getDay(); // 0 So ... 6 Sa
-  const daysUntilSat = (6 - day + 7) % 7;
+  const dow = d.getDay(); // 0 So ... 6 Sa
+  let friday;
 
-  const saturday = addDays(d, daysUntilSat);
-  const sunday = addDays(saturday, 1);
+  // Wenn wir schon im Wochenende sind: aktuelles Wochenende (Fr..So)
+  if (dow === 5) friday = addDays(d, 0);      // Fr
+  else if (dow === 6) friday = addDays(d, -1); // Sa -> Fr
+  else if (dow === 0) friday = addDays(d, -2); // So -> Fr
+  else {
+    // Mo–Do: kommendes Wochenende (nächster Freitag)
+    const daysUntilFri = (5 - dow + 7) % 7; // Fr = 5
+    friday = addDays(d, daysUntilFri);
+  }
 
-  const start = new Date(saturday);
+  const start = new Date(friday);
   start.setHours(0, 0, 0, 0);
 
+  const sunday = addDays(friday, 2);
   const end = new Date(sunday);
   end.setHours(23, 59, 59, 999);
 
   return { start, end };
 }
 /* === END BLOCK: WEEKEND RANGE (next weekend, robust) === */
+
 
 /* ---------- Bucketing (für Gruppenüberschriften) ---------- */
 /* === BEGIN BLOCK: EVENT BUCKET (range-aware via endDate) ===
@@ -433,99 +442,129 @@ if (categoryIcon) {
   }
 
 
-    /* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
-  Zweck: Lange Listen ohne aktive Filter durch dynamische Zeit-Sektionen gliedern.
-         Keine leeren Trenner: Überschrift nur, wenn es Events in der Sektion gibt.
-         Sektionen konsistent zu den Filter-Begriffen: Heute / Dieses Wochenende / Demnächst / Später.
-  Umfang: Ersetzt ausschließlich renderList(list).
-  === */
+   /* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
+Zweck:
+- Saubere, app-typische Zeit-Sections ohne doppelte Header (Buckets werden vorab gesammelt).
+- Reihenfolge: Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später
+- Keine Lücken (z.B. Donnerstag verschwindet nicht), kein „Demnächst“ doppelt.
+Umfang:
+- Ersetzt ausschließlich die Section-Logik in renderList(list).
+=== */
   function renderList(list) {
     const c = ensureContainer();
-    if (!c) return;
-
     c.innerHTML = "";
 
     if (!list || list.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "events-empty";
-      empty.textContent = "Keine passenden Events gefunden.";
-      c.appendChild(empty);
+      c.innerHTML = `<div class="empty-state">Keine Events gefunden.</div>`;
       return;
     }
 
-    // --- helpers (lokal, self-contained) ---
-    const toLocalDay = (iso) => {
-      const dt = parseISODateLocal(iso);
-      if (!dt) return null;
-      const d = new Date(dt);
+    const today = startOfToday();
+
+    const toDay = (ev) => {
+      const effective = ev?.endDate ? getEffectiveDate(ev) : parseISODateLocal(ev?.date);
+      if (!effective) return null;
+      const d = new Date(effective);
       d.setHours(0, 0, 0, 0);
       return d;
     };
 
-    const addDaysLocal = (base, n) => {
-      const t = new Date(base);
-      t.setDate(t.getDate() + n);
-      t.setHours(0, 0, 0, 0);
+    const endOfDay = (d) => {
+      const t = new Date(d);
+      t.setHours(23, 59, 59, 999);
       return t;
     };
 
-    const sectionLabel = {
+    // Diese Woche: nur Mo–Do sinnvoll (morgen..Do)
+    const dow = today.getDay(); // 0 So ... 6 Sa
+    const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
+    const thisWeekStart = addDays(today, 1); // morgen
+    thisWeekStart.setHours(0, 0, 0, 0);
+
+    let thisWeekEnd = null;
+    if (hasThisWeek) {
+      const daysUntilThu = (4 - dow);
+      const thu = addDays(today, daysUntilThu);
+      thisWeekEnd = endOfDay(thu);
+    }
+
+    // Wochenende (Fr–So): aktuelles oder kommendes WE relativ zu heute
+    const weekend = getNextWeekendRange(today);
+    const weekendStart = new Date(weekend.start);
+    const weekendEnd = new Date(weekend.end);
+
+    // Nächste Woche: Kalenderwoche nach dieser Woche (Mo..So)
+    const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
+    const nextWeekStart = addDays(endThisWeek, 1);
+    nextWeekStart.setHours(0, 0, 0, 0);
+
+    const nextWeekEnd = addDays(nextWeekStart, 6);
+    nextWeekEnd.setHours(23, 59, 59, 999);
+
+    const buckets = {
+      today: [],
+      week: [],
+      weekend: [],
+      nextweek: [],
+      later: []
+    };
+
+    const bucketLabel = {
       today: "Heute",
+      week: "Diese Woche",
       weekend: "Dieses Wochenende",
-      soon: "Demnächst",
+      nextweek: "Nächste Woche",
       later: "Später"
     };
 
-       const getSectionKey = (event) => {
-      // Wichtig: KEIN toISOString() verwenden, sonst kippt "heute" je nach Zeitzone auf gestern.
-      const effective = event?.endDate ? getEffectiveDate(event) : parseISODateLocal(event?.date);
-
-      if (!effective) return "later";
-
-      const day = new Date(effective);
-      day.setHours(0, 0, 0, 0);
-
-      const today = startOfToday();
+    const pickBucket = (day) => {
+      if (!day) return "later";
 
       // Heute
       if (day.getTime() === today.getTime()) return "today";
 
-      // Dieses Wochenende (nächstes Sa+So)
-      const { start, end } = getNextWeekendRange(today);
-      if (day >= start && day <= end) return "weekend";
+      // Diese Woche (nur wenn Mo–Do)
+      if (hasThisWeek && day >= thisWeekStart && day <= thisWeekEnd) return "week";
 
-      // Demnächst = nächste 14 Tage (inkl.)
-      const soonEnd = addDaysLocal(today, 14);
-      soonEnd.setHours(23, 59, 59, 999);
-      if (day >= today && day <= soonEnd) return "soon";
+      // Wochenende (Fr–So)
+      if (day >= weekendStart && day <= weekendEnd) return "weekend";
+
+      // Nächste Woche (Mo–So der Folgewoche)
+      if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
 
       return "later";
     };
 
+    // 1) Events in Buckets sammeln (keine Doppel-Header möglich)
+    for (const ev of list) {
+      const day = toDay(ev);
+      const key = pickBucket(day);
+      buckets[key].push(ev);
+    }
+
+    // 2) Buckets in fester Reihenfolge rendern (nur wenn nicht leer)
+    const order = ["today", "week", "weekend", "nextweek", "later"];
+    const frag = document.createDocumentFragment();
 
     const createSectionHeader = (key) => {
       const h = document.createElement("div");
       h.className = "events-section-title";
-      h.textContent = sectionLabel[key] || "Demnächst";
+      h.textContent = bucketLabel[key] || key;
       return h;
     };
 
-    // --- render with dynamic headers (no empty sections) ---
-    const frag = document.createDocumentFragment();
-    let lastSection = null;
-
-    for (const ev of list) {
-      const key = getSectionKey(ev);
-      if (key !== lastSection) {
-        frag.appendChild(createSectionHeader(key));
-        lastSection = key;
+    for (const key of order) {
+      if (!buckets[key] || buckets[key].length === 0) continue;
+      frag.appendChild(createSectionHeader(key));
+      for (const ev of buckets[key]) {
+        frag.appendChild(createCard(ev));
       }
-      frag.appendChild(createCard(ev));
     }
 
     c.appendChild(frag);
   }
-  /* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
+/* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
+
 
 
   function normalizeEvents(events) {
@@ -551,6 +590,7 @@ if (categoryIcon) {
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
