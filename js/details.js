@@ -261,11 +261,20 @@ hide() {
   }
   this._hideNow();
 },
+// === BEGIN BLOCK: DETAILPANEL A11Y CLOSE (aria-hidden + defocus) ===
+// Zweck: Beim Schließen Fokus aus dem Panel nehmen und aria-hidden auf true setzen.
+// Umfang: Ersetzt _hideNow()-Header + Panel-Guard.
 _hideNow() {
-// === END BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
+  if (!this.panel) return;
 
+  // move focus out of the panel to avoid aria-hidden focused descendant warnings
+  if (this.panel.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
 
-    if (!this.panel) return;
+  this.panel.setAttribute("aria-hidden", "true");
+// === END BLOCK: DETAILPANEL A11Y CLOSE (aria-hidden + defocus) ===
+
 
     this.panel.classList.remove("active");
     document.body.classList.remove("is-panel-open");
@@ -528,6 +537,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
