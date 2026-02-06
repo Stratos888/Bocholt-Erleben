@@ -216,6 +216,116 @@ Wenn Informationen fehlen:
 → zuerst nachfragen, niemals raten.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LESSONS LEARNED / PATCH-SAFETY (NEU, verbindlich)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ziel dieser Regeln: Keine „Halb-Patches“, keine Syntax-Brüche, keine widersprüchlichen Handler.
+
+1) Anchor Discipline (NEU)
+Für alle größeren UI-/Overlay-/Panel-Blöcke müssen stabile Anker existieren.
+Bevor Änderungen erfolgen:
+- Entweder BEGIN/END Marker im Code vorhanden
+- Oder eindeutige Nachbarzeilen werden als Replace-Anker definiert
+
+Regel:
+→ Keine Patches mit „ungefähr hier“. Jede Replace-Anweisung muss eindeutig matchen.
+
+2) One-Patch Policy bei Zielzustand (NEU)
+Wenn ein „Zielzustand“ definiert ist (z.B. „Top-App Niveau Detailpanel“):
+- Es wird EIN konsolidierter Patch geplant (max. 2 Dateien: JS + CSS)
+- Danach erst getestet
+
+Feature-Freeze-Regel (NEU)
+Während ein Zielzustand umgesetzt wird:
+- keine zusätzlichen Features
+- keine spontanen „noch schnell“-Änderungen
+- nur die zuvor definierte Maßnahmenliste
+Erst nach erfolgreichem Test darf erweitert werden.
+
+Root-Cause-First-Regel (NEU)
+Vor jedem Fix:
+- Ursache eindeutig identifizieren und reproduzieren
+- erst dann minimalen Patch anwenden
+Symptomatische „Workarounds“ sind verboten.
+
+- Keine Patch-Kaskade ohne neue Root-Cause-Analyse
+
+3) No-Transform-Fight Rule (NEU)
+Wenn CSS Animationen/Transitions `transform` nutzen, darf JS NICHT gleichzeitig `element.style.transform` setzen.
+Stattdessen:
+- JS steuert ausschließlich CSS-Variablen (z.B. `--dp-drag-y`)
+- CSS berechnet `transform` als Komposition (Base + Drag)
+
+Regel:
+→ Direkte Transform-Overrides in JS sind bei animierten Sheets verboten.
+
+4) History/Back Contract (NEU)
+Detailpanel-Back-Handling muss token-basiert sein:
+- show(): pushState mit eindeutiger Token-ID (z.B. `__detailPanelOpen: <token>`)
+- hide(): nutzt `history.back()` nur wenn Token exakt passt
+- X muss IMMER zuverlässig schließen (Fallback: direkt schließen)
+
+Regel:
+→ Kein „hide() macht history.back()“ ohne Token-Check.
+
+5) Handler Conflict Rule (NEU)
+Für Overlay/Panel gilt:
+- Es darf pro Interaktion (ESC, Overlay-Klick, Close, Popstate, Swipe) jeweils nur EIN aktiver Handler existieren.
+- Keine Doppelregistrierungen, keine konkurrierenden Listener.
+
+Regel:
+→ Vor Patch: prüfen, ob bereits Handler existieren. Bei Bedarf konsolidieren statt addieren.
+
+6) Chat-Budget Regel (NEU)
+Bei längeren Iterationen:
+- Antworten müssen kurz, deterministisch und patch-fokussiert bleiben
+- Keine Mehrfachvarianten (A/B/C), wenn Zielzustand feststeht
+- Bei drohender Chat-Länge: erst Planung + Maßnahmenliste, dann Patch
+
+Max-Patch-Regel (NEU)
+Ein einzelner Patch darf maximal 2 Dateien betreffen (typisch: 1x JS + 1x CSS).
+Wenn mehr Dateien notwendig sind:
+→ in mehrere Schritte aufteilen.
+Ziel: kleine, sichere, nachvollziehbare Änderungen statt „Big Bang“-Patches.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DETAILPANEL – TOP-APP CONTRACT (NEU, verbindlich)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Das Detailpanel ist das zentrale Interaktionsmuster (Bottom Sheet). Es bleibt das Standardpattern.
+
+Definition of Done (DoD) für Detailpanel:
+A) Öffnen/Schließen
+- Tap auf Event öffnet immer
+- X schließt immer
+- Overlay-Tap schließt
+- ESC schließt (Desktop)
+
+B) Back-Verhalten
+- Back schließt zuerst das Panel (nicht die Seite)
+- Token-basiert, X bleibt zuverlässig
+
+C) Swipe-to-close (optional, aber wenn vorhanden: stabil)
+- Start nur über definierte Hit-Area im oberen Bereich
+- Nur wenn Panel-Scroll oben ist (scrollTop==0)
+- Keine Transform-Fights: JS -> CSS-Variable, CSS -> Transform
+
+D) Links / Actions
+- Primär: „Ort öffnen“
+- Sekundär: „Website“ nur wenn gültig, stabil, nicht redundant
+- Bocholt „/veranstaltung*“ Pfade gelten als instabil → nicht als „Website“ anbieten
+
+E) A11y-Minimum
+- role="dialog", aria-modal, aria-hidden
+- Focus Trap + Focus Restore
+- Close Button aria-label
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF FILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 END OF FILE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 :::
