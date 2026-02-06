@@ -71,11 +71,18 @@ this.closeBtn = this.panel.querySelector(".detail-panel-close");
     if (!this.panel.classList.contains("active")) return;
 
     if (e.key === "Escape") {
-      this.hide();
-      return;
-    }
+    // === BEGIN BLOCK: DETAILPANEL CLOSE WIRING (robust + a11y) ===
+// Zweck: Close-Button schließt sicher + bekommt beim Öffnen Fokus.
+// Umfang: Ersetzt die alte Close-Bindung komplett.
 
-    if (e.key !== "Tab") return;
+this.closeBtn?.addEventListener("click", () => this.hide());
+
+// beim Öffnen Fokus auf Close (native App Feeling + ESC sofort verfügbar)
+const focusClose = () => this.closeBtn?.focus({ preventScroll: true });
+this.panel.addEventListener("transitionend", focusClose, { once: true });
+
+// === END BLOCK: DETAILPANEL CLOSE WIRING (robust + a11y) ===
+
 
     const focusables = [...this.panel.querySelectorAll(
       'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
@@ -430,6 +437,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
