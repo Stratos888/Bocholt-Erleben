@@ -1523,37 +1523,19 @@ Umfang:
 - Nur #event-detail-panel .detail-panel-content
 === */
 #event-detail-panel .detail-panel-content{
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-
-  max-height: 82vh;
-
-  background: #FFFFFF;
-  background-clip: padding-box;
-
-  border-radius: 22px;
-
-  border-top: 1px solid rgba(31,41,51,0.08);
-  box-shadow:
-    0 -34px 130px rgba(0,0,0,0.18),
-    0 1px 0 rgba(255,255,255,0.78) inset;
-
-  overflow: hidden;
-  padding: 16px 16px 18px;
-
-  /* === BEGIN BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) ===
-     Zweck: Keine Transform-Kämpfe mehr zwischen CSS-Open/Close und JS-Drag.
-     Modell:
-     - --dp-base-y: 110% (geschlossen) bzw. 0px (offen)
-     - --dp-drag-y: 0px..npx (Drag nach unten)
-     === */
-  --dp-base-y: 110%;
+  /* === BEGIN BLOCK: DETAILPANEL SNAP BASE (60% / 100% / closed) ===
+  Zweck: Baseline-Position per CSS-Var; JS setzt --dp-base-y dynamisch.
+  Umfang: Ersetzt nur die Variablen-Defaults + Transform-Zeile.
+  === */
+  --dp-base-y: 100%;
   --dp-drag-y: 0px;
 
-    transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
+  /* CLOSED uses base-y = 100%
+     HALF uses base-y = 40vh
+     FULL uses base-y = 0px */
+  transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
+  /* === END BLOCK: DETAILPANEL SNAP BASE (60% / 100% / closed) === */
+
   transition: transform 220ms ease;
   overscroll-behavior: contain;
   /* === END BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) === */
@@ -2214,6 +2196,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
