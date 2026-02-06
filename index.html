@@ -183,6 +183,11 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
 
 
    
+    <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
+Zweck: Dediziertes Overlay-Root direkt unter <body>; enthält das Event-Detailpanel.
+Umfang: Ersetzt den bisherigen Event-Detailpanel-Block (ohne Overlay-Root).
+=== -->
+<div id="overlay-root">
     <!-- EVENT DETAIL PANEL (hidden by default) -->
     <div id="event-detail-panel" class="detail-panel hidden">
         <div class="detail-panel-overlay"></div>
@@ -193,6 +198,9 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
             </div>
         </div>
     </div>
+</div>
+<!-- === END BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) === -->
+
 
   <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (REDUCED / ACTION-FIRST) ===
 Zweck: Modal ist optional; führt sofort zur Aktionsseite + bietet nur sekundäre Links.
@@ -333,6 +341,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
