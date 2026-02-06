@@ -33,19 +33,23 @@ const DetailPanel = {
   _onOverlayClick: null,
   _onCloseClick: null,
 
- init() {
+// === BEGIN BLOCK: DETAILPANEL INIT (syntax-fix + stable close + esc + focus-trap) ===
+// Zweck: Syntaxfehler beheben; Close/Overlay/ESC zuverlässig; Focus-Trap nur wenn Panel aktiv.
+// Umfang: Ersetzt init() komplett.
+// ===
+init() {
   if (this._isInit) return;
 
   // === BEGIN BLOCK: DETAILPANEL DOM HOOKS (selectors aligned) ===
-// Zweck: Panel/Overlay/Content/Close-Button selektieren (Close = .detail-panel-close).
-// Umfang: Ersetzt nur die DOM-Queries (Zeilen 39–45).
-this.panel = document.getElementById("event-detail-panel");
-if (!this.panel) return;
+  // Zweck: Panel/Overlay/Content/Close-Button selektieren (Close = .detail-panel-close).
+  // Umfang: DOM-Queries.
+  this.panel = document.getElementById("event-detail-panel");
+  if (!this.panel) return;
 
-this.overlay = this.panel.querySelector(".detail-panel-overlay");
-this.content = this.panel.querySelector("#detail-content");
-this.closeBtn = this.panel.querySelector(".detail-panel-close");
-// === END BLOCK: DETAILPANEL DOM HOOKS (selectors aligned) ===
+  this.overlay = this.panel.querySelector(".detail-panel-overlay");
+  this.content = this.panel.querySelector("#detail-content");
+  this.closeBtn = this.panel.querySelector(".detail-panel-close");
+  // === END BLOCK: DETAILPANEL DOM HOOKS (selectors aligned) ===
 
   /* ===============================
      A11y / Dialog semantics
@@ -58,31 +62,27 @@ this.closeBtn = this.panel.querySelector(".detail-panel-close");
   /* ===============================
      Close interactions
   =============================== */
-  this.overlay?.addEventListener("click", (e) => {
+  this._onOverlayClick = (e) => {
     if (e.target === this.overlay) this.hide();
-  });
+  };
+  this.overlay?.addEventListener("click", this._onOverlayClick);
 
-  this.closeBtn?.addEventListener("click", () => this.hide());
+  this._onCloseClick = () => this.hide();
+  this.closeBtn?.addEventListener("click", this._onCloseClick);
 
   /* ===============================
      ESC + Focus Trap
   =============================== */
-  document.addEventListener("keydown", (e) => {
-    if (!this.panel.classList.contains("active")) return;
+  this._onKeyDown = (e) => {
+    if (!this.panel || !this.panel.classList.contains("active")) return;
 
     if (e.key === "Escape") {
-    // === BEGIN BLOCK: DETAILPANEL CLOSE WIRING (robust + a11y) ===
-// Zweck: Close-Button schließt sicher + bekommt beim Öffnen Fokus.
-// Umfang: Ersetzt die alte Close-Bindung komplett.
+      e.preventDefault();
+      this.hide();
+      return;
+    }
 
-this.closeBtn?.addEventListener("click", () => this.hide());
-
-// beim Öffnen Fokus auf Close (native App Feeling + ESC sofort verfügbar)
-const focusClose = () => this.closeBtn?.focus({ preventScroll: true });
-this.panel.addEventListener("transitionend", focusClose, { once: true });
-
-// === END BLOCK: DETAILPANEL CLOSE WIRING (robust + a11y) ===
-
+    if (e.key !== "Tab") return;
 
     const focusables = [...this.panel.querySelectorAll(
       'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
@@ -96,24 +96,26 @@ this.panel.addEventListener("transitionend", focusClose, { once: true });
     if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
       last.focus();
+      return;
     }
     if (!e.shiftKey && document.activeElement === last) {
       e.preventDefault();
       first.focus();
     }
-  });
+  };
+  document.addEventListener("keydown", this._onKeyDown);
 
   /* ===============================
      Back button closes panel
   =============================== */
   window.addEventListener("popstate", () => {
-    if (this.panel.classList.contains("active")) {
+    if (this.panel && this.panel.classList.contains("active")) {
       this._hideNow();
     }
-  })
+  });
 
   /* ===============================
-     Swipe to close (mobile)
+     Swipe to close (mobile) - existing behavior kept
   =============================== */
   const sheet = this.panel.querySelector(".detail-panel-content");
   const scroll = this.panel.querySelector("#detail-content");
@@ -123,8 +125,9 @@ this.panel.addEventListener("transitionend", focusClose, { once: true });
   let dragging = false;
 
   sheet?.addEventListener("pointerdown", (e) => {
-    if (scroll.scrollTop > 0) return;
+    if (scroll && scroll.scrollTop > 0) return;
     startY = e.clientY;
+    dy = 0;
     dragging = true;
   });
 
@@ -143,6 +146,8 @@ this.panel.addEventListener("transitionend", focusClose, { once: true });
 
   this._isInit = true;
 },
+// === END BLOCK: DETAILPANEL INIT (syntax-fix + stable close + esc + focus-trap) ===
+
 
 
 show(event) {
@@ -164,16 +169,20 @@ show(event) {
 },
 
 
+   // === BEGIN BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
+  // Zweck: Syntaxfehler beheben; Schließen via History sauber; kein "hängender" return-Block.
+  // Umfang: Ersetzt hide() komplett (endet direkt vor _hideNow()).
   hide() {
-  if (history.state?.detailOpen) {
-    history.back();
-    return;
- 
-  this._lastFocusEl?.focus();
-}
-
+    if (history.state?.detailOpen) {
+      history.back();
+      return;
+    }
+    this._hideNow();
+  }
+  // === END BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
 
   _hideNow() {
+
     if (!this.panel) return;
 
     this.panel.classList.remove("active");
@@ -437,6 +446,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
