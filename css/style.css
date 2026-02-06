@@ -1638,15 +1638,23 @@ Umfang: Nur Styles für die JS-injizierte Hit-Area.
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
+/* === BEGIN BLOCK: DETAILPANEL CONTENT FILL FIX (remove gray bottom gap)
+Zweck:
+- Content soll die komplette Panelhöhe füllen
+- verhindert sichtbaren “grauen Streifen” unten
+Root Cause:
+- max-height 82vh begrenzte Content künstlich
+=== */
 #event-detail-panel #detail-content{
-  /* mehr Abstand unter dem Handle + Close */
   padding-top: 40px;
 
-  max-height: calc(82vh - 18px);
+  height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+/* === END BLOCK: DETAILPANEL CONTENT FILL FIX === */
+
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -2207,6 +2215,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
