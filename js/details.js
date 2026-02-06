@@ -110,7 +110,7 @@ this.panel.addEventListener("transitionend", focusClose, { once: true });
     if (this.panel.classList.contains("active")) {
       this._hideNow();
     }
-  });
+  })
 
   /* ===============================
      Swipe to close (mobile)
@@ -437,6 +437,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
