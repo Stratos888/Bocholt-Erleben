@@ -36,12 +36,16 @@ const DetailPanel = {
  init() {
   if (this._isInit) return;
 
-  this.panel = document.getElementById("event-detail-panel");
-  if (!this.panel) return;
+  // === BEGIN BLOCK: DETAILPANEL DOM HOOKS (selectors aligned) ===
+// Zweck: Panel/Overlay/Content/Close-Button selektieren (Close = .detail-panel-close).
+// Umfang: Ersetzt nur die DOM-Queries (Zeilen 39–45).
+this.panel = document.getElementById("event-detail-panel");
+if (!this.panel) return;
 
-  this.overlay = this.panel.querySelector(".detail-panel-overlay");
-  this.content = this.panel.querySelector("#detail-content");
-  this.closeBtn = this.panel.querySelector(".detail-close-btn");
+this.overlay = this.panel.querySelector(".detail-panel-overlay");
+this.content = this.panel.querySelector("#detail-content");
+this.closeBtn = this.panel.querySelector(".detail-panel-close");
+// === END BLOCK: DETAILPANEL DOM HOOKS (selectors aligned) ===
 
   /* ===============================
      A11y / Dialog semantics
@@ -157,17 +161,7 @@ show(event) {
   if (history.state?.detailOpen) {
     history.back();
     return;
-  }
-  this._hideNow();
-},
-
-_hideNow() {
-  this.panel.classList.remove("active");
-  this.panel.classList.add("hidden");
-  this.panel.setAttribute("aria-hidden", "true");
-
-  document.body.classList.remove("is-panel-open");
-
+ 
   this._lastFocusEl?.focus();
 },
 
@@ -436,6 +430,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
