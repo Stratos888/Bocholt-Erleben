@@ -224,7 +224,7 @@ show(event) {
   this.init();
   if (!this.panel) return;
 
-  this._render(event);
+  this.render(event);
 
   // start at HALF (60% visible)
   const sheet = this.panel.querySelector(".detail-panel-content");
@@ -528,6 +528,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
