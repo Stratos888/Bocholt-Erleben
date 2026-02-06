@@ -1553,10 +1553,21 @@ Umfang:
   --dp-base-y: 110%;
   --dp-drag-y: 0px;
 
-  transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
+    transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
   transition: transform 220ms ease;
   overscroll-behavior: contain;
   /* === END BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) === */
+}
+
+/* === BEGIN BLOCK: DETAILPANEL DRAG TRANSITION GUARD ===
+Zweck: Während Drag keine Transition (kein „Gummi/ruckeln“), danach snappt es sauber zurück.
+Umfang: Nur DetailPanel Content Transition während Drag.
+=== */
+#event-detail-panel .detail-panel-content.is-dragging{
+  transition: none;
+}
+/* === END BLOCK: DETAILPANEL DRAG TRANSITION GUARD === */
+
 }
 
 /* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
@@ -2203,6 +2214,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
