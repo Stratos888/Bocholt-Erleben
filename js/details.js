@@ -172,16 +172,20 @@ show(event) {
    // === BEGIN BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
   // Zweck: Syntaxfehler beheben; Schließen via History sauber; kein "hängender" return-Block.
   // Umfang: Ersetzt hide() komplett (endet direkt vor _hideNow()).
-  hide() {
-    if (history.state?.detailOpen) {
-      history.back();
-      return;
-    }
-    this._hideNow();
+ // === BEGIN BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
+// Zweck: Syntax korrekt im Object-Literal (Komma zwischen Methoden); Schließen via History sauber.
+// Umfang: Ersetzt hide() + die folgende _hideNow()-Signaturzeile.
+// ===
+hide() {
+  if (history.state?.detailOpen) {
+    history.back();
+    return;
   }
-  // === END BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
+  this._hideNow();
+},
+_hideNow() {
+// === END BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
 
-  _hideNow() {
 
     if (!this.panel) return;
 
@@ -446,6 +450,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
