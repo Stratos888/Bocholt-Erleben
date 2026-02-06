@@ -1522,24 +1522,35 @@ Fix:
 Umfang:
 - Nur #event-detail-panel .detail-panel-content
 === */
+/* === BEGIN BLOCK: DETAILPANEL SURFACE (VISIBLE PANEL BACKGROUND – FIX ROOTCAUSE)
+Zweck:
+- Panel braucht eigene Surface (weiß), sonst wirkt es transparent/unsichtbar
+- klare Trennung vom Blur-Overlay
+- Top-App Feeling (echtes Sheet)
+Umfang:
+- nur Surface/Radius/Shadow + bestehende Transform-Logik
+=== */
 #event-detail-panel .detail-panel-content{
-  /* === BEGIN BLOCK: DETAILPANEL SNAP BASE (60% / 100% / closed) ===
-  Zweck: Baseline-Position per CSS-Var; JS setzt --dp-base-y dynamisch.
-  Umfang: Ersetzt nur die Variablen-Defaults + Transform-Zeile.
-  === */
   --dp-base-y: 100%;
   --dp-drag-y: 0px;
 
-  /* CLOSED uses base-y = 100%
-     HALF uses base-y = 40vh
-     FULL uses base-y = 0px */
-  transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
-  /* === END BLOCK: DETAILPANEL SNAP BASE (60% / 100% / closed) === */
+  /* 🔥 FEHLTE → war Root Cause */
+  background: var(--color-surface);
 
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+
+  box-shadow:
+    0 -28px 80px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.85) inset;
+
+  transform: translateY(calc(var(--dp-base-y) + var(--dp-drag-y)));
   transition: transform 220ms ease;
+
   overscroll-behavior: contain;
-  /* === END BLOCK: DETAILPANEL TRANSFORM MODEL (base + drag) === */
 }
+/* === END BLOCK: DETAILPANEL SURFACE (VISIBLE PANEL BACKGROUND – FIX ROOTCAUSE) === */
+
 
 /* === BEGIN BLOCK: DETAILPANEL DRAG TRANSITION GUARD ===
 Zweck: Während Drag keine Transition (kein „Gummi/ruckeln“), danach snappt es sauber zurück.
@@ -2196,6 +2207,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
