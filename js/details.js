@@ -114,38 +114,80 @@ init() {
     }
   });
 
-  /* ===============================
-     Swipe to close (mobile) - existing behavior kept
+    /* ===============================
+     Swipe to close (mobile) – VAR MODEL (no inline transform)
   =============================== */
   const sheet = this.panel.querySelector(".detail-panel-content");
   const scroll = this.panel.querySelector("#detail-content");
+
+  // Ensure a dedicated drag hit-area exists (CSS already styles .detail-panel-drag-hit)
+  let dragHit = sheet?.querySelector(".detail-panel-drag-hit");
+  if (sheet && !dragHit) {
+    dragHit = document.createElement("div");
+    dragHit.className = "detail-panel-drag-hit";
+    sheet.appendChild(dragHit);
+  }
 
   let startY = 0;
   let dy = 0;
   let dragging = false;
 
-  sheet?.addEventListener("pointerdown", (e) => {
-    if (scroll && scroll.scrollTop > 0) return;
+  const setDragY = (px) => {
+    if (!sheet) return;
+    sheet.style.setProperty("--dp-drag-y", `${px}px`);
+  };
+
+  dragHit?.addEventListener("pointerdown", (e) => {
+    if (!sheet || !scroll) return;
+    if (scroll.scrollTop > 0) return;
+
     startY = e.clientY;
     dy = 0;
     dragging = true;
+
+    sheet.classList.add("is-dragging");
+    setDragY(0);
+
+    try { dragHit.setPointerCapture(e.pointerId); } catch (_) {}
   });
 
-  sheet?.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
+  dragHit?.addEventListener("pointermove", (e) => {
+    if (!dragging || !sheet) return;
+
     dy = e.clientY - startY;
-    if (dy <= 0) return;
-    sheet.style.transform = `translateY(${dy}px)`;
-  });
+    if (dy <= 0) {
+      setDragY(0);
+      return;
+    }
 
-  sheet?.addEventListener("pointerup", () => {
+    // clamp to keep it stable
+    const clamped = Math.min(dy, 360);
+    setDragY(clamped);
+
+    // prevent scroll while dragging
+    e.preventDefault();
+  }, { passive: false });
+
+  const endDrag = () => {
+    if (!sheet) return;
     dragging = false;
-    sheet.style.transform = "";
-    if (dy > 90) this.hide();
-  });
+
+    sheet.classList.remove("is-dragging");
+
+    const shouldClose = dy > 90;
+    dy = 0;
+
+    // snap back (or close) using the CSS transition
+    setDragY(0);
+    if (shouldClose) this.hide();
+  };
+
+  dragHit?.addEventListener("pointerup", endDrag);
+  dragHit?.addEventListener("pointercancel", endDrag);
 
   this._isInit = true;
 },
+
 // === END BLOCK: DETAILPANEL INIT (syntax-fix + stable close + esc + focus-trap) ===
 
 
@@ -450,6 +492,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
