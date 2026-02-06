@@ -151,39 +151,63 @@ init() {
     try { dragHit.setPointerCapture(e.pointerId); } catch (_) {}
   });
 
-  dragHit?.addEventListener("pointermove", (e) => {
+   dragHit?.addEventListener("pointermove", (e) => {
     if (!dragging || !sheet) return;
 
     dy = e.clientY - startY;
-    if (dy <= 0) {
-      setDragY(0);
-      return;
-    }
 
-    // clamp to keep it stable
-    const clamped = Math.min(dy, 360);
+    // allow both directions; clamp both ways
+    const clamped = Math.max(Math.min(dy, 360), -220);
     setDragY(clamped);
 
-    // prevent scroll while dragging
     e.preventDefault();
   }, { passive: false });
 
-  const endDrag = () => {
+
+   const endDrag = () => {
     if (!sheet) return;
     dragging = false;
 
     sheet.classList.remove("is-dragging");
 
-    const shouldClose = dy > 90;
+    const moved = dy;
     dy = 0;
 
-    // snap back (or close) using the CSS transition
+    // thresholds
+    const CLOSE_T = 90;     // down
+    const UP_T = -70;       // up
+
+    // current base state
+    const base = getComputedStyle(sheet).getPropertyValue("--dp-base-y").trim();
+
+    const setBase = (v) => sheet.style.setProperty("--dp-base-y", v);
+
+    // snap decision
+    if (moved > CLOSE_T) {
+      setDragY(0);
+      this.hide();
+      return;
+    }
+
+    if (moved < UP_T) {
+      // swipe up -> FULL
+      setDragY(0);
+      setBase("0px");
+      return;
+    }
+
+    // otherwise snap back to current state (HALF or FULL)
     setDragY(0);
-    if (shouldClose) this.hide();
+    if (base === "0px") {
+      setBase("0px");
+    } else {
+      setBase("40vh"); // HALF
+    }
   };
 
   dragHit?.addEventListener("pointerup", endDrag);
   dragHit?.addEventListener("pointercancel", endDrag);
+
 
   this._isInit = true;
 },
@@ -192,23 +216,35 @@ init() {
 
 
 
+// === BEGIN BLOCK: DETAILPANEL SHOW (snap default HALF) ===
+// Zweck: Panel öffnet im HALF-Snap (60% sichtbar), History-State bleibt wie gehabt.
+// Umfang: Ersetzt show() komplett.
+// ===
 show(event) {
-  if (!this._isInit) this.init();
+  this.init();
+  if (!this.panel) return;
 
-  this._lastFocusEl = document.activeElement;
+  this._render(event);
 
-  this.renderContent(event);
+  // start at HALF (60% visible)
+  const sheet = this.panel.querySelector(".detail-panel-content");
+  sheet?.style.setProperty("--dp-drag-y", "0px");
+  sheet?.style.setProperty("--dp-base-y", "40vh"); // 60% sichtbar
 
   this.panel.classList.remove("hidden");
   this.panel.classList.add("active");
   this.panel.setAttribute("aria-hidden", "false");
 
-  document.body.classList.add("is-panel-open");
+  if (!history.state?.detailOpen) {
+    history.pushState({ ...(history.state || {}), detailOpen: true }, "");
+  }
 
-  history.pushState({ detailOpen: true }, "");
-
-  this.closeBtn?.focus();
+  // focus close after open transition
+  const focusClose = () => this.closeBtn?.focus({ preventScroll: true });
+  this.panel.addEventListener("transitionend", focusClose, { once: true });
 },
+// === END BLOCK: DETAILPANEL SHOW (snap default HALF) ===
+
 
 
    // === BEGIN BLOCK: DETAILPANEL HIDE (syntax-fix + history-safe) ===
@@ -492,6 +528,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
