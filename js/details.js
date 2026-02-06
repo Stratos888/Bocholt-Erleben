@@ -170,7 +170,7 @@ show(event) {
     return;
  
   this._lastFocusEl?.focus();
-},
+}
 
 
   _hideNow() {
@@ -437,6 +437,7 @@ debugLog("DetailPanel loaded (global export OK)", {
 /* === END BLOCK: DETAILPANEL LOAD + GLOBAL EXPORT (window.DetailPanel) === */
 
 /* === END BLOCK: DETAILPANEL MODULE (UX hardened, single-init, focus restore) === */
+
 
 
 
