@@ -281,17 +281,20 @@
       try { this.dragHit?.setPointerCapture(e.pointerId); } catch (_) {}
     },
 
+       /* === BEGIN PATCH: DOWNWARD DRAG ONLY (disable upward expand) === */
     _onDragMove(e) {
       if (!this._drag.dragging || !this.sheet) return;
 
       this._drag.dy = e.clientY - this._drag.startY;
 
-      // allow both directions; clamp
-      const clamped = clamp(this._drag.dy, -220, 360);
+      // only allow downward movement
+      const clamped = clamp(this._drag.dy, 0, 360);
       this.setDragY(clamped);
 
       e.preventDefault();
     },
+    /* === END PATCH: DOWNWARD DRAG ONLY (disable upward expand) === */
+
 
     _onDragEnd() {
       if (!this.sheet) return;
@@ -304,21 +307,16 @@
       this.sheet.classList.remove("is-dragging");
 
       // thresholds
-      const CLOSE_T = 90;   // down closes
-      const UP_T = -70;     // up expands
+           /* === BEGIN PATCH: REMOVE UPWARD EXPAND LOGIC === */
+      const CLOSE_T = 90;   // down closes only
 
       if (moved > CLOSE_T) {
         this.setDragY(0);
         this.hide();
         return;
       }
+      /* === END PATCH: REMOVE UPWARD EXPAND LOGIC === */
 
-      if (moved < UP_T) {
-        // FULL
-        this.setDragY(0);
-        this.setBase("0px");
-        return;
-      }
 
       // snap back to current base (HALF or FULL)
       const base = getComputedStyle(this.sheet).getPropertyValue("--dp-base-y").trim();
@@ -407,3 +405,4 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
