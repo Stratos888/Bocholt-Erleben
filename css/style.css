@@ -1504,25 +1504,24 @@ body.is-panel-open { overflow: hidden; }
 }
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
-/* === BEGIN PATCH: DETAIL PANEL OVERLAY – CALM DIM WITHOUT BLUR
-Zweck: Ruhiger, moderner, seriöser Hintergrund wie in Top-Apps (kein Glas/Blur).
+/* === BEGIN BLOCK: DETAIL PANEL OVERLAY (CALM DIM, NO BLUR) ===
+Zweck: Ruhiger, moderner, seriöser Hintergrund wie in Top-Apps: Dim-Layer ohne Blur.
 Umfang: Nur #event-detail-panel .detail-panel-overlay
 === */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: rgba(17, 24, 39, 0.32);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-/* === END PATCH: DETAIL PANEL OVERLAY – CALM DIM WITHOUT BLUR === */
 
-  background: var(--color-surface);
+  /* Dim statt Glas: Kontext bleibt erkennbar */
+  background: rgba(17, 24, 39, 0.32);
+
+  /* Kein Blur */
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* === END PATCH: DETAIL PANEL OVERLAY – REMOVE GLASS (make background solid white) === */
+/* === END BLOCK: DETAIL PANEL OVERLAY (CALM DIM, NO BLUR) === */
+
 
 
 /* === BEGIN PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED)
@@ -1593,7 +1592,6 @@ Umfang: Nur DetailPanel Content Transition während Drag.
 }
 /* === END BLOCK: DETAILPANEL DRAG TRANSITION GUARD === */
 
-}
 
 /* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
 
@@ -2247,6 +2245,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
