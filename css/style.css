@@ -1504,14 +1504,20 @@ body.is-panel-open { overflow: hidden; }
 }
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
+/* === BEGIN PATCH: DETAIL PANEL OVERLAY – REMOVE GLASS (make background solid white)
+Zweck: Kein Blur/Glas-Effekt mehr beim Öffnen/Drag; Overlay-Fläche ist durchgehend weiß.
+Umfang: Nur #event-detail-panel .detail-panel-overlay
+=== */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: rgba(17, 24, 39, 0.32);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: var(--color-surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
+/* === END PATCH: DETAIL PANEL OVERLAY – REMOVE GLASS (make background solid white) === */
+
 
 /* === BEGIN PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED)
 Proof:
@@ -2215,6 +2221,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
