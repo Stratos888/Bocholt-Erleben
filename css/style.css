@@ -1540,17 +1540,22 @@ Umfang:
 Zweck: Panel ist immer am unteren Rand „angedockt“ (Bottom-Sheet), nicht schwebend.
 Umfang: Nur #event-detail-panel .detail-panel-content
 === */
+/* === BEGIN PATCH: DETAIL PANEL CONTENT – FORCE FULL HEIGHT (ROOT-CAUSE FIX)
+Zweck: Sheet darf nie nur Content-Höhe haben (führt zu Floating/Offscreen).
+Beweis: height war 253px < translateY(40vh≈258px) → komplett verschwunden.
+Fix: Immer 100% Höhe, JS-Transform bleibt unverändert.
+=== */
 #event-detail-panel .detail-panel-content{
   --dp-base-y: 100%;
   --dp-drag-y: 0px;
 
   position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
 
-  width: 100%;
-  max-height: 92vh;
+  height: 100%;
+  max-height: 100%;
 
   background: var(--color-surface);
 
@@ -1566,6 +1571,8 @@ Umfang: Nur #event-detail-panel .detail-panel-content
 
   overscroll-behavior: contain;
 }
+/* === END PATCH: DETAIL PANEL CONTENT – FORCE FULL HEIGHT (ROOT-CAUSE FIX) === */
+
 /* === END PATCH: DETAIL PANEL CONTENT – ANCHOR AS REAL BOTTOM SHEET (no floating) === */
 
 /* === END BLOCK: DETAILPANEL SURFACE (VISIBLE PANEL BACKGROUND – FIX ROOTCAUSE) === */
@@ -2234,6 +2241,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
