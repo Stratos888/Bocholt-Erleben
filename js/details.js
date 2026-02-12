@@ -522,22 +522,57 @@
            renderContent(event) {
       const vm = toEventDetailVM(event);
 
-      const renderAction = (a) => {
+          const renderAction = (a) => {
         if (!a || typeof a !== "object") return "";
-        const label = escapeHtml(a.label || "");
 
+        const rawLabel = String(a.label || "").trim();
+        const label = escapeHtml(rawLabel);
+
+        const key = rawLabel.toLowerCase();
+        const icon =
+          (a.type === "calendar") ? "📅" :
+          (key.includes("teilen") || key.includes("whatsapp")) ? "💬" :
+          (key.includes("route") || key.includes("navigation")) ? "🧭" :
+          (key.includes("website") || key.includes("web")) ? "🔗" :
+          "⚡";
+
+        // calendar stays a button (chooser logic hooks on data-action="calendar")
         if (a.type === "calendar") {
-          // Render as button; click handler is attached after render (ICS download)
-          return `<button class="detail-actionbar-btn" type="button" data-action="calendar">${label}</button>`;
+          return `
+            <button
+              class="detail-actionbar-btn is-icon"
+              type="button"
+              data-action="calendar"
+              aria-label="${label || "Kalender"}"
+              title="${label || "Kalender"}"
+            >
+              <span class="detail-actionbar-icon" aria-hidden="true">${icon}</span>
+              <span class="detail-sr-only">${label || "Kalender"}</span>
+            </button>
+          `;
         }
 
+        // all href-actions stay links (open external)
         if (a.href) {
           const href = escapeHtml(a.href);
-          return `<a class="detail-actionbar-btn" href="${href}" target="_blank" rel="noopener">${label}</a>`;
+          return `
+            <a
+              class="detail-actionbar-btn is-icon"
+              href="${href}"
+              target="_blank"
+              rel="noopener"
+              aria-label="${label || "Aktion"}"
+              title="${label || "Aktion"}"
+            >
+              <span class="detail-actionbar-icon" aria-hidden="true">${icon}</span>
+              <span class="detail-sr-only">${label || "Aktion"}</span>
+            </a>
+          `;
         }
 
         return "";
       };
+
 
            const actionsForBar = (Array.isArray(vm.actions) ? vm.actions : [])
         // Avoid redundancy: if the Location row already links to homepage, hide "Website" in the actionbar
@@ -723,6 +758,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
