@@ -80,17 +80,46 @@
     return iconMap[c] || "🗓️";
   };
 
+  // === BEGIN BLOCK: LOCATION HOMEPAGE LOOKUP (robust matching) ===
+  // Zweck: Homepage lookup robust gegen Klammerzusätze / Stadtteil-Suffixe, ohne Datenmodell zu ändern
+  // Umfang: Nur getLocationHomepage + interne Normalisierung (keine DOM/Side-Effects)
+  const normalizeLocationForLookup = (s) => {
+    const raw = trimOrEmpty(s);
+    if (!raw) return "";
+
+    // remove any parenthetical suffix like " (Innenstadt)"
+    let out = raw.replace(/\s*\([^)]*\)\s*/g, " ").replace(/\s+/g, " ").trim();
+
+    // remove trailing separators
+    out = out.replace(/\s*[-–,;:]\s*$/g, "").trim();
+
+    return out;
+  };
+
   const getLocationHomepage = (locationName) => {
     const name = trimOrEmpty(locationName);
     if (!name) return "";
+
     try {
       if (window.Locations && typeof window.Locations.getHomepage === "function") {
-        const url = window.Locations.getHomepage(name);
-        return normalizeHttpUrl(url);
+        // Try multiple keys, from most specific to more normalized
+        const candidates = [
+          name,
+          normalizeLocationForLookup(name),
+        ].filter(Boolean);
+
+        for (const c of candidates) {
+          const url = window.Locations.getHomepage(c);
+          const norm = normalizeHttpUrl(url);
+          if (norm) return norm;
+        }
       }
     } catch (_) {}
+
     return "";
   };
+  // === END BLOCK: LOCATION HOMEPAGE LOOKUP (robust matching) ===
+
 
   const splitTimeRange = (raw) => {
     const t = trimOrEmpty(raw);
@@ -689,6 +718,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
