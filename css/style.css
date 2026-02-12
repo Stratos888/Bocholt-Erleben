@@ -1797,14 +1797,56 @@ Root Cause:
 }
 
 /* Meta (Datum/Uhrzeit) – nicht boxed */
-#event-detail-panel .detail-meta{
-  margin: 16px 0 14px;
+/* === BEGIN BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) ===
+Zweck: Meta-Infos (Ort/Datum/Zeit) als Chips für bessere Scanbarkeit, konsistent zu SVG-Line-Icons
+Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg.is-chip
+=== */
 
+#event-detail-panel .detail-meta{
+  /* legacy fallback – sollte nicht mehr gerendert werden, aber bleibt harmless */
+  margin: 16px 0 14px;
   font-size: 14px;
   line-height: 1.4;
   font-weight: 650;
   color: rgba(31,41,51,0.78);
 }
+
+#event-detail-panel .detail-meta-chips{
+  margin: 16px 0 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#event-detail-panel .detail-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  height: 32px;
+  padding: 0 12px;
+
+  border-radius: 999px;
+  background: rgba(31,41,51,0.06);
+  color: rgba(31,41,51,0.86);
+
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 750;
+}
+
+#event-detail-panel .detail-chip-text{
+  white-space: nowrap;
+}
+
+#event-detail-panel .detail-icon-svg.is-chip{
+  width: 16px;
+  height: 16px;
+  color: rgba(31,41,51,0.82);
+}
+
+/* === END BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) === */
+
 
 /* Beschreibung */
 #event-detail-panel .detail-description{
@@ -2412,6 +2454,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
