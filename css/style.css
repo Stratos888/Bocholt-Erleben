@@ -1827,7 +1827,7 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
   /* geordnet statt „zufällig umbrochen“ */
   display: grid;
-  grid-template-columns: max-content max-content;
+    grid-template-columns: 1fr 1fr;
   gap: 8px;
   align-items: center;
 }
@@ -1839,6 +1839,9 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
 /* Chip-Design konsistent */
 #event-detail-panel .detail-chip{
+     min-width: 0;
+  max-width: 100%;
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1857,7 +1860,11 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
 #event-detail-panel .detail-chip-text{
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
+
 
 #event-detail-panel .detail-icon-svg.is-chip{
   width: 16px;
@@ -2508,6 +2515,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
