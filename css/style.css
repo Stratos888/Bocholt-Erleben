@@ -1750,6 +1750,17 @@ Root Cause:
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Nicht klickbar: visuell “Info-Zeile”, kein Button-Feeling */
+#event-detail-panel .detail-location-action.is-static{
+  opacity: 0.82;
+  transform: none !important;
+}
+#event-detail-panel .detail-location-action.is-static:active{
+  background: transparent;
+  transform: none;
+}
+
+
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
   opacity: 0.85;
@@ -1863,10 +1874,15 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
   margin: 12px 0 14px;
 
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.6;
   color: rgba(31,41,51,0.86);
+
+  /* future-proof: lange Texte + Zeilenumbrüche sauber */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 #event-detail-panel .detail-description:empty{ display: none; }
+
 
 /* === BEGIN BLOCK: DETAILPANEL ACTIONS + CALENDAR CHOOSER (premium, quiet) ===
 Zweck:
@@ -2478,6 +2494,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
