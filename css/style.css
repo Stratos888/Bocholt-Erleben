@@ -2288,36 +2288,67 @@ Umfang:
 }
 /* === END BLOCK: DETAIL PANEL – DESKTOP MODAL (CSS-only, mobile unchanged) === */
 
-/* Small screens */
+/* === BEGIN BLOCK: DETAILPANEL SMALL SCREENS (3-zone compatible) ===
+Zweck:
+- Keine Rückkehr zum alten Modell (#detail-content als Scroll-Element).
+- 3-Zonen bleiben: .detail-panel-body scrollt, Actionbar bleibt unten.
+Umfang:
+- Nur Mobile <= 360px.
+=== */
 @media (max-width: 360px){
+  /* Sheet bleibt full-height; keine max-height/padding, die die Actionbar “wegdrücken” */
   #event-detail-panel .detail-panel-content{
-    max-height: 85vh;
-    padding: 14px 14px 16px;
+    max-height: 100%;
+    padding: 0;
   }
+
+  /* Scroll-Container ist .detail-panel-body */
+  #event-detail-panel .detail-panel-body{
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* Inhalt braucht oben Luft wegen Handle/Close – bleibt im Content */
   #event-detail-panel #detail-content{
     padding-top: 38px;
-    max-height: calc(85vh - 16px);
+    max-height: none;
   }
+
   #event-detail-panel .detail-header h2{
     font-size: 18px;
   }
 }
+/* === END BLOCK: DETAILPANEL SMALL SCREENS (3-zone compatible) === */
 
 
-/* Safe-area bottom padding (iOS) + Tabbar-Puffer (Android/iOS) */
+
+/* === BEGIN BLOCK: DETAILPANEL SAFE-AREA + TABBAR PADDING (3-zone compatible) ===
+Zweck:
+- Safe-Area/Tabbar-Puffer darf NICHT mehr auf #detail-content zielen (altes Modell).
+- Puffer gehört in den Scroll-Body, weil die Actionbar eine eigene Zone ist.
+Umfang:
+- Nur Mobile/PWA (<= 899px) und nur wenn env() verfügbar ist.
+=== */
 @supports (padding: max(0px)){
-  /* nur Mobile/PWA: Desktop-Modal bleibt unberührt */
   @media (max-width: 899px){
+    /* Kein zusätzliches Padding am Sheet selbst, sonst verschiebt sich die gepinnte Actionbar */
     #event-detail-panel .detail-panel-content{
-      padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+      padding-bottom: 0;
     }
 
-    /* wichtig: das Scroll-Element ist #detail-content → dort muss der Puffer auch ankommen */
+    /* Scrollbereich bekommt Platz für: Actionbar + Tabbar + Safe-Area */
+    #event-detail-panel .detail-panel-body{
+      padding-bottom: calc(12px + 64px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+    }
+
+    /* #detail-content bleibt reiner Inhalt */
     #event-detail-panel #detail-content{
-      padding-bottom: calc(12px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+      padding-bottom: 0;
     }
   }
 }
+/* === END BLOCK: DETAILPANEL SAFE-AREA + TABBAR PADDING (3-zone compatible) === */
+
 
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
@@ -2523,6 +2554,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
