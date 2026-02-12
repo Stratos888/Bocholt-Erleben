@@ -2071,44 +2071,58 @@ Umfang:
 }
 
 /* Buttons inside chooser (supports both variants) */
+/* === BEGIN BLOCK: CALENDAR CHOOSER LIST ITEMS (consistent) ===
+Zweck: Chooser wirkt wie native List Items (ruhig, eindeutig), Cancel separat
+Umfang: detail-calendar-chooser__btn + detail-cal-sheet buttons
+=== */
+
 #event-detail-panel .detail-calendar-chooser__btn,
 #event-detail-panel .detail-cal-sheet button{
   width: 100%;
-  min-height: 48px;
+  min-height: 52px;
 
   border: 0;
-  border-radius: 16px;
+  border-radius: 14px;
 
-  background: rgba(31,41,51,0.04);
+  /* weniger "Button", mehr "List Item" */
+  background: rgba(31,41,51,0.03);
   color: rgba(31,41,51,0.92);
 
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 850;
   text-align: left;
 
-  padding: 12px 14px;
+  padding: 14px 16px;
 
   -webkit-tap-highlight-color: transparent;
-}
 
-#event-detail-panel .detail-calendar-chooser__btn + .detail-calendar-chooser__btn{
-  margin-top: 10px;
-}
-#event-detail-panel .detail-cal-sheet button + button{
-  margin-top: 10px;
+  /* divider-look ohne echte Border-Lines im Sheet */
+  box-shadow: 0 1px 0 rgba(31,41,51,0.06) inset;
 }
 
 #event-detail-panel .detail-calendar-chooser__btn:active,
 #event-detail-panel .detail-cal-sheet button:active{
-  background: rgba(31,41,51,0.07);
-  transform: translateY(1px);
+  background: rgba(31,41,51,0.06);
+  transform: none;
 }
 
-/* Cancel button (richer chooser variant) */
-#event-detail-panel .detail-calendar-chooser__btn.is-cancel{
-  background: rgba(31,41,51,0.03);
-  color: rgba(31,41,51,0.72);
+/* Standard: keine großen Abstände zwischen Items */
+#event-detail-panel .detail-calendar-chooser__btn + .detail-calendar-chooser__btn,
+#event-detail-panel .detail-cal-sheet button + button{
+  margin-top: 8px;
 }
+
+/* Cancel (beide Varianten) */
+#event-detail-panel .detail-calendar-chooser__btn.is-cancel,
+#event-detail-panel .detail-cal-sheet button[data-cal="close"]{
+  margin-top: 12px;
+  background: rgba(31,41,51,0.02);
+  color: rgba(31,41,51,0.74);
+  box-shadow: none;
+}
+
+/* === END BLOCK: CALENDAR CHOOSER LIST ITEMS (consistent) === */
+
 
 /* === END BLOCK: DETAILPANEL ACTIONS + CALENDAR CHOOSER (premium, quiet) === */
 
@@ -2494,6 +2508,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
