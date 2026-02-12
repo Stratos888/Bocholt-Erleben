@@ -551,7 +551,7 @@
 
       this.content.innerHTML = html;
 
-      // Wire calendar action (ICS download) — minimal, self-contained
+           // Wire calendar action — Google Calendar first, ICS fallback
       const calBtn = this.content.querySelector('[data-action="calendar"]');
       if (calBtn) {
         calBtn.addEventListener("click", () => {
@@ -561,11 +561,82 @@
 
           const pad2 = (n) => String(n).padStart(2, "0");
           const ymd = String(p.date).trim().replaceAll("-", "");
-          const hasTime = Boolean(p.startTime && /^\d{1,2}:\d{2}$/.test(String(p.startTime).trim()));
+          const timeOk = (t) => /^\d{1,2}:\d{2}$/.test(String(t || "").trim());
+
+          const toGoogleDateTime = (dateYmd, hhmm) => {
+            const [hh, mm] = String(hhmm).trim().split(":").map(x => parseInt(x, 10));
+            return `${dateYmd}T${pad2(hh)}${pad2(mm)}00`;
+          };
+
+          const buildGoogleCalendarUrl = () => {
+            const title = String(p.title || "").trim();
+            const location = String(p.location || "").trim();
+            const details = String(p.description || "").trim();
+
+            const hasStart = timeOk(p.startTime);
+            const hasEnd = timeOk(p.endTime);
+
+            let datesParam = "";
+
+            if (hasStart) {
+              const start = toGoogleDateTime(ymd, p.startTime);
+
+              let end = "";
+              if (hasEnd) {
+                end = toGoogleDateTime(ymd, p.endTime);
+              } else {
+                // default duration 60 minutes if no end time
+                const [hh, mm] = String(p.startTime).trim().split(":").map(x => parseInt(x, 10));
+                const d = new Date(Date.UTC(2000, 0, 1, hh, mm, 0));
+                const d2 = new Date(d.getTime() + 60 * 60 * 1000);
+                end = `${ymd}T${pad2(d2.getUTCHours())}${pad2(d2.getUTCMinutes())}00`;
+              }
+
+              datesParam = `${start}/${end}`;
+            } else {
+              // all-day: end is next day
+              const yyyy = parseInt(ymd.slice(0, 4), 10);
+              const mm = parseInt(ymd.slice(4, 6), 10) - 1;
+              const dd = parseInt(ymd.slice(6, 8), 10);
+              const d = new Date(Date.UTC(yyyy, mm, dd));
+              const d2 = new Date(d.getTime() + 24 * 60 * 60 * 1000);
+              const y2 = d2.getUTCFullYear();
+              const m2 = pad2(d2.getUTCMonth() + 1);
+              const dday2 = pad2(d2.getUTCDate());
+              const endYmd = `${y2}${m2}${dday2}`;
+              datesParam = `${ymd}/${endYmd}`;
+            }
+
+            const params = new URLSearchParams();
+            params.set("action", "TEMPLATE");
+            params.set("text", title);
+            params.set("dates", datesParam);
+            if (details) params.set("details", details);
+            if (location) params.set("location", location);
+
+            return `https://calendar.google.com/calendar/render?${params.toString()}`;
+          };
+
+          const tryOpen = (url) => {
+            try {
+              const w = window.open(url, "_blank", "noopener");
+              return Boolean(w);
+            } catch (_) {
+              return false;
+            }
+          };
+
+          const googleUrl = buildGoogleCalendarUrl();
+          const opened = tryOpen(googleUrl);
+
+          if (opened) return;
+
+          // Fallback: ICS download (previous behavior)
+          const hasTime = Boolean(p.startTime && timeOk(p.startTime));
 
           const dt = (dateYmd, hhmm) => {
             if (!hhmm) return `${dateYmd}`;
-            const [hh, mm] = hhmm.split(":").map(x => parseInt(x, 10));
+            const [hh, mm] = String(hhmm).trim().split(":").map(x => parseInt(x, 10));
             return `${dateYmd}T${pad2(hh)}${pad2(mm)}00`;
           };
 
@@ -574,11 +645,10 @@
 
           if (hasTime) {
             dtStart = dt(ymd, String(p.startTime).trim());
-            const endOk = Boolean(p.endTime && /^\d{1,2}:\d{2}$/.test(String(p.endTime).trim()));
+            const endOk = Boolean(p.endTime && timeOk(p.endTime));
             dtEnd = endOk ? dt(ymd, String(p.endTime).trim()) : "";
           } else {
-            // All-day fallback: DTEND = next day (simple +1 day)
-            // Use UTC date math to avoid DST edge cases for date-only values
+            // All-day fallback: DTEND = next day
             const yyyy = parseInt(ymd.slice(0, 4), 10);
             const mm = parseInt(ymd.slice(4, 6), 10) - 1;
             const dd = parseInt(ymd.slice(6, 8), 10);
@@ -628,6 +698,8 @@
         });
       }
 
+      }
+
       // reset scroll on open
       this.content.scrollTop = 0;
     },
@@ -648,6 +720,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
