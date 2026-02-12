@@ -1670,20 +1670,28 @@ Umfang: Nur Styles für die JS-injizierte Hit-Area.
 
 /* === BEGIN BLOCK: DETAILPANEL CONTENT FILL FIX (remove gray bottom gap)
 Zweck:
-- Content soll die komplette Panelhöhe füllen
-- verhindert sichtbaren “grauen Streifen” unten
-Root Cause:
-- max-height 82vh begrenzte Content künstlich
+- Nach der 3-Zonen-HTML-Struktur: .detail-panel-body ist der Scroll-Container
+- #detail-content ist nur noch Inhalt (kein eigenes overflow/height), damit die Actionbar nicht „weg“ ist
+Umfang:
+- #event-detail-panel .detail-panel-body (scroll)
+- #event-detail-panel #detail-content (kein scroll-container mehr)
 === */
-#event-detail-panel #detail-content{
-  padding-top: 40px;
-
+#event-detail-panel .detail-panel-body{
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+/* #detail-content ist Inhalt, nicht Scroll-Viewport */
+#event-detail-panel #detail-content{
+  padding-top: 40px;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
 /* === END BLOCK: DETAILPANEL CONTENT FILL FIX === */
+
 
 
 #event-detail-panel .detail-header{
@@ -1919,41 +1927,33 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- 3-Zonen Detailpanel: Header (oben), Body (scroll), Actionbar (fix unten im Sheet)
-- Robust gegen Clipping/Overflow: Actionbar wird innerhalb des Sheets absolut gepinnt
-- Scroll-Content erhält Bottom-Padding in Actionbar-Höhe + Safe-Area
-
+- Actionbar ist eine eigene Zone außerhalb des Scroll-Contents und immer sichtbar
+- Robust: im Sheet unten gepinnt (absolute), unabhängig von Sticky/Overflow-Eigenheiten
+- Icons hart begrenzt (SVG/IMG)
 Umfang:
-- .detail-panel-content / .detail-panel-body
-- #detail-actionbar-slot + Buttons + Icon Hard-Limit
+- .detail-panel-content als Position-Container
+- .detail-panel-body bekommt Bottom-Padding für Actionbar
+- #detail-actionbar-slot + Buttons + Icon sizing
 === */
 
-/* Sheet als Container für absolute Actionbar */
+/* Sheet als Position-Container für die gepinnte Actionbar */
 #event-detail-panel .detail-panel-content{
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  position: absolute; /* bleibt kompatibel zu eurer translateY Bottom-Sheet Mechanik */
+  inset: 0;
 }
 
-/* Nur der Body scrollt – wichtig: min-height:0, sonst „drückt“ Content nach unten */
+/* Scroll-Body: Platz unten für Actionbar + Safe-Area */
 #event-detail-panel .detail-panel-body{
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-
-  /* Platz für Actionbar + Safe-Area */
-  padding-bottom: calc(64px + max(0px, env(safe-area-inset-bottom)) + 12px);
+  padding-bottom: calc(64px + 12px + max(0px, env(safe-area-inset-bottom)));
 }
 
-/* Actionbar IM Sheet unten festpinnen (unabhängig von sticky/overflow edge cases) */
+/* Actionbar unten im Sheet pinnen */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-
-  z-index: 5;
+  z-index: 20;
 
   height: 64px;
   padding: 10px 12px calc(10px + max(0px, env(safe-area-inset-bottom)));
@@ -1961,13 +1961,12 @@ Umfang:
   display: flex;
   gap: 10px;
   align-items: center;
-  justify-content: flex-start;
 
   background: var(--color-surface);
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(31,41,51,0.06);
 }
 
-/* Icon-Buttons */
+/* Buttons */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
@@ -1986,7 +1985,7 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-/* HARD LIMIT: Icons dürfen NIE skalieren */
+/* Icons: NIE groß werden */
 #detail-actionbar-slot svg,
 #detail-actionbar-slot img{
   width: 18px !important;
@@ -2000,9 +1999,6 @@ Umfang:
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
 
-
-
-/* Secondary Website Link (konsolidiert) */
 #event-detail-panel .detail-secondary-link,
 #event-detail-panel .detail-secondary-link:link,
 #event-detail-panel .detail-secondary-link:visited{
@@ -2527,6 +2523,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
