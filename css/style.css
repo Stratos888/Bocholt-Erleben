@@ -1832,32 +1832,35 @@ Umfang:
 }
 
 /* New Actionbar */
-/* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH === */
+/* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
+Zweck:
+- Actionbar als kompakte Icon-Buttons (Top-App Look), ohne Breitenprobleme.
+- Labels bleiben für Screenreader (a11y) erhalten.
+Umfang:
+- Nur #event-detail-panel .detail-actionbar + .detail-actionbar-btn + sr-only helper.
+=== */
 
 /* ruhiger Abstand */
 #event-detail-panel .detail-actionbar{
   margin-top: 16px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-/* echte "App Pills" statt Web-Buttons */
+/* Icon-Buttons: stabil, kompakt, appig */
 #event-detail-panel .detail-actionbar-btn{
   flex: 0 0 auto;
 
-  height: 38px;
-  padding: 0 14px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
 
-  border-radius: 999px;
+  border-radius: 14px;
   border: 0;
 
   background: rgba(31,41,51,0.06);
   color: rgba(31,41,51,0.92);
-
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
 
   display: inline-flex;
   align-items: center;
@@ -1869,18 +1872,33 @@ Umfang:
   transition: background .12s ease, transform .08s ease;
 }
 
-/* subtle press feedback – wie native */
 #event-detail-panel .detail-actionbar-btn:active{
   background: rgba(31,41,51,0.10);
   transform: scale(0.97);
 }
 
-/* erster Button (Kalender) minimal hervorgehoben */
-#event-detail-panel .detail-actionbar-btn:first-child{
-  background: rgba(31,41,51,0.10);
+/* Icon optisch konsistent */
+#event-detail-panel .detail-actionbar-icon{
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(0.5px);
+}
+
+/* Screenreader-only (lokal fürs Detailpanel) */
+#event-detail-panel .detail-sr-only{
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 /* Secondary Website Link (konsolidiert) */
@@ -2385,6 +2403,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
