@@ -11,7 +11,7 @@
 (() => {
   "use strict";
 
-   // === BEGIN BLOCK: DETAILPANEL HELPERS (pure utils) ===
+    // === BEGIN BLOCK: DETAILPANEL HELPERS (pure utils) ===
   // Zweck: Kleine Hilfsfunktionen + Normalisierung in ein Detail-ViewModel (defensiv, keine Seiteneffekte)
   // Umfang: Nur Helper + VM Builder (keine DOM-Operationen)
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -28,14 +28,45 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
+  const isSafeHttpUrl = (url) => {
+    const u = trimOrEmpty(url);
+    if (!u) return false;
+    try {
+      const parsed = new URL(u, window.location.origin);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const normalizeHttpUrl = (url) => (isSafeHttpUrl(url) ? trimOrEmpty(url) : "");
+
   const toMapsUrl = (q) => {
     const query = trimOrEmpty(q);
     if (!query) return "";
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   };
 
-  const getCategoryIcon = (category) => {
-    const c = trimOrEmpty(category);
+  const normalizeCategory = (raw) => {
+    // canonical keys for later use (UI can stay on display/raw for now)
+    const r = trimOrEmpty(raw);
+    if (!r) return { raw: "", canonical: "" };
+
+    const map = {
+      "Musik": "music",
+      "Kultur": "culture",
+      "Essen & Trinken": "food",
+      "Sport": "sports",
+      "Familie": "family",
+      "Natur & Draußen": "nature",
+      "Innenstadt & Leben": "citylife",
+    };
+
+    return { raw: r, canonical: map[r] || "other" };
+  };
+
+  const getCategoryIcon = (categoryRaw) => {
+    const c = trimOrEmpty(categoryRaw);
     if (!c) return "";
     const iconMap = {
       "Musik": "🎵",
@@ -55,7 +86,7 @@
     try {
       if (window.Locations && typeof window.Locations.getHomepage === "function") {
         const url = window.Locations.getHomepage(name);
-        return trimOrEmpty(url);
+        return normalizeHttpUrl(url);
       }
     } catch (_) {}
     return "";
@@ -94,8 +125,10 @@
       return startTime || "";
     })();
 
-    const categoryRaw = trimOrEmpty(e.category || e.kategorie || "");
-    const categoryDisplay = categoryRaw;
+    const cat = normalizeCategory(e.category || e.kategorie || "");
+    const categoryRaw = cat.raw;
+    const categoryCanonical = cat.canonical;
+    const categoryDisplay = categoryRaw; // keep current UI stable
     const icon = getCategoryIcon(categoryDisplay);
 
     const locationName = trimOrEmpty(e.locationName || e.location || e.ort || "");
@@ -105,9 +138,19 @@
     const desc = trimOrEmpty(e.description || e.beschreibung || "");
 
     const homepage = getLocationHomepage(locationName);
-    const maps = toMapsUrl([locationName, city].filter(Boolean).join(" "));
+
+    // Keep existing behavior: if we have a locationName, build query with city; otherwise no maps (avoid random city-only links)
+    const mapsQuery = locationName ? [locationName, city].filter(Boolean).join(" ") : "";
+    const maps = mapsQuery ? toMapsUrl(mapsQuery) : "";
+
+    // Future-proof fields (not used by current UI yet; keeps render stable)
+    const actions = [
+      ...(homepage ? [{ type: "website", href: homepage, label: "Website", primary: false }] : []),
+      ...(maps ? [{ type: "map", href: maps, label: "Karte", primary: false }] : []),
+    ];
 
     return {
+      // current render fields (must remain stable)
       title,
       city,
       date,
@@ -123,13 +166,15 @@
       desc,
       homepage,
       maps,
-      actions: [
-        ...(homepage ? [{ type: "website", href: homepage, label: "Website" }] : []),
-        ...(maps ? [{ type: "map", href: maps, label: "Karte" }] : []),
-      ],
+      actions,
+
+      // additional internal fields for later steps (no UI impact now)
+      categoryCanonical,
+      mapsQuery,
     };
   };
   // === END BLOCK: DETAILPANEL HELPERS (pure utils) ===
+
 
 
   // === BEGIN BLOCK: DETAILPANEL MODULE (single object) ===
@@ -450,5 +495,6 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
