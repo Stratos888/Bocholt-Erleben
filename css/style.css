@@ -1917,85 +1917,7 @@ Umfang:
 }
 
 /* New Actionbar */
-/* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
-Zweck:
-- Actionbar als kompakte Icon-Buttons (Top-App Look)
-- Unten Safe-Area/System-UI Puffer, damit nichts von Android/iOS UI überdeckt wird
-- Funktioniert auch bei längerer Beschreibung (Scroll bis über Actionbar hinaus)
-Umfang:
-- #event-detail-panel .detail-panel-inner + .detail-actionbar + .detail-actionbar-btn + .detail-icon-svg + sr-only helper
-=== */
-
-/* WICHTIG: Platz unten, damit Actionbar nicht unter System-/Browser-UI verschwindet */
-#event-detail-panel .detail-panel-inner{
-  padding-bottom: calc(16px + max(0px, env(safe-area-inset-bottom)));
-}
-
-/* Actionbar */
-#event-detail-panel .detail-actionbar{
-  margin-top: 16px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* Icon-Buttons */
-#event-detail-panel .detail-actionbar-btn{
-  flex: 0 0 auto;
-
-  width: 44px;
-  height: 44px;
-  padding: 0;
-
-  border-radius: 14px;
-  border: 0;
-
-  background: rgba(31,41,51,0.06);
-  color: rgba(31,41,51,0.92);
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-
-  transition: background .12s ease, transform .08s ease;
-
-  position: relative; /* fürs sr-only */
-}
-
-#event-detail-panel .detail-actionbar-btn:active{
-  background: rgba(31,41,51,0.10);
-  transform: scale(0.97);
-}
-
-/* SVG Icons */
-#event-detail-panel .detail-icon-svg{
-  width: 18px;
-  height: 18px;
-  display: block;
-  color: rgba(31,41,51,0.92);
-}
-
-#event-detail-panel .detail-icon-svg.is-location{
-  color: rgba(31,41,51,0.82);
-}
-
-/* Screenreader-only */
-#event-detail-panel .detail-sr-only{
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0,0,0,0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-
-/* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+BEGIN BLOCK: ACTIONBAR PREMIUM POL
 
 
 
@@ -2525,6 +2447,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
