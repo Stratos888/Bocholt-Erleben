@@ -522,19 +522,73 @@
            renderContent(event) {
       const vm = toEventDetailVM(event);
 
-          const renderAction = (a) => {
+              const iconSvg = (type) => {
+        // minimal, consistent line-icons (no brand logos)
+        if (type === "calendar") {
+          return `
+            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M7.5 13h3M7.5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          `;
+        }
+
+        if (type === "whatsapp" || type === "share") {
+          return `
+            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3a7 7 0 0 1 7 7c0 3.9-3.1 7-7 7H8l-3.5 3.5.9-4A7 7 0 0 1 12 3z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M9 10h6M9 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          `;
+        }
+
+        if (type === "route") {
+          return `
+            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11 3l10 8-10 10V3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M3 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          `;
+        }
+
+        if (type === "website") {
+          return `
+            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 14l8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M13 6h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          `;
+        }
+
+        // fallback
+        return `
+          <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v20M2 12h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        `;
+      };
+
+      const renderAction = (a) => {
         if (!a || typeof a !== "object") return "";
 
         const rawLabel = String(a.label || "").trim();
-        const label = escapeHtml(rawLabel);
+        const label = escapeHtml(rawLabel || "Aktion");
 
-        const key = rawLabel.toLowerCase();
-        const icon =
-          (a.type === "calendar") ? "📅" :
-          (key.includes("teilen") || key.includes("whatsapp")) ? "💬" :
-          (key.includes("route") || key.includes("navigation")) ? "🧭" :
-          (key.includes("website") || key.includes("web")) ? "🔗" :
-          "⚡";
+        // Map to semantic types for icons (no brand icons)
+        const type =
+          (a.type === "calendar") ? "calendar" :
+          (a.type === "route") ? "route" :
+          (a.type === "website") ? "website" :
+          (a.type === "whatsapp") ? "whatsapp" :
+          "share";
+
+        const icon = iconSvg(type);
 
         // calendar stays a button (chooser logic hooks on data-action="calendar")
         if (a.type === "calendar") {
@@ -543,16 +597,15 @@
               class="detail-actionbar-btn is-icon"
               type="button"
               data-action="calendar"
-              aria-label="${label || "Kalender"}"
-              title="${label || "Kalender"}"
+              aria-label="${label}"
+              title="${label}"
             >
-              <span class="detail-actionbar-icon" aria-hidden="true">${icon}</span>
-              <span class="detail-sr-only">${label || "Kalender"}</span>
+              ${icon}
+              <span class="detail-sr-only">${label}</span>
             </button>
           `;
         }
 
-        // all href-actions stay links (open external)
         if (a.href) {
           const href = escapeHtml(a.href);
           return `
@@ -561,17 +614,18 @@
               href="${href}"
               target="_blank"
               rel="noopener"
-              aria-label="${label || "Aktion"}"
-              title="${label || "Aktion"}"
+              aria-label="${label}"
+              title="${label}"
             >
-              <span class="detail-actionbar-icon" aria-hidden="true">${icon}</span>
-              <span class="detail-sr-only">${label || "Aktion"}</span>
+              ${icon}
+              <span class="detail-sr-only">${label}</span>
             </a>
           `;
         }
 
         return "";
       };
+
 
 
            const actionsForBar = (Array.isArray(vm.actions) ? vm.actions : [])
@@ -604,13 +658,29 @@
                 rel="noopener"
                 aria-label="Website der Location öffnen"
               >
-                <span class="detail-location-icon" aria-hidden="true">📍</span>
+                               <span class="detail-location-icon" aria-hidden="true">
+                  <svg class="detail-icon-svg is-location" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 21V7a2 2 0 0 1 2-2h6v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M12 21V9h6a2 2 0 0 1 2 2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M7 9h2M7 12h2M7 15h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M15 13h2M15 16h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+
                 <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
                 <span class="detail-location-chev" aria-hidden="true">›</span>
               </a>
             ` : `
               <div class="detail-location-action" aria-label="Location">
-                <span class="detail-location-icon" aria-hidden="true">📍</span>
+                                <span class="detail-location-icon" aria-hidden="true">
+                  <svg class="detail-icon-svg is-location" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 21V7a2 2 0 0 1 2-2h6v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M12 21V9h6a2 2 0 0 1 2 2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M7 9h2M7 12h2M7 15h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M15 13h2M15 16h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+
                 <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
               </div>
             `}
@@ -758,6 +828,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
