@@ -378,10 +378,24 @@
       this.sheet.style.setProperty("--dp-drag-y", `${px}px`);
     },
 
+       // === BEGIN BLOCK: SNAP HEIGHT HELPERS (DVH-SAFE) ===
+    // Zweck: Verhindert zu tiefes Panel bei mobiler Browser/System-UI (vh-Bug). Nutzt dvh wenn verfügbar.
+    // Umfang: getHalfSnap + setBase (nur Layout-Parameter, keine Side-Effects)
+    getHalfSnap() {
+      try {
+        if (window.CSS && typeof window.CSS.supports === "function" && window.CSS.supports("height: 1dvh")) {
+          return "40dvh";
+        }
+      } catch (_) {}
+      return "40vh";
+    },
+
     setBase(v) {
       if (!this.sheet) return;
       this.sheet.style.setProperty("--dp-base-y", v);
     },
+    // === END BLOCK: SNAP HEIGHT HELPERS (DVH-SAFE) ===
+
 
     // show starts HALF
     show(event) {
@@ -396,7 +410,8 @@
 
       // set snap start HALF (60% visible => translateY 40vh)
       this.setDragY(0);
-      this.setBase("40vh");
+          this.setBase(this.getHalfSnap());
+
 
       // open
       this.panel.classList.remove("hidden");
@@ -515,7 +530,8 @@
       if (base === "0px") {
         this.setBase("0px");
       } else {
-        this.setBase("40vh");
+               this.setBase(this.getHalfSnap());
+
       }
     },
 
@@ -861,6 +877,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
