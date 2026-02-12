@@ -289,10 +289,19 @@
       this.panel = document.getElementById("event-detail-panel");
       if (!this.panel) return;
 
+           /* === BEGIN BLOCK: DETAILPANEL SLOT REFS (content + actionbar) ===
+      Zweck: Content-Scrollbereich und Actionbar-Slot als getrennte Zonen referenzieren.
+      Umfang: DOM-Refs in init()
+      === */
       this.overlay = this.panel.querySelector(".detail-panel-overlay");
       this.sheet = this.panel.querySelector(".detail-panel-content");
       this.content = this.panel.querySelector("#detail-content");
+      this.actionbarSlot = this.panel.querySelector("#detail-actionbar-slot");
       this.closeBtn = this.panel.querySelector(".detail-panel-close");
+      /* === END BLOCK: DETAILPANEL SLOT REFS (content + actionbar) === */
+
+      
+
 
       // A11y semantics
       this.panel.setAttribute("role", "dialog");
@@ -450,11 +459,22 @@
         try { document.activeElement.blur(); } catch (_) {}
       }
 
-      this.panel.setAttribute("aria-hidden", "true");
+            this.panel.setAttribute("aria-hidden", "true");
       this.panel.classList.remove("active");
       this.panel.classList.add("hidden");
 
+      /* === BEGIN BLOCK: CLEAR ACTIONBAR SLOT ON HIDE ===
+      Zweck: Keine „hängenden“ Actions nach Close; sauberer Zustand beim nächsten Öffnen.
+      Umfang: _hideNow()
+      === */
+      if (this.actionbarSlot) {
+        this.actionbarSlot.innerHTML = "";
+        this.actionbarSlot.hidden = true;
+      }
+      /* === END BLOCK: CLEAR ACTIONBAR SLOT ON HIDE === */
+
       // reset snap vars
+
       this.setDragY(0);
       this.setBase("100%");
 
@@ -773,16 +793,26 @@
 
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
-
-          ${actionsHtml ? `
-            <div class="detail-actionbar" role="group" aria-label="Aktionen">
-              ${actionsHtml}
-            </div>
-          ` : ""}
         </div>
       `;
 
       this.content.innerHTML = html;
+
+      /* === BEGIN BLOCK: ACTIONBAR RENDER INTO SLOT (outside scroll) ===
+      Zweck: Actions immer sichtbar am Sheet-Boden (nicht im Scroll-Content).
+      Umfang: Render-Output in #detail-actionbar-slot + show/hide handling.
+      === */
+      if (this.actionbarSlot) {
+        if (actionsHtml) {
+          this.actionbarSlot.innerHTML = actionsHtml;
+          this.actionbarSlot.hidden = false;
+        } else {
+          this.actionbarSlot.innerHTML = "";
+          this.actionbarSlot.hidden = true;
+        }
+      }
+      /* === END BLOCK: ACTIONBAR RENDER INTO SLOT (outside scroll) === */
+
 
                 // === BEGIN BLOCK: CALENDAR ACTION CHOOSER (device vs google) ===
       const calBtn = this.content.querySelector('[data-action="calendar"]');
@@ -912,6 +942,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
