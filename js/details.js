@@ -818,7 +818,7 @@ END:VCALENDAR`;
         const showChooser = () => {
           const html = `
             <div class="detail-cal-chooser">
-              <div class="detail-cal-backdrop"></div>
+                          <div class="detail-cal-backdrop" data-cal="close"></div>
               <div class="detail-cal-sheet">
                 <button data-cal="device">Gerätekalender</button>
                 <button data-cal="google">Google Kalender</button>
@@ -877,6 +877,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
