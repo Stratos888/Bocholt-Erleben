@@ -1919,92 +1919,72 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar bleibt immer sichtbar (sticky) und wird nicht von iOS/Android UI überdeckt
-- Icons sind immer klein (SVG/IMG hart begrenzen), egal was im Markup steht
-- Content bekommt Bottom-Puffer, damit nichts unter die Actionbar rutscht
+Finale 3-Zonen Architektur:
+Header (fixed)
+Content (scroll only)
+Actionbar (immer sichtbar unten)
+
 Umfang:
-- #event-detail-panel #detail-content (Bottom-Padding)
-- #event-detail-panel .detail-actionbar
-- #event-detail-panel .detail-actionbar-btn + Icon-Sizing
+- Body wird Flex-Column
+- Content scrollt
+- Actionbar bekommt feste Höhe + Safe-Area
 === */
 
-/* Scroll-Content: Platz unten für die sticky Actionbar + Safe-Area */
-#event-detail-panel #detail-content{
-  padding-bottom: calc(20px + 64px + max(0px, env(safe-area-inset-bottom)));
+/* ===== PANEL BODY LAYOUT ===== */
+#event-detail-panel .detail-panel-content{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Actionbar: sticky unten, immer sichtbar */
-#event-detail-panel .detail-actionbar{
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
+/* nur dieser Bereich scrollt */
+#event-detail-panel .detail-panel-body{
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
 
-  margin-top: 16px;
+/* ===== ACTIONBAR (immer sichtbar unten) ===== */
+#detail-actionbar-slot{
+  flex: 0 0 auto;
+
+  height: 64px; /* feste, sichtbare Höhe */
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
 
   display: flex;
   gap: 10px;
-  flex-wrap: nowrap;
+  align-items: center;
 
-  padding: 10px 0 calc(10px + max(0px, env(safe-area-inset-bottom)));
-
-  /* ruhiger Footer-Look */
-  background: linear-gradient(
-    to top,
-    var(--color-surface) 70%,
-    rgba(255,255,255,0) 100%
-  );
+  background: var(--color-surface);
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 
-/* Icon-Buttons */
-#event-detail-panel .detail-actionbar-btn{
-  flex: 0 0 auto;
-
+/* ===== ICON BUTTONS ===== */
+#detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
-  padding: 0;
-
-  border-radius: 14px;
-  border: 0;
-
-  background: rgba(31,41,51,0.06);
-  color: rgba(31,41,51,0.92);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: 14px;
+  border: 0;
 
-  transition: background .12s ease, transform .08s ease;
+  background: rgba(31,41,51,0.06);
 }
 
-#event-detail-panel .detail-actionbar-btn:active{
-  background: rgba(31,41,51,0.10);
-  transform: scale(0.97);
-}
-
-/* HARD GUARD: Icons dürfen NIE riesig werden (SVG/IMG unabhängig vom Markup) */
-#event-detail-panel .detail-actionbar-btn svg,
-#event-detail-panel .detail-actionbar-btn img{
+/* HARD LIMIT: Icons dürfen NIE skalieren */
+#detail-actionbar-slot svg,
+#detail-actionbar-slot img{
   width: 18px !important;
   height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
-
-  display: block;
   flex: 0 0 auto;
-  object-fit: contain;
-}
-
-#event-detail-panel .detail-icon-svg{
-  width: 18px;
-  height: 18px;
-  display: block;
-  color: rgba(31,41,51,0.92);
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 /* Secondary Website Link (konsolidiert) */
 #event-detail-panel .detail-secondary-link,
@@ -2531,6 +2511,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
