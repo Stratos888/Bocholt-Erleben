@@ -526,25 +526,27 @@
             <div class="detail-meta">${escapeHtml([vm.city, vm.date, vm.timeRange].filter(Boolean).join(" · "))}</div>
           </div>
 
-                    ${vm.locationLabel ? `
-            <a
-              class="detail-location-action"
-              href="${escapeHtml(vm.homepage || vm.maps)}"
-              target="_blank"
-              rel="noopener"
-              aria-label="Location öffnen"
-            >
-              <span class="detail-location-icon" aria-hidden="true">📍</span>
-              <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
-              <span class="detail-location-chev" aria-hidden="true">›</span>
-            </a>
-
-            ${(vm.homepage && vm.maps) ? `
-              <a class="detail-secondary-link" href="${escapeHtml(vm.maps)}" target="_blank" rel="noopener">
-                Karte öffnen
+                             ${vm.locationLabel ? `
+            ${vm.homepage ? `
+              <a
+                class="detail-location-action"
+                href="${escapeHtml(vm.homepage)}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Website der Location öffnen"
+              >
+                <span class="detail-location-icon" aria-hidden="true">📍</span>
+                <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
+                <span class="detail-location-chev" aria-hidden="true">›</span>
               </a>
-            ` : ""}
+            ` : `
+              <div class="detail-location-action" aria-label="Location">
+                <span class="detail-location-icon" aria-hidden="true">📍</span>
+                <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
+              </div>
+            `}
           ` : ""}
+
 
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
@@ -687,6 +689,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
