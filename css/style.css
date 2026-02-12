@@ -1809,7 +1809,7 @@ Root Cause:
 
 /* Meta (Datum/Uhrzeit) – nicht boxed */
 /* === BEGIN BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) ===
-Zweck: Meta-Infos (Ort/Datum/Zeit) als Chips – geordnet, ruhig, scanbar (kein zufälliger Wrap)
+Zweck: Meta-Infos (Ort/Datum/Zeit) als Chips – geordnet, ruhig, scanbar (niemals abgeschnitten)
 Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg.is-chip
 === */
 
@@ -1827,9 +1827,14 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
   /* geordnet statt „zufällig umbrochen“ */
   display: grid;
-    grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   align-items: center;
+}
+
+/* Datum bekommt volle Breite → nie abgeschnitten */
+#event-detail-panel .detail-chip[data-chip="date"]{
+  grid-column: 1 / -1;
 }
 
 /* Zeit immer als volle Zeile → wirkt aufgeräumt */
@@ -1839,32 +1844,36 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
 /* Chip-Design konsistent */
 #event-detail-panel .detail-chip{
-     min-width: 0;
+  min-width: 0;
   max-width: 100%;
 
   display: inline-flex;
   align-items: center;
   gap: 8px;
 
-  height: 32px;
-  padding: 0 12px;
+  /* niemals abschneiden -> Chip darf höher werden */
+  height: auto;
+  min-height: 32px;
+  padding: 6px 12px;
 
   border-radius: 999px;
   background: rgba(31,41,51,0.06);
   color: rgba(31,41,51,0.86);
 
   font-size: 13px;
-  line-height: 1;
+  line-height: 1.2;
   font-weight: 750;
 }
 
 #event-detail-panel .detail-chip-text{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* niemals ellipsen */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+
+  overflow-wrap: anywhere;
   min-width: 0;
 }
-
 
 #event-detail-panel .detail-icon-svg.is-chip{
   width: 16px;
@@ -1873,6 +1882,7 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 }
 
 /* === END BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) === */
+
 
 
 
@@ -2515,6 +2525,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
