@@ -551,163 +551,105 @@
 
       this.content.innerHTML = html;
 
-           // Wire calendar action — Google Calendar first, ICS fallback
+                // === BEGIN BLOCK: CALENDAR ACTION CHOOSER (device vs google) ===
       const calBtn = this.content.querySelector('[data-action="calendar"]');
+
       if (calBtn) {
-        calBtn.addEventListener("click", () => {
-          const cal = (Array.isArray(vm.actions) ? vm.actions : []).find(a => a && a.type === "calendar" && a.payload);
-          const p = cal && cal.payload ? cal.payload : null;
-          if (!p || !p.title || !p.date) return;
+        const getPayload = () =>
+          (Array.isArray(vm.actions) ? vm.actions : [])
+            .find(a => a && a.type === "calendar" && a.payload)?.payload || null;
 
+        const openGoogle = (p) => {
           const pad2 = (n) => String(n).padStart(2, "0");
-          const ymd = String(p.date).trim().replaceAll("-", "");
-          const timeOk = (t) => /^\d{1,2}:\d{2}$/.test(String(t || "").trim());
+          const ymd = String(p.date).replaceAll("-", "");
 
-          const toGoogleDateTime = (dateYmd, hhmm) => {
-            const [hh, mm] = String(hhmm).trim().split(":").map(x => parseInt(x, 10));
-            return `${dateYmd}T${pad2(hh)}${pad2(mm)}00`;
-          };
+          const params = new URLSearchParams();
+          params.set("action", "TEMPLATE");
+          params.set("text", p.title);
 
-          const buildGoogleCalendarUrl = () => {
-            const title = String(p.title || "").trim();
-            const location = String(p.location || "").trim();
-            const details = String(p.description || "").trim();
+          if (p.startTime) {
+            const s = `${ymd}T${p.startTime.replace(":", "")}00`;
+            const e = p.endTime
+              ? `${ymd}T${p.endTime.replace(":", "")}00`
+              : s;
 
-            const hasStart = timeOk(p.startTime);
-            const hasEnd = timeOk(p.endTime);
-
-            let datesParam = "";
-
-            if (hasStart) {
-              const start = toGoogleDateTime(ymd, p.startTime);
-
-              let end = "";
-              if (hasEnd) {
-                end = toGoogleDateTime(ymd, p.endTime);
-              } else {
-                // default duration 60 minutes if no end time
-                const [hh, mm] = String(p.startTime).trim().split(":").map(x => parseInt(x, 10));
-                const d = new Date(Date.UTC(2000, 0, 1, hh, mm, 0));
-                const d2 = new Date(d.getTime() + 60 * 60 * 1000);
-                end = `${ymd}T${pad2(d2.getUTCHours())}${pad2(d2.getUTCMinutes())}00`;
-              }
-
-              datesParam = `${start}/${end}`;
-            } else {
-              // all-day: end is next day
-              const yyyy = parseInt(ymd.slice(0, 4), 10);
-              const mm = parseInt(ymd.slice(4, 6), 10) - 1;
-              const dd = parseInt(ymd.slice(6, 8), 10);
-              const d = new Date(Date.UTC(yyyy, mm, dd));
-              const d2 = new Date(d.getTime() + 24 * 60 * 60 * 1000);
-              const y2 = d2.getUTCFullYear();
-              const m2 = pad2(d2.getUTCMonth() + 1);
-              const dday2 = pad2(d2.getUTCDate());
-              const endYmd = `${y2}${m2}${dday2}`;
-              datesParam = `${ymd}/${endYmd}`;
-            }
-
-            const params = new URLSearchParams();
-            params.set("action", "TEMPLATE");
-            params.set("text", title);
-            params.set("dates", datesParam);
-            if (details) params.set("details", details);
-            if (location) params.set("location", location);
-
-            return `https://calendar.google.com/calendar/render?${params.toString()}`;
-          };
-
-          const tryOpen = (url) => {
-            try {
-              const w = window.open(url, "_blank", "noopener");
-              return Boolean(w);
-            } catch (_) {
-              return false;
-            }
-          };
-
-                    const googleUrl = buildGoogleCalendarUrl();
-
-          // Open Google Calendar (best UX). Avoid double-action:
-          // Some browsers open the tab but still return null → would trigger ICS fallback.
-          try {
-            const w = window.open(googleUrl, "_blank", "noopener");
-            if (!w) {
-              window.location.href = googleUrl;
-            }
-          } catch (_) {
-            window.location.href = googleUrl;
-          }
-
-          return;
-
-          // Fallback: ICS download (previous behavior)
-
-          const hasTime = Boolean(p.startTime && timeOk(p.startTime));
-
-          const dt = (dateYmd, hhmm) => {
-            if (!hhmm) return `${dateYmd}`;
-            const [hh, mm] = String(hhmm).trim().split(":").map(x => parseInt(x, 10));
-            return `${dateYmd}T${pad2(hh)}${pad2(mm)}00`;
-          };
-
-          let dtStart = "";
-          let dtEnd = "";
-
-          if (hasTime) {
-            dtStart = dt(ymd, String(p.startTime).trim());
-            const endOk = Boolean(p.endTime && timeOk(p.endTime));
-            dtEnd = endOk ? dt(ymd, String(p.endTime).trim()) : "";
+            params.set("dates", `${s}/${e}`);
           } else {
-            // All-day fallback: DTEND = next day
-            const yyyy = parseInt(ymd.slice(0, 4), 10);
-            const mm = parseInt(ymd.slice(4, 6), 10) - 1;
-            const dd = parseInt(ymd.slice(6, 8), 10);
-            const d = new Date(Date.UTC(yyyy, mm, dd));
-            const d2 = new Date(d.getTime() + 24 * 60 * 60 * 1000);
-            const y2 = d2.getUTCFullYear();
-            const m2 = pad2(d2.getUTCMonth() + 1);
-            const dday2 = pad2(d2.getUTCDate());
-            dtStart = ymd;
-            dtEnd = `${y2}${m2}${dday2}`;
+            params.set("dates", `${ymd}/${ymd}`);
           }
 
-          const uid = `${Date.now()}-${Math.random().toString(16).slice(2)}@bocholt-erleben`;
-          const now = new Date();
-          const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
+          if (p.location) params.set("location", p.location);
+          if (p.description) params.set("details", p.description);
 
-          const icsLines = [
-            "BEGIN:VCALENDAR",
-            "VERSION:2.0",
-            "PRODID:-//Bocholt erleben//Event//DE",
-            "CALSCALE:GREGORIAN",
-            "METHOD:PUBLISH",
-            "BEGIN:VEVENT",
-            `UID:${uid}`,
-            `DTSTAMP:${stamp}`,
-            `SUMMARY:${String(p.title).replaceAll("\n", " ")}`,
-            ...(dtStart ? [hasTime ? `DTSTART:${dtStart}` : `DTSTART;VALUE=DATE:${dtStart}`] : []),
-            ...(dtEnd ? [hasTime ? `DTEND:${dtEnd}` : `DTEND;VALUE=DATE:${dtEnd}`] : []),
-            ...(p.location ? [`LOCATION:${String(p.location).replaceAll("\n", " ")}`] : []),
-            ...(p.description ? [`DESCRIPTION:${String(p.description).replaceAll("\n", "\\n")}`] : []),
-            "END:VEVENT",
-            "END:VCALENDAR",
-          ].join("\r\n");
+          const url = `https://calendar.google.com/calendar/render?${params.toString()}`;
 
-          const blob = new Blob([icsLines], { type: "text/calendar;charset=utf-8" });
+          try {
+            const w = window.open(url, "_blank", "noopener");
+            if (!w) window.location.href = url;
+          } catch {
+            window.location.href = url;
+          }
+        };
+
+        const downloadICS = (p) => {
+          const ymd = String(p.date).replaceAll("-", "");
+          const start = `${ymd}T000000`;
+
+          const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${p.title}
+DTSTART:${start}
+LOCATION:${p.location || ""}
+DESCRIPTION:${p.description || ""}
+END:VEVENT
+END:VCALENDAR`;
+
+          const blob = new Blob([ics], { type: "text/calendar" });
           const url = URL.createObjectURL(blob);
 
           const a = document.createElement("a");
           a.href = url;
-          const safeName = String(p.title).trim().slice(0, 60).replaceAll(/[^\w\- ]+/g, "").replaceAll(/\s+/g, " ") || "event";
-          a.download = `${safeName}.ics`;
-          document.body.appendChild(a);
+          a.download = "event.ics";
           a.click();
-          a.remove();
 
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-        });
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+        };
+
+        const showChooser = () => {
+          const html = `
+            <div class="detail-cal-chooser">
+              <div class="detail-cal-backdrop"></div>
+              <div class="detail-cal-sheet">
+                <button data-cal="device">Gerätekalender</button>
+                <button data-cal="google">Google Kalender</button>
+                <button data-cal="close">Abbrechen</button>
+              </div>
+            </div>
+          `;
+
+          this.content.insertAdjacentHTML("beforeend", html);
+
+          const chooser = this.content.querySelector(".detail-cal-chooser");
+          const payload = getPayload();
+
+          chooser.addEventListener("click", (e) => {
+            const t = e.target.closest("[data-cal]");
+            if (!t) return;
+
+            chooser.remove();
+
+            if (!payload) return;
+
+            if (t.dataset.cal === "device") downloadICS(payload);
+            if (t.dataset.cal === "google") openGoogle(payload);
+          });
+        };
+
+        calBtn.addEventListener("click", showChooser);
       }
+      // === END BLOCK: CALENDAR ACTION CHOOSER ===
 
       // reset scroll on open
       this.content.scrollTop = 0;
@@ -729,6 +671,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
