@@ -648,7 +648,7 @@
             </div>
                        <div class="detail-meta-chips" role="list" aria-label="Event-Infos">
               ${vm.city ? `
-                <span class="detail-chip" role="listitem">
+                                <span class="detail-chip" role="listitem" data-chip="city">
                   <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                     <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -658,7 +658,7 @@
               ` : ""}
 
               ${vm.date ? `
-                <span class="detail-chip" role="listitem">
+                                <span class="detail-chip" role="listitem" data-chip="date">
                   <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -670,7 +670,7 @@
               ` : ""}
 
               ${vm.timeRange ? `
-                <span class="detail-chip" role="listitem">
+                                <span class="detail-chip" role="listitem" data-chip="time">
                   <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" fill="none" stroke="currentColor" stroke-width="2"/>
                     <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -861,6 +861,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
