@@ -536,7 +536,42 @@
     },
 
            renderContent(event) {
-      const vm = toEventDetailVM(event);
+         const vm = toEventDetailVM(event);
+
+      // === BEGIN BLOCK: DATE LABEL (DE, user-friendly) ===
+      // Zweck: ISO-Datum (YYYY-MM-DD) für Anzeige hübsch formatieren (de-DE), ohne Datenmodell zu verändern
+      const formatDateLabelDE = (iso) => {
+        const s = String(iso || "").trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+        const [y, m, d] = s.split("-").map(n => parseInt(n, 10));
+        // UTC, damit es nicht durch TZ/DST kippt
+        const dt = new Date(Date.UTC(y, m - 1, d));
+
+        try {
+          const now = new Date();
+          const currentYear = now.getFullYear();
+
+          const base = new Intl.DateTimeFormat("de-DE", {
+            weekday: "short",
+            day: "2-digit",
+            month: "short",
+          }).format(dt);
+
+          // Jahr nur zeigen, wenn nicht aktuelles Jahr (ruhiger)
+          if (y !== currentYear) {
+            const yr = new Intl.DateTimeFormat("de-DE", { year: "numeric" }).format(dt);
+            return `${base} ${yr}`;
+          }
+
+          return base;
+        } catch (_) {
+          return s;
+        }
+      };
+      const dateLabel = formatDateLabelDE(vm.date);
+      // === END BLOCK: DATE LABEL (DE, user-friendly) ===
+
 
               const iconSvg = (type) => {
         // minimal, consistent line-icons (no brand logos)
@@ -681,7 +716,7 @@
                     <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
                       fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                   </svg>
-                  <span class="detail-chip-text">${escapeHtml(vm.date)}</span>
+                                    <span class="detail-chip-text">${escapeHtml(dateLabel || vm.date)}</span>
                 </span>
               ` : ""}
 
@@ -877,6 +912,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
