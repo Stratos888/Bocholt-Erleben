@@ -1798,12 +1798,12 @@ Root Cause:
 
 /* Meta (Datum/Uhrzeit) – nicht boxed */
 /* === BEGIN BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) ===
-Zweck: Meta-Infos (Ort/Datum/Zeit) als Chips für bessere Scanbarkeit, konsistent zu SVG-Line-Icons
+Zweck: Meta-Infos (Ort/Datum/Zeit) als Chips – geordnet, ruhig, scanbar (kein zufälliger Wrap)
 Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg.is-chip
 === */
 
 #event-detail-panel .detail-meta{
-  /* legacy fallback – sollte nicht mehr gerendert werden, aber bleibt harmless */
+  /* legacy fallback – sollte nicht mehr gerendert werden, bleibt harmless */
   margin: 16px 0 14px;
   font-size: 14px;
   line-height: 1.4;
@@ -1813,11 +1813,20 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 
 #event-detail-panel .detail-meta-chips{
   margin: 16px 0 14px;
-  display: flex;
-  flex-wrap: wrap;
+
+  /* geordnet statt „zufällig umbrochen“ */
+  display: grid;
+  grid-template-columns: max-content max-content;
   gap: 8px;
+  align-items: center;
 }
 
+/* Zeit immer als volle Zeile → wirkt aufgeräumt */
+#event-detail-panel .detail-chip[data-chip="time"]{
+  grid-column: 1 / -1;
+}
+
+/* Chip-Design konsistent */
 #event-detail-panel .detail-chip{
   display: inline-flex;
   align-items: center;
@@ -1848,6 +1857,7 @@ Umfang: #event-detail-panel .detail-meta-chips / .detail-chip / .detail-icon-svg
 /* === END BLOCK: DETAILPANEL META CHIPS (consistent SVG icons) === */
 
 
+
 /* Beschreibung */
 #event-detail-panel .detail-description{
   margin: 12px 0 14px;
@@ -1876,13 +1886,19 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar als kompakte Icon-Buttons (Top-App Look), ohne Breitenprobleme.
-- Icons sind SVG (kein Emoji), Labels bleiben für Screenreader (a11y) erhalten.
+- Actionbar als kompakte Icon-Buttons (Top-App Look)
+- Unten Safe-Area/System-UI Puffer, damit nichts von Android/iOS UI überdeckt wird
+- Funktioniert auch bei längerer Beschreibung (Scroll bis über Actionbar hinaus)
 Umfang:
-- Nur #event-detail-panel .detail-actionbar + .detail-actionbar-btn + .detail-icon-svg + sr-only helper.
+- #event-detail-panel .detail-panel-inner + .detail-actionbar + .detail-actionbar-btn + .detail-icon-svg + sr-only helper
 === */
 
-/* ruhiger Abstand */
+/* WICHTIG: Platz unten, damit Actionbar nicht unter System-/Browser-UI verschwindet */
+#event-detail-panel .detail-panel-inner{
+  padding-bottom: calc(16px + max(0px, env(safe-area-inset-bottom)));
+}
+
+/* Actionbar */
 #event-detail-panel .detail-actionbar{
   margin-top: 16px;
   display: flex;
@@ -1890,7 +1906,7 @@ Umfang:
   flex-wrap: wrap;
 }
 
-/* Icon-Buttons: stabil, kompakt, appig */
+/* Icon-Buttons */
 #event-detail-panel .detail-actionbar-btn{
   flex: 0 0 auto;
 
@@ -1921,7 +1937,7 @@ Umfang:
   transform: scale(0.97);
 }
 
-/* SVG Icon konsistent */
+/* SVG Icons */
 #event-detail-panel .detail-icon-svg{
   width: 18px;
   height: 18px;
@@ -1929,12 +1945,11 @@ Umfang:
   color: rgba(31,41,51,0.92);
 }
 
-/* Location SVG minimal ruhiger */
 #event-detail-panel .detail-icon-svg.is-location{
   color: rgba(31,41,51,0.82);
 }
 
-/* Screenreader-only (lokal fürs Detailpanel) */
+/* Screenreader-only */
 #event-detail-panel .detail-sr-only{
   position: absolute !important;
   width: 1px !important;
@@ -2454,6 +2469,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
