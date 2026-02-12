@@ -183,23 +183,34 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
 
 
    
-    <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
+   <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
 Zweck: Dediziertes Overlay-Root direkt unter <body>; enthält das Event-Detailpanel.
-Umfang: Ersetzt den bisherigen Event-Detailpanel-Block (ohne Overlay-Root).
+Umfang: Struktur auf 3 Zonen vorbereitet: Header (fixed), Content (scroll), Actionbar-Slot (fixed).
 === -->
 <div id="overlay-root">
     <!-- EVENT DETAIL PANEL (hidden by default) -->
     <div id="event-detail-panel" class="detail-panel hidden">
         <div class="detail-panel-overlay"></div>
+
         <div class="detail-panel-content">
-            <button class="detail-panel-close">&times;</button>
-            <div id="detail-content">
-                <!-- Event details werden hier dynamisch eingefügt -->
+            <div class="detail-panel-header">
+                <div class="detail-panel-handle" aria-hidden="true"></div>
+                <button class="detail-panel-close" type="button" aria-label="Schließen">×</button>
             </div>
+
+            <div class="detail-panel-body">
+                <div id="detail-content">
+                    <!-- Event details werden hier dynamisch eingefügt -->
+                </div>
+            </div>
+
+            <!-- Slot: Actions werden hier (außerhalb des Scroll-Contents) gerendert -->
+            <div id="detail-actionbar-slot" class="detail-actionbar" aria-label="Aktionen"></div>
         </div>
     </div>
 </div>
 <!-- === END BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) === -->
+
 
 
   <!-- === BEGIN BLOCK: LOCATIONS MODAL TEMPLATE (REDUCED / ACTION-FIRST) ===
@@ -341,6 +352,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
