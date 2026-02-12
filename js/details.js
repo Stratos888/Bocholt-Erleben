@@ -629,16 +629,24 @@ END:VCALENDAR`;
             </div>
           `;
 
-          this.content.insertAdjacentHTML("beforeend", html);
+                  this.panel.insertAdjacentHTML("beforeend", html);
 
-          const chooser = this.content.querySelector(".detail-cal-chooser");
+
+                   const chooser = this.panel.querySelector(".detail-cal-chooser");
+
           const payload = getPayload();
 
           chooser.addEventListener("click", (e) => {
             const t = e.target.closest("[data-cal]");
             if (!t) return;
 
+                       if (t.dataset.cal === "close") {
+              chooser.remove();
+              return;
+            }
+
             chooser.remove();
+
 
             if (!payload) return;
 
@@ -671,6 +679,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
