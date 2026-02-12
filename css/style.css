@@ -2259,12 +2259,21 @@ Umfang:
 }
 
 
-/* Safe-area bottom padding (iOS) */
+/* Safe-area bottom padding (iOS) + Tabbar-Puffer (Android/iOS) */
 @supports (padding: max(0px)){
-  #event-detail-panel .detail-panel-content{
-    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  /* nur Mobile/PWA: Desktop-Modal bleibt unberührt */
+  @media (max-width: 899px){
+    #event-detail-panel .detail-panel-content{
+      padding-bottom: calc(18px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+    }
+
+    /* wichtig: das Scroll-Element ist #detail-content → dort muss der Puffer auch ankommen */
+    #event-detail-panel #detail-content{
+      padding-bottom: calc(12px + var(--tabbar-h) + max(0px, env(safe-area-inset-bottom)));
+    }
   }
 }
+
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
 
@@ -2469,6 +2478,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
