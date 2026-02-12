@@ -26,6 +26,36 @@ Designziel:
 - Details erst im Panel
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL ARCHITECTURE SUMMARY (UNVERÄNDERLICH)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Diese Punkte sind feste Systemgesetze. Sie dürfen NICHT umgangen oder „vereinfacht“ werden:
+
+1. Google Sheet ist die EINZIGE redaktionelle Quelle für Events.
+   → Niemals manuell events.tsv oder events.json bearbeiten.
+
+2. events.tsv ist nur ein temporäres Build-Artefakt (CI-intern).
+   → Kein Mensch pflegt diese Datei.
+
+3. events.json ist die einzige Runtime-Datenquelle im Frontend.
+   → UI liest ausschließlich JSON, niemals TSV/CSV.
+
+4. Das Datenschema wird vom Builder (scripts/build-events-from-tsv.py) definiert.
+   → Wenn Feldnamen geändert werden:
+      IMMER zuerst Builder → dann Sheet → dann Frontend.
+      Niemals umgekehrt.
+
+5. Deploy ist Fail-Fast.
+   → Ungültige Daten, Duplikate oder fehlende Pflichtfelder müssen den Build stoppen,
+      niemals „still durchrutschen“.
+
+Diese Architektur sorgt für:
+- einfache Redaktion (Sheet)
+- stabile PWA/Cache (statische JSON)
+- deterministische Builds
+- keine versteckten Seiteneffekte
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 VERBINDLICHE ARBEITSREGELN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
