@@ -1816,32 +1816,58 @@ Root Cause:
 }
 #event-detail-panel .detail-description:empty{ display: none; }
 
-/* CTA / Event-Link – sekundär (Top-App Pattern): als Link, nicht als 2. gleichwertiger Button */
+/* === BEGIN BLOCK: DETAILPANEL ACTIONS + CALENDAR CHOOSER (premium, quiet) ===
+Zweck:
+- Neue Action-Bar (#event-detail-panel .detail-actionbar / .detail-actionbar-btn) hochwertig darstellen
+- Kalender-Chooser als ruhiges Mini-Bottom-Sheet innerhalb des Detailpanels stylen
+- Bestehende Secondary-Link Optik beibehalten (konsolidiert, ohne Duplikate)
+Umfang:
+- Nur #event-detail-panel .detail-actions/.detail-actionbar + Buttons + Kalender-Chooser Klassen
+=== */
+
+/* Legacy/optional: falls irgendwo noch genutzt */
 #event-detail-panel .detail-actions{
   margin-top: 8px;
   background: transparent;
 }
 
-/* Secondary Website link (kein 2. Button) */
-#event-detail-panel .detail-secondary-link{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-
-  padding:8px 2px;
-  font-size:13px;
-  font-weight:700;
-  color:rgba(31,41,51,.75);
-  text-decoration:none;
+/* New Actionbar */
+#event-detail-panel .detail-actionbar{
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 6px;
 }
 
-#event-detail-panel .detail-secondary-link::after{
-  content:"↗";
-  opacity:.6;
+#event-detail-panel .detail-actionbar-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 10px 12px;
+
+  border-radius: 14px;
+  border: 0;
+
+  background: rgba(31,41,51,0.04);
+  color: rgba(31,41,51,0.88);
+
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
+#event-detail-panel .detail-actionbar-btn:active{
+  background: rgba(31,41,51,0.07);
+  transform: translateY(1px);
+}
 
-/* Secondary Website Link (ersetzt "Zum Event"-Button als Primary) */
+/* Secondary Website Link (konsolidiert) */
 #event-detail-panel .detail-secondary-link,
 #event-detail-panel .detail-secondary-link:link,
 #event-detail-panel .detail-secondary-link:visited{
@@ -1872,6 +1898,97 @@ Root Cause:
   background: rgba(31,41,51,0.04);
   transform: translateY(1px);
 }
+
+/* Calendar chooser overlay (supports both class name variants) */
+#event-detail-panel .detail-calendar-chooser,
+#event-detail-panel .detail-cal-chooser{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000; /* above panel content */
+
+  display: block;
+}
+
+#event-detail-panel .detail-calendar-chooser[hidden],
+#event-detail-panel .detail-cal-chooser[hidden]{
+  display: none !important;
+}
+
+/* Backdrop */
+#event-detail-panel .detail-calendar-chooser__backdrop,
+#event-detail-panel .detail-cal-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+}
+
+/* Sheet */
+#event-detail-panel .detail-calendar-chooser__sheet,
+#event-detail-panel .detail-cal-sheet{
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+
+  border-radius: 22px;
+  overflow: hidden;
+
+  background: var(--color-surface);
+  box-shadow: 0 18px 46px rgba(0,0,0,0.20);
+
+  padding: 10px;
+}
+
+/* Title (only for the richer chooser variant) */
+#event-detail-panel .detail-calendar-chooser__title{
+  padding: 10px 10px 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(31,41,51,0.78);
+}
+
+/* Buttons inside chooser (supports both variants) */
+#event-detail-panel .detail-calendar-chooser__btn,
+#event-detail-panel .detail-cal-sheet button{
+  width: 100%;
+  min-height: 48px;
+
+  border: 0;
+  border-radius: 16px;
+
+  background: rgba(31,41,51,0.04);
+  color: rgba(31,41,51,0.92);
+
+  font-size: 15px;
+  font-weight: 800;
+  text-align: left;
+
+  padding: 12px 14px;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-calendar-chooser__btn + .detail-calendar-chooser__btn{
+  margin-top: 10px;
+}
+#event-detail-panel .detail-cal-sheet button + button{
+  margin-top: 10px;
+}
+
+#event-detail-panel .detail-calendar-chooser__btn:active,
+#event-detail-panel .detail-cal-sheet button:active{
+  background: rgba(31,41,51,0.07);
+  transform: translateY(1px);
+}
+
+/* Cancel button (richer chooser variant) */
+#event-detail-panel .detail-calendar-chooser__btn.is-cancel{
+  background: rgba(31,41,51,0.03);
+  color: rgba(31,41,51,0.72);
+}
+
+/* === END BLOCK: DETAILPANEL ACTIONS + CALENDAR CHOOSER (premium, quiet) === */
+
 
 
 /* === BEGIN PATCH: DETAIL CTA – SHADOW VIA DROP-SHADOW (ROOTCAUSE PROVEN)
@@ -2245,6 +2362,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
