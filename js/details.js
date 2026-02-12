@@ -490,10 +490,32 @@
       }
     },
 
-        renderContent(event) {
+           renderContent(event) {
       const vm = toEventDetailVM(event);
 
-      // Minimal, stable markup (no extra features here)
+      const renderAction = (a) => {
+        if (!a || typeof a !== "object") return "";
+        const label = escapeHtml(a.label || "");
+
+        if (a.type === "calendar") {
+          // Render as button; click handler is attached after render (ICS download)
+          return `<button class="detail-actionbar-btn" type="button" data-action="calendar">${label}</button>`;
+        }
+
+        if (a.href) {
+          const href = escapeHtml(a.href);
+          return `<a class="detail-actionbar-btn" href="${href}" target="_blank" rel="noopener">${label}</a>`;
+        }
+
+        return "";
+      };
+
+      const actionsHtml = (Array.isArray(vm.actions) ? vm.actions : [])
+        .map(renderAction)
+        .filter(Boolean)
+        .join("");
+
+      // Minimal, stable markup (keeps current layout), plus action-bar below description
       const html = `
         <div class="detail-panel-inner">
           <div class="detail-header">
@@ -518,14 +540,98 @@
           ` : ""}
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
+
+          ${actionsHtml ? `
+            <div class="detail-actionbar" role="group" aria-label="Aktionen">
+              ${actionsHtml}
+            </div>
+          ` : ""}
         </div>
       `;
 
       this.content.innerHTML = html;
 
+      // Wire calendar action (ICS download) — minimal, self-contained
+      const calBtn = this.content.querySelector('[data-action="calendar"]');
+      if (calBtn) {
+        calBtn.addEventListener("click", () => {
+          const cal = (Array.isArray(vm.actions) ? vm.actions : []).find(a => a && a.type === "calendar" && a.payload);
+          const p = cal && cal.payload ? cal.payload : null;
+          if (!p || !p.title || !p.date) return;
+
+          const pad2 = (n) => String(n).padStart(2, "0");
+          const ymd = String(p.date).trim().replaceAll("-", "");
+          const hasTime = Boolean(p.startTime && /^\d{1,2}:\d{2}$/.test(String(p.startTime).trim()));
+
+          const dt = (dateYmd, hhmm) => {
+            if (!hhmm) return `${dateYmd}`;
+            const [hh, mm] = hhmm.split(":").map(x => parseInt(x, 10));
+            return `${dateYmd}T${pad2(hh)}${pad2(mm)}00`;
+          };
+
+          let dtStart = "";
+          let dtEnd = "";
+
+          if (hasTime) {
+            dtStart = dt(ymd, String(p.startTime).trim());
+            const endOk = Boolean(p.endTime && /^\d{1,2}:\d{2}$/.test(String(p.endTime).trim()));
+            dtEnd = endOk ? dt(ymd, String(p.endTime).trim()) : "";
+          } else {
+            // All-day fallback: DTEND = next day (simple +1 day)
+            // Use UTC date math to avoid DST edge cases for date-only values
+            const yyyy = parseInt(ymd.slice(0, 4), 10);
+            const mm = parseInt(ymd.slice(4, 6), 10) - 1;
+            const dd = parseInt(ymd.slice(6, 8), 10);
+            const d = new Date(Date.UTC(yyyy, mm, dd));
+            const d2 = new Date(d.getTime() + 24 * 60 * 60 * 1000);
+            const y2 = d2.getUTCFullYear();
+            const m2 = pad2(d2.getUTCMonth() + 1);
+            const dday2 = pad2(d2.getUTCDate());
+            dtStart = ymd;
+            dtEnd = `${y2}${m2}${dday2}`;
+          }
+
+          const uid = `${Date.now()}-${Math.random().toString(16).slice(2)}@bocholt-erleben`;
+          const now = new Date();
+          const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
+
+          const icsLines = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Bocholt erleben//Event//DE",
+            "CALSCALE:GREGORIAN",
+            "METHOD:PUBLISH",
+            "BEGIN:VEVENT",
+            `UID:${uid}`,
+            `DTSTAMP:${stamp}`,
+            `SUMMARY:${String(p.title).replaceAll("\n", " ")}`,
+            ...(dtStart ? [hasTime ? `DTSTART:${dtStart}` : `DTSTART;VALUE=DATE:${dtStart}`] : []),
+            ...(dtEnd ? [hasTime ? `DTEND:${dtEnd}` : `DTEND;VALUE=DATE:${dtEnd}`] : []),
+            ...(p.location ? [`LOCATION:${String(p.location).replaceAll("\n", " ")}`] : []),
+            ...(p.description ? [`DESCRIPTION:${String(p.description).replaceAll("\n", "\\n")}`] : []),
+            "END:VEVENT",
+            "END:VCALENDAR",
+          ].join("\r\n");
+
+          const blob = new Blob([icsLines], { type: "text/calendar;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          const safeName = String(p.title).trim().slice(0, 60).replaceAll(/[^\w\- ]+/g, "").replaceAll(/\s+/g, " ") || "event";
+          a.download = `${safeName}.ics`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        });
+      }
+
       // reset scroll on open
       this.content.scrollTop = 0;
     },
+
 
   };
   // === END BLOCK: DETAILPANEL MODULE (single object) ===
@@ -542,6 +648,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
