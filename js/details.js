@@ -105,6 +105,9 @@
     return { start, end };
   };
 
+  // === BEGIN BLOCK: toEventDetailVM (VIEWMODEL NORMALIZER) ===
+  // Zweck: Event-Objekt defensiv in kanonisches Detail-ViewModel normalisieren (keine DOM/Side-Effects)
+  // Umfang: Nur Datenaufbereitung inkl. Actions (Kalender/WhatsApp/Website/Route) – Rendering später
   const toEventDetailVM = (event) => {
     const e = (event && typeof event === "object") ? event : {};
 
@@ -125,10 +128,8 @@
       return startTime || "";
     })();
 
-    const cat = normalizeCategory(e.category || e.kategorie || "");
-    const categoryRaw = cat.raw;
-    const categoryCanonical = cat.canonical;
-    const categoryDisplay = categoryRaw; // keep current UI stable
+    const categoryRaw = trimOrEmpty(e.category || e.kategorie || "");
+    const categoryDisplay = categoryRaw;
     const icon = getCategoryIcon(categoryDisplay);
 
     const locationName = trimOrEmpty(e.locationName || e.location || e.ort || "");
@@ -139,18 +140,64 @@
 
     const homepage = getLocationHomepage(locationName);
 
-    // Keep existing behavior: if we have a locationName, build query with city; otherwise no maps (avoid random city-only links)
-    const mapsQuery = locationName ? [locationName, city].filter(Boolean).join(" ") : "";
-    const maps = mapsQuery ? toMapsUrl(mapsQuery) : "";
+    // Route (Maps) only when we have a meaningful location; avoids city-only links
+    const routeQuery = locationName ? [locationName, city].filter(Boolean).join(" ") : "";
+    const maps = routeQuery ? toMapsUrl(routeQuery) : "";
 
-    // Future-proof fields (not used by current UI yet; keeps render stable)
+    // Kalender-Payload (ICS/Export-Implementierung folgt später)
+    const canCalendar = Boolean(title && date);
+    const calendarPayload = canCalendar ? {
+      title,
+      date,         // erwartetes Format in unseren Daten: YYYY-MM-DD
+      startTime,    // optional
+      endTime,      // optional
+      location: locationName || city,
+      description: desc,
+    } : null;
+
+    // WhatsApp-Share-Text (Deep-Link kann später im Renderer ergänzt werden)
+    const shareParts = [
+      title,
+      date ? `📅 ${date}${timeRange ? ` · ${timeRange}` : ""}` : "",
+      locationLabel ? `📍 ${locationLabel}` : "",
+    ].filter(Boolean);
+    const shareText = shareParts.join("\n");
+    const whatsappHref = shareText ? `https://wa.me/?text=${encodeURIComponent(shareText)}` : "";
+
+    // Actions (noch nicht gerendert; canonical Liste für spätere UI)
     const actions = [
-      ...(homepage ? [{ type: "website", href: homepage, label: "Website", primary: false }] : []),
-      ...(maps ? [{ type: "map", href: maps, label: "Karte", primary: false }] : []),
+      ...(canCalendar ? [{
+        type: "calendar",
+        label: "Kalender",
+        priority: "primary",
+        payload: calendarPayload,
+      }] : []),
+
+      ...(whatsappHref ? [{
+        type: "whatsapp",
+        label: "Teilen",
+        priority: "secondary",
+        href: whatsappHref,
+        payload: { text: shareText },
+      }] : []),
+
+      ...(homepage ? [{
+        type: "website",
+        label: "Website",
+        priority: "secondary",
+        href: homepage,
+      }] : []),
+
+      ...(maps ? [{
+        type: "route",
+        label: "Route",
+        priority: "utility",
+        href: maps,
+      }] : []),
     ];
 
     return {
-      // current render fields (must remain stable)
+      // current render fields (keep stable to avoid UI regression)
       title,
       city,
       date,
@@ -166,13 +213,13 @@
       desc,
       homepage,
       maps,
-      actions,
 
-      // additional internal fields for later steps (no UI impact now)
-      categoryCanonical,
-      mapsQuery,
+      // future usage
+      actions,
     };
   };
+  // === END BLOCK: toEventDetailVM (VIEWMODEL NORMALIZER) ===
+
   // === END BLOCK: DETAILPANEL HELPERS (pure utils) ===
 
 
@@ -495,6 +542,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
