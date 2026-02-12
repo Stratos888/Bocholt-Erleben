@@ -698,8 +698,6 @@
         });
       }
 
-      }
-
       // reset scroll on open
       this.content.scrollTop = 0;
     },
@@ -720,6 +718,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
