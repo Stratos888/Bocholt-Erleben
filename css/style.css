@@ -1832,40 +1832,56 @@ Umfang:
 }
 
 /* New Actionbar */
+/* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH === */
+
+/* ruhiger Abstand */
 #event-detail-panel .detail-actionbar{
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
-  padding-bottom: 6px;
 }
 
+/* echte "App Pills" statt Web-Buttons */
 #event-detail-panel .detail-actionbar-btn{
+  flex: 0 0 auto;
+
+  height: 38px;
+  padding: 0 14px;
+
+  border-radius: 999px;
+  border: 0;
+
+  background: rgba(31,41,51,0.06);
+  color: rgba(31,41,51,0.92);
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  min-height: 44px;
-  padding: 10px 12px;
-
-  border-radius: 14px;
-  border: 0;
-
-  background: rgba(31,41,51,0.04);
-  color: rgba(31,41,51,0.88);
-
-  font-size: 13px;
-  font-weight: 750;
-  line-height: 1;
-
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+
+  transition: background .12s ease, transform .08s ease;
 }
 
+/* subtle press feedback – wie native */
 #event-detail-panel .detail-actionbar-btn:active{
-  background: rgba(31,41,51,0.07);
-  transform: translateY(1px);
+  background: rgba(31,41,51,0.10);
+  transform: scale(0.97);
 }
+
+/* erster Button (Kalender) minimal hervorgehoben */
+#event-detail-panel .detail-actionbar-btn:first-child{
+  background: rgba(31,41,51,0.10);
+}
+
+/* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 /* Secondary Website Link (konsolidiert) */
 #event-detail-panel .detail-secondary-link,
@@ -2369,6 +2385,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
