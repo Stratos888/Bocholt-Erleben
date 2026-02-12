@@ -720,7 +720,7 @@
                 <span class="detail-location-chev" aria-hidden="true">›</span>
               </a>
             ` : `
-              <div class="detail-location-action" aria-label="Location">
+                          <div class="detail-location-action is-static" aria-label="Location">
                                 <span class="detail-location-icon" aria-hidden="true">
                   <svg class="detail-icon-svg is-location" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M4 21V7a2 2 0 0 1 2-2h6v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -877,6 +877,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
