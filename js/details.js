@@ -539,10 +539,15 @@
         return "";
       };
 
-      const actionsHtml = (Array.isArray(vm.actions) ? vm.actions : [])
+           const actionsForBar = (Array.isArray(vm.actions) ? vm.actions : [])
+        // Avoid redundancy: if the Location row already links to homepage, hide "Website" in the actionbar
+        .filter(a => !(a && a.type === "website" && vm.homepage && vm.locationLabel));
+
+      const actionsHtml = actionsForBar
         .map(renderAction)
         .filter(Boolean)
         .join("");
+
 
       // Minimal, stable markup (keeps current layout), plus action-bar below description
       const html = `
@@ -718,6 +723,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
