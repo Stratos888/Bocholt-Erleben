@@ -1919,49 +1919,59 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-Finale 3-Zonen Architektur:
-Header (fixed)
-Content (scroll only)
-Actionbar (immer sichtbar unten)
+- 3-Zonen Detailpanel: Header (oben), Body (scroll), Actionbar (fix unten im Sheet)
+- Robust gegen Clipping/Overflow: Actionbar wird innerhalb des Sheets absolut gepinnt
+- Scroll-Content erhält Bottom-Padding in Actionbar-Höhe + Safe-Area
 
 Umfang:
-- Body wird Flex-Column
-- Content scrollt
-- Actionbar bekommt feste Höhe + Safe-Area
+- .detail-panel-content / .detail-panel-body
+- #detail-actionbar-slot + Buttons + Icon Hard-Limit
 === */
 
-/* ===== PANEL BODY LAYOUT ===== */
+/* Sheet als Container für absolute Actionbar */
 #event-detail-panel .detail-panel-content{
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-/* nur dieser Bereich scrollt */
+/* Nur der Body scrollt – wichtig: min-height:0, sonst „drückt“ Content nach unten */
 #event-detail-panel .detail-panel-body{
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+
+  /* Platz für Actionbar + Safe-Area */
+  padding-bottom: calc(64px + max(0px, env(safe-area-inset-bottom)) + 12px);
 }
 
-/* ===== ACTIONBAR (immer sichtbar unten) ===== */
+/* Actionbar IM Sheet unten festpinnen (unabhängig von sticky/overflow edge cases) */
 #detail-actionbar-slot{
-  flex: 0 0 auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-  height: 64px; /* feste, sichtbare Höhe */
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  z-index: 5;
+
+  height: 64px;
+  padding: 10px 12px calc(10px + max(0px, env(safe-area-inset-bottom)));
 
   display: flex;
   gap: 10px;
   align-items: center;
+  justify-content: flex-start;
 
   background: var(--color-surface);
   border-top: 1px solid rgba(0,0,0,0.06);
 }
 
-/* ===== ICON BUTTONS ===== */
+/* Icon-Buttons */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
+  padding: 0;
 
   display: inline-flex;
   align-items: center;
@@ -1971,6 +1981,9 @@ Umfang:
   border: 0;
 
   background: rgba(31,41,51,0.06);
+  color: rgba(31,41,51,0.92);
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* HARD LIMIT: Icons dürfen NIE skalieren */
@@ -1980,10 +1993,13 @@ Umfang:
   height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
+  display: block;
   flex: 0 0 auto;
+  object-fit: contain;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 /* Secondary Website Link (konsolidiert) */
@@ -2511,6 +2527,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
