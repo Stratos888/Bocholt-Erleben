@@ -11,9 +11,9 @@
 (() => {
   "use strict";
 
-  // === BEGIN BLOCK: DETAILPANEL HELPERS (pure utils) ===
-  // Zweck: Kleine Hilfsfunktionen (defensiv, keine Seiteneffekte)
-  // Umfang: Nur Helper
+   // === BEGIN BLOCK: DETAILPANEL HELPERS (pure utils) ===
+  // Zweck: Kleine Hilfsfunktionen + Normalisierung in ein Detail-ViewModel (defensiv, keine Seiteneffekte)
+  // Umfang: Nur Helper + VM Builder (keine DOM-Operationen)
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
   const safeText = (v) => (typeof v === "string" ? v : (v == null ? "" : String(v)));
@@ -60,7 +60,77 @@
     } catch (_) {}
     return "";
   };
+
+  const splitTimeRange = (raw) => {
+    const t = trimOrEmpty(raw);
+    if (!t) return { start: "", end: "" };
+
+    // Accept "08:00–13:00", "08:00-13:00", "08:00 – 13:00", etc.
+    const m = t.match(/^(.+?)(?:\s*[–-]\s*)(.+)$/);
+    if (!m) return { start: t, end: "" };
+
+    const start = trimOrEmpty(m[1]);
+    const end = trimOrEmpty(m[2]);
+    return { start, end };
+  };
+
+  const toEventDetailVM = (event) => {
+    const e = (event && typeof event === "object") ? event : {};
+
+    const title = trimOrEmpty(e.title || e.name || e.summary) || "Event";
+    const city = trimOrEmpty(e.city || e.stadt || e.locationCity || "Bocholt");
+    const date = trimOrEmpty(e.date || e.datum || e.startDate || "");
+
+    const timeRaw = trimOrEmpty(e.time || e.uhrzeit || e.startTime || "");
+    const endTimeRaw = trimOrEmpty(e.endTime || e.ende || "");
+
+    const parsed = splitTimeRange(timeRaw);
+    const startTime = parsed.start || "";
+    const endTime = endTimeRaw || parsed.end || "";
+
+    const timeRange = (() => {
+      // Keep current behavior: if we have both start+end => "start–end"; else show start (which may already include a range if unparsable)
+      if (startTime && endTime) return `${startTime}–${endTime}`;
+      return startTime || "";
+    })();
+
+    const categoryRaw = trimOrEmpty(e.category || e.kategorie || "");
+    const categoryDisplay = categoryRaw;
+    const icon = getCategoryIcon(categoryDisplay);
+
+    const locationName = trimOrEmpty(e.locationName || e.location || e.ort || "");
+    const locationArea = trimOrEmpty(e.locationArea || e.area || e.stadtteil || "");
+    const locationLabel = [locationName, locationArea].filter(Boolean).join(" ").trim();
+
+    const desc = trimOrEmpty(e.description || e.beschreibung || "");
+
+    const homepage = getLocationHomepage(locationName);
+    const maps = toMapsUrl([locationName, city].filter(Boolean).join(" "));
+
+    return {
+      title,
+      city,
+      date,
+      startTime,
+      endTime,
+      timeRange,
+      categoryRaw,
+      categoryDisplay,
+      icon,
+      locationName,
+      locationArea,
+      locationLabel,
+      desc,
+      homepage,
+      maps,
+      actions: [
+        ...(homepage ? [{ type: "website", href: homepage, label: "Website" }] : []),
+        ...(maps ? [{ type: "map", href: maps, label: "Karte" }] : []),
+      ],
+    };
+  };
   // === END BLOCK: DETAILPANEL HELPERS (pure utils) ===
+
 
   // === BEGIN BLOCK: DETAILPANEL MODULE (single object) ===
   // Zweck: Ein einziges konsistentes API-Objekt: init/show/hide/renderContent
@@ -328,60 +398,34 @@
       }
     },
 
-    renderContent(event) {
-      // Defensive normalize
-      const e = (event && typeof event === "object") ? event : {};
-
-      const title = trimOrEmpty(e.title || e.name || e.summary) || "Event";
-      const city = trimOrEmpty(e.city || e.stadt || e.locationCity || "Bocholt");
-      const date = trimOrEmpty(e.date || e.datum || e.startDate || "");
-      const time = trimOrEmpty(e.time || e.uhrzeit || e.startTime || "");
-      const endTime = trimOrEmpty(e.endTime || e.ende || "");
-
-      const timeRange = (() => {
-        const t = time;
-        const et = endTime;
-        if (t && et) return `${t}–${et}`;
-        return t || "";
-      })();
-
-      const category = trimOrEmpty(e.category || e.kategorie || "");
-      const icon = getCategoryIcon(category);
-
-      const locationName = trimOrEmpty(e.locationName || e.location || e.ort || "");
-      const locationArea = trimOrEmpty(e.locationArea || e.area || e.stadtteil || "");
-      const locationLabel = [locationName, locationArea].filter(Boolean).join(" ").trim();
-
-      const desc = trimOrEmpty(e.description || e.beschreibung || "");
-
-      const homepage = getLocationHomepage(locationName);
-      const maps = toMapsUrl([locationName, city].filter(Boolean).join(" "));
+        renderContent(event) {
+      const vm = toEventDetailVM(event);
 
       // Minimal, stable markup (no extra features here)
       const html = `
         <div class="detail-panel-inner">
           <div class="detail-header">
             <div class="detail-title-row">
-              <h2 class="detail-title">${escapeHtml(title)}</h2>
-              ${icon ? `<span class="detail-category-icon" aria-hidden="true">${escapeHtml(icon)}</span>` : ""}
+              <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
+              ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${escapeHtml(vm.icon)}</span>` : ""}
             </div>
-            <div class="detail-meta">${escapeHtml([city, date, timeRange].filter(Boolean).join(" · "))}</div>
+            <div class="detail-meta">${escapeHtml([vm.city, vm.date, vm.timeRange].filter(Boolean).join(" · "))}</div>
           </div>
 
-          ${locationLabel ? `
+          ${vm.locationLabel ? `
             <div class="detail-location">
               <span class="detail-pin" aria-hidden="true">📍</span>
               <div class="detail-location-main">
-                <div class="detail-location-name">${escapeHtml(locationLabel)}</div>
+                <div class="detail-location-name">${escapeHtml(vm.locationLabel)}</div>
                 <div class="detail-location-actions">
-                  ${homepage ? `<a class="detail-action" href="${escapeHtml(homepage)}" target="_blank" rel="noopener">Website</a>` : ""}
-                  ${maps ? `<a class="detail-action" href="${escapeHtml(maps)}" target="_blank" rel="noopener">Karte</a>` : ""}
+                  ${vm.homepage ? `<a class="detail-action" href="${escapeHtml(vm.homepage)}" target="_blank" rel="noopener">Website</a>` : ""}
+                  ${vm.maps ? `<a class="detail-action" href="${escapeHtml(vm.maps)}" target="_blank" rel="noopener">Karte</a>` : ""}
                 </div>
               </div>
             </div>
           ` : ""}
 
-          ${desc ? `<div class="detail-description">${escapeHtml(desc)}</div>` : ""}
+          ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
         </div>
       `;
 
@@ -390,6 +434,7 @@
       // reset scroll on open
       this.content.scrollTop = 0;
     },
+
   };
   // === END BLOCK: DETAILPANEL MODULE (single object) ===
 
@@ -405,4 +450,5 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
