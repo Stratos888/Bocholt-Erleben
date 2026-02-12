@@ -1,404 +1,248 @@
-# PROJECT.md – Bocholt erleben
-Single Source of Truth (Architektur + Regeln + Arbeitsweise)
+Bocholt erleben – verbindliches Arbeits- & Architekturregelwerk (v3, KI-optimiert)
+🎯 Ziel
 
-Ziel:
-Eine mobile-first Event- und Freizeit-Ideenplattform für Bocholt.
-Fokus: schnell inspirieren („Was kann ich heute machen?“), nicht Datenbank oder Spezial-App.
+Mobile-first Event-PWA mit echtem App-Gefühl.
+Stabil, wartbar, keine Layout- oder Cache-Bugs, schnelle iterative Entwicklung.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GRUNDPRINZIP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Priorität:
 
-Die Seite ist KEINE:
-- Tourenplaner-App (Komoot etc.)
-- Sporttracking-App
-- Spezialistenplattform
+Stabilität
 
-Die Seite IST:
-→ ein schneller Ideenfinder für Freizeit & Ausflüge
+Konsistenz
 
-Designziel:
-- ruhig
-- hochwertig
-- wenig visuelle Unruhe
-- scannbar in Sekunden
-- möglichst wenig Text auf Cards
-- Details erst im Panel
+UX
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CRITICAL ARCHITECTURE SUMMARY (UNVERÄNDERLICH)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Features
 
-Diese Punkte sind feste Systemgesetze. Sie dürfen NICHT umgangen oder „vereinfacht“ werden:
+1. Arbeitsmodus (verbindlich)
+1.1 Konsolidierungs-Modus (hart)
 
-1. Google Sheet ist die EINZIGE redaktionelle Quelle für Events.
-   → Niemals manuell events.tsv oder events.json bearbeiten.
+Letzter geposteter Dateistand = Wahrheit
 
-2. events.tsv ist nur ein temporäres Build-Artefakt (CI-intern).
-   → Kein Mensch pflegt diese Datei.
+Keine Änderungen ohne aktuellen Code
 
-3. events.json ist die einzige Runtime-Datenquelle im Frontend.
-   → UI liest ausschließlich JSON, niemals TSV/CSV.
+Keine Annahmen
 
-4. Das Datenschema wird vom Builder (scripts/build-events-from-tsv.py) definiert.
-   → Wenn Feldnamen geändert werden:
-      IMMER zuerst Builder → dann Sheet → dann Frontend.
-      Niemals umgekehrt.
+Keine Teil-Snippets
 
-5. Deploy ist Fail-Fast.
-   → Ungültige Daten, Duplikate oder fehlende Pflichtfelder müssen den Build stoppen,
-      niemals „still durchrutschen“.
+1.2 Diff-Regel (Pflicht)
 
-Diese Architektur sorgt für:
-- einfache Redaktion (Sheet)
-- stabile PWA/Cache (statische JSON)
-- deterministische Builds
-- keine versteckten Seiteneffekte
+Nur:
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-VERBINDLICHE ARBEITSREGELN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+„Ersetze Block von … bis …“
 
-Diese Regeln gelten IMMER.
+„Ersetze exakt diese Zeile“
 
-1. Konsolidierungs-Modus
-   Der zuletzt gepostete Stand einer Datei ist vollständig und korrekt.
-   Niemals raten oder Teile rekonstruieren.
+Nie:
 
-2. Diff statt Snippet
-   Nur Replace-Blöcke oder klare Änderungen.
-   Keine kompletten Dateien neu erfinden (außer ausdrücklich “neu anlegen”).
+komplette Dateien neu generieren
 
-3. Datei-fokussiert
-   Immer nur 1 Datei pro Schritt ändern.
-   Ziel: 1 Commit pro Schritt.
+vage Anweisungen
 
-4. BEGIN/END Marker
-   Jeder Patch enthält klar markierte Blöcke.
+„füge irgendwo ein“
 
-5. Niemals spekulieren
-   Erst Root Cause beweisen, dann fixen.
+1.3 Datei-Isolation
 
-6. Datenpipeline vor UI debuggen
+Pro Schritt:
+→ genau eine Datei
 
-7. events.json / offers.json = Runtime Truth
-   Keine TSV/CSV im Client rekonstruieren.
+Ausnahme nur bei zwingender Abhängigkeit.
 
-8. UI-Polish nur CSS
-   (JS nur bei Funktionsbedarf, niemals für “nur schöner”.)
+1.4 Root-Cause-Pflicht
 
-9. Overlay-Root unter <body>
-   Alle Modals/Sheets/Details außerhalb sticky/transform Container.
+Vor jedem Fix:
 
-10. Fail-Fast Deploy
-   Build darf bei kaputten Assets hart fehlschlagen.
-   Zusätzlich: wenn Datenquelle (Events) nicht erreichbar/ungültig ist → Deploy bricht ab.
+Ursache identifizieren
 
-11. 100%-Regel für Fixes
-   Änderungen vollständig und korrekt liefern (keine halben Patches).
+minimalen Patch liefern
 
-12. Systemstabilität (verbindlich)
-   Neue Features oder Änderungen dürfen:
-   - nichts anderes kaputt machen
-   - keine Seiteneffekte erzeugen
-   - bestehende Patterns wiederverwenden
-   - keine Sonderlogik einführen
-   - immer ganzheitlich das System berücksichtigen
-   → Evolution statt Workarounds
+Nie:
 
-13. Replace-Anker-Regel (verbindlich)
-   Replace-Blöcke dürfen nur über Textbereiche/Selector/Marker erfolgen,
-   die nachweislich exakt so im aktuellen Stand existieren.
-   Wenn der Block nicht 1:1 verifizierbar ist → erst Proof liefern, dann patchen.
+raten
 
-14. Proof-First Patch Protocol (P3) für Layout/CSS (verbindlich)
-   Für Layout-/CSS-Fixes (Overflow, Grid, Container, Cards, Tabbar) gilt:
-   A) Pre-Proof:
-      - scrollWidth - clientWidth
-      - Top-Offender (Element + Breite)
-      - Computed Styles des Offenders (width/min/max/boxSizing/whiteSpace/transform/grid)
-   B) Token-Check:
-      - jede genutzte var(--...) ist in :root definiert ODER bewusst ergänzt
-   C) Post-Proof:
-      - scrollWidth - clientWidth == 0
-      - visuelle Kontrolle: Cards + Tabbar sichtbar, keine Miniatur-Zoom-Effekte
+Workarounds
 
-15. CSS Token Discipline (verbindlich)
-   - Keine neuen Token-Namen “einfach verwenden”.
-   - Card-Background/Shadow müssen auf bestehende Tokens mappen
-     (z.B. --surface, --shadow-sm, --shadow-md).
-   - Neue Tokens nur als eigener, bewusster Schritt in :root.
+„100% sicher“ ohne Proof
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ARCHITEKTUR – EVENTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1.5 CSS-first
 
-Runtime-Datenfluss:
-data/events.json
-→ js/main.js (load)
-→ js/events.js (render)
-→ js/details.js (detail panel)
+UI/Spacing/Layout:
+→ nur CSS
+
+JS nur für:
+
+State
+
+Events
+
+Datenlogik
+
+2. Architektur (hart, nicht verhandelbar)
+2.1 Overlay-Root
+
+Alle Overlays:
+
+Detailpanel
+
+Modals
+
+Bottom Sheets
+
+→ direkt unter <body>
+
+Nie innerhalb von:
+
+transform
+
+sticky
+
+overflow
+
+backdrop-filter
+
+2.2 Kein vh
+
+Nie:
+
+100vh
+
+40vh
+
+Immer:
+
+dvh + Fallback
+
+Grund: Mobile Viewport Bug
+
+2.3 Safe-Area Pflicht
+
+Unten:
+
+padding-bottom = safe-area + tabbar + spacing
+
+
+Nie:
+
+Positions-Hacks
+
+JS Scroll Tricks
+
+2.4 Scroll nur im Content
+
+Sheet = fixed
+Content = overflow:auto
+
+3. Designsystem (Top-App Standard)
+3.1 Action Bars
+
+nur Icons
+
+44×44 Touch
+
+SVG line icons
+
+aria-label
+
+keine Emojis
+
+keine Markenlogos
+
+3.2 Chips statt Meta-Text
+
+Meta immer als Chips:
+
+Ort
+
+Datum
+
+Zeit
 
 Regeln:
-- Cards minimal
-- keine Beschreibung auf Card
-- Details im Panel
-- URL im Panel
-- Kategorie-Icon oben rechts
-- dynamische Zeitsektionen (Heute/Demnächst/Später)
-- Multi-Day Events gelten während Laufzeit als "Heute" (UI/Filter/Sortierung müssen range-aware sein)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EVENTS – DATENQUELLE & PUBLISHING (final)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+kurz
 
-Single Source of Truth (Redaktion):
-Google Sheet (öffentlich per Link, read-only genügt)
+niemals abgeschnitten
 
-CI/Build:
-Google Sheet (TSV Export)
-→ (CI lädt) data/events.tsv (nur Build-Artefakt; nicht redaktionell pflegen)
-→ scripts/build-events-from-tsv.py
-→ data/events.json
-→ Deploy
+Zeit volle Breite
 
-Wichtige Konsequenzen:
-- events.tsv ist kein Redaktionsmedium mehr.
-- Der Deploy ist Fail-Fast, wenn das Sheet nicht erreichbar ist oder Schema/Validierung failt.
-- Das Frontend bleibt statisch und lädt ausschließlich events.json (PWA/Cache bleibt stabil).
+3.3 Location Logik (wichtig)
 
-Copy/Paste Workflow:
-- Neue Events werden in das Sheet eingetragen.
-- Bulk-Import ist Tab-getrennt (TSV): mehrere Zeilen können direkt eingefügt werden.
+Homepage vorhanden → klickbar
+Homepage fehlt → nur Info
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EVENTS – SCHEMA (muss konsistent bleiben)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nie doppelte Navigation (Maps/Website)
 
-Das Schema ist durch scripts/build-events-from-tsv.py vorgegeben.
+3.4 Listen statt Buttons
 
-Minimal required Header (Tab-getrennt):
-id	title	date	city	location	kategorie
+Keine Web-Buttons
+Nur:
 
-Erlaubte/erwartete zusätzliche Felder (projektabhängig):
-endDate	time	url	description	image (falls im Projekt unterstützt)
+Pills
 
-WICHTIG:
-- Spaltennamen müssen exakt matchen (Groß/Klein, Umlaute).
-- Wenn Schema geändert wird: Proof (alle Verwendungen in Code + CI) und dann konsolidierter Patch.
+List Items
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-KATEGORIEN (EVENTS) – FINAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ruhige Flächen
 
-Prinzip:
-- Jedes Event MUSS mindestens 1 gültige Kategorie haben.
-- “Sonstiges” soll NICHT verwendet werden.
-- Validierung: Google Sheet Dropdown + Builder Fail-Fast.
+3.5 Text robust
 
-Kategorien (aktuell gültig im Projekt / Builder):
-- Märkte & Feste
-- Kultur & Kunst
-- Musik & Bühne
-- Kinder & Familie
-- Sport & Bewegung
-- Natur & Draußen
-- Innenstadt & Leben
+line-height ≥ 1.6
 
-Regel:
-- Google Sheet Datenvalidierung: Dropdown exakt mit obiger Liste
-- Ungültige Werte: ABLEHNEN (nicht nur Warnung)
-- Leere Kategorie: nicht zulassen
+overflow-wrap:anywhere
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DUPLIKATE & DATENHYGIENE (EVENTS)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+lange Inhalte müssen überleben
 
-Ziel:
-- Keine doppelten Veröffentlichungen
-- Copy/Paste soll sicher sein
+4. UX Prinzipien
+4.1 Keine Redundanz
 
-Regeln (Build/CI):
-- Duplikate müssen deterministisch verhindert werden (Fail-Fast) – bevorzugt per (url + date).
-- Alte Ein-Tages-Events (date < heute und kein endDate) sollen nicht mehr veröffentlicht werden
-  (entweder Skip oder Fail-Fast – Entscheidung als eigener Schritt dokumentieren).
+1 Aktion = 1 Weg
 
-Hinweis:
-- Automatisches „Löschen im Google Sheet“ erfolgt nicht durch CI (keine Schreibrechte).
-- “Nicht veröffentlichen” = nicht in events.json output.
+4.2 Progressive Disclosure
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ARCHITEKTUR – ANGEBOTE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nur das Wesentliche anzeigen
 
-Zweck:
-Nicht-kommerzielle Freizeit-Ideen (Seen, Natur, Spielplätze, etc.)
+4.3 Mobile first
 
-KEINE:
-- kommerziellen Anbieter (z.B. Erlebnisbäder)
-- bezahlpflichtige Locations
+Desktop nur größere Variante, kein eigenes Layout
 
-Datenfluss (identisch zu Events):
-data/offers.json
-→ js/offers-main.js (load + filter)
-→ js/offers.js (render)
-→ js/offers-details.js (detail panel)
+5. Qualität & Deployment
+5.1 Fail Fast
 
-WICHTIG:
-Keine Sonderlösung gegenüber Events.
-Gleiche Patterns wiederverwenden.
+Deploy schlägt fehl bei:
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OFFERS – DATENMODELL (final)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+404 Assets
 
-Root:
-{
-  meta: {},
-  offers: []
-}
+Cache-Mismatch
 
-Offer:
-{
-  id: string,
-  title: string,
-  kategorie: string,   // Pflicht – Hauptkategorie
-  tags: string[],      // optional – Aktivitäten/Intents
-  location: string,
-  description: string, // Pflicht – nur im Detailpanel
-  hint: string,
-  url: string          // Pflicht – offizielle Info
-}
+kaputten Links
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OFFERS – UI REGELN (final)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5.2 Keine Layout-JS
 
-Card zeigt NUR:
-- Titel
-- Hauptkategorie
-- Location
-- Kategorie-Icon
+Layout niemals mit JS berechnen
 
-Card zeigt NICHT:
-- description
-- Links
-- mehrere Tags
+6. KI-Arbeitsauftrag (wichtig für mich)
 
-Card-Klick:
-→ Detailpanel öffnen
+Ich soll:
 
-Detailpanel zeigt:
-- vollständige Beschreibung
-- Zur Location (url)
-- Maps-Fallback
+minimal ändern
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-KATEGORIEN & TAGS (OFFERS) (festgelegt)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+niemals bestehendes Verhalten brechen
 
-Hauptkategorien (ein Wort, ruhig):
-- Baden
-- Natur
-- Familie
-- Freizeit
-- Kultur
+konsistent bleiben
 
-Tags (nur Aktivitäten/Intents, keine Details):
-- Wandern
-- Radfahren
-- Spazieren
-- Baden
-- Spielen
-- Picknick
-- Familie
-- Hundegeeignet
-- Entspannen
+nur notwendige Dateien anfassen
 
-KEINE Tags:
-- Uferweg
-- Kurzweg
-- Moor
-- Vogelbeobachtung
-- technische Eigenschaften
+Root Cause liefern
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FILTERLOGIK (OFFERS)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+mobile Probleme zuerst lösen
 
-2 Filter:
-1. Kategorie (Hauptkategorie)
-2. Aktivität (Tags)
+UI wie native App gestalten
 
-Logik:
-AND-Verknüpfung
+Ich soll nicht:
 
-UX:
-Tag-Filter ist facettiert (zeigt nur passende Tags der gewählten Kategorie)
+neu erfinden
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CARD DESIGN REGELN (global)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+große Refactors ohne Grund
 
-- immer gleiche Höhe
-- Titel 1 Zeile + Ellipsis
-- fester Abstand zum Kategorie-Icon
-- keine Label-Flut
-- minimalistische Meta-Zeile
+unnötige Features einbauen
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ARBEITSWEISE FÜR NEUE FEATURES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Bevor ein Feature gebaut wird:
-1. Passt es zur Produktvision (Ideenfinder)?
-2. Ist es minimal?
-3. Wiederverwendet es bestehende Patterns?
-4. Bricht es nichts Bestehendes?
-5. Kann es ohne Sonderlogik integriert werden?
-
-Wenn NEIN → nicht bauen oder vereinfachen.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-BACKLOG – GOOGLE SHEETS EVENTS (verbindlich dokumentiert)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Ziel:
-Events effizient einpflegen (Copy/Paste), keine Duplikate, keine falschen Kategorien,
-saubere Automatisierung, und später TSV aus dem Prozess entfernen.
-
-A) Google Sheet Setup (Datenqualität)
-- [x] Sheet existiert, öffentlich “Jeder mit Link → Betrachter”
-- [ ] Header-Zeile exakt nach Builder-Schema final prüfen und fixieren
-- [ ] Datenvalidierung:
-      - kategorie Dropdown nur mit finalen Kategorien (ohne “Sonstiges”)
-      - ungültige Werte ablehnen
-      - Pflichtfelder: id, title, date, city, location, kategorie
-- [ ] ID-Workflow:
-      - Redaktionsregel definieren (wie IDs erstellt werden)
-      - optional: Sheet-Formel/Helper zur ID-Generierung dokumentieren
-- [ ] Copy/Paste Standard:
-      - ChatGPT liefert TSV-Zeilen (tab-getrennt) passend zum Sheet-Header
-
-B) CI/Deploy (Automatisierung)
-- [x] Deploy lädt Events aus Google Sheet (TSV Export) und baut events.json Fail-Fast
-- [ ] Optional: Deploy-Zeitplan (schedule) definieren (z.B. täglich) + workflow_dispatch beibehalten
-
-C) Dedupe & Cleanup (Build-Logik)
-- [ ] Duplikat-Regel in Builder final festlegen und dokumentieren:
-      - Fail-Fast: (url + date) eindeutig (empfohlen)
-- [ ] Abgelaufene Ein-Tages-Events:
-      - Regel final: Skip oder Fail-Fast
-      - Dokumentation: “nicht veröffentlichen” bedeutet “nicht in events.json”
-- [ ] Range-Events (endDate):
-      - Sicherstellen: UI/Filter/Sortierung sind vollständig range-aware
-
-D) Prozess: tägliche Event-Recherche
-- [x] Täglicher ChatGPT-Check ist eingerichtet (notify only if new events)
-- [ ] Quellenliste final definieren (Stadt, Locations, Kulturkalender)
-- [ ] Standardausgabe definieren: kurze Liste + TSV-Block + Duplikatwarnungen
-
-E) TSV-Entfernung (späterer finaler Schritt)
-- [ ] Wenn Pipeline stabil ist: events.tsv nicht mehr als Repo-Quelle behandeln
-- [ ] Abschließend: TSV als Prozess-/Repo-Abhängigkeit entfernen (nur wenn alle Schritte oben stabil sind)
-
+visuelle Stilwechsel vornehmen
