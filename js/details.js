@@ -646,7 +646,40 @@
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
               ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${escapeHtml(vm.icon)}</span>` : ""}
             </div>
-            <div class="detail-meta">${escapeHtml([vm.city, vm.date, vm.timeRange].filter(Boolean).join(" · "))}</div>
+                       <div class="detail-meta-chips" role="list" aria-label="Event-Infos">
+              ${vm.city ? `
+                <span class="detail-chip" role="listitem">
+                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span class="detail-chip-text">${escapeHtml(vm.city)}</span>
+                </span>
+              ` : ""}
+
+              ${vm.date ? `
+                <span class="detail-chip" role="listitem">
+                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="detail-chip-text">${escapeHtml(vm.date)}</span>
+                </span>
+              ` : ""}
+
+              ${vm.timeRange ? `
+                <span class="detail-chip" role="listitem">
+                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="detail-chip-text">${escapeHtml(vm.timeRange)}</span>
+                </span>
+              ` : ""}
+            </div>
+
           </div>
 
                              ${vm.locationLabel ? `
@@ -828,6 +861,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
