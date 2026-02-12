@@ -626,12 +626,23 @@
             }
           };
 
-          const googleUrl = buildGoogleCalendarUrl();
-          const opened = tryOpen(googleUrl);
+                    const googleUrl = buildGoogleCalendarUrl();
 
-          if (opened) return;
+          // Open Google Calendar (best UX). Avoid double-action:
+          // Some browsers open the tab but still return null → would trigger ICS fallback.
+          try {
+            const w = window.open(googleUrl, "_blank", "noopener");
+            if (!w) {
+              window.location.href = googleUrl;
+            }
+          } catch (_) {
+            window.location.href = googleUrl;
+          }
+
+          return;
 
           // Fallback: ICS download (previous behavior)
+
           const hasTime = Boolean(p.startTime && timeOk(p.startTime));
 
           const dt = (dateYmd, hhmm) => {
@@ -718,6 +729,7 @@
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
