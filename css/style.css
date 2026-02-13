@@ -1547,6 +1547,14 @@ body.is-panel-open { overflow: hidden; }
   backdrop-filter: none;
 }
 
+/* === BEGIN PATCH: DETAILPANEL SHEET HEIGHT + FLEX (compact default, less empty space)
+Zweck:
+- Standardhöhe etwas kompakter (weniger „Leerraum“ bei kurzen Events)
+- Sheet als Flex-Column, damit .detail-panel-body robust „füllt“
+Umfang:
+- Nur .detail-panel-content + ::after
+=== */
+
 /* Sheet */
 #event-detail-panel .detail-panel-content{
   position: absolute;
@@ -1554,9 +1562,12 @@ body.is-panel-open { overflow: hidden; }
   right: 0;
   bottom: 0;
 
-  /* Höhe stabil auf Mobile */
-  height: min(78dvh, 620px);
-  max-height: 78dvh;
+  /* etwas kompakter als vorher */
+  height: min(72dvh, 560px);
+  max-height: 72dvh;
+
+  display: flex;
+  flex-direction: column;
 
   background: rgba(255,255,255,0.98);
   border-radius: 22px 22px 0 0;
@@ -1571,6 +1582,9 @@ body.is-panel-open { overflow: hidden; }
 
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
+
+/* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (compact default, less empty space) === */
+
 
 /* Grabber */
 #event-detail-panel .detail-panel-grabber{
@@ -1625,9 +1639,19 @@ body.is-panel-open { overflow: hidden; }
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
+/* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (title higher, less bottom reserve)
+Zweck:
+- Body nutzt Flex (kein starres height:100%), sauberer Fill im Sheet
+- #detail-content: weniger Top-Padding (Titel höher), weniger Bottom-Reserve (weniger Leerraum)
+Umfang:
+- .detail-panel-body + #detail-content
+=== */
+
 /* Body: EIN Scroll-Container */
 #event-detail-panel .detail-panel-body{
-  height: 100%;
+  flex: 1 1 auto;
+  height: auto;
+
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -1639,38 +1663,56 @@ body.is-panel-open { overflow: hidden; }
 
 /* #detail-content: Inhalt, kein eigener Scroll */
 #event-detail-panel #detail-content{
-  padding-top: 40px;
+  /* Titel näher nach oben (vorher 40px) */
+  padding-top: 24px;
 
-  /* Platz für Actionbar + safe-area */
-  padding-bottom: calc(84px + max(0px, env(safe-area-inset-bottom)));
+  /* Platz für Actionbar + safe-area (etwas weniger als vorher) */
+  padding-bottom: calc(72px + max(0px, env(safe-area-inset-bottom)));
 
   height: auto;
   max-height: none;
   overflow: visible;
 }
 
+/* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
+Zweck:
+- Kein Overlap zwischen Kategorie-Icon und Close
+- Title-Row wirkt wie „echte“ Header-Zeile (ruhiger, kompakter)
+Umfang:
+- .detail-header + .detail-title-row + .detail-category-icon + .detail-title
+=== */
+
 /* Header / Title Row */
 #event-detail-panel .detail-header{
   position: relative;
 
-  /* keine extra Paddings – richtet sich nach .detail-panel-body */
-  padding: 10px 0 12px;
+  padding: 8px 0 10px;
   margin: 0;
 
-  /* ruhiger „Abschnittsabschluss“ */
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
 #event-detail-panel .detail-title-row{
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+
+  /* Reserve für Close: 44px + rechter Gutter (aus deinem Proof: right=var(--gutter)) */
+  padding-right: calc(44px + var(--gutter));
+}
+
+#event-detail-panel .detail-category-icon{
+  flex: 0 0 auto;
+  order: -1;          /* weg von der rechten Seite → keine Kollision mit Close */
+  margin-top: 1px;
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.82;
 }
 
 #event-detail-panel .detail-title{
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   min-width: 0;
   flex: 1 1 auto;
 
@@ -1686,16 +1728,10 @@ body.is-panel-open { overflow: hidden; }
   overflow: hidden;
 }
 
-/* optionales Kategorie-Icon rechts */
-#event-detail-panel .detail-category-icon{
-  flex: 0 0 auto;
-  margin-top: 2px;
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0.82;
-}
-
 /* Meta Chips */
+
+/* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
+
 #event-detail-panel .detail-meta-chips{
   display: flex;
   flex-wrap: wrap;
@@ -2224,6 +2260,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
