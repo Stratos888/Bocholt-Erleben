@@ -183,33 +183,37 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
 
 
    
-   <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
+  <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
 Zweck: Dediziertes Overlay-Root direkt unter <body>; enthält das Event-Detailpanel.
-Umfang: Struktur auf 3 Zonen vorbereitet: Header (fixed), Content (scroll), Actionbar-Slot (fixed).
+Umfang:
+- detail-panel-content bleibt das transformierte Bottom-Sheet (Header + Body + #detail-content)
+- Actionbar-Slot wird AUS dem transformierten Sheet herausgezogen (Kind von #event-detail-panel),
+  damit er später viewport-stabil positioniert werden kann.
 === -->
 <div id="overlay-root">
-    <!-- EVENT DETAIL PANEL (hidden by default) -->
-    <div id="event-detail-panel" class="detail-panel hidden">
-        <div class="detail-panel-overlay"></div>
+  <!-- EVENT DETAIL PANEL (hidden by default) -->
+  <div id="event-detail-panel" class="detail-panel hidden">
+    <div class="detail-panel-overlay"></div>
 
-        <div class="detail-panel-content">
-            <div class="detail-panel-header">
-                <div class="detail-panel-handle" aria-hidden="true"></div>
-                <button class="detail-panel-close" type="button" aria-label="Schließen">×</button>
-            </div>
+    <div class="detail-panel-content">
+      <div class="detail-panel-header">
+        <div class="detail-panel-handle" aria-hidden="true"></div>
+        <button class="detail-panel-close" type="button" aria-label="Schließen">×</button>
+      </div>
 
-            <div class="detail-panel-body">
-                <div id="detail-content">
-                    <!-- Event details werden hier dynamisch eingefügt -->
-                </div>
-            </div>
-
-            <!-- Slot: Actions werden hier (außerhalb des Scroll-Contents) gerendert -->
-            <div id="detail-actionbar-slot" class="detail-actionbar" aria-label="Aktionen"></div>
+      <div class="detail-panel-body">
+        <div id="detail-content">
+          <!-- Event details werden hier dynamisch eingefügt -->
         </div>
+      </div>
     </div>
+
+    <!-- Slot: Actions werden hier gerendert (außerhalb von .detail-panel-content) -->
+    <div id="detail-actionbar-slot" class="detail-actionbar" aria-label="Aktionen"></div>
+  </div>
 </div>
 <!-- === END BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) === -->
+
 
 
 
@@ -352,6 +356,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
