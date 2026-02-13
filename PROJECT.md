@@ -24,6 +24,12 @@ Keine Änderungen ohne aktuellen Code
 Keine Annahmen
 
 Keine Teil-Snippets
+1.1.1 Single Source of Truth (Handshake)
+
+Wenn mehrere Uploads/Versionen existieren:
+- Es wird explizit ein kanonischer Dateistand benannt („Diese Datei ist Wahrheit“).
+- Es wird ausschließlich auf diesem Stand gearbeitet.
+- Jede neue Datei-Version ersetzt die alte vollständig als neue Wahrheit.
 
 1.2 Diff-Regel (Pflicht)
 
@@ -40,6 +46,12 @@ komplette Dateien neu generieren
 vage Anweisungen
 
 „füge irgendwo ein“
+1.2.1 Block-Existenz-Garantie (Pflicht)
+
+Bei „Ersetze Block von … bis …“ gilt zusätzlich:
+- Der Assistant MUSS sicherstellen, dass BEGIN/END exakt im aktuellen Dateistand vorkommen.
+- Wenn BEGIN/END nicht gefunden werden: STOP → aktuellen Datei-Stand anfordern.
+- Kein Ersetzen „auf Verdacht“, keine erfundenen Marker/Blocknamen.
 
 1.3 Datei-Isolation
 
@@ -63,6 +75,31 @@ raten
 Workarounds
 
 „100% sicher“ ohne Proof
+1.4.1 Proof-Gate (Pflicht bei UI/Layout/Positioning)
+
+Bevor irgendein Patch geliefert wird, MUSS zuerst ein „Proof Bundle“ vorliegen (DevTools oder reproduzierbare Messwerte):
+
+A) DOM-Proof:
+- Exists: #event-detail-panel, .detail-panel-content, .detail-panel-body, #detail-actionbar-slot
+
+B) Geometry-Proof:
+- getBoundingClientRect() für Sheet + Actionbar-Slot + window.innerHeight
+
+C) Computed-Style-Proof:
+- position / bottom / transform / overflow / z-index (für Sheet, Body, Slot)
+
+D) Active-Stylesheet-Proof:
+- Welche CSS-Datei ist wirklich geladen (document.styleSheets href)
+
+E) Visual-Proof:
+- 1 Screenshot „Problemzustand“ (gleicher Screen, gleiche Zoom-Stufe)
+
+Ohne Proof Bundle: KEIN Patch. Erst Proof anfordern.
+
+1.4.2 Fix-Ansage nur mit Abnahme-Proof
+
+Ein Fix darf erst als „gelöst“ gelten, wenn nach dem Patch die gleiche Proof-Messung wiederholt wurde
+und die erwarteten Werte erfüllt sind (z. B. SlotRect.bottom innerhalb Viewport; dpBaseY=0px; etc.).
 
 1.5 CSS-first
 
@@ -76,6 +113,15 @@ State
 Events
 
 Datenlogik
+1.6 Definition of Done (UI/Layout Tickets)
+
+Ein UI/Layout Ticket ist erst DONE, wenn:
+- Primärsymptom behoben (z. B. Actionbar sichtbar & korrekt positioniert)
+- Keine Regression der Basis-UI (Typography/Spacing/Icons nicht kaputt)
+- Proof Bundle erneut gemessen und erfüllt (1.4.2)
+- 1 Screenshot „nachher“ mit gleicher Perspektive
+
+Wenn ein Fix das Symptom löst, aber Design regressiert → Ticket gilt als NICHT bestanden.
 
 2. Architektur (hart, nicht verhandelbar)
 2.1 Overlay-Root
@@ -99,6 +145,12 @@ sticky
 overflow
 
 backdrop-filter
+2.1.1 Keine Koordinatensystem-Mischung (Pflicht)
+
+Bei Bottom-Sheets/Transforms gilt:
+- Positionierungs-Strategie pro Element fixieren (absolute vs fixed vs sticky).
+- Keine Wechsel „on the fly“, ohne vorher/nachher Proof Bundle.
+- Wenn transform im Spiel ist: erst beweisen, welches Element der Positionierungs-Anchor ist.
 
 2.2 Kein vh
 
