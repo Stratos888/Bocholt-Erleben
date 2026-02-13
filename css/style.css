@@ -70,15 +70,19 @@
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
 
-  /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
+   /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
   Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
-  Umfang: Header-Höhe + Abstand + Farben für Header/Divider.
+  Umfang: Header-Höhe + Abstand + Farben für Header/Divider + globaler Gutter.
   === */
+  --gutter: 16px;                    /* globaler horizontaler Innenabstand (mobile) */
+  --gutter-lg: 24px;                 /* optional: desktop */
+
   --header-h: 48px;                  /* entspricht .app-header min-height */
   --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
   /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
+
 
 }
 
@@ -98,10 +102,15 @@ Zweck:
 - Desktop: Außenfläche minimal absetzen.
 - App-Frame bleibt hell und ruhig.
 - Mobile/PWA unverändert.
+- Desktop bekommt automatisch größeren Gutter.
 Umfang:
-- Nur Hintergrundfarben via Media Query.
+- Nur Hintergrundfarben + :root Gutter via Media Query.
 === */
 @media (min-width: 900px){
+  :root{
+    --gutter: var(--gutter-lg);
+  }
+
   body{
     background: #eef1e6; /* leicht dunkler als App-Fläche */
   }
@@ -113,6 +122,7 @@ Umfang:
   }
 }
 /* === END BLOCK: DESKTOP BACKDROP POLISH === */
+
 
 /* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
 
@@ -967,7 +977,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   top: calc(var(--header-h) + var(--stack-gap));
   z-index: 900;
 
-  padding: 4px 14px 6px;
+  padding: 4px var(--gutter) 6px;
 
   background: rgba(249, 251, 246, 0.90);
   -webkit-backdrop-filter: blur(12px);
@@ -981,6 +991,7 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
   transform: translateZ(0);
 }
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
+
 
 
 
@@ -2355,6 +2366,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
