@@ -2189,9 +2189,10 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar sitzt IMMER unten im Detailpanel (nicht im normalen Dokumentfluss)
-- Icon-Buttons: 44x44, konsistente Control-DNA (wie Header)
-- Ruhige Hover/Press/Focus States
+- Detailpanel-Actionbar auf Top-App Niveau (ruhige Surface, klare States)
+- Konsistente Control-DNA zu Header-Buttons (Radius/Border/Press/Focus)
+Umfang:
+- #detail-actionbar-slot + .detail-actionbar-btn + Icon-Sizing + Body-Bottom-Padding
 === */
 
 #detail-actionbar-slot{
@@ -2207,8 +2208,12 @@ Zweck:
   gap: 10px;
   align-items: center;
 
-  background: var(--color-surface);
-  border-top: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.96);
+  border-top: 1px solid rgba(31,41,51,0.08);
+
+  box-shadow:
+    0 -10px 24px rgba(31,41,51,0.06),
+    0 1px 0 rgba(255,255,255,0.70) inset;
 
   z-index: 50;
 }
@@ -2218,7 +2223,7 @@ Zweck:
   padding-bottom: calc(64px + 16px + max(0px, env(safe-area-inset-bottom)));
 }
 
-/* Buttons: icon-only */
+/* Buttons: icon-only (44×44) */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
@@ -2231,6 +2236,10 @@ Zweck:
   border-radius: 14px;
   border: 1px solid rgba(31,41,51,0.08);
   background: rgba(31,41,51,0.06);
+
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 
   font-size: 0 !important;
   line-height: 0 !important;
@@ -2245,12 +2254,19 @@ Zweck:
   #detail-actionbar-slot .detail-actionbar-btn:hover{
     background: rgba(31,41,51,0.08);
     border-color: rgba(31,41,51,0.12);
+    box-shadow:
+      0 10px 22px rgba(0,0,0,0.06),
+      0 1px 0 rgba(255,255,255,0.72) inset;
   }
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
   background: rgba(31,41,51,0.10);
+  border-color: rgba(31,41,51,0.14);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.04),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
@@ -2259,7 +2275,7 @@ Zweck:
   border-radius: 14px;
 }
 
-/* Icons */
+/* Icons: niemals 0px */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
@@ -2274,4 +2290,5 @@ Zweck:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
