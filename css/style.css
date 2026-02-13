@@ -1565,9 +1565,18 @@ Umfang:
 }
 
 /* Wenn aktiv: Basis bei 0 */
+/* === BEGIN PATCH: DETAILPANEL OPEN POSITION (force override win) ===
+Zweck:
+- Nachweis: computed --dp-base-y bleibt 40dvh → translateY(258px) → Panel wirkt “zu klein/zu hoch”
+- Fix: Override muss in der Cascade sicher gewinnen
+Umfang:
+- Nur active-state Variable Override
+=== */
 #event-detail-panel.detail-panel.active .detail-panel-content{
-  --dp-base-y: 0px;
+  --dp-base-y: 0px !important;
 }
+/* === END PATCH: DETAILPANEL OPEN POSITION (force override win) === */
+
 
 /* Handle */
 #event-detail-panel .detail-panel-content::before{
@@ -2085,18 +2094,19 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar Layout + Button-Größe + Icon-Scaling
-- Slot sitzt am Panel-Bottom (Panel ist position:fixed inset:0)
-- KEIN Tabbar-Offset: Panel überdeckt die Tabbar, also darf die Actionbar nicht 44px hochrutschen
+- Actionbar Layout + Button-Größe + Icon-Scaling (robust)
+- Buttons sind icon-only (Text bleibt für A11y im DOM, aber visuell aus)
+- verhindert 0px/oversize SVGs in verschiedenen Browsern
 === */
 
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
-
-  /* nur Safe-Area, kein var(--tabbar-h) */
-  bottom: max(0px, env(safe-area-inset-bottom));
+  bottom: calc(
+    var(--tabbar-h) +
+    max(0px, env(safe-area-inset-bottom))
+  );
 
   height: 64px;
   padding: 10px 12px;
@@ -2111,7 +2121,7 @@ Zweck:
   z-index: 5;
 }
 
-/* Buttons */
+/* Buttons: icon-only */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
@@ -2124,18 +2134,30 @@ Zweck:
   border: 0;
 
   background: rgba(31,41,51,0.06);
+
+  /* Text (z.B. "Kalender") visuell ausblenden */
+  font-size: 0;
+  line-height: 0;
+  color: rgba(31,41,51,0.82);
 }
 
-/* Icons NIEMALS groß */
-#detail-actionbar-slot svg,
-#detail-actionbar-slot img{
+/* Icons: robust gegen 0px width / riesige SVGs */
+#detail-actionbar-slot .detail-actionbar-btn svg,
+#detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
   height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
+
+  display: block !important;
+  flex: 0 0 auto !important;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
+
 
 
 
