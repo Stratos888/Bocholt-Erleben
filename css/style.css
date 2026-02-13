@@ -1927,36 +1927,29 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar immer sichtbar im Viewport (unabhängig von Sheet-translateY/Snap)
-- Scroll-Body bekommt Bottom-Puffer in Actionbar-Höhe
-- Icons hart begrenzt (SVG/IMG)
-Umfang:
-- #event-detail-panel .detail-panel-body
-- #detail-actionbar-slot + Buttons/Icon sizing
+- Actionbar bleibt im Sheet-Stacking-Context (nicht fixed!)
+- dadurch niemals vom Overlay überdeckt
+- trotzdem immer sichtbar, weil Scroll-Body Platz unten bekommt
+- kompatibel mit translateY / Snap / Drag
 === */
 
-/* Scroll-Body: Platz unten für die fixed Actionbar + Safe-Area/Tabbar */
+/* Scrollbereich bekommt garantierten Platz */
 #event-detail-panel .detail-panel-body{
   padding-bottom: calc(
-    64px + 12px +
+    64px + 16px +
     var(--tabbar-h) +
     max(0px, env(safe-area-inset-bottom))
   );
 }
 
-/* Actionbar an den VIEWPORT pinnen (nicht an den Element-Bottom!) */
+/* Actionbar bleibt IM Sheet */
 #detail-actionbar-slot{
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
+  bottom: 0;
 
-  /* über OS/Browser-UI anheben */
-  bottom: calc(
-    var(--tabbar-h) +
-    max(0px, env(safe-area-inset-bottom))
-  );
-
-  z-index: 2147482000; /* sicher über Sheet/Overlay, unter Calendar-Chooser (der ist noch höher) */
+  z-index: 5; /* nur über Content, NICHT global */
 
   height: 64px;
   padding: 10px 12px;
@@ -1966,14 +1959,13 @@ Umfang:
   align-items: center;
 
   background: var(--color-surface);
-  border-top: 1px solid rgba(31,41,51,0.06);
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 
 /* Buttons */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
-  padding: 0;
 
   display: inline-flex;
   align-items: center;
@@ -1983,24 +1975,17 @@ Umfang:
   border: 0;
 
   background: rgba(31,41,51,0.06);
-  color: rgba(31,41,51,0.92);
-
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* Icons: NIE groß werden */
+/* Icons niemals skalieren */
 #detail-actionbar-slot svg,
 #detail-actionbar-slot img{
   width: 18px !important;
   height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  display: block;
-  flex: 0 0 auto;
-  object-fit: contain;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
@@ -2559,6 +2544,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
