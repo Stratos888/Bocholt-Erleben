@@ -1726,6 +1726,61 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+/* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
+Zweck:
+- Actionbar Layout + Button-Größe + Icon-Scaling
+- Slot sitzt am Panel-Bottom (Panel ist bereits position:fixed inset:0)
+- verhindert riesige SVGs
+=== */
+
+#detail-actionbar-slot{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(
+    var(--tabbar-h) +
+    max(0px, env(safe-area-inset-bottom))
+  );
+
+  height: 64px;
+  padding: 10px 12px;
+
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  background: var(--color-surface);
+  border-top: 1px solid rgba(0,0,0,0.06);
+
+  z-index: 5;
+}
+
+/* Buttons */
+#detail-actionbar-slot .detail-actionbar-btn{
+  width: 44px;
+  height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+  border: 0;
+
+  background: rgba(31,41,51,0.06);
+}
+
+/* Icons NIEMALS groß */
+#detail-actionbar-slot svg,
+#detail-actionbar-slot img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+}
+
+/* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
