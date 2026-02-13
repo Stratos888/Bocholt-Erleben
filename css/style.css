@@ -1928,35 +1928,42 @@ Umfang:
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
 - Actionbar ist eine eigene Zone außerhalb des Scroll-Contents und immer sichtbar
-- Robust: im Sheet unten gepinnt (absolute), unabhängig von Sticky/Overflow-Eigenheiten
+- Robust im Mobile-Browser: hebt sich um --vv-bottom an (visualViewport), plus iOS safe-area
 - Icons hart begrenzt (SVG/IMG)
 Umfang:
 - .detail-panel-content als Position-Container
-- .detail-panel-body bekommt Bottom-Padding für Actionbar
-- #detail-actionbar-slot + Buttons + Icon sizing
+- .detail-panel-body bekommt Bottom-Padding für Actionbar (inkl. vv-bottom + safe-area)
+- #detail-actionbar-slot wird unten gepinnt (vv-bottom + safe-area)
 === */
 
 /* Sheet als Position-Container für die gepinnte Actionbar */
 #event-detail-panel .detail-panel-content{
-  position: absolute; /* bleibt kompatibel zu eurer translateY Bottom-Sheet Mechanik */
+  position: absolute; /* kompatibel zu eurer Bottom-Sheet Mechanik */
   inset: 0;
 }
 
-/* Scroll-Body: Platz unten für Actionbar + Safe-Area */
+/* Scroll-Body: Platz unten für Actionbar + Safe-Area + Browser-UI Gap (vv-bottom) */
 #event-detail-panel .detail-panel-body{
-  padding-bottom: calc(64px + 12px + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(
+    64px + 12px +
+    max(0px, env(safe-area-inset-bottom)) +
+    var(--vv-bottom, 0px)
+  );
 }
 
-/* Actionbar unten im Sheet pinnen */
+/* Actionbar unten im Sheet pinnen – aber um Browser-UI Gap + Safe-Area anheben */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: calc(
+    max(0px, env(safe-area-inset-bottom)) +
+    var(--vv-bottom, 0px)
+  );
   z-index: 20;
 
   height: 64px;
-  padding: 10px 12px calc(10px + max(0px, env(safe-area-inset-bottom)));
+  padding: 10px 12px;
 
   display: flex;
   gap: 10px;
@@ -1998,6 +2005,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 #event-detail-panel .detail-secondary-link,
 #event-detail-panel .detail-secondary-link:link,
@@ -2554,6 +2562,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
