@@ -254,16 +254,58 @@ Contract:
 
 // App starten sobald DOM ready
 /* === BEGIN BLOCK: APP BOOTSTRAP (DOM first, deterministic) ===
-Zweck: UI-abhängige Module (Filter) dürfen erst nach DOMReady initialisiert werden.
-Umfang: Ersetzt den App-Start am Dateiende.
+Zweck:
+- App startet erst nach DOMReady
+- Setzt Viewport-CSS-Variablen für Mobile-Browser-UI (visualViewport), damit Bottom-Actions sichtbar bleiben
+Umfang:
+- Ersetzt den App-Start am Dateiende + fügt Viewport-Observer ein
 === */
 document.addEventListener("DOMContentLoaded", () => {
+    /* === BEGIN BLOCK: VISUAL VIEWPORT CSS VARS (mobile bottom-safe) ===
+    Zweck:
+    - Im Mobile-Browser kann die sichtbare Fläche kleiner sein als window.innerHeight (Browser-UI, Tastatur).
+    - Wir setzen CSS-Variablen:
+      --vvh       = visualViewport.height (sichtbare Höhe)
+      --vv-bottom = "verlorene" Pixel unten (Layout-Viewport minus sichtbarer Viewport)
+    Umfang:
+    - Aktiv in Browsern mit window.visualViewport
+    === */
+    const root = document.documentElement;
+
+    const applyVV = () => {
+        const vv = window.visualViewport;
+        if (!vv) {
+            root.style.setProperty("--vvh", `${window.innerHeight}px`);
+            root.style.setProperty("--vv-bottom", "0px");
+            return;
+        }
+
+        // Bottom-Gap: wie viel vom Layout-Viewport unten NICHT sichtbar ist
+        const bottomGap = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+
+        root.style.setProperty("--vvh", `${vv.height}px`);
+        root.style.setProperty("--vv-bottom", `${bottomGap}px`);
+    };
+
+    applyVV();
+
+    // Reagiert auf UI-Bar rein/raus, Rotation, Tastatur etc.
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", applyVV, { passive: true });
+        window.visualViewport.addEventListener("scroll", applyVV, { passive: true });
+    }
+    window.addEventListener("resize", applyVV, { passive: true });
+
+    /* === END BLOCK: VISUAL VIEWPORT CSS VARS (mobile bottom-safe) === */
+
     App.init();
 });
 /* === END BLOCK: APP BOOTSTRAP (DOM first, deterministic) === */
 
 
+
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
