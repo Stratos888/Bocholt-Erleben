@@ -1511,14 +1511,23 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 
 /* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER ===
 Zweck:
-- Konsolidierter DetailPanel-Block als Single Source of Truth: gleichmäßiger Gutter, klare Hierarchie, saubere Interaktionen.
-- Entfernt konkurrierende/duplizierte Rules (Header/Location/Spacing), damit Layout stabil & „Top-App“ wirkt.
-Umfang:
-- Komplettblock DetailPanel Styles (overlay/content/header/chips/location/description/actionbar + responsive + safe-area).
+- DetailPanel wirkt „Top-App“: klare Hierarchie, konsistenter Rhythmus, ruhige Divider, keine zufälligen Paddings.
+- Meta als Chips (Ort/Datum/Zeit) mit sauberem Wrap; Zeit nimmt volle Breite.
+- Location als „List Row“ (klar interaktiv) + Description als ruhiger Textblock.
+- Safe-Area + Actionbar-Abstand stabil.
+Umfang: Komplettblock DetailPanel Styles (overlay/content/header/chips/location/description + responsive + safe-area).
 === */
 
-html.is-panel-open{ overflow: hidden; }
-body.is-panel-open{ overflow: hidden; }
+/* === BEGIN BLOCK: DETAILPANEL TOP-APP RHYTHM v2 (single source of truth)
+Zweck:
+- Einheitliche Gutter-Logik (alles richtet sich nach --gutter)
+- Optische Breite „harmonisch“: Sektionen vollflächig innerhalb des Gutters
+- Ruhige Divider statt „Schwebeflächen“ und uneinheitlicher Innenabstände
+Umfang:
+- #event-detail-panel + overlay + sheet + body scroll + header/meta/location/desc + close
+=== */
+
+body.is-panel-open { overflow: hidden; }
 
 #event-detail-panel.detail-panel{
   position: fixed;
@@ -1528,7 +1537,7 @@ body.is-panel-open{ overflow: hidden; }
 }
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
-/* Overlay: ruhiges Dim, kein Blur */
+/* Overlay: ruhiges Dim (kein Blur) */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
@@ -1544,41 +1553,41 @@ body.is-panel-open{ overflow: hidden; }
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
 
-  width: 100%;
-  max-height: 100dvh;
+  /* Höhe stabil auf Mobile */
+  height: min(78dvh, 620px);
+  max-height: 78dvh;
 
   background: rgba(255,255,255,0.98);
   border-radius: 22px 22px 0 0;
 
-  border: 1px solid rgba(31,41,51,0.08);
-  border-bottom: 0;
   box-shadow:
-    0 -10px 30px rgba(0,0,0,0.10),
-    0 -1px 0 rgba(255,255,255,0.72) inset;
+    0 -10px 30px rgba(0,0,0,0.14),
+    0 -1px 0 rgba(31,41,51,0.05);
 
   overflow: hidden;
+  z-index: 2;
 }
 
-/* kein „Mask-Strip“ */
+/* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
-#event-detail-panel .detail-panel-content::before{ content: none !important; }
 
 /* Grabber */
 #event-detail-panel .detail-panel-grabber{
   position: absolute;
-  left: 50%;
   top: 8px;
+  left: 50%;
   transform: translateX(-50%);
+
   width: 46px;
-  height: 4px;
+  height: 5px;
+
   border-radius: 999px;
   background: rgba(31,41,51,0.18);
   z-index: 4;
 }
 
-/* Hit-Area fürs Draggen */
+/* Drag-Hit-Area */
 #event-detail-panel .detail-panel-drag-hit{
   position: absolute;
   left: 0;
@@ -1590,7 +1599,7 @@ body.is-panel-open{ overflow: hidden; }
   touch-action: none;
 }
 
-/* Close (44×44 Touch) */
+/* Close: aligned to gutter, Top-App touch target */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
@@ -1603,63 +1612,60 @@ body.is-panel-open{ overflow: hidden; }
   background: rgba(255,255,255,0.94);
   border: 1px solid rgba(31,41,51,0.10);
   box-shadow:
-    0 6px 16px rgba(0,0,0,0.08),
+    0 10px 22px rgba(0,0,0,0.10),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 22px;
   line-height: 42px;
   color: rgba(31,41,51,0.68);
   cursor: pointer;
-  z-index: 20;
 
   -webkit-tap-highlight-color: transparent;
+  z-index: 20;
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
-#event-detail-panel .detail-panel-close:focus-visible{
-  outline: 3px solid rgba(139,207,74,0.20);
-  outline-offset: 3px;
-}
 
-/* 3-Zonen: Body ist Scroll-Container */
+/* Body: EIN Scroll-Container */
 #event-detail-panel .detail-panel-body{
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 
+  /* global gutter for ALL content inside */
   padding-left: var(--gutter);
   padding-right: var(--gutter);
-
-  /* Platz für Actionbar + safe-area */
-  padding-bottom: calc(64px + var(--gutter) + max(0px, env(safe-area-inset-bottom)));
 }
 
-/* Inhalt */
+/* #detail-content: Inhalt, kein eigener Scroll */
 #event-detail-panel #detail-content{
   padding-top: 40px;
+
+  /* Platz für Actionbar + safe-area */
+  padding-bottom: calc(84px + max(0px, env(safe-area-inset-bottom)));
+
   height: auto;
   max-height: none;
   overflow: visible;
 }
 
-/* Header (keine Sonder-Gutter mehr) */
+/* Header / Title Row */
 #event-detail-panel .detail-header{
   position: relative;
-  padding-left: 0;
-  padding-right: 0;
 
-  padding-top: 10px;
-  padding-bottom: 12px;
+  /* keine extra Paddings – richtet sich nach .detail-panel-body */
+  padding: 10px 0 12px;
+  margin: 0;
 
-  margin: 0 0 6px;
+  /* ruhiger „Abschnittsabschluss“ */
+  border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
-/* Title row: Titel links, Icon rechts */
 #event-detail-panel .detail-title-row{
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -1668,10 +1674,10 @@ body.is-panel-open{ overflow: hidden; }
   min-width: 0;
   flex: 1 1 auto;
 
-  font-size: 19px;
-  line-height: 1.22;
-  font-weight: 820;
-  letter-spacing: -0.01em;
+  font-size: 20px;
+  line-height: 1.18;
+  font-weight: 840;
+  letter-spacing: -0.012em;
   color: rgba(31,41,51,0.96);
 
   display: -webkit-box;
@@ -1680,12 +1686,13 @@ body.is-panel-open{ overflow: hidden; }
   overflow: hidden;
 }
 
+/* optionales Kategorie-Icon rechts */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
-  margin-top: 1px;
+  margin-top: 2px;
   font-size: 18px;
   line-height: 1;
-  opacity: 0.85;
+  opacity: 0.82;
 }
 
 /* Meta Chips */
@@ -1693,7 +1700,7 @@ body.is-panel-open{ overflow: hidden; }
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 16px;
+  margin: 0 0 2px;
 }
 
 #event-detail-panel .detail-chip{
@@ -1702,7 +1709,7 @@ body.is-panel-open{ overflow: hidden; }
   gap: 8px;
 
   max-width: 100%;
-  padding: 7px 10px;
+  padding: 8px 12px;
   border-radius: 999px;
 
   background: rgba(31,41,51,0.06);
@@ -1726,10 +1733,14 @@ body.is-panel-open{ overflow: hidden; }
   overflow-wrap: anywhere;
 }
 
-/* Zeit volle Breite */
-#event-detail-panel .detail-chip[data-chip="time"]{ flex: 1 0 100%; }
+/* Zeit: volle Breite + etwas „wichtiger“ */
+#event-detail-panel .detail-chip[data-chip="time"]{
+  flex: 1 0 100%;
+  background: rgba(139,207,74,0.12);
+  border-color: rgba(139,207,74,0.18);
+}
 
-/* Location Action Row (einmalig, full-width, sauberer Divider) */
+/* Location Row: wie native List Row */
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
 #event-detail-panel .detail-location-action:visited{
@@ -1738,21 +1749,21 @@ body.is-panel-open{ overflow: hidden; }
   gap: 10px;
 
   width: 100%;
-  padding: 12px 0;
-
-  border-radius: 12px;
-  background: transparent;
+  padding: 14px 0;
 
   border: 0;
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+
+  background: transparent;
   color: rgba(31,41,51,0.90);
   text-decoration: none;
 
+  border-radius: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-#event-detail-panel .detail-location-action{
-  border-bottom: 1px solid rgba(31,41,51,0.06);
-  margin-bottom: 12px;
+#event-detail-panel .detail-location-action:active{
+  background: rgba(31,41,51,0.03);
 }
 
 #event-detail-panel .detail-location-action.is-static{
@@ -1766,8 +1777,9 @@ body.is-panel-open{ overflow: hidden; }
 
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
-  opacity: 0.85;
+  opacity: 0.86;
 }
+
 #event-detail-panel .detail-location-text{
   min-width: 0;
   flex: 1 1 auto;
@@ -1780,146 +1792,57 @@ body.is-panel-open{ overflow: hidden; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 #event-detail-panel .detail-location-chev{
   flex: 0 0 auto;
   margin-left: 8px;
-  opacity: 0.65;
+  opacity: 0.62;
   font-size: 18px;
   line-height: 1;
 }
 
-#event-detail-panel .detail-location-action:active{
-  background: rgba(31,41,51,0.03);
-  transform: translateY(1px);
-}
-
-/* Beschreibung */
+/* Description: ruhiger Textblock */
 #event-detail-panel .detail-description{
-  margin-top: 12px;
-  margin-bottom: 6px;
+  margin: 14px 0 0;
+  padding: 0;
 
   font-size: 14px;
-  line-height: 1.65;
-  font-weight: 500;
-  color: rgba(31,41,51,0.88);
+  line-height: 1.5;
+  font-weight: 520;
+  color: rgba(31,41,51,0.82);
 
   overflow-wrap: anywhere;
 }
 
-/* Legacy: falls irgendwo noch vorhanden -> nicht als Pill darstellen */
-#event-detail-panel .detail-location,
-#event-detail-panel .detail-category{
-  display: none !important;
-}
-
-/* Actionbar: Premium Polish (konsistent zur Header-DNA) */
-#detail-actionbar-slot{
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 64px;
-  padding: 10px var(--gutter) calc(10px + max(0px, env(safe-area-inset-bottom)));
-
-  display: flex;
-  gap: 10px;
-  align-items: center;
-
-  background: rgba(255,255,255,0.96);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-
-  border-top: 1px solid rgba(31,41,51,0.08);
-  box-shadow: 0 -10px 24px rgba(0,0,0,0.06);
-
-  z-index: 50;
-}
-
-/* Buttons: icon-only, 44×44 */
-#detail-actionbar-slot .detail-actionbar-btn{
-  width: 44px;
-  height: 44px;
-  padding: 0;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(31,41,51,0.05);
-
-  font-size: 0 !important;
-  line-height: 0 !important;
-  overflow: hidden;
-
-  -webkit-tap-highlight-color: transparent;
-  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.04),
-    0 1px 0 rgba(255,255,255,0.70) inset;
-}
-#detail-actionbar-slot .detail-actionbar-btn:active{
-  transform: translateY(1px);
-  background: rgba(31,41,51,0.07);
-  border-color: rgba(31,41,51,0.10);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.05),
-    0 1px 0 rgba(255,255,255,0.62) inset;
-}
-#detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 3px solid rgba(139,207,74,0.20);
-  outline-offset: 3px;
-}
-
-/* Icon sizing guard */
-#detail-actionbar-slot .detail-actionbar-btn svg,
-#detail-actionbar-slot .detail-actionbar-btn img{
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-
-  display: block !important;
-  flex: 0 0 auto !important;
-}
-
-/* Desktop: als Modal zentriert */
-@media (min-width: 900px){
-  #event-detail-panel .detail-panel-content{
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-
-    width: min(640px, calc(100vw - 64px));
-    max-height: calc(100vh - 64px);
-
-    transform: translate(-50%, calc(-50% + 24px));
-    opacity: 0;
-    transition: transform 220ms ease, opacity 220ms ease;
-  }
-
-  #event-detail-panel.detail-panel.active .detail-panel-content{
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-
-  #event-detail-panel #detail-content{
-    padding-top: 18px;
-  }
-}
-
-/* Small screens */
+/* Responsive: sehr kleine Geräte */
 @media (max-width: 360px){
-  #event-detail-panel .detail-title{ font-size: 18px; }
-  #event-detail-panel #detail-content{ padding-top: 38px; }
+  #event-detail-panel .detail-panel-content{
+    height: min(82dvh, 640px);
+    max-height: 82dvh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  #event-detail-panel .detail-title{
+    font-size: 19px;
+    line-height: 1.18;
+  }
+
+  #event-detail-panel .detail-chip{
+    padding: 8px 11px;
+  }
 }
+
+/* Safe-area extra unten: falls Actionbar groß wird */
+@supports(padding: max(0px)){
+  #event-detail-panel #detail-content{
+    padding-bottom: calc(84px + max(0px, env(safe-area-inset-bottom)));
+  }
+}
+
+/* === END BLOCK: DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) === */
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER === */
+
 
 
 
@@ -2301,6 +2224,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
