@@ -2094,18 +2094,19 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar bleibt im Sheet (gleiches Koordinatensystem wie transform)
-- sticky statt absolute/fixed → folgt immer dem sichtbaren unteren Rand
-- funktioniert unabhängig von dp-base-y, Snap, Drag, Safe-Area
-- exakt wie Google Maps Bottom Sheet
+- Actionbar sitzt IMMER unten im Detailpanel (nicht im normalen Dokumentfluss)
+- Keine Sticky-Logik: Bottom-Bar wird am Panel-Bottom verankert
+- Icons sichtbar, Text visuell aus (A11y bleibt)
 === */
 
 #detail-actionbar-slot{
-  position: sticky;
+  position: absolute;
+  left: 0;
+  right: 0;
   bottom: 0;
 
   height: 64px;
-  padding: 10px 12px;
+  padding: 10px 12px calc(10px + max(0px, env(safe-area-inset-bottom)));
 
   display: flex;
   gap: 10px;
@@ -2114,13 +2115,19 @@ Zweck:
   background: var(--color-surface);
   border-top: 1px solid rgba(0,0,0,0.06);
 
-  z-index: 5;
+  z-index: 50;
 }
 
-/* Buttons */
+/* Content bekommt Platz, damit nichts unter die Bar läuft */
+#event-detail-panel .detail-panel-body{
+  padding-bottom: calc(64px + 16px + max(0px, env(safe-area-inset-bottom)));
+}
+
+/* Buttons: icon-only */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
+  padding: 0;
 
   display: inline-flex;
   align-items: center;
@@ -2128,74 +2135,25 @@ Zweck:
 
   border-radius: 14px;
   border: 0;
-
   background: rgba(31,41,51,0.06);
 
-  font-size: 0;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden;
 }
 
-/* Icons robust */
-#detail-actionbar-slot svg,
-#detail-actionbar-slot img{
+/* Icons: niemals 0px */
+#detail-actionbar-slot .detail-actionbar-btn svg,
+#detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
   height: 18px !important;
   min-width: 18px !important;
   min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+
+  display: block !important;
+  flex: 0 0 auto !important;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
