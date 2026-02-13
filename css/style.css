@@ -1547,10 +1547,20 @@ body.is-panel-open { overflow: hidden; }
   backdrop-filter: none;
 }
 
-/* === BEGIN PATCH: DETAILPANEL SHEET HEIGHT + FLEX (compact default, less empty space)
+/* === BEGIN REPLACE BLOCK: DETAILPANEL ADAPTIVE HEIGHT + SINGLE BOTTOM RESERVE (style.css:1550-1876)
 Zweck:
-- Standardhöhe etwas kompakter (weniger „Leerraum“ bei kurzen Events)
-- Sheet als Flex-Column, damit .detail-panel-body robust „füllt“
+- Entfernt „Leerraum“ bei kurzen Events: Sheet ist content-adaptiv (auto) statt fixe Höhe.
+- Behält sauberes Verhalten bei langen Inhalten: max-height + Scroll im Body.
+- Entfernt doppelte Bottom-Reserves: Bottom-Reserve kommt NUR über .detail-panel-body (Actionbar-Block).
+Umfang:
+- Nur DetailPanel: .detail-panel-content (Height/Max-Height) + .detail-panel-body (min-height:0) + #detail-content (kein padding-bottom)
+- Responsive (max-width:360px) angepasst
+=== */
+
+/* === BEGIN PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space)
+Zweck:
+- Sheet wird so hoch wie der Inhalt (auto) und hat nur eine max-height
+- Flex-Column bleibt erhalten; Body scrollt nur bei Bedarf
 Umfang:
 - Nur .detail-panel-content + ::after
 === */
@@ -1562,9 +1572,12 @@ Umfang:
   right: 0;
   bottom: 0;
 
-  /* etwas kompakter als vorher */
-  height: min(72dvh, 560px);
+  /* adaptiv statt fixe Höhe */
+  height: auto;
+
+  /* Fallback + Cap (lange Inhalte scrollen sauber) */
   max-height: 72dvh;
+  max-height: min(72dvh, 560px);
 
   display: flex;
   flex-direction: column;
@@ -1583,7 +1596,7 @@ Umfang:
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
 
-/* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (compact default, less empty space) === */
+/* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space) === */
 
 
 /* Grabber */
@@ -1639,10 +1652,10 @@ Umfang:
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
-/* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (title higher, less bottom reserve)
+/* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe)
 Zweck:
-- Body nutzt Flex (kein starres height:100%), sauberer Fill im Sheet
-- #detail-content: weniger Top-Padding (Titel höher), weniger Bottom-Reserve (weniger Leerraum)
+- Body bleibt EIN Scroll-Container; flex-child darf schrumpfen (min-height:0)
+- #detail-content bekommt KEINE Bottom-Reserve (kommt ausschließlich über .detail-panel-body im Actionbar-Block)
 Umfang:
 - .detail-panel-body + #detail-content
 === */
@@ -1651,6 +1664,9 @@ Umfang:
 #event-detail-panel .detail-panel-body{
   flex: 1 1 auto;
   height: auto;
+
+  /* wichtig für flex+scroll (verhindert „leer/zu groß“ Bugs) */
+  min-height: 0;
 
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1666,13 +1682,16 @@ Umfang:
   /* Titel näher nach oben (vorher 40px) */
   padding-top: 24px;
 
-  /* Platz für Actionbar + safe-area (etwas weniger als vorher) */
-  padding-bottom: calc(72px + max(0px, env(safe-area-inset-bottom)));
+  /* Bottom-Reserve NICHT hier (verhindert doppelte Reserve/Leerraum) */
+  padding-bottom: 0;
 
   height: auto;
   max-height: none;
   overflow: visible;
 }
+
+/* === END PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe) === */
+
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
@@ -1853,8 +1872,11 @@ Umfang:
 /* Responsive: sehr kleine Geräte */
 @media (max-width: 360px){
   #event-detail-panel .detail-panel-content{
-    height: min(82dvh, 640px);
+    height: auto;
+
     max-height: 82dvh;
+    max-height: min(82dvh, 640px);
+
     border-radius: 20px 20px 0 0;
   }
 
@@ -1868,12 +1890,7 @@ Umfang:
   }
 }
 
-/* Safe-area extra unten: falls Actionbar groß wird */
-@supports(padding: max(0px)){
-  #event-detail-panel #detail-content{
-    padding-bottom: calc(84px + max(0px, env(safe-area-inset-bottom)));
-  }
-}
+/* === END REPLACE BLOCK: DETAILPANEL ADAPTIVE HEIGHT + SINGLE BOTTOM RESERVE (style.css:1550-1876) === */
 
 /* === END BLOCK: DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) === */
 
@@ -2260,6 +2277,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
