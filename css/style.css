@@ -1525,6 +1525,52 @@ Umfang:
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
 
 
+/* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) ===
+Zweck:
+- Fix für riesige SVGs (z.B. 360x360) im Detailpanel
+- Greift unabhängig von JS/Inline-Attrs/fehlenden Klassen zuverlässig
+Umfang:
+- SVG/IMG innerhalb Chips + Location-Row + Meta-Zeilen
+=== */
+
+/* Primär: eure bekannten Chip-Icons (aus DevTools-Proof) */
+#event-detail-panel svg.detail-icon-svg.is-chip{
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  flex: 0 0 auto !important;
+  display: block !important;
+}
+
+/* Robust: egal welche Klassen – in Chips niemals groß */
+#event-detail-panel .detail-chip svg,
+#event-detail-panel .detail-chip img{
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  flex: 0 0 auto !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Location-Row/Icon-Container ebenfalls absichern (falls Icon dort sitzt) */
+#event-detail-panel .detail-location-icon svg,
+#event-detail-panel .detail-location-icon img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  flex: 0 0 auto !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* === END BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) === */
+
+
+
 
 
 
@@ -1780,6 +1826,7 @@ Zweck:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
