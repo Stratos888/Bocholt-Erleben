@@ -202,13 +202,16 @@
         payload: calendarPayload,
       }] : []),
 
+          // === BEGIN PATCH: ACTION WHATSAPP LABEL (ui short, aria long) ===
       ...(whatsappHref ? [{
         type: "whatsapp",
-        label: "Teilen",
+        label: "WhatsApp", // UI short label
         priority: "secondary",
         href: whatsappHref,
         payload: { text: shareText },
       }] : []),
+      // === END PATCH: ACTION WHATSAPP LABEL (ui short, aria long) ===
+
 
       ...(homepage ? [{
         type: "website",
@@ -645,11 +648,25 @@
         `;
       };
 
+            // === BEGIN PATCH: ACTIONBAR LABELS (title short, aria long) ===
       const renderAction = (a) => {
         if (!a || typeof a !== "object") return "";
 
-        const rawLabel = String(a.label || "").trim();
-        const label = escapeHtml(rawLabel || "Aktion");
+        const raw = String(a.label || "").trim();
+        const fallback = raw || "Aktion";
+
+        // UI: kurz & scanbar (wird später als Text unter Icon gerendert)
+        const uiLabel =
+          (a.type === "whatsapp") ? "WhatsApp" :
+          fallback;
+
+        // A11y: klar & vollständig
+        const ariaLabel =
+          (a.type === "whatsapp") ? "Per WhatsApp teilen" :
+          fallback;
+
+        const labelUiEsc = escapeHtml(uiLabel);
+        const labelAriaEsc = escapeHtml(ariaLabel);
 
         // Map to semantic types for icons (no brand icons)
         const type =
@@ -668,11 +685,11 @@
               class="detail-actionbar-btn is-icon"
               type="button"
               data-action="calendar"
-              aria-label="${label}"
-              title="${label}"
+              aria-label="${labelAriaEsc}"
+              title="${labelUiEsc}"
             >
               ${icon}
-              <span class="detail-sr-only">${label}</span>
+              <span class="detail-sr-only">${labelAriaEsc}</span>
             </button>
           `;
         }
@@ -685,17 +702,19 @@
               href="${href}"
               target="_blank"
               rel="noopener"
-              aria-label="${label}"
-              title="${label}"
+              aria-label="${labelAriaEsc}"
+              title="${labelUiEsc}"
             >
               ${icon}
-              <span class="detail-sr-only">${label}</span>
+              <span class="detail-sr-only">${labelAriaEsc}</span>
             </a>
           `;
         }
 
         return "";
       };
+      // === END PATCH: ACTIONBAR LABELS (title short, aria long) ===
+
 
 
 
@@ -942,6 +961,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
