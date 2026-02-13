@@ -1680,15 +1680,33 @@ Umfang:
 
 
 /* Title row (Titel links, Icon optional rechts) */
+/* === BEGIN PATCH: DETAIL TITLE ROW LAYOUT (use full width, icon right)
+Zweck:
+- Visuell volle Panel-Breite nutzen (Top-App Header-Zeile)
+- Titel darf wachsen, Icon sitzt klar rechts und stört Umbruch nicht
+Umfang:
+- Nur #event-detail-panel .detail-title-row
+=== */
 #event-detail-panel .detail-title-row{
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 10px;
+  width: 100%;
 }
+/* === END PATCH: DETAIL TITLE ROW LAYOUT (use full width, icon right) === */
 
+
+/* === BEGIN PATCH: DETAIL TITLE FILL (use available width)
+Zweck:
+- Titel nimmt die verfügbare Breite in der Title-Row ein (Top-App Typo)
+Umfang:
+- Nur #event-detail-panel .detail-title
+=== */
 #event-detail-panel .detail-title{
   margin: 0 0 10px;
   min-width: 0;
+  flex: 1 1 auto;
 
   font-size: 19px;
   line-height: 1.22;
@@ -1701,6 +1719,8 @@ Umfang:
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* === END PATCH: DETAIL TITLE FILL (use available width) === */
+
 
 /* Optionales Kategorie-Icon im Header (ohne Close zu überdecken) */
 #event-detail-panel .detail-category-icon{
@@ -2302,6 +2322,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
