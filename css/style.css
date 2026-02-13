@@ -1487,39 +1487,350 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 
 /* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
 Zweck:
-- #event-detail-panel füllt den Viewport und ist Positionierungs-Anchor
-- .detail-panel-content bleibt transformiertes Sheet
-- Actionbar (absolut) hängt am Panel-Viewport, nicht am Sheet
-Umfang:
-- #event-detail-panel Grundlayout + Overlay + Content
+- DetailPanel wirkt „Top-App“: mehr Luft, klare Hierarchie, keine Info-Pills.
+- Datum/Uhrzeit als Textzeile (nicht boxed).
+- Location ist Action-Zeile (klickbar) – optisch ruhig, aber eindeutig interaktiv.
+- Kategorie-Icon (ohne Text) kann im Header rechts oben angezeigt werden (ohne Close zu überdecken).
+Umfang: Komplettblock DetailPanel Styles (overlay/content/header/meta/cta + icon hooks).
 === */
 
-#event-detail-panel{
+body.is-panel-open { overflow: hidden; }
+
+#event-detail-panel.detail-panel{
   position: fixed;
   inset: 0;
   z-index: 9999;
+  display: block;
 }
+#event-detail-panel.detail-panel.hidden{ display: none; }
 
-#event-detail-panel.hidden{
-  display: none;
-}
-
+/* === BEGIN BLOCK: DETAIL PANEL OVERLAY (CALM DIM, NO BLUR) ===
+Zweck: Ruhiger, moderner, seriöser Hintergrund wie in Top-Apps: Dim-Layer ohne Blur.
+Umfang: Nur #event-detail-panel .detail-panel-overlay
+=== */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.35);
-}
+  z-index: 0;
 
+  /* Dim statt Glas: Kontext bleibt erkennbar */
+  background: rgba(17, 24, 39, 0.32);
+
+  /* Kein Blur */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* === END BLOCK: DETAIL PANEL OVERLAY (CALM DIM, NO BLUR) === */
+
+
+
+/* === BEGIN PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED)
+Proof:
+- bottom radius ist 22px/22px (ok)
+- ::after ist aktiv (content "", height 24px, bg white) → verursacht weißen Balken
+Fix:
+- Panel bleibt unverändert, Radius bleibt, keine zusätzlichen Masken/Overlays.
+Umfang:
+- Nur #event-detail-panel .detail-panel-content (und ::after deaktivieren)
+=== */
+
+/* Panel-Sheet */
 #event-detail-panel .detail-panel-content{
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
   bottom: 0;
 
-  /* euer bestehendes Bottom-Sheet Verhalten läuft weiterhin über transform/vars */
+  /* JS bewegt das Sheet über translateY(...) */
+  transform: translateY(var(--dp-base-y, 0px));
+  transition: transform 220ms ease;
+
+  max-height: 100%;
   border-radius: 22px 22px 0 0;
   background: var(--color-surface);
+
+  box-shadow: 0 18px 46px rgba(0,0,0,0.20);
+
+  overflow: hidden;
+  z-index: 1;
+}
+
+#event-detail-panel .detail-panel-content::after{
+  content: none;
+}
+
+/* Drag während Swipe ohne Transition */
+#event-detail-panel .detail-panel-content.is-dragging{
+  transition: none;
+}
+
+/* Wenn aktiv: Basis bei 0 */
+#event-detail-panel.detail-panel.active .detail-panel-content{
+  --dp-base-y: 0px;
+}
+
+/* Handle */
+#event-detail-panel .detail-panel-content::before{
+  content: "";
+  display: block;
+  width: 54px;
+  height: 5px;
+  border-radius: 999px;
+  margin: 6px auto 12px;
+  background: rgba(31,41,51,0.16);
+}
+
+/* Hit-Area fürs Draggen */
+#event-detail-panel .detail-panel-drag-hit{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 52px;
+  z-index: 3;
+  background: transparent;
+  touch-action: none;
+}
+
+/* Close */
+#event-detail-panel .detail-panel-close{
+  position: absolute;
+  right: 12px;
+  top: 10px;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(31,41,51,0.10);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.78) inset;
+
+  font-size: 22px;
+  line-height: 34px;
+  color: rgba(31,41,51,0.68);
+  cursor: pointer;
+  z-index: 10;
+}
+#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+
+/* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
+
+
+/* === BEGIN BLOCK: DETAILPANEL CONTENT FILL FIX (remove gray bottom gap)
+Zweck:
+- Nach der 3-Zonen-HTML-Struktur: .detail-panel-body ist der Scroll-Container
+- #detail-content ist nur noch Inhalt (kein eigenes overflow/height), damit die Actionbar nicht „weg“ ist
+Umfang:
+- #event-detail-panel .detail-panel-body (scroll)
+- #event-detail-panel #detail-content (kein scroll-container mehr)
+=== */
+#event-detail-panel .detail-panel-body{
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* #detail-content ist Inhalt, nicht Scroll-Viewport */
+#event-detail-panel #detail-content{
+  padding-top: 40px;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+/* === END BLOCK: DETAILPANEL CONTENT FILL FIX === */
+
+
+
+#event-detail-panel .detail-header{
+  position: relative;
+  padding-right: 90px; /* Platz für Icon + Close rechts */
+  padding-top: 10px;
+  padding-bottom: 14px;
+
+  margin-top: -6px;
+}
+
+#event-detail-panel .detail-header h2{
+  font-size: 19px;
+  line-height: 1.22;
+  font-weight: 820;
+  letter-spacing: -0.01em;
+  color: rgba(31,41,51,0.96);
+
+  margin-bottom: 8px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#event-detail-panel .detail-subline{
+  margin: 0 0 14px;
+
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: rgba(95,107,115,0.80);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Location Action Row */
+#event-detail-panel .detail-location-action,
+#event-detail-panel .detail-location-action:link,
+#event-detail-panel .detail-location-action:visited{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 10px 2px;
+
+  border-radius: 12px;
+
+  background: transparent;
+  background-clip: padding-box;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  border: 0;
+
+  color: rgba(31,41,51,0.90);
+  text-decoration: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-location-action.is-static{
+  opacity: 0.82;
+  transform: none !important;
+}
+#event-detail-panel .detail-location-action.is-static:active{
+  background: transparent;
+  transform: none;
+}
+
+#event-detail-panel .detail-location-icon{
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+#event-detail-panel .detail-location-text{
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: calc(100% - 44px);
+
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#event-detail-panel .detail-location-chev{
+  flex: 0 0 auto;
+  margin-left: 8px;
+  opacity: 0.65;
+  font-size: 18px;
+  line-height: 1;
+}
+
+#event-detail-panel .detail-location-action:active{
+  background: rgba(31,41,51,0.03);
+  transform: translateY(1px);
+}
+
+#event-detail-panel .detail-location-action{
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+
+/* Legacy: falls irgendwo noch vorhanden -> nicht als Pill darstellen */
+#event-detail-panel .detail-location,
+#event-detail-panel .detail-category{
+  display: none !important;
+}
+
+/* Desktop Modal */
+@media (min-width: 900px){
+  #event-detail-panel .detail-panel-content{
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+
+    width: min(620px, calc(100vw - 64px));
+    max-height: calc(100vh - 64px);
+
+    padding: 18px 18px 20px;
+
+    transform: translate(-50%, calc(-50% + 24px));
+    opacity: 0;
+    transition: transform 220ms ease, opacity 220ms ease;
+  }
+
+  #event-detail-panel.detail-panel.active .detail-panel-content{
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+
+  #event-detail-panel .detail-panel-content::before{
+    display: none;
+  }
+
+  #event-detail-panel #detail-content{
+    padding-top: 18px;
+    max-height: calc(100vh - 180px);
+  }
+}
+
+/* Small screens (3-zone compatible) */
+@media (max-width: 360px){
+  #event-detail-panel .detail-panel-content{
+    max-height: 100%;
+    padding: 0;
+  }
+
+  #event-detail-panel .detail-panel-body{
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #event-detail-panel #detail-content{
+    padding-top: 38px;
+    max-height: none;
+  }
+
+  #event-detail-panel .detail-header h2{
+    font-size: 18px;
+  }
+}
+
+/* Safe-area bottom padding (3-zone compatible) */
+/* WICHTIG: hier ist der Tabbar-Offset entfernt, weil das Panel die Tabbar überdeckt */
+@supports (padding: max(0px)){
+  @media (max-width: 899px){
+    #event-detail-panel .detail-panel-content{
+      padding-bottom: 0;
+    }
+
+    #event-detail-panel .detail-panel-body{
+      padding-bottom: calc(12px + 64px + max(0px, env(safe-area-inset-bottom)));
+    }
+
+    #event-detail-panel #detail-content{
+      padding-bottom: 0;
+    }
+  }
 }
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
@@ -1775,18 +2086,17 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
 - Actionbar Layout + Button-Größe + Icon-Scaling
-- Slot sitzt am Panel-Bottom (Panel ist bereits position:fixed inset:0)
-- verhindert riesige SVGs
+- Slot sitzt am Panel-Bottom (Panel ist position:fixed inset:0)
+- KEIN Tabbar-Offset: Panel überdeckt die Tabbar, also darf die Actionbar nicht 44px hochrutschen
 === */
 
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(
-    var(--tabbar-h) +
-    max(0px, env(safe-area-inset-bottom))
-  );
+
+  /* nur Safe-Area, kein var(--tabbar-h) */
+  bottom: max(0px, env(safe-area-inset-bottom));
 
   height: 64px;
   padding: 10px 12px;
@@ -1826,6 +2136,8 @@ Zweck:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
+
 
 
 
