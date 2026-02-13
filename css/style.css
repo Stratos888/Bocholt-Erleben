@@ -1485,13 +1485,13 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 
 
 
-/* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT ===
+/* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER ===
 Zweck:
-- DetailPanel wirkt „Top-App“: mehr Luft, klare Hierarchie, keine Info-Pills.
-- Datum/Uhrzeit als Textzeile (nicht boxed).
+- DetailPanel wirkt „Top-App“: klare Hierarchie, mehr Luft, Meta als Chips (Ort/Datum/Zeit).
+- Chips-Regeln: kurz, niemals abgeschnitten (wrap statt ellipsis), Zeit volle Breite.
 - Location ist Action-Zeile (klickbar) – optisch ruhig, aber eindeutig interaktiv.
-- Kategorie-Icon (ohne Text) kann im Header rechts oben angezeigt werden (ohne Close zu überdecken).
-Umfang: Komplettblock DetailPanel Styles (overlay/content/header/meta/cta + icon hooks).
+- Close: 44×44 Touch (Top-App Standard).
+Umfang: Komplettblock DetailPanel Styles (overlay/content/header/chips/location/description + responsive + safe-area).
 === */
 
 body.is-panel-open { overflow: hidden; }
@@ -1601,14 +1601,14 @@ Umfang:
   touch-action: none;
 }
 
-/* Close */
+/* Close (44×44 Touch) */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: 12px;
   top: 10px;
 
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
 
   background: rgba(255,255,255,0.94);
@@ -1618,7 +1618,7 @@ Umfang:
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 22px;
-  line-height: 34px;
+  line-height: 42px;
   color: rgba(31,41,51,0.68);
   cursor: pointer;
   z-index: 10;
@@ -1628,12 +1628,12 @@ Umfang:
 /* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
 
 
-/* === BEGIN BLOCK: DETAILPANEL CONTENT FILL FIX (remove gray bottom gap)
+/* === BEGIN BLOCK: DETAILPANEL CONTENT FILL FIX (3-zone compatible)
 Zweck:
 - Nach der 3-Zonen-HTML-Struktur: .detail-panel-body ist der Scroll-Container
 - #detail-content ist nur noch Inhalt (kein eigenes overflow/height), damit die Actionbar nicht „weg“ ist
 Umfang:
-- #event-detail-panel .detail-panel-body (scroll)
+- #event-detail-panel .detail-panel-body (scroll + horizontal padding)
 - #event-detail-panel #detail-content (kein scroll-container mehr)
 === */
 #event-detail-panel .detail-panel-body{
@@ -1641,6 +1641,9 @@ Umfang:
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 /* #detail-content ist Inhalt, nicht Scroll-Viewport */
@@ -1650,27 +1653,36 @@ Umfang:
   max-height: none;
   overflow: visible;
 }
-/* === END BLOCK: DETAILPANEL CONTENT FILL FIX === */
+/* === END BLOCK: DETAILPANEL CONTENT FILL FIX (3-zone compatible) === */
 
 
 
+/* Header */
 #event-detail-panel .detail-header{
   position: relative;
-  padding-right: 90px; /* Platz für Icon + Close rechts */
+  padding-right: 110px; /* Platz für Icon + Close rechts */
   padding-top: 10px;
   padding-bottom: 14px;
 
   margin-top: -6px;
 }
 
-#event-detail-panel .detail-header h2{
+/* Title row (Titel links, Icon optional rechts) */
+#event-detail-panel .detail-title-row{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+#event-detail-panel .detail-title{
+  margin: 0 0 10px;
+  min-width: 0;
+
   font-size: 19px;
   line-height: 1.22;
   font-weight: 820;
   letter-spacing: -0.01em;
   color: rgba(31,41,51,0.96);
-
-  margin-bottom: 8px;
 
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1678,17 +1690,63 @@ Umfang:
   overflow: hidden;
 }
 
-#event-detail-panel .detail-subline{
+/* Optionales Kategorie-Icon im Header (ohne Close zu überdecken) */
+#event-detail-panel .detail-category-icon{
+  flex: 0 0 auto;
+  margin-top: 1px;
+
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+/* Meta als Chips (Ort/Datum/Zeit) */
+#event-detail-panel .detail-meta-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
   margin: 0 0 14px;
+}
+
+#event-detail-panel .detail-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  max-width: 100%;
+  padding: 7px 10px;
+  border-radius: 999px;
+
+  background: rgba(31,41,51,0.06);
+  border: 1px solid rgba(31,41,51,0.08);
 
   font-size: 13px;
-  line-height: 1.35;
-  font-weight: 600;
-  color: rgba(95,107,115,0.80);
+  line-height: 1.2;
+  font-weight: 650;
+  color: rgba(31,41,51,0.90);
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* niemals abgeschnitten */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+#event-detail-panel .detail-chip-text{
+  min-width: 0;
+
+  /* niemals abgeschnitten */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+
+  /* robust */
+  overflow-wrap: anywhere;
+}
+
+/* Zeit volle Breite */
+#event-detail-panel .detail-chip[data-chip="time"]{
+  flex: 1 0 100%;
 }
 
 /* Location Action Row */
@@ -1763,6 +1821,18 @@ Umfang:
   border-bottom: 1px solid rgba(31,41,51,0.06);
 }
 
+/* Beschreibung (robust, Top-App Lesbarkeit) */
+#event-detail-panel .detail-description{
+  margin-top: 12px;
+
+  font-size: 14px;
+  line-height: 1.65;
+  font-weight: 500;
+  color: rgba(31,41,51,0.88);
+
+  overflow-wrap: anywhere;
+}
+
 /* Legacy: falls irgendwo noch vorhanden -> nicht als Pill darstellen */
 #event-detail-panel .detail-location,
 #event-detail-panel .detail-category{
@@ -1819,7 +1889,7 @@ Umfang:
     max-height: none;
   }
 
-  #event-detail-panel .detail-header h2{
+  #event-detail-panel .detail-title{
     font-size: 18px;
   }
 }
@@ -1842,7 +1912,8 @@ Umfang:
   }
 }
 
-/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – HEADER-DNA CONSISTENT === */
+/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER === */
+
 
 
 /* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) ===
@@ -2157,3 +2228,4 @@ Zweck:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
