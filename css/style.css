@@ -1658,14 +1658,26 @@ Umfang:
 
 
 /* Header */
+/* === BEGIN PATCH: DETAIL HEADER WIDTH (remove fake right gutter)
+Zweck:
+- Proof: padding-right:110px reduziert Header-Contentbreite auf 222px → “leere rechte Spalte”
+- Fix: Right-Reserve nur so groß wie nötig für Close (44px) + Abstand
+Umfang:
+- Nur #event-detail-panel .detail-header
+=== */
 #event-detail-panel .detail-header{
   position: relative;
-  padding-right: 110px; /* Platz für Icon + Close rechts */
+
+  /* vorher 110px → macht Content künstlich schmal */
+  padding-right: 64px;
+
   padding-top: 10px;
   padding-bottom: 14px;
 
   margin-top: -6px;
 }
+/* === END PATCH: DETAIL HEADER WIDTH (remove fake right gutter) === */
+
 
 /* Title row (Titel links, Icon optional rechts) */
 #event-detail-panel .detail-title-row{
@@ -2290,5 +2302,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
