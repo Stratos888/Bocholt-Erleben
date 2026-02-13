@@ -26,12 +26,26 @@
   --color-text-secondary: #5F6B73;
   --color-text-muted: #8A949B;
 
+   /* === BEGIN BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) ===
+  Zweck:
+  - Korrigiert Token-Inkonsistenzen (fehlendes --radius-card).
+  - Definiert einen einheitlichen Seiten-Gutter für die gesamte App.
+  Umfang:
+  - Nur Token in :root (Spacing, Radius, Shadow, --gutter).
+  === */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
   --space-lg: 16px;
- --space-xl: 24px;
+  --space-xl: 24px;
+
+  --radius-card: 16px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+
+  /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
+  --gutter: var(--space-lg);
+  /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
+
 
   /* Backward compat */
   --bg: var(--color-background);
@@ -2341,6 +2355,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
