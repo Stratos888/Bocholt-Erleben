@@ -1602,6 +1602,13 @@ Umfang:
 }
 
 /* Close (44×44 Touch) */
+/* === BEGIN PATCH: DETAIL CLOSE POSITION (no header gutter needed)
+Zweck:
+- Close-Button sitzt im Sheet, nicht im Header-Flow
+- Header braucht keine große Right-Reserve mehr
+Umfang:
+- Nur #event-detail-panel .detail-panel-close
+=== */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: 12px;
@@ -1621,8 +1628,11 @@ Umfang:
   line-height: 42px;
   color: rgba(31,41,51,0.68);
   cursor: pointer;
-  z-index: 10;
+  z-index: 20;
 }
+#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+/* === END PATCH: DETAIL CLOSE POSITION (no header gutter needed) === */
+
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
 /* === END PATCH: DETAIL PANEL – REMOVE MASK STRIP + KEEP RADIUS (PROOF-BASED) === */
@@ -1658,25 +1668,27 @@ Umfang:
 
 
 /* Header */
-/* === BEGIN PATCH: DETAIL HEADER WIDTH (remove fake right gutter)
+/* === BEGIN PATCH: DETAIL HEADER WIDTH (align right padding to left grid)
 Zweck:
-- Proof: padding-right:110px reduziert Header-Contentbreite auf 222px → “leere rechte Spalte”
-- Fix: Right-Reserve nur so groß wie nötig für Close (44px) + Abstand
+- Header soll nicht künstlich schmal wirken
+- padding-right wird an den linken Grid-Gutter angepasst
+- Close bleibt stabil über absoluter Position + minimale Reserve
 Umfang:
 - Nur #event-detail-panel .detail-header
 === */
 #event-detail-panel .detail-header{
   position: relative;
 
-  /* vorher 110px → macht Content künstlich schmal */
-  padding-right: 64px;
+  /* grid-gutter: links/rechts sollen gleich wirken */
+  padding-right: 16px;
 
   padding-top: 10px;
   padding-bottom: 14px;
 
   margin-top: -6px;
 }
-/* === END PATCH: DETAIL HEADER WIDTH (remove fake right gutter) === */
+/* === END PATCH: DETAIL HEADER WIDTH (align right padding to left grid) === */
+
 
 
 /* Title row (Titel links, Icon optional rechts) */
@@ -2322,6 +2334,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
