@@ -1927,13 +1927,20 @@ Umfang:
 /* New Actionbar */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar bleibt im Sheet-Stacking-Context (nicht fixed!)
-- dadurch niemals vom Overlay überdeckt
-- trotzdem immer sichtbar, weil Scroll-Body Platz unten bekommt
-- kompatibel mit translateY / Snap / Drag
+- Actionbar ist NICHT im transformierten .detail-panel-content (Bottom-Sheet) → bleibt sichtbar
+- Actionbar sitzt als Kind von #event-detail-panel und wird am Viewport-Boden des Panels verankert
+- Scroll-Body bekommt Bottom-Puffer, damit Content nicht unter die Actionbar läuft
+Umfang:
+- z-index Ordnung Overlay / Sheet / Actionbar
+- #event-detail-panel .detail-panel-body padding-bottom
+- #detail-actionbar-slot Layout + Buttons + Icon sizing
 === */
 
-/* Scrollbereich bekommt garantierten Platz */
+/* Stack-Reihenfolge eindeutig: Overlay < Sheet < Actionbar */
+#event-detail-panel .detail-panel-content{ z-index: 1; }
+#detail-actionbar-slot{ z-index: 2; }
+
+/* Scrollbereich bekommt garantierten Platz (Actionbar + Tabbar + Safe-Area) */
 #event-detail-panel .detail-panel-body{
   padding-bottom: calc(
     64px + 16px +
@@ -1942,14 +1949,17 @@ Zweck:
   );
 }
 
-/* Actionbar bleibt IM Sheet */
+/* Actionbar sitzt am Panel-Boden (nicht am Sheet-Boden!) */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
 
-  z-index: 5; /* nur über Content, NICHT global */
+  /* Abstand zur Tabbar + Safe-Area, damit nichts verdeckt wird */
+  bottom: calc(
+    var(--tabbar-h) +
+    max(0px, env(safe-area-inset-bottom))
+  );
 
   height: 64px;
   padding: 10px 12px;
@@ -1960,6 +1970,7 @@ Zweck:
 
   background: var(--color-surface);
   border-top: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 -10px 26px rgba(0,0,0,0.06);
 }
 
 /* Buttons */
@@ -1975,6 +1986,9 @@ Zweck:
   border: 0;
 
   background: rgba(31,41,51,0.06);
+  color: rgba(31,41,51,0.92);
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Icons niemals skalieren */
@@ -1982,9 +1996,13 @@ Zweck:
 #detail-actionbar-slot img{
   width: 18px !important;
   height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
 
 
 
@@ -2544,6 +2562,7 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
+
 
 
 
