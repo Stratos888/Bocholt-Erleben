@@ -2094,19 +2094,15 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
-- Actionbar Layout + Button-Größe + Icon-Scaling (robust)
-- Buttons sind icon-only (Text bleibt für A11y im DOM, aber visuell aus)
-- verhindert 0px/oversize SVGs in verschiedenen Browsern
+- Actionbar bleibt im Sheet (gleiches Koordinatensystem wie transform)
+- sticky statt absolute/fixed → folgt immer dem sichtbaren unteren Rand
+- funktioniert unabhängig von dp-base-y, Snap, Drag, Safe-Area
+- exakt wie Google Maps Bottom Sheet
 === */
 
 #detail-actionbar-slot{
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(
-    var(--tabbar-h) +
-    max(0px, env(safe-area-inset-bottom))
-  );
+  position: sticky;
+  bottom: 0;
 
   height: 64px;
   padding: 10px 12px;
@@ -2121,7 +2117,7 @@ Zweck:
   z-index: 5;
 }
 
-/* Buttons: icon-only */
+/* Buttons */
 #detail-actionbar-slot .detail-actionbar-btn{
   width: 44px;
   height: 44px;
@@ -2135,27 +2131,21 @@ Zweck:
 
   background: rgba(31,41,51,0.06);
 
-  /* Text (z.B. "Kalender") visuell ausblenden */
   font-size: 0;
-  line-height: 0;
-  color: rgba(31,41,51,0.82);
 }
 
-/* Icons: robust gegen 0px width / riesige SVGs */
-#detail-actionbar-slot .detail-actionbar-btn svg,
-#detail-actionbar-slot .detail-actionbar-btn img{
+/* Icons robust */
+#detail-actionbar-slot svg,
+#detail-actionbar-slot img{
   width: 18px !important;
   height: 18px !important;
   min-width: 18px !important;
   min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-
-  display: block !important;
-  flex: 0 0 auto !important;
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
+
 
 
 
