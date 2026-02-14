@@ -3,6 +3,21 @@
 <head>
 <link rel="canonical" href="https://bocholt-erleben.de/angebote/">
 <meta charset="UTF-8">
+<!-- === BEGIN BLOCK: OFFERS DISABLED (silent redirect) ===
+Zweck: Angebote-Seite ist unfertig → User sollen sie nicht sehen (auch bei Direktaufruf).
+Umfang: noindex + sehr früher Redirect nach / (ohne Hinweistext).
+=== -->
+<meta name="robots" content="noindex, nofollow">
+<script>
+  (function () {
+    try { window.location.replace("/"); } catch (e) { window.location.href = "/"; }
+  })();
+</script>
+<noscript>
+  <meta http-equiv="refresh" content="0;url=/">
+</noscript>
+<!-- === END BLOCK: OFFERS DISABLED (silent redirect) === -->
+  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Dauerhafte Angebote in Bocholt & Umgebung: Museen, Ausflugsziele, Kinderangebote und mehr – übersichtlich und schnell.">
 
