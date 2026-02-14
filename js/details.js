@@ -833,51 +833,50 @@
       /* === END BLOCK: ACTIONBAR RENDER INTO SLOT (outside scroll) === */
 
 
-                // === BEGIN BLOCK: CALENDAR ACTION CHOOSER (device vs google) ===
-      const calBtn = this.content.querySelector('[data-action="calendar"]');
+// === BEGIN BLOCK: CALENDAR ACTION CHOOSER (device vs google) ===
+const calBtn = this.actionbarSlot?.querySelector('[data-action="calendar"]');
 
-      if (calBtn) {
-        const getPayload = () =>
-          (Array.isArray(vm.actions) ? vm.actions : [])
-            .find(a => a && a.type === "calendar" && a.payload)?.payload || null;
+if (calBtn) {
+  const getPayload = () =>
+    (Array.isArray(vm.actions) ? vm.actions : [])
+      .find(a => a && a.type === "calendar" && a.payload)?.payload || null;
 
-        const openGoogle = (p) => {
-          const pad2 = (n) => String(n).padStart(2, "0");
-          const ymd = String(p.date).replaceAll("-", "");
+  const openGoogle = (p) => {
+    const ymd = String(p.date).replaceAll("-", "");
 
-          const params = new URLSearchParams();
-          params.set("action", "TEMPLATE");
-          params.set("text", p.title);
+    const params = new URLSearchParams();
+    params.set("action", "TEMPLATE");
+    params.set("text", p.title);
 
-          if (p.startTime) {
-            const s = `${ymd}T${p.startTime.replace(":", "")}00`;
-            const e = p.endTime
-              ? `${ymd}T${p.endTime.replace(":", "")}00`
-              : s;
+    if (p.startTime) {
+      const s = `${ymd}T${p.startTime.replace(":", "")}00`;
+      const e = p.endTime
+        ? `${ymd}T${p.endTime.replace(":", "")}00`
+        : s;
 
-            params.set("dates", `${s}/${e}`);
-          } else {
-            params.set("dates", `${ymd}/${ymd}`);
-          }
+      params.set("dates", `${s}/${e}`);
+    } else {
+      params.set("dates", `${ymd}/${ymd}`);
+    }
 
-          if (p.location) params.set("location", p.location);
-          if (p.description) params.set("details", p.description);
+    if (p.location) params.set("location", p.location);
+    if (p.description) params.set("details", p.description);
 
-          const url = `https://calendar.google.com/calendar/render?${params.toString()}`;
+    const url = `https://calendar.google.com/calendar/render?${params.toString()}`;
 
-          try {
-            const w = window.open(url, "_blank", "noopener");
-            if (!w) window.location.href = url;
-          } catch {
-            window.location.href = url;
-          }
-        };
+    try {
+      const w = window.open(url, "_blank", "noopener");
+      if (!w) window.location.href = url;
+    } catch {
+      window.location.href = url;
+    }
+  };
 
-        const downloadICS = (p) => {
-          const ymd = String(p.date).replaceAll("-", "");
-          const start = `${ymd}T000000`;
+  const downloadICS = (p) => {
+    const ymd = String(p.date).replaceAll("-", "");
+    const start = `${ymd}T000000`;
 
-          const ics =
+    const ics =
 `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
@@ -888,58 +887,56 @@ DESCRIPTION:${p.description || ""}
 END:VEVENT
 END:VCALENDAR`;
 
-          const blob = new Blob([ics], { type: "text/calendar" });
-          const url = URL.createObjectURL(blob);
+    const blob = new Blob([ics], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
 
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "event.ics";
-          a.click();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "event.ics";
+    a.click();
 
-          setTimeout(() => URL.revokeObjectURL(url), 500);
-        };
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+  };
 
-        const showChooser = () => {
-          const html = `
-            <div class="detail-cal-chooser">
-                          <div class="detail-cal-backdrop" data-cal="close"></div>
-              <div class="detail-cal-sheet">
-                <button data-cal="device">Gerätekalender</button>
-                <button data-cal="google">Google Kalender</button>
-                <button data-cal="close">Abbrechen</button>
-              </div>
-            </div>
-          `;
+  const showChooser = () => {
+    const html = `
+      <div class="detail-cal-chooser">
+        <div class="detail-cal-backdrop" data-cal="close"></div>
+        <div class="detail-cal-sheet">
+          <button data-cal="device">Gerätekalender</button>
+          <button data-cal="google">Google Kalender</button>
+          <button data-cal="close">Abbrechen</button>
+        </div>
+      </div>
+    `;
 
-                  this.panel.insertAdjacentHTML("beforeend", html);
+    this.panel.insertAdjacentHTML("beforeend", html);
 
+    const chooser = this.panel.querySelector(".detail-cal-chooser");
+    const payload = getPayload();
 
-                   const chooser = this.panel.querySelector(".detail-cal-chooser");
+    chooser.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-cal]");
+      if (!t) return;
 
-          const payload = getPayload();
-
-          chooser.addEventListener("click", (e) => {
-            const t = e.target.closest("[data-cal]");
-            if (!t) return;
-
-                       if (t.dataset.cal === "close") {
-              chooser.remove();
-              return;
-            }
-
-            chooser.remove();
-
-
-            if (!payload) return;
-
-            if (t.dataset.cal === "device") downloadICS(payload);
-            if (t.dataset.cal === "google") openGoogle(payload);
-          });
-        };
-
-        calBtn.addEventListener("click", showChooser);
+      if (t.dataset.cal === "close") {
+        chooser.remove();
+        return;
       }
-      // === END BLOCK: CALENDAR ACTION CHOOSER ===
+
+      chooser.remove();
+
+      if (!payload) return;
+
+      if (t.dataset.cal === "device") downloadICS(payload);
+      if (t.dataset.cal === "google") openGoogle(payload);
+    });
+  };
+
+  calBtn.addEventListener("click", showChooser);
+}
+// === END BLOCK: CALENDAR ACTION CHOOSER ===
+
 
       // reset scroll on open
       this.content.scrollTop = 0;
@@ -961,6 +958,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
