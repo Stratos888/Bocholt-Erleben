@@ -86,6 +86,7 @@ PRESS_SOURCE_HINTS = (
 
 # Worte/Patterns, die sehr wahrscheinlich KEIN Event sind (hard skip)
 NON_EVENT_PATTERNS = [
+    # Presse / Infrastruktur
     r"\bstau\b",
     r"\bverkehr\b",
     r"\bumleitung\b",
@@ -109,9 +110,28 @@ NON_EVENT_PATTERNS = [
     r"\bpressemitteilung\b",
     r"\bmitteilung\b",
     r"\bhinweis\b",
-    r"\binfo\b",
     r"\bwarn",
+
+    # Schule / interne Termine (NEU)
+    r"\belternabend\b",
+    r"\bberufsberatung\b",
+    r"\bberatung\b",
+    r"\bklassen?\b",
+    r"\bklasse\s*\d",
+    r"\b9a\b",
+    r"\b8b\b",
+    r"\bunterricht\b",
+    r"\bsprechstunde\b",
+    r"\bprävention\b",
+    r"\balkohol\b",
+    r"\bdrogen\b",
+    r"\bverkehrserziehung\b",
+    r"\bschul\b",
+    r"\bgymnasium\b",
+    r"\brealschule\b",
+    r"\bgesamtschule\b",
 ]
+
 
 # Worte/Patterns, die stark auf ein Event hindeuten (Event-Signale)
 EVENT_SIGNAL_PATTERNS = [
@@ -337,7 +357,16 @@ def should_hard_skip_candidate(
     """
     text = f"{title}\n{description}".strip()
 
-    # 1) Ohne Datum: generell skip (damit kein Artikel/Info ohne Termin reinrauscht)
+    # 0) Fehlende Location → skip
+    if not norm(description):
+        return True, "skip:no_description"
+
+    # 0b) Fehlende Location → skip
+    # (Location wird aktuell nicht gefüllt, aber wenn leer → meist interne Termine)
+    # später können wir das lockern, wenn Location-Parsing eingebaut wird
+
+    # 1) Ohne Datum: generell skip
+
     if not norm(event_date):
         return True, "skip:no_event_date"
 
