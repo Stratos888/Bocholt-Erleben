@@ -64,6 +64,80 @@ INBOX_COLUMNS = [
     "created_at",
 ]
 
+# === BEGIN BLOCK: DISCOVERY FILTER CONFIG (hard skip junk + date window) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Presse-/Nicht-Event-Müll gar nicht erst in die Inbox schreiben.
+# - Nur Events im sinnvollen Zeitraum übernehmen.
+# Umfang:
+# - Nur Konfiguration (Regex/Window). Logik folgt in Helper-Funktionen.
+# === END BLOCK: DISCOVERY FILTER CONFIG (hard skip junk + date window) ===
+
+# Zeitfenster: nur Events von heute bis +365 Tage
+DATE_WINDOW_DAYS_FUTURE = int(os.environ.get("DATE_WINDOW_DAYS_FUTURE", "365"))
+DATE_WINDOW_ALLOW_PAST_DAYS = int(os.environ.get("DATE_WINDOW_ALLOW_PAST_DAYS", "0"))
+
+# Quellen, die typischerweise Presse-/Info-Müll liefern (hard skip, wenn keine klaren Event-Signale)
+PRESS_SOURCE_HINTS = (
+    "presse",
+    "presse-service",
+    "pressemitteilung",
+)
+
+# Worte/Patterns, die sehr wahrscheinlich KEIN Event sind (hard skip)
+NON_EVENT_PATTERNS = [
+    r"\bstau\b",
+    r"\bverkehr\b",
+    r"\bumleitung\b",
+    r"\bsperr",
+    r"\bvollsperr",
+    r"\bbaustell",
+    r"\bumbau",
+    r"\bsanier",
+    r"\bglasfaser",
+    r"\bkanal\b",
+    r"\btrinkwasser\b",
+    r"\bhausbrunnen\b",
+    r"\buntersuch",
+    r"\bkontroll",
+    r"\bmüllabfuhr\b",
+    r"\babfuhr\b",
+    r"\babfall\b",
+    r"\bsitzung\b",
+    r"\bausschuss\b",
+    r"\bratssitzung\b",
+    r"\bpressemitteilung\b",
+    r"\bmitteilung\b",
+    r"\bhinweis\b",
+    r"\binfo\b",
+    r"\bwarn",
+]
+
+# Worte/Patterns, die stark auf ein Event hindeuten (Event-Signale)
+EVENT_SIGNAL_PATTERNS = [
+    r"\bkonzert\b",
+    r"\bopen\s*air\b",
+    r"\bfestival\b",
+    r"\bmarkt\b",
+    r"\bflohmarkt\b",
+    r"\bkirmes\b",
+    r"\bfest\b",
+    r"\bparty\b",
+    r"\btheater\b",
+    r"\blesung\b",
+    r"\bvortrag\b",
+    r"\bseminar\b",
+    r"\bworkshop\b",
+    r"\bführung\b",
+    r"\bstadtführung\b",
+    r"\btour\b",
+    r"\bausstellung\b",
+    r"\bsport\b",
+    r"\blauf\b",
+    r"\bturnier\b",
+]
+
+
 
 def fail(msg: str) -> None:
     print(f"❌ {msg}", file=sys.stderr)
@@ -206,9 +280,86 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
     return f"{st[:60]}-{ymd}-{short_hash(key, 4)}"
 # === END BLOCK: SLUG + CANONICAL URL + ID SUGGESTION (dedupe v1) ===
 
+# === BEGIN BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Hard-skip für Nicht-Events (Presse/Verkehr/Baustelle/etc.)
+# - Date-Window Filter (keine alten Termine, keine extrem weit entfernten Termine)
+# Umfang:
+# - Nur Helper-Funktionen + Regex-Compile.
+# === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
+
+_NON_EVENT_RE = re.compile("|".join(f"(?:{p})" for p in NON_EVENT_PATTERNS), re.IGNORECASE)
+_EVENT_SIGNAL_RE = re.compile("|".join(f"(?:{p})" for p in EVENT_SIGNAL_PATTERNS), re.IGNORECASE)
+
+def _is_press_like_source(source_name: str, source_url: str) -> bool:
+    key = f"{norm_key(source_name)} {norm_key(source_url)}"
+    return any(h in key for h in PRESS_SOURCE_HINTS)
+
+def _has_event_signal(text: str) -> bool:
+    return bool(_EVENT_SIGNAL_RE.search(text or ""))
+
+def _is_non_event_text(text: str) -> bool:
+    return bool(_NON_EVENT_RE.search(text or ""))
+
+def _parse_iso_date(d: str) -> Optional[date]:
+    d = norm(d)
+    if not d:
+        return None
+    try:
+        return datetime.strptime(d, "%Y-%m-%d").date()
+    except Exception:
+        return None
+
+def _in_date_window(d_iso: str) -> bool:
+    d = _parse_iso_date(d_iso)
+    if not d:
+        return False
+    today = date.today()
+    min_d = today if DATE_WINDOW_ALLOW_PAST_DAYS <= 0 else (today.replace() - (today - today))  # no-op, keep simple
+    if DATE_WINDOW_ALLOW_PAST_DAYS > 0:
+        min_d = today.fromordinal(today.toordinal() - DATE_WINDOW_ALLOW_PAST_DAYS)
+    max_d = today.fromordinal(today.toordinal() + DATE_WINDOW_DAYS_FUTURE)
+    return (d >= min_d) and (d <= max_d)
+
+def should_hard_skip_candidate(
+    *,
+    stype: str,
+    source_name: str,
+    source_url: str,
+    title: str,
+    description: str,
+    event_date: str,
+) -> Tuple[bool, str]:
+    """
+    Returns (skip, reason).
+    Skip bedeutet: Kandidat wird NICHT in die Inbox geschrieben.
+    """
+    text = f"{title}\n{description}".strip()
+
+    # 1) Ohne Datum: generell skip (damit kein Artikel/Info ohne Termin reinrauscht)
+    if not norm(event_date):
+        return True, "skip:no_event_date"
+
+    # 2) Datum außerhalb Fenster
+    if not _in_date_window(event_date):
+        return True, "skip:date_out_of_window"
+
+    # 3) Harte Nicht-Event Wörter
+    if _is_non_event_text(text):
+        return True, "skip:non_event_keywords"
+
+    # 4) Presse-/RSS Quellen: nur zulassen, wenn Event-Signal vorhanden
+    if stype == "rss" or _is_press_like_source(source_name, source_url):
+        if not _has_event_signal(text):
+            return True, "skip:press_without_event_signal"
+
+    return False, ""
+# === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
 
 def safe_fetch(url: str, timeout: int = 20) -> str:
+
     req = urllib.request.Request(url, headers={"User-Agent": "BocholtErlebenDiscovery/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         charset = resp.headers.get_content_charset() or "utf-8"
@@ -687,7 +838,25 @@ def main() -> None:
             if not title:
                 continue
 
-
+            # === BEGIN BLOCK: HARD SKIP JUNK (before writing Inbox) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - Offensichtliche Nicht-Events (Presse/Verkehr/Baustelle/Info) gar nicht in Inbox schreiben.
+            # - Nur Events im Zeitfenster.
+            # Umfang:
+            # - Nur ein Skip-Check + Reason für notes.
+            # === END BLOCK: HARD SKIP JUNK (before writing Inbox) ===
+            desc_text = clean_text(c.get("description", ""))
+            skip, reason = should_hard_skip_candidate(
+                stype=stype,
+                source_name=source_name,
+                source_url=url,
+                title=title,
+                description=desc_text,
+                event_date=d,
+            )
+            if skip:
+                continue
 
             # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
             # Zweck: Korrigiert Einrückung von c_url_raw, damit der Block syntaktisch stabil ist.
@@ -695,6 +864,7 @@ def main() -> None:
             c_url_raw = norm(c.get("url", ""))
             c_url = canonical_url(c_url_raw)
             # === END BLOCK: URL NORMALIZATION (indent fix) ===
+
 
 
             matched_id = ""
