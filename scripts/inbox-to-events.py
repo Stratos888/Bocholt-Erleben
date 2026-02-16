@@ -28,8 +28,15 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 
-TAB_EVENTS = "Events"
-TAB_INBOX = "Inbox"
+# === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
+# Datei: scripts/inbox-to-events.py
+# Zweck:
+# - Ziel-Tabs per ENV steuerbar machen, damit wir Events_Test nutzen können,
+#   ohne Prod anzutasten.
+# === END BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
+TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
+TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
+
 
 
 def fail(msg: str) -> None:
