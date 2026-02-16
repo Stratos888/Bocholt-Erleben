@@ -1144,15 +1144,20 @@ body.is-sheet-open .top-stack{
 }
 
 /* Grabber */
-.filter-sheet__card::before{
-  content: "";
-  display: block;
-  width: 58px;
+#event-detail-panel .detail-panel-grabber{
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 46px;
   height: 5px;
+
   border-radius: 999px;
-  margin: 10px auto 8px;
-  background: rgba(31,41,51,0.18);
+  background: rgba(0,0,0,0.30);
+  z-index: 4;
 }
+
 
 /* Header: sticky + Topbar Layout (Titel links / Close rechts) */
 .filter-sheet__header{
@@ -1476,31 +1481,32 @@ Umfang:
   touch-action: none;
 }
 
-/* Close: aligned to gutter, Top-App touch target */
+/* Close Button: aligned to gutter, compact */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
   top: 10px;
 
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
 
   background: rgba(255,255,255,0.94);
   border: 1px solid rgba(31,41,51,0.10);
   box-shadow:
-    0 10px 22px rgba(0,0,0,0.10),
+    0 8px 18px rgba(0,0,0,0.09),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
-  font-size: 22px;
-  line-height: 42px;
-  color: rgba(31,41,51,0.68);
+  font-size: 18px;
+  line-height: 32px;
+  color: rgba(31,41,51,0.62);
   cursor: pointer;
 
   -webkit-tap-highlight-color: transparent;
   z-index: 20;
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+
 
 /* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe)
 Zweck:
@@ -1567,13 +1573,13 @@ Umfang:
   gap: 10px;
   width: 100%;
 
-  /* Reserve für Close: 44px + rechter Gutter (aus deinem Proof: right=var(--gutter)) */
-  padding-right: calc(44px + var(--gutter));
+  /* Reserve für Close: 34px + rechter Gutter */
+  padding-right: calc(34px + var(--gutter));
 }
 
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
-  order: -1;          /* weg von der rechten Seite → keine Kollision mit Close */
+  order: -1;
   margin-top: 1px;
   font-size: 18px;
   line-height: 1;
@@ -1592,29 +1598,21 @@ Umfang:
   color: rgba(31,41,51,0.96);
 
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Meta Chips */
-
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
+
 
 /* === BEGIN BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) ===
 Zweck:
 - Detailpanel Meta (Ort/Datum/Zeit) als ruhige Info-Rows (Top-App Detail Sheet)
-- Kein Chip-Look, aber weiterhin robust (kein Abschneiden)
+- Ort/Datum minimal weiter nach links (über kleineres Gap)
+- Zeit exakt gleich wie Ort/Datum (neutral, keine Pill)
 Umfang:
-- #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text + time-variant
-=== */
-
-/* === BEGIN BLOCK: DETAIL META AS INFO ROWS (non-button look; no markup changes) ===
-Zweck:
-- Meta (Ort/Datum/Zeit) als ruhige Info-Zeilen statt „Button/Chip“-Look
-- Zeit ist exakt gleich wie Ort/Datum (neutral, keine Pille)
-Umfang:
-- #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text + time-neutral
+- #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text
 === */
 
 #event-detail-panel .detail-meta-chips{
@@ -1626,7 +1624,7 @@ Umfang:
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 
   width: 100%;
   max-width: 100%;
@@ -1660,16 +1658,8 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* Zeit: neutralisieren (exakt wie die anderen Rows), um grüne Pill/Highlight-Styles sicher zu überschreiben */
-#event-detail-panel .detail-chip[data-chip="time"]{
-  padding: 10px 0;
-  border-radius: 0;
-  border: 0;
-  border-bottom: 1px solid rgba(31,41,51,0.08);
-  background: transparent;
-}
+/* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
 
-/* === END BLOCK: DETAIL META AS INFO ROWS (non-button look; no markup changes) === */
 
 
 
@@ -2146,11 +2136,11 @@ Umfang:
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
-/* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral buttons) ===
+/* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) ===
 Zweck:
-- Icon-Buttons mit kleinem Label darunter (Kalender / per WhatsApp teilen / Route)
+- Icon-Buttons mit kleinem Label darunter (Kalender / WhatsApp / Route)
 - detail-sr-only korrekt „visually hidden“, damit kein großer Text angezeigt wird
-- Alle drei Buttons gleich/neutral (keine Primary-Farbe)
+- Alle drei Buttons neutral/einheitlich
 Umfang:
 - #detail-actionbar-slot + .detail-actionbar-btn + labels via ::after + .detail-sr-only + bottom padding
 === */
@@ -2236,13 +2226,11 @@ Umfang:
   font-weight: 700;
   letter-spacing: 0.01em;
   opacity: 0.92;
-
-  white-space: pre-line;
   text-align: center;
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:nth-child(1)::after{ content: "Kalender"; }
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(2)::after{ content: "per WhatsApp\Ateilen"; }
+#detail-actionbar-slot .detail-actionbar-btn:nth-child(2)::after{ content: "WhatsApp"; }
 #detail-actionbar-slot .detail-actionbar-btn:nth-child(3)::after{ content: "Route"; }
 
 @media (hover: hover){
@@ -2284,6 +2272,8 @@ Umfang:
   flex: 0 0 auto !important;
 }
 
-/* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral buttons) === */
+/* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
+
 
 
