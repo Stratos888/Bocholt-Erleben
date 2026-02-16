@@ -1554,7 +1554,7 @@ Umfang:
 /* #detail-content: Inhalt, kein eigener Scroll */
 #event-detail-panel #detail-content{
   /* Titel näher nach oben (vorher 40px) */
-  padding-top: 24px;
+  padding-top: 18px;
 
   /* Bottom-Reserve NICHT hier (verhindert doppelte Reserve/Leerraum) */
   padding-bottom: 0;
@@ -1565,6 +1565,7 @@ Umfang:
 }
 
 /* === END PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe) === */
+
 
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
@@ -2215,13 +2216,26 @@ Umfang:
   border: 0 !important;
 }
 
+/* Safety: niemals Underline in der Actionbar */
+#detail-actionbar-slot a,
+#detail-actionbar-slot a:link,
+#detail-actionbar-slot a:visited,
+#detail-actionbar-slot a:hover,
+#detail-actionbar-slot a:active,
+#detail-actionbar-slot a:focus{
+  text-decoration: none !important;
+}
+
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  height: 78px;
+  min-height: 78px;
+  height: auto;
+
+  z-index: 30;
 
   display: flex;
   align-items: center;
@@ -2261,32 +2275,17 @@ Umfang:
   line-height: 0 !important;
   overflow: hidden;
 
-  text-decoration: none; /* wichtig: verhindert globales Link-Underline */
+  text-decoration: none !important; /* wichtig: verhindert globales Link-Underline */
   -webkit-tap-highlight-color: transparent;
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-/* Label unter Icon */
-#detail-actionbar-slot .detail-actionbar-btn::after{
-  display: block;
-  font-size: 10px;
-  line-height: 1.05;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  opacity: 0.92;
-  text-align: center;
-}
-
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(1)::after{ content: "Kalender"; }
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(2)::after{ content: "WhatsApp"; }
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(3)::after{ content: "Route"; }
-
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
     background: rgba(31,41,51,0.06);
     border-color: rgba(31,41,51,0.14);
-    text-decoration: none;
+    text-decoration: none !important;
 
     box-shadow:
       0 10px 22px rgba(0,0,0,0.06),
@@ -2295,21 +2294,48 @@ Umfang:
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
-  transform: translateY(1px);
-  background: rgba(31,41,51,0.08);
-  border-color: rgba(31,41,51,0.16);
-  text-decoration: none;
-
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.04),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  transform: translateY(1px) scale(0.98);
+  text-decoration: none !important;
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid rgba(31,41,51,0.18);
   outline-offset: 3px;
-  border-radius: 14px;
-  text-decoration: none;
+  text-decoration: none !important;
+}
+
+/* Label: aus data-label (Markup bleibt wie es ist) */
+#detail-actionbar-slot .detail-actionbar-btn::after{
+  content: attr(data-label);
+  font-size: 12px;
+  line-height: 1.05;
+  font-weight: 750;
+  color: rgba(31,41,51,0.78);
+}
+
+/* Falls kein data-label vorhanden: nutze aria-label */
+#detail-actionbar-slot .detail-actionbar-btn:not([data-label])::after{
+  content: attr(aria-label);
+}
+
+/* Einheitlicher Look: kein “Primary” für Route */
+#detail-actionbar-slot .detail-actionbar-btn.is-primary{
+  background: rgba(31,41,51,0.04);
+  border-color: rgba(31,41,51,0.10);
+  color: rgba(31,41,51,0.90);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+/* Optional: etwas kompakter auf sehr schmalen Geräten */
+@media (max-width: 360px){
+  #detail-actionbar-slot .detail-actionbar-btn{
+    width: 68px;
+  }
+  #detail-actionbar-slot{
+    gap: 8px;
+  }
 }
 
 /* Icons: niemals groß */
@@ -2326,10 +2352,9 @@ Umfang:
   flex: 0 0 auto !important;
 }
 
+/* Reserve im Scroll-Body, damit Actionbar nichts überdeckt */
+#event-detail-panel .detail-panel-body{
+  padding-bottom: calc(78px + 16px + max(0px, env(safe-area-inset-bottom)));
+}
+
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
-
-
-
-
-
-
