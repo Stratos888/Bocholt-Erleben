@@ -1531,7 +1531,8 @@ Umfang: Nur Close-Button (Detailpanel).
 /* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe)
 Zweck:
 - Body bleibt EIN Scroll-Container; flex-child darf schrumpfen (min-height:0)
-- #detail-content bekommt KEINE Bottom-Reserve (kommt ausschließlich über .detail-panel-body im Actionbar-Block)
+- #detail-content bekommt KEINE Bottom-Reserve (kommt ausschließlich über .detail-panel-body)
+- Bottom-Reserve MATCHT die Actionbar-Höhe (inkl. Safe-Area), damit nichts dahinter verschwindet
 Umfang:
 - .detail-panel-body + #detail-content
 === */
@@ -1551,6 +1552,9 @@ Umfang:
   /* global gutter for ALL content inside */
   padding-left: var(--gutter);
   padding-right: var(--gutter);
+
+  /* Bottom-Reserve: exakt wie Actionbar-Container (78px + Safe-Area) */
+  padding-bottom: calc(78px + max(0px, env(safe-area-inset-bottom)));
 }
 
 /* #detail-content: Inhalt, kein eigener Scroll */
@@ -1567,6 +1571,7 @@ Umfang:
 }
 
 /* === END PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe) === */
+
 
 
 
@@ -2204,6 +2209,7 @@ Zweck:
 - Actionbar wieder sichtbar (Root-Cause: Sheet hat z-index:2, Slot war z-index:auto -> liegt dahinter)
 - Labels aus title (JS liefert UI-kurz: „WhatsApp“, A11y bleibt aria „Per WhatsApp teilen“)
 - Kein Link-Underline bei Hover/Tap
+- Höhe/Reserve ist konsistent: Slot-Höhe MATCHT Body-Reserve (78px + Safe-Area)
 Umfang:
 - #detail-actionbar-slot + .detail-actionbar-btn + labels via ::after + .detail-sr-only
 === */
@@ -2227,7 +2233,9 @@ Umfang:
   right: 0;
   bottom: 0;
 
-  height: 78px;
+  /* Slot-Höhe inkl. Safe-Area: MATCH zur Body-Reserve */
+  height: calc(78px + max(0px, env(safe-area-inset-bottom)));
+  box-sizing: border-box;
 
   display: flex;
   align-items: center;
@@ -2276,64 +2284,48 @@ Umfang:
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-/* Link-Underline sicher aus */
-#detail-actionbar-slot a,
-#detail-actionbar-slot a:link,
-#detail-actionbar-slot a:visited,
-#detail-actionbar-slot a:hover,
-#detail-actionbar-slot a:active,
-#detail-actionbar-slot a:focus{
-  text-decoration: none !important;
-}
-
-/* Label unter Icon: aus title (WhatsApp bleibt kurz) */
 #detail-actionbar-slot .detail-actionbar-btn::after{
-  content: attr(title);
-  display: block;
-
-  font-size: 10px;
-  line-height: 1.05;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  opacity: 0.92;
-  text-align: center;
+  text-decoration: none !important;
 }
 
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(31,41,51,0.06);
+    background: rgba(31,41,51,0.055);
     border-color: rgba(31,41,51,0.14);
-    box-shadow:
-      0 10px 22px rgba(0,0,0,0.06),
-      0 1px 0 rgba(255,255,255,0.72) inset;
   }
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.08);
-  border-color: rgba(31,41,51,0.16);
+  background: rgba(31,41,51,0.075);
 }
 
-#detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 2px solid rgba(31,41,51,0.18);
-  outline-offset: 3px;
-  border-radius: 14px;
-}
-
-/* Icons: niemals groß */
+/* Icon */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
   height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
-
   display: block !important;
-  flex: 0 0 auto !important;
+}
+
+/* Label aus title (kurz) */
+#detail-actionbar-slot .detail-actionbar-btn::after{
+  content: attr(title);
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 11px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+
+  color: rgba(31,41,51,0.72);
+  text-align: center;
+
+  white-space: nowrap;
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
-
