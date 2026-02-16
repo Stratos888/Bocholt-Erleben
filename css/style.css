@@ -49,9 +49,10 @@
   /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
   --dp-header-pad-top: 18px;            /* entspricht #detail-content padding-top + Close top */
   --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
-  --dp-actionbar-h: 78px;               /* Fix-Höhe der Actionbar-Zone */
+  --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
+  --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
   --dp-actionbar-pad-y: 10px;           /* vertikales Padding in der Actionbar */
-  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + 12px); /* Content-Reserve, damit nichts hinter der Actionbar endet */
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 12px); /* Content-Reserve inkl. Safe-Area */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
 
 
@@ -2244,14 +2245,11 @@ Umfang:
 
   box-sizing: border-box;
 
-  height: var(--dp-actionbar-h);
+  height: auto;
+  min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + max(0px, env(safe-area-inset-bottom)));
 
   border-top: 1px solid rgba(31,41,51,0.06);
   background: rgba(255,255,255,0.96);
@@ -2357,3 +2355,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
