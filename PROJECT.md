@@ -31,6 +31,19 @@ Wenn mehrere Uploads/Versionen existieren:
 - Es wird ausschließlich auf diesem Stand gearbeitet.
 - Jede neue Datei-Version ersetzt die alte vollständig als neue Wahrheit.
 
+<!-- === BEGIN RULE: OVERRIDE PROTOKOLL (ticket scoped) ===
+Zweck: Bewusste Regel-Abweichungen sauber festhalten, damit es keine Inkonsistenzen gibt.
+Umfang: Gilt pro Ticket/Thread, muss explizit gesetzt werden.
+=== -->
+1.1.2 Override-Protokoll (Pflicht, wenn Regel bewusst ausgesetzt wird)
+
+Wenn eine Regel bewusst NICHT gelten soll:
+- Es wird EINMAL explizit notiert: „Override aktiv: Regel X gilt hier nicht, stattdessen Y.“
+- Gilt nur für dieses Ticket/Thread.
+- Ohne expliziten Override gelten alle Regeln unverändert.
+<!-- === END RULE: OVERRIDE PROTOKOLL (ticket scoped) === -->
+
+
 1.2 Diff-Regel (Pflicht)
 
 Nur:
@@ -77,7 +90,13 @@ Workarounds
 „100% sicher“ ohne Proof
 1.4.1 Proof-Gate (Pflicht bei UI/Layout/Positioning)
 
-Bevor irgendein Patch geliefert wird, MUSS zuerst ein „Proof Bundle“ vorliegen (DevTools oder reproduzierbare Messwerte):
+Wenn Root-Cause NICHT eindeutig bewiesen ist:
+→ ZUERST „Proof Bundle“ anfordern, dann Patch.
+
+Wenn Root-Cause bereits eindeutig bewiesen ist (z. B. durch bereits gepostete Proofs im gleichen Ticket):
+→ Patch darf direkt geliefert werden (ohne erneute Proof-Anforderung).
+
+Proof Bundle (DevTools oder reproduzierbare Messwerte):
 
 A) DOM-Proof:
 - Exists: #event-detail-panel, .detail-panel-content, .detail-panel-body, #detail-actionbar-slot
@@ -94,12 +113,17 @@ D) Active-Stylesheet-Proof:
 E) Visual-Proof:
 - 1 Screenshot „Problemzustand“ (gleicher Screen, gleiche Zoom-Stufe)
 
-Ohne Proof Bundle: KEIN Patch. Erst Proof anfordern.
+Ohne Root-Cause-Beweis ODER ohne Proof Bundle: KEIN Patch.
 
-1.4.2 Fix-Ansage nur mit Abnahme-Proof
+1.4.2 Fix-Ansage („gelöst“ / „DONE“) nur mit Abnahme-Proof
 
-Ein Fix darf erst als „gelöst“ gelten, wenn nach dem Patch die gleiche Proof-Messung wiederholt wurde
+Ein Fix darf erst als „gelöst/DONE“ gelten, wenn nach dem Patch die gleiche Proof-Messung wiederholt wurde
 und die erwarteten Werte erfüllt sind (z. B. SlotRect.bottom innerhalb Viewport; dpBaseY=0px; etc.).
+
+Hinweis:
+- „Nachher“-Proof ist nur Pflicht, wenn „gelöst/DONE“ behauptet wird.
+- Für Zwischenschritte/Iterationen reicht „Vorher“-Proof (1.4.1), solange kein DONE-Claim erfolgt.
+
 
 1.5 CSS-first
 
@@ -228,8 +252,6 @@ Nie doppelte Navigation (Maps/Website)
 
 Keine Web-Buttons
 Nur:
-
-Pills
 
 List Items
 
