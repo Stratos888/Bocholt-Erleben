@@ -1601,26 +1601,36 @@ Umfang:
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
+/* === BEGIN BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) ===
+Zweck:
+- Detailpanel Meta (Ort/Datum/Zeit) als ruhige Info-Rows (Top-App Detail Sheet)
+- Kein Chip-Look, aber weiterhin robust (kein Abschneiden)
+Umfang:
+- #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text + time-variant
+=== */
+
 #event-detail-panel .detail-meta-chips{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
-  margin: 0 0 2px;
+  margin: 0 0 6px;
 }
 
 #event-detail-panel .detail-chip{
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 
+  width: 100%;
   max-width: 100%;
-  padding: 8px 12px;
-  border-radius: 999px;
 
-  background: rgba(31,41,51,0.06);
+  min-height: 38px;
+  padding: 10px 12px;
+
+  border-radius: 14px;
+  background: rgba(31,41,51,0.04);
   border: 1px solid rgba(31,41,51,0.08);
 
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.2;
   font-weight: 650;
   color: rgba(31,41,51,0.90);
@@ -1638,12 +1648,14 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* Zeit: volle Breite + etwas „wichtiger“ */
+/* Zeit: weiterhin „wichtiger“, aber als ruhige Info-Row */
 #event-detail-panel .detail-chip[data-chip="time"]{
-  flex: 1 0 100%;
-  background: rgba(139,207,74,0.12);
-  border-color: rgba(139,207,74,0.18);
+  background: rgba(139,207,74,0.10);
+  border-color: rgba(139,207,74,0.16);
 }
+
+/* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
+
 
 /* Location Row: wie native List Row */
 #event-detail-panel .detail-location-action,
@@ -2118,9 +2130,10 @@ Umfang:
 /* === BEGIN BLOCK: ACTIONBAR PREMIUM POLISH ===
 Zweck:
 - Detailpanel-Actionbar auf Top-App Niveau (ruhige Surface, klare States)
-- Konsistente Control-DNA zu Header-Buttons (Radius/Border/Press/Focus)
+- Icons + kleine Labels darunter (Kalender/Teilen/Route) ohne Markup-Änderung
+- Route als Primary
 Umfang:
-- #detail-actionbar-slot + .detail-actionbar-btn + Icon-Sizing + Body-Bottom-Padding
+- #detail-actionbar-slot + .detail-actionbar-btn + Label-Rendering + Body-Bottom-Padding
 === */
 
 #detail-actionbar-slot{
@@ -2129,8 +2142,8 @@ Umfang:
   right: 0;
   bottom: 0;
 
-  height: 64px;
-  padding: 10px var(--gutter) calc(10px + max(0px, env(safe-area-inset-bottom)));
+  height: 78px;
+  padding: 10px var(--gutter) calc(12px + max(0px, env(safe-area-inset-bottom)));
 
   display: flex;
   gap: 10px;
@@ -2146,65 +2159,97 @@ Umfang:
   z-index: 50;
 }
 
-
 /* Content bekommt Platz, damit nichts unter die Bar läuft */
 #event-detail-panel .detail-panel-body{
-  padding-bottom: calc(64px + 16px + max(0px, env(safe-area-inset-bottom)));
+  padding-bottom: calc(78px + 16px + max(0px, env(safe-area-inset-bottom)));
 }
 
-/* Buttons: icon-only (44×44) */
+/* Buttons: icon + label (touch-safe) */
 #detail-actionbar-slot .detail-actionbar-btn{
-  width: 44px;
-  height: 44px;
-  padding: 0;
+  width: 72px;
+  height: 56px;
+  padding: 8px 8px 6px;
 
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 4px;
 
   border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(31,41,51,0.06);
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(31,41,51,0.04);
+  color: rgba(31,41,51,0.90);
 
   box-shadow:
     0 6px 14px rgba(0,0,0,0.045),
     0 1px 0 rgba(255,255,255,0.72) inset;
 
-  font-size: 0 !important;
-  line-height: 0 !important;
-  overflow: hidden;
-
+  overflow: visible;
   -webkit-tap-highlight-color: transparent;
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
+/* Label: nutzt den bereits gesetzten title-Wert (kurz) */
+#detail-actionbar-slot .detail-actionbar-btn::after{
+  content: attr(title);
+  font-size: 10px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  opacity: 0.90;
+}
+
+/* Primary: Route */
+#detail-actionbar-slot .detail-actionbar-btn[title="Route"]{
+  background: rgba(139,207,74,0.92);
+  border-color: rgba(139,207,74,0.55);
+  color: rgba(255,255,255,0.98);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.22) inset;
+}
+
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(31,41,51,0.08);
-    border-color: rgba(31,41,51,0.12);
+    background: rgba(31,41,51,0.06);
+    border-color: rgba(31,41,51,0.14);
     box-shadow:
       0 10px 22px rgba(0,0,0,0.06),
       0 1px 0 rgba(255,255,255,0.72) inset;
+  }
+
+  #detail-actionbar-slot .detail-actionbar-btn[title="Route"]:hover{
+    background: rgba(139,207,74,0.88);
+    border-color: rgba(139,207,74,0.62);
+    box-shadow:
+      0 12px 26px rgba(0,0,0,0.10),
+      0 1px 0 rgba(255,255,255,0.22) inset;
   }
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.10);
-  border-color: rgba(31,41,51,0.14);
+  background: rgba(31,41,51,0.08);
+  border-color: rgba(31,41,51,0.16);
   box-shadow:
     0 6px 14px rgba(0,0,0,0.04),
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
+#detail-actionbar-slot .detail-actionbar-btn[title="Route"]:active{
+  background: rgba(139,207,74,0.84);
+  border-color: rgba(139,207,74,0.68);
+}
+
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.20);
+  outline: 2px solid rgba(139,207,74,0.22);
   outline-offset: 3px;
   border-radius: 14px;
 }
 
-/* Icons: niemals 0px */
+/* Icons: fix */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
@@ -2219,6 +2264,8 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR PREMIUM POLISH === */
+
+
 
 
 
