@@ -1551,8 +1551,9 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Kein Overlap zwischen Kategorie-Icon und Close
-- Title-Row wirkt wie „echte“ Header-Zeile (ruhiger, kompakter)
+- Titel sitzt deutlich unter Grabber/Close (nicht „auf gleicher Höhe“)
+- Mehr Luft, weniger gequetscht
+- Icon links sauber, konsistent skaliert
 Umfang:
 - .detail-header + .detail-title-row + .detail-category-icon + .detail-title
 === */
@@ -1561,7 +1562,8 @@ Umfang:
 #event-detail-panel .detail-header{
   position: relative;
 
-  padding: 8px 0 10px;
+  /* mehr Luft oben: Titel nicht auf Close-Höhe */
+  padding: 18px 0 12px;
   margin: 0;
 
   border-bottom: 1px solid rgba(31,41,51,0.06);
@@ -1569,8 +1571,8 @@ Umfang:
 
 #event-detail-panel .detail-title-row{
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
   width: 100%;
 
   /* Reserve für Close: 34px + rechter Gutter */
@@ -1580,19 +1582,40 @@ Umfang:
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
   order: -1;
-  margin-top: 1px;
+
+  /* wie App-Icons: feste Box + ruhige Opacity */
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+
+  opacity: 0.78;
+
+  /* falls es Text/Emoji ist: nicht riesig */
   font-size: 18px;
-  line-height: 1;
-  opacity: 0.82;
+  line-height: 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* falls svg drin ist: exakt gleiche Größe */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
 }
 
 #event-detail-panel .detail-title{
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   min-width: 0;
   flex: 1 1 auto;
 
   font-size: 20px;
-  line-height: 1.18;
+  line-height: 1.16;
   font-weight: 840;
   letter-spacing: -0.012em;
   color: rgba(31,41,51,0.96);
@@ -1606,11 +1629,11 @@ Umfang:
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
 
+
 /* === BEGIN BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) ===
 Zweck:
-- Detailpanel Meta (Ort/Datum/Zeit) als ruhige Info-Rows (Top-App Detail Sheet)
-- Ort/Datum minimal weiter nach links (über kleineres Gap)
-- Zeit exakt gleich wie Ort/Datum (neutral, keine Pill)
+- Meta (Ort/Datum/Zeit) als ruhige Info-Rows
+- Gleicher Gutter/Rhythmus wie Location-Row (Icon 18px + gap 10px)
 Umfang:
 - #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text
 === */
@@ -1624,7 +1647,9 @@ Umfang:
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  /* MATCH zur Location-Row */
+  gap: 10px;
 
   width: 100%;
   max-width: 100%;
@@ -1659,6 +1684,7 @@ Umfang:
 }
 
 /* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
+
 
 
 
@@ -1757,7 +1783,7 @@ Umfang:
   }
 
   #event-detail-panel .detail-chip{
-    padding: 8px 11px;
+    padding: 8px 0;
   }
 }
 
@@ -1773,18 +1799,18 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) ===
 Zweck:
-- Fix für riesige SVGs (z.B. 360x360) im Detailpanel
-- Greift unabhängig von JS/Inline-Attrs/fehlenden Klassen zuverlässig
+- Fix für riesige SVGs im Detailpanel
+- Meta-Icons konsistent: 18px (wie Location + Actionbar)
 Umfang:
-- SVG/IMG innerhalb Chips + Location-Row + Meta-Zeilen
+- SVG/IMG innerhalb Chips + Location-Row + Header-Icon
 === */
 
-/* Primär: eure bekannten Chip-Icons (aus DevTools-Proof) */
+/* Primär: Chip-Icons */
 #event-detail-panel svg.detail-icon-svg.is-chip{
-  width: 16px !important;
-  height: 16px !important;
-  max-width: 16px !important;
-  max-height: 16px !important;
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
   flex: 0 0 auto !important;
   display: block !important;
 }
@@ -1792,16 +1818,16 @@ Umfang:
 /* Robust: egal welche Klassen – in Chips niemals groß */
 #event-detail-panel .detail-chip svg,
 #event-detail-panel .detail-chip img{
-  width: 16px !important;
-  height: 16px !important;
-  max-width: 16px !important;
-  max-height: 16px !important;
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
   flex: 0 0 auto !important;
   display: block !important;
   object-fit: contain !important;
 }
 
-/* Location-Row/Icon-Container ebenfalls absichern (falls Icon dort sitzt) */
+/* Location-Row/Icon-Container */
 #event-detail-panel .detail-location-icon svg,
 #event-detail-panel .detail-location-icon img{
   width: 18px !important;
@@ -1813,7 +1839,19 @@ Umfang:
   object-fit: contain !important;
 }
 
+/* Header-Icon (falls SVG/IMG) */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
 /* === END BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) === */
+
 
 
 
@@ -2273,6 +2311,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
