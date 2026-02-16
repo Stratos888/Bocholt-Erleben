@@ -9,6 +9,27 @@ Umfang:
 
 # DEBUG.md — Kanonische Proof-Snippets (KI-optimiert)
 
+## Scope & Erweiterbarkeit (wichtig)
+
+Dieses DEBUG.md ist **primär** ein Proof-Kit für:
+- UI / Layout / CSS / DOM / Positioning (z-index, overflow, absolute vs flow, scroll container, safe-area, underline/link-styles)
+- Konsistenz-Themen im Detailpanel (Header/Close/Icon/Actionbar) als Referenzfall
+
+Es ist **nicht** als vollständiges Debug-System für alle Bug-Klassen gedacht.
+Stattdessen wird es **modular** erweitert, sobald neue Bug-Klassen auftreten.
+
+### Bugtyp → Proof-Kit (Faustregel)
+
+- UI/Layout/Positioning → benutze die Snippets in diesem DEBUG.md (Kapitel 1–4)
+- Daten/API/JSON → ergänze ein Kapitel „DEBUG_DATA“ (Network payload, response, schema checks)
+- Cache/ServiceWorker/Deploy → ergänze ein Kapitel „DEBUG_CACHE“ (SW keys, cache storage, build.json, headers)
+- Performance/Jank → ergänze ein Kapitel „DEBUG_PERF“ (Performance profile, long tasks, memory)
+- Logik/State (JS) → ergänze ein Kapitel „DEBUG_STATE“ (repro steps + logging hooks)
+
+Regel:
+- Neue Bug-Klasse? → Einmal sauberes Proof-Kit ergänzen, danach immer wiederverwenden.
+
+
 ## 0) Regeln für diesen Debug-Flow (kurz)
 - Dieses Dokument ist die **einzige** Quelle für Debug-Proofs im Projekt.
 - Bei UI/Layout/Positioning: **erst Proof**, dann Patch (außer Root-Cause ist bereits bewiesen).
