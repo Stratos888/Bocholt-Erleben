@@ -1975,8 +1975,17 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   flex: 0 0 auto;
 }
 
-/* Shared header control: 44px touch target, consistent with Actionbar DNA */
+/* === BEGIN PATCH: HEADER BUTTONS USE DETAILPANEL ACTION STYLE (visual consistency) ===
+Zweck:
+- Header Buttons identisch zu Detailpanel-Action Buttons
+- gleiche DNA, gleiche Wertigkeit, Top-App-Niveau
+- keine Strukturänderung, nur Visual Alignment
+Umfang:
+- nur .header-right > .pwa-install-button
+=== */
+
 .header-right > .pwa-install-button{
+
   --hdr-icon-size: 18px;
 
   display: inline-flex;
@@ -1985,17 +1994,18 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   gap: 8px;
 
   min-height: 44px;
-  padding: 0 10px;
+  padding: 0 14px;
 
   border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.55);
+
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(31,41,51,0.06);
 
   font-family: inherit;
   font-size: 13px;
   font-weight: 750;
   line-height: 1;
-  color: rgba(31,41,51,0.78);
+  color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-decoration: none;
@@ -2003,29 +2013,26 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
   box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
+    0 10px 22px rgba(0,0,0,0.06),
     0 1px 0 rgba(255,255,255,0.72) inset;
-}
 
-@media (hover: hover){
-  .header-right > .pwa-install-button:hover{
-    background: rgba(255,255,255,0.74);
-    border-color: rgba(31,41,51,0.12);
-  }
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
 }
 
 .header-right > .pwa-install-button:active{
   transform: translateY(1px);
-  background: rgba(255,255,255,0.86);
+  background: rgba(31,41,51,0.10);
+  border-color: rgba(31,41,51,0.14);
 }
 
 .header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.20);
+  outline: 2px solid rgba(139,207,74,0.55);
   outline-offset: 3px;
-  border-radius: 14px;
 }
+
+/* === END PATCH: HEADER BUTTONS USE DETAILPANEL ACTION STYLE (visual consistency) === */
+
 /* === BEGIN BLOCK: DETAILPANEL CALENDAR CHOOSER (app-like overlay) ===
 Zweck:
 - Kalender-Chooser als echtes Overlay (nicht inline im Layout)
@@ -2355,4 +2362,5 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
