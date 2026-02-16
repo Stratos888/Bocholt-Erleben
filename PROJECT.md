@@ -65,6 +65,17 @@ Bei „Ersetze Block von … bis …“ gilt zusätzlich:
 - Der Assistant MUSS sicherstellen, dass BEGIN/END exakt im aktuellen Dateistand vorkommen.
 - Wenn BEGIN/END nicht gefunden werden: STOP → aktuellen Datei-Stand anfordern.
 - Kein Ersetzen „auf Verdacht“, keine erfundenen Marker/Blocknamen.
+1.2.2 Marker- & Kommentar-Hygiene (Pflicht)
+
+Bei CSS/HTML/JS-Dateien gilt zusätzlich:
+
+Alle BEGIN/END-Marker müssen immer syntaktisch gültig sein (in CSS z. B. ausschließlich innerhalb von /* … */).
+
+Es darf niemals freie Marker-Zeilen geben (z. B. BEGIN BLOCK: … ohne Kommentar-Syntax).
+
+Jeder Patch muss garantieren: keine unclosed Kommentare, keine abgeschnittenen Marker-Texte, keine “halb offenen” Block-Kommentare.
+
+Wenn ein Patch Marker/Kommentar-Strukturen verändert: erst Proof durch “Suchen im aktuellen Datei-Stand”, dass BEGIN und END exakt vorhanden und korrekt geschlossen sind. Wenn nicht: STOP.
 
 1.3 Datei-Isolation
 
