@@ -26,12 +26,13 @@
   --color-text-secondary: #5F6B73;
   --color-text-muted: #8A949B;
 
-   /* === BEGIN BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) ===
+/* === BEGIN BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) ===
   Zweck:
   - Korrigiert Token-Inkonsistenzen (fehlendes --radius-card).
   - Definiert einen einheitlichen Seiten-Gutter für die gesamte App.
+  - Definiert ein „Detailpanel Layout Contract“ (Header/Close/Actionbar Maße) als Single Source of Truth.
   Umfang:
-  - Nur Token in :root (Spacing, Radius, Shadow, --gutter).
+  - Nur Token in :root (Spacing, Radius, Shadow, --gutter, Detailpanel-Contract).
   === */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -44,7 +45,15 @@
 
   /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
   --gutter: var(--space-lg);
+
+  /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
+  --dp-header-pad-top: 18px;            /* entspricht #detail-content padding-top + Close top */
+  --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
+  --dp-actionbar-h: 78px;               /* Fix-Höhe der Actionbar-Zone */
+  --dp-actionbar-pad-y: 10px;           /* vertikales Padding in der Actionbar */
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + 12px); /* Content-Reserve, damit nichts hinter der Actionbar endet */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
+
 
 
   /* Backward compat */
@@ -1496,10 +1505,10 @@ Umfang: Nur Close-Button (Detailpanel).
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
-  top: 18px; /* aligned to #detail-content padding-top (18px) */
+  top: var(--dp-header-pad-top); /* aligned to #detail-content padding-top */
 
-  width: 30px;
-  height: 30px;
+  width: var(--dp-close-size);
+  height: var(--dp-close-size);
   border-radius: 999px;
 
   display: inline-flex;
@@ -1523,6 +1532,7 @@ Umfang: Nur Close-Button (Detailpanel).
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 /* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
+== */
 
 
 
@@ -1531,8 +1541,7 @@ Umfang: Nur Close-Button (Detailpanel).
 /* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe)
 Zweck:
 - Body bleibt EIN Scroll-Container; flex-child darf schrumpfen (min-height:0)
-- #detail-content bekommt KEINE Bottom-Reserve (kommt ausschließlich über .detail-panel-body)
-- Bottom-Reserve MATCHT die Actionbar-Höhe (inkl. Safe-Area), damit nichts dahinter verschwindet
+- Bottom-Reserve kommt NUR über .detail-panel-body (über Layout-Contract Token), damit Content nie hinter der Actionbar endet.
 Umfang:
 - .detail-panel-body + #detail-content
 === */
@@ -1553,14 +1562,14 @@ Umfang:
   padding-left: var(--gutter);
   padding-right: var(--gutter);
 
-  /* Bottom-Reserve: exakt wie Actionbar-Container (78px + Safe-Area) */
-  padding-bottom: calc(78px + max(0px, env(safe-area-inset-bottom)));
+  /* Reserve, damit der letzte Inhalt nie „unter“ der Actionbar verschwindet */
+  padding-bottom: var(--dp-actionbar-reserve);
 }
 
 /* #detail-content: Inhalt, kein eigener Scroll */
 #event-detail-panel #detail-content{
-  /* Titel näher nach oben (vorher 40px) */
-  padding-top: 18px;
+  /* Titel näher nach oben */
+  padding-top: var(--dp-header-pad-top);
 
   /* Bottom-Reserve NICHT hier (verhindert doppelte Reserve/Leerraum) */
   padding-bottom: 0;
@@ -1571,6 +1580,7 @@ Umfang:
 }
 
 /* === END PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe) === */
+
 
 
 
@@ -2209,7 +2219,6 @@ Zweck:
 - Actionbar wieder sichtbar (Root-Cause: Sheet hat z-index:2, Slot war z-index:auto -> liegt dahinter)
 - Labels aus title (JS liefert UI-kurz: „WhatsApp“, A11y bleibt aria „Per WhatsApp teilen“)
 - Kein Link-Underline bei Hover/Tap
-- Höhe/Reserve ist konsistent: Slot-Höhe MATCHT Body-Reserve (78px + Safe-Area)
 Umfang:
 - #detail-actionbar-slot + .detail-actionbar-btn + labels via ::after + .detail-sr-only
 === */
@@ -2233,16 +2242,16 @@ Umfang:
   right: 0;
   bottom: 0;
 
-  /* Slot-Höhe inkl. Safe-Area: MATCH zur Body-Reserve */
-  height: calc(78px + max(0px, env(safe-area-inset-bottom)));
   box-sizing: border-box;
+
+  height: var(--dp-actionbar-h);
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 
-  padding: 10px var(--gutter) calc(10px + max(0px, env(safe-area-inset-bottom)));
+  padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + max(0px, env(safe-area-inset-bottom)));
 
   border-top: 1px solid rgba(31,41,51,0.06);
   background: rgba(255,255,255,0.96);
@@ -2279,53 +2288,72 @@ Umfang:
   overflow: hidden;
 
   text-decoration: none !important;
+  text-decoration-skip-ink: none;
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease,
+              box-shadow 140ms ease, transform 140ms ease;
 }
 
-#detail-actionbar-slot .detail-actionbar-btn::after{
+/* Explizit: Links in allen States niemals unterstreichen */
+#detail-actionbar-slot .detail-actionbar-btn:link,
+#detail-actionbar-slot .detail-actionbar-btn:visited,
+#detail-actionbar-slot .detail-actionbar-btn:hover,
+#detail-actionbar-slot .detail-actionbar-btn:active{
   text-decoration: none !important;
 }
 
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(31,41,51,0.055);
+    background: rgba(31,41,51,0.06);
     border-color: rgba(31,41,51,0.14);
   }
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.075);
+  background: rgba(31,41,51,0.08);
 }
 
-/* Icon */
-#detail-actionbar-slot .detail-actionbar-btn svg,
-#detail-actionbar-slot .detail-actionbar-btn img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  display: block !important;
-}
-
-/* Label aus title (kurz) */
+/* Label (klein) – kommt aus title */
 #detail-actionbar-slot .detail-actionbar-btn::after{
   content: attr(title);
   display: block;
 
-  margin-top: 2px;
-
   font-size: 11px;
   line-height: 1.05;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 850;
 
-  color: rgba(31,41,51,0.72);
+  color: rgba(31,41,51,0.76);
+  margin-top: 2px;
+
+  max-width: 64px;
   text-align: center;
 
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Focus */
+#detail-actionbar-slot .detail-actionbar-btn:focus-visible{
+  outline: 2px solid rgba(31,41,51,0.18);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+/* Icons: niemals groß */
+#detail-actionbar-slot .detail-actionbar-btn svg,
+#detail-actionbar-slot .detail-actionbar-btn img{
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+
+  display: block !important;
+  flex: 0 0 auto !important;
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
