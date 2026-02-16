@@ -89,7 +89,7 @@ Workarounds
 
 „100% sicher“ ohne Proof
 1.4.1 Proof-Gate (Pflicht bei UI/Layout/Positioning)
-
+- „Proof Bundle ist kanonisch in DEBUG.md definiert; es werden keine ad-hoc Snippets mehr verwendet.“
 Wenn Root-Cause NICHT eindeutig bewiesen ist:
 → ZUERST „Proof Bundle“ anfordern, dann Patch.
 
