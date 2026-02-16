@@ -1496,7 +1496,7 @@ Umfang: Nur Close-Button (Detailpanel).
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
-  top: 24px; /* aligned to #detail-content padding-top */
+  top: 18px; /* aligned to #detail-content padding-top (18px) */
 
   width: 30px;
   height: 30px;
@@ -1523,6 +1523,7 @@ Umfang: Nur Close-Button (Detailpanel).
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 /* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
+
 
 
 
@@ -1571,9 +1572,9 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Titel sitzt deutlich unter Grabber/Close (nicht „auf gleicher Höhe“)
-- Mehr Luft, weniger gequetscht
-- Icon links sauber, konsistent skaliert
+- Entfernt doppeltes Top-Spacing (Root-Cause: #detail-content padding-top + .detail-header padding-top)
+- Titel/Icon optisch auf Close-Höhe (Topbar-Rhythmus)
+- Header-Icon identisch zur Actionbar: Kalender-Line-SVG (ohne Emoji/Text)
 Umfang:
 - .detail-header + .detail-title-row + .detail-category-icon + .detail-title
 === */
@@ -1582,8 +1583,8 @@ Umfang:
 #event-detail-panel .detail-header{
   position: relative;
 
-  /* mehr Luft oben: Titel nicht auf Close-Höhe */
-  padding: 18px 0 12px;
+  /* Root-Cause Fix: KEIN extra padding-top (kommt aus #detail-content) */
+  padding: 0 0 12px;
   margin: 0;
 
   border-bottom: 1px solid rgba(31,41,51,0.06);
@@ -1595,8 +1596,8 @@ Umfang:
   gap: 12px;
   width: 100%;
 
-  /* Reserve für Close: 34px + rechter Gutter */
-   padding-right: calc(30px + var(--gutter));
+  /* Reserve für Close: 30px + rechter Gutter */
+  padding-right: calc(30px + var(--gutter));
 }
 
 #event-detail-panel .detail-category-icon{
@@ -1607,32 +1608,29 @@ Umfang:
   height: 18px;
   margin-top: 2px;
 
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  /* „Icon-Box“-Look wie in der App */
-  border: 1px solid rgba(31,41,51,0.18);
-  border-radius: 6px;
-  background: rgba(31,41,51,0.03);
-
-  /* Emoji/Color-Icons optisch beruhigen */
-  filter: grayscale(1) saturate(0);
-  opacity: 0.86;
-
-  font-size: 14px;
-  line-height: 1;
+  /* Text/Emoji ausblenden */
+  font-size: 0;
+  line-height: 0;
+  color: rgba(31,41,51,0.90);
 }
 
+/* Kalender-Icon wie in Actionbar (CSS-inlined SVG) */
+#event-detail-panel .detail-category-icon::before{
+  content: "";
+  width: 18px;
+  height: 18px;
+  display: block;
 
-/* falls svg drin ist: exakt gleiche Größe */
-#event-detail-panel .detail-category-icon svg,
-#event-detail-panel .detail-category-icon img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  display: block !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px 18px;
+
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%231f2933%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%202v3M17%202v3%22%2F%3E%3Cpath%20d%3D%22M3.5%209h17%22%2F%3E%3Cpath%20d%3D%22M6%205h12a2.5%202.5%200%200%201%202.5%202.5v11A2.5%202.5%200%200%201%2018%2021H6A2.5%202.5%200%200%201%203.5%2018.5v-11A2.5%202.5%200%200%201%206%205z%22%2F%3E%3Cpath%20d%3D%22M7.5%2013h3M7.5%2016h6%22%2F%3E%3C%2Fsvg%3E");
 }
 
 #event-detail-panel .detail-title{
@@ -1653,6 +1651,7 @@ Umfang:
 }
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
+
 
 
 
@@ -2202,16 +2201,14 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) ===
 Zweck:
-- Icon-Buttons mit kleinem Label darunter (Kalender / WhatsApp / Route)
-- detail-sr-only korrekt „visually hidden“, damit kein großer Text angezeigt wird
-- Alle drei Buttons neutral/einheitlich
-- Kein Link-Underline bei Hover/Tap (globales a:hover darf hier nicht greifen)
-- Verhindert sichtbare interne Labels (z.B. „Per WhatsApp teilen“) durch erzwungene Inheritance
+- Actionbar wieder sichtbar (Root-Cause: Sheet hat z-index:2, Slot war z-index:auto -> liegt dahinter)
+- Labels aus title (JS liefert UI-kurz: „WhatsApp“, A11y bleibt aria „Per WhatsApp teilen“)
+- Kein Link-Underline bei Hover/Tap
 Umfang:
 - #detail-actionbar-slot + .detail-actionbar-btn + labels via ::after + .detail-sr-only
 === */
 
-/* SR-only (robust, unabhängig von anderen Styles) */
+/* SR-only (robust) */
 #detail-actionbar-slot .detail-sr-only{
   position: absolute !important;
   width: 1px !important;
@@ -2241,6 +2238,9 @@ Umfang:
 
   border-top: 1px solid rgba(31,41,51,0.06);
   background: rgba(255,255,255,0.96);
+
+  /* Root-Cause Fix: Slot MUSS über dem Sheet (Sheet hat z-index:2) */
+  z-index: 6;
 }
 
 /* Buttons (können <a> oder <button> sein) */
@@ -2266,28 +2266,31 @@ Umfang:
     0 6px 14px rgba(0,0,0,0.045),
     0 1px 0 rgba(255,255,255,0.72) inset;
 
-  /* kill any internal label sizing */
   font-size: 0 !important;
   line-height: 0 !important;
-
   overflow: hidden;
 
-  text-decoration: none; /* wichtig: verhindert globales Link-Underline */
+  text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-/* ROOT-CAUSE FIX: interne Elemente dürfen keine eigenen Fontgrößen reinbringen */
-#detail-actionbar-slot .detail-actionbar-btn *{
-  font-size: inherit !important;
-  line-height: inherit !important;
+/* Link-Underline sicher aus */
+#detail-actionbar-slot a,
+#detail-actionbar-slot a:link,
+#detail-actionbar-slot a:visited,
+#detail-actionbar-slot a:hover,
+#detail-actionbar-slot a:active,
+#detail-actionbar-slot a:focus{
   text-decoration: none !important;
 }
 
-/* Label unter Icon */
+/* Label unter Icon: aus title (WhatsApp bleibt kurz) */
 #detail-actionbar-slot .detail-actionbar-btn::after{
+  content: attr(title);
   display: block;
+
   font-size: 10px;
   line-height: 1.05;
   font-weight: 700;
@@ -2296,16 +2299,10 @@ Umfang:
   text-align: center;
 }
 
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(1)::after{ content: "Kalender"; }
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(2)::after{ content: "WhatsApp"; }
-#detail-actionbar-slot .detail-actionbar-btn:nth-child(3)::after{ content: "Route"; }
-
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
     background: rgba(31,41,51,0.06);
     border-color: rgba(31,41,51,0.14);
-    text-decoration: none;
-
     box-shadow:
       0 10px 22px rgba(0,0,0,0.06),
       0 1px 0 rgba(255,255,255,0.72) inset;
@@ -2316,18 +2313,12 @@ Umfang:
   transform: translateY(1px);
   background: rgba(31,41,51,0.08);
   border-color: rgba(31,41,51,0.16);
-  text-decoration: none;
-
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.04),
-    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid rgba(31,41,51,0.18);
   outline-offset: 3px;
   border-radius: 14px;
-  text-decoration: none;
 }
 
 /* Icons: niemals groß */
@@ -2345,3 +2336,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
