@@ -32,9 +32,17 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 
-TAB_EVENTS = "Events"
-TAB_INBOX = "Inbox"
-TAB_SOURCES = "Sources"
+# === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Tab-Namen per ENV überschreibbar machen (z.B. Events_Prod vs. Events_Test), ohne Code-Änderung pro Umgebung.
+# Umfang:
+# - Ersetzt nur die TAB_* Konstanten.
+# === END BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
+TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
+TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
+TAB_SOURCES = os.environ.get("TAB_SOURCES", "Sources")
+
 
 INBOX_COLUMNS = [
     "status",
@@ -318,7 +326,9 @@ def parse_ics_events(ics_text: str) -> List[Dict[str, str]]:
 # -------------------------
 
 def parse_rss(xml_text: str) -> List[Dict[str, str]]:
-    # Works for RSS/Atom basic fields. Date extraction is heuristic (v0).
+    # Works for RSS/Atom basic fields.
+    # WICHTIG: pubDate/updated/published ist i.d.R. Artikel-Datum, NICHT Event-Datum.
+    # Event-Datum wird heuristisch aus Titel/Description extrahiert (wenn möglich).
     xml_text = xml_text.strip()
     root = ET.fromstring(xml_text)
 
@@ -345,48 +355,134 @@ def parse_rss(xml_text: str) -> List[Dict[str, str]]:
         except Exception:
             return ""
 
+    month_map = {
+        "januar": 1, "jan": 1,
+        "februar": 2, "feb": 2,
+        "maerz": 3, "märz": 3, "mrz": 3,
+        "april": 4, "apr": 4,
+        "mai": 5,
+        "juni": 6, "jun": 6,
+        "juli": 7, "jul": 7,
+        "august": 8, "aug": 8,
+        "september": 9, "sep": 9,
+        "oktober": 10, "okt": 10,
+        "november": 11, "nov": 11,
+        "dezember": 12, "dez": 12,
+    }
+
+    def extract_event_date(text: str, fallback_year: int) -> Tuple[str, str]:
+        """
+        Returns (event_date_iso_or_empty, note)
+        Note contains extraction method / warnings.
+        """
+        t = norm(text)
+        if not t:
+            return ("", "event_date:missing (no text)")
+
+        # 1) dd.mm.yyyy or dd.mm.yy
+        m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
+        if m:
+            dd = int(m.group(1))
+            mm = int(m.group(2))
+            yy = m.group(3)
+            yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
+            try:
+                d = date(yyyy, mm, dd).strftime("%Y-%m-%d")
+                return (d, "event_date:regex(dd.mm.yyyy)")
+            except Exception:
+                return ("", "event_date:invalid(dd.mm.yyyy)")
+
+        # 2) dd.mm. (year inferred)
+        m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
+        if m:
+            dd = int(m.group(1))
+            mm = int(m.group(2))
+            try:
+                d = date(fallback_year, mm, dd).strftime("%Y-%m-%d")
+                return (d, "event_date:regex(dd.mm.) year_inferred")
+            except Exception:
+                return ("", "event_date:invalid(dd.mm.)")
+
+        # 3) dd. Monat yyyy / dd. Monat (year inferred)
+        m = re.search(r"(?<!\d)(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?(?!\d)", t)
+        if m:
+            dd = int(m.group(1))
+            mon = norm_key(m.group(2))
+            yyyy = int(m.group(3)) if m.group(3) else fallback_year
+            mm = month_map.get(mon, 0)
+            if mm:
+                try:
+                    d = date(yyyy, mm, dd).strftime("%Y-%m-%d")
+                    note = "event_date:regex(dd.monat" + (")" if m.group(3) else ") year_inferred")
+                    return (d, note)
+                except Exception:
+                    return ("", "event_date:invalid(dd.monat)")
+
+        return ("", "event_date:missing (article date only)")
+
+    def pack_candidate(title: str, link: str, article_date: str, description: str) -> Dict[str, str]:
+        combined = f"{title}\n{description}"
+        fallback_year = int(article_date[:4]) if article_date and len(article_date) >= 4 else datetime.now().year
+        ev_date, ev_note = extract_event_date(combined, fallback_year)
+
+        notes = f"article_date={article_date or ''}; {ev_note}"
+        return {
+            "title": clean_text(title),
+            "date": ev_date,          # Event-Datum (kann leer sein)
+            "endDate": "",
+            "time": "",
+            "location": "",
+            "url": canonical_url(link),
+            "description": clean_text(description),
+            "notes": notes,
+        }
+
     if entries:
         for e in entries:
             title = norm(e.findtext("atom:title", default="", namespaces=ns))
-            link_el = e.find("atom:link", ns)
-            link = norm(link_el.attrib.get("href", "")) if link_el is not None else ""
+
+            link = ""
+            for link_el in e.findall("atom:link", ns):
+                rel = (link_el.attrib.get("rel", "") or "").lower()
+                href = link_el.attrib.get("href", "") or ""
+                if href and (rel in ("", "alternate")):
+                    link = href
+                    break
+
             updated = norm(e.findtext("atom:updated", default="", namespaces=ns))
             published = norm(e.findtext("atom:published", default="", namespaces=ns))
-            d = parse_date_any(published) or parse_date_any(updated)
+            article_date = parse_date_any(published) or parse_date_any(updated)
 
-            out.append(
-                {
-                    "title": title,
-                    "date": d,
-                    "endDate": "",
-                    "time": "",
-                    "location": "",
-                    "url": link,
-                    "description": "",
-                }
-            )
+            summary = norm(e.findtext("atom:summary", default="", namespaces=ns))
+            content = norm(e.findtext("atom:content", default="", namespaces=ns))
+            desc = summary or content or ""
+
+            out.append(pack_candidate(title, link, article_date, desc))
 
     if items:
+        # handle content namespace sometimes used by RSS feeds
+        content_ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
+
         for it in items:
             title = norm(it.findtext("title", default=""))
             link = norm(it.findtext("link", default=""))
             pub = norm(it.findtext("pubDate", default=""))
-            d = parse_date_any(pub)
+            article_date = parse_date_any(pub)
 
-            out.append(
-                {
-                    "title": title,
-                    "date": d,
-                    "endDate": "",
-                    "time": "",
-                    "location": "",
-                    "url": link,
-                    "description": "",
-                }
-            )
+            desc = norm(it.findtext("description", default=""))
+            encoded = ""
+            try:
+                encoded = norm(it.findtext("content:encoded", default="", namespaces=content_ns))
+            except Exception:
+                encoded = ""
 
-    # RSS is too ambiguous for event dates; v0 allows empty date -> we skip those
-    return [x for x in out if x.get("date")]
+            full_desc = encoded or desc or ""
+            out.append(pack_candidate(title, link, article_date, full_desc))
+
+    # WICHTIG: Nicht mehr nach "date" filtern – RSS/Artikel können ohne Event-Datum in die Inbox,
+    # damit du sie in der PWA manuell datieren kannst.
+    return [x for x in out if x.get("title")]
+
 
 
 # -------------------------
@@ -447,7 +543,14 @@ def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[s
 # Dedupe / matching (v0)
 # -------------------------
 
-# === BEGIN BLOCK: DEDUPE INDEXES (canonical url + slug+date) ===
+# === BEGIN BLOCK: DEDUPE INDEXES (canonical url + slug+date with url-fallback) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Dedupe bleibt stabil auch wenn RSS/Artikel-Kandidaten kein Event-Datum haben.
+# - Fallback: wenn date leer ist, wird canonical candidate-url als dritter Fingerprint-Teil genutzt.
+# Umfang:
+# - Ersetzt nur die Fingerprint/Index-Helfer.
+# === END BLOCK: DEDUPE INDEXES (canonical url + slug+date with url-fallback) ===
 def build_live_index(live_events: List[Dict[str, str]]) -> Tuple[Dict[str, str], Dict[Tuple[str, str], str]]:
     by_url: Dict[str, str] = {}
     by_slug_date: Dict[Tuple[str, str], str] = {}
@@ -466,11 +569,19 @@ def build_live_index(live_events: List[Dict[str, str]]) -> Tuple[Dict[str, str],
     return by_url, by_slug_date
 
 
+def _fp_third(date_str: str, candidate_url: str) -> str:
+    d = norm(date_str)
+    if d:
+        return d
+    u = canonical_url(candidate_url)
+    return norm_key(u) if u else ""
+
+
 def inbox_fingerprint(row: Dict[str, str]) -> Tuple[str, str, str]:
     return (
         norm_key(canonical_url(row.get("source_url", ""))),
         slugify(row.get("title", "")),
-        norm(row.get("date", "")),
+        _fp_third(row.get("date", ""), row.get("url", "")),
     )
 
 
@@ -478,9 +589,10 @@ def make_candidate_fingerprint(c: Dict[str, str], source_url: str) -> Tuple[str,
     return (
         norm_key(canonical_url(source_url)),
         slugify(c.get("title", "")),
-        norm(c.get("date", "")),
+        _fp_third(c.get("date", ""), c.get("url", "")),
     )
-# === END BLOCK: DEDUPE INDEXES (canonical url + slug+date) ===
+# === END BLOCK: DEDUPE INDEXES (canonical url + slug+date with url-fallback) ===
+
 
 
 
@@ -561,10 +673,20 @@ def main() -> None:
 
 
         for c in candidates:
+                       # === BEGIN BLOCK: RSS ARTICLE DATE SAFETY (allow missing event date) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - RSS/Artikel-Kandidaten dürfen ohne Event-Datum in die Inbox (für manuelle Prüfung in der PWA),
+            #   statt fälschlich das Artikel-Datum als Event-Datum zu übernehmen.
+            # - Fehlendes Event-Datum wird als Hinweis in notes markiert.
+            # Umfang:
+            # - Ersetzt nur die title/date Guard-Logik.
+            # === END BLOCK: RSS ARTICLE DATE SAFETY (allow missing event date) ===
             title = clean_text(c.get("title", ""))
             d = norm(c.get("date", ""))
-            if not title or not d:
+            if not title:
                 continue
+
 
 
             # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
@@ -615,7 +737,7 @@ def main() -> None:
                 "source_url": url,
                 "match_score": f"{score:.2f}",
                 "matched_event_id": "",
-                "notes": "",
+                "notes": (clean_text(c.get("notes", "")) + ("" if d else (" | " if clean_text(c.get("notes", "")) else "") + "⚠️ event_date_missing")),
                 "created_at": now_iso(),
             }
 
