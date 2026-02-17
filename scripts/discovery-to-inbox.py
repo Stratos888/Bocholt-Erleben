@@ -307,7 +307,69 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
 # - Date-Window Filter (keine alten Termine, keine extrem weit entfernten Termine)
 # Umfang:
 # - Nur Helper-Funktionen + Regex-Compile.
+# === BEGIN BLOCK: LOCATION/TIME INFERENCE (rss/ics enrichment, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - RSS liefert oft keine Location/Time-Felder -> aus Title/Description ableiten
+# - "Online-Seminar" -> Location="Online"
+# - "// ... //" Segmente im Titel (presse-service) als Ort/Adresse nutzen
+# Umfang:
+# - Nur Heuristiken, keine externen Requests
+# === END BLOCK: LOCATION/TIME INFERENCE (rss/ics enrichment, v1) ===
+
+_TIME_IN_TITLE_RE = re.compile(r"\bum\s*(\d{1,2})(?:[:\.](\d{2}))?\s*uhr\b", re.IGNORECASE)
+_SLASH_SEG_RE = re.compile(r"\s*//\s*")
+
+def _infer_time_from_text(text: str) -> str:
+    m = _TIME_IN_TITLE_RE.search(text or "")
+    if not m:
+        return ""
+    hh = int(m.group(1))
+    mm = int(m.group(2)) if m.group(2) else 0
+    return f"{hh:02d}:{mm:02d}"
+
+def _infer_location_from_title(title: str) -> str:
+    # presse-service Titel hat oft: "<Titel> // <Ort/Adresse> // ..."
+    parts = [p.strip() for p in _SLASH_SEG_RE.split(title or "") if p.strip()]
+    if len(parts) >= 2:
+        # Teil 2 ist meist Location/Adresse
+        loc = parts[1]
+        # Zu generisch? dann leer lassen
+        if len(loc) >= 3 and loc.lower() not in ("eintritt frei",):
+            return loc
+    return ""
+
+def _infer_location_from_description(desc: str) -> str:
+    d = (desc or "").strip()
+    if not d:
+        return ""
+    # einfache, robuste Muster: "im LernWerk", "im Schloss Raesfeld", "in Preen’s Hoff"
+    m = re.search(r"\b(im|in)\s+([A-ZÄÖÜ][^.,;]{2,80})", d)
+    if m:
+        loc = m.group(2).strip()
+        # abschneiden, wenn Satz weiterläuft
+        loc = re.split(r"\s+(am|um|ab|von|für|mit)\b", loc)[0].strip()
+        return loc
+    return ""
+
+def infer_location_time(title: str, description: str) -> Tuple[str, str]:
+    t = norm(title)
+    d = norm(description)
+    low = f"{t} {d}".lower()
+
+    # Online zuerst
+    if "online" in low or "webinar" in low:
+        return ("Online", _infer_time_from_text(t) or _infer_time_from_text(d))
+
+    loc = _infer_location_from_title(t)
+    if not loc:
+        loc = _infer_location_from_description(d)
+
+    tm = _infer_time_from_text(t) or _infer_time_from_text(d)
+    return (loc, tm)
+
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
+
 
 _NON_EVENT_RE = re.compile("|".join(f"(?:{p})" for p in NON_EVENT_PATTERNS), re.IGNORECASE)
 _EVENT_SIGNAL_RE = re.compile("|".join(f"(?:{p})" for p in EVENT_SIGNAL_PATTERNS), re.IGNORECASE)
@@ -952,6 +1014,21 @@ def main() -> None:
             # - ersetzt nur die alte Hard-Skip-Logik + setzt description/status sauber
             # === END BLOCK: CLASSIFY + DESCRIPTION (review/blocked/rejected) ===
             desc_text = clean_text(c.get("description", ""))
+                        # === BEGIN BLOCK: ENRICH LOCATION/TIME (infer missing fields) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - Falls RSS/ICS kein Location/Time liefert: aus Titel/Description ableiten
+            # Umfang:
+            # - Setzt nur lokale Variablen inferred_location / inferred_time
+            # === END BLOCK: ENRICH LOCATION/TIME (infer missing fields) ===
+            raw_location = clean_text(c.get("location", ""))
+            raw_time = norm(c.get("time", ""))
+
+            inferred_location, inferred_time = infer_location_time(title, desc_text)
+
+            final_location = raw_location or inferred_location
+            final_time = raw_time or inferred_time
+
 
             status, reason = classify_candidate(
                 stype=stype,
@@ -997,26 +1074,27 @@ def main() -> None:
 
             # Write to inbox as suggestion
             row = {
-                "status": "status",
+                "status": status,
                 "id_suggestion": make_id_suggestion(title, d, norm(c.get("time", "")), url),
                 "title": title,
                 "date": d,
                 "endDate": norm(c.get("endDate", "")),
-                "time": norm(c.get("time", "")),
+                "time": final_time,
                 "city": default_city,
-                "location": clean_text(c.get("location", "")),
+                "location": final_location,
                 "kategorie_suggestion": default_cat,
                 "url": c_url,
-                                "description": ensure_description(
+                "description": ensure_description(
                     title=title,
                     d_iso=d,
-                    time_str=norm(c.get("time", "")),
+                    time_str=final_time,
                     city=default_city,
-                    location=clean_text(c.get("location", "")),
+                    location=final_location,
                     category=default_cat,
                     url=c_url,
                     description_raw=c.get("description", ""),
                 ),
+
 
 
                 "source_name": source_name,
