@@ -60,17 +60,20 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     </button>
  
 
-  <!-- === BEGIN BLOCK: HEADER INFO CTA (opens locations modal) ===
-Zweck: Zweiter Header-Button „ⓘ Info“ öffnet das Locations-Modal (Trigger: #open-locations-modal).
-Umfang: Ersetzt den Publish-Link im Header durch den Info-Modal-Trigger.
+ <!-- === BEGIN BLOCK: HEADER INFO CTA (opens info hub) ===
+Zweck:
+- Header-Button „Info“ führt auf den Info-Hub (/info/) statt ein Modal zu öffnen.
+- App-typische Navigation: Info = Hub, von dort aus zu Über/Für Veranstalter/Rechtliches.
+Umfang:
+- Ersetzt nur den Link (kein Layout/JS-Refactoring).
 === -->
 <a
-  id="open-locations-modal"
   class="pwa-install-button"
-  href="#"
+  href="/info/"
   aria-label="Info"
 ></a>
-<!-- === END BLOCK: HEADER INFO CTA (opens locations modal) === -->
+<!-- === END BLOCK: HEADER INFO CTA (opens info hub) === -->
+
 
 
   </div>
@@ -357,6 +360,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
