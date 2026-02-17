@@ -67,16 +67,29 @@
       </p>
     </section>
 
-    <!-- === BEGIN BLOCK: CONTENT LINKS (navigation back to events) ===
-Zweck: Ruhiger, app-typischer Rückweg zur Event-Übersicht (Top-PWA-Niveau).
-Umfang: Ersetzt frühere CTA-/Back-Buttons vollständig.
+  <!-- === BEGIN BLOCK: CONTENT LINKS (organizer funnel + safe navigation) ===
+Zweck:
+- Top-App-Führung: von „Für Veranstalter“ direkt zur Aktion „Events veröffentlichen“
+- Zusätzlich sauberer Rückweg in den Info-Hub (weil User von dort kommt)
+- Productionsafe: nur Links auf existierende Seiten, keine Dead Ends
+Umfang:
+- Ersetzt den bisherigen „Zurück zu den Events“-Block am Seitenende vollständig
 === -->
-<div class="content-links">
-  <a class="content-link" href="/">
+<nav class="content-actions" aria-label="Weiter">
+  <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">
+    Events veröffentlichen
+  </a>
+
+  <a class="content-back" href="/info/">
+    Zurück zu Info
+  </a>
+
+  <a class="content-back" href="/">
     Zurück zu den Events
   </a>
-</div>
-<!-- === END BLOCK: CONTENT LINKS (navigation back to events) === -->
+</nav>
+<!-- === END BLOCK: CONTENT LINKS (organizer funnel + safe navigation) === -->
+
 
   </main>
   <!-- === END BLOCK: ORGANIZER INFO PAGE (scanable, trust-first) === -->
