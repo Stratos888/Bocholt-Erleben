@@ -31,6 +31,8 @@ jobs:
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DATE_WINDOW_DAYS_FUTURE: 180
+          DATE_WINDOW_ALLOW_PAST_DAYS: 0
         run: |
           python scripts/discovery-to-inbox.py
 # === END BLOCK: DAILY DISCOVERY WORKFLOW (cron + manual, writes to Sheet Inbox only) ===
