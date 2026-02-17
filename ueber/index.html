@@ -61,16 +61,23 @@
       </p>
     </section>
 
-      <!-- === BEGIN BLOCK: INFO PAGE NAVIGATION (standard back link) ===
-    Zweck: Einheitlicher Rückweg auf allen Infoseiten – identisch zur Referenz /fuer-veranstalter/.
-    Umfang: Ersetzt den bisherigen CTA-Button-Block am Seitenende vollständig.
-    === -->
-    <nav class="content-links">
-      <a class="content-link" href="/">
-        Zurück zu den Events
-      </a>
-    </nav>
-    <!-- === END BLOCK: INFO PAGE NAVIGATION (standard back link) === -->
+      <!-- === BEGIN BLOCK: INFO PAGE NAVIGATION (hub-first back links) ===
+  Zweck:
+  - Top-App-Führung: von Unterseiten zurück in den Info-Hub (/info/)
+  - Zusätzlich weiterhin direkter Rückweg zu den Events (/)
+  Umfang:
+  - Ersetzt den bisherigen „Zurück zu den Events“-Block am Seitenende
+  === -->
+  <nav class="content-links" aria-label="Navigation">
+    <a class="content-link" href="/info/">
+      Zurück zu Info
+    </a>
+    <a class="content-link" href="/">
+      Zurück zu den Events
+    </a>
+  </nav>
+  <!-- === END BLOCK: INFO PAGE NAVIGATION (hub-first back links) === -->
+
 
 
   </main>
