@@ -31,8 +31,9 @@
   - Korrigiert Token-Inkonsistenzen (fehlendes --radius-card).
   - Definiert einen einheitlichen Seiten-Gutter für die gesamte App.
   - Definiert ein „Detailpanel Layout Contract“ (Header/Close/Actionbar Maße) als Single Source of Truth.
+  - Definiert UI-Control Tokens (Buttons/CTA/Focus/Border/Shadow) für app-weite Konsistenz.
   Umfang:
-  - Nur Token in :root (Spacing, Radius, Shadow, --gutter, Detailpanel-Contract).
+  - Nur Token in :root (Spacing, Radius, Shadow, --gutter, Detailpanel-Contract, UI-Control Tokens).
   === */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -53,7 +54,46 @@
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
   --dp-actionbar-pad-y: 10px;           /* vertikales Padding in der Actionbar */
   --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 12px); /* Content-Reserve inkl. Safe-Area */
+
+  /* === BEGIN BLOCK: UI CONTROL TOKENS (buttons/cta/focus) ===
+  Zweck:
+  - Single Source of Truth für Button/CTA DNA (Radius/Border/Surface/Shadow/Focus/Typo)
+  - Werte spiegeln aktuelle UI, damit sich optisch möglichst wenig ändert.
+  Umfang:
+  - Nur Tokens, keine Selektoren.
+  === */
+  --ui-radius-sm: 12px;
+  --ui-radius-md: 14px;
+
+  --ui-border-weak: rgba(31,41,51,0.08);
+  --ui-border-soft: rgba(31,41,51,0.10);
+  --ui-border-strong: rgba(31,41,51,0.14);
+  --ui-border-primary: rgba(139,207,74,.45);
+
+  --ui-surface-soft: rgba(255,255,255,0.55);
+  --ui-surface-soft-hover: rgba(255,255,255,0.74);
+  --ui-surface-soft-active: rgba(255,255,255,0.86);
+
+  --ui-surface-tint: rgba(31,41,51,0.04);
+  --ui-surface-tint-hover: rgba(31,41,51,0.06);
+  --ui-surface-tint-active: rgba(31,41,51,0.08);
+
+  --ui-shadow-soft:
+    0 6px 14px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
+  --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
+
+  --ui-focus-ring: rgba(139,207,74,0.20);
+  --ui-focus-ring-neutral: rgba(31,41,51,0.18);
+
+  --ui-font-size-control: 13px;
+  --ui-font-weight-control: 750;
+  --ui-font-weight-cta: 800;
+  /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
+
 
 
 
@@ -80,11 +120,11 @@
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
 
-   /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
+     /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
   Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
-  Umfang: Header-Höhe + Abstand + Farben für Header/Divider + globaler Gutter.
+  Umfang: Header-Höhe + Abstand + Farben für Header/Divider + optionaler Desktop-Gutter.
+  Hinweis: --gutter kommt global aus CORE SPACING TOKENS.
   === */
-  --gutter: 16px;                    /* globaler horizontaler Innenabstand (mobile) */
   --gutter-lg: 24px;                 /* optional: desktop */
 
   --header-h: 48px;                  /* entspricht .app-header min-height */
@@ -92,6 +132,7 @@
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
   /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
+
 
 
 }
@@ -340,26 +381,27 @@ Umfang: Alle .content-link Navigationseinträge.
   justify-content: center;
 
   padding: 11px 14px;
-  border-radius: 12px;
+  border-radius: var(--ui-radius-sm);
 
   background: var(--color-primary-muted);
-  border: 1px solid rgba(139,207,74,.45);
+  border: 1px solid var(--ui-border-primary);
 
   color: var(--color-text-primary);
-  font-weight: 800;
+  font-weight: var(--ui-font-weight-cta);
   text-decoration: none;
 
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  box-shadow: var(--ui-shadow-cta);
 }
+
 .modal-cta-button:hover{
   text-decoration: none;
   filter: brightness(0.985);
 }
 .modal-cta-button:active{
    /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
-
-  box-shadow: 0 5px 12px rgba(0,0,0,0.08);
+  box-shadow: var(--ui-shadow-cta-active);
 }
+
 /* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) === */
 
 
@@ -449,14 +491,17 @@ html.is-sheet-open body { overflow: hidden; }
 }
 .empty-state__btn{
   width: 100%;
-  border: 1px solid rgba(139,207,74,.45);
+  border: 1px solid var(--ui-border-primary);
   background: var(--color-primary-muted);
   color: var(--color-text-primary);
+
   padding: 12px 14px;
-  border-radius: 14px;
-  font-weight: 800;
+  border-radius: var(--ui-radius-md);
+
+  font-weight: var(--ui-font-weight-cta);
   cursor: pointer;
 }
+
 
 /* === BEGIN BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) ===
 Zweck:
@@ -1978,8 +2023,8 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
 /* === BEGIN PATCH: HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) ===
 Zweck:
 - Header Buttons: gleiche DNA wie Actionbar (Border/Surface), aber header-kompakt
-- Icons zuverlässig sichtbar (fix: fehlender Selector + stray brace entfernt)
-- keine Strukturänderung, nur CSS
+- Icons zuverlässig sichtbar
+- Single Source: Werte aus UI CONTROL TOKENS, damit Designänderungen app-weit wirken
 Umfang:
 - .header-right > .pwa-install-button inkl. States + ::before/::after + Mask-Icons
 === */
@@ -1995,13 +2040,13 @@ Umfang:
   min-height: 34px;
   padding: 0 10px;
 
-  border-radius: 12px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.55);
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border-weak);
+  background: var(--ui-surface-soft);
 
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 750;
+  font-size: var(--ui-font-size-control);
+  font-weight: var(--ui-font-weight-control);
   line-height: 1;
   color: rgba(31,41,51,0.80);
 
@@ -2011,9 +2056,7 @@ Umfang:
 
   -webkit-tap-highlight-color: transparent;
 
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: var(--ui-shadow-soft);
 
   transition: background 140ms ease, border-color 140ms ease,
               box-shadow 140ms ease, transform 140ms ease;
@@ -2021,23 +2064,23 @@ Umfang:
 
 @media (hover: hover){
   .header-right > .pwa-install-button:hover{
-    background: rgba(255,255,255,0.74);
-    border-color: rgba(31,41,51,0.12);
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
   }
 }
 
 .header-right > .pwa-install-button:active{
   transform: translateY(1px);
-  background: rgba(255,255,255,0.86);
+  background: var(--ui-surface-soft-active);
 }
 
 .header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.20);
+  outline: 2px solid var(--ui-focus-ring);
   outline-offset: 3px;
-  border-radius: 12px;
+  border-radius: var(--ui-radius-sm);
 }
 
-/* Icon base (FIX: was broken by stray declarations) */
+/* Icon base */
 .header-right > .pwa-install-button::before{
   content: "";
 
@@ -2057,11 +2100,11 @@ Umfang:
   mask-size: contain;
 }
 
-/* Label (per-type override below) */
+/* Label */
 .header-right > .pwa-install-button::after{
   content: "";
-  font-size: 13px;
-  font-weight: 750;
+  font-size: var(--ui-font-size-control);
+  font-weight: var(--ui-font-weight-control);
   color: currentColor;
 }
 
@@ -2080,6 +2123,7 @@ Umfang:
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 
 /* === END PATCH: HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) === */
+
 
 
 @media (max-width: 360px){
@@ -2197,14 +2241,12 @@ Umfang:
   justify-content: center;
   gap: 4px;
 
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(31,41,51,0.04);
+  border-radius: var(--ui-radius-md);
+  border: 1px solid var(--ui-border-soft);
+  background: var(--ui-surface-tint);
   color: rgba(31,41,51,0.90);
 
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: var(--ui-shadow-soft);
 
   font-size: 0 !important;
   line-height: 0 !important;
@@ -2218,6 +2260,7 @@ Umfang:
               box-shadow 140ms ease, transform 140ms ease;
 }
 
+
 /* Explizit: Links in allen States niemals unterstreichen */
 #detail-actionbar-slot .detail-actionbar-btn:link,
 #detail-actionbar-slot .detail-actionbar-btn:visited,
@@ -2227,16 +2270,18 @@ Umfang:
 }
 
 @media (hover: hover){
-  #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(31,41,51,0.06);
-    border-color: rgba(31,41,51,0.14);
+    #detail-actionbar-slot .detail-actionbar-btn:hover{
+    background: var(--ui-surface-tint-hover);
+    border-color: var(--ui-border-strong);
   }
+
 }
 
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.08);
+  background: var(--ui-surface-tint-active);
 }
+
 
 /* Label (klein) – kommt aus title */
 #detail-actionbar-slot .detail-actionbar-btn::after{
@@ -2260,10 +2305,11 @@ Umfang:
 
 /* Focus */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 2px solid rgba(31,41,51,0.18);
+  outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 3px;
-  border-radius: 14px;
+  border-radius: var(--ui-radius-md);
 }
+
 
 /* Icons: niemals groß */
 #detail-actionbar-slot .detail-actionbar-btn svg,
@@ -2280,6 +2326,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
