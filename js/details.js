@@ -899,6 +899,9 @@ END:VCALENDAR`;
   };
 
   const showChooser = () => {
+    // Defensive cleanup: niemals mehrere Chooser gleichzeitig
+    this.panel.querySelectorAll(".detail-cal-chooser").forEach(n => n.remove());
+
     const html = `
       <div class="detail-cal-chooser">
         <div class="detail-cal-backdrop" data-cal="close"></div>
@@ -913,6 +916,8 @@ END:VCALENDAR`;
     this.panel.insertAdjacentHTML("beforeend", html);
 
     const chooser = this.panel.querySelector(".detail-cal-chooser");
+    if (!chooser) return;
+
     const payload = getPayload();
 
     chooser.addEventListener("click", (e) => {
@@ -933,9 +938,15 @@ END:VCALENDAR`;
     });
   };
 
-  calBtn.addEventListener("click", showChooser);
+  // Defensive bind: falls die Init-/Render-Logik aus irgendeinem Grund mehrfach läuft,
+  // wird der Handler trotzdem nur einmal pro Button gebunden.
+  if (calBtn.dataset.calChooserBound !== "1") {
+    calBtn.dataset.calChooserBound = "1";
+    calBtn.addEventListener("click", showChooser);
+  }
 }
 // === END BLOCK: CALENDAR ACTION CHOOSER ===
+
 
 
       // reset scroll on open
@@ -958,6 +969,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
