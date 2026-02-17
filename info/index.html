@@ -17,45 +17,55 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: INFO HUB (top-app navigation screen) ===
-  Zweck:
-  - App-typischer Hub: klare, ruhige Navigation statt Text-Wüste.
-  - Verlinkt nur auf bereits existierende Seiten (keine Dead Ends).
-  Umfang: Gesamter <body>-Inhalt dieser Datei.
-  === -->
-  <main class="page page--info">
+ <!-- === BEGIN BLOCK: INFO HUB SCREEN (grouped, top-app structure) ===
+Zweck:
+- Klare Trennung: Plattform / Für Veranstalter / Rechtliches
+- Verbessert Orientierung und Conversion (Top-App-Pattern)
+- Nur bestehende Seiten verlinkt (productionsafe)
+Umfang:
+- Gesamter Hub-Inhalt
+=== -->
+<main class="page page--info">
 
-    <header class="content-hero">
-      <p class="content-kicker">Bocholt erleben</p>
-      <h1>Info</h1>
-      <p class="content-lead">
-        Alles Wichtige auf einen Blick – für Besucher und Veranstalter.
-      </p>
-    </header>
+  <header class="content-hero">
+    <p class="content-kicker">Bocholt erleben</p>
+    <h1>Info</h1>
+    <p class="content-lead">Alles Wichtige – für Besucher und Veranstalter.</p>
+  </header>
 
-    <section class="content-card content-card--primary" aria-labelledby="info-main">
-      <h2 id="info-main">Schnellzugriff</h2>
-      <nav class="content-links" aria-label="Info Navigation">
-        <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
-        <a class="content-link" href="/fuer-veranstalter/">Für Veranstalter</a>
-        <a class="content-link" href="/events-veroeffentlichen/">Events veröffentlichen</a>
-      </nav>
-    </section>
-
-    <section class="content-card" aria-labelledby="info-legal">
-      <h2 id="info-legal">Rechtliches</h2>
-      <nav class="content-links" aria-label="Rechtliches">
-        <a class="content-link" href="/impressum/">Impressum</a>
-        <a class="content-link" href="/datenschutz/">Datenschutz</a>
-      </nav>
-    </section>
-
-    <!-- Standard zurück -->
-    <nav class="content-links" aria-label="Zurück">
-      <a class="content-link" href="/">Zurück zu den Events</a>
+  <!-- Plattform -->
+  <section class="content-card" aria-labelledby="info-plattform">
+    <h2 id="info-plattform">Plattform</h2>
+    <nav class="content-links">
+      <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
     </nav>
+  </section>
 
-  </main>
-  <!-- === END BLOCK: INFO HUB (top-app navigation screen) === -->
+  <!-- Für Veranstalter -->
+  <section class="content-card content-card--primary" aria-labelledby="info-veranstalter">
+    <h2 id="info-veranstalter">Für Veranstalter</h2>
+    <nav class="content-links">
+      <a class="content-link" href="/fuer-veranstalter/">Für Veranstalter</a>
+      <a class="content-link" href="/events-veroeffentlichen/">Events veröffentlichen</a>
+    </nav>
+  </section>
+
+  <!-- Rechtliches -->
+  <section class="content-card" aria-labelledby="info-recht">
+    <h2 id="info-recht">Rechtliches</h2>
+    <nav class="content-links">
+      <a class="content-link" href="/impressum/">Impressum</a>
+      <a class="content-link" href="/datenschutz/">Datenschutz</a>
+    </nav>
+  </section>
+
+  <!-- Zurück -->
+  <nav class="content-links">
+    <a class="content-link" href="/">Zurück zu den Events</a>
+  </nav>
+
+</main>
+<!-- === END BLOCK: INFO HUB SCREEN (grouped, top-app structure) === -->
+
 </body>
 </html>
