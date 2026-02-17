@@ -336,13 +336,94 @@ def _in_date_window(d_iso: str) -> bool:
     if not d:
         return False
     today = date.today()
-    min_d = today if DATE_WINDOW_ALLOW_PAST_DAYS <= 0 else (today.replace() - (today - today))  # no-op, keep simple
-    if DATE_WINDOW_ALLOW_PAST_DAYS > 0:
-        min_d = today.fromordinal(today.toordinal() - DATE_WINDOW_ALLOW_PAST_DAYS)
-    max_d = today.fromordinal(today.toordinal() + DATE_WINDOW_DAYS_FUTURE)
+    min_d = today.fromordinal(today.toordinal() - max(DATE_WINDOW_ALLOW_PAST_DAYS, 0))
+    max_d = today.fromordinal(today.toordinal() + max(DATE_WINDOW_DAYS_FUTURE, 0))
     return (d >= min_d) and (d <= max_d)
 
-def should_hard_skip_candidate(
+
+def _format_date_de(d_iso: str) -> str:
+    d = _parse_iso_date(d_iso)
+    if not d:
+        return d_iso
+    months = [
+        "Januar", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
+    ]
+    return f"{d.day}. {months[d.month - 1]} {d.year}"
+
+
+def _format_time_de(time_str: str) -> str:
+    t = norm(time_str)
+    if not t:
+        return ""
+    # "19:00–23:00" -> "von 19:00 bis 23:00 Uhr"
+    if "–" in t:
+        a, b = [x.strip() for x in t.split("–", 1)]
+        if a and b:
+            return f"von {a} bis {b} Uhr"
+    # "19:00" -> "ab 19:00 Uhr"
+    return f"ab {t} Uhr"
+
+
+def ensure_description(
+    *,
+    title: str,
+    d_iso: str,
+    time_str: str,
+    city: str,
+    location: str,
+    category: str,
+    url: str,
+    description_raw: str,
+) -> str:
+    """
+    Rechtlich sauber, faktisch, ohne Marketing:
+    - Nutzt nur bekannte Felder
+    - Kein erfundener Inhalt
+    """
+    raw = clean_text(description_raw)
+    if raw:
+        return raw
+
+    t = clean_text(title)
+    city = clean_text(city)
+    loc = clean_text(location)
+    cat = clean_text(category)
+
+    date_de = _format_date_de(d_iso) if d_iso else ""
+    time_de = _format_time_de(time_str)
+
+    parts: List[str] = []
+
+    # Satz 1: Kernfakten (ohne Redundanz)
+    s = t or "Diese Veranstaltung"
+    if date_de:
+        s += f" findet am {date_de}"
+    if time_de:
+        s += f" {time_de}"
+    if loc and city:
+        s += f" in {loc} in {city}"
+    elif city:
+        s += f" in {city}"
+    elif loc:
+        s += f" in {loc}"
+    s += " statt."
+    parts.append(s)
+
+    # Satz 2: optionale Einordnung, nur wenn sinnvoll (keine Floskeln)
+    if cat:
+        parts.append(f"Kategorie: {cat}.")
+
+    # Satz 3: Quelle/Details (neutral)
+    if url:
+        parts.append("Weitere Details sind auf der offiziellen Veranstaltungsseite verfügbar.")
+    else:
+        parts.append("Weitere Details sind bei der offiziellen Quelle verfügbar.")
+
+    return " ".join([p for p in parts if p]).strip()
+
+
+def classify_candidate(
     *,
     stype: str,
     source_name: str,
@@ -350,41 +431,35 @@ def should_hard_skip_candidate(
     title: str,
     description: str,
     event_date: str,
-) -> Tuple[bool, str]:
+) -> Tuple[str, str]:
     """
-    Returns (skip, reason).
-    Skip bedeutet: Kandidat wird NICHT in die Inbox geschrieben.
+    Returns (status, reason):
+      - review   = guter Kandidat
+      - blocked  = potentielles Event, aber unvollständig/unsicher
+      - rejected = sicher kein Event (Müll) -> wird NICHT in Inbox geschrieben
     """
     text = f"{title}\n{description}".strip()
 
-    # 0) Fehlende Location → skip
-    if not norm(description):
-        return True, "skip:no_description"
-
-    # 0b) Fehlende Location → skip
-    # (Location wird aktuell nicht gefüllt, aber wenn leer → meist interne Termine)
-    # später können wir das lockern, wenn Location-Parsing eingebaut wird
-
-    # 1) Ohne Datum: generell skip
-
-    if not norm(event_date):
-        return True, "skip:no_event_date"
-
-    # 2) Datum außerhalb Fenster
-    if not _in_date_window(event_date):
-        return True, "skip:date_out_of_window"
-
-    # 3) Harte Nicht-Event Wörter
+    # 1) Harte Nicht-Event Wörter -> rejected
     if _is_non_event_text(text):
-        return True, "skip:non_event_keywords"
+        return "rejected", "reject:non_event_keywords"
 
-    # 4) Presse-/RSS Quellen: nur zulassen, wenn Event-Signal vorhanden
+    # 2) Presse/RSS ohne Event-Signal -> rejected
     if stype == "rss" or _is_press_like_source(source_name, source_url):
         if not _has_event_signal(text):
-            return True, "skip:press_without_event_signal"
+            return "rejected", "reject:press_without_event_signal"
 
-    return False, ""
+    # 3) Kein Datum -> blocked (potentiell Event, aber unvollständig)
+    if not norm(event_date):
+        return "blocked", "block:no_event_date"
+
+    # 4) Datum außerhalb Fenster -> rejected (kein relevanter Kandidat)
+    if not _in_date_window(event_date):
+        return "rejected", "reject:date_out_of_window"
+
+    return "review", ""
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
+
 
 
 def safe_fetch(url: str, timeout: int = 20) -> str:
@@ -867,16 +942,18 @@ def main() -> None:
             if not title:
                 continue
 
-            # === BEGIN BLOCK: HARD SKIP JUNK (before writing Inbox) ===
+                       # === BEGIN BLOCK: CLASSIFY + DESCRIPTION (review/blocked/rejected) ===
             # Datei: scripts/discovery-to-inbox.py
             # Zweck:
-            # - Offensichtliche Nicht-Events (Presse/Verkehr/Baustelle/Info) gar nicht in Inbox schreiben.
-            # - Nur Events im Zeitfenster.
+            # - blocked nur für potentielle Events (unsicher/unvollständig)
+            # - rejected ist Müll und wird NICHT in Inbox geschrieben
+            # - description immer gefüllt (original oder generiert, rechtlich sauber)
             # Umfang:
-            # - Nur ein Skip-Check + Reason für notes.
-            # === END BLOCK: HARD SKIP JUNK (before writing Inbox) ===
+            # - ersetzt nur die alte Hard-Skip-Logik + setzt description/status sauber
+            # === END BLOCK: CLASSIFY + DESCRIPTION (review/blocked/rejected) ===
             desc_text = clean_text(c.get("description", ""))
-            skip, reason = should_hard_skip_candidate(
+
+            status, reason = classify_candidate(
                 stype=stype,
                 source_name=source_name,
                 source_url=url,
@@ -884,7 +961,7 @@ def main() -> None:
                 description=desc_text,
                 event_date=d,
             )
-            if skip:
+            if status == "rejected":
                 continue
 
             # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
@@ -920,7 +997,7 @@ def main() -> None:
 
             # Write to inbox as suggestion
             row = {
-                "status": "neu",
+                "status": "status",
                 "id_suggestion": make_id_suggestion(title, d, norm(c.get("time", "")), url),
                 "title": title,
                 "date": d,
@@ -930,13 +1007,28 @@ def main() -> None:
                 "location": clean_text(c.get("location", "")),
                 "kategorie_suggestion": default_cat,
                 "url": c_url,
-                "description": clean_text(c.get("description", "")),
+                                "description": ensure_description(
+                    title=title,
+                    d_iso=d,
+                    time_str=norm(c.get("time", "")),
+                    city=default_city,
+                    location=clean_text(c.get("location", "")),
+                    category=default_cat,
+                    url=c_url,
+                    description_raw=c.get("description", ""),
+                ),
+
 
                 "source_name": source_name,
                 "source_url": url,
                 "match_score": f"{score:.2f}",
                 "matched_event_id": "",
-                "notes": (clean_text(c.get("notes", "")) + ("" if d else (" | " if clean_text(c.get("notes", "")) else "") + "⚠️ event_date_missing")),
+                                "notes": (
+                    clean_text(c.get("notes", ""))
+                    + ("" if not reason else ((" | " if clean_text(c.get("notes", "")) else "") + reason))
+                    + ("" if d else ((" | " if (clean_text(c.get("notes", "")) or reason) else "") + "⚠️ event_date_missing"))
+                ),
+
                 "created_at": now_iso(),
             }
 
