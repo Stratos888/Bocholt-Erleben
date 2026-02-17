@@ -91,7 +91,27 @@
   --ui-font-size-control: 13px;
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
-  /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
+   /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
+
+  /* === BEGIN BLOCK: UI OVERLAY TOKENS (chooser/sheets) ===
+  Zweck:
+  - Tokens für Overlay/Chooser (Backdrop + Sheet + Option Buttons)
+  - Werte entsprechen dem bisherigen “guten” Look (nur tokenisiert)
+  Umfang:
+  - Nur Tokens, keine Selektoren.
+  === */
+  --ui-overlay-dim: rgba(31,41,51,0.36);
+  --ui-overlay-blur: 4px;
+
+  --ui-sheet-radius-lg: 18px;
+  --ui-sheet-shadow-strong:
+    0 24px 56px rgba(0,0,0,0.22),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --ui-choice-minh: 52px;
+  --ui-choice-font-size: 15px;
+  /* === END BLOCK: UI OVERLAY TOKENS (chooser/sheets) === */
+
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
 
 
@@ -811,10 +831,13 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
    FOOTER
    ============================================ */
 
-BEGIN BLOCK: BOTTOM TAB BA
-
-
-
+/* === BEGIN BLOCK: BOTTOM TAB BAR (marker fix; keep CSS valid) ===
+Zweck:
+- Repariert ungültigen “freien” Marker-Text, der CSS parsing ab dieser Stelle brechen kann.
+Umfang:
+- Nur Kommentar-Markierung; keine Styles.
+=== */
+/* === END BLOCK: BOTTOM TAB BAR (marker fix; keep CSS valid) === */
 
 footer {
   background: #0b1220;
@@ -1879,6 +1902,113 @@ Umfang:
 
 /* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER === */
 
+/* === BEGIN BLOCK: DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) ===
+Zweck:
+- Kalender-Chooser als echtes Overlay/Bottom-Sheet (unten, safe-area korrekt)
+- Token-basiert (Overlay/Sheet/Optionen)
+- Robust: wenn JS mehrfach injected, ist nur der letzte sichtbar (keine “Button-Listen” im Layout)
+Umfang:
+- #event-detail-panel .detail-cal-chooser + backdrop + sheet + button states
+=== */
+
+/* Default: alle verstecken (Duplicate-Safety) */
+#event-detail-panel .detail-cal-chooser{
+  display: none;
+
+  position: fixed;
+  inset: 0;
+  z-index: 10010;
+
+  align-items: flex-end;
+  justify-content: center;
+
+  padding: 12px var(--gutter) calc(12px + var(--dp-safe-bottom));
+}
+
+/* Nur der zuletzt eingefügte Chooser ist sichtbar */
+#event-detail-panel .detail-cal-chooser:last-of-type{
+  display: flex;
+}
+
+#event-detail-panel .detail-cal-backdrop{
+  position: absolute;
+  inset: 0;
+
+  background: var(--ui-overlay-dim);
+  -webkit-backdrop-filter: blur(var(--ui-overlay-blur));
+  backdrop-filter: blur(var(--ui-overlay-blur));
+}
+
+#event-detail-panel .detail-cal-sheet{
+  position: relative;
+  width: min(520px, 100%);
+
+  border-radius: var(--ui-sheet-radius-lg);
+  background: rgba(255,255,255,0.98);
+  border: 1px solid var(--ui-border-weak);
+
+  box-shadow: var(--ui-sheet-shadow-strong);
+
+  padding: 10px;
+
+  display: grid;
+  gap: 10px;
+
+  animation: dpCalUp 160ms ease-out both;
+}
+
+@keyframes dpCalUp{
+  from { transform: translateY(10px); opacity: 0.96; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+#event-detail-panel .detail-cal-sheet button{
+  width: 100%;
+  min-height: var(--ui-choice-minh);
+
+  padding: 12px 14px;
+  border-radius: var(--ui-radius-md);
+
+  border: 1px solid var(--ui-border-soft);
+  background: var(--ui-surface-tint-hover);
+
+  font-size: var(--ui-choice-font-size);
+  font-weight: var(--ui-font-weight-control);
+  letter-spacing: -0.01em;
+  color: rgba(31,41,51,0.92);
+
+  text-align: center;
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+@media (hover: hover){
+  #event-detail-panel .detail-cal-sheet button:hover{
+    background: var(--ui-surface-tint-active);
+    border-color: var(--ui-border-strong);
+  }
+}
+
+#event-detail-panel .detail-cal-sheet button:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-tint-active);
+}
+
+#event-detail-panel .detail-cal-sheet button:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 3px;
+}
+
+/* === END BLOCK: DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) === */
+
+
 
 
 
@@ -2326,6 +2456,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
