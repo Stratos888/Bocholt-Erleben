@@ -799,6 +799,129 @@ def parse_rss(xml_text: str) -> List[Dict[str, str]]:
     # WICHTIG: Nicht mehr nach "date" filtern – RSS/Artikel können ohne Event-Datum in die Inbox,
     # damit du sie in der PWA manuell datieren kannst.
     return [x for x in out if x.get("title")]
+# === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Unterstützt JSON-Eventlisten (z.B. bocholt.de/api/events)
+# - Mappt auf Candidate-Felder: title/date/endDate/time/location/url/description/notes
+# Umfang:
+# - Neue Funktion parse_json + kleine Helpers
+# === END BLOCK: JSON PARSER (events API -> candidates) ===
+
+def _pick(obj: dict, *keys: str) -> str:
+    for k in keys:
+        if k in obj and obj.get(k) is not None:
+            return str(obj.get(k))
+    return ""
+
+
+def _normalize_event_url(u: str, base_url: str) -> str:
+    u = norm(u)
+    if not u:
+        return ""
+    if u.startswith("http://") or u.startswith("https://"):
+        return canonical_url(u)
+    # relative -> host aus base_url
+    try:
+        p = urlparse(base_url)
+        return canonical_url(f"{p.scheme}://{p.netloc}{u if u.startswith('/') else '/' + u}")
+    except Exception:
+        return canonical_url(u)
+
+
+def _iso_date_part(iso_dt: str) -> str:
+    s = norm(iso_dt)
+    if not s:
+        return ""
+    # "2026-03-10T19:30:00+01:00" -> "2026-03-10"
+    if len(s) >= 10 and s[4] == "-" and s[7] == "-":
+        return s[:10]
+    return ""
+
+
+def _iso_time_part(iso_dt: str) -> str:
+    s = norm(iso_dt)
+    if "T" not in s:
+        return ""
+    t = s.split("T", 1)[1]
+    # "19:30:00+01:00" -> "19:30"
+    if len(t) >= 5 and t[2] == ":":
+        return t[:5]
+    return ""
+
+
+def parse_json(text: str, base_url: str) -> List[Dict[str, str]]:
+    try:
+        data = json.loads(text)
+    except Exception:
+        return []
+
+    # Akzeptiere: list, oder dict mit events/items/results
+    items: List[dict] = []
+    if isinstance(data, list):
+        items = [x for x in data if isinstance(x, dict)]
+    elif isinstance(data, dict):
+        for k in ("events", "items", "results", "data"):
+            v = data.get(k)
+            if isinstance(v, list):
+                items = [x for x in v if isinstance(x, dict)]
+                break
+
+    out: List[Dict[str, str]] = []
+
+    for ev in items:
+        title = clean_text(_pick(ev, "title", "name", "summary"))
+        start = _pick(ev, "startDate", "start", "from", "dateStart", "dtstart")
+        end = _pick(ev, "endDate", "end", "to", "dateEnd", "dtend")
+
+        d1 = _iso_date_part(start) or norm(_pick(ev, "date"))
+        d2 = _iso_date_part(end)
+
+        t1 = _iso_time_part(start)
+        t2 = _iso_time_part(end)
+
+        time_str = ""
+        if t1 and t2 and d2 == d1:
+            time_str = f"{t1}–{t2}"
+        elif t1:
+            time_str = t1
+
+        url = _normalize_event_url(_pick(ev, "url", "link", "href", "eventUrl"), base_url)
+
+        # location kann string oder dict sein
+        loc = ""
+        loc_obj = ev.get("location")
+        if isinstance(loc_obj, dict):
+            loc = clean_text(_pick(loc_obj, "name", "title", "label"))
+            # optional: adresse anhängen, falls vorhanden und nicht redundant
+            addr = clean_text(_pick(loc_obj, "address", "street", "fullAddress"))
+            if addr and addr.lower() not in (loc.lower(),):
+                loc = f"{loc}, {addr}" if loc else addr
+        elif isinstance(loc_obj, str):
+            loc = clean_text(loc_obj)
+
+        desc = clean_text(_pick(ev, "description", "details", "text", "content"))
+        notes = clean_text(_pick(ev, "notes", "source", "sourceNote"))
+
+        if not title:
+            continue
+
+        out.append(
+            {
+                "title": title,
+                "date": d1 or "",
+                "endDate": d2 or "",
+                "time": time_str,
+                "location": loc,
+                "url": url,
+                "description": desc,
+                "notes": notes,
+            }
+        )
+
+    return out
+
+# === END BLOCK: JSON PARSER (events API -> candidates) ===
 
 
 
@@ -962,14 +1085,14 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-        # === BEGIN BLOCK: FETCH + PARSE DISPATCH (candidates defined, v1) ===
+                # === BEGIN BLOCK: FETCH + PARSE DISPATCH (candidates defined, v2 json) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - candidates ist IMMER definiert (verhindert NameError)
-        # - Fetch + Parse Dispatch nach Source-Typ (rss/ical)
+        # - candidates ist IMMER definiert
+        # - Unterstützt zusätzlich Source-Typ "json"
         # Umfang:
-        # - ersetzt ausschließlich den defekten try/except-Block vor total_candidates
-        # === END BLOCK: FETCH + PARSE DISPATCH (candidates defined, v1) ===
+        # - ersetzt nur den Dispatch-Block
+        # === END BLOCK: FETCH + PARSE DISPATCH (candidates defined, v2 json) ===
 
         candidates: List[Dict[str, str]] = []
         try:
@@ -978,12 +1101,15 @@ def main() -> None:
                 candidates = parse_ics_events(content)
             elif stype == "rss":
                 candidates = parse_rss(content)
+            elif stype == "json":
+                candidates = parse_json(content, url)
             else:
                 info(f"Skip source (unsupported type): {source_name} ({stype})")
                 candidates = []
         except Exception as e:
             info(f"Parse failed: {source_name}: {e}")
             candidates = []
+
 
         total_candidates += len(candidates)
 
