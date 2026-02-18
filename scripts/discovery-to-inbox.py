@@ -799,6 +799,128 @@ def parse_rss(xml_text: str) -> List[Dict[str, str]]:
     # WICHTIG: Nicht mehr nach "date" filtern – RSS/Artikel können ohne Event-Datum in die Inbox,
     # damit du sie in der PWA manuell datieren kannst.
     return [x for x in out if x.get("title")]
+# === BEGIN BLOCK: BOCHOLT HTML CALENDAR PARSER (veranstaltungskalender) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Liest https://www.bocholt.de/veranstaltungskalender (HTML)
+# - Extrahiert aus der Ergebnisliste: Titel, Datum, Zeit, (optionale) Location, Detail-URL
+# Umfang:
+# - Nur Listenseite (keine Detailseiten-Fetches), bewusst robust/konservativ
+# === END BLOCK: BOCHOLT HTML CALENDAR PARSER (veranstaltungskalender) ===
+
+_MONTHS_DE = {
+    "januar": 1, "februar": 2, "märz": 3, "maerz": 3, "april": 4, "mai": 5, "juni": 6,
+    "juli": 7, "august": 8, "september": 9, "oktober": 10, "november": 11, "dezember": 12
+}
+
+def _parse_de_date_from_snippet(snippet: str, fallback_year: int) -> str:
+    """
+    Erwartete Muster im Kalender: "Donnerstag, 19. Februar, 17:00 Uhr - 19:30 Uhr, ..."
+    Wir ziehen dd + Monat, Jahr = fallback_year.
+    """
+    s = norm(snippet).lower()
+    m = re.search(r"(?<!\d)(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)", s)
+    if not m:
+        return ""
+    dd = int(m.group(1))
+    mm = _MONTHS_DE.get(m.group(2), 0)
+    if not mm:
+        return ""
+    try:
+        return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+def _parse_time_from_snippet(snippet: str) -> str:
+    s = norm(snippet)
+    # "17:00 Uhr - 19:30 Uhr" -> "17:00–19:30"
+    m = re.search(r"(\d{1,2}:\d{2})\s*uhr\s*[-–]\s*(\d{1,2}:\d{2})\s*uhr", s, re.IGNORECASE)
+    if m:
+        a, b = m.group(1), m.group(2)
+        return f"{a}–{b}"
+    # "17:00 Uhr" -> "17:00"
+    m = re.search(r"(\d{1,2}:\d{2})\s*uhr", s, re.IGNORECASE)
+    if m:
+        return m.group(1)
+    return ""
+
+def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    """
+    Extrahiert Einträge aus der HTML-Liste.
+    Konservativ: wenn Datum nicht erkennbar -> blocked (über classify_candidate, weil date leer).
+    """
+    html_text = html_text or ""
+    # wir arbeiten bewusst mit clean_text, damit Tags/Whitespace rausfliegen
+    flat = clean_text(html_text)
+
+    # Detail-Links im Kalender sind interne Links; wir greifen Titel aus dem Linktext.
+    # Robust: finde hrefs auf /veranstaltungskalender/...
+    # (Die Seite enthält viele Links; wir filtern stark.)
+    link_re = re.compile(r"(https?://www\.bocholt\.de)?(/veranstaltungskalender/[^\s]+)")
+    links = []
+    for m in link_re.finditer(html_text):
+        path = m.group(2)
+        if not path:
+            continue
+        full = _normalize_event_url(path, base_url)
+        if full and full not in links:
+            links.append(full)
+
+    # Aus der Text-Ansicht gibt es keine sichere Zuordnung Link<->Snippet ohne DOM.
+    # Deshalb: wir extrahieren nur Titel+Snippet aus den sichtbaren Listeneinträgen,
+    # und setzen url als gefundenen Link (best effort, erster passender Link).
+    # Für die Praxis reicht das, weil ihr später per Link prüfen könnt.
+
+    # Heuristik: Einträge erscheinen als "GENRE GENRE TITEL <Datum/Ort Text...>"
+    # Wir ziehen "Titel" als den Teil vor dem Datums-Muster.
+    entry_re = re.compile(
+        r"([A-ZÄÖÜ][^\n]{5,140}?)\s+(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag),\s*\d{1,2}\.\s*(Januar|Februar|März|Maerz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)",
+        re.IGNORECASE
+    )
+
+    out: List[Dict[str, str]] = []
+    fallback_year = datetime.now().year
+
+    for m in entry_re.finditer(flat):
+        title = clean_text(m.group(1))
+        # snippet: nimm ein Stück nach dem Match für Zeit/Ort
+        start = max(m.start(), 0)
+        end = min(m.end() + 180, len(flat))
+        snippet = flat[start:end]
+
+        d = _parse_de_date_from_snippet(snippet, fallback_year)
+        t = _parse_time_from_snippet(snippet)
+
+        # Location nach Komma, z.B. "... , Volksbank Bocholt eG ..."
+        loc = ""
+        mloc = re.search(r",\s*([^,]{3,80})\s", snippet)
+        if mloc:
+            loc = clean_text(mloc.group(1))
+
+        url = links.pop(0) if links else ""
+
+        if not title:
+            continue
+
+        out.append({
+            "title": title,
+            "date": d,
+            "endDate": "",
+            "time": t,
+            "location": loc,
+            "url": url,
+            "description": "",  # wird später via ensure_description() sauber generiert
+            "notes": "source=bocholt_html_calendar",
+        })
+
+        # Sicherheitslimit
+        if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+            break
+
+    return out
+
+# === END BLOCK: BOCHOLT HTML CALENDAR PARSER (veranstaltungskalender) ===
+    
 # === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
@@ -1103,9 +1225,12 @@ def main() -> None:
                 candidates = parse_rss(content)
             elif stype == "json":
                 candidates = parse_json(content, url)
+            elif stype == "html":
+                candidates = parse_bocholt_calendar_html(content, url)
             else:
                 info(f"Skip source (unsupported type): {source_name} ({stype})")
                 candidates = []
+
         except Exception as e:
             info(f"Parse failed: {source_name}: {e}")
             candidates = []
