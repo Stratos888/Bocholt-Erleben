@@ -112,6 +112,19 @@
   --ui-choice-font-size: 15px;
   /* === END BLOCK: UI OVERLAY TOKENS (chooser/sheets) === */
 
+/* === BEGIN BLOCK: CONTENT ACTIONS UTILITIES (token-based spacing) ===
+Zweck:
+- Ersetzt Inline-Styles durch wiederverwendbare Klassen
+- App-weite Konsistenz: Spacing über Tokens
+Umfang:
+- Nur Utility-Klassen, keine Layout-Refactors
+=== */
+.content-actions--spaced{
+  margin-top: var(--space-md);
+}
+/* === END BLOCK: CONTENT ACTIONS UTILITIES (token-based spacing) === */
+
+
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
 
 
@@ -2456,6 +2469,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
