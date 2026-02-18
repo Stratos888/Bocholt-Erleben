@@ -23,7 +23,19 @@
   === -->
   <main class="page page--about">
 
-    <header class="content-hero">
+   <header class="content-hero">
+      <!-- === BEGIN BLOCK: INFO SUBPAGE TOP NAV (hub back, top-app pattern) ===
+      Zweck:
+      - App-typischer Rückweg zum Info-Hub direkt oben
+      - Nutzt bestehende content-link DNA (kein neuer Button-Style)
+      Umfang:
+      - Nur ein zusätzlicher Navigationslink oberhalb des Hero-Inhalts
+      === -->
+      <nav class="content-links" aria-label="Zurück">
+        <a class="content-link" href="/info/">Zurück zu Info</a>
+      </nav>
+      <!-- === END BLOCK: INFO SUBPAGE TOP NAV (hub back, top-app pattern) === -->
+
       <p class="content-kicker">Über die Plattform</p>
       <h1>Mehr über Bocholt erleben</h1>
       <p class="content-lead">
@@ -32,6 +44,7 @@
         und ohne den typischen Lärm klassischer Event-Plattformen.
       </p>
     </header>
+
 
     <section class="content-card content-card--primary" aria-labelledby="idea">
       <h2 id="idea">Die Idee dahinter</h2>
