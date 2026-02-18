@@ -28,10 +28,23 @@ Umfang:
 <main class="page page--info">
 
   <header class="content-hero">
+    <!-- === BEGIN BLOCK: INFO HUB TOP NAV (top-app pattern) ===
+    Zweck:
+    - App-typische Orientierung: „Zurück zu den Events“ direkt oben verfügbar
+    - Konsistent zu den Info-Unterseiten („Zurück zu Info“ dort)
+    Umfang:
+    - Fügt nur eine Top-Navigation im Hero hinzu, restlicher Inhalt bleibt gleich
+    === -->
+    <nav class="content-links" aria-label="Zurück">
+      <a class="content-link" href="/">Zurück zu den Events</a>
+    </nav>
+    <!-- === END BLOCK: INFO HUB TOP NAV (top-app pattern) === -->
+
     <p class="content-kicker">Bocholt erleben</p>
     <h1>Info</h1>
     <p class="content-lead">Alles Wichtige – für Besucher und Veranstalter.</p>
   </header>
+
 
   <!-- Plattform -->
   <section class="content-card" aria-labelledby="info-plattform">
