@@ -23,17 +23,21 @@
   === -->
   <main class="page page--organizers">
     <header class="content-hero">
-      <!-- === BEGIN BLOCK: INFO SUBPAGE TOP NAV (hub back, top-app pattern) ===
-      Zweck:
-      - App-typischer Rückweg zum Info-Hub direkt oben
-      - Konsistent mit /ueber/ und anderen Info-Unterseiten
-      Umfang:
-      - Fügt nur den Back-Link hinzu, verändert keinen bestehenden Inhalt
-      === -->
-      <nav class="content-links" aria-label="Zurück">
-        <a class="content-link" href="/info/">Zurück zu Info</a>
-      </nav>
-      <!-- === END BLOCK: INFO SUBPAGE TOP NAV (hub back, top-app pattern) === -->
+         <!-- === BEGIN BLOCK: INFO PAGE NAVIGATION (bottom escape only, top-app pattern) ===
+  Zweck:
+  - Vermeidet doppelte „Zurück zu Info“-Navigation (oben bereits vorhanden)
+  - Beibehaltung eines direkten Rückwegs zur Event-Übersicht
+  - Entspricht App-Navigation: oben Back, unten optional Exit
+  Umfang:
+  - Entfernt nur den unteren Info-Link, behält Events-Link
+  === -->
+  <nav class="content-links" aria-label="Navigation">
+    <a class="content-link" href="/">
+      Zurück zu den Events
+    </a>
+  </nav>
+  <!-- === END BLOCK: INFO PAGE NAVIGATION (bottom escape only, top-app pattern) === -->
+
 
       <p class="content-kicker">Für Veranstalter in Bocholt</p>
       <h1>So funktioniert Bocholt erleben</h1>
