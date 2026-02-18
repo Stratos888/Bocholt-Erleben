@@ -222,11 +222,30 @@ a{
 a:hover{ text-decoration: underline; }
 a:visited{ color: var(--color-primary); }
 
+/* === BEGIN BLOCK: PAGE LAYOUT CONTRACT (top-app readability) ===
+Zweck:
+- App-weite Lesbarkeit: Content auf großen Screens nicht über die volle Breite
+- Mobile bleibt unverändert (padding bleibt über --gutter)
+- Keine Seite muss einzeln angepasst werden
+Umfang:
+- .page Grundlayout + optional max-width via Token
+=== */
 .page{
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  padding: var(--gutter);
 }
+
+/* Zentrierte Lesebreite auf größeren Screens */
+@media (min-width: 860px){
+  .page{
+    max-width: 760px;
+    margin: 0 auto;
+    padding-left: var(--gutter-lg);
+    padding-right: var(--gutter-lg);
+  }
+}
+/* === END BLOCK: PAGE LAYOUT CONTRACT (top-app readability) === */
+
 .page h1{
   font-size: 1.35rem;
   line-height: 1.2;
@@ -2469,6 +2488,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
