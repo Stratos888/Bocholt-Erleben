@@ -23,6 +23,8 @@ import re
 import sys
 import time
 import urllib.request
+import urllib.error
+
 import xml.etree.ElementTree as ET
 from datetime import datetime, date
 from typing import Dict, List, Optional, Tuple
@@ -36,12 +38,15 @@ from googleapiclient.discovery import build
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
 # - Tab-Namen per ENV überschreibbar machen (z.B. Events_Prod vs. Events_Test), ohne Code-Änderung pro Umgebung.
+# - Source-Health Tab ergänzen (Monitoring, kein Einfluss auf Events/Inbox).
 # Umfang:
 # - Ersetzt nur die TAB_* Konstanten.
 # === END BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
 TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_SOURCES = os.environ.get("TAB_SOURCES", "Sources")
+TAB_SOURCE_HEALTH = os.environ.get("TAB_SOURCE_HEALTH", "Source_Health")
+
 
 
 INBOX_COLUMNS = [
@@ -63,6 +68,27 @@ INBOX_COLUMNS = [
     "notes",
     "created_at",
 ]
+
+# === BEGIN BLOCK: SOURCE HEALTH COLUMNS (sheet logging) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Pro Discovery-Run pro Quelle Status protokollieren (ok/fetch_error/parse_error/unsupported)
+# - Damit kaputte Quellen sofort sichtbar sind (PWA kann später daraus Banner bauen)
+# Umfang:
+# - Definiert nur Spaltenreihenfolge für Tab "Source_Health"
+# === END BLOCK: SOURCE HEALTH COLUMNS (sheet logging) ===
+SOURCE_HEALTH_COLUMNS = [
+    "source_name",
+    "type",
+    "url",
+    "status",
+    "http_status",
+    "error",
+    "last_checked_at",
+    "candidates_count",
+    "new_rows_written",
+]
+
 
 # === BEGIN BLOCK: DISCOVERY FILTER CONFIG (hard skip junk + date window) ===
 # Datei: scripts/discovery-to-inbox.py
@@ -1190,9 +1216,11 @@ def main() -> None:
     enabled_sources = [s for s in sources_rows if norm(s.get("enabled", "")).upper() in ("TRUE", "1", "YES", "JA")]
     info(f"Sources enabled: {len(enabled_sources)}")
 
-    new_inbox_rows: List[List[str]] = []
+      new_inbox_rows: List[List[str]] = []
+    health_rows: List[List[str]] = []
     total_candidates = 0
     total_written = 0
+
 
     for s in enabled_sources:
         source_name = norm(s.get("source_name", s.get("name", ""))) or "Source"
@@ -1207,16 +1235,21 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-                # === BEGIN BLOCK: FETCH + PARSE DISPATCH (candidates defined, v2 json) ===
+                    # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v3) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
         # - candidates ist IMMER definiert
-        # - Unterstützt zusätzlich Source-Typ "json"
+        # - Health pro Quelle loggen (ok / fetch_error / parse_error / unsupported)
         # Umfang:
-        # - ersetzt nur den Dispatch-Block
-        # === END BLOCK: FETCH + PARSE DISPATCH (candidates defined, v2 json) ===
+        # - ersetzt nur den Dispatch-Block; Events/Inbox Logik bleibt danach unverändert
+        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v3) ===
 
         candidates: List[Dict[str, str]] = []
+        health_status = "ok"
+        http_status = ""
+        err_msg = ""
+        checked_at = now_iso()
+
         try:
             content = safe_fetch(url)
             if stype in ("ical", "ics"):
@@ -1228,15 +1261,36 @@ def main() -> None:
             elif stype == "html":
                 candidates = parse_bocholt_calendar_html(content, url)
             else:
-                info(f"Skip source (unsupported type): {source_name} ({stype})")
+                health_status = "unsupported"
+                err_msg = f"unsupported type: {stype}"
                 candidates = []
-
+        except urllib.error.HTTPError as e:
+            health_status = "fetch_error"
+            http_status = str(getattr(e, "code", "") or "")
+            err_msg = f"HTTP Error {http_status}: {getattr(e, 'reason', '')}".strip()
+            info(f"Parse failed: {source_name}: {e}")
+            candidates = []
         except Exception as e:
+            # Parse- oder sonstiger Fehler nach erfolgreichem Fetch
+            health_status = "parse_error"
+            err_msg = str(e)
             info(f"Parse failed: {source_name}: {e}")
             candidates = []
 
+        # kurz halten (Sheet + PWA)
+        err_msg = clean_text(err_msg)[:180]
+
+
 
         total_candidates += len(candidates)
+        # === BEGIN BLOCK: SOURCE HEALTH ROW (per source, per run) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Pro Quelle Status + Kandidatenanzahl + neu geschriebene Zeilen protokollieren
+        # Umfang:
+        # - Schreibt NUR in Source_Health (separater Tab)
+        # === END BLOCK: SOURCE HEALTH ROW (per source, per run) ===
+        written_before_source = total_written
 
 
 
@@ -1365,6 +1419,29 @@ def main() -> None:
             existing_inbox_fps.add(fp)
             total_written += 1
 
+        # === BEGIN BLOCK: SOURCE HEALTH APPEND (after processing source) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Health-Zeile finalisieren (inkl. new_rows_written je Quelle)
+        # Umfang:
+        # - Append in health_rows (Sheet-Write passiert am Ende)
+        # === END BLOCK: SOURCE HEALTH APPEND (after processing source) ===
+        per_source_new = total_written - written_before_source
+
+        health_row = {
+            "source_name": source_name,
+            "type": stype,
+            "url": url,
+            "status": health_status,
+            "http_status": http_status,
+            "error": err_msg,
+            "last_checked_at": checked_at,
+            "candidates_count": str(len(candidates)),
+            "new_rows_written": str(per_source_new),
+        }
+        health_rows.append([health_row.get(col, "") for col in SOURCE_HEALTH_COLUMNS])
+
+        
         # Gentle rate-limit to be nice to sources
         time.sleep(1)
 
@@ -1376,6 +1453,19 @@ def main() -> None:
         info("✅ Inbox updated.")
     else:
         info("✅ Nothing new to add.")
+    # === BEGIN BLOCK: WRITE SOURCE HEALTH (append) ===
+    # Datei: scripts/discovery-to-inbox.py
+    # Zweck:
+    # - Health-Status pro Quelle in Tab "Source_Health" appenden
+    # Umfang:
+    # - Non-blocking: Inbox/Events sollen nicht scheitern, falls Health-Tab fehlt
+    # === END BLOCK: WRITE SOURCE HEALTH (append) ===
+    if health_rows:
+        try:
+            append_rows(service, sheet_id, TAB_SOURCE_HEALTH, health_rows)
+            info("✅ Source_Health updated.")
+        except Exception as e:
+            info(f"⚠️ Source_Health update failed: {e}")
 
     return
 
