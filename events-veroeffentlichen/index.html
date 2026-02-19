@@ -18,35 +18,35 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH PAGE (action-first, reference-aligned, contact) ===
-  Zweck: Aktionsseite — Einstieg in die Event-Veröffentlichung, Kontakt jederzeit möglich.
-  Umfang: Gesamter <body>-Inhalt dieser Datei.
+  <!-- === BEGIN BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) ===
+  Zweck:
+  - Macht /events-veroeffentlichen/ zur einzigen, klaren Veranstalter-Funnel-Seite
+  - Reduziert Redundanz (kein /fuer-veranstalter/-Verweis mehr)
+  - App-like: Explain → Trust → Steps → Requirements → CTA (ohne Preiseite)
+  Umfang:
+  - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
   === -->
   <main class="page page--publish">
+
     <header class="content-hero">
-               <!-- Navigation: zurück zum Info-Hub -->
+
       <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/info/">
-          Zurück zu Info
-        </a>
+        <a class="content-link" href="/info/">Zurück zu Info</a>
       </nav>
-      <!-- /Navigation -->
-
-
 
       <p class="content-kicker">Für Veranstalter in Bocholt</p>
-      <h1>Events veröffentlichen</h1>
+
+      <h1>Event veröffentlichen</h1>
+
       <p class="content-lead">
-        Events veröffentlichen ist mit aktiver Mitgliedschaft und verfügbaren Event-Tokens möglich.
-        Diese Seite zeigt dir kurz die Voraussetzungen und wie du als Veranstalter startest.
+        Du schickst uns die Basisdaten und eine offizielle Quelle – wir kümmern uns um den Start
+        und schalten dich als Veranstalter frei.
       </p>
 
-
-            <!-- Primärer CTA: Start/Fragen – kein Einreichen -->
       <div class="content-actions content-actions--spaced">
         <a
           class="modal-cta-button content-cta"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20%2F%20Location%3A%0AWebsite%20(optional)%3A%0AKurze%20Frage%20oder%20Startwunsch%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20%2F%20Location%3A%0AWebsite%20(optional)%3A%0AErstes%20Event%20(Quelle-Link)%3A%0AFalls%20mehrere%20Events%3A%20kurz%20notieren%0A%0AViele%20Gr%C3%BC%C3%9Fe"
         >
           Als Veranstalter starten
         </a>
@@ -55,45 +55,66 @@
     </header>
 
 
-    <section class="content-card content-card--primary" aria-labelledby="requirements">
-      <h2 id="requirements">Voraussetzungen</h2>
+
+    <section class="content-card content-card--primary" aria-labelledby="principles">
+      <h2 id="principles">Was du bekommst</h2>
       <ul class="locations-benefits">
-        <li>Aktive Mitgliedschaft mit verfügbaren Event-Tokens</li>
-        <li>Ein fester Ansprechpartner (Location/Veranstalter) für Rückfragen</li>
-        <li>Für das spätere Anlegen von Events: Titel, Datum/Uhrzeit, Ort und ein Link zur offiziellen Quelle</li>
+        <li>Ruhige, übersichtliche Darstellung – ohne Werbung und ohne optische Bevorzugung</li>
+        <li>Jedes Event mit Link zur offiziellen Quelle (Transparenz und Vertrauen)</li>
+        <li>Ein fester Ansprechpartner – schnelle Klärung statt Formular-Chaos</li>
       </ul>
     </section>
 
 
+
     <section class="content-card" aria-labelledby="process">
-      <h2 id="process">Ablauf</h2>
+      <h2 id="process">So läuft der Start</h2>
       <ol class="content-steps">
-        <li>Du meldest dich kurz per E-Mail („Als Veranstalter starten“).</li>
-        <li>Wir klären Zugang und Mitgliedschaft (inkl. Event-Tokens).</li>
-        <li>Danach kannst du Events im Rahmen deines Abos veröffentlichen und pflegen.</li>
+        <li>Du schreibst uns per E-Mail („Als Veranstalter starten“).</li>
+        <li>Wir klären kurz die Datenbasis und richten deinen Zugang ein.</li>
+        <li>Danach kannst du Events veröffentlichen und aktuell halten.</li>
       </ol>
     </section>
 
 
+
+    <section class="content-card" aria-labelledby="requirements">
+      <h2 id="requirements">Was wir dafür brauchen</h2>
+      <ul class="locations-benefits">
+        <li>Name/Location und ein Ansprechpartner für Rückfragen</li>
+        <li>Für jedes Event: Titel, Datum/Uhrzeit, Ort</li>
+        <li>Ein Link zur offiziellen Quelle (Website/Veranstaltungskalender)</li>
+      </ul>
+      <p class="content-note">
+        Veröffentlichungen sind an eine aktive Mitgliedschaft mit Kontingent gebunden.
+        Details klären wir beim Start kurz per Mail.
+      </p>
+    </section>
+
+
+
+    <section class="content-card" aria-labelledby="faq">
+      <h2 id="faq">Kurz &amp; klar</h2>
+      <ul class="content-steps">
+        <li><strong>Wie schnell geht das?</strong> In der Regel nach kurzer Abstimmung.</li>
+        <li><strong>Kann ich Events später ändern?</strong> Ja – wir klären den einfachsten Weg für dich.</li>
+        <li><strong>Warum braucht ihr eine Quelle?</strong> Damit Besucher nachvollziehen können, woher die Infos kommen.</li>
+      </ul>
+    </section>
+
+
+
     <section class="content-card" aria-labelledby="more">
-      <h2 id="more">Mehr Infos</h2>
-           <!-- === BEGIN BLOCK: PUBLISH PAGE LINKS (hub-first) ===
-      Zweck:
-      - Top-App-Führung: zurück in den Info-Hub (/info/) als primärer Rückweg
-      - Bestehende Links bleiben erhalten, nur sinnvoll sortiert
-      Umfang:
-      - Ersetzt nur die Linkliste im Abschnitt „Mehr Infos“
-      === -->
+      <h2 id="more">Navigation</h2>
       <nav class="content-links" aria-label="Weiterführende Links">
         <a class="content-link" href="/info/">Zurück zu Info</a>
-        <a class="content-link" href="/fuer-veranstalter/">Wie funktioniert das System?</a>
-        <a class="content-link" href="/ueber/">Mehr über Bocholt erleben</a>
+        <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
         <a class="content-link" href="/">Zurück zu den Events</a>
       </nav>
-      <!-- === END BLOCK: PUBLISH PAGE LINKS (hub-first) === -->
-
     </section>
+
   </main>
-  <!-- === END BLOCK: PUBLISH PAGE (action-first, reference-aligned, contact) === -->
+  <!-- === END BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) === -->
+
 </body>
 </html>
