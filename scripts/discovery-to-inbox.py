@@ -862,119 +862,230 @@ def parse_rss(xml_text: str) -> List[Dict[str, str]]:
 # Umfang:
 # - Nur Listenseite (keine Detailseiten-Fetches), bewusst robust/konservativ
 # === END BLOCK: BOCHOLT HTML CALENDAR PARSER (veranstaltungskalender) ===
+# === BEGIN BLOCK: GENERIC HTML EVENT PARSER (jsonld + feed autodiscovery, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - HTML-Quellen generisch nutzbar machen, ohne Source-spezifische Parser:
+#   1) JSON-LD / schema.org Events aus <script type="application/ld+json">
+#   2) Feed/ICS Autodiscovery aus <link rel="alternate"> + .ics Links im HTML
+#   3) Nachgeladene Feeds werden mit bestehendem RSS/ICS Parser geparst
+# Umfang:
+# - Nur Parse-Helfer; keine Änderung an Dedupe/Inbox-Write-Logik
+# === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feed autodiscovery, v1) ===
 
-_MONTHS_DE = {
-    "januar": 1, "februar": 2, "märz": 3, "maerz": 3, "april": 4, "mai": 5, "juni": 6,
-    "juli": 7, "august": 8, "september": 9, "oktober": 10, "november": 11, "dezember": 12
-}
+_JSONLD_SCRIPT_RE = re.compile(
+    r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+    re.IGNORECASE | re.DOTALL,
+)
 
-def _parse_de_date_from_snippet(snippet: str, fallback_year: int) -> str:
+_LINK_ALT_RE = re.compile(r"<link\s+[^>]*>", re.IGNORECASE)
+_HREF_RE = re.compile(r"href=['\"]([^'\"]+)['\"]", re.IGNORECASE)
+_REL_RE = re.compile(r"rel=['\"]([^'\"]+)['\"]", re.IGNORECASE)
+_TYPE_RE = re.compile(r"type=['\"]([^'\"]+)['\"]", re.IGNORECASE)
+
+def _as_list(x):
+    if x is None:
+        return []
+    if isinstance(x, list):
+        return x
+    return [x]
+
+def _jsonld_iter_objs(obj):
     """
-    Erwartete Muster im Kalender: "Donnerstag, 19. Februar, 17:00 Uhr - 19:30 Uhr, ..."
-    Wir ziehen dd + Monat, Jahr = fallback_year.
+    Flacht JSON-LD-Strukturen ab (dict/list, @graph, etc.) und liefert dict-Objekte.
     """
-    s = norm(snippet).lower()
-    m = re.search(r"(?<!\d)(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)", s)
-    if not m:
-        return ""
-    dd = int(m.group(1))
-    mm = _MONTHS_DE.get(m.group(2), 0)
-    if not mm:
-        return ""
-    try:
-        return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
-    except Exception:
-        return ""
+    if isinstance(obj, dict):
+        yield obj
+        if isinstance(obj.get("@graph"), list):
+            for it in obj["@graph"]:
+                yield from _jsonld_iter_objs(it)
+    elif isinstance(obj, list):
+        for it in obj:
+            yield from _jsonld_iter_objs(it)
 
-def _parse_time_from_snippet(snippet: str) -> str:
-    s = norm(snippet)
-    # "17:00 Uhr - 19:30 Uhr" -> "17:00–19:30"
-    m = re.search(r"(\d{1,2}:\d{2})\s*uhr\s*[-–]\s*(\d{1,2}:\d{2})\s*uhr", s, re.IGNORECASE)
-    if m:
-        a, b = m.group(1), m.group(2)
-        return f"{a}–{b}"
-    # "17:00 Uhr" -> "17:00"
-    m = re.search(r"(\d{1,2}:\d{2})\s*uhr", s, re.IGNORECASE)
-    if m:
-        return m.group(1)
+def _jsonld_is_event(d: dict) -> bool:
+    t = d.get("@type") or d.get("type")
+    types = []
+    if isinstance(t, str):
+        types = [t]
+    elif isinstance(t, list):
+        types = [str(x) for x in t if x]
+    types = [norm_key(x) for x in types]
+    return any("event" == x or x.endswith(":event") or x.endswith("/event") for x in types)
+
+def _jsonld_pick_str(d: dict, *keys: str) -> str:
+    for k in keys:
+        if k in d and d.get(k) is not None:
+            v = d.get(k)
+            if isinstance(v, str):
+                return v
+            if isinstance(v, (int, float)):
+                return str(v)
     return ""
 
-def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str, str]]:
+def _jsonld_location(d: dict) -> str:
+    loc = d.get("location")
+    if isinstance(loc, str):
+        return clean_text(loc)
+    if isinstance(loc, dict):
+        name = clean_text(_jsonld_pick_str(loc, "name"))
+        addr = loc.get("address")
+        addr_s = ""
+        if isinstance(addr, str):
+            addr_s = clean_text(addr)
+        elif isinstance(addr, dict):
+            street = clean_text(_jsonld_pick_str(addr, "streetAddress"))
+            plz = clean_text(_jsonld_pick_str(addr, "postalCode"))
+            city = clean_text(_jsonld_pick_str(addr, "addressLocality"))
+            parts = [p for p in [street, (plz + " " + city).strip()] if p]
+            addr_s = ", ".join(parts).strip()
+        if name and addr_s and norm_key(addr_s) not in norm_key(name):
+            return f"{name}, {addr_s}"
+        return name or addr_s
+    return ""
+
+def parse_html_jsonld_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
     """
-    Extrahiert Einträge aus der HTML-Liste.
-    Konservativ: wenn Datum nicht erkennbar -> blocked (über classify_candidate, weil date leer).
+    Extrahiert schema.org Event aus JSON-LD.
     """
     html_text = html_text or ""
-    # wir arbeiten bewusst mit clean_text, damit Tags/Whitespace rausfliegen
-    flat = clean_text(html_text)
-
-    # Detail-Links im Kalender sind interne Links; wir greifen Titel aus dem Linktext.
-    # Robust: finde hrefs auf /veranstaltungskalender/...
-    # (Die Seite enthält viele Links; wir filtern stark.)
-    link_re = re.compile(r"(https?://www\.bocholt\.de)?(/veranstaltungskalender/[^\s]+)")
-    links = []
-    for m in link_re.finditer(html_text):
-        path = m.group(2)
-        if not path:
-            continue
-        full = _normalize_event_url(path, base_url)
-        if full and full not in links:
-            links.append(full)
-
-    # Aus der Text-Ansicht gibt es keine sichere Zuordnung Link<->Snippet ohne DOM.
-    # Deshalb: wir extrahieren nur Titel+Snippet aus den sichtbaren Listeneinträgen,
-    # und setzen url als gefundenen Link (best effort, erster passender Link).
-    # Für die Praxis reicht das, weil ihr später per Link prüfen könnt.
-
-    # Heuristik: Einträge erscheinen als "GENRE GENRE TITEL <Datum/Ort Text...>"
-    # Wir ziehen "Titel" als den Teil vor dem Datums-Muster.
-    entry_re = re.compile(
-        r"([A-ZÄÖÜ][^\n]{5,140}?)\s+(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag),\s*\d{1,2}\.\s*(Januar|Februar|März|Maerz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)",
-        re.IGNORECASE
-    )
-
     out: List[Dict[str, str]] = []
-    fallback_year = datetime.now().year
 
-    for m in entry_re.finditer(flat):
-        title = clean_text(m.group(1))
-        # snippet: nimm ein Stück nach dem Match für Zeit/Ort
-        start = max(m.start(), 0)
-        end = min(m.end() + 180, len(flat))
-        snippet = flat[start:end]
-
-        d = _parse_de_date_from_snippet(snippet, fallback_year)
-        t = _parse_time_from_snippet(snippet)
-
-        # Location nach Komma, z.B. "... , Volksbank Bocholt eG ..."
-        loc = ""
-        mloc = re.search(r",\s*([^,]{3,80})\s", snippet)
-        if mloc:
-            loc = clean_text(mloc.group(1))
-
-        url = links.pop(0) if links else ""
-
-        if not title:
+    for m in _JSONLD_SCRIPT_RE.finditer(html_text):
+        raw = (m.group(1) or "").strip()
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw)
+        except Exception:
             continue
 
-        out.append({
-            "title": title,
-            "date": d,
-            "endDate": "",
-            "time": t,
-            "location": loc,
-            "url": url,
-            "description": "",  # wird später via ensure_description() sauber generiert
-            "notes": "source=bocholt_html_calendar",
-        })
+        for obj in _jsonld_iter_objs(data):
+            if not isinstance(obj, dict):
+                continue
+            if not _jsonld_is_event(obj):
+                continue
 
-        # Sicherheitslimit
-        if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
-            break
+            title = clean_text(_jsonld_pick_str(obj, "name", "headline"))
+            start = _jsonld_pick_str(obj, "startDate", "startDateTime", "start")
+            end = _jsonld_pick_str(obj, "endDate", "endDateTime", "end")
+
+            d1 = _iso_date_part(start)
+            d2 = _iso_date_part(end)
+
+            t1 = _iso_time_part(start)
+            t2 = _iso_time_part(end)
+
+            time_str = ""
+            if t1 and t2 and (d2 == d1 or not d2):
+                time_str = f"{t1}–{t2}"
+            elif t1:
+                time_str = t1
+
+            url = _normalize_event_url(_jsonld_pick_str(obj, "url"), base_url)
+            loc = _jsonld_location(obj)
+            desc = clean_text(_jsonld_pick_str(obj, "description"))
+
+            if not title:
+                continue
+
+            out.append(
+                {
+                    "title": title,
+                    "date": d1 or "",
+                    "endDate": d2 or "",
+                    "time": time_str,
+                    "location": loc,
+                    "url": url,
+                    "description": desc,
+                    "notes": "source=html_jsonld",
+                }
+            )
+
+            if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+                return out
 
     return out
 
-# === END BLOCK: BOCHOLT HTML CALENDAR PARSER (veranstaltungskalender) ===
+def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
+    """
+    Findet RSS/Atom/ICS Kandidaten in HTML:
+    - <link rel="alternate" type="application/rss+xml|application/atom+xml|text/calendar" href="...">
+    - direkte .ics / webcal / ?ical=1 Links
+    """
+    html_text = html_text or ""
+    found: List[str] = []
+
+    # 1) <link ...>
+    for tag in _LINK_ALT_RE.findall(html_text):
+        rel_m = _REL_RE.search(tag)
+        type_m = _TYPE_RE.search(tag)
+        href_m = _HREF_RE.search(tag)
+
+        rel = norm_key(rel_m.group(1)) if rel_m else ""
+        typ = norm_key(type_m.group(1)) if type_m else ""
+        href = norm(href_m.group(1)) if href_m else ""
+
+        if not href:
+            continue
+        if "alternate" not in rel:
+            continue
+
+        if ("rss+xml" in typ) or ("atom+xml" in typ) or ("text/calendar" in typ) or ("ics" in typ):
+            u = _normalize_event_url(href, base_url)
+            if u and u not in found:
+                found.append(u)
+
+    # 2) direkte Links (.ics / webcal / ?ical=1)
+    for href in re.findall(r"href=['\"]([^'\"]+)['\"]", html_text, flags=re.IGNORECASE):
+        h = norm(href)
+        if not h:
+            continue
+        hk = norm_key(h)
+        if hk.startswith("mailto:") or hk.startswith("tel:") or hk.startswith("javascript:"):
+            continue
+
+        if hk.startswith("webcal://"):
+            h = "https://" + h[len("webcal://"):]
+        if hk.endswith(".ics") or ("?ical=1" in hk) or ("&ical=1" in hk) or ("format=ical" in hk):
+            u = _normalize_event_url(h, base_url)
+            if u and u not in found:
+                found.append(u)
+
+    # Begrenzen: wir testen maximal 3 Feeds pro HTML-Quelle
+    return found[:3]
+
+def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    """
+    Generic HTML -> candidates:
+    1) JSON-LD Events
+    2) Feed Autodiscovery -> fetch feed -> parse_rss/parse_ics_events
+    """
+    # 1) JSON-LD
+    candidates = parse_html_jsonld_events(html_text, base_url)
+    if candidates:
+        return candidates
+
+    # 2) Autodiscovered feeds (RSS/Atom/ICS)
+    feeds = discover_feeds_from_html(html_text, base_url)
+    for fu in feeds:
+        try:
+            fc = safe_fetch(fu)
+            if norm_key(fu).endswith(".ics") or ("ical" in norm_key(fu)) or ("text/calendar" in norm_key(fu)):
+                cand = parse_ics_events(fc)
+            else:
+                cand = parse_rss(fc)
+            if cand:
+                # markiere Quelle
+                for x in cand:
+                    x["notes"] = (clean_text(x.get("notes", "")) + (" | " if x.get("notes") else "") + f"source=html_feed:{canonical_url(fu)}")
+                return cand
+        except Exception:
+            continue
+
+    return []
+# === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feed autodiscovery, v1) ===
+
     
 # === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
 # Datei: scripts/discovery-to-inbox.py
@@ -1264,14 +1375,64 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-                    # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v3) ===
+                          # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v4 html-generic) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
         # - candidates ist IMMER definiert
         # - Health pro Quelle loggen (ok / fetch_error / parse_error / unsupported)
+        # - HTML: generischer Parser (JSON-LD Events + Feed-Autodiscovery), bocholt-spezial bleibt als Fallback
         # Umfang:
         # - ersetzt nur den Dispatch-Block; Events/Inbox Logik bleibt danach unverändert
-        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v3) ===
+        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v4 html-generic) ===
+
+        candidates: List[Dict[str, str]] = []
+        health_status = "ok"
+        http_status = ""
+        err_msg = ""
+        checked_at = now_iso()
+
+        try:
+            content = safe_fetch(url)
+
+            if stype in ("ical", "ics"):
+                candidates = parse_ics_events(content)
+
+            elif stype == "rss":
+                candidates = parse_rss(content)
+
+            elif stype == "json":
+                candidates = parse_json(content, url)
+
+            elif stype == "html":
+                # 1) Generic: JSON-LD (@type=Event) direkt aus HTML
+                # 2) Generic: Feed/ICS Autodiscovery aus HTML und dann RSS/ICS nachladen
+                # 3) Fallback: bocholt-spezifischer Kalenderparser (wenn URL passt)
+                candidates = parse_html_generic_events(content, url)
+
+                if (not candidates) and ("bocholt.de/veranstaltungskalender" in norm_key(url)):
+                    candidates = parse_bocholt_calendar_html(content, url)
+
+            else:
+                health_status = "unsupported"
+                err_msg = f"unsupported type: {stype}"
+                candidates = []
+
+        except urllib.error.HTTPError as e:
+            health_status = "fetch_error"
+            http_status = str(getattr(e, "code", "") or "")
+            err_msg = f"HTTP Error {http_status}: {getattr(e, 'reason', '')}".strip()
+            info(f"Parse failed: {source_name}: {e}")
+            candidates = []
+
+        except Exception as e:
+            health_status = "parse_error"
+            err_msg = str(e)
+            info(f"Parse failed: {source_name}: {e}")
+            candidates = []
+
+        # kurz halten (Sheet + PWA)
+        err_msg = clean_text(err_msg)[:180]
+
 
         candidates: List[Dict[str, str]] = []
         health_status = "ok"
