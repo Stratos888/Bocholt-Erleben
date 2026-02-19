@@ -1886,7 +1886,34 @@ def main() -> None:
                 "notes": combined_notes,
                 "created_at": now_iso(),
             }
-            candidate_log_rows.append([candidate_log.get(col, "") for col in DISCOVERY_CANDIDATES_COLUMNS])
+            # === BEGIN BLOCK: DISCOVERY CANDIDATES SAFE STRING CONVERSION (fix list_value error) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Google Sheets API akzeptiert keine Python-Listen/Objekte
+# - daher alle Werte hart zu String konvertieren
+# Umfang:
+# - ersetzt nur die candidate_log_rows.append Zeile
+# === END BLOCK: DISCOVERY CANDIDATES SAFE STRING CONVERSION ===
+
+row_values = []
+
+for col in DISCOVERY_CANDIDATES_COLUMNS:
+
+    v = candidate_log.get(col, "")
+
+    if v is None:
+        v = ""
+
+    elif isinstance(v, (list, dict, tuple)):
+        v = str(v)
+
+    else:
+        v = str(v)
+
+    row_values.append(v)
+
+candidate_log_rows.append(row_values)
+
 
             # Existing behavior: skip non-new candidates for inbox
             if status == "rejected":
