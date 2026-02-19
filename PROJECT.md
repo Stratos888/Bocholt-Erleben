@@ -69,13 +69,40 @@ Bei „Ersetze Block von … bis …“ gilt zusätzlich:
 
 Bei CSS/HTML/JS-Dateien gilt zusätzlich:
 
-Alle BEGIN/END-Marker müssen immer syntaktisch gültig sein (in CSS z. B. ausschließlich innerhalb von /* … */).
+A) Kommentar-Syntax ist heilig
+- Alle Block-Klammern müssen syntaktisch gültige Kommentare sein (CSS: /* ... */, JS: // ..., HTML: <!-- ... -->).
+- Es darf niemals freie Marker-Zeilen geben (z. B. „BEGIN …“ ohne Kommentar-Syntax).
+- Jeder Change muss garantieren: keine unclosed Kommentare, keine abgeschnittenen Marker-Texte.
 
-Es darf niemals freie Marker-Zeilen geben (z. B. BEGIN BLOCK: … ohne Kommentar-Syntax).
+B) Block-Klammern statt Patch-Marker (Pflicht)
+- In Dateien werden KEINE „BEGIN PATCH / END PATCH“ Marker verwendet.
+- Stattdessen werden fachliche Code-/CSS-Blöcke mit genau 2 Zeilen geklammert:
+  - 1 Zeile direkt über dem Block beschreibt kurz Zweck/Scope.
+  - 1 Zeile direkt unter dem Block markiert das Ende.
+- Diese beiden Zeilen sind die stabilen Anchors für „Ersetze Block von … bis …“.
+- Bei jeder Änderung an so einem Block muss immer der komplette Block inkl. der zwei Klammerzeilen ersetzt werden (keine Stapelung mehrerer BEGIN/END-Zeilen).
 
-Jeder Patch muss garantieren: keine unclosed Kommentare, keine abgeschnittenen Marker-Texte, keine “halb offenen” Block-Kommentare.
+C) Format (genau eine Zeile oben, eine Zeile unten)
+- CSS:
+  /* [BLOCK] <name> — <kurzer zweck> */
+  ...block...
+  /* [/BLOCK] <name> */
+- JS:
+  // [BLOCK] <name> — <kurzer zweck>
+  ...block...
+  // [/BLOCK] <name>
+- HTML:
+  <!-- [BLOCK] <name> — <kurzer zweck> -->
+  ...block...
+  <!-- [/BLOCK] <name> -->
 
-Wenn ein Patch Marker/Kommentar-Strukturen verändert: erst Proof durch “Suchen im aktuellen Datei-Stand”, dass BEGIN und END exakt vorhanden und korrekt geschlossen sind. Wenn nicht: STOP.
+D) Blocknamen-Regeln
+- <name> muss eindeutig sein und in Start/Ende identisch vorkommen.
+- Keine Ticket-/Patch-IDs im Namen.
+- Zweck-Text kurz halten (max. ein Satzfragment).
+
+E) Proof-Pflicht beim Umbau von Block-Klammern
+- Wenn ein Change Block-Klammern hinzufügt/verschiebt/umbenennt: erst Proof durch „Suchen im aktuellen Datei-Stand“, dass Start/Ende exakt vorhanden und korrekt geschlossen sind. Wenn nicht: STOP.
 
 1.3 Datei-Isolation
 
