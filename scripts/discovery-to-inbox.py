@@ -1887,32 +1887,33 @@ def main() -> None:
                 "created_at": now_iso(),
             }
             # === BEGIN BLOCK: DISCOVERY CANDIDATES SAFE STRING CONVERSION (fix list_value error) ===
-# Datei: scripts/discovery-to-inbox.py
-# Zweck:
-# - Google Sheets API akzeptiert keine Python-Listen/Objekte
-# - daher alle Werte hart zu String konvertieren
-# Umfang:
-# - ersetzt nur die candidate_log_rows.append Zeile
-# === END BLOCK: DISCOVERY CANDIDATES SAFE STRING CONVERSION ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - Google Sheets API akzeptiert keine Python-Listen/Objekte
+            # - daher alle Werte hart zu String konvertieren
+            # Umfang:
+            # - ersetzt nur die candidate_log_rows.append Zeile
+            # === END BLOCK: DISCOVERY CANDIDATES SAFE STRING CONVERSION ===
 
-row_values = []
+            row_values = []
 
-for col in DISCOVERY_CANDIDATES_COLUMNS:
+            for col in DISCOVERY_CANDIDATES_COLUMNS:
 
-    v = candidate_log.get(col, "")
+                v = candidate_log.get(col, "")
 
-    if v is None:
-        v = ""
+                if v is None:
+                    v = ""
 
-    elif isinstance(v, (list, dict, tuple)):
-        v = str(v)
+                elif isinstance(v, (list, dict, tuple)):
+                    v = str(v)
 
-    else:
-        v = str(v)
+                else:
+                    v = str(v)
 
-    row_values.append(v)
+                row_values.append(v)
 
-candidate_log_rows.append(row_values)
+            candidate_log_rows.append(row_values)
+
 
 
             # Existing behavior: skip non-new candidates for inbox
