@@ -160,28 +160,47 @@ NON_EVENT_PATTERNS = [
 
 
 # Worte/Patterns, die stark auf ein Event hindeuten (Event-Signale)
+# === BEGIN BLOCK: EVENT SIGNAL PATTERNS (expanded, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Mehr echte Eventformen erkennen (Bocholt-tauglich)
+# - Vorträge/Workshops bleiben drin (landen in Review)
+# Umfang:
+# - Ersetzt nur EVENT_SIGNAL_PATTERNS
+# === END BLOCK: EVENT SIGNAL PATTERNS (expanded, v2) ===
 EVENT_SIGNAL_PATTERNS = [
     r"\bkonzert\b",
+    r"\bjazz\b",
+    r"\bklassik\b",
     r"\bopen\s*air\b",
     r"\bfestival\b",
+    r"\bshow\b",
+    r"\btheater\b",
+    r"\bmusical\b",
+    r"\bkabarett\b",
+    r"\bcomedy\b",
+    r"\blesung\b",
+    r"\bpoetry\s*slam\b",
+    r"\bslam\b",
+    r"\bvortrag\b",
+    r"\bseminar\b",
+    r"\bworkshop\b",
+    r"\bf\u00fchrung\b",
+    r"\bstadtf\u00fchrung\b",
+    r"\brundgang\b",
+    r"\btour\b",
+    r"\bausstellung\b",
+    r"\bvernissage\b",
     r"\bmarkt\b",
     r"\bflohmarkt\b",
     r"\bkirmes\b",
     r"\bfest\b",
     r"\bparty\b",
-    r"\btheater\b",
-    r"\blesung\b",
-    r"\bvortrag\b",
-    r"\bseminar\b",
-    r"\bworkshop\b",
-    r"\bführung\b",
-    r"\bstadtführung\b",
-    r"\btour\b",
-    r"\bausstellung\b",
     r"\bsport\b",
     r"\blauf\b",
     r"\bturnier\b",
 ]
+
 
 
 
@@ -540,6 +559,15 @@ def ensure_description(
 
 
 
+# === BEGIN BLOCK: EVENT QUALITY GATE (review-first, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Echte Events sollen als review landen (nicht blocked)
+# - Müll (Presse/Verkehr/Sitzungen/Schule etc.) soll rejected werden (gar nicht in Inbox)
+# - Grenzfälle (Vortrag/Workshop) bleiben als review für manuelle Prüfung
+# Umfang:
+# - Ersetzt nur classify_candidate()
+# === END BLOCK: EVENT QUALITY GATE (review-first, v1) ===
 def classify_candidate(
     *,
     stype: str,
@@ -551,30 +579,35 @@ def classify_candidate(
 ) -> Tuple[str, str]:
     """
     Returns (status, reason):
-      - review   = guter Kandidat
-      - blocked  = potentielles Event, aber unvollständig/unsicher
+      - review   = Kandidat zur manuellen Prüfung (gewollt!)
       - rejected = sicher kein Event (Müll) -> wird NICHT in Inbox geschrieben
     """
-    text = f"{title}\n{description}".strip()
 
-    # 1) Harte Nicht-Event Wörter -> rejected
-    if _is_non_event_text(text):
+    text = f"{title}\n{description}".strip()
+    is_non_event = _is_non_event_text(text)
+    has_event = _has_event_signal(text)
+    is_pressish = (stype == "rss") or _is_press_like_source(source_name, source_url)
+
+    # 1) Harte Müllsignale UND kein Event-Signal -> raus
+    if is_non_event and not has_event:
         return "rejected", "reject:non_event_keywords"
 
-    # 2) Presse/RSS ohne Event-Signal -> rejected
-    if stype == "rss" or _is_press_like_source(source_name, source_url):
-        if not _has_event_signal(text):
-            return "rejected", "reject:press_without_event_signal"
+    # 2) Presse/RSS ohne Event-Signal -> raus
+    if is_pressish and not has_event:
+        return "rejected", "reject:press_without_event_signal"
 
-    # 3) Kein Datum -> blocked (potentiell Event, aber unvollständig)
-    if not norm(event_date):
-        return "blocked", "block:no_event_date"
-
-    # 4) Datum außerhalb Fenster -> rejected (kein relevanter Kandidat)
-    if not _in_date_window(event_date):
+    # 3) Datum außerhalb Fenster -> raus (wenn Datum vorhanden)
+    if norm(event_date) and (not _in_date_window(event_date)):
         return "rejected", "reject:date_out_of_window"
 
-    return "review", ""
+    # 4) Alles, was irgendwie eventartig ist ODER unklar ist -> REVIEW (nie blocked)
+    if not norm(event_date):
+        return "review", "review:missing_event_date"
+    if has_event:
+        return "review", "review:event_signal"
+
+    return "review", "review:uncertain"
+
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
 
