@@ -17,112 +17,78 @@
 </head>
 
 <body>
- <!-- === BEGIN BLOCK: INFO HUB SCREEN (grouped, top-app structure) ===
+<!-- === BEGIN BLOCK: INFO SCREEN ENTERPRISE V2 (Hybrid: Explain + CTA + Navigation) ===
 Zweck:
-- Klare Trennung: Plattform / Für Veranstalter / Rechtliches
-- Verbessert Orientierung und Conversion (Top-App-Pattern)
-- Nur bestehende Seiten verlinkt (productionsafe)
+- Wandelt /info/ von Hub-only in Enterprise Hybrid Screen um
+- Sofortige Erklärung + direkter Veranstalter-CTA + reduzierte Navigation
+- Entfernt Redundanz und entfernt Verweise auf /fuer-veranstalter/
+- Kein Preise-Teaser mehr (vermeidet Conversion-Verlust und Inkonsistenz)
 Umfang:
-- Gesamter Hub-Inhalt
+- Ersetzt den kompletten bisherigen Info-Hub-Inhalt
+- Keine Änderungen außerhalb dieses Blocks
 === -->
+
 <main class="page page--info">
 
   <header class="content-hero">
-    <!-- === BEGIN BLOCK: INFO HUB TOP NAV (top-app pattern) ===
-    Zweck:
-    - App-typische Orientierung: „Zurück zu den Events“ direkt oben verfügbar
-    - Konsistent zu den Info-Unterseiten („Zurück zu Info“ dort)
-    Umfang:
-    - Fügt nur eine Top-Navigation im Hero hinzu, restlicher Inhalt bleibt gleich
-    === -->
+
     <nav class="content-links" aria-label="Zurück">
       <a class="content-link" href="/">Zurück zu den Events</a>
     </nav>
-    <!-- === END BLOCK: INFO HUB TOP NAV (top-app pattern) === -->
 
     <p class="content-kicker">Bocholt erleben</p>
-    <h1>Info</h1>
-      <p class="content-lead">Kurz erklärt, wie Bocholt erleben funktioniert – und wo du als Veranstalter startest.</p>
+
+    <h1>Eine Plattform für Veranstaltungen in Bocholt</h1>
+
+    <p class="content-lead">
+      Alle Events an einem Ort – ruhig, übersichtlich und gleich behandelt.
+    </p>
 
     <div class="content-actions content-actions--spaced">
-      <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">Event veröffentlichen</a>
-      <a class="content-back" href="/fuer-veranstalter/">Für Veranstalter: So funktioniert’s</a>
+
+      <a class="modal-cta-button content-cta"
+         href="/events-veroeffentlichen/">
+         Event veröffentlichen
+      </a>
+
     </div>
+
   </header>
 
 
 
-    <section class="content-card" aria-labelledby="info-kurz">
-    <h2 id="info-kurz">So funktioniert’s</h2>
-    <ul class="locations-benefits">
-      <li>Ein ruhiger Kalender für Events in Bocholt – übersichtlich und schnell.</li>
-      <li>Alle Einträge werden gleich behandelt: keine Hervorhebung, keine Werbung.</li>
-      <li>Infos kommen aus offiziellen/öffentlichen Quellen oder direkt von Veranstaltern.</li>
-      <li>Veröffentlichen ist mit Mitgliedschaft möglich (ab 9,99 € / Monat, monatlich kündbar).</li>
-      <li>Details öffnest du direkt im Panel – kurz, lesbar, ohne Umwege.</li>
-    </ul>
-  </section>
-
-  <!-- Plattform -->
-
   <section class="content-card" aria-labelledby="info-plattform">
-    <h2 id="info-plattform">Plattform</h2>
+
+    <h2 id="info-plattform">Über die Plattform</h2>
+
     <p class="content-note">
-      Worum es bei Bocholt erleben geht – kurz erklärt, ohne Umwege.
+      Warum Bocholt erleben existiert und wie die Plattform funktioniert.
     </p>
+
     <nav class="content-links">
-      <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
+      <a class="content-link" href="/ueber/">Mehr erfahren</a>
     </nav>
+
   </section>
 
 
-   <!-- === BEGIN BLOCK: INFO HUB ORGANIZER SECTION (conversion-ready, top-app pattern) ===
-  Zweck:
-  - Klarer Einstiegspunkt für Veranstalter (Business-Bereich)
-  - Logische Reihenfolge: verstehen → handeln
-  - Vorbereitung für zukünftige „Preise“-Seite ohne erneuten Umbau
-  Umfang:
-  - Nur interne Struktur dieses Abschnitts, keine neuen Seiten
-  === -->
-  <section class="content-card content-card--primary" aria-labelledby="info-veranstalter">
-    <h2 id="info-veranstalter">Für Veranstalter</h2>
-    <p class="content-note">
-      Erst kurz verstehen, dann veröffentlichen – fair, ruhig und ohne Hervorhebungen.
-    </p>
-    <nav class="content-links">
-      <a class="content-link" href="/fuer-veranstalter/">So funktioniert Bocholt erleben</a>
-      <a class="content-link" href="/events-veroeffentlichen/">Event veröffentlichen</a>
-    </nav>
-  </section>
 
-  <!-- === END BLOCK: INFO HUB ORGANIZER SECTION (conversion-ready, top-app pattern) === -->
-
-
-   <!-- Rechtliches -->
   <section class="content-card" aria-labelledby="info-recht">
+
     <h2 id="info-recht">Rechtliches</h2>
-    <p class="content-note">
-      Impressum und Datenschutz – transparent und schnell erreichbar.
-    </p>
+
     <nav class="content-links">
       <a class="content-link" href="/impressum/">Impressum</a>
       <a class="content-link" href="/datenschutz/">Datenschutz</a>
     </nav>
+
   </section>
 
 
-  <!-- === BEGIN BLOCK: INFO HUB BOTTOM NAV (removed; top-nav handles back) ===
-  Zweck:
-  - Vermeidet doppelte Navigation (oben ist der app-typische Rückweg)
-  - Hält den Hub ruhig und „Top-App-clean“
-  Umfang:
-  - Entfernt nur den bisherigen unteren Zurück-Link
-  === -->
-  <!-- === END BLOCK: INFO HUB BOTTOM NAV (removed; top-nav handles back) === -->
-
-
 </main>
-<!-- === END BLOCK: INFO HUB SCREEN (grouped, top-app structure) === -->
+
+<!-- === END BLOCK: INFO SCREEN ENTERPRISE V2 (Hybrid: Explain + CTA + Navigation) === -->
+
 
 </body>
 </html>
