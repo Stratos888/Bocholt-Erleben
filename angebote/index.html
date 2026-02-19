@@ -35,12 +35,15 @@ Umfang: noindex + sehr früher Redirect nach / (ohne Hinweistext).
 
 <title>Angebote in Bocholt – dauerhaft geöffnet & Freizeitideen</title>
 
-<!-- === BEGIN BLOCK: CSS CACHE BUSTING (forces SW/PWA update) ===
-Zweck: Umgeht aggressives Caching von style.css durch Service Worker / PWA.
-Umfang: Ersetzt nur den stylesheet-link.
-=== -->
-<link rel="stylesheet" href="/css/style.css?v=2026-02-04-1">
-<!-- === END BLOCK: CSS CACHE BUSTING (forces SW/PWA update) === -->
+	<!-- === BEGIN BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) ===
+	Zweck:
+	- Vereinheitlicht den stylesheet-link mit dem restlichen Projekt
+	Umfang:
+	- Ersetzt nur den stylesheet-link
+	=== -->
+	<link rel="stylesheet" href="/css/style.css?v=1">
+	<!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
+
 </head>
 
 <body>
