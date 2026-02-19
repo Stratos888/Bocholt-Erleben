@@ -453,6 +453,14 @@ def _format_time_de(time_str: str) -> str:
     return f"ab {t} Uhr"
 
 
+# === BEGIN BLOCK: DISCOVERY DESCRIPTION STYLE (bocholt voice, fact-only, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Fallback-Description im "Bocholt erleben"-Stil erzeugen, wenn Quellen keine Beschreibung liefern.
+# - Neutral, faktenbasiert, rechtlich sauber (keine erfundenen Inhalte), max. 3 kurze Sätze.
+# Umfang:
+# - Ersetzt ausschließlich ensure_description() (Zeilen 456–511 im ZIP-Stand).
+# === END BLOCK: DISCOVERY DESCRIPTION STYLE (bocholt voice, fact-only, v2) ===
 def ensure_description(
     *,
     title: str,
@@ -465,50 +473,71 @@ def ensure_description(
     description_raw: str,
 ) -> str:
     """
-    Rechtlich sauber, faktisch, ohne Marketing:
-    - Nutzt nur bekannte Felder
-    - Kein erfundener Inhalt
+    Rechtlich sauber, faktisch, ohne Bewertung:
+    - Nutzt nur bekannte Felder (Titel/Datum/Zeit/Ort/Kategorie/URL)
+    - Keine erfundenen Inhalte
+    - Kurz und im "Bocholt erleben"-Ton (ruhig, direkt, ohne Marketing-Floskeln)
     """
     raw = clean_text(description_raw)
     if raw:
         return raw
 
-    t = clean_text(title)
-    city = clean_text(city)
+    t = clean_text(title) or "Veranstaltung"
+    city_clean = clean_text(city)
     loc = clean_text(location)
     cat = clean_text(category)
 
     date_de = _format_date_de(d_iso) if d_iso else ""
     time_de = _format_time_de(time_str)
 
-    parts: List[str] = []
+    # Titelzeile im App-Stil: "Titel: ..."
+    lead = t if t.endswith(":") else f"{t}:"
 
-    # Satz 1: Kernfakten (ohne Redundanz)
-    s = t or "Diese Veranstaltung"
-    if date_de:
-        s += f" findet am {date_de}"
-    if time_de:
-        s += f" {time_de}"
-    if loc and city:
-        s += f" in {loc} in {city}"
-    elif city:
-        s += f" in {city}"
+    # Ort natürlich formulieren, ohne "in X in Y"
+    place = ""
+    if loc and city_clean:
+        if norm_key(city_clean) in norm_key(loc):
+            place = f"in {loc}"
+        else:
+            place = f"in {loc}, {city_clean}"
+    elif city_clean:
+        place = f"in {city_clean}"
     elif loc:
-        s += f" in {loc}"
-    s += " statt."
-    parts.append(s)
+        place = f"in {loc}"
 
-    # Satz 2: optionale Einordnung, nur wenn sinnvoll (keine Floskeln)
-    if cat:
-        parts.append(f"Kategorie: {cat}.")
-
-    # Satz 3: Quelle/Details (neutral)
-    if url:
-        parts.append("Weitere Details sind auf der offiziellen Veranstaltungsseite verfügbar.")
+    # Satz 1: harte Fakten, kurz
+    s1_parts: List[str] = []
+    if date_de:
+        s1_parts.append(f"Am {date_de}")
     else:
-        parts.append("Weitere Details sind bei der offiziellen Quelle verfügbar.")
+        s1_parts.append("Termin")
+
+    if time_de:
+        s1_parts.append(time_de)
+
+    if place:
+        s1_parts.append(place)
+
+    s1 = f"{lead} " + " ".join([p for p in s1_parts if p]).strip() + "."
+    parts: List[str] = [s1]
+
+    # Satz 2: Kategorie ohne Datenexport-Ton
+    if cat:
+        parts.append(f"Ein Termin aus dem Bereich {cat}.")
+
+    # Satz 3: Quelle/Details (neutral, hilfreich)
+    if url:
+        parts.append("Details und mögliche Änderungen: offizielle Veranstaltungsseite.")
+    else:
+        parts.append("Details und mögliche Änderungen: offizielle Quelle.")
 
     return " ".join([p for p in parts if p]).strip()
+# === BEGIN BLOCK: DISCOVERY DESCRIPTION STYLE (bocholt voice, fact-only, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck: Ende des ensure_description()-Blocks (siehe Header).
+# Umfang: Keine weiteren Änderungen.
+# === END BLOCK: DISCOVERY DESCRIPTION STYLE (bocholt voice, fact-only, v2) ===
+
 
 
 def classify_candidate(
