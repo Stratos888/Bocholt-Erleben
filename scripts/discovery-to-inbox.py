@@ -38,14 +38,16 @@ from googleapiclient.discovery import build
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
 # - Tab-Namen per ENV überschreibbar machen (z.B. Events_Prod vs. Events_Test), ohne Code-Änderung pro Umgebung.
-# - Source-Health Tab ergänzen (Monitoring, kein Einfluss auf Events/Inbox).
+# - Source_Health + Discovery_Candidates Tabs ergänzen (Monitoring/Analyse, kein Einfluss auf Events selbst).
 # Umfang:
-# - Ersetzt nur die TAB_* Konstanten.
+# - Definiert nur TAB_* Konstanten.
 # === END BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
 TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_SOURCES = os.environ.get("TAB_SOURCES", "Sources")
 TAB_SOURCE_HEALTH = os.environ.get("TAB_SOURCE_HEALTH", "Source_Health")
+TAB_DISCOVERY_CANDIDATES = os.environ.get("TAB_DISCOVERY_CANDIDATES", "Discovery_Candidates")
+
 
 
 
@@ -88,6 +90,41 @@ SOURCE_HEALTH_COLUMNS = [
     "candidates_count",
     "new_rows_written",
 ]
+
+# === BEGIN BLOCK: DISCOVERY CANDIDATES COLUMNS (sheet logging) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Alle geparsten Kandidaten pro Run in einen Analyse-Tab loggen (auch rejected / deduped),
+#   um Parser/Heuristiken datenbasiert zu verbessern.
+# Umfang:
+# - Definiert nur Spaltenreihenfolge für Tab "Discovery_Candidates"
+# === END BLOCK: DISCOVERY CANDIDATES COLUMNS (sheet logging) ===
+DISCOVERY_CANDIDATES_COLUMNS = [
+    "run_ts",
+    "source_name",
+    "source_type",
+    "source_url",
+    "status",
+    "reason",
+    "is_written_to_inbox",
+    "is_already_live",
+    "is_already_inbox",
+    "matched_event_id",
+    "match_score",
+    "fingerprint",
+    "id_suggestion",
+    "title",
+    "event_date",
+    "endDate",
+    "time",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "notes",
+    "created_at",
+]
+
 
 
 # === BEGIN BLOCK: DISCOVERY FILTER CONFIG (hard skip junk + date window) ===
@@ -1639,10 +1676,15 @@ def main() -> None:
     enabled_sources = [s for s in sources_rows if norm(s.get("enabled", "")).upper() in ("TRUE", "1", "YES", "JA")]
     info(f"Sources enabled: {len(enabled_sources)}")
 
+    run_ts = now_iso()
+
     new_inbox_rows: List[List[str]] = []
     health_rows: List[List[str]] = []
+    candidate_log_rows: List[List[str]] = []
+
     total_candidates = 0
     total_written = 0
+
 
 
     for s in enabled_sources:
@@ -1770,6 +1812,15 @@ def main() -> None:
             final_time = raw_time or inferred_time
 
 
+                        # === BEGIN BLOCK: CANDIDATE CLASSIFY + LOGGING + INBOX WRITE (append Discovery_Candidates, v1) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - Candidate klassifizieren (review/rejected) UND immer in Discovery_Candidates loggen
+            # - Auch rejected / already-live / already-inbox werden geloggt (Analyse)
+            # - Inbox wird weiterhin NUR für "neue" Kandidaten geschrieben (wie bisher)
+            # Umfang:
+            # - Ersetzt nur den Bereich classify_candidate -> dedupe -> inbox write
+            # === END BLOCK: CANDIDATE CLASSIFY + LOGGING + INBOX WRITE (append Discovery_Candidates, v1) ===
             status, reason = classify_candidate(
                 stype=stype,
                 source_name=source_name,
@@ -1778,17 +1829,10 @@ def main() -> None:
                 description=desc_text,
                 event_date=d,
             )
-            if status == "rejected":
-                continue
 
-            # === BEGIN BLOCK: URL NORMALIZATION (indent fix) ===
-            # Zweck: Korrigiert Einrückung von c_url_raw, damit der Block syntaktisch stabil ist.
-            # Umfang: Ersetzt nur die beiden Zeilen c_url_raw/c_url.
+            # URL normalisieren (für Matching/Dedupe/Log)
             c_url_raw = norm(c.get("url", ""))
             c_url = canonical_url(c_url_raw)
-            # === END BLOCK: URL NORMALIZATION (indent fix) ===
-
-
 
             matched_id = ""
             score = 0.0
@@ -1802,20 +1846,60 @@ def main() -> None:
                     matched_id = live_by_title_date[key]
                     score = 0.95
 
-
-            # Already live -> ignore
-            if matched_id:
-                continue
-
-            # Already in inbox -> ignore
             fp = make_candidate_fingerprint(c, url)
-            if fp in existing_inbox_fps:
+            already_live = bool(matched_id)
+            already_inbox = fp in existing_inbox_fps
+
+            # Would be written to inbox?
+            will_write = (status != "rejected") and (not already_live) and (not already_inbox)
+
+            # Notes (inkl. reason + missing-date Hinweis)
+            combined_notes = (
+                clean_text(c.get("notes", ""))
+                + ("" if not reason else ((" | " if clean_text(c.get("notes", "")) else "") + reason))
+                + ("" if d else ((" | " if (clean_text(c.get("notes", "")) or reason) else "") + "⚠️ event_date_missing"))
+            )
+
+            # Log every candidate row (analyse tab)
+            candidate_log = {
+                "run_ts": run_ts,
+                "source_name": source_name,
+                "source_type": stype,
+                "source_url": url,
+                "status": status,
+                "reason": reason,
+                "is_written_to_inbox": "1" if will_write else "0",
+                "is_already_live": "1" if already_live else "0",
+                "is_already_inbox": "1" if already_inbox else "0",
+                "matched_event_id": matched_id,
+                "match_score": f"{score:.2f}",
+                "fingerprint": fp,
+                "id_suggestion": make_id_suggestion(title, d, norm(c.get("time", "")), url),
+                "title": title,
+                "event_date": d,
+                "endDate": norm(c.get("endDate", "")),
+                "time": final_time,
+                "city": default_city,
+                "location": final_location,
+                "kategorie_suggestion": default_cat,
+                "url": c_url,
+                "notes": combined_notes,
+                "created_at": now_iso(),
+            }
+            candidate_log_rows.append([candidate_log.get(col, "") for col in DISCOVERY_CANDIDATES_COLUMNS])
+
+            # Existing behavior: skip non-new candidates for inbox
+            if status == "rejected":
+                continue
+            if already_live:
+                continue
+            if already_inbox:
                 continue
 
-            # Write to inbox as suggestion
+            # Write to inbox as suggestion (nur neue Kandidaten)
             row = {
                 "status": status,
-                "id_suggestion": make_id_suggestion(title, d, norm(c.get("time", "")), url),
+                "id_suggestion": candidate_log.get("id_suggestion", ""),
                 "title": title,
                 "date": d,
                 "endDate": norm(c.get("endDate", "")),
@@ -1834,25 +1918,18 @@ def main() -> None:
                     url=c_url,
                     description_raw=c.get("description", ""),
                 ),
-
-
-
                 "source_name": source_name,
                 "source_url": url,
                 "match_score": f"{score:.2f}",
                 "matched_event_id": "",
-                                "notes": (
-                    clean_text(c.get("notes", ""))
-                    + ("" if not reason else ((" | " if clean_text(c.get("notes", "")) else "") + reason))
-                    + ("" if d else ((" | " if (clean_text(c.get("notes", "")) or reason) else "") + "⚠️ event_date_missing"))
-                ),
-
+                "notes": combined_notes,
                 "created_at": now_iso(),
             }
 
             new_inbox_rows.append([row.get(col, "") for col in INBOX_COLUMNS])
             existing_inbox_fps.add(fp)
             total_written += 1
+
 
         # === BEGIN BLOCK: SOURCE HEALTH APPEND (after processing source) ===
         # Datei: scripts/discovery-to-inbox.py
@@ -1888,6 +1965,22 @@ def main() -> None:
         info("✅ Inbox updated.")
     else:
         info("✅ Nothing new to add.")
+
+    # === BEGIN BLOCK: WRITE DISCOVERY CANDIDATES (append, non-blocking) ===
+    # Datei: scripts/discovery-to-inbox.py
+    # Zweck:
+    # - Alle Kandidaten (review/rejected/deduped) in Tab "Discovery_Candidates" appenden,
+    #   um Analyse/Debugging ohne "blocked" Status zu ermöglichen.
+    # Umfang:
+    # - Non-blocking: Inbox/Events sollen nicht scheitern, falls Tab fehlt
+    # === END BLOCK: WRITE DISCOVERY CANDIDATES (append, non-blocking) ===
+    if candidate_log_rows:
+        try:
+            append_rows(service, sheet_id, TAB_DISCOVERY_CANDIDATES, candidate_log_rows)
+            info("✅ Discovery_Candidates updated.")
+        except Exception as e:
+            info(f"⚠️ Discovery_Candidates update failed: {e}")
+
     # === BEGIN BLOCK: WRITE SOURCE HEALTH (append) ===
     # Datei: scripts/discovery-to-inbox.py
     # Zweck:
