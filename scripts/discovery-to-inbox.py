@@ -1216,7 +1216,7 @@ def main() -> None:
     enabled_sources = [s for s in sources_rows if norm(s.get("enabled", "")).upper() in ("TRUE", "1", "YES", "JA")]
     info(f"Sources enabled: {len(enabled_sources)}")
 
-      new_inbox_rows: List[List[str]] = []
+    new_inbox_rows: List[List[str]] = []
     health_rows: List[List[str]] = []
     total_candidates = 0
     total_written = 0
