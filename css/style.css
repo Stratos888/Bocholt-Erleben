@@ -59,7 +59,13 @@
   --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
   --dp-actionbar-pad-y: 10px;           /* vertikales Padding in der Actionbar */
-  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 12px); /* Content-Reserve inkl. Safe-Area */
+   /* === BEGIN FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) ===
+  Zweck: Etwas mehr Reserve, damit Description garantiert komplett oberhalb der Actionbar endet.
+  Umfang: Nur --dp-actionbar-reserve.
+  === */
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px); /* Content-Reserve inkl. Safe-Area */
+  /* === END FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) === */
+
 
   /* === BEGIN BLOCK: UI CONTROL TOKENS (buttons/cta/focus) ===
   Zweck:
@@ -1643,41 +1649,37 @@ Umfang: Nur Close-Button (Detailpanel).
 Zweck: Entfernt eine ungültige Zeile ("== */"), die ab hier das komplette restliche CSS deaktiviert.
 Umfang: Nur Marker-Repair direkt nach dem Close-Button Patch.
 === */
-/* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
-/* === END FIX: CSS PARSER BREAK (remove stray marker) === */
-
-
-
-
-
-
-/* === BEGIN PATCH: DETAILPANEL BODY + CONTENT SPACING (single bottom reserve, flex-safe)
-Zweck:
-- Body bleibt EIN Scroll-Container; flex-child darf schrumpfen (min-height:0)
-- Bottom-Reserve kommt NUR über .detail-panel-body (über Layout-Contract Token), damit Content nie hinter der Actionbar endet.
-Umfang:
-- .detail-panel-body + #detail-content
+/* === BEGIN FIX: REMOVE STRAY CSS MARKER (keep parser alive) ===
+Zweck: Entfernt die ungültige Zeile "== */", die ab hier CSS-Regeln aushebeln kann.
+Umfang: Nur dieser Marker direkt nach dem Close-Button Patch.
 === */
+/* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
+/* === END FIX: REMOVE STRAY CSS MARKER (keep parser alive) === */
+
 
 /* Body: EIN Scroll-Container */
+/* === BEGIN FIX: DETAILPANEL BODY GUTTER + BOTTOM RESERVE (robust) ===
+Zweck: Globaler Gutter greift sicher + Content endet nie unter der Actionbar.
+Umfang: Nur #event-detail-panel .detail-panel-body
+=== */
 #event-detail-panel .detail-panel-body{
   flex: 1 1 auto;
   height: auto;
 
-  /* wichtig für flex+scroll (verhindert „leer/zu groß“ Bugs) */
+  /* wichtig für flex+scroll */
   min-height: 0;
 
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 
-  /* global gutter for ALL content inside */
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
+  /* EINHEITLICH: gutter links/rechts + actionbar-reserve unten */
+  padding: 0 var(--gutter) var(--dp-actionbar-reserve);
 
-  /* Reserve, damit der letzte Inhalt nie „unter“ der Actionbar verschwindet */
-  padding-bottom: var(--dp-actionbar-reserve);
+  box-sizing: border-box;
 }
+/* === END FIX: DETAILPANEL BODY GUTTER + BOTTOM RESERVE (robust) === */
+
 
 /* #detail-content: Inhalt, kein eigener Scroll */
 #event-detail-panel #detail-content{
@@ -2504,6 +2506,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
