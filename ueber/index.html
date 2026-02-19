@@ -74,36 +74,25 @@
       </p>
     </section>
 
-      <!-- === BEGIN BLOCK: INFO PAGE NAVIGATION (bottom escape only, top-app pattern) ===
-  Zweck:
-  - Vermeidet doppelte „Zurück zu Info“-Navigation (oben bereits vorhanden)
-  - Beibehaltung eines direkten Rückwegs zur Event-Übersicht
-  - Entspricht App-Navigation: oben Back, unten optional Exit
-  Umfang:
-  - Entfernt nur den unteren Info-Link, behält Events-Link
-  === -->
-   <!-- === BEGIN BLOCK: ABOUT PAGE NAVIGATION ENTERPRISE V2 (trust page with funnel access) ===
-  Zweck:
-  - Fügt Enterprise-konformen Zugang zum Veranstalter-Funnel hinzu
-  - Beibehaltung des Event-Exit-Links
-  - Kein Eingriff in bestehende Struktur oder Hierarchie
-  Umfang:
-  - Nur untere Navigation dieser Seite
-  === -->
-  <nav class="content-links" aria-label="Navigation">
+    <!-- === BEGIN BLOCK: ABOUT PAGE NAVIGATION ENTERPRISE V2 (trust page with funnel access) ===
+Zweck:
+- Enterprise V2: Trust-Seite behält „Exit zu Events“ + bietet direkten Einstieg in den Veranstalter-Funnel
+- Keine doppelte „Zurück zu Info“-Navigation (oben bereits vorhanden)
+Umfang:
+- Ersetzt die komplette Bottom-Navigation dieser Seite
+=== -->
+<nav class="content-links" aria-label="Navigation">
 
-    <a class="content-link" href="/events-veroeffentlichen/">
-      Event veröffentlichen
-    </a>
+  <a class="content-link" href="/events-veroeffentlichen/">
+    Event veröffentlichen
+  </a>
 
-    <a class="content-link" href="/">
-      Zurück zu den Events
-    </a>
+  <a class="content-link" href="/">
+    Zurück zu den Events
+  </a>
 
-  </nav>
-  <!-- === END BLOCK: ABOUT PAGE NAVIGATION ENTERPRISE V2 (trust page with funnel access) === -->
-
-  <!-- === END BLOCK: INFO PAGE NAVIGATION (bottom escape only, top-app pattern) === -->
+</nav>
+<!-- === END BLOCK: ABOUT PAGE NAVIGATION ENTERPRISE V2 (trust page with funnel access) === -->
 
 
 
