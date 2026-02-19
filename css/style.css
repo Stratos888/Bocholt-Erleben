@@ -48,7 +48,13 @@
   --gutter: var(--space-lg);
 
   /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
-  --dp-header-pad-top: 26px;            /* entspricht #detail-content padding-top + Close top */
+   /* === BEGIN FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) ===
+  Zweck: Titel/Icon etwas weiter vom Grab-Handle weg (ruhiger), Close bleibt über Token synchron.
+  Umfang: Nur Token --dp-header-pad-top.
+  === */
+  --dp-header-pad-top: 34px;            /* entspricht #detail-content padding-top + Close top */
+  /* === END FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) === */
+
   --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
   --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
@@ -1633,8 +1639,13 @@ Umfang: Nur Close-Button (Detailpanel).
   z-index: 20;
 }
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+/* === BEGIN FIX: CSS PARSER BREAK (remove stray marker) ===
+Zweck: Entfernt eine ungültige Zeile ("== */"), die ab hier das komplette restliche CSS deaktiviert.
+Umfang: Nur Marker-Repair direkt nach dem Close-Button Patch.
+=== */
 /* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
-== */
+/* === END FIX: CSS PARSER BREAK (remove stray marker) === */
+
 
 
 
@@ -2493,6 +2504,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
