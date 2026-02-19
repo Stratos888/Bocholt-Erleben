@@ -1,133 +1,191 @@
 # ENGINEERING CONSTITUTION — BOCHOLT ERLEBEN
-# TECHNICAL RULES — MANDATORY FOR CHATGPT
+# ABSOLUTE ENGINEERING RULES — CHATGPT MUST FOLLOW
 
-This document defines mandatory engineering safety and architecture rules.
-
-These rules must never be violated.
+Defines HOW to safely modify the project.
 
 MASTER.md defines WHAT to build.
-ENGINEERING.md defines HOW to build safely.
 
-If conflict occurs:
+ENGINEERING.md defines HOW to build.
 
-ENGINEERING.md safety rules take precedence.
+These rules are mandatory.
 
 ---
 
-# CORE PRINCIPLES
+# CORE PRINCIPLE
 
 Primary objective:
 
-Maintain production stability at all times.
+Maintain production stability.
 
-Avoid regressions.
-
-Avoid uncontrolled changes.
+Never introduce regression.
 
 Every change must be:
 
-targeted
 minimal
+controlled
 safe
 
 ---
 
-# CHANGE CONTROL RULE
+# OPERATING MODE
 
-Never rewrite large code areas unnecessarily.
+Project operates in:
 
-Always modify smallest possible scope.
+CONSOLIDATION MODE
 
-Preserve existing behavior unless explicitly required.
+Meaning:
+
+Latest project state is complete truth.
+
+Never assume missing code.
+
+Never invent structure.
+
+Work only with actual visible code.
 
 ---
 
-# NO ASSUMPTION RULE
+# ONE FILE RULE
+
+Work on ONLY ONE FILE per change.
+
+Never modify multiple files simultaneously unless explicitly required.
+
+---
+
+# DIFF RULE
+
+Never output full files unless explicitly required.
+
+Always provide:
+
+Clear instruction:
+
+Replace block from X to Y
+
+and provide replacement block separately.
+
+---
+
+# MARKER RULE
+
+Every inserted or replaced block MUST include markers:
+
+BEGIN marker:
+
+Comment explaining purpose and scope
+
+END marker:
+
+Comment explaining end of block
+
+Markers prevent corruption.
+
+---
+
+# 100 PERCENT RULE
+
+When fixing or modifying:
+
+All required changes must be included.
+
+Never provide partial fixes.
+
+Never rely on implicit assumptions.
+
+---
+
+# NO GUESS RULE
 
 Never guess.
 
-Never invent missing code.
+Never hallucinate missing code.
 
-If required information is missing, request clarification.
+If information missing:
 
----
-
-# OVERLAY ARCHITECTURE RULE
-
-All overlays must exist under dedicated overlay root under body.
-
-Never place overlays inside:
-
-sticky elements
-transformed elements
-filtered elements
-
-This prevents rendering and z-index defects.
+Request clarification.
 
 ---
 
-# SERVICE WORKER RULE
+# ROOT CAUSE RULE
 
-Service worker is critical infrastructure.
+Never apply speculative fixes.
 
-Never modify caching logic unless explicitly required.
+Identify root cause first.
 
-Never break versioning logic.
-
----
-
-# DEPLOYMENT RULE
-
-Deployment pipeline must remain deterministic and stable.
-
-Never introduce asset reference instability.
-
-Never break cache-busting.
-
----
-
-# REGRESSION PREVENTION RULE
-
-Never break existing working features.
-
-If change affects working behavior, explicitly verify impact.
+Apply minimal correction.
 
 ---
 
 # UI MODIFICATION RULE
 
-UI polish changes must prefer CSS-only modifications.
+UI polish must be CSS-only whenever possible.
 
-Avoid structural DOM changes unless required.
+Avoid structural DOM changes.
 
----
-
-# DEBUG PRINCIPLE
-
-When fixing bugs:
-
-Identify root cause first.
-
-Do not apply blind fixes.
-
-Do not stack speculative fixes.
+Avoid JS changes unless necessary.
 
 ---
 
-# SESSION OPERATION RULE
+# OVERLAY RULE
 
-At session start:
+All overlays must exist under overlay root under body.
+
+Never inside transformed or sticky containers.
+
+---
+
+# SERVICE WORKER RULE
+
+Never break caching logic.
+
+Never break versioning logic.
+
+Never introduce asset instability.
+
+---
+
+# DEPLOYMENT RULE
+
+Deployment must remain deterministic.
+
+Never break asset references.
+
+Fail fast if asset inconsistency detected.
+
+---
+
+# REGRESSION RULE
+
+Never break existing working functionality.
+
+Preserve behavior.
+
+---
+
+# SESSION START PROTOCOL
+
+At session start ChatGPT MUST:
 
 Read MASTER.md
+
 Read ENGINEERING.md
 
-Follow MASTER.md priorities.
+Follow MASTER.md priorities
 
-Respect ENGINEERING.md safety constraints.
+Follow ENGINEERING.md safety rules
 
-At session close:
+---
 
-Update MASTER.md when requested.
+# SESSION CLOSE PROTOCOL
+
+When requested:
+
+Update MASTER.md
+
+Preserve project continuity
+
+Never lose decisions
 
 ---
 
