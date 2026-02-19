@@ -48,7 +48,7 @@
   --gutter: var(--space-lg);
 
   /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
-  --dp-header-pad-top: 18px;            /* entspricht #detail-content padding-top + Close top */
+  --dp-header-pad-top: 26px;            /* entspricht #detail-content padding-top + Close top */
   --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
   --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
@@ -1606,7 +1606,8 @@ Umfang: Nur Close-Button (Detailpanel).
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
-  top: var(--dp-header-pad-top); /* aligned to #detail-content padding-top */
+  top: calc(var(--dp-header-pad-top) - 3px); /* centered to title row */
+
 
   width: var(--dp-close-size);
   height: var(--dp-close-size);
@@ -1895,6 +1896,7 @@ Umfang:
 }
 
 /* Description: ruhiger Textblock */
+/* === BEGIN BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
 #event-detail-panel .detail-description{
   margin: 14px 0 0;
   padding: 0;
@@ -1904,8 +1906,11 @@ Umfang:
   font-weight: 520;
   color: rgba(31,41,51,0.82);
 
+  white-space: pre-line;
   overflow-wrap: anywhere;
 }
+/* === END BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
+
 
 /* Responsive: sehr kleine Geräte */
 @media (max-width: 360px){
@@ -2488,6 +2493,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
