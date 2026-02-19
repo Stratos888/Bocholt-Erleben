@@ -1,130 +1,66 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: SEO BASICS (organizer info page) ===
-  Zweck: Basis-SEO für die Erklärseite "Für Veranstalter".
-  Umfang: Gesamter <head>-Bereich dieser Datei.
+    <!-- === BEGIN BLOCK: SEO BASICS (organizer info page) ===
+  Zweck:
+  - Diese Seite ist ab Enterprise V2 deprecated (Inhalt ist im Funnel /events-veroeffentlichen/ konsolidiert)
+  - Saubere Weiterleitung + Canonical auf die neue Zielseite
+  - Einheitliche Cache-Busting-Strategie (kein dev-Query mehr)
+  Umfang: Gesamter <head>-Bereich dieser Datei (innerhalb dieses Blocks).
   === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Für Veranstalter: So funktioniert Bocholt erleben</title>
-   <meta name="description" content="Für Veranstalter: Voraussetzungen (Mitgliedschaft & Event-Tokens) und Ablauf, um Events bei Bocholt erleben zu veröffentlichen – fair und ohne Hervorhebungen.">
+  <title>Weiterleitung – Event veröffentlichen</title>
+  <meta name="description" content="Diese Seite wurde zusammengeführt. Bitte nutze die Seite „Event veröffentlichen“ für den Start als Veranstalter.">
 
+  <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
 
-  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/">
-  <link rel="stylesheet" href="/css/style.css?v=dev-20">
+  <meta http-equiv="refresh" content="0; url=/events-veroeffentlichen/">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
   <!-- === END BLOCK: SEO BASICS (organizer info page) === -->
+
 </head>
 
 <body>
   <!-- === BEGIN BLOCK: ORGANIZER INFO PAGE (scanable, trust-first) ===
-  Zweck: Erklärseite — Verständnis und Vertrauen aufbauen, ohne den Publishing-Flow zu blockieren.
-  Umfang: Gesamter <body>-Inhalt dieser Datei.
+  Zweck:
+  - Enterprise V2: /fuer-veranstalter/ ist deprecated
+  - Verhindert 404 und leitet robust auf den einzigen Veranstalter-Funnel um
+  Umfang:
+  - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
   === -->
   <main class="page page--organizers">
+
     <header class="content-hero">
-              <!-- Navigation: zurück zum Info-Hub -->
+
       <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/info/">
-          Zurück zu Info
-        </a>
+        <a class="content-link" href="/info/">Zurück zu Info</a>
       </nav>
-      <!-- /Navigation -->
 
+      <p class="content-kicker">Weiterleitung</p>
+      <h1>Diese Seite wurde zusammengeführt</h1>
 
-
-      <p class="content-kicker">Für Veranstalter in Bocholt</p>
-      <h1>So funktioniert Bocholt erleben</h1>
       <p class="content-lead">
-        Bocholt erleben ist eine ruhige Event-Übersicht für Bocholt. Als Veranstalter kannst du Events im Rahmen einer aktiven Mitgliedschaft
-        und mit verfügbaren Event-Tokens veröffentlichen – ohne bezahlte Hervorhebungen und ohne Design-Bevorzugung.
+        Bitte nutze ab sofort die Seite „Event veröffentlichen“. Du wirst automatisch weitergeleitet.
       </p>
 
+      <div class="content-actions content-actions--spaced">
+        <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">
+          Zum Veranstalter-Start
+        </a>
+      </div>
+
+      <nav class="content-links" aria-label="Alternative">
+        <a class="content-link" href="/">Zurück zu den Events</a>
+      </nav>
 
     </header>
-    <section class="content-card content-card--primary" aria-labelledby="org-start">
-      <h2 id="org-start">Start als Veranstalter</h2>
-      <p>
-        Veröffentlichen ist mit aktiver Mitgliedschaft und verfügbaren Event-Tokens möglich.
-        Wenn du starten möchtest, findest du hier den Ablauf und den Einstieg.
-      </p>
-
-      <nav class="content-actions" aria-label="Start">
-        <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">
-          Als Veranstalter starten
-        </a>
-      </nav>
-
-      <p class="content-note">Kostenprinzip: ab 9,99&nbsp;€ / Monat, abhängig vom Event-Volumen.</p>
-    </section>
-
-
-
-       <section class="content-card content-card--primary" aria-labelledby="how-it-works">
-      <h2 id="how-it-works">Ablauf</h2>
-
-      <ol class="content-steps">
-        <li>Du startest kurz über „Als Veranstalter starten“.</li>
-        <li>Voraussetzung ist eine aktive Mitgliedschaft (inkl. Event-Tokens).</li>
-        <li>Danach kannst du Events veröffentlichen und aktuell halten.</li>
-      </ol>
-
-      <p class="content-note">
-        Alle Events werden gleichwertig dargestellt – ohne bezahlte Hervorhebungen und ohne Design-Bevorzugung.
-      </p>
-    </section>
-
-
-
-    <section class="content-card" aria-labelledby="meaning">
-      <h2 id="meaning">Was bedeutet das für Veranstalter?</h2>
-      <ul class="locations-benefits" aria-label="Konsequenzen für Veranstalter">
-        <li>Deine Events erscheinen in einer übersichtlichen Liste für Bocholt – gut lesbar und schnell auffindbar.</li>
-        <li>Gleichwertige Darstellung: keine bezahlten Hervorhebungen und keine optische Bevorzugung.</li>
-        <li>Jeder Eintrag hat klare Basisdaten (Titel, Zeit, Ort) plus Link zur offiziellen Quelle.</li>
-        <li>Der Fokus liegt auf Ordnung und Aktualität – nicht auf Werbung oder Rankings.</li>
-      </ul>
-    </section>
-
-
-    <section class="content-card" aria-labelledby="fairness">
-      <h2 id="fairness">Warum das fair ist</h2>
-      <p>
-        Weil die Regeln für alle gleich sind: <strong>keine Werbung</strong>, <strong>keine bezahlten Hervorhebungen</strong>
-        und <strong>keine Bevorzugung durch Design</strong>. Jedes Event bekommt die gleiche Bühne – geordnet und gut lesbar.
-      </p>
-    </section>
-
-   <section class="content-card" aria-labelledby="costs">
-      <h2 id="costs">Kostenprinzip</h2>
-      <p>
-        Die Plattform ist kostenpflichtig, damit sie dauerhaft gepflegt, aktuell und hochwertig bleibt.
-        Der Einstieg ist <strong>ab 9,99&nbsp;€ pro Monat</strong> möglich.
-      </p>
-      <p class="content-note">
-        Die genaue Stufe richtet sich danach, wie viele Events ihr veröffentlicht. Details folgen hier in Kürze.
-      </p>
-    </section>
-
-
-     <nav class="content-actions" aria-label="Weiter">
-      <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">
-        Als Veranstalter starten
-      </a>
-
-      <a class="content-back" href="/info/">
-        Zurück zu Info
-      </a>
-
-      <a class="content-back" href="/">
-        Zu den Events
-      </a>
-    </nav>
-
-
 
   </main>
   <!-- === END BLOCK: ORGANIZER INFO PAGE (scanable, trust-first) === -->
+
 </body>
 </html>
