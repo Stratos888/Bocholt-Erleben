@@ -123,8 +123,18 @@ NON_EVENT_PATTERNS = [
     r"\bsanier",
     r"\bglasfaser",
     r"\bkanal\b",
+   # === BEGIN BLOCK: NON EVENT KEYWORDS (press cleanup add, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck: Source-spezifischen Presse/Info-Müll härter erkennen
+# Umfang: Ersetzt nur den Teilblock um trinkwasser/hausbrunnen
+# === END BLOCK: NON EVENT KEYWORDS (press cleanup add, v1) ===
     r"\btrinkwasser\b",
+    r"\bwasserverband\b",
+    r"\bbekanntmachung\b",
+    r"\bgrußwort\b",
+    r"\bgrusswort\b",
     r"\bhausbrunnen\b",
+
     r"\buntersuch",
     r"\bkontroll",
     r"\bmüllabfuhr\b",
@@ -168,38 +178,32 @@ NON_EVENT_PATTERNS = [
 # Umfang:
 # - Ersetzt nur EVENT_SIGNAL_PATTERNS
 # === END BLOCK: EVENT SIGNAL PATTERNS (expanded, v2) ===
+# === BEGIN BLOCK: EVENT SIGNAL PATTERNS (quality fix, v3) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - False-Positives durch generisches \bfest\b verhindern (z.B. "Fest- und Feiertagen")
+# - Nur klare Event-Signale
+# Umfang:
+# - Ersetzt nur EVENT_SIGNAL_PATTERNS
+# === END BLOCK: EVENT SIGNAL PATTERNS (quality fix, v3) ===
 EVENT_SIGNAL_PATTERNS = [
     r"\bkonzert\b",
-    r"\bjazz\b",
-    r"\bklassik\b",
-    r"\bopen\s*air\b",
-    r"\bfestival\b",
-    r"\bshow\b",
-    r"\btheater\b",
-    r"\bmusical\b",
-    r"\bkabarett\b",
-    r"\bcomedy\b",
     r"\blesung\b",
-    r"\bpoetry\s*slam\b",
-    r"\bslam\b",
-    r"\bvortrag\b",
-    r"\bseminar\b",
-    r"\bworkshop\b",
-    r"\bf\u00fchrung\b",
-    r"\bstadtf\u00fchrung\b",
-    r"\brundgang\b",
-    r"\btour\b",
+    r"\bfestival\b",
+    r"\btheater\b",
     r"\bausstellung\b",
-    r"\bvernissage\b",
+    r"\bf\u00fchrung\b",
+    r"\bworkshop\b",
+    r"\bvortrag\b",
     r"\bmarkt\b",
-    r"\bflohmarkt\b",
-    r"\bkirmes\b",
-    r"\bfest\b",
-    r"\bparty\b",
-    r"\bsport\b",
-    r"\blauf\b",
     r"\bturnier\b",
+    # spezifische Feste (statt generischem \bfest\b)
+    r"\bstadtfest\b",
+    r"\bweinfest\b",
+    r"\bsommerfest\b",
+    r"\boktoberfest\b",
 ]
+
 
 
 
@@ -568,6 +572,17 @@ def ensure_description(
 # Umfang:
 # - Ersetzt nur classify_candidate()
 # === END BLOCK: EVENT QUALITY GATE (review-first, v1) ===
+# === BEGIN BLOCK: EVENT QUALITY GATE (final rules, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Nur noch Status: review / rejected
+# - RSS ohne Event-Datum -> rejected (Option A)
+# - Kein Event-Signal -> rejected
+# - Event-Signal + Datum -> review
+# - Event-Signal + kein Datum -> review (außer RSS)
+# Umfang:
+# - Ersetzt nur classify_candidate()
+# === END BLOCK: EVENT QUALITY GATE (final rules, v2) ===
 def classify_candidate(
     *,
     stype: str,
@@ -581,6 +596,11 @@ def classify_candidate(
     Returns (status, reason):
       - review   = Kandidat zur manuellen Prüfung (gewollt!)
       - rejected = sicher kein Event (Müll) -> wird NICHT in Inbox geschrieben
+
+    Zielregeln (final):
+      - RSS ohne Event-Datum -> rejected (massiv weniger Müll)
+      - Kein Event-Signal -> rejected (blocked wird nicht mehr verwendet)
+      - Event-Signal + (Datum vorhanden ODER fehlt) -> review
     """
 
     text = f"{title}\n{description}".strip()
@@ -588,11 +608,15 @@ def classify_candidate(
     has_event = _has_event_signal(text)
     is_pressish = (stype == "rss") or _is_press_like_source(source_name, source_url)
 
+    # 0) RSS ohne Event-Datum -> hart raus (Option A)
+    if stype == "rss" and not norm(event_date):
+        return "rejected", "reject:rss_missing_event_date"
+
     # 1) Harte Müllsignale UND kein Event-Signal -> raus
     if is_non_event and not has_event:
         return "rejected", "reject:non_event_keywords"
 
-    # 2) Presse/RSS ohne Event-Signal -> raus
+    # 2) Presse/Press-ähnlich ohne Event-Signal -> raus
     if is_pressish and not has_event:
         return "rejected", "reject:press_without_event_signal"
 
@@ -600,24 +624,58 @@ def classify_candidate(
     if norm(event_date) and (not _in_date_window(event_date)):
         return "rejected", "reject:date_out_of_window"
 
-    # 4) Alles, was irgendwie eventartig ist ODER unklar ist -> REVIEW (nie blocked)
-    if not norm(event_date):
-        return "review", "review:missing_event_date"
+    # 4) Final: Nur mit Event-Signal in review – Datum darf fehlen (außer RSS)
     if has_event:
-        return "review", "review:event_signal"
+        if norm(event_date):
+            return "review", "review:event_signal+date"
+        return "review", "review:event_signal_missing_date"
 
-    return "review", "review:uncertain"
+    return "rejected", "reject:no_event_signal"
+
 
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
 
 
+# === BEGIN BLOCK: SAFE FETCH (retry + backoff for 503/429, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Stabiler Fetch gegen sporadische 503/429 (z.B. Münsterland)
+# - 3 Retries mit Backoff: 10s, 30s, 90s
+# Umfang:
+# - Ersetzt nur safe_fetch()
+# === END BLOCK: SAFE FETCH (retry + backoff for 503/429, v1) ===
 def safe_fetch(url: str, timeout: int = 20) -> str:
-
     req = urllib.request.Request(url, headers={"User-Agent": "BocholtErlebenDiscovery/1.0"})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        charset = resp.headers.get_content_charset() or "utf-8"
-        return resp.read().decode(charset, errors="replace")
+
+    backoffs = [10, 30, 90]
+    last_err: Exception | None = None
+
+    for attempt in range(len(backoffs) + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                charset = resp.headers.get_content_charset() or "utf-8"
+                return resp.read().decode(charset, errors="replace")
+
+        except urllib.error.HTTPError as e:
+            code = int(getattr(e, "code", 0) or 0)
+            if code in (429, 503) and attempt < len(backoffs):
+                time.sleep(backoffs[attempt])
+                last_err = e
+                continue
+            raise
+
+        except Exception as e:
+            if attempt < len(backoffs):
+                time.sleep(backoffs[attempt])
+                last_err = e
+                continue
+            raise
+
+    if last_err:
+        raise last_err
+    raise RuntimeError("safe_fetch failed unexpectedly")
+
 
 
 # -------------------------
@@ -1088,18 +1146,205 @@ def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
     # Begrenzen: wir testen maximal 3 Feeds pro HTML-Quelle
     return found[:3]
 
+# === BEGIN BLOCK: GENERIC HTML EVENT PARSER (jsonld + feeds + fallback date scan + KuKuG, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - HTML-Quellen besser nutzbar machen:
+#   1) JSON-LD / schema.org Events
+#   2) Feed/ICS Autodiscovery
+#   3) Fallback: Date-Scan (dd.mm.yyyy / dd.mm. / dd. Monat) + Link/Titel
+#   4) KuKuG Spezial: /themen-tipps/ -> /portfolio-items/ Detailseiten
+# Umfang:
+# - Ersetzt nur die generische HTML-Parsing-Strecke (keine Dedupe/Inbox-Write Änderungen)
+# === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feeds + fallback date scan + KuKuG, v2) ===
+
+_MONTHS_DE = {
+    "januar": 1,
+    "februar": 2,
+    "märz": 3,
+    "maerz": 3,
+    "april": 4,
+    "mai": 5,
+    "juni": 6,
+    "juli": 7,
+    "august": 8,
+    "september": 9,
+    "oktober": 10,
+    "november": 11,
+    "dezember": 12,
+}
+
+_RE_DATE_DDMMYYYY = re.compile(r"\b([0-3]?\d)\.([01]?\d)\.(\d{4})\b")
+_RE_DATE_DDMM = re.compile(r"\b([0-3]?\d)\.([01]?\d)\.(?!\d)\b")
+_RE_DATE_DD_MONAT = re.compile(
+    r"\b([0-3]?\d)\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)(?:\s*(\d{4}))?\b",
+    re.IGNORECASE,
+)
+
+_RE_A_TAG = re.compile(r"<a\s+[^>]*href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
+
+def _date_from_match_groups(dd: str, mm: str, yyyy: str) -> str:
+    try:
+        d = date(int(yyyy), int(mm), int(dd))
+        return d.strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+def _parse_de_date_any(text_snip: str) -> str:
+    s = clean_text(text_snip)
+
+    m = _RE_DATE_DDMMYYYY.search(s)
+    if m:
+        return _date_from_match_groups(m.group(1), m.group(2), m.group(3))
+
+    m = _RE_DATE_DD_MONAT.search(s)
+    if m:
+        dd = int(m.group(1))
+        mon = norm_key(m.group(2))
+        yyyy = m.group(3)
+        mm = _MONTHS_DE.get(mon, 0)
+        if mm:
+            y = int(yyyy) if yyyy else datetime.now().date().year
+            iso = _date_from_match_groups(str(dd), str(mm), str(y))
+            if not iso:
+                return ""
+            if not yyyy:
+                today = datetime.now().date()
+                try:
+                    d0 = datetime.strptime(iso, "%Y-%m-%d").date()
+                    if d0 < today and (today - d0).days > DATE_WINDOW_ALLOW_PAST_DAYS:
+                        iso2 = _date_from_match_groups(str(dd), str(mm), str(y + 1))
+                        return iso2 or iso
+                except Exception:
+                    pass
+            return iso
+
+    m = _RE_DATE_DDMM.search(s)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        y = datetime.now().date().year
+        iso = _date_from_match_groups(str(dd), str(mm), str(y))
+        if not iso:
+            return ""
+        today = datetime.now().date()
+        try:
+            d0 = datetime.strptime(iso, "%Y-%m-%d").date()
+            if d0 < today and (today - d0).days > DATE_WINDOW_ALLOW_PAST_DAYS:
+                iso2 = _date_from_match_groups(str(dd), str(mm), str(y + 1))
+                return iso2 or iso
+        except Exception:
+            pass
+        return iso
+
+    return ""
+
+def parse_html_fallback_date_scan(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    """
+    Fallback, wenn keine JSON-LD Events und keine Feeds gefunden werden:
+    - Sucht Datumsmuster im Umfeld von <a href=...> und erzeugt Kandidaten.
+    """
+    html_text = html_text or ""
+    out: List[Dict[str, str]] = []
+    seen = set()
+
+    max_events = int(os.environ.get("MAX_HTML_EVENTS", "80"))
+    for m in _RE_A_TAG.finditer(html_text):
+        href = norm(m.group(1) or "")
+        a_text = clean_text(m.group(2) or "")
+        if not href:
+            continue
+        hk = norm_key(href)
+        if hk.startswith(("mailto:", "tel:", "javascript:")):
+            continue
+
+        s0 = max(0, m.start() - 250)
+        s1 = min(len(html_text), m.end() + 250)
+        around = html_text[s0:s1]
+
+        d_iso = _parse_de_date_any(around)
+        if not d_iso:
+            continue
+
+        title = a_text or clean_text(around)
+        if not title or len(title) < 4:
+            continue
+
+        url = _normalize_event_url(href, base_url)
+        fp = (slugify(title), d_iso, norm_key(url))
+        if fp in seen:
+            continue
+        seen.add(fp)
+
+        out.append(
+            {
+                "title": title,
+                "date": d_iso,
+                "endDate": "",
+                "time": "",
+                "location": "",
+                "url": url,
+                "description": "",
+                "notes": "source=html_fallback_date_scan",
+            }
+        )
+        if len(out) >= max_events:
+            break
+
+    return out
+
+def parse_kukug_themen_tipps(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    """
+    KuKuG Spezial:
+    - /themen-tipps/ listet Teaser, die auf /portfolio-items/... Detailseiten verlinken.
+    - Detailseiten werden wie normale HTML-Eventquellen geparst (JSON-LD oder Fallback-Date-Scan).
+    """
+    html_text = html_text or ""
+    links = []
+    for href in re.findall(r"href=['\"]([^'\"]+)['\"]", html_text, flags=re.IGNORECASE):
+        h = norm(href)
+        if "/portfolio-items/" not in norm_key(h):
+            continue
+        u = _normalize_event_url(h, base_url)
+        if u and u not in links:
+            links.append(u)
+
+    out: List[Dict[str, str]] = []
+    for u in links:
+        try:
+            detail = safe_fetch(u)
+        except Exception:
+            continue
+
+        cand = parse_html_jsonld_events(detail, u) or parse_html_fallback_date_scan(detail, u)
+        for x in cand:
+            x["url"] = canonical_url(x.get("url", "")) or canonical_url(u)
+            x["notes"] = (clean_text(x.get("notes", "")) + (" | " if x.get("notes") else "") + "source=html_kukug_portfolio")
+            out.append(x)
+
+            if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+                return out
+
+    return out
+
 def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
     """
     Generic HTML -> candidates:
     1) JSON-LD Events
     2) Feed Autodiscovery -> fetch feed -> parse_rss/parse_ics_events
+    3) Fallback: Date-Scan (dd.mm.yyyy / dd.mm. / dd. Monat)
+    4) KuKuG Spezial: /themen-tipps/ -> /portfolio-items/
     """
-    # 1) JSON-LD
+
+    if "kukug-bocholt.de/themen-tipps" in norm_key(base_url):
+        cand = parse_kukug_themen_tipps(html_text, base_url)
+        if cand:
+            return cand
+
     candidates = parse_html_jsonld_events(html_text, base_url)
     if candidates:
         return candidates
 
-    # 2) Autodiscovered feeds (RSS/Atom/ICS)
     feeds = discover_feeds_from_html(html_text, base_url)
     for fu in feeds:
         try:
@@ -1109,15 +1354,20 @@ def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, s
             else:
                 cand = parse_rss(fc)
             if cand:
-                # markiere Quelle
                 for x in cand:
-                    x["notes"] = (clean_text(x.get("notes", "")) + (" | " if x.get("notes") else "") + f"source=html_feed:{canonical_url(fu)}")
+                    x["notes"] = (
+                        clean_text(x.get("notes", ""))
+                        + (" | " if x.get("notes") else "")
+                        + f"source=html_feed:{canonical_url(fu)}"
+                    )
                 return cand
         except Exception:
             continue
 
-    return []
+    return parse_html_fallback_date_scan(html_text, base_url)
+
 # === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feed autodiscovery, v1) ===
+
 
     
 # === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
