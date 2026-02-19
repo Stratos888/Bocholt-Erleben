@@ -1,61 +1,70 @@
 # MASTER CONTROL FILE — BOCHOLT ERLEBEN
-# THIS IS THE SINGLE SOURCE OF TRUTH FOR PROJECT STATE
+# SINGLE SOURCE OF TRUTH FOR PROJECT STATE
 # CHATGPT MUST FOLLOW THIS FILE STRICTLY
 
 ---
 
 # SESSION INSTRUCTIONS FOR CHATGPT
 
-You are operating on a persistent software project.
+You are operating a persistent production software project.
 
 This file defines:
 
-- current phase
-- active sprint
-- frozen areas
+- project phase
+- sprint scope
+- frozen systems
 - product priorities
-- allowed focus
+- decision memory
 
 You MUST:
 
-1. Read this file completely at session start
-2. Follow CURRENT SPRINT only
-3. NEVER invent new priorities outside this file
-4. NEVER modify frozen areas unless explicitly required
-5. Update this file at session end when requested
-6. Preserve all completed progress
-7. Never regress completed areas
+1. Read this file at session start
+2. Read ENGINEERING.md at session start
+3. Work ONLY on CURRENT SPRINT tasks
+4. Never modify frozen areas
+5. Never invent new priorities
+6. Update this file when session closes
+7. Record all permanent decisions
+8. Never regress completed areas
 
-This file has priority over all other guidance except ENGINEERING.md safety rules.
+This file is the project brain.
 
 ---
 
 # PROJECT OBJECTIVE
 
-Build and operate a production-grade event discovery platform for Bocholt.
+Build and operate a production-grade event discovery PWA.
 
-Primary business goal:
+Target level:
+
+Enterprise-grade stability
+Enterprise-grade UX
+Enterprise-grade evolution safety
+
+Business goal:
 
 Enable reliable event discovery and monetizable organizer onboarding.
-
-Platform must reach enterprise-grade stability, UX quality, and controlled evolution.
 
 ---
 
 # CURRENT PHASE
 
-PHASE: UI STABILIZATION AND CONTENT PIPELINE RELIABILITY
+PHASE:
+
+UI STABILIZATION AND CONTENT PIPELINE RELIABILITY
 
 PHASE GOAL:
 
-Achieve production-trustworthy UI perception and fully reliable automated event intake.
+Users must perceive platform as:
 
-Definition of phase completion:
+trustworthy
+modern
+stable
+professional
 
-- UI appears modern, clean, stable, and professional
-- No major visual trust-breaking issues remain
-- Event pipeline continuously supplies usable events
-- No manual daily event searching required
+Event pipeline must operate continuously.
+
+Manual daily event search must not be required.
 
 ---
 
@@ -63,28 +72,53 @@ Definition of phase completion:
 
 ACTIVE TASKS:
 
-TASK 1:
-Detailpanel UI stabilization
+---
+
+TASK 1: DETAILPANEL UI STABILIZATION
+
 STATUS: IN PROGRESS
 
-Objectives:
+DEFINITION OF DONE:
 
-- clean hierarchy
-- correct spacing rhythm
-- remove visual noise
-- achieve calm, professional appearance
+Visual hierarchy clear
 
-TASK 2:
-Event card visual hierarchy stabilization
+Spacing follows baseline scale
+
+No visual clutter
+
+Max two primary actions
+
+No layout breaks
+
+No visual trust-breaking elements
+
+Professional appearance achieved
+
+After completion:
+
+Move task to COMPLETED AREAS
+
+Add decision entry if structural decisions were made
+
+Freeze component
+
+---
+
+TASK 2: EVENT CARD HIERARCHY STABILIZATION
+
 STATUS: TODO
 
-TASK 3:
-Event pipeline deduplication and reliability improvement
+---
+
+TASK 3: EVENT PIPELINE RELIABILITY IMPROVEMENT
+
 STATUS: TODO
+
+---
 
 RULE:
 
-ChatGPT must work on these tasks only.
+Work ONLY on tasks listed here.
 
 Do not introduce unrelated improvements.
 
@@ -92,23 +126,29 @@ Do not introduce unrelated improvements.
 
 # FROZEN AREAS
 
-These areas are considered stable and must not be modified unless explicitly required:
+These systems are stable infrastructure.
 
-- Header layout and structure
-- Routing system
-- Service worker architecture
-- Overlay root system
-- Build and deploy pipeline
+Do not modify unless explicitly required.
 
-These systems are critical infrastructure.
+HEADER LAYOUT
 
-Avoid touching them unless fixing a confirmed defect.
+ROUTING SYSTEM
+
+SERVICE WORKER
+
+OVERLAY ROOT SYSTEM
+
+BUILD PIPELINE
+
+DEPLOY PIPELINE
+
+PWA CORE
 
 ---
 
 # UI BASELINE
 
-These are mandatory UI rules:
+Mandatory visual rules:
 
 Spacing scale:
 
@@ -128,19 +168,18 @@ Interaction rules:
 
 Max primary actions per screen: 2
 
-Avoid unnecessary dividers.
+Avoid unnecessary dividers
 
-Visual goals:
+Visual goal:
 
 calm
 clean
-modern
 professional
 trustworthy
 
 Avoid:
 
-visual clutter
+visual noise
 tight layouts
 aggressive styling
 
@@ -148,49 +187,95 @@ aggressive styling
 
 # CONTENT PIPELINE REQUIREMENTS
 
-Event pipeline must achieve:
+Pipeline must provide:
 
 continuous intake
-minimal manual effort
-deduplication reliability
+
+deduplicated events
+
 stable operation
 
-Manual daily event discovery must not be required.
+minimal manual effort
 
 ---
 
 # COMPLETED AREAS
 
-Core PWA infrastructure
-Overlay system
-Deploy pipeline
-Basic event system
-Basic UI system
+These must never regress.
 
-These must not regress.
+PWA infrastructure
+
+Overlay architecture
+
+Deploy pipeline
+
+Event loading system
+
+Base UI system
+
+---
+
+# DECISIONS LOG
+
+Permanent architectural and UX decisions.
+
+ChatGPT MUST append new decisions here when made.
+
+---
+
+2026-02-19
+
+MASTER/ENGINEERING system introduced
+
+Purpose:
+
+Prevent context loss
+
+Prevent regression
+
+Enable enterprise-grade evolution
+
+Status:
+
+ACTIVE
 
 ---
 
 # NEXT PRIORITIES (DO NOT START YET)
 
-Organizer onboarding funnel improvement
+Organizer onboarding funnel
 
-Monetization integration
+Monetization system
 
-Organizer self-service submission system
+Organizer submission system
+
+Account system
+
+---
+
+# SESSION CLOSE PROTOCOL
+
+When session closes ChatGPT MUST:
+
+Update CURRENT SPRINT statuses
+
+Move completed tasks to COMPLETED AREAS
+
+Append new DECISIONS if needed
+
+Update SESSION STATE
 
 ---
 
 # SESSION STATE
 
-This section must be updated by ChatGPT when session closes.
-
-Current overall stability:
+OVERALL STATUS:
 
 UI: IN PROGRESS
-Pipeline: IN PROGRESS
 
-Last update:
+PIPELINE: IN PROGRESS
+
+LAST UPDATE:
 
 2026-02-19
 
