@@ -682,8 +682,8 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 /* === BEGIN FIX: EVENT CARD RAIL FLUSH + SINGLE SOURCE OF TRUTH ===
 Zweck:
 - Rail startet an der Card-Kante (nicht erst nach padding-left)
-- Badge kann nicht „über den Rail-Rand“ wirken
-- Ein Wert steuert Grid-Spalte + Rail-Breite (inkl. padding-Kompensation)
+- Rail ist breit genug, damit das Badge optisch sauber mittig wirkt
+- Ein Wert steuert Grid-Spalte + Rail-Fläche (inkl. padding-Kompensation)
 Umfang:
 - Ersetzt .event-card + .event-card::before innerhalb EVENT CARD FINAL LAYOUT
 === */
@@ -696,7 +696,7 @@ Umfang:
   display: grid;
 
   /* Rail-Kernbreite (ohne padding); Gesamtbreite der Rail-Spalte = rail + padding-left */
-  --rail-w: 44px;
+  --rail-w: 56px; /* 56 + 16 padding = 72px Rail-Spalte */
 
   grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
   column-gap: var(--space-md);
@@ -941,14 +941,14 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 /* Mobile fein */
 /* === BEGIN FIX: EVENT CARD MOBILE RAIL SYNC (rail flush + centered badge) ===
 Zweck:
-- Rail/Spalte bleibt konsistent zur Desktop-Logik (inkl. flush bis Card-Kante)
-- Keine getrennten Width-Overrides mehr für ::before
+- Rail-Spalte (Grid) und Rail-Fläche (::before) bleiben konsistent
+- Rail optisch „groß genug“, damit Badge klar mittig wirkt (kein „zu knapp“ Eindruck)
 Umfang:
 - Nur @media (max-width: 360px) innerhalb EVENT CARD FINAL LAYOUT
 === */
 @media (max-width: 360px){
   .event-card{
-    --rail-w: 40px;
+    --rail-w: 44px; /* 44 + 16 padding = 60px Rail-Spalte */
     grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
     column-gap: var(--space-md);
     padding: var(--space-lg);
@@ -2635,6 +2635,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
