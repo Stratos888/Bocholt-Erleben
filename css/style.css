@@ -85,7 +85,9 @@
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
-  --ui-border-primary: rgba(139,207,74,.45);
+ /* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
+--ui-border-primary: rgba(139,207,74,.45);
+/* === END FIX: RGBA ALPHA TYPO (ui-border-primary) === */
 
   --ui-surface-soft: rgba(255,255,255,0.55);
   --ui-surface-soft-hover: rgba(255,255,255,0.74);
@@ -125,7 +127,9 @@
   --primary: var(--color-primary);
   --accent: var(--color-primary);
 
-  --focus-ring: rgba(139,207,74,.25);
+ /* === BEGIN FIX: RGBA ALPHA TYPO (focus-ring) === */
+--focus-ring: rgba(139,207,74,.25);
+/* === END FIX: RGBA ALPHA TYPO (focus-ring) === */
 
   --radius: var(--radius-card);
   --shadow-sm: var(--shadow-card);
@@ -1095,6 +1099,7 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   font-weight: 550;
 }
 
+/* === BEGIN FIX: SEARCH FOCUS RGBA ALPHA TYPO (stable across browsers) === */
 #search-filter:focus{
   outline: none;
   border-color: rgba(139,207,74,.55);
@@ -1104,6 +1109,7 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
     0 0 0 3px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
+/* === END FIX: SEARCH FOCUS RGBA ALPHA TYPO (stable across browsers) === */
 /* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
 
 
@@ -2597,6 +2603,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
