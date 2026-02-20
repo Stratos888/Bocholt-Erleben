@@ -672,10 +672,16 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 === */
 
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
-/* === BEGIN POLISH: EVENT CARD PREMIUM SHADOW === */
+/* === BEGIN POLISH: EVENT CARD MICRO-CONTRAST (premium calm, v1) ===
+Zweck:
+- Subtilere Kante + sauberer Shadow (weniger „webby“, mehr native)
+- Hover/Press/Fokus konsistent mit UI-Tokens
+Umfang:
+- Ersetzt .event-card Basis + :hover + :active + :focus-visible innerhalb EVENT CARD FINAL LAYOUT
+=== */
 
+/* --- Card: 2 Spalten (Date-Chip | Content) --- */
 .event-card{
-
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
   column-gap: var(--space-md);
@@ -685,40 +691,43 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 
   background: var(--surface);
 
-  border: 1px solid rgba(31,41,51,0.06);
-
+  border: 1px solid rgba(31,41,51,0.055);
   border-radius: var(--radius-card);
 
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 6px 18px rgba(0,0,0,0.05);
+    0 1px 1px rgba(0,0,0,0.035),
+    0 10px 26px rgba(0,0,0,0.045);
 
-  transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
-
+  transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease, background 140ms ease;
 }
 
-/* === END POLISH: EVENT CARD PREMIUM SHADOW === */
-
-
-/* Hover: minimal stärkerer Shadow + Kante (kein Lift) */
-.event-card:hover{
-  transform: none;
-  box-shadow: var(--shadow-md);
-  border-color: var(--ui-border-strong);
+/* Hover: minimal stärker, ohne Lift */
+@media (hover: hover){
+  .event-card:hover{
+    transform: none;
+    border-color: rgba(31,41,51,0.085);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.040),
+      0 12px 30px rgba(0,0,0,0.055);
+  }
 }
 
-/* Press: kleines “Eindrücken” (App-Feeling) */
+/* Press: leicht „eingedrückt“ */
 .event-card:active{
   transform: scale(0.99);
-  box-shadow: var(--shadow-sm);
-  border-color: rgba(31,41,51,0.18);
+  border-color: rgba(31,41,51,0.115);
+  box-shadow:
+    0 1px 1px rgba(0,0,0,0.030),
+    0 8px 18px rgba(0,0,0,0.045);
 }
 
-/* Keyboard/Accessibility: sichtbarer Fokus ohne Layoutsprung */
+/* Keyboard/Accessibility: ruhiger Ring + keine Layoutsprünge */
 .event-card:focus-visible{
-  outline: 2px solid rgba(31, 123, 73, 0.35);
-  outline-offset: 2px;
+  outline: 3px solid rgba(139,207,74,0.16);
+  outline-offset: 3px;
 }
+
+/* === END POLISH: EVENT CARD MICRO-CONTRAST (premium calm, v1) === */
 
 
 
@@ -2539,6 +2548,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
