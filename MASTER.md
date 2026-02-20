@@ -620,6 +620,31 @@ Golden Screen considered reference baseline.
 
 ---
 
+ADDENDUM (BUGFIX, UI ONLY)
+
+Events Feed — Date Badge Rail alignment model fixed (Single Coordinate System)
+
+Reason:
+
+Rail + Grid previously drifted due to padding/offset hacks → badge could appear off-center or overflow rail.
+
+Fix model:
+
+- Rail is a true grid column (single source of truth via --rail-w)
+- Rail starts at card edge (no negative left compensation)
+- Date badge is centered inside rail column
+- Rail rendered as solid surface to avoid optical drift
+
+Proof requirement:
+
+Console checks confirm:
+railLeft - cardLeft = 0
+delta(badgeCenter - railCenter) ≤ 1px
+
+Status:
+
+APPLIED as bugfix within Golden Screen constraints.
+
 Decision authority:
 
 Permanent UX and surface baseline established.
