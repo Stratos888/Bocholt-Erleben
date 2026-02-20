@@ -696,7 +696,11 @@ grid-template-columns: 42px 1fr;
   background: var(--surface);
 
   border: 1px solid rgba(31,41,51,0.055);
-  border-radius: var(--radius-card);
+/* === BEGIN FIX: EVENT CARD ELITE SURFACE RADIUS === */
+
+border-radius: 16px;
+
+/* === END FIX: EVENT CARD ELITE SURFACE RADIUS === */
 
   box-shadow:
     0 1px 1px rgba(0,0,0,0.035),
@@ -2589,6 +2593,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
