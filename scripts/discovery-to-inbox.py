@@ -1377,14 +1377,16 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         if not url:
             continue
 
-               # === BEGIN BLOCK: HTML DATE-SCAN (datetime attr + start/end + gating, v4) ===
+        # === BEGIN BLOCK: HTML DATE-SCAN (datetime attr + json-ld Event + start/end + gating, v5) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Reduziert review:event_signal_missing_date durch Auslesen von <time datetime="YYYY-MM-DD...">
-        # - Nutzt weiterhin _extract_event_date_de (start+end) + bestehendes Noise-Gating
+        # - Reduziert review:event_signal_missing_date durch:
+        #   1) <time datetime="YYYY-MM-DD...">
+        #   2) JSON-LD (application/ld+json) mit @type=Event (startDate/endDate) im Link-Umfeld
+        # - Noise-Kontrolle bleibt: (Datum ODER Event-Signal), Datum-only nur bei event-typischer URL
         # Umfang:
         # - Ersetzt nur den Date-Scan-Teil innerhalb _html_link_candidates_date_scan (Kontext, Extraktion, Gate, out.append)
-        # === END BLOCK: HTML DATE-SCAN (datetime attr + start/end + gating, v4) ===
+        # === END BLOCK: HTML DATE-SCAN (datetime attr + json-ld Event + start/end + gating, v5) ===
 
         # Kontext um die Fundstelle
         start = max(0, m.start() - 180)
@@ -1414,9 +1416,70 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 ev_date = iso_dates[0]
                 ev_end = iso_dates[-1] if len(iso_dates) > 1 else iso_dates[0]
 
+        # 3) Datum aus JSON-LD (Schema.org Event) im Link-Umfeld (sehr sauber, wenig Noise)
+        if not ev_date:
+            scripts = re.findall(
+                r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+                ctx_html,
+                flags=re.IGNORECASE | re.DOTALL,
+            )
+
+            def _iter_ld_nodes(obj):
+                if isinstance(obj, list):
+                    for it in obj:
+                        yield from _iter_ld_nodes(it)
+                elif isinstance(obj, dict):
+                    yield obj
+                    if "@graph" in obj:
+                        yield from _iter_ld_nodes(obj.get("@graph"))
+
+            def _is_event_type(tval) -> bool:
+                if isinstance(tval, str):
+                    return norm_key(tval) == "event" or norm_key(tval).endswith(":event")
+                if isinstance(tval, list):
+                    return any(_is_event_type(x) for x in tval)
+                return False
+
+            for raw in scripts:
+                raw = (raw or "").strip()
+                if not raw:
+                    continue
+                try:
+                    data = json.loads(raw)
+                except Exception:
+                    continue
+
+                for node in _iter_ld_nodes(data):
+                    if not isinstance(node, dict):
+                        continue
+                    if not _is_event_type(node.get("@type")):
+                        continue
+
+                    sd = norm(str(node.get("startDate") or ""))
+                    ed = norm(str(node.get("endDate") or ""))
+
+                    # "2026-03-15T19:30:00+01:00" -> "2026-03-15"
+                    if sd:
+                        sd = sd.split("T")[0].split(" ")[0]
+                    if ed:
+                        ed = ed.split("T")[0].split(" ")[0]
+
+                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
+                        ev_date = sd
+                        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
+                            ev_end = ed
+                        else:
+                            ev_end = sd
+                        break
+
+                if ev_date:
+                    break
+
         event_signal = bool(_EVENT_SIGNAL_RE.search(combined))
         url_key = norm_key(url)
-        url_seems_event = bool(re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key))
+        url_seems_event = bool(
+            re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
+        )
 
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
