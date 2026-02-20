@@ -1356,7 +1356,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
     - versucht Datum aus naher Umgebung (Anchor-Text + kleiner Kontext) zu ziehen
     - lässt Klassifizierung später entscheiden (classify_candidate)
     """
-        html_text = html_text or ""
+    html_text = html_text or ""
     fallback_year = datetime.now().year
     out: List[Dict[str, str]] = []
 
@@ -1527,69 +1527,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             }
         )
 
-            for raw in scripts:
-                raw = (raw or "").strip()
-                if not raw:
-                    continue
-                try:
-                    data = json.loads(raw)
-                except Exception:
-                    continue
-
-                for node in _iter_ld_nodes(data):
-                    if not isinstance(node, dict):
-                        continue
-                    if not _is_event_type(node.get("@type")):
-                        continue
-
-                    sd = norm(str(node.get("startDate") or ""))
-                    ed = norm(str(node.get("endDate") or ""))
-
-                    # "2026-03-15T19:30:00+01:00" -> "2026-03-15"
-                    if sd:
-                        sd = sd.split("T")[0].split(" ")[0]
-                    if ed:
-                        ed = ed.split("T")[0].split(" ")[0]
-
-                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
-                        ev_date = sd
-                        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
-                            ev_end = ed
-                        else:
-                            ev_end = sd
-                        break
-
-                if ev_date:
-                    break
-
-        event_signal = bool(_EVENT_SIGNAL_RE.search(combined))
-        url_key = norm_key(url)
-        url_seems_event = bool(
-            re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
-        )
-
-        # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
-        # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
-        if not ev_date and not event_signal:
-            continue
-        if ev_date and not event_signal and not url_seems_event:
-            continue
-
-        # Description kurz halten
-        desc = ctx[:500]
-
-        out.append(
-            {
-                "title": title,
-                "date": ev_date or "",
-                "endDate": (ev_end or "") if ev_date else "",
-                "time": "",
-                "location": "",
-                "url": canonical_url(url),
-                "description": desc,
-                "notes": "source=html_datescan",
-            }
-        )
+            
         if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
             break
 
