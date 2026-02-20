@@ -2155,9 +2155,9 @@ Umfang:
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
 
-/* === BEGIN BLOCK: APP HEADER (REAL sticky + brand visibility) ===
-Zweck: Flacher, appiger Header, Brand bleibt sichtbar, Actions ruhig + Top-App Touch Targets.
-Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
+/* === BEGIN BLOCK: APP HEADER (PREMIUM INTEGRATION v1) ===
+Zweck: Premium-Header-Integration (ruhiger Übergang, weniger Box-Gefühl)
+Umfang: Ersetzt ausschließlich .app-header
 === */
 .app-header{
   color: var(--color-text-primary);
@@ -2169,21 +2169,22 @@ Umfang: .app-header + Brand + Actions (nur innerhalb dieses Blocks).
   min-height: 48px;
   padding: 0 var(--gutter);
 
-  background: var(--color-primary-muted);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--color-primary-muted) 88%, white);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 
   display: flex;
   align-items: center;
   gap: 8px;
 
-  border-bottom: 1px solid rgba(31, 41, 51, 0.04);
+  border-bottom: 1px solid var(--divider);
   box-shadow:
-    0 1px 0 rgba(31, 41, 51, 0.03),
-    0 4px 14px rgba(31, 41, 51, 0.05);
+    0 1px 0 rgba(255,255,255,0.70) inset,
+    0 6px 16px rgba(31, 41, 51, 0.05);
 
   transform: translateZ(0);
 }
+/* === END BLOCK: APP HEADER (PREMIUM INTEGRATION v1) === */
 
 
 .app-header::after{ content: none; }
@@ -2533,6 +2534,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
