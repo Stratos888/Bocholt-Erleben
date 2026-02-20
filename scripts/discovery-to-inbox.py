@@ -458,7 +458,19 @@ def infer_location_time(title: str, description: str) -> Tuple[str, str]:
 
 
 _NON_EVENT_RE = re.compile("|".join(f"(?:{p})" for p in NON_EVENT_PATTERNS), re.IGNORECASE)
-_EVENT_SIGNAL_RE = re.compile("|".join(f"(?:{p})" for p in EVENT_SIGNAL_PATTERNS), re.IGNORECASE)
+_EVENT_SIGNAL_RE = re.compile(
+    r"\b("
+    r"konzert|live|festival|party|show|theater|kabarett|lesung|"
+    r"ausstellung|vernissage|führung|vortrag|seminar|kurs|workshop|"
+    r"treffen|treff|stammtisch|repair\s*cafe|repaircafe|"
+    r"markt|flohmarkt|basar|börse|messe|"
+    r"event|veranstaltung|programm|abend|nacht|"
+    r"kino|film|premiere|aufführung|performance|"
+    r"tag\s*der\s*offenen\s*tür|familientag|"
+    r"aktion|angebot"
+    r")\b",
+    re.IGNORECASE,
+)
 
 def _is_press_like_source(source_name: str, source_url: str) -> bool:
     key = f"{norm_key(source_name)} {norm_key(source_url)}"
