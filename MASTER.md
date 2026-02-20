@@ -543,7 +543,7 @@ Only token spacing allowed:
 
 Card internal padding: 16px
 
-Card vertical spacing: 24px
+Card vertical spacing: 16px
 
 No non-token spacing values allowed.
 
