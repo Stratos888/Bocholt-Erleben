@@ -590,16 +590,24 @@ Nur margin-Reset für Section Labels.
 
 
 /* Grid/Stack: nur Abstand, keine eigene Surface */
+/* === BEGIN FIX: EVENTS GRID GAP DENSITY (24 -> 16) ===
+Zweck:
+- Mehr „Information Density“ im ersten Viewport (insb. mit Tabbar).
+- Rhythmus bleibt strikt konsistent (ein Gap-Wert für alle direkten Nachbarn).
+Umfang:
+- Nur gap der .event-cards-grid (kein Layout/HTML/JS).
+=== */
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-lg); /* 16px */
 
   padding: 0;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 }
+/* === END FIX: EVENTS GRID GAP DENSITY (24 -> 16) === */
 
 
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
@@ -2478,6 +2486,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
