@@ -67,6 +67,37 @@ and provide replacement block separately.
 
 ---
 
+# NO-FILE, NO-DIFF RULE
+
+If the current file content is not provided (pasted or uploaded):
+
+DO NOT produce a diff.
+
+Stop and request the current file.
+
+---
+
+# EXACT BOUNDARY RULE
+
+BEGIN/END boundaries MUST be exact, verbatim lines from the provided file.
+
+Do not approximate line numbers.
+
+Prefer stable markers (e.g. "=== BEGIN BLOCK ===" / "=== END BLOCK ===").
+
+---
+
+# MATCH OR STOP RULE
+
+If the specified BEGIN/END lines cannot be found exactly in the provided file:
+
+Stop.
+
+Ask for the current file.
+
+---
+
+
 # MARKER RULE
 
 Every inserted or replaced block MUST include markers:
