@@ -121,7 +121,81 @@ RULE:
 Work ONLY on tasks listed here.
 
 Do not introduce unrelated improvements.
+/* === BEGIN INSERT: EXECUTION PRIORITY CONTROL (Golden Screen Primary, Pipeline Secondary) === */
 
+# EXECUTION PRIORITY CONTROL
+
+This section defines execution priority between UI Golden Screen and Discovery Pipeline.
+
+Both systems are allowed to evolve in parallel.
+
+However, priority order is strictly defined.
+
+---
+
+## PRIMARY OBJECTIVE — GOLDEN SCREEN FREEZE
+
+Golden Screen Freeze is the primary execution objective.
+
+Reason:
+
+Golden Screen becomes visual and UX baseline for entire product.
+
+Without Golden Screen Freeze, product lacks enterprise-grade visual foundation.
+
+Rule:
+
+Golden Screen tasks must be prioritized.
+
+Golden Screen Freeze must be achieved as early as possible.
+
+Golden Screen defines permanent UI reference.
+
+---
+
+## SECONDARY OBJECTIVE — DISCOVERY PIPELINE IMPROVEMENT
+
+Discovery Pipeline improvement is allowed in parallel.
+
+However:
+
+Golden Screen Freeze has priority.
+
+Pipeline work must not delay Golden Screen Freeze.
+
+Pipeline becomes primary focus only AFTER Golden Screen Freeze is achieved.
+
+---
+
+## EXECUTION RULE
+
+When session begins:
+
+If Golden Screen is not frozen:
+
+Golden Screen tasks have priority.
+
+Pipeline tasks may be executed in separate sessions.
+
+But Golden Screen Freeze remains primary milestone.
+
+---
+
+## FREEZE TRANSITION RULE
+
+After Golden Screen Freeze is achieved:
+
+Execution priority shifts.
+
+Pipeline improvement becomes primary objective.
+
+Golden Screen becomes frozen infrastructure.
+
+No visual changes allowed.
+
+Only bug fixes allowed.
+
+/* === END INSERT: EXECUTION PRIORITY CONTROL (Golden Screen Primary, Pipeline Secondary) === */
 ---
 
 # FROZEN AREAS
