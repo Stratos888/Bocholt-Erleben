@@ -1194,6 +1194,211 @@ def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
 # Umfang:
 # - Ersetzt nur die generische HTML-Parsing-Strecke (keine Dedupe/Inbox-Write Änderungen)
 # === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feeds + fallback date scan + KuKuG, v2) ===
+
+_HTML_A_RE = re.compile(r"<a\b[^>]*href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
+
+def _extract_event_date_de(text: str, fallback_year: int) -> str:
+    t = norm(text)
+    if not t:
+        return ""
+
+    # dd.mm.yyyy or dd.mm.yy
+    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        yy = m.group(3)
+        yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
+        try:
+            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # dd.mm. (year inferred)
+    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        try:
+            return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # dd. Monat yyyy / dd. Monat (year inferred)
+    month_map = {
+        "januar": 1, "jan": 1,
+        "februar": 2, "feb": 2,
+        "maerz": 3, "märz": 3, "mrz": 3,
+        "april": 4, "apr": 4,
+        "mai": 5,
+        "juni": 6, "jun": 6,
+        "juli": 7, "jul": 7,
+        "august": 8, "aug": 8,
+        "september": 9, "sep": 9,
+        "oktober": 10, "okt": 10,
+        "november": 11, "nov": 11,
+        "dezember": 12, "dez": 12,
+    }
+    m = re.search(r"(?<!\d)(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mon = norm_key(m.group(2))
+        yyyy = int(m.group(3)) if m.group(3) else fallback_year
+        mm = month_map.get(mon, 0)
+        if mm:
+            try:
+                return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            except Exception:
+                return ""
+
+    return ""
+
+def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    """
+    Sehr konservativer Fallback:
+    - sammelt <a href>text</a>
+    - versucht Datum aus naher Umgebung (Anchor-Text + kleiner Kontext) zu ziehen
+    - lässt Klassifizierung später entscheiden (classify_candidate)
+    """
+    html_text = html_text or ""
+    fallback_year = datetime.now().year
+    out: List[Dict[str, str]] = []
+
+    # Kontext: wir nutzen kurze Fenster um den Link (um Datum/Ort/Uhrzeit mitzunehmen)
+    for m in _HTML_A_RE.finditer(html_text):
+        href = norm(m.group(1))
+        inner = clean_text(m.group(2))
+        if not href:
+            continue
+
+        hk = norm_key(href)
+        if hk.startswith("mailto:") or hk.startswith("tel:") or hk.startswith("javascript:"):
+            continue
+        if hk.startswith("#"):
+            continue
+
+        url = _normalize_event_url(href, base_url)
+        if not url:
+            continue
+
+        # Kontext um die Fundstelle
+        start = max(0, m.start() - 180)
+        end = min(len(html_text), m.end() + 180)
+        ctx = clean_text(_strip_html_tags(html_text[start:end]))
+
+        title = inner or ""
+        if not title:
+            continue
+
+        # Datum aus Kontext
+        ev_date = _extract_event_date_de(f"{title}\n{ctx}", fallback_year)
+
+        # Description kurz halten
+        desc = ctx[:500]
+
+        out.append(
+            {
+                "title": title,
+                "date": ev_date or "",
+                "endDate": "",
+                "time": "",
+                "location": "",
+                "url": canonical_url(url),
+                "description": desc,
+                "notes": "source=html_datescan",
+            }
+        )
+
+        if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+            break
+
+    return out
+
+def _kukug_expand_portfolio_links(html_text: str, base_url: str) -> List[str]:
+    """
+    KuKuG: Programmübersicht listet oft nur Teaser.
+    Wir sammeln /portfolio-items/ Links und geben sie zum Nachladen zurück.
+    """
+    html_text = html_text or ""
+    links: List[str] = []
+    for href in re.findall(r"href=['\"]([^'\"]+)['\"]", html_text, flags=re.IGNORECASE):
+        h = norm(href)
+        if not h:
+            continue
+        hk = norm_key(h)
+        if "/portfolio-items/" not in hk:
+            continue
+        u = _normalize_event_url(h, base_url)
+        if u and u not in links:
+            links.append(u)
+    return links[:10]
+
+def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
+    html_text = html_text or ""
+    base_url = norm(base_url)
+
+    # 1) JSON-LD Events
+    out = parse_html_jsonld_events(html_text, base_url)
+    if out:
+        return out
+
+    # 2) KuKuG Spezial: Detailseiten nachladen und dort JSON-LD/DateScan anwenden
+    if ("/themen-tipps" in norm_key(base_url)) or ("kukug" in norm_key(base_url)):
+        detail_urls = _kukug_expand_portfolio_links(html_text, base_url)
+        collected: List[Dict[str, str]] = []
+        for du in detail_urls:
+            try:
+                detail_html = safe_fetch(du)
+            except Exception:
+                continue
+
+            # erst JSON-LD, sonst DateScan
+            d = parse_html_jsonld_events(detail_html, du)
+            if not d:
+                d = _html_link_candidates_date_scan(detail_html, du)
+
+            for c in d:
+                # notes erweitern (ohne zu lang zu werden)
+                c["notes"] = clean_text((c.get("notes", "") + f"; via=portfolio:{du}")[:180])
+                collected.append(c)
+
+            if len(collected) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+                break
+
+        if collected:
+            return collected
+
+    # 3) Feed/ICS Autodiscovery → nachladen und als RSS/ICS parsen
+    feed_urls = discover_feeds_from_html(html_text, base_url)
+    collected2: List[Dict[str, str]] = []
+    for fu in feed_urls:
+        try:
+            feed_text = safe_fetch(fu)
+        except Exception:
+            continue
+
+        fk = norm_key(fu)
+        parsed: List[Dict[str, str]] = []
+        try:
+            if fk.endswith(".ics") or ("text/calendar" in fk) or ("format=ical" in fk) or ("?ical=1" in fk) or ("&ical=1" in fk):
+                parsed = parse_ics_events(feed_text)
+            else:
+                parsed = parse_rss(feed_text)
+        except Exception:
+            parsed = []
+
+        for c in parsed:
+            c["notes"] = clean_text((c.get("notes", "") + f"; source=html_feed:{fu}")[:180])
+            collected2.append(c)
+
+        if len(collected2) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+            break
+
+    if collected2:
+        return collected2
+
+    # 4) Fallback: Date-Scan
+    return _html_link_candidates_date_scan(html_text, base_url)
 # === BEGIN BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v1) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
@@ -1710,7 +1915,7 @@ def main() -> None:
             candidates = []
 
         # kurz halten (Sheet + PWA)
-        err_msg = clean_text(err_msg)[:180]
+        err_msg = clean_text(err_msg)[:180]]
 
         candidates: List[Dict[str, str]] = []
         health_status = "ok"
