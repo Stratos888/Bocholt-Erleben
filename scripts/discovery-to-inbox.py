@@ -1194,8 +1194,20 @@ def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
 # Umfang:
 # - Ersetzt nur die generische HTML-Parsing-Strecke (keine Dedupe/Inbox-Write Änderungen)
 # === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feeds + fallback date scan + KuKuG, v2) ===
+# === BEGIN BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Parst https://www.bocholt.de/veranstaltungskalender (Listenansicht) in Kandidaten
+# - Extrahiert title, date (ISO), time (HH:MM), location, url
+# Umfang:
+# - Neue Funktion parse_bocholt_calendar_html + kleine Helpers
+# === END BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v1) ===
 
-_MONTHS_DE = {
+_BOCHOLT_WEEKDAYS = (
+    "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
+)
+
+_BOCHOLT_MONTHS = {
     "januar": 1,
     "februar": 2,
     "märz": 3,
@@ -1211,103 +1223,122 @@ _MONTHS_DE = {
     "dezember": 12,
 }
 
-_RE_DATE_DDMMYYYY = re.compile(r"\b([0-3]?\d)\.([01]?\d)\.(\d{4})\b")
-_RE_DATE_DDMM = re.compile(r"\b([0-3]?\d)\.([01]?\d)\.(?!\d)\b")
-_RE_DATE_DD_MONAT = re.compile(
-    r"\b([0-3]?\d)\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)(?:\s*(\d{4}))?\b",
-    re.IGNORECASE,
-)
+def _strip_html_tags(s: str) -> str:
+    s = s or ""
+    s = re.sub(r"<\s*br\s*/?\s*>", " ", s, flags=re.IGNORECASE)
+    s = re.sub(r"<[^>]+>", " ", s)
+    return clean_text(s)
 
-_RE_A_TAG = re.compile(r"<a\s+[^>]*href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
+def _bocholt_infer_year(month: int) -> int:
+    today = datetime.now().date()
+    y = today.year
+    # Wenn der Monat "weit zurück" wirkt, behandeln wir es als nächstes Jahr (Jahreswechsel-heuristik)
+    if month and today.month in (11, 12) and month in (1, 2, 3, 4):
+        y += 1
+    return y
 
-def _date_from_match_groups(dd: str, mm: str, yyyy: str) -> str:
+def _bocholt_parse_date_from_text(t: str) -> str:
+    # Beispiel: "Freitag, 20. Februar,"
+    m = re.search(
+        r"(?:%s)\s*,\s*(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)" % "|".join(_BOCHOLT_WEEKDAYS),
+        t,
+        flags=re.IGNORECASE,
+    )
+    if not m:
+        return ""
+    day = int(m.group(1))
+    mon_name = norm(m.group(2)).lower()
+    mon_name = mon_name.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+    month = _BOCHOLT_MONTHS.get(mon_name, 0)
+    if not month:
+        return ""
+    year = _bocholt_infer_year(month)
     try:
-        d = date(int(yyyy), int(mm), int(dd))
-        return d.strftime("%Y-%m-%d")
+        return date(year, month, day).isoformat()
     except Exception:
         return ""
 
-def _parse_de_date_any(text_snip: str) -> str:
-    s = clean_text(text_snip)
-
-    m = _RE_DATE_DDMMYYYY.search(s)
+def _bocholt_parse_time_from_text(t: str) -> str:
+    # nimmt die erste Uhrzeit (HH:MM) als time
+    m = re.search(r"\b(\d{1,2}:\d{2})\s*Uhr\b", t)
     if m:
-        return _date_from_match_groups(m.group(1), m.group(2), m.group(3))
-
-    m = _RE_DATE_DD_MONAT.search(s)
+        hhmm = m.group(1)
+        if len(hhmm) == 4:  # "9:00"
+            hhmm = "0" + hhmm
+        return hhmm
+    # "ab 20:00 Uhr"
+    m = re.search(r"\bab\s*(\d{1,2}:\d{2})\s*Uhr\b", t, flags=re.IGNORECASE)
     if m:
-        dd = int(m.group(1))
-        mon = norm_key(m.group(2))
-        yyyy = m.group(3)
-        mm = _MONTHS_DE.get(mon, 0)
-        if mm:
-            y = int(yyyy) if yyyy else datetime.now().date().year
-            iso = _date_from_match_groups(str(dd), str(mm), str(y))
-            if not iso:
-                return ""
-            if not yyyy:
-                today = datetime.now().date()
-                try:
-                    d0 = datetime.strptime(iso, "%Y-%m-%d").date()
-                    if d0 < today and (today - d0).days > DATE_WINDOW_ALLOW_PAST_DAYS:
-                        iso2 = _date_from_match_groups(str(dd), str(mm), str(y + 1))
-                        return iso2 or iso
-                except Exception:
-                    pass
-            return iso
-
-    m = _RE_DATE_DDMM.search(s)
-    if m:
-        dd = int(m.group(1))
-        mm = int(m.group(2))
-        y = datetime.now().date().year
-        iso = _date_from_match_groups(str(dd), str(mm), str(y))
-        if not iso:
-            return ""
-        today = datetime.now().date()
-        try:
-            d0 = datetime.strptime(iso, "%Y-%m-%d").date()
-            if d0 < today and (today - d0).days > DATE_WINDOW_ALLOW_PAST_DAYS:
-                iso2 = _date_from_match_groups(str(dd), str(mm), str(y + 1))
-                return iso2 or iso
-        except Exception:
-            pass
-        return iso
-
+        hhmm = m.group(1)
+        if len(hhmm) == 4:
+            hhmm = "0" + hhmm
+        return hhmm
     return ""
 
-def parse_html_fallback_date_scan(html_text: str, base_url: str) -> List[Dict[str, str]]:
-    """
-    Fallback, wenn keine JSON-LD Events und keine Feeds gefunden werden:
-    - Sucht Datumsmuster im Umfeld von <a href=...> und erzeugt Kandidaten.
-    """
+def _bocholt_parse_location_from_text(t: str) -> str:
+    # oft: "... 09:00 Uhr - 11:30 Uhr, Volksbank Bocholt eG ..."
+    # oder: "... ab 20:00 Uhr Innenstadt"
+    m = re.search(r"Uhr\s*(?:-\s*\d{1,2}:\d{2}\s*Uhr\s*)?,\s*([^,]{3,120})", t)
+    if m:
+        return clean_text(m.group(1))
+    m = re.search(r"\bab\s*\d{1,2}:\d{2}\s*Uhr\s+([^,]{3,120})", t, flags=re.IGNORECASE)
+    if m:
+        return clean_text(m.group(1))
+    return ""
+
+def _bocholt_cleanup_title(t: str) -> str:
+    # Entfernt doppeltes Genre-Präfix: "Wirtschaft Wirtschaft <Title>"
+    t = clean_text(t)
+    # wiederholte Prefix-Sequenz (bis 40 Zeichen) entfernen
+    m = re.match(r"^(.{3,40}?)\s+\1\s+(.*)$", t)
+    if m:
+        return clean_text(m.group(2))
+    return t
+
+def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str, str]]:
     html_text = html_text or ""
+
+    # 1) Sammle alle <a ...>...</a> Kandidaten
+    anchors = re.findall(
+        r"<a\b([^>]*?)>(.*?)</a>",
+        html_text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
     out: List[Dict[str, str]] = []
-    seen = set()
+    seen: set = set()
 
-    max_events = int(os.environ.get("MAX_HTML_EVENTS", "80"))
-    for m in _RE_A_TAG.finditer(html_text):
-        href = norm(m.group(1) or "")
-        a_text = clean_text(m.group(2) or "")
-        if not href:
-            continue
-        hk = norm_key(href)
-        if hk.startswith(("mailto:", "tel:", "javascript:")):
+    for attrs, inner in anchors:
+        inner_txt = _strip_html_tags(inner)
+        if not inner_txt:
             continue
 
-        s0 = max(0, m.start() - 250)
-        s1 = min(len(html_text), m.end() + 250)
-        around = html_text[s0:s1]
+        # muss einen klaren Wochentag enthalten (typisch für Einträge)
+        if not re.search(r"(?:%s)\s*," % "|".join(_BOCHOLT_WEEKDAYS), inner_txt):
+            continue
 
-        d_iso = _parse_de_date_any(around)
+        d_iso = _bocholt_parse_date_from_text(inner_txt)
         if not d_iso:
             continue
 
-        title = a_text or clean_text(around)
-        if not title or len(title) < 4:
+        time_str = _bocholt_parse_time_from_text(inner_txt)
+        loc = _bocholt_parse_location_from_text(inner_txt)
+
+        # href extrahieren
+        href = ""
+        m = re.search(r'href\s*=\s*["\']([^"\']+)["\']', attrs, flags=re.IGNORECASE)
+        if m:
+            href = norm(m.group(1))
+
+        url = _normalize_event_url(href, base_url) if href else canonical_url(base_url)
+
+        # Titel: alles VOR dem Wochentagsteil ist meistens Genre+Titel
+        title_part = inner_txt.split(",", 1)[0]  # "Wirtschaft Wirtschaft Zoll im Dialog: ..."
+        title = _bocholt_cleanup_title(title_part)
+
+        if not title:
             continue
 
-        url = _normalize_event_url(href, base_url)
         fp = (slugify(title), d_iso, norm_key(url))
         if fp in seen:
             continue
@@ -1318,95 +1349,18 @@ def parse_html_fallback_date_scan(html_text: str, base_url: str) -> List[Dict[st
                 "title": title,
                 "date": d_iso,
                 "endDate": "",
-                "time": "",
-                "location": "",
+                "time": time_str,
+                "location": loc,
                 "url": url,
                 "description": "",
-                "notes": "source=html_fallback_date_scan",
+                "notes": "source=bocholt_veranstaltungskalender_html",
             }
         )
-        if len(out) >= max_events:
+
+        if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
             break
 
-    return out
-
-def parse_kukug_themen_tipps(html_text: str, base_url: str) -> List[Dict[str, str]]:
-    """
-    KuKuG Spezial:
-    - /themen-tipps/ listet Teaser, die auf /portfolio-items/... Detailseiten verlinken.
-    - Detailseiten werden wie normale HTML-Eventquellen geparst (JSON-LD oder Fallback-Date-Scan).
-    """
-    html_text = html_text or ""
-    links = []
-    for href in re.findall(r"href=['\"]([^'\"]+)['\"]", html_text, flags=re.IGNORECASE):
-        h = norm(href)
-        if "/portfolio-items/" not in norm_key(h):
-            continue
-        u = _normalize_event_url(h, base_url)
-        if u and u not in links:
-            links.append(u)
-
-    out: List[Dict[str, str]] = []
-    for u in links:
-        try:
-            detail = safe_fetch(u)
-        except Exception:
-            continue
-
-        cand = parse_html_jsonld_events(detail, u) or parse_html_fallback_date_scan(detail, u)
-        for x in cand:
-            x["url"] = canonical_url(x.get("url", "")) or canonical_url(u)
-            x["notes"] = (clean_text(x.get("notes", "")) + (" | " if x.get("notes") else "") + "source=html_kukug_portfolio")
-            out.append(x)
-
-            if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
-                return out
-
-    return out
-
-def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
-    """
-    Generic HTML -> candidates:
-    1) JSON-LD Events
-    2) Feed Autodiscovery -> fetch feed -> parse_rss/parse_ics_events
-    3) Fallback: Date-Scan (dd.mm.yyyy / dd.mm. / dd. Monat)
-    4) KuKuG Spezial: /themen-tipps/ -> /portfolio-items/
-    """
-
-    if "kukug-bocholt.de/themen-tipps" in norm_key(base_url):
-        cand = parse_kukug_themen_tipps(html_text, base_url)
-        if cand:
-            return cand
-
-    candidates = parse_html_jsonld_events(html_text, base_url)
-    if candidates:
-        return candidates
-
-    feeds = discover_feeds_from_html(html_text, base_url)
-    for fu in feeds:
-        try:
-            fc = safe_fetch(fu)
-            if norm_key(fu).endswith(".ics") or ("ical" in norm_key(fu)) or ("text/calendar" in norm_key(fu)):
-                cand = parse_ics_events(fc)
-            else:
-                cand = parse_rss(fc)
-            if cand:
-                for x in cand:
-                    x["notes"] = (
-                        clean_text(x.get("notes", ""))
-                        + (" | " if x.get("notes") else "")
-                        + f"source=html_feed:{canonical_url(fu)}"
-                    )
-                return cand
-        except Exception:
-            continue
-
-    return parse_html_fallback_date_scan(html_text, base_url)
-
-# === END BLOCK: GENERIC HTML EVENT PARSER (jsonld + feed autodiscovery, v1) ===
-
-
-    
+    return out 
 # === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
@@ -1700,15 +1654,62 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-        # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v4 html-generic) ===
+                # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 bocholt-first) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - candidates ist IMMER definiert
+        # - Bocholt Veranstaltungskalender robust parsen (bocholt-first), bevor generische HTML-Heuristiken laufen
         # - Health pro Quelle loggen (ok / fetch_error / parse_error / unsupported)
-        # - HTML: generischer Parser (JSON-LD Events + Feed-Autodiscovery), bocholt-spezial bleibt als Fallback
         # Umfang:
         # - ersetzt nur den Dispatch-Block; Events/Inbox Logik bleibt danach unverändert
-        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v4 html-generic) ===
+        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 bocholt-first) ===
+
+        candidates: List[Dict[str, str]] = []
+        health_status = "ok"
+        http_status = ""
+        err_msg = ""
+        checked_at = now_iso()
+
+        try:
+            content = safe_fetch(url)
+
+            if stype in ("ical", "ics"):
+                candidates = parse_ics_events(content)
+
+            elif stype == "rss":
+                candidates = parse_rss(content)
+
+            elif stype == "json":
+                candidates = parse_json(content, url)
+
+            elif stype == "html":
+                # Bocholt-first (deterministisch, nicht von JSON-LD/Feed abhängig)
+                if "bocholt.de/veranstaltungskalender" in norm_key(url):
+                    candidates = parse_bocholt_calendar_html(content, url)
+
+                # Fallbacks
+                if not candidates:
+                    candidates = parse_html_generic_events(content, url)
+
+            else:
+                health_status = "unsupported"
+                err_msg = f"unsupported type: {stype}"
+                candidates = []
+
+        except urllib.error.HTTPError as e:
+            health_status = "fetch_error"
+            http_status = str(getattr(e, "code", "") or "")
+            err_msg = f"HTTP Error {http_status}: {getattr(e, 'reason', '')}".strip()
+            info(f"Parse failed: {source_name}: {e}")
+            candidates = []
+
+        except Exception as e:
+            health_status = "parse_error"
+            err_msg = str(e)
+            info(f"Parse failed: {source_name}: {e}")
+            candidates = []
+
+        # kurz halten (Sheet + PWA)
+        err_msg = clean_text(err_msg)[:180]
 
         candidates: List[Dict[str, str]] = []
         health_status = "ok"
