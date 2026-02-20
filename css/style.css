@@ -585,9 +585,18 @@ Section Header klar als Gruppierung sichtbar machen,
 ohne Layout oder Rhythmus zu verändern.
 === */
 
+/* === BEGIN BLOCK: SECTION HEADER (FINAL ENTERPRISE RHYTHM) ===
+Zweck:
+- Perfekt konsistenter Feed-Rhythmus
+- Abstand wird ausschließlich vom Grid (gap:16px) gesteuert
+- Keine zusätzlichen margin-Offsets
+
+Enterprise-Standard für Feed-Apps
+=== */
+
 .events-section-title{
 
-  margin: 24px 0 6px;
+  margin: 0;
 
   font-weight: 700;
   font-size: 0.76rem;
@@ -600,6 +609,7 @@ ohne Layout oder Rhythmus zu verändern.
 
 }
 
+/* === END BLOCK: SECTION HEADER (FINAL ENTERPRISE RHYTHM) === */
 /* === END POLISH: SECTION HEADER PREMIUM HIERARCHY === */
 
 /* === END FIX: GOLDEN SCREEN RHYTHM NORMALIZATION === */
@@ -2523,6 +2533,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
