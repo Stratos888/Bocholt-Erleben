@@ -1859,7 +1859,7 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-        # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 CONSOLIDATED) ===
+             # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 CONSOLIDATED) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
         # - EINMALIGER Dispatch (kein Duplikat)
@@ -1915,7 +1915,7 @@ def main() -> None:
             candidates = []
 
         # kurz halten (Sheet + PWA)
-        err_msg = clean_text(err_msg)[:180]]
+        err_msg = clean_text(err_msg)[:180]
 
         candidates: List[Dict[str, str]] = []
         health_status = "ok"
