@@ -1100,7 +1100,10 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
 }
 
 /* === BEGIN FIX: SEARCH FOCUS RGBA ALPHA TYPO (stable across browsers) === */
-#search-filter:focus{
+/* === BEGIN FIX: SEARCH FOCUS STATE (focus + focus-visible) === */
+#search-filter:focus,
+#search-filter:focus-visible{
+/* === END FIX: SEARCH FOCUS STATE (focus + focus-visible) === */
   outline: none;
   border-color: rgba(139,207,74,.55);
   background: rgba(255,255,255,0.98);
@@ -2603,6 +2606,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
