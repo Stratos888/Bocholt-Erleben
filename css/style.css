@@ -679,16 +679,26 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 === */
 
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
+/* === BEGIN FIX: EVENT CARD RAIL FLUSH + SINGLE SOURCE OF TRUTH ===
+Zweck:
+- Rail startet an der Card-Kante (nicht erst nach padding-left)
+- Badge kann nicht „über den Rail-Rand“ wirken
+- Ein Wert steuert Grid-Spalte + Rail-Breite (inkl. padding-Kompensation)
+Umfang:
+- Ersetzt .event-card + .event-card::before innerhalb EVENT CARD FINAL LAYOUT
+=== */
+
+/* --- Card: 2 Spalten (Rail | Content) --- */
 .event-card{
   position: relative;
   overflow: hidden;
 
   display: grid;
 
-  /* === BEGIN FIX: DATE BADGE CENTERING IN RAIL === */
-  grid-template-columns: 60px 1fr;
-  /* === END FIX: DATE BADGE CENTERING IN RAIL === */
+  /* Rail-Kernbreite (ohne padding); Gesamtbreite der Rail-Spalte = rail + padding-left */
+  --rail-w: 44px;
 
+  grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
   column-gap: var(--space-md);
   align-items: center;
 
@@ -697,10 +707,7 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   background: var(--surface);
 
   border: 1px solid rgba(31,41,51,0.055);
-
-  /* === BEGIN FIX: EVENT CARD ELITE SURFACE RADIUS === */
   border-radius: 16px;
-  /* === END FIX: EVENT CARD ELITE SURFACE RADIUS === */
 
   box-shadow:
     0 1px 1px rgba(0,0,0,0.035),
@@ -710,24 +717,30 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease, background 140ms ease;
 }
 
-/* Linke „Rail“ für Integration des Date-Badges (soft fade statt harter Fläche) */
+/* Linke Rail: flush bis Card-Kante, ohne optische Drift */
 .event-card::before{
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
 
-  /* === BEGIN FIX: RAIL WIDTH MATCHES GRID === */
-  width: 60px;
-  /* === END FIX: RAIL WIDTH MATCHES GRID === */
+  /* Flush bis zur Card-Kante (Containing-Block startet an padding edge → kompensieren) */
+  left: calc(var(--space-lg) * -1);
 
- /* === BEGIN POLISH: RAIL SOLID SURFACE (top-app, no optical drift) === */
-background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
-/* === END POLISH: RAIL SOLID SURFACE (top-app, no optical drift) === */
+  width: calc(var(--rail-w) + var(--space-lg));
+
+  background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
   opacity: 0.55;
 
   box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
   pointer-events: none;
 }
+
+.event-card > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* === END FIX: EVENT CARD RAIL FLUSH + SINGLE SOURCE OF TRUTH === */
 
 .event-card > *{
   position: relative;
@@ -773,12 +786,17 @@ Umfang:
 - Nur .event-date-badge + .event-date-badge__wday/__day/__month
 === */
 
+/* === BEGIN FIX: EVENT DATE BADGE CENTER LOCK (grid column) ===
+Zweck:
+- Badge zentriert in der Rail-Spalte (horizontal + vertikal), ohne optische Drift
+Umfang:
+- Nur .event-date-badge Block
+=== */
 .event-date-badge{
   width: 42px;
 
-  /* === BEGIN FIX: CENTER BADGE IN GRID COLUMN === */
   justify-self: center;
-  /* === END FIX: CENTER BADGE IN GRID COLUMN === */
+  align-self: center;
 
   display: flex;
   flex-direction: column;
@@ -799,6 +817,7 @@ Umfang:
   line-height: 1;
   text-align: center;
 }
+/* === END FIX: EVENT DATE BADGE CENTER LOCK (grid column) === */
 
 /* === BEGIN BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) ===
 Zweck: Premium-Hierarchie im Date-Chip → Zahl dominiert, Labels ruhig
@@ -920,15 +939,23 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 }
 
 /* Mobile fein */
+/* === BEGIN FIX: EVENT CARD MOBILE RAIL SYNC (rail flush + centered badge) ===
+Zweck:
+- Rail/Spalte bleibt konsistent zur Desktop-Logik (inkl. flush bis Card-Kante)
+- Keine getrennten Width-Overrides mehr für ::before
+Umfang:
+- Nur @media (max-width: 360px) innerhalb EVENT CARD FINAL LAYOUT
+=== */
 @media (max-width: 360px){
   .event-card{
-    grid-template-columns: 56px 1fr;
+    --rail-w: 40px;
+    grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
     column-gap: var(--space-md);
     padding: var(--space-lg);
   }
-  .event-card::before{ width: 56px; }
   .event-date-badge{ width: 40px; }
 }
+/* === END FIX: EVENT CARD MOBILE RAIL SYNC (rail flush + centered badge) === */
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
 
@@ -2608,6 +2635,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
