@@ -1099,11 +1099,15 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   font-weight: 550;
 }
 
-/* === BEGIN FIX: SEARCH FOCUS RGBA ALPHA TYPO (stable across browsers) === */
-/* === BEGIN FIX: SEARCH FOCUS STATE (focus + focus-visible) === */
+/* === BEGIN FIX: SEARCH FOCUS STATE (focus + focus-visible, consolidated) ===
+Zweck:
+- Ein einziger, sauberer Focus-Block (kein Marker-Nesting)
+- Greift für Maus (focus) + Tastatur (focus-visible)
+Umfang:
+- Nur Focus-Styles für #search-filter
+=== */
 #search-filter:focus,
 #search-filter:focus-visible{
-/* === END FIX: SEARCH FOCUS STATE (focus + focus-visible) === */
   outline: none;
   border-color: rgba(139,207,74,.55);
   background: rgba(255,255,255,0.98);
@@ -1112,7 +1116,7 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
     0 0 0 3px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
-/* === END FIX: SEARCH FOCUS RGBA ALPHA TYPO (stable across browsers) === */
+/* === END FIX: SEARCH FOCUS STATE (focus + focus-visible, consolidated) === */
 /* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
 
 
@@ -2606,6 +2610,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
