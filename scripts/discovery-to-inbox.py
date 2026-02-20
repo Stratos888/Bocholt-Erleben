@@ -1377,10 +1377,20 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         if not url:
             continue
 
+               # === BEGIN BLOCK: HTML DATE-SCAN (datetime attr + start/end + gating, v4) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Reduziert review:event_signal_missing_date durch Auslesen von <time datetime="YYYY-MM-DD...">
+        # - Nutzt weiterhin _extract_event_date_de (start+end) + bestehendes Noise-Gating
+        # Umfang:
+        # - Ersetzt nur den Date-Scan-Teil innerhalb _html_link_candidates_date_scan (Kontext, Extraktion, Gate, out.append)
+        # === END BLOCK: HTML DATE-SCAN (datetime attr + start/end + gating, v4) ===
+
         # Kontext um die Fundstelle
         start = max(0, m.start() - 180)
         end = min(len(html_text), m.end() + 180)
-        ctx = clean_text(_strip_html_tags(html_text[start:end]))
+        ctx_html = html_text[start:end]
+        ctx = clean_text(_strip_html_tags(ctx_html))
 
         title = inner or ""
         if not title:
@@ -1388,17 +1398,21 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         combined = f"{title}\n{ctx}"
 
-               # === BEGIN BLOCK: HTML DATE-SCAN (start+end + gating, v3) ===
-        # Datei: scripts/discovery-to-inbox.py
-        # Zweck:
-        # - _extract_event_date_de liefert (startDate, endDate)
-        # - Noise-Kontrolle: (Datum ODER Event-Signal), aber Datum-only nur bei event-typischer URL
-        # Umfang:
-        # - Ersetzt nur: Datum-Extraktion + Gate + Candidate-Feld endDate im Date-Scan
-        # === END BLOCK: HTML DATE-SCAN (start+end + gating, v3) ===
-
-        # Datum aus Kontext
+        # 1) Datum aus Kontext (DE/ISO/Slash + Ranges -> (start,end))
         ev_date, ev_end = _extract_event_date_de(combined, fallback_year)
+
+        # 2) Datum aus HTML-Attributen (sehr sicher): datetime="YYYY-MM-DD..."
+        if not ev_date:
+            iso_dates = re.findall(
+                r"datetime\s*=\s*['\"](\d{4}-\d{2}-\d{2})(?:[T\s][^'\"]*)?['\"]",
+                ctx_html,
+                flags=re.IGNORECASE,
+            )
+            iso_dates = [d for d in iso_dates if d]
+            if iso_dates:
+                iso_dates = sorted(set(iso_dates))
+                ev_date = iso_dates[0]
+                ev_end = iso_dates[-1] if len(iso_dates) > 1 else iso_dates[0]
 
         event_signal = bool(_EVENT_SIGNAL_RE.search(combined))
         url_key = norm_key(url)
