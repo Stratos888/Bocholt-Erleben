@@ -1917,53 +1917,7 @@ def main() -> None:
         # kurz halten (Sheet + PWA)
         err_msg = clean_text(err_msg)[:180]
 
-        candidates: List[Dict[str, str]] = []
-        health_status = "ok"
-        http_status = ""
-        err_msg = ""
-        checked_at = now_iso()
-
-        try:
-            content = safe_fetch(url)
-
-            if stype in ("ical", "ics"):
-                candidates = parse_ics_events(content)
-
-            elif stype == "rss":
-                candidates = parse_rss(content)
-
-            elif stype == "json":
-                candidates = parse_json(content, url)
-
-            elif stype == "html":
-                # 1) Generic: JSON-LD (@type=Event) direkt aus HTML
-                # 2) Generic: Feed/ICS Autodiscovery aus HTML und dann RSS/ICS nachladen
-                # 3) Fallback: bocholt-spezifischer Kalenderparser (wenn URL passt)
-                candidates = parse_html_generic_events(content, url)
-
-                if (not candidates) and ("bocholt.de/veranstaltungskalender" in norm_key(url)):
-                    candidates = parse_bocholt_calendar_html(content, url)
-
-            else:
-                health_status = "unsupported"
-                err_msg = f"unsupported type: {stype}"
-                candidates = []
-
-        except urllib.error.HTTPError as e:
-            health_status = "fetch_error"
-            http_status = str(getattr(e, "code", "") or "")
-            err_msg = f"HTTP Error {http_status}: {getattr(e, 'reason', '')}".strip()
-            info(f"Parse failed: {source_name}: {e}")
-            candidates = []
-
-        except Exception as e:
-            health_status = "parse_error"
-            err_msg = str(e)
-            info(f"Parse failed: {source_name}: {e}")
-            candidates = []
-
-        # kurz halten (Sheet + PWA)
-        err_msg = clean_text(err_msg)[:180]
+ 
 
 
         total_candidates += len(candidates)
