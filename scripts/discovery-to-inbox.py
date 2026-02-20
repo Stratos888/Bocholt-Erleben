@@ -1368,9 +1368,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
     # Umfang:
     # - Nur lokale Variablen für _html_link_candidates_date_scan
     # === END BLOCK: DETAIL FETCH BUDGET (missing_date enrichment, v1) ===
-    detail_fetch_budget = int(os.environ.get("MAX_DETAIL_FETCH", "20"))
+    detail_fetch_budget = int(os.environ.get("MAX_DETAIL_FETCH", "60"))
     detail_fetch_timeout = int(os.environ.get("DETAIL_FETCH_TIMEOUT", "15"))
+    detail_fetch_host_cap = int(os.environ.get("MAX_DETAIL_FETCH_PER_HOST", "8"))
     detail_fetch_count = 0
+    detail_fetch_by_host: Dict[str, int] = {}
     detail_html_cache: Dict[str, str] = {}
 
     # Kontext: wir nutzen kurze Fenster um den Link (um Datum/Ort/Uhrzeit mitzunehmen)
@@ -1443,7 +1445,16 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # - Noise/Load-Kontrolle: nur bei (event_signal AND url_seems_event) und nur budgetiert; Cache verhindert Re-Fetch.
         # Umfang:
         # - Ersetzt nur den bestehenden Detail-Fetch-Block innerhalb _html_link_candidates_date_scan (keine UI/andere Logik).
-        if (not ev_date) and event_signal and url_seems_event and (detail_fetch_count < detail_fetch_budget):
+        host = (urlparse(url).netloc or "").lower()
+        host_fetches = detail_fetch_by_host.get(host, 0)
+
+        if (
+            (not ev_date)
+            and event_signal
+            and url_seems_event
+            and (detail_fetch_count < detail_fetch_budget)
+            and (host_fetches < detail_fetch_host_cap)
+        ):
             # Cache: nur einmal pro URL fetch-en (auch wenn Ergebnis leer ist)
             if url not in detail_html_cache:
                 try:
@@ -1451,6 +1462,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 except Exception:
                     detail_html_cache[url] = ""
                 detail_fetch_count += 1
+                detail_fetch_by_host[host] = host_fetches + 1
 
             detail_html = detail_html_cache.get(url, "") or ""
 
