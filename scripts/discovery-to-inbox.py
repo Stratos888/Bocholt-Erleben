@@ -1435,18 +1435,27 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
         )
 
-        # 3) NEU: Wenn Event-Signal da ist, aber Datum fehlt -> Detailseite budgetiert nachladen und JSON-LD Event auslesen
+              # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text, v1) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Schließt die Hauptlücke review:event_signal_missing_date:
+        #   Wenn JSON-LD kein Datum liefert, Detailseiten-HTML nachladen und Datum mit _extract_event_date_de extrahieren.
+        # - Noise/Load-Kontrolle: nur bei (event_signal AND url_seems_event) und nur budgetiert; Cache verhindert Re-Fetch.
+        # Umfang:
+        # - Ersetzt nur den bestehenden Detail-Fetch-Block innerhalb _html_link_candidates_date_scan (keine UI/andere Logik).
         if (not ev_date) and event_signal and url_seems_event and (detail_fetch_count < detail_fetch_budget):
-            detail_html = detail_html_cache.get(url, "")
-            if detail_html == "":
+            # Cache: nur einmal pro URL fetch-en (auch wenn Ergebnis leer ist)
+            if url not in detail_html_cache:
                 try:
-                    detail_html = safe_fetch(url, timeout=detail_fetch_timeout)
+                    detail_html_cache[url] = safe_fetch(url, timeout=detail_fetch_timeout)
                 except Exception:
-                    detail_html = ""
-                detail_html_cache[url] = detail_html
+                    detail_html_cache[url] = ""
                 detail_fetch_count += 1
 
+            detail_html = detail_html_cache.get(url, "") or ""
+
             if detail_html:
+                # 1) JSON-LD Event startDate/endDate
                 scripts = re.findall(
                     r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
                     detail_html,
@@ -1504,6 +1513,16 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                     if ev_date:
                         break
 
+                # 2) Fallback: Datum aus Detailseiten-Text (DE/ISO/Slash/Ranges) extrahieren
+                if not ev_date:
+                    detail_text = clean_text(_strip_html_tags(detail_html))
+                    # Begrenzen, damit wir nicht unnötig viel Text parsen
+                    detail_combined = f"{title}\n{detail_text[:6000]}"
+                    d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
+                    if d_sd:
+                        ev_date = d_sd
+                        ev_end = d_ed or d_sd
+        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text, v1) ===
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
         if not ev_date and not event_signal:
