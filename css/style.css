@@ -731,6 +731,14 @@ Umfang:
 
 
 
+/* === BEGIN POLISH: EVENT DATE BADGE MICRO-HIERARCHY (less sticker, contrast tuning) ===
+Zweck:
+- Date-Badge wirkt weniger „Sticker“, mehr integriert
+- Hierarchie feiner: Zahl dominiert, Labels ruhiger (Kontrast-Feintuning)
+Umfang:
+- Nur .event-date-badge + .event-date-badge__wday/__day/__month
+=== */
+
 /* --- Date Chip (ruhig & kompakt) --- */
 .event-date-badge{
   width: 42px;
@@ -743,30 +751,29 @@ Umfang:
 
   padding: 5px 3px;
 
-  background: var(--color-primary-muted);
+  /* weniger „Sticker“: minimal neutraler, näher an Surface */
+  background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
   border-radius: 11px;
 
-  /* weniger Sticker: Border sehr subtil */
-  border: 1px solid rgba(31,41,51,0.04);
+  /* statt Border: very subtle inset edge → wirkt eingebettet */
+  border: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(31,41,51,0.035),
+    inset 0 1px 0 rgba(255,255,255,0.75);
 
   line-height: 1;
   text-align: center;
 }
 
-/* === BEGIN BLOCK: EVENT DATE BADGE PREMIUM TYPO HIERARCHY (weekday/month quieter) ===
+/* === BEGIN BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) ===
 Zweck: Premium-Hierarchie im Date-Chip → Zahl dominiert, Labels ruhig
-Umfang: Nur Typo der drei Date-Badge Zeilen
-=== */
-
-/* === BEGIN BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy + meta color) ===
-Zweck: Premium-Hierarchie im Date-Chip + ruhigere, besser lesbare Meta-Zeile (ohne Layoutänderung)
-Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Block
+Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
 === */
 
 .event-date-badge__wday{
   font-size: 0.62rem;
   font-weight: 700;
-  opacity: 0.62;
+  color: rgba(31,41,51,0.54);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -774,15 +781,19 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
 .event-date-badge__day{
   font-size: 1.32rem;
   font-weight: 800;
+  color: rgba(31,41,51,0.90);
 }
 
 .event-date-badge__month{
   font-size: 0.62rem;
   font-weight: 700;
-  opacity: 0.58;
+  color: rgba(31,41,51,0.50);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* === END BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) === */
+/* === END POLISH: EVENT DATE BADGE MICRO-HIERARCHY (less sticker, contrast tuning) === */
 
 /* --- Content Area: 2 Zeilen --- */
 .event-card-body{
@@ -2548,6 +2559,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
