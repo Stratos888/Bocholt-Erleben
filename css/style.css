@@ -679,11 +679,11 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 === */
 
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
-/* === BEGIN FIX: EVENT CARD RAIL FLUSH + SINGLE SOURCE OF TRUTH ===
+/* === BEGIN FIX: EVENT CARD RAIL MODEL (single coordinate system, top-app) ===
 Zweck:
-- Rail startet an der Card-Kante (nicht erst nach padding-left)
-- Rail ist breit genug, damit das Badge optisch sauber mittig wirkt
-- Ein Wert steuert Grid-Spalte + Rail-Fläche (inkl. padding-Kompensation)
+- Rail ist echte Grid-Spalte + beginnt an Card-Kante (kein left:-padding Hack)
+- Rail-Breite = Grid-Spaltenbreite (Single Source of Truth)
+- Badge kann nicht „über Rail-Rand“ wirken; Proof: railLeft-cardLeft=0, delta<=1px
 Umfang:
 - Ersetzt .event-card + .event-card::before innerhalb EVENT CARD FINAL LAYOUT
 === */
@@ -695,14 +695,14 @@ Umfang:
 
   display: grid;
 
-  /* Rail-Kernbreite (ohne padding); Gesamtbreite der Rail-Spalte = rail + padding-left */
-  --rail-w: 56px; /* 56 + 16 padding = 72px Rail-Spalte */
+  --rail-w: 60px;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
 
-  grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
   column-gap: var(--space-md);
   align-items: center;
 
   padding: var(--space-lg);
+  padding-left: 0;
 
   background: var(--surface);
 
@@ -717,16 +717,14 @@ Umfang:
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease, background 140ms ease;
 }
 
-/* Linke Rail: flush bis Card-Kante, ohne optische Drift */
+/* Linke Rail: echte Spalte, beginnt an Card-Kante */
 .event-card::before{
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
 
-  /* Flush bis zur Card-Kante (Containing-Block startet an padding edge → kompensieren) */
-  left: calc(var(--space-lg) * -1);
-
-  width: calc(var(--rail-w) + var(--space-lg));
+  left: 0;
+  width: var(--rail-w);
 
   background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
   opacity: 0.55;
@@ -740,7 +738,7 @@ Umfang:
   z-index: 1;
 }
 
-/* === END FIX: EVENT CARD RAIL FLUSH + SINGLE SOURCE OF TRUTH === */
+/* === END FIX: EVENT CARD RAIL MODEL (single coordinate system, top-app) === */
 
 .event-card > *{
   position: relative;
@@ -939,23 +937,28 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 }
 
 /* Mobile fein */
-/* === BEGIN FIX: EVENT CARD MOBILE RAIL SYNC (rail flush + centered badge) ===
+/* === BEGIN FIX: EVENT CARD MOBILE RAIL MODEL (single coordinate system) ===
 Zweck:
-- Rail-Spalte (Grid) und Rail-Fläche (::before) bleiben konsistent
-- Rail optisch „groß genug“, damit Badge klar mittig wirkt (kein „zu knapp“ Eindruck)
+- Rail ist echte Grid-Spalte + beginnt an Card-Kante (kein left:-padding Hack)
+- Badge zentriert in Rail-Spalte; Rail/Spalte immer identisch
 Umfang:
 - Nur @media (max-width: 360px) innerhalb EVENT CARD FINAL LAYOUT
 === */
 @media (max-width: 360px){
   .event-card{
-    --rail-w: 44px; /* 44 + 16 padding = 60px Rail-Spalte */
-    grid-template-columns: calc(var(--rail-w) + var(--space-lg)) minmax(0, 1fr);
-    column-gap: var(--space-md);
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+
     padding: var(--space-lg);
+    padding-left: 0;
+
+    column-gap: var(--space-md);
   }
+
+  .event-card::before{ width: var(--rail-w); left: 0; }
   .event-date-badge{ width: 40px; }
 }
-/* === END FIX: EVENT CARD MOBILE RAIL SYNC (rail flush + centered badge) === */
+/* === END FIX: EVENT CARD MOBILE RAIL MODEL (single coordinate system) === */
 
 /* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
 
@@ -2635,6 +2638,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
