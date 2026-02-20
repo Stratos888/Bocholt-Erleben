@@ -1654,14 +1654,15 @@ def main() -> None:
 
         info(f"Fetch: {source_name} ({stype})")
 
-                # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 bocholt-first) ===
+        # === BEGIN BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 CONSOLIDATED) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Bocholt Veranstaltungskalender robust parsen (bocholt-first), bevor generische HTML-Heuristiken laufen
+        # - EINMALIGER Dispatch (kein Duplikat)
+        # - Bocholt Kalender: erst Spezialparser, dann Generic-HTML
         # - Health pro Quelle loggen (ok / fetch_error / parse_error / unsupported)
         # Umfang:
-        # - ersetzt nur den Dispatch-Block; Events/Inbox Logik bleibt danach unverändert
-        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 bocholt-first) ===
+        # - Ersetzt den aktuell doppelt vorhandenen Dispatch-Block vollständig
+        # === END BLOCK: FETCH + PARSE DISPATCH + HEALTH LOGGING (v5 CONSOLIDATED) ===
 
         candidates: List[Dict[str, str]] = []
         health_status = "ok"
@@ -1682,11 +1683,11 @@ def main() -> None:
                 candidates = parse_json(content, url)
 
             elif stype == "html":
-                # Bocholt-first (deterministisch, nicht von JSON-LD/Feed abhängig)
+                # Bocholt-first (deterministisch)
                 if "bocholt.de/veranstaltungskalender" in norm_key(url):
                     candidates = parse_bocholt_calendar_html(content, url)
 
-                # Fallbacks
+                # Fallback: generic HTML (JSON-LD, Feed-Discovery, Date-Scan, KuKuG)
                 if not candidates:
                     candidates = parse_html_generic_events(content, url)
 
