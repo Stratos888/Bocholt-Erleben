@@ -579,11 +579,28 @@ Umfang:
 Nur margin-Reset für Section Labels.
 === */
 
+/* === BEGIN POLISH: SECTION HEADER PREMIUM HIERARCHY ===
+Zweck:
+Section Header klar als Gruppierung sichtbar machen,
+ohne Layout oder Rhythmus zu verändern.
+=== */
+
 .events-section-title{
 
-  margin: 0;
+  margin: 24px 0 6px;
+
+  font-weight: 700;
+  font-size: 0.76rem;
+
+  letter-spacing: 0.11em;
+
+  text-transform: uppercase;
+
+  color: rgba(60,72,88,0.55);
 
 }
+
+/* === END POLISH: SECTION HEADER PREMIUM HIERARCHY === */
 
 /* === END FIX: GOLDEN SCREEN RHYTHM NORMALIZATION === */
 
@@ -645,7 +662,10 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 === */
 
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
+/* === BEGIN POLISH: EVENT CARD PREMIUM SHADOW === */
+
 .event-card{
+
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
   column-gap: var(--space-md);
@@ -654,12 +674,20 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
   padding: var(--space-lg);
 
   background: var(--surface);
-  border: 1px solid var(--ui-border-weak);
+
+  border: 1px solid rgba(31,41,51,0.06);
+
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm);
+
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 6px 18px rgba(0,0,0,0.05);
 
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
+
 }
+
+/* === END POLISH: EVENT CARD PREMIUM SHADOW === */
 
 
 /* Hover: minimal stärkerer Shadow + Kante (kein Lift) */
@@ -794,16 +822,25 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 }
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
+/* === BEGIN POLISH: EVENT META PREMIUM CALMNESS === */
+
 .event-meta{
+
   margin: 0;
+
   font-size: var(--font-event-meta);
+
   line-height: 1.28;
-  color: var(--muted);
+
+  color: rgba(60,72,88,0.68);
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
 }
+
+/* === END POLISH: EVENT META PREMIUM CALMNESS === */
 
 /* === END BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy + meta color) === */
 
@@ -2486,6 +2523,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
