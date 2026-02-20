@@ -187,15 +187,191 @@ aggressive styling
 
 # CONTENT PIPELINE REQUIREMENTS
 
-Pipeline must provide:
+/* === BEGIN INSERT: DISCOVERY PIPELINE ENTERPRISE TARGET STATE === */
 
-continuous intake
+# DISCOVERY PIPELINE — ENTERPRISE TARGET STATE
 
-deduplicated events
+This section defines the enterprise-grade target state for the automated event discovery system.
 
-stable operation
+This system is separate from the UI and must be treated as independent production infrastructure.
 
-minimal manual effort
+Goal:
+
+Fully automated, reliable, high-quality event intake.
+
+Manual event search must not be required.
+
+---
+
+## DISCOVERY PIPELINE RESPONSIBILITY
+
+Discovery Pipeline is responsible for:
+
+Source fetching
+
+Event candidate extraction
+
+Quality classification
+
+Deduplication
+
+Inbox population
+
+Providing high-quality review candidates
+
+It is NOT responsible for:
+
+UI rendering
+
+Final publishing
+
+User interaction
+
+---
+
+## DISCOVERY PIPELINE DEFINITION OF DONE
+
+Pipeline is considered enterprise-grade when ALL criteria are fulfilled:
+
+---
+
+### INTAKE VOLUME
+
+Pipeline must consistently produce:
+
+Minimum:
+
+20 valid review candidates per run
+
+Target:
+
+30–60 valid review candidates per run
+
+Maximum candidate volume is not limited.
+
+---
+
+### QUALITY
+
+At least:
+
+80% of review candidates must be real events
+
+Reject rate caused by parsing errors must be minimal
+
+False positives from:
+
+Impressum
+
+Datenschutz
+
+Blog publish dates
+
+must be eliminated
+
+---
+
+### AUTOMATION
+
+Pipeline must operate:
+
+fully automatically
+
+without manual triggering
+
+without manual correction
+
+Sources must be fetched automatically.
+
+---
+
+### RELIABILITY
+
+Pipeline must:
+
+never silently fail
+
+log all candidates
+
+log classification reason
+
+log source health
+
+Failures must be observable.
+
+---
+
+### ANALYSIS CAPABILITY
+
+System must provide full visibility of:
+
+all candidates
+
+classification status
+
+classification reason
+
+deduplication result
+
+This is mandatory.
+
+Discovery_Candidates tab fulfills this requirement.
+
+---
+
+## DISCOVERY PIPELINE ARCHITECTURE STATUS
+
+Current status:
+
+ACTIVE DEVELOPMENT
+
+Not frozen.
+
+This system is allowed to evolve until enterprise target state is achieved.
+
+After Definition of Done is fulfilled:
+
+System becomes FROZEN INFRASTRUCTURE.
+
+Further changes must be treated as enterprise-level architectural changes.
+
+---
+
+## DISCOVERY PIPELINE CURRENT PRIMARY OBJECTIVE
+
+Current focus:
+
+Improve extraction accuracy.
+
+Priority order:
+
+1 Improve HTML event extraction accuracy
+
+2 Improve date extraction accuracy
+
+3 Eliminate publish-date false positives
+
+4 Improve source-specific parsers
+
+5 Increase valid review candidate volume
+
+---
+
+## DISCOVERY PIPELINE SUCCESS CONDITION
+
+Discovery Pipeline is considered COMPLETE when:
+
+Manual event search is no longer required.
+
+Pipeline provides sufficient high-quality events continuously.
+
+Inbox consistently receives valid event candidates.
+
+At that point:
+
+Pipeline becomes frozen enterprise infrastructure.
+
+/* === END INSERT: DISCOVERY PIPELINE ENTERPRISE TARGET STATE === */
 
 ---
 
