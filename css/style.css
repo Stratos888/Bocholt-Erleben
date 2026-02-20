@@ -2155,9 +2155,12 @@ Umfang:
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
 
-/* === BEGIN BLOCK: APP HEADER (PREMIUM INTEGRATION v1) ===
-Zweck: Premium-Header-Integration (ruhiger Übergang, weniger Box-Gefühl)
-Umfang: Ersetzt ausschließlich .app-header
+/* === BEGIN BLOCK: APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) ===
+Zweck:
+- Header-Ton weniger „voll“, mehr Premium (mehr Weißanteil)
+- Übergang zum Content ruhiger, weniger „grün blockig“
+Umfang:
+- Ersetzt ausschließlich .app-header (nur Farb-/Kanten-Feintuning, kein Layout)
 === */
 .app-header{
   color: var(--color-text-primary);
@@ -2169,7 +2172,8 @@ Umfang: Ersetzt ausschließlich .app-header
   min-height: 48px;
   padding: 0 var(--gutter);
 
-  background: color-mix(in srgb, var(--color-primary-muted) 88%, white);
+  /* calmer tint: etwas mehr weiß als v1 */
+  background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 
@@ -2177,14 +2181,15 @@ Umfang: Ersetzt ausschließlich .app-header
   align-items: center;
   gap: 8px;
 
-  border-bottom: 1px solid var(--divider);
+  /* Kante etwas definierter, aber weiterhin soft */
+  border-bottom: 1px solid rgba(31, 41, 51, 0.05);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.70) inset,
-    0 6px 16px rgba(31, 41, 51, 0.05);
+    0 1px 0 rgba(255,255,255,0.78) inset,
+    0 6px 16px rgba(31, 41, 51, 0.045);
 
   transform: translateZ(0);
 }
-/* === END BLOCK: APP HEADER (PREMIUM INTEGRATION v1) === */
+/* === END BLOCK: APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) === */
 
 
 .app-header::after{ content: none; }
@@ -2534,6 +2539,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
