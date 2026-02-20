@@ -656,6 +656,49 @@ Next pipeline focus (in priority order):
 3 Ongoing monitoring via Source_Health + Discovery_Candidates (no clearing during analysis)
 ---
 ---
+2026-02-20
+
+Discovery Pipeline — Date extraction improvement + detail enrichment
+
+Status:
+
+IN PROGRESS
+
+Session scope:
+
+Improve date extraction completeness without increasing noise.
+
+Pipeline-only session.
+
+UI not modified.
+
+Implemented:
+
+- Multi-day date extraction support (startDate + endDate)
+- HTML <time datetime> extraction added
+- Budgeted detail-page fetch introduced for missing-date candidates
+- JSON-LD Event extraction implemented on detail pages
+
+Observed results:
+
+- Pipeline stable
+- Inbox increased from 55 → 67 review events after date extraction improvements
+- Subsequent runs produced 0 new rows (expected due to dedupe)
+- Major sources provide dates primarily via HTML text on detail pages
+
+Conclusion:
+
+Current primary gap:
+
+Detail-page HTML date extraction (non-JSON-LD sources)
+
+Next pipeline focus:
+
+Extract date from detail-page HTML text using existing extractor
+
+Pipeline reliability remains intact.
+
+---
 
 # NEXT PRIORITIES (DO NOT START YET)
 
