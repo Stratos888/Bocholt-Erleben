@@ -1209,34 +1209,24 @@ def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
 
 _HTML_A_RE = re.compile(r"<a\b[^>]*href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
 
+# === BEGIN BLOCK: DATE EXTRACTION (DE, ranges + iso + slash, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Robustere Datumserkennung für deutsche Event-Texte, ohne Noise zu erhöhen
+# - Unterstützt zusätzlich: ISO (YYYY-MM-DD), Slash (DD/MM/YYYY), Range-Formate (z.B. 15.-16.03.2026, 15.–16. März 2026, 15. bis 16.03.2026)
+# Umfang:
+# - Ersetzt ausschließlich die Funktion _extract_event_date_de
+# === END BLOCK: DATE EXTRACTION (DE, ranges + iso + slash, v2) ===
 def _extract_event_date_de(text: str, fallback_year: int) -> str:
+    # === BEGIN BLOCK: _extract_event_date_de IMPLEMENTATION (v2) ===
+    # Datei: scripts/discovery-to-inbox.py
+    # Zweck: Siehe Header-Block "DATE EXTRACTION (DE, ranges + iso + slash, v2)"
+    # Umfang: Vollständige Implementierung der Funktion (keine externen Seiteneffekte)
+    # === END BLOCK: _extract_event_date_de IMPLEMENTATION (v2) ===
     t = norm(text)
     if not t:
         return ""
 
-    # dd.mm.yyyy or dd.mm.yy
-    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
-    if m:
-        dd = int(m.group(1))
-        mm = int(m.group(2))
-        yy = m.group(3)
-        yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
-        try:
-            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
-        except Exception:
-            return ""
-
-    # dd.mm. (year inferred)
-    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
-    if m:
-        dd = int(m.group(1))
-        mm = int(m.group(2))
-        try:
-            return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
-        except Exception:
-            return ""
-
-    # dd. Monat yyyy / dd. Monat (year inferred)
     month_map = {
         "januar": 1, "jan": 1,
         "februar": 2, "feb": 2,
@@ -1251,6 +1241,86 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         "november": 11, "nov": 11,
         "dezember": 12, "dez": 12,
     }
+
+    # 0) ISO: yyyy-mm-dd
+    m = re.search(r"(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)", t)
+    if m:
+        yyyy = int(m.group(1))
+        mm = int(m.group(2))
+        dd = int(m.group(3))
+        try:
+            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # 0b) Slash: dd/mm/yyyy or dd/mm/yy
+    m = re.search(r"(?<!\d)(\d{1,2})/(\d{1,2})/(\d{2}|\d{4})(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        yy = m.group(3)
+        yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
+        try:
+            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # 1) Range: "15.-16.03.2026" / "15.–16.03.2026" / "15. bis 16.03.2026"
+    m = re.search(
+        r"(?<!\d)(\d{1,2})\.\s*(?:-|–|bis)\s*(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)",
+        t,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        dd = int(m.group(1))  # Starttag
+        mm = int(m.group(3))
+        yy = m.group(4)
+        yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
+        try:
+            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # 2) Range: "15.–16. März 2026" / "15. bis 16. März 2026"
+    m = re.search(
+        r"(?<!\d)(\d{1,2})\.\s*(?:-|–|bis)\s*(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})(?!\d)",
+        t,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        dd = int(m.group(1))  # Starttag
+        mon = norm_key(m.group(3))
+        yyyy = int(m.group(4))
+        mm = month_map.get(mon, 0)
+        if mm:
+            try:
+                return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            except Exception:
+                return ""
+
+    # 3) dd.mm.yyyy or dd.mm.yy
+    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        yy = m.group(3)
+        yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
+        try:
+            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # 4) dd.mm. (year inferred)
+    m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
+    if m:
+        dd = int(m.group(1))
+        mm = int(m.group(2))
+        try:
+            return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
+        except Exception:
+            return ""
+
+    # 5) dd. Monat yyyy / dd. Monat (year inferred)
     m = re.search(r"(?<!\d)(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?(?!\d)", t)
     if m:
         dd = int(m.group(1))
@@ -1307,8 +1377,23 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # Datum aus Kontext
         ev_date = _extract_event_date_de(combined, fallback_year)
 
-        # NEU: nur Kandidaten erzeugen wenn Datum ODER Event Signal
-        if not ev_date and not EVENT_SIGNAL_RE.search(combined):
+               # === BEGIN BLOCK: HTML DATE-SCAN GATING (event-signal or event-url, v2) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Fix: kein NameError (EVENT_SIGNAL_RE -> _EVENT_SIGNAL_RE)
+        # - Noise-Kontrolle: "Date-only" Kandidaten nur, wenn URL event-typisch wirkt
+        # Umfang:
+        # - Ersetzt nur die Gate-Logik direkt nach ev_date Extraktion
+        # === END BLOCK: HTML DATE-SCAN GATING (event-signal or event-url, v2) ===
+        event_signal = bool(_EVENT_SIGNAL_RE.search(combined))
+        url_key = norm_key(url)
+        url_seems_event = bool(re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key))
+
+        # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
+        # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
+        if not ev_date and not event_signal:
+            continue
+        if ev_date and not event_signal and not url_seems_event:
             continue
 
         # Description kurz halten
