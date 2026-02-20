@@ -112,7 +112,7 @@ STATUS: COMPLETED
 
 TASK 3: EVENT PIPELINE RELIABILITY IMPROVEMENT
 
-STATUS: TODO
+STATUS: In Progress
 
 ---
 
@@ -624,6 +624,36 @@ Decision authority:
 
 Permanent UX and surface baseline established.
 
+2026-02-20
+
+Discovery Pipeline — Intake Quality + Noise Reduction session
+
+Status:
+
+IN PROGRESS
+
+Verified:
+
+- Pipeline runs stable (no HTML parser NameErrors; sources fetch ok)
+- Dedupe behavior verified: subsequent runs produce 0 new inbox rows when candidates already exist
+
+Implemented (pipeline-only):
+
+- Bocholt Veranstaltungskalender HTML parsing enabled (Stadt Bocholt HTML Kalender now produces candidates reliably)
+- Event signal recognition expanded to accept relevant event types (workshop/ausstellung/markt/repair café etc.)
+- Candidate noise reduction: HTML date-scan must not emit candidates unless (date present) OR (event signal present)
+
+Measured outcomes (observed runs):
+
+- 786 candidates parsed produced 55 inbox rows (first run after changes; inbox previously empty)
+- Subsequent run: 786 candidates parsed, 0 new inbox rows (expected due to dedupe)
+- After noise reduction: candidates parsed reduced to ~143 while preserving review candidates (0 new rows due to dedupe)
+
+Next pipeline focus (in priority order):
+
+1 Improve date extraction accuracy (reduce review:event_signal_missing_date)
+2 Source-specific improvements for top-performing sources (Bocholt calendar, KuKuG, NABU, Stadtbibliothek)
+3 Ongoing monitoring via Source_Health + Discovery_Candidates (no clearing during analysis)
 ---
 ---
 
