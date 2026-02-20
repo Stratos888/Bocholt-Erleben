@@ -685,7 +685,9 @@ Umfang:
   overflow: hidden;
 
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  /* === BEGIN FIX: GRID DISCIPLINE ELITE ALIGNMENT === */
+grid-template-columns: 42px 1fr;
+/* === END FIX: GRID DISCIPLINE ELITE ALIGNMENT === */
   column-gap: var(--space-md);
   align-items: center;
 
@@ -827,17 +829,23 @@ Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
 }
 
 /* Title-Zeile: Text + Icon getrennt */
+/* === BEGIN FIX: EVENT TITLE ELITE TYPOGRAPHY === */
+
 .event-title{
-  margin: 0;
 
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  font-size: 1.05rem;
 
-  font-size: var(--font-event-title);
-  font-weight: 600;
-  line-height: 1.22;
+  font-weight: 700;
+
+  letter-spacing: -0.01em;
+
+  color: rgba(31,41,51,0.92);
+
+  line-height: 1.25;
+
 }
+
+/* === END FIX: EVENT TITLE ELITE TYPOGRAPHY === */
 
 /* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, single source) ===
 Zweck: Titel max. 2 Zeilen, ohne spätere Overrides/!important.
@@ -2581,6 +2589,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
