@@ -41,8 +41,13 @@
   --space-lg: 16px;
   --space-xl: 24px;
 
-  --radius-card: 16px;
+  /* Golden Screen: Cards */
+  --radius-card: 12px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+
+  /* Golden Screen: Event-Card Typo */
+  --font-event-title: 18px;
+  --font-event-meta: 14px;
 
   /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
   --gutter: var(--space-lg);
@@ -104,39 +109,6 @@
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
    /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
-
-  /* === BEGIN BLOCK: UI OVERLAY TOKENS (chooser/sheets) ===
-  Zweck:
-  - Tokens für Overlay/Chooser (Backdrop + Sheet + Option Buttons)
-  - Werte entsprechen dem bisherigen “guten” Look (nur tokenisiert)
-  Umfang:
-  - Nur Tokens, keine Selektoren.
-  === */
-  --ui-overlay-dim: rgba(31,41,51,0.36);
-  --ui-overlay-blur: 4px;
-
-  --ui-sheet-radius-lg: 18px;
-  --ui-sheet-shadow-strong:
-    0 24px 56px rgba(0,0,0,0.22),
-    0 1px 0 rgba(255,255,255,0.72) inset;
-
-  --ui-choice-minh: 52px;
-  --ui-choice-font-size: 15px;
-  /* === END BLOCK: UI OVERLAY TOKENS (chooser/sheets) === */
-
-/* === BEGIN BLOCK: CONTENT ACTIONS UTILITIES (token-based spacing) ===
-Zweck:
-- Ersetzt Inline-Styles durch wiederverwendbare Klassen
-- App-weite Konsistenz: Spacing über Tokens
-Umfang:
-- Nur Utility-Klassen, keine Layout-Refactors
-=== */
-.content-actions--spaced{
-  margin-top: var(--space-md);
-}
-/* === END BLOCK: CONTENT ACTIONS UTILITIES (token-based spacing) === */
-
-
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
 
 
@@ -617,7 +589,7 @@ Umfang:
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: 8px; /* vorher 10px */
+  gap: var(--space-xl);
 
   padding: 0;
   background: transparent;
@@ -664,14 +636,14 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 .event-card{
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
-  column-gap: 10px;
+  column-gap: var(--space-md);
   align-items: center;
 
-  padding: 8px 12px; /* vorher 10px */
+  padding: var(--space-lg);
 
   background: var(--surface);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 14px;
+  border: 1px solid var(--ui-border-weak);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-sm);
 
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
@@ -682,7 +654,7 @@ Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML
 .event-card:hover{
   transform: none;
   box-shadow: var(--shadow-md);
-  border-color: rgba(31,41,51,0.14);
+  border-color: var(--ui-border-strong);
 }
 
 /* Press: kleines “Eindrücken” (App-Feeling) */
@@ -770,7 +742,7 @@ Umfang: .event-date-badge__* + .event-meta innerhalb EVENT CARD FINAL LAYOUT Blo
   align-items: flex-start;
   gap: 6px;
 
-  font-size: 0.98rem;
+  font-size: var(--font-event-title);
   font-weight: 600;
   line-height: 1.22;
 }
@@ -812,7 +784,7 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 .event-meta{
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--font-event-meta);
   line-height: 1.28;
   color: var(--muted);
 
@@ -833,8 +805,8 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 @media (max-width: 360px){
   .event-card{
     grid-template-columns: 40px minmax(0, 1fr);
-    column-gap: 9px;
-    padding: 10px 11px;
+    column-gap: var(--space-md);
+    padding: var(--space-lg);
   }
   .event-date-badge{ width: 40px; }
 }
@@ -2502,6 +2474,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
