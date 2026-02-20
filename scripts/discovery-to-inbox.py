@@ -1448,14 +1448,37 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         host = (urlparse(url).netloc or "").lower()
         host_fetches = detail_fetch_by_host.get(host, 0)
 
-        if (
+               # === BEGIN BLOCK: DETAIL FETCH GATE RELIABILITY EXPANSION (TASK 3 FIX) ===
+        # Zweck:
+        # Erlaubt Detail-Fetch auch für typische deutsche Event-Pfadstrukturen,
+        # selbst wenn url_seems_event False ist.
+        #
+        path = urlparse(url).path.lower()
+
+        path_event_hint = (
+            "/veranstaltung" in path
+            or "/veranstaltungen" in path
+            or "/event" in path
+            or "/events" in path
+            or "/termin" in path
+            or "/termine" in path
+            or "/kalender" in path
+            or "/programm" in path
+        )
+
+        should_fetch_detail = (
             (not ev_date)
             and event_signal
-            and url_seems_event
+            and (
+                url_seems_event
+                or path_event_hint
+            )
             and (detail_fetch_count < detail_fetch_budget)
             and (host_fetches < detail_fetch_host_cap)
-        ):
-            # Cache: nur einmal pro URL fetch-en (auch wenn Ergebnis leer ist)
+        )
+
+        if should_fetch_detail:
+
             if url not in detail_html_cache:
                 try:
                     detail_html_cache[url] = safe_fetch(url, timeout=detail_fetch_timeout)
