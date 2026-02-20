@@ -1302,8 +1302,14 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         if not title:
             continue
 
+        combined = f"{title}\n{ctx}"
+
         # Datum aus Kontext
-        ev_date = _extract_event_date_de(f"{title}\n{ctx}", fallback_year)
+        ev_date = _extract_event_date_de(combined, fallback_year)
+
+        # NEU: nur Kandidaten erzeugen wenn Datum ODER Event Signal
+        if not ev_date and not EVENT_SIGNAL_RE.search(combined):
+            continue
 
         # Description kurz halten
         desc = ctx[:500]
