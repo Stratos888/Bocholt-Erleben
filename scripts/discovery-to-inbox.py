@@ -1209,23 +1209,23 @@ def discover_feeds_from_html(html_text: str, base_url: str) -> List[str]:
 
 _HTML_A_RE = re.compile(r"<a\b[^>]*href=['\"]([^'\"]+)['\"][^>]*>(.*?)</a>", re.IGNORECASE | re.DOTALL)
 
-# === BEGIN BLOCK: DATE EXTRACTION (DE, ranges + iso + slash, v2) ===
+# === BEGIN BLOCK: DATE EXTRACTION (DE, start+end, ranges + iso + slash, v3) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
-# - Robustere Datumserkennung für deutsche Event-Texte, ohne Noise zu erhöhen
-# - Unterstützt zusätzlich: ISO (YYYY-MM-DD), Slash (DD/MM/YYYY), Range-Formate (z.B. 15.-16.03.2026, 15.–16. März 2026, 15. bis 16.03.2026)
+# - Liefert (startDate, endDate) als ISO (YYYY-MM-DD)
+# - Unterstützt Multi-Day-Formate (Ranges) + ISO + Slash + klassische DE-Formate
 # Umfang:
 # - Ersetzt ausschließlich die Funktion _extract_event_date_de
-# === END BLOCK: DATE EXTRACTION (DE, ranges + iso + slash, v2) ===
-def _extract_event_date_de(text: str, fallback_year: int) -> str:
-    # === BEGIN BLOCK: _extract_event_date_de IMPLEMENTATION (v2) ===
+# === END BLOCK: DATE EXTRACTION (DE, start+end, ranges + iso + slash, v3) ===
+def _extract_event_date_de(text: str, fallback_year: int) -> Tuple[str, str]:
+    # === BEGIN BLOCK: _extract_event_date_de IMPLEMENTATION (v3) ===
     # Datei: scripts/discovery-to-inbox.py
-    # Zweck: Siehe Header-Block "DATE EXTRACTION (DE, ranges + iso + slash, v2)"
+    # Zweck: Siehe Header-Block "DATE EXTRACTION (DE, start+end, ranges + iso + slash, v3)"
     # Umfang: Vollständige Implementierung der Funktion (keine externen Seiteneffekte)
-    # === END BLOCK: _extract_event_date_de IMPLEMENTATION (v2) ===
+    # === END BLOCK: _extract_event_date_de IMPLEMENTATION (v3) ===
     t = norm(text)
     if not t:
-        return ""
+        return ("", "")
 
     month_map = {
         "januar": 1, "jan": 1,
@@ -1242,6 +1242,9 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         "dezember": 12, "dez": 12,
     }
 
+    def _iso(yyyy: int, mm: int, dd: int) -> str:
+        return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+
     # 0) ISO: yyyy-mm-dd
     m = re.search(r"(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)", t)
     if m:
@@ -1249,9 +1252,10 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         mm = int(m.group(2))
         dd = int(m.group(3))
         try:
-            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            d = _iso(yyyy, mm, dd)
+            return (d, d)
         except Exception:
-            return ""
+            return ("", "")
 
     # 0b) Slash: dd/mm/yyyy or dd/mm/yy
     m = re.search(r"(?<!\d)(\d{1,2})/(\d{1,2})/(\d{2}|\d{4})(?!\d)", t)
@@ -1261,9 +1265,10 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         yy = m.group(3)
         yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
         try:
-            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            d = _iso(yyyy, mm, dd)
+            return (d, d)
         except Exception:
-            return ""
+            return ("", "")
 
     # 1) Range: "15.-16.03.2026" / "15.–16.03.2026" / "15. bis 16.03.2026"
     m = re.search(
@@ -1272,14 +1277,17 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         flags=re.IGNORECASE,
     )
     if m:
-        dd = int(m.group(1))  # Starttag
+        d1 = int(m.group(1))
+        d2 = int(m.group(2))
         mm = int(m.group(3))
         yy = m.group(4)
         yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
         try:
-            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            s = _iso(yyyy, mm, d1)
+            e = _iso(yyyy, mm, d2)
+            return (s, e)
         except Exception:
-            return ""
+            return ("", "")
 
     # 2) Range: "15.–16. März 2026" / "15. bis 16. März 2026"
     m = re.search(
@@ -1288,15 +1296,18 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         flags=re.IGNORECASE,
     )
     if m:
-        dd = int(m.group(1))  # Starttag
+        d1 = int(m.group(1))
+        d2 = int(m.group(2))
         mon = norm_key(m.group(3))
         yyyy = int(m.group(4))
         mm = month_map.get(mon, 0)
         if mm:
             try:
-                return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+                s = _iso(yyyy, mm, d1)
+                e = _iso(yyyy, mm, d2)
+                return (s, e)
             except Exception:
-                return ""
+                return ("", "")
 
     # 3) dd.mm.yyyy or dd.mm.yy
     m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
@@ -1306,9 +1317,10 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         yy = m.group(3)
         yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
         try:
-            return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+            d = _iso(yyyy, mm, dd)
+            return (d, d)
         except Exception:
-            return ""
+            return ("", "")
 
     # 4) dd.mm. (year inferred)
     m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
@@ -1316,9 +1328,10 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         dd = int(m.group(1))
         mm = int(m.group(2))
         try:
-            return date(fallback_year, mm, dd).strftime("%Y-%m-%d")
+            d = _iso(fallback_year, mm, dd)
+            return (d, d)
         except Exception:
-            return ""
+            return ("", "")
 
     # 5) dd. Monat yyyy / dd. Monat (year inferred)
     m = re.search(r"(?<!\d)(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?(?!\d)", t)
@@ -1329,11 +1342,12 @@ def _extract_event_date_de(text: str, fallback_year: int) -> str:
         mm = month_map.get(mon, 0)
         if mm:
             try:
-                return date(yyyy, mm, dd).strftime("%Y-%m-%d")
+                d = _iso(yyyy, mm, dd)
+                return (d, d)
             except Exception:
-                return ""
+                return ("", "")
 
-    return ""
+    return ("", "")
 
 def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[str, str]]:
     """
@@ -1374,17 +1388,18 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         combined = f"{title}\n{ctx}"
 
-        # Datum aus Kontext
-        ev_date = _extract_event_date_de(combined, fallback_year)
-
-               # === BEGIN BLOCK: HTML DATE-SCAN GATING (event-signal or event-url, v2) ===
+               # === BEGIN BLOCK: HTML DATE-SCAN (start+end + gating, v3) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Fix: kein NameError (EVENT_SIGNAL_RE -> _EVENT_SIGNAL_RE)
-        # - Noise-Kontrolle: "Date-only" Kandidaten nur, wenn URL event-typisch wirkt
+        # - _extract_event_date_de liefert (startDate, endDate)
+        # - Noise-Kontrolle: (Datum ODER Event-Signal), aber Datum-only nur bei event-typischer URL
         # Umfang:
-        # - Ersetzt nur die Gate-Logik direkt nach ev_date Extraktion
-        # === END BLOCK: HTML DATE-SCAN GATING (event-signal or event-url, v2) ===
+        # - Ersetzt nur: Datum-Extraktion + Gate + Candidate-Feld endDate im Date-Scan
+        # === END BLOCK: HTML DATE-SCAN (start+end + gating, v3) ===
+
+        # Datum aus Kontext
+        ev_date, ev_end = _extract_event_date_de(combined, fallback_year)
+
         event_signal = bool(_EVENT_SIGNAL_RE.search(combined))
         url_key = norm_key(url)
         url_seems_event = bool(re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key))
@@ -1403,7 +1418,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             {
                 "title": title,
                 "date": ev_date or "",
-                "endDate": "",
+                "endDate": (ev_end or "") if ev_date else "",
                 "time": "",
                 "location": "",
                 "url": canonical_url(url),
@@ -1411,7 +1426,6 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 "notes": "source=html_datescan",
             }
         )
-
         if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
             break
 
