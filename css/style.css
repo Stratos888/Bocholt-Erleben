@@ -568,20 +568,24 @@ Umfang:
 
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
+/* === BEGIN FIX: GOLDEN SCREEN RHYTHM NORMALIZATION ===
+Zweck:
+Golden Screen verlangt konstanten 24px Rhythmus zwischen allen Feed-Elementen.
+
+Labels dürfen KEINEN eigenen vertikalen Abstand erzeugen,
+sondern müssen Teil des Grid-Rhythmus sein.
+
+Umfang:
+Nur margin-Reset für Section Labels.
+=== */
+
 .events-section-title{
-  margin: 5px 0 4px;
-  padding: 2px 2px;
 
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
+  margin: 0;
 
-  font-weight: 750;
-  font-size: 0.78rem;
-  letter-spacing: 0.075em;
-  text-transform: uppercase;
-  color: rgba(95,107,115,0.78);
 }
+
+/* === END FIX: GOLDEN SCREEN RHYTHM NORMALIZATION === */
 
 
 
@@ -2474,6 +2478,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
