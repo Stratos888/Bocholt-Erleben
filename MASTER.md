@@ -106,7 +106,7 @@ Freeze component
 
 TASK 2: EVENT CARD HIERARCHY STABILIZATION
 
-STATUS: TODO
+STATUS: COMPLETED
 
 ---
 
@@ -491,6 +491,142 @@ ACTIVE
 
 ---
 
+2026-02-20
+
+Golden Screen — Events Feed Enterprise Baseline achieved
+
+Status:
+
+GOLDEN SCREEN FREEZE READY
+
+All Golden Screen Definition of Done criteria fulfilled.
+
+Implementation decisions frozen:
+
+---
+
+EVENT CARD BASELINE
+
+Card padding:
+
+16px
+
+Card radius:
+
+12px
+
+Card vertical spacing:
+
+16px (token spacing)
+
+Card border:
+
+rgba(31,41,51,0.055)
+
+Card shadow:
+
+0 1px 1px rgba(0,0,0,0.035)
+0 10px 26px rgba(0,0,0,0.045)
+
+Interaction:
+
+Press scale feedback active
+
+Focus-visible ring active
+
+---
+
+TYPOGRAPHY BASELINE
+
+Title:
+
+18px
+600 weight
+
+Meta:
+
+14px
+400 weight
+
+Hierarchy validated.
+
+---
+
+SECTION HEADER BASELINE
+
+Section headers produce no independent vertical spacing.
+
+Spacing controlled exclusively by feed container gap.
+
+Margin:
+
+0
+
+Typography:
+
+uppercase
+letter-spacing 0.11em
+
+---
+
+HEADER BASELINE
+
+Header blur:
+
+12px
+
+Header surface:
+
+color-mix(in srgb, var(--color-primary-muted) 78%, white)
+
+Header shadow:
+
+0 1px 0 rgba(255,255,255,0.78) inset
+0 6px 16px rgba(31,41,51,0.045)
+
+Header considered enterprise-grade.
+
+---
+
+RHYTHM VALIDATION
+
+Console measurement confirmed:
+
+Card → Card = 16px  
+Card → Label = 16px  
+Label → Card = 16px  
+
+Vertical rhythm considered correct and frozen.
+
+---
+
+FREEZE STATUS
+
+Golden Screen baseline must not be visually modified further.
+
+Only bug fixes allowed.
+
+Any visual changes require explicit unfreeze decision.
+
+---
+
+NEXT UI PRIORITY
+
+Continue CURRENT SPRINT Task:
+
+DETAILPANEL UI STABILIZATION
+
+Golden Screen considered reference baseline.
+
+---
+
+Decision authority:
+
+Permanent UX and surface baseline established.
+
+---
+---
+
 # NEXT PRIORITIES (DO NOT START YET)
 
 /* === BEGIN INSERT: GOLDEN SCREEN BASELINE + NEXT PRIORITIES (Enterprise Freeze Definition) === */
@@ -677,7 +813,7 @@ PIPELINE: IN PROGRESS
 
 LAST UPDATE:
 
-2026-02-19
+2026-02-20
 
 ---
 
