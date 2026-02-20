@@ -1437,23 +1437,91 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
         )
 
-              # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text, v1) ===
+        # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v2) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Schließt die Hauptlücke review:event_signal_missing_date:
-        #   Wenn JSON-LD kein Datum liefert, Detailseiten-HTML nachladen und Datum mit _extract_event_date_de extrahieren.
-        # - Noise/Load-Kontrolle: nur bei (event_signal AND url_seems_event) und nur budgetiert; Cache verhindert Re-Fetch.
+        # - Schließt review:event_signal_missing_date nachhaltig:
+        #   Wenn JSON-LD auf Listen-/Kategorie-URLs kein Datum liefert, wird (budgetiert) die Seite geladen
+        #   und bei Bedarf EIN Detail-Link aus der geladenen Seite nachgezogen, um Datum zu extrahieren.
+        # - Nutzt bestehende _extract_event_date_de als Fallback, wenn JSON-LD kein Datum liefert.
+        # - Noise/Load-Kontrolle: budgetiert + per-host cap + cache; maximal 1 zusätzlicher Detail-Fetch pro Kandidat.
         # Umfang:
-        # - Ersetzt nur den bestehenden Detail-Fetch-Block innerhalb _html_link_candidates_date_scan (keine UI/andere Logik).
+        # - Ersetzt ausschließlich diesen Block innerhalb _html_link_candidates_date_scan.
         host = (urlparse(url).netloc or "").lower()
         host_fetches = detail_fetch_by_host.get(host, 0)
 
-               # === BEGIN BLOCK: DETAIL FETCH GATE RELIABILITY EXPANSION (TASK 3 FIX) ===
-        # Zweck:
-        # Erlaubt Detail-Fetch auch für typische deutsche Event-Pfadstrukturen,
-        # selbst wenn url_seems_event False ist.
-        #
         path = urlparse(url).path.lower()
+        is_listing_like = (
+            "/kategorie/" in path
+            or "/category/" in path
+            or "/kalender/" in path
+            or "/monat/" in path
+            or "/wochen" in path
+            or "/tage" in path
+            or "/programm/kategorie" in path
+        )
+
+        def _extract_date_from_html(_html_text: str) -> Tuple[str, str]:
+            # 1) JSON-LD Event startDate/endDate
+            scripts = re.findall(
+                r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+                _html_text,
+                flags=re.IGNORECASE | re.DOTALL,
+            )
+
+            def _iter_ld_nodes(obj):
+                if isinstance(obj, list):
+                    for it in obj:
+                        yield from _iter_ld_nodes(it)
+                elif isinstance(obj, dict):
+                    yield obj
+                    if "@graph" in obj:
+                        yield from _iter_ld_nodes(obj.get("@graph"))
+
+            def _is_event_type(tval) -> bool:
+                if isinstance(tval, str):
+                    k = norm_key(tval)
+                    return (k == "event") or k.endswith(":event")
+                if isinstance(tval, list):
+                    return any(_is_event_type(x) for x in tval)
+                return False
+
+            for raw in scripts:
+                raw = (raw or "").strip()
+                if not raw:
+                    continue
+                try:
+                    data = json.loads(raw)
+                except Exception:
+                    continue
+
+                for node in _iter_ld_nodes(data):
+                    if not isinstance(node, dict):
+                        continue
+                    if not _is_event_type(node.get("@type")):
+                        continue
+
+                    sd = norm(str(node.get("startDate") or ""))
+                    ed = norm(str(node.get("endDate") or ""))
+
+                    if sd:
+                        sd = sd.split("T")[0].split(" ")[0]
+                    if ed:
+                        ed = ed.split("T")[0].split(" ")[0]
+
+                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
+                        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
+                            return (sd, ed)
+                        return (sd, sd)
+
+            # 2) Fallback: Datum aus sichtbarem Text via bestehender Funktion
+            detail_text = clean_text(_strip_html_tags(_html_text))
+            detail_combined = f"{title}\n{detail_text[:6000]}"
+            d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
+            if d_sd:
+                return (d_sd, d_ed or d_sd)
+
+            return ("", "")
 
         path_event_hint = (
             "/veranstaltung" in path
@@ -1469,16 +1537,13 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         should_fetch_detail = (
             (not ev_date)
             and event_signal
-            and (
-                url_seems_event
-                or path_event_hint
-            )
+            and (url_seems_event or path_event_hint)
             and (detail_fetch_count < detail_fetch_budget)
             and (host_fetches < detail_fetch_host_cap)
         )
 
         if should_fetch_detail:
-
+            # 0) Haupt-URL laden (cache + budget)
             if url not in detail_html_cache:
                 try:
                     detail_html_cache[url] = safe_fetch(url, timeout=detail_fetch_timeout)
@@ -1490,74 +1555,75 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             detail_html = detail_html_cache.get(url, "") or ""
 
             if detail_html:
-                # 1) JSON-LD Event startDate/endDate
-                scripts = re.findall(
-                    r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
-                    detail_html,
-                    flags=re.IGNORECASE | re.DOTALL,
-                )
+                d1, d2 = _extract_date_from_html(detail_html)
+                if d1:
+                    ev_date, ev_end = d1, d2
 
-                def _iter_ld_nodes(obj):
-                    if isinstance(obj, list):
-                        for it in obj:
-                            yield from _iter_ld_nodes(it)
-                    elif isinstance(obj, dict):
-                        yield obj
-                        if "@graph" in obj:
-                            yield from _iter_ld_nodes(obj.get("@graph"))
-
-                def _is_event_type(tval) -> bool:
-                    if isinstance(tval, str):
-                        k = norm_key(tval)
-                        return (k == "event") or k.endswith(":event")
-                    if isinstance(tval, list):
-                        return any(_is_event_type(x) for x in tval)
-                    return False
-
-                for raw in scripts:
-                    raw = (raw or "").strip()
-                    if not raw:
+            # 1) Wenn immer noch kein Datum: bei listing-like Seiten EIN Detail-Link nachziehen
+            if (not ev_date) and detail_html and is_listing_like:
+                # Kandidaten-Detail-Links aus der geladenen Seite
+                detail_candidates: List[str] = []
+                for mm in _HTML_A_RE.finditer(detail_html):
+                    href2 = norm(mm.group(1))
+                    if not href2:
                         continue
-                    try:
-                        data = json.loads(raw)
-                    except Exception:
+                    hk2 = norm_key(href2)
+                    if hk2.startswith(("mailto:", "tel:", "javascript:")) or hk2.startswith("#"):
                         continue
 
-                    for node in _iter_ld_nodes(data):
-                        if not isinstance(node, dict):
-                            continue
-                        if not _is_event_type(node.get("@type")):
-                            continue
+                    u2 = _normalize_event_url(href2, url)  # base = aktuelle Seite
+                    if not u2 or u2 == url:
+                        continue
 
-                        sd = norm(str(node.get("startDate") or ""))
-                        ed = norm(str(node.get("endDate") or ""))
+                    p2 = urlparse(u2)
+                    if (p2.netloc or "").lower() != host:
+                        continue
 
-                        if sd:
-                            sd = sd.split("T")[0].split(" ")[0]
-                        if ed:
-                            ed = ed.split("T")[0].split(" ")[0]
+                    path2 = (p2.path or "").lower()
+                    if "/kategorie/" in path2 or "/category/" in path2:
+                        continue
 
-                        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
-                            ev_date = sd
-                            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
-                                ev_end = ed
-                            else:
-                                ev_end = sd
-                            break
+                    # nur plausible Detailpfade (konservativ)
+                    if not (
+                        "/veranstaltung" in path2
+                        or "/event" in path2
+                        or "/termin" in path2
+                        or ("/programm/" in path2 and "/kategorie/" not in path2)
+                        or "/portfolio-items/" in path2
+                    ):
+                        continue
 
-                    if ev_date:
+                    if u2 not in detail_candidates:
+                        detail_candidates.append(u2)
+
+                    if len(detail_candidates) >= 3:
                         break
 
-                # 2) Fallback: Datum aus Detailseiten-Text (DE/ISO/Slash/Ranges) extrahieren
-                if not ev_date:
-                    detail_text = clean_text(_strip_html_tags(detail_html))
-                    # Begrenzen, damit wir nicht unnötig viel Text parsen
-                    detail_combined = f"{title}\n{detail_text[:6000]}"
-                    d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
-                    if d_sd:
-                        ev_date = d_sd
-                        ev_end = d_ed or d_sd
-        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text, v1) ===
+                # genau EIN Detail-Fetch (zusätzlich), budgetiert
+                if detail_candidates and (detail_fetch_count < detail_fetch_budget):
+                    u2 = detail_candidates[0]
+                    host_fetches2 = detail_fetch_by_host.get(host, 0)
+                    if host_fetches2 < detail_fetch_host_cap:
+                        if u2 not in detail_html_cache:
+                            try:
+                                detail_html_cache[u2] = safe_fetch(u2, timeout=detail_fetch_timeout)
+                            except Exception:
+                                detail_html_cache[u2] = ""
+                            detail_fetch_count += 1
+                            detail_fetch_by_host[host] = host_fetches2 + 1
+
+                        h2 = detail_html_cache.get(u2, "") or ""
+                        if h2:
+                            d1, d2 = _extract_date_from_html(h2)
+                            if d1:
+                                ev_date, ev_end = d1, d2
+                                # URL auf echte Detailseite upgraden (Qualität, weniger missing_date)
+                                url = u2
+                                url_key = norm_key(url)
+                                url_seems_event = bool(
+                                    re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
+                                )
+        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v2) ===
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
         if not ev_date and not event_signal:
