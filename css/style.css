@@ -1755,14 +1755,24 @@ html.is-panel-open body {
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
 /* Overlay: ruhiges Dim (kein Blur) */
+/* === BEGIN BLOCK: DETAILPANEL OVERLAY (tokenized, consistent with other overlays) ===
+Zweck:
+- Gleiches Overlay-Dim wie Filter/Chooser (konsistente App-DNA)
+- Kein Blur (Performance + Klarheit)
+Umfang:
+- Nur .detail-panel-overlay
+=== */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: rgba(17, 24, 39, 0.32);
+
+  background: var(--ui-overlay-dim);
+
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+/* === END BLOCK: DETAILPANEL OVERLAY (tokenized, consistent with other overlays) === */
 
 /* === BEGIN REPLACE BLOCK: DETAILPANEL ADAPTIVE HEIGHT + SINGLE BOTTOM RESERVE (style.css:1550-1876)
 Zweck:
@@ -1783,32 +1793,42 @@ Umfang:
 === */
 
 /* Sheet */
+/* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) ===
+Zweck:
+- Sheet fühlt sich wie „eine App“ an (gleiche Border/Surface/Shadow-Logik wie Cards)
+- Weniger „random iOS sheet“, mehr konsistente Premium-Fläche
+Umfang:
+- Nur .detail-panel-content (keine Layout-Logik geändert)
+=== */
 #event-detail-panel .detail-panel-content{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  /* adaptiv statt fixe Höhe */
   height: auto;
 
-  /* Fallback + Cap (lange Inhalte scrollen sauber) */
   max-height: 72dvh;
   max-height: min(72dvh, 560px);
 
   display: flex;
   flex-direction: column;
 
-  background: rgba(255,255,255,0.98);
+  background: var(--color-surface);
+  border: 1px solid rgba(31,41,51,0.08);
+  border-bottom: 0;
+
   border-radius: 22px 22px 0 0;
 
+  /* „Card-DNA“: ruhiger, nicht so „heavy“ */
   box-shadow:
-    0 -10px 30px rgba(0,0,0,0.14),
-    0 -1px 0 rgba(31,41,51,0.05);
+    0 -18px 40px rgba(0,0,0,0.12),
+    0 -1px 0 rgba(255,255,255,0.70) inset;
 
   overflow: hidden;
   z-index: 2;
 }
+/* === END BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) === */
 
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
@@ -2065,17 +2085,22 @@ Umfang:
 - #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text
 === */
 
+/* === BEGIN BLOCK: DETAIL META ROWS (calmer, consistent dividers) ===
+Zweck:
+- Weniger „Tabellen-Look“, mehr ruhiger Rhythmus wie im Feed
+- Divider überall gleich „soft“
+Umfang:
+- .detail-meta-chips + .detail-chip
+=== */
 #event-detail-panel .detail-meta-chips{
   display: grid;
-  gap: 10px;
-  margin: 0 0 8px;
+  gap: 8px;
+  margin: 0 0 10px;
 }
 
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
-
-  /* MATCH zur Location-Row */
   gap: 10px;
 
   width: 100%;
@@ -2084,12 +2109,12 @@ Umfang:
   padding: 10px 0;
 
   border: 0;
-  border-bottom: 1px solid rgba(31,41,51,0.08);
+  border-bottom: 1px solid rgba(31,41,51,0.06);
 
   background: transparent;
   box-shadow: none;
 
-  font-size: 14px;
+  font-size: var(--font-event-meta);
   line-height: 1.2;
   font-weight: 650;
   color: rgba(31,41,51,0.90);
@@ -2101,6 +2126,7 @@ Umfang:
   overflow: visible;
   text-overflow: clip;
 }
+/* === END BLOCK: DETAIL META ROWS (calmer, consistent dividers) === */
 
 #event-detail-panel .detail-chip-text{
   min-width: 0;
@@ -2141,9 +2167,14 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
+/* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) ===
+Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
+Umfang: Nur :active
+=== */
 #event-detail-panel .detail-location-action:active{
-  background: rgba(31,41,51,0.03);
+  background: rgba(31,41,51,0.04);
 }
+/* === END BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) === */
 
 #event-detail-panel .detail-location-action.is-static{
   opacity: 0.82;
@@ -2785,6 +2816,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
