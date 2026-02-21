@@ -1437,7 +1437,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
         )
 
-                # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3) ===
+        # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
         # - Schließt review:event_signal_missing_date nachhaltig:
