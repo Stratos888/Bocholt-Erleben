@@ -112,7 +112,7 @@ STATUS: COMPLETED
 
 TASK 3: EVENT PIPELINE RELIABILITY IMPROVEMENT
 
-STATUS: In Progress
+STATUS: COMPLETED
 
 ---
 
@@ -651,38 +651,6 @@ Permanent UX and surface baseline established.
 
 2026-02-20
 
-Discovery Pipeline — Intake Quality + Noise Reduction session
-
-Status:
-
-IN PROGRESS
-
-Verified:
-
-- Pipeline runs stable (no HTML parser NameErrors; sources fetch ok)
-- Dedupe behavior verified: subsequent runs produce 0 new inbox rows when candidates already exist
-
-Implemented (pipeline-only):
-
-- Bocholt Veranstaltungskalender HTML parsing enabled (Stadt Bocholt HTML Kalender now produces candidates reliably)
-- Event signal recognition expanded to accept relevant event types (workshop/ausstellung/markt/repair café etc.)
-- Candidate noise reduction: HTML date-scan must not emit candidates unless (date present) OR (event signal present)
-
-Measured outcomes (observed runs):
-
-- 786 candidates parsed produced 55 inbox rows (first run after changes; inbox previously empty)
-- Subsequent run: 786 candidates parsed, 0 new inbox rows (expected due to dedupe)
-- After noise reduction: candidates parsed reduced to ~143 while preserving review candidates (0 new rows due to dedupe)
-
-Next pipeline focus (in priority order):
-
-1 Improve date extraction accuracy (reduce review:event_signal_missing_date)
-2 Source-specific improvements for top-performing sources (Bocholt calendar, KuKuG, NABU, Stadtbibliothek)
-3 Ongoing monitoring via Source_Health + Discovery_Candidates (no clearing during analysis)
----
----
-2026-02-20
-
 Discovery Pipeline — Date extraction improvement + detail enrichment
 
 Status:
@@ -722,6 +690,32 @@ Next pipeline focus:
 Extract date from detail-page HTML text using existing extractor
 
 Pipeline reliability remains intact.
+
+---
+2026-02-21
+
+Discovery Pipeline — TASK 3 Abschluss: Detail-HTML Nachladen + Datums-Extraktion (Correctness-first)
+
+Status:
+
+COMPLETED
+
+Beschlusslage:
+
+- Datumsermittlung wird bei fehlendem JSON-LD durch budgetiertes Nachladen von Detailseiten-HTML ergänzt.
+- Auf listing-like Seiten wird die Datumszuweisung konservativ gehandhabt (Korrektheit vor Vollständigkeit).
+- Listing → Detail wird bevorzugt (Detail-URL wird bei erfolgreicher Extraktion „hochgestuft“), um systematisch echte Event-Detailseiten zu erfassen.
+
+Nachweis (Messwerte, beobachtete Runs):
+
+- review:event_signal_missing_date reduziert von ~500–600 auf ~50–60 pro Run (bei ~200–216 candidates parsed).
+- Keine offensichtlichen falschen Datums-Treffer in den geprüften Review-Fällen festgestellt.
+- Dedupe-Verhalten bestätigt: „0 new inbox rows“ ist erwartbar, wenn Kandidaten bereits in Inbox existieren.
+
+Scope-Hinweis:
+
+- Keine UI-Änderungen.
+- Nur pipeline-seitige Anpassungen in scripts/discovery-to-inbox.py im Rahmen TASK 3.
 
 ---
 
@@ -907,11 +901,11 @@ OVERALL STATUS:
 
 UI: IN PROGRESS
 
-PIPELINE: IN PROGRESS
+PIPELINE: IN PROGRESS (TASK 3 COMPLETED)
 
 LAST UPDATE:
 
-2026-02-20
+2026-02-21
 
 ---
 
