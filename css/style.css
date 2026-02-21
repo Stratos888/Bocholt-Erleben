@@ -507,6 +507,32 @@ html.is-sheet-open { overflow: hidden; }
 html.is-sheet-open body { overflow: hidden; }
 /* === END BLOCK: FILTER SHEET SCROLL LOCK === */
 
+/* === BEGIN BLOCK: OVERLAY SAFETY CONTRACT (fixed overlays never clipped) ===
+Zweck:
+- Verhindert, dass sticky/transform/backdrop/contain Overlays „einsperren“
+- Gilt nur, wenn ein Overlay offen ist (sheet oder detailpanel)
+- Systematischer Guardrail gegen Regressionen
+
+Umfang:
+- Neutralisiert nur Risiko-Eigenschaften auf .top-stack während Overlays
+=== */
+
+/* Wenn irgendein Overlay offen ist: top-stack darf keinen containing context bauen */
+body.is-sheet-open .top-stack,
+body.is-panel-open .top-stack{
+  transform: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  contain: none !important;
+  overflow: visible !important;
+}
+
+/* Z-Order: Overlays müssen über dem Top-Stack liegen */
+body.is-sheet-open .top-stack{ z-index: 9997 !important; }
+body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
+
+/* === END BLOCK: OVERLAY SAFETY CONTRACT (fixed overlays never clipped) === */
+
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
@@ -2759,6 +2785,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
