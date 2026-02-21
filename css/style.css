@@ -1126,7 +1126,7 @@ Umfang:
 
   /* wichtig: kein transform → reduziert sticky „rubberband wobble“ auf Android */
   transform: none;
-  contain: paint;
+  contain: none;
 }
 /* === END BLOCK: TOP STACK (sticky, wobble-safe) === */
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
@@ -1396,8 +1396,9 @@ body.is-sheet-open .top-stack{
   transform: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  contain: none !important;
+  overflow: visible !important;
 
-  /* Wichtig: .top-stack (900) muss > .bottom-tabbar (950) liegen, sonst wird das Sheet darunter gerendert */
   z-index: 9997 !important;
 }
 /* === END BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) === */
@@ -2758,6 +2759,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
