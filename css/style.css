@@ -2017,10 +2017,9 @@ Zweck:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Entfernt doppeltes Top-Spacing (Root-Cause: #detail-content padding-top + .detail-header padding-top)
-- Titel/Icon optisch auf Close-Höhe (Topbar-Rhythmus)
-- Header-Icon identisch zur Actionbar: Kalender-Line-SVG (ohne Emoji/Text)
-- Entfernt Magic-Number 30px → nutzt Token --dp-close-size (systematisch)
+- Detailpanel-Header optisch identisch zur Event-Card-Hierarchie (Title-Row + Inline-Icon)
+- Icon wieder als Emoji/Zeichen sichtbar (wie Event-Card), kein SVG-Override
+- Typo/Spacing an Event-Card-DNA angleichen (ruhiger, konsistent)
 Umfang:
 - .detail-header + .detail-title-row + .detail-category-icon + .detail-title
 === */
@@ -2029,7 +2028,7 @@ Umfang:
 #event-detail-panel .detail-header{
   position: relative;
 
-  /* Root-Cause Fix: KEIN extra padding-top (kommt aus #detail-content) */
+  /* Kein doppeltes Top-Spacing: kommt aus #detail-content */
   padding: 0 0 12px;
   margin: 0;
 
@@ -2039,62 +2038,57 @@ Umfang:
 #event-detail-panel .detail-title-row{
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 
   /* Reserve für Close: Token statt Magic-Number */
   padding-right: calc(var(--dp-close-size) + var(--gutter));
 }
 
-#event-detail-panel .detail-category-icon{
-  flex: 0 0 auto;
-  order: -1;
-
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Text/Emoji ausblenden */
-  font-size: 0;
-  line-height: 0;
-  color: rgba(31,41,51,0.90);
-}
-
-/* Kalender-Icon wie in Actionbar (CSS-inlined SVG) */
-#event-detail-panel .detail-category-icon::before{
-  content: "";
-  width: 18px;
-  height: 18px;
-  display: block;
-
-  background-repeat: no-repeat;
-  background-size: 18px 18px;
-  background-position: center;
-
-  /* (bestehendes Data-URI bleibt unverändert) */
-}
-
+/* Title: wie Event-Card (Text dominiert, clamp) */
 #event-detail-panel .detail-title{
   margin: 0 0 6px;
   min-width: 0;
   flex: 1 1 auto;
 
-  /* Match zur Event-Card DNA (Token) */
   font-size: var(--font-event-title);
-  line-height: 1.18;
-  font-weight: 850;
-  letter-spacing: -0.02em;
-  color: rgba(31,41,51,0.96);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(31,41,51,0.92);
+  line-height: 1.25;
 
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+/* Icon: inline am Titelende, ruhig (wie Event-Card) */
+#event-detail-panel .detail-category-icon{
+  flex: 0 0 auto;
+
+  position: static;
+  display: inline;
+  width: auto;
+  height: auto;
+  margin-top: 0;
+
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.75;
+
+  /* kein Emoji-Suppression */
+  color: inherit;
+}
+
+/* SVG-Override deaktivieren (Event-Card-DNA: Emoji/Text Icon) */
+#event-detail-panel .detail-category-icon::before{
+  content: none;
+  background: none;
 }
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
@@ -2841,6 +2835,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
