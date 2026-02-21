@@ -310,6 +310,17 @@
       this.panel.setAttribute("role", "dialog");
       this.panel.setAttribute("aria-modal", "true");
       this.panel.setAttribute("aria-hidden", "true");
+            /* === BEGIN BLOCK: DETAILPANEL FOCUS FALLBACK TARGET ===
+      Zweck:
+      - Sheet als programmatisch fokussierbares Ziel bereitstellen (Fallback, falls Close fehlt/unsichtbar)
+      - Hilft Screenreader/Keyboard-Navigation (Enterprise a11y)
+      Umfang:
+      - Setzt tabindex nur auf .detail-panel-content (sheet)
+      === */
+      if (this.sheet && !this.sheet.hasAttribute("tabindex")) {
+        this.sheet.setAttribute("tabindex", "-1");
+      }
+      /* === END BLOCK: DETAILPANEL FOCUS FALLBACK TARGET === */
       if (this.closeBtn) this.closeBtn.setAttribute("aria-label", "Schließen");
 
       // Ensure drag hit area exists
@@ -484,9 +495,27 @@
         history.pushState({ ...(history.state || {}), detailOpen: true }, "");
       }
 
-      // focus close after transition
-      const focusClose = () => this.closeBtn?.focus({ preventScroll: true });
+           /* === BEGIN BLOCK: OPEN FOCUS (robust, transitionend + fallback) ===
+      Zweck:
+      - Close-Button wird zuverlässig fokussiert (auch wenn transitionend nicht feuert)
+      - Verhindert „kein Fokus“ bei reduced motion / fehlender Transition
+      Umfang:
+      - Ersetzt ausschließlich den Focus-After-Open Block in show(event)
+      === */
+      const focusClose = () => {
+        try { this.closeBtn?.focus({ preventScroll: true }); } catch (_) {}
+      };
+
+      // 1) Prefer transition end (smooth)
       this.panel.addEventListener("transitionend", focusClose, { once: true });
+
+      // 2) Fallback: next frame + micro delay
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (this.panel?.classList.contains("active")) focusClose();
+        }, 0);
+      });
+      /* === END BLOCK: OPEN FOCUS (robust, transitionend + fallback) === */
     },
 
     hide() {
@@ -1012,6 +1041,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
