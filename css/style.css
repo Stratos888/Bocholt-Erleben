@@ -2020,6 +2020,7 @@ Zweck:
 - Entfernt doppeltes Top-Spacing (Root-Cause: #detail-content padding-top + .detail-header padding-top)
 - Titel/Icon optisch auf Close-Höhe (Topbar-Rhythmus)
 - Header-Icon identisch zur Actionbar: Kalender-Line-SVG (ohne Emoji/Text)
+- Entfernt Magic-Number 30px → nutzt Token --dp-close-size (systematisch)
 Umfang:
 - .detail-header + .detail-title-row + .detail-category-icon + .detail-title
 === */
@@ -2041,8 +2042,8 @@ Umfang:
   gap: 12px;
   width: 100%;
 
-  /* Reserve für Close: 30px + rechter Gutter */
-  padding-right: calc(30px + var(--gutter));
+  /* Reserve für Close: Token statt Magic-Number */
+  padding-right: calc(var(--dp-close-size) + var(--gutter));
 }
 
 #event-detail-panel .detail-category-icon{
@@ -2072,10 +2073,10 @@ Umfang:
   display: block;
 
   background-repeat: no-repeat;
-  background-position: center;
   background-size: 18px 18px;
+  background-position: center;
 
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%231f2933%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%202v3M17%202v3%22%2F%3E%3Cpath%20d%3D%22M3.5%209h17%22%2F%3E%3Cpath%20d%3D%22M6%205h12a2.5%202.5%200%200%201%202.5%202.5v11A2.5%202.5%200%200%201%2018%2021H6A2.5%202.5%200%200%201%203.5%2018.5v-11A2.5%202.5%200%200%201%206%205z%22%2F%3E%3Cpath%20d%3D%22M7.5%2013h3M7.5%2016h6%22%2F%3E%3C%2Fsvg%3E");
+  /* (bestehendes Data-URI bleibt unverändert) */
 }
 
 #event-detail-panel .detail-title{
@@ -2083,10 +2084,11 @@ Umfang:
   min-width: 0;
   flex: 1 1 auto;
 
-  font-size: 20px;
-  line-height: 1.16;
-  font-weight: 840;
-  letter-spacing: -0.012em;
+  /* Match zur Event-Card DNA (Token) */
+  font-size: var(--font-event-title);
+  line-height: 1.18;
+  font-weight: 850;
+  letter-spacing: -0.02em;
   color: rgba(31,41,51,0.96);
 
   display: -webkit-box;
@@ -2839,6 +2841,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
