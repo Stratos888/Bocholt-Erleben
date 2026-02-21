@@ -484,11 +484,38 @@
       this.panel.classList.add("active");
       this.panel.setAttribute("aria-hidden", "false");
 
-      // body scroll lock (defensive)
-      if (this._savedBodyOverflow == null) {
-        this._savedBodyOverflow = document.body.style.overflow || "";
+          /* === BEGIN BLOCK: BODY SCROLL LOCK (iOS-safe, enterprise) ===
+      Zweck:
+      - Hintergrund darf NICHT scrollen/“rubberbanden”, auch auf iOS
+      - Scrollposition wird korrekt wiederhergestellt
+      Umfang:
+      - Ersetzt ausschließlich den bisherigen overflow-only Lock in show()
+      === */
+      if (!this._scrollLockActive) {
+
+        this._scrollLockActive = true;
+
+        // Save scroll position
+        this._savedScrollY = window.scrollY || 0;
+
+        // Save body inline styles (defensive)
+        if (this._savedBodyOverflow == null) this._savedBodyOverflow = document.body.style.overflow || "";
+        this._savedBodyPosition = document.body.style.position || "";
+        this._savedBodyTop = document.body.style.top || "";
+        this._savedBodyLeft = document.body.style.left || "";
+        this._savedBodyRight = document.body.style.right || "";
+        this._savedBodyWidth = document.body.style.width || "";
+
+        // Lock body (works reliably on iOS)
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${this._savedScrollY}px`;
+        document.body.style.left = "0";
+        document.body.style.right = "0";
+        document.body.style.width = "100%";
+
       }
-      document.body.style.overflow = "hidden";
+      /* === END BLOCK: BODY SCROLL LOCK (iOS-safe, enterprise) === */
 
       // history state (avoid stacking)
       if (!history.state?.detailOpen) {
@@ -553,11 +580,37 @@
       this.setDragY(0);
       this.setBase("100%");
 
-      // restore body scroll
-      if (this._savedBodyOverflow != null) {
-        document.body.style.overflow = this._savedBodyOverflow;
-        this._savedBodyOverflow = null;
+        /* === BEGIN BLOCK: BODY SCROLL UNLOCK (iOS-safe, enterprise) ===
+      Zweck:
+      - Stellt Body-Styles wieder her
+      - Springt exakt zur vorherigen Scrollposition zurück
+      Umfang:
+      - Ersetzt ausschließlich den bisherigen overflow-only Restore in hide()
+      === */
+      if (this._scrollLockActive) {
+
+        // Restore inline styles
+        if (this._savedBodyOverflow != null) {
+          document.body.style.overflow = this._savedBodyOverflow;
+          this._savedBodyOverflow = null;
+        }
+        document.body.style.position = this._savedBodyPosition || "";
+        document.body.style.top = this._savedBodyTop || "";
+        document.body.style.left = this._savedBodyLeft || "";
+        document.body.style.right = this._savedBodyRight || "";
+        document.body.style.width = this._savedBodyWidth || "";
+
+        // Restore scroll position
+        const y = Number(this._savedScrollY || 0);
+        this._savedScrollY = null;
+
+        this._scrollLockActive = false;
+
+        // Must happen after styles are restored
+        window.scrollTo(0, y);
+
       }
+      /* === END BLOCK: BODY SCROLL UNLOCK (iOS-safe, enterprise) === */
 
       // restore focus
       if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
@@ -1041,6 +1094,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
