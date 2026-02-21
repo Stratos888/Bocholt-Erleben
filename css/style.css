@@ -1653,12 +1653,23 @@ Regel:
 
 === */
 
+/* === BEGIN BLOCK: VIEWPORT LOCK – ROOT LEVEL (enterprise correct) ===
+Zweck:
+- Sperrt den gesamten Viewport garantiert (html + body)
+- verhindert Rubberband, Header-Shift, Background-Move
+- systematische Lösung ohne Nebenwirkungen
+=== */
+
 html.is-panel-open,
-body.is-panel-open {
+html.is-panel-open body {
 
   overflow: hidden;
+  height: 100%;
+  overscroll-behavior: none;
 
 }
+
+/* === END BLOCK: VIEWPORT LOCK – ROOT LEVEL === */
 
 /* === END BLOCK: VIEWPORT SCROLL LOCK CONTRACT === */
 
@@ -2683,6 +2694,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
