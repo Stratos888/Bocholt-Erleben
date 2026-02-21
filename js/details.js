@@ -506,13 +506,16 @@
         this._savedBodyRight = document.body.style.right || "";
         this._savedBodyWidth = document.body.style.width || "";
 
-        // Lock body (works reliably on iOS)
-        document.body.style.overflow = "hidden";
-        document.body.style.position = "fixed";
-        document.body.style.top = `-${this._savedScrollY}px`;
-        document.body.style.left = "0";
-        document.body.style.right = "0";
-        document.body.style.width = "100%";
+      // Lock body (works reliably on iOS)
+      document.documentElement.classList.add("is-panel-open");
+      document.body.classList.add("is-panel-open");
+
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${this._savedScrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
 
       }
       /* === END BLOCK: BODY SCROLL LOCK (iOS-safe, enterprise) === */
@@ -590,6 +593,9 @@
       if (this._scrollLockActive) {
 
         // Restore inline styles
+        document.documentElement.classList.remove("is-panel-open");
+        document.body.classList.remove("is-panel-open");
+
         if (this._savedBodyOverflow != null) {
           document.body.style.overflow = this._savedBodyOverflow;
           this._savedBodyOverflow = null;
@@ -1094,6 +1100,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
