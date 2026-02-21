@@ -36,7 +36,14 @@ REQUIRED_FIELDS = ["status", "title", "source_url", "created_at"]
 
 
 @dataclass
+# === BEGIN BLOCK: INBOX ITEM DATACLASS (incl. row_number for writeback) ===
+# Zweck:
+# - Ergänzt row_number (echte Sheet-Zeile), damit Writeback exakt die Zeile updaten kann.
+# Umfang:
+# - Ersetzt ausschließlich die InboxItem-Dataclass.
+@dataclass
 class InboxItem:
+    row_number: int  # echte Sheet-Zeile (Header=1, erste Datenzeile=2, ...)
     status: str
     id_suggestion: str
     title: str
@@ -54,6 +61,7 @@ class InboxItem:
     matched_event_id: str
     notes: str
     created_at: str
+# === END BLOCK: INBOX ITEM DATACLASS (incl. row_number for writeback) ===
 
 
 def fail(msg: str) -> None:
@@ -146,8 +154,14 @@ def main() -> None:
         if not (data.get("url", "") or data.get("source_url", "")):
             warnings_missing_open_url += 1
 
+        # === BEGIN BLOCK: APPEND INBOX ITEM (incl. row_number for writeback) ===
+        # Zweck:
+        # - Persistiert die echte Sheet-Zeile (idx) in row_number.
+        # Umfang:
+        # - Ersetzt ausschließlich den items.append(...) Block.
         items.append(
             InboxItem(
+                row_number=idx,
                 status=data.get("status", ""),
                 id_suggestion=data.get("id_suggestion", ""),
                 title=data.get("title", ""),
@@ -167,6 +181,7 @@ def main() -> None:
                 created_at=data.get("created_at", ""),
             )
         )
+        # === END BLOCK: APPEND INBOX ITEM (incl. row_number for writeback) ===
 
     # Sortierung: Neueste zuerst (created_at desc), Fallback stabil (title)
     def sort_key(it: InboxItem) -> Tuple[int, str, str]:
@@ -178,12 +193,19 @@ def main() -> None:
 
     out: List[Dict[str, str]] = []
     for it in items:
+        # === BEGIN BLOCK: OUTPUT OBJECT BASE FIELDS (incl. row_number for writeback) ===
+        # Zweck:
+        # - row_number ist Pflichtfeld für Writeback.
+        # Umfang:
+        # - Ersetzt ausschließlich das Basis-obj-Dict.
         obj: Dict[str, str] = {
+            "row_number": it.row_number,
             "status": it.status,
             "title": it.title,
             "source_url": it.source_url,
             "created_at": it.created_at,
         }
+        # === END BLOCK: OUTPUT OBJECT BASE FIELDS (incl. row_number for writeback) ===
 
         # Optionalfelder (nur wenn befüllt)
         if it.id_suggestion:
