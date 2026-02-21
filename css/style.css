@@ -1641,7 +1641,26 @@ Umfang:
 - #event-detail-panel + overlay + sheet + body scroll + header/meta/location/desc + close
 === */
 
-body.is-panel-open { overflow: hidden; }
+/* === BEGIN BLOCK: VIEWPORT SCROLL LOCK CONTRACT (systematic, single source of truth) ===
+Zweck:
+- Sperrt den gesamten Viewport sauber, ohne andere Komponenten zu beeinflussen
+- Verhindert Header-Rubberband und Background-Scroll
+- Grundlage für alle Overlay-Systeme (Detailpanel, zukünftige Overlays)
+
+Regel:
+- Nur html/body werden gesperrt
+- Keine overscroll-behavior Hacks auf anderen Ebenen
+
+=== */
+
+html.is-panel-open,
+body.is-panel-open {
+
+  overflow: hidden;
+
+}
+
+/* === END BLOCK: VIEWPORT SCROLL LOCK CONTRACT === */
 
 #event-detail-panel.detail-panel{
   position: fixed;
@@ -1799,27 +1818,33 @@ Umfang:
 - ersetzt ausschließlich .detail-panel-body Scrollblock
 === */
 
+/* === BEGIN BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT (single scroll authority) ===
+Zweck:
+- Dieses Element ist der EINZIGE Scroll-Container
+- verhindert Scroll-Propagation zum Viewport
+- stabile native Scroll-Physics auf iOS und Android
+- keine Seiteneffekte auf andere Layout-Elemente
+
+=== */
+
 #event-detail-panel .detail-panel-body{
 
   flex: 1 1 auto;
-  height: auto;
   min-height: 0;
 
-  overflow-x: hidden;
   overflow-y: auto;
+  overflow-x: hidden;
 
   -webkit-overflow-scrolling: touch;
 
-  overscroll-behavior-y: contain;
-  overscroll-behavior-x: none;
-
-  touch-action: pan-y;
+  overscroll-behavior: contain;
 
   padding: 0;
   box-sizing: border-box;
 
 }
 
+/* === END BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT === */
 /* === END BLOCK: DETAILPANEL SCROLL PHYSICS (native momentum + isolation, enterprise) === */
 
 #event-detail-panel #detail-content{
@@ -2658,6 +2683,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
