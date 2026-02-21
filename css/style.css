@@ -1821,11 +1821,17 @@ Zweck: Close sitzt auf gleicher Top-Höhe wie Header-Content; weniger Platzverlu
 Umfang: Nur Close-Button (Detailpanel).
 === */
 /* Close Button: aligned to gutter, compact */
+/* === BEGIN BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) ===
+Zweck:
+- Touch-Target >= 44x44 (Enterprise)
+- Optik bleibt kompakt (Token --dp-close-size)
+Umfang:
+- ersetzt nur .detail-panel-close + :active + ::before
+=== */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
-  top: calc(var(--dp-header-pad-top) - 3px); /* centered to title row */
-
+  top: calc(var(--dp-header-pad-top) - 3px);
 
   width: var(--dp-close-size);
   height: var(--dp-close-size);
@@ -1850,7 +1856,18 @@ Umfang: Nur Close-Button (Detailpanel).
   -webkit-tap-highlight-color: transparent;
   z-index: 20;
 }
+
+/* Invisible hit-area expansion to >=44px without changing visuals */
+#event-detail-panel .detail-panel-close::before{
+  content: "";
+  position: absolute;
+  inset: -7px; /* 30px + 14px = 44px */
+  border-radius: 999px;
+  background: transparent;
+}
+
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+/* === END BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) === */
 /* === BEGIN FIX: CSS PARSER BREAK (remove stray marker) ===
 Zweck: Entfernt eine ungültige Zeile ("== */"), die ab hier das komplette restliche CSS deaktiviert.
 Umfang: Nur Marker-Repair direkt nach dem Close-Button Patch.
@@ -2644,7 +2661,8 @@ Umfang:
 /* Buttons (können <a> oder <button> sein) */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
-
+  min-width: 44px;
+  min-height: 44px;
   width: 72px;
   height: 56px;
   padding: 8px 8px 6px;
@@ -2740,6 +2758,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
