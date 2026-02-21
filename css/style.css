@@ -1788,19 +1788,39 @@ Umfang: Nur dieser Marker direkt nach dem Close-Button Patch.
 
 
 /* Detailpanel: Scroll-Container bleibt .detail-panel-body; Gutter+Reserve liegen robust auf #detail-content */
+/* === BEGIN BLOCK: DETAILPANEL SCROLL PHYSICS (native momentum + isolation, enterprise) ===
+Zweck:
+- Native App Scrollgefühl (iOS + Android)
+- verhindert Scroll-Leaks und Scroll-Chaining
+- verhindert „Rubberband bleed“ in den Background
+- stabilisiert Touch-Verhalten in allen Browsern
+
+Umfang:
+- ersetzt ausschließlich .detail-panel-body Scrollblock
+=== */
+
 #event-detail-panel .detail-panel-body{
+
   flex: 1 1 auto;
   height: auto;
   min-height: 0;
 
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overflow-x: hidden;
+  overflow-y: auto;
 
-  /* wichtig: kein Layout-Gutter mehr hier, damit #detail-content single source ist */
+  -webkit-overflow-scrolling: touch;
+
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
+
+  touch-action: pan-y;
+
   padding: 0;
   box-sizing: border-box;
+
 }
+
+/* === END BLOCK: DETAILPANEL SCROLL PHYSICS (native momentum + isolation, enterprise) === */
 
 #event-detail-panel #detail-content{
   /* Abstand zum Grab-Handle/Top (Token) */
@@ -2638,6 +2658,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
