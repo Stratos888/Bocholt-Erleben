@@ -217,6 +217,16 @@ Umfang:
 @media (min-width: 900px){
   :root{
     --gutter: var(--gutter-lg);
+   /* === BEGIN BLOCK: OVERLAY TOKENS (global design system contract) ===
+  Zweck:
+  - Einheitliches Overlay-Dim für alle Overlays
+  - Grundlage für Detailpanel, Filter, Chooser und zukünftige Overlays
+  - verhindert visuelle Inkonsistenzen
+  === */
+
+  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+
+  /* === END BLOCK: OVERLAY TOKENS === */   
   }
 
   body{
@@ -2816,6 +2826,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
