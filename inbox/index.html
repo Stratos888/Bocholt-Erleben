@@ -67,15 +67,43 @@ Umfang:
         </div>
       </div>
 
+      <!-- === BEGIN BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) ===
+      Zweck:
+      - Daily-Review: oben nur 2 Buttons (Settings + Reload)
+      - API-URL/Unlock nur in einklappbaren Settings
+      Umfang:
+      - Ersetzt ausschließlich den bisherigen .inbox-actions Block
+      === END BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) === -->
       <div class="inbox-actions">
-        <input id="apiUrl" type="text" placeholder="Apps Script /exec URL" style="min-width: 280px;" />
-        <button id="saveApiUrl" class="btn btn-primary">URL speichern</button>
-        <button id="unlockBtn" class="btn btn-primary">Entsperren</button>
-        <button id="reloadBtn" class="btn">Reload</button>
+        <button id="settingsBtn" class="btn btn-primary" type="button" aria-expanded="false">⚙️</button>
+        <button id="reloadBtn" class="btn" type="button">↻</button>
       </div>
     </div>
 
-    <div id="statusLine" class="muted" style="margin-top:10px;"></div>
+    <!-- === BEGIN BLOCK: STATUS + SETTINGS PANEL (collapsed) ===
+    Zweck:
+    - Status kompakt
+    - Settings (API-URL + optional Unlock) einklappbar
+    Umfang:
+    - Ersetzt ausschließlich die statusLine-Zeile
+    === END BLOCK: STATUS + SETTINGS PANEL (collapsed) === -->
+    <div id="statusLine" class="muted" style="margin-top:10px; font-size:13px;"></div>
+
+    <div id="settingsPanel" class="onebox hidden" style="margin-top:10px;">
+      <div class="muted" style="margin-bottom:10px;">
+        Settings (nur nötig beim ersten Mal oder wenn du die API-URL ändern willst).
+      </div>
+
+      <div class="row" style="gap:10px;">
+        <input id="apiUrl" type="text" placeholder="Apps Script /exec URL" />
+        <button id="saveApiUrl" class="btn btn-primary" type="button">URL speichern</button>
+      </div>
+
+      <div class="row" style="margin-top:10px; gap:10px;">
+        <button id="unlockBtn" class="btn btn-primary" type="button">Entsperren</button>
+        <span class="muted">Tipp: Für Daily-Review brauchst du das nicht – Unlock passiert automatisch beim ersten Übernehmen/Verwerfen.</span>
+      </div>
+    </div>
 
 <!-- === BEGIN BLOCK: INBOX ONE-BY-ONE CONTAINER ===
 Zweck:
@@ -111,49 +139,57 @@ Umfang:
     // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
     // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
 
+       // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one, auto-unlock on approve/reject) ===
+    // Zweck:
+    // - One-by-one Review: 1 Item sichtbar
+    // - Auto-Unlock: beim ersten Übernehmen/Verwerfen Passwort abfragen -> Token in sessionStorage
+    // - Minimaler Screen: Meta komprimiert, Beschreibung standardmäßig eingeklappt
+    // Umfang:
+    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
+    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one, auto-unlock on approve/reject) ===
+
     const FEED_URL = "/data/inbox.json";
     const LS_API_URL_KEY = "inbox_writeback_api_url";
     const SS_TOKEN_KEY = "inbox_writeback_token";
 
     const elStatus = document.getElementById("statusLine");
     const elLock = document.getElementById("lockState");
-    const elApiUrl = document.getElementById("apiUrl");
-
     const elOne = document.getElementById("one");
     const elProgressLeft = document.getElementById("progressLeft");
+
+    const elSettingsBtn = document.getElementById("settingsBtn");
+    const elSettingsPanel = document.getElementById("settingsPanel");
+    const elApiUrl = document.getElementById("apiUrl");
+    const elSaveApiUrl = document.getElementById("saveApiUrl");
+    const elUnlockBtn = document.getElementById("unlockBtn");
 
     let queue = [];
     let current = null;
 
-    document.getElementById("saveApiUrl").addEventListener("click", () => {
+    document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
+
+    elSettingsBtn.addEventListener("click", () => {
+      const isOpen = !elSettingsPanel.classList.contains("hidden");
+      if (isOpen) {
+        elSettingsPanel.classList.add("hidden");
+        elSettingsBtn.setAttribute("aria-expanded", "false");
+      } else {
+        elSettingsPanel.classList.remove("hidden");
+        elSettingsBtn.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    elSaveApiUrl.addEventListener("click", () => {
       const v = (elApiUrl.value || "").trim();
       if (!v) return setStatus("Bitte Apps Script /exec URL eintragen.");
       localStorage.setItem(LS_API_URL_KEY, v);
       setStatus("URL gespeichert.");
     });
 
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
-
-    document.getElementById("unlockBtn").addEventListener("click", async () => {
-      const api = getApiUrl();
-      if (!api) return setStatus("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
-      const pw = prompt("Passwort zum Entsperren:");
-      if (!pw) return;
-
-      try {
-        const res = await jsonp(api, { action: "unlock", password: pw });
-        if (!res || !res.ok || !res.token) {
-          setStatus("Unlock fehlgeschlagen.");
-          return;
-        }
-        sessionStorage.setItem(SS_TOKEN_KEY, res.token);
-        refreshLockState();
-        setStatus(`Entsperrt (TTL: ${res.expires_in_seconds || "?"}s).`);
-        renderCurrent(); // Buttons aktivieren
-      } catch (e) {
-        console.error(e);
-        setStatus("Unlock fehlgeschlagen (JSONP/CORS).");
-      }
+    elUnlockBtn.addEventListener("click", async () => {
+      const ok = await ensureUnlocked(true);
+      if (ok) setStatus("Entsperrt.");
+      renderCurrent();
     });
 
     function getApiUrl() {
@@ -169,8 +205,7 @@ Umfang:
     }
 
     function refreshLockState() {
-      const t = getToken();
-      if (t) {
+      if (isUnlocked()) {
         elLock.textContent = "entsperrt";
         elLock.classList.remove("muted");
       } else {
@@ -198,8 +233,8 @@ Umfang:
 
       const items = await r.json();
       queue = (items || []).filter(it => (String(it.status || "").toLowerCase() === "review"));
-      setStatus(`Geladen: ${queue.length} review-items (von ${(items||[]).length}).`);
 
+      setStatus(`Review: ${queue.length}`);
       showNext();
     }
 
@@ -215,7 +250,7 @@ Umfang:
         elOne.innerHTML = `
           <div class="onebox">
             <h3>Keine review-items mehr 🎉</h3>
-            <div class="muted">Reload, um neu zu laden.</div>
+            <div class="muted">↻ zum Neuladen.</div>
           </div>
         `;
         elProgressLeft.textContent = "0 übrig";
@@ -225,41 +260,51 @@ Umfang:
       elProgressLeft.textContent = `${queue.length + 1} übrig`;
 
       const it = current;
+
       const title = escapeHtml(it.title || "(ohne Titel)");
 
-      const meta = [];
-      if (it.row_number) meta.push(`<span class="pill">row ${escapeHtml(String(it.row_number))}</span>`);
-      if (it.date) meta.push(`<span class="pill">${escapeHtml(it.date)}</span>`);
-      if (it.time) meta.push(`<span class="pill">${escapeHtml(it.time)}</span>`);
-      if (it.city) meta.push(`<span class="pill">${escapeHtml(it.city)}</span>`);
-      if (it.location) meta.push(`<span class="pill">${escapeHtml(it.location)}</span>`);
-      if (it.kategorie_suggestion) meta.push(`<span class="pill">${escapeHtml(it.kategorie_suggestion)}</span>`);
-      if (it.match_score) meta.push(`<span class="pill">match ${escapeHtml(it.match_score)}</span>`);
-      if (it.source_name) meta.push(`<span class="pill">${escapeHtml(it.source_name)}</span>`);
+      const parts = [];
+      if (it.date) parts.push(it.date);
+      if (it.time) parts.push(it.time);
+      if (it.city) parts.push(it.city);
+      const metaLine = parts.length ? escapeHtml(parts.join(" · ")) : "";
+
+      const locLine = (it.location || "").trim();
+      const srcLine = (it.source_name || "").trim();
 
       const desc = (it.description || "").trim();
-      const descHtml = desc ? `<div class="onebox-desc">${escapeHtml(desc)}</div>` : "";
+      const descShort = desc ? escapeHtml(desc.slice(0, 160) + (desc.length > 160 ? " …" : "")) : "";
 
       const openDisabled = !(it.url || it.source_url);
-      const actDisabled = !isUnlocked();
 
       elOne.innerHTML = `
         <div class="onebox" id="onebox">
           <h3>${title}</h3>
-          <div class="onebox-meta">${meta.join("")}</div>
-          ${descHtml}
+
+          ${metaLine ? `<div class="muted" style="margin:6px 0 10px; font-size:14px;">${metaLine}</div>` : ""}
+
+          ${locLine ? `<div class="muted" style="margin:-6px 0 10px; font-size:14px;">📍 ${escapeHtml(locLine)}</div>` : ""}
+
+          ${srcLine ? `<div class="muted" style="margin:-6px 0 12px; font-size:13px;">Quelle: ${escapeHtml(srcLine)}</div>` : ""}
+
+          ${desc ? `
+            <details style="margin: 0 0 12px;">
+              <summary class="muted" style="cursor:pointer; font-size:13px;">Kurztext anzeigen</summary>
+              <div class="onebox-desc" style="margin-top:8px;">${escapeHtml(desc)}</div>
+            </details>
+          ` : ""}
+
           <div class="onebox-actions">
             <button id="btnOpen" class="btn btn-primary" type="button" ${openDisabled ? "disabled" : ""}>Öffnen</button>
-            <button id="btnOk" class="btn btn-good" type="button" ${actDisabled ? "disabled" : ""}>Übernehmen</button>
-            <button id="btnNo" class="btn btn-bad" type="button" ${actDisabled ? "disabled" : ""}>Verwerfen</button>
+            <button id="btnOk" class="btn btn-good" type="button">Übernehmen</button>
+            <button id="btnNo" class="btn btn-bad" type="button">Verwerfen</button>
           </div>
-          ${actDisabled ? `<div class="muted" style="margin-top:10px;">Zum Bestätigen bitte oben <strong>Entsperren</strong>.</div>` : ``}
         </div>
       `;
 
       document.getElementById("btnOpen").addEventListener("click", () => openUrl(it));
-      document.getElementById("btnOk").addEventListener("click", () => setStatusWriteback(it, "übernehmen"));
-      document.getElementById("btnNo").addEventListener("click", () => setStatusWriteback(it, "verworfen"));
+      document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
+      document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
     }
 
     function openUrl(it) {
@@ -271,18 +316,52 @@ Umfang:
       window.open(u, "_blank", "noopener,noreferrer");
     }
 
-    function setStatusWriteback(it, newStatus) {
+    async function approveReject(newStatus) {
+      if (!current) return;
+
+      // Auto-Unlock beim ersten Klick
+      const ok = await ensureUnlocked(false);
+      if (!ok) return;
+
+      await setStatusWriteback(current, newStatus);
+    }
+
+    async function ensureUnlocked(fromSettings) {
+      const api = getApiUrl();
+      if (!api) {
+        // Settings automatisch öffnen, damit du die URL setzen kannst
+        elSettingsPanel.classList.remove("hidden");
+        elSettingsBtn.setAttribute("aria-expanded", "true");
+        setStatus("Fehlt: Apps Script URL (⚙️ öffnen).");
+        return false;
+      }
+
+      if (isUnlocked()) return true;
+
+      const pw = prompt(fromSettings ? "Passwort zum Entsperren:" : "Passwort (einmal pro Session):");
+      if (!pw) return false;
+
+      try {
+        const res = await jsonp(api, { action: "unlock", password: pw });
+        if (!res || !res.ok || !res.token) {
+          setStatus("Unlock fehlgeschlagen.");
+          return false;
+        }
+        sessionStorage.setItem(SS_TOKEN_KEY, res.token);
+        refreshLockState();
+        setStatus("Entsperrt.");
+        return true;
+      } catch (e) {
+        console.error(e);
+        setStatus("Unlock fehlgeschlagen (JSONP/CORS).");
+        return false;
+      }
+    }
+
+    async function setStatusWriteback(it, newStatus) {
       const api = getApiUrl();
       const token = getToken();
 
-      if (!api) {
-        alert("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
-        return;
-      }
-      if (!token) {
-        alert("Bitte zuerst entsperren (Button 'Entsperren').");
-        return;
-      }
       if (!it.row_number) {
         alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
         return;
@@ -290,8 +369,10 @@ Umfang:
 
       const btnOk = document.getElementById("btnOk");
       const btnNo = document.getElementById("btnNo");
+      const btnOpen = document.getElementById("btnOpen");
       if (btnOk) btnOk.disabled = true;
       if (btnNo) btnNo.disabled = true;
+      if (btnOpen) btnOpen.disabled = true;
 
       const img = new Image();
       const qs = new URLSearchParams({
@@ -302,24 +383,16 @@ Umfang:
       });
 
       img.onload = () => {
-        setStatus(`OK: row ${it.row_number} → ${newStatus}`);
+        setStatus(`OK → ${newStatus}`);
         showNext();
       };
       img.onerror = () => {
-        setStatus(`Fehler: row ${it.row_number} → ${newStatus} (Network/Token?)`);
+        setStatus(`Fehler bei ${newStatus} (Token abgelaufen?)`);
         renderCurrent();
       };
 
       img.src = api.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
     }
-
-    document.addEventListener("keydown", (ev) => {
-      if (!current) return;
-      const k = String(ev.key || "").toLowerCase();
-      if (k === "o") openUrl(current);
-      if (k === "a") setStatusWriteback(current, "übernehmen");
-      if (k === "v") setStatusWriteback(current, "verworfen");
-    });
 
     function escapeHtml(s) {
       return String(s || "")
