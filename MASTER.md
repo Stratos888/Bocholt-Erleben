@@ -88,11 +88,25 @@ No visual clutter
 
 Max two primary actions
 
-No layout breaks
+No layout breaks (mobile + desktop)
 
 No visual trust-breaking elements
 
 Professional appearance achieved
+
+FOUNDATION BASELINE (DONE THIS SPRINT):
+
+- Focus trap + ESC close behavior stable
+- Scroll isolation stable (panel open: background locked; panel body scroll only)
+- Overlay stability guardrails applied (fixed overlays must never be clipped)
+- Touch targets meet enterprise minimum (close/actionbar)
+- Reduced Motion support present (prefers-reduced-motion)
+
+REMAINING (NEXT UI WORK INSIDE TASK 1):
+
+- Visual DNA alignment to Golden Screen baseline (header/title/meta rhythm)
+- Chooser overlay hardening (avoid future overlay scope regressions)
+- Drag/snap feel polish (no phantom drags, consistent snap behavior)
 
 After completion:
 
@@ -648,7 +662,41 @@ APPLIED as bugfix within Golden Screen constraints.
 Decision authority:
 
 Permanent UX and surface baseline established.
+2026-02-21
 
+Detailpanel UI Stabilization — Foundation Baseline Hardening (UI-only)
+
+Status:
+
+IN PROGRESS (Foundation baseline achieved; visual alignment pending)
+
+Applied (UI/Overlay only; pipeline untouched):
+
+- Detailpanel keyboard accessibility hardened:
+  - ESC closes
+  - Focus trap prevents focus leak
+  - robust focus handling on open
+- Panel open/close root-state standardized:
+  - .is-panel-open is applied on html + body to enable root-level scroll/overscroll contracts
+- Scroll & overscroll stabilization:
+  - Android “rubberband” on Events page eliminated via root overscroll-behavior guard
+  - Pull-to-refresh disabled intentionally (enterprise-controlled refresh; prevents accidental reload)
+- Overlay regression guardrail:
+  - Removed/neutralized overlay-clipping causes (contain/transform/backdrop contexts) when overlays are active
+  - Fixed filter sheet clipping regression caused by containing contexts
+- Design system token introduced:
+  - --ui-overlay-dim defined globally and used by detailpanel overlay for consistent dimming
+- Touch target compliance:
+  - Close button hit area expanded (visual unchanged) via ::before
+  - Actionbar buttons guarded to >= 44x44
+- Reduced motion support:
+  - prefers-reduced-motion contract present and verified via devtools emulation
+
+Next inside Task 1:
+
+- Visual DNA alignment (detail header/typography/rhythm to Golden Screen baseline)
+- Chooser overlay hardening (avoid scope regressions)
+- Drag/snap feel polish
 2026-02-20
 
 Discovery Pipeline — Date extraction improvement + detail enrichment
