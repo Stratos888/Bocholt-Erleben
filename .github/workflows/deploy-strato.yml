@@ -33,24 +33,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # === BEGIN BLOCK: BUILD EVENTS (TSV -> JSON, fail-fast) ===
+      # === BEGIN BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
       # Zweck:
-      # - events.tsv ist die einzige Quelle.
-      # - events.json wird in der Action generiert (kein lokales Script nötig).
+      # - events.tsv ist die einzige Quelle für Events.
+      # - inbox.tsv ist die einzige Quelle für Inbox-Review.
+      # - events.json + inbox.json werden in der Action generiert.
       # - Fail-Fast: Bei Fehlern KEIN Deploy.
       # Umfang:
-      # - Führt scripts/build-events-from-tsv.py aus und erzeugt data/events.json
+      # - Exportiert Tabs "Events" und "Inbox" via Sheets API
+      # - Führt scripts/build-events-from-tsv.py + scripts/build-inbox-from-tsv.py aus
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-                 # === BEGIN BLOCK: GOOGLE SHEET → events.tsv (fail-fast, single source of truth) ===
+      # === BEGIN BLOCK: GOOGLE SHEET → TSV EXPORTS (Events + Inbox, fail-fast) ===
       # Zweck:
-      #   - Google Sheet ist die einzige Quelle für Events (Fail-Fast, kein Fallback).
-      #   - Exportiert gezielt den Tab "Events" via Sheets API (kein Publish-to-web nötig).
+      #   - Google Sheet ist die einzige Quelle (Fail-Fast, kein Fallback).
+      #   - Exportiert gezielt die Tabs "Events" und "Inbox" via Sheets API.
       # Sicherheit:
-      #   - Abbruch bei Auth-/Read-Fehlern, leerem Sheet oder fehlenden Pflichtspalten.
+      #   - Abbruch bei Auth-/Read-Fehlern oder fehlenden Pflichtspalten.
       - name: Install deps (Google Sheets API)
         shell: bash
         run: |
@@ -121,9 +123,66 @@ jobs:
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
           PY
           test -s data/events.tsv
-      # === END BLOCK: GOOGLE SHEET → events.tsv (fail-fast, single source of truth) ===
 
+      - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows)
+        shell: bash
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -e
+          python - <<'PY'
+          import csv, json, os, sys
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
 
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+            print("❌ ENV SHEET_ID fehlt.", file=sys.stderr); sys.exit(1)
+          if not sa_json:
+            print("❌ ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.", file=sys.stderr); sys.exit(1)
+
+          try:
+            sa_info = json.loads(sa_json)
+          except Exception:
+            print("❌ GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.", file=sys.stderr); sys.exit(1)
+
+          scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          rng = "Inbox!A:ZZ"
+          res = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=rng).execute()
+          values = res.get("values", []) or []
+          if not values:
+            print("❌ Inbox-Tab ist leer oder nicht lesbar.", file=sys.stderr); sys.exit(1)
+
+          header = [h.strip() for h in (values[0] or [])]
+          required = ["status","title","source_url","created_at"]
+          missing = [c for c in required if c not in header]
+          if missing:
+            print(f"❌ Inbox-Header unvollständig. Fehlende Spalten: {missing}. Header={header}", file=sys.stderr)
+            sys.exit(1)
+
+          rows = []
+          for r in values[1:]:
+            r = (r or [])
+            row = [ (r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header)) ]
+            if any(v for v in row):
+              rows.append(row)
+
+          out_path = "data/inbox.tsv"
+          with open(out_path, "w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f, delimiter="\t", lineterminator="\n")
+            w.writerow(header)
+            if rows:
+              w.writerows(rows)
+
+          print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
+          PY
+          test -s data/inbox.tsv
+      # === END BLOCK: GOOGLE SHEET → TSV EXPORTS (Events + Inbox, fail-fast) ===
 
       - name: Build events.json from events.tsv
         shell: bash
@@ -133,7 +192,16 @@ jobs:
 
           echo "=== events.json (head) ==="
           head -n 40 data/events.json || true
-      # === END BLOCK: BUILD EVENTS (TSV -> JSON, fail-fast) ===
+
+      - name: Build inbox.json from inbox.tsv
+        shell: bash
+        run: |
+          set -e
+          python scripts/build-inbox-from-tsv.py
+
+          echo "=== inbox.json (head) ==="
+          head -n 60 data/inbox.json || true
+      # === END BLOCK: BUILD EVENTS + INBOX FEEDS (TSV -> JSON, fail-fast where needed) ===
 
       - name: Compute build version
         shell: bash
