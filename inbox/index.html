@@ -101,6 +101,16 @@ Umfang:
     // - Ersetzt die gesamte bisherige Logik im <script> Block ab dieser Marker-Zeile
     // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
 
+        // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
+    // Zweck:
+    // - One-by-one Review: zeigt immer nur 1 Item (status=review)
+    // - Unlock via Apps Script JSONP (Passwort 1x) -> token in sessionStorage
+    // - setStatus via IMG GET (CORS-frei), benötigt row_number
+    // - Nach Übernehmen/Verwerfen -> nächstes Item
+    // Umfang:
+    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
+    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
+
     const FEED_URL = "/data/inbox.json";
     const LS_API_URL_KEY = "inbox_writeback_api_url";
     const SS_TOKEN_KEY = "inbox_writeback_token";
@@ -248,8 +258,8 @@ Umfang:
       `;
 
       document.getElementById("btnOpen").addEventListener("click", () => openUrl(it));
-      document.getElementById("btnOk").addEventListener("click", () => approveCurrent());
-      document.getElementById("btnNo").addEventListener("click", () => rejectCurrent());
+      document.getElementById("btnOk").addEventListener("click", () => setStatusWriteback(it, "übernehmen"));
+      document.getElementById("btnNo").addEventListener("click", () => setStatusWriteback(it, "verworfen"));
     }
 
     function openUrl(it) {
@@ -259,16 +269,6 @@ Umfang:
         return;
       }
       window.open(u, "_blank", "noopener,noreferrer");
-    }
-
-    function approveCurrent() {
-      if (!current) return;
-      setStatusWriteback(current, "übernehmen");
-    }
-
-    function rejectCurrent() {
-      if (!current) return;
-      setStatusWriteback(current, "verworfen");
     }
 
     function setStatusWriteback(it, newStatus) {
@@ -288,13 +288,11 @@ Umfang:
         return;
       }
 
-      // Buttons sofort sperren, damit keine Doppelklicks passieren
       const btnOk = document.getElementById("btnOk");
       const btnNo = document.getElementById("btnNo");
       if (btnOk) btnOk.disabled = true;
       if (btnNo) btnNo.disabled = true;
 
-      // CORS-frei via IMG GET (Apps Script doGet)
       const img = new Image();
       const qs = new URLSearchParams({
         action: "setStatus",
@@ -305,25 +303,22 @@ Umfang:
 
       img.onload = () => {
         setStatus(`OK: row ${it.row_number} → ${newStatus}`);
-        // Nächstes Item anzeigen
         showNext();
       };
       img.onerror = () => {
         setStatus(`Fehler: row ${it.row_number} → ${newStatus} (Network/Token?)`);
-        // Buttons wieder aktivieren
         renderCurrent();
       };
 
       img.src = api.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
     }
 
-    // Keyboard shortcuts (Mobile: optional, Desktop: hilfreich)
     document.addEventListener("keydown", (ev) => {
       if (!current) return;
       const k = String(ev.key || "").toLowerCase();
       if (k === "o") openUrl(current);
-      if (k === "a") approveCurrent();
-      if (k === "v") rejectCurrent();
+      if (k === "a") setStatusWriteback(current, "übernehmen");
+      if (k === "v") setStatusWriteback(current, "verworfen");
     });
 
     function escapeHtml(s) {
@@ -335,7 +330,6 @@ Umfang:
         .replaceAll("'", "&#039;");
     }
 
-    // JSONP helper: benötigt Apps Script Support für ?callback=fn
     function jsonp(apiUrl, params) {
       return new Promise((resolve, reject) => {
         const cbName = "__inbox_cb_" + Math.random().toString(16).slice(2);
@@ -365,212 +359,6 @@ Umfang:
       });
     }
 
-    // Init
-    (function init() {
-      const saved = localStorage.getItem(LS_API_URL_KEY);
-      if (saved) elApiUrl.value = saved;
-      refreshLockState();
-      loadAndRender().catch(err => {
-        console.error(err);
-        setStatus("Fehler beim Laden/Rendern (siehe Console).");
-      });
-    })();
-
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
-
-    document.getElementById("unlockBtn").addEventListener("click", async () => {
-      const api = getApiUrl();
-      if (!api) return setStatus("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
-      const pw = prompt("Passwort zum Entsperren:");
-      if (!pw) return;
-
-      try {
-        const res = await jsonp(api, { action: "unlock", password: pw });
-        if (!res || !res.ok || !res.token) {
-          setStatus("Unlock fehlgeschlagen.");
-          return;
-        }
-        sessionStorage.setItem(SS_TOKEN_KEY, res.token);
-        refreshLockState();
-        setStatus(`Entsperrt (TTL: ${res.expires_in_seconds || "?"}s).`);
-      } catch (e) {
-        console.error(e);
-        setStatus("Unlock fehlgeschlagen (JSONP/CORS).");
-      }
-    });
-
-    function getApiUrl() {
-      return (localStorage.getItem(LS_API_URL_KEY) || "").trim();
-    }
-
-    function getToken() {
-      return (sessionStorage.getItem(SS_TOKEN_KEY) || "").trim();
-    }
-
-    function refreshLockState() {
-      const t = getToken();
-      if (t) {
-        elLock.textContent = "entsperrt";
-        elLock.classList.remove("muted");
-      } else {
-        elLock.textContent = "gesperrt";
-        elLock.classList.add("muted");
-      }
-    }
-
-    function setStatus(msg) {
-      elStatus.textContent = msg || "";
-    }
-
-    async function loadAndRender() {
-      setStatus("Lade inbox.json …");
-      elList.innerHTML = "";
-
-      const url = FEED_URL + "?v=" + Date.now();
-      const r = await fetch(url, { cache: "no-store" });
-      if (!r.ok) {
-        setStatus(`Fehler: inbox.json nicht ladbar (${r.status}).`);
-        return;
-      }
-
-      const items = await r.json();
-      const review = (items || []).filter(it => (String(it.status || "").toLowerCase() === "review"));
-
-      setStatus(`Geladen: ${review.length} review-items (von ${items.length}).`);
-
-      if (!review.length) {
-        elList.innerHTML = `<div class="muted">Keine review-items vorhanden.</div>`;
-        return;
-      }
-
-      for (const it of review) {
-        elList.appendChild(renderCard(it));
-      }
-    }
-
-    function openUrl(it) {
-      const u = (it.url || it.source_url || "").trim();
-      if (!u) {
-        alert("Keine URL vorhanden (weder url noch source_url).");
-        return;
-      }
-      window.open(u, "_blank", "noopener,noreferrer");
-    }
-
-    function setStatusWriteback(it, newStatus) {
-      const api = getApiUrl();
-      const token = getToken();
-
-      if (!api) {
-        alert("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
-        return;
-      }
-      if (!token) {
-        alert("Bitte zuerst entsperren (Button 'Entsperren').");
-        return;
-      }
-      if (!it.row_number) {
-        alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-        return;
-      }
-
-      // CORS-frei via IMG GET (Apps Script doGet)
-      // Hinweis: Das setzt voraus, dass Apps Script JSONP/GET unterstützt (siehe Code.gs Patch).
-      const img = new Image();
-      const qs = new URLSearchParams({
-        action: "setStatus",
-        token,
-        row_number: String(it.row_number),
-        status: String(newStatus)
-      });
-      img.onload = () => setStatus(`OK: row ${it.row_number} → ${newStatus}`);
-      img.onerror = () => setStatus(`Fehler: row ${it.row_number} → ${newStatus} (Network/Token?)`);
-      img.src = api.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
-
-      // Optimistisch aus UI entfernen
-      const card = document.getElementById("card-" + it.row_number);
-      if (card) card.remove();
-    }
-
-    function renderCard(it) {
-      const card = document.createElement("div");
-      card.className = "inbox-card";
-      card.id = "card-" + (it.row_number || Math.random().toString(16).slice(2));
-
-      const title = escapeHtml(it.title || "(ohne Titel)");
-      const meta = [];
-
-      if (it.row_number) meta.push(`<span class="pill">row ${escapeHtml(String(it.row_number))}</span>`);
-      if (it.date) meta.push(`<span class="pill">${escapeHtml(it.date)}</span>`);
-      if (it.time) meta.push(`<span class="pill">${escapeHtml(it.time)}</span>`);
-      if (it.city) meta.push(`<span class="pill">${escapeHtml(it.city)}</span>`);
-      if (it.location) meta.push(`<span class="pill">${escapeHtml(it.location)}</span>`);
-      if (it.kategorie_suggestion) meta.push(`<span class="pill">${escapeHtml(it.kategorie_suggestion)}</span>`);
-      if (it.match_score) meta.push(`<span class="pill">match ${escapeHtml(it.match_score)}</span>`);
-      if (it.source_name) meta.push(`<span class="pill">${escapeHtml(it.source_name)}</span>`);
-
-      const desc = (it.description || "").trim();
-      const descHtml = desc ? `<p class="inbox-desc">${escapeHtml(desc)}</p>` : "";
-
-      card.innerHTML = `
-        <h3>${title}</h3>
-        <div class="inbox-meta">${meta.join("")}</div>
-        ${descHtml}
-        <div class="row">
-          <button class="btn btn-primary" type="button">Öffnen</button>
-          <button class="btn btn-good" type="button">Übernehmen</button>
-          <button class="btn btn-bad" type="button">Verwerfen</button>
-        </div>
-      `;
-
-      const [btnOpen, btnOk, btnNo] = card.querySelectorAll("button");
-      btnOpen.addEventListener("click", () => openUrl(it));
-      btnOk.addEventListener("click", () => setStatusWriteback(it, "übernehmen"));
-      btnNo.addEventListener("click", () => setStatusWriteback(it, "verworfen"));
-
-      return card;
-    }
-
-    function escapeHtml(s) {
-      return String(s || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    // JSONP helper: benötigt Apps Script Support für ?callback=fn
-    function jsonp(apiUrl, params) {
-      return new Promise((resolve, reject) => {
-        const cbName = "__inbox_cb_" + Math.random().toString(16).slice(2);
-        const qs = new URLSearchParams(params || {});
-        qs.set("callback", cbName);
-
-        const src = apiUrl.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
-        const script = document.createElement("script");
-
-        window[cbName] = (data) => {
-          cleanup();
-          resolve(data);
-        };
-
-        script.onerror = () => {
-          cleanup();
-          reject(new Error("jsonp_load_failed"));
-        };
-
-        function cleanup() {
-          try { delete window[cbName]; } catch (_) { window[cbName] = undefined; }
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-
-        script.src = src;
-        document.body.appendChild(script);
-      });
-    }
-
-    // Init
     (function init() {
       const saved = localStorage.getItem(LS_API_URL_KEY);
       if (saved) elApiUrl.value = saved;
