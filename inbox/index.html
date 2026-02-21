@@ -13,26 +13,46 @@ Umfang:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Inbox Review</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <style>
-    /* minimal layout only (keine Design-Refactors) */
-    .inbox-wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-    .inbox-top { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
-    .inbox-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .inbox-list { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
-    .inbox-card { border: 1px solid rgba(0,0,0,.12); border-radius: 12px; padding: 12px; background: rgba(255,255,255,.02); }
-    .inbox-card h3 { margin: 0 0 6px 0; font-size: 16px; line-height: 1.2; }
-    .inbox-meta { font-size: 13px; opacity: .85; display:flex; flex-wrap:wrap; gap:8px; margin: 6px 0 10px; }
-    .inbox-desc { font-size: 14px; opacity: .92; margin: 0 0 10px; white-space: pre-wrap; }
-    .btn { padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
-    .btn:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-primary { border-color: rgba(0,0,0,.28); }
-    .btn-good { border-color: rgba(0,120,0,.45); }
-    .btn-bad { border-color: rgba(160,0,0,.45); }
-    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
-    .muted { opacity: .75; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    input[type="text"], input[type="password"] { padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,.18); background: transparent; }
-  </style>
+<style>
+  /* === BEGIN BLOCK: INBOX ONE-BY-ONE UI (mobile-first, minimal) ===
+     Zweck:
+     - One-by-one Review (nur 1 Item sichtbar)
+     - Buttons groß, klare Struktur, weniger Text
+     Umfang:
+     - Ersetzt ausschließlich den kompletten <style> Block
+  === END BLOCK: INBOX ONE-BY-ONE UI (mobile-first, minimal) === */
+
+  .inbox-wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
+  .inbox-top { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+  .inbox-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+  .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary { border-color: rgba(0,0,0,.28); }
+  .btn-good { border-color: rgba(0,120,0,.45); }
+  .btn-bad { border-color: rgba(160,0,0,.45); }
+
+  .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
+  .muted { opacity: .75; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+  input[type="text"], input[type="password"] {
+    padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18);
+    background: transparent; width: min(520px, 78vw);
+  }
+
+  .onebox { margin-top: 14px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
+  .onebox h3 { margin: 0 0 8px 0; font-size: 18px; line-height: 1.25; }
+  .onebox-meta { font-size: 13px; opacity: .88; display:flex; flex-wrap:wrap; gap:8px; margin: 6px 0 10px; }
+  .onebox-desc { font-size: 14px; opacity: .92; margin: 0 0 12px; white-space: pre-wrap; }
+  .onebox-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 10px; }
+  .onebox-actions .btn { flex: 1 1 140px; padding: 12px 12px; font-size: 15px; }
+
+  .progress { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .progress .pill { font-size: 12px; }
+
+  .hidden { display:none !important; }
+</style>
 </head>
 <body>
   <main class="inbox-wrap">
@@ -57,27 +77,43 @@ Umfang:
 
     <div id="statusLine" class="muted" style="margin-top:10px;"></div>
 
-    <section class="inbox-list" id="list"></section>
+<!-- === BEGIN BLOCK: INBOX ONE-BY-ONE CONTAINER ===
+Zweck:
+- Ersetzt die Listen-Section durch 1-Item-Review Container + Progress
+Umfang:
+- Ersetzt ausschließlich die Section-Zeile
+=== END BLOCK: INBOX ONE-BY-ONE CONTAINER === -->
+<section id="one"></section>
+<div class="progress">
+  <span id="progressLeft" class="pill muted"></span>
+  <span id="progressHint" class="pill muted">Shortcuts: O=Öffnen, A=Übernehmen, V=Verwerfen</span>
+</div>
   </main>
 
   <script>
-    // === BEGIN BLOCK: INBOX REVIEW LOGIC (JSON feed + writeback via JSONP/IMG) ===
+      // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
     // Zweck:
-    // - Lädt /data/inbox.json, filtert status=review
-    // - Unlock via Apps Script (JSONP callback) -> token in sessionStorage
+    // - One-by-one Review: zeigt immer nur 1 Item (status=review)
+    // - Unlock via Apps Script JSONP (Passwort 1x) -> token in sessionStorage
     // - setStatus via IMG GET (CORS-frei), benötigt row_number
+    // - Nach Übernehmen/Verwerfen -> nächstes Item
     // Umfang:
-    // - Komplettes Inline-Script für inbox/index.html
-    // === END BLOCK: INBOX REVIEW LOGIC (JSON feed + writeback via JSONP/IMG) ===
+    // - Ersetzt die gesamte bisherige Logik im <script> Block ab dieser Marker-Zeile
+    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
 
     const FEED_URL = "/data/inbox.json";
     const LS_API_URL_KEY = "inbox_writeback_api_url";
     const SS_TOKEN_KEY = "inbox_writeback_token";
 
-    const elList = document.getElementById("list");
     const elStatus = document.getElementById("statusLine");
     const elLock = document.getElementById("lockState");
     const elApiUrl = document.getElementById("apiUrl");
+
+    const elOne = document.getElementById("one");
+    const elProgressLeft = document.getElementById("progressLeft");
+
+    let queue = [];
+    let current = null;
 
     document.getElementById("saveApiUrl").addEventListener("click", () => {
       const v = (elApiUrl.value || "").trim();
@@ -85,6 +121,260 @@ Umfang:
       localStorage.setItem(LS_API_URL_KEY, v);
       setStatus("URL gespeichert.");
     });
+
+    document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
+
+    document.getElementById("unlockBtn").addEventListener("click", async () => {
+      const api = getApiUrl();
+      if (!api) return setStatus("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
+      const pw = prompt("Passwort zum Entsperren:");
+      if (!pw) return;
+
+      try {
+        const res = await jsonp(api, { action: "unlock", password: pw });
+        if (!res || !res.ok || !res.token) {
+          setStatus("Unlock fehlgeschlagen.");
+          return;
+        }
+        sessionStorage.setItem(SS_TOKEN_KEY, res.token);
+        refreshLockState();
+        setStatus(`Entsperrt (TTL: ${res.expires_in_seconds || "?"}s).`);
+        renderCurrent(); // Buttons aktivieren
+      } catch (e) {
+        console.error(e);
+        setStatus("Unlock fehlgeschlagen (JSONP/CORS).");
+      }
+    });
+
+    function getApiUrl() {
+      return (localStorage.getItem(LS_API_URL_KEY) || "").trim();
+    }
+
+    function getToken() {
+      return (sessionStorage.getItem(SS_TOKEN_KEY) || "").trim();
+    }
+
+    function isUnlocked() {
+      return !!getToken();
+    }
+
+    function refreshLockState() {
+      const t = getToken();
+      if (t) {
+        elLock.textContent = "entsperrt";
+        elLock.classList.remove("muted");
+      } else {
+        elLock.textContent = "gesperrt";
+        elLock.classList.add("muted");
+      }
+    }
+
+    function setStatus(msg) {
+      elStatus.textContent = msg || "";
+    }
+
+    async function loadAndRender() {
+      setStatus("Lade inbox.json …");
+      elOne.innerHTML = "";
+      queue = [];
+      current = null;
+
+      const url = FEED_URL + "?v=" + Date.now();
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) {
+        setStatus(`Fehler: inbox.json nicht ladbar (${r.status}).`);
+        return;
+      }
+
+      const items = await r.json();
+      queue = (items || []).filter(it => (String(it.status || "").toLowerCase() === "review"));
+      setStatus(`Geladen: ${queue.length} review-items (von ${(items||[]).length}).`);
+
+      showNext();
+    }
+
+    function showNext() {
+      current = queue.shift() || null;
+      renderCurrent();
+    }
+
+    function renderCurrent() {
+      refreshLockState();
+
+      if (!current) {
+        elOne.innerHTML = `
+          <div class="onebox">
+            <h3>Keine review-items mehr 🎉</h3>
+            <div class="muted">Reload, um neu zu laden.</div>
+          </div>
+        `;
+        elProgressLeft.textContent = "0 übrig";
+        return;
+      }
+
+      elProgressLeft.textContent = `${queue.length + 1} übrig`;
+
+      const it = current;
+      const title = escapeHtml(it.title || "(ohne Titel)");
+
+      const meta = [];
+      if (it.row_number) meta.push(`<span class="pill">row ${escapeHtml(String(it.row_number))}</span>`);
+      if (it.date) meta.push(`<span class="pill">${escapeHtml(it.date)}</span>`);
+      if (it.time) meta.push(`<span class="pill">${escapeHtml(it.time)}</span>`);
+      if (it.city) meta.push(`<span class="pill">${escapeHtml(it.city)}</span>`);
+      if (it.location) meta.push(`<span class="pill">${escapeHtml(it.location)}</span>`);
+      if (it.kategorie_suggestion) meta.push(`<span class="pill">${escapeHtml(it.kategorie_suggestion)}</span>`);
+      if (it.match_score) meta.push(`<span class="pill">match ${escapeHtml(it.match_score)}</span>`);
+      if (it.source_name) meta.push(`<span class="pill">${escapeHtml(it.source_name)}</span>`);
+
+      const desc = (it.description || "").trim();
+      const descHtml = desc ? `<div class="onebox-desc">${escapeHtml(desc)}</div>` : "";
+
+      const openDisabled = !(it.url || it.source_url);
+      const actDisabled = !isUnlocked();
+
+      elOne.innerHTML = `
+        <div class="onebox" id="onebox">
+          <h3>${title}</h3>
+          <div class="onebox-meta">${meta.join("")}</div>
+          ${descHtml}
+          <div class="onebox-actions">
+            <button id="btnOpen" class="btn btn-primary" type="button" ${openDisabled ? "disabled" : ""}>Öffnen</button>
+            <button id="btnOk" class="btn btn-good" type="button" ${actDisabled ? "disabled" : ""}>Übernehmen</button>
+            <button id="btnNo" class="btn btn-bad" type="button" ${actDisabled ? "disabled" : ""}>Verwerfen</button>
+          </div>
+          ${actDisabled ? `<div class="muted" style="margin-top:10px;">Zum Bestätigen bitte oben <strong>Entsperren</strong>.</div>` : ``}
+        </div>
+      `;
+
+      document.getElementById("btnOpen").addEventListener("click", () => openUrl(it));
+      document.getElementById("btnOk").addEventListener("click", () => approveCurrent());
+      document.getElementById("btnNo").addEventListener("click", () => rejectCurrent());
+    }
+
+    function openUrl(it) {
+      const u = (it.url || it.source_url || "").trim();
+      if (!u) {
+        alert("Keine URL vorhanden (weder url noch source_url).");
+        return;
+      }
+      window.open(u, "_blank", "noopener,noreferrer");
+    }
+
+    function approveCurrent() {
+      if (!current) return;
+      setStatusWriteback(current, "übernehmen");
+    }
+
+    function rejectCurrent() {
+      if (!current) return;
+      setStatusWriteback(current, "verworfen");
+    }
+
+    function setStatusWriteback(it, newStatus) {
+      const api = getApiUrl();
+      const token = getToken();
+
+      if (!api) {
+        alert("Fehlt: Apps Script /exec URL (oben eintragen + speichern).");
+        return;
+      }
+      if (!token) {
+        alert("Bitte zuerst entsperren (Button 'Entsperren').");
+        return;
+      }
+      if (!it.row_number) {
+        alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
+        return;
+      }
+
+      // Buttons sofort sperren, damit keine Doppelklicks passieren
+      const btnOk = document.getElementById("btnOk");
+      const btnNo = document.getElementById("btnNo");
+      if (btnOk) btnOk.disabled = true;
+      if (btnNo) btnNo.disabled = true;
+
+      // CORS-frei via IMG GET (Apps Script doGet)
+      const img = new Image();
+      const qs = new URLSearchParams({
+        action: "setStatus",
+        token,
+        row_number: String(it.row_number),
+        status: String(newStatus)
+      });
+
+      img.onload = () => {
+        setStatus(`OK: row ${it.row_number} → ${newStatus}`);
+        // Nächstes Item anzeigen
+        showNext();
+      };
+      img.onerror = () => {
+        setStatus(`Fehler: row ${it.row_number} → ${newStatus} (Network/Token?)`);
+        // Buttons wieder aktivieren
+        renderCurrent();
+      };
+
+      img.src = api.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
+    }
+
+    // Keyboard shortcuts (Mobile: optional, Desktop: hilfreich)
+    document.addEventListener("keydown", (ev) => {
+      if (!current) return;
+      const k = String(ev.key || "").toLowerCase();
+      if (k === "o") openUrl(current);
+      if (k === "a") approveCurrent();
+      if (k === "v") rejectCurrent();
+    });
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // JSONP helper: benötigt Apps Script Support für ?callback=fn
+    function jsonp(apiUrl, params) {
+      return new Promise((resolve, reject) => {
+        const cbName = "__inbox_cb_" + Math.random().toString(16).slice(2);
+        const qs = new URLSearchParams(params || {});
+        qs.set("callback", cbName);
+
+        const src = apiUrl.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
+        const script = document.createElement("script");
+
+        window[cbName] = (data) => {
+          cleanup();
+          resolve(data);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("jsonp_load_failed"));
+        };
+
+        function cleanup() {
+          try { delete window[cbName]; } catch (_) { window[cbName] = undefined; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        script.src = src;
+        document.body.appendChild(script);
+      });
+    }
+
+    // Init
+    (function init() {
+      const saved = localStorage.getItem(LS_API_URL_KEY);
+      if (saved) elApiUrl.value = saved;
+      refreshLockState();
+      loadAndRender().catch(err => {
+        console.error(err);
+        setStatus("Fehler beim Laden/Rendern (siehe Console).");
+      });
+    })();
 
     document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
 
