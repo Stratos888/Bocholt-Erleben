@@ -1437,16 +1437,18 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
         )
 
-        # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v2) ===
+                # === BEGIN BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
         # - Schließt review:event_signal_missing_date nachhaltig:
-        #   Wenn JSON-LD auf Listen-/Kategorie-URLs kein Datum liefert, wird (budgetiert) die Seite geladen
-        #   und bei Bedarf EIN Detail-Link aus der geladenen Seite nachgezogen, um Datum zu extrahieren.
+        #   Wenn JSON-LD auf Listen-/Kategorie-URLs kein Datum liefert, wird (budgetiert) die Seite geladen.
+        #   Bei listing-like Seiten wird bevorzugt ein Detail-Link gewählt, dessen Umfeld bereits ein Datum enthält
+        #   (ohne zusätzlichen Fetch). Nur wenn das nicht gelingt, wird EIN Detail-Link zusätzlich nachgeladen.
         # - Nutzt bestehende _extract_event_date_de als Fallback, wenn JSON-LD kein Datum liefert.
         # - Noise/Load-Kontrolle: budgetiert + per-host cap + cache; maximal 1 zusätzlicher Detail-Fetch pro Kandidat.
         # Umfang:
         # - Ersetzt ausschließlich diesen Block innerhalb _html_link_candidates_date_scan.
+
         host = (urlparse(url).netloc or "").lower()
         host_fetches = detail_fetch_by_host.get(host, 0)
 
@@ -1559,12 +1561,16 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 if d1:
                     ev_date, ev_end = d1, d2
 
-            # 1) Wenn immer noch kein Datum: bei listing-like Seiten EIN Detail-Link nachziehen
+            # 1) Wenn immer noch kein Datum: bei listing-like Seiten bevorzugt einen Detail-Link MIT Datum im Umfeld wählen
             if (not ev_date) and detail_html and is_listing_like:
-                # Kandidaten-Detail-Links aus der geladenen Seite
-                detail_candidates: List[str] = []
+                best_u2 = ""
+                best_d1 = ""
+                best_d2 = ""
+                best_score = -1
+
                 for mm in _HTML_A_RE.finditer(detail_html):
                     href2 = norm(mm.group(1))
+                    inner2 = clean_text(mm.group(2))
                     if not href2:
                         continue
                     hk2 = norm_key(href2)
@@ -1593,15 +1599,47 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                     ):
                         continue
 
-                    if u2 not in detail_candidates:
-                        detail_candidates.append(u2)
+                    # Kontext um den Link auf der LISTING-Seite -> Datum ohne zusätzlichen Fetch finden
+                    s2 = max(0, mm.start() - 220)
+                    e2 = min(len(detail_html), mm.end() + 220)
+                    ctx2_html = detail_html[s2:e2]
+                    ctx2_txt = clean_text(_strip_html_tags(ctx2_html))
+                    combined2 = f"{inner2}\n{ctx2_txt}".strip()
 
-                    if len(detail_candidates) >= 3:
+                    d_sd, d_ed = _extract_event_date_de(combined2, fallback_year)
+                    has_date = bool(d_sd)
+
+                    # Scoring: Datum im Umfeld ist Gold; zusätzlich URL/Anchor-Signale
+                    score = 0
+                    if has_date:
+                        score += 100
+                    if inner2 and _EVENT_SIGNAL_RE.search(inner2):
+                        score += 10
+                    if re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|programm)\b", norm_key(u2)):
+                        score += 5
+
+                    if score > best_score:
+                        best_score = score
+                        best_u2 = u2
+                        best_d1 = d_sd
+                        best_d2 = d_ed or d_sd
+
+                    # Früh abbrechen: perfekte Wahl (Datum gefunden) + gutes Signal
+                    if best_score >= 110:
                         break
 
-                # genau EIN Detail-Fetch (zusätzlich), budgetiert
-                if detail_candidates and (detail_fetch_count < detail_fetch_budget):
-                    u2 = detail_candidates[0]
+                # Wenn wir auf der Listing-Seite bereits ein Datum zum Detail-Link finden -> direkt übernehmen (0 extra fetch)
+                if best_u2 and best_d1:
+                    ev_date, ev_end = best_d1, best_d2
+                    url = best_u2
+                    url_key = norm_key(url)
+                    url_seems_event = bool(
+                        re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
+                    )
+
+                # 2) Fallback: genau EIN Detail-Fetch (zusätzlich), falls Listing-Kontext kein Datum liefert
+                if (not ev_date) and best_u2 and (detail_fetch_count < detail_fetch_budget):
+                    u2 = best_u2
                     host_fetches2 = detail_fetch_by_host.get(host, 0)
                     if host_fetches2 < detail_fetch_host_cap:
                         if u2 not in detail_html_cache:
@@ -1617,13 +1655,12 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                             d1, d2 = _extract_date_from_html(h2)
                             if d1:
                                 ev_date, ev_end = d1, d2
-                                # URL auf echte Detailseite upgraden (Qualität, weniger missing_date)
                                 url = u2
                                 url_key = norm_key(url)
                                 url_seems_event = bool(
                                     re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
                                 )
-        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v2) ===
+        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3) ===
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
         if not ev_date and not event_signal:
