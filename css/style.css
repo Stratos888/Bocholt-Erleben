@@ -2046,12 +2046,18 @@ Umfang:
 }
 
 /* Title: wie Event-Card (Text dominiert, clamp) */
+/* === BEGIN FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD ===
+Zweck:
+100% identische Typografie wie .event-title
+keine Token-Abweichung
+=== */
+
 #event-detail-panel .detail-title{
   margin: 0 0 6px;
   min-width: 0;
   flex: 1 1 auto;
 
-  font-size: var(--font-event-title);
+  font-size: 1.05rem; /* exakt wie .event-title */
   font-weight: 700;
   letter-spacing: -0.01em;
   color: rgba(31,41,51,0.92);
@@ -2066,6 +2072,8 @@ Umfang:
   word-break: normal;
   hyphens: auto;
 }
+
+/* === END FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD === */
 
 /* Icon: inline am Titelende, ruhig (wie Event-Card) */
 #event-detail-panel .detail-category-icon{
@@ -2835,6 +2843,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
