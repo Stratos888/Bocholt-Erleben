@@ -1,3 +1,16 @@
+/* === BEGIN BLOCK: GLOBAL DESIGN TOKENS ===
+Zweck:
+Globale Design-System-Tokens für alle UI-Komponenten
+Muss am Anfang der CSS-Datei stehen
+=== */
+
+:root{
+
+  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+
+}
+
+/* === END BLOCK: GLOBAL DESIGN TOKENS === */
 /**
  * STYLE.CSS – Bocholt erleben (MVP frozen)
  * Ziel: ruhig, modern, funktional, konsistent
@@ -2826,6 +2839,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
