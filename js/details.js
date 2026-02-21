@@ -332,10 +332,18 @@
       this._onCloseClick = () => this.hide();
       this.closeBtn?.addEventListener("click", this._onCloseClick);
 
-      // ESC + Focus trap (only while active)
+           /* === BEGIN BLOCK: DETAILPANEL KEYBOARD + FOCUS TRAP (enterprise a11y) ===
+      Zweck:
+      - ESC schließt zuverlässig
+      - TAB bleibt IM Panel (vollständige Focusables inkl. Inputs)
+      - Edge-Case: Fokus „rutscht“ außerhalb → zurück ins Panel
+      Umfang:
+      - Ersetzt ausschließlich this._onKeyDown Handler in init()
+      === */
       this._onKeyDown = (e) => {
         if (!this.panel || !this.panel.classList.contains("active")) return;
 
+        // ESC closes
         if (e.key === "Escape") {
           e.preventDefault();
           this.hide();
@@ -344,25 +352,60 @@
 
         if (e.key !== "Tab") return;
 
-        const focusables = [...this.panel.querySelectorAll(
-          'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
-        )];
+        const selectors = [
+          'a[href]',
+          'area[href]',
+          'button:not([disabled])',
+          'input:not([disabled])',
+          'select:not([disabled])',
+          'textarea:not([disabled])',
+          'summary',
+          '[tabindex]:not([tabindex="-1"])',
+          '[contenteditable="true"]'
+        ].join(",");
+
+        // Visible + enabled focusables only
+        const focusables = Array.from(this.panel.querySelectorAll(selectors))
+          .filter((el) => {
+            if (!(el instanceof HTMLElement)) return false;
+            if (el.hasAttribute("disabled")) return false;
+            if (el.getAttribute("aria-hidden") === "true") return false;
+            const style = window.getComputedStyle(el);
+            if (style.display === "none" || style.visibility === "hidden") return false;
+            // offsetParent null can be false-negative for position:fixed; use rect as fallback
+            const r = el.getClientRects();
+            return r && r.length > 0;
+          });
 
         if (!focusables.length) return;
 
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
 
-        if (e.shiftKey && document.activeElement === first) {
+        const active = document.activeElement;
+
+        // If focus is outside panel (or body), force it back in
+        if (!(active instanceof HTMLElement) || !this.panel.contains(active)) {
           e.preventDefault();
-          last.focus();
+          (e.shiftKey ? last : first).focus({ preventScroll: true });
           return;
         }
-        if (!e.shiftKey && document.activeElement === last) {
+
+        if (e.shiftKey) {
+          if (active === first) {
+            e.preventDefault();
+            last.focus({ preventScroll: true });
+          }
+          return;
+        }
+
+        // forward tab
+        if (active === last) {
           e.preventDefault();
-          first.focus();
+          first.focus({ preventScroll: true });
         }
       };
+      /* === END BLOCK: DETAILPANEL KEYBOARD + FOCUS TRAP (enterprise a11y) === */
       document.addEventListener("keydown", this._onKeyDown);
 
       // Back button closes if open
@@ -969,6 +1012,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
