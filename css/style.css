@@ -168,7 +168,18 @@ body{
   background: #f4f6ef; /* Basis: mobile & desktop gleich */
   color: #111827;
 }
-
+/* === BEGIN BLOCK: VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) ===
+Zweck:
+- verhindert Viewport-„Gummi“ beim Überziehen (Android)
+- stabilisiert sticky header/top-stack (kein Wobble)
+Umfang:
+- nur Root-Scrollverhalten, kein Layout
+=== */
+html,
+body{
+  overscroll-behavior-y: none;
+}
+/* === END BLOCK: VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) === */
 /* === BEGIN BLOCK: DESKTOP BACKDROP POLISH ===
 Zweck:
 - Desktop: Außenfläche minimal absetzen.
@@ -1065,6 +1076,13 @@ Umfang:
 Zweck: Noch kompakter + ruhiger (Feed-first), weniger “Formularfläche”, sticky bleibt premium.
 Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu ändern.
 === */
+/* === BEGIN BLOCK: TOP STACK (sticky, wobble-safe) ===
+Zweck:
+- Sticky bleibt stabil (kein Android „Wobble“)
+- backdrop-filter bleibt erhalten
+Umfang:
+- ersetzt .top-stack vollständig (nur Stabilität, keine Optik-Änderung)
+=== */
 .top-stack{
   position: sticky;
   top: calc(var(--header-h) + var(--stack-gap));
@@ -1081,8 +1099,11 @@ Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu än
     0 1px 0 rgba(255,255,255,0.72) inset,
     0 6px 14px rgba(31,41,51,0.045);
 
-  transform: translateZ(0);
+  /* wichtig: kein transform → reduziert sticky „rubberband wobble“ auf Android */
+  transform: none;
+  contain: paint;
 }
+/* === END BLOCK: TOP STACK (sticky, wobble-safe) === */
 /* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
 
@@ -2694,6 +2715,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
