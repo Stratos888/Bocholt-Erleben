@@ -62,9 +62,10 @@ Umfang:
           <strong>Inbox Review</strong>
           <span id="lockState" class="pill muted">gesperrt</span>
         </div>
-        <div class="muted" style="margin-top:4px;">
-          Zeigt <code>status=review</code>. Approve setzt <code>übernehmen</code>, Reject setzt <code>verworfen</code>.
-        </div>
+       <!-- FINAL REVIEW UI: Header minimal -->
+<div class="muted" style="margin-top:4px;">
+  Review-Modus
+</div>
       </div>
 
       <!-- === BEGIN BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) ===
@@ -103,7 +104,7 @@ Umfang:
 <section id="one"></section>
 <div class="progress">
   <span id="progressLeft" class="pill muted"></span>
-  <span id="progressHint" class="pill muted">Shortcuts: O=Öffnen, A=Übernehmen, V=Verwerfen</span>
+ <!-- entfernt: shortcuts hint -->
 </div>
   </main>
 
@@ -227,11 +228,21 @@ Umfang:
 
       const title = escapeHtml(it.title || "(ohne Titel)");
 
-      const parts = [];
-      if (it.date) parts.push(it.date);
-      if (it.time) parts.push(it.time);
-      if (it.city) parts.push(it.city);
-      const metaLine = parts.length ? escapeHtml(parts.join(" · ")) : "";
+     let metaLine = "";
+
+if (it.date || it.time) {
+
+  metaLine += "📅 ";
+
+  if (it.date) metaLine += escapeHtml(it.date);
+
+  if (it.time) metaLine += "  " + escapeHtml(it.time);
+}
+
+if (it.city) {
+
+  metaLine += "<br>📍 " + escapeHtml(it.city);
+}
 
       const locLine = (it.location || "").trim();
       const srcLine = (it.source_name || "").trim();
@@ -247,14 +258,15 @@ Umfang:
 
           ${locLine ? `<div class="muted" style="margin:-6px 0 10px; font-size:14px;">📍 ${escapeHtml(locLine)}</div>` : ""}
 
-          ${srcLine ? `<div class="muted" style="margin:-6px 0 12px; font-size:13px;">Quelle: ${escapeHtml(srcLine)}</div>` : ""}
+         ${srcLine ? `<div class="muted" style="margin:6px 0 12px; font-size:13px;">
+Quelle:<br><strong>${escapeHtml(srcLine)}</strong>
+</div>` : ""}
 
-          ${desc ? `
-            <details style="margin: 0 0 12px;">
-              <summary class="muted" style="cursor:pointer; font-size:13px;">Kurztext anzeigen</summary>
-              <div class="onebox-desc" style="margin-top:8px;">${escapeHtml(desc)}</div>
-            </details>
-          ` : ""}
+${desc ? `
+  <div class="onebox-desc">
+    ${escapeHtml(desc)}
+  </div>
+` : ""}
 
           <div class="onebox-actions">
             <button id="btnOpen" class="btn btn-primary" type="button" ${openDisabled ? "disabled" : ""}>Öffnen</button>
