@@ -256,49 +256,53 @@ Umfang:
       }
     }
 
-    function writeStatus(it, newStatus) {
-      return new Promise((resolve) => {
-        if (!it.row_number) {
-          alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-          return resolve();
-        }
-
-        // Buttons sperren
-        const btnOk = document.getElementById("btnOk");
-        const btnNo = document.getElementById("btnNo");
-        const btnOpen = document.getElementById("btnOpen");
-        if (btnOk) btnOk.disabled = true;
-        if (btnNo) btnNo.disabled = true;
-        if (btnOpen) btnOpen.disabled = true;
-
-        const img = new Image();
-        const qs = new URLSearchParams({
-          action: "setStatus",
-          token: sessionToken,
-          row_number: String(it.row_number),
-          status: String(newStatus)
-        });
-
-        img.onload = () => {
-          setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
-          // next
-          showNext();
-          resolve();
-        };
-
-        img.onerror = () => {
-          // Fehler -> Token verwerfen, damit beim nächsten Klick neu entsperrt wird
-          sessionToken = "";
-          refreshLock();
-          setStatus("Fehler beim Schreiben (Token abgelaufen?) – bitte erneut klicken.");
-          // Re-render aktuelles Item
-          renderCurrent();
-          resolve();
-        };
-
-        img.src = API_URL.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
-      });
+function writeStatus(it, newStatus) {
+  return new Promise(async (resolve) => {
+    if (!it.row_number) {
+      alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
+      return resolve();
     }
+
+    // Buttons sperren
+    const btnOk = document.getElementById("btnOk");
+    const btnNo = document.getElementById("btnNo");
+    const btnOpen = document.getElementById("btnOpen");
+    if (btnOk) btnOk.disabled = true;
+    if (btnNo) btnNo.disabled = true;
+    if (btnOpen) btnOpen.disabled = true;
+
+    try {
+      const res = await jsonp(API_URL, {
+        action: "setStatus",
+        token: sessionToken,
+        row_number: String(it.row_number),
+        status: String(newStatus)
+      });
+
+      if (res && res.ok) {
+        setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
+        showNext();
+        return resolve();
+      }
+
+      // Server hat geantwortet, aber ok=false (z. B. token invalid/expired)
+      sessionToken = "";
+      refreshLock();
+      setStatus("Fehler beim Schreiben (Token ungültig) – bitte erneut klicken.");
+      renderCurrent();
+      return resolve();
+
+    } catch (e) {
+      console.error(e);
+      // Netzwerk/JSONP Fehler
+      sessionToken = "";
+      refreshLock();
+      setStatus("Fehler beim Schreiben (Netz/JSONP) – bitte erneut klicken.");
+      renderCurrent();
+      return resolve();
+    }
+  });
+}
 
     function escapeHtml(s) {
       return String(s || "")
