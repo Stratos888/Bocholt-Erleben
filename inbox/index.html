@@ -74,36 +74,25 @@ Umfang:
       Umfang:
       - Ersetzt ausschließlich den bisherigen .inbox-actions Block
       === END BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) === -->
+      <!-- === BEGIN BLOCK: INBOX TOP CONTROLS (ultra-minimal) ===
+      Zweck:
+      - Daily Review: nur Reload
+      - Keine Settings/UI für API-URL (API ist fest im Script verdrahtet)
+      Umfang:
+      - Ersetzt ausschließlich den bisherigen .inbox-actions Block
+      === END BLOCK: INBOX TOP CONTROLS (ultra-minimal) === -->
       <div class="inbox-actions">
-        <button id="settingsBtn" class="btn btn-primary" type="button" aria-expanded="false">⚙️</button>
         <button id="reloadBtn" class="btn" type="button">↻</button>
       </div>
     </div>
 
-    <!-- === BEGIN BLOCK: STATUS + SETTINGS PANEL (collapsed) ===
+    <!-- === BEGIN BLOCK: STATUS (minimal; no settings UI) ===
     Zweck:
-    - Status kompakt
-    - Settings (API-URL + optional Unlock) einklappbar
+    - Nur Statuszeile, keine Settings/URL/Unlock UI mehr (Storage wird nicht genutzt)
     Umfang:
-    - Ersetzt ausschließlich die statusLine-Zeile
-    === END BLOCK: STATUS + SETTINGS PANEL (collapsed) === -->
+    - Ersetzt den gesamten STATUS+SETTINGS Bereich
+    === END BLOCK: STATUS (minimal; no settings UI) === -->
     <div id="statusLine" class="muted" style="margin-top:10px; font-size:13px;"></div>
-
-    <div id="settingsPanel" class="onebox hidden" style="margin-top:10px;">
-      <div class="muted" style="margin-bottom:10px;">
-        Settings (nur nötig beim ersten Mal oder wenn du die API-URL ändern willst).
-      </div>
-
-      <div class="row" style="gap:10px;">
-        <input id="apiUrl" type="text" placeholder="Apps Script /exec URL" />
-        <button id="saveApiUrl" class="btn btn-primary" type="button">URL speichern</button>
-      </div>
-
-      <div class="row" style="margin-top:10px; gap:10px;">
-        <button id="unlockBtn" class="btn btn-primary" type="button">Entsperren</button>
-        <span class="muted">Tipp: Für Daily-Review brauchst du das nicht – Unlock passiert automatisch beim ersten Übernehmen/Verwerfen.</span>
-      </div>
-    </div>
 
 <!-- === BEGIN BLOCK: INBOX ONE-BY-ONE CONTAINER ===
 Zweck:
@@ -148,60 +137,35 @@ Umfang:
     // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
     // === END BLOCK: INBOX REVIEW LOGIC (one-by-one, auto-unlock on approve/reject) ===
 
+       // === BEGIN BLOCK: INBOX REVIEW LOGIC (storage-free, fixed API URL, in-memory token) ===
+    // Zweck:
+    // - One-by-one Review: 1 Item sichtbar (status=review)
+    // - Kein localStorage/sessionStorage (Tracking Prevention kompatibel)
+    // - API_URL ist fest verdrahtet
+    // - Auto-Unlock beim ersten Übernehmen/Verwerfen (Passwort-Prompt)
+    // - Token nur im RAM (gilt solange Seite offen ist)
+    // Umfang:
+    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
+    // === END BLOCK: INBOX REVIEW LOGIC (storage-free, fixed API URL, in-memory token) ===
+
     const FEED_URL = "/data/inbox.json";
-    const LS_API_URL_KEY = "inbox_writeback_api_url";
-    const SS_TOKEN_KEY = "inbox_writeback_token";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSEtz9anZOfRLcZkJqH3V5_O-vT9nBqmU1Ig-UooXwl6tkbu2Vd-MGWCgX1900-ZcN/exec";
 
     const elStatus = document.getElementById("statusLine");
     const elLock = document.getElementById("lockState");
     const elOne = document.getElementById("one");
     const elProgressLeft = document.getElementById("progressLeft");
 
-    const elSettingsBtn = document.getElementById("settingsBtn");
-    const elSettingsPanel = document.getElementById("settingsPanel");
-    const elApiUrl = document.getElementById("apiUrl");
-    const elSaveApiUrl = document.getElementById("saveApiUrl");
-    const elUnlockBtn = document.getElementById("unlockBtn");
-
     let queue = [];
     let current = null;
 
+    // Token nur im RAM
+    let sessionToken = "";
+
     document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
 
-    elSettingsBtn.addEventListener("click", () => {
-      const isOpen = !elSettingsPanel.classList.contains("hidden");
-      if (isOpen) {
-        elSettingsPanel.classList.add("hidden");
-        elSettingsBtn.setAttribute("aria-expanded", "false");
-      } else {
-        elSettingsPanel.classList.remove("hidden");
-        elSettingsBtn.setAttribute("aria-expanded", "true");
-      }
-    });
-
-    elSaveApiUrl.addEventListener("click", () => {
-      const v = (elApiUrl.value || "").trim();
-      if (!v) return setStatus("Bitte Apps Script /exec URL eintragen.");
-      localStorage.setItem(LS_API_URL_KEY, v);
-      setStatus("URL gespeichert.");
-    });
-
-    elUnlockBtn.addEventListener("click", async () => {
-      const ok = await ensureUnlocked(true);
-      if (ok) setStatus("Entsperrt.");
-      renderCurrent();
-    });
-
-    function getApiUrl() {
-      return (localStorage.getItem(LS_API_URL_KEY) || "").trim();
-    }
-
-    function getToken() {
-      return (sessionStorage.getItem(SS_TOKEN_KEY) || "").trim();
-    }
-
     function isUnlocked() {
-      return !!getToken();
+      return !!sessionToken;
     }
 
     function refreshLockState() {
@@ -273,8 +237,6 @@ Umfang:
       const srcLine = (it.source_name || "").trim();
 
       const desc = (it.description || "").trim();
-      const descShort = desc ? escapeHtml(desc.slice(0, 160) + (desc.length > 160 ? " …" : "")) : "";
-
       const openDisabled = !(it.url || it.source_url);
 
       elOne.innerHTML = `
@@ -299,6 +261,8 @@ Umfang:
             <button id="btnOk" class="btn btn-good" type="button">Übernehmen</button>
             <button id="btnNo" class="btn btn-bad" type="button">Verwerfen</button>
           </div>
+
+          ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
         </div>
       `;
 
@@ -319,49 +283,36 @@ Umfang:
     async function approveReject(newStatus) {
       if (!current) return;
 
-      // Auto-Unlock beim ersten Klick
-      const ok = await ensureUnlocked(false);
+      const ok = await ensureUnlocked();
       if (!ok) return;
 
-      await setStatusWriteback(current, newStatus);
+      setStatusWriteback(current, newStatus);
     }
 
-    async function ensureUnlocked(fromSettings) {
-      const api = getApiUrl();
-      if (!api) {
-        // Settings automatisch öffnen, damit du die URL setzen kannst
-        elSettingsPanel.classList.remove("hidden");
-        elSettingsBtn.setAttribute("aria-expanded", "true");
-        setStatus("Fehlt: Apps Script URL (⚙️ öffnen).");
-        return false;
-      }
-
+    async function ensureUnlocked() {
       if (isUnlocked()) return true;
 
-      const pw = prompt(fromSettings ? "Passwort zum Entsperren:" : "Passwort (einmal pro Session):");
+      const pw = prompt("Passwort (einmal pro Session):");
       if (!pw) return false;
 
       try {
-        const res = await jsonp(api, { action: "unlock", password: pw });
+        const res = await jsonp(API_URL, { action: "unlock", password: pw });
         if (!res || !res.ok || !res.token) {
           setStatus("Unlock fehlgeschlagen.");
           return false;
         }
-        sessionStorage.setItem(SS_TOKEN_KEY, res.token);
+        sessionToken = String(res.token || "");
         refreshLockState();
         setStatus("Entsperrt.");
         return true;
       } catch (e) {
         console.error(e);
-        setStatus("Unlock fehlgeschlagen (JSONP/CORS).");
+        setStatus("Unlock fehlgeschlagen (JSONP).");
         return false;
       }
     }
 
-    async function setStatusWriteback(it, newStatus) {
-      const api = getApiUrl();
-      const token = getToken();
-
+    function setStatusWriteback(it, newStatus) {
       if (!it.row_number) {
         alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
         return;
@@ -377,7 +328,7 @@ Umfang:
       const img = new Image();
       const qs = new URLSearchParams({
         action: "setStatus",
-        token,
+        token: sessionToken,
         row_number: String(it.row_number),
         status: String(newStatus)
       });
@@ -388,10 +339,12 @@ Umfang:
       };
       img.onerror = () => {
         setStatus(`Fehler bei ${newStatus} (Token abgelaufen?)`);
+        // Token ggf. ungültig -> wieder sperren
+        sessionToken = "";
         renderCurrent();
       };
 
-      img.src = api.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
+      img.src = API_URL.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
     }
 
     function escapeHtml(s) {
@@ -433,8 +386,6 @@ Umfang:
     }
 
     (function init() {
-      const saved = localStorage.getItem(LS_API_URL_KEY);
-      if (saved) elApiUrl.value = saved;
       refreshLockState();
       loadAndRender().catch(err => {
         console.error(err);
