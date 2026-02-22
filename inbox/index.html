@@ -6,6 +6,16 @@ Zweck:
 Umfang:
 - Komplettes inbox/index.html inkl. Inline-JS
 === END BLOCK: INBOX REVIEW PAGE (standalone, writeback-ready) === -->
+<!-- === BEGIN BLOCK: INBOX REVIEW PAGE (FINAL UI, storage-free) ===
+Zweck:
+- Finaler Daily-Review Screen: 1 Event gleichzeitig, maximal übersichtlich.
+- Immer sichtbarer extrahierter Text (description).
+- Auto-Unlock beim ersten Übernehmen/Verwerfen (Passwort-Prompt).
+- Kein localStorage/sessionStorage (Tracking-Prevention kompatibel).
+- API_URL fest verdrahtet.
+Umfang:
+- Komplette inbox/index.html (konsolidiert).
+=== END BLOCK: INBOX REVIEW PAGE (FINAL UI, storage-free) === -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -13,163 +23,102 @@ Umfang:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Inbox Review</title>
   <link rel="stylesheet" href="../css/style.css" />
-<style>
-  /* === BEGIN BLOCK: INBOX ONE-BY-ONE UI (mobile-first, minimal) ===
-     Zweck:
-     - One-by-one Review (nur 1 Item sichtbar)
-     - Buttons groß, klare Struktur, weniger Text
-     Umfang:
-     - Ersetzt ausschließlich den kompletten <style> Block
-  === END BLOCK: INBOX ONE-BY-ONE UI (mobile-first, minimal) === */
+  <style>
+    /* === BEGIN BLOCK: FINAL REVIEW UI CSS (minimal, readable) ===
+       Zweck:
+       - Max. Lesbarkeit & klare Hierarchie für schnelles Ja/Nein.
+       - Keine Debug-/Setup-UI.
+       Umfang:
+       - Nur Styles für diese Seite.
+    === END BLOCK: FINAL REVIEW UI CSS (minimal, readable) === */
 
-  .inbox-wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
-  .inbox-top { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
-  .inbox-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .brand { display:flex; align-items:baseline; gap:10px; }
+    .title { font-weight: 700; }
+    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
+    .muted { opacity: .75; }
+    .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-good { border-color: rgba(0,120,0,.45); }
+    .btn-bad { border-color: rgba(160,0,0,.45); }
 
-  .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
-  .btn:disabled { opacity: .45; cursor: not-allowed; }
-  .btn-primary { border-color: rgba(0,0,0,.28); }
-  .btn-good { border-color: rgba(0,120,0,.45); }
-  .btn-bad { border-color: rgba(160,0,0,.45); }
+    .status { margin-top: 10px; font-size: 13px; }
+    .card { margin-top: 12px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
+    .card h1 { margin: 0 0 10px 0; font-size: 18px; line-height: 1.25; }
 
-  .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
-  .muted { opacity: .75; }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta { font-size: 14px; line-height: 1.35; margin: 0 0 10px 0; }
+    .meta .line { margin: 3px 0; }
 
-  input[type="text"], input[type="password"] {
-    padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18);
-    background: transparent; width: min(520px, 78vw);
-  }
+    .descTitle { margin: 10px 0 6px; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; opacity: .8; }
+    .desc { white-space: pre-wrap; font-size: 14px; line-height: 1.4; margin: 0 0 12px 0; }
 
-  .onebox { margin-top: 14px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
-  .onebox h3 { margin: 0 0 8px 0; font-size: 18px; line-height: 1.25; }
-  .onebox-meta { font-size: 13px; opacity: .88; display:flex; flex-wrap:wrap; gap:8px; margin: 6px 0 10px; }
-  .onebox-desc { font-size: 14px; opacity: .92; margin: 0 0 12px; white-space: pre-wrap; }
-  .onebox-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 10px; }
-  .onebox-actions .btn { flex: 1 1 140px; padding: 12px 12px; font-size: 15px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    .actions .btn { flex: 1 1 160px; padding: 12px; font-size: 15px; }
+    .sourceBtn { flex: 1 1 100%; }
 
-  .progress { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-  .progress .pill { font-size: 12px; }
-
-  .hidden { display:none !important; }
-</style>
+    .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  </style>
 </head>
-<body>
-  <main class="inbox-wrap">
-    <div class="inbox-top">
-      <div>
-        <div class="row">
-          <strong>Inbox Review</strong>
-          <span id="lockState" class="pill muted">gesperrt</span>
-        </div>
-       <!-- FINAL REVIEW UI: Header minimal -->
-<div class="muted" style="margin-top:4px;">
-  Review-Modus
-</div>
-      </div>
 
-      <!-- === BEGIN BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) ===
-      Zweck:
-      - Daily-Review: oben nur 2 Buttons (Settings + Reload)
-      - API-URL/Unlock nur in einklappbaren Settings
-      Umfang:
-      - Ersetzt ausschließlich den bisherigen .inbox-actions Block
-      === END BLOCK: INBOX TOP CONTROLS (minimal; settings collapsed) === -->
-      <!-- === BEGIN BLOCK: INBOX TOP CONTROLS (ultra-minimal) ===
-      Zweck:
-      - Daily Review: nur Reload
-      - Keine Settings/UI für API-URL (API ist fest im Script verdrahtet)
-      Umfang:
-      - Ersetzt ausschließlich den bisherigen .inbox-actions Block
-      === END BLOCK: INBOX TOP CONTROLS (ultra-minimal) === -->
-      <div class="inbox-actions">
-        <button id="reloadBtn" class="btn" type="button">↻</button>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="title">Inbox Review</div>
+        <span id="lockState" class="pill muted">gesperrt</span>
       </div>
+      <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
     </div>
 
-    <!-- === BEGIN BLOCK: STATUS (minimal; no settings UI) ===
-    Zweck:
-    - Nur Statuszeile, keine Settings/URL/Unlock UI mehr (Storage wird nicht genutzt)
-    Umfang:
-    - Ersetzt den gesamten STATUS+SETTINGS Bereich
-    === END BLOCK: STATUS (minimal; no settings UI) === -->
-    <div id="statusLine" class="muted" style="margin-top:10px; font-size:13px;"></div>
+    <div id="statusLine" class="status muted"></div>
 
-<!-- === BEGIN BLOCK: INBOX ONE-BY-ONE CONTAINER ===
-Zweck:
-- Ersetzt die Listen-Section durch 1-Item-Review Container + Progress
-Umfang:
-- Ersetzt ausschließlich die Section-Zeile
-=== END BLOCK: INBOX ONE-BY-ONE CONTAINER === -->
-<section id="one"></section>
-<div class="progress">
-  <span id="progressLeft" class="pill muted"></span>
- <!-- entfernt: shortcuts hint -->
-</div>
+    <section id="one"></section>
+
+    <div class="footer">
+      <span id="progressLeft" class="pill muted"></span>
+      <span id="progressRight" class="pill muted"></span>
+    </div>
   </main>
 
   <script>
-      // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
+    // === BEGIN BLOCK: FINAL REVIEW LOGIC (storage-free, fixed API, auto-unlock) ===
     // Zweck:
-    // - One-by-one Review: zeigt immer nur 1 Item (status=review)
-    // - Unlock via Apps Script JSONP (Passwort 1x) -> token in sessionStorage
-    // - setStatus via IMG GET (CORS-frei), benötigt row_number
-    // - Nach Übernehmen/Verwerfen -> nächstes Item
+    // - Lädt /data/inbox.json, filtert status=review
+    // - Zeigt immer genau 1 Event
+    // - description immer sichtbar
+    // - Auto-Unlock beim ersten Approve/Reject (Passwort-Prompt)
+    // - Token nur im RAM (solange Tab offen)
     // Umfang:
-    // - Ersetzt die gesamte bisherige Logik im <script> Block ab dieser Marker-Zeile
-    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
-
-        // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
-    // Zweck:
-    // - One-by-one Review: zeigt immer nur 1 Item (status=review)
-    // - Unlock via Apps Script JSONP (Passwort 1x) -> token in sessionStorage
-    // - setStatus via IMG GET (CORS-frei), benötigt row_number
-    // - Nach Übernehmen/Verwerfen -> nächstes Item
-    // Umfang:
-    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
-    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one queue + writeback) ===
-
-       // === BEGIN BLOCK: INBOX REVIEW LOGIC (one-by-one, auto-unlock on approve/reject) ===
-    // Zweck:
-    // - One-by-one Review: 1 Item sichtbar
-    // - Auto-Unlock: beim ersten Übernehmen/Verwerfen Passwort abfragen -> Token in sessionStorage
-    // - Minimaler Screen: Meta komprimiert, Beschreibung standardmäßig eingeklappt
-    // Umfang:
-    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
-    // === END BLOCK: INBOX REVIEW LOGIC (one-by-one, auto-unlock on approve/reject) ===
-
-       // === BEGIN BLOCK: INBOX REVIEW LOGIC (storage-free, fixed API URL, in-memory token) ===
-    // Zweck:
-    // - One-by-one Review: 1 Item sichtbar (status=review)
-    // - Kein localStorage/sessionStorage (Tracking Prevention kompatibel)
-    // - API_URL ist fest verdrahtet
-    // - Auto-Unlock beim ersten Übernehmen/Verwerfen (Passwort-Prompt)
-    // - Token nur im RAM (gilt solange Seite offen ist)
-    // Umfang:
-    // - Ersetzt den gesamten JS-Teil ab const FEED_URL bis Ende init()
-    // === END BLOCK: INBOX REVIEW LOGIC (storage-free, fixed API URL, in-memory token) ===
+    // - Vollständige Logik für diese Seite (konsolidiert)
+    // === END BLOCK: FINAL REVIEW LOGIC (storage-free, fixed API, auto-unlock) ===
 
     const FEED_URL = "/data/inbox.json";
-    const API_URL = "https://script.google.com/macros/s/AKfycbwSEtz9anZOfRLcZkJqH3V5_O-vT9nBqmU1Ig-UooXwl6tkbu2Vd-MGWCgX1900-ZcN/exec";
+    const API_URL  = "https://script.google.com/macros/s/AKfycbwSEtz9anZOfRLcZkJqH3V5_O-vT9nBqmU1Ig-UooXwl6tkbu2Vd-MGWCgX1900-ZcN/exec";
 
+    const elOne = document.getElementById("one");
     const elStatus = document.getElementById("statusLine");
     const elLock = document.getElementById("lockState");
-    const elOne = document.getElementById("one");
-    const elProgressLeft = document.getElementById("progressLeft");
+    const elLeft = document.getElementById("progressLeft");
+    const elRight = document.getElementById("progressRight");
 
     let queue = [];
     let current = null;
 
-    // Token nur im RAM
+    // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
 
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndRender());
+    document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+
+    function setStatus(msg) {
+      elStatus.textContent = msg || "";
+    }
 
     function isUnlocked() {
       return !!sessionToken;
     }
 
-    function refreshLockState() {
+    function refreshLock() {
       if (isUnlocked()) {
         elLock.textContent = "entsperrt";
         elLock.classList.remove("muted");
@@ -179,126 +128,109 @@ Umfang:
       }
     }
 
-    function setStatus(msg) {
-      elStatus.textContent = msg || "";
-    }
-
-    async function loadAndRender() {
-      setStatus("Lade inbox.json …");
+    async function loadAndShow() {
+      setStatus("Lade …");
       elOne.innerHTML = "";
       queue = [];
       current = null;
 
-      const url = FEED_URL + "?v=" + Date.now();
-      const r = await fetch(url, { cache: "no-store" });
+      const r = await fetch(FEED_URL + "?v=" + Date.now(), { cache: "no-store" });
       if (!r.ok) {
-        setStatus(`Fehler: inbox.json nicht ladbar (${r.status}).`);
+        setStatus(`Fehler: inbox.json (${r.status})`);
+        elLeft.textContent = "";
+        elRight.textContent = "";
         return;
       }
 
       const items = await r.json();
-      queue = (items || []).filter(it => (String(it.status || "").toLowerCase() === "review"));
+      queue = (items || []).filter(it => String(it.status || "").toLowerCase() === "review");
 
-      setStatus(`Review: ${queue.length}`);
-      showNext();
+      refreshLock();
+      setStatus(queue.length ? "" : "Keine review-items.");
+
+      showNext(items.length);
     }
 
-    function showNext() {
+    function showNext(totalCount) {
       current = queue.shift() || null;
-      renderCurrent();
+      renderCurrent(totalCount);
     }
 
-    function renderCurrent() {
-      refreshLockState();
+    function renderCurrent(totalCount) {
+      refreshLock();
+
+      const remaining = queue.length + (current ? 1 : 0);
+      elLeft.textContent = remaining ? `${remaining} übrig` : `0 übrig`;
+      elRight.textContent = totalCount ? `Inbox: ${totalCount}` : "";
 
       if (!current) {
         elOne.innerHTML = `
-          <div class="onebox">
-            <h3>Keine review-items mehr 🎉</h3>
+          <div class="card">
+            <h1>Fertig 🎉</h1>
             <div class="muted">↻ zum Neuladen.</div>
           </div>
         `;
-        elProgressLeft.textContent = "0 übrig";
         return;
       }
 
-      elProgressLeft.textContent = `${queue.length + 1} übrig`;
-
       const it = current;
 
-      const title = escapeHtml(it.title || "(ohne Titel)");
+      // Meta: klar & schnell scanbar
+      const dateTime = [
+        (it.date || "").trim(),
+        (it.time || "").trim()
+      ].filter(Boolean).join(" · ");
 
-     let metaLine = "";
+      const placeLine = [
+        (it.city || "").trim(),
+        (it.location || "").trim()
+      ].filter(Boolean).join(" — ");
 
-if (it.date || it.time) {
-
-  metaLine += "📅 ";
-
-  if (it.date) metaLine += escapeHtml(it.date);
-
-  if (it.time) metaLine += "  " + escapeHtml(it.time);
-}
-
-if (it.city) {
-
-  metaLine += "<br>📍 " + escapeHtml(it.city);
-}
-
-      const locLine = (it.location || "").trim();
-      const srcLine = (it.source_name || "").trim();
-
+      const sourceLine = (it.source_name || "").trim();
       const desc = (it.description || "").trim();
-      const openDisabled = !(it.url || it.source_url);
+
+      const urlToOpen = (it.url || it.source_url || "").trim();
+      const openDisabled = !urlToOpen;
 
       elOne.innerHTML = `
-        <div class="onebox" id="onebox">
-          <h3>${title}</h3>
+        <article class="card">
+          <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
 
-          ${metaLine ? `<div class="muted" style="margin:6px 0 10px; font-size:14px;">${metaLine}</div>` : ""}
-
-          ${locLine ? `<div class="muted" style="margin:-6px 0 10px; font-size:14px;">📍 ${escapeHtml(locLine)}</div>` : ""}
-
-         ${srcLine ? `<div class="muted" style="margin:6px 0 12px; font-size:13px;">
-Quelle:<br><strong>${escapeHtml(srcLine)}</strong>
-</div>` : ""}
-
-${desc ? `
-  <div class="onebox-desc">
-    ${escapeHtml(desc)}
-  </div>
-` : ""}
-
-          <div class="onebox-actions">
-            <button id="btnOpen" class="btn btn-primary" type="button" ${openDisabled ? "disabled" : ""}>Öffnen</button>
-            <button id="btnOk" class="btn btn-good" type="button">Übernehmen</button>
-            <button id="btnNo" class="btn btn-bad" type="button">Verwerfen</button>
+          <div class="meta">
+            ${dateTime ? `<div class="line">📅 ${escapeHtml(dateTime)}</div>` : ``}
+            ${placeLine ? `<div class="line">📍 ${escapeHtml(placeLine)}</div>` : ``}
+            ${sourceLine ? `<div class="line muted">Quelle: <strong>${escapeHtml(sourceLine)}</strong></div>` : ``}
           </div>
 
-          ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
-        </div>
+          <div class="descTitle">Extrahierter Text</div>
+          <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
+
+          <div class="actions">
+            <button id="btnOpen" class="btn sourceBtn" type="button" ${openDisabled ? "disabled" : ""}>Quelle öffnen</button>
+            <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
+            <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
+          </div>
+
+          ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Klick auf Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
+        </article>
       `;
 
-      document.getElementById("btnOpen").addEventListener("click", () => openUrl(it));
+      document.getElementById("btnOpen").addEventListener("click", () => {
+        if (!urlToOpen) return;
+        window.open(urlToOpen, "_blank", "noopener,noreferrer");
+      });
+
       document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
     }
 
-    function openUrl(it) {
-      const u = (it.url || it.source_url || "").trim();
-      if (!u) {
-        alert("Keine URL vorhanden (weder url noch source_url).");
-        return;
-      }
-      window.open(u, "_blank", "noopener,noreferrer");
-    }
-
-    async function approveReject(newStatus) {
+    async function approveReject(status) {
       if (!current) return;
 
       const ok = await ensureUnlocked();
       if (!ok) return;
 
-      setStatusWriteback(current, newStatus);
+      await writeStatus(current, status);
     }
 
     async function ensureUnlocked() {
@@ -314,49 +246,58 @@ ${desc ? `
           return false;
         }
         sessionToken = String(res.token || "");
-        refreshLockState();
-        setStatus("Entsperrt.");
+        refreshLock();
+        setStatus("");
         return true;
       } catch (e) {
         console.error(e);
-        setStatus("Unlock fehlgeschlagen (JSONP).");
+        setStatus("Unlock fehlgeschlagen.");
         return false;
       }
     }
 
-    function setStatusWriteback(it, newStatus) {
-      if (!it.row_number) {
-        alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-        return;
-      }
+    function writeStatus(it, newStatus) {
+      return new Promise((resolve) => {
+        if (!it.row_number) {
+          alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
+          return resolve();
+        }
 
-      const btnOk = document.getElementById("btnOk");
-      const btnNo = document.getElementById("btnNo");
-      const btnOpen = document.getElementById("btnOpen");
-      if (btnOk) btnOk.disabled = true;
-      if (btnNo) btnNo.disabled = true;
-      if (btnOpen) btnOpen.disabled = true;
+        // Buttons sperren
+        const btnOk = document.getElementById("btnOk");
+        const btnNo = document.getElementById("btnNo");
+        const btnOpen = document.getElementById("btnOpen");
+        if (btnOk) btnOk.disabled = true;
+        if (btnNo) btnNo.disabled = true;
+        if (btnOpen) btnOpen.disabled = true;
 
-      const img = new Image();
-      const qs = new URLSearchParams({
-        action: "setStatus",
-        token: sessionToken,
-        row_number: String(it.row_number),
-        status: String(newStatus)
+        const img = new Image();
+        const qs = new URLSearchParams({
+          action: "setStatus",
+          token: sessionToken,
+          row_number: String(it.row_number),
+          status: String(newStatus)
+        });
+
+        img.onload = () => {
+          setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
+          // next
+          showNext();
+          resolve();
+        };
+
+        img.onerror = () => {
+          // Fehler -> Token verwerfen, damit beim nächsten Klick neu entsperrt wird
+          sessionToken = "";
+          refreshLock();
+          setStatus("Fehler beim Schreiben (Token abgelaufen?) – bitte erneut klicken.");
+          // Re-render aktuelles Item
+          renderCurrent();
+          resolve();
+        };
+
+        img.src = API_URL.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
       });
-
-      img.onload = () => {
-        setStatus(`OK → ${newStatus}`);
-        showNext();
-      };
-      img.onerror = () => {
-        setStatus(`Fehler bei ${newStatus} (Token abgelaufen?)`);
-        // Token ggf. ungültig -> wieder sperren
-        sessionToken = "";
-        renderCurrent();
-      };
-
-      img.src = API_URL.replace(/\/exec.*$/, "/exec") + "?" + qs.toString() + "&t=" + Date.now();
     }
 
     function escapeHtml(s) {
@@ -368,6 +309,7 @@ ${desc ? `
         .replaceAll("'", "&#039;");
     }
 
+    // JSONP, damit Unlock robust ohne CORS-Header funktioniert
     function jsonp(apiUrl, params) {
       return new Promise((resolve, reject) => {
         const cbName = "__inbox_cb_" + Math.random().toString(16).slice(2);
@@ -397,11 +339,12 @@ ${desc ? `
       });
     }
 
+    // Init
     (function init() {
-      refreshLockState();
-      loadAndRender().catch(err => {
+      refreshLock();
+      loadAndShow().catch(err => {
         console.error(err);
-        setStatus("Fehler beim Laden/Rendern (siehe Console).");
+        setStatus("Fehler beim Laden.");
       });
     })();
   </script>
