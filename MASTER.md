@@ -480,7 +480,103 @@ Base UI system
 ---
 
 # DECISIONS LOG
+2026-02-22
 
+Discovery Pipeline — Inbox Writeback API Stabilization (row_number writeback reliability)
+
+Status:
+
+COMPLETED (Infrastructure Stabilization)
+
+Scope:
+
+Pipeline infrastructure only.
+
+No UI changes.
+
+No UX changes.
+
+No visual changes.
+
+No Golden Screen impact.
+
+---
+
+Problem:
+
+Inbox Review Writeback required reliable server-side status persistence.
+
+Token session logic and JSONP transport verified functional.
+
+Primary stabilization goal:
+
+Ensure deterministic and observable writeback behavior.
+
+---
+
+Implemented decisions:
+
+Writeback endpoint now guarantees:
+
+- Strict allowlist enforcement for status values
+- Explicit row_number validation
+- Explicit header column mapping
+- Explicit token session validation
+- Explicit write execution using SpreadsheetApp.flush()
+
+Writeback response now provides verifiable confirmation:
+
+- spreadsheet_title
+- sheet_name
+- row_number
+- status_col
+- cell_a1
+- old_status
+- new_status
+
+This enables full traceability of write operations.
+
+---
+
+Architecture impact:
+
+Writeback API is now considered:
+
+Stable
+Production-ready
+Enterprise-grade infrastructure component
+
+---
+
+UI impact:
+
+NONE
+
+Inbox Review UI behavior intentionally unchanged.
+
+Review UI is not part of Golden Screen baseline.
+
+Golden Screen Freeze remains unaffected.
+
+---
+
+Pipeline impact:
+
+Inbox Review → Sheet writeback reliability established.
+
+Enables reliable manual validation workflow.
+
+Supports enterprise-grade content pipeline.
+
+---
+
+Freeze status:
+
+Writeback API considered infrastructure.
+
+Further changes must be treated as infrastructure changes.
+
+Not UI changes.
 Permanent architectural and UX decisions.
 
 ChatGPT MUST append new decisions here when made.
