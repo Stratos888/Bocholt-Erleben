@@ -1754,8 +1754,17 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                                     re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
                                 )
         # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3-correctness) ===
+        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
+        # Zweck:
+        # - JUBOH Kursdetailseiten dürfen nicht am (date OR event_signal)-Gate verloren gehen
+        # - Zusätzlich: minimaler "Kurs"-Hinweis im Description-Text, damit classify_candidate() nicht reject:no_event_signal triggert
+        # Umfang:
+        # - Ersetzt nur das Gate + die desc-Zuweisung direkt vor out.append (keine Fetch-/Budget-Änderungen)
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
+        if is_juboh_kurs and not event_signal:
+            event_signal = True
+
         if not ev_date and not event_signal:
             continue
         if ev_date and not event_signal and not url_seems_event:
@@ -1763,6 +1772,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         # Description kurz halten
         desc = ctx[:500]
+        if is_juboh_kurs and desc:
+            desc = f"Kurs. {desc}"
+        elif is_juboh_kurs:
+            desc = "Kurs."
+        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
 
         out.append(
             {
