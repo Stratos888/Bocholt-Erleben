@@ -2180,7 +2180,13 @@ Umfang:
 /* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
 
 
-/* Location Row: wie native List Row */
+/* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
+Zweck:
+- Location-Row visuell wie Feed-Meta (ruhig), nicht „bold/section“
+- bleibt klar klickbar (Chevron + Active-Feedback bleibt)
+Umfang:
+- Nur .detail-location-action Grundstil (Farbe/Typo)
+=== */
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
 #event-detail-panel .detail-location-action:visited{
@@ -2195,12 +2201,13 @@ Umfang:
   border-bottom: 1px solid rgba(31,41,51,0.06);
 
   background: transparent;
-  color: rgba(31,41,51,0.90);
+  color: rgba(60,72,88,0.68);   /* wie .event-meta */
   text-decoration: none;
 
   border-radius: 0;
   -webkit-tap-highlight-color: transparent;
 }
+/* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
 
 /* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) ===
 Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
@@ -2225,18 +2232,26 @@ Umfang: Nur :active
   opacity: 0.86;
 }
 
+/* === BEGIN FIX: DETAIL LOCATION TEXT TYPO MATCH META RHYTHM ===
+Zweck:
+- keine „fette“ Location im Detailpanel
+- Rhythmus wie .event-meta
+Umfang:
+- Nur .detail-location-text
+=== */
 #event-detail-panel .detail-location-text{
   min-width: 0;
   flex: 1 1 auto;
 
   font-size: 14px;
-  font-weight: 650;
-  line-height: 1.2;
+  font-weight: 400;      /* wie Meta (nicht fett) */
+  line-height: 1.28;     /* wie .event-meta */
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* === END FIX: DETAIL LOCATION TEXT TYPO MATCH META RHYTHM === */
 
 #event-detail-panel .detail-location-chev{
   flex: 0 0 auto;
@@ -2859,6 +2874,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
