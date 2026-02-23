@@ -1409,11 +1409,40 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         ctx_html = html_text[start:end]
         ctx = clean_text(_strip_html_tags(ctx_html))
 
+               # === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
+        # Zweck:
+        # - "Mehr erfahren"/"Details" sind Linktexte -> Titel später aus Detailseite reparieren
+        # - Filter/Kategorie/Pagination Links (z.B. "16 Jahre", "2", "Datum", "/kategorie/", "browse=") sind KEINE Events
+        # Umfang:
+        # - Ersetzt nur die Titel/Combined-Erzeugung (inkl. frühe hard-skips) in _html_link_candidates_date_scan
         title = inner or ""
         if not title:
             continue
 
+        title_norm = norm_key(title)
+
+        # Hard skip: reine Ziffern / Sort-/Pager-Links
+        if title_norm.isdigit():
+            continue
+
+        # Hard skip: Alters-/Zielgruppenfilter (z.B. "6 - 7 Jahre", "16 Jahre")
+        if re.fullmatch(r"\d+\s*(?:-|–)?\s*\d*\s*jahre", title_norm):
+            continue
+
+        # Hard skip: offensichtliche Filterkategorien/Meta
+        if title_norm in ("plus", "+ (plus)", "+", "event", "seminar", "vorlesung", "datum"):
+            continue
+
+        url_lk = norm_key(url)
+        # Hard skip: JUBOH Kategorien + Listing/Sortier-/Pager-URLs
+        if ("/kategorie/" in url_lk) or ("browse=" in url_lk) or ("orderby=" in url_lk) or ("&cHash=" in url_lk.lower()):
+            continue
+
+        # Generische CTA-Titel -> später aus Detailseite reparieren
+        needs_title_repair = title_norm in ("mehr erfahren", "details", "weiterlesen")
+
         combined = f"{title}\n{ctx}"
+        # === END BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
 
         # 1) Datum aus Kontext (DE/ISO/Slash + Ranges -> (start,end))
         ev_date, ev_end = _extract_event_date_de(combined, fallback_year)
@@ -1535,13 +1564,19 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             or "/programm" in path
         )
 
+             # === BEGIN BLOCK: DETAIL FETCH TRIGGER (date OR title repair) ===
+        # Zweck:
+        # - Detail-Fetch nicht nur für fehlendes Datum, sondern auch für generische Titel ("Mehr erfahren")
+        # Umfang:
+        # - Ersetzt nur die should_fetch_detail-Definition
         should_fetch_detail = (
-            (not ev_date)
+            ((not ev_date) or needs_title_repair)
             and event_signal
             and (url_seems_event or path_event_hint)
             and (detail_fetch_count < detail_fetch_budget)
             and (host_fetches < detail_fetch_host_cap)
         )
+        # === END BLOCK: DETAIL FETCH TRIGGER (date OR title repair) ===
 
         if should_fetch_detail:
             # 0) Haupt-URL laden (cache + budget)
@@ -1553,7 +1588,37 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 detail_fetch_count += 1
                 detail_fetch_by_host[host] = host_fetches + 1
 
+               # === BEGIN BLOCK: TITLE REPAIR FROM DETAIL HTML (og:title -> h1 -> title) ===
+            # Zweck:
+            # - Wenn Linktext generisch ("Mehr erfahren"), Titel aus Detailseite extrahieren
+            # Umfang:
+            # - Ersetzt nur die Zuweisung von detail_html und ergänzt Reparaturlogik
             detail_html = detail_html_cache.get(url, "") or ""
+
+            if detail_html and needs_title_repair:
+                # 1) og:title
+                m_og = re.search(
+                    r"<meta[^>]+property=['\"]og:title['\"][^>]+content=['\"]([^'\"]+)['\"]",
+                    detail_html,
+                    flags=re.IGNORECASE,
+                )
+                repaired = clean_text(m_og.group(1)) if m_og else ""
+
+                # 2) h1 (falls og:title fehlt)
+                if not repaired:
+                    m_h1 = re.search(r"<h1[^>]*>(.*?)</h1>", detail_html, flags=re.IGNORECASE | re.DOTALL)
+                    repaired = clean_text(_strip_html_tags(m_h1.group(1))) if m_h1 else ""
+
+                # 3) <title> (fallback)
+                if not repaired:
+                    m_t = re.search(r"<title[^>]*>(.*?)</title>", detail_html, flags=re.IGNORECASE | re.DOTALL)
+                    repaired = clean_text(_strip_html_tags(m_t.group(1))) if m_t else ""
+
+                if repaired:
+                    title = repaired
+                    combined = f"{title}\n{ctx}"
+                    needs_title_repair = False
+            # === END BLOCK: TITLE REPAIR FROM DETAIL HTML (og:title -> h1 -> title) ===
 
             # Auf Listing-Seiten kein Text-Fallback: nur JSON-LD (sonst Gefahr falscher Datumstreffer)
             allow_text_on_main = not (is_listing_like and (not url_seems_event))
