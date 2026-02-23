@@ -1626,12 +1626,15 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
              # === BEGIN BLOCK: DETAIL FETCH TRIGGER (date OR title repair) ===
         # Zweck:
         # - Detail-Fetch nicht nur für fehlendes Datum, sondern auch für generische Titel ("Mehr erfahren")
+        # - JUBOH Kursdetailseiten: Detail-Fetch auch dann, wenn event_signal im Listing-Kontext fehlt
         # Umfang:
         # - Ersetzt nur die should_fetch_detail-Definition
+        is_juboh_kurs = host.endswith("juboh.de") and ("/programm/kurs/" in path)
+
         should_fetch_detail = (
             ((not ev_date) or needs_title_repair)
-            and event_signal
-            and (url_seems_event or path_event_hint)
+            and (event_signal or is_juboh_kurs)
+            and (url_seems_event or path_event_hint or is_juboh_kurs)
             and (detail_fetch_count < detail_fetch_budget)
             and (host_fetches < detail_fetch_host_cap)
         )
