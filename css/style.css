@@ -90,13 +90,23 @@ Umfang:
   /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
   --gutter: var(--space-lg);
 
-  /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
+   /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
    /* === BEGIN FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) ===
   Zweck: Titel/Icon etwas weiter vom Grab-Handle weg (ruhiger), Close bleibt über Token synchron.
   Umfang: Nur Token --dp-header-pad-top.
   === */
   --dp-header-pad-top: 34px;            /* entspricht #detail-content padding-top + Close top */
   /* === END FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) === */
+
+  /* === BEGIN FIX: DETAILPANEL SHEET RADIUS (single source of truth) ===
+  Zweck:
+  - Sheet-Radius ist systemisch konsistent (Desktop + Mobile)
+  - verhindert „20px vs 22px“ Regressionen durch Media-Overrides
+  Umfang:
+  - Nur Token
+  === */
+  --dp-sheet-radius: 22px;
+  /* === END FIX: DETAILPANEL SHEET RADIUS (single source of truth) === */
 
   --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
   --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
@@ -1492,22 +1502,26 @@ body.is-sheet-open .top-stack{
 }
 
 /* === BEGIN PATCH: DETAILPANEL DRAG HANDLE (render via ::before; no DOM dependency)
-Zweck: Handle immer sichtbar, ohne dass ein .detail-panel-grabber Element existieren muss.
-Umfang: Nur Handle-Rendering (Detailpanel).
+Zweck:
+- Handle immer sichtbar, ohne DOM-Abhängigkeit (.detail-panel-grabber kann fehlen)
+- Handle-DNA: ruhig, minimal, passend zum Feed (kein „anderes App-Sheet“)
+Umfang:
+- Nur ::before auf .detail-panel-content
 === */
 #event-detail-panel .detail-panel-content::before{
   content: "";
   position: absolute;
-  top: 8px;
+  top: 9px;
   left: 50%;
   transform: translateX(-50%);
 
-  width: 46px;
-  height: 5px;
+  width: 42px;
+  height: 4px;
 
   border-radius: 999px;
-  background: rgba(0,0,0,0.32);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset;
+  background: rgba(31,41,51,0.14);
+
+  box-shadow: none;
   z-index: 4;
 }
 /* === END PATCH: DETAILPANEL DRAG HANDLE (render via ::before; no DOM dependency) === */
@@ -1820,6 +1834,7 @@ Umfang:
 Zweck:
 - Sheet wirkt wie eine natürliche Fortsetzung der Event-Card-DNA (weniger „Modal“)
 - Ruhigeres Shadow/Border-Verhalten, weniger „heavy sheet“
+- Radius ist tokenisiert (Single Source of Truth)
 Umfang:
 - Nur .detail-panel-content (keine Layout-Logik geändert)
 === */
@@ -1843,7 +1858,7 @@ Umfang:
   border: 1px solid rgba(31,41,51,0.08);
   border-bottom: 0;
 
-  border-radius: 22px 22px 0 0;
+  border-radius: var(--dp-sheet-radius) var(--dp-sheet-radius) 0 0;
 
   /* ruhiger als vorher: weniger “lift”, mehr “surface” */
   box-shadow:
@@ -1861,27 +1876,17 @@ Umfang:
 /* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space) === */
 
 
-/* === BEGIN BLOCK: DETAILPANEL GRABBER (calm, minimal, non-modal) ===
+/* === BEGIN BLOCK: DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) ===
 Zweck:
-- Grabber bleibt als Affordance vorhanden, wirkt aber nicht wie “anderes App-Sheet”
+- Systemisch: Grabber ist DOM-unabhängig via .detail-panel-content::before
+- Falls ein altes DOM-Element .detail-panel-grabber auftaucht, darf es nicht doppelt rendern
 Umfang:
-- Nur #event-detail-panel .detail-panel-grabber
+- Nur .detail-panel-grabber (keine Layout-Logik)
 === */
 #event-detail-panel .detail-panel-grabber{
-  position: absolute;
-  top: 9px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width: 42px;
-  height: 4px;
-
-  border-radius: 999px;
-  background: rgba(31,41,51,0.14);
-
-  z-index: 4;
+  display: none;
 }
-/* === END BLOCK: DETAILPANEL GRABBER (calm, minimal, non-modal) === */
+/* === END BLOCK: DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) === */
 
 /* Drag-Hit-Area */
 #event-detail-panel .detail-panel-drag-hit{
@@ -2353,7 +2358,7 @@ Umfang:
     max-height: 82dvh;
     max-height: min(82dvh, 640px);
 
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--dp-sheet-radius) var(--dp-sheet-radius) 0 0;
   }
 
 /* === BEGIN FIX: DETAIL TITLE MOBILE MUST MATCH EVENT CARD ===
@@ -2967,6 +2972,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
