@@ -159,9 +159,21 @@ def main() -> None:
         # - Persistiert die echte Sheet-Zeile (idx) in row_number.
         # Umfang:
         # - Ersetzt ausschließlich den items.append(...) Block.
+        # === BEGIN BLOCK: APPEND INBOX ITEM (prefer TSV row_number, fallback idx) ===
+        # Zweck:
+        # - Wenn TSV row_number enthält, ist das die echte Sheet-Zeile (Writeback-sicher)
+        # - Fallback bleibt idx (kompatibel)
+        # Umfang:
+        # - Ersetzt ausschließlich den items.append(...) Block.
+        rn_raw = data.get("row_number", "")
+        try:
+            rn = int(rn_raw) if rn_raw else idx
+        except Exception:
+            rn = idx
+
         items.append(
             InboxItem(
-                row_number=idx,
+                row_number=rn,
                 status=data.get("status", ""),
                 id_suggestion=data.get("id_suggestion", ""),
                 title=data.get("title", ""),
@@ -181,6 +193,7 @@ def main() -> None:
                 created_at=data.get("created_at", ""),
             )
         )
+        # === END BLOCK: APPEND INBOX ITEM (prefer TSV row_number, fallback idx) ===
         # === END BLOCK: APPEND INBOX ITEM (incl. row_number for writeback) ===
 
     # Sortierung: Neueste zuerst (created_at desc), Fallback stabil (title)
