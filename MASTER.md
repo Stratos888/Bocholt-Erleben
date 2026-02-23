@@ -583,6 +583,83 @@ ChatGPT MUST append new decisions here when made.
 
 ---
 
+2026-02-23
+
+Discovery Pipeline — HTML Extraction Hardening (CTA/Filter Titles, JUBOH Link Classification, URL Normalization)
+
+Status:
+
+APPLIED (Quality hardening)
+OPEN (JUBOH date/time fill pending)
+
+Scope:
+
+Pipeline only.
+
+No UI changes.
+
+---
+
+Problem:
+
+HTML-based sources produced candidates with incorrect titles derived from UI/CTA link text (e.g. “Mehr erfahren”) and filter/navigation links (e.g. “8 Jahre”, “16 Jahre”, numeric pagination).
+
+These polluted Discovery_Candidates and led to low-quality Inbox review items.
+
+Additionally, double-encoded href URLs reduced detection reliability.
+
+---
+
+Implemented decisions:
+
+1) HTML link candidate quality gates:
+
+- Reject numeric-only titles (pagination)
+- Reject age-filter titles matching “<n> Jahre” patterns
+- Reject generic/CTA titles (“Mehr erfahren”, “Details”, etc.) as final titles
+
+2) Title repair:
+
+- For generic CTA titles, fetch detail page and repair title via:
+  og:title → h1 → title fallback
+
+3) Source-specific hardening for JUBOH:
+
+- Only allow true course detail pages under /programm/kurs/
+- Reject category/info/filter pages (/programm/kategorie/, /info/, etc.)
+
+4) URL normalization robustness:
+
+- Apply unquote + HTML unescape before canonicalization to handle double-encoded hrefs
+
+---
+
+Observed run result after changes:
+
+- Candidates parsed: 229
+- New Inbox rows: 46
+- New Inbox rows no longer contain CTA/Filter titles (“Mehr erfahren”, “Plus”, “… Jahre”, etc.)
+- Majority of new rows from JUNGE UNI Bocholt (html)
+
+---
+
+Open issue / next step:
+
+JUBOH course detail candidates still frequently lack date/time fields.
+
+Next patch:
+
+- Adjust detail-fetch trigger: for JUBOH /programm/kurs/ pages, fetch details for missing date/time even when listing-context “event_signal” is weak (budget/host caps unchanged).
+
+Verification:
+
+- Post-run TSV gates:
+  - Inbox contains 0 titles matching “mehr erfahren|plus|<n> jahre|numeric-only”
+  - All juboh.de Inbox URLs contain /programm/kurs/
+  - JUBOH missing-date ratio drops significantly after trigger adjustment
+
+---
+
 2026-02-19
 
 MASTER/ENGINEERING system introduced
