@@ -310,7 +310,7 @@ def clean_text(s: str) -> str:
 # Umfang: reine Hilfsfunktionen, keine Side-Effects
 
 import hashlib
-from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode, unquote
 
 
 def slugify(s: str) -> str:
@@ -1388,9 +1388,30 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         if hk.startswith("#"):
             continue
 
+        # === BEGIN BLOCK: JUBOH URL CLASSIFICATION (skip category/listing/info links) ===
+        # Zweck:
+        # - JUBOH hat viele Nicht-Event-Links im Programm (Alter/Kategorie/Info/Navi)
+        # - Diese Links sind Listing-/Filterseiten und dürfen NICHT als Event-Kandidaten in die Inbox
+        # Umfang:
+        # - Ersetzt nur die URL-Normalisierung + direktes Filtering in _html_link_candidates_date_scan
         url = _normalize_event_url(href, base_url)
         if not url:
             continue
+
+        p0 = urlparse(url)
+        host0 = (p0.netloc or "").lower()
+        path0 = (p0.path or "").lower()
+
+        if host0.endswith("juboh.de"):
+            # 1) Kategorie/Filterseiten (inkl. Altersfilter "16 Jahre", usw.)
+            if "/programm/kategorie/" in path0 or "/info/" in path0:
+                continue
+
+            # 2) JUBOH Event-Detailseiten erkennt man stabil am Parameter "knr="
+            #    (die echten Kurse/Events hängen daran)
+            if "knr=" not in (p0.query or "").lower():
+                continue
+        # === END BLOCK: JUBOH URL CLASSIFICATION (skip category/listing/info links) ===
 
                # === BEGIN BLOCK: HTML DATE-SCAN (detail fetch + json-ld Event + gating, v6) ===
         # Datei: scripts/discovery-to-inbox.py
@@ -1990,17 +2011,37 @@ def _pick(obj: dict, *keys: str) -> str:
 
 
 def _normalize_event_url(u: str, base_url: str) -> str:
+    # === BEGIN BLOCK: URL NORMALIZATION (unquote + html-unescape) ===
+    # Zweck:
+    # - Repariert doppelt encodierte hrefs wie "&amp%3B..." (JUBOH)
+    # - Erst danach canonical_url anwenden, damit Query korrekt wird
+    # Umfang:
+    # - Ersetzt vollständig _normalize_event_url
     u = norm(u)
     if not u:
         return ""
+
+    # 1) %-Decoding (z.B. %3B -> ;) und danach HTML-Unescape (&amp; -> &)
+    try:
+        u = _html.unescape(unquote(u))
+    except Exception:
+        # wenn unquote/unescape scheitern, weiter mit Rohwert
+        pass
+
+    u = norm(u)
+    if not u:
+        return ""
+
     if u.startswith("http://") or u.startswith("https://"):
         return canonical_url(u)
+
     # relative -> host aus base_url
     try:
         p = urlparse(base_url)
         return canonical_url(f"{p.scheme}://{p.netloc}{u if u.startswith('/') else '/' + u}")
     except Exception:
         return canonical_url(u)
+    # === END BLOCK: URL NORMALIZATION (unquote + html-unescape) ===
 
 
 def _iso_date_part(iso_dt: str) -> str:
