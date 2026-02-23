@@ -2223,10 +2223,18 @@ Umfang:
   gap: 10px;
 
   width: 100%;
-  padding: 14px 0;
 
+  /* === BEGIN FIX: LOCATION ROW RHYTHM (match meta rows) ===
+  Zweck:
+  - Location-Row soll im Rhythmus wie die Meta-Rows wirken (weniger “dicker” Abschnitt)
+  - Optik bleibt klickbar, aber ruhiger
+  Umfang:
+  - nur padding + divider
+  === */
+  padding: 10px 0;
   border: 0;
   border-bottom: 1px solid rgba(31,41,51,0.06);
+  /* === END FIX: LOCATION ROW RHYTHM (match meta rows) === */
 
   background: transparent;
   color: rgba(60,72,88,0.68);   /* wie .event-meta */
@@ -2283,8 +2291,11 @@ Umfang:
 
 #event-detail-panel .detail-location-chev{
   flex: 0 0 auto;
-  margin-left: 8px;
-  opacity: 0.62;
+
+  /* ruhiger, weniger “zieht Aufmerksamkeit” */
+  margin-left: 6px;
+  opacity: 0.58;
+
   font-size: 18px;
   line-height: 1;
 }
@@ -2927,6 +2938,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
