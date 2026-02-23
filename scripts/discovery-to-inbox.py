@@ -1399,20 +1399,33 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         pass
     # === END BLOCK: JUBOH PAGINATION PREFETCH (programm pages) ===
     
-    # === BEGIN BLOCK: DETAIL FETCH BUDGET (missing_date enrichment, v1) ===
+    # === BEGIN BLOCK: DETAIL FETCH BUDGET (missing_date enrichment + per-host cap override, v2) ===
     # Datei: scripts/discovery-to-inbox.py
     # Zweck:
-    # - Begrenzter, sicherer Detailseiten-Fetch nur zur Datums-Anreicherung (JSON-LD Event)
+    # - Begrenzter, sicherer Detailseiten-Fetch nur zur Datums-Anreicherung (JSON-LD/Text auf Detailseiten)
     # - Budget + Cache, damit kein Noise/Load-Exploit entsteht
+    # - Per-host Cap Override für High-Confidence Quellen (aktuell: juboh.de), damit TASK 4 Backfill sichtbar wirkt
     # Umfang:
-    # - Nur lokale Variablen für _html_link_candidates_date_scan
-    # === END BLOCK: DETAIL FETCH BUDGET (missing_date enrichment, v1) ===
+    # - Nur lokale Variablen + Helper für _html_link_candidates_date_scan
     detail_fetch_budget = int(os.environ.get("MAX_DETAIL_FETCH", "60"))
     detail_fetch_timeout = int(os.environ.get("DETAIL_FETCH_TIMEOUT", "15"))
+
+    # Default cap
     detail_fetch_host_cap = int(os.environ.get("MAX_DETAIL_FETCH_PER_HOST", "8"))
+
+    # Override caps (nur wenn gesetzt, sonst Default)
+    detail_fetch_host_cap_juboh = int(os.environ.get("MAX_DETAIL_FETCH_PER_HOST_JUBOH", str(detail_fetch_host_cap)))
+
+    def cap_for_host(h: str) -> int:
+        h = (h or "").lower()
+        if h.endswith("juboh.de"):
+            return detail_fetch_host_cap_juboh
+        return detail_fetch_host_cap
+
     detail_fetch_count = 0
     detail_fetch_by_host: Dict[str, int] = {}
     detail_html_cache: Dict[str, str] = {}
+    # === END BLOCK: DETAIL FETCH BUDGET (missing_date enrichment + per-host cap override, v2) ===
 
     # Kontext: wir nutzen kurze Fenster um den Link (um Datum/Ort/Uhrzeit mitzunehmen)
     for m in _HTML_A_RE.finditer(html_text):
@@ -1645,7 +1658,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             # 2) Fallback: Datum aus sichtbarem Text via bestehender Funktion (nur wenn erlaubt)
             if allow_text_fallback:
                 detail_text = clean_text(_strip_html_tags(_html_text))
-                detail_combined = f"{title}\n{detail_text[:6000]}"
+                detail_combined = f"{title}\n{detail_text[:20000]}"
                 d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
                 if d_sd:
                     return (d_sd, d_ed or d_sd)
@@ -1771,22 +1784,24 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             or "/programm" in path
         )
 
-             # === BEGIN BLOCK: DETAIL FETCH TRIGGER (date OR title repair) ===
+             # === BEGIN BLOCK: DETAIL FETCH TRIGGER (date OR title repair + per-host cap, v2) ===
         # Zweck:
         # - Detail-Fetch nicht nur für fehlendes Datum, sondern auch für generische Titel ("Mehr erfahren")
         # - JUBOH Kursdetailseiten: Detail-Fetch auch dann, wenn event_signal im Listing-Kontext fehlt
+        # - Per-host cap via cap_for_host(host)
         # Umfang:
         # - Ersetzt nur die should_fetch_detail-Definition
         is_juboh_kurs = host.endswith("juboh.de") and ("/programm/kurs/" in path)
+        host_cap = cap_for_host(host)
 
         should_fetch_detail = (
             ((not ev_date) or needs_title_repair)
             and (event_signal or is_juboh_kurs)
             and (url_seems_event or path_event_hint or is_juboh_kurs)
             and (detail_fetch_count < detail_fetch_budget)
-            and (host_fetches < detail_fetch_host_cap)
+            and (host_fetches < host_cap)
         )
-        # === END BLOCK: DETAIL FETCH TRIGGER (date OR title repair) ===
+        # === END BLOCK: DETAIL FETCH TRIGGER (date OR title repair + per-host cap, v2) ===
 
         if should_fetch_detail:
             # 0) Haupt-URL laden (cache + budget)
@@ -1881,7 +1896,8 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 if detail_candidates and (detail_fetch_count < detail_fetch_budget):
                     u2 = detail_candidates[0]
                     host_fetches2 = detail_fetch_by_host.get(host, 0)
-                    if host_fetches2 < detail_fetch_host_cap:
+                    host_cap2 = cap_for_host(host)
+                    if host_fetches2 < host_cap2:
                         if u2 not in detail_html_cache:
                             try:
                                 detail_html_cache[u2] = safe_fetch(u2, timeout=detail_fetch_timeout)
@@ -1902,19 +1918,13 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                                     re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
                                 )
         # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3-correctness) ===
-        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
+        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v2 consolidated) ===
         # Zweck:
         # - JUBOH Kursdetailseiten dürfen nicht am (date OR event_signal)-Gate verloren gehen
         # - Zusätzlich: minimaler "Kurs"-Hinweis im Description-Text, damit classify_candidate() nicht reject:no_event_signal triggert
         # Umfang:
-        # - Ersetzt nur das Gate + die desc-Zuweisung direkt vor out.append (keine Fetch-/Budget-Änderungen)
-        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
-        # Zweck:
-        # - JUBOH Kursdetailseiten dürfen nicht am (date OR event_signal)-Gate verloren gehen
-        # Umfang:
-        # - Ersetzt nur das Gate + die desc-Zuweisung direkt vor out.append
-        # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
-        # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
+        # - Ersetzt nur das Gate + desc-Zuweisung direkt vor out.append (keine Fetch-/Budget-Änderungen)
+
         if is_juboh_kurs and not event_signal:
             event_signal = True
 
@@ -1925,14 +1935,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         # Description kurz halten
         desc = ctx[:500]
-        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
         if is_juboh_kurs and desc:
             desc = f"Kurs. {desc}"
         elif is_juboh_kurs:
             desc = "Kurs."
-        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
-
-        # === BEGIN BLOCK: HTML DATE-SCAN ENRICH TIME/LOCATION (JUBOH+fallback, v1) ===
+        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v2 consolidated) ===
         ev_time = ""
         ev_loc = ""
 
@@ -2610,7 +2617,7 @@ def main() -> None:
             return (best_start, best_end)
 
         # 2) Fallback: sichtbarer Text (konservativ: nur Anfang der Seite)
-        plain = clean_text(_strip_html_tags(html[:8000]))
+        plain = clean_text(_strip_html_tags(html[:20000]))
         fy = datetime.now().year
         d1, d2 = _extract_event_date_de(plain, fy)
         return (d1, d2)
