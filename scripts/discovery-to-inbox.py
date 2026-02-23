@@ -2256,6 +2256,22 @@ def batch_update_rows(service: object, sheet_id: str, updates: List[Dict[str, ob
     ).execute()
 
 
+def batch_update_rows(service: object, sheet_id: str, updates: List[Dict[str, object]]) -> None:
+    """
+    updates = [{"range": "Inbox!A2:Q2", "values": [[...]]}, ...]
+    """
+    if not updates:
+        return
+    body = {
+        "valueInputOption": "RAW",
+        "data": updates,
+    }
+    service.spreadsheets().values().batchUpdate(
+        spreadsheetId=sheet_id,
+        body=body,
+    ).execute()
+
+
 def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[str, str]]]:
     if not values:
         return ([], [])
@@ -2356,6 +2372,97 @@ def main() -> None:
     live_by_url, live_by_title_date = build_live_index(live_events)
 
     existing_inbox_fps = set(inbox_fingerprint(r) for r in inbox_rows)
+
+    # === BEGIN BLOCK: INBOX BACKFILL PASS (missing fields via detail fetch, JUBOH kurs, v1) ===
+    # Zweck:
+    # - Systematisches Nachpflegen bereits vorhandener Inbox-Zeilen (v.a. fehlendes Datum),
+    #   unabhängig davon, ob die URL im aktuellen Source-Fetch erneut als Candidate auftaucht.
+    # - Start: nur High-Confidence JUBOH Kursdetailseiten.
+    # Umfang:
+    # - Ergänzt nur einen Backfill-Pass + erzeugt inbox_backfill_updates (keine Änderungen an Budgets/Host-Caps für Source-Fetch)
+    inbox_backfill_updates: List[Dict[str, object]] = []
+    inbox_backfill_count = 0
+
+    backfill_budget = int(os.environ.get("MAX_DETAIL_FETCH", "60"))
+    backfill_timeout = int(os.environ.get("DETAIL_FETCH_TIMEOUT", "15"))
+    backfill_host_cap = int(os.environ.get("MAX_DETAIL_FETCH_PER_HOST", "8"))
+
+    backfill_count = 0
+    backfill_by_host: Dict[str, int] = {}
+    backfill_html_cache: Dict[str, str] = {}
+
+    for row_idx, r in enumerate(inbox_rows, start=2):
+        cur_url = norm(r.get("url", ""))
+        if not cur_url:
+            continue
+
+        cur_date = norm(r.get("date", ""))
+        if cur_date:
+            continue
+
+        try:
+            pu = urlparse(norm(cur_url))
+            host = (pu.netloc or "").lower()
+            path = (pu.path or "").lower()
+        except Exception:
+            continue
+
+        is_juboh_kurs = host.endswith("juboh.de") and ("/programm/kurs/" in path)
+        if not is_juboh_kurs:
+            continue
+
+        if backfill_count >= backfill_budget:
+            break
+
+        host_fetches = backfill_by_host.get(host, 0)
+        if host_fetches >= backfill_host_cap:
+            continue
+
+        if cur_url not in backfill_html_cache:
+            try:
+                backfill_html_cache[cur_url] = safe_fetch(cur_url, timeout=backfill_timeout)
+            except Exception:
+                backfill_html_cache[cur_url] = ""
+            backfill_count += 1
+            backfill_by_host[host] = host_fetches + 1
+
+        html = backfill_html_cache.get(cur_url, "") or ""
+        if not html:
+            continue
+
+        d1, d2 = _extract_date_from_html(html, allow_text_fallback=True)
+        if not d1:
+            continue
+
+        # nur leere Felder füllen
+        updated_row: Dict[str, str] = {col: norm(r.get(col, "")) for col in INBOX_COLUMNS}
+        changed = False
+
+        def _fill(col: str, val: str) -> None:
+            nonlocal changed
+            if (not norm(updated_row.get(col, ""))) and norm(val):
+                updated_row[col] = norm(val)
+                changed = True
+
+        _fill("date", d1)
+        _fill("endDate", d2)
+
+        # optional: time/location nur wenn leer (aus Detail-HTML über infer_location_time)
+        title_for_infer = norm(updated_row.get("title", ""))
+        plain = clean_text(_strip_html_tags(html[:8000]))
+        loc2, time2 = infer_location_time(title_for_infer, plain)
+        _fill("time", time2)
+        _fill("location", loc2)
+
+        if changed:
+            inbox_backfill_updates.append(
+                {
+                    "range": f"{TAB_INBOX}!A{row_idx}:Q{row_idx}",
+                    "values": [[updated_row.get(col, "") for col in INBOX_COLUMNS]],
+                }
+            )
+            inbox_backfill_count += 1
+    # === END BLOCK: INBOX BACKFILL PASS (missing fields via detail fetch, JUBOH kurs, v1) ===
     existing_inbox_fp_to_row: Dict[Tuple[str, str, str], int] = {}
     existing_inbox_fp_to_rowdata: Dict[Tuple[str, str, str], Dict[str, str]] = {}
 
@@ -2785,6 +2892,10 @@ def main() -> None:
         info("✅ Inbox updated.")
     else:
         info("✅ Nothing new to add.")
+
+    if inbox_backfill_updates:
+        batch_update_rows(service, sheet_id, inbox_backfill_updates)
+        info(f"✅ Inbox backfilled (updated rows): {inbox_backfill_count}")
 
     if "inbox_updates" in locals() and inbox_updates:
         batch_update_rows(service, sheet_id, inbox_updates)
