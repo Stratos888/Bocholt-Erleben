@@ -2125,6 +2125,13 @@ Umfang:
   margin: 0 0 10px;
 }
 
+/* === BEGIN FIX: DETAIL META MUST MATCH EVENT META (color + line-height) ===
+Zweck:
+- Detailpanel Meta-Info optisch identisch zur Event-Card (.event-meta)
+- Muted-Farbton + ruhiger Zeilenrhythmus angleichen
+Umfang:
+- Nur #event-detail-panel .detail-chip (keine Layout-Änderungen)
+=== */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2142,9 +2149,9 @@ Umfang:
   box-shadow: none;
 
   font-size: var(--font-event-meta);
-  line-height: 1.2;
+  line-height: 1.28;                 /* wie .event-meta */
   font-weight: 650;
-  color: rgba(31,41,51,0.90);
+  color: rgba(60,72,88,0.68);        /* wie .event-meta */
 
   cursor: default;
   user-select: text;
@@ -2153,6 +2160,7 @@ Umfang:
   overflow: visible;
   text-overflow: clip;
 }
+/* === END FIX: DETAIL META MUST MATCH EVENT META (color + line-height) === */
 /* === END BLOCK: DETAIL META ROWS (calmer, consistent dividers) === */
 
 #event-detail-panel .detail-chip-text{
@@ -2851,6 +2859,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
