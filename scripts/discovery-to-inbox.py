@@ -1760,6 +1760,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # - Zusätzlich: minimaler "Kurs"-Hinweis im Description-Text, damit classify_candidate() nicht reject:no_event_signal triggert
         # Umfang:
         # - Ersetzt nur das Gate + die desc-Zuweisung direkt vor out.append (keine Fetch-/Budget-Änderungen)
+        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
+        # Zweck:
+        # - JUBOH Kursdetailseiten dürfen nicht am (date OR event_signal)-Gate verloren gehen
+        # Umfang:
+        # - Ersetzt nur das Gate + die desc-Zuweisung direkt vor out.append
         # Nur Kandidaten erzeugen wenn (Datum ODER Event-Signal),
         # aber Datum-ohne-Event-Signal nur bei "event-typischer" URL (Noise-Reduktion).
         if is_juboh_kurs and not event_signal:
@@ -1772,6 +1777,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         # Description kurz halten
         desc = ctx[:500]
+        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
         if is_juboh_kurs and desc:
             desc = f"Kurs. {desc}"
         elif is_juboh_kurs:
@@ -2485,6 +2491,11 @@ def main() -> None:
             # Umfang:
             # - Ersetzt nur den Bereich classify_candidate -> dedupe -> inbox write
             # === END BLOCK: CANDIDATE CLASSIFY + LOGGING + INBOX WRITE (append Discovery_Candidates, v1) ===
+            # === BEGIN BLOCK: CLASSIFY OVERRIDE (JUBOH kurs no_event_signal -> review, v1) ===
+            # Zweck:
+            # - JUBOH Kursdetailseiten nicht als reject:no_event_signal verlieren (Enrichment/Review ermöglichen)
+            # Umfang:
+            # - Ersetzt nur den classify_candidate()-Call inkl. minimalem Override direkt danach
             status, reason = classify_candidate(
                 stype=stype,
                 source_name=source_name,
@@ -2493,6 +2504,18 @@ def main() -> None:
                 description=desc_text,
                 event_date=d,
             )
+
+            try:
+                _pu = urlparse(norm(c.get("url", "")))
+                _host = (_pu.netloc or "").lower()
+                _path = (_pu.path or "").lower()
+                _is_juboh_kurs = _host.endswith("juboh.de") and ("/programm/kurs/" in _path)
+            except Exception:
+                _is_juboh_kurs = False
+
+            if _is_juboh_kurs and reason == "reject:no_event_signal":
+                status, reason = "review", "review:juboh_kurs_missing_event_signal"
+            # === END BLOCK: CLASSIFY OVERRIDE (JUBOH kurs no_event_signal -> review, v1) ===)
 
             # URL normalisieren (für Matching/Dedupe/Log)
             c_url_raw = norm(c.get("url", ""))
