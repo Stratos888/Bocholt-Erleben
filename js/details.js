@@ -65,20 +65,28 @@
     return { raw: r, canonical: map[r] || "other" };
   };
 
-  const getCategoryIcon = (categoryRaw) => {
-    const c = trimOrEmpty(categoryRaw);
-    if (!c) return "";
-    const iconMap = {
-      "Musik": "🎵",
-      "Kultur": "🎭",
-      "Essen & Trinken": "🍽️",
-      "Sport": "🏃",
-      "Familie": "👨‍👩‍👧‍👦",
-      "Natur & Draußen": "🌿",
-      "Innenstadt & Leben": "🏙️",
-    };
-    return iconMap[c] || "🗓️";
+/* === BEGIN BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji)
+Zweck:
+- Unbekannte Kategorien sollen NICHT 🗓️ als Emoji nutzen
+- Stattdessen: konsistentes Kalender-Icon wie Action-Bar (SVG Token)
+Umfang:
+- Nur getCategoryIcon()
+=== */
+const getCategoryIcon = (categoryRaw) => {
+  const c = trimOrEmpty(categoryRaw);
+  if (!c) return "";
+  const iconMap = {
+    "Musik": "🎵",
+    "Kultur": "🎭",
+    "Essen & Trinken": "🍽️",
+    "Sport": "🏃",
+    "Familie": "👨‍👩‍👧‍👦",
+    "Natur & Draußen": "🌿",
+    "Innenstadt & Leben": "🏙️",
   };
+  return iconMap[c] || "calendar";
+};
+/* === END BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji) === */
 
   // === BEGIN BLOCK: LOCATION HOMEPAGE LOOKUP (robust matching) ===
   // Zweck: Homepage lookup robust gegen Klammerzusätze / Stadtteil-Suffixe, ohne Datenmodell zu ändern
@@ -874,7 +882,7 @@ const iconSvg = (type, extraClass = "") => {
           <div class="detail-header">
             <div class="detail-title-row">
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
-              ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${escapeHtml(vm.icon)}</span>` : ""}
+${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${vm.icon === "calendar" ? iconSvg("calendar", "is-category") : escapeHtml(vm.icon)}</span>` : ""}
             </div>
                        <div class="detail-meta-chips" role="list" aria-label="Event-Infos">
               ${vm.city ? `
@@ -1104,6 +1112,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
