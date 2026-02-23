@@ -1538,6 +1538,10 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         host = (urlparse(url).netloc or "").lower()
         host_fetches = detail_fetch_by_host.get(host, 0)
 
+        # === BEGIN BLOCK: DETAIL HTML INIT (fix unbound detail_html, v1) ===
+        detail_html = ""
+        # === END BLOCK: DETAIL HTML INIT (fix unbound detail_html, v1) ===
+
         path = urlparse(url).path.lower()
         is_listing_like = (
             "/kategorie/" in path
