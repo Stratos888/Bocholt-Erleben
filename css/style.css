@@ -133,8 +133,8 @@ Umfang:
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
- /* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
---ui-border-primary: rgba(139,207,74,.45);
+/* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
+--ui-border-primary: rgba(139,207,74,0.45);
 /* === END FIX: RGBA ALPHA TYPO (ui-border-primary) === */
 
   --ui-surface-soft: rgba(255,255,255,0.55);
@@ -175,8 +175,8 @@ Umfang:
   --primary: var(--color-primary);
   --accent: var(--color-primary);
 
- /* === BEGIN FIX: RGBA ALPHA TYPO (focus-ring) === */
---focus-ring: rgba(139,207,74,.25);
+/* === BEGIN FIX: RGBA ALPHA TYPO (focus-ring) === */
+--focus-ring: rgba(139,207,74,0.25);
 /* === END FIX: RGBA ALPHA TYPO (focus-ring) === */
 
   --radius: var(--radius-card);
@@ -1844,40 +1844,36 @@ Umfang:
   right: 0;
   bottom: 0;
 
-  height: auto;
+  /* Fallback + Fix: dvh verhindert “vh”-Abschneiden durch Browser-UI */
+  max-height: 92vh;
+  max-height: 92dvh;
 
-  max-height: 72dvh;
-  max-height: min(72dvh, 560px);
+  /* === BEGIN PATCH: DETAILPANEL SURFACE (NO GRADIENT, feed-consistent) ===
+  Zweck:
+  - Entfernt jeden Gradient/Color-Wash → kein “billig”
+  - Premium-Surface wie Feed-Cards: klare Weißfläche + sehr weiche Kante
+  Umfang:
+  - nur Surface-Rendering (background/border/shadow/radius)
+  === */
+  background-color: rgba(255,255,255,0.98);
+  background-image: none !important;
+
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+
+  border-top: 1px solid rgba(31,41,51,0.08);
+  box-shadow:
+    0 -42px 130px rgba(0,0,0,0.26),
+    0 1px 0 rgba(255,255,255,0.82) inset;
+  /* === END PATCH: DETAILPANEL SURFACE (NO GRADIENT, feed-consistent) === */
+
+  overflow: hidden;
+  overscroll-behavior: contain;
+
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 
   display: flex;
   flex-direction: column;
-
-  /* Surface: identisch ruhig wie Feed, aber mit minimalem Premium-Tint */
-  background: var(--color-surface);
-  background: color-mix(in srgb, var(--color-surface) 92%, white);
-
-  /* “Wow” ohne Lautstärke: leichter Top-Tint wie Header/Brand (subtil) */
-  background-image:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-primary-muted) 55%, white) 0%,
-      rgba(255,255,255,0) 64px
-    );
-
-  /* Card-DNA: definierte Kante, keine “modal chrome” Optik */
-  border: 1px solid rgba(31,41,51,0.055);
-  border-bottom: 0;
-
-  border-radius: var(--dp-sheet-radius) var(--dp-sheet-radius) 0 0;
-
-  /* Premium Tiefe: näher an .event-card Shadow-Charakteristik */
-  box-shadow:
-    0 -1px 1px rgba(0,0,0,0.035),
-    0 -18px 52px rgba(0,0,0,0.090),
-    0 1px 0 rgba(255,255,255,0.78) inset;
-
-  overflow: hidden;
-  z-index: 2;
 }
 /* === END BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) === */
 
@@ -2160,31 +2156,27 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META ROWS (calmer, consistent dividers) ===
 Zweck:
-- Weniger „Tabellen-Look“, mehr ruhiger Rhythmus wie im Feed
-- Divider überall gleich „soft“
+- Weg vom „Zeilenlisten“-Look → Meta wirkt wie ein ruhiger Info-Block (Feed-DNA)
+- Keine Divider-Linien, stattdessen Group-Surface + Whitespace
 Umfang:
-- .detail-meta-chips + .detail-chip
+- .detail-meta-chips + .detail-chip (+ hover/active-feel ohne “Button-Look”)
 === */
 #event-detail-panel .detail-meta-chips{
   display: grid;
-  gap: 8px;
-  margin: 0 0 10px;
+  gap: 4px;
+  margin: 0 0 12px;
+
+  /* Group Surface (wie “embedded card”) */
+  padding: 10px 10px;
+  border-radius: 14px;
+
+  background: rgba(31,41,51,0.028);
+  border: 1px solid rgba(31,41,51,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.70) inset;
 }
 
-/* === BEGIN FIX: DETAIL META MUST MATCH EVENT META (color + line-height) ===
-Zweck:
-- Detailpanel Meta-Info optisch identisch zur Event-Card (.event-meta)
-- Muted-Farbton + ruhiger Zeilenrhythmus angleichen
-Umfang:
-- Nur #event-detail-panel .detail-chip (keine Layout-Änderungen)
-=== */
-/* === BEGIN FIX: META DIVIDER DENSITY (avoid table feel) ===
-Zweck:
-- Meta-Block wirkt wie Feed-Meta (ruhig), nicht wie „Tabelle“
-- Divider nur als Abschlusslinie unter dem Meta-Block
-Umfang:
-- Nur Border-Regel der .detail-chip
-=== */
+/* Meta-Row selbst: ruhig, nicht “chip”, aber klar strukturiert */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2193,12 +2185,11 @@ Umfang:
   width: 100%;
   max-width: 100%;
 
-  padding: 10px 0;
+  padding: 8px 8px;
+  border: 0;
 
-  border: 0; /* keine Divider pro Row */
-
+  border-radius: 12px;
   background: transparent;
-  box-shadow: none;
 
   font-size: var(--font-event-meta);
   line-height: 1.28;
@@ -2211,21 +2202,18 @@ Umfang:
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sehr dezentes “Touch-Feedback”, ohne Button-Charakter */
+#event-detail-panel .detail-chip:active{
+  background: rgba(31,41,51,0.035);
 }
 
 #event-detail-panel .detail-meta-chips .detail-chip:last-child{
-  /* === BEGIN FIX: META CONTINUITY (no divider; spacing-only like feed) ===
-  Zweck:
-  - Entfernt Abschlusslinie, damit Meta nicht wie eigener Block wirkt
-  - Feed-DNA: Ruhe über Whitespace
-  Umfang:
-  - Nur Border-Reset
-  === */
   border-bottom: 0;
-  /* === END FIX: META CONTINUITY (no divider; spacing-only like feed) === */
 }
-/* === END FIX: META DIVIDER DENSITY (avoid table feel) === */
-/* === END FIX: DETAIL META MUST MATCH EVENT META (color + line-height) === */
 /* === END BLOCK: DETAIL META ROWS (calmer, consistent dividers) === */
 
 #event-detail-panel .detail-chip-text{
@@ -2261,23 +2249,38 @@ Umfang:
 
   width: 100%;
 
-  /* === BEGIN FIX: LOCATION ROW RHYTHM (no divider; feed-like) ===
-  Zweck:
-  - Keine Abschlusslinie → wirkt nicht wie eigener “Section Row”
-  - Rhythmus bleibt wie Meta (ruhig, inline feel)
-  Umfang:
-  - nur padding + border reset
-  === */
-  padding: 10px 0;
-  border: 0;
-  /* === END FIX: LOCATION ROW RHYTHM (no divider; feed-like) === */
+/* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
+Zweck:
+- Location ist Teil der selben “Info”-DNA wie Meta (nicht wie eigener Abschnitt)
+- trotzdem eindeutig klickbar (Chevron + Active-Feedback)
+Umfang:
+- Nur .detail-location-action Grundstil (Layout/Surface/Typo)
+=== */
+#event-detail-panel .detail-location-action,
+#event-detail-panel .detail-location-action:link,
+#event-detail-panel .detail-location-action:visited{
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-  background: transparent;
+  width: 100%;
+
+  /* wie Meta-Group, aber als einzelne “Karte” */
+  padding: 10px 12px;
+  border-radius: 14px;
+
+  background: rgba(31,41,51,0.028);
+  border: 1px solid rgba(31,41,51,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.70) inset;
+
   color: rgba(60,72,88,0.68);   /* wie .event-meta */
   text-decoration: none;
 
-  border-radius: 0;
   -webkit-tap-highlight-color: transparent;
+}
+#event-detail-panel .detail-location-action:active{
+  background: rgba(31,41,51,0.045);
 }
 /* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
 
@@ -2996,3 +2999,4 @@ Umfang:
   opacity: 0.92;
 }
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
