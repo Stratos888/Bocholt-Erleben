@@ -76,7 +76,7 @@ ACTIVE TASKS:
 
 TASK 1: DETAILPANEL UI STABILIZATION
 
-STATUS: IN PROGRESS
+STATUS: COMPLETED
 
 DEFINITION OF DONE:
 
@@ -102,19 +102,21 @@ FOUNDATION BASELINE (DONE THIS SPRINT):
 - Touch targets meet enterprise minimum (close/actionbar)
 - Reduced Motion support present (prefers-reduced-motion)
 
-REMAINING (NEXT UI WORK INSIDE TASK 1):
+VISUAL DNA ALIGNMENT (DONE THIS SPRINT):
 
-- Visual DNA alignment to Golden Screen baseline (header/title/meta rhythm)
-- Chooser overlay hardening (avoid future overlay scope regressions)
-- Drag/snap feel polish (no phantom drags, consistent snap behavior)
+- Header/title hierarchy aligned to Golden Screen baseline
+- Meta (date/time/location) rhythm aligned (muted, non-bold, consistent line-height)
+- Location row aligned to Meta DNA (calm, non-headline feel)
+- Description typography calmed (enterprise readability)
+- Divider density reduced (no “table/form” feel)
+- Actionbar consolidated (button sizing/radius/shadow/states) and verified via console proofs
+- Calendar icon token consistency enforced inside Detailpanel (Date + Actionbar + Category fallback)
 
-After completion:
+FREEZE INSTRUCTION (EFFECTIVE IMMEDIATELY):
 
-Move task to COMPLETED AREAS
-
-Add decision entry if structural decisions were made
-
-Freeze component
+Detailpanel is now treated as the Event Detail Page (overlay-based).
+Detailpanel visual DNA is frozen.
+Only bug fixes allowed unless explicit unfreeze decision is recorded.
 
 ---
 
@@ -509,9 +511,45 @@ Event loading system
 
 Base UI system
 
+Detailpanel (Event Detail Overlay baseline frozen)
+
 ---
 
 # DECISIONS LOG
+2026-02-23
+
+Detailpanel UI Stabilization — Visual DNA Freeze (UI-only)
+
+Status:
+
+COMPLETED (Frozen baseline)
+
+Scope:
+
+UI only.
+
+No pipeline changes.
+
+No deploy/build changes.
+
+Decision:
+
+Detailpanel serves as the Event Detail Page (overlay-based).
+Visual DNA aligned to Golden Screen baseline and now frozen.
+
+Applied:
+
+- Title/header hierarchy aligned (incl. small-screen behavior)
+- Meta rows calmed and consistent (color/weight/line-height)
+- Location row aligned to meta DNA
+- Divider density reduced (no table feel)
+- Description typography calmed
+- Actionbar consolidated (sizing/radius/shadow/states)
+- Calendar icon token consistency enforced within Detailpanel (date/actionbar/category fallback)
+
+Freeze rule:
+
+Only bug fixes allowed unless explicit unfreeze decision is recorded.
 2026-02-22
 
 Discovery Pipeline — Inbox Writeback API Stabilization (row_number writeback reliability)
@@ -1231,7 +1269,7 @@ Update SESSION STATE
 
 OVERALL STATUS:
 
-UI: IN PROGRESS
+UI: DETAILPANEL BASELINE FROZEN (Event Detail Overlay)
 
 PIPELINE: IN PROGRESS (TASK 4 BACKFILL ACTIVE)
 
