@@ -403,39 +403,94 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
 # - Nur Heuristiken, keine externen Requests
 # === END BLOCK: LOCATION/TIME INFERENCE (rss/ics enrichment, v1) ===
 
-_TIME_IN_TITLE_RE = re.compile(r"\bum\s*(\d{1,2})(?:[:\.](\d{2}))?\s*uhr\b", re.IGNORECASE)
+# === BEGIN BLOCK: LOCATION/TIME INFERENCE (rss/ics enrichment, v2 robust) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - RSS liefert oft keine Location/Time-Felder -> aus Title/Description ableiten
+# - Robustere Extraktion aus "Ort:", "Veranstaltungsort:", "Treffpunkt:", Adresszeilen
+# - Online/Webinar bleibt "Online"
+# Umfang:
+# - Ersetzt nur die infer_location_time-Helper inkl. Regexes
+
+_TIME_IN_TITLE_RE = re.compile(r"\b(?:um|ab)\s*(\d{1,2})(?:[:\.](\d{2}))?\s*uhr\b", re.IGNORECASE)
+_TIME_PLAIN_RE = re.compile(r"(?<!\d)(\d{1,2})[:\.](\d{2})(?!\d)")
 _SLASH_SEG_RE = re.compile(r"\s*//\s*")
 
+# typische "Label: Wert" Felder
+_LOC_LABEL_RE = re.compile(
+    r"\b(?:ort|veranstaltungsort|treffpunkt|adresse|veranstaltungsadresse)\s*:\s*([^\n\r]{3,160})",
+    re.IGNORECASE,
+)
+
+# grobe Adresszeile: "Musterstraße 12, 46399 Bocholt" oder "46399 Bocholt"
+_ADDR_LINE_RE = re.compile(
+    r"\b([A-ZÄÖÜ][A-Za-zÄÖÜäöüß\-\s]{2,40}\s+\d{1,4}[a-zA-Z]?)\s*,?\s*(\b\d{5}\b\s*[A-ZÄÖÜ][A-Za-zÄÖÜäöüß\-\s]{2,40})?",
+    re.IGNORECASE,
+)
+
 def _infer_time_from_text(text: str) -> str:
-    m = _TIME_IN_TITLE_RE.search(text or "")
-    if not m:
-        return ""
-    hh = int(m.group(1))
-    mm = int(m.group(2)) if m.group(2) else 0
-    return f"{hh:02d}:{mm:02d}"
+    txt = text or ""
+    m = _TIME_IN_TITLE_RE.search(txt)
+    if m:
+        hh = int(m.group(1))
+        mm = int(m.group(2)) if m.group(2) else 0
+        return f"{hh:02d}:{mm:02d}"
+
+    # fallback: erste HH:MM im Text
+    m = _TIME_PLAIN_RE.search(txt)
+    if m:
+        hh = int(m.group(1))
+        mm = int(m.group(2))
+        if 0 <= hh <= 23 and 0 <= mm <= 59:
+            return f"{hh:02d}:{mm:02d}"
+    return ""
 
 def _infer_location_from_title(title: str) -> str:
     # presse-service Titel hat oft: "<Titel> // <Ort/Adresse> // ..."
     parts = [p.strip() for p in _SLASH_SEG_RE.split(title or "") if p.strip()]
     if len(parts) >= 2:
-        # Teil 2 ist meist Location/Adresse
         loc = parts[1]
-        # Zu generisch? dann leer lassen
         if len(loc) >= 3 and loc.lower() not in ("eintritt frei",):
             return loc
     return ""
 
+def _clean_loc(loc: str) -> str:
+    loc = clean_text(loc)
+    if not loc:
+        return ""
+    # häufige Abschneider
+    loc = re.split(r"\s+(?:am|um|ab|von|für|mit)\b", loc, maxsplit=1)[0].strip()
+    # sehr generische Werte verwerfen
+    if loc.lower() in ("bocholt", "kreis borken", "nrw"):
+        return ""
+    return loc
+
 def _infer_location_from_description(desc: str) -> str:
-    d = (desc or "").strip()
+    d = clean_text(desc or "")
     if not d:
         return ""
-    # einfache, robuste Muster: "im LernWerk", "im Schloss Raesfeld", "in Preen’s Hoff"
-    m = re.search(r"\b(im|in)\s+([A-ZÄÖÜ][^.,;]{2,80})", d)
+
+    # 1) Label: Ort: ...
+    m = _LOC_LABEL_RE.search(d)
     if m:
-        loc = m.group(2).strip()
-        # abschneiden, wenn Satz weiterläuft
-        loc = re.split(r"\s+(am|um|ab|von|für|mit)\b", loc)[0].strip()
-        return loc
+        loc = _clean_loc(m.group(1))
+        if loc:
+            return loc
+
+    # 2) Adresszeile im Text
+    m = _ADDR_LINE_RE.search(d)
+    if m:
+        loc = _clean_loc(m.group(0))
+        if loc:
+            return loc
+
+    # 3) "im/in <Name>" (konservativ)
+    m = re.search(r"\b(im|in)\s+([A-ZÄÖÜ][^.,;\n\r]{2,80})", d)
+    if m:
+        loc = _clean_loc(m.group(2))
+        if loc:
+            return loc
+
     return ""
 
 def infer_location_time(title: str, description: str) -> Tuple[str, str]:
@@ -444,7 +499,7 @@ def infer_location_time(title: str, description: str) -> Tuple[str, str]:
     low = f"{t} {d}".lower()
 
     # Online zuerst
-    if "online" in low or "webinar" in low:
+    if "online" in low or "webinar" in low or "zoom" in low or "teams" in low:
         return ("Online", _infer_time_from_text(t) or _infer_time_from_text(d))
 
     loc = _infer_location_from_title(t)
@@ -453,6 +508,8 @@ def infer_location_time(title: str, description: str) -> Tuple[str, str]:
 
     tm = _infer_time_from_text(t) or _infer_time_from_text(d)
     return (loc, tm)
+
+# === END BLOCK: LOCATION/TIME INFERENCE (rss/ics enrichment, v2 robust) ===
 
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
@@ -909,72 +966,52 @@ def parse_rss(xml_text: str) -> List[Dict[str, str]]:
         "dezember": 12, "dez": 12,
     }
 
-    def extract_event_date(text: str, fallback_year: int) -> Tuple[str, str]:
-        """
-        Returns (event_date_iso_or_empty, note)
-        Note contains extraction method / warnings.
-        """
-        t = norm(text)
-        if not t:
-            return ("", "event_date:missing (no text)")
+# === BEGIN BLOCK: RSS EVENT DATE+LOCATION ENRICHMENT (v2, uses global date-range + loc/time inference) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - RSS-Feeds liefern oft nur "Artikel-Datum" + Text -> wir extrahieren Event-Datum aus Title+Desc
+# - Zusätzlich Location/Time aus Text inferieren (Pflichtfeld Location!)
+# - Nutzt _extract_date_range_de (unterstützt Ranges wie 15.–16. März 2026)
+# Umfang:
+# - Ersetzt nur extract_event_date + pack_candidate innerhalb parse_rss()
 
-        # 1) dd.mm.yyyy or dd.mm.yy
-        m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})(?!\d)", t)
-        if m:
-            dd = int(m.group(1))
-            mm = int(m.group(2))
-            yy = m.group(3)
-            yyyy = int(yy) if len(yy) == 4 else (2000 + int(yy))
-            try:
-                d = date(yyyy, mm, dd).strftime("%Y-%m-%d")
-                return (d, "event_date:regex(dd.mm.yyyy)")
-            except Exception:
-                return ("", "event_date:invalid(dd.mm.yyyy)")
+def extract_event_date(text: str, fallback_year: int) -> Tuple[str, str]:
+    """
+    Returns (event_date_iso_or_empty, note)
+    """
+    t = clean_text(text or "")
+    if not t:
+        return ("", "event_date:missing (no text)")
 
-        # 2) dd.mm. (year inferred)
-        m = re.search(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(?!\d)", t)
-        if m:
-            dd = int(m.group(1))
-            mm = int(m.group(2))
-            try:
-                d = date(fallback_year, mm, dd).strftime("%Y-%m-%d")
-                return (d, "event_date:regex(dd.mm.) year_inferred")
-            except Exception:
-                return ("", "event_date:invalid(dd.mm.)")
+    d1, d2 = _extract_date_range_de(t, fallback_year=fallback_year)
+    if d1:
+        if d2 and d2 != d1:
+            return (d1, "event_date:range(_extract_date_range_de)")
+        return (d1, "event_date:single(_extract_date_range_de)")
 
-        # 3) dd. Monat yyyy / dd. Monat (year inferred)
-        m = re.search(r"(?<!\d)(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?(?!\d)", t)
-        if m:
-            dd = int(m.group(1))
-            mon = norm_key(m.group(2))
-            yyyy = int(m.group(3)) if m.group(3) else fallback_year
-            mm = month_map.get(mon, 0)
-            if mm:
-                try:
-                    d = date(yyyy, mm, dd).strftime("%Y-%m-%d")
-                    note = "event_date:regex(dd.monat" + (")" if m.group(3) else ") year_inferred")
-                    return (d, note)
-                except Exception:
-                    return ("", "event_date:invalid(dd.monat)")
+    return ("", "event_date:missing (article date only)")
 
-        return ("", "event_date:missing (article date only)")
+def pack_candidate(title: str, link: str, article_date: str, description: str) -> Dict[str, str]:
+    combined = f"{title}\n{description}"
+    fallback_year = int(article_date[:4]) if article_date and len(article_date) >= 4 else datetime.now().year
+    ev_date, ev_note = extract_event_date(combined, fallback_year)
 
-    def pack_candidate(title: str, link: str, article_date: str, description: str) -> Dict[str, str]:
-        combined = f"{title}\n{description}"
-        fallback_year = int(article_date[:4]) if article_date and len(article_date) >= 4 else datetime.now().year
-        ev_date, ev_note = extract_event_date(combined, fallback_year)
+    # Location/Time aus Text ableiten (wichtig für Pflichtfeld Location)
+    loc_guess, time_guess = infer_location_time(clean_text(title), clean_text(description))
 
-        notes = f"article_date={article_date or ''}; {ev_note}"
-        return {
-            "title": clean_text(title),
-            "date": ev_date,          # Event-Datum (kann leer sein)
-            "endDate": "",
-            "time": "",
-            "location": "",
-            "url": canonical_url(link),
-            "description": clean_text(description),
-            "notes": notes,
-        }
+    notes = f"article_date={article_date or ''}; {ev_note}"
+    return {
+        "title": clean_text(title),
+        "date": ev_date,                 # Event-Datum (kann leer sein)
+        "endDate": "",
+        "time": time_guess or "",
+        "location": loc_guess or "",
+        "url": canonical_url(link),
+        "description": clean_text(description),
+        "notes": notes,
+    }
+
+# === END BLOCK: RSS EVENT DATE+LOCATION ENRICHMENT (v2, uses global date-range + loc/time inference) ===
 
     if entries:
         for e in entries:
