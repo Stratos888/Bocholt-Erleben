@@ -103,27 +103,22 @@ jobs:
             sys.exit(1)
 
           # Datenzeilen normalisieren (auf Header-Länge), komplett leere Zeilen entfernen
-           # === BEGIN BLOCK: INBOX TSV EXPORT WITH row_number (stable writeback) ===
-          # Zweck:
-          # - row_number muss echte Sheet-Zeile sein, auch wenn leere Zeilen übersprungen werden
-          # Umfang:
-          # - Ersetzt nur rows-Build + TSV-Write für Inbox
           rows = []
-          out_header = ["row_number"] + header
-
-          for sheet_rowno, r in enumerate(values[1:], start=2):  # Header=1, erste Datenzeile=2
+          for r in values[1:]:
             r = (r or [])
             row = [ (r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header)) ]
             if any(v for v in row):
-              rows.append([str(sheet_rowno)] + row)
+              rows.append(row)
 
-          out_path = "data/inbox.tsv"
+          if not rows:
+            print("❌ Events-Tab enthält keine Datenzeilen (nur Header).", file=sys.stderr)
+            sys.exit(1)
+
+          out_path = "data/events.tsv"
           with open(out_path, "w", encoding="utf-8", newline="") as f:
             w = csv.writer(f, delimiter="\t", lineterminator="\n")
-            w.writerow(out_header)
-            if rows:
-              w.writerows(rows)
-          # === END BLOCK: INBOX TSV EXPORT WITH row_number (stable writeback) ===
+            w.writerow(header)
+            w.writerows(rows)
 
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
           PY
