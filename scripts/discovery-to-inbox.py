@@ -2256,21 +2256,7 @@ def batch_update_rows(service: object, sheet_id: str, updates: List[Dict[str, ob
     ).execute()
 
 
-def batch_update_rows(service: object, sheet_id: str, updates: List[Dict[str, object]]) -> None:
-    """
-    updates = [{"range": "Inbox!A2:Q2", "values": [[...]]}, ...]
-    """
-    if not updates:
-        return
-    body = {
-        "valueInputOption": "RAW",
-        "data": updates,
-    }
-    service.spreadsheets().values().batchUpdate(
-        spreadsheetId=sheet_id,
-        body=body,
-    ).execute()
-
+# (duplicate batch_update_rows removed)
 
 def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[str, str]]]:
     if not values:
@@ -2391,6 +2377,53 @@ def main() -> None:
     backfill_by_host: Dict[str, int] = {}
     backfill_html_cache: Dict[str, str] = {}
 
+    def _backfill_extract_date_from_html(_html_text: str) -> Tuple[str, str]:
+        # 1) JSON-LD Event startDate/endDate
+        scripts = re.findall(
+            r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+            _html_text or "",
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+
+        def _iter_ld_nodes(obj):
+            if isinstance(obj, list):
+                for it in obj:
+                    yield from _iter_ld_nodes(it)
+            elif isinstance(obj, dict):
+                yield obj
+                if "@graph" in obj:
+                    yield from _iter_ld_nodes(obj.get("@graph"))
+
+        for raw in scripts:
+            raw = norm(raw)
+            if not raw:
+                continue
+            try:
+                data = json.loads(raw)
+            except Exception:
+                continue
+
+            for node in _iter_ld_nodes(data):
+                t = node.get("@type") if isinstance(node, dict) else None
+                if isinstance(t, list):
+                    is_event = any(str(x).lower() == "event" for x in t)
+                else:
+                    is_event = str(t).lower() == "event"
+
+                if not is_event:
+                    continue
+
+                start = norm(node.get("startDate", ""))
+                end = norm(node.get("endDate", ""))
+                d1 = _iso_date_part(start)
+                d2 = _iso_date_part(end)
+                if d1:
+                    return (d1, d2)
+
+        # 2) Text-Fallback (für JUBOH ok): deutsches Datum im HTML
+        d1 = _extract_event_date_de(_html_text or "")
+        return (d1, "")
+
     for row_idx, r in enumerate(inbox_rows, start=2):
         cur_url = norm(r.get("url", ""))
         if not cur_url:
@@ -2430,7 +2463,7 @@ def main() -> None:
         if not html:
             continue
 
-        d1, d2 = _extract_date_from_html(html, allow_text_fallback=True)
+        d1, d2 = _backfill_extract_date_from_html(html)
         if not d1:
             continue
 
