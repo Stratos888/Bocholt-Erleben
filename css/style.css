@@ -2769,11 +2769,13 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) ===
 Zweck:
-- Actionbar wieder sichtbar (Root-Cause: Sheet hat z-index:2, Slot war z-index:auto -> liegt dahinter)
-- Labels aus title (JS liefert UI-kurz: „WhatsApp“, A11y bleibt aria „Per WhatsApp teilen“)
-- Kein Link-Underline bei Hover/Tap
+- Detailpanel-Actionbar „in einem Zug“ konsolidieren: Container + Buttons + Labels + Icons
+- Konsistent, ruhig, enterprise: gleiches Touch-Target, gleiche Radius/Border/Shadow-Logik
+- Keine Unterstreichungen, sauberes Hover/Active/Focus
 Umfang:
-- #detail-actionbar-slot + .detail-actionbar-btn + labels via ::after + .detail-sr-only
+- #detail-actionbar-slot inkl. .detail-actionbar (Layout)
+- .detail-actionbar-btn inkl. Icon/Label/States
+- .detail-sr-only
 === */
 
 /* SR-only (robust) */
@@ -2789,6 +2791,7 @@ Umfang:
   border: 0 !important;
 }
 
+/* Slot: immer über dem Sheet, stabile Safe-Area */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
@@ -2797,27 +2800,37 @@ Umfang:
 
   box-sizing: border-box;
 
-  height: auto;
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
-
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
-
 
   border-top: 1px solid rgba(31,41,51,0.06);
   background: rgba(255,255,255,0.96);
 
-  /* Root-Cause Fix: Slot MUSS über dem Sheet (Sheet hat z-index:2) */
   z-index: 6;
+}
+
+/* Layout: Buttons als ruhige „Dock“-Row, zentriert bei <4 Actions */
+#detail-actionbar-slot .detail-actionbar{
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+
+  gap: 10px;
+  width: 100%;
+
+  /* verhindert „kleben“ am Rand bei wenigen Buttons */
+  padding: 0;
+  margin: 0;
 }
 
 /* Buttons (können <a> oder <button> sein) */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
-  min-width: 44px;
-  min-height: 44px;
-  width: 72px;
+
+  min-width: 72px;
   height: 56px;
-  padding: 8px 8px 6px;
+
+  padding: 8px 10px 7px;
 
   display: inline-flex;
   flex-direction: column;
@@ -2826,26 +2839,27 @@ Umfang:
   gap: 4px;
 
   border-radius: var(--ui-radius-md);
-  border: 1px solid var(--ui-border-soft);
-  background: var(--ui-surface-tint);
-  color: rgba(31,41,51,0.90);
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(31,41,51,0.03);
 
-  box-shadow: var(--ui-shadow-soft);
+  color: rgba(31,41,51,0.86);
+
+  box-shadow:
+    0 10px 18px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 0 !important;
   line-height: 0 !important;
   overflow: hidden;
 
   text-decoration: none !important;
-  text-decoration-skip-ink: none;
   -webkit-tap-highlight-color: transparent;
 
   transition: background 140ms ease, border-color 140ms ease,
               box-shadow 140ms ease, transform 140ms ease;
 }
 
-
-/* Explizit: Links in allen States niemals unterstreichen */
+/* Links: in allen States niemals unterstreichen */
 #detail-actionbar-slot .detail-actionbar-btn:link,
 #detail-actionbar-slot .detail-actionbar-btn:visited,
 #detail-actionbar-slot .detail-actionbar-btn:hover,
@@ -2853,19 +2867,29 @@ Umfang:
   text-decoration: none !important;
 }
 
+/* Hover (Desktop) */
 @media (hover: hover){
-    #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: var(--ui-surface-tint-hover);
-    border-color: var(--ui-border-strong);
+  #detail-actionbar-slot .detail-actionbar-btn:hover{
+    background: rgba(31,41,51,0.045);
+    border-color: rgba(31,41,51,0.14);
+    box-shadow:
+      0 12px 22px rgba(0,0,0,0.075),
+      0 1px 0 rgba(255,255,255,0.82) inset;
   }
-
 }
 
+/* Active (Tap) */
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: var(--ui-surface-tint-active);
+  background: rgba(31,41,51,0.055);
 }
 
+/* Focus */
+#detail-actionbar-slot .detail-actionbar-btn:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-md);
+}
 
 /* Label (klein) – kommt aus title */
 #detail-actionbar-slot .detail-actionbar-btn::after{
@@ -2873,10 +2897,10 @@ Umfang:
   display: block;
 
   font-size: 11px;
-  line-height: 1.05;
-  font-weight: 850;
+  line-height: 1.1;
+  font-weight: 700;
 
-  color: rgba(31,41,51,0.76);
+  color: rgba(31,41,51,0.74);
   margin-top: 2px;
 
   max-width: 64px;
@@ -2887,15 +2911,7 @@ Umfang:
   text-overflow: ellipsis;
 }
 
-/* Focus */
-#detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: 3px;
-  border-radius: var(--ui-radius-md);
-}
-
-
-/* Icons: niemals groß */
+/* Icons: immer gleich groß, ruhig */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
@@ -2907,9 +2923,11 @@ Umfang:
 
   display: block !important;
   flex: 0 0 auto !important;
+  opacity: 0.9;
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
