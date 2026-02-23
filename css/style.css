@@ -2244,8 +2244,8 @@ Umfang:
 
 /* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
 Zweck:
-- Location ist Teil der selben “Info”-DNA wie Meta (nicht wie eigener Abschnitt)
-- trotzdem eindeutig klickbar (Chevron + Active-Feedback)
+- Location-Row visuell wie Feed-Meta (ruhig), nicht „bold/section“
+- bleibt klar klickbar (Chevron + Active-Feedback bleibt)
 Umfang:
 - Nur .detail-location-action Grundstil (Layout/Surface/Typo)
 === */
@@ -2258,7 +2258,7 @@ Umfang:
 
   width: 100%;
 
-  /* wie Meta-Group, aber als einzelne “Karte” */
+  /* gleiche DNA wie Meta-Group: “embedded surface” statt Zeile */
   padding: 10px 12px;
   border-radius: 14px;
 
@@ -2272,12 +2272,13 @@ Umfang:
 
   -webkit-tap-highlight-color: transparent;
 }
-#event-detail-panel .detail-location-action:active{
-  background: rgba(31,41,51,0.045);
-}
 /* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
 
+
 /* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) ===
+Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
+Umfang: Nur :active
+=== */
 Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
 Umfang: Nur :active
 === */
@@ -2992,5 +2993,6 @@ Umfang:
   opacity: 0.92;
 }
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
