@@ -2132,6 +2132,13 @@ Zweck:
 Umfang:
 - Nur #event-detail-panel .detail-chip (keine Layout-Änderungen)
 === */
+/* === BEGIN FIX: META DIVIDER DENSITY (avoid table feel) ===
+Zweck:
+- Meta-Block wirkt wie Feed-Meta (ruhig), nicht wie „Tabelle“
+- Divider nur als Abschlusslinie unter dem Meta-Block
+Umfang:
+- Nur Border-Regel der .detail-chip
+=== */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2142,16 +2149,15 @@ Umfang:
 
   padding: 10px 0;
 
-  border: 0;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  border: 0; /* keine Divider pro Row */
 
   background: transparent;
   box-shadow: none;
 
   font-size: var(--font-event-meta);
-  line-height: 1.28;                 /* wie .event-meta */
+  line-height: 1.28;
   font-weight: 400;
-  color: rgba(60,72,88,0.68);        /* wie .event-meta */
+  color: rgba(60,72,88,0.68);
 
   cursor: default;
   user-select: text;
@@ -2160,6 +2166,12 @@ Umfang:
   overflow: visible;
   text-overflow: clip;
 }
+
+/* Abschlusslinie nur einmal unter dem Meta-Block */
+#event-detail-panel .detail-meta-chips .detail-chip:last-child{
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+}
+/* === END FIX: META DIVIDER DENSITY (avoid table feel) === */
 /* === END FIX: DETAIL META MUST MATCH EVENT META (color + line-height) === */
 /* === END BLOCK: DETAIL META ROWS (calmer, consistent dividers) === */
 
@@ -2882,6 +2894,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
