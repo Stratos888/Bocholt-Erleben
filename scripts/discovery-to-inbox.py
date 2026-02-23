@@ -2359,7 +2359,7 @@ def main() -> None:
 
     existing_inbox_fps = set(inbox_fingerprint(r) for r in inbox_rows)
 
-        # === BEGIN BLOCK: INBOX BACKFILL PASS (missing fields via detail fetch, JUBOH kurs, v1) ===
+         # === BEGIN BLOCK: INBOX BACKFILL PASS (missing fields via detail fetch, JUBOH kurs, v1) ===
     # Zweck:
     # - Systematisches Nachpflegen bereits vorhandener Inbox-Zeilen (v.a. fehlendes Datum),
     #   unabhängig davon, ob die URL im aktuellen Source-Fetch erneut als Candidate auftaucht.
@@ -2377,6 +2377,79 @@ def main() -> None:
     backfill_count = 0
     backfill_by_host: Dict[str, int] = {}
     backfill_html_cache: Dict[str, str] = {}
+
+    def _backfill_extract_dates_from_html(_html_text: str) -> Tuple[str, str]:
+        """
+        Returns (start_date_iso, end_date_iso) or ("","") if nothing found.
+        Strategy:
+        1) JSON-LD startDate/endDate (Event/Course-like nodes)
+        2) fallback: German date parsing on visible text (best-effort)
+        """
+        html = _html_text or ""
+
+        # 1) JSON-LD
+        scripts = re.findall(
+            r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+            html,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+
+        def _iter_ld_nodes(obj):
+            if isinstance(obj, list):
+                for it in obj:
+                    yield from _iter_ld_nodes(it)
+            elif isinstance(obj, dict):
+                yield obj
+                if "@graph" in obj:
+                    yield from _iter_ld_nodes(obj.get("@graph"))
+
+        def _is_relevant_type(tval) -> bool:
+            if isinstance(tval, str):
+                k = norm_key(tval)
+                return (k.endswith("event") or k.endswith("course") or "educationevent" in k)
+            if isinstance(tval, list):
+                return any(_is_relevant_type(x) for x in tval)
+            return False
+
+        best_start = ""
+        best_end = ""
+
+        for s in scripts:
+            try:
+                obj = json.loads(s)
+            except Exception:
+                continue
+            for node in _iter_ld_nodes(obj):
+                if not isinstance(node, dict):
+                    continue
+                if not _is_relevant_type(node.get("@type")):
+                    continue
+
+                sd = norm(str(node.get("startDate", "") or ""))
+                ed = norm(str(node.get("endDate", "") or ""))
+
+                # normalize ISO-ish to yyyy-mm-dd (ignore time)
+                if sd:
+                    sd = _iso_date_part(sd)
+                if ed:
+                    ed = _iso_date_part(ed)
+
+                if sd and not best_start:
+                    best_start = sd
+                    best_end = ed or sd
+                if best_start:
+                    break
+            if best_start:
+                break
+
+        if best_start:
+            return (best_start, best_end)
+
+        # 2) Fallback: sichtbarer Text (konservativ: nur Anfang der Seite)
+        plain = clean_text(_strip_html_tags(html[:8000]))
+        fy = datetime.now().year
+        d1, d2 = _extract_event_date_de(plain, fy)
+        return (d1, d2)
 
     def _backfill_extract_time_loc_from_html(_html_text: str) -> Tuple[str, str]:
         """
@@ -2409,65 +2482,56 @@ def main() -> None:
                 return any(_is_relevant_type(x) for x in tval)
             return False
 
-        def _time_hhmm(iso: str) -> str:
-            s = norm(iso)
-            if not s:
-                return ""
-            m = re.search(r"[T\s](\d{2}:\d{2})", s)
-            return m.group(1) if m else ""
-
-        def _loc_from_node(node: Dict[str, object]) -> str:
-            loc = node.get("location")
-            if isinstance(loc, str):
-                return norm(loc)
-            if isinstance(loc, list) and loc:
-                # take first
-                loc = loc[0]
-            if isinstance(loc, dict):
-                name = norm(str(loc.get("name") or ""))
-                addr = loc.get("address")
-                if isinstance(addr, str):
-                    addr_s = norm(addr)
-                elif isinstance(addr, dict):
-                    street = norm(str(addr.get("streetAddress") or ""))
-                    plz = norm(str(addr.get("postalCode") or ""))
-                    city = norm(str(addr.get("addressLocality") or ""))
-                    parts = [p for p in [street, f"{plz} {city}".strip()] if p]
-                    addr_s = ", ".join(parts)
-                else:
-                    addr_s = ""
-                return name or addr_s
-            return ""
-
-        # prefer first relevant node that has startDate
-        for raw in scripts:
-            raw = (raw or "").strip()
-            if not raw:
-                continue
+        # try JSON-LD first
+        for s in scripts:
             try:
-                data = json.loads(raw)
+                obj = json.loads(s)
             except Exception:
                 continue
-            for node in _iter_ld_nodes(data):
+
+            for node in _iter_ld_nodes(obj):
                 if not isinstance(node, dict):
                     continue
                 if not _is_relevant_type(node.get("@type")):
                     continue
 
-                sd = norm(str(node.get("startDate") or ""))
-                ed = norm(str(node.get("endDate") or ""))
-                t1 = _time_hhmm(sd)
-                t2 = _time_hhmm(ed)
+                # time: from startDate/endDate if they include time
+                sd = norm(str(node.get("startDate", "") or ""))
+                ed = norm(str(node.get("endDate", "") or ""))
+                t1 = _infer_time_from_text(sd)
+                t2 = _infer_time_from_text(ed)
+                time_str = t1
                 if t1 and t2 and t2 != t1:
                     time_str = f"{t1}–{t2}"
-                else:
-                    time_str = t1
 
-                loc_str = _loc_from_node(node)
+                # location: name + address best-effort
+                loc_obj = node.get("location")
+                loc_str = ""
+                if isinstance(loc_obj, dict):
+                    loc_name = clean_text(str(loc_obj.get("name", "") or ""))
+                    addr = loc_obj.get("address")
+                    addr_str = ""
+                    if isinstance(addr, dict):
+                        addr_parts = [
+                            clean_text(str(addr.get("streetAddress", "") or "")),
+                            clean_text(str(addr.get("postalCode", "") or "")),
+                            clean_text(str(addr.get("addressLocality", "") or "")),
+                        ]
+                        addr_str = " ".join([p for p in addr_parts if p]).strip()
+                    elif isinstance(addr, str):
+                        addr_str = clean_text(addr)
+
+                    loc_str = " - ".join([p for p in [loc_name, addr_str] if p]).strip()
+                elif isinstance(loc_obj, str):
+                    loc_str = clean_text(loc_obj)
+
                 if time_str or loc_str:
                     return (time_str, loc_str)
 
-        return ("", "")
+        # fallback: infer from text
+        plain = clean_text(_strip_html_tags(html[:8000]))
+        loc2, time2 = infer_location_time("", plain)
+        return (time2, loc2)
 
     for row_idx, r in enumerate(inbox_rows, start=2):
         cur_url = norm(r.get("url", ""))
@@ -2475,9 +2539,6 @@ def main() -> None:
             continue
 
         cur_date = norm(r.get("date", ""))
-        cur_time = norm(r.get("time", ""))
-        cur_loc = norm(r.get("location", ""))
-        # Backfill nur wenn mind. date fehlt (Hauptziel)
         if cur_date:
             continue
 
@@ -2511,13 +2572,9 @@ def main() -> None:
         if not html:
             continue
 
-        # Datum aus bestehendem Extractor (JSON-LD + Text-Fallback)
-        d1, d2 = _extract_date_from_html(html, allow_text_fallback=True)
+        d1, d2 = _backfill_extract_dates_from_html(html)
         if not d1:
             continue
-
-        # Zeit/Location bevorzugt aus JSON-LD (falls leer), sonst Text-Inference
-        jl_time, jl_loc = _backfill_extract_time_loc_from_html(html)
 
         # nur leere Felder füllen
         updated_row: Dict[str, str] = {col: norm(r.get(col, "")) for col in INBOX_COLUMNS}
@@ -2532,19 +2589,10 @@ def main() -> None:
         _fill("date", d1)
         _fill("endDate", d2)
 
-        # time/location: JSON-LD first, then inference
-        if not cur_time:
-            _fill("time", jl_time)
-
-        if not cur_loc:
-            _fill("location", jl_loc)
-
-        if (not norm(updated_row.get("time", ""))) or (not norm(updated_row.get("location", ""))):
-            title_for_infer = norm(updated_row.get("title", ""))
-            plain = clean_text(_strip_html_tags(html[:8000]))
-            loc2, time2 = infer_location_time(title_for_infer, plain)
-            _fill("time", time2)
-            _fill("location", loc2)
+        # optional: time/location nur wenn leer
+        time2, loc2 = _backfill_extract_time_loc_from_html(html)
+        _fill("time", time2)
+        _fill("location", loc2)
 
         if changed:
             inbox_backfill_updates.append(
