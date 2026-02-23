@@ -1830,31 +1830,23 @@ Umfang:
 === */
 
 /* Sheet */
-/* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) ===
+/* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
 Zweck:
-- Sheet wirkt wie eine natürliche Fortsetzung der Event-Card-DNA (weniger „Modal“)
-- Enterprise-Polish: subtiler Tint + hochwertigere Tiefe, ohne “Chrome/Toolbar”-Look
-- Radius ist tokenisiert (Single Source of Truth)
-Umfang:
-- Nur .detail-panel-content (keine Layout-Logik geändert)
+- Sheet wirkt wie Feed-Surface
+- kein Gradient
+- parser-safe (keine nested comments)
 === */
+
 #event-detail-panel .detail-panel-content{
+
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  /* Fallback + Fix: dvh verhindert “vh”-Abschneiden durch Browser-UI */
   max-height: 92vh;
   max-height: 92dvh;
 
-  /* === BEGIN PATCH: DETAILPANEL SURFACE (NO GRADIENT, feed-consistent) ===
-  Zweck:
-  - Entfernt jeden Gradient/Color-Wash → kein “billig”
-  - Premium-Surface wie Feed-Cards: klare Weißfläche + sehr weiche Kante
-  Umfang:
-  - nur Surface-Rendering (background/border/shadow/radius)
-  === */
   background-color: rgba(255,255,255,0.98);
   background-image: none !important;
 
@@ -1862,10 +1854,10 @@ Umfang:
   border-top-right-radius: 22px;
 
   border-top: 1px solid rgba(31,41,51,0.08);
+
   box-shadow:
     0 -42px 130px rgba(0,0,0,0.26),
     0 1px 0 rgba(255,255,255,0.82) inset;
-  /* === END PATCH: DETAILPANEL SURFACE (NO GRADIENT, feed-consistent) === */
 
   overflow: hidden;
   overscroll-behavior: contain;
@@ -1875,7 +1867,8 @@ Umfang:
   display: flex;
   flex-direction: column;
 }
-/* === END BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) === */
+
+/* === END BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) === */
 
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
@@ -2999,4 +2992,5 @@ Umfang:
   opacity: 0.92;
 }
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
