@@ -2263,18 +2263,26 @@ Umfang:
 
 /* Description: ruhiger Textblock */
 /* === BEGIN BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
+/* === BEGIN FIX: DETAIL DESCRIPTION CALMNESS (less bold-looking) ===
+Zweck:
+- Description ruhiger/leichter (nach Meta-Harmonisierung)
+- weniger „dick“ (Weight + Color), bessere Lesbarkeit (Line-height)
+Umfang:
+- nur #event-detail-panel .detail-description
+=== */
 #event-detail-panel .detail-description{
   margin: 14px 0 0;
   padding: 0;
 
   font-size: 14px;
-  line-height: 1.5;
-  font-weight: 520;
-  color: rgba(31,41,51,0.82);
+  line-height: 1.55;
+  font-weight: 450;
+  color: rgba(31,41,51,0.78);
 
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
+/* === END FIX: DETAIL DESCRIPTION CALMNESS (less bold-looking) === */
 /* === END BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
 
 
@@ -2874,6 +2882,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
