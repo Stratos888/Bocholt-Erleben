@@ -2799,10 +2799,12 @@ Umfang:
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
 - Actionbar als „Dock“ wie Enterprise-Apps: Teil derselben Surface, kein Extra-Panel
-- FIX: Slot selbst ist die Row (kein Child .detail-actionbar nötig)
-- Gradient entfernen (wirkt billig)
+- FIX: Slot ist IMMER Flex-Row (egal ob Buttons direkt oder via Wrapper .detail-actionbar)
+- Robuster Icon-Guard: verhindert „Riesen-Icons“ (SVG/IMG) im Detailpanel zuverlässig
+- Kein Gradient (wirkt billig)
 Umfang:
-- #detail-actionbar-slot inkl. Layout als Row
+- #detail-actionbar-slot Layout + Surface
+- optionaler Wrapper .detail-actionbar (fallback)
 - .detail-actionbar-btn inkl. Icon/Label/States
 - .detail-sr-only
 === */
@@ -2820,7 +2822,7 @@ Umfang:
   border: 0 !important;
 }
 
-/* Slot: immer über dem Sheet, stabile Safe-Area + Dock-Surface */
+/* Slot: immer über dem Sheet, stabile Safe-Area + immer Row */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
@@ -2832,31 +2834,23 @@ Umfang:
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  /* Surface-Continuity: gleiche Material-Basis wie Sheet (ohne Gradient) */
-  background: color-mix(in srgb, var(--color-surface) 92%, white);
+  /* FIX: Slot ist die Row */
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
 
+  /* Continuity: Teil derselben Surface, nur sehr softes Inset als Separator */
   border-top: 0;
-  box-shadow:
-    0 -1px 0 rgba(31,41,51,0.06) inset;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
 
   z-index: 6;
-
-  /* ✅ WICHTIG: Slot ist die Row */
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 10px;
 }
 
-/* Legacy-Support (falls irgendwann Wrapper eingeführt wird) */
+/* Fallback: falls ein Wrapper existiert, soll er NICHT das Layout kaputt machen */
 #detail-actionbar-slot .detail-actionbar{
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 0;
-  margin: 0;
+  display: contents;
 }
 
 /* Buttons (können <a> oder <button> sein) */
@@ -2866,7 +2860,7 @@ Umfang:
   min-width: 72px;
   height: 56px;
 
-  padding: 9px 10px 7px;
+  padding: 8px 10px 7px;
 
   display: inline-flex;
   flex-direction: column;
@@ -2875,11 +2869,9 @@ Umfang:
   gap: 4px;
 
   border-radius: var(--ui-radius-md);
-
-  /* ruhig + hochwertig wie Controls im Feed */
-  background: rgba(255,255,255,0.86);
   border: 1px solid rgba(31,41,51,0.10);
 
+  background: rgba(255,255,255,0.86);
   color: rgba(31,41,51,0.88);
 
   box-shadow:
@@ -2957,7 +2949,7 @@ Umfang:
   text-overflow: ellipsis;
 }
 
-/* Icons: immer gleich groß, ruhig */
+/* Icons: immer gleich groß, ruhig (Actionbar) */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
@@ -2970,6 +2962,23 @@ Umfang:
   display: block !important;
   flex: 0 0 auto !important;
   opacity: 0.92;
+  object-fit: contain !important;
+}
+
+/* ROBUST GUARD: Detailpanel-SVGs niemals “riesig” (Header/Meta/Location) */
+#event-detail-panel .detail-header svg,
+#event-detail-panel .detail-meta-chips svg,
+#event-detail-panel .detail-location-action svg,
+#event-detail-panel .detail-header img,
+#event-detail-panel .detail-meta-chips img,
+#event-detail-panel .detail-location-action img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
+  object-fit: contain !important;
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
