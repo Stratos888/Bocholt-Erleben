@@ -2080,7 +2080,10 @@ keine Token-Abweichung
   flex: 0 0 auto;
 
   position: static;
-  display: inline;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   width: auto;
   height: auto;
   margin-top: 0;
@@ -2089,8 +2092,12 @@ keine Token-Abweichung
   line-height: 1;
   opacity: 0.75;
 
-  /* kein Emoji-Suppression */
   color: inherit;
+}
+#event-detail-panel .detail-category-icon svg{
+  width: 16px;
+  height: 16px;
+  display: block;
 }
 
 /* SVG-Override deaktivieren (Event-Card-DNA: Emoji/Text Icon) */
@@ -2894,6 +2901,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
