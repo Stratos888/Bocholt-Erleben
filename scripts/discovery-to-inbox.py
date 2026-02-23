@@ -1427,13 +1427,12 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         if hk.startswith("#"):
             continue
 
-        # === BEGIN BLOCK: JUBOH URL CLASSIFICATION (skip category/listing/info links) ===
+        # === BEGIN BLOCK: JUBOH URL CLASSIFICATION (ONLY /programm/kurs/, no query knr) ===
         # Zweck:
-        # - JUBOH hat viele Nicht-Event-Links im Programm (Alter/Kategorie/Info/Navi)
-        # - Diese Links sind Listing-/Filterseiten und dürfen NICHT als Event-Kandidaten in die Inbox
+        # - JUBOH: In die Inbox dürfen nur echte Kurs-Detailseiten
+        # - Kategorie-/Info-/Navi-Links (Alter, Filter, Pagination etc.) werden verworfen
         # Umfang:
-        # - Ersetzt nur die URL-Normalisierung + direktes Filtering in _html_link_candidates_date_scan
-        # === BEGIN BLOCK: JUBOH STRICT URL TYPE (only /programm/kurs/ are events) ===
+        # - Ersetzt die doppelte/inkonsistente JUBOH-Filterstrecke vollständig
         url = _normalize_event_url(href, base_url)
         if not url:
             continue
@@ -1443,25 +1442,14 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         path0 = (p0.path or "").lower()
 
         if host0.endswith("juboh.de"):
-            # Nur Kurs-Detailseiten sind echte Events
-            if "/programm/kurs/" not in path0:
-                continue
-        # === END BLOCK: JUBOH STRICT URL TYPE (only /programm/kurs/ are events) ===
-
-        p0 = urlparse(url)
-        host0 = (p0.netloc or "").lower()
-        path0 = (p0.path or "").lower()
-
-        if host0.endswith("juboh.de"):
-            # 1) Kategorie/Filterseiten (inkl. Altersfilter "16 Jahre", usw.)
+            # harte Ausschlüsse
             if "/programm/kategorie/" in path0 or "/info/" in path0:
                 continue
 
-            # 2) JUBOH Event-Detailseiten erkennt man stabil am Parameter "knr="
-            #    (die echten Kurse/Events hängen daran)
-            if "knr=" not in (p0.query or "").lower():
+            # nur Kurs-Detailseiten sind Events
+            if "/programm/kurs/" not in path0:
                 continue
-        # === END BLOCK: JUBOH URL CLASSIFICATION (skip category/listing/info links) ===
+        # === END BLOCK: JUBOH URL CLASSIFICATION (ONLY /programm/kurs/, no query knr) ===
 
                # === BEGIN BLOCK: HTML DATE-SCAN (detail fetch + json-ld Event + gating, v6) ===
         # Datei: scripts/discovery-to-inbox.py
