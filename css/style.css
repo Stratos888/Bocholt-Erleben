@@ -1898,6 +1898,13 @@ Zweck:
 Umfang:
 - ersetzt nur .detail-panel-close + :active + ::before
 === */
+/* === BEGIN FIX: DETAIL CLOSE BUTTON CALMNESS (less dominant) ===
+Zweck:
+- Close bleibt voll klickbar (Touch-Target via ::before bleibt)
+- Optik ruhiger: weniger Shadow, softer Border, weniger “Badge”
+Umfang:
+- Nur #event-detail-panel .detail-panel-close
+=== */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
@@ -1911,21 +1918,23 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  background: rgba(255,255,255,0.94);
-  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(31,41,51,0.08);
+
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.09),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+    0 6px 14px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 
   font-size: 16px;
   line-height: 1;
-  color: rgba(31,41,51,0.62);
+  color: rgba(31,41,51,0.58);
   cursor: pointer;
 
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   z-index: 20;
 }
+/* === END FIX: DETAIL CLOSE BUTTON CALMNESS (less dominant) === */
 
 /* Invisible hit-area expansion to >=44px without changing visuals */
 #event-detail-panel .detail-panel-close::before{
@@ -2901,6 +2910,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
