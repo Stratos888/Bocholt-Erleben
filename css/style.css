@@ -2150,7 +2150,7 @@ Umfang:
 
   font-size: var(--font-event-meta);
   line-height: 1.28;                 /* wie .event-meta */
-  font-weight: 650;
+  font-weight: 400;
   color: rgba(60,72,88,0.68);        /* wie .event-meta */
 
   cursor: default;
@@ -2859,6 +2859,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
