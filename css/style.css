@@ -1818,8 +1818,8 @@ Umfang:
 /* Sheet */
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) ===
 Zweck:
-- Sheet fühlt sich wie „eine App“ an (gleiche Border/Surface/Shadow-Logik wie Cards)
-- Weniger „random iOS sheet“, mehr konsistente Premium-Fläche
+- Sheet wirkt wie eine natürliche Fortsetzung der Event-Card-DNA (weniger „Modal“)
+- Ruhigeres Shadow/Border-Verhalten, weniger „heavy sheet“
 Umfang:
 - Nur .detail-panel-content (keine Layout-Logik geändert)
 === */
@@ -1838,15 +1838,17 @@ Umfang:
   flex-direction: column;
 
   background: var(--color-surface);
+
+  /* Card-DNA: definierte Kante, keine “modal chrome” Optik */
   border: 1px solid rgba(31,41,51,0.08);
   border-bottom: 0;
 
   border-radius: 22px 22px 0 0;
 
-  /* „Card-DNA“: ruhiger, nicht so „heavy“ */
+  /* ruhiger als vorher: weniger “lift”, mehr “surface” */
   box-shadow:
-    0 -18px 40px rgba(0,0,0,0.12),
-    0 -1px 0 rgba(255,255,255,0.70) inset;
+    0 -10px 28px rgba(0,0,0,0.10),
+    0 -1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
   z-index: 2;
@@ -1859,20 +1861,27 @@ Umfang:
 /* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space) === */
 
 
-/* Grabber */
+/* === BEGIN BLOCK: DETAILPANEL GRABBER (calm, minimal, non-modal) ===
+Zweck:
+- Grabber bleibt als Affordance vorhanden, wirkt aber nicht wie “anderes App-Sheet”
+Umfang:
+- Nur #event-detail-panel .detail-panel-grabber
+=== */
 #event-detail-panel .detail-panel-grabber{
   position: absolute;
-  top: 8px;
+  top: 9px;
   left: 50%;
   transform: translateX(-50%);
 
-  width: 46px;
-  height: 5px;
+  width: 42px;
+  height: 4px;
 
   border-radius: 999px;
-  background: rgba(31,41,51,0.18);
+  background: rgba(31,41,51,0.14);
+
   z-index: 4;
 }
+/* === END BLOCK: DETAILPANEL GRABBER (calm, minimal, non-modal) === */
 
 /* Drag-Hit-Area */
 #event-detail-panel .detail-panel-drag-hit{
@@ -2041,7 +2050,15 @@ Umfang:
   padding: 0 0 12px;
   margin: 0;
 
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  /* === BEGIN FIX: HEADER CONTINUITY (no modal divider) ===
+  Zweck:
+  - Entfernt “Modal-Header” Gefühl (keine harte Trennlinie)
+  - Rhythmus wie Feed: Struktur über Spacing statt Divider
+  Umfang:
+  - Nur Border-Reset im Header
+  === */
+  border-bottom: 0;
+  /* === END FIX: HEADER CONTINUITY (no modal divider) === */
 }
 
 #event-detail-panel .detail-title-row{
@@ -2180,9 +2197,16 @@ Umfang:
   text-overflow: clip;
 }
 
-/* Abschlusslinie nur einmal unter dem Meta-Block */
 #event-detail-panel .detail-meta-chips .detail-chip:last-child{
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  /* === BEGIN FIX: META CONTINUITY (no divider; spacing-only like feed) ===
+  Zweck:
+  - Entfernt Abschlusslinie, damit Meta nicht wie eigener Block wirkt
+  - Feed-DNA: Ruhe über Whitespace
+  Umfang:
+  - Nur Border-Reset
+  === */
+  border-bottom: 0;
+  /* === END FIX: META CONTINUITY (no divider; spacing-only like feed) === */
 }
 /* === END FIX: META DIVIDER DENSITY (avoid table feel) === */
 /* === END FIX: DETAIL META MUST MATCH EVENT META (color + line-height) === */
@@ -2221,17 +2245,16 @@ Umfang:
 
   width: 100%;
 
-  /* === BEGIN FIX: LOCATION ROW RHYTHM (match meta rows) ===
+  /* === BEGIN FIX: LOCATION ROW RHYTHM (no divider; feed-like) ===
   Zweck:
-  - Location-Row soll im Rhythmus wie die Meta-Rows wirken (weniger “dicker” Abschnitt)
-  - Optik bleibt klickbar, aber ruhiger
+  - Keine Abschlusslinie → wirkt nicht wie eigener “Section Row”
+  - Rhythmus bleibt wie Meta (ruhig, inline feel)
   Umfang:
-  - nur padding + divider
+  - nur padding + border reset
   === */
   padding: 10px 0;
   border: 0;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
-  /* === END FIX: LOCATION ROW RHYTHM (match meta rows) === */
+  /* === END FIX: LOCATION ROW RHYTHM (no divider; feed-like) === */
 
   background: transparent;
   color: rgba(60,72,88,0.68);   /* wie .event-meta */
@@ -2811,8 +2834,17 @@ Umfang:
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  border-top: 1px solid rgba(31,41,51,0.06);
-  background: rgba(255,255,255,0.96);
+  /* === BEGIN FIX: ACTIONBAR CONTINUITY (less toolbar, more panel surface) ===
+  Zweck:
+  - Weniger “separate Toolbar”, mehr “Teil der gleichen Surface”
+  - Keine harte Trennkante; Separation über sehr softes Inset
+  Umfang:
+  - Nur border/background/shadow
+  === */
+  border-top: 0;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
+  /* === END FIX: ACTIONBAR CONTINUITY (less toolbar, more panel surface) === */
 
   z-index: 6;
 }
@@ -2935,6 +2967,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
