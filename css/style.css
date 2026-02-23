@@ -2026,9 +2026,9 @@ Zweck:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Detailpanel-Header optisch identisch zur Event-Card-Hierarchie (Title-Row + Inline-Icon)
-- Icon wieder als Emoji/Zeichen sichtbar (wie Event-Card), kein SVG-Override
-- Typo/Spacing an Event-Card-DNA angleichen (ruhiger, konsistent)
+- Header verhält sich wie Event-Card-DNA, auch bei 2 Zeilen Titel
+- Rechts (Kategorie + Close) wirkt „Topbar-like“, ohne den Titel optisch zu quetschen
+- Entfernt 16px-SVG-Sonderfall (Header-Icon folgt dem 18px SVG Guard im Detailpanel)
 Umfang:
 - .detail-header + .detail-title-row + .detail-category-icon + .detail-title
 === */
@@ -2050,8 +2050,8 @@ Umfang:
   gap: 8px;
   width: 100%;
 
-  /* Reserve für Close: Token statt Magic-Number */
-  padding-right: calc(var(--dp-close-size) + var(--gutter));
+  /* etwas mehr Luft zum Close, damit es bei 2 Zeilen nie „gedrückt“ wirkt */
+  padding-right: calc(var(--dp-close-size) + var(--gutter) + 8px);
 }
 
 /* Title: wie Event-Card (Text dominiert, clamp) */
@@ -2060,7 +2060,6 @@ Zweck:
 100% identische Typografie wie .event-title
 keine Token-Abweichung
 === */
-
 #event-detail-panel .detail-title{
   margin: 0 0 6px;
   min-width: 0;
@@ -2081,10 +2080,9 @@ keine Token-Abweichung
   word-break: normal;
   hyphens: auto;
 }
-
 /* === END FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD === */
 
-/* Icon: inline am Titelende, ruhig (wie Event-Card) */
+/* Icon: ruhig, inline am Titelende (folgt SVG-Guard = 18px) */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
 
@@ -2095,7 +2093,9 @@ keine Token-Abweichung
 
   width: auto;
   height: auto;
-  margin-top: 0;
+
+  /* kleine optische Baseline-Korrektur bei SVG/Emoji */
+  margin-top: 1px;
 
   font-size: 0.9rem;
   line-height: 1;
@@ -2103,13 +2103,10 @@ keine Token-Abweichung
 
   color: inherit;
 }
-#event-detail-panel .detail-category-icon svg{
-  width: 16px;
-  height: 16px;
-  display: block;
-}
 
-/* SVG-Override deaktivieren (Event-Card-DNA: Emoji/Text Icon) */
+/* WICHTIG: keine 16px-Spezialgröße mehr – das kommt aus dem globalen SVG Guard (18px) */
+
+/* SVG-Override deaktivieren (Event-Card-DNA: Emoji/Text Icon möglich) */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
@@ -2938,6 +2935,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
+
 
 
 
