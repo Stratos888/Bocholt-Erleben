@@ -1475,11 +1475,20 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # - Ersetzt nur den Date-Scan-Teil innerhalb _html_link_candidates_date_scan (Kontext, Extraktion, Gate, out.append)
         # === END BLOCK: HTML DATE-SCAN (detail fetch + json-ld Event + gating, v6) ===
 
-        # Kontext um die Fundstelle
-        start = max(0, m.start() - 180)
-        end = min(len(html_text), m.end() + 180)
+        # === BEGIN BLOCK: HTML LINK CONTEXT WINDOW (dynamic, juboh boost, v1) ===
+        # Kontext um die Fundstelle: für juboh.de deutlich größer, weil Datum/Zeit oft weiter weg im Karten-Container steht.
+        p_ctx = urlparse(url)
+        host_ctx = (p_ctx.netloc or "").lower()
+
+        pad = 180
+        if host_ctx.endswith("juboh.de"):
+            pad = 1200
+
+        start = max(0, m.start() - pad)
+        end = min(len(html_text), m.end() + pad)
         ctx_html = html_text[start:end]
         ctx = clean_text(_strip_html_tags(ctx_html))
+        # === END BLOCK: HTML LINK CONTEXT WINDOW (dynamic, juboh boost, v1) ===
 
                # === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
         # Zweck:
