@@ -2504,66 +2504,51 @@ Umfang:
 
 
 
-/* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) ===
+/* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) ===
 Zweck:
-- Fix für riesige SVGs im Detailpanel
-- Meta-Icons konsistent: 18px (wie Location + Actionbar)
+- Fix für riesige inline-SVGs (Default 300x150) im Detailpanel
+- Systemisch: alle Renderer-Icons (.detail-icon-svg) werden hart normalisiert
 Umfang:
-- SVG/IMG innerhalb Chips + Location-Row + Header-Icon
+- Nur Icons im #event-detail-panel (keine globalen SVG-Regeln)
 === */
 
-/* Primär: Chip-Icons */
-#event-detail-panel svg.detail-icon-svg.is-chip{
+/* Systemic: jedes Renderer-SVG im Detailpanel bekommt feste Icon-Größe */
+#event-detail-panel svg.detail-icon-svg,
+#event-detail-panel img.detail-icon-svg{
   width: 18px !important;
   height: 18px !important;
+
+  min-width: 18px !important;
+  min-height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
+
   flex: 0 0 auto !important;
   display: block !important;
+  object-fit: contain !important;
 }
 
-/* Robust: egal welche Klassen – in Chips niemals groß */
+/* Fallback: falls irgendwo SVG/IMG ohne detail-icon-svg in Chip/Location/Category landet */
 #event-detail-panel .detail-chip svg,
-#event-detail-panel .detail-chip img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  flex: 0 0 auto !important;
-  display: block !important;
-  object-fit: contain !important;
-}
-
-/* Location-Row/Icon-Container */
+#event-detail-panel .detail-chip img,
 #event-detail-panel .detail-location-icon svg,
-#event-detail-panel .detail-location-icon img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  flex: 0 0 auto !important;
-  display: block !important;
-  object-fit: contain !important;
-}
-
-/* Header-Icon (falls SVG/IMG) */
+#event-detail-panel .detail-location-icon img,
 #event-detail-panel .detail-category-icon svg,
 #event-detail-panel .detail-category-icon img{
   width: 18px !important;
   height: 18px !important;
+
+  min-width: 18px !important;
+  min-height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
+
+  flex: 0 0 auto !important;
   display: block !important;
   object-fit: contain !important;
 }
 
-/* === END BLOCK: DETAILPANEL SVG SIZE GUARD (chips + location + meta) === */
-
-
-
-
-
-
+/* === END BLOCK: DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) === */
 
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
@@ -2811,13 +2796,13 @@ Umfang:
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
-/* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) ===
+/* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- Detailpanel-Actionbar „in einem Zug“ konsolidieren: Container + Buttons + Labels + Icons
-- Enterprise-Polish: Dock wirkt wie Teil der gleichen Surface (kein “separates Toolbar-Teil”)
-- Buttons: gleiche DNA wie Feed-Controls (Border/Shadow/Radius), ruhig + hochwertig
+- Actionbar als „Dock“ wie Enterprise-Apps: Teil derselben Surface, kein Extra-Panel
+- FIX: Slot selbst ist die Row (kein Child .detail-actionbar nötig)
+- Gradient entfernen (wirkt billig)
 Umfang:
-- #detail-actionbar-slot inkl. .detail-actionbar (Layout)
+- #detail-actionbar-slot inkl. Layout als Row
 - .detail-actionbar-btn inkl. Icon/Label/States
 - .detail-sr-only
 === */
@@ -2835,7 +2820,7 @@ Umfang:
   border: 0 !important;
 }
 
-/* Slot: immer über dem Sheet, stabile Safe-Area */
+/* Slot: immer über dem Sheet, stabile Safe-Area + Dock-Surface */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
@@ -2847,34 +2832,29 @@ Umfang:
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  /* Surface-Continuity: gleiche “Material”-Basis wie Sheet + softer Separator */
-  background: rgba(255,255,255,0.94);
-  background: color-mix(in srgb, var(--color-surface) 90%, white);
-
-  /* oben minimaler Verlauf, damit es “eingebettet” wirkt */
-  background-image:
-    linear-gradient(
-      to top,
-      rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.62) 100%
-    );
+  /* Surface-Continuity: gleiche Material-Basis wie Sheet (ohne Gradient) */
+  background: color-mix(in srgb, var(--color-surface) 92%, white);
 
   border-top: 0;
   box-shadow:
     0 -1px 0 rgba(31,41,51,0.06) inset;
 
   z-index: 6;
+
+  /* ✅ WICHTIG: Slot ist die Row */
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
 }
 
-/* Layout: Buttons als ruhige „Dock“-Row, zentriert bei <4 Actions */
+/* Legacy-Support (falls irgendwann Wrapper eingeführt wird) */
 #detail-actionbar-slot .detail-actionbar{
   display: flex;
   align-items: stretch;
   justify-content: center;
-
   gap: 10px;
   width: 100%;
-
   padding: 0;
   margin: 0;
 }
@@ -2883,8 +2863,8 @@ Umfang:
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
-  min-width: 74px;
-  height: 58px;
+  min-width: 72px;
+  height: 56px;
 
   padding: 9px 10px 7px;
 
@@ -2896,13 +2876,12 @@ Umfang:
 
   border-radius: var(--ui-radius-md);
 
-  /* Feed-/Control-DNA: hellere Surface, klarer aber leiser Border */
+  /* ruhig + hochwertig wie Controls im Feed */
   background: rgba(255,255,255,0.86);
   border: 1px solid rgba(31,41,51,0.10);
 
   color: rgba(31,41,51,0.88);
 
-  /* ruhige Tiefe wie Controls */
   box-shadow:
     0 10px 20px rgba(0,0,0,0.055),
     0 1px 0 rgba(255,255,255,0.78) inset;
@@ -2941,7 +2920,7 @@ Umfang:
   }
 }
 
-/* Active (Tap): minimal “pressed”, nicht hüpfend */
+/* Active (Tap): minimal “pressed” */
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
   background: rgba(31,41,51,0.04);
@@ -2992,7 +2971,5 @@ Umfang:
   flex: 0 0 auto !important;
   opacity: 0.92;
 }
-/* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
 
-
-
+/* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
