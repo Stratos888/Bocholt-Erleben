@@ -3170,6 +3170,18 @@ def main() -> None:
                 continue
             # === END BLOCK: INBOX UPDATE POLICY (fill missing fields for existing rows, v1) ===
 
+            # === BEGIN BLOCK: INBOX REQUIRED FIELDS GATE (title+date+url+location, v1) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - Inbox zeigt nur Events, die in der PWA wirklich als Event taugen
+            # - Pflichtfelder: title + date + url + location
+            # - time bleibt optional
+            # Umfang:
+            # - Ersetzt nur den "Write to inbox as suggestion"-Append-Block in diesem Abschnitt
+            if not (norm(title) and norm(d) and norm(c_url) and norm(final_location)):
+                continue
+            # === END BLOCK: INBOX REQUIRED FIELDS GATE (title+date+url+location, v1) ===
+
             # Write to inbox as suggestion (nur neue Kandidaten)
             row = {
                 "status": status,
