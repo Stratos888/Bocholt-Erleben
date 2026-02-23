@@ -2377,7 +2377,7 @@ def main() -> None:
     backfill_by_host: Dict[str, int] = {}
     backfill_html_cache: Dict[str, str] = {}
 
-    def _backfill_extract_date_from_html(_html_text: str) -> Tuple[str, str]:
+    def _backfill_extract_date_from_html(_html_text: str, title_hint: str) -> Tuple[str, str]:
         # 1) JSON-LD Event startDate/endDate
         scripts = re.findall(
             r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
@@ -2394,8 +2394,16 @@ def main() -> None:
                 if "@graph" in obj:
                     yield from _iter_ld_nodes(obj.get("@graph"))
 
+        def _is_event_type(tval) -> bool:
+            if isinstance(tval, str):
+                k = norm_key(tval)
+                return (k == "event") or k.endswith(":event")
+            if isinstance(tval, list):
+                return any(_is_event_type(x) for x in tval)
+            return False
+
         for raw in scripts:
-            raw = norm(raw)
+            raw = (raw or "").strip()
             if not raw:
                 continue
             try:
@@ -2404,25 +2412,33 @@ def main() -> None:
                 continue
 
             for node in _iter_ld_nodes(data):
-                t = node.get("@type") if isinstance(node, dict) else None
-                if isinstance(t, list):
-                    is_event = any(str(x).lower() == "event" for x in t)
-                else:
-                    is_event = str(t).lower() == "event"
-
-                if not is_event:
+                if not isinstance(node, dict):
+                    continue
+                if not _is_event_type(node.get("@type")):
                     continue
 
-                start = norm(node.get("startDate", ""))
-                end = norm(node.get("endDate", ""))
-                d1 = _iso_date_part(start)
-                d2 = _iso_date_part(end)
-                if d1:
-                    return (d1, d2)
+                sd = norm(str(node.get("startDate") or ""))
+                ed = norm(str(node.get("endDate") or ""))
 
-        # 2) Text-Fallback (für JUBOH ok): deutsches Datum im HTML
-        d1 = _extract_event_date_de(_html_text or "")
-        return (d1, "")
+                if sd:
+                    sd = sd.split("T")[0].split(" ")[0]
+                if ed:
+                    ed = ed.split("T")[0].split(" ")[0]
+
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
+                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
+                        return (sd, ed)
+                    return (sd, sd)
+
+        # 2) Fallback: Datum aus sichtbarem Text via bestehender Funktion
+        fallback_year = datetime.now().year
+        detail_text = clean_text(_strip_html_tags(_html_text or ""))
+        detail_combined = f"{norm(title_hint)}\n{detail_text[:6000]}".strip()
+        d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
+        if d_sd:
+            return (d_sd, d_ed or d_sd)
+
+        return ("", "")
 
     for row_idx, r in enumerate(inbox_rows, start=2):
         cur_url = norm(r.get("url", ""))
@@ -2463,7 +2479,7 @@ def main() -> None:
         if not html:
             continue
 
-        d1, d2 = _backfill_extract_date_from_html(html)
+        d1, d2 = _backfill_extract_date_from_html(html, norm(r.get("title", "")))
         if not d1:
             continue
 
