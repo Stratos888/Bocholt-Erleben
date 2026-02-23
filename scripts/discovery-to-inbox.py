@@ -1360,6 +1360,45 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
     fallback_year = datetime.now().year
     out: List[Dict[str, str]] = []
 
+    # === BEGIN BLOCK: JUBOH PAGINATION PREFETCH (programm pages) ===
+    # Ziel: /programm hat mehrere Seiten (1..5). Wir holen sie vorab und scannen alle.
+    try:
+        bu = urlparse(base_url)
+        if (bu.netloc or "").lower().endswith("juboh.de") and (bu.path or "").lower().startswith("/programm"):
+            max_pages = int(os.environ.get("MAX_JUBOH_PAGES", "5"))
+            seen = {base_url}
+            extra_html_parts: List[str] = []
+
+            # Links auf Folgeseiten sind auf /programm typischerweise die Ziffern "2","3","4","5"
+            for mm in _HTML_A_RE.finditer(html_text):
+                href2 = norm(mm.group(1))
+                txt2 = clean_text(mm.group(2))
+                if not href2 or not txt2 or not txt2.isdigit():
+                    continue
+
+                u2 = _normalize_event_url(href2, base_url)
+                if not u2 or u2 in seen:
+                    continue
+
+                pu2 = urlparse(u2)
+                if (pu2.netloc or "").lower().endswith("juboh.de") and (pu2.path or "").lower().startswith("/programm"):
+                    seen.add(u2)
+
+            # deterministisch und begrenzt
+            for u2 in list(sorted(seen))[:max_pages]:
+                if u2 == base_url:
+                    continue
+                try:
+                    extra_html_parts.append(safe_fetch(u2, timeout=20))
+                except Exception:
+                    continue
+
+            if extra_html_parts:
+                html_text = html_text + "\n" + "\n".join(extra_html_parts)
+    except Exception:
+        pass
+    # === END BLOCK: JUBOH PAGINATION PREFETCH (programm pages) ===
+    
     # === BEGIN BLOCK: DETAIL FETCH BUDGET (missing_date enrichment, v1) ===
     # Datei: scripts/discovery-to-inbox.py
     # Zweck:
@@ -1394,9 +1433,20 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # - Diese Links sind Listing-/Filterseiten und dürfen NICHT als Event-Kandidaten in die Inbox
         # Umfang:
         # - Ersetzt nur die URL-Normalisierung + direktes Filtering in _html_link_candidates_date_scan
+        # === BEGIN BLOCK: JUBOH STRICT URL TYPE (only /programm/kurs/ are events) ===
         url = _normalize_event_url(href, base_url)
         if not url:
             continue
+
+        p0 = urlparse(url)
+        host0 = (p0.netloc or "").lower()
+        path0 = (p0.path or "").lower()
+
+        if host0.endswith("juboh.de"):
+            # Nur Kurs-Detailseiten sind echte Events
+            if "/programm/kurs/" not in path0:
+                continue
+        # === END BLOCK: JUBOH STRICT URL TYPE (only /programm/kurs/ are events) ===
 
         p0 = urlparse(url)
         host0 = (p0.netloc or "").lower()
