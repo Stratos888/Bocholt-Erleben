@@ -727,57 +727,66 @@
       // === END BLOCK: DATE LABEL (DE, user-friendly) ===
 
 
-              const iconSvg = (type) => {
-        // minimal, consistent line-icons (no brand logos)
-        if (type === "calendar") {
-          return `
-            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M7.5 13h3M7.5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          `;
-        }
+/* === BEGIN FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere)
+Zweck:
+- Kalender-Icon Token: EINMAL definieren und überall wiederverwenden (Actionbar + Detailpanel + später Events-Screen)
+Umfang:
+- Erweitert iconSvg um optionale CSS-Klasse (z.B. "is-chip")
+=== */
+const iconSvg = (type, extraClass = "") => {
+  const cls = `detail-icon-svg${extraClass ? " " + extraClass : ""}`;
 
-        if (type === "whatsapp" || type === "share") {
-          return `
-            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 3a7 7 0 0 1 7 7c0 3.9-3.1 7-7 7H8l-3.5 3.5.9-4A7 7 0 0 1 12 3z"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M9 10h6M9 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          `;
-        }
+  // minimal, consistent line-icons (no brand logos)
+  if (type === "calendar") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M7.5 13h3M7.5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
 
-        if (type === "route") {
-          return `
-            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M11 3l10 8-10 10V3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M3 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          `;
-        }
+  if (type === "whatsapp" || type === "share") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3a7 7 0 0 1 7 7c0 3.9-3.1 7-7 7H8l-3.5 3.5.9-4A7 7 0 0 1 12 3z"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 10h6M9 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
 
-        if (type === "website") {
-          return `
-            <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M10 14l8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M13 6h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-          `;
-        }
+  if (type === "route") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M11 3l10 8-10 10V3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M3 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
 
-        // fallback
-        return `
-          <svg class="detail-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2v20M2 12h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        `;
-      };
+  if (type === "website") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 14l8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 6h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+
+  // fallback
+  return `
+    <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2v20M2 12h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  `;
+};
+/* === END FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere) === */
 
             // === BEGIN PATCH: ACTIONBAR LABELS (title short, aria long) ===
       const renderAction = (a) => {
@@ -879,13 +888,8 @@
               ` : ""}
 
               ${vm.date ? `
-                                <span class="detail-chip" role="listitem" data-chip="date">
-                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
-                      fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                  </svg>
+<span class="detail-chip" role="listitem" data-chip="date">
+  ${iconSvg("calendar", "is-chip")}
                                     <span class="detail-chip-text">${escapeHtml(dateLabel || vm.date)}</span>
                 </span>
               ` : ""}
@@ -1100,6 +1104,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
