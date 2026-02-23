@@ -2507,12 +2507,13 @@ Umfang:
 /* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) ===
 Zweck:
 - Fix für riesige inline-SVGs (Default 300x150) im Detailpanel
-- Systemisch: alle Renderer-Icons (.detail-icon-svg) werden hart normalisiert
+- Systemisch: ALLE Icons im Detailpanel werden normalisiert (auch ohne .detail-icon-svg Klassen)
+- Ausnahme: Content/Description darf weiterhin normale Mediengrößen nutzen
 Umfang:
-- Nur Icons im #event-detail-panel (keine globalen SVG-Regeln)
+- Nur innerhalb #event-detail-panel
 === */
 
-/* Systemic: jedes Renderer-SVG im Detailpanel bekommt feste Icon-Größe */
+/* 1) Primär: explizite Icon-Klassen (falls vorhanden) */
 #event-detail-panel svg.detail-icon-svg,
 #event-detail-panel img.detail-icon-svg{
   width: 18px !important;
@@ -2528,13 +2529,9 @@ Umfang:
   object-fit: contain !important;
 }
 
-/* Fallback: falls irgendwo SVG/IMG ohne detail-icon-svg in Chip/Location/Category landet */
-#event-detail-panel .detail-chip svg,
-#event-detail-panel .detail-chip img,
-#event-detail-panel .detail-location-icon svg,
-#event-detail-panel .detail-location-icon img,
-#event-detail-panel .detail-category-icon svg,
-#event-detail-panel .detail-category-icon img{
+/* 2) Systemic Guard: JEDES svg/img im Detailpanel wird als Icon behandelt... */
+#event-detail-panel svg,
+#event-detail-panel img{
   width: 18px !important;
   height: 18px !important;
 
@@ -2545,6 +2542,21 @@ Umfang:
 
   flex: 0 0 auto !important;
   display: block !important;
+  object-fit: contain !important;
+}
+
+/* ...AUSNAHME: echte Medien/Content-Bilder in der Description dürfen normal sein */
+#event-detail-panel .detail-description svg,
+#event-detail-panel .detail-description img{
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+
+  display: inline !important;
   object-fit: contain !important;
 }
 
@@ -2800,6 +2812,7 @@ Umfang:
 Zweck:
 - Actionbar als „Dock“ wie Enterprise-Apps: Teil derselben Surface, kein Extra-Panel
 - FIX: Slot ist IMMER Flex-Row (egal ob Buttons direkt oder via Wrapper .detail-actionbar)
+- FIX: Slot darf bei offenem Panel niemals display:none sein (auch nicht via [hidden])
 - Robuster Icon-Guard: verhindert „Riesen-Icons“ (SVG/IMG) im Detailpanel zuverlässig
 - Kein Gradient (wirkt billig)
 Umfang:
@@ -2820,6 +2833,16 @@ Umfang:
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+}
+
+/* HARD GUARD: wenn Panel offen ist, darf Slot nie verborgen sein (auch nicht via [hidden]) */
+html.is-panel-open #detail-actionbar-slot,
+body.is-panel-open #detail-actionbar-slot{
+  display: flex !important;
+}
+html.is-panel-open #detail-actionbar-slot[hidden],
+body.is-panel-open #detail-actionbar-slot[hidden]{
+  display: flex !important;
 }
 
 /* Slot: immer über dem Sheet, stabile Safe-Area + immer Row */
@@ -2981,4 +3004,3 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
