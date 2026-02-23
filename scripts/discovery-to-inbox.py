@@ -632,6 +632,13 @@ def ensure_description(
 # Umfang:
 # - Ersetzt nur classify_candidate()
 # === END BLOCK: EVENT QUALITY GATE (final rules, v2) ===
+# === BEGIN BLOCK: EVENT QUALITY GATE (premium events focus, v3) ===
+# Zweck:
+# - Nur hochwertige Events in Inbox lassen
+# - Erwachsenen-Kurse blockieren
+# - Kinder-Events erlauben
+# - Fokus auf App-relevante Events
+
 def classify_candidate(
     *,
     stype: str,
@@ -641,45 +648,65 @@ def classify_candidate(
     description: str,
     event_date: str,
 ) -> Tuple[str, str]:
-    """
-    Returns (status, reason):
-      - review   = Kandidat zur manuellen Prüfung (gewollt!)
-      - rejected = sicher kein Event (Müll) -> wird NICHT in Inbox geschrieben
 
-    Zielregeln (final):
-      - RSS ohne Event-Datum -> rejected (massiv weniger Müll)
-      - Kein Event-Signal -> rejected (blocked wird nicht mehr verwendet)
-      - Event-Signal + (Datum vorhanden ODER fehlt) -> review
-    """
+    text = f"{title}\n{description}".lower()
 
-    text = f"{title}\n{description}".strip()
-    is_non_event = _is_non_event_text(text)
-    has_event = _has_event_signal(text)
-    is_pressish = (stype == "rss") or _is_press_like_source(source_name, source_url)
+    # Muss Datum haben
+    if not event_date:
+        return "rejected", "reject:missing_date"
 
-    # 0) RSS ohne Event-Datum -> hart raus (Option A)
-    if stype == "rss" and not norm(event_date):
-        return "rejected", "reject:rss_missing_event_date"
+    # Kinder-Events explizit erlauben
+    kids_keywords = [
+        "kind",
+        "kinder",
+        "familie",
+        "jugend",
+        "ferien",
+        "kids",
+        "teen",
+    ]
 
-    # 1) Harte Müllsignale UND kein Event-Signal -> raus
-    if is_non_event and not has_event:
-        return "rejected", "reject:non_event_keywords"
+    if any(k in text for k in kids_keywords):
+        return "review", "review:kids_event"
 
-    # 2) Presse/Press-ähnlich ohne Event-Signal -> raus
-    if is_pressish and not has_event:
-        return "rejected", "reject:press_without_event_signal"
+    # Premium Events
+    premium_keywords = [
+        "konzert",
+        "festival",
+        "theater",
+        "lesung",
+        "ausstellung",
+        "führung",
+        "markt",
+        "stadtfest",
+        "event",
+        "veranstaltung",
+        "kino",
+        "aufführung",
+    ]
 
-    # 3) Datum außerhalb Fenster -> raus (wenn Datum vorhanden)
-    if norm(event_date) and (not _in_date_window(event_date)):
-        return "rejected", "reject:date_out_of_window"
+    if any(k in text for k in premium_keywords):
+        return "review", "review:premium_event"
 
-    # 4) Final: Nur mit Event-Signal in review – Datum darf fehlen (außer RSS)
-    if has_event:
-        if norm(event_date):
-            return "review", "review:event_signal+date"
-        return "review", "review:event_signal_missing_date"
+    # Hard block: Erwachsenen-Kurse / Workshops
+    blocked_keywords = [
+        "kurs",
+        "seminar",
+        "workshop",
+        "fortbildung",
+        "schulung",
+        "weiterbildung",
+        "coaching",
+        "training",
+        "vorlesung",
+    ]
 
-    return "rejected", "reject:no_event_signal"
+    if any(k in text for k in blocked_keywords):
+        return "rejected", "reject:adult_course"
+
+    return "rejected", "reject:low_quality_event"
+
+# === END BLOCK: EVENT QUALITY GATE (premium events focus, v3) ===
 
 
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
