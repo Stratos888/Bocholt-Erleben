@@ -127,7 +127,39 @@ STATUS: COMPLETED
 TASK 3: EVENT PIPELINE RELIABILITY IMPROVEMENT
 
 STATUS: COMPLETED
+---
 
+TASK 4: PIPELINE ENRICHMENT BACKFILL (JUBOH date/time completion)
+
+STATUS: IN PROGRESS
+
+DEFINITION OF DONE:
+
+Existing Inbox events with missing date must be automatically backfilled.
+
+Backfill must run during normal pipeline execution.
+
+Backfill must respect existing budget and host caps.
+
+No duplicate Inbox rows allowed.
+
+Only missing fields may be filled.
+
+Verification criteria:
+
+Inbox backfilled (updated rows) appears in pipeline logs.
+
+JUBOH /programm/kurs/ missing-date ratio must decrease continuously.
+
+Time extraction must appear (>0 filled time values).
+
+Scope restriction:
+
+Pipeline only.
+
+No UI changes allowed.
+
+---
 ---
 
 RULE:
@@ -657,7 +689,86 @@ Verification:
   - Inbox contains 0 titles matching “mehr erfahren|plus|<n> jahre|numeric-only”
   - All juboh.de Inbox URLs contain /programm/kurs/
   - JUBOH missing-date ratio drops significantly after trigger adjustment
+---
 
+2026-02-23
+
+Discovery Pipeline — Inbox Backfill Pass (Automatic completion of missing date fields)
+
+Status:
+
+APPLIED (date fill active)
+IN PROGRESS (time fill completion pending)
+
+Scope:
+
+Pipeline only.
+
+No UI changes.
+
+---
+
+Problem:
+
+Pipeline deduplication prevented improvement of existing Inbox rows.
+
+Events already present in Inbox with missing date remained permanently incomplete.
+
+Detail extraction improvements had no effect on already existing rows.
+
+---
+
+Implemented decision:
+
+Pipeline now performs Inbox Backfill Pass:
+
+During normal pipeline execution:
+
+Inbox rows are scanned.
+
+High-confidence event detail pages (currently JUBOH /programm/kurs/) with missing date are refetched.
+
+Missing fields are filled using:
+
+JSON-LD extraction
+
+HTML detail extraction fallback
+
+Batch update is applied in-place.
+
+No duplicate Inbox rows created.
+
+Budget and host caps remain enforced.
+
+---
+
+Observed run result:
+
+Pipeline log shows:
+
+Inbox backfilled (updated rows): 8
+
+JUBOH missing-date count decreased accordingly.
+
+Backfill operates without introducing duplicate Inbox entries.
+
+---
+
+Next step:
+
+Extend Backfill extraction to reliably fill:
+
+time field from JSON-LD startDate
+
+location field when available
+
+Goal:
+
+Achieve enterprise-grade completeness of Inbox events.
+
+Pipeline infrastructure remains UI-independent.
+
+---
 ---
 
 2026-02-19
@@ -1122,11 +1233,11 @@ OVERALL STATUS:
 
 UI: IN PROGRESS
 
-PIPELINE: IN PROGRESS (TASK 3 COMPLETED)
+PIPELINE: IN PROGRESS (TASK 4 BACKFILL ACTIVE)
 
 LAST UPDATE:
 
-2026-02-21
+2026-02-23
 
 ---
 
