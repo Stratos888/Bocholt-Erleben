@@ -2240,6 +2240,22 @@ def append_rows(service: object, sheet_id: str, tab_name: str, rows: List[List[s
     ).execute()
 
 
+def batch_update_rows(service: object, sheet_id: str, updates: List[Dict[str, object]]) -> None:
+    """
+    updates = [{"range": "Inbox!A2:Q2", "values": [[...]]}, ...]
+    """
+    if not updates:
+        return
+    body = {
+        "valueInputOption": "RAW",
+        "data": updates,
+    }
+    service.spreadsheets().values().batchUpdate(
+        spreadsheetId=sheet_id,
+        body=body,
+    ).execute()
+
+
 def sheet_rows_to_dicts(values: List[List[str]]) -> Tuple[List[str], List[Dict[str, str]]]:
     if not values:
         return ([], [])
@@ -2340,6 +2356,16 @@ def main() -> None:
     live_by_url, live_by_title_date = build_live_index(live_events)
 
     existing_inbox_fps = set(inbox_fingerprint(r) for r in inbox_rows)
+    existing_inbox_fp_to_row: Dict[Tuple[str, str, str], int] = {}
+    existing_inbox_fp_to_rowdata: Dict[Tuple[str, str, str], Dict[str, str]] = {}
+
+    # Hinweis: wir nehmen an, dass inbox_rows die Sheet-Reihenfolge ohne Lücken abbildet.
+    # Header ist Zeile 1, erste Datenzeile ist Zeile 2.
+    for i, r in enumerate(inbox_rows, start=2):
+        fp = inbox_fingerprint(r)
+        if fp not in existing_inbox_fp_to_row:
+            existing_inbox_fp_to_row[fp] = i
+            existing_inbox_fp_to_rowdata[fp] = r
 
     enabled_sources = [s for s in sources_rows if norm(s.get("enabled", "")).upper() in ("TRUE", "1", "YES", "JA")]
     info(f"Sources enabled: {len(enabled_sources)}")
@@ -2611,6 +2637,85 @@ def main() -> None:
             if already_inbox:
                 continue
 
+            # Existing behavior: skip non-new candidates for inbox
+            if status == "rejected":
+                continue
+            if already_live:
+                continue
+
+            # === BEGIN BLOCK: INBOX UPDATE POLICY (fill missing fields for existing rows, v1) ===
+            # Zweck:
+            # - Wenn Kandidat bereits in Inbox ist, aber Felder fehlen (v.a. date), dann in-place updaten statt skippen.
+            # - Keine Duplikate erzeugen; Append bleibt nur für echte "neue" Kandidaten.
+            # Umfang:
+            # - Ersetzt nur den already_inbox-Branch + den Append-Branch in diesem Abschnitt.
+            if "inbox_updates" not in locals():
+                inbox_updates: List[Dict[str, object]] = []
+                inbox_updates_count = 0
+
+            if already_inbox:
+                row_idx = existing_inbox_fp_to_row.get(fp, 0)
+                old = existing_inbox_fp_to_rowdata.get(fp, {}) or {}
+
+                # nur fehlende Felder füllen (niemals überschreiben, wenn schon gesetzt)
+                new_date = d
+                new_end = norm(c.get("endDate", ""))
+                new_time = final_time
+                new_loc = final_location
+                new_title = title
+                new_url = c_url
+
+                new_desc = ensure_description(
+                    title=title,
+                    d_iso=d,
+                    time_str=final_time,
+                    city=default_city,
+                    location=final_location,
+                    category=default_cat,
+                    url=c_url,
+                    description_raw=c.get("description", ""),
+                )
+
+                changed = False
+
+                def _pick_fill(col: str, val: str) -> str:
+                    nonlocal changed
+                    cur = norm(old.get(col, ""))
+                    v = norm(val)
+                    if (not cur) and v:
+                        changed = True
+                        return v
+                    return cur
+
+                if row_idx >= 2:
+                    updated_row = {}
+                    # bestehende Werte behalten / nur leere füllen
+                    for col in INBOX_COLUMNS:
+                        updated_row[col] = norm(old.get(col, ""))
+
+                    updated_row["date"] = _pick_fill("date", new_date)
+                    updated_row["endDate"] = _pick_fill("endDate", new_end)
+                    updated_row["time"] = _pick_fill("time", new_time)
+                    updated_row["location"] = _pick_fill("location", new_loc)
+                    updated_row["title"] = _pick_fill("title", new_title)
+                    updated_row["url"] = _pick_fill("url", new_url)
+                    updated_row["description"] = _pick_fill("description", new_desc)
+
+                    if changed:
+                        # A..Q entspricht 17 Spalten (INBOX_COLUMNS)
+                        inbox_updates.append(
+                            {
+                                "range": f"{TAB_INBOX}!A{row_idx}:Q{row_idx}",
+                                "values": [[updated_row.get(col, "") for col in INBOX_COLUMNS]],
+                            }
+                        )
+                        inbox_updates_count += 1
+                        # cache aktualisieren, damit weitere Kandidaten im selben Run konsistent bleiben
+                        existing_inbox_fp_to_rowdata[fp] = updated_row
+
+                continue
+            # === END BLOCK: INBOX UPDATE POLICY (fill missing fields for existing rows, v1) ===
+
             # Write to inbox as suggestion (nur neue Kandidaten)
             row = {
                 "status": status,
@@ -2680,6 +2785,10 @@ def main() -> None:
         info("✅ Inbox updated.")
     else:
         info("✅ Nothing new to add.")
+
+    if "inbox_updates" in locals() and inbox_updates:
+        batch_update_rows(service, sheet_id, inbox_updates)
+        info(f"✅ Inbox backfilled (updated rows): {locals().get('inbox_updates_count', 0)}")
 
     # === BEGIN BLOCK: WRITE DISCOVERY CANDIDATES (append, non-blocking) ===
     # Datei: scripts/discovery-to-inbox.py
