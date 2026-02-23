@@ -1833,7 +1833,7 @@ Umfang:
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA) ===
 Zweck:
 - Sheet wirkt wie eine natürliche Fortsetzung der Event-Card-DNA (weniger „Modal“)
-- Ruhigeres Shadow/Border-Verhalten, weniger „heavy sheet“
+- Enterprise-Polish: subtiler Tint + hochwertigere Tiefe, ohne “Chrome/Toolbar”-Look
 - Radius ist tokenisiert (Single Source of Truth)
 Umfang:
 - Nur .detail-panel-content (keine Layout-Logik geändert)
@@ -1852,18 +1852,29 @@ Umfang:
   display: flex;
   flex-direction: column;
 
+  /* Surface: identisch ruhig wie Feed, aber mit minimalem Premium-Tint */
   background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 92%, white);
+
+  /* “Wow” ohne Lautstärke: leichter Top-Tint wie Header/Brand (subtil) */
+  background-image:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-primary-muted) 55%, white) 0%,
+      rgba(255,255,255,0) 64px
+    );
 
   /* Card-DNA: definierte Kante, keine “modal chrome” Optik */
-  border: 1px solid rgba(31,41,51,0.08);
+  border: 1px solid rgba(31,41,51,0.055);
   border-bottom: 0;
 
   border-radius: var(--dp-sheet-radius) var(--dp-sheet-radius) 0 0;
 
-  /* ruhiger als vorher: weniger “lift”, mehr “surface” */
+  /* Premium Tiefe: näher an .event-card Shadow-Charakteristik */
   box-shadow:
-    0 -10px 28px rgba(0,0,0,0.10),
-    0 -1px 0 rgba(255,255,255,0.78) inset;
+    0 -1px 1px rgba(0,0,0,0.035),
+    0 -18px 52px rgba(0,0,0,0.090),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   overflow: hidden;
   z-index: 2;
@@ -2806,8 +2817,8 @@ Umfang:
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) ===
 Zweck:
 - Detailpanel-Actionbar „in einem Zug“ konsolidieren: Container + Buttons + Labels + Icons
-- Konsistent, ruhig, enterprise: gleiches Touch-Target, gleiche Radius/Border/Shadow-Logik
-- Keine Unterstreichungen, sauberes Hover/Active/Focus
+- Enterprise-Polish: Dock wirkt wie Teil der gleichen Surface (kein “separates Toolbar-Teil”)
+- Buttons: gleiche DNA wie Feed-Controls (Border/Shadow/Radius), ruhig + hochwertig
 Umfang:
 - #detail-actionbar-slot inkl. .detail-actionbar (Layout)
 - .detail-actionbar-btn inkl. Icon/Label/States
@@ -2839,17 +2850,21 @@ Umfang:
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  /* === BEGIN FIX: ACTIONBAR CONTINUITY (less toolbar, more panel surface) ===
-  Zweck:
-  - Weniger “separate Toolbar”, mehr “Teil der gleichen Surface”
-  - Keine harte Trennkante; Separation über sehr softes Inset
-  Umfang:
-  - Nur border/background/shadow
-  === */
-  border-top: 0;
+  /* Surface-Continuity: gleiche “Material”-Basis wie Sheet + softer Separator */
   background: rgba(255,255,255,0.94);
-  box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
-  /* === END FIX: ACTIONBAR CONTINUITY (less toolbar, more panel surface) === */
+  background: color-mix(in srgb, var(--color-surface) 90%, white);
+
+  /* oben minimaler Verlauf, damit es “eingebettet” wirkt */
+  background-image:
+    linear-gradient(
+      to top,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.62) 100%
+    );
+
+  border-top: 0;
+  box-shadow:
+    0 -1px 0 rgba(31,41,51,0.06) inset;
 
   z-index: 6;
 }
@@ -2863,7 +2878,6 @@ Umfang:
   gap: 10px;
   width: 100%;
 
-  /* verhindert „kleben“ am Rand bei wenigen Buttons */
   padding: 0;
   margin: 0;
 }
@@ -2872,10 +2886,10 @@ Umfang:
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
-  min-width: 72px;
-  height: 56px;
+  min-width: 74px;
+  height: 58px;
 
-  padding: 8px 10px 7px;
+  padding: 9px 10px 7px;
 
   display: inline-flex;
   flex-direction: column;
@@ -2884,13 +2898,16 @@ Umfang:
   gap: 4px;
 
   border-radius: var(--ui-radius-md);
+
+  /* Feed-/Control-DNA: hellere Surface, klarer aber leiser Border */
+  background: rgba(255,255,255,0.86);
   border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(31,41,51,0.03);
 
-  color: rgba(31,41,51,0.86);
+  color: rgba(31,41,51,0.88);
 
+  /* ruhige Tiefe wie Controls */
   box-shadow:
-    0 10px 18px rgba(0,0,0,0.06),
+    0 10px 20px rgba(0,0,0,0.055),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 0 !important;
@@ -2900,8 +2917,12 @@ Umfang:
   text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, border-color 140ms ease,
-              box-shadow 140ms ease, transform 140ms ease;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
 }
 
 /* Links: in allen States niemals unterstreichen */
@@ -2915,18 +2936,22 @@ Umfang:
 /* Hover (Desktop) */
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(31,41,51,0.045);
+    background: rgba(255,255,255,0.94);
     border-color: rgba(31,41,51,0.14);
     box-shadow:
-      0 12px 22px rgba(0,0,0,0.075),
+      0 12px 26px rgba(0,0,0,0.070),
       0 1px 0 rgba(255,255,255,0.82) inset;
   }
 }
 
-/* Active (Tap) */
+/* Active (Tap): minimal “pressed”, nicht hüpfend */
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.055);
+  background: rgba(31,41,51,0.04);
+  border-color: rgba(31,41,51,0.14);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.055),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 }
 
 /* Focus */
@@ -2943,7 +2968,7 @@ Umfang:
 
   font-size: 11px;
   line-height: 1.1;
-  font-weight: 700;
+  font-weight: 750;
 
   color: rgba(31,41,51,0.74);
   margin-top: 2px;
@@ -2968,66 +2993,6 @@ Umfang:
 
   display: block !important;
   flex: 0 0 auto !important;
-  opacity: 0.9;
+  opacity: 0.92;
 }
-
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (sr-only hidden; neutral) === */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
