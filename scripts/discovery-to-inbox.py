@@ -1550,7 +1550,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         )
 
         def _extract_date_from_html(_html_text: str, *, allow_text_fallback: bool) -> Tuple[str, str]:
-            # 1) JSON-LD Event startDate/endDate
+            # 1) JSON-LD (Event/Course/EducationEvent/CourseInstance) startDate/endDate
             scripts = re.findall(
                 r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
                 _html_text,
@@ -1566,13 +1566,34 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                     if "@graph" in obj:
                         yield from _iter_ld_nodes(obj.get("@graph"))
 
-            def _is_event_type(tval) -> bool:
+            def _is_relevant_type(tval) -> bool:
+                # accept Event / Course / EducationEvent / CourseInstance (and prefixed variants)
                 if isinstance(tval, str):
                     k = norm_key(tval)
-                    return (k == "event") or k.endswith(":event")
+                    return (
+                        k.endswith("event")
+                        or k.endswith(":event")
+                        or k.endswith("course")
+                        or k.endswith(":course")
+                        or "educationevent" in k
+                        or "courseinstance" in k
+                    )
                 if isinstance(tval, list):
-                    return any(_is_event_type(x) for x in tval)
+                    return any(_is_relevant_type(x) for x in tval)
                 return False
+
+            def _pick_dates(sd_raw: str, ed_raw: str) -> Tuple[str, str]:
+                sd = norm(sd_raw)
+                ed = norm(ed_raw)
+                if sd:
+                    sd = sd.split("T")[0].split(" ")[0]
+                if ed:
+                    ed = ed.split("T")[0].split(" ")[0]
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
+                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
+                        return (sd, ed)
+                    return (sd, sd)
+                return ("", "")
 
             for raw in scripts:
                 raw = (raw or "").strip()
@@ -1586,21 +1607,36 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 for node in _iter_ld_nodes(data):
                     if not isinstance(node, dict):
                         continue
-                    if not _is_event_type(node.get("@type")):
+                    if not _is_relevant_type(node.get("@type")):
                         continue
 
-                    sd = norm(str(node.get("startDate") or ""))
-                    ed = norm(str(node.get("endDate") or ""))
+                    # direct startDate/endDate
+                    d1, d2 = _pick_dates(str(node.get("startDate") or ""), str(node.get("endDate") or ""))
+                    if d1:
+                        return (d1, d2)
 
-                    if sd:
-                        sd = sd.split("T")[0].split(" ")[0]
-                    if ed:
-                        ed = ed.split("T")[0].split(" ")[0]
+                    # Course instances (common pattern for Kursseiten)
+                    for key in ("hasCourseInstance", "courseInstance", "subEvent", "event"):
+                        inst = node.get(key)
+                        if not inst:
+                            continue
+                        if isinstance(inst, dict):
+                            d1, d2 = _pick_dates(str(inst.get("startDate") or ""), str(inst.get("endDate") or ""))
+                            if d1:
+                                return (d1, d2)
+                        elif isinstance(inst, list):
+                            for it in inst:
+                                if not isinstance(it, dict):
+                                    continue
+                                d1, d2 = _pick_dates(str(it.get("startDate") or ""), str(it.get("endDate") or ""))
+                                if d1:
+                                    return (d1, d2)
 
-                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd or ""):
-                        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", ed or ""):
-                            return (sd, ed)
-                        return (sd, sd)
+            # 1b) <time datetime="..."> (often present even without JSON-LD)
+            for m_time in re.finditer(r"<time[^>]+datetime=['\"]([^'\"]+)['\"]", _html_text or "", flags=re.IGNORECASE):
+                d1, d2 = _pick_dates(m_time.group(1), "")
+                if d1:
+                    return (d1, d2)
 
             # 2) Fallback: Datum aus sichtbarem Text via bestehender Funktion (nur wenn erlaubt)
             if allow_text_fallback:
@@ -1609,6 +1645,114 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
                 d_sd, d_ed = _extract_event_date_de(detail_combined, fallback_year)
                 if d_sd:
                     return (d_sd, d_ed or d_sd)
+
+            return ("", "")
+
+        def _extract_time_loc_from_html(_html_text: str, *, allow_text_fallback: bool) -> Tuple[str, str]:
+            """Returns (time_str, location_str)."""
+            html = _html_text or ""
+            scripts = re.findall(
+                r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+                html,
+                flags=re.IGNORECASE | re.DOTALL,
+            )
+
+            def _iter_ld_nodes(obj):
+                if isinstance(obj, list):
+                    for it in obj:
+                        yield from _iter_ld_nodes(it)
+                elif isinstance(obj, dict):
+                    yield obj
+                    if "@graph" in obj:
+                        yield from _iter_ld_nodes(obj.get("@graph"))
+
+            def _is_relevant_type(tval) -> bool:
+                if isinstance(tval, str):
+                    k = norm_key(tval)
+                    return (
+                        k.endswith("event")
+                        or k.endswith(":event")
+                        or k.endswith("course")
+                        or k.endswith(":course")
+                        or "educationevent" in k
+                        or "courseinstance" in k
+                    )
+                if isinstance(tval, list):
+                    return any(_is_relevant_type(x) for x in tval)
+                return False
+
+            def _time_from_iso(sd_raw: str, ed_raw: str) -> str:
+                t1 = _infer_time_from_text(sd_raw or "")
+                t2 = _infer_time_from_text(ed_raw or "")
+                if t1 and t2 and t2 != t1:
+                    return f"{t1}–{t2}"
+                return t1 or ""
+
+            # JSON-LD preferred
+            for raw in scripts:
+                raw = (raw or "").strip()
+                if not raw:
+                    continue
+                try:
+                    data = json.loads(raw)
+                except Exception:
+                    continue
+
+                for node in _iter_ld_nodes(data):
+                    if not isinstance(node, dict):
+                        continue
+                    if not _is_relevant_type(node.get("@type")):
+                        continue
+
+                    # time
+                    time_str = _time_from_iso(str(node.get("startDate") or ""), str(node.get("endDate") or ""))
+
+                    # location
+                    loc_str = ""
+                    loc_obj = node.get("location") or node.get("place")
+                    if isinstance(loc_obj, dict):
+                        loc_name = clean_text(str(loc_obj.get("name", "") or ""))
+                        addr = loc_obj.get("address")
+                        addr_str = ""
+                        if isinstance(addr, dict):
+                            addr_parts = [
+                                clean_text(str(addr.get("streetAddress", "") or "")),
+                                clean_text(str(addr.get("postalCode", "") or "")),
+                                clean_text(str(addr.get("addressLocality", "") or "")),
+                            ]
+                            addr_str = " ".join([p for p in addr_parts if p]).strip()
+                        elif isinstance(addr, str):
+                            addr_str = clean_text(addr)
+                        loc_str = " - ".join([p for p in [loc_name, addr_str] if p]).strip()
+                    elif isinstance(loc_obj, str):
+                        loc_str = clean_text(loc_obj)
+
+                    if time_str or loc_str:
+                        return (time_str, loc_str)
+
+                    # Course instances may hold the real startDate/location
+                    for key in ("hasCourseInstance", "courseInstance", "subEvent", "event"):
+                        inst = node.get(key)
+                        if not inst:
+                            continue
+                        inst_list = [inst] if isinstance(inst, dict) else (inst if isinstance(inst, list) else [])
+                        for it in inst_list:
+                            if not isinstance(it, dict):
+                                continue
+                            t2 = _time_from_iso(str(it.get("startDate") or ""), str(it.get("endDate") or ""))
+                            loc2 = ""
+                            loc_obj2 = it.get("location") or it.get("place")
+                            if isinstance(loc_obj2, dict):
+                                loc2 = clean_text(str(loc_obj2.get("name", "") or ""))
+                            elif isinstance(loc_obj2, str):
+                                loc2 = clean_text(loc_obj2)
+                            if t2 or loc2:
+                                return (t2, loc2)
+
+            if allow_text_fallback:
+                detail_text = clean_text(_strip_html_tags(html))
+                loc_guess, time_guess = infer_location_time(title, detail_text)
+                return (time_guess or "", loc_guess or "")
 
             return ("", "")
 
@@ -1784,13 +1928,29 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             desc = "Kurs."
         # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v1) ===
 
+        # === BEGIN BLOCK: HTML DATE-SCAN ENRICH TIME/LOCATION (JUBOH+fallback, v1) ===
+        ev_time = ""
+        ev_loc = ""
+
+        if detail_html:
+            ev_time, ev_loc = _extract_time_loc_from_html(detail_html, allow_text_fallback=True)
+
+        if (not ev_time) or (not ev_loc):
+            base_text = clean_text(_strip_html_tags(detail_html)) if detail_html else ctx
+            loc_guess, time_guess = infer_location_time(title, base_text)
+            if not ev_loc:
+                ev_loc = loc_guess or ""
+            if not ev_time:
+                ev_time = time_guess or ""
+        # === END BLOCK: HTML DATE-SCAN ENRICH TIME/LOCATION (JUBOH+fallback, v1) ===
+
         out.append(
             {
                 "title": title,
                 "date": ev_date or "",
                 "endDate": (ev_end or "") if ev_date else "",
-                "time": "",
-                "location": "",
+                "time": ev_time or "",
+                "location": ev_loc or "",
                 "url": canonical_url(url),
                 "description": desc,
                 "notes": "source=html_datescan",
