@@ -2821,13 +2821,12 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- FIX Root Cause: entfernt kaputte/abgeschnittene Selektoren, hält den CSS-Parser „alive“
 - Actionbar ist zuverlässig sichtbar und IMMER eine Flex-Row (Slot selbst ist die Row)
+- Robust gegen hidden-Attribut (UA styles) und Layout-Regressions
 - Robuster Icon-Guard (SVG/IMG) im Detailpanel: keine Riesen-Icons mehr
-- Kein Gradient (billig), stattdessen ruhige Surface-Continuity wie Feed
+- Spacing strikt nach erlaubter Skala (4/8/12/16/24/32)
 Umfang:
-- #detail-actionbar-slot Layout + Surface
-- optionaler Wrapper .detail-actionbar (fallback)
+- #detail-actionbar-slot Layout + Surface + hidden-contract
 - .detail-actionbar-btn inkl. Icon/Label/States
 - Icon-Guards für Header/Meta/Location/Actionbar
 - .detail-sr-only
@@ -2846,9 +2845,14 @@ Umfang:
   border: 0 !important;
 }
 
-/* Slot: IMMER sichtbar + IMMER Row (Hard-Override gegen Regressionen) */
+/* hidden-contract: UA [hidden] darf die Bar zuverlässig ausblenden */
+#detail-actionbar-slot[hidden]{
+  display: none !important;
+}
+
+/* Slot: IMMER Row (Hard-Override gegen Regressionen) */
 #detail-actionbar-slot{
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
@@ -2861,18 +2865,13 @@ Umfang:
   display: flex !important;
   align-items: stretch;
   justify-content: center;
-  gap: 10px;
+  gap: var(--space-md);
 
   border-top: 0;
   background: rgba(255,255,255,0.94);
   box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
 
   z-index: 6;
-}
-
-/* Fallback: falls Wrapper existiert, darf er Layout nicht „umstellen“ */
-#detail-actionbar-slot .detail-actionbar{
-  display: contents;
 }
 
 /* Buttons (können <a> oder <button> sein) */
@@ -2882,13 +2881,13 @@ Umfang:
   min-width: 72px;
   height: 56px;
 
-  padding: 8px 10px 7px;
+  padding: var(--space-sm) var(--space-md);
 
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-1);
 
   border-radius: var(--ui-radius-md);
   border: 1px solid rgba(31,41,51,0.10);
@@ -2947,7 +2946,7 @@ Umfang:
 /* Focus */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: 3px;
+  outline-offset: var(--space-1);
   border-radius: var(--ui-radius-md);
 }
 
@@ -2961,7 +2960,7 @@ Umfang:
   font-weight: 750;
 
   color: rgba(31,41,51,0.74);
-  margin-top: 2px;
+  margin-top: var(--space-1);
 
   max-width: 64px;
   text-align: center;
@@ -2987,7 +2986,7 @@ Umfang:
   object-fit: contain !important;
 }
 
-/* ROBUST GUARD: Detailpanel-SVGs/IMGs niemals “riesig” (Header/Meta/Location) */
+/* ROBUST GUARD: Detailpanel-SVGs/IMGs niemals “riesig” (Header/Meta/Location/Actionbar) */
 #event-detail-panel .detail-header svg,
 #event-detail-panel .detail-meta-chips svg,
 #event-detail-panel .detail-location-action svg,
