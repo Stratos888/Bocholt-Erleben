@@ -997,15 +997,49 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 
 
 
-/* Icon bleibt IMMER sichtbar, ruhig */
+/* === BEGIN BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) ===
+Zweck:
+- Kategorie ist reiner Indicator (keine Button-Anmutung), ruhig & hochwertig
+- In die Eventcard integriert (leichter Surface + feiner Border), ohne Dominanz
+Umfang:
+- Nur .event-title .event-category-icon (Eventcards)
+=== */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
 
-  font-size: 0.9rem;
-  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--space-xl);   /* 24px */
+  height: var(--space-xl);  /* 24px */
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.80);
+  border: 1px solid rgba(31,41,51,0.08);
+
+  color: rgba(31,41,51,0.56);
+  opacity: 0.95;
+
+  font-size: 14px;
+  line-height: 1;
+
   transform: none;
+  -webkit-tap-highlight-color: transparent;
 }
+
+/* Wenn das Icon als SVG/IMG kommt: clamp */
+.event-title .event-category-icon svg,
+.event-title .event-category-icon img{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+/* === END BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* === BEGIN POLISH: EVENT META PREMIUM CALMNESS === */
@@ -2109,15 +2143,15 @@ keine Token-Abweichung
 }
 /* === END FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD === */
 
-/* === BEGIN BLOCK: GS-02 HEADER RIGHT ICON CHROME (calm, aligned, consistent) ===
+/* === BEGIN BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) ===
 Zweck:
-- Header-right Icon (Kategorie/Calendar) wirkt wie echtes Control-Chrome (wie Close), ohne dominant zu sein
-- Visuelle Achse/Alignment zur Close-Fläche stabilisieren
+- Kategorie ist reiner Indicator (wie Eventcards), kein Control-Chrome wie Close
+- Exakt gleiche Außenhöhe/Alignment wie Header-Controls möglich, aber visuell klar sekundär
 Umfang:
 - Nur #event-detail-panel .detail-category-icon (+ ::before Reset)
 === */
 
-/* Icon: calm control-chrome aligned to close */
+/* Category indicator: same box size for alignment, calmer surface (no button-look) */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
 
@@ -2129,18 +2163,15 @@ Umfang:
   height: var(--dp-close-size);
   border-radius: 999px;
 
-  background: rgba(255,255,255,0.90);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(31,41,51,0.04);
+  border: 1px solid rgba(31,41,51,0.06);
+  box-shadow: none;
 
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.05),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  color: rgba(31,41,51,0.52);
+  opacity: 0.95;
 
-  color: rgba(31,41,51,0.62);
-  opacity: 0.92;
-
-  /* optische Baseline-Korrektur im Title-Row */
-  transform: translateY(-1px);
+  transform: none;
+  cursor: default;
 
   -webkit-tap-highlight-color: transparent;
 }
@@ -2151,7 +2182,7 @@ Umfang:
   background: none;
 }
 
-/* === END BLOCK: GS-02 HEADER RIGHT ICON CHROME (calm, aligned, consistent) === */
+/* === END BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) === */
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
@@ -3000,5 +3031,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
