@@ -2969,30 +2969,28 @@ def main() -> None:
         candidates = candidates or []
 
         total_candidates += len(candidates)
-        # === BEGIN BLOCK: SOURCE HEALTH ROW (per source, per run) ===
+
+        # === BEGIN BLOCK: MAIN LOOP SAFETY + DETAIL ENRICH INIT (indent+none-guard, v1) ===
         # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Pro Quelle Status + Kandidatenanzahl + neu geschriebene Zeilen protokollieren
+        # - Fix: korrekte Indentation im Main-Loop (Scope bleibt innerhalb der Source-Schleife)
+        # - Fix: candidates darf nie None sein (sonst 'NoneType is not iterable')
+        # - Init: Detail-Enrichment Budget/Cache pro Source
         # Umfang:
-        # - Schreibt NUR in Source_Health (separater Tab)
-        # === END BLOCK: SOURCE HEALTH ROW (per source, per run) ===
-written_before_source = total_written
+        # - Nur Main-Loop direkt vor der Kandidaten-Schleife
+        # === END BLOCK: MAIN LOOP SAFETY + DETAIL ENRICH INIT (indent+none-guard, v1) ===
 
-# === BEGIN BLOCK: MAIN LOOP DETAIL ENRICH INIT (budget+cache per source, v1) ===
-# Datei: scripts/discovery-to-inbox.py
-# Zweck:
-# - Budgetierter Detailseiten-Fetch im Main-Loop, nur zur Ergänzung von Location/Time,
-#   wenn Parser/Inferenz leer bleibt.
-# - Pro Quelle eigener Cache + Budget, damit es deterministisch und "nett" bleibt.
-# Umfang:
-# - Nur Initialisierung von lokalen Variablen vor der Kandidaten-Schleife.
-# === END BLOCK: MAIN LOOP DETAIL ENRICH INIT (budget+cache per source, v1) ===
-detail_enrich_budget = int(os.environ.get("MAX_DETAIL_ENRICH_MAIN", "12"))
-detail_enrich_timeout = int(os.environ.get("DETAIL_ENRICH_TIMEOUT", "12"))
-detail_enrich_count = 0
-detail_enrich_cache: Dict[str, str] = {}
+        if candidates is None:
+            candidates = []
 
-for c in candidates:
+        written_before_source = total_written
+
+        detail_enrich_budget = int(os.environ.get("MAX_DETAIL_ENRICH_MAIN", "12"))
+        detail_enrich_timeout = int(os.environ.get("DETAIL_ENRICH_TIMEOUT", "12"))
+        detail_enrich_count = 0
+        detail_enrich_cache: Dict[str, str] = {}
+
+        for c in candidates:
                        # === BEGIN BLOCK: RSS ARTICLE DATE SAFETY (allow missing event date) ===
             # Datei: scripts/discovery-to-inbox.py
             # Zweck:
