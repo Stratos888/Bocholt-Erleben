@@ -125,7 +125,7 @@ Umfang:
   /* === END FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) === */
 
 
-  /* === BEGIN BLOCK: UI CONTROL TOKENS (buttons/cta/focus) ===
+   /* === BEGIN BLOCK: UI CONTROL TOKENS (buttons/cta/focus) ===
   Zweck:
   - Single Source of Truth für Button/CTA DNA (Radius/Border/Surface/Shadow/Focus/Typo)
   - Werte spiegeln aktuelle UI, damit sich optisch möglichst wenig ändert.
@@ -138,9 +138,9 @@ Umfang:
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
-/* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
---ui-border-primary: rgba(139,207,74,0.45);
-/* === END FIX: RGBA ALPHA TYPO (ui-border-primary) === */
+ /* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
+ --ui-border-primary: rgba(139,207,74,0.45);
+ /* === END FIX: RGBA ALPHA TYPO (ui-border-primary) === */
 
   --ui-surface-soft: rgba(255,255,255,0.55);
   --ui-surface-soft-hover: rgba(255,255,255,0.74);
@@ -163,6 +163,20 @@ Umfang:
   --ui-font-size-control: 13px;
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
+
+  /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
+  Zweck:
+  - Single Source of Truth für Icon-DNA (Größen/Opacity)
+  - Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
+  Umfang:
+  - Nur Tokens, keine Selektoren.
+  === */
+  --ui-icon-size-sm: 16px;   /* Cards / Meta */
+  --ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
+  --ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
+  --ui-icon-opacity: 0.92;
+  /* === END BLOCK: ICON TOKENS (app-wide) === */
+
    /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
 
@@ -999,8 +1013,8 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 
 /* === BEGIN BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) ===
 Zweck:
-- Kategorie ist reiner Indicator (keine Button-Anmutung), ruhig & hochwertig
-- In die Eventcard integriert (leichter Surface + feiner Border), ohne Dominanz
+- Kategorie ist reiner Indicator (kein Chip/Badge/Control)
+- Gleiche Icon-DNA wie Actionbar, nur kleiner (sm)
 Umfang:
 - Nur .event-title .event-category-icon (Eventcards)
 === */
@@ -1012,32 +1026,31 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  width: var(--space-xl);   /* 24px */
-  height: var(--space-xl);  /* 24px */
-  border-radius: 999px;
+  width: var(--ui-icon-size-sm);
+  height: var(--ui-icon-size-sm);
 
-  background: rgba(255,255,255,0.80);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: none;
+  border: 0;
+  box-shadow: none;
 
-  color: rgba(31,41,51,0.56);
-  opacity: 0.95;
+  opacity: var(--ui-icon-opacity);
 
-  font-size: 14px;
+  font-size: var(--ui-icon-size-sm);
   line-height: 1;
 
   transform: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 /* Wenn das Icon als SVG/IMG kommt: clamp */
 .event-title .event-category-icon svg,
 .event-title .event-category-icon img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
+  width: var(--ui-icon-size-sm) !important;
+  height: var(--ui-icon-size-sm) !important;
+  max-width: var(--ui-icon-size-sm) !important;
+  max-height: var(--ui-icon-size-sm) !important;
   display: block !important;
   object-fit: contain !important;
+  opacity: var(--ui-icon-opacity);
 }
 /* === END BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) === */
 
@@ -2145,13 +2158,12 @@ keine Token-Abweichung
 
 /* === BEGIN BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) ===
 Zweck:
-- Kategorie ist reiner Indicator (wie Eventcards), kein Control-Chrome wie Close
-- Exakt gleiche Außenhöhe/Alignment wie Header-Controls möglich, aber visuell klar sekundär
+- Kategorie ist reiner Indicator (wie Actionbar), kein Control-Chrome
+- Exakt gleiche Icon-DNA über Tokens (md)
 Umfang:
 - Nur #event-detail-panel .detail-category-icon (+ ::before Reset)
 === */
 
-/* Category indicator: same box size for alignment, calmer surface (no button-look) */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
 
@@ -2159,16 +2171,17 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  width: var(--dp-close-size);
-  height: var(--dp-close-size);
-  border-radius: 999px;
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
 
-  background: rgba(31,41,51,0.04);
-  border: 1px solid rgba(31,41,51,0.06);
+  background: none;
+  border: 0;
   box-shadow: none;
 
-  color: rgba(31,41,51,0.52);
-  opacity: 0.95;
+  opacity: var(--ui-icon-opacity);
+
+  font-size: var(--ui-icon-size-md);
+  line-height: 1;
 
   transform: none;
   cursor: default;
@@ -2180,6 +2193,18 @@ Umfang:
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
+}
+
+/* SVG/IMG clamp */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+  max-width: var(--ui-icon-size-md) !important;
+  max-height: var(--ui-icon-size-md) !important;
+  display: block !important;
+  object-fit: contain !important;
+  opacity: var(--ui-icon-opacity);
 }
 
 /* === END BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) === */
@@ -2854,8 +2879,8 @@ Umfang:
 Zweck:
 - Actionbar Slot ist zuverlässig display:flex (Row) im Open-State
 - Buttons: Enterprise-States (hover/active/focus/disabled) ohne „bling“
-- Kein Layout-Shift bei Focus/States, Touch-Targets bleiben stabil
-- Reduced-Motion respektiert, Kontrast minimal stabilisiert
+- Icons sind app-weit konsistent über Tokens (Actionbar DNA)
+- Detailpanel Icon-Guards nutzen Tokens (keine „Riesen-Icons“)
 Umfang:
 - #detail-actionbar-slot Layout + hidden contract
 - .detail-actionbar-btn inkl. Icon/Label/States/Disabled
@@ -3037,36 +3062,38 @@ Umfang:
   text-overflow: ellipsis;
 }
 
-/* Icons: immer gleich groß (Actionbar) */
+/* Icons: Actionbar-DNA über Tokens (md) */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+  min-width: var(--ui-icon-size-md) !important;
+  min-height: var(--ui-icon-size-md) !important;
+  max-width: var(--ui-icon-size-md) !important;
+  max-height: var(--ui-icon-size-md) !important;
 
   display: block !important;
   flex: 0 0 auto !important;
 
-  opacity: 0.94;
+  opacity: var(--ui-icon-opacity);
   object-fit: contain !important;
 }
 
-/* Detailpanel Icon Guards (Header/Meta/Location/Actionbar) */
+/* Detailpanel Icon Guards (Header/Meta/Location/Actionbar) -> Tokens (md) */
 #event-detail-panel .detail-header svg,
 #event-detail-panel .detail-meta-chips svg,
 #event-detail-panel .detail-location-action svg,
 #event-detail-panel .detail-header img,
 #event-detail-panel .detail-meta-chips img,
 #event-detail-panel .detail-location-action img{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+  max-width: var(--ui-icon-size-md) !important;
+  max-height: var(--ui-icon-size-md) !important;
   display: block !important;
   object-fit: contain !important;
+
+  opacity: var(--ui-icon-opacity);
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
