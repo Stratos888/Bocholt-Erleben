@@ -128,25 +128,27 @@ Detailpanel is considered enterprise-frozen ONLY when ALL are true:
 FOUNDATION BASELINE (PREVIOUSLY ACHIEVED):
 
 - Focus trap + ESC close behavior stable
-- Scroll isolation stable (panel open: background locked; panel body scroll only)
+- Scroll isolation baseline was previously stable (panel open: background locked; intended: panel body scroll only)
 - Overlay stability guardrails applied (fixed overlays must never be clipped)
 - Touch targets meet enterprise minimum (close/actionbar)
 - Reduced Motion support present (prefers-reduced-motion)
 
-VISUAL DNA ALIGNMENT (PARTIALLY VERIFIED VIA CONSOLE PROOFS):
+VISUAL DNA ALIGNMENT (VERIFIED VIA CONSOLE PROOFS THIS SESSION):
 
-Verified (PASS proofs captured during work):
-- Meta last-child border-bottom removed
-- Location row border-bottom removed
-- Actionbar top border removed
-- Sheet radius (top-left/top-right) = 22px and grabber via ::before exists
+Verified (PASS proofs captured):
+- Header title reserve works (no collision with close): rightGapPx > 0
+- Category icon is indicator-only (18x18, transparent, no border/shadow/transform)
+- Meta block is a single enterprise info surface (grid + subtle bg + border + padding + radius)
+- Meta rows calm and consistent (no borders, readable muted color)
 
 REGRESSION BLOCKERS (NOT FIXED YET):
 
 Must be resolved before any “frozen baseline” claim:
-- Actionbar slot must be reliably `display:flex` (Row) in open state
-- Detailpanel icons (svg/img) must be clamped (no “Riesen-Icons”)
-- Proof suite must be green (no FAIL results for actionbar + icon sizing)
+- Scroll container contract is NOT active:
+  - #event-detail-panel .detail-panel-body computed overflowY = visible (should be auto)
+  - scrollPaddingBottom = auto (should be var(--dp-actionbar-reserve))
+  - canScroll = false in proof (needs verification under long content once overflow is correct)
+- Until fixed: bottom-overlap prevention cannot be claimed as enterprise-safe.
 
 FREEZE INSTRUCTION:
 
@@ -676,41 +678,28 @@ Detailpanel (Event Detail Overlay baseline frozen)
 ---
 
 # DECISIONS LOG
-2026-02-23
+2026-02-24
 
-Detailpanel UI Stabilization — Visual DNA Freeze (UI-only)
+Detailpanel UI Stabilization — Category Icon Semantics + Proof Snapshot
 
 Status:
 
-COMPLETED (Frozen baseline)
-
-Scope:
-
-UI only.
-
-No pipeline changes.
-
-No deploy/build changes.
+IN PROGRESS (Gate not claimable)
 
 Decision:
 
-Detailpanel serves as the Event Detail Page (overlay-based).
-Visual DNA aligned to Golden Screen baseline and now frozen.
+- Category icon is an INDICATOR (same purpose as Eventcards), NOT a control (must not look like Close).
+- GS-02 verification is proof-driven; no “frozen baseline” claim while scroll contract is failing.
 
-Applied:
+Proof snapshot (captured):
 
-- Title/header hierarchy aligned (incl. small-screen behavior)
-- Meta rows calmed and consistent (color/weight/line-height)
-- Location row aligned to meta DNA
-- Divider density reduced (no table feel)
-- Description typography calmed
-- Actionbar consolidated (sizing/radius/shadow/states)
-- Calendar icon token consistency enforced within Detailpanel (date/actionbar/category fallback)
+- Header reserve: rightGapPx = 80; paddingRight = 54px
+- Category icon: 18x18, transparent, no border/shadow/transform; opacity 0.92
+- Meta block: display grid; bg rgba(31,41,51,0.027); border 1px solid rgba(31,41,51,0.06); padding 8px; radius 14px
+- Scroll contract FAIL: detail-panel-body overflowY visible; scrollPaddingBottom auto
+- Token present: --dp-actionbar-reserve = calc(78px + max(0px, 0px) + 24px)
 
-Freeze rule:
-
-Only bug fixes allowed unless explicit unfreeze decision is recorded.
-2026-02-22
+2026-02-23
 
 Discovery Pipeline — Inbox Writeback API Stabilization (row_number writeback reliability)
 
@@ -1286,14 +1275,13 @@ Update SESSION STATE
 
 OVERALL STATUS:
 
-UI: DETAILPANEL REGRESSION INVESTIGATION (Actionbar layout + icon sizing proofs failing)
+UI: DETAILPANEL REGRESSION INVESTIGATION — HEADER/META PASS (proofs green), SCROLL CONTRACT FAIL (detail-panel-body overflowY visible, scrollPaddingBottom auto)
 
 PIPELINE: IN PROGRESS (TASK 4 BACKFILL ACTIVE)
 
 LAST UPDATE:
 
 2026-02-24
-
 ---
 
 # END OF FILE
