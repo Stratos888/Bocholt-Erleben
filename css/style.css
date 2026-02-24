@@ -2242,6 +2242,14 @@ Umfang:
 
   width: 100%;
 
+/* === BEGIN BLOCK: CSS PARSER REPAIR (Detail Location Row duplicate removal)
+Zweck:
+- Entfernt einen CSS-Parser-Break durch doppelte/ineinander geschachtelte Kommentare + unvollständigen Selector
+- Stellt sicher, dass nachfolgende Detailpanel-Regeln wieder geladen werden (Actionbar flex + Icon-Guards etc.)
+Umfang:
+- Konsolidiert den Block rund um .detail-location-action inkl. :active-Feedback
+=== */
+
 /* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
 Zweck:
 - Location-Row visuell wie Feed-Meta (ruhig), nicht „bold/section“
@@ -2264,8 +2272,7 @@ Umfang:
 
   background: rgba(31,41,51,0.028);
   border: 1px solid rgba(31,41,51,0.06);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.70) inset;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 
   color: rgba(60,72,88,0.68);   /* wie .event-meta */
   text-decoration: none;
@@ -2275,13 +2282,17 @@ Umfang:
 /* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
 
 
-/* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) ===
+/* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap)
 Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
 Umfang: Nur :active
 === */
-Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
-Umfang: Nur :active
-=== */
+#event-detail-panel .detail-location-action:active{
+  background: rgba(31,41,51,0.04);
+  border-color: rgba(31,41,51,0.10);
+}
+/* === END BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) === */
+
+/* === END BLOCK: CSS PARSER REPAIR (Detail Location Row duplicate removal) === */
 #event-detail-panel .detail-location-action:active{
   background: rgba(31,41,51,0.04);
 }
@@ -3004,3 +3015,4 @@ body.is-panel-open #detail-actionbar-slot[hidden]{
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
