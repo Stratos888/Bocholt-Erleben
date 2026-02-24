@@ -2821,15 +2821,15 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- Actionbar als „Dock“ wie Enterprise-Apps: Teil derselben Surface, kein Extra-Panel
-- FIX: Slot ist IMMER Flex-Row (egal ob Buttons direkt oder via Wrapper .detail-actionbar)
-- FIX: Slot darf bei offenem Panel niemals display:none sein (auch nicht via [hidden])
-- Robuster Icon-Guard: verhindert „Riesen-Icons“ (SVG/IMG) im Detailpanel zuverlässig
-- Kein Gradient (wirkt billig)
+- FIX Root Cause: entfernt kaputte/abgeschnittene Selektoren, hält den CSS-Parser „alive“
+- Actionbar ist zuverlässig sichtbar und IMMER eine Flex-Row (Slot selbst ist die Row)
+- Robuster Icon-Guard (SVG/IMG) im Detailpanel: keine Riesen-Icons mehr
+- Kein Gradient (billig), stattdessen ruhige Surface-Continuity wie Feed
 Umfang:
 - #detail-actionbar-slot Layout + Surface
 - optionaler Wrapper .detail-actionbar (fallback)
 - .detail-actionbar-btn inkl. Icon/Label/States
+- Icon-Guards für Header/Meta/Location/Actionbar
 - .detail-sr-only
 === */
 
@@ -2846,17 +2846,7 @@ Umfang:
   border: 0 !important;
 }
 
-/* HARD GUARD: wenn Panel offen ist, darf Slot nie verborgen sein (auch nicht via [hidden]) */
-html.is-panel-open #detail-actionbar-slot,
-body.is-panel-open #detail-actionbar-slot{
-  display: flex !important;
-}
-html.is-panel-open #detail-actionbar-slot[hidden],
-body.is-panel-open #detail-actionbar-slot[hidden]{
-  display: flex !important;
-}
-
-/* Slot: immer über dem Sheet, stabile Safe-Area + immer Row */
+/* Slot: IMMER sichtbar + IMMER Row (Hard-Override gegen Regressionen) */
 #detail-actionbar-slot{
   position: absolute;
   left: 0;
@@ -2868,13 +2858,11 @@ body.is-panel-open #detail-actionbar-slot[hidden]{
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  /* FIX: Slot ist die Row */
-  display: flex;
+  display: flex !important;
   align-items: stretch;
   justify-content: center;
   gap: 10px;
 
-  /* Continuity: Teil derselben Surface, nur sehr softes Inset als Separator */
   border-top: 0;
   background: rgba(255,255,255,0.94);
   box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
@@ -2882,7 +2870,7 @@ body.is-panel-open #detail-actionbar-slot[hidden]{
   z-index: 6;
 }
 
-/* Fallback: falls ein Wrapper existiert, soll er NICHT das Layout kaputt machen */
+/* Fallback: falls Wrapper existiert, darf er Layout nicht „umstellen“ */
 #detail-actionbar-slot .detail-actionbar{
   display: contents;
 }
@@ -2946,7 +2934,7 @@ body.is-panel-open #detail-actionbar-slot[hidden]{
   }
 }
 
-/* Active (Tap): minimal “pressed” */
+/* Active (Tap): minimal pressed */
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
   background: rgba(31,41,51,0.04);
@@ -2999,7 +2987,7 @@ body.is-panel-open #detail-actionbar-slot[hidden]{
   object-fit: contain !important;
 }
 
-/* ROBUST GUARD: Detailpanel-SVGs niemals “riesig” (Header/Meta/Location) */
+/* ROBUST GUARD: Detailpanel-SVGs/IMGs niemals “riesig” (Header/Meta/Location) */
 #event-detail-panel .detail-header svg,
 #event-detail-panel .detail-meta-chips svg,
 #event-detail-panel .detail-location-action svg,
