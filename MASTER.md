@@ -1277,7 +1277,10 @@ OVERALL STATUS:
 
 UI: DETAILPANEL REGRESSION INVESTIGATION — HEADER/META PASS (proofs green), SCROLL CONTRACT FAIL (detail-panel-body overflowY visible, scrollPaddingBottom auto)
 
-PIPELINE: IN PROGRESS (TASK 4 BACKFILL ACTIVE)
+PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
+- Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
+- Aktuell Indentation-Regressionsrisiko im discovery-to-inbox Script (Run kann mit IndentationError abbrechen)
+- Hauptgap bleibt: Pflichtfeld-Vollständigkeit (insb. Location/Time) für „curation-ready“ Events
 
 LAST UPDATE:
 
