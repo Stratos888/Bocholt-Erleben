@@ -108,10 +108,15 @@ Umfang:
   --dp-sheet-radius: 22px;
   /* === END FIX: DETAILPANEL SHEET RADIUS (single source of truth) === */
 
+  /* === BEGIN BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) ===
+  Zweck: Spacing auf Skala (4/8/12/16/24/32) – entfernt 10px Magic Number.
+  Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
+  === */
   --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
   --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
-  --dp-actionbar-pad-y: 10px;           /* vertikales Padding in der Actionbar */
+  --dp-actionbar-pad-y: var(--space-sm); /* vertikales Padding in der Actionbar (8px) */
+  /* === END BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) === */
    /* === BEGIN FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) ===
   Zweck: Etwas mehr Reserve, damit Description garantiert komplett oberhalb der Actionbar endet.
   Umfang: Nur --dp-actionbar-reserve.
@@ -2228,59 +2233,55 @@ Umfang:
 
 /* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
 Zweck:
-- Location-Row visuell wie Feed-Meta (ruhig), nicht „bold/section“
-- bleibt klar klickbar (Chevron + Active-Feedback bleibt)
+- CSS-PARSER REPAIR: entfernt duplizierte/verschachtelte Block-Starts und stellt sicher,
+  dass nachfolgende Detailpanel-Regeln wieder geladen werden (Actionbar + Icon-Clamps).
+- Location-Row visuell wie Feed-Meta (ruhig), bleibt klar klickbar.
 Umfang:
-- Nur .detail-location-action Grundstil (Farbe/Typo)
+- Konsolidiert nur .detail-location-action (inkl. States).
 === */
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
 #event-detail-panel .detail-location-action:visited{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 
   width: 100%;
 
-/* === BEGIN BLOCK: CSS PARSER REPAIR (Detail Location Row duplicate removal)
-Zweck:
-- Entfernt einen CSS-Parser-Break durch doppelte/ineinander geschachtelte Kommentare + unvollständigen Selector
-- Stellt sicher, dass nachfolgende Detailpanel-Regeln wieder geladen werden (Actionbar flex + Icon-Guards etc.)
-Umfang:
-- Konsolidiert den Block rund um .detail-location-action inkl. :active-Feedback
-=== */
+  padding: var(--space-md) var(--gutter);
 
-/* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
-Zweck:
-- Location-Row visuell wie Feed-Meta (ruhig), nicht „bold/section“
-- bleibt klar klickbar (Chevron + Active-Feedback bleibt)
-Umfang:
-- Nur .detail-location-action Grundstil (Layout/Surface/Typo)
-=== */
-#event-detail-panel .detail-location-action,
-#event-detail-panel .detail-location-action:link,
-#event-detail-panel .detail-location-action:visited{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  width: 100%;
-
-  /* gleiche DNA wie Meta-Group: “embedded surface” statt Zeile */
-  padding: 10px 12px;
   border-radius: 14px;
+  border: 1px solid rgba(31,41,51,0.08);
+  background: rgba(255,255,255,0.72);
 
-  background: rgba(31,41,51,0.028);
-  border: 1px solid rgba(31,41,51,0.06);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
-
-  color: rgba(60,72,88,0.68);   /* wie .event-meta */
-  text-decoration: none;
+  color: rgba(31,41,51,0.86);
+  font-weight: 650;
+  text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+#event-detail-panel .detail-location-action:active{
+  transform: translateY(1px);
+  background: rgba(31,41,51,0.04);
+  border-color: rgba(31,41,51,0.12);
+}
+
+#event-detail-panel .detail-location-action:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: var(--space-1);
+}
+
+/* Static variant: same look, no hover/tap emphasis changes needed */
+#event-detail-panel .detail-location-action.is-static{
+  cursor: default;
 }
 /* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
-
 
 /* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap)
 Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
@@ -2821,12 +2822,12 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- Actionbar ist zuverlässig sichtbar und IMMER eine Flex-Row (Slot selbst ist die Row)
-- Robust gegen hidden-Attribut (UA styles) und Layout-Regressions
-- Robuster Icon-Guard (SVG/IMG) im Detailpanel: keine Riesen-Icons mehr
-- Spacing strikt nach erlaubter Skala (4/8/12/16/24/32)
+- Actionbar Slot ist zuverlässig display:flex (Row) im Open-State
+- Robust gegen [hidden] (UA styles)
+- Icons im Detailpanel werden geclamped (keine „Riesen-Icons“)
+- Spacing strikt nach Skala (Tokens)
 Umfang:
-- #detail-actionbar-slot Layout + Surface + hidden-contract
+- #detail-actionbar-slot Layout + hidden contract
 - .detail-actionbar-btn inkl. Icon/Label/States
 - Icon-Guards für Header/Meta/Location/Actionbar
 - .detail-sr-only
@@ -2845,12 +2846,12 @@ Umfang:
   border: 0 !important;
 }
 
-/* hidden-contract: UA [hidden] darf die Bar zuverlässig ausblenden */
+/* hidden-contract: UA [hidden] muss zuverlässig ausblenden */
 #detail-actionbar-slot[hidden]{
   display: none !important;
 }
 
-/* Slot: IMMER Row (Hard-Override gegen Regressionen) */
+/* Slot: IMMER Row (Hard-Override) */
 #detail-actionbar-slot{
   position: fixed;
   left: 0;
@@ -2922,7 +2923,6 @@ Umfang:
   text-decoration: none !important;
 }
 
-/* Hover (Desktop) */
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
     background: rgba(255,255,255,0.94);
@@ -2933,7 +2933,6 @@ Umfang:
   }
 }
 
-/* Active (Tap): minimal pressed */
 #detail-actionbar-slot .detail-actionbar-btn:active{
   transform: translateY(1px);
   background: rgba(31,41,51,0.04);
@@ -2943,7 +2942,6 @@ Umfang:
     0 1px 0 rgba(255,255,255,0.78) inset;
 }
 
-/* Focus */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: var(--space-1);
@@ -2970,7 +2968,7 @@ Umfang:
   text-overflow: ellipsis;
 }
 
-/* Icons: immer gleich groß, ruhig (Actionbar) */
+/* Icons: immer gleich groß (Actionbar) */
 #detail-actionbar-slot .detail-actionbar-btn svg,
 #detail-actionbar-slot .detail-actionbar-btn img{
   width: 18px !important;
@@ -2982,11 +2980,12 @@ Umfang:
 
   display: block !important;
   flex: 0 0 auto !important;
+
   opacity: 0.92;
   object-fit: contain !important;
 }
 
-/* ROBUST GUARD: Detailpanel-SVGs/IMGs niemals “riesig” (Header/Meta/Location/Actionbar) */
+/* Detailpanel Icon Guards (Header/Meta/Location/Actionbar) */
 #event-detail-panel .detail-header svg,
 #event-detail-panel .detail-meta-chips svg,
 #event-detail-panel .detail-location-action svg,
