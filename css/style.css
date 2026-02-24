@@ -2043,11 +2043,9 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT (single scroll authority) ===
 Zweck:
-- Dieses Element ist der EINZIGE Scroll-Container
-- verhindert Scroll-Propagation zum Viewport
-- stabile native Scroll-Physics auf iOS und Android
-- keine Seiteneffekte auf andere Layout-Elemente
-
+- EINZIGER Scroll-Container bleibt stabil
+- Scroll-Padding sorgt dafür, dass Fokus/Anker niemals unter die Actionbar rutschen
+- Kein Layout-Impact außerhalb des Panels
 === */
 
 #event-detail-panel .detail-panel-body{
@@ -2061,6 +2059,9 @@ Zweck:
   -webkit-overflow-scrolling: touch;
 
   overscroll-behavior: contain;
+
+  /* Wichtig: Fokus/Scroll-Into-View respektiert die Actionbar-Reserve */
+  scroll-padding-bottom: var(--dp-actionbar-reserve);
 
   padding: 0;
   box-sizing: border-box;
@@ -2096,11 +2097,11 @@ Zweck:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Header verhält sich wie Event-Card-DNA, auch bei 2 Zeilen Titel
-- Rechts (Kategorie + Close) wirkt „Topbar-like“, ohne den Titel optisch zu quetschen
-- Entfernt 16px-SVG-Sonderfall (Header-Icon folgt dem 18px SVG Guard im Detailpanel)
+- Header-Right Cluster (Kategorie + Close) ist exakt aligned (gleiche Achse, keine Offsets)
+- Title Row bleibt ruhig und kollidiert nie mit Close
+- Hit-Targets bleiben Enterprise-sicher (Close via ::before schon >=44px; Row-Alignment stabil)
 Umfang:
-- .detail-header + .detail-title-row + .detail-category-icon + .detail-title
+- .detail-header + .detail-title-row + .detail-title + .detail-category-icon
 === */
 
 /* Header / Title Row */
@@ -2108,38 +2109,28 @@ Umfang:
   position: relative;
 
   /* Kein doppeltes Top-Spacing: kommt aus #detail-content */
-  padding: 0 0 12px;
+  padding: 0 0 var(--space-md);
   margin: 0;
 
-  /* === BEGIN FIX: HEADER CONTINUITY (no modal divider) ===
-  Zweck:
-  - Entfernt “Modal-Header” Gefühl (keine harte Trennlinie)
-  - Rhythmus wie Feed: Struktur über Spacing statt Divider
-  Umfang:
-  - Nur Border-Reset im Header
-  === */
   border-bottom: 0;
-  /* === END FIX: HEADER CONTINUITY (no modal divider) === */
 }
 
+/* Title-Row: einheitliche Achse (Category + Title), Reserve für Close */
 #event-detail-panel .detail-title-row{
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
+  align-items: center;
+  gap: var(--space-sm);
 
-  /* etwas mehr Luft zum Close, damit es bei 2 Zeilen nie „gedrückt“ wirkt */
-  padding-right: calc(var(--dp-close-size) + var(--gutter) + 8px);
+  width: 100%;
+  min-height: var(--dp-close-size);
+
+  /* Reserve rechts: Close + Gutter + minimaler Abstand */
+  padding-right: calc(var(--dp-close-size) + var(--gutter) + var(--space-sm));
 }
 
 /* Title: wie Event-Card (Text dominiert, clamp) */
-/* === BEGIN FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD ===
-Zweck:
-100% identische Typografie wie .event-title
-keine Token-Abweichung
-=== */
 #event-detail-panel .detail-title{
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-sm);
   min-width: 0;
   flex: 1 1 auto;
 
@@ -2158,16 +2149,8 @@ keine Token-Abweichung
   word-break: normal;
   hyphens: auto;
 }
-/* === END FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD === */
 
-/* === BEGIN BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) ===
-Zweck:
-- Kategorie ist reiner Indicator (wie Actionbar), kein Control-Chrome
-- Exakt gleiche Icon-DNA über Tokens (md)
-Umfang:
-- Nur #event-detail-panel .detail-category-icon (+ ::before Reset)
-=== */
-
+/* Category Indicator: exakt mittig zur Title-Row Achse */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
 
@@ -2198,21 +2181,6 @@ Umfang:
   content: none;
   background: none;
 }
-
-/* SVG/IMG clamp */
-#event-detail-panel .detail-category-icon svg,
-#event-detail-panel .detail-category-icon img{
-  width: var(--ui-icon-size-md) !important;
-  height: var(--ui-icon-size-md) !important;
-  max-width: var(--ui-icon-size-md) !important;
-  max-height: var(--ui-icon-size-md) !important;
-  display: block !important;
-  object-fit: contain !important;
-  opacity: var(--ui-icon-opacity);
-}
-
-/* === END BLOCK: GS-02 HEADER RIGHT CATEGORY INDICATOR (non-control, aligned) === */
-
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
 
@@ -2228,19 +2196,18 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META ROWS (calmer, consistent dividers) ===
 Zweck:
-- Weg vom „Zeilenlisten“-Look → Meta wirkt wie ein ruhiger Info-Block (Feed-DNA)
-- Keine Divider-Linien, stattdessen Group-Surface + Whitespace
+- Meta wirkt wie ruhiger Enterprise-Info-Block (klarer Rhythmus, keine “Zeilenliste”)
+- Token-Skala (Spacing), bessere Lesbarkeit (Kontrast), saubere Baseline
 Umfang:
-- .detail-meta-chips + .detail-chip (+ hover/active-feel ohne “Button-Look”)
+- #event-detail-panel .detail-meta-chips + .detail-chip
 === */
 #event-detail-panel .detail-meta-chips{
   display: grid;
-  gap: 4px;
-  margin: 0 0 12px;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-md);
 
-  /* Group Surface (wie “embedded card”) */
-  padding: 10px 10px;
-  border-radius: 14px;
+  padding: var(--space-sm) var(--space-sm);
+  border-radius: var(--ui-radius-md);
 
   background: rgba(31,41,51,0.028);
   border: 1px solid rgba(31,41,51,0.06);
@@ -2248,25 +2215,25 @@ Umfang:
     0 1px 0 rgba(255,255,255,0.70) inset;
 }
 
-/* Meta-Row selbst: ruhig, nicht “chip”, aber klar strukturiert */
+/* Meta-Row: ruhig, nicht “Button”, aber klar strukturiert */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 
   width: 100%;
   max-width: 100%;
 
-  padding: 8px 8px;
+  padding: var(--space-sm) var(--space-sm);
   border: 0;
 
-  border-radius: 12px;
+  border-radius: var(--ui-radius-sm);
   background: transparent;
 
   font-size: var(--font-event-meta);
-  line-height: 1.28;
-  font-weight: 400;
-  color: rgba(60,72,88,0.68);
+  line-height: 1.32;
+  font-weight: 450;
+  color: rgba(31,41,51,0.74);
 
   cursor: default;
   user-select: text;
@@ -3101,4 +3068,5 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
