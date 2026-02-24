@@ -2109,35 +2109,49 @@ keine Token-Abweichung
 }
 /* === END FIX: DETAIL TITLE FONT EXACT MATCH EVENT CARD === */
 
-/* Icon: ruhig, inline am Titelende (folgt SVG-Guard = 18px) */
+/* === BEGIN BLOCK: GS-02 HEADER RIGHT ICON CHROME (calm, aligned, consistent) ===
+Zweck:
+- Header-right Icon (Kategorie/Calendar) wirkt wie echtes Control-Chrome (wie Close), ohne dominant zu sein
+- Visuelle Achse/Alignment zur Close-Fläche stabilisieren
+Umfang:
+- Nur #event-detail-panel .detail-category-icon (+ ::before Reset)
+=== */
+
+/* Icon: calm control-chrome aligned to close */
 #event-detail-panel .detail-category-icon{
   flex: 0 0 auto;
 
-  position: static;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  width: auto;
-  height: auto;
+  width: var(--dp-close-size);
+  height: var(--dp-close-size);
+  border-radius: 999px;
 
-  /* kleine optische Baseline-Korrektur bei SVG/Emoji */
-  margin-top: 1px;
+  background: rgba(255,255,255,0.90);
+  border: 1px solid rgba(31,41,51,0.08);
 
-  font-size: 0.9rem;
-  line-height: 1;
-  opacity: 0.75;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.05),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 
-  color: inherit;
+  color: rgba(31,41,51,0.62);
+  opacity: 0.92;
+
+  /* optische Baseline-Korrektur im Title-Row */
+  transform: translateY(-1px);
+
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* WICHTIG: keine 16px-Spezialgröße mehr – das kommt aus dem globalen SVG Guard (18px) */
-
-/* SVG-Override deaktivieren (Event-Card-DNA: Emoji/Text Icon möglich) */
+/* SVG/Emoji/Text Icon: keine pseudo-Overlays */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
 }
+
+/* === END BLOCK: GS-02 HEADER RIGHT ICON CHROME (calm, aligned, consistent) === */
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
@@ -2231,14 +2245,16 @@ Umfang:
 /* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
 
 
-/* === BEGIN FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) ===
+/* === BEGIN BLOCK: GS-02 LOCATION ROW (enterprise surface + states + scale) ===
 Zweck:
-- CSS-PARSER REPAIR: entfernt duplizierte/verschachtelte Block-Starts und stellt sicher,
-  dass nachfolgende Detailpanel-Regeln wieder geladen werden (Actionbar + Icon-Clamps).
-- Location-Row visuell wie Feed-Meta (ruhig), bleibt klar klickbar.
+- Location-Row wirkt wie Meta-Block (ruhig, hochwertig), bleibt aber klar “navigierbar”
+- Spacing strikt auf Skala (Tokens), keine Magic Numbers
+- Focus/Active verlässlich und konsistent
 Umfang:
-- Konsolidiert nur .detail-location-action (inkl. States).
+- .detail-location-action (+ states)
+- .detail-location-icon / .detail-location-text / .detail-location-chev
 === */
+
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
 #event-detail-panel .detail-location-action:visited{
@@ -2254,8 +2270,9 @@ Umfang:
   border: 1px solid rgba(31,41,51,0.08);
   background: rgba(255,255,255,0.72);
 
-  color: rgba(31,41,51,0.86);
-  font-weight: 650;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+
+  color: rgba(31,41,51,0.84);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
@@ -2264,6 +2281,13 @@ Umfang:
     background 140ms ease,
     border-color 140ms ease,
     transform 140ms ease;
+}
+
+@media (hover: hover){
+  #event-detail-panel .detail-location-action:hover{
+    background: rgba(255,255,255,0.86);
+    border-color: rgba(31,41,51,0.10);
+  }
 }
 
 #event-detail-panel .detail-location-action:active{
@@ -2275,75 +2299,50 @@ Umfang:
 #event-detail-panel .detail-location-action:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: var(--space-1);
+  border-radius: 14px;
 }
 
-/* Static variant: same look, no hover/tap emphasis changes needed */
+/* Static variant */
 #event-detail-panel .detail-location-action.is-static{
   cursor: default;
-}
-/* === END FIX: DETAIL LOCATION ROW MUST FEEL LIKE META (not headline) === */
-
-/* === BEGIN BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap)
-Zweck: Tap fühlt sich wie Controls im Feed an (ruhig, aber eindeutig)
-Umfang: Nur :active
-=== */
-#event-detail-panel .detail-location-action:active{
-  background: rgba(31,41,51,0.04);
-  border-color: rgba(31,41,51,0.10);
-}
-/* === END BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) === */
-
-/* === END BLOCK: CSS PARSER REPAIR (Detail Location Row duplicate removal) === */
-#event-detail-panel .detail-location-action:active{
-  background: rgba(31,41,51,0.04);
-}
-/* === END BLOCK: DETAIL LOCATION ACTIVE FEEL (premium tap) === */
-
-#event-detail-panel .detail-location-action.is-static{
-  opacity: 0.82;
   transform: none !important;
+  opacity: 0.86;
 }
 #event-detail-panel .detail-location-action.is-static:active{
-  background: transparent;
   transform: none;
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(31,41,51,0.08);
 }
 
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
-  opacity: 0.86;
+  opacity: 0.88;
 }
 
-/* === BEGIN FIX: DETAIL LOCATION TEXT TYPO MATCH META RHYTHM ===
-Zweck:
-- keine „fette“ Location im Detailpanel
-- Rhythmus wie .event-meta
-Umfang:
-- Nur .detail-location-text
-=== */
 #event-detail-panel .detail-location-text{
   min-width: 0;
   flex: 1 1 auto;
 
   font-size: 14px;
-  font-weight: 400;      /* wie Meta (nicht fett) */
-  line-height: 1.28;     /* wie .event-meta */
+  font-weight: 650;
+  line-height: 1.28;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* === END FIX: DETAIL LOCATION TEXT TYPO MATCH META RHYTHM === */
 
 #event-detail-panel .detail-location-chev{
   flex: 0 0 auto;
 
-  /* ruhiger, weniger “zieht Aufmerksamkeit” */
-  margin-left: 6px;
-  opacity: 0.58;
+  margin-left: var(--space-sm);
+  opacity: 0.60;
 
   font-size: 18px;
   line-height: 1;
 }
+
+/* === END BLOCK: GS-02 LOCATION ROW (enterprise surface + states + scale) === */
 
 /* Description: ruhiger Textblock */
 /* === BEGIN BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
@@ -3001,4 +3000,5 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
