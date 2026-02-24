@@ -2853,12 +2853,12 @@ Umfang:
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
 - Actionbar Slot ist zuverlässig display:flex (Row) im Open-State
-- Robust gegen [hidden] (UA styles)
-- Icons im Detailpanel werden geclamped (keine „Riesen-Icons“)
-- Spacing strikt nach Skala (Tokens)
+- Buttons: Enterprise-States (hover/active/focus/disabled) ohne „bling“
+- Kein Layout-Shift bei Focus/States, Touch-Targets bleiben stabil
+- Reduced-Motion respektiert, Kontrast minimal stabilisiert
 Umfang:
 - #detail-actionbar-slot Layout + hidden contract
-- .detail-actionbar-btn inkl. Icon/Label/States
+- .detail-actionbar-btn inkl. Icon/Label/States/Disabled
 - Icon-Guards für Header/Meta/Location/Actionbar
 - .detail-sr-only
 === */
@@ -2921,10 +2921,10 @@ Umfang:
   gap: var(--space-1);
 
   border-radius: var(--ui-radius-md);
-  border: 1px solid rgba(31,41,51,0.10);
+  border: 1px solid var(--ui-border-soft);
 
   background: rgba(255,255,255,0.86);
-  color: rgba(31,41,51,0.88);
+  color: rgba(31,41,51,0.90);
 
   box-shadow:
     0 10px 20px rgba(0,0,0,0.055),
@@ -2937,12 +2937,15 @@ Umfang:
   text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
 
+  cursor: pointer;
+
   transition:
     background 140ms ease,
     border-color 140ms ease,
     box-shadow 140ms ease,
     transform 140ms ease,
-    color 140ms ease;
+    color 140ms ease,
+    opacity 140ms ease;
 }
 
 /* Links: in allen States niemals unterstreichen */
@@ -2953,29 +2956,65 @@ Umfang:
   text-decoration: none !important;
 }
 
+/* Hover (Desktop) */
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(255,255,255,0.94);
-    border-color: rgba(31,41,51,0.14);
+    background: rgba(255,255,255,0.92);
+    border-color: var(--ui-border-strong);
     box-shadow:
       0 12px 26px rgba(0,0,0,0.070),
       0 1px 0 rgba(255,255,255,0.82) inset;
   }
 }
 
+/* Active (Tap): spürbar, aber subtil */
 #detail-actionbar-slot .detail-actionbar-btn:active{
-  transform: translateY(1px);
-  background: rgba(31,41,51,0.04);
-  border-color: rgba(31,41,51,0.14);
+  transform: translateY(1px) scale(0.99);
+  background: rgba(31,41,51,0.05);
+  border-color: var(--ui-border-strong);
   box-shadow:
     0 8px 18px rgba(0,0,0,0.055),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
+/* Focus: sichtbar, ohne Layout-Jump */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: var(--space-1);
   border-radius: var(--ui-radius-md);
+}
+
+/* Disabled (alle gängigen Formen) */
+#detail-actionbar-slot .detail-actionbar-btn[disabled],
+#detail-actionbar-slot .detail-actionbar-btn.is-disabled,
+#detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]{
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.035),
+    0 1px 0 rgba(255,255,255,0.70) inset;
+}
+#detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]{
+  pointer-events: none;
+}
+@media (hover: hover){
+  #detail-actionbar-slot .detail-actionbar-btn[disabled]:hover,
+  #detail-actionbar-slot .detail-actionbar-btn.is-disabled:hover,
+  #detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]:hover{
+    background: rgba(255,255,255,0.86);
+    border-color: var(--ui-border-soft);
+    box-shadow:
+      0 6px 14px rgba(0,0,0,0.035),
+      0 1px 0 rgba(255,255,255,0.70) inset;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce){
+  #detail-actionbar-slot .detail-actionbar-btn{
+    transition: none;
+  }
 }
 
 /* Label (klein) – kommt aus title */
@@ -2987,7 +3026,7 @@ Umfang:
   line-height: 1.1;
   font-weight: 750;
 
-  color: rgba(31,41,51,0.74);
+  color: rgba(31,41,51,0.76);
   margin-top: var(--space-1);
 
   max-width: 64px;
@@ -3011,7 +3050,7 @@ Umfang:
   display: block !important;
   flex: 0 0 auto !important;
 
-  opacity: 0.92;
+  opacity: 0.94;
   object-fit: contain !important;
 }
 
@@ -3031,6 +3070,3 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
-
-
