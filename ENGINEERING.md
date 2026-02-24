@@ -138,6 +138,8 @@ Request clarification.
 
 ---
 
+<!-- === BEGIN REPLACEMENT BLOCK: ROOT CAUSE + EVIDENCE PACK + SCORECARD + FIXTURES | Scope: replaces Root Cause section only === -->
+
 # ROOT CAUSE RULE
 
 Never apply speculative fixes.
@@ -148,13 +150,113 @@ Apply minimal correction.
 
 ---
 
+# EVIDENCE PACK RULE (SPEED WITHOUT GUESSING)
+
+For any change that claims improvement (UI, pipeline, deploy, caching, parsing):
+Provide a minimal Evidence Pack before proposing the patch:
+
+- Repro: exact steps / input / page / source that shows the problem
+- Observation: what is currently happening (symptom)
+- Cause: why it happens (root cause in code/data)
+- Proof: how we verify the fix (observable signal)
+
+If an Evidence Pack cannot be produced from available material:
+Stop and request the missing artifact (file, sample HTML, logs, screenshot).
+
+---
+
+# PIPELINE SCORECARD RULE (ENTERPRISE OBSERVABILITY)
+
+For pipeline work, success must be measurable per run.
+
+Any pipeline change must define or update a Scorecard output with:
+- candidates_total
+- inbox_new
+- inbox_updated (backfill)
+- dates_filled
+- times_filled
+- false_positive_reasons_top (at least top 3)
+- source_health summary (success/fail + fetch counts)
+
+No “it should be better” fixes without Scorecard delta.
+
+---
+
+# FIXTURE RULE (PREVENTS REGRESSIONS + ACCELERATES ITERATION)
+
+When adding/changing extraction logic:
+Create/extend fixtures (saved sample HTML snippets) for:
+- at least 1 positive example (real event)
+- at least 1 negative example (impressum/datenschutz/blog publish date)
+
+Fixes must be validated against fixtures to avoid re-breaking solved cases.
+
+<!-- === END REPLACEMENT BLOCK: ROOT CAUSE + EVIDENCE PACK + SCORECARD + FIXTURES === -->
+
+---
+
+<!-- === BEGIN REPLACEMENT BLOCK: UI MODIFICATION (Batch Mode + Component Contract + Golden Screen verification) | Scope: replaces UI modification rules only === -->
+
 # UI MODIFICATION RULE
 
+Default:
 UI polish must be CSS-only whenever possible.
 
 Avoid structural DOM changes.
 
 Avoid JS changes unless necessary.
+
+---
+
+# UI BATCH MODE (ENTERPRISE LEAPS WITHOUT CHAOS)
+
+Purpose:
+Enable fewer iterations with larger, system-level UI improvements.
+
+Allowed when MASTER.md defines an “Enterprise Gate Closure Workpack”:
+
+- Still ONE FILE per change (typically css/style.css)
+- Allowed to replace larger consolidated blocks (tokens + component mapping) in that one file
+- Changes must be systemic (component-level), not scattered one-off overrides
+- Must be validated against the Enterprise UI Rubric for the target screen
+
+Disallowed in UI Batch Mode:
+- touching multiple files
+- ad-hoc per-page overrides that bypass component mapping
+- micro-tweaks that do not move rubric score
+
+---
+
+# COMPONENT MAPPING CONTRACT (SINGLE SOURCE OF TRUTH)
+
+In CSS, enterprise UI must be driven by:
+1) Tokens (spacing, radius, typography, shadows, colors)
+2) Component mapping blocks for:
+   - Buttons (primary/secondary/ghost)
+   - Cards / surfaces
+   - Dividers
+   - Links
+   - Inputs
+   - Focus styles
+
+Rule:
+If a UI issue repeats across screens, fix it in tokens/mapping, not per-screen.
+
+---
+
+# GOLDEN SCREEN VERIFICATION RULE (NO VISUAL GUESSING)
+
+For UI changes:
+Verification must target a Golden Screen and include:
+- mobile + desktop check
+- long text stress check (overflow prevention)
+- focus + keyboard check (visible focus)
+- no layout jump check for conditional UI
+
+If Golden Screen reference is missing:
+Stop and request screenshot or exact reproduction details.
+
+<!-- === END REPLACEMENT BLOCK: UI MODIFICATION (Batch Mode + Component Contract + Golden Screen verification) === -->
 
 ---
 
