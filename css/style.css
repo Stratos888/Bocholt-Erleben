@@ -1013,8 +1013,8 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
 
 /* === BEGIN BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) ===
 Zweck:
-- Kategorie ist reiner Indicator (kein Chip/Badge/Control)
-- Gleiche Icon-DNA wie Actionbar, nur kleiner (sm)
+- Kategorie-Icon auf Eventcards = gleiches Icon-System wie Actionbar (ruhig, neutral, tokenized)
+- Funktioniert für Emoji/Text-Icons (span) ohne svg/img (dein aktueller Fall)
 Umfang:
 - Nur .event-title .event-category-icon (Eventcards)
 === */
@@ -1026,17 +1026,20 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  width: var(--ui-icon-size-sm);
-  height: var(--ui-icon-size-sm);
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
 
   background: none;
   border: 0;
   box-shadow: none;
 
-  opacity: var(--ui-icon-opacity);
-
-  font-size: var(--ui-icon-size-sm);
+  /* Emoji/Text Icons */
+  font-size: var(--ui-icon-size-md);
   line-height: 1;
+
+  /* Make emoji/text icon feel like the app icon set */
+  opacity: var(--ui-icon-opacity);
+  filter: grayscale(1) saturate(0) brightness(0.55);
 
   transform: none;
 }
@@ -1044,13 +1047,14 @@ Umfang:
 /* Wenn das Icon als SVG/IMG kommt: clamp */
 .event-title .event-category-icon svg,
 .event-title .event-category-icon img{
-  width: var(--ui-icon-size-sm) !important;
-  height: var(--ui-icon-size-sm) !important;
-  max-width: var(--ui-icon-size-sm) !important;
-  max-height: var(--ui-icon-size-sm) !important;
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+  max-width: var(--ui-icon-size-md) !important;
+  max-height: var(--ui-icon-size-md) !important;
   display: block !important;
   object-fit: contain !important;
   opacity: var(--ui-icon-opacity);
+  filter: none;
 }
 /* === END BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) === */
 
@@ -3097,3 +3101,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
