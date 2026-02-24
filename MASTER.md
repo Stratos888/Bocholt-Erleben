@@ -278,10 +278,7 @@ PWA CORE
 
 ---
 
-<!-- === BEGIN REPLACEMENT BLOCK: UI BASELINE (Enterprise Rubric + Workpacks + Freeze policy) | Scope: replaces UI BASELINE section only === -->
-
 <!-- === BEGIN REPLACEMENT BLOCK: UI BASELINE + ENTERPRISE RUBRIC + GOLDEN SCREENS (Canonical Set & Rules) | Scope: replaces the entire UI BASELINE section === -->
-
 # UI BASELINE
 
 Mandatory visual rules:
@@ -1221,165 +1218,22 @@ Scope-Hinweis:
 
 # NEXT PRIORITIES (DO NOT START YET)
 
-/* === BEGIN INSERT: GOLDEN SCREEN BASELINE + NEXT PRIORITIES (Enterprise Freeze Definition) === */
+/* === BEGIN REPLACEMENT: GOLDEN SCREEN BASELINE + NEXT PRIORITIES (Canonical reference only) | Scope: removes legacy conflicting GS-01 DoD block === */
 
-# GOLDEN SCREEN BASELINE — ENTERPRISE FREEZE DEFINITION
+# GOLDEN SCREEN BASELINE — CANONICAL REFERENCE
 
-This section defines the mandatory enterprise-level baseline for the Events Feed first viewport.
+Golden Screens are defined exclusively in:
 
-This Golden Screen becomes the permanent visual and UX reference for the entire app.
+# GOLDEN SCREENS (CANONICAL SET + RULES)
 
-After completion, it must be frozen.
+Rule:
+There must be no second/legacy Golden Screen DoD elsewhere in this file.
 
----
+Notes:
+- GS-01 (Event Feed) is already enterprise-baseline frozen per Decisions Log (2026-02-20).
+- Next Golden Screen work happens via Workpacks against GS-02..GS-06 as defined in the canonical set.
 
-## GOLDEN SCREEN SCOPE
-
-Golden Screen is defined as:
-
-First visible viewport of Events Feed without scrolling.
-
-Includes:
-
-Event Feed container  
-First visible Event Cards  
-Card spacing rhythm  
-Typography hierarchy  
-Surface system  
-
-Does NOT include:
-
-Detailpanel  
-Other pages  
-
----
-
-## GOLDEN SCREEN DEFINITION OF DONE
-
-All criteria MUST be fulfilled.
-
-### SPACING
-
-Only token spacing allowed:
-
-4  
-8  
-12  
-16  
-24  
-32  
-
-Card internal padding: 16px
-
-Card vertical spacing: 16px
-
-No non-token spacing values allowed.
-
----
-
-### TYPOGRAPHY
-
-Title:
-
-18–20px  
-600 weight  
-Line height 1.2–1.3  
-
-Meta:
-
-14–15px  
-400 weight  
-Line height 1.4–1.5  
-
-Clear visual hierarchy required.
-
----
-
-### SURFACE SYSTEM
-
-Page background, card surface, and borders must use only defined tokens.
-
-No hardcoded colors allowed.
-
-Card radius must use radius token only.
-
----
-
-### VISUAL HIERARCHY
-
-User eye must naturally focus on title of first visible card.
-
-No visual clutter allowed.
-
-No unnecessary dividers allowed.
-
-Whitespace must define structure.
-
----
-
-### RHYTHM
-
-Vertical rhythm must be perfectly consistent.
-
-Card  
-24px  
-Card  
-24px  
-Card  
-
-No deviation allowed.
-
----
-
-### INTERACTION REALISM
-
-Card must provide immediate press feedback.
-
-Card must feel like native app component.
-
-No delayed feedback allowed.
-
----
-
-### PERCEPTION TEST
-
-Golden Screen must pass this test:
-
-A first-time user viewing for 3 seconds perceives:
-
-professional quality  
-clear structure  
-high trust  
-
-User must perceive this as app-level product, not generic webpage.
-
----
-
-## FREEZE RULE
-
-After Golden Screen Definition of Done is achieved:
-
-Golden Screen must be frozen.
-
-No further visual modifications allowed.
-
-Only bug fixes allowed.
-
-Golden Screen becomes baseline reference for entire product.
-
----
-
-# NEXT PRIORITIES (DO NOT START YET)
-
-Organizer onboarding funnel
-
-Monetization system
-
-Organizer submission system
-
-Account system
-
-/* === END INSERT: GOLDEN SCREEN BASELINE + NEXT PRIORITIES (Enterprise Freeze Definition) === */
+/* === END REPLACEMENT: GOLDEN SCREEN BASELINE + NEXT PRIORITIES (Canonical reference only) === */
 
 # SESSION CLOSE PROTOCOL
 
