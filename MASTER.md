@@ -280,6 +280,8 @@ PWA CORE
 
 <!-- === BEGIN REPLACEMENT BLOCK: UI BASELINE (Enterprise Rubric + Workpacks + Freeze policy) | Scope: replaces UI BASELINE section only === -->
 
+<!-- === BEGIN REPLACEMENT BLOCK: UI BASELINE + ENTERPRISE RUBRIC + GOLDEN SCREENS (Canonical Set & Rules) | Scope: replaces the entire UI BASELINE section === -->
+
 # UI BASELINE
 
 Mandatory visual rules:
@@ -304,6 +306,7 @@ Max primary actions per screen: 2
 Avoid unnecessary dividers
 No layout jumps when conditional UI appears/disappears (e.g. Install button)
 Touch targets: primary controls >= 44px
+Reduced motion must be respected (prefers-reduced-motion)
 
 Visual goal:
 
@@ -357,20 +360,63 @@ Each item is PASS/FAIL.
 
 ---
 
-# UI EXECUTION MODE (FASTER ENTERPRISE PROGRESS)
+# GOLDEN SCREENS (CANONICAL SET + RULES)
+
+Golden Screens are the permanent visual reference set for enterprise-grade UX.
+They exist to eliminate subjective “feels better” loops.
 
 Rule:
+All UI work must target one Golden Screen at a time.
+
+Canonical set (IDs are stable and referenced in chat workpacks):
+
+GS-01 — Event Feed (Home):
+- Header + filter/search + event list cards
+- Install button may appear/disappear without layout jump
+
+GS-02 — Detailpanel (Event Detail Overlay):
+- Title/meta/location/description/actions
+- Long text stress test
+- Focus/ESC/overlay click behavior stable
+
+GS-03 — /info/ Hub:
+- Explanation + trust + primary CTA “Event veröffentlichen”
+- Navigation block (links) must feel enterprise and calm
+
+GS-04 — /events-veroeffentlichen/ (Organizer Funnel):
+- CTA hierarchy, form/steps, error states, focus states
+- Must feel trustworthy and conversion-strong
+
+GS-05 — Locations Modal:
+- Trust story + “ab 9,99€” principle + CTA
+- No tariff table; no visual favoritism
+
+GS-06 — “Empty / Edge States”:
+- No events, offline, fetch error, loading states
+- Must not look broken; messaging calm and clear
+
+Golden Screen verification checklist (mandatory per UI workpack):
+- mobile + desktop check
+- long text / overflow check
+- focus + keyboard check (visible focus)
+- no layout jump check for conditional UI
+- reduced motion check
+
+---
+
+# UI EXECUTION MODE (FASTER ENTERPRISE PROGRESS)
+
 UI changes are executed as “Enterprise Gate Closure Workpacks”.
 
-Workpack definition:
-- One target screen (Golden Screen)
-- Rubric gap list (top 3 failing items)
-- One consolidated CSS-only patch that fixes gaps systemically (tokens + component mapping)
-- Result must move score measurably (not micro-tweaks)
+Workpack definition (in chat, not in MASTER):
+- Choose 1 Golden Screen (GS-xx)
+- List top 3 failing rubric items (PASS/FAIL delta target)
+- Apply one consolidated CSS-only patch (tokens + component mapping)
+- Re-score rubric after patch (must improve measurably)
 
 Anti-rule:
 No endless micro-iterations.
-If a patch does not change rubric score, stop and redesign the patch approach.
+If a patch does not improve rubric score, stop and redesign the patch approach.
 
 ---
 
@@ -378,8 +424,8 @@ If a patch does not change rubric score, stop and redesign the patch approach.
 
 A UI area may be marked “Completed” for baseline stability.
 A UI area is “Frozen” ONLY after:
-- Rubric score >= 9/10
-- Golden Screens captured (mobile + desktop)
+- Rubric score >= 9/10 on its Golden Screen(s)
+- Golden Screen verification checklist passed (mobile + desktop)
 - Decision recorded in Decisions Log
 
 Frozen means:
@@ -387,8 +433,9 @@ Frozen means:
 - Bug fixes only
 - Any unfreeze requires explicit decision entry
 
-<!-- === END REPLACEMENT BLOCK: UI BASELINE (Enterprise Rubric + Workpacks + Freeze policy) === -->
 ---
+
+<!-- === END REPLACEMENT BLOCK: UI BASELINE + ENTERPRISE RUBRIC + GOLDEN SCREENS (Canonical Set & Rules) === -->
 
 # CONTENT PIPELINE REQUIREMENTS
 
