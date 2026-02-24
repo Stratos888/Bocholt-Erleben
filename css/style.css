@@ -2043,13 +2043,14 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT (single scroll authority) ===
 Zweck:
-- EINZIGER Scroll-Container bleibt stabil
-- Scroll-Padding sorgt dafür, dass Fokus/Anker niemals unter die Actionbar rutschen
-- Kein Layout-Impact außerhalb des Panels
+- Detailpanel hat genau EINEN Scroll-Container (Body)
+- Scroll-Padding schützt Content/Fokus vor Actionbar-Overlap
+Umfang:
+- .detail-panel-body (mit und ohne #event-detail-panel Scope)
 === */
 
-#event-detail-panel .detail-panel-body{
-
+#event-detail-panel .detail-panel-body,
+.detail-panel-body{
   flex: 1 1 auto;
   min-height: 0;
 
@@ -2057,15 +2058,12 @@ Zweck:
   overflow-x: hidden;
 
   -webkit-overflow-scrolling: touch;
-
   overscroll-behavior: contain;
 
-  /* Wichtig: Fokus/Scroll-Into-View respektiert die Actionbar-Reserve */
   scroll-padding-bottom: var(--dp-actionbar-reserve);
 
   padding: 0;
   box-sizing: border-box;
-
 }
 
 /* === END BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT === */
@@ -3068,5 +3066,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
