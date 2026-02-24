@@ -2976,11 +2976,23 @@ def main() -> None:
         # Umfang:
         # - Schreibt NUR in Source_Health (separater Tab)
         # === END BLOCK: SOURCE HEALTH ROW (per source, per run) ===
-        written_before_source = total_written
+written_before_source = total_written
 
+# === BEGIN BLOCK: MAIN LOOP DETAIL ENRICH INIT (budget+cache per source, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Budgetierter Detailseiten-Fetch im Main-Loop, nur zur Ergänzung von Location/Time,
+#   wenn Parser/Inferenz leer bleibt.
+# - Pro Quelle eigener Cache + Budget, damit es deterministisch und "nett" bleibt.
+# Umfang:
+# - Nur Initialisierung von lokalen Variablen vor der Kandidaten-Schleife.
+# === END BLOCK: MAIN LOOP DETAIL ENRICH INIT (budget+cache per source, v1) ===
+detail_enrich_budget = int(os.environ.get("MAX_DETAIL_ENRICH_MAIN", "12"))
+detail_enrich_timeout = int(os.environ.get("DETAIL_ENRICH_TIMEOUT", "12"))
+detail_enrich_count = 0
+detail_enrich_cache: Dict[str, str] = {}
 
-
-        for c in candidates:
+for c in candidates:
                        # === BEGIN BLOCK: RSS ARTICLE DATE SAFETY (allow missing event date) ===
             # Datei: scripts/discovery-to-inbox.py
             # Zweck:
@@ -3005,13 +3017,15 @@ def main() -> None:
             # - ersetzt nur die alte Hard-Skip-Logik + setzt description/status sauber
             # === END BLOCK: CLASSIFY + DESCRIPTION (review/blocked/rejected) ===
             desc_text = clean_text(c.get("description", ""))
-                        # === BEGIN BLOCK: ENRICH LOCATION/TIME (infer missing fields) ===
+                                               # === BEGIN BLOCK: ENRICH LOCATION/TIME (infer + detail fetch fallback, v2) ===
             # Datei: scripts/discovery-to-inbox.py
             # Zweck:
-            # - Falls RSS/ICS kein Location/Time liefert: aus Titel/Description ableiten
+            # - Fehlende Location/Time zuerst aus Titel/Description inferieren
+            # - Wenn danach immer noch leer: budgetierter Detailseiten-Fetch (nur wenn URL da)
+            #   und erneut inferieren/HTML-Extraktion probieren.
             # Umfang:
-            # - Setzt nur lokale Variablen inferred_location / inferred_time
-            # === END BLOCK: ENRICH LOCATION/TIME (infer missing fields) ===
+            # - Setzt nur lokale Variablen final_location / final_time (+ erweitert notes)
+            # === END BLOCK: ENRICH LOCATION/TIME (infer + detail fetch fallback, v2) ===
             raw_location = clean_text(c.get("location", ""))
             raw_time = norm(c.get("time", ""))
 
@@ -3019,6 +3033,47 @@ def main() -> None:
 
             final_location = raw_location or inferred_location
             final_time = raw_time or inferred_time
+
+            # Detail-Enrichment nur wenn nach allem noch etwas fehlt
+            c_url = canonical_url(c.get("url", ""))
+            need_loc = not norm(final_location)
+            need_time = not norm(final_time)
+
+            if (need_loc or need_time) and c_url and (detail_enrich_count < detail_enrich_budget):
+                detail_html = detail_enrich_cache.get(c_url, "")
+                if detail_html == "" and c_url not in detail_enrich_cache:
+                    try:
+                        detail_html = safe_fetch(c_url, timeout=detail_enrich_timeout)
+                    except Exception:
+                        detail_html = ""
+                    detail_enrich_cache[c_url] = detail_html
+                    detail_enrich_count += 1
+
+                if detail_html:
+                    # 1) erst strukturiert (JSON-LD), dann Textfallback
+                    t2, l2 = _extract_time_loc_from_html(detail_html, allow_text_fallback=True)
+
+                    if need_time and t2:
+                        final_time = t2
+                        need_time = False
+
+                    if need_loc and l2:
+                        final_location = l2
+                        need_loc = False
+
+                    if need_loc or need_time:
+                        detail_text = clean_text(_strip_html_tags(detail_html))
+                        loc_guess, time_guess = infer_location_time(title, detail_text)
+
+                        if need_loc and loc_guess:
+                            final_location = loc_guess
+                            need_loc = False
+                        if need_time and time_guess:
+                            final_time = time_guess
+                            need_time = False
+
+                    # notes kurz halten
+                    combined_notes = clean_text((combined_notes + "; enrich=detail_loc_time")[:180])
 
 
                         # === BEGIN BLOCK: CANDIDATE CLASSIFY + LOGGING + INBOX WRITE (append Discovery_Candidates, v1) ===
