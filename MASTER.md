@@ -31,6 +31,35 @@ This file is the project brain.
 
 ---
 
+# SESSION PROTOCOLS (STANDARDIZED)
+
+Purpose:
+Reduce setup/close friction and prevent regressions by using standardized session prompts.
+
+Rule:
+Use the repo prompt templates for every session start and close.
+
+Templates (canonical):
+- docs/prompts/session-open.md
+- docs/prompts/session-close.md
+
+SESSION OPEN PROTOCOL (must do):
+- Read MASTER.md fully
+- Read ENGINEERING.md fully
+- Confirm CURRENT SPRINT scope + Frozen Areas
+- Choose 1 Golden Screen / 1 Workpack
+- Produce Rubric Gap List (Top 3 FAIL) before patch
+- Output code changes as Replace-instructions only (BEGIN/END + replacement block)
+
+SESSION CLOSE PROTOCOL (must do):
+- Short session report (max 8 bullets)
+- Update CURRENT SPRINT statuses (only what changed)
+- Update COMPLETED AREAS (only if DoD met)
+- Append DECISIONS LOG entries (only permanent decisions made)
+- Update SESSION STATE (LAST UPDATE)
+
+---
+
 # PROJECT OBJECTIVE
 
 Build and operate a production-grade event discovery PWA.
@@ -78,7 +107,7 @@ ACTIVE TASKS:
 
 TASK 1: DETAILPANEL UI STABILIZATION
 
-STATUS: COMPLETED (BASELINE STABLE) — ENTERPRISE FREEZE: PENDING
+STATUS: IN PROGRESS — REGRESSION INVESTIGATION (UI ONLY) — ENTERPRISE FREEZE: BLOCKED
 
 DEFINITION OF DONE (ENTERPRISE GATE):
 
@@ -96,7 +125,7 @@ Detailpanel is considered enterprise-frozen ONLY when ALL are true:
    - reduced motion respected (prefers-reduced-motion)
    - max 2 primary actions (CTA discipline)
 
-FOUNDATION BASELINE (DONE THIS SPRINT):
+FOUNDATION BASELINE (PREVIOUSLY ACHIEVED):
 
 - Focus trap + ESC close behavior stable
 - Scroll isolation stable (panel open: background locked; panel body scroll only)
@@ -104,23 +133,27 @@ FOUNDATION BASELINE (DONE THIS SPRINT):
 - Touch targets meet enterprise minimum (close/actionbar)
 - Reduced Motion support present (prefers-reduced-motion)
 
-VISUAL DNA ALIGNMENT (DONE THIS SPRINT):
+VISUAL DNA ALIGNMENT (PARTIALLY VERIFIED VIA CONSOLE PROOFS):
 
-- Header/title hierarchy aligned to Golden Screen baseline
-- Meta (date/time/location) rhythm aligned (muted, non-bold, consistent line-height)
-- Location row aligned to Meta DNA (calm, non-headline feel)
-- Description typography calmed (enterprise readability)
-- Divider density reduced (no “table/form” feel)
-- Actionbar consolidated (button sizing/radius/shadow/states) and verified via console proofs
-- Calendar icon token consistency enforced inside Detailpanel (Date + Actionbar + Category fallback)
+Verified (PASS proofs captured during work):
+- Meta last-child border-bottom removed
+- Location row border-bottom removed
+- Actionbar top border removed
+- Sheet radius (top-left/top-right) = 22px and grabber via ::before exists
 
-FREEZE INSTRUCTION (UPDATED):
+REGRESSION BLOCKERS (NOT FIXED YET):
+
+Must be resolved before any “frozen baseline” claim:
+- Actionbar slot must be reliably `display:flex` (Row) in open state
+- Detailpanel icons (svg/img) must be clamped (no “Riesen-Icons”)
+- Proof suite must be green (no FAIL results for actionbar + icon sizing)
+
+FREEZE INSTRUCTION:
 
 Detailpanel is treated as the Event Detail Page (overlay-based).
-Detailpanel is BASELINE-FROZEN (stability + architecture).
 
-Until Enterprise Gate is met:
-Changes are allowed ONLY as "Enterprise Gate Closure Workpacks" (see UI EXECUTION MODE).
+Until Enterprise Gate is met AND regression blockers are cleared:
+Changes are allowed ONLY as "Enterprise Gate Closure Workpacks" (UI-only) with console proofs.
 
 After Enterprise Gate is met and recorded:
 Detailpanel becomes ENTERPRISE-FROZEN.
@@ -1253,13 +1286,13 @@ Update SESSION STATE
 
 OVERALL STATUS:
 
-UI: DETAILPANEL BASELINE FROZEN (Event Detail Overlay)
+UI: DETAILPANEL REGRESSION INVESTIGATION (Actionbar layout + icon sizing proofs failing)
 
 PIPELINE: IN PROGRESS (TASK 4 BACKFILL ACTIVE)
 
 LAST UPDATE:
 
-2026-02-23
+2026-02-24
 
 ---
 
