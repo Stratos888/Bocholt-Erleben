@@ -74,25 +74,27 @@ ACTIVE TASKS:
 
 ---
 
+<!-- === BEGIN REPLACEMENT BLOCK: TASK 1 (Enterprise Gate + controlled evolution) | Scope: replaces Task 1 section only === -->
+
 TASK 1: DETAILPANEL UI STABILIZATION
 
-STATUS: COMPLETED
+STATUS: COMPLETED (BASELINE STABLE) — ENTERPRISE FREEZE: PENDING
 
-DEFINITION OF DONE:
+DEFINITION OF DONE (ENTERPRISE GATE):
 
-Visual hierarchy clear
+Detailpanel is considered enterprise-frozen ONLY when ALL are true:
 
-Spacing follows baseline scale
-
-No visual clutter
-
-Max two primary actions
-
-No layout breaks (mobile + desktop)
-
-No visual trust-breaking elements
-
-Professional appearance achieved
+1) Enterprise UI Rubric score >= 9/10 (see UI BASELINE section)
+2) Golden Screens captured for Detailpanel (mobile + desktop) and referenced in Decisions Log
+3) No layout jumps or overflow issues in:
+   - mobile narrow (<= 375px)
+   - mobile wide (<= 430px)
+   - desktop (>= 1024px)
+4) Interactive contract verified:
+   - focus visible + consistent
+   - touch targets >= 44px for primary controls
+   - reduced motion respected (prefers-reduced-motion)
+   - max 2 primary actions (CTA discipline)
 
 FOUNDATION BASELINE (DONE THIS SPRINT):
 
@@ -112,11 +114,19 @@ VISUAL DNA ALIGNMENT (DONE THIS SPRINT):
 - Actionbar consolidated (button sizing/radius/shadow/states) and verified via console proofs
 - Calendar icon token consistency enforced inside Detailpanel (Date + Actionbar + Category fallback)
 
-FREEZE INSTRUCTION (EFFECTIVE IMMEDIATELY):
+FREEZE INSTRUCTION (UPDATED):
 
-Detailpanel is now treated as the Event Detail Page (overlay-based).
-Detailpanel visual DNA is frozen.
+Detailpanel is treated as the Event Detail Page (overlay-based).
+Detailpanel is BASELINE-FROZEN (stability + architecture).
+
+Until Enterprise Gate is met:
+Changes are allowed ONLY as "Enterprise Gate Closure Workpacks" (see UI EXECUTION MODE).
+
+After Enterprise Gate is met and recorded:
+Detailpanel becomes ENTERPRISE-FROZEN.
 Only bug fixes allowed unless explicit unfreeze decision is recorded.
+
+<!-- === END REPLACEMENT BLOCK: TASK 1 (Enterprise Gate + controlled evolution) === -->
 
 ---
 
@@ -268,11 +278,13 @@ PWA CORE
 
 ---
 
+<!-- === BEGIN REPLACEMENT BLOCK: UI BASELINE (Enterprise Rubric + Workpacks + Freeze policy) | Scope: replaces UI BASELINE section only === -->
+
 # UI BASELINE
 
 Mandatory visual rules:
 
-Spacing scale:
+Spacing scale (allowed values only):
 
 4
 8
@@ -281,7 +293,7 @@ Spacing scale:
 24
 32
 
-Corner radius:
+Corner radius (allowed values only):
 
 Cards: 12px
 Buttons: 10px
@@ -289,8 +301,9 @@ Buttons: 10px
 Interaction rules:
 
 Max primary actions per screen: 2
-
 Avoid unnecessary dividers
+No layout jumps when conditional UI appears/disappears (e.g. Install button)
+Touch targets: primary controls >= 44px
 
 Visual goal:
 
@@ -305,6 +318,76 @@ visual noise
 tight layouts
 aggressive styling
 
+---
+
+# ENTERPRISE UI RUBRIC (CUSTOMER / TOP APP DEVELOPER STANDARD)
+
+Enterprise UI is achieved when a target screen scores >= 9/10 on this rubric.
+Each item is PASS/FAIL.
+
+1) Hierarchy clarity:
+   - Title vs meta vs body instantly readable; no competing emphasis.
+
+2) Rhythm & spacing discipline:
+   - Consistent vertical rhythm; spacing uses the scale only.
+
+3) Typography quality:
+   - Body readability (line-height/length/weight); meta calm; headings not oversized.
+
+4) Surface & contrast:
+   - Cards/sections feel intentional; contrast is accessible; key info not washed out.
+
+5) Noise budget:
+   - Dividers/icons/badges minimal; nothing looks “template-y” or “form-like”.
+
+6) CTA discipline:
+   - <= 2 primary CTAs; rest secondary/tertiary; actions predictable.
+
+7) Interaction states:
+   - Hover/active/focus consistent across components; focus visible and elegant.
+
+8) Touch & ergonomics:
+   - Spacing prevents mis-taps; controls feel comfortable on mobile.
+
+9) Stability:
+   - No jitter, overflow, clipping, or scroll traps; long text safe.
+
+10) Brand trust:
+   - Screen feels like a serious product (no “prototype vibes”).
+
+---
+
+# UI EXECUTION MODE (FASTER ENTERPRISE PROGRESS)
+
+Rule:
+UI changes are executed as “Enterprise Gate Closure Workpacks”.
+
+Workpack definition:
+- One target screen (Golden Screen)
+- Rubric gap list (top 3 failing items)
+- One consolidated CSS-only patch that fixes gaps systemically (tokens + component mapping)
+- Result must move score measurably (not micro-tweaks)
+
+Anti-rule:
+No endless micro-iterations.
+If a patch does not change rubric score, stop and redesign the patch approach.
+
+---
+
+# UI FREEZE POLICY (PREVENTS PREMATURE FREEZES)
+
+A UI area may be marked “Completed” for baseline stability.
+A UI area is “Frozen” ONLY after:
+- Rubric score >= 9/10
+- Golden Screens captured (mobile + desktop)
+- Decision recorded in Decisions Log
+
+Frozen means:
+- No visual changes
+- Bug fixes only
+- Any unfreeze requires explicit decision entry
+
+<!-- === END REPLACEMENT BLOCK: UI BASELINE (Enterprise Rubric + Workpacks + Freeze policy) === -->
 ---
 
 # CONTENT PIPELINE REQUIREMENTS
