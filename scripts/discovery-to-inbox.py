@@ -412,29 +412,38 @@ def make_id_suggestion(title: str, d: str, t: str, source_url: str) -> str:
 # Umfang:
 # - Ersetzt nur die infer_location_time-Helper inkl. Regexes
 
-_TIME_IN_TITLE_RE = re.compile(r"\b(?:um|ab)\s*(\d{1,2})(?:[:\.](\d{2}))?\s*uhr\b", re.IGNORECASE)
-_TIME_PLAIN_RE = re.compile(r"(?<!\d)(\d{1,2})[:\.](\d{2})(?!\d)")
+# === BEGIN BLOCK: TIME INFERENCE REGEX (broader, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Mehr Zeiten finden (auch "ab 19 Uhr", "Beginn 20:00 Uhr", "Einlass 18.30 Uhr", "19:00 Uhr")
+# Umfang:
+# - Ersetzt nur Regex + _infer_time_from_text (keine weitere Logik)
+# === END BLOCK: TIME INFERENCE REGEX (broader, v2) ===
+_TIME_IN_TITLE_RE = re.compile(
+    r"\b(?:um|ab|von|beginn|start|einlass)?\s*(\d{1,2})(?:[:\.](\d{2}))?\s*uhr\b",
+    re.IGNORECASE,
+)
 _SLASH_SEG_RE = re.compile(r"\s*//\s*")
 
-# typische "Label: Wert" Felder
-_LOC_LABEL_RE = re.compile(
-    r"\b(?:ort|veranstaltungsort|treffpunkt|adresse|veranstaltungsadresse)\s*:\s*([^\n\r]{3,160})",
-    re.IGNORECASE,
-)
-
-# grobe Adresszeile: "Musterstraße 12, 46399 Bocholt" oder "46399 Bocholt"
-_ADDR_LINE_RE = re.compile(
-    r"\b([A-ZÄÖÜ][A-Za-zÄÖÜäöüß\-\s]{2,40}\s+\d{1,4}[a-zA-Z]?)\s*,?\s*(\b\d{5}\b\s*[A-ZÄÖÜ][A-Za-zÄÖÜäöüß\-\s]{2,40})?",
-    re.IGNORECASE,
-)
-
 def _infer_time_from_text(text: str) -> str:
-    txt = text or ""
-    m = _TIME_IN_TITLE_RE.search(txt)
-    if m:
-        hh = int(m.group(1))
-        mm = int(m.group(2)) if m.group(2) else 0
+    t = text or ""
+    m = _TIME_IN_TITLE_RE.search(t)
+    if not m:
+        # fallback: "19:00" ohne "Uhr" (vorsichtig)
+        m2 = re.search(r"\b(\d{1,2})(?:[:\.](\d{2}))\b", t)
+        if not m2:
+            return ""
+        hh = int(m2.group(1))
+        mm = int(m2.group(2))
+        if hh > 23 or mm > 59:
+            return ""
         return f"{hh:02d}:{mm:02d}"
+
+    hh = int(m.group(1))
+    mm = int(m.group(2)) if m.group(2) else 0
+    if hh > 23 or mm > 59:
+        return ""
+    return f"{hh:02d}:{mm:02d}"
 
     # fallback: erste HH:MM im Text
     m = _TIME_PLAIN_RE.search(txt)
@@ -465,31 +474,38 @@ def _clean_loc(loc: str) -> str:
         return ""
     return loc
 
+# === BEGIN BLOCK: LOCATION+TIME INFERENCE (better heuristics, v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Location häufiger/sauberer füllen (Labels wie "Ort:", "Veranstaltungsort:", "Treffpunkt:", "Wo:", "Adresse:")
+# - Weiterhin konservativ bleiben (keine Fantasie-Orte)
+# Umfang:
+# - Ersetzt nur _infer_location_from_description + infer_location_time
+# === END BLOCK: LOCATION+TIME INFERENCE (better heuristics, v2) ===
 def _infer_location_from_description(desc: str) -> str:
-    d = clean_text(desc or "")
+    d = (desc or "").strip()
     if not d:
         return ""
 
-    # 1) Label: Ort: ...
-    m = _LOC_LABEL_RE.search(d)
-    if m:
-        loc = _clean_loc(m.group(1))
-        if loc:
-            return loc
+    # 1) Explizite Labels (häufig auf Eventseiten)
+    for lab in ("Veranstaltungsort", "Ort", "Treffpunkt", "Wo", "Adresse"):
+        m = re.search(rf"(?:^|\n)\s*{lab}\s*:\s*([^\n\r]{{3,160}})", d, flags=re.IGNORECASE)
+        if m:
+            loc = clean_text(m.group(1))
+            loc = re.split(r"\s+(am|um|ab|von|für|mit)\b", loc, flags=re.IGNORECASE)[0].strip()
+            if len(loc) >= 3:
+                return loc
 
-    # 2) Adresszeile im Text
-    m = _ADDR_LINE_RE.search(d)
+    # 2) Muster: "im <Ort>" / "in <Ort>" (aber harte Ausschlüsse gegen Quatsch)
+    m = re.search(r"\b(im|in)\s+([A-ZÄÖÜ][^.,;\n]{2,100})", d)
     if m:
-        loc = _clean_loc(m.group(0))
-        if loc:
-            return loc
+        loc = m.group(2).strip()
+        loc = re.split(r"\s+(am|um|ab|von|für|mit)\b", loc, flags=re.IGNORECASE)[0].strip()
 
-    # 3) "im/in <Name>" (konservativ)
-    m = re.search(r"\b(im|in)\s+([A-ZÄÖÜ][^.,;\n\r]{2,80})", d)
-    if m:
-        loc = _clean_loc(m.group(2))
-        if loc:
-            return loc
+        bad_starts = ("rahmen", "kurs", "workshop", "seminar", "programm", "projekt", "gruppe")
+        if loc and not any(loc.lower().startswith(b) for b in bad_starts):
+            if len(loc) >= 3:
+                return loc
 
     return ""
 
@@ -499,7 +515,7 @@ def infer_location_time(title: str, description: str) -> Tuple[str, str]:
     low = f"{t} {d}".lower()
 
     # Online zuerst
-    if "online" in low or "webinar" in low or "zoom" in low or "teams" in low:
+    if "online" in low or "webinar" in low:
         return ("Online", _infer_time_from_text(t) or _infer_time_from_text(d))
 
     loc = _infer_location_from_title(t)
@@ -2943,8 +2959,14 @@ def main() -> None:
         # kurz halten (Sheet + PWA)
         err_msg = clean_text(err_msg)[:180]
 
- 
-
+        # === BEGIN BLOCK: CANDIDATES NONE GUARD (v1) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Verhindert Pipeline-Crash, falls ein Parser versehentlich None zurückgibt
+        # Umfang:
+        # - Normalisiert candidates auf Liste direkt vor Stats/Write
+        # === END BLOCK: CANDIDATES NONE GUARD (v1) ===
+        candidates = candidates or []
 
         total_candidates += len(candidates)
         # === BEGIN BLOCK: SOURCE HEALTH ROW (per source, per run) ===
