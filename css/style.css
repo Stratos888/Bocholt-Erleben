@@ -2017,36 +2017,9 @@ Umfang:
 
 #event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 /* === END BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) === */
-/* === BEGIN FIX: CSS PARSER BREAK (remove stray marker) ===
-Zweck: Entfernt eine ungültige Zeile ("== */"), die ab hier das komplette restliche CSS deaktiviert.
-Umfang: Nur Marker-Repair direkt nach dem Close-Button Patch.
-=== */
-/* === BEGIN FIX: REMOVE STRAY CSS MARKER (keep parser alive) ===
-Zweck: Entfernt die ungültige Zeile "== */", die ab hier CSS-Regeln aushebeln kann.
-Umfang: Nur dieser Marker direkt nach dem Close-Button Patch.
-=== */
-/* === END PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller) === */
-/* === END FIX: REMOVE STRAY CSS MARKER (keep parser alive) === */
-
-
-/* Detailpanel: Scroll-Container bleibt .detail-panel-body; Gutter+Reserve liegen robust auf #detail-content */
-/* === BEGIN BLOCK: DETAILPANEL SCROLL PHYSICS (native momentum + isolation, enterprise) ===
-Zweck:
-- Native App Scrollgefühl (iOS + Android)
-- verhindert Scroll-Leaks und Scroll-Chaining
-- verhindert „Rubberband bleed“ in den Background
-- stabilisiert Touch-Verhalten in allen Browsern
-
-Umfang:
-- ersetzt ausschließlich .detail-panel-body Scrollblock
-=== */
-
-/* === BEGIN BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT (single scroll authority) ===
-Zweck:
-- Detailpanel hat genau EINEN Scroll-Container (Body)
-- Scroll-Padding schützt Content/Fokus vor Actionbar-Overlap
-Umfang:
-- .detail-panel-body (mit und ohne #event-detail-panel Scope)
+/* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
+Zweck: Parser-sichere Definition des einzigen Scroll-Containers im Detailpanel + Reserve gegen Actionbar-Overlap.
+Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detail-panel #detail-content).
 === */
 
 #event-detail-panel .detail-panel-body,
@@ -2060,14 +2033,13 @@ Umfang:
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 
-  scroll-padding-bottom: var(--dp-actionbar-reserve);
+  scroll-padding-bottom: var(--dp-actionbar-reserve, 96px);
 
   padding: 0;
   box-sizing: border-box;
 }
 
-/* === END BLOCK: DETAILPANEL SCROLL CONTAINER CONTRACT === */
-/* === END BLOCK: DETAILPANEL SCROLL PHYSICS (native momentum + isolation, enterprise) === */
+/* === END REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) === */
 
 #event-detail-panel #detail-content{
   /* Abstand zum Grab-Handle/Top (Token) */
@@ -2087,11 +2059,6 @@ Umfang:
   box-sizing: border-box;
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
-
-
-
-
-
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
@@ -3066,6 +3033,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
