@@ -49,7 +49,10 @@ SESSION OPEN PROTOCOL (must do):
 - Confirm CURRENT SPRINT scope + Frozen Areas
 - Choose 1 Golden Screen / 1 Workpack
 - Produce Rubric Gap List (Top 3 FAIL) before patch
+- Use uploaded repo ZIP as canonical baseline for this session (ZIP-FIRST)
 - Output code changes as Replace-instructions only (BEGIN/END + replacement block)
+- Batch is allowed for speed ONLY if Replace ranges do not overlap; otherwise merge into one Replace block
+- Assume user applies all assistant-provided changes unless user explicitly says otherwise; if sync is uncertain, STOP and request current file/section
 
 SESSION CLOSE PROTOCOL (must do):
 - Short session report (max 8 bullets)
