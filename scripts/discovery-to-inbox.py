@@ -1707,20 +1707,44 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         # - Ersetzt nur den Date-Scan-Teil innerhalb _html_link_candidates_date_scan (Kontext, Extraktion, Gate, out.append)
         # === END BLOCK: HTML DATE-SCAN (detail fetch + json-ld Event + gating, v6) ===
 
-        # === BEGIN BLOCK: HTML LINK CONTEXT WINDOW (dynamic, juboh boost, v1) ===
-        # Kontext um die Fundstelle: für juboh.de deutlich größer, weil Datum/Zeit oft weiter weg im Karten-Container steht.
+        # === BEGIN BLOCK: HTML LINK CONTEXT WINDOW (dynamic, multi-host boost, v2) ===
+        # Ziel: Auf vielen Event-Listen-Seiten stehen Datum/Zeit/Ort nicht direkt am <a>, sondern im Karten-Container.
+        # Wir erhöhen daher den Kontext-Puffer hostbasiert, damit Date/Time/Location zuverlässig gefunden werden.
         p_ctx = urlparse(url)
         host_ctx = (p_ctx.netloc or "").lower()
 
-        pad = 180
+        # Default höher (war 180) – reduziert "kein Datum im Kontext" massiv auf typischen Listen-Layouts.
+        pad = 650
+
+        # Sehr “container-lastige” Seiten: noch größer
         if host_ctx.endswith("juboh.de"):
+            pad = 1600
+        elif host_ctx.endswith("textilwerk-bocholt.lwl.org"):
+            pad = 1200
+        elif "stadtbibliothek" in host_ctx:
+            pad = 1200
+        elif "stadtmuseum" in host_ctx:
+            pad = 1200
+        elif "fabi" in host_ctx:
+            pad = 1200
+        elif "nabu" in host_ctx:
+            pad = 1200
+        elif "euregio" in host_ctx:
+            pad = 1200
+        elif "muensterland" in host_ctx:
+            pad = 1200
+        elif "isselburg" in host_ctx:
+            pad = 1200
+        elif "kukug" in host_ctx:
+            pad = 1200
+        elif "lernwerkstatt" in host_ctx:
             pad = 1200
 
         start = max(0, m.start() - pad)
         end = min(len(html_text), m.end() + pad)
         ctx_html = html_text[start:end]
         ctx = clean_text(_strip_html_tags(ctx_html))
-        # === END BLOCK: HTML LINK CONTEXT WINDOW (dynamic, juboh boost, v1) ===
+        # === END BLOCK: HTML LINK CONTEXT WINDOW (dynamic, multi-host boost, v2) ===
 
 # === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
         # Zweck:
