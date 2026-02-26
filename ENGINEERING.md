@@ -45,6 +45,31 @@ Work only with actual visible code.
 
 ---
 
+# CANONICAL BASELINE RULE (ZIP-FIRST)
+
+A repo ZIP uploaded at session start counts as "provided file content".
+
+Workflow:
+
+- Use the ZIP snapshot as canonical baseline for files.
+- Maintain a consolidated working copy per file inside this session.
+- Assume the user applies ALL assistant-provided changes.
+- If the user does NOT apply a change or applies extra manual edits, the user MUST explicitly say so.
+- If the assistant is not 100% sure the working copy matches the user's local file, STOP and request the current file (or the minimal relevant section).
+
+---
+
+# BATCH PATCH RULE (SAFE SPEED)
+
+To avoid slow micro-iterations:
+
+- Allowed: multiple Replace-blocks in one response
+- Condition: Replace ranges MUST NOT overlap.
+- If overlap risk exists: merge into ONE larger Replace-block.
+
+---
+
+
 # ONE FILE RULE
 
 Work on ONLY ONE FILE per change.
@@ -69,13 +94,20 @@ and provide replacement block separately.
 
 # NO-FILE, NO-DIFF RULE
 
-If the current file content is not provided (pasted or uploaded):
+If the current file content is not provided:
 
 DO NOT produce a diff.
 
 Stop and request the current file.
 
+Notes:
+
+- A repo ZIP uploaded at session start counts as "provided file content".
+- If the assistant has a verified consolidated working copy of the file in this session, it may continue to produce Replace-instructions without re-requesting the file.
+- If there is any doubt about sync between working copy and user's local file: STOP and request the current file (or the minimal relevant section).
+
 ---
+
 
 # EXACT BOUNDARY RULE
 
