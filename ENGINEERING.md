@@ -45,11 +45,7 @@ Work only with actual visible code.
 
 ---
 
-<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE RULE (ZIP-FIRST) + VERIFIED WORKING COPY GATE | Scope: replaces ZIP-FIRST section only === -->
-
-<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) | Scope: replaces the entire ZIP-FIRST section === -->
-
-<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT WORKING COPY (HARD) | Scope: replaces ZIP-FIRST section only === -->
+<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE (ZIP-FIRST) — ASSISTANT WORKING COPY (HARD) | Scope: replaces ZIP-FIRST section only === -->
 
 # CANONICAL BASELINE RULE (ZIP-FIRST) — ASSISTANT-MAINTAINED WORKING COPY (HARD)
 
@@ -75,7 +71,7 @@ Every patch response MUST include:
 - Source: ZIP snapshot (or later user-uploaded file, if explicitly used)
 - File: exact path
 - Anchors: exact, verbatim BEGIN and END lines that exist in the current canonical working copy
-- Fingerprint: `bytes=<N>` of the current canonical working copy for that file
+- Fingerprint: `bytes=<N>, sha256=<HASH>` of the current canonical working copy for that file
 
 If the assistant cannot provide this attestation: **STOP. No patch.**
 
@@ -86,8 +82,7 @@ Only if the user explicitly says they did NOT apply a patch or applied manual ed
 
 ---
 
-<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT WORKING COPY (HARD) === -->
-<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) === -->
+<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE (ZIP-FIRST) — ASSISTANT WORKING COPY (HARD) === -->
 # BATCH PATCH RULE (SAFE SPEED)
 
 To avoid slow micro-iterations:
