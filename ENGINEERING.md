@@ -47,42 +47,41 @@ Work only with actual visible code.
 
 <!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE RULE (ZIP-FIRST) + VERIFIED WORKING COPY GATE | Scope: replaces ZIP-FIRST section only === -->
 
-# CANONICAL BASELINE RULE (ZIP-FIRST) — WITH VERIFIED WORKING COPY GATE
+<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) | Scope: replaces the entire ZIP-FIRST section === -->
 
-A repo ZIP uploaded at session start provides the canonical baseline.
+# CANONICAL BASELINE RULE (ZIP-FIRST) — ASSISTANT-MAINTAINED WORKING COPY (HARD)
 
-**But: ZIP content counts as "visible code" ONLY after it is VERIFIED.**
+A repo ZIP uploaded at session start counts as "provided file content" and is the canonical baseline.
 
-## VERIFIED WORKING COPY GATE (HARD STOP)
+## HARD GUARANTEE (IN-CHAT)
 
-Before ANY patch is allowed, ChatGPT MUST:
+Within THIS chat session, ChatGPT MUST maintain an internal, consolidated **canonical working copy** for every modified file.
 
-1) Extract/open the target file from the ZIP snapshot
-2) Build a session working copy for that file
-3) Prove sync by citing exact, verbatim anchor lines from that file
+This means:
 
-If steps (1–3) are not done and shown in-chat:
-**STOP. Request the current file (or minimal relevant section).**
+- Every patch instruction ChatGPT gives is treated as **applied immediately** to the canonical working copy.
+- All subsequent patches MUST be computed against that **updated** canonical working copy.
+- ChatGPT MUST NOT reference “guessed” markers/blocks; only markers/blocks that exist in the **current** canonical working copy.
 
-## PATCH ATTESTATION (MANDATORY IN EVERY PATCH RESPONSE)
+## MANDATORY PATCH ATTESTATION (EVERY PATCH RESPONSE)
 
-Every response that includes Replace-instructions MUST include a short "Working Copy Attestation":
+Every response that contains Replace-instructions MUST start with a short attestation:
 
-- Source: ZIP snapshot or user-pasted file
+- Source: ZIP snapshot (or latest user-uploaded file, if provided later)
 - File: exact path
-- Anchors: exact BEGIN/END lines that exist verbatim in the working copy
-- Sync confidence: "verified" or "not verified" (if not verified → STOP)
+- Anchors: verbatim BEGIN/END lines that exist in the current canonical working copy
+- Fingerprint: `bytes=<N>, sha256=<HASH>` of the current canonical working copy for that file
 
-## SYNC LOSS RULE
+If ChatGPT cannot provide this attestation: **STOP. No patch.**
 
-If there is ANY doubt that the session working copy matches the user's local file
-(e.g., user applied only part of a patch, manual edits, merge conflicts, unknown order):
-**STOP and request the current file or the minimal relevant block.**
+## USER ASSUMPTION
 
-<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE RULE (ZIP-FIRST) + VERIFIED WORKING COPY GATE === -->
+- Assume the user applies ALL assistant-provided changes and makes NO additional edits unless explicitly stated.
+- If the user explicitly states they did NOT apply a change or applied extra manual edits: **STOP and request the current file**.
 
 ---
 
+<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) === -->
 # BATCH PATCH RULE (SAFE SPEED)
 
 To avoid slow micro-iterations:
