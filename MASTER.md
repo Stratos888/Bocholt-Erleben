@@ -110,7 +110,7 @@ ACTIVE TASKS:
 
 TASK 1: DETAILPANEL UI STABILIZATION
 
-STATUS: IN PROGRESS — REGRESSION INVESTIGATION (UI ONLY) — ENTERPRISE FREEZE: BLOCKED
+STATUS: IN PROGRESS — ENTERPRISE GATE CLOSURE WORKPACKS (UI ONLY) — NOT FROZEN
 
 DEFINITION OF DONE (ENTERPRISE GATE):
 
@@ -128,37 +128,49 @@ Detailpanel is considered enterprise-frozen ONLY when ALL are true:
    - reduced motion respected (prefers-reduced-motion)
    - max 2 primary actions (CTA discipline)
 
-FOUNDATION BASELINE (PREVIOUSLY ACHIEVED):
+FOUNDATION BASELINE (VERIFIED):
 
 - Focus trap + ESC close behavior stable
-- Scroll isolation baseline was previously stable (panel open: background locked; intended: panel body scroll only)
+- Background scroll-lock stable when panel is open
 - Overlay stability guardrails applied (fixed overlays must never be clipped)
 - Touch targets meet enterprise minimum (close/actionbar)
 - Reduced Motion support present (prefers-reduced-motion)
 
-VISUAL DNA ALIGNMENT (VERIFIED VIA CONSOLE PROOFS THIS SESSION):
+WORKPACKS COMPLETED THIS SESSION (VERIFIED VIA PROOFS):
 
-Verified (PASS proofs captured):
-- Header title reserve works (no collision with close): rightGapPx > 0
-- Category icon is indicator-only (18x18, transparent, no border/shadow/transform)
-- Meta block is a single enterprise info surface (grid + subtle bg + border + padding + radius)
-- Meta rows calm and consistent (no borders, readable muted color)
+- Scroll container contract fixed:
+  - detail-panel-body overflowY = auto
+  - scrollPaddingBottom resolves to px (not auto)
+  - canScroll becomes true under long-content stress test (scrollHeight > clientHeight)
+- Header direction locked (enterprise alignment):
+  - Category icon is indicator-only and must visually behave as content badge (not a control)
+  - Close is a dedicated dismiss control with app-like affordance (quiet-filled), token-based
 
-REGRESSION BLOCKERS (NOT FIXED YET):
+REMAINING GAPS (NEXT WORKPACKS):
 
-Must be resolved before any “frozen baseline” claim:
-- Scroll container contract is NOT active:
-  - #event-detail-panel .detail-panel-body computed overflowY = visible (should be auto)
-  - scrollPaddingBottom = auto (should be var(--dp-actionbar-reserve))
-  - canScroll = false in proof (needs verification under long content once overflow is correct)
-- Until fixed: bottom-overlap prevention cannot be claimed as enterprise-safe.
+1) HEADER FINALIZATION (UI POLISH, TOKEN-CONSISTENT)
+   - Ensure header row feels “one line” (consistent optical alignment across title / badge / close)
+   - Validate long-title clamp + no collision with close
+   - Validate focus states (close + any header interactive elements)
+
+2) META COMPACTION (STRUCTURE/STYLE)
+   - Goal layout: Row 1 = Ort + Location-Link (thematisch zusammen)
+   - Row 2 = Datum + Uhrzeit (thematisch zusammen)
+   - Keep chip-overflow concerns low-priority (assumed rare), but layout must remain robust
+
+3) READABILITY + RHYTHM (TYPO + SPACING)
+   - Description line-height + paragraph spacing
+   - Consistent vertical rhythm between header / meta / description / location row
+   - Link styling calm but unmistakable (location link + any inline links)
+
+4) ACTIONBAR INTEGRATION (CONNECTED FEEL)
+   - Actionbar top separator / surface integration
+   - Safe-area + reserve contract stays correct (no overlap)
 
 FREEZE INSTRUCTION:
 
-Detailpanel is treated as the Event Detail Page (overlay-based).
-
-Until Enterprise Gate is met AND regression blockers are cleared:
-Changes are allowed ONLY as "Enterprise Gate Closure Workpacks" (UI-only) with console proofs.
+Until Enterprise Gate is met:
+Changes allowed ONLY as "Enterprise Gate Closure Workpacks" (UI-only) with console proofs.
 
 After Enterprise Gate is met and recorded:
 Detailpanel becomes ENTERPRISE-FROZEN.
@@ -681,6 +693,37 @@ Detailpanel (Event Detail Overlay baseline frozen)
 ---
 
 # DECISIONS LOG
+2026-02-26
+
+Detailpanel UI Stabilization — Scroll Contract FIX + Header Direction Locked
+
+Status:
+
+IN PROGRESS (Gate not claimable yet)
+
+Decisions (permanent):
+
+- Detailpanel remains “height-to-content”; scroll is a safety-net only.
+- Scroll contract must be provable via CSSOM + computed styles (no “looks fine” claims):
+  - detail-panel-body overflowY must be auto
+  - scrollPaddingBottom must resolve to px (var fallback allowed)
+  - canScroll must become true under long-content stress test
+- Header semantics are locked:
+  - Category icon is INDICATOR (content badge), never a control.
+  - Close is DISMISS control with app-like affordance; token-based, calm, and touch-safe.
+- Working mode for ongoing sessions (efficiency, no drift):
+  - ZIP baseline can be treated as canonical for the session.
+  - Assistant maintains a consolidated working copy per file across the session.
+  - User applies assistant-provided changes unless explicitly stated otherwise.
+
+Proof snapshot (captured):
+
+- CSSOM parsing issue was isolated and resolved (rules present and effective).
+- After fix:
+  - overflowY = auto
+  - scrollPaddingBottom resolves to px (not auto)
+  - stress test produces scrollHeight > clientHeight and canScroll = true
+
 2026-02-24
 
 Detailpanel UI Stabilization — Category Icon Semantics + Proof Snapshot
@@ -1278,7 +1321,7 @@ Update SESSION STATE
 
 OVERALL STATUS:
 
-UI: DETAILPANEL REGRESSION INVESTIGATION — HEADER/META PASS (proofs green), SCROLL CONTRACT FAIL (detail-panel-body overflowY visible, scrollPaddingBottom auto)
+UI: DETAILPANEL ENTERPRISE GATE CLOSURE — Scroll contract FIXED (proofs green under stress test); Header direction locked (category = badge indicator, close = dismiss control). Next: header final alignment polish + meta compaction + readability/rhythm + actionbar integration.
 
 PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
 - Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
