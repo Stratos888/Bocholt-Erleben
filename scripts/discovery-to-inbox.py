@@ -3150,6 +3150,7 @@ def main() -> None:
             # Umfang:
             # - Setzt nur lokale Variablen final_location / final_time (+ erweitert notes)
             # === END BLOCK: ENRICH LOCATION/TIME (infer + detail fetch fallback, v2) ===
+            combined_notes = clean_text(c.get("notes", ""))
             raw_location = clean_text(c.get("location", ""))
             raw_time = norm(c.get("time", ""))
 
@@ -3259,10 +3260,11 @@ def main() -> None:
             will_write = (status != "rejected") and (not already_live) and (not already_inbox)
 
             # Notes (inkl. reason + missing-date Hinweis)
+            _base_notes = clean_text(combined_notes)
             combined_notes = (
-                clean_text(c.get("notes", ""))
-                + ("" if not reason else ((" | " if clean_text(c.get("notes", "")) else "") + reason))
-                + ("" if d else ((" | " if (clean_text(c.get("notes", "")) or reason) else "") + "⚠️ event_date_missing"))
+                _base_notes
+                + ("" if not reason else ((" | " if _base_notes else "") + reason))
+                + ("" if d else ((" | " if (_base_notes or reason) else "") + "⚠️ event_date_missing"))
             )
 
             # Log every candidate row (analyse tab)
