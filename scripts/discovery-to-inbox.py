@@ -1294,62 +1294,88 @@ def parse_html_jsonld_events(html_text: str, base_url: str) -> List[Dict[str, st
     """
     Extrahiert schema.org Event aus JSON-LD.
     """
-    html_text = html_text or ""
-    out: List[Dict[str, str]] = []
+    # === BEGIN BLOCK: JSONLD PARSER HARDEN (no-throw, v1) ===
+    # Datei: scripts/discovery-to-inbox.py
+    # Zweck:
+    # - Stabilität: JSON-LD Parsing darf keine Exceptions nach außen werfen
+    # - Verhindert Parse-failed durch Edge-Cases in einzelnen Quellen
+    # Umfang:
+    # - Umhüllt die komplette Extraktion in try/except und liefert immer List[Dict]
+    # === END BLOCK: JSONLD PARSER HARDEN (no-throw, v1) ===
+    try:
+        html_text = html_text or ""
+        out: List[Dict[str, str]] = []
 
-    for m in _JSONLD_SCRIPT_RE.finditer(html_text):
-        raw = (m.group(1) or "").strip()
-        if not raw:
-            continue
-        try:
-            data = json.loads(raw)
-        except Exception:
-            continue
-
-        for obj in _jsonld_iter_objs(data):
-            if not isinstance(obj, dict):
+        for m in _JSONLD_SCRIPT_RE.finditer(html_text):
+            raw = (m.group(1) or "").strip()
+            if not raw:
                 continue
-            if not _jsonld_is_event(obj):
-                continue
-
-            title = clean_text(_jsonld_pick_str(obj, "name", "headline"))
-            start = _jsonld_pick_str(obj, "startDate", "startDateTime", "start")
-            end = _jsonld_pick_str(obj, "endDate", "endDateTime", "end")
-
-            d1 = _iso_date_part(start)
-            d2 = _iso_date_part(end)
-
-            t1 = _iso_time_part(start)
-            t2 = _iso_time_part(end)
-
-            time_str = ""
-            if t1 and t2 and (d2 == d1 or not d2):
-                time_str = f"{t1}–{t2}"
-            elif t1:
-                time_str = t1
-
-            url = _normalize_event_url(_jsonld_pick_str(obj, "url"), base_url)
-            loc = _jsonld_location(obj)
-            desc = clean_text(_jsonld_pick_str(obj, "description"))
-
-            if not title:
+            try:
+                data = json.loads(raw)
+            except Exception:
                 continue
 
-            out.append(
-                {
-                    "title": title,
-                    "date": d1 or "",
-                    "endDate": d2 or "",
-                    "time": time_str,
-                    "location": loc,
-                    "url": url,
-                    "description": desc,
-                    "notes": "source=html_jsonld",
-                }
-            )
+            try:
+                objs = list(_jsonld_iter_objs(data))
+            except Exception:
+                objs = []
 
-            if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
-                return out
+            for obj in (objs or []):
+                if not isinstance(obj, dict):
+                    continue
+                try:
+                    if not _jsonld_is_event(obj):
+                        continue
+                except Exception:
+                    continue
+
+                title = clean_text(_jsonld_pick_str(obj, "name", "headline"))
+                start = _jsonld_pick_str(obj, "startDate", "startDateTime", "start")
+                end = _jsonld_pick_str(obj, "endDate", "endDateTime", "end")
+
+                d1 = _iso_date_part(start)
+                d2 = _iso_date_part(end)
+
+                t1 = _iso_time_part(start)
+                t2 = _iso_time_part(end)
+
+                time_str = ""
+                if t1 and t2 and (d2 == d1 or not d2):
+                    time_str = f"{t1}–{t2}"
+                elif t1:
+                    time_str = t1
+
+                url = _normalize_event_url(_jsonld_pick_str(obj, "url"), base_url)
+
+                try:
+                    loc = _jsonld_location(obj)
+                except Exception:
+                    loc = ""
+
+                desc = clean_text(_jsonld_pick_str(obj, "description"))
+
+                if not title:
+                    continue
+
+                out.append(
+                    {
+                        "title": title,
+                        "date": d1 or "",
+                        "endDate": d2 or "",
+                        "time": time_str,
+                        "location": loc,
+                        "url": url,
+                        "description": desc,
+                        "notes": "source=html_jsonld",
+                    }
+                )
+
+                if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+                    return out
+
+        return out
+    except Exception:
+        return []
 
     return out
 
@@ -1880,312 +1906,14 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
             return ("", "")
 
-        def _extract_time_loc_from_html(_html_text: str, *, allow_text_fallback: bool) -> Tuple[str, str]:
-            """Returns (time_str, location_str)."""
-            html = _html_text or ""
-            scripts = re.findall(
-                r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
-                html,
-                flags=re.IGNORECASE | re.DOTALL,
-            )
-
-            def _iter_ld_nodes(obj):
-                if isinstance(obj, list):
-                    for it in obj:
-                        yield from _iter_ld_nodes(it)
-                elif isinstance(obj, dict):
-                    yield obj
-                    if "@graph" in obj:
-                        yield from _iter_ld_nodes(obj.get("@graph"))
-
-            def _is_relevant_type(tval) -> bool:
-                if isinstance(tval, str):
-                    k = norm_key(tval)
-                    return (
-                        k.endswith("event")
-                        or k.endswith(":event")
-                        or k.endswith("course")
-                        or k.endswith(":course")
-                        or "educationevent" in k
-                        or "courseinstance" in k
-                    )
-                if isinstance(tval, list):
-                    return any(_is_relevant_type(x) for x in tval)
-                return False
-
-            def _time_from_iso(sd_raw: str, ed_raw: str) -> str:
-                t1 = _infer_time_from_text(sd_raw or "")
-                t2 = _infer_time_from_text(ed_raw or "")
-                if t1 and t2 and t2 != t1:
-                    return f"{t1}–{t2}"
-                return t1 or ""
-
-            # JSON-LD preferred
-            for raw in scripts:
-                raw = (raw or "").strip()
-                if not raw:
-                    continue
-                try:
-                    data = json.loads(raw)
-                except Exception:
-                    continue
-
-                for node in _iter_ld_nodes(data):
-                    if not isinstance(node, dict):
-                        continue
-                    if not _is_relevant_type(node.get("@type")):
-                        continue
-
-                    # time
-                    time_str = _time_from_iso(str(node.get("startDate") or ""), str(node.get("endDate") or ""))
-
-                    # location
-                    loc_str = ""
-                    loc_obj = node.get("location") or node.get("place")
-                    if isinstance(loc_obj, dict):
-                        loc_name = clean_text(str(loc_obj.get("name", "") or ""))
-                        addr = loc_obj.get("address")
-                        addr_str = ""
-                        if isinstance(addr, dict):
-                            addr_parts = [
-                                clean_text(str(addr.get("streetAddress", "") or "")),
-                                clean_text(str(addr.get("postalCode", "") or "")),
-                                clean_text(str(addr.get("addressLocality", "") or "")),
-                            ]
-                            addr_str = " ".join([p for p in addr_parts if p]).strip()
-                        elif isinstance(addr, str):
-                            addr_str = clean_text(addr)
-                        loc_str = " - ".join([p for p in [loc_name, addr_str] if p]).strip()
-                    elif isinstance(loc_obj, str):
-                        loc_str = clean_text(loc_obj)
-
-                    if time_str or loc_str:
-                        return (time_str, loc_str)
-
-                    # Course instances may hold the real startDate/location
-                    for key in ("hasCourseInstance", "courseInstance", "subEvent", "event"):
-                        inst = node.get(key)
-                        if not inst:
-                            continue
-                        inst_list = [inst] if isinstance(inst, dict) else (inst if isinstance(inst, list) else [])
-                        for it in inst_list:
-                            if not isinstance(it, dict):
-                                continue
-                            t2 = _time_from_iso(str(it.get("startDate") or ""), str(it.get("endDate") or ""))
-                            loc2 = ""
-                            loc_obj2 = it.get("location") or it.get("place")
-                            if isinstance(loc_obj2, dict):
-                                loc2 = clean_text(str(loc_obj2.get("name", "") or ""))
-                            elif isinstance(loc_obj2, str):
-                                loc2 = clean_text(loc_obj2)
-                            if t2 or loc2:
-                                return (t2, loc2)
-
-            if allow_text_fallback:
-                detail_text = clean_text(_strip_html_tags(html))
-                loc_guess, time_guess = infer_location_time(title, detail_text)
-                return (time_guess or "", loc_guess or "")
-
-            return ("", "")
-
-        path_event_hint = (
-            "/veranstaltung" in path
-            or "/veranstaltungen" in path
-            or "/event" in path
-            or "/events" in path
-            or "/termin" in path
-            or "/termine" in path
-            or "/kalender" in path
-            or "/programm" in path
-        )
-
-             # === BEGIN BLOCK: DETAIL FETCH TRIGGER (date OR title repair + per-host cap, v2) ===
+        # === BEGIN BLOCK: REMOVE LOCAL _extract_time_loc_from_html SHADOW (v1) ===
+        # Datei: scripts/discovery-to-inbox.py
         # Zweck:
-        # - Detail-Fetch nicht nur für fehlendes Datum, sondern auch für generische Titel ("Mehr erfahren")
-        # - JUBOH Kursdetailseiten: Detail-Fetch auch dann, wenn event_signal im Listing-Kontext fehlt
-        # - Per-host cap via cap_for_host(host)
+        # - Fix: verhindert Shadowing der globalen Helper-Funktion _extract_time_loc_from_html(...)
+        # - Bugfix: vermeidet 'unexpected keyword argument title' aus lokalen nested Funktionen
         # Umfang:
-        # - Ersetzt nur die should_fetch_detail-Definition
-        is_juboh_kurs = host.endswith("juboh.de") and ("/programm/kurs/" in path)
-        host_cap = cap_for_host(host)
-
-        should_fetch_detail = (
-            ((not ev_date) or needs_title_repair)
-            and (event_signal or is_juboh_kurs)
-            and (url_seems_event or path_event_hint or is_juboh_kurs)
-            and (detail_fetch_count < detail_fetch_budget)
-            and (host_fetches < host_cap)
-        )
-        # === END BLOCK: DETAIL FETCH TRIGGER (date OR title repair + per-host cap, v2) ===
-
-        if should_fetch_detail:
-            # 0) Haupt-URL laden (cache + budget)
-            if url not in detail_html_cache:
-                try:
-                    detail_html_cache[url] = safe_fetch(url, timeout=detail_fetch_timeout)
-                except Exception:
-                    detail_html_cache[url] = ""
-                detail_fetch_count += 1
-                detail_fetch_by_host[host] = host_fetches + 1
-
-               # === BEGIN BLOCK: TITLE REPAIR FROM DETAIL HTML (og:title -> h1 -> title) ===
-            # Zweck:
-            # - Wenn Linktext generisch ("Mehr erfahren"), Titel aus Detailseite extrahieren
-            # Umfang:
-            # - Ersetzt nur die Zuweisung von detail_html und ergänzt Reparaturlogik
-            detail_html = detail_html_cache.get(url, "") or ""
-
-            if detail_html and needs_title_repair:
-                # 1) og:title
-                m_og = re.search(
-                    r"<meta[^>]+property=['\"]og:title['\"][^>]+content=['\"]([^'\"]+)['\"]",
-                    detail_html,
-                    flags=re.IGNORECASE,
-                )
-                repaired = clean_text(m_og.group(1)) if m_og else ""
-
-                # 2) h1 (falls og:title fehlt)
-                if not repaired:
-                    m_h1 = re.search(r"<h1[^>]*>(.*?)</h1>", detail_html, flags=re.IGNORECASE | re.DOTALL)
-                    repaired = clean_text(_strip_html_tags(m_h1.group(1))) if m_h1 else ""
-
-                # 3) <title> (fallback)
-                if not repaired:
-                    m_t = re.search(r"<title[^>]*>(.*?)</title>", detail_html, flags=re.IGNORECASE | re.DOTALL)
-                    repaired = clean_text(_strip_html_tags(m_t.group(1))) if m_t else ""
-
-                if repaired:
-                    title = repaired
-                    combined = f"{title}\n{ctx}"
-                    needs_title_repair = False
-            # === END BLOCK: TITLE REPAIR FROM DETAIL HTML (og:title -> h1 -> title) ===
-
-            # Auf Listing-Seiten kein Text-Fallback: nur JSON-LD (sonst Gefahr falscher Datumstreffer)
-            allow_text_on_main = not (is_listing_like and (not url_seems_event))
-
-            if detail_html:
-                d1, d2 = _extract_date_from_html(detail_html, allow_text_fallback=allow_text_on_main)
-                if d1:
-                    ev_date, ev_end = d1, d2
-
-            # 1) Wenn immer noch kein Datum: bei listing-like Seiten EIN Detail-Link nachziehen
-            if (not ev_date) and detail_html and is_listing_like:
-                detail_candidates: List[str] = []
-                for mm in _HTML_A_RE.finditer(detail_html):
-                    href2 = norm(mm.group(1))
-                    if not href2:
-                        continue
-                    hk2 = norm_key(href2)
-                    if hk2.startswith(("mailto:", "tel:", "javascript:")) or hk2.startswith("#"):
-                        continue
-
-                    u2 = _normalize_event_url(href2, url)  # base = aktuelle Seite
-                    if not u2 or u2 == url:
-                        continue
-
-                    p2 = urlparse(u2)
-                    if (p2.netloc or "").lower() != host:
-                        continue
-
-                    path2 = (p2.path or "").lower()
-                    if "/kategorie/" in path2 or "/category/" in path2 or "/programm/kategorie" in path2:
-                        continue
-
-                    # nur plausible Detailpfade (konservativ)
-                    if not (
-                        "/veranstaltung" in path2
-                        or "/event" in path2
-                        or "/termin" in path2
-                        or ("/programm/" in path2 and "/kategorie/" not in path2)
-                        or "/portfolio-items/" in path2
-                    ):
-                        continue
-
-                    if u2 not in detail_candidates:
-                        detail_candidates.append(u2)
-
-                    if len(detail_candidates) >= 3:
-                        break
-
-                # genau EIN Detail-Fetch (zusätzlich), budgetiert
-                if detail_candidates and (detail_fetch_count < detail_fetch_budget):
-                    u2 = detail_candidates[0]
-                    host_fetches2 = detail_fetch_by_host.get(host, 0)
-                    host_cap2 = cap_for_host(host)
-                    if host_fetches2 < host_cap2:
-                        if u2 not in detail_html_cache:
-                            try:
-                                detail_html_cache[u2] = safe_fetch(u2, timeout=detail_fetch_timeout)
-                            except Exception:
-                                detail_html_cache[u2] = ""
-                            detail_fetch_count += 1
-                            detail_fetch_by_host[host] = host_fetches2 + 1
-
-                        h2 = detail_html_cache.get(u2, "") or ""
-                        if h2:
-                            d1, d2 = _extract_date_from_html(h2, allow_text_fallback=True)
-                            if d1:
-                                ev_date, ev_end = d1, d2
-                                # URL auf echte Detailseite upgraden
-                                url = u2
-                                url_key = norm_key(url)
-                                url_seems_event = bool(
-                                    re.search(r"/(event|events|veranstalt|veranstaltungen|termin|termine|kalender|programm|agenda)\b", url_key)
-                                )
-        # === END BLOCK: DETAIL HTML DATE ENRICHMENT (budgeted fetch + json-ld + text + listing->detail, v3-correctness) ===
-        # === BEGIN BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v2 consolidated) ===
-        # Zweck:
-        # - JUBOH Kursdetailseiten dürfen nicht am (date OR event_signal)-Gate verloren gehen
-        # - Zusätzlich: minimaler "Kurs"-Hinweis im Description-Text, damit classify_candidate() nicht reject:no_event_signal triggert
-        # Umfang:
-        # - Ersetzt nur das Gate + desc-Zuweisung direkt vor out.append (keine Fetch-/Budget-Änderungen)
-
-        if is_juboh_kurs and not event_signal:
-            event_signal = True
-
-        if not ev_date and not event_signal:
-            continue
-        if ev_date and not event_signal and not url_seems_event:
-            continue
-
-        # Description kurz halten
-        desc = ctx[:500]
-        if is_juboh_kurs and desc:
-            desc = f"Kurs. {desc}"
-        elif is_juboh_kurs:
-            desc = "Kurs."
-        # === END BLOCK: HTML DATE-SCAN GATE (JUBOH kurs allowlist, v2 consolidated) ===
-        ev_time = ""
-        ev_loc = ""
-
-        if detail_html:
-            ev_time, ev_loc = _extract_time_loc_from_html(detail_html, title=title, allow_text_fallback=True)
-
-        if (not ev_time) or (not ev_loc):
-            base_text = clean_text(_strip_html_tags(detail_html)) if detail_html else ctx
-            loc_guess, time_guess = infer_location_time(title, base_text)
-            if not ev_loc:
-                ev_loc = loc_guess or ""
-            if not ev_time:
-                ev_time = time_guess or ""
-        # === END BLOCK: HTML DATE-SCAN ENRICH TIME/LOCATION (JUBOH+fallback, v1) ===
-
-        out.append(
-            {
-                "title": title,
-                "date": ev_date or "",
-                "endDate": (ev_end or "") if ev_date else "",
-                "time": ev_time or "",
-                "location": ev_loc or "",
-                "url": canonical_url(url),
-                "description": desc,
-                "notes": "source=html_datescan",
-            }
-        )
-
-            
-        if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
-            break
+        # - Lokale (nested) Definition entfernt; Aufrufe nutzen ab jetzt die globale Funktion
+        # === END BLOCK: REMOVE LOCAL _extract_time_loc_from_html SHADOW (v1) ===
 
     return out
 
@@ -2209,68 +1937,94 @@ def _kukug_expand_portfolio_links(html_text: str, base_url: str) -> List[str]:
     return links[:10]
 
 def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, str]]:
-    html_text = html_text or ""
-    base_url = norm(base_url)
+    # === BEGIN BLOCK: HTML GENERIC PARSER HARDEN (no-throw, v1) ===
+    # Datei: scripts/discovery-to-inbox.py
+    # Zweck:
+    # - Stabilität: generisches HTML-Parsing darf keine Exceptions nach außen werfen
+    # - Verhindert Parse-failed durch "'NoneType' object is not iterable" in Edge-Cases
+    # Umfang:
+    # - Defensive Guards (or []) und try/except an kritischen Stellen
+    # === END BLOCK: HTML GENERIC PARSER HARDEN (no-throw, v1) ===
+    try:
+        html_text = html_text or ""
+        base_url = norm(base_url)
 
-    # 1) JSON-LD Events
-    out = parse_html_jsonld_events(html_text, base_url)
-    if out:
-        return out
+        # 1) JSON-LD Events
+        out = parse_html_jsonld_events(html_text, base_url) or []
+        if out:
+            return out
 
-    # 2) KuKuG Spezial: Detailseiten nachladen und dort JSON-LD/DateScan anwenden
-    if ("/themen-tipps" in norm_key(base_url)) or ("kukug" in norm_key(base_url)):
-        detail_urls = _kukug_expand_portfolio_links(html_text, base_url)
-        collected: List[Dict[str, str]] = []
-        for du in detail_urls:
+        # 2) KuKuG Spezial: Detailseiten nachladen und dort JSON-LD/DateScan anwenden
+        if ("/themen-tipps" in norm_key(base_url)) or ("kukug" in norm_key(base_url)):
+            detail_urls = _kukug_expand_portfolio_links(html_text, base_url) or []
+            collected: List[Dict[str, str]] = []
+            for du in detail_urls:
+                try:
+                    detail_html = safe_fetch(du)
+                except Exception:
+                    continue
+
+                d = []
+                try:
+                    d = parse_html_jsonld_events(detail_html, du) or []
+                except Exception:
+                    d = []
+                if not d:
+                    try:
+                        d = _html_link_candidates_date_scan(detail_html, du) or []
+                    except Exception:
+                        d = []
+
+                for c in (d or []):
+                    c["notes"] = clean_text((c.get("notes", "") + f"; via=portfolio:{du}")[:180])
+                    collected.append(c)
+
+                if len(collected) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+                    break
+
+            if collected:
+                return collected
+
+        # 3) Feed/ICS Autodiscovery → nachladen und als RSS/ICS parsen
+        try:
+            feed_urls = discover_feeds_from_html(html_text, base_url) or []
+        except Exception:
+            feed_urls = []
+
+        collected2: List[Dict[str, str]] = []
+        for fu in feed_urls:
             try:
-                detail_html = safe_fetch(du)
+                feed_text = safe_fetch(fu)
             except Exception:
                 continue
 
-            # erst JSON-LD, sonst DateScan
-            d = parse_html_jsonld_events(detail_html, du)
-            if not d:
-                d = _html_link_candidates_date_scan(detail_html, du)
+            fk = norm_key(fu)
+            parsed: List[Dict[str, str]] = []
+            try:
+                if fk.endswith(".ics") or ("text/calendar" in fk) or ("format=ical" in fk) or ("?ical=1" in fk) or ("&ical=1" in fk):
+                    parsed = parse_ics_events(feed_text) or []
+                else:
+                    parsed = parse_rss(feed_text) or []
+            except Exception:
+                parsed = []
 
-            for c in d:
-                # notes erweitern (ohne zu lang zu werden)
-                c["notes"] = clean_text((c.get("notes", "") + f"; via=portfolio:{du}")[:180])
-                collected.append(c)
+            for c in (parsed or []):
+                c["notes"] = clean_text((c.get("notes", "") + f"; source=html_feed:{fu}")[:180])
+                collected2.append(c)
 
-            if len(collected) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
+            if len(collected2) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
                 break
 
-        if collected:
-            return collected
+        if collected2:
+            return collected2
 
-    # 3) Feed/ICS Autodiscovery → nachladen und als RSS/ICS parsen
-    feed_urls = discover_feeds_from_html(html_text, base_url)
-    collected2: List[Dict[str, str]] = []
-    for fu in feed_urls:
+        # 4) Fallback: Date-Scan
         try:
-            feed_text = safe_fetch(fu)
+            return _html_link_candidates_date_scan(html_text, base_url) or []
         except Exception:
-            continue
-
-        fk = norm_key(fu)
-        parsed: List[Dict[str, str]] = []
-        try:
-            if fk.endswith(".ics") or ("text/calendar" in fk) or ("format=ical" in fk) or ("?ical=1" in fk) or ("&ical=1" in fk):
-                parsed = parse_ics_events(feed_text)
-            else:
-                parsed = parse_rss(feed_text)
-        except Exception:
-            parsed = []
-
-        for c in parsed:
-            c["notes"] = clean_text((c.get("notes", "") + f"; source=html_feed:{fu}")[:180])
-            collected2.append(c)
-
-        if len(collected2) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
-            break
-
-    if collected2:
-        return collected2
+            return []
+    except Exception:
+        return []
 
     # 4) Fallback: Date-Scan
     return _html_link_candidates_date_scan(html_text, base_url)
