@@ -223,65 +223,31 @@ Stop and request the missing artifact (file, sample HTML, logs, screenshot).
 
 # PIPELINE SCORECARD RULE (ENTERPRISE OBSERVABILITY)
 
-For pipeline work, success must be measurable per run.
+Pipeline changes must include a scorecard:
 
-Any pipeline change must define or update a Scorecard output with:
-- candidates_total
-- inbox_new
-- inbox_updated (backfill)
-- dates_filled
-- times_filled
-- false_positive_reasons_top (at least top 3)
-- source_health summary (success/fail + fetch counts)
+- parsed candidates
+- new inbox rows
+- missing fields ratios
+- error counts
+- top sources by contribution
 
-No “it should be better” fixes without Scorecard delta.
+This is mandatory for enterprise confidence.
 
 ---
 
-# FIXTURE RULE (PREVENTS REGRESSIONS + ACCELERATES ITERATION)
+# FIXTURE RULE (REPRODUCIBLE TEST INPUTS)
 
-When adding/changing extraction logic:
-Create/extend fixtures (saved sample HTML snippets) for:
-- at least 1 positive example (real event)
-- at least 1 negative example (impressum/datenschutz/blog publish date)
+If a bug is source-specific:
 
-Fixes must be validated against fixtures to avoid re-breaking solved cases.
+- capture minimal HTML fixture
+- store in repo under fixtures/
+- ensure parser runs against fixture
+
+No speculative fixes.
+
+---
 
 <!-- === END REPLACEMENT BLOCK: ROOT CAUSE + EVIDENCE PACK + SCORECARD + FIXTURES === -->
-
----
-
-<!-- === BEGIN REPLACEMENT BLOCK: UI MODIFICATION (Batch Mode + Component Contract + Golden Screen verification) | Scope: replaces UI modification rules only === -->
-
-# UI MODIFICATION RULE
-
-Default:
-UI polish must be CSS-only whenever possible.
-
-Avoid structural DOM changes.
-
-Avoid JS changes unless necessary.
-
----
-
-# UI BATCH MODE (ENTERPRISE LEAPS WITHOUT CHAOS)
-
-Purpose:
-Enable fewer iterations with larger, system-level UI improvements.
-
-Allowed when MASTER.md defines an “Enterprise Gate Closure Workpack”:
-
-- Still ONE FILE per change (typically css/style.css)
-- Allowed to replace larger consolidated blocks (tokens + component mapping) in that one file
-- Changes must be systemic (component-level), not scattered one-off overrides
-- Must be validated against the Enterprise UI Rubric for the target screen
-
-Disallowed in UI Batch Mode:
-- touching multiple files
-- ad-hoc per-page overrides that bypass component mapping
-- micro-tweaks that do not move rubric score
-
----
 
 # COMPONENT MAPPING CONTRACT (SINGLE SOURCE OF TRUTH)
 
