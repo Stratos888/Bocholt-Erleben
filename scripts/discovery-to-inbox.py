@@ -530,6 +530,132 @@ def infer_location_time(title: str, description: str) -> Tuple[str, str]:
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
 
+# === BEGIN BLOCK: DETAIL HTML TIME/LOCATION EXTRACTION (global helper, v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Fix: _extract_time_loc_from_html muss global verfügbar sein (wird auch im Main-Loop genutzt)
+# - Stabil: nie Exceptions nach außen (liefert ("","") bei Problemen)
+# - Qualität: bevorzugt JSON-LD (Event/Course), fällt optional auf Text-Inference zurück
+# Umfang:
+# - Neue globale Helper-Funktion (keine Änderung am Parsing-Flow außerhalb der Call-Sites)
+# === END BLOCK: DETAIL HTML TIME/LOCATION EXTRACTION (global helper, v1) ===
+def _extract_time_loc_from_html(
+    html_text: str,
+    *,
+    title: str = "",
+    allow_text_fallback: bool = False,
+) -> Tuple[str, str]:
+    """Returns (time_str, location_str). Never raises."""
+    try:
+        html = html_text or ""
+
+        scripts = re.findall(
+            r"<script[^>]+type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+            html,
+            flags=re.IGNORECASE | re.DOTALL,
+        )
+
+        def _iter_ld_nodes(obj):
+            if isinstance(obj, list):
+                for it in obj:
+                    yield from _iter_ld_nodes(it)
+            elif isinstance(obj, dict):
+                yield obj
+                if "@graph" in obj:
+                    yield from _iter_ld_nodes(obj.get("@graph"))
+
+        def _is_relevant_type(tval) -> bool:
+            if isinstance(tval, str):
+                k = norm_key(tval)
+                return (
+                    k.endswith("event")
+                    or k.endswith(":event")
+                    or k.endswith("course")
+                    or k.endswith(":course")
+                    or "educationevent" in k
+                    or "courseinstance" in k
+                )
+            if isinstance(tval, list):
+                return any(_is_relevant_type(x) for x in tval)
+            return False
+
+        def _time_from_iso(sd_raw: str, ed_raw: str) -> str:
+            t1 = _infer_time_from_text(sd_raw or "")
+            t2 = _infer_time_from_text(ed_raw or "")
+            if t1 and t2 and t2 != t1:
+                return f"{t1}–{t2}"
+            return t1 or ""
+
+        # 1) JSON-LD bevorzugt
+        for raw in scripts:
+            raw = (raw or "").strip()
+            if not raw:
+                continue
+            try:
+                data = json.loads(raw)
+            except Exception:
+                continue
+
+            for node in _iter_ld_nodes(data):
+                if not isinstance(node, dict):
+                    continue
+                if not _is_relevant_type(node.get("@type")):
+                    continue
+
+                # time
+                time_str = _time_from_iso(str(node.get("startDate") or ""), str(node.get("endDate") or ""))
+
+                # location
+                loc_str = ""
+                loc_obj = node.get("location") or node.get("place")
+                if isinstance(loc_obj, dict):
+                    loc_name = clean_text(str(loc_obj.get("name", "") or ""))
+                    addr = loc_obj.get("address")
+                    addr_str = ""
+                    if isinstance(addr, dict):
+                        addr_parts = [
+                            clean_text(str(addr.get("streetAddress", "") or "")),
+                            clean_text(str(addr.get("postalCode", "") or "")),
+                            clean_text(str(addr.get("addressLocality", "") or "")),
+                        ]
+                        addr_str = " ".join([p for p in addr_parts if p]).strip()
+                    elif isinstance(addr, str):
+                        addr_str = clean_text(addr)
+                    loc_str = " - ".join([p for p in [loc_name, addr_str] if p]).strip()
+                elif isinstance(loc_obj, str):
+                    loc_str = clean_text(loc_obj)
+
+                if time_str or loc_str:
+                    return (time_str, loc_str)
+
+                # Kurs-Instanzen enthalten oft die echten Werte
+                for key in ("hasCourseInstance", "courseInstance", "subEvent", "event"):
+                    inst = node.get(key)
+                    if not inst:
+                        continue
+                    inst_list = [inst] if isinstance(inst, dict) else (inst if isinstance(inst, list) else [])
+                    for it in inst_list:
+                        if not isinstance(it, dict):
+                            continue
+                        t2 = _time_from_iso(str(it.get("startDate") or ""), str(it.get("endDate") or ""))
+                        loc2 = ""
+                        loc_obj2 = it.get("location") or it.get("place")
+                        if isinstance(loc_obj2, dict):
+                            loc2 = clean_text(str(loc_obj2.get("name", "") or ""))
+                        elif isinstance(loc_obj2, str):
+                            loc2 = clean_text(loc_obj2)
+                        if t2 or loc2:
+                            return (t2, loc2)
+
+        # 2) Fallback: Text-Inference
+        if allow_text_fallback:
+            detail_text = clean_text(_strip_html_tags(html))
+            loc_guess, time_guess = infer_location_time(title or "", detail_text)
+            return (time_guess or "", loc_guess or "")
+
+        return ("", "")
+    except Exception:
+        return ("", "")
 _NON_EVENT_RE = re.compile("|".join(f"(?:{p})" for p in NON_EVENT_PATTERNS), re.IGNORECASE)
 _EVENT_SIGNAL_RE = re.compile(
     r"\b("
@@ -2033,7 +2159,7 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         ev_loc = ""
 
         if detail_html:
-            ev_time, ev_loc = _extract_time_loc_from_html(detail_html, allow_text_fallback=True)
+            ev_time, ev_loc = _extract_time_loc_from_html(detail_html, title=title, allow_text_fallback=True)
 
         if (not ev_time) or (not ev_loc):
             base_text = clean_text(_strip_html_tags(detail_html)) if detail_html else ctx
@@ -3049,7 +3175,7 @@ def main() -> None:
 
                 if detail_html:
                     # 1) erst strukturiert (JSON-LD), dann Textfallback
-                    t2, l2 = _extract_time_loc_from_html(detail_html, allow_text_fallback=True)
+                    t2, l2 = _extract_time_loc_from_html(detail_html, title=title, allow_text_fallback=True)
 
                     if need_time and t2:
                         final_time = t2
