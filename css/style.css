@@ -1982,17 +1982,19 @@ Umfang:
 === */
 /* === BEGIN FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) ===
 Zweck:
-- Close bleibt voll klickbar (Touch-Target via ::before bleibt)
-- “Quiet filled” statt reines Ghost (Touch-Affordance)
-- Zentrierung ohne -3px Hack
+- Close ist Teil der Headerzeile (koppelt vertikal sauber an 1/2-Zeilen Titel)
+- Kein absolutes Top/Right mehr -> keine optischen Drift-Probleme bei Wrap
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
 #event-detail-panel .detail-panel-close{
-  position: absolute;
-  right: var(--gutter);
-  top: calc(var(--dp-header-pad-top) / 2);
-  transform: translateY(-50%);
+  position: static;
+
+  /* Header-Grid Placement */
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
 
   width: var(--dp-close-size);
   height: var(--dp-close-size);
@@ -2027,7 +2029,7 @@ Umfang:
 
 #event-detail-panel .detail-panel-close:active{
   background: var(--ui-surface-tint-active);
-  transform: translateY(-50%) scale(0.96);
+  transform: scale(0.96);
 }
 /* === END FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) === */
 
@@ -2085,9 +2087,9 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Kategorie ist Indikator (kein Control) -> links am Titel als ruhiger Badge/Marker
-- Titel ist Anchor -> keine Block-Margins in der Zeile, sauberes Raster
-- Reserve rechts für Close bleibt stabil, keine Kollisionen
+- Header ist ein Grid: Titel links, Close rechts (ohne padding-right Hacks)
+- Title-Row als Grid: Badge + Titel stabil, auch bei 2 Zeilen Clamp
+- Saubere vertikale Kopplung: Close zentriert zur realen Zeilenhöhe
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon
 === */
@@ -2096,6 +2098,11 @@ Umfang:
 #event-detail-panel .detail-header{
   position: relative;
 
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--space-sm);
+  align-items: center;
+
   /* Kein doppeltes Top-Spacing: kommt aus #detail-content */
   padding: 0 0 var(--space-md);
   margin: 0;
@@ -2103,24 +2110,23 @@ Umfang:
   border-bottom: 0;
 }
 
-/* Title-Row: einheitliche Achse (Badge + Title), Reserve für Close */
+/* Title-Row: Badge + Title als Raster (kein Reserve-Padding mehr nötig) */
 #event-detail-panel .detail-title-row{
-  display: flex;
+  grid-column: 1;
+  grid-row: 1;
+
+  display: grid;
+  grid-template-columns: var(--ui-icon-btn-size) minmax(0, 1fr);
   align-items: center;
   gap: var(--space-sm);
 
   width: 100%;
   min-height: var(--ui-icon-btn-size);
-
-  /* Reserve rechts: Close + Gutter + minimaler Abstand */
-  padding-right: calc(var(--dp-close-size) + var(--gutter) + var(--space-sm));
+  min-width: 0;
 }
 
-/* Category Indicator: links am Titel als Badge/Marker (nicht klickbar) */
+/* Category Indicator: ruhiger Badge/Marker (nicht klickbar) */
 #event-detail-panel .detail-category-icon{
-  order: -1; /* links vor den Titel ziehen */
-  flex: 0 0 auto;
-
   width: var(--ui-icon-btn-size);
   height: var(--ui-icon-btn-size);
 
@@ -2134,7 +2140,8 @@ Umfang:
 
   opacity: var(--ui-icon-opacity);
 
-  font-size: var(--ui-icon-size-md);
+  /* etwas ruhiger als Titel/Close */
+  font-size: var(--ui-icon-size-sm);
   line-height: 1;
 
   cursor: default;
@@ -2144,11 +2151,10 @@ Umfang:
 
 /* Title: Anchor (ruhig, clamp), ohne “Zeilen-Margin” */
 #event-detail-panel .detail-title{
-  margin: 0;              /* wichtig: kein eigener Block-Abstand in der Headerzeile */
+  margin: 0;
   min-width: 0;
-  flex: 1 1 auto;
 
-  font-size: 1.05rem; /* exakt wie .event-title */
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -3056,6 +3062,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
