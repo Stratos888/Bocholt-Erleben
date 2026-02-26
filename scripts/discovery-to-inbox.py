@@ -912,21 +912,28 @@ def classify_candidate(
 
 
 
-# === BEGIN BLOCK: SAFE FETCH (retry + backoff for 503/429, v1) ===
+# === BEGIN BLOCK: SAFE FETCH (retry + backoff for 503/429/5xx, v2) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
-# - Stabiler Fetch gegen sporadische 503/429 (z.B. Münsterland)
-# - 3 Retries mit Backoff: 10s, 30s, 90s
+# - Stabiler Fetch gegen sporadische 503/429/5xx (z.B. Münsterland)
+# - Retries mit Backoff + Retry-After Support
+# - Nach Ausschöpfen der Retries: "soft fail" für diese Codes (return ""), damit kein "Parse failed" geloggt wird
 # Umfang:
 # - Ersetzt nur safe_fetch()
-# === END BLOCK: SAFE FETCH (retry + backoff for 503/429, v1) ===
+# === END BLOCK: SAFE FETCH (retry + backoff for 503/429/5xx, v2) ===
 def safe_fetch(url: str, timeout: int = 20) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "BocholtErlebenDiscovery/1.0"})
-
     backoffs = [10, 30, 90]
     last_err: Exception | None = None
 
     for attempt in range(len(backoffs) + 1):
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "BocholtErlebenDiscovery/1.0",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
+        )
+
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 charset = resp.headers.get_content_charset() or "utf-8"
@@ -934,10 +941,25 @@ def safe_fetch(url: str, timeout: int = 20) -> str:
 
         except urllib.error.HTTPError as e:
             code = int(getattr(e, "code", 0) or 0)
-            if code in (429, 503) and attempt < len(backoffs):
-                time.sleep(backoffs[attempt])
+
+            # Retry auf typische Transient-Errors
+            if code in (429, 500, 502, 503, 504) and attempt < len(backoffs):
+                retry_after = None
+                try:
+                    ra = e.headers.get("Retry-After")
+                    if ra:
+                        retry_after = int(str(ra).strip())
+                except Exception:
+                    retry_after = None
+
+                time.sleep(retry_after if retry_after is not None else backoffs[attempt])
                 last_err = e
                 continue
+
+            # Nach Retries: soft-fail für Transient-Errors (damit Quelle nicht "Parse failed" triggert)
+            if code in (429, 500, 502, 503, 504):
+                return ""
+
             raise
 
         except Exception as e:
@@ -948,7 +970,9 @@ def safe_fetch(url: str, timeout: int = 20) -> str:
             raise
 
     if last_err:
-        raise last_err
+        # Finaler Soft-Fail, wenn es (aus welchem Grund auch immer) nur Transient-Probleme waren
+        return ""
+
     raise RuntimeError("safe_fetch failed unexpectedly")
 
 
