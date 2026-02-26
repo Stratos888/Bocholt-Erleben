@@ -52,10 +52,11 @@ SESSION OPEN PROTOCOL (must do):
 - Choose 1 Golden Screen / 1 Workpack
 - Produce Rubric Gap List (Top 3 FAIL) before patch
 - Use uploaded repo ZIP as canonical baseline for this session (ZIP-FIRST)
-- Enforce VERIFIED WORKING COPY GATE (ENGINEERING.md): no patch before file is opened and anchor lines are proven in-chat
+- Maintain an assistant-managed canonical working copy per file for this chat session (ENGINEERING.md)
+- Every patch response MUST include Working Copy Attestation (source + file + verbatim anchors + bytes fingerprint); otherwise: STOP (no patch)
 - Output code changes as Replace-instructions only (BEGIN/END + replacement block)
 - Batch is allowed for speed ONLY if Replace ranges do not overlap; otherwise merge into one Replace block
-- Assume user applies all assistant-provided changes unless user explicitly says otherwise; if sync is uncertain, STOP and request current file/section
+- Assume user applies all assistant-provided changes unless user explicitly says otherwise; if user says they didn’t apply or made manual edits, STOP and request current file/section
 
 SESSION CLOSE PROTOCOL (must do):
 - Short session report (max 8 bullets)
