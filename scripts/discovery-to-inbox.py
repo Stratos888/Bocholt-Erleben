@@ -1748,12 +1748,28 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
 # === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
         # Zweck:
-        # - "Mehr erfahren"/"Details" sind Linktexte -> Titel später aus Detailseite reparieren
+        # - Titel robust aus Link-Text/Attributen ableiten (inner, title, aria-label, img alt)
         # - Filter/Kategorie/Pagination Links (z.B. "16 Jahre", "2", "Datum", "/kategorie/", "browse=") sind KEINE Events
-        # - (NEU) Host-spezifische Hard-Skips, um Nicht-Events aus bekannten Quellen konsequent rauszufiltern
+        # - Host-spezifische Hard-Skips, um Nicht-Events aus bekannten Hosts konsequent rauszufiltern
         # Umfang:
-        # - Ersetzt nur die Titel/Combined-Erzeugung (inkl. frühe hard-skips) in _html_link_candidates_date_scan
-        title = inner or ""
+        # - Nur Titel/Combined-Erzeugung + frühe hard-skips in _html_link_candidates_date_scan
+
+        # Titel robust bestimmen (inner -> title/aria-label -> img alt)
+        title = clean_text(inner or "")
+        if not title:
+            try:
+                title = clean_text(a.get("title", "") or a.get("aria-label", "") or "")
+            except Exception:
+                title = ""
+
+        if not title:
+            try:
+                img = a.find("img")
+                if img:
+                    title = clean_text(img.get("alt", "") or "")
+            except Exception:
+                title = ""
+
         if not title:
             continue
 
@@ -1773,16 +1789,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
 
         url_lk = norm_key(url)
 
-        # Hard skip: JUBOH Kategorien + Listing/Sortier-/Pager-URLs
+        # Hard skip: Kategorien + Listing/Sortier-/Pager-URLs
         if ("/kategorie/" in url_lk) or ("browse=" in url_lk) or ("orderby=" in url_lk) or ("&cHash=" in url_lk.lower()):
             continue
 
         # === BEGIN BLOCK: HOST HARD SKIPS (reduce non-events, v1) ===
-        # Zweck:
-        # - Entfernt systematisch "Nicht-Event"-Seiten aus bekannten Hosts (leichte Sprache, Wirtschaft, Kulturförderung, Programme, Listing-Roots)
-        # - Erhöht Quote "vollständig" (title+date+url+location), weil Review nicht mehr mit Off-Topic geflutet wird
-        # Umfang:
-        # - Nur harte, klar belegte Skip-Regeln; keine heuristischen "vielleicht"-Matches
         host_lk = (urlparse(url).netloc or "").lower()
         path_lk = (urlparse(url).path or "").lower()
 
@@ -1791,12 +1802,12 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             if ("/leichte-sprache" in path_lk) or ("leichte sprache" in title_norm):
                 continue
 
-        # Münsterland e.V.: Review war voll mit Kultur-/Förderseiten; nur echte /veranstaltungen/ akzeptieren
+        # Münsterland e.V.: nur echte /veranstaltungen/ akzeptieren
         if host_lk.endswith("www.muensterland.com"):
             if "/veranstaltungen/" not in path_lk:
                 continue
 
-        # Isselburg: Review war voll mit Wirtschaft/Ansprechpartner; nur Veranstaltungsbereich akzeptieren
+        # Isselburg: nur Veranstaltungsbereich akzeptieren
         if host_lk.endswith("www.isselburg.de"):
             if "/veranstaltungen" not in path_lk:
                 continue
