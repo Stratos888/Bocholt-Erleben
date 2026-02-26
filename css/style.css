@@ -1955,49 +1955,50 @@ Umfang:
 }
 /* === END BLOCK: DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) === */
 
+/* === BEGIN FIX: DETAILPANEL DRAG HIT SAFE AREA (do not block close) ===
+Zweck:
+- Drag-Hit darf den Close-Button oben rechts nicht überdecken
+- CSS-only: reserviert rechts eine Safe-Area in Close-Breite (+ Abstand)
+Umfang:
+- Nur #event-detail-panel .detail-panel-drag-hit
+=== */
 /* Drag-Hit-Area */
 #event-detail-panel .detail-panel-drag-hit{
   position: absolute;
   left: 0;
-  right: 0;
+
+  /* Safe-Area für Close oben rechts */
+  right: calc(var(--ui-tap-target) + var(--space-sm));
+
   top: 0;
   height: 52px;
+
   z-index: 3;
   background: transparent;
   touch-action: none;
 }
+/* === END FIX: DETAILPANEL DRAG HIT SAFE AREA (do not block close) === */
 
-/* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller)
-Zweck: Close sitzt in der Headerzeile (1/2-Zeilen Titel bleibt stabil); keine absoluten Offsets.
-Umfang: Nur Close-Button (Detailpanel).
-=== */
-/* Close Button: aligned to header grid, compact */
-/* === BEGIN BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) ===
+/* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps)
 Zweck:
-- Touch-Target >= 44x44 (Enterprise)
-- Close wirkt “App-mäßig”: quiet-filled (dauerhaft erkennbar), aber ruhig
-- Token-only (keine RGBA-Hardcodes) + keine Magic Offsets
-Umfang:
-- ersetzt nur .detail-panel-close + :hover/:focus-visible/:active + ::before
-=== */
-/* === BEGIN FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) ===
-Zweck:
-- Close ist Teil des Header-Rasters (keine Drift bei 2 Zeilen Titel)
-- “Quiet filled” statt reines Ghost (Touch-Affordance)
-- Zentrierung ohne translateY Hacks
+- Close ist garantiert klickbar (kein pseudo-element das fremd positioniert)
+- z-index wirkt sicher (positioned element)
+- bleibt in Header-Grid, ohne Magic Offsets
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
 #event-detail-panel .detail-panel-close{
-  position: static;
+  /* IMPORTANT: z-index wirkt nur bei position != static */
+  position: relative;
+  z-index: 6; /* über drag-hit (3) und handle (4) */
 
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
   align-self: center;
 
-  width: var(--dp-close-size);
-  height: var(--dp-close-size);
+  width: var(--ui-tap-target);
+  height: var(--ui-tap-target);
   border-radius: 999px;
 
   display: inline-flex;
@@ -2015,7 +2016,6 @@ Umfang:
 
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  z-index: 20;
 
   transform: none;
 }
@@ -2033,17 +2033,7 @@ Umfang:
   background: var(--ui-surface-tint-active);
   transform: scale(0.96);
 }
-/* === END FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) === */
-
-/* Invisible hit-area expansion to >=44px without changing visuals */
-#event-detail-panel .detail-panel-close::before{
-  content: "";
-  position: absolute;
-  inset: calc((var(--dp-close-size) - var(--ui-tap-target)) / 2);
-  border-radius: 999px;
-  background: transparent;
-}
-/* === END BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) === */
+/* === END PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps) === */
 /* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
 Zweck: Parser-sichere Definition des einzigen Scroll-Containers im Detailpanel + Reserve gegen Actionbar-Overlap.
 Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detail-panel #detail-content).
@@ -3063,6 +3053,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
