@@ -1722,10 +1722,11 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
         ctx = clean_text(_strip_html_tags(ctx_html))
         # === END BLOCK: HTML LINK CONTEXT WINDOW (dynamic, juboh boost, v1) ===
 
-               # === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
+# === BEGIN BLOCK: HTML LINK TITLE QUALITY (generic titles + hard skips) ===
         # Zweck:
         # - "Mehr erfahren"/"Details" sind Linktexte -> Titel später aus Detailseite reparieren
         # - Filter/Kategorie/Pagination Links (z.B. "16 Jahre", "2", "Datum", "/kategorie/", "browse=") sind KEINE Events
+        # - (NEU) Host-spezifische Hard-Skips, um Nicht-Events aus bekannten Quellen konsequent rauszufiltern
         # Umfang:
         # - Ersetzt nur die Titel/Combined-Erzeugung (inkl. frühe hard-skips) in _html_link_candidates_date_scan
         title = inner or ""
@@ -1747,9 +1748,45 @@ def _html_link_candidates_date_scan(html_text: str, base_url: str) -> List[Dict[
             continue
 
         url_lk = norm_key(url)
+
         # Hard skip: JUBOH Kategorien + Listing/Sortier-/Pager-URLs
         if ("/kategorie/" in url_lk) or ("browse=" in url_lk) or ("orderby=" in url_lk) or ("&cHash=" in url_lk.lower()):
             continue
+
+        # === BEGIN BLOCK: HOST HARD SKIPS (reduce non-events, v1) ===
+        # Zweck:
+        # - Entfernt systematisch "Nicht-Event"-Seiten aus bekannten Hosts (leichte Sprache, Wirtschaft, Kulturförderung, Programme, Listing-Roots)
+        # - Erhöht Quote "vollständig" (title+date+url+location), weil Review nicht mehr mit Off-Topic geflutet wird
+        # Umfang:
+        # - Nur harte, klar belegte Skip-Regeln; keine heuristischen "vielleicht"-Matches
+        host_lk = (urlparse(url).netloc or "").lower()
+        path_lk = (urlparse(url).path or "").lower()
+
+        # LWL Textilwerk: Utility-Seiten wie "Leichte Sprache" sind keine Events
+        if host_lk.endswith("textilwerk-bocholt.lwl.org"):
+            if ("/leichte-sprache" in path_lk) or ("leichte sprache" in title_norm):
+                continue
+
+        # Münsterland e.V.: Review war voll mit Kultur-/Förderseiten; nur echte /veranstaltungen/ akzeptieren
+        if host_lk.endswith("www.muensterland.com"):
+            if "/veranstaltungen/" not in path_lk:
+                continue
+
+        # Isselburg: Review war voll mit Wirtschaft/Ansprechpartner; nur Veranstaltungsbereich akzeptieren
+        if host_lk.endswith("www.isselburg.de"):
+            if "/veranstaltungen" not in path_lk:
+                continue
+
+        # KuKuG Programmübersicht: "Programm" Portfolio-Items sind keine Einzeltermine
+        if host_lk.endswith("www.kukug-bocholt.de"):
+            if ("/portfolio-items/" in path_lk) and ("programm" in (path_lk + " " + title_norm)):
+                continue
+
+        # EUREGIO: Listing-Root /agenda/ ist kein Event-Detail
+        if host_lk.endswith("www.euregio.eu"):
+            if path_lk.rstrip("/") == "/de/agenda":
+                continue
+        # === END BLOCK: HOST HARD SKIPS (reduce non-events, v1) ===
 
         # Generische CTA-Titel -> später aus Detailseite reparieren
         needs_title_repair = title_norm in ("mehr erfahren", "details", "weiterlesen")
