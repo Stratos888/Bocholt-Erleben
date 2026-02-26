@@ -49,38 +49,44 @@ Work only with actual visible code.
 
 <!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) | Scope: replaces the entire ZIP-FIRST section === -->
 
+<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT WORKING COPY (HARD) | Scope: replaces ZIP-FIRST section only === -->
+
 # CANONICAL BASELINE RULE (ZIP-FIRST) — ASSISTANT-MAINTAINED WORKING COPY (HARD)
 
 A repo ZIP uploaded at session start counts as "provided file content" and is the canonical baseline.
 
-## HARD GUARANTEE (IN-CHAT)
+Workflow (mandatory):
 
-Within THIS chat session, ChatGPT MUST maintain an internal, consolidated **canonical working copy** for every modified file.
-
-This means:
-
-- Every patch instruction ChatGPT gives is treated as **applied immediately** to the canonical working copy.
-- All subsequent patches MUST be computed against that **updated** canonical working copy.
-- ChatGPT MUST NOT reference “guessed” markers/blocks; only markers/blocks that exist in the **current** canonical working copy.
-
-## MANDATORY PATCH ATTESTATION (EVERY PATCH RESPONSE)
-
-Every response that contains Replace-instructions MUST start with a short attestation:
-
-- Source: ZIP snapshot (or latest user-uploaded file, if provided later)
-- File: exact path
-- Anchors: verbatim BEGIN/END lines that exist in the current canonical working copy
-- Fingerprint: `bytes=<N>, sha256=<HASH>` of the current canonical working copy for that file
-
-If ChatGPT cannot provide this attestation: **STOP. No patch.**
-
-## USER ASSUMPTION
-
+- Use the ZIP snapshot as the canonical baseline for files.
+- Maintain a consolidated, **assistant-maintained canonical working copy per file** inside this chat session.
+- Every patch the assistant gives is treated as **applied immediately** to that canonical working copy.
+- All subsequent patches MUST be computed against the **updated** canonical working copy (never against an older version).
 - Assume the user applies ALL assistant-provided changes and makes NO additional edits unless explicitly stated.
-- If the user explicitly states they did NOT apply a change or applied extra manual edits: **STOP and request the current file**.
+
+## NO ATTESTATION, NO PATCH (HARD STOP)
+
+If a response contains Replace-instructions, it MUST start with a "Working Copy Attestation".
+If it does not: **the patch is invalid and must not be applied.**
+
+## WORKING COPY ATTESTATION (MANDATORY FOR EVERY PATCH RESPONSE)
+
+Every patch response MUST include:
+
+- Source: ZIP snapshot (or later user-uploaded file, if explicitly used)
+- File: exact path
+- Anchors: exact, verbatim BEGIN and END lines that exist in the current canonical working copy
+- Fingerprint: `bytes=<N>` of the current canonical working copy for that file
+
+If the assistant cannot provide this attestation: **STOP. No patch.**
+
+## SYNC LOSS EXCEPTION (ONLY IF USER SAYS SO)
+
+Only if the user explicitly says they did NOT apply a patch or applied manual edits:
+**STOP and request the current file.**
 
 ---
 
+<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT WORKING COPY (HARD) === -->
 <!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE + ASSISTANT-MAINTAINED WORKING COPY (HARD) === -->
 # BATCH PATCH RULE (SAFE SPEED)
 
