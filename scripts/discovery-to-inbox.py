@@ -831,13 +831,15 @@ def ensure_description(
 # Umfang:
 # - Ersetzt nur classify_candidate()
 # === END BLOCK: EVENT QUALITY GATE (final rules, v2) ===
-# === BEGIN BLOCK: EVENT QUALITY GATE (premium events focus, v3) ===
+# === BEGIN BLOCK: EVENT QUALITY GATE (inclusive public events, freeze v1) ===
+# Datei: scripts/discovery-to-inbox.py
 # Zweck:
-# - Nur hochwertige Events in Inbox lassen
-# - Erwachsenen-Kurse blockieren
-# - Kinder-Events erlauben
-# - Fokus auf App-relevante Events
-
+# - Umsetzung eurer Definition (1C/2C/3B/4C/5B): "viel rein", inkl. Kurse & Wiederkehrendes
+# - Rejected nur für: klar kein Event / klar nicht öffentlich / außerhalb Date-Window
+# - Missing date bleibt review (für Analyse), aber Inbox-Gate verhindert ohnehin unvollständige Events
+# Umfang:
+# - Ersetzt nur classify_candidate()
+# === END BLOCK: EVENT QUALITY GATE (inclusive public events, freeze v1) ===
 def classify_candidate(
     *,
     stype: str,
@@ -848,64 +850,43 @@ def classify_candidate(
     event_date: str,
 ) -> Tuple[str, str]:
 
-    text = f"{title}\n{description}".lower()
+    text = f"{title}\n{description}".strip()
+    text_l = text.lower()
 
-    # Muss Datum haben
+    # 1) Klar nicht öffentlich (5B: Community ja, aber keine internen Vereinsinterna)
+    not_public_keywords = [
+        "mitgliederversammlung",
+        "jahreshauptversammlung",
+        "nur für mitglieder",
+        "nur fuer mitglieder",
+        "vereinsintern",
+        "intern",
+        "geschlossene gesellschaft",
+        "einladung",
+        "kassenprüfung",
+        "kassenpruefung",
+        "vorstandssitzung",
+    ]
+    if any(k in text_l for k in not_public_keywords):
+        return "rejected", "reject:not_public"
+
+    # 2) Klar kein Event (Presse/Infra/Utility) -> rejected,
+    #    aber nur wenn KEIN Event-Signal vorhanden ist
+    if _is_non_event_text(text) and (not _has_event_signal(text)):
+        return "rejected", "reject:non_event_pattern"
+
+    # 3) Datum fehlt -> review (für Analyse/Fehlerfälle); Inbox-Gate schreibt eh nicht ohne date+loc+url
     if not event_date:
-        return "rejected", "reject:missing_date"
+        return "review", "review:missing_date"
 
-    # Kinder-Events explizit erlauben
-    kids_keywords = [
-        "kind",
-        "kinder",
-        "familie",
-        "jugend",
-        "ferien",
-        "kids",
-        "teen",
-    ]
+    # 4) Date-Window (today..+365) erzwingen, damit Inbox nicht mit alten Sachen zugelaufen wird
+    if not _in_date_window(event_date):
+        return "rejected", "reject:outside_window"
 
-    if any(k in text for k in kids_keywords):
-        return "review", "review:kids_event"
-
-    # Premium Events
-    premium_keywords = [
-        "konzert",
-        "festival",
-        "theater",
-        "lesung",
-        "ausstellung",
-        "führung",
-        "markt",
-        "stadtfest",
-        "event",
-        "veranstaltung",
-        "kino",
-        "aufführung",
-    ]
-
-    if any(k in text for k in premium_keywords):
-        return "review", "review:premium_event"
-
-    # Hard block: Erwachsenen-Kurse / Workshops
-    blocked_keywords = [
-        "kurs",
-        "seminar",
-        "workshop",
-        "fortbildung",
-        "schulung",
-        "weiterbildung",
-        "coaching",
-        "training",
-        "vorlesung",
-    ]
-
-    if any(k in text for k in blocked_keywords):
-        return "rejected", "reject:adult_course"
-
-    return "rejected", "reject:low_quality_event"
-
-# === END BLOCK: EVENT QUALITY GATE (premium events focus, v3) ===
+    # 5) Default: öffentliches Event -> review
+    # (Kurse/Workshops/Vorlesungen sind ausdrücklich erlaubt in Freeze v1)
+    return "review", "review:public_event"
+# === END BLOCK: EVENT QUALITY GATE (inclusive public events, freeze v1) ===
 
 
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
@@ -2895,6 +2876,22 @@ def main() -> None:
 
         try:
             content = safe_fetch(url)
+
+            # === BEGIN BLOCK: EMPTY FETCH SURFACES IN SOURCE HEALTH (freeze v1) ===
+            # Datei: scripts/discovery-to-inbox.py
+            # Zweck:
+            # - safe_fetch kann bei 503/429/5xx soft "" zurückgeben
+            # - Das MUSS in Source_Health sichtbar werden (statt "ok" mit 0 candidates)
+            # Umfang:
+            # - Nur Guard direkt nach safe_fetch()
+            # === END BLOCK: EMPTY FETCH SURFACES IN SOURCE HEALTH (freeze v1) ===
+            if not norm(content):
+                health_status = "fetch_error"
+                http_status = ""
+                err_msg = "empty_response_or_soft_fail"
+                candidates = []
+                raise RuntimeError("soft_fetch_empty")
+            # === END BLOCK: EMPTY FETCH SURFACES IN SOURCE HEALTH (freeze v1) ===
 
             if stype in ("ical", "ics"):
                 candidates = parse_ics_events(content)
