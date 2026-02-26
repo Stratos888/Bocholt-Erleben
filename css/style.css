@@ -2082,6 +2082,7 @@ Zweck:
 - Header als Grid: Titel links, Close rechts (ohne padding-right Reserve-Hacks)
 - Kategorie ist Indikator (kein Control) -> links am Titel als ruhiger Badge/Marker
 - Titel ist Anchor -> keine Block-Margins in der Zeile, sauberes Raster, stabil bei 2 Zeilen
+- FIX: Markup-Order (Title vor Icon) wird CSS-seitig stabilisiert (Icon links, Title rechts)
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon
 === */
@@ -2109,16 +2110,22 @@ Umfang:
 
   display: grid;
   grid-template-columns: var(--ui-icon-btn-size) minmax(0, 1fr);
-  align-items: center;
   gap: var(--space-sm);
 
   width: 100%;
   min-height: var(--ui-icon-btn-size);
   min-width: 0;
+
+  /* Enterprise: bei 2 Zeilen Titel soll der Badge optisch an der ersten Zeile hängen */
+  align-items: start;
 }
 
 /* Category Indicator: links am Titel als Badge/Marker (nicht klickbar) */
 #event-detail-panel .detail-category-icon{
+  /* FIX: Icon immer links – unabhängig von DOM-Reihenfolge */
+  grid-column: 1;
+  grid-row: 1;
+
   width: var(--ui-icon-btn-size);
   height: var(--ui-icon-btn-size);
 
@@ -2138,10 +2145,17 @@ Umfang:
   cursor: default;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  /* Optische Baseline-Korrektur (Token-basiert, kein Magic Number Hardcode) */
+  margin-top: var(--space-1);
 }
 
 /* Title: Anchor (ruhig, clamp), ohne “Zeilen-Margin” */
 #event-detail-panel .detail-title{
+  /* FIX: Title immer rechts – unabhängig von DOM-Reihenfolge */
+  grid-column: 2;
+  grid-row: 1;
+
   margin: 0;
   min-width: 0;
 
@@ -3053,6 +3067,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
