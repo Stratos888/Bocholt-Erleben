@@ -1968,10 +1968,10 @@ Umfang:
 }
 
 /* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (align with header; smaller)
-Zweck: Close sitzt auf gleicher Top-Höhe wie Header-Content; weniger Platzverlust für Titel.
+Zweck: Close sitzt in der Headerzeile (1/2-Zeilen Titel bleibt stabil); keine absoluten Offsets.
 Umfang: Nur Close-Button (Detailpanel).
 === */
-/* Close Button: aligned to gutter, compact */
+/* Close Button: aligned to header grid, compact */
 /* === BEGIN BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) ===
 Zweck:
 - Touch-Target >= 44x44 (Enterprise)
@@ -1982,15 +1982,15 @@ Umfang:
 === */
 /* === BEGIN FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) ===
 Zweck:
-- Close ist Teil der Headerzeile (koppelt vertikal sauber an 1/2-Zeilen Titel)
-- Kein absolutes Top/Right mehr -> keine optischen Drift-Probleme bei Wrap
+- Close ist Teil des Header-Rasters (keine Drift bei 2 Zeilen Titel)
+- “Quiet filled” statt reines Ghost (Touch-Affordance)
+- Zentrierung ohne translateY Hacks
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
 #event-detail-panel .detail-panel-close{
   position: static;
 
-  /* Header-Grid Placement */
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
@@ -2016,6 +2016,8 @@ Umfang:
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   z-index: 20;
+
+  transform: none;
 }
 
 #event-detail-panel .detail-panel-close:hover{
@@ -2087,9 +2089,9 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Header ist ein Grid: Titel links, Close rechts (ohne padding-right Hacks)
-- Title-Row als Grid: Badge + Titel stabil, auch bei 2 Zeilen Clamp
-- Saubere vertikale Kopplung: Close zentriert zur realen Zeilenhöhe
+- Header als Grid: Titel links, Close rechts (ohne padding-right Reserve-Hacks)
+- Kategorie ist Indikator (kein Control) -> links am Titel als ruhiger Badge/Marker
+- Titel ist Anchor -> keine Block-Margins in der Zeile, sauberes Raster, stabil bei 2 Zeilen
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon
 === */
@@ -2110,7 +2112,7 @@ Umfang:
   border-bottom: 0;
 }
 
-/* Title-Row: Badge + Title als Raster (kein Reserve-Padding mehr nötig) */
+/* Title-Row: Badge + Title als Raster (stabil, kein Reserve-Padding) */
 #event-detail-panel .detail-title-row{
   grid-column: 1;
   grid-row: 1;
@@ -2125,7 +2127,7 @@ Umfang:
   min-width: 0;
 }
 
-/* Category Indicator: ruhiger Badge/Marker (nicht klickbar) */
+/* Category Indicator: links am Titel als Badge/Marker (nicht klickbar) */
 #event-detail-panel .detail-category-icon{
   width: var(--ui-icon-btn-size);
   height: var(--ui-icon-btn-size);
@@ -2140,7 +2142,6 @@ Umfang:
 
   opacity: var(--ui-icon-opacity);
 
-  /* etwas ruhiger als Titel/Close */
   font-size: var(--ui-icon-size-sm);
   line-height: 1;
 
@@ -2154,7 +2155,7 @@ Umfang:
   margin: 0;
   min-width: 0;
 
-  font-size: 1.05rem;
+  font-size: 1.05rem; /* exakt wie .event-title */
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -3062,6 +3063,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
