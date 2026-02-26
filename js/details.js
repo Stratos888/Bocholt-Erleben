@@ -192,14 +192,38 @@ const getCategoryIcon = (categoryRaw) => {
       description: desc,
     } : null;
 
-    // WhatsApp-Share-Text (Deep-Link kann später im Renderer ergänzt werden)
+    /* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
+    Zweck:
+    - Teilen als generische Aktion (navigator.share / clipboard fallback)
+    - Website vs Quelle sauber trennen (Heuristik: bocholt.de/veranstaltungskalender => Quelle)
+    - Route-CTA entfernen (Maps steckt im Ort-Link)
+    Umfang:
+    - VM Felder: websiteUrl, sourceUrl, sharePayload
+    - actions: calendar + share + optional website
+    === */
+
+    // Link-Klassifizierung: Event-URL aus Daten (oft Quelle oder Website)
+    const rawEventUrl = normalizeHttpUrl(trimOrEmpty(e.url || e.link || e.website || ""));
+    const isBocholtCalendarSource = rawEventUrl
+      ? /(^|\/\/)www\.bocholt\.de\/veranstaltungskalender\//i.test(rawEventUrl)
+      : false;
+
+    const sourceUrl = (rawEventUrl && isBocholtCalendarSource) ? rawEventUrl : "";
+    const directWebsiteUrl = (rawEventUrl && !isBocholtCalendarSource) ? rawEventUrl : "";
+
+    // Website: bevorzugt echte Event-/Veranstalterseite; Fallback: Location-Homepage
+    const websiteUrl = directWebsiteUrl || normalizeHttpUrl(homepage) || "";
+
+    // Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
     const shareParts = [
       title,
       date ? `📅 ${date}${timeRange ? ` · ${timeRange}` : ""}` : "",
       locationLabel ? `📍 ${locationLabel}` : "",
     ].filter(Boolean);
+
     const shareText = shareParts.join("\n");
-    const whatsappHref = shareText ? `https://wa.me/?text=${encodeURIComponent(shareText)}` : "";
+    const shareUrl = websiteUrl || sourceUrl || "";
+    const sharePayload = { title, text: shareText, url: shareUrl };
 
     // Actions (noch nicht gerendert; canonical Liste für spätere UI)
     const actions = [
@@ -210,31 +234,22 @@ const getCategoryIcon = (categoryRaw) => {
         payload: calendarPayload,
       }] : []),
 
-          // === BEGIN PATCH: ACTION WHATSAPP LABEL (ui short, aria long) ===
-      ...(whatsappHref ? [{
-        type: "whatsapp",
-        label: "WhatsApp", // UI short label
-        priority: "secondary",
-        href: whatsappHref,
-        payload: { text: shareText },
+      ...(shareText ? [{
+        type: "share",
+        label: "Teilen",
+        priority: "primary",
+        payload: sharePayload,
       }] : []),
-      // === END PATCH: ACTION WHATSAPP LABEL (ui short, aria long) ===
 
-
-      ...(homepage ? [{
+      ...(websiteUrl ? [{
         type: "website",
         label: "Website",
         priority: "secondary",
-        href: homepage,
-      }] : []),
-
-      ...(maps ? [{
-        type: "route",
-        label: "Route",
-        priority: "utility",
-        href: maps,
+        href: websiteUrl,
       }] : []),
     ];
+
+    /* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA) === */
 
     return {
       // current render fields (keep stable to avoid UI regression)
@@ -253,6 +268,11 @@ const getCategoryIcon = (categoryRaw) => {
       desc,
       homepage,
       maps,
+
+      // enterprise v2 link model (render uses these)
+      websiteUrl,
+      sourceUrl,
+      sharePayload,
 
       // future usage
       actions,
@@ -796,43 +816,59 @@ const iconSvg = (type, extraClass = "") => {
 };
 /* === END FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere) === */
 
-            // === BEGIN PATCH: ACTIONBAR LABELS (title short, aria long) ===
+            /* === BEGIN PATCH: ACTIONBAR LABELS (enterprise v2: calendar + share + website)
+            Zweck:
+            - Actionbar strikt: Kalender, Teilen, optional Website
+            - Share als Button (navigator.share/clipboard) statt WhatsApp-Link
+            - Kein Route-CTA
+            Umfang:
+            - renderAction() + icon mapping
+            === */
       const renderAction = (a) => {
         if (!a || typeof a !== "object") return "";
 
         const raw = String(a.label || "").trim();
         const fallback = raw || "Aktion";
 
-        // UI: kurz & scanbar (wird später als Text unter Icon gerendert)
         const uiLabel =
-          (a.type === "whatsapp") ? "WhatsApp" :
+          (a.type === "share") ? "Teilen" :
           fallback;
 
-        // A11y: klar & vollständig
         const ariaLabel =
-          (a.type === "whatsapp") ? "Per WhatsApp teilen" :
+          (a.type === "share") ? "Event teilen" :
           fallback;
 
         const labelUiEsc = escapeHtml(uiLabel);
         const labelAriaEsc = escapeHtml(ariaLabel);
 
-        // Map to semantic types for icons (no brand icons)
         const type =
           (a.type === "calendar") ? "calendar" :
-          (a.type === "route") ? "route" :
           (a.type === "website") ? "website" :
-          (a.type === "whatsapp") ? "whatsapp" :
           "share";
 
         const icon = iconSvg(type);
 
-        // calendar stays a button (chooser logic hooks on data-action="calendar")
         if (a.type === "calendar") {
           return `
             <button
               class="detail-actionbar-btn is-icon"
               type="button"
               data-action="calendar"
+              aria-label="${labelAriaEsc}"
+              title="${labelUiEsc}"
+            >
+              ${icon}
+              <span class="detail-sr-only">${labelAriaEsc}</span>
+            </button>
+          `;
+        }
+
+        if (a.type === "share") {
+          return `
+            <button
+              class="detail-actionbar-btn is-icon"
+              type="button"
+              data-action="share"
               aria-label="${labelAriaEsc}"
               title="${labelUiEsc}"
             >
@@ -861,14 +897,13 @@ const iconSvg = (type, extraClass = "") => {
 
         return "";
       };
-      // === END PATCH: ACTIONBAR LABELS (title short, aria long) ===
+            /* === END PATCH: ACTIONBAR LABELS (enterprise v2: calendar + share + website) === */
 
 
 
 
            const actionsForBar = (Array.isArray(vm.actions) ? vm.actions : [])
-        // Avoid redundancy: if the Location row already links to homepage, hide "Website" in the actionbar
-        .filter(a => !(a && a.type === "website" && vm.homepage && vm.locationLabel));
+        .filter(a => a && (a.type === "calendar" || a.type === "share" || a.type === "website"));
 
       const actionsHtml = actionsForBar
         .map(renderAction)
@@ -876,7 +911,39 @@ const iconSvg = (type, extraClass = "") => {
         .join("");
 
 
-      // Minimal, stable markup (keeps current layout), plus action-bar below description
+      /* === BEGIN BLOCK: ENTERPRISE V2 DETAIL CONTENT (meta compaction + no redundancy)
+      Zweck:
+      - Meta direkt unter Titel: Row1 Ort (Maps), Row2 Datum·Zeit
+      - Keine Meta-Chips-Kachel / kein separater Route-CTA
+      - Quelle als Footer-Link (nur wenn != Website)
+      Umfang:
+      - detail-header markup + meta rows + optional source footer
+      === */
+
+      const dateTimeLabel = (() => {
+        const d = dateLabel || vm.date || "";
+        if (!d) return "";
+        if (vm.timeRange) return `${d} · ${vm.timeRange}`;
+        return `${d} · ganztägig`;
+      })();
+
+      const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
+      const normSource = normalizeHttpUrl(vm.sourceUrl || "");
+      const showSource = Boolean(normSource) && (!normWebsite || normSource !== normWebsite);
+
+      const sourceHostLabel = (() => {
+        if (!normSource) return "";
+        try {
+          const u = new URL(normSource);
+          const host = (u.hostname || "").replace(/^www\./, "");
+          // Friendly label for known source
+          if (/bocholt\.de$/i.test(host)) return "Stadt Bocholt · Veranstaltungskalender";
+          return host;
+        } catch {
+          return "Quelle";
+        }
+      })();
+
       const html = `
         <div class="detail-panel-inner">
           <div class="detail-header">
@@ -884,81 +951,69 @@ const iconSvg = (type, extraClass = "") => {
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
 ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${vm.icon === "calendar" ? iconSvg("calendar", "is-category") : escapeHtml(vm.icon)}</span>` : ""}
             </div>
-                       <div class="detail-meta-chips" role="list" aria-label="Event-Infos">
-              ${vm.city ? `
-                                <span class="detail-chip" role="listitem" data-chip="city">
-                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
-                  </svg>
-                  <span class="detail-chip-text">${escapeHtml(vm.city)}</span>
-                </span>
+
+            <div class="detail-meta-rows" aria-label="Event-Infos">
+              ${vm.locationLabel ? `
+                ${vm.maps ? `
+                  <a
+                    class="detail-meta-row is-location"
+                    href="${escapeHtml(vm.maps)}"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Ort in Karten öffnen"
+                  >
+                    <span class="detail-meta-icon" aria-hidden="true">
+                      <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </span>
+                    <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
+                    <span class="detail-meta-ext" aria-hidden="true">↗</span>
+                  </a>
+                ` : `
+                  <div class="detail-meta-row is-location is-static" aria-label="Ort">
+                    <span class="detail-meta-icon" aria-hidden="true">
+                      <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </span>
+                    <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
+                  </div>
+                `}
               ` : ""}
 
-              ${vm.date ? `
-<span class="detail-chip" role="listitem" data-chip="date">
-  ${iconSvg("calendar", "is-chip")}
-                                    <span class="detail-chip-text">${escapeHtml(dateLabel || vm.date)}</span>
-                </span>
-              ` : ""}
-
-              ${vm.timeRange ? `
-                                <span class="detail-chip" role="listitem" data-chip="time">
-                  <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <span class="detail-chip-text">${escapeHtml(vm.timeRange)}</span>
-                </span>
+              ${dateTimeLabel ? `
+                <div class="detail-meta-row is-datetime" aria-label="Datum und Uhrzeit">
+                  <span class="detail-meta-icon" aria-hidden="true">
+                    ${iconSvg("calendar", "is-chip")}
+                  </span>
+                  <span class="detail-meta-text">${escapeHtml(dateTimeLabel)}</span>
+                </div>
               ` : ""}
             </div>
-
           </div>
 
-                             ${vm.locationLabel ? `
-            ${vm.homepage ? `
+          ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
+
+          ${showSource ? `
+            <div class="detail-source">
+              <span class="detail-source-label">Quelle:</span>
               <a
-                class="detail-location-action"
-                href="${escapeHtml(vm.homepage)}"
+                class="detail-source-link"
+                href="${escapeHtml(normSource)}"
                 target="_blank"
                 rel="noopener"
-                aria-label="Website der Location öffnen"
-              >
-                               <span class="detail-location-icon" aria-hidden="true">
-                  <svg class="detail-icon-svg is-location" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 21V7a2 2 0 0 1 2-2h6v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M12 21V9h6a2 2 0 0 1 2 2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M7 9h2M7 12h2M7 15h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M15 13h2M15 16h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                </span>
-
-                <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
-                <span class="detail-location-chev" aria-hidden="true">›</span>
-              </a>
-            ` : `
-                          <div class="detail-location-action is-static" aria-label="Location">
-                                <span class="detail-location-icon" aria-hidden="true">
-                  <svg class="detail-icon-svg is-location" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 21V7a2 2 0 0 1 2-2h6v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M12 21V9h6a2 2 0 0 1 2 2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    <path d="M7 9h2M7 12h2M7 15h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M15 13h2M15 16h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                </span>
-
-                <span class="detail-location-text">${escapeHtml(vm.locationLabel)}</span>
-              </div>
-            `}
+              >${escapeHtml(sourceHostLabel)}</a>
+            </div>
           ` : ""}
-
-
-
-          ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
         </div>
       `;
 
       this.content.innerHTML = html;
+
+      /* === END BLOCK: ENTERPRISE V2 DETAIL CONTENT (meta compaction + no redundancy) === */
 
       /* === BEGIN BLOCK: ACTIONBAR RENDER INTO SLOT (outside scroll) ===
       Zweck: Actions immer sichtbar am Sheet-Boden (nicht im Scroll-Content).
@@ -1081,14 +1136,78 @@ END:VCALENDAR`;
     });
   };
 
-  // Defensive bind: falls die Init-/Render-Logik aus irgendeinem Grund mehrfach läuft,
-  // wird der Handler trotzdem nur einmal pro Button gebunden.
   if (calBtn.dataset.calChooserBound !== "1") {
     calBtn.dataset.calChooserBound = "1";
     calBtn.addEventListener("click", showChooser);
   }
 }
 // === END BLOCK: CALENDAR ACTION CHOOSER ===
+
+
+/* === BEGIN BLOCK: SHARE ACTION (navigator.share + clipboard fallback)
+Zweck:
+- Enterprise v2: Teilen als System-Share, ohne WhatsApp-Primärbutton
+- Fallback: Clipboard (oder prompt) ohne zusätzliche UI-Abhängigkeiten
+Umfang:
+- bindet [data-action="share"] einmalig pro Render
+=== */
+const shareBtn = this.actionbarSlot?.querySelector('[data-action="share"]');
+
+if (shareBtn) {
+  const getPayload = () =>
+    (Array.isArray(vm.actions) ? vm.actions : [])
+      .find(a => a && a.type === "share" && a.payload)?.payload || null;
+
+  const doShare = async () => {
+    const p = getPayload();
+    if (!p) return;
+
+    const text = String(p.text || "").trim();
+    const url = String(p.url || "").trim();
+    const title = String(p.title || vm.title || "Event").trim();
+
+    // 1) Native share (best)
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title,
+          text: [text, url].filter(Boolean).join("\n"),
+          url: url || undefined,
+        });
+        return;
+      }
+    } catch (_) {
+      // continue to fallback
+    }
+
+    // 2) Clipboard fallback
+    const payloadText = [text, url].filter(Boolean).join("\n");
+    try {
+      if (navigator.clipboard && payloadText) {
+        await navigator.clipboard.writeText(payloadText);
+        // tiny affordance without new UI components
+        const prev = shareBtn.title;
+        shareBtn.title = "Kopiert";
+        setTimeout(() => { shareBtn.title = prev; }, 1200);
+        return;
+      }
+    } catch (_) {}
+
+    // 3) Last resort
+    if (payloadText) {
+      window.prompt("Kopieren:", payloadText);
+    }
+  };
+
+  if (shareBtn.dataset.shareBound !== "1") {
+    shareBtn.dataset.shareBound = "1";
+    shareBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      doShare();
+    });
+  }
+}
+/* === END BLOCK: SHARE ACTION (navigator.share + clipboard fallback) === */
 
 
 
@@ -1112,6 +1231,7 @@ END:VCALENDAR`;
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
