@@ -109,14 +109,14 @@ Umfang:
   /* === END FIX: DETAILPANEL SHEET RADIUS (single source of truth) === */
 
   /* === BEGIN BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) ===
-  Zweck: Spacing auf Skala (4/8/12/16/24/32) – entfernt 10px Magic Number.
-  Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
-  === */
-  --dp-close-size: 30px;                /* Close Button Touch-Target (kompakt, aber klickbar) */
-  --dp-actionbar-h: 78px;               /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
-  --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
-  --dp-actionbar-pad-y: var(--space-sm); /* vertikales Padding in der Actionbar (8px) */
-  /* === END BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) === */
+Zweck: Spacing auf Skala (4/8/12/16/24/32) – entfernt 10px Magic Number.
+Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
+=== */
+--dp-close-size: 36px;                 /* sichtbare Close-Größe (Hit-Area bleibt >=44px via ::before) */
+--dp-actionbar-h: 78px;                /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
+--dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
+--dp-actionbar-pad-y: var(--space-sm); /* vertikales Padding in der Actionbar (8px) */
+/* === END BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) === */
    /* === BEGIN FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) ===
   Zweck: Etwas mehr Reserve, damit Description garantiert komplett oberhalb der Actionbar endet.
   Umfang: Nur --dp-actionbar-reserve.
@@ -165,28 +165,28 @@ Umfang:
   --ui-font-weight-cta: 800;
 
   /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
-  Zweck:
-  - Single Source of Truth für Icon-DNA (Größen/Opacity)
-  - Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
-  Umfang:
-  - Nur Tokens, keine Selektoren.
-  === */
-  --ui-icon-size-sm: 16px;   /* Cards / Meta */
-  --ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
-  --ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
-  --ui-icon-opacity: 0.92;
+Zweck:
+- Single Source of Truth für Icon-DNA (Größen/Opacity)
+- Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
+Umfang:
+- Nur Tokens, keine Selektoren.
+=== */
+--ui-icon-size-sm: 16px;   /* Cards / Meta */
+--ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
+--ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
+--ui-icon-opacity: 0.92;
 
-  /* === BEGIN ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) ===
-  Zweck:
-  - Einheitliche Hit-Areas / Icon-Button Boxen in Overlays (Detailpanel/Modals/Sheets)
-  Umfang:
-  - Nur Tokens, keine Selektoren.
-  === */
-  --ui-tap-target: 44px;       /* Enterprise Touch Target */
-  --ui-icon-btn-size: 32px;    /* sichtbare Icon-Button-Box (Hit-Area bleibt via padding/::before möglich) */
-  /* === END ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) === */
+/* === BEGIN ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) ===
+Zweck:
+- Einheitliche Hit-Areas / Icon-Button-Boxen in Overlays (Detailpanel/Modals/Sheets)
+Umfang:
+- Nur Tokens, keine Selektoren.
+=== */
+--ui-tap-target: 44px;       /* Enterprise Touch Target */
+--ui-icon-btn-size: 32px;    /* sichtbare Box für Icon-Controls/Badges im Overlay-Header */
+/* === END ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) === */
 
-  /* === END BLOCK: ICON TOKENS (app-wide) === */
+/* === END BLOCK: ICON TOKENS (app-wide) === */
 
    /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
@@ -1975,31 +1975,24 @@ Umfang: Nur Close-Button (Detailpanel).
 /* === BEGIN BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) ===
 Zweck:
 - Touch-Target >= 44x44 (Enterprise)
-- Optik bleibt kompakt (Token --dp-close-size)
+- Close wirkt “App-mäßig”: quiet-filled (dauerhaft erkennbar), aber ruhig
+- Token-only (keine RGBA-Hardcodes) + keine Magic Offsets
 Umfang:
-- ersetzt nur .detail-panel-close + :active + ::before
+- ersetzt nur .detail-panel-close + :hover/:focus-visible/:active + ::before
 === */
-/* === BEGIN REPLACEMENT BLOCK: DETAIL CLOSE BUTTON (ghost + tokenized + centered) ===
+/* === BEGIN FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) ===
 Zweck:
-- Close ist “Dismiss/Chrome”: ruhig (ghost), aber eindeutig auffindbar
-- Keine RGBA-Hardcodes: nutzt App-Tokens (Surface/Border/Focus/Text)
-- Zentrierung ohne Magic Offsets (-3px entfernt)
+- Close bleibt voll klickbar (Touch-Target via ::before bleibt)
+- “Quiet filled” statt reines Ghost (Touch-Affordance)
+- Zentrierung ohne -3px Hack
 Umfang:
-- #event-detail-panel .detail-panel-header (nur Layout-Höhe/Anker)
-- #event-detail-panel .detail-panel-close (inkl. hover/focus/active)
+- Nur #event-detail-panel .detail-panel-close (+ states)
 === */
-
-/* Header-Anker: definiert die Zeilenhöhe für den Overlay-Headerbereich */
-#event-detail-panel .detail-panel-header{
-  position: relative;
-  height: var(--dp-header-pad-top);
-}
-
-/* Close: ghost (ruhig), zentriert im Overlay-Headerbereich */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   right: var(--gutter);
-  top: 50%;
+  top: calc(var(--dp-header-pad-top) / 2);
+  transform: translateY(-50%);
 
   width: var(--dp-close-size);
   height: var(--dp-close-size);
@@ -2009,19 +2002,17 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  background: transparent;
-  border: 0;
+  background: var(--ui-surface-tint);
+  border: 1px solid var(--ui-border-weak);
   box-shadow: none;
 
-  font-size: 16px;
+  font-size: var(--ui-icon-size-md);
   line-height: 1;
   color: var(--color-text-secondary);
   cursor: pointer;
 
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-
-  transform: translateY(-50%);
   z-index: 20;
 }
 
@@ -2038,18 +2029,16 @@ Umfang:
   background: var(--ui-surface-tint-active);
   transform: translateY(-50%) scale(0.96);
 }
+/* === END FIX: DETAIL CLOSE BUTTON CALMNESS (quiet-filled, tokenized, centered) === */
 
-/* === END REPLACEMENT BLOCK: DETAIL CLOSE BUTTON (ghost + tokenized + centered) === */
 /* Invisible hit-area expansion to >=44px without changing visuals */
 #event-detail-panel .detail-panel-close::before{
   content: "";
   position: absolute;
-  inset: -7px; /* 30px + 14px = 44px */
+  inset: calc((var(--dp-close-size) - var(--ui-tap-target)) / 2);
   border-radius: 999px;
   background: transparent;
 }
-
-#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 /* === END BLOCK: DETAILPANEL CLOSE TARGET (44px hit-area, same visuals) === */
 /* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
 Zweck: Parser-sichere Definition des einzigen Scroll-Containers im Detailpanel + Reserve gegen Actionbar-Overlap.
@@ -2094,16 +2083,16 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* === BEGIN REPLACEMENT BLOCK: DETAILPANEL HEADER ROW (enterprise alignment + badge indicator) ===
+/* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
 - Kategorie ist Indikator (kein Control) -> links am Titel als ruhiger Badge/Marker
-- Titel ist Anchor -> keine “Block-Margins” in der Zeile, sauberes Raster
+- Titel ist Anchor -> keine Block-Margins in der Zeile, sauberes Raster
 - Reserve rechts für Close bleibt stabil, keine Kollisionen
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon
 === */
 
-/* Header / Title Block */
+/* Header / Title Row */
 #event-detail-panel .detail-header{
   position: relative;
 
@@ -2114,7 +2103,7 @@ Umfang:
   border-bottom: 0;
 }
 
-/* Title-Row: eine Achse, konsistente Höhe */
+/* Title-Row: einheitliche Achse (Badge + Title), Reserve für Close */
 #event-detail-panel .detail-title-row{
   display: flex;
   align-items: center;
@@ -2127,11 +2116,11 @@ Umfang:
   padding-right: calc(var(--dp-close-size) + var(--gutter) + var(--space-sm));
 }
 
-/* Kategorie-Indikator: links am Titel als Badge/Marker (nicht klickbar) */
+/* Category Indicator: links am Titel als Badge/Marker (nicht klickbar) */
 #event-detail-panel .detail-category-icon{
   order: -1; /* links vor den Titel ziehen */
-
   flex: 0 0 auto;
+
   width: var(--ui-icon-btn-size);
   height: var(--ui-icon-btn-size);
 
@@ -2159,7 +2148,7 @@ Umfang:
   min-width: 0;
   flex: 1 1 auto;
 
-  font-size: 1.05rem;     /* wie Event-Card */
+  font-size: 1.05rem; /* exakt wie .event-title */
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -2175,13 +2164,15 @@ Umfang:
   hyphens: auto;
 }
 
-/* keine pseudo-Overlays am Kategorie-Indikator */
+/* SVG/Emoji/Text Icon: keine pseudo-Overlays */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
 }
+/* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
-/* === END REPLACEMENT BLOCK: DETAILPANEL HEADER ROW (enterprise alignment + badge indicator) === */
+
+
 
 /* === BEGIN BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) ===
 Zweck:
@@ -3065,7 +3056,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
 
 
 
