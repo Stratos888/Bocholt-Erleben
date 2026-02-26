@@ -45,17 +45,41 @@ Work only with actual visible code.
 
 ---
 
-# CANONICAL BASELINE RULE (ZIP-FIRST)
+<!-- === BEGIN REPLACEMENT BLOCK: CANONICAL BASELINE RULE (ZIP-FIRST) + VERIFIED WORKING COPY GATE | Scope: replaces ZIP-FIRST section only === -->
 
-A repo ZIP uploaded at session start counts as "provided file content".
+# CANONICAL BASELINE RULE (ZIP-FIRST) — WITH VERIFIED WORKING COPY GATE
 
-Workflow:
+A repo ZIP uploaded at session start provides the canonical baseline.
 
-- Use the ZIP snapshot as canonical baseline for files.
-- Maintain a consolidated working copy per file inside this session.
-- Assume the user applies ALL assistant-provided changes.
-- If the user does NOT apply a change or applies extra manual edits, the user MUST explicitly say so.
-- If the assistant is not 100% sure the working copy matches the user's local file, STOP and request the current file (or the minimal relevant section).
+**But: ZIP content counts as "visible code" ONLY after it is VERIFIED.**
+
+## VERIFIED WORKING COPY GATE (HARD STOP)
+
+Before ANY patch is allowed, ChatGPT MUST:
+
+1) Extract/open the target file from the ZIP snapshot
+2) Build a session working copy for that file
+3) Prove sync by citing exact, verbatim anchor lines from that file
+
+If steps (1–3) are not done and shown in-chat:
+**STOP. Request the current file (or minimal relevant section).**
+
+## PATCH ATTESTATION (MANDATORY IN EVERY PATCH RESPONSE)
+
+Every response that includes Replace-instructions MUST include a short "Working Copy Attestation":
+
+- Source: ZIP snapshot or user-pasted file
+- File: exact path
+- Anchors: exact BEGIN/END lines that exist verbatim in the working copy
+- Sync confidence: "verified" or "not verified" (if not verified → STOP)
+
+## SYNC LOSS RULE
+
+If there is ANY doubt that the session working copy matches the user's local file
+(e.g., user applied only part of a patch, manual edits, merge conflicts, unknown order):
+**STOP and request the current file or the minimal relevant block.**
+
+<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE RULE (ZIP-FIRST) + VERIFIED WORKING COPY GATE === -->
 
 ---
 
