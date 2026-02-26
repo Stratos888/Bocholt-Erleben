@@ -43,6 +43,8 @@ Templates (canonical):
 - docs/prompts/session-open.md
 - docs/prompts/session-close.md
 
+<!-- === BEGIN REPLACEMENT BLOCK: SESSION PROTOCOLS (Open/Close) | Scope: replaces SESSION OPEN/CLOSE PROTOCOL bullet blocks only === -->
+
 SESSION OPEN PROTOCOL (must do):
 - Read MASTER.md fully
 - Read ENGINEERING.md fully
@@ -50,6 +52,7 @@ SESSION OPEN PROTOCOL (must do):
 - Choose 1 Golden Screen / 1 Workpack
 - Produce Rubric Gap List (Top 3 FAIL) before patch
 - Use uploaded repo ZIP as canonical baseline for this session (ZIP-FIRST)
+- Enforce VERIFIED WORKING COPY GATE (ENGINEERING.md): no patch before file is opened and anchor lines are proven in-chat
 - Output code changes as Replace-instructions only (BEGIN/END + replacement block)
 - Batch is allowed for speed ONLY if Replace ranges do not overlap; otherwise merge into one Replace block
 - Assume user applies all assistant-provided changes unless user explicitly says otherwise; if sync is uncertain, STOP and request current file/section
@@ -60,6 +63,8 @@ SESSION CLOSE PROTOCOL (must do):
 - Update COMPLETED AREAS (only if DoD met)
 - Append DECISIONS LOG entries (only permanent decisions made)
 - Update SESSION STATE (LAST UPDATE)
+
+<!-- === END REPLACEMENT BLOCK: SESSION PROTOCOLS (Open/Close) === -->
 
 ---
 
