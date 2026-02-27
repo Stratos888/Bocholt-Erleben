@@ -207,51 +207,40 @@ Notes:
 
 # SESSION STATE
 
-<!-- === BEGIN REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) | Scope: replaces SESSION STATE section to end of file === -->
-
-SESSION REPORT (this session, max 8 bullets):
-
-- Pipeline hatte harte Runtime-Regressions (NameError/UnboundLocalError/NoneType/Indentation) → aktuell wieder lauffähiger Stand erreicht (Run endet grün).
-- Discovery-Run zeigt wieder Output (z. B. „Candidates parsed: 37“; zeitweise „New inbox rows: 19/21“, danach je nach Dedupe „0“).
-- Source_Health logging zeigt Ausfälle sichtbar (z. B. Münsterland e.V. zeitweise HTTP 503) → Daily Discovery kann damit als „Quelle kaputt“ auffallen.
-- Inbox-Qualität aktuell noch zu „müllig“ (viele Einträge ohne echten Event-Charakter, u. a. normale Gottesdienste).
-- Pflichtfeld-Policy in der Realität inkonsistent (Events ohne Location tauchen im Review auf) → Gate/Filter muss wieder strikt werden.
-- Nächster Fokus bleibt: Pipeline-Qualitätsgates so scharf machen, dass nur „wirkliche Events“ in die Inbox kommen (Review wird wieder handhabbar).
-
----
-
 OVERALL STATUS:
 
-UI: DETAILPANEL ENTERPRISE GATE CLOSURE — unverändert gegenüber letztem Stand (siehe Task 1 Workpacks/Gaps).
+SESSION REPORT (this session, verified):
+- Detailpanel: Quelle-Link ist konsolidiert (keine redundante „Website + Quelle“-Dopplung mehr)
+- Detailpanel: Actionbar auf 2 Primary Actions reduziert („Kalender“, „Teilen“)
+- Detailpanel: Close-Control als Dismiss stabil vorhanden (Touch-Target im Proof 44×44)
+- Detailpanel: Scroll-/Overlay-Vertrag grundsätzlich stabil (Body/HTML overflow hidden; Panel scrollt intern)
 
-PIPELINE: TASK 4 IN PROGRESS — Script wieder run-stabil (keine harten Crashes im letzten Log), Source-Ausfälle werden sichtbar geloggt; Hauptproblem ist jetzt klar „Qualitätsgate (was ist ein Event?)“ + „Location-Pflichtfeld strikt durchsetzen“.
+UI: DETAILPANEL ENTERPRISE GATE CLOSURE — Basis stabil, aber sichtbare Enterprise-Gaps offen.
+Ist-Stand (Screenshots/Proofs):
+- Header ist funktional, aber nicht „Top-App“-aligned: Titel und Kategorie-Icon wirken optisch versetzt (keine saubere gemeinsame Achse).
+- Kategorie-Icon wirkt aktuell zu sehr wie ein Button/Chip statt als reiner Indicator-Badge.
+- Scrollbar ist sichtbar (insb. auf Mobile wirkt das eher „Web“ als „App“).
+- Farb-/Surface-DNA Richtung „Eventcard Expanded“ ist noch nicht stark genug wahrnehmbar (Token-Ansatz vorhanden, aber visuell noch zu subtil).
 
-OBSERVED RUN FACTS (from session logs):
+NEXT WORKPACKS (UI ONLY, shortest path to enterprise look):
+1) HEADER FINAL ALIGNMENT
+   - Eine optische Achse: Icon ↔ Titel ↔ Close (auch bei 2-line title clamp)
+   - Kategorie-Icon als ruhiger Indicator (kein Button-Look)
+2) SCROLLBAR APP FEEL (MOBILE)
+   - Scroll bleibt, Scrollbar auf Mobile verstecken (ohne Funktionsverlust)
+3) PANEL DNA MATCH (FEED → CARD EXPANDED)
+   - Panel-Surfaces/Borders/Shadows so nachziehen, dass „Eventcard geöffnet“ spürbar ist
+4) SHARE FALLBACK UX (optional, falls weiterhin Popup/Prompt)
+   - Kein Browser-Prompt; stattdessen Copy-to-Clipboard + Toast, wenn Share API nicht greift
 
-- Sources enabled: 18
-- Candidates parsed: 37
-- New inbox rows: schwankend je nach Dedupe (beobachtet: 0 bis 21)
-- Inbox backfilled (updated rows): beobachtet: 4–7
-- Beispiel-Fehlerfall: Münsterland e.V. → HTTP 503 (Service Temporarily Unavailable)
-
----
-
-DECISIONS LOG (append-only):
-
-- 2026-02-27 — Event-Definition für Inbox-Qualitätsgate geschärft:
-  - „Normale Gottesdienste“ (auch mit Abendmahl/Kirchencafé) zählen NICHT als Event für die App.
-  - Erlaubt sind nur „Kirchen-Events mit Event-Charakter“ (z. B. Konzert/Lesung/Workshop/Sonderveranstaltung), nicht der reguläre Gottesdienstbetrieb.
-- 2026-02-27 — Freeze-Ziel (Pipeline) präzisiert:
-  - Ziel ist NICHT maximale Menge/Monat, sondern ein stabiler Daily-Discovery-Fluss mit sinnvollen Events.
-  - Daily Discovery muss Source-Ausfälle sichtbar machen (Source_Health), damit zeitnah repariert werden kann.
-  - Danach „Freeze“ des Stands, und nur noch reaktiv/bei Auffälligkeiten nachziehen.
-
----
+PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
+- Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
+- Aktuell Indentation-Regressionsrisiko im discovery-to-inbox Script (Run kann mit IndentationError abbrechen)
+- Hauptgap bleibt: Pflichtfeld-Vollständigkeit (insb. Location/Time) für „curation-ready“ Events
 
 LAST UPDATE:
 
 2026-02-27
-
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 
 ---
