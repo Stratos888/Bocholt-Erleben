@@ -938,8 +938,31 @@ def classify_candidate(
 # - Ersetzt den bestehenden safe_fetch()-Block 1:1 und fügt safe_fetch_post() direkt danach hinzu
 # === END BLOCK: SAFE FETCH (GET) + SAFE FETCH (POST FORM) (v1) ===
 
+# === BEGIN BLOCK: SAFE FETCH GET (diagnostic for bocholt, v2) ===
+# Zweck:
+# - Sichtbar machen, ob Bocholt-Fetch leer/fehlerhaft ist (Status/Len/Snippet)
+# Umfang:
+# - Ersetzt safe_fetch() vollständig, gleiche Signatur, zusätzliche Logs nur für bocholt.de
+# === END BLOCK HEADER ===
 def safe_fetch(url: str, timeout: int = 20) -> str:
     backoffs = [10, 30, 90]
+
+    def _is_bocholt(u: str) -> bool:
+        u = (u or "").lower()
+        return "bocholt.de/veranstaltungskalender" in u or "bocholt.de" in u
+
+    def _diag(u: str, label: str, body: bytes | None) -> None:
+        if not _is_bocholt(u):
+            return
+        n = len(body or b"")
+        snippet = ""
+        if body:
+            try:
+                snippet = body[:200].decode("utf-8", errors="replace")
+            except Exception:
+                snippet = ""
+        info(f"[bocholt-fetch][GET] {label} bytes={n} snippet={clean_text(snippet)[:120]}")
+
     last_err: Exception | None = None
 
     for attempt in range(len(backoffs) + 1):
@@ -955,28 +978,67 @@ def safe_fetch(url: str, timeout: int = 20) -> str:
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 raw = resp.read()
+                _diag(url, f"ok status={getattr(resp, 'status', '?')}", raw)
                 try:
                     return raw.decode("utf-8", errors="replace")
                 except Exception:
                     return raw.decode("latin-1", errors="replace")
-        except Exception as e:
+        except urllib.error.HTTPError as e:
+            try:
+                raw = e.read()
+            except Exception:
+                raw = b""
+            _diag(url, f"HTTPError status={getattr(e, 'code', '?')}", raw)
             last_err = e
-            if attempt < len(backoffs):
-                time.sleep(backoffs[attempt])
-                continue
-            return ""
+        except Exception as e:
+            _diag(url, f"error {type(e).__name__}", None)
+            last_err = e
 
+        if attempt < len(backoffs):
+            time.sleep(backoffs[attempt])
+            continue
+
+    # final fallback
+    if _is_bocholt(url) and last_err:
+        info(f"[bocholt-fetch][GET] final_fail {type(last_err).__name__}: {str(last_err)[:160]}")
     return ""
+# === END BLOCK: SAFE FETCH GET (diagnostic for bocholt, v2) ===
 
-
+# === BEGIN BLOCK: SAFE FETCH POST FORM (diagnostic for bocholt, v2) ===
+# Zweck:
+# - Sichtbar machen, ob Bocholt-Pagination per POST leer/fehlerhaft ist
+# Umfang:
+# - Ersetzt safe_fetch_post() vollständig, gleiche Signatur, zusätzliche Logs nur für bocholt.de
+# === END BLOCK HEADER ===
 def safe_fetch_post(url: str, form: Dict[str, str], timeout: int = 20) -> str:
-    """
-    POST x-www-form-urlencoded (simple form submit).
-    Wichtig: URL-Fragmente (#results) werden entfernt.
-    """
     url = (url or "").split("#", 1)[0].strip()
 
-    body = urllib.parse.urlencode(form or {}).encode("utf-8")
+    def _is_bocholt(u: str) -> bool:
+        u = (u or "").lower()
+        return "bocholt.de/veranstaltungskalender" in u or "bocholt.de" in u
+
+    def _diag(u: str, label: str, body: bytes | None) -> None:
+        if not _is_bocholt(u):
+            return
+        n = len(body or b"")
+        snippet = ""
+        if body:
+            try:
+                snippet = body[:200].decode("utf-8", errors="replace")
+            except Exception:
+                snippet = ""
+        pos = ""
+        try:
+            pos = str((form or {}).get("pos", ""))
+        except Exception:
+            pos = ""
+        info(f"[bocholt-fetch][POST pos={pos}] {label} bytes={n} snippet={clean_text(snippet)[:120]}")
+
+    try:
+        body = urllib.parse.urlencode(form or {}).encode("utf-8")
+    except Exception:
+        body = b""
+
     req = urllib.request.Request(
         url,
         data=body,
@@ -992,14 +1054,22 @@ def safe_fetch_post(url: str, form: Dict[str, str], timeout: int = 20) -> str:
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             raw = resp.read()
+            _diag(url, f"ok status={getattr(resp, 'status', '?')}", raw)
             try:
                 return raw.decode("utf-8", errors="replace")
             except Exception:
                 return raw.decode("latin-1", errors="replace")
-    except Exception:
+    except urllib.error.HTTPError as e:
+        try:
+            raw = e.read()
+        except Exception:
+            raw = b""
+        _diag(url, f"HTTPError status={getattr(e, 'code', '?')}", raw)
         return ""
-# === END BLOCK: SAFE FETCH (GET) + SAFE FETCH (POST FORM) (v1) ===
-
+    except Exception as e:
+        _diag(url, f"error {type(e).__name__}", None)
+        return ""
+# === END BLOCK: SAFE FETCH POST FORM (diagnostic for bocholt, v2) ===
 def ics_unfold_lines(text: str) -> List[str]:
     # RFC5545 line folding: lines starting with space/tab are continuations
     lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
