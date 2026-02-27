@@ -251,11 +251,6 @@ const websiteUrl = (() => {
   if (sourceUrl && hp === sourceUrl) return "";
   return hp;
 })();
-  const hp = normalizeHttpUrl(homepage) || "";
-  if (!hp) return "";
-  if (sourceUrl && hp === sourceUrl) return "";
-  return hp;
-})();
 
 // Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
 const shareParts = [
@@ -1279,6 +1274,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
