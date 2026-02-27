@@ -2186,6 +2186,31 @@ def _strip_html_tags(s: str) -> str:
     s = re.sub(r"<[^>]+>", " ", s)
     return clean_text(s)
 
+# === BEGIN BLOCK: BOCHOLT INFER YEAR + PARSE SINGLE DATE (hotfix v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Fix: _bocholt_infer_year fehlte -> NameError im Bocholt-Kalender-Parser
+# - Liefert ein plausibles Jahr für Monatsangaben (kalendernah, über Jahreswechsel robust)
+# Umfang:
+# - Ersetzt nur _bocholt_parse_date_from_text() und fügt _bocholt_infer_year() direkt davor ein
+# === END BLOCK: BOCHOLT INFER YEAR + PARSE SINGLE DATE (hotfix v1) ===
+
+def _bocholt_infer_year(month: int) -> int:
+    """
+    Inferiert das Jahr für einen Monatsnamen ohne Jahrangabe.
+    Heuristik:
+    - Wenn der Monat bereits "hinter" dem aktuellen Monat liegt (z.B. Januar bei aktuellem Monat Dezember),
+      dann ist es sehr wahrscheinlich nächstes Jahr.
+    - Sonst aktuelles Jahr.
+    """
+    try:
+        today = date.today()
+        if month < (today.month - 1):  # kleiner Puffer für Runs am Monatsanfang
+            return today.year + 1
+        return today.year
+    except Exception:
+        return date.today().year
+
 def _bocholt_parse_date_from_text(t: str) -> str:
     # Beispiel: "Freitag, 20. Februar,"
     m = re.search(
