@@ -1,12 +1,43 @@
 /* === BEGIN BLOCK: GLOBAL DESIGN TOKENS ===
 Zweck:
-Globale Design-System-Tokens für alle UI-Komponenten
+- Globale Design-System-Tokens für alle UI-Komponenten
+- Panel-Tokens: Detailpanel ist “Card Expanded” (keine neue Designwelt)
+- Ableitung aus bestehenden Tokens (primary-muted etc.)
 Muss am Anfang der CSS-Datei stehen
 === */
 
 :root{
 
   --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+
+  /* === BEGIN SUBBLOCK: PANEL SEMANTIC TOKENS (Card Expanded DNA)
+  Zweck:
+  - Semantische Tokens für Detailpanel (Surface/Border/Shadow)
+  - Werte werden aus bestehenden Tokens abgeleitet (keine Hardcodes in Panel-Blöcken)
+  Umfang:
+  - --surface-panel*, --border-panel*, --shadow-panel*
+  === */
+
+  /* Surfaces */
+  --surface-panel: color-mix(in srgb, white 90%, var(--color-primary-muted));
+  --surface-panel-elevated: color-mix(in srgb, white 86%, var(--color-primary-muted));
+  --surface-panel-footer: color-mix(in srgb, white 88%, var(--color-primary-muted));
+
+  /* Rows (Info vs Action) */
+  --surface-panel-row: var(--surface-panel-elevated);
+  --surface-panel-row-action: color-mix(in srgb, white 84%, var(--color-primary-muted));
+  --surface-panel-row-info: color-mix(in srgb, white 92%, var(--color-primary-muted));
+
+  /* Borders */
+  --border-panel: color-mix(in srgb, rgba(31,41,51,0.10) 72%, var(--color-primary-muted));
+  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.08) 72%, var(--color-primary-muted));
+  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.14) 72%, var(--color-primary-muted));
+
+  /* Shadows */
+  --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
+  --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
+
+  /* === END SUBBLOCK: PANEL SEMANTIC TOKENS (Card Expanded DNA) === */
 
 }
 
@@ -1899,8 +1930,8 @@ Umfang:
 /* Sheet */
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
 Zweck:
-- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint) + klarer Panel-Interface Eindruck
-- ruhige Top-Kante (Divider statt “glassy”)
+- Detailpanel = Card Expanded: nutzt Panel-Tokens (Surface/Border/Shadow)
+- sichtbarer, konsistenter Brand-Abgleich (D), ohne “grün anzumalen”
 Umfang:
 - Nur #event-detail-panel .detail-panel-content
 === */
@@ -1915,23 +1946,15 @@ Umfang:
   max-height: 92vh;
   max-height: 92dvh;
 
-  /* Fallback */
-  background-color: rgba(255,255,255,0.985);
-
-  /* Brand-Tint (subtil, sichtbar aber nicht “grün”) */
-  background-color: color-mix(in srgb, white 92%, var(--color-primary-muted));
-
+  background-color: var(--surface-panel);
   background-image: none !important;
 
   border-top-left-radius: var(--dp-sheet-radius);
   border-top-right-radius: var(--dp-sheet-radius);
 
-  /* Klarer Panel-Header Divider */
-  border-top: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 72%, var(--color-primary-muted));
+  border-top: 1px solid var(--border-panel);
 
-  box-shadow:
-    0 -42px 130px rgba(0,0,0,0.26),
-    0 1px 0 rgba(255,255,255,0.82) inset;
+  box-shadow: var(--shadow-panel);
 
   overflow: hidden;
   overscroll-behavior: contain;
@@ -1988,16 +2011,14 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps)
 Zweck:
-- Close ist garantiert klickbar (kein pseudo-element das fremd positioniert)
-- z-index wirkt sicher (positioned element)
-- bleibt in Header-Grid, ohne Magic Offsets
+- Close bleibt im Header-Grid rechts oben (Enterprise Header)
+- nutzt Panel-Tokens (Card Expanded DNA), keine fremde Farbwelt
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
 #event-detail-panel .detail-panel-close{
-  /* IMPORTANT: z-index wirkt nur bei position != static */
   position: relative;
-  z-index: 6; /* über drag-hit (3) und handle (4) */
+  z-index: 6;
 
   grid-column: 2;
   grid-row: 1;
@@ -2012,8 +2033,8 @@ Umfang:
   align-items: center;
   justify-content: center;
 
-  background: var(--ui-surface-tint);
-  border: 1px solid var(--ui-border-weak);
+  background: var(--surface-panel-elevated);
+  border: 1px solid var(--border-panel-soft);
   box-shadow: none;
 
   font-size: var(--ui-icon-size-md);
@@ -2023,22 +2044,23 @@ Umfang:
 
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-
   transform: none;
 }
 
 #event-detail-panel .detail-panel-close:hover{
-  background: var(--ui-surface-tint-hover);
-}
-
-#event-detail-panel .detail-panel-close:focus-visible{
-  outline: 3px solid var(--ui-focus-ring);
-  outline-offset: 2px;
+  background: color-mix(in srgb, var(--surface-panel-elevated) 92%, white);
+  border-color: var(--border-panel);
 }
 
 #event-detail-panel .detail-panel-close:active{
-  background: var(--ui-surface-tint-active);
-  transform: scale(0.96);
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--surface-panel-elevated) 86%, white);
+  border-color: var(--border-panel-strong);
+}
+
+#event-detail-panel .detail-panel-close:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 2px;
 }
 /* === END PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps) === */
 /* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
@@ -2308,8 +2330,8 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
 Zweck:
-- Meta trägt Mainpage-DNA: subtile Brand-Tints
-- Location-Row wirkt eindeutig “Action” (interaktiv), Datum/Zeit eindeutig “Info”
+- Meta-Rows nutzen Panel-Tokens (A/D)
+- Location klar “Action”, Datetime klar “Info” (Zielzustand)
 Umfang:
 - .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
@@ -2329,9 +2351,8 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
-  /* Brand-Tint (subtil) */
-  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  background: var(--surface-panel-row);
+  border: 1px solid var(--border-panel-soft);
 
   color: rgba(31,41,51,0.82);
   text-decoration: none !important;
@@ -2341,29 +2362,29 @@ Umfang:
   transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
-/* Location = Action-Row (minimal stärker) */
+/* Location = Action-Row */
 #event-detail-panel .detail-meta-row.is-location{
-  background: color-mix(in srgb, white 89%, var(--color-primary-muted));
-  border-color: color-mix(in srgb, rgba(31,41,51,0.14) 70%, var(--color-primary-muted));
+  background: var(--surface-panel-row-action);
+  border-color: var(--border-panel);
 }
 
-/* Datetime = Info-Row (minimal ruhiger) */
+/* Datetime = Info-Row */
 #event-detail-panel .detail-meta-row.is-datetime{
-  background: color-mix(in srgb, white 94%, var(--color-primary-muted));
-  border-color: color-mix(in srgb, rgba(31,41,51,0.09) 70%, var(--color-primary-muted));
+  background: var(--surface-panel-row-info);
+  border-color: var(--border-panel-soft);
 }
 
 @media (hover: hover){
   #event-detail-panel a.detail-meta-row:hover{
-    background: color-mix(in srgb, white 88%, var(--color-primary-muted));
-    border-color: color-mix(in srgb, rgba(31,41,51,0.13) 70%, var(--color-primary-muted));
+    background: color-mix(in srgb, var(--surface-panel-row) 92%, white);
+    border-color: var(--border-panel);
   }
 }
 
 #event-detail-panel a.detail-meta-row:active{
   transform: translateY(1px);
-  background: color-mix(in srgb, white 85%, var(--color-primary-muted));
-  border-color: color-mix(in srgb, rgba(31,41,51,0.16) 70%, var(--color-primary-muted));
+  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
+  border-color: var(--border-panel-strong);
 }
 
 #event-detail-panel a.detail-meta-row:focus-visible{
@@ -2413,8 +2434,8 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
-  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  background: var(--surface-panel-row);
+  border: 1px solid var(--border-panel-soft);
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2431,7 +2452,7 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 #event-detail-panel .detail-chip:active{
-  background: color-mix(in srgb, white 85%, var(--color-primary-muted));
+  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
 }
 #event-detail-panel .detail-chip-text{
   min-width: 0;
@@ -3025,13 +3046,10 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- Actionbar bleibt Token-konsistent, aber farblich an Mainpage/Sheet angepasst
-- ruhiger Divider statt „glasig“
+- Actionbar nutzt Panel-Tokens (Footer-Surface), keine Sonderfarben
+- Buttons nutzen gleiche Border/Shadow DNA wie Panel
 Umfang:
-- #detail-actionbar-slot Layout + hidden contract
-- .detail-actionbar-btn inkl. Icon/Label/States/Disabled
-- Icon-Guards für Header/Meta/Location/Actionbar
-- .detail-sr-only
+- #detail-actionbar-slot + .detail-actionbar-btn + states + .detail-sr-only
 === */
 
 /* SR-only (robust) */
@@ -3066,9 +3084,8 @@ Umfang:
   justify-items: stretch;
   gap: var(--space-md);
 
-  /* Ruhige, brand-warme Surface */
-  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border-top: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  background: var(--surface-panel-footer);
+  border-top: 1px solid var(--border-panel);
   box-shadow: none;
 
   z-index: 6;
@@ -3091,14 +3108,12 @@ Umfang:
   gap: var(--space-1);
 
   border-radius: var(--ui-radius-md);
-  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 75%, var(--color-primary-muted));
+  border: 1px solid var(--border-panel-soft);
 
   background: rgba(255,255,255,0.88);
   color: rgba(31,41,51,0.90);
 
-  box-shadow:
-    0 10px 20px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+  box-shadow: var(--shadow-panel-btn);
 
   font-size: 0 !important;
   line-height: 0 !important;
@@ -3120,7 +3135,7 @@ Umfang:
 
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    border-color: color-mix(in srgb, rgba(31,41,51,0.14) 75%, var(--color-primary-muted));
+    border-color: var(--border-panel);
     box-shadow:
       0 12px 24px rgba(0,0,0,0.055),
       0 1px 0 rgba(255,255,255,0.80) inset;
@@ -3140,7 +3155,6 @@ Umfang:
   outline-offset: 2px;
 }
 
-/* Icon + Label (small) */
 #detail-actionbar-slot .detail-actionbar-btn svg{
   width: 20px;
   height: 20px;
@@ -3159,7 +3173,6 @@ Umfang:
   color: rgba(31,41,51,0.72);
 }
 
-/* Disabled */
 #detail-actionbar-slot .detail-actionbar-btn[disabled],
 #detail-actionbar-slot .detail-actionbar-btn.is-disabled{
   opacity: 0.55;
@@ -3167,17 +3180,4 @@ Umfang:
   transform: none;
 }
 
-/* Icon-Guards (systemic) */
-#event-detail-panel .detail-icon-svg{
-  width: 18px;
-  height: 18px;
-  display: inline-block;
-  flex: 0 0 auto;
-}
-#event-detail-panel .detail-icon-svg.is-chip{
-  width: 18px;
-  height: 18px;
-}
-
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
