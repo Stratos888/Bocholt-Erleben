@@ -2152,31 +2152,29 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Header als Grid: Titel links, Close rechts (ohne padding-right Reserve-Hacks)
-- Kategorie ist Indikator (kein Control) -> links am Titel als ruhiger Badge/Marker
-- Titel ist Anchor -> keine Block-Margins in der Zeile, sauberes Raster, stabil bei 2 Zeilen
-- FIX: Markup-Order (Title vor Icon) wird CSS-seitig stabilisiert (Icon links, Title rechts)
+- Header: Titel links, Close rechts; Meta darunter über volle Breite (Enterprise v2)
+- Verhindert Auto-Placement in eine „rechte Spalte“
+- Title Wrapping: keine „Wo-“ Trennung, sauberer Clamp
 Umfang:
-- .detail-header + .detail-title-row + .detail-title + .detail-category-icon
+- .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
 === */
 
-/* Header / Title Row */
 #event-detail-panel .detail-header{
   position: relative;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
   column-gap: var(--space-sm);
-  align-items: center;
+  row-gap: var(--space-sm);
+  align-items: start;
 
-  /* Kein doppeltes Top-Spacing: kommt aus #detail-content */
   padding: 0 0 var(--space-md);
   margin: 0;
-
   border-bottom: 0;
 }
 
-/* Title-Row: Badge + Title als Raster (stabil, kein Reserve-Padding) */
+/* Titelzeile links oben */
 #event-detail-panel .detail-title-row{
   grid-column: 1;
   grid-row: 1;
@@ -2189,13 +2187,11 @@ Umfang:
   min-height: var(--ui-icon-btn-size);
   min-width: 0;
 
-  /* Enterprise: bei 2 Zeilen Titel soll der Badge optisch an der ersten Zeile hängen */
   align-items: start;
 }
 
-/* Category Indicator: links am Titel als Badge/Marker (nicht klickbar) */
+/* Kategorie links als Indikator */
 #event-detail-panel .detail-category-icon{
-  /* FIX: Icon immer links – unabhängig von DOM-Reihenfolge */
   grid-column: 1;
   grid-row: 1;
 
@@ -2211,7 +2207,6 @@ Umfang:
   border: 1px solid var(--ui-border-weak);
 
   opacity: var(--ui-icon-opacity);
-
   font-size: var(--ui-icon-size-sm);
   line-height: 1;
 
@@ -2219,20 +2214,18 @@ Umfang:
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  /* Optische Baseline-Korrektur (Token-basiert, kein Magic Number Hardcode) */
   margin-top: var(--space-1);
 }
 
-/* Title: Anchor (ruhig, clamp), ohne “Zeilen-Margin” */
+/* Titel rechts vom Badge – sauberes Wrapping */
 #event-detail-panel .detail-title{
-  /* FIX: Title immer rechts – unabhängig von DOM-Reihenfolge */
   grid-column: 2;
   grid-row: 1;
 
   margin: 0;
   min-width: 0;
 
-  font-size: 1.05rem; /* exakt wie .event-title */
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -2243,12 +2236,19 @@ Umfang:
   -webkit-box-orient: vertical;
   overflow: hidden;
 
-  overflow-wrap: anywhere;
+  /* Fix: keine hässlichen Hyphen-Breaks wie "Wo-" */
+  overflow-wrap: break-word;
   word-break: normal;
-  hyphens: auto;
+  hyphens: none;
 }
 
-/* SVG/Emoji/Text Icon: keine pseudo-Overlays */
+/* Meta MUSS unter dem Titel über volle Breite */
+#event-detail-panel .detail-meta-rows{
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+}
+
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
@@ -3193,6 +3193,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
