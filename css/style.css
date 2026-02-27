@@ -1899,11 +1899,14 @@ Umfang:
 /* Sheet */
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
 Zweck:
-- Sheet wirkt wie Feed-Surface
+- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint statt neutral-weiß)
 - kein Gradient
 - parser-safe (keine nested comments)
+Umfang:
+- Nur .detail-panel-content + ::after
 === */
 
+/* Sheet */
 #event-detail-panel .detail-panel-content{
 
   position: absolute;
@@ -1914,13 +1917,18 @@ Zweck:
   max-height: 92vh;
   max-height: 92dvh;
 
-  background-color: rgba(255,255,255,0.98);
+  /* Fallback (neutral) */
+  background-color: rgba(255,255,255,0.985);
+
+  /* Brand-Tint (subtil) */
+  background-color: color-mix(in srgb, white 92%, var(--color-primary-muted));
+
   background-image: none !important;
 
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
+  border-top-left-radius: var(--dp-sheet-radius);
+  border-top-right-radius: var(--dp-sheet-radius);
 
-  border-top: 1px solid rgba(31,41,51,0.08);
+  border-top: 1px solid rgba(31,41,51,0.07);
 
   box-shadow:
     0 -42px 130px rgba(0,0,0,0.26),
@@ -2079,8 +2087,7 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
 Zweck:
-- Enterprise: Quelle/Website als dezente Attribution (kein Card-CTA Look)
-- Dedupe bleibt in JS; CSS macht es ruhig + kompakt
+- Links bleiben Attribution (ruhig), aber farblich in Mainpage-DNA
 Umfang:
 - .detail-links + .detail-link + label/value/ext (nur Detailpanel)
 === */
@@ -2095,7 +2102,7 @@ Umfang:
   border-top: 1px solid rgba(31,41,51,0.08);
 }
 
-/* Link: wie Footnote-Row, nicht wie Card */
+/* Link: Footnote-Row, kein Card-CTA Look */
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
@@ -2116,19 +2123,20 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hover/Active sehr subtil */
+/* Hover/Active subtil + brand-warm */
 @media (hover: hover){
   #event-detail-panel .detail-link:hover{
-    color: rgba(31,41,51,0.86);
+    color: rgba(31,41,51,0.88);
     text-decoration: underline;
     text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, rgba(31,41,51,0.25) 60%, var(--color-primary));
   }
 }
 #event-detail-panel .detail-link:active{
-  background: rgba(31,41,51,0.04);
+  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
 }
 
-/* Focus: sauber, aber ruhig */
+/* Focus: sauber */
 #event-detail-panel .detail-link:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
@@ -2146,7 +2154,7 @@ Umfang:
   min-width: 0;
   font-size: 13px;
   font-weight: 650;
-  color: rgba(31,41,51,0.78);
+  color: rgba(31,41,51,0.80);
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2270,8 +2278,8 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
 Zweck:
-- Meta ist „Info“, nicht „Card“: ruhig, flach, enterprise
-- Rows bleiben klar klickbar (Ort), aber ohne CTA-Anmutung
+- Meta trägt Mainpage-DNA: subtile Brand-Tints statt neutral-grau
+- Rows bleiben ruhig/enterprise, keine CTA-Kachel-Optik
 Umfang:
 - .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
@@ -2291,8 +2299,13 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
+  /* Fallback */
   background: rgba(31,41,51,0.020);
   border: 1px solid rgba(31,41,51,0.055);
+
+  /* Brand-Tint (subtil) */
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
 
   color: rgba(31,41,51,0.82);
   text-decoration: none !important;
@@ -2304,15 +2317,26 @@ Umfang:
 
 @media (hover: hover){
   #event-detail-panel a.detail-meta-row:hover{
+    /* Fallback */
     background: rgba(31,41,51,0.032);
     border-color: rgba(31,41,51,0.075);
+
+    /* Brand-Tint hover */
+    background: color-mix(in srgb, white 88%, var(--color-primary-muted));
+    border-color: color-mix(in srgb, rgba(31,41,51,0.13) 70%, var(--color-primary-muted));
   }
 }
 
 #event-detail-panel a.detail-meta-row:active{
   transform: translateY(1px);
+
+  /* Fallback */
   background: rgba(31,41,51,0.040);
   border-color: rgba(31,41,51,0.095);
+
+  /* Brand-Tint active */
+  background: color-mix(in srgb, white 85%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, rgba(31,41,51,0.16) 70%, var(--color-primary-muted));
 }
 
 #event-detail-panel a.detail-meta-row:focus-visible{
@@ -2336,7 +2360,7 @@ Umfang:
   opacity: 0.55;
 }
 
-/* Legacy chips container: entschärfen (kein „Kasten“) */
+/* Legacy chips container: bleibt neutral/leer */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: var(--space-xs);
@@ -2350,7 +2374,7 @@ Umfang:
   box-shadow: none;
 }
 
-/* Legacy chip rows übernehmen das neue Row-Look */
+/* Legacy chip rows übernehmen den neuen Row-Look */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2362,8 +2386,13 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
+  /* Fallback */
   background: rgba(31,41,51,0.020);
   border: 1px solid rgba(31,41,51,0.055);
+
+  /* Brand-Tint (subtil) */
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2380,7 +2409,11 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 #event-detail-panel .detail-chip:active{
+  /* Fallback */
   background: rgba(31,41,51,0.040);
+
+  /* Brand-Tint active */
+  background: color-mix(in srgb, white 85%, var(--color-primary-muted));
 }
 #event-detail-panel .detail-chip-text{
   min-width: 0;
@@ -2975,10 +3008,8 @@ Umfang:
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
 Zweck:
-- Actionbar Slot ist zuverlässig display:flex (Row) im Open-State
-- Buttons: Enterprise-States (hover/active/focus/disabled) ohne „bling“
-- Icons sind app-weit konsistent über Tokens (Actionbar DNA)
-- Detailpanel Icon-Guards nutzen Tokens (keine „Riesen-Icons“)
+- Actionbar bleibt Token-konsistent, aber farblich an Mainpage/Sheet angepasst
+- ruhiger Divider statt „glasig“
 Umfang:
 - #detail-actionbar-slot Layout + hidden contract
 - .detail-actionbar-btn inkl. Icon/Label/States/Disabled
@@ -2994,17 +3025,12 @@ Umfang:
   padding: 0 !important;
   margin: -1px !important;
   overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
+  clip: rect(0,0,0,0) !important;
   white-space: nowrap !important;
   border: 0 !important;
 }
 
-/* hidden-contract: UA [hidden] muss zuverlässig ausblenden */
-#detail-actionbar-slot[hidden]{
-  display: none !important;
-}
-
-/* Slot: Enterprise Grid (2 CTAs fühlen sich wie “Bottom Actions” an) */
+/* Slot: Enterprise Grid */
 #detail-actionbar-slot{
   position: fixed;
   left: 0;
@@ -3023,14 +3049,15 @@ Umfang:
   justify-items: stretch;
   gap: var(--space-md);
 
-  border-top: 0;
-  background: rgba(255,255,255,0.94);
-  box-shadow: 0 -1px 0 rgba(31,41,51,0.06) inset;
+  /* Ruhige, brand-warme Surface */
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  border-top: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  box-shadow: none;
 
   z-index: 6;
 }
 
-/* Buttons (können <a> oder <button> sein) */
+/* Buttons (<a> oder <button>) */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
@@ -3047,13 +3074,13 @@ Umfang:
   gap: var(--space-1);
 
   border-radius: var(--ui-radius-md);
-  border: 1px solid var(--ui-border-soft);
+  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 75%, var(--color-primary-muted));
 
-  background: rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.88);
   color: rgba(31,41,51,0.90);
 
   box-shadow:
-    0 10px 20px rgba(0,0,0,0.055),
+    0 10px 20px rgba(0,0,0,0.045),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
   font-size: 0 !important;
@@ -3074,138 +3101,65 @@ Umfang:
     opacity 140ms ease;
 }
 
-/* Links: in allen States niemals unterstreichen */
-#detail-actionbar-slot .detail-actionbar-btn:link,
-#detail-actionbar-slot .detail-actionbar-btn:visited,
-#detail-actionbar-slot .detail-actionbar-btn:hover,
-#detail-actionbar-slot .detail-actionbar-btn:active{
-  text-decoration: none !important;
-}
-
-/* Hover (Desktop) */
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
-    background: rgba(255,255,255,0.92);
-    border-color: var(--ui-border-strong);
+    border-color: color-mix(in srgb, rgba(31,41,51,0.14) 75%, var(--color-primary-muted));
     box-shadow:
-      0 12px 26px rgba(0,0,0,0.070),
-      0 1px 0 rgba(255,255,255,0.82) inset;
+      0 12px 24px rgba(0,0,0,0.055),
+      0 1px 0 rgba(255,255,255,0.80) inset;
   }
 }
 
-/* Active (Tap): spürbar, aber subtil */
 #detail-actionbar-slot .detail-actionbar-btn:active{
-  transform: translateY(1px) scale(0.99);
-  background: rgba(31,41,51,0.05);
-  border-color: var(--ui-border-strong);
+  transform: translateY(1px);
+  background: rgba(255,255,255,0.82);
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.055),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 8px 16px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
-/* Focus: sichtbar, ohne Layout-Jump */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: var(--space-1);
-  border-radius: var(--ui-radius-md);
+  outline-offset: 2px;
 }
 
-/* Disabled (alle gängigen Formen) */
-#detail-actionbar-slot .detail-actionbar-btn[disabled],
-#detail-actionbar-slot .detail-actionbar-btn.is-disabled,
-#detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]{
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.035),
-    0 1px 0 rgba(255,255,255,0.70) inset;
-}
-#detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]{
-  pointer-events: none;
-}
-@media (hover: hover){
-  #detail-actionbar-slot .detail-actionbar-btn[disabled]:hover,
-  #detail-actionbar-slot .detail-actionbar-btn.is-disabled:hover,
-  #detail-actionbar-slot .detail-actionbar-btn[aria-disabled="true"]:hover{
-    background: rgba(255,255,255,0.86);
-    border-color: var(--ui-border-soft);
-    box-shadow:
-      0 6px 14px rgba(0,0,0,0.035),
-      0 1px 0 rgba(255,255,255,0.70) inset;
-  }
+/* Icon + Label (small) */
+#detail-actionbar-slot .detail-actionbar-btn svg{
+  width: 20px;
+  height: 20px;
+  opacity: 0.92;
 }
 
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce){
-  #detail-actionbar-slot .detail-actionbar-btn{
-    transition: none;
-  }
-}
-
-/* Label (klein) – kommt aus title */
 #detail-actionbar-slot .detail-actionbar-btn::after{
   content: attr(title);
   display: block;
+  margin-top: 6px;
 
-  font-size: 11px;
-  line-height: 1.1;
+  font-size: 12px;
+  line-height: 1;
   font-weight: 750;
 
-  color: rgba(31,41,51,0.76);
-  margin-top: var(--space-1);
-
-  max-width: 64px;
-  text-align: center;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(31,41,51,0.72);
 }
 
-/* Icons: Actionbar-DNA über Tokens (md) */
-#detail-actionbar-slot .detail-actionbar-btn svg,
-#detail-actionbar-slot .detail-actionbar-btn img{
-  width: var(--ui-icon-size-md) !important;
-  height: var(--ui-icon-size-md) !important;
-  min-width: var(--ui-icon-size-md) !important;
-  min-height: var(--ui-icon-size-md) !important;
-  max-width: var(--ui-icon-size-md) !important;
-  max-height: var(--ui-icon-size-md) !important;
-
-  display: block !important;
-  flex: 0 0 auto !important;
-
-  opacity: var(--ui-icon-opacity);
-  object-fit: contain !important;
+/* Disabled */
+#detail-actionbar-slot .detail-actionbar-btn[disabled],
+#detail-actionbar-slot .detail-actionbar-btn.is-disabled{
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
 }
 
-/* Detailpanel Icon Guards (Header/Meta/Location/Actionbar) -> Tokens (md) */
-#event-detail-panel .detail-header svg,
-#event-detail-panel .detail-meta-chips svg,
-#event-detail-panel .detail-location-action svg,
-#event-detail-panel .detail-header img,
-#event-detail-panel .detail-meta-chips img,
-#event-detail-panel .detail-location-action img{
-  width: var(--ui-icon-size-md) !important;
-  height: var(--ui-icon-size-md) !important;
-  max-width: var(--ui-icon-size-md) !important;
-  max-height: var(--ui-icon-size-md) !important;
-  display: block !important;
-  object-fit: contain !important;
-
-  opacity: var(--ui-icon-opacity);
+/* Icon-Guards (systemic) */
+#event-detail-panel .detail-icon-svg{
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+#event-detail-panel .detail-icon-svg.is-chip{
+  width: 18px;
+  height: 18px;
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
-
-
-
-
-
-
-
-
-
-
