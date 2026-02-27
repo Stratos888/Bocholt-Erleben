@@ -2077,6 +2077,79 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
+/* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
+Zweck:
+- Ruhige Links im Content (nicht als CTA), dedupliziert
+- Touch & Focus enterprise-konform
+Umfang:
+- .detail-links + .detail-link + label/value/ext
+=== */
+
+#event-detail-panel .detail-links{
+  display: grid;
+  gap: var(--space-xs);
+
+  margin-top: var(--space-lg);
+  padding-top: var(--space-sm);
+
+  border-top: 1px solid rgba(31,41,51,0.08);
+}
+
+#event-detail-panel .detail-link,
+#event-detail-panel .detail-link:link,
+#event-detail-panel .detail-link:visited{
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-sm);
+
+  padding: 12px var(--space-sm);
+  border-radius: var(--ui-radius-md);
+
+  background: rgba(255,255,255,0.60);
+  border: 1px solid rgba(31,41,51,0.08);
+
+  color: rgba(31,41,51,0.86);
+  text-decoration: none !important;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-link:hover{
+  background: rgba(255,255,255,0.74);
+}
+
+#event-detail-panel .detail-link:active{
+  transform: translateY(1px);
+  background: rgba(31,41,51,0.04);
+}
+
+#event-detail-panel .detail-link:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 2px;
+}
+
+#event-detail-panel .detail-link-label{
+  font-size: 12px;
+  font-weight: 750;
+  color: rgba(31,41,51,0.66);
+}
+
+#event-detail-panel .detail-link-value{
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#event-detail-panel .detail-link-ext{
+  opacity: 0.60;
+}
+
+/* === END BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped) === */
+
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
 - Header als Grid: Titel links, Close rechts (ohne padding-right Reserve-Hacks)
@@ -2185,21 +2258,82 @@ Umfang:
 
 
 
-/* === BEGIN BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) ===
+/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
 Zweck:
-- Meta (Ort/Datum/Zeit) als ruhige Info-Rows
-- Gleicher Gutter/Rhythmus wie Location-Row (Icon 18px + gap 10px)
+- Enterprise v2 Markup: .detail-meta-rows + .detail-meta-row
+- Rückwärtskompatibel: .detail-meta-chips/.detail-chip bleibt optisch „ok“, falls noch irgendwo genutzt
 Umfang:
-- #event-detail-panel .detail-meta-chips + .detail-chip + .detail-chip-text
+- Meta-Rows Styling + Icons/Text/Ext
 === */
 
-/* === BEGIN BLOCK: DETAIL META ROWS (calmer, consistent dividers) ===
-Zweck:
-- Meta wirkt wie ruhiger Enterprise-Info-Block (klarer Rhythmus, keine “Zeilenliste”)
-- Token-Skala (Spacing), bessere Lesbarkeit (Kontrast), saubere Baseline
-Umfang:
-- #event-detail-panel .detail-meta-chips + .detail-chip
-=== */
+#event-detail-panel .detail-meta-rows{
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-md);
+
+  padding: var(--space-sm) var(--space-sm);
+  border-radius: var(--ui-radius-md);
+
+  background: rgba(31,41,51,0.028);
+  border: 1px solid rgba(31,41,51,0.06);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+}
+
+#event-detail-panel .detail-meta-row{
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-sm);
+
+  width: 100%;
+  padding: var(--space-sm) var(--space-sm);
+
+  border-radius: var(--ui-radius-sm);
+  background: transparent;
+
+  font-size: var(--font-event-meta);
+  line-height: 1.32;
+  font-weight: 450;
+  color: rgba(31,41,51,0.78);
+
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#event-detail-panel .detail-meta-row.is-static{
+  cursor: default;
+  user-select: text;
+}
+
+#event-detail-panel a.detail-meta-row:hover{
+  background: rgba(255,255,255,0.52);
+}
+
+#event-detail-panel a.detail-meta-row:active{
+  background: rgba(31,41,51,0.035);
+}
+
+#event-detail-panel a.detail-meta-row:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 2px;
+}
+
+#event-detail-panel .detail-meta-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#event-detail-panel .detail-meta-text{
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#event-detail-panel .detail-meta-ext{
+  opacity: 0.65;
+}
+
+/* Backward compatible (legacy chips) */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: var(--space-xs);
@@ -2210,11 +2344,8 @@ Umfang:
 
   background: rgba(31,41,51,0.028);
   border: 1px solid rgba(31,41,51,0.06);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.70) inset;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 }
-
-/* Meta-Row: ruhig, nicht “Button”, aber klar strukturiert */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2243,17 +2374,9 @@ Umfang:
 
   -webkit-tap-highlight-color: transparent;
 }
-
-/* Sehr dezentes “Touch-Feedback”, ohne Button-Charakter */
 #event-detail-panel .detail-chip:active{
   background: rgba(31,41,51,0.035);
 }
-
-#event-detail-panel .detail-meta-chips .detail-chip:last-child{
-  border-bottom: 0;
-}
-/* === END BLOCK: DETAIL META ROWS (calmer, consistent dividers) === */
-
 #event-detail-panel .detail-chip-text{
   min-width: 0;
   white-space: normal;
@@ -2262,7 +2385,7 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
+/* === END BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips) === */
 
 
 
@@ -2876,7 +2999,7 @@ Umfang:
   display: none !important;
 }
 
-/* Slot: IMMER Row (Hard-Override) */
+/* Slot: Enterprise Grid (2 CTAs fühlen sich wie “Bottom Actions” an) */
 #detail-actionbar-slot{
   position: fixed;
   left: 0;
@@ -2888,9 +3011,11 @@ Umfang:
   min-height: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom));
   padding: var(--dp-actionbar-pad-y) var(--gutter) calc(var(--dp-actionbar-pad-y) + var(--dp-safe-bottom));
 
-  display: flex !important;
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
-  justify-content: center;
+  justify-items: stretch;
   gap: var(--space-md);
 
   border-top: 0;
@@ -2904,7 +3029,8 @@ Umfang:
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
-  min-width: 72px;
+  width: 100%;
+  min-width: 0;
   height: 56px;
 
   padding: var(--space-sm) var(--space-md);
@@ -3067,6 +3193,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
