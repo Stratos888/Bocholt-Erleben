@@ -2133,20 +2133,25 @@ def parse_html_generic_events(html_text: str, base_url: str) -> List[Dict[str, s
 
     # 4) Fallback: Date-Scan
     return _html_link_candidates_date_scan(html_text, base_url)
-# === BEGIN BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v1) ===
+# === BEGIN BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v2) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
 # - Parst https://www.bocholt.de/veranstaltungskalender (Listenansicht) in Kandidaten
-# - Extrahiert title, date (ISO), time (HH:MM), location, url
+# - Unterstützt:
+#   a) Einzeltermine mit Wochentag: "Freitag, 27. Februar, 18:00 Uhr - 20:30 Uhr, Ort"
+#   b) Serien/Ranges: "Mehrere Termine vom 03. - 31. März ... | Dienstags zwischen ..."
+# - Extrahiert: title, date (start ISO), endDate (optional ISO), time (optional), location (optional), url
 # Umfang:
-# - Neue Funktion parse_bocholt_calendar_html + kleine Helpers
-# === END BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v1) ===
+# - Nur Listenseite (keine Detailseiten-Fetches)
+# - Konservativ: keine "date" => kein Candidate (für diese Quelle)
+# === END BLOCK: BOCHOLT VERANSTALTUNGSKALENDER HTML PARSER (v2) ===
 
 _BOCHOLT_WEEKDAYS = (
     "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
 )
 
 _BOCHOLT_MONTHS = {
+    # DE
     "januar": 1,
     "februar": 2,
     "märz": 3,
@@ -2160,6 +2165,19 @@ _BOCHOLT_MONTHS = {
     "oktober": 10,
     "november": 11,
     "dezember": 12,
+    # EN (falls mal EN-Ansicht/Fragmente auftauchen)
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
 }
 
 def _strip_html_tags(s: str) -> str:
@@ -2167,14 +2185,6 @@ def _strip_html_tags(s: str) -> str:
     s = re.sub(r"<\s*br\s*/?\s*>", " ", s, flags=re.IGNORECASE)
     s = re.sub(r"<[^>]+>", " ", s)
     return clean_text(s)
-
-def _bocholt_infer_year(month: int) -> int:
-    today = datetime.now().date()
-    y = today.year
-    # Wenn der Monat "weit zurück" wirkt, behandeln wir es als nächstes Jahr (Jahreswechsel-heuristik)
-    if month and today.month in (11, 12) and month in (1, 2, 3, 4):
-        y += 1
-    return y
 
 def _bocholt_parse_date_from_text(t: str) -> str:
     # Beispiel: "Freitag, 20. Februar,"
@@ -2197,6 +2207,61 @@ def _bocholt_parse_date_from_text(t: str) -> str:
     except Exception:
         return ""
 
+def _bocholt_parse_date_range_from_text(t: str) -> Tuple[str, str]:
+    """
+    Unterstützt u.a.:
+    - "Mehrere Termine vom 03. - 31. März"
+    - "Mehrere Termine vom 27. - 27. Februar"
+    - "Mehrere Termine from 04. - 25. March"
+    """
+    t = clean_text(t)
+
+    # Range mit Monat nur einmal (am Ende)
+    m = re.search(
+        r"(?:Mehrere\s+Termine\s+(?:vom|from))\s*(\d{1,2})\.\s*-\s*(\d{1,2})\.?\s*([A-Za-zÄÖÜäöüß]+)",
+        t,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        d1 = int(m.group(1))
+        d2 = int(m.group(2))
+        mon_name = norm(m.group(3)).lower()
+        mon_name = mon_name.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+        month = _BOCHOLT_MONTHS.get(mon_name, 0)
+        if month:
+            year = _bocholt_infer_year(month)
+            try:
+                start = date(year, month, d1).isoformat()
+                end = date(year, month, d2).isoformat()
+                return start, end
+            except Exception:
+                return "", ""
+
+    # Range mit Monat auf beiden Seiten (seltener)
+    m = re.search(
+        r"(?:Mehrere\s+Termine\s+(?:vom|from))\s*(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*-\s*(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)",
+        t,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        d1 = int(m.group(1))
+        m1n = norm(m.group(2)).lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+        d2 = int(m.group(3))
+        m2n = norm(m.group(4)).lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+        m1 = _BOCHOLT_MONTHS.get(m1n, 0)
+        m2 = _BOCHOLT_MONTHS.get(m2n, 0)
+        if m1 and m2:
+            y1 = _bocholt_infer_year(m1)
+            y2 = _bocholt_infer_year(m2)
+            try:
+                start = date(y1, m1, d1).isoformat()
+                end = date(y2, m2, d2).isoformat()
+                return start, end
+            except Exception:
+                return "", ""
+
+    return "", ""
+
 def _bocholt_parse_time_from_text(t: str) -> str:
     # nimmt die erste Uhrzeit (HH:MM) als time
     m = re.search(r"\b(\d{1,2}:\d{2})\s*Uhr\b", t)
@@ -2215,29 +2280,64 @@ def _bocholt_parse_time_from_text(t: str) -> str:
     return ""
 
 def _bocholt_parse_location_from_text(t: str) -> str:
-    # oft: "... 09:00 Uhr - 11:30 Uhr, Volksbank Bocholt eG ..."
-    # oder: "... ab 20:00 Uhr Innenstadt"
+    # häufig:
+    # - "... 20:00 Uhr - 22:30 Uhr, Kulturort Alte Molkerei ..."
+    # - "... ab 20:00 Uhr Innenstadt"
+    # - "... | Treffpunkt: Weberei"
     m = re.search(r"Uhr\s*(?:-\s*\d{1,2}:\d{2}\s*Uhr\s*)?,\s*([^,]{3,120})", t)
     if m:
         return clean_text(m.group(1))
-    m = re.search(r"\bab\s*\d{1,2}:\d{2}\s*Uhr\s+([^,]{3,120})", t, flags=re.IGNORECASE)
+
+    m = re.search(r"\bab\s*\d{1,2}:\d{2}\s*Uhr\s+([^,|]{3,120})", t, flags=re.IGNORECASE)
     if m:
         return clean_text(m.group(1))
+
+    m = re.search(r"\bTreffpunkt\s*:\s*([^|,]{3,120})", t, flags=re.IGNORECASE)
+    if m:
+        return clean_text(m.group(1))
+
+    m = re.search(r"\bMeeting\s+point\s*:\s*([^|,]{3,120})", t, flags=re.IGNORECASE)
+    if m:
+        return clean_text(m.group(1))
+
+    # sehr konservativer Fallback: "... 09:00 Uhr - 18:30 Uhr Innenstadt"
+    m = re.search(r"Uhr\s*(?:-\s*\d{1,2}:\d{2}\s*Uhr\s*)?\s+(Innenstadt)\b", t)
+    if m:
+        return clean_text(m.group(1))
+
     return ""
 
 def _bocholt_cleanup_title(t: str) -> str:
     # Entfernt doppeltes Genre-Präfix: "Wirtschaft Wirtschaft <Title>"
     t = clean_text(t)
-    # wiederholte Prefix-Sequenz (bis 40 Zeichen) entfernen
     m = re.match(r"^(.{3,40}?)\s+\1\s+(.*)$", t)
     if m:
         return clean_text(m.group(2))
     return t
 
+def _bocholt_extract_title(inner_txt: str) -> str:
+    """
+    Titel sitzt in der Listenansicht meistens vor:
+    - "Wochentag, ..." oder
+    - "Mehrere Termine ..."
+    """
+    t = clean_text(inner_txt)
+
+    # vor "Mehrere Termine ..."
+    m = re.search(r"\bMehrere\s+Termine\b", t, flags=re.IGNORECASE)
+    if m and m.start() > 2:
+        return _bocholt_cleanup_title(t[: m.start()])
+
+    # vor "Freitag, ..." etc.
+    m = re.search(r"(?:%s)\s*," % "|".join(_BOCHOLT_WEEKDAYS), t)
+    if m and m.start() > 2:
+        return _bocholt_cleanup_title(t[: m.start()])
+
+    return _bocholt_cleanup_title(t)
+
 def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str, str]]:
     html_text = html_text or ""
 
-    # 1) Sammle alle <a ...>...</a> Kandidaten
     anchors = re.findall(
         r"<a\b([^>]*?)>(.*?)</a>",
         html_text,
@@ -2252,33 +2352,31 @@ def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str,
         if not inner_txt:
             continue
 
-        # muss einen klaren Wochentag enthalten (typisch für Einträge)
-        if not re.search(r"(?:%s)\s*," % "|".join(_BOCHOLT_WEEKDAYS), inner_txt):
-            continue
+        # href extrahieren
+        href = ""
+        mh = re.search(r'href\s*=\s*["\']([^"\']+)["\']', attrs, flags=re.IGNORECASE)
+        if mh:
+            href = norm(mh.group(1))
+        url = _normalize_event_url(href, base_url) if href else canonical_url(base_url)
 
+        # 1) Datum: entweder Einzeltermin (Wochentag) oder Range ("Mehrere Termine ...")
         d_iso = _bocholt_parse_date_from_text(inner_txt)
+        end_iso = ""
+
         if not d_iso:
-            continue
+            d_iso, end_iso = _bocholt_parse_date_range_from_text(inner_txt)
+
+        if not d_iso:
+            continue  # diese Quelle bleibt konservativ: ohne Datum kein Candidate
 
         time_str = _bocholt_parse_time_from_text(inner_txt)
         loc = _bocholt_parse_location_from_text(inner_txt)
-
-        # href extrahieren
-        href = ""
-        m = re.search(r'href\s*=\s*["\']([^"\']+)["\']', attrs, flags=re.IGNORECASE)
-        if m:
-            href = norm(m.group(1))
-
-        url = _normalize_event_url(href, base_url) if href else canonical_url(base_url)
-
-        # Titel: alles VOR dem Wochentagsteil ist meistens Genre+Titel
-        title_part = inner_txt.split(",", 1)[0]  # "Wirtschaft Wirtschaft Zoll im Dialog: ..."
-        title = _bocholt_cleanup_title(title_part)
+        title = _bocholt_extract_title(inner_txt)
 
         if not title:
             continue
 
-        fp = (slugify(title), d_iso, norm_key(url))
+        fp = (slugify(title), d_iso, end_iso, norm_key(url))
         if fp in seen:
             continue
         seen.add(fp)
@@ -2287,7 +2385,7 @@ def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str,
             {
                 "title": title,
                 "date": d_iso,
-                "endDate": "",
+                "endDate": end_iso,
                 "time": time_str,
                 "location": loc,
                 "url": url,
