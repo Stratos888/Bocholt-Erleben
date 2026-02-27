@@ -1899,14 +1899,12 @@ Umfang:
 /* Sheet */
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
 Zweck:
-- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint statt neutral-weiß)
-- kein Gradient
-- parser-safe (keine nested comments)
+- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint) + klarer Panel-Interface Eindruck
+- ruhige Top-Kante (Divider statt “glassy”)
 Umfang:
-- Nur .detail-panel-content + ::after
+- Nur #event-detail-panel .detail-panel-content
 === */
 
-/* Sheet */
 #event-detail-panel .detail-panel-content{
 
   position: absolute;
@@ -1917,10 +1915,10 @@ Umfang:
   max-height: 92vh;
   max-height: 92dvh;
 
-  /* Fallback (neutral) */
+  /* Fallback */
   background-color: rgba(255,255,255,0.985);
 
-  /* Brand-Tint (subtil) */
+  /* Brand-Tint (subtil, sichtbar aber nicht “grün”) */
   background-color: color-mix(in srgb, white 92%, var(--color-primary-muted));
 
   background-image: none !important;
@@ -1928,7 +1926,8 @@ Umfang:
   border-top-left-radius: var(--dp-sheet-radius);
   border-top-right-radius: var(--dp-sheet-radius);
 
-  border-top: 1px solid rgba(31,41,51,0.07);
+  /* Klarer Panel-Header Divider */
+  border-top: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 72%, var(--color-primary-muted));
 
   box-shadow:
     0 -42px 130px rgba(0,0,0,0.26),
@@ -2043,7 +2042,8 @@ Umfang:
 }
 /* === END PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps) === */
 /* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
-Zweck: Parser-sichere Definition des einzigen Scroll-Containers im Detailpanel + Reserve gegen Actionbar-Overlap.
+Zweck: Einziger Scroll-Container im Detailpanel + Reserve gegen Actionbar-Overlap.
+Zusatz: Desktop-Scrollbar dezent (nicht entfernen), mobile unverändert.
 Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detail-panel #detail-content).
 === */
 
@@ -2062,6 +2062,40 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Desktop-only: Scrollbar ruhiger (Enterprise), aber nicht “weg” */
+@media (hover: hover){
+  #event-detail-panel .detail-panel-body,
+  .detail-panel-body{
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31,41,51,0.22) transparent;
+  }
+
+  #event-detail-panel .detail-panel-body::-webkit-scrollbar,
+  .detail-panel-body::-webkit-scrollbar{
+    width: 10px;
+  }
+
+  #event-detail-panel .detail-panel-body::-webkit-scrollbar-track,
+  .detail-panel-body::-webkit-scrollbar-track{
+    background: transparent;
+  }
+
+  #event-detail-panel .detail-panel-body::-webkit-scrollbar-thumb,
+  .detail-panel-body::-webkit-scrollbar-thumb{
+    background: rgba(31,41,51,0.18);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  #event-detail-panel .detail-panel-body::-webkit-scrollbar-thumb:hover,
+  .detail-panel-body::-webkit-scrollbar-thumb:hover{
+    background: rgba(31,41,51,0.26);
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
 }
 
 /* === END REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) === */
@@ -2087,7 +2121,8 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
 Zweck:
-- Links bleiben Attribution (ruhig), aber farblich in Mainpage-DNA
+- Attribution wirkt wie Footer-Zeile eines Interfaces (nicht wie Card)
+- trotzdem tappable + focus-safe
 Umfang:
 - .detail-links + .detail-link + label/value/ext (nur Detailpanel)
 === */
@@ -2102,7 +2137,6 @@ Umfang:
   border-top: 1px solid rgba(31,41,51,0.08);
 }
 
-/* Link: Footnote-Row, kein Card-CTA Look */
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
@@ -2123,7 +2157,6 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hover/Active subtil + brand-warm */
 @media (hover: hover){
   #event-detail-panel .detail-link:hover{
     color: rgba(31,41,51,0.88);
@@ -2136,20 +2169,17 @@ Umfang:
   background: color-mix(in srgb, white 90%, var(--color-primary-muted));
 }
 
-/* Focus: sauber */
 #event-detail-panel .detail-link:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
 }
 
-/* Label klein + muted */
 #event-detail-panel .detail-link-label{
   font-size: 12px;
   font-weight: 750;
   color: rgba(31,41,51,0.56);
 }
 
-/* Value etwas stärker */
 #event-detail-panel .detail-link-value{
   min-width: 0;
   font-size: 13px;
@@ -2161,7 +2191,6 @@ Umfang:
   white-space: nowrap;
 }
 
-/* External indicator minimal */
 #event-detail-panel .detail-link-ext{
   opacity: 0.55;
 }
@@ -2170,9 +2199,8 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Header: Titel links, Close rechts; Meta darunter über volle Breite (Enterprise v2)
-- Verhindert Auto-Placement in eine „rechte Spalte“
-- Title Wrapping: keine „Wo-“ Trennung, sauberer Clamp
+- Panel-Header wirkt wie eigenes Interface: klare Header-Zone + Divider
+- Titel/Badge konsistent, Meta sauber darunter
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
 === */
@@ -2187,9 +2215,11 @@ Umfang:
   row-gap: var(--space-sm);
   align-items: start;
 
+  /* Header-Zone klarer */
   padding: 0 0 var(--space-md);
-  margin: 0;
-  border-bottom: 0;
+  margin: 0 0 var(--space-md);
+
+  border-bottom: 1px solid rgba(31,41,51,0.08);
 }
 
 /* Titelzeile links oben */
@@ -2221,8 +2251,8 @@ Umfang:
   justify-content: center;
 
   border-radius: 999px;
-  background: var(--ui-surface-tint);
-  border: 1px solid var(--ui-border-weak);
+  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
+  border: 1px solid rgba(31,41,51,0.10);
 
   opacity: var(--ui-icon-opacity);
   font-size: var(--ui-icon-size-sm);
@@ -2254,7 +2284,6 @@ Umfang:
   -webkit-box-orient: vertical;
   overflow: hidden;
 
-  /* Fix: keine hässlichen Hyphen-Breaks wie "Wo-" */
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: none;
@@ -2271,6 +2300,7 @@ Umfang:
   content: none;
   background: none;
 }
+
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
 
@@ -2278,8 +2308,8 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
 Zweck:
-- Meta trägt Mainpage-DNA: subtile Brand-Tints statt neutral-grau
-- Rows bleiben ruhig/enterprise, keine CTA-Kachel-Optik
+- Meta trägt Mainpage-DNA: subtile Brand-Tints
+- Location-Row wirkt eindeutig “Action” (interaktiv), Datum/Zeit eindeutig “Info”
 Umfang:
 - .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
@@ -2299,13 +2329,9 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
-  /* Fallback */
-  background: rgba(31,41,51,0.020);
-  border: 1px solid rgba(31,41,51,0.055);
-
   /* Brand-Tint (subtil) */
   background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border-color: color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
 
   color: rgba(31,41,51,0.82);
   text-decoration: none !important;
@@ -2315,13 +2341,20 @@ Umfang:
   transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
+/* Location = Action-Row (minimal stärker) */
+#event-detail-panel .detail-meta-row.is-location{
+  background: color-mix(in srgb, white 89%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, rgba(31,41,51,0.14) 70%, var(--color-primary-muted));
+}
+
+/* Datetime = Info-Row (minimal ruhiger) */
+#event-detail-panel .detail-meta-row.is-datetime{
+  background: color-mix(in srgb, white 94%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, rgba(31,41,51,0.09) 70%, var(--color-primary-muted));
+}
+
 @media (hover: hover){
   #event-detail-panel a.detail-meta-row:hover{
-    /* Fallback */
-    background: rgba(31,41,51,0.032);
-    border-color: rgba(31,41,51,0.075);
-
-    /* Brand-Tint hover */
     background: color-mix(in srgb, white 88%, var(--color-primary-muted));
     border-color: color-mix(in srgb, rgba(31,41,51,0.13) 70%, var(--color-primary-muted));
   }
@@ -2329,12 +2362,6 @@ Umfang:
 
 #event-detail-panel a.detail-meta-row:active{
   transform: translateY(1px);
-
-  /* Fallback */
-  background: rgba(31,41,51,0.040);
-  border-color: rgba(31,41,51,0.095);
-
-  /* Brand-Tint active */
   background: color-mix(in srgb, white 85%, var(--color-primary-muted));
   border-color: color-mix(in srgb, rgba(31,41,51,0.16) 70%, var(--color-primary-muted));
 }
@@ -2348,7 +2375,7 @@ Umfang:
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.90;
+  opacity: 0.92;
 }
 
 #event-detail-panel .detail-meta-text{
@@ -2360,7 +2387,7 @@ Umfang:
   opacity: 0.55;
 }
 
-/* Legacy chips container: bleibt neutral/leer */
+/* Legacy chips container: neutral */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: var(--space-xs);
@@ -2386,13 +2413,8 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
-  /* Fallback */
-  background: rgba(31,41,51,0.020);
-  border: 1px solid rgba(31,41,51,0.055);
-
-  /* Brand-Tint (subtil) */
   background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border-color: color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
+  border: 1px solid color-mix(in srgb, rgba(31,41,51,0.10) 70%, var(--color-primary-muted));
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2409,10 +2431,6 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 #event-detail-panel .detail-chip:active{
-  /* Fallback */
-  background: rgba(31,41,51,0.040);
-
-  /* Brand-Tint active */
   background: color-mix(in srgb, white 85%, var(--color-primary-muted));
 }
 #event-detail-panel .detail-chip-text{
@@ -2535,17 +2553,16 @@ Umfang:
 /* === BEGIN BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
 /* === BEGIN FIX: DETAIL DESCRIPTION CALMNESS (less bold-looking) ===
 Zweck:
-- Description ruhiger/leichter (nach Meta-Harmonisierung)
-- weniger „dick“ (Weight + Color), bessere Lesbarkeit (Line-height)
+- Description lesbarer + besserer Rhythmus zur Header-Sektion (Enterprise)
 Umfang:
 - nur #event-detail-panel .detail-description
 === */
 #event-detail-panel .detail-description{
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   padding: 0;
 
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.58;
   font-weight: 450;
   color: rgba(31,41,51,0.78);
 
@@ -3163,3 +3180,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
