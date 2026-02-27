@@ -192,26 +192,32 @@ const getCategoryIcon = (categoryRaw) => {
       description: desc,
     } : null;
 
-    /* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
+        /* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
     Zweck:
-    - Teilen als generische Aktion (navigator.share / clipboard fallback)
-    - Website vs Quelle sauber trennen (Heuristik: bocholt.de/veranstaltungskalender => Quelle)
-    - Route-CTA entfernen (Maps steckt im Ort-Link)
+    - CTA-Disziplin: Actionbar zeigt NUR 2 Aktionen (Kalender + Teilen)
+    - Website/Quelle werden dedupliziert und als ruhige Links im Content gezeigt (nicht als Actionbar-CTA)
+    - Route-CTA entfällt (Maps steckt im Ort-Link)
     Umfang:
     - VM Felder: websiteUrl, sourceUrl, sharePayload
-    - actions: calendar + share + optional website
+    - actions: calendar + share (max 2)
     === */
 
-    // Link-Klassifizierung: Event-URL aus Daten (oft Quelle oder Website)
-    const rawEventUrl = normalizeHttpUrl(trimOrEmpty(e.url || e.link || e.website || ""));
+    // Link-Klassifizierung: Event-URL aus Daten (Quelle oder Website) + optionale neue Felder
+    const rawEventUrl = normalizeHttpUrl(
+      trimOrEmpty(
+        e.source_url || e.sourceUrl || e.url || e.link || e.website || e.website_url || e.websiteUrl || ""
+      )
+    );
+
     const isBocholtCalendarSource = rawEventUrl
       ? /(^|\/\/)www\.bocholt\.de\/veranstaltungskalender\//i.test(rawEventUrl)
       : false;
 
+    // Quelle: bocholt.de/veranstaltungskalender
     const sourceUrl = (rawEventUrl && isBocholtCalendarSource) ? rawEventUrl : "";
-    const directWebsiteUrl = (rawEventUrl && !isBocholtCalendarSource) ? rawEventUrl : "";
 
-    // Website: bevorzugt echte Event-/Veranstalterseite; Fallback: Location-Homepage
+    // Website: echte Event-/Veranstalterseite (wenn rawEventUrl NICHT Quelle ist) sonst Fallback: Location-Homepage
+    const directWebsiteUrl = (rawEventUrl && !isBocholtCalendarSource) ? rawEventUrl : "";
     const websiteUrl = directWebsiteUrl || normalizeHttpUrl(homepage) || "";
 
     // Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
@@ -225,7 +231,7 @@ const getCategoryIcon = (categoryRaw) => {
     const shareUrl = websiteUrl || sourceUrl || "";
     const sharePayload = { title, text: shareText, url: shareUrl };
 
-    // Actions (noch nicht gerendert; canonical Liste für spätere UI)
+    // Actions (Actionbar: exakt 2 CTAs max)
     const actions = [
       ...(canCalendar ? [{
         type: "calendar",
@@ -239,13 +245,6 @@ const getCategoryIcon = (categoryRaw) => {
         label: "Teilen",
         priority: "primary",
         payload: sharePayload,
-      }] : []),
-
-      ...(websiteUrl ? [{
-        type: "website",
-        label: "Website",
-        priority: "secondary",
-        href: websiteUrl,
       }] : []),
     ];
 
@@ -903,7 +902,7 @@ const iconSvg = (type, extraClass = "") => {
 
 
            const actionsForBar = (Array.isArray(vm.actions) ? vm.actions : [])
-        .filter(a => a && (a.type === "calendar" || a.type === "share" || a.type === "website"));
+        .filter(a => a && (a.type === "calendar" || a.type === "share"));
 
       const actionsHtml = actionsForBar
         .map(renderAction)
@@ -914,10 +913,10 @@ const iconSvg = (type, extraClass = "") => {
       /* === BEGIN BLOCK: ENTERPRISE V2 DETAIL CONTENT (meta compaction + no redundancy)
       Zweck:
       - Meta direkt unter Titel: Row1 Ort (Maps), Row2 Datum·Zeit
-      - Keine Meta-Chips-Kachel / kein separater Route-CTA
-      - Quelle als Footer-Link (nur wenn != Website)
+      - Actionbar strikt 2 CTAs: Kalender + Teilen
+      - Website + Quelle als ruhige Links im Content, dedupliziert (keine Doppelungen)
       Umfang:
-      - detail-header markup + meta rows + optional source footer
+      - detail-header markup + meta rows + optional links block
       === */
 
       const dateTimeLabel = (() => {
@@ -929,20 +928,24 @@ const iconSvg = (type, extraClass = "") => {
 
       const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
       const normSource = normalizeHttpUrl(vm.sourceUrl || "");
+
+      const showWebsite = Boolean(normWebsite) && (!normSource || normWebsite !== normSource);
       const showSource = Boolean(normSource) && (!normWebsite || normSource !== normWebsite);
 
-      const sourceHostLabel = (() => {
-        if (!normSource) return "";
+      const hostLabel = (u, fallbackLabel) => {
+        if (!u) return "";
         try {
-          const u = new URL(normSource);
-          const host = (u.hostname || "").replace(/^www\./, "");
-          // Friendly label for known source
+          const url = new URL(u);
+          const host = (url.hostname || "").replace(/^www\./, "");
           if (/bocholt\.de$/i.test(host)) return "Stadt Bocholt · Veranstaltungskalender";
-          return host;
+          return host || fallbackLabel;
         } catch {
-          return "Quelle";
+          return fallbackLabel;
         }
-      })();
+      };
+
+      const websiteHostLabel = hostLabel(normWebsite, "Website");
+      const sourceHostLabel = hostLabel(normSource, "Quelle");
 
       const html = `
         <div class="detail-panel-inner">
@@ -997,15 +1000,23 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${vm.icon ===
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
 
-          ${showSource ? `
-            <div class="detail-source">
-              <span class="detail-source-label">Quelle:</span>
-              <a
-                class="detail-source-link"
-                href="${escapeHtml(normSource)}"
-                target="_blank"
-                rel="noopener"
-              >${escapeHtml(sourceHostLabel)}</a>
+          ${(showWebsite || showSource) ? `
+            <div class="detail-links" aria-label="Links">
+              ${showWebsite ? `
+                <a class="detail-link" href="${escapeHtml(normWebsite)}" target="_blank" rel="noopener">
+                  <span class="detail-link-label">Website</span>
+                  <span class="detail-link-value">${escapeHtml(websiteHostLabel)}</span>
+                  <span class="detail-link-ext" aria-hidden="true">↗</span>
+                </a>
+              ` : ""}
+
+              ${showSource ? `
+                <a class="detail-link" href="${escapeHtml(normSource)}" target="_blank" rel="noopener">
+                  <span class="detail-link-label">Quelle</span>
+                  <span class="detail-link-value">${escapeHtml(sourceHostLabel)}</span>
+                  <span class="detail-link-ext" aria-hidden="true">↗</span>
+                </a>
+              ` : ""}
             </div>
           ` : ""}
         </div>
@@ -1231,6 +1242,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
