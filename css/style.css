@@ -2020,53 +2020,40 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps)
 Zweck:
-- Close bleibt im Header-Grid rechts oben (Enterprise Header)
-- nutzt Panel-Tokens (Card Expanded DNA), keine fremde Farbwelt
+- Close ist garantiert klickbar (kein Grid-Annahme)
+- Immer oben rechts im Sheet, visuell wie Top-App
+- z-index sicher über drag-hit/handle
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
 #event-detail-panel .detail-panel-close{
-  position: relative;
-  z-index: 6;
+  position: absolute;
+  z-index: 6; /* über drag-hit (3) und handle (4) */
 
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: end;
-  align-self: center;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  right: var(--gutter);
 
   width: var(--ui-tap-target);
   height: var(--ui-tap-target);
-  border-radius: 999px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  background: var(--surface-panel-elevated);
-  border: 1px solid var(--border-panel-soft);
-  box-shadow: none;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border-strong);
 
-  font-size: var(--ui-icon-size-md);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+
+  font-size: 22px;
   line-height: 1;
-  color: var(--color-text-secondary);
+  color: rgba(31,41,51,0.74);
+
   cursor: pointer;
-
-  text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transform: none;
 }
-
-#event-detail-panel .detail-panel-close:hover{
-  background: color-mix(in srgb, var(--surface-panel-elevated) 92%, white);
-  border-color: var(--border-panel);
-}
-
-#event-detail-panel .detail-panel-close:active{
-  transform: translateY(1px);
-  background: color-mix(in srgb, var(--surface-panel-elevated) 86%, white);
-  border-color: var(--border-panel-strong);
-}
-
+#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 #event-detail-panel .detail-panel-close:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
@@ -2152,52 +2139,59 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
 Zweck:
-- Attribution wirkt wie Footer-Zeile eines Interfaces (nicht wie Card)
-- trotzdem tappable + focus-safe
+- Attribution wirkt wie „ruhige System-Zeile“, aber sichtbar (Row-Surface)
+- Nicht wie CTA-Kachel, aber klar tappable + focus-safe
 Umfang:
 - .detail-links + .detail-link + label/value/ext (nur Detailpanel)
 === */
 
 #event-detail-panel .detail-links{
   display: grid;
-  gap: 2px;
+  gap: var(--space-xs);
 
   margin-top: var(--space-lg);
   padding-top: var(--space-sm);
 
-  border-top: 1px solid rgba(31,41,51,0.08);
+  border-top: 1px solid var(--border-panel-soft);
 }
 
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-sm);
 
-  padding: 8px 0;
-  border-radius: 10px;
+  padding: 12px 12px;
+  border-radius: var(--ui-radius-md);
 
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+  background: var(--surface-panel-row);
+  border: 1px solid var(--border-panel-soft);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 
-  color: rgba(31,41,51,0.74);
+  color: rgba(31,41,51,0.84);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-link:hover{
-    color: rgba(31,41,51,0.88);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: color-mix(in srgb, rgba(31,41,51,0.25) 60%, var(--color-primary));
+    background: color-mix(in srgb, var(--surface-panel-row) 92%, white);
+    border-color: var(--border-panel);
   }
 }
+
 #event-detail-panel .detail-link:active{
-  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
+  border-color: var(--border-panel-strong);
 }
 
 #event-detail-panel .detail-link:focus-visible{
@@ -2208,14 +2202,14 @@ Umfang:
 #event-detail-panel .detail-link-label{
   font-size: 12px;
   font-weight: 750;
-  color: rgba(31,41,51,0.56);
+  color: rgba(31,41,51,0.58);
 }
 
 #event-detail-panel .detail-link-value{
   min-width: 0;
   font-size: 13px;
   font-weight: 650;
-  color: rgba(31,41,51,0.80);
+  color: rgba(31,41,51,0.84);
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2223,7 +2217,7 @@ Umfang:
 }
 
 #event-detail-panel .detail-link-ext{
-  opacity: 0.55;
+  opacity: 0.60;
 }
 
 /* === END BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped) === */
@@ -3192,4 +3186,5 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
