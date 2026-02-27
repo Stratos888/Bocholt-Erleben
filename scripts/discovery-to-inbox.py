@@ -2394,42 +2394,50 @@ def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str,
         if not d_iso:
             continue  # diese Quelle bleibt konservativ: ohne Datum kein Candidate
 
+        # === BEGIN BLOCK: BOCHOLT CALENDAR LIST PARSE (indent fix + sanitizer, v1) ===
+        # Datei: scripts/discovery-to-inbox.py
+        # Zweck:
+        # - Fix: Indentation/Syntax im Bocholt-HTML-Listenparser
+        # - Fix: fp/seen Scope bleibt innerhalb des anchor-loops
+        # - Beibehalt: Location-Sanitizer (force detail enrichment)
+        # Umfang:
+        # - Ersetzt nur den Abschnitt ab time_str..out.append(...)
         time_str = _bocholt_parse_time_from_text(inner_txt)
-            loc = _bocholt_parse_location_from_text(inner_txt)
-            title = _bocholt_extract_title(inner_txt)
+        loc = _bocholt_parse_location_from_text(inner_txt)
+        title = _bocholt_extract_title(inner_txt)
 
-            if not title:
-                continue
+        if not title:
+            continue
 
-            # === BEGIN BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
-            # Zweck:
-            # - Listen-Location ist häufig Kategorie/Title-Mix -> führt zu falschen Pflichtfeldern
-            # - Bei "noisy" Locations: bewusst leeren, damit später Detail-Enrichment Location/Time sauber füllt
-            # Umfang:
-            # - Nur für Bocholt-Kalender-Parser; keine globalen Heuristiken
-            if loc:
-                loc = clean_text(str(loc)).strip(' "\'')
-                loc_l = loc.lower()
-                title_l = title.lower()
+        # === BEGIN BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
+        # Zweck:
+        # - Listen-Location ist häufig Kategorie/Title-Mix -> führt zu falschen Pflichtfeldern
+        # - Bei "noisy" Locations: bewusst leeren, damit später Detail-Enrichment Location/Time sauber füllt
+        # Umfang:
+        # - Nur für Bocholt-Kalender-Parser; keine globalen Heuristiken
+        if loc:
+            loc = clean_text(str(loc)).strip(' "\'')
+            loc_l = loc.lower()
+            title_l = title.lower()
 
-                # Kategorie-/Teaser-Wörter und typische Noise-Signale
-                if "ausflugstipps" in loc_l:
-                    loc = ""
+            # Kategorie-/Teaser-Wörter und typische Noise-Signale
+            if "ausflugstipps" in loc_l:
+                loc = ""
 
-                # Wenn Location sehr lang ist, ist es meist ein zusammengesetzter Teaser
-                if loc and len(loc) > 55:
-                    loc = ""
+            # Wenn Location sehr lang ist, ist es meist ein zusammengesetzter Teaser
+            if loc and len(loc) > 55:
+                loc = ""
 
-                # Wenn Location den Titel (oder große Teile) enthält -> sehr wahrscheinlich vermischt
-                if loc and (title_l[:24] in loc_l or loc_l[:24] in title_l):
-                    loc = ""
+            # Wenn Location den Titel (oder große Teile) enthält -> sehr wahrscheinlich vermischt
+            if loc and (title_l[:24] in loc_l or loc_l[:24] in title_l):
+                loc = ""
 
-                # Wenn Location zu viele Satzzeichen/Trenner enthält -> oft "Ort + Programmtitel"
-                if loc and (loc.count(" - ") >= 1 or loc.count(" & ") >= 2 or loc.count(":") >= 2):
-                    loc = ""
-            # === END BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
+            # Wenn Location zu viele Satzzeichen/Trenner enthält -> oft "Ort + Programmtitel"
+            if loc and (loc.count(" - ") >= 1 or loc.count(" & ") >= 2 or loc.count(":") >= 2):
+                loc = ""
+        # === END BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
 
-            fp = (slugify(title), d_iso, end_iso, norm_key(url))
+        fp = (slugify(title), d_iso, end_iso, norm_key(url))
         if fp in seen:
             continue
         seen.add(fp)
@@ -2446,6 +2454,7 @@ def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str,
                 "notes": "source=bocholt_veranstaltungskalender_html",
             }
         )
+        # === END BLOCK: BOCHOLT CALENDAR LIST PARSE (indent fix + sanitizer, v1) ===
 
         if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
             break
