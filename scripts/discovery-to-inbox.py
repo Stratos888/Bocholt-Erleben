@@ -840,6 +840,15 @@ def ensure_description(
 # Umfang:
 # - Ersetzt nur classify_candidate()
 # === END BLOCK: EVENT QUALITY GATE (inclusive public events, freeze v1) ===
+# === BEGIN BLOCK: EVENT QUALITY GATE (inclusive public events + regular service filter, freeze v2) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Weiterhin: "viel rein" (Kurse/Workshops/Wiederkehrendes erlaubt), rejected nur für klar ungeeignet
+# - Neu (Decision 2026-02-27): Normale Gottesdienste / regulärer Kirchenbetrieb zählen NICHT als Event
+#   -> rejected, AUSSER es gibt klare Event-Signale (z.B. Konzert/Lesung/Workshop/Sonderformat)
+# Umfang:
+# - Ersetzt nur classify_candidate()
+# === END BLOCK: EVENT QUALITY GATE (inclusive public events + regular service filter, freeze v2) ===
 def classify_candidate(
     *,
     stype: str,
@@ -870,24 +879,43 @@ def classify_candidate(
     if any(k in text_l for k in not_public_keywords):
         return "rejected", "reject:not_public"
 
-    # 2) Klar kein Event (Presse/Infra/Utility) -> rejected,
+    # 2) Normale Gottesdienste / regulärer Kirchenbetrieb sind KEINE Events (Decision 2026-02-27)
+    #    Ausnahme: es gibt klare Event-Signale (Konzert/Lesung/Workshop/...).
+    regular_service_keywords = [
+        "gottesdienst",
+        "abendmahl",
+        "kirchkaffee",
+        "messe",
+        "eucharistie",
+        "andacht",
+        "vesper",
+        "rosenkranz",
+        "tauffeier",
+        "trauung",
+        "beichte",
+        "bibelstunde",
+        "kindergottesdienst",
+    ]
+    if any(k in text_l for k in regular_service_keywords) and (not _has_event_signal(text)):
+        return "rejected", "reject:regular_service"
+
+    # 3) Klar kein Event (Presse/Infra/Utility) -> rejected,
     #    aber nur wenn KEIN Event-Signal vorhanden ist
     if _is_non_event_text(text) and (not _has_event_signal(text)):
         return "rejected", "reject:non_event_pattern"
 
-    # 3) Datum fehlt -> review (für Analyse/Fehlerfälle); Inbox-Gate schreibt eh nicht ohne date+loc+url
+    # 4) Datum fehlt -> review (für Analyse/Fehlerfälle); Inbox-Gate schreibt eh nicht ohne date+loc+url
     if not event_date:
         return "review", "review:missing_date"
 
-    # 4) Date-Window (today..+365) erzwingen, damit Inbox nicht mit alten Sachen zugelaufen wird
+    # 5) Date-Window (today..+365) erzwingen, damit Inbox nicht mit alten Sachen zugelaufen wird
     if not _in_date_window(event_date):
         return "rejected", "reject:outside_window"
 
-    # 5) Default: öffentliches Event -> review
+    # 6) Default: öffentliches Event -> review
     # (Kurse/Workshops/Vorlesungen sind ausdrücklich erlaubt in Freeze v1)
     return "review", "review:public_event"
 # === END BLOCK: EVENT QUALITY GATE (inclusive public events, freeze v1) ===
-
 
 # === END BLOCK: DISCOVERY FILTER HELPERS (junk skip + date window) ===
 
