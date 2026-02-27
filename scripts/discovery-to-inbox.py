@@ -2370,87 +2370,53 @@ def _bocholt_extract_title(inner_txt: str) -> str:
 
     return _bocholt_cleanup_title(t)
 
+# === BEGIN BLOCK: BOCHOLT CALENDAR PARSER (parse_bocholt_calendar_html, v3) ===
+# Zweck & Umfang:
+# - Listenseite parsen
+# - Location absichtlich leer lassen -> Detail-Enrichment zieht Location aus JSON-LD
+# === END BLOCK HEADER: BOCHOLT CALENDAR PARSER ===
 def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str, str]]:
     html_text = html_text or ""
-
-    anchors = re.findall(
-        r"<a\b([^>]*?)>(.*?)</a>",
-        html_text,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-
     out: List[Dict[str, str]] = []
     seen: set = set()
 
-    for attrs, inner in anchors:
-        inner_txt = _strip_html_tags(inner)
-        if not inner_txt:
+    # defensiv: schnell abbrechen, wenn keine list entries
+    if "event-entry" not in html_text and "event-entry__wrapper" not in html_text:
+        return out
+
+    # Kandidaten aus der Listenseite extrahieren (konservativ)
+    for inner_txt, url in _bocholt_iter_list_entries(html_text, base_url):
+        inner_txt = clean_text(inner_txt)
+
+        d_iso, end_iso = _bocholt_parse_date_range(inner_txt)
+        if not d_iso:
             continue
 
-        # href extrahieren
-        href = ""
-        mh = re.search(r'href\s*=\s*["\']([^"\']+)["\']', attrs, flags=re.IGNORECASE)
-        if mh:
-            href = norm(mh.group(1))
-        url = _normalize_event_url(href, base_url) if href else canonical_url(base_url)
+        time_str = _bocholt_parse_time(inner_txt)
 
-        # 1) Datum: entweder Einzeltermin (Wochentag) oder Range ("Mehrere Termine ...")
-        d_iso = _bocholt_parse_date_from_text(inner_txt)
-        end_iso = ""
+        # === BEGIN BLOCK: BOCHOLT CALENDAR LOCATION STRATEGY (force detail enrichment) ===
+        # Zweck: Listenseite liefert bei dieser Quelle häufig keine echte Location (z.B. "Bocholt Ausflugstipps").
+        # Strategie: List-Location nur als Notiz behalten und Location leer lassen, damit der Detail-Fetch
+        # (JSON-LD @type Event) die echte Location/Adresse liefert.
+        loc_list = _bocholt_parse_location_from_text(inner_txt)
+        loc = ""  # bewusst leer -> triggert Detail-Enrichment
+        notes_list = f"list_location={loc_list}" if loc_list else ""
+        # === END BLOCK: BOCHOLT CALENDAR LOCATION STRATEGY (force detail enrichment) ===
 
-        if not d_iso:
-            d_iso, end_iso = _bocholt_parse_date_range_from_text(inner_txt)
-
-        if not d_iso:
-            continue  # diese Quelle bleibt konservativ: ohne Datum kein Candidate
-
-        # === BEGIN BLOCK: BOCHOLT CALENDAR LIST PARSE (indent fix + sanitizer, v1) ===
-        # Datei: scripts/discovery-to-inbox.py
-        # Zweck:
-        # - Fix: Indentation/Syntax im Bocholt-HTML-Listenparser
-        # - Fix: fp/seen Scope bleibt innerhalb des anchor-loops
-        # - Beibehalt: Location-Sanitizer (force detail enrichment)
-        # Umfang:
-        # - Ersetzt nur den Abschnitt ab time_str..out.append(...)
-        time_str = _bocholt_parse_time_from_text(inner_txt)
-        loc = _bocholt_parse_location_from_text(inner_txt)
         title = _bocholt_extract_title(inner_txt)
-
         if not title:
             continue
-
-        # === BEGIN BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
-        # Zweck:
-        # - Listen-Location ist häufig Kategorie/Title-Mix -> führt zu falschen Pflichtfeldern
-        # - Bei "noisy" Locations: bewusst leeren, damit später Detail-Enrichment Location/Time sauber füllt
-        # Umfang:
-        # - Nur für Bocholt-Kalender-Parser; keine globalen Heuristiken
-        if loc:
-            loc = clean_text(str(loc)).strip(' "\'')
-            loc_l = loc.lower()
-            title_l = title.lower()
-
-            # Kategorie-/Teaser-Wörter und typische Noise-Signale
-            if "ausflugstipps" in loc_l:
-                loc = ""
-
-            # Wenn Location sehr lang ist, ist es meist ein zusammengesetzter Teaser
-            if loc and len(loc) > 55:
-                loc = ""
-
-            # Wenn Location den Titel (oder große Teile) enthält -> sehr wahrscheinlich vermischt
-            if loc and (title_l[:24] in loc_l or loc_l[:24] in title_l):
-                loc = ""
-
-            # Wenn Location zu viele Satzzeichen/Trenner enthält -> oft "Ort + Programmtitel"
-            if loc and (loc.count(" - ") >= 1 or loc.count(" & ") >= 2 or loc.count(":") >= 2):
-                loc = ""
-        # === END BLOCK: BOCHOLT LOCATION SANITIZER (force detail enrichment, v1) ===
 
         fp = (slugify(title), d_iso, end_iso, norm_key(url))
         if fp in seen:
             continue
         seen.add(fp)
+
+        # === BEGIN BLOCK: BOCHOLT CALENDAR NOTES (carry list_location) ===
+        notes = "source=bocholt_veranstaltungskalender_html"
+        if notes_list:
+            notes = notes + ";" + notes_list
+        # === END BLOCK: BOCHOLT CALENDAR NOTES (carry list_location) ===
 
         out.append(
             {
@@ -2461,15 +2427,15 @@ def parse_bocholt_calendar_html(html_text: str, base_url: str) -> List[Dict[str,
                 "location": loc,
                 "url": url,
                 "description": "",
-                "notes": "source=bocholt_veranstaltungskalender_html",
+                "notes": notes,
             }
         )
-        # === END BLOCK: BOCHOLT CALENDAR LIST PARSE (indent fix + sanitizer, v1) ===
 
         if len(out) >= int(os.environ.get("MAX_HTML_EVENTS", "80")):
             break
 
-    return out 
+    return out
+# === END BLOCK: BOCHOLT CALENDAR PARSER (parse_bocholt_calendar_html, v3) ===
 # === BEGIN BLOCK: JSON PARSER (events API -> candidates) ===
 # Datei: scripts/discovery-to-inbox.py
 # Zweck:
