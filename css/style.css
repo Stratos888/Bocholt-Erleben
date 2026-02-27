@@ -2225,7 +2225,8 @@ Umfang:
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
 - Panel-Header wirkt wie eigenes Interface: klare Header-Zone + Divider
-- Titel/Badge konsistent, Meta sauber darunter
+- Titel + Kategorie-Icon sind optisch exakt aligned (kein “hängt schief”)
+- Kategorie-Icon ist Indikator (Badge), kein Button-Look
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
 === */
@@ -2240,54 +2241,62 @@ Umfang:
   row-gap: var(--space-sm);
   align-items: start;
 
-  /* Header-Zone klarer */
   padding: 0 0 var(--space-md);
   margin: 0 0 var(--space-md);
 
   border-bottom: 1px solid rgba(31,41,51,0.08);
 }
 
-/* Titelzeile links oben */
+/* Titelzeile: Icon + Titel auf einer Linie */
 #event-detail-panel .detail-title-row{
+  --dp-badge-size: 40px;
+
   grid-column: 1;
   grid-row: 1;
 
   display: grid;
-  grid-template-columns: var(--ui-icon-btn-size) minmax(0, 1fr);
+  grid-template-columns: var(--dp-badge-size) minmax(0, 1fr);
   gap: var(--space-sm);
 
   width: 100%;
-  min-height: var(--ui-icon-btn-size);
+  min-height: var(--dp-badge-size);
   min-width: 0;
 
-  align-items: start;
+  align-items: center; /* <-- Fix: vertikales Alignment */
 }
 
-/* Kategorie links als Indikator */
+/* Kategorie-Indikator (kein Button) */
 #event-detail-panel .detail-category-icon{
   grid-column: 1;
   grid-row: 1;
 
-  width: var(--ui-icon-btn-size);
-  height: var(--ui-icon-btn-size);
+  width: var(--dp-badge-size);
+  height: var(--dp-badge-size);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 999px;
-  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
-  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 12px;
 
-  opacity: var(--ui-icon-opacity);
-  font-size: var(--ui-icon-size-sm);
-  line-height: 1;
+  background: transparent;     /* <-- Fix: kein Button-Fill */
+  border: 0;                   /* <-- Fix: kein Button-Rahmen */
+  box-shadow: none;
+
+  color: rgba(31,41,51,0.56);  /* currentColor -> SVG stroke */
+  opacity: 1;
 
   cursor: default;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;        /* <-- Fix: nie interaktiv wirken */
 
-  margin-top: var(--space-1);
+  margin-top: 0;               /* <-- Fix: keine optische Verschiebung */
+}
+
+#event-detail-panel .detail-category-icon svg{
+  width: 22px;
+  height: 22px;
+  opacity: 0.95;
 }
 
 /* Titel rechts vom Badge – sauberes Wrapping */
@@ -2302,7 +2311,8 @@ Umfang:
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
-  line-height: 1.25;
+
+  line-height: 1.28; /* <-- Fix: stabilere Linebox für Alignment */
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -2314,13 +2324,14 @@ Umfang:
   hyphens: none;
 }
 
-/* Meta MUSS unter dem Titel über volle Breite */
+/* Meta unter dem Titel über volle Breite */
 #event-detail-panel .detail-meta-rows{
   grid-column: 1 / -1;
   grid-row: 2;
   min-width: 0;
 }
 
+/* Legacy: kein Emoji-Overlay */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
@@ -3186,5 +3197,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
