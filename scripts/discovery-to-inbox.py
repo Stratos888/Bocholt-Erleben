@@ -2986,7 +2986,7 @@ def main() -> None:
 
         written_before_source = total_written
 
-        detail_enrich_budget = int(os.environ.get("MAX_DETAIL_ENRICH_MAIN", "12"))
+        detail_enrich_budget = int(os.environ.get("MAX_DETAIL_ENRICH_MAIN", "30"))
         detail_enrich_timeout = int(os.environ.get("DETAIL_ENRICH_TIMEOUT", "12"))
         detail_enrich_count = 0
         detail_enrich_cache: Dict[str, str] = {}
@@ -3016,15 +3016,14 @@ def main() -> None:
             # - ersetzt nur die alte Hard-Skip-Logik + setzt description/status sauber
             # === END BLOCK: CLASSIFY + DESCRIPTION (review/blocked/rejected) ===
             desc_text = clean_text(c.get("description", ""))
-                                               # === BEGIN BLOCK: ENRICH LOCATION/TIME (infer + detail fetch fallback, v2) ===
+            # === BEGIN BLOCK: ENRICH REQUIRED FIELDS (date+location+time via infer + detail fetch fallback, v3) ===
             # Datei: scripts/discovery-to-inbox.py
             # Zweck:
-            # - Fehlende Location/Time zuerst aus Titel/Description inferieren
-            # - Wenn danach immer noch leer: budgetierter Detailseiten-Fetch (nur wenn URL da)
-            #   und erneut inferieren/HTML-Extraktion probieren.
+            # - Pflichtfelder-Durchsatz erhöhen: missing date/location/time zuerst inferieren, danach budgetierter Detail-Fetch.
+            # - Reuse desselben Detail-Fetches für date + location + time (kein zusätzlicher Load).
+            # - date/endDate bevorzugt aus JSON-LD/<time datetime>, sonst konservativer Text-Fallback.
             # Umfang:
-            # - Setzt nur lokale Variablen final_location / final_time (+ erweitert notes)
-            # === END BLOCK: ENRICH LOCATION/TIME (infer + detail fetch fallback, v2) ===
+            # - Setzt nur lokale Variablen d/final_location/final_time (+ ggf. c["endDate"]) und erweitert notes.
             combined_notes = clean_text(c.get("notes", ""))
             raw_location = clean_text(c.get("location", ""))
             raw_time = norm(c.get("time", ""))
@@ -3034,12 +3033,13 @@ def main() -> None:
             final_location = raw_location or inferred_location
             final_time = raw_time or inferred_time
 
-            # Detail-Enrichment nur wenn nach allem noch etwas fehlt
+            # Detail-Enrichment nur wenn nach allem noch Pflichtfelder fehlen
             c_url = canonical_url(c.get("url", ""))
+            need_date = not norm(d)
             need_loc = not norm(final_location)
             need_time = not norm(final_time)
 
-            if (need_loc or need_time) and c_url and (detail_enrich_count < detail_enrich_budget):
+            if (need_date or need_loc or need_time) and c_url and (detail_enrich_count < detail_enrich_budget):
                 detail_html = detail_enrich_cache.get(c_url, "")
                 if detail_html == "" and c_url not in detail_enrich_cache:
                     try:
@@ -3050,7 +3050,21 @@ def main() -> None:
                     detail_enrich_count += 1
 
                 if detail_html:
-                    # 1) erst strukturiert (JSON-LD), dann Textfallback
+                    # 1) date/endDate aus Detailseite (reuse vorhandene Backfill-Extractor)
+                    if need_date:
+                        try:
+                            d1, d2 = _backfill_extract_dates_from_html(detail_html)
+                        except Exception:
+                            d1, d2 = ("", "")
+                        if d1:
+                            d = d1
+                            # endDate nur setzen, wenn Kandidat bisher keins hatte
+                            if not norm(c.get("endDate", "")) and d2:
+                                c["endDate"] = d2
+
+                            need_date = False
+
+                    # 2) time/location strukturiert (JSON-LD), dann Textfallback
                     t2, l2 = _extract_time_loc_from_html(detail_html, title=title, allow_text_fallback=True)
 
                     if need_time and t2:
@@ -3073,7 +3087,8 @@ def main() -> None:
                             need_time = False
 
                     # notes kurz halten
-                    combined_notes = clean_text((combined_notes + "; enrich=detail_loc_time")[:180])
+                    combined_notes = clean_text((combined_notes + "; enrich=detail_date_loc_time")[:180])
+            # === END BLOCK: ENRICH REQUIRED FIELDS (date+location+time via infer + detail fetch fallback, v3) ===
 
 
                         # === BEGIN BLOCK: CANDIDATE CLASSIFY + LOGGING + INBOX WRITE (append Discovery_Candidates, v1) ===
