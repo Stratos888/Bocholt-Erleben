@@ -2079,15 +2079,15 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 
 /* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
 Zweck:
-- Ruhige Links im Content (nicht als CTA), dedupliziert
-- Touch & Focus enterprise-konform
+- Enterprise: Quelle/Website als dezente Attribution (kein Card-CTA Look)
+- Dedupe bleibt in JS; CSS macht es ruhig + kompakt
 Umfang:
-- .detail-links + .detail-link + label/value/ext
+- .detail-links + .detail-link + label/value/ext (nur Detailpanel)
 === */
 
 #event-detail-panel .detail-links{
   display: grid;
-  gap: var(--space-xs);
+  gap: 2px;
 
   margin-top: var(--space-lg);
   padding-top: var(--space-sm);
@@ -2095,57 +2095,67 @@ Umfang:
   border-top: 1px solid rgba(31,41,51,0.08);
 }
 
+/* Link: wie Footnote-Row, nicht wie Card */
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--space-sm);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
 
-  padding: 12px var(--space-sm);
-  border-radius: var(--ui-radius-md);
+  padding: 8px 0;
+  border-radius: 10px;
 
-  background: rgba(255,255,255,0.60);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 
-  color: rgba(31,41,51,0.86);
+  color: rgba(31,41,51,0.74);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
 }
 
-#event-detail-panel .detail-link:hover{
-  background: rgba(255,255,255,0.74);
+/* Hover/Active sehr subtil */
+@media (hover: hover){
+  #event-detail-panel .detail-link:hover{
+    color: rgba(31,41,51,0.86);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
-
 #event-detail-panel .detail-link:active{
-  transform: translateY(1px);
   background: rgba(31,41,51,0.04);
 }
 
+/* Focus: sauber, aber ruhig */
 #event-detail-panel .detail-link:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
 }
 
+/* Label klein + muted */
 #event-detail-panel .detail-link-label{
   font-size: 12px;
   font-weight: 750;
-  color: rgba(31,41,51,0.66);
+  color: rgba(31,41,51,0.56);
 }
 
+/* Value etwas stärker */
 #event-detail-panel .detail-link-value{
   min-width: 0;
   font-size: 13px;
   font-weight: 650;
+  color: rgba(31,41,51,0.78);
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* External indicator minimal */
 #event-detail-panel .detail-link-ext{
-  opacity: 0.60;
+  opacity: 0.55;
 }
 
 /* === END BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped) === */
@@ -2260,23 +2270,16 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
 Zweck:
-- Enterprise v2 Markup: .detail-meta-rows + .detail-meta-row
-- Rückwärtskompatibel: .detail-meta-chips/.detail-chip bleibt optisch „ok“, falls noch irgendwo genutzt
+- Meta ist „Info“, nicht „Card“: ruhig, flach, enterprise
+- Rows bleiben klar klickbar (Ort), aber ohne CTA-Anmutung
 Umfang:
-- Meta-Rows Styling + Icons/Text/Ext
+- .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
 
+/* Rows (v2 markup) */
 #event-detail-panel .detail-meta-rows{
   display: grid;
   gap: var(--space-xs);
-  margin: 0 0 var(--space-md);
-
-  padding: var(--space-sm) var(--space-sm);
-  border-radius: var(--ui-radius-md);
-
-  background: rgba(31,41,51,0.028);
-  border: 1px solid rgba(31,41,51,0.06);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 }
 
 #event-detail-panel .detail-meta-row{
@@ -2285,32 +2288,31 @@ Umfang:
   align-items: center;
   column-gap: var(--space-sm);
 
-  width: 100%;
-  padding: var(--space-sm) var(--space-sm);
+  padding: 10px 12px;
+  border-radius: 14px;
 
-  border-radius: var(--ui-radius-sm);
-  background: transparent;
+  background: rgba(31,41,51,0.020);
+  border: 1px solid rgba(31,41,51,0.055);
 
-  font-size: var(--font-event-meta);
-  line-height: 1.32;
-  font-weight: 450;
-  color: rgba(31,41,51,0.78);
+  color: rgba(31,41,51,0.82);
+  text-decoration: none !important;
 
-  text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
-#event-detail-panel .detail-meta-row.is-static{
-  cursor: default;
-  user-select: text;
-}
-
-#event-detail-panel a.detail-meta-row:hover{
-  background: rgba(255,255,255,0.52);
+@media (hover: hover){
+  #event-detail-panel a.detail-meta-row:hover{
+    background: rgba(31,41,51,0.032);
+    border-color: rgba(31,41,51,0.075);
+  }
 }
 
 #event-detail-panel a.detail-meta-row:active{
-  background: rgba(31,41,51,0.035);
+  transform: translateY(1px);
+  background: rgba(31,41,51,0.040);
+  border-color: rgba(31,41,51,0.095);
 }
 
 #event-detail-panel a.detail-meta-row:focus-visible{
@@ -2322,6 +2324,7 @@ Umfang:
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.90;
 }
 
 #event-detail-panel .detail-meta-text{
@@ -2330,22 +2333,24 @@ Umfang:
 }
 
 #event-detail-panel .detail-meta-ext{
-  opacity: 0.65;
+  opacity: 0.55;
 }
 
-/* Backward compatible (legacy chips) */
+/* Legacy chips container: entschärfen (kein „Kasten“) */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: var(--space-xs);
   margin: 0 0 var(--space-md);
 
-  padding: var(--space-sm) var(--space-sm);
-  border-radius: var(--ui-radius-md);
+  padding: 0;
+  border-radius: 0;
 
-  background: rgba(31,41,51,0.028);
-  border: 1px solid rgba(31,41,51,0.06);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
+
+/* Legacy chip rows übernehmen das neue Row-Look */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2354,16 +2359,16 @@ Umfang:
   width: 100%;
   max-width: 100%;
 
-  padding: var(--space-sm) var(--space-sm);
-  border: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
 
-  border-radius: var(--ui-radius-sm);
-  background: transparent;
+  background: rgba(31,41,51,0.020);
+  border: 1px solid rgba(31,41,51,0.055);
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
-  font-weight: 450;
-  color: rgba(31,41,51,0.74);
+  font-weight: 500;
+  color: rgba(31,41,51,0.78);
 
   cursor: default;
   user-select: text;
@@ -2375,7 +2380,7 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 #event-detail-panel .detail-chip:active{
-  background: rgba(31,41,51,0.035);
+  background: rgba(31,41,51,0.040);
 }
 #event-detail-panel .detail-chip-text{
   min-width: 0;
@@ -3193,6 +3198,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
