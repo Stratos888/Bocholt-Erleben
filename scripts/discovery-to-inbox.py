@@ -930,6 +930,14 @@ def classify_candidate(
 # Umfang:
 # - Ersetzt nur safe_fetch()
 # === END BLOCK: SAFE FETCH (retry + backoff for 503/429/5xx, v2) ===
+# === BEGIN BLOCK: SAFE FETCH (GET) + SAFE FETCH (POST FORM) (v1) ===
+# Datei: scripts/discovery-to-inbox.py
+# Zweck:
+# - Ergänzt safe_fetch_post() für POST-Form-Pagination (Bocholt Kalender)
+# Umfang:
+# - Ersetzt den bestehenden safe_fetch()-Block 1:1 und fügt safe_fetch_post() direkt danach hinzu
+# === END BLOCK: SAFE FETCH (GET) + SAFE FETCH (POST FORM) (v1) ===
+
 def safe_fetch(url: str, timeout: int = 20) -> str:
     backoffs = [10, 30, 90]
     last_err: Exception | None = None
@@ -940,55 +948,57 @@ def safe_fetch(url: str, timeout: int = 20) -> str:
             headers={
                 "User-Agent": "BocholtErlebenDiscovery/1.0",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "de-DE,de;q=0.9,en;q=0.6",
             },
         )
 
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
-                charset = resp.headers.get_content_charset() or "utf-8"
-                return resp.read().decode(charset, errors="replace")
-
-        except urllib.error.HTTPError as e:
-            code = int(getattr(e, "code", 0) or 0)
-
-            # Retry auf typische Transient-Errors
-            if code in (429, 500, 502, 503, 504) and attempt < len(backoffs):
-                retry_after = None
+                raw = resp.read()
                 try:
-                    ra = e.headers.get("Retry-After")
-                    if ra:
-                        retry_after = int(str(ra).strip())
+                    return raw.decode("utf-8", errors="replace")
                 except Exception:
-                    retry_after = None
-
-                time.sleep(retry_after if retry_after is not None else backoffs[attempt])
-                last_err = e
-                continue
-
-            # Nach Retries: soft-fail für Transient-Errors (damit Quelle nicht "Parse failed" triggert)
-            if code in (429, 500, 502, 503, 504):
-                return ""
-
-            raise
-
+                    return raw.decode("latin-1", errors="replace")
         except Exception as e:
+            last_err = e
             if attempt < len(backoffs):
                 time.sleep(backoffs[attempt])
-                last_err = e
                 continue
-            raise
+            return ""
 
-    if last_err:
-        # Finaler Soft-Fail, wenn es (aus welchem Grund auch immer) nur Transient-Probleme waren
+    return ""
+
+
+def safe_fetch_post(url: str, form: Dict[str, str], timeout: int = 20) -> str:
+    """
+    POST x-www-form-urlencoded (simple form submit).
+    Wichtig: URL-Fragmente (#results) werden entfernt.
+    """
+    url = (url or "").split("#", 1)[0].strip()
+
+    body = urllib.parse.urlencode(form or {}).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=body,
+        method="POST",
+        headers={
+            "User-Agent": "BocholtErlebenDiscovery/1.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "de-DE,de;q=0.9,en;q=0.6",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read()
+            try:
+                return raw.decode("utf-8", errors="replace")
+            except Exception:
+                return raw.decode("latin-1", errors="replace")
+    except Exception:
         return ""
-
-    raise RuntimeError("safe_fetch failed unexpectedly")
-
-
-
-# -------------------------
-# ICS (iCal) minimal parser
-# -------------------------
+# === END BLOCK: SAFE FETCH (GET) + SAFE FETCH (POST FORM) (v1) ===
 
 def ics_unfold_lines(text: str) -> List[str]:
     # RFC5545 line folding: lines starting with space/tab are continuations
@@ -3091,9 +3101,48 @@ def main() -> None:
                 candidates = parse_json(content, url)
 
             elif stype == "html":
-                # Bocholt-first (deterministisch)
+                # Bocholt-first (deterministisch) + Pagination per POST (pos=1..N)
                 if "bocholt.de/veranstaltungskalender" in norm_key(url):
-                    candidates = parse_bocholt_calendar_html(content, url)
+                    pages_cap = int(os.environ.get("MAX_BOCHOLT_PAGES", "23"))
+                    per_page = os.environ.get("BOCHOLT_ENTRIES_PER_PAGE", "10")
+
+                    # Page 1 (GET wie bisher)
+                    all_candidates: List[Dict[str, str]] = []
+                    all_candidates.extend(parse_bocholt_calendar_html(content, url))
+
+                    # max page aus Pagination (name="pos" value="N")
+                    pos_vals = [int(x) for x in re.findall(r'name="pos"\s+value="(\d+)"', content)]
+                    max_pos = min(max(pos_vals) if pos_vals else 1, pages_cap)
+
+                    # Pages 2..max_pos per POST
+                    for pos in range(2, max_pos + 1):
+                        page_html = safe_fetch_post(
+                            url,
+                            {
+                                "search": "",
+                                "date_from": "",
+                                "date_until": "",
+                                "entries_per_page": str(per_page),
+                                "pos": str(pos),
+                            },
+                            timeout=20,
+                        )
+                        if not norm(page_html):
+                            break
+                        all_candidates.extend(parse_bocholt_calendar_html(page_html, url))
+
+                    # Cross-page dedupe
+                    dedup: Dict[Tuple[str, str, str, str], Dict[str, str]] = {}
+                    for c in all_candidates:
+                        key = (
+                            slugify(c.get("title", "")),
+                            norm(c.get("date", "")),
+                            norm(c.get("endDate", "")),
+                            norm_key(c.get("url", "")),
+                        )
+                        if key not in dedup:
+                            dedup[key] = c
+                    candidates = list(dedup.values())
 
                 # Fallback: generic HTML (JSON-LD, Feed-Discovery, Date-Scan, KuKuG)
                 if not candidates:
