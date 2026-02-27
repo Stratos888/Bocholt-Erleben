@@ -18,20 +18,20 @@ Muss am Anfang der CSS-Datei stehen
   - --surface-panel*, --border-panel*, --shadow-panel*
   === */
 
-  /* Surfaces */
-  --surface-panel: color-mix(in srgb, white 90%, var(--color-primary-muted));
-  --surface-panel-elevated: color-mix(in srgb, white 86%, var(--color-primary-muted));
-  --surface-panel-footer: color-mix(in srgb, white 88%, var(--color-primary-muted));
+  /* Surfaces (sichtbar, aber weiterhin ruhig) */
+  --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
+  --surface-panel-elevated: color-mix(in srgb, white 76%, var(--color-primary-muted));
+  --surface-panel-footer: color-mix(in srgb, white 80%, var(--color-primary-muted));
 
   /* Rows (Info vs Action) */
   --surface-panel-row: var(--surface-panel-elevated);
-  --surface-panel-row-action: color-mix(in srgb, white 84%, var(--color-primary-muted));
-  --surface-panel-row-info: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  --surface-panel-row-action: color-mix(in srgb, white 72%, var(--color-primary-muted));
+  --surface-panel-row-info: color-mix(in srgb, white 86%, var(--color-primary-muted));
 
   /* Borders */
-  --border-panel: color-mix(in srgb, rgba(31,41,51,0.10) 72%, var(--color-primary-muted));
-  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.08) 72%, var(--color-primary-muted));
-  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.14) 72%, var(--color-primary-muted));
+  --border-panel: color-mix(in srgb, rgba(31,41,51,0.12) 72%, var(--color-primary-muted));
+  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.09) 72%, var(--color-primary-muted));
+  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.16) 72%, var(--color-primary-muted));
 
   /* Shadows */
   --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
@@ -1930,8 +1930,8 @@ Umfang:
 /* Sheet */
 /* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
 Zweck:
-- Detailpanel = Card Expanded: nutzt Panel-Tokens (Surface/Border/Shadow)
-- sichtbarer, konsistenter Brand-Abgleich (D), ohne “grün anzumalen”
+- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint) + klarer Panel-Interface Eindruck
+- ruhige Top-Kante (Divider statt “glassy”)
 Umfang:
 - Nur #event-detail-panel .detail-panel-content
 === */
@@ -1946,12 +1946,21 @@ Umfang:
   max-height: 92vh;
   max-height: 92dvh;
 
+  /* Surface = Token (Card Expanded DNA) */
   background-color: var(--surface-panel);
-  background-image: none !important;
+
+  /* Subtiler Verlauf wie „Feed-Unterton“ (sichtbar aber ruhig) */
+  background-image: linear-gradient(
+    to bottom,
+    var(--surface-panel-elevated) 0%,
+    var(--surface-panel) 28%,
+    rgba(255,255,255,0) 120px
+  );
 
   border-top-left-radius: var(--dp-sheet-radius);
   border-top-right-radius: var(--dp-sheet-radius);
 
+  /* Klarer Panel-Header Divider */
   border-top: 1px solid var(--border-panel);
 
   box-shadow: var(--shadow-panel);
@@ -2434,8 +2443,10 @@ Umfang:
   padding: 10px 12px;
   border-radius: 14px;
 
-  background: var(--surface-panel-row);
+  background: var(--surface-panel-row-info);
   border: 1px solid var(--border-panel-soft);
+
+  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2493,8 +2504,8 @@ Umfang:
   padding: var(--space-md) var(--gutter);
 
   border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--border-panel-soft);
+  background: var(--surface-panel-row);
 
   box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
 
@@ -3181,3 +3192,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
