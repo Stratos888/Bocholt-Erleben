@@ -215,11 +215,42 @@ const isBocholtDomain = rawUrl
   ? /(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(rawUrl)
   : false;
 
-// Quelle: alles von bocholt.de gilt bei euch als Attribution/Source
-const sourceUrl = (rawUrl && isBocholtDomain) ? rawUrl : "";
+// Quelle: bocholt.de immer Attribution; bevorzugt spezifische Event-Links, falls vorhanden
+const sourceCandidates = [
+  normalizeHttpUrl(trimOrEmpty(e.source_url || e.sourceUrl || "")),
+  normalizeHttpUrl(trimOrEmpty(e.url || e.link || "")),
+].filter(Boolean);
 
-// Website: bevorzugt Location-Homepage (extern), nur wenn nicht identisch mit Quelle
+const pickBestBocholtSource = (urls) => {
+  const bocholt = urls.filter(u => /(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(u));
+  if (!bocholt.length) return "";
+
+  // 1) bevorzugt /veranstaltungskalender/
+  const vk = bocholt.find(u => /\/veranstaltungskalender\//i.test(u));
+  if (vk) return vk;
+
+  // 2) sonst „spezifischster“ Pfad (mehr Segmente)
+  const score = (u) => {
+    try {
+      const p = new URL(u).pathname || "/";
+      const segs = p.split("/").filter(Boolean).length;
+      return segs;
+    } catch { return 0; }
+  };
+
+  return bocholt.slice().sort((a,b) => score(b) - score(a))[0];
+};
+
+const sourceUrl = pickBestBocholtSource(sourceCandidates) || (rawUrl && isBocholtDomain ? rawUrl : "");
+
+// Website: NUR externe Homepage (nicht bocholt.de)
 const websiteUrl = (() => {
+  const hp = normalizeHttpUrl(homepage) || "";
+  if (!hp) return "";
+  if (/(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(hp)) return "";
+  if (sourceUrl && hp === sourceUrl) return "";
+  return hp;
+})();
   const hp = normalizeHttpUrl(homepage) || "";
   if (!hp) return "";
   if (sourceUrl && hp === sourceUrl) return "";
@@ -1248,6 +1279,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
