@@ -192,63 +192,69 @@ const getCategoryIcon = (categoryRaw) => {
       description: desc,
     } : null;
 
-        /* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
-    Zweck:
-    - CTA-Disziplin: Actionbar zeigt NUR 2 Aktionen (Kalender + Teilen)
-    - Website/Quelle werden dedupliziert und als ruhige Links im Content gezeigt (nicht als Actionbar-CTA)
-    - Route-CTA entfällt (Maps steckt im Ort-Link)
-    Umfang:
-    - VM Felder: websiteUrl, sourceUrl, sharePayload
-    - actions: calendar + share (max 2)
-    === */
+/* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
+Zweck:
+- CTA-Disziplin: Actionbar zeigt NUR Kalender + Teilen
+- Website/Quelle werden korrekt getrennt:
+  * bocholt.de/* => Quelle (sourceUrl)
+  * homepage (locations.json) => Website (websiteUrl)
+- Keine Route-Redundanz (Maps steckt im Ort-Link)
+Umfang:
+- VM Felder: websiteUrl, sourceUrl, sharePayload
+- actions: calendar + share (max 2)
+=== */
 
-    // Link-Klassifizierung: Event-URL aus Daten (Quelle oder Website) + optionale neue Felder
-    const rawEventUrl = normalizeHttpUrl(
-      trimOrEmpty(
-        e.source_url || e.sourceUrl || e.url || e.link || e.website || e.website_url || e.websiteUrl || ""
-      )
-    );
+const rawUrl = normalizeHttpUrl(
+  trimOrEmpty(
+    // bevorzugt explizite Source-Felder, sonst generisches url/link
+    e.source_url || e.sourceUrl || e.url || e.link || e.website || e.website_url || e.websiteUrl || ""
+  )
+);
 
-    const isBocholtCalendarSource = rawEventUrl
-      ? /(^|\/\/)www\.bocholt\.de\/veranstaltungskalender\//i.test(rawEventUrl)
-      : false;
+const isBocholtDomain = rawUrl
+  ? /(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(rawUrl)
+  : false;
 
-    // Quelle: bocholt.de/veranstaltungskalender
-    const sourceUrl = (rawEventUrl && isBocholtCalendarSource) ? rawEventUrl : "";
+// Quelle: alles von bocholt.de gilt bei euch als Attribution/Source
+const sourceUrl = (rawUrl && isBocholtDomain) ? rawUrl : "";
 
-    // Website: echte Event-/Veranstalterseite (wenn rawEventUrl NICHT Quelle ist) sonst Fallback: Location-Homepage
-    const directWebsiteUrl = (rawEventUrl && !isBocholtCalendarSource) ? rawEventUrl : "";
-    const websiteUrl = directWebsiteUrl || normalizeHttpUrl(homepage) || "";
+// Website: bevorzugt Location-Homepage (extern), nur wenn nicht identisch mit Quelle
+const websiteUrl = (() => {
+  const hp = normalizeHttpUrl(homepage) || "";
+  if (!hp) return "";
+  if (sourceUrl && hp === sourceUrl) return "";
+  return hp;
+})();
 
-    // Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
-    const shareParts = [
-      title,
-      date ? `📅 ${date}${timeRange ? ` · ${timeRange}` : ""}` : "",
-      locationLabel ? `📍 ${locationLabel}` : "",
-    ].filter(Boolean);
+// Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
+const shareParts = [
+  title,
+  date ? `📅 ${date}${timeRange ? ` · ${timeRange}` : ""}` : "",
+  locationLabel ? `📍 ${locationLabel}` : "",
+].filter(Boolean);
 
-    const shareText = shareParts.join("\n");
-    const shareUrl = websiteUrl || sourceUrl || "";
-    const sharePayload = { title, text: shareText, url: shareUrl };
+const shareText = shareParts.join("\n");
+const shareUrl = websiteUrl || sourceUrl || "";
+const sharePayload = { title, text: shareText, url: shareUrl };
 
-    // Actions (Actionbar: exakt 2 CTAs max)
-    const actions = [
-      ...(canCalendar ? [{
-        type: "calendar",
-        label: "Kalender",
-        priority: "primary",
-        payload: calendarPayload,
-      }] : []),
+// Actions (Actionbar: exakt 2 CTAs max)
+const actions = [
+  ...(canCalendar ? [{
+    type: "calendar",
+    label: "Kalender",
+    priority: "primary",
+    payload: calendarPayload,
+  }] : []),
 
-      ...(shareText ? [{
-        type: "share",
-        label: "Teilen",
-        priority: "primary",
-        payload: sharePayload,
-      }] : []),
-    ];
+  ...(shareText ? [{
+    type: "share",
+    label: "Teilen",
+    priority: "primary",
+    payload: sharePayload,
+  }] : []),
+];
 
-    /* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA) === */
+/* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA) === */
 
     return {
       // current render fields (keep stable to avoid UI regression)
@@ -1157,8 +1163,9 @@ END:VCALENDAR`;
 
 /* === BEGIN BLOCK: SHARE ACTION (navigator.share + clipboard fallback)
 Zweck:
-- Enterprise v2: Teilen als System-Share, ohne WhatsApp-Primärbutton
-- Fallback: Clipboard (oder prompt) ohne zusätzliche UI-Abhängigkeiten
+- Enterprise: Share-Abbruch (Back/Cancel) darf KEIN Fallback-Popup triggern
+- Kein window.prompt mehr
+- Fallback nur Clipboard (still, optional kurzer Title-Feedback)
 Umfang:
 - bindet [data-action="share"] einmalig pro Render
 === */
@@ -1177,36 +1184,35 @@ if (shareBtn) {
     const url = String(p.url || "").trim();
     const title = String(p.title || vm.title || "Event").trim();
 
-    // 1) Native share (best)
+    const combined = [text, url].filter(Boolean).join("\n");
+    if (!combined) return;
+
+    // 1) Native share
     try {
       if (navigator.share) {
         await navigator.share({
           title,
-          text: [text, url].filter(Boolean).join("\n"),
+          text: combined,
           url: url || undefined,
         });
         return;
       }
-    } catch (_) {
-      // continue to fallback
+    } catch (err) {
+      // WICHTIG: User-Abbruch -> KEIN Fallback
+      if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+      // sonst weiter zu Clipboard
     }
 
-    // 2) Clipboard fallback
-    const payloadText = [text, url].filter(Boolean).join("\n");
+    // 2) Clipboard fallback (still, kein Prompt)
     try {
-      if (navigator.clipboard && payloadText) {
-        await navigator.clipboard.writeText(payloadText);
-        // tiny affordance without new UI components
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(combined);
         const prev = shareBtn.title;
         shareBtn.title = "Kopiert";
         setTimeout(() => { shareBtn.title = prev; }, 1200);
-        return;
       }
-    } catch (_) {}
-
-    // 3) Last resort
-    if (payloadText) {
-      window.prompt("Kopieren:", payloadText);
+    } catch (_) {
+      // Absichtlich still: kein Popup/Prompt
     }
   };
 
@@ -1242,6 +1248,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
