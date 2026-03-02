@@ -498,13 +498,24 @@ def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) 
 
 
 async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
-    # === BEGIN BLOCK: Collector (Playwright) with POST-pagination support (Bocholt) ===
+    # === BEGIN BLOCK: Collector (Playwright) with CF-proof logging ===
     listing_url = cfg.url
     detail_urls: Set[str] = set()
 
     http_status_first = ""
     http_status_last = ""
     error_msg = ""
+
+    # Proof fields
+    nav2_method = ""
+    nav2_url = ""
+    nav2_status = ""
+    nav2_cf_mitigated = ""
+    nav2_cf_ray = ""
+    nav2_server = ""
+    nav2_location = ""
+
+    debug_cf = os.environ.get("DEBUG_CF", "").strip().lower() in ("1", "true", "yes")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -525,14 +536,14 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         )
         page = await context.new_page()
 
-        # Load first page
+        # First navigation
         try:
             resp = await page.goto(listing_url, wait_until="domcontentloaded", timeout=60_000)
             if resp is not None:
                 http_status_first = str(resp.status)
                 http_status_last = http_status_first
             if http_status_first and int(http_status_first) >= 400:
-                error_msg = f"non_200_on_navigation: {http_status_first}"
+                error_msg = f"non_200_on_navigation:first={http_status_first}"
                 await context.close()
                 await browser.close()
                 return {
@@ -542,9 +553,16 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
                     "http_status_last": http_status_last,
                     "http_status_first": http_status_first,
                     "error": error_msg,
+                    "nav2_method": nav2_method,
+                    "nav2_url": nav2_url,
+                    "nav2_status": nav2_status,
+                    "nav2_cf_mitigated": nav2_cf_mitigated,
+                    "nav2_cf_ray": nav2_cf_ray,
+                    "nav2_server": nav2_server,
+                    "nav2_location": nav2_location,
                 }
         except Exception as e:
-            error_msg = f"playwright_fetch_error: {e}"
+            error_msg = f"playwright_fetch_error:first={e}"
             await context.close()
             await browser.close()
             return {
@@ -554,6 +572,13 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
                 "http_status_last": http_status_last,
                 "http_status_first": http_status_first,
                 "error": error_msg,
+                "nav2_method": nav2_method,
+                "nav2_url": nav2_url,
+                "nav2_status": nav2_status,
+                "nav2_cf_mitigated": nav2_cf_mitigated,
+                "nav2_cf_ray": nav2_cf_ray,
+                "nav2_server": nav2_server,
+                "nav2_location": nav2_location,
             }
 
         pages_visited = 0
@@ -561,7 +586,6 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         for page_idx in range(max(cfg.max_pages, 1)):
             pages_visited += 1
 
-            # Parse current page content
             await page.wait_for_timeout(1200)
             html = await page.content()
             soup = BeautifulSoup(html, "html.parser")
@@ -571,16 +595,14 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
                 if is_probable_detail_url(listing_url, href):
                     detail_urls.add(href)
 
-            # Stop if we reached max pages
             if page_idx >= max(cfg.max_pages, 1) - 1:
                 break
 
-            # Bocholt pagination is POST via button[aria-label="Nächste Seite"]
+            # Bocholt pagination: POST via button[aria-label="Nächste Seite"]
             next_btn = await page.query_selector('button[aria-label="Nächste Seite"]')
             if not next_btn:
                 break
 
-            # If the button is effectively disabled (wrapper has class 'disabled'), stop
             try:
                 is_disabled = await next_btn.evaluate(
                     "btn => btn.closest('.pagination__item')?.classList.contains('disabled') || btn.disabled === true"
@@ -590,18 +612,38 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
             except Exception:
                 pass
 
-            # Click and wait for navigation (form submit)
+            # Click and capture the navigation response for proof
             try:
                 async with page.expect_navigation(wait_until="domcontentloaded", timeout=60_000) as nav:
                     await next_btn.click()
                 nav_resp = await nav.value
+
                 if nav_resp is not None:
-                    http_status_last = str(nav_resp.status)
-                    if int(http_status_last) >= 400:
-                        error_msg = f"non_200_on_navigation: {http_status_last}"
+                    req = nav_resp.request
+                    nav2_method = (req.method or "")
+                    nav2_url = (req.url or "")
+                    nav2_status = str(nav_resp.status)
+                    http_status_last = nav2_status
+
+                    h = nav_resp.headers or {}
+                    nav2_cf_mitigated = h.get("cf-mitigated", "")
+                    nav2_cf_ray = h.get("cf-ray", "")
+                    nav2_server = h.get("server", "")
+                    nav2_location = h.get("location", "")
+
+                    if debug_cf:
+                        print(f"[CF-PROOF] nav2 method={nav2_method} status={nav2_status}")
+                        print(f"[CF-PROOF] nav2 url={nav2_url}")
+                        print(f"[CF-PROOF] cf-mitigated={nav2_cf_mitigated} cf-ray={nav2_cf_ray} server={nav2_server} location={nav2_location}")
+
+                    if int(nav2_status) >= 400:
+                        error_msg = (
+                            f"non_200_on_navigation: {nav2_status} "
+                            f"(method={nav2_method}, cf-mitigated={nav2_cf_mitigated}, server={nav2_server})"
+                        )
                         break
             except Exception as e:
-                error_msg = f"pagination_click_error: {e}"
+                error_msg = f"pagination_click_error:{e}"
                 break
 
         await context.close()
@@ -614,6 +656,15 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         "http_status_last": http_status_last,
         "http_status_first": http_status_first,
         "error": error_msg,
+        "nav2_method": nav2_method,
+        "nav2_url": nav2_url,
+        "nav2_status": nav2_status,
+        "nav2_cf_mitigated": nav2_cf_mitigated,
+        "nav2_cf_ray": nav2_cf_ray,
+        "nav2_server": nav2_server,
+        "nav2_location": nav2_location,
+    }
+    # === END BLOCK: Collector (Playwright) with CF-proof logging ===
     }
     # === END BLOCK: Collector (Playwright) with POST-pagination support (Bocholt) ===
 
@@ -661,13 +712,17 @@ def make_health_row(
     candidates_count: int,
     new_rows_written: int,
 ) -> List[str]:
+    # Keep error short for Sheets cell readability
+    error_short = (error or "").strip()
+    if len(error_short) > 240:
+        error_short = error_short[:240] + "…"
     return [
         cfg.source_name,
         cfg.source_type,
         cfg.url,
         status,
         http_status,
-        error,
+        error_short,
         run_ts,
         str(candidates_count),
         str(new_rows_written),
@@ -766,7 +821,11 @@ async def main_async() -> None:
         details: List[str] = res["detail_urls"]
         http_status_last = res["http_status_last"]
         http_status_first = res.get("http_status_first", "") or http_status_last
+
+        # Append CF proof summary into error (short)
         err = res["error"]
+        if not err and res.get("nav2_status") and int(res["nav2_status"] or "0") >= 400:
+            err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
 
         # We treat llm_batch_size as "target number of NEW inbox rows" per run.
         target_new = max(cfg.llm_batch_size, 10)
