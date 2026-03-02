@@ -210,28 +210,29 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- Detailpanel: Quelle-Link ist konsolidiert (keine redundante „Website + Quelle“-Dopplung mehr)
-- Detailpanel: Actionbar auf 2 Primary Actions reduziert („Kalender“, „Teilen“)
-- Detailpanel: Close-Control als Dismiss stabil vorhanden (Touch-Target im Proof 44×44)
-- Detailpanel: Scroll-/Overlay-Vertrag grundsätzlich stabil (Body/HTML overflow hidden; Panel scrollt intern)
+- Detailpanel: Actionbar ist enterprise-like integriert (Top-Radius + Shadow + Blur), weiterhin exakt 2 Primary Actions
+- Detailpanel: Touch-Targets verifiziert (Close + Actions >= 44×44); Close ist jetzt token-driven (appwide --ui-tap-target / --ui-close-size)
+- Detailpanel: Header-Reserve fix (Titel kann nicht mehr unter Close laufen; 2-line clamp stabil)
+- Detailpanel: Meta-Bereich als „List Group“ (Rows neutral/transparent, Divider nur zwischen Rows) — Formfeld-Look entfernt
+- Detailpanel: Quelle-Link als ruhige Zeile (borderless/transparent) — Kachel-/Formfeld-Look entfernt
+- CSS: style.css wurde erfolgreich konsolidiert und als konsolidierte Datei verifiziert (keine sichtbaren Regressionen im Detailpanel-Smoke-Test)
 
-UI: DETAILPANEL ENTERPRISE GATE CLOSURE — Basis stabil, aber sichtbare Enterprise-Gaps offen.
-Ist-Stand (Screenshots/Proofs):
-- Header ist funktional, aber nicht „Top-App“-aligned: Titel und Kategorie-Icon wirken optisch versetzt (keine saubere gemeinsame Achse).
-- Kategorie-Icon wirkt aktuell zu sehr wie ein Button/Chip statt als reiner Indicator-Badge.
-- Scrollbar ist sichtbar (insb. auf Mobile wirkt das eher „Web“ als „App“).
-- Farb-/Surface-DNA Richtung „Eventcard Expanded“ ist noch nicht stark genug wahrnehmbar (Token-Ansatz vorhanden, aber visuell noch zu subtil).
+DECISIONS LOG (permanent, project-wide):
+- ENGINEERING.md: Patch-Output-Standard ist minimal (pro Replace: File + BEGIN + END + Replacement block; keine Zusatznotizen) — Forensics/Attestation nur auf explizite User-Anforderung
+- UI Contract: Tap-Targets appwide über Token `--ui-tap-target` (44px) definiert; Close-Button nutzt tokenisierte DNA (`--ui-close-*`)
+- UI Contract: Detailpanel Meta-Block ist canonical „List Group“ (kein Formfeld-Look)
 
-NEXT WORKPACKS (UI ONLY, shortest path to enterprise look):
-1) HEADER FINAL ALIGNMENT
-   - Eine optische Achse: Icon ↔ Titel ↔ Close (auch bei 2-line title clamp)
-   - Kategorie-Icon als ruhiger Indicator (kein Button-Look)
-2) SCROLLBAR APP FEEL (MOBILE)
-   - Scroll bleibt, Scrollbar auf Mobile verstecken (ohne Funktionsverlust)
-3) PANEL DNA MATCH (FEED → CARD EXPANDED)
-   - Panel-Surfaces/Borders/Shadows so nachziehen, dass „Eventcard geöffnet“ spürbar ist
-4) SHARE FALLBACK UX (optional, falls weiterhin Popup/Prompt)
-   - Kein Browser-Prompt; stattdessen Copy-to-Clipboard + Toast, wenn Share API nicht greift
+CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
+- Enterprise-Basis stabil; zentrale UI-Gaps geschlossen (Header-Kollision, Meta/Formfield-Look, Quelle-Link, Actionbar-Integration, Close 44×44 tokenisiert)
+- Kategorie-Icon im Detailpanel wird aktuell als Emoji gerendert und per Filter tokenisiert; akzeptiert als Debt (Renderer-abhängig). Optional später: SVG/Icon-Registry.
+
+REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
+1) CSS-KONSOLIDIERUNG IN REPO FINALISIEREN
+   - Konsolidierte style.css in Repo übernehmen (ersetzt bisherigen Stand), Smoke-Test GS-02 (Detailpanel) + GS-01 (Feed) + PWA Header
+2) RHYTHM / SPACING POLISH (nur wenn sichtbar nötig)
+   - vertikaler Rhythmus zwischen Meta → Beschreibung → Quelle → Actionbar final beruhigen
+3) ICON SYSTEM (optional, später)
+   - Wenn 100% Neutralität gefordert: Kategorie-Icons von Emoji auf SVG/Icon-Registry umstellen (Single Source of Truth)
 
 PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
 - Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
@@ -240,7 +241,7 @@ PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (upda
 
 LAST UPDATE:
 
-2026-02-27
+2026-03-02
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 
 ---
