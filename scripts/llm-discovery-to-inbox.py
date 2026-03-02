@@ -129,6 +129,10 @@ def truthy(v: str) -> bool:
     return str(v).strip().lower() in ("true", "1", "yes", "y", "ja")
 
 
+def env_flag(name: str, default: str = "false") -> bool:
+    return truthy(os.environ.get(name, default))
+
+
 def safe_int(v: str, default: int) -> int:
     try:
         vv = str(v).strip()
@@ -579,18 +583,22 @@ async def main_async() -> None:
     inbox_rows: List[List[str]] = []
 
     # Dedupe against existing Inbox URLs (best effort)
+    # Can be disabled for controlled end-to-end tests via ENV DISABLE_INBOX_DEDUPE=true
     existing_inbox_urls: Set[str] = set()
-    try:
-        inbox_values = read_tab(service, sheet_id, TAB_INBOX)
-        if inbox_values and len(inbox_values) > 1:
-            header = inbox_values[0]
-            url_idx = header.index("url") if "url" in header else None
-            if url_idx is not None:
-                for r in inbox_values[1:]:
-                    if url_idx < len(r) and r[url_idx]:
-                        existing_inbox_urls.add(r[url_idx].strip())
-    except Exception:
-        pass
+    disable_inbox_dedupe = env_flag("DISABLE_INBOX_DEDUPE", "false")
+
+    if not disable_inbox_dedupe:
+        try:
+            inbox_values = read_tab(service, sheet_id, TAB_INBOX)
+            if inbox_values and len(inbox_values) > 1:
+                header = inbox_values[0]
+                url_idx = header.index("url") if "url" in header else None
+                if url_idx is not None:
+                    for r in inbox_values[1:]:
+                        if url_idx < len(r) and r[url_idx]:
+                            existing_inbox_urls.add(r[url_idx].strip())
+        except Exception:
+            pass
 
     for cfg in llm_sources:
         if cfg.source_type != "html":
@@ -660,7 +668,11 @@ async def main_async() -> None:
             except Exception:
                 continue
 
-        status = "llm_collect_ok" if not err else "llm_collect_fetch_error"
+        if err:
+            status = "llm_collect_fetch_error"
+        else:
+            status = "llm_collect_ok" if new_inbox_written > 0 else "llm_collect_ok_no_new"
+
         health_rows.append(
             make_health_row(
                 cfg,
