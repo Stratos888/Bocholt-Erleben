@@ -1,24 +1,23 @@
-# === BEGIN BLOCK: LLM DISCOVERY TO INBOX (collector proof: html pagination + detail-url splitting, no LLM) ===
+# === BEGIN BLOCK: LLM DISCOVERY TO INBOX (Playwright collector + minimal extraction) ===
 # Datei: scripts/llm-discovery-to-inbox.py
 # Zweck:
-# - Parallel zum Legacy-Prozess: Proof, dass wir aus HTML-Quellen (z.B. bocholt.de Kalender)
-#   sauber paginieren und pro Event Detail-URLs extrahieren können.
-# - NOCH KEIN LLM-Call, NOCH KEIN Schreiben in Inbox.
-# - Schreibt nur Monitoring:
-#   - Source_Health: llm_collect_ok + candidates_count
+# - Parallel zum Legacy-Prozess: LLM-Pipeline (pipeline_mode=="llm") betreiben, ohne Legacy zu verändern.
+# - Phase 1 (Collector): Browser-basiertes Laden (Playwright) inkl. Pagination und Detail-URL-Splitting.
+# - Phase 2 (Extraction): Minimal-Extraktion aus Detailseiten (ohne externen LLM), um Inbox befüllbar zu machen.
+# - Schreibt:
+#   - Source_Health: Status + candidates_count + new_rows_written
 #   - Discovery_Candidates: pro Detail-URL eine Zeile (reason=llm_candidate_detail_url)
+#   - Inbox: pro Detail-URL eine Zeile mit best-effort Feldern (title/date/time/location)
 #
 # Eingaben (ENV):
 # - SHEET_ID
 # - GOOGLE_SERVICE_ACCOUNT_JSON
-# - TAB_SOURCES, TAB_SOURCE_HEALTH, TAB_DISCOVERY_CANDIDATES
+# - TAB_SOURCES, TAB_SOURCE_HEALTH, TAB_DISCOVERY_CANDIDATES, TAB_INBOX
 #
-# Verhalten:
-# - Filtert Quellen: enabled==TRUE und pipeline_mode=="llm"
-# - Lädt max_pages Seiten über "next"-Links (generisch)
-# - Extrahiert Detail-Links, die nach Eventdetail aussehen (Heuristik)
-# - Loggt Kandidaten in Discovery_Candidates
-# === END BLOCK: LLM DISCOVERY TO INBOX (collector proof: html pagination + detail-url splitting, no LLM) ===
+# Hinweise:
+# - Cloudflare: Ziel ist, dass Chromium (Playwright) durchkommt, wo requests 403 bekommt.
+# - Das ist bewusst robust/heuristisch; Feldqualität wird später durch LLM Extraction ersetzt.
+# === END BLOCK: LLM DISCOVERY TO INBOX (Playwright collector + minimal extraction) ===
 
 from __future__ import annotations
 
@@ -30,8 +29,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 from urllib.parse import urljoin, urlparse
 
-import requests
 from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -41,6 +40,7 @@ from googleapiclient.discovery import build
 TAB_SOURCES = os.environ.get("TAB_SOURCES", "Sources")
 TAB_SOURCE_HEALTH = os.environ.get("TAB_SOURCE_HEALTH", "Source_Health")
 TAB_DISCOVERY_CANDIDATES = os.environ.get("TAB_DISCOVERY_CANDIDATES", "Discovery_Candidates")
+TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 # === END BLOCK: SHEET TAB CONFIG (ENV override) ===
 
 
@@ -79,6 +79,32 @@ DISCOVERY_CANDIDATES_COLUMNS = [
     "location",
     "kategorie_suggestion",
     "url",
+    "notes",
+    "created_at",
+]
+
+
+# === BEGIN BLOCK: INBOX COLUMNS (stable) ===
+# Datei: scripts/llm-discovery-to-inbox.py
+# Zweck: Spaltenreihenfolge des Google Sheet Tabs "Inbox" (wie in discovery-to-inbox.py)
+# Umfang: Definiert nur INBOX_COLUMNS.
+# === END BLOCK: INBOX COLUMNS (stable) ===
+INBOX_COLUMNS = [
+    "status",
+    "id_suggestion",
+    "title",
+    "date",
+    "endDate",
+    "time",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
+    "source_name",
+    "source_url",
+    "match_score",
+    "matched_event_id",
     "notes",
     "created_at",
 ]
@@ -237,15 +263,90 @@ def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
         return False
 
 
-def collect_detail_urls(cfg: SourceCfg) -> Dict[str, Any]:
-    session = requests.Session()
-    session.headers.update(
-        {
-            "User-Agent": "Mozilla/5.0 (compatible; BocholtErlebenBot/1.0; +https://bocholt-erleben.de)",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        }
-    )
+def norm_text(s: str) -> str:
+    return re.sub(r"\s+", " ", (s or "").strip())
 
+
+DATE_RE = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(\d{2,4})\b")
+TIME_RE = re.compile(r"\b(\d{1,2}:\d{2})\b")
+
+
+def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Dict[str, str]:
+    """Best-effort extraction from a detail page.
+
+    Returns Inbox-compatible fields (subset).
+    """
+    soup = BeautifulSoup(detail_html, "html.parser")
+
+    # title
+    title = ""
+    h1 = soup.find("h1")
+    if h1:
+        title = norm_text(h1.get_text(" ", strip=True))
+    if not title:
+        og = soup.find("meta", property="og:title")
+        if og and og.get("content"):
+            title = norm_text(og["content"])
+
+    # text blob for regex
+    text_blob = norm_text(soup.get_text(" ", strip=True))
+
+    # date
+    date = ""
+    # 1) <time datetime="YYYY-MM-DD">
+    t = soup.find("time")
+    if t and t.get("datetime"):
+        dt = norm_text(t.get("datetime", ""))
+        m_iso = re.match(r"^(\d{4}-\d{2}-\d{2})", dt)
+        if m_iso:
+            date = m_iso.group(1)
+    # 2) dd.mm.yyyy
+    if not date:
+        m = DATE_RE.search(text_blob)
+        if m:
+            dd, mm, yy = m.group(1), m.group(2), m.group(3)
+            if len(yy) == 2:
+                yy = "20" + yy
+            date = f"{yy.zfill(4)}-{mm.zfill(2)}-{dd.zfill(2)}"
+
+    # time
+    time = ""
+    mt = TIME_RE.search(text_blob)
+    if mt:
+        time = mt.group(1)
+
+    # location (very heuristic)
+    location = ""
+    for label in ("Ort", "Veranstaltungsort", "Location"):
+        idx = text_blob.lower().find(label.lower())
+        if idx != -1:
+            snippet = text_blob[idx : idx + 160]
+            if ":" in snippet:
+                snippet = snippet.split(":", 1)[1]
+            location = norm_text(snippet)[:120]
+            break
+
+    if not location and "bocholt" in text_blob.lower():
+        location = "Bocholt"
+
+    description = ""
+    ogd = soup.find("meta", property="og:description")
+    if ogd and ogd.get("content"):
+        description = norm_text(ogd["content"])[:500]
+
+    return {
+        "title": title,
+        "date": date,
+        "time": time,
+        "city": cfg.default_city or "Bocholt",
+        "location": location,
+        "kategorie_suggestion": cfg.default_category or "",
+        "url": detail_url,
+        "description": description,
+    }
+
+
+async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
     listing_url = cfg.url
     current_url = listing_url
     visited_pages: Set[str] = set()
@@ -254,31 +355,53 @@ def collect_detail_urls(cfg: SourceCfg) -> Dict[str, Any]:
     http_status_last = ""
     error_msg = ""
 
-    for _ in range(max(cfg.max_pages, 1)):
-        if current_url in visited_pages:
-            break
-        visited_pages.add(current_url)
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled",
+            ],
+        )
+        context = await browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            ),
+            locale="de-DE",
+        )
+        page = await context.new_page()
 
-        try:
-            resp = session.get(current_url, timeout=30)
-            http_status_last = str(resp.status_code)
-            resp.raise_for_status()
-        except Exception as e:
-            error_msg = f"fetch_error: {e}"
-            break
+        for _ in range(max(cfg.max_pages, 1)):
+            if current_url in visited_pages:
+                break
+            visited_pages.add(current_url)
 
-        soup = BeautifulSoup(resp.text, "html.parser")
+            try:
+                resp = await page.goto(current_url, wait_until="domcontentloaded", timeout=60_000)
+                if resp is not None:
+                    http_status_last = str(resp.status)
+                await page.wait_for_timeout(1500)
+                html = await page.content()
+            except Exception as e:
+                error_msg = f"playwright_fetch_error: {e}"
+                break
 
-        # collect all hrefs
-        for a in soup.find_all("a", href=True):
-            href = urljoin(current_url, a["href"])
-            if is_probable_detail_url(listing_url, href):
-                detail_urls.add(href)
+            soup = BeautifulSoup(html, "html.parser")
 
-        next_url = find_next_url(current_url, soup)
-        if not next_url:
-            break
-        current_url = next_url
+            for a in soup.find_all("a", href=True):
+                href = urljoin(current_url, a["href"])
+                if is_probable_detail_url(listing_url, href):
+                    detail_urls.add(href)
+
+            next_url = find_next_url(current_url, soup)
+            if not next_url:
+                break
+            current_url = next_url
+
+        await context.close()
+        await browser.close()
 
     return {
         "listing_url": listing_url,
@@ -295,7 +418,7 @@ def make_candidate_row(
     detail_url: str,
 ) -> List[str]:
     created_at = run_ts
-    # keep minimal fields empty; this is only a collector proof
+    # keep minimal fields empty; this is only a collector proof / candidate log
     return [
         run_ts,
         cfg.source_name,
@@ -318,7 +441,7 @@ def make_candidate_row(
         "",  # location
         cfg.default_category or "",  # kategorie_suggestion
         detail_url,  # url
-        "collector_only (no LLM yet)",  # notes
+        "collector_only (playwright)",  # notes
         created_at,
     ]
 
@@ -345,7 +468,29 @@ def make_health_row(
     ]
 
 
-def main() -> None:
+def make_inbox_row(run_ts: str, cfg: SourceCfg, fields: Dict[str, str]) -> List[str]:
+    return [
+        "neu",  # status
+        "",  # id_suggestion
+        fields.get("title", ""),
+        fields.get("date", ""),
+        "",  # endDate
+        fields.get("time", ""),
+        fields.get("city", cfg.default_city or "Bocholt"),
+        fields.get("location", ""),
+        fields.get("kategorie_suggestion", cfg.default_category or ""),
+        fields.get("url", ""),
+        fields.get("description", ""),
+        cfg.source_name,
+        cfg.url,  # source_url (listing)
+        "",  # match_score
+        "",  # matched_event_id
+        "llm_pipeline_playwright_collector (best-effort extraction, no external LLM yet)",
+        run_ts,
+    ]
+
+
+async def main_async() -> None:
     service, sheet_id = build_sheets_service()
     run_ts = datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
@@ -353,7 +498,6 @@ def main() -> None:
     llm_sources = parse_sources(sources_values)
 
     if not llm_sources:
-        # still log something visible
         append_rows(
             service,
             sheet_id,
@@ -377,6 +521,21 @@ def main() -> None:
 
     health_rows: List[List[str]] = []
     candidate_rows: List[List[str]] = []
+    inbox_rows: List[List[str]] = []
+
+    # Dedupe against existing Inbox URLs (best effort)
+    existing_inbox_urls: Set[str] = set()
+    try:
+        inbox_values = read_tab(service, sheet_id, TAB_INBOX)
+        if inbox_values and len(inbox_values) > 1:
+            header = inbox_values[0]
+            url_idx = header.index("url") if "url" in header else None
+            if url_idx is not None:
+                for r in inbox_values[1:]:
+                    if url_idx < len(r) and r[url_idx]:
+                        existing_inbox_urls.add(r[url_idx].strip())
+    except Exception:
+        pass
 
     for cfg in llm_sources:
         if cfg.source_type != "html":
@@ -385,7 +544,7 @@ def main() -> None:
                     cfg,
                     "llm_collect_skip_non_html",
                     "",
-                    "Collector proof implemented only for html in Step 3",
+                    "Collector implemented only for html in this script",
                     run_ts,
                     0,
                     0,
@@ -393,15 +552,50 @@ def main() -> None:
             )
             continue
 
-        res = collect_detail_urls(cfg)
+        res = await collect_detail_urls_playwright(cfg)
         details: List[str] = res["detail_urls"]
         http_status_last = res["http_status_last"]
         err = res["error"]
 
-        # log limited number of candidates per run to avoid tab explosion
         limit = max(cfg.llm_batch_size, 10)
+
+        new_inbox_written = 0
         for u in details[:limit]:
             candidate_rows.append(make_candidate_row(run_ts, cfg, u))
+
+            if u in existing_inbox_urls:
+                continue
+
+            try:
+                async with async_playwright() as p:
+                    browser = await p.chromium.launch(
+                        headless=True,
+                        args=[
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",
+                            "--disable-blink-features=AutomationControlled",
+                        ],
+                    )
+                    context = await browser.new_context(
+                        user_agent=(
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                            "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                        ),
+                        locale="de-DE",
+                    )
+                    page = await context.new_page()
+                    await page.goto(u, wait_until="domcontentloaded", timeout=60_000)
+                    await page.wait_for_timeout(1200)
+                    detail_html = await page.content()
+                    await context.close()
+                    await browser.close()
+
+                fields = extract_event_fields(detail_html, u, cfg)
+                inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                existing_inbox_urls.add(u)
+                new_inbox_written += 1
+            except Exception:
+                continue
 
         status = "llm_collect_ok" if not err else "llm_collect_fetch_error"
         health_rows.append(
@@ -412,15 +606,20 @@ def main() -> None:
                 err,
                 run_ts,
                 len(details),
-                0,
+                new_inbox_written,
             )
         )
 
     append_rows(service, sheet_id, TAB_SOURCE_HEALTH, health_rows)
     append_rows(service, sheet_id, TAB_DISCOVERY_CANDIDATES, candidate_rows)
+    append_rows(service, sheet_id, TAB_INBOX, inbox_rows)
 
-    print(f"LLM collector proof done: sources={len(llm_sources)} candidates_logged={len(candidate_rows)}")
+    print(
+        f"LLM Playwright collector done: sources={len(llm_sources)} candidates_logged={len(candidate_rows)} inbox_new={len(inbox_rows)}"
+    )
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+
+    asyncio.run(main_async())
