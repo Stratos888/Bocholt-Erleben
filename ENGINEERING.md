@@ -59,21 +59,35 @@ Workflow (mandatory):
 - All subsequent patches MUST be computed against the **updated** canonical working copy (never against an older version).
 - Assume the user applies ALL assistant-provided changes and makes NO additional edits unless explicitly stated.
 
-## NO ATTESTATION, NO PATCH (HARD STOP)
+## PATCH OUTPUT FORMAT (MINIMAL, DEFAULT)
 
-If a response contains Replace-instructions, it MUST start with a "Working Copy Attestation".
-If it does not: **the patch is invalid and must not be applied.**
+If a response contains Replace-instructions, it MUST use this exact minimal format and nothing else:
 
-## WORKING COPY ATTESTATION (MANDATORY FOR EVERY PATCH RESPONSE)
+For each file:
 
-Every patch response MUST include:
+1) **File:** `<exact path>`
 
-- Source: ZIP snapshot (or later user-uploaded file, if explicitly used)
+For each replace operation in that file:
+
+2) **BEGIN line:** `<exact, verbatim line from the current file>`
+3) **END line:** `<exact, verbatim line from the current file>`
+4) **Replacement block:** (a single fenced code block)
+
+Rules:
+
+- Do NOT include fingerprints/hashes/byte counts by default.
+- Do NOT include extra commentary, rationale, checklists, or notes inside patch responses.
+- Replace ranges MUST NOT overlap within a single response. If they would overlap: merge into one larger Replace-block.
+- If BEGIN/END lines cannot be found exactly: **STOP and request the current file or the relevant block.**
+
+## OPTIONAL: FORENSICS ATTESTATION (ONLY ON USER REQUEST)
+
+Only if the user explicitly asks for it (e.g., “prove you have the latest file”):
+
+- Source: ZIP snapshot or uploaded file name
 - File: exact path
-- Anchors: exact, verbatim BEGIN and END lines that exist in the current canonical working copy
-- Fingerprint: `bytes=<N>, sha256=<HASH>` of the current canonical working copy for that file
-
-If the assistant cannot provide this attestation: **STOP. No patch.**
+- Anchors: exact BEGIN/END lines used
+- Fingerprint: `bytes=<N>, sha256=<HASH>`
 
 ## SYNC LOSS EXCEPTION (ONLY IF USER SAYS SO)
 
