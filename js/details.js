@@ -69,12 +69,14 @@
 Zweck:
 - Unbekannte Kategorien sollen NICHT 🗓️ als Emoji nutzen
 - Stattdessen: konsistentes Kalender-Icon wie Action-Bar (SVG Token)
+- Kategorie-Icons müssen mit Event-Cards konsistent sein (z. B. Märkte -> 🧺)
 Umfang:
 - Nur getCategoryIcon()
 === */
 const getCategoryIcon = (categoryRaw) => {
   const c = trimOrEmpty(categoryRaw);
   if (!c) return "";
+
   const iconMap = {
     "Musik": "🎵",
     "Kultur": "🎭",
@@ -83,7 +85,14 @@ const getCategoryIcon = (categoryRaw) => {
     "Familie": "👨‍👩‍👧‍👦",
     "Natur & Draußen": "🌿",
     "Innenstadt & Leben": "🏙️",
+
+    // Konsistenz zu Event-Cards:
+    "Märkte & Feste": "🧺",
+    // Robuste Synonyme (falls Sources variieren)
+    "Märkte": "🧺",
+    "Markt": "🧺",
   };
+
   return iconMap[c] || "calendar";
 };
 /* === END BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji) === */
@@ -1274,6 +1283,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
