@@ -615,6 +615,7 @@ async def main_async() -> None:
                 continue
 
             try:
+                # === BEGIN BLOCK: DETAIL FETCH (Playwright, fixed indentation + no-download context) ===
                 async with async_playwright() as p:
                     browser = await p.chromium.launch(
                         headless=True,
@@ -624,20 +625,21 @@ async def main_async() -> None:
                             "--disable-blink-features=AutomationControlled",
                         ],
                     )
-        context = await browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-            ),
-            locale="de-DE",
-            accept_downloads=False,
-        )
+                    context = await browser.new_context(
+                        user_agent=(
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                            "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                        ),
+                        locale="de-DE",
+                        accept_downloads=False,
+                    )
                     page = await context.new_page()
                     await page.goto(u, wait_until="domcontentloaded", timeout=60_000)
                     await page.wait_for_timeout(1200)
                     detail_html = await page.content()
                     await context.close()
                     await browser.close()
+                # === END BLOCK: DETAIL FETCH (Playwright, fixed indentation + no-download context) ===
 
                 fields = extract_event_fields(detail_html, u, cfg)
                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
