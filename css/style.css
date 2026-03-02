@@ -196,28 +196,25 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   --ui-font-weight-cta: 800;
 
   /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
-Zweck:
-- Single Source of Truth für Icon-DNA (Größen/Opacity)
-- Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
-Umfang:
-- Nur Tokens, keine Selektoren.
-=== */
---ui-icon-size-sm: 16px;   /* Cards / Meta */
---ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
---ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
---ui-icon-opacity: 0.92;
+  Zweck:
+  - Single Source of Truth für Icon-DNA (Größen/Opacity/Emoji-Filter)
+  - Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
+  Umfang:
+  - Nur Tokens, keine Selektoren.
+  === */
+  --ui-icon-size-sm: 16px;   /* Cards / Meta */
+  --ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
+  --ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
 
-/* === BEGIN ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) ===
-Zweck:
-- Einheitliche Hit-Areas / Icon-Button-Boxen in Overlays (Detailpanel/Modals/Sheets)
-Umfang:
-- Nur Tokens, keine Selektoren.
-=== */
---ui-tap-target: 44px;       /* Enterprise Touch Target */
---ui-icon-btn-size: 32px;    /* sichtbare Box für Icon-Controls/Badges im Overlay-Header */
-/* === END ADD: OVERLAY HEADER MEASURE TOKENS (app-wide) === */
+  /* Default (für einfache Nutzung in Selektoren) */
+  --ui-icon-size: var(--ui-icon-size-md);
 
-/* === END BLOCK: ICON TOKENS (app-wide) === */
+  --ui-icon-opacity: 0.92;
+
+  /* Emoji-Icons app-like neutralisieren (nur dort verwenden, wo Emoji gerendert wird) */
+  --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
+
+  /* === END BLOCK: ICON TOKENS (app-wide) === */
 
    /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
   /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
@@ -3221,6 +3218,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
