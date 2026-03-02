@@ -559,10 +559,29 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
                 if is_probable_detail_url(listing_url, href):
                     detail_urls.add(href)
 
-            next_url = find_next_url(current_url, soup)
-            if not next_url:
+            # === BEGIN BLOCK: Pagination via Playwright click (Bocholt POST form) ===
+
+            # finde "Nächste Seite" Button
+            next_button = await page.query_selector('button[aria-label="Nächste Seite"]')
+
+            if not next_button:
                 break
-            current_url = next_url
+
+            try:
+                await next_button.click()
+                await page.wait_for_timeout(1500)
+
+                # nach Klick neuen Content lesen
+                html = await page.content()
+
+                # neue URL ist gleich, daher current_url nicht ändern
+                # wichtig: soup neu setzen
+                soup = BeautifulSoup(html, "html.parser")
+
+            except Exception:
+                break
+
+            # === END BLOCK: Pagination via Playwright click ===
 
         await context.close()
         await browser.close()
