@@ -2137,17 +2137,17 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped)
+/* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: quiet row link, no input-card look)
 Zweck:
-- Attribution wirkt wie „ruhige System-Zeile“, aber sichtbar (Row-Surface)
-- Nicht wie CTA-Kachel, aber klar tappable + focus-safe
+- Attribution/Quelle wirkt wie ruhige System-Zeile (tappable), nicht wie Formularfeld/Kachel
+- Fokus/States bleiben sauber
 Umfang:
 - .detail-links + .detail-link + label/value/ext (nur Detailpanel)
 === */
 
 #event-detail-panel .detail-links{
   display: grid;
-  gap: var(--space-xs);
+  gap: 0;
 
   margin-top: var(--space-lg);
   padding-top: var(--space-sm);
@@ -2155,6 +2155,7 @@ Umfang:
   border-top: 1px solid var(--border-panel-soft);
 }
 
+/* Link row */
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
@@ -2163,35 +2164,33 @@ Umfang:
   align-items: center;
   column-gap: var(--space-sm);
 
-  padding: 12px 12px;
-  border-radius: var(--ui-radius-md);
+  min-height: 44px;
+  padding: 10px 12px;
 
-  background: var(--surface-panel-row);
-  border: 1px solid var(--border-panel-soft);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 12px;
 
-  color: rgba(31,41,51,0.84);
+  box-shadow: none !important;
+
+  color: rgba(31,41,51,0.78);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
 
-  transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    transform 140ms ease;
+  transition: background 140ms ease, transform 140ms ease, color 140ms ease;
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-link:hover{
-    background: color-mix(in srgb, var(--surface-panel-row) 92%, white);
-    border-color: var(--border-panel);
+    background: rgba(31,41,51,0.05) !important;
+    color: rgba(31,41,51,0.86);
   }
 }
 
 #event-detail-panel .detail-link:active{
   transform: translateY(1px);
-  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
-  border-color: var(--border-panel-strong);
+  background: rgba(31,41,51,0.07) !important;
 }
 
 #event-detail-panel .detail-link:focus-visible{
@@ -2220,7 +2219,7 @@ Umfang:
   opacity: 0.60;
 }
 
-/* === END BLOCK: DETAIL LINKS (Enterprise v2: website + source, deduped) === */
+/* === END BLOCK: DETAIL LINKS (Enterprise v2: quiet row link, no input-card look) === */
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
@@ -2342,15 +2341,16 @@ Umfang:
 
 
 
-/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, less form-field look)
+/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look)
 Zweck:
-- Meta-Rows wirken wie “List Group” (ein Block), nicht wie einzelne Formfelder
-- Location bleibt “Action”, Datetime bleibt “Info”, aber ohne Input-Anmutung
+- Meta-Block als eine “List Group” (ein Rahmen), Rows ohne eigene Felder-Optik
+- Divider nur zwischen Rows
+- Robust gegen Overrides (höhere Specificity + !important nur dort, wo nötig)
 Umfang:
 - .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
 
-/* Rows (v2 markup): als gruppierter Block */
+/* Group container (v2 markup) */
 #event-detail-panel .detail-meta-rows{
   display: grid;
   gap: 0;
@@ -2362,8 +2362,8 @@ Umfang:
   overflow: hidden;
 }
 
-/* Einzelne Rows: keine eigenen “Input-Felder” */
-#event-detail-panel .detail-meta-row{
+/* Rows: neutral (keine eigenen “Inputs”) */
+#event-detail-panel .detail-meta-rows .detail-meta-row{
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -2371,10 +2371,10 @@ Umfang:
 
   padding: 12px 12px;
 
-  border-radius: 0;
-  border: 0;
-
-  background: transparent;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 
   color: rgba(31,41,51,0.82);
   text-decoration: none !important;
@@ -2384,58 +2384,46 @@ Umfang:
   transition: background 140ms ease, transform 140ms ease;
 }
 
-/* Divider zwischen Rows */
-#event-detail-panel .detail-meta-row + .detail-meta-row{
-  border-top: 1px solid rgba(31,41,51,0.08);
+/* Divider between rows */
+#event-detail-panel .detail-meta-rows .detail-meta-row + .detail-meta-row{
+  border-top: 1px solid rgba(31,41,51,0.08) !important;
 }
 
-/* Location = Action-Row: nur subtiler Accent (kein eigener Field-Fill) */
-#event-detail-panel .detail-meta-row.is-location{
-  background: transparent;
-}
-#event-detail-panel .detail-meta-row.is-location .detail-meta-ext{
-  opacity: 0.70;
-}
-
-/* Datetime = Info-Row */
-#event-detail-panel .detail-meta-row.is-datetime{
-  background: transparent;
-}
-
-/* Interaktion nur für Links */
-@media (hover: hover){
-  #event-detail-panel a.detail-meta-row:hover{
-    background: color-mix(in srgb, var(--surface-panel-row) 90%, white);
-  }
-}
-
-#event-detail-panel a.detail-meta-row:active{
-  transform: translateY(1px);
-  background: color-mix(in srgb, var(--surface-panel-row) 84%, white);
-}
-
-#event-detail-panel a.detail-meta-row:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: 2px;
-}
-
-#event-detail-panel .detail-meta-icon{
+/* Icons/text/ext */
+#event-detail-panel .detail-meta-rows .detail-meta-icon{
   display: inline-flex;
   align-items: center;
   justify-content: center;
   opacity: 0.92;
 }
 
-#event-detail-panel .detail-meta-text{
+#event-detail-panel .detail-meta-rows .detail-meta-text{
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-#event-detail-panel .detail-meta-ext{
-  opacity: 0.55;
+#event-detail-panel .detail-meta-rows .detail-meta-ext{
+  opacity: 0.60;
 }
 
-/* Legacy chips container: als gleicher “Group”-Look */
+/* Hover/active only for links */
+@media (hover: hover){
+  #event-detail-panel .detail-meta-rows a.detail-meta-row:hover{
+    background: color-mix(in srgb, var(--surface-panel-row) 90%, white) !important;
+  }
+}
+
+#event-detail-panel .detail-meta-rows a.detail-meta-row:active{
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--surface-panel-row) 84%, white) !important;
+}
+
+#event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
+  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline-offset: 2px;
+}
+
+/* Legacy chips container: make it the same “Group” */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: 0;
@@ -2449,11 +2437,11 @@ Umfang:
   background: var(--surface-panel-row);
   overflow: hidden;
 
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
-/* Legacy chip = Row im Group-Block */
-#event-detail-panel .detail-chip{
+/* Legacy chip = row */
+#event-detail-panel .detail-meta-chips .detail-chip{
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -2463,10 +2451,10 @@ Umfang:
 
   padding: 12px 12px;
 
-  border-radius: 0;
-  border: 0;
-
-  background: transparent;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2483,15 +2471,11 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-#event-detail-panel .detail-chip + .detail-chip{
-  border-top: 1px solid rgba(31,41,51,0.08);
+#event-detail-panel .detail-meta-chips .detail-chip + .detail-chip{
+  border-top: 1px solid rgba(31,41,51,0.08) !important;
 }
 
-#event-detail-panel .detail-chip:active{
-  background: color-mix(in srgb, var(--surface-panel-row) 84%, white);
-}
-
-#event-detail-panel .detail-chip-text{
+#event-detail-panel .detail-meta-chips .detail-chip-text{
   min-width: 0;
   white-space: normal;
   overflow: visible;
@@ -2499,7 +2483,7 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* === END BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, less form-field look) === */
+/* === END BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look) === */
 
 
 
@@ -3234,4 +3218,5 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
