@@ -1908,45 +1908,54 @@ html.is-panel-open body {
 }
 
 
-/* DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look) */
+/* BEGIN PATCH DP-META-ENTERPRISE-V3
+   Zweck: Meta-Bereich (Ort/Datum) von "Form-Field/Card" zu "calm list rows" (Apple Wallet / Google Maps).
+   Umfang: Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
+*/
 
-/* Group container (v2 markup) */
+/* DETAIL META INFO (Enterprise v3: calm list rows, no input-card container) */
+
+/* Group container (v2 markup) -> neutral flow container */
 #event-detail-panel .detail-meta-rows{
   display: grid;
-  gap: 0;
+  gap: 2px;
 
-  border-radius: 14px;
-  border: 1px solid var(--border-panel-soft);
+  margin: 0 0 var(--space-md);
+  padding: 0;
 
-  background: var(--surface-panel-row);
-  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  overflow: visible;
 }
 
-/* Rows: neutral (keine eigenen “Inputs”) */
+/* Rows: calm list item (consistent with .detail-link DNA) */
 #event-detail-panel .detail-meta-rows .detail-meta-row{
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: var(--space-sm);
 
-  padding: 12px 12px;
+  min-height: 44px;
+  padding: 10px 12px;
 
   background: transparent !important;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-radius: 12px !important;
   box-shadow: none !important;
 
-  color: rgba(31,41,51,0.82);
+  color: rgba(31,41,51,0.80);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, transform 140ms ease, color 140ms ease;
 }
 
-/* Divider between rows */
+/* No “input-like” divider inside container */
 #event-detail-panel .detail-meta-rows .detail-meta-row + .detail-meta-row{
-  border-top: 1px solid rgba(31,41,51,0.08) !important;
+  border-top: 0 !important;
 }
 
 /* Icons/text/ext */
@@ -1954,12 +1963,13 @@ html.is-panel-open body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.92;
+  opacity: 0.90;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-text{
   min-width: 0;
   overflow-wrap: anywhere;
+  line-height: 1.32;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
@@ -1969,13 +1979,14 @@ html.is-panel-open body {
 /* Hover/active only for links */
 @media (hover: hover){
   #event-detail-panel .detail-meta-rows a.detail-meta-row:hover{
-    background: color-mix(in srgb, var(--surface-panel-row) 90%, white) !important;
+    background: rgba(31,41,51,0.05) !important;
+    color: rgba(31,41,51,0.86);
   }
 }
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row:active{
   transform: translateY(1px);
-  background: color-mix(in srgb, var(--surface-panel-row) 84%, white) !important;
+  background: rgba(31,41,51,0.07) !important;
 }
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
@@ -1983,24 +1994,24 @@ html.is-panel-open body {
   outline-offset: 2px;
 }
 
-/* Legacy chips container: make it the same “Group” */
+/* Legacy chips container: match calm list rows (no container card) */
 #event-detail-panel .detail-meta-chips{
   display: grid;
-  gap: 0;
-  margin: 0 0 var(--space-md);
+  gap: 2px;
 
+  margin: 0 0 var(--space-md);
   padding: 0;
 
-  border-radius: 14px;
-  border: 1px solid var(--border-panel-soft);
+  border: 0;
+  border-radius: 0;
 
-  background: var(--surface-panel-row);
-  overflow: hidden;
+  background: transparent;
+  overflow: visible;
 
   box-shadow: none !important;
 }
 
-/* Legacy chip = row */
+/* Legacy chip = calm list item */
 #event-detail-panel .detail-meta-chips .detail-chip{
   display: flex;
   align-items: center;
@@ -2009,11 +2020,12 @@ html.is-panel-open body {
   width: 100%;
   max-width: 100%;
 
-  padding: 12px 12px;
+  min-height: 44px;
+  padding: 10px 12px;
 
   background: transparent !important;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-radius: 12px !important;
   box-shadow: none !important;
 
   font-size: var(--font-event-meta);
@@ -2032,7 +2044,7 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-meta-chips .detail-chip + .detail-chip{
-  border-top: 1px solid rgba(31,41,51,0.08) !important;
+  border-top: 0 !important;
 }
 
 #event-detail-panel .detail-meta-chips .detail-chip-text{
@@ -2043,8 +2055,7 @@ html.is-panel-open body {
   overflow-wrap: anywhere;
 }
 
-
-/* GS-02 LOCATION ROW (enterprise surface + states + scale) */
+/* END PATCH DP-META-ENTERPRISE-V3 *//* GS-02 LOCATION ROW (enterprise surface + states + scale) */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2691,4 +2702,5 @@ html.is-panel-open body {
   cursor: default;
   transform: none;
 }
+
 
