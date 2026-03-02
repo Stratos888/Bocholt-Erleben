@@ -1,0 +1,37 @@
+# === BEGIN BLOCK: LLM DISCOVERY WORKFLOW (manual, test-safe, parallel) ===
+name: LLM Discovery (Test)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  llm_discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+
+      - name: Run LLM discovery smoke test
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+          # Tabs (wir nutzen eure bestehenden)
+          TAB_SOURCES: Sources
+          TAB_INBOX: Inbox
+          TAB_DISCOVERY_CANDIDATES: Discovery_Candidates
+          TAB_SOURCE_HEALTH: Source_Health
+
+        run: |
+          python scripts/llm-discovery-to-inbox.py
+# === END BLOCK: LLM DISCOVERY WORKFLOW (manual, test-safe, parallel) ===
