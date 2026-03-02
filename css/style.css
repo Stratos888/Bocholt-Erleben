@@ -1792,6 +1792,11 @@ html.is-panel-open body {
 }
 
 
+/* BEGIN PATCH DP-HEADER-ALIGNMENT-V1
+   Zweck: Header-Polish (Apple/Maps-Niveau): Icon als reiner Indikator, saubere Baseline/Vertikal-Ausrichtung, ruhiger Rhythmus.
+   Umfang: Ersetzt Detailpanel-Header-Layout (Header/Title-Row/Icon/Title).
+*/
+
 /* DETAILPANEL HEADER ROW (reserve close area + prevent overlap) */
 
 #event-detail-panel .detail-header{
@@ -1811,7 +1816,8 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-title-row{
-  --dp-badge-size: 40px;
+  /* Slightly smaller indicator for calmer, less “badge/button” feel */
+  --dp-badge-size: 36px;
 
   grid-column: 1;
   grid-row: 1;
@@ -1824,7 +1830,8 @@ html.is-panel-open body {
   min-height: var(--dp-badge-size);
   min-width: 0;
 
-  align-items: center;
+  /* Align to first-line rhythm instead of optical center (better for 2-line titles) */
+  align-items: start;
 
   padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
@@ -1842,8 +1849,8 @@ html.is-panel-open body {
   align-items: center;
   justify-content: center;
 
-  border-radius: 12px;
-
+  /* indicator-only: no “chip/button” styling */
+  border-radius: 10px;
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -1851,7 +1858,8 @@ html.is-panel-open body {
   font-size: var(--ui-icon-size-lg);
   line-height: 1;
 
-  opacity: var(--ui-icon-opacity);
+  /* calmer visual weight */
+  opacity: 0.78;
 
   /* Emoji neutralisieren */
   filter: var(--ui-icon-filter-emoji);
@@ -1860,7 +1868,8 @@ html.is-panel-open body {
   user-select: none;
   pointer-events: none;
 
-  margin-top: 0;
+  /* Optical alignment to title first line */
+  margin-top: 2px;
 }
 
 /* SVG soll NICHT gegrayscaled werden */
@@ -1868,7 +1877,7 @@ html.is-panel-open body {
   width: var(--ui-icon-size-lg);
   height: var(--ui-icon-size-lg);
 
-  opacity: var(--ui-icon-opacity);
+  opacity: 0.85;
   filter: none;
 }
 
@@ -1884,7 +1893,9 @@ html.is-panel-open body {
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
-  line-height: 1.28;
+  /* Align title’s first line visually with the indicator */
+  line-height: 1.24;
+  padding-top: 2px;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1906,6 +1917,8 @@ html.is-panel-open body {
   content: none;
   background: none;
 }
+
+/* END PATCH DP-HEADER-ALIGNMENT-V1 */
 
 
 /* BEGIN PATCH DP-META-ENTERPRISE-V3
@@ -2702,5 +2715,6 @@ html.is-panel-open body {
   cursor: default;
   transform: none;
 }
+
 
 
