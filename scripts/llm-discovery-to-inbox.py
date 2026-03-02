@@ -498,9 +498,8 @@ def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) 
 
 
 async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
+    # === BEGIN BLOCK: Collector (Playwright) with POST-pagination support (Bocholt) ===
     listing_url = cfg.url
-    current_url = listing_url
-    visited_pages: Set[str] = set()
     detail_urls: Set[str] = set()
 
     http_status_first = ""
@@ -526,75 +525,97 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         )
         page = await context.new_page()
 
-        for _ in range(max(cfg.max_pages, 1)):
-            if current_url in visited_pages:
-                break
-            visited_pages.add(current_url)
+        # Load first page
+        try:
+            resp = await page.goto(listing_url, wait_until="domcontentloaded", timeout=60_000)
+            if resp is not None:
+                http_status_first = str(resp.status)
+                http_status_last = http_status_first
+            if http_status_first and int(http_status_first) >= 400:
+                error_msg = f"non_200_on_navigation: {http_status_first}"
+                await context.close()
+                await browser.close()
+                return {
+                    "listing_url": listing_url,
+                    "pages_visited": 0,
+                    "detail_urls": [],
+                    "http_status_last": http_status_last,
+                    "http_status_first": http_status_first,
+                    "error": error_msg,
+                }
+        except Exception as e:
+            error_msg = f"playwright_fetch_error: {e}"
+            await context.close()
+            await browser.close()
+            return {
+                "listing_url": listing_url,
+                "pages_visited": 0,
+                "detail_urls": [],
+                "http_status_last": http_status_last,
+                "http_status_first": http_status_first,
+                "error": error_msg,
+            }
 
-            try:
-                resp = await page.goto(current_url, wait_until="domcontentloaded", timeout=60_000)
-                status = ""
-                if resp is not None:
-                    status = str(resp.status)
-                    http_status_last = status
-                    if not http_status_first:
-                        http_status_first = status
+        pages_visited = 0
 
-                # Wenn Pagination/weiter-Seite geblockt wird, nicht weiter parsen (verhindert Challenge-HTML-Müll)
-                if status and int(status) >= 400:
-                    if not error_msg:
-                        error_msg = f"non_200_on_navigation: {status}"
-                    break
+        for page_idx in range(max(cfg.max_pages, 1)):
+            pages_visited += 1
 
-                await page.wait_for_timeout(1500)
-                html = await page.content()
-            except Exception as e:
-                error_msg = f"playwright_fetch_error: {e}"
-                break
-
+            # Parse current page content
+            await page.wait_for_timeout(1200)
+            html = await page.content()
             soup = BeautifulSoup(html, "html.parser")
 
             for a in soup.find_all("a", href=True):
-                href = urljoin(current_url, a["href"])
+                href = urljoin(listing_url, a["href"])
                 if is_probable_detail_url(listing_url, href):
                     detail_urls.add(href)
 
-            # === BEGIN BLOCK: Pagination via Playwright click (Bocholt POST form) ===
-
-            # finde "Nächste Seite" Button
-            next_button = await page.query_selector('button[aria-label="Nächste Seite"]')
-
-            if not next_button:
+            # Stop if we reached max pages
+            if page_idx >= max(cfg.max_pages, 1) - 1:
                 break
 
+            # Bocholt pagination is POST via button[aria-label="Nächste Seite"]
+            next_btn = await page.query_selector('button[aria-label="Nächste Seite"]')
+            if not next_btn:
+                break
+
+            # If the button is effectively disabled (wrapper has class 'disabled'), stop
             try:
-                await next_button.click()
-                await page.wait_for_timeout(1500)
-
-                # nach Klick neuen Content lesen
-                html = await page.content()
-
-                # neue URL ist gleich, daher current_url nicht ändern
-                # wichtig: soup neu setzen
-                soup = BeautifulSoup(html, "html.parser")
-
+                is_disabled = await next_btn.evaluate(
+                    "btn => btn.closest('.pagination__item')?.classList.contains('disabled') || btn.disabled === true"
+                )
+                if is_disabled:
+                    break
             except Exception:
-                break
+                pass
 
-            # === END BLOCK: Pagination via Playwright click ===
+            # Click and wait for navigation (form submit)
+            try:
+                async with page.expect_navigation(wait_until="domcontentloaded", timeout=60_000) as nav:
+                    await next_btn.click()
+                nav_resp = await nav.value
+                if nav_resp is not None:
+                    http_status_last = str(nav_resp.status)
+                    if int(http_status_last) >= 400:
+                        error_msg = f"non_200_on_navigation: {http_status_last}"
+                        break
+            except Exception as e:
+                error_msg = f"pagination_click_error: {e}"
+                break
 
         await context.close()
         await browser.close()
 
-    # Für Source_Health: first_status ist der relevante “konnte die Quelle grundsätzlich laden?”
     return {
         "listing_url": listing_url,
-        "pages_visited": len(visited_pages),
+        "pages_visited": pages_visited,
         "detail_urls": sorted(detail_urls),
         "http_status_last": http_status_last,
         "http_status_first": http_status_first,
         "error": error_msg,
     }
+    # === END BLOCK: Collector (Playwright) with POST-pagination support (Bocholt) ===
 
 
 def make_candidate_row(
