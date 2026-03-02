@@ -2224,7 +2224,8 @@ Umfang:
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
 - Panel-Header wirkt wie eigenes Interface: klare Header-Zone + Divider
-- Titel + Kategorie-Icon sind optisch exakt aligned (kein “hängt schief”)
+- Titel + Kategorie-Icon sind optisch exakt aligned
+- Titel kann nie unter den Close-Button laufen (rechts reservierter Bereich)
 - Kategorie-Icon ist Indikator (Badge), kein Button-Look
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
@@ -2246,7 +2247,7 @@ Umfang:
   border-bottom: 1px solid rgba(31,41,51,0.08);
 }
 
-/* Titelzeile: Icon + Titel auf einer Linie */
+/* Titelzeile: Icon + Titel auf einer Linie (rechts Close-Area reservieren) */
 #event-detail-panel .detail-title-row{
   --dp-badge-size: 40px;
 
@@ -2261,7 +2262,11 @@ Umfang:
   min-height: var(--dp-badge-size);
   min-width: 0;
 
-  align-items: center; /* <-- Fix: vertikales Alignment */
+  align-items: center;
+
+  /* Reserve für absoluten Close-Button (var(--ui-tap-target) @ right gutter) */
+  padding-right: calc(var(--ui-tap-target) + var(--space-md));
+  box-sizing: border-box;
 }
 
 /* Kategorie-Indikator (kein Button) */
@@ -2278,18 +2283,18 @@ Umfang:
 
   border-radius: 12px;
 
-  background: transparent;     /* <-- Fix: kein Button-Fill */
-  border: 0;                   /* <-- Fix: kein Button-Rahmen */
+  background: transparent;
+  border: 0;
   box-shadow: none;
 
-  color: rgba(31,41,51,0.56);  /* currentColor -> SVG stroke */
+  color: rgba(31,41,51,0.56);
   opacity: 1;
 
   cursor: default;
   user-select: none;
-  pointer-events: none;        /* <-- Fix: nie interaktiv wirken */
+  pointer-events: none;
 
-  margin-top: 0;               /* <-- Fix: keine optische Verschiebung */
+  margin-top: 0;
 }
 
 #event-detail-panel .detail-category-icon svg{
@@ -2311,7 +2316,7 @@ Umfang:
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
-  line-height: 1.28; /* <-- Fix: stabilere Linebox für Alignment */
+  line-height: 1.28;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -2337,8 +2342,6 @@ Umfang:
 }
 
 /* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
-
-
 
 
 /* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look)
@@ -3218,5 +3221,6 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
