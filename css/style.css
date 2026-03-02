@@ -1,22 +1,10 @@
-/* === BEGIN BLOCK: GLOBAL DESIGN TOKENS ===
-Zweck:
-- Globale Design-System-Tokens für alle UI-Komponenten
-- Panel-Tokens: Detailpanel ist “Card Expanded” (keine neue Designwelt)
-- Ableitung aus bestehenden Tokens (primary-muted etc.)
-Muss am Anfang der CSS-Datei stehen
-=== */
+/* GLOBAL DESIGN TOKENS */
 
 :root{
 
   --ui-overlay-dim: rgba(17, 24, 39, 0.36);
 
-  /* === BEGIN SUBBLOCK: PANEL SEMANTIC TOKENS (Card Expanded DNA)
-  Zweck:
-  - Semantische Tokens für Detailpanel (Surface/Border/Shadow)
-  - Werte werden aus bestehenden Tokens abgeleitet (keine Hardcodes in Panel-Blöcken)
-  Umfang:
-  - --surface-panel*, --border-panel*, --shadow-panel*
-  === */
+/* PANEL SEMANTIC TOKENS (Card Expanded DNA) */
 
   /* Surfaces (sichtbar, aber weiterhin ruhig) */
   --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
@@ -37,11 +25,9 @@ Muss am Anfang der CSS-Datei stehen
   --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
   --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
 
-  /* === END SUBBLOCK: PANEL SEMANTIC TOKENS (Card Expanded DNA) === */
 
 }
 
-/* === END BLOCK: GLOBAL DESIGN TOKENS === */
 /**
  * STYLE.CSS – Bocholt erleben (MVP frozen)
  * Ziel: ruhig, modern, funktional, konsistent
@@ -58,14 +44,7 @@ Muss am Anfang der CSS-Datei stehen
   padding: 0;
   box-sizing: border-box;
 }
-/* === BEGIN BLOCK: REDUCED MOTION CONTRACT (enterprise a11y) ===
-Zweck:
-- Respektiert OS Setting „Bewegung reduzieren“
-- Verhindert unnötige Transitions/Animationen (Cards, Pills, Spinner, Panel)
-- Keine Layout-Änderungen, nur Motion
-Umfang:
-- globaler Media Query Guardrail
-=== */
+/* REDUCED MOTION CONTRACT (enterprise a11y) */
 @media (prefers-reduced-motion: reduce){
 
   html:focus-within{
@@ -82,7 +61,6 @@ Umfang:
   }
 
 }
-/* === END BLOCK: REDUCED MOTION CONTRACT (enterprise a11y) === */
 
 :root {
   /* 2026 UI Tokens */
@@ -95,15 +73,7 @@ Umfang:
   --color-text-secondary: #5F6B73;
   --color-text-muted: #8A949B;
 
-/* === BEGIN BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) ===
-  Zweck:
-  - Korrigiert Token-Inkonsistenzen (fehlendes --radius-card).
-  - Definiert einen einheitlichen Seiten-Gutter für die gesamte App.
-  - Definiert ein „Detailpanel Layout Contract“ (Header/Close/Actionbar Maße) als Single Source of Truth.
-  - Definiert UI-Control Tokens (Buttons/CTA/Focus/Border/Shadow) für app-weite Konsistenz.
-  Umfang:
-  - Nur Token in :root (Spacing, Radius, Shadow, --gutter, Detailpanel-Contract, UI-Control Tokens).
-  === */
+/* CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
@@ -122,56 +92,30 @@ Umfang:
   --gutter: var(--space-lg);
 
    /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
-   /* === BEGIN FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) ===
-  Zweck: Titel/Icon etwas weiter vom Grab-Handle weg (ruhiger), Close bleibt über Token synchron.
-  Umfang: Nur Token --dp-header-pad-top.
-  === */
+/* SECTION */
   --dp-header-pad-top: 34px;            /* entspricht #detail-content padding-top + Close top */
-  /* === END FIX: DETAILPANEL HEADER TOP GAP (more distance to grab-handle) === */
 
-  /* === BEGIN FIX: DETAILPANEL SHEET RADIUS (single source of truth) ===
-  Zweck:
-  - Sheet-Radius ist systemisch konsistent (Desktop + Mobile)
-  - verhindert „20px vs 22px“ Regressionen durch Media-Overrides
-  Umfang:
-  - Nur Token
-  === */
+/* SECTION */
   --dp-sheet-radius: 22px;
-  /* === END FIX: DETAILPANEL SHEET RADIUS (single source of truth) === */
 
-  /* === BEGIN BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) ===
-Zweck: Spacing auf Skala (4/8/12/16/24/32) – entfernt 10px Magic Number.
-Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
-=== */
+/* DETAILPANEL ACTIONBAR TOKENS (scale-aligned) */
 --dp-close-size: 36px;                 /* sichtbare Close-Größe (Hit-Area bleibt >=44px via ::before) */
 --dp-actionbar-h: 78px;                /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
 --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
 --dp-actionbar-pad-y: var(--space-sm); /* vertikales Padding in der Actionbar (8px) */
-/* === END BLOCK: DETAILPANEL ACTIONBAR TOKENS (scale-aligned) === */
-   /* === BEGIN FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) ===
-  Zweck: Etwas mehr Reserve, damit Description garantiert komplett oberhalb der Actionbar endet.
-  Umfang: Nur --dp-actionbar-reserve.
-  === */
+/* SECTION */
   --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px); /* Content-Reserve inkl. Safe-Area */
-  /* === END FIX: ACTIONBAR RESERVE TUNING (prevent text underlap) === */
 
 
-   /* === BEGIN BLOCK: UI CONTROL TOKENS (buttons/cta/focus) ===
-  Zweck:
-  - Single Source of Truth für Button/CTA DNA (Radius/Border/Surface/Shadow/Focus/Typo)
-  - Werte spiegeln aktuelle UI, damit sich optisch möglichst wenig ändert.
-  Umfang:
-  - Nur Tokens, keine Selektoren.
-  === */
+/* UI CONTROL TOKENS (buttons/cta/focus) */
   --ui-radius-sm: 12px;
   --ui-radius-md: 14px;
 
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
- /* === BEGIN FIX: RGBA ALPHA TYPO (ui-border-primary) === */
+/* SECTION */
  --ui-border-primary: rgba(139,207,74,0.45);
- /* === END FIX: RGBA ALPHA TYPO (ui-border-primary) === */
 
   --ui-surface-soft: rgba(255,255,255,0.55);
   --ui-surface-soft-hover: rgba(255,255,255,0.74);
@@ -195,13 +139,7 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
 
-  /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
-  Zweck:
-  - Single Source of Truth für Icon-DNA (Größen/Opacity/Emoji-Filter)
-  - Single Source of Truth für Tap-Targets (44×44) + Close-Button DNA
-  Umfang:
-  - Nur Tokens, keine Selektoren.
-  === */
+/* ICON TOKENS (app-wide) */
 
   /* Tap target (app-wide contract) */
   --ui-tap-target: 44px;
@@ -227,13 +165,6 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   --ui-close-font-size: 22px;
   --ui-close-color: rgba(31,41,51,0.74);
 
-  /* === END BLOCK: ICON TOKENS (app-wide) === */
-
-   /* === END BLOCK: UI CONTROL TOKENS (buttons/cta/focus) === */
-  /* === END BLOCK: CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) === */
-
-
-
 
   /* Backward compat */
   --bg: var(--color-background);
@@ -246,9 +177,8 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   --primary: var(--color-primary);
   --accent: var(--color-primary);
 
-/* === BEGIN FIX: RGBA ALPHA TYPO (focus-ring) === */
+/* SECTION */
 --focus-ring: rgba(139,207,74,0.25);
-/* === END FIX: RGBA ALPHA TYPO (focus-ring) === */
 
   --radius: var(--radius-card);
   --shadow-sm: var(--shadow-card);
@@ -260,67 +190,37 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
 
-     /* === BEGIN BLOCK: LAYOUT TOKENS (header + sticky stack) ===
-  Zweck: Single Source of Truth für Sticky-Offsets + ruhige Brand-DNA.
-  Umfang: Header-Höhe + Abstand + Farben für Header/Divider + optionaler Desktop-Gutter.
-  Hinweis: --gutter kommt global aus CORE SPACING TOKENS.
-  === */
+/* LAYOUT TOKENS (header + sticky stack) */
   --gutter-lg: 24px;                 /* optional: desktop */
 
   --header-h: 48px;                  /* entspricht .app-header min-height */
   --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
-  /* === END BLOCK: LAYOUT TOKENS (header + sticky stack) === */
-
 
 
 }
 
-/* === BEGIN BLOCK: GLOBAL TYPOGRAPHY BASE ===
-Zweck: Einheitliche System-Schrift für die gesamte App.
-Umfang: body Basis.
-=== */
+/* GLOBAL TYPOGRAPHY BASE */
 body{
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #f4f6ef; /* Basis: mobile & desktop gleich */
   color: #111827;
 }
-/* === BEGIN BLOCK: VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) ===
-Zweck:
-- verhindert Viewport-„Gummi“ beim Überziehen (Android)
-- stabilisiert sticky header/top-stack (kein Wobble)
-Umfang:
-- nur Root-Scrollverhalten, kein Layout
-=== */
+/* VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) */
 html,
 body{
   overscroll-behavior-y: none;
 }
-/* === END BLOCK: VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) === */
-/* === BEGIN BLOCK: DESKTOP BACKDROP POLISH ===
-Zweck:
-- Desktop: Außenfläche minimal absetzen.
-- App-Frame bleibt hell und ruhig.
-- Mobile/PWA unverändert.
-- Desktop bekommt automatisch größeren Gutter.
-Umfang:
-- Nur Hintergrundfarben + :root Gutter via Media Query.
-=== */
+/* DESKTOP BACKDROP POLISH */
 @media (min-width: 900px){
   :root{
     --gutter: var(--gutter-lg);
-   /* === BEGIN BLOCK: OVERLAY TOKENS (global design system contract) ===
-  Zweck:
-  - Einheitliches Overlay-Dim für alle Overlays
-  - Grundlage für Detailpanel, Filter, Chooser und zukünftige Overlays
-  - verhindert visuelle Inkonsistenzen
-  === */
+/* OVERLAY TOKENS (global design system contract) */
 
   --ui-overlay-dim: rgba(17, 24, 39, 0.36);
 
-  /* === END BLOCK: OVERLAY TOKENS === */   
   }
 
   body{
@@ -333,15 +233,9 @@ Umfang:
     border-radius: 18px;
   }
 }
-/* === END BLOCK: DESKTOP BACKDROP POLISH === */
 
 
-/* === END BLOCK: GLOBAL TYPOGRAPHY BASE === */
-
-/* === BEGIN BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) ===
-Zweck: Links konsistent, Textseiten lesbar, CTA konsistent + Referenz-Infoseiten (Content-Blueprint UI).
-Umfang: a + .page + .modal-cta-button + Content-Komponenten (.content-*)
-=== */
+/* GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) */
 a{
   color: var(--color-primary);
   text-decoration: none;
@@ -350,14 +244,7 @@ a{
 a:hover{ text-decoration: underline; }
 a:visited{ color: var(--color-primary); }
 
-/* === BEGIN BLOCK: PAGE LAYOUT CONTRACT (top-app readability) ===
-Zweck:
-- App-weite Lesbarkeit: Content auf großen Screens nicht über die volle Breite
-- Mobile bleibt unverändert (padding bleibt über --gutter)
-- Keine Seite muss einzeln angepasst werden
-Umfang:
-- .page Grundlayout + optional max-width via Token
-=== */
+/* PAGE LAYOUT CONTRACT (top-app readability) */
 .page{
   width: 100%;
   padding: var(--gutter);
@@ -372,7 +259,6 @@ Umfang:
     padding-right: var(--gutter-lg);
   }
 }
-/* === END BLOCK: PAGE LAYOUT CONTRACT (top-app readability) === */
 
 .page h1{
   font-size: 1.35rem;
@@ -397,10 +283,7 @@ Umfang:
 }
 .page li{ margin: 6px 0; }
 
-/* === BEGIN BLOCK: CONTENT PAGE COMPONENTS (reference pages) ===
-Zweck: Wiederverwendbare Bausteine für ruhige, ige Inhaltsseiten (Blueprint).
-Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locations-benefits, .content-links/.content-link.
-=== */
+/* CONTENT PAGE COMPONENTS (reference pages) */
 .content-hero{
   margin: 4px 0 14px;
 }
@@ -502,20 +385,14 @@ Umfang: .content-hero, .content-card, .content-steps, .content-actions, .locatio
   color: var(--color-text-muted);
 }
 
-/* === BEGIN BLOCK: CONTENT LINKS (top-pwa navigation list, borderless) ===
-Zweck: Ruhige, hochwertige Navigationsliste ohne Button- oder Rahmen-Anmutung.
-Umfang: .content-links + .content-link (nur innerhalb von Inhaltsseiten).
-=== */
+/* CONTENT LINKS (top-pwa navigation list, borderless) */
 .content-links{
   margin-top: 6px;
   display: grid;
   gap: 2px;
 }
 
-/* === BEGIN BLOCK: CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) ===
-Zweck: Pfeil sitzt direkt am Text (klar klickbar), nicht am rechten Rand.
-Umfang: Alle .content-link Navigationseinträge.
-=== */
+/* CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) */
 .content-link{
   display: inline-flex;
   align-items: center;
@@ -540,7 +417,6 @@ Umfang: Alle .content-link Navigationseinträge.
   font-weight: 700;
   transform: translateY(1px);
 }
-/* === END BLOCK: CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) === */
 
 
 .content-link:hover{
@@ -551,8 +427,6 @@ Umfang: Alle .content-link Navigationseinträge.
 .content-link:visited{
   color: var(--color-text-primary);
 }
-/* === END BLOCK: CONTENT LINKS (top-pwa navigation list, borderless) === */
-
 
 
 .modal-cta-button{
@@ -582,18 +456,12 @@ Umfang: Alle .content-link Navigationseinträge.
   box-shadow: var(--ui-shadow-cta-active);
 }
 
-/* === END BLOCK: GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) === */
 
-
-/* === BEGIN BLOCK: GLOBAL HEADINGS TYPOGRAPHY ===
-Zweck: Überschriften ohne Serif-Anmutung.
-Umfang: h1–h6.
-=== */
+/* GLOBAL HEADINGS TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   font-weight: 600;
 }
-/* === END BLOCK: GLOBAL HEADINGS TYPOGRAPHY === */
 
 /* Accessibility */
 :focus-visible {
@@ -602,24 +470,12 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 10px;
 }
 
-/* === BEGIN BLOCK: FILTER SHEET SCROLL LOCK ===
-Zweck: Beim offenen Filter-Sheet darf der Hintergrund nicht scrollen.
-Umfang: html+body.
-=== */
+/* FILTER SHEET SCROLL LOCK */
 body.is-sheet-open { overflow: hidden; }
 html.is-sheet-open { overflow: hidden; }
 html.is-sheet-open body { overflow: hidden; }
-/* === END BLOCK: FILTER SHEET SCROLL LOCK === */
 
-/* === BEGIN BLOCK: OVERLAY SAFETY CONTRACT (fixed overlays never clipped) ===
-Zweck:
-- Verhindert, dass sticky/transform/backdrop/contain Overlays „einsperren“
-- Gilt nur, wenn ein Overlay offen ist (sheet oder detailpanel)
-- Systematischer Guardrail gegen Regressionen
-
-Umfang:
-- Neutralisiert nur Risiko-Eigenschaften auf .top-stack während Overlays
-=== */
+/* OVERLAY SAFETY CONTRACT (fixed overlays never clipped) */
 
 /* Wenn irgendein Overlay offen ist: top-stack darf keinen containing context bauen */
 body.is-sheet-open .top-stack,
@@ -635,7 +491,6 @@ body.is-panel-open .top-stack{
 body.is-sheet-open .top-stack{ z-index: 9997 !important; }
 body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
 
-/* === END BLOCK: OVERLAY SAFETY CONTRACT (fixed overlays never clipped) === */
 
 /* ============================================
    LOADING & MESSAGES
@@ -709,14 +564,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) ===
-Zweck:
-- Mehr nutzbare Breite (kein “Card-in-Card-in-Card” Look).
-- Abschnittsüberschriften („Heute“, „Demnächst“) als ruhige Labels ohne Rahmen.
-- Guardrail gegen horizontales Overflow bleibt erhalten.
-Umfang:
-- Nur .events-section / .events-section-title / .event-cards-grid / .event-card Basis-Layout (CSS-only).
-=== */
+/* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
 /* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
@@ -730,9 +578,8 @@ Umfang:
 
 /* Feed-Container: full-bleed, keine eigene “Surface” */
 .events-section{
-  /* === BEGIN FIX: TOP STACK CLEARANCE (section labels never tuck under) === */
+/* SECTION */
   padding: 10px var(--gutter) 0;
-  /* === END FIX: TOP STACK CLEARANCE (section labels never tuck under) === */
 
   background: transparent;
   border-radius: 0;
@@ -741,31 +588,11 @@ Umfang:
 
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
-/* === BEGIN FIX: GOLDEN SCREEN RHYTHM NORMALIZATION ===
-Zweck:
-Golden Screen verlangt konstanten 24px Rhythmus zwischen allen Feed-Elementen.
+/* SECTION */
 
-Labels dürfen KEINEN eigenen vertikalen Abstand erzeugen,
-sondern müssen Teil des Grid-Rhythmus sein.
+/* SECTION */
 
-Umfang:
-Nur margin-Reset für Section Labels.
-=== */
-
-/* === BEGIN POLISH: SECTION HEADER PREMIUM HIERARCHY ===
-Zweck:
-Section Header klar als Gruppierung sichtbar machen,
-ohne Layout oder Rhythmus zu verändern.
-=== */
-
-/* === BEGIN BLOCK: SECTION HEADER (FINAL ENTERPRISE RHYTHM) ===
-Zweck:
-- Perfekt konsistenter Feed-Rhythmus
-- Abstand wird ausschließlich vom Grid (gap:16px) gesteuert
-- Keine zusätzlichen margin-Offsets
-
-Enterprise-Standard für Feed-Apps
-=== */
+/* SECTION HEADER (FINAL ENTERPRISE RHYTHM) */
 
 .events-section-title{
 
@@ -782,21 +609,9 @@ Enterprise-Standard für Feed-Apps
 
 }
 
-/* === END BLOCK: SECTION HEADER (FINAL ENTERPRISE RHYTHM) === */
-/* === END POLISH: SECTION HEADER PREMIUM HIERARCHY === */
-
-/* === END FIX: GOLDEN SCREEN RHYTHM NORMALIZATION === */
-
-
 
 /* Grid/Stack: nur Abstand, keine eigene Surface */
-/* === BEGIN FIX: EVENTS GRID GAP DENSITY (24 -> 16) ===
-Zweck:
-- Mehr „Information Density“ im ersten Viewport (insb. mit Tabbar).
-- Rhythmus bleibt strikt konsistent (ein Gap-Wert für alle direkten Nachbarn).
-Umfang:
-- Nur gap der .event-cards-grid (kein Layout/HTML/JS).
-=== */
+/* SECTION */
 .event-cards-grid{
   display: flex;
   flex-direction: column;
@@ -807,7 +622,6 @@ Umfang:
   border-radius: 0;
   box-shadow: none;
 }
-/* === END FIX: EVENTS GRID GAP DENSITY (24 -> 16) === */
 
 
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
@@ -817,42 +631,17 @@ Umfang:
 }
 
 
-/* === END BLOCK: EVENTS LIST LAYOUT (full-bleed feed + labels without frames) === */
-
-
-
-
 /* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
 
 
-/* === BEGIN BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) ===
-Zweck:
-- Stil 1 (Apple/Google clean): weniger “schwebend”, mehr Liste.
-- Cards: Border statt Shadow; ruhiger Hover ohne Lift.
-- Date-Chip: integrierter, weniger “Sticker”.
-Umfang:
-- Nur Eventcard-Layout/Badge/Body/Title/Icon innerhalb dieses Blocks.
-=== */
+/* EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) */
 
-/* === BEGIN BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow) ===
-Zweck: Premium-Feeling durch mehr Luft + subtilen Shadow, ohne Layout/JS zu ändern.
-Umfang: Nur .event-card + .event-card:hover im FINAL LAYOUT Block.
-=== */
+/* EVENT CARD PREMIUM POLISH (spacing + soft shadow) */
 
-/* === BEGIN BLOCK: EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) ===
-Zweck: Premium-Feeling durch subtilen Shadow + klares Press-Feedback + sichtbaren Fokus
-Umfang: Nur .event-card Zustände innerhalb FINAL LAYOUT Block (kein Layout/HTML/JS)
-=== */
+/* EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) */
 
 /* --- Card: 2 Spalten (Date-Chip | Content) --- */
-/* === BEGIN FIX: EVENT CARD RAIL MODEL (single coordinate system, top-app) ===
-Zweck:
-- Rail ist echte Grid-Spalte + beginnt an Card-Kante (kein left:-padding Hack)
-- Rail-Breite = Grid-Spaltenbreite (Single Source of Truth)
-- Badge kann nicht „über Rail-Rand“ wirken; Proof: railLeft-cardLeft=0, delta<=1px
-Umfang:
-- Ersetzt .event-card + .event-card::before innerhalb EVENT CARD FINAL LAYOUT
-=== */
+/* SECTION */
 
 /* --- Card: 2 Spalten (Rail | Content) --- */
 .event-card{
@@ -904,7 +693,6 @@ Umfang:
   z-index: 1;
 }
 
-/* === END FIX: EVENT CARD RAIL MODEL (single coordinate system, top-app) === */
 
 .event-card > *{
   position: relative;
@@ -939,23 +727,10 @@ Umfang:
   outline-offset: 3px;
 }
 
-/* === END POLISH: EVENT CARD SURFACE INTEGRATION (left rail, premium calm, v2) === */
 
+/* SECTION */
 
-/* === BEGIN POLISH: EVENT DATE BADGE MICRO-HIERARCHY (less sticker, contrast tuning) ===
-Zweck:
-- Date-Badge wirkt weniger „Sticker“, mehr integriert
-- Hierarchie feiner: Zahl dominiert, Labels ruhiger (Kontrast-Feintuning)
-Umfang:
-- Nur .event-date-badge + .event-date-badge__wday/__day/__month
-=== */
-
-/* === BEGIN FIX: EVENT DATE BADGE CENTER LOCK (grid column) ===
-Zweck:
-- Badge zentriert in der Rail-Spalte (horizontal + vertikal), ohne optische Drift
-Umfang:
-- Nur .event-date-badge Block
-=== */
+/* SECTION */
 .event-date-badge{
   width: 42px;
 
@@ -981,12 +756,8 @@ Umfang:
   line-height: 1;
   text-align: center;
 }
-/* === END FIX: EVENT DATE BADGE CENTER LOCK (grid column) === */
 
-/* === BEGIN BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) ===
-Zweck: Premium-Hierarchie im Date-Chip → Zahl dominiert, Labels ruhig
-Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
-=== */
+/* EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) */
 
 .event-date-badge__wday{
   font-size: 0.62rem;
@@ -1010,8 +781,6 @@ Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
   text-transform: uppercase;
 }
 
-/* === END BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) === */
-/* === END POLISH: EVENT DATE BADGE MICRO-HIERARCHY (less sticker, contrast tuning) === */
 
 /* --- Content Area: 2 Zeilen --- */
 .event-card-body{
@@ -1024,11 +793,10 @@ Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
 
 /* Title-Zeile: Text + Icon getrennt */
 .event-title{
-  /* === BEGIN FIX: TITLE ROW LAYOUT (text + icon stay together) === */
+/* SECTION */
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  /* === END FIX: TITLE ROW LAYOUT (text + icon stay together) === */
 
   font-size: 1.05rem;
   font-weight: 700;
@@ -1037,12 +805,8 @@ Umfang: .event-date-badge__* innerhalb EVENT CARD FINAL LAYOUT Block
   line-height: 1.25;
 }
 
-/* === END FIX: EVENT TITLE ELITE TYPOGRAPHY === */
 
-/* === BEGIN BLOCK: EVENT TITLE FINAL (2-line clamp, single source) ===
-Zweck: Titel max. 2 Zeilen, ohne spätere Overrides/!important.
-Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
-=== */
+/* EVENT TITLE FINAL (2-line clamp, single source) */
 
 .event-title__text{
   flex: 1 1 auto;
@@ -1059,17 +823,8 @@ Umfang: Nur .event-title__text innerhalb EVENT CARD FINAL LAYOUT Block.
   hyphens: auto;
 }
 
-/* === END BLOCK: EVENT TITLE FINAL (2-line clamp, single source) === */
 
-
-
-/* === BEGIN BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) ===
-Zweck:
-- Kategorie-Icon auf Eventcards = gleiches Icon-System wie Actionbar (ruhig, neutral, tokenized)
-- Funktioniert für Emoji/Text-Icons (span) ohne svg/img (dein aktueller Fall)
-Umfang:
-- Nur .event-title .event-category-icon (Eventcards)
-=== */
+/* EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
@@ -1108,10 +863,9 @@ Umfang:
   opacity: var(--ui-icon-opacity);
   filter: none;
 }
-/* === END BLOCK: EVENT CARD CATEGORY INDICATOR (enterprise, calm, detailpanel-DNA) === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
-/* === BEGIN POLISH: EVENT META PREMIUM CALMNESS === */
+/* SECTION */
 
 .event-meta{
 
@@ -1129,10 +883,6 @@ Umfang:
 
 }
 
-/* === END POLISH: EVENT META PREMIUM CALMNESS === */
-
-/* === END BLOCK: EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy + meta color) === */
-
 
 /* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
 .event-card > .event-category-icon{
@@ -1140,13 +890,7 @@ Umfang:
 }
 
 /* Mobile fein */
-/* === BEGIN FIX: EVENT CARD MOBILE RAIL MODEL (single coordinate system) ===
-Zweck:
-- Rail ist echte Grid-Spalte + beginnt an Card-Kante (kein left:-padding Hack)
-- Badge zentriert in Rail-Spalte; Rail/Spalte immer identisch
-Umfang:
-- Nur @media (max-width: 360px) innerhalb EVENT CARD FINAL LAYOUT
-=== */
+/* SECTION */
 @media (max-width: 360px){
   .event-card{
     --rail-w: 56px;
@@ -1161,12 +905,6 @@ Umfang:
   .event-card::before{ width: var(--rail-w); left: 0; }
   .event-date-badge{ width: 40px; }
 }
-/* === END FIX: EVENT CARD MOBILE RAIL MODEL (single coordinate system) === */
-
-/* === END BLOCK: EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) === */
-
-
-
 
 
 /* (removed) legacy event title/meta/icon/location overrides to avoid contradictions */
@@ -1188,24 +926,12 @@ Umfang:
   text-overflow: ellipsis;
 }
 
-/* === END BLOCK: EVENT CARDS POLISH (Header-DNA, compact A, premium) === */
-
-
-
-
-
 
 /* ============================================
    FOOTER
    ============================================ */
 
-/* === BEGIN BLOCK: BOTTOM TAB BAR (marker fix; keep CSS valid) ===
-Zweck:
-- Repariert ungültigen “freien” Marker-Text, der CSS parsing ab dieser Stelle brechen kann.
-Umfang:
-- Nur Kommentar-Markierung; keine Styles.
-=== */
-/* === END BLOCK: BOTTOM TAB BAR (marker fix; keep CSS valid) === */
+/* BOTTOM TAB BAR (marker fix; keep CSS valid) */
 
 footer {
   background: #0b1220;
@@ -1215,13 +941,7 @@ footer {
 }
 
 
-/* === BEGIN BLOCK: RESPONSIVE (mobile unchanged + desktop frame) ===
-Zweck:
-- Mobile/PWA bleibt unverändert.
-- Desktop: zentrierter App-Frame + ruhiges Grid.
-Umfang:
-- Ergänzt nur Desktop-Overrides via Media Queries.
-=== */
+/* RESPONSIVE (mobile unchanged + desktop frame) */
 
 /* Mobile: bleibt wie bisher */
 @media (max-width: 768px) {
@@ -1252,7 +972,6 @@ Umfang:
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
-/* === END BLOCK: RESPONSIVE (mobile unchanged + desktop frame) === */
 
 
 /* ============================================
@@ -1264,17 +983,8 @@ Umfang:
   margin: 0;
 }
 
-/* === BEGIN BLOCK: TOP STACK (search as hero, reduced section feel) ===
-Zweck: Noch kompakter + ruhiger (Feed-first), weniger “Formularfläche”, sticky bleibt premium.
-Umfang: Ersetzt .top-stack vollständig (Spacing/Look), ohne Layout-Logik zu ändern.
-=== */
-/* === BEGIN BLOCK: TOP STACK (sticky, wobble-safe) ===
-Zweck:
-- Sticky bleibt stabil (kein Android „Wobble“)
-- backdrop-filter bleibt erhalten
-Umfang:
-- ersetzt .top-stack vollständig (nur Stabilität, keine Optik-Änderung)
-=== */
+/* TOP STACK (search as hero, reduced section feel) */
+/* TOP STACK (sticky, wobble-safe) */
 .top-stack{
   position: sticky;
   top: calc(var(--header-h) + var(--stack-gap));
@@ -1295,18 +1005,9 @@ Umfang:
   transform: none;
   contain: none;
 }
-/* === END BLOCK: TOP STACK (sticky, wobble-safe) === */
-/* === END BLOCK: TOP STACK (search as hero, reduced section feel) === */
 
 
-
-
-
-
-/* === BEGIN BLOCK: SEARCH BAR (functional hero, top- level) ===
-Zweck: Exakt gleiche Control-Höhe wie Filter-Pills (wirklich identisch).
-Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
-=== */
+/* SEARCH BAR (functional hero, top- level) */
 #search-filter{
   width: 100%;
   max-width: 820px;
@@ -1340,13 +1041,7 @@ Umfang: Ersetzt #search-filter inkl. Placeholder + Focus.
   font-weight: 550;
 }
 
-/* === BEGIN FIX: SEARCH FOCUS STATE (focus + focus-visible, consolidated) ===
-Zweck:
-- Ein einziger, sauberer Focus-Block (kein Marker-Nesting)
-- Greift für Maus (focus) + Tastatur (focus-visible)
-Umfang:
-- Nur Focus-Styles für #search-filter
-=== */
+/* SECTION */
 #search-filter:focus,
 #search-filter:focus-visible{
   outline: none;
@@ -1357,19 +1052,9 @@ Umfang:
     0 0 0 3px rgba(139,207,74,.12),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
-/* === END FIX: SEARCH FOCUS STATE (focus + focus-visible, consolidated) === */
-/* === END BLOCK: SEARCH BAR (functional hero, top- level) === */
 
 
-
-
-
-
-
-/* === BEGIN BLOCK: FILTER BAR (compact single-row + inline reset X) ===
-Zweck: Exakt gleiche Control-Höhe wie Search-Bar (wirklich identisch).
-Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill / .filter-pill--reset.
-=== */
+/* FILTER BAR (compact single-row + inline reset X) */
 
 .filters-bar{
   max-width: 820px;
@@ -1527,22 +1212,8 @@ Umfang: Ersetzt ausschließlich Layout + Styles von .filters-bar / .filter-pill 
   background: rgba(31,41,51,0.06);
 }
 
-/* === END BLOCK: FILTER BAR (compact single-row + inline reset X) === */
 
-
-
-
-
-
-
-
-
-/* === BEGIN BLOCK: FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) ===
-Zweck:
-- Bottom-Sheet wird auf Mobile nicht unten abgeschnitten; Inhalt scrollt im Body, Header bleibt sticky.
-- FIX UI: Titel links + Close rechts oben (Top- Konsistenz).
-Umfang: Ersetzt den kompletten Bottom-Sheet Basisblock inkl. overlay/card/grabber/header/body.
-=== */
+/* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
 
 /* ===== Bottom Sheet ===== */
 .filter-sheet{
@@ -1551,14 +1222,7 @@ Umfang: Ersetzt den kompletten Bottom-Sheet Basisblock inkl. overlay/card/grabbe
   z-index: 9998;
 }
 
-/* === BEGIN BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) ===
-Zweck:
-- Verhindert, dass .top-stack (sticky/transform/backdrop-filter) das position:fixed Sheet “einsperrt”.
-- Stellt sicher, dass das Sheet nicht unter der Bottom-Tabbar liegt (Stacking Context: top-stack < tabbar).
-Umfang:
-- Nur aktiv während body.is-sheet-open.
-- Neutralisiert transform + backdrop-filter und hebt z-index der .top-stack Ebene über die Tabbar.
-=== */
+/* FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) */
 body.is-sheet-open .top-stack{
   transform: none !important;
   -webkit-backdrop-filter: none !important;
@@ -1568,7 +1232,6 @@ body.is-sheet-open .top-stack{
 
   z-index: 9997 !important;
 }
-/* === END BLOCK: FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) === */
 
 
 .filter-sheet__overlay{
@@ -1609,13 +1272,7 @@ body.is-sheet-open .top-stack{
   flex-direction: column;
 }
 
-/* === BEGIN PATCH: DETAILPANEL DRAG HANDLE (render via ::before; no DOM dependency)
-Zweck:
-- Handle immer sichtbar, ohne DOM-Abhängigkeit (.detail-panel-grabber kann fehlen)
-- Handle-DNA: ruhig, minimal, passend zum Feed (kein „anderes App-Sheet“)
-Umfang:
-- Nur ::before auf .detail-panel-content
-=== */
+/* DETAILPANEL DRAG HANDLE (render via ::before; no DOM dependency) */
 #event-detail-panel .detail-panel-content::before{
   content: "";
   position: absolute;
@@ -1632,8 +1289,6 @@ Umfang:
   box-shadow: none;
   z-index: 4;
 }
-/* === END PATCH: DETAILPANEL DRAG HANDLE (render via ::before; no DOM dependency) === */
-
 
 
 /* Header: sticky + Topbar Layout (Titel links / Close rechts) */
@@ -1660,8 +1315,6 @@ Umfang:
   max-height: calc(92vh - 86px);
   max-height: calc(92dvh - 86px);
 }
-
-/* === END BLOCK: FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) === */
 
 
 .filter-sheet__title{
@@ -1704,13 +1357,7 @@ Umfang:
   max-height: calc(92vh - 86px);
 }
 
-/* === BEGIN BLOCK: FILTER BAR + SHEETS (Top-App level) ===
-Zweck:
-- Filter-Optionen als “List Cards”
-- Active-State + Hover + Focus
-- Disabled-State (0 Treffer) sichtbar, klar ausgegraut, nicht klickbar, ohne “Bug-Gefühl”
-Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Active/Hover/Focus/Hidden/Small-Screens.
-=== */
+/* FILTER BAR + SHEETS (Top-App level) */
 
 /* Optionen: als “List Cards” statt billiger Textzeilen */
 .filter-sheet-option,
@@ -1836,47 +1483,13 @@ Umfang: Ersetzt den kompletten Block für Filter Bar + Sheets Optionen inkl. Act
 }
 
 
+/* DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER */
 
-/* === END BLOCK: FILTER BAR + SHEETS (Top-App level) === */
+/* DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) */
 
+/* VIEWPORT SCROLL LOCK CONTRACT (systematic, single source of truth) */
 
-
-/* === BEGIN BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER ===
-Zweck:
-- DetailPanel wirkt „Top-App“: klare Hierarchie, konsistenter Rhythmus, ruhige Divider, keine zufälligen Paddings.
-- Meta als Chips (Ort/Datum/Zeit) mit sauberem Wrap; Zeit nimmt volle Breite.
-- Location als „List Row“ (klar interaktiv) + Description als ruhiger Textblock.
-- Safe-Area + Actionbar-Abstand stabil.
-Umfang: Komplettblock DetailPanel Styles (overlay/content/header/chips/location/description + responsive + safe-area).
-=== */
-
-/* === BEGIN BLOCK: DETAILPANEL TOP-APP RHYTHM v2 (single source of truth)
-Zweck:
-- Einheitliche Gutter-Logik (alles richtet sich nach --gutter)
-- Optische Breite „harmonisch“: Sektionen vollflächig innerhalb des Gutters
-- Ruhige Divider statt „Schwebeflächen“ und uneinheitlicher Innenabstände
-Umfang:
-- #event-detail-panel + overlay + sheet + body scroll + header/meta/location/desc + close
-=== */
-
-/* === BEGIN BLOCK: VIEWPORT SCROLL LOCK CONTRACT (systematic, single source of truth) ===
-Zweck:
-- Sperrt den gesamten Viewport sauber, ohne andere Komponenten zu beeinflussen
-- Verhindert Header-Rubberband und Background-Scroll
-- Grundlage für alle Overlay-Systeme (Detailpanel, zukünftige Overlays)
-
-Regel:
-- Nur html/body werden gesperrt
-- Keine overscroll-behavior Hacks auf anderen Ebenen
-
-=== */
-
-/* === BEGIN BLOCK: VIEWPORT LOCK – ROOT LEVEL (enterprise correct) ===
-Zweck:
-- Sperrt den gesamten Viewport garantiert (html + body)
-- verhindert Rubberband, Header-Shift, Background-Move
-- systematische Lösung ohne Nebenwirkungen
-=== */
+/* VIEWPORT LOCK – ROOT LEVEL (enterprise correct) */
 
 html.is-panel-open,
 html.is-panel-open body {
@@ -1887,9 +1500,6 @@ html.is-panel-open body {
 
 }
 
-/* === END BLOCK: VIEWPORT LOCK – ROOT LEVEL === */
-
-/* === END BLOCK: VIEWPORT SCROLL LOCK CONTRACT === */
 
 #event-detail-panel.detail-panel{
   position: fixed;
@@ -1900,13 +1510,7 @@ html.is-panel-open body {
 #event-detail-panel.detail-panel.hidden{ display: none; }
 
 /* Overlay: ruhiges Dim (kein Blur) */
-/* === BEGIN BLOCK: DETAILPANEL OVERLAY (tokenized, consistent with other overlays) ===
-Zweck:
-- Gleiches Overlay-Dim wie Filter/Chooser (konsistente App-DNA)
-- Kein Blur (Performance + Klarheit)
-Umfang:
-- Nur .detail-panel-overlay
-=== */
+/* DETAILPANEL OVERLAY (tokenized, consistent with other overlays) */
 #event-detail-panel .detail-panel-overlay{
   position: absolute;
   inset: 0;
@@ -1917,34 +1521,13 @@ Umfang:
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* === END BLOCK: DETAILPANEL OVERLAY (tokenized, consistent with other overlays) === */
 
-/* === BEGIN REPLACE BLOCK: DETAILPANEL ADAPTIVE HEIGHT + SINGLE BOTTOM RESERVE (style.css:1550-1876)
-Zweck:
-- Entfernt „Leerraum“ bei kurzen Events: Sheet ist content-adaptiv (auto) statt fixe Höhe.
-- Behält sauberes Verhalten bei langen Inhalten: max-height + Scroll im Body.
-- Entfernt doppelte Bottom-Reserves: Bottom-Reserve kommt NUR über .detail-panel-body (Actionbar-Block).
-Umfang:
-- Nur DetailPanel: .detail-panel-content (Height/Max-Height) + .detail-panel-body (min-height:0) + #detail-content (kein padding-bottom)
-- Responsive (max-width:360px) angepasst
-=== */
+/* SECTION */
 
-/* === BEGIN PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space)
-Zweck:
-- Sheet wird so hoch wie der Inhalt (auto) und hat nur eine max-height
-- Flex-Column bleibt erhalten; Body scrollt nur bei Bedarf
-Umfang:
-- Nur .detail-panel-content + ::after
-=== */
+/* DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space) */
 
 /* Sheet */
-/* === BEGIN BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) ===
-Zweck:
-- Sheet übernimmt Mainpage-DNA (subtile Brand-Tint) + klarer Panel-Interface Eindruck
-- ruhige Top-Kante (Divider statt “glassy”)
-Umfang:
-- Nur #event-detail-panel .detail-panel-content
-=== */
+/* DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) */
 
 #event-detail-panel .detail-panel-content{
 
@@ -1984,33 +1567,17 @@ Umfang:
   flex-direction: column;
 }
 
-/* === END BLOCK: DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) === */
 
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
 
-/* === END PATCH: DETAILPANEL SHEET HEIGHT + FLEX (adaptive, no fixed empty space) === */
 
-
-/* === BEGIN BLOCK: DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) ===
-Zweck:
-- Systemisch: Grabber ist DOM-unabhängig via .detail-panel-content::before
-- Falls ein altes DOM-Element .detail-panel-grabber auftaucht, darf es nicht doppelt rendern
-Umfang:
-- Nur .detail-panel-grabber (keine Layout-Logik)
-=== */
+/* DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) */
 #event-detail-panel .detail-panel-grabber{
   display: none;
 }
-/* === END BLOCK: DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) === */
 
-/* === BEGIN FIX: DETAILPANEL DRAG HIT SAFE AREA (do not block close) ===
-Zweck:
-- Drag-Hit darf den Close-Button oben rechts nicht überdecken
-- CSS-only: reserviert rechts eine Safe-Area in Close-Breite (+ Abstand)
-Umfang:
-- Nur #event-detail-panel .detail-panel-drag-hit
-=== */
+/* SECTION */
 /* Drag-Hit-Area */
 #event-detail-panel .detail-panel-drag-hit{
   position: absolute;
@@ -2026,15 +1593,8 @@ Umfang:
   background: transparent;
   touch-action: none;
 }
-/* === END FIX: DETAILPANEL DRAG HIT SAFE AREA (do not block close) === */
 
-/* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (tokenized, restore stable look)
-Zweck:
-- Close ist wieder sicher 44×44 (Tap-Target), optisch wie vorher, token-driven
-- Robust: width/height dürfen nie auf auto zurückfallen
-Umfang:
-- Detailpanel Close Target + inneres Icon
-=== */
+/* DETAILPANEL CLOSE BUTTON (tokenized, restore stable look) */
 
 #event-detail-panel .detail-panel-close{
   position: absolute;
@@ -2082,12 +1642,7 @@ Umfang:
   outline-offset: 2px;
 }
 
-/* === END PATCH: DETAILPANEL CLOSE BUTTON (tokenized, restore stable look) === */
-/* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
-Zweck: Einziger Scroll-Container im Detailpanel + Reserve gegen Actionbar-Overlap.
-Zusatz: Desktop-Scrollbar dezent (nicht entfernen), mobile unverändert.
-Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detail-panel #detail-content).
-=== */
+/* SECTION */
 
 #event-detail-panel .detail-panel-body,
 .detail-panel-body{
@@ -2140,7 +1695,6 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
   }
 }
 
-/* === END REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) === */
 
 #event-detail-panel #detail-content{
   /* Abstand zum Grab-Handle/Top (Token) */
@@ -2161,13 +1715,7 @@ Umfang: Ersetzt den gesamten Marker-/Scroll-Contract-Abschnitt (vor #event-detai
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* === BEGIN BLOCK: DETAIL LINKS (Enterprise v2: quiet row link, no input-card look)
-Zweck:
-- Attribution/Quelle wirkt wie ruhige System-Zeile (tappable), nicht wie Formularfeld/Kachel
-- Fokus/States bleiben sauber
-Umfang:
-- .detail-links + .detail-link + label/value/ext (nur Detailpanel)
-=== */
+/* DETAIL LINKS (Enterprise v2: quiet row link, no input-card look) */
 
 #event-detail-panel .detail-links{
   display: grid;
@@ -2243,16 +1791,8 @@ Umfang:
   opacity: 0.60;
 }
 
-/* === END BLOCK: DETAIL LINKS (Enterprise v2: quiet row link, no input-card look) === */
 
-/* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
-Zweck:
-- Titel kann nie unter den Close-Button laufen (rechts reservierter Bereich)
-- Kategorie-Icon ist Indikator (Badge), kein Button-Look
-- Emoji-Icons im Badge werden appweit neutralisiert (Token)
-Umfang:
-- .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
-=== */
+/* DETAILPANEL HEADER ROW (reserve close area + prevent overlap) */
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -2367,17 +1907,8 @@ Umfang:
   background: none;
 }
 
-/* === END PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap) === */
 
-
-/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look)
-Zweck:
-- Meta-Block als eine “List Group” (ein Rahmen), Rows ohne eigene Felder-Optik
-- Divider nur zwischen Rows
-- Robust gegen Overrides (höhere Specificity + !important nur dort, wo nötig)
-Umfang:
-- .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
-=== */
+/* DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look) */
 
 /* Group container (v2 markup) */
 #event-detail-panel .detail-meta-rows{
@@ -2512,24 +2043,8 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* === END BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, kill form-field look) === */
 
-
-
-
-
-/* === END BLOCK: DETAIL META INFO ROWS (no chips UI; reuse existing markup) === */
-
-
-/* === BEGIN BLOCK: GS-02 LOCATION ROW (enterprise surface + states + scale) ===
-Zweck:
-- Location-Row wirkt wie Meta-Block (ruhig, hochwertig), bleibt aber klar “navigierbar”
-- Spacing strikt auf Skala (Tokens), keine Magic Numbers
-- Focus/Active verlässlich und konsistent
-Umfang:
-- .detail-location-action (+ states)
-- .detail-location-icon / .detail-location-text / .detail-location-chev
-=== */
+/* GS-02 LOCATION ROW (enterprise surface + states + scale) */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2618,16 +2133,10 @@ Umfang:
   line-height: 1;
 }
 
-/* === END BLOCK: GS-02 LOCATION ROW (enterprise surface + states + scale) === */
 
 /* Description: ruhiger Textblock */
-/* === BEGIN BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
-/* === BEGIN FIX: DETAIL DESCRIPTION CALMNESS (less bold-looking) ===
-Zweck:
-- Description lesbarer + besserer Rhythmus zur Header-Sektion (Enterprise)
-Umfang:
-- nur #event-detail-panel .detail-description
-=== */
+/* DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
+/* SECTION */
 #event-detail-panel .detail-description{
   margin: 16px 0 0;
   padding: 0;
@@ -2640,8 +2149,6 @@ Umfang:
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
-/* === END FIX: DETAIL DESCRIPTION CALMNESS (less bold-looking) === */
-/* === END BLOCK: DETAILPANEL DESCRIPTION RENDER (respect line breaks; no layout side-effects) === */
 
 
 /* Responsive: sehr kleine Geräte */
@@ -2655,38 +2162,19 @@ Umfang:
     border-radius: var(--dp-sheet-radius) var(--dp-sheet-radius) 0 0;
   }
 
-/* === BEGIN FIX: DETAIL TITLE MOBILE MUST MATCH EVENT CARD ===
-Zweck:
-- Auf <=360px NICHT größer als Event-Card
-- 1:1 gleiche Typo wie .event-title
-Umfang:
-- Nur mobile override für #event-detail-panel .detail-title
-=== */
+/* SECTION */
   #event-detail-panel .detail-title{
     font-size: 1.05rem;   /* exakt wie .event-title */
     line-height: 1.25;    /* exakt wie .event-title */
   }
-/* === END FIX: DETAIL TITLE MOBILE MUST MATCH EVENT CARD === */
 
   #event-detail-panel .detail-chip{
     padding: 8px 0;
   }
 }
 
-/* === END REPLACE BLOCK: DETAILPANEL ADAPTIVE HEIGHT + SINGLE BOTTOM RESERVE (style.css:1550-1876) === */
 
-/* === END BLOCK: DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) === */
-
-/* === END BLOCK: DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER === */
-
-/* === BEGIN BLOCK: DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) ===
-Zweck:
-- Kalender-Chooser als echtes Overlay/Bottom-Sheet (unten, safe-area korrekt)
-- Token-basiert (Overlay/Sheet/Optionen)
-- Robust: wenn JS mehrfach injected, ist nur der letzte sichtbar (keine “Button-Listen” im Layout)
-Umfang:
-- #event-detail-panel .detail-cal-chooser + backdrop + sheet + button states
-=== */
+/* DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) */
 
 /* Default: alle verstecken (Duplicate-Safety) */
 #event-detail-panel .detail-cal-chooser{
@@ -2783,21 +2271,8 @@ Umfang:
   outline-offset: 3px;
 }
 
-/* === END BLOCK: DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) === */
 
-
-
-
-
-
-/* === BEGIN BLOCK: DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) ===
-Zweck:
-- Fix für riesige inline-SVGs (Default 300x150) im Detailpanel
-- Systemisch: ALLE Icons im Detailpanel werden normalisiert (auch ohne .detail-icon-svg Klassen)
-- Ausnahme: Content/Description darf weiterhin normale Mediengrößen nutzen
-Umfang:
-- Nur innerhalb #event-detail-panel
-=== */
+/* DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) */
 
 /* 1) Primär: explizite Icon-Klassen (falls vorhanden) */
 #event-detail-panel svg.detail-icon-svg,
@@ -2846,19 +2321,12 @@ Umfang:
   object-fit: contain !important;
 }
 
-/* === END BLOCK: DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) === */
 
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
 
-/* === BEGIN BLOCK: APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) ===
-Zweck:
-- Header-Ton weniger „voll“, mehr Premium (mehr Weißanteil)
-- Übergang zum Content ruhiger, weniger „grün blockig“
-Umfang:
-- Ersetzt ausschließlich .app-header (nur Farb-/Kanten-Feintuning, kein Layout)
-=== */
+/* APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) */
 .app-header{
   color: var(--color-text-primary);
   position: sticky;
@@ -2886,7 +2354,6 @@ Umfang:
 
   transform: translateZ(0);
 }
-/* === END BLOCK: APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) === */
 
 
 .app-header::after{ content: none; }
@@ -2930,14 +2397,7 @@ Umfang:
   flex: 0 0 auto;
 }
 
-/* === BEGIN PATCH: HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) ===
-Zweck:
-- Header Buttons: gleiche DNA wie Actionbar (Border/Surface), aber header-kompakt
-- Icons zuverlässig sichtbar
-- Single Source: Werte aus UI CONTROL TOKENS, damit Designänderungen app-weit wirken
-Umfang:
-- .header-right > .pwa-install-button inkl. States + ::before/::after + Mask-Icons
-=== */
+/* HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) */
 
 .header-right > .pwa-install-button{
   --hdr-icon-size: 16px;
@@ -3032,19 +2492,12 @@ Umfang:
 }
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 
-/* === END PATCH: HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) === */
-
-
 
 @media (max-width: 360px){
   .app-header{ padding: 0 var(--gutter); min-height: 48px; }
   .header-right{ gap: 8px; }
   .app-title{ max-width: 56vw; }
 }
-
-/* === END BLOCK: APP HEADER (REAL sticky + brand visibility) === */
-
-
 
 
 /* --- Modal (Locations) --- */
@@ -3094,14 +2547,7 @@ Umfang:
   justify-content: flex-end;
 }
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
-/* === BEGIN BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) ===
-Zweck:
-- Actionbar nutzt Panel-Tokens (Footer-Surface), keine Sonderfarben
-- Buttons nutzen gleiche Border/Shadow DNA wie Panel
-- Actionbar wirkt wie integrierter Teil des Sheets (Top-Radius + subtiler Up-Shadow)
-Umfang:
-- #detail-actionbar-slot + .detail-actionbar-btn + states + .detail-sr-only
-=== */
+/* ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) */
 
 /* SR-only (robust) */
 #detail-actionbar-slot .detail-sr-only{
@@ -3245,12 +2691,4 @@ Umfang:
   cursor: default;
   transform: none;
 }
-
-/* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
-
-
-
-
-
 
