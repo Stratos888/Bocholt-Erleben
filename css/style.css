@@ -3064,6 +3064,7 @@ Umfang:
 Zweck:
 - Actionbar nutzt Panel-Tokens (Footer-Surface), keine Sonderfarben
 - Buttons nutzen gleiche Border/Shadow DNA wie Panel
+- Actionbar wirkt wie integrierter Teil des Sheets (Top-Radius + subtiler Up-Shadow)
 Umfang:
 - #detail-actionbar-slot + .detail-actionbar-btn + states + .detail-sr-only
 === */
@@ -3100,9 +3101,24 @@ Umfang:
   justify-items: stretch;
   gap: var(--space-md);
 
+  /* Fallback */
   background: var(--surface-panel-footer);
+
+  /* Premium: leichter “Sheet”-Layer (subtil, keine neue Designwelt) */
+  background: color-mix(in srgb, var(--surface-panel-footer) 88%, transparent);
+
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+
   border-top: 1px solid var(--border-panel);
-  box-shadow: none;
+
+  /* Integriert ins Sheet: Radius + Up-Shadow statt “flach” */
+  border-top-left-radius: var(--dp-sheet-radius);
+  border-top-right-radius: var(--dp-sheet-radius);
+
+  box-shadow:
+    0 -18px 44px rgba(0,0,0,0.10),
+    0 1px 0 rgba(255,255,255,0.70) inset;
 
   z-index: 6;
 }
@@ -3132,7 +3148,7 @@ Umfang:
   box-shadow: var(--shadow-panel-btn);
 
   font-size: 0 !important;
-  line-height: 0 !important;
+
   overflow: hidden;
 
   text-decoration: none !important;
@@ -3197,6 +3213,3 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
-
-
-
