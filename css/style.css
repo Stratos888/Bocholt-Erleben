@@ -198,10 +198,13 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
   Zweck:
   - Single Source of Truth für Icon-DNA (Größen/Opacity/Emoji-Filter)
-  - Single Source of Truth für Close-Button DNA (Size/Background/Border/Shadow/Font)
+  - Single Source of Truth für Tap-Targets (44×44) + Close-Button DNA
   Umfang:
   - Nur Tokens, keine Selektoren.
   === */
+
+  /* Tap target (app-wide contract) */
+  --ui-tap-target: 44px;
 
   /* Icon sizes */
   --ui-icon-size-sm: 16px;   /* Cards / Meta */
@@ -2027,16 +2030,13 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (tokenized, restore stable look)
 Zweck:
-- Close ist wieder sicher 44×44 (Tap-Target), optisch wie vorher, aber token-driven
-- Robust gegen Markup-Varianten (Button vs. inneres Icon-Element)
+- Close ist wieder sicher 44×44 (Tap-Target), optisch wie vorher, token-driven
+- Robust: width/height dürfen nie auf auto zurückfallen
 Umfang:
 - Detailpanel Close Target + inneres Icon
 === */
 
-/* Close TARGET (Button/Link/Container) */
-#event-detail-panel .detail-panel-close,
-#event-detail-panel .detail-panel-close-btn,
-#event-detail-panel button.detail-panel-close{
+#event-detail-panel .detail-panel-close{
   position: absolute;
   z-index: 6;
 
@@ -2048,6 +2048,9 @@ Umfang:
   min-width: var(--ui-close-size) !important;
   min-height: var(--ui-close-size) !important;
 
+  box-sizing: border-box !important;
+  padding: 0 !important;
+
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2058,37 +2061,23 @@ Umfang:
   background: var(--ui-close-bg) !important;
   box-shadow: var(--ui-close-shadow) !important;
 
+  font-size: var(--ui-close-font-size) !important;
+  line-height: 1 !important;
+  color: var(--ui-close-color) !important;
+
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
-  padding: 0 !important;
-  line-height: 1;
 }
 
-/* Inneres “X” (falls separates Element / SVG) */
-#event-detail-panel .detail-panel-close svg,
-#event-detail-panel .detail-panel-close-btn svg,
-#event-detail-panel .detail-panel-close .icon,
-#event-detail-panel .detail-panel-close-btn .icon{
+#event-detail-panel .detail-panel-close svg{
   width: 18px;
   height: 18px;
-  opacity: 0.92;
+  opacity: var(--ui-icon-opacity);
 }
 
-/* Wenn das X als Text/Emoji gerendert wird */
-#event-detail-panel .detail-panel-close,
-#event-detail-panel .detail-panel-close-btn{
-  font-size: var(--ui-close-font-size) !important;
-  color: var(--ui-close-color) !important;
-}
+#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
 
-#event-detail-panel .detail-panel-close:active,
-#event-detail-panel .detail-panel-close-btn:active{
-  transform: scale(0.96);
-}
-
-#event-detail-panel .detail-panel-close:focus-visible,
-#event-detail-panel .detail-panel-close-btn:focus-visible{
+#event-detail-panel .detail-panel-close:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
 }
@@ -3258,6 +3247,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
