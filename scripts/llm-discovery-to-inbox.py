@@ -305,7 +305,14 @@ def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
         if any(h in q for h in BLOCKED_QUERY_HINTS):
             return False
 
+        # Bocholt-Kalender: echte Events haben "?event=<id>"
+        if "bocholt.de" in lu.netloc and "/veranstaltungskalender/" in path:
+            if "event=" not in q:
+                return False
+
         return any(h in path for h in DETAIL_PATH_HINTS) and len(path) > 3
+    except Exception:
+        return False
     except Exception:
         return False
 
@@ -605,11 +612,18 @@ async def main_async() -> None:
         http_status_last = res["http_status_last"]
         err = res["error"]
 
-        limit = max(cfg.llm_batch_size, 10)
+        # We treat llm_batch_size as "target number of NEW inbox rows" per run.
+        target_new = max(cfg.llm_batch_size, 10)
 
         new_inbox_written = 0
-        for u in details[:limit]:
+
+        # Log candidates for all collected detail URLs (collector proof),
+        # but only write up to target_new NEW items to Inbox (skip duplicates).
+        for u in details:
             candidate_rows.append(make_candidate_row(run_ts, cfg, u))
+
+            if new_inbox_written >= target_new:
+                continue
 
             if u in existing_inbox_urls:
                 continue
