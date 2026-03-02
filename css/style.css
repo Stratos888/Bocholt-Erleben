@@ -198,21 +198,31 @@ Umfang: Nur --dp-actionbar-pad-y innerhalb :root.
   /* === BEGIN BLOCK: ICON TOKENS (app-wide) ===
   Zweck:
   - Single Source of Truth für Icon-DNA (Größen/Opacity/Emoji-Filter)
-  - Gleiche Symbole überall, nur Größe je Kontext variieren (Cards/Header/Actionbar)
+  - Single Source of Truth für Close-Button DNA (Size/Background/Border/Shadow/Font)
   Umfang:
   - Nur Tokens, keine Selektoren.
   === */
+
+  /* Icon sizes */
   --ui-icon-size-sm: 16px;   /* Cards / Meta */
-  --ui-icon-size-md: 18px;   /* Detailpanel + Actionbar */
-  --ui-icon-size-lg: 20px;   /* selten: Hero/CTA */
+  --ui-icon-size-md: 18px;   /* Default */
+  --ui-icon-size-lg: 22px;   /* Header/Icon-Badge */
 
   /* Default (für einfache Nutzung in Selektoren) */
   --ui-icon-size: var(--ui-icon-size-md);
 
   --ui-icon-opacity: 0.92;
 
-  /* Emoji-Icons app-like neutralisieren (nur dort verwenden, wo Emoji gerendert wird) */
+  /* Emoji-Icons app-like neutralisieren */
   --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
+
+  /* Close button DNA (tokenized) */
+  --ui-close-size: var(--ui-tap-target);
+  --ui-close-bg: rgba(255,255,255,0.92);
+  --ui-close-border: 1px solid var(--ui-border-strong);
+  --ui-close-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  --ui-close-font-size: 22px;
+  --ui-close-color: rgba(31,41,51,0.74);
 
   /* === END BLOCK: ICON TOKENS (app-wide) === */
 
@@ -2015,11 +2025,10 @@ Umfang:
 }
 /* === END FIX: DETAILPANEL DRAG HIT SAFE AREA (do not block close) === */
 
-/* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps)
+/* === BEGIN PATCH: DETAILPANEL CLOSE BUTTON (tokenized, restore stable look)
 Zweck:
-- Close ist garantiert klickbar (kein Grid-Annahme)
-- Immer oben rechts im Sheet, visuell wie Top-App
-- z-index sicher über drag-hit/handle
+- Close ist garantiert klickbar (Tap-Target)
+- Visuals bleiben wie bisher, aber vollständig tokenisiert
 Umfang:
 - Nur #event-detail-panel .detail-panel-close (+ states)
 === */
@@ -2030,22 +2039,24 @@ Umfang:
   top: calc(8px + env(safe-area-inset-top, 0px));
   right: var(--gutter);
 
-  width: var(--ui-tap-target);
-  height: var(--ui-tap-target);
+  width: var(--ui-close-size);
+  height: var(--ui-close-size);
+  min-width: var(--ui-close-size);
+  min-height: var(--ui-close-size);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   border-radius: 999px;
-  border: 1px solid var(--ui-border-strong);
+  border: var(--ui-close-border);
 
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  background: var(--ui-close-bg);
+  box-shadow: var(--ui-close-shadow);
 
-  font-size: 22px;
+  font-size: var(--ui-close-font-size);
   line-height: 1;
-  color: rgba(31,41,51,0.74);
+  color: var(--ui-close-color);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -2055,7 +2066,7 @@ Umfang:
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
 }
-/* === END PATCH: DETAILPANEL CLOSE BUTTON (clickable + header-aligned, no overlay traps) === */
+/* === END PATCH: DETAILPANEL CLOSE BUTTON (tokenized, restore stable look) === */
 /* === BEGIN REPLACEMENT BLOCK: DETAILPANEL SCROLL CONTRACT (parser-safe, single scroll authority) ===
 Zweck: Einziger Scroll-Container im Detailpanel + Reserve gegen Actionbar-Overlap.
 Zusatz: Desktop-Scrollbar dezent (nicht entfernen), mobile unverändert.
@@ -2220,10 +2231,9 @@ Umfang:
 
 /* === BEGIN PATCH: DETAILPANEL HEADER ROW (reserve close area + prevent overlap)
 Zweck:
-- Panel-Header wirkt wie eigenes Interface: klare Header-Zone + Divider
-- Titel + Kategorie-Icon sind optisch exakt aligned
 - Titel kann nie unter den Close-Button laufen (rechts reservierter Bereich)
 - Kategorie-Icon ist Indikator (Badge), kein Button-Look
+- Emoji-Icons im Badge werden appweit neutralisiert (Token)
 Umfang:
 - .detail-header + .detail-title-row + .detail-title + .detail-category-icon + .detail-meta-rows
 === */
@@ -2244,7 +2254,6 @@ Umfang:
   border-bottom: 1px solid rgba(31,41,51,0.08);
 }
 
-/* Titelzeile: Icon + Titel auf einer Linie (rechts Close-Area reservieren) */
 #event-detail-panel .detail-title-row{
   --dp-badge-size: 40px;
 
@@ -2261,12 +2270,11 @@ Umfang:
 
   align-items: center;
 
-  /* Reserve für absoluten Close-Button (var(--ui-tap-target) @ right gutter) */
-  padding-right: calc(var(--ui-tap-target) + var(--space-md));
+  padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
 }
 
-/* Kategorie-Indikator (kein Button) */
+/* Kategorie-Indikator (Emoji/SVG) */
 #event-detail-panel .detail-category-icon{
   grid-column: 1;
   grid-row: 1;
@@ -2284,8 +2292,13 @@ Umfang:
   border: 0;
   box-shadow: none;
 
-  color: rgba(31,41,51,0.56);
-  opacity: 1;
+  font-size: var(--ui-icon-size-lg);
+  line-height: 1;
+
+  opacity: var(--ui-icon-opacity);
+
+  /* Emoji neutralisieren */
+  filter: var(--ui-icon-filter-emoji);
 
   cursor: default;
   user-select: none;
@@ -2294,13 +2307,15 @@ Umfang:
   margin-top: 0;
 }
 
+/* SVG soll NICHT gegrayscaled werden */
 #event-detail-panel .detail-category-icon svg{
-  width: 22px;
-  height: 22px;
-  opacity: 0.95;
+  width: var(--ui-icon-size-lg);
+  height: var(--ui-icon-size-lg);
+
+  opacity: var(--ui-icon-opacity);
+  filter: none;
 }
 
-/* Titel rechts vom Badge – sauberes Wrapping */
 #event-detail-panel .detail-title{
   grid-column: 2;
   grid-row: 1;
@@ -2325,14 +2340,12 @@ Umfang:
   hyphens: none;
 }
 
-/* Meta unter dem Titel über volle Breite */
 #event-detail-panel .detail-meta-rows{
   grid-column: 1 / -1;
   grid-row: 2;
   min-width: 0;
 }
 
-/* Legacy: kein Emoji-Overlay */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
@@ -3218,6 +3231,7 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
 
 
 
