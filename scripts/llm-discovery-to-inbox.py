@@ -664,10 +664,7 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         "nav2_server": nav2_server,
         "nav2_location": nav2_location,
     }
-    # === END BLOCK: Collector (Playwright) with CF-proof logging ===
-    }
-    # === END BLOCK: Collector (Playwright) with POST-pagination support (Bocholt) ===
-
+  
 
 def make_candidate_row(
     run_ts: str,
