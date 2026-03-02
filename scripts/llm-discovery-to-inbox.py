@@ -31,6 +31,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
+from openai import OpenAI
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -330,10 +331,7 @@ TIME_RE = re.compile(r"\b(\d{1,2}:\d{2})\b")
 
 
 def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Dict[str, str]:
-    """Best-effort extraction from a detail page.
-
-    Returns Inbox-compatible fields (subset).
-    """
+    """Heuristic fallback extraction (used if LLM is not configured or fails)."""
     soup = BeautifulSoup(detail_html, "html.parser")
 
     # title
@@ -402,6 +400,101 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
         "url": detail_url,
         "description": description,
     }
+
+
+def _build_llm_input(detail_html: str, detail_url: str, cfg: SourceCfg) -> str:
+    soup = BeautifulSoup(detail_html, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+
+    text = norm_text(soup.get_text(" ", strip=True))
+    # hard cap to keep costs predictable
+    text = text[:60000]
+
+    return (
+        f"Quelle (Detail-URL): {detail_url}\n"
+        f"Default-Stadt: {cfg.default_city or 'Bocholt'}\n"
+        f"Default-Kategorie: {cfg.default_category or ''}\n"
+        "Extrahiere Eventdaten aus folgendem Text (HTML in Text umgewandelt):\n"
+        f"{text}\n"
+    )
+
+
+def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Optional[Dict[str, str]]:
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        return None
+
+    model = os.environ.get("OPENAI_MODEL", "gpt-5-mini").strip()
+    client = OpenAI(api_key=api_key)
+
+    llm_input = _build_llm_input(detail_html, detail_url, cfg)
+
+    schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "title": {"type": "string"},
+            "date": {"type": "string", "description": "YYYY-MM-DD oder leer"},
+            "time": {"type": "string", "description": "z.B. 19:30 oder leer"},
+            "location": {"type": "string"},
+            "city": {"type": "string"},
+            "category": {"type": "string"},
+            "url": {"type": "string"},
+            "description": {"type": "string"},
+        },
+        "required": ["title", "date", "time", "location", "city", "category", "url", "description"],
+    }
+
+    try:
+        resp = client.responses.create(
+            model=model,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Du extrahierst Veranstaltungsdaten. "
+                        "Antworte ausschließlich im vorgegebenen JSON-Schema. "
+                        "Wenn ein Feld nicht sicher ist, gib einen leeren String zurück."
+                    ),
+                },
+                {"role": "user", "content": llm_input},
+            ],
+            text={
+                "format": {
+                    "type": "json_schema",
+                    "name": "event_extraction",
+                    "strict": True,
+                    "schema": schema,
+                }
+            },
+            store=False,
+        )
+
+        # Responses API: when using structured outputs, we expect JSON text in output_text
+        out = (resp.output_text or "").strip()
+        if not out:
+            return None
+        data = json.loads(out)
+
+        # normalize / fallbacks
+        data["url"] = detail_url
+        if not (data.get("city") or "").strip():
+            data["city"] = cfg.default_city or "Bocholt"
+        if not (data.get("category") or "").strip():
+            data["category"] = cfg.default_category or ""
+        return {
+            "title": (data.get("title") or "").strip(),
+            "date": (data.get("date") or "").strip(),
+            "time": (data.get("time") or "").strip(),
+            "location": (data.get("location") or "").strip(),
+            "city": (data.get("city") or "").strip(),
+            "kategorie_suggestion": (data.get("category") or "").strip(),
+            "url": detail_url,
+            "description": (data.get("description") or "").strip(),
+        }
+    except Exception:
+        return None
 
 
 async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
@@ -661,7 +754,15 @@ async def main_async() -> None:
                     await context.close()
                     await browser.close()
 
-                fields = extract_event_fields(detail_html, u, cfg)
+                fields = llm_extract_event_fields(detail_html, u, cfg)
+                if fields is None:
+                    fields = extract_event_fields(detail_html, u, cfg)
+
+                # Pflichtfelder-Gate (damit Inbox nur "gute" Events bekommt)
+                # Pflicht: title + date + location (city fallback ist ok)
+                if not fields.get("title") or not fields.get("date") or not fields.get("location"):
+                    continue
+
                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
                 existing_inbox_urls.add(u)
                 new_inbox_written += 1
