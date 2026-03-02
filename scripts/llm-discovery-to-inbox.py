@@ -214,28 +214,53 @@ def parse_sources(values: List[List[str]]) -> List[SourceCfg]:
 
 
 NEXT_TEXT_HINTS = ("weiter", "nächste", "naechste", "next", ">", "»")
+BLOCKED_EXTS = (".pdf", ".jpg", ".jpeg", ".png", ".zip", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
+BLOCKED_QUERY_HINTS = ("download=1",)
+
+
+def _is_safe_nav_url(listing_url: str, candidate_url: str) -> bool:
+    try:
+        lu = urlparse(listing_url)
+        cu = urlparse(candidate_url)
+        if not cu.scheme.startswith("http"):
+            return False
+        if lu.netloc != cu.netloc:
+            return False
+        path = (cu.path or "").lower()
+        if any(path.endswith(ext) for ext in BLOCKED_EXTS):
+            return False
+        q = (cu.query or "").lower()
+        if any(h in q for h in BLOCKED_QUERY_HINTS):
+            return False
+        return True
+    except Exception:
+        return False
 
 
 def find_next_url(base_url: str, soup: BeautifulSoup) -> Optional[str]:
     # 1) rel=next
     a = soup.find("a", attrs={"rel": re.compile(r"\bnext\b", re.I)})
     if a and a.get("href"):
-        return urljoin(base_url, a["href"])
+        cand = urljoin(base_url, a["href"])
+        return cand if _is_safe_nav_url(base_url, cand) else None
 
     # 2) aria-label contains next/weiter
     for a in soup.find_all("a"):
         label = (a.get("aria-label") or "").strip().lower()
         if any(h in label for h in ("next", "weiter", "nächste", "naechste")) and a.get("href"):
-            return urljoin(base_url, a["href"])
+            cand = urljoin(base_url, a["href"])
+            if _is_safe_nav_url(base_url, cand):
+                return cand
 
     # 3) link text heuristic
     for a in soup.find_all("a"):
         text = (a.get_text(" ", strip=True) or "").strip().lower()
         if any(h in text for h in NEXT_TEXT_HINTS) and a.get("href"):
             href = a["href"]
-            # avoid self-links
             if href and href != "#" and "javascript:" not in href.lower():
-                return urljoin(base_url, href)
+                cand = urljoin(base_url, href)
+                if _is_safe_nav_url(base_url, cand):
+                    return cand
 
     return None
 
@@ -248,16 +273,38 @@ DETAIL_PATH_HINTS = (
     "/kalender/",
 )
 
+EXCLUDE_PATH_HINTS = (
+    "/bocholt_media/",
+    "/media/",
+)
 
 def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
     try:
         u = urlparse(candidate_url)
         if not u.scheme.startswith("http"):
             return False
+
+        # same host only
+        lu = urlparse(listing_url)
+        if lu.netloc != u.netloc:
+            return False
+
         # reject same listing root
         if candidate_url.rstrip("/") == listing_url.rstrip("/"):
             return False
+
         path = (u.path or "").lower()
+
+        # exclude media/downloads
+        if any(x in path for x in EXCLUDE_PATH_HINTS):
+            return False
+        if any(path.endswith(ext) for ext in BLOCKED_EXTS):
+            return False
+
+        q = (u.query or "").lower()
+        if any(h in q for h in BLOCKED_QUERY_HINTS):
+            return False
+
         return any(h in path for h in DETAIL_PATH_HINTS) and len(path) > 3
     except Exception:
         return False
@@ -370,6 +417,7 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
                 "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
             ),
             locale="de-DE",
+            accept_downloads=False,
         )
         page = await context.new_page()
 
@@ -576,13 +624,14 @@ async def main_async() -> None:
                             "--disable-blink-features=AutomationControlled",
                         ],
                     )
-                    context = await browser.new_context(
-                        user_agent=(
-                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                            "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                        ),
-                        locale="de-DE",
-                    )
+        context = await browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            ),
+            locale="de-DE",
+            accept_downloads=False,
+        )
                     page = await context.new_page()
                     await page.goto(u, wait_until="domcontentloaded", timeout=60_000)
                     await page.wait_for_timeout(1200)
