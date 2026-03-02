@@ -758,10 +758,14 @@ async def main_async() -> None:
                 if fields is None:
                     fields = extract_event_fields(detail_html, u, cfg)
 
-                # Pflichtfelder-Gate (damit Inbox nur "gute" Events bekommt)
-                # Pflicht: title + date + location (city fallback ist ok)
-                if not fields.get("title") or not fields.get("date") or not fields.get("location"):
+                # Pflichtfelder-Gate (minimal, robust)
+                # Pflicht nur: title + date
+                if not fields.get("title") or not fields.get("date"):
                     continue
+
+                # location fallback
+                if not fields.get("location"):
+                    fields["location"] = cfg.default_city or "Bocholt"
 
                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
                 existing_inbox_urls.add(u)
