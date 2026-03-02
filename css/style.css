@@ -2342,63 +2342,76 @@ Umfang:
 
 
 
-/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips)
+/* === BEGIN BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, less form-field look)
 Zweck:
-- Meta-Rows nutzen Panel-Tokens (A/D)
-- Location klar “Action”, Datetime klar “Info” (Zielzustand)
+- Meta-Rows wirken wie “List Group” (ein Block), nicht wie einzelne Formfelder
+- Location bleibt “Action”, Datetime bleibt “Info”, aber ohne Input-Anmutung
 Umfang:
 - .detail-meta-rows/.detail-meta-row + legacy .detail-meta-chips/.detail-chip
 === */
 
-/* Rows (v2 markup) */
+/* Rows (v2 markup): als gruppierter Block */
 #event-detail-panel .detail-meta-rows{
   display: grid;
-  gap: var(--space-xs);
+  gap: 0;
+
+  border-radius: 14px;
+  border: 1px solid var(--border-panel-soft);
+
+  background: var(--surface-panel-row);
+  overflow: hidden;
 }
 
+/* Einzelne Rows: keine eigenen “Input-Felder” */
 #event-detail-panel .detail-meta-row{
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: var(--space-sm);
 
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 12px 12px;
 
-  background: var(--surface-panel-row);
-  border: 1px solid var(--border-panel-soft);
+  border-radius: 0;
+  border: 0;
+
+  background: transparent;
 
   color: rgba(31,41,51,0.82);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, transform 140ms ease;
 }
 
-/* Location = Action-Row */
+/* Divider zwischen Rows */
+#event-detail-panel .detail-meta-row + .detail-meta-row{
+  border-top: 1px solid rgba(31,41,51,0.08);
+}
+
+/* Location = Action-Row: nur subtiler Accent (kein eigener Field-Fill) */
 #event-detail-panel .detail-meta-row.is-location{
-  background: var(--surface-panel-row-action);
-  border-color: var(--border-panel);
+  background: transparent;
+}
+#event-detail-panel .detail-meta-row.is-location .detail-meta-ext{
+  opacity: 0.70;
 }
 
 /* Datetime = Info-Row */
 #event-detail-panel .detail-meta-row.is-datetime{
-  background: var(--surface-panel-row-info);
-  border-color: var(--border-panel-soft);
+  background: transparent;
 }
 
+/* Interaktion nur für Links */
 @media (hover: hover){
   #event-detail-panel a.detail-meta-row:hover{
-    background: color-mix(in srgb, var(--surface-panel-row) 92%, white);
-    border-color: var(--border-panel);
+    background: color-mix(in srgb, var(--surface-panel-row) 90%, white);
   }
 }
 
 #event-detail-panel a.detail-meta-row:active{
   transform: translateY(1px);
-  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
-  border-color: var(--border-panel-strong);
+  background: color-mix(in srgb, var(--surface-panel-row) 84%, white);
 }
 
 #event-detail-panel a.detail-meta-row:focus-visible{
@@ -2422,21 +2435,24 @@ Umfang:
   opacity: 0.55;
 }
 
-/* Legacy chips container: neutral */
+/* Legacy chips container: als gleicher “Group”-Look */
 #event-detail-panel .detail-meta-chips{
   display: grid;
-  gap: var(--space-xs);
+  gap: 0;
   margin: 0 0 var(--space-md);
 
   padding: 0;
-  border-radius: 0;
 
-  background: transparent;
-  border: 0;
+  border-radius: 14px;
+  border: 1px solid var(--border-panel-soft);
+
+  background: var(--surface-panel-row);
+  overflow: hidden;
+
   box-shadow: none;
 }
 
-/* Legacy chip rows übernehmen den neuen Row-Look */
+/* Legacy chip = Row im Group-Block */
 #event-detail-panel .detail-chip{
   display: flex;
   align-items: center;
@@ -2445,13 +2461,12 @@ Umfang:
   width: 100%;
   max-width: 100%;
 
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 12px 12px;
 
-  background: var(--surface-panel-row-info);
-  border: 1px solid var(--border-panel-soft);
+  border-radius: 0;
+  border: 0;
 
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+  background: transparent;
 
   font-size: var(--font-event-meta);
   line-height: 1.32;
@@ -2467,9 +2482,15 @@ Umfang:
 
   -webkit-tap-highlight-color: transparent;
 }
-#event-detail-panel .detail-chip:active{
-  background: color-mix(in srgb, var(--surface-panel-row) 86%, white);
+
+#event-detail-panel .detail-chip + .detail-chip{
+  border-top: 1px solid rgba(31,41,51,0.08);
 }
+
+#event-detail-panel .detail-chip:active{
+  background: color-mix(in srgb, var(--surface-panel-row) 84%, white);
+}
+
 #event-detail-panel .detail-chip-text{
   min-width: 0;
   white-space: normal;
@@ -2478,7 +2499,7 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* === END BLOCK: DETAIL META INFO (Enterprise v2: meta rows + backward compatible chips) === */
+/* === END BLOCK: DETAIL META INFO (Enterprise v2: grouped meta rows, less form-field look) === */
 
 
 
@@ -3213,3 +3234,4 @@ Umfang:
 }
 
 /* === END BLOCK: ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) === */
+
