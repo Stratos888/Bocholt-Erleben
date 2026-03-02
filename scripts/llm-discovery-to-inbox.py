@@ -503,6 +503,7 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
     visited_pages: Set[str] = set()
     detail_urls: Set[str] = set()
 
+    http_status_first = ""
     http_status_last = ""
     error_msg = ""
 
@@ -532,8 +533,19 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
 
             try:
                 resp = await page.goto(current_url, wait_until="domcontentloaded", timeout=60_000)
+                status = ""
                 if resp is not None:
-                    http_status_last = str(resp.status)
+                    status = str(resp.status)
+                    http_status_last = status
+                    if not http_status_first:
+                        http_status_first = status
+
+                # Wenn Pagination/weiter-Seite geblockt wird, nicht weiter parsen (verhindert Challenge-HTML-Müll)
+                if status and int(status) >= 400:
+                    if not error_msg:
+                        error_msg = f"non_200_on_navigation: {status}"
+                    break
+
                 await page.wait_for_timeout(1500)
                 html = await page.content()
             except Exception as e:
@@ -555,11 +567,13 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
         await context.close()
         await browser.close()
 
+    # Für Source_Health: first_status ist der relevante “konnte die Quelle grundsätzlich laden?”
     return {
         "listing_url": listing_url,
         "pages_visited": len(visited_pages),
         "detail_urls": sorted(detail_urls),
         "http_status_last": http_status_last,
+        "http_status_first": http_status_first,
         "error": error_msg,
     }
 
@@ -711,6 +725,7 @@ async def main_async() -> None:
         res = await collect_detail_urls_playwright(cfg)
         details: List[str] = res["detail_urls"]
         http_status_last = res["http_status_last"]
+        http_status_first = res.get("http_status_first", "") or http_status_last
         err = res["error"]
 
         # We treat llm_batch_size as "target number of NEW inbox rows" per run.
@@ -782,7 +797,7 @@ async def main_async() -> None:
             make_health_row(
                 cfg,
                 status,
-                http_status_last,
+                http_status_first,
                 err,
                 run_ts,
                 len(details),
