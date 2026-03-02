@@ -1797,6 +1797,11 @@ html.is-panel-open body {
    Umfang: Ersetzt Detailpanel-Header-Layout (Header/Title-Row/Icon/Title).
 */
 
+/* BEGIN PATCH DP-HEADER-ALIGNMENT-V2
+   Zweck: Detailpanel-Header auf “native sheet” Niveau: Icon kleiner/leichter, klare Indikator-Anmutung, Title/Icon Baseline-näher.
+   Umfang: Ersetzt Detailpanel-Header-Layout (Header/Title-Row/Icon/Title) ohne Icon-Mapping/Logik zu verändern.
+*/
+
 /* DETAILPANEL HEADER ROW (reserve close area + prevent overlap) */
 
 #event-detail-panel .detail-header{
@@ -1816,8 +1821,8 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-title-row{
-  /* Slightly smaller indicator for calmer, less “badge/button” feel */
-  --dp-badge-size: 36px;
+  /* Smaller indicator (noticeably) – local token, does not affect app-wide icons */
+  --dp-badge-size: 32px;
 
   grid-column: 1;
   grid-row: 1;
@@ -1830,14 +1835,14 @@ html.is-panel-open body {
   min-height: var(--dp-badge-size);
   min-width: 0;
 
-  /* Align to first-line rhythm instead of optical center (better for 2-line titles) */
+  /* Baseline-near alignment (better for 1–2 line titles) */
   align-items: start;
 
   padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
 }
 
-/* Kategorie-Indikator (Emoji/SVG) */
+/* Kategorie-Indikator (Emoji/SVG) – indicator-only, not a badge/button */
 #event-detail-panel .detail-category-icon{
   grid-column: 1;
   grid-row: 1;
@@ -1849,8 +1854,8 @@ html.is-panel-open body {
   align-items: center;
   justify-content: center;
 
-  /* indicator-only: no “chip/button” styling */
   border-radius: 10px;
+
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -1858,17 +1863,16 @@ html.is-panel-open body {
   font-size: var(--ui-icon-size-lg);
   line-height: 1;
 
-  /* calmer visual weight */
-  opacity: 0.78;
+  /* lighter visual weight than cards/controls */
+  opacity: 0.72;
 
-  /* Emoji neutralisieren */
   filter: var(--ui-icon-filter-emoji);
 
   cursor: default;
   user-select: none;
   pointer-events: none;
 
-  /* Optical alignment to title first line */
+  /* optical alignment to first title line */
   margin-top: 2px;
 }
 
@@ -1877,7 +1881,7 @@ html.is-panel-open body {
   width: var(--ui-icon-size-lg);
   height: var(--ui-icon-size-lg);
 
-  opacity: 0.85;
+  opacity: 0.78;
   filter: none;
 }
 
@@ -1893,8 +1897,8 @@ html.is-panel-open body {
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
-  /* Align title’s first line visually with the indicator */
-  line-height: 1.24;
+  /* tighter + baseline-near */
+  line-height: 1.22;
   padding-top: 2px;
 
   display: -webkit-box;
@@ -1917,6 +1921,8 @@ html.is-panel-open body {
   content: none;
   background: none;
 }
+
+/* END PATCH DP-HEADER-ALIGNMENT-V2 */
 
 /* END PATCH DP-HEADER-ALIGNMENT-V1 */
 
@@ -2715,6 +2721,7 @@ html.is-panel-open body {
   cursor: default;
   transform: none;
 }
+
 
 
 
