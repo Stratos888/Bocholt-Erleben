@@ -615,7 +615,6 @@ async def main_async() -> None:
                 continue
 
             try:
-                # === BEGIN BLOCK: DETAIL FETCH (Playwright, fixed indentation + no-download context) ===
                 async with async_playwright() as p:
                     browser = await p.chromium.launch(
                         headless=True,
@@ -639,7 +638,6 @@ async def main_async() -> None:
                     detail_html = await page.content()
                     await context.close()
                     await browser.close()
-                # === END BLOCK: DETAIL FETCH (Playwright, fixed indentation + no-download context) ===
 
                 fields = extract_event_fields(detail_html, u, cfg)
                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
