@@ -31,6 +31,7 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: gpt-5-mini
+          DEBUG_CF: "true"
           # Tabs (wir nutzen eure bestehenden)
           TAB_SOURCES: Sources
           TAB_INBOX: Inbox
