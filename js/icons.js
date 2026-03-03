@@ -95,21 +95,16 @@ Umfang:
 /* END BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE) */
 
   // Category → icon key (canonical mapping; app-wide)
+  // Canonical Category → IconKey
+  // WICHTIG: Hier nur noch kanonische Kategorien aus FilterModule!
   const CATEGORY_ICON_KEY = {
-    "Musik": "cat-music",
-    "Musik & Bühne": "cat-music",
-    "Kultur": "cat-culture",
-    "Kultur & Kunst": "cat-culture",
-    "Essen & Trinken": "cat-food",
-    "Sport": "cat-sport",
-    "Sport & Bewegung": "cat-sport",
-    "Familie": "cat-kids",
+    "Märkte & Feste": "cat-market",
     "Kinder & Familie": "cat-kids",
+    "Musik & Bühne": "cat-music",
+    "Kultur & Kunst": "cat-culture",
+    "Sport & Bewegung": "cat-sport",
     "Natur & Draußen": "cat-nature",
     "Innenstadt & Leben": "cat-city",
-    "Märkte & Feste": "cat-market",
-    "Märkte": "cat-market",
-    "Markt": "cat-market",
   };
 
   const svg = (name, { className = "" } = {}) => {
@@ -124,9 +119,9 @@ Umfang:
     `;
   };
 
-  const categoryKey = (categoryName) => {
-    const c = String(categoryName || "").trim();
-    return CATEGORY_ICON_KEY[c] || "calendar";
+  const categoryKey = (canonicalCategory) => {
+    if (!canonicalCategory) return "calendar";
+    return CATEGORY_ICON_KEY[canonicalCategory] || "calendar";
   };
 
   window.Icons = { svg, categoryKey };
