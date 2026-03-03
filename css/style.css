@@ -1806,23 +1806,21 @@ html.is-panel-open body {
 }
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V3 (native sheet header polish)
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V4 (robust flex header, native PWA)
 Zweck:
-- Detailpanel-Header auf Top-App-Niveau: Icon als ruhiger Kategorie-Indikator, Titel/Icon optisch sauber ausgerichtet (erste Zeile),
-  konsistent zum restlichen Panel (Meta/List-rows/Links/Actionbar).
+- Detailpanel-Header auf Top-PWA Niveau: stabiler Titel/Icon-Header + Meta darunter (kein Grid-Reflow).
+- Icon bleibt zentral gesteuert (nur Container/Alignment im Header).
 Umfang:
-- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title.
+- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
 === */
 
 #event-detail-panel .detail-header{
   position: relative;
 
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  column-gap: var(--space-sm);
-  row-gap: var(--space-sm);
-  align-items: start;
+  /* Robust: kein Grid am Header-Container */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 
   padding: 0 0 var(--space-md);
   margin: 0 0 var(--space-md);
@@ -1831,22 +1829,15 @@ Umfang:
 }
 
 #event-detail-panel .detail-title-row{
-  /* Local-only header indicator size (does not affect app-wide icons) */
-  --dp-badge-size: 30px;
+  /* Local-only indicator size (does not affect app-wide icons) */
+  --dp-indicator-size: 30px;
 
-  grid-column: 1;
-  grid-row: 1;
-
-  display: grid;
-  grid-template-columns: var(--dp-badge-size) minmax(0, 1fr);
+  display: flex;
+  align-items: flex-start;
   gap: var(--space-sm);
 
   width: 100%;
-  min-height: var(--dp-badge-size);
   min-width: 0;
-
-  /* Title may wrap; keep layout stable and align to first line (not overall block height) */
-  align-items: start;
 
   /* Reserve space so the sheet-close area never visually crowds the title */
   padding-right: calc(var(--ui-close-size) + var(--space-md));
@@ -1855,24 +1846,21 @@ Umfang:
 
 /* Kategorie-Indikator (SVG) – indicator-only, not a badge/button */
 #event-detail-panel .detail-category-icon{
-  grid-column: 1;
-  grid-row: 1;
-
-  width: var(--dp-badge-size);
-  height: var(--dp-badge-size);
+  width: var(--dp-indicator-size);
+  height: var(--dp-indicator-size);
+  flex: 0 0 var(--dp-indicator-size);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   border-radius: 10px;
-
   background: transparent;
   border: 0;
   box-shadow: none;
 
   /* Inner icon size = lg; padding optisch zentriert im Indikator */
-  padding: calc((var(--dp-badge-size) - var(--ui-icon-size-lg)) / 2);
+  padding: calc((var(--dp-indicator-size) - var(--ui-icon-size-lg)) / 2);
 
   /* Lighter visual weight than controls */
   opacity: 0.78;
@@ -1886,10 +1874,7 @@ Umfang:
   user-select: none;
   pointer-events: none;
 
-  /*
-    Optical alignment: aligns the icon with the first text line’s visual center
-    (prevents “button-look” and fixes the perceived vertical drift).
-  */
+  /* Optical baseline alignment */
   transform: translateY(2px);
 }
 
@@ -1901,9 +1886,6 @@ Umfang:
 }
 
 #event-detail-panel .detail-title{
-  grid-column: 2;
-  grid-row: 1;
-
   margin: 0;
   min-width: 0;
 
@@ -1913,7 +1895,6 @@ Umfang:
   color: var(--color-text-primary);
 
   line-height: 1.20;
-  padding-top: 0;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1925,13 +1906,19 @@ Umfang:
   hyphens: none;
 }
 
+/* Meta immer stabil unter dem Titelbereich */
+#event-detail-panel .detail-meta-rows{
+  min-width: 0;
+  margin-top: 2px;
+}
+
 /* keep this hook neutral (legacy safety) */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
 }
 
-/* === END BLOCK: DP-HEADER-ALIGNMENT-V3 (native sheet header polish) === */
+/* === END BLOCK: DP-HEADER-ALIGNMENT-V4 (robust flex header, native PWA) === */
 /* BEGIN PATCH DP-META-ENTERPRISE-V3
    Zweck: Meta-Bereich (Ort/Datum) von "Form-Field/Card" zu "calm list rows" (Apple Wallet / Google Maps).
    Umfang: Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
@@ -2874,6 +2861,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
