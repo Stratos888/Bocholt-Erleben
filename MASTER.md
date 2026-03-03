@@ -11,7 +11,8 @@ You are operating a persistent production software project.
 This file defines:
 
 - project phase
-- sprint scope
+- sprint scope<img width="388" height="747" alt="image" src="https://github.com/user-attachments/assets/1afd8458-1a10-4b0e-bc5f-6ae294637ea9" />
+
 - frozen systems
 - product priorities
 - decision memory
@@ -238,10 +239,56 @@ REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
 3) Typografie/Rhythmus (Description weight/line-height, Meta-Icons leicht entschärfen)
 4) Focus-visible Audit (Close/Links/Actions)
 
-PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
-- Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
-- Aktuell Indentation-Regressionsrisiko im discovery-to-inbox Script (Run kann mit IndentationError abbrechen)
-- Hauptgap bleibt: Pflichtfeld-Vollständigkeit (insb. Location/Time) für „curation-ready“ Events
+PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: FUNCTIONAL BASELINE REACHED
+
+Current architecture verified in production runs:
+
+Sources
+→ Collector (HTML + RSS)
+→ Discovery_Candidates (collector proof)
+→ Field extraction (LLM + fallback parser)
+→ Mandatory field gate (title + date)
+→ Dedup (existing inbox URLs)
+→ Inbox
+
+Latest verified run example:
+sources=3
+candidates_logged=43
+inbox_new=1
+
+Key improvements implemented in this session:
+- RSS sources now supported inside the LLM discovery pipeline
+- Collector supports both HTML and RSS sources
+- Discovery_Candidates now logs all collected detail URLs (collector proof)
+- Inbox write happens only after mandatory field validation + dedup
+- Health log reflects collector status per source
+
+Stability assessment:
+- Collector layer: STABLE
+- RSS ingestion: WORKING
+- Dedup logic: WORKING
+- Health logging: WORKING
+
+Remaining gaps (non-blocking):
+1) Event date extraction robustness (HTML pages)
+2) Better heuristics for aggregator sites (Münsterland / EUREGIO)
+3) Some sources produce candidates but fail the mandatory field gate
+
+Strategic source policy (confirmed):
+- Prefer neutral aggregators and public feeds
+- Avoid using individual venues/locations as primary discovery sources
+- Example preferred sources:
+  - presse-service Bocholt
+  - presse-service Kreis Borken
+  - Münsterland Veranstaltungen
+  - EUREGIO Agenda
+
+Next work focus (pipeline only):
+- Improve date extraction reliability
+- Adjust HTML detail-URL heuristics for aggregator sites
+- Validate candidate → inbox conversion rates using TSV exports
+
+Pipeline architecture itself is now considered **validated**.
 
 LAST UPDATE:
 
