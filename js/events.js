@@ -369,9 +369,9 @@ badge.appendChild(bMonth);
     - Danach Badge + Body.
     === */
 
- // === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
-// Zweck: Icons konsistent zu Canonical Categories (Sheet/Filter/Builder) via FilterModule.normalizeCategory().
-// Umfang: Ersetzt nur Icon-Ermittlung; DOM-Anhängung bleibt inline an <h3 class="event-title">.
+// === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
+// Zweck: Kategorie-Icon auf Event Cards als SVG aus window.Icons (Single Source of Truth), keine Emojis.
+// Umfang: Ersetzt nur Icon-Ermittlung + DOM-Injection; Canonical Category Logik bleibt.
 // ===
 const kategorieRaw = (event?.kategorie || "").toString().trim();
 
@@ -380,24 +380,19 @@ const canonicalCategory =
   (window.FilterModule?.normalizeCategory ? window.FilterModule.normalizeCategory(kategorieRaw) : "") ||
   kategorieRaw;
 
-const iconMap = {
-  "Märkte & Feste": "🧺",
-  "Kultur & Kunst": "🎭",
-  "Musik & Bühne": "🎵",
-  "Kinder & Familie": "🧒",
-  "Sport & Bewegung": "🏃",
-  "Natur & Draußen": "🌿",
-  "Innenstadt & Leben": "🏙️",
-};
+const iconKey =
+  canonicalCategory && window.Icons?.categoryKey
+    ? (window.Icons.categoryKey(canonicalCategory) || "calendar")
+    : "";
 
-const categoryIcon = canonicalCategory ? (iconMap[canonicalCategory] || "🗓️") : "";
-
-if (categoryIcon) {
+if (iconKey && window.Icons?.svg) {
   const icon = document.createElement("span");
   icon.className = "event-category-icon";
   icon.setAttribute("role", "img");
-  icon.setAttribute("aria-label", `Kategorie: ${canonicalCategory}`);
-  icon.textContent = categoryIcon;
+  icon.setAttribute("aria-label", `Kategorie: ${canonicalCategory || "Kalender"}`);
+
+  // SVG (styling via CSS tokens)
+  icon.innerHTML = window.Icons.svg(iconKey, { className: "event-icon-svg is-category" });
 
   // Icon INLINE in die Titelzeile
   h3.appendChild(icon);
@@ -590,6 +585,7 @@ Umfang:
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
