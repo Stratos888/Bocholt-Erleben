@@ -144,35 +144,36 @@ FOUNDATION BASELINE (VERIFIED):
 
 WORKPACKS COMPLETED THIS SESSION (VERIFIED VIA PROOFS):
 
-- Scroll container contract fixed:
-  - detail-panel-body overflowY = auto
-  - scrollPaddingBottom resolves to px (not auto)
-  - canScroll becomes true under long-content stress test (scrollHeight > clientHeight)
-- Header direction locked (enterprise alignment):
-  - Category icon is indicator-only and must visually behave as content badge (not a control)
-  - Close is a dedicated dismiss control with app-like affordance (quiet-filled), token-based
+- Icons: Appweite Single-Source-of-Truth eingeführt:
+  - `window.Icons` Registry (`js/icons.js`) mit SVG Line Icons
+  - Script-Order in `index.html`: icons.js vor details.js/events.js
+  - Detailpanel + Event Cards nutzen SVGs über `Icons.svg()` (keine Emojis mehr)
+- Categories: Kanonische Kategorie ist single-source in `FilterModule.normalizeCategory()`:
+  - Variante A umgesetzt: `Highlights` + `Wirtschaft` → `Innenstadt & Leben`
+  - `Icons.categoryKey()` mappt ausschließlich kanonische Kategorien auf `cat-*` Keys
+- CSS: Appweite Tokenisierung/Rendering für SVG Icons:
+  - `svg.ui-icon-svg` globaler Base-Style (size/stroke/opacity via Tokens)
+  - Kontext-Overrides (sm/md/lg + stroke-sm/md/lg) für Cards/Meta/Header
+  - Detailpanel SVG-Guard scoped (UI-Icons clamped, Kategorie-Badge frei skalierbar)
 
 REMAINING GAPS (NEXT WORKPACKS):
 
-1) HEADER FINALIZATION (UI POLISH, TOKEN-CONSISTENT)
-   - Ensure header row feels “one line” (consistent optical alignment across title / badge / close)
-   - Validate long-title clamp + no collision with close
-   - Validate focus states (close + any header interactive elements)
+1) HEADER FINALIZATION — BASELINE ALIGNMENT (TOP-APP LOOK)
+   - Kategorie-Icon muss auf Baseline der ersten Titelzeile ausgerichtet werden (nicht vertikal zentriert im Header-Block)
+   - Long-title clamp + keine Kollision mit Close (re-check nach Baseline-Adjust)
 
-2) META COMPACTION (DATE/TIME/LOCATION, CALM)
-   - Row model: Row 1 = location link, Row 2 = date + time
-   - No right-side “meta box” next to title on mobile
-   - Robust under long location names (wrap safe)
+2) ACTIONBAR INTEGRATION (CONNECTED FEEL)
+   - Visuelle Verbindung Content ↔ Actionbar finalisieren (Shadow/Divider/Rhythmus)
+   - Safe-area bottom inset berücksichtigen (env(safe-area-inset-bottom))
+   - Focus/active states konsistent
 
 3) READABILITY + RHYTHM (TEXT FLOW)
-   - Calm vertical rhythm across sections (no “jumps”)
-   - Line-height + paragraph spacing consistent
-   - Description readability strong; no cramped blocks
+   - Line-height / Absatzabstände im Description Block final beruhigen
+   - Meta-Icon Gewichtung minimal leichter als Text
 
-4) ACTIONBAR INTEGRATION (CONNECTED FEEL)
-   - Actionbar feels connected to content
-   - Touch targets >= 44px
-   - Focus/active states consistent
+4) ENTERPRISE INTERACTION AUDIT
+   - Focus-visible für alle interaktiven Elemente im Panel (Close, Links, Actions)
+   - Tab-Reihenfolge (Header → Content → Actions) verifizieren
 
 <!-- === END REPLACEMENT BLOCK: TASK 1 (Enterprise Gate + controlled evolution) === -->
 
@@ -210,29 +211,32 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- Detailpanel: Actionbar ist enterprise-like integriert (Top-Radius + Shadow + Blur), weiterhin exakt 2 Primary Actions
-- Detailpanel: Touch-Targets verifiziert (Close + Actions >= 44×44); Close ist jetzt token-driven (appwide --ui-tap-target / --ui-close-size)
-- Detailpanel: Header-Reserve fix (Titel kann nicht mehr unter Close laufen; 2-line clamp stabil)
-- Detailpanel: Meta-Bereich als „List Group“ (Rows neutral/transparent, Divider nur zwischen Rows) — Formfeld-Look entfernt
-- Detailpanel: Quelle-Link als ruhige Zeile (borderless/transparent) — Kachel-/Formfeld-Look entfernt
-- CSS: style.css wurde erfolgreich konsolidiert und als konsolidierte Datei verifiziert (keine sichtbaren Regressionen im Detailpanel-Smoke-Test)
+- Detailpanel: Appweite Icon-Standardisierung abgeschlossen (SVG Line Icons + Tokens)
+  - `window.Icons` Registry (`js/icons.js`)
+  - `details.js` + `events.js` nutzen `Icons.svg()` / `Icons.categoryKey()`
+  - Keine Emoji-Kategorie-Icons mehr (keine OS/Font-Drifts)
+- Categories: Single Source of Truth ist `FilterModule.normalizeCategory()`
+  - Variante A: `Highlights` + `Wirtschaft` → `Innenstadt & Leben`
+  - `Icons.categoryKey()` mappt ausschließlich kanonische Kategorien auf `cat-*`
+- CSS/Tokens: SVG Rendering ist appweit konsistent
+  - `svg.ui-icon-svg` Base Style (size/stroke/opacity via Tokens)
+  - Kontextgrößen für Cards/Meta/Header (sm/md/lg + stroke-sm/md/lg)
+  - Detailpanel SVG Guard scoped (UI-Icons clamped, Kategorie-Badge frei)
 
 DECISIONS LOG (permanent, project-wide):
-- ENGINEERING.md: Patch-Output-Standard ist minimal (pro Replace: File + BEGIN + END + Replacement block; keine Zusatznotizen) — Forensics/Attestation nur auf explizite User-Anforderung
-- UI Contract: Tap-Targets appwide über Token `--ui-tap-target` (44px) definiert; Close-Button nutzt tokenisierte DNA (`--ui-close-*`)
-- UI Contract: Detailpanel Meta-Block ist canonical „List Group“ (kein Formfeld-Look)
+- Icons: Single Source of Truth ist `window.Icons` (SVG Line Icons). Keine Emojis für Kategorien.
+- Kategorien: Single Source of Truth ist `FilterModule.normalizeCategory()` (kanonische Kategorien). Icons mappt nur kanonisch → IconKey.
+- Darstellung: Größe/Stroke/Opacity werden ausschließlich über CSS Tokens gesteuert (`--ui-icon-*`).
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
-- Enterprise-Basis stabil; zentrale UI-Gaps geschlossen (Header-Kollision, Meta/Formfield-Look, Quelle-Link, Actionbar-Integration, Close 44×44 tokenisiert)
-- Kategorie-Icon im Detailpanel wird aktuell als Emoji gerendert und per Filter tokenisiert; akzeptiert als Debt (Renderer-abhängig). Optional später: SVG/Icon-Registry.
+- Architektur + Konsistenz stabil (Overlay-Root, Scroll/Close/Actions, Icon-System zentral)
+- Nächster UI-Workpack: Header Baseline Alignment (Kategorie-Icon an erste Titelzeilen-Baseline, nicht center)
 
 REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
-1) CSS-KONSOLIDIERUNG IN REPO FINALISIEREN
-   - Konsolidierte style.css in Repo übernehmen (ersetzt bisherigen Stand), Smoke-Test GS-02 (Detailpanel) + GS-01 (Feed) + PWA Header
-2) RHYTHM / SPACING POLISH (nur wenn sichtbar nötig)
-   - vertikaler Rhythmus zwischen Meta → Beschreibung → Quelle → Actionbar final beruhigen
-3) ICON SYSTEM (optional, später)
-   - Wenn 100% Neutralität gefordert: Kategorie-Icons von Emoji auf SVG/Icon-Registry umstellen (Single Source of Truth)
+1) Header Baseline Alignment (Kategorie-Icon ↔ erste Titelzeile)
+2) Actionbar Integration + Safe-Area bottom inset
+3) Typografie/Rhythmus (Description weight/line-height, Meta-Icons leicht entschärfen)
+4) Focus-visible Audit (Close/Links/Actions)
 
 PIPELINE: TASK 4 IN PROGRESS — Backfill aktiv (z. B. „Inbox backfilled (updated rows): 7“ beobachtet), aber Parser-/Script-Stabilität noch nicht enterprise-safe:
 - Sporadische Parse-Fehler je Quelle („NoneType object is not iterable“)
