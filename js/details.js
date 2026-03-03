@@ -69,10 +69,14 @@
    Zweck: Kategorie-Icons im Detailpanel als SVG-Typen (keine Emojis, keine Font-Metrik-Drifts).
    Umfang: Ersetzt nur getCategoryIcon().
 */
+/* BEGIN PATCH ICONS-DETAILS-CATEGORYKEY-V1
+   Zweck: Kategorie-Icons im Detailpanel NICHT als Emojis, sondern als IconKeys (SVG via window.Icons).
+   Umfang: Ersetzt nur getCategoryIcon().
+*/
 /* === BEGIN BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji)
 Zweck:
-- Kategorie-Icons im Detailpanel als SVG (app-like, baseline-stabil)
-- Fallback bleibt "calendar" (SVG Token)
+- Kategorie → IconKey (Single Source of Truth: window.Icons.categoryKey)
+- Fallback: "calendar"
 Umfang:
 - Nur getCategoryIcon()
 === */
@@ -80,33 +84,15 @@ const getCategoryIcon = (categoryRaw) => {
   const c = trimOrEmpty(categoryRaw);
   if (!c) return "";
 
-  const iconMap = {
-    "Musik": "cat-music",
-    "Musik & Bühne": "cat-music",
+  // Single Source of Truth
+  if (window.Icons && typeof window.Icons.categoryKey === "function") {
+    return window.Icons.categoryKey(c) || "calendar";
+  }
 
-    "Kultur": "cat-culture",
-    "Kultur & Kunst": "cat-culture",
-
-    "Essen & Trinken": "cat-food",
-
-    "Sport": "cat-sport",
-    "Sport & Bewegung": "cat-sport",
-
-    "Familie": "cat-kids",
-    "Kinder & Familie": "cat-kids",
-
-    "Natur & Draußen": "cat-nature",
-
-    "Innenstadt & Leben": "cat-city",
-
-    "Märkte & Feste": "cat-market",
-    "Märkte": "cat-market",
-    "Markt": "cat-market",
-  };
-
-  return iconMap[c] || "calendar";
+  return "calendar";
 };
 /* === END BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji) === */
+/* END PATCH ICONS-DETAILS-CATEGORYKEY-V1 */
 /* END PATCH DP-CATEGORY-ICONS-SVG-V1 (CATEGORY MAP) */
 
   // === BEGIN BLOCK: LOCATION HOMEPAGE LOOKUP (robust matching) ===
@@ -807,153 +793,29 @@ const actions = [
       // === END BLOCK: DATE LABEL (DE, user-friendly) ===
 
 
+/* BEGIN PATCH ICONS-DETAILS-ICONS-WRAPPER-V1
+   Zweck: Detailpanel-Icons zentral aus window.Icons.svg() beziehen (keine Inline-SVG-Definitionen in details.js).
+   Umfang: Ersetzt iconSvg() Block komplett, API bleibt kompatibel (type, extraClass).
+*/
 /* === BEGIN FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere)
 Zweck:
-- Kalender-Icon Token: EINMAL definieren und überall wiederverwenden (Actionbar + Detailpanel + später Events-Screen)
+- Icons als Single Source of Truth über window.Icons.svg()
+- Bestehende Call-Sites behalten iconSvg(type, extraClass)
 Umfang:
-- Erweitert iconSvg um optionale CSS-Klasse (z.B. "is-chip")
+- Ersetzt iconSvg()
 === */
-/* BEGIN PATCH DP-CATEGORY-ICONS-SVG-V1 (ICONSVG)
-   Zweck: SVG Icon Registry erweitern (Kategorie-Icons + bestehende UI-Icons).
-   Umfang: Ersetzt iconSvg() komplett, keine Änderungen an Aufrufern außer Type-Strings.
-*/
 const iconSvg = (type, extraClass = "") => {
   const cls = `detail-icon-svg${extraClass ? " " + extraClass : ""}`;
 
-  // minimal, consistent line-icons (no brand logos)
-  if (type === "calendar") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 2v3M17 2v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
-          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M7.5 13h3M7.5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
+  if (window.Icons && typeof window.Icons.svg === "function") {
+    // IMPORTANT: keep existing CSS hooks by passing "detail-icon-svg"
+    return window.Icons.svg(type, { className: cls });
   }
 
-  // === Category icons (SVG, not emoji) ===
-  if (type === "cat-market") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6.5 10.5l1.2 9.5h8.6l1.2-9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M8 10.5V9a4 4 0 0 1 8 0v1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M5.5 10.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-culture") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 16c2.5-2 4.5-3 8-3s5.5 1 8 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M7 10c.8-1 1.9-1.5 3.3-1.5 1.3 0 2.4.5 3.2 1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M9.5 11.5h0M14.5 11.5h0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <path d="M6 17.5V19M18 17.5V19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-music") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 4v11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M12 4l8-2v11" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M9 18a2.5 2.5 0 1 0 0 .1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M17 16a2.5 2.5 0 1 0 0 .1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-kids") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M8 10a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M7 20c.5-3 2.5-5 5-5s4.5 2 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M9 12h0M15 12h0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-sport") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M15 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" fill="none" stroke="currentColor" stroke-width="2"/>
-        <path d="M10 20l2-6 3 2 2 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 13l4-2 2-3 4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-nature") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 19c7-1 12-6 12-13-7 1-12 6-12 13z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M6 19c3-4 7-7 12-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-city") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 20V9l5-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M9 20V6l6-2v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M15 20v-8l5 2v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "cat-food") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 3v8M9 3v8M5 3v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M7 11v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M15 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M15 7c0-2 1-4 3-4v8c-2 0-3-2-3-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "whatsapp" || type === "share") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3a7 7 0 0 1 7 7c0 3.9-3.1 7-7 7H8l-3.5 3.5.9-4A7 7 0 0 1 12 3z"
-          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M9 10h6M9 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "route") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M11 3l10 8-10 10V3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M3 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (type === "website") {
-    return `
-      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 14l8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M13 6h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"
-          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      </svg>
-    `;
-  }
-
-  // fallback
-  return `
-    <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 2v20M2 12h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  `;
+  return "";
 };
 /* === END FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere) === */
+/* END PATCH ICONS-DETAILS-ICONS-WRAPPER-V1 */
 /* END PATCH DP-CATEGORY-ICONS-SVG-V1 (ICONSVG) */
 
             /* === BEGIN PATCH: ACTIONBAR LABELS (enterprise v2: calendar + share + website)
@@ -1383,6 +1245,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
