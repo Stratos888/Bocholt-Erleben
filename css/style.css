@@ -152,6 +152,9 @@
   /* Default (für einfache Nutzung in Selektoren) */
   --ui-icon-size: var(--ui-icon-size-md);
 
+  /* Line icon style (state of the art) */
+  --ui-icon-stroke: 2;
+
   --ui-icon-opacity: 0.92;
 
   /* Emoji-Icons app-like neutralisieren */
@@ -2302,23 +2305,92 @@ html.is-panel-open body {
 }
 
 
-/* DETAILPANEL SVG SIZE GUARD (systemic, all detail-icon-svg) */
+/* BEGIN PATCH ICONS-CSS-SYSTEM-V1
+   Zweck:
+   1) Einheitlicher “Top-App” Line-Icon Look für alle SVGs aus window.Icons (class: ui-icon-svg).
+   2) Detailpanel SVG Guard so scopen, dass NUR UI-Icons (Meta/Links/Actions/Close) auf 18px geklemmt werden.
+   3) Kategorie-Icon im Header darf wieder über Tokens skalieren (ui-icon-size-lg).
+   Umfang:
+   - Ersetzt kompletten bisherigen Detailpanel “JEDES svg/img = 18px” Guard + bringt SVG Base Styles mit.
+*/
 
-/* 1) Primär: explizite Icon-Klassen (falls vorhanden) */
-#event-detail-panel svg.detail-icon-svg,
-#event-detail-panel img.detail-icon-svg{
-  width: 18px !important;
-  height: 18px !important;
+/* APP-WIDE SVG ICON BASE (Single Source of Truth: window.Icons → class ui-icon-svg) */
+svg.ui-icon-svg{
+  width: var(--ui-icon-size);
+  height: var(--ui-icon-size);
 
-  min-width: 18px !important;
-  min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
+  display: block;
+  flex: 0 0 auto;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--ui-icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  opacity: var(--ui-icon-opacity);
+
+  /* keep stroke visually consistent */
+  vector-effect: non-scaling-stroke;
+}
+
+/* DETAILPANEL SVG SIZE GUARD (scoped, UI-icons only) */
+
+/* 1) NUR UI-Icon-Container im Detailpanel clampen */
+#event-detail-panel .detail-meta-icon svg,
+#event-detail-panel .detail-meta-icon img,
+#event-detail-panel .detail-link svg,
+#event-detail-panel .detail-link img,
+#event-detail-panel .detail-actions svg,
+#event-detail-panel .detail-actions img,
+#event-detail-panel .detail-action svg,
+#event-detail-panel .detail-action img,
+#event-detail-panel .detail-close svg,
+#event-detail-panel .detail-close img{
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+
+  min-width: var(--ui-icon-size-md) !important;
+  min-height: var(--ui-icon-size-md) !important;
+  max-width: var(--ui-icon-size-md) !important;
+  max-height: var(--ui-icon-size-md) !important;
 
   flex: 0 0 auto !important;
   display: block !important;
   object-fit: contain !important;
 }
+
+/* 2) Kategorie-Indikator im Detailpanel-Header: folgt dem Badge-Container / Tokens */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* 3) Description-Content: Medien bleiben frei (kein Icon-Guard) */
+#event-detail-panel .detail-description svg,
+#event-detail-panel .detail-description img{
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+
+  display: inline !important;
+  object-fit: contain !important;
+}
+
+/* END PATCH ICONS-CSS-SYSTEM-V1 */
 
 /* BEGIN PATCH DP-SVG-GUARD-SCOPE-V1
    Zweck: Verhindert, dass jedes svg/img im Detailpanel hart auf 18px gezwungen wird.
@@ -2753,6 +2825,7 @@ html.is-panel-open body {
   cursor: default;
   transform: none;
 }
+
 
 
 
