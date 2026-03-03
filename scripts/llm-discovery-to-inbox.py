@@ -21,13 +21,16 @@
 
 from __future__ import annotations
 
+# === BEGIN REPLACEMENT BLOCK: imports — LLM DISCOVERY | Scope: add hashlib + url normalization helpers ===
 import json
 import os
 import re
+import hashlib
 from dataclasses import dataclass
-from datetime import datetime, timedelta, date
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, parse_qsl, urlencode, urlunparse
+# === END REPLACEMENT BLOCK: imports — LLM DISCOVERY | Scope: add hashlib + url normalization helpers ===
 
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
@@ -364,10 +367,55 @@ def parse_sources(values: List[List[str]]) -> List[SourceCfg]:
 
 NEXT_TEXT_HINTS = ("weiter", "nächste", "naechste", "next", ">", "»")
 BLOCKED_EXTS = (".pdf", ".jpg", ".jpeg", ".png", ".zip", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
+# === BEGIN REPLACEMENT BLOCK: url normalization + tracking filters — LLM DISCOVERY | Scope: stable dedupe/fingerprints ===
 BLOCKED_QUERY_HINTS = ("download=1",)
 
+TRACKING_QUERY_KEYS = {
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "fbclid",
+    "mc_cid",
+    "mc_eid",
+    "cmpid",
+    "pk_campaign",
+    "pk_kwd",
+    "pk_source",
+    "pk_medium",
+    "ref",
+    "referrer",
+}
+
+def normalize_url(u: str) -> str:
+    """Normalize URL for dedupe (remove fragment + common tracking params; keep meaningful params like event=)."""
+    try:
+        p = urlparse((u or "").strip())
+        if not p.scheme or not p.netloc:
+            return (u or "").strip()
+
+        qs = []
+        for k, v in parse_qsl(p.query, keep_blank_values=True):
+            kk = (k or "").strip().lower()
+            if kk in TRACKING_QUERY_KEYS:
+                continue
+            qs.append((k, v))
+
+        new_query = urlencode(qs, doseq=True)
+        # drop fragment
+        p2 = p._replace(query=new_query, fragment="")
+        return urlunparse(p2).strip()
+    except Exception:
+        return (u or "").strip()
+
+def url_fingerprint(u: str) -> str:
+    nu = normalize_url(u)
+    return hashlib.sha1(nu.encode("utf-8", errors="ignore")).hexdigest()
 
 def _is_safe_nav_url(listing_url: str, candidate_url: str) -> bool:
+# === END REPLACEMENT BLOCK: url normalization + tracking filters — LLM DISCOVERY | Scope: stable dedupe/fingerprints ===
     try:
         lu = urlparse(listing_url)
         cu = urlparse(candidate_url)
@@ -992,13 +1040,17 @@ async def collect_detail_urls_playwright(cfg: SourceCfg) -> Dict[str, Any]:
     }
   
 
+# === BEGIN REPLACEMENT BLOCK: make_candidate_row — LLM DISCOVERY | Scope: real flags + stable fingerprint ===
 def make_candidate_row(
     run_ts: str,
     cfg: SourceCfg,
     detail_url: str,
+    *,
+    is_already_inbox: bool,
+    is_written_to_inbox: bool,
+    notes: str,
 ) -> List[str]:
     created_at = run_ts
-    # keep minimal fields empty; this is only a collector proof / candidate log
     return [
         run_ts,
         cfg.source_name,
@@ -1006,12 +1058,12 @@ def make_candidate_row(
         cfg.url,
         "candidate",
         "llm_candidate_detail_url",
-        "FALSE",  # is_written_to_inbox
+        "TRUE" if is_written_to_inbox else "FALSE",
         "FALSE",  # is_already_live
-        "FALSE",  # is_already_inbox
+        "TRUE" if is_already_inbox else "FALSE",
         "",  # matched_event_id
         "",  # match_score
-        detail_url,  # fingerprint (temporary)
+        url_fingerprint(detail_url),  # fingerprint (stable)
         "",  # id_suggestion
         "",  # title
         "",  # event_date
@@ -1020,10 +1072,11 @@ def make_candidate_row(
         cfg.default_city or "Bocholt",  # city
         "",  # location
         cfg.default_category or "",  # kategorie_suggestion
-        detail_url,  # url
-        "collector_only (playwright)",  # notes
+        detail_url,  # url (raw)
+        (notes or "")[:240],
         created_at,
     ]
+# === END REPLACEMENT BLOCK: make_candidate_row — LLM DISCOVERY | Scope: real flags + stable fingerprint ===
 
 
 def make_health_row(
@@ -1121,7 +1174,7 @@ async def main_async() -> None:
                 if url_idx is not None:
                     for r in inbox_values[1:]:
                         if url_idx < len(r) and r[url_idx]:
-                            existing_inbox_urls.add(r[url_idx].strip())
+                            existing_inbox_urls.add(normalize_url(r[url_idx].strip()))
         except Exception:
             pass
 
@@ -1172,80 +1225,122 @@ async def main_async() -> None:
 
         # Log candidates for all collected detail URLs (collector proof),
         # but only write up to target_new NEW items to Inbox (skip duplicates).
-        for u in details:
-            candidate_rows.append(make_candidate_row(run_ts, cfg, u))
+        if cfg.source_type == "html":
+            # Reuse a single browser/context/page for all detail fetches of this source (major speed-up)
+            async with async_playwright() as p_det:
+                browser_det = await p_det.chromium.launch(
+                    headless=True,
+                    args=[
+                        "--no-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                    ],
+                )
+                context_det = await browser_det.new_context(
+                    user_agent=(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                    ),
+                    locale="de-DE",
+                    accept_downloads=False,
+                )
+                page_det = await context_det.new_page()
 
-            if new_inbox_written >= target_new:
-                continue
-            if u in existing_inbox_urls:
-                continue
+                for u in details:
+                    nu = normalize_url(u)
+                    already_inbox = (not disable_inbox_dedupe) and (nu in existing_inbox_urls)
 
-            try:
-                # === BEGIN BLOCK: RSS direct write to Inbox (no detail fetch) ===
-                if cfg.source_type == "rss":
-                    fields = (rss_items_by_url.get(u) or {}).copy()
-                    fields["url"] = u
+                    will_write = False
+                    note = "collector_only (playwright)"
+                    if already_inbox:
+                        note = "collector_only (dup: already_inbox)"
+                    elif new_inbox_written >= target_new:
+                        note = "collector_only (cap reached)"
+                    else:
+                        try:
+                            await page_det.goto(u, wait_until="domcontentloaded", timeout=60_000)
+                            await page_det.wait_for_timeout(1200)
+                            detail_html = await page_det.content()
 
-                    # Pflichtfelder-Gate (minimal, robust)
-                    if not fields.get("title") or not fields.get("date"):
-                        continue
+                            fields = llm_extract_event_fields(detail_html, u, cfg)
+                            if fields is None:
+                                fields = extract_event_fields(detail_html, u, cfg)
 
-                    if not fields.get("location"):
-                        fields["location"] = cfg.default_city or "Bocholt"
-                    if not fields.get("city"):
-                        fields["city"] = cfg.default_city or "Bocholt"
-                    if not fields.get("kategorie_suggestion"):
-                        fields["kategorie_suggestion"] = cfg.default_category or ""
+                            # Pflichtfelder-Gate (minimal, robust)
+                            if not fields.get("title") or not fields.get("date"):
+                                note = "skipped (missing title/date)"
+                            else:
+                                if not fields.get("location"):
+                                    fields["location"] = cfg.default_city or "Bocholt"
 
-                    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-                    existing_inbox_urls.add(u)
-                    new_inbox_written += 1
-                    continue
-                # === END BLOCK: RSS direct write to Inbox (no detail fetch) ===
+                                inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                                existing_inbox_urls.add(nu)
+                                new_inbox_written += 1
+                                will_write = True
+                                note = "written_to_inbox"
+                        except Exception:
+                            note = "skipped (detail_fetch_or_extract_error)"
 
-                # === BEGIN BLOCK: HTML detail fetch + extraction ===
-                async with async_playwright() as p:
-                    browser = await p.chromium.launch(
-                        headless=True,
-                        args=[
-                            "--no-sandbox",
-                            "--disable-dev-shm-usage",
-                            "--disable-blink-features=AutomationControlled",
-                        ],
+                    candidate_rows.append(
+                        make_candidate_row(
+                            run_ts,
+                            cfg,
+                            u,
+                            is_already_inbox=already_inbox,
+                            is_written_to_inbox=will_write,
+                            notes=note,
+                        )
                     )
-                    context = await browser.new_context(
-                        user_agent=(
-                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                            "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                        ),
-                        locale="de-DE",
-                        accept_downloads=False,
+
+                await context_det.close()
+                await browser_det.close()
+
+        else:
+            # RSS: no detail fetch; write directly using feed fields
+            for u in details:
+                nu = normalize_url(u)
+                already_inbox = (not disable_inbox_dedupe) and (nu in existing_inbox_urls)
+
+                will_write = False
+                note = "collector_only (rss)"
+                if already_inbox:
+                    note = "collector_only (dup: already_inbox)"
+                elif new_inbox_written >= target_new:
+                    note = "collector_only (cap reached)"
+                else:
+                    try:
+                        fields = (rss_items_by_url.get(u) or {}).copy()
+                        fields["url"] = u
+
+                        # Pflichtfelder-Gate (minimal, robust)
+                        if not fields.get("title") or not fields.get("date"):
+                            note = "skipped (missing title/date)"
+                        else:
+                            if not fields.get("location"):
+                                fields["location"] = cfg.default_city or "Bocholt"
+                            if not fields.get("city"):
+                                fields["city"] = cfg.default_city or "Bocholt"
+                            if not fields.get("kategorie_suggestion"):
+                                fields["kategorie_suggestion"] = cfg.default_category or ""
+
+                            inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                            existing_inbox_urls.add(nu)
+                            new_inbox_written += 1
+                            will_write = True
+                            note = "written_to_inbox"
+                    except Exception:
+                        note = "skipped (rss_parse_or_write_error)"
+
+                candidate_rows.append(
+                    make_candidate_row(
+                        run_ts,
+                        cfg,
+                        u,
+                        is_already_inbox=already_inbox,
+                        is_written_to_inbox=will_write,
+                        notes=note,
                     )
-                    page = await context.new_page()
-                    await page.goto(u, wait_until="domcontentloaded", timeout=60_000)
-                    await page.wait_for_timeout(1200)
-                    detail_html = await page.content()
-                    await context.close()
-                    await browser.close()
-
-                fields = llm_extract_event_fields(detail_html, u, cfg)
-                if fields is None:
-                    fields = extract_event_fields(detail_html, u, cfg)
-
-                # Pflichtfelder-Gate (minimal, robust)
-                if not fields.get("title") or not fields.get("date"):
-                    continue
-
-                if not fields.get("location"):
-                    fields["location"] = cfg.default_city or "Bocholt"
-
-                inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-                existing_inbox_urls.add(u)
-                new_inbox_written += 1
-                # === END BLOCK: HTML detail fetch + extraction ===
-
-            except Exception:
-                continue
+                )
 
         if err:
             status = "llm_collect_fetch_error"
@@ -1253,6 +1348,7 @@ async def main_async() -> None:
             status = "llm_collect_ok" if new_inbox_written > 0 else "llm_collect_ok_no_new"
 
         health_rows.append(
+# === END REPLACEMENT BLOCK: per-source reuse + candidate flags — LLM DISCOVERY | Scope: performance + better logging ===
             make_health_row(
                 cfg,
                 status,
