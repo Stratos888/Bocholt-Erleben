@@ -2320,9 +2320,24 @@ html.is-panel-open body {
   object-fit: contain !important;
 }
 
-/* 2) Systemic Guard: JEDES svg/img im Detailpanel wird als Icon behandelt... */
-#event-detail-panel svg,
-#event-detail-panel img{
+/* BEGIN PATCH DP-SVG-GUARD-SCOPE-V1
+   Zweck: Verhindert, dass jedes svg/img im Detailpanel hart auf 18px gezwungen wird.
+          Guard gilt nur noch für UI-Icons (Meta/Links/Actions/Close).
+          Kategorie-Icon skaliert wieder mit seinem Container; Description-Content bleibt frei.
+   Umfang: Ersetzt den bisherigen “JEDES svg/img” Guard + Description-Ausnahme.
+*/
+
+/* 2) Systemic Guard (scoped): NUR UI-Icons im Detailpanel werden als Icons behandelt */
+#event-detail-panel .detail-meta-icon svg,
+#event-detail-panel .detail-meta-icon img,
+#event-detail-panel .detail-link svg,
+#event-detail-panel .detail-link img,
+#event-detail-panel .detail-actions svg,
+#event-detail-panel .detail-actions img,
+#event-detail-panel .detail-action svg,
+#event-detail-panel .detail-action img,
+#event-detail-panel .detail-close svg,
+#event-detail-panel .detail-close img{
   width: 18px !important;
   height: 18px !important;
 
@@ -2336,7 +2351,22 @@ html.is-panel-open body {
   object-fit: contain !important;
 }
 
-/* ...AUSNAHME: echte Medien/Content-Bilder in der Description dürfen normal sein */
+/* Kategorie-Indikator: soll mit dem Badge-Container skalieren (nicht auf 18px gezwungen) */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Description-Content: Medien bleiben frei (kein Icon-Guard) */
 #event-detail-panel .detail-description svg,
 #event-detail-panel .detail-description img{
   width: auto !important;
@@ -2350,6 +2380,8 @@ html.is-panel-open body {
   display: inline !important;
   object-fit: contain !important;
 }
+
+/* END PATCH DP-SVG-GUARD-SCOPE-V1 */
 
 
 /* ============================================
@@ -2721,6 +2753,7 @@ html.is-panel-open body {
   cursor: default;
   transform: none;
 }
+
 
 
 
