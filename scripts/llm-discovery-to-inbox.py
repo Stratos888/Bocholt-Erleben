@@ -27,14 +27,18 @@ import os
 import re
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from typing import Any, Dict, List, Optional, Set
 from urllib.parse import urljoin, urlparse, parse_qsl, urlencode, urlunparse
 # === END REPLACEMENT BLOCK: imports — LLM DISCOVERY | Scope: add hashlib + url normalization helpers ===
 
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
-from openai import OpenAI
+# Optional dependency: script must run even if openai is not installed (fallback extractor)
+try:
+    from openai import OpenAI  # type: ignore
+except Exception:
+    OpenAI = None  # type: ignore
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -795,6 +799,8 @@ def _build_llm_input(detail_html: str, detail_url: str, cfg: SourceCfg) -> str:
 
 
 def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Optional[Dict[str, str]]:
+    if OpenAI is None:
+        return None
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         return None
