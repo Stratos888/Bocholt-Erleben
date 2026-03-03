@@ -25,7 +25,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from typing import Any, Dict, List, Optional, Set
 from urllib.parse import urljoin, urlparse
 
@@ -414,23 +414,36 @@ def find_next_url(base_url: str, soup: BeautifulSoup) -> Optional[str]:
     return None
 
 
+# === BEGIN REPLACEMENT BLOCK: DETAIL_PATH_HINTS — LLM DISCOVERY | Scope: expand path hints for aggregators ===
 DETAIL_PATH_HINTS = (
     "/veranstaltungskalender/",
+    "/veranstaltungen/",
     "/event/",
     "/events/",
+    "/termin/",
     "/termine/",
+    "/agenda/",
     "/kalender/",
+    "/eventkalender/",
 )
+# === END REPLACEMENT BLOCK: DETAIL_PATH_HINTS — LLM DISCOVERY | Scope: expand path hints for aggregators ===
 
 EXCLUDE_PATH_HINTS = (
     "/bocholt_media/",
     "/media/",
 )
 
+# === BEGIN REPLACEMENT BLOCK: is_probable_detail_url — LLM DISCOVERY | Scope: stronger heuristics for aggregator detail pages ===
 def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
+    """Return True if candidate_url looks like an event/detail page for listing_url host.
+
+    Design goals:
+    - Stay conservative (avoid media/downloads, tracking, category/list pages)
+    - Be less brittle for aggregators (numeric IDs, event query params, deeper paths)
+    """
     try:
         u = urlparse(candidate_url)
-        if not u.scheme.startswith("http"):
+        if not (u.scheme or "").startswith("http"):
             return False
 
         # same host only
@@ -443,35 +456,217 @@ def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
             return False
 
         path = (u.path or "").lower()
+        q = (u.query or "").lower()
 
         # exclude media/downloads
         if any(x in path for x in EXCLUDE_PATH_HINTS):
             return False
         if any(path.endswith(ext) for ext in BLOCKED_EXTS):
             return False
-
-        q = (u.query or "").lower()
         if any(h in q for h in BLOCKED_QUERY_HINTS):
             return False
 
         # Bocholt-Kalender: echte Events haben "?event=<id>"
         if "bocholt.de" in lu.netloc and "/veranstaltungskalender/" in path:
-            if "event=" not in q:
-                return False
+            return "event=" in q
 
-        return any(h in path for h in DETAIL_PATH_HINTS) and len(path) > 3
-    except Exception:
+        # Strong positive signals
+        has_path_hint = any(h in path for h in DETAIL_PATH_HINTS)
+        has_event_query = any(k in q for k in ("event=", "termin=", "id=", "eid=", "eventid="))
+        has_numeric_id = bool(re.search(r"/(\d{4,})(?:/|$)", path))
+
+        # Avoid obvious listing/category pages
+        looks_like_listing = bool(
+            re.search(r"/(kategorie|kategorien|rubrik|suche|search|archiv|archive)(?:/|$)", path)
+        )
+
+        if looks_like_listing and not (has_event_query or has_numeric_id):
+            return False
+
+        if has_event_query or has_numeric_id or has_path_hint:
+            # keep a minimum path length to avoid /events/ root pages
+            return len(path.strip("/")) >= 4
+
         return False
     except Exception:
         return False
+# === END REPLACEMENT BLOCK: is_probable_detail_url — LLM DISCOVERY | Scope: stronger heuristics for aggregator detail pages ===
 
 
 def norm_text(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip())
 
 
-DATE_RE = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(\d{2,4})\b")
+# === BEGIN REPLACEMENT BLOCK: DATE/TIME EXTRACTION HELPERS — LLM DISCOVERY | Scope: robust date parsing for German sources ===
+DATE_RE_DDMMYYYY = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(\d{2,4})\b")
+DATE_RE_ISO = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+DATE_RE_DDMM_NOYEAR = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(?!\d)")  # dd.mm. (no year)
 TIME_RE = re.compile(r"\b(\d{1,2}:\d{2})\b")
+
+_MONTHS_DE = {
+    "januar": 1,
+    "jan": 1,
+    "februar": 2,
+    "feb": 2,
+    "maerz": 3,
+    "märz": 3,
+    "mrz": 3,
+    "april": 4,
+    "apr": 4,
+    "mai": 5,
+    "juni": 6,
+    "jun": 6,
+    "juli": 7,
+    "jul": 7,
+    "august": 8,
+    "aug": 8,
+    "september": 9,
+    "sep": 9,
+    "sept": 9,
+    "oktober": 10,
+    "okt": 10,
+    "november": 11,
+    "nov": 11,
+    "dezember": 12,
+    "dez": 12,
+}
+
+DATE_RE_MONTHNAME = re.compile(
+    r"\b(\d{1,2})\.\s*([A-Za-zÄÖÜäöüß]+)\s*(\d{4})?\b",
+    re.UNICODE,
+)
+
+
+def _normalize_month_token(s: str) -> str:
+    t = (s or "").strip().lower()
+    t = (
+        t.replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
+    return t
+
+
+def _safe_yyyy_mm_dd(year: int, month: int, day: int) -> Optional[str]:
+    try:
+        d = datetime(year, month, day).date()
+        return d.strftime("%Y-%m-%d")
+    except Exception:
+        return None
+
+
+def _choose_year_for_partial_date(day: int, month: int, today: "date") -> int:
+    """If year is missing, assume current year, but roll to next year if the date is clearly in the past."""
+    y = today.year
+    try:
+        cand = datetime(y, month, day).date()
+        if cand < (today - timedelta(days=14)):
+            return y + 1
+        return y
+    except Exception:
+        return y
+
+
+def _try_jsonld_event_date(soup: BeautifulSoup) -> Optional[str]:
+    """Try to extract Event.startDate from JSON-LD."""
+    scripts = soup.find_all("script", attrs={"type": re.compile(r"application/ld\+json", re.I)})
+    for s in scripts:
+        raw = (s.string or "").strip()
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw)
+        except Exception:
+            continue
+
+        stack: List[Any] = [data]
+        while stack:
+            cur = stack.pop()
+            if isinstance(cur, list):
+                stack.extend(cur)
+                continue
+            if isinstance(cur, dict):
+                t = cur.get("@type") or cur.get("type")
+                if isinstance(t, list):
+                    is_event = any(str(x).lower() == "event" for x in t)
+                else:
+                    is_event = str(t).lower() == "event"
+
+                if is_event:
+                    sd = (cur.get("startDate") or cur.get("startdate") or "").strip()
+                    if sd:
+                        m = DATE_RE_ISO.search(sd)
+                        if m:
+                            return m.group(1)
+                        m2 = re.match(r"^(\d{4}-\d{2}-\d{2})", sd)
+                        if m2:
+                            return m2.group(1)
+
+                for v in cur.values():
+                    if isinstance(v, (dict, list)):
+                        stack.append(v)
+
+    return None
+
+
+def extract_best_date(soup: BeautifulSoup, text_blob: str) -> str:
+    """Best-effort extraction of a single event date in YYYY-MM-DD."""
+    today = datetime.now().date()
+
+    jd = _try_jsonld_event_date(soup)
+    if jd:
+        return jd
+
+    t = soup.find("time")
+    if t and t.get("datetime"):
+        dt = norm_text(t.get("datetime", ""))
+        m = DATE_RE_ISO.search(dt)
+        if m:
+            return m.group(1)
+
+    meta = soup.find(attrs={"itemprop": re.compile(r"startdate", re.I)})
+    if meta and meta.get("content"):
+        m = DATE_RE_ISO.search(meta.get("content", ""))
+        if m:
+            return m.group(1)
+
+    m = DATE_RE_ISO.search(text_blob)
+    if m:
+        return m.group(1)
+
+    m = DATE_RE_DDMMYYYY.search(text_blob)
+    if m:
+        dd, mm, yy = int(m.group(1)), int(m.group(2)), m.group(3)
+        y = int(yy) if len(yy) == 4 else int("20" + yy)
+        out = _safe_yyyy_mm_dd(y, mm, dd)
+        if out:
+            return out
+
+    m = DATE_RE_MONTHNAME.search(text_blob)
+    if m:
+        dd = int(m.group(1))
+        month_tok = _normalize_month_token(m.group(2))
+        month = _MONTHS_DE.get(month_tok)
+        if month:
+            if m.group(3):
+                y = int(m.group(3))
+            else:
+                y = _choose_year_for_partial_date(dd, month, today)
+            out = _safe_yyyy_mm_dd(y, month, dd)
+            if out:
+                return out
+
+    m = DATE_RE_DDMM_NOYEAR.search(text_blob)
+    if m:
+        dd, mm = int(m.group(1)), int(m.group(2))
+        y = _choose_year_for_partial_date(dd, mm, today)
+        out = _safe_yyyy_mm_dd(y, mm, dd)
+        if out:
+            return out
+
+    return ""
+# === END REPLACEMENT BLOCK: DATE/TIME EXTRACTION HELPERS — LLM DISCOVERY | Scope: robust date parsing for German sources ===
 
 
 def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Dict[str, str]:
@@ -491,23 +686,10 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
     # text blob for regex
     text_blob = norm_text(soup.get_text(" ", strip=True))
 
+    # === BEGIN REPLACEMENT BLOCK: DATE EXTRACTION — LLM DISCOVERY | Scope: use extract_best_date(soup, text_blob) ===
     # date
-    date = ""
-    # 1) <time datetime="YYYY-MM-DD">
-    t = soup.find("time")
-    if t and t.get("datetime"):
-        dt = norm_text(t.get("datetime", ""))
-        m_iso = re.match(r"^(\d{4}-\d{2}-\d{2})", dt)
-        if m_iso:
-            date = m_iso.group(1)
-    # 2) dd.mm.yyyy
-    if not date:
-        m = DATE_RE.search(text_blob)
-        if m:
-            dd, mm, yy = m.group(1), m.group(2), m.group(3)
-            if len(yy) == 2:
-                yy = "20" + yy
-            date = f"{yy.zfill(4)}-{mm.zfill(2)}-{dd.zfill(2)}"
+    date = extract_best_date(soup, text_blob)
+    # === END REPLACEMENT BLOCK: DATE EXTRACTION — LLM DISCOVERY | Scope: use extract_best_date(soup, text_blob) ===
 
     # time
     time = ""
