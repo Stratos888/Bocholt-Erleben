@@ -518,10 +518,24 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       return "Natur & Draußen";
     }
 
+    // Variante A: Highlights/Wirtschaft werden in bestehende kanonische Kategorien gemappt
+    // Highlights: bewusst KEINE eigene Kategorie -> läuft unter "Innenstadt & Leben"
+    if (v.includes("highlight") || v.includes("highlights") || v.includes("tipp") || v.includes("top")) {
+      return "Innenstadt & Leben";
+    }
+
+    // Wirtschaft: bewusst KEINE eigene Kategorie -> läuft unter "Innenstadt & Leben"
+    if (v.includes("wirtschaft") || v.includes("business") || v.includes("handel") || v.includes("unternehmen")) {
+      return "Innenstadt & Leben";
+    }
+
     // Innenstadt & Leben
     if (v.includes("innenstadt") || v.includes("urban") || v.includes("city")) {
       return "Innenstadt & Leben";
     }
+
+    // Fallback: keine Canonicalisierung (damit Facets nicht "undefined" bekommen)
+    return "";
   },
 
   setActiveOption(sheetEl, activeBtn) {
