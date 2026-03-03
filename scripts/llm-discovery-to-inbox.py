@@ -144,6 +144,150 @@ def safe_int(v: str, default: int) -> int:
         return default
 
 
+# === BEGIN BLOCK: RSS COLLECTOR HELPERS (llm pipeline) ===
+# Datei: scripts/llm-discovery-to-inbox.py
+# Zweck: RSS/Atom Feed lesen, Items normalisieren (title/date/url/description), um LLM-Pipeline auch für RSS zu nutzen.
+# Umfang: Helper-Funktionen + collect_rss_items(cfg). Keine Roh-HTML Speicherung.
+# === END BLOCK: RSS COLLECTOR HELPERS (llm pipeline) ===
+import html as _html_mod
+import xml.etree.ElementTree as _ET
+from email.utils import parsedate_to_datetime as _parsedate_to_datetime
+
+import requests
+
+
+def _rss_strip_tags(s: str) -> str:
+    s = (s or "").strip()
+    if not s:
+        return ""
+    s = re.sub(r"<[^>]+>", " ", s)
+    s = _html_mod.unescape(s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
+def _rss_to_yyyy_mm_dd(dt_str: str) -> str:
+    dt_str = (dt_str or "").strip()
+    if not dt_str:
+        return ""
+    try:
+        dt = _parsedate_to_datetime(dt_str)
+        return dt.date().isoformat()
+    except Exception:
+        pass
+    m = re.match(r"^(\d{4}-\d{2}-\d{2})", dt_str)
+    return m.group(1) if m else ""
+
+
+def collect_rss_items(cfg: "SourceCfg") -> Dict[str, Any]:
+    """
+    Returns:
+      {
+        "detail_urls": [...],
+        "items_by_url": {url: fields_dict},
+        "http_status_last": "200",
+        "error": ""
+      }
+    fields_dict keys match make_inbox_row usage.
+    """
+    feed_url = cfg.url
+    http_status_last = ""
+    error_msg = ""
+    items_by_url: Dict[str, Dict[str, str]] = {}
+
+    try:
+        r = requests.get(
+            feed_url,
+            timeout=30,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                ),
+                "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7",
+            },
+        )
+        http_status_last = str(r.status_code)
+        if r.status_code >= 400:
+            return {
+                "detail_urls": [],
+                "items_by_url": {},
+                "http_status_last": http_status_last,
+                "error": f"rss_fetch_non_200:{r.status_code}",
+            }
+
+        root = _ET.fromstring(r.content or b"")
+
+        # RSS 2.0: <rss><channel><item>...
+        channel = root.find("channel")
+        if channel is not None:
+            for it in channel.findall("item"):
+                link = (it.findtext("link") or "").strip()
+                title = (it.findtext("title") or "").strip()
+                pub = (it.findtext("pubDate") or "").strip()
+                desc = (it.findtext("description") or "").strip()
+
+                if not link:
+                    continue
+
+                items_by_url[link] = {
+                    "title": title,
+                    "date": _rss_to_yyyy_mm_dd(pub),
+                    "time": "",
+                    "city": cfg.default_city or "Bocholt",
+                    "location": cfg.default_city or "Bocholt",
+                    "kategorie_suggestion": cfg.default_category or "",
+                    "url": link,
+                    "description": _rss_strip_tags(desc)[:500],
+                }
+
+        else:
+            # Atom: <feed><entry>...
+            ns = ""
+            if root.tag.startswith("{") and "}" in root.tag:
+                ns = root.tag.split("}", 1)[0] + "}"
+
+            for entry in root.findall(f"{ns}entry"):
+                title = (entry.findtext(f"{ns}title") or "").strip()
+                updated = (entry.findtext(f"{ns}updated") or "").strip() or (entry.findtext(f"{ns}published") or "").strip()
+
+                link = ""
+                for l in entry.findall(f"{ns}link"):
+                    href = (l.attrib.get("href") or "").strip()
+                    rel = (l.attrib.get("rel") or "").strip()
+                    if href and (rel in ("", "alternate")):
+                        link = href
+                        break
+                if not link:
+                    continue
+
+                summary = (entry.findtext(f"{ns}summary") or "").strip()
+                content = (entry.findtext(f"{ns}content") or "").strip()
+                desc = summary or content
+
+                items_by_url[link] = {
+                    "title": title,
+                    "date": _rss_to_yyyy_mm_dd(updated),
+                    "time": "",
+                    "city": cfg.default_city or "Bocholt",
+                    "location": cfg.default_city or "Bocholt",
+                    "kategorie_suggestion": cfg.default_category or "",
+                    "url": link,
+                    "description": _rss_strip_tags(desc)[:500],
+                }
+
+    except Exception as e:
+        error_msg = f"rss_parse_error:{e}"
+
+    detail_urls = sorted(items_by_url.keys())
+    return {
+        "detail_urls": detail_urls,
+        "items_by_url": items_by_url,
+        "http_status_last": http_status_last,
+        "error": error_msg,
+    }
+
+
 def build_sheets_service() -> Any:
     sheet_id = os.environ.get("SHEET_ID")
     sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -800,33 +944,48 @@ async def main_async() -> None:
             pass
 
     for cfg in llm_sources:
-        if cfg.source_type != "html":
+        details: List[str] = []
+        http_status_first = ""
+        err = ""
+        rss_items_by_url: Dict[str, Dict[str, str]] = {}
+
+        # === BEGIN BLOCK: Collector switch (html vs rss) ===
+        if cfg.source_type == "html":
+            res = await collect_detail_urls_playwright(cfg)
+            details = res["detail_urls"]
+            http_status_last = res["http_status_last"]
+            http_status_first = res.get("http_status_first", "") or http_status_last
+
+            # Append CF proof summary into error (short)
+            err = res["error"]
+            if not err and res.get("nav2_status") and int(res["nav2_status"] or "0") >= 400:
+                err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
+
+        elif cfg.source_type == "rss":
+            res = collect_rss_items(cfg)
+            details = res["detail_urls"]
+            rss_items_by_url = res["items_by_url"]
+            http_status_last = res["http_status_last"]
+            http_status_first = http_status_last
+            err = res["error"]
+
+        else:
             health_rows.append(
                 make_health_row(
                     cfg,
-                    "llm_collect_skip_non_html",
+                    "llm_collect_skip_unsupported_type",
                     "",
-                    "Collector implemented only for html in this script",
+                    f"Unsupported type for llm pipeline: {cfg.source_type}",
                     run_ts,
                     0,
                     0,
                 )
             )
             continue
-
-        res = await collect_detail_urls_playwright(cfg)
-        details: List[str] = res["detail_urls"]
-        http_status_last = res["http_status_last"]
-        http_status_first = res.get("http_status_first", "") or http_status_last
-
-        # Append CF proof summary into error (short)
-        err = res["error"]
-        if not err and res.get("nav2_status") and int(res["nav2_status"] or "0") >= 400:
-            err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
+        # === END BLOCK: Collector switch (html vs rss) ===
 
         # We treat llm_batch_size as "target number of NEW inbox rows" per run.
         target_new = max(cfg.llm_batch_size, 10)
-
         new_inbox_written = 0
 
         # Log candidates for all collected detail URLs (collector proof),
@@ -836,11 +995,33 @@ async def main_async() -> None:
 
             if new_inbox_written >= target_new:
                 continue
-
             if u in existing_inbox_urls:
                 continue
 
             try:
+                # === BEGIN BLOCK: RSS direct write to Inbox (no detail fetch) ===
+                if cfg.source_type == "rss":
+                    fields = (rss_items_by_url.get(u) or {}).copy()
+                    fields["url"] = u
+
+                    # Pflichtfelder-Gate (minimal, robust)
+                    if not fields.get("title") or not fields.get("date"):
+                        continue
+
+                    if not fields.get("location"):
+                        fields["location"] = cfg.default_city or "Bocholt"
+                    if not fields.get("city"):
+                        fields["city"] = cfg.default_city or "Bocholt"
+                    if not fields.get("kategorie_suggestion"):
+                        fields["kategorie_suggestion"] = cfg.default_category or ""
+
+                    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                    existing_inbox_urls.add(u)
+                    new_inbox_written += 1
+                    continue
+                # === END BLOCK: RSS direct write to Inbox (no detail fetch) ===
+
+                # === BEGIN BLOCK: HTML detail fetch + extraction ===
                 async with async_playwright() as p:
                     browser = await p.chromium.launch(
                         headless=True,
@@ -870,17 +1051,17 @@ async def main_async() -> None:
                     fields = extract_event_fields(detail_html, u, cfg)
 
                 # Pflichtfelder-Gate (minimal, robust)
-                # Pflicht nur: title + date
                 if not fields.get("title") or not fields.get("date"):
                     continue
 
-                # location fallback
                 if not fields.get("location"):
                     fields["location"] = cfg.default_city or "Bocholt"
 
                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
                 existing_inbox_urls.add(u)
                 new_inbox_written += 1
+                # === END BLOCK: HTML detail fetch + extraction ===
+
             except Exception:
                 continue
 
