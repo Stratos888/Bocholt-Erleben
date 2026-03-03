@@ -65,11 +65,14 @@
     return { raw: r, canonical: map[r] || "other" };
   };
 
+/* BEGIN PATCH DP-CATEGORY-ICONS-SVG-V1 (CATEGORY MAP)
+   Zweck: Kategorie-Icons im Detailpanel als SVG-Typen (keine Emojis, keine Font-Metrik-Drifts).
+   Umfang: Ersetzt nur getCategoryIcon().
+*/
 /* === BEGIN BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji)
 Zweck:
-- Unbekannte Kategorien sollen NICHT 🗓️ als Emoji nutzen
-- Stattdessen: konsistentes Kalender-Icon wie Action-Bar (SVG Token)
-- Kategorie-Icons müssen mit Event-Cards konsistent sein (z. B. Märkte -> 🧺)
+- Kategorie-Icons im Detailpanel als SVG (app-like, baseline-stabil)
+- Fallback bleibt "calendar" (SVG Token)
 Umfang:
 - Nur getCategoryIcon()
 === */
@@ -78,24 +81,33 @@ const getCategoryIcon = (categoryRaw) => {
   if (!c) return "";
 
   const iconMap = {
-    "Musik": "🎵",
-    "Kultur": "🎭",
-    "Essen & Trinken": "🍽️",
-    "Sport": "🏃",
-    "Familie": "👨‍👩‍👧‍👦",
-    "Natur & Draußen": "🌿",
-    "Innenstadt & Leben": "🏙️",
+    "Musik": "cat-music",
+    "Musik & Bühne": "cat-music",
 
-    // Konsistenz zu Event-Cards:
-    "Märkte & Feste": "🧺",
-    // Robuste Synonyme (falls Sources variieren)
-    "Märkte": "🧺",
-    "Markt": "🧺",
+    "Kultur": "cat-culture",
+    "Kultur & Kunst": "cat-culture",
+
+    "Essen & Trinken": "cat-food",
+
+    "Sport": "cat-sport",
+    "Sport & Bewegung": "cat-sport",
+
+    "Familie": "cat-kids",
+    "Kinder & Familie": "cat-kids",
+
+    "Natur & Draußen": "cat-nature",
+
+    "Innenstadt & Leben": "cat-city",
+
+    "Märkte & Feste": "cat-market",
+    "Märkte": "cat-market",
+    "Markt": "cat-market",
   };
 
   return iconMap[c] || "calendar";
 };
 /* === END BLOCK: CATEGORY ICON FALLBACK (calendar token, not emoji) === */
+/* END PATCH DP-CATEGORY-ICONS-SVG-V1 (CATEGORY MAP) */
 
   // === BEGIN BLOCK: LOCATION HOMEPAGE LOOKUP (robust matching) ===
   // Zweck: Homepage lookup robust gegen Klammerzusätze / Stadtteil-Suffixe, ohne Datenmodell zu ändern
@@ -801,6 +813,10 @@ Zweck:
 Umfang:
 - Erweitert iconSvg um optionale CSS-Klasse (z.B. "is-chip")
 === */
+/* BEGIN PATCH DP-CATEGORY-ICONS-SVG-V1 (ICONSVG)
+   Zweck: SVG Icon Registry erweitern (Kategorie-Icons + bestehende UI-Icons).
+   Umfang: Ersetzt iconSvg() komplett, keine Änderungen an Aufrufern außer Type-Strings.
+*/
 const iconSvg = (type, extraClass = "") => {
   const cls = `detail-icon-svg${extraClass ? " " + extraClass : ""}`;
 
@@ -813,6 +829,89 @@ const iconSvg = (type, extraClass = "") => {
         <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 18 21H6A2.5 2.5 0 0 1 3.5 18.5v-11A2.5 2.5 0 0 1 6 5z"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
         <path d="M7.5 13h3M7.5 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  // === Category icons (SVG, not emoji) ===
+  if (type === "cat-market") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6.5 10.5l1.2 9.5h8.6l1.2-9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M8 10.5V9a4 4 0 0 1 8 0v1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M5.5 10.5h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-culture") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 16c2.5-2 4.5-3 8-3s5.5 1 8 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7 10c.8-1 1.9-1.5 3.3-1.5 1.3 0 2.4.5 3.2 1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9.5 11.5h0M14.5 11.5h0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <path d="M6 17.5V19M18 17.5V19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-music") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4v11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 4l8-2v11" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 18a2.5 2.5 0 1 0 0 .1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M17 16a2.5 2.5 0 1 0 0 .1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-kids") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 10a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7 20c.5-3 2.5-5 5-5s4.5 2 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 12h0M15 12h0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-sport") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M10 20l2-6 3 2 2 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 13l4-2 2-3 4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-nature") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 19c7-1 12-6 12-13-7 1-12 6-12 13z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M6 19c3-4 7-7 12-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-city") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 20V9l5-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 20V6l6-2v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M15 20v-8l5 2v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    `;
+  }
+
+  if (type === "cat-food") {
+    return `
+      <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 3v8M9 3v8M5 3v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7 11v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M15 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M15 7c0-2 1-4 3-4v8c-2 0-3-2-3-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
       </svg>
     `;
   }
@@ -855,6 +954,7 @@ const iconSvg = (type, extraClass = "") => {
   `;
 };
 /* === END FIX: CALENDAR ICON SINGLE SOURCE (actionbar token reused everywhere) === */
+/* END PATCH DP-CATEGORY-ICONS-SVG-V1 (ICONSVG) */
 
             /* === BEGIN PATCH: ACTIONBAR LABELS (enterprise v2: calendar + share + website)
             Zweck:
@@ -993,7 +1093,7 @@ const iconSvg = (type, extraClass = "") => {
           <div class="detail-header">
             <div class="detail-title-row">
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
-${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${vm.icon === "calendar" ? iconSvg("calendar", "is-category") : escapeHtml(vm.icon)}</span>` : ""}
+${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.icon, "is-category")}</span>` : ""}
             </div>
 
             <div class="detail-meta-rows" aria-label="Event-Infos">
@@ -1283,6 +1383,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
