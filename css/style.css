@@ -149,15 +149,18 @@
   --ui-icon-size-md: 18px;   /* Default */
   --ui-icon-size-lg: 22px;   /* Header/Icon-Badge */
 
-  /* Default (für einfache Nutzung in Selektoren) */
-  --ui-icon-size: var(--ui-icon-size-md);
+  /* Line icon stroke (Top-App look: slightly lighter on small sizes) */
+  --ui-icon-stroke-sm: 1.75;
+  --ui-icon-stroke-md: 1.85;
+  --ui-icon-stroke-lg: 2;
 
-  /* Line icon style (state of the art) */
-  --ui-icon-stroke: 2;
+  /* Defaults (context can override) */
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
 
   --ui-icon-opacity: 0.92;
 
-  /* Emoji-Icons app-like neutralisieren */
+  /* Emoji-Icons app-like neutralisieren (legacy) */
   --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
 
   /* Close button DNA (tokenized) */
@@ -2345,13 +2348,27 @@ svg.ui-icon-svg{
 
   opacity: var(--ui-icon-opacity);
 
-  /* keep stroke visually consistent */
+  /* Keep stroke consistent and crisp */
   vector-effect: non-scaling-stroke;
+  shape-rendering: geometricPrecision;
+  paint-order: stroke;
 }
 
 /* DETAILPANEL SVG SIZE GUARD (scoped, UI-icons only) */
 
-/* 1) NUR UI-Icon-Container im Detailpanel clampen */
+/* 1) NUR UI-Icon-Container im Detailpanel clampen (md) + stroke md */
+#event-detail-panel .detail-meta-icon{
+  --ui-icon-size: var(--ui-icon-size-sm);
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+}
+#event-detail-panel .detail-link,
+#event-detail-panel .detail-actions,
+#event-detail-panel .detail-action,
+#event-detail-panel .detail-close{
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+}
+
 #event-detail-panel .detail-meta-icon svg,
 #event-detail-panel .detail-meta-icon img,
 #event-detail-panel .detail-link svg,
@@ -2362,16 +2379,49 @@ svg.ui-icon-svg{
 #event-detail-panel .detail-action img,
 #event-detail-panel .detail-close svg,
 #event-detail-panel .detail-close img{
-  width: var(--ui-icon-size-md) !important;
-  height: var(--ui-icon-size-md) !important;
+  width: var(--ui-icon-size) !important;
+  height: var(--ui-icon-size) !important;
 
-  min-width: var(--ui-icon-size-md) !important;
-  min-height: var(--ui-icon-size-md) !important;
-  max-width: var(--ui-icon-size-md) !important;
-  max-height: var(--ui-icon-size-md) !important;
+  min-width: var(--ui-icon-size) !important;
+  min-height: var(--ui-icon-size) !important;
+  max-width: var(--ui-icon-size) !important;
+  max-height: var(--ui-icon-size) !important;
 
   flex: 0 0 auto !important;
   display: block !important;
+  object-fit: contain !important;
+}
+
+/* 2) Kategorie-Indikator im Detailpanel-Header: folgt Badge-Container + nutzt lg Stroke */
+#event-detail-panel .detail-category-icon{
+  --ui-icon-stroke: var(--ui-icon-stroke-lg);
+}
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* 3) Description-Content: Medien bleiben frei (kein Icon-Guard) */
+#event-detail-panel .detail-description svg,
+#event-detail-panel .detail-description img{
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+
+  display: inline !important;
   object-fit: contain !important;
 }
 
@@ -2840,6 +2890,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
