@@ -1806,17 +1806,13 @@ html.is-panel-open body {
 }
 
 
-/* BEGIN PATCH DP-HEADER-ALIGNMENT-V1
-   Zweck: Header-Polish (Apple/Maps-Niveau): Icon als reiner Indikator, saubere Baseline/Vertikal-Ausrichtung, ruhiger Rhythmus.
-   Umfang: Ersetzt Detailpanel-Header-Layout (Header/Title-Row/Icon/Title).
-*/
-
-/* BEGIN PATCH DP-HEADER-ALIGNMENT-V2
-   Zweck: Detailpanel-Header auf “native sheet” Niveau: Icon kleiner/leichter, klare Indikator-Anmutung, Title/Icon Baseline-näher.
-   Umfang: Ersetzt Detailpanel-Header-Layout (Header/Title-Row/Icon/Title) ohne Icon-Mapping/Logik zu verändern.
-*/
-
-/* DETAILPANEL HEADER ROW (reserve close area + prevent overlap) */
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V3 (native sheet header polish)
+Zweck:
+- Detailpanel-Header auf Top-App-Niveau: Icon als ruhiger Kategorie-Indikator, Titel/Icon optisch sauber ausgerichtet (erste Zeile),
+  konsistent zum restlichen Panel (Meta/List-rows/Links/Actionbar).
+Umfang:
+- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title.
+=== */
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -1835,8 +1831,8 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-title-row{
-  /* Smaller indicator (noticeably) – local token, does not affect app-wide icons */
-  --dp-badge-size: 32px;
+  /* Local-only header indicator size (does not affect app-wide icons) */
+  --dp-badge-size: 30px;
 
   grid-column: 1;
   grid-row: 1;
@@ -1849,17 +1845,14 @@ html.is-panel-open body {
   min-height: var(--dp-badge-size);
   min-width: 0;
 
-  /* Baseline-near alignment (better for 1–2 line titles) */
+  /* Title may wrap; keep layout stable and align to first line (not overall block height) */
   align-items: start;
 
+  /* Reserve space so the sheet-close area never visually crowds the title */
   padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
 }
 
-/* BEGIN PATCH ICONS-CSS-DETAILPANEL-CATEGORY-V1
-   Zweck: Detailpanel Kategorie-Icon wie Top-Apps: Container definiert Badge, SVG füllt über Padding den perfekten optischen Bereich.
-   Umfang: Ersetzt nur .detail-category-icon + svg-Regel (entfernt Emoji-Legacy: font-size/filter/margin-top).
-*/
 /* Kategorie-Indikator (SVG) – indicator-only, not a badge/button */
 #event-detail-panel .detail-category-icon{
   grid-column: 1;
@@ -1878,13 +1871,13 @@ html.is-panel-open body {
   border: 0;
   box-shadow: none;
 
-  /* inner icon size = lg, outer badge size = dp-badge-size */
+  /* Inner icon size = lg; padding optisch zentriert im Indikator */
   padding: calc((var(--dp-badge-size) - var(--ui-icon-size-lg)) / 2);
 
-  /* lighter visual weight than cards/controls */
+  /* Lighter visual weight than controls */
   opacity: 0.78;
 
-  /* remove emoji-legacy behavior */
+  /* Remove emoji-legacy behavior */
   font-size: 0;
   line-height: 0;
   filter: none;
@@ -1893,18 +1886,19 @@ html.is-panel-open body {
   user-select: none;
   pointer-events: none;
 
-  /* baseline: no hacky margin-top; padding does the optical centering */
-  margin-top: 0;
+  /*
+    Optical alignment: aligns the icon with the first text line’s visual center
+    (prevents “button-look” and fixes the perceived vertical drift).
+  */
+  transform: translateY(2px);
 }
 
-/* SVG: nutzt den globalen ui-icon-svg style; hier nur sicherstellen, dass es den Container füllt */
 #event-detail-panel .detail-category-icon svg{
   width: 100% !important;
   height: 100% !important;
   opacity: 1;
   filter: none;
 }
-/* END PATCH ICONS-CSS-DETAILPANEL-CATEGORY-V1 */
 
 #event-detail-panel .detail-title{
   grid-column: 2;
@@ -1913,14 +1907,13 @@ html.is-panel-open body {
   margin: 0;
   min-width: 0;
 
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.08rem;
+  font-weight: 720;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 
-  /* tighter + baseline-near */
-  line-height: 1.22;
-  padding-top: 2px;
+  line-height: 1.20;
+  padding-top: 0;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1932,22 +1925,13 @@ html.is-panel-open body {
   hyphens: none;
 }
 
-#event-detail-panel .detail-meta-rows{
-  grid-column: 1 / -1;
-  grid-row: 2;
-  min-width: 0;
-}
-
+/* keep this hook neutral (legacy safety) */
 #event-detail-panel .detail-category-icon::before{
   content: none;
   background: none;
 }
 
-/* END PATCH DP-HEADER-ALIGNMENT-V2 */
-
-/* END PATCH DP-HEADER-ALIGNMENT-V1 */
-
-
+/* === END BLOCK: DP-HEADER-ALIGNMENT-V3 (native sheet header polish) === */
 /* BEGIN PATCH DP-META-ENTERPRISE-V3
    Zweck: Meta-Bereich (Ort/Datum) von "Form-Field/Card" zu "calm list rows" (Apple Wallet / Google Maps).
    Umfang: Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
@@ -2890,6 +2874,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
