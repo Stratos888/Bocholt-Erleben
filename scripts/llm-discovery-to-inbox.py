@@ -1344,8 +1344,10 @@ async def main_async() -> None:
     candidate_rows: List[List[str]] = []
     inbox_rows: List[List[str]] = []
 
+    # === BEGIN REPLACEMENT BLOCK: Inbox dedupe respects status=ignore | Scope: exclude ignored rows from existing_inbox_urls ===
     # Dedupe against existing Inbox URLs (best effort)
     # Can be disabled for controlled end-to-end tests via ENV DISABLE_INBOX_DEDUPE=true
+    # IMPORTANT: rows with status=ignore are excluded from dedupe to allow cleanup without permanently poisoning dedupe.
     existing_inbox_urls: Set[str] = set()
     disable_inbox_dedupe = env_flag("DISABLE_INBOX_DEDUPE", "false")
 
@@ -1355,12 +1357,17 @@ async def main_async() -> None:
             if inbox_values and len(inbox_values) > 1:
                 header = inbox_values[0]
                 url_idx = header.index("url") if "url" in header else None
+                status_idx = header.index("status") if "status" in header else None
                 if url_idx is not None:
                     for r in inbox_values[1:]:
                         if url_idx < len(r) and r[url_idx]:
+                            if status_idx is not None and status_idx < len(r):
+                                if (r[status_idx] or "").strip().lower() == "ignore":
+                                    continue
                             existing_inbox_urls.add(normalize_url(r[url_idx].strip()))
         except Exception:
             pass
+    # === END REPLACEMENT BLOCK: Inbox dedupe respects status=ignore | Scope: exclude ignored rows from existing_inbox_urls ===
 
     for cfg in llm_sources:
         details: List[str] = []
