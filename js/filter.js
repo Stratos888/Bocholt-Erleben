@@ -38,7 +38,7 @@ const FilterModule = {
     searchText: "",
     location: "",     // Ort-Filter später (aktuell immer leer)
     kategorie: "",    // Single
-    zeitraum: "all"   // all | today | weekend | soon
+    zeitraum: "all"   // all | today | week | weekend | nextweek | later
   },
 
   /**
@@ -294,105 +294,126 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
 
 
-                                 /* === BEGIN BLOCK: ZEITFILTER (self-contained, no external helpers) ===
-      Zweck: Zeitfilter ohne Abhängigkeit von events.js-Helpern (kein parseISODateLocal/startOfToday/...).
-      + Zusatzzweck: Filter-Bar-UI (inkl. Reset-X) wird immer aus dem State abgeleitet (Single Source of Truth),
-        damit Reset-X wirklich nur bei aktiven B/C/D (Search/Zeit/Kategorie) sichtbar ist – auch nach refresh()/applyFilters().
-      Umfang: Ersetzt Zeitraum-Filter-Logik in applyFilters() (inkl. UI-Sync nach dem Filtern).
-      === */
-      if (timeKey !== "all") {
-        const isoStart = (event?.date || event?.datum || "").trim();
-        const isoEnd = (event?.endDate || event?.endDatum || "").trim(); // optional
+/* === BEGIN BLOCK: ZEITFILTER (feed-buckets, single source of truth) ===
+Zweck:
+- Zeitfilter muss exakt dieselben Buckets nutzen wie die Feed-Überschriften in js/events.js:
+  Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später
+- Range-aware: endDate wird berücksichtigt; laufende Events zählen als "Heute".
+Umfang:
+- Ersetzt ausschließlich Zeitraum-Filterlogik in applyFilters().
+=== */
+if (timeKey !== "all") {
+  const isoStart = (event?.date || event?.datum || "").trim();
+  const isoEnd = (event?.endDate || event?.endDatum || "").trim(); // optional
 
-        // ISO YYYY-MM-DD robust lokal parsen (00:00 lokal)
-        const toLocalDay = (s) => {
-          const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-          if (!m) return null;
-          const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-          if (!y || !mo || !d) return null;
-          const dt = new Date(y, mo - 1, d);
-          dt.setHours(0, 0, 0, 0);
-          return dt;
-        };
+  // ISO YYYY-MM-DD robust lokal parsen (00:00 lokal)
+  const toLocalDay = (s) => {
+    const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return null;
+    const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+    if (!y || !mo || !d) return null;
+    const dt = new Date(y, mo - 1, d);
+    dt.setHours(0, 0, 0, 0);
+    return dt;
+  };
 
-        const startDay = toLocalDay(isoStart);
-        if (!startDay) return false;
+  const addDaysLocal = (base, n) => {
+    const t = new Date(base);
+    t.setDate(t.getDate() + n);
+    t.setHours(0, 0, 0, 0);
+    return t;
+  };
 
-        // Wenn kein endDate: same-day Event
-        const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
-        if (!endBase) return false;
+  const endOfDay = (d) => {
+    const t = new Date(d);
+    t.setHours(23, 59, 59, 999);
+    return t;
+  };
 
-        const endDay = new Date(endBase);
-        endDay.setHours(23, 59, 59, 999); // inkl. Endtag
+  const endOfWeek = (fromDate) => {
+    const d = new Date(fromDate);
+    const day = d.getDay(); // 0 So .. 6 Sa
+    const diff = (7 - day) % 7;
+    d.setDate(d.getDate() + diff);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  };
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+  const nextWeekendRange = (base) => {
+    const b = new Date(base);
+    b.setHours(0, 0, 0, 0);
+    const dow = b.getDay(); // 0 So ... 6 Sa
 
-        const addDaysLocal = (base, n) => {
-          const t = new Date(base);
-          t.setDate(t.getDate() + n);
-          t.setHours(0, 0, 0, 0);
-          return t;
-        };
+    let fri;
+    if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
+    else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
+    else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
+    else {
+      const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
+      fri = addDaysLocal(b, daysUntilFri);
+    }
 
-        // Overlap-Check: Event [startDay..endDay] muss Fenster [ws..we] schneiden
-        const overlaps = (ws, we) => !(endDay < ws || startDay > we);
+    const start = new Date(fri);
+    start.setHours(0, 0, 0, 0);
 
-               // nächstes/aktuelles Wochenende (Fr+Sa+So)
-        const nextWeekendRange = (base) => {
-          const b = new Date(base);
-          b.setHours(0, 0, 0, 0);
-          const dow = b.getDay(); // 0 So ... 6 Sa
+    const sun = addDaysLocal(fri, 2);
+    const end = new Date(sun);
+    end.setHours(23, 59, 59, 999);
 
-          let fri;
-          if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
-          else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
-          else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
-          else {
-            const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
-            fri = addDaysLocal(b, daysUntilFri);
-          }
+    return { start, end };
+  };
 
-          const start = new Date(fri);
-          start.setHours(0, 0, 0, 0);
+  const startDay = toLocalDay(isoStart);
+  if (!startDay) return false;
 
-          const sun = addDaysLocal(fri, 2);
-          const end = new Date(sun);
-          end.setHours(23, 59, 59, 999);
+  const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
+  if (!endBase) return false;
 
-          return { start, end };
-        };
+  const endDay = endOfDay(endBase);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-        switch (timeKey) {
-          case "today": {
-            const ws = new Date(today);
-            const we = new Date(today);
-            we.setHours(23, 59, 59, 999);
-            if (!overlaps(ws, we)) return false;
-            break;
-          }
-          case "weekend": {
-            const { start, end } = nextWeekendRange(today);
-            if (!overlaps(start, end)) return false;
-            break;
-          }
-          case "soon": {
-            const ws = new Date(today);
-            const we = addDaysLocal(today, 14);
-            we.setHours(23, 59, 59, 999);
-            if (!overlaps(ws, we)) return false;
-            break;
-          }
-          default:
-            break;
-        }
-      }
+  // "effective day" wie events.js: laufende Events gelten als heute
+  const effectiveDay = (() => {
+    if (today >= startDay && today <= endDay) return new Date(today);
+    return new Date(startDay);
+  })();
+  effectiveDay.setHours(0, 0, 0, 0);
 
-      // Wichtig: Reset-X/Labels dürfen nicht nur an UI-Events hängen -> immer aus State syncen.
-      // (B/C/D aktiv = SearchText != "" ODER Zeitraum != "all" ODER Kategorie != "")
-      // So bleibt die Sichtbarkeit korrekt auch nach refresh() / applyFilters() Aufrufen ohne User-Interaction.
-      /* === END BLOCK: ZEITFILTER (self-contained, no external helpers) === */
+  // Bucket-Definition exakt wie events.js renderList()
+  const dow = today.getDay(); // 0 So .. 6 Sa
+  const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
+  const thisWeekStart = addDaysLocal(today, 1); // morgen
+  let thisWeekEnd = null;
+  if (hasThisWeek) {
+    const daysUntilThu = (4 - dow);
+    const thu = addDaysLocal(today, daysUntilThu);
+    thisWeekEnd = endOfDay(thu);
+  }
+
+  const weekend = nextWeekendRange(today);
+  const weekendStart = new Date(weekend.start);
+  const weekendEnd = new Date(weekend.end);
+
+  const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
+  const nextWeekStart = addDaysLocal(endThisWeek, 1);
+  const nextWeekEnd = addDaysLocal(nextWeekStart, 6);
+  nextWeekEnd.setHours(23, 59, 59, 999);
+
+  const pickBucket = (day) => {
+    if (!day) return "later";
+    if (day.getTime() === today.getTime()) return "today";
+    if (hasThisWeek && thisWeekEnd && day >= thisWeekStart && day <= thisWeekEnd) return "week";
+    if (day >= weekendStart && day <= weekendEnd) return "weekend";
+    if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
+    return "later";
+  };
+
+  const bucket = pickBucket(effectiveDay);
+  if (bucket !== timeKey) return false;
+}
+/* === END BLOCK: ZEITFILTER (feed-buckets, single source of truth) === */
 
 
 
@@ -545,12 +566,14 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
   },
 
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
-    const timeMap = {
-      all: "Alle",
-      today: "Heute",
-      weekend: "Wochenende",
-      soon: "Demnächst"
-    };
+const timeMap = {
+  all: "Alle",
+  today: "Heute",
+  week: "Diese Woche",
+  weekend: "Dieses Wochenende",
+  nextweek: "Nächste Woche",
+  later: "Später"
+};
 
     const timeKey = this.filters.zeitraum || "all";
     const cat = (this.filters.kategorie || "").trim();
@@ -592,7 +615,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       return t;
     };
 
-       const nextWeekendRange = (base) => {
+      const nextWeekendRange = (base) => {
       const b = new Date(base);
       b.setHours(0, 0, 0, 0);
       const dow = b.getDay(); // 0 So ... 6 Sa
@@ -677,11 +700,23 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     });
 
     // --- Counts berechnen ---
-    const timeCounts = { all: baseForTime.length, today: 0, weekend: 0, soon: 0 };
-    for (const ev of baseForTime) {
-      if (matchesTimeKey(ev, "today")) timeCounts.today++;
-      if (matchesTimeKey(ev, "weekend")) timeCounts.weekend++;
-      if (matchesTimeKey(ev, "soon")) timeCounts.soon++;
+const timeCounts = {
+  all: baseForTime.length,
+  today: 0,
+  week: 0,
+  weekend: 0,
+  nextweek: 0,
+  later: 0
+};
+
+for (const ev of baseForTime) {
+  const k = getBucketForEvent(ev);
+  if (k === "today") timeCounts.today++;
+  else if (k === "week") timeCounts.week++;
+  else if (k === "weekend") timeCounts.weekend++;
+  else if (k === "nextweek") timeCounts.nextweek++;
+  else if (k === "later") timeCounts.later++;
+}
     }
 
     const catCounts = {};
