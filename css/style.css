@@ -87,6 +87,7 @@
   /* GS-01 Event Feed scanability tokens */
   --eventcard-rail-opacity: 0.48;
   --eventcard-meta-color: rgba(60,72,88,0.68);
+  --eventcard-meta-gap: 2px;
 
   /* Golden Screen: Event Cards (GS-01 scanability) */
   --radius-eventcard: 16px;
@@ -929,31 +930,27 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   margin: 0;
 
   font-size: var(--font-event-meta);
-  line-height: 1.28;
+  line-height: 1.22;
 
   color: var(--eventcard-meta-color);
 
-  /* Enterprise scan: Zeit stabil, Ort truncatable */
-  display: flex;
-  align-items: baseline;
-  min-width: 0;
+  /* Enterprise scan: exakt 2 Zeilen (Zeit | Ort) */
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: var(--eventcard-meta-gap);
 
-  white-space: nowrap;
-  overflow: hidden;
+  min-width: 0;
 }
 
 .event-meta__prefix{
-  flex: 0 0 auto;
-  white-space: nowrap;
+  display: none; /* wird im Feed nicht mehr genutzt (2-line contract) */
 }
 
 .event-meta__time{
-  flex: 0 0 auto;
   white-space: nowrap;
 }
 
 .event-meta__place{
-  flex: 1 1 auto;
   min-width: 0;
 
   white-space: nowrap;
@@ -3071,6 +3068,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
