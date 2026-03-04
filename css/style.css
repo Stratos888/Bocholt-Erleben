@@ -1288,25 +1288,24 @@ footer {
   content: "";
   display: block;
 
-  /* hartes Sizing (dein Proof: 16px/16px) */
-  width: 16px !important;
-  height: 16px !important;
-  min-width: 16px !important;
-  min-height: 16px !important;
-  flex: 0 0 16px !important;
+  /* stabile Box (wird von flex-center exakt zentriert) */
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
 
-  /* Iconfarbe kommt aus CSS */
+  /* Iconfarbe aus CSS */
   color: rgba(31,41,51,0.62);
 
   background-repeat: no-repeat;
   background-position: 50% 50%;
-  background-size: 16px 16px;
 
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272.25%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  /* OPTICAL FIX: 15px Render innerhalb 16px Box -> weniger Subpixel-Drift */
+  background-size: 15px 15px;
 
-  /* IMPORTANT: kein Baseline-/Optical-Shift */
-  transform: none !important;
-  margin: 0 auto;
+  /* URL-encoded SVG, stroke=currentColor, stroke-width=2 (crisper + symmetrischer) */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+
+  transform: none;
 }
 
 @media (hover: hover){
@@ -3117,6 +3116,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
