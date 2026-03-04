@@ -1230,7 +1230,9 @@ def make_inbox_row(run_ts: str, cfg: SourceCfg, fields: Dict[str, str]) -> List[
         cfg.url,  # source_url (listing)
         "",  # match_score
         "",  # matched_event_id
-        "llm_pipeline_playwright_collector (best-effort extraction, no external LLM yet)",
+# === BEGIN REPLACEMENT BLOCK: inbox notes — LLM DISCOVERY | Scope: truthful LLM+fallback note ===
+        "llm_pipeline (OpenAI LLM + heuristic fallback; html via Playwright detail fetch)",
+# === END REPLACEMENT BLOCK: inbox notes — LLM DISCOVERY | Scope: truthful LLM+fallback note ===
         run_ts,
     ]
 
@@ -1424,9 +1426,12 @@ async def main_async() -> None:
                         fields = (rss_items_by_url.get(u) or {}).copy()
                         fields["url"] = u
 
+                        # === BEGIN REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                         # Pflichtfelder-Gate (minimal, robust)
                         if not fields.get("title") or not fields.get("date"):
                             note = "skipped (missing title/date)"
+                        elif is_non_event_fields(fields, u):
+                            note = "skipped (non_event_page)"
                         else:
                             if not fields.get("location"):
                                 fields["location"] = cfg.default_city or "Bocholt"
@@ -1440,6 +1445,7 @@ async def main_async() -> None:
                             new_inbox_written += 1
                             will_write = True
                             note = "written_to_inbox"
+                        # === END REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                     except Exception:
                         note = "skipped (rss_parse_or_write_error)"
 
