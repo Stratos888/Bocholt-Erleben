@@ -321,74 +321,42 @@ badge.appendChild(bMonth);
 
         /* === BEGIN BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) ===
     Zweck:
-    - Enterprise Scanability: Meta ist strukturiert (Prefix · Zeit · Ort) statt „1 Textwurst“
-    - Zeit bleibt stabil lesbar, Ort ist truncatable, Prefix (City/Range) nur wenn sinnvoll
-    - Entfernt Redundanz: City wird NICHT doppelt gezeigt, wenn Location City bereits enthält
+    - Enterprise Scanability: Meta ist exakt 2 Zeilen (Zeit | Ort) statt 1 Zeile mit Trennern.
+    - Keine Bullet/Separator-Textnodes mehr → kein "18:30•Innenstadt".
+    - Redundanz-Vermeidung bleibt erhalten; City nur als Fallback, wenn Location fehlt.
     Umfang:
     - Ersetzt Meta/Title-Erzeugung in createCard (nur Rendering, keine Logik außenrum).
     === */
 
-    function escapeRegex(s) {
-      return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
     const timeText = event?.time ? String(event.time).trim() : "";
     const locTextRaw = (event?.location || "").trim();
 
-    // City nur anzeigen, wenn Informationsgewinn (Bocholt weglassen) + nicht redundant zur Location
+    // City nur als Fallback nutzen (wenn Location fehlt) und Bocholt nicht anzeigen
     const cityRaw = (city || "").toString().trim();
-    let showCity = !!cityRaw && cityRaw !== "Bocholt";
+    const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
 
-    if (showCity && locTextRaw) {
-      const cityLower = cityRaw.toLowerCase();
-      const locLower = locTextRaw.toLowerCase();
+    // Mehrtägig: falls keine Uhrzeit vorhanden ist, statt leerer Zeitzeile den Datumsrange zeigen
+    const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
+    const line1Text = timeText || (isRange ? String(dateLabel).trim() : "");
 
-      // exakt gleich
-      if (locLower === cityLower) {
-        showCity = false;
-      } else {
-        // City als eigenes Wort in Location (z.B. "Rhede Rudolf-Dieselstraße …") => redundant
-        const re = new RegExp(`\\b${escapeRegex(cityLower)}\\b`, "i");
-        if (re.test(locTextRaw)) showCity = false;
-      }
-    }
+    // Ort: primär Location, sonst City-Fallback (wenn sinnvoll)
+    const placeText = locTextRaw || (cityIsUseful ? cityRaw : "");
 
-    // Prefix: City (optional) + Date-Range (optional)
-    const prefixParts = [];
-    if (showCity) prefixParts.push(cityRaw);
-    if (event?.date && event?.endDate && event.endDate !== event.date) {
-      prefixParts.push(dateLabel);
-    }
-    const prefixText = prefixParts.join(" · ");
-
-    // Meta DOM: Prefix · Time · Place (Place truncatable in CSS)
+    // Meta DOM: exakt zwei Zeilen (time | place), ohne Separatoren
     const meta = document.createElement("div");
     meta.className = "event-meta";
 
-    function appendSepIfNeeded() {
-      if (meta.childNodes.length) meta.appendChild(document.createTextNode(" · "));
-    }
-
-    if (prefixText) {
-      const prefixEl = document.createElement("span");
-      prefixEl.className = "event-meta__prefix";
-      prefixEl.textContent = prefixText;
-      meta.appendChild(prefixEl);
-    }
-
-    if (timeText) {
-      appendSepIfNeeded();
-      const timeEl = document.createElement("span");
+    if (line1Text) {
+      const timeEl = document.createElement("div");
       timeEl.className = "event-meta__time";
-      timeEl.textContent = timeText;
+      timeEl.textContent = line1Text;
       meta.appendChild(timeEl);
     }
 
-    if (locTextRaw) {
-      appendSepIfNeeded();
-      const placeEl = document.createElement("span");
+    if (placeText) {
+      const placeEl = document.createElement("div");
       placeEl.className = "event-meta__place";
-      placeEl.textContent = locTextRaw;
+      placeEl.textContent = placeText;
       meta.appendChild(placeEl);
     }
 
@@ -630,6 +598,7 @@ Umfang:
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
