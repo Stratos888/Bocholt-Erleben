@@ -130,21 +130,23 @@ Umfang: Entfernt die <section class="intro"> vollständig.
   </div>
 
   <!-- Zeit Sheet -->
-  <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
-    <div class="filter-sheet__overlay" data-close-sheet></div>
-    <div class="filter-sheet__card">
-      <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Zeit</div>
-        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
-      </div>
-      <div class="filter-sheet__body">
-        <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
-        <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
-        <button type="button" class="filter-sheet-option" data-time="weekend">Wochenende</button>
-        <button type="button" class="filter-sheet-option" data-time="soon">Demnächst</button>
-      </div>
+<div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
+  <div class="filter-sheet__overlay" data-close-sheet></div>
+  <div class="filter-sheet__card">
+    <div class="filter-sheet__header">
+      <div class="filter-sheet__title">Zeit</div>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+    </div>
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
+      <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
+      <button type="button" class="filter-sheet-option" data-time="week">Diese Woche</button>
+      <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
+      <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
+      <button type="button" class="filter-sheet-option" data-time="later">Später</button>
     </div>
   </div>
+</div>
 
 <!-- === BEGIN BLOCK: FILTER SHEET CATEGORY OPTIONS (canonical categories) ===
 Zweck: Kategorie-Optionen auf Canonical-Kategorien umstellen, passend zum normalisierten Filter in js/filter.js.
@@ -367,6 +369,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
