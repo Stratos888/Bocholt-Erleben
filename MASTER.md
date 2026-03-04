@@ -239,60 +239,53 @@ REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
 3) Typografie/Rhythmus (Description weight/line-height, Meta-Icons leicht entschärfen)
 4) Focus-visible Audit (Close/Links/Actions)
 
-PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: FUNCTIONAL BASELINE REACHED
+PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: INTAKE RESTORED (QUALITY WORK IN PROGRESS)
 
-Current architecture verified in production runs:
+Current architecture (verified in runs):
 
-Sources
-→ Collector (HTML + RSS)
+Sources (Google Sheet tab "Sources")
+→ Collector (HTML + RSS; Playwright for HTML)
 → Discovery_Candidates (collector proof)
-→ Field extraction (LLM + fallback parser)
+→ Field extraction (OpenAI LLM + heuristic fallback)
 → Mandatory field gate (title + date)
-→ Dedup (existing inbox URLs)
+→ Dedup (normalize_url vs existing inbox URLs)
 → Inbox
 
-Latest verified run example:
-sources=3
-candidates_logged=43
-inbox_new=1
+Key configuration rule (now proven critical):
+- Only rows with `enabled=true` AND `pipeline_mode=llm` are processed in LLM runs.
+- For HTML sources, `include_detail_pages=true` is required to collect real event detail URLs (otherwise mostly listing/hub URLs).
 
-Key improvements implemented in this session:
-- RSS sources now supported inside the LLM discovery pipeline
-- Collector supports both HTML and RSS sources
-- Discovery_Candidates now logs all collected detail URLs (collector proof)
-- Inbox write happens only after mandatory field validation + dedup
-- Health log reflects collector status per source
+Recent run milestones (proof points):
+- Before sources switch: sources=3 → candidates_logged=44 → inbox_new=0..1 (mostly dup / too narrow intake)
+- After switching enabled HTML sources to llm + include_detail_pages=true:
+  - sources=17 → candidates_logged=159 → inbox_new=48 (intake restored but contained noise)
+  - sources=17 → candidates_logged=159 → inbox_new=10 (after initial noise reduction; still quality gaps)
 
-Stability assessment:
-- Collector layer: STABLE
-- RSS ingestion: WORKING
-- Dedup logic: WORKING
-- Health logging: WORKING
+Quality work implemented (post-intake restoration):
+- Non-event filtering: block obvious utility/legal/cookie/login/newsletter pages before Inbox-write
+  - applied consistently to HTML + RSS write gates
+- Inbox notes corrected to reflect: OpenAI LLM + heuristic fallback + Playwright HTML fetch
+- Isselburg-specific datetime fix:
+  - isselburg.de encodes occurrence datetime in query param `from=YYYY-MM-DD HH:MM:SS`
+  - add `extract_datetime_from_url()` and apply override to both:
+    - heuristic extractor output
+    - LLM extractor output (postprocess)
 
-Remaining gaps (non-blocking):
-1) Event date extraction robustness (HTML pages)
-2) Better heuristics for aggregator sites (Münsterland / EUREGIO)
-3) Some sources produce candidates but fail the mandatory field gate
+Known remaining quality gaps (next focus, proof-driven from TSV outputs):
+1) Listing/hub pages still slipping through as "events" on some aggregator sources (needs stronger detail-URL heuristics and/or non-event title/url filters).
+2) Location noise on some sites where heuristics pick up navigation text; tighten extraction selectors + add guardrails.
+3) Date parsing: German human-formats are handled, but source-specific structures should be preferred when present (structured selectors > regex).
 
-Strategic source policy (confirmed):
-- Prefer neutral aggregators and public feeds
-- Avoid using individual venues/locations as primary discovery sources
-- Example preferred sources:
-  - presse-service Bocholt
-  - presse-service Kreis Borken
-  - Münsterland Veranstaltungen
-  - EUREGIO Agenda
-
-Next work focus (pipeline only):
-- Improve date extraction reliability
-- Adjust HTML detail-URL heuristics for aggregator sites
-- Validate candidate → inbox conversion rates using TSV exports
-
-Pipeline architecture itself is now considered **validated**.
+Next work focus (pipeline only; no UI work):
+- For each run: analyze Run log + Inbox.tsv + Discovery_Candidates.tsv to quantify:
+  - conversion rate (candidates → inbox)
+  - top noise clusters by source + notes
+  - which rule yields biggest quality gain with minimal change
+- Iterate with minimal, source-agnostic filters first; source-specific rules only when proven necessary.
 
 LAST UPDATE:
 
-2026-03-02
+2026-03-04
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 
 ---
