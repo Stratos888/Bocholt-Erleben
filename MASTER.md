@@ -159,22 +159,44 @@ WORKPACKS COMPLETED THIS SESSION (VERIFIED VIA PROOFS):
 
 REMAINING GAPS (NEXT WORKPACKS):
 
-1) HEADER FINALIZATION — BASELINE ALIGNMENT (TOP-APP LOOK)
-   - Kategorie-Icon muss auf Baseline der ersten Titelzeile ausgerichtet werden (nicht vertikal zentriert im Header-Block)
-   - Long-title clamp + keine Kollision mit Close (re-check nach Baseline-Adjust)
+Detailpanel UI is now visually stabilized and considered ENTERPRISE BASELINE for the product.
 
-2) ACTIONBAR INTEGRATION (CONNECTED FEEL)
-   - Visuelle Verbindung Content ↔ Actionbar finalisieren (Shadow/Divider/Rhythmus)
-   - Safe-area bottom inset berücksichtigen (env(safe-area-inset-bottom))
-   - Focus/active states konsistent
+The following improvements were implemented and verified during the latest UI stabilization session:
 
-3) READABILITY + RHYTHM (TEXT FLOW)
-   - Line-height / Absatzabstände im Description Block final beruhigen
-   - Meta-Icon Gewichtung minimal leichter als Text
+- Header hierarchy finalized
+  - Category icon acts as indicator (not button)
+  - Title baseline alignment corrected
+  - Close button visual weight reduced
 
-4) ENTERPRISE INTERACTION AUDIT
-   - Focus-visible für alle interaktiven Elemente im Panel (Close, Links, Actions)
-   - Tab-Reihenfolge (Header → Content → Actions) verifizieren
+- Meta rows stabilized
+  - Global gutter alignment enforced (no internal row inset)
+  - Location arrow proximity fixed via grid layout (fit-content column)
+  - Location wrapping fixed (no artificial width clamp)
+
+- Description block typography stabilized
+  - improved line-height and wrapping behavior
+  - consistent spacing rhythm between sections
+
+- Source row alignment stabilized
+  - arrow alignment works for 1-line and 2-line sources
+  - gutter alignment matches description block
+
+- Actionbar visually integrated with content block
+
+This means the DETAIL PANEL STRUCTURE is now ENTERPRISE READY.
+
+Remaining future work (optional polish only):
+
+1) Motion polish
+   - panel opening / closing easing
+   - drag interaction refinement
+
+2) Accessibility audit
+   - final keyboard navigation verification
+   - ARIA roles verification
+
+3) Feed scanning improvements (outside detailpanel)
+   - event card hierarchy / scan speed
 
 <!-- === END REPLACEMENT BLOCK: TASK 1 (Enterprise Gate + controlled evolution) === -->
 
@@ -223,11 +245,19 @@ SESSION REPORT (this session, verified):
   - `svg.ui-icon-svg` Base Style (size/stroke/opacity via Tokens)
   - Kontextgrößen für Cards/Meta/Header (sm/md/lg + stroke-sm/md/lg)
   - Detailpanel SVG Guard scoped (UI-Icons clamped, Kategorie-Badge frei)
+- Detailpanel UI finalized to enterprise baseline:
+  header hierarchy, meta gutter alignment, location arrow proximity, description typography and source alignment corrected.
+- Event card mobile tap-highlight removed to avoid blue flash during detailpanel opening.
 
 DECISIONS LOG (permanent, project-wide):
 - Icons: Single Source of Truth ist `window.Icons` (SVG Line Icons). Keine Emojis für Kategorien.
 - Kategorien: Single Source of Truth ist `FilterModule.normalizeCategory()` (kanonische Kategorien). Icons mappt nur kanonisch → IconKey.
 - Darstellung: Größe/Stroke/Opacity werden ausschließlich über CSS Tokens gesteuert (`--ui-icon-*`).
+- - Detailpanel layout stabilized to enterprise baseline (header, meta rows, description, source and actions visually finalized).
+
+- Location link arrow (↗) proximity solved via CSS grid fit-content column strategy instead of text-length based positioning.
+
+- Mobile tap highlight on event cards disabled using `-webkit-tap-highlight-color: transparent` to prevent blue flash during panel opening.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Architektur + Konsistenz stabil (Overlay-Root, Scroll/Close/Actions, Icon-System zentral)
