@@ -1481,22 +1481,22 @@ async def main_async() -> None:
                             if fields is None:
                                 fields = extract_event_fields(detail_html, u, cfg)
 
-# === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
-# Pflichtfelder-Gate (minimal, robust)
-if not fields.get("title") or not fields.get("date"):
-    note = "skipped (missing title/date)"
-elif is_non_event_fields(fields, u, cfg.source_name):
-    note = "skipped (non_event_page)"
-else:
-    if not fields.get("location"):
-        fields["location"] = cfg.default_city or "Bocholt"
+                            # === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                            # Pflichtfelder-Gate (minimal, robust)
+                            if not fields.get("title") or not fields.get("date"):
+                                note = "skipped (missing title/date)"
+                            elif is_non_event_fields(fields, u, cfg.source_name):
+                                note = "skipped (non_event_page)"
+                            else:
+                                if not fields.get("location"):
+                                    fields["location"] = cfg.default_city or "Bocholt"
 
-    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-    existing_inbox_urls.add(nu)
-    new_inbox_written += 1
-    will_write = True
-    note = "written_to_inbox"
-# === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                                inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                                existing_inbox_urls.add(nu)
+                                new_inbox_written += 1
+                                will_write = True
+                                note = "written_to_inbox"
+                            # === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                         except Exception:
                             note = "skipped (detail_fetch_or_extract_error)"
 
@@ -1535,7 +1535,7 @@ else:
                         # Pflichtfelder-Gate (minimal, robust)
                         if not fields.get("title") or not fields.get("date"):
                             note = "skipped (missing title/date)"
-                        elif is_non_event_fields(fields, u):
+                        elif is_non_event_fields(fields, u, cfg.source_name):
                             note = "skipped (non_event_page)"
                         else:
                             if not fields.get("location"):
