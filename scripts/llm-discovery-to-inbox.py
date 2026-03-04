@@ -414,9 +414,67 @@ def normalize_url(u: str) -> str:
     except Exception:
         return (u or "").strip()
 
+# === BEGIN REPLACEMENT BLOCK: url_fingerprint + non-event filter — LLM DISCOVERY | Scope: stable fingerprint + block obvious non-events ===
 def url_fingerprint(u: str) -> str:
     nu = normalize_url(u)
     return hashlib.sha1(nu.encode("utf-8", errors="ignore")).hexdigest()
+
+NON_EVENT_TITLE_HINTS = (
+    "cookie",
+    "cookies",
+    "datenschutz",
+    "privacy",
+    "impressum",
+    "kontakt",
+    "login",
+    "anmeldung",
+    "registrierung",
+    "newsletter",
+    "sitemap",
+    "agb",
+    "terms",
+)
+
+NON_EVENT_URL_HINTS = (
+    "/cookie",
+    "/cookies",
+    "/datenschutz",
+    "/privacy",
+    "/impressum",
+    "/kontakt",
+    "/contact",
+    "/login",
+    "/signin",
+    "/signup",
+    "/register",
+    "/anmeldung",
+    "/registrierung",
+    "/newsletter",
+    "/sitemap",
+    "/agb",
+    "/terms",
+)
+
+def is_non_event_fields(fields: Dict[str, str], url: str) -> bool:
+    t = (fields.get("title") or "").strip().lower()
+    u = (url or "").strip().lower()
+    loc = (fields.get("location") or "").strip().lower()
+
+    if any(h in t for h in NON_EVENT_TITLE_HINTS):
+        return True
+    if any(h in u for h in NON_EVENT_URL_HINTS):
+        return True
+
+    # Noise that already appeared in your Inbox
+    if "local storage" in loc or "rc::" in loc:
+        return True
+
+    # Münsterland listing/hub pages that are not a single event
+    if "events in the münsterland" in t:
+        return True
+
+    return False
+# === END REPLACEMENT BLOCK: url_fingerprint + non-event filter — LLM DISCOVERY | Scope: stable fingerprint + block obvious non-events ===
 
 def _is_safe_nav_url(listing_url: str, candidate_url: str) -> bool:
 # === END REPLACEMENT BLOCK: url normalization + tracking filters — LLM DISCOVERY | Scope: stable dedupe/fingerprints ===
@@ -480,10 +538,29 @@ DETAIL_PATH_HINTS = (
 )
 # === END REPLACEMENT BLOCK: DETAIL_PATH_HINTS — LLM DISCOVERY | Scope: expand path hints for aggregators ===
 
+# === BEGIN REPLACEMENT BLOCK: EXCLUDE_PATH_HINTS — LLM DISCOVERY | Scope: block non-event utility/legal/cookie pages ===
 EXCLUDE_PATH_HINTS = (
     "/bocholt_media/",
     "/media/",
+    "/cookie",
+    "/cookies",
+    "/datenschutz",
+    "/privacy",
+    "/impressum",
+    "/kontakt",
+    "/contact",
+    "/login",
+    "/signin",
+    "/signup",
+    "/register",
+    "/anmeldung",
+    "/registrierung",
+    "/newsletter",
+    "/agb",
+    "/terms",
+    "/sitemap",
 )
+# === END REPLACEMENT BLOCK: EXCLUDE_PATH_HINTS — LLM DISCOVERY | Scope: block non-event utility/legal/cookie pages ===
 
 # === BEGIN REPLACEMENT BLOCK: is_probable_detail_url — LLM DISCOVERY | Scope: stronger heuristics for aggregator detail pages ===
 def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
@@ -1297,9 +1374,12 @@ async def main_async() -> None:
                             if fields is None:
                                 fields = extract_event_fields(detail_html, u, cfg)
 
+                            # === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                             # Pflichtfelder-Gate (minimal, robust)
                             if not fields.get("title") or not fields.get("date"):
                                 note = "skipped (missing title/date)"
+                            elif is_non_event_fields(fields, u):
+                                note = "skipped (non_event_page)"
                             else:
                                 if not fields.get("location"):
                                     fields["location"] = cfg.default_city or "Bocholt"
@@ -1309,6 +1389,7 @@ async def main_async() -> None:
                                 new_inbox_written += 1
                                 will_write = True
                                 note = "written_to_inbox"
+                            # === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                         except Exception:
                             note = "skipped (detail_fetch_or_extract_error)"
 
