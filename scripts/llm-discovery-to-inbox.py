@@ -721,44 +721,68 @@ def extract_best_date(soup: BeautifulSoup, text_blob: str) -> str:
 # === END REPLACEMENT BLOCK: DATE/TIME EXTRACTION HELPERS — LLM DISCOVERY | Scope: robust date parsing for German sources ===
 
 
+# === BEGIN REPLACEMENT BLOCK: extract_event_fields — LLM DISCOVERY | Scope: structured selectors first, better title/date/location ===
 def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> Dict[str, str]:
     """Heuristic fallback extraction (used if LLM is not configured or fails)."""
     soup = BeautifulSoup(detail_html, "html.parser")
 
-    # title
-    title = ""
-    h1 = soup.find("h1")
-    if h1:
-        title = norm_text(h1.get_text(" ", strip=True))
+    def sel_text(css: str) -> str:
+        el = soup.select_one(css)
+        return norm_text(el.get_text(" ", strip=True)) if el else ""
+
+    # title (structured first)
+    title = (
+        sel_text(".detail-title")
+        or sel_text("h1")
+        or sel_text("h2")
+    )
     if not title:
         og = soup.find("meta", property="og:title")
         if og and og.get("content"):
             title = norm_text(og["content"])
 
-    # text blob for regex
+    # remove noisy parts before building text_blob (cookie/storage/scripts)
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+
     text_blob = norm_text(soup.get_text(" ", strip=True))
+    # common noise patterns that poisoned location/date on some pages
+    text_blob = re.sub(r"\brc::[a-z]\b", " ", text_blob)
+    text_blob = re.sub(r"\bLocal Storage\b.*", " ", text_blob, flags=re.IGNORECASE)
+    text_blob = norm_text(text_blob)
 
-    # === BEGIN REPLACEMENT BLOCK: DATE EXTRACTION — LLM DISCOVERY | Scope: use extract_best_date(soup, text_blob) ===
-    # date
-    date = extract_best_date(soup, text_blob)
-    # === END REPLACEMENT BLOCK: DATE EXTRACTION — LLM DISCOVERY | Scope: use extract_best_date(soup, text_blob) ===
+    # date/time (structured first)
+    datetime_text = sel_text(".detail-meta-row.is-datetime .detail-meta-text")
+    date = ""
+    if datetime_text:
+        date = extract_best_date(BeautifulSoup(detail_html, "html.parser"), datetime_text) or extract_best_date(
+            BeautifulSoup(detail_html, "html.parser"), text_blob
+        )
+    else:
+        date = extract_best_date(BeautifulSoup(detail_html, "html.parser"), text_blob)
 
-    # time
+    # time (prefer structured datetime text; keep simple start time)
     time = ""
-    mt = TIME_RE.search(text_blob)
-    if mt:
-        time = mt.group(1)
+    if datetime_text:
+        mt = TIME_RE.search(datetime_text)
+        if mt:
+            time = mt.group(1)
+    if not time:
+        mt = TIME_RE.search(text_blob)
+        if mt:
+            time = mt.group(1)
 
-    # location (very heuristic)
-    location = ""
-    for label in ("Ort", "Veranstaltungsort", "Location"):
-        idx = text_blob.lower().find(label.lower())
-        if idx != -1:
-            snippet = text_blob[idx : idx + 160]
-            if ":" in snippet:
-                snippet = snippet.split(":", 1)[1]
-            location = norm_text(snippet)[:120]
-            break
+    # location (structured first, then heuristic)
+    location = sel_text(".detail-meta-row.is-location .detail-meta-text")
+    if not location:
+        for label in ("Ort", "Veranstaltungsort", "Location"):
+            idx = text_blob.lower().find(label.lower())
+            if idx != -1:
+                snippet = text_blob[idx : idx + 160]
+                if ":" in snippet:
+                    snippet = snippet.split(":", 1)[1]
+                location = norm_text(snippet)[:120]
+                break
 
     if not location and "bocholt" in text_blob.lower():
         location = "Bocholt"
@@ -778,6 +802,7 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
         "url": detail_url,
         "description": description,
     }
+# === END REPLACEMENT BLOCK: extract_event_fields — LLM DISCOVERY | Scope: structured selectors first, better title/date/location ===
 
 
 def _build_llm_input(detail_html: str, detail_url: str, cfg: SourceCfg) -> str:
