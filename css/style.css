@@ -1608,7 +1608,13 @@ html.is-panel-open body {
   touch-action: none;
 }
 
-/* DETAILPANEL CLOSE BUTTON (tokenized, restore stable look) */
+/* BEGIN PATCH DP-CLOSE-BUTTON-POLISH-V2
+   Zweck:
+   - Close-Button weniger “dominant”, mehr native PWA (ruhige Surface, softer Shadow, klare States).
+   - Keine Änderung am zentralen Icon-System (SVG bleibt über ui-icon Tokens gesteuert).
+   Umfang:
+   - Ersetzt NUR die Detailpanel-Close-Regeln inkl. States (active/hover/focus).
+*/
 
 #event-detail-panel .detail-panel-close{
   position: absolute;
@@ -1630,31 +1636,65 @@ html.is-panel-open body {
   justify-content: center !important;
 
   border-radius: 999px !important;
-  border: var(--ui-close-border) !important;
 
-  background: var(--ui-close-bg) !important;
-  box-shadow: var(--ui-close-shadow) !important;
+  /* calmer + more “sheet-native” */
+  background: rgba(255,255,255,0.78) !important;
+  border: 1px solid rgba(31,41,51,0.10) !important;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.085),
+    0 1px 0 rgba(255,255,255,0.72) inset !important;
+
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 
   font-size: var(--ui-close-font-size) !important;
   line-height: 1 !important;
-  color: var(--ui-close-color) !important;
+  color: rgba(31,41,51,0.66) !important;
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    color 120ms ease;
 }
 
+/* If close is SVG-based, keep it aligned with icon system */
 #event-detail-panel .detail-panel-close svg{
-  width: 18px;
-  height: 18px;
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
   opacity: var(--ui-icon-opacity);
 }
 
-#event-detail-panel .detail-panel-close:active{ transform: scale(0.96); }
+@media (hover: hover){
+  #event-detail-panel .detail-panel-close:hover{
+    background: rgba(255,255,255,0.90) !important;
+    border-color: rgba(31,41,51,0.14) !important;
+    color: rgba(31,41,51,0.78) !important;
+    box-shadow:
+      0 12px 26px rgba(0,0,0,0.10),
+      0 1px 0 rgba(255,255,255,0.76) inset !important;
+  }
+}
+
+#event-detail-panel .detail-panel-close:active{
+  transform: scale(0.96);
+  background: rgba(255,255,255,0.72) !important;
+  border-color: rgba(31,41,51,0.16) !important;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.085),
+    0 1px 0 rgba(255,255,255,0.70) inset !important;
+}
 
 #event-detail-panel .detail-panel-close:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
 }
+
+/* END PATCH DP-CLOSE-BUTTON-POLISH-V2 */
 
 /* SECTION */
 
@@ -2862,6 +2902,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
