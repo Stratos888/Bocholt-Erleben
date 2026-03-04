@@ -1960,14 +1960,16 @@ Umfang:
 }
 
 /* === END BLOCK: DP-HEADER-ALIGNMENT-V6 (final: baseline + spacing + icon tone) === */
-/* BEGIN PATCH DP-META-ENTERPRISE-V3
-   Zweck: Meta-Bereich (Ort/Datum) von "Form-Field/Card" zu "calm list rows" (Apple Wallet / Google Maps).
+/* BEGIN PATCH DP-META-ENTERPRISE-V4
+   Zweck: Meta-Bereich (Ort/Datum) final polieren:
+   - Link nur bei Location (Hover/Active), Datum klar statisch.
+   - Pfeil ↗ leiser + sauber aligned, Typo/Spacing konsistent mit Panel-DNA.
    Umfang: Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
 */
 
-/* DETAIL META INFO (Enterprise v3: calm list rows, no input-card container) */
+/* DETAIL META INFO (Enterprise v4: calm list rows, clearer link vs static) */
 
-/* Group container (v2 markup) -> neutral flow container */
+/* Group container -> neutral flow container */
 #event-detail-panel .detail-meta-rows{
   display: grid;
   gap: 2px;
@@ -1982,7 +1984,7 @@ Umfang:
   overflow: visible;
 }
 
-/* Rows: calm list item (consistent with .detail-link DNA) */
+/* Rows: calm list item */
 #event-detail-panel .detail-meta-rows .detail-meta-row{
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -1997,7 +1999,7 @@ Umfang:
   border-radius: 12px !important;
   box-shadow: none !important;
 
-  color: rgba(31,41,51,0.80);
+  color: rgba(31,41,51,0.82);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
@@ -2005,34 +2007,41 @@ Umfang:
   transition: background 140ms ease, transform 140ms ease, color 140ms ease;
 }
 
-/* No “input-like” divider inside container */
-#event-detail-panel .detail-meta-rows .detail-meta-row + .detail-meta-row{
-  border-top: 0 !important;
-}
-
 /* Icons/text/ext */
 #event-detail-panel .detail-meta-rows .detail-meta-icon{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.90;
+  opacity: 0.88;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-text{
   min-width: 0;
+  line-height: 1.30;
+
+  font-size: 14px;
+  font-weight: 650;
+  color: rgba(31,41,51,0.80);
+
   overflow-wrap: anywhere;
-  line-height: 1.32;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
-  opacity: 0.60;
+  opacity: 0.44;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+  transform: translateY(1px);
 }
 
 /* Hover/active only for links */
 @media (hover: hover){
   #event-detail-panel .detail-meta-rows a.detail-meta-row:hover{
     background: rgba(31,41,51,0.05) !important;
-    color: rgba(31,41,51,0.86);
+    color: rgba(31,41,51,0.88);
+  }
+  #event-detail-panel .detail-meta-rows a.detail-meta-row:hover .detail-meta-ext{
+    opacity: 0.62;
   }
 }
 
@@ -2044,6 +2053,19 @@ Umfang:
 #event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
   outline: 2px solid var(--ui-focus-ring-neutral);
   outline-offset: 2px;
+}
+
+/* Non-link rows (e.g., datetime): clearly static */
+#event-detail-panel .detail-meta-rows .detail-meta-row:not(a){
+  cursor: default;
+  transform: none !important;
+}
+#event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime{
+  color: rgba(31,41,51,0.78);
+}
+#event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime .detail-meta-text{
+  font-weight: 600;
+  color: rgba(31,41,51,0.76);
 }
 
 /* Legacy chips container: match calm list rows (no container card) */
@@ -2080,10 +2102,10 @@ Umfang:
   border-radius: 12px !important;
   box-shadow: none !important;
 
-  font-size: var(--font-event-meta);
-  line-height: 1.32;
-  font-weight: 500;
-  color: rgba(31,41,51,0.78);
+  font-size: 14px;
+  line-height: 1.30;
+  font-weight: 600;
+  color: rgba(31,41,51,0.76);
 
   cursor: default;
   user-select: text;
@@ -2095,10 +2117,6 @@ Umfang:
   -webkit-tap-highlight-color: transparent;
 }
 
-#event-detail-panel .detail-meta-chips .detail-chip + .detail-chip{
-  border-top: 0 !important;
-}
-
 #event-detail-panel .detail-meta-chips .detail-chip-text{
   min-width: 0;
   white-space: normal;
@@ -2107,7 +2125,7 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* END PATCH DP-META-ENTERPRISE-V3 *//* GS-02 LOCATION ROW (enterprise surface + states + scale) */
+/* END PATCH DP-META-ENTERPRISE-V4 */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2902,6 +2920,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
