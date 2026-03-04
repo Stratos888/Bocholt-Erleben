@@ -1286,13 +1286,24 @@ footer {
 .filter-pill--reset{ font-size: 0; }
 .filter-pill--reset::before{
   content: "";
-  display: block;
+  display: inline-block;
 
-  width: 16px;
-  height: 16px;
+  /* PROOF-FIX: computed width war 0px → hart setzen */
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  flex: 0 0 16px !important;
 
-  background: center / 16px 16px no-repeat
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 6 L18 18 M18 6 L6 18' fill='none' stroke='rgba(31,41,51,0.60)' stroke-width='2.25' stroke-linecap='round'/></svg>");
+  /* Farbe kommt aus CSS (konsistent mit App-Icons) */
+  color: rgba(31,41,51,0.62);
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+
+  /* URL-encoded SVG, stroke=currentColor (robust) */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272.25%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
 
   transform: translateY(-0.5px);
 }
@@ -1314,7 +1325,6 @@ footer {
   transform: translateY(1px);
 }
 
-/* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
 .filter-pill--reset:focus-visible{
   outline: none;
@@ -3106,6 +3116,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
