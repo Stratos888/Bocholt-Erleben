@@ -1130,11 +1130,13 @@ footer {
 #search-filter:focus,
 #search-filter:focus-visible{
   outline: none;
-  border-color: rgba(139,207,74,.55);
+
+  border-color: var(--ui-border-primary);
   background: rgba(255,255,255,0.98);
+
   box-shadow:
     0 7px 16px rgba(0,0,0,0.052),
-    0 0 0 3px rgba(139,207,74,.12),
+    0 0 0 3px var(--ui-focus-ring),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
 
@@ -1239,9 +1241,11 @@ footer {
 .filter-pill:active{ transform: translateY(1px); }
 
 .filter-pill:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.16);
-  outline-offset: 3px;
-  border-radius: 14px;
+  outline: none;
+  box-shadow:
+    0 7px 16px rgba(0,0,0,0.050),
+    0 0 0 3px var(--ui-focus-ring),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 /* Reset: exakt gleiche Höhe wie die anderen Controls */
@@ -1295,6 +1299,11 @@ footer {
 .filter-pill--reset:active{
   transform: translateY(1px);
   background: rgba(31,41,51,0.06);
+}
+
+.filter-pill--reset:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ui-focus-ring);
 }
 
 
@@ -1544,8 +1553,8 @@ body.is-sheet-open .top-stack{
 /* Focus */
 .filter-sheet-option:focus-visible,
 .filter-option:focus-visible{
-  outline: 2px solid rgba(139,207,74,0.18);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ui-focus-ring);
 }
 
 /* hidden muss immer wirken */
@@ -3079,6 +3088,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
