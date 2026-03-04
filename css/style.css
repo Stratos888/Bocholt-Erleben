@@ -2242,16 +2242,18 @@ Umfang:
 }
 
 
-/* BEGIN PATCH DP-DESCRIPTION-ENTERPRISE-V2
-   Zweck: Beschreibungstext im Detailpanel auf Enterprise-Niveau:
-   - bessere Lesbarkeit (Zeilenhöhe/Gewicht/Farbe), bessere Umbrüche, ruhiger Rhythmus.
-   Umfang: Ersetzt ausschließlich #event-detail-panel .detail-description.
+/* BEGIN PATCH DP-DESCRIPTION-ENTERPRISE-V3
+   Zweck:
+   - Vertikalen Rhythmus im Detailpanel harmonisieren (Meta → Divider → Beschreibung → Quelle → Actions).
+   - Einheitlicher Spacing-Rhythmus (8 / 16 / 24) für ruhigere Struktur.
+   Umfang:
+   - Nur Beschreibung + Abstände zu Divider/Quelle beeinflusst. Keine Layout- oder Funktionsänderungen.
 */
 
-/* Description: ruhiger Textblock (Enterprise V2) */
-/* DETAILPANEL DESCRIPTION RENDER (respect line breaks; premium type) */
+/* Beschreibung: ruhiger Textblock + konsistenter Abstand */
 #event-detail-panel .detail-description{
-  margin: 14px 0 0;
+  /* etwas weniger Abstand zum Divider darüber */
+  margin: 12px 0 0;
   padding: 0;
 
   font-size: 14px;
@@ -2261,15 +2263,30 @@ Umfang:
 
   color: rgba(31,41,51,0.80);
 
-  /* Line breaks aus Daten respektieren */
   white-space: pre-line;
-
-  /* bessere Umbrüche bei langen Wörtern/URLs */
   overflow-wrap: anywhere;
   hyphens: auto;
 }
 
-/* END PATCH DP-DESCRIPTION-ENTERPRISE-V2 */
+/* Divider oberhalb Beschreibung */
+#event-detail-panel .detail-divider{
+  margin: 16px 0 8px;
+  border: 0;
+  border-top: 1px solid var(--border-panel-soft);
+}
+
+/* Quelle-Bereich: etwas mehr Luft über der Quelle */
+#event-detail-panel .detail-links{
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+/* Actionbar etwas klarer vom Inhalt getrennt */
+#event-detail-panel .detail-actions{
+  margin-top: 16px;
+}
+
+/* END PATCH DP-DESCRIPTION-ENTERPRISE-V3 */
 
 
 /* Responsive: sehr kleine Geräte */
@@ -2960,6 +2977,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
