@@ -1531,26 +1531,26 @@ else:
                         fields = (rss_items_by_url.get(u) or {}).copy()
                         fields["url"] = u
 
-# === BEGIN REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
-# Pflichtfelder-Gate (minimal, robust)
-if not fields.get("title") or not fields.get("date"):
-    note = "skipped (missing title/date)"
-elif is_non_event_fields(fields, u, cfg.source_name):
-    note = "skipped (non_event_page)"
-else:
-    if not fields.get("location"):
-        fields["location"] = cfg.default_city or "Bocholt"
-    if not fields.get("city"):
-        fields["city"] = cfg.default_city or "Bocholt"
-    if not fields.get("kategorie_suggestion"):
-        fields["kategorie_suggestion"] = cfg.default_category or ""
+                        # === BEGIN REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                        # Pflichtfelder-Gate (minimal, robust)
+                        if not fields.get("title") or not fields.get("date"):
+                            note = "skipped (missing title/date)"
+                        elif is_non_event_fields(fields, u):
+                            note = "skipped (non_event_page)"
+                        else:
+                            if not fields.get("location"):
+                                fields["location"] = cfg.default_city or "Bocholt"
+                            if not fields.get("city"):
+                                fields["city"] = cfg.default_city or "Bocholt"
+                            if not fields.get("kategorie_suggestion"):
+                                fields["kategorie_suggestion"] = cfg.default_category or ""
 
-    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-    existing_inbox_urls.add(nu)
-    new_inbox_written += 1
-    will_write = True
-    note = "written_to_inbox"
-# === END REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                            inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                            existing_inbox_urls.add(nu)
+                            new_inbox_written += 1
+                            will_write = True
+                            note = "written_to_inbox"
+                        # === END REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                     except Exception:
                         note = "skipped (rss_parse_or_write_error)"
 
