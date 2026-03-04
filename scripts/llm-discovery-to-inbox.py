@@ -449,6 +449,31 @@ NON_EVENT_TITLE_HINTS = (
     "sitemap",
     "agb",
     "terms",
+    # Strong DE non-event signals (recurring utility/office/club items + religious services)
+    "gottesdienst",
+    "abendmahl",
+    "andacht",
+    "messe",
+    "wortgottesdienst",
+    "gemeindebüro",
+    "gemeindebuero",
+    "büro geöffnet",
+    "buero geoeffnet",
+    "sprechstunde",
+    "kleiderkammer",
+    "laden geöffnet",
+    "laden geoeffnet",
+    "jugendtreff",
+    "kinderchor",
+    "chorprobe",
+    "probe",
+    "gymnastik",
+    "tai chi",
+    "gedächtnistraining",
+    "gedaechtnistraining",
+    "doppelkopf",
+    "kicken",
+    "mittagstisch",
 )
 
 NON_EVENT_URL_HINTS = (
@@ -469,6 +494,7 @@ NON_EVENT_URL_HINTS = (
     "/sitemap",
     "/agb",
     "/terms",
+    "#content",
 )
 
 def is_non_event_fields(fields: Dict[str, str], url: str) -> bool:
