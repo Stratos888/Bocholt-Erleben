@@ -414,6 +414,22 @@ def normalize_url(u: str) -> str:
     except Exception:
         return (u or "").strip()
 
+
+def extract_datetime_from_url(u: str) -> Optional[Dict[str, str]]:
+    """Some sites (e.g., isselburg.de) encode the real occurrence datetime in query param 'from'."""
+    try:
+        p = urlparse((u or "").strip())
+        q = dict(parse_qsl(p.query, keep_blank_values=True))
+        raw = (q.get("from") or "").strip()
+        # expected: "YYYY-MM-DD HH:MM:SS"
+        m = re.match(r"^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})", raw)
+        if not m:
+            return None
+        return {"date": m.group(1), "time": m.group(2)}
+    except Exception:
+        return None
+
+
 # === BEGIN REPLACEMENT BLOCK: url_fingerprint + non-event filter — LLM DISCOVERY | Scope: stable fingerprint + block obvious non-events ===
 def url_fingerprint(u: str) -> str:
     nu = normalize_url(u)
@@ -849,6 +865,14 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
         if mt:
             time = mt.group(1)
 
+    # override for sources that encode occurrence datetime in URL query (?from=YYYY-MM-DD HH:MM:SS)
+    dtq = extract_datetime_from_url(detail_url)
+    if dtq:
+        if dtq.get("date"):
+            date = dtq["date"]
+        if dtq.get("time"):
+            time = dtq["time"]
+
     # location (structured first, then heuristic)
     location = sel_text(".detail-meta-row.is-location .detail-meta-text")
     if not location:
@@ -860,6 +884,21 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
                     snippet = snippet.split(":", 1)[1]
                 location = norm_text(snippet)[:120]
                 break
+
+    # guard: avoid navigation/utility text becoming "location" (seen on isselburg.de)
+    if location and any(
+        h in location.lower()
+        for h in (
+            "bildung",
+            "schulen",
+            "hochwasserschutz",
+            "kommunalwahl",
+            "notfall",
+            "notfallnummern",
+            "feuerwehr",
+        )
+    ):
+        location = ""
 
     if not location and "bocholt" in text_blob.lower():
         location = "Bocholt"
@@ -953,19 +992,18 @@ def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) 
             store=False,
         )
 
-        # Responses API: when using structured outputs, we expect JSON text in output_text
         out = (resp.output_text or "").strip()
         if not out:
             return None
         data = json.loads(out)
 
-        # normalize / fallbacks
         data["url"] = detail_url
         if not (data.get("city") or "").strip():
             data["city"] = cfg.default_city or "Bocholt"
         if not (data.get("category") or "").strip():
             data["category"] = cfg.default_category or ""
-        return {
+
+        fields = {
             "title": (data.get("title") or "").strip(),
             "date": (data.get("date") or "").strip(),
             "time": (data.get("time") or "").strip(),
@@ -975,6 +1013,16 @@ def llm_extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) 
             "url": detail_url,
             "description": (data.get("description") or "").strip(),
         }
+
+        # override for sources that encode occurrence datetime in URL query (?from=YYYY-MM-DD HH:MM:SS)
+        dtq = extract_datetime_from_url(detail_url)
+        if dtq:
+            if dtq.get("date"):
+                fields["date"] = dtq["date"]
+            if dtq.get("time"):
+                fields["time"] = dtq["time"]
+
+        return fields
     except Exception:
         return None
 
