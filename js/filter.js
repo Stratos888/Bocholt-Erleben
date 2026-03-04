@@ -615,7 +615,22 @@ const timeMap = {
       return t;
     };
 
-      const nextWeekendRange = (base) => {
+    const endOfDay = (d) => {
+      const t = new Date(d);
+      t.setHours(23, 59, 59, 999);
+      return t;
+    };
+
+    const endOfWeek = (fromDate) => {
+      const d = new Date(fromDate);
+      const day = d.getDay(); // 0 So .. 6 Sa
+      const diff = (7 - day) % 7;
+      d.setDate(d.getDate() + diff);
+      d.setHours(23, 59, 59, 999);
+      return d;
+    };
+
+    const nextWeekendRange = (base) => {
       const b = new Date(base);
       b.setHours(0, 0, 0, 0);
       const dow = b.getDay(); // 0 So ... 6 Sa
@@ -639,33 +654,61 @@ const timeMap = {
       return { start, end };
     };
 
+    // Bucket-Definition exakt wie Feed: Heute / Diese Woche / Dieses Wochenende / Nächste Woche / Später
+    const getBucketForEvent = (event) => {
+      const isoStart = (event?.date || event?.datum || "").trim();
+      const isoEnd = (event?.endDate || event?.endDatum || "").trim();
 
-    const matchesTimeKey = (event, key) => {
-      if (key === "all") return true;
+      const startDay = toLocalDay(isoStart);
+      if (!startDay) return "later";
 
-      const iso = (event?.date || event?.datum || "").trim();
-      const day = toLocalDay(iso);
-      if (!day) return false;
+      const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
+      if (!endBase) return "later";
+
+      const endDay = endOfDay(endBase);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const endToday = addDaysLocal(today, 1);
+      // laufende Events zählen als "Heute"
+      const effectiveDay = (() => {
+        const todayEnd = endOfDay(today);
+        if (today >= startDay && todayEnd <= endDay) return new Date(today);
+        // Fallback: klassischer Overlap (heute liegt zwischen Start/Ende)
+        if (today >= startDay && today <= endDay) return new Date(today);
+        return new Date(startDay);
+      })();
+      effectiveDay.setHours(0, 0, 0, 0);
 
-      if (key === "today") return (day >= today && day < endToday);
-
-      if (key === "weekend") {
-        const { start, end } = nextWeekendRange(today);
-        return (day >= start && day <= end);
+      const dow = today.getDay(); // 0 So .. 6 Sa
+      const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
+      const thisWeekStart = addDaysLocal(today, 1); // morgen
+      let thisWeekEnd = null;
+      if (hasThisWeek) {
+        const daysUntilThu = (4 - dow);
+        const thu = addDaysLocal(today, daysUntilThu);
+        thisWeekEnd = endOfDay(thu);
       }
 
-      if (key === "soon") {
-        const soonEnd = addDaysLocal(today, 14);
-        soonEnd.setHours(23, 59, 59, 999);
-        return (day >= today && day <= soonEnd);
-      }
+      const weekend = nextWeekendRange(today);
+      const weekendStart = new Date(weekend.start);
+      const weekendEnd = new Date(weekend.end);
 
-      return true;
+      const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
+      const nextWeekStart = addDaysLocal(endThisWeek, 1);
+      const nextWeekEnd = addDaysLocal(nextWeekStart, 6);
+      nextWeekEnd.setHours(23, 59, 59, 999);
+
+      if (effectiveDay.getTime() === today.getTime()) return "today";
+      if (hasThisWeek && thisWeekEnd && effectiveDay >= thisWeekStart && effectiveDay <= thisWeekEnd) return "week";
+      if (effectiveDay >= weekendStart && effectiveDay <= weekendEnd) return "weekend";
+      if (effectiveDay >= nextWeekStart && effectiveDay <= nextWeekEnd) return "nextweek";
+      return "later";
+    };
+
+    const matchesTimeKey = (event, key) => {
+      if (key === "all") return true;
+      return getBucketForEvent(event) === key;
     };
 
     // --- Base-Listen: Für Zeit-Facets zählt Search + aktive Kategorie.
@@ -700,23 +743,22 @@ const timeMap = {
     });
 
     // --- Counts berechnen ---
-const timeCounts = {
-  all: baseForTime.length,
-  today: 0,
-  week: 0,
-  weekend: 0,
-  nextweek: 0,
-  later: 0
-};
+    const timeCounts = {
+      all: baseForTime.length,
+      today: 0,
+      week: 0,
+      weekend: 0,
+      nextweek: 0,
+      later: 0
+    };
 
-for (const ev of baseForTime) {
-  const k = getBucketForEvent(ev);
-  if (k === "today") timeCounts.today++;
-  else if (k === "week") timeCounts.week++;
-  else if (k === "weekend") timeCounts.weekend++;
-  else if (k === "nextweek") timeCounts.nextweek++;
-  else if (k === "later") timeCounts.later++;
-}
+    for (const ev of baseForTime) {
+      const k = getBucketForEvent(ev);
+      if (k === "today") timeCounts.today++;
+      else if (k === "week") timeCounts.week++;
+      else if (k === "weekend") timeCounts.weekend++;
+      else if (k === "nextweek") timeCounts.nextweek++;
+      else if (k === "later") timeCounts.later++;
     }
 
     const catCounts = {};
