@@ -1285,14 +1285,16 @@ footer {
 /* Icon: bewusst wie UI-Icon behandelt (kein “Textbutton”-Look) */
 .filter-pill--reset{ font-size: 0; }
 .filter-pill--reset::before{
-  content: "×";
+  content: "";
   display: block;
 
-  font-size: 20px;
-  line-height: 1;
+  width: 16px;
+  height: 16px;
 
-  color: rgba(31,41,51,0.52);
-  transform: translateY(-1px);
+  background: center / 16px 16px no-repeat
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 6 L18 18 M18 6 L6 18' fill='none' stroke='rgba(31,41,51,0.60)' stroke-width='2.25' stroke-linecap='round'/></svg>");
+
+  transform: translateY(-0.5px);
 }
 
 @media (hover: hover){
@@ -1313,17 +1315,13 @@ footer {
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
+/* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
 .filter-pill--reset:focus-visible{
   outline: none;
   box-shadow:
     0 7px 16px rgba(0,0,0,0.050),
     0 0 0 3px var(--ui-focus-ring),
     0 1px 0 rgba(255,255,255,0.72) inset;
-}
-
-.filter-pill--reset:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 3px var(--ui-focus-ring);
 }
 
 
@@ -3108,6 +3106,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
