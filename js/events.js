@@ -321,42 +321,39 @@ badge.appendChild(bMonth);
 
         /* === BEGIN BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) ===
     Zweck:
-    - Enterprise Scanability: Meta ist exakt 2 Zeilen (Zeit | Ort) statt 1 Zeile mit Trennern.
-    - Keine Bullet/Separator-Textnodes mehr → kein "18:30•Innenstadt".
-    - Redundanz-Vermeidung bleibt erhalten; City nur als Fallback, wenn Location fehlt.
+    - GS-01 Enterprise: feste Card-Dichte (Titel max 2 Zeilen, Meta exakt 1 Zeile)
+    - Meta-Contract: Zeit (fixed) + Ort (ellipsis) ohne Separator-Textnodes
+    - City/Prefix werden NICHT im Feed angezeigt (Redundanz/Noise). Mehrtägig ohne Uhrzeit: Zeitraum statt Zeit.
     Umfang:
-    - Ersetzt Meta/Title-Erzeugung in createCard (nur Rendering, keine Logik außenrum).
+    - Ersetzt nur Meta/Title-Erzeugung in createCard (Rendering-only).
     === */
 
     const timeText = event?.time ? String(event.time).trim() : "";
     const locTextRaw = (event?.location || "").trim();
 
-    // City nur als Fallback nutzen (wenn Location fehlt) und Bocholt nicht anzeigen
+    const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
+    const timeLine = timeText || (isRange ? String(dateLabel).trim() : "");
+
+    // Place: primär Location, sonst (wenn != Bocholt) City als Fallback
     const cityRaw = (city || "").toString().trim();
     const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
+    const placeLine = locTextRaw || (cityIsUseful ? cityRaw : "");
 
-    // Mehrtägig: falls keine Uhrzeit vorhanden ist, statt leerer Zeitzeile den Datumsrange zeigen
-    const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
-    const line1Text = timeText || (isRange ? String(dateLabel).trim() : "");
-
-    // Ort: primär Location, sonst City-Fallback (wenn sinnvoll)
-    const placeText = locTextRaw || (cityIsUseful ? cityRaw : "");
-
-    // Meta DOM: exakt zwei Zeilen (time | place), ohne Separatoren
+    // Meta DOM: 1 Zeile, strukturiert (time | place) — Separator kommt aus CSS (kein "18:30•...")
     const meta = document.createElement("div");
     meta.className = "event-meta";
 
-    if (line1Text) {
-      const timeEl = document.createElement("div");
+    if (timeLine) {
+      const timeEl = document.createElement("span");
       timeEl.className = "event-meta__time";
-      timeEl.textContent = line1Text;
+      timeEl.textContent = timeLine;
       meta.appendChild(timeEl);
     }
 
-    if (placeText) {
-      const placeEl = document.createElement("div");
+    if (placeLine) {
+      const placeEl = document.createElement("span");
       placeEl.className = "event-meta__place";
-      placeEl.textContent = placeText;
+      placeEl.textContent = placeLine;
       meta.appendChild(placeEl);
     }
 
@@ -598,6 +595,7 @@ Umfang:
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
