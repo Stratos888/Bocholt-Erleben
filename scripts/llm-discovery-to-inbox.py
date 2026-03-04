@@ -435,6 +435,8 @@ def url_fingerprint(u: str) -> str:
     nu = normalize_url(u)
     return hashlib.sha1(nu.encode("utf-8", errors="ignore")).hexdigest()
 
+
+# 1) Titel-basierte Killer (Utility/Legal/Navigation + wiederkehrende Nicht-Events)
 NON_EVENT_TITLE_HINTS = (
     "cookie",
     "cookies",
@@ -449,33 +451,29 @@ NON_EVENT_TITLE_HINTS = (
     "sitemap",
     "agb",
     "terms",
-    # Strong DE non-event signals (recurring utility/office/club items + religious services)
-    "gottesdienst",
-    "abendmahl",
-    "andacht",
-    "messe",
-    "wortgottesdienst",
-    "gemeindebüro",
-    "gemeindebuero",
-    "büro geöffnet",
-    "buero geoeffnet",
-    "sprechstunde",
-    "kleiderkammer",
-    "laden geöffnet",
-    "laden geoeffnet",
-    "jugendtreff",
-    "kinderchor",
-    "chorprobe",
-    "probe",
-    "gymnastik",
-    "tai chi",
-    "gedächtnistraining",
-    "gedaechtnistraining",
+    # recurring / club / routine stuff
+    "skat",
+    "skatclub",
+    "skattermine",
     "doppelkopf",
-    "kicken",
-    "mittagstisch",
+    "kegeln",
+    "stammtisch",
+    # (optional strict) online-only noise
+    "webinar",
+    # sale/admin noise
+    "ticketverkauf",
 )
 
+# 2) Exakt generische Platzhalter-Titel, die KEIN Event sind
+GENERIC_NON_EVENT_TITLES = (
+    "details",
+    "veranstaltungen",
+    "termine",
+    "kurssuche",
+    "buchungen",
+)
+
+# 3) URL-Hints für Hubs/Listing/Utility
 NON_EVENT_URL_HINTS = (
     "/cookie",
     "/cookies",
@@ -495,15 +493,41 @@ NON_EVENT_URL_HINTS = (
     "/agb",
     "/terms",
     "#content",
+    # common listing paths
+    "/events/liste",
+    "/events/heute",
+    "/events/list",
+    "/events/today",
+    "/events/",
+    "/category/",
+    # known non-detail endpoints seen in Inbox
+    "index.php?id=15",  # Kurssuche (JuBoH)
 )
 
-def is_non_event_fields(fields: Dict[str, str], url: str) -> bool:
-    t = (fields.get("title") or "").strip().lower()
+def is_non_event_fields(fields: Dict[str, str], url: str, source_name: str = "") -> bool:
+    t_raw = (fields.get("title") or "").strip()
+    t = t_raw.lower()
     u = (url or "").strip().lower()
     loc = (fields.get("location") or "").strip().lower()
+    sn = (source_name or "").strip().lower()
 
+    # A) Kill whole noisy sources for Go-Live quality (proof: presse-service produced 20/53 junk in clean-slate run)
+    if "presse-service" in sn:
+        return True
+
+    # B) Placeholder / navigation titles
+    if t in GENERIC_NON_EVENT_TITLES:
+        return True
+
+    # C) Super-short titles are almost always placeholder noise
+    if len(t) < 6:
+        return True
+
+    # D) Keyword hints in title
     if any(h in t for h in NON_EVENT_TITLE_HINTS):
         return True
+
+    # E) URL hints (hub/listing/utility)
     if any(h in u for h in NON_EVENT_URL_HINTS):
         return True
 
@@ -1457,22 +1481,22 @@ async def main_async() -> None:
                             if fields is None:
                                 fields = extract_event_fields(detail_html, u, cfg)
 
-                            # === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
-                            # Pflichtfelder-Gate (minimal, robust)
-                            if not fields.get("title") or not fields.get("date"):
-                                note = "skipped (missing title/date)"
-                            elif is_non_event_fields(fields, u):
-                                note = "skipped (non_event_page)"
-                            else:
-                                if not fields.get("location"):
-                                    fields["location"] = cfg.default_city or "Bocholt"
+# === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+# Pflichtfelder-Gate (minimal, robust)
+if not fields.get("title") or not fields.get("date"):
+    note = "skipped (missing title/date)"
+elif is_non_event_fields(fields, u, cfg.source_name):
+    note = "skipped (non_event_page)"
+else:
+    if not fields.get("location"):
+        fields["location"] = cfg.default_city or "Bocholt"
 
-                                inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-                                existing_inbox_urls.add(nu)
-                                new_inbox_written += 1
-                                will_write = True
-                                note = "written_to_inbox"
-                            # === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+    existing_inbox_urls.add(nu)
+    new_inbox_written += 1
+    will_write = True
+    note = "written_to_inbox"
+# === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                         except Exception:
                             note = "skipped (detail_fetch_or_extract_error)"
 
@@ -1507,26 +1531,26 @@ async def main_async() -> None:
                         fields = (rss_items_by_url.get(u) or {}).copy()
                         fields["url"] = u
 
-                        # === BEGIN REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
-                        # Pflichtfelder-Gate (minimal, robust)
-                        if not fields.get("title") or not fields.get("date"):
-                            note = "skipped (missing title/date)"
-                        elif is_non_event_fields(fields, u):
-                            note = "skipped (non_event_page)"
-                        else:
-                            if not fields.get("location"):
-                                fields["location"] = cfg.default_city or "Bocholt"
-                            if not fields.get("city"):
-                                fields["city"] = cfg.default_city or "Bocholt"
-                            if not fields.get("kategorie_suggestion"):
-                                fields["kategorie_suggestion"] = cfg.default_category or ""
+# === BEGIN REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+# Pflichtfelder-Gate (minimal, robust)
+if not fields.get("title") or not fields.get("date"):
+    note = "skipped (missing title/date)"
+elif is_non_event_fields(fields, u, cfg.source_name):
+    note = "skipped (non_event_page)"
+else:
+    if not fields.get("location"):
+        fields["location"] = cfg.default_city or "Bocholt"
+    if not fields.get("city"):
+        fields["city"] = cfg.default_city or "Bocholt"
+    if not fields.get("kategorie_suggestion"):
+        fields["kategorie_suggestion"] = cfg.default_category or ""
 
-                            inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
-                            existing_inbox_urls.add(nu)
-                            new_inbox_written += 1
-                            will_write = True
-                            note = "written_to_inbox"
-                        # === END REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+    existing_inbox_urls.add(nu)
+    new_inbox_written += 1
+    will_write = True
+    note = "written_to_inbox"
+# === END REPLACEMENT BLOCK: rss write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                     except Exception:
                         note = "skipped (rss_parse_or_write_error)"
 
