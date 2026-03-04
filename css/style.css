@@ -1769,39 +1769,42 @@ html.is-panel-open body {
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* BEGIN PATCH DP-DESC-SOURCE-LINKS-V3
-   Zweck: Quelle/Links im Detailpanel auf Enterprise-Niveau:
-   - Label klar sekundär, Value darf umbrechen (2 Zeilen), Ext-Icon leiser/stabil.
-   Umfang: Ersetzt den kompletten "DETAIL LINKS (Enterprise v2)" Block.
+/* BEGIN PATCH DP-DESC-SOURCE-LINKS-V4
+   Zweck:
+   - Quelle/Links exakt auf dem gleichen Gutter wie Description (keine extra 12px Einrückung).
+   - ↗ Pfeil immer korrekt (dynamisch), egal ob 1 oder 2 Zeilen.
+   Umfang:
+   - Ersetzt den kompletten Links/Quelle Block.
 */
 
-/* DETAIL LINKS (Enterprise v3: calm link rows, multi-line safe) */
+/* DETAIL LINKS (Enterprise v4: gutter-aligned, dynamic arrow alignment) */
 
 #event-detail-panel .detail-links{
   display: grid;
   gap: 0;
 
-  /* etwas weniger "Loch" zwischen Text und Quelle */
   margin-top: var(--space-md);
   padding-top: 8px;
 
   border-top: 1px solid var(--border-panel-soft);
 }
 
-/* Link row */
+/* Link row: no extra horizontal inset -> aligns with description text */
 #event-detail-panel .detail-link,
 #event-detail-panel .detail-link:link,
 #event-detail-panel .detail-link:visited{
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
 
-  /* multiline-friendly */
-  align-items: start;
+  /* dynamic vertical alignment for 1 or 2 lines */
+  align-items: center;
 
   column-gap: var(--space-sm);
 
   min-height: 44px;
-  padding: 10px 12px;
+
+  /* IMPORTANT: remove the extra 12px left/right inset */
+  padding: 10px 0;
 
   background: transparent !important;
   border: 0 !important;
@@ -1840,7 +1843,6 @@ html.is-panel-open body {
   letter-spacing: 0.02em;
   color: rgba(31,41,51,0.56);
 
-  /* Label sitzt optisch sauber über dem Value */
   margin-top: 1px;
 }
 
@@ -1852,10 +1854,8 @@ html.is-panel-open body {
   line-height: 1.30;
   color: rgba(31,41,51,0.84);
 
-  /* nicht mehr hart 1-zeilig */
   white-space: normal;
 
-  /* aber visuell begrenzen */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1865,18 +1865,19 @@ html.is-panel-open body {
   hyphens: auto;
 }
 
+/* Arrow: always vertically centered relative to row height (works for 1 or 2 lines) */
 #event-detail-panel .detail-link-ext{
   opacity: 0.48;
-  transform: translateY(1px);
+  transform: none;
 }
 
-/* END PATCH DP-DESC-SOURCE-LINKS-V3 */
+/* END PATCH DP-DESC-SOURCE-LINKS-V4 */
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V6 (final: baseline + spacing + icon tone)
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V7 (title-meta rhythm, enterprise separation)
 Zweck:
-- Header sichtbar „Top-PWA“: Icon links als ruhiger Indikator, Title baseline sauber, bessere Typo/Spacing, Meta stabil darunter.
-- 100% CSS-only; Icon-System bleibt zentral (wir stylen nur den Container).
+- Titel vs. Meta klarer trennen (mehr “Headline” Wirkung).
+- Meta-Zeilen leicht dichter zusammen, ohne Layout/DOM zu ändern.
 Umfang:
 - Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
 === */
@@ -1886,7 +1887,9 @@ Umfang:
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+
+  /* etwas mehr Separation zwischen Title-Row und Meta-Block */
+  gap: 12px;
 
   padding: 0 0 var(--space-md);
   margin: 0 0 var(--space-md);
@@ -1904,12 +1907,10 @@ Umfang:
   width: 100%;
   min-width: 0;
 
-  /* Reserve space so the sheet-close area never crowds the title */
   padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
 }
 
-/* DOM: Title kommt vor Icon → visuell trotzdem Icon links */
 #event-detail-panel .detail-category-icon{ order: 1; }
 #event-detail-panel .detail-title{ order: 2; }
 
@@ -1929,7 +1930,6 @@ Umfang:
 
   padding: calc((var(--dp-indicator-size) - var(--ui-icon-size-lg)) / 2);
 
-  /* Ruhiger als Controls / weniger „Button“ */
   opacity: 0.72;
   color: rgba(31,41,51,0.72);
 
@@ -1941,7 +1941,6 @@ Umfang:
   user-select: none;
   pointer-events: none;
 
-  /* Baseline-Feintuning (weil align-items:center) */
   transform: translateY(1px);
 }
 
@@ -1972,13 +1971,13 @@ Umfang:
   word-break: normal;
   hyphens: none;
 
-  /* Optisch minimal nach unten, damit erste Zeile perfekt zum Icon sitzt */
   padding-top: 1px;
 }
 
+/* Meta-Block: minimal runter + dichter (Header-Hierarchie klarer) */
 #event-detail-panel .detail-meta-rows{
   min-width: 0;
-  margin-top: 0;
+  margin-top: 2px;
 }
 
 #event-detail-panel .detail-category-icon::before{
@@ -1986,7 +1985,7 @@ Umfang:
   background: none;
 }
 
-/* === END BLOCK: DP-HEADER-ALIGNMENT-V6 (final: baseline + spacing + icon tone) === */
+/* === END BLOCK: DP-HEADER-ALIGNMENT-V7 (title-meta rhythm, enterprise separation) === */
 /* BEGIN PATCH DP-META-ENTERPRISE-V4
    Zweck: Meta-Bereich (Ort/Datum) final polieren:
    - Link nur bei Location (Hover/Active), Datum klar statisch.
@@ -2977,6 +2976,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
