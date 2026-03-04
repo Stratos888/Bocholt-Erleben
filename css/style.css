@@ -84,6 +84,32 @@
   --radius-card: 12px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
 
+  /* Golden Screen: Event Cards (GS-01 scanability) */
+  --radius-eventcard: 16px;
+  --border-eventcard: rgba(31,41,51,0.055);
+  --border-eventcard-hover: rgba(31,41,51,0.075);
+
+  /* ruhiger als vorher, aber weiterhin „premium“ */
+  --shadow-eventcard:
+    0 1px 1px rgba(0,0,0,0.032),
+    0 8px 22px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --shadow-eventcard-hover:
+    0 1px 2px rgba(0,0,0,0.038),
+    0 10px 26px rgba(0,0,0,0.050),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --eventcard-rail-opacity: 0.48;
+
+  /* Meta: 2-line clamp statt 1-line ellipsis */
+  --eventcard-meta-lines: 2;
+  --eventcard-meta-color: rgba(60,72,88,0.70);
+
+  /* Category indicator: etwas stärker (nur Feed) */
+  --eventcard-category-size: var(--ui-icon-size-sm);
+  --eventcard-category-opacity: 0.72;
+
   /* Golden Screen: Event-Card Typo */
   --font-event-title: 18px;
   --font-event-meta: 14px;
@@ -684,13 +710,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   background: var(--surface);
 
-  border: 1px solid rgba(31,41,51,0.055);
-  border-radius: 16px;
+  border: 1px solid var(--border-eventcard);
+  border-radius: var(--radius-eventcard);
 
-  box-shadow:
-    0 1px 1px rgba(0,0,0,0.035),
-    0 10px 26px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: var(--shadow-eventcard);
 
   transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease, background 140ms ease;
 }
@@ -705,7 +728,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   width: var(--rail-w);
 
   background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
-  opacity: 0.55;
+  opacity: var(--eventcard-rail-opacity);
 
   box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
   pointer-events: none;
@@ -857,8 +880,8 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   position: static;
 
   /* Icon size for cards */
-  width: var(--ui-icon-size-sm);
-  height: var(--ui-icon-size-sm);
+  width: var(--eventcard-category-size);
+  height: var(--eventcard-category-size);
 
   display: inline-flex;
   align-items: center;
@@ -872,7 +895,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   font-size: 0;
   line-height: 0;
 
-  opacity: var(--ui-icon-opacity);
+  opacity: var(--eventcard-category-opacity);
   filter: none;
 
   /* optical baseline alignment in title row */
@@ -890,7 +913,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   display: block !important;
   object-fit: contain !important;
 
-  opacity: var(--ui-icon-opacity);
+  opacity: var(--eventcard-category-opacity);
   filter: none;
 }
 /* END PATCH ICONS-CSS-EVENTCARD-V1 */
@@ -906,14 +929,21 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   line-height: 1.28;
 
-  color: rgba(60,72,88,0.68);
+  color: var(--eventcard-meta-color);
 
-  white-space: nowrap;
+  /* Scanability: 2 Zeilen statt 1 Zeile + Ellipsis */
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+
+  display: -webkit-box;
+  -webkit-line-clamp: var(--eventcard-meta-lines);
+  -webkit-box-orient: vertical;
+
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
 
 }
-
 
 /* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
 .event-card > .event-category-icon{
@@ -3025,6 +3055,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
