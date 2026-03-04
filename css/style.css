@@ -630,11 +630,28 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
+/* BEGIN PATCH EVENTCARD-TAP-HIGHLIGHT-V1
+   Zweck: Entfernt den mobilen „blauen Tap-Flash“ auf Eventcards (native WebKit/Chromium Tap-Highlight),
+          ohne die vorhandenen :active Press-Styles (scale) zu verändern.
+   Umfang: Ersetzt nur den kleinen Klick-Block für .event-card (cursor/interaction).
+*/
+  
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
   position: relative;
   cursor: pointer;
+
+  /* Mobile: kein blauer Tap-Flash */
+  -webkit-tap-highlight-color: transparent;
+
+  /* Mobile UX: reduziert Click-Delay/Double-Tap Zoom Heuristiken */
+  touch-action: manipulation;
+
+  /* Optional, aber passend für Cards: verhindert Text-Selection-Flash beim Tap */
+  user-select: none;
 }
+
+/* END PATCH EVENTCARD-TAP-HIGHLIGHT-V1 */
 
 
 /* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
@@ -3008,6 +3025,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
