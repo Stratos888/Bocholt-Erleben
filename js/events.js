@@ -321,31 +321,76 @@ badge.appendChild(bMonth);
 
         /* === BEGIN BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) ===
     Zweck:
-    - Zielzustand: 2 Zeilen rechts (Title + Meta), keine 3. Zeile mehr.
-    - Icon darf nie “rausrutschen”: Titeltext und Icon werden getrennt gerendert.
-    - Meta-Zeile: Zeit • Location (optional Stadt/Range davor), 1 Zeile.
+    - Enterprise Scanability: Meta ist strukturiert (Prefix · Zeit · Ort) statt „1 Textwurst“
+    - Zeit bleibt stabil lesbar, Ort ist truncatable, Prefix (City/Range) nur wenn sinnvoll
+    - Entfernt Redundanz: City wird NICHT doppelt gezeigt, wenn Location City bereits enthält
     Umfang:
-    - Ersetzt Meta/Title/Location-Erzeugung in createCard (nur Rendering, keine Logik außenrum).
+    - Ersetzt Meta/Title-Erzeugung in createCard (nur Rendering, keine Logik außenrum).
     === */
 
-    /* Meta (1 Zeile): Stadt (optional) • Range (optional) • Zeit (optional) • Location */
-    const metaParts = [];
-
-    if (city && city !== "Bocholt") metaParts.push(city);
-
-    if (event?.date && event?.endDate && event.endDate !== event.date) {
-      metaParts.push(dateLabel);
+    function escapeRegex(s) {
+      return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
     const timeText = event?.time ? String(event.time).trim() : "";
-    if (timeText) metaParts.push(timeText);
+    const locTextRaw = (event?.location || "").trim();
 
-    const locText = (event?.location || "").trim();
-    if (locText) metaParts.push(locText);
+    // City nur anzeigen, wenn Informationsgewinn (Bocholt weglassen) + nicht redundant zur Location
+    const cityRaw = (city || "").toString().trim();
+    let showCity = !!cityRaw && cityRaw !== "Bocholt";
 
+    if (showCity && locTextRaw) {
+      const cityLower = cityRaw.toLowerCase();
+      const locLower = locTextRaw.toLowerCase();
+
+      // exakt gleich
+      if (locLower === cityLower) {
+        showCity = false;
+      } else {
+        // City als eigenes Wort in Location (z.B. "Rhede Rudolf-Dieselstraße …") => redundant
+        const re = new RegExp(`\\b${escapeRegex(cityLower)}\\b`, "i");
+        if (re.test(locTextRaw)) showCity = false;
+      }
+    }
+
+    // Prefix: City (optional) + Date-Range (optional)
+    const prefixParts = [];
+    if (showCity) prefixParts.push(cityRaw);
+    if (event?.date && event?.endDate && event.endDate !== event.date) {
+      prefixParts.push(dateLabel);
+    }
+    const prefixText = prefixParts.join(" · ");
+
+    // Meta DOM: Prefix · Time · Place (Place truncatable in CSS)
     const meta = document.createElement("div");
     meta.className = "event-meta";
-    meta.textContent = metaParts.join(" • ");
+
+    function appendSepIfNeeded() {
+      if (meta.childNodes.length) meta.appendChild(document.createTextNode(" · "));
+    }
+
+    if (prefixText) {
+      const prefixEl = document.createElement("span");
+      prefixEl.className = "event-meta__prefix";
+      prefixEl.textContent = prefixText;
+      meta.appendChild(prefixEl);
+    }
+
+    if (timeText) {
+      appendSepIfNeeded();
+      const timeEl = document.createElement("span");
+      timeEl.className = "event-meta__time";
+      timeEl.textContent = timeText;
+      meta.appendChild(timeEl);
+    }
+
+    if (locTextRaw) {
+      appendSepIfNeeded();
+      const placeEl = document.createElement("span");
+      placeEl.className = "event-meta__place";
+      placeEl.textContent = locTextRaw;
+      meta.appendChild(placeEl);
+    }
 
     /* Title: Text + Icon getrennt (Icon bleibt immer sichtbar) */
     const h3 = document.createElement("h3");
@@ -585,6 +630,7 @@ Umfang:
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
