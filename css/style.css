@@ -1985,16 +1985,15 @@ Umfang:
 }
 
 /* === END BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy) === */
-/* BEGIN PATCH DP-META-ENTERPRISE-V5
+/* BEGIN PATCH DP-META-ENTERPRISE-V6
    Zweck:
-   - Meta-Zeilen exakt auf globalem Gutter ausrichten (kein zusätzliches 12px Inset).
-   - Touch-Targets bleiben groß (min-height), Hover/Active bleiben ruhig.
-   - Meta wirkt leicht sekundärer (Top-App Hierarchie).
+   - Location-Link-Indikator ↗ wirkt immer “zum Ort gehörig”: visuell näher am Text, aber rechts weiterhin sauber/tapbar.
+   - Kein textlängenabhängiges Positionieren (robust), sondern Layout-Regeln.
    Umfang:
    - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
 */
 
-/* DETAIL META INFO (Enterprise v5: gutter-aligned rows, clearer hierarchy) */
+/* DETAIL META INFO (Enterprise v6: gutter-aligned + location arrow proximity) */
 
 #event-detail-panel .detail-meta-rows{
   display: grid;
@@ -2017,8 +2016,6 @@ Umfang:
   column-gap: var(--space-sm);
 
   min-height: 44px;
-
-  /* IMPORTANT: remove extra horizontal inset -> aligns with description/source */
   padding: 10px 0;
 
   background: transparent !important;
@@ -2030,7 +2027,6 @@ Umfang:
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
-
   transition: background 140ms ease, transform 140ms ease, color 140ms ease;
 }
 
@@ -2045,7 +2041,6 @@ Umfang:
   min-width: 0;
   line-height: 1.30;
 
-  /* slightly calmer than title hierarchy */
   font-size: 14px;
   font-weight: 600;
   color: rgba(31,41,51,0.76);
@@ -2053,6 +2048,34 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
+/* --- Key fix: location row arrow proximity --- */
+/* For location links, make the text block not “feel” full-width and keep arrow visually close */
+#event-detail-panel .detail-meta-rows a.detail-meta-row.is-location{
+  /* tighter spacing between text and arrow */
+  column-gap: 8px;
+}
+
+/* Make location text a shrink-to-fit-ish block (still wraps for long addresses) */
+#event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-text{
+  /* prevents “empty runway” effect on short locations */
+  max-width: 26ch;
+}
+
+/* Arrow gets a small dedicated tap/visual zone so it doesn't look “lost” */
+#event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-ext{
+  opacity: 0.50;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+
+  /* keeps it visually aligned even when text wraps */
+  align-self: center;
+
+  /* small hit/spacing without shifting gutter */
+  padding-left: 6px;
+}
+
+/* For non-location rows keep the calmer default */
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
   opacity: 0.42;
   font-weight: 800;
@@ -2067,7 +2090,7 @@ Umfang:
     color: rgba(31,41,51,0.86);
   }
   #event-detail-panel .detail-meta-rows a.detail-meta-row:hover .detail-meta-ext{
-    opacity: 0.60;
+    opacity: 0.62;
   }
 }
 
@@ -2081,20 +2104,21 @@ Umfang:
   outline-offset: 2px;
 }
 
-/* Non-link rows (e.g., datetime): clearly static */
 #event-detail-panel .detail-meta-rows .detail-meta-row:not(a){
   cursor: default;
   transform: none !important;
 }
+
 #event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime{
   color: rgba(31,41,51,0.74);
 }
+
 #event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime .detail-meta-text{
   font-weight: 580;
   color: rgba(31,41,51,0.72);
 }
 
-/* Legacy chips: match gutter-aligned rows */
+/* Legacy chips: unchanged from V5 but kept for completeness */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: 2px;
@@ -2120,8 +2144,6 @@ Umfang:
   max-width: 100%;
 
   min-height: 44px;
-
-  /* IMPORTANT: gutter-aligned */
   padding: 10px 0;
 
   background: transparent !important;
@@ -2152,7 +2174,7 @@ Umfang:
   overflow-wrap: anywhere;
 }
 
-/* END PATCH DP-META-ENTERPRISE-V5 */
+/* END PATCH DP-META-ENTERPRISE-V6 */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2977,6 +2999,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
