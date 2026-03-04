@@ -1984,16 +1984,16 @@ Umfang:
   background: none;
 }
 
-/* === END BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy) === */
-/* BEGIN PATCH DP-META-ENTERPRISE-V6
+/* BEGIN PATCH DP-META-ENTERPRISE-V7
    Zweck:
-   - Location-Link-Indikator ↗ wirkt immer “zum Ort gehörig”: visuell näher am Text, aber rechts weiterhin sauber/tapbar.
-   - Kein textlängenabhängiges Positionieren (robust), sondern Layout-Regeln.
+   - Location-↗ sitzt immer „am Ort“ (auch bei kurzen Ortsnamen), ohne fragiles Textlängen-Positionieren.
+   - Entfernt die künstliche max-width-Begrenzung, die zu frühe Umbrüche („Cluster zu kurz“) erzeugt.
+   - Gutter bleibt appweit konsistent (0-Inset links/rechts).
    Umfang:
    - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
 */
 
-/* DETAIL META INFO (Enterprise v6: gutter-aligned + location arrow proximity) */
+/* DETAIL META INFO (Enterprise v7: fit-content column for location arrow proximity) */
 
 #event-detail-panel .detail-meta-rows{
   display: grid;
@@ -2045,37 +2045,44 @@ Umfang:
   font-weight: 600;
   color: rgba(31,41,51,0.76);
 
-  overflow-wrap: anywhere;
+  /* weniger „brutales“ Brechen */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
 }
 
-/* --- Key fix: location row arrow proximity --- */
-/* For location links, make the text block not “feel” full-width and keep arrow visually close */
+/* --- Key fix: location row arrow proximity (robust) --- */
+/* Make the TEXT column shrink when short, but never exceed available width */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location{
+  /* icon | fit-content(text) | arrow  */
+  grid-template-columns: auto fit-content(100%) auto;
+
   /* tighter spacing between text and arrow */
   column-gap: 8px;
+
+  /* keep columns packed left; leftover space stays at end */
+  justify-content: start;
 }
 
-/* Make location text a shrink-to-fit-ish block (still wraps for long addresses) */
+/* Remove the artificial “26ch” clamp that caused early wrapping */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-text{
-  /* prevents “empty runway” effect on short locations */
-  max-width: 26ch;
+  max-width: none;
 }
 
-/* Arrow gets a small dedicated tap/visual zone so it doesn't look “lost” */
+/* Arrow: centered, no fake padding; proximity comes from fit-content column */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-ext{
   opacity: 0.50;
   font-weight: 800;
   font-size: 14px;
   line-height: 1;
 
-  /* keeps it visually aligned even when text wraps */
   align-self: center;
 
-  /* small hit/spacing without shifting gutter */
-  padding-left: 6px;
+  padding-left: 0;
+  transform: none;
 }
 
-/* For non-location rows keep the calmer default */
+/* Default ext (non-location rows) */
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
   opacity: 0.42;
   font-weight: 800;
@@ -2118,7 +2125,7 @@ Umfang:
   color: rgba(31,41,51,0.72);
 }
 
-/* Legacy chips: unchanged from V5 but kept for completeness */
+/* Legacy chips: keep gutter-aligned */
 #event-detail-panel .detail-meta-chips{
   display: grid;
   gap: 2px;
@@ -2171,10 +2178,12 @@ Umfang:
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
 }
 
-/* END PATCH DP-META-ENTERPRISE-V6 */
+/* END PATCH DP-META-ENTERPRISE-V7 */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2999,6 +3008,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
