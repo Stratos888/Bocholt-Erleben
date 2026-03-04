@@ -1255,8 +1255,20 @@ def make_candidate_row(
     is_already_inbox: bool,
     is_written_to_inbox: bool,
     notes: str,
+    fields: Optional[Dict[str, str]] = None,
 ) -> List[str]:
     created_at = run_ts
+    f = fields or {}
+
+    title = (f.get("title") or "").strip()
+    date = (f.get("date") or f.get("event_date") or "").strip()
+    end_date = (f.get("endDate") or f.get("end_date") or "").strip()
+    time = (f.get("time") or "").strip()
+    city = (f.get("city") or cfg.default_city or "Bocholt").strip()
+    location = (f.get("location") or "").strip()
+    cat = (f.get("kategorie_suggestion") or cfg.default_category or "").strip()
+    id_suggestion = (f.get("id_suggestion") or "").strip()
+
     return [
         run_ts,
         cfg.source_name,
@@ -1270,14 +1282,14 @@ def make_candidate_row(
         "",  # matched_event_id
         "",  # match_score
         url_fingerprint(detail_url),  # fingerprint (stable)
-        "",  # id_suggestion
-        "",  # title
-        "",  # event_date
-        "",  # endDate
-        "",  # time
-        cfg.default_city or "Bocholt",  # city
-        "",  # location
-        cfg.default_category or "",  # kategorie_suggestion
+        id_suggestion[:120],
+        title[:240],
+        date[:40],
+        end_date[:40],
+        time[:40],
+        city[:80],
+        location[:160],
+        cat[:120],
         detail_url,  # url (raw)
         (notes or "")[:240],
         created_at,
@@ -1500,6 +1512,7 @@ async def main_async() -> None:
                         except Exception:
                             note = "skipped (detail_fetch_or_extract_error)"
 
+                    fields_for_candidate = locals().get("fields") if "fields" in locals() else {}
                     candidate_rows.append(
                         make_candidate_row(
                             run_ts,
@@ -1508,6 +1521,7 @@ async def main_async() -> None:
                             is_already_inbox=already_inbox,
                             is_written_to_inbox=will_write,
                             notes=note,
+                            fields=fields_for_candidate,
                         )
                     )
 
@@ -1554,6 +1568,7 @@ async def main_async() -> None:
                     except Exception:
                         note = "skipped (rss_parse_or_write_error)"
 
+                fields_for_candidate = locals().get("fields") if "fields" in locals() else {}
                 candidate_rows.append(
                     make_candidate_row(
                         run_ts,
@@ -1562,6 +1577,7 @@ async def main_async() -> None:
                         is_already_inbox=already_inbox,
                         is_written_to_inbox=will_write,
                         notes=note,
+                        fields=fields_for_candidate,
                     )
                 )
 
