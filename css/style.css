@@ -842,12 +842,13 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   gap: 3px;
 }
 
-/* Title-Zeile: Text + Icon getrennt */
+/* Title-Zeile: Text | Icon als Grid (Enterprise Pattern, keine Overlap/kein absolute) */
 .event-title{
 /* SECTION */
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 8px;
 
   font-size: 1.05rem;
   font-weight: 700;
@@ -930,32 +931,42 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   margin: 0;
 
   font-size: var(--font-event-meta);
-  line-height: 1.22;
+  line-height: 1.28;
 
   color: var(--eventcard-meta-color);
 
-  /* Enterprise scan: exakt 2 Zeilen (Zeit | Ort) */
-  display: grid;
-  grid-auto-rows: min-content;
-  gap: var(--eventcard-meta-gap);
+  /* GS-01 Enterprise: 1 Zeile, Zeit fix | Ort ellipsis */
+  display: flex;
+  align-items: baseline;
+  gap: 0;
 
   min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .event-meta__prefix{
-  display: none; /* wird im Feed nicht mehr genutzt (2-line contract) */
+  display: none;
 }
 
 .event-meta__time{
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 
 .event-meta__place{
+  flex: 1 1 auto;
   min-width: 0;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Separator kommt aus CSS (kein Separator-Textnode im DOM) */
+.event-meta__time + .event-meta__place::before{
+  content: " · ";
 }
 
 /* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
@@ -3068,6 +3079,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
