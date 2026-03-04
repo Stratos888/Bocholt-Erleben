@@ -1806,10 +1806,10 @@ html.is-panel-open body {
 }
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V5 (icon-left, baseline aligned, native PWA)
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V6 (final: baseline + spacing + icon tone)
 Zweck:
-- Header auf Top-PWA Niveau: Kategorie-Icon links (Indicator), Titel sauber aligned, Meta stabil darunter.
-- Icon bleibt zentral gesteuert (nur Container/Alignment im Header).
+- Header sichtbar „Top-PWA“: Icon links als ruhiger Indikator, Title baseline sauber, bessere Typo/Spacing, Meta stabil darunter.
+- 100% CSS-only; Icon-System bleibt zentral (wir stylen nur den Container).
 Umfang:
 - Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
 === */
@@ -1819,7 +1819,7 @@ Umfang:
 
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 10px;
 
   padding: 0 0 var(--space-md);
   margin: 0 0 var(--space-md);
@@ -1828,21 +1828,21 @@ Umfang:
 }
 
 #event-detail-panel .detail-title-row{
-  --dp-indicator-size: 30px;
+  --dp-indicator-size: 28px;
 
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-sm);
+  align-items: center;
+  gap: 10px;
 
   width: 100%;
   min-width: 0;
 
-  /* Reserve space so the sheet-close area never visually crowds the title */
+  /* Reserve space so the sheet-close area never crowds the title */
   padding-right: calc(var(--ui-close-size) + var(--space-md));
   box-sizing: border-box;
 }
 
-/* Re-order without touching central icon system / DOM */
+/* DOM: Title kommt vor Icon → visuell trotzdem Icon links */
 #event-detail-panel .detail-category-icon{ order: 1; }
 #event-detail-panel .detail-title{ order: 2; }
 
@@ -1862,7 +1862,9 @@ Umfang:
 
   padding: calc((var(--dp-indicator-size) - var(--ui-icon-size-lg)) / 2);
 
-  opacity: 0.78;
+  /* Ruhiger als Controls / weniger „Button“ */
+  opacity: 0.72;
+  color: rgba(31,41,51,0.72);
 
   font-size: 0;
   line-height: 0;
@@ -1872,8 +1874,8 @@ Umfang:
   user-select: none;
   pointer-events: none;
 
-  /* Optical baseline alignment to first title line */
-  transform: translateY(2px);
+  /* Baseline-Feintuning (weil align-items:center) */
+  transform: translateY(1px);
 }
 
 #event-detail-panel .detail-category-icon svg{
@@ -1887,12 +1889,12 @@ Umfang:
   margin: 0;
   min-width: 0;
 
-  font-size: 1.08rem;
-  font-weight: 720;
-  letter-spacing: -0.01em;
-  color: var(--color-text-primary);
+  font-size: 1.10rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: rgba(31,41,51,0.92);
 
-  line-height: 1.20;
+  line-height: 1.18;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1902,11 +1904,14 @@ Umfang:
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: none;
+
+  /* Optisch minimal nach unten, damit erste Zeile perfekt zum Icon sitzt */
+  padding-top: 1px;
 }
 
 #event-detail-panel .detail-meta-rows{
   min-width: 0;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 #event-detail-panel .detail-category-icon::before{
@@ -1914,7 +1919,7 @@ Umfang:
   background: none;
 }
 
-/* === END BLOCK: DP-HEADER-ALIGNMENT-V5 (icon-left, baseline aligned, native PWA) === */
+/* === END BLOCK: DP-HEADER-ALIGNMENT-V6 (final: baseline + spacing + icon tone) === */
 /* BEGIN PATCH DP-META-ENTERPRISE-V3
    Zweck: Meta-Bereich (Ort/Datum) von "Form-Field/Card" zu "calm list rows" (Apple Wallet / Google Maps).
    Umfang: Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
@@ -2857,6 +2862,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
