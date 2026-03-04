@@ -84,6 +84,10 @@
   --radius-card: 12px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
 
+  /* GS-01 Event Feed scanability tokens */
+  --eventcard-rail-opacity: 0.48;
+  --eventcard-meta-color: rgba(60,72,88,0.68);
+
   /* Golden Screen: Event Cards (GS-01 scanability) */
   --radius-eventcard: 16px;
   --border-eventcard: rgba(31,41,51,0.055);
@@ -922,27 +926,39 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* SECTION */
 
 .event-meta{
-
   margin: 0;
 
   font-size: var(--font-event-meta);
-
   line-height: 1.28;
 
   color: var(--eventcard-meta-color);
 
-  /* Scanability: 2 Zeilen statt 1 Zeile + Ellipsis */
-  white-space: normal;
+  /* Enterprise scan: Zeit stabil, Ort truncatable */
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+
+  white-space: nowrap;
   overflow: hidden;
+}
 
-  display: -webkit-box;
-  -webkit-line-clamp: var(--eventcard-meta-lines);
-  -webkit-box-orient: vertical;
+.event-meta__prefix{
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
 
-  overflow-wrap: anywhere;
-  word-break: normal;
-  hyphens: auto;
+.event-meta__time{
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
 
+.event-meta__place{
+  flex: 1 1 auto;
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
@@ -3055,6 +3071,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
