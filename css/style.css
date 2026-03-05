@@ -1204,7 +1204,7 @@ Umfang:
 /* Offline badge: fixed unter Header, zentriert, kein Layout-Shift */
 .offline-badge{
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px);
+  top: var(--offline-badge-top, calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px));
   left: 50%;
   transform: translateX(-50%) translateY(-4px);
 
@@ -1227,7 +1227,7 @@ Umfang:
   line-height: 1.15;
   color: rgba(31,41,51,0.86);
 
-  pointer-events: none; /* nicht blockierend */
+  pointer-events: none;
 
   opacity: 0;
   visibility: hidden;
@@ -3310,6 +3310,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
