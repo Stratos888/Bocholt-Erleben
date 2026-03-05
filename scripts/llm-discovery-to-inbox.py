@@ -151,6 +151,27 @@ def safe_int(v: str, default: int) -> int:
         return default
 
 
+def date_in_horizon(date_str: str, horizon_days: int) -> bool:
+    """
+    Keep only dates in [today, today + horizon_days].
+    If date_str is invalid/empty -> reject (caller already gates on required date).
+    """
+    ds = (date_str or "").strip()
+    if not ds:
+        return False
+    try:
+        d = datetime.strptime(ds, "%Y-%m-%d").date()
+    except Exception:
+        return False
+
+    today = datetime.utcnow().date()
+    if d < today:
+        return False
+    if horizon_days <= 0:
+        return True
+    return d <= (today + timedelta(days=int(horizon_days)))
+
+
 # === BEGIN BLOCK: RSS COLLECTOR HELPERS (llm pipeline) ===
 # Datei: scripts/llm-discovery-to-inbox.py
 # Zweck: RSS/Atom Feed lesen, Items normalisieren (title/date/url/description), um LLM-Pipeline auch für RSS zu nutzen.
@@ -955,31 +976,26 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
     # location (structured first, then heuristic)
     location = sel_text(".detail-meta-row.is-location .detail-meta-text")
     if not location:
-        for label in ("Ort", "Veranstaltungsort", "Location"):
+        for label in ("Ort(e)", "Ort", "Veranstaltungsort", "Location"):
             idx = text_blob.lower().find(label.lower())
             if idx != -1:
-                snippet = text_blob[idx : idx + 160]
+                snippet = text_blob[idx : idx + 180]
                 if ":" in snippet:
                     snippet = snippet.split(":", 1)[1]
-                location = norm_text(snippet)[:120]
-                break
+                snippet = norm_text(snippet)[:140]
 
-    # guard: avoid navigation/utility text becoming "location" (seen on isselburg.de)
-    if location and any(
-        h in location.lower()
-        for h in (
-            "bildung",
-            "schulen",
-            "hochwasserschutz",
-            "kommunalwahl",
-            "notfall",
-            "notfallnummern",
-            "feuerwehr",
-        )
-    ):
-        location = ""
+                # Guard against table/header lines (seen on juboh.de): "Ort(e) Termin(e) Dozent(en) ..."
+                if re.search(r"\btermin\(e\)\b|\bdozent\(en\)\b", snippet, flags=re.IGNORECASE):
+                    continue
+                if snippet.lower().startswith(("termin(e)", "dozent(en)")):
+                    continue
+
+                location = norm_text(snippet)[:120]
+                if location:
+                    break
 
     if not location and "bocholt" in text_blob.lower():
+        location = "Bocholt"
         location = "Bocholt"
 
     description = ""
@@ -1273,6 +1289,192 @@ def _extract_django_flint_termine_events(cfg: SourceCfg, listing_url: str, soup:
         add_item(token, title, d_iso, "", loc, "")
 
         i = j if j > i else i + 1
+
+    return items_by_url
+
+
+def _dmy_to_iso(dmy: str) -> str:
+    m = re.search(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", dmy)
+    if not m:
+        return ""
+    dd, mm, yyyy = m.group(1), m.group(2), m.group(3)
+    try:
+        return datetime(int(yyyy), int(mm), int(dd)).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+
+def _extract_coltplay_tour_events(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    coltplay.de/tour:
+    - stable anchor is any element whose text STARTS with "DD.MM.YYYY - ..."
+    - parse: date + city + venue (best-effort)
+    - explicitly ignore phone/email utility lines (they do NOT start with date)
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = "Coltplay"
+
+    def add_item(token: str, title: str, date_s: str, time_s: str, loc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": (time_s or "")[:40],
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": "",
+        }
+
+    date_head_re = re.compile(r"^\s*\d{1,2}\.\d{1,2}\.\d{4}\s*-\s*.+")
+    candidates: List[Any] = []
+
+    for el in soup.select("h1,h2,h3,h4,p,div,span,strong,b,a,li"):
+        txt = norm_text(el.get_text(" ", strip=True))
+        if not txt:
+            continue
+        if date_head_re.match(txt):
+            candidates.append((el, txt))
+
+    seen: Set[str] = set()
+    for el, head in candidates:
+        if head in seen:
+            continue
+        seen.add(head)
+
+        date_iso = _dmy_to_iso(head)
+        if not date_iso:
+            continue
+
+        parts = [p.strip() for p in re.split(r"\s*-\s*", head) if p.strip()]
+        city = parts[1] if len(parts) >= 2 else ""
+        venue = parts[2] if len(parts) >= 3 else ""
+        venue = re.sub(r"\s+KRANKHEITSBEDINGT.*$", "", venue, flags=re.IGNORECASE).strip()
+        venue = re.sub(r"\s+AUSVERKAUFT.*$", "", venue, flags=re.IGNORECASE).strip()
+
+        block = el.find_parent("li") or el.find_parent("article") or el.parent
+        block_text = norm_text(block.get_text(" ", strip=True)) if block else head
+
+        time_s = ""
+        m1 = re.search(r"\bBeginn:\s*(\d{1,2}:\d{2})\b", block_text, re.IGNORECASE)
+        if m1:
+            time_s = m1.group(1)
+        else:
+            m2 = re.search(r"\b(\d{1,2}:\d{2})\b", head)
+            if m2:
+                time_s = m2.group(1)
+
+        loc = ""
+        if venue and city:
+            loc = f"{venue}, {city}"
+        elif venue:
+            loc = venue
+        elif city:
+            loc = city
+
+        title = f"{band} – Konzert"
+        if venue and city:
+            title = f"{band} – {venue} ({city})"
+        elif venue:
+            title = f"{band} – {venue}"
+        elif city:
+            title = f"{band} – {city}"
+
+        token = f"{band}|{date_iso}|{time_s}|{loc}|{head}"
+        add_item(token, title, date_iso, time_s, loc)
+
+    return items_by_url
+
+
+def _extract_django_flint_termine_events(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    django-flint.de:
+    - parse around heading "Unsere Termine" (case-insensitive)
+    - consume following lines until next main heading
+    - accept date lines "DD.MM.YYYY", next non-date line as label (optional)
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = "Django Flint"
+
+    def add_item(token: str, title: str, date_s: str, loc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": "",
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": "",
+        }
+
+    anchor = None
+    for hx in soup.select("h1,h2,h3,h4"):
+        if norm_text(hx.get_text(" ", strip=True)).lower() == "unsere termine":
+            anchor = hx
+            break
+    if not anchor:
+        for hx in soup.select("h1,h2,h3,h4"):
+            if "termine" in norm_text(hx.get_text(" ", strip=True)).lower():
+                anchor = hx
+                break
+    if not anchor:
+        return {}
+
+    lines: List[str] = []
+    for el in anchor.find_all_next():
+        if getattr(el, "name", None) in {"h1", "h2", "h3"} and el is not anchor:
+            break
+        if getattr(el, "name", None) not in {"p", "div", "li", "span"}:
+            continue
+        txt = norm_text(el.get_text(" ", strip=True))
+        if not txt:
+            continue
+        for part in [p.strip() for p in re.split(r"\s{2,}|\n", txt) if p.strip()]:
+            lines.append(norm_text(part))
+
+        if len(lines) > 120:
+            break
+
+    cleaned: List[str] = []
+    for ln in lines:
+        if not ln or len(ln) < 4:
+            continue
+        if "@" in ln:
+            continue
+        if re.search(r"\b\d{3,}\s*-\s*\d{2,}", ln):
+            continue
+        cleaned.append(ln)
+
+    i = 0
+    while i < len(cleaned):
+        d_iso = _dmy_to_iso(cleaned[i])
+        if not d_iso:
+            i += 1
+            continue
+
+        label = ""
+        if i + 1 < len(cleaned) and not _dmy_to_iso(cleaned[i + 1]):
+            label = cleaned[i + 1]
+
+        title = f"{band} – Live"
+        loc = ""
+        if label:
+            title = f"{band} – {label}"[:240]
+            # keep loc empty unless it looks like a venue/place (avoid placeholder words)
+            if re.search(r"(vinothek|kultur|theater|abendmarkt|bühne|halle|zelt|krug|mühle|museum)", label, re.IGNORECASE):
+                loc = label[:160]
+
+        token = f"{band}|{d_iso}|{label}"
+        add_item(token, title, d_iso, loc)
+
+        i += 2 if label else 1
 
     return items_by_url
 
@@ -1901,6 +2103,8 @@ async def main_async() -> None:
                             # Pflichtfelder-Gate (minimal, robust)
                             if not fields.get("title") or not fields.get("date"):
                                 note = "skipped (missing title/date)"
+                            elif not date_in_horizon(fields.get("date", ""), cfg.horizon_days):
+                                note = "skipped (out_of_horizon)"
                             elif is_non_event_fields(fields, u, cfg.source_name):
                                 note = "skipped (non_event_page)"
                             else:
@@ -1976,6 +2180,8 @@ async def main_async() -> None:
                                 # Pflichtfelder-Gate (minimal, robust)
                                 if not fields.get("title") or not fields.get("date"):
                                     note = "skipped (missing title/date)"
+                                elif not date_in_horizon(fields.get("date", ""), cfg.horizon_days):
+                                    note = "skipped (out_of_horizon)"
                                 elif is_non_event_fields(fields, u, cfg.source_name):
                                     note = "skipped (non_event_page)"
                                 else:
@@ -2027,6 +2233,8 @@ async def main_async() -> None:
                         # Pflichtfelder-Gate (minimal, robust)
                         if not fields.get("title") or not fields.get("date"):
                             note = "skipped (missing title/date)"
+                        elif not date_in_horizon(fields.get("date", ""), cfg.horizon_days):
+                            note = "skipped (out_of_horizon)"
                         elif is_non_event_fields(fields, u, cfg.source_name):
                             note = "skipped (non_event_page)"
                         else:
