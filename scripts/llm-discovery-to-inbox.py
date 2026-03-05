@@ -1000,6 +1000,182 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
 # === END REPLACEMENT BLOCK: extract_event_fields — LLM DISCOVERY | Scope: structured selectors first, better title/date/location ===
 
 
+# === BEGIN REPLACEMENT BLOCK: listpage parser fallback — LLM DISCOVERY | Scope: extract tour/termine lists without detail pages ===
+def _host_norm(h: str) -> str:
+    h = (h or "").strip().lower()
+    return h[4:] if h.startswith("www.") else h
+
+
+def _synthetic_event_url(listing_url: str, token: str) -> str:
+    base = normalize_url(listing_url)
+    h = hashlib.sha1(token.encode("utf-8", errors="ignore")).hexdigest()
+    return f"{base}#event={h}"
+
+
+def _band_name_from_source(cfg: SourceCfg) -> str:
+    # e.g. "Django Flint – Termine" -> "Django Flint"
+    n = (cfg.source_name or "").strip()
+    if "–" in n:
+        return n.split("–", 1)[0].strip()
+    if "-" in n:
+        return n.split("-", 1)[0].strip()
+    return n or "Band"
+
+
+def _extract_events_from_blocks(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    Generic list parser:
+    - looks at LI/TR/ARTICLE/.event-like blocks
+    - extracts date (YYYY-MM-DD), time (HH:MM optional), location (best-effort)
+    - returns items_by_url {synthetic_url: fields}
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = _band_name_from_source(cfg)
+
+    def add_item(token: str, title: str, date_s: str, time_s: str, loc: str, desc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": (time_s or "")[:40],
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": (desc or "")[:500],
+        }
+
+    # Candidate blocks (broad, but domain-scoped by caller)
+    blocks: List[Any] = []
+    blocks.extend(soup.select("li"))
+    blocks.extend(soup.select("tr"))
+    blocks.extend(soup.select("article"))
+    blocks.extend(soup.select(".event, .events, .termin, .termine, .tour, .tourdates, .tour-dates, .date, .dates"))
+
+    seen_text: Set[str] = set()
+    for b in blocks:
+        t = norm_text(b.get_text(" ", strip=True))
+        if not t or len(t) < 12:
+            continue
+        if t in seen_text:
+            continue
+        seen_text.add(t)
+
+        # must contain a date token somewhere
+        d = extract_best_date(BeautifulSoup(str(b), "html.parser"), t)
+        if not d:
+            continue
+
+        tm = ""
+        mt = TIME_RE.search(t)
+        if mt:
+            tm = mt.group(1)
+
+        # best-effort location: take tail of string after date/time, keep short
+        loc = ""
+        # common separators
+        # examples: "07.11.2026 19:00 Bocholt – Bürgerzentrum"
+        parts = re.split(r"\s[-–•|]\s|\s·\s", t)
+        if len(parts) >= 2:
+            loc = parts[-1].strip()
+        else:
+            # fallback: remove date+time from text and take remainder start
+            loc = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", " ", t)
+            loc = re.sub(r"\b\d{1,2}\.\d{1,2}\.\d{2,4}\b", " ", loc)
+            loc = re.sub(r"\b\d{1,2}:\d{2}\b", " ", loc)
+            loc = norm_text(loc)[:120]
+
+        # title: band + short location cue
+        title = f"{band} – Konzert"
+        if loc:
+            title = f"{band} – {loc}"[:240]
+
+        token = f"{band}|{d}|{tm}|{loc}|{t}"
+        add_item(token, title, d, tm, loc, "")
+
+    return items_by_url
+
+
+def parse_listpage_events(cfg: SourceCfg, listing_url: str, html: str) -> Dict[str, Dict[str, str]]:
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+
+    host = _host_norm(urlparse(listing_url).netloc)
+
+    # Domain-scoped: only activate for these two sources
+    if "django-flint.de" in host:
+        return _extract_events_from_blocks(cfg, listing_url, soup)
+
+    if "coltplay.de" in host:
+        return _extract_events_from_blocks(cfg, listing_url, soup)
+
+    return {}
+
+
+async def collect_listpage_items_playwright(cfg: SourceCfg) -> Dict[str, Any]:
+    """
+    Fallback collector: fetch listing page and parse event rows directly (no detail pages).
+    Returns same-ish shape as RSS collector: {items_by_url, detail_urls, http_status_last, error}
+    """
+    listing_url = cfg.url
+    http_status_last = ""
+    error_msg = ""
+    items_by_url: Dict[str, Dict[str, str]] = {}
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled",
+            ],
+        )
+        context = await browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            ),
+            locale="de-DE",
+            accept_downloads=False,
+        )
+        page = await context.new_page()
+
+        try:
+            resp = await page.goto(listing_url, wait_until="domcontentloaded", timeout=60_000)
+            if resp is not None:
+                http_status_last = str(resp.status)
+            await page.wait_for_load_state("networkidle", timeout=60_000)
+
+            # scroll for lazy content
+            try:
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(800)
+                await page.evaluate("window.scrollTo(0, 0)")
+            except Exception:
+                pass
+
+            html = await page.content()
+            items_by_url = parse_listpage_events(cfg, listing_url, html)
+
+        except Exception as e:
+            error_msg = f"listpage_fallback_error:{e}"
+
+        await context.close()
+        await browser.close()
+
+    return {
+        "detail_urls": sorted(items_by_url.keys()),
+        "items_by_url": items_by_url,
+        "http_status_last": http_status_last,
+        "error": error_msg,
+    }
+# === END REPLACEMENT BLOCK: listpage parser fallback — LLM DISCOVERY | Scope: extract tour/termine lists without detail pages ===
+
+
 def _build_llm_input(detail_html: str, detail_url: str, cfg: SourceCfg) -> str:
     soup = BeautifulSoup(detail_html, "html.parser")
     for tag in soup(["script", "style", "noscript"]):
@@ -1473,6 +1649,8 @@ async def main_async() -> None:
         rss_items_by_url: Dict[str, Dict[str, str]] = {}
 
         # === BEGIN BLOCK: Collector switch (html vs rss) ===
+        list_items_by_url: Dict[str, Dict[str, str]] = {}
+
         if cfg.source_type == "html":
             res = await collect_detail_urls_playwright(cfg)
             details = res["detail_urls"]
@@ -1483,6 +1661,17 @@ async def main_async() -> None:
             err = res["error"]
             if not err and res.get("nav2_status") and int(res["nav2_status"] or "0") >= 400:
                 err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
+
+            # Fallback: if no detail URLs found, parse list page directly for specific domains
+            if (not details) and (not err):
+                host = _host_norm(urlparse(cfg.url).netloc)
+                if ("django-flint.de" in host) or ("coltplay.de" in host):
+                    fb = await collect_listpage_items_playwright(cfg)
+                    list_items_by_url = fb.get("items_by_url", {}) or {}
+                    details = fb.get("detail_urls", []) or []
+                    http_status_last = fb.get("http_status_last", "") or http_status_last
+                    if fb.get("error"):
+                        err = fb["error"]
 
         elif cfg.source_type == "rss":
             res = collect_rss_items(cfg)
@@ -1505,56 +1694,30 @@ async def main_async() -> None:
                 )
             )
             continue
-        # === END BLOCK: Collector switch (html vs rss) ===
+        # === END BLOCK: Collector switch (html vs rss) ===# === END BLOCK: Collector switch (html vs rss) ===
 
         # We treat llm_batch_size as "target number of NEW inbox rows" per run.
         target_new = max(cfg.llm_batch_size, 10)
         new_inbox_written = 0
 
-        # Log candidates for all collected detail URLs (collector proof),
-        # but only write up to target_new NEW items to Inbox (skip duplicates).
         if cfg.source_type == "html":
-            # Reuse a single browser/context/page for all detail fetches of this source (major speed-up)
-            async with async_playwright() as p_det:
-                browser_det = await p_det.chromium.launch(
-                    headless=True,
-                    args=[
-                        "--no-sandbox",
-                        "--disable-dev-shm-usage",
-                        "--disable-blink-features=AutomationControlled",
-                    ],
-                )
-                context_det = await browser_det.new_context(
-                    user_agent=(
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                    ),
-                    locale="de-DE",
-                    accept_downloads=False,
-                )
-                page_det = await context_det.new_page()
-
+            # ListPage fallback: no detail fetch, write directly using parsed rows
+            if "list_items_by_url" in locals() and list_items_by_url:
                 for u in details:
                     nu = normalize_url(u)
                     already_inbox = (not disable_inbox_dedupe) and (nu in existing_inbox_urls)
 
                     will_write = False
-                    note = "collector_only (playwright)"
+                    note = "collector_only (html_listpage)"
                     if already_inbox:
                         note = "collector_only (dup: already_inbox)"
                     elif new_inbox_written >= target_new:
                         note = "collector_only (cap reached)"
                     else:
                         try:
-                            await page_det.goto(u, wait_until="domcontentloaded", timeout=60_000)
-                            await page_det.wait_for_timeout(1200)
-                            detail_html = await page_det.content()
+                            fields = (list_items_by_url.get(u) or {}).copy()
+                            fields["url"] = u
 
-                            fields = llm_extract_event_fields(detail_html, u, cfg)
-                            if fields is None:
-                                fields = extract_event_fields(detail_html, u, cfg)
-
-                            # === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                             # Pflichtfelder-Gate (minimal, robust)
                             if not fields.get("title") or not fields.get("date"):
                                 note = "skipped (missing title/date)"
@@ -1563,17 +1726,19 @@ async def main_async() -> None:
                             else:
                                 if not fields.get("location"):
                                     fields["location"] = cfg.default_city or "Bocholt"
+                                if not fields.get("city"):
+                                    fields["city"] = cfg.default_city or "Bocholt"
+                                if not fields.get("kategorie_suggestion"):
+                                    fields["kategorie_suggestion"] = cfg.default_category or ""
 
                                 inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
                                 existing_inbox_urls.add(nu)
                                 new_inbox_written += 1
                                 will_write = True
                                 note = "written_to_inbox"
-                            # === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
                         except Exception:
-                            note = "skipped (detail_fetch_or_extract_error)"
+                            note = "skipped (listpage_parse_or_write_error)"
 
-                    fields_for_candidate = locals().get("fields") if "fields" in locals() else {}
                     candidate_rows.append(
                         make_candidate_row(
                             run_ts,
@@ -1582,15 +1747,87 @@ async def main_async() -> None:
                             is_already_inbox=already_inbox,
                             is_written_to_inbox=will_write,
                             notes=note,
-                            fields=fields_for_candidate,
+                            fields=(list_items_by_url.get(u) or {}),
                         )
                     )
 
-                await context_det.close()
-                await browser_det.close()
+            else:
+                # Reuse a single browser/context/page for all detail fetches of this source (major speed-up)
+                async with async_playwright() as p_det:
+                    browser_det = await p_det.chromium.launch(
+                        headless=True,
+                        args=[
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",
+                            "--disable-blink-features=AutomationControlled",
+                        ],
+                    )
+                    context_det = await browser_det.new_context(
+                        user_agent=(
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                            "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                        ),
+                        locale="de-DE",
+                        accept_downloads=False,
+                    )
+                    page_det = await context_det.new_page()
+
+                    for u in details:
+                        nu = normalize_url(u)
+                        already_inbox = (not disable_inbox_dedupe) and (nu in existing_inbox_urls)
+
+                        will_write = False
+                        note = "collector_only (playwright)"
+                        if already_inbox:
+                            note = "collector_only (dup: already_inbox)"
+                        elif new_inbox_written >= target_new:
+                            note = "collector_only (cap reached)"
+                        else:
+                            try:
+                                await page_det.goto(u, wait_until="domcontentloaded", timeout=60_000)
+                                await page_det.wait_for_timeout(1200)
+                                detail_html = await page_det.content()
+
+                                fields = llm_extract_event_fields(detail_html, u, cfg)
+                                if fields is None:
+                                    fields = extract_event_fields(detail_html, u, cfg)
+
+                                # === BEGIN REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                                # Pflichtfelder-Gate (minimal, robust)
+                                if not fields.get("title") or not fields.get("date"):
+                                    note = "skipped (missing title/date)"
+                                elif is_non_event_fields(fields, u, cfg.source_name):
+                                    note = "skipped (non_event_page)"
+                                else:
+                                    if not fields.get("location"):
+                                        fields["location"] = cfg.default_city or "Bocholt"
+
+                                    inbox_rows.append(make_inbox_row(run_ts, cfg, fields))
+                                    existing_inbox_urls.add(nu)
+                                    new_inbox_written += 1
+                                    will_write = True
+                                    note = "written_to_inbox"
+                                # === END REPLACEMENT BLOCK: write gate — LLM DISCOVERY | Scope: skip non-event utility/legal pages ===
+                            except Exception:
+                                note = "skipped (detail_fetch_or_extract_error)"
+
+                        fields_for_candidate = locals().get("fields") if "fields" in locals() else {}
+                        candidate_rows.append(
+                            make_candidate_row(
+                                run_ts,
+                                cfg,
+                                u,
+                                is_already_inbox=already_inbox,
+                                is_written_to_inbox=will_write,
+                                notes=note,
+                                fields=fields_for_candidate,
+                            )
+                        )
+
+                    await context_det.close()
+                    await browser_det.close()
 
         else:
-            # RSS: no detail fetch; write directly using feed fields
             for u in details:
                 nu = normalize_url(u)
                 already_inbox = (not disable_inbox_dedupe) and (nu in existing_inbox_urls)
