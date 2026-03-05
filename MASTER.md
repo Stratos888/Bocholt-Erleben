@@ -234,40 +234,37 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- Detailpanel: Appweite Icon-Standardisierung abgeschlossen (SVG Line Icons + Tokens)
-  - `window.Icons` Registry (`js/icons.js`)
-  - `details.js` + `events.js` nutzen `Icons.svg()` / `Icons.categoryKey()`
-  - Keine Emoji-Kategorie-Icons mehr (keine OS/Font-Drifts)
-- Categories: Single Source of Truth ist `FilterModule.normalizeCategory()`
-  - Variante A: `Highlights` + `Wirtschaft` → `Innenstadt & Leben`
-  - `Icons.categoryKey()` mappt ausschließlich kanonische Kategorien auf `cat-*`
-- CSS/Tokens: SVG Rendering ist appweit konsistent
-  - `svg.ui-icon-svg` Base Style (size/stroke/opacity via Tokens)
-  - Kontextgrößen für Cards/Meta/Header (sm/md/lg + stroke-sm/md/lg)
-  - Detailpanel SVG Guard scoped (UI-Icons clamped, Kategorie-Badge frei)
-- Detailpanel UI finalized to enterprise baseline:
-  header hierarchy, meta gutter alignment, location arrow proximity, description typography and source alignment corrected.
-- Event card mobile tap-highlight removed to avoid blue flash during detailpanel opening.
+- GS-01 Event Feed (Golden Screen) — Enterprise Scanability Workpack umgesetzt (UI + Filter, per Console-Proofs verifiziert):
+  - Event Cards: Titel bleibt 2-zeilig (Clamp); Meta ist 1-zeilig (Zeit fix | Ort ellipsis) und Redundanz City/Location entfernt.
+  - Title-Row als Grid (Text | Kategorie-Icon) stabilisiert (kein Overlap/absolute hacks).
+  - Feed Rhythm/Density tokenbasiert eingeführt und per Gaps-Proof feinjustiert:
+    - `events-section-title` margins reduziert (mt/mb) und Cards/Section Abstände deterministisch aus Tokens abgeleitet.
+- Filter (Zeit) — Enterprise Facets an Feed-Gruppen gekoppelt (kontextabhängige Counts):
+  - Zeit-Buckets: `all | today | week | weekend | nextweek | later`
+  - Facet-Counts korrekt (Search + aktive Kategorie) + `endDate` berücksichtigt (laufende Events zählen als „Heute“).
+- Control System Polish (Search + Pills + Reset + Focus):
+  - Einheitliche Control-DNA tokenbasiert (Höhe/Radius/Border/Shadow/Focus-Ring) für Search, Pills und Reset.
+  - Reset-Icon als SVG (stroke=currentColor) + robuste Zentrierung; Fokus-Ring konsistent via `--ui-focus-ring`.
 
 DECISIONS LOG (permanent, project-wide):
-- Icons: Single Source of Truth ist `window.Icons` (SVG Line Icons). Keine Emojis für Kategorien.
-- Kategorien: Single Source of Truth ist `FilterModule.normalizeCategory()` (kanonische Kategorien). Icons mappt nur kanonisch → IconKey.
-- Darstellung: Größe/Stroke/Opacity werden ausschließlich über CSS Tokens gesteuert (`--ui-icon-*`).
-- - Detailpanel layout stabilized to enterprise baseline (header, meta rows, description, source and actions visually finalized).
-
-- Location link arrow (↗) proximity solved via CSS grid fit-content column strategy instead of text-length based positioning.
-
-- Mobile tap highlight on event cards disabled using `-webkit-tap-highlight-color: transparent` to prevent blue flash during panel opening.
+- GS-01 Feed: Scanability-Contract:
+  - Event Card: Titel max 2 Zeilen; Meta 1 Zeile (Zeit vollständig, Ort ellipsis); City/Location-Dopplung wird vermieden.
+  - Kategorie-Icon ist Indikator (nicht Button) und wird layoutstabil in der Titelzeile (Grid Text|Icon) geführt.
+- Zeitfilter ist Single Source of Truth = Feed-Buckets:
+  - Keys: `all | today | week | weekend | nextweek | later`
+  - Facet-Counts bleiben kontextabhängig (Search + aktive Kategorie) und berücksichtigen `endDate`.
+- Control-System-DNA ist tokenbasiert:
+  - Search/Pills/Reset nutzen gemeinsame Control Tokens; Fokus-Ring ausschließlich über `--ui-focus-ring`.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
-- Architektur + Konsistenz stabil (Overlay-Root, Scroll/Close/Actions, Icon-System zentral)
-- Nächster UI-Workpack: Header Baseline Alignment (Kategorie-Icon an erste Titelzeilen-Baseline, nicht center)
+- Detailpanel bleibt Enterprise-Baseline (frozen unless critical bug); in dieser Session nicht verändert.
+- Aktiver UI-Fokus dieser Session war GS-01 Event Feed + Filter-Facets (ohne Detailpanel-Redesign).
 
 REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
-1) Header Baseline Alignment (Kategorie-Icon ↔ erste Titelzeile)
-2) Actionbar Integration + Safe-Area bottom inset
-3) Typografie/Rhythmus (Description weight/line-height, Meta-Icons leicht entschärfen)
-4) Focus-visible Audit (Close/Links/Actions)
+1) GS-01 Loading/Empty/Error States vereinheitlichen (Skeleton Cards, „Keine Events“ + Reset CTA, Retry)
+2) GS-01 Kategorie-Erkennbarkeit Feintuning (nur Tokens/CSS, low-noise)
+3) GS-01 Scroll-Performance QA (Shadows/blur auf Midrange Android; ggf. CSS-only abmildern)
+4) Optional: Detailpanel Accessiblity Audit (Keyboard/ARIA) — nur wenn Bug/Regression sichtbar
 
 PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: HYBRID GO-LIVE TRACK (QUALITY-FIRST)
 
