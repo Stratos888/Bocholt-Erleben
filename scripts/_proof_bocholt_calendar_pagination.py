@@ -7,14 +7,24 @@ URL = "https://www.bocholt.de/veranstaltungskalender"
 
 DETAIL_RE = re.compile(r"^/veranstaltungskalender/[^?#]+$")
 
+
 def extract_detail_links(html: str):
-    # very conservative: only /veranstaltungskalender/<slug>
     hrefs = set(re.findall(r'href="([^"]+)"', html))
     out = set()
     for h in hrefs:
         if DETAIL_RE.match(h):
             out.add(urljoin(BASE, h))
     return sorted(out)
+
+
+def wait_events_visible(page, timeout_ms: int = 60000):
+    # Do NOT wait for networkidle (bocholt.de keeps background requests open)
+    page.wait_for_timeout(1200)
+    page.wait_for_function(
+        "() => Array.from(document.querySelectorAll('a[href]')).some(a => (a.getAttribute('href')||'').startsWith('/veranstaltungskalender/'))",
+        timeout=timeout_ms,
+    )
+
 
 def main():
     with sync_playwright() as p:
@@ -27,16 +37,8 @@ def main():
             locale="de-DE",
         )
 
-page.goto(URL, wait_until="domcontentloaded", timeout=60000)
-
-# Do NOT wait for networkidle (bocholt.de keeps background requests open)
-page.wait_for_timeout(1500)
-
-# Wait until at least one event detail link appears in DOM
-page.wait_for_function(
-    "() => Array.from(document.querySelectorAll('a[href]')).some(a => a.getAttribute('href') && a.getAttribute('href').startsWith('/veranstaltungskalender/'))",
-    timeout=60000,
-)
+        page.goto(URL, wait_until="domcontentloaded", timeout=60000)
+        wait_events_visible(page)
 
         all_links = set()
 
@@ -48,20 +50,16 @@ page.wait_for_function(
 
             print(f"PAGE {n}: links={len(links)} new={len(new_links)} sample={new_links[:5]}")
 
-            # Try to click pagination number (if present). If it doesn't exist, break.
             if n < 3:
                 locator = page.locator(f"text=\"{n+1}\"").first
                 if locator.count() == 0:
                     print(f"Pagination button '{n+1}' not found; stop.")
                     break
                 locator.click()
-page.wait_for_timeout(1200)
-page.wait_for_function(
-    "() => Array.from(document.querySelectorAll('a[href]')).some(a => a.getAttribute('href') && a.getAttribute('href').startsWith('/veranstaltungskalender/'))",
-    timeout=60000,
-)
+                wait_events_visible(page)
 
         browser.close()
+
 
 if __name__ == "__main__":
     main()
