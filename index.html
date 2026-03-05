@@ -104,11 +104,28 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
+<!-- === BEGIN BLOCK: GS-01 TOP-STACK + SEARCH (FilterContract: provide #search-filter) ===
+Zweck: Stellt die verpflichtende Search-UI für FilterModule bereit (id="search-filter") und nutzt bestehende CSS (#search-filter, .top-stack, .events-filter).
+Umfang: Fügt Top-Stack + Search direkt vor die Filter-Pills ein; ersetzt nur den Blockbeginn bis zur Öffnung der .filters-bar.
+=== -->
+<div class="top-stack">
+  <div class="events-filter">
+    <input
+      id="search-filter"
+      type="search"
+      placeholder="Suche Events oder Orte"
+      aria-label="Suche"
+      autocomplete="off"
+      inputmode="search"
+    >
+  </div>
+
  <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
   Zweck: Ersetzt Chip-Teppich durch 2 strukturierte Filter-Pills (Zeit + Kategorie) mit Bottom-Sheet Auswahl.
   Umfang: Entfernt quick-interests/time-chips; führt Filter-Bar + zwei Sheets ein (Zeit/Kategorie).
   === -->
   <div class="filters-bar" aria-label="Filter">
+<!-- === END BLOCK: GS-01 TOP-STACK + SEARCH (FilterContract: provide #search-filter) === -->
     <button type="button" class="filter-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
       <span class="filter-pill__label">Zeit</span>
       <span class="filter-pill__value" id="filter-time-value">Alle</span>
@@ -364,6 +381,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
