@@ -1831,6 +1831,8 @@ async def main_async() -> None:
                 err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
 
             # Force ListPage extraction for specific domains (LLM detail-url extraction is noisy there)
+            # IMPORTANT: do not hard-fail the whole source when listpage extraction returns empty;
+            # fall back to LLM details so we still get candidates + logs for diagnosis.
             host = _host_norm(urlparse(cfg.url).netloc)
             if ("django-flint.de" in host) or ("coltplay.de" in host):
                 fb = await collect_listpage_items_playwright(cfg)
@@ -1839,11 +1841,12 @@ async def main_async() -> None:
 
                 if fb.get("error"):
                     err = fb["error"]
-                elif not list_items_by_url:
-                    err = "listpage_extractor_empty"
-                else:
-                    # IMPORTANT: drive the write-loop by parsed list items, not by LLM-produced detail URLs
+                elif list_items_by_url:
+                    # drive the write-loop by parsed list items, not by LLM-produced detail URLs
                     details = list(list_items_by_url.keys())
+                else:
+                    # listpage empty -> keep existing LLM-derived details; do NOT set err here
+                    pass
             else:
                 # Fallback: if no detail URLs found, parse list page directly for specific domains
                 if (not details) and (not err):
