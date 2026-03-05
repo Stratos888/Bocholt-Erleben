@@ -55,15 +55,16 @@ Umfang: Ersetzt nur den DetailPanel-init Abschnitt.
 
 
 
-        /* === BEGIN BLOCK: GS-01 LOADING START (skeleton first, overlay optional) ===
-Zweck: Stabiler Feed während Fetch (Skeleton) + optionales Loading-Overlay ohne Layout-Shift.
-Umfang: Ersetzt nur das "Loading anzeigen" Statement.
+             /* === BEGIN BLOCK: GS-01 LOADING START (skeleton only, no overlay) ===
+Zweck: Während Fetch nur Skeleton im Feed anzeigen (enterprise), kein Vollbild-Overlay (verdeckt sonst den Feed).
+Umfang: Ersetzt nur diesen Loading-Start-Block.
 === */
         if (typeof EventCards?.renderSkeleton === "function") {
             EventCards.renderSkeleton(8);
         }
-        this.showLoading(true);
-        /* === END BLOCK: GS-01 LOADING START (skeleton first, overlay optional) === */
+        // Overlay beim normalen Laden bewusst aus (Error-State nutzt weiterhin showError()).
+        this.showLoading(false);
+        /* === END BLOCK: GS-01 LOADING START (skeleton only, no overlay) === */
 
         // Events von Airtable laden
         try {
@@ -330,6 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
