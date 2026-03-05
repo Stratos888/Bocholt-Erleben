@@ -170,13 +170,15 @@ Ergänzung:
 - staleWhileRevalidate: fetch(..., { cache: "reload" }) damit Browser-HTTP-Cache (z.B. max-age/immutable) Änderungen nicht „unsichtbar“ macht.
 === */
 async function staleWhileRevalidate(request) {
-  /* === BEGIN BLOCK: SWR STATIC CACHE FALLBACK (fix offline CSS/JS) ===
+  /* === BEGIN BLOCK: GS-01.5 OFFLINE ASSET FALLBACK (STATIC+RUNTIME) ===
   Zweck:
   - Offline muss App-Shell inkl. CSS/JS vollständig laden können.
-  - STATIC_CACHE wird beim Install befüllt (inkl. ?v=...), daher hier als Fallback matchen.
+  - STATIC_CACHE enthält precached Assets (inkl. ?v=...), daher hier als Fallback matchen.
   Umfang:
-  - RUNTIME zuerst, dann STATIC.
+  - Cache-Lookup: RUNTIME zuerst, dann STATIC (ohne ignoreSearch).
+  - Writes bleiben im RUNTIME_CACHE (wie bisher).
   === */
+
   const runtimeCache = await caches.open(RUNTIME_CACHE);
   const staticCache = await caches.open(STATIC_CACHE);
 
@@ -184,14 +186,13 @@ async function staleWhileRevalidate(request) {
   const cached =
     (await runtimeCache.match(request)) ||
     (await staticCache.match(request));
-  /* === END BLOCK: SWR STATIC CACHE FALLBACK (fix offline CSS/JS) === */
 
   // WICHTIG: "reload" erzwingt ein Re-Fetch (bypasst aggressiven HTTP-Cache),
   // damit Deploy-Änderungen an CSS/JS auch bei gleichbleibender URL sichtbar werden.
   const networkPromise = fetch(request, { cache: "reload" })
     .then((response) => {
       if (response && response.ok) {
-        cache.put(request, response.clone());
+        runtimeCache.put(request, response.clone());
       }
       return response;
     })
@@ -210,6 +211,8 @@ async function staleWhileRevalidate(request) {
     status: 503,
     headers: { "Content-Type": "text/plain; charset=utf-8" }
   });
+
+  /* === END BLOCK: GS-01.5 OFFLINE ASSET FALLBACK (STATIC+RUNTIME) === */
 }
 
 async function networkFirst(request) {
@@ -313,6 +316,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
