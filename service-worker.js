@@ -275,6 +275,14 @@ async function networkFirst(request) {
   const runtimeCache = await caches.open(RUNTIME_CACHE);
   const staticCache = await caches.open(STATIC_CACHE);
 
+  /* === BEGIN BLOCK: JSON NETWORK-FIRST WITH ignoreSearch FALLBACK ===
+  Zweck:
+  - Mobile Offline-Reload darf bei /data/*.json?v=... nicht den Feed verlieren.
+  - Fallback matched zusätzlich mit ignoreSearch (Runtime + Static).
+  Umfang:
+  - Nur networkFirst() angepasst, restliche Routing-Logik unverändert.
+  === */
+
   try {
     const response = await fetch(request, { cache: "no-store" });
     if (response && response.ok) {
@@ -303,6 +311,8 @@ async function networkFirst(request) {
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
   }
+
+  /* === END BLOCK: JSON NETWORK-FIRST WITH ignoreSearch FALLBACK === */
 }
 /* === END BLOCK: CACHING HELPERS (cache-busting works) === */
 
@@ -386,6 +396,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
