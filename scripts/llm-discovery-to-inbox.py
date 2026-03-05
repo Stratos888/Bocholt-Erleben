@@ -1024,7 +1024,7 @@ def _band_name_from_source(cfg: SourceCfg) -> str:
 
 def _extract_events_from_blocks(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
     """
-    Generic list parser:
+    Generic list parser (fallback):
     - looks at LI/TR/ARTICLE/.event-like blocks
     - extracts date (YYYY-MM-DD), time (HH:MM optional), location (best-effort)
     - returns items_by_url {synthetic_url: fields}
@@ -1047,7 +1047,6 @@ def _extract_events_from_blocks(cfg: SourceCfg, listing_url: str, soup: Beautifu
             "description": (desc or "")[:500],
         }
 
-    # Candidate blocks (broad, but domain-scoped by caller)
     blocks: List[Any] = []
     blocks.extend(soup.select("li"))
     blocks.extend(soup.select("tr"))
@@ -1063,7 +1062,6 @@ def _extract_events_from_blocks(cfg: SourceCfg, listing_url: str, soup: Beautifu
             continue
         seen_text.add(t)
 
-        # must contain a date token somewhere
         d = extract_best_date(BeautifulSoup(str(b), "html.parser"), t)
         if not d:
             continue
@@ -1073,27 +1071,208 @@ def _extract_events_from_blocks(cfg: SourceCfg, listing_url: str, soup: Beautifu
         if mt:
             tm = mt.group(1)
 
-        # best-effort location: take tail of string after date/time, keep short
         loc = ""
-        # common separators
-        # examples: "07.11.2026 19:00 Bocholt – Bürgerzentrum"
         parts = re.split(r"\s[-–•|]\s|\s·\s", t)
         if len(parts) >= 2:
             loc = parts[-1].strip()
         else:
-            # fallback: remove date+time from text and take remainder start
             loc = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", " ", t)
             loc = re.sub(r"\b\d{1,2}\.\d{1,2}\.\d{2,4}\b", " ", loc)
             loc = re.sub(r"\b\d{1,2}:\d{2}\b", " ", loc)
             loc = norm_text(loc)[:120]
 
-        # title: band + short location cue
         title = f"{band} – Konzert"
         if loc:
             title = f"{band} – {loc}"[:240]
 
         token = f"{band}|{d}|{tm}|{loc}|{t}"
         add_item(token, title, d, tm, loc, "")
+
+    return items_by_url
+
+
+def _dmy_to_iso(dmy: str) -> str:
+    m = re.search(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", dmy)
+    if not m:
+        return ""
+    dd, mm, yyyy = m.group(1), m.group(2), m.group(3)
+    try:
+        return datetime(int(yyyy), int(mm), int(dd)).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+
+def _extract_coltplay_tour_events(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    coltplay.de/tour (observed):
+    - event headline lines are headings containing: "DD.MM.YYYY - City - Venue ..."
+    - details (Beginn/Einlass/Adresse) are in following siblings within the same list item
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = "Coltplay"
+
+    def add_item(token: str, title: str, date_s: str, time_s: str, loc: str, desc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": (time_s or "")[:40],
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": (desc or "")[:500],
+        }
+
+    for h in soup.select("h3, h4"):
+        head = norm_text(h.get_text(" ", strip=True))
+        if not head:
+            continue
+        if not re.match(r"^\d{1,2}\.\d{1,2}\.\d{4}\s*-\s*", head):
+            continue
+
+        date_iso = _dmy_to_iso(head)
+        if not date_iso:
+            continue
+
+        parts = [p.strip() for p in re.split(r"\s*-\s*", head) if p.strip()]
+        city = parts[1] if len(parts) >= 2 else ""
+        venue = parts[2] if len(parts) >= 3 else ""
+        venue = re.sub(r"\s+KRANKHEITSBEDINGT.*$", "", venue, flags=re.IGNORECASE).strip()
+        venue = re.sub(r"\s+AUSVERKAUFT.*$", "", venue, flags=re.IGNORECASE).strip()
+
+        block = h.find_parent("li") or h.parent
+        block_text = norm_text(block.get_text(" ", strip=True)) if block else head
+
+        time_s = ""
+        m1 = re.search(r"\bBeginn:\s*(\d{1,2}:\d{2})\b", block_text, re.IGNORECASE)
+        if m1:
+            time_s = m1.group(1)
+        else:
+            m2 = re.search(r"\bum\s*(\d{1,2}:\d{2})\b", block_text, re.IGNORECASE)
+            if m2:
+                time_s = m2.group(1)
+
+        loc = ""
+        if venue and city:
+            loc = f"{venue}, {city}"
+        elif venue:
+            loc = venue
+        elif city:
+            loc = city
+
+        title = f"{band} – Konzert"
+        if venue and city:
+            title = f"{band} – {venue} ({city})"
+        elif venue:
+            title = f"{band} – {venue}"
+        elif city:
+            title = f"{band} – {city}"
+
+        token = f"{band}|{date_iso}|{time_s}|{loc}|{head}"
+        add_item(token, title, date_iso, time_s, loc, "")
+
+    return items_by_url
+
+
+def _extract_django_flint_termine_events(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    django-flint.de (observed):
+    - section heading "Unsere Termine"
+    - following text lines alternate between date lines and (optional) event/venue lines
+    - stop at "Hier finden Sie" / next major section
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = "Django Flint"
+
+    def add_item(token: str, title: str, date_s: str, time_s: str, loc: str, desc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": (time_s or "")[:40],
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": (desc or "")[:500],
+        }
+
+    anchor = None
+    for hx in soup.select("h1, h2, h3, h4"):
+        if norm_text(hx.get_text(" ", strip=True)).lower() == "unsere termine":
+            anchor = hx
+            break
+
+    if not anchor:
+        return {}
+
+    lines_out: List[str] = []
+    for el in anchor.find_all_next():
+        if getattr(el, "name", None) in {"h1", "h2", "h3"} and el is not anchor:
+            break
+
+        txt = ""
+        if getattr(el, "name", None) in {"p", "div", "li", "span"}:
+            txt = norm_text(el.get_text(" ", strip=True))
+        if not txt:
+            continue
+
+        low = txt.lower()
+        if "hier finden sie" in low or "unsere cd" in low or "unsere bewertungen" in low or "kontakt" == low:
+            break
+
+        for part in [p.strip() for p in re.split(r"\s{2,}|\n", txt) if p.strip()]:
+            if part and part.lower() not in {"4 4"}:
+                lines_out.append(part)
+
+        if len(lines_out) > 80:
+            break
+
+    cleaned: List[str] = []
+    for ln in lines_out:
+        l = norm_text(ln)
+        if not l or len(l) < 4:
+            continue
+        low = l.lower()
+        if "weitere termine folgen" in low:
+            continue
+        if "@" in l:
+            continue
+        if re.search(r"\b\d{3,}\s*-\s*\d{2,}", l):
+            continue
+        cleaned.append(l)
+
+    i = 0
+    while i < len(cleaned):
+        d_iso = _dmy_to_iso(cleaned[i])
+        if not d_iso:
+            i += 1
+            continue
+
+        label = ""
+        j = i + 1
+        while j < len(cleaned):
+            if _dmy_to_iso(cleaned[j]):
+                break
+            label = cleaned[j]
+            break
+
+        title = f"{band} – Live"
+        loc = ""
+        if label:
+            title = f"{band} – {label}"[:240]
+            if re.search(r"(vinothek|kultur|theater|abendmarkt|nacht|live|bühne|zelt|krug)", label, re.IGNORECASE):
+                loc = label[:160]
+
+        token = f"{band}|{d_iso}|{loc}|{cleaned[i]}|{label}"
+        add_item(token, title, d_iso, "", loc, "")
+
+        i = j if j > i else i + 1
 
     return items_by_url
 
@@ -1105,12 +1284,13 @@ def parse_listpage_events(cfg: SourceCfg, listing_url: str, html: str) -> Dict[s
 
     host = _host_norm(urlparse(listing_url).netloc)
 
-    # Domain-scoped: only activate for these two sources
-    if "django-flint.de" in host:
-        return _extract_events_from_blocks(cfg, listing_url, soup)
-
     if "coltplay.de" in host:
-        return _extract_events_from_blocks(cfg, listing_url, soup)
+        items = _extract_coltplay_tour_events(cfg, listing_url, soup)
+        return items or _extract_events_from_blocks(cfg, listing_url, soup)
+
+    if "django-flint.de" in host:
+        items = _extract_django_flint_termine_events(cfg, listing_url, soup)
+        return items or _extract_events_from_blocks(cfg, listing_url, soup)
 
     return {}
 
