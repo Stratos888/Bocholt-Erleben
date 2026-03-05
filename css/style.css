@@ -80,6 +80,15 @@
   --space-lg: 16px;
   --space-xl: 24px;
 
+  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
+  --feed-section-pad-top: 8px;          /* vorher 10px */
+  --feed-cards-gap: 12px;               /* vorher 16px */
+  --feed-title-mt: 10px;                /* vorher 0 (implizit) */
+  --feed-title-mb: 8px;                 /* vorher 0 (implizit) */
+
+  --eventcard-pad: 14px;                /* vorher 16px */
+  --topstack-pad-bottom: 4px;           /* vorher 6px */
+
   /* Golden Screen: Cards */
   --radius-card: 12px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
@@ -284,10 +293,14 @@ body{
   }
 
   .top-stack,
-  .events-section{
-    background: #f7f9f2;
-    border-radius: 18px;
-  }
+.events-section{
+/* SECTION */
+  padding: var(--feed-section-pad-top) var(--gutter) 0;
+
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
 }
 
 
@@ -652,7 +665,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 .events-section-title{
 
-  margin: 0;
+  margin: var(--feed-title-mt) 0 var(--feed-title-mb);
 
   font-weight: 700;
   font-size: 0.76rem;
@@ -671,7 +684,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg); /* 16px */
+  gap: var(--feed-cards-gap);
 
   padding: 0;
   background: transparent;
@@ -729,7 +742,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   column-gap: var(--space-md);
   align-items: center;
 
-  padding: var(--space-lg);
+  padding: var(--eventcard-pad);
   padding-left: 0;
 
   background: var(--surface);
@@ -1088,13 +1101,12 @@ footer {
 }
 
 /* TOP STACK (search as hero, reduced section feel) */
-/* TOP STACK (sticky, wobble-safe) */
 .top-stack{
   position: sticky;
   top: calc(var(--header-h) + var(--stack-gap));
   z-index: 900;
 
-  padding: 4px var(--gutter) 6px;
+  padding: 4px var(--gutter) var(--topstack-pad-bottom);
 
   background: rgba(249, 251, 246, 0.90);
   -webkit-backdrop-filter: blur(12px);
@@ -3128,6 +3140,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
