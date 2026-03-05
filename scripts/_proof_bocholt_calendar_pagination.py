@@ -27,8 +27,16 @@ def main():
             locale="de-DE",
         )
 
-        page.goto(URL, wait_until="domcontentloaded", timeout=60000)
-        page.wait_for_load_state("networkidle", timeout=60000)
+page.goto(URL, wait_until="domcontentloaded", timeout=60000)
+
+# Do NOT wait for networkidle (bocholt.de keeps background requests open)
+page.wait_for_timeout(1500)
+
+# Wait until at least one event detail link appears in DOM
+page.wait_for_function(
+    "() => Array.from(document.querySelectorAll('a[href]')).some(a => a.getAttribute('href') && a.getAttribute('href').startsWith('/veranstaltungskalender/'))",
+    timeout=60000,
+)
 
         all_links = set()
 
@@ -47,7 +55,11 @@ def main():
                     print(f"Pagination button '{n+1}' not found; stop.")
                     break
                 locator.click()
-                page.wait_for_load_state("networkidle", timeout=60000)
+page.wait_for_timeout(1200)
+page.wait_for_function(
+    "() => Array.from(document.querySelectorAll('a[href]')).some(a => a.getAttribute('href') && a.getAttribute('href').startsWith('/veranstaltungskalender/'))",
+    timeout=60000,
+)
 
         browser.close()
 
