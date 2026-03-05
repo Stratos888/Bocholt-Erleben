@@ -282,13 +282,21 @@ async function networkFirst(request) {
     }
     return response;
   } catch (e) {
-    // 1) Runtime-Fallback (wenn Daten schon mal online geladen wurden)
+    // 1) Runtime-Fallback (exakter Match)
     const cachedRuntime = await runtimeCache.match(request);
     if (cachedRuntime) return cachedRuntime;
 
-    // 2) Static-Fallback (für "first offline reload" durch precache)
+    // 1b) Runtime-Fallback (Query ignorieren) – wichtig für /data/*.json?v=...
+    const cachedRuntimeNoSearch = await runtimeCache.match(request, { ignoreSearch: true });
+    if (cachedRuntimeNoSearch) return cachedRuntimeNoSearch;
+
+    // 2) Static-Fallback (exakter Match)
     const cachedStatic = await staticCache.match(request);
     if (cachedStatic) return cachedStatic;
+
+    // 2b) Static-Fallback (Query ignorieren) – nutzt precache /data/*.json ohne Query
+    const cachedStaticNoSearch = await staticCache.match(request, { ignoreSearch: true });
+    if (cachedStaticNoSearch) return cachedStaticNoSearch;
 
     return new Response("Offline", {
       status: 503,
@@ -378,6 +386,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
