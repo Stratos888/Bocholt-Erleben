@@ -269,7 +269,7 @@ REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
 3) Typografie/Rhythmus (Description weight/line-height, Meta-Icons leicht entschärfen)
 4) Focus-visible Audit (Close/Links/Actions)
 
-PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: INTAKE RESTORED (QUALITY WORK IN PROGRESS)
+PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: HYBRID GO-LIVE TRACK (QUALITY-FIRST)
 
 Current architecture (verified in runs):
 
@@ -281,41 +281,77 @@ Sources (Google Sheet tab "Sources")
 → Dedup (normalize_url vs existing inbox URLs)
 → Inbox
 
-Key configuration rule (now proven critical):
+Key configuration rule (proven critical):
 - Only rows with `enabled=true` AND `pipeline_mode=llm` are processed in LLM runs.
-- For HTML sources, `include_detail_pages=true` is required to collect real event detail URLs (otherwise mostly listing/hub URLs).
+- For HTML sources, `include_detail_pages=true` is required to collect real event detail URLs
+  unless an explicit list-page fallback exists.
 
-Recent run milestones (proof points):
-- Before sources switch: sources=3 → candidates_logged=44 → inbox_new=0..1 (mostly dup / too narrow intake)
-- After switching enabled HTML sources to llm + include_detail_pages=true:
-  - sources=17 → candidates_logged=159 → inbox_new=48 (intake restored but contained noise)
-  - sources=17 → candidates_logged=159 → inbox_new=10 (after initial noise reduction; still quality gaps)
+Hybrid go-live strategy (decided):
+- Primary goal: Inbox must stay curatable (quality & completeness), not maximum intake.
+- Duplicates are acceptable during rapid run cycles; focus metric is "good inbox_new".
+- Disable low-yield/high-noise sources for now; re-enable later only if needed.
+- Prefer source-scoped rules (per domain) over fragile global heuristics.
 
-Quality work implemented (post-intake restoration):
-- Non-event filtering: block obvious utility/legal/cookie/login/newsletter pages before Inbox-write
-  - applied consistently to HTML + RSS write gates
-- Inbox notes corrected to reflect: OpenAI LLM + heuristic fallback + Playwright HTML fetch
-- Isselburg-specific datetime fix:
-  - isselburg.de encodes occurrence datetime in query param `from=YYYY-MM-DD HH:MM:SS`
-  - add `extract_datetime_from_url()` and apply override to both:
-    - heuristic extractor output
-    - LLM extractor output (postprocess)
+Quality improvements implemented (confirmed by runs):
+1) Strict detail URL gating for JUNGE UNI
+- Only accept detail URLs matching: `/programm/kurs/...`
+- Result: category/overview pages (e.g., /info/...) no longer pollute Inbox.
 
-Known remaining quality gaps (next focus, proof-driven from TSV outputs):
-1) Listing/hub pages still slipping through as "events" on some aggregator sources (needs stronger detail-URL heuristics and/or non-event title/url filters).
-2) Location noise on some sites where heuristics pick up navigation text; tighten extraction selectors + add guardrails.
-3) Date parsing: German human-formats are handled, but source-specific structures should be preferred when present (structured selectors > regex).
+2) Stronger non-event filtering and write gates (HTML + RSS)
+- Block obvious utility/legal/cookie/login/newsletter pages before Inbox-write.
+- Block generic placeholder titles (e.g., "Details", "Buchungen", etc.) via non-event heuristics.
 
-Next work focus (pipeline only; no UI work):
-- For each run: analyze Run log + Inbox.tsv + Discovery_Candidates.tsv to quantify:
-  - conversion rate (candidates → inbox)
-  - top noise clusters by source + notes
-  - which rule yields biggest quality gain with minimal change
-- Iterate with minimal, source-agnostic filters first; source-specific rules only when proven necessary.
+3) Isselburg-specific datetime fix (kept)
+- isselburg.de encodes occurrence datetime in query param `from=YYYY-MM-DD HH:MM:SS`
+- `extract_datetime_from_url()` overrides both heuristic + LLM extractor outputs.
+
+4) ListPageParser fallback for band tour/termine pages (new)
+- For domains:
+  - `django-flint.de`
+  - `coltplay.de`
+- If Collector finds no detail URLs, parse list page directly and create synthetic URLs:
+  `...#event=<hash>`
+- Write directly to Inbox without detail fetch (still subject to title/date gate + non-event filter).
+
+Recent proof runs (high-signal milestones):
+- 2026-03-05T06:27:21Z: sources=14 → candidates_logged=111 → inbox_new=10
+  - 10/10 curatable (JUNGE UNI).
+- 2026-03-05T07:23:06Z: sources=11 → candidates_logged=109 → inbox_new=10
+  - 10/10 curatable (JUNGE UNI).
+- 2026-03-05T09:03:59Z: sources=11 → candidates_logged=155 → inbox_new=4
+  - 3/4 curatable (JUNGE UNI)
+  - 1/4 Coltplay written but title/location extraction is wrong (phone/email line used).
+
+Current state (as of last run in this session):
+- Stable good intake source: JUNGE UNI (consistently curatable).
+- Other sources often show dup/no-new during minute-by-minute runs (expected).
+- Band sources:
+  - Coltplay: list-page fallback produces candidates but needs domain-specific row parsing to avoid phone/email lines.
+  - Django Flint: list-page fallback currently produces 0 candidates; needs domain-specific selectors/date parsing.
+
+Known remaining blockers (next work, pipeline only):
+A) Coltplay list-page parsing must become domain-specific
+- Extract actual tour rows (date/time/venue/city), never contact/footer text.
+- Build clean titles like: "Coltplay – <Venue/City>".
+
+B) Django Flint list-page parsing must become domain-specific
+- Identify the "Termine" rows reliably; parse date/time/location.
+
+C) Keep strict inbox quality gates
+- Inbox must not contain listing/overview placeholders.
+- Any list-page fallback must produce valid (title+date [+time/location]) or be skipped.
+
+Next steps (next chat, in this order):
+1) Inspect Coltplay tour HTML and implement robust domain-specific extractor (selectors → rows → date/time/venue/city).
+2) Inspect Django Flint termine HTML and implement robust domain-specific extractor.
+3) Run once; verify:
+   - Coltplay produces multiple correct events
+   - Django Flint produces events
+   - Inbox remains 100% curatable (no placeholders/listings)
 
 LAST UPDATE:
 
-2026-03-04
+2026-03-05
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 
 ---
