@@ -630,7 +630,10 @@ EXCLUDE_PATH_HINTS = (
 
 # === BEGIN REPLACEMENT BLOCK: is_probable_detail_url — LLM DISCOVERY | Scope: stronger heuristics for aggregator detail pages ===
 def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
-    """Return True if candidate_url looks like an event/detail page for listing_url host."""
+    """Return True if candidate_url looks like an event/detail page for listing_url host.
+
+    Goal: reject listing/category/navigation pages early so they don't burn the per-source cap.
+    """
 
     def _host_norm(h: str) -> str:
         h = (h or "").strip().lower()
@@ -641,6 +644,7 @@ def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
         if not (u.scheme or "").startswith("http"):
             return False
 
+        # same host only (normalized)
         lu = urlparse(listing_url)
         if _host_norm(lu.netloc) != _host_norm(u.netloc):
             return False
@@ -649,81 +653,63 @@ def is_probable_detail_url(listing_url: str, candidate_url: str) -> bool:
         if candidate_url.rstrip("/") == listing_url.rstrip("/"):
             return False
 
-        path = (u.path or "")
-        path_l = path.lower()
+        host = _host_norm(lu.netloc)
+        path = (u.path or "").lower()
         q = (u.query or "").lower()
 
         # exclude media/downloads + utility
-        if any(x in path_l for x in EXCLUDE_PATH_HINTS):
+        if any(x in path for x in EXCLUDE_PATH_HINTS):
             return False
-        if any(path_l.endswith(ext) for ext in BLOCKED_EXTS):
+        if any(path.endswith(ext) for ext in BLOCKED_EXTS):
             return False
         if any(h in q for h in BLOCKED_QUERY_HINTS):
             return False
 
-        host = _host_norm(lu.netloc)
+        # --- Domain-specific rules (high-impact, low-risk) ---
 
-        # --- Domain-specific "detail allow" rules (fast, proof-based) ---
-
-        # Bocholt official calendar: detail pages have ?event=<id>
-        if "bocholt.de" in host and "/veranstaltungskalender/" in path_l:
+        # Bocholt official calendar: real events have "?event=<id>"
+        if "bocholt.de" in host and "/veranstaltungskalender/" in path:
             return "event=" in q
 
-        # ANDERSMACHER: /veranstaltungen/<slug>/
-        if "andersmacher.w-hs.de" in host:
-            return bool(re.match(r"^/veranstaltungen/[^#/]+/?$", path_l)) and "#content" not in candidate_url
+        # JUNGE UNI Bocholt (juboh.de): ONLY real course detail pages
+        # Proof: /info/* pages are category/landing pages (junk) and burned cap + polluted Inbox.
+        if "juboh.de" in host:
+            return path.startswith("/programm/kurs/")
+
+        # NABU Borken (WordPress): reject /category/ and /page/N/, allow post slugs
+        if "nabu-borken.de" in host:
+            if path.startswith("/category/"):
+                return False
+            if re.search(r"/page/\d+/?$", path):
+                return False
+            return bool(re.match(r"^/[^#/]+/?$", path)) and ("-" in path.strip("/"))
 
         # Shanty Chor: /event/<slug>/
         if "shanty-chor-bocholt.de" in host:
-            return bool(re.match(r"^/event/[^#/]+/?$", path_l))
+            return bool(re.match(r"^/event/[^#/]+/?$", path))
 
-        # NABU Borken (WP): allow post permalinks, block /category/ + /page/N/
-        if "nabu-borken.de" in host:
-            if path_l.startswith("/category/"):
-                return False
-            if re.search(r"/page/\d+/?$", path_l):
-                return False
-            # accept typical WP post slugs (at least 2 words/hyphen)
-            return bool(re.match(r"^/[^#/]+-.*[^#/]+/?$", path_l))
+        # ANDERSMACHER: /veranstaltungen/<slug>/
+        if "andersmacher.w-hs.de" in host:
+            return bool(re.match(r"^/veranstaltungen/[^#/]+/?$", path)) and "#content" not in candidate_url
 
-        # Stadtbibliothek: /Angebote/Veranstaltungen/<slug>
-        if "stadtbibliothek.bocholt.de" in host:
-            if "linkclick.aspx" in path_l:
-                return False
-            return bool(re.match(r"^/angebote/veranstaltungen/[^#/]+/?$", path_l))
-
-        # Stadtmuseum: /veranstaltungen/<slug>/ (and allow non-www host)
-        if "stadtmuseum-bocholt.de" in host:
-            return bool(re.match(r"^/veranstaltungen/[^#/]+/?$", path_l))
-
-        # LWL Textilwerk: /de/veranstaltungen/?id=<digits>
+        # LWL Textilwerk: /de/veranstaltungen/ + id=<digits>
         if "textilwerk-bocholt.lwl.org" in host:
-            return ("/de/veranstaltungen/" in path_l) and bool(re.search(r"(?:^|[?&])id=\d+", q))
+            return ("/de/veranstaltungen/" in path) and bool(re.search(r"(?:^|[?&])id=\d+", q))
 
-        # JuBoH: allow numeric ids and deeper paths (courses)
-        if "juboh.de" in host:
-            if any(x in path_l for x in ("/kurssuche", "/login", "/kontakt", "/downloads")):
-                return False
-            if re.search(r"/kategorie/[^/]+/\d+/?$", path_l):
-                return False
-            has_numeric = bool(re.search(r"/(\d{2,})(?:/|$)", path_l)) or ("id=" in q)
-            looks_like_course = any(x in path_l for x in ("/programm", "/kurs", "/info/"))
-            return has_numeric or looks_like_course
+        # --- Generic fallback heuristics ---
 
-        # --- Generic heuristics (fallback) ---
-
-        has_path_hint = any(h in path_l for h in DETAIL_PATH_HINTS)
+        has_path_hint = any(h in path for h in DETAIL_PATH_HINTS)
         has_event_query = any(k in q for k in ("event=", "termin=", "id=", "eid=", "eventid="))
-        has_numeric_id = bool(re.search(r"/(\d{4,})(?:/|$)", path_l))
+        has_numeric_id = bool(re.search(r"/(\d{4,})(?:/|$)", path))
 
         looks_like_listing = bool(
-            re.search(r"/(kategorie|kategorien|rubrik|suche|search|archiv|archive)(?:/|$)", path_l)
+            re.search(r"/(kategorie|kategorien|rubrik|suche|search|archiv|archive)(?:/|$)", path)
         )
         if looks_like_listing and not (has_event_query or has_numeric_id):
             return False
 
         if has_event_query or has_numeric_id or has_path_hint:
-            return len(path_l.strip("/")) >= 4
+            return len(path.strip("/")) >= 4
 
         return False
     except Exception:
