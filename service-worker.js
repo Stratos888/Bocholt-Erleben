@@ -170,10 +170,21 @@ Ergänzung:
 - staleWhileRevalidate: fetch(..., { cache: "reload" }) damit Browser-HTTP-Cache (z.B. max-age/immutable) Änderungen nicht „unsichtbar“ macht.
 === */
 async function staleWhileRevalidate(request) {
-  const cache = await caches.open(RUNTIME_CACHE);
+  /* === BEGIN BLOCK: SWR STATIC CACHE FALLBACK (fix offline CSS/JS) ===
+  Zweck:
+  - Offline muss App-Shell inkl. CSS/JS vollständig laden können.
+  - STATIC_CACHE wird beim Install befüllt (inkl. ?v=...), daher hier als Fallback matchen.
+  Umfang:
+  - RUNTIME zuerst, dann STATIC.
+  === */
+  const runtimeCache = await caches.open(RUNTIME_CACHE);
+  const staticCache = await caches.open(STATIC_CACHE);
 
   // WICHTIG: KEIN ignoreSearch -> Querystring ist Teil des Cache-Keys
-  const cached = await cache.match(request);
+  const cached =
+    (await runtimeCache.match(request)) ||
+    (await staticCache.match(request));
+  /* === END BLOCK: SWR STATIC CACHE FALLBACK (fix offline CSS/JS) === */
 
   // WICHTIG: "reload" erzwingt ein Re-Fetch (bypasst aggressiven HTTP-Cache),
   // damit Deploy-Änderungen an CSS/JS auch bei gleichbleibender URL sichtbar werden.
@@ -302,6 +313,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
