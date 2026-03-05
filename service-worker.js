@@ -43,9 +43,10 @@ async function resolveBuildVersion() {
       return;
     }
   } catch (_) {
-    // Fallback: wenn offline, versuche die Version aus existierenden Cache-Namen zu ziehen
+    // offline/fehler: Fallback auf bestehende produktive Cache-Namen (wichtig für wiederholte Offline-Reloads)
     try {
       const keys = await caches.keys();
+
       const staticKeys = keys
         .filter((k) => k.startsWith("be-static-") && k !== "be-static-dev")
         .sort();
@@ -53,12 +54,12 @@ async function resolveBuildVersion() {
         .filter((k) => k.startsWith("be-runtime-") && k !== "be-runtime-dev")
         .sort();
 
-      const staticKey = staticKeys.length ? staticKeys[staticKeys.length - 1] : null;
-      const runtimeKey = runtimeKeys.length ? runtimeKeys[runtimeKeys.length - 1] : null;
+      const latestStatic = staticKeys.length ? staticKeys[staticKeys.length - 1] : null;
+      const latestRuntime = runtimeKeys.length ? runtimeKeys[runtimeKeys.length - 1] : null;
 
-      // Wenn wir eine „echte“ Version finden, nutze sie statt dev
-      if (staticKey) {
-        const v = staticKey.replace("be-static-", "");
+      // Prefer STATIC version as source of truth
+      if (latestStatic) {
+        const v = latestStatic.replace("be-static-", "");
         if (v) {
           VERSION = v;
           STATIC_CACHE = `be-static-${VERSION}`;
@@ -67,9 +68,9 @@ async function resolveBuildVersion() {
         }
       }
 
-      // Wenn nur runtime existiert (selten), nutze die
-      if (runtimeKey) {
-        const v = runtimeKey.replace("be-runtime-", "");
+      // Fallback: runtime-only (rare)
+      if (latestRuntime) {
+        const v = latestRuntime.replace("be-runtime-", "");
         if (v) {
           VERSION = v;
           STATIC_CACHE = `be-static-${VERSION}`;
@@ -78,7 +79,7 @@ async function resolveBuildVersion() {
         }
       }
     } catch (_) {
-      // Fallback bleibt "dev"
+      // letzter Fallback bleibt dev
     }
   }
 }
@@ -377,6 +378,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
