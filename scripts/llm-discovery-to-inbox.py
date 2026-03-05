@@ -984,17 +984,31 @@ def extract_event_fields(detail_html: str, detail_url: str, cfg: SourceCfg) -> D
                     snippet = snippet.split(":", 1)[1]
                 snippet = norm_text(snippet)[:140]
 
-                # Guard against table/header lines (seen on juboh.de): "Ort(e) Termin(e) Dozent(en) ..."
+                # Guard: table/header lines (seen in candidates): "Ort(e) Termin(e) Dozent(en) ..."
                 if re.search(r"\btermin\(e\)\b|\bdozent\(en\)\b", snippet, flags=re.IGNORECASE):
-                    continue
-                if snippet.lower().startswith(("termin(e)", "dozent(en)")):
                     continue
 
                 location = norm_text(snippet)[:120]
                 if location:
                     break
 
+    # guard: avoid navigation/utility text becoming "location" (seen on isselburg.de)
+    if location and any(
+        h in location.lower()
+        for h in (
+            "bildung",
+            "schulen",
+            "hochwasserschutz",
+            "kommunalwahl",
+            "notfall",
+            "notfallnummern",
+            "feuerwehr",
+        )
+    ):
+        location = ""
+
     if not location and "bocholt" in text_blob.lower():
+        location = "Bocholt"
         location = "Bocholt"
         location = "Bocholt"
 
@@ -1479,6 +1493,110 @@ def _extract_django_flint_termine_events(cfg: SourceCfg, listing_url: str, soup:
     return items_by_url
 
 
+def _dmy_to_iso(dmy: str) -> str:
+    m = re.search(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", dmy)
+    if not m:
+        return ""
+    dd, mm, yyyy = m.group(1), m.group(2), m.group(3)
+    try:
+        return datetime(int(yyyy), int(mm), int(dd)).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+
+def _extract_coltplay_tour_events(cfg: SourceCfg, listing_url: str, soup: BeautifulSoup) -> Dict[str, Dict[str, str]]:
+    """
+    coltplay.de/tour:
+    - Find text nodes that contain a DMY date AND a " - " separator (headline rows).
+    - Parse date + optional city/venue from that headline.
+    - Never use phone/email/utility lines (they don't match headline pattern).
+    """
+    items_by_url: Dict[str, Dict[str, str]] = {}
+    band = "Coltplay"
+
+    def add_item(token: str, title: str, date_s: str, time_s: str, loc: str) -> None:
+        if not title or not date_s:
+            return
+        u = _synthetic_event_url(listing_url, token)
+        items_by_url[u] = {
+            "title": title[:240],
+            "date": date_s,
+            "time": (time_s or "")[:40],
+            "city": (cfg.default_city or "Bocholt")[:80],
+            "location": (loc or "")[:160],
+            "kategorie_suggestion": (cfg.default_category or "")[:120],
+            "url": u,
+            "description": "",
+        }
+
+    # headline pattern: "DD.MM.YYYY - ..."
+    head_re = re.compile(r"\b\d{1,2}\.\d{1,2}\.\d{4}\b\s*-\s*.+")
+    seen: Set[str] = set()
+
+    for tn in soup.find_all(string=re.compile(r"\b\d{1,2}\.\d{1,2}\.\d{4}\b")):
+        try:
+            el = tn.parent
+        except Exception:
+            continue
+
+        head = norm_text(el.get_text(" ", strip=True))
+        if not head or len(head) < 10:
+            continue
+        if not head_re.search(head):
+            continue
+
+        # Hard reject utility lines even if they accidentally contain a date somewhere
+        if ("@" in head) or re.search(r"\b\d{3,}\s*\d{2,}\b", head):
+            # (still allows normal venue addresses; but blocks phone-like digit runs)
+            pass  # keep evaluating; do not blanket-skip
+
+        # Prefer the smallest "headline-ish" string: if parent container is huge, take only first ~180 chars
+        head = head[:180]
+
+        if head in seen:
+            continue
+        seen.add(head)
+
+        date_iso = _dmy_to_iso(head)
+        if not date_iso:
+            continue
+
+        parts = [p.strip() for p in re.split(r"\s*-\s*", head) if p.strip()]
+        # expected: [date, city, venue...]
+        city = parts[1] if len(parts) >= 2 else ""
+        venue = parts[2] if len(parts) >= 3 else ""
+
+        # time from nearby block if present
+        block = el.find_parent("li") or el.find_parent("article") or el
+        block_text = norm_text(block.get_text(" ", strip=True)) if block else head
+
+        time_s = ""
+        m1 = re.search(r"\bBeginn:\s*(\d{1,2}:\d{2})\b", block_text, re.IGNORECASE)
+        if m1:
+            time_s = m1.group(1)
+
+        loc = ""
+        if venue and city:
+            loc = f"{venue}, {city}"
+        elif venue:
+            loc = venue
+        elif city:
+            loc = city
+
+        title = f"{band} – Live"
+        if venue and city:
+            title = f"{band} – {venue} ({city})"
+        elif venue:
+            title = f"{band} – {venue}"
+        elif city:
+            title = f"{band} – {city}"
+
+        token = f"{band}|{date_iso}|{time_s}|{loc}|{head}"
+        add_item(token, title, date_iso, time_s, loc)
+
+    return items_by_url
+
+
 def parse_listpage_events(cfg: SourceCfg, listing_url: str, html: str) -> Dict[str, Dict[str, str]]:
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript"]):
@@ -1491,8 +1609,7 @@ def parse_listpage_events(cfg: SourceCfg, listing_url: str, html: str) -> Dict[s
         return items or _extract_events_from_blocks(cfg, listing_url, soup)
 
     if "django-flint.de" in host:
-        items = _extract_django_flint_termine_events(cfg, listing_url, soup)
-        return items or _extract_events_from_blocks(cfg, listing_url, soup)
+        return _extract_events_from_blocks(cfg, listing_url, soup)
 
     return {}
 
