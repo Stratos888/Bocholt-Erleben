@@ -66,6 +66,10 @@ const STATIC_ASSETS = [
   "/css/style.css",
   "/js/main.js",
 
+  // Offline-Datenbasis (für "first offline reload" auf Mobile)
+  "/data/events.json",
+  "/data/locations.json",
+
   "/icons/app/icon-180.png",
   "/icons/app/icon-192.png",
   "/icons/app/icon-512.png",
@@ -216,17 +220,23 @@ async function staleWhileRevalidate(request) {
 }
 
 async function networkFirst(request) {
-  const cache = await caches.open(RUNTIME_CACHE);
+  const runtimeCache = await caches.open(RUNTIME_CACHE);
+  const staticCache = await caches.open(STATIC_CACHE);
 
   try {
     const response = await fetch(request, { cache: "no-store" });
     if (response && response.ok) {
-      await cache.put(request, response.clone());
+      await runtimeCache.put(request, response.clone());
     }
     return response;
   } catch (e) {
-    const cached = await cache.match(request);
-    if (cached) return cached;
+    // 1) Runtime-Fallback (wenn Daten schon mal online geladen wurden)
+    const cachedRuntime = await runtimeCache.match(request);
+    if (cachedRuntime) return cachedRuntime;
+
+    // 2) Static-Fallback (für "first offline reload" durch precache)
+    const cachedStatic = await staticCache.match(request);
+    if (cachedStatic) return cachedStatic;
 
     return new Response("Offline", {
       status: 503,
@@ -316,6 +326,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
