@@ -81,13 +81,13 @@
   --space-xl: 24px;
 
   /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
-  --feed-section-pad-top: 8px;          /* vorher 10px */
-  --feed-cards-gap: 12px;               /* vorher 16px */
-  --feed-title-mt: 10px;                /* vorher 0 (implizit) */
-  --feed-title-mb: 8px;                 /* vorher 0 (implizit) */
+  --feed-section-pad-top: 6px;          /* war 8px */
+  --feed-cards-gap: 10px;               /* war 12px */
+  --feed-title-mt: 4px;                 /* war 10px */
+  --feed-title-mb: 6px;                 /* war 8px */
 
-  --eventcard-pad: 14px;                /* vorher 16px */
-  --topstack-pad-bottom: 4px;           /* vorher 6px */
+  --eventcard-pad: 14px;
+  --topstack-pad-bottom: 4px;
 
   /* Golden Screen: Cards */
   --radius-card: 12px;
@@ -3141,6 +3141,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
