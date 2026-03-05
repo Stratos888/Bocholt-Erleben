@@ -170,6 +170,25 @@
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
 
+  /* CONTROL SYSTEM (Search + Pills + Reset) */
+  --ui-control-h: 36px;
+  --ui-control-pad-x: 12px;
+
+  --ui-control-radius: var(--ui-radius-md);
+
+  --ui-control-border: var(--ui-border-weak);
+  --ui-control-border-strong: var(--ui-border-soft);
+
+  --ui-control-bg: rgba(255,255,255,0.82);
+  --ui-control-bg-strong: rgba(255,255,255,0.92);
+
+  --ui-control-shadow: var(--ui-shadow-soft);
+  --ui-control-shadow-strong:
+    0 5px 12px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.80) inset;
+
+  --ui-control-ring-active: rgba(139,207,74,0.09);
+
 /* ICON TOKENS (app-wide) */
 
   /* Tap target (app-wide contract) */
@@ -1099,13 +1118,14 @@ footer {
   margin: 0 auto;
 
   box-sizing: border-box;
-  height: 36px;
-  padding: 0 12px;
-  line-height: 36px;
 
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.92);
+  height: var(--ui-control-h);
+  padding: 0 var(--ui-control-pad-x);
+  line-height: var(--ui-control-h);
+
+  border-radius: var(--ui-control-radius);
+  border: 1px solid var(--ui-control-border-strong);
+  background: var(--ui-control-bg-strong);
 
   font-size: 0.92rem;
   font-weight: 650;
@@ -1114,9 +1134,7 @@ footer {
   -webkit-appearance: none;
   appearance: none;
 
-  box-shadow:
-    0 5px 12px rgba(0,0,0,0.040),
-    0 1px 0 rgba(255,255,255,0.80) inset;
+  box-shadow: var(--ui-control-shadow-strong);
 
   transition: box-shadow 140ms ease, border-color 140ms ease, background 140ms ease;
 }
@@ -1168,16 +1186,16 @@ footer {
   justify-content: space-between;
   gap: 10px;
 
-  height: 36px;
-  padding: 0 12px;
+  height: var(--ui-control-h);
+  padding: 0 var(--ui-control-pad-x);
 
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.82);
+  border-radius: var(--ui-control-radius);
+  border: 1px solid var(--ui-control-border);
+  background: var(--ui-control-bg);
 
   font: inherit;
   font-size: 0.90rem;
-  font-weight: 750;
+  font-weight: var(--ui-font-weight-control);
   line-height: 1;
 
   color: var(--color-text-primary);
@@ -1186,9 +1204,7 @@ footer {
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: var(--ui-control-shadow);
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
@@ -1221,7 +1237,7 @@ footer {
   background: rgba(255,255,255,0.92);
   box-shadow:
     0 7px 16px rgba(0,0,0,0.050),
-    0 0 0 3px rgba(139,207,74,0.09),
+    0 0 0 3px var(--ui-control-ring-active),
     0 1px 0 rgba(255,255,255,0.78) inset;
 }
 .filter-pill.is-active .filter-pill__value{
@@ -1255,27 +1271,24 @@ footer {
 
   flex: 0 0 auto;
 
-  height: 36px;
-  width: 36px;
+  height: var(--ui-control-h);
+  width: var(--ui-control-h);
   padding: 0;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  /* robust centering anchor */
   position: relative;
 
-  border-radius: 14px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.82);
+  border-radius: var(--ui-control-radius);
+  border: 1px solid var(--ui-control-border);
+  background: var(--ui-control-bg);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: var(--ui-control-shadow);
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
@@ -3115,6 +3128,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
