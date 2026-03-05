@@ -460,7 +460,29 @@ Umfang:
     c.innerHTML = "";
 
     if (!list || list.length === 0) {
-      c.innerHTML = `<div class="empty-state">Keine Events gefunden.</div>`;
+      c.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state__card" role="status" aria-live="polite">
+            <div class="empty-state__title">Keine Events gefunden</div>
+            <div class="empty-state__text">Filter anpassen oder zurücksetzen.</div>
+            <button type="button" class="empty-state__btn" id="empty-reset-btn">Filter zurücksetzen</button>
+          </div>
+        </div>
+      `;
+
+      const btn = document.getElementById("empty-reset-btn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          if (window.FilterModule?.resetFilters) {
+            window.FilterModule.resetFilters();
+            return;
+          }
+          // Fallback (sollte nicht nötig sein, aber safe)
+          const resetPill = document.getElementById("filter-reset-pill");
+          if (resetPill) resetPill.click();
+        });
+      }
+
       return;
     }
 
@@ -570,7 +592,71 @@ Umfang:
   }
 /* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
 
+/* === BEGIN BLOCK: GS-01 SKELETON RENDER (stable feed while loading) ===
+Zweck: Während Fetch laufen Skeleton-Cards in #event-cards rendern (kein Layout-Jump).
+Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
+=== */
+  function createSkeletonCard() {
+    const card = document.createElement("div");
+    card.className = "event-card is-skeleton";
+    card.tabIndex = -1;
+    card.setAttribute("aria-hidden", "true");
 
+    const badge = document.createElement("div");
+    badge.className = "event-date-badge";
+
+    const b1 = document.createElement("div");
+    b1.className = "event-date-badge__wday skel-line skel-line--sm";
+    b1.style.width = "34px";
+
+    const b2 = document.createElement("div");
+    b2.className = "event-date-badge__day skel-line";
+    b2.style.width = "28px";
+    b2.style.marginTop = "6px";
+
+    const b3 = document.createElement("div");
+    b3.className = "event-date-badge__month skel-line skel-line--sm";
+    b3.style.width = "36px";
+    b3.style.marginTop = "6px";
+
+    badge.appendChild(b1);
+    badge.appendChild(b2);
+    badge.appendChild(b3);
+
+    const body = document.createElement("div");
+    body.className = "event-card-body";
+
+    const title = document.createElement("div");
+    title.className = "event-title";
+    const t1 = document.createElement("span");
+    t1.className = "skel-line";
+    t1.style.width = "72%";
+    title.appendChild(t1);
+
+    const meta = document.createElement("div");
+    meta.className = "event-meta";
+    const m1 = document.createElement("span");
+    m1.className = "skel-line skel-line--sm";
+    m1.style.width = "44%";
+    meta.appendChild(m1);
+
+    body.appendChild(title);
+    body.appendChild(meta);
+
+    card.appendChild(badge);
+    card.appendChild(body);
+
+    return card;
+  }
+
+  function renderSkeleton(count = 8) {
+    const c = ensureContainer();
+    c.innerHTML = "";
+
+    const n = Math.max(1, Math.min(12, Number(count) || 8));
+    for (let i = 0; i < n; i++) c.appendChild(createSkeletonCard());
+  }
+/* === END BLOCK: GS-01 SKELETON RENDER (stable feed while loading) === */
 
   function normalizeEvents(events) {
     return (events || [])
@@ -591,10 +677,11 @@ Umfang:
     render(events);
   }
 
-  return { render, refresh };
+  return { render, refresh, renderSkeleton };
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
