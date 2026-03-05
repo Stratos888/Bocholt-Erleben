@@ -49,14 +49,22 @@ async function resolveBuildVersion() {
 
 
 
-/* === BEGIN BLOCK: STATIC ASSETS (minimal shell) ===
-Zweck: Minimal offline shell. Rest kommt über SWR aus Runtime-Cache.
-Umfang: Liste bewusst klein gehalten.
+/* === BEGIN BLOCK: STATIC ASSETS + INDEX ASSET PRECACHE (offline shell works) ===
+Zweck:
+- Offline darf niemals "weiß" sein: App-Shell + essentielle CSS/JS müssen offline verfügbar sein.
+- Da Querystrings Teil des Cache-Keys sind (kein ignoreSearch), müssen wir die exakten URLs aus index.html cachen.
+Umfang:
+- Erweitert STATIC_ASSETS minimal (Fallback ohne Query).
+- Fügt Helper hinzu, der index.html parst und alle same-origin CSS/JS-URLs (inkl. ?v=...) in STATIC_CACHE precacht.
 === */
 const STATIC_ASSETS = [
   "/",
   "/index.html",
   "/manifest.json",
+
+  // Fallbacks (ohne Query) – falls HTML mal ohne ?v ausliefert
+  "/css/style.css",
+  "/js/main.js",
 
   "/icons/app/icon-180.png",
   "/icons/app/icon-192.png",
@@ -65,7 +73,44 @@ const STATIC_ASSETS = [
   "/icons/favicon/favicon.ico",
   "/icons/favicon/icon-32.png"
 ];
-/* === END BLOCK: STATIC ASSETS (minimal shell) === */
+
+async function precacheIndexAssets(cache) {
+  try {
+    // Wichtig: HTML frisch holen (inkl. ggf. ?v-Links), nicht aus HTTP-Cache
+    const res = await fetch("/index.html", { cache: "no-store" });
+    if (!res.ok) return;
+
+    const html = await res.text();
+
+    // Sehr bewusst simpel: wir cachen nur same-origin CSS/JS aus href/src
+    const urls = new Set();
+
+    const attrRe = /\s(?:href|src)\s*=\s*["']([^"']+)["']/gi;
+    let m;
+    while ((m = attrRe.exec(html)) !== null) {
+      const raw = m[1];
+      if (!raw) continue;
+
+      // nur same-origin / relative Pfade
+      if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("//")) continue;
+      if (!raw.startsWith("/")) continue;
+
+      // nur CSS/JS (inkl. Querystrings)
+      const path = raw.split("?")[0];
+      if (!(path.endsWith(".css") || path.endsWith(".js"))) continue;
+
+      urls.add(raw);
+    }
+
+    // Cache robust: einzelne Fehlschläge nicht abbrechen lassen
+    await Promise.allSettled(
+      Array.from(urls).map((u) => cache.add(u))
+    );
+  } catch (_) {
+    // offline/fehler: nichts tun, install darf nicht hard-failen
+  }
+}
+/* === END BLOCK: STATIC ASSETS + INDEX ASSET PRECACHE (offline shell works) === */
 
 
 self.addEventListener("install", (event) => {
@@ -80,6 +125,9 @@ self.addEventListener("install", (event) => {
       } catch (e) {
         console.warn("SW install: STATIC_ASSETS caching failed", e);
       }
+
+      // Zusätzlich: exakte CSS/JS-URLs aus index.html (inkl. ?v=...) precachen
+      await precacheIndexAssets(cache);
 
       self.skipWaiting();
     })()
@@ -254,6 +302,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
