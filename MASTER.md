@@ -245,11 +245,26 @@ SESSION REPORT (this session, verified):
 - Control System Polish (Search + Pills + Reset + Focus):
   - Einheitliche Control-DNA tokenbasiert (Höhe/Radius/Border/Shadow/Focus-Ring) für Search, Pills und Reset.
   - Reset-Icon als SVG (stroke=currentColor) + robuste Zentrierung; Fokus-Ring konsistent via `--ui-focus-ring`.
+- GS-01 Loading/Empty/Error States (Workpack umgesetzt, proof-basiert):
+  - Loading: Skeleton-Eventcards im Feed (stabile Geometrie; kein Layout-Jump).
+  - Empty: „Keine Events gefunden“ als Card + Reset-CTA („Filter zurücksetzen“).
+  - Error: Retry-CTA („Erneut versuchen“) (deterministisch via Reload).
+  - Loading-Overlay wird beim normalen Laden nicht mehr gezeigt (Skeleton-only); Overlay bleibt für Error-State.
+- FilterContract Hotfix (UI):
+  - Pflicht-Search-Element (`#search-filter`) wieder im DOM bereitgestellt → FilterModule init bricht nicht mehr ab.
+- PWA Offline-Shell Robustness (Service Worker):
+  - Mobile „weiß/Offline“-Screen behoben durch Precache der in `/index.html` referenzierten CSS/JS-Assets (inkl. `?v=`).
+  - Offline-Reload kann weiterhin „normal“ funktionieren (Cache-Fallback für `events.json`); Error-State tritt nur auf, wenn Cache fehlt.
 
 DECISIONS LOG (permanent, project-wide):
 - GS-01 Feed: Scanability-Contract:
   - Event Card: Titel max 2 Zeilen; Meta 1 Zeile (Zeit vollständig, Ort ellipsis); City/Location-Dopplung wird vermieden.
   - Kategorie-Icon ist Indikator (nicht Button) und wird layoutstabil in der Titelzeile (Grid Text|Icon) geführt.
+- GS-01 Feed: Loading/Empty/Error-Contract:
+  - Loading zeigt Skeleton-Cards im Feed (keine Layout-Shifts).
+  - Normaler Load zeigt kein Vollbild-Overlay; Overlay ist für Error-State reserviert.
+  - Empty-State enthält Reset-CTA („Filter zurücksetzen“).
+  - Error-State enthält Retry-CTA („Erneut versuchen“).
 - Zeitfilter ist Single Source of Truth = Feed-Buckets:
   - Keys: `all | today | week | weekend | nextweek | later`
   - Facet-Counts bleiben kontextabhängig (Search + aktive Kategorie) und berücksichtigen `endDate`.
@@ -261,10 +276,19 @@ CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Aktiver UI-Fokus dieser Session war GS-01 Event Feed + Filter-Facets (ohne Detailpanel-Redesign).
 
 REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
-1) GS-01 Loading/Empty/Error States vereinheitlichen (Skeleton Cards, „Keine Events“ + Reset CTA, Retry)
-2) GS-01 Kategorie-Erkennbarkeit Feintuning (nur Tokens/CSS, low-noise)
-3) GS-01 Scroll-Performance QA (Shadows/blur auf Midrange Android; ggf. CSS-only abmildern)
+1) GS-01 Kategorie-Erkennbarkeit Feintuning (nur Tokens/CSS, low-noise)
+2) GS-01 Scroll-Performance QA (Shadows/blur auf Midrange Android; ggf. CSS-only abmildern)
+3) GS-01.5 Offline-Indicator (Toast + persistentes Badge; UI-only, minimal JS)
+   - Toast nur bei Zustandswechsel:
+     - online → offline: „Offline – gespeicherte Daten“
+     - offline → online: „Wieder online“
+   - Persistentes Badge solange offline (unaufdringlich, nicht blockierend):
+     - Text: „Offline – gespeicherte Daten (ggf. nicht aktuell)“
+     - Kein Vollflächen-Layer; keine Layout-Shifts; kompatibel mit sticky header/top-stack.
 4) Optional: Detailpanel Accessiblity Audit (Keyboard/ARIA) — nur wenn Bug/Regression sichtbar
+
+NEXT CHAT PROMPT (start here):
+„GS-01.5 Offline-Indicator umsetzen: UI-only. Ziel: Toast bei online/offline Wechsel + persistentes Offline-Badge solange offline. Bitte ZIP-first: MASTER.md + ENGINEERING.md lesen, dann one-file-at-a-time Patch liefern (CSS-first; minimal JS für online/offline Listener). Pipeline-Sektion in MASTER.md nicht anfassen.“
 
 PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: HYBRID GO-LIVE TRACK (QUALITY-FIRST)
 
