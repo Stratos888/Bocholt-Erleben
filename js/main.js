@@ -55,8 +55,15 @@ Umfang: Ersetzt nur den DetailPanel-init Abschnitt.
 
 
 
-        // Loading anzeigen
+        /* === BEGIN BLOCK: GS-01 LOADING START (skeleton first, overlay optional) ===
+Zweck: Stabiler Feed während Fetch (Skeleton) + optionales Loading-Overlay ohne Layout-Shift.
+Umfang: Ersetzt nur das "Loading anzeigen" Statement.
+=== */
+        if (typeof EventCards?.renderSkeleton === "function") {
+            EventCards.renderSkeleton(8);
+        }
         this.showLoading(true);
+        /* === END BLOCK: GS-01 LOADING START (skeleton first, overlay optional) === */
 
         // Events von Airtable laden
         try {
@@ -213,13 +220,18 @@ Contract:
     /**
      * Loading Indicator
      */
+    /* === BEGIN BLOCK: GS-01 SHOWLOADING (overlay + a11y) ===
+Zweck: Loading als Overlay steuern (CSS: fixed) + aria-busy sauber setzen.
+Umfang: Ersetzt nur showLoading(show).
+=== */
     showLoading(show) {
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.style.display = show ? 'flex' : 'none';
-        }
-    },
+        const loadingEl = document.getElementById("loading");
+        if (!loadingEl) return;
 
+        loadingEl.setAttribute("aria-busy", show ? "true" : "false");
+        loadingEl.style.display = show ? "flex" : "none";
+    },
+    /* === END BLOCK: GS-01 SHOWLOADING (overlay + a11y) === */
     /**
      * "Keine Events" Nachricht
      */
@@ -239,17 +251,30 @@ Contract:
     /**
      * Generischer Error
      */
+    /* === BEGIN BLOCK: GS-01 ERROR STATE (retry) ===
+Zweck: Fehlerzustand mit Retry-CTA (deterministisch: reload) im Loading-Overlay.
+Umfang: Ersetzt nur showError(message).
+=== */
     showError(message) {
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.innerHTML = `
-                <div class="error-message">
-                    <p>⚠️ ${message}</p>
-                </div>
-            `;
-            loadingEl.style.display = 'flex';
+        const loadingEl = document.getElementById("loading");
+        if (!loadingEl) return;
+
+        loadingEl.innerHTML = `
+            <div class="error-message" role="alert">
+                <p>⚠️ ${message}</p>
+                <button type="button" class="empty-state__btn" id="error-retry-btn">Erneut versuchen</button>
+            </div>
+        `;
+
+        loadingEl.setAttribute("aria-busy", "false");
+        loadingEl.style.display = "flex";
+
+        const btn = document.getElementById("error-retry-btn");
+        if (btn) {
+            btn.addEventListener("click", () => location.reload());
         }
     }
+    /* === END BLOCK: GS-01 ERROR STATE (retry) === */
 };
 
 // App starten sobald DOM ready
@@ -305,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
