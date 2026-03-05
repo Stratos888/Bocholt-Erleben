@@ -648,7 +648,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* Feed-Container: full-bleed, keine eigene “Surface” */
 .events-section{
 /* SECTION */
-  padding: 10px var(--gutter) 0;
+  padding: var(--feed-section-pad-top) var(--gutter) 0;
 
   background: transparent;
   border-radius: 0;
@@ -1013,7 +1013,8 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     --rail-w: 56px;
     grid-template-columns: var(--rail-w) minmax(0, 1fr);
 
-    padding: var(--space-lg);
+    /* keep density tokens (do NOT revert to --space-lg=16px) */
+    padding: var(--eventcard-pad);
     padding-left: 0;
 
     column-gap: var(--space-md);
@@ -3140,6 +3141,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
