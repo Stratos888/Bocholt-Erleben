@@ -564,13 +564,27 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
+/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) ===
+   Zweck: #loading darf nie Layout verschieben; Loading als fixed Overlay.
+   Umfang: Ersetzt nur .loading-container/.loading-spinner/@keyframes spin.
+=== */
 .loading-container {
-  min-height: 240px;
-  padding: 60px 20px;
-  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+
+  display: none; /* wird per JS auf flex gesetzt */
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  padding: 24px 20px;
+
+  background: rgba(245, 247, 250, 0.82);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+
+  text-align: center;
 }
 
 .loading-spinner {
@@ -582,7 +596,13 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   animation: spin 1s linear infinite;
   margin-bottom: 14px;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce){
+  .loading-spinner { animation: none; }
+}
+/* === END BLOCK: GS-01 LOADING OVERLAY (no layout shift) === */
 
 .error-message,
 .info-message {
@@ -632,6 +652,56 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   cursor: pointer;
 }
 
+
+/* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) ===
+   Zweck: Skeleton-Styles für Eventcards (kein Layout-Jump, ruhiges Shimmer).
+   Umfang: Fügt neue Klassen hinzu, ohne bestehende Eventcard-Styles zu verändern.
+=== */
+.event-card.is-skeleton{
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+
+.event-card.is-skeleton::before{
+  opacity: 0.55; /* Rail etwas ruhiger */
+}
+
+.event-card.is-skeleton .event-date-badge{
+  background: rgba(0,0,0,0.03);
+  box-shadow: inset 0 0 0 1px rgba(31,41,51,0.03);
+}
+
+.skel-line,
+.skel-block{
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    rgba(31,41,51,0.06) 0%,
+    rgba(31,41,51,0.10) 45%,
+    rgba(31,41,51,0.06) 100%
+  );
+  background-size: 240% 100%;
+  animation: skel-shimmer 1.1s ease-in-out infinite;
+}
+
+.skel-line{ height: 12px; }
+.skel-line.skel-line--sm{ height: 10px; opacity: 0.95; }
+.skel-block{ border-radius: 12px; }
+
+@keyframes skel-shimmer{
+  0%{ background-position: 100% 0; }
+  100%{ background-position: 0% 0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .skel-line,
+  .skel-block{
+    animation: none;
+    background: rgba(31,41,51,0.08);
+  }
+}
+/* === END BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
 
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
@@ -3141,6 +3211,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
