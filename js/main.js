@@ -348,6 +348,20 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(badge);
         document.body.appendChild(toast);
 
+        // Badge unterhalb der Top-Stack (Suche + Pills) verankern, ohne Layout-Shift
+        const setBadgeTop = () => {
+            const topStack = document.querySelector(".top-stack");
+            if (!topStack) return;
+            const r = topStack.getBoundingClientRect();
+            // r.bottom ist bereits viewport-relativ; fixed top erwartet px im viewport
+            const topPx = Math.round(r.bottom + 8); // 8px spacing
+            document.documentElement.style.setProperty("--offline-badge-top", `${topPx}px`);
+        };
+
+        setBadgeTop();
+        window.addEventListener("resize", setBadgeTop, { passive: true });
+        window.addEventListener("scroll", setBadgeTop, { passive: true });
+
         let lastOnline = navigator.onLine;
         let toastTimer = null;
 
@@ -397,6 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
