@@ -40,9 +40,46 @@ async function resolveBuildVersion() {
       VERSION = v;
       STATIC_CACHE = `be-static-${VERSION}`;
       RUNTIME_CACHE = `be-runtime-${VERSION}`;
+      return;
     }
   } catch (_) {
-    // Fallback bleibt "dev"
+    // Fallback: wenn offline, versuche die Version aus existierenden Cache-Namen zu ziehen
+    try {
+      const keys = await caches.keys();
+      const staticKeys = keys
+        .filter((k) => k.startsWith("be-static-") && k !== "be-static-dev")
+        .sort();
+      const runtimeKeys = keys
+        .filter((k) => k.startsWith("be-runtime-") && k !== "be-runtime-dev")
+        .sort();
+
+      const staticKey = staticKeys.length ? staticKeys[staticKeys.length - 1] : null;
+      const runtimeKey = runtimeKeys.length ? runtimeKeys[runtimeKeys.length - 1] : null;
+
+      // Wenn wir eine „echte“ Version finden, nutze sie statt dev
+      if (staticKey) {
+        const v = staticKey.replace("be-static-", "");
+        if (v) {
+          VERSION = v;
+          STATIC_CACHE = `be-static-${VERSION}`;
+          RUNTIME_CACHE = `be-runtime-${VERSION}`;
+          return;
+        }
+      }
+
+      // Wenn nur runtime existiert (selten), nutze die
+      if (runtimeKey) {
+        const v = runtimeKey.replace("be-runtime-", "");
+        if (v) {
+          VERSION = v;
+          STATIC_CACHE = `be-static-${VERSION}`;
+          RUNTIME_CACHE = `be-runtime-${VERSION}`;
+          return;
+        }
+      }
+    } catch (_) {
+      // Fallback bleibt "dev"
+    }
   }
 }
 /* === END BLOCK: BUILD VERSION RESOLUTION (no manual bump) === */
@@ -145,6 +182,20 @@ self.addEventListener("activate", (event) => {
       await resolveBuildVersion();
 
       const keys = await caches.keys();
+
+      /* === BEGIN BLOCK: ACTIVATE GUARD (no cache purge on VERSION=dev) ===
+      Zweck:
+      - Wenn /meta/build.txt offline nicht auflösbar ist (VERSION=dev),
+        dürfen produktive Version-Caches nicht gelöscht werden.
+      Umfang:
+      - Guard in activate vor dem Cache-Purge
+      === */
+      if (VERSION === "dev") {
+        self.clients.claim();
+        return;
+      }
+      /* === END BLOCK: ACTIVATE GUARD (no cache purge on VERSION=dev) === */
+
       await Promise.all(
         keys.map((key) => {
           if (key !== STATIC_CACHE && key !== RUNTIME_CACHE) {
@@ -326,6 +377,7 @@ event.respondWith(staleWhileRevalidate(req));
 });
 
 /* === END BLOCK: FETCH HANDLER (routing + offline shell) === */
+
 
 
 
