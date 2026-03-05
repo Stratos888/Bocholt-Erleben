@@ -324,6 +324,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* === END BLOCK: VISUAL VIEWPORT CSS VARS (mobile bottom-safe) === */
 
+    /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (minimal JS; toast on transitions) ===
+    Zweck:
+    - Persistentes Badge solange offline (rein informativ)
+    - Toast nur bei Zustandswechsel (online->offline / offline->online)
+    Umfang:
+    - Erzeugt DOM-Hosts (Badge + Toast) dynamisch (kein index.html Patch nötig)
+    - Setzt html.is-offline Klasse + zeigt Toast zeitlich begrenzt
+    === */
+    (function initOfflineIndicator(){
+        const root = document.documentElement;
+
+        // Hosts (UI-only, fixed overlay; no layout impact)
+        const badge = document.createElement("div");
+        badge.className = "offline-badge";
+        badge.textContent = "Offline – gespeicherte Daten (ggf. nicht aktuell)";
+
+        const toast = document.createElement("div");
+        toast.className = "offline-toast";
+        toast.setAttribute("role", "status");
+        toast.setAttribute("aria-live", "polite");
+
+        document.body.appendChild(badge);
+        document.body.appendChild(toast);
+
+        let lastOnline = navigator.onLine;
+        let toastTimer = null;
+
+        const setOfflineUI = (isOnline) => {
+            root.classList.toggle("is-offline", !isOnline);
+        };
+
+        const showToast = (msg) => {
+            toast.textContent = msg;
+            toast.classList.add("is-visible");
+
+            if (toastTimer) window.clearTimeout(toastTimer);
+            toastTimer = window.setTimeout(() => {
+                toast.classList.remove("is-visible");
+            }, 3200);
+        };
+
+        // Initial state (no toast)
+        setOfflineUI(lastOnline);
+
+        window.addEventListener("offline", () => {
+            if (lastOnline === true) {
+                lastOnline = false;
+                setOfflineUI(false);
+                showToast("Offline – gespeicherte Daten");
+            } else {
+                setOfflineUI(false);
+            }
+        }, { passive: true });
+
+        window.addEventListener("online", () => {
+            if (lastOnline === false) {
+                lastOnline = true;
+                setOfflineUI(true);
+                showToast("Wieder online");
+            } else {
+                setOfflineUI(true);
+            }
+        }, { passive: true });
+    })();
+    /* === END BLOCK: GS-01.5 OFFLINE INDICATOR (minimal JS; toast on transitions) === */
+
     App.init();
 });
 /* === END BLOCK: APP BOOTSTRAP (DOM first, deterministic) === */
@@ -331,6 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 debugLog('Main module loaded - waiting for DOM ready');
+
 
 
 
