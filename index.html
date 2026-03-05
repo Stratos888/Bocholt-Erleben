@@ -93,21 +93,16 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 
 
 
+    <!-- === BEGIN BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) ===
+    Zweck: Verhindert Layout-Shift durch #loading vor CSS/JS; Loading wird erst per JS sichtbar.
+    Umfang: Ersetzt ausschließlich den bestehenden LOADING INDICATOR Block.
+    === -->
     <!-- LOADING INDICATOR -->
-    <div id="loading" class="loading-container">
-        <div class="loading-spinner"></div>
+    <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
+        <div class="loading-spinner" aria-hidden="true"></div>
         <p>Events werden geladen...</p>
     </div>
-
-<div class="top-stack">
-  <div class="events-filter">
-    <input
-      id="search-filter"
-      type="search"
-      placeholder="Suche Events oder Orte"
-      aria-label="Events durchsuchen"
-    />
-  </div>
+    <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
  <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
   Zweck: Ersetzt Chip-Teppich durch 2 strukturierte Filter-Pills (Zeit + Kategorie) mit Bottom-Sheet Auswahl.
@@ -369,6 +364,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
