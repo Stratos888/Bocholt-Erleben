@@ -154,7 +154,7 @@ def safe_int(v: str, default: int) -> int:
 def date_in_horizon(date_str: str, horizon_days: int) -> bool:
     """
     Keep only dates in [today, today + horizon_days].
-    If date_str is invalid/empty -> reject (caller already gates on required date).
+    Invalid/missing dates -> reject.
     """
     ds = (date_str or "").strip()
     if not ds:
@@ -2161,16 +2161,31 @@ async def main_async() -> None:
             if not err and res.get("nav2_status") and int(res["nav2_status"] or "0") >= 400:
                 err = f"nav2_non_200:{res.get('nav2_status')} method={res.get('nav2_method')} cf-mitigated={res.get('nav2_cf_mitigated')}"
 
-            # Fallback: if no detail URLs found, parse list page directly for specific domains
-            if (not details) and (not err):
-                host = _host_norm(urlparse(cfg.url).netloc)
-                if ("django-flint.de" in host) or ("coltplay.de" in host):
-                    fb = await collect_listpage_items_playwright(cfg)
-                    list_items_by_url = fb.get("items_by_url", {}) or {}
-                    details = fb.get("detail_urls", []) or []
-                    http_status_last = fb.get("http_status_last", "") or http_status_last
-                    if fb.get("error"):
-                        err = fb["error"]
+            # Force ListPage extraction for specific domains (LLM detail-url extraction is noisy there)
+            host = _host_norm(urlparse(cfg.url).netloc)
+            if ("django-flint.de" in host) or ("coltplay.de" in host):
+                fb = await collect_listpage_items_playwright(cfg)
+                list_items_by_url = fb.get("items_by_url", {}) or {}
+                http_status_last = fb.get("http_status_last", "") or http_status_last
+
+                if fb.get("error"):
+                    err = fb["error"]
+                elif not list_items_by_url:
+                    err = "listpage_extractor_empty"
+                else:
+                    # IMPORTANT: drive the write-loop by parsed list items, not by LLM-produced detail URLs
+                    details = list(list_items_by_url.keys())
+            else:
+                # Fallback: if no detail URLs found, parse list page directly for specific domains
+                if (not details) and (not err):
+                    host = _host_norm(urlparse(cfg.url).netloc)
+                    if ("django-flint.de" in host) or ("coltplay.de" in host):
+                        fb = await collect_listpage_items_playwright(cfg)
+                        list_items_by_url = fb.get("items_by_url", {}) or {}
+                        details = fb.get("detail_urls", []) or []
+                        http_status_last = fb.get("http_status_last", "") or http_status_last
+                        if fb.get("error"):
+                            err = fb["error"]
 
         elif cfg.source_type == "rss":
             res = collect_rss_items(cfg)
