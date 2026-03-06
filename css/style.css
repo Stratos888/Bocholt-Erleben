@@ -25,6 +25,29 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
+
+  /* LAYOUT TOKENS */
+  --gutter-lg: 24px;
+  --header-h: 48px;
+  --stack-gap: 0px;
+
+  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
+  --feed-section-pad-top: 6px;
+  --feed-cards-gap: 10px;
+  --feed-title-mt: 4px;
+  --feed-title-mb: 6px;
+
+  /* DETAILPANEL LAYOUT TOKENS (frozen contract) */
+  --dp-close-size: 36px;
+  --dp-actionbar-h: 78px;
+  --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
+  --dp-actionbar-pad-y: var(--space-sm);
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
+
+  /* ICON SIZE TOKENS (app-wide) */
+  --ui-icon-size-sm: 16px;
+  --ui-icon-size-md: 18px;
+  --ui-icon-size-lg: 22px;
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
   --radius-card: 12px;
@@ -3197,6 +3220,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
