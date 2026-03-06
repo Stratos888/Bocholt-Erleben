@@ -359,8 +359,7 @@ async def collect_manual_candidates(helper: Any) -> Tuple[List[Dict[str, str]], 
     quality_reason_counts: Dict[str, int] = {}
     source_candidate_counts: Dict[str, int] = {}
     source_written_counts: Dict[str, int] = {}
-    }
-
+    
     for cfg in llm_sources:
         details: List[str] = []
         list_items_by_url: Dict[str, Dict[str, str]] = {}
