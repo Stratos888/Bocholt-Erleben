@@ -1,15 +1,15 @@
-# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first + deploy trigger) ===
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first, deploy-compatible) ===
 # Datei: .github/workflows/manual-ki-intake.yml
 # Zweck:
-# - Liest data/inbox_manual.json
-# - Appendet neue review-Zeilen direkt in den Google-Sheet-Tab "Inbox" (Source of Truth)
-# - Leert danach data/inbox_manual.json im Repo
-# - Triggert anschließend den bestehenden Deploy-to-STRATO-Workflow
+# - Liest data/inbox_manual.json aus dem Repo
+# - Appendet neue review-Zeilen direkt in den Google-Sheet-Tab "Inbox"
+# - Leert danach data/inbox_manual.json
+# - Verwendet den normalen Push-Trigger, damit Deploy to STRATO automatisch läuft
 # Umfang:
-# - Kein lokales data/inbox.tsv / data/inbox.json als Zwischenziel
+# - Kein lokales data/inbox.tsv / data/inbox.json als Ziel
 # - Dedupe gegen bestehende Inbox-Sheet-Zeilen
 # - Fail-fast bei JSON-/Sheet-/Auth-Fehlern
-# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first + deploy trigger) ===
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first, deploy-compatible) ===
 
 name: Manual KI Event Intake
 
@@ -18,7 +18,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 jobs:
   manual_ki_event_intake:
@@ -168,9 +167,7 @@ jobs:
           except Exception:
               fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
 
-          scopes = [
-              "https://www.googleapis.com/auth/spreadsheets",
-          ]
+          scopes = ["https://www.googleapis.com/auth/spreadsheets"]
           creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
           service = build("sheets", "v4", credentials=creds, cache_discovery=False)
 
@@ -181,7 +178,7 @@ jobs:
 
           values = res.get("values", []) or []
           if not values:
-              fail('Inbox-Tab ist leer oder nicht lesbar.')
+              fail("Inbox-Tab ist leer oder nicht lesbar.")
 
           header = [str(h).strip() for h in (values[0] or [])]
           missing_columns = [col for col in INBOX_COLUMNS if col not in header]
@@ -304,12 +301,3 @@ jobs:
             git commit -m "chore: clear manual inbox buffer"
             git push
           fi
-
-      # === BEGIN BLOCK: TRIGGER DEPLOY TO STRATO ===
-      # === END BLOCK: TRIGGER DEPLOY TO STRATO ===
-      - name: Trigger Deploy to STRATO
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -e
-          gh workflow run "Deploy to STRATO" --ref main
