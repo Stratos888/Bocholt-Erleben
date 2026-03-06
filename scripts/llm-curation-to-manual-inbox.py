@@ -3,7 +3,7 @@
 # Zweck:
 # - Nutzt bestehende LLM-Discovery-Helfer minimal-invasiv weiter
 # - Liest aktivierte Sources mit pipeline_mode=llm aus dem Google-Sheet-Tab "Sources"
-# - Sammelt/kuratiert Event-Kandidaten
+# - Sammelt/kuratiert Event-Kandidaten 
 # - Deduped gegen bestehende data/inbox.tsv und innerhalb des aktuellen Laufs
 # - Schreibt nur review-taugliche Kandidaten in data/inbox_manual.json
 #
