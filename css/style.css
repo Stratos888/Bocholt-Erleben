@@ -1,444 +1,124 @@
-/* === BEGIN BLOCK: CSS_SECTION_TOKENS_CANONICAL | Purpose: Single source of truth tokens + compat aliases | Scope: replaces all token roots above RESET === */
+/* === BEGIN BLOCK: CSS_SECTION_TOKENS_CANONICAL | Scope: single source tokens + compat aliases === */
 @layer tokens, base, layout, components, overlays, pages, utilities;
 
 :root{
-  /* 2026 UI Tokens (Canonical) */
+  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+  --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
+  --surface-panel-elevated: color-mix(in srgb, white 76%, var(--color-primary-muted));
+  --surface-panel-footer: color-mix(in srgb, white 80%, var(--color-primary-muted));
+  --surface-panel-row: var(--surface-panel-elevated);
+  --surface-panel-row-action: color-mix(in srgb, white 72%, var(--color-primary-muted));
+  --surface-panel-row-info: color-mix(in srgb, white 86%, var(--color-primary-muted));
+  --border-panel: color-mix(in srgb, rgba(31,41,51,0.12) 72%, var(--color-primary-muted));
+  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.09) 72%, var(--color-primary-muted));
+  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.16) 72%, var(--color-primary-muted));
+  --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
+  --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
   --color-primary: #8BCF4A;
   --color-primary-muted: #EAF6DB;
   --color-background: #F9FBF6;
   --color-surface: #FFFFFF;
-
   --color-text-primary: #1F2933;
   --color-text-secondary: #5F6B73;
   --color-text-muted: #8A949B;
-
-  /* Overlay */
-  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
-
-  /* CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
-
-  /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
-  --gutter: var(--space-lg);
-  --gutter-lg: 24px;                 /* optional: desktop */
-
-  /* LAYOUT TOKENS (header + sticky stack) */
-  --header-h: 48px;                  /* entspricht .app-header min-height */
-  --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
-  --stack-bg: rgba(249, 251, 246, 0.86);
-  --divider: rgba(31,41,51,0.06);
-
-  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
-  --feed-section-pad-top: 6px;
-  --feed-cards-gap: 10px;
-  --feed-title-mt: 4px;
-  --feed-title-mb: 6px;
-
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
-
-  /* Golden Screen: Cards */
   --radius-card: 12px;
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
-
-  /* Golden Screen: Event Cards (GS-01 scanability) */
+  --eventcard-rail-opacity: 0.48;
+  --eventcard-meta-color: rgba(60,72,88,0.70);
+  --eventcard-meta-gap: 2px;
   --radius-eventcard: 16px;
   --border-eventcard: rgba(31,41,51,0.055);
   --border-eventcard-hover: rgba(31,41,51,0.075);
-
-  --shadow-eventcard:
-    0 1px 1px rgba(0,0,0,0.032),
+  --shadow-eventcard: 0 1px 1px rgba(0,0,0,0.032),
     0 8px 22px rgba(0,0,0,0.040),
     0 1px 0 rgba(255,255,255,0.72) inset;
-
-  --shadow-eventcard-hover:
-    0 1px 2px rgba(0,0,0,0.038),
+  --shadow-eventcard-hover: 0 1px 2px rgba(0,0,0,0.038),
     0 10px 26px rgba(0,0,0,0.050),
     0 1px 0 rgba(255,255,255,0.72) inset;
-
-  /* GS-01 Event Feed scanability tokens */
-  --eventcard-rail-opacity: 0.48;
-  --eventcard-meta-gap: 2px;
-
-  /* Meta: 2-line clamp statt 1-line ellipsis */
   --eventcard-meta-lines: 2;
-  --eventcard-meta-color: rgba(60,72,88,0.70);
-
-  /* Category indicator: etwas stärker (nur Feed) */
-  --ui-icon-size-sm: 16px;   /* Cards / Meta */
-  --ui-icon-size-md: 18px;   /* Default */
-  --ui-icon-size-lg: 22px;   /* Header/Icon-Badge */
   --eventcard-category-size: var(--ui-icon-size-sm);
   --eventcard-category-opacity: 0.72;
-
-  /* Golden Screen: Event-Card Typo */
   --font-event-title: 18px;
   --font-event-meta: 14px;
-
-  /* DETAILPANEL ACTIONBAR TOKENS (scale-aligned) */
-  --dp-header-pad-top: 34px;
+  --gutter: var(--space-lg);
   --dp-sheet-radius: 22px;
-
-  --dp-close-size: 36px;
-  --dp-actionbar-h: 78px;
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
-  --dp-actionbar-pad-y: var(--space-sm);
-  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
-
-  /* UI CONTROL TOKENS (buttons/cta/focus) */
   --ui-radius-sm: 12px;
   --ui-radius-md: 14px;
-
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
   --ui-border-primary: rgba(139,207,74,0.45);
-
   --ui-surface-soft: rgba(255,255,255,0.55);
   --ui-surface-soft-hover: rgba(255,255,255,0.74);
   --ui-surface-soft-active: rgba(255,255,255,0.86);
-
   --ui-surface-tint: rgba(31,41,51,0.04);
   --ui-surface-tint-hover: rgba(31,41,51,0.06);
   --ui-surface-tint-active: rgba(31,41,51,0.08);
-
-  --ui-shadow-soft:
-    0 6px 14px rgba(0,0,0,0.045),
+  --ui-shadow-soft: 0 6px 14px rgba(0,0,0,0.045),
     0 1px 0 rgba(255,255,255,0.72) inset;
-
   --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
   --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
-
   --ui-focus-ring: rgba(139,207,74,0.20);
   --ui-focus-ring-neutral: rgba(31,41,51,0.18);
-
   --ui-font-size-control: 13px;
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
-
-  /* CONTROL SYSTEM (Search + Pills + Reset) */
   --ui-control-h: 36px;
   --ui-control-pad-x: 12px;
   --ui-control-radius: var(--ui-radius-md);
-
   --ui-control-border: var(--ui-border-weak);
   --ui-control-border-strong: var(--ui-border-soft);
-
   --ui-control-bg: rgba(255,255,255,0.82);
   --ui-control-bg-strong: rgba(255,255,255,0.92);
-
   --ui-control-shadow: var(--ui-shadow-soft);
-  --ui-control-shadow-strong:
-    0 5px 12px rgba(0,0,0,0.040),
+  --ui-control-shadow-strong: 0 5px 12px rgba(0,0,0,0.040),
     0 1px 0 rgba(255,255,255,0.80) inset;
-
   --ui-control-ring-active: rgba(139,207,74,0.09);
-
-  /* ICON TOKENS (app-wide) */
   --ui-tap-target: 44px;
-
   --ui-icon-stroke-sm: 1.75;
   --ui-icon-stroke-md: 1.85;
   --ui-icon-stroke-lg: 2;
-
   --ui-icon-size: var(--ui-icon-size-md);
   --ui-icon-stroke: var(--ui-icon-stroke-md);
-
   --ui-icon-opacity: 0.92;
   --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
-
-  /* Close button DNA (tokenized) */
   --ui-close-size: var(--ui-tap-target);
   --ui-close-bg: rgba(255,255,255,0.92);
   --ui-close-border: 1px solid var(--ui-border-strong);
   --ui-close-shadow: 0 14px 30px rgba(0,0,0,0.12);
   --ui-close-font-size: 22px;
   --ui-close-color: rgba(31,41,51,0.74);
-
-  /* PANEL SEMANTIC TOKENS (Card Expanded DNA) */
-  --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
-  --surface-panel-elevated: color-mix(in srgb, white 76%, var(--color-primary-muted));
-  --surface-panel-footer: color-mix(in srgb, white 80%, var(--color-primary-muted));
-
-  --surface-panel-row: var(--surface-panel-elevated);
-  --surface-panel-row-action: color-mix(in srgb, white 72%, var(--color-primary-muted));
-  --surface-panel-row-info: color-mix(in srgb, white 86%, var(--color-primary-muted));
-
-  --border-panel: color-mix(in srgb, rgba(31,41,51,0.12) 72%, var(--color-primary-muted));
-  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.09) 72%, var(--color-primary-muted));
-  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.16) 72%, var(--color-primary-muted));
-
-  --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
-  --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
-
-  /* Backward compat (keep existing code stable) */
   --bg: var(--color-background);
   --surface: var(--color-surface);
   --text: var(--color-text-primary);
   --muted: var(--color-text-muted);
-
   --border: rgba(31,41,51,0.10);
-
   --primary: var(--color-primary);
   --accent: var(--color-primary);
-
   --focus-ring: rgba(139,207,74,0.25);
-
   --radius: var(--radius-card);
   --shadow-sm: var(--shadow-card);
   --shadow-md: var(--shadow-card);
-
   --space-1: var(--space-xs);
   --space-2: var(--space-sm);
   --space-3: var(--space-md);
   --space-4: var(--space-lg);
   --space-5: var(--space-xl);
-}
-/* === END BLOCK: CSS_SECTION_TOKENS_CANONICAL === */
-
-/* ============================================
-   RESET & BASE
-   ============================================ */
- * STYLE.CSS – Bocholt erleben (MVP frozen)
- * Ziel: ruhig, modern, funktional, konsistent
- * Architektur: Single Source of Truth
- */
-
-/* ============================================
-   RESET & BASE
-   ============================================ */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-/* REDUCED MOTION CONTRACT (enterprise a11y) */
-@media (prefers-reduced-motion: reduce){
-
-  html:focus-within{
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after{
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-}
-
-:root {
-  /* 2026 UI Tokens */
-  --color-primary: #8BCF4A;
-  --color-primary-muted: #EAF6DB;
-  --color-background: #F9FBF6;
-  --color-surface: #FFFFFF;
-
-  --color-text-primary: #1F2933;
-  --color-text-secondary: #5F6B73;
-  --color-text-muted: #8A949B;
-
-/* CORE SPACING TOKENS + GLOBAL GUTTER (app-wide) */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-
-  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
-  --feed-section-pad-top: 6px;          /* war 8px */
-  --feed-cards-gap: 10px;               /* war 12px */
-  --feed-title-mt: 4px;                 /* war 10px */
-  --feed-title-mb: 6px;                 /* war 8px */
-
-  --eventcard-pad: 14px;
-  --topstack-pad-bottom: 4px;
-
-  /* Golden Screen: Cards */
-  --radius-card: 12px;
-  --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
-
-  /* GS-01 Event Feed scanability tokens */
-  --eventcard-rail-opacity: 0.48;
-  --eventcard-meta-color: rgba(60,72,88,0.68);
-  --eventcard-meta-gap: 2px;
-
-  /* Golden Screen: Event Cards (GS-01 scanability) */
-  --radius-eventcard: 16px;
-  --border-eventcard: rgba(31,41,51,0.055);
-  --border-eventcard-hover: rgba(31,41,51,0.075);
-
-  /* ruhiger als vorher, aber weiterhin „premium“ */
-  --shadow-eventcard:
-    0 1px 1px rgba(0,0,0,0.032),
-    0 8px 22px rgba(0,0,0,0.040),
-    0 1px 0 rgba(255,255,255,0.72) inset;
-
-  --shadow-eventcard-hover:
-    0 1px 2px rgba(0,0,0,0.038),
-    0 10px 26px rgba(0,0,0,0.050),
-    0 1px 0 rgba(255,255,255,0.72) inset;
-
-  --eventcard-rail-opacity: 0.48;
-
-  /* Meta: 2-line clamp statt 1-line ellipsis */
-  --eventcard-meta-lines: 2;
-  --eventcard-meta-color: rgba(60,72,88,0.70);
-
-  /* Category indicator: etwas stärker (nur Feed) */
-  --eventcard-category-size: var(--ui-icon-size-sm);
-  --eventcard-category-opacity: 0.72;
-
-  /* Golden Screen: Event-Card Typo */
-  --font-event-title: 18px;
-  --font-event-meta: 14px;
-
-  /* Einheitlicher Seiten-Gutter (Header / Top-Stack / Feed / Detailpanel) */
-  --gutter: var(--space-lg);
-
-   /* Detailpanel Layout Contract (kein Magic-Number-Durcheinander) */
-/* SECTION */
-  --dp-header-pad-top: 34px;            /* entspricht #detail-content padding-top + Close top */
-
-/* SECTION */
-  --dp-sheet-radius: 22px;
-
-/* DETAILPANEL ACTIONBAR TOKENS (scale-aligned) */
---dp-close-size: 36px;                 /* sichtbare Close-Größe (Hit-Area bleibt >=44px via ::before) */
---dp-actionbar-h: 78px;                /* Basis-Höhe der Actionbar-Zone (ohne Safe-Area) */
---dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
---dp-actionbar-pad-y: var(--space-sm); /* vertikales Padding in der Actionbar (8px) */
-/* SECTION */
-  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px); /* Content-Reserve inkl. Safe-Area */
-
-
-/* UI CONTROL TOKENS (buttons/cta/focus) */
-  --ui-radius-sm: 12px;
-  --ui-radius-md: 14px;
-
-  --ui-border-weak: rgba(31,41,51,0.08);
-  --ui-border-soft: rgba(31,41,51,0.10);
-  --ui-border-strong: rgba(31,41,51,0.14);
-/* SECTION */
- --ui-border-primary: rgba(139,207,74,0.45);
-
-  --ui-surface-soft: rgba(255,255,255,0.55);
-  --ui-surface-soft-hover: rgba(255,255,255,0.74);
-  --ui-surface-soft-active: rgba(255,255,255,0.86);
-
-  --ui-surface-tint: rgba(31,41,51,0.04);
-  --ui-surface-tint-hover: rgba(31,41,51,0.06);
-  --ui-surface-tint-active: rgba(31,41,51,0.08);
-
-  --ui-shadow-soft:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
-
-  --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
-  --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
-
-  --ui-focus-ring: rgba(139,207,74,0.20);
-  --ui-focus-ring-neutral: rgba(31,41,51,0.18);
-
-  --ui-font-size-control: 13px;
-  --ui-font-weight-control: 750;
-  --ui-font-weight-cta: 800;
-
-  /* CONTROL SYSTEM (Search + Pills + Reset) */
-  --ui-control-h: 36px;
-  --ui-control-pad-x: 12px;
-
-  --ui-control-radius: var(--ui-radius-md);
-
-  --ui-control-border: var(--ui-border-weak);
-  --ui-control-border-strong: var(--ui-border-soft);
-
-  --ui-control-bg: rgba(255,255,255,0.82);
-  --ui-control-bg-strong: rgba(255,255,255,0.92);
-
-  --ui-control-shadow: var(--ui-shadow-soft);
-  --ui-control-shadow-strong:
-    0 5px 12px rgba(0,0,0,0.040),
-    0 1px 0 rgba(255,255,255,0.80) inset;
-
-  --ui-control-ring-active: rgba(139,207,74,0.09);
-
-/* ICON TOKENS (app-wide) */
-
-  /* Tap target (app-wide contract) */
-  --ui-tap-target: 44px;
-
-  /* Icon sizes */
-  --ui-icon-size-sm: 16px;   /* Cards / Meta */
-  --ui-icon-size-md: 18px;   /* Default */
-  --ui-icon-size-lg: 22px;   /* Header/Icon-Badge */
-
-  /* Line icon stroke (Top-App look: slightly lighter on small sizes) */
-  --ui-icon-stroke-sm: 1.75;
-  --ui-icon-stroke-md: 1.85;
-  --ui-icon-stroke-lg: 2;
-
-  /* Defaults (context can override) */
-  --ui-icon-size: var(--ui-icon-size-md);
-  --ui-icon-stroke: var(--ui-icon-stroke-md);
-
-  --ui-icon-opacity: 0.92;
-
-  /* Emoji-Icons app-like neutralisieren (legacy) */
-  --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
-
-  /* Close button DNA (tokenized) */
-  --ui-close-size: var(--ui-tap-target);
-  --ui-close-bg: rgba(255,255,255,0.92);
-  --ui-close-border: 1px solid var(--ui-border-strong);
-  --ui-close-shadow: 0 14px 30px rgba(0,0,0,0.12);
-  --ui-close-font-size: 22px;
-  --ui-close-color: rgba(31,41,51,0.74);
-
-
-  /* Backward compat */
-  --bg: var(--color-background);
-  --surface: var(--color-surface);
-  --text: var(--color-text-primary);
-  --muted: var(--color-text-muted);
-
-  --border: rgba(31,41,51,0.10);
-
-  --primary: var(--color-primary);
-  --accent: var(--color-primary);
-
-/* SECTION */
---focus-ring: rgba(139,207,74,0.25);
-
-  --radius: var(--radius-card);
-  --shadow-sm: var(--shadow-card);
-  --shadow-md: var(--shadow-card);
-
-  --space-1: var(--space-xs);
-  --space-2: var(--space-sm);
-  --space-3: var(--space-md);
-  --space-4: var(--space-lg);
-  --space-5: var(--space-xl);
-
-/* LAYOUT TOKENS (header + sticky stack) */
-  --gutter-lg: 24px;                 /* optional: desktop */
-
-  --header-h: 48px;                  /* entspricht .app-header min-height */
-  --stack-gap: 0px;                  /* Abstand zwischen Header und Top-Stack */
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
-
-
 }
+/* === END BLOCK: CSS_SECTION_TOKENS_CANONICAL === */
+/* === BEGIN BLOCK: CSS_FILE_HEADER | Scope: stable anchor === */
+/* Bocholt erleben — css/style.css (canonical) */
+/* === END BLOCK: CSS_FILE_HEADER === */
 
 /* GLOBAL TYPOGRAPHY BASE */
 body{
@@ -456,9 +136,6 @@ body{
 @media (min-width: 900px){
   :root{
     --gutter: var(--gutter-lg);
-/* OVERLAY TOKENS (global design system contract) */
-
-  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
 
   }
 
@@ -476,7 +153,6 @@ body{
   box-shadow: none;
 }
 }
-
 
 /* GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) */
 a{
@@ -661,7 +337,6 @@ a:visited{ color: var(--color-primary); }
   transform: translateY(1px);
 }
 
-
 .content-link:hover{
   background: rgba(31,41,51,0.04);
   text-decoration: none;
@@ -670,7 +345,6 @@ a:visited{ color: var(--color-primary); }
 .content-link:visited{
   color: var(--color-text-primary);
 }
-
 
 .modal-cta-button{
   display: inline-flex;
@@ -698,7 +372,6 @@ a:visited{ color: var(--color-primary); }
    /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
   box-shadow: var(--ui-shadow-cta-active);
 }
-
 
 /* GLOBAL HEADINGS TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6 {
@@ -734,14 +407,11 @@ body.is-panel-open .top-stack{
 body.is-sheet-open .top-stack{ z-index: 9997 !important; }
 body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
 
-
+/* === BEGIN BLOCK: CSS_SECTION_LOADING_MESSAGES === */
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
-/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) ===
-   Zweck: #loading darf nie Layout verschieben; Loading als fixed Overlay.
-   Umfang: Ersetzt nur .loading-container/.loading-spinner/@keyframes spin.
-=== */
+/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) === */
 .loading-container {
   position: fixed;
   inset: 0;
@@ -790,6 +460,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 .info-message { background: #fff3cd; }
 .error-message { background: #f8d7da; color: #721c24; }
 
+/* === END BLOCK: CSS_SECTION_LOADING_MESSAGES === */
+
+/* === BEGIN BLOCK: CSS_SECTION_EMPTY_STATE === */
 /* ============================================
    EMPTY STATE
    ============================================ */
@@ -826,11 +499,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   cursor: pointer;
 }
 
-
-/* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) ===
-   Zweck: Skeleton-Styles für Eventcards (kein Layout-Jump, ruhiges Shimmer).
-   Umfang: Fügt neue Klassen hinzu, ohne bestehende Eventcard-Styles zu verändern.
-=== */
+/* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
 .event-card.is-skeleton{
   cursor: default;
   user-select: none;
@@ -877,6 +546,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 /* === END BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
 
+/* === BEGIN BLOCK: CSS_SECTION_EVENT_FEED === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
 /* Guardrail: nichts darf breiter als der Viewport werden */
@@ -898,7 +568,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   border-radius: 0;
   box-shadow: none;
 }
-
 
 /* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
 /* SECTION */
@@ -922,7 +591,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 }
 
-
 /* Grid/Stack: nur Abstand, keine eigene Surface */
 /* SECTION */
 .event-cards-grid{
@@ -936,12 +604,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   box-shadow: none;
 }
 
-
-/* BEGIN PATCH EVENTCARD-TAP-HIGHLIGHT-V1
-   Zweck: Entfernt den mobilen „blauen Tap-Flash“ auf Eventcards (native WebKit/Chromium Tap-Highlight),
-          ohne die vorhandenen :active Press-Styles (scale) zu verändern.
-   Umfang: Ersetzt nur den kleinen Klick-Block für .event-card (cursor/interaction).
-*/
+/* === BEGIN BLOCK: EVENTCARD-TAP-HIGHLIGHT-V1 | Scope: preserved styles, marker-only === */
   
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
@@ -958,11 +621,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   user-select: none;
 }
 
-/* END PATCH EVENTCARD-TAP-HIGHLIGHT-V1 */
-
+/* === END BLOCK: EVENTCARD-TAP-HIGHLIGHT-V1 === */
 
 /* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
-
 
 /* EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) */
 
@@ -1020,7 +681,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   z-index: 1;
 }
 
-
 .event-card > *{
   position: relative;
   z-index: 1;
@@ -1053,7 +713,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   outline: 3px solid rgba(139,207,74,0.16);
   outline-offset: 3px;
 }
-
 
 /* SECTION */
 
@@ -1108,7 +767,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   text-transform: uppercase;
 }
 
-
 /* --- Content Area: 2 Zeilen --- */
 .event-card-body{
   min-width: 0;
@@ -1133,7 +791,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   line-height: 1.25;
 }
 
-
 /* EVENT TITLE FINAL (2-line clamp, single source) */
 
 .event-title__text{
@@ -1151,11 +808,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   hyphens: auto;
 }
 
-
-/* BEGIN PATCH ICONS-CSS-EVENTCARD-V1
-   Zweck: Event-Card Kategorie-Icon state-of-the-art SVG (kein Emoji-Legacy), Größe via Tokens (sm).
-   Umfang: Ersetzt nur .event-title .event-category-icon + svg/img clamp.
-*/
+/* === BEGIN BLOCK: ICONS-CSS-EVENTCARD-V1 | Scope: preserved styles, marker-only === */
 /* EVENT CARD CATEGORY INDICATOR (state-of-the-art, tokenized) */
 .event-title .event-category-icon{
   flex: 0 0 auto;
@@ -1198,7 +851,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   opacity: var(--eventcard-category-opacity);
   filter: none;
 }
-/* END PATCH ICONS-CSS-EVENTCARD-V1 */
+/* === END BLOCK: ICONS-CSS-EVENTCARD-V1 === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
@@ -1268,9 +921,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   .event-date-badge{ width: 40px; }
 }
 
-
 /* (removed) legacy event title/meta/icon/location overrides to avoid contradictions */
-
 
 /* Location: reine Info-Zeile (kein Pill) */
 .event-location{
@@ -1288,7 +939,11 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   text-overflow: ellipsis;
 }
 
+/* === END BLOCK: CSS_SECTION_EMPTY_STATE === */
 
+/* === END BLOCK: CSS_SECTION_EVENT_FEED === */
+
+/* === BEGIN BLOCK: CSS_SECTION_FOOTER === */
 /* ============================================
    FOOTER
    ============================================ */
@@ -1301,7 +956,6 @@ footer {
   padding: 34px 20px;
   text-align: center;
 }
-
 
 /* RESPONSIVE (mobile unchanged + desktop frame) */
 
@@ -1335,7 +989,9 @@ footer {
   }
 }
 
+/* === END BLOCK: CSS_SECTION_FOOTER === */
 
+/* === BEGIN BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
 /* ============================================
    FILTERS / SEARCH / TOP STACK (Top-App)
    ============================================ */
@@ -1367,13 +1023,7 @@ footer {
   contain: none;
 }
 
-/* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
-Zweck:
-- Persistentes Offline-Badge solange offline (informativ, nicht blockierend)
-- Toast/Snackbar nur bei Zustandswechsel online<->offline
-Umfang:
-- Reines UI-Styling, JS setzt nur Klassen/States
-=== */
+/* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts === */
 
 /* Offline badge: fixed unter Header, zentriert, kein Layout-Shift */
 .offline-badge{
@@ -1466,7 +1116,6 @@ html.is-offline .offline-badge{
 
 /* === END BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) === */
 
-
 /* SEARCH BAR (functional hero, top- level) */
 #search-filter{
   width: 100%;
@@ -1513,7 +1162,6 @@ html.is-offline .offline-badge{
     0 0 0 3px var(--ui-focus-ring),
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
-
 
 /* FILTER BAR (compact single-row + inline reset X) */
 
@@ -1702,7 +1350,6 @@ html.is-offline .offline-badge{
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
-
 /* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
 
 /* ===== Bottom Sheet ===== */
@@ -1722,7 +1369,6 @@ body.is-sheet-open .top-stack{
 
   z-index: 9997 !important;
 }
-
 
 .filter-sheet__overlay{
   position: absolute;
@@ -1780,7 +1426,6 @@ body.is-sheet-open .top-stack{
   z-index: 4;
 }
 
-
 /* Header: sticky + Topbar Layout (Titel links / Close rechts) */
 .filter-sheet__header{
   position: sticky;
@@ -1805,7 +1450,6 @@ body.is-sheet-open .top-stack{
   max-height: calc(92vh - 86px);
   max-height: calc(92dvh - 86px);
 }
-
 
 .filter-sheet__title{
   font-size: 1.05rem;
@@ -1972,7 +1616,6 @@ body.is-sheet-open .top-stack{
   }
 }
 
-
 /* DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER */
 
 /* DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) */
@@ -1989,7 +1632,6 @@ html.is-panel-open body {
   overscroll-behavior: none;
 
 }
-
 
 #event-detail-panel.detail-panel{
   position: fixed;
@@ -2057,10 +1699,8 @@ html.is-panel-open body {
   flex-direction: column;
 }
 
-
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
 #event-detail-panel .detail-panel-content::after{ content: none !important; }
-
 
 /* DETAILPANEL GRABBER (legacy DOM hook; disabled in favor of ::before) */
 #event-detail-panel .detail-panel-grabber{
@@ -2084,13 +1724,7 @@ html.is-panel-open body {
   touch-action: none;
 }
 
-/* BEGIN PATCH DP-CLOSE-BUTTON-POLISH-V2
-   Zweck:
-   - Close-Button weniger “dominant”, mehr native PWA (ruhige Surface, softer Shadow, klare States).
-   - Keine Änderung am zentralen Icon-System (SVG bleibt über ui-icon Tokens gesteuert).
-   Umfang:
-   - Ersetzt NUR die Detailpanel-Close-Regeln inkl. States (active/hover/focus).
-*/
+/* === BEGIN BLOCK: DP-CLOSE-BUTTON-POLISH-V2 | Scope: preserved styles, marker-only === */
 
 #event-detail-panel .detail-panel-close{
   position: absolute;
@@ -2170,7 +1804,7 @@ html.is-panel-open body {
   outline-offset: 2px;
 }
 
-/* END PATCH DP-CLOSE-BUTTON-POLISH-V2 */
+/* === END BLOCK: DP-CLOSE-BUTTON-POLISH-V2 === */
 
 /* SECTION */
 
@@ -2225,7 +1859,6 @@ html.is-panel-open body {
   }
 }
 
-
 #event-detail-panel #detail-content{
   /* Abstand zum Grab-Handle/Top (Token) */
   padding-top: var(--dp-header-pad-top);
@@ -2245,13 +1878,7 @@ html.is-panel-open body {
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* BEGIN PATCH DP-DESC-SOURCE-LINKS-V4
-   Zweck:
-   - Quelle/Links exakt auf dem gleichen Gutter wie Description (keine extra 12px Einrückung).
-   - ↗ Pfeil immer korrekt (dynamisch), egal ob 1 oder 2 Zeilen.
-   Umfang:
-   - Ersetzt den kompletten Links/Quelle Block.
-*/
+/* === BEGIN BLOCK: DP-DESC-SOURCE-LINKS-V4 | Scope: preserved styles, marker-only === */
 
 /* DETAIL LINKS (Enterprise v4: gutter-aligned, dynamic arrow alignment) */
 
@@ -2347,14 +1974,10 @@ html.is-panel-open body {
   transform: none;
 }
 
-/* END PATCH DP-DESC-SOURCE-LINKS-V4 */
-
+/* === END BLOCK: DP-DESC-SOURCE-LINKS-V4 === */
 
 /* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy)
-Zweck:
-- Titel wirkt klar als Headline (mehr Separation), Meta wirkt als eigener Block.
-Umfang:
-- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
+
 === */
 
 #event-detail-panel .detail-header{
@@ -2460,14 +2083,7 @@ Umfang:
   background: none;
 }
 
-/* BEGIN PATCH DP-META-ENTERPRISE-V7
-   Zweck:
-   - Location-↗ sitzt immer „am Ort“ (auch bei kurzen Ortsnamen), ohne fragiles Textlängen-Positionieren.
-   - Entfernt die künstliche max-width-Begrenzung, die zu frühe Umbrüche („Cluster zu kurz“) erzeugt.
-   - Gutter bleibt appweit konsistent (0-Inset links/rechts).
-   Umfang:
-   - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
-*/
+/* === BEGIN BLOCK: DP-META-ENTERPRISE-V7 | Scope: preserved styles, marker-only === */
 
 /* DETAIL META INFO (Enterprise v7: fit-content column for location arrow proximity) */
 
@@ -2659,7 +2275,7 @@ Umfang:
   hyphens: auto;
 }
 
-/* END PATCH DP-META-ENTERPRISE-V7 */
+/* === END BLOCK: DP-META-ENTERPRISE-V7 === */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2748,14 +2364,7 @@ Umfang:
   line-height: 1;
 }
 
-
-/* BEGIN PATCH DP-DESCRIPTION-ENTERPRISE-V3
-   Zweck:
-   - Vertikalen Rhythmus im Detailpanel harmonisieren (Meta → Divider → Beschreibung → Quelle → Actions).
-   - Einheitlicher Spacing-Rhythmus (8 / 16 / 24) für ruhigere Struktur.
-   Umfang:
-   - Nur Beschreibung + Abstände zu Divider/Quelle beeinflusst. Keine Layout- oder Funktionsänderungen.
-*/
+/* === BEGIN BLOCK: DP-DESCRIPTION-ENTERPRISE-V3 | Scope: preserved styles, marker-only === */
 
 /* Beschreibung: ruhiger Textblock + konsistenter Abstand */
 #event-detail-panel .detail-description{
@@ -2793,8 +2402,7 @@ Umfang:
   margin-top: 16px;
 }
 
-/* END PATCH DP-DESCRIPTION-ENTERPRISE-V3 */
-
+/* === END BLOCK: DP-DESCRIPTION-ENTERPRISE-V3 === */
 
 /* Responsive: sehr kleine Geräte */
 @media (max-width: 360px){
@@ -2817,7 +2425,6 @@ Umfang:
     padding: 8px 0;
   }
 }
-
 
 /* DETAILPANEL CALENDAR CHOOSER (tokenized, bottom-sheet, duplicate-safe) */
 
@@ -2916,15 +2523,7 @@ Umfang:
   outline-offset: 3px;
 }
 
-
-/* BEGIN PATCH ICONS-CSS-SYSTEM-V1
-   Zweck:
-   1) Einheitlicher “Top-App” Line-Icon Look für alle SVGs aus window.Icons (class: ui-icon-svg).
-   2) Detailpanel SVG Guard so scopen, dass NUR UI-Icons (Meta/Links/Actions/Close) auf 18px geklemmt werden.
-   3) Kategorie-Icon im Header darf wieder über Tokens skalieren (ui-icon-size-lg).
-   Umfang:
-   - Ersetzt kompletten bisherigen Detailpanel “JEDES svg/img = 18px” Guard + bringt SVG Base Styles mit.
-*/
+/* === BEGIN BLOCK: ICONS-CSS-SYSTEM-V1 | Scope: preserved styles, marker-only === */
 
 /* APP-WIDE SVG ICON BASE (Single Source of Truth: window.Icons → class ui-icon-svg) */
 svg.ui-icon-svg{
@@ -3049,14 +2648,9 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* END PATCH ICONS-CSS-SYSTEM-V1 */
+/* === END BLOCK: ICONS-CSS-SYSTEM-V1 === */
 
-/* BEGIN PATCH DP-SVG-GUARD-SCOPE-V1
-   Zweck: Verhindert, dass jedes svg/img im Detailpanel hart auf 18px gezwungen wird.
-          Guard gilt nur noch für UI-Icons (Meta/Links/Actions/Close).
-          Kategorie-Icon skaliert wieder mit seinem Container; Description-Content bleibt frei.
-   Umfang: Ersetzt den bisherigen “JEDES svg/img” Guard + Description-Ausnahme.
-*/
+/* === BEGIN BLOCK: DP-SVG-GUARD-SCOPE-V1 | Scope: preserved styles, marker-only === */
 
 /* 2) Systemic Guard (scoped): NUR UI-Icons im Detailpanel werden als Icons behandelt */
 #event-detail-panel .detail-meta-icon svg,
@@ -3112,9 +2706,11 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* END PATCH DP-SVG-GUARD-SCOPE-V1 */
+/* === END BLOCK: DP-SVG-GUARD-SCOPE-V1 === */
 
+/* === END BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
 
+/* === BEGIN BLOCK: CSS_SECTION_HEADER_MODAL === */
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
@@ -3147,7 +2743,6 @@ svg.ui-icon-svg{
 
   transform: translateZ(0);
 }
-
 
 .app-header::after{ content: none; }
 
@@ -3285,13 +2880,11 @@ svg.ui-icon-svg{
 }
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 
-
 @media (max-width: 360px){
   .app-header{ padding: 0 var(--gutter); min-height: 48px; }
   .header-right{ gap: 8px; }
   .app-title{ max-width: 56vw; }
 }
-
 
 /* --- Modal (Locations) --- */
 .modal-overlay {
@@ -3484,4 +3077,3 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
-
