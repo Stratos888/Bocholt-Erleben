@@ -1,0 +1,73 @@
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> Inbox sheet append) ===
+# Datei: .github/workflows/manual-ki-intake.yml
+# Zweck:
+# - Startet den manuellen KI-Intake per workflow_dispatch
+# - Führt scripts/inbox-manual-to-sheet.py aus
+# - Nutzt bestehende Google-Sheets-Secrets
+# Umfang:
+# - Kein UI-Work
+# - Nur manueller Import in Tab "Inbox"
+# - Fail-fast bei Script-/Secret-Fehlern
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> Inbox sheet append) ===
+
+name: Manual KI Event Intake
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manual_ki_event_intake:
+    name: Import manual inbox JSON into Sheet Inbox
+    runs-on: ubuntu-latest
+
+    steps:
+      # === BEGIN BLOCK: CHECKOUT REPOSITORY (workflow input basis) ===
+      # Zweck:
+      # - Holt den aktuellen Repo-Stand inkl. data/inbox_manual.json und scripts/
+      # Umfang:
+      # - Standard-Checkout
+      # === END BLOCK: CHECKOUT REPOSITORY (workflow input basis) ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # === BEGIN BLOCK: SETUP PYTHON RUNTIME (script execution runtime) ===
+      # Zweck:
+      # - Stellt Python für das Import-Skript bereit
+      # Umfang:
+      # - Python 3.11
+      # === END BLOCK: SETUP PYTHON RUNTIME (script execution runtime) ===
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # === BEGIN BLOCK: INSTALL IMPORT DEPENDENCIES (Google Sheets client only) ===
+      # Zweck:
+      # - Installiert nur die für den Sheet-Import nötigen Pakete
+      # Umfang:
+      # - minimal-invasive Dependencies
+      # === END BLOCK: INSTALL IMPORT DEPENDENCIES (Google Sheets client only) ===
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
+
+      # === BEGIN BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> Sheet Inbox) ===
+      # Zweck:
+      # - Führt den Manual-KI-Import aus
+      # - Liest data/inbox_manual.json
+      # - Appendet neue review-Zeilen in Tab "Inbox"
+      # Umfang:
+      # - nutzt bestehende Secrets SHEET_ID + GOOGLE_SERVICE_ACCOUNT_JSON
+      # === END BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> Sheet Inbox) ===
+      - name: Run manual inbox importer
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          TAB_INBOX: Inbox
+          MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
+        run: |
+          python scripts/inbox-manual-to-sheet.py
