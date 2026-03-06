@@ -38,6 +38,7 @@
   --feed-title-mb: 6px;
 
   /* DETAILPANEL LAYOUT TOKENS (frozen contract) */
+  --dp-header-pad-top: 34px;
   --dp-close-size: 36px;
   --dp-actionbar-h: 78px;
   --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
@@ -3220,6 +3221,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
