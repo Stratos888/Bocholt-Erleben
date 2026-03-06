@@ -1,14 +1,15 @@
-# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (fixed valid YAML) ===
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first + deploy trigger) ===
 # Datei: .github/workflows/manual-ki-intake.yml
 # Zweck:
-# - Importiert data/inbox_manual.json -> data/inbox.tsv
-# - Baut danach data/inbox.json neu
-# - Commitet die aktualisierten Dateien
-# - Leert anschließend data/inbox_manual.json
+# - Liest data/inbox_manual.json
+# - Appendet neue review-Zeilen direkt in den Google-Sheet-Tab "Inbox" (Source of Truth)
+# - Leert danach data/inbox_manual.json im Repo
+# - Triggert anschließend den bestehenden Deploy-to-STRATO-Workflow
 # Umfang:
-# - workflow_dispatch manuell startbar
-# - gültiges YAML für GitHub Actions
-# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (fixed valid YAML) ===
+# - Kein lokales data/inbox.tsv / data/inbox.json als Zwischenziel
+# - Dedupe gegen bestehende Inbox-Sheet-Zeilen
+# - Fail-fast bei JSON-/Sheet-/Auth-Fehlern
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (sheet-first + deploy trigger) ===
 
 name: Manual KI Event Intake
 
@@ -17,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   manual_ki_event_intake:
@@ -37,50 +39,241 @@ jobs:
         with:
           python-version: "3.11"
 
-      # === BEGIN BLOCK: IMPORT MANUAL INBOX JSON ===
-      # === END BLOCK: IMPORT MANUAL INBOX JSON ===
-      - name: Import manual inbox JSON
+      # === BEGIN BLOCK: INSTALL GOOGLE SHEETS DEPENDENCIES ===
+      # === END BLOCK: INSTALL GOOGLE SHEETS DEPENDENCIES ===
+      - name: Install dependencies
         run: |
           set -e
-          python scripts/inbox-manual-to-sheet.py
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth
 
-      # === BEGIN BLOCK: BUILD INBOX JSON ===
-      # === END BLOCK: BUILD INBOX JSON ===
-      - name: Build inbox.json
+      # === BEGIN BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
+      # === END BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
+      - name: Append manual inbox JSON to Google Sheet Inbox
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -e
-          python scripts/build-inbox-from-tsv.py
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          from datetime import datetime
+          from pathlib import Path
+          from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-      # === BEGIN BLOCK: COMMIT INBOX CHANGES ===
-      # === END BLOCK: COMMIT INBOX CHANGES ===
-      - name: Commit inbox changes
-        run: |
-          set -e
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ROOT = Path.cwd()
+          MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
 
-          git add data/inbox.tsv data/inbox.json
+          INBOX_COLUMNS = [
+              "status",
+              "id_suggestion",
+              "title",
+              "date",
+              "endDate",
+              "time",
+              "city",
+              "location",
+              "kategorie_suggestion",
+              "url",
+              "description",
+              "source_name",
+              "source_url",
+              "match_score",
+              "matched_event_id",
+              "notes",
+              "created_at",
+          ]
 
-          if git diff --cached --quiet; then
-            echo "No inbox changes."
-          else
-            git commit -m "chore: update inbox review feed"
-            git push
-          fi
+          REQUIRED_JSON_KEYS = [
+              "title",
+              "date",
+              "city",
+              "location",
+              "source_name",
+              "source_url",
+          ]
 
-      # === BEGIN BLOCK: RESET MANUAL INBOX BUFFER ===
-      # === END BLOCK: RESET MANUAL INBOX BUFFER ===
-      - name: Reset manual inbox buffer
-        run: |
-          set -e
+          def fail(msg: str) -> None:
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
 
-          printf '[]\n' > data/inbox_manual.json
-          git add data/inbox_manual.json
+          def info(msg: str) -> None:
+              print(f"ℹ️  {msg}")
 
-          if git diff --cached --quiet; then
-            echo "No manual buffer changes."
-          else
-            git commit -m "chore: clear manual inbox buffer"
-            git push
-          fi
+          def norm(s: str) -> str:
+              return (s or "").strip()
+
+          def norm_key(s: str) -> str:
+              return re.sub(r"\s+", " ", norm(s)).lower()
+
+          def canonical_url(raw: str) -> str:
+              raw = norm(raw)
+              if not raw:
+                  return ""
+              try:
+                  parsed = urlparse(raw)
+              except Exception:
+                  return raw
+              query_pairs = []
+              for key, value in parse_qsl(parsed.query, keep_blank_values=True):
+                  k = key.lower().strip()
+                  if k.startswith("utm_") or k in {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "ref_src"}:
+                      continue
+                  query_pairs.append((key, value))
+              cleaned = parsed._replace(
+                  scheme=(parsed.scheme or "https").lower(),
+                  netloc=parsed.netloc.lower(),
+                  query=urlencode(query_pairs, doseq=True),
+                  fragment="",
+              )
+              return urlunparse(cleaned).rstrip("/")
+
+          def dedupe_fp(title: str, date_value: str, location: str) -> str:
+              return "|".join([
+                  norm_key(title),
+                  norm(date_value),
+                  norm_key(location),
+              ])
+
+          if not MANUAL_JSON_PATH.exists():
+              fail(f"Manual-JSON fehlt: {MANUAL_JSON_PATH}")
+
+          try:
+              raw = json.loads(MANUAL_JSON_PATH.read_text(encoding="utf-8"))
+          except Exception as e:
+              fail(f"Manual-JSON ist ungültig: {e}")
+
+          if not isinstance(raw, list):
+              fail("data/inbox_manual.json muss ein JSON-Array sein.")
+
+          if not raw:
+              info("data/inbox_manual.json ist leer. Nichts zu importieren.")
+              sys.exit(0)
+
+          sheet_id = os.environ.get("SHEET_ID", "").strip()
+          sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+          if not sheet_id:
+              fail("ENV SHEET_ID fehlt.")
+          if not sa_json:
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
+
+          try:
+              sa_info = json.loads(sa_json)
+          except Exception:
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
+
+          scopes = [
+              "https://www.googleapis.com/auth/spreadsheets",
+          ]
+          creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
+          service = build("sheets", "v4", credentials=creds, cache_discovery=False)
+
+          res = service.spreadsheets().values().get(
+              spreadsheetId=sheet_id,
+              range="Inbox!A:ZZ"
+          ).execute()
+
+          values = res.get("values", []) or []
+          if not values:
+              fail('Inbox-Tab ist leer oder nicht lesbar.')
+
+          header = [str(h).strip() for h in (values[0] or [])]
+          missing_columns = [col for col in INBOX_COLUMNS if col not in header]
+          if missing_columns:
+              fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing_columns}")
+
+          existing_rows = []
+          for r in values[1:]:
+              row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
+              if any(v for v in row):
+                  existing_rows.append(dict(zip(header, row)))
+
+          existing_source_urls = set()
+          existing_fps = set()
+
+          for row in existing_rows:
+              source_url = canonical_url(row.get("source_url", ""))
+              if source_url:
+                  existing_source_urls.add(norm_key(source_url))
+              fp = dedupe_fp(
+                  row.get("title", ""),
+                  row.get("date", ""),
+                  row.get("location", ""),
+              )
+              if fp != "||":
+                  existing_fps.add(fp)
+
+          created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+          rows_to_append = []
+          skipped = 0
+
+          for idx, item in enumerate(raw, start=1):
+              if not isinstance(item, dict):
+                  fail(f"Element #{idx} ist kein Objekt.")
+
+              normalized = {}
+              for key, value in item.items():
+                  if value is None:
+                      normalized[str(key)] = ""
+                  elif isinstance(value, (str, int, float, bool)):
+                      normalized[str(key)] = str(value).strip()
+                  else:
+                      fail(f"Element #{idx}: Feld '{key}' ist kein skalarer Wert.")
+
+              missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]
+              if missing_required:
+                  fail(f"Element #{idx}: missing_required={','.join(missing_required)}")
+
+              date_value = norm(normalized.get("date", ""))
+              if date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", date_value):
+                  fail(f"Element #{idx}: invalid_date_format")
+
+              end_date_value = norm(normalized.get("endDate", ""))
+              if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
+                  fail(f"Element #{idx}: invalid_endDate_format")
+
+              normalized["status"] = "review"
+              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
+              normalized["source_url"] = canonical_url(normalized.get("source_url", ""))
+              normalized["url"] = canonical_url(normalized.get("url", ""))
+
+              source_url_key = norm_key(normalized["source_url"])
+              fp = dedupe_fp(
+                  normalized.get("title", ""),
+                  normalized.get("date", ""),
+                  normalized.get("location", ""),
+              )
+
+              if source_url_key and source_url_key in existing_source_urls:
+                  skipped += 1
+                  continue
+
+              if fp != "||" and fp in existing_fps:
+                  skipped += 1
+                  continue
+
+              row_map = {col: "" for col in header}
+              for col in header:
+                  if col in normalized:
+                      row_map[col] = normalized[col]
+
+              rows_to_append.append([row_map.get(col, "") for col in header])
+
+              if source_url_key:
+                  existing_source_urls.add(source_url_key)
+              if fp != "||":
+                  existing_fps.add(fp)
+
+          if not rows_to_append:
+              info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
+              sys.exit(0)
+
+          service.spreadsheets().values().append(
+              spreadsheetId=sheet_id,
+              range
