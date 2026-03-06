@@ -1,26 +1,26 @@
-# === BEGIN BLOCK: MANUAL INBOX IMPORTER (JSON -> Google Sheet Inbox, curaton-first) ===
+# === BEGIN BLOCK: MANUAL INBOX IMPORTER (JSON -> local TSV Inbox, curation-first) ===
 # Datei: scripts/inbox-manual-to-sheet.py
 # Zweck:
 # - Liest data/inbox_manual.json
 # - Validiert feste Manual-Intake-Struktur
-# - Deduped gegen bestehenden Sheet-Tab "Inbox"
+# - Deduped gegen bestehende data/inbox.tsv
 # - Appendet nur neue Zeilen mit status="review"
 # - Schreibt klare Run-Summary ins Log
 #
 # Eingaben (ENV):
-# - SHEET_ID
-# - GOOGLE_SERVICE_ACCOUNT_JSON
-# - optional: TAB_INBOX (default: Inbox)
 # - optional: MANUAL_INBOX_JSON_PATH (default: data/inbox_manual.json)
+# - optional: INBOX_TSV_PATH (default: data/inbox.tsv)
 #
 # Regeln:
 # - Kein UI-Work
-# - Fail-fast bei fehlenden Secrets / ungültigem JSON / fehlenden Inbox-Spalten
+# - Kein Google Sheet / keine Secrets nötig
+# - Fail-fast bei ungültigem JSON / ungültiger TSV-Struktur
 # - Dedupe mindestens über source_url, zusätzlich title+date+location
-# === END BLOCK: MANUAL INBOX IMPORTER (JSON -> Google Sheet Inbox, curaton-first) ===
+# === END BLOCK: MANUAL INBOX IMPORTER (JSON -> local TSV Inbox, curation-first) ===
 
 from __future__ import annotations
 
+import csv
 import json
 import os
 import re
@@ -30,21 +30,18 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 
-
-# === BEGIN BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox columns) ===
+# === BEGIN BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox TSV columns) ===
 # Datei: scripts/inbox-manual-to-sheet.py
 # Zweck:
 # - Definiert festen Schema-Vertrag für data/inbox_manual.json
-# - Hält Spaltenreihenfolge exakt kompatibel zum bestehenden Inbox-Sheet
+# - Hält Spaltenreihenfolge kompatibel zu data/inbox.tsv / build-inbox-from-tsv.py
 # Umfang:
-# - Nur Konfiguration / Schema
-# === END BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox columns) ===
+# - Nur Konfiguration / Schema / Pfade
+# === END BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox TSV columns) ===
 ROOT = Path(__file__).resolve().parents[1]
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
-TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
+INBOX_TSV_PATH = Path(os.environ.get("INBOX_TSV_PATH", str(ROOT / "data" / "inbox.tsv")))
 
 INBOX_COLUMNS = [
     "status",
@@ -76,7 +73,7 @@ REQUIRED_JSON_KEYS = [
     "source_name",
     "source_url",
 ]
-# === END BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox columns) ===
+# === END BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox TSV columns) ===
 
 
 def fail(msg: str) -> None:
@@ -134,68 +131,6 @@ def dedupe_fp(title: str, date_value: str, location: str) -> str:
     ])
 
 
-def get_sheet_service() -> object:
-    sheet_id = os.environ.get("SHEET_ID")
-    sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
-    if not sheet_id:
-        fail("ENV SHEET_ID fehlt.")
-    if not sa_json:
-        fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
-
-    try:
-        sa_info = json.loads(sa_json)
-    except Exception:
-        fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
-
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
-    return build("sheets", "v4", credentials=creds, cache_discovery=False)
-
-
-def read_tab(service: object, sheet_id: str, tab_name: str) -> list[list[str]]:
-    rng = f"{tab_name}!A:ZZ"
-    try:
-        res = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=rng).execute()
-        return res.get("values", []) or []
-    except Exception as e:
-        fail(f"Tab '{tab_name}' konnte nicht gelesen werden. Existiert er? ({e})")
-
-
-def append_rows(service: object, sheet_id: str, tab_name: str, rows: list[list[str]]) -> None:
-    if not rows:
-        return
-
-    body = {"values": rows}
-    service.spreadsheets().values().append(
-        spreadsheetId=sheet_id,
-        range=f"{tab_name}!A1",
-        valueInputOption="RAW",
-        insertDataOption="INSERT_ROWS",
-        body=body,
-    ).execute()
-
-
-def sheet_header(values: list[list[str]]) -> list[str]:
-    if not values:
-        return []
-    return [norm(h) for h in values[0]]
-
-
-def sheet_rows_to_dicts(values: list[list[str]]) -> Tuple[list[str], list[Dict[str, str]]]:
-    header = sheet_header(values)
-    if not header:
-        return [], []
-
-    rows: list[Dict[str, str]] = []
-    for row in values[1:]:
-        obj: Dict[str, str] = {}
-        for i, col in enumerate(header):
-            obj[col] = norm(row[i]) if i < len(row) else ""
-        if any(v for v in obj.values()):
-            rows.append(obj)
-    return header, rows
-
-
 def load_manual_json(path: Path) -> list[Dict[str, str]]:
     if not path.exists():
         fail(f"Manual-JSON fehlt: {path}")
@@ -249,6 +184,38 @@ def validate_item(item: Dict[str, str], idx: int) -> Tuple[bool, str]:
     return True, ""
 
 
+def ensure_inbox_tsv_exists(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        return
+
+    with path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, delimiter="\t", lineterminator="\n")
+        writer.writerow(INBOX_COLUMNS)
+
+
+def read_inbox_tsv(path: Path) -> Tuple[list[str], list[Dict[str, str]]]:
+    ensure_inbox_tsv_exists(path)
+
+    with path.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        header = reader.fieldnames or []
+        if not header:
+            fail(f"Inbox-TSV hat keine Header-Zeile: {path}")
+
+        missing_columns = [col for col in INBOX_COLUMNS if col not in header]
+        if missing_columns:
+            fail(f"Inbox-TSV Header unvollständig. Fehlende Spalten: {missing_columns}")
+
+        rows: list[Dict[str, str]] = []
+        for raw in reader:
+            row = {k: norm(v if v is not None else "") for k, v in raw.items()}
+            if any(v for v in row.values()):
+                rows.append(row)
+
+    return header, rows
+
+
 def build_existing_indexes(rows: list[Dict[str, str]]) -> Tuple[set[str], set[str]]:
     source_urls: set[str] = set()
     fingerprints: set[str] = set()
@@ -284,6 +251,15 @@ def build_output_row(item: Dict[str, str], inbox_header: list[str], created_at: 
     return [row_map.get(col, "") for col in inbox_header]
 
 
+def append_rows_to_tsv(path: Path, header: list[str], rows: list[list[str]]) -> None:
+    if not rows:
+        return
+
+    with path.open("a", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f, delimiter="\t", lineterminator="\n")
+        writer.writerows(rows)
+
+
 def write_summary(total_input: int, added: int, deduped: int, skipped_invalid: int, invalid_details: list[str]) -> None:
     lines = [
         "MANUAL KI EVENT INTAKE SUMMARY",
@@ -306,22 +282,11 @@ def write_summary(total_input: int, added: int, deduped: int, skipped_invalid: i
 
 
 def main() -> None:
-    spreadsheet_id = os.environ.get("SHEET_ID", "")
-    service = get_sheet_service()
-
     info(f"Lese Manual-JSON: {MANUAL_JSON_PATH}")
     manual_items = load_manual_json(MANUAL_JSON_PATH)
 
-    info(f"Lese Sheet-Tab '{TAB_INBOX}'")
-    inbox_values = read_tab(service, spreadsheet_id, TAB_INBOX)
-    inbox_header, inbox_rows = sheet_rows_to_dicts(inbox_values)
-
-    if not inbox_header:
-        fail("Inbox-Tab hat keine Header-Zeile.")
-
-    missing_columns = [col for col in INBOX_COLUMNS if col not in inbox_header]
-    if missing_columns:
-        fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing_columns}")
+    info(f"Lese lokale Inbox-TSV: {INBOX_TSV_PATH}")
+    inbox_header, inbox_rows = read_inbox_tsv(INBOX_TSV_PATH)
 
     existing_source_urls, existing_fps = build_existing_indexes(inbox_rows)
 
@@ -358,7 +323,8 @@ def main() -> None:
         batch_fps.add(fp)
         added += 1
 
-    append_rows(service, spreadsheet_id, TAB_INBOX, rows_to_append)
+    append_rows_to_tsv(INBOX_TSV_PATH, inbox_header, rows_to_append)
+
     write_summary(
         total_input=len(manual_items),
         added=added,
