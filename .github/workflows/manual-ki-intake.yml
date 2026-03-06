@@ -1,14 +1,15 @@
-# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> Inbox sheet append) ===
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> local TSV + inbox.json + commit) ===
 # Datei: .github/workflows/manual-ki-intake.yml
 # Zweck:
 # - Startet den manuellen KI-Intake per workflow_dispatch
-# - Führt scripts/inbox-manual-to-sheet.py aus
-# - Nutzt bestehende Google-Sheets-Secrets
+# - Importiert data/inbox_manual.json in data/inbox.tsv
+# - Baut danach data/inbox.json neu
+# - Commitet geänderte Inbox-Daten zurück ins Repo
 # Umfang:
-# - Kein UI-Work
-# - Nur manueller Import in Tab "Inbox"
-# - Fail-fast bei Script-/Secret-Fehlern
-# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> Inbox sheet append) ===
+# - Kein Google Sheet
+# - Keine Secrets nötig
+# - Fail-fast bei Import-/Build-Fehlern
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (workflow_dispatch -> local TSV + inbox.json + commit) ===
 
 name: Manual KI Event Intake
 
@@ -16,11 +17,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   manual_ki_event_intake:
-    name: Import manual inbox JSON into Sheet Inbox
+    name: Import manual inbox JSON into local Inbox TSV
     runs-on: ubuntu-latest
 
     steps:
@@ -28,14 +29,16 @@ jobs:
       # Zweck:
       # - Holt den aktuellen Repo-Stand inkl. data/inbox_manual.json und scripts/
       # Umfang:
-      # - Standard-Checkout
+      # - Standard-Checkout mit Schreibrechten für Commit
       # === END BLOCK: CHECKOUT REPOSITORY (workflow input basis) ===
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # === BEGIN BLOCK: SETUP PYTHON RUNTIME (script execution runtime) ===
       # Zweck:
-      # - Stellt Python für das Import-Skript bereit
+      # - Stellt Python für Import + Build bereit
       # Umfang:
       # - Python 3.11
       # === END BLOCK: SETUP PYTHON RUNTIME (script execution runtime) ===
@@ -44,30 +47,54 @@ jobs:
         with:
           python-version: "3.11"
 
-      # === BEGIN BLOCK: INSTALL IMPORT DEPENDENCIES (Google Sheets client only) ===
+      # === BEGIN BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> local TSV) ===
       # Zweck:
-      # - Installiert nur die für den Sheet-Import nötigen Pakete
-      # Umfang:
-      # - minimal-invasive Dependencies
-      # === END BLOCK: INSTALL IMPORT DEPENDENCIES (Google Sheets client only) ===
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth
-
-      # === BEGIN BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> Sheet Inbox) ===
-      # Zweck:
-      # - Führt den Manual-KI-Import aus
+      # - Führt den lokalen Manual-KI-Import aus
       # - Liest data/inbox_manual.json
-      # - Appendet neue review-Zeilen in Tab "Inbox"
+      # - Appendet neue review-Zeilen in data/inbox.tsv
       # Umfang:
-      # - nutzt bestehende Secrets SHEET_ID + GOOGLE_SERVICE_ACCOUNT_JSON
-      # === END BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> Sheet Inbox) ===
+      # - keine externen Abhängigkeiten
+      # === END BLOCK: RUN MANUAL INBOX IMPORTER (JSON -> local TSV) ===
       - name: Run manual inbox importer
-        env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          TAB_INBOX: Inbox
-          MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
         run: |
+          set -e
+          python scripts/inbox-manual-to-sheet.py
+
+      # === BEGIN BLOCK: BUILD INBOX JSON (TSV -> JSON for Review PWA) ===
+      # Zweck:
+      # - Baut data/inbox.json aus data/inbox.tsv
+      # Umfang:
+      # - nutzt bestehenden Build-Flow
+      # === END BLOCK: BUILD INBOX JSON (TSV -> JSON for Review PWA) ===
+      - name: Build inbox.json from inbox.tsv
+        run: |
+          set -e
+          python scripts/build-inbox-from-tsv.py
+
+          echo "=== inbox.json (head) ==="
+          head -n 60 data/inbox.json || true
+
+      # === BEGIN BLOCK: COMMIT GENERATED INBOX FILES (repo is source of truth for manual intake) ===
+      # Zweck:
+      # - Commitet geänderte Inbox-Daten zurück ins Repo
+      # - Kein Commit, wenn nichts geändert wurde
+      # Umfang:
+      # - data/inbox.tsv
+      # - data/inbox.json
+      # === END BLOCK: COMMIT GENERATED INBOX FILES (repo is source of truth for manual intake) ===
+      - name: Commit updated inbox files
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/inbox.tsv data/inbox.json
+
+          if git diff --cached --quiet; then
+            echo "No inbox changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: import manual inbox items"
+          git push
           python scripts/inbox-manual-to-sheet.py
