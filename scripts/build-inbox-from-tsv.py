@@ -109,7 +109,7 @@ def parse_created_at(ts: str) -> Optional[datetime]:
         return None
 
 
-def read_tsv(path: Path) -> List[Dict[str, str]]:
+def read_tsv(path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
     if not path.exists():
         fail(f"TSV-Datei fehlt: {path}")
 
@@ -158,14 +158,13 @@ def read_tsv(path: Path) -> List[Dict[str, str]]:
                 cleaned[nk] = (v if v is not None else "")
             rows.append(cleaned)
 
-        return rows
+        return norm_fieldnames, rows
 
 
 def main() -> None:
-    rows = read_tsv(TSV_PATH)
+    header, rows = read_tsv(TSV_PATH)
 
     # Header-Check
-    header = set(rows[0].keys()) if rows else set()
     missing = [f for f in REQUIRED_FIELDS if f not in header]
     if missing:
         fail(f"TSV Header unvollständig. Fehlende Spalten: {missing}. Erwartet mindestens: {REQUIRED_FIELDS}")
