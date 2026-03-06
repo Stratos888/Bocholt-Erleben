@@ -1,0 +1,19 @@
+[
+  {
+    "row_number": 2,
+    "status": "review",
+    "title": "Frühlingsmarkt Bocholt",
+    "source_url": "https://example.com/fruehlingsmarkt-bocholt",
+    "created_at": "2026-03-06 09:09:50",
+    "date": "2026-04-18",
+    "endDate": "2026-04-18",
+    "time": "11:00",
+    "city": "Bocholt",
+    "location": "Innenstadt Bocholt",
+    "kategorie_suggestion": "Markt",
+    "url": "https://example.com/fruehlingsmarkt-bocholt",
+    "description": "Frühlingsmarkt mit Ständen und Musik.",
+    "source_name": "Bocholt Marketing",
+    "notes": "manual ki test"
+  }
+]
