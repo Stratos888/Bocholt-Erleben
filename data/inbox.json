@@ -1,5 +1,22 @@
 [
   {
+    "row_number": 3,
+    "status": "review",
+    "title": "Sommerabend am Aasee",
+    "source_url": "https://example.com/sommerabend-aasee",
+    "created_at": "2026-03-06 09:24:25",
+    "date": "2026-06-12",
+    "endDate": "2026-06-12",
+    "time": "18:30",
+    "city": "Bocholt",
+    "location": "Aasee Bocholt",
+    "kategorie_suggestion": "Open Air",
+    "url": "https://example.com/sommerabend-aasee",
+    "description": "Open-Air-Abend mit Musik und Gastro.",
+    "source_name": "Bocholt Tourismus",
+    "notes": "manual ki e2e test"
+  },
+  {
     "row_number": 2,
     "status": "review",
     "title": "Frühlingsmarkt Bocholt",
