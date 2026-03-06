@@ -1997,9 +1997,7 @@ html.is-panel-open body {
 
 /* === END BLOCK: DP-DESC-SOURCE-LINKS-V4 === */
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy)
-
-=== */
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 === */
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -3098,4 +3096,5 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
