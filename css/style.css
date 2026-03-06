@@ -38,6 +38,13 @@
   --feed-title-mt: 4px;
   --feed-title-mb: 6px;
 
+  /* DETAILPANEL LAYOUT TOKENS (GS-Detailpanel frozen contract) */
+  --dp-header-pad-top: 34px;
+  --dp-close-size: 36px;
+  --dp-actionbar-h: 78px;
+  --dp-actionbar-pad-y: var(--space-sm);
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
+
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
   --radius-card: 12px;
@@ -3142,5 +3149,6 @@ svg.ui-icon-svg{
 }
 
 /* === END BLOCK: CSS_SECTION_HEADER_MODAL === */
+
 
 
