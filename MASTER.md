@@ -270,6 +270,11 @@ DECISIONS LOG (permanent, project-wide):
   - Facet-Counts bleiben kontextabhängig (Search + aktive Kategorie) und berücksichtigen `endDate`.
 - Control-System-DNA ist tokenbasiert:
   - Search/Pills/Reset nutzen gemeinsame Control Tokens; Fokus-Ring ausschließlich über `--ui-focus-ring`.
+- Pipeline strategy shift (Bocholt-only, quality-first):
+  - LLM Collector pipeline is parked for now (optional later add-on).
+  - Primary intake becomes “Manual KI → curatierfreundlich” using the existing Inbox Review PWA workflow.
+  - Optional later: neutral newsletter leads (facts only + deep-link; no description copying).
+  - Search/Pills/Reset nutzen gemeinsame Control Tokens; Fokus-Ring ausschließlich über `--ui-focus-ring`.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Detailpanel bleibt Enterprise-Baseline (frozen unless critical bug); in dieser Session nicht verändert.
@@ -290,9 +295,13 @@ REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
 NEXT CHAT PROMPT (start here):
 „GS-01.5 Offline-Indicator umsetzen: UI-only. Ziel: Toast bei online/offline Wechsel + persistentes Offline-Badge solange offline. Bitte ZIP-first: MASTER.md + ENGINEERING.md lesen, dann one-file-at-a-time Patch liefern (CSS-first; minimal JS für online/offline Listener). Pipeline-Sektion in MASTER.md nicht anfassen.“
 
-PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: HYBRID GO-LIVE TRACK (QUALITY-FIRST)
+PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: PARKED (for later / optional add-on)
 
-Current architecture (verified in runs):
+Reason (decision):
+- Current focus is “curation-first intake” for Bocholt only.
+- Scalability/automation is not priority right now; trial/error on scraping domains is too costly.
+
+Current architecture (kept as reference; do not delete; use later if reactivated):
 
 Sources (Google Sheet tab "Sources")
 → Collector (HTML + RSS; Playwright for HTML)
@@ -307,13 +316,13 @@ Key configuration rule (proven critical):
 - For HTML sources, `include_detail_pages=true` is required to collect real event detail URLs
   unless an explicit list-page fallback exists.
 
-Hybrid go-live strategy (decided):
+Hybrid go-live strategy (decided; keep):
 - Primary goal: Inbox must stay curatable (quality & completeness), not maximum intake.
 - Duplicates are acceptable during rapid run cycles; focus metric is "good inbox_new".
 - Disable low-yield/high-noise sources for now; re-enable later only if needed.
 - Prefer source-scoped rules (per domain) over fragile global heuristics.
 
-Quality improvements implemented (confirmed by runs):
+Quality improvements implemented (confirmed by runs; keep):
 1) Strict detail URL gating for JUNGE UNI
 - Only accept detail URLs matching: `/programm/kurs/...`
 - Result: category/overview pages (e.g., /info/...) no longer pollute Inbox.
@@ -334,7 +343,7 @@ Quality improvements implemented (confirmed by runs):
   `...#event=<hash>`
 - Write directly to Inbox without detail fetch (still subject to title/date gate + non-event filter).
 
-Recent proof runs (high-signal milestones):
+Recent proof runs (high-signal milestones; keep):
 - 2026-03-05T06:27:21Z: sources=14 → candidates_logged=111 → inbox_new=10
   - 10/10 curatable (JUNGE UNI).
 - 2026-03-05T07:23:06Z: sources=11 → candidates_logged=109 → inbox_new=10
@@ -343,14 +352,7 @@ Recent proof runs (high-signal milestones):
   - 3/4 curatable (JUNGE UNI)
   - 1/4 Coltplay written but title/location extraction is wrong (phone/email line used).
 
-Current state (as of last run in this session):
-- Stable good intake source: JUNGE UNI (consistently curatable).
-- Other sources often show dup/no-new during minute-by-minute runs (expected).
-- Band sources:
-  - Coltplay: list-page fallback produces candidates but needs domain-specific row parsing to avoid phone/email lines.
-  - Django Flint: list-page fallback currently produces 0 candidates; needs domain-specific selectors/date parsing.
-
-Known remaining blockers (next work, pipeline only):
+Known remaining blockers (pipeline-only; deferred):
 A) Coltplay list-page parsing must become domain-specific
 - Extract actual tour rows (date/time/venue/city), never contact/footer text.
 - Build clean titles like: "Coltplay – <Venue/City>".
@@ -362,10 +364,35 @@ C) Keep strict inbox quality gates
 - Inbox must not contain listing/overview placeholders.
 - Any list-page fallback must produce valid (title+date [+time/location]) or be skipped.
 
-Next steps (next chat, in this order):
+Deferred next steps (only if/when pipeline is reactivated):
 1) Inspect Coltplay tour HTML and implement robust domain-specific extractor (selectors → rows → date/time/venue/city).
 2) Inspect Django Flint termine HTML and implement robust domain-specific extractor.
 3) Run once; verify:
+   - Coltplay produces multiple correct events
+   - Django Flint produces events
+   - Inbox remains 100% curatable (no placeholders/listings)
+
+
+PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only)
+
+Goal:
+- Minimal ongoing effort.
+- Regular intake of “good events” without scraping/Cloudflare trial/error.
+- Output must be immediately curatable in the existing Inbox Review PWA.
+
+Rules (fixed):
+- Extract facts only (title/date/time/location/city/source URL/category suggestion).
+- Do not copy long descriptions from sources/newsletters.
+- Prefer neutral/public sources; avoid over-representing potential future organizer subscribers.
+- Deliver as a file format that can be imported into the existing inbox flow (no copy/paste into spreadsheets).
+
+Planned integration (minimal, no UI work):
+- KI generates `data/inbox_manual.json` (or equivalent) using a fixed schema.
+- A manual import step appends these rows into the Inbox source of truth (Google Sheet tab "Inbox") with `status=review`,
+  so the existing Inbox Review PWA can be used unchanged (approve/reject + writeback).
+
+Optional lead source (later):
+- Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
    - Coltplay produces multiple correct events
    - Django Flint produces events
    - Inbox remains 100% curatable (no placeholders/listings)
