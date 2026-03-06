@@ -112,13 +112,52 @@ def parse_created_at(ts: str) -> Optional[datetime]:
 def read_tsv(path: Path) -> List[Dict[str, str]]:
     if not path.exists():
         fail(f"TSV-Datei fehlt: {path}")
+
+    # Robustness:
+    # - tolerate UTF-8 BOM in header
+    # - tolerate accidental delimiter changes (tab is canonical; fallback to ; or ,)
     with path.open("r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f, delimiter="\t")
+        first_line = f.readline()
+        if not first_line:
+            fail("TSV hat keine Headerzeile.")
+
+        # detect delimiter
+        tab_count = first_line.count("\t")
+        semi_count = first_line.count(";")
+        comma_count = first_line.count(",")
+
+        if tab_count > 0:
+            delimiter = "\t"
+        elif semi_count > 0 and semi_count >= comma_count:
+            delimiter = ";"
+        elif comma_count > 0:
+            delimiter = ","
+        else:
+            delimiter = "\t"
+
+        f.seek(0)
+
+        reader = csv.DictReader(f, delimiter=delimiter)
         if not reader.fieldnames:
             fail("TSV hat keine Headerzeile.")
+
+        # normalize header names (strip BOM + whitespace)
+        norm_fieldnames = []
+        for name in reader.fieldnames:
+            n = (name or "")
+            n = n.lstrip("\ufeff").strip()
+            norm_fieldnames.append(n)
+        reader.fieldnames = norm_fieldnames
+
         rows: List[Dict[str, str]] = []
         for row in reader:
-            rows.append({k: (v if v is not None else "") for k, v in row.items()})
+            # normalize row keys to match normalized fieldnames
+            cleaned: Dict[str, str] = {}
+            for k, v in row.items():
+                nk = (k or "").lstrip("\ufeff").strip()
+                cleaned[nk] = (v if v is not None else "")
+            rows.append(cleaned)
+
         return rows
 
 
