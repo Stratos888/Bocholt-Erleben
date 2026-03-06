@@ -292,7 +292,7 @@ def write_manual_json(path: Path, items: List[Dict[str, str]]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def write_summary(stats: Dict[str, int], source_count: int, out_path: Path) -> None:
+def write_summary(stats: Dict[str, Any], source_count: int, out_path: Path) -> None:
     lines = [
         "LLM CURATION TO MANUAL INBOX SUMMARY",
         f"- sources_selected: {source_count}",
@@ -303,6 +303,22 @@ def write_summary(stats: Dict[str, int], source_count: int, out_path: Path) -> N
         f"- skipped_quality: {stats.get('skipped_quality', 0)}",
         f"- output_file: {out_path}",
     ]
+
+    quality_reason_counts = stats.get("quality_reason_counts", {}) or {}
+    if quality_reason_counts:
+        lines.append("- quality_reasons:")
+        for key in sorted(quality_reason_counts.keys()):
+            lines.append(f"  - {key}: {quality_reason_counts[key]}")
+
+    source_candidate_counts = stats.get("source_candidate_counts", {}) or {}
+    source_written_counts = stats.get("source_written_counts", {}) or {}
+    if source_candidate_counts:
+        lines.append("- per_source:")
+        for source_name in sorted(source_candidate_counts.keys()):
+            seen = source_candidate_counts.get(source_name, 0)
+            written = source_written_counts.get(source_name, 0)
+            lines.append(f"  - {source_name}: seen={seen}, written={written}")
+
     summary = "\n".join(lines)
     print(summary)
 
@@ -339,6 +355,10 @@ async def collect_manual_candidates(helper: Any) -> Tuple[List[Dict[str, str]], 
         "skipped_invalid": 0,
         "skipped_deduped": 0,
         "skipped_quality": 0,
+    }
+    quality_reason_counts: Dict[str, int] = {}
+    source_candidate_counts: Dict[str, int] = {}
+    source_written_counts: Dict[str, int] = {}
     }
 
     for cfg in llm_sources:
@@ -378,6 +398,8 @@ async def collect_manual_candidates(helper: Any) -> Tuple[List[Dict[str, str]], 
                 break
 
             stats["candidates_seen"] += 1
+            source_name = norm(getattr(cfg, "source_name", "")) or norm(getattr(cfg, "url", "")) or "unknown_source"
+            source_candidate_counts[source_name] = source_candidate_counts.get(source_name, 0) + 1
 
             fields: Dict[str, str] = {}
             try:
@@ -405,6 +427,7 @@ async def collect_manual_candidates(helper: Any) -> Tuple[List[Dict[str, str]], 
             is_ok, reason = is_reviewable_candidate(item, helper)
             if not is_ok:
                 stats["skipped_quality"] += 1
+                quality_reason_counts[reason] = quality_reason_counts.get(reason, 0) + 1
                 continue
 
             source_url_key = norm_key(item.get("source_url", "") or item.get("url", ""))
@@ -422,10 +445,14 @@ async def collect_manual_candidates(helper: Any) -> Tuple[List[Dict[str, str]], 
             batch_source_urls.add(source_url_key)
             batch_fps.add(fp)
             stats["written_manual_json"] += 1
+            source_written_counts[source_name] = source_written_counts.get(source_name, 0) + 1
 
         if stats["written_manual_json"] >= MAX_NEW_PER_RUN:
             break
 
+    stats["quality_reason_counts"] = quality_reason_counts
+    stats["source_candidate_counts"] = source_candidate_counts
+    stats["source_written_counts"] = source_written_counts
     return output_items, stats, len(llm_sources)
 # === END BLOCK: COLLECT + CURATE CANDIDATES (reuse existing LLM discovery helpers) ===
 
