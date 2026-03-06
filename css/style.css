@@ -1,4 +1,3 @@
-/* === BEGIN BLOCK: CSS_SECTION_TOKENS_CANONICAL === */
 /* GLOBAL DESIGN TOKENS */
 
 :root{
@@ -26,25 +25,6 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
-
-  /* LAYOUT TOKENS (header + sticky stack) */
-  --gutter-lg: 24px;
-  --header-h: 48px;
-  --stack-gap: 0px;
-
-  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
-  --feed-section-pad-top: 6px;
-  --feed-cards-gap: 10px;
-  --feed-title-mt: 4px;
-  --feed-title-mb: 6px;
-
-  /* DETAILPANEL LAYOUT TOKENS (GS-Detailpanel frozen contract) */
-  --dp-header-pad-top: 34px;
-  --dp-close-size: 36px;
-  --dp-actionbar-h: 78px;
-  --dp-actionbar-pad-y: var(--space-sm);
-  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
-
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
   --radius-card: 12px;
@@ -102,11 +82,6 @@
     0 1px 0 rgba(255,255,255,0.80) inset;
   --ui-control-ring-active: rgba(139,207,74,0.09);
   --ui-tap-target: 44px;
-
-  --ui-icon-size-sm: 16px;
-  --ui-icon-size-md: 18px;
-  --ui-icon-size-lg: 22px;
-
   --ui-icon-stroke-sm: 1.75;
   --ui-icon-stroke-md: 1.85;
   --ui-icon-stroke-lg: 2;
@@ -139,10 +114,43 @@
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
 }
-/* === END BLOCK: CSS_SECTION_TOKENS_CANONICAL === */
-/* === BEGIN BLOCK: CSS_FILE_HEADER === */
-/* Bocholt erleben — css/style.css (canonical) */
-/* === END BLOCK: CSS_FILE_HEADER === */
+
+/**
+ * STYLE.CSS – Bocholt erleben (MVP frozen)
+ * Ziel: ruhig, modern, funktional, konsistent
+ * Architektur: Single Source of Truth
+ */
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* REDUCED MOTION CONTRACT (enterprise a11y) */
+@media (prefers-reduced-motion: reduce){
+
+  html:focus-within{
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+}
+
+/* (removed duplicate :root; merged into the first one) */
+
 
 /* GLOBAL TYPOGRAPHY BASE */
 body{
@@ -159,9 +167,10 @@ body{
 /* DESKTOP BACKDROP POLISH */
 @media (min-width: 900px){
   :root{
-
     --gutter: var(--gutter-lg);
+/* OVERLAY TOKENS (global design system contract) */
 
+  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
 
   }
 
@@ -438,13 +447,13 @@ body.is-sheet-open .top-stack{ z-index: 9997 !important; }
 body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
 
 
-/* === END BLOCK: CSS_SECTION_BASE_RESET === */
-
-/* === BEGIN BLOCK: CSS_SECTION_LOADING_MESSAGES === */
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
-/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) === */
+/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) ===
+   Zweck: #loading darf nie Layout verschieben; Loading als fixed Overlay.
+   Umfang: Ersetzt nur .loading-container/.loading-spinner/@keyframes spin.
+=== */
 .loading-container {
   position: fixed;
   inset: 0;
@@ -493,9 +502,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 .info-message { background: #fff3cd; }
 .error-message { background: #f8d7da; color: #721c24; }
 
-/* === BEGIN BLOCK: CSS_SECTION_EMPTY_STATE === */
-/* === END BLOCK: CSS_SECTION_LOADING_MESSAGES === */
-
 /* ============================================
    EMPTY STATE
    ============================================ */
@@ -533,7 +539,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
+/* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) ===
+   Zweck: Skeleton-Styles für Eventcards (kein Layout-Jump, ruhiges Shimmer).
+   Umfang: Fügt neue Klassen hinzu, ohne bestehende Eventcard-Styles zu verändern.
+=== */
 .event-card.is-skeleton{
   cursor: default;
   user-select: none;
@@ -580,9 +589,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 /* === END BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
 
-/* === END BLOCK: CSS_SECTION_EMPTY_STATE === */
-
-/* === BEGIN BLOCK: CSS_SECTION_EVENT_FEED === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
 /* Guardrail: nichts darf breiter als der Viewport werden */
@@ -643,7 +649,11 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: EVENTCARD-TAP-HIGHLIGHT-V1 === */
+/* BEGIN PATCH EVENTCARD-TAP-HIGHLIGHT-V1
+   Zweck: Entfernt den mobilen „blauen Tap-Flash“ auf Eventcards (native WebKit/Chromium Tap-Highlight),
+          ohne die vorhandenen :active Press-Styles (scale) zu verändern.
+   Umfang: Ersetzt nur den kleinen Klick-Block für .event-card (cursor/interaction).
+*/
   
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
@@ -660,7 +670,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   user-select: none;
 }
 
-/* === END BLOCK: EVENTCARD-TAP-HIGHLIGHT-V1 === */
+/* END PATCH EVENTCARD-TAP-HIGHLIGHT-V1 */
 
 
 /* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
@@ -854,7 +864,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: ICONS-CSS-EVENTCARD-V1 === */
+/* BEGIN PATCH ICONS-CSS-EVENTCARD-V1
+   Zweck: Event-Card Kategorie-Icon state-of-the-art SVG (kein Emoji-Legacy), Größe via Tokens (sm).
+   Umfang: Ersetzt nur .event-title .event-category-icon + svg/img clamp.
+*/
 /* EVENT CARD CATEGORY INDICATOR (state-of-the-art, tokenized) */
 .event-title .event-category-icon{
   flex: 0 0 auto;
@@ -897,7 +910,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   opacity: var(--eventcard-category-opacity);
   filter: none;
 }
-/* === END BLOCK: ICONS-CSS-EVENTCARD-V1 === */
+/* END PATCH ICONS-CSS-EVENTCARD-V1 */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
@@ -988,9 +1001,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === END BLOCK: CSS_SECTION_EVENT_FEED === */
-
-/* === BEGIN BLOCK: CSS_SECTION_FOOTER === */
 /* ============================================
    FOOTER
    ============================================ */
@@ -1038,9 +1048,6 @@ footer {
 }
 
 
-/* === BEGIN BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
-/* === END BLOCK: CSS_SECTION_FOOTER === */
-
 /* ============================================
    FILTERS / SEARCH / TOP STACK (Top-App)
    ============================================ */
@@ -1072,7 +1079,13 @@ footer {
   contain: none;
 }
 
-/* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts === */
+/* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
+Zweck:
+- Persistentes Offline-Badge solange offline (informativ, nicht blockierend)
+- Toast/Snackbar nur bei Zustandswechsel online<->offline
+Umfang:
+- Reines UI-Styling, JS setzt nur Klassen/States
+=== */
 
 /* Offline badge: fixed unter Header, zentriert, kein Layout-Shift */
 .offline-badge{
@@ -1672,9 +1685,6 @@ body.is-sheet-open .top-stack{
 }
 
 
-/* === BEGIN BLOCK: CSS_SECTION_DETAILPANEL === */
-/* === END BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
-
 /* DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER */
 
 /* DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) */
@@ -1786,7 +1796,13 @@ html.is-panel-open body {
   touch-action: none;
 }
 
-/* === BEGIN BLOCK: DP-CLOSE-BUTTON-POLISH-V2 === */
+/* BEGIN PATCH DP-CLOSE-BUTTON-POLISH-V2
+   Zweck:
+   - Close-Button weniger “dominant”, mehr native PWA (ruhige Surface, softer Shadow, klare States).
+   - Keine Änderung am zentralen Icon-System (SVG bleibt über ui-icon Tokens gesteuert).
+   Umfang:
+   - Ersetzt NUR die Detailpanel-Close-Regeln inkl. States (active/hover/focus).
+*/
 
 #event-detail-panel .detail-panel-close{
   position: absolute;
@@ -1866,7 +1882,7 @@ html.is-panel-open body {
   outline-offset: 2px;
 }
 
-/* === END BLOCK: DP-CLOSE-BUTTON-POLISH-V2 === */
+/* END PATCH DP-CLOSE-BUTTON-POLISH-V2 */
 
 /* SECTION */
 
@@ -1941,7 +1957,13 @@ html.is-panel-open body {
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* === BEGIN BLOCK: DP-DESC-SOURCE-LINKS-V4 === */
+/* BEGIN PATCH DP-DESC-SOURCE-LINKS-V4
+   Zweck:
+   - Quelle/Links exakt auf dem gleichen Gutter wie Description (keine extra 12px Einrückung).
+   - ↗ Pfeil immer korrekt (dynamisch), egal ob 1 oder 2 Zeilen.
+   Umfang:
+   - Ersetzt den kompletten Links/Quelle Block.
+*/
 
 /* DETAIL LINKS (Enterprise v4: gutter-aligned, dynamic arrow alignment) */
 
@@ -2037,10 +2059,15 @@ html.is-panel-open body {
   transform: none;
 }
 
-/* === END BLOCK: DP-DESC-SOURCE-LINKS-V4 === */
+/* END PATCH DP-DESC-SOURCE-LINKS-V4 */
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy) === */
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy)
+Zweck:
+- Titel wirkt klar als Headline (mehr Separation), Meta wirkt als eigener Block.
+Umfang:
+- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
+=== */
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -2145,7 +2172,14 @@ html.is-panel-open body {
   background: none;
 }
 
-/* === BEGIN BLOCK: DP-META-ENTERPRISE-V7 === */
+/* BEGIN PATCH DP-META-ENTERPRISE-V7
+   Zweck:
+   - Location-↗ sitzt immer „am Ort“ (auch bei kurzen Ortsnamen), ohne fragiles Textlängen-Positionieren.
+   - Entfernt die künstliche max-width-Begrenzung, die zu frühe Umbrüche („Cluster zu kurz“) erzeugt.
+   - Gutter bleibt appweit konsistent (0-Inset links/rechts).
+   Umfang:
+   - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
+*/
 
 /* DETAIL META INFO (Enterprise v7: fit-content column for location arrow proximity) */
 
@@ -2337,7 +2371,7 @@ html.is-panel-open body {
   hyphens: auto;
 }
 
-/* === END BLOCK: DP-META-ENTERPRISE-V7 === */
+/* END PATCH DP-META-ENTERPRISE-V7 */
 
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
@@ -2427,7 +2461,13 @@ html.is-panel-open body {
 }
 
 
-/* === BEGIN BLOCK: DP-DESCRIPTION-ENTERPRISE-V3 === */
+/* BEGIN PATCH DP-DESCRIPTION-ENTERPRISE-V3
+   Zweck:
+   - Vertikalen Rhythmus im Detailpanel harmonisieren (Meta → Divider → Beschreibung → Quelle → Actions).
+   - Einheitlicher Spacing-Rhythmus (8 / 16 / 24) für ruhigere Struktur.
+   Umfang:
+   - Nur Beschreibung + Abstände zu Divider/Quelle beeinflusst. Keine Layout- oder Funktionsänderungen.
+*/
 
 /* Beschreibung: ruhiger Textblock + konsistenter Abstand */
 #event-detail-panel .detail-description{
@@ -2465,7 +2505,7 @@ html.is-panel-open body {
   margin-top: 16px;
 }
 
-/* === END BLOCK: DP-DESCRIPTION-ENTERPRISE-V3 === */
+/* END PATCH DP-DESCRIPTION-ENTERPRISE-V3 */
 
 
 /* Responsive: sehr kleine Geräte */
@@ -2589,7 +2629,14 @@ html.is-panel-open body {
 }
 
 
-/* === BEGIN BLOCK: ICONS-CSS-SYSTEM-V1 === */
+/* BEGIN PATCH ICONS-CSS-SYSTEM-V1
+   Zweck:
+   1) Einheitlicher “Top-App” Line-Icon Look für alle SVGs aus window.Icons (class: ui-icon-svg).
+   2) Detailpanel SVG Guard so scopen, dass NUR UI-Icons (Meta/Links/Actions/Close) auf 18px geklemmt werden.
+   3) Kategorie-Icon im Header darf wieder über Tokens skalieren (ui-icon-size-lg).
+   Umfang:
+   - Ersetzt kompletten bisherigen Detailpanel “JEDES svg/img = 18px” Guard + bringt SVG Base Styles mit.
+*/
 
 /* APP-WIDE SVG ICON BASE (Single Source of Truth: window.Icons → class ui-icon-svg) */
 svg.ui-icon-svg{
@@ -2714,9 +2761,14 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* === END BLOCK: ICONS-CSS-SYSTEM-V1 === */
+/* END PATCH ICONS-CSS-SYSTEM-V1 */
 
-/* === BEGIN BLOCK: DP-SVG-GUARD-SCOPE-V1 === */
+/* BEGIN PATCH DP-SVG-GUARD-SCOPE-V1
+   Zweck: Verhindert, dass jedes svg/img im Detailpanel hart auf 18px gezwungen wird.
+          Guard gilt nur noch für UI-Icons (Meta/Links/Actions/Close).
+          Kategorie-Icon skaliert wieder mit seinem Container; Description-Content bleibt frei.
+   Umfang: Ersetzt den bisherigen “JEDES svg/img” Guard + Description-Ausnahme.
+*/
 
 /* 2) Systemic Guard (scoped): NUR UI-Icons im Detailpanel werden als Icons behandelt */
 #event-detail-panel .detail-meta-icon svg,
@@ -2772,11 +2824,8 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* === END BLOCK: DP-SVG-GUARD-SCOPE-V1 === */
+/* END PATCH DP-SVG-GUARD-SCOPE-V1 */
 
-
-/* === BEGIN BLOCK: CSS_SECTION_HEADER_MODAL === */
-/* === END BLOCK: CSS_SECTION_DETAILPANEL === */
 
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
@@ -3148,7 +3197,41 @@ svg.ui-icon-svg{
   transform: none;
 }
 
-/* === END BLOCK: CSS_SECTION_HEADER_MODAL === */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
