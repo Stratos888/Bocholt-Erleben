@@ -26,6 +26,25 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
+
+  /* LAYOUT TOKENS (header + sticky stack) */
+  --gutter-lg: 24px;
+  --header-h: 48px;
+  --stack-gap: 0px;
+
+  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
+  --feed-section-pad-top: 6px;
+  --feed-cards-gap: 10px;
+  --feed-title-mt: 4px;
+  --feed-title-mb: 6px;
+
+  /* DETAILPANEL LAYOUT TOKENS (GS-Detailpanel frozen contract) */
+  --dp-header-pad-top: 34px;
+  --dp-close-size: 36px;
+  --dp-actionbar-h: 78px;
+  --dp-actionbar-pad-y: var(--space-sm);
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
+
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
   --radius-card: 12px;
@@ -83,6 +102,11 @@
     0 1px 0 rgba(255,255,255,0.80) inset;
   --ui-control-ring-active: rgba(139,207,74,0.09);
   --ui-tap-target: 44px;
+
+  --ui-icon-size-sm: 16px;
+  --ui-icon-size-md: 18px;
+  --ui-icon-size-lg: 22px;
+
   --ui-icon-stroke-sm: 1.75;
   --ui-icon-stroke-md: 1.85;
   --ui-icon-stroke-lg: 2;
@@ -135,10 +159,9 @@ body{
 /* DESKTOP BACKDROP POLISH */
 @media (min-width: 900px){
   :root{
-    --gutter: var(--gutter-lg);
-/* OVERLAY TOKENS (global design system contract) */
 
-  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+    --gutter: var(--gutter-lg);
+
 
   }
 
@@ -415,13 +438,13 @@ body.is-sheet-open .top-stack{ z-index: 9997 !important; }
 body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
 
 
+/* === END BLOCK: CSS_SECTION_BASE_RESET === */
+
+/* === BEGIN BLOCK: CSS_SECTION_LOADING_MESSAGES === */
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
 /* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) === */
-   Zweck: #loading darf nie Layout verschieben; Loading als fixed Overlay.
-   Umfang: Ersetzt nur .loading-container/.loading-spinner/@keyframes spin.
-=== */
 .loading-container {
   position: fixed;
   inset: 0;
@@ -470,6 +493,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 .info-message { background: #fff3cd; }
 .error-message { background: #f8d7da; color: #721c24; }
 
+/* === BEGIN BLOCK: CSS_SECTION_EMPTY_STATE === */
+/* === END BLOCK: CSS_SECTION_LOADING_MESSAGES === */
+
 /* ============================================
    EMPTY STATE
    ============================================ */
@@ -508,9 +534,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 
 /* === BEGIN BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
-   Zweck: Skeleton-Styles für Eventcards (kein Layout-Jump, ruhiges Shimmer).
-   Umfang: Fügt neue Klassen hinzu, ohne bestehende Eventcard-Styles zu verändern.
-=== */
 .event-card.is-skeleton{
   cursor: default;
   user-select: none;
@@ -557,6 +580,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 /* === END BLOCK: GS-01 SKELETON EVENT CARDS (enterprise loading polish) === */
 
+/* === END BLOCK: CSS_SECTION_EMPTY_STATE === */
+
+/* === BEGIN BLOCK: CSS_SECTION_EVENT_FEED === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
 /* Guardrail: nichts darf breiter als der Viewport werden */
@@ -962,6 +988,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
+/* === END BLOCK: CSS_SECTION_EVENT_FEED === */
+
+/* === BEGIN BLOCK: CSS_SECTION_FOOTER === */
 /* ============================================
    FOOTER
    ============================================ */
@@ -1009,6 +1038,9 @@ footer {
 }
 
 
+/* === BEGIN BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
+/* === END BLOCK: CSS_SECTION_FOOTER === */
+
 /* ============================================
    FILTERS / SEARCH / TOP STACK (Top-App)
    ============================================ */
@@ -1041,12 +1073,6 @@ footer {
 }
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts === */
-Zweck:
-- Persistentes Offline-Badge solange offline (informativ, nicht blockierend)
-- Toast/Snackbar nur bei Zustandswechsel online<->offline
-Umfang:
-- Reines UI-Styling, JS setzt nur Klassen/States
-=== */
 
 /* Offline badge: fixed unter Header, zentriert, kein Layout-Shift */
 .offline-badge{
@@ -1646,6 +1672,9 @@ body.is-sheet-open .top-stack{
 }
 
 
+/* === BEGIN BLOCK: CSS_SECTION_DETAILPANEL === */
+/* === END BLOCK: CSS_SECTION_FILTERS_TOPSTACK === */
+
 /* DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER */
 
 /* DETAILPANEL TOP-APP RHYTHM v2 (single source of truth) */
@@ -2011,12 +2040,7 @@ html.is-panel-open body {
 /* === END BLOCK: DP-DESC-SOURCE-LINKS-V4 === */
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy) */
-Zweck:
-- Titel wirkt klar als Headline (mehr Separation), Meta wirkt als eigener Block.
-Umfang:
-- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
-=== */
+/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy) === */
 
 #event-detail-panel .detail-header{
   position: relative;
@@ -2751,6 +2775,9 @@ svg.ui-icon-svg{
 /* === END BLOCK: DP-SVG-GUARD-SCOPE-V1 === */
 
 
+/* === BEGIN BLOCK: CSS_SECTION_HEADER_MODAL === */
+/* === END BLOCK: CSS_SECTION_DETAILPANEL === */
+
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
@@ -3121,42 +3148,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* === END BLOCK: CSS_SECTION_HEADER_MODAL === */
 
 
 
