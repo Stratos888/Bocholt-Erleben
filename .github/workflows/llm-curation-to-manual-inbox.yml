@@ -1,0 +1,122 @@
+# === BEGIN BLOCK: LLM CURATION TO MANUAL INBOX WORKFLOW (workflow_dispatch -> generate inbox_manual.json only) ===
+# Datei: .github/workflows/llm-curation-to-manual-inbox.yml
+# Zweck:
+# - Startet die KI-Kuration für den Manual-Intake per workflow_dispatch
+# - Erzeugt/aktualisiert nur data/inbox_manual.json
+# - Commitet die erzeugte Datei zurück ins Repo
+# Umfang:
+# - Kein Direktimport in data/inbox.tsv
+# - Kein Build von data/inbox.json
+# - Manual KI Event Intake bleibt separater zweiter Schritt
+# === END BLOCK: LLM CURATION TO MANUAL INBOX WORKFLOW (workflow_dispatch -> generate inbox_manual.json only) ===
+
+name: LLM Curation → Manual Inbox
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  llm_curation_manual_inbox:
+    name: Generate data/inbox_manual.json from LLM sources
+    runs-on: ubuntu-latest
+
+    steps:
+      # === BEGIN BLOCK: CHECKOUT REPOSITORY (generator input + commit target) ===
+      # Zweck:
+      # - Holt den aktuellen Repo-Stand
+      # - Erlaubt Rückschreiben von data/inbox_manual.json
+      # Umfang:
+      # - Checkout mit voller History für sicheren Push
+      # === END BLOCK: CHECKOUT REPOSITORY (generator input + commit target) ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # === BEGIN BLOCK: SETUP PYTHON RUNTIME (generator execution runtime) ===
+      # Zweck:
+      # - Stellt Python für Generator + bestehende Helper bereit
+      # Umfang:
+      # - Python 3.11
+      # === END BLOCK: SETUP PYTHON RUNTIME (generator execution runtime) ===
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # === BEGIN BLOCK: INSTALL GENERATOR DEPENDENCIES (match existing LLM stack) ===
+      # Zweck:
+      # - Installiert die Dependencies, die bereits von scripts/llm-discovery-to-inbox.py genutzt werden
+      # Umfang:
+      # - Google Sheets
+      # - requests / bs4
+      # - playwright
+      # - openai
+      # === END BLOCK: INSTALL GENERATOR DEPENDENCIES (match existing LLM stack) ===
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth requests beautifulsoup4 playwright openai
+
+      # === BEGIN BLOCK: INSTALL PLAYWRIGHT BROWSERS (collector runtime) ===
+      # Zweck:
+      # - Stellt Chromium für die bestehenden Playwright-Collector bereit
+      # Umfang:
+      # - vollständige Browser-Installation inkl. System-Dependencies
+      # === END BLOCK: INSTALL PLAYWRIGHT BROWSERS (collector runtime) ===
+      - name: Install Playwright browsers
+        run: |
+          set -e
+          python -m playwright install --with-deps chromium
+
+      # === BEGIN BLOCK: RUN LLM CURATION GENERATOR (sources -> inbox_manual.json) ===
+      # Zweck:
+      # - Liest aktivierte Sources mit pipeline_mode=llm
+      # - Kuratiert Kandidaten
+      # - Schreibt nur data/inbox_manual.json
+      # Umfang:
+      # - keine Änderung an inbox.tsv / inbox.json
+      # === END BLOCK: RUN LLM CURATION GENERATOR (sources -> inbox_manual.json) ===
+      - name: Run LLM curation to manual inbox
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5-mini
+          TAB_SOURCES: Sources
+          MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
+          INBOX_TSV_PATH: data/inbox.tsv
+          MAX_NEW_PER_RUN: "25"
+        run: |
+          set -e
+          python scripts/llm-curation-to-manual-inbox.py
+
+          echo "=== inbox_manual.json (head) ==="
+          head -n 120 data/inbox_manual.json || true
+
+      # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
+      # Zweck:
+      # - Commitet nur die erzeugte data/inbox_manual.json zurück ins Repo
+      # - Kein Commit, wenn sich nichts geändert hat
+      # Umfang:
+      # - nur data/inbox_manual.json
+      # === END BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
+      - name: Commit generated manual inbox JSON
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/inbox_manual.json
+
+          if git diff --cached --quiet; then
+            echo "No manual inbox changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: generate manual inbox candidates"
+          git push
