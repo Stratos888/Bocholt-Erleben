@@ -1,76 +1,85 @@
-=== BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (fixed build + commit order) ===
-
-Datei: .github/workflows/manual-ki-intake.yml
-
-Zweck:
-
-- Importiert data/inbox_manual.json → data/inbox.tsv
-
-- Baut danach data/inbox.json neu
-
-- Commitet die aktualisierten Dateien
-
-- Leert anschließend data/inbox_manual.json
-
-=== END BLOCK ===
+# === BEGIN BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (fixed valid YAML) ===
+# Datei: .github/workflows/manual-ki-intake.yml
+# Zweck:
+# - Importiert data/inbox_manual.json -> data/inbox.tsv
+# - Baut danach data/inbox.json neu
+# - Commitet die aktualisierten Dateien
+# - Leert anschließend data/inbox_manual.json
+# Umfang:
+# - workflow_dispatch manuell startbar
+# - gültiges YAML für GitHub Actions
+# === END BLOCK: MANUAL KI EVENT INTAKE WORKFLOW (fixed valid YAML) ===
 
 name: Manual KI Event Intake
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
-contents: write
+  contents: write
 
 jobs:
-manual_ki_event_intake:
-runs-on: ubuntu-latest
+  manual_ki_event_intake:
+    runs-on: ubuntu-latest
 
-steps:
+    steps:
+      # === BEGIN BLOCK: CHECKOUT REPOSITORY ===
+      # === END BLOCK: CHECKOUT REPOSITORY ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  - name: Checkout repository
-    uses: actions/checkout@v4
-    with:
-      fetch-depth: 0
+      # === BEGIN BLOCK: SETUP PYTHON ===
+      # === END BLOCK: SETUP PYTHON ===
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-  - name: Setup Python
-    uses: actions/setup-python@v5
-    with:
-      python-version: "3.11"
+      # === BEGIN BLOCK: IMPORT MANUAL INBOX JSON ===
+      # === END BLOCK: IMPORT MANUAL INBOX JSON ===
+      - name: Import manual inbox JSON
+        run: |
+          set -e
+          python scripts/inbox-manual-to-sheet.py
 
-  # JSON → TSV
-  - name: Import manual inbox JSON
-    run: |
-      set -e
-      python scripts/inbox-manual-to-sheet.py
+      # === BEGIN BLOCK: BUILD INBOX JSON ===
+      # === END BLOCK: BUILD INBOX JSON ===
+      - name: Build inbox.json
+        run: |
+          set -e
+          python scripts/build-inbox-from-tsv.py
 
-  # TSV → JSON
-  - name: Build inbox.json
-    run: |
-      set -e
-      python scripts/build-inbox-from-tsv.py
+      # === BEGIN BLOCK: COMMIT INBOX CHANGES ===
+      # === END BLOCK: COMMIT INBOX CHANGES ===
+      - name: Commit inbox changes
+        run: |
+          set -e
 
-  # Commit Änderungen
-  - name: Commit inbox changes
-    run: |
-      set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      git config user.name "github-actions[bot]"
-      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/inbox.tsv data/inbox.json
 
-      git add data/inbox.tsv data/inbox.json
+          if git diff --cached --quiet; then
+            echo "No inbox changes."
+          else
+            git commit -m "chore: update inbox review feed"
+            git push
+          fi
 
-      if git diff --cached --quiet; then
-        echo "No inbox changes."
-      else
-        git commit -m "chore: update inbox review feed"
-        git push
-      fi
+      # === BEGIN BLOCK: RESET MANUAL INBOX BUFFER ===
+      # === END BLOCK: RESET MANUAL INBOX BUFFER ===
+      - name: Reset manual inbox buffer
+        run: |
+          set -e
 
-  # Buffer leeren (nach Commit)
-  - name: Reset manual inbox buffer
-    run: |
-      printf '[]\n' > data/inbox_manual.json
-      git add data/inbox_manual.json
-      git commit -m "chore: clear manual inbox buffer" || true
-      git push || true
+          printf '[]\n' > data/inbox_manual.json
+          git add data/inbox_manual.json
+
+          if git diff --cached --quiet; then
+            echo "No manual buffer changes."
+          else
+            git commit -m "chore: clear manual inbox buffer"
+            git push
