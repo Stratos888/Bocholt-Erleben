@@ -75,160 +75,29 @@ For each replace operation in that file:
 
 Rules:
 
-- Do NOT include fingerprints/hashes/byte counts by default.
-- Do NOT include extra commentary, rationale, checklists, or notes inside patch responses.
+- Do NOT include patch-notes, rationale, checklists, “next steps”, or any other commentary inside patch responses.
+- Do NOT include fingerprints/hashes/byte counts by default (only on explicit user request).
 - Replace ranges MUST NOT overlap within a single response. If they would overlap: merge into one larger Replace-block.
-- If BEGIN/END lines cannot be found exactly: **STOP and request the current file or the relevant block.**
+- BEGIN/END lines MUST be unique within the file. If not unique: STOP and request a better anchor (or the current relevant block).
+- If BEGIN/END lines cannot be found exactly: STOP and request the current file or the relevant block.
 
-## OPTIONAL: FORENSICS ATTESTATION (ONLY ON USER REQUEST)
+## MARKER RULE (UNIQUE BLOCK IDS, NO PATCH NOTES IN FILES)
 
-Only if the user explicitly asks for it (e.g., “prove you have the latest file”):
-
-- Source: ZIP snapshot or uploaded file name
-- File: exact path
-- Anchors: exact BEGIN/END lines used
-- Fingerprint: `bytes=<N>, sha256=<HASH>`
-
-## SYNC LOSS EXCEPTION (ONLY IF USER SAYS SO)
-
-Only if the user explicitly says they did NOT apply a patch or applied manual edits:
-**STOP and request the current file.**
-
----
-
-<!-- === END REPLACEMENT BLOCK: CANONICAL BASELINE (ZIP-FIRST) — ASSISTANT WORKING COPY (HARD) === -->
-# BATCH PATCH RULE (SAFE SPEED)
-
-To avoid slow micro-iterations:
-
-- Allowed: multiple Replace-blocks in one response
-- Condition: Replace ranges MUST NOT overlap.
-- If overlap risk exists: merge into ONE larger Replace-block.
-
----
-
-
-# ONE FILE RULE
-
-Work on ONLY ONE FILE per change.
-
-Never modify multiple files simultaneously unless explicitly required.
-
----
-
-# DIFF RULE
-
-Never output full files unless explicitly required.
-
-Always provide:
-
-Clear instruction:
-
-Replace block from X to Y
-
-and provide replacement block separately.
-
----
-
-# NO-FILE, NO-DIFF RULE
-
-If the current file content is not provided:
-
-DO NOT produce a diff.
-
-Stop and request the current file.
-
-Notes:
-
-- A repo ZIP uploaded at session start counts as "provided file content".
-- If the assistant has a verified consolidated working copy of the file in this session, it may continue to produce Replace-instructions without re-requesting the file.
-- If there is any doubt about sync between working copy and user's local file: STOP and request the current file (or the minimal relevant section).
-
----
-
-
-# EXACT BOUNDARY RULE
-
-BEGIN/END boundaries MUST be exact, verbatim lines from the provided file.
-
-Do not approximate line numbers.
-
-Prefer stable markers (e.g. "=== BEGIN BLOCK ===" / "=== END BLOCK ===").
-
----
-
-# MATCH OR STOP RULE
-
-If the specified BEGIN/END lines cannot be found exactly in the provided file:
-
-Stop.
-
-Ask for the current file.
-
----
-
-
-# MARKER RULE
-
-Every inserted or replaced block MUST include markers:
+Every inserted or replaced code block MUST include markers with a unique, stable block id:
 
 BEGIN marker:
 
-Comment explaining purpose and scope
+`/* === BEGIN BLOCK: <UNIQUE_ID> | Purpose: ... | Scope: ... === */`
 
 END marker:
 
-Comment explaining end of block
+`/* === END BLOCK: <UNIQUE_ID> === */`
 
-Markers prevent corruption.
+Rules:
 
----
-
-# 100 PERCENT RULE
-
-When fixing or modifying:
-
-All required changes must be included.
-
-Never provide partial fixes.
-
-Never rely on implicit assumptions.
-
----
-
-# NO GUESS RULE
-
-Never guess.
-
-Never hallucinate missing code.
-
-If information missing:
-
-Request clarification.
-
----
-
-<!-- === BEGIN REPLACEMENT BLOCK: ROOT CAUSE + EVIDENCE PACK + SCORECARD + FIXTURES | Scope: replaces Root Cause section only === -->
-
-# ROOT CAUSE RULE
-
-Never apply speculative fixes.
-
-Identify root cause first.
-
-Apply minimal correction.
-
----
-
-# EVIDENCE PACK RULE (SPEED WITHOUT GUESSING)
-
-For any change that claims improvement (UI, pipeline, deploy, caching, parsing):
-Provide a minimal Evidence Pack before proposing the patch:
-
-- Repro: exact steps / input / page / source that shows the problem
-- Observation: what is currently happening (symptom)
-- Cause: why it happens (root cause in code/data)
-- Proof: how we verify the fix (observable signal)
+- `<UNIQUE_ID>` must be globally unique within the file (never reuse the same id for a different block).
+- No “patch notes” headers/paragraphs inside code files (CSS/JS/HTML). Use only these BEGIN/END block markers.
+- If a block needs a short explanation, keep it inside the BEGIN marker line only (purpose + scope), no multi-paragraph commentary.
 
 If an Evidence Pack cannot be produced from available material:
 Stop and request the missing artifact (file, sample HTML, logs, screenshot).
