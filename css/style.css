@@ -26,6 +26,18 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
+
+  /* LAYOUT TOKENS (header + sticky stack) */
+  --gutter-lg: 24px;
+  --header-h: 48px;
+  --stack-gap: 0px;
+
+  /* FEED RHYTHM / DENSITY TOKENS (GS-01) */
+  --feed-section-pad-top: 6px;
+  --feed-cards-gap: 10px;
+  --feed-title-mt: 4px;
+  --feed-title-mb: 6px;
+
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
   --radius-card: 12px;
@@ -3130,4 +3142,5 @@ svg.ui-icon-svg{
 }
 
 /* === END BLOCK: CSS_SECTION_HEADER_MODAL === */
+
 
