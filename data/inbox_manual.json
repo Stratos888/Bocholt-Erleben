@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "status": "review",
+    "title": "Coltplay – TraumGmbH, Kiel",
+    "date": "2026-04-11",
+    "city": "Bocholt",
+    "location": "TraumGmbH, Kiel",
+    "kategorie_suggestion": "Musik",
+    "url": "https://www.coltplay.de/tour",
+    "source_name": "Coltplay – Tour Dates",
+    "source_url": "https://www.coltplay.de/tour",
+    "notes": "llm_manual_curation",
+    "created_at": "2026-03-06 11:45:13"
+  }
+]
