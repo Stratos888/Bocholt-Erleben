@@ -83,6 +83,11 @@
     0 1px 0 rgba(255,255,255,0.80) inset;
   --ui-control-ring-active: rgba(139,207,74,0.09);
   --ui-tap-target: 44px;
+
+  --ui-icon-size-sm: 16px;
+  --ui-icon-size-md: 18px;
+  --ui-icon-size-lg: 22px;
+
   --ui-icon-stroke-sm: 1.75;
   --ui-icon-stroke-md: 1.85;
   --ui-icon-stroke-lg: 2;
@@ -3125,3 +3130,4 @@ svg.ui-icon-svg{
 }
 
 /* === END BLOCK: CSS_SECTION_HEADER_MODAL === */
+
