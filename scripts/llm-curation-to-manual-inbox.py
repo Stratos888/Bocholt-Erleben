@@ -128,11 +128,13 @@ def load_llm_helper_module():
     if not HELPER_PATH.exists():
         fail(f"Helferdatei fehlt: {HELPER_PATH}")
 
-    spec = importlib.util.spec_from_file_location("llm_discovery_helper", HELPER_PATH)
+    module_name = "llm_discovery_helper"
+    spec = importlib.util.spec_from_file_location(module_name, HELPER_PATH)
     if spec is None or spec.loader is None:
         fail(f"Import von Helferdatei fehlgeschlagen: {HELPER_PATH}")
 
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
 # === END BLOCK: LOAD EXISTING LLM DISCOVERY HELPERS (import via file path) ===
