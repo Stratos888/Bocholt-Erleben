@@ -276,4 +276,40 @@ jobs:
 
           service.spreadsheets().values().append(
               spreadsheetId=sheet_id,
-              range
+              range="Inbox!A1",
+              valueInputOption="RAW",
+              insertDataOption="INSERT_ROWS",
+              body={"values": rows_to_append},
+          ).execute()
+
+          info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
+          PY
+
+      # === BEGIN BLOCK: RESET MANUAL INPUT BUFFER IN REPO ===
+      # === END BLOCK: RESET MANUAL INPUT BUFFER IN REPO ===
+      - name: Reset manual inbox buffer
+        run: |
+          set -e
+
+          printf '[]\n' > data/inbox_manual.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/inbox_manual.json
+
+          if git diff --cached --quiet; then
+            echo "No manual buffer changes."
+          else
+            git commit -m "chore: clear manual inbox buffer"
+            git push
+          fi
+
+      # === BEGIN BLOCK: TRIGGER DEPLOY TO STRATO ===
+      # === END BLOCK: TRIGGER DEPLOY TO STRATO ===
+      - name: Trigger Deploy to STRATO
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh workflow run "Deploy to STRATO" --ref main
