@@ -808,13 +808,15 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   hyphens: auto;
 }
 
-/* === BEGIN BLOCK: ICONS-CSS-EVENTCARD-V1 | Scope: preserved styles, marker-only === */
-/* EVENT CARD CATEGORY INDICATOR (state-of-the-art, tokenized) */
+/* === BEGIN BLOCK: ICONS-CSS-EVENTCARD-V1 | Scope: clamp category icon in event cards (wrapper + direct svg/img) === */
+
+/* EVENT CARD CATEGORY INDICATOR (robust, tokenized) */
+
+/* 1) Preferred structure: wrapper element */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
 
-  /* Icon size for cards */
   width: var(--eventcard-category-size);
   height: var(--eventcard-category-size);
 
@@ -826,31 +828,50 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   border: 0;
   box-shadow: none;
 
-  /* remove emoji-legacy behavior */
   font-size: 0;
   line-height: 0;
 
   opacity: var(--eventcard-category-opacity);
   filter: none;
 
-  /* optical baseline alignment in title row */
   vertical-align: middle;
   transform: translateY(1px);
 }
 
-/* Wenn das Icon als SVG/IMG kommt: clamp */
 .event-title .event-category-icon svg,
 .event-title .event-category-icon img{
   width: 100% !important;
   height: 100% !important;
+
   max-width: none !important;
   max-height: none !important;
+
   display: block !important;
   object-fit: contain !important;
 
   opacity: var(--eventcard-category-opacity);
   filter: none;
 }
+
+/* 2) Defensive: if the icon is inserted directly as svg/img in the title row (no wrapper) */
+.event-title > svg,
+.event-title > img{
+  width: var(--eventcard-category-size) !important;
+  height: var(--eventcard-category-size) !important;
+
+  min-width: var(--eventcard-category-size) !important;
+  min-height: var(--eventcard-category-size) !important;
+
+  max-width: var(--eventcard-category-size) !important;
+  max-height: var(--eventcard-category-size) !important;
+
+  display: block !important;
+  object-fit: contain !important;
+
+  opacity: var(--eventcard-category-opacity);
+  filter: none;
+}
+
 /* === END BLOCK: ICONS-CSS-EVENTCARD-V1 === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
@@ -3077,3 +3098,4 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
