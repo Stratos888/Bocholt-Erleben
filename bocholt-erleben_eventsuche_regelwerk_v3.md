@@ -35,11 +35,14 @@ Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese 
 - `data/inbox.tsv`
 
 ### Standard-Arbeitsanweisung für neue Chats
-Dem Chat sinngemäß sagen:
+Für neue Suchläufe soll nach Möglichkeit diese Standard-Anweisung verwendet werden:
 
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json` und `data/inbox.tsv`. Liefere nur neue, passende Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json` und `data/inbox.tsv`. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue, passende Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
 
-### Erwartetes Verhalten des Chats
+### Empfohlener Startprompt für neue Chats
+Dieser Prompt kann in neuen Chats direkt verwendet werden:
+
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json` und `data/inbox.tsv`. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs- und Qualitätsregeln strikt an. Liefere ausschließlich ein JSON-Array für `data/inbox_manual.json` und keine weiteren Erklärungen im JSON-Block.
 Der Chat soll vor der Suche bzw. vor der Ausgabe immer berücksichtigen:
 - Regelwerk anwenden
 - gegen `data/events.json` dedupen
@@ -251,7 +254,9 @@ Die KI soll standardmäßig diese Struktur verwenden:
 
 Nur wenn diese Struktur sachlich nicht passt, darf davon abgewichen werden.
 
-Beispiele:
+Die KI soll bevorzugt konkrete Begriffe aus der Quelle verwenden
+(z. B. Konzert, Markt, Ausstellung, Lesung, Comedy-Abend),
+aber die Beschreibung vollständig neu formulieren.
 
 Gut:
 
@@ -438,7 +443,7 @@ Die Ausgabe muss **direkt als JSON für `data/inbox_manual.json`** erfolgen.
     "time": "HH:MM",
     "city": "Bocholt",
     "location": "Ort / Venue",
-    "kategorie_suggestion": "Musik & Bühne"
+    "kategorie_suggestion": "Musik & Bühne",
     "url": "https://...",
     "description": "Kurze sachliche Beschreibung.",
     "source_name": "Quellenname",
@@ -498,7 +503,9 @@ Keine freien Fantasie-Kategorien, keine Werbebegriffe und keine unnötig feingra
 Wenn ein Event nicht eindeutig zuordenbar ist, dann:
 
 - die sachlich nächstpassende kanonische Kategorie wählen
-- im Zweifel `Sonstiges` verwenden
+im Zweifel `Sonstiges` verwenden.
+
+### `url`
 Direkte Event-URL, wenn vorhanden.
 
 ### `source_url`
