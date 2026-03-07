@@ -273,11 +273,10 @@ function writeStatus(it, newStatus) {
 
     try {
       const res = await jsonp(API_URL, {
-        action: "setStatus",
-        token: sessionToken,
-        row_number: String(it.row_number),
-        status: String(newStatus)
-      });
+  action: "approve",
+  token: sessionToken,
+  row_number: String(it.row_number)
+});
 
       if (res && res.ok) {
         setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
