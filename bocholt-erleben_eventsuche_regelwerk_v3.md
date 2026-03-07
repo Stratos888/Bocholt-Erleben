@@ -246,8 +246,10 @@ Keine:
 
 #### Beschreibungsschablone
 
-Wenn möglich soll diese Struktur verwendet werden:
+Die KI soll standardmäßig diese Struktur verwenden:
 <Eventtyp> im <Ort>. <Kurze Einordnung des Programms oder Formats>.
+
+Nur wenn diese Struktur sachlich nicht passt, darf davon abgewichen werden.
 
 Beispiele:
 
@@ -280,6 +282,10 @@ Die Beschreibung muss immer:
 - **keine Zitate enthalten**
 
 Dies dient der Vermeidung von Urheberrechts- und Leistungsschutzproblemen.
+
+---
+
+## 7. Qualitätsanforderungen
 Ein Event nur aufnehmen, wenn die Kerndaten ausreichend belastbar sind.
 
 Nach Möglichkeit müssen vorhanden sein:
@@ -359,7 +365,7 @@ Dann:
 
 ## 11. Dedupe-Regel
 Keine Events aufnehmen, die wahrscheinlich bereits vorhanden sind oder offensichtliche Dubletten sind.
-
+Tracking-Parameter, URL-Fragmente und offensichtliche URL-Varianten derselben Quelle sollen als identische Quelle behandelt werden.
 Als Dublette behandeln:
 
 - gleiche oder sehr ähnliche `source_url`
@@ -476,7 +482,17 @@ Sauber setzen, wenn eindeutig.
 Möglichst konkret, aber nur wenn belastbar.
 
 ### `kategorie_suggestion`
-Kurz und sinnvoll.
+Nur kurze, einfache Kategorien verwenden, z. B.:
+
+- Musik
+- Theater
+- Kultur
+- Kinder
+- Markt
+- Sport
+- Messe
+- Führung
+- Comedy
 
 ### `url`
 Direkte Event-URL, wenn vorhanden.
@@ -485,8 +501,9 @@ Direkte Event-URL, wenn vorhanden.
 Beste belastbare Quell-URL.
 
 ### `description`
-Kurz, neutral, facts-only.  
+Kurz, neutral, facts-only.
 1–2 Sätze, maximal 200 Zeichen, gemäß den Stilregeln für Eventbeschreibungen.
+Keine Werbesprache, keine Zitate, keine Copy-Paste-Formulierungen aus der Quelle.
 
 ### `notes`
 Immer setzen auf:
