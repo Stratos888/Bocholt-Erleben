@@ -87,6 +87,58 @@ def get_sheet_service() -> object:
     return build("sheets", "v4", credentials=creds, cache_discovery=False)
 
 
+def normalize_event_category(raw: str) -> str:
+    s = norm_key(raw)
+
+    if not s:
+        return "Sonstiges"
+
+    mapping = {
+        "party": "Innenstadt & Leben",
+        "kneipe": "Innenstadt & Leben",
+        "quiz": "Innenstadt & Leben",
+        "innenstadt": "Innenstadt & Leben",
+        "leben": "Innenstadt & Leben",
+        "stadtleben": "Innenstadt & Leben",
+
+        "musik": "Musik & Bühne",
+        "konzert": "Musik & Bühne",
+        "live": "Musik & Bühne",
+        "bühne": "Musik & Bühne",
+        "buehne": "Musik & Bühne",
+        "show": "Musik & Bühne",
+
+        "kultur": "Kultur & Kunst",
+        "kunst": "Kultur & Kunst",
+        "ausstellung": "Kultur & Kunst",
+        "lesung": "Kultur & Kunst",
+        "kabarett": "Kultur & Kunst",
+        "comedy": "Kultur & Kunst",
+
+        "kinder": "Kinder & Familie",
+        "familie": "Kinder & Familie",
+        "familien": "Kinder & Familie",
+
+        "markt": "Märkte & Feste",
+        "märkte": "Märkte & Feste",
+        "maerkte": "Märkte & Feste",
+        "fest": "Märkte & Feste",
+        "feste": "Märkte & Feste",
+        "festival": "Märkte & Feste",
+        "messe": "Märkte & Feste",
+
+        "sport": "Sport & Bewegung",
+        "bewegung": "Sport & Bewegung",
+        "lauf": "Sport & Bewegung",
+
+        "natur": "Natur & Draußen",
+        "draußen": "Natur & Draußen",
+        "draussen": "Natur & Draußen",
+    }
+
+    return mapping.get(s, "Sonstiges")
+
+
 def read_tab(service: object, sheet_id: str, tab_name: str) -> List[List[str]]:
     rng = f"{tab_name}!A:ZZ"
     res = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=rng).execute()
@@ -255,7 +307,9 @@ def main() -> None:
             "city": norm(inb.get("city", "")),
             "location": norm(inb.get("location", "")),
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
-            "kategorie": norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", "")),
+            "kategorie": normalize_event_category(
+                norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", ""))
+            ),
             "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
 
             "description": norm(inb.get("description", "")),
