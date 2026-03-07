@@ -183,6 +183,7 @@ Nicht übernehmen:
 - individuell formulierte fremde Fließtexte
 
 ### Formulierungsregel
+
 Beschreibung immer:
 
 - kurz
@@ -190,9 +191,95 @@ Beschreibung immer:
 - neu formuliert
 - facts-only
 
----
+### Stilregeln für Eventbeschreibungen
 
-## 7. Qualitätsanforderungen
+Die Eventbeschreibung wird immer **redaktionell neu formuliert**.  
+Originaltexte von Veranstaltern oder Eventseiten dürfen **nicht übernommen werden**.
+
+Ziel ist eine kurze neutrale Einordnung im Stil eines Veranstaltungskalenders.
+
+#### Länge
+
+- maximal **1–2 kurze Sätze**
+- ideal **80–180 Zeichen**
+- maximal **200 Zeichen**
+
+#### Stil
+
+Die Beschreibung muss:
+
+- sachlich
+- neutral
+- faktenbasiert
+- nicht werblich
+- nicht ausschmückend
+
+sein.
+
+Nicht verwenden:
+
+- Werbesprache
+- Marketingformulierungen
+- Aufforderungen
+- Bewertungen
+
+Beispiele für verbotene Formulierungen:
+
+- „Freuen Sie sich auf einen unvergesslichen Abend“
+- „Ein besonderes Highlight erwartet die Besucher“
+- „Der Veranstalter lädt herzlich ein“
+
+#### Inhalt
+
+Die Beschreibung soll möglichst nur enthalten:
+
+- Eventart
+- kurzer Kontext des Programms
+- ggf. Besonderheit oder Format
+
+Keine:
+
+- langen Programmbeschreibungen
+- vollständigen Ablauftexte
+- Zitate
+- Werbeformulierungen
+
+#### Beschreibungsschablone
+
+Wenn möglich soll diese Struktur verwendet werden:
+<Eventtyp> im <Ort>. <Kurze Einordnung des Programms oder Formats>.
+
+Beispiele:
+
+Gut:
+
+> Live-Konzert im Kinodrom Bocholt. Mehrere regionale Bands treten an diesem Abend auf.
+
+Gut:
+
+> Comedy-Abend im Kinodrom Bocholt mit mehreren Stand-up-Künstlern.
+
+Gut:
+
+> Geführte Fahrradtour durch das Bocholter Umland mit mehreren Zwischenstopps.
+
+Schlecht:
+
+> Freuen Sie sich auf einen unvergesslichen Abend voller Unterhaltung.
+
+Schlecht:
+
+> Der Veranstalter verspricht beste Stimmung und tolle Künstler.
+
+#### Rechtliche Sicherheitsregel
+
+Die Beschreibung muss immer:
+
+- vollständig **neu formuliert**
+- **nicht strukturell aus der Quelle übernommen**
+- **keine Zitate enthalten**
+
+Dies dient der Vermeidung von Urheberrechts- und Leistungsschutzproblemen.
 Ein Event nur aufnehmen, wenn die Kerndaten ausreichend belastbar sind.
 
 Nach Möglichkeit müssen vorhanden sein:
@@ -398,7 +485,8 @@ Direkte Event-URL, wenn vorhanden.
 Beste belastbare Quell-URL.
 
 ### `description`
-Kurz, neutral, facts-only.
+Kurz, neutral, facts-only.  
+1–2 Sätze, maximal 200 Zeichen, gemäß den Stilregeln für Eventbeschreibungen.
 
 ### `notes`
 Immer setzen auf:
