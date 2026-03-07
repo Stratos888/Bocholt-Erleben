@@ -45,14 +45,53 @@ CANONICAL_CATEGORIES = [
 
 # Synonyme/Altwerte -> Canonical (damit ihr schnell migrieren könnt)
 CATEGORY_MAP = {
+    # Innenstadt / Leben
     "party": "Innenstadt & Leben",
     "kneipe": "Innenstadt & Leben",
     "quiz": "Innenstadt & Leben",
+    "innenstadt": "Innenstadt & Leben",
+    "leben": "Innenstadt & Leben",
+    "stadtleben": "Innenstadt & Leben",
+
+    # Musik / Bühne
     "musik": "Musik & Bühne",
+    "konzert": "Musik & Bühne",
+    "live": "Musik & Bühne",
+    "bühne": "Musik & Bühne",
+    "buehne": "Musik & Bühne",
+    "show": "Musik & Bühne",
+
+    # Kultur / Kunst
     "kultur": "Kultur & Kunst",
+    "kunst": "Kultur & Kunst",
+    "ausstellung": "Kultur & Kunst",
+    "lesung": "Kultur & Kunst",
+    "kabarett": "Kultur & Kunst",
+    "comedy": "Kultur & Kunst",
+
+    # Kinder / Familie
     "kinder": "Kinder & Familie",
     "familie": "Kinder & Familie",
+    "familien": "Kinder & Familie",
+
+    # Märkte / Feste
     "markt": "Märkte & Feste",
+    "märkte": "Märkte & Feste",
+    "maerkte": "Märkte & Feste",
+    "fest": "Märkte & Feste",
+    "feste": "Märkte & Feste",
+    "festival": "Märkte & Feste",
+    "messe": "Märkte & Feste",
+
+    # Sport / Bewegung
+    "sport": "Sport & Bewegung",
+    "bewegung": "Sport & Bewegung",
+    "lauf": "Sport & Bewegung",
+
+    # Natur / Draußen
+    "natur": "Natur & Draußen",
+    "draußen": "Natur & Draußen",
+    "draussen": "Natur & Draußen",
 }
 
 REQUIRED_FIELDS = ["id", "title", "date", "city", "location", "kategorie"]
