@@ -272,11 +272,22 @@ function writeStatus(it, newStatus) {
     if (btnOpen) btnOpen.disabled = true;
 
     try {
-      const res = await jsonp(API_URL, {
-  action: "approve",
-  token: sessionToken,
-  row_number: String(it.row_number)
-});
+      let res;
+
+      if (newStatus === "übernehmen") {
+        res = await jsonp(API_URL, {
+          action: "approve",
+          token: sessionToken,
+          row_number: String(it.row_number)
+        });
+      } else {
+        res = await jsonp(API_URL, {
+          action: "setStatus",
+          token: sessionToken,
+          row_number: String(it.row_number),
+          status: String(newStatus)
+        });
+      }
 
       if (res && res.ok) {
         setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
@@ -284,7 +295,6 @@ function writeStatus(it, newStatus) {
         return resolve();
       }
 
-      // Server hat geantwortet, aber ok=false (z. B. token invalid/expired)
       sessionToken = "";
       refreshLock();
       setStatus("Fehler beim Schreiben (Token ungültig) – bitte erneut klicken.");
@@ -293,7 +303,6 @@ function writeStatus(it, newStatus) {
 
     } catch (e) {
       console.error(e);
-      // Netzwerk/JSONP Fehler
       sessionToken = "";
       refreshLock();
       setStatus("Fehler beim Schreiben (Netz/JSONP) – bitte erneut klicken.");
