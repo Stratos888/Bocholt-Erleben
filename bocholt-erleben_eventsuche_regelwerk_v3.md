@@ -438,7 +438,7 @@ Die Ausgabe muss **direkt als JSON für `data/inbox_manual.json`** erfolgen.
     "time": "HH:MM",
     "city": "Bocholt",
     "location": "Ort / Venue",
-    "kategorie_suggestion": "Kategorie",
+    "kategorie_suggestion": "Musik & Bühne"
     "url": "https://...",
     "description": "Kurze sachliche Beschreibung.",
     "source_name": "Quellenname",
@@ -482,19 +482,23 @@ Sauber setzen, wenn eindeutig.
 Möglichst konkret, aber nur wenn belastbar.
 
 ### `kategorie_suggestion`
-Nur kurze, einfache Kategorien verwenden, z. B.:
+Es sollen nach Möglichkeit direkt die kanonischen Projektkategorien verwendet werden:
 
-- Musik
-- Theater
-- Kultur
-- Kinder
-- Markt
-- Sport
-- Messe
-- Führung
-- Comedy
+- Märkte & Feste
+- Kultur & Kunst
+- Musik & Bühne
+- Kinder & Familie
+- Sport & Bewegung
+- Natur & Draußen
+- Innenstadt & Leben
+- Sonstiges
 
-### `url`
+Keine freien Fantasie-Kategorien, keine Werbebegriffe und keine unnötig feingranularen Unterkategorien verwenden.
+
+Wenn ein Event nicht eindeutig zuordenbar ist, dann:
+
+- die sachlich nächstpassende kanonische Kategorie wählen
+- im Zweifel `Sonstiges` verwenden
 Direkte Event-URL, wenn vorhanden.
 
 ### `source_url`
