@@ -317,55 +317,6 @@ function writeStatus(it, newStatus) {
   });
 }
 
-    // Buttons sperren
-    const btnOk = document.getElementById("btnOk");
-    const btnNo = document.getElementById("btnNo");
-    const btnOpen = document.getElementById("btnOpen");
-    if (btnOk) btnOk.disabled = true;
-    if (btnNo) btnNo.disabled = true;
-    if (btnOpen) btnOpen.disabled = true;
-
-    try {
-      let res;
-
-      if (newStatus === "übernehmen") {
-        res = await jsonp(API_URL, {
-          action: "approve",
-          token: sessionToken,
-          row_number: String(it.row_number)
-        });
-      } else {
-        res = await jsonp(API_URL, {
-          action: "setStatus",
-          token: sessionToken,
-          row_number: String(it.row_number),
-          status: String(newStatus)
-        });
-      }
-
-      if (res && res.ok) {
-        setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
-        showNext();
-        return resolve();
-      }
-
-      sessionToken = "";
-      refreshLock();
-      setStatus("Fehler beim Schreiben (Token ungültig) – bitte erneut klicken.");
-      renderCurrent();
-      return resolve();
-
-    } catch (e) {
-      console.error(e);
-      sessionToken = "";
-      refreshLock();
-      setStatus("Fehler beim Schreiben (Netz/JSONP) – bitte erneut klicken.");
-      renderCurrent();
-      return resolve();
-    }
-  });
-}
-
     function escapeHtml(s) {
       return String(s || "")
         .replaceAll("&", "&amp;")
