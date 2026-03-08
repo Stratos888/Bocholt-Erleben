@@ -256,6 +256,7 @@ Umfang:
       }
     }
 
+<script>
 function writeStatus(it, newStatus) {
   return new Promise(async (resolve) => {
     if (!it.row_number) {
@@ -271,25 +272,15 @@ function writeStatus(it, newStatus) {
     if (btnOpen) btnOpen.disabled = true;
 
     try {
-      let res;
-
-      if (newStatus === "übernehmen") {
-        res = await jsonp(API_URL, {
-          action: "approve",
-          token: sessionToken,
-          row_number: String(it.row_number)
-        });
-      } else {
-        res = await jsonp(API_URL, {
-          action: "setStatus",
-          token: sessionToken,
-          row_number: String(it.row_number),
-          status: String(newStatus)
-        });
-      }
+      const res = await jsonp(API_URL, {
+        action: "setStatus",
+        token: sessionToken,
+        row_number: String(it.row_number),
+        status: String(newStatus)
+      });
 
       if (res && res.ok) {
-        setStatus(newStatus === "übernehmen" ? "Übernommen." : "Verworfen.");
+        setStatus(newStatus === "übernehmen" ? "Als 'übernehmen' markiert." : "Verworfen.");
         showNext();
         return resolve();
       }
@@ -316,6 +307,7 @@ function writeStatus(it, newStatus) {
     }
   });
 }
+</script>
 
     function escapeHtml(s) {
       return String(s || "")
