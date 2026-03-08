@@ -1328,6 +1328,7 @@ html.is-offline .offline-badge{
 
 
 /* SEARCH BAR (functional hero, top- level) */
+/* === BEGIN BLOCK: DS-02_SEARCH_INPUT_MAPPING | Purpose: map search input to DS-02 input tokens without visual change | Scope: replaces #search-filter base rule only === */
 #search-filter{
   width: 100%;
   max-width: 820px;
@@ -1335,13 +1336,13 @@ html.is-offline .offline-badge{
 
   box-sizing: border-box;
 
-  height: var(--ui-control-h);
-  padding: 0 var(--ui-control-pad-x);
-  line-height: var(--ui-control-h);
+  height: var(--cmp-input-minh);
+  padding: 0 var(--cmp-input-pad-x);
+  line-height: var(--cmp-input-minh);
 
-  border-radius: var(--ui-control-radius);
-  border: 1px solid var(--ui-control-border-strong);
-  background: var(--ui-control-bg-strong);
+  border-radius: var(--cmp-input-radius);
+  border: 1px solid var(--cmp-input-border-strong);
+  background: var(--cmp-input-bg-strong);
 
   font-size: 0.92rem;
   font-weight: 650;
@@ -1350,9 +1351,11 @@ html.is-offline .offline-badge{
   -webkit-appearance: none;
   appearance: none;
 
-  box-shadow: var(--ui-control-shadow-strong);
+  box-shadow: var(--cmp-input-shadow-strong);
 
   transition: box-shadow 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+/* === END BLOCK: DS-02_SEARCH_INPUT_MAPPING === */
 }
 
 #search-filter::placeholder{
@@ -1361,6 +1364,7 @@ html.is-offline .offline-badge{
 }
 
 /* SECTION */
+/* === BEGIN BLOCK: DS-02_SEARCH_INPUT_FOCUS_MAPPING | Purpose: map search focus state to DS-02 focus token without visual change | Scope: replaces #search-filter focus rule only === */
 #search-filter:focus,
 #search-filter:focus-visible{
   outline: none;
@@ -1370,8 +1374,10 @@ html.is-offline .offline-badge{
 
   box-shadow:
     0 7px 16px rgba(0,0,0,0.052),
-    0 0 0 3px var(--ui-focus-ring),
+    0 0 0 3px var(--cmp-input-focus-ring),
     0 1px 0 rgba(255,255,255,0.82) inset;
+}
+/* === END BLOCK: DS-02_SEARCH_INPUT_FOCUS_MAPPING === */
 }
 
 
@@ -1389,6 +1395,7 @@ html.is-offline .offline-badge{
 }
 
 /* Pills: exakte Höhe, Padding vertikal = 0 */
+/* === BEGIN BLOCK: DS-02_FILTER_PILL_MAPPING | Purpose: map filter pills to DS-02 input/choice tokens without visual change | Scope: replaces .filter-pill base rule only === */
 .filter-pill{
   -webkit-appearance: none;
   appearance: none;
@@ -1402,12 +1409,12 @@ html.is-offline .offline-badge{
   justify-content: space-between;
   gap: 10px;
 
-  height: var(--ui-control-h);
-  padding: 0 var(--ui-control-pad-x);
+  height: var(--cmp-input-minh);
+  padding: 0 var(--cmp-input-pad-x);
 
-  border-radius: var(--ui-control-radius);
-  border: 1px solid var(--ui-control-border);
-  background: var(--ui-control-bg);
+  border-radius: var(--cmp-input-radius);
+  border: 1px solid var(--cmp-input-border);
+  background: var(--cmp-input-bg);
 
   font: inherit;
   font-size: 0.90rem;
@@ -1420,9 +1427,11 @@ html.is-offline .offline-badge{
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 
-  box-shadow: var(--ui-control-shadow);
+  box-shadow: var(--cmp-input-shadow);
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+/* === END BLOCK: DS-02_FILTER_PILL_MAPPING === */
 }
 
 .filter-pill__label{
@@ -1472,23 +1481,27 @@ html.is-offline .offline-badge{
 
 .filter-pill:active{ transform: translateY(1px); }
 
+/* === BEGIN BLOCK: DS-02_FILTER_PILL_FOCUS_MAPPING | Purpose: map filter pill focus state to DS-02 focus token without visual change | Scope: replaces .filter-pill focus rule only === */
 .filter-pill:focus-visible{
   outline: none;
   box-shadow:
     0 7px 16px rgba(0,0,0,0.050),
-    0 0 0 3px var(--ui-focus-ring),
+    0 0 0 3px var(--cmp-input-focus-ring),
     0 1px 0 rgba(255,255,255,0.72) inset;
+}
+/* === END BLOCK: DS-02_FILTER_PILL_FOCUS_MAPPING === */
 }
 
 /* Reset: exakt gleiche Höhe wie die anderen Controls */
+/* === BEGIN BLOCK: DS-02_FILTER_RESET_MAPPING | Purpose: map filter reset control to DS-02 input tokens without visual change | Scope: replaces .filter-pill--reset base rule only === */
 .filter-pill--reset{
   -webkit-appearance: none;
   appearance: none;
 
   flex: 0 0 auto;
 
-  height: var(--ui-control-h);
-  width: var(--ui-control-h);
+  height: var(--cmp-input-minh);
+  width: var(--cmp-input-minh);
   padding: 0;
 
   display: inline-flex;
@@ -1497,12 +1510,14 @@ html.is-offline .offline-badge{
 
   position: relative;
 
-  border-radius: var(--ui-control-radius);
-  border: 1px solid var(--ui-control-border);
-  background: var(--ui-control-bg);
+  border-radius: var(--cmp-input-radius);
+  border: 1px solid var(--cmp-input-border);
+  background: var(--cmp-input-bg);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+/* === END BLOCK: DS-02_FILTER_RESET_MAPPING === */
 
   box-shadow: var(--ui-control-shadow);
 
@@ -1554,12 +1569,15 @@ html.is-offline .offline-badge{
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
+/* === BEGIN BLOCK: DS-02_FILTER_RESET_FOCUS_MAPPING | Purpose: map filter reset focus state to DS-02 focus token without visual change | Scope: replaces .filter-pill--reset focus rule only === */
 .filter-pill--reset:focus-visible{
   outline: none;
   box-shadow:
     0 7px 16px rgba(0,0,0,0.050),
-    0 0 0 3px var(--ui-focus-ring),
+    0 0 0 3px var(--cmp-input-focus-ring),
     0 1px 0 rgba(255,255,255,0.72) inset;
+}
+/* === END BLOCK: DS-02_FILTER_RESET_FOCUS_MAPPING === */
 }
 
 
@@ -3344,6 +3362,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
