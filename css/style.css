@@ -4,6 +4,7 @@
 :root{
   /* Overlay / Panels */
   --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+  --ui-overlay-blur: 6px;
 
   --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
   --surface-panel-elevated: color-mix(in srgb, white 76%, var(--color-primary-muted));
@@ -43,6 +44,7 @@
 
   --header-h: 48px;
   --stack-gap: 0px;
+  --vv-bottom: 0px;
 
   --stack-bg: rgba(249, 251, 246, 0.86);
   --divider: rgba(31,41,51,0.06);
@@ -55,6 +57,7 @@
 
   --eventcard-pad: 14px;
   --topstack-pad-bottom: 4px;
+  --offline-badge-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px);
 
   /* Cards */
   --radius-card: 12px;
@@ -118,6 +121,7 @@
   /* UI controls */
   --ui-radius-sm: 12px;
   --ui-radius-md: 14px;
+  --ui-sheet-radius-lg: 18px;
 
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
@@ -138,6 +142,9 @@
 
   --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
   --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
+  --ui-sheet-shadow-strong:
+    0 24px 64px rgba(0,0,0,0.16),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   --ui-focus-ring: rgba(139,207,74,0.20);
   --ui-focus-ring-neutral: rgba(31,41,51,0.18);
@@ -145,9 +152,11 @@
   --ui-font-size-control: 13px;
   --ui-font-weight-control: 750;
   --ui-font-weight-cta: 800;
+  --ui-choice-font-size: 15px;
 
   --ui-control-h: 36px;
   --ui-control-pad-x: 12px;
+  --ui-choice-minh: var(--ui-tap-target);
 
   --ui-control-radius: var(--ui-radius-md);
 
@@ -3275,6 +3284,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
