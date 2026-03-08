@@ -373,23 +373,32 @@ Deferred next steps (only if/when pipeline is reactivated):
    - Inbox remains 100% curatable (no placeholders/listings)
 
 
-PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only)
+PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only, Zielstufe A)
 
 Goal:
 - Minimal ongoing effort.
 - Regular intake of “good events” without scraping/Cloudflare trial/error.
 - Output must be immediately curatable in the existing Inbox Review PWA.
+- Zielstufe A: Nach der Chat-Suche maximal 1x Copy-Paste + 1x Workflow-Klick.
 
 Rules (fixed):
+- Search with Regelwerk stays unchanged for now.
 - Extract facts only (title/date/time/location/city/source URL/category suggestion).
 - Do not copy long descriptions from sources/newsletters.
 - Prefer neutral/public sources; avoid over-representing potential future organizer subscribers.
 - Deliver as a file format that can be imported into the existing inbox flow (no copy/paste into spreadsheets).
 
-Planned integration (minimal, no UI work):
-- KI generates `data/inbox_manual.json` (or equivalent) using a fixed schema.
-- A manual import step appends these rows into the Inbox source of truth (Google Sheet tab "Inbox") with `status=review`,
-  so the existing Inbox Review PWA can be used unchanged (approve/reject + writeback).
+Operational flow (current target):
+1) Chat returns JSON for `data/inbox_manual.json`
+2) User pastes once into `data/inbox_manual.json`
+3) User starts exactly one workflow: `Manual KI Event Intake`
+4) Workflow appends to Google Sheet tab `Inbox`, clears `data/inbox_manual.json`, and dispatches `Deploy to STRATO`
+5) Inbox Review PWA is then refreshed from the normal deploy output (`data/inbox.json`)
+
+Non-goal for this stage:
+- No direct Chat → Sheet integration yet
+- No new UI for manual JSON input yet
+- No changes to search prompt / rulebook behavior yet
 
 Optional lead source (later):
 - Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
