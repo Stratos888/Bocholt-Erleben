@@ -234,27 +234,20 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- GS-01 Event Feed (Golden Screen) — Enterprise Scanability Workpack umgesetzt (UI + Filter, per Console-Proofs verifiziert):
-  - Event Cards: Titel bleibt 2-zeilig (Clamp); Meta ist 1-zeilig (Zeit fix | Ort ellipsis) und Redundanz City/Location entfernt.
-  - Title-Row als Grid (Text | Kategorie-Icon) stabilisiert (kein Overlap/absolute hacks).
-  - Feed Rhythm/Density tokenbasiert eingeführt und per Gaps-Proof feinjustiert:
-    - `events-section-title` margins reduziert (mt/mb) und Cards/Section Abstände deterministisch aus Tokens abgeleitet.
-- Filter (Zeit) — Enterprise Facets an Feed-Gruppen gekoppelt (kontextabhängige Counts):
-  - Zeit-Buckets: `all | today | week | weekend | nextweek | later`
-  - Facet-Counts korrekt (Search + aktive Kategorie) + `endDate` berücksichtigt (laufende Events zählen als „Heute“).
-- Control System Polish (Search + Pills + Reset + Focus):
-  - Einheitliche Control-DNA tokenbasiert (Höhe/Radius/Border/Shadow/Focus-Ring) für Search, Pills und Reset.
-  - Reset-Icon als SVG (stroke=currentColor) + robuste Zentrierung; Fokus-Ring konsistent via `--ui-focus-ring`.
-- GS-01 Loading/Empty/Error States (Workpack umgesetzt, proof-basiert):
-  - Loading: Skeleton-Eventcards im Feed (stabile Geometrie; kein Layout-Jump).
-  - Empty: „Keine Events gefunden“ als Card + Reset-CTA („Filter zurücksetzen“).
-  - Error: Retry-CTA („Erneut versuchen“) (deterministisch via Reload).
-  - Loading-Overlay wird beim normalen Laden nicht mehr gezeigt (Skeleton-only); Overlay bleibt für Error-State.
-- FilterContract Hotfix (UI):
-  - Pflicht-Search-Element (`#search-filter`) wieder im DOM bereitgestellt → FilterModule init bricht nicht mehr ab.
-- PWA Offline-Shell Robustness (Service Worker):
-  - Mobile „weiß/Offline“-Screen behoben durch Precache der in `/index.html` referenzierten CSS/JS-Assets (inkl. `?v=`).
-  - Offline-Reload kann weiterhin „normal“ funktionieren (Cache-Fallback für `events.json`); Error-State tritt nur auf, wenn Cache fehlt.
+- GS-01.5 Offline-Indicator (Toast + Badge) umgesetzt (UI-only, minimal JS):
+  - Toast nur bei Zustandswechsel:
+    - online → offline: „Offline – gespeicherte Daten“
+    - offline → online: „Wieder online“
+  - Persistentes Badge solange offline:
+    - Text: „Offline – gespeicherte Daten (ggf. nicht aktuell)“
+    - Keine Layout-Shifts, kompatibel mit sticky header/top-stack, nicht blockierend
+- Offline-Reload Robustness (Mobile/Desktop) stabilisiert:
+  - Wiederholtes Reload im Offline-Modus lädt App-Shell + Feed zuverlässig (kein „white/offline“-Fallback mehr)
+  - data/events.json Offline-Fallback stabil (Cache/ignoreSearch-Fallback)
+- CSS Stabilisierung (Design-System Grundlage, UI unverändert):
+  - Root-Cause reproduzierbar gefixt: fehlende Tokens → `var(--token)` invalid → Spacing/Icon-Drift
+  - Token-Contract im `:root` ergänzt: Layout/Feed/Detailpanel/Icon-Size Tokens müssen immer definiert sein
+  - Arbeitsregel bestätigt: erst token-only Stabilisierung, erst danach Component-Mapping; keine riskanten Kommentar-/Marker-Umbauten im selben Schritt
 
 DECISIONS LOG (permanent, project-wide):
 - GS-01 Feed: Scanability-Contract:
@@ -281,19 +274,18 @@ CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Aktiver UI-Fokus dieser Session war GS-01 Event Feed + Filter-Facets (ohne Detailpanel-Redesign).
 
 REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
-1) GS-01 Kategorie-Erkennbarkeit Feintuning (nur Tokens/CSS, low-noise)
-2) GS-01 Scroll-Performance QA (Shadows/blur auf Midrange Android; ggf. CSS-only abmildern)
-3) GS-01.5 Offline-Indicator (Toast + persistentes Badge; UI-only, minimal JS)
-   - Toast nur bei Zustandswechsel:
-     - online → offline: „Offline – gespeicherte Daten“
-     - offline → online: „Wieder online“
-   - Persistentes Badge solange offline (unaufdringlich, nicht blockierend):
-     - Text: „Offline – gespeicherte Daten (ggf. nicht aktuell)“
-     - Kein Vollflächen-Layer; keine Layout-Shifts; kompatibel mit sticky header/top-stack.
-4) Optional: Detailpanel Accessiblity Audit (Keyboard/ARIA) — nur wenn Bug/Regression sichtbar
+1) CSS Design System — DS-01 Token-Contract finalisieren (UI unverändert):
+   - `:root` enthält vollständigen „must-exist“ Token-Satz (Layout/Feed/DP/Icon sizes)
+   - Keine Duplikate/Overrides, die Tokens still überschreiben
+2) CSS Design System — DS-02 Component-Mapping (UI unverändert, CSS-only):
+   - Button / Link / Input / Card / Divider / Focus als wiederverwendbare “DNA”
+   - Bestehende Klassen schrittweise auf Tokens/Components mappen (kein Redesign)
+3) Marker-Hygiene in `css/style.css` (nur Struktur, kein UI):
+   - Alle BEGIN/END Marker strikt einzeilig und syntaktisch safe
+   - Keine multi-line “Patch-Notes”-Kommentarblöcke mehr in CSS
 
 NEXT CHAT PROMPT (start here):
-„GS-01.5 Offline-Indicator umsetzen: UI-only. Ziel: Toast bei online/offline Wechsel + persistentes Offline-Badge solange offline. Bitte ZIP-first: MASTER.md + ENGINEERING.md lesen, dann one-file-at-a-time Patch liefern (CSS-first; minimal JS für online/offline Listener). Pipeline-Sektion in MASTER.md nicht anfassen.“
+„Wir sind wieder auf dem alten UI-Stand. Nächster Schritt: CSS Design System DS-01. ZIP-first: MASTER.md + ENGINEERING.md lesen. One file at a time: `css/style.css`. Ziel: Token-Contract (must-exist Tokens) finalisieren, ohne UI-Änderung. Danach DS-02 Component-Mapping vorbereiten (CSS-only, kein Redesign). Bitte nur Replace-Instructions mit eindeutigen BEGIN/END Anchors.“
 
 PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: PARKED (for later / optional add-on)
 
