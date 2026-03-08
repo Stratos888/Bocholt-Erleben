@@ -199,12 +199,11 @@ const getCategoryIcon = (categoryRaw) => {
       description: desc,
     } : null;
 
-/* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA)
+/* === BEGIN BLOCK: ENTERPRISE V2 LINKS + SHARE (source always visible, no route CTA)
 Zweck:
 - CTA-Disziplin: Actionbar zeigt NUR Kalender + Teilen
-- Website/Quelle werden korrekt getrennt:
-  * bocholt.de/* => Quelle (sourceUrl)
-  * homepage (locations.json) => Website (websiteUrl)
+- Quelle wird immer aus der besten belastbaren Event-URL gebildet (nicht nur bocholt.de)
+- Website bleibt die Venue-/Homepage aus locations.json, wenn sie sinnvoll von der Quelle verschieden ist
 - Keine Route-Redundanz (Maps steckt im Ort-Link)
 Umfang:
 - VM Felder: websiteUrl, sourceUrl, sharePayload
@@ -218,43 +217,46 @@ const rawUrl = normalizeHttpUrl(
   )
 );
 
-const isBocholtDomain = rawUrl
-  ? /(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(rawUrl)
-  : false;
-
-// Quelle: bocholt.de immer Attribution; bevorzugt spezifische Event-Links, falls vorhanden
 const sourceCandidates = [
   normalizeHttpUrl(trimOrEmpty(e.source_url || e.sourceUrl || "")),
   normalizeHttpUrl(trimOrEmpty(e.url || e.link || "")),
+  rawUrl,
 ].filter(Boolean);
 
-const pickBestBocholtSource = (urls) => {
-  const bocholt = urls.filter(u => /(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(u));
-  if (!bocholt.length) return "";
+const scoreSourceUrl = (u) => {
+  try {
+    const parsed = new URL(u);
+    const host = parsed.hostname.toLowerCase();
+    const path = parsed.pathname || "/";
+    const segs = path.split("/").filter(Boolean).length;
 
-  // 1) bevorzugt /veranstaltungskalender/
-  const vk = bocholt.find(u => /\/veranstaltungskalender\//i.test(u));
-  if (vk) return vk;
+    let score = 0;
 
-  // 2) sonst „spezifischster“ Pfad (mehr Segmente)
-  const score = (u) => {
-    try {
-      const p = new URL(u).pathname || "/";
-      const segs = p.split("/").filter(Boolean).length;
-      return segs;
-    } catch { return 0; }
-  };
+    // konkrete Event-Detailseiten bevorzugen
+    if (/\/veranstaltungskalender\//i.test(path)) score += 100;
+    if (/\/programm\//i.test(path)) score += 90;
 
-  return bocholt.slice().sort((a,b) => score(b) - score(a))[0];
+    // offizielle Bocholter Quellen leicht bevorzugen, aber nicht erzwingen
+    if (/(^|\.)bocholt\.de$/i.test(host)) score += 20;
+    if (/(^|\.)stadttheater-bocholt\.de$/i.test(host)) score += 15;
+
+    // spezifischere Pfade bevorzugen
+    score += segs;
+
+    return score;
+  } catch {
+    return 0;
+  }
 };
 
-const sourceUrl = pickBestBocholtSource(sourceCandidates) || (rawUrl && isBocholtDomain ? rawUrl : "");
+const sourceUrl = sourceCandidates.length
+  ? sourceCandidates.slice().sort((a, b) => scoreSourceUrl(b) - scoreSourceUrl(a))[0]
+  : "";
 
-// Website: NUR externe Homepage (nicht bocholt.de)
+// Website: externe Homepage aus locations.json, nur wenn sinnvoll von Quelle verschieden
 const websiteUrl = (() => {
   const hp = normalizeHttpUrl(homepage) || "";
   if (!hp) return "";
-  if (/(^|\/\/)(www\.)?bocholt\.de(\/|$)/i.test(hp)) return "";
   if (sourceUrl && hp === sourceUrl) return "";
   return hp;
 })();
@@ -287,7 +289,7 @@ const actions = [
   }] : []),
 ];
 
-/* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (dedupe, no route CTA) === */
+/* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (source always visible, no route CTA) === */
 
     return {
       // current render fields (keep stable to avoid UI regression)
@@ -1245,6 +1247,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
