@@ -531,22 +531,27 @@ a:visited{ color: var(--color-primary); }
 }
 
 
+/* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: replaces .modal-cta-button base rule only === */
 .modal-cta-button{
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 11px 14px;
-  border-radius: var(--ui-radius-sm);
+  min-height: var(--cmp-btn-minh);
+  padding: 11px var(--cmp-btn-pad-x);
+  border-radius: var(--cmp-btn-radius);
 
-  background: var(--color-primary-muted);
+  background: var(--cmp-btn-primary-bg);
   border: 1px solid var(--ui-border-primary);
 
-  color: var(--color-text-primary);
+  color: var(--cmp-btn-primary-fg);
+  font-size: var(--cmp-btn-font-size);
   font-weight: var(--ui-font-weight-cta);
   text-decoration: none;
 
-  box-shadow: var(--ui-shadow-cta);
+  box-shadow: var(--cmp-btn-primary-shadow);
+}
+/* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
 }
 
 .modal-cta-button:hover{
@@ -2750,18 +2755,19 @@ Umfang:
   to   { transform: translateY(0);   opacity: 1; }
 }
 
+/* === BEGIN BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING | Purpose: map calendar chooser buttons to DS-02 choice/input tokens without UI change | Scope: replaces #event-detail-panel .detail-cal-sheet button base rule only === */
 #event-detail-panel .detail-cal-sheet button{
   width: 100%;
-  min-height: var(--ui-choice-minh);
+  min-height: var(--cmp-choice-minh);
 
   padding: 12px 14px;
-  border-radius: var(--ui-radius-md);
+  border-radius: var(--cmp-input-radius);
 
-  border: 1px solid var(--ui-border-soft);
+  border: 1px solid var(--cmp-input-border-strong);
   background: var(--ui-surface-tint-hover);
 
-  font-size: var(--ui-choice-font-size);
-  font-weight: var(--ui-font-weight-control);
+  font-size: var(--cmp-choice-font-size);
+  font-weight: var(--cmp-btn-font-weight);
   letter-spacing: -0.01em;
   color: rgba(31,41,51,0.92);
 
@@ -2776,6 +2782,8 @@ Umfang:
 
   transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
 }
+/* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING === */
+}
 
 @media (hover: hover){
   #event-detail-panel .detail-cal-sheet button:hover{
@@ -2789,9 +2797,12 @@ Umfang:
   background: var(--ui-surface-tint-active);
 }
 
+/* === BEGIN BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_FOCUS_MAPPING | Purpose: map calendar chooser focus state to DS-02 neutral focus token without UI change | Scope: replaces #event-detail-panel .detail-cal-sheet button:focus-visible only === */
 #event-detail-panel .detail-cal-sheet button:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: 3px;
+}
+/* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_FOCUS_MAPPING === */
 }
 
 
@@ -3070,6 +3081,7 @@ svg.ui-icon-svg{
 
 /* HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) */
 
+/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_MAPPING | Purpose: map header CTA base to DS-02 button tokens without UI change | Scope: replaces .header-right > .pwa-install-button base rule only === */
 .header-right > .pwa-install-button{
   --hdr-icon-size: 16px;
 
@@ -3078,18 +3090,18 @@ svg.ui-icon-svg{
   justify-content: center;
   gap: 6px;
 
-  min-height: 34px;
+  min-height: calc(var(--cmp-btn-minh) - 10px);
   padding: 0 10px;
 
   border-radius: var(--ui-radius-sm);
-  border: 1px solid var(--ui-border-weak);
+  border: 1px solid var(--cmp-btn-secondary-border);
   background: var(--ui-surface-soft);
 
   font-family: inherit;
-  font-size: var(--ui-font-size-control);
-  font-weight: var(--ui-font-weight-control);
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
   line-height: 1;
-  color: rgba(31,41,51,0.80);
+  color: var(--cmp-btn-secondary-fg);
 
   cursor: pointer;
   text-decoration: none;
@@ -3101,6 +3113,8 @@ svg.ui-icon-svg{
 
   transition: background 140ms ease, border-color 140ms ease,
               box-shadow 140ms ease, transform 140ms ease;
+}
+/* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 }
 
 @media (hover: hover){
@@ -3115,10 +3129,13 @@ svg.ui-icon-svg{
   background: var(--ui-surface-soft-active);
 }
 
+/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING | Purpose: map header CTA focus to DS-02 button focus token without UI change | Scope: replaces .header-right > .pwa-install-button:focus-visible only === */
 .header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid var(--ui-focus-ring);
+  outline: 2px solid var(--cmp-btn-focus-ring);
   outline-offset: 3px;
   border-radius: var(--ui-radius-sm);
+}
+/* === END BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING === */
 }
 
 /* Icon base */
@@ -3275,6 +3292,7 @@ svg.ui-icon-svg{
 }
 
 /* Buttons (<a> oder <button>) */
+/* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_BUTTON_MAPPING | Purpose: map detail actionbar buttons to DS-02 secondary button tokens without UI change | Scope: replaces #detail-actionbar-slot .detail-actionbar-btn base rule only === */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
@@ -3290,11 +3308,11 @@ svg.ui-icon-svg{
   justify-content: center;
   gap: var(--space-1);
 
-  border-radius: var(--ui-radius-md);
-  border: 1px solid var(--border-panel-soft);
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--cmp-surface-panel-border);
 
-  background: rgba(255,255,255,0.88);
-  color: rgba(31,41,51,0.90);
+  background: var(--cmp-btn-secondary-bg);
+  color: var(--cmp-btn-secondary-fg);
 
   box-shadow: var(--shadow-panel-btn);
 
@@ -3314,6 +3332,8 @@ svg.ui-icon-svg{
     transform 140ms ease,
     color 140ms ease,
     opacity 140ms ease;
+}
+/* === END BLOCK: DS-02_DETAIL_ACTIONBAR_BUTTON_MAPPING === */
 }
 
 @media (hover: hover){
@@ -3362,6 +3382,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
