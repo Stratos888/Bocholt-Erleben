@@ -537,6 +537,29 @@ a:visited{ color: var(--color-primary); }
   align-items: center;
   justify-content: center;
 
+  padding: 11px 14px;
+  border-radius: var(--ui-radius-sm);
+
+  background: var(--color-primary-muted);
+  border: 1px solid var(--ui-border-primary);
+
+  color: var(--color-text-primary);
+  font-weight: var(--ui-font-weight-cta);
+  text-decoration: none;
+
+  box-shadow: var(--ui-shadow-cta);
+}
+/* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
+
+.modal-cta-button:hover{
+  text-decoration: none;
+  filter: brightness(0.985);
+}
+.modal-cta-button:active{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   min-height: var(--cmp-btn-minh);
   padding: 11px var(--cmp-btn-pad-x);
   border-radius: var(--cmp-btn-radius);
@@ -1361,7 +1384,6 @@ html.is-offline .offline-badge{
   transition: box-shadow 140ms ease, border-color 140ms ease, background 140ms ease;
 }
 /* === END BLOCK: DS-02_SEARCH_INPUT_MAPPING === */
-}
 
 #search-filter::placeholder{
   color: rgba(138,148,155,0.95);
@@ -1383,8 +1405,6 @@ html.is-offline .offline-badge{
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
 /* === END BLOCK: DS-02_SEARCH_INPUT_FOCUS_MAPPING === */
-}
-
 
 /* FILTER BAR (compact single-row + inline reset X) */
 
@@ -1437,7 +1457,6 @@ html.is-offline .offline-badge{
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 /* === END BLOCK: DS-02_FILTER_PILL_MAPPING === */
-}
 
 .filter-pill__label{
   color: rgba(95,107,115,0.90);
@@ -1495,7 +1514,6 @@ html.is-offline .offline-badge{
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 /* === END BLOCK: DS-02_FILTER_PILL_FOCUS_MAPPING === */
-}
 
 /* Reset: exakt gleiche Höhe wie die anderen Controls */
 /* === BEGIN BLOCK: DS-02_FILTER_RESET_MAPPING | Purpose: map filter reset control to DS-02 input tokens without visual change | Scope: replaces .filter-pill--reset base rule only === */
@@ -1521,13 +1539,12 @@ html.is-offline .offline-badge{
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-/* === END BLOCK: DS-02_FILTER_RESET_MAPPING === */
 
   box-shadow: var(--ui-control-shadow);
 
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
+/* === END BLOCK: DS-02_FILTER_RESET_MAPPING === */
 
 /* Keine Pill-Chevron */
 .filter-pill--reset::after{ content: none; }
@@ -1541,7 +1558,6 @@ html.is-offline .offline-badge{
   width: 16px;
   height: 16px;
 
-  /* Hard-center regardless of flex/gap/space-between from .filter-pill */
   position: absolute;
   left: 50%;
   top: 50%;
@@ -1583,8 +1599,6 @@ html.is-offline .offline-badge{
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 /* === END BLOCK: DS-02_FILTER_RESET_FOCUS_MAPPING === */
-}
-
 
 /* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
 
@@ -3382,6 +3396,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
