@@ -1,4 +1,4 @@
-/* === BEGIN BLOCK: TOKEN_CONTRACT_ROOT | Purpose: single source of truth for all app tokens used by CSS | Scope: replaces entire :root token block === */
+/* === BEGIN BLOCK: TOKEN_CONTRACT_ROOT | Purpose: finalize DS-01 token contract and prepare DS-02 component mapping aliases without UI change | Scope: replaces entire :root token block === */
 /* GLOBAL DESIGN TOKENS */
 
 :root{
@@ -64,6 +64,7 @@
   --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
 
   /* Event cards */
+  --rail-w: 4px;
   --eventcard-rail-opacity: 0.48;
   --eventcard-meta-color: rgba(60,72,88,0.70);
   --eventcard-meta-gap: 2px;
@@ -101,6 +102,7 @@
   --ui-icon-opacity: 0.92;
   --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
 
+  --hdr-icon-size: var(--ui-icon-size-md);
   --eventcard-category-size: var(--ui-icon-size-sm);
   --eventcard-category-opacity: 0.72;
 
@@ -111,6 +113,7 @@
   /* Detailpanel layout */
   --dp-header-pad-top: 34px;
   --dp-sheet-radius: 22px;
+  --dp-indicator-size: 44px;
 
   --dp-close-size: 36px;
   --dp-actionbar-h: 78px;
@@ -181,6 +184,64 @@
   --ui-close-font-size: 22px;
   --ui-close-color: rgba(31,41,51,0.74);
 
+  /* DS-02 component mapping prep: buttons */
+  --cmp-btn-minh: var(--ui-tap-target);
+  --cmp-btn-pad-x: var(--ui-control-pad-x);
+  --cmp-btn-radius: var(--ui-control-radius);
+  --cmp-btn-font-size: var(--ui-font-size-control);
+  --cmp-btn-font-weight: var(--ui-font-weight-control);
+  --cmp-btn-focus-ring: var(--ui-focus-ring);
+  --cmp-btn-primary-bg: var(--color-primary);
+  --cmp-btn-primary-fg: var(--color-text-primary);
+  --cmp-btn-primary-shadow: var(--ui-shadow-cta);
+  --cmp-btn-secondary-bg: var(--ui-control-bg-strong);
+  --cmp-btn-secondary-fg: var(--color-text-primary);
+  --cmp-btn-secondary-border: var(--ui-control-border-strong);
+  --cmp-btn-secondary-shadow: var(--ui-control-shadow-strong);
+  --cmp-btn-ghost-bg: transparent;
+  --cmp-btn-ghost-fg: var(--color-text-primary);
+  --cmp-btn-ghost-border: transparent;
+
+  /* DS-02 component mapping prep: cards / surfaces */
+  --cmp-card-radius: var(--radius-card);
+  --cmp-card-border: var(--border);
+  --cmp-card-shadow: var(--shadow-card);
+  --cmp-card-bg: var(--color-surface);
+  --cmp-surface-panel-bg: var(--surface-panel);
+  --cmp-surface-panel-elevated-bg: var(--surface-panel-elevated);
+  --cmp-surface-panel-footer-bg: var(--surface-panel-footer);
+  --cmp-surface-panel-border: var(--border-panel);
+  --cmp-surface-panel-shadow: var(--shadow-panel);
+
+  /* DS-02 component mapping prep: dividers */
+  --cmp-divider-color: var(--divider);
+  --cmp-divider-strong: var(--ui-border-soft);
+
+  /* DS-02 component mapping prep: links */
+  --cmp-link-color: var(--color-text-primary);
+  --cmp-link-color-muted: var(--color-text-secondary);
+  --cmp-link-underline-color: currentColor;
+  --cmp-link-focus-ring: var(--ui-focus-ring-neutral);
+
+  /* DS-02 component mapping prep: inputs / choices */
+  --cmp-input-minh: var(--ui-control-h);
+  --cmp-input-pad-x: var(--ui-control-pad-x);
+  --cmp-input-radius: var(--ui-control-radius);
+  --cmp-input-border: var(--ui-control-border);
+  --cmp-input-border-strong: var(--ui-control-border-strong);
+  --cmp-input-bg: var(--ui-control-bg);
+  --cmp-input-bg-strong: var(--ui-control-bg-strong);
+  --cmp-input-shadow: var(--ui-control-shadow);
+  --cmp-input-shadow-strong: var(--ui-control-shadow-strong);
+  --cmp-input-focus-ring: var(--ui-focus-ring);
+  --cmp-choice-minh: var(--ui-choice-minh);
+  --cmp-choice-font-size: var(--ui-choice-font-size);
+
+  /* DS-02 component mapping prep: focus */
+  --cmp-focus-ring-brand: var(--ui-focus-ring);
+  --cmp-focus-ring-neutral: var(--ui-focus-ring-neutral);
+  --cmp-focus-outline-offset: 2px;
+
   /* Backward compat */
   --bg: var(--color-background);
   --surface: var(--color-surface);
@@ -205,7 +266,6 @@
   --space-5: var(--space-xl);
 }
 /* === END BLOCK: TOKEN_CONTRACT_ROOT === */
-
 /**
  * STYLE.CSS – Bocholt erleben (MVP frozen)
  * Ziel: ruhig, modern, funktional, konsistent
@@ -3284,6 +3344,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
