@@ -419,21 +419,26 @@ a:visited{ color: var(--color-primary); }
   color: var(--color-text-secondary);
 }
 
+/* === BEGIN BLOCK: DS-02_CONTENT_CARD_MAPPING | Purpose: map content cards to DS-02 surface/card DNA without UI redesign | Scope: replaces content-card block including primary variant only === */
 .content-card{
-  background: var(--color-surface);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background: var(--cmp-card-bg);
+  border: 1px solid var(--cmp-card-border);
+  border-radius: var(--cmp-card-radius);
+  box-shadow: var(--cmp-card-shadow);
+
   padding: 14px 14px;
   margin-top: 12px;
 }
+
 .content-card--primary{
-  border-color: rgba(139,207,74,.35);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.07);
+  border-color: var(--ui-border-primary);
+  box-shadow: var(--ui-shadow-cta);
 }
+
 .content-card h2{
   margin-top: 0;
 }
+/* === END BLOCK: DS-02_CONTENT_CARD_MAPPING === */
 
 .content-steps{
   list-style: none;
@@ -494,18 +499,80 @@ a:visited{ color: var(--color-primary); }
   border: 1px solid rgba(139,207,74,.35);
 }
 
+/* === BEGIN BLOCK: DS-02_CONTENT_ACTIONS_MAPPING | Purpose: map content page CTA/back actions to DS-02 button/link DNA without UI redesign | Scope: replaces content-actions/content-cta/content-back block only === */
 .content-actions{
   margin-top: 16px;
   display: grid;
   gap: 10px;
 }
+
 .content-cta{
   width: 100%;
+  min-height: var(--cmp-btn-minh);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 var(--cmp-btn-pad-x);
+  border-radius: var(--ui-radius-sm);
+
+  background: var(--cmp-btn-secondary-bg);
+  border: 1px solid var(--cmp-btn-secondary-border);
+  color: var(--cmp-btn-secondary-fg);
+
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
+  text-decoration: none;
+
+  box-shadow: var(--cmp-btn-secondary-shadow);
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
 }
+
+@media (hover: hover){
+  .content-cta:hover{
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
+    text-decoration: none;
+  }
+}
+
+.content-cta:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.content-cta:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-sm);
+}
+
 .content-back{
-  display: inline-block;
-  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  min-height: var(--cmp-btn-minh);
+  color: var(--cmp-link-color-muted);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
+
+.content-back:focus-visible{
+  outline: 2px solid var(--cmp-link-focus-ring);
+  outline-offset: var(--cmp-focus-outline-offset);
+  border-radius: var(--ui-radius-sm);
+}
+/* === END BLOCK: DS-02_CONTENT_ACTIONS_MAPPING === */
 
 /* CONTENT LINKS (top-pwa navigation list, borderless) */
 .content-links{
@@ -2111,14 +2178,7 @@ html.is-panel-open body {
   touch-action: none;
 }
 
-/* BEGIN PATCH DP-CLOSE-BUTTON-POLISH-V2
-   Zweck:
-   - Detailpanel-Close auf DS-02 Ghost/Icon-Button-DNA mappen.
-   - Bestehenden Look beibehalten: ruhig, rund, leicht elevated, kein Redesign.
-   Umfang:
-   - Ersetzt den kompletten Close-Button-Block inkl. States.
-*/
-
+/* === BEGIN BLOCK: DS-02_DETAIL_CLOSE_BUTTON_MAPPING | Purpose: consolidate detail close button into one clean DS-02 block and remove malformed stray brace | Scope: replaces complete detail-panel-close block including states and focus === */
 #event-detail-panel .detail-panel-close{
   position: absolute;
   z-index: 6;
@@ -2167,7 +2227,6 @@ html.is-panel-open body {
     transform 140ms ease,
     color 140ms ease;
 }
-}
 
 #event-detail-panel .detail-panel-close > *{
   pointer-events: none;
@@ -2202,14 +2261,11 @@ html.is-panel-open body {
     0 1px 0 rgba(255,255,255,0.76) inset !important;
 }
 
-/* === BEGIN BLOCK: DS-02_DETAIL_CLOSE_FOCUS_MAPPING | Purpose: align detail close button focus to central DS-02 focus contract without UI redesign | Scope: replaces detail close focus rule only === */
 #event-detail-panel .detail-panel-close:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: var(--cmp-focus-outline-offset);
 }
-/* === END BLOCK: DS-02_DETAIL_CLOSE_FOCUS_MAPPING === */
-
-/* END PATCH DP-CLOSE-BUTTON-POLISH-V2 */
+/* === END BLOCK: DS-02_DETAIL_CLOSE_BUTTON_MAPPING === */
 
 /* SECTION */
 
@@ -3505,8 +3561,7 @@ svg.ui-icon-svg{
   z-index: 6;
 }
 
-/* Buttons (<a> oder <button>) */
-/* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_BUTTON_MAPPING | Purpose: map detail actionbar buttons to DS-02 secondary button tokens without UI change | Scope: replaces #detail-actionbar-slot .detail-actionbar-btn base rule only === */
+/* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING | Purpose: consolidate detail actionbar buttons into one clean DS-02 block and remove malformed stray brace | Scope: replaces complete detail actionbar button/state/focus/icon block === */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
@@ -3531,12 +3586,10 @@ svg.ui-icon-svg{
   box-shadow: var(--shadow-panel-btn);
 
   font-size: 0 !important;
-
   overflow: hidden;
 
   text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
-
   cursor: pointer;
 
   transition:
@@ -3546,8 +3599,6 @@ svg.ui-icon-svg{
     transform 140ms ease,
     color 140ms ease,
     opacity 140ms ease;
-}
-/* === END BLOCK: DS-02_DETAIL_ACTIONBAR_BUTTON_MAPPING === */
 }
 
 @media (hover: hover){
@@ -3567,12 +3618,10 @@ svg.ui-icon-svg{
     0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
-/* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_FOCUS_MAPPING | Purpose: align detail actionbar focus to central DS-02 focus contract without UI redesign | Scope: replaces detail-actionbar focus rule only === */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: var(--cmp-focus-outline-offset);
 }
-/* === END BLOCK: DS-02_DETAIL_ACTIONBAR_FOCUS_MAPPING === */
 
 #detail-actionbar-slot .detail-actionbar-btn svg{
   width: 20px;
@@ -3598,74 +3647,4 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
