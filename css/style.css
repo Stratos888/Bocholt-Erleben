@@ -2405,14 +2405,14 @@ Umfang:
 
 /* BEGIN PATCH DP-META-ENTERPRISE-V7
    Zweck:
-   - Location-↗ sitzt immer „am Ort“ (auch bei kurzen Ortsnamen), ohne fragiles Textlängen-Positionieren.
-   - Entfernt die künstliche max-width-Begrenzung, die zu frühe Umbrüche („Cluster zu kurz“) erzeugt.
-   - Gutter bleibt appweit konsistent (0-Inset links/rechts).
+   - Detail-Meta-Zeilen auf DS-02 Row/Link/Focus-DNA mappen, ohne sichtbares Redesign.
+   - Location-↗ bleibt robust nah am Ort.
+   - Legacy-Chips bleiben gutter-aligned und visuell konsistent.
    Umfang:
    - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
 */
 
-/* DETAIL META INFO (Enterprise v7: fit-content column for location arrow proximity) */
+/* DETAIL META INFO (DS-02 mapped, gutter-aligned, robust location proximity) */
 
 #event-detail-panel .detail-meta-rows{
   display: grid;
@@ -2434,7 +2434,7 @@ Umfang:
   align-items: center;
   column-gap: var(--space-sm);
 
-  min-height: 44px;
+  min-height: var(--ui-choice-minh);
   padding: 10px 0;
 
   background: transparent !important;
@@ -2442,11 +2442,11 @@ Umfang:
   border-radius: 12px !important;
   box-shadow: none !important;
 
-  color: rgba(31,41,51,0.78);
+  color: var(--cmp-link-color-muted);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
-  transition: background 140ms ease, transform 140ms ease, color 140ms ease;
+  transition: background 140ms ease, transform 140ms ease, color 140ms ease, opacity 140ms ease;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-icon{
@@ -2454,6 +2454,7 @@ Umfang:
   align-items: center;
   justify-content: center;
   opacity: 0.86;
+  color: var(--cmp-link-color-muted);
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-text{
@@ -2462,33 +2463,24 @@ Umfang:
 
   font-size: 14px;
   font-weight: 600;
-  color: rgba(31,41,51,0.76);
+  color: var(--cmp-link-color-muted);
 
-  /* weniger „brutales“ Brechen */
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: auto;
 }
 
-/* --- Key fix: location row arrow proximity (robust) --- */
-/* Make the TEXT column shrink when short, but never exceed available width */
+/* Location row: arrow stays close to text */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location{
-  /* icon | fit-content(text) | arrow  */
   grid-template-columns: auto fit-content(100%) auto;
-
-  /* tighter spacing between text and arrow */
   column-gap: 8px;
-
-  /* keep columns packed left; leftover space stays at end */
   justify-content: start;
 }
 
-/* Remove the artificial “26ch” clamp that caused early wrapping */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-text{
   max-width: none;
 }
 
-/* Arrow: centered, no fake padding; proximity comes from fit-content column */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-ext{
   opacity: 0.50;
   font-weight: 800;
@@ -2501,33 +2493,42 @@ Umfang:
   transform: none;
 }
 
-/* Default ext (non-location rows) */
+/* Default ext */
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
   opacity: 0.42;
   font-weight: 800;
   font-size: 14px;
   line-height: 1;
   transform: translateY(1px);
+  color: var(--cmp-link-color-muted);
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-meta-rows a.detail-meta-row:hover{
-    background: rgba(31,41,51,0.05) !important;
-    color: rgba(31,41,51,0.86);
+    background: var(--ui-surface-tint-hover) !important;
+    color: var(--cmp-link-color);
   }
+
+  #event-detail-panel .detail-meta-rows a.detail-meta-row:hover .detail-meta-text,
+  #event-detail-panel .detail-meta-rows a.detail-meta-row:hover .detail-meta-icon{
+    color: var(--cmp-link-color);
+  }
+
   #event-detail-panel .detail-meta-rows a.detail-meta-row:hover .detail-meta-ext{
     opacity: 0.62;
+    color: var(--cmp-link-color-muted);
   }
 }
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.07) !important;
+  background: var(--ui-surface-tint-active) !important;
 }
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: 2px;
+  border-radius: var(--ui-radius-sm);
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-row:not(a){
@@ -2569,7 +2570,7 @@ Umfang:
   width: 100%;
   max-width: 100%;
 
-  min-height: 44px;
+  min-height: var(--ui-choice-minh);
   padding: 10px 0;
 
   background: transparent !important;
@@ -3426,6 +3427,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
