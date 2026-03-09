@@ -369,17 +369,22 @@ a:visited{ color: var(--color-primary); }
 /* PAGE LAYOUT CONTRACT (top-app readability) */
 .page{
   width: 100%;
-  padding: var(--gutter);
+  padding: calc(var(--gutter) + 2px) var(--gutter) calc(var(--gutter) + 14px);
 }
 
-/* Zentrierte Lesebreite auf größeren Screens */
 @media (min-width: 860px){
   .page{
     max-width: 760px;
     margin: 0 auto;
-    padding-left: var(--gutter-lg);
-    padding-right: var(--gutter-lg);
+    padding:
+      calc(var(--gutter-lg) + 4px)
+      var(--gutter-lg)
+      calc(var(--gutter-lg) + 18px);
   }
+}
+
+.page > * + *{
+  margin-top: 16px;
 }
 
 .page h1{
@@ -388,22 +393,28 @@ a:visited{ color: var(--color-primary); }
   letter-spacing: -0.015em;
   margin: 6px 0 10px;
 }
+
 .page h2{
   font-size: 1.05rem;
   line-height: 1.25;
-  margin: 18px 0 8px;
+  margin: 0;
 }
+
 .page p,
 .page ul,
 .page ol{
   color: var(--color-text-secondary);
 }
+
 .page ul,
 .page ol{
   margin: 10px 0 0;
   padding-left: 18px;
 }
-.page li{ margin: 6px 0; }
+
+.page li{
+  margin: 6px 0;
+}
 
 /* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate info/content subpages into one app-like secondary screen system without redesign | Scope: hero, kicker, lead, cards, notes, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
 /* CONTENT PAGE COMPONENTS (reference pages) */
@@ -411,18 +422,16 @@ a:visited{ color: var(--color-primary); }
   display: grid;
   gap: 10px;
 
-  margin: 4px 0 18px;
-  padding: 0 0 2px;
+  margin: 0 0 8px;
+  padding: 0 0 4px;
 }
 
-.content-hero h1{
-  margin: 0;
-  max-width: 16ch;
+.content-hero > .content-links:first-child{
+  margin: 0 0 2px;
+}
 
-  font-size: clamp(1.38rem, 1.1rem + 1.2vw, 1.72rem);
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: var(--color-text-primary);
+.content-hero + .content-note{
+  margin-top: -2px;
 }
 
 .content-kicker{
@@ -465,10 +474,14 @@ a:visited{ color: var(--color-primary); }
   box-shadow: var(--cmp-card-shadow);
 
   padding: 16px 16px;
-  margin-top: 14px;
+  margin-top: 0;
 
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+}
+
+.content-card + .content-card{
+  margin-top: 2px;
 }
 
 .content-card--primary{
@@ -648,11 +661,17 @@ a:visited{ color: var(--color-primary); }
 /* CONTENT LINKS (top-pwa navigation list, borderless) */
 .content-links{
   display: grid;
-  gap: 4px;
-  margin-top: 2px;
+  gap: 6px;
+  margin: 0;
 }
 
 .content-card .content-links{
+  margin-top: 2px;
+  padding-top: 2px;
+}
+
+.page > nav.content-links:last-child,
+.page > .content-links:last-child{
   margin-top: 4px;
   padding-top: 2px;
 }
@@ -686,6 +705,7 @@ a:visited{ color: var(--color-primary); }
 
 .content-link::after{
   content: "›";
+  margin-left: auto;
   color: var(--cmp-link-color-muted);
   font-weight: 700;
   transform: translateY(1px);
@@ -716,7 +736,11 @@ a:visited{ color: var(--color-primary); }
   }
 
   .content-hero{
-    margin-bottom: 20px;
+    padding-bottom: 6px;
+  }
+
+  .page > * + *{
+    margin-top: 18px;
   }
 }
 /* === END BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING === */
@@ -3556,6 +3580,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
