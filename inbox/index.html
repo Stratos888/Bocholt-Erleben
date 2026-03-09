@@ -256,58 +256,56 @@ Umfang:
       }
     }
 
-<script>
-function writeStatus(it, newStatus) {
-  return new Promise(async (resolve) => {
-    if (!it.row_number) {
-      alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-      return resolve();
-    }
+    function writeStatus(it, newStatus) {
+      return new Promise(async (resolve) => {
+        if (!it.row_number) {
+          alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
+          return resolve();
+        }
 
-    const btnOk = document.getElementById("btnOk");
-    const btnNo = document.getElementById("btnNo");
-    const btnOpen = document.getElementById("btnOpen");
-    if (btnOk) btnOk.disabled = true;
-    if (btnNo) btnNo.disabled = true;
-    if (btnOpen) btnOpen.disabled = true;
+        const btnOk = document.getElementById("btnOk");
+        const btnNo = document.getElementById("btnNo");
+        const btnOpen = document.getElementById("btnOpen");
+        if (btnOk) btnOk.disabled = true;
+        if (btnNo) btnNo.disabled = true;
+        if (btnOpen) btnOpen.disabled = true;
 
-    try {
-      const res = await jsonp(API_URL, {
-        action: "setStatus",
-        token: sessionToken,
-        row_number: String(it.row_number),
-        status: String(newStatus)
+        try {
+          const res = await jsonp(API_URL, {
+            action: "setStatus",
+            token: sessionToken,
+            row_number: String(it.row_number),
+            status: String(newStatus)
+          });
+
+          if (res && res.ok) {
+            setStatus(newStatus === "übernehmen" ? "Als 'übernehmen' markiert." : "Verworfen.");
+            showNext();
+            return resolve();
+          }
+
+          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+
+          if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+            sessionToken = "";
+            refreshLock();
+            setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+            renderCurrent();
+            return resolve();
+          }
+
+          setStatus("Serverfehler: " + err);
+          renderCurrent();
+          return resolve();
+
+        } catch (e) {
+          console.error(e);
+          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+          renderCurrent();
+          return resolve();
+        }
       });
-
-      if (res && res.ok) {
-        setStatus(newStatus === "übernehmen" ? "Als 'übernehmen' markiert." : "Verworfen.");
-        showNext();
-        return resolve();
-      }
-
-      const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
-
-      if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
-        sessionToken = "";
-        refreshLock();
-        setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
-        renderCurrent();
-        return resolve();
-      }
-
-      setStatus("Serverfehler: " + err);
-      renderCurrent();
-      return resolve();
-
-    } catch (e) {
-      console.error(e);
-      setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
-      renderCurrent();
-      return resolve();
     }
-  });
-}
-</script>
 
     function escapeHtml(s) {
       return String(s || "")
