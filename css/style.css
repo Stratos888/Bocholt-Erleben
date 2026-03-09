@@ -416,7 +416,7 @@ a:visited{ color: var(--color-primary); }
   margin: 6px 0;
 }
 
-/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: finalize shared info/content page rhythm so all subpages read like one secondary app screen family without redesign | Scope: page-level rhythm, reduced top nav, hero, kicker, lead, cards, notes, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
+/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: final polish for info/content pages so reduced top chrome feels closer to app header and content reads less card-blocky | Scope: page-level rhythm, reduced top nav, hero, kicker, lead, cards, notes, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
 
 /* PAGE FAMILY: one shared vertical choreography for info subpages */
 .page--info,
@@ -426,10 +426,10 @@ a:visited{ color: var(--color-primary); }
 .page--privacy{
   display: grid;
   align-content: start;
-  gap: 16px;
+  gap: 14px;
 
   padding-top: calc(var(--gutter) + 2px);
-  padding-bottom: calc(var(--gutter) + 16px);
+  padding-bottom: calc(var(--gutter) + 18px);
 }
 
 .page--info > *,
@@ -447,9 +447,9 @@ a:visited{ color: var(--color-primary); }
   .page--publish,
   .page--imprint,
   .page--privacy{
-    gap: 18px;
+    gap: 16px;
     padding-top: calc(var(--gutter-lg) + 4px);
-    padding-bottom: calc(var(--gutter-lg) + 22px);
+    padding-bottom: calc(var(--gutter-lg) + 24px);
   }
 }
 
@@ -459,38 +459,39 @@ a:visited{ color: var(--color-primary); }
   gap: 10px;
 
   margin: 0;
-  padding: 0 0 4px;
+  padding: 0 0 6px;
 }
 
+/* reduced top chrome: closer to app bar, less like first content card */
 .content-hero > .content-links:first-child{
   position: sticky;
   top: calc(env(safe-area-inset-top, 0px) + 8px);
-  z-index: 20;
+  z-index: 24;
 
   display: flex;
   align-items: center;
 
-  min-height: 48px;
-  margin: -2px 0 6px;
-  padding: 6px 8px;
+  min-height: 44px;
+  margin: -2px 0 10px;
+  padding: 4px 8px;
 
-  border-radius: 14px;
-  border: 1px solid rgba(31, 41, 51, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(31, 41, 51, 0.04);
 
-  background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
+  background: rgba(222, 230, 206, 0.82);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.78) inset,
-    0 6px 16px rgba(31, 41, 51, 0.045);
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 4px 12px rgba(31, 41, 51, 0.035);
 }
 
 .content-hero > .content-links:first-child .content-link{
   width: auto;
-  min-height: 34px;
+  min-height: 32px;
   margin: 0;
-  padding: 0 4px 0 2px;
+  padding: 0 6px 0 2px;
 
   display: inline-flex;
   align-items: center;
@@ -502,7 +503,7 @@ a:visited{ color: var(--color-primary); }
 
   color: rgba(31,41,51,0.82);
   font-size: var(--ui-font-size-control);
-  font-weight: var(--ui-font-weight-control);
+  font-weight: 700;
 }
 
 .content-hero > .content-links:first-child .content-link::before{
@@ -572,30 +573,34 @@ a:visited{ color: var(--color-primary); }
   display: grid;
   gap: 10px;
 
-  background: rgba(255,255,255,0.82);
-  border: 1px solid var(--cmp-card-border);
+  background: rgba(255,255,255,0.74);
+  border: 1px solid rgba(31,41,51,0.07);
   border-radius: var(--cmp-card-radius);
-  box-shadow: var(--cmp-card-shadow);
+  box-shadow:
+    0 8px 20px rgba(31,41,51,0.035),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 
   padding: 16px 16px;
   margin: 0;
 
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
 
 .content-card--primary{
-  border-color: var(--ui-border-primary);
-  box-shadow: var(--ui-shadow-cta);
-  background: color-mix(in srgb, white 88%, var(--color-primary-muted));
+  border-color: rgba(139,207,74,0.44);
+  box-shadow:
+    0 10px 24px rgba(92,122,46,0.05),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+  background: color-mix(in srgb, white 86%, var(--color-primary-muted));
 }
 
 .page--imprint .content-card,
 .page--privacy .content-card{
-  background: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.70);
   box-shadow:
-    0 10px 24px rgba(0,0,0,0.05),
-    0 1px 0 rgba(255,255,255,0.70) inset;
+    0 8px 20px rgba(0,0,0,0.03),
+    0 1px 0 rgba(255,255,255,0.68) inset;
 }
 
 .content-card h2{
@@ -774,8 +779,8 @@ a:visited{ color: var(--color-primary); }
 }
 
 .content-card .content-links{
-  margin-top: 2px;
-  padding-top: 2px;
+  margin-top: 4px;
+  padding-top: 0;
 }
 
 /* page-end navigation should feel like quiet footer navigation */
@@ -785,9 +790,9 @@ a:visited{ color: var(--color-primary); }
 .page--privacy > nav.content-links:last-child,
 .page--info > nav.content-links:last-child,
 .page--info > .content-links:last-child{
-  gap: 4px;
-  margin-top: 2px;
-  padding-top: 8px;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 10px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
@@ -851,10 +856,11 @@ a:visited{ color: var(--color-primary); }
   }
 
   .content-hero{
-    padding-bottom: 6px;
+    padding-bottom: 8px;
   }
 
   .content-hero > .content-links:first-child{
+    min-height: 46px;
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -3696,6 +3702,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
