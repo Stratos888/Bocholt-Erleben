@@ -234,71 +234,64 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- CSS Design System DS-01 in `css/style.css` aufgebaut und konsolidiert:
-  - `:root` Token-Contract auf „must-exist“ Tokens erweitert
-  - fehlende Layout-/Feed-/Detailpanel-/Icon-/Control-Tokens ergänzt
-  - DS-02-Vorbereitungs-Aliases (`--cmp-*`) eingeführt
-- CSS Design System DS-02 begonnen und für bestehende UI-Komponenten ohne Redesign gemappt:
-  - Search Input
-  - Filter Pills + Reset Pill
-  - Header Buttons (`App`, `Info`)
-  - Modal CTA
-  - Detailpanel Actionbar Buttons
-  - Calendar Choice Buttons
-  - Detailpanel Links / Source Rows
-  - Detailpanel Close Button
-  - Event-Card Shell
-  - Detailpanel Meta Rows
-- Mehrere Copy/Paste-/Strukturfehler in `css/style.css` reproduzierbar behoben:
-  - doppelte/kaputte DS-02-Blöcke konsolidiert
-  - fehlerhafte Selector-Anker korrigiert
-  - Header/App-Button-Regressionsursache nachgewiesen und behoben
-- Detailpanel Link-Dedupe funktional korrigiert in `js/details.js`:
-  - Website/Quelle werden nicht mehr doppelt gerendert, wenn beide effektiv auf dasselbe Ziel zeigen
-  - Vergleich erfolgt nicht nur über rohe URL-Gleichheit, sondern über kanonisierten Target-Key
-- Empty State im Feed auf finalen Zielzustand gebracht und eingefroren:
-  - wie echtes Feed-/Event-Card-Element, kein Sonderpanel
-  - keine Accent-Rail / kein Primary-CTA
-  - ruhige Secondary-Action
-  - Layout/Ausrichtung bewusst linksbündig belassen
-- Aktueller beobachteter Functional Bug außerhalb des gefreezten Empty States:
-  - Reset über das X neben den Pills setzt Suche/Pills optisch zurück, berechnet aber Facet-Counts nicht neu
-  - wahrscheinlicher Root Cause in `js/filter.js`: Reset-Pfad ruft nicht den vollständigen kanonischen Recompute (`applyFilters`) auf
+- Filter-Reset-Bug in `js/filter.js` wurde analysiert:
+  - Root-Cause-Hypothese war ein nicht-kanonischer Reset-Pfad über das X neben den Pills
+  - aktueller Ist-Stand wurde danach gegen den realen Datei-/UI-Stand geprüft
+  - Ergebnis: kein weiterer Patch in `js/filter.js` eingebracht, weil der Reset im getesteten Stand wieder korrekt funktioniert
+  - Filter-/Reset-Verhalten wurde praktisch gegengeprüft (Suche, Input-X, Reset-X, Kombinationen mit Kategorie/Zeit) und vorerst gefreezt
+- CSS Design System DS-02 in `css/style.css` deutlich weiter konsolidiert, ohne Redesign:
+  - Focus-/Link-/Action-Mappings weiter vereinheitlicht
+  - Content-/Info-Seiten hinter dem Info-Button strukturell an die App-DNA angeglichen
+  - größere Content-/Info-Cluster statt vieler Mini-Patches zusammengeführt
+  - Modal-/Filter-/Detailpanel-/Icon-/Header-/Content-Blöcke weiter auf DS-02-/Token-DNA gezogen
+- Mehrere strukturelle CSS-Regressions-/Konsolidierungsfehler wurden reproduzierbar gefunden und behoben:
+  - kaputter `DS-02_MODAL_CTA_MAPPING`-Block korrigiert
+  - doppelte/inkonsistente Content-Link-/Content-Cluster-Struktur bereinigt
+  - größere Detailpanel-Header-/Meta-/Description-/Icon-Cluster sauberer zusammengeführt
+- Event-Card-Regressionsphase während der Konsolidierung wurde analysiert und behoben:
+  - Event-Card-Shell/Grid/Surface-DNA wiederhergestellt
+  - Event-Card-Innenstruktur (Badge, Body, Title/Icon-Row) wiederhergestellt
+  - unsaubere Worttrennungen/Title-Umbruchlogik korrigiert
+  - Ziel: kein Qualitätsverlust gegenüber Vorzustand durch CSS-Konsolidierung
+- Session-Endstand:
+  - Event-Cards wieder auf stabilem Qualitätsniveau
+  - keine weitere akute Functional-Fix-Baustelle offen
+  - nächster sinnvoller CSS-Workpack ist nicht mehr Feed-/Card-Regression, sondern Status-/Feedback-Zustände
 
 DECISIONS LOG (permanent, project-wide):
-- GS-01 Feed / Design System:
-  - DS-01 Token-Contract in `css/style.css` ist aufgebaut; fehlende „must-exist“ Tokens gelten als Root-Cause-Klasse für Layout-/Icon-/Spacing-Drift und müssen künftig zuerst geschlossen werden, bevor Component-Mapping erfolgt.
-- GS-01 Feed / Design System:
-  - DS-02 wird als CSS-only Component-Mapping ohne Redesign umgesetzt.
-  - Ziel-DNA: Button / Link / Input / Card / Divider / Focus über `--cmp-*` Tokens; bestehende Selektoren werden schrittweise darauf gemappt.
-- GS-01 Feed / Empty State:
-  - Empty State ist vorerst eingefroren.
-  - Zielzustand ist eine echte Feed-/Event-Card-Variante, nicht ein bewusst andersartiges Sonderpanel.
-  - Text linksbündig, Action darunter; keine Vollzentrierung.
-- Detailpanel Links:
-  - Website/Quelle-Dedupe gehört auf Render-/JS-Ebene, nicht in CSS.
-  - Wenn Website und Quelle effektiv auf dasselbe Ziel zeigen, bleibt nur eine Zeile sichtbar.
-- Header Controls:
-  - App-Button im Header wird über den echten Button-Selector gemappt (`button.pwa-install-button`), nicht über einen ID-only Selector.
+- GS-01 Feed / Filter Reset:
+  - Der in einem Zwischenstand vermutete Reset-Bug in `js/filter.js` wurde in dieser Session nicht final als aktueller Defekt bestätigt.
+  - Wenn beide Reset-Wege (Input-X und Reset-X neben den Pills) im praktischen Test korrekt laufen, wird `js/filter.js` nicht weiter angefasst.
+- GS-01 Feed / Event Cards:
+  - CSS-Design-System-Konsolidierung darf keine sichtbare Qualitätsminderung der Event-Cards verursachen.
+  - Bei Regressionen gilt: erst Vorzustand gegen Ist-Stand abgleichen, dann die vollständige Card-DNA wiederherstellen (Shell + Innenstruktur + Typografie).
+- CSS Design System / Content Pages:
+  - Die Content-/Info-Seiten hinter dem Info-Button werden nicht separat „neu designt“, sondern systemisch an die bestehende App-DNA angeglichen.
+  - Ziel bleibt: gleiche Oberflächenlogik, gleiche Typo-/Spacing-/Focus-/Link-DNA wie im Rest der App.
+- CSS Cleanup:
+  - Alte Kommentar-/Patch-Marker werden nicht als eigener Workpack priorisiert, sondern nur peu à peu bei späteren echten Patches mitbereinigt.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Detailpanel bleibt Enterprise-Baseline; keine strukturelle Neugestaltung.
-- In dieser Session wurden nur konsistente CSS-/Render-Fixes vorgenommen.
-- Aktiver UI-Fokus dieser Session: GS-01 Feed + CSS Design System (`css/style.css`) + Detailpanel-Feinschliff ohne Redesign.
+- Feed-/Filter-/Card-Regressionsphase dieser Session ist beendet.
+- Aktiver UI-Fokus am Session-Ende: CSS Design System (`css/style.css`) → Status-/Feedback-Zustände an App-DNA angleichen, ohne Loading-Logik neu zu bauen.
 
 REMAINING GAPS (NEXT WORKPACKS, UI/UX + FUNCTIONAL):
-1) Filter Reset Functional Fix in `js/filter.js`:
-   - Reset über die Reset-Pill / das X neben den Pills muss Suche + Facets + Counts + Disabled-States vollständig neu berechnen
-   - `resetFilters()` als kanonischen Full-Reset konsolidieren
-2) CSS Design System DS-02 weiterführen (weiterhin one-file / CSS-only, kein Redesign):
-   - Restliche Komponenten in `css/style.css` auf vorhandene `--cmp-*` DNA prüfen und nur dort weiter mappen, wo keine sichtbare Regression entsteht
-3) `css/style.css` Strukturhygiene:
-   - verbleibende stray braces / Marker-Unsauberkeiten gezielt bereinigen, sobald der nächste echte CSS-Workpack ansteht
+1) Status-/Feedback-Cluster in `css/style.css` auf DS-02 / App-DNA ziehen:
+   - bestehende Skeleton-Eventcards bleiben als Loading-Standard bestehen
+   - prüfen/konsolidieren: `.loading-container`, `.loading-spinner`, `.info-message`, `.error-message`
+   - Ziel: gleiche Surface-/Spacing-/Radius-/Typo-Logik wie im Rest der App, kein Redesign
+2) Danach Modal-/Overlay-Feinschliff:
+   - verbleibende strukturelle Alt-/Duplikat-Reste im Modal-/Overlay-Bereich prüfen und nur bei echtem Bedarf bereinigen
+3) Kommentar-/Marker-Cleanup nicht separat priorisieren:
+   - nur bei künftigen echten CSS-Workpacks mit erledigen
 
 NEXT CHAT PROMPT (start here):
-„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach nur eine Datei bearbeiten: `js/filter.js`. Problem: Wenn ich die Suche über das X neben den Category-/Time-Pills zurücksetze, werden Suche und Pills optisch korrekt geleert, aber die Time- und Category-Facets bleiben auf 0 statt sich neu korrekt zu füllen. Bitte Root-Cause in `js/filter.js` nachweisen und dann einen minimalen Patch liefern, sodass der Reset-Pfad ein vollständiger kanonischer Full-Reset wird (Suche leeren, State resetten, `applyFilters()`/Facet-Recompute korrekt ausführen). Nur Replace-Instructions mit eindeutigen BEGIN/END Anchors.“
+„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach nur `css/style.css` bearbeiten. Nächster Workpack ist der Status-/Feedback-Cluster, nicht die Skeleton-Eventcards. Die Skeletons sind bereits eingebaut und sollen funktional unverändert bleiben. Bitte prüfe den aktuellen Stand von `.loading-container`, `.loading-spinner`, `.info-message` und `.error-message`, beschreibe kurz den Ist-Zustand für Dummies, definiere den Zielzustand im Rahmen unserer bestehenden App-DNA und liefere dann einen größeren, konsolidierten CSS-Patch nur für diese Zustände. Kein Redesign, keine JS-Logikänderung, nur CSS-only mit eindeutigen BEGIN/END Anchors.“
 
 LAST UPDATE:
+
+2026-03-09
 
 2026-03-09
 
