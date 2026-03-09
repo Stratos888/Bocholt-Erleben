@@ -343,14 +343,13 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
           return;
         }
 
-        const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
-
-        if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
-          sessionToken = "";
-          refreshLock();
-          setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
-          return;
-        }
+        const err = (() => {
+          if (!res) return "unknown_error";
+          if (res.error === "deploy_internal_error" && res.detail) {
+            return res.error + ": " + res.detail;
+          }
+          return res.error || res.detail || JSON.stringify(res);
+        })();
 
         setStatus("Deploy-Fehler: " + err);
       } catch (e) {
