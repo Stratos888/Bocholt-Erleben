@@ -1586,6 +1586,10 @@ html.is-offline .offline-badge{
 
 /* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
 
+/* === BEGIN BLOCK: DS-02_FILTER_SHEET_CLUSTER_MAPPING | Purpose: consolidate filter-sheet shell, header, body and option rows into one clean DS-02 cluster without redesign | Scope: filter-sheet, overlay, card, handle, header, body, close, options, hidden rules, mobile compact adjustments === */
+
+/* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
+
 /* ===== Bottom Sheet ===== */
 .filter-sheet{
   position: fixed;
@@ -1600,43 +1604,34 @@ body.is-sheet-open .top-stack{
   backdrop-filter: none !important;
   contain: none !important;
   overflow: visible !important;
-
   z-index: 9997 !important;
 }
-
 
 .filter-sheet__overlay{
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.44);
-
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: var(--ui-overlay-dim);
+  -webkit-backdrop-filter: blur(var(--ui-overlay-blur));
+  backdrop-filter: blur(var(--ui-overlay-blur));
 }
 
-/* Card: fast full-screen, aber mit dvh (Mobile-Viewport korrekt) */
 .filter-sheet__card{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
 
-  /* Fallback + Fix: dvh verhindert “vh”-Abschneiden durch Browser-UI */
   max-height: 92vh;
   max-height: 92dvh;
 
-  background: rgba(255,255,255,0.98);
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
-
-  border-top: 1px solid rgba(31,41,51,0.10);
-  box-shadow:
-    0 -42px 130px rgba(0,0,0,0.28),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  border-top-left-radius: var(--ui-sheet-radius-lg);
+  border-top-right-radius: var(--ui-sheet-radius-lg);
+  border-top: 1px solid var(--ui-border-soft);
+  box-shadow: var(--ui-sheet-shadow-strong);
 
   overflow: hidden;
   overscroll-behavior: contain;
-
   padding-bottom: max(0px, env(safe-area-inset-bottom));
 
   display: flex;
@@ -1650,43 +1645,30 @@ body.is-sheet-open .top-stack{
   top: 9px;
   left: 50%;
   transform: translateX(-50%);
-
   width: 42px;
   height: 4px;
-
   border-radius: 999px;
   background: rgba(31,41,51,0.14);
-
   box-shadow: none;
   z-index: 4;
 }
-
 
 /* Header: sticky + Topbar Layout (Titel links / Close rechts) */
 .filter-sheet__header{
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(255,255,255,0.98);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 
   padding: 10px 12px 8px;
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+
+  background: color-mix(in srgb, white 95%, var(--color-primary-muted));
+  border-bottom: 1px solid var(--cmp-divider-color);
 }
-
-/* Body: scrollbarer Bereich (nie abschneiden) */
-.filter-sheet__body{
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-
-  /* Fallback + Fix: dvh verhindert “vh”-Abschneiden der Scroll-Fläche */
-  max-height: calc(92vh - 86px);
-  max-height: calc(92dvh - 86px);
-}
-
 
 .filter-sheet__title{
   font-size: 1.05rem;
@@ -1695,7 +1677,6 @@ body.is-sheet-open .top-stack{
   color: var(--color-text-primary);
 }
 
-/* === BEGIN BLOCK: DS-02_FILTER_SHEET_CLOSE_MAPPING | Purpose: map filter-sheet close button to DS-02 ghost/icon-button DNA without UI redesign | Scope: replaces complete filter-sheet close block including states === */
 /* Close */
 .filter-sheet__close{
   -webkit-appearance: none;
@@ -1752,19 +1733,18 @@ body.is-sheet-open .top-stack{
   outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: var(--cmp-focus-outline-offset);
 }
-/* === END BLOCK: DS-02_FILTER_SHEET_CLOSE_MAPPING === */
 
-/* Body: Padding, damit Liste “App-like” wirkt */
+/* Body: single source of truth */
 .filter-sheet__body{
   padding: 10px 12px 14px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+
   max-height: calc(92vh - 86px);
+  max-height: calc(92dvh - 86px);
 }
 
 /* FILTER BAR + SHEETS (Top-App level) */
-
-/* Optionen: als “List Cards” statt billiger Textzeilen */
 .filter-sheet-option,
 .filter-option{
   -webkit-appearance: none;
@@ -1774,25 +1754,36 @@ body.is-sheet-open .top-stack{
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 
+  min-height: var(--cmp-choice-minh);
   padding: 14px 14px;
   margin: 0 0 10px;
 
-  background: rgba(31,41,51,0.03);
-  border: 1px solid rgba(31,41,51,0.08);
+  background: var(--cmp-input-bg-strong);
+  border: 1px solid var(--cmp-input-border);
   border-radius: 16px;
 
   font: inherit;
-  font-weight: 850;
   font-size: 1rem;
+  font-weight: 850;
   color: rgba(31,41,51,0.92);
 
   cursor: pointer;
   text-align: left;
+  -webkit-tap-highlight-color: transparent;
 
   box-shadow:
     0 10px 24px rgba(0,0,0,0.06),
     0 1px 0 rgba(255,255,255,0.70) inset;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
 }
 
 .filter-sheet-option:last-child,
@@ -1800,7 +1791,6 @@ body.is-sheet-open .top-stack{
   margin-bottom: 0;
 }
 
-/* Disabled (0 Treffer): sichtbar, aber eindeutig inaktiv */
 .filter-sheet-option[disabled],
 .filter-option[disabled],
 .filter-sheet-option.is-disabled,
@@ -1809,17 +1799,15 @@ body.is-sheet-open .top-stack{
   cursor: not-allowed;
 }
 
-/* Disabled soll nicht “hoverbar” wirken */
 @media (hover: hover){
   .filter-sheet-option[disabled]:hover,
   .filter-option[disabled]:hover,
   .filter-sheet-option.is-disabled:hover,
   .filter-option.is-disabled:hover{
-    background: rgba(31,41,51,0.03);
+    background: var(--cmp-input-bg-strong);
   }
 }
 
-/* Active */
 .filter-sheet-option.is-active,
 .filter-option.is-active{
   background: rgba(139,207,74,0.14);
@@ -1834,14 +1822,14 @@ body.is-sheet-open .top-stack{
   margin-left: 12px;
 }
 
-/* Active soll nicht möglich sein, wenn disabled (Sicherheitsnetz) */
 .filter-sheet-option.is-active[disabled],
 .filter-option.is-active[disabled],
 .filter-sheet-option.is-active.is-disabled,
 .filter-option.is-active.is-disabled{
-  background: rgba(31,41,51,0.03);
-  border-color: rgba(31,41,51,0.08);
+  background: var(--cmp-input-bg-strong);
+  border-color: var(--cmp-input-border);
 }
+
 .filter-sheet-option.is-active[disabled]::after,
 .filter-option.is-active[disabled]::after,
 .filter-sheet-option.is-active.is-disabled::after,
@@ -1849,26 +1837,23 @@ body.is-sheet-open .top-stack{
   content: "";
 }
 
-/* Hover */
 @media (hover: hover){
   .filter-sheet-option:hover,
   .filter-option:hover{
     background: rgba(31,41,51,0.045);
   }
+
   .filter-sheet-option.is-active:hover,
   .filter-option.is-active:hover{
     background: rgba(139,207,74,0.16);
   }
 }
 
-/* === BEGIN BLOCK: DS-02_FILTER_OPTION_FOCUS_MAPPING | Purpose: align filter option focus to central DS-02 focus contract without UI redesign | Scope: replaces filter option focus block only === */
-/* Focus */
 .filter-sheet-option:focus-visible,
 .filter-option:focus-visible{
   outline: none;
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
-/* === END BLOCK: DS-02_FILTER_OPTION_FOCUS_MAPPING === */
 
 /* hidden muss immer wirken */
 .filter-pill[hidden]{ display: none !important; }
@@ -1877,7 +1862,6 @@ body.is-sheet-open .top-stack{
 @media (max-width: 360px){
   .filters-bar{ gap: 8px; }
 
-  /* bleibt identisch zur Search-Bar */
   .filter-pill{
     height: 36px;
     min-height: 36px;
@@ -1889,6 +1873,7 @@ body.is-sheet-open .top-stack{
   }
 }
 
+/* === END BLOCK: DS-02_FILTER_SHEET_CLUSTER_MAPPING === */
 
 /* DETAIL PANEL (BOTTOM SHEET) – TOP-APP CHIPS + HEADER */
 
@@ -2978,23 +2963,32 @@ svg.ui-icon-svg{
 }
 
 
+/* === BEGIN BLOCK: DS-02_MODAL_SHELL_CLUSTER_MAPPING | Purpose: consolidate locations modal shell to app DNA and DS-02 surface tokens without redesign | Scope: modal overlay, card, header, title, body and cta wrapper === */
 /* --- Modal (Locations) --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  z-index: 100;
+
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding: 12px;
-  z-index: 100;
+
+  background: var(--ui-overlay-dim);
+  -webkit-backdrop-filter: blur(var(--ui-overlay-blur));
+  backdrop-filter: blur(var(--ui-overlay-blur));
 }
 
 .modal-card {
   width: 100%;
   max-width: 680px;
-  background: #fff;
-  border-radius: 18px;
+
+  background: var(--cmp-surface-panel-bg);
+  border: 1px solid var(--cmp-surface-panel-border);
+  border-radius: var(--ui-sheet-radius-lg);
+  box-shadow: var(--ui-sheet-shadow-strong);
+
   overflow: hidden;
 }
 
@@ -3002,11 +2996,33 @@ svg.ui-icon-svg{
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+
   padding: 14px 16px;
-  border-bottom: 1px solid #eee;
+
+  background: color-mix(in srgb, white 94%, var(--color-primary-muted));
+  border-bottom: 1px solid var(--cmp-divider-color);
 }
 
-.modal-title { font-size: 18px; margin: 0; }
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: 14px 16px 18px;
+  color: var(--color-text-secondary);
+}
+
+.modal-cta {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+/* === END BLOCK: DS-02_MODAL_SHELL_CLUSTER_MAPPING === */
 
 /* === BEGIN BLOCK: DS-02_MODAL_CLOSE_MAPPING | Purpose: map modal close button to DS-02 ghost/icon-button DNA without UI redesign | Scope: replaces modal-close base rule only === */
 .modal-close {
@@ -3216,6 +3232,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
