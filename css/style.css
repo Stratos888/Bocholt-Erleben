@@ -884,6 +884,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* SECTION */
 
 /* --- Card: 2 Spalten (Rail | Content) --- */
+/* === BEGIN BLOCK: DS-02_EVENT_CARD_MAPPING | Purpose: map event-card shell to DS-02 card/focus DNA without UI redesign | Scope: replaces event-card shell, rail, states and mobile shell only === */
 .event-card{
   position: relative;
   overflow: hidden;
@@ -899,14 +900,18 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   padding: var(--eventcard-pad);
   padding-left: 0;
 
-  background: var(--surface);
+  background: var(--cmp-card-bg);
 
   border: 1px solid var(--border-eventcard);
   border-radius: var(--radius-eventcard);
 
   box-shadow: var(--shadow-eventcard);
 
-  transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease, background 140ms ease;
+  transition:
+    box-shadow 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    background 140ms ease;
 }
 
 /* Linke Rail: echte Spalte, beginnt an Card-Kante */
@@ -930,28 +935,19 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   z-index: 1;
 }
 
-
-.event-card > *{
-  position: relative;
-  z-index: 1;
-}
-
 /* Hover: minimal stärker, ohne Lift */
 @media (hover: hover){
   .event-card:hover{
     transform: none;
-    border-color: rgba(31,41,51,0.085);
-    box-shadow:
-      0 1px 2px rgba(0,0,0,0.040),
-      0 12px 30px rgba(0,0,0,0.055),
-      0 1px 0 rgba(255,255,255,0.72) inset;
+    border-color: var(--border-eventcard-hover);
+    box-shadow: var(--shadow-eventcard-hover);
   }
 }
 
 /* Press: leicht „eingedrückt“ */
 .event-card:active{
   transform: scale(0.99);
-  border-color: rgba(31,41,51,0.115);
+  border-color: var(--border-panel-strong);
   box-shadow:
     0 1px 1px rgba(0,0,0,0.030),
     0 8px 18px rgba(0,0,0,0.045),
@@ -960,14 +956,33 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 /* Keyboard/Accessibility: ruhiger Ring + keine Layoutsprünge */
 .event-card:focus-visible{
-  outline: 3px solid rgba(139,207,74,0.16);
+  outline: 3px solid var(--cmp-focus-ring-brand);
   outline-offset: 3px;
 }
 
+/* Mobile fein */
+@media (max-width: 360px){
+  .event-card{
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
 
-/* SECTION */
+    padding: var(--eventcard-pad);
+    padding-left: 0;
 
-/* SECTION */
+    column-gap: var(--space-md);
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    left: 0;
+  }
+
+  .event-date-badge{
+    width: 40px;
+  }
+}
+/* === END BLOCK: DS-02_EVENT_CARD_MAPPING === */
+
 .event-date-badge{
   width: 42px;
 
@@ -3411,6 +3426,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
