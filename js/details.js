@@ -931,11 +931,22 @@ const iconSvg = (type, extraClass = "") => {
         return `${d} · ganztägig`;
       })();
 
-      const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
+           const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
       const normSource = normalizeHttpUrl(vm.sourceUrl || "");
 
-      const showWebsite = Boolean(normWebsite) && (!normSource || normWebsite !== normSource);
-      const showSource = Boolean(normSource) && (!normWebsite || normSource !== normWebsite);
+      const canonicalLinkKey = (u) => {
+        if (!u) return "";
+        try {
+          const url = new URL(u);
+          const host = (url.hostname || "").toLowerCase().replace(/^www\./, "");
+          const path = (url.pathname || "/")
+            .replace(/\/+$/g, "")
+            .toLowerCase() || "/";
+          return `${host}${path}`;
+        } catch {
+          return u.trim().toLowerCase();
+        }
+      };
 
       const hostLabel = (u, fallbackLabel) => {
         if (!u) return "";
@@ -949,8 +960,28 @@ const iconSvg = (type, extraClass = "") => {
         }
       };
 
+      const websiteKey = canonicalLinkKey(normWebsite);
+      const sourceKey = canonicalLinkKey(normSource);
+
       const websiteHostLabel = hostLabel(normWebsite, "Website");
       const sourceHostLabel = hostLabel(normSource, "Quelle");
+
+      const sameCanonicalTarget =
+        Boolean(websiteKey) &&
+        Boolean(sourceKey) &&
+        websiteKey === sourceKey;
+
+      const sameDisplayTarget =
+        Boolean(websiteHostLabel) &&
+        Boolean(sourceHostLabel) &&
+        websiteHostLabel === sourceHostLabel;
+
+      const showWebsite =
+        Boolean(normWebsite) &&
+        !sameCanonicalTarget &&
+        !sameDisplayTarget;
+
+      const showSource = Boolean(normSource);
 
       const html = `
         <div class="detail-panel-inner">
@@ -1247,6 +1278,7 @@ if (shareBtn) {
 })();
 
 // === END FILE: js/details.js (DETAILPANEL MODULE – CONSOLIDATED, SINGLE SOURCE OF TRUTH) ===
+
 
 
 
