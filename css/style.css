@@ -514,6 +514,7 @@ a:visited{ color: var(--color-primary); }
   gap: 2px;
 }
 
+/* === BEGIN BLOCK: DS-02_CONTENT_LINK_MAPPING | Purpose: map content-link navigation rows to DS-02 link DNA without UI redesign | Scope: replaces complete content-link block only === */
 /* CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) */
 .content-link{
   display: inline-flex;
@@ -522,33 +523,49 @@ a:visited{ color: var(--color-primary); }
   gap: 6px;
 
   width: 100%;
+  min-height: var(--cmp-btn-minh);
   padding: 12px 8px;
-  border-radius: 10px;
+  border-radius: var(--ui-radius-sm);
 
   background: transparent;
   border: none;
 
-  color: var(--color-text-primary);
+  color: var(--cmp-link-color);
   font-weight: 600;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .content-link::after{
   content: "›";
-  color: var(--color-text-muted);
+  color: var(--cmp-link-color-muted);
   font-weight: 700;
   transform: translateY(1px);
 }
 
-
-.content-link:hover{
-  background: rgba(31,41,51,0.04);
-  text-decoration: none;
+@media (hover: hover){
+  .content-link:hover{
+    background: var(--ui-surface-tint);
+    color: var(--cmp-link-color);
+    text-decoration: none;
+  }
 }
 
 .content-link:visited{
-  color: var(--color-text-primary);
+  color: var(--cmp-link-color);
 }
+
+.content-link:focus-visible{
+  outline: 2px solid var(--cmp-link-focus-ring);
+  outline-offset: var(--cmp-focus-outline-offset);
+  border-radius: var(--ui-radius-sm);
+}
+/* === END BLOCK: DS-02_CONTENT_LINK_MAPPING === */
 
 
 /* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: modal CTA block fully consolidated === */
@@ -587,12 +604,14 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* === BEGIN BLOCK: DS-02_FOCUS_CONTRACT_MAPPING | Purpose: centralize global focus contract on DS-02 tokens without UI redesign | Scope: replaces legacy global accessibility focus block only === */
 /* Accessibility */
 :focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-  border-radius: 10px;
+  outline: 2px solid var(--cmp-focus-ring-brand);
+  outline-offset: var(--cmp-focus-outline-offset);
+  border-radius: var(--ui-radius-sm);
 }
+/* === END BLOCK: DS-02_FOCUS_CONTRACT_MAPPING === */
 
 /* FILTER SHEET SCROLL LOCK */
 body.is-sheet-open { overflow: hidden; }
@@ -1918,12 +1937,14 @@ body.is-sheet-open .top-stack{
   }
 }
 
+/* === BEGIN BLOCK: DS-02_FILTER_OPTION_FOCUS_MAPPING | Purpose: align filter option focus to central DS-02 focus contract without UI redesign | Scope: replaces filter option focus block only === */
 /* Focus */
 .filter-sheet-option:focus-visible,
 .filter-option:focus-visible{
   outline: none;
-  box-shadow: 0 0 0 3px var(--ui-focus-ring);
+  box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
+/* === END BLOCK: DS-02_FILTER_OPTION_FOCUS_MAPPING === */
 
 /* hidden muss immer wirken */
 .filter-pill[hidden]{ display: none !important; }
@@ -2642,6 +2663,7 @@ Umfang:
 
 /* END PATCH DP-META-ENTERPRISE-V7 */
 
+/* === BEGIN BLOCK: DS-02_DETAIL_LOCATION_ACTION_MAPPING | Purpose: map detail location action row to DS-02 secondary button/link DNA without UI redesign | Scope: replaces complete detail-location-action block including static variant === */
 #event-detail-panel .detail-location-action,
 #event-detail-panel .detail-location-action:link,
 #event-detail-panel .detail-location-action:visited{
@@ -2650,16 +2672,16 @@ Umfang:
   gap: var(--space-sm);
 
   width: 100%;
-
+  min-height: var(--cmp-btn-minh);
   padding: var(--space-md) var(--gutter);
 
-  border-radius: 14px;
-  border: 1px solid var(--border-panel-soft);
-  background: var(--surface-panel-row);
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--cmp-surface-panel-border);
+  background: var(--cmp-btn-secondary-bg);
 
-  box-shadow: 0 1px 0 rgba(255,255,255,0.70) inset;
+  box-shadow: var(--shadow-panel-btn);
 
-  color: rgba(31,41,51,0.84);
+  color: var(--cmp-link-color-muted);
   text-decoration: none !important;
 
   -webkit-tap-highlight-color: transparent;
@@ -2667,26 +2689,36 @@ Umfang:
   transition:
     background 140ms ease,
     border-color 140ms ease,
-    transform 140ms ease;
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-location-action:hover{
     background: rgba(255,255,255,0.86);
-    border-color: rgba(31,41,51,0.10);
+    border-color: var(--border-panel);
+    color: var(--cmp-link-color);
+    box-shadow:
+      0 12px 24px rgba(0,0,0,0.055),
+      0 1px 0 rgba(255,255,255,0.80) inset;
   }
 }
 
 #event-detail-panel .detail-location-action:active{
   transform: translateY(1px);
-  background: rgba(31,41,51,0.04);
+  background: rgba(255,255,255,0.82);
   border-color: rgba(31,41,51,0.12);
+  box-shadow:
+    0 8px 16px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
 #event-detail-panel .detail-location-action:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: var(--space-1);
-  border-radius: 14px;
+  outline: 2px solid var(--cmp-focus-ring-neutral);
+  outline-offset: var(--cmp-focus-outline-offset);
+  border-radius: var(--cmp-btn-radius);
 }
 
 /* Static variant */
@@ -2699,7 +2731,9 @@ Umfang:
   transform: none;
   background: rgba(255,255,255,0.72);
   border-color: rgba(31,41,51,0.08);
+  box-shadow: var(--shadow-panel-btn);
 }
+/* === END BLOCK: DS-02_DETAIL_LOCATION_ACTION_MAPPING === */
 
 #event-detail-panel .detail-location-icon{
   flex: 0 0 auto;
@@ -3435,10 +3469,12 @@ svg.ui-icon-svg{
     0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
+/* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_FOCUS_MAPPING | Purpose: align detail actionbar focus to central DS-02 focus contract without UI redesign | Scope: replaces detail-actionbar focus rule only === */
 #detail-actionbar-slot .detail-actionbar-btn:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
-  outline-offset: 2px;
+  outline: 2px solid var(--cmp-focus-ring-neutral);
+  outline-offset: var(--cmp-focus-outline-offset);
 }
+/* === END BLOCK: DS-02_DETAIL_ACTIONBAR_FOCUS_MAPPING === */
 
 #detail-actionbar-slot .detail-actionbar-btn svg{
   width: 20px;
@@ -3464,6 +3500,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
