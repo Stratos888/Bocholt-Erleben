@@ -3342,15 +3342,40 @@ svg.ui-icon-svg{
 
 .modal-title { font-size: 18px; margin: 0; }
 
+/* === BEGIN BLOCK: DS-02_MODAL_CLOSE_MAPPING | Purpose: map modal close button to DS-02 ghost/icon-button DNA without UI redesign | Scope: replaces modal-close base rule only === */
 .modal-close {
-  width: 40px;
-  height: 36px;
-  border: 1px solid #e0e0e0;
-  background: #fff;
-  border-radius: 10px;
-  font-size: 22px;
+  width: var(--ui-close-size);
+  height: var(--ui-close-size);
+  min-width: var(--ui-close-size);
+  min-height: var(--ui-close-size);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: var(--ui-close-border);
+  background: var(--ui-close-bg);
+  border-radius: 999px;
+
+  color: var(--ui-close-color);
+  font-size: var(--ui-close-font-size);
   line-height: 1;
+  text-align: center;
+
+  box-shadow: var(--ui-close-shadow);
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
 }
+/* === END BLOCK: DS-02_MODAL_CLOSE_MAPPING === */
 
 .modal-body { padding: 14px 16px 18px; }
 .modal-cta {
@@ -3358,6 +3383,29 @@ svg.ui-icon-svg{
   display: flex;
   justify-content: flex-end;
 }
+
+/* === BEGIN BLOCK: DS-02_MODAL_CLOSE_STATES_MAPPING | Purpose: align modal close states to central DS-02 focus/interaction contract without UI redesign | Scope: adds hover/active/focus for modal-close only === */
+@media (hover: hover){
+  .modal-close:hover{
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
+    color: rgba(31,41,51,0.82);
+  }
+}
+
+.modal-close:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
+  box-shadow:
+    0 10px 18px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.modal-close:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-neutral);
+  outline-offset: var(--cmp-focus-outline-offset);
+}
+/* === END BLOCK: DS-02_MODAL_CLOSE_STATES_MAPPING === */
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
 /* ACTIONBAR ICONS + SMALL LABELS (slot-is-row, no gradient) */
 
@@ -3508,6 +3556,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
