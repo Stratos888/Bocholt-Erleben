@@ -656,6 +656,7 @@ a:visited{ color: var(--color-primary); }
 
 
 /* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: modal CTA block fully consolidated === */
+.modal-cta-button{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -671,6 +672,12 @@ a:visited{ color: var(--color-primary); }
   text-decoration: none;
 
   box-shadow: var(--ui-shadow-cta);
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    color 140ms ease;
 }
 
 .modal-cta-button:hover{
@@ -679,8 +686,13 @@ a:visited{ color: var(--color-primary); }
 }
 
 .modal-cta-button:active{
-  /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
   box-shadow: var(--ui-shadow-cta-active);
+}
+
+.modal-cta-button:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-sm);
 }
 /* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
 
@@ -2359,14 +2371,7 @@ html.is-panel-open body {
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* BEGIN PATCH DP-DESC-SOURCE-LINKS-V4
-   Zweck:
-   - Detail-Links (Website / Quelle) auf DS-02 Link/Card-DNA mappen.
-   - Gleicher Gutter wie Description, ruhiger Card-Row-Look, kein Redesign.
-   Umfang:
-   - Ersetzt den kompletten Links/Quelle Block.
-*/
-
+/* === BEGIN BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING | Purpose: consolidate detail source/link area into one clean DS-02 link cluster without UI redesign | Scope: detail-links wrapper, rows, hover, focus, labels, values, ext icon === */
 #event-detail-panel .detail-links{
   display: grid;
   gap: 10px;
@@ -2393,7 +2398,6 @@ html.is-panel-open body {
   background: transparent;
   border: 0;
   border-radius: 0;
-
   box-shadow: none;
 
   -webkit-tap-highlight-color: transparent;
@@ -2419,20 +2423,17 @@ html.is-panel-open body {
   }
 }
 
-/* === BEGIN BLOCK: DS-02_DETAIL_LINK_FOCUS_MAPPING | Purpose: align detail link focus to central DS-02 link focus contract without UI redesign | Scope: replaces detail link focus rule only === */
 #event-detail-panel .detail-link:focus-visible{
   outline: 2px solid var(--cmp-link-focus-ring);
   outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
-/* === END BLOCK: DS-02_DETAIL_LINK_FOCUS_MAPPING === */
 
 #event-detail-panel .detail-link-label{
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: rgba(31,41,51,0.56);
-
   margin-top: 1px;
 }
 
@@ -2460,8 +2461,7 @@ html.is-panel-open body {
   transform: none;
   color: var(--cmp-link-color-muted);
 }
-
-/* END PATCH DP-DESC-SOURCE-LINKS-V4 */
+/* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
 
 /* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy)
@@ -3667,5 +3667,6 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
