@@ -2167,70 +2167,68 @@ html.is-panel-open body {
 
 /* BEGIN PATCH DP-DESC-SOURCE-LINKS-V4
    Zweck:
-   - Quelle/Links exakt auf dem gleichen Gutter wie Description (keine extra 12px Einrückung).
-   - ↗ Pfeil immer korrekt (dynamisch), egal ob 1 oder 2 Zeilen.
+   - Detail-Links (Website / Quelle) auf DS-02 Link/Card-DNA mappen.
+   - Gleicher Gutter wie Description, ruhiger Card-Row-Look, kein Redesign.
    Umfang:
    - Ersetzt den kompletten Links/Quelle Block.
 */
 
-/* DETAIL LINKS (Enterprise v4: gutter-aligned, dynamic arrow alignment) */
-
 #event-detail-panel .detail-links{
   display: grid;
-  gap: 0;
+  gap: 10px;
 
-  margin-top: var(--space-md);
-  padding-top: 8px;
+  margin: 0;
+  padding: 0 0 var(--space-md);
 
-  border-top: 1px solid var(--border-panel-soft);
+  border-top: 1px solid var(--cmp-divider-color);
+  border-bottom: 1px solid var(--cmp-divider-color);
 }
 
-/* Link row: no extra horizontal inset -> aligns with description text */
-#event-detail-panel .detail-link,
-#event-detail-panel .detail-link:link,
-#event-detail-panel .detail-link:visited{
+#event-detail-panel .detail-link{
+  min-width: 0;
+  text-decoration: none;
+
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-
-  /* dynamic vertical alignment for 1 or 2 lines */
+  grid-template-columns: minmax(44px, auto) minmax(0, 1fr) auto;
   align-items: center;
+  column-gap: 10px;
 
-  column-gap: var(--space-sm);
-
-  min-height: 44px;
-
-  /* IMPORTANT: remove the extra 12px left/right inset */
   padding: 10px 0;
 
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 12px;
+  color: var(--cmp-link-color);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 
-  box-shadow: none !important;
-
-  color: rgba(31,41,51,0.78);
-  text-decoration: none !important;
+  box-shadow: none;
 
   -webkit-tap-highlight-color: transparent;
 
-  transition: background 140ms ease, transform 140ms ease, color 140ms ease;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-link:hover{
-    background: rgba(31,41,51,0.05) !important;
-    color: rgba(31,41,51,0.86);
+    color: var(--cmp-link-color);
+  }
+
+  #event-detail-panel .detail-link:hover .detail-link-value{
+    color: var(--cmp-link-color);
+  }
+
+  #event-detail-panel .detail-link:hover .detail-link-ext{
+    opacity: 0.62;
   }
 }
 
-#event-detail-panel .detail-link:active{
-  transform: translateY(1px);
-  background: rgba(31,41,51,0.07) !important;
-}
-
 #event-detail-panel .detail-link:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline: 2px solid var(--cmp-link-focus-ring);
   outline-offset: 2px;
+  border-radius: var(--ui-radius-sm);
 }
 
 #event-detail-panel .detail-link-label{
@@ -2248,7 +2246,7 @@ html.is-panel-open body {
   font-size: 13px;
   font-weight: 680;
   line-height: 1.30;
-  color: rgba(31,41,51,0.84);
+  color: var(--cmp-link-color);
 
   white-space: normal;
 
@@ -2261,10 +2259,10 @@ html.is-panel-open body {
   hyphens: auto;
 }
 
-/* Arrow: always vertically centered relative to row height (works for 1 or 2 lines) */
 #event-detail-panel .detail-link-ext{
   opacity: 0.48;
   transform: none;
+  color: var(--cmp-link-color-muted);
 }
 
 /* END PATCH DP-DESC-SOURCE-LINKS-V4 */
@@ -3403,6 +3401,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
