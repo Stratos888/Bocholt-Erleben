@@ -1001,13 +1001,12 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: DS-02_EVENT_CARD_MAPPING | Purpose: restore missing event-card shell/grid/surface DNA after structure cleanup regression | Scope: event-card shell, rail, states and mobile shell === */
+/* === BEGIN BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING | Purpose: restore complete event-card shell + inner layout + badge + title/icon structure after regression | Scope: shell, rail, date badge, card body, title row, title clamp, category icon, mobile shell === */
 .event-card{
   position: relative;
   overflow: hidden;
 
   display: grid;
-
   --rail-w: 60px;
   grid-template-columns: var(--rail-w) minmax(0, 1fr);
 
@@ -1018,11 +1017,14 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   padding-left: 0;
 
   background: var(--cmp-card-bg);
-
   border: 1px solid var(--border-eventcard);
   border-radius: var(--radius-eventcard);
-
   box-shadow: var(--shadow-eventcard);
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 
   transition:
     box-shadow 140ms ease,
@@ -1035,8 +1037,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-
-  left: 0;
   width: var(--rail-w);
 
   background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
@@ -1073,41 +1073,77 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   outline-offset: 3px;
 }
 
-@media (max-width: 360px){
-  .event-card{
-    --rail-w: 56px;
-    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+.event-date-badge{
+  width: 42px;
 
-    padding: var(--eventcard-pad);
-    padding-left: 0;
+  justify-self: center;
+  align-self: center;
 
-    column-gap: var(--space-md);
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 
-  .event-card::before{
-    width: var(--rail-w);
-    left: 0;
-  }
+  padding: 5px 3px;
 
-  .event-date-badge{
-    width: 40px;
-  }
-}
-/* === END BLOCK: DS-02_EVENT_CARD_MAPPING === */
+  background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+  border-radius: 11px;
 
-/* === BEGIN BLOCK: DS-02_EVENTCARD_INTERACTION_ICON_MAPPING | Purpose: consolidate event-card tap behavior and category-icon rules into one clean DS-02 block without redesign | Scope: event-card interaction helper, event title text, event category icon wrapper and svg/img clamp === */
+  border: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(31,41,51,0.035),
+    inset 0 1px 0 rgba(255,255,255,0.75);
 
-/* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
-.event-card{
-  position: relative;
-  cursor: pointer;
-
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
+  line-height: 1;
+  text-align: center;
 }
 
-/* EVENT TITLE FINAL (2-line clamp, single source) */
+.event-date-badge__wday{
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(31,41,51,0.54);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.event-date-badge__day{
+  font-size: 1.32rem;
+  font-weight: 800;
+  color: rgba(31,41,51,0.90);
+}
+
+.event-date-badge__month{
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(31,41,51,0.50);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.event-card-body{
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.event-title{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 8px;
+
+  margin: 0;
+
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(31,41,51,0.92);
+  line-height: 1.25;
+}
+
 .event-title__text{
   flex: 1 1 auto;
   min-width: 0;
@@ -1123,7 +1159,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   hyphens: auto;
 }
 
-/* EVENT CARD CATEGORY INDICATOR (state-of-the-art, tokenized) */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
@@ -1149,7 +1184,6 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   transform: translateY(1px);
 }
 
-/* Wenn das Icon als SVG/IMG kommt: clamp to wrapper */
 .event-title .event-category-icon svg,
 .event-title .event-category-icon img{
   width: 100% !important;
@@ -1164,7 +1198,32 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   opacity: var(--eventcard-category-opacity);
   filter: none;
 }
-/* === END BLOCK: DS-02_EVENTCARD_INTERACTION_ICON_MAPPING === */
+
+.event-card > .event-category-icon{
+  display: none;
+}
+
+@media (max-width: 360px){
+  .event-card{
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+
+    padding: var(--eventcard-pad);
+    padding-left: 0;
+
+    column-gap: var(--space-md);
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    left: 0;
+  }
+
+  .event-date-badge{
+    width: 40px;
+  }
+}
+/* === END BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
@@ -3326,6 +3385,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
