@@ -213,6 +213,28 @@
   --cmp-surface-panel-border: var(--border-panel);
   --cmp-surface-panel-shadow: var(--shadow-panel);
 
+  /* DS-02 component mapping prep: empty state */
+  --cmp-empty-card-bg: var(--cmp-surface-panel-bg);
+  --cmp-empty-card-border: var(--border-panel-soft);
+  --cmp-empty-card-radius: var(--radius-eventcard);
+  --cmp-empty-card-shadow:
+    0 8px 22px rgba(0,0,0,0.035),
+    0 1px 0 rgba(255,255,255,0.80) inset;
+  --cmp-empty-card-accent-w: 6px;
+  --cmp-empty-card-accent-bg: color-mix(in srgb, var(--color-primary-muted) 78%, white);
+
+  --cmp-empty-title-color: var(--color-text-primary);
+  --cmp-empty-text-color: var(--color-text-secondary);
+
+  --cmp-empty-btn-minh: var(--cmp-btn-minh);
+  --cmp-empty-btn-radius: var(--cmp-btn-radius);
+  --cmp-empty-btn-bg: var(--cmp-btn-primary-bg);
+  --cmp-empty-btn-fg: var(--cmp-btn-primary-fg);
+  --cmp-empty-btn-border: var(--ui-border-primary);
+  --cmp-empty-btn-shadow: var(--cmp-btn-primary-shadow);
+  --cmp-empty-btn-shadow-active: var(--ui-shadow-cta-active);
+  --cmp-empty-btn-focus-ring: var(--cmp-btn-focus-ring);
+
   /* DS-02 component mapping prep: dividers */
   --cmp-divider-color: var(--divider);
   --cmp-divider-strong: var(--ui-border-soft);
@@ -654,7 +676,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    EMPTY STATE
    ============================================ */
-/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: integrate no-results state into app card/panel DNA more clearly without redesign | Scope: replaces complete EMPTY STATE section only === */
+/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: make no-results state fully token-driven and consistent with app card/button DNA | Scope: replaces complete EMPTY STATE section only === */
 .empty-state{
   padding: 10px 0 8px;
 }
@@ -668,21 +690,19 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   padding: 16px 16px 14px;
 
-  background: var(--surface-panel);
-  border: 1px solid var(--border-panel-soft);
-  border-radius: var(--radius-eventcard);
-  box-shadow:
-    0 8px 22px rgba(0,0,0,0.035),
-    0 1px 0 rgba(255,255,255,0.80) inset;
+  background: var(--cmp-empty-card-bg);
+  border: 1px solid var(--cmp-empty-card-border);
+  border-radius: var(--cmp-empty-card-radius);
+  box-shadow: var(--cmp-empty-card-shadow);
 }
 
 .empty-state__card::before{
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-  width: 6px;
+  width: var(--cmp-empty-card-accent-w);
 
-  background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
+  background: var(--cmp-empty-card-accent-bg);
   box-shadow: inset -1px 0 0 rgba(31,41,51,0.04);
   opacity: 0.95;
 
@@ -700,37 +720,37 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   line-height: 1.22;
   font-weight: 800;
   letter-spacing: -0.012em;
-  color: var(--color-text-primary);
+  color: var(--cmp-empty-title-color);
 }
 
 .empty-state__text{
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: var(--color-text-secondary);
+  color: var(--cmp-empty-text-color);
 }
 
 .empty-state__btn{
   width: 100%;
-  min-height: 44px;
+  min-height: var(--cmp-empty-btn-minh);
   margin-top: 6px;
-  padding: 0 14px;
+  padding: 0 var(--cmp-btn-pad-x);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: var(--ui-radius-md);
-  border: 1px solid var(--ui-border-primary);
-  background: rgba(255,255,255,0.72);
-  color: var(--color-text-primary);
+  border-radius: var(--cmp-empty-btn-radius);
+  border: 1px solid var(--cmp-empty-btn-border);
+  background: var(--cmp-empty-btn-bg);
+  color: var(--cmp-empty-btn-fg);
 
   font: inherit;
-  font-size: 0.98rem;
+  font-size: var(--cmp-btn-font-size);
   font-weight: var(--ui-font-weight-cta);
   text-decoration: none;
 
-  box-shadow: var(--ui-shadow-soft);
+  box-shadow: var(--cmp-empty-btn-shadow);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -744,20 +764,17 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 @media (hover: hover){
   .empty-state__btn:hover{
-    background: rgba(255,255,255,0.86);
-    border-color: rgba(139,207,74,0.58);
+    filter: brightness(0.985);
   }
 }
 
 .empty-state__btn:active{
   transform: translateY(1px);
-  box-shadow:
-    0 5px 12px rgba(0,0,0,0.04),
-    0 1px 0 rgba(255,255,255,0.76) inset;
+  box-shadow: var(--cmp-empty-btn-shadow-active);
 }
 
 .empty-state__btn:focus-visible{
-  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline: 2px solid var(--cmp-empty-btn-focus-ring);
   outline-offset: 3px;
 }
 /* === END BLOCK: DS-02_EMPTY_STATE_MAPPING === */
@@ -3452,6 +3469,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
