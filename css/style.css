@@ -531,7 +531,7 @@ a:visited{ color: var(--color-primary); }
 }
 
 
-/* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: replaces .modal-cta-button base rule only === */
+/* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: modal CTA block fully consolidated === */
 .modal-cta-button{
   display: inline-flex;
   align-items: center;
@@ -549,43 +549,17 @@ a:visited{ color: var(--color-primary); }
 
   box-shadow: var(--ui-shadow-cta);
 }
-/* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
 
 .modal-cta-button:hover{
   text-decoration: none;
   filter: brightness(0.985);
 }
+
 .modal-cta-button:active{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: var(--cmp-btn-minh);
-  padding: 11px var(--cmp-btn-pad-x);
-  border-radius: var(--cmp-btn-radius);
-
-  background: var(--cmp-btn-primary-bg);
-  border: 1px solid var(--ui-border-primary);
-
-  color: var(--cmp-btn-primary-fg);
-  font-size: var(--cmp-btn-font-size);
-  font-weight: var(--ui-font-weight-cta);
-  text-decoration: none;
-
-  box-shadow: var(--cmp-btn-primary-shadow);
-}
-/* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
-}
-
-.modal-cta-button:hover{
-  text-decoration: none;
-  filter: brightness(0.985);
-}
-.modal-cta-button:active{
-   /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
+  /* transform removed: breaks position:fixed overlays (filter-sheet) on some browsers */
   box-shadow: var(--ui-shadow-cta-active);
 }
-
+/* === END BLOCK: DS-02_MODAL_CTA_MAPPING === */
 
 /* GLOBAL HEADINGS TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6 {
@@ -2769,7 +2743,7 @@ Umfang:
   to   { transform: translateY(0);   opacity: 1; }
 }
 
-/* === BEGIN BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING | Purpose: map calendar chooser buttons to DS-02 choice/input tokens without UI change | Scope: replaces #event-detail-panel .detail-cal-sheet button base rule only === */
+/* === BEGIN BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING | Purpose: map calendar chooser buttons to DS-02 choice/input tokens without UI change | Scope: calendar choice block fully consolidated === */
 #event-detail-panel .detail-cal-sheet button{
   width: 100%;
   min-height: var(--cmp-choice-minh);
@@ -2796,8 +2770,6 @@ Umfang:
 
   transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
 }
-/* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING === */
-}
 
 @media (hover: hover){
   #event-detail-panel .detail-cal-sheet button:hover{
@@ -2817,8 +2789,7 @@ Umfang:
   outline-offset: 3px;
 }
 /* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_FOCUS_MAPPING === */
-}
-
+/* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING === */
 
 /* BEGIN PATCH ICONS-CSS-SYSTEM-V1
    Zweck:
@@ -3382,6 +3353,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
