@@ -654,16 +654,23 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    EMPTY STATE
    ============================================ */
-/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: align no-results state with app card/button DNA without redesign | Scope: replaces complete EMPTY STATE section only === */
+/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: give no-results state a clearly app-consistent card/panel look without redesign | Scope: replaces complete EMPTY STATE section only === */
 .empty-state{
-  padding: 12px 0 8px;
+  padding: 14px 0 10px;
 }
 
 .empty-state__card{
-  background: var(--cmp-card-bg);
-  border: 1px solid var(--cmp-card-border);
-  border-radius: var(--cmp-card-radius);
-  box-shadow: var(--cmp-card-shadow);
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
+      #ffffff 100%
+    );
+  border: 1px solid rgba(31,41,51,0.07);
+  border-radius: 18px;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   padding: 18px 16px 16px;
   max-width: 100%;
@@ -674,41 +681,43 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 .empty-state__title{
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 1.04rem;
   line-height: 1.22;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 820;
+  letter-spacing: -0.012em;
   color: var(--color-text-primary);
 }
 
 .empty-state__text{
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.97rem;
   line-height: 1.45;
   color: var(--color-text-secondary);
 }
 
 .empty-state__btn{
   width: 100%;
-  min-height: var(--cmp-btn-minh);
-  margin-top: 4px;
-  padding: 0 var(--cmp-btn-pad-x);
+  min-height: 46px;
+  margin-top: 6px;
+  padding: 0 14px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: var(--cmp-btn-radius);
-  border: 1px solid var(--ui-border-primary);
-  background: var(--color-primary-muted);
+  border-radius: 16px;
+  border: 1px solid rgba(139,207,74,0.56);
+  background: color-mix(in srgb, white 18%, var(--color-primary-muted));
   color: var(--color-text-primary);
 
   font: inherit;
-  font-size: 0.98rem;
-  font-weight: var(--ui-font-weight-cta);
+  font-size: 1rem;
+  font-weight: 820;
   text-decoration: none;
 
-  box-shadow: var(--cmp-btn-primary-shadow);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.05),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -722,13 +731,16 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 @media (hover: hover){
   .empty-state__btn:hover{
-    filter: brightness(0.985);
+    background: color-mix(in srgb, white 8%, var(--color-primary-muted));
+    border-color: rgba(139,207,74,0.68);
   }
 }
 
 .empty-state__btn:active{
   transform: translateY(1px);
-  box-shadow: var(--ui-shadow-cta-active);
+  box-shadow:
+    0 5px 12px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.74) inset;
 }
 
 .empty-state__btn:focus-visible{
@@ -3427,6 +3439,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
