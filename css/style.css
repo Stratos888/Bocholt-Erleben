@@ -1001,7 +1001,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* === BEGIN BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING | Purpose: restore complete event-card shell + inner layout + badge + title/icon structure after regression | Scope: shell, rail, date badge, card body, title row, title clamp, category icon, mobile shell === */
+/* === BEGIN BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING | Purpose: restore event-card inner typography/rhythm to pre-regression quality without changing shell DNA | Scope: shell, rail, badge, body, title row, title clamp, category icon, mobile shell === */
 .event-card{
   position: relative;
   overflow: hidden;
@@ -1126,7 +1126,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .event-title{
@@ -1141,11 +1141,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   font-weight: 700;
   letter-spacing: -0.01em;
   color: rgba(31,41,51,0.92);
-  line-height: 1.25;
+  line-height: 1.22;
 }
 
 .event-title__text{
-  flex: 1 1 auto;
   min-width: 0;
 
   display: -webkit-box;
@@ -1154,9 +1153,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   overflow: hidden;
 
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
-  hyphens: auto;
+  hyphens: none;
 }
 
 .event-title .event-category-icon{
@@ -1169,6 +1168,9 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  align-self: start;
+  margin-top: 1px;
 
   background: none;
   border: 0;
@@ -3385,6 +3387,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
