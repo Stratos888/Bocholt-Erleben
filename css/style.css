@@ -736,7 +736,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
-/* === BEGIN BLOCK: WP_STATUS_FEEDBACK_CLUSTER_MAPPING | Purpose: consolidate loading/info/error states into existing app DNA without behavior change | Scope: replaces complete LOADING & MESSAGES cluster only === */
+/* === BEGIN BLOCK: WP_STATUS_FEEDBACK_CLUSTER_MAPPING | Purpose: consolidate loading/info/error hierarchy into one stronger status surface family without behavior change | Scope: replaces complete LOADING & MESSAGES cluster only === */
 .loading-container {
   position: fixed;
   inset: 0;
@@ -761,15 +761,18 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   isolation: isolate;
 }
 
+.loading-container > *{
+  width: min(100%, 560px);
+}
+
 .loading-container > p{
-  width: min(100%, 360px);
   margin: 0;
   padding: 14px 16px;
 
-  border: 1px solid var(--ui-border-weak);
-  border-radius: var(--radius-eventcard);
-  background: rgba(255,255,255,0.88);
-  box-shadow: var(--shadow-eventcard);
+  border: 1px solid var(--cmp-empty-card-border);
+  border-radius: var(--cmp-empty-card-radius);
+  background: rgba(255,255,255,0.90);
+  box-shadow: var(--cmp-empty-card-shadow);
 
   color: var(--color-text-primary);
   font-size: var(--font-event-meta);
@@ -805,13 +808,12 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   gap: 8px;
   justify-items: center;
 
-  width: min(100%, 640px);
   margin: 0;
-  padding: 20px 18px;
+  padding: 18px 18px;
 
-  border-radius: var(--radius-eventcard);
-  border: 1px solid var(--ui-border-weak);
-  box-shadow: var(--shadow-eventcard);
+  border-radius: var(--cmp-empty-card-radius);
+  border: 1px solid var(--cmp-empty-card-border);
+  box-shadow: var(--cmp-empty-card-shadow);
 
   text-align: center;
 }
@@ -827,26 +829,30 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   color: var(--color-text-primary);
   font-size: 1rem;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.38;
+  letter-spacing: -0.01em;
 }
 
 .info-message small,
 .error-message small{
   display: block;
+  width: 100%;
+  max-width: 42ch;
+
   color: var(--color-text-secondary);
   font-size: 13px;
   line-height: 1.45;
 }
 
 .info-message{
-  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
-  border-color: rgba(139,207,74,0.20);
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  border-color: rgba(139,207,74,0.18);
   color: var(--color-text-primary);
 }
 
 .error-message{
-  background: color-mix(in srgb, white 92%, #f8d7da);
-  border-color: rgba(114,28,36,0.18);
+  background: color-mix(in srgb, white 93%, #f8d7da);
+  border-color: rgba(114,28,36,0.16);
   color: var(--color-text-primary);
 }
 
@@ -855,8 +861,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 .loading-container .empty-state__btn{
-  margin-top: 2px;
+  margin-top: 4px;
   justify-self: center;
+  align-self: center;
+  min-width: min(100%, var(--cmp-empty-btn-minw));
 }
 
 @media (hover: hover){
@@ -877,7 +885,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /*/* ============================================
    EMPTY STATE
    ============================================ */
-/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: final enterprise empty-state using event-card DNA and quiet feed action | Scope: replaces complete EMPTY STATE section only === */
+/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: align empty-state with status hierarchy while keeping it clearly quieter than overlay states | Scope: replaces complete EMPTY STATE section only === */
 .empty-state{
   padding: 10px 0 8px;
 }
@@ -888,7 +896,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   justify-items: start;
 
   width: 100%;
-  max-width: 100%;
+  max-width: 720px;
 
   padding: var(--eventcard-pad);
 
@@ -914,6 +922,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 .empty-state__text{
+  max-width: 44ch;
   margin: 0;
 
   font-size: var(--font-event-meta);
@@ -927,7 +936,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   max-width: 100%;
   min-height: var(--cmp-empty-btn-minh);
 
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 0 var(--cmp-empty-btn-pad-x);
 
   display: inline-flex;
@@ -1484,6 +1493,7 @@ footer {
 Zweck:
 - Persistentes Offline-Badge solange offline (informativ, nicht blockierend)
 - Toast/Snackbar nur bei Zustandswechsel online<->offline
+- Formal konsistent mit Status-/Empty-State-DNA, aber klar niedriger priorisiert
 Umfang:
 - Reines UI-Styling, JS setzt nur Klassen/States
 === */
@@ -1497,21 +1507,22 @@ Umfang:
 
   z-index: 910;
 
-  max-width: calc(100% - (2 * var(--gutter)));
+  max-width: min(100% - (2 * var(--gutter)), 420px);
   width: max-content;
 
   padding: 8px 12px;
   border-radius: 999px;
 
   background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(31,41,51,0.10);
+  border: 1px solid var(--ui-border-weak);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.70) inset,
     0 10px 24px rgba(31,41,51,0.10);
 
   font-size: 12.5px;
   font-weight: 650;
-  line-height: 1.15;
+  line-height: 1.2;
+  text-align: center;
   color: rgba(31,41,51,0.86);
 
   pointer-events: none;
@@ -1538,11 +1549,11 @@ html.is-offline .offline-badge{
 
   z-index: 910;
 
-  max-width: calc(100% - (2 * var(--gutter)));
+  max-width: min(100% - (2 * var(--gutter)), 460px);
   width: max-content;
 
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: var(--ui-radius-md);
 
   background: rgba(17,24,39,0.92);
   border: 1px solid rgba(255,255,255,0.10);
@@ -1551,7 +1562,8 @@ html.is-offline .offline-badge{
 
   font-size: 13px;
   font-weight: 650;
-  line-height: 1.15;
+  line-height: 1.2;
+  text-align: center;
   color: rgba(255,255,255,0.96);
 
   pointer-events: none;
@@ -3473,6 +3485,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
