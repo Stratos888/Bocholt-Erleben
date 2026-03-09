@@ -405,21 +405,30 @@ a:visited{ color: var(--color-primary); }
 }
 .page li{ margin: 6px 0; }
 
+/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate content/info page structure to app DNA and DS-02 tokens without redesign | Scope: hero, kicker, lead, cards, steps, benefits, content actions/back, content-links wrapper === */
 /* CONTENT PAGE COMPONENTS (reference pages) */
 .content-hero{
-  margin: 4px 0 14px;
+  margin: 6px 0 16px;
 }
+
 .content-kicker{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin: 0 0 8px;
+  color: var(--cmp-link-color-muted);
   font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0 0 6px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
+
 .content-lead{
   margin-top: 8px;
   color: var(--color-text-secondary);
+  max-width: 62ch;
 }
 
-/* === BEGIN BLOCK: DS-02_CONTENT_CARD_MAPPING | Purpose: map content cards to DS-02 surface/card DNA without UI redesign | Scope: replaces content-card block including primary variant only === */
 .content-card{
   background: var(--cmp-card-bg);
   border: 1px solid var(--cmp-card-border);
@@ -438,68 +447,62 @@ a:visited{ color: var(--color-primary); }
 .content-card h2{
   margin-top: 0;
 }
-/* === END BLOCK: DS-02_CONTENT_CARD_MAPPING === */
 
-.content-steps{
-  list-style: none;
-  padding-left: 0;
-  margin-top: 10px;
-  counter-reset: step;
-}
-.content-steps li{
-  counter-increment: step;
-  margin: 10px 0;
-  padding-left: 34px;
-  position: relative;
-  color: var(--color-text-secondary);
-}
-.content-steps li::before{
-  content: counter(step);
-  position: absolute;
-  left: 0;
-  top: 0.1em;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: var(--color-text-primary);
-  background: var(--color-primary-muted);
-  border: 1px solid rgba(139,207,74,.45);
-}
-
+.content-steps,
 .locations-benefits{
   list-style: none;
   padding-left: 0;
   margin-top: 10px;
 }
+
+.content-steps{
+  counter-reset: step;
+}
+
+.content-steps li,
 .locations-benefits li{
   position: relative;
-  padding-left: 30px;
   margin: 10px 0;
+  padding-left: 34px;
   color: var(--color-text-secondary);
 }
+
+.content-steps li{
+  counter-increment: step;
+}
+
+.content-steps li::before,
 .locations-benefits li::before{
-  content: "✓";
   position: absolute;
   left: 0;
   top: 0.1em;
-  width: 20px;
-  height: 20px;
+
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+
   color: var(--color-text-primary);
   background: var(--color-primary-muted);
-  border: 1px solid rgba(139,207,74,.35);
 }
 
-/* === BEGIN BLOCK: DS-02_CONTENT_ACTIONS_MAPPING | Purpose: map content page CTA/back actions to DS-02 button/link DNA without UI redesign | Scope: replaces content-actions/content-cta/content-back block only === */
+.content-steps li::before{
+  content: counter(step);
+  font-size: 0.9rem;
+  font-weight: 800;
+  border: 1px solid rgba(139,207,74,0.45);
+}
+
+.locations-benefits li::before{
+  content: "✓";
+  font-size: 0.82rem;
+  font-weight: 900;
+  border: 1px solid rgba(139,207,74,0.35);
+}
+
 .content-actions{
   margin-top: 16px;
   display: grid;
@@ -572,9 +575,14 @@ a:visited{ color: var(--color-primary); }
   outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
-/* === END BLOCK: DS-02_CONTENT_ACTIONS_MAPPING === */
 
 /* CONTENT LINKS (top-pwa navigation list, borderless) */
+.content-links{
+  margin-top: 6px;
+  display: grid;
+  gap: 2px;
+}
+/* === END BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING === */
 .content-links{
   margin-top: 6px;
   display: grid;
@@ -3648,3 +3656,4 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
