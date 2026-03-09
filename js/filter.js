@@ -877,8 +877,36 @@ const timeMap = {
       zeitraum: "all"
     };
 
-    this.filteredEvents = this.allEvents;
-    this.updateUI();
+    const ui = this._ui || {};
+
+    if (ui.searchInput) {
+      ui.searchInput.value = "";
+    } else {
+      const searchInput = document.getElementById("search-filter");
+      if (searchInput) searchInput.value = "";
+    }
+
+    if (ui.timeSheet) {
+      this.setActiveOption(
+        ui.timeSheet,
+        ui.timeSheet.querySelector('[data-time="all"]')
+      );
+    }
+
+    if (ui.catSheet) {
+      this.setActiveOption(
+        ui.catSheet,
+        ui.catSheet.querySelector('[data-category=""]')
+      );
+    }
+
+    this.applyFilters();
+
+    this.updateFilterBarUI(
+      ui.timeValue || document.getElementById("filter-time-value"),
+      ui.catValue || document.getElementById("filter-category-value"),
+      ui.resetPill || document.getElementById("filter-reset-pill")
+    );
 
     debugLog("Filters reset");
   },
