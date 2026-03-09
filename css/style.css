@@ -1805,30 +1805,64 @@ body.is-sheet-open .top-stack{
   color: var(--color-text-primary);
 }
 
+/* === BEGIN BLOCK: DS-02_FILTER_SHEET_CLOSE_MAPPING | Purpose: map filter-sheet close button to DS-02 ghost/icon-button DNA without UI redesign | Scope: replaces complete filter-sheet close block including states === */
 /* Close */
 .filter-sheet__close{
   -webkit-appearance: none;
   appearance: none;
 
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
+  width: var(--ui-close-size);
+  height: var(--ui-close-size);
+  min-width: var(--ui-close-size);
+  min-height: var(--ui-close-size);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(31,41,51,0.14);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.16);
+  padding: 0;
+  border-radius: 999px;
+  border: var(--ui-close-border);
+  background: var(--ui-close-bg);
 
-  font-size: 22px;
+  color: var(--ui-close-color);
+  font-size: var(--ui-close-font-size);
   line-height: 1;
-  color: rgba(31,41,51,0.72);
+
+  box-shadow: var(--ui-close-shadow);
 
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
 }
-.filter-sheet__close:active{ transform: scale(0.96); }
+
+@media (hover: hover){
+  .filter-sheet__close:hover{
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
+    color: rgba(31,41,51,0.82);
+  }
+}
+
+.filter-sheet__close:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
+  box-shadow:
+    0 10px 18px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.filter-sheet__close:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-neutral);
+  outline-offset: var(--cmp-focus-outline-offset);
+}
+/* === END BLOCK: DS-02_FILTER_SHEET_CLOSE_MAPPING === */
 
 /* Body: Padding, damit Liste “App-like” wirkt */
 .filter-sheet__body{
@@ -3305,6 +3339,14 @@ svg.ui-icon-svg{
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
+/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING | Purpose: align header button focus to central DS-02 focus contract without UI redesign | Scope: adds header button focus rule only === */
+.header-right > .pwa-install-button:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-sm);
+}
+/* === END BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING === */
+
 @media (max-width: 360px){
   .app-header{ padding: 0 var(--gutter); min-height: 48px; }
   .header-right{ gap: 8px; }
@@ -3556,6 +3598,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
