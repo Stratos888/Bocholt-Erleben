@@ -234,68 +234,89 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- Filter-Reset-Bug in `js/filter.js` wurde analysiert:
-  - Root-Cause-Hypothese war ein nicht-kanonischer Reset-Pfad über das X neben den Pills
-  - aktueller Ist-Stand wurde danach gegen den realen Datei-/UI-Stand geprüft
-  - Ergebnis: kein weiterer Patch in `js/filter.js` eingebracht, weil der Reset im getesteten Stand wieder korrekt funktioniert
-  - Filter-/Reset-Verhalten wurde praktisch gegengeprüft (Suche, Input-X, Reset-X, Kombinationen mit Kategorie/Zeit) und vorerst gefreezt
-- CSS Design System DS-02 in `css/style.css` deutlich weiter konsolidiert, ohne Redesign:
-  - Focus-/Link-/Action-Mappings weiter vereinheitlicht
-  - Content-/Info-Seiten hinter dem Info-Button strukturell an die App-DNA angeglichen
-  - größere Content-/Info-Cluster statt vieler Mini-Patches zusammengeführt
-  - Modal-/Filter-/Detailpanel-/Icon-/Header-/Content-Blöcke weiter auf DS-02-/Token-DNA gezogen
-- Mehrere strukturelle CSS-Regressions-/Konsolidierungsfehler wurden reproduzierbar gefunden und behoben:
-  - kaputter `DS-02_MODAL_CTA_MAPPING`-Block korrigiert
-  - doppelte/inkonsistente Content-Link-/Content-Cluster-Struktur bereinigt
-  - größere Detailpanel-Header-/Meta-/Description-/Icon-Cluster sauberer zusammengeführt
-- Event-Card-Regressionsphase während der Konsolidierung wurde analysiert und behoben:
-  - Event-Card-Shell/Grid/Surface-DNA wiederhergestellt
-  - Event-Card-Innenstruktur (Badge, Body, Title/Icon-Row) wiederhergestellt
-  - unsaubere Worttrennungen/Title-Umbruchlogik korrigiert
-  - Ziel: kein Qualitätsverlust gegenüber Vorzustand durch CSS-Konsolidierung
+- Status-/Feedback-Cluster in `css/style.css` wurde als eigener Workpack konsolidiert:
+  - `.loading-container`, `.loading-spinner`, `.info-message`, `.error-message` auf App-/DS-02-DNA gezogen
+  - Skeleton-Eventcards blieben funktional unverändert und wurden bewusst nicht angefasst
+  - Zustands-Hierarchie zu Empty State / Offline-Hinweisen wurde geprüft und per CSS-only nachgeschärft
+- Empty State sowie Offline-Badge/Toast wurden in die gemeinsame Zustandsfamilie eingeordnet:
+  - Empty State ruhiger gegenüber Overlay-Zuständen
+  - Offline-Hinweise klar niedriger priorisiert als Loading / Error / Info
+  - Dev-Proofs/Konsolen-Checks für Status-/State-Prüfung wurden praktisch genutzt
+- Geplanter Workpack „State Transition & Hierarchy Polish“ wurde bewusst vertagt:
+  - keine weitere Energie in Rand-/Eventualitäts-Polish
+  - Small-Viewport-/Prioritätskanten-/Übergangs-Feinschliff vorerst on hold
+- Reale Event-Cards im Normalzustand wurden erneut geprüft:
+  - Ergebnis: weitgehend konsolidiert, nur noch geringe Feinluft
+  - kein neuer großer Event-Card-Workpack gestartet
+  - Bereich vorerst eingefroren
+- Detailpanel wurde erneut geprüft und minimal final nachgeschärft:
+  - linke Fluchtung der Meta-Zeilen (Ort sowie Datum/Uhrzeit) per CSS-only angepasst
+  - danach Detailpanel vorerst eingefroren
+- Filterbereich wurde nicht erneut geöffnet:
+  - gilt weiterhin als bereits gefreezt
+- Info-/Content-Seiten hinter dem Info-Button wurden als nächster Hauptbereich bearbeitet:
+  - gemeinsamer Content-/Info-Seiten-Cluster in `css/style.css` systemisch an die App-DNA angepasst
+  - `/info/` als echter Hub finalisiert (Erklärung + Veranstalter-CTA + Navigation)
+  - reduzierte Header-/Top-Chrome-Variante für Content-Seiten eingeführt, abgeleitet aus derselben App-Bar-DNA wie der Feed-Header
+  - Seitenfamilie (`/info/`, `/ueber/`, `/events-veroeffentlichen/`, `/impressum/`, `/datenschutz/`) visuell gegengeprüft und in mehreren gemeinsamen CSS-Pässen konsolidiert
+- Globales Design-System wurde erneut geprüft:
+  - Ergebnis: im Wesentlichen konsolidiert und nicht mehr als offener Haupt-Workpack behandelt
+  - verbleibend höchstens kleiner späterer Cleanup, kein eigener großer DS-Block
 - Session-Endstand:
-  - Event-Cards wieder auf stabilem Qualitätsniveau
-  - keine weitere akute Functional-Fix-Baustelle offen
-  - nächster sinnvoller CSS-Workpack ist nicht mehr Feed-/Card-Regression, sondern Status-/Feedback-Zustände
+  - Feed, Filter, Event-Cards und Detailpanel gelten vorerst als eingefroren
+  - Status-/Feedback-Cluster auf brauchbarem Stand; Rand-Polish vertagt
+  - Info-/Content-Seiten deutlich konsistenter und näher an einer gemeinsamen App-Familie
+  - nächster Chat sollte nicht alte UI-Hauptflächen wieder aufmachen, sondern auf Basis dieses Freeze-/Scope-Stands weiterarbeiten
 
 DECISIONS LOG (permanent, project-wide):
-- GS-01 Feed / Filter Reset:
-  - Der in einem Zwischenstand vermutete Reset-Bug in `js/filter.js` wurde in dieser Session nicht final als aktueller Defekt bestätigt.
-  - Wenn beide Reset-Wege (Input-X und Reset-X neben den Pills) im praktischen Test korrekt laufen, wird `js/filter.js` nicht weiter angefasst.
-- GS-01 Feed / Event Cards:
-  - CSS-Design-System-Konsolidierung darf keine sichtbare Qualitätsminderung der Event-Cards verursachen.
-  - Bei Regressionen gilt: erst Vorzustand gegen Ist-Stand abgleichen, dann die vollständige Card-DNA wiederherstellen (Shell + Innenstruktur + Typografie).
-- CSS Design System / Content Pages:
-  - Die Content-/Info-Seiten hinter dem Info-Button werden nicht separat „neu designt“, sondern systemisch an die bestehende App-DNA angeglichen.
-  - Ziel bleibt: gleiche Oberflächenlogik, gleiche Typo-/Spacing-/Focus-/Link-DNA wie im Rest der App.
-- CSS Cleanup:
-  - Alte Kommentar-/Patch-Marker werden nicht als eigener Workpack priorisiert, sondern nur peu à peu bei späteren echten Patches mitbereinigt.
+- Status-/Feedback-Cluster:
+  - Skeleton-Eventcards bleiben der bestehende Loading-Standard und werden in diesem Workpack funktional nicht verändert.
+  - `.loading-container`, `.loading-spinner`, `.info-message`, `.error-message`, Empty State und Offline-Hinweise werden nur CSS-seitig an die App-DNA angeglichen, ohne Redesign und ohne JS-Logikänderung.
+- State Transition & Hierarchy Polish:
+  - Der Workpack zu Zustands-Übergängen, Prioritätskanten und Small-Viewport-Härtefällen wird vorerst bewusst auf Eis gelegt.
+  - Keine weitere Energie in Rand-/Eventualitäts-Polish investieren, bis später explizit wieder aufgenommen.
+- Event-Cards:
+  - Event-Card Normal State Polish gilt vorerst als eingefroren.
+  - Weitere Arbeit an realen Event-Cards nur noch bei klaren konkreten Symptomen im echten Feed, nicht als eigener großer Workpack.
+- Detailpanel:
+  - Das Event-Detailpanel gilt vorerst ebenfalls als eingefroren.
+  - Nur noch gezielte Eingriffe bei klaren konkreten Symptomen; letzter Feinschliff war die linke Fluchtung der Meta-Zeilen (Ort sowie Datum/Uhrzeit).
+- Filterbereich:
+  - Search-/Filter-UI wird vorerst nicht erneut geöffnet; Bereich gilt als bereits gefreezt.
+- Globales Design-System:
+  - Das globale Design-System in `css/style.css` gilt als im Wesentlichen konsolidiert.
+  - Weitere Arbeit daran ist höchstens Cleanup/Vereinheitlichung letzter Direktwerte, aber kein eigener Haupt-Workpack mehr.
+- Info-/Content-Seiten hinter dem Info-Button:
+  - Nächster großer sichtbarer UI-Bereich nach Feed/Detailpanel ist die gesamte Seitenfamilie hinter dem Info-Button.
+  - Zielbild: nicht „Website neben der App“, sondern sekundäre App-Screens derselben Produktfamilie.
+  - Gleiche Header-/Top-Bar-DNA über alle Seiten ja; denselben Feed-Header 1:1 über alle Unterseiten nein.
+  - Für Content-Seiten gilt eine reduzierte Header-/Top-Chrome-Variante mit derselben App-DNA, aber screen-passender Aktionslogik.
+- `/info/` Hub:
+  - `/info/` ist der zentrale Hub des Bereichs hinter dem Info-Button und soll Erklärung + Veranstalter-CTA + Navigation bündeln.
+  - `/fuer-veranstalter/` wird nicht wieder eingeführt; Preis-/Tarifdiskussion gehört nicht in den Hub.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
-- Detailpanel bleibt Enterprise-Baseline; keine strukturelle Neugestaltung.
-- Feed-/Filter-/Card-Regressionsphase dieser Session ist beendet.
-- Aktiver UI-Fokus am Session-Ende: CSS Design System (`css/style.css`) → Status-/Feedback-Zustände an App-DNA angleichen, ohne Loading-Logik neu zu bauen.
+- Detailpanel bleibt Enterprise-Baseline und ist vorerst eingefroren; keine strukturelle Neugestaltung.
+- Feed-/Filter-/Event-Card-Hauptflächen bleiben vorerst eingefroren.
+- Status-/Feedback-Cluster wurde bearbeitet und ist aktuell auf brauchbarem Stand; Rand-/Übergangs-Polish bewusst vertagt.
+- Aktiver sichtbarer UI-Fokus wurde in dieser Session auf die Info-/Content-Seiten hinter dem Info-Button verschoben.
+- Globales Design-System gilt nicht mehr als offener Haupt-Workpack.
 
 REMAINING GAPS (NEXT WORKPACKS, UI/UX + FUNCTIONAL):
-1) Status-/Feedback-Cluster in `css/style.css` auf DS-02 / App-DNA ziehen:
-   - bestehende Skeleton-Eventcards bleiben als Loading-Standard bestehen
-   - prüfen/konsolidieren: `.loading-container`, `.loading-spinner`, `.info-message`, `.error-message`
-   - Ziel: gleiche Surface-/Spacing-/Radius-/Typo-Logik wie im Rest der App, kein Redesign
-2) Danach Modal-/Overlay-Feinschliff:
-   - verbleibende strukturelle Alt-/Duplikat-Reste im Modal-/Overlay-Bereich prüfen und nur bei echtem Bedarf bereinigen
-3) Kommentar-/Marker-Cleanup nicht separat priorisieren:
-   - nur bei künftigen echten CSS-Workpacks mit erledigen
+1) Info-/Hub-Bereich nur noch gegen echten UI-Bedarf weiterführen:
+   - keine alten Hauptflächen wieder öffnen
+   - nur noch gezielte Restarbeiten, falls in der realen Seitenfamilie noch klare Ausreißer sichtbar werden
+2) Status-/Transition-Polish bleibt bewusst on hold:
+   - nicht automatisch wieder aufnehmen
+3) Globales DS-Cleanup nur bei echtem Bedarf:
+   - kein eigener Workpack, nur opportunistisch bei späteren Patches
 
 NEXT CHAT PROMPT (start here):
-„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach nur `css/style.css` bearbeiten. Nächster Workpack ist der Status-/Feedback-Cluster, nicht die Skeleton-Eventcards. Die Skeletons sind bereits eingebaut und sollen funktional unverändert bleiben. Bitte prüfe den aktuellen Stand von `.loading-container`, `.loading-spinner`, `.info-message` und `.error-message`, beschreibe kurz den Ist-Zustand für Dummies, definiere den Zielzustand im Rahmen unserer bestehenden App-DNA und liefere dann einen größeren, konsolidierten CSS-Patch nur für diese Zustände. Kein Redesign, keine JS-Logikänderung, nur CSS-only mit eindeutigen BEGIN/END Anchors.“
+„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach den aktuellen Freeze-/Scope-Stand strikt respektieren: Feed, Filter, Event-Cards und Detailpanel sind vorerst eingefroren; der Workpack ‚State Transition & Hierarchy Polish‘ bleibt on hold; das globale Design-System gilt als im Wesentlichen konsolidiert. Prüfe dann nur den aktuell sinnvollen nächsten Bereich auf Basis dieses Stands und öffne keine eingefrorenen UI-Hauptflächen ohne klaren konkreten Defekt.“
 
 LAST UPDATE:
 
 2026-03-09
-
-2026-03-09
-
-2026-03-05
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 
 ---
