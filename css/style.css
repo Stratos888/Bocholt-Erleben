@@ -2494,7 +2494,7 @@ html.is-panel-open body {
 /* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
 
-/* === BEGIN BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING | Purpose: consolidate detail header and meta rows into one clean DS-02 cluster without redesign | Scope: detail header, title row, category icon, title, meta rows, hover/active/focus, datetime/location variants === */
+/* === BEGIN BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING | Purpose: align detail meta rows to the same left gutter/grid as the rest of the detail panel without redesign | Scope: detail header, title row, category icon, title, meta rows, hover/active/focus, datetime/location variants === */
 #event-detail-panel .detail-header{
   position: relative;
 
@@ -2510,6 +2510,7 @@ html.is-panel-open body {
 
 #event-detail-panel .detail-title-row{
   --dp-indicator-size: 28px;
+  --dp-meta-icon-col: var(--dp-indicator-size);
 
   display: flex;
   align-items: center;
@@ -2597,11 +2598,11 @@ html.is-panel-open body {
   min-width: 0;
 
   display: grid;
-  grid-template-columns: auto minmax(0,1fr) auto;
+  grid-template-columns: var(--dp-meta-icon-col, 28px) minmax(0,1fr) auto;
   align-items: center;
   column-gap: 10px;
 
-  padding: 10px 12px;
+  padding: 10px 0;
   border-radius: var(--ui-radius-sm);
 
   color: var(--cmp-link-color-muted);
@@ -2613,6 +2614,9 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-icon{
+  width: var(--dp-meta-icon-col, 28px);
+  min-width: var(--dp-meta-icon-col, 28px);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2634,7 +2638,7 @@ html.is-panel-open body {
 }
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location{
-  grid-template-columns: auto fit-content(100%) auto;
+  grid-template-columns: var(--dp-meta-icon-col, 28px) fit-content(100%) auto;
   column-gap: 8px;
   justify-content: start;
 }
@@ -3485,6 +3489,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
