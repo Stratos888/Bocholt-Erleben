@@ -654,50 +654,65 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    EMPTY STATE
    ============================================ */
-/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: give no-results state a clearly app-consistent card/panel look without redesign | Scope: replaces complete EMPTY STATE section only === */
+/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: integrate no-results state into app card/panel DNA more clearly without redesign | Scope: replaces complete EMPTY STATE section only === */
 .empty-state{
-  padding: 14px 0 10px;
+  padding: 10px 0 8px;
 }
 
 .empty-state__card{
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
-      #ffffff 100%
-    );
-  border: 1px solid rgba(31,41,51,0.07);
-  border-radius: 18px;
-  box-shadow:
-    0 10px 26px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.78) inset;
-
-  padding: 18px 16px 16px;
-  max-width: 100%;
+  position: relative;
+  overflow: hidden;
 
   display: grid;
   gap: 8px;
+
+  padding: 16px 16px 14px;
+
+  background: var(--surface-panel);
+  border: 1px solid var(--border-panel-soft);
+  border-radius: var(--radius-eventcard);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.035),
+    0 1px 0 rgba(255,255,255,0.80) inset;
+}
+
+.empty-state__card::before{
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+
+  background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
+  box-shadow: inset -1px 0 0 rgba(31,41,51,0.04);
+  opacity: 0.95;
+
+  pointer-events: none;
+}
+
+.empty-state__card > *{
+  position: relative;
+  z-index: 1;
 }
 
 .empty-state__title{
   margin: 0;
-  font-size: 1.04rem;
+  font-size: 1.02rem;
   line-height: 1.22;
-  font-weight: 820;
+  font-weight: 800;
   letter-spacing: -0.012em;
   color: var(--color-text-primary);
 }
 
 .empty-state__text{
   margin: 0;
-  font-size: 0.97rem;
+  font-size: 0.95rem;
   line-height: 1.45;
   color: var(--color-text-secondary);
 }
 
 .empty-state__btn{
   width: 100%;
-  min-height: 46px;
+  min-height: 44px;
   margin-top: 6px;
   padding: 0 14px;
 
@@ -705,19 +720,17 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   align-items: center;
   justify-content: center;
 
-  border-radius: 16px;
-  border: 1px solid rgba(139,207,74,0.56);
-  background: color-mix(in srgb, white 18%, var(--color-primary-muted));
+  border-radius: var(--ui-radius-md);
+  border: 1px solid var(--ui-border-primary);
+  background: rgba(255,255,255,0.72);
   color: var(--color-text-primary);
 
   font: inherit;
-  font-size: 1rem;
-  font-weight: 820;
+  font-size: 0.98rem;
+  font-weight: var(--ui-font-weight-cta);
   text-decoration: none;
 
-  box-shadow:
-    0 8px 18px rgba(0,0,0,0.05),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+  box-shadow: var(--ui-shadow-soft);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -731,16 +744,16 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 @media (hover: hover){
   .empty-state__btn:hover{
-    background: color-mix(in srgb, white 8%, var(--color-primary-muted));
-    border-color: rgba(139,207,74,0.68);
+    background: rgba(255,255,255,0.86);
+    border-color: rgba(139,207,74,0.58);
   }
 }
 
 .empty-state__btn:active{
   transform: translateY(1px);
   box-shadow:
-    0 5px 12px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.74) inset;
+    0 5px 12px rgba(0,0,0,0.04),
+    0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
 .empty-state__btn:focus-visible{
@@ -3439,6 +3452,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
