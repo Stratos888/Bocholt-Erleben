@@ -17,12 +17,11 @@
 </head>
 
 <body>
-<!-- === BEGIN BLOCK: INFO SCREEN ENTERPRISE V2 (Hybrid: Explain + CTA + Navigation) ===
+<!-- === BEGIN BLOCK: INFO SCREEN ENTERPRISE V3 (final hub: explain + organizer CTA + clean navigation) ===
 Zweck:
-- Wandelt /info/ von Hub-only in Enterprise Hybrid Screen um
-- Sofortige Erklärung + direkter Veranstalter-CTA + reduzierte Navigation
-- Entfernt Redundanz und entfernt Verweise auf /fuer-veranstalter/
-- Kein Preise-Teaser mehr (vermeidet Conversion-Verlust und Inkonsistenz)
+- Finalisiert /info/ als echten App-Hub statt nur als kleine Infoseite
+- Hält „Event veröffentlichen“ als Hauptweg, stärkt aber Orientierung und Priorisierung
+- Keine neue Seite, keine Rückkehr zu /fuer-veranstalter/, keine Preis-/Tarifdiskussion
 Umfang:
 - Ersetzt den kompletten bisherigen Info-Hub-Inhalt
 - Keine Änderungen außerhalb dieses Blocks
@@ -38,69 +37,70 @@ Umfang:
 
     <p class="content-kicker">Bocholt erleben</p>
 
-    <h1>Eine Plattform für Veranstaltungen in Bocholt</h1>
+    <h1>Info zu Bocholt erleben</h1>
 
     <p class="content-lead">
-      Alle Events an einem Ort – ruhig, übersichtlich und gleich behandelt.
+      Bocholt erleben bündelt Veranstaltungen aus Bocholt an einem Ort – ruhig, übersichtlich und ohne optische Bevorzugung einzelner Events.
     </p>
 
-      <!-- === BEGIN BLOCK: INFO CTA TRUST BOOST ENTERPRISE V2 (adds clear organizer value) ===
-      Zweck:
-      - Ergänzt klaren Nutzen-Satz direkt unter dem CTA
-      - Stärkt Conversion ohne Layoutänderung
-      Umfang:
-      - Ersetzt nur den CTA-Block im Hero
-      === -->
     <div class="content-actions content-actions--spaced">
+      <a class="modal-cta-button content-cta" href="/events-veroeffentlichen/">
+        Event veröffentlichen
+      </a>
 
-        <a class="modal-cta-button content-cta"
-           href="/events-veroeffentlichen/">
-           Event veröffentlichen
-        </a>
-
-        <p class="content-note">
-          Erreiche gezielt Menschen aus Bocholt – übersichtlich, ohne Werbung und ohne Konkurrenz um Sichtbarkeit.
-        </p>
-
+      <p class="content-note">
+        Für Veranstalter ist das der direkte Einstieg: kurz klären, wie dein Event eingebunden wird, dann sauber und nachvollziehbar veröffentlichen.
+      </p>
     </div>
-      <!-- === END BLOCK: INFO CTA TRUST BOOST ENTERPRISE V2 (adds clear organizer value) === -->
-
 
   </header>
 
-
-
-  <section class="content-card" aria-labelledby="info-plattform">
-
-    <h2 id="info-plattform">Über die Plattform</h2>
+  <section class="content-card content-card--primary" aria-labelledby="info-organizer">
+    <h2 id="info-organizer">Für Veranstalter</h2>
 
     <p class="content-note">
-      Warum Bocholt erleben existiert und wie die Plattform funktioniert.
+      Der wichtigste nächste Schritt, wenn du eigene Veranstaltungen sichtbar machen möchtest.
     </p>
 
-    <nav class="content-links">
-      <a class="content-link" href="/ueber/">Mehr erfahren</a>
-    </nav>
+    <ul class="locations-benefits">
+      <li>klarer Einstieg ohne Umwege</li>
+      <li>ruhige Darstellung ohne Werbung und ohne Konkurrenz um Sichtbarkeit</li>
+      <li>Veröffentlichung mit offizieller Quelle für mehr Vertrauen</li>
+    </ul>
 
+    <nav class="content-links" aria-label="Veranstalter">
+      <a class="content-link" href="/events-veroeffentlichen/">Zum Einstieg für Veranstalter</a>
+    </nav>
   </section>
 
+  <section class="content-card" aria-labelledby="info-platform">
+    <h2 id="info-platform">Über die Plattform</h2>
 
+    <p class="content-note">
+      Warum Bocholt erleben existiert, wie die Plattform gedacht ist und worin sie sich bewusst von Werbung, Rankings und unruhigen Stadtportalen unterscheidet.
+    </p>
 
-  <section class="content-card" aria-labelledby="info-recht">
+    <nav class="content-links" aria-label="Plattform">
+      <a class="content-link" href="/ueber/">Mehr über Bocholt erleben</a>
+    </nav>
+  </section>
 
-    <h2 id="info-recht">Rechtliches</h2>
+  <section class="content-card" aria-labelledby="info-legal">
+    <h2 id="info-legal">Rechtliches &amp; Kontakt</h2>
 
-    <nav class="content-links">
+    <p class="content-note">
+      Die rechtlichen Pflichtseiten und die Anbieterangaben findest du gesammelt hier.
+    </p>
+
+    <nav class="content-links" aria-label="Rechtliches">
       <a class="content-link" href="/impressum/">Impressum</a>
       <a class="content-link" href="/datenschutz/">Datenschutz</a>
     </nav>
-
   </section>
-
 
 </main>
 
-<!-- === END BLOCK: INFO SCREEN ENTERPRISE V2 (Hybrid: Explain + CTA + Navigation) === -->
+<!-- === END BLOCK: INFO SCREEN ENTERPRISE V3 (final hub: explain + organizer CTA + clean navigation) === -->
 
 
 </body>
