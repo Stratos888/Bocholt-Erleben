@@ -2168,10 +2168,12 @@ html.is-panel-open body {
     0 1px 0 rgba(255,255,255,0.76) inset !important;
 }
 
+/* === BEGIN BLOCK: DS-02_DETAIL_CLOSE_FOCUS_MAPPING | Purpose: align detail close button focus to central DS-02 focus contract without UI redesign | Scope: replaces detail close focus rule only === */
 #event-detail-panel .detail-panel-close:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
-  outline-offset: 2px;
+  outline-offset: var(--cmp-focus-outline-offset);
 }
+/* === END BLOCK: DS-02_DETAIL_CLOSE_FOCUS_MAPPING === */
 
 /* END PATCH DP-CLOSE-BUTTON-POLISH-V2 */
 
@@ -2308,11 +2310,13 @@ html.is-panel-open body {
   }
 }
 
+/* === BEGIN BLOCK: DS-02_DETAIL_LINK_FOCUS_MAPPING | Purpose: align detail link focus to central DS-02 link focus contract without UI redesign | Scope: replaces detail link focus rule only === */
 #event-detail-panel .detail-link:focus-visible{
   outline: 2px solid var(--cmp-link-focus-ring);
-  outline-offset: 2px;
+  outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
+/* === END BLOCK: DS-02_DETAIL_LINK_FOCUS_MAPPING === */
 
 #event-detail-panel .detail-link-label{
   font-size: 11px;
@@ -2583,11 +2587,13 @@ Umfang:
   background: var(--ui-surface-tint-active) !important;
 }
 
+/* === BEGIN BLOCK: DS-02_DETAIL_META_ROW_FOCUS_MAPPING | Purpose: align detail meta row focus to central DS-02 focus contract without UI redesign | Scope: replaces detail meta row focus rule only === */
 #event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
-  outline-offset: 2px;
+  outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
+/* === END BLOCK: DS-02_DETAIL_META_ROW_FOCUS_MAPPING === */
 
 #event-detail-panel .detail-meta-rows .detail-meta-row:not(a){
   cursor: default;
@@ -3256,11 +3262,13 @@ svg.ui-icon-svg{
   background: var(--ui-surface-soft-active);
 }
 
+/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING | Purpose: align header button focus to central DS-02 focus contract without UI redesign | Scope: replaces header button focus rule only === */
 .header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid var(--ui-focus-ring);
+  outline: 2px solid var(--cmp-btn-focus-ring);
   outline-offset: 3px;
   border-radius: var(--ui-radius-sm);
 }
+/* === END BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING === */
 
 /* Icon base */
 .header-right > .pwa-install-button::before{
@@ -3500,6 +3508,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
