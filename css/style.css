@@ -2006,10 +2006,10 @@ html.is-panel-open body {
 
 /* BEGIN PATCH DP-CLOSE-BUTTON-POLISH-V2
    Zweck:
-   - Close-Button weniger “dominant”, mehr native PWA (ruhige Surface, softer Shadow, klare States).
-   - Keine Änderung am zentralen Icon-System (SVG bleibt über ui-icon Tokens gesteuert).
+   - Detailpanel-Close auf DS-02 Ghost/Icon-Button-DNA mappen.
+   - Bestehenden Look beibehalten: ruhig, rund, leicht elevated, kein Redesign.
    Umfang:
-   - Ersetzt NUR die Detailpanel-Close-Regeln inkl. States (active/hover/focus).
+   - Ersetzt den kompletten Close-Button-Block inkl. States.
 */
 
 #event-detail-panel .detail-panel-close{
@@ -2032,61 +2032,65 @@ html.is-panel-open body {
   justify-content: center !important;
 
   border-radius: 999px !important;
+  border: var(--ui-close-border) !important;
+  background: var(--ui-close-bg) !important;
+  color: var(--ui-close-color) !important;
 
-  /* calmer + more “sheet-native” */
-  background: rgba(255,255,255,0.78) !important;
-  border: 1px solid rgba(31,41,51,0.10) !important;
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.085),
-    0 1px 0 rgba(255,255,255,0.72) inset !important;
+  box-shadow: var(--ui-close-shadow) !important;
 
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 
-  font-size: var(--ui-close-font-size) !important;
-  line-height: 1 !important;
-  color: rgba(31,41,51,0.66) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 
   cursor: pointer;
+  text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
 
   transition:
-    transform 120ms ease,
-    background 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease,
-    color 120ms ease;
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
 }
 
-/* If close is SVG-based, keep it aligned with icon system */
-#event-detail-panel .detail-panel-close svg{
-  width: var(--ui-icon-size-md);
-  height: var(--ui-icon-size-md);
-  opacity: var(--ui-icon-opacity);
+#event-detail-panel .detail-panel-close > *{
+  pointer-events: none;
+}
+
+#event-detail-panel .detail-panel-close svg,
+#event-detail-panel .detail-panel-close img{
+  width: var(--ui-icon-size-md) !important;
+  height: var(--ui-icon-size-md) !important;
+  min-width: var(--ui-icon-size-md) !important;
+  min-height: var(--ui-icon-size-md) !important;
+
+  display: block !important;
+  flex: 0 0 auto !important;
+
+  opacity: 0.96;
 }
 
 @media (hover: hover){
   #event-detail-panel .detail-panel-close:hover{
-    background: rgba(255,255,255,0.90) !important;
-    border-color: rgba(31,41,51,0.14) !important;
-    color: rgba(31,41,51,0.78) !important;
-    box-shadow:
-      0 12px 26px rgba(0,0,0,0.10),
-      0 1px 0 rgba(255,255,255,0.76) inset !important;
+    background: var(--ui-surface-soft-hover) !important;
+    border-color: var(--ui-border-strong) !important;
+    color: rgba(31,41,51,0.82) !important;
   }
 }
 
 #event-detail-panel .detail-panel-close:active{
-  transform: scale(0.96);
-  background: rgba(255,255,255,0.72) !important;
-  border-color: rgba(31,41,51,0.16) !important;
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active) !important;
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.085),
-    0 1px 0 rgba(255,255,255,0.70) inset !important;
+    0 10px 18px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.76) inset !important;
 }
 
 #event-detail-panel .detail-panel-close:focus-visible{
-  outline: 2px solid var(--ui-focus-ring-neutral);
+  outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: 2px;
 }
 
@@ -3401,6 +3405,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
