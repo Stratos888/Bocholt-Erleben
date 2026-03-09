@@ -405,7 +405,7 @@ a:visited{ color: var(--color-primary); }
 }
 .page li{ margin: 6px 0; }
 
-/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate content/info page structure to app DNA and DS-02 tokens without redesign | Scope: hero, kicker, lead, cards, steps, benefits, content actions/back, content-links wrapper === */
+/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate content/info page structure and navigation into one clean DS-02 cluster without redesign | Scope: hero, kicker, lead, cards, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
 /* CONTENT PAGE COMPONENTS (reference pages) */
 .content-hero{
   margin: 6px 0 16px;
@@ -539,6 +539,10 @@ a:visited{ color: var(--color-primary); }
     color 140ms ease;
 }
 
+.content-cta:visited{
+  color: var(--cmp-btn-secondary-fg);
+}
+
 @media (hover: hover){
   .content-cta:hover{
     background: var(--ui-surface-soft-hover);
@@ -568,6 +572,21 @@ a:visited{ color: var(--color-primary); }
   color: var(--cmp-link-color-muted);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+
+  transition:
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.content-back:visited{
+  color: var(--cmp-link-color-muted);
+}
+
+@media (hover: hover){
+  .content-back:hover{
+    color: var(--cmp-link-color);
+    text-decoration: none;
+  }
 }
 
 .content-back:focus-visible{
@@ -582,14 +601,7 @@ a:visited{ color: var(--color-primary); }
   display: grid;
   gap: 2px;
 }
-/* === END BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING === */
-.content-links{
-  margin-top: 6px;
-  display: grid;
-  gap: 2px;
-}
 
-/* === BEGIN BLOCK: DS-02_CONTENT_LINK_MAPPING | Purpose: map content-link navigation rows to DS-02 link DNA without UI redesign | Scope: replaces complete content-link block only === */
 /* CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) */
 .content-link{
   display: inline-flex;
@@ -640,11 +652,10 @@ a:visited{ color: var(--color-primary); }
   outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
-/* === END BLOCK: DS-02_CONTENT_LINK_MAPPING === */
+/* === END BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING === */
 
 
 /* === BEGIN BLOCK: DS-02_MODAL_CTA_MAPPING | Purpose: map modal CTA to DS-02 primary button tokens without UI change | Scope: modal CTA block fully consolidated === */
-.modal-cta-button{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3656,4 +3667,5 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
