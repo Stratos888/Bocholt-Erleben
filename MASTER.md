@@ -365,34 +365,63 @@ Deferred next steps (only if/when pipeline is reactivated):
    - Inbox remains 100% curatable (no placeholders/listings)
 
 
-PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only, Zielstufe A)
+PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only, operating baseline frozen)
 
 Goal:
 - Minimal ongoing effort.
 - Regular intake of “good events” without scraping/Cloudflare trial/error.
-- Output must be immediately curatable in the existing Inbox Review PWA.
-- Zielstufe A: Nach der Chat-Suche maximal 1x Copy-Paste + 1x Workflow-Klick.
+- After the search step, the user should work only in the Inbox Review PWA.
+- Current operating baseline:
+  - 1x copy JSON
+  - 1x start workflow
+  - then only PWA actions (`Übernehmen` / `Verwerfen` / `Deploy jetzt`)
 
 Rules (fixed):
 - Search with Regelwerk stays unchanged for now.
+- Search output remains JSON for `data/inbox_manual.json`.
 - Extract facts only (title/date/time/location/city/source URL/category suggestion).
 - Do not copy long descriptions from sources/newsletters.
 - Prefer neutral/public sources; avoid over-representing potential future organizer subscribers.
-- Deliver as a file format that can be imported into the existing inbox flow (no copy/paste into spreadsheets).
+- For search dedupe:
+  - always use current `data/events.json`
+  - use `data/inbox.tsv` only if Inbox is not empty / still contains review items
+  - optional live-site cross-check is additive only, never a replacement for `data/events.json`
 
-Operational flow (current target):
+Operational flow (current verified baseline):
 1) Chat returns JSON for `data/inbox_manual.json`
 2) User pastes once into `data/inbox_manual.json`
 3) User starts exactly one workflow: `Manual KI Event Intake`
-4) Workflow appends to Google Sheet tab `Inbox`, clears `data/inbox_manual.json`, and dispatches `Deploy to STRATO`
-5) Inbox Review PWA is then refreshed from the normal deploy output (`data/inbox.json`)
+4) Workflow appends new review rows to Google Sheet tab `Inbox`, clears `data/inbox_manual.json`, and dispatches `Deploy to STRATO`
+5) Inbox Review PWA reads review items directly from the Apps Script / Google Sheet API (`listReview`) and is therefore no longer dependent on `data/inbox.json` for live review state
+6) In the PWA:
+   - `Übernehmen` = direct Inbox → Events import via Apps Script, then delete Inbox row
+   - `Verwerfen` = set Inbox status to `verworfen`
+   - `Deploy jetzt` = manually trigger `deploy-strato.yml` from the PWA when the user wants to publish current session changes
+7) Recommended working mode:
+   - curate the whole session in the PWA
+   - deploy once at a chosen checkpoint or when Inbox is empty
+
+Verified behavior / permanent decisions:
+- `id_suggestion` may remain empty in Inbox; final valid slug-like event IDs are generated during the direct Events import path.
+- Source link must remain visible in the detail/UI model; source is not restricted to `bocholt.de`.
+- Inbox Review PWA must use the operational source of truth for reloads (Apps Script / Sheet API), not stale exported JSON.
+- Deploy should not run automatically after every approve; manual session-based deploy from the PWA is the preferred operating model.
 
 Non-goal for this stage:
 - No direct Chat → Sheet integration yet
 - No new UI for manual JSON input yet
 - No changes to search prompt / rulebook behavior yet
+- No automatic deploy after every single approval
+- No cleanup/archive automation in the same step yet
+
+Next possible automation steps (deferred, not active now):
+1) Replace `data/inbox_manual.json` with a direct admin input surface (remove repo-file paste step)
+2) Add Inbox cleanup/archive action for final `verworfen` / processed rows
+3) Optional smart prompt when Inbox becomes empty (“Deploy now?”), but keep manual control
+4) Only later: direct Chat → intake endpoint, if current operating baseline proves stable over time
 
 Optional lead source (later):
+- Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
 - Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
    - Coltplay produces multiple correct events
    - Django Flint produces events
