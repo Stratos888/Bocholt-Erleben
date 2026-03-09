@@ -68,7 +68,10 @@ Umfang:
         <div class="title">Inbox Review</div>
         <span id="lockState" class="pill muted">gesperrt</span>
       </div>
-      <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+  <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
+  <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
+</div>
     </div>
 
     <div id="statusLine" class="status muted"></div>
@@ -108,7 +111,12 @@ Umfang:
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
 
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+document.getElementById("deployBtn").addEventListener("click", async () => {
+  const ok = await ensureUnlocked();
+  if (!ok) return;
+  await triggerDeploy();
+});
 
     function setStatus(msg) {
       elStatus.textContent = msg || "";
@@ -256,64 +264,104 @@ Umfang:
       }
     }
 
-   function writeStatus(it, newStatus) {
-  return new Promise(async (resolve) => {
-    if (!it.row_number) {
-      alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-      return resolve();
-    }
+    function writeStatus(it, newStatus) {
+      return new Promise(async (resolve) => {
+        if (!it.row_number) {
+          alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
+          return resolve();
+        }
 
-    const btnOk = document.getElementById("btnOk");
-    const btnNo = document.getElementById("btnNo");
-    const btnOpen = document.getElementById("btnOpen");
-    if (btnOk) btnOk.disabled = true;
-    if (btnNo) btnNo.disabled = true;
-    if (btnOpen) btnOpen.disabled = true;
+        const btnOk = document.getElementById("btnOk");
+        const btnNo = document.getElementById("btnNo");
+        const btnOpen = document.getElementById("btnOpen");
+        const btnDeploy = document.getElementById("deployBtn");
+        if (btnOk) btnOk.disabled = true;
+        if (btnNo) btnNo.disabled = true;
+        if (btnOpen) btnOpen.disabled = true;
+        if (btnDeploy) btnDeploy.disabled = true;
 
-    try {
-      const isApprove = String(newStatus) === "übernehmen";
+        try {
+          const isApprove = String(newStatus) === "übernehmen";
 
-      const res = await jsonp(API_URL, isApprove ? {
-        action: "approve",
-        token: sessionToken,
-        row_number: String(it.row_number)
-      } : {
-        action: "setStatus",
-        token: sessionToken,
-        row_number: String(it.row_number),
-        status: String(newStatus)
+          const res = await jsonp(API_URL, isApprove ? {
+            action: "approve",
+            token: sessionToken,
+            row_number: String(it.row_number)
+          } : {
+            action: "setStatus",
+            token: sessionToken,
+            row_number: String(it.row_number),
+            status: String(newStatus)
+          });
+
+          if (res && res.ok) {
+            setStatus(isApprove ? "Übernommen." : "Verworfen.");
+            showNext();
+            return resolve();
+          }
+
+          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+
+          if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+            sessionToken = "";
+            refreshLock();
+            setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+            renderCurrent();
+            return resolve();
+          }
+
+          setStatus("Serverfehler: " + err);
+          renderCurrent();
+          return resolve();
+
+        } catch (e) {
+          console.error(e);
+          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+          renderCurrent();
+          return resolve();
+        } finally {
+          const btnDeployFinally = document.getElementById("deployBtn");
+          if (btnDeployFinally) btnDeployFinally.disabled = false;
+        }
       });
-
-      if (res && res.ok) {
-        setStatus(isApprove ? "Übernommen." : "Verworfen.");
-        showNext();
-        return resolve();
-      }
-
-      const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
-
-      if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
-        sessionToken = "";
-        refreshLock();
-        setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
-        renderCurrent();
-        return resolve();
-      }
-
-      setStatus("Serverfehler: " + err);
-      renderCurrent();
-      return resolve();
-
-    } catch (e) {
-      console.error(e);
-      setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
-      renderCurrent();
-      return resolve();
     }
-  });
-}
 
-function escapeHtml(s) {
+    async function triggerDeploy() {
+      const btnDeploy = document.getElementById("deployBtn");
+      if (btnDeploy) btnDeploy.disabled = true;
+
+      try {
+        setStatus("Deploy wird gestartet …");
+
+        const res = await jsonp(API_URL, {
+          action: "deploy",
+          token: sessionToken
+        });
+
+        if (res && res.ok) {
+          setStatus("Deploy gestartet.");
+          return;
+        }
+
+        const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+
+        if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+          sessionToken = "";
+          refreshLock();
+          setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+          return;
+        }
+
+        setStatus("Deploy-Fehler: " + err);
+      } catch (e) {
+        console.error(e);
+        setStatus("Fehler beim Deploy (Netz/JSONP): " + (e && e.message ? e.message : e));
+      } finally {
+        if (btnDeploy) btnDeploy.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
       return String(s || "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
