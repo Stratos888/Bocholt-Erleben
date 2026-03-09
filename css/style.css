@@ -213,26 +213,22 @@
   --cmp-surface-panel-border: var(--border-panel);
   --cmp-surface-panel-shadow: var(--shadow-panel);
 
-  /* DS-02 component mapping prep: empty state */
-  --cmp-empty-card-bg: var(--cmp-surface-panel-bg);
-  --cmp-empty-card-border: var(--border-panel-soft);
+    /* DS-02 component mapping prep: empty state */
+  --cmp-empty-card-bg: var(--cmp-card-bg);
+  --cmp-empty-card-border: var(--border-eventcard);
   --cmp-empty-card-radius: var(--radius-eventcard);
-  --cmp-empty-card-shadow:
-    0 8px 22px rgba(0,0,0,0.035),
-    0 1px 0 rgba(255,255,255,0.80) inset;
-  --cmp-empty-card-accent-w: 6px;
-  --cmp-empty-card-accent-bg: color-mix(in srgb, var(--color-primary-muted) 78%, white);
+  --cmp-empty-card-shadow: var(--shadow-eventcard);
 
   --cmp-empty-title-color: var(--color-text-primary);
   --cmp-empty-text-color: var(--color-text-secondary);
 
   --cmp-empty-btn-minh: var(--cmp-btn-minh);
   --cmp-empty-btn-radius: var(--cmp-btn-radius);
-  --cmp-empty-btn-bg: var(--cmp-btn-primary-bg);
-  --cmp-empty-btn-fg: var(--cmp-btn-primary-fg);
-  --cmp-empty-btn-border: var(--ui-border-primary);
-  --cmp-empty-btn-shadow: var(--cmp-btn-primary-shadow);
-  --cmp-empty-btn-shadow-active: var(--ui-shadow-cta-active);
+  --cmp-empty-btn-bg: var(--cmp-btn-secondary-bg);
+  --cmp-empty-btn-fg: var(--cmp-btn-secondary-fg);
+  --cmp-empty-btn-border: var(--cmp-btn-secondary-border);
+  --cmp-empty-btn-shadow: var(--cmp-btn-secondary-shadow);
+  --cmp-empty-btn-shadow-active: var(--ui-shadow-soft);
   --cmp-empty-btn-focus-ring: var(--cmp-btn-focus-ring);
 
   /* DS-02 component mapping prep: dividers */
@@ -676,42 +672,24 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    EMPTY STATE
    ============================================ */
-/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: make no-results state fully token-driven and consistent with app card/button DNA | Scope: replaces complete EMPTY STATE section only === */
+/* === BEGIN BLOCK: DS-02_EMPTY_STATE_MAPPING | Purpose: render no-results as a real feed-card with quiet secondary action | Scope: replaces complete EMPTY STATE section only === */
 .empty-state{
   padding: 10px 0 8px;
 }
 
 .empty-state__card{
-  position: relative;
-  overflow: hidden;
-
   display: grid;
   gap: 8px;
 
-  padding: 16px 16px 14px;
+  width: 100%;
+  max-width: 100%;
+
+  padding: var(--eventcard-pad);
 
   background: var(--cmp-empty-card-bg);
   border: 1px solid var(--cmp-empty-card-border);
   border-radius: var(--cmp-empty-card-radius);
   box-shadow: var(--cmp-empty-card-shadow);
-}
-
-.empty-state__card::before{
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--cmp-empty-card-accent-w);
-
-  background: var(--cmp-empty-card-accent-bg);
-  box-shadow: inset -1px 0 0 rgba(31,41,51,0.04);
-  opacity: 0.95;
-
-  pointer-events: none;
-}
-
-.empty-state__card > *{
-  position: relative;
-  z-index: 1;
 }
 
 .empty-state__title{
@@ -759,17 +737,20 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     background 140ms ease,
     border-color 140ms ease,
     box-shadow 140ms ease,
-    transform 140ms ease;
+    transform 140ms ease,
+    color 140ms ease;
 }
 
 @media (hover: hover){
   .empty-state__btn:hover{
-    filter: brightness(0.985);
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
   }
 }
 
 .empty-state__btn:active{
   transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
   box-shadow: var(--cmp-empty-btn-shadow-active);
 }
 
@@ -3469,6 +3450,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
