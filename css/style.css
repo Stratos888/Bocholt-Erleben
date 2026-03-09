@@ -405,10 +405,24 @@ a:visited{ color: var(--color-primary); }
 }
 .page li{ margin: 6px 0; }
 
-/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate content/info page structure and navigation into one clean DS-02 cluster without redesign | Scope: hero, kicker, lead, cards, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
+/* === BEGIN BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING | Purpose: consolidate info/content subpages into one app-like secondary screen system without redesign | Scope: hero, kicker, lead, cards, notes, steps, benefits, content actions/back, content-links wrapper, content-link rows === */
 /* CONTENT PAGE COMPONENTS (reference pages) */
 .content-hero{
-  margin: 6px 0 16px;
+  display: grid;
+  gap: 10px;
+
+  margin: 4px 0 18px;
+  padding: 0 0 2px;
+}
+
+.content-hero h1{
+  margin: 0;
+  max-width: 16ch;
+
+  font-size: clamp(1.38rem, 1.1rem + 1.2vw, 1.72rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
 .content-kicker{
@@ -416,43 +430,73 @@ a:visited{ color: var(--color-primary); }
   align-items: center;
   gap: 6px;
 
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.84rem;
+  font-weight: 750;
   letter-spacing: 0.01em;
 }
 
 .content-lead{
-  margin-top: 8px;
-  color: var(--color-text-secondary);
   max-width: 62ch;
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.content-note{
+  max-width: 62ch;
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.48;
 }
 
 .content-card{
-  background: var(--cmp-card-bg);
+  display: grid;
+  gap: 10px;
+
+  background: rgba(255,255,255,0.82);
   border: 1px solid var(--cmp-card-border);
   border-radius: var(--cmp-card-radius);
   box-shadow: var(--cmp-card-shadow);
 
-  padding: 14px 14px;
-  margin-top: 12px;
+  padding: 16px 16px;
+  margin-top: 14px;
+
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .content-card--primary{
   border-color: var(--ui-border-primary);
   box-shadow: var(--ui-shadow-cta);
+  background: color-mix(in srgb, white 88%, var(--color-primary-muted));
 }
 
 .content-card h2{
-  margin-top: 0;
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.content-card p:last-child,
+.content-card ul:last-child,
+.content-card ol:last-child,
+.content-card nav:last-child{
+  margin-bottom: 0;
 }
 
 .content-steps,
 .locations-benefits{
   list-style: none;
   padding-left: 0;
-  margin-top: 10px;
+  margin: 2px 0 0;
 }
 
 .content-steps{
@@ -463,8 +507,10 @@ a:visited{ color: var(--color-primary); }
 .locations-benefits li{
   position: relative;
   margin: 10px 0;
-  padding-left: 34px;
+  padding-left: 36px;
+
   color: var(--color-text-secondary);
+  line-height: 1.46;
 }
 
 .content-steps li{
@@ -475,7 +521,7 @@ a:visited{ color: var(--color-primary); }
 .locations-benefits li::before{
   position: absolute;
   left: 0;
-  top: 0.1em;
+  top: 0.08em;
 
   width: 24px;
   height: 24px;
@@ -491,22 +537,26 @@ a:visited{ color: var(--color-primary); }
 
 .content-steps li::before{
   content: counter(step);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 800;
   border: 1px solid rgba(139,207,74,0.45);
 }
 
 .locations-benefits li::before{
   content: "✓";
-  font-size: 0.82rem;
+  font-size: 0.80rem;
   font-weight: 900;
   border: 1px solid rgba(139,207,74,0.35);
 }
 
 .content-actions{
-  margin-top: 16px;
   display: grid;
   gap: 10px;
+  margin-top: 6px;
+}
+
+.content-actions--spaced{
+  margin-top: 10px;
 }
 
 .content-cta{
@@ -597,33 +647,39 @@ a:visited{ color: var(--color-primary); }
 
 /* CONTENT LINKS (top-pwa navigation list, borderless) */
 .content-links{
-  margin-top: 6px;
   display: grid;
-  gap: 2px;
+  gap: 4px;
+  margin-top: 2px;
 }
 
-/* CONTENT LINK – ARROW NEAR TEXT (PWA POLISH) */
+.content-card .content-links{
+  margin-top: 4px;
+  padding-top: 2px;
+}
+
+/* CONTENT LINK – app-like secondary navigation */
 .content-link{
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 7px;
 
   width: 100%;
   min-height: var(--cmp-btn-minh);
-  padding: 12px 8px;
+  padding: 11px 10px;
   border-radius: var(--ui-radius-sm);
 
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
 
   color: var(--cmp-link-color);
-  font-weight: 600;
+  font-weight: 650;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 
   transition:
     background 140ms ease,
+    border-color 140ms ease,
     color 140ms ease,
     box-shadow 140ms ease;
 }
@@ -638,6 +694,7 @@ a:visited{ color: var(--color-primary); }
 @media (hover: hover){
   .content-link:hover{
     background: var(--ui-surface-tint);
+    border-color: var(--ui-border-weak);
     color: var(--cmp-link-color);
     text-decoration: none;
   }
@@ -651,6 +708,16 @@ a:visited{ color: var(--color-primary); }
   outline: 2px solid var(--cmp-link-focus-ring);
   outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
+}
+
+@media (min-width: 720px){
+  .content-card{
+    padding: 18px 18px;
+  }
+
+  .content-hero{
+    margin-bottom: 20px;
+  }
 }
 /* === END BLOCK: DS-02_CONTENT_PAGE_CLUSTER_MAPPING === */
 
@@ -3489,6 +3556,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
