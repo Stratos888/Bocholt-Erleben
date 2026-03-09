@@ -1001,220 +1001,19 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
-/* BEGIN PATCH EVENTCARD-TAP-HIGHLIGHT-V1
-   Zweck: Entfernt den mobilen „blauen Tap-Flash“ auf Eventcards (native WebKit/Chromium Tap-Highlight),
-          ohne die vorhandenen :active Press-Styles (scale) zu verändern.
-   Umfang: Ersetzt nur den kleinen Klick-Block für .event-card (cursor/interaction).
-*/
-  
+/* === BEGIN BLOCK: DS-02_EVENTCARD_INTERACTION_ICON_MAPPING | Purpose: consolidate event-card tap behavior and category-icon rules into one clean DS-02 block without redesign | Scope: event-card interaction helper, event title text, event category icon wrapper and svg/img clamp === */
+
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
 .event-card{
   position: relative;
   cursor: pointer;
 
-  /* Mobile: kein blauer Tap-Flash */
   -webkit-tap-highlight-color: transparent;
-
-  /* Mobile UX: reduziert Click-Delay/Double-Tap Zoom Heuristiken */
   touch-action: manipulation;
-
-  /* Optional, aber passend für Cards: verhindert Text-Selection-Flash beim Tap */
   user-select: none;
 }
 
-/* END PATCH EVENTCARD-TAP-HIGHLIGHT-V1 */
-
-
-/* (removed) event-card hover/active is defined in EVENT CARD FINAL LAYOUT only */
-
-
-/* EVENT CARD FINAL LAYOUT (date chip + 2-line content + inline icon) */
-
-/* EVENT CARD PREMIUM POLISH (spacing + soft shadow) */
-
-/* EVENT CARD PREMIUM POLISH (spacing + soft shadow + press/focus) */
-
-/* --- Card: 2 Spalten (Date-Chip | Content) --- */
-/* SECTION */
-
-/* --- Card: 2 Spalten (Rail | Content) --- */
-/* === BEGIN BLOCK: DS-02_EVENT_CARD_MAPPING | Purpose: map event-card shell to DS-02 card/focus DNA without UI redesign | Scope: replaces event-card shell, rail, states and mobile shell only === */
-.event-card{
-  position: relative;
-  overflow: hidden;
-
-  display: grid;
-
-  --rail-w: 60px;
-  grid-template-columns: var(--rail-w) minmax(0, 1fr);
-
-  column-gap: var(--space-md);
-  align-items: center;
-
-  padding: var(--eventcard-pad);
-  padding-left: 0;
-
-  background: var(--cmp-card-bg);
-
-  border: 1px solid var(--border-eventcard);
-  border-radius: var(--radius-eventcard);
-
-  box-shadow: var(--shadow-eventcard);
-
-  transition:
-    box-shadow 140ms ease,
-    border-color 140ms ease,
-    transform 140ms ease,
-    background 140ms ease;
-}
-
-/* Linke Rail: echte Spalte, beginnt an Card-Kante */
-.event-card::before{
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-
-  left: 0;
-  width: var(--rail-w);
-
-  background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
-  opacity: var(--eventcard-rail-opacity);
-
-  box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
-  pointer-events: none;
-}
-
-.event-card > *{
-  position: relative;
-  z-index: 1;
-}
-
-/* Hover: minimal stärker, ohne Lift */
-@media (hover: hover){
-  .event-card:hover{
-    transform: none;
-    border-color: var(--border-eventcard-hover);
-    box-shadow: var(--shadow-eventcard-hover);
-  }
-}
-
-/* Press: leicht „eingedrückt“ */
-.event-card:active{
-  transform: scale(0.99);
-  border-color: var(--border-panel-strong);
-  box-shadow:
-    0 1px 1px rgba(0,0,0,0.030),
-    0 8px 18px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
-}
-
-/* Keyboard/Accessibility: ruhiger Ring + keine Layoutsprünge */
-.event-card:focus-visible{
-  outline: 3px solid var(--cmp-focus-ring-brand);
-  outline-offset: 3px;
-}
-
-/* Mobile fein */
-@media (max-width: 360px){
-  .event-card{
-    --rail-w: 56px;
-    grid-template-columns: var(--rail-w) minmax(0, 1fr);
-
-    padding: var(--eventcard-pad);
-    padding-left: 0;
-
-    column-gap: var(--space-md);
-  }
-
-  .event-card::before{
-    width: var(--rail-w);
-    left: 0;
-  }
-
-  .event-date-badge{
-    width: 40px;
-  }
-}
-/* === END BLOCK: DS-02_EVENT_CARD_MAPPING === */
-
-.event-date-badge{
-  width: 42px;
-
-  justify-self: center;
-  align-self: center;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-
-  padding: 5px 3px;
-
-  background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
-  border-radius: 11px;
-
-  border: 0;
-  box-shadow:
-    inset 0 0 0 1px rgba(31,41,51,0.035),
-    inset 0 1px 0 rgba(255,255,255,0.75);
-
-  line-height: 1;
-  text-align: center;
-}
-
-/* EVENT CARD PREMIUM TYPE POLISH (date badge hierarchy) */
-
-.event-date-badge__wday{
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: rgba(31,41,51,0.54);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.event-date-badge__day{
-  font-size: 1.32rem;
-  font-weight: 800;
-  color: rgba(31,41,51,0.90);
-}
-
-.event-date-badge__month{
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: rgba(31,41,51,0.50);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-
-/* --- Content Area: 2 Zeilen --- */
-.event-card-body{
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-/* Title-Zeile: Text | Icon als Grid (Enterprise Pattern, keine Overlap/kein absolute) */
-.event-title{
-/* SECTION */
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  column-gap: 8px;
-
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: rgba(31,41,51,0.92);
-  line-height: 1.25;
-}
-
-
 /* EVENT TITLE FINAL (2-line clamp, single source) */
-
 .event-title__text{
   flex: 1 1 auto;
   min-width: 0;
@@ -1230,18 +1029,11 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   hyphens: auto;
 }
 
-
-/* BEGIN PATCH ICONS-CSS-EVENTCARD-V1
-   Zweck: Event-Card Kategorie-Icon state-of-the-art SVG (kein Emoji-Legacy), Größe via Tokens (sm).
-   Umfang: Ersetzt nur .event-title .event-category-icon + svg/img clamp.
-*/
-
 /* EVENT CARD CATEGORY INDICATOR (state-of-the-art, tokenized) */
 .event-title .event-category-icon{
   flex: 0 0 auto;
   position: static;
 
-  /* CRITICAL: clamp wrapper size, so the auto-column in .event-title cannot grow */
   width: var(--eventcard-category-size);
   height: var(--eventcard-category-size);
 
@@ -1278,7 +1070,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   opacity: var(--eventcard-category-opacity);
   filter: none;
 }
-/* END PATCH ICONS-CSS-EVENTCARD-V1 */
+/* === END BLOCK: DS-02_EVENTCARD_INTERACTION_ICON_MAPPING === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
@@ -2464,26 +2256,18 @@ html.is-panel-open body {
 /* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
 
-/* === BEGIN BLOCK: DP-HEADER-ALIGNMENT-V8 (stronger title separation, top-app hierarchy)
-Zweck:
-- Titel wirkt klar als Headline (mehr Separation), Meta wirkt als eigener Block.
-Umfang:
-- Ersetzt ausschließlich Header-Layout-Regeln: .detail-header, .detail-title-row, .detail-category-icon (+ svg), .detail-title, .detail-meta-rows.
-=== */
-
+/* === BEGIN BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING | Purpose: consolidate detail header and meta rows into one clean DS-02 cluster without redesign | Scope: detail header, title row, category icon, title, meta rows, hover/active/focus, datetime/location variants === */
 #event-detail-panel .detail-header{
   position: relative;
 
   display: flex;
   flex-direction: column;
-
-  /* more separation between title-row and meta block */
   gap: 16px;
 
   padding: 0 0 var(--space-md);
   margin: 0 0 var(--space-md);
 
-  border-bottom: 1px solid rgba(31,41,51,0.08);
+  border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
 #event-detail-panel .detail-title-row{
@@ -2548,7 +2332,6 @@ Umfang:
   font-weight: 820;
   letter-spacing: -0.015em;
   color: rgba(31,41,51,0.92);
-
   line-height: 1.18;
 
   display: -webkit-box;
@@ -2563,58 +2346,29 @@ Umfang:
   padding-top: 1px;
 }
 
-/* Meta block sits a touch lower for headline separation */
-#event-detail-panel .detail-meta-rows{
-  min-width: 0;
-  margin-top: 0;
-}
-
-#event-detail-panel .detail-category-icon::before{
-  content: none;
-  background: none;
-}
-
-/* BEGIN PATCH DP-META-ENTERPRISE-V7
-   Zweck:
-   - Detail-Meta-Zeilen auf DS-02 Row/Link/Focus-DNA mappen, ohne sichtbares Redesign.
-   - Location-↗ bleibt robust nah am Ort.
-   - Legacy-Chips bleiben gutter-aligned und visuell konsistent.
-   Umfang:
-   - Ersetzt den kompletten DETAIL META INFO Block inkl. Legacy-Chips-Angleichung.
-*/
-
-/* DETAIL META INFO (DS-02 mapped, gutter-aligned, robust location proximity) */
-
 #event-detail-panel .detail-meta-rows{
   display: grid;
-  gap: 2px;
+  gap: 8px;
 
-  margin: 0 0 var(--space-md);
+  min-width: 0;
+  margin: 0;
   padding: 0;
-
-  border: 0;
-  border-radius: 0;
-
-  background: transparent;
-  overflow: visible;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-row{
+  min-width: 0;
+
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0,1fr) auto;
   align-items: center;
-  column-gap: var(--space-sm);
+  column-gap: 10px;
 
-  min-height: var(--ui-choice-minh);
-  padding: 10px 0;
-
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 12px !important;
-  box-shadow: none !important;
+  padding: 10px 12px;
+  border-radius: var(--ui-radius-sm);
 
   color: var(--cmp-link-color-muted);
-  text-decoration: none !important;
+  text-decoration: none;
+  background: transparent;
 
   -webkit-tap-highlight-color: transparent;
   transition: background 140ms ease, transform 140ms ease, color 140ms ease, opacity 140ms ease;
@@ -2641,7 +2395,6 @@ Umfang:
   hyphens: auto;
 }
 
-/* Location row: arrow stays close to text */
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location{
   grid-template-columns: auto fit-content(100%) auto;
   column-gap: 8px;
@@ -2657,14 +2410,11 @@ Umfang:
   font-weight: 800;
   font-size: 14px;
   line-height: 1;
-
   align-self: center;
-
   padding-left: 0;
   transform: none;
 }
 
-/* Default ext */
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
   opacity: 0.42;
   font-weight: 800;
@@ -2696,13 +2446,11 @@ Umfang:
   background: var(--ui-surface-tint-active) !important;
 }
 
-/* === BEGIN BLOCK: DS-02_DETAIL_META_ROW_FOCUS_MAPPING | Purpose: align detail meta row focus to central DS-02 focus contract without UI redesign | Scope: replaces detail meta row focus rule only === */
 #event-detail-panel .detail-meta-rows a.detail-meta-row:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: var(--cmp-focus-outline-offset);
   border-radius: var(--ui-radius-sm);
 }
-/* === END BLOCK: DS-02_DETAIL_META_ROW_FOCUS_MAPPING === */
 
 #event-detail-panel .detail-meta-rows .detail-meta-row:not(a){
   cursor: default;
@@ -2712,71 +2460,7 @@ Umfang:
 #event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime{
   color: rgba(31,41,51,0.74);
 }
-
-#event-detail-panel .detail-meta-rows .detail-meta-row.is-datetime .detail-meta-text{
-  font-weight: 580;
-  color: rgba(31,41,51,0.72);
-}
-
-/* Legacy chips: keep gutter-aligned */
-#event-detail-panel .detail-meta-chips{
-  display: grid;
-  gap: 2px;
-
-  margin: 0 0 var(--space-md);
-  padding: 0;
-
-  border: 0;
-  border-radius: 0;
-
-  background: transparent;
-  overflow: visible;
-
-  box-shadow: none !important;
-}
-
-#event-detail-panel .detail-meta-chips .detail-chip{
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-
-  width: 100%;
-  max-width: 100%;
-
-  min-height: var(--ui-choice-minh);
-  padding: 10px 0;
-
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 12px !important;
-  box-shadow: none !important;
-
-  font-size: 14px;
-  line-height: 1.30;
-  font-weight: 580;
-  color: rgba(31,41,51,0.72);
-
-  cursor: default;
-  user-select: text;
-
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-
-  -webkit-tap-highlight-color: transparent;
-}
-
-#event-detail-panel .detail-meta-chips .detail-chip-text{
-  min-width: 0;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-  overflow-wrap: break-word;
-  word-break: normal;
-  hyphens: auto;
-}
-
-/* END PATCH DP-META-ENTERPRISE-V7 */
+/* === END BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING === */
 
 /* === BEGIN BLOCK: DS-02_DETAIL_LOCATION_ACTION_MAPPING | Purpose: map detail location action row to DS-02 secondary button/link DNA without UI redesign | Scope: replaces complete detail-location-action block including static variant === */
 #event-detail-panel .detail-location-action,
@@ -3037,14 +2721,7 @@ Umfang:
 /* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_FOCUS_MAPPING === */
 /* === END BLOCK: DS-02_CALENDAR_CHOICE_BUTTON_MAPPING === */
 
-/* BEGIN PATCH ICONS-CSS-SYSTEM-V1
-   Zweck:
-   1) Einheitlicher “Top-App” Line-Icon Look für alle SVGs aus window.Icons (class: ui-icon-svg).
-   2) Detailpanel SVG Guard so scopen, dass NUR UI-Icons (Meta/Links/Actions/Close) auf 18px geklemmt werden.
-   3) Kategorie-Icon im Header darf wieder über Tokens skalieren (ui-icon-size-lg).
-   Umfang:
-   - Ersetzt kompletten bisherigen Detailpanel “JEDES svg/img = 18px” Guard + bringt SVG Base Styles mit.
-*/
+/* === BEGIN BLOCK: DS-02_ICON_SYSTEM_GUARD_CLUSTER_MAPPING | Purpose: consolidate global svg icon base and scoped detailpanel icon guards into one clean DS-02 cluster without redesign | Scope: ui-icon-svg base, scoped detailpanel icon clamp, category icon passthrough, description media freedom === */
 
 /* APP-WIDE SVG ICON BASE (Single Source of Truth: window.Icons → class ui-icon-svg) */
 svg.ui-icon-svg{
@@ -3061,124 +2738,10 @@ svg.ui-icon-svg{
   stroke-linejoin: round;
 
   opacity: var(--ui-icon-opacity);
-
-  /* Keep stroke consistent and crisp */
   vector-effect: non-scaling-stroke;
-  shape-rendering: geometricPrecision;
-  paint-order: stroke;
 }
 
-/* DETAILPANEL SVG SIZE GUARD (scoped, UI-icons only) */
-
-/* 1) NUR UI-Icon-Container im Detailpanel clampen (md) + stroke md */
-#event-detail-panel .detail-meta-icon{
-  --ui-icon-size: var(--ui-icon-size-sm);
-  --ui-icon-stroke: var(--ui-icon-stroke-sm);
-}
-#event-detail-panel .detail-link,
-#event-detail-panel .detail-actions,
-#event-detail-panel .detail-action,
-#event-detail-panel .detail-close{
-  --ui-icon-size: var(--ui-icon-size-md);
-  --ui-icon-stroke: var(--ui-icon-stroke-md);
-}
-
-#event-detail-panel .detail-meta-icon svg,
-#event-detail-panel .detail-meta-icon img,
-#event-detail-panel .detail-link svg,
-#event-detail-panel .detail-link img,
-#event-detail-panel .detail-actions svg,
-#event-detail-panel .detail-actions img,
-#event-detail-panel .detail-action svg,
-#event-detail-panel .detail-action img,
-#event-detail-panel .detail-close svg,
-#event-detail-panel .detail-close img{
-  width: var(--ui-icon-size) !important;
-  height: var(--ui-icon-size) !important;
-
-  min-width: var(--ui-icon-size) !important;
-  min-height: var(--ui-icon-size) !important;
-  max-width: var(--ui-icon-size) !important;
-  max-height: var(--ui-icon-size) !important;
-
-  flex: 0 0 auto !important;
-  display: block !important;
-  object-fit: contain !important;
-}
-
-/* 2) Kategorie-Indikator im Detailpanel-Header: folgt Badge-Container + nutzt lg Stroke */
-#event-detail-panel .detail-category-icon{
-  --ui-icon-stroke: var(--ui-icon-stroke-lg);
-}
-#event-detail-panel .detail-category-icon svg,
-#event-detail-panel .detail-category-icon img{
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-
-  display: block !important;
-  object-fit: contain !important;
-}
-
-/* 3) Description-Content: Medien bleiben frei (kein Icon-Guard) */
-#event-detail-panel .detail-description svg,
-#event-detail-panel .detail-description img{
-  width: auto !important;
-  height: auto !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: 100% !important;
-  max-height: none !important;
-
-  display: inline !important;
-  object-fit: contain !important;
-}
-
-/* 2) Kategorie-Indikator im Detailpanel-Header: folgt dem Badge-Container / Tokens */
-#event-detail-panel .detail-category-icon svg,
-#event-detail-panel .detail-category-icon img{
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-
-  display: block !important;
-  object-fit: contain !important;
-}
-
-/* 3) Description-Content: Medien bleiben frei (kein Icon-Guard) */
-#event-detail-panel .detail-description svg,
-#event-detail-panel .detail-description img{
-  width: auto !important;
-  height: auto !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: 100% !important;
-  max-height: none !important;
-
-  display: inline !important;
-  object-fit: contain !important;
-}
-
-/* END PATCH ICONS-CSS-SYSTEM-V1 */
-
-/* BEGIN PATCH DP-SVG-GUARD-SCOPE-V1
-   Zweck: Verhindert, dass jedes svg/img im Detailpanel hart auf 18px gezwungen wird.
-          Guard gilt nur noch für UI-Icons (Meta/Links/Actions/Close).
-          Kategorie-Icon skaliert wieder mit seinem Container; Description-Content bleibt frei.
-   Umfang: Ersetzt den bisherigen “JEDES svg/img” Guard + Description-Ausnahme.
-*/
-
-/* 2) Systemic Guard (scoped): NUR UI-Icons im Detailpanel werden als Icons behandelt */
+/* Scoped detailpanel guard: only UI icons are clamped as icons */
 #event-detail-panel .detail-meta-icon svg,
 #event-detail-panel .detail-meta-icon img,
 #event-detail-panel .detail-link svg,
@@ -3202,7 +2765,7 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* Kategorie-Indikator: soll mit dem Badge-Container skalieren (nicht auf 18px gezwungen) */
+/* Category indicator follows its own container/tokens */
 #event-detail-panel .detail-category-icon svg,
 #event-detail-panel .detail-category-icon img{
   width: 100% !important;
@@ -3217,7 +2780,7 @@ svg.ui-icon-svg{
   object-fit: contain !important;
 }
 
-/* Description-Content: Medien bleiben frei (kein Icon-Guard) */
+/* Description content stays free, not clamped as UI icon */
 #event-detail-panel .detail-description svg,
 #event-detail-panel .detail-description img{
   width: auto !important;
@@ -3231,8 +2794,7 @@ svg.ui-icon-svg{
   display: inline !important;
   object-fit: contain !important;
 }
-
-/* END PATCH DP-SVG-GUARD-SCOPE-V1 */
+/* === END BLOCK: DS-02_ICON_SYSTEM_GUARD_CLUSTER_MAPPING === */
 
 
 /* ============================================
@@ -3654,6 +3216,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
