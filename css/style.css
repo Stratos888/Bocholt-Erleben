@@ -2036,6 +2036,11 @@ html.is-panel-open body {
   background: var(--ui-close-bg) !important;
   color: var(--ui-close-color) !important;
 
+  font-size: var(--ui-close-font-size) !important;
+  line-height: 1 !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+
   box-shadow: var(--ui-close-shadow) !important;
 
   -webkit-backdrop-filter: none !important;
@@ -2054,6 +2059,7 @@ html.is-panel-open body {
     box-shadow 140ms ease,
     transform 140ms ease,
     color 140ms ease;
+}
 }
 
 #event-detail-panel .detail-panel-close > *{
@@ -3405,6 +3411,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
