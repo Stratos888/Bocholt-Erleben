@@ -1001,6 +1001,100 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 
+/* === BEGIN BLOCK: DS-02_EVENT_CARD_MAPPING | Purpose: restore missing event-card shell/grid/surface DNA after structure cleanup regression | Scope: event-card shell, rail, states and mobile shell === */
+.event-card{
+  position: relative;
+  overflow: hidden;
+
+  display: grid;
+
+  --rail-w: 60px;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+
+  column-gap: var(--space-md);
+  align-items: center;
+
+  padding: var(--eventcard-pad);
+  padding-left: 0;
+
+  background: var(--cmp-card-bg);
+
+  border: 1px solid var(--border-eventcard);
+  border-radius: var(--radius-eventcard);
+
+  box-shadow: var(--shadow-eventcard);
+
+  transition:
+    box-shadow 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    background 140ms ease;
+}
+
+.event-card::before{
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  left: 0;
+  width: var(--rail-w);
+
+  background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
+  opacity: var(--eventcard-rail-opacity);
+
+  box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
+  pointer-events: none;
+}
+
+.event-card > *{
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover){
+  .event-card:hover{
+    transform: none;
+    border-color: var(--border-eventcard-hover);
+    box-shadow: var(--shadow-eventcard-hover);
+  }
+}
+
+.event-card:active{
+  transform: scale(0.99);
+  border-color: var(--border-panel-strong);
+  box-shadow:
+    0 1px 1px rgba(0,0,0,0.030),
+    0 8px 18px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.event-card:focus-visible{
+  outline: 3px solid var(--cmp-focus-ring-brand);
+  outline-offset: 3px;
+}
+
+@media (max-width: 360px){
+  .event-card{
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+
+    padding: var(--eventcard-pad);
+    padding-left: 0;
+
+    column-gap: var(--space-md);
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    left: 0;
+  }
+
+  .event-date-badge{
+    width: 40px;
+  }
+}
+/* === END BLOCK: DS-02_EVENT_CARD_MAPPING === */
+
 /* === BEGIN BLOCK: DS-02_EVENTCARD_INTERACTION_ICON_MAPPING | Purpose: consolidate event-card tap behavior and category-icon rules into one clean DS-02 block without redesign | Scope: event-card interaction helper, event title text, event category icon wrapper and svg/img clamp === */
 
 /* Nur die echte Card ist klickbar (Styling kommt ausschließlich aus EVENT CARD FINAL LAYOUT) */
@@ -3232,6 +3326,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
