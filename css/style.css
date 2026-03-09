@@ -3095,7 +3095,7 @@ svg.ui-icon-svg{
 
 /* HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) */
 
-/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_MAPPING | Purpose: map header CTA base to DS-02 button tokens without UI change | Scope: replaces .header-right > .pwa-install-button base rule only === */
+/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_MAPPING | Purpose: map header CTA base to DS-02 button tokens without UI change | Scope: header button block fully consolidated === */
 .header-right > .pwa-install-button{
   --hdr-icon-size: 16px;
 
@@ -3104,18 +3104,18 @@ svg.ui-icon-svg{
   justify-content: center;
   gap: 6px;
 
-  min-height: calc(var(--cmp-btn-minh) - 10px);
+  min-height: 34px;
   padding: 0 10px;
 
   border-radius: var(--ui-radius-sm);
-  border: 1px solid var(--cmp-btn-secondary-border);
+  border: 1px solid var(--ui-border-weak);
   background: var(--ui-surface-soft);
 
   font-family: inherit;
-  font-size: var(--cmp-btn-font-size);
-  font-weight: var(--cmp-btn-font-weight);
+  font-size: var(--ui-font-size-control);
+  font-weight: var(--ui-font-weight-control);
   line-height: 1;
-  color: var(--cmp-btn-secondary-fg);
+  color: rgba(31,41,51,0.80);
 
   cursor: pointer;
   text-decoration: none;
@@ -3127,8 +3127,6 @@ svg.ui-icon-svg{
 
   transition: background 140ms ease, border-color 140ms ease,
               box-shadow 140ms ease, transform 140ms ease;
-}
-/* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 }
 
 @media (hover: hover){
@@ -3143,13 +3141,10 @@ svg.ui-icon-svg{
   background: var(--ui-surface-soft-active);
 }
 
-/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING | Purpose: map header CTA focus to DS-02 button focus token without UI change | Scope: replaces .header-right > .pwa-install-button:focus-visible only === */
 .header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline: 2px solid var(--ui-focus-ring);
   outline-offset: 3px;
   border-radius: var(--ui-radius-sm);
-}
-/* === END BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING === */
 }
 
 /* Icon base */
@@ -3158,42 +3153,33 @@ svg.ui-icon-svg{
 
   width: var(--hdr-icon-size);
   height: var(--hdr-icon-size);
-  flex: 0 0 var(--hdr-icon-size);
 
+  flex: 0 0 auto;
   display: inline-block;
+
   background-color: currentColor;
+  opacity: 0.82;
 
   -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-
   mask-repeat: no-repeat;
+  -webkit-mask-position: center;
   mask-position: center;
+  -webkit-mask-size: contain;
   mask-size: contain;
 }
 
-/* Label */
-.header-right > .pwa-install-button::after{
-  content: "";
-  font-size: var(--ui-font-size-control);
-  font-weight: var(--ui-font-weight-control);
-  color: currentColor;
+.header-right > #pwa-install-button::before{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
 }
+.header-right > #pwa-install-button::after{ content: "App"; }
 
-/* Install (button) */
-.header-right > button.pwa-install-button::before{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10M7 13l5 5 5-5M5 21h14'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10M7 13l5 5 5-5M5 21h14'/%3E%3C/svg%3E");
-}
-.header-right > button.pwa-install-button::after{ content: "App"; }
-
-/* Info (link) */
 .header-right > a.pwa-install-button::before{
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
 }
 .header-right > a.pwa-install-button::after{ content: "Info"; }
-
+/* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
 @media (max-width: 360px){
   .app-header{ padding: 0 var(--gutter); min-height: 48px; }
@@ -3396,6 +3382,7 @@ svg.ui-icon-svg{
   cursor: default;
   transform: none;
 }
+
 
 
 
