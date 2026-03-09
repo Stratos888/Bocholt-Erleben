@@ -736,10 +736,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* ============================================
    LOADING & MESSAGES
    ============================================ */
-/* === BEGIN BLOCK: GS-01 LOADING OVERLAY (no layout shift) ===
-   Zweck: #loading darf nie Layout verschieben; Loading als fixed Overlay.
-   Umfang: Ersetzt nur .loading-container/.loading-spinner/@keyframes spin.
-=== */
+/* === BEGIN BLOCK: WP_STATUS_FEEDBACK_CLUSTER_MAPPING | Purpose: consolidate loading/info/error states into existing app DNA without behavior change | Scope: replaces complete LOADING & MESSAGES cluster only === */
 .loading-container {
   position: fixed;
   inset: 0;
@@ -749,44 +746,133 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 14px;
 
-  padding: 24px 20px;
+  padding:
+    max(24px, env(safe-area-inset-top, 0px) + 20px)
+    20px
+    max(24px, env(safe-area-inset-bottom, 0px) + 20px);
 
-  background: rgba(245, 247, 250, 0.82);
+  background: rgba(245, 247, 250, 0.84);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 
   text-align: center;
+  isolation: isolate;
+}
+
+.loading-container > p{
+  width: min(100%, 360px);
+  margin: 0;
+  padding: 14px 16px;
+
+  border: 1px solid var(--ui-border-weak);
+  border-radius: var(--radius-eventcard);
+  background: rgba(255,255,255,0.88);
+  box-shadow: var(--shadow-eventcard);
+
+  color: var(--color-text-primary);
+  font-size: var(--font-event-meta);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .loading-spinner {
+  flex: 0 0 auto;
+
   width: 44px;
   height: 44px;
+  margin: 0;
+
   border-radius: 50%;
-  border: 4px solid #e5e7eb;
+  border: 4px solid rgba(31,41,51,0.10);
   border-top-color: var(--accent);
+
+  box-shadow:
+    0 0 0 6px rgba(255,255,255,0.52),
+    0 8px 20px rgba(0,0,0,0.06);
+
   animation: spin 1s linear infinite;
-  margin-bottom: 14px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.info-message,
+.error-message {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+
+  width: min(100%, 640px);
+  margin: 0;
+  padding: 20px 18px;
+
+  border-radius: var(--radius-eventcard);
+  border: 1px solid var(--ui-border-weak);
+  box-shadow: var(--shadow-eventcard);
+
+  text-align: center;
+}
+
+.info-message > p,
+.error-message > p{
+  width: 100%;
+  margin: 0;
+}
+
+.info-message p:first-child,
+.error-message p:first-child{
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.info-message small,
+.error-message small{
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.info-message{
+  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
+  border-color: rgba(139,207,74,0.20);
+  color: var(--color-text-primary);
+}
+
+.error-message{
+  background: color-mix(in srgb, white 92%, #f8d7da);
+  border-color: rgba(114,28,36,0.18);
+  color: var(--color-text-primary);
+}
+
+.error-message p:first-child{
+  color: #721c24;
+}
+
+.loading-container .empty-state__btn{
+  margin-top: 2px;
+  justify-self: center;
+}
+
+@media (hover: hover){
+  .loading-container .empty-state__btn:hover{
+    transform: none;
+  }
+}
 
 @media (prefers-reduced-motion: reduce){
   .loading-spinner { animation: none; }
-}
-/* === END BLOCK: GS-01 LOADING OVERLAY (no layout shift) === */
 
-.error-message,
-.info-message {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 22px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid rgba(0,0,0,.06);
+  .loading-container .empty-state__btn{
+    transition: none;
+  }
 }
-.info-message { background: #fff3cd; }
-.error-message { background: #f8d7da; color: #721c24; }
+/* === END BLOCK: WP_STATUS_FEEDBACK_CLUSTER_MAPPING === */
 
 /*/* ============================================
    EMPTY STATE
@@ -3387,6 +3473,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
