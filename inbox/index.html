@@ -70,7 +70,10 @@ Umfang:
       </div>
 <div style="display:flex; gap:10px; flex-wrap:wrap;">
   <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
-  <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
+        <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
+      </div>
 </div>
     </div>
 
@@ -96,8 +99,7 @@ Umfang:
     // - Vollständige Logik für diese Seite (konsolidiert)
     // === END BLOCK: FINAL REVIEW LOGIC (storage-free, fixed API, auto-unlock) ===
 
-    const FEED_URL = "/data/inbox.json";
-    const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
+    const API_URL  = "https://script.google.com/macros/s/AKfycbzqfaIjmJHF7EiZkM7YVFWkMWq95V7VlXsaNqmqeb2dZ0VshMT122e8dN3CRIRu_ZRX/exec";
 
     const elOne = document.getElementById("one");
     const elStatus = document.getElementById("statusLine");
@@ -107,11 +109,17 @@ Umfang:
 
     let queue = [];
     let current = null;
+    let totalLoaded = 0;
 
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
 
-document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+    document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+    document.getElementById("deployBtn").addEventListener("click", async () => {
+      const ok = await ensureUnlocked();
+      if (!ok) return;
+      await triggerDeploy();
+    });
 document.getElementById("deployBtn").addEventListener("click", async () => {
   const ok = await ensureUnlocked();
   if (!ok) return;
@@ -141,22 +149,34 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       elOne.innerHTML = "";
       queue = [];
       current = null;
+      totalLoaded = 0;
 
-      const r = await fetch(FEED_URL + "?v=" + Date.now(), { cache: "no-store" });
-      if (!r.ok) {
-        setStatus(`Fehler: inbox.json (${r.status})`);
+      try {
+        const res = await jsonp(API_URL, { action: "listReview" });
+
+        if (!res || !res.ok) {
+          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+          setStatus("Fehler beim Laden: " + err);
+          elLeft.textContent = "";
+          elRight.textContent = "";
+          refreshLock();
+          return;
+        }
+
+        queue = Array.isArray(res.items) ? res.items : [];
+        totalLoaded = Number(res.total || queue.length || 0);
+
+        refreshLock();
+        setStatus(queue.length ? "" : "Keine review-items.");
+
+        showNext(totalLoaded);
+      } catch (e) {
+        console.error(e);
+        setStatus("Fehler beim Laden (Netz/JSONP): " + (e && e.message ? e.message : e));
         elLeft.textContent = "";
         elRight.textContent = "";
-        return;
+        refreshLock();
       }
-
-      const items = await r.json();
-      queue = (items || []).filter(it => String(it.status || "").toLowerCase() === "review");
-
-      refreshLock();
-      setStatus(queue.length ? "" : "Keine review-items.");
-
-      showNext(items.length);
     }
 
     function showNext(totalCount) {
@@ -296,7 +316,7 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
 
           if (res && res.ok) {
             setStatus(isApprove ? "Übernommen." : "Verworfen.");
-            showNext();
+            await loadAndShow();
             return resolve();
           }
 
@@ -306,22 +326,24 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
             sessionToken = "";
             refreshLock();
             setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
-            renderCurrent();
+            renderCurrent(totalLoaded);
             return resolve();
           }
 
           setStatus("Serverfehler: " + err);
-          renderCurrent();
+          renderCurrent(totalLoaded);
           return resolve();
 
         } catch (e) {
           console.error(e);
           setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
-          renderCurrent();
+          renderCurrent(totalLoaded);
           return resolve();
         } finally {
-          const btnDeployFinally = document.getElementById("deployBtn");
-          if (btnDeployFinally) btnDeployFinally.disabled = false;
+          if (btnOk) btnOk.disabled = false;
+          if (btnNo) btnNo.disabled = false;
+          if (btnOpen) btnOpen.disabled = false;
+          if (btnDeploy) btnDeploy.disabled = false;
         }
       });
     }
@@ -350,6 +372,13 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
           }
           return res.error || res.detail || JSON.stringify(res);
         })();
+
+        if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+          sessionToken = "";
+          refreshLock();
+          setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+          return;
+        }
 
         setStatus("Deploy-Fehler: " + err);
       } catch (e) {
