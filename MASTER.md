@@ -234,200 +234,73 @@ Notes:
 OVERALL STATUS:
 
 SESSION REPORT (this session, verified):
-- GS-01.5 Offline-Indicator (Toast + Badge) umgesetzt (UI-only, minimal JS):
-  - Toast nur bei Zustandswechsel:
-    - online → offline: „Offline – gespeicherte Daten“
-    - offline → online: „Wieder online“
-  - Persistentes Badge solange offline:
-    - Text: „Offline – gespeicherte Daten (ggf. nicht aktuell)“
-    - Keine Layout-Shifts, kompatibel mit sticky header/top-stack, nicht blockierend
-- Offline-Reload Robustness (Mobile/Desktop) stabilisiert:
-  - Wiederholtes Reload im Offline-Modus lädt App-Shell + Feed zuverlässig (kein „white/offline“-Fallback mehr)
-  - data/events.json Offline-Fallback stabil (Cache/ignoreSearch-Fallback)
-- CSS Stabilisierung (Design-System Grundlage, UI unverändert):
-  - Root-Cause reproduzierbar gefixt: fehlende Tokens → `var(--token)` invalid → Spacing/Icon-Drift
-  - Token-Contract im `:root` ergänzt: Layout/Feed/Detailpanel/Icon-Size Tokens müssen immer definiert sein
-  - Arbeitsregel bestätigt: erst token-only Stabilisierung, erst danach Component-Mapping; keine riskanten Kommentar-/Marker-Umbauten im selben Schritt
+- CSS Design System DS-01 in `css/style.css` aufgebaut und konsolidiert:
+  - `:root` Token-Contract auf „must-exist“ Tokens erweitert
+  - fehlende Layout-/Feed-/Detailpanel-/Icon-/Control-Tokens ergänzt
+  - DS-02-Vorbereitungs-Aliases (`--cmp-*`) eingeführt
+- CSS Design System DS-02 begonnen und für bestehende UI-Komponenten ohne Redesign gemappt:
+  - Search Input
+  - Filter Pills + Reset Pill
+  - Header Buttons (`App`, `Info`)
+  - Modal CTA
+  - Detailpanel Actionbar Buttons
+  - Calendar Choice Buttons
+  - Detailpanel Links / Source Rows
+  - Detailpanel Close Button
+  - Event-Card Shell
+  - Detailpanel Meta Rows
+- Mehrere Copy/Paste-/Strukturfehler in `css/style.css` reproduzierbar behoben:
+  - doppelte/kaputte DS-02-Blöcke konsolidiert
+  - fehlerhafte Selector-Anker korrigiert
+  - Header/App-Button-Regressionsursache nachgewiesen und behoben
+- Detailpanel Link-Dedupe funktional korrigiert in `js/details.js`:
+  - Website/Quelle werden nicht mehr doppelt gerendert, wenn beide effektiv auf dasselbe Ziel zeigen
+  - Vergleich erfolgt nicht nur über rohe URL-Gleichheit, sondern über kanonisierten Target-Key
+- Empty State im Feed auf finalen Zielzustand gebracht und eingefroren:
+  - wie echtes Feed-/Event-Card-Element, kein Sonderpanel
+  - keine Accent-Rail / kein Primary-CTA
+  - ruhige Secondary-Action
+  - Layout/Ausrichtung bewusst linksbündig belassen
+- Aktueller beobachteter Functional Bug außerhalb des gefreezten Empty States:
+  - Reset über das X neben den Pills setzt Suche/Pills optisch zurück, berechnet aber Facet-Counts nicht neu
+  - wahrscheinlicher Root Cause in `js/filter.js`: Reset-Pfad ruft nicht den vollständigen kanonischen Recompute (`applyFilters`) auf
 
 DECISIONS LOG (permanent, project-wide):
-- GS-01 Feed: Scanability-Contract:
-  - Event Card: Titel max 2 Zeilen; Meta 1 Zeile (Zeit vollständig, Ort ellipsis); City/Location-Dopplung wird vermieden.
-  - Kategorie-Icon ist Indikator (nicht Button) und wird layoutstabil in der Titelzeile (Grid Text|Icon) geführt.
-- GS-01 Feed: Loading/Empty/Error-Contract:
-  - Loading zeigt Skeleton-Cards im Feed (keine Layout-Shifts).
-  - Normaler Load zeigt kein Vollbild-Overlay; Overlay ist für Error-State reserviert.
-  - Empty-State enthält Reset-CTA („Filter zurücksetzen“).
-  - Error-State enthält Retry-CTA („Erneut versuchen“).
-- Zeitfilter ist Single Source of Truth = Feed-Buckets:
-  - Keys: `all | today | week | weekend | nextweek | later`
-  - Facet-Counts bleiben kontextabhängig (Search + aktive Kategorie) und berücksichtigen `endDate`.
-- Control-System-DNA ist tokenbasiert:
-  - Search/Pills/Reset nutzen gemeinsame Control Tokens; Fokus-Ring ausschließlich über `--ui-focus-ring`.
-- Pipeline strategy shift (Bocholt-only, quality-first):
-  - LLM Collector pipeline is parked for now (optional later add-on).
-  - Primary intake becomes “Manual KI → curatierfreundlich” using the existing Inbox Review PWA workflow.
-  - Optional later: neutral newsletter leads (facts only + deep-link; no description copying).
-  - Search/Pills/Reset nutzen gemeinsame Control Tokens; Fokus-Ring ausschließlich über `--ui-focus-ring`.
+- GS-01 Feed / Design System:
+  - DS-01 Token-Contract in `css/style.css` ist aufgebaut; fehlende „must-exist“ Tokens gelten als Root-Cause-Klasse für Layout-/Icon-/Spacing-Drift und müssen künftig zuerst geschlossen werden, bevor Component-Mapping erfolgt.
+- GS-01 Feed / Design System:
+  - DS-02 wird als CSS-only Component-Mapping ohne Redesign umgesetzt.
+  - Ziel-DNA: Button / Link / Input / Card / Divider / Focus über `--cmp-*` Tokens; bestehende Selektoren werden schrittweise darauf gemappt.
+- GS-01 Feed / Empty State:
+  - Empty State ist vorerst eingefroren.
+  - Zielzustand ist eine echte Feed-/Event-Card-Variante, nicht ein bewusst andersartiges Sonderpanel.
+  - Text linksbündig, Action darunter; keine Vollzentrierung.
+- Detailpanel Links:
+  - Website/Quelle-Dedupe gehört auf Render-/JS-Ebene, nicht in CSS.
+  - Wenn Website und Quelle effektiv auf dasselbe Ziel zeigen, bleibt nur eine Zeile sichtbar.
+- Header Controls:
+  - App-Button im Header wird über den echten Button-Selector gemappt (`button.pwa-install-button`), nicht über einen ID-only Selector.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
-- Detailpanel bleibt Enterprise-Baseline (frozen unless critical bug); in dieser Session nicht verändert.
-- Aktiver UI-Fokus dieser Session war GS-01 Event Feed + Filter-Facets (ohne Detailpanel-Redesign).
+- Detailpanel bleibt Enterprise-Baseline; keine strukturelle Neugestaltung.
+- In dieser Session wurden nur konsistente CSS-/Render-Fixes vorgenommen.
+- Aktiver UI-Fokus dieser Session: GS-01 Feed + CSS Design System (`css/style.css`) + Detailpanel-Feinschliff ohne Redesign.
 
-REMAINING GAPS (NEXT WORKPACKS, UI ONLY):
-1) CSS Design System — DS-01 Token-Contract finalisieren (UI unverändert):
-   - `:root` enthält vollständigen „must-exist“ Token-Satz (Layout/Feed/DP/Icon sizes)
-   - Keine Duplikate/Overrides, die Tokens still überschreiben
-2) CSS Design System — DS-02 Component-Mapping (UI unverändert, CSS-only):
-   - Button / Link / Input / Card / Divider / Focus als wiederverwendbare “DNA”
-   - Bestehende Klassen schrittweise auf Tokens/Components mappen (kein Redesign)
-3) Marker-Hygiene in `css/style.css` (nur Struktur, kein UI):
-   - Alle BEGIN/END Marker strikt einzeilig und syntaktisch safe
-   - Keine multi-line “Patch-Notes”-Kommentarblöcke mehr in CSS
+REMAINING GAPS (NEXT WORKPACKS, UI/UX + FUNCTIONAL):
+1) Filter Reset Functional Fix in `js/filter.js`:
+   - Reset über die Reset-Pill / das X neben den Pills muss Suche + Facets + Counts + Disabled-States vollständig neu berechnen
+   - `resetFilters()` als kanonischen Full-Reset konsolidieren
+2) CSS Design System DS-02 weiterführen (weiterhin one-file / CSS-only, kein Redesign):
+   - Restliche Komponenten in `css/style.css` auf vorhandene `--cmp-*` DNA prüfen und nur dort weiter mappen, wo keine sichtbare Regression entsteht
+3) `css/style.css` Strukturhygiene:
+   - verbleibende stray braces / Marker-Unsauberkeiten gezielt bereinigen, sobald der nächste echte CSS-Workpack ansteht
 
 NEXT CHAT PROMPT (start here):
-„Wir sind wieder auf dem alten UI-Stand. Nächster Schritt: CSS Design System DS-01. ZIP-first: MASTER.md + ENGINEERING.md lesen. One file at a time: `css/style.css`. Ziel: Token-Contract (must-exist Tokens) finalisieren, ohne UI-Änderung. Danach DS-02 Component-Mapping vorbereiten (CSS-only, kein Redesign). Bitte nur Replace-Instructions mit eindeutigen BEGIN/END Anchors.“
-
-PIPELINE: TASK 4 — EVENT DISCOVERY PIPELINE (LLM COLLECTOR) — STATUS: PARKED (for later / optional add-on)
-
-Reason (decision):
-- Current focus is “curation-first intake” for Bocholt only.
-- Scalability/automation is not priority right now; trial/error on scraping domains is too costly.
-
-Current architecture (kept as reference; do not delete; use later if reactivated):
-
-Sources (Google Sheet tab "Sources")
-→ Collector (HTML + RSS; Playwright for HTML)
-→ Discovery_Candidates (collector proof)
-→ Field extraction (OpenAI LLM + heuristic fallback)
-→ Mandatory field gate (title + date)
-→ Dedup (normalize_url vs existing inbox URLs)
-→ Inbox
-
-Key configuration rule (proven critical):
-- Only rows with `enabled=true` AND `pipeline_mode=llm` are processed in LLM runs.
-- For HTML sources, `include_detail_pages=true` is required to collect real event detail URLs
-  unless an explicit list-page fallback exists.
-
-Hybrid go-live strategy (decided; keep):
-- Primary goal: Inbox must stay curatable (quality & completeness), not maximum intake.
-- Duplicates are acceptable during rapid run cycles; focus metric is "good inbox_new".
-- Disable low-yield/high-noise sources for now; re-enable later only if needed.
-- Prefer source-scoped rules (per domain) over fragile global heuristics.
-
-Quality improvements implemented (confirmed by runs; keep):
-1) Strict detail URL gating for JUNGE UNI
-- Only accept detail URLs matching: `/programm/kurs/...`
-- Result: category/overview pages (e.g., /info/...) no longer pollute Inbox.
-
-2) Stronger non-event filtering and write gates (HTML + RSS)
-- Block obvious utility/legal/cookie/login/newsletter pages before Inbox-write.
-- Block generic placeholder titles (e.g., "Details", "Buchungen", etc.) via non-event heuristics.
-
-3) Isselburg-specific datetime fix (kept)
-- isselburg.de encodes occurrence datetime in query param `from=YYYY-MM-DD HH:MM:SS`
-- `extract_datetime_from_url()` overrides both heuristic + LLM extractor outputs.
-
-4) ListPageParser fallback for band tour/termine pages (new)
-- For domains:
-  - `django-flint.de`
-  - `coltplay.de`
-- If Collector finds no detail URLs, parse list page directly and create synthetic URLs:
-  `...#event=<hash>`
-- Write directly to Inbox without detail fetch (still subject to title/date gate + non-event filter).
-
-Recent proof runs (high-signal milestones; keep):
-- 2026-03-05T06:27:21Z: sources=14 → candidates_logged=111 → inbox_new=10
-  - 10/10 curatable (JUNGE UNI).
-- 2026-03-05T07:23:06Z: sources=11 → candidates_logged=109 → inbox_new=10
-  - 10/10 curatable (JUNGE UNI).
-- 2026-03-05T09:03:59Z: sources=11 → candidates_logged=155 → inbox_new=4
-  - 3/4 curatable (JUNGE UNI)
-  - 1/4 Coltplay written but title/location extraction is wrong (phone/email line used).
-
-Known remaining blockers (pipeline-only; deferred):
-A) Coltplay list-page parsing must become domain-specific
-- Extract actual tour rows (date/time/venue/city), never contact/footer text.
-- Build clean titles like: "Coltplay – <Venue/City>".
-
-B) Django Flint list-page parsing must become domain-specific
-- Identify the "Termine" rows reliably; parse date/time/location.
-
-C) Keep strict inbox quality gates
-- Inbox must not contain listing/overview placeholders.
-- Any list-page fallback must produce valid (title+date [+time/location]) or be skipped.
-
-Deferred next steps (only if/when pipeline is reactivated):
-1) Inspect Coltplay tour HTML and implement robust domain-specific extractor (selectors → rows → date/time/venue/city).
-2) Inspect Django Flint termine HTML and implement robust domain-specific extractor.
-3) Run once; verify:
-   - Coltplay produces multiple correct events
-   - Django Flint produces events
-   - Inbox remains 100% curatable (no placeholders/listings)
-
-
-PIPELINE: TASK 4.5 — MANUAL KI EVENT INTAKE (CURATION-FIRST) — STATUS: ACTIVE (Bocholt-only, operating baseline frozen)
-
-Goal:
-- Minimal ongoing effort.
-- Regular intake of “good events” without scraping/Cloudflare trial/error.
-- After the search step, the user should work only in the Inbox Review PWA.
-- Current operating baseline:
-  - 1x copy JSON
-  - 1x start workflow
-  - then only PWA actions (`Übernehmen` / `Verwerfen` / `Deploy jetzt`)
-
-Rules (fixed):
-- Search with Regelwerk stays unchanged for now.
-- Search output remains JSON for `data/inbox_manual.json`.
-- Extract facts only (title/date/time/location/city/source URL/category suggestion).
-- Do not copy long descriptions from sources/newsletters.
-- Prefer neutral/public sources; avoid over-representing potential future organizer subscribers.
-- For search dedupe:
-  - always use current `data/events.json`
-  - use `data/inbox.tsv` only if Inbox is not empty / still contains review items
-  - optional live-site cross-check is additive only, never a replacement for `data/events.json`
-
-Operational flow (current verified baseline):
-1) Chat returns JSON for `data/inbox_manual.json`
-2) User pastes once into `data/inbox_manual.json`
-3) User starts exactly one workflow: `Manual KI Event Intake`
-4) Workflow appends new review rows to Google Sheet tab `Inbox`, clears `data/inbox_manual.json`, and dispatches `Deploy to STRATO`
-5) Inbox Review PWA reads review items directly from the Apps Script / Google Sheet API (`listReview`) and is therefore no longer dependent on `data/inbox.json` for live review state
-6) In the PWA:
-   - `Übernehmen` = direct Inbox → Events import via Apps Script, then delete Inbox row
-   - `Verwerfen` = set Inbox status to `verworfen`
-   - `Deploy jetzt` = manually trigger `deploy-strato.yml` from the PWA when the user wants to publish current session changes
-7) Recommended working mode:
-   - curate the whole session in the PWA
-   - deploy once at a chosen checkpoint or when Inbox is empty
-
-Verified behavior / permanent decisions:
-- `id_suggestion` may remain empty in Inbox; final valid slug-like event IDs are generated during the direct Events import path.
-- Source link must remain visible in the detail/UI model; source is not restricted to `bocholt.de`.
-- Inbox Review PWA must use the operational source of truth for reloads (Apps Script / Sheet API), not stale exported JSON.
-- Deploy should not run automatically after every approve; manual session-based deploy from the PWA is the preferred operating model.
-
-Non-goal for this stage:
-- No direct Chat → Sheet integration yet
-- No new UI for manual JSON input yet
-- No changes to search prompt / rulebook behavior yet
-- No automatic deploy after every single approval
-- No cleanup/archive automation in the same step yet
-
-Next possible automation steps (deferred, not active now):
-1) Replace `data/inbox_manual.json` with a direct admin input surface (remove repo-file paste step)
-2) Add Inbox cleanup/archive action for final `verworfen` / processed rows
-3) Optional smart prompt when Inbox becomes empty (“Deploy now?”), but keep manual control
-4) Only later: direct Chat → intake endpoint, if current operating baseline proves stable over time
-
-Optional lead source (later):
-- Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
-- Newsletter-based leads (neutral sources), extracted as facts only and deep-linked to original source.
-   - Coltplay produces multiple correct events
-   - Django Flint produces events
-   - Inbox remains 100% curatable (no placeholders/listings)
+„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach nur eine Datei bearbeiten: `js/filter.js`. Problem: Wenn ich die Suche über das X neben den Category-/Time-Pills zurücksetze, werden Suche und Pills optisch korrekt geleert, aber die Time- und Category-Facets bleiben auf 0 statt sich neu korrekt zu füllen. Bitte Root-Cause in `js/filter.js` nachweisen und dann einen minimalen Patch liefern, sodass der Reset-Pfad ein vollständiger kanonischer Full-Reset wird (Suche leeren, State resetten, `applyFilters()`/Facet-Recompute korrekt ausführen). Nur Replace-Instructions mit eindeutigen BEGIN/END Anchors.“
 
 LAST UPDATE:
+
+2026-03-09
 
 2026-03-05
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
