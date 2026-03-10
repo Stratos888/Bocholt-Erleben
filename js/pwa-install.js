@@ -20,52 +20,57 @@
 // END: FILE_HEADER_PWA_INSTALL
 
 
+// === BEGIN BLOCK: MULTI INSTALL TRIGGERS (header + desktop entry) ===
 (() => {
-  const installButton = document.querySelector("button.pwa-install-button");
-  if (!installButton) return;
+  const installButtons = Array.from(
+    document.querySelectorAll("[data-pwa-install-trigger]")
+  );
 
-  // Button ist standardmäßig verborgen
-  installButton.style.display = "none";
+  if (!installButtons.length) return;
 
   let deferredPrompt = null;
 
-  // Standalone-Erkennung (Android + iOS)
+  const setButtonsVisible = (isVisible) => {
+    installButtons.forEach((button) => {
+      button.style.display = isVisible ? "inline-flex" : "none";
+    });
+  };
+
   const isStandalone =
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true;
 
-  // Wenn App bereits installiert / standalone → Button dauerhaft ausblenden
+  setButtonsVisible(false);
+
   if (isStandalone) {
-    installButton.style.display = "none";
     return;
   }
 
-  // beforeinstallprompt abfangen
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    // Button jetzt sichtbar machen
-    installButton.style.display = "inline-flex";
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    setButtonsVisible(true);
   });
 
-  // Klick auf Install-Button
-  installButton.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
+  installButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
 
-    installButton.style.display = "none";
+      setButtonsVisible(false);
 
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
 
-    deferredPrompt = null;
+      deferredPrompt = null;
+    });
   });
 
-  // Falls App nachträglich installiert wurde
   window.addEventListener("appinstalled", () => {
-    installButton.style.display = "none";
+    setButtonsVisible(false);
     deferredPrompt = null;
   });
 })();
+// === END BLOCK: MULTI INSTALL TRIGGERS (header + desktop entry) ===
+
 
 
