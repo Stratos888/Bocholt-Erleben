@@ -55,9 +55,10 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     <span class="app-title">Bocholt erleben</span>
   </div>
  <div class="header-right">
-    <button type="button" class="pwa-install-button">
-      
+    <!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
+    <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
     </button>
+    <!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
  
 
  <!-- === BEGIN BLOCK: HEADER INFO CTA (opens info hub) ===
@@ -189,8 +190,44 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
 
 </div>
 
+<!-- === BEGIN BLOCK: DESKTOP ENTRY SURFACE (desktop trust + install + publish) ===
+Zweck:
+- Ergänzt oberhalb des Feeds eine ruhige Desktop-Entry-Zone
+- Gleiche App-DNA wie Mobile/PWA, aber bessere Desktop-Einordnung
+- Kein Hero, keine zweite Desktop-Welt
+Umfang:
+- Fügt genau einen neuen Block zwischen .top-stack und .events-section ein
+=== -->
+<section class="desktop-entry" aria-label="Einführung">
+  <div class="desktop-entry__inner">
+    <div class="desktop-entry__content">
+      <p class="desktop-entry__eyebrow">Bocholt erleben</p>
+      <h1 class="desktop-entry__title">Bocholt erleben – lokal, aktuell, übersichtlich.</h1>
+      <p class="desktop-entry__text">Konzerte, Märkte, Kultur und mehr – übersichtlich an einem Ort.</p>
+      <p class="desktop-entry__meta">Für Bocholt. Direkt im Browser und als App nutzbar.</p>
+    </div>
 
+    <div class="desktop-entry__actions" aria-label="Schnellzugriffe">
+      <button
+        type="button"
+        class="desktop-entry__cta desktop-entry__cta--install"
+        data-pwa-install-trigger
+        aria-label="Als App installieren"
+      >
+        Als App installieren
+      </button>
 
+      <a class="desktop-entry__cta desktop-entry__cta--publish" href="/events-veroeffentlichen/">
+        Event veröffentlichen
+      </a>
+
+      <a class="desktop-entry__cta desktop-entry__cta--info" href="/info/">
+        Mehr erfahren
+      </a>
+    </div>
+  </div>
+</section>
+<!-- === END BLOCK: DESKTOP ENTRY SURFACE (desktop trust + install + publish) === -->
 
    <!-- EVENT CARDS SECTION -->
 <section class="events-section">
@@ -381,6 +418,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
