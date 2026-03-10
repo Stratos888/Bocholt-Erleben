@@ -1633,10 +1633,45 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 /* BOTTOM TAB BAR (marker fix; keep CSS valid) */
 
 footer {
-  background: #0b1220;
-  color: #e5e7eb;
-  padding: 34px 20px;
+  margin-top: 20px;
+  padding: 28px 20px 34px;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, white 86%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 92%, var(--color-primary-muted)) 100%
+    );
+  border-top: 1px solid rgba(31, 41, 51, 0.08);
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.72) inset;
+
+  color: var(--color-text-secondary);
   text-align: center;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer p + p {
+  margin-top: 10px;
+}
+
+footer a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 900px) {
+  footer {
+    margin-top: 28px;
+    padding-top: 32px;
+    padding-bottom: 38px;
+  }
 }
 
 
@@ -3897,6 +3932,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
