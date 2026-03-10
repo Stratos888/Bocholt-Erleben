@@ -1722,97 +1722,98 @@ footer {
 
 /* === BEGIN BLOCK: DESKTOP ENTRY SURFACE (desktop-only adaptive intro layer) ===
 Zweck:
-- Ergänzt eine ruhige Desktop-Entry-Zone zwischen Search/Filter und Feed
-- Nutzt bestehende Tokens / App-DNA
-- Mobile bleibt unverändert fokussiert
+- Entlastet die Desktop-Entry-Zone visuell
+- Reduziert CTA-Schwere und stärkt die Hierarchie Richtung Feed
+- Behält gleiche App-DNA und gleiche Funktionslogik
 Umfang:
-- Nur neue Styles für .desktop-entry und Unterelemente
+- Nur Feinschliff für .desktop-entry und Unterelemente
 === */
 .desktop-entry{
   display: none;
-  padding: 10px var(--gutter) 4px;
+  padding: 8px var(--gutter) 2px;
 }
 
 .desktop-entry__inner{
   display: grid;
-  gap: 18px;
+  gap: 16px;
 
-  padding: 18px;
+  padding: 16px 18px;
 
   border: 1px solid var(--cmp-surface-panel-border);
   border-radius: var(--cmp-card-radius);
-  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
-  box-shadow: var(--cmp-card-shadow);
+  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+  box-shadow: 0 10px 24px rgba(31,41,51,0.05);
 }
 
 .desktop-entry__content{
   display: grid;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
 .desktop-entry__eyebrow{
   margin: 0;
 
-  color: var(--color-text-secondary);
-  font-size: 0.84rem;
-  font-weight: 700;
+  color: #4f6480;
+  font-size: 0.82rem;
+  font-weight: 760;
   line-height: 1.2;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .desktop-entry__title{
   margin: 0;
 
+  max-width: 18ch;
   color: var(--color-text-primary);
-  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.9rem);
+  font-size: clamp(1.08rem, 0.98rem + 0.9vw, 1.42rem);
   font-weight: 760;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  line-height: 1.12;
+  letter-spacing: -0.028em;
 }
 
 .desktop-entry__text{
-  margin: 0;
+  margin: 2px 0 0;
 
-  max-width: 54ch;
+  max-width: 52ch;
   color: var(--color-text-primary);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 560;
-  line-height: 1.42;
+  line-height: 1.4;
 }
 
 .desktop-entry__meta{
   margin: 2px 0 0;
 
   color: var(--color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.45;
+  font-size: 0.9rem;
+  line-height: 1.42;
 }
 
 .desktop-entry__actions{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
 }
 
 .desktop-entry__cta{
-  min-height: var(--cmp-btn-minh);
-  padding: 0 var(--cmp-btn-pad-x);
+  min-height: 46px;
+  padding: 0 14px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: var(--cmp-btn-radius);
-  border: 1px solid var(--cmp-btn-secondary-border);
-  background: var(--cmp-btn-secondary-bg);
-  box-shadow: var(--cmp-btn-secondary-shadow);
+  border-radius: calc(var(--cmp-btn-radius) - 2px);
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.76);
+  box-shadow: 0 1px 2px rgba(31,41,51,0.03);
 
   color: var(--cmp-btn-secondary-fg);
   font: inherit;
-  font-size: var(--cmp-btn-font-size);
-  font-weight: var(--cmp-btn-font-weight);
+  font-size: 0.96rem;
+  font-weight: 680;
   line-height: 1;
   text-decoration: none;
   text-align: center;
@@ -1829,36 +1830,40 @@ Umfang:
 }
 
 .desktop-entry__cta--install{
-  border-color: rgba(118, 173, 47, 0.34);
-  background: color-mix(in srgb, white 18%, var(--cmp-btn-primary-bg));
-  box-shadow: var(--cmp-btn-primary-shadow);
+  border-color: rgba(118,173,47,0.28);
+  background: color-mix(in srgb, white 34%, var(--cmp-btn-primary-bg));
+  box-shadow: 0 4px 14px rgba(118,173,47,0.10);
   color: var(--cmp-btn-primary-fg);
+}
+
+.desktop-entry__cta--publish{
+  color: #5f8f24;
 }
 
 .desktop-entry__cta--info{
   background: rgba(255,255,255,0.62);
-  box-shadow: var(--ui-shadow-soft);
+  color: var(--color-text-primary);
 }
 
 @media (hover: hover){
   .desktop-entry__cta:hover{
-    background: var(--ui-surface-soft-hover);
-    border-color: var(--ui-border-strong);
+    background: rgba(255,255,255,0.92);
+    border-color: rgba(31,41,51,0.16);
   }
 
   .desktop-entry__cta--install:hover{
-    background: color-mix(in srgb, white 10%, var(--cmp-btn-primary-bg));
-    border-color: rgba(118, 173, 47, 0.44);
+    background: color-mix(in srgb, white 26%, var(--cmp-btn-primary-bg));
+    border-color: rgba(118,173,47,0.36);
   }
 }
 
 .desktop-entry__cta:active{
   transform: translateY(1px);
-  background: var(--ui-surface-soft-active);
+  background: rgba(255,255,255,0.94);
 }
 
 .desktop-entry__cta--install:active{
-  background: color-mix(in srgb, white 24%, var(--cmp-btn-primary-bg));
+  background: color-mix(in srgb, white 40%, var(--cmp-btn-primary-bg));
 }
 
 .desktop-entry__cta:focus-visible{
@@ -1869,13 +1874,19 @@ Umfang:
 @media (min-width: 900px){
   .desktop-entry{
     display: block;
+    padding-top: 10px;
+    padding-bottom: 2px;
   }
 
   .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.9fr);
+    grid-template-columns: minmax(0, 1.75fr) minmax(248px, 0.82fr);
     align-items: start;
-    gap: 24px;
-    padding: 22px 24px;
+    gap: 22px;
+    padding: 18px 20px;
+  }
+
+  .desktop-entry__actions{
+    padding-top: 2px;
   }
 }
 
@@ -3886,6 +3897,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
