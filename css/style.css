@@ -346,13 +346,15 @@ body{
   }
 
   .top-stack,
-.events-section{
-/* SECTION */
-  padding: var(--feed-section-pad-top) var(--gutter) 0;
+  .desktop-entry,
+  .events-section{
+  /* SECTION */
+    padding: var(--feed-section-pad-top) var(--gutter) 0;
 
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 }
 
@@ -1648,10 +1650,26 @@ footer {
 /* Desktop: Frame zentrieren + Grid angenehmer skalieren */
 @media (min-width: 900px) {
   .top-stack,
+  .desktop-entry,
   .events-section{
     max-width: 1040px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .top-stack{
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .desktop-entry{
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .events-section{
+    padding-left: 24px;
+    padding-right: 24px;
   }
 
   .top-stack{
@@ -1701,6 +1719,172 @@ footer {
   transform: none;
   contain: none;
 }
+
+/* === BEGIN BLOCK: DESKTOP ENTRY SURFACE (desktop-only adaptive intro layer) ===
+Zweck:
+- Ergänzt eine ruhige Desktop-Entry-Zone zwischen Search/Filter und Feed
+- Nutzt bestehende Tokens / App-DNA
+- Mobile bleibt unverändert fokussiert
+Umfang:
+- Nur neue Styles für .desktop-entry und Unterelemente
+=== */
+.desktop-entry{
+  display: none;
+  padding: 10px var(--gutter) 4px;
+}
+
+.desktop-entry__inner{
+  display: grid;
+  gap: 18px;
+
+  padding: 18px;
+
+  border: 1px solid var(--cmp-surface-panel-border);
+  border-radius: var(--cmp-card-radius);
+  background: color-mix(in srgb, white 90%, var(--color-primary-muted));
+  box-shadow: var(--cmp-card-shadow);
+}
+
+.desktop-entry__content{
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.desktop-entry__eyebrow{
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.desktop-entry__title{
+  margin: 0;
+
+  color: var(--color-text-primary);
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.9rem);
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.desktop-entry__text{
+  margin: 0;
+
+  max-width: 54ch;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 560;
+  line-height: 1.42;
+}
+
+.desktop-entry__meta{
+  margin: 2px 0 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.desktop-entry__actions{
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.desktop-entry__cta{
+  min-height: var(--cmp-btn-minh);
+  padding: 0 var(--cmp-btn-pad-x);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--cmp-btn-secondary-border);
+  background: var(--cmp-btn-secondary-bg);
+  box-shadow: var(--cmp-btn-secondary-shadow);
+
+  color: var(--cmp-btn-secondary-fg);
+  font: inherit;
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
+  line-height: 1;
+  text-decoration: none;
+  text-align: center;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
+}
+
+.desktop-entry__cta--install{
+  border-color: rgba(118, 173, 47, 0.34);
+  background: color-mix(in srgb, white 18%, var(--cmp-btn-primary-bg));
+  box-shadow: var(--cmp-btn-primary-shadow);
+  color: var(--cmp-btn-primary-fg);
+}
+
+.desktop-entry__cta--info{
+  background: rgba(255,255,255,0.62);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+@media (hover: hover){
+  .desktop-entry__cta:hover{
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
+  }
+
+  .desktop-entry__cta--install:hover{
+    background: color-mix(in srgb, white 10%, var(--cmp-btn-primary-bg));
+    border-color: rgba(118, 173, 47, 0.44);
+  }
+}
+
+.desktop-entry__cta:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
+}
+
+.desktop-entry__cta--install:active{
+  background: color-mix(in srgb, white 24%, var(--cmp-btn-primary-bg));
+}
+
+.desktop-entry__cta:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+}
+
+@media (min-width: 900px){
+  .desktop-entry{
+    display: block;
+  }
+
+  .desktop-entry__inner{
+    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.9fr);
+    align-items: start;
+    gap: 24px;
+    padding: 22px 24px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1080px){
+  .desktop-entry__inner{
+    grid-template-columns: 1fr;
+  }
+}
+/* === END BLOCK: DESKTOP ENTRY SURFACE (desktop-only adaptive intro layer) === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -3702,6 +3886,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
