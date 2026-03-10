@@ -2617,6 +2617,14 @@ html.is-panel-open body {
 /* Sheet */
 /* DETAILPANEL SHEET SURFACE (align to card DNA, parser-safe) */
 
+/* === BEGIN BLOCK: DETAIL PANEL SHEET SURFACE (mobile default + desktop frame polish) ===
+Zweck:
+- Behält das mobile Bottom-Sheet-Verhalten unverändert bei
+- Gibt dem Detailpanel auf Desktop einen klareren, zentrierten Frame
+- Reduziert den Eindruck eines bloß hochgezogenen Mobile-Sheets auf großen Viewports
+Umfang:
+- Ersetzt nur den detail-panel-content-Block inkl. desktop-spezifischer Rahmenlogik
+=== */
 #event-detail-panel .detail-panel-content{
 
   position: absolute;
@@ -2654,6 +2662,26 @@ html.is-panel-open body {
   display: flex;
   flex-direction: column;
 }
+
+@media (min-width: 900px){
+  #event-detail-panel .detail-panel-content{
+    left: 50%;
+    right: auto;
+    bottom: 0;
+    transform: translateX(-50%);
+
+    width: min(1040px, calc(100vw - 40px));
+    max-height: min(86dvh, 940px);
+
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+
+    box-shadow:
+      0 -20px 48px rgba(0,0,0,0.12),
+      0 1px 0 rgba(255,255,255,0.74) inset;
+  }
+}
+/* === END BLOCK: DETAIL PANEL SHEET SURFACE (mobile default + desktop frame polish) === */
 
 
 /* Verhindert „weiße Maskenstreifen“ durch Legacy ::after */
@@ -3805,6 +3833,14 @@ svg.ui-icon-svg{
 }
 
 /* Slot: Enterprise Grid */
+/* === BEGIN BLOCK: DETAIL ACTIONBAR SLOT (mobile default + desktop containment) ===
+Zweck:
+- Behält die mobile Actionbar als festen Bottom-Slot bei
+- Bindet die Actionbar auf Desktop an dieselbe Breite wie das Detailpanel
+- Reduziert den mobilehaften Full-Viewport-Eindruck auf großen Screens
+Umfang:
+- Ersetzt nur den #detail-actionbar-slot-Block inkl. desktop-spezifischer Containment-Regeln
+=== */
 #detail-actionbar-slot{
   position: fixed;
   left: 0;
@@ -3845,7 +3881,38 @@ svg.ui-icon-svg{
   z-index: 6;
 }
 
+@media (min-width: 900px){
+  #detail-actionbar-slot{
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+
+    width: min(1040px, calc(100vw - 40px));
+    padding-left: 28px;
+    padding-right: 28px;
+    padding-bottom: max(14px, calc(14px + var(--dp-safe-bottom)));
+
+    gap: 12px;
+
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+    box-shadow:
+      0 -10px 24px rgba(0,0,0,0.06),
+      0 1px 0 rgba(255,255,255,0.72) inset;
+  }
+}
+/* === END BLOCK: DETAIL ACTIONBAR SLOT (mobile default + desktop containment) === */
+
 /* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING | Purpose: consolidate detail actionbar buttons into one clean DS-02 block and remove malformed stray brace | Scope: replaces complete detail actionbar button/state/focus/icon block === */
+/* === BEGIN BLOCK: DETAIL ACTIONBAR BUTTONS (mobile default + desktop polish) ===
+Zweck:
+- Behält die mobile Button-Logik unverändert bei
+- Gibt den Actions auf Desktop etwas mehr Ruhe und weniger „mobile slab“-Charakter
+- Passt Höhe und Label-Anmutung an den Desktop-Panelrahmen an
+Umfang:
+- Ersetzt nur den Basis-Buttonblock inkl. desktop-spezifischer Größenanpassung
+=== */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
 
@@ -3885,6 +3952,17 @@ svg.ui-icon-svg{
     opacity 140ms ease;
 }
 
+@media (min-width: 900px){
+  #detail-actionbar-slot .detail-actionbar-btn{
+    height: 52px;
+    border-radius: calc(var(--cmp-btn-radius) - 2px);
+    box-shadow:
+      0 8px 18px rgba(0,0,0,0.045),
+      0 1px 0 rgba(255,255,255,0.78) inset;
+  }
+}
+/* === END BLOCK: DETAIL ACTIONBAR BUTTONS (mobile default + desktop polish) === */
+
 @media (hover: hover){
   #detail-actionbar-slot .detail-actionbar-btn:hover{
     border-color: var(--border-panel);
@@ -3913,6 +3991,13 @@ svg.ui-icon-svg{
   opacity: 0.92;
 }
 
+/* === BEGIN BLOCK: DETAIL ACTIONBAR BUTTON LABELS (mobile default + desktop polish) ===
+Zweck:
+- Behält die mobile Label-Darstellung bei
+- Macht die Action-Labels auf Desktop etwas kompakter und erwachsener
+Umfang:
+- Ersetzt nur den ::after-Labelblock inkl. desktop-spezifischer Anpassung
+=== */
 #detail-actionbar-slot .detail-actionbar-btn::after{
   content: attr(title);
   display: block;
@@ -3925,6 +4010,15 @@ svg.ui-icon-svg{
   color: rgba(31,41,51,0.72);
 }
 
+@media (min-width: 900px){
+  #detail-actionbar-slot .detail-actionbar-btn::after{
+    margin-top: 5px;
+    font-size: 11.5px;
+    color: rgba(31,41,51,0.68);
+  }
+}
+/* === END BLOCK: DETAIL ACTIONBAR BUTTON LABELS (mobile default + desktop polish) === */
+
 #detail-actionbar-slot .detail-actionbar-btn[disabled],
 #detail-actionbar-slot .detail-actionbar-btn.is-disabled{
   opacity: 0.55;
@@ -3932,6 +4026,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
