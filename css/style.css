@@ -1722,15 +1722,15 @@ footer {
 
 /* === BEGIN BLOCK: DESKTOP ENTRY SURFACE (desktop-only adaptive intro layer) ===
 Zweck:
-- Entlastet die Desktop-Entry-Zone visuell
-- Reduziert CTA-Schwere und stärkt die Hierarchie Richtung Feed
-- Behält gleiche App-DNA und gleiche Funktionslogik
+- Finaler Hierarchie-Polish für die Desktop-Entry-Zone
+- CTA-Spalte kompakter und ruhiger
+- Feed-Übergang etwas klarer
 Umfang:
 - Nur Feinschliff für .desktop-entry und Unterelemente
 === */
 .desktop-entry{
   display: none;
-  padding: 8px var(--gutter) 2px;
+  padding: 8px var(--gutter) 8px;
 }
 
 .desktop-entry__inner{
@@ -1741,8 +1741,8 @@ Umfang:
 
   border: 1px solid var(--cmp-surface-panel-border);
   border-radius: var(--cmp-card-radius);
-  background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  box-shadow: 0 10px 24px rgba(31,41,51,0.05);
+  background: color-mix(in srgb, white 93%, var(--color-primary-muted));
+  box-shadow: 0 8px 20px rgba(31,41,51,0.045);
 }
 
 .desktop-entry__content{
@@ -1767,7 +1767,7 @@ Umfang:
 
   max-width: 18ch;
   color: var(--color-text-primary);
-  font-size: clamp(1.08rem, 0.98rem + 0.9vw, 1.42rem);
+  font-size: clamp(1.08rem, 0.98rem + 0.9vw, 1.38rem);
   font-weight: 760;
   line-height: 1.12;
   letter-spacing: -0.028em;
@@ -1778,17 +1778,17 @@ Umfang:
 
   max-width: 52ch;
   color: var(--color-text-primary);
-  font-size: 0.98rem;
+  font-size: 0.97rem;
   font-weight: 560;
-  line-height: 1.4;
+  line-height: 1.38;
 }
 
 .desktop-entry__meta{
   margin: 2px 0 0;
 
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.42;
+  font-size: 0.89rem;
+  line-height: 1.4;
 }
 
 .desktop-entry__actions{
@@ -1798,22 +1798,22 @@ Umfang:
 }
 
 .desktop-entry__cta{
-  min-height: 46px;
+  min-height: 42px;
   padding: 0 14px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: calc(var(--cmp-btn-radius) - 2px);
+  border-radius: calc(var(--cmp-btn-radius) - 3px);
   border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.76);
-  box-shadow: 0 1px 2px rgba(31,41,51,0.03);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 1px 2px rgba(31,41,51,0.025);
 
   color: var(--cmp-btn-secondary-fg);
   font: inherit;
-  font-size: 0.96rem;
-  font-weight: 680;
+  font-size: 0.95rem;
+  font-weight: 670;
   line-height: 1;
   text-decoration: none;
   text-align: center;
@@ -1830,9 +1830,9 @@ Umfang:
 }
 
 .desktop-entry__cta--install{
-  border-color: rgba(118,173,47,0.28);
-  background: color-mix(in srgb, white 34%, var(--cmp-btn-primary-bg));
-  box-shadow: 0 4px 14px rgba(118,173,47,0.10);
+  border-color: rgba(118,173,47,0.24);
+  background: color-mix(in srgb, white 42%, var(--cmp-btn-primary-bg));
+  box-shadow: 0 3px 10px rgba(118,173,47,0.08);
   color: var(--cmp-btn-primary-fg);
 }
 
@@ -1841,19 +1841,19 @@ Umfang:
 }
 
 .desktop-entry__cta--info{
-  background: rgba(255,255,255,0.62);
+  background: rgba(255,255,255,0.64);
   color: var(--color-text-primary);
 }
 
 @media (hover: hover){
   .desktop-entry__cta:hover{
     background: rgba(255,255,255,0.92);
-    border-color: rgba(31,41,51,0.16);
+    border-color: rgba(31,41,51,0.15);
   }
 
   .desktop-entry__cta--install:hover{
-    background: color-mix(in srgb, white 26%, var(--cmp-btn-primary-bg));
-    border-color: rgba(118,173,47,0.36);
+    background: color-mix(in srgb, white 36%, var(--cmp-btn-primary-bg));
+    border-color: rgba(118,173,47,0.30);
   }
 }
 
@@ -1863,7 +1863,7 @@ Umfang:
 }
 
 .desktop-entry__cta--install:active{
-  background: color-mix(in srgb, white 40%, var(--cmp-btn-primary-bg));
+  background: color-mix(in srgb, white 46%, var(--cmp-btn-primary-bg));
 }
 
 .desktop-entry__cta:focus-visible{
@@ -1875,13 +1875,13 @@ Umfang:
   .desktop-entry{
     display: block;
     padding-top: 10px;
-    padding-bottom: 2px;
+    padding-bottom: 10px;
   }
 
   .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1.75fr) minmax(248px, 0.82fr);
+    grid-template-columns: minmax(0, 1.9fr) minmax(220px, 0.72fr);
     align-items: start;
-    gap: 22px;
+    gap: 20px;
     padding: 18px 20px;
   }
 
@@ -3897,6 +3897,7 @@ svg.ui-icon-svg{
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
