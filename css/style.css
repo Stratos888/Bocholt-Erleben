@@ -2619,11 +2619,12 @@ html.is-panel-open body {
 
 /* === BEGIN BLOCK: DETAIL PANEL SHEET SURFACE (mobile default + desktop frame polish) ===
 Zweck:
-- Behält das mobile Bottom-Sheet-Verhalten unverändert bei
-- Gibt dem Detailpanel auf Desktop einen klareren, zentrierten Frame
-- Reduziert den Eindruck eines bloß hochgezogenen Mobile-Sheets auf großen Viewports
+- Behält das mobile Bottom-Sheet-Verhalten vollständig unverändert bei
+- Macht den Desktop-Zustand sichtbar kompakter, ruhiger und klarer gefasst
+- Verwandelt das große Desktop-Sheet in ein engeres, zentriertes Fokus-Panel
 Umfang:
-- Ersetzt nur den detail-panel-content-Block inkl. desktop-spezifischer Rahmenlogik
+- Mobile Basis bleibt identisch
+- Nur Desktop-Regeln ab 900px werden deutlich strenger gefasst
 === */
 #event-detail-panel .detail-panel-content{
 
@@ -2667,18 +2668,18 @@ Umfang:
   #event-detail-panel .detail-panel-content{
     left: 50%;
     right: auto;
-    bottom: 0;
+    bottom: 18px;
     transform: translateX(-50%);
 
-    width: min(1040px, calc(100vw - 40px));
-    max-height: min(86dvh, 940px);
+    width: min(820px, calc(100vw - 64px));
+    max-height: min(84dvh, 880px);
 
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
 
     box-shadow:
-      0 -20px 48px rgba(0,0,0,0.12),
-      0 1px 0 rgba(255,255,255,0.74) inset;
+      0 24px 64px rgba(0,0,0,0.16),
+      0 1px 0 rgba(255,255,255,0.76) inset;
   }
 }
 /* === END BLOCK: DETAIL PANEL SHEET SURFACE (mobile default + desktop frame polish) === */
@@ -3835,11 +3836,12 @@ svg.ui-icon-svg{
 /* Slot: Enterprise Grid */
 /* === BEGIN BLOCK: DETAIL ACTIONBAR SLOT (mobile default + desktop containment) ===
 Zweck:
-- Behält die mobile Actionbar als festen Bottom-Slot bei
-- Bindet die Actionbar auf Desktop an dieselbe Breite wie das Detailpanel
-- Reduziert den mobilehaften Full-Viewport-Eindruck auf großen Screens
+- Behält die mobile Actionbar vollständig unverändert bei
+- Bindet die Desktop-Actionbar sichtbar an den schmaleren Desktop-Panelrahmen
+- Reduziert den Eindruck einer full-width Mobile-Bar auf großen Screens
 Umfang:
-- Ersetzt nur den #detail-actionbar-slot-Block inkl. desktop-spezifischer Containment-Regeln
+- Mobile Basis bleibt identisch
+- Nur Desktop-Regeln ab 900px werden kompakter und stärker contained
 === */
 #detail-actionbar-slot{
   position: fixed;
@@ -3885,21 +3887,22 @@ Umfang:
   #detail-actionbar-slot{
     left: 50%;
     right: auto;
+    bottom: 18px;
     transform: translateX(-50%);
 
-    width: min(1040px, calc(100vw - 40px));
-    padding-left: 28px;
-    padding-right: 28px;
-    padding-bottom: max(14px, calc(14px + var(--dp-safe-bottom)));
+    width: min(820px, calc(100vw - 64px));
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: max(12px, calc(12px + var(--dp-safe-bottom)));
 
-    gap: 12px;
+    gap: 10px;
 
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 
     box-shadow:
-      0 -10px 24px rgba(0,0,0,0.06),
-      0 1px 0 rgba(255,255,255,0.72) inset;
+      0 -8px 20px rgba(0,0,0,0.05),
+      0 1px 0 rgba(255,255,255,0.74) inset;
   }
 }
 /* === END BLOCK: DETAIL ACTIONBAR SLOT (mobile default + desktop containment) === */
@@ -3907,11 +3910,12 @@ Umfang:
 /* === BEGIN BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING | Purpose: consolidate detail actionbar buttons into one clean DS-02 block and remove malformed stray brace | Scope: replaces complete detail actionbar button/state/focus/icon block === */
 /* === BEGIN BLOCK: DETAIL ACTIONBAR BUTTONS (mobile default + desktop polish) ===
 Zweck:
-- Behält die mobile Button-Logik unverändert bei
-- Gibt den Actions auf Desktop etwas mehr Ruhe und weniger „mobile slab“-Charakter
-- Passt Höhe und Label-Anmutung an den Desktop-Panelrahmen an
+- Behält die mobile Button-Logik vollständig unverändert bei
+- Macht die Desktop-Actions klar kompakter und weniger mobilehaft
+- Passt Höhe und Radius sichtbar an den engeren Desktop-Panelrahmen an
 Umfang:
-- Ersetzt nur den Basis-Buttonblock inkl. desktop-spezifischer Größenanpassung
+- Mobile Basis bleibt identisch
+- Nur Desktop-Regeln ab 900px werden kompakter
 === */
 #detail-actionbar-slot .detail-actionbar-btn{
   position: relative;
@@ -3954,11 +3958,11 @@ Umfang:
 
 @media (min-width: 900px){
   #detail-actionbar-slot .detail-actionbar-btn{
-    height: 52px;
-    border-radius: calc(var(--cmp-btn-radius) - 2px);
+    height: 48px;
+    border-radius: calc(var(--cmp-btn-radius) - 4px);
     box-shadow:
-      0 8px 18px rgba(0,0,0,0.045),
-      0 1px 0 rgba(255,255,255,0.78) inset;
+      0 6px 14px rgba(0,0,0,0.040),
+      0 1px 0 rgba(255,255,255,0.80) inset;
   }
 }
 /* === END BLOCK: DETAIL ACTIONBAR BUTTONS (mobile default + desktop polish) === */
@@ -3993,10 +3997,11 @@ Umfang:
 
 /* === BEGIN BLOCK: DETAIL ACTIONBAR BUTTON LABELS (mobile default + desktop polish) ===
 Zweck:
-- Behält die mobile Label-Darstellung bei
-- Macht die Action-Labels auf Desktop etwas kompakter und erwachsener
+- Behält die mobile Label-Darstellung vollständig unverändert bei
+- Macht die Desktop-Labels kompakter und ruhiger
 Umfang:
-- Ersetzt nur den ::after-Labelblock inkl. desktop-spezifischer Anpassung
+- Mobile Basis bleibt identisch
+- Nur Desktop-Regeln ab 900px werden leicht reduziert
 === */
 #detail-actionbar-slot .detail-actionbar-btn::after{
   content: attr(title);
@@ -4012,9 +4017,9 @@ Umfang:
 
 @media (min-width: 900px){
   #detail-actionbar-slot .detail-actionbar-btn::after{
-    margin-top: 5px;
-    font-size: 11.5px;
-    color: rgba(31,41,51,0.68);
+    margin-top: 4px;
+    font-size: 11px;
+    color: rgba(31,41,51,0.66);
   }
 }
 /* === END BLOCK: DETAIL ACTIONBAR BUTTON LABELS (mobile default + desktop polish) === */
@@ -4026,6 +4031,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
