@@ -161,36 +161,7 @@ Umfang: Fügt Top-Stack + Search direkt vor die Filter-Pills ein; ersetzt nur de
   </div>
 </div>
 
-<!-- === BEGIN BLOCK: FILTER SHEET CATEGORY OPTIONS (canonical categories) ===
-Zweck: Kategorie-Optionen auf Canonical-Kategorien umstellen, passend zum normalisierten Filter in js/filter.js.
-Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + Optionen).
-=== -->
-<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
-  <div class="filter-sheet__overlay" data-close-sheet></div>
-  <div class="filter-sheet__card">
-    <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Kategorie</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
-    </div>
-    <div class="filter-sheet__body">
-      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
-
-      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
-      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
-      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
-      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
-      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
-      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
-      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
-    </div>
-  </div>
-</div>
-<!-- === END BLOCK: FILTER SHEET CATEGORY OPTIONS (canonical categories) === -->
-
-
-</div>
-
-<!-- === BEGIN BLOCK: DESKTOP_STAGE_INTRO_V2 | Purpose: Desktop-Bühne in Richtung lokale Event-Homepage schärfen; sekundäre Aktionen entkoppeln und App-Hinweis beruhigen | Scope: ersetzt nur den Desktop-Entry-Block zwischen .top-stack und .events-section === -->
+<!-- === BEGIN BLOCK: DESKTOP_STAGE_INTRO_V3 | Purpose: Desktop-Bühne semantisch schärfen; rechte Spalte als Service-Bereich benennen und App-Hinweis ruhiger einordnen | Scope: ersetzt nur den Desktop-Entry-Block === -->
 <section class="desktop-entry" aria-label="Einführung">
   <div class="desktop-entry__inner">
     <div class="desktop-entry__content">
@@ -205,8 +176,8 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
       </ul>
     </div>
 
-    <div class="desktop-entry__aside" aria-label="Sekundäre Aktionen">
-      <p class="desktop-entry__aside-title">Direkt weiter</p>
+    <div class="desktop-entry__aside" aria-label="Service">
+      <p class="desktop-entry__aside-title">Service</p>
 
       <div class="desktop-entry__actions">
         <a class="desktop-entry__cta desktop-entry__cta--publish" href="/events-veroeffentlichen/">
@@ -229,7 +200,7 @@ Umfang: Ersetzt ausschließlich den kompletten #sheet-category Block (Dialog + O
     </div>
   </div>
 </section>
-<!-- === END BLOCK: DESKTOP_STAGE_INTRO_V2 === -->
+<!-- === END BLOCK: DESKTOP_STAGE_INTRO_V3 === -->
 
    <!-- EVENT CARDS SECTION -->
 <section class="events-section">
@@ -420,6 +391,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
