@@ -218,236 +218,334 @@ const EventCards = (() => {
     return container;
   }
 
-    function createCard(event) {
-    const card = document.createElement("div");
-    card.className = "event-card";
-    card.tabIndex = 0;
+function createCard(event) {
+  const card = document.createElement("div");
+  card.className = "event-card";
+  card.tabIndex = 0;
 
-    // A11y/UX
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Event anzeigen: ${event?.title || ""}`);
+  /* === BEGIN BLOCK: DESKTOP_CARD_BEHAVIOR_AND_CONTENT_V2 | Purpose: Desktop-Card anreichern und Desktop vom Detailpanel entkoppeln, Mobile unverändert lassen | Scope: createCard komplett konsolidiert inkl. Desktop-Aktionen, direkter Desktop-Navigation und ruhigen Zusatzinfos === */
 
-    /* === BEGIN BLOCK: EVENT CITY RESOLUTION ===
-    Zweck: Stellt sicher, dass jedes Event eine Stadt hat.
-    Reihenfolge:
-    1) event.city (explizit)
-    2) aus event.location ableiten
-    3) Fallback: "Bocholt"
-    Umfang: Lokal in createCard, kein globaler State.
-    === */
-    const resolveCity = (ev) => {
-      if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
+  const isDesktopViewport = () => window.matchMedia("(min-width: 900px)").matches;
 
-      const loc = String(ev?.location || "").toLowerCase();
+  const normalizeHttpUrl = (raw) => {
+    const value = String(raw || "").trim();
+    if (!value) return "";
 
-      if (loc.includes("rhede")) return "Rhede";
-      if (loc.includes("isselburg")) return "Isselburg";
-      if (loc.includes("borken")) return "Borken";
-      if (loc.includes("bocholt")) return "Bocholt";
+    try {
+      return new URL(value).href;
+    } catch (_) {
+      try {
+        return new URL(`https://${value}`).href;
+      } catch (_) {
+        return "";
+      }
+    }
+  };
 
-      return "Bocholt";
+  const parseTimeParts = (raw) => {
+    const matches = String(raw || "").match(/\b(\d{1,2}:\d{2})\b/g) || [];
+    return {
+      start: matches[0] || "",
+      end: matches[1] || ""
     };
-    const city = resolveCity(event);
-    /* === END BLOCK: EVENT CITY RESOLUTION === */
+  };
 
-   /* === BEGIN BLOCK: RANGE DATE LABEL ===
-Zweck:
-- Mehrtägige Events als Zeitraum anzeigen (20.11 – 10.01)
-=== */
-let dateLabel = "";
+  const buildGoogleCalendarUrl = (ev) => {
+    const date = String(ev?.date || "").trim();
+    if (!date) return "";
 
-if (event?.date && event?.endDate && event.endDate !== event.date) {
-  dateLabel = `${formatDate(event.date)} – ${formatDate(event.endDate)}`;
-} else if (event?.date) {
-  dateLabel = formatDate(event.date);
-}
-/* === END BLOCK: RANGE DATE LABEL === */
+    const ymd = date.replaceAll("-", "");
+    const { start, end } = parseTimeParts(ev?.time);
 
-    const timeLabel = event?.time ? ` · ${escapeHtml(event.time)}` : "";
+    const params = new URLSearchParams();
+    params.set("action", "TEMPLATE");
+    params.set("text", String(ev?.title || "Event").trim());
 
-   /* === BEGIN BLOCK: EVENT META LINE (badge-ready, calm meta) ===
-Zweck:
-- Vorbereitung Date-Badge Layout (Top-App Pattern): Datum/Uhrzeit als linke Badge, Content rechts.
-- Meta-Zeile wird ruhiger: kein permanentes "Bocholt", Stadt nur wenn != Bocholt.
-Umfang:
-- Ersetzt Meta-Erzeugung + Append-Reihenfolge (h3/meta/location) durch Badge + Body-Wrapper.
-=== */
-
-    /* --- Date Badge (left) --- */
-    const startDateObj = parseISODateLocal(event?.date);
-    const weekdayShort = startDateObj
-      ? new Intl.DateTimeFormat("de-DE", { weekday: "short" })
-          .format(startDateObj)
-          .replace(".", "")
-          .toUpperCase()
-      : "";
-    const dayNum = startDateObj ? String(startDateObj.getDate()).padStart(2, "0") : "";
-    const monthShort = startDateObj
-      ? new Intl.DateTimeFormat("de-DE", { month: "short" })
-          .format(startDateObj)
-          .replace(".", "")
-          .toUpperCase()
-      : "";
-
-    const badge = document.createElement("div");
-    badge.className = "event-date-badge";
-    badge.setAttribute("aria-hidden", "true");
-
-    const bWday = document.createElement("div");
-    bWday.className = "event-date-badge__wday";
-    bWday.textContent = weekdayShort;
-
-    const bDay = document.createElement("div");
-    bDay.className = "event-date-badge__day";
-    bDay.textContent = dayNum;
-
-    const bMonth = document.createElement("div");
-    bMonth.className = "event-date-badge__month";
-    bMonth.textContent = monthShort;
-
-    // === BEGIN BLOCK: DATE BADGE WITHOUT TIME (clean scan) ===
-// Zweck: Badge zeigt nur Wochentag/Tag/Monat (Zeit kommt in Meta-Zeile).
-// Umfang: Entfernt nur das Zeit-Element aus dem Badge.
-// ===
-badge.appendChild(bWday);
-badge.appendChild(bDay);
-badge.appendChild(bMonth);
-// === END BLOCK: DATE BADGE WITHOUT TIME (clean scan) ===
-
-
-    /* --- Card body (right) --- */
-    const body = document.createElement("div");
-    body.className = "event-card-body";
-
-        /* === BEGIN BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) ===
-    Zweck:
-    - GS-01 Enterprise: feste Card-Dichte (Titel max 2 Zeilen, Meta exakt 1 Zeile)
-    - Meta-Contract: Zeit (fixed) + Ort (ellipsis) ohne Separator-Textnodes
-    - City/Prefix werden NICHT im Feed angezeigt (Redundanz/Noise). Mehrtägig ohne Uhrzeit: Zeitraum statt Zeit.
-    Umfang:
-    - Ersetzt nur Meta/Title-Erzeugung in createCard (Rendering-only).
-    === */
-
-    const timeText = event?.time ? String(event.time).trim() : "";
-    const locTextRaw = (event?.location || "").trim();
-
-    const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
-    const timeLine = timeText || (isRange ? String(dateLabel).trim() : "");
-
-    // Place: primär Location, sonst (wenn != Bocholt) City als Fallback
-    const cityRaw = (city || "").toString().trim();
-    const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
-    const placeLine = locTextRaw || (cityIsUseful ? cityRaw : "");
-
-    // Meta DOM: 1 Zeile, strukturiert (time | place) — Separator kommt aus CSS (kein "18:30•...")
-    const meta = document.createElement("div");
-    meta.className = "event-meta";
-
-    if (timeLine) {
-      const timeEl = document.createElement("span");
-      timeEl.className = "event-meta__time";
-      timeEl.textContent = timeLine;
-      meta.appendChild(timeEl);
+    if (start) {
+      const startStamp = `${ymd}T${start.replace(":", "")}00`;
+      const endStamp = `${ymd}T${(end || start).replace(":", "")}00`;
+      params.set("dates", `${startStamp}/${endStamp}`);
+    } else {
+      params.set("dates", `${ymd}/${ymd}`);
     }
 
-    if (placeLine) {
-      const placeEl = document.createElement("span");
-      placeEl.className = "event-meta__place";
-      placeEl.textContent = placeLine;
-      meta.appendChild(placeEl);
+    const locationValue = String(ev?.location || "").trim();
+    const descriptionValue = String(ev?.description || "").trim();
+
+    if (locationValue) params.set("location", locationValue);
+    if (descriptionValue) params.set("details", descriptionValue);
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
+  const buildSharePayload = (ev, fallbackUrl) => {
+    const title = String(ev?.title || "Event").trim();
+    const datePart = ev?.date ? formatDate(ev.date) : "";
+    const timePart = String(ev?.time || "").trim();
+    const locationPart = String(ev?.location || "").trim();
+
+    const lines = [
+      title,
+      [datePart, timePart].filter(Boolean).join(" · "),
+      locationPart,
+      fallbackUrl
+    ].filter(Boolean);
+
+    return {
+      title,
+      text: lines.join("\n"),
+      url: fallbackUrl
+    };
+  };
+
+  const openPrimaryDesktopTarget = (url) => {
+    if (!url) return false;
+
+    try {
+      const w = window.open(url, "_blank", "noopener");
+      if (!w) window.location.href = url;
+      return true;
+    } catch (_) {
+      window.location.href = url;
+      return true;
     }
+  };
 
-    /* Title: Text + Icon getrennt (Icon bleibt immer sichtbar) */
-    const h3 = document.createElement("h3");
-    h3.className = "event-title";
+  const resolveCity = (ev) => {
+    if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
 
-    const titleText = document.createElement("span");
-    titleText.className = "event-title__text";
-    titleText.textContent = event?.title ? String(event.title) : "Event";
+    const loc = String(ev?.location || "").toLowerCase();
 
-    h3.appendChild(titleText);
+    if (loc.includes("rhede")) return "Rhede";
+    if (loc.includes("isselburg")) return "Isselburg";
+    if (loc.includes("borken")) return "Borken";
+    if (loc.includes("bocholt")) return "Bocholt";
 
-    /* === END BLOCK: CARD 2-LINE CONTENT (title+icon stable, meta = time+location) === */
+    return "Bocholt";
+  };
+  const city = resolveCity(event);
 
+  let dateLabel = "";
 
-    /* === BEGIN BLOCK: EVENTCARD APPEND CONTENT ===
-    Zweck:
-    - Kategorie-Icon auf Event Cards wieder anzeigen (oben rechts).
-    - Icon ist rein visuell, Card bleibt komplett klickbar.
-    Umfang:
-    - Erzeugt optional .event-category-icon und hängt sie an die Card.
-    - Danach Badge + Body.
-    === */
-
-// === BEGIN BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
-// Zweck: Kategorie-Icon auf Event Cards als SVG aus window.Icons (Single Source of Truth), keine Emojis.
-// Umfang: Ersetzt nur Icon-Ermittlung + DOM-Injection; Canonical Category Logik bleibt.
-// ===
-const kategorieRaw = (event?.kategorie || "").toString().trim();
-
-// Canonical-Kategorie (Single Source of Truth: FilterModule)
-const canonicalCategory =
-  (window.FilterModule?.normalizeCategory ? window.FilterModule.normalizeCategory(kategorieRaw) : "") ||
-  kategorieRaw;
-
-const iconKey =
-  canonicalCategory && window.Icons?.categoryKey
-    ? (window.Icons.categoryKey(canonicalCategory) || "calendar")
-    : "";
-
-if (iconKey && window.Icons?.svg) {
-  const icon = document.createElement("span");
-  icon.className = "event-category-icon";
-  icon.setAttribute("role", "img");
-  icon.setAttribute("aria-label", `Kategorie: ${canonicalCategory || "Kalender"}`);
-
-  // SVG (styling via CSS tokens)
-  icon.innerHTML = window.Icons.svg(iconKey, { className: "event-icon-svg is-category" });
-
-  // Icon INLINE in die Titelzeile
-  h3.appendChild(icon);
-}
-// === END BLOCK: CATEGORY ICON INLINE WITH TITLE (canonical + consistent) ===
-
-
-
-
-        // === BEGIN BLOCK: BODY APPEND (2 lines only: title + meta) ===
-    // Zweck: Zielzustand 2 Zeilen rechts (Titel + Meta), keine Location-Node mehr anhängen.
-    // Umfang: Ersetzt nur das Anhängen der Body-Children.
-    // ===
-    body.appendChild(h3);
-    if (meta.textContent) body.appendChild(meta);
-    // === END BLOCK: BODY APPEND (2 lines only: title + meta) ===
-
-
-    card.appendChild(badge);
-    card.appendChild(body);
-
-    /* === END BLOCK: EVENTCARD APPEND CONTENT === */
-
-/* === END BLOCK: EVENT META LINE (badge-ready, calm meta) === */
-
-
-
-    /* === BEGIN BLOCK: EVENTCARD CLICK HANDLER === */
-    card.addEventListener("click", () => {
-      if (window.DetailPanel?.show) window.DetailPanel.show(event);
-    });
-    /* === END BLOCK: EVENTCARD CLICK HANDLER === */
-
-    // Keyboard: Enter/Space
-    card.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      e.preventDefault();
-      if (window.DetailPanel?.show) window.DetailPanel.show(event);
-    });
-
-    return card;
+  if (event?.date && event?.endDate && event.endDate !== event.date) {
+    dateLabel = `${formatDate(event.date)} – ${formatDate(event.endDate)}`;
+  } else if (event?.date) {
+    dateLabel = formatDate(event.date);
   }
 
+  const startDateObj = parseISODateLocal(event?.date);
+  const weekdayShort = startDateObj
+    ? new Intl.DateTimeFormat("de-DE", { weekday: "short" })
+        .format(startDateObj)
+        .replace(".", "")
+        .toUpperCase()
+    : "";
+  const dayNum = startDateObj ? String(startDateObj.getDate()).padStart(2, "0") : "";
+  const monthShort = startDateObj
+    ? new Intl.DateTimeFormat("de-DE", { month: "short" })
+        .format(startDateObj)
+        .replace(".", "")
+        .toUpperCase()
+    : "";
 
-   /* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
+  const badge = document.createElement("div");
+  badge.className = "event-date-badge";
+  badge.setAttribute("aria-hidden", "true");
+
+  const bWday = document.createElement("div");
+  bWday.className = "event-date-badge__wday";
+  bWday.textContent = weekdayShort;
+
+  const bDay = document.createElement("div");
+  bDay.className = "event-date-badge__day";
+  bDay.textContent = dayNum;
+
+  const bMonth = document.createElement("div");
+  bMonth.className = "event-date-badge__month";
+  bMonth.textContent = monthShort;
+
+  badge.appendChild(bWday);
+  badge.appendChild(bDay);
+  badge.appendChild(bMonth);
+
+  const body = document.createElement("div");
+  body.className = "event-card-body";
+
+  const timeText = event?.time ? String(event.time).trim() : "";
+  const locTextRaw = String(event?.location || "").trim();
+
+  const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
+  const timeLine = timeText || (isRange ? String(dateLabel).trim() : "");
+
+  const cityRaw = String(city || "").trim();
+  const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
+  const placeLine = locTextRaw || (cityIsUseful ? cityRaw : "");
+
+  const meta = document.createElement("div");
+  meta.className = "event-meta";
+
+  if (timeLine) {
+    const timeEl = document.createElement("span");
+    timeEl.className = "event-meta__time";
+    timeEl.textContent = timeLine;
+    meta.appendChild(timeEl);
+  }
+
+  if (placeLine) {
+    const placeEl = document.createElement("span");
+    placeEl.className = "event-meta__place";
+    placeEl.textContent = placeLine;
+    meta.appendChild(placeEl);
+  }
+
+  const h3 = document.createElement("h3");
+  h3.className = "event-title";
+
+  const titleText = document.createElement("span");
+  titleText.className = "event-title__text";
+  titleText.textContent = event?.title ? String(event.title) : "Event";
+  h3.appendChild(titleText);
+
+  const kategorieRaw = String(event?.kategorie || "").trim();
+  const canonicalCategory =
+    (window.FilterModule?.normalizeCategory ? window.FilterModule.normalizeCategory(kategorieRaw) : "") ||
+    kategorieRaw;
+
+  const iconKey =
+    canonicalCategory && window.Icons?.categoryKey
+      ? (window.Icons.categoryKey(canonicalCategory) || "calendar")
+      : "";
+
+  if (iconKey && window.Icons?.svg) {
+    const icon = document.createElement("span");
+    icon.className = "event-category-icon";
+    icon.setAttribute("role", "img");
+    icon.setAttribute("aria-label", `Kategorie: ${canonicalCategory || "Kalender"}`);
+    icon.innerHTML = window.Icons.svg(iconKey, { className: "event-icon-svg is-category" });
+    h3.appendChild(icon);
+  }
+
+  const descText = String(event?.description || "").trim();
+  const desc = document.createElement("p");
+  desc.className = "event-card-desc";
+  desc.textContent = descText;
+
+  const quietMetaItems = [];
+  if (canonicalCategory) quietMetaItems.push(canonicalCategory);
+  if (cityIsUseful) quietMetaItems.push(cityRaw);
+  else if (!cityIsUseful && cityRaw) quietMetaItems.push(cityRaw);
+
+  const quietMeta = document.createElement("div");
+  quietMeta.className = "event-card-meta-quiet";
+  quietMeta.textContent = quietMetaItems.join(" · ");
+
+  const primaryUrl = normalizeHttpUrl(
+    event?.url || event?.website || event?.sourceUrl || event?.source_url || ""
+  );
+  const calendarUrl = buildGoogleCalendarUrl(event);
+  const sharePayload = buildSharePayload(event, primaryUrl);
+
+  card.setAttribute("role", "button");
+  card.setAttribute(
+    "aria-label",
+    primaryUrl ? `Event öffnen: ${event?.title || ""}` : `Event anzeigen: ${event?.title || ""}`
+  );
+  if (primaryUrl) card.dataset.desktopBehavior = "direct-link";
+
+  const actions = document.createElement("div");
+  actions.className = "event-card-actions";
+
+  if (primaryUrl) {
+    const primaryLink = document.createElement("a");
+    primaryLink.className = "event-card-action event-card-action--primary";
+    primaryLink.href = primaryUrl;
+    primaryLink.target = "_blank";
+    primaryLink.rel = "noopener";
+    primaryLink.textContent = "Zur Veranstaltung";
+    primaryLink.setAttribute("aria-label", `Zur Veranstaltung: ${event?.title || "Event"}`);
+    primaryLink.addEventListener("click", (e) => e.stopPropagation());
+    actions.appendChild(primaryLink);
+  }
+
+  if (calendarUrl) {
+    const calendarLink = document.createElement("a");
+    calendarLink.className = "event-card-action";
+    calendarLink.href = calendarUrl;
+    calendarLink.target = "_blank";
+    calendarLink.rel = "noopener";
+    calendarLink.textContent = "In Kalender";
+    calendarLink.setAttribute("aria-label", `In Kalender: ${event?.title || "Event"}`);
+    calendarLink.addEventListener("click", (e) => e.stopPropagation());
+    actions.appendChild(calendarLink);
+  }
+
+  const shareButton = document.createElement("button");
+  shareButton.type = "button";
+  shareButton.className = "event-card-action";
+  shareButton.textContent = "Teilen";
+  shareButton.setAttribute("aria-label", `Event teilen: ${event?.title || "Event"}`);
+  shareButton.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: sharePayload.title,
+          text: sharePayload.text,
+          url: sharePayload.url || undefined
+        });
+        return;
+      }
+    } catch (_) {}
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(
+          [sharePayload.text, sharePayload.url].filter(Boolean).join("\n")
+        );
+      }
+    } catch (_) {}
+  });
+  actions.appendChild(shareButton);
+
+  body.appendChild(h3);
+  if (meta.textContent) body.appendChild(meta);
+  if (descText) body.appendChild(desc);
+  if (quietMeta.textContent) body.appendChild(quietMeta);
+  if (actions.childNodes.length) body.appendChild(actions);
+
+  card.appendChild(badge);
+  card.appendChild(body);
+
+  const openCard = () => {
+    if (isDesktopViewport() && primaryUrl) {
+      if (openPrimaryDesktopTarget(primaryUrl)) return;
+    }
+
+    if (window.DetailPanel?.show) {
+      window.DetailPanel.show(event);
+      return;
+    }
+
+    if (primaryUrl) {
+      openPrimaryDesktopTarget(primaryUrl);
+    }
+  };
+
+  card.addEventListener("click", openCard);
+
+  card.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    openCard();
+  });
+
+  return card;
+  /* === END BLOCK: DESKTOP_CARD_BEHAVIOR_AND_CONTENT_V2 === */
+}
+
+/* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
 Zweck:
 - Saubere, app-typische Zeit-Sections ohne doppelte Header (Buckets werden vorab gesammelt).
 - Reihenfolge: Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später
@@ -455,141 +553,163 @@ Zweck:
 Umfang:
 - Ersetzt ausschließlich die Section-Logik in renderList(list).
 === */
-  function renderList(list) {
-    const c = ensureContainer();
-    c.innerHTML = "";
+function renderList(list) {
+  const c = ensureContainer();
+  c.innerHTML = "";
 
-    if (!list || list.length === 0) {
-      c.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state__card" role="status" aria-live="polite">
-            <div class="empty-state__title">Keine Events gefunden</div>
-            <div class="empty-state__text">Filter anpassen oder zurücksetzen.</div>
-            <button type="button" class="empty-state__btn" id="empty-reset-btn">Filter zurücksetzen</button>
-          </div>
+  if (!list || list.length === 0) {
+    c.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state__card" role="status" aria-live="polite">
+          <div class="empty-state__title">Keine Events gefunden</div>
+          <div class="empty-state__text">Filter anpassen oder zurücksetzen.</div>
+          <button type="button" class="empty-state__btn" id="empty-reset-btn">Filter zurücksetzen</button>
         </div>
-      `;
+      </div>
+    `;
 
-      const btn = document.getElementById("empty-reset-btn");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          if (window.FilterModule?.resetFilters) {
-            window.FilterModule.resetFilters();
-            return;
-          }
-          // Fallback (sollte nicht nötig sein, aber safe)
-          const resetPill = document.getElementById("filter-reset-pill");
-          if (resetPill) resetPill.click();
-        });
-      }
-
-      return;
+    const btn = document.getElementById("empty-reset-btn");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (window.FilterModule?.resetFilters) {
+          window.FilterModule.resetFilters();
+          return;
+        }
+        const resetPill = document.getElementById("filter-reset-pill");
+        if (resetPill) resetPill.click();
+      });
     }
-
-    const today = startOfToday();
-
-    const toDay = (ev) => {
-      const effective = ev?.endDate ? getEffectiveDate(ev) : parseISODateLocal(ev?.date);
-      if (!effective) return null;
-      const d = new Date(effective);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    };
-
-    const endOfDay = (d) => {
-      const t = new Date(d);
-      t.setHours(23, 59, 59, 999);
-      return t;
-    };
-
-    // Diese Woche: nur Mo–Do sinnvoll (morgen..Do)
-    const dow = today.getDay(); // 0 So ... 6 Sa
-    const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
-    const thisWeekStart = addDays(today, 1); // morgen
-    thisWeekStart.setHours(0, 0, 0, 0);
-
-    let thisWeekEnd = null;
-    if (hasThisWeek) {
-      const daysUntilThu = (4 - dow);
-      const thu = addDays(today, daysUntilThu);
-      thisWeekEnd = endOfDay(thu);
-    }
-
-    // Wochenende (Fr–So): aktuelles oder kommendes WE relativ zu heute
-    const weekend = getNextWeekendRange(today);
-    const weekendStart = new Date(weekend.start);
-    const weekendEnd = new Date(weekend.end);
-
-    // Nächste Woche: Kalenderwoche nach dieser Woche (Mo..So)
-    const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
-    const nextWeekStart = addDays(endThisWeek, 1);
-    nextWeekStart.setHours(0, 0, 0, 0);
-
-    const nextWeekEnd = addDays(nextWeekStart, 6);
-    nextWeekEnd.setHours(23, 59, 59, 999);
-
-    const buckets = {
-      today: [],
-      week: [],
-      weekend: [],
-      nextweek: [],
-      later: []
-    };
-
-    const bucketLabel = {
-      today: "Heute",
-      week: "Diese Woche",
-      weekend: "Dieses Wochenende",
-      nextweek: "Nächste Woche",
-      later: "Später"
-    };
-
-    const pickBucket = (day) => {
-      if (!day) return "later";
-
-      // Heute
-      if (day.getTime() === today.getTime()) return "today";
-
-      // Diese Woche (nur wenn Mo–Do)
-      if (hasThisWeek && day >= thisWeekStart && day <= thisWeekEnd) return "week";
-
-      // Wochenende (Fr–So)
-      if (day >= weekendStart && day <= weekendEnd) return "weekend";
-
-      // Nächste Woche (Mo–So der Folgewoche)
-      if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
-
-      return "later";
-    };
-
-    // 1) Events in Buckets sammeln (keine Doppel-Header möglich)
-    for (const ev of list) {
-      const day = toDay(ev);
-      const key = pickBucket(day);
-      buckets[key].push(ev);
-    }
-
-    // 2) Buckets in fester Reihenfolge rendern (nur wenn nicht leer)
-    const order = ["today", "week", "weekend", "nextweek", "later"];
-    const frag = document.createDocumentFragment();
-
-    const createSectionHeader = (key) => {
-      const h = document.createElement("div");
-      h.className = "events-section-title";
-      h.textContent = bucketLabel[key] || key;
-      return h;
-    };
-
-    for (const key of order) {
-      if (!buckets[key] || buckets[key].length === 0) continue;
-      frag.appendChild(createSectionHeader(key));
-      for (const ev of buckets[key]) {
-        frag.appendChild(createCard(ev));
-      }
-    }
-
-    c.appendChild(frag);
+    return;
   }
+
+  const toDay = (ev) => {
+    const d = parseISODateLocal(ev?.date);
+    if (!d) return null;
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const addDays = (d, n) => {
+    const t = new Date(d);
+    t.setDate(t.getDate() + n);
+    return t;
+  };
+
+  const endOfWeek = (d) => {
+    const t = new Date(d);
+    const delta = (7 - t.getDay()) % 7;
+    t.setDate(t.getDate() + delta);
+    t.setHours(23, 59, 59, 999);
+    return t;
+  };
+
+  const getNextWeekendRange = (base) => {
+    const day = base.getDay();
+    const daysUntilFriday = ((5 - day) + 7) % 7;
+    const start = addDays(base, daysUntilFriday);
+    start.setHours(0, 0, 0, 0);
+
+    const end = addDays(start, 2);
+    end.setHours(23, 59, 59, 999);
+
+    return { start, end };
+  };
+
+  const endOfDay = (d) => {
+    const t = new Date(d);
+    t.setHours(23, 59, 59, 999);
+    return t;
+  };
+
+  const dow = today.getDay();
+  const hasThisWeek = dow >= 1 && dow <= 4;
+  const thisWeekStart = addDays(today, 1);
+  thisWeekStart.setHours(0, 0, 0, 0);
+
+  let thisWeekEnd = null;
+  if (hasThisWeek) {
+    const daysUntilThu = 4 - dow;
+    const thu = addDays(today, daysUntilThu);
+    thisWeekEnd = endOfDay(thu);
+  }
+
+  const weekend = getNextWeekendRange(today);
+  const weekendStart = new Date(weekend.start);
+  const weekendEnd = new Date(weekend.end);
+
+  const endThisWeek = endOfWeek(today);
+  const nextWeekStart = addDays(endThisWeek, 1);
+  nextWeekStart.setHours(0, 0, 0, 0);
+
+  const nextWeekEnd = addDays(nextWeekStart, 6);
+  nextWeekEnd.setHours(23, 59, 59, 999);
+
+  const buckets = {
+    today: [],
+    week: [],
+    weekend: [],
+    nextweek: [],
+    later: []
+  };
+
+  const bucketLabel = {
+    today: "Heute",
+    week: "Diese Woche",
+    weekend: "Dieses Wochenende",
+    nextweek: "Nächste Woche",
+    later: "Später"
+  };
+
+  const pickBucket = (day) => {
+    if (!day) return "later";
+    if (day.getTime() === today.getTime()) return "today";
+    if (hasThisWeek && day >= thisWeekStart && day <= thisWeekEnd) return "week";
+    if (day >= weekendStart && day <= weekendEnd) return "weekend";
+    if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
+    return "later";
+  };
+
+  for (const ev of list) {
+    const day = toDay(ev);
+    const key = pickBucket(day);
+    buckets[key].push(ev);
+  }
+
+  const order = ["today", "week", "weekend", "nextweek", "later"];
+  const frag = document.createDocumentFragment();
+
+  const createSectionHeader = (key) => {
+    const h = document.createElement("div");
+    h.className = "events-section-title";
+    h.textContent = bucketLabel[key] || key;
+    return h;
+  };
+
+  for (const key of order) {
+    if (!buckets[key] || buckets[key].length === 0) continue;
+
+    const section = document.createElement("section");
+    section.className = "events-feed-group";
+    section.setAttribute("aria-label", bucketLabel[key] || key);
+
+    const grid = document.createElement("div");
+    grid.className = "events-feed-group__grid";
+
+    section.appendChild(createSectionHeader(key));
+
+    for (const ev of buckets[key]) {
+      grid.appendChild(createCard(ev));
+    }
+
+    section.appendChild(grid);
+    frag.appendChild(section);
+  }
+
+  c.appendChild(frag);
+}
 /* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
 
 /* === BEGIN BLOCK: GS-01 SKELETON RENDER (stable feed while loading) ===
@@ -681,6 +801,7 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
