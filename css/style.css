@@ -51,7 +51,7 @@
 
   /* Feed rhythm */
   --feed-section-pad-top: 6px;
-  --feed-cards-gap: 14px;
+  --feed-cards-gap: 10px;
   --feed-title-mt: 4px;
   --feed-title-mb: 6px;
 
@@ -1964,6 +1964,23 @@ footer a:hover {
 .event-card-desc,
 .event-card-meta-quiet,
 .event-card-actions{
+  display: none;
+}
+
+.events-feed-group{
+  display: grid;
+  gap: 12px;
+}
+
+.events-feed-group + .events-feed-group{
+  margin-top: 8px;
+}
+
+.events-feed-group__grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
   display: none;
 }
 
@@ -4489,6 +4506,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
