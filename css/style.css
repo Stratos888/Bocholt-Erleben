@@ -3894,6 +3894,7 @@ svg.ui-icon-svg{
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
 
+/* === BEGIN BLOCK: DESKTOP_HEADER_FINAL_LOCK_V1 | Purpose: finalen Header-Desktop-Lock gegen spätere Base-Overrides absichern; Desktop rechts leer und Desktop-Padding stabil halten | Scope: ersetzt nur den späten globalen Header-Block bis vor den 360px-Media-Block === */
 /* APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) */
 .app-header{
   color: var(--color-text-primary);
@@ -3905,7 +3906,6 @@ svg.ui-icon-svg{
   min-height: 48px;
   padding: 0 var(--gutter);
 
-  /* calmer tint: etwas mehr weiß als v1 */
   background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
@@ -3914,7 +3914,6 @@ svg.ui-icon-svg{
   align-items: center;
   gap: 8px;
 
-  /* Kante etwas definierter, aber weiterhin soft */
   border-bottom: 1px solid rgba(31, 41, 51, 0.05);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.78) inset,
@@ -3922,7 +3921,6 @@ svg.ui-icon-svg{
 
   transform: translateZ(0);
 }
-
 
 .app-header::after{ content: none; }
 
@@ -4056,15 +4054,20 @@ svg.ui-icon-svg{
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
-/* === BEGIN BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING | Purpose: align header button focus to central DS-02 focus contract without UI redesign | Scope: adds header button focus rule only === */
-.header-right > .pwa-install-button:focus-visible{
-  outline: 2px solid var(--cmp-btn-focus-ring);
-  outline-offset: 3px;
-  border-radius: var(--ui-radius-sm);
+@media (min-width: 900px){
+  .app-header{
+    min-height: 60px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .header-right{
+    display: none;
+  }
 }
-/* === END BLOCK: DS-02_HEADER_BUTTON_FOCUS_MAPPING === */
 
 @media (max-width: 360px){
+/* === END BLOCK: DESKTOP_HEADER_FINAL_LOCK_V1 === */
   .app-header{ padding: 0 var(--gutter); min-height: 48px; }
   .header-right{ gap: 8px; }
   .app-title{ max-width: 56vw; }
@@ -4410,6 +4413,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
