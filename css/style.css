@@ -1755,10 +1755,10 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V4 | Purpose: Desktop-Bühne auf finalen Zielzustand schärfen; Suche klar primär, Filter sekundär, linker Intro-Bereich editorialer, rechte Spalte als ruhiger Service-Bereich | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; Feed/Card-Layer bleibt enthalten === */
+/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V5 | Purpose: Desktop-Bühne strukturell neu bauen; Search-Hero oben, Intro-Hero links und kleines angedocktes Service-Modul rechts unten, ohne Mobile oder Feed-Verhalten zu beschädigen | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; Feed/Card-Layer bleibt enthalten === */
 .desktop-entry{
   display: none;
-  padding: 0 var(--gutter) 20px;
+  padding: 0 var(--gutter) 22px;
 }
 
 .desktop-entry__inner{
@@ -1768,46 +1768,46 @@ footer a:hover {
 
 .desktop-entry__content{
   display: grid;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .desktop-entry__eyebrow{
   margin: 0;
 
-  color: #617492;
+  color: #5f7290;
   font-size: 0.76rem;
-  font-weight: 780;
+  font-weight: 790;
   line-height: 1.2;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
 .desktop-entry__title{
   margin: 0;
 
-  max-width: 14ch;
+  max-width: 11.5ch;
   color: var(--color-text-primary);
-  font-size: clamp(1.7rem, 1.2rem + 1.28vw, 2.38rem);
-  font-weight: 790;
-  line-height: 1.01;
-  letter-spacing: -0.045em;
+  font-size: clamp(2rem, 1.48rem + 1.45vw, 3rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
   text-wrap: balance;
 }
 
 .desktop-entry__text{
-  margin: 0;
+  margin: 2px 0 0;
 
-  max-width: 58ch;
-  color: rgba(31,41,51,0.78);
-  font-size: 1.02rem;
+  max-width: 46ch;
+  color: rgba(31,41,51,0.80);
+  font-size: 1.06rem;
   font-weight: 560;
   line-height: 1.58;
 }
 
 .desktop-entry__facts{
   list-style: none;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   padding: 0;
 
   display: flex;
@@ -1820,27 +1820,27 @@ footer a:hover {
   align-items: center;
   gap: 8px;
 
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 13px;
 
   border-radius: 999px;
   border: 1px solid rgba(31,41,51,0.07);
-  background: rgba(255,255,255,0.56);
+  background: rgba(255,255,255,0.58);
 
   color: rgba(31,41,51,0.72);
-  font-size: 0.88rem;
+  font-size: 0.89rem;
   font-weight: 660;
   line-height: 1;
 
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.82) inset,
+    0 1px 0 rgba(255,255,255,0.84) inset,
     0 1px 2px rgba(31,41,51,0.02);
 }
 
 .desktop-entry__facts li::before{
   content: "";
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   flex: 0 0 auto;
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-primary) 84%, white);
@@ -1849,7 +1849,7 @@ footer a:hover {
 
 .desktop-entry__aside{
   display: grid;
-  gap: 16px;
+  gap: 14px;
   align-content: start;
 }
 
@@ -1857,16 +1857,16 @@ footer a:hover {
   margin: 0;
 
   color: rgba(31,41,51,0.48);
-  font-size: 0.75rem;
-  font-weight: 780;
+  font-size: 0.74rem;
+  font-weight: 790;
   line-height: 1.2;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
 .desktop-entry__actions{
   display: grid;
-  gap: 10px;
+  gap: 12px;
   align-content: start;
   justify-items: start;
 }
@@ -1885,7 +1885,7 @@ footer a:hover {
   color: rgba(31,41,51,0.80);
   font: inherit;
   font-size: 0.98rem;
-  font-weight: 690;
+  font-weight: 700;
   line-height: 1.35;
   text-decoration: none;
 
@@ -1900,7 +1900,7 @@ footer a:hover {
 
 .desktop-entry__cta::after{
   content: "→";
-  color: rgba(31,41,51,0.36);
+  color: rgba(31,41,51,0.34);
   font-weight: 700;
   transform: translateY(-0.5px);
 }
@@ -2022,7 +2022,7 @@ footer a:hover {
     top: auto;
     z-index: auto;
 
-    padding-top: 24px;
+    padding-top: 26px;
     padding-bottom: 0;
 
     background: transparent;
@@ -2034,49 +2034,50 @@ footer a:hover {
   }
 
   .top-stack .events-filter{
-    padding: 28px 30px 0;
+    padding: 34px 38px 0;
 
-    border: 1px solid rgba(31,41,51,0.08);
+    border: 1px solid rgba(31,41,51,0.07);
     border-bottom: 0;
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
+    border-top-left-radius: 36px;
+    border-top-right-radius: 36px;
 
     background:
       linear-gradient(
         180deg,
-        color-mix(in srgb, white 72%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 88%, var(--color-primary-muted)) 58%,
-        color-mix(in srgb, white 93%, var(--color-primary-muted)) 100%
+        color-mix(in srgb, white 70%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 86%, var(--color-primary-muted)) 56%,
+        color-mix(in srgb, white 92%, var(--color-primary-muted)) 100%
       );
 
     box-shadow:
       0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.84) inset;
+      0 1px 0 rgba(255,255,255,0.86) inset;
   }
 
   .top-stack #search-filter{
     max-width: none;
-    height: 60px;
-    padding-left: 18px;
-    padding-right: 18px;
+    height: 72px;
+    padding-left: 22px;
+    padding-right: 22px;
 
-    font-size: 1.02rem;
-    font-weight: 560;
+    font-size: 1.08rem;
+    font-weight: 570;
 
     border-color: rgba(31,41,51,0.11);
-    background: rgba(255,255,255,0.94);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.96);
     box-shadow:
-      0 8px 18px rgba(31,41,51,0.04),
-      0 1px 0 rgba(255,255,255,0.88) inset;
+      0 10px 22px rgba(31,41,51,0.04),
+      0 1px 0 rgba(255,255,255,0.90) inset;
   }
 
   .top-stack .filters-bar{
     max-width: none;
     margin: 0;
-    padding: 16px 30px 26px;
+    padding: 16px 38px 24px;
 
-    border-left: 1px solid rgba(31,41,51,0.08);
-    border-right: 1px solid rgba(31,41,51,0.08);
+    border-left: 1px solid rgba(31,41,51,0.07);
+    border-right: 1px solid rgba(31,41,51,0.07);
 
     background:
       linear-gradient(
@@ -2087,7 +2088,8 @@ footer a:hover {
   }
 
   .top-stack .filters-bar .filter-pill{
-    background: rgba(255,255,255,0.74);
+    min-height: 44px;
+    background: rgba(255,255,255,0.76);
     border-color: rgba(31,41,51,0.08);
     box-shadow: 0 1px 0 rgba(255,255,255,0.84) inset;
   }
@@ -2095,19 +2097,20 @@ footer a:hover {
   .desktop-entry{
     display: block;
     padding-top: 0;
-    padding-bottom: 20px;
+    padding-bottom: 24px;
   }
 
   .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1.72fr) minmax(240px, 0.68fr);
-    gap: 34px;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+    align-items: end;
+    gap: 30px 40px;
 
-    padding: 8px 30px 32px;
+    padding: 12px 38px 36px;
 
-    border: 1px solid rgba(31,41,51,0.08);
+    border: 1px solid rgba(31,41,51,0.07);
     border-top: 0;
-    border-bottom-left-radius: 32px;
-    border-bottom-right-radius: 32px;
+    border-bottom-left-radius: 36px;
+    border-bottom-right-radius: 36px;
 
     background:
       linear-gradient(
@@ -2118,19 +2121,35 @@ footer a:hover {
 
     box-shadow:
       0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.84) inset;
+      0 1px 0 rgba(255,255,255,0.86) inset;
   }
 
   .desktop-entry__content{
-    gap: 14px;
-    padding-top: 4px;
+    max-width: 760px;
+    gap: 16px;
+    padding-top: 8px;
   }
 
   .desktop-entry__aside{
+    justify-self: end;
+    align-self: end;
+    width: 100%;
+    max-width: 280px;
     gap: 16px;
-    padding-top: 8px;
-    padding-left: 28px;
-    border-left: 1px solid rgba(31,41,51,0.07);
+
+    padding: 20px 22px 18px;
+
+    border: 1px solid rgba(31,41,51,0.07);
+    border-radius: 24px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255,255,255,0.90) 0%,
+        rgba(255,255,255,0.72) 100%
+      );
+    box-shadow:
+      0 10px 22px rgba(31,41,51,0.04),
+      0 1px 0 rgba(255,255,255,0.88) inset;
   }
 
   .events-section{
@@ -2340,16 +2359,16 @@ footer a:hover {
     gap: 24px;
   }
 
+  .desktop-entry__content{
+    max-width: none;
+  }
+
   .desktop-entry__aside{
-    gap: 14px;
-    padding-top: 0;
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid rgba(31,41,51,0.07);
-    padding-top: 18px;
+    justify-self: start;
+    max-width: 320px;
   }
 }
-/* === END BLOCK: DESKTOP_STAGE_SURFACE_V4 === */
+/* === END BLOCK: DESKTOP_STAGE_SURFACE_V5 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4470,6 +4489,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
