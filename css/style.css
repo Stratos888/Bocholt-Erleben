@@ -1755,58 +1755,59 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V3 | Purpose: Desktop-Bühne konsolidieren und Desktop-Feed/Card-Layer ergänzen, Mobile bleibt unverändert | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; enthält Header/Desktop-Stage sowie Desktop-only Feed/Card-Anreicherung === */
+/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V4 | Purpose: Desktop-Bühne auf finalen Zielzustand schärfen; Suche klar primär, Filter sekundär, linker Intro-Bereich editorialer, rechte Spalte als ruhiger Service-Bereich | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; Feed/Card-Layer bleibt enthalten === */
 .desktop-entry{
   display: none;
-  padding: 0 var(--gutter) 18px;
+  padding: 0 var(--gutter) 20px;
 }
 
 .desktop-entry__inner{
   display: grid;
-  gap: 22px;
+  gap: 24px;
 }
 
 .desktop-entry__content{
   display: grid;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
 }
 
 .desktop-entry__eyebrow{
   margin: 0;
 
-  color: #5e7190;
-  font-size: 0.77rem;
+  color: #617492;
+  font-size: 0.76rem;
   font-weight: 780;
   line-height: 1.2;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 
 .desktop-entry__title{
   margin: 0;
 
-  max-width: 16ch;
+  max-width: 14ch;
   color: var(--color-text-primary);
-  font-size: clamp(1.5rem, 1.15rem + 1.05vw, 2.15rem);
-  font-weight: 780;
-  line-height: 1.03;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.7rem, 1.2rem + 1.28vw, 2.38rem);
+  font-weight: 790;
+  line-height: 1.01;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
 }
 
 .desktop-entry__text{
   margin: 0;
 
-  max-width: 60ch;
-  color: rgba(31,41,51,0.86);
-  font-size: 1rem;
-  font-weight: 570;
-  line-height: 1.5;
+  max-width: 58ch;
+  color: rgba(31,41,51,0.78);
+  font-size: 1.02rem;
+  font-weight: 560;
+  line-height: 1.58;
 }
 
 .desktop-entry__facts{
   list-style: none;
-  margin: 6px 0 0;
+  margin: 10px 0 0;
   padding: 0;
 
   display: flex;
@@ -1823,14 +1824,17 @@ footer a:hover {
   padding: 0 12px;
 
   border-radius: 999px;
-  border: 1px solid rgba(31,41,51,0.08);
-  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(31,41,51,0.07);
+  background: rgba(255,255,255,0.56);
 
-  color: rgba(31,41,51,0.78);
-  font-size: 0.9rem;
-  font-weight: 640;
+  color: rgba(31,41,51,0.72);
+  font-size: 0.88rem;
+  font-weight: 660;
   line-height: 1;
-  box-shadow: 0 1px 2px rgba(31,41,51,0.025);
+
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.82) inset,
+    0 1px 2px rgba(31,41,51,0.02);
 }
 
 .desktop-entry__facts li::before{
@@ -1839,71 +1843,64 @@ footer a:hover {
   height: 7px;
   flex: 0 0 auto;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-primary) 82%, white);
-  box-shadow: 0 0 0 4px rgba(118,173,47,0.10);
+  background: color-mix(in srgb, var(--color-primary) 84%, white);
+  box-shadow: 0 0 0 4px rgba(118,173,47,0.09);
 }
 
 .desktop-entry__aside{
   display: grid;
-  gap: 12px;
+  gap: 16px;
   align-content: start;
 }
 
 .desktop-entry__aside-title{
   margin: 0;
 
-  color: rgba(31,41,51,0.56);
-  font-size: 0.76rem;
-  font-weight: 760;
+  color: rgba(31,41,51,0.48);
+  font-size: 0.75rem;
+  font-weight: 780;
   line-height: 1.2;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 
 .desktop-entry__actions{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 12px;
-  align-items: center;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  justify-items: start;
 }
 
-.desktop-entry__cta,
-.desktop-entry__app-link{
+.desktop-entry__cta{
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
 
-  min-height: 40px;
-  padding: 0 14px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 
-  border-radius: 999px;
-  border: 1px solid rgba(31,41,51,0.10);
-  background: rgba(255,255,255,0.72);
-
-  color: rgba(31,41,51,0.82);
+  color: rgba(31,41,51,0.80);
   font: inherit;
-  font-size: 0.94rem;
-  font-weight: 680;
-  line-height: 1;
+  font-size: 0.98rem;
+  font-weight: 690;
+  line-height: 1.35;
   text-decoration: none;
-
-  box-shadow: 0 1px 2px rgba(31,41,51,0.025);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
   transition:
-    background 140ms ease,
-    border-color 140ms ease,
     color 140ms ease,
-    box-shadow 140ms ease,
+    text-decoration-color 140ms ease,
     transform 140ms ease;
 }
 
 .desktop-entry__cta::after{
   content: "→";
-  color: rgba(31,41,51,0.42);
+  color: rgba(31,41,51,0.36);
   font-weight: 700;
   transform: translateY(-0.5px);
 }
@@ -1917,20 +1914,32 @@ footer a:hover {
 }
 
 .desktop-entry__app-link{
-  justify-content: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
   width: fit-content;
-  padding-left: 0;
-  padding-right: 0;
   min-height: auto;
+  padding: 0;
 
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
 
-  color: rgba(31,41,51,0.58);
+  color: rgba(31,41,51,0.56);
+  font: inherit;
   font-size: 0.9rem;
-  font-weight: 650;
+  font-weight: 640;
+  line-height: 1.4;
+  text-decoration: none;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    color 140ms ease,
+    transform 140ms ease;
 }
 
 .desktop-entry__app-link::before{
@@ -1940,7 +1949,7 @@ footer a:hover {
   flex: 0 0 auto;
 
   background-color: currentColor;
-  opacity: 0.8;
+  opacity: 0.78;
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
@@ -1960,15 +1969,18 @@ footer a:hover {
 
 @media (hover: hover){
   .desktop-entry__cta:hover{
-    background: rgba(255,255,255,0.94);
-    border-color: rgba(31,41,51,0.14);
-    box-shadow:
-      0 8px 18px rgba(31,41,51,0.06),
-      0 1px 0 rgba(255,255,255,0.78) inset;
+    color: rgba(31,41,51,0.92);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+  }
+
+  .desktop-entry__cta--publish:hover{
+    color: #496d1f;
   }
 
   .desktop-entry__app-link:hover{
-    color: rgba(31,41,51,0.74);
+    color: rgba(31,41,51,0.72);
   }
 }
 
@@ -1981,6 +1993,7 @@ footer a:hover {
 .desktop-entry__app-link:focus-visible{
   outline: 2px solid var(--cmp-btn-focus-ring);
   outline-offset: 3px;
+  border-radius: 8px;
 }
 
 @media (min-width: 900px){
@@ -2009,7 +2022,7 @@ footer a:hover {
     top: auto;
     z-index: auto;
 
-    padding-top: 22px;
+    padding-top: 24px;
     padding-bottom: 0;
 
     background: transparent;
@@ -2021,35 +2034,46 @@ footer a:hover {
   }
 
   .top-stack .events-filter{
-    padding: 26px 28px 0;
+    padding: 28px 30px 0;
 
     border: 1px solid rgba(31,41,51,0.08);
     border-bottom: 0;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
 
     background:
       linear-gradient(
         180deg,
-        color-mix(in srgb, white 74%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 90%, var(--color-primary-muted)) 100%
+        color-mix(in srgb, white 72%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 88%, var(--color-primary-muted)) 58%,
+        color-mix(in srgb, white 93%, var(--color-primary-muted)) 100%
       );
 
     box-shadow:
       0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.82) inset;
+      0 1px 0 rgba(255,255,255,0.84) inset;
   }
 
   .top-stack #search-filter{
     max-width: none;
-    height: 56px;
-    font-size: 1rem;
+    height: 60px;
+    padding-left: 18px;
+    padding-right: 18px;
+
+    font-size: 1.02rem;
+    font-weight: 560;
+
+    border-color: rgba(31,41,51,0.11);
+    background: rgba(255,255,255,0.94);
+    box-shadow:
+      0 8px 18px rgba(31,41,51,0.04),
+      0 1px 0 rgba(255,255,255,0.88) inset;
   }
 
   .top-stack .filters-bar{
     max-width: none;
     margin: 0;
-    padding: 14px 28px 24px;
+    padding: 16px 30px 26px;
 
     border-left: 1px solid rgba(31,41,51,0.08);
     border-right: 1px solid rgba(31,41,51,0.08);
@@ -2057,44 +2081,56 @@ footer a:hover {
     background:
       linear-gradient(
         180deg,
-        color-mix(in srgb, white 90%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 89%, var(--color-primary-muted)) 0%,
         color-mix(in srgb, white 95%, var(--color-primary-muted)) 100%
       );
+  }
+
+  .top-stack .filters-bar .filter-pill{
+    background: rgba(255,255,255,0.74);
+    border-color: rgba(31,41,51,0.08);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.84) inset;
   }
 
   .desktop-entry{
     display: block;
     padding-top: 0;
-    padding-bottom: 18px;
+    padding-bottom: 20px;
   }
 
   .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1.65fr) minmax(250px, 0.72fr);
-    gap: 28px;
+    grid-template-columns: minmax(0, 1.72fr) minmax(240px, 0.68fr);
+    gap: 34px;
 
-    padding: 0 28px 28px;
+    padding: 8px 30px 32px;
 
     border: 1px solid rgba(31,41,51,0.08);
     border-top: 0;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 32px;
 
     background:
       linear-gradient(
         180deg,
-        color-mix(in srgb, white 95%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 98%, var(--color-primary-muted)) 100%
+        color-mix(in srgb, white 96%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 99%, var(--color-primary-muted)) 100%
       );
 
     box-shadow:
       0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.82) inset;
+      0 1px 0 rgba(255,255,255,0.84) inset;
+  }
+
+  .desktop-entry__content{
+    gap: 14px;
+    padding-top: 4px;
   }
 
   .desktop-entry__aside{
-    padding-top: 6px;
+    gap: 16px;
+    padding-top: 8px;
     padding-left: 28px;
-    border-left: 1px solid rgba(31,41,51,0.08);
+    border-left: 1px solid rgba(31,41,51,0.07);
   }
 
   .events-section{
@@ -2301,15 +2337,19 @@ footer a:hover {
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-entry__inner{
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .desktop-entry__aside{
+    gap: 14px;
     padding-top: 0;
     padding-left: 0;
     border-left: 0;
+    border-top: 1px solid rgba(31,41,51,0.07);
+    padding-top: 18px;
   }
 }
-/* === END BLOCK: DESKTOP_STAGE_SURFACE_V3 === */
+/* === END BLOCK: DESKTOP_STAGE_SURFACE_V4 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4430,6 +4470,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
