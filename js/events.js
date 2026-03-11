@@ -518,9 +518,13 @@ function createCard(event) {
   card.appendChild(badge);
   card.appendChild(body);
 
+  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V1 | Purpose: Auf Desktop niemals Detailpanel öffnen; stattdessen nur Primär-URL nutzen oder Card ohne Aktion lassen; Mobile bleibt unverändert | Scope: ersetzt ausschließlich openCard innerhalb createCard === */
   const openCard = () => {
-    if (isDesktopViewport() && primaryUrl) {
-      if (openPrimaryDesktopTarget(primaryUrl)) return;
+    if (isDesktopViewport()) {
+      if (primaryUrl) {
+        openPrimaryDesktopTarget(primaryUrl);
+      }
+      return;
     }
 
     if (window.DetailPanel?.show) {
@@ -532,6 +536,7 @@ function createCard(event) {
       openPrimaryDesktopTarget(primaryUrl);
     }
   };
+  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V1 === */
 
   card.addEventListener("click", openCard);
 
@@ -801,6 +806,7 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS
+
 
 
 
