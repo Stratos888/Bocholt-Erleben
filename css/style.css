@@ -1755,7 +1755,7 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V2 | Purpose: Desktop-Header leeren, Top-Stage als gemeinsame Homepage-Bühne komponieren und Desktop-Entry erwachsener staffeln; Mobile bleibt unverändert | Scope: ersetzt den bisherigen Desktop-Entry-Block vollständig und kapselt alle neuen Desktop-only Regeln für Header/Top-Stage/Desktop-Entry === */
+/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V3 | Purpose: Desktop-Bühne konsolidieren und Desktop-Feed/Card-Layer ergänzen, Mobile bleibt unverändert | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; enthält Header/Desktop-Stage sowie Desktop-only Feed/Card-Anreicherung === */
 .desktop-entry{
   display: none;
   padding: 0 var(--gutter) 18px;
@@ -1952,6 +1952,12 @@ footer a:hover {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
 }
 
+.event-card-desc,
+.event-card-meta-quiet,
+.event-card-actions{
+  display: none;
+}
+
 @media (hover: hover){
   .desktop-entry__cta:hover{
     background: rgba(255,255,255,0.94);
@@ -2092,7 +2098,203 @@ footer a:hover {
   }
 
   .events-section{
-    padding-top: 6px;
+    padding-top: 8px;
+  }
+
+  .events-feed-group{
+    display: grid;
+    gap: 12px;
+  }
+
+  .events-feed-group + .events-feed-group{
+    margin-top: 8px;
+  }
+
+  .events-section-title{
+    margin: 0;
+    padding-left: 2px;
+
+    color: rgba(60,72,88,0.58);
+    font-size: 0.78rem;
+    font-weight: 760;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .events-feed-group__grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+  }
+
+  .event-card{
+    --rail-w: 72px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+    align-items: start;
+
+    min-height: 172px;
+    padding-top: 16px;
+    padding-right: 18px;
+    padding-bottom: 16px;
+
+    border-radius: 22px;
+    box-shadow:
+      0 10px 24px rgba(31,41,51,0.05),
+      0 1px 0 rgba(255,255,255,0.78) inset;
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 20%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 54%, var(--color-primary-muted)) 100%
+    );
+  }
+
+  .event-date-badge{
+    width: 50px;
+    margin-top: 2px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border-radius: 14px;
+  }
+
+  .event-date-badge__wday{
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+  }
+
+  .event-date-badge__day{
+    font-size: 1.45rem;
+  }
+
+  .event-date-badge__month{
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+  }
+
+  .event-card-body{
+    gap: 8px;
+    padding-top: 2px;
+  }
+
+  .event-title{
+    font-size: 1.08rem;
+    line-height: 1.2;
+  }
+
+  .event-title__text{
+    -webkit-line-clamp: 2;
+  }
+
+  .event-meta{
+    font-size: 0.93rem;
+    color: rgba(31,41,51,0.72);
+  }
+
+  .event-card-desc{
+    display: -webkit-box;
+    margin: 0;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    color: rgba(31,41,51,0.76);
+    font-size: 0.94rem;
+    font-weight: 500;
+    line-height: 1.48;
+  }
+
+  .event-card-meta-quiet{
+    display: block;
+    min-width: 0;
+
+    color: rgba(31,41,51,0.54);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-card-actions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 2px;
+  }
+
+  .event-card-action{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 0;
+    border: 0;
+    background: transparent;
+
+    color: rgba(31,41,51,0.72);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 680;
+    line-height: 1;
+    text-decoration: none;
+
+    cursor: pointer;
+  }
+
+  .event-card-action::after{
+    content: "↗";
+    color: rgba(31,41,51,0.34);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transform: translateY(-0.5px);
+  }
+
+  .event-card-action:nth-child(2)::after,
+  .event-card-action:nth-child(3)::after{
+    content: "";
+    width: 0;
+    height: 0;
+  }
+
+  .event-card-action--primary{
+    color: #557f22;
+  }
+
+  @media (hover: hover){
+    .event-card:hover{
+      border-color: rgba(31,41,51,0.16);
+      box-shadow:
+        0 16px 34px rgba(31,41,51,0.07),
+        0 1px 0 rgba(255,255,255,0.80) inset;
+    }
+
+    .event-card-action:hover{
+      color: rgba(31,41,51,0.88);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-thickness: 1px;
+    }
+
+    .event-card-action--primary:hover{
+      color: #496d1f;
+    }
+  }
+
+  .event-card-action:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 3px;
+    border-radius: 8px;
   }
 }
 
@@ -2107,7 +2309,7 @@ footer a:hover {
     border-left: 0;
   }
 }
-/* === END BLOCK: DESKTOP_STAGE_SURFACE_V2 === */
+/* === END BLOCK: DESKTOP_STAGE_SURFACE_V3 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4208,6 +4410,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
