@@ -105,30 +105,30 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: ordnet die Desktop-Bühne auf den Zielzustand um – links starke Intro-Spalte, rechts große Search-Hero-Card mit integrierter CTA-Leiste; Scope: ersetzt nur den Hero-Markup-Block, Mobile bleibt über CSS unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: setzt den Desktop-Hero als Single-Hero-Struktur neu auf – oben ruhige Brand-Fläche, darunter breite Search-Hero-Card mit integrierter Service-Leiste; Scope: ersetzt nur den Hero-Markup-Block inkl. Filter-Sheets, Mobile bleibt über CSS unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
-  <section class="desktop-entry" aria-label="Einführung">
+  <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
       <div class="desktop-entry__content">
         <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
         <h1 class="desktop-entry__title">Bocholt erleben</h1>
         <p class="desktop-entry__text desktop-entry__text--lead">
-          Alle Events, Märkte und Kulturveranstaltungen in Bocholt – aktuell und übersichtlich an einem Ort.
+          Alle Events, Märkte und Kulturveranstaltungen in Bocholt – aktuell, lokal und übersichtlich an einem Ort.
         </p>
       </div>
     </div>
   </section>
 
-  <div class="top-stack desktop-hero__search">
-    <div class="desktop-hero__search-intro" aria-hidden="true">
-      <p class="desktop-hero__search-title">Finde Events in Bocholt</p>
+  <div class="top-stack desktop-hero__panel">
+    <div class="desktop-hero__panel-head">
+      <p class="desktop-hero__panel-kicker">Finde Veranstaltungen in Bocholt</p>
     </div>
 
     <div class="events-filter">
       <input
         id="search-filter"
         type="search"
-        placeholder="Events oder Orte suchen..."
+        placeholder="Suche nach Events oder Orten"
         aria-label="Suche"
         autocomplete="off"
         inputmode="search"
@@ -151,18 +151,18 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       </button>
     </div>
 
-    <div class="desktop-hero__search-actions" aria-label="Service">
-      <a class="desktop-hero__service desktop-hero__service--publish" href="/events-veroeffentlichen/">
+    <div class="desktop-hero__actions" aria-label="Service">
+      <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
         Event veröffentlichen
       </a>
 
-      <a class="desktop-hero__service desktop-hero__service--info" href="/info/">
+      <a class="desktop-hero__action desktop-hero__action--info" href="/info/">
         Mehr erfahren
       </a>
 
       <button
         type="button"
-        class="desktop-hero__service desktop-hero__service--app"
+        class="desktop-hero__action desktop-hero__action--app"
         data-pwa-install-trigger
         aria-label="Als App installieren"
       >
@@ -171,6 +171,44 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
   </div>
 </section>
+
+<div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
+  <div class="filter-sheet__overlay" data-close-sheet></div>
+  <div class="filter-sheet__card">
+    <div class="filter-sheet__header">
+      <div class="filter-sheet__title">Zeit</div>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+    </div>
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
+      <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
+      <button type="button" class="filter-sheet-option" data-time="week">Diese Woche</button>
+      <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
+      <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
+      <button type="button" class="filter-sheet-option" data-time="later">Später</button>
+    </div>
+  </div>
+</div>
+
+<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
+  <div class="filter-sheet__overlay" data-close-sheet></div>
+  <div class="filter-sheet__card">
+    <div class="filter-sheet__header">
+      <div class="filter-sheet__title">Kategorie</div>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+    </div>
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
+      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
+      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
+      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
+      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
+      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
+      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
+    </div>
+  </div>
+</div>
 <!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
    <!-- EVENT CARDS SECTION -->
@@ -362,6 +400,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
