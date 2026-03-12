@@ -2179,7 +2179,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V7 === */
 
-/* === BEGIN BLOCK: FEED_GROUP_BASELINE_RESTORE_V1 | Zweck: stellt den alten Mobile-Stack-Abstand der Event-Cards wieder her und kapselt Desktop-Grid weiterhin sauber ab | Umfang: Default/Mobile-Regeln für events-feed-group + Desktop-Overrides ab 900px === */
+/* === BEGIN BLOCK: FEED_GROUP_BASELINE_RESTORE_V2 | Zweck: stellt den alten Event-Card-Abstand wieder her, ohne die Mobile-Kartenhöhe zu beschädigen | Umfang: korrigiert events-feed-group / events-feed-group__grid für Mobile/Default und behält Desktop-Grid ab 900px bei === */
 .events-feed-group{
   display: grid;
   gap: var(--feed-title-mb);
@@ -2190,8 +2190,8 @@ footer a:hover {
 }
 
 .events-feed-group__grid{
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--feed-cards-gap);
 }
 
@@ -2226,7 +2226,7 @@ footer a:hover {
     gap: 14px 16px;
   }
 }
-/* === END BLOCK: FEED_GROUP_BASELINE_RESTORE_V1 === */
+/* === END BLOCK: FEED_GROUP_BASELINE_RESTORE_V2 === */
 
   .event-card{
     --rail-w: 72px;
@@ -4538,6 +4538,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
