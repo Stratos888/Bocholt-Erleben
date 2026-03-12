@@ -1682,46 +1682,31 @@ footer a:hover {
   .event-cards-grid { grid-template-columns: 1fr; }
 }
 
-/* Desktop: Frame zentrieren + Grid angenehmer skalieren */
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V6 | Zweck: Kapselt Desktop-Hero und Feed sauber auf Container-Ebene; Scope: ersetzt die bisher getrennte Desktop-Rahmung von top-stack und desktop-entry durch eine gemeinsame Hero-Rahmung, Mobile bleibt unverändert === */
 @media (min-width: 900px) {
-  .top-stack,
-  .desktop-entry,
+  .desktop-hero,
   .events-section{
-    max-width: 1040px;
+    max-width: 1120px;
     margin-left: auto;
     margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 
-  .top-stack{
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .desktop-entry{
-    padding-left: 24px;
-    padding-right: 24px;
+  .desktop-hero{
+    padding-top: 26px;
   }
 
   .events-section{
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .top-stack{
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .events-section{
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-top: 14px;
   }
 
   .event-cards-grid{
-    max-width: 1040px;
+    max-width: 1120px;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
+/* === END BLOCK: DESKTOP_HERO_FRAME_V6 === */
 
 
 /* ============================================
@@ -1755,10 +1740,14 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_STAGE_SURFACE_V5 | Purpose: Desktop-Bühne strukturell neu bauen; Search-Hero oben, Intro-Hero links und kleines angedocktes Service-Modul rechts unten, ohne Mobile oder Feed-Verhalten zu beschädigen | Scope: ersetzt den bisherigen Desktop-Stage-Block vollständig; Feed/Card-Layer bleibt enthalten === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: Definiert die gemeinsame Hero-Struktur mit natürlicher Headline-Breite, kompakter Content-Zone und ruhigem Service-Modul; Scope: ersetzt die bisherigen desktop-entry Basisregeln vollständig, ohne Mobile-Layout oder Feed-Logik zu verändern === */
+.desktop-hero{
+  position: relative;
+}
+
 .desktop-entry{
   display: none;
-  padding: 0 var(--gutter) 22px;
+  padding: 0;
 }
 
 .desktop-entry__inner{
@@ -1770,11 +1759,11 @@ footer a:hover {
   display: grid;
   gap: 14px;
   min-width: 0;
+  align-content: start;
 }
 
 .desktop-entry__eyebrow{
   margin: 0;
-
   color: #5f7290;
   font-size: 0.76rem;
   font-weight: 790;
@@ -1785,31 +1774,28 @@ footer a:hover {
 
 .desktop-entry__title{
   margin: 0;
-
-  max-width: 11.5ch;
+  max-width: 18ch;
   color: var(--color-text-primary);
-  font-size: clamp(2rem, 1.48rem + 1.45vw, 3rem);
+  font-size: clamp(2.15rem, 1.7rem + 1.3vw, 3.2rem);
   font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: -0.05em;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
   text-wrap: balance;
 }
 
 .desktop-entry__text{
   margin: 2px 0 0;
-
-  max-width: 46ch;
+  max-width: 54ch;
   color: rgba(31,41,51,0.80);
-  font-size: 1.06rem;
+  font-size: 1.05rem;
   font-weight: 560;
-  line-height: 1.58;
+  line-height: 1.6;
 }
 
 .desktop-entry__facts{
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
-
   display: flex;
   flex-wrap: wrap;
   gap: 10px 12px;
@@ -1819,19 +1805,15 @@ footer a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   min-height: 36px;
   padding: 0 13px;
-
   border-radius: 999px;
   border: 1px solid rgba(31,41,51,0.07);
-  background: rgba(255,255,255,0.58);
-
-  color: rgba(31,41,51,0.72);
+  background: rgba(255,255,255,0.62);
+  color: rgba(31,41,51,0.74);
   font-size: 0.89rem;
   font-weight: 660;
   line-height: 1;
-
   box-shadow:
     0 1px 0 rgba(255,255,255,0.84) inset,
     0 1px 2px rgba(31,41,51,0.02);
@@ -1855,7 +1837,6 @@ footer a:hover {
 
 .desktop-entry__aside-title{
   margin: 0;
-
   color: rgba(31,41,51,0.48);
   font-size: 0.74rem;
   font-weight: 790;
@@ -1875,23 +1856,19 @@ footer a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   min-height: 0;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
-
   color: rgba(31,41,51,0.80);
   font: inherit;
   font-size: 0.98rem;
   font-weight: 700;
   line-height: 1.35;
   text-decoration: none;
-
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
   transition:
     color 140ms ease,
     text-decoration-color 140ms ease,
@@ -1917,26 +1894,21 @@ footer a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   width: fit-content;
   min-height: auto;
   padding: 0;
-
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-
   color: rgba(31,41,51,0.56);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 640;
   line-height: 1.4;
   text-decoration: none;
-
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
   transition:
     color 140ms ease,
     transform 140ms ease;
@@ -1947,10 +1919,8 @@ footer a:hover {
   width: 14px;
   height: 14px;
   flex: 0 0 auto;
-
   background-color: currentColor;
   opacity: 0.78;
-
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
@@ -1959,29 +1929,6 @@ footer a:hover {
   mask-size: contain;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
-}
-
-.event-card-desc,
-.event-card-meta-quiet,
-.event-card-actions{
-  display: none;
-}
-
-.events-feed-group{
-  display: grid;
-  gap: 12px;
-}
-
-.events-feed-group + .events-feed-group{
-  margin-top: 8px;
-}
-
-.events-feed-group__grid{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-  display: none;
 }
 
 @media (hover: hover){
@@ -2012,7 +1959,9 @@ footer a:hover {
   outline-offset: 3px;
   border-radius: 8px;
 }
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === */
 
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V6 | Zweck: Baut auf Desktop eine einzige Hero-Fläche mit integrierter Search-Zone oben und kompakter Content-Zone darunter; Scope: ersetzt die bisher getrennte Desktop-Behandlung von top-stack und desktop-entry, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -2024,62 +1973,47 @@ footer a:hover {
     display: none;
   }
 
-  .top-stack,
-  .desktop-entry,
-  .events-section{
-    max-width: 1120px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 32px;
-    padding-right: 32px;
+  .desktop-hero{
+    display: grid;
+    gap: 0;
+    padding: 26px 38px 34px;
+    border: 1px solid rgba(31,41,51,0.07);
+    border-radius: 36px;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, white 70%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 88%, var(--color-primary-muted)) 38%,
+        color-mix(in srgb, white 96%, var(--color-primary-muted)) 100%
+      );
+    box-shadow:
+      0 22px 48px rgba(31,41,51,0.055),
+      0 1px 0 rgba(255,255,255,0.86) inset;
   }
 
   .top-stack{
     position: static;
     top: auto;
     z-index: auto;
-
-    padding-top: 26px;
-    padding-bottom: 0;
-
+    padding: 0 0 18px;
     background: transparent;
     border-bottom: 0;
     box-shadow: none;
-
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
   .top-stack .events-filter{
-    padding: 34px 38px 0;
-
-    border: 1px solid rgba(31,41,51,0.07);
-    border-bottom: 0;
-    border-top-left-radius: 36px;
-    border-top-right-radius: 36px;
-
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, white 70%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 86%, var(--color-primary-muted)) 56%,
-        color-mix(in srgb, white 92%, var(--color-primary-muted)) 100%
-      );
-
-    box-shadow:
-      0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.86) inset;
+    padding: 0;
   }
 
   .top-stack #search-filter{
     max-width: none;
-    height: 72px;
+    height: 74px;
     padding-left: 22px;
     padding-right: 22px;
-
     font-size: 1.08rem;
     font-weight: 570;
-
     border-color: rgba(31,41,51,0.11);
     border-radius: 20px;
     background: rgba(255,255,255,0.96);
@@ -2091,17 +2025,9 @@ footer a:hover {
   .top-stack .filters-bar{
     max-width: none;
     margin: 0;
-    padding: 16px 38px 24px;
-
-    border-left: 1px solid rgba(31,41,51,0.07);
-    border-right: 1px solid rgba(31,41,51,0.07);
-
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, white 89%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 95%, var(--color-primary-muted)) 100%
-      );
+    padding: 14px 0 0;
+    border: 0;
+    background: transparent;
   }
 
   .top-stack .filters-bar .filter-pill{
@@ -2113,50 +2039,43 @@ footer a:hover {
 
   .desktop-entry{
     display: block;
-    padding-top: 0;
-    padding-bottom: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(31,41,51,0.07);
   }
 
   .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
-    align-items: end;
-    gap: 30px 40px;
-
-    padding: 12px 38px 36px;
-
-    border: 1px solid rgba(31,41,51,0.07);
-    border-top: 0;
-    border-bottom-left-radius: 36px;
-    border-bottom-right-radius: 36px;
-
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, white 96%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 99%, var(--color-primary-muted)) 100%
-      );
-
-    box-shadow:
-      0 22px 48px rgba(31,41,51,0.055),
-      0 1px 0 rgba(255,255,255,0.86) inset;
+    grid-template-columns: minmax(0, 1fr) minmax(238px, 278px);
+    align-items: start;
+    gap: 24px 40px;
   }
 
   .desktop-entry__content{
     max-width: 760px;
     gap: 16px;
-    padding-top: 8px;
   }
 
   .desktop-entry__aside{
     justify-self: end;
-    align-self: end;
+    align-self: start;
     width: 100%;
-    max-width: 280px;
+    max-width: 278px;
     gap: 16px;
-
+    margin-top: 2px;
     padding: 20px 22px 18px;
-
     border: 1px solid rgba(31,41,51,0.07);
+    border-radius: 24px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255,255,255,0.90) 0%,
+        rgba(255,255,255,0.74) 100%
+      );
+    box-shadow:
+      0 10px 22px rgba(31,41,51,0.04),
+      0 1px 0 rgba(255,255,255,0.88) inset;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V6 === */
     border-radius: 24px;
     background:
       linear-gradient(
@@ -2370,22 +2289,33 @@ footer a:hover {
   }
 }
 
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V6 | Zweck: Hält die Hero-Komposition auf schmalem Desktop stabil, ohne in Mobile einzugreifen; Scope: ersetzt den bisherigen 900-1024-Desktop-Override nur für die Bühne === */
 @media (min-width: 900px) and (max-width: 1024px){
-  .desktop-entry__inner{
-    grid-template-columns: 1fr;
-    gap: 24px;
+  .desktop-hero{
+    padding-left: 30px;
+    padding-right: 30px;
   }
 
-  .desktop-entry__content{
-    max-width: none;
+  .desktop-entry__inner{
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 248px);
+    gap: 22px 28px;
+  }
+
+  .desktop-entry__title{
+    max-width: 16ch;
+  }
+
+  .desktop-entry__text{
+    max-width: 46ch;
   }
 
   .desktop-entry__aside{
-    justify-self: start;
-    max-width: 320px;
+    max-width: 248px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }
-/* === END BLOCK: DESKTOP_STAGE_SURFACE_V5 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V6 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4506,6 +4436,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
