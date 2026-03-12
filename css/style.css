@@ -1832,7 +1832,7 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: legt die gemeinsame Hero-Grundstruktur für den Zielzustand fest – reduzierte Intro-Spalte links, Search-Hero-Card mit eigener Service-Leiste rechts; Scope: nur Hero-Basisregeln, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: definiert die neue Single-Hero-Basis für Desktop – Brand-Fläche und integrierte Search-Hero-Card mit eigener Action-Leiste; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
 .desktop-hero{
   position: relative;
 }
@@ -1856,21 +1856,21 @@ footer a:hover {
 
 .desktop-entry__eyebrow{
   margin: 0;
-  color: #67824d;
-  font-size: 0.78rem;
+  color: #6f8758;
+  font-size: 0.76rem;
   font-weight: 820;
   line-height: 1.2;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .desktop-entry__title{
   margin: 0;
   color: #16273d;
-  font-size: clamp(2.5rem, 2rem + 1.4vw, 4.4rem);
+  font-size: clamp(2.8rem, 2.2rem + 1.8vw, 5rem);
   font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
   text-wrap: balance;
 }
 
@@ -1879,46 +1879,47 @@ footer a:hover {
   color: rgba(22,39,61,0.82);
   font-size: 1rem;
   font-weight: 560;
-  line-height: 1.6;
+  line-height: 1.58;
 }
 
 .desktop-entry__text--lead{
-  max-width: 31ch;
+  max-width: 34ch;
 }
 
 .desktop-entry__facts,
-.desktop-entry__aside{
+.desktop-entry__aside,
+.desktop-entry__actions,
+.desktop-entry__cta,
+.desktop-entry__app-link,
+.desktop-hero__panel-head,
+.desktop-hero__actions{
   display: none;
 }
 
-.desktop-hero__search-intro,
-.desktop-hero__search-actions{
-  display: none;
-}
-
-.desktop-hero__search-title{
+.desktop-hero__panel-kicker{
   margin: 0;
-  color: #6b7f9a;
-  font-size: 0.98rem;
-  font-weight: 780;
+  color: rgba(22,39,61,0.56);
+  font-size: 0.8rem;
+  font-weight: 800;
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.desktop-hero__service{
+.desktop-hero__action{
   appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 58px;
-  padding: 0 20px;
+  min-height: 56px;
+  padding: 0 18px;
   border: 1px solid rgba(22,39,61,0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.84);
+  background: rgba(255,255,255,0.86);
   color: #1f3552;
   font: inherit;
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   font-weight: 720;
   line-height: 1;
   text-decoration: none;
@@ -1935,16 +1936,16 @@ footer a:hover {
     box-shadow 140ms ease;
 }
 
-.desktop-hero__service--publish{
-  color: #445a1d;
+.desktop-hero__action--publish{
+  color: #31481d;
 }
 
-.desktop-hero__service--app{
+.desktop-hero__action--app{
   font: inherit;
 }
 
 @media (hover: hover){
-  .desktop-hero__service:hover{
+  .desktop-hero__action:hover{
     border-color: rgba(22,39,61,0.12);
     background: rgba(255,255,255,0.94);
     color: #16273d;
@@ -1954,17 +1955,17 @@ footer a:hover {
   }
 }
 
-.desktop-hero__service:active{
+.desktop-hero__action:active{
   transform: translateY(1px);
 }
 
-.desktop-hero__service:focus-visible{
+.desktop-hero__action:focus-visible{
   outline: 2px solid var(--cmp-btn-focus-ring);
   outline-offset: 3px;
 }
-/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 | Zweck: baut die Desktop-Bühne bildnah zum Zielzustand um – links große ruhige Markenfläche, rechts kompakte Search-Hero-Card mit integrierter Service-Leiste und atmosphärischem Hintergrund; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den Desktop-Hero als echten Single-Hero-Reset um – oben ruhige Markenfläche, darunter breites Search-Panel mit integrierter Action-Leiste und atmosphärischem Hintergrund; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -1981,13 +1982,11 @@ footer a:hover {
     isolation: isolate;
     overflow: hidden;
     display: grid;
-    grid-template-columns: minmax(360px, 0.9fr) minmax(520px, 1.1fr);
-    grid-template-areas: "intro search";
-    align-items: start;
-    gap: 44px;
-    padding: 34px 32px 18px;
-    background:
-      linear-gradient(180deg, rgba(248,250,244,0.96) 0%, rgba(242,246,238,0.92) 100%);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 38px 32px 14px;
+    background: linear-gradient(180deg, rgba(249,251,245,0.98) 0%, rgba(242,246,238,0.94) 100%);
+    border: 0;
     border-radius: 0;
     box-shadow: none;
   }
@@ -1998,64 +1997,52 @@ footer a:hover {
     inset: 0;
     z-index: -3;
     background:
-      radial-gradient(circle at 18% 22%, rgba(208,228,171,0.34) 0%, rgba(208,228,171,0.00) 30%),
-      radial-gradient(circle at 78% 30%, rgba(233,208,157,0.24) 0%, rgba(233,208,157,0.00) 28%),
+      radial-gradient(circle at 16% 18%, rgba(205,227,166,0.36) 0%, rgba(205,227,166,0.00) 28%),
+      radial-gradient(circle at 84% 24%, rgba(241,211,158,0.28) 0%, rgba(241,211,158,0.00) 22%),
       linear-gradient(180deg, rgba(250,252,246,0.98) 0%, rgba(242,246,238,0.94) 100%);
   }
 
   .desktop-hero::after{
     content: "";
     position: absolute;
-    top: 38px;
-    right: -26px;
-    width: 60%;
-    min-width: 540px;
-    height: 340px;
+    top: 32px;
+    right: -64px;
+    width: 720px;
+    height: 360px;
     z-index: -2;
-    border-radius: 999px 0 0 999px;
+    border-radius: 999px;
     background:
-      radial-gradient(circle at 28% 52%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.66) 22%, rgba(255,255,255,0.18) 44%, rgba(255,255,255,0) 58%),
-      radial-gradient(circle at 58% 48%, rgba(236,197,121,0.44) 0%, rgba(236,197,121,0.22) 12%, rgba(236,197,121,0.00) 24%),
-      radial-gradient(circle at 70% 34%, rgba(255,238,202,0.42) 0%, rgba(255,238,202,0.18) 10%, rgba(255,238,202,0.00) 22%),
-      radial-gradient(circle at 82% 58%, rgba(201,180,141,0.24) 0%, rgba(201,180,141,0.00) 20%),
-      linear-gradient(135deg, rgba(244,246,241,0.16) 0%, rgba(226,233,219,0.46) 100%);
-    filter: blur(12px) saturate(1.02);
+      radial-gradient(circle at 26% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.60) 22%, rgba(255,255,255,0.00) 50%),
+      radial-gradient(circle at 62% 42%, rgba(235,198,122,0.44) 0%, rgba(235,198,122,0.18) 12%, rgba(235,198,122,0.00) 24%),
+      radial-gradient(circle at 74% 54%, rgba(206,185,145,0.26) 0%, rgba(206,185,145,0.00) 20%),
+      linear-gradient(135deg, rgba(246,248,243,0.10) 0%, rgba(225,232,218,0.46) 100%);
+    filter: blur(12px);
     opacity: 0.98;
     pointer-events: none;
   }
 
   .desktop-entry{
-    grid-area: intro;
     display: block;
     min-width: 0;
-    padding: 26px 0 0;
-  }
-
-  .desktop-entry__inner{
-    align-content: start;
-    min-height: 100%;
+    padding: 0;
   }
 
   .desktop-entry__content{
-    max-width: 33rem;
+    max-width: 38rem;
     gap: 18px;
   }
 
   .desktop-entry__title{
-    max-width: 7.4ch;
-    font-size: clamp(4rem, 3.14rem + 1.9vw, 5.15rem);
-    line-height: 0.88;
-    letter-spacing: -0.068em;
+    max-width: 8.2ch;
+    font-size: clamp(4rem, 3.18rem + 2vw, 5.35rem);
   }
 
   .desktop-entry__text{
-    max-width: 25ch;
-    font-size: 1rem;
-    line-height: 1.52;
+    max-width: 31ch;
+    font-size: 1.04rem;
   }
 
   .top-stack{
-    grid-area: search;
     position: relative;
     top: auto;
     z-index: 1;
@@ -2063,15 +2050,15 @@ footer a:hover {
     justify-self: stretch;
     display: grid;
     gap: 18px;
-    min-width: 0;
-    max-width: none;
+    width: min(100%, 980px);
+    max-width: 980px;
+    margin-top: 2px;
     padding: 22px;
     border: 1px solid rgba(22,39,61,0.06);
     border-radius: 34px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(252,252,249,0.84) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(252,252,249,0.86) 100%);
     box-shadow:
-      0 24px 54px rgba(22,39,61,0.08),
+      0 26px 56px rgba(22,39,61,0.08),
       0 1px 0 rgba(255,255,255,0.96) inset;
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
@@ -2084,11 +2071,10 @@ footer a:hover {
     inset: 10px;
     z-index: -1;
     border-radius: 26px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(244,248,239,0.28) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.52) 0%, rgba(244,248,239,0.22) 100%);
   }
 
-  .desktop-hero__search-intro{
+  .desktop-hero__panel-head{
     display: block;
     padding: 2px 6px 0;
   }
@@ -2101,15 +2087,15 @@ footer a:hover {
   }
 
   .top-stack #search-filter{
-    max-width: none;
     width: 100%;
+    max-width: none;
     height: 92px;
     padding: 0 28px;
     border: 1px solid rgba(22,39,61,0.09);
-    border-radius: 22px;
-    background: rgba(255,255,255,0.94);
+    border-radius: 24px;
+    background: rgba(255,255,255,0.96);
     color: #16273d;
-    font-size: 1.1rem;
+    font-size: 1.14rem;
     font-weight: 620;
     letter-spacing: -0.015em;
     box-shadow:
@@ -2127,7 +2113,7 @@ footer a:hover {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     border: 0;
     background: transparent;
@@ -2153,19 +2139,18 @@ footer a:hover {
   }
 
   .top-stack .filters-bar .filter-pill--reset{
-    grid-column: 1 / -1;
     justify-content: center;
     color: rgba(22,39,61,0.72);
   }
 
-  .desktop-hero__search-actions{
+  .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     padding-top: 6px;
   }
 
-  .desktop-hero__service{
+  .desktop-hero__action{
     min-height: 60px;
     padding: 0 18px;
     border-radius: 16px;
@@ -2173,16 +2158,16 @@ footer a:hover {
     font-weight: 730;
   }
 
-  .desktop-hero__service--publish{
+  .desktop-hero__action--publish{
     border-color: rgba(136,173,79,0.28);
     background: linear-gradient(180deg, rgba(170,205,110,0.20) 0%, rgba(255,255,255,0.92) 100%);
   }
 
-  .desktop-hero__service--app{
+  .desktop-hero__action--app{
     color: #304761;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -2394,39 +2379,35 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V14 | Zweck: hält den neuen bildnahen Desktop-Hero zwischen 900px und 1024px stabil, ohne Mobile zu berühren; Scope: nur Narrow-Desktop-Feintuning für Bühne und Search-Hero-Card === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Single-Hero-Reset zwischen 900px und 1024px, ohne Mobile zu berühren; Scope: nur Narrow-Desktop-Feintuning für Bühne und Search-Hero-Card === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
-    grid-template-columns: minmax(300px, 0.86fr) minmax(420px, 1.14fr);
-    gap: 28px;
-    padding-top: 28px;
+    gap: 24px;
+    padding-top: 30px;
     padding-left: 28px;
     padding-right: 28px;
   }
 
   .desktop-hero::after{
-    top: 34px;
-    right: -34px;
-    width: 56%;
-    min-width: 420px;
-    height: 300px;
-  }
-
-  .desktop-entry{
-    padding-top: 18px;
+    top: 30px;
+    right: -110px;
+    width: 560px;
+    height: 320px;
   }
 
   .desktop-entry__title{
-    font-size: clamp(3.1rem, 2.58rem + 1.08vw, 3.9rem);
-    max-width: 7.8ch;
+    font-size: clamp(3.2rem, 2.72rem + 1.18vw, 4.2rem);
+    max-width: 8.6ch;
   }
 
   .desktop-entry__text{
-    max-width: 23ch;
-    font-size: 0.95rem;
+    max-width: 28ch;
+    font-size: 0.98rem;
   }
 
   .top-stack{
+    width: 100%;
+    max-width: none;
     padding: 18px;
     border-radius: 28px;
   }
@@ -2435,11 +2416,12 @@ footer a:hover {
     height: 82px;
     padding-left: 24px;
     padding-right: 24px;
-    font-size: 1.02rem;
+    font-size: 1.04rem;
     border-radius: 20px;
   }
 
   .top-stack .filters-bar{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -2449,18 +2431,23 @@ footer a:hover {
     padding-right: 16px;
   }
 
-  .desktop-hero__search-actions{
+  .top-stack .filters-bar .filter-pill--reset{
+    grid-column: 1 / -1;
+  }
+
+  .desktop-hero__actions{
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  .desktop-hero__service{
+  .desktop-hero__action{
     min-height: 56px;
     padding-left: 14px;
     padding-right: 14px;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V14 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4581,6 +4568,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
