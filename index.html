@@ -105,14 +105,30 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: Baut die Desktop-Bühne als eine gemeinsame Hero-Fläche mit integrierter Search-Zone oben und kompakter Content-Zone darunter; Scope: ersetzt Top-Stack, Filter-Sheets und Desktop-Entry in einem konsolidierten Block, Mobile bleibt über CSS unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: ordnet die Desktop-Bühne auf den Zielzustand um – links starke Intro-Spalte, rechts große Search-Hero-Card mit integrierter CTA-Leiste; Scope: ersetzt nur den Hero-Markup-Block, Mobile bleibt über CSS unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
+  <section class="desktop-entry" aria-label="Einführung">
+    <div class="desktop-entry__inner">
+      <div class="desktop-entry__content">
+        <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
+        <h1 class="desktop-entry__title">Bocholt erleben</h1>
+        <p class="desktop-entry__text desktop-entry__text--lead">
+          Alle Events, Märkte und Kulturveranstaltungen in Bocholt – aktuell und übersichtlich an einem Ort.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <div class="top-stack desktop-hero__search">
+    <div class="desktop-hero__search-intro" aria-hidden="true">
+      <p class="desktop-hero__search-title">Finde Events in Bocholt</p>
+    </div>
+
     <div class="events-filter">
       <input
         id="search-filter"
         type="search"
-        placeholder="Suche Events oder Orte"
+        placeholder="Events oder Orte suchen..."
         aria-label="Suche"
         autocomplete="off"
         inputmode="search"
@@ -134,85 +150,27 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         Zurücksetzen
       </button>
     </div>
-  </div>
 
-  <section class="desktop-entry" aria-label="Einführung">
-    <div class="desktop-entry__inner">
-      <div class="desktop-entry__content">
-        <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
-        <h1 class="desktop-entry__title">Bocholt erleben – lokal, aktuell, übersichtlich.</h1>
-        <p class="desktop-entry__text">Konzerte, Märkte, Kultur und mehr – übersichtlich an einem Ort für Bocholt kuratiert.</p>
+    <div class="desktop-hero__search-actions" aria-label="Service">
+      <a class="desktop-hero__service desktop-hero__service--publish" href="/events-veroeffentlichen/">
+        Event veröffentlichen
+      </a>
 
-        <ul class="desktop-entry__facts" aria-label="Qualitätsmerkmale">
-          <li>Für Bocholt kuratiert</li>
-          <li>Schnell mobil nutzbar</li>
-          <li>Direkt zur offiziellen Quelle</li>
-        </ul>
-      </div>
+      <a class="desktop-hero__service desktop-hero__service--info" href="/info/">
+        Mehr erfahren
+      </a>
 
-      <aside class="desktop-entry__aside" aria-label="Service">
-        <p class="desktop-entry__aside-title">Service</p>
-
-        <div class="desktop-entry__actions">
-          <a class="desktop-entry__cta desktop-entry__cta--publish" href="/events-veroeffentlichen/">
-            Event veröffentlichen
-          </a>
-
-          <a class="desktop-entry__cta desktop-entry__cta--info" href="/info/">
-            Mehr erfahren
-          </a>
-        </div>
-
-        <button
-          type="button"
-          class="desktop-entry__app-link"
-          data-pwa-install-trigger
-          aria-label="Als App installieren"
-        >
-          Als App nutzbar
-        </button>
-      </aside>
+      <button
+        type="button"
+        class="desktop-hero__service desktop-hero__service--app"
+        data-pwa-install-trigger
+        aria-label="Als App installieren"
+      >
+        Als App nutzen
+      </button>
     </div>
-  </section>
+  </div>
 </section>
-
-<div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
-  <div class="filter-sheet__overlay" data-close-sheet></div>
-  <div class="filter-sheet__card">
-    <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Zeit</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
-    </div>
-    <div class="filter-sheet__body">
-      <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
-      <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
-      <button type="button" class="filter-sheet-option" data-time="week">Diese Woche</button>
-      <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
-      <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
-      <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-    </div>
-  </div>
-</div>
-
-<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
-  <div class="filter-sheet__overlay" data-close-sheet></div>
-  <div class="filter-sheet__card">
-    <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Kategorie</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
-    </div>
-    <div class="filter-sheet__body">
-      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
-      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
-      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
-      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
-      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
-      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
-      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
-      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
-    </div>
-  </div>
-</div>
 <!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
    <!-- EVENT CARDS SECTION -->
@@ -404,6 +362,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
