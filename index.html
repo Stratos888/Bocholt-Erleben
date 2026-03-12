@@ -105,44 +105,77 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: GS-01 TOP-STACK + SEARCH (FilterContract: provide #search-filter) ===
-Zweck: Stellt die verpflichtende Search-UI für FilterModule bereit (id="search-filter") und nutzt bestehende CSS (#search-filter, .top-stack, .events-filter).
-Umfang: Fügt Top-Stack + Search direkt vor die Filter-Pills ein; ersetzt nur den Blockbeginn bis zur Öffnung der .filters-bar.
-=== -->
-<div class="top-stack">
-  <div class="events-filter">
-    <input
-      id="search-filter"
-      type="search"
-      placeholder="Suche Events oder Orte"
-      aria-label="Suche"
-      autocomplete="off"
-      inputmode="search"
-    >
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: Baut die Desktop-Bühne als eine gemeinsame Hero-Fläche mit integrierter Search-Zone oben und kompakter Content-Zone darunter; Scope: ersetzt Top-Stack, Filter-Sheets und Desktop-Entry in einem konsolidierten Block, Mobile bleibt über CSS unverändert === -->
+<section class="desktop-hero" aria-label="Suche und Einführung">
+  <div class="top-stack desktop-hero__search">
+    <div class="events-filter">
+      <input
+        id="search-filter"
+        type="search"
+        placeholder="Suche Events oder Orte"
+        aria-label="Suche"
+        autocomplete="off"
+        inputmode="search"
+      >
+    </div>
+
+    <div class="filters-bar" aria-label="Filter">
+      <button type="button" class="filter-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+        <span class="filter-pill__label">Zeit</span>
+        <span class="filter-pill__value" id="filter-time-value">Alle</span>
+      </button>
+
+      <button type="button" class="filter-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
+        <span class="filter-pill__label">Kategorie</span>
+        <span class="filter-pill__value" id="filter-category-value">Alle</span>
+      </button>
+
+      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" hidden>
+        Zurücksetzen
+      </button>
+    </div>
   </div>
 
- <!-- === BEGIN BLOCK: FILTER PILLS (Top-App level, category single, location later) ===
-  Zweck: Ersetzt Chip-Teppich durch 2 strukturierte Filter-Pills (Zeit + Kategorie) mit Bottom-Sheet Auswahl.
-  Umfang: Entfernt quick-interests/time-chips; führt Filter-Bar + zwei Sheets ein (Zeit/Kategorie).
-  === -->
-  <div class="filters-bar" aria-label="Filter">
-<!-- === END BLOCK: GS-01 TOP-STACK + SEARCH (FilterContract: provide #search-filter) === -->
-    <button type="button" class="filter-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-      <span class="filter-pill__label">Zeit</span>
-      <span class="filter-pill__value" id="filter-time-value">Alle</span>
-    </button>
+  <section class="desktop-entry" aria-label="Einführung">
+    <div class="desktop-entry__inner">
+      <div class="desktop-entry__content">
+        <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
+        <h1 class="desktop-entry__title">Bocholt erleben – lokal, aktuell, übersichtlich.</h1>
+        <p class="desktop-entry__text">Konzerte, Märkte, Kultur und mehr – übersichtlich an einem Ort für Bocholt kuratiert.</p>
 
-    <button type="button" class="filter-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
-      <span class="filter-pill__label">Kategorie</span>
-      <span class="filter-pill__value" id="filter-category-value">Alle</span>
-    </button>
+        <ul class="desktop-entry__facts" aria-label="Qualitätsmerkmale">
+          <li>Für Bocholt kuratiert</li>
+          <li>Schnell mobil nutzbar</li>
+          <li>Direkt zur offiziellen Quelle</li>
+        </ul>
+      </div>
 
-    <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" hidden>
-      Zurücksetzen
-    </button>
-  </div>
+      <aside class="desktop-entry__aside" aria-label="Service">
+        <p class="desktop-entry__aside-title">Service</p>
 
-  <!-- Zeit Sheet -->
+        <div class="desktop-entry__actions">
+          <a class="desktop-entry__cta desktop-entry__cta--publish" href="/events-veroeffentlichen/">
+            Event veröffentlichen
+          </a>
+
+          <a class="desktop-entry__cta desktop-entry__cta--info" href="/info/">
+            Mehr erfahren
+          </a>
+        </div>
+
+        <button
+          type="button"
+          class="desktop-entry__app-link"
+          data-pwa-install-trigger
+          aria-label="Als App installieren"
+        >
+          Als App nutzbar
+        </button>
+      </aside>
+    </div>
+  </section>
+</section>
+
 <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
   <div class="filter-sheet__overlay" data-close-sheet></div>
   <div class="filter-sheet__card">
@@ -161,46 +194,26 @@ Umfang: Fügt Top-Stack + Search direkt vor die Filter-Pills ein; ersetzt nur de
   </div>
 </div>
 
-<!-- === BEGIN BLOCK: DESKTOP_STAGE_INTRO_V3 | Purpose: Desktop-Bühne semantisch schärfen; rechte Spalte als Service-Bereich benennen und App-Hinweis ruhiger einordnen | Scope: ersetzt nur den Desktop-Entry-Block === -->
-<section class="desktop-entry" aria-label="Einführung">
-  <div class="desktop-entry__inner">
-    <div class="desktop-entry__content">
-      <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
-      <h1 class="desktop-entry__title">Bocholt erleben – lokal, aktuell, übersichtlich.</h1>
-      <p class="desktop-entry__text">Konzerte, Märkte, Kultur und mehr – übersichtlich an einem Ort.</p>
-
-      <ul class="desktop-entry__facts" aria-label="Vorteile">
-        <li>Für Bocholt kuratiert</li>
-        <li>Schnell mobil nutzbar</li>
-        <li>Direkt zur offiziellen Quelle</li>
-      </ul>
+<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
+  <div class="filter-sheet__overlay" data-close-sheet></div>
+  <div class="filter-sheet__card">
+    <div class="filter-sheet__header">
+      <div class="filter-sheet__title">Kategorie</div>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
     </div>
-
-    <div class="desktop-entry__aside" aria-label="Service">
-      <p class="desktop-entry__aside-title">Service</p>
-
-      <div class="desktop-entry__actions">
-        <a class="desktop-entry__cta desktop-entry__cta--publish" href="/events-veroeffentlichen/">
-          Event veröffentlichen
-        </a>
-
-        <a class="desktop-entry__cta desktop-entry__cta--info" href="/info/">
-          Mehr erfahren
-        </a>
-      </div>
-
-      <button
-        type="button"
-        class="desktop-entry__app-link"
-        data-pwa-install-trigger
-        aria-label="Als App installieren"
-      >
-        Als App nutzbar
-      </button>
+    <div class="filter-sheet__body">
+      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
+      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
+      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
+      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
+      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
+      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
+      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
     </div>
   </div>
-</section>
-<!-- === END BLOCK: DESKTOP_STAGE_INTRO_V3 === -->
+</div>
+<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
    <!-- EVENT CARDS SECTION -->
 <section class="events-section">
@@ -391,6 +404,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
