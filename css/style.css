@@ -1537,6 +1537,34 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 /* === END BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING === */
 
+/* === BEGIN BLOCK: MOBILE_EVENT_CARD_RESTORE_V1 | Zweck: Stellt unter 900px die kompakten Event-Cards wieder her und blendet Desktop-Zusatzinhalte auf Mobile aus; Scope: mobile-only Restore für Beschreibung, Quiet-Meta und Actions, Desktop bleibt unverändert === */
+@media (max-width: 899.98px){
+  .event-card{
+    align-items: center;
+  }
+
+  .event-card-body{
+    gap: 4px;
+    padding-top: 0;
+  }
+
+  .event-title{
+    font-size: 1.05rem;
+    line-height: 1.22;
+  }
+
+  .event-title__text{
+    -webkit-line-clamp: 2;
+  }
+
+  .event-card-desc,
+  .event-card-meta-quiet,
+  .event-card-actions{
+    display: none !important;
+  }
+}
+/* === END BLOCK: MOBILE_EVENT_CARD_RESTORE_V1 === */
+
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
 
@@ -4429,6 +4457,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
