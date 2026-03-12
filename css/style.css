@@ -2045,7 +2045,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V8 | Zweck: baut die Desktop-Bühne zu einem hochwertigen zweispaltigen Hero um (links Brand/Intro + Service, rechts Search/Filter-Panel) und lässt Mobile vollständig unangetastet | Umfang: ersetzt ausschließlich den Desktop-Hero-Block ab 900px === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V9 | Zweck: baut die Desktop-Bühne zu einem kompakten Utility-Einstieg mit klar dominanter Suche, reduzierter linker Orientierung und frühem Feed-Anschluss um; Scope: nur Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -2059,23 +2059,140 @@ footer a:hover {
 
   .desktop-hero{
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 440px);
+    grid-template-columns: minmax(340px, 0.9fr) minmax(420px, 1.1fr);
     grid-template-areas: "intro search";
-    align-items: stretch;
-    gap: 30px;
-    padding: 36px 36px 38px;
-    border: 1px solid rgba(22,39,61,0.07);
-    border-radius: 36px;
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, white 70%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 86%, var(--color-primary-muted)) 36%,
-        color-mix(in srgb, white 96%, var(--color-primary-muted)) 100%
-      );
-    box-shadow:
-      0 24px 52px rgba(22,39,61,0.055),
-      0 1px 0 rgba(255,255,255,0.88) inset;
+    align-items: start;
+    gap: 28px;
+    padding: 20px 32px 10px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .desktop-entry{
+    grid-area: intro;
+    display: block;
+    min-width: 0;
+    padding: 6px 0 0;
+    border-top: 0;
+  }
+
+  .desktop-entry__inner{
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  .desktop-entry__content{
+    max-width: 34rem;
+    gap: 12px;
+    padding-top: 0;
+  }
+
+  .desktop-entry__eyebrow{
+    color: #617694;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+  }
+
+  .desktop-entry__title{
+    max-width: 11.5ch;
+    color: #15263b;
+    font-size: clamp(2.2rem, 1.96rem + 0.78vw, 2.82rem);
+    font-weight: 790;
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .desktop-entry__text{
+    margin-top: 0;
+    max-width: 38ch;
+    color: rgba(22,39,61,0.80);
+    font-size: 0.98rem;
+    font-weight: 550;
+    line-height: 1.55;
+  }
+
+  .desktop-entry__facts{
+    display: none;
+  }
+
+  .desktop-entry__aside{
+    display: block;
+    justify-self: start;
+    align-self: start;
+    width: auto;
+    max-width: none;
+    margin-top: 2px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .desktop-entry__aside-title{
+    display: none;
+  }
+
+  .desktop-entry__actions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    justify-items: start;
+  }
+
+  .desktop-entry__cta,
+  .desktop-entry__app-link{
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    text-decoration: none;
+  }
+
+  .desktop-entry__cta{
+    color: #1f3552;
+    font-size: 0.94rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .desktop-entry__cta::after{
+    content: "→";
+    color: rgba(22,39,61,0.34);
+    font-weight: 700;
+    transform: translateY(-0.5px);
+  }
+
+  .desktop-entry__cta--publish,
+  .desktop-entry__cta--info{
+    color: #1f3552;
+  }
+
+  .desktop-entry__app-link{
+    color: rgba(22,39,61,0.56);
+    font-size: 0.9rem;
+    font-weight: 640;
+    line-height: 1.35;
+    cursor: pointer;
+  }
+
+  .desktop-entry__app-link::before{
+    opacity: 0.78;
   }
 
   .top-stack{
@@ -2083,15 +2200,13 @@ footer a:hover {
     position: static;
     top: auto;
     z-index: auto;
-
     display: grid;
     align-content: start;
-    gap: 14px;
-
+    gap: 12px;
     min-width: 0;
-    padding: 22px;
+    padding: 18px;
     border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 28px;
+    border-radius: 24px;
     background:
       linear-gradient(
         180deg,
@@ -2099,9 +2214,8 @@ footer a:hover {
         rgba(248,250,246,0.92) 100%
       );
     box-shadow:
-      0 14px 30px rgba(22,39,61,0.05),
+      0 12px 28px rgba(22,39,61,0.05),
       0 1px 0 rgba(255,255,255,0.90) inset;
-
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     border-bottom-color: rgba(22,39,61,0.08);
@@ -2113,17 +2227,17 @@ footer a:hover {
 
   .top-stack #search-filter{
     max-width: none;
-    height: 76px;
-    padding-left: 24px;
-    padding-right: 24px;
-    font-size: 1.08rem;
-    font-weight: 600;
+    height: 70px;
+    padding-left: 22px;
+    padding-right: 22px;
+    font-size: 1.04rem;
+    font-weight: 590;
     letter-spacing: -0.01em;
     border-color: rgba(22,39,61,0.10);
-    border-radius: 22px;
+    border-radius: 20px;
     background: rgba(255,255,255,0.98);
     box-shadow:
-      0 10px 24px rgba(22,39,61,0.045),
+      0 8px 18px rgba(22,39,61,0.04),
       0 1px 0 rgba(255,255,255,0.92) inset;
   }
 
@@ -2144,12 +2258,12 @@ footer a:hover {
   }
 
   .top-stack .filters-bar .filter-pill{
-    min-height: 48px;
+    min-height: 46px;
     background: rgba(255,255,255,0.82);
     border-color: rgba(22,39,61,0.08);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
-      0 6px 14px rgba(22,39,61,0.025);
+      0 5px 12px rgba(22,39,61,0.022);
   }
 
   .top-stack .filters-bar .filter-pill__label{
@@ -2161,174 +2275,39 @@ footer a:hover {
   }
 
   .top-stack .filters-bar .filter-pill--reset{
+    grid-column: 1 / -1;
+    justify-content: center;
     color: rgba(22,39,61,0.72);
   }
 
-  .desktop-entry{
-    grid-area: intro;
-    display: block;
-    min-width: 0;
-    padding: 4px 0 0;
-    border-top: 0;
-  }
-
-  .desktop-entry__inner{
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start;
-    gap: 26px;
-    min-height: 100%;
-  }
-
-  .desktop-entry__content{
-    max-width: 640px;
-    gap: 18px;
-    padding-top: 6px;
-  }
-
-  .desktop-entry__eyebrow{
-    color: #617694;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-  }
-
-  .desktop-entry__title{
-    max-width: 12ch;
-    color: #15263b;
-    font-size: clamp(2.7rem, 2.15rem + 1.35vw, 3.65rem);
-    font-weight: 800;
-    line-height: 0.96;
-    letter-spacing: -0.055em;
-    text-wrap: balance;
-  }
-
-  .desktop-entry__text{
-    margin-top: 2px;
-    max-width: 44ch;
-    color: rgba(22,39,61,0.80);
-    font-size: 1.08rem;
-    font-weight: 560;
-    line-height: 1.62;
-  }
-
-  .desktop-entry__facts{
-    margin-top: 10px;
-    gap: 10px 12px;
-  }
-
-  .desktop-entry__facts li{
-    min-height: 38px;
-    padding: 0 14px;
-    border: 1px solid rgba(22,39,61,0.07);
-    background: rgba(255,255,255,0.64);
-    color: rgba(22,39,61,0.74);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.86) inset,
-      0 2px 6px rgba(22,39,61,0.02);
-  }
-
-  .desktop-entry__aside{
-    justify-self: start;
-    align-self: start;
-    width: min(100%, 430px);
-    gap: 14px;
-    margin-top: 2px;
-    padding: 20px 22px 22px;
-    border: 1px solid rgba(22,39,61,0.07);
-    border-radius: 24px;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255,255,255,0.86) 0%,
-        rgba(248,250,246,0.74) 100%
-      );
-    box-shadow:
-      0 12px 26px rgba(22,39,61,0.035),
-      0 1px 0 rgba(255,255,255,0.88) inset;
-  }
-
-  .desktop-entry__aside-title{
-    color: rgba(22,39,61,0.48);
-    font-size: 0.74rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-  }
-
-  .desktop-entry__actions{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-    justify-items: stretch;
-  }
-
-  .desktop-entry__cta,
-  .desktop-entry__app-link{
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    width: 100%;
-    min-height: 48px;
-    padding: 0 16px;
-    border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 14px;
-    background: rgba(255,255,255,0.76);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.88) inset,
-      0 6px 14px rgba(22,39,61,0.028);
-    text-decoration: none;
-  }
-
-  .desktop-entry__cta{
-    color: #1f3552;
-    font-size: 0.96rem;
-    font-weight: 720;
-    line-height: 1.3;
-  }
-
-  .desktop-entry__cta::after{
-    content: "→";
-    color: rgba(22,39,61,0.34);
-    font-weight: 700;
-    transform: translateY(-0.5px);
-  }
-
-  .desktop-entry__app-link{
-    color: rgba(22,39,61,0.62);
-    font-size: 0.92rem;
-    font-weight: 650;
-    line-height: 1.35;
-    cursor: pointer;
-  }
-
-  .desktop-entry__app-link::before{
-    opacity: 0.82;
-  }
-
   @media (hover: hover){
-    .desktop-entry__cta:hover,
+    .desktop-entry__cta:hover{
+      color: #14263b;
+      opacity: 0.92;
+    }
+
     .desktop-entry__app-link:hover{
-      transform: translateY(-1px);
-      border-color: rgba(22,39,61,0.12);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.90) inset,
-        0 10px 20px rgba(22,39,61,0.05);
+      color: rgba(22,39,61,0.74);
     }
   }
 
   .desktop-entry__cta:active,
   .desktop-entry__app-link:active{
-    transform: translateY(0);
+    transform: translateY(1px);
   }
 
   .desktop-entry__cta:focus-visible,
   .desktop-entry__app-link:focus-visible{
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
+    border-radius: 8px;
+  }
+
+  .events-section{
+    padding-top: 0;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V8 === */
-
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V9 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -2540,42 +2519,40 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V8 | Zweck: hält die neue Desktop-Bühne zwischen 900px und 1024px stabil und sauber proportioniert, ohne Mobile zu berühren | Umfang: ersetzt ausschließlich den Narrow-Desktop-Override der Bühne === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V9 | Zweck: hält den kompakten Utility-Einstieg zwischen 900px und 1024px ausgewogen, ohne Mobile zu berühren | Umfang: nur Narrow-Desktop-Feintuning der Bühne === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 364px);
-    gap: 24px;
+    grid-template-columns: minmax(300px, 0.88fr) minmax(360px, 1.12fr);
+    gap: 22px;
     padding-left: 28px;
     padding-right: 28px;
   }
 
   .desktop-entry__title{
-    max-width: 12.4ch;
-    font-size: clamp(2.3rem, 1.96rem + 1.02vw, 2.95rem);
+    max-width: 12ch;
+    font-size: clamp(2.02rem, 1.84rem + 0.7vw, 2.48rem);
   }
 
   .desktop-entry__text{
-    max-width: 40ch;
-    font-size: 1rem;
-  }
-
-  .desktop-entry__aside{
-    width: min(100%, 380px);
-    padding-left: 18px;
-    padding-right: 18px;
+    max-width: 34ch;
+    font-size: 0.95rem;
   }
 
   .top-stack{
-    padding: 18px;
-    border-radius: 24px;
+    padding: 16px;
+    border-radius: 22px;
   }
 
   .top-stack #search-filter{
-    height: 70px;
-    font-size: 1rem;
+    height: 64px;
+    font-size: 0.98rem;
+  }
+
+  .desktop-entry__actions{
+    gap: 8px 14px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V8 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V9 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4696,6 +4673,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
