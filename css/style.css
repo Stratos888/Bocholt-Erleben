@@ -1537,12 +1537,50 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 /* === END BLOCK: DS-02_EVENT_CARD_CLUSTER_MAPPING === */
 
-/* === BEGIN BLOCK: MOBILE_EVENT_CARD_RESTORE_V3 | Zweck: Stellt unter 900px den früheren Mobile-Kartenabstand wieder her, indem nur Desktop-Zusatzinhalte entfernt werden; Scope: kein eigenes Mobile-Spacing mehr, sondern Rückfall auf den bestehenden DS-02-Basisstand === */
+/* === BEGIN BLOCK: MOBILE_EVENT_CARD_RESTORE_V4 | Zweck: Stellt für 361–899px die kompaktere Mobile-Card-Dichte wieder her und blendet Desktop-Zusatzinhalte aus; Scope: mobile-only Verdichtung von Rail, Badge, Gap, Padding und Meta ohne Desktop-Eingriff === */
 @media (max-width: 899.98px){
-  .event-card-desc,
-  .event-card-meta-quiet,
-  .event-card-actions{
-    display: none !important;
+  .event-card{
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+    column-gap: 10px;
+
+    padding: 12px 12px 12px 0;
+    align-items: center;
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    left: 0;
+  }
+
+  .event-date-badge{
+    width: 40px;
+    padding: 4px 3px;
+    border-radius: 10px;
+  }
+
+  .event-date-badge__wday{
+    font-size: 0.60rem;
+    letter-spacing: 0.05em;
+  }
+
+  .event-date-badge__day{
+    font-size: 1.24rem;
+  }
+
+  .event-date-badge__month{
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+  }
+
+  .event-card-body{
+    gap: 2px;
+  }
+
+  .event-title{
+    column-gap: 6px;
+    font-size: 1rem;
+    line-height: 1.18;
   }
 
   .event-title__text{
@@ -1550,22 +1588,46 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   }
 
   .event-meta{
+    font-size: 13px;
+    line-height: 1.24;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .event-card-desc,
+  .event-card-meta-quiet,
+  .event-card-actions{
+    display: none !important;
+  }
 }
 
 @media (max-width: 360px){
+  .event-card{
+    --rail-w: 52px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 12px 10px 12px 0;
+  }
+
+  .event-card::before{
+    width: var(--rail-w);
+    left: 0;
+  }
+
+  .event-date-badge{
+    width: 38px;
+  }
+
   .event-title{
     font-size: 0.98rem;
   }
 
   .event-meta{
-    font-size: 0.89rem;
+    font-size: 12px;
   }
 }
-/* === END BLOCK: MOBILE_EVENT_CARD_RESTORE_V3 === */
+/* === END BLOCK: MOBILE_EVENT_CARD_RESTORE_V4 === */
 
 /* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
 /* SECTION */
@@ -4459,6 +4521,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
