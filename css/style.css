@@ -2087,7 +2087,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 | Zweck: Kapselt das Desktop-Feed-Layout sauber getrennt von der Hero-Bühne; Scope: ersetzt den versehentlich stehen gebliebenen Altblock zwischen Hero-Desktop und Narrow-Desktop, Mobile bleibt unverändert === */
+/* === BEGIN BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 | Zweck: Kapselt alle Desktop-Feed-Regeln strikt ab 900px, damit Mobile vollständig beim alten Kartenlayout bleibt; Scope: ersetzt den versehentlich global gewordenen Desktop-Restblock zwischen Hero-Desktop und Narrow-Desktop === */
 @media (min-width: 900px){
   .events-section{
     padding-top: 8px;
@@ -4429,6 +4429,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
