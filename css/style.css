@@ -2179,7 +2179,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V7 === */
 
-/* === BEGIN BLOCK: FEED_GROUP_BASELINE_RESTORE_V2 | Zweck: stellt den alten Event-Card-Abstand wieder her, ohne die Mobile-Kartenhöhe zu beschädigen | Umfang: korrigiert events-feed-group / events-feed-group__grid für Mobile/Default und behält Desktop-Grid ab 900px bei === */
+/* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
   gap: var(--feed-title-mb);
@@ -2195,6 +2195,7 @@ footer a:hover {
   gap: var(--feed-cards-gap);
 }
 
+/* === BEGIN BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 | Zweck: Desktop-Feed-Regeln nur ab 900px aktivieren | Umfang: Feed-Header, Gruppierung und Desktop-Event-Card-Layout === */
 @media (min-width: 900px){
   .events-section{
     padding-top: 8px;
@@ -2225,8 +2226,6 @@ footer a:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 16px;
   }
-}
-/* === END BLOCK: FEED_GROUP_BASELINE_RESTORE_V2 === */
 
   .event-card{
     --rail-w: 72px;
@@ -2389,6 +2388,7 @@ footer a:hover {
   }
 }
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
+/* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V7 | Zweck: Stabilisiert die konsolidierte Hero-Komposition zwischen 900px und 1024px; Scope: ersetzt nur den Narrow-Desktop-Override der Bühne, Mobile bleibt unverändert === */
 @media (min-width: 900px) and (max-width: 1024px){
@@ -4538,6 +4538,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
