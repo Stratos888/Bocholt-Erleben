@@ -1772,6 +1772,39 @@ footer a:hover {
 /* Mobile: bleibt wie bisher */
 @media (max-width: 768px) {
   .event-cards-grid { grid-template-columns: 1fr; }
+
+  .desktop-hero__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .desktop-hero__search-field{
+    min-width: 0;
+  }
+
+  .filters-bar{
+    max-width: none;
+    width: 100%;
+    margin: 0;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .filter-pill{
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filter-pill--reset{
+    width: var(--cmp-input-minh);
+    min-width: var(--cmp-input-minh);
+    justify-self: stretch;
+    align-self: stretch;
+  }
 }
 
 /* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V7 | Zweck: Konsolidiert die Desktop-Rahmung für Hero und Feed auf dem aktuellen Stand; Scope: ersetzt nur die Container-Breite und vertikale Taktung der Desktop-Bühne, Mobile bleibt unverändert === */
@@ -4740,6 +4773,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
