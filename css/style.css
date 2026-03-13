@@ -2028,7 +2028,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den validierten Desktop-Zielzustand um – einzeilige Headline, feste zweizeilige Subline, horizontale Such-Toolbar mit Suche + Wann? + Kategorie und neutrale 3er-Action-Leiste; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 | Zweck: finalisiert den Desktop-Hero durch kompakteres Suchband, exakt gleich hohe Pills, klar sekundäre Action-Leiste und insgesamt leichtere Bühnenproportionen; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -2046,8 +2046,8 @@ footer a:hover {
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 26px;
-    padding: 36px 32px 14px;
+    gap: 22px;
+    padding: 32px 32px 10px;
     background:
       radial-gradient(circle at 14% 16%, rgba(197,224,150,0.30) 0%, rgba(197,224,150,0.00) 28%),
       radial-gradient(circle at 84% 26%, rgba(232,201,146,0.22) 0%, rgba(232,201,146,0.00) 20%),
@@ -2093,7 +2093,7 @@ footer a:hover {
 
   .desktop-entry__content{
     max-width: 48rem;
-    gap: 18px;
+    gap: 16px;
   }
 
   .desktop-entry__title{
@@ -2115,13 +2115,13 @@ footer a:hover {
     align-self: start;
     justify-self: stretch;
     display: grid;
-    gap: 18px;
+    gap: 16px;
     width: min(100%, 1040px);
     max-width: 1040px;
     margin-top: 4px;
-    padding: 22px;
+    padding: 18px;
     border: 1px solid rgba(22,39,61,0.06);
-    border-radius: 34px;
+    border-radius: 30px;
     background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(252,252,249,0.86) 100%);
     box-shadow:
       0 26px 56px rgba(22,39,61,0.08),
@@ -2136,7 +2136,7 @@ footer a:hover {
     position: absolute;
     inset: 10px;
     z-index: -1;
-    border-radius: 26px;
+    border-radius: 24px;
     background: linear-gradient(180deg, rgba(255,255,255,0.52) 0%, rgba(244,248,239,0.22) 100%);
   }
 
@@ -2146,9 +2146,9 @@ footer a:hover {
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) minmax(164px, 0.21fr) minmax(164px, 0.21fr);
+    grid-template-columns: minmax(0, 1fr) 148px 148px;
     align-items: stretch;
-    gap: 14px;
+    gap: 12px;
   }
 
   .top-stack .events-filter{
@@ -2172,16 +2172,16 @@ footer a:hover {
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 72px;
+    height: 64px;
   }
 
   .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 0 28px 0 62px;
+    padding: 0 24px 0 56px;
     border: 1px solid rgba(22,39,61,0.09);
-    border-radius: 24px;
+    border-radius: 20px;
     background: rgba(255,255,255,0.96);
     color: #16273d;
     font-size: 1.04rem;
@@ -2204,9 +2204,9 @@ footer a:hover {
     align-content: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 0 20px;
+    padding: 0 16px;
     border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 20px;
+    border-radius: 18px;
     background: rgba(255,255,255,0.88);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.94) inset,
@@ -2244,15 +2244,15 @@ footer a:hover {
   .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    padding-top: 6px;
+    gap: 10px;
+    padding-top: 2px;
   }
 
   .desktop-hero__action{
-    min-height: 54px;
-    padding: 0 18px;
-    border-radius: 16px;
-    font-size: 0.94rem;
+    min-height: 46px;
+    padding: 0 16px;
+    border-radius: 14px;
+    font-size: 0.92rem;
     font-weight: 720;
     border-color: rgba(22,39,61,0.08);
     background: rgba(255,255,255,0.88);
@@ -2273,7 +2273,7 @@ footer a:hover {
     color: #1f3552;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -2485,13 +2485,13 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den validierten Hero zwischen 900px und 1024px – feste 2-Zeilen-Subline, kompakte Such-Toolbar mit gleicher Elementhöhe und neutrale Action-Leiste; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V14 | Zweck: verdichtet den Hero zwischen 900px und 1024px mit flacherem Suchband, schmaleren Pills und klar sekundärer Action-Leiste; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
-    gap: 22px;
+    gap: 20px;
     padding-left: 28px;
     padding-right: 28px;
-    padding-top: 30px;
+    padding-top: 28px;
   }
 
   .desktop-hero::after{
@@ -2503,6 +2503,7 @@ footer a:hover {
 
   .desktop-entry__content{
     max-width: 40rem;
+    gap: 16px;
   }
 
   .desktop-entry__title{
@@ -2522,12 +2523,12 @@ footer a:hover {
   .top-stack{
     width: 100%;
     max-width: none;
-    padding: 18px;
-    border-radius: 28px;
+    padding: 16px;
+    border-radius: 24px;
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 170px 170px;
+    grid-template-columns: minmax(0, 1fr) 152px 152px;
     gap: 10px;
   }
 
@@ -2539,20 +2540,20 @@ footer a:hover {
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 66px;
+    height: 58px;
   }
 
   .top-stack #search-filter{
-    padding-left: 56px;
-    padding-right: 24px;
+    padding-left: 52px;
+    padding-right: 20px;
     font-size: 1rem;
-    border-radius: 20px;
+    border-radius: 18px;
   }
 
   .desktop-hero__toolbar-pill{
-    padding-left: 16px;
-    padding-right: 16px;
-    border-radius: 18px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border-radius: 16px;
   }
 
   .desktop-hero__toolbar-pill .filter-pill__label{
@@ -2564,17 +2565,17 @@ footer a:hover {
   }
 
   .desktop-hero__actions{
-    gap: 10px;
+    gap: 8px;
   }
 
   .desktop-hero__action{
-    min-height: 52px;
-    padding-left: 14px;
-    padding-right: 14px;
-    font-size: 0.9rem;
+    min-height: 44px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 0.88rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V14 === */
 
 /* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
 Zweck:
@@ -4695,6 +4696,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
