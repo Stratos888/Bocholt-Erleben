@@ -1775,31 +1775,22 @@ footer a:hover {
 
   .desktop-hero__search-row{
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-
-  .desktop-hero__search-field{
-    min-width: 0;
-  }
-
-  .filters-bar{
-    max-width: none;
-    width: 100%;
-    margin: 0;
-
-    display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
     align-items: stretch;
     gap: 8px;
   }
 
-  .filter-pill{
+  .desktop-hero__search-field{
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .desktop-hero__search-row > .filter-pill{
     min-width: 0;
     width: 100%;
   }
 
-  .filter-pill--reset{
+  .desktop-hero__search-row > .filter-pill--reset{
     width: var(--cmp-input-minh);
     min-width: var(--cmp-input-minh);
     justify-self: stretch;
@@ -4773,6 +4764,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
