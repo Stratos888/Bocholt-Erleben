@@ -1832,7 +1832,7 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: konsolidiert die Hero-Basis für Desktop mit thematisch korrektem Publish-Icon, breiterer Lead-Zeile und neutral vereinheitlichter Button-DNA; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: definiert die Hero-Basis für den validierten Desktop-Zielzustand mit fester zweizeiliger Subline, kompakter Such-Toolbar und neutraler Action-Leiste; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
 .desktop-hero{
   position: relative;
 }
@@ -1872,7 +1872,7 @@ footer a:hover {
   font-weight: 800;
   line-height: 0.92;
   letter-spacing: -0.065em;
-  text-wrap: balance;
+  white-space: nowrap;
   overflow: visible;
 }
 
@@ -1881,11 +1881,18 @@ footer a:hover {
   color: rgba(22,39,61,0.82);
   font-size: 1rem;
   font-weight: 560;
-  line-height: 1.58;
+  line-height: 1.42;
 }
 
 .desktop-entry__text--lead{
-  max-width: 44ch;
+  display: grid;
+  gap: 4px;
+  max-width: none;
+}
+
+.desktop-entry__lead-line{
+  display: block;
+  white-space: nowrap;
 }
 
 .desktop-entry__facts,
@@ -1906,6 +1913,16 @@ footer a:hover {
   line-height: 1.2;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+.desktop-hero__search-row{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.desktop-hero__search-slot{
+  min-width: 0;
 }
 
 .desktop-hero__search-field{
@@ -1940,13 +1957,17 @@ footer a:hover {
 }
 
 .desktop-hero__icon--app{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .desktop-hero__icon--info{
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__toolbar-pill{
+  min-width: 0;
 }
 
 .desktop-hero__action{
@@ -2007,7 +2028,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: konsolidiert den Desktop-Hero visuell – breitere Lead-Zeile, neutrales einheitliches Button-System und kein hellgrüner Sonderstil mehr; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den validierten Desktop-Zielzustand um – einzeilige Headline, feste zweizeilige Subline, horizontale Such-Toolbar mit Suche + Wann? + Kategorie und neutrale 3er-Action-Leiste; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -2083,7 +2104,7 @@ footer a:hover {
   }
 
   .desktop-entry__text{
-    max-width: 42ch;
+    max-width: none;
     font-size: 1.04rem;
   }
 
@@ -2095,8 +2116,8 @@ footer a:hover {
     justify-self: stretch;
     display: grid;
     gap: 18px;
-    width: min(100%, 960px);
-    max-width: 960px;
+    width: min(100%, 1040px);
+    max-width: 1040px;
     margin-top: 4px;
     padding: 22px;
     border: 1px solid rgba(22,39,61,0.06);
@@ -2124,6 +2145,12 @@ footer a:hover {
     padding: 2px 6px 0;
   }
 
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) minmax(164px, 0.21fr) minmax(164px, 0.21fr);
+    align-items: stretch;
+    gap: 14px;
+  }
+
   .top-stack .events-filter{
     position: relative;
     z-index: 1;
@@ -2143,17 +2170,21 @@ footer a:hover {
     pointer-events: none;
   }
 
+  .top-stack #search-filter,
+  .desktop-hero__toolbar-pill{
+    height: 72px;
+  }
+
   .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
-    height: 92px;
     padding: 0 28px 0 62px;
     border: 1px solid rgba(22,39,61,0.09);
     border-radius: 24px;
     background: rgba(255,255,255,0.96);
     color: #16273d;
-    font-size: 1.12rem;
+    font-size: 1.04rem;
     font-weight: 620;
     letter-spacing: -0.015em;
     box-shadow:
@@ -2166,40 +2197,48 @@ footer a:hover {
     font-weight: 600;
   }
 
-  .top-stack .filters-bar{
-    max-width: none;
-    margin: 0;
-    padding: 0;
+  .desktop-hero__toolbar-pill{
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    border: 0;
-    background: transparent;
-  }
-
-  .top-stack .filters-bar .filter-pill{
-    min-height: 58px;
-    padding: 10px 18px;
+    grid-template-columns: auto auto;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 20px;
     border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.84);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.88);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.94) inset,
       0 10px 20px rgba(22,39,61,0.028);
   }
 
-  .top-stack .filters-bar .filter-pill__label{
+  .desktop-hero__toolbar-pill .filter-pill__label{
     color: #6b7f9a;
+    font-size: 0.94rem;
+    font-weight: 700;
+    line-height: 1;
   }
 
-  .top-stack .filters-bar .filter-pill__value{
+  .desktop-hero__toolbar-pill .filter-pill__value{
     color: #16273d;
+    font-size: 0.98rem;
+    font-weight: 730;
+    line-height: 1;
   }
 
-  .top-stack .filters-bar .filter-pill--reset{
+  .desktop-hero__toolbar-pill::after{
+    content: "›";
+    color: rgba(99,119,149,0.72);
+    font-size: 1.2rem;
+    line-height: 1;
+    margin-left: 6px;
+  }
+
+  .filter-pill--reset{
     grid-column: 1 / -1;
-    justify-content: center;
-    color: rgba(22,39,61,0.72);
+    min-height: 52px;
+    justify-self: start;
   }
 
   .desktop-hero__actions{
@@ -2210,11 +2249,11 @@ footer a:hover {
   }
 
   .desktop-hero__action{
-    min-height: 60px;
+    min-height: 54px;
     padding: 0 18px;
     border-radius: 16px;
     font-size: 0.94rem;
-    font-weight: 730;
+    font-weight: 720;
     border-color: rgba(22,39,61,0.08);
     background: rgba(255,255,255,0.88);
     color: #1f3552;
@@ -2446,7 +2485,7 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Hero zwischen 900px und 1024px mit breiterer Lead-Zeile und konsistenten neutralen Actions; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den validierten Hero zwischen 900px und 1024px – feste 2-Zeilen-Subline, kompakte Such-Toolbar mit gleicher Elementhöhe und neutrale Action-Leiste; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     gap: 22px;
@@ -2463,18 +2502,21 @@ footer a:hover {
   }
 
   .desktop-entry__content{
-    max-width: 38rem;
+    max-width: 40rem;
   }
 
   .desktop-entry__title{
     max-width: none;
-    font-size: clamp(3.25rem, 2.78rem + 1.08vw, 4.1rem);
+    font-size: clamp(3.2rem, 2.74rem + 1.04vw, 4rem);
     line-height: 0.92;
   }
 
   .desktop-entry__text{
-    max-width: 34ch;
-    font-size: 0.97rem;
+    font-size: 0.98rem;
+  }
+
+  .desktop-entry__lead-line{
+    white-space: nowrap;
   }
 
   .top-stack{
@@ -2484,28 +2526,41 @@ footer a:hover {
     border-radius: 28px;
   }
 
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) 170px 170px;
+    gap: 10px;
+  }
+
   .desktop-hero__search-field .desktop-hero__icon--search{
     left: 24px;
     width: 20px;
     height: 20px;
   }
 
+  .top-stack #search-filter,
+  .desktop-hero__toolbar-pill{
+    height: 66px;
+  }
+
   .top-stack #search-filter{
-    height: 82px;
     padding-left: 56px;
     padding-right: 24px;
-    font-size: 1.03rem;
+    font-size: 1rem;
     border-radius: 20px;
   }
 
-  .top-stack .filters-bar{
-    gap: 10px;
-  }
-
-  .top-stack .filters-bar .filter-pill{
-    min-height: 54px;
+  .desktop-hero__toolbar-pill{
     padding-left: 16px;
     padding-right: 16px;
+    border-radius: 18px;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__label{
+    font-size: 0.88rem;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__value{
+    font-size: 0.94rem;
   }
 
   .desktop-hero__actions{
@@ -2513,10 +2568,10 @@ footer a:hover {
   }
 
   .desktop-hero__action{
-    min-height: 56px;
+    min-height: 52px;
     padding-left: 14px;
     padding-right: 14px;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 }
 /* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 === */
@@ -4640,6 +4695,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
