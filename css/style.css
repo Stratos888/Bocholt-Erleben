@@ -1832,7 +1832,7 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: definiert die neue Single-Hero-Basis für Desktop – Brand-Fläche und integrierte Search-Hero-Card mit eigener Action-Leiste; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: definiert die neue Single-Hero-Basis für Desktop mit sauberer Headline, Search-Feld mit Icon und nachhaltigem Hero-Icon-System für Service-Actions; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
 .desktop-hero{
   position: relative;
 }
@@ -1866,12 +1866,14 @@ footer a:hover {
 
 .desktop-entry__title{
   margin: 0;
+  max-width: none;
   color: #16273d;
-  font-size: clamp(2.8rem, 2.2rem + 1.8vw, 5rem);
+  font-size: clamp(2.8rem, 2.24rem + 1.78vw, 5rem);
   font-weight: 800;
-  line-height: 0.9;
+  line-height: 0.92;
   letter-spacing: -0.065em;
   text-wrap: balance;
+  overflow: visible;
 }
 
 .desktop-entry__text{
@@ -1906,12 +1908,49 @@ footer a:hover {
   text-transform: uppercase;
 }
 
+.desktop-hero__search-field{
+  position: relative;
+  display: grid;
+  align-items: center;
+}
+
+.desktop-hero__icon{
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  opacity: 0.82;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.desktop-hero__icon--search{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__icon--publish,
+.desktop-hero__icon--app{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__icon--info{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+}
+
 .desktop-hero__action{
   appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   min-height: 56px;
   padding: 0 18px;
   border: 1px solid rgba(22,39,61,0.08);
@@ -1965,7 +2004,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den Desktop-Hero als echten Single-Hero-Reset um – oben ruhige Markenfläche, darunter breites Search-Panel mit integrierter Action-Leiste und atmosphärischem Hintergrund; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den Desktop-Hero als echten Single-Hero-Reset um – saubere einzeilige Marken-Headline, breites Search-Panel mit Search-Icon und integrierter Action-Leiste; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -1980,12 +2019,15 @@ footer a:hover {
   .desktop-hero{
     position: relative;
     isolation: isolate;
-    overflow: hidden;
+    overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-    padding: 38px 32px 14px;
-    background: linear-gradient(180deg, rgba(249,251,245,0.98) 0%, rgba(242,246,238,0.94) 100%);
+    gap: 26px;
+    padding: 36px 32px 14px;
+    background:
+      radial-gradient(circle at 14% 16%, rgba(197,224,150,0.30) 0%, rgba(197,224,150,0.00) 28%),
+      radial-gradient(circle at 84% 26%, rgba(232,201,146,0.22) 0%, rgba(232,201,146,0.00) 20%),
+      linear-gradient(180deg, rgba(252,254,249,0.98) 0%, rgba(245,249,241,0.92) 100%);
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -1997,27 +2039,25 @@ footer a:hover {
     inset: 0;
     z-index: -3;
     background:
-      radial-gradient(circle at 16% 18%, rgba(205,227,166,0.36) 0%, rgba(205,227,166,0.00) 28%),
-      radial-gradient(circle at 84% 24%, rgba(241,211,158,0.28) 0%, rgba(241,211,158,0.00) 22%),
-      linear-gradient(180deg, rgba(250,252,246,0.98) 0%, rgba(242,246,238,0.94) 100%);
+      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.56) 20%, rgba(255,255,255,0.00) 44%);
+    pointer-events: none;
   }
 
   .desktop-hero::after{
     content: "";
     position: absolute;
-    top: 32px;
-    right: -64px;
+    top: 34px;
+    right: -44px;
     width: 720px;
-    height: 360px;
+    height: 320px;
     z-index: -2;
     border-radius: 999px;
     background:
-      radial-gradient(circle at 26% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.60) 22%, rgba(255,255,255,0.00) 50%),
-      radial-gradient(circle at 62% 42%, rgba(235,198,122,0.44) 0%, rgba(235,198,122,0.18) 12%, rgba(235,198,122,0.00) 24%),
-      radial-gradient(circle at 74% 54%, rgba(206,185,145,0.26) 0%, rgba(206,185,145,0.00) 20%),
-      linear-gradient(135deg, rgba(246,248,243,0.10) 0%, rgba(225,232,218,0.46) 100%);
+      radial-gradient(circle at 32% 52%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.52) 24%, rgba(255,255,255,0.00) 52%),
+      radial-gradient(circle at 64% 42%, rgba(236,198,120,0.38) 0%, rgba(236,198,120,0.16) 12%, rgba(236,198,120,0.00) 24%),
+      radial-gradient(circle at 78% 56%, rgba(206,185,145,0.22) 0%, rgba(206,185,145,0.00) 18%);
     filter: blur(12px);
-    opacity: 0.98;
+    opacity: 0.96;
     pointer-events: none;
   }
 
@@ -2028,13 +2068,15 @@ footer a:hover {
   }
 
   .desktop-entry__content{
-    max-width: 38rem;
+    max-width: 44rem;
     gap: 18px;
   }
 
   .desktop-entry__title{
-    max-width: 8.2ch;
-    font-size: clamp(4rem, 3.18rem + 2vw, 5.35rem);
+    max-width: none;
+    font-size: clamp(4rem, 3.28rem + 1.8vw, 5.1rem);
+    line-height: 0.9;
+    letter-spacing: -0.07em;
   }
 
   .desktop-entry__text{
@@ -2050,9 +2092,9 @@ footer a:hover {
     justify-self: stretch;
     display: grid;
     gap: 18px;
-    width: min(100%, 980px);
-    max-width: 980px;
-    margin-top: 2px;
+    width: min(100%, 960px);
+    max-width: 960px;
+    margin-top: 4px;
     padding: 22px;
     border: 1px solid rgba(22,39,61,0.06);
     border-radius: 34px;
@@ -2086,16 +2128,29 @@ footer a:hover {
     gap: 0;
   }
 
+  .desktop-hero__search-field .desktop-hero__icon--search{
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(99,119,149,0.80);
+    width: 22px;
+    height: 22px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
   .top-stack #search-filter{
     width: 100%;
     max-width: none;
+    margin: 0;
     height: 92px;
-    padding: 0 28px;
+    padding: 0 28px 0 62px;
     border: 1px solid rgba(22,39,61,0.09);
     border-radius: 24px;
     background: rgba(255,255,255,0.96);
     color: #16273d;
-    font-size: 1.14rem;
+    font-size: 1.12rem;
     font-weight: 620;
     letter-spacing: -0.015em;
     box-shadow:
@@ -2113,7 +2168,7 @@ footer a:hover {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     border: 0;
     background: transparent;
@@ -2139,6 +2194,7 @@ footer a:hover {
   }
 
   .top-stack .filters-bar .filter-pill--reset{
+    grid-column: 1 / -1;
     justify-content: center;
     color: rgba(22,39,61,0.72);
   }
@@ -2156,6 +2212,12 @@ footer a:hover {
     border-radius: 16px;
     font-size: 0.94rem;
     font-weight: 730;
+  }
+
+  .desktop-hero__action .desktop-hero__icon{
+    width: 18px;
+    height: 18px;
+    opacity: 0.78;
   }
 
   .desktop-hero__action--publish{
@@ -2379,30 +2441,35 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Single-Hero-Reset zwischen 900px und 1024px, ohne Mobile zu berühren; Scope: nur Narrow-Desktop-Feintuning für Bühne und Search-Hero-Card === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Single-Hero-Reset zwischen 900px und 1024px, verhindert Title-Clipping und hält Search/Icon/Card-Proportionen konsistent; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
-    gap: 24px;
-    padding-top: 30px;
+    gap: 22px;
     padding-left: 28px;
     padding-right: 28px;
+    padding-top: 30px;
   }
 
   .desktop-hero::after{
     top: 30px;
     right: -110px;
     width: 560px;
-    height: 320px;
+    height: 280px;
+  }
+
+  .desktop-entry__content{
+    max-width: 34rem;
   }
 
   .desktop-entry__title{
-    font-size: clamp(3.2rem, 2.72rem + 1.18vw, 4.2rem);
-    max-width: 8.6ch;
+    max-width: none;
+    font-size: clamp(3.25rem, 2.78rem + 1.08vw, 4.1rem);
+    line-height: 0.92;
   }
 
   .desktop-entry__text{
     max-width: 28ch;
-    font-size: 0.98rem;
+    font-size: 0.97rem;
   }
 
   .top-stack{
@@ -2412,16 +2479,21 @@ footer a:hover {
     border-radius: 28px;
   }
 
+  .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 24px;
+    width: 20px;
+    height: 20px;
+  }
+
   .top-stack #search-filter{
     height: 82px;
-    padding-left: 24px;
+    padding-left: 56px;
     padding-right: 24px;
-    font-size: 1.04rem;
+    font-size: 1.03rem;
     border-radius: 20px;
   }
 
   .top-stack .filters-bar{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -2431,12 +2503,7 @@ footer a:hover {
     padding-right: 16px;
   }
 
-  .top-stack .filters-bar .filter-pill--reset{
-    grid-column: 1 / -1;
-  }
-
   .desktop-hero__actions{
-    grid-template-columns: 1fr;
     gap: 10px;
   }
 
@@ -4568,6 +4635,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
