@@ -105,7 +105,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: setzt den Desktop-Hero als Single-Hero-Struktur neu auf – oben ruhige Brand-Fläche, darunter breite Search-Hero-Card mit integrierter Service-Leiste; Scope: ersetzt nur den Hero-Markup-Block inkl. Filter-Sheets, Mobile bleibt über CSS unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: setzt die Desktop-Bühne als ruhigen Single-Hero mit sauberer Headline, Search-Panel und integrierten Service-Actions inklusive Icons um; Scope: ersetzt nur den Hero-Markup-Block inkl. Filter-Sheets, Mobile bleibt über CSS unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
   <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
@@ -125,14 +125,17 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
 
     <div class="events-filter">
-      <input
-        id="search-filter"
-        type="search"
-        placeholder="Suche nach Events oder Orten"
-        aria-label="Suche"
-        autocomplete="off"
-        inputmode="search"
-      >
+      <label class="desktop-hero__search-field" for="search-filter">
+        <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
+        <input
+          id="search-filter"
+          type="search"
+          placeholder="Suche nach Events oder Orten"
+          aria-label="Suche"
+          autocomplete="off"
+          inputmode="search"
+        >
+      </label>
     </div>
 
     <div class="filters-bar" aria-label="Filter">
@@ -153,11 +156,13 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
-        Event veröffentlichen
+        <span class="desktop-hero__icon desktop-hero__icon--publish" aria-hidden="true"></span>
+        <span>Event veröffentlichen</span>
       </a>
 
       <a class="desktop-hero__action desktop-hero__action--info" href="/info/">
-        Mehr erfahren
+        <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
+        <span>Mehr erfahren</span>
       </a>
 
       <button
@@ -166,7 +171,8 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         data-pwa-install-trigger
         aria-label="Als App installieren"
       >
-        Als App nutzen
+        <span class="desktop-hero__icon desktop-hero__icon--app" aria-hidden="true"></span>
+        <span>Als App nutzen</span>
       </button>
     </div>
   </div>
@@ -400,6 +406,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
