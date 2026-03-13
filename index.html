@@ -105,7 +105,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: setzt die Desktop-Bühne als ruhigen Single-Hero mit sauberer Headline, Search-Panel und integrierten Service-Actions inklusive Icons um; Scope: ersetzt nur den Hero-Markup-Block inkl. Filter-Sheets, Mobile bleibt über CSS unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V6 | Zweck: richtet die Desktop-Bühne auf den validierten Zielzustand aus – einzeilige Headline, feste zweizeilige Subline, kompakte Suchzeile mit Suche + Wann? + Kategorie sowie neutrale 3er-Action-Leiste; Scope: ersetzt nur den Hero-Markup-Block inkl. Filter-Sheets, Mobile bleibt über CSS unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
   <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
@@ -113,7 +113,8 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         <p class="desktop-entry__eyebrow">Lokaler Veranstaltungskalender</p>
         <h1 class="desktop-entry__title">Bocholt erleben</h1>
         <p class="desktop-entry__text desktop-entry__text--lead">
-          Alle Events, Märkte und Kulturveranstaltungen in Bocholt – aktuell, lokal und übersichtlich an einem Ort.
+          <span class="desktop-entry__lead-line">Alle Events, Märkte und Kulturveranstaltungen in Bocholt</span>
+          <span class="desktop-entry__lead-line">– aktuell und übersichtlich an einem Ort.</span>
         </p>
       </div>
     </div>
@@ -121,30 +122,30 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 
   <div class="top-stack desktop-hero__panel">
     <div class="desktop-hero__panel-head">
-      <p class="desktop-hero__panel-kicker">Finde Veranstaltungen in Bocholt</p>
+      <p class="desktop-hero__panel-kicker">Finde Events in Bocholt</p>
     </div>
 
-    <div class="events-filter">
-      <label class="desktop-hero__search-field" for="search-filter">
-        <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
-        <input
-          id="search-filter"
-          type="search"
-          placeholder="Suche nach Events oder Orten"
-          aria-label="Suche"
-          autocomplete="off"
-          inputmode="search"
-        >
-      </label>
-    </div>
+    <div class="desktop-hero__search-row" aria-label="Suche und Filter">
+      <div class="events-filter desktop-hero__search-slot">
+        <label class="desktop-hero__search-field" for="search-filter">
+          <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
+          <input
+            id="search-filter"
+            type="search"
+            placeholder="Events oder Orte suchen..."
+            aria-label="Suche"
+            autocomplete="off"
+            inputmode="search"
+          >
+        </label>
+      </div>
 
-    <div class="filters-bar" aria-label="Filter">
-      <button type="button" class="filter-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-        <span class="filter-pill__label">Zeit</span>
+      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+        <span class="filter-pill__label">Wann?</span>
         <span class="filter-pill__value" id="filter-time-value">Alle</span>
       </button>
 
-      <button type="button" class="filter-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
+      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
         <span class="filter-pill__label">Kategorie</span>
         <span class="filter-pill__value" id="filter-category-value">Alle</span>
       </button>
@@ -182,7 +183,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
   <div class="filter-sheet__overlay" data-close-sheet></div>
   <div class="filter-sheet__card">
     <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Zeit</div>
+      <div class="filter-sheet__title">Wann?</div>
       <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
     </div>
     <div class="filter-sheet__body">
@@ -406,6 +407,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 </body>
 </html>
+
 
 
 
