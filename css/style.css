@@ -1832,7 +1832,7 @@ footer a:hover {
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: definiert die neue Single-Hero-Basis für Desktop mit sauberer Headline, Search-Feld mit Icon und nachhaltigem Hero-Icon-System für Service-Actions; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V7 | Zweck: konsolidiert die Hero-Basis für Desktop mit thematisch korrektem Publish-Icon, breiterer Lead-Zeile und neutral vereinheitlichter Button-DNA; Scope: ersetzt nur die Hero-Basisregeln, Mobile bleibt unangetastet === */
 .desktop-hero{
   position: relative;
 }
@@ -1885,7 +1885,7 @@ footer a:hover {
 }
 
 .desktop-entry__text--lead{
-  max-width: 34ch;
+  max-width: 44ch;
 }
 
 .desktop-entry__facts,
@@ -1934,7 +1934,11 @@ footer a:hover {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-.desktop-hero__icon--publish,
+.desktop-hero__icon--publish{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+}
+
 .desktop-hero__icon--app{
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
@@ -1975,11 +1979,10 @@ footer a:hover {
     box-shadow 140ms ease;
 }
 
-.desktop-hero__action--publish{
-  color: #31481d;
-}
-
+.desktop-hero__action--publish,
+.desktop-hero__action--info,
 .desktop-hero__action--app{
+  color: #1f3552;
   font: inherit;
 }
 
@@ -2004,7 +2007,7 @@ footer a:hover {
 }
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V7 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: setzt den Desktop-Hero als echten Single-Hero-Reset um – saubere einzeilige Marken-Headline, breites Search-Panel mit Search-Icon und integrierter Action-Leiste; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 | Zweck: konsolidiert den Desktop-Hero visuell – breitere Lead-Zeile, neutrales einheitliches Button-System und kein hellgrüner Sonderstil mehr; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -2068,7 +2071,7 @@ footer a:hover {
   }
 
   .desktop-entry__content{
-    max-width: 44rem;
+    max-width: 48rem;
     gap: 18px;
   }
 
@@ -2080,7 +2083,7 @@ footer a:hover {
   }
 
   .desktop-entry__text{
-    max-width: 31ch;
+    max-width: 42ch;
     font-size: 1.04rem;
   }
 
@@ -2212,21 +2215,23 @@ footer a:hover {
     border-radius: 16px;
     font-size: 0.94rem;
     font-weight: 730;
+    border-color: rgba(22,39,61,0.08);
+    background: rgba(255,255,255,0.88);
+    color: #1f3552;
   }
 
   .desktop-hero__action .desktop-hero__icon{
     width: 18px;
     height: 18px;
-    opacity: 0.78;
+    opacity: 0.72;
   }
 
-  .desktop-hero__action--publish{
-    border-color: rgba(136,173,79,0.28);
-    background: linear-gradient(180deg, rgba(170,205,110,0.20) 0%, rgba(255,255,255,0.92) 100%);
-  }
-
+  .desktop-hero__action--publish,
+  .desktop-hero__action--info,
   .desktop-hero__action--app{
-    color: #304761;
+    border-color: rgba(22,39,61,0.08);
+    background: rgba(255,255,255,0.88);
+    color: #1f3552;
   }
 }
 /* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V13 === */
@@ -2441,7 +2446,7 @@ footer a:hover {
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Single-Hero-Reset zwischen 900px und 1024px, verhindert Title-Clipping und hält Search/Icon/Card-Proportionen konsistent; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V13 | Zweck: stabilisiert den Hero zwischen 900px und 1024px mit breiterer Lead-Zeile und konsistenten neutralen Actions; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     gap: 22px;
@@ -2458,7 +2463,7 @@ footer a:hover {
   }
 
   .desktop-entry__content{
-    max-width: 34rem;
+    max-width: 38rem;
   }
 
   .desktop-entry__title{
@@ -2468,7 +2473,7 @@ footer a:hover {
   }
 
   .desktop-entry__text{
-    max-width: 28ch;
+    max-width: 34ch;
     font-size: 0.97rem;
   }
 
@@ -4635,6 +4640,7 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
 
 
 
