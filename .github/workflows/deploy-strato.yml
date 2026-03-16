@@ -9,20 +9,20 @@ name: Deploy to STRATO
 # === BEGIN BLOCK: WORKFLOW TRIGGERS (push + daily + manual) ===
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "staging"]
 
   # Manuell im GitHub UI startbar (Actions → Workflow → Run workflow)
   workflow_dispatch:
 
   # Täglich, damit events.json automatisch “aktuell” bleibt (Sheet → JSON)
-  # GitHub cron ist UTC. 05:15 UTC ≈ 06:15 Europe/Berlin (Winterzeit).
+  # Läuft weiterhin effektiv über den Default-Branch main.
   schedule:
     - cron: "15 5 * * *"
 # === END BLOCK: WORKFLOW TRIGGERS (push + daily + manual) ===
 
 
 concurrency:
-  group: deploy-strato
+  group: deploy-strato-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -123,7 +123,25 @@ jobs:
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
           PY
           test -s data/events.tsv
+      - name: Decide deploy target
+        shell: bash
+        run: |
+          set -e
 
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            TARGET_DIR="staging"
+            ENV_NAME="staging"
+          else
+            TARGET_DIR="."
+            ENV_NAME="live"
+          fi
+
+          echo "DEPLOY_TARGET_DIR=$TARGET_DIR" >> "$GITHUB_ENV"
+          echo "DEPLOY_ENV_NAME=$ENV_NAME" >> "$GITHUB_ENV"
+
+          echo "Branch: ${GITHUB_REF_NAME}"
+          echo "Deploy target dir: $TARGET_DIR"
+          echo "Environment: $ENV_NAME"
       - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows)
         shell: bash
         env:
@@ -307,10 +325,15 @@ jobs:
         run: |
           set -e
 
-          # === BEGIN BLOCK: LFTP DEPLOY (ROOT ONLY) ===
-          # Zweck: Stabiler Deploy ohne Permission-Fehler; STRATO-apps wird nicht angefasst.
-          # Umfang: Mirror deploy/ nach "." (Webroot).
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<'LFTP'
+          echo "Deploying branch '$GITHUB_REF_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
+
+          # === BEGIN BLOCK: LFTP DEPLOY (MAIN OR STAGING) ===
+          # Zweck:
+          # - main deployt weiter ins Webroot
+          # - staging deployt in den Unterordner staging
+          # Umfang:
+          # - deploy/ wird vollständig in das branchabhängige Ziel gespiegelt
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
           set net:timeout 20
@@ -322,13 +345,15 @@ jobs:
           pwd
           cls -l
 
+          cd $DEPLOY_TARGET_DIR
+          pwd
+          cls -l
+
           rm -f index.html
           mirror -R --delete --verbose deploy/ .
-
-
 
           cls -l
           bye
           LFTP
-          # === END BLOCK: LFTP DEPLOY (ROOT ONLY) ===
+          # === END BLOCK: LFTP DEPLOY (MAIN OR STAGING) ===
 
