@@ -1769,34 +1769,11 @@ footer a:hover {
 
 /* RESPONSIVE (mobile unchanged + desktop frame) */
 
-/* Mobile: bleibt wie bisher */
+/* === BEGIN BLOCK: MOBILE_EVENT_GRID_ONLY_V1 | Zweck: hält im frühen Mobile-Abschnitt ausschließlich das Event-Grid einspaltig; Scope: entfernt die doppelte Such-/Filter-Grid-Logik aus diesem Bereich, damit die autoritative Mobile-Toolbar-Regel später zentral greift === */
 @media (max-width: 768px) {
   .event-cards-grid { grid-template-columns: 1fr; }
-
-  .desktop-hero__search-row{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .desktop-hero__search-field{
-    grid-column: 1 / -1;
-    min-width: 0;
-  }
-
-  .desktop-hero__search-row > .filter-pill{
-    min-width: 0;
-    width: 100%;
-  }
-
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: var(--cmp-input-minh);
-    min-width: var(--cmp-input-minh);
-    justify-self: stretch;
-    align-self: stretch;
-  }
 }
+/* === END BLOCK: MOBILE_EVENT_GRID_ONLY_V1 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V7 | Zweck: Konsolidiert die Desktop-Rahmung für Hero und Feed auf dem aktuellen Stand; Scope: ersetzt nur die Container-Breite und vertikale Taktung der Desktop-Bühne, Mobile bleibt unverändert === */
 @media (min-width: 900px) {
@@ -2049,19 +2026,46 @@ footer a:hover {
   outline-offset: 3px;
 }
 
+/* === BEGIN BLOCK: MOBILE_FILTER_BAR_FINAL_UX_V1 | Zweck: stellt auf Non-Desktop eine stabile 2-Zeilen-Filterleiste her (Suche vollbreit, darunter 2-Spalten-Pills, bei aktiven Facetten 3. Spalte für Reset); Scope: nur Search-/Filter-Toolbar bis 899.98px === */
 @media (max-width: 899.98px){
   .desktop-hero__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
     gap: 12px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
+  }
+
+  .desktop-hero__search-slot{
+    grid-column: 1 / -1;
+    min-width: 0;
   }
 
   .desktop-hero__search-field{
     display: block;
+    min-width: 0;
   }
 
   .desktop-hero__toolbar-pill{
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--cmp-input-minh);
+    min-width: var(--cmp-input-minh);
+    justify-self: stretch;
+    align-self: stretch;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
+/* === END BLOCK: MOBILE_FILTER_BAR_FINAL_UX_V1 === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 | Zweck: finalisiert den Desktop-Hero durch kompakteres Suchband, exakt gleich hohe Pills, klar sekundäre Action-Leiste und insgesamt leichtere Bühnenproportionen; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
