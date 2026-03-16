@@ -123,25 +123,25 @@ jobs:
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
           PY
           test -s data/events.tsv
+      # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V3 | Zweck: main/live und staging sauber über getrennte SFTP-User steuern; kein Remote-Unterordner mehr ===
       - name: Decide deploy target
         shell: bash
         run: |
           set -e
 
           if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            TARGET_DIR="staging"
             ENV_NAME="staging"
           else
-            TARGET_DIR="."
             ENV_NAME="live"
           fi
 
-          echo "DEPLOY_TARGET_DIR=$TARGET_DIR" >> "$GITHUB_ENV"
           echo "DEPLOY_ENV_NAME=$ENV_NAME" >> "$GITHUB_ENV"
+          echo "DEPLOY_TARGET_DIR=." >> "$GITHUB_ENV"
 
           echo "Branch: ${GITHUB_REF_NAME}"
-          echo "Deploy target dir: $TARGET_DIR"
           echo "Environment: $ENV_NAME"
+          echo "Deploy target dir: ."
+      # === END BLOCK: DEPLOY_ENV_DECISION_V3 ===
       - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows)
         shell: bash
         env:
@@ -316,32 +316,35 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
+           # === BEGIN BLOCK: STRATO_UPLOAD_V3 | Zweck: main nutzt Live-User, staging nutzt Staging-User; gleicher Server, kein cd staging ===
       - name: Upload to STRATO via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
+          STRATO_FTP_USERNAME_STAGING: ${{ secrets.STRATO_FTP_USERNAME_STAGING }}
+          STRATO_FTP_PASSWORD_STAGING: ${{ secrets.STRATO_FTP_PASSWORD_STAGING }}
         run: |
           set -e
 
-          echo "Deploying branch '$GITHUB_REF_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
-
-          if [ "$DEPLOY_TARGET_DIR" = "." ]; then
-            REMOTE_PREP="cd ."
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            FTP_USERNAME="$STRATO_FTP_USERNAME_STAGING"
+            FTP_PASSWORD="$STRATO_FTP_PASSWORD_STAGING"
+            ENV_NAME="staging"
           else
-            REMOTE_PREP="mkdir -p $DEPLOY_TARGET_DIR
-          cd $DEPLOY_TARGET_DIR"
+            FTP_USERNAME="$STRATO_FTP_USERNAME"
+            FTP_PASSWORD="$STRATO_FTP_PASSWORD"
+            ENV_NAME="live"
           fi
 
-          # === BEGIN BLOCK: LFTP DEPLOY (MAIN OR STAGING + AUTO MKDIR) ===
-          # Zweck:
-          # - main deployt weiter ins Webroot
-          # - staging deployt in den Unterordner staging
-          # - fehlender staging-Ordner wird bei Bedarf automatisch angelegt
-          # Umfang:
-          # - deploy/ wird vollständig in das branchabhängige Ziel gespiegelt
-          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          test -n "$STRATO_FTP_SERVER"
+          test -n "$FTP_USERNAME"
+          test -n "$FTP_PASSWORD"
+
+          echo "Deploying branch '$GITHUB_REF_NAME' with environment '$ENV_NAME' to remote dir '.'"
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
           set net:timeout 20
@@ -353,7 +356,7 @@ jobs:
           pwd
           cls -l
 
-          $REMOTE_PREP
+          cd .
           pwd
           cls -l
 
@@ -363,5 +366,4 @@ jobs:
           cls -l
           bye
           LFTP
-          # === END BLOCK: LFTP DEPLOY (MAIN OR STAGING + AUTO MKDIR) ===
-
+      # === END BLOCK: STRATO_UPLOAD_V3 ===
