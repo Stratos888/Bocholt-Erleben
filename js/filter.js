@@ -140,11 +140,13 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
 
 
 
-      // BEGIN: FILTER_UI_REFS_STORE
-    // Zweck: UI-Referenzen persistent im Modul speichern, damit Facet-Counts/Disabled-States nach applyFilters() aktualisiert werden können.
-    // Umfang: Ersetzt nur den Default-Reset-Abschnitt und ergänzt UI-Refs.
+    // BEGIN: FILTER_UI_REFS_STORE
+    // Zweck: UI-Referenzen persistent im Modul speichern, damit Facet-Counts/Disabled-States
+    //        und der Mobile-3-Spalten-State stabil gegen die richtige Row laufen.
+    // Umfang: Ersetzt nur den UI-Refs-Store.
     // END: FILTER_UI_REFS_STORE
     this._ui = {
+      searchRow: document.querySelector(".desktop-hero__search-row"),
       searchInput,
       timePill, timeValue, timeSheet,
       catPill,  catValue,  catSheet,
@@ -561,21 +563,23 @@ if (timeKey !== "all") {
     if (activeBtn && !activeBtn.disabled) activeBtn.classList.add("is-active");
   },
 
-  /* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V2 | Zweck: trennt Suchzustand und Facettenzustand sauber, sodass das globale Reset nur bei aktiven Facetten sichtbar ist und das Mobile-Grid die 2-/3-Spalten-Logik per Klassenwechsel steuert; Umfang: ersetzt ausschließlich updateFilterBarUI() === */
+  /* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V3 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und den Mobile-3-Spalten-State strikt am Facettenzustand; Umfang: ersetzt ausschließlich updateFilterBarUI() === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
-const timeMap = {
-  all: "Alle",
-  today: "Heute",
-  week: "Diese Woche",
-  weekend: "Dieses Wochenende",
-  nextweek: "Nächste Woche",
-  later: "Später"
-};
+    const timeMap = {
+      all: "Alle",
+      today: "Heute",
+      week: "Diese Woche",
+      weekend: "Dieses Wochenende",
+      nextweek: "Nächste Woche",
+      later: "Später"
+    };
 
-    const timeKey = this.filters.zeitraum || "all";
+    const timeKey = (this.filters.zeitraum || "all").trim();
     const cat = (this.filters.kategorie || "").trim();
-    const rowEl = this._ui?.searchRow || document.querySelector(".desktop-hero__search-row");
     const hasActiveFacetFilters = timeKey !== "all" || cat.length > 0;
+
+    const ui = this._ui || {};
+    const rowEl = ui.searchRow || document.querySelector(".desktop-hero__search-row");
 
     if (timeValueEl) timeValueEl.textContent = timeMap[timeKey] || "Alle";
     if (catValueEl) catValueEl.textContent = cat ? cat : "Alle";
@@ -584,9 +588,11 @@ const timeMap = {
       rowEl.classList.toggle("has-active-filter-reset", hasActiveFacetFilters);
     }
 
-    if (resetEl) resetEl.hidden = !hasActiveFacetFilters;
+    if (resetEl) {
+      resetEl.hidden = !hasActiveFacetFilters;
+    }
   },
-  /* === END BLOCK: FILTER_BAR_UI_STATE_V2 === */
+  /* === END BLOCK: FILTER_BAR_UI_STATE_V3 === */
 
   updateFacetOptionStates() {
     const ui = this._ui;
@@ -865,15 +871,16 @@ const timeMap = {
     this.applyFilters();
   },
 
-  /**
-  /* === BEGIN BLOCK: FILTER_RESET_METHODS_V2 | Zweck: trennt Facetten-Reset (globales X) und Voll-Reset (z. B. Empty-State/harte Rücksetzung), damit Suche lokal bleibt und Filter dennoch zentral zurückgesetzt werden können; Umfang: ersetzt ausschließlich den bisherigen resetFilters()-Block === */
+    /* === BEGIN BLOCK: FILTER_RESET_METHODS_V3 | Zweck: trennt Facetten-Reset (globales X) und Voll-Reset sauber und beseitigt den unsauberen Kommentar-/Methodenblock; Umfang: ersetzt ausschließlich den Reset-Methodenblock === */
   /**
    * Nur Facetten zurücksetzen; Suche bleibt erhalten.
    */
   resetFacetFilters() {
     const ui = this._ui || {};
     const searchInput = ui.searchInput || document.getElementById("search-filter");
-    const preservedSearchText = searchInput ? (searchInput.value || "") : (this.filters.searchText || "");
+    const preservedSearchText = searchInput
+      ? (searchInput.value || "")
+      : (this.filters.searchText || "");
 
     this.filters = {
       searchText: String(preservedSearchText).toLowerCase(),
@@ -915,14 +922,14 @@ const timeMap = {
    * Alle Filter inkl. Suche zurücksetzen.
    */
   resetFilters() {
+    const ui = this._ui || {};
+
     this.filters = {
       searchText: "",
       location: "",
       kategorie: "",
       zeitraum: "all"
     };
-
-    const ui = this._ui || {};
 
     if (ui.searchInput) {
       ui.searchInput.value = "";
@@ -955,8 +962,7 @@ const timeMap = {
 
     debugLog("Filters reset");
   },
-  /* === END BLOCK: FILTER_RESET_METHODS_V2 === */
-  /**
+  /* === END BLOCK: FILTER_RESET_METHODS_V3 === */
    * Events neu laden (z.B. nach Airtable-Update)
    */
   refresh(events) {
