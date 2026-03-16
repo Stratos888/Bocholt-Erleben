@@ -918,6 +918,7 @@ if (timeKey !== "all") {
     debugLog("Facet filters reset");
   },
 
+    /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V4 | Zweck: repariert den kaputten Methodenabschluss im Objekt und stellt den gültigen Übergang von resetFilters() zu refresh() wieder her; Umfang: ersetzt ausschließlich den Tail-Block ab resetFilters() bis inkl. refresh() === */
   /**
    * Alle Filter inkl. Suche zurücksetzen.
    */
@@ -962,13 +963,15 @@ if (timeKey !== "all") {
 
     debugLog("Filters reset");
   },
-  /* === END BLOCK: FILTER_RESET_METHODS_V3 === */
-   * Events neu laden (z.B. nach Airtable-Update)
+
+  /**
+   * Events neu laden (z. B. nach Airtable-Update)
    */
   refresh(events) {
     this.allEvents = Array.isArray(events) ? events : [];
     this.applyFilters();
   }
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V4 === */
 };
 
 /* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) ===
