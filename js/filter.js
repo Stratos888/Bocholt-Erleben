@@ -226,15 +226,11 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       });
     });
 
-    // Reset
+    /* === BEGIN BLOCK: FILTER_RESET_PILL_HANDLER_V2 | Zweck: koppelt das globale X an einen reinen Facetten-Reset, während die Suche als lokales Search-Feld-Verhalten bestehen bleibt; Umfang: ersetzt ausschließlich den Click-Handler des globalen Reset-Pills === */
     resetPill.addEventListener("click", () => {
-      this.resetFilters();
-      // UI reset
-      searchInput.value = "";
-      this.setActiveOption(timeSheet, timeSheet.querySelector('[data-time="all"]'));
-      this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
-      this.updateFilterBarUI(timeValue, catValue, resetPill);
+      this.resetFacetFilters();
     });
+    /* === END BLOCK: FILTER_RESET_PILL_HANDLER_V2 === */
 
     // Initial render
     this.applyFilters();
@@ -565,6 +561,7 @@ if (timeKey !== "all") {
     if (activeBtn && !activeBtn.disabled) activeBtn.classList.add("is-active");
   },
 
+  /* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V2 | Zweck: trennt Suchzustand und Facettenzustand sauber, sodass das globale Reset nur bei aktiven Facetten sichtbar ist und das Mobile-Grid die 2-/3-Spalten-Logik per Klassenwechsel steuert; Umfang: ersetzt ausschließlich updateFilterBarUI() === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
 const timeMap = {
   all: "Alle",
@@ -577,17 +574,19 @@ const timeMap = {
 
     const timeKey = this.filters.zeitraum || "all";
     const cat = (this.filters.kategorie || "").trim();
+    const rowEl = this._ui?.searchRow || document.querySelector(".desktop-hero__search-row");
+    const hasActiveFacetFilters = timeKey !== "all" || cat.length > 0;
 
     if (timeValueEl) timeValueEl.textContent = timeMap[timeKey] || "Alle";
     if (catValueEl) catValueEl.textContent = cat ? cat : "Alle";
 
-    const hasActive =
-      (this.filters.searchText && this.filters.searchText.trim().length > 0) ||
-      timeKey !== "all" ||
-      cat.length > 0;
+    if (rowEl) {
+      rowEl.classList.toggle("has-active-filter-reset", hasActiveFacetFilters);
+    }
 
-    if (resetEl) resetEl.hidden = !hasActive;
+    if (resetEl) resetEl.hidden = !hasActiveFacetFilters;
   },
+  /* === END BLOCK: FILTER_BAR_UI_STATE_V2 === */
 
   updateFacetOptionStates() {
     const ui = this._ui;
@@ -867,7 +866,53 @@ const timeMap = {
   },
 
   /**
-   * Filter zurücksetzen
+  /* === BEGIN BLOCK: FILTER_RESET_METHODS_V2 | Zweck: trennt Facetten-Reset (globales X) und Voll-Reset (z. B. Empty-State/harte Rücksetzung), damit Suche lokal bleibt und Filter dennoch zentral zurückgesetzt werden können; Umfang: ersetzt ausschließlich den bisherigen resetFilters()-Block === */
+  /**
+   * Nur Facetten zurücksetzen; Suche bleibt erhalten.
+   */
+  resetFacetFilters() {
+    const ui = this._ui || {};
+    const searchInput = ui.searchInput || document.getElementById("search-filter");
+    const preservedSearchText = searchInput ? (searchInput.value || "") : (this.filters.searchText || "");
+
+    this.filters = {
+      searchText: String(preservedSearchText).toLowerCase(),
+      location: "",
+      kategorie: "",
+      zeitraum: "all"
+    };
+
+    if (searchInput) {
+      searchInput.value = preservedSearchText;
+    }
+
+    if (ui.timeSheet) {
+      this.setActiveOption(
+        ui.timeSheet,
+        ui.timeSheet.querySelector('[data-time="all"]')
+      );
+    }
+
+    if (ui.catSheet) {
+      this.setActiveOption(
+        ui.catSheet,
+        ui.catSheet.querySelector('[data-category=""]')
+      );
+    }
+
+    this.applyFilters();
+
+    this.updateFilterBarUI(
+      ui.timeValue || document.getElementById("filter-time-value"),
+      ui.catValue || document.getElementById("filter-category-value"),
+      ui.resetPill || document.getElementById("filter-reset-pill")
+    );
+
+    debugLog("Facet filters reset");
+  },
+
+  /**
+   * Alle Filter inkl. Suche zurücksetzen.
    */
   resetFilters() {
     this.filters = {
@@ -910,7 +955,7 @@ const timeMap = {
 
     debugLog("Filters reset");
   },
-
+  /* === END BLOCK: FILTER_RESET_METHODS_V2 === */
   /**
    * Events neu laden (z.B. nach Airtable-Update)
    */
