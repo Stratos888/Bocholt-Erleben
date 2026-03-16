@@ -327,10 +327,18 @@ jobs:
 
           echo "Deploying branch '$GITHUB_REF_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
 
-          # === BEGIN BLOCK: LFTP DEPLOY (MAIN OR STAGING) ===
+          if [ "$DEPLOY_TARGET_DIR" = "." ]; then
+            REMOTE_PREP="cd ."
+          else
+            REMOTE_PREP="mkdir -p $DEPLOY_TARGET_DIR
+          cd $DEPLOY_TARGET_DIR"
+          fi
+
+          # === BEGIN BLOCK: LFTP DEPLOY (MAIN OR STAGING + AUTO MKDIR) ===
           # Zweck:
           # - main deployt weiter ins Webroot
           # - staging deployt in den Unterordner staging
+          # - fehlender staging-Ordner wird bei Bedarf automatisch angelegt
           # Umfang:
           # - deploy/ wird vollständig in das branchabhängige Ziel gespiegelt
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
@@ -345,7 +353,7 @@ jobs:
           pwd
           cls -l
 
-          cd $DEPLOY_TARGET_DIR
+          $REMOTE_PREP
           pwd
           cls -l
 
@@ -355,5 +363,5 @@ jobs:
           cls -l
           bye
           LFTP
-          # === END BLOCK: LFTP DEPLOY (MAIN OR STAGING) ===
+          # === END BLOCK: LFTP DEPLOY (MAIN OR STAGING + AUTO MKDIR) ===
 
