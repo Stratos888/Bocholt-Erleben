@@ -259,11 +259,18 @@ jobs:
           echo "=== PROOF A: after rsync (raw deploy/index.html style.css line) ==="
           grep -n "style.css" deploy/index.html || true
 
-          echo "=== STEP 1: replace existing ?v=... with BUILD_ID (no-op if no ?v= present) ==="
+          # === BEGIN BLOCK: BUILD_ID REWRITE FOR HTML + STYLE IMPORTS | Purpose: propagate BUILD_ID not only into HTML assets but also into css/style.css @imports so split CSS files cannot stay stuck on stale ?v=1 cache keys | Scope: replaces step-1/step-2 proof section only ===
+          echo "=== STEP 1A: replace existing ?v=... in HTML with BUILD_ID ==="
           find deploy -name "*.html" -print0 | xargs -0 sed -i "s/\?v=[^\"' >]*/?v=$BUILD_ID/g"
 
-          echo "=== PROOF B: after STEP 1 (deploy/index.html style.css line) ==="
+          echo "=== STEP 1B: replace existing ?v=... in deploy/css/style.css imports with BUILD_ID ==="
+          sed -i "s/\?v=[^\"') >]*/?v=$BUILD_ID/g" deploy/css/style.css
+
+          echo "=== PROOF B1: after STEP 1A (deploy/index.html style.css line) ==="
           grep -n "style.css" deploy/index.html || true
+
+          echo "=== PROOF B2: after STEP 1B (deploy/css/style.css import lines) ==="
+          nl -ba deploy/css/style.css | sed -n '1,20p' || true
 
           echo "=== STEP 2: normalize hashed suffix links back to ?v=BUILD_ID ==="
           find deploy -name "*.html" -print0 | xargs -0 perl -pi -e '
@@ -274,6 +281,7 @@ jobs:
 
           echo "=== PROOF C: after STEP 2 (deploy/index.html style.css line) ==="
           grep -n "style.css" deploy/index.html || true
+          # === END BLOCK: BUILD_ID REWRITE FOR HTML + STYLE IMPORTS ===
 
           echo "=== DEBUG index.html: first 120 lines (final before guard) ==="
           nl -ba deploy/index.html | sed -n '1,120p' || true
