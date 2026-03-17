@@ -123,25 +123,27 @@ jobs:
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
           PY
           test -s data/events.tsv
-      # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V3 | Zweck: main/live und staging sauber über getrennte SFTP-User steuern; kein Remote-Unterordner mehr ===
+      # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V4 | Zweck: main/live und staging nutzen denselben funktionierenden SFTP-Server/User; nur das Zielverzeichnis unterscheidet sich wieder ===
       - name: Decide deploy target
         shell: bash
         run: |
           set -e
 
           if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            TARGET_DIR="staging"
             ENV_NAME="staging"
           else
+            TARGET_DIR="."
             ENV_NAME="live"
           fi
 
+          echo "DEPLOY_TARGET_DIR=$TARGET_DIR" >> "$GITHUB_ENV"
           echo "DEPLOY_ENV_NAME=$ENV_NAME" >> "$GITHUB_ENV"
-          echo "DEPLOY_TARGET_DIR=." >> "$GITHUB_ENV"
 
           echo "Branch: ${GITHUB_REF_NAME}"
+          echo "Deploy target dir: $TARGET_DIR"
           echo "Environment: $ENV_NAME"
-          echo "Deploy target dir: ."
-      # === END BLOCK: DEPLOY_ENV_DECISION_V3 ===
+      # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
       - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows)
         shell: bash
         env:
@@ -316,35 +318,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-           # === BEGIN BLOCK: STRATO_UPLOAD_V3 | Zweck: main nutzt Live-User, staging nutzt Staging-User; gleicher Server, kein cd staging ===
+      # === BEGIN BLOCK: STRATO_UPLOAD_V4 | Zweck: main und staging nutzen wieder denselben funktionierenden Live-SFTP-User; staging deployt in Unterordner staging ===
       - name: Upload to STRATO via SFTP
         shell: bash
         env:
           STRATO_FTP_SERVER: ${{ secrets.STRATO_FTP_SERVER }}
           STRATO_FTP_USERNAME: ${{ secrets.STRATO_FTP_USERNAME }}
           STRATO_FTP_PASSWORD: ${{ secrets.STRATO_FTP_PASSWORD }}
-          STRATO_FTP_USERNAME_STAGING: ${{ secrets.STRATO_FTP_USERNAME_STAGING }}
-          STRATO_FTP_PASSWORD_STAGING: ${{ secrets.STRATO_FTP_PASSWORD_STAGING }}
         run: |
           set -e
 
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            FTP_USERNAME="$STRATO_FTP_USERNAME_STAGING"
-            FTP_PASSWORD="$STRATO_FTP_PASSWORD_STAGING"
-            ENV_NAME="staging"
-          else
-            FTP_USERNAME="$STRATO_FTP_USERNAME"
-            FTP_PASSWORD="$STRATO_FTP_PASSWORD"
-            ENV_NAME="live"
-          fi
-
           test -n "$STRATO_FTP_SERVER"
-          test -n "$FTP_USERNAME"
-          test -n "$FTP_PASSWORD"
+          test -n "$STRATO_FTP_USERNAME"
+          test -n "$STRATO_FTP_PASSWORD"
 
-          echo "Deploying branch '$GITHUB_REF_NAME' with environment '$ENV_NAME' to remote dir '.'"
+          echo "Deploying branch '$GITHUB_REF_NAME' with environment '$DEPLOY_ENV_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
 
-          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
+          lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
           set net:timeout 20
@@ -356,7 +346,7 @@ jobs:
           pwd
           cls -l
 
-          cd .
+          cd $DEPLOY_TARGET_DIR
           pwd
           cls -l
 
@@ -366,4 +356,4 @@ jobs:
           cls -l
           bye
           LFTP
-      # === END BLOCK: STRATO_UPLOAD_V3 ===
+      # === END BLOCK: STRATO_UPLOAD_V4 ===
