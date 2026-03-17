@@ -183,6 +183,43 @@ Never introduce asset instability.
 
 ---
 
+# BRANCH / RELEASE RULE
+
+Standard workflow is mandatory:
+
+- `staging` = default work + test branch
+- `main` = production / release branch
+
+Rules:
+
+- Routine changes must start on `staging`, not on `main`
+- Validate changes on `https://staging.bocholt-erleben.de` first
+- Only after successful staging validation: merge `staging` into `main`
+- Then deploy `main`
+- After `main` deploy, verify both:
+  - `https://bocholt-erleben.de`
+  - `https://staging.bocholt-erleben.de`
+
+Exception:
+- Direct edits on `main` are allowed only for urgent live hotfixes
+- Every direct `main` hotfix must be synced back into `staging` immediately after
+
+# STAGING INFRASTRUCTURE RULE
+
+The staging environment is now part of the canonical project infrastructure.
+
+Canonical staging target:
+
+- `https://staging.bocholt-erleben.de`
+
+Rules:
+
+- Never treat staging as optional or temporary
+- Never propose routine direct work on `main` if `staging` is available
+- Never break the staging URL, its SSL setup, or its deploy path without explicit instruction
+- The deploy workflow must preserve the remote `staging/` folder during live deploys
+- The wildcard SSL setup for `bocholt-erleben.de` + subdomains is part of the staging baseline and must be respected
+
 # DEPLOYMENT RULE
 
 Deployment must remain deterministic.
@@ -191,9 +228,9 @@ Never break asset references.
 
 Fail fast if asset inconsistency detected.
 
----
+Live deploy must not remove or damage staging infrastructure.
 
-# REGRESSION RULE
+Staging deploy must remain isolated from live behavior as far as possible within the current STRATO setup.
 
 Never break existing working functionality.
 
