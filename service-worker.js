@@ -102,6 +102,9 @@ const STATIC_ASSETS = [
 
   // Fallbacks (ohne Query) – falls HTML mal ohne ?v ausliefert
   "/css/style.css",
+  "/css/base.css",
+  "/css/pages.css",
+  "/css/legacy.css",
   "/js/main.js",
 
   // Offline-Datenbasis (für "first offline reload" auf Mobile)
