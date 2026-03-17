@@ -318,7 +318,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      # === BEGIN BLOCK: STRATO_UPLOAD_V4 | Zweck: main und staging nutzen wieder denselben funktionierenden Live-SFTP-User; staging deployt in Unterordner staging ===
+      # === BEGIN BLOCK: STRATO_UPLOAD_V6 | Zweck: main schützt staging vor --delete; staging deployt in staging; Scope: nur Upload-Step, mit einer einzigen stabilen lftp-Session ===
       - name: Upload to STRATO via SFTP
         shell: bash
         env:
@@ -334,6 +334,26 @@ jobs:
 
           echo "Deploying branch '$GITHUB_REF_NAME' with environment '$DEPLOY_ENV_NAME' to remote dir '$DEPLOY_TARGET_DIR'"
 
+          if [ "$DEPLOY_TARGET_DIR" = "." ]; then
+            LFTP_TARGET_COMMANDS=$(cat <<'EOF'
+          cd .
+          pwd
+          cls -l
+          rm -f index.html
+          mirror -R --delete --verbose -x '^staging(/|$)' deploy/ .
+          EOF
+            )
+          else
+            LFTP_TARGET_COMMANDS=$(cat <<EOF
+          cd $DEPLOY_TARGET_DIR
+          pwd
+          cls -l
+          rm -f index.html
+          mirror -R --delete --verbose deploy/ .
+          EOF
+            )
+          fi
+
           lftp -u "$STRATO_FTP_USERNAME","$STRATO_FTP_PASSWORD" "sftp://$STRATO_FTP_SERVER" <<LFTP
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
@@ -346,14 +366,9 @@ jobs:
           pwd
           cls -l
 
-          cd $DEPLOY_TARGET_DIR
-          pwd
-          cls -l
-
-          rm -f index.html
-          mirror -R --delete --verbose deploy/ .
+          $LFTP_TARGET_COMMANDS
 
           cls -l
           bye
           LFTP
-      # === END BLOCK: STRATO_UPLOAD_V4 ===
+      # === END BLOCK: STRATO_UPLOAD_V6 ===
