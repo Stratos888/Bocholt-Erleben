@@ -345,7 +345,6 @@ jobs:
             )
           else
             LFTP_TARGET_COMMANDS=$(cat <<EOF
-          mkdir -p $DEPLOY_TARGET_DIR
           cd $DEPLOY_TARGET_DIR
           pwd
           cls -l
