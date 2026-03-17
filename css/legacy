@@ -1,0 +1,420 @@
+/* === BEGIN BLOCK: TOKEN_CONTRACT_ROOT | Purpose: finalize DS-01 token contract and prepare DS-02 component mapping aliases without UI change | Scope: replaces entire :root token block === */
+/* GLOBAL DESIGN TOKENS */
+
+:root{
+  /* Overlay / Panels */
+  --ui-overlay-dim: rgba(17, 24, 39, 0.36);
+  --ui-overlay-blur: 6px;
+
+  --surface-panel: color-mix(in srgb, white 82%, var(--color-primary-muted));
+  --surface-panel-elevated: color-mix(in srgb, white 76%, var(--color-primary-muted));
+  --surface-panel-footer: color-mix(in srgb, white 80%, var(--color-primary-muted));
+
+  --surface-panel-row: var(--surface-panel-elevated);
+  --surface-panel-row-action: color-mix(in srgb, white 72%, var(--color-primary-muted));
+  --surface-panel-row-info: color-mix(in srgb, white 86%, var(--color-primary-muted));
+
+  --border-panel: color-mix(in srgb, rgba(31,41,51,0.12) 72%, var(--color-primary-muted));
+  --border-panel-soft: color-mix(in srgb, rgba(31,41,51,0.09) 72%, var(--color-primary-muted));
+  --border-panel-strong: color-mix(in srgb, rgba(31,41,51,0.16) 72%, var(--color-primary-muted));
+
+  --shadow-panel: 0 -42px 130px rgba(0,0,0,0.26), 0 1px 0 rgba(255,255,255,0.82) inset;
+  --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
+
+  /* Colors */
+  --color-primary: #8BCF4A;
+  --color-primary-muted: #EAF6DB;
+  --color-background: #F9FBF6;
+  --color-surface: #FFFFFF;
+
+  --color-text-primary: #1F2933;
+  --color-text-secondary: #5F6B73;
+  --color-text-muted: #8A949B;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  /* Layout */
+  --gutter: var(--space-lg);
+  --gutter-lg: 24px;
+
+  --header-h: 48px;
+  --stack-gap: 0px;
+  --vv-bottom: 0px;
+
+  --stack-bg: rgba(249, 251, 246, 0.86);
+  --divider: rgba(31,41,51,0.06);
+
+  /* Feed rhythm */
+  --feed-section-pad-top: 6px;
+  --feed-cards-gap: 10px;
+  --feed-title-mt: 4px;
+  --feed-title-mb: 6px;
+
+  --eventcard-pad: 14px;
+  --topstack-pad-bottom: 4px;
+  --offline-badge-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px);
+
+  /* Cards */
+  --radius-card: 12px;
+  --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+
+  /* Event cards */
+  --rail-w: 4px;
+  --eventcard-rail-opacity: 0.48;
+  --eventcard-meta-color: rgba(60,72,88,0.70);
+  --eventcard-meta-gap: 2px;
+
+  --radius-eventcard: 16px;
+  --border-eventcard: rgba(31,41,51,0.055);
+  --border-eventcard-hover: rgba(31,41,51,0.075);
+
+  --shadow-eventcard:
+    0 1px 1px rgba(0,0,0,0.032),
+    0 8px 22px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --shadow-eventcard-hover:
+    0 1px 2px rgba(0,0,0,0.038),
+    0 10px 26px rgba(0,0,0,0.050),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --eventcard-meta-lines: 2;
+
+  /* Icons */
+  --ui-tap-target: 44px;
+
+  --ui-icon-size-sm: 16px;
+  --ui-icon-size-md: 18px;
+  --ui-icon-size-lg: 22px;
+
+  --ui-icon-stroke-sm: 1.75;
+  --ui-icon-stroke-md: 1.85;
+  --ui-icon-stroke-lg: 2;
+
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  --ui-icon-opacity: 0.92;
+  --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
+
+  --hdr-icon-size: var(--ui-icon-size-md);
+  --eventcard-category-size: var(--ui-icon-size-sm);
+  --eventcard-category-opacity: 0.72;
+
+  /* Typography */
+  --font-event-title: 18px;
+  --font-event-meta: 14px;
+
+  /* Detailpanel layout */
+  --dp-header-pad-top: 34px;
+  --dp-sheet-radius: 22px;
+  --dp-indicator-size: 44px;
+
+  --dp-close-size: 36px;
+  --dp-actionbar-h: 78px;
+  --dp-safe-bottom: max(0px, env(safe-area-inset-bottom));
+  --dp-actionbar-pad-y: var(--space-sm);
+  --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
+
+  /* UI controls */
+  --ui-radius-sm: 12px;
+  --ui-radius-md: 14px;
+  --ui-sheet-radius-lg: 18px;
+
+  --ui-border-weak: rgba(31,41,51,0.08);
+  --ui-border-soft: rgba(31,41,51,0.10);
+  --ui-border-strong: rgba(31,41,51,0.14);
+  --ui-border-primary: rgba(139,207,74,0.45);
+
+  --ui-surface-soft: rgba(255,255,255,0.55);
+  --ui-surface-soft-hover: rgba(255,255,255,0.74);
+  --ui-surface-soft-active: rgba(255,255,255,0.86);
+
+  --ui-surface-tint: rgba(31,41,51,0.04);
+  --ui-surface-tint-hover: rgba(31,41,51,0.06);
+  --ui-surface-tint-active: rgba(31,41,51,0.08);
+
+  --ui-shadow-soft:
+    0 6px 14px rgba(0,0,0,0.045),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
+  --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
+  --ui-sheet-shadow-strong:
+    0 24px 64px rgba(0,0,0,0.16),
+    0 1px 0 rgba(255,255,255,0.78) inset;
+
+  --ui-focus-ring: rgba(139,207,74,0.20);
+  --ui-focus-ring-neutral: rgba(31,41,51,0.18);
+
+  --ui-font-size-control: 13px;
+  --ui-font-weight-control: 750;
+  --ui-font-weight-cta: 800;
+  --ui-choice-font-size: 15px;
+
+  --ui-control-h: 36px;
+  --ui-control-pad-x: 12px;
+  --ui-choice-minh: var(--ui-tap-target);
+
+  --ui-control-radius: var(--ui-radius-md);
+
+  --ui-control-border: var(--ui-border-weak);
+  --ui-control-border-strong: var(--ui-border-soft);
+
+  --ui-control-bg: rgba(255,255,255,0.82);
+  --ui-control-bg-strong: rgba(255,255,255,0.92);
+
+  --ui-control-shadow: var(--ui-shadow-soft);
+  --ui-control-shadow-strong:
+    0 5px 12px rgba(0,0,0,0.040),
+    0 1px 0 rgba(255,255,255,0.80) inset;
+
+  --ui-control-ring-active: rgba(139,207,74,0.09);
+
+  /* Close button DNA */
+  --ui-close-size: var(--ui-tap-target);
+  --ui-close-bg: rgba(255,255,255,0.92);
+  --ui-close-border: 1px solid var(--ui-border-strong);
+  --ui-close-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  --ui-close-font-size: 22px;
+  --ui-close-color: rgba(31,41,51,0.74);
+
+  /* DS-02 component mapping prep: buttons */
+  --cmp-btn-minh: var(--ui-tap-target);
+  --cmp-btn-pad-x: var(--ui-control-pad-x);
+  --cmp-btn-radius: var(--ui-control-radius);
+  --cmp-btn-font-size: var(--ui-font-size-control);
+  --cmp-btn-font-weight: var(--ui-font-weight-control);
+  --cmp-btn-focus-ring: var(--ui-focus-ring);
+  --cmp-btn-primary-bg: var(--color-primary);
+  --cmp-btn-primary-fg: var(--color-text-primary);
+  --cmp-btn-primary-shadow: var(--ui-shadow-cta);
+  --cmp-btn-secondary-bg: var(--ui-control-bg-strong);
+  --cmp-btn-secondary-fg: var(--color-text-primary);
+  --cmp-btn-secondary-border: var(--ui-control-border-strong);
+  --cmp-btn-secondary-shadow: var(--ui-control-shadow-strong);
+  --cmp-btn-ghost-bg: transparent;
+  --cmp-btn-ghost-fg: var(--color-text-primary);
+  --cmp-btn-ghost-border: transparent;
+
+  /* DS-02 component mapping prep: cards / surfaces */
+  --cmp-card-radius: var(--radius-card);
+  --cmp-card-border: var(--border);
+  --cmp-card-shadow: var(--shadow-card);
+  --cmp-card-bg: var(--color-surface);
+  --cmp-surface-panel-bg: var(--surface-panel);
+  --cmp-surface-panel-elevated-bg: var(--surface-panel-elevated);
+  --cmp-surface-panel-footer-bg: var(--surface-panel-footer);
+  --cmp-surface-panel-border: var(--border-panel);
+  --cmp-surface-panel-shadow: var(--shadow-panel);
+
+  /* DS-02 component mapping prep: empty state */
+  --cmp-empty-card-bg: var(--cmp-card-bg);
+  --cmp-empty-card-border: var(--border-eventcard);
+  --cmp-empty-card-radius: var(--radius-eventcard);
+  --cmp-empty-card-shadow: var(--shadow-eventcard);
+
+  --cmp-empty-title-color: var(--color-text-primary);
+  --cmp-empty-text-color: var(--eventcard-meta-color);
+
+  --cmp-empty-btn-minh: 38px;
+  --cmp-empty-btn-minw: 200px;
+  --cmp-empty-btn-pad-x: 16px;
+  --cmp-empty-btn-radius: var(--ui-radius-sm);
+  --cmp-empty-btn-bg: var(--cmp-btn-secondary-bg);
+  --cmp-empty-btn-fg: var(--cmp-btn-secondary-fg);
+  --cmp-empty-btn-border: var(--cmp-btn-secondary-border);
+  --cmp-empty-btn-shadow: var(--cmp-btn-secondary-shadow);
+  --cmp-empty-btn-shadow-active: var(--ui-shadow-soft);
+  --cmp-empty-btn-focus-ring: var(--cmp-btn-focus-ring);
+
+  /* DS-02 component mapping prep: dividers */
+  --cmp-divider-color: var(--divider);
+  --cmp-divider-strong: var(--ui-border-soft);
+
+  /* DS-02 component mapping prep: links */
+  --cmp-link-color: var(--color-text-primary);
+  --cmp-link-color-muted: var(--color-text-secondary);
+  --cmp-link-underline-color: currentColor;
+  --cmp-link-focus-ring: var(--ui-focus-ring-neutral);
+
+  /* DS-02 component mapping prep: inputs / choices */
+  --cmp-input-minh: var(--ui-control-h);
+  --cmp-input-pad-x: var(--ui-control-pad-x);
+  --cmp-input-radius: var(--ui-control-radius);
+  --cmp-input-border: var(--ui-control-border);
+  --cmp-input-border-strong: var(--ui-control-border-strong);
+  --cmp-input-bg: var(--ui-control-bg);
+  --cmp-input-bg-strong: var(--ui-control-bg-strong);
+  --cmp-input-shadow: var(--ui-control-shadow);
+  --cmp-input-shadow-strong: var(--ui-control-shadow-strong);
+  --cmp-input-focus-ring: var(--ui-focus-ring);
+  --cmp-choice-minh: var(--ui-choice-minh);
+  --cmp-choice-font-size: var(--ui-choice-font-size);
+
+  /* DS-02 component mapping prep: focus */
+  --cmp-focus-ring-brand: var(--ui-focus-ring);
+  --cmp-focus-ring-neutral: var(--ui-focus-ring-neutral);
+  --cmp-focus-outline-offset: 2px;
+
+  /* Backward compat */
+  --bg: var(--color-background);
+  --surface: var(--color-surface);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+
+  --border: rgba(31,41,51,0.10);
+
+  --primary: var(--color-primary);
+  --accent: var(--color-primary);
+
+  --focus-ring: rgba(139,207,74,0.25);
+
+  --radius: var(--radius-card);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-card);
+
+  --space-1: var(--space-xs);
+  --space-2: var(--space-sm);
+  --space-3: var(--space-md);
+  --space-4: var(--space-lg);
+  --space-5: var(--space-xl);
+}
+/* === END BLOCK: TOKEN_CONTRACT_ROOT === */
+/**
+ * STYLE.CSS – Bocholt erleben (MVP frozen)
+ * Ziel: ruhig, modern, funktional, konsistent
+ * Architektur: Single Source of Truth
+ */
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* REDUCED MOTION CONTRACT (enterprise a11y) */
+@media (prefers-reduced-motion: reduce){
+
+  html:focus-within{
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+}
+
+/* (removed duplicate :root; merged into the first one) */
+
+
+/* GLOBAL TYPOGRAPHY BASE */
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f4f6ef; /* Basis: mobile & desktop gleich */
+  color: #111827;
+}
+/* VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) */
+html,
+body{
+  overscroll-behavior-y: none;
+}
+/* DESKTOP BACKDROP POLISH */
+@media (min-width: 900px){
+  :root{
+    --gutter: var(--gutter-lg);
+  }
+
+  body{
+    background: #eef1e6; /* leicht dunkler als App-Fläche */
+  }
+
+  .top-stack,
+  .desktop-entry,
+  .events-section{
+  /* SECTION */
+    padding: var(--feed-section-pad-top) var(--gutter) 0;
+
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+}
+
+
+/* GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) */
+a{
+  color: var(--color-primary);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+a:hover{ text-decoration: underline; }
+a:visited{ color: var(--color-primary); }
+
+/* PAGE LAYOUT CONTRACT (top-app readability) */
+.page{
+  width: 100%;
+  padding: calc(var(--gutter) + 2px) var(--gutter) calc(var(--gutter) + 14px);
+}
+
+@media (min-width: 860px){
+  .page{
+    max-width: 760px;
+    margin: 0 auto;
+    padding:
+      calc(var(--gutter-lg) + 4px)
+      var(--gutter-lg)
+      calc(var(--gutter-lg) + 18px);
+  }
+}
+
+.page > * + *{
+  margin-top: 16px;
+}
+
+.page h1{
+  font-size: 1.35rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 6px 0 10px;
+}
+
+.page h2{
+  font-size: 1.05rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.page p,
+.page ul,
+.page ol{
+  color: var(--color-text-secondary);
+}
+
+.page ul,
+.page ol{
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.page li{
+  margin: 6px 0;
+}
+
