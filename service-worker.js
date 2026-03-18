@@ -104,6 +104,7 @@ const STATIC_ASSETS = [
   "/css/style.css",
   "/css/base.css",
   "/css/pages.css",
+  "/css/components.css",
   "/css/legacy.css",
   "/css/overlays.css",
   "/js/main.js",
