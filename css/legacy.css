@@ -897,38 +897,9 @@ footer a:hover {
 
 /* RESPONSIVE (mobile unchanged + desktop frame) */
 
-/* Mobile: Suche oben vollbreit, Filterreihe darunter adaptiv mit/ohne Reset */
-@media (max-width: 768px) {
-  .event-cards-grid { grid-template-columns: 1fr; }
-
-  .desktop-hero__search-row{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
-  }
-
-  .desktop-hero__search-field{
-    grid-column: 1 / -1;
-    min-width: 0;
-  }
-
-  .desktop-hero__search-row > .filter-pill{
-    min-width: 0;
-    width: 100%;
-  }
-
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: var(--cmp-input-minh);
-    min-width: var(--cmp-input-minh);
-    justify-self: stretch;
-    align-self: stretch;
-  }
-}
+/* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
+/* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
+/* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V7 | Zweck: Konsolidiert die Desktop-Rahmung für Hero und Feed auf dem aktuellen Stand; Scope: ersetzt nur die Container-Breite und vertikale Taktung der Desktop-Bühne, Mobile bleibt unverändert === */
 @media (min-width: 900px) {
@@ -1181,6 +1152,7 @@ footer a:hover {
   outline-offset: 3px;
 }
 
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE | Purpose: keep the final winning responsive owner for the search row local to DESKTOP_HERO_STRUCTURE_V8 so mobile gets a true two-pill row and optional third reset slot without later same-specificity overrides | Scope: replaces the existing max-width:899.98px responsive block === */
 @media (max-width: 899.98px){
   .desktop-hero__search-row{
     gap: 12px;
@@ -1194,6 +1166,41 @@ footer a:hover {
     min-height: 0;
   }
 }
+
+@media (max-width: 768px){
+  .event-cards-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-hero__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
+  }
+
+  .desktop-hero__search-field{
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .desktop-hero__search-row > .filter-pill{
+    min-width: 0;
+    width: 100%;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--cmp-input-minh);
+    min-width: var(--cmp-input-minh);
+    justify-self: stretch;
+    align-self: stretch;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V14 | Zweck: finalisiert den Desktop-Hero durch kompakteres Suchband, exakt gleich hohe Pills, klar sekundäre Action-Leiste und insgesamt leichtere Bühnenproportionen; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
