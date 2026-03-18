@@ -105,6 +105,7 @@ const STATIC_ASSETS = [
   "/css/base.css",
   "/css/pages.css",
   "/css/legacy.css",
+  "/css/overlays.css",
   "/js/main.js",
 
   // Offline-Datenbasis (für "first offline reload" auf Mobile)
