@@ -305,6 +305,18 @@ DECISIONS LOG (permanent, project-wide):
   - Die Staging-Subdomain ist per Wildcard-SSL abgesichert und gehört zum kanonischen Betriebsmodell des Projekts.
   - Der Deploy-Workflow muss den Remote-Ordner `staging/` bei Live-Deploys explizit schützen und darf ihn nicht mehr durch `--delete` entfernen.
   - Staging ist kein temporärer Hilfspfad mehr, sondern fester Bestandteil des Release-Prozesses.
+- CSS architecture / asset entrypoint:
+  - Der öffentliche CSS-Einstiegspunkt in HTML ist ausschließlich `/css/style.css?v=...`.
+  - `css/style.css` ist nur noch der kanonische Aggregator und lädt in fester Reihenfolge: `base.css`, `pages.css`, `components.css`, `home.css`, `overlays.css`.
+  - HTML-Dateien dürfen die Teildateien `base.css`, `pages.css`, `components.css`, `home.css` und `overlays.css` nie direkt laden.
+  - `css/legacy.css` ist deprecated, nur noch Übergangs-/Stub-Datei und darf nicht wieder in `style.css` eingebunden oder als aktiver Owner reaktiviert werden.
+  - Verbindliche CSS-Besitzverteilung:
+    - `base.css` = globale Foundation, Tokens, globale Header-/Footer-/Focus-/Icon-Basis
+    - `pages.css` = Content-/statische Seiten
+    - `components.css` = wiederverwendbare UI-Komponenten
+    - `home.css` = Home-/Hero-/Feed-/Search-Row-Layout inkl. responsiver Home-Regeln
+    - `overlays.css` = Detailpanel, Filter-Sheet, Modals, Overlay-Locks und overlaynahe Zustände
+  - Neue CSS-Arbeit erfolgt ab jetzt im zuständigen Owner-File; Cross-File-Patches nur bei nachgewiesener Root Cause.
 
 CURRENT SPRINT (TASK 1: DETAILPANEL UI STABILIZATION) — STATUS:
 - Detailpanel bleibt Enterprise-Baseline und ist vorerst eingefroren; keine strukturelle Neugestaltung.
@@ -328,10 +340,10 @@ REMAINING GAPS (NEXT WORKPACKS, UI/UX + FUNCTIONAL):
    - erst nach validiertem Staging-Stand nach `main` übernehmen
 
 NEXT CHAT PROMPT (start here):
-„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach den aktuellen Freeze-/Scope-Stand strikt respektieren: Feed, Filter, Event-Cards und Detailpanel sind vorerst eingefroren; der Workpack ‚State Transition & Hierarchy Polish‘ bleibt on hold; das globale Design-System gilt als im Wesentlichen konsolidiert. Zusätzlich gilt ab jetzt verbindlich der neue Release-Workflow: normale Änderungen immer zuerst auf `staging`, Test auf `https://staging.bocholt-erleben.de`, danach PR/Merge `staging` → `main`, dann erst Live-Deploy. Öffne keine eingefrorenen UI-Hauptflächen ohne klaren konkreten Defekt und arbeite neue größere Änderungen staging-first.“
+„ZIP-first: Bitte zuerst MASTER.md und ENGINEERING.md lesen. Danach den aktuellen Freeze-/Scope-Stand strikt respektieren: Feed, Filter, Event-Cards und Detailpanel sind vorerst eingefroren; der Workpack ‚State Transition & Hierarchy Polish‘ bleibt on hold; das globale Design-System gilt als im Wesentlichen konsolidiert. Zusätzlich gilt ab jetzt verbindlich der neue Release-Workflow: normale Änderungen immer zuerst auf `staging`, Test auf `https://staging.bocholt-erleben.de`, danach PR/Merge `staging` → `main`, dann erst Live-Deploy. Die CSS-Architektur gilt als strukturell abgeschlossen und ist nicht erneut aufzubrechen: öffentlicher CSS-Einstiegspunkt nur `/css/style.css?v=...`; `style.css` lädt nur `base.css`, `pages.css`, `components.css`, `home.css`, `overlays.css`; Teildateien werden nie direkt in HTML eingebunden; `legacy.css` bleibt deprecated. Öffne keine eingefrorenen UI-Hauptflächen ohne klaren konkreten Defekt und arbeite neue CSS-Patches nur im zuständigen Owner-File auf Basis nachgewiesener Root Cause.“
 
 LAST UPDATE:
 
-2026-03-17
+2026-03-18
 <!-- === END REPLACEMENT BLOCK: SESSION STATE + DECISIONS LOG (Session Close 2026-02-27) === -->
 # END OF FILE
