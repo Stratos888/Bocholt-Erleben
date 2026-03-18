@@ -1,6 +1,9 @@
 /* === BEGIN BLOCK: DS-02_FILTER_SHEET_CLUSTER_MAPPING | Purpose: consolidate filter-sheet shell, header, body and option rows into one clean DS-02 cluster without redesign | Scope: filter-sheet, overlay, card, handle, header, body, close, options, hidden rules, mobile compact adjustments === */
 
 /* FILTER SHEET HEIGHT + SCROLL (dvh + stable body scroll) */
+body.is-sheet-open { overflow: hidden; }
+html.is-sheet-open { overflow: hidden; }
+html.is-sheet-open body { overflow: hidden; }
 
 /* ===== Bottom Sheet ===== */
 .filter-sheet{
@@ -9,15 +12,18 @@
   z-index: 9998;
 }
 
-/* FIXED OVERLAY SCOPE FIX (remove transformed ancestor while sheet open) */
-body.is-sheet-open .top-stack{
+/* FIXED OVERLAY SCOPE FIX (remove transformed ancestor while any overlay is open) */
+body.is-sheet-open .top-stack,
+body.is-panel-open .top-stack{
   transform: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   contain: none !important;
   overflow: visible !important;
-  z-index: 9997 !important;
 }
+
+body.is-sheet-open .top-stack{ z-index: 9997 !important; }
+body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohnehin z-index:9999 */
 
 .filter-sheet__overlay{
   position: absolute;
@@ -1490,3 +1496,163 @@ Umfang:
   transform: none;
 }
 /* === END BLOCK: DS-02_DETAIL_ACTIONBAR_MAPPING === */
+
+/* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS | Purpose: absorb remaining overlay-scoped rules from legacy.css so all fixed/sheet/panel states live in overlays.css; Scope: offline badge/toast plus detailpanel icon guards === */
+/* === BEGIN BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) | Scope: UI-only overlay, no layout shifts ===
+Zweck:
+- Persistentes Offline-Badge solange offline (informativ, nicht blockierend)
+- Toast/Snackbar nur bei Zustandswechsel online<->offline
+- Formal konsistent mit Status-/Empty-State-DNA, aber klar niedriger priorisiert
+Umfang:
+- Reines UI-Styling, JS setzt nur Klassen/States
+=== */
+
+/* Offline badge: fixed unter Header, zentriert, kein Layout-Shift */
+.offline-badge{
+  position: fixed;
+  top: var(--offline-badge-top, calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px));
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+
+  z-index: 910;
+
+  max-width: min(100% - (2 * var(--gutter)), 420px);
+  width: max-content;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--ui-border-weak);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.70) inset,
+    0 10px 24px rgba(31,41,51,0.10);
+
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+  color: rgba(31,41,51,0.86);
+
+  pointer-events: none;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
+}
+
+html.is-offline .offline-badge{
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+/* Toast: fixed unten, safe mit visualViewport bottom */
+.offline-toast{
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + var(--vv-bottom));
+  transform: translateX(-50%) translateY(12px);
+
+  z-index: 910;
+
+  max-width: min(100% - (2 * var(--gutter)), 460px);
+  width: max-content;
+
+  padding: 10px 14px;
+  border-radius: var(--ui-radius-md);
+
+  background: rgba(17,24,39,0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.18);
+
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+  color: rgba(255,255,255,0.96);
+
+  pointer-events: none;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
+}
+
+.offline-toast.is-visible{
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .offline-badge,
+  .offline-toast{
+    transition: none !important;
+  }
+}
+
+/* === END BLOCK: GS-01.5 OFFLINE INDICATOR (Badge + Toast) === */
+
+/* Scoped detailpanel guard: only UI icons are clamped as icons */
+/* Scoped detailpanel guard: only UI icons are clamped as icons */
+#event-detail-panel .detail-meta-icon svg,
+#event-detail-panel .detail-meta-icon img,
+#event-detail-panel .detail-link svg,
+#event-detail-panel .detail-link img,
+#event-detail-panel .detail-actions svg,
+#event-detail-panel .detail-actions img,
+#event-detail-panel .detail-action svg,
+#event-detail-panel .detail-action img,
+#event-detail-panel .detail-close svg,
+#event-detail-panel .detail-close img{
+  width: 18px !important;
+  height: 18px !important;
+
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+
+  flex: 0 0 auto !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Category indicator follows its own container/tokens */
+#event-detail-panel .detail-category-icon svg,
+#event-detail-panel .detail-category-icon img{
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Description content stays free, not clamped as UI icon */
+#event-detail-panel .detail-description svg,
+#event-detail-panel .detail-description img{
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+
+  display: inline !important;
+  object-fit: contain !important;
+}
+/* === END BLOCK: DS-02_ICON_SYSTEM_GUARD_CLUSTER_MAPPING === */
+/* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS === */
