@@ -897,15 +897,19 @@ footer a:hover {
 
 /* RESPONSIVE (mobile unchanged + desktop frame) */
 
-/* Mobile: bleibt wie bisher */
+/* Mobile: Suche oben vollbreit, Filterreihe darunter adaptiv mit/ohne Reset */
 @media (max-width: 768px) {
   .event-cards-grid { grid-template-columns: 1fr; }
 
   .desktop-hero__search-row{
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
     gap: 8px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
   }
 
   .desktop-hero__search-field{
