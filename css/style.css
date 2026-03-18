@@ -1,5 +1,6 @@
-/* === BEGIN BLOCK: CSS_AGGREGATOR_STEP_1 | Purpose: migrate style.css into stable entrypoint that delegates to base/pages/legacy for stepwise CSS split | Scope: entire file === */
+/* === BEGIN BLOCK: CSS_AGGREGATOR_STEP_2 | Purpose: extend stable style.css entrypoint by splitting overlay-specific CSS into dedicated overlays.css while keeping base/pages/legacy loading order controlled | Scope: entire file === */
 @import url("/css/base.css?v=1");
 @import url("/css/pages.css?v=1");
 @import url("/css/legacy.css?v=1");
-/* === END BLOCK: CSS_AGGREGATOR_STEP_1 === */
+@import url("/css/overlays.css?v=1");
+/* === END BLOCK: CSS_AGGREGATOR_STEP_2 === */
