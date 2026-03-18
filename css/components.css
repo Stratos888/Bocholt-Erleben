@@ -904,3 +904,218 @@
 }
 .header-right > a.pwa-install-button::after{ content: "Info"; }
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
+
+/* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS | Purpose: absorb remaining event-card meta/location and filter-control detail rules from legacy.css so component DNA stays self-owned; Scope: event-meta base, tiny-card override, location row, filters-bar helper, pill subparts, reset icon states === */
+/* ============================================
+   LOADING & MESSAGES
+   ============================================ */
+
+/*/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+
+
+
+
+
+/* Meta-Zeile: 1 Zeile, ruhig (muted statt opacity) */
+/* SECTION */
+
+.event-meta{
+  margin: 0;
+
+  font-size: var(--font-event-meta);
+  line-height: 1.28;
+
+  color: var(--eventcard-meta-color);
+
+  /* GS-01 Enterprise: 1 Zeile, Zeit fix | Ort ellipsis */
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.event-meta__prefix{
+  display: none;
+}
+
+.event-meta__time{
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.event-meta__place{
+  flex: 1 1 auto;
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Separator kommt aus CSS (kein Separator-Textnode im DOM) */
+.event-meta__time + .event-meta__place::before{
+  content: " · ";
+}
+
+/* Falls irgendwo noch ein “floating” Icon direkt in der Card hängt: ausblenden */
+.event-card > .event-category-icon{
+  display: none;
+}
+
+/* Mobile fein */
+/* SECTION */
+@media (max-width: 360px){
+  .event-card{
+    --rail-w: 56px;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+
+    /* keep density tokens (do NOT revert to --space-lg=16px) */
+    padding: var(--eventcard-pad);
+    padding-left: 0;
+
+    column-gap: var(--space-md);
+  }
+
+  .event-card::before{ width: var(--rail-w); left: 0; }
+  .event-date-badge{ width: 40px; }
+}
+
+
+/* (removed) legacy event title/meta/icon/location overrides to avoid contradictions */
+
+
+/* Location: reine Info-Zeile (kein Pill) */
+.event-location{
+  margin-top: 0;
+  min-width: 0;
+}
+
+.event-location-text{
+  font-size: 13px;
+  font-weight: 650;
+  color: rgba(31,41,51,0.78);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* SECTION */
+
+/* FILTER BAR (compact single-row + inline reset X) */
+
+.filters-bar{
+  max-width: 820px;
+  margin: 6px auto 0;
+
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+
+  flex-wrap: nowrap;
+}
+
+/* Pills: exakte Höhe, Padding vertikal = 0 */
+
+.filter-pill__label{
+  color: rgba(95,107,115,0.90);
+  font-weight: 650;
+}
+
+.filter-pill__value{
+  color: rgba(31,41,51,0.94);
+  font-weight: 850;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-pill::after{
+  content: "›";
+  margin-left: 2px;
+  color: rgba(31,41,51,0.40);
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.filter-pill.is-active{
+  border-color: rgba(139,207,74,0.26);
+  background: rgba(255,255,255,0.92);
+  box-shadow:
+    0 7px 16px rgba(0,0,0,0.050),
+    0 0 0 3px var(--ui-control-ring-active),
+    0 1px 0 rgba(255,255,255,0.78) inset;
+}
+.filter-pill.is-active .filter-pill__value{
+  color: color-mix(in srgb, var(--color-text-primary) 86%, var(--color-primary));
+}
+
+@media (hover: hover){
+  .filter-pill:hover{
+    background: rgba(255,255,255,0.90);
+    border-color: rgba(31,41,51,0.12);
+    box-shadow:
+      0 7px 16px rgba(0,0,0,0.050),
+      0 1px 0 rgba(255,255,255,0.72) inset;
+  }
+}
+
+.filter-pill:active{ transform: translateY(1px); }
+
+
+/* Reset: exakt gleiche Höhe wie die anderen Controls */
+
+/* Keine Pill-Chevron */
+.filter-pill--reset::after{ content: none; }
+
+/* Icon: bewusst wie UI-Icon behandelt (kein “Textbutton”-Look) */
+.filter-pill--reset{ font-size: 0; }
+.filter-pill--reset::before{
+  content: "";
+  display: block;
+
+  width: 16px;
+  height: 16px;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  color: rgba(31,41,51,0.62);
+
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 15px 15px;
+
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+}
+
+@media (hover: hover){
+  .filter-pill--reset:hover{
+    background: rgba(255,255,255,0.90);
+    border-color: rgba(31,41,51,0.12);
+    box-shadow:
+      0 7px 16px rgba(0,0,0,0.050),
+      0 1px 0 rgba(255,255,255,0.72) inset;
+  }
+  .filter-pill--reset:hover::before{
+    color: rgba(31,41,51,0.72);
+  }
+}
+
+.filter-pill--reset:active{
+  transform: translateY(1px);
+}
+
+/* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
+/* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS === */
