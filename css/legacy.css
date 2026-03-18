@@ -1183,8 +1183,12 @@ footer a:hover {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
   }
 
-  .desktop-hero__search-field{
+  .desktop-hero__search-slot{
     grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .desktop-hero__search-field{
     min-width: 0;
   }
 
