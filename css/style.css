@@ -1,8 +1,7 @@
-/* === BEGIN BLOCK: CSS_AGGREGATOR_STEP_4 | Purpose: extend stable style.css entrypoint by splitting home/start-page layout into dedicated home.css while keeping remaining legacy and overlay loading controlled | Scope: entire file === */
+/* === BEGIN BLOCK: CSS_AGGREGATOR_STEP_5 | Purpose: remove legacy.css from runtime by consolidating its remaining foundation, component and overlay rules into their final owner files | Scope: entire file === */
 @import url("/css/base.css?v=1");
 @import url("/css/pages.css?v=1");
 @import url("/css/components.css?v=1");
 @import url("/css/home.css?v=1");
-@import url("/css/legacy.css?v=1");
 @import url("/css/overlays.css?v=1");
-/* === END BLOCK: CSS_AGGREGATOR_STEP_4 === */
+/* === END BLOCK: CSS_AGGREGATOR_STEP_5 === */
