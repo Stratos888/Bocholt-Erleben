@@ -61,40 +61,41 @@
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
 /* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V9 | Zweck: verschiebt den Hero-Bild-Slot von einem sichtbaren Bildblock zu einer weich austauschbaren rechten Atmosphärenzone mit zentralen Bild-Parametern; Scope: nur Home-Hero-/Feed-Rahmung und zentrale Hintergrundbild-Konfiguration, Mobile visuell unverändert === */
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V10 | Purpose: switch the desktop hero from a right-side image slot to a full-bleed stage with controlled focal-point variables | Scope: desktop hero background tokens, container width and asset activation only; mobile remains unchanged === */
 :root{
   --hero-bg-image-desktop: none;
   --hero-bg-image-mobile: none;
-  --hero-bg-opacity-desktop: 0;
+  --hero-bg-opacity-desktop: 1;
   --hero-bg-opacity-mobile: 0;
-  --hero-bg-size-desktop: 920px auto;
-  --hero-bg-size-desktop-narrow: 760px auto;
+  --hero-bg-size-desktop: cover;
+  --hero-bg-size-desktop-narrow: cover;
   --hero-bg-size-mobile: cover;
-  --hero-bg-position-desktop: right -148px top 8px;
-  --hero-bg-position-desktop-narrow: right -236px top 12px;
+  --hero-bg-position-desktop: 64% 10%;
+  --hero-bg-position-desktop-narrow: 61% 12%;
   --hero-bg-position-mobile: center top;
   --hero-bg-blur-desktop: 0px;
   --hero-bg-blur-mobile: 0px;
-  --hero-bg-brightness-desktop: 1.12;
+  --hero-bg-brightness-desktop: 0.98;
   --hero-bg-brightness-mobile: 1.04;
-  --hero-bg-saturate-desktop: 0.72;
+  --hero-bg-saturate-desktop: 0.90;
   --hero-bg-saturate-mobile: 0.84;
-  --hero-bg-contrast-desktop: 0.88;
+  --hero-bg-contrast-desktop: 0.94;
   --hero-bg-contrast-mobile: 0.90;
+  --hero-stage-min-h-desktop: 472px;
+  --hero-stage-min-h-desktop-narrow: 434px;
 }
 
-/* Aktivierung Desktop nach Asset-Ablage, z. B. in assets/hero/: */
 :root{
   --hero-bg-image-desktop: url("../assets/hero/bocholt-hero-a.jpg");
-  --hero-bg-opacity-desktop: 0.92;
-  --hero-bg-size-desktop: 920px auto;
-  --hero-bg-size-desktop-narrow: 760px auto;
-  --hero-bg-position-desktop: right -148px top 8px;
-  --hero-bg-position-desktop-narrow: right -236px top 12px;
+  --hero-bg-opacity-desktop: 1;
+  --hero-bg-size-desktop: cover;
+  --hero-bg-size-desktop-narrow: cover;
+  --hero-bg-position-desktop: 64% 10%;
+  --hero-bg-position-desktop-narrow: 61% 12%;
   --hero-bg-blur-desktop: 0px;
-  --hero-bg-brightness-desktop: 1.12;
-  --hero-bg-saturate-desktop: 0.72;
-  --hero-bg-contrast-desktop: 0.88;
+  --hero-bg-brightness-desktop: 0.98;
+  --hero-bg-saturate-desktop: 0.90;
+  --hero-bg-contrast-desktop: 0.94;
 }
 
 /* Optionales Mobile-Opt-in später, bewusst noch deaktiviert: */
@@ -121,7 +122,7 @@
   }
 
   .desktop-hero{
-    padding-top: 26px;
+    padding-top: 0;
   }
 
   .events-section{
@@ -133,7 +134,7 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
-/* === END BLOCK: DESKTOP_HERO_FRAME_V9 === */
+/* === END BLOCK: DESKTOP_HERO_FRAME_V10 === */
 
 
 /* ============================================
@@ -415,7 +416,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V19 | Zweck: wandelt den Hero-Bild-Slot in eine weich auslaufende rechte Atmosphärenzone um, sodass kein sichtbarer Bildblock mehr entsteht und die aktuelle Desktop-Hierarchie erhalten bleibt; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet und bildfrei === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V20 | Purpose: rebuild the desktop hero as a full-bleed image stage with protected left copy zone and premium floating search panel | Scope: desktop-only hero surface, copy and panel layout; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -441,12 +442,10 @@
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
-    padding: 28px 32px 10px;
-    background:
-      radial-gradient(circle at 14% 16%, rgba(197,224,150,0.28) 0%, rgba(197,224,150,0.00) 28%),
-      radial-gradient(circle at 84% 26%, rgba(232,201,146,0.19) 0%, rgba(232,201,146,0.00) 20%),
-      linear-gradient(180deg, rgba(252,254,249,0.98) 0%, rgba(245,249,241,0.92) 100%);
+    gap: 24px;
+    min-height: var(--hero-stage-min-h-desktop);
+    padding: 42px 32px 26px;
+    background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -455,37 +454,39 @@
   .desktop-hero::before{
     content: "";
     position: absolute;
-    inset: 8px 0 0 39%;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
     z-index: -4;
-    border-radius: 34px 0 0 30px;
     background-image:
-      linear-gradient(90deg, rgba(248,250,245,1.00) 0%, rgba(248,250,245,0.98) 10%, rgba(248,250,245,0.90) 20%, rgba(248,250,245,0.66) 34%, rgba(248,250,245,0.26) 52%, rgba(248,250,245,0.00) 72%),
-      linear-gradient(180deg, rgba(248,250,245,0.92) 0%, rgba(248,250,245,0.28) 18%, rgba(248,250,245,0.00) 42%, rgba(248,250,245,0.12) 82%, rgba(248,250,245,0.48) 100%),
+      linear-gradient(90deg, rgba(247,250,244,0.98) 0%, rgba(247,250,244,0.96) 12%, rgba(247,250,244,0.84) 24%, rgba(247,250,244,0.52) 38%, rgba(247,250,244,0.18) 52%, rgba(247,250,244,0.00) 68%),
+      linear-gradient(180deg, rgba(247,250,244,0.84) 0%, rgba(247,250,244,0.20) 22%, rgba(247,250,244,0.06) 54%, rgba(247,250,244,0.22) 100%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat;
-    background-position: left top, center, var(--hero-bg-position-active);
-    background-size: auto, auto, var(--hero-bg-size-active);
+    background-position: left top, center top, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
       saturate(var(--hero-bg-saturate-active))
       brightness(var(--hero-bg-brightness-active))
       contrast(var(--hero-bg-contrast-active));
-    transform: translateZ(0);
     pointer-events: none;
   }
 
   .desktop-hero::after{
     content: "";
     position: absolute;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
     z-index: -3;
     background:
-      linear-gradient(180deg, rgba(250,252,247,0.24) 0%, rgba(250,252,247,0.00) 18%, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.18) 100%),
-      radial-gradient(circle at 82% 20%, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.30) 18%, rgba(255,255,255,0.00) 42%),
-      radial-gradient(circle at calc(100% - 132px) 92px, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.20) 18%, rgba(255,255,255,0.00) 40%),
-      radial-gradient(circle at calc(100% - 88px) 188px, rgba(236,198,120,0.16) 0%, rgba(236,198,120,0.06) 10%, rgba(236,198,120,0.00) 22%),
-      linear-gradient(90deg, rgba(247,249,244,0.00) 70%, rgba(247,249,244,0.08) 100%);
+      radial-gradient(circle at 72% 26%, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.00) 18%),
+      radial-gradient(circle at 86% 56%, rgba(246,214,153,0.18) 0%, rgba(246,214,153,0.00) 20%),
+      linear-gradient(180deg, rgba(250,252,247,0.00) 72%, rgba(250,252,247,0.28) 100%);
     pointer-events: none;
   }
 
@@ -496,30 +497,30 @@
   }
 
   .desktop-entry__content{
-    max-width: 43rem;
-    gap: 13px;
+    max-width: 46rem;
+    gap: 14px;
   }
 
   .desktop-entry__eyebrow{
-    margin-bottom: 2px;
+    margin-bottom: 0;
   }
 
   .desktop-entry__title{
     max-width: none;
-    font-size: clamp(4rem, 3.28rem + 1.68vw, 4.9rem);
-    line-height: 0.885;
-    letter-spacing: -0.074em;
+    font-size: clamp(4rem, 3.34rem + 1.62vw, 5.15rem);
+    line-height: 0.89;
+    letter-spacing: -0.076em;
   }
 
   .desktop-entry__text{
-    max-width: 42rem;
-    color: rgba(22,39,61,0.80);
-    font-size: 1.01rem;
-    line-height: 1.36;
+    max-width: 38rem;
+    color: rgba(22,39,61,0.84);
+    font-size: 1.04rem;
+    line-height: 1.40;
   }
 
   .desktop-entry__text--lead{
-    gap: 2px;
+    gap: 4px;
   }
 
   .top-stack{
@@ -532,17 +533,17 @@
     gap: 10px;
     width: min(100%, 956px);
     max-width: 956px;
-    margin-top: 4px;
-    padding: 15px 15px 12px;
-    border: 1px solid rgba(22,39,61,0.052);
+    margin-top: 8px;
+    padding: 16px 16px 12px;
+    border: 1px solid rgba(22,39,61,0.06);
     border-radius: 26px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(251,252,248,0.89) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(252,253,250,0.88) 100%);
     box-shadow:
-      0 20px 40px rgba(22,39,61,0.065),
+      0 18px 36px rgba(22,39,61,0.07),
       0 1px 0 rgba(255,255,255,0.97) inset;
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border-bottom-color: rgba(22,39,61,0.052);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-bottom-color: rgba(22,39,61,0.06);
   }
 
   .top-stack::before{
@@ -551,7 +552,7 @@
     inset: 10px;
     z-index: -1;
     border-radius: 20px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.48) 0%, rgba(244,248,239,0.17) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.38) 0%, rgba(244,248,239,0.12) 100%);
   }
 
   .desktop-hero__panel-head{
@@ -688,7 +689,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     padding-top: 14px;
-    border-top: 1px solid rgba(22,39,61,0.062);
+    border-top: 1px solid rgba(22,39,61,0.07);
   }
 
   .desktop-hero__action{
@@ -697,9 +698,9 @@
     border-radius: 13px;
     font-size: 0.88rem;
     font-weight: 675;
-    border-color: rgba(22,39,61,0.048);
-    background: rgba(255,255,255,0.62);
-    color: rgba(31,53,82,0.82);
+    border-color: rgba(22,39,61,0.05);
+    background: rgba(255,255,255,0.68);
+    color: rgba(31,53,82,0.84);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.82) inset;
   }
@@ -711,28 +712,28 @@
   }
 
   .desktop-hero__actions .desktop-hero__action--publish{
-    border-color: rgba(22,39,61,0.062);
-    background: rgba(255,255,255,0.72);
-    color: rgba(31,53,82,0.90);
+    border-color: rgba(22,39,61,0.064);
+    background: rgba(255,255,255,0.76);
+    color: rgba(31,53,82,0.92);
     font-weight: 705;
   }
 
   .desktop-hero__actions .desktop-hero__action--info{
-    border-color: rgba(22,39,61,0.048);
-    background: rgba(255,255,255,0.62);
-    color: rgba(31,53,82,0.82);
+    border-color: rgba(22,39,61,0.05);
+    background: rgba(255,255,255,0.68);
+    color: rgba(31,53,82,0.84);
   }
 
   .desktop-hero__actions .desktop-hero__action--app{
-    border-color: rgba(22,39,61,0.042);
-    background: rgba(255,255,255,0.56);
-    color: rgba(31,53,82,0.76);
+    border-color: rgba(22,39,61,0.046);
+    background: rgba(255,255,255,0.60);
+    color: rgba(31,53,82,0.78);
   }
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover{
       border-color: rgba(22,39,61,0.075);
-      background: rgba(255,255,255,0.74);
+      background: rgba(255,255,255,0.78);
       color: #16273d;
       box-shadow:
         0 1px 0 rgba(255,255,255,0.88) inset,
@@ -740,11 +741,40 @@
     }
 
     .desktop-hero__actions .desktop-hero__action--publish:hover{
-      background: rgba(255,255,255,0.80);
+      background: rgba(255,255,255,0.84);
     }
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V19 === */
+
+@media (min-width: 900px) and (max-width: 1199.98px){
+  .desktop-hero{
+    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
+    --hero-bg-position-active: var(--hero-bg-position-desktop-narrow);
+    min-height: var(--hero-stage-min-h-desktop-narrow);
+    padding-top: 34px;
+  }
+
+  .desktop-entry__content{
+    max-width: 42rem;
+  }
+
+  .desktop-entry__title{
+    font-size: clamp(3.45rem, 2.92rem + 1.14vw, 4.35rem);
+  }
+
+  .desktop-entry__text{
+    max-width: 35rem;
+  }
+
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) 176px 176px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) 176px 176px 52px;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V20 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
