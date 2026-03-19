@@ -61,7 +61,52 @@
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
 /* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V7 | Zweck: Konsolidiert die Desktop-Rahmung für Hero und Feed auf dem aktuellen Stand; Scope: ersetzt nur die Container-Breite und vertikale Taktung der Desktop-Bühne, Mobile bleibt unverändert === */
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V8 | Zweck: behält die Desktop-Rahmung bei und ergänzt einen zentralen, standardmäßig deaktivierten Hero-Bild-Slot für Desktop plus vorbereitete Mobile-Opt-in-Parameter; Scope: nur Home-Hero-/Feed-Rahmung und zentrale Hintergrundbild-Konfiguration, Mobile visuell unverändert === */
+:root{
+  --hero-bg-image-desktop: none;
+  --hero-bg-image-mobile: none;
+  --hero-bg-desktop-opt-in: 0;
+  --hero-bg-mobile-opt-in: 0;
+  --hero-bg-size-desktop: 760px auto;
+  --hero-bg-size-desktop-narrow: 620px auto;
+  --hero-bg-size-mobile: cover;
+  --hero-bg-position-desktop: calc(100% + 84px) 24px;
+  --hero-bg-position-desktop-narrow: calc(100% + 136px) 22px;
+  --hero-bg-position-mobile: center top;
+  --hero-bg-blur-desktop: 0px;
+  --hero-bg-blur-mobile: 0px;
+  --hero-bg-brightness-desktop: 1.08;
+  --hero-bg-brightness-mobile: 1.04;
+  --hero-bg-saturate-desktop: 0.86;
+  --hero-bg-saturate-mobile: 0.84;
+  --hero-bg-contrast-desktop: 0.92;
+  --hero-bg-contrast-mobile: 0.90;
+}
+
+/* Aktivierung Desktop nach Asset-Ablage, z. B. in assets/hero/: */
+/*
+:root{
+  --hero-bg-image-desktop: image-set(
+    url("../assets/hero/bocholt-hero-desktop.webp") type("image/webp") 1x,
+    url("../assets/hero/bocholt-hero-desktop@2x.webp") type("image/webp") 2x
+  );
+  --hero-bg-desktop-opt-in: 1;
+}
+*/
+
+/* Optionales Mobile-Opt-in später, bewusst noch deaktiviert: */
+/*
+@media (max-width: 899.98px){
+  :root{
+    --hero-bg-image-mobile: image-set(
+      url("../assets/hero/bocholt-hero-mobile.webp") type("image/webp") 1x,
+      url("../assets/hero/bocholt-hero-mobile@2x.webp") type("image/webp") 2x
+    );
+    --hero-bg-mobile-opt-in: 1;
+  }
+}
+*/
+
 @media (min-width: 900px) {
   .desktop-hero,
   .events-section{
@@ -85,7 +130,7 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
-/* === END BLOCK: DESKTOP_HERO_FRAME_V7 === */
+/* === END BLOCK: DESKTOP_HERO_FRAME_V8 === */
 
 
 /* ============================================
@@ -367,7 +412,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V17 | Zweck: härtet den Desktop-Zielzustand messbar ab, indem die Suchzeile klar führt, die Feld/Pill-Proportionen im Zielkorridor liegen und die Service-Leiste sichtbar sekundär bleibt; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V18 | Zweck: ergänzt einen austauschbaren Desktop-Hero-Bild-Slot mit zentralen Variablen und vorbereitetem Mobile-Opt-in, ohne die aktuelle Desktop-Hierarchie zu verändern; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet und bildfrei === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -380,6 +425,14 @@
   }
 
   .desktop-hero{
+    --hero-bg-image-active: var(--hero-bg-image-desktop);
+    --hero-bg-size-active: var(--hero-bg-size-desktop);
+    --hero-bg-position-active: var(--hero-bg-position-desktop);
+    --hero-bg-opacity-active: var(--hero-bg-desktop-opt-in);
+    --hero-bg-blur-active: var(--hero-bg-blur-desktop);
+    --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
+    --hero-bg-saturate-active: var(--hero-bg-saturate-desktop);
+    --hero-bg-contrast-active: var(--hero-bg-contrast-desktop);
     position: relative;
     isolation: isolate;
     overflow: visible;
@@ -400,27 +453,34 @@
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -3;
-    background:
-      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.54) 20%, rgba(255,255,255,0.00) 44%);
+    z-index: -4;
+    background-image:
+      linear-gradient(90deg, rgba(248,250,245,0.98) 0%, rgba(248,250,245,0.95) 30%, rgba(248,250,245,0.78) 50%, rgba(248,250,245,0.40) 68%, rgba(248,250,245,0.08) 86%, rgba(248,250,245,0.00) 100%),
+      linear-gradient(180deg, rgba(250,252,247,0.14) 0%, rgba(250,252,247,0.00) 100%),
+      var(--hero-bg-image-active);
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-position: center, center, var(--hero-bg-position-active);
+    background-size: auto, auto, var(--hero-bg-size-active);
+    opacity: var(--hero-bg-opacity-active);
+    filter:
+      blur(var(--hero-bg-blur-active))
+      saturate(var(--hero-bg-saturate-active))
+      brightness(var(--hero-bg-brightness-active))
+      contrast(var(--hero-bg-contrast-active));
+    transform: translateZ(0);
     pointer-events: none;
   }
 
   .desktop-hero::after{
     content: "";
     position: absolute;
-    top: 28px;
-    right: -58px;
-    width: 660px;
-    height: 286px;
-    z-index: -2;
-    border-radius: 999px;
+    inset: 0;
+    z-index: -3;
     background:
-      radial-gradient(circle at 32% 52%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.50) 24%, rgba(255,255,255,0.00) 52%),
-      radial-gradient(circle at 64% 42%, rgba(236,198,120,0.32) 0%, rgba(236,198,120,0.14) 12%, rgba(236,198,120,0.00) 24%),
-      radial-gradient(circle at 78% 56%, rgba(206,185,145,0.19) 0%, rgba(206,185,145,0.00) 18%);
-    filter: blur(12px);
-    opacity: 0.93;
+      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.54) 20%, rgba(255,255,255,0.00) 44%),
+      radial-gradient(circle at calc(100% - 92px) 86px, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.32) 18%, rgba(255,255,255,0.00) 42%),
+      radial-gradient(circle at calc(100% - 72px) 160px, rgba(236,198,120,0.28) 0%, rgba(236,198,120,0.12) 12%, rgba(236,198,120,0.00) 24%),
+      radial-gradient(circle at calc(100% - 42px) 196px, rgba(206,185,145,0.17) 0%, rgba(206,185,145,0.00) 18%);
     pointer-events: none;
   }
 
@@ -679,7 +739,7 @@
     }
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V17 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V18 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -891,20 +951,15 @@
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V17 | Zweck: hält den gehärteten Desktop-Zielzustand auch im Narrow-Desktop ein, insbesondere die Suchzeilen-Proportion, die sekundäre Service-Leiste und die stabile Ein-Zeilen-Logik mit Reset; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V18 | Zweck: hält den Desktop-Hero-Bild-Slot auch im Narrow-Desktop austauschbar und sauber positioniert, ohne Mobile zu aktivieren; Scope: nur Narrow-Desktop-Feintuning für Bild-Slot und bestehende Hero-Proportionen === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
+    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
+    --hero-bg-position-active: var(--hero-bg-position-desktop-narrow);
     gap: 19px;
     padding-left: 28px;
     padding-right: 28px;
     padding-top: 25px;
-  }
-
-  .desktop-hero::after{
-    top: 26px;
-    right: -118px;
-    width: 500px;
-    height: 248px;
   }
 
   .desktop-entry__content{
@@ -995,5 +1050,5 @@
     font-size: 0.85rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V17 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V18 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
