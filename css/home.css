@@ -367,7 +367,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V15 | Zweck: verdichtet die Desktop-Bühne, stapelt die Filter-Pill-Typografie sauber, hält den Reset in derselben Zeile und normalisiert alle drei Service-Buttons auf dieselbe dunkle Sekundärfarbe; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V16 | Zweck: fokussiert die Desktop-Bühne stärker auf H1 plus Suche, hält das Suchmodul kontrolliert statt übergroß und trennt die Service-Leiste klar sekundär ab; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -385,11 +385,11 @@
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
-    padding: 32px 32px 10px;
+    gap: 24px;
+    padding: 30px 32px 12px;
     background:
-      radial-gradient(circle at 14% 16%, rgba(197,224,150,0.30) 0%, rgba(197,224,150,0.00) 28%),
-      radial-gradient(circle at 84% 26%, rgba(232,201,146,0.22) 0%, rgba(232,201,146,0.00) 20%),
+      radial-gradient(circle at 14% 16%, rgba(197,224,150,0.28) 0%, rgba(197,224,150,0.00) 28%),
+      radial-gradient(circle at 84% 26%, rgba(232,201,146,0.20) 0%, rgba(232,201,146,0.00) 20%),
       linear-gradient(180deg, rgba(252,254,249,0.98) 0%, rgba(245,249,241,0.92) 100%);
     border: 0;
     border-radius: 0;
@@ -402,25 +402,25 @@
     inset: 0;
     z-index: -3;
     background:
-      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.56) 20%, rgba(255,255,255,0.00) 44%);
+      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.54) 20%, rgba(255,255,255,0.00) 44%);
     pointer-events: none;
   }
 
   .desktop-hero::after{
     content: "";
     position: absolute;
-    top: 34px;
-    right: -44px;
-    width: 720px;
-    height: 320px;
+    top: 30px;
+    right: -54px;
+    width: 680px;
+    height: 300px;
     z-index: -2;
     border-radius: 999px;
     background:
-      radial-gradient(circle at 32% 52%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.52) 24%, rgba(255,255,255,0.00) 52%),
-      radial-gradient(circle at 64% 42%, rgba(236,198,120,0.38) 0%, rgba(236,198,120,0.16) 12%, rgba(236,198,120,0.00) 24%),
-      radial-gradient(circle at 78% 56%, rgba(206,185,145,0.22) 0%, rgba(206,185,145,0.00) 18%);
+      radial-gradient(circle at 32% 52%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.50) 24%, rgba(255,255,255,0.00) 52%),
+      radial-gradient(circle at 64% 42%, rgba(236,198,120,0.34) 0%, rgba(236,198,120,0.15) 12%, rgba(236,198,120,0.00) 24%),
+      radial-gradient(circle at 78% 56%, rgba(206,185,145,0.20) 0%, rgba(206,185,145,0.00) 18%);
     filter: blur(12px);
-    opacity: 0.96;
+    opacity: 0.94;
     pointer-events: none;
   }
 
@@ -431,20 +431,30 @@
   }
 
   .desktop-entry__content{
-    max-width: 48rem;
-    gap: 16px;
+    max-width: 44rem;
+    gap: 14px;
+  }
+
+  .desktop-entry__eyebrow{
+    margin-bottom: 2px;
   }
 
   .desktop-entry__title{
     max-width: none;
-    font-size: clamp(4rem, 3.28rem + 1.8vw, 5.1rem);
-    line-height: 0.9;
-    letter-spacing: -0.07em;
+    font-size: clamp(4rem, 3.3rem + 1.72vw, 4.95rem);
+    line-height: 0.89;
+    letter-spacing: -0.072em;
   }
 
   .desktop-entry__text{
-    max-width: none;
-    font-size: 1.04rem;
+    max-width: 43rem;
+    color: rgba(22,39,61,0.80);
+    font-size: 1.02rem;
+    line-height: 1.38;
+  }
+
+  .desktop-entry__text--lead{
+    gap: 2px;
   }
 
   .top-stack{
@@ -454,20 +464,20 @@
     align-self: start;
     justify-self: stretch;
     display: grid;
-    gap: 16px;
-    width: min(100%, 1008px);
-    max-width: 1008px;
-    margin-top: 4px;
-    padding: 18px;
-    border: 1px solid rgba(22,39,61,0.06);
-    border-radius: 30px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(252,252,249,0.86) 100%);
+    gap: 12px;
+    width: min(100%, 980px);
+    max-width: 980px;
+    margin-top: 6px;
+    padding: 16px 16px 14px;
+    border: 1px solid rgba(22,39,61,0.055);
+    border-radius: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(251,252,248,0.88) 100%);
     box-shadow:
-      0 26px 56px rgba(22,39,61,0.08),
-      0 1px 0 rgba(255,255,255,0.96) inset;
+      0 22px 46px rgba(22,39,61,0.07),
+      0 1px 0 rgba(255,255,255,0.97) inset;
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
-    border-bottom-color: rgba(22,39,61,0.06);
+    border-bottom-color: rgba(22,39,61,0.055);
   }
 
   .top-stack::before{
@@ -475,8 +485,8 @@
     position: absolute;
     inset: 10px;
     z-index: -1;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.52) 0%, rgba(244,248,239,0.22) 100%);
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.50) 0%, rgba(244,248,239,0.18) 100%);
   }
 
   .desktop-hero__panel-head{
@@ -485,13 +495,13 @@
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 160px 160px;
+    grid-template-columns: minmax(0, 1fr) 150px 150px;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
   }
 
   .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 160px 160px 56px;
+    grid-template-columns: minmax(0, 1fr) 150px 150px 52px;
   }
 
   .top-stack .events-filter{
@@ -503,40 +513,40 @@
 
   .desktop-hero__search-field .desktop-hero__icon--search{
     position: absolute;
-    left: 28px;
+    left: 24px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(99,119,149,0.80);
-    width: 22px;
-    height: 22px;
+    color: rgba(99,119,149,0.76);
+    width: 20px;
+    height: 20px;
     z-index: 2;
     pointer-events: none;
   }
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 64px;
+    height: 60px;
   }
 
   .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 0 24px 0 56px;
-    border: 1px solid rgba(22,39,61,0.09);
-    border-radius: 20px;
-    background: rgba(255,255,255,0.96);
+    padding: 0 22px 0 52px;
+    border: 1px solid rgba(22,39,61,0.085);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.97);
     color: #16273d;
-    font-size: 1.04rem;
-    font-weight: 620;
-    letter-spacing: -0.015em;
+    font-size: 1.01rem;
+    font-weight: 610;
+    letter-spacing: -0.012em;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
-      0 14px 28px rgba(22,39,61,0.035);
+      0 10px 22px rgba(22,39,61,0.03);
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(99,119,149,0.82);
+    color: rgba(99,119,149,0.80);
     font-weight: 600;
   }
 
@@ -546,15 +556,15 @@
     grid-template-rows: auto auto;
     align-items: center;
     justify-content: stretch;
-    column-gap: 12px;
-    row-gap: 3px;
-    padding: 10px 16px 11px;
-    border: 1px solid rgba(22,39,61,0.08);
+    column-gap: 10px;
+    row-gap: 2px;
+    padding: 9px 15px 10px;
+    border: 1px solid rgba(22,39,61,0.075);
     border-radius: 18px;
-    background: rgba(255,255,255,0.88);
+    background: rgba(255,255,255,0.90);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.94) inset,
-      0 10px 20px rgba(22,39,61,0.028);
+      0 8px 18px rgba(22,39,61,0.022);
     text-align: left;
   }
 
@@ -563,10 +573,10 @@
     grid-row: 1;
     min-width: 0;
     color: #7a8ca4;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 760;
     line-height: 1;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.015em;
     white-space: nowrap;
   }
 
@@ -575,9 +585,9 @@
     grid-row: 2;
     min-width: 0;
     color: #16273d;
-    font-size: 1rem;
-    font-weight: 760;
-    line-height: 1.12;
+    font-size: 0.97rem;
+    font-weight: 780;
+    line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -588,54 +598,88 @@
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(99,119,149,0.72);
-    font-size: 1.2rem;
+    color: rgba(99,119,149,0.58);
+    font-size: 1.08rem;
     line-height: 1;
     margin-left: 0;
   }
 
   .desktop-hero__search-row > .filter-pill--reset{
     grid-column: auto;
-    width: 56px;
-    min-width: 56px;
-    min-height: 64px;
+    width: 52px;
+    min-width: 52px;
+    min-height: 60px;
     justify-self: stretch;
     align-self: stretch;
+    border-color: rgba(22,39,61,0.07);
+    background: rgba(255,255,255,0.86);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 8px 18px rgba(22,39,61,0.022);
   }
 
   .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    padding-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(22,39,61,0.055);
   }
 
   .desktop-hero__action{
-    min-height: 46px;
-    padding: 0 16px;
+    min-height: 42px;
+    padding: 0 15px;
     border-radius: 14px;
-    font-size: 0.92rem;
-    font-weight: 720;
-    border-color: rgba(22,39,61,0.08);
-    background: rgba(255,255,255,0.90);
-    color: #1f3552;
+    font-size: 0.9rem;
+    font-weight: 690;
+    border-color: rgba(22,39,61,0.055);
+    background: rgba(255,255,255,0.72);
+    color: rgba(31,53,82,0.88);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.86) inset;
   }
 
   .desktop-hero__action .desktop-hero__icon{
-    width: 18px;
-    height: 18px;
-    opacity: 0.74;
+    width: 17px;
+    height: 17px;
+    opacity: 0.70;
   }
 
-  .desktop-hero__actions .desktop-hero__action--publish,
-  .desktop-hero__actions .desktop-hero__action--info,
-  .desktop-hero__actions .desktop-hero__action--app{
-    border-color: rgba(22,39,61,0.08);
-    background: rgba(255,255,255,0.90);
+  .desktop-hero__actions .desktop-hero__action--publish{
+    border-color: rgba(22,39,61,0.075);
+    background: rgba(255,255,255,0.82);
     color: #1f3552;
+    font-weight: 720;
+  }
+
+  .desktop-hero__actions .desktop-hero__action--info{
+    border-color: rgba(22,39,61,0.055);
+    background: rgba(255,255,255,0.72);
+    color: rgba(31,53,82,0.88);
+  }
+
+  .desktop-hero__actions .desktop-hero__action--app{
+    border-color: rgba(22,39,61,0.05);
+    background: rgba(255,255,255,0.68);
+    color: rgba(31,53,82,0.82);
+  }
+
+  @media (hover: hover){
+    .desktop-hero__actions .desktop-hero__action:hover{
+      border-color: rgba(22,39,61,0.09);
+      background: rgba(255,255,255,0.82);
+      color: #16273d;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.90) inset,
+        0 10px 22px rgba(22,39,61,0.03);
+    }
+
+    .desktop-hero__actions .desktop-hero__action--publish:hover{
+      background: rgba(255,255,255,0.90);
+    }
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V15 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V16 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -847,35 +891,37 @@
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V15 | Zweck: hält den verdichteten Desktop-Hero auch im Narrow-Desktop stabil, inklusive zweizeiliger Pills und Reset in derselben Zeile; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V16 | Zweck: hält den fokussierten Desktop-Hero auch im Narrow-Desktop kontrolliert, ohne das Suchmodul zu groß werden zu lassen; Scope: nur Narrow-Desktop-Feintuning, Mobile bleibt unangetastet === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     gap: 20px;
     padding-left: 28px;
     padding-right: 28px;
-    padding-top: 28px;
+    padding-top: 26px;
   }
 
   .desktop-hero::after{
-    top: 30px;
-    right: -110px;
-    width: 560px;
-    height: 280px;
+    top: 28px;
+    right: -112px;
+    width: 520px;
+    height: 260px;
   }
 
   .desktop-entry__content{
-    max-width: 40rem;
-    gap: 16px;
+    max-width: 38rem;
+    gap: 14px;
   }
 
   .desktop-entry__title{
     max-width: none;
-    font-size: clamp(3.2rem, 2.74rem + 1.04vw, 4rem);
-    line-height: 0.92;
+    font-size: clamp(3.15rem, 2.74rem + 0.98vw, 3.95rem);
+    line-height: 0.9;
   }
 
   .desktop-entry__text{
-    font-size: 0.98rem;
+    max-width: 37rem;
+    font-size: 0.96rem;
+    line-height: 1.36;
   }
 
   .desktop-entry__lead-line{
@@ -885,68 +931,69 @@
   .top-stack{
     width: 100%;
     max-width: none;
-    padding: 16px;
+    padding: 15px 15px 13px;
     border-radius: 24px;
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 152px 152px;
+    grid-template-columns: minmax(0, 1fr) 144px 144px;
     gap: 8px;
   }
 
   .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 152px 152px 52px;
+    grid-template-columns: minmax(0, 1fr) 144px 144px 50px;
   }
 
   .desktop-hero__search-field .desktop-hero__icon--search{
-    left: 24px;
-    width: 20px;
-    height: 20px;
+    left: 22px;
+    width: 19px;
+    height: 19px;
   }
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 58px;
+    height: 56px;
   }
 
   .top-stack #search-filter{
-    padding-left: 52px;
-    padding-right: 20px;
-    font-size: 1rem;
-    border-radius: 18px;
+    padding-left: 48px;
+    padding-right: 18px;
+    font-size: 0.98rem;
+    border-radius: 17px;
   }
 
   .desktop-hero__toolbar-pill{
-    padding: 9px 14px 10px;
-    column-gap: 10px;
+    padding: 8px 13px 9px;
+    column-gap: 9px;
     row-gap: 2px;
     border-radius: 16px;
   }
 
   .desktop-hero__search-row > .filter-pill--reset{
-    width: 52px;
-    min-width: 52px;
-    min-height: 58px;
+    width: 50px;
+    min-width: 50px;
+    min-height: 56px;
   }
 
   .desktop-hero__toolbar-pill .filter-pill__label{
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 
   .desktop-hero__toolbar-pill .filter-pill__value{
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .desktop-hero__actions{
     gap: 8px;
+    padding-top: 10px;
   }
 
   .desktop-hero__action{
-    min-height: 44px;
+    min-height: 40px;
     padding-left: 12px;
     padding-right: 12px;
-    font-size: 0.88rem;
+    font-size: 0.87rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V15 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V16 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
