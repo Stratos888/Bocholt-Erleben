@@ -83,11 +83,9 @@
   --hero-bg-contrast-mobile: 0.90;
 }
 
-/* Aktivierung Desktop nach Asset-Ablage */
+/* Aktivierung Desktop nach Asset-Ablage, z. B. in assets/hero/: */
 :root{
-  --hero-bg-image-desktop: image-set(
-    url("../assets/hero/bocholt-hero-a.webp") type("image/webp") 1x
-  );
+  --hero-bg-image-desktop: url("../assets/hero/bocholt-hero-a.jpg");
   --hero-bg-desktop-opt-in: 1;
   --hero-bg-size-desktop: 760px auto;
   --hero-bg-size-desktop-narrow: 620px auto;
