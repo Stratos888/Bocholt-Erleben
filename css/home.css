@@ -61,40 +61,40 @@
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
 /* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V8 | Zweck: behält die Desktop-Rahmung bei und ergänzt einen zentralen, standardmäßig deaktivierten Hero-Bild-Slot für Desktop plus vorbereitete Mobile-Opt-in-Parameter; Scope: nur Home-Hero-/Feed-Rahmung und zentrale Hintergrundbild-Konfiguration, Mobile visuell unverändert === */
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V9 | Zweck: verschiebt den Hero-Bild-Slot von einem sichtbaren Bildblock zu einer weich austauschbaren rechten Atmosphärenzone mit zentralen Bild-Parametern; Scope: nur Home-Hero-/Feed-Rahmung und zentrale Hintergrundbild-Konfiguration, Mobile visuell unverändert === */
 :root{
   --hero-bg-image-desktop: none;
   --hero-bg-image-mobile: none;
-  --hero-bg-desktop-opt-in: 0;
-  --hero-bg-mobile-opt-in: 0;
-  --hero-bg-size-desktop: 760px auto;
-  --hero-bg-size-desktop-narrow: 620px auto;
+  --hero-bg-opacity-desktop: 0;
+  --hero-bg-opacity-mobile: 0;
+  --hero-bg-size-desktop: 920px auto;
+  --hero-bg-size-desktop-narrow: 760px auto;
   --hero-bg-size-mobile: cover;
-  --hero-bg-position-desktop: calc(100% + 84px) 24px;
-  --hero-bg-position-desktop-narrow: calc(100% + 136px) 22px;
+  --hero-bg-position-desktop: right -148px top 8px;
+  --hero-bg-position-desktop-narrow: right -236px top 12px;
   --hero-bg-position-mobile: center top;
   --hero-bg-blur-desktop: 0px;
   --hero-bg-blur-mobile: 0px;
-  --hero-bg-brightness-desktop: 1.08;
+  --hero-bg-brightness-desktop: 1.12;
   --hero-bg-brightness-mobile: 1.04;
-  --hero-bg-saturate-desktop: 0.86;
+  --hero-bg-saturate-desktop: 0.72;
   --hero-bg-saturate-mobile: 0.84;
-  --hero-bg-contrast-desktop: 0.92;
+  --hero-bg-contrast-desktop: 0.88;
   --hero-bg-contrast-mobile: 0.90;
 }
 
 /* Aktivierung Desktop nach Asset-Ablage, z. B. in assets/hero/: */
 :root{
   --hero-bg-image-desktop: url("../assets/hero/bocholt-hero-a.jpg");
-  --hero-bg-desktop-opt-in: 1;
-  --hero-bg-size-desktop: 760px auto;
-  --hero-bg-size-desktop-narrow: 620px auto;
-  --hero-bg-position-desktop: calc(100% + 84px) 24px;
-  --hero-bg-position-desktop-narrow: calc(100% + 136px) 22px;
+  --hero-bg-opacity-desktop: 0.92;
+  --hero-bg-size-desktop: 920px auto;
+  --hero-bg-size-desktop-narrow: 760px auto;
+  --hero-bg-position-desktop: right -148px top 8px;
+  --hero-bg-position-desktop-narrow: right -236px top 12px;
   --hero-bg-blur-desktop: 0px;
-  --hero-bg-brightness-desktop: 1.08;
-  --hero-bg-saturate-desktop: 0.86;
-  --hero-bg-contrast-desktop: 0.92;
+  --hero-bg-brightness-desktop: 1.12;
+  --hero-bg-saturate-desktop: 0.72;
+  --hero-bg-contrast-desktop: 0.88;
 }
 
 /* Optionales Mobile-Opt-in später, bewusst noch deaktiviert: */
@@ -105,7 +105,7 @@
       url("../assets/hero/bocholt-hero-mobile.webp") type("image/webp") 1x,
       url("../assets/hero/bocholt-hero-mobile@2x.webp") type("image/webp") 2x
     );
-    --hero-bg-mobile-opt-in: 1;
+    --hero-bg-opacity-mobile: 0.70;
   }
 }
 */
@@ -133,7 +133,7 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
-/* === END BLOCK: DESKTOP_HERO_FRAME_V8 === */
+/* === END BLOCK: DESKTOP_HERO_FRAME_V9 === */
 
 
 /* ============================================
@@ -415,7 +415,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V18 | Zweck: ergänzt einen austauschbaren Desktop-Hero-Bild-Slot mit zentralen Variablen und vorbereitetem Mobile-Opt-in, ohne die aktuelle Desktop-Hierarchie zu verändern; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet und bildfrei === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V19 | Zweck: wandelt den Hero-Bild-Slot in eine weich auslaufende rechte Atmosphärenzone um, sodass kein sichtbarer Bildblock mehr entsteht und die aktuelle Desktop-Hierarchie erhalten bleibt; Scope: ausschließlich Desktop ab 900px, Mobile bleibt unangetastet und bildfrei === */
 @media (min-width: 900px){
   .app-header{
     min-height: 60px;
@@ -431,7 +431,7 @@
     --hero-bg-image-active: var(--hero-bg-image-desktop);
     --hero-bg-size-active: var(--hero-bg-size-desktop);
     --hero-bg-position-active: var(--hero-bg-position-desktop);
-    --hero-bg-opacity-active: var(--hero-bg-desktop-opt-in);
+    --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
     --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
     --hero-bg-saturate-active: var(--hero-bg-saturate-desktop);
@@ -455,14 +455,15 @@
   .desktop-hero::before{
     content: "";
     position: absolute;
-    inset: 0;
+    inset: 8px 0 0 39%;
     z-index: -4;
+    border-radius: 34px 0 0 30px;
     background-image:
-      linear-gradient(90deg, rgba(248,250,245,0.98) 0%, rgba(248,250,245,0.95) 30%, rgba(248,250,245,0.78) 50%, rgba(248,250,245,0.40) 68%, rgba(248,250,245,0.08) 86%, rgba(248,250,245,0.00) 100%),
-      linear-gradient(180deg, rgba(250,252,247,0.14) 0%, rgba(250,252,247,0.00) 100%),
+      linear-gradient(90deg, rgba(248,250,245,1.00) 0%, rgba(248,250,245,0.98) 10%, rgba(248,250,245,0.90) 20%, rgba(248,250,245,0.66) 34%, rgba(248,250,245,0.26) 52%, rgba(248,250,245,0.00) 72%),
+      linear-gradient(180deg, rgba(248,250,245,0.92) 0%, rgba(248,250,245,0.28) 18%, rgba(248,250,245,0.00) 42%, rgba(248,250,245,0.12) 82%, rgba(248,250,245,0.48) 100%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat;
-    background-position: center, center, var(--hero-bg-position-active);
+    background-position: left top, center, var(--hero-bg-position-active);
     background-size: auto, auto, var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
@@ -480,10 +481,11 @@
     inset: 0;
     z-index: -3;
     background:
-      radial-gradient(circle at 78% 30%, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.54) 20%, rgba(255,255,255,0.00) 44%),
-      radial-gradient(circle at calc(100% - 92px) 86px, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.32) 18%, rgba(255,255,255,0.00) 42%),
-      radial-gradient(circle at calc(100% - 72px) 160px, rgba(236,198,120,0.28) 0%, rgba(236,198,120,0.12) 12%, rgba(236,198,120,0.00) 24%),
-      radial-gradient(circle at calc(100% - 42px) 196px, rgba(206,185,145,0.17) 0%, rgba(206,185,145,0.00) 18%);
+      linear-gradient(180deg, rgba(250,252,247,0.24) 0%, rgba(250,252,247,0.00) 18%, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.18) 100%),
+      radial-gradient(circle at 82% 20%, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.30) 18%, rgba(255,255,255,0.00) 42%),
+      radial-gradient(circle at calc(100% - 132px) 92px, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.20) 18%, rgba(255,255,255,0.00) 40%),
+      radial-gradient(circle at calc(100% - 88px) 188px, rgba(236,198,120,0.16) 0%, rgba(236,198,120,0.06) 10%, rgba(236,198,120,0.00) 22%),
+      linear-gradient(90deg, rgba(247,249,244,0.00) 70%, rgba(247,249,244,0.08) 100%);
     pointer-events: none;
   }
 
@@ -742,7 +744,7 @@
     }
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V18 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V19 === */
 /* === BEGIN BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 | Zweck: stellt den alten Mobile-Event-Card-Abstand wieder her und kapselt alle Desktop-Feed-Regeln wieder korrekt in min-width:900px | Umfang: ersetzt den fehlerhaft getrennten Feed-/Desktop-Block vollständig === */
 .events-feed-group{
   display: grid;
@@ -954,7 +956,7 @@
 /* === END BLOCK: DESKTOP_FEED_DESKTOP_LAYOUT_V7 === */
 /* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V18 | Zweck: hält den Desktop-Hero-Bild-Slot auch im Narrow-Desktop austauschbar und sauber positioniert, ohne Mobile zu aktivieren; Scope: nur Narrow-Desktop-Feintuning für Bild-Slot und bestehende Hero-Proportionen === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V19 | Zweck: schiebt die Hero-Bild-Zone im Narrow-Desktop weiter nach rechts und hält die weiche Atmosphärenkante stabil, ohne Mobile zu aktivieren; Scope: nur Narrow-Desktop-Feintuning für Bild-Slot und bestehende Hero-Proportionen === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
@@ -963,6 +965,11 @@
     padding-left: 28px;
     padding-right: 28px;
     padding-top: 25px;
+  }
+
+  .desktop-hero::before{
+    inset: 10px -10px 0 42%;
+    border-radius: 30px 0 0 28px;
   }
 
   .desktop-entry__content{
@@ -1053,5 +1060,5 @@
     font-size: 0.85rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V18 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V19 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
