@@ -486,7 +486,7 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* === BEGIN BLOCK: INFO_DESKTOP_REFERENCE_POLISH_V1 | Zweck: veredelt /info/ auf Desktop zur echten Referenz-Subpage mit ruhiger Hero-Zone und sauber ausbalancierter 2-Spalten-Sekundärebene | Umfang: ersetzt den kompletten Desktop-/Large-Desktop-Block der Subpage-Familie und schärft nur /info/ kompositorisch nach === */
+/* === BEGIN BLOCK: INFO_DESKTOP_REFERENCE_POLISH_V2 | Zweck: gibt dem /info/-Hero auf Desktop wieder echte volle Breite, führt nur Textbreiten gezielt und nutzt Tokens bzw. lokale Custom Properties statt wiederholter Hardcodes | Umfang: ersetzt den kompletten Desktop-/Large-Desktop-Block der Subpage-Familie und schärft nur /info/ kompositorisch nach === */
 @media (min-width: 900px){
   :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy){
     --subpage-stack-gap: 18px;
@@ -508,6 +508,22 @@
     --subpage-card-pad-y: 20px;
     --subpage-hero-gap: 12px;
 
+    --info-hero-pad-x: 32px;
+    --info-hero-pad-y: 28px;
+    --info-hero-pad-bottom: 24px;
+    --info-hero-radius: var(--cmp-card-radius);
+    --info-hero-content-max: 960px;
+    --info-hero-actions-max: 560px;
+    --info-hero-heading-max: 15ch;
+    --info-hero-lead-max: 60ch;
+    --info-hero-note-max: 58ch;
+    --info-hero-border-color: rgba(31,41,51,0.055);
+    --info-hero-bg-start: rgba(255,255,255,0.80);
+    --info-hero-bg-end: rgba(255,255,255,0.68);
+    --info-hero-shadow:
+      0 1px 0 rgba(255,255,255,0.80) inset,
+      0 16px 34px rgba(22,39,61,0.038);
+
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 22px;
     row-gap: 22px;
@@ -522,40 +538,43 @@
 
     width: 100%;
     max-width: none;
-    padding: 24px 28px 20px;
+    padding:
+      var(--info-hero-pad-y)
+      var(--info-hero-pad-x)
+      var(--info-hero-pad-bottom);
 
-    border: 1px solid rgba(31,41,51,0.055);
-    border-radius: 24px;
+    border: 1px solid var(--info-hero-border-color);
+    border-radius: var(--info-hero-radius);
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.80), rgba(255,255,255,0.68));
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.80) inset,
-      0 16px 34px rgba(22,39,61,0.038);
+      linear-gradient(180deg, var(--info-hero-bg-start), var(--info-hero-bg-end));
+    box-shadow: var(--info-hero-shadow);
 
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
-  .page--info > .content-hero > *{
-    max-width: 700px;
+  .page--info > .content-hero > .content-links:first-child,
+  .page--info > .content-hero .content-kicker,
+  .page--info > .content-hero h1,
+  .page--info > .content-hero .content-lead,
+  .page--info > .content-hero > .content-actions{
+    width: min(100%, var(--info-hero-content-max));
+    max-width: none;
   }
 
   .page--info > .content-hero > .content-links:first-child{
-    width: auto;
-    max-width: none;
     margin: 0 0 12px;
   }
 
   .page--info > .content-hero > .content-actions{
-    width: min(100%, 500px);
-    max-width: none;
     gap: 8px;
+    width: min(100%, var(--info-hero-actions-max));
     margin-top: 4px;
   }
 
   .page--info > .content-hero .content-kicker{
-    color: #6f8758;
-    font-size: 0.77rem;
+    color: var(--cmp-link-color-muted);
+    font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -563,26 +582,26 @@
 
   .page--info > .content-hero h1{
     margin: 0;
-    max-width: 11ch;
-    color: #16273d;
-    font-size: clamp(2.35rem, 1.98rem + 1.02vw, 3.25rem);
+    max-width: var(--info-hero-heading-max);
+    color: var(--color-text-primary);
+    font-size: clamp(2.36rem, 2.02rem + 0.96vw, 3.24rem);
     font-weight: 790;
     line-height: 0.98;
     letter-spacing: -0.04em;
   }
 
   .page--info > .content-hero .content-lead{
-    max-width: 46ch;
-    color: rgba(22,39,61,0.82);
+    max-width: var(--info-hero-lead-max);
+    color: var(--color-text-secondary);
     font-size: 1.01rem;
-    line-height: 1.5;
+    line-height: 1.52;
   }
 
   .page--info > .content-hero .content-note{
-    max-width: 48ch;
-    color: rgba(31,41,51,0.80);
+    max-width: var(--info-hero-note-max);
+    color: var(--color-text-secondary);
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.52;
   }
 
   .page--info > .content-card{
@@ -642,19 +661,34 @@
   .page--info{
     column-gap: 24px;
     row-gap: 24px;
-  }
 
-  .page--info > .content-hero{
-    padding: 28px 32px 22px;
-  }
-
-  .page--info > .content-hero > *{
-    max-width: 720px;
+    --info-hero-pad-x: 36px;
+    --info-hero-pad-y: 30px;
+    --info-hero-pad-bottom: 24px;
+    --info-hero-content-max: 1040px;
+    --info-hero-actions-max: 580px;
+    --info-hero-heading-max: 17ch;
+    --info-hero-lead-max: 64ch;
+    --info-hero-note-max: 60ch;
   }
 
   .page--info > .content-hero h1{
-    font-size: clamp(2.5rem, 2.14rem + 0.92vw, 3.4rem);
+    font-size: clamp(2.5rem, 2.16rem + 0.9vw, 3.38rem);
   }
+
+  .page--about,
+  .page--publish{
+    --subpage-hero-max: 820px;
+    --subpage-body-max: 820px;
+  }
+
+  .page--imprint,
+  .page--privacy{
+    --subpage-hero-max: 900px;
+    --subpage-body-max: 900px;
+  }
+}
+/* === END BLOCK: INFO_DESKTOP_REFERENCE_POLISH_V2 === */
 
   .page--about,
   .page--publish{
