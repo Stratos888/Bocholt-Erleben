@@ -24,10 +24,17 @@
   padding-bottom: calc(var(--gutter) + 18px);
 }
 
+/* === BEGIN BLOCK: INFO_PAGE_WIDTH_TOKENS_V2 | Zweck: zieht /info/ enger und kontrollierter als Referenzseite zusammen | Umfang: ersetzt nur den .page--info Token-Block === */
 .page--info{
-  --subpage-hero-max: 800px;
-  --subpage-body-max: 820px;
+  --subpage-hero-max: 760px;
+  --subpage-body-max: 780px;
+  --subpage-stack-gap: 20px;
+  --subpage-card-gap: 12px;
+  --subpage-card-pad-x: 18px;
+  --subpage-card-pad-y: 18px;
+  --subpage-hero-gap: 12px;
 }
+/* === END BLOCK: INFO_PAGE_WIDTH_TOKENS_V2 === */
 
 .page--about{
   --subpage-hero-max: 780px;
@@ -178,6 +185,7 @@
   line-height: 1.56;
 }
 
+/* === BEGIN BLOCK: INFO_CARD_HIERARCHY_V2 | Zweck: macht die Karten unter /info/ klar sekundär und trennt Hero stärker von Folgeblöcken | Umfang: ersetzt den kompletten content-card Cluster inkl. info-spezifischer Overrides === */
 .content-card{
   display: grid;
   gap: var(--subpage-card-gap);
@@ -197,6 +205,23 @@
   backdrop-filter: blur(5px);
 }
 
+.page--info > .content-hero{
+  padding-bottom: 12px;
+}
+
+.page--info > .content-card{
+  gap: 12px;
+  background: rgba(255,255,255,0.80);
+  border-color: rgba(31,41,51,0.06);
+  box-shadow:
+    0 10px 24px rgba(31,41,51,0.03),
+    0 1px 0 rgba(255,255,255,0.74) inset;
+}
+
+.page--info > .content-card .content-links{
+  margin-top: 2px;
+}
+
 .content-card--primary{
   border-color: rgba(139,207,74,0.44);
   box-shadow:
@@ -212,6 +237,7 @@
     0 8px 20px rgba(0,0,0,0.03),
     0 1px 0 rgba(255,255,255,0.68) inset;
 }
+/* === END BLOCK: INFO_CARD_HIERARCHY_V2 === */
 
 .content-card h2{
   margin: 0;
@@ -460,7 +486,7 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* DESKTOP LAYER: same content, calmer layout */
+/* === BEGIN BLOCK: SUBPAGE_DESKTOP_LAYER_INFO_V2 | Zweck: zieht /info/ auf Desktop enger, ruhiger und hero-dominanter auf | Umfang: ersetzt den kompletten Desktop-/Large-Desktop-Block für die Subpage-Familie === */
 @media (min-width: 900px){
   :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy){
     --subpage-stack-gap: 18px;
@@ -476,8 +502,19 @@
     padding-left: 32px;
   }
 
+  .page--info{
+    --subpage-stack-gap: 22px;
+    --subpage-card-pad-x: 22px;
+    --subpage-card-pad-y: 20px;
+    --subpage-hero-gap: 14px;
+  }
+
   .content-hero{
     padding-bottom: 10px;
+  }
+
+  .page--info > .content-hero{
+    padding-bottom: 16px;
   }
 
   .content-hero > .content-links:first-child{
@@ -513,8 +550,8 @@
 
 @media (min-width: 1120px){
   .page--info{
-    --subpage-hero-max: 840px;
-    --subpage-body-max: 860px;
+    --subpage-hero-max: 780px;
+    --subpage-body-max: 800px;
   }
 
   .page--about,
@@ -529,6 +566,7 @@
     --subpage-body-max: 900px;
   }
 }
+/* === END BLOCK: SUBPAGE_DESKTOP_LAYER_INFO_V2 === */
 /* === END BLOCK: DS-03_SUBPAGE_SYSTEM_FOUNDATION_V1 === */
 
 
