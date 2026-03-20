@@ -298,29 +298,18 @@ function createCard(event) {
     };
   };
 
-   /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V1 | Purpose: open desktop event targets in a new tab without navigating the homepage away; Scope: replaces only the desktop external-open helper inside createCard === */
+     /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 | Purpose: remove the synthetic hidden-anchor click path and open desktop event targets only via window.open in a new tab; Scope: replaces only the desktop external-open helper inside createCard === */
   const openPrimaryDesktopTarget = (url) => {
     if (!url) return false;
 
     try {
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.tabIndex = -1;
-      a.setAttribute("aria-hidden", "true");
-
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
+      window.open(url, "_blank", "noopener,noreferrer");
       return true;
     } catch (_) {
       return false;
     }
   };
-  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V1 === */
-
+  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 === */
   const resolveCity = (ev) => {
     if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
 
@@ -528,8 +517,13 @@ function createCard(event) {
   card.appendChild(badge);
   card.appendChild(body);
 
-  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V1 | Purpose: Auf Desktop niemals Detailpanel öffnen; stattdessen nur Primär-URL nutzen oder Card ohne Aktion lassen; Mobile bleibt unverändert | Scope: ersetzt ausschließlich openCard innerhalb createCard === */
-  const openCard = () => {
+   /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 | Purpose: handle the original card interaction explicitly so desktop opens only a new tab while the current homepage stays untouched; Mobile detail-panel behavior remains unchanged | Scope: replaces openCard plus card click/keyboard wiring inside createCard === */
+  const openCard = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     if (isDesktopViewport()) {
       if (primaryUrl) {
         openPrimaryDesktopTarget(primaryUrl);
@@ -546,14 +540,15 @@ function createCard(event) {
       openPrimaryDesktopTarget(primaryUrl);
     }
   };
-  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V1 === */
+  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 === */
 
-  card.addEventListener("click", openCard);
+  card.addEventListener("click", (e) => {
+    openCard(e);
+  });
 
   card.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    openCard();
+    openCard(e);
   });
 
   return card;
