@@ -298,18 +298,28 @@ function createCard(event) {
     };
   };
 
+   /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V1 | Purpose: open desktop event targets in a new tab without navigating the homepage away; Scope: replaces only the desktop external-open helper inside createCard === */
   const openPrimaryDesktopTarget = (url) => {
     if (!url) return false;
 
     try {
-      const w = window.open(url, "_blank", "noopener");
-      if (!w) window.location.href = url;
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.tabIndex = -1;
+      a.setAttribute("aria-hidden", "true");
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
       return true;
     } catch (_) {
-      window.location.href = url;
-      return true;
+      return false;
     }
   };
+  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V1 === */
 
   const resolveCity = (ev) => {
     if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
