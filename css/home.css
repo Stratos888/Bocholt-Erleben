@@ -1,7 +1,7 @@
 /* === BEGIN BLOCK: HOME_CSS_STEP_4 | Purpose: isolate home/start-page feed, hero, search-row and responsive layout into a dedicated owner file while preserving validated mobile filter-row behavior | Scope: home feed layout, hero layout, desktop/narrow desktop hero variants === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
-/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_SYNC_V1 | Purpose: restore event-card spacing after grouped feed rendering moved cards into .events-feed-group__grid instead of the legacy direct .event-cards-grid stack | Scope: viewport guardrails + stacked feed layout ownership for grouped sections === */
+/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 | Purpose: keep homepage feed groups vertically stacked and prepare only the inner group grid for desktop 2-up while preserving the existing mobile card flow | Scope: viewport guardrails, feed section ownership, top-level group stack and per-group card container behavior === */
 /* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
 .events-section-title,
@@ -48,25 +48,44 @@
 }
 
 
-/* Grid/Stack: nur Abstand, keine eigene Surface */
-.events-feed-group__grid,
+/* Top-Level-Feed: Gruppen immer untereinander */
 .event-cards-grid{
   display: flex;
   flex-direction: column;
-  gap: var(--feed-cards-gap);
+  gap: clamp(22px, 2.2vw, 30px);
+  width: 100%;
 
   padding: 0;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 }
-/* === END BLOCK: EVENT_FEED_LAYOUT_SYNC_V1 === */
+
+.events-feed-group{
+  display: grid;
+  gap: var(--feed-title-mb);
+  width: 100%;
+}
+
+/* Basis / Mobile: Karten innerhalb einer Gruppe untereinander */
+.events-feed-group__grid{
+  display: flex;
+  flex-direction: column;
+  gap: var(--feed-cards-gap);
+  width: 100%;
+
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 === */
 
 /* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
 /* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V14 | Purpose: keep the proven desktop hero framing intact while restoring the intended desktop event-feed target state with grouped-grid ownership, compact scan-cards and late two-column activation | Scope: desktop-only hero frame plus desktop-only feed/card layout on the homepage; mobile remains unchanged === */
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V15 | Purpose: keep the proven desktop hero framing, align the visible hero panel to the same content rail as the feed, and activate a strict inner 2-up card grid only on true desktop widths | Scope: desktop-only hero frame plus desktop-only feed/card layout on the homepage; mobile remains unchanged === */
 :root{
   --hero-bg-image-desktop: none;
   --hero-bg-image-mobile: none;
@@ -134,13 +153,13 @@
     padding-top: 10px;
   }
 
-  .events-feed-group__grid,
+  .desktop-hero .top-stack{
+    width: 100%;
+    max-width: none;
+  }
+
   .event-cards-grid{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--feed-cards-gap);
     max-width: 1128px;
-    align-items: stretch;
   }
 
   .event-card{
@@ -181,12 +200,18 @@
 }
 
 @media (min-width: 1280px) {
-  .events-feed-group__grid,
-  .event-cards-grid{
+  .events-feed-group__grid{
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    align-items: stretch;
+  }
+
+  .events-feed-group__grid > .event-card{
+    height: 100%;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_FRAME_V14 === */
+/* === END BLOCK: DESKTOP_HERO_FRAME_V15 === */
 /* ============================================
    FILTERS / SEARCH / TOP STACK (Top-App)
    ============================================ */
