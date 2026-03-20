@@ -492,12 +492,12 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V23 | Purpose: tighten the desktop hero composition after 1024/1226/1920 proofing by shrinking the left veil, freeing the headline from the tower and keeping the floating panel more centered and stable | Scope: desktop-only hero surface, copy and panel layout; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V24 | Purpose: rebalance the full desktop hero so header, stage and search panel read as one calmer composition with clearer hierarchy and lighter CTA weight | Scope: desktop-only homepage hero, header, search module and narrow-desktop refinements; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
-    min-height: 60px;
-    padding-left: 32px;
-    padding-right: 32px;
+    min-height: 56px;
+    padding-left: 28px;
+    padding-right: 28px;
   }
 
   .header-right{
@@ -507,7 +507,7 @@
   .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
     --hero-bg-size-active: var(--hero-bg-size-desktop);
-    --hero-bg-position-active: var(--hero-bg-position-desktop);
+    --hero-bg-position-active: 79.25% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
     --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
@@ -518,9 +518,9 @@
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
-    min-height: var(--hero-stage-min-h-desktop);
-    padding: 40px 32px 26px;
+    gap: 18px;
+    min-height: 452px;
+    padding: 32px 32px 22px;
     background: none;
     border: 0;
     border-radius: 0;
@@ -536,12 +536,13 @@
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.985) 8%, rgba(247,250,244,0.90) 15%, rgba(247,250,244,0.54) 24%, rgba(247,250,244,0.18) 33%, rgba(247,250,244,0.05) 41%, rgba(247,250,244,0.00) 49%),
-      linear-gradient(180deg, rgba(247,250,244,0.56) 0%, rgba(247,250,244,0.12) 18%, rgba(247,250,244,0.03) 42%, rgba(247,250,244,0.10) 100%),
+      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.986) 7%, rgba(247,250,244,0.91) 13%, rgba(247,250,244,0.58) 21%, rgba(247,250,244,0.26) 30%, rgba(247,250,244,0.08) 38%, rgba(247,250,244,0.00) 46%),
+      radial-gradient(58% 64% at 18% 29%, rgba(247,250,244,0.52) 0%, rgba(247,250,244,0.24) 36%, rgba(247,250,244,0.08) 60%, rgba(247,250,244,0.00) 78%),
+      linear-gradient(180deg, rgba(247,250,244,0.44) 0%, rgba(247,250,244,0.11) 16%, rgba(247,250,244,0.02) 40%, rgba(247,250,244,0.08) 100%),
       var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat;
-    background-position: left top, center top, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
@@ -560,9 +561,9 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 72% 21%, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.00) 12%),
-      radial-gradient(circle at 87% 56%, rgba(246,214,153,0.06) 0%, rgba(246,214,153,0.00) 14%),
-      linear-gradient(180deg, rgba(250,252,247,0.00) 78%, rgba(250,252,247,0.14) 100%);
+      radial-gradient(circle at 70% 18%, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.00) 11%),
+      radial-gradient(circle at 85% 53%, rgba(246,214,153,0.05) 0%, rgba(246,214,153,0.00) 13%),
+      linear-gradient(180deg, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.12) 100%);
     pointer-events: none;
   }
 
@@ -573,8 +574,8 @@
   }
 
   .desktop-entry__content{
-    max-width: 40rem;
-    gap: 10px;
+    max-width: 36.5rem;
+    gap: 12px;
   }
 
   .desktop-entry__eyebrow{
@@ -582,21 +583,21 @@
   }
 
   .desktop-entry__title{
-    max-width: none;
-    font-size: clamp(3.6rem, 3.08rem + 1.34vw, 4.6rem);
-    line-height: 0.94;
-    letter-spacing: -0.064em;
+    max-width: 32rem;
+    font-size: clamp(3.25rem, 2.92rem + 1.10vw, 4.25rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
   }
 
   .desktop-entry__text{
-    max-width: 35rem;
-    color: rgba(22,39,61,0.84);
-    font-size: 1.02rem;
-    line-height: 1.42;
+    max-width: 31rem;
+    color: rgba(22,39,61,0.88);
+    font-size: 1rem;
+    line-height: 1.46;
   }
 
   .desktop-entry__text--lead{
-    gap: 4px;
+    gap: 6px;
   }
 
   .top-stack{
@@ -606,44 +607,43 @@
     align-self: start;
     justify-self: stretch;
     display: grid;
-    gap: 10px;
-    width: min(100%, 952px);
-    max-width: 952px;
-    margin-top: 8px;
-    padding: 15px 17px 13px;
-    border: 1px solid rgba(22,39,61,0.06);
-    border-radius: 26px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.955) 0%, rgba(252,253,250,0.92) 100%);
+    gap: 8px;
+    width: min(100%, 926px);
+    max-width: 926px;
+    margin-top: 4px;
+    padding: 13px 15px 11px;
+    border: 1px solid rgba(22,39,61,0.055);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
     box-shadow:
-      0 20px 40px rgba(22,39,61,0.08),
+      0 16px 32px rgba(22,39,61,0.072),
       0 1px 0 rgba(255,255,255,0.985) inset;
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    border-bottom-color: rgba(22,39,61,0.06);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
   }
 
   .top-stack::before{
     content: "";
     position: absolute;
-    inset: 9px;
+    inset: 8px;
     z-index: -1;
-    border-radius: 20px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(244,248,239,0.06) 100%);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
   }
 
   .desktop-hero__panel-head{
     display: block;
-    padding: 2px 6px 0;
+    padding: 0 4px 0;
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 188px 188px;
+    grid-template-columns: minmax(0, 1fr) 176px 176px;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 188px 188px 52px;
+    grid-template-columns: minmax(0, 1fr) 176px 176px 50px;
   }
 
   .top-stack .events-filter{
@@ -655,40 +655,40 @@
 
   .desktop-hero__search-field .desktop-hero__icon--search{
     position: absolute;
-    left: 24px;
+    left: 22px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(99,119,149,0.74);
-    width: 20px;
-    height: 20px;
+    color: rgba(99,119,149,0.70);
+    width: 19px;
+    height: 19px;
     z-index: 2;
     pointer-events: none;
   }
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 62px;
+    height: 58px;
   }
 
   .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 0 22px 0 52px;
-    border: 1px solid rgba(22,39,61,0.09);
-    border-radius: 18px;
+    padding: 0 20px 0 48px;
+    border: 1px solid rgba(22,39,61,0.082);
+    border-radius: 17px;
     background: rgba(255,255,255,0.988);
     color: #16273d;
-    font-size: 1.01rem;
-    font-weight: 615;
+    font-size: 1rem;
+    font-weight: 610;
     letter-spacing: -0.012em;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.988) inset,
-      0 12px 24px rgba(22,39,61,0.032);
+      0 8px 18px rgba(22,39,61,0.026);
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(99,119,149,0.80);
+    color: rgba(99,119,149,0.76);
     font-weight: 600;
   }
 
@@ -698,15 +698,15 @@
     grid-template-rows: auto auto;
     align-items: center;
     justify-content: stretch;
-    column-gap: 10px;
+    column-gap: 9px;
     row-gap: 2px;
-    padding: 9px 15px 10px;
-    border: 1px solid rgba(22,39,61,0.074);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.94);
+    padding: 8px 14px 9px;
+    border: 1px solid rgba(22,39,61,0.07);
+    border-radius: 17px;
+    background: rgba(255,255,255,0.935);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.96) inset,
-      0 8px 18px rgba(22,39,61,0.022);
+      0 6px 14px rgba(22,39,61,0.02);
     text-align: left;
   }
 
@@ -715,7 +715,7 @@
     grid-row: 1;
     min-width: 0;
     color: #7d8ea5;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 760;
     line-height: 1;
     letter-spacing: 0.015em;
@@ -727,8 +727,8 @@
     grid-row: 2;
     min-width: 0;
     color: #16273d;
-    font-size: 1rem;
-    font-weight: 790;
+    font-size: 0.98rem;
+    font-weight: 780;
     line-height: 1.08;
     white-space: nowrap;
     overflow: hidden;
@@ -740,84 +740,84 @@
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(99,119,149,0.54);
-    font-size: 1.04rem;
+    color: rgba(99,119,149,0.46);
+    font-size: 1rem;
     line-height: 1;
     margin-left: 0;
   }
 
   .desktop-hero__search-row > .filter-pill--reset{
     grid-column: auto;
-    width: 52px;
-    min-width: 52px;
-    min-height: 62px;
+    width: 50px;
+    min-width: 50px;
+    min-height: 58px;
     justify-self: stretch;
     align-self: stretch;
-    border-color: rgba(22,39,61,0.066);
-    background: rgba(255,255,255,0.87);
+    border-color: rgba(22,39,61,0.06);
+    background: rgba(255,255,255,0.84);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 8px 18px rgba(22,39,61,0.022);
+      0 6px 14px rgba(22,39,61,0.02);
   }
 
   .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(22,39,61,0.07);
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(22,39,61,0.06);
   }
 
   .desktop-hero__action{
-    min-height: 40px;
-    padding: 0 14px;
-    border-radius: 13px;
-    font-size: 0.88rem;
-    font-weight: 675;
-    border-color: rgba(22,39,61,0.05);
-    background: rgba(255,255,255,0.72);
-    color: rgba(31,53,82,0.84);
+    min-height: 38px;
+    padding: 0 12px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    font-weight: 660;
+    border-color: rgba(22,39,61,0.044);
+    background: rgba(255,255,255,0.64);
+    color: rgba(31,53,82,0.78);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.84) inset;
+      0 1px 0 rgba(255,255,255,0.82) inset;
   }
 
   .desktop-hero__action .desktop-hero__icon{
-    width: 16px;
-    height: 16px;
-    opacity: 0.64;
+    width: 15px;
+    height: 15px;
+    opacity: 0.58;
   }
 
   .desktop-hero__actions .desktop-hero__action--publish{
-    border-color: rgba(22,39,61,0.064);
-    background: rgba(255,255,255,0.80);
-    color: rgba(31,53,82,0.92);
-    font-weight: 705;
+    border-color: rgba(22,39,61,0.056);
+    background: rgba(255,255,255,0.76);
+    color: rgba(31,53,82,0.88);
+    font-weight: 690;
   }
 
   .desktop-hero__actions .desktop-hero__action--info{
-    border-color: rgba(22,39,61,0.05);
-    background: rgba(255,255,255,0.72);
-    color: rgba(31,53,82,0.84);
+    border-color: rgba(22,39,61,0.046);
+    background: rgba(255,255,255,0.68);
+    color: rgba(31,53,82,0.82);
   }
 
   .desktop-hero__actions .desktop-hero__action--app{
-    border-color: rgba(22,39,61,0.046);
-    background: rgba(255,255,255,0.64);
-    color: rgba(31,53,82,0.78);
+    border-color: rgba(22,39,61,0.042);
+    background: rgba(255,255,255,0.58);
+    color: rgba(31,53,82,0.74);
   }
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover{
-      border-color: rgba(22,39,61,0.075);
-      background: rgba(255,255,255,0.82);
+      border-color: rgba(22,39,61,0.066);
+      background: rgba(255,255,255,0.76);
       color: #16273d;
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.89) inset,
-        0 8px 18px rgba(22,39,61,0.026);
+        0 1px 0 rgba(255,255,255,0.88) inset,
+        0 6px 14px rgba(22,39,61,0.024);
     }
 
     .desktop-hero__actions .desktop-hero__action--publish:hover{
-      background: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.84);
     }
   }
 }
@@ -825,68 +825,85 @@
 @media (min-width: 900px) and (max-width: 1199.98px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: var(--hero-bg-position-desktop-narrow);
-    min-height: var(--hero-stage-min-h-desktop-narrow);
-    padding-top: 32px;
+    --hero-bg-position-active: 86.75% 9.5%;
+    min-height: 424px;
+    padding-top: 28px;
+    padding-bottom: 20px;
   }
 
   .desktop-entry__content{
-    max-width: 34rem;
+    max-width: 31.5rem;
   }
 
   .desktop-entry__title{
-    font-size: clamp(3.05rem, 2.72rem + 0.84vw, 3.7rem);
+    max-width: 28rem;
+    font-size: clamp(2.9rem, 2.62rem + 0.80vw, 3.5rem);
   }
 
   .desktop-entry__text{
-    max-width: 29rem;
+    max-width: 26rem;
+    font-size: 0.97rem;
+  }
+
+  .top-stack{
+    width: 100%;
+    max-width: none;
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 180px 180px;
+    grid-template-columns: minmax(0, 1fr) 168px 168px;
   }
 
   .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 180px 180px 52px;
+    grid-template-columns: minmax(0, 1fr) 168px 168px 48px;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: 48px;
+    min-width: 48px;
   }
 }
-/* === END BLOCK: FEED_GROUP_BASELINE_AND_DESKTOP_FEED_RESTORE_V3 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V24 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V22 | Purpose: rebalance the hero at 1024-class widths by pushing the tower farther out of the headline and narrowing the copy-safe veil without collapsing into a right-side image slot | Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V23 | Purpose: keep the 1024-class desktop state stable by tightening the copy-safe zone, reducing module mass and preventing the hero image from colliding with the headline | Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: 88.5% 10%;
-    gap: 18px;
-    min-height: 420px;
+    --hero-bg-position-active: 89.25% 10%;
+    gap: 16px;
+    min-height: 404px;
     padding-left: 24px;
     padding-right: 24px;
-    padding-top: 24px;
-    padding-bottom: 22px;
+    padding-top: 22px;
+    padding-bottom: 20px;
   }
 
   .desktop-hero::before{
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.995) 0%, rgba(247,250,244,0.986) 10%, rgba(247,250,244,0.92) 18%, rgba(247,250,244,0.64) 28%, rgba(247,250,244,0.24) 38%, rgba(247,250,244,0.06) 47%, rgba(247,250,244,0.00) 55%),
-      linear-gradient(180deg, rgba(247,250,244,0.60) 0%, rgba(247,250,244,0.14) 20%, rgba(247,250,244,0.04) 44%, rgba(247,250,244,0.10) 100%),
+      linear-gradient(90deg, rgba(247,250,244,0.995) 0%, rgba(247,250,244,0.987) 10%, rgba(247,250,244,0.93) 18%, rgba(247,250,244,0.62) 27%, rgba(247,250,244,0.24) 36%, rgba(247,250,244,0.06) 44%, rgba(247,250,244,0.00) 52%),
+      radial-gradient(62% 66% at 20% 28%, rgba(247,250,244,0.54) 0%, rgba(247,250,244,0.26) 38%, rgba(247,250,244,0.08) 61%, rgba(247,250,244,0.00) 79%),
+      linear-gradient(180deg, rgba(247,250,244,0.48) 0%, rgba(247,250,244,0.12) 18%, rgba(247,250,244,0.03) 42%, rgba(247,250,244,0.09) 100%),
       var(--hero-bg-image-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
   }
 
   .desktop-entry__content{
-    max-width: 29rem;
+    max-width: 27.5rem;
     gap: 10px;
   }
 
   .desktop-entry__title{
-    max-width: none;
-    font-size: clamp(2.6rem, 2.34rem + 0.62vw, 3.18rem);
-    line-height: 0.96;
+    max-width: 24rem;
+    font-size: clamp(2.45rem, 2.25rem + 0.56vw, 3rem);
+    line-height: 0.97;
   }
 
   .desktop-entry__text{
-    max-width: 24rem;
-    font-size: 0.94rem;
-    line-height: 1.38;
+    max-width: 21.5rem;
+    font-size: 0.92rem;
+    line-height: 1.4;
   }
 
   .desktop-entry__lead-line{
@@ -894,72 +911,74 @@
   }
 
   .top-stack{
-    width: 100%;
-    max-width: none;
-    margin-top: 8px;
-    padding: 12px 14px 12px;
-    border-radius: 24px;
+    margin-top: 4px;
+    padding: 11px 12px 10px;
+    border-radius: 22px;
+  }
+
+  .top-stack::before{
+    inset: 7px;
+    border-radius: 16px;
   }
 
   .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 176px 176px;
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 160px 160px;
+    gap: 7px;
   }
 
   .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 176px 176px 50px;
+    grid-template-columns: minmax(0, 1fr) 160px 160px 46px;
   }
 
   .desktop-hero__search-field .desktop-hero__icon--search{
-    left: 22px;
-    width: 19px;
-    height: 19px;
+    left: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .top-stack #search-filter,
   .desktop-hero__toolbar-pill{
-    height: 58px;
+    height: 56px;
   }
 
   .top-stack #search-filter{
-    padding-left: 48px;
-    padding-right: 18px;
-    font-size: 0.98rem;
-    border-radius: 17px;
-  }
-
-  .desktop-hero__toolbar-pill{
-    padding: 8px 13px 9px;
-    column-gap: 9px;
-    row-gap: 2px;
+    padding-left: 44px;
+    padding-right: 17px;
+    font-size: 0.97rem;
     border-radius: 16px;
   }
 
+  .desktop-hero__toolbar-pill{
+    padding: 8px 12px 8px;
+    column-gap: 8px;
+    border-radius: 15px;
+  }
+
   .desktop-hero__search-row > .filter-pill--reset{
-    width: 50px;
-    min-width: 50px;
-    min-height: 58px;
+    width: 46px;
+    min-width: 46px;
+    min-height: 56px;
   }
 
   .desktop-hero__toolbar-pill .filter-pill__label{
-    font-size: 0.68rem;
+    font-size: 0.66rem;
   }
 
   .desktop-hero__toolbar-pill .filter-pill__value{
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .desktop-hero__actions{
-    gap: 8px;
-    padding-top: 12px;
+    gap: 6px;
+    padding-top: 9px;
   }
 
   .desktop-hero__action{
-    min-height: 38px;
-    padding-left: 12px;
-    padding-right: 12px;
-    font-size: 0.85rem;
+    min-height: 36px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 0.82rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V22 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V23 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
