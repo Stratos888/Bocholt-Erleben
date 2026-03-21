@@ -1031,18 +1031,19 @@ if (timeKey !== "all") {
 
   /* === END BLOCK: FILTER UI HELPERS + FACETS (canonical + counts + disabled) === */
 
-    if (ui.searchInput) {
-      ui.searchInput.value = "";
-    } else {
-      const searchInput = document.getElementById("search-filter");
-      if (searchInput) searchInput.value = "";
-    }
+  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 | Zweck: stellt die fehlende resetFacetFilters()-Methode korrekt wieder her, setzt nur Zeit/Kategorie zurück, synchronisiert aktive Optionen in Sheet+Popover und belässt die Suche unangetastet; Umfang: ersetzt den kaputten Tail ab dem losen Reset-Code bis inkl. refresh() === */
+  resetFacetFilters() {
+    const ui = this._ui || {};
+
+    this.filters.kategorie = "";
+    this.filters.zeitraum = "all";
 
     if (ui.timeSheet) {
       this.setActiveOption(
         ui.timeSheet,
         ui.timeSheet.querySelector('[data-time="all"]')
       );
+      ui.timeSheet.hidden = true;
     }
 
     if (ui.catSheet) {
@@ -1050,7 +1051,23 @@ if (timeKey !== "all") {
         ui.catSheet,
         ui.catSheet.querySelector('[data-category=""]')
       );
+      ui.catSheet.hidden = true;
     }
+
+    const timePopover = document.getElementById("popover-time");
+    const catPopover = document.getElementById("popover-category");
+
+    if (timePopover) timePopover.hidden = true;
+    if (catPopover) catPopover.hidden = true;
+
+    const timePill = ui.timePill || document.getElementById("filter-time-pill");
+    const catPill = ui.catPill || document.getElementById("filter-category-pill");
+
+    if (timePill) timePill.setAttribute("aria-expanded", "false");
+    if (catPill) catPill.setAttribute("aria-expanded", "false");
+
+    this._openDesktopPopover = null;
+    document.body.classList.remove("is-sheet-open");
 
     this.applyFilters();
 
@@ -1060,7 +1077,7 @@ if (timeKey !== "all") {
       ui.resetPill || document.getElementById("filter-reset-pill")
     );
 
-    debugLog("Filters reset");
+    debugLog("Facet filters reset");
   },
 
   /**
@@ -1070,7 +1087,7 @@ if (timeKey !== "all") {
     this.allEvents = Array.isArray(events) ? events : [];
     this.applyFilters();
   }
-  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V4 === */
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 === */
 };
 
 /* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) ===
