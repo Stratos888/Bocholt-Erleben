@@ -503,6 +503,15 @@
   line-height: 1.52;
 }
 
+/* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_V1 | Zweck: macht den primären Hero-CTA auf /info/ klarer als Section-Homepage-Aktion lesbar statt wie einen generischen Inhaltsbutton; Umfang: nur page--info Hero-CTA, keine anderen Seiten === */
+.page--info .content-actions--inline .content-cta--primary{
+  min-width: clamp(248px, 24vw, 320px);
+  min-height: 50px;
+  padding-inline: calc(var(--cmp-btn-pad-x) + 4px);
+  font-weight: 760;
+}
+/* === END BLOCK: INFO_HERO_CTA_POLISH_V1 === */
+
 .page--info .content-link{
   padding-left: 0;
   padding-right: 0;
@@ -574,9 +583,16 @@
     max-width: 60ch;
   }
 
-  .page--info .content-note{
+   .page--info .content-note{
     max-width: 58ch;
   }
+
+  /* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 | Zweck: skaliert den /info/-Hero-CTA auf Desktop leicht hoch, damit er wie die Hauptaktion des Hubs wirkt; Umfang: nur Desktop für page--info === */
+  .page--info .content-actions--inline .content-cta--primary{
+    min-width: clamp(264px, 19vw, 336px);
+    min-height: 52px;
+  }
+  /* === END BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 === */
 }
 
 @media (min-width: 1024px){
