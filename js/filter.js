@@ -181,9 +181,103 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       this.updateFilterBarUI(timeValue, catValue, resetPill);
     });
 
-    // Open sheets
-    timePill.addEventListener("click", () => openSheet(timeSheet));
-    catPill.addEventListener("click", () => openSheet(catSheet));
+   /* === BEGIN BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) ===
+Zweck:
+- Desktop: Popover statt Bottom-Sheet
+- Mobile: unverändert Sheets
+Umfang:
+- ersetzt nur Öffnungslogik der Filter-Pills
+=== */
+
+const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
+
+const getPopover = (type) => document.getElementById(`popover-${type}`);
+
+const openPopover = (type, triggerEl) => {
+  const pop = getPopover(type);
+  if (!pop || !triggerEl) return;
+
+  closeAllPopovers();
+
+  const rect = triggerEl.getBoundingClientRect();
+
+  const top = rect.bottom + window.scrollY + 8;
+  const left = rect.left + window.scrollX;
+
+  pop.style.top = `${top}px`;
+  pop.style.left = `${left}px`;
+  pop.hidden = false;
+
+  triggerEl.setAttribute("aria-expanded", "true");
+
+  this._openDesktopPopover = type;
+};
+
+const closePopover = (type) => {
+  const pop = getPopover(type);
+  if (!pop) return;
+
+  pop.hidden = true;
+
+  const trigger = type === "time" ? timePill : catPill;
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+
+  this._openDesktopPopover = null;
+};
+
+const closeAllPopovers = () => {
+  closePopover("time");
+  closePopover("category");
+};
+
+// CLICK HANDLER (ADAPTIV)
+timePill.addEventListener("click", (e) => {
+  if (!isDesktop()) return openSheet(timeSheet);
+  openPopover("time", timePill);
+});
+
+catPill.addEventListener("click", (e) => {
+  if (!isDesktop()) return openSheet(catSheet);
+  openPopover("category", catPill);
+});
+
+// OUTSIDE CLICK (DESKTOP ONLY)
+document.addEventListener("click", (e) => {
+  if (!isDesktop()) return;
+
+  const open = this._openDesktopPopover;
+  if (!open) return;
+
+  const pop = getPopover(open);
+  const trigger = open === "time" ? timePill : catPill;
+
+  if (
+    pop &&
+    !pop.contains(e.target) &&
+    trigger &&
+    !trigger.contains(e.target)
+  ) {
+    closePopover(open);
+  }
+});
+
+// ESC erweitert (für Popover)
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+
+  if (this._openDesktopPopover) {
+    closeAllPopovers();
+  }
+});
+
+// RESIZE SAFETY
+window.addEventListener("resize", () => {
+  if (!isDesktop()) {
+    closeAllPopovers();
+  }
+});
+
+/* === END BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) === */
 
     // Close on overlay + close button (data-close-sheet)
     const wireSheetClose = (sheetEl) => {
@@ -204,27 +298,33 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       if (!catSheet.hidden) closeSheet(catSheet);
     });
 
-    // Zeit Auswahl
-    timeSheet.querySelectorAll("[data-time]").forEach((btn) => {
+   // Zeit Auswahl (Sheet + Popover)
+[...timeSheet.querySelectorAll("[data-time]"),
+ ...document.querySelectorAll("#popover-time [data-time]")]
+.forEach((btn) => {
       btn.addEventListener("click", () => {
         const v = (btn.getAttribute("data-time") || "all").trim();
         this.filters.zeitraum = v;
         this.applyFilters();
         this.setActiveOption(timeSheet, btn);
         this.updateFilterBarUI(timeValue, catValue, resetPill);
-        closeSheet(timeSheet);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
       });
     });
 
-    // Kategorie Auswahl (Single)
-    catSheet.querySelectorAll("[data-category]").forEach((btn) => {
+   // Kategorie Auswahl (Sheet + Popover)
+[...catSheet.querySelectorAll("[data-category]"),
+ ...document.querySelectorAll("#popover-category [data-category]")]
+.forEach((btn) => {
       btn.addEventListener("click", () => {
         const v = btn.getAttribute("data-category"); // '' = Alle
         this.filters.kategorie = (v ?? "").trim();
         this.applyFilters();
         this.setActiveOption(catSheet, btn);
         this.updateFilterBarUI(timeValue, catValue, resetPill);
-        closeSheet(catSheet);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(catSheet);
       });
     });
 
