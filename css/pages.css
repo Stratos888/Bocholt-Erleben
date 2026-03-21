@@ -24,7 +24,9 @@
     calc(var(--gutter) + 20px);
 }
 
+/* === BEGIN BLOCK: INFO_HUB_RAIL_V2 | Zweck: gibt /info/ als Hub-Seite eine sichtbar breitere Außen-Rail, damit Hero und Karten auf Desktop nicht gequetscht wirken; Umfang: nur page--info Basisvariablen === */
 .page--info{
+  --subpage-rail-max: 1280px;
   --subpage-hero-max: 1088px;
   --subpage-body-max: 1088px;
   --subpage-stack-gap: 22px;
@@ -33,6 +35,7 @@
   --subpage-card-pad-y: 20px;
   --subpage-hero-gap: 14px;
 }
+/* === END BLOCK: INFO_HUB_RAIL_V2 === */
 
 .page--about,
 .page--publish,
@@ -614,7 +617,7 @@
       calc(var(--gutter-lg) + 24px);
   }
 
-  /* === BEGIN BLOCK: INFO_DESKTOP_RAIL_SYNC_V1 | Zweck: synchronisiert /info/ ab Desktop mit der äußeren Rail der Main Page, ohne die innere Lesebreite der Texte aufzugeben; Umfang: nur page--info Variablen im Desktop-Breakpoint === */
+   /* === BEGIN BLOCK: INFO_DESKTOP_HUB_RAIL_V2 | Zweck: lässt /info/ ab Desktop die breitere Hub-Rail vollständig nutzen, während Text intern weiter begrenzt bleibt; Umfang: nur page--info Variablen im Desktop-Breakpoint === */
   .page--info{
     --subpage-hero-max: 100%;
     --subpage-body-max: 100%;
@@ -624,7 +627,7 @@
     --subpage-card-pad-y: 20px;
     --subpage-hero-gap: 14px;
   }
-  /* === END BLOCK: INFO_DESKTOP_RAIL_SYNC_V1 === */
+  /* === END BLOCK: INFO_DESKTOP_HUB_RAIL_V2 === */
 
   .page--about,
   .page--publish,
