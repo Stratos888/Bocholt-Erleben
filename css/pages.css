@@ -614,13 +614,17 @@
       calc(var(--gutter-lg) + 24px);
   }
 
+  /* === BEGIN BLOCK: INFO_DESKTOP_RAIL_SYNC_V1 | Zweck: synchronisiert /info/ ab Desktop mit der äußeren Rail der Main Page, ohne die innere Lesebreite der Texte aufzugeben; Umfang: nur page--info Variablen im Desktop-Breakpoint === */
   .page--info{
+    --subpage-hero-max: 100%;
+    --subpage-body-max: 100%;
     --subpage-stack-gap: 24px;
     --subpage-card-gap: 12px;
     --subpage-card-pad-x: 22px;
     --subpage-card-pad-y: 20px;
     --subpage-hero-gap: 14px;
   }
+  /* === END BLOCK: INFO_DESKTOP_RAIL_SYNC_V1 === */
 
   .page--about,
   .page--publish,
