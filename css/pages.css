@@ -414,88 +414,74 @@
   border-radius: var(--ui-radius-sm);
 }
 
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V4 | Zweck: richtet /info/ strikt auf den eingefrorenen Zielzustand aus: einspaltiger Hero, 2-spaltiger Nutzenbereich mit Full-Width-Flow-Card und sekundärer Service-Zeile; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
+.page--info{
+  --subpage-hero-max: 820px;
+  --subpage-body-max: 1040px;
+  --subpage-stack-gap: 18px;
+  --subpage-card-gap: 12px;
+  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-y: 20px;
+  --subpage-hero-gap: 14px;
+}
+
 /* INFO PAGE MODULES ---------------------------------------------------- */
 .page--info .content-hero{
-  width: 100%;
-  padding: 18px 18px 16px;
+  justify-self: start;
+  width: min(100%, var(--subpage-hero-max));
+  padding: 22px 22px 20px;
   border: 1px solid rgba(31,41,51,0.055);
   border-radius: var(--cmp-card-radius);
-  background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.72) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.74) 100%);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.8) inset,
-    0 14px 28px rgba(22,39,61,0.036);
+    0 12px 24px rgba(22,39,61,0.03);
 
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
-.info-hero-layout{
-  display: grid;
-  gap: 16px;
+.page--info .content-hero h1{
+  max-width: 11.2ch;
+  font-size: clamp(2.18rem, 1.9rem + 1.15vw, 3rem);
+  line-height: 1.01;
+  letter-spacing: -0.035em;
 }
 
 .info-hero-main{
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  max-width: 58ch;
   align-content: start;
 }
 
-.info-hero-summary{
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: 14px;
-
-  border: 1px solid rgba(31,41,51,0.06);
-  border-radius: var(--ui-radius-md);
-  background: rgba(246,249,240,0.74);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 6px 16px rgba(22,39,61,0.03);
+.page--info .content-lead{
+  max-width: 54ch;
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
-.info-hero-summary h2{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.98rem;
-  line-height: 1.24;
+.page--info .content-note{
+  max-width: 52ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.info-summary-list{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
+.page--info .content-actions{
+  justify-items: start;
   gap: 10px;
+  margin-top: 4px;
 }
 
-.info-summary-list li{
-  display: grid;
-  gap: 4px;
-  padding: 11px 12px;
-
-  border: 1px solid rgba(31,41,51,0.06);
-  border-radius: var(--ui-radius-sm);
-  background: rgba(255,255,255,0.68);
-}
-
-.info-summary-list strong{
-  color: var(--color-text-primary);
-  font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.info-summary-list span{
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.42;
+.page--info .content-actions .content-cta{
+  width: auto;
+  min-width: clamp(220px, 22vw, 276px);
 }
 
 .info-grid{
   display: grid;
   gap: var(--subpage-stack-gap);
-  width: 100%;
+  width: min(100%, var(--subpage-body-max));
 }
 
 .info-grid--three,
@@ -503,13 +489,47 @@
   grid-template-columns: 1fr;
 }
 
-/* DESKTOP -------------------------------------------------------------- */
+.page--info .content-card{
+  width: 100%;
+  background: rgba(255,255,255,0.82);
+  border-color: rgba(31,41,51,0.06);
+  box-shadow:
+    0 10px 24px rgba(22,39,61,0.028),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.page--info .content-card h2{
+  font-size: 1.03rem;
+}
+
+.page--info .content-card .content-note{
+  max-width: 38ch;
+}
+
+.page--info .content-card .content-links{
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.page--info .content-link{
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.page--info .content-card--flow .content-steps{
+  margin-top: 0;
+}
+
+.page--info .content-card--flow .content-steps li{
+  margin: 8px 0;
+}
+
 @media (min-width: 900px){
   :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy){
     padding:
       calc(var(--gutter-lg) + 6px)
       32px
-      calc(var(--gutter-lg) + 28px);
+      calc(var(--gutter-lg) + 24px);
   }
 
   .page--info{
@@ -532,52 +552,36 @@
     --subpage-body-max: 900px;
   }
 
-  .content-actions{
-    justify-items: start;
-  }
-
-  .content-actions .content-cta{
-    width: auto;
-    min-width: clamp(232px, 24vw, 286px);
-  }
-
   .page--info .content-hero{
-    padding: 30px 32px 26px;
+    padding: 28px 30px 24px;
   }
 
   .page--info .content-hero h1{
-    max-width: 13ch;
-    font-size: clamp(2.52rem, 2.12rem + 0.98vw, 3.38rem);
+    max-width: 11.4ch;
+    font-size: clamp(2.34rem, 2.04rem + 0.82vw, 3.02rem);
   }
 
   .page--info .content-lead{
-    max-width: 58ch;
-    font-size: 1.01rem;
+    max-width: 56ch;
   }
 
   .page--info .content-note{
-    max-width: 58ch;
-    font-size: 0.95rem;
+    max-width: 54ch;
   }
+}
 
-  .info-hero-layout{
-    grid-template-columns: minmax(0, 1.22fr) minmax(280px, 0.78fr);
-    align-items: start;
-    gap: 24px;
-  }
-
-  .info-hero-summary{
-    padding: 16px;
-    gap: 12px;
-  }
-
+@media (min-width: 1024px){
   .info-grid--three{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
     gap: 22px;
   }
 
+  .info-grid--three .content-card--flow{
+    grid-column: 1 / -1;
+  }
+
   .info-grid--two{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
     gap: 22px;
   }
 
@@ -587,30 +591,20 @@
     grid-template-rows: auto auto 1fr auto;
     align-content: start;
   }
-
-  .page--info .info-grid--three .content-card p{
-    max-width: 38ch;
-  }
-
-  .page--info .content-card .content-link{
-    padding-left: 8px;
-    padding-right: 8px;
-  }
 }
 
-@media (min-width: 1120px){
+@media (min-width: 1280px){
+  .page--info{
+    --subpage-stack-gap: 24px;
+  }
+
   .page--info .content-hero{
-    padding: 32px 36px 28px;
+    padding: 30px 32px 26px;
   }
 
   .page--info .content-hero h1{
-    max-width: 14ch;
-    font-size: clamp(2.62rem, 2.22rem + 0.92vw, 3.5rem);
-  }
-
-  .info-hero-layout{
-    grid-template-columns: minmax(0, 1.28fr) minmax(300px, 0.72fr);
-    gap: 26px;
+    max-width: 11.6ch;
+    font-size: clamp(2.46rem, 2.12rem + 0.72vw, 3.08rem);
   }
 
   .info-grid--three,
@@ -618,4 +612,4 @@
     gap: 24px;
   }
 }
-/* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V2 === */
+/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V4 === */
