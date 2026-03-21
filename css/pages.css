@@ -414,11 +414,11 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V4 | Zweck: richtet /info/ strikt auf den eingefrorenen Zielzustand aus: einspaltiger Hero, 2-spaltiger Nutzenbereich mit Full-Width-Flow-Card und sekundärer Service-Zeile; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V5 | Zweck: finaler CSS-only Feinschliff für /info/ mit breiterem Hero, entspannterer H1 für 2-Zeilen-Ziel auf großen Desktops und visuell leiserem Sekundärbereich; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
 .page--info{
-  --subpage-hero-max: 820px;
-  --subpage-body-max: 1040px;
-  --subpage-stack-gap: 18px;
+  --subpage-hero-max: 940px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 20px;
   --subpage-card-gap: 12px;
   --subpage-card-pad-x: 20px;
   --subpage-card-pad-y: 20px;
@@ -429,53 +429,53 @@
 .page--info .content-hero{
   justify-self: start;
   width: min(100%, var(--subpage-hero-max));
-  padding: 22px 22px 20px;
-  border: 1px solid rgba(31,41,51,0.055);
+  padding: 24px 26px 22px;
+  border: 1px solid rgba(31,41,51,0.05);
   border-radius: var(--cmp-card-radius);
-  background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.74) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.75) 100%);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.8) inset,
-    0 12px 24px rgba(22,39,61,0.03);
+    0 1px 0 rgba(255,255,255,0.82) inset,
+    0 12px 24px rgba(22,39,61,0.026);
 
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
 .page--info .content-hero h1{
-  max-width: 11.2ch;
-  font-size: clamp(2.18rem, 1.9rem + 1.15vw, 3rem);
-  line-height: 1.01;
-  letter-spacing: -0.035em;
+  max-width: 14.4ch;
+  font-size: clamp(2.12rem, 1.92rem + 0.78vw, 2.84rem);
+  line-height: 0.99;
+  letter-spacing: -0.032em;
 }
 
 .info-hero-main{
   display: grid;
   gap: 14px;
-  max-width: 58ch;
+  max-width: 60ch;
   align-content: start;
 }
 
 .page--info .content-lead{
-  max-width: 54ch;
+  max-width: 58ch;
   font-size: 1rem;
   line-height: 1.55;
 }
 
 .page--info .content-note{
-  max-width: 52ch;
+  max-width: 56ch;
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.52;
 }
 
 .page--info .content-actions{
   justify-items: start;
   gap: 10px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .page--info .content-actions .content-cta{
   width: auto;
-  min-width: clamp(220px, 22vw, 276px);
+  min-width: clamp(224px, 21vw, 284px);
 }
 
 .info-grid{
@@ -494,7 +494,7 @@
   background: rgba(255,255,255,0.82);
   border-color: rgba(31,41,51,0.06);
   box-shadow:
-    0 10px 24px rgba(22,39,61,0.028),
+    0 10px 22px rgba(22,39,61,0.026),
     0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
@@ -503,7 +503,7 @@
 }
 
 .page--info .content-card .content-note{
-  max-width: 38ch;
+  max-width: 41ch;
 }
 
 .page--info .content-card .content-links{
@@ -522,6 +522,14 @@
 
 .page--info .content-card--flow .content-steps li{
   margin: 8px 0;
+}
+
+.page--info .info-grid--two .content-card{
+  background: rgba(255,255,255,0.74);
+  border-color: rgba(31,41,51,0.052);
+  box-shadow:
+    0 8px 18px rgba(22,39,61,0.018),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 @media (min-width: 900px){
@@ -553,20 +561,20 @@
   }
 
   .page--info .content-hero{
-    padding: 28px 30px 24px;
+    padding: 30px 34px 26px;
   }
 
   .page--info .content-hero h1{
-    max-width: 11.4ch;
-    font-size: clamp(2.34rem, 2.04rem + 0.82vw, 3.02rem);
+    max-width: 14.8ch;
+    font-size: clamp(2.34rem, 2.08rem + 0.56vw, 2.92rem);
   }
 
   .page--info .content-lead{
-    max-width: 56ch;
+    max-width: 60ch;
   }
 
   .page--info .content-note{
-    max-width: 54ch;
+    max-width: 58ch;
   }
 }
 
@@ -599,12 +607,12 @@
   }
 
   .page--info .content-hero{
-    padding: 30px 32px 26px;
+    padding: 32px 38px 28px;
   }
 
   .page--info .content-hero h1{
-    max-width: 11.6ch;
-    font-size: clamp(2.46rem, 2.12rem + 0.72vw, 3.08rem);
+    max-width: 15.2ch;
+    font-size: clamp(2.46rem, 2.18rem + 0.42vw, 2.98rem);
   }
 
   .info-grid--three,
@@ -612,4 +620,4 @@
     gap: 24px;
   }
 }
-/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V4 === */
+/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V5 === */
