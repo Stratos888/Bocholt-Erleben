@@ -16,12 +16,15 @@
   justify-items: stretch;
   gap: var(--subpage-stack-gap);
 
-  width: min(100%, var(--subpage-rail-max));
+  /* === BEGIN BLOCK: SUBPAGE_RAIL_OVERRIDE_V1 | Zweck: hebt die globale .page-Maxbreite aus base.css für das Subpage-System korrekt auf und macht die Rail-Variablen erstmals tatsächlich wirksam; Umfang: ersetzt nur die äußere Breitenlogik der gemeinsamen Subpage-Familie === */
+  width: 100%;
+  max-width: var(--subpage-rail-max);
   margin: 0 auto;
   padding:
     calc(var(--gutter) + 4px)
     var(--gutter)
     calc(var(--gutter) + 20px);
+  /* === END BLOCK: SUBPAGE_RAIL_OVERRIDE_V1 === */
 }
 
 /* === BEGIN BLOCK: INFO_HUB_RAIL_V2 | Zweck: gibt /info/ als Hub-Seite eine sichtbar breitere Außen-Rail, damit Hero und Karten auf Desktop nicht gequetscht wirken; Umfang: nur page--info Basisvariablen === */
