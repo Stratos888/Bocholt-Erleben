@@ -36,15 +36,15 @@
 
 .page--about,
 .page--publish,
-.page--organizers{
-  --subpage-hero-max: 780px;
-  --subpage-body-max: 780px;
-}
-
 .page--imprint,
-.page--privacy{
-  --subpage-hero-max: 860px;
-  --subpage-body-max: 860px;
+.page--privacy,
+.page--organizers{
+  --subpage-hero-max: 910px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 22px;
+  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-y: 20px;
+  --subpage-hero-gap: 14px;
 }
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
@@ -550,15 +550,15 @@
 
   .page--about,
   .page--publish,
-  .page--organizers{
-    --subpage-hero-max: 820px;
-    --subpage-body-max: 820px;
-  }
-
   .page--imprint,
-  .page--privacy{
-    --subpage-hero-max: 900px;
-    --subpage-body-max: 900px;
+  .page--privacy,
+  .page--organizers{
+    --subpage-hero-max: 910px;
+    --subpage-body-max: 1088px;
+    --subpage-stack-gap: 24px;
+    --subpage-card-pad-x: 22px;
+    --subpage-card-pad-y: 20px;
+    --subpage-hero-gap: 14px;
   }
 
   .content-hero--panel{
