@@ -414,11 +414,11 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V5 | Zweck: finaler CSS-only Feinschliff für /info/ mit breiterem Hero, entspannterer H1 für 2-Zeilen-Ziel auf großen Desktops und visuell leiserem Sekundärbereich; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V6 | Zweck: richtet /info/ auf die reduzierte Zielstruktur aus: ruhiger Hero, dreiteiliger Prinzipienbereich ohne Aktionen und klar sekundärer Vertiefungs-/Rechtsbereich; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
 .page--info{
-  --subpage-hero-max: 940px;
+  --subpage-hero-max: 900px;
   --subpage-body-max: 1088px;
-  --subpage-stack-gap: 20px;
+  --subpage-stack-gap: 22px;
   --subpage-card-gap: 12px;
   --subpage-card-pad-x: 20px;
   --subpage-card-pad-y: 20px;
@@ -442,8 +442,8 @@
 }
 
 .page--info .content-hero h1{
-  max-width: 14.4ch;
-  font-size: clamp(2.12rem, 1.92rem + 0.78vw, 2.84rem);
+  max-width: 14.8ch;
+  font-size: clamp(2.14rem, 1.94rem + 0.72vw, 2.86rem);
   line-height: 0.99;
   letter-spacing: -0.032em;
 }
@@ -462,7 +462,7 @@
 }
 
 .page--info .content-note{
-  max-width: 56ch;
+  max-width: 58ch;
   font-size: 0.95rem;
   line-height: 1.52;
 }
@@ -484,7 +484,7 @@
   width: min(100%, var(--subpage-body-max));
 }
 
-.info-grid--three,
+.info-grid--principles,
 .info-grid--two{
   grid-template-columns: 1fr;
 }
@@ -503,7 +503,7 @@
 }
 
 .page--info .content-card .content-note{
-  max-width: 41ch;
+  max-width: 42ch;
 }
 
 .page--info .content-card .content-links{
@@ -516,12 +516,12 @@
   padding-right: 0;
 }
 
-.page--info .content-card--flow .content-steps{
-  margin-top: 0;
-}
-
-.page--info .content-card--flow .content-steps li{
-  margin: 8px 0;
+.page--info .content-card--principle{
+  background: rgba(255,255,255,0.78);
+  border-color: rgba(31,41,51,0.052);
+  box-shadow:
+    0 8px 18px rgba(22,39,61,0.02),
+    0 1px 0 rgba(255,255,255,0.74) inset;
 }
 
 .page--info .info-grid--two .content-card{
@@ -541,7 +541,7 @@
   }
 
   .page--info{
-    --subpage-stack-gap: 22px;
+    --subpage-stack-gap: 24px;
     --subpage-card-gap: 12px;
     --subpage-card-pad-x: 22px;
     --subpage-card-pad-y: 20px;
@@ -565,8 +565,8 @@
   }
 
   .page--info .content-hero h1{
-    max-width: 14.8ch;
-    font-size: clamp(2.34rem, 2.08rem + 0.56vw, 2.92rem);
+    max-width: 15.2ch;
+    font-size: clamp(2.34rem, 2.08rem + 0.52vw, 2.92rem);
   }
 
   .page--info .content-lead{
@@ -579,13 +579,9 @@
 }
 
 @media (min-width: 1024px){
-  .info-grid--three{
-    grid-template-columns: repeat(2, minmax(320px, 1fr));
+  .info-grid--principles{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 22px;
-  }
-
-  .info-grid--three .content-card--flow{
-    grid-column: 1 / -1;
   }
 
   .info-grid--two{
@@ -593,7 +589,7 @@
     gap: 22px;
   }
 
-  .page--info .info-grid--three .content-card,
+  .page--info .info-grid--principles .content-card,
   .page--info .info-grid--two .content-card{
     min-height: 100%;
     grid-template-rows: auto auto 1fr auto;
@@ -611,13 +607,13 @@
   }
 
   .page--info .content-hero h1{
-    max-width: 15.2ch;
-    font-size: clamp(2.46rem, 2.18rem + 0.42vw, 2.98rem);
+    max-width: 15.6ch;
+    font-size: clamp(2.44rem, 2.18rem + 0.38vw, 2.98rem);
   }
 
-  .info-grid--three,
+  .info-grid--principles,
   .info-grid--two{
     gap: 24px;
   }
 }
-/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V5 === */
+/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V6 === */
