@@ -414,9 +414,9 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V6 | Zweck: richtet /info/ auf die reduzierte Zielstruktur aus: ruhiger Hero, dreiteiliger Prinzipienbereich ohne Aktionen und klar sekundärer Vertiefungs-/Rechtsbereich; Umfang: ersetzt den bisherigen /info/-Block ab INFO PAGE MODULES bis Dateiende === */
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V7 | Zweck: richtet /info/ visuell enger an die Landingpage-DNA an, setzt die Hero-Breite exakt auf die Landingpage-Panelbreite und mappt den Hero-CTA auf die bestehende Token-/DS-02-Button-DNA; Umfang: ersetzt den kompletten /info/-Desktop-Referenzblock === */
 .page--info{
-  --subpage-hero-max: 900px;
+  --subpage-hero-max: 910px;
   --subpage-body-max: 1088px;
   --subpage-stack-gap: 22px;
   --subpage-card-gap: 12px;
@@ -427,18 +427,31 @@
 
 /* INFO PAGE MODULES ---------------------------------------------------- */
 .page--info .content-hero{
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   justify-self: start;
   width: min(100%, var(--subpage-hero-max));
   padding: 24px 26px 22px;
-  border: 1px solid rgba(31,41,51,0.05);
-  border-radius: var(--cmp-card-radius);
-  background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.75) 100%);
+  border: 1px solid rgba(22,39,61,0.052);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.82) inset,
-    0 12px 24px rgba(22,39,61,0.026);
+    0 14px 28px rgba(22,39,61,0.062),
+    0 1px 0 rgba(255,255,255,0.985) inset;
 
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.page--info .content-hero::before{
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border-radius: 17px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
+  pointer-events: none;
 }
 
 .page--info .content-hero h1{
@@ -473,9 +486,55 @@
   margin-top: 6px;
 }
 
-.page--info .content-actions .content-cta{
+.page--info .content-actions .content-cta,
+.page--info .content-actions .content-cta--primary{
   width: auto;
   min-width: clamp(224px, 21vw, 284px);
+  min-height: var(--cmp-btn-minh);
+  padding: 11px 14px;
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border-primary);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--ui-font-weight-cta);
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: var(--ui-shadow-cta);
+  transform: none;
+}
+
+.page--info .content-actions .content-cta:visited,
+.page--info .content-actions .content-cta--primary:visited{
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover){
+  .page--info .content-actions .content-cta:hover,
+  .page--info .content-actions .content-cta--primary:hover{
+    background: var(--color-primary-muted);
+    border-color: var(--ui-border-primary);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    box-shadow: var(--ui-shadow-cta);
+    transform: none;
+    filter: brightness(0.985);
+  }
+}
+
+.page--info .content-actions .content-cta:active,
+.page--info .content-actions .content-cta--primary:active{
+  background: var(--color-primary-muted);
+  border-color: var(--ui-border-primary);
+  box-shadow: var(--ui-shadow-cta-active);
+  transform: none;
+}
+
+.page--info .content-actions .content-cta:focus-visible,
+.page--info .content-actions .content-cta--primary:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-sm);
 }
 
 .info-grid{
@@ -616,4 +675,4 @@
     gap: 24px;
   }
 }
-/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V6 === */
+/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V7 === */
