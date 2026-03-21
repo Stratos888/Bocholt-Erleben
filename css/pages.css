@@ -1,7 +1,7 @@
-/* === BEGIN BLOCK: SUBPAGE_REFERENCE_SYSTEM_V2 | Zweck: konsolidiert das gemeinsame Subpage-System und baut /info/ als modulare Desktop-Referenzseite mit globalem Header-Link, dichterem Hero, sauberem Card-Grid und standardisiertem CTA auf; Umfang: ersetzt die komplette pages.css === */
+/* === BEGIN BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 | Zweck: konsolidiert das gemeinsame Subpage-System in wiederverwendbare Hero-/CTA-/Grid-Bausteine, übernimmt die /info/-Referenz-DNA appweit und hält spätere Änderungen zentral; Umfang: ersetzt die komplette pages.css === */
 
 /* PAGE FAMILY --------------------------------------------------------- */
-:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy){
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
   --subpage-rail-max: 1128px;
   --subpage-hero-max: 760px;
   --subpage-body-max: 760px;
@@ -25,17 +25,18 @@
 }
 
 .page--info{
-  --subpage-hero-max: 1128px;
-  --subpage-body-max: 1128px;
-  --subpage-stack-gap: 18px;
+  --subpage-hero-max: 910px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 22px;
   --subpage-card-gap: 12px;
-  --subpage-card-pad-x: 18px;
-  --subpage-card-pad-y: 18px;
+  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-y: 20px;
   --subpage-hero-gap: 14px;
 }
 
 .page--about,
-.page--publish{
+.page--publish,
+.page--organizers{
   --subpage-hero-max: 780px;
   --subpage-body-max: 780px;
 }
@@ -46,7 +47,7 @@
   --subpage-body-max: 860px;
 }
 
-:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy) > *{
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -86,6 +87,33 @@
 
   width: min(100%, var(--subpage-hero-max));
   margin: 0;
+}
+
+.content-hero--panel{
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  justify-self: start;
+  padding: 24px 26px 22px;
+  border: 1px solid rgba(22,39,61,0.052);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
+  box-shadow:
+    0 14px 28px rgba(22,39,61,0.062),
+    0 1px 0 rgba(255,255,255,0.985) inset;
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.content-hero--panel::before{
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border-radius: 17px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
+  pointer-events: none;
 }
 
 .content-hero h1{
@@ -162,7 +190,7 @@
   background: rgba(255,255,255,0.82);
   border-color: rgba(31,41,51,0.06);
   box-shadow:
-    0 10px 24px rgba(22,39,61,0.032),
+    0 10px 22px rgba(22,39,61,0.026),
     0 1px 0 rgba(255,255,255,0.76) inset;
 }
 
@@ -198,7 +226,8 @@
 }
 
 .page--info .content-card .content-links{
-  margin-top: 2px;
+  margin-top: auto;
+  padding-top: 4px;
 }
 
 /* LISTS ---------------------------------------------------------------- */
@@ -268,6 +297,16 @@
 
 .content-actions--spaced{
   margin-top: 10px;
+}
+
+.content-actions--inline{
+  justify-items: start;
+}
+
+.content-actions--inline .content-cta,
+.content-actions--inline .content-cta--primary{
+  width: auto;
+  min-width: clamp(224px, 21vw, 284px);
 }
 
 .content-cta{
@@ -354,7 +393,8 @@
 .page--about > nav.content-links:last-child,
 .page--publish > nav.content-links:last-child,
 .page--imprint > nav.content-links:last-child,
-.page--privacy > nav.content-links:last-child{
+.page--privacy > nav.content-links:last-child,
+.page--organizers > nav.content-links:last-child{
   gap: 2px;
   margin-top: 4px;
   padding-top: 10px;
@@ -414,44 +454,34 @@
   border-radius: var(--ui-radius-sm);
 }
 
-/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V7 | Zweck: richtet /info/ visuell enger an die Landingpage-DNA an, setzt die Hero-Breite exakt auf die Landingpage-Panelbreite und mappt den Hero-CTA auf die bestehende Token-/DS-02-Button-DNA; Umfang: ersetzt den kompletten /info/-Desktop-Referenzblock === */
-.page--info{
-  --subpage-hero-max: 910px;
-  --subpage-body-max: 1088px;
-  --subpage-stack-gap: 22px;
-  --subpage-card-gap: 12px;
-  --subpage-card-pad-x: 20px;
-  --subpage-card-pad-y: 20px;
-  --subpage-hero-gap: 14px;
+/* CONTENT GRIDS -------------------------------------------------------- */
+.content-grid,
+.info-grid{
+  display: grid;
+  gap: var(--subpage-stack-gap);
+  width: min(100%, var(--subpage-body-max));
 }
 
-/* INFO PAGE MODULES ---------------------------------------------------- */
-.page--info .content-hero{
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  justify-self: start;
-  width: min(100%, var(--subpage-hero-max));
-  padding: 24px 26px 22px;
-  border: 1px solid rgba(22,39,61,0.052);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
-  box-shadow:
-    0 14px 28px rgba(22,39,61,0.062),
-    0 1px 0 rgba(255,255,255,0.985) inset;
-
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+.content-grid--2,
+.content-grid--3,
+.info-grid--principles,
+.info-grid--two{
+  grid-template-columns: 1fr;
 }
 
-.page--info .content-hero::before{
-  content: "";
-  position: absolute;
-  inset: 8px;
-  z-index: -1;
-  border-radius: 17px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
-  pointer-events: none;
+.content-grid--balanced > .content-card,
+.page--info .info-grid--principles .content-card,
+.page--info .info-grid--two .content-card{
+  min-height: 100%;
+  align-content: start;
+}
+
+/* INFO PAGE REFERENCE -------------------------------------------------- */
+.info-hero-main{
+  display: grid;
+  gap: 14px;
+  max-width: 60ch;
+  align-content: start;
 }
 
 .page--info .content-hero h1{
@@ -459,13 +489,6 @@
   font-size: clamp(2.14rem, 1.94rem + 0.72vw, 2.86rem);
   line-height: 0.99;
   letter-spacing: -0.032em;
-}
-
-.info-hero-main{
-  display: grid;
-  gap: 14px;
-  max-width: 60ch;
-  align-content: start;
 }
 
 .page--info .content-lead{
@@ -480,81 +503,9 @@
   line-height: 1.52;
 }
 
-.page--info .content-actions{
-  justify-items: start;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.page--info .content-actions .content-cta,
-.page--info .content-actions .content-cta--primary{
-  width: auto;
-  min-width: clamp(224px, 21vw, 284px);
-  min-height: var(--cmp-btn-minh);
-  padding: 11px 14px;
-  border-radius: var(--ui-radius-sm);
-  border: 1px solid var(--ui-border-primary);
-  background: var(--color-primary-muted);
-  color: var(--color-text-primary);
-  font-size: var(--cmp-btn-font-size);
-  font-weight: var(--ui-font-weight-cta);
-  line-height: 1;
-  text-decoration: none;
-  box-shadow: var(--ui-shadow-cta);
-  transform: none;
-}
-
-.page--info .content-actions .content-cta:visited,
-.page--info .content-actions .content-cta--primary:visited{
-  color: var(--color-text-primary);
-}
-
-@media (hover: hover){
-  .page--info .content-actions .content-cta:hover,
-  .page--info .content-actions .content-cta--primary:hover{
-    background: var(--color-primary-muted);
-    border-color: var(--ui-border-primary);
-    color: var(--color-text-primary);
-    text-decoration: none;
-    box-shadow: var(--ui-shadow-cta);
-    transform: none;
-    filter: brightness(0.985);
-  }
-}
-
-.page--info .content-actions .content-cta:active,
-.page--info .content-actions .content-cta--primary:active{
-  background: var(--color-primary-muted);
-  border-color: var(--ui-border-primary);
-  box-shadow: var(--ui-shadow-cta-active);
-  transform: none;
-}
-
-.page--info .content-actions .content-cta:focus-visible,
-.page--info .content-actions .content-cta--primary:focus-visible{
-  outline: 2px solid var(--cmp-btn-focus-ring);
-  outline-offset: 3px;
-  border-radius: var(--ui-radius-sm);
-}
-
-.info-grid{
-  display: grid;
-  gap: var(--subpage-stack-gap);
-  width: min(100%, var(--subpage-body-max));
-}
-
-.info-grid--principles,
-.info-grid--two{
-  grid-template-columns: 1fr;
-}
-
-.page--info .content-card{
-  width: 100%;
-  background: rgba(255,255,255,0.82);
-  border-color: rgba(31,41,51,0.06);
-  box-shadow:
-    0 10px 22px rgba(22,39,61,0.026),
-    0 1px 0 rgba(255,255,255,0.76) inset;
+.page--info .content-link{
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .page--info .content-card h2{
@@ -563,16 +514,6 @@
 
 .page--info .content-card .content-note{
   max-width: 42ch;
-}
-
-.page--info .content-card .content-links{
-  margin-top: auto;
-  padding-top: 4px;
-}
-
-.page--info .content-link{
-  padding-left: 0;
-  padding-right: 0;
 }
 
 .page--info .content-card--principle{
@@ -592,7 +533,7 @@
 }
 
 @media (min-width: 900px){
-  :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy){
+  :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
     padding:
       calc(var(--gutter-lg) + 6px)
       32px
@@ -608,7 +549,8 @@
   }
 
   .page--about,
-  .page--publish{
+  .page--publish,
+  .page--organizers{
     --subpage-hero-max: 820px;
     --subpage-body-max: 820px;
   }
@@ -619,7 +561,7 @@
     --subpage-body-max: 900px;
   }
 
-  .page--info .content-hero{
+  .content-hero--panel{
     padding: 30px 34px 26px;
   }
 
@@ -638,19 +580,21 @@
 }
 
 @media (min-width: 1024px){
-  .info-grid--principles{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
-  }
-
+  .content-grid--2,
   .info-grid--two{
     grid-template-columns: repeat(2, minmax(320px, 1fr));
     gap: 22px;
   }
 
+  .content-grid--3,
+  .info-grid--principles{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .content-grid--balanced > .content-card,
   .page--info .info-grid--principles .content-card,
   .page--info .info-grid--two .content-card{
-    min-height: 100%;
     grid-template-rows: auto auto 1fr auto;
     align-content: start;
   }
@@ -661,7 +605,7 @@
     --subpage-stack-gap: 24px;
   }
 
-  .page--info .content-hero{
+  .content-hero--panel{
     padding: 32px 38px 28px;
   }
 
@@ -670,9 +614,11 @@
     font-size: clamp(2.44rem, 2.18rem + 0.38vw, 2.98rem);
   }
 
+  .content-grid--2,
+  .content-grid--3,
   .info-grid--principles,
   .info-grid--two{
     gap: 24px;
   }
 }
-/* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V7 === */
+/* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 === */
