@@ -519,6 +519,13 @@
   align-content: start;
 }
 
+/* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 | Zweck: richtet auf /info/ die inneren Textkanten von Hero und Cards aneinander aus; Umfang: nur horizontale Hero-Innenabstände auf page--info, mobile/default === */
+.page--info .content-hero--panel{
+  padding-left: var(--subpage-card-pad-x);
+  padding-right: var(--subpage-card-pad-x);
+}
+/* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 === */
+
 .page--info .content-hero h1{
   max-width: 14.8ch;
   font-size: clamp(2.14rem, 1.94rem + 0.72vw, 2.86rem);
@@ -605,9 +612,16 @@
     --subpage-hero-gap: 14px;
   }
 
-  .content-hero--panel{
+   .content-hero--panel{
     padding: 30px 34px 26px;
   }
+
+  /* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_DESKTOP_V1 | Zweck: hält auf /info/ auch ab 900px die inneren Hero-Kanten exakt auf Card-Gutter-Niveau; Umfang: nur page--info im Desktop-Breakpoint === */
+  .page--info .content-hero--panel{
+    padding-left: var(--subpage-card-pad-x);
+    padding-right: var(--subpage-card-pad-x);
+  }
+  /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_DESKTOP_V1 === */
 
   .page--info .content-hero h1{
     max-width: 15.2ch;
@@ -659,6 +673,13 @@
   .content-hero--panel{
     padding: 32px 38px 28px;
   }
+
+  /* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_WIDE_V1 | Zweck: verhindert, dass der globale Wide-Desktop-Hero-Padding auf /info/ wieder breiter wird als die Card-Gutter; Umfang: nur page--info ab 1280px === */
+  .page--info .content-hero--panel{
+    padding-left: var(--subpage-card-pad-x);
+    padding-right: var(--subpage-card-pad-x);
+  }
+  /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_WIDE_V1 === */
 
   .page--info .content-hero h1{
     max-width: 15.6ch;
