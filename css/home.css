@@ -1016,4 +1016,117 @@
   }
 }
 /* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V24 === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+@media (min-width: 900px){
+  .filter-popover[hidden]{
+    display: none !important;
+  }
+
+  .filter-popover{
+    position: absolute;
+    z-index: 1300;
+    min-width: 0;
+    pointer-events: auto;
+  }
+
+  #popover-time{
+    width: min(280px, calc(100vw - 32px));
+  }
+
+  #popover-category{
+    width: min(332px, calc(100vw - 32px));
+  }
+
+  .filter-popover__panel{
+    display: grid;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid rgba(22,39,61,0.08);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(250,252,247,0.965) 100%);
+    box-shadow:
+      0 18px 36px rgba(22,39,61,0.12),
+      0 1px 0 rgba(255,255,255,0.96) inset;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .filter-popover__panel button{
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #16273d;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 630;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 140ms ease,
+      color 140ms ease,
+      box-shadow 140ms ease,
+      transform 140ms ease;
+  }
+
+  .filter-popover__panel button:hover{
+    background: rgba(240,245,235,0.92);
+    box-shadow: inset 0 0 0 1px rgba(22,39,61,0.04);
+  }
+
+  .filter-popover__panel button:active{
+    transform: translateY(1px);
+  }
+
+  .filter-popover__panel button:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 2px;
+    background: rgba(240,245,235,0.96);
+  }
+
+  .filter-popover__panel button.is-active{
+    background: rgba(230,238,222,0.98);
+    color: #16273d;
+    box-shadow:
+      inset 0 0 0 1px rgba(111,135,88,0.18),
+      0 1px 0 rgba(255,255,255,0.72);
+  }
+
+  .filter-popover__panel button.is-disabled,
+  .filter-popover__panel button[disabled]{
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .filter-popover__panel button.is-disabled:hover,
+  .filter-popover__panel button[disabled]:hover{
+    background: transparent;
+  }
+
+  #filter-time-pill[aria-expanded="true"],
+  #filter-category-pill[aria-expanded="true"]{
+    border-color: rgba(111,135,88,0.22);
+    background: rgba(255,255,255,0.985);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.96) inset,
+      0 10px 20px rgba(22,39,61,0.038);
+  }
+}
+
+@media (max-width: 899.98px){
+  .filter-popover{
+    display: none !important;
+  }
+}
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V1 === */
+
 /* === END BLOCK: HOME_CSS_STEP_4 === */
