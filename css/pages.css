@@ -383,6 +383,41 @@
   border-radius: var(--cmp-btn-radius);
 }
 
+/* === BEGIN BLOCK: INFO_HERO_CTA_HOME_DNA_V1 | Zweck: zieht den /info/-Hero-CTA aus der harten generischen Primary-Button-DNA auf eine weichere, app-konsistente Hub-CTA-DNA; Umfang: nur /info/ Hero-CTA, keine anderen Seiten === */
+.page--info .content-actions--inline .content-cta--primary{
+  min-width: clamp(216px, 20vw, 248px);
+  min-height: 48px;
+  padding-inline: 18px;
+
+  border-radius: var(--ui-radius-sm);
+  border-color: var(--ui-border-primary);
+
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+
+  font-size: 0.96rem;
+  font-weight: var(--ui-font-weight-cta);
+
+  box-shadow: var(--ui-shadow-cta);
+}
+
+.page--info .content-actions--inline .content-cta--primary:visited{
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover){
+  .page--info .content-actions--inline .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+    border-color: var(--ui-border-primary);
+  }
+}
+
+.page--info .content-actions--inline .content-cta--primary:active{
+  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
+  box-shadow: var(--ui-shadow-cta-active);
+}
+/* === END BLOCK: INFO_HERO_CTA_HOME_DNA_V1 === */
+
 /* CONTENT LINKS -------------------------------------------------------- */
 .content-links{
   display: grid;
