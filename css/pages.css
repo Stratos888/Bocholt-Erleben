@@ -436,22 +436,23 @@
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
+/* === BEGIN BLOCK: CONTENT_LINK_ROW_V2 | Zweck: stärkt content-link appweit als klare klickbare Navigationszeile statt als buttonähnliches CTA-Element; Umfang: ersetzt den Grundstil aller content-link Rows === */
 .content-link{
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 7px;
+  gap: 8px;
 
   width: 100%;
-  min-height: var(--cmp-btn-minh);
-  padding: 11px 10px;
+  min-height: 46px;
+  padding: 11px 12px;
   border-radius: var(--ui-radius-sm);
 
   background: transparent;
   border: 1px solid transparent;
 
   color: var(--cmp-link-color);
-  font-weight: 650;
+  font-weight: 680;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 
@@ -459,25 +460,45 @@
     background 140ms ease,
     border-color 140ms ease,
     color 140ms ease,
-    box-shadow 140ms ease;
+    box-shadow 140ms ease,
+    transform 140ms ease;
 }
+/* === END BLOCK: CONTENT_LINK_ROW_V2 === */
 
+/* === BEGIN BLOCK: CONTENT_LINK_CHEVRON_V2 | Zweck: macht das Chevron als sekundären Navigationshinweis klarer, ohne den Link in einen CTA zu verwandeln; Umfang: ersetzt nur den trailing-indicator von content-link === */
 .content-link::after{
   content: "›";
   margin-left: auto;
   color: var(--cmp-link-color-muted);
-  font-weight: 700;
-  transform: translateY(1px);
+  font-size: 1.05rem;
+  font-weight: 760;
+  line-height: 1;
+  opacity: 0.88;
+  transform: translateY(0);
+  transition:
+    transform 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
 }
+/* === END BLOCK: CONTENT_LINK_CHEVRON_V2 === */
 
+/* === BEGIN BLOCK: CONTENT_LINK_ROW_HOVER_V2 | Zweck: gibt content-link Rows einen klareren Whole-Row-Hover ohne CTA-Anmutung; Umfang: ersetzt nur den Hover-Zustand von content-link === */
 @media (hover: hover){
   .content-link:hover{
     background: var(--ui-surface-tint);
-    border-color: var(--ui-border-weak);
+    border-color: var(--cmp-divider-strong);
     color: var(--cmp-link-color);
     text-decoration: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset;
+  }
+
+  .content-link:hover::after{
+    color: var(--cmp-link-color);
+    transform: translateX(2px);
+    opacity: 1;
   }
 }
+/* === END BLOCK: CONTENT_LINK_ROW_HOVER_V2 === */
 
 .content-link:visited{
   color: var(--cmp-link-color);
@@ -554,10 +575,12 @@
 }
 /* === END BLOCK: INFO_HERO_CTA_POLISH_V1 === */
 
-.page--info .content-link{
-  padding-left: 0;
-  padding-right: 0;
+/* === BEGIN BLOCK: INFO_CARD_ROW_LINK_ALIGNMENT_V2 | Zweck: hält auf /info/ die Textkante der Row-Links bündig zur Card-Typografie, erweitert aber gleichzeitig die klickbare Zeilenfläche; Umfang: nur content-link innerhalb von content-card auf page--info === */
+.page--info .content-card .content-link{
+  margin-inline: -8px;
+  padding-inline: 8px;
 }
+/* === END BLOCK: INFO_CARD_ROW_LINK_ALIGNMENT_V2 === */
 
 .page--info .content-card h2{
   font-size: 1.03rem;
