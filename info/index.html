@@ -1,139 +1,37 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: SEO BASICS (info hub) ===
-  Zweck: Basis-SEO für die Info-Hub-Seite (App-typischer Einstieg).
-  Umfang: Gesamter <head>-Bereich dieser Datei.
-  === -->
+  <!-- === BEGIN BLOCK: INFO_PAGE_REDIRECT_HEAD_V1 | Zweck: deprecated /info/ vollständig aus der IA und leitet robust auf /ueber/ um; Umfang: ersetzt den kompletten <head>-SEO-Basisblock dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Info – Bocholt erleben</title>
-  <meta name="description" content="Info zu Bocholt erleben: Über die Plattform, Für Veranstalter, Events veröffentlichen und rechtliche Seiten.">
+  <title>Weiterleitung – Über Bocholt erleben</title>
+  <meta name="description" content="Diese Seite wurde zusammengeführt. Bitte nutze ab sofort die Seite „Über Bocholt erleben“." />
 
-  <link rel="canonical" href="https://bocholt-erleben.de/info/">
-<link rel="stylesheet" href="/css/style.css?v=2">
-  <!-- === END BLOCK: SEO BASICS (info hub) === -->
+  <link rel="canonical" href="https://bocholt-erleben.de/ueber/">
+  <meta http-equiv="refresh" content="0; url=/ueber/">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="/css/style.css?v=2">
+  <!-- === END BLOCK: INFO_PAGE_REDIRECT_HEAD_V1 === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: INFO_PAGE_REFERENCE_V11 | Zweck: setzt den deterministischen /info/-Render-Contract mit fixer Copy, hartem 3-Zonen-Aufbau und kompakterer Hub-Hierarchie um; Umfang: ersetzt den kompletten <body>-Inhalt dieser Datei === -->
-  <header class="app-header">
-    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
-      <img
-        src="/icons/app/icon-192.png"
-        alt="Bocholt erleben Logo"
-        class="app-logo"
-      >
-      <span class="app-title">Bocholt erleben</span>
-    </a>
-  </header>
-
-  <main class="page page--info">
+  <!-- === BEGIN BLOCK: INFO_PAGE_REDIRECT_BODY_V1 | Zweck: deprecated /info/ als Redirect-Hülle mit manueller Ausweich-Navigation; Umfang: ersetzt den kompletten <body>-Inhalt dieser Datei === -->
+  <main class="page page--about">
     <header class="content-hero content-hero--panel">
-      <div class="info-hero-layout">
-        <div class="info-hero-main">
-          <h1>Bocholt erleben<br>auf einen Blick</h1>
+      <p class="content-kicker">Weiterleitung</p>
+      <h1>Diese Seite wurde zusammengeführt</h1>
+      <p class="content-lead">
+        Bitte nutze ab sofort die Seite „Über Bocholt erleben“. Du wirst automatisch weitergeleitet.
+      </p>
 
-          <p class="content-lead">
-            Bocholt erleben bündelt Veranstaltungen aus Bocholt an einem Ort.
-            Besucher finden schneller Relevantes, Veranstalter erhalten einen klaren Einstieg zur Veröffentlichung.
-          </p>
-
-          <div class="content-actions content-actions--spaced content-actions--inline">
-            <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
-              Event veröffentlichen
-            </a>
-          </div>
-
-          <p class="content-note">
-            Ruhig, fair und ohne optische Bevorzugung einzelner Veranstaltungen.
-          </p>
-        </div>
-
-        <aside class="info-hero-side" aria-labelledby="info-hero-side-title">
-          <p class="info-hero-side-kicker">Auf dieser Seite</p>
-          <h2 id="info-hero-side-title">Schnelle Orientierung</h2>
-
-          <ul class="info-hero-points" aria-label="Orientierung">
-            <li>
-              <strong>Plattform &amp; Veröffentlichung</strong>
-              <span>Worum es geht und wie Veranstalter starten.</span>
-            </li>
-            <li>
-              <strong>Wofür Bocholt erleben steht</strong>
-              <span>Übersicht, Fairness und nachvollziehbare Quellen.</span>
-            </li>
-            <li>
-              <strong>Wichtige Links</strong>
-              <span>Über Bocholt erleben, Impressum und Datenschutz.</span>
-            </li>
-          </ul>
-        </aside>
-      </div>
+      <nav class="content-links" aria-label="Alternative">
+        <a class="content-link" href="/ueber/">Jetzt zu Über Bocholt erleben</a>
+        <a class="content-link" href="/">Zurück zu den Events</a>
+      </nav>
     </header>
-
-    <section class="info-grid info-grid--principles" aria-label="Wofür Bocholt erleben steht">
-      <article class="content-card content-card--principle" aria-labelledby="info-principle-clear">
-        <h2 id="info-principle-clear">Übersichtlich</h2>
-
-        <p class="content-note">
-          Veranstaltungen werden an einem Ort gebündelt, damit Besucher schneller finden,
-          was in Bocholt relevant ist.
-        </p>
-      </article>
-
-      <article class="content-card content-card--principle" aria-labelledby="info-principle-fair">
-        <h2 id="info-principle-fair">Fair</h2>
-
-        <p class="content-note">
-          Bocholt erleben setzt nicht auf künstliche Hervorhebung einzelner Einträge,
-          sondern auf gleiche Sichtbarkeit und klare Ordnung.
-        </p>
-      </article>
-
-      <article class="content-card content-card--principle" aria-labelledby="info-principle-reliable">
-        <h2 id="info-principle-reliable">Verlässlich</h2>
-
-        <p class="content-note">
-          Veranstaltungen werden auf Basis nachvollziehbarer Quellen veröffentlicht,
-          damit die Plattform vertrauenswürdig und ruhig bleibt.
-        </p>
-      </article>
-    </section>
-
-    <section class="info-grid info-grid--closure" aria-label="Mehr zur Plattform und Rechtliches">
-      <article class="content-card info-closure-card" aria-labelledby="info-more">
-        <div class="info-closure-copy">
-          <h2 id="info-more">Mehr zur Plattform</h2>
-
-          <p class="content-note">
-            Hier findest du gebündelt die wichtigsten Hintergründe zur Plattform
-            sowie die rechtlichen Angaben.
-          </p>
-        </div>
-
-        <div class="info-closure-layout">
-          <section class="info-closure-group" aria-labelledby="info-closure-platform">
-            <h3 id="info-closure-platform">Plattform</h3>
-
-            <nav class="content-links" aria-label="Mehr zur Plattform">
-              <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
-            </nav>
-          </section>
-
-          <section class="info-closure-group" aria-labelledby="info-closure-legal">
-            <h3 id="info-closure-legal">Rechtliches</h3>
-
-            <nav class="content-links" aria-label="Rechtliches">
-              <a class="content-link" href="/impressum/">Impressum</a>
-              <a class="content-link" href="/datenschutz/">Datenschutz</a>
-            </nav>
-          </section>
-        </div>
-      </article>
-    </section>
   </main>
-  <!-- === END BLOCK: INFO_PAGE_REFERENCE_V11 === -->
+  <!-- === END BLOCK: INFO_PAGE_REDIRECT_BODY_V1 === -->
 </body>
 </html>
