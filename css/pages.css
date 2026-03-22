@@ -540,10 +540,10 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V2 | Zweck: vereinheitlicht auf /ueber/ die Außenbreite aller drei Hauptzonen, hält aber im Hero weiterhin eine ruhige innere Leserail und die Rechtszone kompakt; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V2 | Zweck: balanciert auf /ueber/ den Hero-Innenraum besser aus, ohne die ruhige Einspalten-Logik zu verlassen; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
-  width: min(100%, var(--subpage-body-max));
-  justify-self: stretch;
+  width: min(100%, 920px);
+  --subpage-hero-gap: 12px;
 }
 
 .page--about .content-hero h1{
@@ -551,16 +551,16 @@
 }
 
 .page--about .content-lead{
-  max-width: 38ch;
+  max-width: 40ch;
 }
 
 .page--about .content-note{
-  max-width: 42ch;
+  max-width: 44ch;
 }
 
 .page--about .about-legal-card{
-  width: min(100%, var(--subpage-body-max));
-  justify-self: stretch;
+  width: min(100%, 820px);
+  justify-self: start;
   gap: 10px;
   align-content: start;
 }
@@ -778,20 +778,24 @@
     padding: 30px 34px 26px;
   }
 
-  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V2 | Zweck: hält /ueber/ ab Desktop auf einer gemeinsamen Außenbreite, während Hero-Text intern lesbar begrenzt und Rechtliches servicehaft kompakt organisiert bleibt; Umfang: nur page--about im 900px-Breakpoint === */
+  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V2 | Zweck: verdichtet auf /ueber/ den Hero gezielt nur innen, damit die linke Copy-Rail weniger schmal und die rechte Leerfläche weniger dominant wirkt; Umfang: nur page--about im 900px-Breakpoint === */
+  .page--about .content-hero{
+    --subpage-hero-gap: 10px;
+  }
+
   .page--about .content-hero--panel{
-    width: min(100%, var(--subpage-body-max));
-    justify-self: stretch;
-    padding: 28px 30px 22px;
+    padding: 24px 28px 20px;
   }
 
   .page--about .content-lead{
-    max-width: 39ch;
+    max-width: 43ch;
+  }
+
+  .page--about .content-note{
+    max-width: 46ch;
   }
 
   .page--about .about-legal-card{
-    width: min(100%, var(--subpage-body-max));
-    justify-self: stretch;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 24px;
     row-gap: 8px;
@@ -920,16 +924,13 @@
     padding: 32px 38px 28px;
   }
 
-  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V2 | Zweck: hält /ueber/ auch auf sehr breiten Viewports auf derselben gemeinsamen Außenbreite und verhindert erneutes Flächigwerden nur über Innenabstände; Umfang: nur page--about ab 1280px === */
+  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V2 | Zweck: hält den /ueber/-Hero auch auf sehr breiten Viewports kompakter, ohne die ruhige Gesamtbreite der Seite zu verändern; Umfang: nur page--about ab 1280px === */
   .page--about .content-hero--panel{
-    width: min(100%, var(--subpage-body-max));
-    justify-self: stretch;
-    padding: 30px 32px 24px;
+    padding: 26px 30px 22px;
   }
 
-  .page--about .about-legal-card{
-    width: min(100%, var(--subpage-body-max));
-    justify-self: stretch;
+  .page--about .content-lead{
+    max-width: 44ch;
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V2 === */
 
