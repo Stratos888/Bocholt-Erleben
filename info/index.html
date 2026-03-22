@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: INFO_PAGE_REFERENCE_V8 | Zweck: richtet /info/ als reduzierte Info- und Vertrauensseite aus, mit nur einem primären CTA im Hero, drei Prinzipienkarten ohne Aktionen und einem klar sekundären Vertiefungs-/Rechtsbereich; Umfang: ersetzt den kompletten <body>-Inhalt dieser Datei === -->
+  <!-- === BEGIN BLOCK: INFO_PAGE_REFERENCE_V9 | Zweck: hebt /info/ auf einen klaren 3-Abschnitt-Infohub mit 2-Zonen-Hero, geschärften Kernversprechen und kombinierter Abschlusszone; Umfang: ersetzt den kompletten <body>-Inhalt dieser Datei === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -31,23 +31,45 @@
 
   <main class="page page--info">
     <header class="content-hero content-hero--panel">
-      <div class="info-hero-main">
-        <h1>Bocholt erleben auf einen Blick</h1>
+      <div class="info-hero-layout">
+        <div class="info-hero-main">
+          <h1>Bocholt erleben auf einen Blick</h1>
 
-        <p class="content-lead">
-          Bocholt erleben bündelt Veranstaltungen aus Bocholt an einem Ort.
-          Für Besucher übersichtlich, für Veranstalter ein klarer Einstieg zur Veröffentlichung.
-        </p>
+          <p class="content-lead">
+            Bocholt erleben bündelt Veranstaltungen aus Bocholt an einem Ort.
+            Für Besucher übersichtlich, für Veranstalter ein klarer Einstieg zur Veröffentlichung.
+          </p>
 
-        <div class="content-actions content-actions--spaced content-actions--inline">
-          <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
-            Event veröffentlichen
-          </a>
+          <div class="content-actions content-actions--spaced content-actions--inline">
+            <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
+              Event veröffentlichen
+            </a>
+          </div>
+
+          <p class="content-note">
+            Ruhig, fair und ohne optische Bevorzugung einzelner Veranstaltungen.
+          </p>
         </div>
 
-        <p class="content-note">
-          Ruhig, fair und ohne optische Bevorzugung einzelner Veranstaltungen.
-        </p>
+        <aside class="info-hero-side" aria-labelledby="info-hero-side-title">
+          <p class="info-hero-side-kicker">Auf dieser Seite</p>
+          <h2 id="info-hero-side-title">Schnelle Orientierung</h2>
+
+          <ul class="info-hero-points" aria-label="Orientierung">
+            <li>
+              <strong>Wie Bocholt erleben funktioniert</strong>
+              <span>Einordnung, Prinzipien und klare Veröffentlichung ohne Werbelogik.</span>
+            </li>
+            <li>
+              <strong>Was die Plattform auszeichnet</strong>
+              <span>Übersicht, Fairness und nachvollziehbare Quellen statt Hervorhebung.</span>
+            </li>
+            <li>
+              <strong>Wichtige Links &amp; Rechtliches</strong>
+              <span>Mehr zur Plattform sowie Impressum und Datenschutz gesammelt an einem Ort.</span>
+            </li>
+          </ul>
+        </aside>
       </div>
     </header>
 
@@ -56,8 +78,8 @@
         <h2 id="info-principle-clear">Übersichtlich</h2>
 
         <p class="content-note">
-          Veranstaltungen werden an einem Ort gebündelt, damit Inhalte schneller erfassbar
-          und ohne unnötige Ablenkung nutzbar bleiben.
+          Veranstaltungen werden an einem Ort gebündelt, damit Besucher schneller finden,
+          was in Bocholt relevant ist – ohne unnötige Ablenkung und ohne überladene Oberflächen.
         </p>
       </article>
 
@@ -66,7 +88,7 @@
 
         <p class="content-note">
           Bocholt erleben setzt nicht auf künstliche Hervorhebung einzelner Einträge,
-          sondern auf klare Ordnung und gleiche Sichtbarkeit im Feed.
+          sondern auf gleiche Sichtbarkeit, klare Ordnung und einen transparenten Rahmen.
         </p>
       </article>
 
@@ -75,18 +97,18 @@
 
         <p class="content-note">
           Veranstaltungen werden auf Basis nachvollziehbarer Quellen veröffentlicht,
-          damit die Plattform ruhig, sauber und vertrauenswürdig bleibt.
+          damit die Plattform ruhig, sauber und für Besucher wie Veranstalter vertrauenswürdig bleibt.
         </p>
       </article>
     </section>
 
-    <section class="info-grid info-grid--two" aria-label="Vertiefung und Rechtliches">
+    <section class="info-grid info-grid--two" aria-label="Vertiefung und weiterführende Links">
       <article class="content-card" aria-labelledby="info-platform">
-        <h2 id="info-platform">Wie Bocholt erleben arbeitet</h2>
+        <h2 id="info-platform">So arbeitet Bocholt erleben</h2>
 
         <p class="content-note">
-          Hier erfährst du, wie die Plattform gedacht ist und warum Übersicht wichtiger ist
-          als Werbung, Rankings oder künstliche Hervorhebung.
+          Hier erfährst du, wie die Plattform gedacht ist, warum Übersicht wichtiger ist
+          als Werbung und wie Veranstaltungen in einem ruhigen, klaren Rahmen sichtbar werden.
         </p>
 
         <nav class="content-links" aria-label="Vertiefung">
@@ -94,20 +116,21 @@
         </nav>
       </article>
 
-      <article class="content-card" aria-labelledby="info-legal">
-        <h2 id="info-legal">Rechtliches &amp; Kontakt</h2>
+      <article class="content-card" aria-labelledby="info-links">
+        <h2 id="info-links">Weiterführende Links</h2>
 
         <p class="content-note">
-          Impressum, Datenschutz und Anbieterangaben findest du gesammelt an einem Ort.
+          Rechtliches, Datenschutz und Anbieterangaben bleiben erreichbar,
+          aber bewusst nachgeordnet zur eigentlichen Plattform-Orientierung.
         </p>
 
-        <nav class="content-links" aria-label="Rechtliches">
+        <nav class="content-links" aria-label="Weiterführende Links">
           <a class="content-link" href="/impressum/">Impressum</a>
           <a class="content-link" href="/datenschutz/">Datenschutz</a>
         </nav>
       </article>
     </section>
   </main>
-  <!-- === END BLOCK: INFO_PAGE_REFERENCE_V8 === -->
+  <!-- === END BLOCK: INFO_PAGE_REFERENCE_V9 === -->
 </body>
 </html>
