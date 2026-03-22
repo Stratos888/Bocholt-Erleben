@@ -61,19 +61,19 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     <!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
  
 
- <!-- === BEGIN BLOCK: HEADER INFO CTA (opens info hub) ===
+<!-- === BEGIN BLOCK: HEADER ABOUT CTA (opens about page) ===
 Zweck:
-- Header-Button „Info“ führt auf den Info-Hub (/info/) statt ein Modal zu öffnen.
-- App-typische Navigation: Info = Hub, von dort aus zu Über/Für Veranstalter/Rechtliches.
+- Header-Button führt nicht mehr auf /info/, sondern direkt auf die kanonische Plattformseite /ueber/.
+- Entfernt den alten Info-Hub aus der primären IA.
 Umfang:
-- Ersetzt nur den Link (kein Layout/JS-Refactoring).
+- Ersetzt nur diesen Link-Block.
 === -->
 <a
   class="pwa-install-button"
-  href="/info/"
-  aria-label="Info"
+  href="/ueber/"
+  aria-label="Über Bocholt erleben"
 ></a>
-<!-- === END BLOCK: HEADER INFO CTA (opens info hub) === -->
+<!-- === END BLOCK: HEADER ABOUT CTA (opens about page) === -->
 
 
 
@@ -161,11 +161,11 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         <span>Event veröffentlichen</span>
       </a>
 
-      <a class="desktop-hero__action desktop-hero__action--info" href="/info/">
+          <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
         <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
         <span>Mehr erfahren</span>
       </a>
-
+        
       <button
         type="button"
         class="desktop-hero__action desktop-hero__action--app"
