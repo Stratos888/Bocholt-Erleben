@@ -539,12 +539,77 @@
 }
 
 /* INFO PAGE REFERENCE -------------------------------------------------- */
+.info-hero-layout{
+  display: grid;
+  gap: 18px;
+  align-items: start;
+}
+
 .info-hero-main{
   display: grid;
   gap: 14px;
   max-width: 60ch;
   align-content: start;
 }
+
+ /* === BEGIN BLOCK: INFO_HERO_SIDECARD_V1 | Zweck: ergänzt für /info/ eine ruhige sekundäre Orientierungs-Card im Hero, damit die Desktop-Breite als echter Hub-Einstieg genutzt wird; Umfang: Hero-Zweitspalte inkl. Listenstil nur für die Info-Seite === */
+.info-hero-side{
+  display: grid;
+  gap: 12px;
+  align-content: start;
+
+  padding: 18px;
+  border: 1px solid rgba(31,41,51,0.06);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    0 8px 18px rgba(22,39,61,0.018),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.info-hero-side-kicker{
+  margin: 0;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
+.info-hero-side h2{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.info-hero-points{
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.info-hero-points li{
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.info-hero-points strong{
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 720;
+  line-height: 1.25;
+}
+
+.info-hero-points span{
+  color: var(--cmp-copy-color);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+/* === END BLOCK: INFO_HERO_SIDECARD_V1 === */
 
 /* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 | Zweck: richtet auf /info/ die inneren Textkanten von Hero und Cards aneinander aus; Umfang: nur horizontale Hero-Innenabstände auf page--info, mobile/default === */
 .page--info .content-hero--panel{
@@ -553,26 +618,38 @@
 }
 /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 === */
 
-.page--info .content-hero h1{
-  max-width: 14.8ch;
-  font-size: clamp(2.14rem, 1.94rem + 0.72vw, 2.86rem);
-  line-height: 0.99;
-  letter-spacing: -0.032em;
-}
+  /* === BEGIN BLOCK: INFO_HERO_DESKTOP_LAYOUT_V1 | Zweck: macht den /info/-Hero ab Desktop zu einem echten 2-Zonen-Hub-Einstieg mit klarer Haupt- und Orientierungs-Spalte; Umfang: nur page--info im Desktop-Breakpoint === */
+  .page--info .info-hero-layout{
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.82fr);
+    gap: 24px;
+  }
 
-.page--info .content-lead{
-  max-width: 58ch;
-  font-size: 1rem;
-  line-height: 1.55;
-}
+  .page--info .info-hero-main{
+    min-width: 0;
+  }
 
-.page--info .content-note{
-  max-width: 58ch;
-  font-size: 0.95rem;
-  line-height: 1.52;
-}
+  .page--info .info-hero-side{
+    min-width: 0;
+    max-width: 360px;
+    justify-self: end;
+    padding: 20px;
+  }
 
-/* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_V1 | Zweck: macht den primären Hero-CTA auf /info/ klarer als Section-Homepage-Aktion lesbar statt wie einen generischen Inhaltsbutton; Umfang: nur page--info Hero-CTA, keine anderen Seiten === */
+  .page--info .content-hero h1{
+    max-width: 13.6ch;
+    font-size: clamp(2.34rem, 2.08rem + 0.52vw, 2.92rem);
+  }
+
+  .page--info .content-lead{
+    max-width: 56ch;
+  }
+
+  .page--info .content-note{
+    max-width: 54ch;
+  }
+  /* === END BLOCK: INFO_HERO_DESKTOP_LAYOUT_V1 === */
+
+  /* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 | Zweck: skaliert den /info/-Hero-CTA auf Desktop leicht hoch, damit er wie die Hauptaktion des Hubs wirkt; Umfang: nur Desktop für page--info === */
 .page--info .content-actions--inline .content-cta--primary{
   min-width: clamp(248px, 24vw, 320px);
   min-height: 50px;
@@ -715,8 +792,18 @@
   /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_WIDE_V1 === */
 
   .page--info .content-hero h1{
-    max-width: 15.6ch;
+    max-width: 13.9ch;
     font-size: clamp(2.44rem, 2.18rem + 0.38vw, 2.98rem);
+  }
+
+  .page--info .info-hero-layout{
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.8fr);
+    gap: 28px;
+  }
+
+  .page--info .info-hero-side{
+    max-width: 376px;
+    padding: 22px;
   }
 
   .content-grid--2,
