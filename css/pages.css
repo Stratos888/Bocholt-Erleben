@@ -231,10 +231,12 @@
   margin-bottom: 0;
 }
 
-.page--info .content-card .content-links{
-  margin-top: auto;
-  padding-top: 4px;
+/* === BEGIN BLOCK: INFO_CLOSURE_LINK_FLOW_V1 | Zweck: beseitigt auf /info/ die vertikal hängenden Linklisten, indem Link-Navs nicht mehr pauschal an den Kartenboden gedrückt werden; Umfang: nur /info/ Abschlussgruppen === */
+.page--info .info-closure-group .content-links{
+  margin-top: 0;
+  padding-top: 0;
 }
+/* === END BLOCK: INFO_CLOSURE_LINK_FLOW_V1 === */
 
 /* LISTS ---------------------------------------------------------------- */
 .content-steps,
@@ -538,31 +540,32 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V10 | Zweck: verdichtet die Hero-Orientierung, bereitet /info/ mobil korrekt gestapelt vor und führt die Abschlusszone zu einer kombinierten Hub-Sektion zusammen; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
   display: grid;
-  gap: 18px;
+  gap: 16px;
   align-items: start;
 }
 
 .info-hero-main{
   display: grid;
-  gap: 14px;
-  max-width: 60ch;
+  gap: 12px;
+  max-width: none;
   align-content: start;
 }
 
 .info-hero-side{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
+  justify-self: start;
 
-  padding: 16px;
+  padding: 14px 15px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.66);
   box-shadow:
-    0 8px 18px rgba(22,39,61,0.016),
+    0 6px 14px rgba(22,39,61,0.014),
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
@@ -577,7 +580,7 @@
 .info-hero-side h2{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.98rem;
+  font-size: 0.96rem;
   font-weight: 760;
   line-height: 1.2;
 }
@@ -592,28 +595,28 @@
 
 .info-hero-points li{
   display: grid;
-  gap: 3px;
+  gap: 2px;
   margin: 0;
 }
 
 .info-hero-points li + li{
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .info-hero-points strong{
   color: var(--color-text-primary);
-  font-size: 0.93rem;
+  font-size: 0.91rem;
   font-weight: 720;
-  line-height: 1.24;
+  line-height: 1.22;
 }
 
 .info-hero-points span{
-  max-width: 30ch;
+  max-width: none;
   color: var(--cmp-copy-color);
-  font-size: 0.88rem;
-  line-height: 1.42;
+  font-size: 0.86rem;
+  line-height: 1.4;
 }
 
 .page--info .content-hero--panel{
@@ -627,18 +630,18 @@
 }
 
 .page--info .content-card h2{
-  font-size: 1.03rem;
+  font-size: 1.02rem;
 }
 
 .page--info .content-card .content-note{
-  max-width: 42ch;
+  max-width: 38ch;
 }
 
 .page--info .content-card--principle{
   background: rgba(255,255,255,0.78);
   border-color: rgba(31,41,51,0.052);
   box-shadow:
-    0 8px 18px rgba(22,39,61,0.02),
+    0 8px 18px rgba(22,39,61,0.018),
     0 1px 0 rgba(255,255,255,0.74) inset;
 }
 
@@ -649,32 +652,34 @@
   background: rgba(255,255,255,0.74);
   border-color: rgba(31,41,51,0.052);
   box-shadow:
-    0 8px 18px rgba(22,39,61,0.018),
+    0 8px 18px rgba(22,39,61,0.016),
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
 .info-closure-card{
-  gap: 16px;
+  gap: 18px;
 }
 
 .info-closure-copy{
   display: grid;
-  gap: 10px;
-  max-width: 58ch;
+  gap: 8px;
+  max-width: 42ch;
 }
 
 .page--info .info-closure-card .content-note{
-  max-width: 58ch;
+  max-width: 42ch;
 }
 
 .info-closure-layout{
   display: grid;
   gap: 14px;
+  align-items: start;
 }
 
 .info-closure-group{
   display: grid;
   gap: 10px;
+  align-content: start;
   padding-top: 14px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
@@ -693,9 +698,10 @@
 }
 
 .page--info .info-closure-group .content-links{
-  gap: 4px;
+  gap: 8px;
+  align-content: start;
 }
-/* === END BLOCK: INFO_PAGE_REFERENCE_BASE_V10 === */
+/* === END BLOCK: INFO_PAGE_REFERENCE_BASE_V11 === */
 @media (min-width: 900px){
   :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
     padding:
@@ -733,64 +739,77 @@
     padding: 30px 34px 26px;
   }
 
-    /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V10 | Zweck: aktiviert /info/ erst ab Desktop als echten 2-Zonen-Hub, skaliert CTA und Abschlusszone sauber auf die breite Rail; Umfang: nur page--info im 900px-Breakpoint === */
+  /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
     padding-left: var(--subpage-card-pad-x);
     padding-right: var(--subpage-card-pad-x);
   }
 
   .page--info .info-hero-layout{
-    grid-template-columns: minmax(0, 1.56fr) minmax(290px, 0.78fr);
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 308px;
+    gap: 28px;
   }
 
   .page--info .info-hero-main{
     min-width: 0;
+    align-content: start;
   }
 
   .page--info .info-hero-side{
-    min-width: 0;
-    max-width: 348px;
+    width: 308px;
+    min-width: 308px;
+    max-width: 308px;
     justify-self: end;
-    padding: 18px;
+    padding: 15px 16px;
   }
 
   .page--info .content-hero h1{
-    max-width: 14.2ch;
-    font-size: clamp(2.34rem, 2.08rem + 0.52vw, 2.92rem);
+    max-width: none;
+    font-size: clamp(2.46rem, 2.18rem + 0.42vw, 2.88rem);
   }
 
   .page--info .content-lead{
-    max-width: 58ch;
+    max-width: 36ch;
   }
 
   .page--info .content-note{
-    max-width: 56ch;
+    max-width: 44ch;
+  }
+
+  .page--info .info-hero-points span{
+    max-width: 24ch;
   }
 
   .page--info .content-actions--inline .content-cta--primary{
-    min-width: clamp(264px, 19vw, 336px);
+    width: 336px;
+    min-width: 336px;
     min-height: 52px;
-    padding-inline: calc(var(--cmp-btn-pad-x) + 4px);
+    padding-inline: calc(var(--cmp-btn-pad-x) + 2px);
     font-weight: 760;
   }
 
   .page--info .info-closure-card{
-    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-    gap: 22px;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 32px;
     align-items: start;
+  }
+
+  .page--info .info-closure-copy{
+    max-width: 44ch;
   }
 
   .page--info .info-closure-layout{
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    gap: 24px;
+    align-items: start;
   }
 
   .page--info .info-closure-group{
     padding-top: 0;
     border-top: 0;
+    align-content: start;
   }
-  /* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V10 === */
+  /* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 === */
 }
 
 @media (min-width: 1024px){
@@ -823,29 +842,29 @@
     padding: 32px 38px 28px;
   }
 
-  /* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_WIDE_V1 | Zweck: verhindert, dass der globale Wide-Desktop-Hero-Padding auf /info/ wieder breiter wird als die Card-Gutter; Umfang: nur page--info ab 1280px === */
+  /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{
     padding-left: var(--subpage-card-pad-x);
     padding-right: var(--subpage-card-pad-x);
   }
-  /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_WIDE_V1 === */
 
   .page--info .content-hero h1{
-    max-width: 13.9ch;
-    font-size: clamp(2.44rem, 2.18rem + 0.38vw, 2.98rem);
+    max-width: none;
+    font-size: clamp(2.56rem, 2.3rem + 0.34vw, 2.96rem);
   }
 
-  /* === BEGIN BLOCK: INFO_HERO_WIDE_BALANCE_V1 | Zweck: hält die rechte Orientierungs-Card auf sehr breiten Viewports kompakt und gibt der linken Hero-Zone mehr Dominanz; Umfang: nur page--info ab 1280px === */
   .page--info .info-hero-layout{
-    grid-template-columns: minmax(0, 1.62fr) minmax(296px, 0.76fr);
+    grid-template-columns: minmax(0, 1fr) 308px;
     gap: 28px;
   }
 
   .page--info .info-hero-side{
-    max-width: 352px;
-    padding: 20px;
+    width: 308px;
+    min-width: 308px;
+    max-width: 308px;
+    padding: 15px 16px;
   }
-  /* === END BLOCK: INFO_HERO_WIDE_BALANCE_V1 === */
+  /* === END BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 === */
 
   .content-grid--2,
   .content-grid--3,
