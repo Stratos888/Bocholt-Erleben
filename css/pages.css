@@ -540,6 +540,44 @@
   align-content: start;
 }
 
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V1 | Zweck: gibt /ueber/ auf allen Breiten eine feste innere Lesespalte im Hero und hält die Rechts-/Service-Zone bewusst kompakt; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+.page--about .content-hero{
+  width: min(100%, 920px);
+}
+
+.page--about .content-hero h1{
+  max-width: 11ch;
+}
+
+.page--about .content-lead{
+  max-width: 38ch;
+}
+
+.page--about .content-note{
+  max-width: 42ch;
+}
+
+.page--about .about-legal-card{
+  width: min(100%, 820px);
+  justify-self: start;
+  gap: 10px;
+  align-content: start;
+}
+
+.page--about .about-legal-card .content-note{
+  max-width: 48ch;
+}
+
+.page--about .about-legal-card .content-links{
+  gap: 2px;
+}
+
+.page--about .about-legal-card .content-link{
+  min-height: 42px;
+  padding-block: 9px;
+}
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V1 === */
+
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
   display: grid;
@@ -735,9 +773,44 @@
     --subpage-hero-gap: 14px;
   }
 
-   .content-hero--panel{
+  .content-hero--panel{
     padding: 30px 34px 26px;
   }
+
+  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V1 | Zweck: hält /ueber/ ab Desktop ruhiger, begrenzt den Hero-Innenraum und macht die Rechts-/Service-Zone zu einer echten Nebenfläche; Umfang: nur page--about im 900px-Breakpoint === */
+  .page--about .content-hero--panel{
+    padding: 28px 30px 22px;
+  }
+
+  .page--about .content-lead{
+    max-width: 39ch;
+  }
+
+  .page--about .about-legal-card{
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 24px;
+    row-gap: 8px;
+    align-items: center;
+  }
+
+  .page--about .about-legal-card .content-links{
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .page--about .about-legal-card .content-link{
+    width: auto;
+    min-width: max-content;
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V1 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
@@ -841,6 +914,12 @@
   .content-hero--panel{
     padding: 32px 38px 28px;
   }
+
+  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V1 | Zweck: verhindert, dass /ueber/ auf sehr breiten Viewports wieder zu flächig wird; Umfang: nur page--about ab 1280px === */
+  .page--about .content-hero--panel{
+    padding: 30px 32px 24px;
+  }
+  /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V1 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{
