@@ -538,7 +538,7 @@
   align-content: start;
 }
 
-/* INFO PAGE REFERENCE -------------------------------------------------- */
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V10 | Zweck: verdichtet die Hero-Orientierung, bereitet /info/ mobil korrekt gestapelt vor und führt die Abschlusszone zu einer kombinierten Hub-Sektion zusammen; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
   display: grid;
   gap: 18px;
@@ -552,18 +552,17 @@
   align-content: start;
 }
 
- /* === BEGIN BLOCK: INFO_HERO_SIDECARD_V1 | Zweck: ergänzt für /info/ eine ruhige sekundäre Orientierungs-Card im Hero, damit die Desktop-Breite als echter Hub-Einstieg genutzt wird; Umfang: Hero-Zweitspalte inkl. Listenstil nur für die Info-Seite === */
 .info-hero-side{
   display: grid;
-  gap: 12px;
+  gap: 10px;
   align-content: start;
 
-  padding: 18px;
-  border: 1px solid rgba(31,41,51,0.06);
+  padding: 16px;
+  border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
-  background: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.7);
   box-shadow:
-    0 8px 18px rgba(22,39,61,0.018),
+    0 8px 18px rgba(22,39,61,0.016),
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
@@ -578,14 +577,14 @@
 .info-hero-side h2{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 760;
   line-height: 1.2;
 }
 
 .info-hero-points{
   display: grid;
-  gap: 12px;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -593,77 +592,39 @@
 
 .info-hero-points li{
   display: grid;
-  gap: 4px;
+  gap: 3px;
   margin: 0;
+}
+
+.info-hero-points li + li{
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .info-hero-points strong{
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: 0.93rem;
   font-weight: 720;
-  line-height: 1.25;
+  line-height: 1.24;
 }
 
 .info-hero-points span{
+  max-width: 30ch;
   color: var(--cmp-copy-color);
-  font-size: 0.92rem;
-  line-height: 1.45;
+  font-size: 0.88rem;
+  line-height: 1.42;
 }
-/* === END BLOCK: INFO_HERO_SIDECARD_V1 === */
 
-/* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 | Zweck: richtet auf /info/ die inneren Textkanten von Hero und Cards aneinander aus; Umfang: nur horizontale Hero-Innenabstände auf page--info, mobile/default === */
 .page--info .content-hero--panel{
   padding-left: var(--subpage-card-pad-x);
   padding-right: var(--subpage-card-pad-x);
 }
-/* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_V1 === */
 
-  /* === BEGIN BLOCK: INFO_HERO_DESKTOP_LAYOUT_V1 | Zweck: macht den /info/-Hero ab Desktop zu einem echten 2-Zonen-Hub-Einstieg mit klarer Haupt- und Orientierungs-Spalte; Umfang: nur page--info im Desktop-Breakpoint === */
-  .page--info .info-hero-layout{
-    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.82fr);
-    gap: 24px;
-  }
-
-  .page--info .info-hero-main{
-    min-width: 0;
-  }
-
-  .page--info .info-hero-side{
-    min-width: 0;
-    max-width: 360px;
-    justify-self: end;
-    padding: 20px;
-  }
-
-  .page--info .content-hero h1{
-    max-width: 13.6ch;
-    font-size: clamp(2.34rem, 2.08rem + 0.52vw, 2.92rem);
-  }
-
-  .page--info .content-lead{
-    max-width: 56ch;
-  }
-
-  .page--info .content-note{
-    max-width: 54ch;
-  }
-  /* === END BLOCK: INFO_HERO_DESKTOP_LAYOUT_V1 === */
-
-  /* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 | Zweck: skaliert den /info/-Hero-CTA auf Desktop leicht hoch, damit er wie die Hauptaktion des Hubs wirkt; Umfang: nur Desktop für page--info === */
-.page--info .content-actions--inline .content-cta--primary{
-  min-width: clamp(248px, 24vw, 320px);
-  min-height: 50px;
-  padding-inline: calc(var(--cmp-btn-pad-x) + 4px);
-  font-weight: 760;
-}
-/* === END BLOCK: INFO_HERO_CTA_POLISH_V1 === */
-
-/* === BEGIN BLOCK: INFO_CARD_ROW_LINK_ALIGNMENT_V2 | Zweck: hält auf /info/ die Textkante der Row-Links bündig zur Card-Typografie, erweitert aber gleichzeitig die klickbare Zeilenfläche; Umfang: nur content-link innerhalb von content-card auf page--info === */
 .page--info .content-card .content-link{
   margin-inline: -8px;
   padding-inline: 8px;
 }
-/* === END BLOCK: INFO_CARD_ROW_LINK_ALIGNMENT_V2 === */
 
 .page--info .content-card h2{
   font-size: 1.03rem;
@@ -681,7 +642,10 @@
     0 1px 0 rgba(255,255,255,0.74) inset;
 }
 
-.page--info .info-grid--two .content-card{
+.page--info .info-grid--closure .content-card{
+  min-height: 100%;
+  align-content: start;
+
   background: rgba(255,255,255,0.74);
   border-color: rgba(31,41,51,0.052);
   box-shadow:
@@ -689,6 +653,49 @@
     0 1px 0 rgba(255,255,255,0.72) inset;
 }
 
+.info-closure-card{
+  gap: 16px;
+}
+
+.info-closure-copy{
+  display: grid;
+  gap: 10px;
+  max-width: 58ch;
+}
+
+.page--info .info-closure-card .content-note{
+  max-width: 58ch;
+}
+
+.info-closure-layout{
+  display: grid;
+  gap: 14px;
+}
+
+.info-closure-group{
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.info-closure-group:first-child{
+  padding-top: 0;
+  border-top: 0;
+}
+
+.info-closure-group h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
+.page--info .info-closure-group .content-links{
+  gap: 4px;
+}
+/* === END BLOCK: INFO_PAGE_REFERENCE_BASE_V10 === */
 @media (min-width: 900px){
   :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
     padding:
@@ -726,32 +733,64 @@
     padding: 30px 34px 26px;
   }
 
-  /* === BEGIN BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_DESKTOP_V1 | Zweck: hält auf /info/ auch ab 900px die inneren Hero-Kanten exakt auf Card-Gutter-Niveau; Umfang: nur page--info im Desktop-Breakpoint === */
+    /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V10 | Zweck: aktiviert /info/ erst ab Desktop als echten 2-Zonen-Hub, skaliert CTA und Abschlusszone sauber auf die breite Rail; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
     padding-left: var(--subpage-card-pad-x);
     padding-right: var(--subpage-card-pad-x);
   }
-  /* === END BLOCK: INFO_HERO_INNER_GUTTER_ALIGN_DESKTOP_V1 === */
+
+  .page--info .info-hero-layout{
+    grid-template-columns: minmax(0, 1.56fr) minmax(290px, 0.78fr);
+    gap: 24px;
+  }
+
+  .page--info .info-hero-main{
+    min-width: 0;
+  }
+
+  .page--info .info-hero-side{
+    min-width: 0;
+    max-width: 348px;
+    justify-self: end;
+    padding: 18px;
+  }
 
   .page--info .content-hero h1{
-    max-width: 15.2ch;
+    max-width: 14.2ch;
     font-size: clamp(2.34rem, 2.08rem + 0.52vw, 2.92rem);
   }
 
   .page--info .content-lead{
-    max-width: 60ch;
-  }
-
-   .page--info .content-note{
     max-width: 58ch;
   }
 
-  /* === BEGIN BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 | Zweck: skaliert den /info/-Hero-CTA auf Desktop leicht hoch, damit er wie die Hauptaktion des Hubs wirkt; Umfang: nur Desktop für page--info === */
+  .page--info .content-note{
+    max-width: 56ch;
+  }
+
   .page--info .content-actions--inline .content-cta--primary{
     min-width: clamp(264px, 19vw, 336px);
     min-height: 52px;
+    padding-inline: calc(var(--cmp-btn-pad-x) + 4px);
+    font-weight: 760;
   }
-  /* === END BLOCK: INFO_HERO_CTA_POLISH_DESKTOP_V1 === */
+
+  .page--info .info-closure-card{
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .page--info .info-closure-layout{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .page--info .info-closure-group{
+    padding-top: 0;
+    border-top: 0;
+  }
+  /* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V10 === */
 }
 
 @media (min-width: 1024px){
@@ -796,15 +835,17 @@
     font-size: clamp(2.44rem, 2.18rem + 0.38vw, 2.98rem);
   }
 
+  /* === BEGIN BLOCK: INFO_HERO_WIDE_BALANCE_V1 | Zweck: hält die rechte Orientierungs-Card auf sehr breiten Viewports kompakt und gibt der linken Hero-Zone mehr Dominanz; Umfang: nur page--info ab 1280px === */
   .page--info .info-hero-layout{
-    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.8fr);
+    grid-template-columns: minmax(0, 1.62fr) minmax(296px, 0.76fr);
     gap: 28px;
   }
 
   .page--info .info-hero-side{
-    max-width: 376px;
-    padding: 22px;
+    max-width: 352px;
+    padding: 20px;
   }
+  /* === END BLOCK: INFO_HERO_WIDE_BALANCE_V1 === */
 
   .content-grid--2,
   .content-grid--3,
