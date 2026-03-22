@@ -26,9 +26,22 @@
   Umfang:
   - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
   === -->
+  <!-- === BEGIN BLOCK: SUBPAGE_APP_HEADER_V1 | Zweck: zieht die /info/-Header-DNA auf diese Unterseite; Umfang: fügt den globalen App-Header direkt vor dem Seiteninhalt ein === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+  <!-- === END BLOCK: SUBPAGE_APP_HEADER_V1 === -->
+
   <main class="page page--publish">
 
-    <header class="content-hero">
+    <header class="content-hero content-hero--panel">
 
       <nav class="content-links" aria-label="Navigation">
         <a class="content-link" href="/ueber/">Zurück zu Über Bocholt erleben</a>
@@ -43,9 +56,9 @@
         und schalten dich als Veranstalter frei.
       </p>
 
-      <div class="content-actions content-actions--spaced">
+      <div class="content-actions content-actions--spaced content-actions--inline">
         <a
-          class="modal-cta-button content-cta"
+          class="content-cta content-cta--primary"
           href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20%2F%20Location%3A%0AWebsite%20(optional)%3A%0AErstes%20Event%20(Quelle-Link)%3A%0AFalls%20mehrere%20Events%3A%20kurz%20notieren%0A%0AViele%20Gr%C3%BC%C3%9Fe"
         >
           Als Veranstalter starten

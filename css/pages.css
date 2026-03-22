@@ -1,0 +1,876 @@
+/* === BEGIN BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 | Zweck: konsolidiert das gemeinsame Subpage-System in wiederverwendbare Hero-/CTA-/Grid-Bausteine, übernimmt die /info/-Referenz-DNA appweit und hält spätere Änderungen zentral; Umfang: ersetzt die komplette pages.css === */
+
+/* PAGE FAMILY --------------------------------------------------------- */
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
+  --subpage-rail-max: 1128px;
+  --subpage-hero-max: 760px;
+  --subpage-body-max: 760px;
+  --subpage-stack-gap: 16px;
+  --subpage-card-gap: 12px;
+  --subpage-card-pad-x: 16px;
+  --subpage-card-pad-y: 16px;
+  --subpage-hero-gap: 12px;
+
+  display: grid;
+  align-content: start;
+  justify-items: stretch;
+  gap: var(--subpage-stack-gap);
+
+  /* === BEGIN BLOCK: SUBPAGE_RAIL_OVERRIDE_V1 | Zweck: hebt die globale .page-Maxbreite aus base.css für das Subpage-System korrekt auf und macht die Rail-Variablen erstmals tatsächlich wirksam; Umfang: ersetzt nur die äußere Breitenlogik der gemeinsamen Subpage-Familie === */
+  width: 100%;
+  max-width: var(--subpage-rail-max);
+  margin: 0 auto;
+  padding:
+    calc(var(--gutter) + 4px)
+    var(--gutter)
+    calc(var(--gutter) + 20px);
+  /* === END BLOCK: SUBPAGE_RAIL_OVERRIDE_V1 === */
+}
+
+/* === BEGIN BLOCK: INFO_HUB_RAIL_V2 | Zweck: gibt /info/ als Hub-Seite eine sichtbar breitere Außen-Rail, damit Hero und Karten auf Desktop nicht gequetscht wirken; Umfang: nur page--info Basisvariablen === */
+.page--info{
+  --subpage-rail-max: 1280px;
+  --subpage-hero-max: 1088px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 22px;
+  --subpage-card-gap: 12px;
+  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-y: 20px;
+  --subpage-hero-gap: 14px;
+}
+/* === END BLOCK: INFO_HUB_RAIL_V2 === */
+
+.page--about,
+.page--publish,
+.page--imprint,
+.page--privacy,
+.page--organizers{
+  --subpage-hero-max: 910px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 22px;
+  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-y: 20px;
+  --subpage-hero-gap: 14px;
+}
+
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* SUBPAGE HEADER ------------------------------------------------------ */
+.subpage-brand-link{
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  min-width: 0;
+  flex: 0 0 auto;
+  margin-right: auto;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.subpage-brand-link:hover{
+  color: inherit;
+  text-decoration: none;
+}
+
+.subpage-brand-link:visited{
+  color: inherit;
+}
+
+.subpage-brand-link:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-brand);
+  outline-offset: 3px;
+  border-radius: var(--ui-radius-sm);
+}
+
+/* HERO + TEXT --------------------------------------------------------- */
+.content-hero{
+  display: grid;
+  gap: var(--subpage-hero-gap);
+
+  width: min(100%, var(--subpage-hero-max));
+  margin: 0;
+}
+
+.content-hero--panel{
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  justify-self: start;
+  padding: 24px 26px 22px;
+  border: 1px solid rgba(22,39,61,0.052);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
+  box-shadow:
+    0 14px 28px rgba(22,39,61,0.062),
+    0 1px 0 rgba(255,255,255,0.985) inset;
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.content-hero--panel::before{
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border-radius: 17px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
+  pointer-events: none;
+}
+
+.content-hero h1{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(2.18rem, 1.72rem + 2vw, 3.1rem);
+  font-weight: 780;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.content-kicker{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin: 0;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.84rem;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
+.content-lead{
+  max-width: 62ch;
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.99rem;
+  line-height: 1.54;
+}
+
+.content-note{
+  max-width: 62ch;
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.page--imprint .content-lead,
+.page--privacy .content-lead,
+.page--imprint .content-note,
+.page--privacy .content-note,
+.page--imprint .content-card p,
+.page--privacy .content-card p{
+  max-width: 68ch;
+  line-height: 1.58;
+}
+
+/* CARDS ---------------------------------------------------------------- */
+.content-card{
+  display: grid;
+  gap: var(--subpage-card-gap);
+
+  width: min(100%, var(--subpage-body-max));
+  margin: 0;
+  padding: var(--subpage-card-pad-y) var(--subpage-card-pad-x);
+
+  background: rgba(255,255,255,0.76);
+  border: 1px solid rgba(31,41,51,0.07);
+  border-radius: var(--cmp-card-radius);
+  box-shadow:
+    0 8px 20px rgba(31,41,51,0.034),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.page--info .content-card{
+  width: 100%;
+  background: rgba(255,255,255,0.82);
+  border-color: rgba(31,41,51,0.06);
+  box-shadow:
+    0 10px 22px rgba(22,39,61,0.026),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.content-card--primary{
+  background: color-mix(in srgb, white 86%, var(--color-primary-muted));
+  border-color: rgba(139,207,74,0.42);
+  box-shadow:
+    0 10px 24px rgba(92,122,46,0.05),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.page--imprint .content-card,
+.page--privacy .content-card{
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.03),
+    0 1px 0 rgba(255,255,255,0.68) inset;
+}
+
+.content-card h2{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1.04rem;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+}
+
+.content-card p:last-child,
+.content-card ul:last-child,
+.content-card ol:last-child,
+.content-card nav:last-child{
+  margin-bottom: 0;
+}
+
+/* === BEGIN BLOCK: INFO_CLOSURE_LINK_FLOW_V1 | Zweck: beseitigt auf /info/ die vertikal hängenden Linklisten, indem Link-Navs nicht mehr pauschal an den Kartenboden gedrückt werden; Umfang: nur /info/ Abschlussgruppen === */
+.page--info .info-closure-group .content-links{
+  margin-top: 0;
+  padding-top: 0;
+}
+/* === END BLOCK: INFO_CLOSURE_LINK_FLOW_V1 === */
+
+/* LISTS ---------------------------------------------------------------- */
+.content-steps,
+.locations-benefits{
+  list-style: none;
+  padding-left: 0;
+  margin: 2px 0 0;
+}
+
+.content-steps{
+  counter-reset: step;
+}
+
+.content-steps li,
+.locations-benefits li{
+  position: relative;
+  margin: 10px 0;
+  padding-left: 36px;
+
+  color: var(--color-text-secondary);
+  line-height: 1.48;
+}
+
+.content-steps li{
+  counter-increment: step;
+}
+
+.content-steps li::before,
+.locations-benefits li::before{
+  position: absolute;
+  left: 0;
+  top: 0.08em;
+
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-text-primary);
+  background: var(--color-primary-muted);
+}
+
+.content-steps li::before{
+  content: counter(step);
+  font-size: 0.86rem;
+  font-weight: 800;
+  border: 1px solid rgba(139,207,74,0.45);
+}
+
+.locations-benefits li::before{
+  content: "✓";
+  font-size: 0.8rem;
+  font-weight: 900;
+  border: 1px solid rgba(139,207,74,0.35);
+}
+
+/* ACTIONS + CTA -------------------------------------------------------- */
+.content-actions{
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.content-actions--spaced{
+  margin-top: 10px;
+}
+
+.content-actions--inline{
+  justify-items: start;
+}
+
+.content-actions--inline .content-cta,
+.content-actions--inline .content-cta--primary{
+  width: auto;
+  min-width: clamp(224px, 21vw, 284px);
+}
+
+.content-cta{
+  width: 100%;
+  min-height: var(--cmp-btn-minh);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 var(--cmp-btn-pad-x);
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--cmp-btn-secondary-border);
+
+  background: var(--cmp-btn-secondary-bg);
+  color: var(--cmp-btn-secondary-fg);
+
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
+  text-decoration: none;
+
+  box-shadow: var(--cmp-btn-secondary-shadow);
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
+}
+
+.content-cta:visited{
+  color: var(--cmp-btn-secondary-fg);
+}
+
+.content-cta--primary{
+  background: var(--cmp-btn-primary-bg);
+  color: var(--cmp-btn-primary-fg);
+  border-color: rgba(139,207,74,0.52);
+  box-shadow: var(--cmp-btn-primary-shadow);
+}
+
+.content-cta--primary:visited{
+  color: var(--cmp-btn-primary-fg);
+}
+
+@media (hover: hover){
+  .content-cta:hover{
+    background: var(--ui-surface-soft-hover);
+    border-color: var(--ui-border-strong);
+    text-decoration: none;
+  }
+
+  .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--cmp-btn-primary-bg) 88%, white);
+    border-color: rgba(139,207,74,0.62);
+  }
+}
+
+.content-cta:active{
+  transform: translateY(1px);
+  background: var(--ui-surface-soft-active);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.content-cta--primary:active{
+  background: color-mix(in srgb, var(--cmp-btn-primary-bg) 90%, black 4%);
+}
+
+.content-cta:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--cmp-btn-radius);
+}
+
+/* === BEGIN BLOCK: INFO_HERO_CTA_HOME_DNA_V1 | Zweck: zieht den /info/-Hero-CTA aus der harten generischen Primary-Button-DNA auf eine weichere, app-konsistente Hub-CTA-DNA; Umfang: nur /info/ Hero-CTA, keine anderen Seiten === */
+.page--info .content-actions--inline .content-cta--primary{
+  min-width: clamp(216px, 20vw, 248px);
+  min-height: 48px;
+  padding-inline: 18px;
+
+  border-radius: var(--ui-radius-sm);
+  border-color: var(--ui-border-primary);
+
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+
+  font-size: 0.96rem;
+  font-weight: var(--ui-font-weight-cta);
+
+  box-shadow: var(--ui-shadow-cta);
+}
+
+.page--info .content-actions--inline .content-cta--primary:visited{
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover){
+  .page--info .content-actions--inline .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+    border-color: var(--ui-border-primary);
+  }
+}
+
+.page--info .content-actions--inline .content-cta--primary:active{
+  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
+  box-shadow: var(--ui-shadow-cta-active);
+}
+/* === END BLOCK: INFO_HERO_CTA_HOME_DNA_V1 === */
+
+/* CONTENT LINKS -------------------------------------------------------- */
+.content-links{
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.page--about > nav.content-links:last-child,
+.page--publish > nav.content-links:last-child,
+.page--imprint > nav.content-links:last-child,
+.page--privacy > nav.content-links:last-child,
+.page--organizers > nav.content-links:last-child{
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+/* === BEGIN BLOCK: CONTENT_LINK_ROW_V2 | Zweck: stärkt content-link appweit als klare klickbare Navigationszeile statt als buttonähnliches CTA-Element; Umfang: ersetzt den Grundstil aller content-link Rows === */
+.content-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border-radius: var(--ui-radius-sm);
+
+  background: transparent;
+  border: 1px solid transparent;
+
+  color: var(--cmp-link-color);
+  font-weight: 680;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+/* === END BLOCK: CONTENT_LINK_ROW_V2 === */
+
+/* === BEGIN BLOCK: CONTENT_LINK_CHEVRON_V2 | Zweck: macht das Chevron als sekundären Navigationshinweis klarer, ohne den Link in einen CTA zu verwandeln; Umfang: ersetzt nur den trailing-indicator von content-link === */
+.content-link::after{
+  content: "›";
+  margin-left: auto;
+  color: var(--cmp-link-color-muted);
+  font-size: 1.05rem;
+  font-weight: 760;
+  line-height: 1;
+  opacity: 0.88;
+  transform: translateY(0);
+  transition:
+    transform 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
+}
+/* === END BLOCK: CONTENT_LINK_CHEVRON_V2 === */
+
+/* === BEGIN BLOCK: CONTENT_LINK_ROW_HOVER_V2 | Zweck: gibt content-link Rows einen klareren Whole-Row-Hover ohne CTA-Anmutung; Umfang: ersetzt nur den Hover-Zustand von content-link === */
+@media (hover: hover){
+  .content-link:hover{
+    background: var(--ui-surface-tint);
+    border-color: var(--cmp-divider-strong);
+    color: var(--cmp-link-color);
+    text-decoration: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset;
+  }
+
+  .content-link:hover::after{
+    color: var(--cmp-link-color);
+    transform: translateX(2px);
+    opacity: 1;
+  }
+}
+/* === END BLOCK: CONTENT_LINK_ROW_HOVER_V2 === */
+
+.content-link:visited{
+  color: var(--cmp-link-color);
+}
+
+.content-link:focus-visible{
+  outline: 2px solid var(--cmp-link-focus-ring);
+  outline-offset: var(--cmp-focus-outline-offset);
+  border-radius: var(--ui-radius-sm);
+}
+
+/* CONTENT GRIDS -------------------------------------------------------- */
+.content-grid,
+.info-grid{
+  display: grid;
+  gap: var(--subpage-stack-gap);
+  width: min(100%, var(--subpage-body-max));
+}
+
+.content-grid--2,
+.content-grid--3,
+.info-grid--principles,
+.info-grid--two{
+  grid-template-columns: 1fr;
+}
+
+.content-grid--balanced > .content-card,
+.page--info .info-grid--principles .content-card,
+.page--info .info-grid--two .content-card{
+  min-height: 100%;
+  align-content: start;
+}
+
+/* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
+.info-hero-layout{
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.info-hero-main{
+  display: grid;
+  gap: 12px;
+  max-width: none;
+  align-content: start;
+}
+
+.info-hero-side{
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  justify-self: start;
+
+  padding: 14px 15px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.66);
+  box-shadow:
+    0 6px 14px rgba(22,39,61,0.014),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.info-hero-side-kicker{
+  margin: 0;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
+.info-hero-side h2{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.info-hero-points{
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.info-hero-points li{
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.info-hero-points li + li{
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.info-hero-points strong{
+  color: var(--color-text-primary);
+  font-size: 0.91rem;
+  font-weight: 720;
+  line-height: 1.22;
+}
+
+.info-hero-points span{
+  max-width: none;
+  color: var(--cmp-copy-color);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.page--info .content-hero--panel{
+  padding-left: var(--subpage-card-pad-x);
+  padding-right: var(--subpage-card-pad-x);
+}
+
+.page--info .content-card .content-link{
+  margin-inline: -8px;
+  padding-inline: 8px;
+}
+
+.page--info .content-card h2{
+  font-size: 1.02rem;
+}
+
+.page--info .content-card .content-note{
+  max-width: 38ch;
+}
+
+.page--info .content-card--principle{
+  background: rgba(255,255,255,0.78);
+  border-color: rgba(31,41,51,0.052);
+  box-shadow:
+    0 8px 18px rgba(22,39,61,0.018),
+    0 1px 0 rgba(255,255,255,0.74) inset;
+}
+
+.page--info .info-grid--closure .content-card{
+  min-height: 100%;
+  align-content: start;
+
+  background: rgba(255,255,255,0.74);
+  border-color: rgba(31,41,51,0.052);
+  box-shadow:
+    0 8px 18px rgba(22,39,61,0.016),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.info-closure-card{
+  gap: 18px;
+}
+
+.info-closure-copy{
+  display: grid;
+  gap: 8px;
+  max-width: 42ch;
+}
+
+.page--info .info-closure-card .content-note{
+  max-width: 42ch;
+}
+
+.info-closure-layout{
+  display: grid;
+  gap: 14px;
+  align-items: start;
+}
+
+.info-closure-group{
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding-top: 14px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.info-closure-group:first-child{
+  padding-top: 0;
+  border-top: 0;
+}
+
+.info-closure-group h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
+.page--info .info-closure-group .content-links{
+  gap: 8px;
+  align-content: start;
+}
+/* === END BLOCK: INFO_PAGE_REFERENCE_BASE_V11 === */
+@media (min-width: 900px){
+  :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
+    padding:
+      calc(var(--gutter-lg) + 6px)
+      32px
+      calc(var(--gutter-lg) + 24px);
+  }
+
+   /* === BEGIN BLOCK: INFO_DESKTOP_HUB_RAIL_V2 | Zweck: lässt /info/ ab Desktop die breitere Hub-Rail vollständig nutzen, während Text intern weiter begrenzt bleibt; Umfang: nur page--info Variablen im Desktop-Breakpoint === */
+  .page--info{
+    --subpage-hero-max: 100%;
+    --subpage-body-max: 100%;
+    --subpage-stack-gap: 24px;
+    --subpage-card-gap: 12px;
+    --subpage-card-pad-x: 22px;
+    --subpage-card-pad-y: 20px;
+    --subpage-hero-gap: 14px;
+  }
+  /* === END BLOCK: INFO_DESKTOP_HUB_RAIL_V2 === */
+
+  .page--about,
+  .page--publish,
+  .page--imprint,
+  .page--privacy,
+  .page--organizers{
+    --subpage-hero-max: 910px;
+    --subpage-body-max: 1088px;
+    --subpage-stack-gap: 24px;
+    --subpage-card-pad-x: 22px;
+    --subpage-card-pad-y: 20px;
+    --subpage-hero-gap: 14px;
+  }
+
+   .content-hero--panel{
+    padding: 30px 34px 26px;
+  }
+
+  /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
+  .page--info .content-hero--panel{
+    padding-left: var(--subpage-card-pad-x);
+    padding-right: var(--subpage-card-pad-x);
+  }
+
+  .page--info .info-hero-layout{
+    grid-template-columns: minmax(0, 1fr) 308px;
+    gap: 28px;
+  }
+
+  .page--info .info-hero-main{
+    min-width: 0;
+    align-content: start;
+  }
+
+  .page--info .info-hero-side{
+    width: 308px;
+    min-width: 308px;
+    max-width: 308px;
+    justify-self: end;
+    padding: 15px 16px;
+  }
+
+  .page--info .content-hero h1{
+    max-width: none;
+    font-size: clamp(2.46rem, 2.18rem + 0.42vw, 2.88rem);
+  }
+
+  .page--info .content-lead{
+    max-width: 36ch;
+  }
+
+  .page--info .content-note{
+    max-width: 44ch;
+  }
+
+  .page--info .info-hero-points span{
+    max-width: 24ch;
+  }
+
+  .page--info .content-actions--inline .content-cta--primary{
+    width: 336px;
+    min-width: 336px;
+    min-height: 52px;
+    padding-inline: calc(var(--cmp-btn-pad-x) + 2px);
+    font-weight: 760;
+  }
+
+  .page--info .info-closure-card{
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .page--info .info-closure-copy{
+    max-width: 44ch;
+  }
+
+  .page--info .info-closure-layout{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .page--info .info-closure-group{
+    padding-top: 0;
+    border-top: 0;
+    align-content: start;
+  }
+  /* === END BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 === */
+}
+
+@media (min-width: 1024px){
+  .content-grid--2,
+  .info-grid--two{
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: 22px;
+  }
+
+  .content-grid--3,
+  .info-grid--principles{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .content-grid--balanced > .content-card,
+  .page--info .info-grid--principles .content-card,
+  .page--info .info-grid--two .content-card{
+    grid-template-rows: auto auto 1fr auto;
+    align-content: start;
+  }
+}
+
+@media (min-width: 1280px){
+  .page--info{
+    --subpage-stack-gap: 24px;
+  }
+
+  .content-hero--panel{
+    padding: 32px 38px 28px;
+  }
+
+  /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
+  .page--info .content-hero--panel{
+    padding-left: var(--subpage-card-pad-x);
+    padding-right: var(--subpage-card-pad-x);
+  }
+
+  .page--info .content-hero h1{
+    max-width: none;
+    font-size: clamp(2.56rem, 2.3rem + 0.34vw, 2.96rem);
+  }
+
+  .page--info .info-hero-layout{
+    grid-template-columns: minmax(0, 1fr) 308px;
+    gap: 28px;
+  }
+
+  .page--info .info-hero-side{
+    width: 308px;
+    min-width: 308px;
+    max-width: 308px;
+    padding: 15px 16px;
+  }
+  /* === END BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 === */
+
+  .content-grid--2,
+  .content-grid--3,
+  .info-grid--principles,
+  .info-grid--two{
+    gap: 24px;
+  }
+}
+/* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 === */

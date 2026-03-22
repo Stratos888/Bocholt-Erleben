@@ -1,0 +1,1132 @@
+/* === BEGIN BLOCK: HOME_CSS_STEP_4 | Purpose: isolate home/start-page feed, hero, search-row and responsive layout into a dedicated owner file while preserving validated mobile filter-row behavior | Scope: home feed layout, hero layout, desktop/narrow desktop hero variants === */
+/* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
+
+/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 | Purpose: keep homepage feed groups vertically stacked and prepare only the inner group grid for desktop 2-up while preserving the existing mobile card flow | Scope: viewport guardrails, feed section ownership, top-level group stack and per-group card container behavior === */
+/* Guardrail: nichts darf breiter als der Viewport werden */
+.events-section,
+.events-section-title,
+.events-group-title,
+.events-feed-group,
+.event-cards-grid,
+.events-feed-group__grid,
+.event-card{
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Feed-Container: full-bleed, keine eigene “Surface” */
+.events-section{
+/* SECTION */
+  padding: var(--feed-section-pad-top) var(--gutter) 0;
+
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+
+/* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
+/* SECTION */
+
+/* SECTION */
+
+/* SECTION HEADER (FINAL ENTERPRISE RHYTHM) */
+
+.events-section-title{
+
+  margin: var(--feed-title-mt) 0 var(--feed-title-mb);
+
+  font-weight: 700;
+  font-size: 0.76rem;
+
+  letter-spacing: 0.11em;
+
+  text-transform: uppercase;
+
+  color: rgba(60,72,88,0.55);
+
+}
+
+
+/* Top-Level-Feed: Gruppen immer untereinander */
+.event-cards-grid{
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 2.2vw, 30px);
+  width: 100%;
+
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.events-feed-group{
+  display: grid;
+  gap: var(--feed-title-mb);
+  width: 100%;
+}
+
+/* Basis / Mobile: Karten innerhalb einer Gruppe untereinander */
+.events-feed-group__grid{
+  display: flex;
+  flex-direction: column;
+  gap: var(--feed-cards-gap);
+  width: 100%;
+
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 === */
+
+/* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
+/* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
+/* === END BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE === */
+
+/* === BEGIN BLOCK: DESKTOP_HERO_FRAME_V16 | Purpose: keep the proven desktop hero framing while tightening the hero-to-feed transition for the final homepage freeze; Scope: desktop-only hero frame plus desktop-only feed/card layout on the homepage; mobile remains unchanged === */
+:root{
+  --hero-bg-image-desktop: none;
+  --hero-bg-image-mobile: none;
+  --hero-bg-opacity-desktop: 1;
+  --hero-bg-opacity-mobile: 0;
+  --hero-bg-size-desktop: cover;
+  --hero-bg-size-desktop-narrow: cover;
+  --hero-bg-size-mobile: cover;
+  --hero-bg-position-desktop: 76.5% 7.5%;
+  --hero-bg-position-desktop-narrow: 84.5% 9.5%;
+  --hero-bg-position-mobile: center top;
+  --hero-bg-blur-desktop: 0px;
+  --hero-bg-blur-mobile: 0px;
+  --hero-bg-brightness-desktop: 0.948;
+  --hero-bg-brightness-mobile: 1.04;
+  --hero-bg-saturate-desktop: 1.01;
+  --hero-bg-saturate-mobile: 0.84;
+  --hero-bg-contrast-desktop: 1.02;
+  --hero-bg-contrast-mobile: 0.90;
+  --hero-stage-min-h-desktop: 476px;
+  --hero-stage-min-h-desktop-narrow: 436px;
+}
+
+:root{
+  --hero-bg-image-desktop: url("../assets/hero/bocholt-hero-a.jpg");
+  --hero-bg-opacity-desktop: 1;
+  --hero-bg-size-desktop: cover;
+  --hero-bg-size-desktop-narrow: cover;
+  --hero-bg-position-desktop: 76.5% 7.5%;
+  --hero-bg-position-desktop-narrow: 84.5% 9.5%;
+  --hero-bg-blur-desktop: 0px;
+  --hero-bg-brightness-desktop: 0.948;
+  --hero-bg-saturate-desktop: 1.01;
+  --hero-bg-contrast-desktop: 1.02;
+}
+
+/* Optionales Mobile-Opt-in später, bewusst noch deaktiviert: */
+/*
+@media (max-width: 899.98px){
+  :root{
+    --hero-bg-image-mobile: image-set(
+      url("../assets/hero/bocholt-hero-mobile.webp") type("image/webp") 1x,
+      url("../assets/hero/bocholt-hero-mobile@2x.webp") type("image/webp") 2x
+    );
+    --hero-bg-opacity-mobile: 0.70;
+  }
+}
+*/
+
+@media (min-width: 900px) {
+  .desktop-hero,
+  .events-section{
+    max-width: 1128px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .desktop-hero{
+    padding-top: 0;
+  }
+
+  .events-section{
+    padding-top: 4px;
+  }
+
+  .desktop-hero .top-stack{
+    width: 100%;
+    max-width: none;
+  }
+
+  .event-cards-grid{
+    max-width: 1128px;
+  }
+
+  .event-card{
+    height: 100%;
+    align-items: start;
+  }
+
+  .event-card-body{
+    gap: 5px;
+  }
+
+  .event-title{
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .event-title__text{
+    -webkit-line-clamp: 2;
+  }
+
+  .event-card-desc{
+    margin: 0;
+    color: rgba(31,41,51,0.78);
+    font-size: 0.95rem;
+    line-height: 1.38;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+  }
+
+  .event-card-meta-quiet,
+  .event-card-actions{
+    display: none !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .events-feed-group__grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    align-items: stretch;
+  }
+
+  .events-feed-group__grid > .event-card{
+    height: 100%;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_FRAME_V16 === */
+/* ============================================
+   FILTERS / SEARCH / TOP STACK (Top-App)
+   ============================================ */
+.events-filter{
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+/* TOP STACK (search as hero, reduced section feel) */
+.top-stack{
+  position: sticky;
+  top: calc(var(--header-h) + var(--stack-gap));
+  z-index: 900;
+
+  padding: 4px var(--gutter) var(--topstack-pad-bottom);
+
+  background: rgba(249, 251, 246, 0.90);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid rgba(31,41,51,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 6px 14px rgba(31,41,51,0.045);
+
+  /* wichtig: kein transform → reduziert sticky „rubberband wobble“ auf Android */
+  transform: none;
+  contain: none;
+}
+
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: hält die mobile Hero-/Filter-Basis stabil und lässt nur die strukturelle Desktop-Hero-Basis bestehen; Scope: Mobile-Filterbereich bleibt wie zuvor, Search-Icon kann sauber absolut im Feld sitzen === */
+.desktop-hero{
+  position: relative;
+}
+
+.desktop-entry{
+  display: none;
+  padding: 0;
+}
+
+.desktop-entry__inner{
+  display: grid;
+  gap: 0;
+}
+
+.desktop-entry__content{
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  align-content: start;
+}
+
+.desktop-entry__eyebrow{
+  margin: 0;
+  color: #6f8758;
+  font-size: 0.76rem;
+  font-weight: 820;
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.desktop-entry__title{
+  margin: 0;
+  max-width: none;
+  color: #16273d;
+  font-size: clamp(2.8rem, 2.24rem + 1.78vw, 5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.065em;
+  white-space: normal;
+  text-wrap: balance;
+  overflow: visible;
+}
+
+.desktop-entry__text{
+  margin: 0;
+  color: rgba(22,39,61,0.82);
+  font-size: 1rem;
+  font-weight: 560;
+  line-height: 1.42;
+}
+
+.desktop-entry__text--lead{
+  display: grid;
+  gap: 4px;
+  max-width: none;
+}
+
+.desktop-entry__lead-line{
+  display: block;
+  white-space: nowrap;
+}
+
+.desktop-entry__facts,
+.desktop-entry__aside,
+.desktop-entry__actions,
+.desktop-entry__cta,
+.desktop-entry__app-link,
+.desktop-hero__panel-head,
+.desktop-hero__actions{
+  display: none;
+}
+
+.desktop-hero__panel-kicker{
+  margin: 0;
+  color: rgba(22,39,61,0.56);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.desktop-hero__search-row{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.desktop-hero__search-slot{
+  min-width: 0;
+}
+
+.desktop-hero__search-field{
+  min-width: 0;
+}
+
+.desktop-hero__icon{
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  opacity: 0.82;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.desktop-hero__icon--search{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__icon--publish{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__icon--app{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__icon--info{
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+}
+
+.desktop-hero__toolbar-pill{
+  min-width: 0;
+}
+
+.desktop-hero__action{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 18px;
+  border: 1px solid rgba(22,39,61,0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.86);
+  color: #1f3552;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 720;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.92) inset,
+    0 10px 24px rgba(22,39,61,0.035);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.desktop-hero__action--publish,
+.desktop-hero__action--info,
+.desktop-hero__action--app{
+  color: #1f3552;
+  font: inherit;
+}
+
+@media (hover: hover){
+  .desktop-hero__action:hover{
+    border-color: rgba(22,39,61,0.12);
+    background: rgba(255,255,255,0.94);
+    color: #16273d;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.96) inset,
+      0 14px 28px rgba(22,39,61,0.05);
+  }
+}
+
+.desktop-hero__action:active{
+  transform: translateY(1px);
+}
+
+.desktop-hero__action:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring);
+  outline-offset: 3px;
+}
+
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE | Purpose: keep the final winning responsive owner for the search row local to DESKTOP_HERO_STRUCTURE_V8 so mobile gets a true two-pill row and optional third reset slot without later same-specificity overrides | Scope: replaces the existing max-width:899.98px responsive block === */
+@media (max-width: 899.98px){
+  .desktop-hero__search-row{
+    gap: 12px;
+  }
+
+  .desktop-hero__search-field{
+    display: block;
+  }
+
+  .desktop-hero__toolbar-pill{
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px){
+  .event-cards-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-hero__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--cmp-input-minh);
+  }
+
+  .desktop-hero__search-slot{
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .desktop-hero__search-field{
+    min-width: 0;
+  }
+
+  .desktop-hero__search-row > .filter-pill{
+    min-width: 0;
+    width: 100%;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--cmp-input-minh);
+    min-width: var(--cmp-input-minh);
+    justify-self: stretch;
+    align-self: stretch;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
+
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+@media (min-width: 900px){
+  .app-header{
+    min-height: 62px;
+    padding-left: 32px;
+    padding-right: 32px;
+    background: linear-gradient(180deg, rgba(246,249,240,0.965) 0%, rgba(243,247,235,0.91) 100%);
+    border-bottom: 1px solid rgba(22,39,61,0.055);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.84) inset,
+      0 10px 22px rgba(22,39,61,0.038);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .header-left{
+    gap: 11px;
+  }
+
+  .app-logo{
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 6px 14px rgba(22,39,61,0.06);
+  }
+
+  .app-title{
+    max-width: none;
+    color: #16273d;
+    font-size: 1.34rem;
+    font-weight: 720;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+  }
+
+  .header-right{
+    display: none;
+  }
+
+  .desktop-hero{
+    --hero-bg-image-active: var(--hero-bg-image-desktop);
+    --hero-bg-size-active: var(--hero-bg-size-desktop);
+    --hero-bg-position-active: 79.25% 8%;
+    --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
+    --hero-bg-blur-active: var(--hero-bg-blur-desktop);
+    --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
+    --hero-bg-saturate-active: var(--hero-bg-saturate-desktop);
+    --hero-bg-contrast-active: var(--hero-bg-contrast-desktop);
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    min-height: 420px;
+    padding: 24px 32px 16px;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .desktop-hero::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+    z-index: -4;
+    background-image:
+      linear-gradient(90deg, rgba(247,250,244,0.992) 0%, rgba(247,250,244,0.984) 7%, rgba(247,250,244,0.88) 13%, rgba(247,250,244,0.52) 21%, rgba(247,250,244,0.22) 30%, rgba(247,250,244,0.06) 38%, rgba(247,250,244,0.00) 45%),
+      radial-gradient(58% 64% at 18% 29%, rgba(247,250,244,0.46) 0%, rgba(247,250,244,0.22) 36%, rgba(247,250,244,0.07) 60%, rgba(247,250,244,0.00) 78%),
+      linear-gradient(180deg, rgba(247,250,244,0.38) 0%, rgba(247,250,244,0.10) 16%, rgba(247,250,244,0.02) 40%, rgba(247,250,244,0.08) 100%),
+      var(--hero-bg-image-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    opacity: var(--hero-bg-opacity-active);
+    filter:
+      blur(var(--hero-bg-blur-active))
+      saturate(var(--hero-bg-saturate-active))
+      brightness(var(--hero-bg-brightness-active))
+      contrast(var(--hero-bg-contrast-active));
+    pointer-events: none;
+  }
+
+  .desktop-hero::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+    z-index: -3;
+    background:
+      radial-gradient(circle at 70% 18%, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.00) 11%),
+      radial-gradient(circle at 85% 53%, rgba(246,214,153,0.05) 0%, rgba(246,214,153,0.00) 13%),
+      linear-gradient(180deg, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.12) 100%);
+    pointer-events: none;
+  }
+
+  .desktop-entry{
+    display: block;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .desktop-entry__content{
+    max-width: 35rem;
+    gap: 10px;
+  }
+
+  .desktop-entry__eyebrow{
+    margin-bottom: 0;
+  }
+
+  .desktop-entry__title{
+    max-width: 30rem;
+    font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+  }
+
+  .desktop-entry__text{
+    max-width: 29rem;
+    color: rgba(22,39,61,0.88);
+    font-size: 0.99rem;
+    line-height: 1.42;
+  }
+
+  .desktop-entry__text br{
+    display: block;
+  }
+
+  .desktop-entry__text--lead{
+    gap: 6px;
+  }
+
+  .top-stack{
+    position: relative;
+    top: auto;
+    z-index: 1;
+    align-self: start;
+    justify-self: stretch;
+    display: grid;
+    gap: 6px;
+    width: min(100%, 910px);
+    max-width: 910px;
+    margin-top: 0;
+    padding: 12px 14px 10px;
+    border: 1px solid rgba(22,39,61,0.052);
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
+    box-shadow:
+      0 14px 28px rgba(22,39,61,0.062),
+      0 1px 0 rgba(255,255,255,0.985) inset;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .top-stack::before{
+    content: "";
+    position: absolute;
+    inset: 8px;
+    z-index: -1;
+    border-radius: 17px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
+  }
+
+  .desktop-hero__panel-head{
+    display: block;
+    padding: 0 4px 0;
+  }
+
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) 172px 172px;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) 172px 172px 48px;
+  }
+
+  .top-stack .events-filter{
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    gap: 0;
+  }
+
+  .desktop-hero__search-field .desktop-hero__icon--search{
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(99,119,149,0.68);
+    width: 18px;
+    height: 18px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .top-stack #search-filter,
+  .desktop-hero__toolbar-pill{
+    height: 56px;
+  }
+
+  .top-stack #search-filter{
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 18px 0 46px;
+    border: 1px solid rgba(22,39,61,0.078);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.988);
+    color: #16273d;
+    font-size: 0.99rem;
+    font-weight: 610;
+    letter-spacing: -0.012em;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.988) inset,
+      0 8px 16px rgba(22,39,61,0.022);
+  }
+
+  .top-stack #search-filter::placeholder{
+    color: rgba(99,119,149,0.74);
+    font-weight: 600;
+  }
+
+  .desktop-hero__toolbar-pill{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-content: stretch;
+    column-gap: 8px;
+    row-gap: 2px;
+    padding: 8px 13px 8px;
+    border: 1px solid rgba(22,39,61,0.065);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.93);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.96) inset,
+      0 5px 12px rgba(22,39,61,0.018);
+    text-align: left;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__label{
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    color: #7d8ea5;
+    font-size: 0.67rem;
+    font-weight: 760;
+    line-height: 1;
+    letter-spacing: 0.015em;
+    white-space: nowrap;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__value{
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    color: #16273d;
+    font-size: 0.95rem;
+    font-weight: 780;
+    line-height: 1.08;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desktop-hero__toolbar-pill::after{
+    content: "›";
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    color: rgba(99,119,149,0.42);
+    font-size: 0.98rem;
+    line-height: 1;
+    margin-left: 0;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    grid-column: auto;
+    width: 48px;
+    min-width: 48px;
+    min-height: 56px;
+    justify-self: stretch;
+    align-self: stretch;
+    border-color: rgba(22,39,61,0.055);
+    background: rgba(255,255,255,0.82);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.92) inset,
+      0 5px 12px rgba(22,39,61,0.018);
+  }
+
+  .desktop-hero__actions{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(22,39,61,0.055);
+  }
+
+  .desktop-hero__action{
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 11px;
+    font-size: 0.84rem;
+    font-weight: 650;
+    border-color: rgba(22,39,61,0.04);
+    background: rgba(255,255,255,0.58);
+    color: rgba(31,53,82,0.72);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.80) inset;
+  }
+
+  .desktop-hero__action .desktop-hero__icon{
+    width: 14px;
+    height: 14px;
+    opacity: 0.52;
+  }
+
+  .desktop-hero__actions .desktop-hero__action--publish{
+    border-color: rgba(22,39,61,0.05);
+    background: rgba(255,255,255,0.70);
+    color: rgba(31,53,82,0.84);
+    font-weight: 680;
+  }
+
+  .desktop-hero__actions .desktop-hero__action--info{
+    border-color: rgba(22,39,61,0.042);
+    background: rgba(255,255,255,0.63);
+    color: rgba(31,53,82,0.78);
+  }
+
+  .desktop-hero__actions .desktop-hero__action--app{
+    border-color: rgba(22,39,61,0.038);
+    background: rgba(255,255,255,0.54);
+    color: rgba(31,53,82,0.70);
+  }
+
+  @media (hover: hover){
+    .desktop-hero__actions .desktop-hero__action:hover{
+      border-color: rgba(22,39,61,0.06);
+      background: rgba(255,255,255,0.72);
+      color: #16273d;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.88) inset,
+        0 6px 14px rgba(22,39,61,0.022);
+    }
+
+    .desktop-hero__actions .desktop-hero__action--publish:hover{
+      background: rgba(255,255,255,0.80);
+    }
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1199.98px){
+  .desktop-hero{
+    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
+    --hero-bg-position-active: 86.75% 9.5%;
+    min-height: 396px;
+    padding-top: 20px;
+    padding-bottom: 14px;
+  }
+
+  .desktop-entry__content{
+    max-width: 30rem;
+  }
+
+  .desktop-entry__title{
+    max-width: 27rem;
+    font-size: clamp(2.78rem, 2.58rem + 0.68vw, 3.32rem);
+  }
+
+  .desktop-entry__text{
+    max-width: 24.5rem;
+    font-size: 0.96rem;
+    line-height: 1.40;
+  }
+
+  .top-stack{
+    width: 100%;
+    max-width: none;
+  }
+
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) 164px 164px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) 164px 164px 46px;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: 46px;
+    min-width: 46px;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 === */
+
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V24 | Purpose: final 1024-class desktop freeze by compressing hero height, preserving copy safety and keeping the module calm at the smallest desktop width; Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
+@media (min-width: 900px) and (max-width: 1024px){
+  .desktop-hero{
+    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
+    --hero-bg-position-active: 89.25% 10%;
+    gap: 12px;
+    min-height: 380px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+
+  .desktop-hero::before{
+    background-image:
+      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.986) 10%, rgba(247,250,244,0.90) 18%, rgba(247,250,244,0.56) 27%, rgba(247,250,244,0.22) 36%, rgba(247,250,244,0.05) 44%, rgba(247,250,244,0.00) 51%),
+      radial-gradient(62% 66% at 20% 28%, rgba(247,250,244,0.48) 0%, rgba(247,250,244,0.23) 38%, rgba(247,250,244,0.07) 61%, rgba(247,250,244,0.00) 79%),
+      linear-gradient(180deg, rgba(247,250,244,0.42) 0%, rgba(247,250,244,0.11) 18%, rgba(247,250,244,0.03) 42%, rgba(247,250,244,0.09) 100%),
+      var(--hero-bg-image-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+  }
+
+  .desktop-entry__content{
+    max-width: 26.5rem;
+    gap: 8px;
+  }
+
+  .desktop-entry__title{
+    max-width: 23rem;
+    font-size: clamp(2.32rem, 2.18rem + 0.44vw, 2.82rem);
+    line-height: 0.98;
+  }
+
+  .desktop-entry__text{
+    max-width: 20.75rem;
+    font-size: 0.90rem;
+    line-height: 1.38;
+  }
+
+  .desktop-entry__lead-line{
+    white-space: normal;
+  }
+
+  .top-stack{
+    margin-top: 0;
+    padding: 10px 11px 9px;
+    border-radius: 20px;
+  }
+
+  .top-stack::before{
+    inset: 7px;
+    border-radius: 14px;
+  }
+
+  .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) 156px 156px;
+    gap: 6px;
+  }
+
+  .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) 156px 156px 44px;
+  }
+
+  .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 19px;
+    width: 17px;
+    height: 17px;
+  }
+
+  .top-stack #search-filter,
+  .desktop-hero__toolbar-pill{
+    height: 54px;
+  }
+
+  .top-stack #search-filter{
+    padding-left: 42px;
+    padding-right: 16px;
+    font-size: 0.96rem;
+    border-radius: 15px;
+  }
+
+  .desktop-hero__toolbar-pill{
+    padding: 7px 11px 7px;
+    column-gap: 7px;
+    border-radius: 14px;
+  }
+
+  .desktop-hero__search-row > .filter-pill--reset{
+    width: 44px;
+    min-width: 44px;
+    min-height: 54px;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__label{
+    font-size: 0.64rem;
+  }
+
+  .desktop-hero__toolbar-pill .filter-pill__value{
+    font-size: 0.88rem;
+  }
+
+  .desktop-hero__actions{
+    gap: 5px;
+    padding-top: 8px;
+  }
+
+  .desktop-hero__action{
+    min-height: 34px;
+    padding-left: 9px;
+    padding-right: 9px;
+    border-radius: 10px;
+    font-size: 0.80rem;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V24 === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+@media (min-width: 900px){
+  .filter-popover[hidden]{
+    display: none !important;
+  }
+
+  .filter-popover{
+    position: absolute;
+    z-index: 1300;
+    min-width: 0;
+    pointer-events: auto;
+  }
+
+  #popover-time{
+    width: min(280px, calc(100vw - 32px));
+  }
+
+  #popover-category{
+    width: min(332px, calc(100vw - 32px));
+  }
+
+  .filter-popover__panel{
+    display: grid;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid rgba(22,39,61,0.08);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(250,252,247,0.965) 100%);
+    box-shadow:
+      0 18px 36px rgba(22,39,61,0.12),
+      0 1px 0 rgba(255,255,255,0.96) inset;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .filter-popover__panel button{
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #16273d;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 630;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 140ms ease,
+      color 140ms ease,
+      box-shadow 140ms ease,
+      transform 140ms ease;
+  }
+
+  .filter-popover__panel button:hover{
+    background: rgba(240,245,235,0.92);
+    box-shadow: inset 0 0 0 1px rgba(22,39,61,0.04);
+  }
+
+  .filter-popover__panel button:active{
+    transform: translateY(1px);
+  }
+
+  .filter-popover__panel button:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 2px;
+    background: rgba(240,245,235,0.96);
+  }
+
+  .filter-popover__panel button.is-active{
+    background: rgba(230,238,222,0.98);
+    color: #16273d;
+    box-shadow:
+      inset 0 0 0 1px rgba(111,135,88,0.18),
+      0 1px 0 rgba(255,255,255,0.72);
+  }
+
+  .filter-popover__panel button.is-disabled,
+  .filter-popover__panel button[disabled]{
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .filter-popover__panel button.is-disabled:hover,
+  .filter-popover__panel button[disabled]:hover{
+    background: transparent;
+  }
+
+  #filter-time-pill[aria-expanded="true"],
+  #filter-category-pill[aria-expanded="true"]{
+    border-color: rgba(111,135,88,0.22);
+    background: rgba(255,255,255,0.985);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.96) inset,
+      0 10px 20px rgba(22,39,61,0.038);
+  }
+}
+
+@media (max-width: 899.98px){
+  .filter-popover{
+    display: none !important;
+  }
+}
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V1 === */
+
+/* === END BLOCK: HOME_CSS_STEP_4 === */

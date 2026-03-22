@@ -149,6 +149,49 @@ If a UI issue repeats across screens, fix it in tokens/mapping, not per-screen.
 
 ---
 
+<!-- === BEGIN REPLACEMENT BLOCK: CSS ARCHITECTURE CONTRACT (Public entrypoint + file ownership) | Scope: canonical CSS split rules after style.css decomposition === -->
+
+# CSS ARCHITECTURE CONTRACT (PUBLIC ENTRYPOINT + FILE OWNERSHIP)
+
+Public CSS entrypoint rule:
+- The only public CSS entrypoint allowed in HTML is `/css/style.css?v=...`.
+- HTML must never directly load `base.css`, `pages.css`, `components.css`, `home.css`, `overlays.css`, or `legacy.css`.
+
+Canonical aggregator rule:
+- `css/style.css` is the only canonical aggregator.
+- `css/style.css` may only import CSS in this canonical order:
+  1) `base.css`
+  2) `pages.css`
+  3) `components.css`
+  4) `home.css`
+  5) `overlays.css`
+
+File ownership rule:
+- `base.css` owns global foundation, tokens, app-wide header/footer/focus rules, and global icon base rules.
+- `pages.css` owns content/static page styling.
+- `components.css` owns reusable UI components and component states.
+- `home.css` owns home/hero/feed/search-row layout and home-specific responsive behavior.
+- `overlays.css` owns detailpanel, filter-sheet, modals, overlay locks, and overlay-adjacent states.
+
+Boundary rule:
+- Components style themselves; page/layout files place them.
+- Layout fixes belong in the owning layout file, not in `components.css`.
+- Overlay mechanics/locks must stay in `overlays.css`, not in page/layout files.
+- Cross-file patches are allowed only with explicit root-cause proof.
+
+Legacy rule:
+- `css/legacy.css` is deprecated.
+- It must not be re-imported into `css/style.css`.
+- It must not become an active owner file again except in an explicit cleanup/removal task.
+
+Patch discipline rule:
+- For CSS bugs, patch the owner file first.
+- If the fix appears to require changes in multiple CSS files, prove why before patching.
+
+<!-- === END REPLACEMENT BLOCK: CSS ARCHITECTURE CONTRACT (Public entrypoint + file ownership) === -->
+
+---
+
 # GOLDEN SCREEN VERIFICATION RULE (NO VISUAL GUESSING)
 
 For UI changes:
@@ -183,6 +226,43 @@ Never introduce asset instability.
 
 ---
 
+# BRANCH / RELEASE RULE
+
+Standard workflow is mandatory:
+
+- `staging` = default work + test branch
+- `main` = production / release branch
+
+Rules:
+
+- Routine changes must start on `staging`, not on `main`
+- Validate changes on `https://staging.bocholt-erleben.de` first
+- Only after successful staging validation: merge `staging` into `main`
+- Then deploy `main`
+- After `main` deploy, verify both:
+  - `https://bocholt-erleben.de`
+  - `https://staging.bocholt-erleben.de`
+
+Exception:
+- Direct edits on `main` are allowed only for urgent live hotfixes
+- Every direct `main` hotfix must be synced back into `staging` immediately after
+
+# STAGING INFRASTRUCTURE RULE
+
+The staging environment is now part of the canonical project infrastructure.
+
+Canonical staging target:
+
+- `https://staging.bocholt-erleben.de`
+
+Rules:
+
+- Never treat staging as optional or temporary
+- Never propose routine direct work on `main` if `staging` is available
+- Never break the staging URL, its SSL setup, or its deploy path without explicit instruction
+- The deploy workflow must preserve the remote `staging/` folder during live deploys
+- The wildcard SSL setup for `bocholt-erleben.de` + subdomains is part of the staging baseline and must be respected
+
 # DEPLOYMENT RULE
 
 Deployment must remain deterministic.
@@ -191,13 +271,19 @@ Never break asset references.
 
 Fail fast if asset inconsistency detected.
 
----
+Live deploy must not remove or damage staging infrastructure.
 
-# REGRESSION RULE
+Staging deploy must remain isolated from live behavior as far as possible within the current STRATO setup.
 
 Never break existing working functionality.
 
 Preserve behavior.
+
+Asset hardening rules:
+- Fail fast if any HTML file references CSS differently than `/css/style.css?v=...`.
+- Fail fast if any HTML file directly references `base.css`, `pages.css`, `components.css`, `home.css`, `overlays.css`, or `legacy.css`.
+- Fail fast if `deploy/css/style.css` does not keep the canonical five-file import set and canonical order.
+- Fail fast if the version-rewrite step does not propagate the active build version into the imported CSS URLs inside `deploy/css/style.css`.
 
 ---
 

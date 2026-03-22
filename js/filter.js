@@ -181,9 +181,103 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       this.updateFilterBarUI(timeValue, catValue, resetPill);
     });
 
-    // Open sheets
-    timePill.addEventListener("click", () => openSheet(timeSheet));
-    catPill.addEventListener("click", () => openSheet(catSheet));
+   /* === BEGIN BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) ===
+Zweck:
+- Desktop: Popover statt Bottom-Sheet
+- Mobile: unverändert Sheets
+Umfang:
+- ersetzt nur Öffnungslogik der Filter-Pills
+=== */
+
+const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
+
+const getPopover = (type) => document.getElementById(`popover-${type}`);
+
+const openPopover = (type, triggerEl) => {
+  const pop = getPopover(type);
+  if (!pop || !triggerEl) return;
+
+  closeAllPopovers();
+
+  const rect = triggerEl.getBoundingClientRect();
+
+  const top = rect.bottom + window.scrollY + 8;
+  const left = rect.left + window.scrollX;
+
+  pop.style.top = `${top}px`;
+  pop.style.left = `${left}px`;
+  pop.hidden = false;
+
+  triggerEl.setAttribute("aria-expanded", "true");
+
+  this._openDesktopPopover = type;
+};
+
+const closePopover = (type) => {
+  const pop = getPopover(type);
+  if (!pop) return;
+
+  pop.hidden = true;
+
+  const trigger = type === "time" ? timePill : catPill;
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+
+  this._openDesktopPopover = null;
+};
+
+const closeAllPopovers = () => {
+  closePopover("time");
+  closePopover("category");
+};
+
+// CLICK HANDLER (ADAPTIV)
+timePill.addEventListener("click", (e) => {
+  if (!isDesktop()) return openSheet(timeSheet);
+  openPopover("time", timePill);
+});
+
+catPill.addEventListener("click", (e) => {
+  if (!isDesktop()) return openSheet(catSheet);
+  openPopover("category", catPill);
+});
+
+// OUTSIDE CLICK (DESKTOP ONLY)
+document.addEventListener("click", (e) => {
+  if (!isDesktop()) return;
+
+  const open = this._openDesktopPopover;
+  if (!open) return;
+
+  const pop = getPopover(open);
+  const trigger = open === "time" ? timePill : catPill;
+
+  if (
+    pop &&
+    !pop.contains(e.target) &&
+    trigger &&
+    !trigger.contains(e.target)
+  ) {
+    closePopover(open);
+  }
+});
+
+// ESC erweitert (für Popover)
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+
+  if (this._openDesktopPopover) {
+    closeAllPopovers();
+  }
+});
+
+// RESIZE SAFETY
+window.addEventListener("resize", () => {
+  if (!isDesktop()) {
+    closeAllPopovers();
+  }
+});
+
+/* === END BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) === */
 
     // Close on overlay + close button (data-close-sheet)
     const wireSheetClose = (sheetEl) => {
@@ -204,27 +298,33 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       if (!catSheet.hidden) closeSheet(catSheet);
     });
 
-    // Zeit Auswahl
-    timeSheet.querySelectorAll("[data-time]").forEach((btn) => {
+   // Zeit Auswahl (Sheet + Popover)
+[...timeSheet.querySelectorAll("[data-time]"),
+ ...document.querySelectorAll("#popover-time [data-time]")]
+.forEach((btn) => {
       btn.addEventListener("click", () => {
         const v = (btn.getAttribute("data-time") || "all").trim();
         this.filters.zeitraum = v;
         this.applyFilters();
         this.setActiveOption(timeSheet, btn);
         this.updateFilterBarUI(timeValue, catValue, resetPill);
-        closeSheet(timeSheet);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
       });
     });
 
-    // Kategorie Auswahl (Single)
-    catSheet.querySelectorAll("[data-category]").forEach((btn) => {
+   // Kategorie Auswahl (Sheet + Popover)
+[...catSheet.querySelectorAll("[data-category]"),
+ ...document.querySelectorAll("#popover-category [data-category]")]
+.forEach((btn) => {
       btn.addEventListener("click", () => {
         const v = btn.getAttribute("data-category"); // '' = Alle
         this.filters.kategorie = (v ?? "").trim();
         this.applyFilters();
         this.setActiveOption(catSheet, btn);
         this.updateFilterBarUI(timeValue, catValue, resetPill);
-        closeSheet(catSheet);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(catSheet);
       });
     });
 
@@ -557,11 +657,93 @@ if (timeKey !== "all") {
     return "";
   },
 
-  setActiveOption(sheetEl, activeBtn) {
-    if (!sheetEl) return;
-    sheetEl.querySelectorAll(".filter-sheet-option").forEach((b) => b.classList.remove("is-active"));
-    if (activeBtn && !activeBtn.disabled) activeBtn.classList.add("is-active");
+  /* === BEGIN BLOCK: FILTER_FACET_SYNC_HELPERS_V2 | Zweck: synchronisiert aktive/disabled States zwischen Mobile-Sheet und Desktop-Popover, damit Desktop keine "hängenden" grünen Optionen mehr behält und 0-Treffer-Facets nicht klickbar bleiben; Umfang: ersetzt setActiveOption() und erweitert die Facet-Helper-Infrastruktur === */
+  getFacetButtons(group) {
+    const ui = this._ui || {};
+    const selectors = {
+      time: {
+        attr: "data-time",
+        sheetRoot: ui.timeSheet,
+        popoverSelector: "#popover-time [data-time]"
+      },
+      category: {
+        attr: "data-category",
+        sheetRoot: ui.catSheet,
+        popoverSelector: "#popover-category [data-category]"
+      }
+    };
+
+    const cfg = selectors[group];
+    if (!cfg) return [];
+
+    const result = [];
+    const seen = new Set();
+    const pushUnique = (btn) => {
+      if (!btn || seen.has(btn)) return;
+      seen.add(btn);
+      result.push(btn);
+    };
+
+    if (cfg.sheetRoot) {
+      cfg.sheetRoot.querySelectorAll(`[${cfg.attr}]`).forEach(pushUnique);
+    }
+
+    document.querySelectorAll(cfg.popoverSelector).forEach(pushUnique);
+    return result;
   },
+
+  getFacetGroup(sheetEl, activeBtn) {
+    if (activeBtn?.hasAttribute?.("data-time")) return "time";
+    if (activeBtn?.hasAttribute?.("data-category")) return "category";
+    if (sheetEl?.id === "sheet-time") return "time";
+    if (sheetEl?.id === "sheet-category") return "category";
+    return "";
+  },
+
+  getFacetButtonValue(btn, group) {
+    if (!btn) return "";
+    if (group === "time") return (btn.getAttribute("data-time") || "all").trim();
+    if (group === "category") return (btn.getAttribute("data-category") ?? "").trim();
+    return "";
+  },
+
+  setFacetButtonState(btn, { enabled, count, withCount = false }) {
+    if (!btn) return;
+
+    if (!btn.hasAttribute("data-label")) {
+      const raw = (btn.textContent || "").trim();
+      btn.setAttribute("data-label", raw.replace(/\s*\(\d+\)\s*$/, ""));
+    }
+
+    const baseLabel = btn.getAttribute("data-label") || (btn.textContent || "").trim();
+    btn.textContent = withCount ? `${baseLabel} (${count})` : baseLabel;
+
+    btn.disabled = !enabled;
+    btn.setAttribute("aria-disabled", (!enabled).toString());
+    btn.classList.toggle("is-disabled", !enabled);
+
+    if (!enabled) btn.classList.remove("is-active");
+  },
+
+  setActiveOption(sheetEl, activeBtn) {
+    const group = this.getFacetGroup(sheetEl, activeBtn);
+    if (!group) return;
+
+    const allButtons = this.getFacetButtons(group);
+    allButtons.forEach((btn) => btn.classList.remove("is-active"));
+
+    if (!activeBtn || activeBtn.disabled) return;
+
+    const activeValue = this.getFacetButtonValue(activeBtn, group);
+    allButtons
+      .filter((btn) => !btn.disabled && this.getFacetButtonValue(btn, group) === activeValue)
+      .forEach((btn) => btn.classList.add("is-active"));
+
+    if (typeof activeBtn.blur === "function") {
+      activeBtn.blur();
+    }
+  },
+  /* === END BLOCK: FILTER_FACET_SYNC_HELPERS_V2 === */
 
   /* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V3 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und den Mobile-3-Spalten-State strikt am Facettenzustand; Umfang: ersetzt ausschließlich updateFilterBarUI() === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
@@ -790,114 +972,78 @@ if (timeKey !== "all") {
       }
     }
 
-    // --- UI helper: Label + (count) + disabled ---
-    const setBtnState = (btn, enabled, count) => {
-      if (!btn) return;
+    const timeButtons = this.getFacetButtons("time");
+    const catButtons = this.getFacetButtons("category");
 
-      if (!btn.hasAttribute("data-label")) {
-        const raw = (btn.textContent || "").trim();
-        btn.setAttribute("data-label", raw.replace(/\s*\(\d+\)\s*$/, ""));
-      }
-      const baseLabel = btn.getAttribute("data-label") || (btn.textContent || "").trim();
-      btn.textContent = `${baseLabel} (${count})`;
-
-      btn.disabled = !enabled;
-      btn.setAttribute("aria-disabled", (!enabled).toString());
-      btn.classList.toggle("is-disabled", !enabled);
-
-      if (!enabled) btn.classList.remove("is-active");
-    };
-
-    // Zeitbuttons (disabled sichtbar)
-    ui.timeSheet.querySelectorAll("[data-time]").forEach((btn) => {
-      const key = (btn.getAttribute("data-time") || "all").trim();
+    timeButtons.forEach((btn) => {
+      const key = this.getFacetButtonValue(btn, "time");
       const cnt = timeCounts[key] ?? 0;
       const enabled = (key === "all") ? true : cnt > 0;
-      setBtnState(btn, enabled, cnt);
+      const withCount = btn.classList.contains("filter-sheet-option");
+      this.setFacetButtonState(btn, { enabled, count: cnt, withCount });
     });
 
-    // Kategoriebuttons (disabled sichtbar)
-    ui.catSheet.querySelectorAll("[data-category]").forEach((btn) => {
-      const raw = (btn.getAttribute("data-category") ?? "").trim();
+    catButtons.forEach((btn) => {
+      const raw = this.getFacetButtonValue(btn, "category");
+      const withCount = btn.classList.contains("filter-sheet-option");
 
-      // "Alle"
       if (!raw) {
-        setBtnState(btn, true, baseForCat.length);
+        this.setFacetButtonState(btn, { enabled: true, count: baseForCat.length, withCount });
         return;
       }
 
       const canon = this.normalizeCategory(raw) || raw;
       const cnt = catCounts[canon] ?? 0;
-      setBtnState(btn, cnt > 0, cnt);
+      this.setFacetButtonState(btn, { enabled: cnt > 0, count: cnt, withCount });
     });
 
-    // Kategorie-Sortierung (Stufe B): nach Count absteigend, "Alle" bleibt oben
-    const catBody = ui.catSheet.querySelector(".filter-sheet__body");
-    if (catBody) {
-      const allBtn = catBody.querySelector('[data-category=""]');
-      const catBtns = Array.from(catBody.querySelectorAll('[data-category]'))
-        .filter((b) => (b.getAttribute("data-category") || "").trim().length > 0);
+    const sortCategoryContainer = (container) => {
+      if (!container) return;
+
+      const allBtn = container.querySelector('[data-category=""]');
+      const catBtns = Array.from(container.querySelectorAll('[data-category]'))
+        .filter((btn) => this.getFacetButtonValue(btn, "category").length > 0);
 
       catBtns.sort((a, b) => {
-        const ac = this.normalizeCategory(a.getAttribute("data-category")) || a.getAttribute("data-category");
-        const bc = this.normalizeCategory(b.getAttribute("data-category")) || b.getAttribute("data-category");
+        const ac = this.normalizeCategory(this.getFacetButtonValue(a, "category")) || this.getFacetButtonValue(a, "category");
+        const bc = this.normalizeCategory(this.getFacetButtonValue(b, "category")) || this.getFacetButtonValue(b, "category");
         const ca = catCounts[ac] ?? 0;
         const cb = catCounts[bc] ?? 0;
         if (cb !== ca) return cb - ca;
-        return (this.canonicalCategories.indexOf(ac) - this.canonicalCategories.indexOf(bc));
+        return this.canonicalCategories.indexOf(ac) - this.canonicalCategories.indexOf(bc);
       });
 
-      if (allBtn) catBody.appendChild(allBtn);
-      for (const b of catBtns) catBody.appendChild(b);
-    }
+      if (allBtn) container.appendChild(allBtn);
+      for (const btn of catBtns) container.appendChild(btn);
+    };
+
+    sortCategoryContainer(ui.catSheet.querySelector(".filter-sheet__body"));
+    sortCategoryContainer(document.querySelector("#popover-category .filter-popover__panel"));
+
+    const activeTimeBtn = timeButtons.find((btn) => this.getFacetButtonValue(btn, "time") === this.filters.zeitraum)
+      || timeButtons.find((btn) => this.getFacetButtonValue(btn, "time") === "all");
+    const activeCatBtn = catButtons.find((btn) => this.getFacetButtonValue(btn, "category") === this.filters.kategorie)
+      || catButtons.find((btn) => this.getFacetButtonValue(btn, "category") === "");
+
+    this.setActiveOption(ui.timeSheet, activeTimeBtn);
+    this.setActiveOption(ui.catSheet, activeCatBtn);
   },
 
   /* === END BLOCK: FILTER UI HELPERS + FACETS (canonical + counts + disabled) === */
 
-
-  /**
-   * Extern: Search Text setzen (optional nutzbar)
-   */
-  setSearchText(text) {
-    const searchInput = document.getElementById("search-filter");
-    const normalized = (text || "").trim();
-
-    this.filters.searchText = normalized.toLowerCase();
-
-    if (searchInput) {
-      searchInput.value = normalized; // ersetzt komplett
-    }
-
-    this.applyFilters();
-  },
-
-    /* === BEGIN BLOCK: FILTER_RESET_METHODS_V3 | Zweck: trennt Facetten-Reset (globales X) und Voll-Reset sauber und beseitigt den unsauberen Kommentar-/Methodenblock; Umfang: ersetzt ausschließlich den Reset-Methodenblock === */
-  /**
-   * Nur Facetten zurücksetzen; Suche bleibt erhalten.
-   */
+  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 | Zweck: stellt die fehlende resetFacetFilters()-Methode korrekt wieder her, setzt nur Zeit/Kategorie zurück, synchronisiert aktive Optionen in Sheet+Popover und belässt die Suche unangetastet; Umfang: ersetzt den kaputten Tail ab dem losen Reset-Code bis inkl. refresh() === */
   resetFacetFilters() {
     const ui = this._ui || {};
-    const searchInput = ui.searchInput || document.getElementById("search-filter");
-    const preservedSearchText = searchInput
-      ? (searchInput.value || "")
-      : (this.filters.searchText || "");
 
-    this.filters = {
-      searchText: String(preservedSearchText).toLowerCase(),
-      location: "",
-      kategorie: "",
-      zeitraum: "all"
-    };
-
-    if (searchInput) {
-      searchInput.value = preservedSearchText;
-    }
+    this.filters.kategorie = "";
+    this.filters.zeitraum = "all";
 
     if (ui.timeSheet) {
       this.setActiveOption(
         ui.timeSheet,
         ui.timeSheet.querySelector('[data-time="all"]')
       );
+      ui.timeSheet.hidden = true;
     }
 
     if (ui.catSheet) {
@@ -905,7 +1051,23 @@ if (timeKey !== "all") {
         ui.catSheet,
         ui.catSheet.querySelector('[data-category=""]')
       );
+      ui.catSheet.hidden = true;
     }
+
+    const timePopover = document.getElementById("popover-time");
+    const catPopover = document.getElementById("popover-category");
+
+    if (timePopover) timePopover.hidden = true;
+    if (catPopover) catPopover.hidden = true;
+
+    const timePill = ui.timePill || document.getElementById("filter-time-pill");
+    const catPill = ui.catPill || document.getElementById("filter-category-pill");
+
+    if (timePill) timePill.setAttribute("aria-expanded", "false");
+    if (catPill) catPill.setAttribute("aria-expanded", "false");
+
+    this._openDesktopPopover = null;
+    document.body.classList.remove("is-sheet-open");
 
     this.applyFilters();
 
@@ -918,52 +1080,6 @@ if (timeKey !== "all") {
     debugLog("Facet filters reset");
   },
 
-    /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V4 | Zweck: repariert den kaputten Methodenabschluss im Objekt und stellt den gültigen Übergang von resetFilters() zu refresh() wieder her; Umfang: ersetzt ausschließlich den Tail-Block ab resetFilters() bis inkl. refresh() === */
-  /**
-   * Alle Filter inkl. Suche zurücksetzen.
-   */
-  resetFilters() {
-    const ui = this._ui || {};
-
-    this.filters = {
-      searchText: "",
-      location: "",
-      kategorie: "",
-      zeitraum: "all"
-    };
-
-    if (ui.searchInput) {
-      ui.searchInput.value = "";
-    } else {
-      const searchInput = document.getElementById("search-filter");
-      if (searchInput) searchInput.value = "";
-    }
-
-    if (ui.timeSheet) {
-      this.setActiveOption(
-        ui.timeSheet,
-        ui.timeSheet.querySelector('[data-time="all"]')
-      );
-    }
-
-    if (ui.catSheet) {
-      this.setActiveOption(
-        ui.catSheet,
-        ui.catSheet.querySelector('[data-category=""]')
-      );
-    }
-
-    this.applyFilters();
-
-    this.updateFilterBarUI(
-      ui.timeValue || document.getElementById("filter-time-value"),
-      ui.catValue || document.getElementById("filter-category-value"),
-      ui.resetPill || document.getElementById("filter-reset-pill")
-    );
-
-    debugLog("Filters reset");
-  },
-
   /**
    * Events neu laden (z. B. nach Airtable-Update)
    */
@@ -971,7 +1087,7 @@ if (timeKey !== "all") {
     this.allEvents = Array.isArray(events) ? events : [];
     this.applyFilters();
   }
-  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V4 === */
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 === */
 };
 
 /* === BEGIN BLOCK: FILTER AUTO-BOOTSTRAP (removed - main.js is source of truth) ===
