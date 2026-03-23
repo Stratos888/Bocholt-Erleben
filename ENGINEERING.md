@@ -19,7 +19,28 @@
 
 ---
 
-## 3. DEFAULT INPUT FOR UI WORK
+## 3. CANONICAL PROJECT HIERARCHY
+
+Use this hierarchy when documents, screenshots, or repo leftovers create ambiguity:
+
+1. visible current code from the uploaded ZIP
+2. `Produktvertrag.md` for canonical product logic
+3. `MASTER.md` for strategic direction / frozen areas / current focus
+4. `ENGINEERING.md` for implementation rules and working modes
+
+Rules:
+
+- Do not treat old routes, leftover files, or repo presence alone as canonical product truth.
+- Do not redefine product rules from `Produktvertrag.md` inside `MASTER.md`, UI copy, or ad-hoc chat reasoning.
+- If a contradiction is found, resolve it at the canonical source first.
+
+---
+
+## 4. WORKING MODES
+
+Every chat must run in exactly one primary mode.
+
+### MODE A — UI POLISH / EXISTING PAGE OPTIMIZATION
 
 Preferred input:
 
@@ -31,11 +52,7 @@ Preferred input:
    - desktop wide
 4. 1 clear goal sentence
 
----
-
-## 4. DEFAULT UI WORK LOOP
-
-For each UI page:
+Execution loop:
 
 1. define page contract:
    - Goal
@@ -49,9 +66,65 @@ For each UI page:
 
 Do not drift into open-ended visual iteration loops.
 
+### MODE B — NEW ROUTE / CONTENT HUB
+
+Preferred input:
+
+1. uploaded ZIP
+2. target route
+3. page purpose
+4. desired blocks / order
+5. 1 reference page
+
+Execution loop:
+
+1. define page contract:
+   - Goal
+   - Audience
+   - Page Role
+   - Freeze
+   - Acceptance Criteria
+2. define content / structure contract:
+   - required blocks
+   - block order
+   - CTA logic
+   - excluded content
+3. deliver 1 consolidated multi-file implementation patch
+4. review once
+5. freeze the page structure
+
+Do not start with CSS polish before the structure contract is clear.
+
+### MODE C — FEATURE / LOGIC / DATA
+
+Preferred input:
+
+1. uploaded ZIP
+2. user flow
+3. trigger
+4. data source
+5. desired behavior
+6. definition of done
+
+Execution loop:
+
+1. define flow contract / root-cause contract
+2. identify owner files
+3. deliver 1 consolidated implementation patch
+4. provide smoke-test proof points
+
+Do not mix feature work with unrelated UI polish in the same workpack.
+
 ---
 
-## 5. PATCH OUTPUT CONTRACT
+## 5. ONE CHAT = ONE WORKPACK
+
+- Each chat should focus on one primary workpack only.
+- Do not mix UI polish, new route design, feature logic, and product-governance changes in the same implementation round unless root cause proves they are inseparable.
+
+---
+
+## 6. PATCH OUTPUT CONTRACT
 
 - Output code/document changes as concrete replace instructions only.
 - Always specify:
@@ -65,7 +138,7 @@ Do not drift into open-ended visual iteration loops.
 
 ---
 
-## 6. OWNER-FILE RULE
+## 7. OWNER-FILE RULE
 
 Patch the owning file first.
 
@@ -87,7 +160,7 @@ Rules:
 
 ---
 
-## 7. TOKEN-FIRST RULE
+## 8. TOKEN-FIRST RULE
 
 - Reuse existing design tokens first.
 - Introduce new values as tokens only when they are truly reusable.
@@ -95,21 +168,21 @@ Rules:
 
 ---
 
-## 8. UI-POLISH RULE
+## 9. UI-POLISH RULE
 
 - UI-polish patches should be CSS-only unless root cause proves otherwise.
 - Do not spread small visual fixes across multiple files without proof.
 
 ---
 
-## 9. OVERLAY RULE
+## 10. OVERLAY RULE
 
 - All overlays must render in a dedicated overlay root directly under `body`.
 - Never render overlays inside sticky, transformed, or backdrop-filter containers.
 
 ---
 
-## 10. DEPLOY / ASSET SAFETY
+## 11. DEPLOY / ASSET SAFETY
 
 - Preserve deterministic build and versioning behavior.
 - Never break service worker, cache, or asset-reference logic.
@@ -118,19 +191,14 @@ Rules:
 
 ---
 
-## 11. DEPRECATED PROMPT FILES
+## 12. DEPRECATED PROMPT FILES
 
-The following files are not canonical workflow controllers anymore:
+If deprecated prompt files still exist, they are not canonical workflow controllers.
 
-- `docs/prompts/session-open.md`
-- `docs/prompts/session-close.md`
+Canonical project control is limited to:
 
-Canonical project control is now limited to:
-
+- `Produktvertrag.md`
 - `MASTER.md`
 - `ENGINEERING.md`
 - the uploaded ZIP
-- the current target page
-- the current screenshots
-
-<!-- === END CANONICAL ENGINEERING FILE === -->
+- the active workpack input
