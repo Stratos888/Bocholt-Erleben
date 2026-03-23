@@ -626,6 +626,96 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 === */
 
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V1 | Zweck: setzt /events-veroeffentlichen/ auf die finale Funnel-Grundstruktur mit Hero, Nutzenkarte, Hauptgrid und Abschlusskarte; Umfang: nur page--publish außerhalb der Desktop-Breakpoints === */
+.page--publish .content-hero{
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
+  --subpage-hero-gap: 0;
+}
+
+.page--publish .content-hero--panel{
+  padding: 24px 24px 22px;
+}
+
+.page--publish .publish-hero-layout{
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.page--publish .publish-hero-main,
+.page--publish .publish-hero-copy,
+.page--publish .publish-closure-copy,
+.page--publish .publish-closure-actions{
+  display: grid;
+  align-content: start;
+}
+
+.page--publish .publish-hero-main{
+  gap: 12px;
+  min-width: 0;
+}
+
+.page--publish .publish-hero-copy{
+  gap: 12px;
+  max-width: none;
+}
+
+.page--publish .publish-hero-note{
+  max-width: 50ch;
+}
+
+.page--publish .publish-hero-values{
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page--publish .publish-values-card,
+.page--publish .publish-main-grid,
+.page--publish .publish-closure-card{
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
+}
+
+.page--publish .publish-main-grid{
+  display: grid;
+  gap: var(--subpage-stack-gap);
+}
+
+.page--publish .publish-main-grid > .content-card{
+  min-height: 100%;
+  align-content: start;
+}
+
+.page--publish .publish-requirements-note{
+  margin-top: 4px;
+}
+
+.page--publish .publish-closure-card{
+  gap: 18px;
+}
+
+.page--publish .publish-closure-copy{
+  gap: 8px;
+  max-width: 42ch;
+}
+
+.page--publish .publish-closure-actions{
+  gap: 12px;
+}
+
+.page--publish .publish-closure-links{
+  gap: 4px;
+}
+
+.page--publish .publish-closure-links .content-link{
+  min-height: 42px;
+  padding-block: 9px;
+}
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V1 === */
+
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
   display: grid;
@@ -873,6 +963,38 @@
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V4 === */
 
+  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V1 | Zweck: hält /events-veroeffentlichen/ im kompakten Desktop einspaltig im Hero und bereitet den Funnel ohne rechte Hero-Spalte vor; Umfang: nur page--publish im 900px-Breakpoint === */
+  .page--publish{
+    --subpage-body-max: 1136px;
+  }
+
+  .page--publish .content-hero--panel{
+    padding: 24px 24px 22px;
+  }
+
+  .page--publish .publish-hero-layout{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .page--publish .publish-hero-main .content-lead{
+    max-width: 44ch;
+  }
+
+  .page--publish .publish-hero-note{
+    max-width: 46ch;
+  }
+
+  .page--publish .publish-values-card{
+    background: rgba(255,255,255,0.82);
+  }
+
+  .page--publish .publish-closure-actions .content-actions--inline .content-cta--primary{
+    width: min(100%, 336px);
+    min-width: 0;
+  }
+  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V1 === */
+
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
     padding-left: var(--subpage-card-pad-x);
@@ -965,6 +1087,25 @@
     grid-template-rows: auto auto 1fr auto;
     align-content: start;
   }
+
+  /* === BEGIN BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V1 | Zweck: setzt auf /events-veroeffentlichen/ ab 1024px das 2/3–1/3-Hauptgrid und den kompakten Abschluss mit rechter CTA-Spalte um; Umfang: nur page--publish im 1024px-Breakpoint === */
+  .page--publish .publish-main-grid{
+    grid-template-columns: minmax(0, 1.34fr) minmax(304px, 0.86fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .page--publish .publish-closure-card{
+    grid-template-columns: minmax(0, 1fr) 336px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .page--publish .publish-closure-actions{
+    width: 336px;
+    justify-self: end;
+  }
+  /* === END BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V1 === */
 }
 
 @media (min-width: 1280px){
@@ -1007,6 +1148,56 @@
     justify-self: start;
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V4 === */
+
+  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V1 | Zweck: stellt /events-veroeffentlichen/ ab 1280px auf den finalen Desktop-Hero mit rechter Werte-Liste um und entfernt die separate Nutzenkarte; Umfang: nur page--publish ab 1280px === */
+  .page--publish .content-hero--panel{
+    padding: 28px 32px 24px;
+  }
+
+  .page--publish .publish-hero-layout{
+    grid-template-columns: minmax(0, 620px) 220px;
+    column-gap: 72px;
+    row-gap: 16px;
+    align-items: start;
+  }
+
+  .page--publish .publish-hero-values{
+    display: grid;
+    gap: 12px;
+    width: 220px;
+    min-width: 220px;
+    justify-self: start;
+  }
+
+  .page--publish .publish-hero-values li{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 0.96rem;
+    font-weight: 720;
+    line-height: 1.28;
+  }
+
+  .page--publish .publish-hero-values li::before{
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 999px;
+    background: var(--color-text-primary);
+    opacity: 0.72;
+  }
+
+  .page--publish .publish-values-card{
+    display: none;
+  }
+
+  .page--publish .publish-main-grid{
+    grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.8fr);
+  }
+  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V1 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{
