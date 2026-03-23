@@ -540,9 +540,10 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V2 | Zweck: balanciert auf /ueber/ den Hero-Innenraum besser aus, ohne die ruhige Einspalten-Logik zu verlassen; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V3 | Zweck: stellt auf /ueber/ wieder eine einzige gemeinsame Außenbreite für Hero, Karten und Rechtliches her, während nur die Hero-Texte innen lesbar begrenzt bleiben; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
-  width: min(100%, 920px);
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
   --subpage-hero-gap: 12px;
 }
 
@@ -559,8 +560,8 @@
 }
 
 .page--about .about-legal-card{
-  width: min(100%, 820px);
-  justify-self: start;
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
   gap: 10px;
   align-content: start;
 }
@@ -577,7 +578,7 @@
   min-height: 42px;
   padding-block: 9px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V2 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V3 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
