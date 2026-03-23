@@ -52,24 +52,22 @@ The following workpack is intentionally on hold:
 - All overlays render in a dedicated overlay root directly under `body`
 - Deploy must fail fast on broken asset references
 
-### Organizer / location model
+### Product governance
 
-- No free tariff
-- Monthly volume-based pricing model:
-  - Starter: 9,99 € / month, up to 3 events
-  - Aktiv: 19,99 € / month, up to 8 events
-  - Dauerhaft: 39,99 € / month, unlimited events
-- No paid visual prioritization
-- No ads
-- No design favoritism
-- Monthly cancellation should remain possible
+- `Produktvertrag.md` is the only canonical source for:
+  - organizer membership model
+  - tariff names
+  - pricing
+  - token / event quota logic
+  - event submission and approval rules
+- `MASTER.md` may define strategic direction, but must not redefine canonical product mechanics from `Produktvertrag.md`.
 
 ### Information architecture
 
 - `/info/` is a hybrid of explanation + direct CTA + navigation
-- `/events-veroeffentlichen/` is the only organizer funnel page
+- `/events-veroeffentlichen/` is the canonical organizer funnel page
 - `/ueber/` exists for trust
-- `/fuer-veranstalter/` is removed; useful content is integrated elsewhere
+- Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture
 - The locations modal is final as an explanation / entry layer, not as a pricing table
 
 ---
