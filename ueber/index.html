@@ -32,19 +32,24 @@
   <!-- === END BLOCK: SUBPAGE_APP_HEADER_V1 === -->
 
   <main class="page page--about">
-    <!-- === BEGIN BLOCK: ABOUT_PAGE_CONTENT_REFINEMENT_V5 | Zweck: schärft auf /ueber/ nur Hero-Textdichte, Kartenrollen und den integrierten Rechtliches-Abschluss nach; Umfang: ersetzt Hero, 3er-Grid und Rechtliches innerhalb von .page--about === -->
+    <!-- === BEGIN BLOCK: ABOUT_PAGE_HERO_LAYOUT_V6 | Zweck: ersetzt auf /ueber/ den Hero durch die finale, klare Intro-Struktur ohne Kicker mit vertikaler Werte-Liste; Umfang: nur Hero innerhalb von .page--about === -->
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Über die Plattform</p>
-      <h1>Über Bocholt erleben</h1>
-      <p class="content-lead">
-        In Bocholt und Umgebung gibt es viel zu entdecken. Bocholt erleben bündelt Veranstaltungen,
-        Orte und weitere Aktivitäten in einer klaren Übersicht, damit du schneller findest, was gerade zu dir passt.
-      </p>
-      <p class="content-note">
-        Übersichtlich – nachvollziehbar – seriös
-      </p>
-    </header>
+      <div class="about-hero-layout">
+        <h1 class="about-hero-title">Über Bocholt erleben</h1>
 
+        <p class="content-lead about-hero-lead">
+          Bocholt erleben bündelt Veranstaltungen, Orte und weitere Aktivitäten aus Bocholt und Umgebung
+          in einer klaren Übersicht, damit du schneller findest, was zu dir passt.
+        </p>
+
+        <ul class="about-hero-values" aria-label="Werte von Bocholt erleben">
+          <li>Übersichtlich</li>
+          <li>Nachvollziehbar</li>
+          <li>Seriös</li>
+        </ul>
+      </div>
+    </header>
+    <!-- === END BLOCK: ABOUT_PAGE_HERO_LAYOUT_V6 === -->
     <section class="content-grid content-grid--3" aria-label="Über Bocholt erleben">
       <article class="content-card" aria-labelledby="about-idea">
         <h2 id="about-idea">Die Idee dahinter</h2>
