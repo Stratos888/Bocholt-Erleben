@@ -626,7 +626,7 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V2 | Zweck: konsolidiert /events-veroeffentlichen/ auf einen ruhigen Funnel ohne Nutzen-/Abschlusskarte, mit konsistentem Hero-CTA und kompakterem Hauptbereich; Umfang: nur page--publish außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V3 | Zweck: konsolidiert /events-veroeffentlichen/ auf den finalen Prozess-Funnel mit Preis-/Paketklarheit, Quellenlogik und ohne redundante Zusatzkarten; Umfang: nur page--publish außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
@@ -660,7 +660,7 @@
 }
 
 .page--publish .publish-hero-note{
-  max-width: 54ch;
+  max-width: 56ch;
 }
 
 .page--publish .publish-hero-values,
@@ -669,24 +669,89 @@
   display: none;
 }
 
-.page--publish .publish-main-grid{
+.page--publish .publish-main-grid,
+.page--publish .publish-routing-card{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
+}
+
+.page--publish .publish-main-grid{
   display: grid;
   gap: var(--subpage-stack-gap);
 }
 
-.page--publish .publish-main-grid > .content-card{
+.page--publish .publish-main-grid > .content-card,
+.page--publish .publish-routing-card{
   min-height: 0;
   align-content: start;
 }
 
-.page--publish .publish-requirements-note{
-  margin-top: 4px;
+.page--publish .publish-plans{
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page--publish .publish-plans li{
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.52);
+}
+
+.page--publish .publish-plans strong{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.22;
+}
+
+.page--publish .publish-plans span{
+  color: var(--cmp-copy-color);
+  font-size: 0.9rem;
+  line-height: 1.42;
+}
+
+.page--publish .publish-plans-note{
+  max-width: 36ch;
+}
+
+.page--publish .publish-routing-card{
+  display: grid;
+  gap: 14px;
+}
+
+.page--publish .publish-routing-intro,
+.page--publish .publish-routing-note{
+  max-width: 58ch;
+}
+
+.page--publish .publish-routing-layout{
+  display: grid;
+  gap: 18px;
+}
+
+.page--publish .publish-routing-group{
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.page--publish .publish-routing-group h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.24;
 }
 
 .page--publish .content-actions--inline .content-cta--primary{
-  min-width: clamp(228px, 22vw, 272px);
+  min-width: clamp(216px, 20vw, 248px);
   min-height: 48px;
   padding-inline: 18px;
 
@@ -717,7 +782,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V2 === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V3 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
@@ -966,7 +1031,7 @@
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V4 === */
 
-  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V2 | Zweck: hält /events-veroeffentlichen/ auf Desktop konsequent einspaltig im Hero, nutzt die Lead-Breite besser aus und stärkt den primären CTA ohne rechte Hero-Spalte; Umfang: nur page--publish im 900px-Breakpoint === */
+  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V3 | Zweck: hält /events-veroeffentlichen/ auf Desktop konsequent im ruhigen einspaltigen Hero, gibt der Copy mehr Breite und nutzt den projektweiten CTA-Stil ohne rechtes Hero-Muster; Umfang: nur page--publish im 900px-Breakpoint === */
   .page--publish{
     --subpage-body-max: 1136px;
   }
@@ -985,17 +1050,17 @@
   }
 
   .page--publish .publish-hero-main .content-lead{
-    max-width: 56ch;
+    max-width: 60ch;
   }
 
   .page--publish .publish-hero-note{
-    max-width: 54ch;
+    max-width: 58ch;
   }
 
   .page--publish .content-actions--inline .content-cta--primary{
-    min-width: 264px;
+    min-width: 248px;
   }
-  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V2 === */
+  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V3 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
@@ -1090,9 +1155,9 @@
     align-content: start;
   }
 
-  /* === BEGIN BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V2 | Zweck: balanciert auf /events-veroeffentlichen/ ab 1024px den Hauptbereich neu, damit Anforderungen mehr Raum bekommen und die Prozesskarte nicht leer gestreckt wirkt; Umfang: nur page--publish im 1024px-Breakpoint === */
+  /* === BEGIN BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V3 | Zweck: balanciert auf /events-veroeffentlichen/ ab 1024px den Hauptbereich neu und stellt die Quellen-/Vorlagen-Card in zwei gleichwertige Desktop-Spalten; Umfang: nur page--publish im 1024px-Breakpoint === */
   .page--publish .publish-main-grid{
-    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
     gap: 24px;
     align-items: start;
   }
@@ -1101,7 +1166,13 @@
     height: auto;
     align-self: start;
   }
-  /* === END BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V2 === */
+
+  .page--publish .publish-routing-layout{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+  /* === END BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V3 === */
 }
 
 @media (min-width: 1280px){
@@ -1145,7 +1216,7 @@
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V4 === */
 
-  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V2 | Zweck: hält /events-veroeffentlichen/ auch auf Wide-Desktop bewusst im einspaltigen Hero, entfernt die rechte Bullet-Spalte vollständig und balanciert das Hauptgrid neu; Umfang: nur page--publish ab 1280px === */
+  /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V3 | Zweck: hält /events-veroeffentlichen/ auch auf Wide-Desktop im ruhigen einspaltigen Hero, nutzt die Hero-Copy breiter aus und balanciert Hauptgrid sowie Quellen-Card für den finalen Prozess-Funnel; Umfang: nur page--publish ab 1280px === */
   .page--publish .content-hero--panel{
     padding: 28px 32px 24px;
   }
@@ -1156,21 +1227,21 @@
   }
 
   .page--publish .publish-hero-main .content-lead{
-    max-width: 58ch;
+    max-width: 62ch;
   }
 
   .page--publish .publish-hero-note{
-    max-width: 56ch;
-  }
-
-  .page--publish .publish-hero-values{
-    display: none;
+    max-width: 60ch;
   }
 
   .page--publish .publish-main-grid{
-    grid-template-columns: minmax(0, 1.04fr) minmax(372px, 0.96fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr);
   }
-  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V2 === */
+
+  .page--publish .publish-routing-layout{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V3 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{
