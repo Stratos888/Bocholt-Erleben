@@ -40,35 +40,56 @@
 
   <main class="page page--publish">
 
-    <!-- === BEGIN BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V5 | Zweck: setzt den eingefrorenen Veranstalter-Funnel mit Nutzenblock, geschärften Paketen, drei klaren Startschritten und Abschlussleiste mit zwei Aktionen um; Umfang: ersetzt den kompletten Inhaltsblock innerhalb von .page--publish === -->
+    <!-- === BEGIN BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V6 | Zweck: verdichtet /events-veroeffentlichen/ auf den finalen 9.5–10/10-Funnel mit klarerem Hero, heute-vs.-perspektivisch getrenntem Nutzenblock, geschärften Schritten und reduzierter Abschlussleiste; Umfang: ersetzt den kompletten Inhaltsblock innerhalb von .page--publish === -->
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
-        <div class="publish-hero-main">
-          <div class="publish-hero-copy">
-            <h1>Event veröffentlichen</h1>
-          </div>
+        <div class="publish-hero-copy">
+          <h1>Event veröffentlichen</h1>
+        </div>
 
-          <div class="content-actions content-actions--spaced content-actions--inline">
-            <a
-              class="content-cta content-cta--primary"
-              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-            >
-              Jetzt per Mail starten
-            </a>
-          </div>
+        <div class="publish-hero-actions content-actions content-actions--inline">
+          <a
+            class="content-cta content-cta--primary"
+            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+          >
+            Jetzt per Mail starten
+          </a>
         </div>
       </div>
     </header>
 
     <section class="content-card publish-benefits-card" aria-labelledby="publish-benefits">
       <h2 id="publish-benefits">Warum sich das für dich als Veranstalter lohnen kann</h2>
-      <ul class="locations-benefits publish-benefits-list">
-        <li><strong>Mehr Sichtbarkeit in Bocholt</strong>Deine Events erscheinen zusätzlich dort, wo Menschen gezielt nach Veranstaltungen in Bocholt suchen.</li>
-        <li><strong>Auch für neue Besucher sichtbar</strong>Du erreichst nicht nur Menschen, die deine Website schon kennen, sondern auch neue Interessierte aus dem lokalen Umfeld.</li>
-        <li><strong>Passendes, kuratiertes Umfeld</strong>Bocholt erleben soll kein beliebiges Schwarzes Brett sein, sondern eine gepflegte Plattform mit ausgewählten, relevanten Veranstaltungen.</li>
-        <li><strong>Mehr Präsenz für deine Location</strong>Perspektivisch kann neben deinen Events auch deine Location selbst auf Bocholt erleben sichtbar werden.</li>
-        <li><strong>Später mit mehr Einblicken</strong>Perspektivisch sollen auch einfache Auswertungen möglich werden, etwa zur Sichtbarkeit deiner Events oder deiner Location auf der Plattform.</li>
+
+      <ul class="publish-benefits-grid" aria-label="Heutige Vorteile für Veranstalter">
+        <li>
+          <strong>Mehr Sichtbarkeit in Bocholt</strong>
+          <span>Deine Events erscheinen zusätzlich dort, wo Menschen nach Veranstaltungen in Bocholt suchen.</span>
+        </li>
+        <li>
+          <strong>Auch neue Besucher erreichen</strong>
+          <span>Du erreichst nicht nur Stammgäste, sondern auch Menschen, die dich noch nicht gezielt kennen.</span>
+        </li>
+        <li>
+          <strong>Kuratiertes Umfeld</strong>
+          <span>Deine Events erscheinen auf einer gepflegten Plattform mit ausgewählten, relevanten Veranstaltungen.</span>
+        </li>
       </ul>
+
+      <div class="publish-benefits-future" aria-labelledby="publish-benefits-future">
+        <h3 id="publish-benefits-future">Perspektivisch zusätzlich</h3>
+
+        <ul class="publish-benefits-grid publish-benefits-grid--future" aria-label="Perspektivische Vorteile für Veranstalter">
+          <li>
+            <strong>Mehr Präsenz für deine Location</strong>
+            <span>Neben Events kann später auch deine Location selbst auf Bocholt erleben sichtbar werden.</span>
+          </li>
+          <li>
+            <strong>Einblicke zur Sichtbarkeit</strong>
+            <span>Später sollen auch einfache Auswertungen zur Präsenz deiner Events oder deiner Location möglich werden.</span>
+          </li>
+        </ul>
+      </div>
     </section>
 
     <section class="content-card publish-plans-card" aria-labelledby="publish-plans">
@@ -104,19 +125,19 @@
             <li>Name des Veranstalters oder der Location</li>
             <li>Ansprechpartner</li>
             <li>Rechnungsdaten</li>
-            <li>Link zu Website, Kalender oder einer Quelle, aus der neue Events übernommen werden können</li>
+            <li>Link zu Website, Kalender oder passender Eventquelle</li>
           </ul>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-2">
           <h3 id="publish-step-2">2. Quelle und Paket klären</h3>
-          <p>Wir klären einmal, aus welcher Quelle deine Events kommen, welches Paket zu dir passt und wie die Abrechnung läuft.</p>
+          <p>Wir klären Quelle, Paket und die nötigen Rechnungsdaten einmal gemeinsam.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-3">
           <h3 id="publish-step-3">3. Events einreichen</h3>
-          <p>Danach sollen neue Events und Änderungen möglichst direkt aus deiner Website, deinem Kalender, einer Schnittstelle oder einer passenden Vorlage übernommen werden.</p>
-          <p>Im besten Fall musst du nicht jeden Termin einzeln schicken.</p>
+          <p>Danach sollen neue Events und Änderungen möglichst direkt aus deiner Website, deinem Kalender oder einer passenden Vorlage übernommen werden.</p>
+          <p>Im besten Fall musst du keine Termine einzeln schicken.</p>
         </section>
       </div>
     </section>
@@ -125,7 +146,7 @@
       <article class="content-card publish-contact-card" aria-labelledby="publish-contact-start">
         <div class="publish-contact-copy">
           <h2 id="publish-contact-start">Alles klar?</h2>
-          <p class="content-note">Dann kannst du jetzt per Mail als Veranstalter starten.</p>
+          <p class="content-note">Dann kannst du jetzt starten.</p>
         </div>
 
         <div class="content-actions content-actions--inline">
@@ -141,7 +162,7 @@
       <article class="content-card publish-contact-card" aria-labelledby="publish-contact-questions">
         <div class="publish-contact-copy">
           <h2 id="publish-contact-questions">Noch Fragen?</h2>
-          <p class="content-note">Dann schreib uns kurz, was du vorab klären möchtest.</p>
+          <p class="content-note">Dann schreib uns kurz.</p>
         </div>
 
         <div class="content-actions content-actions--inline">
@@ -154,7 +175,7 @@
         </div>
       </article>
     </section>
-    <!-- === END BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V5 === -->
+    <!-- === END BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V6 === -->
 
   </main>
   <!-- === END BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) === -->
