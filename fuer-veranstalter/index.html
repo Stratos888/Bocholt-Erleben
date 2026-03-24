@@ -1,66 +1,58 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <!-- === BEGIN BLOCK: SEO BASICS (organizer info page) ===
-  Zweck:
-  - Diese Seite ist ab Enterprise V2 deprecated (Inhalt ist im Funnel /events-veroeffentlichen/ konsolidiert)
-  - Saubere Weiterleitung + Canonical auf die neue Zielseite
-  - Einheitliche Cache-Busting-Strategie (kein dev-Query mehr)
-  Umfang: Gesamter <head>-Bereich dieser Datei (innerhalb dieses Blocks).
-  === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_HEAD_V2 | Zweck: macht /fuer-veranstalter/ zur sauberen Legacy-Redirect-Seite auf den einzigen Veranstalter-Funnel; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Weiterleitung – Event veröffentlichen</title>
-  <meta name="description" content="Diese Seite wurde zusammengeführt. Bitte nutze die Seite „Event veröffentlichen“ für den Start als Veranstalter.">
+  <meta
+    name="description"
+    content="Diese Seite wurde zusammengeführt. Bitte nutze die Seite „Event veröffentlichen“ für den Start als Veranstalter."
+  >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
-
   <meta http-equiv="refresh" content="0; url=/events-veroeffentlichen/">
   <meta name="robots" content="noindex">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: SEO BASICS (organizer info page) === -->
-
+  <!-- === END BLOCK: ORGANIZER_REDIRECT_HEAD_V2 === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER INFO PAGE (scanable, trust-first) ===
-  Zweck:
-  - Enterprise V2: /fuer-veranstalter/ ist deprecated
-  - Verhindert 404 und leitet robust auf den einzigen Veranstalter-Funnel um
-  Umfang:
-  - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
-  === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_BODY_V2 | Zweck: rendert /fuer-veranstalter/ als robuste Redirect-Hülle mit gültigem HTML und klaren Ausweichpfaden; Umfang: kompletter Body dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
   <main class="page page--organizers">
-
     <header class="content-hero content-hero--panel">
-
-      <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/info/">Zurück zu Info</a>
-      </nav>
-
       <p class="content-kicker">Weiterleitung</p>
       <h1>Diese Seite wurde zusammengeführt</h1>
 
       <p class="content-lead">
-        Bitte nutze ab sofort die Seite „Event veröffentlichen“. Du wirst automatisch weitergeleitet.
+        Bitte nutze ab sofort den zentralen Veranstalter-Start. Du wirst automatisch weitergeleitet.
       </p>
 
-      <header class="content-hero content-hero--panel">
-        <div class="content-actions content-actions--spaced content-actions--inline">
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
           Zum Veranstalter-Start
         </a>
       </div>
 
-      <nav class="content-links" aria-label="Alternative">
+      <nav class="content-links" aria-label="Alternative Navigation">
+        <a class="content-link" href="/info/">Zur Info-Seite</a>
         <a class="content-link" href="/">Zurück zu den Events</a>
       </nav>
-
     </header>
-
   </main>
-  <!-- === END BLOCK: ORGANIZER INFO PAGE (scanable, trust-first) === -->
-
+  <!-- === END BLOCK: ORGANIZER_REDIRECT_BODY_V2 === -->
 </body>
 </html>
