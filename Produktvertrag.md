@@ -45,8 +45,8 @@ Er dient außerdem als **Single Source of Truth** für:
 | Tarif        | Preis / Monat | Events (Tokens)      | Zielgruppe                            |
 | ------------ | ------------- | -------------------- | ------------------------------------- |
 | Starter      | 9,99 €        | bis 3 Events / Monat | kleine Veranstalter                   |
-| Professional | 19,99 €       | bis 8 Events / Monat | aktive Veranstaltungsplaner           |
-| Unlimited    | 39,99 €       | unbegrenzt           | Viel-Veranstalter, Clubs, Gastronomen |
+| Aktiv        | 19,99 €       | bis 8 Events / Monat | aktive Veranstalter                   |
+| Unbegrenzt   | 29,99 €       | unbegrenzt           | Viel-Veranstalter, Clubs, Gastronomen |
 
 ### Allgemeine Regeln
 
