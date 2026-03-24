@@ -1,31 +1,23 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: SEO BASICS (publish page) ===
-  Zweck: Basis-SEO für die Aktionsseite "Events veröffentlichen".
-  Umfang: Gesamter <head>-Bereich dieser Datei.
-  === -->
+  <!-- === BEGIN BLOCK: SEO_BASICS_PUBLISH_PAGE_V3 | Zweck: schärft die SEO-Basis für die kanonische Veranstalter-Seite mit Mitgliedschaft, Regeln und Start per Mail; Umfang: kompletter <head>-Bereich dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Event veröffentlichen in Bocholt | Bocholt erleben</title>
-  <meta name="description" content="Events in Bocholt veröffentlichen: Pakete für Veranstalter, zusätzliche lokale Sichtbarkeit und einfacher Start per Mail.">
+  <meta
+    name="description"
+    content="Event in Bocholt veröffentlichen: monatliche Pakete für Veranstalter, klare Mitgliedschaftsregeln, redaktionelle Prüfung und Start per Mail."
+  >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: SEO BASICS (publish page) === -->
+  <!-- === END BLOCK: SEO_BASICS_PUBLISH_PAGE_V3 === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) ===
-  Zweck:
-  - Macht /events-veroeffentlichen/ zur einzigen, klaren Veranstalter-Funnel-Seite
-  - Reduziert Redundanz (kein /fuer-veranstalter/-Verweis mehr)
-  - App-like: Explain → Trust → Steps → Requirements → CTA (ohne Preiseite)
-  Umfang:
-  - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
-  === -->
-  <!-- === BEGIN BLOCK: SUBPAGE_APP_HEADER_V1 | Zweck: zieht die /info/-Header-DNA auf diese Unterseite; Umfang: fügt den globalen App-Header direkt vor dem Seiteninhalt ein === -->
+  <!-- === BEGIN BLOCK: PUBLISH_PAGE_FUNNEL_V8 | Zweck: bringt /events-veroeffentlichen/ auf den finalen linearen Funnel ohne Hero-CTA, ohne Perspektiv-Teil, mit eigenem Regelblock und einem einzigen Abschluss-CTA; Umfang: kompletter <body>-Inhalt dieser Datei === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -36,24 +28,15 @@
       <span class="app-title">Bocholt erleben</span>
     </a>
   </header>
-  <!-- === END BLOCK: SUBPAGE_APP_HEADER_V1 === -->
 
   <main class="page page--publish">
-
-    <!-- === BEGIN BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V6 | Zweck: verdichtet /events-veroeffentlichen/ auf den finalen 9.5–10/10-Funnel mit klarerem Hero, heute-vs.-perspektivisch getrenntem Nutzenblock, geschärften Schritten und reduzierter Abschlussleiste; Umfang: ersetzt den kompletten Inhaltsblock innerhalb von .page--publish === -->
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
-        </div>
-
-        <div class="publish-hero-actions content-actions content-actions--inline">
-          <a
-            class="content-cta content-cta--primary"
-            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-          >
-            Jetzt per Mail starten
-          </a>
+          <p class="content-lead">
+            Der Start läuft aktuell per Mail und im Rahmen einer aktiven Mitgliedschaft. Jedes Event wird vor der Veröffentlichung redaktionell geprüft.
+          </p>
         </div>
       </div>
     </header>
@@ -75,25 +58,11 @@
           <span>Deine Events erscheinen auf einer gepflegten Plattform mit ausgewählten, relevanten Veranstaltungen.</span>
         </li>
       </ul>
-
-      <div class="publish-benefits-future" aria-labelledby="publish-benefits-future">
-        <h3 id="publish-benefits-future">Perspektivisch zusätzlich</h3>
-
-        <ul class="publish-benefits-grid publish-benefits-grid--future" aria-label="Perspektivische Vorteile für Veranstalter">
-          <li>
-            <strong>Mehr Präsenz für deine Location</strong>
-            <span>Neben Events kann später auch deine Location selbst auf Bocholt erleben sichtbar werden.</span>
-          </li>
-          <li>
-            <strong>Einblicke zur Sichtbarkeit</strong>
-            <span>Später sollen auch einfache Auswertungen zur Präsenz deiner Events oder deiner Location möglich werden.</span>
-          </li>
-        </ul>
-      </div>
     </section>
 
     <section class="content-card publish-plans-card" aria-labelledby="publish-plans">
       <h2 id="publish-plans">Pakete</h2>
+
       <ul class="publish-plans" aria-label="Monatliche Pakete">
         <li>
           <strong>Starter</strong>
@@ -108,9 +77,33 @@
           <span>29,99&nbsp;€ / Monat · unbegrenzt</span>
         </li>
       </ul>
+
       <p class="content-note publish-plans-note">
         Alle Pakete sind monatlich kündbar. Die Abrechnung läuft aktuell per Rechnung.
       </p>
+    </section>
+
+    <section class="content-card publish-rules-card" aria-labelledby="publish-rules">
+      <h2 id="publish-rules">Wichtige Regeln</h2>
+
+      <ul class="publish-rules-list" aria-label="Verbindliche Grundregeln">
+        <li>
+          <strong>Aktive Mitgliedschaft</strong>
+          <span>Eine aktive Mitgliedschaft ist Voraussetzung für jede Event-Veröffentlichung.</span>
+        </li>
+        <li>
+          <strong>Jeder Termin zählt einzeln</strong>
+          <span>Jeder einzelne Event-Termin zählt als eigenes Event.</span>
+        </li>
+        <li>
+          <strong>Verbrauch erst bei Freigabe</strong>
+          <span>Ein Eventplatz wird erst bei redaktioneller Freigabe verbraucht.</span>
+        </li>
+        <li>
+          <strong>Kontingente verfallen monatlich</strong>
+          <span>Nicht genutzte Kontingente verfallen am Monatsende.</span>
+        </li>
+      </ul>
     </section>
 
     <section class="content-card publish-start-card" aria-labelledby="publish-start">
@@ -119,66 +112,54 @@
       <div class="publish-steps-flow">
         <section class="publish-step" aria-labelledby="publish-step-1">
           <h3 id="publish-step-1">1. Kontakt aufnehmen</h3>
-          <p>Du meldest dich erstmals per Mail.</p>
-          <p class="content-note">Das brauchen wir von dir:</p>
+          <p>Schick uns eine Mail.</p>
+          <p class="content-note">Bitte gib Folgendes an:</p>
           <ul class="locations-benefits publish-step-list">
             <li>Name des Veranstalters oder der Location</li>
             <li>Ansprechpartner</li>
             <li>Rechnungsdaten</li>
-            <li>Link zu Website, Kalender oder passender Eventquelle</li>
+            <li>Website, Kalender oder passende Eventquelle</li>
           </ul>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-2">
           <h3 id="publish-step-2">2. Quelle und Paket klären</h3>
-          <p>Wir klären Quelle, Paket und die nötigen Rechnungsdaten einmal gemeinsam.</p>
+          <p>Wir prüfen die Quelle, legen das passende Paket fest und stimmen die Rechnungsdaten einmal sauber ab.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-3">
-          <h3 id="publish-step-3">3. Events einreichen</h3>
-          <p>Danach sollen neue Events und Änderungen möglichst direkt aus deiner Website, deinem Kalender oder einer passenden Vorlage übernommen werden.</p>
-          <p>Im besten Fall musst du keine Termine einzeln schicken.</p>
+          <h3 id="publish-step-3">3. Events strukturiert übernehmen</h3>
+          <p>Neue Termine und Änderungen werden danach strukturiert aus deiner Website, deinem Kalender oder einer passenden Vorlage übernommen.</p>
+          <p>Ziel ist, dass du Termine nicht jedes Mal einzeln per Mail schicken musst.</p>
         </section>
       </div>
     </section>
 
-    <section class="content-grid content-grid--2 publish-contact-grid" aria-label="Kontaktmöglichkeiten für Veranstalter">
-      <article class="content-card publish-contact-card" aria-labelledby="publish-contact-start">
-        <div class="publish-contact-copy">
-          <h2 id="publish-contact-start">Alles klar?</h2>
-          <p class="content-note">Dann kannst du jetzt starten.</p>
-        </div>
+    <section class="content-card publish-final-card" aria-labelledby="publish-final">
+      <div class="publish-final-copy">
+        <h2 id="publish-final">Als Veranstalter starten</h2>
+        <p class="content-note">
+          Wenn alles passt, kannst du jetzt direkt starten. Für Rückfragen gibt es daneben den kurzen Kontaktweg.
+        </p>
+      </div>
 
-        <div class="content-actions content-actions--inline">
-          <a
-            class="content-cta content-cta--primary"
-            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-          >
-            Jetzt per Mail starten
-          </a>
-        </div>
-      </article>
+      <div class="content-actions content-actions--inline publish-final-actions">
+        <a
+          class="content-cta content-cta--primary"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+        >
+          Jetzt per Mail starten
+        </a>
 
-      <article class="content-card publish-contact-card" aria-labelledby="publish-contact-questions">
-        <div class="publish-contact-copy">
-          <h2 id="publish-contact-questions">Noch Fragen?</h2>
-          <p class="content-note">Dann schreib uns kurz.</p>
-        </div>
-
-        <div class="content-actions content-actions--inline">
-          <a
-            class="content-cta"
-            href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Frage%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20noch%20eine%20Frage%20zu%20Bocholt%20erleben%20als%20Veranstalter.%0A%0AMeine%20Frage%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-          >
-            Fragen per Mail
-          </a>
-        </div>
-      </article>
+        <a
+          class="content-cta"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Frage%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20noch%20eine%20Frage%20zu%20Bocholt%20erleben%20als%20Veranstalter.%0A%0AMeine%20Frage%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+        >
+          Fragen per Mail
+        </a>
+      </div>
     </section>
-    <!-- === END BLOCK: PUBLISH_PAGE_PROCESS_FUNNEL_V6 === -->
-
   </main>
-  <!-- === END BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) === -->
-
+  <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V8 === -->
 </body>
 </html>
