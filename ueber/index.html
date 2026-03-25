@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ABOUT_PAGE_REFERENCE_V4 | Zweck: konsolidiert /ueber/ zur einzigen Plattformseite mit ruhigem Hero, drei Kernkarten und kompakter Rechts-/Service-Zone; Umfang: ersetzt den kompletten <body>-Inhalt dieser Datei === -->
+  <!-- === BEGIN BLOCK: ABOUT_PAGE_REFERENCE_V5 | Zweck: bringt /ueber/ auf denselben Reifegrad wie /events-veroeffentlichen/ mit geführtem Hero, geschärften Kernkarten und sauberem Rechtliches-Abschluss; Umfang: kompletter <body>-Inhalt dieser Datei === -->
   <!-- === BEGIN BLOCK: SUBPAGE_APP_HEADER_V1 | Zweck: übernimmt den konsolidierten Subpage-Header; Umfang: fügt den globalen App-Header direkt vor dem Seiteninhalt ein === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
@@ -32,49 +32,53 @@
   <!-- === END BLOCK: SUBPAGE_APP_HEADER_V1 === -->
 
   <main class="page page--about">
-    <!-- === BEGIN BLOCK: ABOUT_PAGE_HERO_LAYOUT_V6 | Zweck: ersetzt auf /ueber/ den Hero durch die finale, klare Intro-Struktur ohne Kicker mit vertikaler Werte-Liste; Umfang: nur Hero innerhalb von .page--about === -->
+    <!-- === BEGIN BLOCK: ABOUT_PAGE_HERO_LAYOUT_V7 | Zweck: schärft auf /ueber/ den Hero mit klarer Intro-Spalte links und ruhigem Werteblock rechts; Umfang: nur Hero innerhalb von .page--about === -->
     <header class="content-hero content-hero--panel">
       <div class="about-hero-layout">
-        <h1 class="about-hero-title">Über Bocholt erleben</h1>
+        <div class="about-hero-copy">
+          <h1 class="about-hero-title">Über Bocholt erleben</h1>
 
-        <p class="content-lead about-hero-lead">
-          Bocholt erleben bündelt Veranstaltungen, Orte und weitere Aktivitäten aus Bocholt und Umgebung
-          in einer klaren Übersicht, damit du schneller findest, was zu dir passt.
-        </p>
+          <p class="content-lead about-hero-lead">
+            Bocholt erleben bündelt Veranstaltungen, Orte und weitere Aktivitäten aus Bocholt und Umgebung
+            in einer klaren Übersicht, damit du schneller findest, was zu dir passt.
+          </p>
+        </div>
 
-        <ul class="about-hero-values" aria-label="Werte von Bocholt erleben">
-          <li>Übersichtlich</li>
-          <li>Nachvollziehbar</li>
-          <li>Seriös</li>
-        </ul>
+        <aside class="about-hero-values-card" aria-labelledby="about-values-title">
+          <p class="about-hero-values-title" id="about-values-title">Auf einen Blick</p>
+
+          <ul class="about-hero-values" aria-label="Werte von Bocholt erleben">
+            <li>Übersichtlich</li>
+            <li>Nachvollziehbar</li>
+            <li>Seriös</li>
+          </ul>
+        </aside>
       </div>
     </header>
-    <!-- === END BLOCK: ABOUT_PAGE_HERO_LAYOUT_V6 === -->
-    <section class="content-grid content-grid--3" aria-label="Über Bocholt erleben">
+    <!-- === END BLOCK: ABOUT_PAGE_HERO_LAYOUT_V7 === -->
+
+    <section class="content-grid content-grid--3 content-grid--balanced about-focus-grid" aria-label="Über Bocholt erleben">
       <article class="content-card" aria-labelledby="about-idea">
         <h2 id="about-idea">Die Idee dahinter</h2>
         <p>
-          Viele Hinweise zu Veranstaltungen, Orten und Aktivitäten verteilen sich auf unterschiedliche
-          Quellen und gehen im Alltag leicht unter. Bocholt erleben sammelt Relevantes an einem Ort
-          und macht sichtbar, was es aktuell zu entdecken gibt.
+          Veranstaltungen, Orte und Aktivitäten verteilen sich oft auf viele Quellen. Bocholt erleben bündelt
+          Relevantes an einem Ort, damit Aktuelles schneller sichtbar wird.
         </p>
       </article>
 
       <article class="content-card" aria-labelledby="about-principles">
         <h2 id="about-principles">Wofür Bocholt erleben steht</h2>
         <p>
-          Die Plattform steht für ruhige Gestaltung, klare Struktur und nachvollziehbare Informationen.
-          Ziel ist eine verlässliche Orientierung, die schnell erfassbar bleibt und ohne unnötige
-          Reizüberladung auskommt.
+          Die Plattform setzt auf ruhige Gestaltung, klare Struktur und nachvollziehbare Informationen.
+          So bleibt Orientierung verlässlich und ohne unnötige Reizüberladung erfassbar.
         </p>
       </article>
 
       <article class="content-card" aria-labelledby="about-benefit">
         <h2 id="about-benefit">Dein Nutzen</h2>
         <p>
-          Du siehst schneller, was in Bocholt und Umgebung interessant ist, ohne mehrere Seiten parallel
-          prüfen zu müssen. So sparst du Zeit und findest passende Veranstaltungen, Locations und weitere
-          Aktivitäten direkter.
+          Du erkennst schneller, was in Bocholt und Umgebung relevant ist. So prüfst du weniger Seiten
+          parallel und findest passende Veranstaltungen, Orte und Aktivitäten direkter.
         </p>
       </article>
     </section>
@@ -83,7 +87,7 @@
       <div class="about-legal-copy">
         <h2 id="about-legal">Rechtliches</h2>
         <p class="content-note">
-          Impressum und Datenschutz zu Bocholt erleben findest du hier gesammelt.
+          Impressum und Datenschutz findest du hier gesammelt und schnell erreichbar.
         </p>
       </div>
 
@@ -92,6 +96,7 @@
         <a class="content-link" href="/datenschutz/">Datenschutz</a>
       </nav>
     </section>
-    <!-- === END BLOCK: ABOUT_PAGE_CONTENT_REFINEMENT_V5 === -->
   </main>
-  <!-- === END BLOCK: ABOUT_PAGE_REFERENCE_V4 === -->
+  <!-- === END BLOCK: ABOUT_PAGE_REFERENCE_V5 === -->
+</body>
+</html>
