@@ -540,7 +540,7 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 | Zweck: setzt auf /ueber/ den finalen Hero ohne Kicker mit klarer Werte-Liste um und hält den Rechtliches-Abschluss mobil kompakt; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V6 | Zweck: hebt /ueber/ auf denselben Qualitätsstand wie /events-veroeffentlichen/ mit geführtem Hero, klareren Mittelkarten und präziserem Rechtliches-Abschluss; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
@@ -548,7 +548,7 @@
 }
 
 .page--about .content-hero--panel{
-  padding: 24px 24px 22px;
+  padding: 26px 26px 24px;
 }
 
 .page--about .content-hero h1{
@@ -557,8 +557,14 @@
 
 .page--about .about-hero-layout{
   display: grid;
-  gap: 16px;
+  gap: 18px;
   align-items: start;
+}
+
+.page--about .about-hero-copy{
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
 .page--about .about-hero-title{
@@ -569,9 +575,28 @@
   max-width: 42ch;
 }
 
+.page--about .about-hero-values-card{
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 14px 16px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.58);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.74) inset;
+}
+
+.page--about .about-hero-values-title{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
 .page--about .about-hero-values{
   display: grid;
-  gap: 12px;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -582,10 +607,15 @@
   align-items: center;
   gap: 10px;
   margin: 0;
+  padding: 10px 0;
   color: var(--color-text-primary);
-  font-size: 0.96rem;
+  font-size: 0.95rem;
   font-weight: 720;
   line-height: 1.28;
+}
+
+.page--about .about-hero-values li + li{
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .page--about .about-hero-values li::before{
@@ -598,33 +628,47 @@
   opacity: 0.72;
 }
 
+.page--about .about-focus-grid{
+  width: min(100%, var(--subpage-body-max));
+}
+
+.page--about .about-focus-grid > .content-card{
+  min-height: 100%;
+  gap: 10px;
+  align-content: start;
+}
+
+.page--about .about-focus-grid p{
+  max-width: none;
+}
+
 .page--about .about-legal-card{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
-  gap: 12px;
+  gap: 14px;
   align-content: start;
 }
 
 .page--about .about-legal-copy{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   align-content: start;
 }
 
 .page--about .about-legal-card .content-note{
-  max-width: 50ch;
+  max-width: 42ch;
 }
 
 .page--about .about-legal-card .content-links{
-  gap: 4px;
+  gap: 6px;
 }
 
 .page--about .about-legal-card .content-link{
   min-height: 42px;
   padding-block: 9px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V6 === */
 
 /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE | Zweck: stellt die verlorene mobile/base-Struktur von /events-veroeffentlichen/ wieder her, damit Listen, Karten und Abschluss-Grid nicht auf Browser-Defaults zurückfallen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero,
@@ -1115,53 +1159,50 @@
     padding: 30px 34px 26px;
   }
 
-  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V4 | Zweck: hält /ueber/ bei 1024 sauber einspaltig im Hero, erzwingt keine zweizeilige H1 und stapelt Rechtliches rechts hinter der Trennlinie vertikal; Umfang: nur page--about im 900px-Breakpoint === */
-  .page--about{
-    --subpage-body-max: 1136px;
-  }
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V5 | Zweck: bringt /ueber/ auf Desktop auf denselben Reifegrad wie /events-veroeffentlichen/ mit stabilen Kartenhöhen und sauberem Rechtliches-Abschluss; Umfang: nur page--about im 900px-Breakpoint === */
+.page--about{
+  --subpage-body-max: 1136px;
+}
 
-  .page--about .content-hero--panel{
-    padding: 24px 24px 22px;
-  }
+.page--about .content-hero--panel{
+  padding: 28px 30px 24px;
+}
 
-  .page--about .about-hero-title{
-    max-width: none;
-  }
+.page--about .about-focus-grid > .content-card{
+  min-height: 100%;
+  align-content: start;
+}
 
-  .page--about .about-hero-lead{
-    max-width: 42ch;
-  }
+.page--about .about-legal-card{
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 26px;
+  row-gap: 10px;
+  align-items: center;
+}
 
-  .page--about .about-legal-card{
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 26px;
-    row-gap: 8px;
-    align-items: center;
-  }
+.page--about .about-legal-copy{
+  max-width: 46ch;
+}
 
-  .page--about .about-legal-copy{
-    max-width: 54ch;
-  }
+.page--about .about-legal-card .content-links{
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  align-self: stretch;
+  width: 188px;
+  padding-left: 18px;
+  border-left: 1px solid var(--cmp-divider-strong);
+}
 
-  .page--about .about-legal-card .content-links{
-    grid-column: 2;
-    grid-row: 1;
-    display: grid;
-    gap: 4px;
-    align-content: center;
-    align-self: stretch;
-    width: 188px;
-    padding-left: 18px;
-    border-left: 1px solid var(--cmp-divider-strong);
-  }
-
-  .page--about .about-legal-card .content-link{
-    width: 100%;
-    min-width: 0;
-    min-height: 40px;
-    padding: 8px 10px;
-  }
-  /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V4 === */
+.page--about .about-legal-card .content-link{
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V5 === */
 
 /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V10 | Zweck: schärft /events-veroeffentlichen/ auf Desktop mit klarerer Bereichshierarchie, luftigerem Bullet-Block und präziserem Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
@@ -1365,37 +1406,34 @@
     padding: 32px 38px 28px;
   }
 
-  /* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V4 | Zweck: stellt /ueber/ auf Wide-Desktop auf den finalen Hero mit linker Intro-Spalte und rechter Werte-Liste um, ohne die Content-Breite zu brechen; Umfang: nur page--about ab 1280px === */
-  .page--about .content-hero--panel{
-    padding: 28px 32px 24px;
-  }
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V5 | Zweck: schärft /ueber/ auf Wide-Desktop mit klarem Hero-Zweispalter und ruhigem Werteblock rechts; Umfang: nur page--about ab 1280px === */
+.page--about .content-hero--panel{
+  padding: 30px 34px 26px;
+}
 
-  .page--about .about-hero-layout{
-    grid-template-columns: minmax(0, 620px) 220px;
-    grid-template-areas:
-      "title ."
-      "lead values";
-    column-gap: 72px;
-    row-gap: 16px;
-    align-items: start;
-  }
+.page--about .about-hero-layout{
+  grid-template-columns: minmax(0, 1fr) 256px;
+  grid-template-areas: "copy values";
+  column-gap: 40px;
+  row-gap: 0;
+  align-items: start;
+}
 
-  .page--about .about-hero-title{
-    grid-area: title;
-  }
+.page--about .about-hero-copy{
+  grid-area: copy;
+}
 
-  .page--about .about-hero-lead{
-    grid-area: lead;
-    max-width: 44ch;
-  }
+.page--about .about-hero-lead{
+  max-width: 44ch;
+}
 
-  .page--about .about-hero-values{
-    grid-area: values;
-    width: 220px;
-    min-width: 220px;
-    justify-self: start;
-  }
-  /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V4 === */
+.page--about .about-hero-values-card{
+  grid-area: values;
+  width: 256px;
+  min-width: 256px;
+  justify-self: end;
+}
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V5 === */
 
 
 
