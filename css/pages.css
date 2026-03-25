@@ -40,7 +40,7 @@
 }
 /* === END BLOCK: INFO_HUB_RAIL_V2 === */
 
-/* === BEGIN BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 | Zweck: hält Rechtstext-Seiten schmal, gleich breit und sauber mittig in der Rail; Umfang: ersetzt die gemeinsame Breiten-/Ausrichtungs-Definition für about/publish/imprint/privacy/organizers === */
+/* === BEGIN BLOCK: SUBPAGE_LEGAL_ALIGNMENT_ROOT_CAUSE_FIX_V3 | Zweck: behebt auf Impressum/Datenschutz die echte Kernursache der Fehlfluchtung, indem Hero und Legal-Content explizit auf derselben Achse zentriert werden und der Legal-Hero dieselbe Nutzbreite wie der Body verwendet; Umfang: ersetzt den bisherigen Legal-Breitenblock inkl. doppeltem End-Marker === */
 .page--about,
 .page--publish,
 .page--imprint,
@@ -62,10 +62,22 @@
 .page--imprint,
 .page--privacy{
   --subpage-body-max: 910px;
-  justify-items: center;
 }
-/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 === */
-/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 === */
+
+.page--imprint .content-hero,
+.page--privacy .content-hero,
+.page--imprint .content-card,
+.page--privacy .content-card,
+.page--imprint .content-grid,
+.page--privacy .content-grid{
+  justify-self: center;
+}
+
+.page--imprint .content-hero,
+.page--privacy .content-hero{
+  width: min(100%, var(--subpage-body-max));
+}
+/* === END BLOCK: SUBPAGE_LEGAL_ALIGNMENT_ROOT_CAUSE_FIX_V3 === */
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
