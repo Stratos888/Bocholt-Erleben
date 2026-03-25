@@ -1105,10 +1105,9 @@
   }
   /* === END BLOCK: INFO_DESKTOP_HUB_RAIL_V2 === */
 
+  /* === BEGIN BLOCK: SUBPAGE_DESKTOP_LEGAL_WIDTH_FIX_V1 | Zweck: trennt im Desktop-Breakpoint die breiten Content-Seiten von den schmalen Rechtstext-Seiten, damit auf /impressum/ und /datenschutz/ Hero und Card exakt gleich breit bleiben; Umfang: ersetzt die gemeinsame Desktop-Variablen-Zuweisung für about/publish/imprint/privacy/organizers === */
   .page--about,
   .page--publish,
-  .page--imprint,
-  .page--privacy,
   .page--organizers{
     --subpage-hero-max: 910px;
     --subpage-body-max: 1088px;
@@ -1117,6 +1116,17 @@
     --subpage-card-pad-y: 20px;
     --subpage-hero-gap: 14px;
   }
+
+  .page--imprint,
+  .page--privacy{
+    --subpage-hero-max: 910px;
+    --subpage-body-max: 910px;
+    --subpage-stack-gap: 24px;
+    --subpage-card-pad-x: 22px;
+    --subpage-card-pad-y: 20px;
+    --subpage-hero-gap: 14px;
+  }
+  /* === END BLOCK: SUBPAGE_DESKTOP_LEGAL_WIDTH_FIX_V1 === */
 
   .content-hero--panel{
     padding: 30px 34px 26px;
