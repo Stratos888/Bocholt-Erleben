@@ -540,7 +540,7 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V6 | Zweck: hebt /ueber/ auf denselben Qualitätsstand wie /events-veroeffentlichen/ mit geführtem Hero, klareren Mittelkarten und präziserem Rechtliches-Abschluss; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 | Zweck: setzt /ueber/ auf die sichere Basis mit ruhigem Einspalten-Hero ohne rechten Werteblock und präzisem Rechtliches-Abschluss; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
@@ -557,7 +557,7 @@
 
 .page--about .about-hero-layout{
   display: grid;
-  gap: 18px;
+  gap: 0;
   align-items: start;
 }
 
@@ -572,60 +572,11 @@
 }
 
 .page--about .about-hero-lead{
-  max-width: 42ch;
+  max-width: 48ch;
 }
 
 .page--about .about-hero-values-card{
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  padding: 14px 16px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.58);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.74) inset;
-}
-
-.page--about .about-hero-values-title{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.94rem;
-  font-weight: 760;
-  line-height: 1.24;
-}
-
-.page--about .about-hero-values{
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.page--about .about-hero-values li{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  padding: 10px 0;
-  color: var(--color-text-primary);
-  font-size: 0.95rem;
-  font-weight: 720;
-  line-height: 1.28;
-}
-
-.page--about .about-hero-values li + li{
-  border-top: 1px solid var(--cmp-divider-strong);
-}
-
-.page--about .about-hero-values li::before{
-  content: "";
-  width: 6px;
-  height: 6px;
-  flex: 0 0 6px;
-  border-radius: 999px;
-  background: var(--color-text-primary);
-  opacity: 0.72;
+  display: none;
 }
 
 .page--about .about-focus-grid{
@@ -668,7 +619,7 @@
   min-height: 42px;
   padding-block: 9px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V6 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 === */
 
 /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE | Zweck: stellt die verlorene mobile/base-Struktur von /events-veroeffentlichen/ wieder her, damit Listen, Karten und Abschluss-Grid nicht auf Browser-Defaults zurückfallen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero,
@@ -1159,13 +1110,30 @@
     padding: 30px 34px 26px;
   }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V5 | Zweck: bringt /ueber/ auf Desktop auf denselben Reifegrad wie /events-veroeffentlichen/ mit stabilen Kartenhöhen und sauberem Rechtliches-Abschluss; Umfang: nur page--about im 900px-Breakpoint === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V6 | Zweck: hält /ueber/ auf Desktop im ruhigen Einspalten-Hero, blendet den rechten Werteblock aus und bindet den Rechtliches-Text einzeilig an den Abschluss an; Umfang: nur page--about im 900px-Breakpoint === */
 .page--about{
   --subpage-body-max: 1136px;
 }
 
 .page--about .content-hero--panel{
   padding: 28px 30px 24px;
+}
+
+.page--about .about-hero-layout{
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.page--about .about-hero-copy{
+  max-width: 60ch;
+}
+
+.page--about .about-hero-lead{
+  max-width: 56ch;
+}
+
+.page--about .about-hero-values-card{
+  display: none;
 }
 
 .page--about .about-focus-grid > .content-card{
@@ -1182,6 +1150,10 @@
 
 .page--about .about-legal-copy{
   max-width: 46ch;
+}
+
+.page--about .about-legal-card .content-note{
+  white-space: nowrap;
 }
 
 .page--about .about-legal-card .content-links{
@@ -1202,7 +1174,7 @@
   min-height: 40px;
   padding: 8px 10px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V5 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V6 === */
 
 /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V10 | Zweck: schärft /events-veroeffentlichen/ auf Desktop mit klarerer Bereichshierarchie, luftigerem Bullet-Block und präziserem Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
@@ -1406,34 +1378,29 @@
     padding: 32px 38px 28px;
   }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V5 | Zweck: schärft /ueber/ auf Wide-Desktop mit klarem Hero-Zweispalter und ruhigem Werteblock rechts; Umfang: nur page--about ab 1280px === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V6 | Zweck: setzt /ueber/ auf Wide-Desktop auf einen ruhigen Einspalten-Hero ohne rechten Werteblock und mit späterem Lead-Umbruch; Umfang: nur page--about ab 1280px === */
 .page--about .content-hero--panel{
   padding: 30px 34px 26px;
 }
 
 .page--about .about-hero-layout{
-  grid-template-columns: minmax(0, 1fr) 256px;
-  grid-template-areas: "copy values";
-  column-gap: 40px;
-  row-gap: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: start;
 }
 
 .page--about .about-hero-copy{
-  grid-area: copy;
+  max-width: 64ch;
 }
 
 .page--about .about-hero-lead{
-  max-width: 44ch;
+  max-width: 58ch;
 }
 
 .page--about .about-hero-values-card{
-  grid-area: values;
-  width: 256px;
-  min-width: 256px;
-  justify-self: end;
+  display: none;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V5 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V6 === */
 
 
 
