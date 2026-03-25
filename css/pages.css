@@ -65,6 +65,7 @@
   justify-items: center;
 }
 /* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 === */
+/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 === */
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
