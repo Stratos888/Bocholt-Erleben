@@ -626,7 +626,7 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V8 | Zweck: setzt /events-veroeffentlichen/ auf den validierten Zielzustand mit ruhigem Hero, sauber abgesetzten Bereichstiteln, kombiniertem Mitgliedschaftsblock, kompakterem Startbereich und gestuftem Abschluss; Umfang: nur page--publish außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V9 | Zweck: setzt /events-veroeffentlichen/ auf den validierten Zielzustand mit fixierbarem Hero-Umbruch, sauber abgesetzten Bereichstiteln, kombiniertem Mitgliedschaftsblock mit Bullet-Logik, kompakterem Startbereich und gestuftem Abschluss; Umfang: nur page--publish außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero,
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
@@ -656,6 +656,10 @@
   margin: 0;
   max-width: 58ch;
   text-wrap: pretty;
+}
+
+.page--publish .publish-hero-lead-break{
+  display: none;
 }
 
 .page--publish .publish-benefits-card,
@@ -776,32 +780,31 @@
   display: grid;
   gap: 10px;
   margin: 0;
-  padding: 0;
-  list-style: none;
+  padding: 0 0 0 1.2rem;
+  list-style: disc;
 }
 
 .page--publish .publish-rules-list li{
-  display: grid;
-  gap: 4px;
+  display: list-item;
   margin: 0;
-  padding: 12px 14px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.52);
+  color: var(--cmp-copy-color);
+  font-size: 0.91rem;
+  line-height: 1.5;
 }
 
 .page--publish .publish-rules-list strong{
-  display: block;
+  display: inline;
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: inherit;
   font-weight: 760;
-  line-height: 1.24;
+  line-height: inherit;
 }
 
 .page--publish .publish-rules-list span{
-  color: var(--cmp-copy-color);
-  font-size: 0.9rem;
-  line-height: 1.45;
+  display: inline;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .page--publish .publish-steps-flow{
@@ -811,15 +814,14 @@
 
 .page--publish .publish-step{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
-  padding-top: 18px;
-  border-top: 1px solid var(--cmp-divider-strong);
+  padding: 0 0 12px;
 }
 
-.page--publish .publish-step:first-child{
-  padding-top: 0;
-  border-top: 0;
+.page--publish .publish-step + .publish-step{
+  padding-top: 20px;
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-step h3{
@@ -910,7 +912,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V8 === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V9 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
@@ -1159,13 +1161,17 @@
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V4 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V8 | Zweck: bringt /events-veroeffentlichen/ auf Desktop in den validierten Zielzustand mit späterem Hero-Umbruch, klarer Titelabsetzung, kombiniertem Mitgliedschaftsblock und 2/3–1/3-Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V9 | Zweck: bringt /events-veroeffentlichen/ auf Desktop in den validierten Zielzustand mit fixem Hero-Umbruch nach Satz 1, klarer Titelabsetzung, Bullet-Logik im Mitgliedschaftsblock und 2/3–1/3-Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
   --subpage-body-max: 1088px;
 }
 
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 69ch;
+  max-width: 76ch;
+}
+
+.page--publish .publish-hero-lead-break{
+  display: block;
 }
 
 .page--publish .publish-section-head{
@@ -1206,11 +1212,6 @@
   white-space: nowrap;
 }
 
-.page--publish .publish-rules-list{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 18px;
-}
-
 .page--publish .publish-final-grid{
   grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
   gap: 12px;
@@ -1230,7 +1231,7 @@
 .page--publish .content-actions--inline .content-cta--primary{
   min-width: 0;
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V8 === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V9 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
@@ -1325,17 +1326,28 @@
     align-content: start;
   }
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V8 | Zweck: hält /events-veroeffentlichen/ ab 1024px bei ruhigen 2x2-Regeln und synchronisiert Kartenhöhen im Mitgliedschaftsblock; Umfang: nur page--publish im 1024px-Breakpoint === */
-.page--publish .publish-rules-list{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 18px;
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V9 | Zweck: justiert /events-veroeffentlichen/ auf Wide-Desktop mit fixem Hero-Umbruch nach Satz 1, ruhigerem Mitgliedschaftsblock und stabiler 2/3–1/3-Abschlussverteilung; Umfang: nur page--publish ab 1280px === */
+.page--publish .publish-hero-copy .content-lead{
+  max-width: 78ch;
 }
 
-.page--publish .publish-plans li,
-.page--publish .publish-rules-list li{
-  min-height: 100%;
+.page--publish .publish-section-head .content-note{
+  max-width: 60ch;
 }
-/* === END BLOCK: PUBLISH_PAGE_GRID_DESKTOP_V8 === */
+
+.page--publish .publish-benefits-grid li{
+  padding-inline: 22px;
+}
+
+.page--publish .publish-membership-layout{
+  gap: 22px;
+}
+
+.page--publish .publish-final-grid{
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 14px;
+}
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V9 === */
 }
 
 @media (min-width: 1280px){
@@ -1379,28 +1391,7 @@
   }
   /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V4 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V8 | Zweck: schärft /events-veroeffentlichen/ auf Wide-Desktop mit späterem Hero-Umbruch, ruhigerem Mitgliedschaftsblock und stabiler 2/3–1/3-Abschlussverteilung; Umfang: nur page--publish ab 1280px === */
-.page--publish .publish-hero-copy .content-lead{
-  max-width: 74ch;
-}
 
-.page--publish .publish-section-head .content-note{
-  max-width: 60ch;
-}
-
-.page--publish .publish-benefits-grid li{
-  padding-inline: 22px;
-}
-
-.page--publish .publish-membership-layout{
-  gap: 22px;
-}
-
-.page--publish .publish-final-grid{
-  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-  gap: 14px;
-}
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V8 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{
