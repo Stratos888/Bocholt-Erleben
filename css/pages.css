@@ -40,7 +40,7 @@
 }
 /* === END BLOCK: INFO_HUB_RAIL_V2 === */
 
-/* === BEGIN BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V1 | Zweck: gleicht auf den rechtlichen Seiten die Kartenbreite an die Hero-Breite an, damit Impressum und Datenschutz konsistent wirken; Umfang: ersetzt die gemeinsame Breiten-Definition für about/publish/imprint/privacy/organizers === */
+/* === BEGIN BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 | Zweck: hält Rechtstext-Seiten schmal, gleich breit und sauber mittig in der Rail; Umfang: ersetzt die gemeinsame Breiten-/Ausrichtungs-Definition für about/publish/imprint/privacy/organizers === */
 .page--about,
 .page--publish,
 .page--imprint,
@@ -62,8 +62,9 @@
 .page--imprint,
 .page--privacy{
   --subpage-body-max: 910px;
+  justify-items: center;
 }
-/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V1 === */
+/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V2 === */
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
