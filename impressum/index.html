@@ -17,19 +17,22 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: IMPRINT PAGE CONTENT ===
-  Zweck: Rechtliche Anbieterkennzeichnung (Impressum) als eigene Seite.
-  Umfang: Gesamter <body>-Inhalt dieser Datei.
-  === -->
-   <main class="page page--imprint">
-    <header class="content-hero content-hero--panel">
-      <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/info/">Zurück zu Info</a>
-      </nav>
+  <!-- === BEGIN BLOCK: IMPRINT_PAGE_SUBPAGE_ALIGNMENT_V2 | Zweck: richtet /impressum/ strukturell an /ueber/ und /events-veroeffentlichen/ aus, entfernt Sondernavigation und übernimmt den konsolidierten Subpage-Header; Umfang: kompletter <body>-Inhalt dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
 
-      <p class="content-kicker">Bocholt erleben</p>
+  <main class="page page--imprint">
+    <header class="content-hero content-hero--panel">
       <h1>Impressum</h1>
-      <p class="content-lead">Anbieterkennzeichnung und Kontakt.</p>
+      <p class="content-lead">Anbieterkennzeichnung und Kontakt von Bocholt erleben.</p>
     </header>
 
     <section class="content-card" aria-labelledby="imprint-details">
@@ -43,7 +46,8 @@
 
       <p>
         <strong>Kontakt:</strong><br>
-        E-Mail: mathias@bocholt-erleben.de
+        E-Mail:
+        <a href="mailto:mathias@bocholt-erleben.de">mathias@bocholt-erleben.de</a>
       </p>
 
       <p>
@@ -52,12 +56,7 @@
         Gildhaus-Esch 18a
       </p>
     </section>
-
-    <nav class="content-links" aria-label="Weiter">
-      <a class="content-link" href="/">Zurück zu den Events</a>
-    </nav>
   </main>
-
-  <!-- === END BLOCK: IMPRINT PAGE CONTENT === -->
+  <!-- === END BLOCK: IMPRINT_PAGE_SUBPAGE_ALIGNMENT_V2 === -->
 </body>
 </html>
