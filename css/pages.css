@@ -626,69 +626,258 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V5 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V10 | Zweck: schärft /events-veroeffentlichen/ auf Desktop mit klarerer Bereichshierarchie, luftigerem Bullet-Block und präziserem Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
-.page--publish{
-  --subpage-body-max: 1088px;
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE | Zweck: stellt die verlorene mobile/base-Struktur von /events-veroeffentlichen/ wieder her, damit Listen, Karten und Abschluss-Grid nicht auf Browser-Defaults zurückfallen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+.page--publish .content-hero,
+.page--publish .publish-benefits-card,
+.page--publish .publish-membership-card,
+.page--publish .publish-start-card,
+.page--publish .publish-final-card{
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
+}
+
+.page--publish .content-hero{
+  --subpage-hero-gap: 0;
+}
+
+.page--publish .publish-hero-layout{
+  display: grid;
+  gap: 10px;
+  align-items: start;
+}
+
+.page--publish .publish-hero-copy{
+  display: grid;
+  gap: 8px;
+  min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 76ch;
+  margin: 0;
+  max-width: 58ch;
+  text-wrap: pretty;
 }
 
 .page--publish .publish-hero-lead-break{
-  display: block;
+  display: none;
+}
+
+.page--publish .publish-benefits-card,
+.page--publish .publish-membership-card,
+.page--publish .publish-start-card,
+.page--publish .publish-final-card{
+  gap: 18px;
 }
 
 .page--publish .publish-section-head{
-  padding-bottom: 18px;
+  display: grid;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-section-head h2{
+  margin: 0;
+  line-height: 1.2;
 }
 
 .page--publish .publish-benefits-grid{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .page--publish .publish-benefits-grid li{
-  padding: 0 20px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 0;
 }
 
 .page--publish .publish-benefits-grid li + li{
-  border-top: 0;
-  border-left: 1px solid var(--cmp-divider-strong);
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
-.page--publish .publish-benefits-grid li:first-child{
-  padding-left: 0;
+.page--publish .publish-benefits-grid strong{
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1.24;
 }
 
-.page--publish .publish-benefits-grid li:last-child{
-  padding-right: 0;
+.page--publish .publish-benefits-grid span{
+  color: var(--cmp-copy-color);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .page--publish .publish-membership-layout{
-  gap: 22px;
+  display: grid;
+  gap: 18px;
 }
 
-.page--publish .publish-plans{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.page--publish .publish-membership-block{
+  display: grid;
   gap: 14px;
 }
 
+.page--publish .publish-membership-block-head{
+  display: grid;
+  gap: 4px;
+}
+
+.page--publish .publish-membership-block-head h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
+.page--publish .publish-membership-divider{
+  block-size: 1px;
+  background: var(--cmp-divider-strong);
+}
+
+.page--publish .publish-plans{
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page--publish .publish-plans li{
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.52);
+}
+
+.page--publish .publish-plans strong{
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: 760;
+  line-height: 1.22;
+}
+
+.page--publish .publish-plans span{
+  color: var(--cmp-copy-color);
+  font-size: 0.91rem;
+  line-height: 1.42;
+}
+
 .page--publish .publish-plans-note{
-  white-space: nowrap;
+  max-width: none;
 }
 
 .page--publish .publish-rules-list{
-  gap: 16px;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0 0 0 1.2rem;
+  list-style: disc;
+}
+
+.page--publish .publish-rules-list li{
+  display: list-item;
+  margin: 0;
+  color: var(--cmp-copy-color);
+  font-size: 0.91rem;
+  line-height: 1.58;
+}
+
+.page--publish .publish-rules-list strong{
+  display: inline;
+  color: var(--color-text-primary);
+  font-size: inherit;
+  font-weight: 760;
+  line-height: inherit;
+}
+
+.page--publish .publish-rules-list span{
+  display: inline;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.page--publish .publish-steps-flow{
+  display: grid;
+  gap: 0;
+}
+
+.page--publish .publish-step{
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 0 0 16px;
+}
+
+.page--publish .publish-step + .publish-step{
+  padding-top: 24px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-step h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
+.page--publish .publish-step p{
+  margin: 0;
+  max-width: 78ch;
 }
 
 .page--publish .publish-final-grid{
-  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  display: grid;
   gap: 12px;
-  align-items: stretch;
 }
 
 .page--publish .publish-final-panel{
-  min-height: 100%;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-height: 0;
+  padding: 15px 16px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.52);
+}
+
+.page--publish .publish-final-panel--primary{
+  background: color-mix(in srgb, white 86%, var(--color-primary-muted));
+  border-color: rgba(139,207,74,0.42);
+  box-shadow:
+    0 10px 24px rgba(92,122,46,0.05),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.page--publish .publish-final-panel h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-weight: 760;
+  line-height: 1.24;
+}
+
+.page--publish .publish-final-panel .content-note{
+  max-width: none;
+}
+
+.page--publish .publish-final-actions{
+  display: grid;
+  gap: 10px;
+  justify-items: stretch;
 }
 
 .page--publish .publish-final-actions .content-cta,
@@ -698,9 +887,34 @@
 }
 
 .page--publish .content-actions--inline .content-cta--primary{
-  min-width: 0;
+  min-width: clamp(216px, 20vw, 248px);
+  min-height: 48px;
+  padding-inline: 18px;
+  border-radius: var(--ui-radius-sm);
+  border-color: var(--ui-border-primary);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: var(--ui-font-weight-cta);
+  box-shadow: var(--ui-shadow-cta);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V10 === */
+
+.page--publish .content-actions--inline .content-cta--primary:visited{
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover){
+  .page--publish .content-actions--inline .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+    border-color: var(--ui-border-primary);
+  }
+}
+
+.page--publish .content-actions--inline .content-cta--primary:active{
+  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
+  box-shadow: var(--ui-shadow-cta-active);
+}
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
