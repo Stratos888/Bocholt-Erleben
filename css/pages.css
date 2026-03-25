@@ -1110,7 +1110,7 @@
     padding: 30px 34px 26px;
   }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V6 | Zweck: hält /ueber/ auf Desktop im ruhigen Einspalten-Hero, blendet den rechten Werteblock aus und bindet den Rechtliches-Text einzeilig an den Abschluss an; Umfang: nur page--about im 900px-Breakpoint === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V7 | Zweck: korrigiert auf /ueber/ den zu frühen Lead-Umbruch auf Desktop durch spätere Textbegrenzung und lässt den Hero wieder voller genutzt wirken; Umfang: nur page--about im 900px-Breakpoint === */
 .page--about{
   --subpage-body-max: 1136px;
 }
@@ -1125,11 +1125,11 @@
 }
 
 .page--about .about-hero-copy{
-  max-width: 60ch;
+  max-width: 80ch;
 }
 
 .page--about .about-hero-lead{
-  max-width: 56ch;
+  max-width: 74ch;
 }
 
 .page--about .about-hero-values-card{
@@ -1174,7 +1174,7 @@
   min-height: 40px;
   padding: 8px 10px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V6 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V7 === */
 
 /* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V10 | Zweck: schärft /events-veroeffentlichen/ auf Desktop mit klarerer Bereichshierarchie, luftigerem Bullet-Block und präziserem Abschluss; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
@@ -1378,7 +1378,7 @@
     padding: 32px 38px 28px;
   }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V6 | Zweck: setzt /ueber/ auf Wide-Desktop auf einen ruhigen Einspalten-Hero ohne rechten Werteblock und mit späterem Lead-Umbruch; Umfang: nur page--about ab 1280px === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V7 | Zweck: korrigiert auf /ueber/ den zu frühen Lead-Umbruch auf Wide-Desktop durch deutlich spätere Textbegrenzung bei unverändert ruhigem Einspalten-Hero; Umfang: nur page--about ab 1280px === */
 .page--about .content-hero--panel{
   padding: 30px 34px 26px;
 }
@@ -1390,17 +1390,17 @@
 }
 
 .page--about .about-hero-copy{
-  max-width: 64ch;
+  max-width: 84ch;
 }
 
 .page--about .about-hero-lead{
-  max-width: 58ch;
+  max-width: 78ch;
 }
 
 .page--about .about-hero-values-card{
   display: none;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V6 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V7 === */
 
 
 
