@@ -40,18 +40,30 @@
 }
 /* === END BLOCK: INFO_HUB_RAIL_V2 === */
 
+/* === BEGIN BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V1 | Zweck: gleicht auf den rechtlichen Seiten die Kartenbreite an die Hero-Breite an, damit Impressum und Datenschutz konsistent wirken; Umfang: ersetzt die gemeinsame Breiten-Definition für about/publish/imprint/privacy/organizers === */
 .page--about,
 .page--publish,
 .page--imprint,
 .page--privacy,
 .page--organizers{
   --subpage-hero-max: 910px;
-  --subpage-body-max: 1088px;
   --subpage-stack-gap: 22px;
   --subpage-card-pad-x: 20px;
   --subpage-card-pad-y: 20px;
   --subpage-hero-gap: 14px;
 }
+
+.page--about,
+.page--publish,
+.page--organizers{
+  --subpage-body-max: 1088px;
+}
+
+.page--imprint,
+.page--privacy{
+  --subpage-body-max: 910px;
+}
+/* === END BLOCK: SUBPAGE_LEGAL_WIDTH_ALIGNMENT_V1 === */
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
