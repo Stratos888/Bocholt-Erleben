@@ -493,103 +493,85 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V4 | Zweck: reduziert den mobilen Veranstalter-Hinweis auf eine ruhige Utility-Zeile statt eines Button-Objekts, damit der Funnel klar sichtbar ist, aber nicht wie Werbung oder eine halbe Card wirkt; Umfang: ersetzt die bisherige MOBILE_PUBLISH_FUNNEL_STRIP_V3-Styles vollständig, Desktop bleibt unangetastet === */
-.mobile-publish-strip{
+/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 | Zweck: implementiert eine kompakte, vom Event-Card-Look bewusst abgesetzte Service-Card im Feed-Raster; Umfang: ersetzt vollständig den bisherigen Funnel-Strip; Desktop bleibt unangetastet === */
+
+.mobile-publish-card{
   display: none;
 }
 
 @media (max-width: 899.98px){
-  .mobile-publish-strip{
+  .mobile-publish-card{
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    column-gap: 8px;
-    row-gap: 0;
-    margin: 6px var(--gutter) 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .mobile-publish-strip__eyebrow{
-    margin: 0;
-    color: rgba(99,119,149,0.82);
-    font-size: 0.70rem;
-    font-weight: 820;
-    line-height: 1.2;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .mobile-publish-strip__row{
-    display: inline-flex;
-    align-items: baseline;
-    justify-content: flex-start;
     gap: 6px;
-    min-width: 0;
+
+    margin: 12px var(--gutter) 6px;
+    padding: 12px 14px;
+
+    border-radius: 16px;
+    border: 1px solid rgba(95,141,47,0.10);
+
+    background: linear-gradient(
+      180deg,
+      rgba(245,249,237,0.9),
+      rgba(255,255,255,0.85)
+    );
+
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 6px 18px rgba(22,39,61,0.035);
   }
 
-  .mobile-publish-strip__text{
-    display: none;
-  }
+  .mobile-publish-card__eyebrow{
+    margin: 0;
+    color: rgba(95,141,47,0.85);
 
-  .mobile-publish-strip__cta{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: auto;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: #5f8d2f;
-    font-size: 0.88rem;
-    font-weight: 760;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     line-height: 1.2;
+  }
+
+  .mobile-publish-card__title{
+    margin: 0;
+
+    color: #1f3552;
+
+    font-size: 0.95rem;
+    font-weight: 720;
+    line-height: 1.25;
+  }
+
+  .mobile-publish-card__cta{
+    margin-top: 2px;
+
+    color: #5f8d2f;
+
+    font-size: 0.9rem;
+    font-weight: 760;
+
     text-decoration: none;
     text-underline-offset: 0.14em;
-    box-shadow: none;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mobile-publish-strip__cta::after{
-    content: "›";
-    margin-left: 4px;
-    color: rgba(95,141,47,0.88);
-    font-weight: 760;
+  .mobile-publish-card__cta:active{
+    opacity: 0.8;
   }
 
-  .mobile-publish-strip__cta:active{
-    transform: none;
-    opacity: 0.82;
-  }
-
-  .mobile-publish-strip__cta:focus-visible{
+  .mobile-publish-card__cta:focus-visible{
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
     border-radius: 6px;
   }
 }
 
-@media (max-width: 389.98px){
-  .mobile-publish-strip{
-    grid-template-columns: 1fr;
-    align-items: start;
-    row-gap: 2px;
-  }
-
-  .mobile-publish-strip__row{
-    justify-content: flex-start;
-  }
-
-  .mobile-publish-strip__cta{
-    font-size: 0.86rem;
-  }
-}
-/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V4 === */
-
+/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
