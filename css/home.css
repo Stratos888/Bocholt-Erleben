@@ -493,32 +493,26 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V4 | Zweck: korrigiert die Breite exakt auf Event-Card-Raster und verbessert gleichzeitig die visuelle Absetzung auf Enterprise-Niveau; Umfang: ersetzt V3 vollständig === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V1 | Zweck: styled den Veranstalter-CTA robust als mobile Utility-Row direkt im Top-Stack und deckt dabei sowohl alten Card-Markup-Stand als auch neuen Strip-Markup-Stand ab; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
 
-.mobile-publish-card{
+.mobile-publish-card,
+.mobile-publish-strip{
   display: none;
 }
 
 @media (max-width: 899.98px){
-  .mobile-publish-card{
-    display: grid;
-    gap: 4px;
-    align-content: center;
-    min-height: 64px;
-
-    /* ❗ FIX: keine eigene horizontale Einrückung mehr */
-    margin: 12px 0 8px;
-    padding: 11px 14px 12px;
-
-    border: 1px solid rgba(22,39,61,0.05);
-    border-radius: 16px;
-
-    /* ❗ FIX: bessere Absetzung vom Background */
-    background: rgba(255,255,255,0.85);
-
-    /* ❗ FIX: Shadow entfernt → weniger „Box“, mehr Integration */
-    box-shadow: none;
-
+  .mobile-publish-card,
+  .mobile-publish-strip{
+    display: block;
+    position: relative;
+    min-height: 56px;
+    margin: 10px 0 8px;
+    padding: 10px 38px 10px 14px;
+    border: 1px solid rgba(22,39,61,0.055);
+    border-radius: var(--cmp-input-radius);
+    background: linear-gradient(180deg, rgba(234,246,219,0.56) 0%, rgba(255,255,255,0.74) 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.74) inset;
+    color: inherit;
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
   }
@@ -526,47 +520,76 @@
   .mobile-publish-card:link,
   .mobile-publish-card:visited,
   .mobile-publish-card:hover,
-  .mobile-publish-card:active{
+  .mobile-publish-card:active,
+  .mobile-publish-strip:link,
+  .mobile-publish-strip:visited,
+  .mobile-publish-strip:hover,
+  .mobile-publish-strip:active{
+    color: inherit;
     text-decoration: none;
   }
 
-  .mobile-publish-card__eyebrow{
-    margin: 0;
+  .mobile-publish-card::after,
+  .mobile-publish-strip::after{
+    content: "›";
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    font-size: 1.16rem;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+  }
 
-    /* ❗ etwas ruhiger */
-    color: rgba(99,119,149,0.60);
+  .mobile-publish-strip__copy{
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
 
+  .mobile-publish-strip__chevron{
+    display: none;
+  }
+
+  .mobile-publish-card__eyebrow,
+  .mobile-publish-strip__eyebrow{
+    display: block;
+    margin: 0 0 3px;
+    color: #6f8758;
     font-size: 0.68rem;
     font-weight: 760;
-    line-height: 1.15;
+    line-height: 1.1;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .mobile-publish-card__title{
+  .mobile-publish-card__title,
+  .mobile-publish-strip__title{
+    display: block;
     margin: 0;
-
-    /* ❗ weniger dominant als Event-Titel */
-    color: rgba(31,53,82,0.88);
-
-    font-size: 0.95rem;
-    font-weight: 660;
+    color: var(--color-text-primary);
+    font-size: 0.98rem;
+    font-weight: 720;
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
 
-  .mobile-publish-card:active{
+  .mobile-publish-card:active,
+  .mobile-publish-strip:active{
     transform: translateY(1px);
-    background: rgba(248,250,244,0.95);
+    background: linear-gradient(180deg, rgba(234,246,219,0.68) 0%, rgba(255,255,255,0.82) 100%);
   }
 
-  .mobile-publish-card:focus-visible{
+  .mobile-publish-card:focus-visible,
+  .mobile-publish-strip:focus-visible{
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V4 === */
+/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V1 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
