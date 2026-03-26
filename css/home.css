@@ -492,6 +492,94 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
+/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 | Zweck: gestaltet den mobilen Veranstalter-CTA als kompakten, nicht-sticky Inline-Strip unter dem Top-Stack; Umfang: nur Mobile/Narrow-Tablet bis 899.98px, Desktop bleibt unangetastet === */
+.mobile-publish-strip{
+  display: none;
+}
+
+@media (max-width: 899.98px){
+  .mobile-publish-strip{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin: 10px var(--gutter) 2px;
+    padding: 14px 14px 14px 16px;
+    border: 1px solid rgba(22,39,61,0.08);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.86);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.92) inset,
+      0 10px 24px rgba(22,39,61,0.035);
+  }
+
+  .mobile-publish-strip__copy{
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .mobile-publish-strip__eyebrow{
+    margin: 0;
+    color: rgba(22,39,61,0.56);
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .mobile-publish-strip__text{
+    margin: 0;
+    color: rgba(22,39,61,0.82);
+    font-size: 0.94rem;
+    font-weight: 620;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+
+  .mobile-publish-strip__cta{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: start;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(22,39,61,0.08);
+    border-radius: 14px;
+    background: rgba(245,249,237,0.98);
+    color: #1f3552;
+    font-size: 0.94rem;
+    font-weight: 760;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-publish-strip__cta:active{
+    transform: translateY(1px);
+  }
+
+  .mobile-publish-strip__cta:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 3px;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 899.98px){
+  .mobile-publish-strip{
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-publish-strip__cta{
+    align-self: center;
+    white-space: nowrap;
+  }
+}
+/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 === */
+
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
