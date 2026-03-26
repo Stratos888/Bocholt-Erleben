@@ -492,7 +492,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 | Zweck: gestaltet den mobilen Veranstalter-CTA als kompakten, nicht-sticky Inline-Strip unter dem Top-Stack; Umfang: nur Mobile/Narrow-Tablet bis 899.98px, Desktop bleibt unangetastet === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V2 | Zweck: macht den mobilen Veranstalter-Funnel zu einem kleinen Inline-Strip im Feed und lässt den sticky Top-Stack unberührt; Umfang: ersetzt die bisherige mobile Funnel-Card vollständig, Desktop bleibt unangetastet === */
 .mobile-publish-strip{
   display: none;
 }
@@ -500,57 +500,56 @@
 @media (max-width: 899.98px){
   .mobile-publish-strip{
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-    margin: 10px var(--gutter) 2px;
-    padding: 14px 14px 14px 16px;
-    border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.86);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 10px 24px rgba(22,39,61,0.035);
-  }
-
-  .mobile-publish-strip__copy{
-    display: grid;
-    gap: 4px;
-    min-width: 0;
+    gap: 6px;
+    margin: 8px var(--gutter) 4px;
+    padding: 10px 12px;
+    border: 1px solid rgba(22,39,61,0.06);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.88) inset;
   }
 
   .mobile-publish-strip__eyebrow{
     margin: 0;
-    color: rgba(22,39,61,0.56);
-    font-size: 0.74rem;
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.12em;
+    color: rgba(99,119,149,0.82);
+    font-size: 0.70rem;
+    font-weight: 820;
+    line-height: 1.15;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+  }
+
+  .mobile-publish-strip__row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
   }
 
   .mobile-publish-strip__text{
     margin: 0;
-    color: rgba(22,39,61,0.82);
-    font-size: 0.94rem;
-    font-weight: 620;
-    line-height: 1.35;
-    text-wrap: balance;
+    color: #22364f;
+    font-size: 0.92rem;
+    font-weight: 680;
+    line-height: 1.2;
+    min-width: 0;
   }
 
   .mobile-publish-strip__cta{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    align-self: start;
-    min-height: 44px;
-    padding: 0 14px;
-    border: 1px solid rgba(22,39,61,0.08);
-    border-radius: 14px;
-    background: rgba(245,249,237,0.98);
-    color: #1f3552;
-    font-size: 0.94rem;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid rgba(111,135,88,0.18);
+    border-radius: 12px;
+    background: rgba(241,247,232,0.96);
+    color: #5f8d2f;
+    font-size: 0.86rem;
     font-weight: 760;
     line-height: 1;
+    white-space: nowrap;
     text-decoration: none;
     box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset;
     -webkit-tap-highlight-color: transparent;
@@ -566,19 +565,17 @@
   }
 }
 
-@media (min-width: 390px) and (max-width: 899.98px){
-  .mobile-publish-strip{
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
+@media (max-width: 389.98px){
+  .mobile-publish-strip__row{
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
   }
 
   .mobile-publish-strip__cta{
-    align-self: center;
-    white-space: nowrap;
+    justify-self: start;
   }
 }
-/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 === */
+/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V2 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
