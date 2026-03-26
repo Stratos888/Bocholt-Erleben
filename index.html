@@ -211,15 +211,22 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 </div>
 <!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
-<!-- === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 | Zweck: ersetzt die bisherige Utility-Zeile durch eine feed-integrierte, klar unterscheidbare Service-Card für Veranstalter; Umfang: nur Mobile-Funnel vor Event-Feed === -->
-<section class="mobile-publish-card" aria-label="Für Veranstalter">
-  <p class="mobile-publish-card__eyebrow">Für Veranstalter</p>
-  <p class="mobile-publish-card__title">Eigenes Event einreichen</p>
-  <a class="mobile-publish-card__cta" href="/events-veroeffentlichen/">
-    Event veröffentlichen →
+<!-- === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V2 | Zweck: repariert den fehlenden Feed-Container und hebt den Mobile-Funnel auf einen kompakten, vollständig klickbaren 2-Zeilen-Service-Slot; Umfang: ersetzt den bisherigen Veranstalter-Block und stellt #event-cards direkt danach wieder her === -->
+<section class="events-section">
+  <a
+    class="mobile-publish-card"
+    href="/events-veroeffentlichen/"
+    aria-label="Für Veranstalter – Event veröffentlichen"
+  >
+    <span class="mobile-publish-card__eyebrow">Für Veranstalter</span>
+    <span class="mobile-publish-card__title">Event veröffentlichen</span>
   </a>
+
+  <div id="event-cards" class="event-cards-grid">
+    <!-- Event cards werden hier dynamisch eingefügt -->
+  </div>
 </section>
-<!-- === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 === -->
+<!-- === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V2 === -->
 
 
    
