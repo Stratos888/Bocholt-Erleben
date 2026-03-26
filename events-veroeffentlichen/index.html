@@ -1,32 +1,23 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: SEO BASICS (publish page) ===
-  Zweck: Basis-SEO für die Aktionsseite "Events veröffentlichen".
-  Umfang: Gesamter <head>-Bereich dieser Datei.
-  === -->
+  <!-- === BEGIN BLOCK: SEO_BASICS_PUBLISH_PAGE_V4 | Zweck: schärft die SEO-Basis für die kanonische Veranstalter-Seite mit Mitgliedschaft, Paketen und Start per Mail; Umfang: kompletter <head>-Bereich dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Events veröffentlichen in Bocholt</title>
-    <meta name="description" content="Events in Bocholt veröffentlichen: Infos für Veranstalter, Voraussetzungen (Mitgliedschaft & Event-Tokens) und der Ablauf zum Start.">
-
+  <title>Event veröffentlichen in Bocholt | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Event in Bocholt veröffentlichen: Mitgliedschaft mit monatlichen Paketen, klare Kontingentlogik und einfacher Start per Mail."
+  >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
-    <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: SEO BASICS (publish page) === -->
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: SEO_BASICS_PUBLISH_PAGE_V4 === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) ===
-  Zweck:
-  - Macht /events-veroeffentlichen/ zur einzigen, klaren Veranstalter-Funnel-Seite
-  - Reduziert Redundanz (kein /fuer-veranstalter/-Verweis mehr)
-  - App-like: Explain → Trust → Steps → Requirements → CTA (ohne Preiseite)
-  Umfang:
-  - Gesamter <body>-Inhalt dieser Datei (innerhalb dieses Blocks)
-  === -->
-  <!-- === BEGIN BLOCK: SUBPAGE_APP_HEADER_V1 | Zweck: zieht die /info/-Header-DNA auf diese Unterseite; Umfang: fügt den globalen App-Header direkt vor dem Seiteninhalt ein === -->
+  <!-- === BEGIN BLOCK: PUBLISH_PAGE_FUNNEL_V11 | Zweck: bringt /events-veroeffentlichen/ auf den finalen Polish-Stand mit präziserem Mitgliedschaftsblock, gestrafften Startschritten und klarerem Abschluss; Umfang: kompletter <body>-Inhalt dieser Datei === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -37,118 +28,151 @@
       <span class="app-title">Bocholt erleben</span>
     </a>
   </header>
-  <!-- === END BLOCK: SUBPAGE_APP_HEADER_V1 === -->
 
   <main class="page page--publish">
-
     <header class="content-hero content-hero--panel">
-
-      <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/ueber/">Zurück zu Über Bocholt erleben</a>
-      </nav>
-
-      <p class="content-kicker">Für Veranstalter in Bocholt</p>
-
-      <h1>Event veröffentlichen</h1>
-
-      <p class="content-lead">
-        Du schickst uns die Basisdaten und eine offizielle Quelle – wir kümmern uns um den Start
-        und schalten dich als Veranstalter frei.
-      </p>
-
-      <div class="content-actions content-actions--spaced content-actions--inline">
-        <a
-          class="content-cta content-cta--primary"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20%2F%20Location%3A%0AWebsite%20(optional)%3A%0AErstes%20Event%20(Quelle-Link)%3A%0AFalls%20mehrere%20Events%3A%20kurz%20notieren%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-        >
-          Als Veranstalter starten
-        </a>
+      <div class="publish-hero-layout">
+        <div class="publish-hero-copy">
+          <h1>Event veröffentlichen</h1>
+          <p class="content-lead">
+            Der Start läuft aktuell per Mail und im Rahmen einer aktiven Mitgliedschaft. <span class="publish-hero-lead-break" aria-hidden="true"></span>Jedes Event wird vor der Veröffentlichung redaktionell geprüft.
+          </p>
+        </div>
       </div>
-
     </header>
 
+    <section class="content-card publish-benefits-card" aria-labelledby="publish-benefits">
+      <div class="publish-section-head">
+        <h2 id="publish-benefits">Warum sich das für dich als Veranstalter lohnen kann</h2>
+      </div>
 
-
-       <!-- === BEGIN BLOCK: PUBLISH PAGE TRUST INTRO ENTERPRISE V2 (adds operator trust signal) ===
-    Zweck:
-    - Ergänzt persönlichen Vertrauens-Satz direkt am Einstieg in den Funnel
-    - Erhöht Antwort- und Kontaktwahrscheinlichkeit
-    Umfang:
-    - Fügt nur Trust-Note vor dem ersten Content-Card Abschnitt ein
-    === -->
-    <p class="content-note">
-      Du schreibst direkt mit dem Betreiber der Plattform – keine automatisierten Antworten.
-    </p>
-
-    <section class="content-card content-card--primary" aria-labelledby="principles">
-    <!-- === END BLOCK: PUBLISH PAGE TRUST INTRO ENTERPRISE V2 (adds operator trust signal) === -->
-
-      <h2 id="principles">Was du bekommst</h2>
-      <ul class="locations-benefits">
-        <li>Ruhige, übersichtliche Darstellung – ohne Werbung und ohne optische Bevorzugung</li>
-        <li>Jedes Event mit Link zur offiziellen Quelle (Transparenz und Vertrauen)</li>
-        <li>Ein fester Ansprechpartner – schnelle Klärung statt Formular-Chaos</li>
+      <ul class="publish-benefits-grid" aria-label="Heutige Vorteile für Veranstalter">
+        <li>
+          <strong>Mehr Sichtbarkeit in Bocholt und Umgebung</strong>
+          <span>Deine Events erscheinen zusätzlich dort, wo Menschen nach Veranstaltungen in Bocholt und Umgebung suchen.</span>
+        </li>
+        <li>
+          <strong>Auch neue Besucher erreichen</strong>
+          <span>Du erreichst nicht nur Stammgäste, sondern auch Menschen, die dich noch nicht gezielt kennen.</span>
+        </li>
+        <li>
+          <strong>Kuratiertes Umfeld</strong>
+          <span>Deine Events erscheinen auf einer gepflegten Plattform mit ausgewählten, relevanten Veranstaltungen.</span>
+        </li>
       </ul>
     </section>
 
+    <section class="content-card publish-membership-card" aria-labelledby="publish-membership">
+      <div class="publish-section-head">
+        <h2 id="publish-membership">Mitgliedschaft</h2>
+      </div>
 
+      <div class="publish-membership-layout">
+        <section class="publish-membership-block" aria-labelledby="publish-membership-plans">
+          <div class="publish-membership-block-head">
+            <h3 id="publish-membership-plans">Pakete</h3>
+          </div>
 
-    <section class="content-card" aria-labelledby="process">
-      <h2 id="process">So läuft der Start</h2>
-      <ol class="content-steps">
-        <li>Du schreibst uns per E-Mail („Als Veranstalter starten“).</li>
-        <li>Wir klären kurz die Datenbasis und richten deinen Zugang ein.</li>
-        <li>Danach kannst du Events veröffentlichen und aktuell halten.</li>
-      </ol>
+          <ul class="publish-plans" aria-label="Monatliche Pakete">
+            <li>
+              <strong>Starter</strong>
+              <span>9,99&nbsp;€ / Monat · bis zu 3 Events</span>
+            </li>
+            <li>
+              <strong>Aktiv</strong>
+              <span>19,99&nbsp;€ / Monat · bis zu 8 Events</span>
+            </li>
+            <li>
+              <strong>Unbegrenzt</strong>
+              <span>29,99&nbsp;€ / Monat · unbegrenzt</span>
+            </li>
+          </ul>
+
+          <p class="content-note publish-plans-note">
+            Alle Pakete sind monatlich kündbar. Die Abrechnung läuft aktuell per Rechnung.
+          </p>
+        </section>
+
+        <div class="publish-membership-divider" aria-hidden="true"></div>
+
+        <section class="publish-membership-block" aria-labelledby="publish-membership-how">
+          <div class="publish-membership-block-head">
+            <h3 id="publish-membership-how">So funktioniert's</h3>
+          </div>
+
+          <ul class="publish-rules-list" aria-label="So funktioniert die Mitgliedschaft">
+            <li><strong>Aktive Mitgliedschaft:</strong> <span>Voraussetzung für jede Event-Veröffentlichung.</span></li>
+            <li><strong>Jeder Termin zählt einzeln:</strong> <span>Jeder Event-Termin zählt als eigenes Event.</span></li>
+            <li><strong>Verbrauch erst bei Freigabe:</strong> <span>Ein Eventplatz wird erst bei redaktioneller Freigabe verbraucht.</span></li>
+            <li><strong>Kontingente verfallen monatlich:</strong> <span>Nicht genutzte Kontingente verfallen am Monatsende.</span></li>
+          </ul>
+        </section>
+      </div>
     </section>
 
+    <section class="content-card publish-start-card" aria-labelledby="publish-start">
+      <div class="publish-section-head">
+        <h2 id="publish-start">So startest du</h2>
+      </div>
 
+      <div class="publish-steps-flow">
+        <section class="publish-step" aria-labelledby="publish-step-1">
+          <h3 id="publish-step-1">1. Per Mail starten</h3>
+          <p>Die Mail-Vorlage öffnet sich direkt. Du ergänzt nur noch die Pflichtpunkte.</p>
+        </section>
 
-    <section class="content-card" aria-labelledby="requirements">
-      <h2 id="requirements">Was wir dafür brauchen</h2>
-      <ul class="locations-benefits">
-        <li>Name/Location und ein Ansprechpartner für Rückfragen</li>
-        <li>Für jedes Event: Titel, Datum/Uhrzeit, Ort</li>
-        <li>Ein Link zur offiziellen Quelle (Website/Veranstaltungskalender)</li>
-      </ul>
-      <p class="content-note">
-        Veröffentlichungen sind an eine aktive Mitgliedschaft mit Kontingent gebunden.
-        Details klären wir beim Start kurz per Mail.
-      </p>
+        <section class="publish-step" aria-labelledby="publish-step-2">
+          <h3 id="publish-step-2">2. Quelle und Paket klären</h3>
+          <p>Wir prüfen die Quelle, legen das passende Paket fest und stimmen die Rechnungsdaten ab.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-step-3">
+          <h3 id="publish-step-3">3. Events strukturiert übernehmen</h3>
+          <p>Danach übernehmen wir neue Termine und Änderungen strukturiert aus deiner Website, deinem Kalender oder einer passenden Vorlage.</p>
+        </section>
+      </div>
     </section>
 
+    <section class="content-card publish-final-card" aria-labelledby="publish-final">
+      <div class="publish-section-head">
+        <h2 id="publish-final">Nächster Schritt</h2>
+      </div>
 
+      <div class="publish-final-grid">
+        <section class="publish-final-panel publish-final-panel--primary" aria-labelledby="publish-final-primary">
+          <h3 id="publish-final-primary">Los geht's</h3>
+          <p class="content-note">
+            Wenn alles passt, öffnet der Button direkt die vorbereitete Mail-Vorlage für deinen Start.
+          </p>
 
-    <section class="content-card" aria-labelledby="faq">
-      <h2 id="faq">Kurz &amp; klar</h2>
-      <ul class="content-steps">
-        <li><strong>Wie schnell geht das?</strong> In der Regel nach kurzer Abstimmung.</li>
-        <li><strong>Kann ich Events später ändern?</strong> Ja – wir klären den einfachsten Weg für dich.</li>
-        <li><strong>Warum braucht ihr eine Quelle?</strong> Damit Besucher nachvollziehen können, woher die Infos kommen.</li>
-      </ul>
+          <div class="content-actions content-actions--inline publish-final-actions">
+            <a
+              class="content-cta content-cta--primary"
+              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+            >
+              Jetzt per Mail starten
+            </a>
+          </div>
+        </section>
+
+        <section class="publish-final-panel publish-final-panel--secondary" aria-labelledby="publish-final-secondary">
+          <h3 id="publish-final-secondary">Noch Fragen?</h3>
+          <p class="content-note">
+            Für Rückfragen gibt es daneben den kurzen Kontaktweg per Mail.
+          </p>
+
+          <div class="content-actions content-actions--inline publish-final-actions">
+            <a
+              class="content-cta"
+              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Frage%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20noch%20eine%20Frage%20zu%20Bocholt%20erleben%20als%20Veranstalter.%0A%0AMeine%20Frage%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+            >
+              Fragen per Mail
+            </a>
+          </div>
+        </section>
+      </div>
     </section>
-
-
-
-    <section class="content-card" aria-labelledby="more">
-      <h2 id="more">Navigation</h2>
-           <!-- === BEGIN BLOCK: PUBLISH PAGE BOTTOM NAV ENTERPRISE V2 (no duplicate back link) ===
-      Zweck:
-      - Entfernt doppelten „Zurück zu Info“-Link (oben existiert bereits der Back-Link)
-      - Behält sinnvolle Secondary Navigation (Über + Exit zu Events)
-      Umfang:
-      - Ersetzt nur die Bottom-Navigation in der „Navigation“-Card
-      === -->
-      <nav class="content-links" aria-label="Weiterführende Links">
-        <a class="content-link" href="/ueber/">Über Bocholt erleben</a>
-        <a class="content-link" href="/">Zurück zu den Events</a>
-      </nav>
-      <!-- === END BLOCK: PUBLISH PAGE BOTTOM NAV ENTERPRISE V2 (no duplicate back link) === -->
-
-    </section>
-
   </main>
-  <!-- === END BLOCK: PUBLISH PAGE ENTERPRISE V2 (single funnel, no redundancy) === -->
-
+  <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V11 === -->
 </body>
 </html>

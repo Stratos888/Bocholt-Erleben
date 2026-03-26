@@ -1,4 +1,4 @@
-# Produktvertrag – Mitgliedschaft & Event-Tokens (v1.0)
+# Produktvertrag – Mitgliedschaft & Event-Tokens (v1.1)
 
 **Projekt:** Bocholt erleben
 **Status:** Verbindlich beschlossen
@@ -7,19 +7,26 @@
 
 ---
 
-## 1. Ziel & Zweck
+## 1. Ziel, Zweck & Kanonische Rolle
 
 Dieser Produktvertrag definiert verbindlich das Modell für **Mitgliedschaften**, **Event-Tokens** und den **Prozess der Event-Einreichung** bei *Bocholt erleben*.
 
-Er dient als **Single Source of Truth** für:
+Er ist die **einzige kanonische Quelle** für:
+
+* Tarifnamen
+* Preise
+* Event-/Token-Logik
+* Mitgliedschaftsregeln
+* Einreichungs-, Freigabe- und Veröffentlichungsregeln
+
+Er dient außerdem als **Single Source of Truth** für:
 
 * Produktentscheidungen
 * spätere UI-Texte
 * Backend-Logik
 * Zahlungs- und Prüfprozesse
 
-Marketing-Texte, Infoseiten und technische Implementierungen werden **immer aus diesem Dokument abgeleitet**, nicht umgekehrt.
-
+`MASTER.md` darf strategische Richtung definieren, `ENGINEERING.md` technische Arbeitsregeln – aber **keine** dieser Dateien darf die in diesem Dokument festgelegte Produktlogik parallel neu definieren.
 ---
 
 ## 2. Grundprinzipien
@@ -38,8 +45,8 @@ Marketing-Texte, Infoseiten und technische Implementierungen werden **immer aus 
 | Tarif        | Preis / Monat | Events (Tokens)      | Zielgruppe                            |
 | ------------ | ------------- | -------------------- | ------------------------------------- |
 | Starter      | 9,99 €        | bis 3 Events / Monat | kleine Veranstalter                   |
-| Professional | 19,99 €       | bis 8 Events / Monat | aktive Veranstaltungsplaner           |
-| Unlimited    | 39,99 €       | unbegrenzt           | Viel-Veranstalter, Clubs, Gastronomen |
+| Aktiv        | 19,99 €       | bis 8 Events / Monat | aktive Veranstalter                   |
+| Unbegrenzt   | 29,99 €       | unbegrenzt           | Viel-Veranstalter, Clubs, Gastronomen |
 
 ### Allgemeine Regeln
 

@@ -17,19 +17,22 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PRIVACY PAGE CONTENT (minimal, no tracking) ===
-  Zweck: Datenschutzhinweise passend zum aktuellen Setup (STRATO Hosting, kein Tracking).
-  Umfang: Gesamter <body>-Inhalt dieser Datei.
-  === -->
+  <!-- === BEGIN BLOCK: PRIVACY_PAGE_SUBPAGE_ALIGNMENT_V2 | Zweck: richtet /datenschutz/ strukturell an /impressum/, /ueber/ und /events-veroeffentlichen/ aus, entfernt Sondernavigation und übernimmt den konsolidierten Subpage-Header; Umfang: kompletter <body>-Inhalt dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
   <main class="page page--privacy">
     <header class="content-hero content-hero--panel">
-      <nav class="content-links" aria-label="Navigation">
-        <a class="content-link" href="/ueber/">Zurück zu Über Bocholt erleben</a>
-      </nav>
-
-      <p class="content-kicker">Bocholt erleben</p>
       <h1>Datenschutz</h1>
-      <p class="content-lead">Datenschutzhinweise zum aktuellen Setup (Hosting, Server-Logs, Kontakt per E-Mail) und Ihre Rechte nach DSGVO.</p>
+      <p class="content-lead">Datenschutzhinweise zum aktuellen Setup von Bocholt erleben.</p>
     </header>
 
     <section class="content-card" aria-labelledby="privacy-responsible">
@@ -39,7 +42,7 @@
         Mathias Stöckert<br>
         Gildhaus-Esch 18a<br>
         46399 Bocholt<br>
-        E-Mail: mathias@bocholt-erleben.de
+        E-Mail: <a href="mailto:mathias@bocholt-erleben.de">mathias@bocholt-erleben.de</a>
       </p>
     </section>
 
@@ -47,7 +50,8 @@
       <h2 id="privacy-hosting">2. Hosting</h2>
       <p>
         Diese Website wird bei der STRATO GmbH (Otto-Ostrowski-Straße 7, 10249 Berlin) gehostet.
-        Zum Betrieb und zur Bereitstellung der Website verarbeitet STRATO personenbezogene Daten (z. B. in Server-Logfiles).
+        Zum Betrieb und zur Bereitstellung der Website verarbeitet STRATO personenbezogene Daten
+        (z. B. in Server-Logfiles).
       </p>
       <p>
         Wir haben mit STRATO eine Vereinbarung zur Auftragsverarbeitung (AVV) gemäß Art. 28 DSGVO abgeschlossen.
@@ -72,9 +76,10 @@
     <section class="content-card" aria-labelledby="privacy-contact">
       <h2 id="privacy-contact">4. Kontaktaufnahme per E-Mail</h2>
       <p>
-        Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben (z. B. E-Mail-Adresse und Inhalt der Nachricht),
-        um Ihre Anfrage zu bearbeiten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen bzw.
-        Vertragserfüllung) oder Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung von Anfragen),
+        Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben
+        (z. B. E-Mail-Adresse und Inhalt der Nachricht), um Ihre Anfrage zu bearbeiten.
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen bzw. Vertragserfüllung)
+        oder Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung von Anfragen),
         je nach Inhalt Ihrer Anfrage.
       </p>
     </section>
@@ -100,12 +105,8 @@
       <h2 id="privacy-status">7. Stand</h2>
       <p>Stand: Januar 2026</p>
     </section>
-
-    <nav class="content-links" aria-label="Weiter">
-      <a class="content-link" href="/">Zurück zu den Events</a>
-    </nav>
   </main>
-
-  <!-- === END BLOCK: PRIVACY PAGE CONTENT (minimal, no tracking) === -->
+  <!-- === END BLOCK: PRIVACY_PAGE_SUBPAGE_ALIGNMENT_V2 === -->
+</body>
 </body>
 </html>

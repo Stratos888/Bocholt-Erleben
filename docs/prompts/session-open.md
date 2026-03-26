@@ -1,35 +1,23 @@
-# SESSION OPEN — BOCHOLT ERLEBEN (UI FIRST)
+# DEPRECATED — SESSION OPEN
 
-Kontext:
-Wir arbeiten am Produktionsprojekt „Bocholt erleben“. MASTER.md ist SINGLE SOURCE OF TRUTH und muss strikt befolgt werden. ENGINEERING.md ebenfalls.
+<!-- === BEGIN DEPRECATED SESSION-OPEN STUB: Prevent reuse of outdated startup prompt logic === -->
 
-Session-Regeln (verbindlich):
-1) Lies zu Beginn MASTER.md vollständig.
-2) Lies zu Beginn ENGINEERING.md vollständig.
-3) Arbeite NUR an CURRENT SPRINT Tasks. Keine neuen Prioritäten.
-4) Frozen Areas dürfen nicht verändert werden.
-5) UI-Arbeit läuft als „Enterprise Gate Closure Workpacks“ gegen Golden Screens (Rubric >= 9/10).
-6) UI-Änderungen: CSS-only, one-file, diff-statt-snippet. Große UI-Sprünge sind als UI-Batch-Mode erlaubt (tokens + component mapping) – aber weiterhin nur ein File (i.d.R. css/style.css).
-7) Keine Spekulation: erst Rubric-Gap-Liste (Top 3 FAIL) für den Zielscreen definieren, dann Patch.
-8) Output-Format für Code-Änderungen: Nur konkrete Replace-Anweisungen (Datei + exakte BEGIN/END-Zeilen) + Replacement-Block. Keine Zusatz-Erklärungen.
+This file is kept only to prevent accidental reuse of outdated session-open prompt logic.
 
-Ziel dieser Session:
-Wir priorisieren UI.
-1) Erst GS-01 (Event Feed) prüfen: ist frozen, daher keine optischen Änderungen. Nur wenn echter Bug mit Proof.
-2) Danach GS-02 (Detailpanel) auf Enterprise Gate bringen (Rubric >= 9/10) und dann als ENTERPRISE-FROZEN markieren (nur via MASTER-Decision; kein visuelles Extra).
-3) Arbeitsweise: Workpack-Loop:
-   - Wähle Golden Screen (start: GS-02)
-   - Rubric-Gap-Liste: Top 3 FAIL mit konkreter Beschreibung (woran sichtbar / woran gemessen)
-   - Ein konsolidierter CSS-only Patch (css/style.css) als UI-Batch, der diese 3 Punkte systemisch löst
-   - Re-Score Rubric (PASS/FAIL) und dokumentiere die Delta-Punkte in Chat
+It is no longer a canonical workflow controller.
 
-Input:
-Ich poste dir als nächstes:
-- MASTER.md (aktueller Stand)
-- ENGINEERING.md (aktueller Stand)
-- Den aktuellen Inhalt von css/style.css
+Canonical control now lives in:
 
-Deine erste Antwort soll:
-1) Bestätigen, dass du MASTER + ENGINEERING gelesen hast (kurz).
-2) GS-02 auswählen und die Rubric-Gap-Liste (Top 3 FAIL) erstellen, basierend auf dem aktuellen UI (keine Vermutungen ohne Bezug auf CSS/Struktur).
-3) Danach direkt den ersten CSS Patch liefern (Replace-Block Anweisung), der die 3 FAILs adressiert.
+- `MASTER.md`
+- `ENGINEERING.md`
+
+Default working input for UI tasks is:
+
+- uploaded ZIP
+- target page
+- 3 screenshots
+- 1 clear goal sentence
+
+Do not treat this file as a mandatory session-start protocol.
+
+<!-- === END DEPRECATED SESSION-OPEN STUB === -->
