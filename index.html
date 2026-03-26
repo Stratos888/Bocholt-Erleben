@@ -105,7 +105,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: finaler Homepage-Hero-Freeze mit kontrolliertem Desktop-Subline-Umbruch und unveränderter Funktionsstruktur; Scope: ersetzt nur den Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V9 | Zweck: verankert den mobilen Veranstalter-CTA als Utility-Row im Top-Stack statt im Feed; Scope: ersetzt nur den Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
   <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
@@ -147,17 +147,31 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       </button>
     </div>
 
+    <!-- === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_V1 | Zweck: positioniert den Veranstalter-Funnel im mobilen Top-Stack als sekundäre Utility-Row; Scope: mobile-only CTA unter den Filtern, oberhalb des Feeds === -->
+    <a
+      class="mobile-publish-strip"
+      href="/events-veroeffentlichen/"
+      aria-label="Für Veranstalter – Event veröffentlichen"
+    >
+      <span class="mobile-publish-strip__copy">
+        <span class="mobile-publish-strip__eyebrow">Für Veranstalter</span>
+        <span class="mobile-publish-strip__title">Event veröffentlichen</span>
+      </span>
+      <span class="mobile-publish-strip__chevron" aria-hidden="true">›</span>
+    </a>
+    <!-- === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_V1 === -->
+
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
         <span class="desktop-hero__icon desktop-hero__icon--publish" aria-hidden="true"></span>
         <span>Event veröffentlichen</span>
       </a>
 
-          <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
+      <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
         <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
         <span>Mehr erfahren</span>
       </a>
-        
+
       <button
         type="button"
         class="desktop-hero__action desktop-hero__action--app"
@@ -170,7 +184,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
   </div>
 </section>
-<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === -->
+<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V9 === -->
 
 <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
   <div class="filter-sheet__overlay" data-close-sheet></div>
@@ -211,12 +225,13 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 </div>
 <!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
-   <!-- EVENT CARDS SECTION -->
+<!-- === BEGIN BLOCK: EVENTS_SECTION_FEED_ONLY_V1 | Zweck: entfernt den Veranstalter-CTA aus dem Feed, damit der Feed nur noch echte Event-Gruppen enthält; Umfang: ersetzt den bisherigen Mobile-Service-Card-Block direkt vor dem Event-Feed === -->
 <section class="events-section">
-    <div id="event-cards" class="event-cards-grid">
-        <!-- Event cards werden hier dynamisch eingefügt -->
-    </div>
+  <div id="event-cards" class="event-cards-grid">
+    <!-- Event cards werden hier dynamisch eingefügt -->
+  </div>
 </section>
+<!-- === END BLOCK: EVENTS_SECTION_FEED_ONLY_V1 === -->
 
 
    

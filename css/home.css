@@ -243,10 +243,11 @@
   contain: none;
 }
 
-/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: hält die mobile Hero-/Filter-Basis stabil und lässt nur die strukturelle Desktop-Hero-Basis bestehen; Scope: Mobile-Filterbereich bleibt wie zuvor, Search-Icon kann sauber absolut im Feld sitzen === */
+/* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: löst auf Mobile den sticky Top-Stack aus dem kurzen Hero-Container, damit Suche und Filter wirklich am Viewport kleben; Scope: Mobile nutzt display: contents, Desktop überschreibt später wieder auf grid === */
 .desktop-hero{
-  position: relative;
+  display: contents;
 }
+/* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
 .desktop-entry{
   display: none;
@@ -492,6 +493,101 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
+/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 | Zweck: reduziert den mobilen Veranstalter-CTA auf eine kompakte Ein-Zeilen-Utility-Row ohne Kicker und hält alte/new Markup-Varianten kompatibel; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
+
+.mobile-publish-card,
+.mobile-publish-strip{
+  display: none;
+}
+
+@media (max-width: 899.98px){
+  .mobile-publish-card,
+  .mobile-publish-strip{
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-height: 44px;
+    margin: 8px 0 8px;
+    padding: 0 34px 0 12px;
+    border: 1px solid rgba(22,39,61,0.026);
+    border-radius: var(--cmp-input-radius);
+    background: linear-gradient(180deg, rgba(249,250,246,0.84) 0%, rgba(251,252,249,0.74) 100%);
+    box-shadow: none;
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-publish-card:link,
+  .mobile-publish-card:visited,
+  .mobile-publish-card:hover,
+  .mobile-publish-card:active,
+  .mobile-publish-strip:link,
+  .mobile-publish-strip:visited,
+  .mobile-publish-strip:hover,
+  .mobile-publish-strip:active{
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .mobile-publish-card::after,
+  .mobile-publish-strip::after{
+    content: "›";
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: rgba(99,119,149,0.46);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .mobile-publish-strip__copy{
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .mobile-publish-strip__chevron{
+    display: none;
+  }
+
+  .mobile-publish-card__eyebrow,
+  .mobile-publish-strip__eyebrow{
+    display: none;
+  }
+
+  .mobile-publish-card__title,
+  .mobile-publish-strip__title{
+    display: block;
+    min-width: 0;
+    margin: 0;
+    color: rgba(22,39,61,0.94);
+    font-size: 0.93rem;
+    font-weight: 660;
+    line-height: 1;
+    letter-spacing: -0.008em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-publish-card:active,
+  .mobile-publish-strip:active{
+    background: linear-gradient(180deg, rgba(245,248,240,0.9) 0%, rgba(249,251,246,0.8) 100%);
+    transform: translateY(1px);
+  }
+
+  .mobile-publish-card:focus-visible,
+  .mobile-publish-strip:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 3px;
+  }
+}
+
+/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
