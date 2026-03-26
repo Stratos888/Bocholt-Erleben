@@ -211,24 +211,24 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 </div>
 <!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
 
-<!-- === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 | Zweck: fügt unter dem mobilen Such-/Filterbereich einen kompakten, nicht-sticky Veranstalter-Funnel ein; Umfang: nur Startseiten-CTA zwischen Filterbereich und Event-Feed, Desktop bleibt per CSS ausgeblendet === -->
-<section class="mobile-publish-strip" aria-label="Für Veranstalter">
-  <div class="mobile-publish-strip__copy">
-    <p class="mobile-publish-strip__eyebrow">Für Veranstalter</p>
-    <p class="mobile-publish-strip__text">Event einreichen und in Bocholt sichtbar machen.</p>
-  </div>
-  <a class="mobile-publish-strip__cta" href="/events-veroeffentlichen/">
-    Event veröffentlichen
-  </a>
-</section>
-<!-- === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V1 === -->
-
+<!-- === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V2 | Zweck: verschiebt den mobilen Veranstalter-Funnel in den normalen Feed-Scrollbereich, damit der sticky Top-Stack unberührt bleibt; Umfang: ersetzt den bisherigen Strip zwischen Filterbereich und Feed durch einen kompakten Inline-Teaser direkt im Events-Section-Flow === -->
 <!-- EVENT CARDS SECTION -->
 <section class="events-section">
-    <div id="event-cards" class="event-cards-grid">
-        <!-- Event cards werden hier dynamisch eingefügt -->
+  <section class="mobile-publish-strip" aria-label="Für Veranstalter">
+    <p class="mobile-publish-strip__eyebrow">Für Veranstalter</p>
+    <div class="mobile-publish-strip__row">
+      <p class="mobile-publish-strip__text">Event einreichen</p>
+      <a class="mobile-publish-strip__cta" href="/events-veroeffentlichen/">
+        Veröffentlichen
+      </a>
     </div>
+  </section>
+
+  <div id="event-cards" class="event-cards-grid">
+      <!-- Event cards werden hier dynamisch eingefügt -->
+  </div>
 </section>
+<!-- === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V2 === -->
 
 
    
