@@ -493,7 +493,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 | Zweck: implementiert eine kompakte, vom Event-Card-Look bewusst abgesetzte Service-Card im Feed-Raster; Umfang: ersetzt vollständig den bisherigen Funnel-Strip; Desktop bleibt unangetastet === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V2 | Zweck: macht den Mobile-Funnel zu einer ruhigen, vollständig klickbaren 2-Zeilen-Service-Card im Feed-Raster; Umfang: ersetzt den bisherigen V1-Block vollständig, Desktop bleibt unverändert === */
 
 .mobile-publish-card{
   display: none;
@@ -502,76 +502,74 @@
 @media (max-width: 899.98px){
   .mobile-publish-card{
     display: grid;
-    gap: 6px;
+    gap: 4px;
+    align-content: center;
 
-    margin: 12px var(--gutter) 6px;
-    padding: 12px 14px;
+    margin: 12px var(--gutter) 8px;
+    padding: 11px 14px 12px;
 
+    border: 1px solid rgba(111,135,88,0.12);
     border-radius: 16px;
-    border: 1px solid rgba(95,141,47,0.10);
-
-    background: linear-gradient(
-      180deg,
-      rgba(245,249,237,0.9),
-      rgba(255,255,255,0.85)
-    );
-
+    background:
+      linear-gradient(180deg,
+        rgba(244,247,238,0.98) 0%,
+        rgba(240,244,233,0.96) 100%);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.9) inset,
-      0 6px 18px rgba(22,39,61,0.035);
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 4px 12px rgba(22,39,61,0.028);
+
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-publish-card:visited,
+  .mobile-publish-card:hover,
+  .mobile-publish-card:active{
+    text-decoration: none;
   }
 
   .mobile-publish-card__eyebrow{
     margin: 0;
-    color: rgba(95,141,47,0.85);
-
+    color: rgba(95,116,145,0.78);
     font-size: 0.68rem;
     font-weight: 800;
+    line-height: 1.15;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    line-height: 1.2;
   }
 
   .mobile-publish-card__title{
     margin: 0;
-
     color: #1f3552;
-
-    font-size: 0.95rem;
+    font-size: 0.97rem;
     font-weight: 720;
-    line-height: 1.25;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
-  .mobile-publish-card__cta{
-    margin-top: 2px;
-
-    color: #5f8d2f;
-
-    font-size: 0.9rem;
-    font-weight: 760;
-
-    text-decoration: none;
-    text-underline-offset: 0.14em;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-
-    -webkit-tap-highlight-color: transparent;
+  .mobile-publish-card:visited .mobile-publish-card__eyebrow{
+    color: rgba(95,116,145,0.78);
   }
 
-  .mobile-publish-card__cta:active{
-    opacity: 0.8;
+  .mobile-publish-card:visited .mobile-publish-card__title{
+    color: #1f3552;
   }
 
-  .mobile-publish-card__cta:focus-visible{
+  .mobile-publish-card:active{
+    transform: translateY(1px);
+    background:
+      linear-gradient(180deg,
+        rgba(239,244,230,0.98) 0%,
+        rgba(235,241,225,0.96) 100%);
+  }
+
+  .mobile-publish-card:focus-visible{
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
-    border-radius: 6px;
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V1 === */
+/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_SERVICE_CARD_V2 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
