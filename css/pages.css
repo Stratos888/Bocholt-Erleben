@@ -40,7 +40,7 @@
 }
 /* === END BLOCK: INFO_HUB_RAIL_V2 === */
 
-/* === BEGIN BLOCK: SUBPAGE_LEGAL_ALIGNMENT_ROOT_CAUSE_FIX_V3 | Zweck: behebt auf Impressum/Datenschutz die echte Kernursache der Fehlfluchtung, indem Hero und Legal-Content explizit auf derselben Achse zentriert werden und der Legal-Hero dieselbe Nutzbreite wie der Body verwendet; Umfang: ersetzt den bisherigen Legal-Breitenblock inkl. doppeltem End-Marker === */
+/* === BEGIN BLOCK: SUBPAGE_MOBILE_INSET_CALIBRATION_V4 | Zweck: kalibriert auf Mobile den optischen Innenraum der Content-Unterseiten näher an die Home-Eventcards, ohne Desktop-Werte oder Legal-Achsenlogik zu verändern; Umfang: ersetzt den bisherigen gemeinsamen about/publish/legal-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--about,
 .page--publish,
 .page--imprint,
@@ -48,7 +48,7 @@
 .page--organizers{
   --subpage-hero-max: 910px;
   --subpage-stack-gap: 22px;
-  --subpage-card-pad-x: 20px;
+  --subpage-card-pad-x: 17px;
   --subpage-card-pad-y: 20px;
   --subpage-hero-gap: 14px;
 }
@@ -77,7 +77,7 @@
 .page--privacy .content-hero{
   width: min(100%, var(--subpage-body-max));
 }
-/* === END BLOCK: SUBPAGE_LEGAL_ALIGNMENT_ROOT_CAUSE_FIX_V3 === */
+/* === END BLOCK: SUBPAGE_MOBILE_INSET_CALIBRATION_V4 === */
 
 :is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
   margin-top: 0 !important;
@@ -566,7 +566,7 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 | Zweck: setzt /ueber/ auf die sichere Basis mit ruhigem Einspalten-Hero ohne rechten Werteblock und präzisem Rechtliches-Abschluss; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V8_MOBILE_INSET_ALIGN | Zweck: kalibriert /ueber/ auf Mobile auf denselben optischen Innenraum wie die Home-Eventcards, indem Hero-Panel und Contentkarten sichtbar näher an 18px Innenkante gezogen werden; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
@@ -574,7 +574,7 @@
 }
 
 .page--about .content-hero--panel{
-  padding: 26px 26px 24px;
+  padding: 26px 17px 24px;
 }
 
 .page--about .content-hero h1{
@@ -645,9 +645,9 @@
   min-height: 42px;
   padding-block: 9px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 === */
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V8_MOBILE_INSET_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE | Zweck: stellt die verlorene mobile/base-Struktur von /events-veroeffentlichen/ wieder her, damit Listen, Karten und Abschluss-Grid nicht auf Browser-Defaults zurückfallen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V11_MOBILE_INSET_ALIGN | Zweck: kalibriert /events-veroeffentlichen/ auf Mobile auf denselben optischen Innenraum wie die Home-Eventcards, indem Hero-Panel und Hauptkarten ohne Desktop-Eingriff sichtbar näher an 18px Innenkante gezogen werden; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero,
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
@@ -659,6 +659,10 @@
 
 .page--publish .content-hero{
   --subpage-hero-gap: 0;
+}
+
+.page--publish .content-hero--panel{
+  padding: 26px 17px 24px;
 }
 
 .page--publish .publish-hero-layout{
@@ -935,7 +939,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V11_MOBILE_INSET_ALIGN === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
