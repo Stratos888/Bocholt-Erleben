@@ -493,7 +493,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V1 | Zweck: styled den Veranstalter-CTA robust als mobile Utility-Row direkt im Top-Stack und deckt dabei sowohl alten Card-Markup-Stand als auch neuen Strip-Markup-Stand ab; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V2 | Zweck: reduziert den mobilen Veranstalter-CTA visuell auf eine ruhige Utility-Row mit weniger Card-Charakter und engerer Anbindung an Suche/Filter; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
 
 .mobile-publish-card,
 .mobile-publish-strip{
@@ -505,13 +505,13 @@
   .mobile-publish-strip{
     display: block;
     position: relative;
-    min-height: 56px;
-    margin: 10px 0 8px;
-    padding: 10px 38px 10px 14px;
-    border: 1px solid rgba(22,39,61,0.055);
+    min-height: 52px;
+    margin: 8px 0 6px;
+    padding: 8px 34px 8px 12px;
+    border: 1px solid rgba(22,39,61,0.032);
     border-radius: var(--cmp-input-radius);
-    background: linear-gradient(180deg, rgba(234,246,219,0.56) 0%, rgba(255,255,255,0.74) 100%);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.74) inset;
+    background: linear-gradient(180deg, rgba(248,250,244,0.78) 0%, rgba(251,252,249,0.68) 100%);
+    box-shadow: none;
     color: inherit;
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
@@ -534,18 +534,18 @@
     content: "›";
     position: absolute;
     top: 50%;
-    right: 14px;
+    right: 12px;
     transform: translateY(-50%);
-    color: var(--color-text-secondary);
-    font-size: 1.16rem;
-    font-weight: 700;
+    color: rgba(99,119,149,0.52);
+    font-size: 0.98rem;
+    font-weight: 620;
     line-height: 1;
     pointer-events: none;
   }
 
   .mobile-publish-strip__copy{
     display: grid;
-    gap: 3px;
+    gap: 1px;
     min-width: 0;
   }
 
@@ -556,12 +556,12 @@
   .mobile-publish-card__eyebrow,
   .mobile-publish-strip__eyebrow{
     display: block;
-    margin: 0 0 3px;
-    color: #6f8758;
-    font-size: 0.68rem;
-    font-weight: 760;
-    line-height: 1.1;
-    letter-spacing: 0.12em;
+    margin: 0 0 2px;
+    color: rgba(111,135,88,0.84);
+    font-size: 0.61rem;
+    font-weight: 720;
+    line-height: 1.08;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
   }
 
@@ -569,17 +569,17 @@
   .mobile-publish-strip__title{
     display: block;
     margin: 0;
-    color: var(--color-text-primary);
-    font-size: 0.98rem;
-    font-weight: 720;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    color: rgba(22,39,61,0.96);
+    font-size: 0.93rem;
+    font-weight: 680;
+    line-height: 1.18;
+    letter-spacing: -0.008em;
   }
 
   .mobile-publish-card:active,
   .mobile-publish-strip:active{
+    background: linear-gradient(180deg, rgba(244,248,238,0.88) 0%, rgba(249,251,246,0.78) 100%);
     transform: translateY(1px);
-    background: linear-gradient(180deg, rgba(234,246,219,0.68) 0%, rgba(255,255,255,0.82) 100%);
   }
 
   .mobile-publish-card:focus-visible,
@@ -589,7 +589,7 @@
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V1 === */
+/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V2 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
