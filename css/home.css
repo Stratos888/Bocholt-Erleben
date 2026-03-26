@@ -493,18 +493,19 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V3 | Zweck: reduziert den mobilen Veranstalter-Funnel auf Utility-Level, damit er kaum Höhe verbraucht und den Feed nicht mehr blockiert; Umfang: ersetzt die bisherige Funnel-Card vollständig, Desktop bleibt unangetastet === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V4 | Zweck: reduziert den mobilen Veranstalter-Hinweis auf eine ruhige Utility-Zeile statt eines Button-Objekts, damit der Funnel klar sichtbar ist, aber nicht wie Werbung oder eine halbe Card wirkt; Umfang: ersetzt die bisherige MOBILE_PUBLISH_FUNNEL_STRIP_V3-Styles vollständig, Desktop bleibt unangetastet === */
 .mobile-publish-strip{
   display: none;
 }
 
 @media (max-width: 899.98px){
   .mobile-publish-strip{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 6px var(--gutter) 2px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 8px;
+    row-gap: 0;
+    margin: 6px var(--gutter) 0;
     padding: 0;
     border: 0;
     background: transparent;
@@ -516,69 +517,18 @@
     color: rgba(99,119,149,0.82);
     font-size: 0.70rem;
     font-weight: 820;
-    line-height: 1.15;
+    line-height: 1.2;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     white-space: nowrap;
-    flex: 0 0 auto;
   }
 
   .mobile-publish-strip__row{
     display: inline-flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 6px;
     min-width: 0;
-    flex: 1 1 auto;
-  }
-
-  .mobile-publish-strip__text{
-    margin: 0;
-    color: rgba(34,54,79,0.82);
-    font-size: 0.82rem;
-    font-weight: 640;
-    line-height: 1.15;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .mobile-publish-strip__cta{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
-    padding: 0 10px;
-    border: 1px solid rgba(111,135,88,0.18);
-    border-radius: 999px;
-    background: rgba(241,247,232,0.96);
-    color: #5f8d2f;
-    font-size: 0.82rem;
-    font-weight: 760;
-    line-height: 1;
-    white-space: nowrap;
-    text-decoration: none;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .mobile-publish-strip__cta:active{
-    transform: translateY(1px);
-  }
-
-  .mobile-publish-strip__cta:focus-visible{
-    outline: 2px solid var(--cmp-btn-focus-ring);
-    outline-offset: 3px;
-  }
-}
-
-@media (max-width: 389.98px){
-  .mobile-publish-strip{
-    gap: 8px;
-  }
-
-  .mobile-publish-strip__row{
-    flex: 0 0 auto;
   }
 
   .mobile-publish-strip__text{
@@ -586,11 +536,59 @@
   }
 
   .mobile-publish-strip__cta{
-    min-height: 30px;
-    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #5f8d2f;
+    font-size: 0.88rem;
+    font-weight: 760;
+    line-height: 1.2;
+    text-decoration: none;
+    text-underline-offset: 0.14em;
+    box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-publish-strip__cta::after{
+    content: "›";
+    margin-left: 4px;
+    color: rgba(95,141,47,0.88);
+    font-weight: 760;
+  }
+
+  .mobile-publish-strip__cta:active{
+    transform: none;
+    opacity: 0.82;
+  }
+
+  .mobile-publish-strip__cta:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 3px;
+    border-radius: 6px;
   }
 }
-/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V3 === */
+
+@media (max-width: 389.98px){
+  .mobile-publish-strip{
+    grid-template-columns: 1fr;
+    align-items: start;
+    row-gap: 2px;
+  }
+
+  .mobile-publish-strip__row{
+    justify-content: flex-start;
+  }
+
+  .mobile-publish-strip__cta{
+    font-size: 0.86rem;
+  }
+}
+/* === END BLOCK: MOBILE_PUBLISH_FUNNEL_STRIP_V4 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
