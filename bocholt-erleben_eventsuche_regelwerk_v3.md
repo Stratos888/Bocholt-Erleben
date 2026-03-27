@@ -334,56 +334,87 @@ Das gilt besonders für:
 
 ---
 
-## 9. Datumsregel
+## 9. Datums- und Instanzregel
 Wichtig:
 
-- verwende das **tatsächliche Veranstaltungsdatum**
+- **ein JSON-Objekt repräsentiert genau eine konkrete, besuchbare Termin-Instanz**
+- verwende das **tatsächliche Veranstaltungsdatum dieser Instanz**
 - nicht das Veröffentlichungsdatum einer Pressemeldung
 - nicht das Änderungsdatum einer Seite
 - nicht ein unsicher abgeleitetes Datum
 
 Wenn mehrere Daten vorkommen:
 
-- nimm das **konkrete Eventdatum**
+- jeden **klar genannten Termin** als **eigenen JSON-Eintrag** ausgeben
+- bei gleichem Eventtitel an mehreren Tagen **mehrere Einträge** erzeugen
+- bei gleichem Datum mit mehreren Startzeiten **mehrere Einträge** erzeugen
 
-Wenn kein belastbares Eventdatum erkennbar ist:
+Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
 
 - **nicht aufnehmen**
 
 ---
 
 ## 10. Uhrzeit-Regel
-`time` nur setzen, wenn **genau eine klare Startzeit** direkt aus der Quelle hervorgeht.
+`time` pro Instanz setzen, wenn für **diese konkrete Instanz** direkt und eindeutig eine Startzeit aus der Quelle hervorgeht.
 
 Wenn es gibt:
 
 - mehrere Startzeiten
-- verschiedene Programmpunkte
-- Tagesprogramm ohne klaren Startwert
 - mehrere Läufe / Slots / Blöcke
+- denselben Eventtitel an mehreren Tagen
 
-Dann:
+Dann gilt:
+
+- **nicht zu einem Sammel-Eintrag komprimieren**
+- stattdessen **pro Termin / Slot einen eigenen JSON-Eintrag** erzeugen
+- pro Eintrag die jeweils konkrete `time` setzen
+
+Nur wenn für die **konkrete Instanz** keine eindeutige Startzeit belegbar ist, dann:
 
 - `time` **weglassen**
 
+Ein identischer `source_url` darf dabei mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
+
 ---
 
-## 11. Dedupe-Regel
+## 11. Dedupe- und Session-Dedupe-Regel
 Keine Events aufnehmen, die wahrscheinlich bereits vorhanden sind oder offensichtliche Dubletten sind.
 Tracking-Parameter, URL-Fragmente und offensichtliche URL-Varianten derselben Quelle sollen als identische Quelle behandelt werden.
-Als Dublette behandeln:
 
-- gleiche oder sehr ähnliche `source_url`
+Als **identische Termin-Instanz** behandeln:
+
+- kanonisierte `source_url`
+- gleicher oder sehr ähnlicher `title`
+- gleiches `date`
+- gleiches `time`
+- gleiche oder sehr ähnliche `location`
+
+Fallback, wenn `time` für die konkrete Instanz nicht vorhanden ist:
+
+- kanonisierte `source_url`
 - gleicher oder sehr ähnlicher `title`
 - gleiches `date`
 - gleiche oder sehr ähnliche `location`
 
-Wenn mehrere Varianten desselben Events gefunden werden:
+Wenn mehrere Varianten derselben Termin-Instanz gefunden werden:
 
 - nur die **vollständigste und belastbarste** Variante behalten
 
 Wichtig:
-Dieses Dedupe soll bereits im Chat-Suchlauf gegen `data/events.json` und `data/inbox.tsv` berücksichtigt werden.
+Dieses Dedupe soll bereits im Chat-Suchlauf berücksichtigt werden gegen:
+
+- `data/events.json`
+- `data/inbox.tsv`
+- `data/inbox_manual.json`, wenn vorhanden
+- alle bereits **im selben Chat** gelieferten JSON-Kandidaten
+
+Bei mehreren Suchläufen innerhalb desselben Chats gilt:
+
+- bereits gelieferte Kandidaten sind **temporärer Session-Bestand**
+- Folgeläufe dürfen **nur Delta-Kandidaten** liefern
+- ein bereits gelieferter Kandidat darf **nicht noch einmal als neuer Treffer** ausgegeben werden
+- wenn später bessere Daten gefunden werden, darf der Kandidat nur als **gezielte Korrektur/Ersetzung** behandelt werden
 
 ---
 
@@ -559,23 +590,32 @@ Nach jedem Suchlauf soll der Chat nach dem JSON zusätzlich kurz und eindeutig d
 
 > Dieses JSON vollständig in `data/inbox_manual.json` kopieren. Nicht in `data/inbox.json` und nicht in `data/inbox.tsv` einfügen. Danach den Workflow `Manual KI Event Intake` starten.
 
+Wenn im selben Chat ein weiterer Suchlauf folgt, muss der Chat zusätzlich intern beachten:
+
+> Alle bereits in diesem Chat gelieferten JSON-Kandidaten gelten als temporärer Session-Bestand. Ein weiterer Suchlauf darf nur neue Delta-Kandidaten liefern.
+
 Wenn für den Suchlauf nicht alle Referenzdateien vorhanden sind, soll der Chat zusätzlich vorher klar darauf hinweisen:
 
-> Für sauberes Dedupe brauche ich zusätzlich die aktuelle `data/events.json` und `data/inbox.tsv` aus deinem Repo.
+> Für sauberes Dedupe brauche ich zusätzlich die aktuelle `data/events.json`, `data/inbox.tsv` und gegebenenfalls `data/inbox_manual.json` aus deinem Repo.
 
 ---
 
 ## 21. Wöchentliche Arbeitsroutine
 1. Neues Chat-Fenster öffnen
-2. Diese drei Dateien mitgeben:
+2. Diese Dateien mitgeben:
    - `bocholt-erleben_eventsuche_regelwerk_v3.md`
    - `data/events.json`
    - `data/inbox.tsv`
+   - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 3. Suchlauf starten lassen
 4. JSON-Ausgabe vollständig in `data/inbox_manual.json` kopieren
-5. Workflow **Manual KI Event Intake** starten
-6. Inbox Review PWA vollständig kuratieren
-7. Erst danach neuen Suchlauf starten
+5. Wenn im selben Chat direkt weitergesucht wird:
+   - bisherigen Chat-Output als Session-Bestand behandeln
+   - nur Delta-Kandidaten liefern lassen
+   - neues Delta in `data/inbox_manual.json` ergänzen
+6. Workflow **Manual KI Event Intake** starten
+7. Inbox Review PWA vollständig kuratieren
+8. Erst danach neuen Suchlauf starten
 
 ---
 
@@ -585,5 +625,12 @@ Vor einem neuen Suchlauf sollte die Inbox möglichst vollständig kuratiert sein
 Das heißt:
 - offene Review-Reste möglichst zuerst abarbeiten
 - erst danach nächsten Suchlauf starten
+
+Wenn ausnahmsweise mehrere Suchläufe **innerhalb desselben Chats** vor dem Intake gemacht werden, dann gilt zusätzlich:
+
+- `data/inbox_manual.json` vor dem Folgelauf wieder mitgeben
+- gegen alle bereits im Chat gelieferten Kandidaten dedupen
+- bereits gelieferte Kandidaten nicht erneut ausgeben
+- nur echte Delta-Kandidaten ergänzen
 
 So bleibt der Prozess übersichtlich und das Risiko wiederholter Kandidaten sinkt.
