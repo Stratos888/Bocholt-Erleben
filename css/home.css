@@ -221,6 +221,7 @@
   margin: 0;
 }
 
+/* === BEGIN BLOCK: HOME_TOP_STACK_STICKY_OFFSET_FIX_V1 | Zweck: synchronisiert auf Mobile den sticky Top-Offset des Filterbereichs mit der realen Header-Höhe und verhindert das nachgewiesene 2px-Hochrutschen beim Scrollen/Pull; Umfang: ersetzt nur den globalen .top-stack-Basisblock und ergänzt den Mobile-Offset-Fix === */
 /* TOP STACK (search as hero, reduced section feel) */
 .top-stack{
   position: sticky;
@@ -242,6 +243,13 @@
   transform: none;
   contain: none;
 }
+
+@media (max-width: 899.98px){
+  .top-stack{
+    top: calc(var(--header-h) + var(--stack-gap) + 2px);
+  }
+}
+/* === END BLOCK: HOME_TOP_STACK_STICKY_OFFSET_FIX_V1 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V8 | Zweck: löst auf Mobile den sticky Top-Stack aus dem kurzen Hero-Container, damit Suche und Filter wirklich am Viewport kleben; Scope: Mobile nutzt display: contents, Desktop überschreibt später wieder auf grid === */
 .desktop-hero{
