@@ -11,18 +11,25 @@ Die Chat-Suche soll möglichst nah an hoher manueller Chat-Qualität bleiben, oh
 
 ## Wichtige Arbeitslogik
 
-### Die Chat-Suche deduped nicht allein gegen den echten Projektbestand.
-Damit ein Suchlauf sauber funktioniert, müssen dem Chat **immer drei Dinge** mitgegeben werden:
+### Die Chat-Suche deduped gegen Projektbestand, Manual-Bestand und Chat-Session-Bestand.
+Damit ein Suchlauf sauber funktioniert, müssen dem Chat **immer diese Referenzen** mitgegeben werden:
 
 1. **dieses Regelwerk**
 2. **die aktuelle `data/events.json`**
 3. **die aktuelle `data/inbox.tsv`**
+4. **die aktuelle `data/inbox_manual.json`**, wenn dort bereits Kandidaten liegen
 
 ### Warum genau diese Dateien?
 - `data/events.json` = bereits kuratierter Live-/Bestandsfeed der App
 - `data/inbox.tsv` = aktuelle Inbox-/Review-Basis, also Events, die schon im Prüfprozess sind
+- `data/inbox_manual.json` = bereits vorbereitete, aber noch nicht importierte Manual-Kandidaten
 
-Nur mit beiden Dateien kann der Chat vorab möglichst gut erkennen, welche Events vermutlich schon vorhanden oder bereits in Review sind.
+### Zusätzliche Session-Regel
+Innerhalb desselben Chats gelten **alle bereits ausgegebenen JSON-Kandidaten** als temporärer Zusatz-Bestand.
+
+Bei **jedem weiteren Suchlauf desselben Chats** muss zusätzlich gegen diesen Chat-Session-Bestand deduped werden.
+
+Folgeläufe dürfen **nur neue Delta-Kandidaten** liefern.
 
 ---
 
@@ -33,23 +40,28 @@ Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese 
 - `bocholt-erleben_eventsuche_regelwerk_v3.md`
 - `data/events.json`
 - `data/inbox.tsv`
+- `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
 Für neue Suchläufe soll nach Möglichkeit diese Standard-Anweisung verwendet werden:
 
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json` und `data/inbox.tsv`. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue, passende Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json`, `data/inbox.tsv`, `data/inbox_manual.json` und gegen bereits im selben Chat gelieferte Kandidaten. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
 Dieser Prompt kann in neuen Chats direkt verwendet werden:
 
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json` und `data/inbox.tsv`. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs- und Qualitätsregeln strikt an. Liefere ausschließlich ein JSON-Array für `data/inbox_manual.json` und keine weiteren Erklärungen im JSON-Block.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json`, `data/inbox.tsv`, `data/inbox_manual.json` und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs- und Qualitätsregeln strikt an. Liefere ausschließlich ein JSON-Array für `data/inbox_manual.json` und keine weiteren Erklärungen im JSON-Block.
+
 Der Chat soll vor der Suche bzw. vor der Ausgabe immer berücksichtigen:
 - Regelwerk anwenden
 - gegen `data/events.json` dedupen
 - gegen `data/inbox.tsv` dedupen
+- gegen `data/inbox_manual.json` dedupen, wenn vorhanden
+- gegen bereits im selben Chat gelieferte Kandidaten dedupen
+- bei Folgeläufen nur Delta liefern
 - nur JSON für `data/inbox_manual.json` ausgeben
 
-Wenn eine der beiden Referenzdateien fehlt, soll der Chat vor dem Suchlauf darauf hinweisen, dass für sauberes Dedupe zusätzlich noch `data/events.json` und/oder `data/inbox.tsv` aus dem aktuellen Repo-Stand benötigt werden.
+Wenn eine der Referenzdateien fehlt, soll der Chat vor dem Suchlauf darauf hinweisen, dass für sauberes Dedupe zusätzlich noch `data/events.json`, `data/inbox.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Repo-Stand benötigt werden.
 
 ---
 
