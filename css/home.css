@@ -1220,4 +1220,48 @@
 }
 /* === END BLOCK: DESKTOP_FILTER_POPOVER_V1 === */
 
+/* === BEGIN BLOCK: HOME_EMPTY_STATE_ALIGN_V1 | Zweck: entfernt im Home-Empty-State den zusätzlichen Reset-Button visuell, zieht den Empty-State auf dieselbe Rail/Breite wie Search und Feed und zentriert den Text nur auf Mobile; Umfang: nur Home-Empty-State im Event-Feed === */
+#event-cards .empty-state{
+  width: 100%;
+  padding: 0;
+}
+
+#event-cards .empty-state__card{
+  justify-items: start;
+  width: 100%;
+  max-width: none;
+  gap: 8px;
+}
+
+#event-cards .empty-state__title,
+#event-cards .empty-state__text{
+  width: 100%;
+  text-align: left;
+}
+
+#event-cards .empty-state__text{
+  max-width: 52ch;
+}
+
+#event-cards #empty-reset-btn{
+  display: none;
+}
+
+@media (max-width: 899.98px){
+  #event-cards .empty-state__card{
+    justify-items: center;
+    text-align: center;
+  }
+
+  #event-cards .empty-state__title,
+  #event-cards .empty-state__text{
+    text-align: center;
+  }
+
+  #event-cards .empty-state__text{
+    max-width: 30ch;
+  }
+}
+/* === END BLOCK: HOME_EMPTY_STATE_ALIGN_V1 === */
+
 /* === END BLOCK: HOME_CSS_STEP_4 === */
