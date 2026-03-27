@@ -910,6 +910,7 @@
   line-height: 1.2;
 }
 
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V16_BUTTON_POLISH | Zweck: hebt auf /events-veroeffentlichen/ beide sichtbaren CTA-Buttons mit einer weichen Standardfarbe klarer vom Card-Hintergrund ab und behält die kompakte Mobile-Geometrie bei; Umfang: publish-CTA-/Final-Button-Bereich bis zum Ende des Mobile-/Interaction-Blocks === */
 .page--publish .publish-final-actions{
   display: grid;
   gap: 8px;
@@ -920,6 +921,26 @@
 .page--publish .publish-final-actions .content-cta--primary{
   width: 100%;
   min-width: 0;
+}
+
+.page--publish .publish-hero-cta .content-cta--primary,
+.page--publish .publish-final-actions .content-cta,
+.page--publish .publish-final-actions .content-cta--primary{
+  min-height: 46px;
+  padding-inline: 16px;
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--ui-border-primary);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
+  box-shadow: var(--ui-shadow-cta);
+}
+
+.page--publish .publish-hero-cta .content-cta--primary:visited,
+.page--publish .publish-final-actions .content-cta:visited,
+.page--publish .publish-final-actions .content-cta--primary:visited{
+  color: var(--color-text-primary);
 }
 
 @media (max-width: 899.98px){
@@ -941,22 +962,6 @@
     min-width: 0;
   }
 
-  .page--publish .publish-hero-cta .content-cta--primary{
-    min-height: 46px;
-    padding-inline: 16px;
-    border-radius: var(--cmp-btn-radius);
-    border: 1px solid var(--cmp-btn-secondary-border);
-    background: var(--cmp-btn-secondary-bg);
-    color: var(--cmp-btn-secondary-fg);
-    font-size: var(--cmp-btn-font-size);
-    font-weight: var(--cmp-btn-font-weight);
-    box-shadow: var(--cmp-btn-secondary-shadow);
-  }
-
-  .page--publish .publish-hero-cta .content-cta--primary:visited{
-    color: var(--cmp-btn-secondary-fg);
-  }
-
   .page--publish .publish-final-card--help{
     padding-top: 13px;
     padding-bottom: 13px;
@@ -964,19 +969,23 @@
 }
 
 @media (hover: hover){
-  .page--publish .publish-hero-cta .content-cta--primary:hover{
-    background: var(--ui-surface-soft-hover);
-    border-color: var(--ui-border-strong);
-    color: var(--cmp-btn-secondary-fg);
+  .page--publish .publish-hero-cta .content-cta--primary:hover,
+  .page--publish .publish-final-actions .content-cta:hover,
+  .page--publish .publish-final-actions .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+    border-color: var(--ui-border-primary);
+    color: var(--color-text-primary);
   }
 }
 
-.page--publish .publish-hero-cta .content-cta--primary:active{
+.page--publish .publish-hero-cta .content-cta--primary:active,
+.page--publish .publish-final-actions .content-cta:active,
+.page--publish .publish-final-actions .content-cta--primary:active{
   transform: translateY(1px);
-  background: var(--ui-surface-soft-active);
-  box-shadow: var(--ui-shadow-soft);
+  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
+  box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V15_MOBILE_COMPACT_CLEAN_END === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V16_BUTTON_POLISH === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
