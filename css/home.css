@@ -588,7 +588,7 @@
 }
 
 /* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 === */
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 | Purpose: final homepage desktop freeze by tightening hero height, refining header proportions and demoting service CTAs while preserving the validated desktop structure; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V26 | Purpose: schärft den Desktop-Suchbereich mit klarerer Surface-Hierarchie, helleren Controls und besser lesbaren Service-Actions, ohne die bewährte Hero-Struktur zu verändern; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
@@ -736,17 +736,17 @@
     align-self: start;
     justify-self: stretch;
     display: grid;
-    gap: 6px;
+    gap: 8px;
     width: min(100%, 910px);
     max-width: 910px;
     margin-top: 0;
-    padding: 12px 14px 10px;
-    border: 1px solid rgba(22,39,61,0.052);
+    padding: 14px 14px 12px;
+    border: 1px solid var(--border-panel);
     border-radius: 22px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,253,250,0.90) 100%);
+    background: var(--cmp-surface-panel-bg);
     box-shadow:
-      0 14px 28px rgba(22,39,61,0.062),
-      0 1px 0 rgba(255,255,255,0.985) inset;
+      0 16px 32px rgba(22,39,61,0.068),
+      0 1px 0 rgba(255,255,255,0.92) inset;
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -757,7 +757,11 @@
     inset: 8px;
     z-index: -1;
     border-radius: 17px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(244,248,239,0.03) 100%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 90%, var(--color-primary-muted)) 0%,
+      rgba(255,255,255,0.14) 100%
+    );
   }
 
   .desktop-hero__panel-head{
@@ -787,7 +791,7 @@
     left: 21px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(99,119,149,0.68);
+    color: rgba(82,102,128,0.82);
     width: 18px;
     height: 18px;
     z-index: 2;
@@ -804,21 +808,21 @@
     max-width: none;
     margin: 0;
     padding: 0 18px 0 46px;
-    border: 1px solid rgba(22,39,61,0.078);
+    border: 1px solid var(--border-panel-strong);
     border-radius: 16px;
-    background: rgba(255,255,255,0.988);
-    color: #16273d;
+    background: color-mix(in srgb, white 97%, var(--color-primary-muted));
+    color: var(--color-text-primary);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.988) inset,
-      0 8px 16px rgba(22,39,61,0.022);
+      0 1px 0 rgba(255,255,255,0.98) inset,
+      0 9px 18px rgba(22,39,61,0.028);
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(99,119,149,0.74);
-    font-weight: 600;
+    color: rgba(82,102,128,0.78);
+    font-weight: 620;
   }
 
   .desktop-hero__toolbar-pill{
@@ -830,12 +834,12 @@
     column-gap: 8px;
     row-gap: 2px;
     padding: 8px 13px 8px;
-    border: 1px solid rgba(22,39,61,0.065);
+    border: 1px solid var(--border-panel-strong);
     border-radius: 16px;
-    background: rgba(255,255,255,0.93);
+    background: color-mix(in srgb, white 95%, var(--color-primary-muted));
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.96) inset,
-      0 5px 12px rgba(22,39,61,0.018);
+      0 1px 0 rgba(255,255,255,0.97) inset,
+      0 6px 14px rgba(22,39,61,0.022);
     text-align: left;
   }
 
@@ -843,7 +847,7 @@
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
-    color: #7d8ea5;
+    color: rgba(82,102,128,0.86);
     font-size: 0.67rem;
     font-weight: 760;
     line-height: 1;
@@ -855,7 +859,7 @@
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
-    color: #16273d;
+    color: var(--color-text-primary);
     font-size: 0.95rem;
     font-weight: 780;
     line-height: 1.08;
@@ -869,7 +873,7 @@
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(99,119,149,0.42);
+    color: rgba(82,102,128,0.52);
     font-size: 0.98rem;
     line-height: 1;
     margin-left: 0;
@@ -882,11 +886,11 @@
     min-height: 56px;
     justify-self: stretch;
     align-self: stretch;
-    border-color: rgba(22,39,61,0.055);
-    background: rgba(255,255,255,0.82);
+    border-color: var(--border-panel-strong);
+    background: color-mix(in srgb, white 94%, var(--color-primary-muted));
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 5px 12px rgba(22,39,61,0.018);
+      0 1px 0 rgba(255,255,255,0.96) inset,
+      0 6px 14px rgba(22,39,61,0.022);
   }
 
   .desktop-hero__actions{
@@ -894,7 +898,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid rgba(22,39,61,0.055);
+    border-top: 1px solid var(--border-panel-soft);
   }
 
   .desktop-hero__action{
@@ -902,51 +906,52 @@
     padding: 0 12px;
     border-radius: 11px;
     font-size: 0.84rem;
-    font-weight: 650;
-    border-color: rgba(22,39,61,0.04);
-    background: rgba(255,255,255,0.58);
-    color: rgba(31,53,82,0.72);
+    font-weight: 660;
+    border: 1px solid var(--border-panel);
+    background: color-mix(in srgb, white 93%, var(--color-primary-muted));
+    color: rgba(31,53,82,0.84);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.80) inset;
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 4px 10px rgba(22,39,61,0.018);
   }
 
   .desktop-hero__action .desktop-hero__icon{
     width: 14px;
     height: 14px;
-    opacity: 0.52;
+    opacity: 0.62;
   }
 
   .desktop-hero__actions .desktop-hero__action--publish{
-    border-color: rgba(22,39,61,0.05);
-    background: rgba(255,255,255,0.70);
-    color: rgba(31,53,82,0.84);
-    font-weight: 680;
+    border-color: var(--ui-border-primary);
+    background: var(--color-primary-muted);
+    color: var(--color-text-primary);
+    font-weight: 690;
+    box-shadow: var(--ui-shadow-cta);
   }
 
   .desktop-hero__actions .desktop-hero__action--info{
-    border-color: rgba(22,39,61,0.042);
-    background: rgba(255,255,255,0.63);
-    color: rgba(31,53,82,0.78);
+    background: color-mix(in srgb, white 94%, var(--color-primary-muted));
+    color: rgba(31,53,82,0.82);
   }
 
   .desktop-hero__actions .desktop-hero__action--app{
-    border-color: rgba(22,39,61,0.038);
-    background: rgba(255,255,255,0.54);
-    color: rgba(31,53,82,0.70);
+    background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+    color: rgba(31,53,82,0.80);
   }
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover{
-      border-color: rgba(22,39,61,0.06);
-      background: rgba(255,255,255,0.72);
-      color: #16273d;
+      border-color: var(--border-panel-strong);
+      background: color-mix(in srgb, white 96%, var(--color-primary-muted));
+      color: var(--color-text-primary);
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.88) inset,
-        0 6px 14px rgba(22,39,61,0.022);
+        0 1px 0 rgba(255,255,255,0.92) inset,
+        0 7px 16px rgba(22,39,61,0.024);
     }
 
     .desktop-hero__actions .desktop-hero__action--publish:hover{
-      background: rgba(255,255,255,0.80);
+      border-color: var(--ui-border-primary);
+      background: color-mix(in srgb, var(--color-primary-muted) 86%, white);
     }
   }
 }
@@ -993,7 +998,7 @@
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V25 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V26 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V24 | Purpose: final 1024-class desktop freeze by compressing hero height, preserving copy safety and keeping the module calm at the smallest desktop width; Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
