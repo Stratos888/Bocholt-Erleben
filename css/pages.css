@@ -660,7 +660,14 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V12_MOBILE_H1_ONE_LINE | Zweck: behält den aktuellen Mobile-Inset-Stand von /events-veroeffentlichen/ bei und fixt zusätzlich die einzeilige Hero-H1 nur auf Mobile; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V13_MOBILE_COMPACT | Zweck: verdichtet /events-veroeffentlichen/ auf Mobile deutlich in der Vertikalen, ohne Desktop anzufassen, und behält den aktuellen H1-One-Line-Fix bei; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+.page--publish{
+  --subpage-stack-gap: 16px;
+  --subpage-card-gap: 10px;
+  --subpage-card-pad-y: 16px;
+  --subpage-hero-gap: 10px;
+}
+
 .page--publish .content-hero,
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
@@ -675,24 +682,26 @@
 }
 
 .page--publish .content-hero--panel{
-  padding: 26px 17px 24px;
+  padding: 22px 17px 20px;
 }
 
 .page--publish .publish-hero-layout{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-items: start;
 }
 
 .page--publish .publish-hero-copy{
   display: grid;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
   margin: 0;
   max-width: 58ch;
+  font-size: 0.94rem;
+  line-height: 1.46;
   text-wrap: pretty;
 }
 
@@ -704,19 +713,23 @@
 .page--publish .publish-membership-card,
 .page--publish .publish-start-card,
 .page--publish .publish-final-card{
-  gap: 18px;
+  gap: 14px;
 }
 
 .page--publish .publish-section-head{
   display: grid;
-  gap: 8px;
-  padding-bottom: 16px;
+  gap: 6px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-section-head h2{
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.18;
+}
+
+.page--publish .publish-section-head .content-note{
+  line-height: 1.46;
 }
 
 .page--publish .publish-benefits-grid{
@@ -729,9 +742,9 @@
 
 .page--publish .publish-benefits-grid li{
   display: grid;
-  gap: 4px;
+  gap: 3px;
   align-content: start;
-  padding: 12px 0;
+  padding: 9px 0;
 }
 
 .page--publish .publish-benefits-grid li + li{
@@ -741,38 +754,38 @@
 .page--publish .publish-benefits-grid strong{
   display: block;
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: 0.91rem;
   font-weight: 760;
-  line-height: 1.24;
+  line-height: 1.22;
 }
 
 .page--publish .publish-benefits-grid span{
   color: var(--cmp-copy-color);
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.44;
 }
 
 .page--publish .publish-membership-layout{
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .page--publish .publish-membership-block-head{
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 .page--publish .publish-membership-block-head h3{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.94rem;
+  font-size: 0.93rem;
   font-weight: 760;
-  line-height: 1.24;
+  line-height: 1.22;
 }
 
 .page--publish .publish-membership-divider{
@@ -782,7 +795,7 @@
 
 .page--publish .publish-plans{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -790,9 +803,9 @@
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 4px;
+  gap: 3px;
   margin: 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
   background: rgba(255,255,255,0.52);
@@ -800,26 +813,27 @@
 
 .page--publish .publish-plans strong{
   color: var(--color-text-primary);
-  font-size: 0.96rem;
+  font-size: 0.94rem;
   font-weight: 760;
-  line-height: 1.22;
+  line-height: 1.2;
 }
 
 .page--publish .publish-plans span{
   color: var(--cmp-copy-color);
-  font-size: 0.91rem;
-  line-height: 1.42;
+  font-size: 0.89rem;
+  line-height: 1.38;
 }
 
 .page--publish .publish-plans-note{
   max-width: none;
+  line-height: 1.44;
 }
 
 .page--publish .publish-rules-list{
   display: grid;
-  gap: 14px;
+  gap: 10px;
   margin: 0;
-  padding: 0 0 0 1.2rem;
+  padding: 0 0 0 1.1rem;
   list-style: disc;
 }
 
@@ -827,8 +841,8 @@
   display: list-item;
   margin: 0;
   color: var(--cmp-copy-color);
-  font-size: 0.91rem;
-  line-height: 1.58;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .page--publish .publish-rules-list strong{
@@ -853,40 +867,41 @@
 
 .page--publish .publish-step{
   display: grid;
-  gap: 8px;
+  gap: 6px;
   align-content: start;
-  padding: 0 0 16px;
+  padding: 0 0 12px;
 }
 
 .page--publish .publish-step + .publish-step{
-  padding-top: 24px;
+  padding-top: 18px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-step h3{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.94rem;
+  font-size: 0.93rem;
   font-weight: 760;
-  line-height: 1.24;
+  line-height: 1.22;
 }
 
 .page--publish .publish-step p{
   margin: 0;
   max-width: 78ch;
+  line-height: 1.48;
 }
 
 .page--publish .publish-final-grid{
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .page--publish .publish-final-panel{
   display: grid;
-  gap: 12px;
+  gap: 10px;
   align-content: start;
   min-height: 0;
-  padding: 15px 16px;
+  padding: 13px 14px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
   background: rgba(255,255,255,0.52);
@@ -903,18 +918,19 @@
 .page--publish .publish-final-panel h3{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   font-weight: 760;
-  line-height: 1.24;
+  line-height: 1.22;
 }
 
 .page--publish .publish-final-panel .content-note{
   max-width: none;
+  line-height: 1.46;
 }
 
 .page--publish .publish-final-actions{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   justify-items: stretch;
 }
 
@@ -961,7 +977,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V12_MOBILE_H1_ONE_LINE === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V13_MOBILE_COMPACT === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
