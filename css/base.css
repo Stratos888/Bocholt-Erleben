@@ -504,9 +504,7 @@ svg.ui-icon-svg{
    HEADER + MODAL (NO OVERFLOW MENU)
    ============================================ */
 
-/* === BEGIN BLOCK: DESKTOP_HEADER_FINAL_LOCK_V1 | Purpose: finalen Header-Desktop-Lock gegen spätere Base-Overrides absichern; Desktop rechts leer und Desktop-Padding stabil halten | Scope: ersetzt nur den späten globalen Header-Block bis vor den 360px-Media-Block === */
-/* === BEGIN BLOCK: DESKTOP_HEADER_POLISH_V1 | Purpose: Header auf Desktop final beruhigen; rechte Utility-Zone ausblenden, Markenbereich sauberer skalieren und doppelte Focus-Regel konsolidieren | Scope: ersetzt nur den späten globalen Header-Block bis vor den 360px-Media-Block === */
-/* APP HEADER (PREMIUM INTEGRATION v2 – calmer tint) */
+/* === BEGIN BLOCK: GLOBAL_HEADER_ENTERPRISE_LOCK_V2 | Zweck: zieht den globalen Header über alle Breiten auf einen präziseren Enterprise-Stand, beruhigt die Fläche, reduziert Icon-Betonung und schärft das Brand-Lockup; Umfang: kompletter globaler Header-Block bis vor den nächsten Basis-Abschnitt === */
 .app-header{
   color: var(--color-text-primary);
   position: sticky;
@@ -514,21 +512,21 @@ svg.ui-icon-svg{
   z-index: 1000;
   isolation: isolate;
 
-  min-height: 48px;
+  min-height: 52px;
   padding: 0 var(--gutter);
 
-  background: color-mix(in srgb, var(--color-primary-muted) 78%, white);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(247,249,244,0.986) 0%, rgba(243,246,238,0.968) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 
-  border-bottom: 1px solid rgba(31, 41, 51, 0.05);
+  border-bottom: 1px solid rgba(22,39,61,0.068);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.78) inset,
-    0 6px 16px rgba(31, 41, 51, 0.045);
+    0 1px 0 rgba(255,255,255,0.84) inset,
+    0 4px 12px rgba(22,39,61,0.026);
 
   transform: translateZ(0);
 }
@@ -538,32 +536,35 @@ svg.ui-icon-svg{
 .header-left{
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
   flex: 1 1 auto;
 }
 
 .app-logo{
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
   border-radius: 6px;
   border: 0;
   background: transparent;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.52) inset,
+    0 1px 4px rgba(22,39,61,0.024);
 }
 
 .app-title{
   color: var(--color-text-primary);
-  font-size: 19px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-size: 18px;
+  font-weight: 690;
+  letter-spacing: -0.028em;
+  line-height: 1.05;
 
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 60vw;
+  max-width: 64vw;
 }
 
 .header-right{
@@ -576,41 +577,62 @@ svg.ui-icon-svg{
 
 /* HEADER BUTTONS (COMPACT, ICON+TEXT, HEADER-APP DNA) */
 
-
 @media (min-width: 900px){
   .app-header{
-    min-height: 60px;
-    padding-left: 28px;
-    padding-right: 28px;
-    gap: 10px;
+    min-height: 58px;
+    padding-left: 24px;
+    padding-right: 24px;
+    gap: 8px;
   }
 
   .header-left{
-    gap: 10px;
+    gap: 8px;
   }
 
   .app-logo{
-    width: 28px;
-    height: 28px;
+    width: 27px;
+    height: 27px;
     border-radius: 7px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.56) inset,
+      0 2px 5px rgba(22,39,61,0.026);
   }
 
   .app-title{
     max-width: none;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.025em;
+    font-size: 19px;
+    font-weight: 710;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
   }
 
   .header-right{
     display: none;
   }
 }
-/* === END BLOCK: DESKTOP_HEADER_POLISH_V1 === */
 
 @media (max-width: 360px){
-  .app-header{ padding: 0 var(--gutter); min-height: 48px; }
-  .header-right{ gap: 8px; }
-  .app-title{ max-width: 56vw; }
+  .app-header{
+    min-height: 50px;
+    padding: 0 var(--gutter);
+  }
+
+  .header-left{
+    gap: 6px;
+  }
+
+  .app-logo{
+    width: 23px;
+    height: 23px;
+  }
+
+  .app-title{
+    max-width: 62vw;
+    font-size: 17px;
+  }
+
+  .header-right{
+    gap: 8px;
+  }
 }
-/* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_BASE === */
+/* === END BLOCK: GLOBAL_HEADER_ENTERPRISE_LOCK_V2 === */
