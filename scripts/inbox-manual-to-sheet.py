@@ -123,10 +123,21 @@ def canonical_url(raw: str) -> str:
     return urlunparse(cleaned).rstrip("/")
 
 
-def dedupe_fp(title: str, date_value: str, location: str) -> str:
+def dedupe_occurrence_fp(title: str, date_value: str, time_value: str, location: str) -> str:
     return "|".join([
         norm_key(title),
         norm(date_value),
+        norm(time_value),
+        norm_key(location),
+    ])
+
+
+def dedupe_source_occurrence_fp(source_url: str, title: str, date_value: str, time_value: str, location: str) -> str:
+    return "|".join([
+        norm_key(canonical_url(source_url)),
+        norm_key(title),
+        norm(date_value),
+        norm(time_value),
         norm_key(location),
     ])
 
@@ -176,6 +187,12 @@ def validate_item(item: Dict[str, str], idx: int) -> Tuple[bool, str]:
     end_date_value = norm(item.get("endDate", ""))
     if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
         return False, f"item#{idx}: invalid_endDate_format"
+    if date_value and end_date_value and end_date_value < date_value:
+        return False, f"item#{idx}: endDate_before_date"
+
+    time_value = norm(item.get("time", ""))
+    if time_value and not re.match(r"^\d{2}:\d{2}$", time_value):
+        return False, f"item#{idx}: invalid_time_format"
 
     source_url = canonical_url(item.get("source_url", ""))
     if not source_url:
@@ -217,23 +234,30 @@ def read_inbox_tsv(path: Path) -> Tuple[list[str], list[Dict[str, str]]]:
 
 
 def build_existing_indexes(rows: list[Dict[str, str]]) -> Tuple[set[str], set[str]]:
-    source_urls: set[str] = set()
-    fingerprints: set[str] = set()
+    source_occurrence_fps: set[str] = set()
+    occurrence_fps: set[str] = set()
 
     for row in rows:
-        source_url = canonical_url(row.get("source_url", ""))
-        if source_url:
-            source_urls.add(norm_key(source_url))
-
-        fp = dedupe_fp(
+        source_occurrence_fp = dedupe_source_occurrence_fp(
+            row.get("source_url", ""),
             row.get("title", ""),
             row.get("date", ""),
+            row.get("time", ""),
             row.get("location", ""),
         )
-        if fp != "||":
-            fingerprints.add(fp)
+        if source_occurrence_fp != "||||":
+            source_occurrence_fps.add(source_occurrence_fp)
 
-    return source_urls, fingerprints
+        occurrence_fp = dedupe_occurrence_fp(
+            row.get("title", ""),
+            row.get("date", ""),
+            row.get("time", ""),
+            row.get("location", ""),
+        )
+        if occurrence_fp != "|||":
+            occurrence_fps.add(occurrence_fp)
+
+    return source_occurrence_fps, occurrence_fps
 
 
 def build_output_row(item: Dict[str, str], inbox_header: list[str], created_at: str) -> list[str]:
@@ -288,10 +312,10 @@ def main() -> None:
     info(f"Lese lokale Inbox-TSV: {INBOX_TSV_PATH}")
     inbox_header, inbox_rows = read_inbox_tsv(INBOX_TSV_PATH)
 
-    existing_source_urls, existing_fps = build_existing_indexes(inbox_rows)
+    existing_source_occurrence_fps, existing_occurrence_fps = build_existing_indexes(inbox_rows)
 
-    batch_source_urls: set[str] = set()
-    batch_fps: set[str] = set()
+    batch_source_occurrence_fps: set[str] = set()
+    batch_occurrence_fps: set[str] = set()
     rows_to_append: list[list[str]] = []
     invalid_details: list[str] = []
 
@@ -307,20 +331,31 @@ def main() -> None:
             invalid_details.append(reason)
             continue
 
-        source_url_key = norm_key(canonical_url(item.get("source_url", "")))
-        fp = dedupe_fp(item.get("title", ""), item.get("date", ""), item.get("location", ""))
+        source_occurrence_fp = dedupe_source_occurrence_fp(
+            item.get("source_url", ""),
+            item.get("title", ""),
+            item.get("date", ""),
+            item.get("time", ""),
+            item.get("location", ""),
+        )
+        occurrence_fp = dedupe_occurrence_fp(
+            item.get("title", ""),
+            item.get("date", ""),
+            item.get("time", ""),
+            item.get("location", ""),
+        )
 
-        if source_url_key in existing_source_urls or source_url_key in batch_source_urls:
+        if source_occurrence_fp in existing_source_occurrence_fps or source_occurrence_fp in batch_source_occurrence_fps:
             deduped += 1
             continue
 
-        if fp in existing_fps or fp in batch_fps:
+        if occurrence_fp in existing_occurrence_fps or occurrence_fp in batch_occurrence_fps:
             deduped += 1
             continue
 
         rows_to_append.append(build_output_row(item, inbox_header, created_at))
-        batch_source_urls.add(source_url_key)
-        batch_fps.add(fp)
+        batch_source_occurrence_fps.add(source_occurrence_fp)
+        batch_occurrence_fps.add(occurrence_fp)
         added += 1
 
     append_rows_to_tsv(INBOX_TSV_PATH, inbox_header, rows_to_append)
