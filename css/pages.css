@@ -566,7 +566,7 @@
   align-content: start;
 }
 
-/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 | Zweck: setzt /ueber/ auf die sichere Basis mit ruhigem Einspalten-Hero ohne rechten Werteblock und präzisem Rechtliches-Abschluss; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V8_MOBILE_H1_AND_LEGAL_ALIGN | Zweck: erhält die bestehende /ueber/-Basisstruktur und fixt zusätzlich nur auf Mobile die einzeilige Hero-H1 sowie die linke Achse von Impressum/Datenschutz ohne Desktop-Eingriff; Umfang: nur page--about außerhalb der Desktop-Breakpoints === */
 .page--about .content-hero{
   width: min(100%, var(--subpage-body-max));
   justify-self: stretch;
@@ -645,9 +645,22 @@
   min-height: 42px;
   padding-block: 9px;
 }
-/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V7 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE | Zweck: stellt die verlorene mobile/base-Struktur von /events-veroeffentlichen/ wieder her, damit Listen, Karten und Abschluss-Grid nicht auf Browser-Defaults zurückfallen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+@media (max-width: 899.98px){
+  .page--about .content-hero h1{
+    font-size: clamp(1.48rem, 7.2vw, 1.82rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+
+  .page--about .about-legal-card .content-link{
+    padding: 9px 0;
+  }
+}
+/* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V8_MOBILE_H1_AND_LEGAL_ALIGN === */
+
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V11_MOBILE_H1_ONE_LINE | Zweck: erhält die bestehende mobile/base-Struktur von /events-veroeffentlichen/ und erzwingt zusätzlich nur auf Mobile eine einzeilige Hero-H1 ohne Desktop-Eingriff; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--publish .content-hero,
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
@@ -924,6 +937,15 @@
   color: var(--color-text-primary);
 }
 
+@media (max-width: 899.98px){
+  .page--publish .content-hero h1{
+    font-size: clamp(1.48rem, 7.2vw, 1.82rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+}
+
 @media (hover: hover){
   .page--publish .content-actions--inline .content-cta--primary:hover{
     background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
@@ -935,7 +957,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V10_RESTORE === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V11_MOBILE_H1_ONE_LINE === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
