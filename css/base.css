@@ -33,13 +33,13 @@
   --brand-gold-200: #F0DE89;
 
   --color-primary: var(--brand-lime-400);
-  --color-primary-muted: #EEF7E2;
-  --color-background: #F7FAF4;
+  --color-primary-muted: #EDF5E1;
+  --color-background: #EEF2E7;
   --color-surface: #FFFFFF;
 
   --color-text-primary: #18281E;
-  --color-text-secondary: #5A685F;
-  --color-text-muted: #87928A;
+  --color-text-secondary: #55655B;
+  --color-text-muted: #829087;
 
   /* Spacing */
   --space-xs: 4px;
@@ -56,8 +56,8 @@
   --stack-gap: 0px;
   --vv-bottom: 0px;
 
-  --stack-bg: rgba(247,250,244,0.88);
-  --divider: rgba(24,40,30,0.08);
+  --stack-bg: rgba(239,244,236,0.92);
+  --divider: rgba(24,40,30,0.10);
 
   /* Feed rhythm */
   --feed-section-pad-top: 6px;
@@ -71,27 +71,29 @@
 
   /* Cards */
   --radius-card: 12px;
-  --shadow-card: 0 6px 20px rgba(0,0,0,0.06);
+  --shadow-card:
+    0 10px 24px rgba(10,24,16,0.055),
+    0 1px 0 rgba(255,255,255,0.76) inset;
 
   /* Event cards */
   --rail-w: 4px;
-  --eventcard-rail-opacity: 0.48;
-  --eventcard-meta-color: rgba(60,72,88,0.70);
+  --eventcard-rail-opacity: 0.58;
+  --eventcard-meta-color: rgba(58,70,66,0.76);
   --eventcard-meta-gap: 2px;
 
   --radius-eventcard: 16px;
-  --border-eventcard: rgba(31,41,51,0.055);
-  --border-eventcard-hover: rgba(31,41,51,0.075);
+  --border-eventcard: rgba(24,40,30,0.075);
+  --border-eventcard-hover: rgba(24,40,30,0.11);
 
   --shadow-eventcard:
-    0 1px 1px rgba(0,0,0,0.032),
-    0 8px 22px rgba(0,0,0,0.040),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 1px 1px rgba(0,0,0,0.024),
+    0 10px 24px rgba(11,24,16,0.048),
+    0 1px 0 rgba(255,255,255,0.80) inset;
 
   --shadow-eventcard-hover:
-    0 1px 2px rgba(0,0,0,0.038),
-    0 10px 26px rgba(0,0,0,0.050),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 1px 2px rgba(0,0,0,0.028),
+    0 14px 30px rgba(11,24,16,0.062),
+    0 1px 0 rgba(255,255,255,0.82) inset;
 
   --eventcard-meta-lines: 2;
 
@@ -136,25 +138,25 @@
   --ui-radius-md: 14px;
   --ui-sheet-radius-lg: 18px;
 
-  --ui-border-weak: rgba(31,41,51,0.08);
-  --ui-border-soft: rgba(31,41,51,0.10);
-  --ui-border-strong: rgba(31,41,51,0.14);
-  --ui-border-primary: rgba(143,203,59,0.42);
+  --ui-border-weak: rgba(24,40,30,0.10);
+  --ui-border-soft: rgba(24,40,30,0.12);
+  --ui-border-strong: rgba(24,40,30,0.16);
+  --ui-border-primary: rgba(143,203,59,0.46);
 
-  --ui-surface-soft: rgba(255,255,255,0.55);
-  --ui-surface-soft-hover: rgba(255,255,255,0.74);
-  --ui-surface-soft-active: rgba(255,255,255,0.86);
+  --ui-surface-soft: rgba(255,255,255,0.72);
+  --ui-surface-soft-hover: rgba(255,255,255,0.86);
+  --ui-surface-soft-active: rgba(255,255,255,0.94);
 
-  --ui-surface-tint: rgba(31,41,51,0.04);
-  --ui-surface-tint-hover: rgba(31,41,51,0.06);
-  --ui-surface-tint-active: rgba(31,41,51,0.08);
+  --ui-surface-tint: rgba(24,40,30,0.045);
+  --ui-surface-tint-hover: rgba(24,40,30,0.065);
+  --ui-surface-tint-active: rgba(24,40,30,0.09);
 
   --ui-shadow-soft:
-    0 6px 14px rgba(0,0,0,0.045),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 8px 18px rgba(10,24,16,0.055),
+    0 1px 0 rgba(255,255,255,0.76) inset;
 
-  --ui-shadow-cta: 0 8px 18px rgba(0,0,0,0.08);
-  --ui-shadow-cta-active: 0 5px 12px rgba(0,0,0,0.08);
+  --ui-shadow-cta: 0 10px 22px rgba(10,24,16,0.09);
+  --ui-shadow-cta-active: 0 6px 14px rgba(10,24,16,0.08);
   --ui-sheet-shadow-strong:
     0 24px 64px rgba(0,0,0,0.16),
     0 1px 0 rgba(255,255,255,0.78) inset;
@@ -176,13 +178,13 @@
   --ui-control-border: var(--ui-border-weak);
   --ui-control-border-strong: var(--ui-border-soft);
 
-  --ui-control-bg: rgba(255,255,255,0.82);
-  --ui-control-bg-strong: rgba(255,255,255,0.92);
+  --ui-control-bg: rgba(255,255,255,0.90);
+  --ui-control-bg-strong: rgba(255,255,255,0.97);
 
   --ui-control-shadow: var(--ui-shadow-soft);
   --ui-control-shadow-strong:
-    0 5px 12px rgba(0,0,0,0.040),
-    0 1px 0 rgba(255,255,255,0.80) inset;
+    0 7px 16px rgba(10,24,16,0.050),
+    0 1px 0 rgba(255,255,255,0.82) inset;
 
   --ui-control-ring-active: rgba(143,203,59,0.10);
 
@@ -337,8 +339,8 @@
 body{
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f4f6ef; /* Basis: mobile & desktop gleich */
-  color: #111827;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 /* VIEWPORT OVERSCROLL GUARD (prevents header rubberband on Android) */
 html,
@@ -352,7 +354,7 @@ body{
   }
 
   body{
-    background: #eef1e6; /* leicht dunkler als App-Fläche */
+    background: #E8EDE1;
   }
 
   .top-stack,
