@@ -216,8 +216,7 @@ filters: {
   /**
    * Init: Event Listeners registrieren
    */
-   */
-     /* === BEGIN BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) ===
+  /* === BEGIN BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) ===
 Zweck: Harter Beweis, ob init() wirklich läuft und wo es ggf. abbricht.
 Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zuweisung.
 === */
@@ -614,9 +613,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
     this.updateFacetOptionStates();
     debugLog(`Filtered: ${this.filteredEvents.length} of ${(this.allEvents || []).length} events`);
-// END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
-
-
+  },
 
   /**
    * UI aktualisieren
@@ -1045,6 +1042,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     );
 
     debugLog("Facet filters reset");
+  },
 
   /**
    * Events neu laden (z. B. nach Airtable-Update)
