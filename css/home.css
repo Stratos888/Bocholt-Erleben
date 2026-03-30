@@ -548,7 +548,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V1 | Zweck: entfernt den mobilen Veranstalter-CTA aus dem Top-Stack und stylt stattdessen einen ruhigen In-Feed-Einstieg nach dem ersten echten Event-Block; Umfang: mobile publish top-strip ausblenden + neuer mobile-only feed entry === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V2 | Zweck: trennt den mobilen Veranstalter-Einstieg visuell klar vom Event-Feed, reduziert den Card-Look und stärkt den Charakter als eigenständige Service-Zeile; Umfang: mobile-only Styling für den dynamisch im Feed gerenderten Publish-Einstieg === */
 
 .mobile-publish-card,
 .mobile-publish-strip,
@@ -559,28 +559,31 @@
 @media (max-width: 899.98px){
   .feed-publish-entry{
     display: grid;
-    gap: 4px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label label"
+      "title chevron";
+    column-gap: 12px;
+    row-gap: 5px;
     width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--border-panel-soft);
-    border-radius: var(--ui-radius-md);
+    margin: 4px 0 2px;
+    padding: 11px 14px 12px;
+    border: 1px dashed color-mix(in srgb, rgba(24,40,30,0.24) 68%, var(--brand-gold-200) 32%);
+    border-radius: 14px;
     background:
       linear-gradient(
         180deg,
-        color-mix(in srgb, white 86%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 78%, var(--color-primary-muted)) 100%
+        color-mix(in srgb, white 78%, var(--color-primary-muted)) 0%,
+        color-mix(in srgb, white 70%, var(--color-primary-muted)) 100%
       );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.84) inset,
-      0 8px 18px rgba(12,24,18,0.038);
+    box-shadow: none;
     color: var(--color-text-primary);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
     transition:
       border-color 140ms ease,
       background 140ms ease,
-      box-shadow 140ms ease,
-      transform 140ms ease;
+      transform 120ms ease;
   }
 
   .feed-publish-entry:link,
@@ -592,54 +595,53 @@
   }
 
   .feed-publish-entry__label{
+    grid-area: label;
     display: block;
     min-width: 0;
     margin: 0;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    font-weight: 760;
+    color: color-mix(in srgb, var(--color-text-muted) 88%, var(--brand-green-900) 12%);
+    font-size: 10px;
+    font-weight: 800;
     line-height: 1.1;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .feed-publish-entry__main{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-width: 0;
+    grid-area: title / title / title / chevron;
+    display: contents;
   }
 
   .feed-publish-entry__title{
+    grid-area: title;
     display: block;
     min-width: 0;
     margin: 0;
-    color: var(--color-text-primary);
-    font-size: var(--ui-font-size-control);
+    color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
+    font-size: 0.98rem;
     font-weight: 760;
-    line-height: 1.2;
+    line-height: 1.18;
   }
 
   .feed-publish-entry__chevron{
+    grid-area: chevron;
+    align-self: center;
+    justify-self: end;
     flex: 0 0 auto;
-    color: color-mix(in srgb, var(--color-text-primary) 68%, white);
-    font-size: 18px;
+    color: color-mix(in srgb, var(--color-text-muted) 76%, var(--brand-green-900) 24%);
+    font-size: 17px;
     line-height: 1;
   }
 
   @media (hover: hover){
     .feed-publish-entry:hover{
-      border-color: var(--border-panel);
+      border-color: color-mix(in srgb, rgba(24,40,30,0.34) 70%, var(--brand-gold-200) 30%);
       background:
         linear-gradient(
           180deg,
-          color-mix(in srgb, white 90%, var(--color-primary-muted)) 0%,
-          color-mix(in srgb, white 82%, var(--color-primary-muted)) 100%
+          color-mix(in srgb, white 82%, var(--color-primary-muted)) 0%,
+          color-mix(in srgb, white 74%, var(--color-primary-muted)) 100%
         );
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.88) inset,
-        0 10px 22px rgba(12,24,18,0.048);
     }
   }
 
@@ -653,7 +655,7 @@
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V1 === */
+/* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V2 === */
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
