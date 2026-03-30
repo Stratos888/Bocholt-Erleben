@@ -36,14 +36,14 @@
 
   margin: var(--feed-title-mt) 0 var(--feed-title-mb);
 
-  font-weight: 700;
+  font-weight: 760;
   font-size: 0.76rem;
 
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
 
   text-transform: uppercase;
 
-  color: color-mix(in srgb, var(--color-text-secondary) 48%, var(--brand-green-700));
+  color: color-mix(in srgb, var(--brand-green-800) 86%, var(--brand-gold-300) 14%);
 
 }
 
@@ -501,7 +501,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 | Zweck: reduziert den mobilen Veranstalter-CTA auf eine kompakte Ein-Zeilen-Utility-Row ohne Kicker und hält alte/new Markup-Varianten kompatibel; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V4 | Zweck: zieht den mobilen Veranstalter-CTA vollständig auf dieselbe neutrale Button-Systematik wie App/Info, entfernt die Sonderrolle als grüner Highlight-CTA und hält alte/new Markup-Varianten kompatibel; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
 
 .mobile-publish-card,
 .mobile-publish-strip{
@@ -511,25 +511,29 @@
 @media (max-width: 899.98px){
   .mobile-publish-card,
   .mobile-publish-strip{
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
     position: relative;
     min-height: 44px;
     margin: 8px 0 8px;
-    padding: 0 34px 0 12px;
-    border: 1px solid color-mix(in srgb, transparent 60%, var(--brand-green-700));
-    border-radius: var(--cmp-input-radius);
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, white 78%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 88%, var(--brand-lime-300)) 100%
-    );
+    padding: 0 12px;
+    border: 1px solid rgba(24,40,30,0.11);
+    border-radius: var(--ui-radius-sm);
+    background: linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(242,246,237,0.88) 100%);
     box-shadow:
-      0 8px 18px rgba(10,24,16,0.05),
+      0 8px 18px rgba(10,24,16,0.055),
       0 1px 0 rgba(255,255,255,0.82) inset;
-    color: inherit;
+    color: rgba(24,40,30,0.84);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      box-shadow 140ms ease,
+      transform 140ms ease,
+      color 140ms ease;
   }
 
   .mobile-publish-card:link,
@@ -544,18 +548,28 @@
     text-decoration: none;
   }
 
+  .mobile-publish-card::before,
+  .mobile-publish-strip::before{
+    content: "";
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    display: inline-block;
+    background-color: currentColor;
+    opacity: 0.82;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  }
+
   .mobile-publish-card::after,
   .mobile-publish-strip::after{
-    content: "›";
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    color: color-mix(in srgb, var(--brand-green-700) 58%, var(--color-text-secondary));
-    font-size: 0.9rem;
-    font-weight: 600;
-    line-height: 1;
-    pointer-events: none;
+    content: none;
   }
 
   .mobile-publish-strip__copy{
@@ -578,24 +592,28 @@
     display: block;
     min-width: 0;
     margin: 0;
-    color: var(--brand-green-900);
-    font-size: 0.93rem;
-    font-weight: 700;
+    color: rgba(24,40,30,0.84);
+    font-size: var(--ui-font-size-control);
+    font-weight: var(--ui-font-weight-control);
     line-height: 1;
-    letter-spacing: -0.008em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
+  @media (hover: hover){
+    .mobile-publish-card:hover,
+    .mobile-publish-strip:hover{
+      background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(246,249,242,0.92) 100%);
+      border-color: rgba(24,40,30,0.16);
+      color: var(--color-text-primary);
+    }
+  }
+
   .mobile-publish-card:active,
   .mobile-publish-strip:active{
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, white 72%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 82%, var(--brand-lime-300)) 100%
-    );
     transform: translateY(1px);
+    background: linear-gradient(180deg, rgba(248,250,245,0.96) 0%, rgba(240,245,236,0.94) 100%);
   }
 
   .mobile-publish-card:focus-visible,
@@ -605,8 +623,8 @@
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 === */
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V27 | Purpose: kalibriert den Desktop-Hero auf klare Ebenen mit ruhiger Feed-naher Search-Surface, gleichwertigen Service-Actions und präziserem Bild-Fade; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V4 === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V28 | Purpose: schärft den Home-only Brand-Polish auf Desktop, übersetzt Icon-Grün/Gold kontrolliert in Hero und Section-Hierarchy und vereinheitlicht alle Service-Actions vollständig; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
@@ -672,12 +690,12 @@
     --hero-bg-position-active: 79.25% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
-    --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
-    --hero-bg-saturate-active: var(--hero-bg-saturate-desktop);
-    --hero-bg-contrast-active: var(--hero-bg-contrast-desktop);
-    --hero-panel-bg: linear-gradient(180deg, rgba(247,250,244,0.975) 0%, rgba(238,244,233,0.955) 100%);
-    --hero-panel-border: rgba(24,40,30,0.14);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(246,250,241,0.965) 100%);
+    --hero-bg-brightness-active: 0.956;
+    --hero-bg-saturate-active: 1.03;
+    --hero-bg-contrast-active: 1.04;
+    --hero-panel-bg: linear-gradient(180deg, rgba(248,250,244,0.978) 0%, rgba(239,244,234,0.962) 100%);
+    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.16) 78%, var(--brand-gold-200) 22%);
+    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.988) 0%, rgba(246,250,241,0.968) 100%);
     --hero-control-border: rgba(24,40,30,0.12);
     --hero-control-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
@@ -687,9 +705,9 @@
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-    min-height: 420px;
-    padding: 24px 32px 16px;
+    gap: 14px;
+    min-height: 424px;
+    padding: 22px 32px 14px;
     background: none;
     border: 0;
     border-radius: 0;
@@ -705,9 +723,9 @@
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.992) 0%, rgba(247,250,244,0.985) 6%, rgba(247,250,244,0.90) 11%, rgba(247,250,244,0.58) 17%, rgba(247,250,244,0.24) 24%, rgba(247,250,244,0.07) 31%, rgba(247,250,244,0.00) 37%),
-      radial-gradient(46% 56% at 16% 28%, rgba(247,250,244,0.34) 0%, rgba(247,250,244,0.14) 38%, rgba(247,250,244,0.04) 63%, rgba(247,250,244,0.00) 79%),
-      linear-gradient(180deg, rgba(247,250,244,0.28) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.02) 42%, rgba(247,250,244,0.08) 100%),
+      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.988) 6%, rgba(247,250,244,0.91) 11%, rgba(247,250,244,0.56) 17%, rgba(247,250,244,0.22) 24%, rgba(247,250,244,0.06) 31%, rgba(247,250,244,0.00) 37%),
+      radial-gradient(48% 58% at 16% 28%, rgba(247,250,244,0.34) 0%, rgba(247,250,244,0.14) 38%, rgba(247,250,244,0.04) 63%, rgba(247,250,244,0.00) 79%),
+      linear-gradient(180deg, rgba(247,250,244,0.24) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.02) 42%, rgba(247,250,244,0.08) 100%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
     background-position: left top, left top, center top, var(--hero-bg-position-active);
@@ -730,9 +748,9 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 72% 18%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.00) 10%),
-      radial-gradient(circle at 86% 54%, rgba(246,214,153,0.04) 0%, rgba(246,214,153,0.00) 12%),
-      linear-gradient(180deg, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.10) 100%);
+      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.11) 0%, rgba(240,222,137,0.00) 13%),
+      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.05) 0%, rgba(216,178,52,0.00) 13%),
+      linear-gradient(180deg, rgba(250,252,247,0.00) 74%, rgba(250,252,247,0.12) 100%);
     pointer-events: none;
   }
 
@@ -753,7 +771,7 @@
 
   .desktop-entry__title{
     max-width: 30rem;
-    color: var(--brand-green-900);
+    color: color-mix(in srgb, var(--brand-green-900) 94%, var(--brand-gold-300) 6%);
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
@@ -761,7 +779,7 @@
 
   .desktop-entry__text{
     max-width: 29rem;
-    color: rgba(24,40,30,0.84);
+    color: rgba(24,40,30,0.86);
     font-size: 0.99rem;
     line-height: 1.42;
   }
@@ -790,8 +808,8 @@
     border-radius: 22px;
     background: var(--hero-panel-bg);
     box-shadow:
-      0 18px 36px rgba(22,39,61,0.072),
-      0 1px 0 rgba(255,255,255,0.92) inset;
+      0 20px 40px rgba(22,39,61,0.078),
+      0 1px 0 rgba(255,255,255,0.93) inset;
     -webkit-backdrop-filter: blur(9px);
     backdrop-filter: blur(9px);
   }
@@ -937,7 +955,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid rgba(117,133,108,0.14);
+    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 72%, var(--brand-gold-200) 28%);
   }
 
   .desktop-hero__action{
@@ -945,7 +963,7 @@
     padding: 0 12px;
     border-radius: 11px;
     font-size: 0.84rem;
-    font-weight: 670;
+    font-weight: 680;
     border: 1px solid rgba(24,40,30,0.11);
     background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(245,248,241,0.95) 100%);
     color: rgba(24,40,30,0.84);
@@ -957,66 +975,17 @@
   .desktop-hero__action .desktop-hero__icon{
     width: 14px;
     height: 14px;
-    opacity: 0.64;
-  }
-
-  .desktop-hero__actions .desktop-hero__action--publish{
-    border-color: color-mix(in srgb, transparent 54%, var(--color-primary));
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 72%, var(--brand-lime-300)) 100%
-    );
-    color: var(--brand-green-900);
-    font-weight: 720;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 8px 18px rgba(63,133,44,0.14);
-  }
-
-  .desktop-hero__actions .desktop-hero__action--info,
-  .desktop-hero__actions .desktop-hero__action--app{
-    border-color: rgba(24,40,30,0.11);
-    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(245,248,241,0.95) 100%);
-    color: rgba(24,40,30,0.82);
-    font-weight: 660;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(10,24,16,0.024);
-  }
-
-  @media (hover: hover){
-    .desktop-hero__actions .desktop-hero__action:hover{
-      border-color: rgba(24,40,30,0.16);
-      background: linear-gradient(180deg, rgba(255,255,255,0.995) 0%, rgba(248,250,244,0.98) 100%);
-      color: var(--color-text-primary);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(10,24,16,0.035);
-    }
-
-    .desktop-hero__actions .desktop-hero__action--publish:hover{
-      border-color: color-mix(in srgb, transparent 44%, var(--color-primary));
-      background: linear-gradient(
-        180deg,
-        color-mix(in srgb, white 42%, var(--color-primary-muted)) 0%,
-        color-mix(in srgb, white 62%, var(--brand-lime-300)) 100%
-      );
-      color: var(--brand-green-950);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.94) inset,
-        0 10px 22px rgba(63,133,44,0.16);
-    }
+    opacity: 0.68;
   }
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover{
       border-color: rgba(22,39,61,0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(248,251,246,0.965) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
       color: var(--color-text-primary);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(22,39,61,0.024);
+        0 8px 18px rgba(22,39,61,0.026);
     }
   }
 }
@@ -1063,7 +1032,7 @@
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V27 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V28 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V25 | Purpose: stabilisiert die 1024-Klasse mit kompakterem aber klar getrenntem Hero, schmalerem Fade und ruhiger Search-Surface ohne Kontrastverlust; Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
