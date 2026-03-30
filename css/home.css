@@ -714,6 +714,7 @@
     box-shadow: none;
   }
 
+/* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 | Zweck: schließt den letzten verbleibenden Desktop-Farb-Gap, indem der linke Hero-Fade auf breiten Desktops deutlich transparenter, natürlicher und weniger kreidig wird; Umfang: nur Desktop-Hero-Overlay im V29-Block, keine Geometrieänderung === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -723,10 +724,10 @@
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(246,248,240,0.988) 0%, rgba(246,248,240,0.982) 6%, rgba(246,248,240,0.86) 11%, rgba(245,247,238,0.52) 16%, rgba(244,246,236,0.22) 22%, rgba(244,246,236,0.05) 28%, rgba(244,246,236,0.00) 34%),
-      radial-gradient(48% 58% at 16% 28%, rgba(245,248,239,0.26) 0%, rgba(245,248,239,0.11) 36%, rgba(245,248,239,0.03) 60%, rgba(245,248,239,0.00) 78%),
-      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.01) 42%, rgba(245,248,239,0.06) 100%),
-      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.055) 0%, rgba(240,222,137,0.00) 13%),
+      linear-gradient(90deg, rgba(246,248,240,0.974) 0%, rgba(246,248,240,0.964) 5%, rgba(246,248,240,0.78) 9%, rgba(245,247,238,0.40) 14%, rgba(244,246,236,0.14) 19%, rgba(244,246,236,0.03) 24%, rgba(244,246,236,0.00) 30%),
+      radial-gradient(44% 56% at 15% 28%, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.075) 34%, rgba(245,248,239,0.018) 58%, rgba(245,248,239,0.00) 76%),
+      linear-gradient(180deg, rgba(245,248,239,0.11) 0%, rgba(245,248,239,0.03) 18%, rgba(245,248,239,0.00) 42%, rgba(245,248,239,0.04) 100%),
+      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.04) 0%, rgba(240,222,137,0.00) 12%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
@@ -749,11 +750,12 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.09) 0%, rgba(240,222,137,0.00) 14%),
-      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.038) 0%, rgba(216,178,52,0.00) 13%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 74%, rgba(246,249,241,0.10) 100%);
+      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.072) 0%, rgba(240,222,137,0.00) 13%),
+      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.028) 0%, rgba(216,178,52,0.00) 12%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, rgba(246,249,241,0.075) 100%);
     pointer-events: none;
   }
+/* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 === */
 
   .desktop-entry{
     display: block;
