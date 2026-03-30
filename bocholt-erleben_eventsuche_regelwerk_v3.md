@@ -11,18 +11,28 @@ Die Chat-Suche soll möglichst nah an hoher manueller Chat-Qualität bleiben, oh
 
 ## Wichtige Arbeitslogik
 
-### Die Chat-Suche deduped gegen Projektbestand, Manual-Bestand und Chat-Session-Bestand.
+### Die Chat-Suche deduped gegen Live-Bestand, offene Review-Basis, Entscheidungs-Archiv, Manual-Bestand und Chat-Session-Bestand.
 Damit ein Suchlauf sauber funktioniert, müssen dem Chat **immer diese Referenzen** mitgegeben werden:
 
 1. **dieses Regelwerk**
-2. **die aktuelle `data/events.json`**
-3. **die aktuelle `data/inbox.tsv`**
-4. **die aktuelle `data/inbox_manual.json`**, wenn dort bereits Kandidaten liegen
+2. **der aktuelle Bestands-Export**: bevorzugt `events.tsv`, ersatzweise `data/events.json`
+3. **die aktuelle offene Review-Basis**: `inbox.tsv` bzw. `data/inbox.tsv`
+4. **das aktuelle Entscheidungs-Archiv**: `inbox_archive.tsv`
+5. **die aktuelle `data/inbox_manual.json`**, wenn dort bereits Kandidaten liegen
 
 ### Warum genau diese Dateien?
-- `data/events.json` = bereits kuratierter Live-/Bestandsfeed der App
-- `data/inbox.tsv` = aktuelle Inbox-/Review-Basis, also Events, die schon im Prüfprozess sind
+- `events.tsv` bzw. `data/events.json` = bereits kuratierter Live-/Bestandsfeed der App
+- `inbox.tsv` bzw. `data/inbox.tsv` = aktuelle Inbox-/Review-Basis, also Events, die schon im Prüfprozess sind
+- `inbox_archive.tsv` = bereits entschiedene Fälle aus `Inbox_Archive`, einschließlich **übernommen** und **verworfen**
 - `data/inbox_manual.json` = bereits vorbereitete, aber noch nicht importierte Manual-Kandidaten
+
+### Harte Archiv-Regel
+`inbox_archive.tsv` ist **Pflichtbestand für sauberes Dedupe**.
+
+Grund:
+- verworfene Events dürfen bei späteren Suchläufen **nicht erneut vorgeschlagen** werden
+- bereits entschiedene Alt-Fälle aus dem Archiv dürfen ebenfalls **nicht erneut vorgeschlagen** werden
+- das Archiv ist die Grundlage für spätere Lern-/Negativlogik
 
 ### Zusätzliche Session-Regel
 Innerhalb desselben Chats gelten **alle bereits ausgegebenen JSON-Kandidaten** als temporärer Zusatz-Bestand.
@@ -38,30 +48,32 @@ Folgeläufe dürfen **nur neue Delta-Kandidaten** liefern.
 Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese Dateien mitgegeben werden:
 
 - `bocholt-erleben_eventsuche_regelwerk_v3.md`
-- `data/events.json`
-- `data/inbox.tsv`
+- `events.tsv` oder ersatzweise `data/events.json`
+- `inbox.tsv` bzw. `data/inbox.tsv`
+- `inbox_archive.tsv`
 - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
 Für neue Suchläufe soll nach Möglichkeit diese Standard-Anweisung verwendet werden:
 
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json`, `data/inbox.tsv`, `data/inbox_manual.json` und gegen bereits im selben Chat gelieferte Kandidaten. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten ausschließlich als JSON für `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
 Dieser Prompt kann in neuen Chats direkt verwendet werden:
 
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `data/events.json`, `data/inbox.tsv`, `data/inbox_manual.json` und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs- und Qualitätsregeln strikt an. Liefere ausschließlich ein JSON-Array für `data/inbox_manual.json` und keine weiteren Erklärungen im JSON-Block.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs- und Qualitätsregeln strikt an. Liefere ausschließlich ein JSON-Array für `data/inbox_manual.json` und keine weiteren Erklärungen im JSON-Block.
 
 Der Chat soll vor der Suche bzw. vor der Ausgabe immer berücksichtigen:
 - Regelwerk anwenden
-- gegen `data/events.json` dedupen
-- gegen `data/inbox.tsv` dedupen
+- gegen `events.tsv` bzw. ersatzweise `data/events.json` dedupen
+- gegen `inbox.tsv` bzw. `data/inbox.tsv` dedupen
+- gegen `inbox_archive.tsv` dedupen
 - gegen `data/inbox_manual.json` dedupen, wenn vorhanden
 - gegen bereits im selben Chat gelieferte Kandidaten dedupen
 - bei Folgeläufen nur Delta liefern
 - nur JSON für `data/inbox_manual.json` ausgeben
 
-Wenn eine der Referenzdateien fehlt, soll der Chat vor dem Suchlauf darauf hinweisen, dass für sauberes Dedupe zusätzlich noch `data/events.json`, `data/inbox.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Repo-Stand benötigt werden.
+Wenn eine der Referenzdateien fehlt, soll der Chat vor dem Suchlauf darauf hinweisen, dass für sauberes Dedupe zusätzlich noch der aktuelle Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Stand benötigt werden.
 
 ---
 
@@ -138,6 +150,8 @@ Nicht aufnehmen:
 Nicht aufnehmen:
 
 - Events von **potenziellen späteren zahlenden Kunden**, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
+- Events, deren Hauptnutzen die Sichtbarkeit einer einzelnen potenziellen Kunden-Location erhöht
+- Eventorte potenzieller Kunden dürfen im manuellen KI-Suchlauf **nicht aktiv als zu beliefernde Eventorte** behandelt werden
 
 Besonders vorsichtig behandeln:
 
@@ -149,8 +163,22 @@ Besonders vorsichtig behandeln:
 - kommerzielle Veranstalter
 - sonstige Locations, die später für Event-Veröffentlichung zahlen könnten
 
+### Explizite Schutzregel
+Mögliche spätere zahlende Kundschaft soll im manuellen KI-Suchlauf bewusst **nicht** als normale Eventquelle oder Eventort-Liste bespielt werden.
+
+Dazu zählt ausdrücklich auch:
+
+- **Kulturort Alte Molkerei**
+
+Für solche Locations gilt konservativ:
+
+- **ohne explizite spätere Freigabe keine neuen Treffer als Eventort liefern**
+- **nicht aktiv nach deren Einzel-Events suchen**
+- **keine Treffer liefern, deren Hauptwert die Sichtbarkeit dieser Location erhöht**
+- **im Zweifel weglassen**
+
 ### Entscheidungsregel
-Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verschafft und kein klar öffentlich relevantes Stadt-/Kulturevent ist:
+Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verschafft und kein klar öffentlich relevantes Stadt-/Kulturevent aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle ist:
 
 - **nicht aufnehmen**
 
@@ -416,10 +444,17 @@ Wenn mehrere Varianten derselben Termin-Instanz gefunden werden:
 Wichtig:
 Dieses Dedupe soll bereits im Chat-Suchlauf berücksichtigt werden gegen:
 
-- `data/events.json`
-- `data/inbox.tsv`
+- `events.tsv` bzw. ersatzweise `data/events.json`
+- `inbox.tsv` bzw. `data/inbox.tsv`
+- `inbox_archive.tsv`
 - `data/inbox_manual.json`, wenn vorhanden
 - alle bereits **im selben Chat** gelieferten JSON-Kandidaten
+
+Besonders wichtig:
+
+- `inbox_archive.tsv` enthält auch bereits **verworfene** Fälle
+- verworfene Fälle dürfen **nicht erneut als neue Treffer** ausgegeben werden
+- das Archiv ist Teil des kanonischen Dedupe-Bestands
 
 Bei mehreren Suchläufen innerhalb desselben Chats gilt:
 
@@ -608,7 +643,7 @@ Wenn im selben Chat ein weiterer Suchlauf folgt, muss der Chat zusätzlich inter
 
 Wenn für den Suchlauf nicht alle Referenzdateien vorhanden sind, soll der Chat zusätzlich vorher klar darauf hinweisen:
 
-> Für sauberes Dedupe brauche ich zusätzlich die aktuelle `data/events.json`, `data/inbox.tsv` und gegebenenfalls `data/inbox_manual.json` aus deinem Repo.
+> Für sauberes Dedupe brauche ich zusätzlich den aktuellen Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus deinem aktuellen Stand.
 
 ---
 
@@ -616,8 +651,9 @@ Wenn für den Suchlauf nicht alle Referenzdateien vorhanden sind, soll der Chat 
 1. Neues Chat-Fenster öffnen
 2. Diese Dateien mitgeben:
    - `bocholt-erleben_eventsuche_regelwerk_v3.md`
-   - `data/events.json`
-   - `data/inbox.tsv`
+   - `events.tsv` oder ersatzweise `data/events.json`
+   - `inbox.tsv` bzw. `data/inbox.tsv`
+   - `inbox_archive.tsv`
    - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 3. Suchlauf starten lassen
 4. JSON-Ausgabe vollständig in `data/inbox_manual.json` kopieren
@@ -627,7 +663,7 @@ Wenn für den Suchlauf nicht alle Referenzdateien vorhanden sind, soll der Chat 
    - neues Delta in `data/inbox_manual.json` ergänzen
 6. Workflow **Manual KI Event Intake** starten
 7. Inbox Review PWA vollständig kuratieren
-8. Erst danach neuen Suchlauf starten
+8. Vor dem nächsten Suchlauf wieder gegen den aktuellen Bestand, die offene Inbox, das Archiv und ggf. `data/inbox_manual.json` dedupen
 
 ---
 
@@ -637,6 +673,11 @@ Vor einem neuen Suchlauf sollte die Inbox möglichst vollständig kuratiert sein
 Das heißt:
 - offene Review-Reste möglichst zuerst abarbeiten
 - erst danach nächsten Suchlauf starten
+
+Wichtig:
+- verworfene oder übernommene Fälle bleiben für künftige Suchläufe dedupe-relevant über `inbox_archive.tsv`
+- `inbox_archive.tsv` ist kein optionales Nice-to-have, sondern Pflichtbestand für saubere Folgeläufe
+- ohne Archiv-Datei ist das Dedupe unvollständig
 
 Wenn ausnahmsweise mehrere Suchläufe **innerhalb desselben Chats** vor dem Intake gemacht werden, dann gilt zusätzlich:
 
