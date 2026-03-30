@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <!-- === BEGIN BLOCK: PWA ICON + META BASICS (home) ===
 Zweck: Bindet Manifest, Favicon, Apple-Touch-Icon und Basis-PWA-Meta für Home sauber ein.
-Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head>.
+Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head> und ergänzt den sicheren Theme-Lab-Preview-Bootstrap.
 === -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#F2F6EC">
@@ -15,14 +15,12 @@ Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head>.
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
-<!-- === BEGIN BLOCK: HOME_THEME_PREVIEW_BOOTSTRAP_V1 | Zweck: aktiviert über ?themePreview=… sichere Home-Farb-Previews ohne den Normalzustand zu verändern; Umfang: setzt nur data-theme-preview am <html> und überschreibt im Preview-Fall die theme-color-Meta === -->
 <script>
 (function () {
   const previewThemeMap = {
-    "warm-civic": "#F6F0E6",
-    "fresh-editorial": "#EEF5F1",
-    "refined-brand": "#F3F7EB"
+    "brand-warm": "#F4F3E8",
+    "civic-gold": "#F6F0E4",
+    "forest-light": "#EFF4EA"
   };
 
   const previewKey = new URLSearchParams(window.location.search).get("themePreview");
@@ -36,7 +34,7 @@ Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head>.
   }
 })();
 </script>
-<!-- === END BLOCK: HOME_THEME_PREVIEW_BOOTSTRAP_V1 === -->
+<!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
 
 <!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
 
