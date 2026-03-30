@@ -63,7 +63,7 @@
 
     .lab-header p{
       margin: 0;
-      max-width: 72ch;
+      max-width: 74ch;
       color: var(--lab-text-soft);
       font-size: 0.98rem;
       line-height: 1.5;
@@ -75,18 +75,20 @@
       gap: 10px;
     }
 
-    .lab-nav a{
+    .lab-nav a,
+    .lab-links a{
       display: inline-flex;
       align-items: center;
       min-height: 38px;
       padding: 0 14px;
       border: 1px solid var(--lab-border);
       border-radius: 999px;
-      background: rgba(255,255,255,0.78);
+      background: rgba(255,255,255,0.80);
       color: var(--lab-text);
       text-decoration: none;
       font-size: 0.92rem;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .lab-variant{
@@ -110,7 +112,7 @@
     .lab-variant__meta{
       display: grid;
       gap: 6px;
-      max-width: 70ch;
+      max-width: 76ch;
     }
 
     .lab-variant__eyebrow{
@@ -141,21 +143,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-    }
-
-    .lab-links a{
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 0 12px;
-      border: 1px solid var(--lab-border-strong);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.84);
-      color: var(--lab-text);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 700;
-      white-space: nowrap;
     }
 
     .lab-preview-grid{
@@ -263,25 +250,24 @@
 <body>
   <main class="lab-shell">
     <section class="lab-header">
-      <h1>Theme Lab – Home-Farbvarianten</h1>
-      <p>Vergleich auf echter Home-UI mit echten Assets. Jede Variante rendert die normale Startseite über <code>?themePreview=…</code>. Damit bleiben Layout, Komponenten, Bildmaterial und Abstände identisch; nur die Farbwelt wird ausgetauscht.</p>
+      <h1>Theme Lab – zweite Auswahlrunde</h1>
+      <p>Drei neue Varianten, alle näher am Icon und an einer enterprise-fähigen Gesamtanmutung. Fokus: weniger trist, mehr Produktcharakter, aber weiterhin ruhig und nicht überladen.</p>
       <nav class="lab-nav" aria-label="Sprungmarken">
-        <a href="#warm-civic">Warm Civic</a>
-        <a href="#fresh-editorial">Fresh Editorial</a>
-        <a href="#refined-brand">Refined Brand</a>
+        <a href="#brand-warm">Brand Warm</a>
+        <a href="#civic-gold">Civic Gold</a>
+        <a href="#forest-light">Forest Light</a>
       </nav>
     </section>
 
-    <section class="lab-variant" id="warm-civic">
+    <section class="lab-variant" id="brand-warm">
       <div class="lab-variant__top">
         <div class="lab-variant__meta">
           <p class="lab-variant__eyebrow">Variante A</p>
-          <h2 class="lab-variant__title">Warm Civic</h2>
-          <p class="lab-variant__text">Wärmer, freundlicher und etwas weniger grau. Ziel: ruhige Civic-/Stadtportal-Anmutung mit mehr Wärme und weniger Kreidigkeit.</p>
+          <h2 class="lab-variant__title">Brand Warm</h2>
+          <p class="lab-variant__text">Die neue Hauptkandidatin: wärmere Flächen gegen den Graueindruck, aber mit klarerer Bindung an das dunkle Grün und den goldenen Unterton des Icons.</p>
         </div>
         <div class="lab-links">
-          <a href="/?themePreview=warm-civic" target="_blank" rel="noopener noreferrer">Live öffnen</a>
-          <a href="/?themePreview=warm-civic" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+          <a href="/?themePreview=brand-warm" target="_blank" rel="noopener noreferrer">Live öffnen</a>
         </div>
       </div>
 
@@ -292,7 +278,7 @@
             <span class="lab-preview__meta">1920 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--wide">
-            <iframe loading="lazy" title="Warm Civic Desktop wide" src="/?themePreview=warm-civic"></iframe>
+            <iframe loading="lazy" title="Brand Warm Desktop wide" src="/?themePreview=brand-warm"></iframe>
           </div>
         </article>
 
@@ -302,7 +288,7 @@
             <span class="lab-preview__meta">1024 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--desktop">
-            <iframe loading="lazy" title="Warm Civic Desktop normal" src="/?themePreview=warm-civic"></iframe>
+            <iframe loading="lazy" title="Brand Warm Desktop normal" src="/?themePreview=brand-warm"></iframe>
           </div>
         </article>
 
@@ -312,22 +298,21 @@
             <span class="lab-preview__meta">390 × 844</span>
           </div>
           <div class="lab-stage lab-stage--mobile">
-            <iframe loading="lazy" title="Warm Civic Mobile" src="/?themePreview=warm-civic"></iframe>
+            <iframe loading="lazy" title="Brand Warm Mobile" src="/?themePreview=brand-warm"></iframe>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="lab-variant" id="fresh-editorial">
+    <section class="lab-variant" id="civic-gold">
       <div class="lab-variant__top">
         <div class="lab-variant__meta">
           <p class="lab-variant__eyebrow">Variante B</p>
-          <h2 class="lab-variant__title">Fresh Editorial</h2>
-          <p class="lab-variant__text">Luftiger, klarer und etwas frischer. Ziel: mehr Separation und modernerer Editorial-Eindruck, ohne laut oder bunt zu werden.</p>
+          <h2 class="lab-variant__title">Civic Gold</h2>
+          <p class="lab-variant__text">Die wärmere Premium-Interpretation: mehr Wärme und Wertigkeit, mit deutlicherem goldenen Civic-Unterton, aber weiterhin grün verankert.</p>
         </div>
         <div class="lab-links">
-          <a href="/?themePreview=fresh-editorial" target="_blank" rel="noopener noreferrer">Live öffnen</a>
-          <a href="/?themePreview=fresh-editorial" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+          <a href="/?themePreview=civic-gold" target="_blank" rel="noopener noreferrer">Live öffnen</a>
         </div>
       </div>
 
@@ -338,7 +323,7 @@
             <span class="lab-preview__meta">1920 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--wide">
-            <iframe loading="lazy" title="Fresh Editorial Desktop wide" src="/?themePreview=fresh-editorial"></iframe>
+            <iframe loading="lazy" title="Civic Gold Desktop wide" src="/?themePreview=civic-gold"></iframe>
           </div>
         </article>
 
@@ -348,7 +333,7 @@
             <span class="lab-preview__meta">1024 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--desktop">
-            <iframe loading="lazy" title="Fresh Editorial Desktop normal" src="/?themePreview=fresh-editorial"></iframe>
+            <iframe loading="lazy" title="Civic Gold Desktop normal" src="/?themePreview=civic-gold"></iframe>
           </div>
         </article>
 
@@ -358,22 +343,21 @@
             <span class="lab-preview__meta">390 × 844</span>
           </div>
           <div class="lab-stage lab-stage--mobile">
-            <iframe loading="lazy" title="Fresh Editorial Mobile" src="/?themePreview=fresh-editorial"></iframe>
+            <iframe loading="lazy" title="Civic Gold Mobile" src="/?themePreview=civic-gold"></iframe>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="lab-variant" id="refined-brand">
+    <section class="lab-variant" id="forest-light">
       <div class="lab-variant__top">
         <div class="lab-variant__meta">
           <p class="lab-variant__eyebrow">Variante C</p>
-          <h2 class="lab-variant__title">Refined Brand</h2>
-          <p class="lab-variant__text">Am nächsten am aktuellen Stand, aber mit klarerer Trennung, etwas mehr Wärme und markanterer Brand-Spur. Ziel: mehr Charakter ohne Stilbruch.</p>
+          <h2 class="lab-variant__title">Forest Light</h2>
+          <p class="lab-variant__text">Die klarste und leichteste Variante: frischer, aber nicht steril. Mehr Kontrast, mehr grüne Produktidentität, ohne in Kühle oder Härte zu kippen.</p>
         </div>
         <div class="lab-links">
-          <a href="/?themePreview=refined-brand" target="_blank" rel="noopener noreferrer">Live öffnen</a>
-          <a href="/?themePreview=refined-brand" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+          <a href="/?themePreview=forest-light" target="_blank" rel="noopener noreferrer">Live öffnen</a>
         </div>
       </div>
 
@@ -384,7 +368,7 @@
             <span class="lab-preview__meta">1920 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--wide">
-            <iframe loading="lazy" title="Refined Brand Desktop wide" src="/?themePreview=refined-brand"></iframe>
+            <iframe loading="lazy" title="Forest Light Desktop wide" src="/?themePreview=forest-light"></iframe>
           </div>
         </article>
 
@@ -394,7 +378,7 @@
             <span class="lab-preview__meta">1024 × 1220</span>
           </div>
           <div class="lab-stage lab-stage--desktop">
-            <iframe loading="lazy" title="Refined Brand Desktop normal" src="/?themePreview=refined-brand"></iframe>
+            <iframe loading="lazy" title="Forest Light Desktop normal" src="/?themePreview=forest-light"></iframe>
           </div>
         </article>
 
@@ -404,7 +388,7 @@
             <span class="lab-preview__meta">390 × 844</span>
           </div>
           <div class="lab-stage lab-stage--mobile">
-            <iframe loading="lazy" title="Refined Brand Mobile" src="/?themePreview=refined-brand"></iframe>
+            <iframe loading="lazy" title="Forest Light Mobile" src="/?themePreview=forest-light"></iframe>
           </div>
         </article>
       </div>
@@ -412,7 +396,7 @@
 
     <section class="lab-note">
       Aufruf danach: <strong>/theme-lab/</strong><br>
-      Direkt-Preview einzelner Varianten: <strong>/?themePreview=warm-civic</strong>, <strong>/?themePreview=fresh-editorial</strong>, <strong>/?themePreview=refined-brand</strong>
+      Direkt-Preview einzelner Varianten: <strong>/?themePreview=brand-warm</strong>, <strong>/?themePreview=civic-gold</strong>, <strong>/?themePreview=forest-light</strong>
     </section>
   </main>
 </body>
