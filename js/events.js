@@ -698,6 +698,37 @@ function renderList(list) {
     return h;
   };
 
+  /* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_INSERTION_V1 | Zweck: rendert den mobilen Veranstalter-Einstieg dynamisch erst nach der ersten echten Event-Sektion; Umfang: In-Feed-CTA-Erzeugung und Einfügelogik innerhalb renderList() === */
+  const createFeedPublishEntry = () => {
+    const link = document.createElement("a");
+    link.className = "feed-publish-entry";
+    link.href = "/events-veroeffentlichen/";
+    link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+
+    const label = document.createElement("span");
+    label.className = "feed-publish-entry__label";
+    label.textContent = "Für Veranstalter";
+
+    const main = document.createElement("span");
+    main.className = "feed-publish-entry__main";
+
+    const title = document.createElement("span");
+    title.className = "feed-publish-entry__title";
+    title.textContent = "Event veröffentlichen";
+
+    const chevron = document.createElement("span");
+    chevron.className = "feed-publish-entry__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "›";
+
+    main.append(title, chevron);
+    link.append(label, main);
+
+    return link;
+  };
+
+  let hasInsertedFeedPublishEntry = false;
+
   for (const key of order) {
     if (!buckets[key] || buckets[key].length === 0) continue;
 
@@ -716,7 +747,13 @@ function renderList(list) {
 
     section.appendChild(grid);
     frag.appendChild(section);
+
+    if (!hasInsertedFeedPublishEntry) {
+      frag.appendChild(createFeedPublishEntry());
+      hasInsertedFeedPublishEntry = true;
+    }
   }
+  /* === END BLOCK: FEED_PUBLISH_ENTRY_INSERTION_V1 === */
 
   c.appendChild(frag);
 }
