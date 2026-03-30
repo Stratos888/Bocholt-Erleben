@@ -1,7 +1,7 @@
 /* === BEGIN BLOCK: HOME_CSS_STEP_4 | Purpose: isolate home/start-page feed, hero, search-row and responsive layout into a dedicated owner file while preserving validated mobile filter-row behavior | Scope: home feed layout, hero layout, desktop/narrow desktop hero variants === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
-/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 | Purpose: keep homepage feed groups vertically stacked and prepare only the inner group grid for desktop 2-up while preserving the existing mobile card flow | Scope: viewport guardrails, feed section ownership, top-level group stack and per-group card container behavior === */
+/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 | Purpose: keep homepage feed groups vertically stacked, preserve the existing mobile card flow and establish a calmer brand-consistent base visual system for labels and cards before desktop-specific polish | Scope: viewport guardrails, feed section ownership, top-level group stack, per-group card container behavior and feed-card base styling === */
 /* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
 .events-section-title,
@@ -36,14 +36,15 @@
 
   margin: var(--feed-title-mt) 0 var(--feed-title-mb);
 
-  font-weight: 760;
+  font-weight: 780;
   font-size: 0.76rem;
 
-  letter-spacing: 0.12em;
+  letter-spacing: 0.135em;
 
   text-transform: uppercase;
 
-  color: color-mix(in srgb, var(--brand-green-800) 86%, var(--brand-gold-300) 14%);
+  color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.38);
 
 }
 
@@ -63,7 +64,7 @@
 
 .events-feed-group{
   display: grid;
-  gap: var(--feed-title-mb);
+  gap: calc(var(--feed-title-mb) + 2px);
   width: 100%;
 }
 
@@ -79,7 +80,53 @@
   border-radius: 0;
   box-shadow: none;
 }
-/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 === */
+
+.event-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.968) 0%, rgba(251,252,248,0.95) 100%);
+  border-color: color-mix(in srgb, rgba(24,40,30,0.075) 72%, var(--brand-gold-200) 28%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.88) inset,
+    0 8px 18px rgba(12,24,18,0.038);
+}
+
+.event-card::before{
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 60%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 72%, var(--color-primary-muted)) 100%
+  );
+  opacity: 0.94;
+  box-shadow: inset -1px 0 0 rgba(24,40,30,0.042);
+}
+
+.event-date-badge{
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 66%, var(--color-primary-muted)) 100%
+  );
+  color: rgba(24,40,30,0.90);
+  box-shadow:
+    inset 0 0 0 1px rgba(24,40,30,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.82);
+}
+
+.event-date-badge__wday{
+  color: rgba(68,86,72,0.58);
+}
+
+.event-date-badge__month{
+  color: rgba(68,86,72,0.56);
+}
+
+.event-title{
+  color: rgba(23,39,29,0.92);
+}
+
+.event-card-desc{
+  color: rgba(31,41,51,0.78);
+}
+/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 === */
 
 /* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
@@ -985,55 +1032,64 @@
     opacity: 0.68;
   }
 
+/* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 | Zweck: zieht auf Desktop Feed-Fläche, Karten, Rail, Date-Badge und Text-Hierarchie visuell auf denselben Qualitätsstand wie den finalisierten Hero, ohne Geometrie zu ändern; Umfang: nur Desktop-Feed-Surface im V29-Block === */
   .events-section{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 24%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 14%, var(--color-primary-muted)) 100%
+      color-mix(in srgb, white 28%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 16%, var(--color-primary-muted)) 58%,
+      color-mix(in srgb, white 12%, var(--color-primary-muted)) 100%
     );
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
   }
 
   .event-card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.962) 0%, rgba(252,253,249,0.946) 100%);
-    border-color: color-mix(in srgb, rgba(24,40,30,0.08) 74%, var(--brand-gold-200) 26%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.978) 0%, rgba(252,253,249,0.958) 100%);
+    border-color: color-mix(in srgb, rgba(24,40,30,0.085) 70%, var(--brand-gold-200) 30%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.92) inset,
+      0 10px 24px rgba(12,24,18,0.045);
   }
 
   .event-card::before{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 56%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 70%, var(--color-primary-muted)) 100%
+      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
     );
-    opacity: var(--eventcard-rail-opacity);
-    box-shadow: inset -1px 0 0 rgba(24,40,30,0.045);
+    opacity: 0.96;
+    box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
   }
 
   .event-date-badge{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 48%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 64%, var(--color-primary-muted)) 100%
+      color-mix(in srgb, white 42%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 60%, var(--color-primary-muted)) 100%
     );
+    color: rgba(24,40,30,0.92);
     box-shadow:
-      inset 0 0 0 1px rgba(24,40,30,0.055),
-      inset 0 1px 0 rgba(255,255,255,0.84);
+      inset 0 0 0 1px rgba(24,40,30,0.062),
+      inset 0 1px 0 rgba(255,255,255,0.86),
+      0 1px 2px rgba(12,24,18,0.028);
   }
 
   .event-date-badge__wday{
-    color: rgba(70,87,73,0.58);
+    color: rgba(67,84,71,0.62);
   }
 
   .event-date-badge__month{
-    color: rgba(70,87,73,0.56);
+    color: rgba(67,84,71,0.60);
   }
 
   .event-title{
-    color: rgba(24,40,30,0.90);
+    color: rgba(21,37,28,0.93);
   }
 
   .event-card-desc{
-    color: rgba(31,41,51,0.74);
+    color: rgba(31,41,51,0.76);
   }
+/* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 === */
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover,
