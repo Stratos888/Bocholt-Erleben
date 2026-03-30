@@ -335,7 +335,6 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       dateTexts: Array.from(document.querySelectorAll("[data-date-trigger-text]")),
       dateModules: Array.from(document.querySelectorAll("[data-date-module]"))
     };
-    };
 
     // Defaults (konsistent)
     this.filters.searchText = "";
