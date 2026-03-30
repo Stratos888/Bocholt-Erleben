@@ -273,7 +273,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
 
-/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V1 | Zweck: ergänzt das Sheet um einen kompakten exakten Datums-Trigger mit Entfernen-Aktion; Umfang: nur Wann-Sheet-Date-UI direkt vor den hidden-Regeln === */
+/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V1 | Zweck: vereinfacht die exakte Datumsauswahl auf einen einzigen robusten Trigger ohne doppelte Beschriftung oder Extra-Reset; Umfang: nur Wann-Sheet-/Popover-Date-UI direkt vor den hidden-Regeln === */
 .filter-date-module{
   display: grid;
   gap: 10px;
@@ -286,20 +286,13 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   background: rgba(22,39,61,0.08);
 }
 
-.filter-date-module__label{
-  color: rgba(22,39,61,0.72);
-  font-size: 0.83rem;
-  font-weight: 780;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .filter-date-trigger{
+  appearance: none;
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-start;
+  width: 100%;
   min-height: var(--cmp-choice-minh);
   padding: 14px 14px;
   border: 1px solid var(--cmp-input-border);
@@ -309,14 +302,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     0 10px 24px rgba(0,0,0,0.06),
     0 1px 0 rgba(255,255,255,0.70) inset;
   cursor: pointer;
-}
-
-.filter-date-trigger::after{
-  content: "Datum wählen";
-  flex: 0 0 auto;
-  color: rgba(22,39,61,0.56);
-  font-size: 0.82rem;
-  font-weight: 720;
+  text-align: left;
 }
 
 .filter-date-trigger__text{
@@ -329,29 +315,10 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 .filter-date-trigger__input{
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inline-size: 1px;
+  block-size: 1px;
   opacity: 0;
-  cursor: pointer;
-}
-
-.filter-date-clear{
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid rgba(22,39,61,0.09);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.82);
-  color: rgba(22,39,61,0.86);
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 740;
-  cursor: pointer;
-  justify-self: start;
+  pointer-events: none;
 }
 
 .filter-date-module.is-active .filter-date-trigger{
@@ -359,13 +326,8 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   border-color: color-mix(in srgb, transparent 74%, var(--color-primary));
 }
 
-.filter-date-module.is-active .filter-date-trigger::after{
-  content: "Gewählt";
-  color: rgba(22,39,61,0.72);
-}
-
-.filter-date-trigger:focus-within,
-.filter-date-clear:focus-visible{
+.filter-date-trigger:focus-visible,
+.filter-date-trigger:focus-within{
   outline: none;
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
@@ -378,12 +340,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   .filter-date-module.is-active .filter-date-trigger:hover{
     background: color-mix(in srgb, transparent 84%, var(--color-primary));
   }
-
-  .filter-date-clear:hover{
-    background: rgba(240,245,235,0.92);
-  }
 }
-
 /* === END BLOCK: FILTER_DATE_EXACT_UI_V1 === */
 
 /* hidden muss immer wirken */
