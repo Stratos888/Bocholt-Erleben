@@ -197,15 +197,13 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
       <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
       <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 | Zweck: ergänzt den Wann-Filter um eine exakte Datumsauswahl unterhalb der Schnelloptionen; Umfang: nur Datumsmodul im Zeit-Sheet === -->
+      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 | Zweck: vereinfacht den Mobile-Wann-Filter auf einen einzigen klaren Datums-Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Zeit-Sheet === -->
       <div class="filter-date-module" data-date-module>
         <div class="filter-date-module__divider" aria-hidden="true"></div>
-        <div class="filter-date-module__label">Oder bestimmtes Datum</div>
-        <label class="filter-date-trigger">
+        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
           <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-          <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
-        </label>
-        <button type="button" class="filter-date-clear" data-date-clear hidden>Datum entfernen</button>
+        </button>
+        <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
       </div>
       <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 === -->
     </div>
@@ -429,15 +427,13 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
     <button data-time="weekend">Dieses Wochenende</button>
     <button data-time="nextweek">Nächste Woche</button>
     <button data-time="later">Später</button>
-    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 | Zweck: ergänzt den Desktop-Wann-Popover um eine exakte Datumsauswahl unterhalb der Schnelloptionen; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
+    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 | Zweck: vereinfacht den Desktop-Datumsfilter auf einen einzigen klaren Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
     <div class="filter-popover__divider" aria-hidden="true"></div>
     <div class="filter-date-module filter-date-module--popover" data-date-module>
-      <div class="filter-date-module__label">Bestimmtes Datum</div>
-      <label class="filter-date-trigger">
+      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
         <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-        <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
-      </label>
-      <button type="button" class="filter-date-clear" data-date-clear hidden>Datum entfernen</button>
+      </button>
+      <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
     </div>
     <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 === -->
   </div>
