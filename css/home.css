@@ -660,6 +660,30 @@ background:
 }
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V3 === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 | Zweck: entfernt grüne Unterstreichung (Tap/Active-Link-Decoration) beim Klick auf den Feed-CTA; Umfang: nur feed-publish-entry Link-Zustände === */
+
+.feed-publish-entry,
+.feed-publish-entry:link,
+.feed-publish-entry:visited,
+.feed-publish-entry:hover,
+.feed-publish-entry:active,
+.feed-publish-entry:focus{
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+.feed-publish-entry *{
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+/* zusätzliche Sicherheit für iOS/Chrome Tap-Highlight */
+.feed-publish-entry{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
+
 /* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
