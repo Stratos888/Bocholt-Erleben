@@ -276,7 +276,7 @@
 
 .desktop-entry__eyebrow{
   margin: 0;
-  color: #6f8758;
+  color: color-mix(in srgb, var(--color-text-secondary) 56%, var(--color-primary));
   font-size: 0.76rem;
   font-weight: 820;
   line-height: 1.2;
