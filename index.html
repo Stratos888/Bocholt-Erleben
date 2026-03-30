@@ -3,12 +3,19 @@
 <head>
 <link rel="canonical" href="https://bocholt-erleben.de/">   
 <meta charset="UTF-8">
-<!-- === BEGIN BLOCK: PWA MANIFEST LINK (required for install prompt) ===
-Zweck: Stellt sicher, dass Chrome das Manifest findet (DevTools: Application → Manifest).
-Umfang: Fügt NUR den Manifest-Link ein (kein weiteres Refactoring).
+<!-- === BEGIN BLOCK: PWA ICON + META BASICS (home) ===
+Zweck: Bindet Manifest, Favicon, Apple-Touch-Icon und Basis-PWA-Meta für Home sauber ein.
+Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head>.
 === -->
 <link rel="manifest" href="/manifest.json">
-<!-- === END BLOCK: PWA MANIFEST LINK (required for install prompt) === -->
+<meta name="theme-color" content="#8BCF4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
 
 <!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
 
