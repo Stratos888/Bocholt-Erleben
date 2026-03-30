@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Bocholt erleben – Theme Lab</title>
+  <style>
+    :root{
+      color-scheme: light;
+      --lab-bg: #eef2ea;
+      --lab-surface: #ffffff;
+      --lab-surface-soft: #f6f8f2;
+      --lab-border: rgba(24,40,30,0.10);
+      --lab-border-strong: rgba(24,40,30,0.14);
+      --lab-text: #18281E;
+      --lab-text-soft: #5F6E65;
+      --lab-shadow:
+        0 1px 0 rgba(255,255,255,0.88) inset,
+        0 16px 32px rgba(10,24,16,0.06);
+      --lab-radius-xl: 22px;
+      --lab-radius-lg: 16px;
+      --lab-radius-md: 12px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    html, body{
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--lab-text);
+      background: linear-gradient(180deg, #f3f6ef 0%, #e9eee4 100%);
+    }
+
+    body{
+      padding: 24px;
+    }
+
+    .lab-shell{
+      max-width: 1760px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .lab-header{
+      display: grid;
+      gap: 10px;
+      padding: 24px;
+      border: 1px solid var(--lab-border);
+      border-radius: var(--lab-radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(247,250,243,0.92) 100%);
+      box-shadow: var(--lab-shadow);
+    }
+
+    .lab-header h1{
+      margin: 0;
+      font-size: clamp(1.8rem, 1.4rem + 1vw, 2.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .lab-header p{
+      margin: 0;
+      max-width: 72ch;
+      color: var(--lab-text-soft);
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .lab-nav{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .lab-nav a{
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--lab-border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+      color: var(--lab-text);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .lab-variant{
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+      border: 1px solid var(--lab-border);
+      border-radius: var(--lab-radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(247,250,243,0.92) 100%);
+      box-shadow: var(--lab-shadow);
+    }
+
+    .lab-variant__top{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px 18px;
+    }
+
+    .lab-variant__meta{
+      display: grid;
+      gap: 6px;
+      max-width: 70ch;
+    }
+
+    .lab-variant__eyebrow{
+      margin: 0;
+      color: #6C7B72;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .lab-variant__title{
+      margin: 0;
+      font-size: clamp(1.35rem, 1.1rem + 0.45vw, 1.8rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .lab-variant__text{
+      margin: 0;
+      color: var(--lab-text-soft);
+      font-size: 0.97rem;
+      line-height: 1.45;
+    }
+
+    .lab-links{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .lab-links a{
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--lab-border-strong);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.84);
+      color: var(--lab-text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .lab-preview-grid{
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 1320px){
+      .lab-preview-grid{
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .lab-preview{
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--lab-border);
+      border-radius: var(--lab-radius-lg);
+      background: var(--lab-surface-soft);
+      overflow: auto;
+    }
+
+    .lab-preview__label{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: max-content;
+      color: var(--lab-text);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .lab-preview__meta{
+      color: var(--lab-text-soft);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .lab-stage{
+      overflow: hidden;
+      border: 1px solid var(--lab-border-strong);
+      border-radius: var(--lab-radius-md);
+      background: #dce4d8;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.76) inset;
+    }
+
+    .lab-stage iframe{
+      display: block;
+      border: 0;
+      transform-origin: top left;
+      background: white;
+    }
+
+    .lab-stage--wide{
+      width: 806px;
+      max-width: 100%;
+      height: 512px;
+    }
+
+    .lab-stage--wide iframe{
+      width: 1920px;
+      height: 1220px;
+      transform: scale(0.42);
+    }
+
+    .lab-stage--desktop{
+      width: 737px;
+      max-width: 100%;
+      height: 878px;
+    }
+
+    .lab-stage--desktop iframe{
+      width: 1024px;
+      height: 1220px;
+      transform: scale(0.72);
+    }
+
+    .lab-stage--mobile{
+      width: 390px;
+      max-width: 100%;
+      height: 844px;
+    }
+
+    .lab-stage--mobile iframe{
+      width: 390px;
+      height: 844px;
+      transform: scale(1);
+    }
+
+    .lab-note{
+      padding: 16px 18px;
+      border: 1px solid var(--lab-border);
+      border-radius: var(--lab-radius-lg);
+      background: rgba(255,255,255,0.72);
+      color: var(--lab-text-soft);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <main class="lab-shell">
+    <section class="lab-header">
+      <h1>Theme Lab – Home-Farbvarianten</h1>
+      <p>Vergleich auf echter Home-UI mit echten Assets. Jede Variante rendert die normale Startseite über <code>?themePreview=…</code>. Damit bleiben Layout, Komponenten, Bildmaterial und Abstände identisch; nur die Farbwelt wird ausgetauscht.</p>
+      <nav class="lab-nav" aria-label="Sprungmarken">
+        <a href="#warm-civic">Warm Civic</a>
+        <a href="#fresh-editorial">Fresh Editorial</a>
+        <a href="#refined-brand">Refined Brand</a>
+      </nav>
+    </section>
+
+    <section class="lab-variant" id="warm-civic">
+      <div class="lab-variant__top">
+        <div class="lab-variant__meta">
+          <p class="lab-variant__eyebrow">Variante A</p>
+          <h2 class="lab-variant__title">Warm Civic</h2>
+          <p class="lab-variant__text">Wärmer, freundlicher und etwas weniger grau. Ziel: ruhige Civic-/Stadtportal-Anmutung mit mehr Wärme und weniger Kreidigkeit.</p>
+        </div>
+        <div class="lab-links">
+          <a href="/?themePreview=warm-civic" target="_blank" rel="noopener noreferrer">Live öffnen</a>
+          <a href="/?themePreview=warm-civic" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+        </div>
+      </div>
+
+      <div class="lab-preview-grid">
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop wide</span>
+            <span class="lab-preview__meta">1920 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--wide">
+            <iframe loading="lazy" title="Warm Civic Desktop wide" src="/?themePreview=warm-civic"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop normal</span>
+            <span class="lab-preview__meta">1024 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--desktop">
+            <iframe loading="lazy" title="Warm Civic Desktop normal" src="/?themePreview=warm-civic"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Mobile</span>
+            <span class="lab-preview__meta">390 × 844</span>
+          </div>
+          <div class="lab-stage lab-stage--mobile">
+            <iframe loading="lazy" title="Warm Civic Mobile" src="/?themePreview=warm-civic"></iframe>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="lab-variant" id="fresh-editorial">
+      <div class="lab-variant__top">
+        <div class="lab-variant__meta">
+          <p class="lab-variant__eyebrow">Variante B</p>
+          <h2 class="lab-variant__title">Fresh Editorial</h2>
+          <p class="lab-variant__text">Luftiger, klarer und etwas frischer. Ziel: mehr Separation und modernerer Editorial-Eindruck, ohne laut oder bunt zu werden.</p>
+        </div>
+        <div class="lab-links">
+          <a href="/?themePreview=fresh-editorial" target="_blank" rel="noopener noreferrer">Live öffnen</a>
+          <a href="/?themePreview=fresh-editorial" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+        </div>
+      </div>
+
+      <div class="lab-preview-grid">
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop wide</span>
+            <span class="lab-preview__meta">1920 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--wide">
+            <iframe loading="lazy" title="Fresh Editorial Desktop wide" src="/?themePreview=fresh-editorial"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop normal</span>
+            <span class="lab-preview__meta">1024 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--desktop">
+            <iframe loading="lazy" title="Fresh Editorial Desktop normal" src="/?themePreview=fresh-editorial"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Mobile</span>
+            <span class="lab-preview__meta">390 × 844</span>
+          </div>
+          <div class="lab-stage lab-stage--mobile">
+            <iframe loading="lazy" title="Fresh Editorial Mobile" src="/?themePreview=fresh-editorial"></iframe>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="lab-variant" id="refined-brand">
+      <div class="lab-variant__top">
+        <div class="lab-variant__meta">
+          <p class="lab-variant__eyebrow">Variante C</p>
+          <h2 class="lab-variant__title">Refined Brand</h2>
+          <p class="lab-variant__text">Am nächsten am aktuellen Stand, aber mit klarerer Trennung, etwas mehr Wärme und markanterer Brand-Spur. Ziel: mehr Charakter ohne Stilbruch.</p>
+        </div>
+        <div class="lab-links">
+          <a href="/?themePreview=refined-brand" target="_blank" rel="noopener noreferrer">Live öffnen</a>
+          <a href="/?themePreview=refined-brand" target="_blank" rel="noopener noreferrer">Direkt vergleichen</a>
+        </div>
+      </div>
+
+      <div class="lab-preview-grid">
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop wide</span>
+            <span class="lab-preview__meta">1920 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--wide">
+            <iframe loading="lazy" title="Refined Brand Desktop wide" src="/?themePreview=refined-brand"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Desktop normal</span>
+            <span class="lab-preview__meta">1024 × 1220</span>
+          </div>
+          <div class="lab-stage lab-stage--desktop">
+            <iframe loading="lazy" title="Refined Brand Desktop normal" src="/?themePreview=refined-brand"></iframe>
+          </div>
+        </article>
+
+        <article class="lab-preview">
+          <div class="lab-preview__label">
+            <span>Mobile</span>
+            <span class="lab-preview__meta">390 × 844</span>
+          </div>
+          <div class="lab-stage lab-stage--mobile">
+            <iframe loading="lazy" title="Refined Brand Mobile" src="/?themePreview=refined-brand"></iframe>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="lab-note">
+      Aufruf danach: <strong>/theme-lab/</strong><br>
+      Direkt-Preview einzelner Varianten: <strong>/?themePreview=warm-civic</strong>, <strong>/?themePreview=fresh-editorial</strong>, <strong>/?themePreview=refined-brand</strong>
+    </section>
+  </main>
+</body>
+</html>
