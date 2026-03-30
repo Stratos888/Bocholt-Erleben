@@ -950,6 +950,7 @@
     box-shadow: var(--hero-control-shadow);
   }
 
+/* === BEGIN BLOCK: HOME_DESKTOP_ACTIONS_NEUTRAL_COLOR_LOCK_V2 | Zweck: gleicht auf Desktop Publish und Info farblich und zustandsseitig exakt an den neutralen App-Button an und verhindert grüne Link-/Visited-Abweichungen; Umfang: nur Desktop-Hero-Action-Buttons im V28-Block === */
   .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -958,7 +959,18 @@
     border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 72%, var(--brand-gold-200) 28%);
   }
 
-  .desktop-hero__action{
+  .desktop-hero__action,
+  .desktop-hero__action:link,
+  .desktop-hero__action:visited,
+  .desktop-hero__action--publish,
+  .desktop-hero__action--publish:link,
+  .desktop-hero__action--publish:visited,
+  .desktop-hero__action--info,
+  .desktop-hero__action--info:link,
+  .desktop-hero__action--info:visited,
+  .desktop-hero__action--app,
+  .desktop-hero__action--app:link,
+  .desktop-hero__action--app:visited{
     min-height: 36px;
     padding: 0 12px;
     border-radius: 11px;
@@ -967,28 +979,53 @@
     border: 1px solid rgba(24,40,30,0.11);
     background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(245,248,241,0.95) 100%);
     color: rgba(24,40,30,0.84);
+    text-decoration: none;
+    -webkit-text-fill-color: rgba(24,40,30,0.84);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
       0 4px 10px rgba(10,24,16,0.024);
   }
 
-  .desktop-hero__action .desktop-hero__icon{
+  .desktop-hero__action *,
+  .desktop-hero__action--publish *,
+  .desktop-hero__action--info *,
+  .desktop-hero__action--app *{
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .desktop-hero__action .desktop-hero__icon,
+  .desktop-hero__action--publish .desktop-hero__icon,
+  .desktop-hero__action--info .desktop-hero__icon,
+  .desktop-hero__action--app .desktop-hero__icon{
     width: 14px;
     height: 14px;
     opacity: 0.68;
   }
 
   @media (hover: hover){
-    .desktop-hero__actions .desktop-hero__action:hover{
+    .desktop-hero__actions .desktop-hero__action:hover,
+    .desktop-hero__actions .desktop-hero__action:link:hover,
+    .desktop-hero__actions .desktop-hero__action:visited:hover,
+    .desktop-hero__actions .desktop-hero__action--publish:hover,
+    .desktop-hero__actions .desktop-hero__action--publish:link:hover,
+    .desktop-hero__actions .desktop-hero__action--publish:visited:hover,
+    .desktop-hero__actions .desktop-hero__action--info:hover,
+    .desktop-hero__actions .desktop-hero__action--info:link:hover,
+    .desktop-hero__actions .desktop-hero__action--info:visited:hover,
+    .desktop-hero__actions .desktop-hero__action--app:hover,
+    .desktop-hero__actions .desktop-hero__action--app:link:hover,
+    .desktop-hero__actions .desktop-hero__action--app:visited:hover{
       border-color: rgba(22,39,61,0.14);
       background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
       color: var(--color-text-primary);
+      -webkit-text-fill-color: var(--color-text-primary);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
         0 8px 18px rgba(22,39,61,0.026);
     }
   }
-}
+/* === END BLOCK: HOME_DESKTOP_ACTIONS_NEUTRAL_COLOR_LOCK_V2 === */
 
 @media (min-width: 900px) and (max-width: 1199.98px){
   .desktop-hero{
