@@ -203,8 +203,10 @@ filters: {
       node.textContent = triggerLabel;
     });
 
-    (ui.dateClearButtons || []).forEach((button) => {
-      button.hidden = !hasSelectedDate;
+    (ui.dateTriggers || []).forEach((trigger) => {
+      const label = hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen";
+      trigger.setAttribute("aria-label", label);
+      trigger.setAttribute("title", hasSelectedDate ? triggerLabel : "Datum auswählen");
     });
 
     (ui.dateModules || []).forEach((module) => {
@@ -328,10 +330,11 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       timePill, timeValue, timeSheet,
       catPill,  catValue,  catSheet,
       resetPill,
+      dateTriggers: Array.from(document.querySelectorAll("[data-date-trigger]")),
       dateInputs: Array.from(document.querySelectorAll("[data-date-input]")),
       dateTexts: Array.from(document.querySelectorAll("[data-date-trigger-text]")),
-      dateClearButtons: Array.from(document.querySelectorAll("[data-date-clear]")),
       dateModules: Array.from(document.querySelectorAll("[data-date-module]"))
+    };
     };
 
     // Defaults (konsistent)
@@ -513,6 +516,31 @@ window.addEventListener("resize", () => {
     });
 
     // Exaktes Datum (Sheet + Popover)
+    (this._ui.dateTriggers || []).forEach((trigger) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const module = trigger.closest("[data-date-module]");
+        const input = module?.querySelector("[data-date-input]");
+        if (!input) return;
+
+        input.min = this.getTodayIso();
+
+        if (typeof input.showPicker === "function") {
+          try {
+            input.showPicker();
+            return;
+          } catch (_) {
+            // Fallback below
+          }
+        }
+
+        input.focus({ preventScroll: true });
+        input.click();
+      });
+    });
+
     (this._ui.dateInputs || []).forEach((input) => {
       input.min = this.getTodayIso();
 
@@ -528,17 +556,6 @@ window.addEventListener("resize", () => {
           if (isDesktop()) closeAllPopovers();
           else closeSheet(timeSheet);
         }
-      });
-    });
-
-    (this._ui.dateClearButtons || []).forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.filters.selectedDate = "";
-        this.syncDateFilterUI();
-        this.applyFilters();
-        this.updateFilterBarUI(timeValue, catValue, resetPill);
       });
     });
 
