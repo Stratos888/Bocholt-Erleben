@@ -22,14 +22,24 @@
   --shadow-panel-btn: 0 10px 20px rgba(0,0,0,0.045), 0 1px 0 rgba(255,255,255,0.78) inset;
 
   /* Colors */
-  --color-primary: #8BCF4A;
-  --color-primary-muted: #EAF6DB;
-  --color-background: #F9FBF6;
+  --brand-green-950: #07240F;
+  --brand-green-900: #0D3014;
+  --brand-green-800: #16471C;
+  --brand-green-700: #266826;
+  --brand-green-600: #3F852C;
+  --brand-lime-400: #8FCB3B;
+  --brand-lime-300: #D5EF57;
+  --brand-gold-300: #D8B234;
+  --brand-gold-200: #F0DE89;
+
+  --color-primary: var(--brand-lime-400);
+  --color-primary-muted: #EEF7E2;
+  --color-background: #F7FAF4;
   --color-surface: #FFFFFF;
 
-  --color-text-primary: #1F2933;
-  --color-text-secondary: #5F6B73;
-  --color-text-muted: #8A949B;
+  --color-text-primary: #18281E;
+  --color-text-secondary: #5A685F;
+  --color-text-muted: #87928A;
 
   /* Spacing */
   --space-xs: 4px;
@@ -46,8 +56,8 @@
   --stack-gap: 0px;
   --vv-bottom: 0px;
 
-  --stack-bg: rgba(249, 251, 246, 0.86);
-  --divider: rgba(31,41,51,0.06);
+  --stack-bg: rgba(247,250,244,0.88);
+  --divider: rgba(24,40,30,0.08);
 
   /* Feed rhythm */
   --feed-section-pad-top: 6px;
@@ -129,7 +139,7 @@
   --ui-border-weak: rgba(31,41,51,0.08);
   --ui-border-soft: rgba(31,41,51,0.10);
   --ui-border-strong: rgba(31,41,51,0.14);
-  --ui-border-primary: rgba(139,207,74,0.45);
+  --ui-border-primary: rgba(143,203,59,0.42);
 
   --ui-surface-soft: rgba(255,255,255,0.55);
   --ui-surface-soft-hover: rgba(255,255,255,0.74);
@@ -149,8 +159,8 @@
     0 24px 64px rgba(0,0,0,0.16),
     0 1px 0 rgba(255,255,255,0.78) inset;
 
-  --ui-focus-ring: rgba(139,207,74,0.20);
-  --ui-focus-ring-neutral: rgba(31,41,51,0.18);
+  --ui-focus-ring: rgba(143,203,59,0.22);
+  --ui-focus-ring-neutral: rgba(24,40,30,0.18);
 
   --ui-font-size-control: 13px;
   --ui-font-weight-control: 750;
@@ -174,7 +184,7 @@
     0 5px 12px rgba(0,0,0,0.040),
     0 1px 0 rgba(255,255,255,0.80) inset;
 
-  --ui-control-ring-active: rgba(139,207,74,0.09);
+  --ui-control-ring-active: rgba(143,203,59,0.10);
 
   /* Close button DNA */
   --ui-close-size: var(--ui-tap-target);
@@ -268,12 +278,12 @@
   --text: var(--color-text-primary);
   --muted: var(--color-text-muted);
 
-  --border: rgba(31,41,51,0.10);
+  --border: rgba(24,40,30,0.11);
 
   --primary: var(--color-primary);
-  --accent: var(--color-primary);
+  --accent: var(--brand-gold-300);
 
-  --focus-ring: rgba(139,207,74,0.25);
+  --focus-ring: rgba(143,203,59,0.26);
 
   --radius: var(--radius-card);
   --shadow-sm: var(--shadow-card);
