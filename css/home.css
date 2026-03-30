@@ -624,14 +624,14 @@
 }
 
 /* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V4 === */
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V28 | Purpose: schärft den Home-only Brand-Polish auf Desktop, übersetzt Icon-Grün/Gold kontrolliert in Hero und Section-Hierarchy und vereinheitlicht alle Service-Actions vollständig; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
     padding-left: 32px;
     padding-right: 32px;
-    background: linear-gradient(180deg, rgba(246,249,240,0.965) 0%, rgba(243,247,235,0.91) 100%);
-    border-bottom: 1px solid rgba(22,39,61,0.055);
+    background: linear-gradient(180deg, rgba(248,249,242,0.97) 0%, rgba(243,246,236,0.93) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.06) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.84) inset,
       0 10px 22px rgba(22,39,61,0.038);
@@ -643,13 +643,13 @@
     gap: 11px;
   }
 
-   /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V1 | Zweck: schärft auf der Startseite den Desktop-Header auf Enterprise-Niveau, beruhigt die Fläche und zieht Icon/Text zu einem präziseren Brand-Lockup zusammen; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
+  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 | Zweck: färbt auf der Startseite den Desktop-Header ruhiger und markenkonsistenter ein, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
   .app-header{
     min-height: 60px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(247,249,244,0.978) 0%, rgba(243,246,238,0.946) 100%);
-    border-bottom: 1px solid rgba(22,39,61,0.068);
+    background: linear-gradient(180deg, rgba(248,249,242,0.982) 0%, rgba(242,246,236,0.95) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.07) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
       0 8px 18px rgba(22,39,61,0.030);
@@ -672,7 +672,7 @@
 
   .app-title{
     max-width: none;
-    color: #16273d;
+    color: color-mix(in srgb, var(--brand-green-900) 78%, #16273d 22%);
     font-size: 1.24rem;
     font-weight: 710;
     letter-spacing: -0.028em;
@@ -682,7 +682,7 @@
   .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V1 === */
+  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 === */
 
   .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
@@ -690,13 +690,13 @@
     --hero-bg-position-active: 79.25% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
-    --hero-bg-brightness-active: 0.956;
-    --hero-bg-saturate-active: 1.03;
-    --hero-bg-contrast-active: 1.04;
-    --hero-panel-bg: linear-gradient(180deg, rgba(248,250,244,0.978) 0%, rgba(239,244,234,0.962) 100%);
-    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.16) 78%, var(--brand-gold-200) 22%);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.988) 0%, rgba(246,250,241,0.968) 100%);
-    --hero-control-border: rgba(24,40,30,0.12);
+    --hero-bg-brightness-active: 0.968;
+    --hero-bg-saturate-active: 1.035;
+    --hero-bg-contrast-active: 1.03;
+    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(242,246,236,0.958) 100%);
+    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.15) 70%, var(--brand-gold-200) 30%);
+    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.986) 0%, rgba(247,250,243,0.968) 100%);
+    --hero-control-border: color-mix(in srgb, rgba(24,40,30,0.11) 76%, var(--brand-gold-200) 24%);
     --hero-control-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
       0 10px 22px rgba(10,24,16,0.034);
@@ -723,13 +723,14 @@
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.988) 6%, rgba(247,250,244,0.91) 11%, rgba(247,250,244,0.56) 17%, rgba(247,250,244,0.22) 24%, rgba(247,250,244,0.06) 31%, rgba(247,250,244,0.00) 37%),
-      radial-gradient(48% 58% at 16% 28%, rgba(247,250,244,0.34) 0%, rgba(247,250,244,0.14) 38%, rgba(247,250,244,0.04) 63%, rgba(247,250,244,0.00) 79%),
-      linear-gradient(180deg, rgba(247,250,244,0.24) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.02) 42%, rgba(247,250,244,0.08) 100%),
+      linear-gradient(90deg, rgba(246,248,240,0.988) 0%, rgba(246,248,240,0.982) 6%, rgba(246,248,240,0.86) 11%, rgba(245,247,238,0.52) 16%, rgba(244,246,236,0.22) 22%, rgba(244,246,236,0.05) 28%, rgba(244,246,236,0.00) 34%),
+      radial-gradient(48% 58% at 16% 28%, rgba(245,248,239,0.26) 0%, rgba(245,248,239,0.11) 36%, rgba(245,248,239,0.03) 60%, rgba(245,248,239,0.00) 78%),
+      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.01) 42%, rgba(245,248,239,0.06) 100%),
+      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.055) 0%, rgba(240,222,137,0.00) 13%),
       var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
@@ -748,9 +749,9 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.11) 0%, rgba(240,222,137,0.00) 13%),
-      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.05) 0%, rgba(216,178,52,0.00) 13%),
-      linear-gradient(180deg, rgba(250,252,247,0.00) 74%, rgba(250,252,247,0.12) 100%);
+      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.09) 0%, rgba(240,222,137,0.00) 14%),
+      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.038) 0%, rgba(216,178,52,0.00) 13%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 74%, rgba(246,249,241,0.10) 100%);
     pointer-events: none;
   }
 
@@ -771,7 +772,7 @@
 
   .desktop-entry__title{
     max-width: 30rem;
-    color: color-mix(in srgb, var(--brand-green-900) 94%, var(--brand-gold-300) 6%);
+    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
@@ -779,7 +780,7 @@
 
   .desktop-entry__text{
     max-width: 29rem;
-    color: rgba(24,40,30,0.86);
+    color: rgba(24,40,30,0.84);
     font-size: 0.99rem;
     line-height: 1.42;
   }
@@ -806,7 +807,7 @@
     padding: 14px 14px 12px;
     border: 1px solid var(--hero-panel-border);
     border-radius: 22px;
-    background: var(--hero-panel-bg);
+    background: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(243,247,239,0.956) 100%);
     box-shadow:
       0 20px 40px rgba(22,39,61,0.078),
       0 1px 0 rgba(255,255,255,0.93) inset;
@@ -822,8 +823,8 @@
     border-radius: 17px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.30) 0%,
-      rgba(255,255,255,0.08) 100%
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.06) 100%
     );
   }
 
@@ -854,7 +855,7 @@
     left: 21px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(82,102,128,0.82);
+    color: rgba(78,97,87,0.78);
     width: 18px;
     height: 18px;
     z-index: 2;
@@ -874,7 +875,7 @@
     border: 1px solid var(--hero-control-border);
     border-radius: 16px;
     background: var(--hero-control-bg);
-    color: var(--color-text-primary);
+    color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
@@ -882,7 +883,7 @@
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(82,102,128,0.78);
+    color: rgba(82,101,89,0.74);
     font-weight: 620;
   }
 
@@ -906,7 +907,7 @@
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
-    color: rgba(82,102,128,0.86);
+    color: rgba(84,100,89,0.80);
     font-size: 0.67rem;
     font-weight: 760;
     line-height: 1;
@@ -918,7 +919,7 @@
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
-    color: var(--color-text-primary);
+    color: color-mix(in srgb, var(--brand-green-900) 84%, #16273d 16%);
     font-size: 0.95rem;
     font-weight: 780;
     line-height: 1.08;
@@ -932,7 +933,7 @@
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(82,102,128,0.52);
+    color: rgba(84,100,89,0.48);
     font-size: 0.98rem;
     line-height: 1;
     margin-left: 0;
@@ -950,34 +951,24 @@
     box-shadow: var(--hero-control-shadow);
   }
 
-/* === BEGIN BLOCK: HOME_DESKTOP_ACTIONS_NEUTRAL_COLOR_LOCK_V2 | Zweck: gleicht auf Desktop Publish und Info farblich und zustandsseitig exakt an den neutralen App-Button an und verhindert grüne Link-/Visited-Abweichungen; Umfang: nur Desktop-Hero-Action-Buttons im V28-Block === */
   .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 72%, var(--brand-gold-200) 28%);
+    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 68%, var(--brand-gold-200) 32%);
   }
 
   .desktop-hero__action,
   .desktop-hero__action:link,
-  .desktop-hero__action:visited,
-  .desktop-hero__action--publish,
-  .desktop-hero__action--publish:link,
-  .desktop-hero__action--publish:visited,
-  .desktop-hero__action--info,
-  .desktop-hero__action--info:link,
-  .desktop-hero__action--info:visited,
-  .desktop-hero__action--app,
-  .desktop-hero__action--app:link,
-  .desktop-hero__action--app:visited{
+  .desktop-hero__action:visited{
     min-height: 36px;
     padding: 0 12px;
     border-radius: 11px;
     font-size: 0.84rem;
     font-weight: 680;
-    border: 1px solid rgba(24,40,30,0.11);
-    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(245,248,241,0.95) 100%);
+    border: 1px solid color-mix(in srgb, rgba(24,40,30,0.11) 78%, var(--brand-gold-200) 22%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.982) 0%, rgba(246,249,242,0.958) 100%);
     color: rgba(24,40,30,0.84);
     text-decoration: none;
     -webkit-text-fill-color: rgba(24,40,30,0.84);
@@ -986,46 +977,76 @@
       0 4px 10px rgba(10,24,16,0.024);
   }
 
-  .desktop-hero__action *,
-  .desktop-hero__action--publish *,
-  .desktop-hero__action--info *,
-  .desktop-hero__action--app *{
-    color: inherit;
-    -webkit-text-fill-color: currentColor;
-  }
-
-  .desktop-hero__action .desktop-hero__icon,
-  .desktop-hero__action--publish .desktop-hero__icon,
-  .desktop-hero__action--info .desktop-hero__icon,
-  .desktop-hero__action--app .desktop-hero__icon{
+  .desktop-hero__action .desktop-hero__icon{
     width: 14px;
     height: 14px;
     opacity: 0.68;
   }
 
+  .events-section{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 24%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 14%, var(--color-primary-muted)) 100%
+    );
+  }
+
+  .event-card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.962) 0%, rgba(252,253,249,0.946) 100%);
+    border-color: color-mix(in srgb, rgba(24,40,30,0.08) 74%, var(--brand-gold-200) 26%);
+  }
+
+  .event-card::before{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 56%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 70%, var(--color-primary-muted)) 100%
+    );
+    opacity: var(--eventcard-rail-opacity);
+    box-shadow: inset -1px 0 0 rgba(24,40,30,0.045);
+  }
+
+  .event-date-badge{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 48%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 64%, var(--color-primary-muted)) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.055),
+      inset 0 1px 0 rgba(255,255,255,0.84);
+  }
+
+  .event-date-badge__wday{
+    color: rgba(70,87,73,0.58);
+  }
+
+  .event-date-badge__month{
+    color: rgba(70,87,73,0.56);
+  }
+
+  .event-title{
+    color: rgba(24,40,30,0.90);
+  }
+
+  .event-card-desc{
+    color: rgba(31,41,51,0.74);
+  }
+
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover,
     .desktop-hero__actions .desktop-hero__action:link:hover,
-    .desktop-hero__actions .desktop-hero__action:visited:hover,
-    .desktop-hero__actions .desktop-hero__action--publish:hover,
-    .desktop-hero__actions .desktop-hero__action--publish:link:hover,
-    .desktop-hero__actions .desktop-hero__action--publish:visited:hover,
-    .desktop-hero__actions .desktop-hero__action--info:hover,
-    .desktop-hero__actions .desktop-hero__action--info:link:hover,
-    .desktop-hero__actions .desktop-hero__action--info:visited:hover,
-    .desktop-hero__actions .desktop-hero__action--app:hover,
-    .desktop-hero__actions .desktop-hero__action--app:link:hover,
-    .desktop-hero__actions .desktop-hero__action--app:visited:hover{
-      border-color: rgba(22,39,61,0.14);
+    .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, rgba(22,39,61,0.13) 76%, var(--brand-gold-200) 24%);
       background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
-      color: var(--color-text-primary);
-      -webkit-text-fill-color: var(--color-text-primary);
+      color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
         0 8px 18px rgba(22,39,61,0.026);
     }
   }
-/* === END BLOCK: HOME_DESKTOP_ACTIONS_NEUTRAL_COLOR_LOCK_V2 === */
+}
 
 @media (min-width: 900px) and (max-width: 1199.98px){
   .desktop-hero{
@@ -1069,9 +1090,9 @@
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V28 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V25 | Purpose: stabilisiert die 1024-Klasse mit kompakterem aber klar getrenntem Hero, schmalerem Fade und ruhiger Search-Surface ohne Kontrastverlust; Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
@@ -1086,13 +1107,14 @@
 
   .desktop-hero::before{
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.987) 8%, rgba(247,250,244,0.91) 14%, rgba(247,250,244,0.60) 20%, rgba(247,250,244,0.26) 27%, rgba(247,250,244,0.08) 34%, rgba(247,250,244,0.00) 40%),
-      radial-gradient(42% 54% at 16% 28%, rgba(247,250,244,0.32) 0%, rgba(247,250,244,0.14) 40%, rgba(247,250,244,0.04) 64%, rgba(247,250,244,0.00) 80%),
-      linear-gradient(180deg, rgba(247,250,244,0.26) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.03) 42%, rgba(247,250,244,0.08) 100%),
+      linear-gradient(90deg, rgba(246,248,240,0.986) 0%, rgba(246,248,240,0.976) 8%, rgba(246,248,240,0.86) 14%, rgba(245,247,238,0.54) 20%, rgba(244,246,236,0.22) 27%, rgba(244,246,236,0.06) 34%, rgba(244,246,236,0.00) 40%),
+      radial-gradient(42% 54% at 16% 28%, rgba(245,248,239,0.28) 0%, rgba(245,248,239,0.12) 40%, rgba(245,248,239,0.03) 64%, rgba(245,248,239,0.00) 80%),
+      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.015) 42%, rgba(245,248,239,0.07) 100%),
+      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.05) 0%, rgba(240,222,137,0.00) 14%),
       var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
   }
 
   .desktop-entry__content{
@@ -1187,7 +1209,7 @@
     font-size: 0.80rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V25 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
