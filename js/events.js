@@ -759,6 +759,29 @@ function renderList(list) {
 
     const section = document.createElement("section");
     section.className = "events-feed-group";
+    section.setAttribute("aria-label", bucketLabel[key] || key);
+
+    const grid = document.createElement("div");
+    grid.className = "events-feed-group__grid";
+
+    section.appendChild(createSectionHeader(bucketLabel[key] || key));
+
+    for (const ev of buckets[key]) {
+      grid.appendChild(createCard(ev));
+    }
+
+    section.appendChild(grid);
+    frag.appendChild(section);
+
+    if (!hasInsertedFeedPublishEntry) {
+      frag.appendChild(createFeedPublishEntry());
+      hasInsertedFeedPublishEntry = true;
+    }
+  }
+
+  c.appendChild(frag);
+}
+/* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later + exact date) === */
 
 /* === BEGIN BLOCK: GS-01 SKELETON RENDER (stable feed while loading) ===
 Zweck: Während Fetch laufen Skeleton-Cards in #event-cards rendern (kein Layout-Jump).
