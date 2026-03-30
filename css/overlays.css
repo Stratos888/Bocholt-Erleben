@@ -228,8 +228,8 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 .filter-sheet-option.is-active,
 .filter-option.is-active{
-  background: rgba(139,207,74,0.14);
-  border-color: rgba(139,207,74,0.26);
+  background: color-mix(in srgb, transparent 86%, var(--color-primary));
+  border-color: color-mix(in srgb, transparent 74%, var(--color-primary));
 }
 
 .filter-sheet-option.is-active::after,
@@ -263,7 +263,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   .filter-sheet-option.is-active:hover,
   .filter-option.is-active:hover{
-    background: rgba(139,207,74,0.16);
+    background: color-mix(in srgb, transparent 84%, var(--color-primary));
   }
 }
 
