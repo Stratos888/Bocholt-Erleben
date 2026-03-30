@@ -16,6 +16,27 @@ Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head>.
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
+<!-- === BEGIN BLOCK: HOME_THEME_PREVIEW_BOOTSTRAP_V1 | Zweck: aktiviert über ?themePreview=… sichere Home-Farb-Previews ohne den Normalzustand zu verändern; Umfang: setzt nur data-theme-preview am <html> und überschreibt im Preview-Fall die theme-color-Meta === -->
+<script>
+(function () {
+  const previewThemeMap = {
+    "warm-civic": "#F6F0E6",
+    "fresh-editorial": "#EEF5F1",
+    "refined-brand": "#F3F7EB"
+  };
+
+  const previewKey = new URLSearchParams(window.location.search).get("themePreview");
+  if (!previewKey || !previewThemeMap[previewKey]) return;
+
+  document.documentElement.setAttribute("data-theme-preview", previewKey);
+
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) {
+    themeMeta.setAttribute("content", previewThemeMap[previewKey]);
+  }
+})();
+</script>
+<!-- === END BLOCK: HOME_THEME_PREVIEW_BOOTSTRAP_V1 === -->
 
 <!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
 
