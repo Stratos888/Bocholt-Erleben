@@ -149,7 +149,7 @@
 
 .info-message{
   background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border-color: rgba(139,207,74,0.18);
+  border-color: color-mix(in srgb, transparent 82%, var(--color-primary));
   color: var(--color-text-primary);
 }
 
@@ -1048,7 +1048,7 @@
 }
 
 .filter-pill.is-active{
-  border-color: rgba(139,207,74,0.26);
+  border-color: color-mix(in srgb, transparent 74%, var(--color-primary));
   background: rgba(255,255,255,0.92);
   box-shadow:
     0 7px 16px rgba(0,0,0,0.050),
