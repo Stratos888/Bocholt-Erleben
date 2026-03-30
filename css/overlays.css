@@ -228,8 +228,8 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
 .filter-sheet-option.is-active,
 .filter-option.is-active{
-  background: rgba(139,207,74,0.14);
-  border-color: rgba(139,207,74,0.26);
+  background: color-mix(in srgb, transparent 86%, var(--color-primary));
+  border-color: color-mix(in srgb, transparent 74%, var(--color-primary));
 }
 
 .filter-sheet-option.is-active::after,
@@ -263,7 +263,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 
   .filter-sheet-option.is-active:hover,
   .filter-option.is-active:hover{
-    background: rgba(139,207,74,0.16);
+    background: color-mix(in srgb, transparent 84%, var(--color-primary));
   }
 }
 
@@ -272,6 +272,76 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   outline: none;
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
+
+/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V1 | Zweck: vereinfacht die exakte Datumsauswahl auf einen einzigen robusten Trigger ohne doppelte Beschriftung oder Extra-Reset; Umfang: nur Wann-Sheet-/Popover-Date-UI direkt vor den hidden-Regeln === */
+.filter-date-module{
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.filter-date-module__divider{
+  height: 1px;
+  width: 100%;
+  background: rgba(22,39,61,0.08);
+}
+
+.filter-date-trigger{
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: var(--cmp-choice-minh);
+  padding: 14px 14px;
+  border: 1px solid var(--cmp-input-border);
+  border-radius: 16px;
+  background: var(--cmp-input-bg-strong);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.70) inset;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filter-date-trigger__text{
+  min-width: 0;
+  color: rgba(31,41,51,0.92);
+  font-size: 1rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.filter-date-trigger__input{
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.filter-date-module.is-active .filter-date-trigger{
+  background: color-mix(in srgb, transparent 86%, var(--color-primary));
+  border-color: color-mix(in srgb, transparent 74%, var(--color-primary));
+}
+
+.filter-date-trigger:focus-visible,
+.filter-date-trigger:focus-within{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
+}
+
+@media (hover: hover){
+  .filter-date-trigger:hover{
+    background: rgba(31,41,51,0.045);
+  }
+
+  .filter-date-module.is-active .filter-date-trigger:hover{
+    background: color-mix(in srgb, transparent 84%, var(--color-primary));
+  }
+}
+/* === END BLOCK: FILTER_DATE_EXACT_UI_V1 === */
 
 /* hidden muss immer wirken */
 .filter-pill[hidden]{ display: none !important; }

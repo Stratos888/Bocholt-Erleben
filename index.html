@@ -3,12 +3,38 @@
 <head>
 <link rel="canonical" href="https://bocholt-erleben.de/">   
 <meta charset="UTF-8">
-<!-- === BEGIN BLOCK: PWA MANIFEST LINK (required for install prompt) ===
-Zweck: Stellt sicher, dass Chrome das Manifest findet (DevTools: Application → Manifest).
-Umfang: Fügt NUR den Manifest-Link ein (kein weiteres Refactoring).
+<!-- === BEGIN BLOCK: PWA ICON + META BASICS (home) ===
+Zweck: Bindet Manifest, Favicon, Apple-Touch-Icon und Basis-PWA-Meta für Home sauber ein.
+Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head> und ergänzt den sicheren Theme-Lab-Preview-Bootstrap.
 === -->
 <link rel="manifest" href="/manifest.json">
-<!-- === END BLOCK: PWA MANIFEST LINK (required for install prompt) === -->
+<meta name="theme-color" content="#F2F6EC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script>
+(function () {
+  const previewThemeMap = {
+    "brand-warm": "#F4F3E8",
+    "civic-gold": "#F6F0E4",
+    "forest-light": "#EFF4EA"
+  };
+
+  const previewKey = new URLSearchParams(window.location.search).get("themePreview");
+  if (!previewKey || !previewThemeMap[previewKey]) return;
+
+  document.documentElement.setAttribute("data-theme-preview", previewKey);
+
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) {
+    themeMeta.setAttribute("content", previewThemeMap[previewKey]);
+  }
+})();
+</script>
+<!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
 
 <!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
 
@@ -147,19 +173,9 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       </button>
     </div>
 
-    <!-- === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_V1 | Zweck: positioniert den Veranstalter-Funnel im mobilen Top-Stack als sekundäre Utility-Row; Scope: mobile-only CTA unter den Filtern, oberhalb des Feeds === -->
-    <a
-      class="mobile-publish-strip"
-      href="/events-veroeffentlichen/"
-      aria-label="Für Veranstalter – Event veröffentlichen"
-    >
-      <span class="mobile-publish-strip__copy">
-        <span class="mobile-publish-strip__eyebrow">Für Veranstalter</span>
-        <span class="mobile-publish-strip__title">Event veröffentlichen</span>
-      </span>
-      <span class="mobile-publish-strip__chevron" aria-hidden="true">›</span>
-    </a>
-    <!-- === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_V1 === -->
+    <!-- === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_REMOVED_V1 | Zweck: entfernt den mobilen Veranstalter-CTA vollständig aus dem Top-Stack; Umfang: kein CTA mehr zwischen Filtern und Feed === -->
+    <!-- intentionally removed: organizer entry now renders dynamically after the first real feed section -->
+    <!-- === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_REMOVED_V1 === -->
 
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
@@ -200,6 +216,15 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
       <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
       <button type="button" class="filter-sheet-option" data-time="later">Später</button>
+      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 | Zweck: vereinfacht den Mobile-Wann-Filter auf einen einzigen klaren Datums-Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Zeit-Sheet === -->
+      <div class="filter-date-module" data-date-module>
+        <div class="filter-date-module__divider" aria-hidden="true"></div>
+        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
+          <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+        </button>
+        <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
+      </div>
+      <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 === -->
     </div>
   </div>
 </div>
@@ -421,6 +446,15 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
     <button data-time="weekend">Dieses Wochenende</button>
     <button data-time="nextweek">Nächste Woche</button>
     <button data-time="later">Später</button>
+    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 | Zweck: vereinfacht den Desktop-Datumsfilter auf einen einzigen klaren Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
+    <div class="filter-popover__divider" aria-hidden="true"></div>
+    <div class="filter-date-module filter-date-module--popover" data-date-module>
+      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
+        <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+      </button>
+      <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
+    </div>
+    <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 === -->
   </div>
 </div>
 

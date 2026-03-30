@@ -149,7 +149,7 @@
 
 .info-message{
   background: color-mix(in srgb, white 92%, var(--color-primary-muted));
-  border-color: rgba(139,207,74,0.18);
+  border-color: color-mix(in srgb, transparent 82%, var(--color-primary));
   color: var(--color-text-primary);
 }
 
@@ -422,13 +422,17 @@
 
   padding: 5px 3px;
 
-  background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+  );
   border-radius: 11px;
 
   border: 0;
   box-shadow:
-    inset 0 0 0 1px rgba(31,41,51,0.035),
-    inset 0 1px 0 rgba(255,255,255,0.75);
+    inset 0 0 0 1px rgba(24,40,30,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.80);
 
   line-height: 1;
   text-align: center;
@@ -437,7 +441,7 @@
 .event-date-badge__wday{
   font-size: 0.62rem;
   font-weight: 700;
-  color: rgba(31,41,51,0.54);
+  color: rgba(58,70,66,0.58);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -445,13 +449,13 @@
 .event-date-badge__day{
   font-size: 1.32rem;
   font-weight: 800;
-  color: rgba(31,41,51,0.90);
+  color: var(--color-text-primary);
 }
 
 .event-date-badge__month{
   font-size: 0.62rem;
   font-weight: 700;
-  color: rgba(31,41,51,0.50);
+  color: rgba(58,70,66,0.54);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -831,14 +835,14 @@
   padding: 0 10px;
 
   border-radius: var(--ui-radius-sm);
-  border: 1px solid var(--ui-border-weak);
-  background: var(--ui-surface-soft);
+  border: 1px solid rgba(24,40,30,0.11);
+  background: linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(242,246,237,0.88) 100%);
 
   font-family: inherit;
   font-size: var(--ui-font-size-control);
   font-weight: var(--ui-font-weight-control);
   line-height: 1;
-  color: rgba(31,41,51,0.80);
+  color: rgba(24,40,30,0.84);
 
   cursor: pointer;
   text-decoration: none;
@@ -846,22 +850,25 @@
 
   -webkit-tap-highlight-color: transparent;
 
-  box-shadow: var(--ui-shadow-soft);
+  box-shadow:
+    0 8px 18px rgba(10,24,16,0.055),
+    0 1px 0 rgba(255,255,255,0.82) inset;
 
   transition: background 140ms ease, border-color 140ms ease,
-              box-shadow 140ms ease, transform 140ms ease;
+              box-shadow 140ms ease, transform 140ms ease, color 140ms ease;
 }
 
 @media (hover: hover){
   .header-right > .pwa-install-button:hover{
-    background: var(--ui-surface-soft-hover);
-    border-color: var(--ui-border-strong);
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(246,249,242,0.92) 100%);
+    border-color: rgba(24,40,30,0.16);
+    color: var(--color-text-primary);
   }
 }
 
 .header-right > .pwa-install-button:active{
   transform: translateY(1px);
-  background: var(--ui-surface-soft-active);
+  background: linear-gradient(180deg, rgba(248,250,245,0.96) 0%, rgba(240,245,236,0.94) 100%);
 }
 
 .header-right > .pwa-install-button:focus-visible{
@@ -1048,24 +1055,24 @@
 }
 
 .filter-pill.is-active{
-  border-color: rgba(139,207,74,0.26);
-  background: rgba(255,255,255,0.92);
+  border-color: color-mix(in srgb, transparent 58%, var(--color-primary));
+  background: color-mix(in srgb, white 84%, var(--color-primary-muted));
   box-shadow:
-    0 7px 16px rgba(0,0,0,0.050),
+    0 8px 18px rgba(10,24,16,0.055),
     0 0 0 3px var(--ui-control-ring-active),
-    0 1px 0 rgba(255,255,255,0.78) inset;
+    0 1px 0 rgba(255,255,255,0.82) inset;
 }
 .filter-pill.is-active .filter-pill__value{
-  color: color-mix(in srgb, var(--color-text-primary) 86%, var(--color-primary));
+  color: color-mix(in srgb, var(--color-text-primary) 82%, var(--color-primary));
 }
 
 @media (hover: hover){
   .filter-pill:hover{
-    background: rgba(255,255,255,0.90);
-    border-color: rgba(31,41,51,0.12);
+    background: rgba(255,255,255,0.94);
+    border-color: rgba(24,40,30,0.14);
     box-shadow:
-      0 7px 16px rgba(0,0,0,0.050),
-      0 1px 0 rgba(255,255,255,0.72) inset;
+      0 8px 18px rgba(10,24,16,0.050),
+      0 1px 0 rgba(255,255,255,0.76) inset;
   }
 }
 
@@ -1102,14 +1109,14 @@
 
 @media (hover: hover){
   .filter-pill--reset:hover{
-    background: rgba(255,255,255,0.90);
-    border-color: rgba(31,41,51,0.12);
+    background: rgba(255,255,255,0.94);
+    border-color: rgba(24,40,30,0.14);
     box-shadow:
-      0 7px 16px rgba(0,0,0,0.050),
-      0 1px 0 rgba(255,255,255,0.72) inset;
+      0 8px 18px rgba(10,24,16,0.050),
+      0 1px 0 rgba(255,255,255,0.76) inset;
   }
   .filter-pill--reset:hover::before{
-    color: rgba(31,41,51,0.72);
+    color: rgba(24,40,30,0.74);
   }
 }
 

@@ -1,7 +1,7 @@
 /* === BEGIN BLOCK: HOME_CSS_STEP_4 | Purpose: isolate home/start-page feed, hero, search-row and responsive layout into a dedicated owner file while preserving validated mobile filter-row behavior | Scope: home feed layout, hero layout, desktop/narrow desktop hero variants === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
-/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 | Purpose: keep homepage feed groups vertically stacked and prepare only the inner group grid for desktop 2-up while preserving the existing mobile card flow | Scope: viewport guardrails, feed section ownership, top-level group stack and per-group card container behavior === */
+/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 | Purpose: keep homepage feed groups vertically stacked, preserve the existing mobile card flow and establish a calmer brand-consistent base visual system for labels and cards before desktop-specific polish | Scope: viewport guardrails, feed section ownership, top-level group stack, per-group card container behavior and feed-card base styling === */
 /* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
 .events-section-title,
@@ -36,14 +36,15 @@
 
   margin: var(--feed-title-mt) 0 var(--feed-title-mb);
 
-  font-weight: 700;
+  font-weight: 780;
   font-size: 0.76rem;
 
-  letter-spacing: 0.11em;
+  letter-spacing: 0.135em;
 
   text-transform: uppercase;
 
-  color: rgba(60,72,88,0.55);
+  color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.38);
 
 }
 
@@ -63,7 +64,7 @@
 
 .events-feed-group{
   display: grid;
-  gap: var(--feed-title-mb);
+  gap: calc(var(--feed-title-mb) + 2px);
   width: 100%;
 }
 
@@ -79,7 +80,53 @@
   border-radius: 0;
   box-shadow: none;
 }
-/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V2 === */
+
+.event-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.968) 0%, rgba(251,252,248,0.95) 100%);
+  border-color: color-mix(in srgb, rgba(24,40,30,0.075) 72%, var(--brand-gold-200) 28%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.88) inset,
+    0 8px 18px rgba(12,24,18,0.038);
+}
+
+.event-card::before{
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 60%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 72%, var(--color-primary-muted)) 100%
+  );
+  opacity: 0.94;
+  box-shadow: inset -1px 0 0 rgba(24,40,30,0.042);
+}
+
+.event-date-badge{
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 66%, var(--color-primary-muted)) 100%
+  );
+  color: rgba(24,40,30,0.90);
+  box-shadow:
+    inset 0 0 0 1px rgba(24,40,30,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.82);
+}
+
+.event-date-badge__wday{
+  color: rgba(68,86,72,0.58);
+}
+
+.event-date-badge__month{
+  color: rgba(68,86,72,0.56);
+}
+
+.event-title{
+  color: rgba(23,39,29,0.92);
+}
+
+.event-card-desc{
+  color: rgba(31,41,51,0.78);
+}
+/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 === */
 
 /* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
@@ -230,14 +277,14 @@
 
   padding: 4px var(--gutter) var(--topstack-pad-bottom);
 
-  background: rgba(249, 251, 246, 0.90);
+  background: rgba(243,247,239,0.96);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 
-  border-bottom: 1px solid rgba(31,41,51,0.06);
+  border-bottom: 1px solid rgba(24,40,30,0.09);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 6px 14px rgba(31,41,51,0.045);
+    0 1px 0 rgba(255,255,255,0.78) inset,
+    0 8px 18px rgba(10,24,16,0.05);
 
   /* wichtig: kein transform → reduziert sticky „rubberband wobble“ auf Android */
   transform: none;
@@ -276,7 +323,7 @@
 
 .desktop-entry__eyebrow{
   margin: 0;
-  color: #6f8758;
+  color: color-mix(in srgb, var(--color-text-secondary) 56%, var(--color-primary));
   font-size: 0.76rem;
   font-weight: 820;
   line-height: 1.2;
@@ -287,7 +334,7 @@
 .desktop-entry__title{
   margin: 0;
   max-width: none;
-  color: #16273d;
+  color: #16311F;
   font-size: clamp(2.8rem, 2.24rem + 1.78vw, 5rem);
   font-weight: 800;
   line-height: 0.92;
@@ -299,7 +346,7 @@
 
 .desktop-entry__text{
   margin: 0;
-  color: rgba(22,39,61,0.82);
+  color: rgba(24,40,30,0.82);
   font-size: 1rem;
   font-weight: 560;
   line-height: 1.42;
@@ -397,18 +444,18 @@
   gap: 10px;
   min-height: 56px;
   padding: 0 18px;
-  border: 1px solid rgba(22,39,61,0.08);
+  border: 1px solid rgba(24,40,30,0.11);
   border-radius: 18px;
-  background: rgba(255,255,255,0.86);
-  color: #1f3552;
+  background: linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(242,246,237,0.88) 100%);
+  color: var(--color-text-primary);
   font: inherit;
   font-size: 0.95rem;
   font-weight: 720;
   line-height: 1;
   text-decoration: none;
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.92) inset,
-    0 10px 24px rgba(22,39,61,0.035);
+    0 1px 0 rgba(255,255,255,0.94) inset,
+    0 10px 24px rgba(10,24,16,0.045);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -422,18 +469,18 @@
 .desktop-hero__action--publish,
 .desktop-hero__action--info,
 .desktop-hero__action--app{
-  color: #1f3552;
+  color: var(--color-text-primary);
   font: inherit;
 }
 
 @media (hover: hover){
   .desktop-hero__action:hover{
-    border-color: rgba(22,39,61,0.12);
-    background: rgba(255,255,255,0.94);
-    color: #16273d;
+    border-color: rgba(24,40,30,0.16);
+    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(246,249,242,0.92) 100%);
+    color: #16311F;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.96) inset,
-      0 14px 28px rgba(22,39,61,0.05);
+      0 1px 0 rgba(255,255,255,0.97) inset,
+      0 14px 28px rgba(10,24,16,0.058);
   }
 }
 
@@ -501,109 +548,150 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 | Zweck: reduziert den mobilen Veranstalter-CTA auf eine kompakte Ein-Zeilen-Utility-Row ohne Kicker und hält alte/new Markup-Varianten kompatibel; Umfang: ersetzt den bisherigen Mobile-Publish-Block vollständig === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V3 | Zweck: entfernt den technischen/placeholder-artigen Look (dashed border) und erzeugt einen ruhigen, hochwertigen Service-Block mit klarer Systemzugehörigkeit; Umfang: mobile-only Styling für den Feed-CTA === */
 
 .mobile-publish-card,
-.mobile-publish-strip{
+.mobile-publish-strip,
+.feed-publish-entry{
   display: none;
 }
 
 @media (max-width: 899.98px){
-  .mobile-publish-card,
-  .mobile-publish-strip{
-    display: flex;
-    align-items: center;
-    position: relative;
-    min-height: 44px;
-    margin: 8px 0 8px;
-    padding: 0 34px 0 12px;
-    border: 1px solid rgba(22,39,61,0.026);
-    border-radius: var(--cmp-input-radius);
-    background: linear-gradient(180deg, rgba(249,250,246,0.84) 0%, rgba(251,252,249,0.74) 100%);
-    box-shadow: none;
-    color: inherit;
+  .feed-publish-entry{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label label"
+      "title chevron";
+
+    column-gap: 12px;
+    row-gap: 5px;
+
+    width: 100%;
+
+    /* 🔴 wichtiger Rhythmus */
+    margin: 6px 0 4px;
+
+    padding: 12px 14px;
+
+    /* 🔴 saubere, ruhige Fläche */
+border: 1px solid color-mix(in srgb, rgba(24,40,30,0.16) 70%, var(--brand-gold-200) 30%);
+    border-radius: 14px;
+
+background:
+  linear-gradient(
+    180deg,
+    color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
+    color-mix(in srgb, white 82%, var(--color-primary-muted)) 100%
+  );
+
+    /* 🔴 sehr leichter Depth statt Card-Look */
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset;
+
+    color: var(--color-text-primary);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
+
+    transition:
+      border-color 140ms ease,
+      background 140ms ease,
+      transform 120ms ease;
   }
 
-  .mobile-publish-card:link,
-  .mobile-publish-card:visited,
-  .mobile-publish-card:hover,
-  .mobile-publish-card:active,
-  .mobile-publish-strip:link,
-  .mobile-publish-strip:visited,
-  .mobile-publish-strip:hover,
-  .mobile-publish-strip:active{
-    color: inherit;
-    text-decoration: none;
+  .feed-publish-entry__label{
+    grid-area: label;
+
+    font-size: 10px;
+    font-weight: 780;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    color: color-mix(in srgb, var(--color-text-muted) 85%, var(--brand-green-900) 15%);
   }
 
-  .mobile-publish-card::after,
-  .mobile-publish-strip::after{
-    content: "›";
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    color: rgba(99,119,149,0.46);
-    font-size: 0.9rem;
-    font-weight: 600;
-    line-height: 1;
-    pointer-events: none;
+  .feed-publish-entry__main{
+    display: contents;
   }
 
-  .mobile-publish-strip__copy{
-    display: block;
-    min-width: 0;
-    width: 100%;
+  .feed-publish-entry__title{
+    grid-area: title;
+
+    font-size: 0.98rem;
+    font-weight: 760;
+    line-height: 1.2;
+
+    color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
   }
 
-  .mobile-publish-strip__chevron{
-    display: none;
+.feed-publish-entry__chevron{
+  grid-area: chevron;
+
+  align-self: center;
+  justify-self: end;
+
+  font-size: 17px;
+  opacity: 0.75;
+
+  /* leichter Brand-Touch */
+  color: color-mix(in srgb, var(--brand-green-900) 60%, var(--color-text-muted) 40%);
+}
+
+  @media (hover: hover){
+    .feed-publish-entry:hover{
+      border-color: color-mix(in srgb, rgba(24,40,30,0.18) 70%, var(--brand-gold-200) 30%);
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
+          color-mix(in srgb, white 82%, var(--color-primary-muted)) 100%
+        );
+    }
   }
 
-  .mobile-publish-card__eyebrow,
-  .mobile-publish-strip__eyebrow{
-    display: none;
-  }
-
-  .mobile-publish-card__title,
-  .mobile-publish-strip__title{
-    display: block;
-    min-width: 0;
-    margin: 0;
-    color: rgba(22,39,61,0.94);
-    font-size: 0.93rem;
-    font-weight: 660;
-    line-height: 1;
-    letter-spacing: -0.008em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .mobile-publish-card:active,
-  .mobile-publish-strip:active{
-    background: linear-gradient(180deg, rgba(245,248,240,0.9) 0%, rgba(249,251,246,0.8) 100%);
+  .feed-publish-entry:active{
     transform: translateY(1px);
   }
 
-  .mobile-publish-card:focus-visible,
-  .mobile-publish-strip:focus-visible{
+  .feed-publish-entry:focus-visible{
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_COMPAT_V3 === */
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V27 | Purpose: kalibriert den Desktop-Hero auf klare Ebenen mit ruhiger Feed-naher Search-Surface, gleichwertigen Service-Actions und präziserem Bild-Fade; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V3 === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 | Zweck: entfernt grüne Unterstreichung (Tap/Active-Link-Decoration) beim Klick auf den Feed-CTA; Umfang: nur feed-publish-entry Link-Zustände === */
+
+.feed-publish-entry,
+.feed-publish-entry:link,
+.feed-publish-entry:visited,
+.feed-publish-entry:hover,
+.feed-publish-entry:active,
+.feed-publish-entry:focus{
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+.feed-publish-entry *{
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+/* zusätzliche Sicherheit für iOS/Chrome Tap-Highlight */
+.feed-publish-entry{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
+
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
     padding-left: 32px;
     padding-right: 32px;
-    background: linear-gradient(180deg, rgba(246,249,240,0.965) 0%, rgba(243,247,235,0.91) 100%);
-    border-bottom: 1px solid rgba(22,39,61,0.055);
+    background: linear-gradient(180deg, rgba(248,249,242,0.97) 0%, rgba(243,246,236,0.93) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.06) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.84) inset,
       0 10px 22px rgba(22,39,61,0.038);
@@ -615,13 +703,13 @@
     gap: 11px;
   }
 
-   /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V1 | Zweck: schärft auf der Startseite den Desktop-Header auf Enterprise-Niveau, beruhigt die Fläche und zieht Icon/Text zu einem präziseren Brand-Lockup zusammen; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
+  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 | Zweck: färbt auf der Startseite den Desktop-Header ruhiger und markenkonsistenter ein, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
   .app-header{
     min-height: 60px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(247,249,244,0.978) 0%, rgba(243,246,238,0.946) 100%);
-    border-bottom: 1px solid rgba(22,39,61,0.068);
+    background: linear-gradient(180deg, rgba(248,249,242,0.982) 0%, rgba(242,246,236,0.95) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.07) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
       0 8px 18px rgba(22,39,61,0.030);
@@ -644,7 +732,7 @@
 
   .app-title{
     max-width: none;
-    color: #16273d;
+    color: color-mix(in srgb, var(--brand-green-900) 78%, #16273d 22%);
     font-size: 1.24rem;
     font-weight: 710;
     letter-spacing: -0.028em;
@@ -654,7 +742,7 @@
   .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V1 === */
+  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 === */
 
   .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
@@ -662,30 +750,31 @@
     --hero-bg-position-active: 79.25% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
-    --hero-bg-brightness-active: var(--hero-bg-brightness-desktop);
-    --hero-bg-saturate-active: var(--hero-bg-saturate-desktop);
-    --hero-bg-contrast-active: var(--hero-bg-contrast-desktop);
-    --hero-panel-bg: linear-gradient(180deg, rgba(239,243,234,0.975) 0%, rgba(235,240,230,0.965) 100%);
-    --hero-panel-border: rgba(117,133,108,0.18);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.975) 0%, rgba(252,253,250,0.955) 100%);
-    --hero-control-border: rgba(22,39,61,0.10);
+    --hero-bg-brightness-active: 0.968;
+    --hero-bg-saturate-active: 1.035;
+    --hero-bg-contrast-active: 1.03;
+    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(242,246,236,0.958) 100%);
+    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.15) 70%, var(--brand-gold-200) 30%);
+    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.986) 0%, rgba(247,250,243,0.968) 100%);
+    --hero-control-border: color-mix(in srgb, rgba(24,40,30,0.11) 76%, var(--brand-gold-200) 24%);
     --hero-control-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
-      0 8px 18px rgba(22,39,61,0.024);
+      0 10px 22px rgba(10,24,16,0.034);
     position: relative;
     isolation: isolate;
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-    min-height: 420px;
-    padding: 24px 32px 16px;
+    gap: 14px;
+    min-height: 424px;
+    padding: 22px 32px 14px;
     background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
+/* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 | Zweck: schließt den letzten verbleibenden Desktop-Farb-Gap, indem der linke Hero-Fade auf breiten Desktops deutlich transparenter, natürlicher und weniger kreidig wird; Umfang: nur Desktop-Hero-Overlay im V29-Block, keine Geometrieänderung === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -695,13 +784,14 @@
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.992) 0%, rgba(247,250,244,0.985) 6%, rgba(247,250,244,0.90) 11%, rgba(247,250,244,0.58) 17%, rgba(247,250,244,0.24) 24%, rgba(247,250,244,0.07) 31%, rgba(247,250,244,0.00) 37%),
-      radial-gradient(46% 56% at 16% 28%, rgba(247,250,244,0.34) 0%, rgba(247,250,244,0.14) 38%, rgba(247,250,244,0.04) 63%, rgba(247,250,244,0.00) 79%),
-      linear-gradient(180deg, rgba(247,250,244,0.28) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.02) 42%, rgba(247,250,244,0.08) 100%),
+      linear-gradient(90deg, rgba(246,248,240,0.974) 0%, rgba(246,248,240,0.964) 5%, rgba(246,248,240,0.78) 9%, rgba(245,247,238,0.40) 14%, rgba(244,246,236,0.14) 19%, rgba(244,246,236,0.03) 24%, rgba(244,246,236,0.00) 30%),
+      radial-gradient(44% 56% at 15% 28%, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.075) 34%, rgba(245,248,239,0.018) 58%, rgba(245,248,239,0.00) 76%),
+      linear-gradient(180deg, rgba(245,248,239,0.11) 0%, rgba(245,248,239,0.03) 18%, rgba(245,248,239,0.00) 42%, rgba(245,248,239,0.04) 100%),
+      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.04) 0%, rgba(240,222,137,0.00) 12%),
       var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
@@ -720,11 +810,12 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 72% 18%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.00) 10%),
-      radial-gradient(circle at 86% 54%, rgba(246,214,153,0.04) 0%, rgba(246,214,153,0.00) 12%),
-      linear-gradient(180deg, rgba(250,252,247,0.00) 76%, rgba(250,252,247,0.10) 100%);
+      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.072) 0%, rgba(240,222,137,0.00) 13%),
+      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.028) 0%, rgba(216,178,52,0.00) 12%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, rgba(246,249,241,0.075) 100%);
     pointer-events: none;
   }
+/* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 === */
 
   .desktop-entry{
     display: block;
@@ -743,6 +834,7 @@
 
   .desktop-entry__title{
     max-width: 30rem;
+    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
@@ -750,7 +842,7 @@
 
   .desktop-entry__text{
     max-width: 29rem;
-    color: rgba(22,39,61,0.88);
+    color: rgba(24,40,30,0.84);
     font-size: 0.99rem;
     line-height: 1.42;
   }
@@ -777,10 +869,10 @@
     padding: 14px 14px 12px;
     border: 1px solid var(--hero-panel-border);
     border-radius: 22px;
-    background: var(--hero-panel-bg);
+    background: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(243,247,239,0.956) 100%);
     box-shadow:
-      0 18px 36px rgba(22,39,61,0.072),
-      0 1px 0 rgba(255,255,255,0.92) inset;
+      0 20px 40px rgba(22,39,61,0.078),
+      0 1px 0 rgba(255,255,255,0.93) inset;
     -webkit-backdrop-filter: blur(9px);
     backdrop-filter: blur(9px);
   }
@@ -793,8 +885,8 @@
     border-radius: 17px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.30) 0%,
-      rgba(255,255,255,0.08) 100%
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.06) 100%
     );
   }
 
@@ -825,7 +917,7 @@
     left: 21px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(82,102,128,0.82);
+    color: rgba(78,97,87,0.78);
     width: 18px;
     height: 18px;
     z-index: 2;
@@ -845,7 +937,7 @@
     border: 1px solid var(--hero-control-border);
     border-radius: 16px;
     background: var(--hero-control-bg);
-    color: var(--color-text-primary);
+    color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
@@ -853,7 +945,7 @@
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(82,102,128,0.78);
+    color: rgba(82,101,89,0.74);
     font-weight: 620;
   }
 
@@ -877,7 +969,7 @@
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
-    color: rgba(82,102,128,0.86);
+    color: rgba(84,100,89,0.80);
     font-size: 0.67rem;
     font-weight: 760;
     line-height: 1;
@@ -889,7 +981,7 @@
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
-    color: var(--color-text-primary);
+    color: color-mix(in srgb, var(--brand-green-900) 84%, #16273d 16%);
     font-size: 0.95rem;
     font-weight: 780;
     line-height: 1.08;
@@ -903,7 +995,7 @@
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(82,102,128,0.52);
+    color: rgba(84,100,89,0.48);
     font-size: 0.98rem;
     line-height: 1;
     margin-left: 0;
@@ -926,49 +1018,103 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid rgba(117,133,108,0.14);
+    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 68%, var(--brand-gold-200) 32%);
   }
 
-  .desktop-hero__action{
+  .desktop-hero__action,
+  .desktop-hero__action:link,
+  .desktop-hero__action:visited{
     min-height: 36px;
     padding: 0 12px;
     border-radius: 11px;
     font-size: 0.84rem;
-    font-weight: 660;
-    border: 1px solid var(--hero-control-border);
-    background: var(--hero-control-bg);
-    color: rgba(31,53,82,0.84);
+    font-weight: 680;
+    border: 1px solid color-mix(in srgb, rgba(24,40,30,0.11) 78%, var(--brand-gold-200) 22%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.982) 0%, rgba(246,249,242,0.958) 100%);
+    color: rgba(24,40,30,0.84);
+    text-decoration: none;
+    -webkit-text-fill-color: rgba(24,40,30,0.84);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(22,39,61,0.016);
+      0 4px 10px rgba(10,24,16,0.024);
   }
 
   .desktop-hero__action .desktop-hero__icon{
     width: 14px;
     height: 14px;
-    opacity: 0.62;
+    opacity: 0.68;
   }
 
-  .desktop-hero__actions .desktop-hero__action--publish,
-  .desktop-hero__actions .desktop-hero__action--info,
-  .desktop-hero__actions .desktop-hero__action--app{
-    border-color: var(--hero-control-border);
-    background: var(--hero-control-bg);
-    color: rgba(31,53,82,0.84);
-    font-weight: 660;
+/* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 | Zweck: zieht auf Desktop Feed-Fläche, Karten, Rail, Date-Badge und Text-Hierarchie visuell auf denselben Qualitätsstand wie den finalisierten Hero, ohne Geometrie zu ändern; Umfang: nur Desktop-Feed-Surface im V29-Block === */
+  .events-section{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 28%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 16%, var(--color-primary-muted)) 58%,
+      color-mix(in srgb, white 12%, var(--color-primary-muted)) 100%
+    );
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+  }
+
+  .event-card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.978) 0%, rgba(252,253,249,0.958) 100%);
+    border-color: color-mix(in srgb, rgba(24,40,30,0.085) 70%, var(--brand-gold-200) 30%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(22,39,61,0.016);
+      0 10px 24px rgba(12,24,18,0.045);
   }
 
+  .event-card::before{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+    );
+    opacity: 0.96;
+    box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
+  }
+
+  .event-date-badge{
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 42%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 60%, var(--color-primary-muted)) 100%
+    );
+    color: rgba(24,40,30,0.92);
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.062),
+      inset 0 1px 0 rgba(255,255,255,0.86),
+      0 1px 2px rgba(12,24,18,0.028);
+  }
+
+  .event-date-badge__wday{
+    color: rgba(67,84,71,0.62);
+  }
+
+  .event-date-badge__month{
+    color: rgba(67,84,71,0.60);
+  }
+
+  .event-title{
+    color: rgba(21,37,28,0.93);
+  }
+
+  .event-card-desc{
+    color: rgba(31,41,51,0.76);
+  }
+/* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 === */
+
   @media (hover: hover){
-    .desktop-hero__actions .desktop-hero__action:hover{
-      border-color: rgba(22,39,61,0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(248,251,246,0.965) 100%);
-      color: var(--color-text-primary);
+    .desktop-hero__actions .desktop-hero__action:hover,
+    .desktop-hero__actions .desktop-hero__action:link:hover,
+    .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, rgba(22,39,61,0.13) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
+      color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(22,39,61,0.024);
+        0 8px 18px rgba(22,39,61,0.026);
     }
   }
 }
@@ -1015,9 +1161,9 @@
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V27 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V25 | Purpose: stabilisiert die 1024-Klasse mit kompakterem aber klar getrenntem Hero, schmalerem Fade und ruhiger Search-Surface ohne Kontrastverlust; Scope: only narrow-desktop focal-point and spacing refinement between 900px and 1024px === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
@@ -1032,13 +1178,14 @@
 
   .desktop-hero::before{
     background-image:
-      linear-gradient(90deg, rgba(247,250,244,0.994) 0%, rgba(247,250,244,0.987) 8%, rgba(247,250,244,0.91) 14%, rgba(247,250,244,0.60) 20%, rgba(247,250,244,0.26) 27%, rgba(247,250,244,0.08) 34%, rgba(247,250,244,0.00) 40%),
-      radial-gradient(42% 54% at 16% 28%, rgba(247,250,244,0.32) 0%, rgba(247,250,244,0.14) 40%, rgba(247,250,244,0.04) 64%, rgba(247,250,244,0.00) 80%),
-      linear-gradient(180deg, rgba(247,250,244,0.26) 0%, rgba(247,250,244,0.08) 18%, rgba(247,250,244,0.03) 42%, rgba(247,250,244,0.08) 100%),
+      linear-gradient(90deg, rgba(246,248,240,0.986) 0%, rgba(246,248,240,0.976) 8%, rgba(246,248,240,0.86) 14%, rgba(245,247,238,0.54) 20%, rgba(244,246,236,0.22) 27%, rgba(244,246,236,0.06) 34%, rgba(244,246,236,0.00) 40%),
+      radial-gradient(42% 54% at 16% 28%, rgba(245,248,239,0.28) 0%, rgba(245,248,239,0.12) 40%, rgba(245,248,239,0.03) 64%, rgba(245,248,239,0.00) 80%),
+      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.015) 42%, rgba(245,248,239,0.07) 100%),
+      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.05) 0%, rgba(240,222,137,0.00) 14%),
       var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
   }
 
   .desktop-entry__content{
@@ -1133,7 +1280,7 @@
     font-size: 0.80rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V25 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
@@ -1238,6 +1385,34 @@
       0 1px 0 rgba(255,255,255,0.96) inset,
       0 10px 20px rgba(22,39,61,0.038);
   }
+
+  .filter-popover__divider{
+    height: 1px;
+    margin: 4px 0 2px;
+    background: rgba(22,39,61,0.08);
+  }
+
+  .filter-date-module--popover{
+    gap: 8px;
+    margin-top: 0;
+    padding: 2px 0 0;
+  }
+
+  .filter-date-module--popover .filter-date-trigger{
+    min-height: 44px;
+    padding: 12px 12px;
+    border-radius: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+
+  .filter-date-module--popover .filter-date-trigger__text{
+    font-size: 0.92rem;
+    font-weight: 630;
+  }
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+  }
 }
 
 @media (max-width: 899.98px){
@@ -1290,5 +1465,315 @@
   }
 }
 /* === END BLOCK: HOME_EMPTY_STATE_ALIGN_V1 === */
+/* === BEGIN BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 | Zweck: ergänzt drei neue Enterprise-nahe Theme-Lab-Farbwelten mit stärkerer Icon-Anbindung, wärmeren Flächen und klarerer Ebenentrennung; Umfang: nur Preview-Overrides für /?themePreview=..., produktiver Standard bleibt unverändert === */
 
+html[data-theme-preview="brand-warm"]{
+  --color-background: #EFF1E4;
+  --color-primary-muted: #E8EDD6;
+  --preview-theme-color: #F4F3E8;
+  --preview-page-bg: #EFF1E4;
+
+  --preview-header-top: rgba(248,248,241,0.988);
+  --preview-header-bottom: rgba(242,244,234,0.972);
+  --preview-header-border: rgba(53,74,38,0.10);
+  --preview-header-shadow: rgba(30,41,20,0.028);
+
+  --preview-stack-bg: rgba(244,246,237,0.952);
+  --preview-stack-border: rgba(53,74,38,0.10);
+  --preview-stack-shadow: rgba(30,41,20,0.046);
+
+  --preview-feed-top: #ECEFDF;
+  --preview-feed-mid: #E7EBD7;
+  --preview-feed-bottom: #E2E7D0;
+
+  --preview-card-top: rgba(255,254,249,0.988);
+  --preview-card-bottom: rgba(250,251,241,0.970);
+  --preview-card-border: color-mix(in srgb, rgba(53,74,38,0.13) 72%, var(--brand-gold-200) 28%);
+  --preview-card-shadow: rgba(20,32,12,0.038);
+
+  --preview-rail-top: rgba(239,245,224,0.980);
+  --preview-rail-bottom: rgba(232,240,212,0.980);
+
+  --preview-badge-top: rgba(243,248,231,0.980);
+  --preview-badge-bottom: rgba(236,243,219,0.980);
+
+  --preview-service-top: rgba(255,254,249,0.988);
+  --preview-service-bottom: rgba(248,250,238,0.970);
+
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 86%, var(--brand-gold-300) 14%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
+  --preview-text-strong: rgba(24,40,30,0.84);
+
+  --preview-panel-top: rgba(249,250,243,0.982);
+  --preview-panel-bottom: rgba(241,245,232,0.962);
+  --preview-panel-border: color-mix(in srgb, rgba(53,74,38,0.14) 72%, var(--brand-gold-200) 28%);
+  --preview-panel-shadow: rgba(20,32,12,0.066);
+  --preview-panel-sheen-top: rgba(255,255,255,0.26);
+  --preview-panel-sheen-bottom: rgba(255,255,255,0.06);
+
+  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.990) 0%, rgba(247,250,239,0.972) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(53,74,38,0.11) 72%, var(--brand-gold-200) 28%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(20,32,12,0.028);
+
+  --preview-hero-fade-a: color-mix(in srgb, #EFF1E4 88%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #EFF1E4 74%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #EFF1E4 34%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #EFF1E4 10%, transparent);
+  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 16%, transparent);
+}
+
+html[data-theme-preview="civic-gold"]{
+  --color-background: #F1ECE0;
+  --color-primary-muted: #EDE4D2;
+  --preview-theme-color: #F6F0E4;
+  --preview-page-bg: #F1ECE0;
+
+  --preview-header-top: rgba(250,246,237,0.988);
+  --preview-header-bottom: rgba(244,238,227,0.972);
+  --preview-header-border: rgba(88,70,39,0.10);
+  --preview-header-shadow: rgba(52,35,14,0.028);
+
+  --preview-stack-bg: rgba(247,242,232,0.952);
+  --preview-stack-border: rgba(88,70,39,0.10);
+  --preview-stack-shadow: rgba(52,35,14,0.048);
+
+  --preview-feed-top: #EFE8DA;
+  --preview-feed-mid: #EBE2D1;
+  --preview-feed-bottom: #E5DAC6;
+
+  --preview-card-top: rgba(255,252,246,0.988);
+  --preview-card-bottom: rgba(252,246,236,0.970);
+  --preview-card-border: color-mix(in srgb, rgba(88,70,39,0.14) 68%, var(--brand-gold-200) 32%);
+  --preview-card-shadow: rgba(42,27,10,0.040);
+
+  --preview-rail-top: rgba(247,238,221,0.980);
+  --preview-rail-bottom: rgba(242,231,210,0.980);
+
+  --preview-badge-top: rgba(249,241,227,0.980);
+  --preview-badge-bottom: rgba(244,233,214,0.980);
+
+  --preview-service-top: rgba(255,252,246,0.988);
+  --preview-service-bottom: rgba(250,243,231,0.970);
+
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 78%, #8D6328 22%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 76%, #8D6328 24%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 84%, #8D6328 16%);
+  --preview-text-strong: rgba(31,37,28,0.84);
+
+  --preview-panel-top: rgba(250,245,236,0.982);
+  --preview-panel-bottom: rgba(243,235,222,0.962);
+  --preview-panel-border: color-mix(in srgb, rgba(88,70,39,0.15) 68%, var(--brand-gold-200) 32%);
+  --preview-panel-shadow: rgba(42,27,10,0.070);
+  --preview-panel-sheen-top: rgba(255,255,255,0.25);
+  --preview-panel-sheen-bottom: rgba(255,255,255,0.07);
+
+  --preview-control-bg: linear-gradient(180deg, rgba(255,254,250,0.990) 0%, rgba(249,243,232,0.972) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(88,70,39,0.12) 68%, var(--brand-gold-200) 32%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.96) inset, 0 10px 22px rgba(42,27,10,0.030);
+
+  --preview-hero-fade-a: color-mix(in srgb, #F1ECE0 90%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #F1ECE0 76%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #F1ECE0 38%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #F1ECE0 12%, transparent);
+  --preview-hero-glow: color-mix(in srgb, #D9B56A 18%, transparent);
+}
+
+html[data-theme-preview="forest-light"]{
+  --color-background: #EAF1E6;
+  --color-primary-muted: #E1EBD9;
+  --preview-theme-color: #EFF4EA;
+  --preview-page-bg: #EAF1E6;
+
+  --preview-header-top: rgba(247,250,245,0.988);
+  --preview-header-bottom: rgba(239,245,237,0.972);
+  --preview-header-border: rgba(46,79,56,0.10);
+  --preview-header-shadow: rgba(18,45,29,0.026);
+
+  --preview-stack-bg: rgba(242,247,242,0.952);
+  --preview-stack-border: rgba(46,79,56,0.10);
+  --preview-stack-shadow: rgba(18,45,29,0.046);
+
+  --preview-feed-top: #E8F0E5;
+  --preview-feed-mid: #E3ECDD;
+  --preview-feed-bottom: #DDE7D6;
+
+  --preview-card-top: rgba(255,255,253,0.988);
+  --preview-card-bottom: rgba(247,251,246,0.972);
+  --preview-card-border: color-mix(in srgb, rgba(46,79,56,0.14) 72%, var(--brand-gold-200) 28%);
+  --preview-card-shadow: rgba(14,36,22,0.038);
+
+  --preview-rail-top: rgba(235,244,232,0.980);
+  --preview-rail-bottom: rgba(227,239,223,0.980);
+
+  --preview-badge-top: rgba(239,247,236,0.980);
+  --preview-badge-bottom: rgba(231,241,227,0.980);
+
+  --preview-service-top: rgba(255,255,253,0.988);
+  --preview-service-bottom: rgba(245,250,243,0.972);
+
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 88%, #3F7660 12%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 88%, #3F7660 12%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 92%, #2F6B56 8%);
+  --preview-text-strong: rgba(24,40,30,0.84);
+
+  --preview-panel-top: rgba(248,251,247,0.982);
+  --preview-panel-bottom: rgba(238,245,239,0.962);
+  --preview-panel-border: color-mix(in srgb, rgba(46,79,56,0.14) 72%, var(--brand-gold-200) 28%);
+  --preview-panel-shadow: rgba(14,36,22,0.066);
+  --preview-panel-sheen-top: rgba(255,255,255,0.24);
+  --preview-panel-sheen-bottom: rgba(255,255,255,0.06);
+
+  --preview-control-bg: linear-gradient(180deg, rgba(255,255,255,0.990) 0%, rgba(244,249,245,0.972) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(46,79,56,0.11) 72%, var(--brand-gold-200) 28%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(14,36,22,0.028);
+
+  --preview-hero-fade-a: color-mix(in srgb, #EAF1E6 90%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #EAF1E6 76%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #EAF1E6 34%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #EAF1E6 10%, transparent);
+  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 10%, transparent);
+}
+
+html[data-theme-preview]{
+  background: var(--preview-theme-color);
+}
+
+html[data-theme-preview] body{
+  background: var(--preview-page-bg);
+}
+
+html[data-theme-preview] .app-header{
+  background: linear-gradient(180deg, var(--preview-header-top) 0%, var(--preview-header-bottom) 100%);
+  border-bottom-color: var(--preview-header-border);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.86) inset,
+    0 8px 18px var(--preview-header-shadow);
+}
+
+html[data-theme-preview] .app-title{
+  color: var(--preview-accent-strong);
+}
+
+html[data-theme-preview] .top-stack{
+  background: var(--preview-stack-bg);
+  border-bottom-color: var(--preview-stack-border);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.78) inset,
+    0 8px 18px var(--preview-stack-shadow);
+}
+
+html[data-theme-preview] .events-section-title{
+  color: var(--preview-section-title);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.44);
+}
+
+html[data-theme-preview] .event-card{
+  background: linear-gradient(180deg, var(--preview-card-top) 0%, var(--preview-card-bottom) 100%);
+  border-color: var(--preview-card-border);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.88) inset,
+    0 8px 18px var(--preview-card-shadow);
+}
+
+html[data-theme-preview] .event-card::before{
+  background: linear-gradient(180deg, var(--preview-rail-top) 0%, var(--preview-rail-bottom) 100%);
+  box-shadow: inset -1px 0 0 rgba(24,40,30,0.042);
+}
+
+html[data-theme-preview] .event-date-badge{
+  background: linear-gradient(180deg, var(--preview-badge-top) 0%, var(--preview-badge-bottom) 100%);
+}
+
+html[data-theme-preview] .feed-publish-entry{
+  background: linear-gradient(180deg, var(--preview-service-top) 0%, var(--preview-service-bottom) 100%);
+  border-color: var(--preview-card-border);
+}
+
+html[data-theme-preview] .feed-publish-entry__chevron,
+html[data-theme-preview] .desktop-hero__toolbar-pill::after,
+html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
+  color: var(--preview-accent-strong);
+}
+
+@media (min-width: 900px){
+  html[data-theme-preview] .events-section{
+    background: linear-gradient(
+      180deg,
+      var(--preview-feed-top) 0%,
+      var(--preview-feed-mid) 58%,
+      var(--preview-feed-bottom) 100%
+    );
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+  }
+
+  html[data-theme-preview] .desktop-entry__title{
+    color: var(--preview-title-strong);
+  }
+
+  html[data-theme-preview] .desktop-entry__text{
+    color: var(--preview-text-strong);
+  }
+
+  html[data-theme-preview] .top-stack{
+    background: linear-gradient(180deg, var(--preview-panel-top) 0%, var(--preview-panel-bottom) 100%);
+    border-color: var(--preview-panel-border);
+    box-shadow:
+      0 20px 40px var(--preview-panel-shadow),
+      0 1px 0 rgba(255,255,255,0.92) inset;
+  }
+
+  html[data-theme-preview] .top-stack::before{
+    background: linear-gradient(
+      180deg,
+      var(--preview-panel-sheen-top) 0%,
+      var(--preview-panel-sheen-bottom) 100%
+    );
+  }
+
+  html[data-theme-preview] .top-stack #search-filter,
+  html[data-theme-preview] .desktop-hero__toolbar-pill,
+  html[data-theme-preview] .desktop-hero__actions .desktop-hero__action,
+  html[data-theme-preview] .desktop-hero__search-row > .filter-pill--reset{
+    background: var(--preview-control-bg);
+    border-color: var(--preview-control-border);
+    box-shadow: var(--preview-control-shadow);
+  }
+
+  html[data-theme-preview] .desktop-hero::before{
+    background-image:
+      linear-gradient(
+        90deg,
+        var(--preview-hero-fade-a) 0%,
+        var(--preview-hero-fade-a) 5%,
+        var(--preview-hero-fade-b) 10%,
+        var(--preview-hero-fade-c) 16%,
+        var(--preview-hero-fade-d) 22%,
+        rgba(255,255,255,0) 28%
+      ),
+      radial-gradient(
+        42% 54% at 15% 28%,
+        color-mix(in srgb, var(--preview-page-bg) 18%, white) 0%,
+        color-mix(in srgb, var(--preview-page-bg) 7%, transparent) 38%,
+        rgba(255,255,255,0) 72%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--preview-page-bg) 9%, white) 0%,
+        rgba(255,255,255,0) 42%,
+        color-mix(in srgb, var(--preview-page-bg) 4%, transparent) 100%
+      ),
+      radial-gradient(circle at 70% 22%, var(--preview-hero-glow) 0%, rgba(255,255,255,0) 12%),
+      var(--hero-bg-image-active);
+  }
+
+  html[data-theme-preview] .desktop-hero::after{
+    background:
+      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--preview-hero-glow) 76%, transparent) 0%, rgba(255,255,255,0) 14%),
+      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--preview-hero-glow) 38%, transparent) 0%, rgba(255,255,255,0) 13%),
+      linear-gradient(180deg, rgba(255,255,255,0) 76%, color-mix(in srgb, var(--preview-page-bg) 8%, transparent) 100%);
+  }
+}
+
+/* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */

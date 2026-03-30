@@ -228,7 +228,7 @@
 
 .content-card--primary{
   background: color-mix(in srgb, white 86%, var(--color-primary-muted));
-  border-color: rgba(139,207,74,0.42);
+  border-color: var(--ui-border-primary);
   box-shadow:
     0 10px 24px rgba(92,122,46,0.05),
     0 1px 0 rgba(255,255,255,0.76) inset;
@@ -312,14 +312,14 @@
   content: counter(step);
   font-size: 0.86rem;
   font-weight: 800;
-  border: 1px solid rgba(139,207,74,0.45);
+  border: 1px solid color-mix(in srgb, transparent 55%, var(--color-primary));
 }
 
 .locations-benefits li::before{
   content: "✓";
   font-size: 0.8rem;
   font-weight: 900;
-  border: 1px solid rgba(139,207,74,0.35);
+  border: 1px solid color-mix(in srgb, transparent 65%, var(--color-primary));
 }
 
 /* ACTIONS + CTA -------------------------------------------------------- */
@@ -380,7 +380,7 @@
 .content-cta--primary{
   background: var(--cmp-btn-primary-bg);
   color: var(--cmp-btn-primary-fg);
-  border-color: rgba(139,207,74,0.52);
+  border-color: color-mix(in srgb, transparent 48%, var(--color-primary));
   box-shadow: var(--cmp-btn-primary-shadow);
 }
 
@@ -397,7 +397,7 @@
 
   .content-cta--primary:hover{
     background: color-mix(in srgb, var(--cmp-btn-primary-bg) 88%, white);
-    border-color: rgba(139,207,74,0.62);
+    border-color: color-mix(in srgb, transparent 38%, var(--color-primary));
   }
 }
 
@@ -730,6 +730,93 @@
 .page--publish .publish-section-head h2{
   margin: 0;
   line-height: 1.16;
+}/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V17_SYSTEMATIC_RELAYOUT | Zweck: verdichtet /events-veroeffentlichen/ auf Mobile systematisch im Hero, ersetzt den gebrochenen Benefit-Flow durch gleichwertige Benefit-Cards und stabilisiert Membership/CTA innerhalb eines klaren Seitenvertrags; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints inklusive CTA-Polish === */
+.page--publish{
+  --subpage-stack-gap: 12px;
+  --subpage-card-gap: 10px;
+  --subpage-card-pad-y: 14px;
+  --subpage-hero-gap: 8px;
+}
+
+.page--publish .content-hero,
+.page--publish .publish-benefits-card,
+.page--publish .publish-membership-card,
+.page--publish .publish-start-card,
+.page--publish .publish-final-card{
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
+}
+
+.page--publish .content-hero{
+  --subpage-hero-gap: 0;
+}
+
+.page--publish .content-hero--panel{
+  padding: 16px 17px 16px;
+}
+
+.page--publish .publish-hero-layout{
+  display: grid;
+  gap: 0;
+  align-items: start;
+}
+
+.page--publish .publish-hero-copy{
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.page--publish .publish-hero-copy .content-lead{
+  margin: 0;
+  max-width: 46ch;
+  font-size: 0.94rem;
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+
+.page--publish .publish-hero-meta{
+  max-width: 46ch;
+  margin: 0;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.84rem;
+  line-height: 1.34;
+}
+
+.page--publish .publish-hero-trust{
+  max-width: 46ch;
+  margin: 0;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.83rem;
+  line-height: 1.34;
+}
+
+.page--publish .publish-hero-lead-break{
+  display: none;
+}
+
+.page--publish .publish-hero-cta{
+  display: grid;
+  margin-top: 2px;
+}
+
+.page--publish .publish-benefits-card,
+.page--publish .publish-membership-card,
+.page--publish .publish-start-card,
+.page--publish .publish-final-card{
+  gap: 10px;
+}
+
+.page--publish .publish-section-head{
+  display: grid;
+  gap: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-section-head h2{
+  margin: 0;
+  line-height: 1.16;
 }
 
 .page--publish .publish-section-head .content-note{
@@ -738,7 +825,7 @@
 
 .page--publish .publish-benefits-grid{
   display: grid;
-  gap: 0;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -746,17 +833,17 @@
 
 .page--publish .publish-benefits-grid li{
   display: grid;
-  gap: 2px;
+  gap: 4px;
   align-content: start;
-  padding: 9px 0;
+  min-height: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.52);
 }
 
 .page--publish .publish-benefits-grid li + li{
   border-top: 1px solid var(--cmp-divider-strong);
-}
-
-.page--publish .publish-benefits-grid li + li strong{
-  margin-top: 1px;
 }
 
 .page--publish .publish-benefits-grid strong{
@@ -775,12 +862,12 @@
 
 .page--publish .publish-membership-layout{
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .page--publish .publish-membership-block-head{
@@ -803,7 +890,7 @@
 
 .page--publish .publish-plans{
   display: grid;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -811,9 +898,9 @@
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 2px;
+  gap: 3px;
   margin: 0;
-  padding: 9px 11px;
+  padding: 11px 12px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
   background: rgba(255,255,255,0.52);
@@ -830,6 +917,12 @@
   color: var(--cmp-copy-color);
   font-size: 0.88rem;
   line-height: 1.34;
+}
+
+.page--publish .publish-plans li small{
+  color: var(--cmp-copy-color);
+  font-size: 0.84rem;
+  line-height: 1.36;
 }
 
 .page--publish .publish-plans-note{
@@ -910,7 +1003,76 @@
   line-height: 1.2;
 }
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V16_BUTTON_POLISH | Zweck: hebt auf /events-veroeffentlichen/ beide sichtbaren CTA-Buttons mit einer weichen Standardfarbe klarer vom Card-Hintergrund ab und behält die kompakte Mobile-Geometrie bei; Umfang: publish-CTA-/Final-Button-Bereich bis zum Ende des Mobile-/Interaction-Blocks === */
+.page--publish .publish-final-actions{
+  display: grid;
+  gap: 8px;
+  justify-items: stretch;
+}
+
+.page--publish .publish-final-actions .content-cta,
+.page--publish .publish-final-actions .content-cta--primary{
+  width: 100%;
+  min-width: 0;
+}
+
+.page--publish .publish-hero-cta .content-cta--primary,
+.page--publish .publish-final-actions .content-cta,
+.page--publish .publish-final-actions .content-cta--primary{
+  min-height: 46px;
+  padding-inline: 16px;
+  border-radius: var(--cmp-btn-radius);
+  border: 1px solid var(--ui-border-primary);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  font-size: var(--cmp-btn-font-size);
+  font-weight: var(--cmp-btn-font-weight);
+  box-shadow: var(--ui-shadow-cta);
+}
+
+.page--publish .publish-hero-cta .content-cta--primary:visited,
+.page--publish .publish-final-actions .content-cta:visited,
+.page--publish .publish-final-actions .content-cta--primary:visited{
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 899.98px){
+  .page--publish .content-hero h1{
+    font-size: clamp(1.34rem, 5.6vw, 1.52rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+
+  .page--publish .publish-hero-cta .content-cta,
+  .page--publish .publish-hero-cta .content-cta--primary{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .page--publish .publish-final-card--help{
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+}
+
+@media (hover: hover){
+  .page--publish .publish-hero-cta .content-cta--primary:hover,
+  .page--publish .publish-final-actions .content-cta:hover,
+  .page--publish .publish-final-actions .content-cta--primary:hover{
+    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
+    border-color: var(--ui-border-primary);
+    color: var(--color-text-primary);
+  }
+}
+
+.page--publish .publish-hero-cta .content-cta--primary:active,
+.page--publish .publish-final-actions .content-cta:active,
+.page--publish .publish-final-actions .content-cta--primary:active{
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
+  box-shadow: var(--ui-shadow-cta-active);
+}
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V17_SYSTEMATIC_RELAYOUT === */
 .page--publish .publish-final-actions{
   display: grid;
   gap: 8px;
@@ -1262,22 +1424,48 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V7 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V11 | Zweck: macht /events-veroeffentlichen/ auf Desktop logisch konsistent mit sichtbarem Hero-CTA, gleicher CTA-DNA oben und unten sowie bereinigter Desktop-Struktur ohne Alt-Regeln; Umfang: nur page--publish im 900px-Breakpoint === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V12 | Zweck: stellt /events-veroeffentlichen/ auf Desktop mit klarer Hero-Hierarchie, echtem 2x2-Benefit-Grid und sicherer Membership-Breite ohne Überlauf auf Enterprise-Niveau; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
   --subpage-body-max: 1088px;
 }
 
+.page--publish .content-hero--panel{
+  padding: 24px 28px 22px;
+}
+
+.page--publish .publish-hero-layout{
+  gap: 0;
+}
+
+.page--publish .publish-hero-copy{
+  gap: 10px;
+}
+
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 76ch;
+  max-width: 60ch;
+  font-size: 0.98rem;
+  line-height: 1.48;
+}
+
+.page--publish .publish-hero-copy .publish-hero-meta{
+  max-width: 60ch;
+  font-size: 0.88rem;
+  line-height: 1.38;
+}
+
+.page--publish .publish-hero-copy .publish-hero-trust{
+  max-width: 60ch;
+  font-size: 0.86rem;
+  line-height: 1.36;
 }
 
 .page--publish .publish-hero-lead-break{
-  display: block;
+  display: none;
 }
 
 .page--publish .publish-hero-cta{
   display: flex;
-  margin-top: 8px;
+  margin-top: 2px;
 }
 
 .page--publish .publish-hero-cta .content-cta,
@@ -1287,32 +1475,25 @@
 }
 
 .page--publish .publish-section-head{
-  padding-bottom: 18px;
+  padding-bottom: 16px;
 }
 
 .page--publish .publish-benefits-grid{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .page--publish .publish-benefits-grid li{
-  padding: 0 20px;
-}
-
-.page--publish .publish-benefits-grid li + li{
-  border-top: 0;
-  border-left: 1px solid var(--cmp-divider-strong);
-}
-
-.page--publish .publish-benefits-grid li:first-child{
-  padding-left: 0;
-}
-
-.page--publish .publish-benefits-grid li:last-child{
-  padding-right: 0;
+  min-height: 100%;
+  padding: 16px 18px;
 }
 
 .page--publish .publish-membership-layout{
-  gap: 22px;
+  gap: 12px;
+}
+
+.page--publish .publish-membership-block{
+  gap: 12px;
 }
 
 .page--publish .publish-plans{
@@ -1320,8 +1501,14 @@
   gap: 14px;
 }
 
+.page--publish .publish-plans li{
+  min-width: 0;
+  align-content: start;
+}
+
 .page--publish .publish-plans-note{
-  white-space: nowrap;
+  max-width: 78ch;
+  white-space: normal;
 }
 
 .page--publish .publish-final-card--help{
@@ -1337,7 +1524,7 @@
   width: auto;
   min-width: clamp(232px, 18vw, 268px);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V11 === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V12 === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
@@ -1432,33 +1619,53 @@
     align-content: start;
   }
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V10 | Zweck: hält /events-veroeffentlichen/ auf Wide-Desktop konsistent mit sichtbarem Hero-CTA, ruhiger Abschlussbreite und bereinigter finaler Struktur ohne Alt-Grid-Reste; Umfang: nur page--publish ab 1024px === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V12 | Zweck: schärft /events-veroeffentlichen/ auf Wide-Desktop mit ruhigerer Hero-Breite, stabiler 2x2-Benefit-Logik und belastbarer Membership-Breite ohne Overflow; Umfang: nur page--publish ab 1024px === */
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 78ch;
+  max-width: 62ch;
+}
+
+.page--publish .publish-hero-copy .publish-hero-meta{
+  max-width: 62ch;
+}
+
+.page--publish .publish-hero-copy .publish-hero-trust{
+  max-width: 62ch;
 }
 
 .page--publish .publish-section-head .content-note{
-  max-width: 60ch;
+  max-width: 58ch;
+}
+
+.page--publish .publish-benefits-grid{
+  gap: 16px;
 }
 
 .page--publish .publish-benefits-grid li{
-  padding-inline: 22px;
+  padding: 18px 20px;
 }
 
 .page--publish .publish-membership-layout{
-  gap: 22px;
+  gap: 14px;
+}
+
+.page--publish .publish-plans{
+  gap: 16px;
+}
+
+.page--publish .publish-plans-note{
+  max-width: 82ch;
 }
 
 .page--publish .publish-hero-cta .content-cta,
 .page--publish .publish-hero-cta .content-cta--primary{
-  min-width: clamp(244px, 18vw, 288px);
+  min-width: clamp(248px, 18vw, 292px);
 }
 
 .page--publish .publish-final-actions .content-cta,
 .page--publish .publish-final-actions .content-cta--primary{
   min-width: clamp(232px, 18vw, 272px);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V10 === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V12 === */
 }
 
 @media (min-width: 1280px){

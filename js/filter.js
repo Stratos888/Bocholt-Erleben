@@ -34,17 +34,191 @@ const FilterModule = {
 /* === END BLOCK: FILTER MODULE STATE (init flag) === */
 
 
-  filters: {
+filters: {
     searchText: "",
     location: "",     // Ort-Filter später (aktuell immer leer)
     kategorie: "",    // Single
-    zeitraum: "all"   // all | today | week | weekend | nextweek | later
+    zeitraum: "all",  // all | today | week | weekend | nextweek | later
+    selectedDate: ""  // exact day YYYY-MM-DD
   },
+
+  /* === BEGIN BLOCK: FILTER_DATE_HELPERS_V1 | Zweck: zentrale Helpers für exakte Datumsauswahl, Bucket-Berechnung und UI-Sync ohne doppelte Logik; Umfang: nur Datums-/Zeit-Helper innerhalb des FilterModules === */
+  getTodayIso() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  },
+
+  toLocalDay(value) {
+    const match = String(value || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return null;
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    if (!year || !month || !day) return null;
+
+    const date = new Date(year, month - 1, day);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  },
+
+  addDaysLocal(base, days) {
+    const next = new Date(base);
+    next.setDate(next.getDate() + days);
+    next.setHours(0, 0, 0, 0);
+    return next;
+  },
+
+  endOfDay(date) {
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return end;
+  },
+
+  endOfWeekLocal(fromDate) {
+    const end = new Date(fromDate);
+    const weekday = end.getDay();
+    const delta = (7 - weekday) % 7;
+    end.setDate(end.getDate() + delta);
+    end.setHours(23, 59, 59, 999);
+    return end;
+  },
+
+  getNextWeekendRange(base) {
+    const day = new Date(base);
+    day.setHours(0, 0, 0, 0);
+
+    const weekday = day.getDay();
+    let friday;
+
+    if (weekday === 5) friday = this.addDaysLocal(day, 0);
+    else if (weekday === 6) friday = this.addDaysLocal(day, -1);
+    else if (weekday === 0) friday = this.addDaysLocal(day, -2);
+    else friday = this.addDaysLocal(day, (5 - weekday + 7) % 7);
+
+    const start = new Date(friday);
+    start.setHours(0, 0, 0, 0);
+
+    const end = this.addDaysLocal(friday, 2);
+    end.setHours(23, 59, 59, 999);
+
+    return { start, end };
+  },
+
+  getEventEffectiveDay(event) {
+    const startDay = this.toLocalDay(event?.date || event?.datum || "");
+    if (!startDay) return null;
+
+    const rawEnd = event?.endDate || event?.endDatum || "";
+    const endBase = rawEnd ? this.toLocalDay(rawEnd) : new Date(startDay);
+    if (!endBase) return null;
+
+    const endDay = this.endOfDay(endBase);
+    const today = this.toLocalDay(this.getTodayIso());
+
+    if (today && today >= startDay && today <= endDay) {
+      return new Date(today);
+    }
+
+    return new Date(startDay);
+  },
+
+  getBucketForEvent(event) {
+    const effectiveDay = this.getEventEffectiveDay(event);
+    if (!effectiveDay) return "later";
+
+    effectiveDay.setHours(0, 0, 0, 0);
+
+    const today = this.toLocalDay(this.getTodayIso());
+    if (!today) return "later";
+
+    const weekday = today.getDay();
+    const hasThisWeek = weekday >= 1 && weekday <= 4;
+    const thisWeekStart = this.addDaysLocal(today, 1);
+    let thisWeekEnd = null;
+
+    if (hasThisWeek) {
+      thisWeekEnd = this.endOfDay(this.addDaysLocal(today, 4 - weekday));
+    }
+
+    const weekend = this.getNextWeekendRange(today);
+    const endThisWeek = this.endOfWeekLocal(today);
+    const nextWeekStart = this.addDaysLocal(endThisWeek, 1);
+    const nextWeekEnd = this.endOfDay(this.addDaysLocal(nextWeekStart, 6));
+
+    if (effectiveDay.getTime() === today.getTime()) return "today";
+    if (hasThisWeek && thisWeekEnd && effectiveDay >= thisWeekStart && effectiveDay <= thisWeekEnd) return "week";
+    if (effectiveDay >= weekend.start && effectiveDay <= weekend.end) return "weekend";
+    if (effectiveDay >= nextWeekStart && effectiveDay <= nextWeekEnd) return "nextweek";
+    return "later";
+  },
+
+  eventMatchesSelectedDate(event, isoDate) {
+    const selectedDay = this.toLocalDay(isoDate);
+    const startDay = this.toLocalDay(event?.date || event?.datum || "");
+    if (!selectedDay || !startDay) return false;
+
+    const rawEnd = event?.endDate || event?.endDatum || "";
+    const endBase = rawEnd ? this.toLocalDay(rawEnd) : new Date(startDay);
+    if (!endBase) return false;
+
+    return selectedDay >= startDay && selectedDay <= this.endOfDay(endBase);
+  },
+
+  formatSelectedDateLabel(isoDate, variant = "long") {
+    const day = this.toLocalDay(isoDate);
+    if (!day) return "";
+
+    const formats = {
+      short: { day: "2-digit", month: "long" },
+      long: { weekday: "short", day: "2-digit", month: "long", year: "numeric" }
+    };
+
+    return new Intl.DateTimeFormat("de-DE", formats[variant] || formats.long).format(day).replace(/\s+/g, " ").trim();
+  },
+
+  syncDateFilterUI() {
+    const ui = this._ui || {};
+    const selectedDate = (this.filters.selectedDate || "").trim();
+    const hasSelectedDate = selectedDate.length > 0;
+    const triggerLabel = hasSelectedDate
+      ? (this.formatSelectedDateLabel(selectedDate, "long") || selectedDate)
+      : "Datum auswählen";
+    const minDate = this.getTodayIso();
+
+    (ui.dateInputs || []).forEach((input) => {
+      if (!input) return;
+      input.min = minDate;
+      if (input.value !== selectedDate) input.value = selectedDate;
+      input.setAttribute(
+        "aria-label",
+        hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen"
+      );
+    });
+
+    (ui.dateTexts || []).forEach((node) => {
+      node.textContent = triggerLabel;
+    });
+
+    (ui.dateTriggers || []).forEach((trigger) => {
+      const label = hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen";
+      trigger.setAttribute("aria-label", label);
+      trigger.setAttribute("title", hasSelectedDate ? triggerLabel : "Datum auswählen");
+    });
+
+    (ui.dateModules || []).forEach((module) => {
+      module.classList.toggle("is-active", hasSelectedDate);
+    });
+  },
+  /* === END BLOCK: FILTER_DATE_HELPERS_V1 === */
 
   /**
    * Init: Event Listeners registrieren
    */
-     /* === BEGIN BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) ===
+  /* === BEGIN BLOCK: FILTER INIT GUARD + PROOF LOGS (single init) ===
 Zweck: Harter Beweis, ob init() wirklich läuft und wo es ggf. abbricht.
 Umfang: Ersetzt den Start von init(events) bis inkl. allEvents/filteredEvents Zuweisung.
 === */
@@ -145,12 +319,21 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
     //        und der Mobile-3-Spalten-State stabil gegen die richtige Row laufen.
     // Umfang: Ersetzt nur den UI-Refs-Store.
     // END: FILTER_UI_REFS_STORE
+// BEGIN: FILTER_UI_REFS_STORE
+    // Zweck: UI-Referenzen persistent im Modul speichern, damit Facet-Counts/Disabled-States
+    //        und der Mobile-3-Spalten-State stabil gegen die richtige Row laufen.
+    // Umfang: Ersetzt nur den UI-Refs-Store.
+    // END: FILTER_UI_REFS_STORE
     this._ui = {
       searchRow: document.querySelector(".desktop-hero__search-row"),
       searchInput,
       timePill, timeValue, timeSheet,
       catPill,  catValue,  catSheet,
-      resetPill
+      resetPill,
+      dateTriggers: Array.from(document.querySelectorAll("[data-date-trigger]")),
+      dateInputs: Array.from(document.querySelectorAll("[data-date-input]")),
+      dateTexts: Array.from(document.querySelectorAll("[data-date-trigger-text]")),
+      dateModules: Array.from(document.querySelectorAll("[data-date-module]"))
     };
 
     // Defaults (konsistent)
@@ -158,6 +341,7 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
     this.filters.location = "";
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
+    this.filters.selectedDate = "";
 
 
     // Sheet helper
@@ -305,6 +489,8 @@ window.addEventListener("resize", () => {
       btn.addEventListener("click", () => {
         const v = (btn.getAttribute("data-time") || "all").trim();
         this.filters.zeitraum = v;
+        this.filters.selectedDate = "";
+        this.syncDateFilterUI();
         this.applyFilters();
         this.setActiveOption(timeSheet, btn);
         this.updateFilterBarUI(timeValue, catValue, resetPill);
@@ -328,6 +514,50 @@ window.addEventListener("resize", () => {
       });
     });
 
+    // Exaktes Datum (Sheet + Popover)
+    (this._ui.dateTriggers || []).forEach((trigger) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const module = trigger.closest("[data-date-module]");
+        const input = module?.querySelector("[data-date-input]");
+        if (!input) return;
+
+        input.min = this.getTodayIso();
+
+        if (typeof input.showPicker === "function") {
+          try {
+            input.showPicker();
+            return;
+          } catch (_) {
+            // Fallback below
+          }
+        }
+
+        input.focus({ preventScroll: true });
+        input.click();
+      });
+    });
+
+    (this._ui.dateInputs || []).forEach((input) => {
+      input.min = this.getTodayIso();
+
+      input.addEventListener("change", () => {
+        const value = (input.value || "").trim();
+        this.filters.selectedDate = value;
+        if (value) this.filters.zeitraum = "all";
+        this.syncDateFilterUI();
+        this.applyFilters();
+        this.updateFilterBarUI(timeValue, catValue, resetPill);
+
+        if (value) {
+          if (isDesktop()) closeAllPopovers();
+          else closeSheet(timeSheet);
+        }
+      });
+    });
+
     /* === BEGIN BLOCK: FILTER_RESET_PILL_HANDLER_V2 | Zweck: koppelt das globale X an einen reinen Facetten-Reset, während die Suche als lokales Search-Feld-Verhalten bestehen bleibt; Umfang: ersetzt ausschließlich den Click-Handler des globalen Reset-Pills === */
     resetPill.addEventListener("click", () => {
       this.resetFacetFilters();
@@ -335,10 +565,10 @@ window.addEventListener("resize", () => {
     /* === END BLOCK: FILTER_RESET_PILL_HANDLER_V2 === */
 
     // Initial render
+    this.syncDateFilterUI();
     this.applyFilters();
     this.setActiveOption(timeSheet, timeSheet.querySelector('[data-time="all"]'));
     this.setActiveOption(catSheet, catSheet.querySelector('[data-category=""]'));
-    this.updateFilterBarUI(timeValue, catValue, resetPill);
 
          /* === BEGIN BLOCK: FILTER INIT FINALIZE + PROOF LOGS ===
 Zweck: Harter Beweis, dass init() wirklich bis zum Ende kommt und _isInit setzt.
@@ -352,13 +582,14 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
 
 
-  /**
+/**
    * Filter anwenden
    */
-    applyFilters() {
+  applyFilters() {
     debugLog("Applying filters:", this.filters);
 
     const timeKey = (this.filters.zeitraum || "all").trim();
+    const selectedDate = (this.filters.selectedDate || "").trim();
     const searchNeedle = (this.filters.searchText || "").trim().toLowerCase();
     const catNeedle = (this.filters.kategorie || "").trim();
 
@@ -367,187 +598,38 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       const desc = (event?.beschreibung || "").toLowerCase();
       const loc = (event?.location || "").toLowerCase();
 
-      // Textsuche
       if (searchNeedle) {
         const searchable = `${title} ${desc} ${loc}`;
         if (!searchable.includes(searchNeedle)) return false;
       }
 
-               /* === BEGIN BLOCK: CATEGORY FILTER (normalized, canonical) ===
-      Zweck: Kategorie-Filter robust via Canonical-Mapping, damit keine Events “unsichtbar” werden,
-            auch wenn Event-Kategorien granular/uneinheitlich sind.
-      Umfang: Ersetzt nur die Single-Kategorie-Filterlogik in applyFilters().
-      === */
       if (catNeedle) {
         const evCatRaw = (event?.kategorie || "").trim();
         const filterRaw = catNeedle;
-
         const evCat = this.normalizeCategory(evCatRaw);
-        const filterCat = this.normalizeCategory(filterRaw) || filterRaw; // falls Filter bereits canonical ist
-
-        // Match, wenn canonical übereinstimmt ODER (Fallback) raw exakt passt
+        const filterCat = this.normalizeCategory(filterRaw) || filterRaw;
         if (evCat !== filterCat && evCatRaw !== filterRaw) return false;
       }
-      /* === END BLOCK: CATEGORY FILTER (normalized, canonical) === */
 
-
-
-/* === BEGIN BLOCK: ZEITFILTER (feed-buckets, single source of truth) ===
-Zweck:
-- Zeitfilter muss exakt dieselben Buckets nutzen wie die Feed-Überschriften in js/events.js:
-  Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später
-- Range-aware: endDate wird berücksichtigt; laufende Events zählen als "Heute".
-Umfang:
-- Ersetzt ausschließlich Zeitraum-Filterlogik in applyFilters().
-=== */
-if (timeKey !== "all") {
-  const isoStart = (event?.date || event?.datum || "").trim();
-  const isoEnd = (event?.endDate || event?.endDatum || "").trim(); // optional
-
-  // ISO YYYY-MM-DD robust lokal parsen (00:00 lokal)
-  const toLocalDay = (s) => {
-    const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return null;
-    const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-    if (!y || !mo || !d) return null;
-    const dt = new Date(y, mo - 1, d);
-    dt.setHours(0, 0, 0, 0);
-    return dt;
-  };
-
-  const addDaysLocal = (base, n) => {
-    const t = new Date(base);
-    t.setDate(t.getDate() + n);
-    t.setHours(0, 0, 0, 0);
-    return t;
-  };
-
-  const endOfDay = (d) => {
-    const t = new Date(d);
-    t.setHours(23, 59, 59, 999);
-    return t;
-  };
-
-  const endOfWeek = (fromDate) => {
-    const d = new Date(fromDate);
-    const day = d.getDay(); // 0 So .. 6 Sa
-    const diff = (7 - day) % 7;
-    d.setDate(d.getDate() + diff);
-    d.setHours(23, 59, 59, 999);
-    return d;
-  };
-
-  const nextWeekendRange = (base) => {
-    const b = new Date(base);
-    b.setHours(0, 0, 0, 0);
-    const dow = b.getDay(); // 0 So ... 6 Sa
-
-    let fri;
-    if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
-    else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
-    else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
-    else {
-      const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
-      fri = addDaysLocal(b, daysUntilFri);
-    }
-
-    const start = new Date(fri);
-    start.setHours(0, 0, 0, 0);
-
-    const sun = addDaysLocal(fri, 2);
-    const end = new Date(sun);
-    end.setHours(23, 59, 59, 999);
-
-    return { start, end };
-  };
-
-  const startDay = toLocalDay(isoStart);
-  if (!startDay) return false;
-
-  const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
-  if (!endBase) return false;
-
-  const endDay = endOfDay(endBase);
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // "effective day" wie events.js: laufende Events gelten als heute
-  const effectiveDay = (() => {
-    if (today >= startDay && today <= endDay) return new Date(today);
-    return new Date(startDay);
-  })();
-  effectiveDay.setHours(0, 0, 0, 0);
-
-  // Bucket-Definition exakt wie events.js renderList()
-  const dow = today.getDay(); // 0 So .. 6 Sa
-  const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
-  const thisWeekStart = addDaysLocal(today, 1); // morgen
-  let thisWeekEnd = null;
-  if (hasThisWeek) {
-    const daysUntilThu = (4 - dow);
-    const thu = addDaysLocal(today, daysUntilThu);
-    thisWeekEnd = endOfDay(thu);
-  }
-
-  const weekend = nextWeekendRange(today);
-  const weekendStart = new Date(weekend.start);
-  const weekendEnd = new Date(weekend.end);
-
-  const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
-  const nextWeekStart = addDaysLocal(endThisWeek, 1);
-  const nextWeekEnd = addDaysLocal(nextWeekStart, 6);
-  nextWeekEnd.setHours(23, 59, 59, 999);
-
-  const pickBucket = (day) => {
-    if (!day) return "later";
-    if (day.getTime() === today.getTime()) return "today";
-    if (hasThisWeek && thisWeekEnd && day >= thisWeekStart && day <= thisWeekEnd) return "week";
-    if (day >= weekendStart && day <= weekendEnd) return "weekend";
-    if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
-    return "later";
-  };
-
-  const bucket = pickBucket(effectiveDay);
-  if (bucket !== timeKey) return false;
-}
-/* === END BLOCK: ZEITFILTER (feed-buckets, single source of truth) === */
-
-
-
+      if (selectedDate) {
+        if (!this.eventMatchesSelectedDate(event, selectedDate)) return false;
+      } else if (timeKey !== "all") {
+        if (this.getBucketForEvent(event) !== timeKey) return false;
+      }
 
       return true;
     });
 
-    // BEGIN: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
-// Zweck: UI-Status (Labels + Reset-X) wird nach jedem applyFilters() aus dem State synchronisiert.
-// Umfang: Ersetzt den UI-Update-Abschnitt am Ende von applyFilters().
-// END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
-    // UI aktualisieren
     this.updateUI();
-
-    // Reset-X/Labels immer aus State ableiten (nicht nur aus UI-Events),
-    // damit Sichtbarkeit nur bei B/C/D aktiv ist – auch nach refresh()/initial apply.
-       this.updateFilterBarUI(
+    this.updateFilterBarUI(
       document.getElementById("filter-time-value"),
       document.getElementById("filter-category-value"),
       document.getElementById("filter-reset-pill")
     );
 
-    /* === BEGIN BLOCK: FACETS UPDATE (counts + disabled, time + category) ===
-    Zweck: Zeit- und Kategorieoptionen mit Counts versehen und 0-Treffer-Optionen disabled anzeigen.
-           Disabled bleibt sichtbar (transparente UX), aber verhindert Sackgassen.
-    Umfang: Wird nach jedem applyFilters() ausgeführt.
-    === */
     this.updateFacetOptionStates();
-    /* === END BLOCK: FACETS UPDATE (counts + disabled, time + category) === */
-
     debugLog(`Filtered: ${this.filteredEvents.length} of ${(this.allEvents || []).length} events`);
-
   },
-// END: APPLYFILTERS_UI_SYNC (Reset-X nur bei B/C/D aktiv)
-
-
 
   /**
    * UI aktualisieren
@@ -745,7 +827,7 @@ if (timeKey !== "all") {
   },
   /* === END BLOCK: FILTER_FACET_SYNC_HELPERS_V2 === */
 
-  /* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V3 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und den Mobile-3-Spalten-State strikt am Facettenzustand; Umfang: ersetzt ausschließlich updateFilterBarUI() === */
+/* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V4 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und Date-UI strikt synchron zum Facettenzustand; Umfang: ersetzt updateFilterBarUI() und updateFacetOptionStates() für Zeitraum + exaktes Datum === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
     const timeMap = {
       all: "Alle",
@@ -757,13 +839,22 @@ if (timeKey !== "all") {
     };
 
     const timeKey = (this.filters.zeitraum || "all").trim();
+    const selectedDate = (this.filters.selectedDate || "").trim();
     const cat = (this.filters.kategorie || "").trim();
-    const hasActiveFacetFilters = timeKey !== "all" || cat.length > 0;
+    const hasActiveFacetFilters = timeKey !== "all" || cat.length > 0 || selectedDate.length > 0;
 
     const ui = this._ui || {};
     const rowEl = ui.searchRow || document.querySelector(".desktop-hero__search-row");
+    const timeLabel = selectedDate
+      ? (this.formatSelectedDateLabel(selectedDate, "short") || selectedDate)
+      : (timeMap[timeKey] || "Alle");
 
-    if (timeValueEl) timeValueEl.textContent = timeMap[timeKey] || "Alle";
+    if (timeValueEl) {
+      timeValueEl.textContent = timeLabel;
+      if (selectedDate) timeValueEl.title = this.formatSelectedDateLabel(selectedDate, "long") || timeLabel;
+      else timeValueEl.removeAttribute("title");
+    }
+
     if (catValueEl) catValueEl.textContent = cat ? cat : "Alle";
 
     if (rowEl) {
@@ -773,163 +864,50 @@ if (timeKey !== "all") {
     if (resetEl) {
       resetEl.hidden = !hasActiveFacetFilters;
     }
+
+    this.syncDateFilterUI();
   },
-  /* === END BLOCK: FILTER_BAR_UI_STATE_V3 === */
 
   updateFacetOptionStates() {
     const ui = this._ui;
     if (!ui?.timeSheet || !ui?.catSheet) return;
 
     const timeKey = (this.filters.zeitraum || "all").trim();
+    const selectedDate = (this.filters.selectedDate || "").trim();
     const catNeedle = (this.filters.kategorie || "").trim();
     const searchNeedle = (this.filters.searchText || "").trim().toLowerCase();
 
-    // --- Zeit-Helfer (identisch zur applyFilters Logik) ---
-    const toLocalDay = (s) => {
-      const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (!m) return null;
-      const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-      if (!y || !mo || !d) return null;
-      const dt = new Date(y, mo - 1, d);
-      dt.setHours(0, 0, 0, 0);
-      return dt;
+    const matchesSearch = (event) => {
+      if (!searchNeedle) return true;
+      const title = (event?.eventName || event?.title || "").toLowerCase();
+      const desc = (event?.beschreibung || "").toLowerCase();
+      const loc = (event?.location || "").toLowerCase();
+      return `${title} ${desc} ${loc}`.includes(searchNeedle);
     };
 
-    const addDaysLocal = (base, n) => {
-      const t = new Date(base);
-      t.setDate(t.getDate() + n);
-      t.setHours(0, 0, 0, 0);
-      return t;
-    };
-
-    const endOfDay = (d) => {
-      const t = new Date(d);
-      t.setHours(23, 59, 59, 999);
-      return t;
-    };
-
-    const endOfWeek = (fromDate) => {
-      const d = new Date(fromDate);
-      const day = d.getDay(); // 0 So .. 6 Sa
-      const diff = (7 - day) % 7;
-      d.setDate(d.getDate() + diff);
-      d.setHours(23, 59, 59, 999);
-      return d;
-    };
-
-    const nextWeekendRange = (base) => {
-      const b = new Date(base);
-      b.setHours(0, 0, 0, 0);
-      const dow = b.getDay(); // 0 So ... 6 Sa
-
-      let fri;
-      if (dow === 5) fri = addDaysLocal(b, 0);       // Fr
-      else if (dow === 6) fri = addDaysLocal(b, -1); // Sa -> Fr
-      else if (dow === 0) fri = addDaysLocal(b, -2); // So -> Fr
-      else {
-        const daysUntilFri = (5 - dow + 7) % 7; // Fr=5
-        fri = addDaysLocal(b, daysUntilFri);
-      }
-
-      const start = new Date(fri);
-      start.setHours(0, 0, 0, 0);
-
-      const sun = addDaysLocal(fri, 2);
-      const end = new Date(sun);
-      end.setHours(23, 59, 59, 999);
-
-      return { start, end };
-    };
-
-    // Bucket-Definition exakt wie Feed: Heute / Diese Woche / Dieses Wochenende / Nächste Woche / Später
-    const getBucketForEvent = (event) => {
-      const isoStart = (event?.date || event?.datum || "").trim();
-      const isoEnd = (event?.endDate || event?.endDatum || "").trim();
-
-      const startDay = toLocalDay(isoStart);
-      if (!startDay) return "later";
-
-      const endBase = isoEnd ? toLocalDay(isoEnd) : new Date(startDay);
-      if (!endBase) return "later";
-
-      const endDay = endOfDay(endBase);
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      // laufende Events zählen als "Heute"
-      const effectiveDay = (() => {
-        const todayEnd = endOfDay(today);
-        if (today >= startDay && todayEnd <= endDay) return new Date(today);
-        // Fallback: klassischer Overlap (heute liegt zwischen Start/Ende)
-        if (today >= startDay && today <= endDay) return new Date(today);
-        return new Date(startDay);
-      })();
-      effectiveDay.setHours(0, 0, 0, 0);
-
-      const dow = today.getDay(); // 0 So .. 6 Sa
-      const hasThisWeek = (dow >= 1 && dow <= 4); // Mo–Do
-      const thisWeekStart = addDaysLocal(today, 1); // morgen
-      let thisWeekEnd = null;
-      if (hasThisWeek) {
-        const daysUntilThu = (4 - dow);
-        const thu = addDaysLocal(today, daysUntilThu);
-        thisWeekEnd = endOfDay(thu);
-      }
-
-      const weekend = nextWeekendRange(today);
-      const weekendStart = new Date(weekend.start);
-      const weekendEnd = new Date(weekend.end);
-
-      const endThisWeek = endOfWeek(today); // Sonntag 23:59:59
-      const nextWeekStart = addDaysLocal(endThisWeek, 1);
-      const nextWeekEnd = addDaysLocal(nextWeekStart, 6);
-      nextWeekEnd.setHours(23, 59, 59, 999);
-
-      if (effectiveDay.getTime() === today.getTime()) return "today";
-      if (hasThisWeek && thisWeekEnd && effectiveDay >= thisWeekStart && effectiveDay <= thisWeekEnd) return "week";
-      if (effectiveDay >= weekendStart && effectiveDay <= weekendEnd) return "weekend";
-      if (effectiveDay >= nextWeekStart && effectiveDay <= nextWeekEnd) return "nextweek";
-      return "later";
+    const matchesCategory = (event) => {
+      if (!catNeedle) return true;
+      const evCatRaw = (event?.kategorie || "").trim();
+      const evCat = this.normalizeCategory(evCatRaw);
+      const filterCat = this.normalizeCategory(catNeedle) || catNeedle;
+      return evCat === filterCat || evCatRaw === catNeedle;
     };
 
     const matchesTimeKey = (event, key) => {
       if (key === "all") return true;
-      return getBucketForEvent(event) === key;
+      return this.getBucketForEvent(event) === key;
     };
 
-    // --- Base-Listen: Für Zeit-Facets zählt Search + aktive Kategorie.
     const baseForTime = (this.allEvents || []).filter((event) => {
-      if (searchNeedle) {
-        const title = (event?.eventName || event?.title || "").toLowerCase();
-        const desc = (event?.beschreibung || "").toLowerCase();
-        const loc = (event?.location || "").toLowerCase();
-        const searchable = `${title} ${desc} ${loc}`;
-        if (!searchable.includes(searchNeedle)) return false;
-      }
-      if (catNeedle) {
-        const evCatRaw = (event?.kategorie || "").trim();
-        const evCat = this.normalizeCategory(evCatRaw);
-        const filterCat = this.normalizeCategory(catNeedle) || catNeedle;
-        if (evCat !== filterCat && evCatRaw !== catNeedle) return false;
-      }
-      return true;
+      return matchesSearch(event) && matchesCategory(event);
     });
 
-    // --- Base-Listen: Für Kategorie-Facets zählt Search + aktiver Zeitfilter.
     const baseForCat = (this.allEvents || []).filter((event) => {
-      if (searchNeedle) {
-        const title = (event?.eventName || event?.title || "").toLowerCase();
-        const desc = (event?.beschreibung || "").toLowerCase();
-        const loc = (event?.location || "").toLowerCase();
-        const searchable = `${title} ${desc} ${loc}`;
-        if (!searchable.includes(searchNeedle)) return false;
-      }
-      if (timeKey !== "all" && !matchesTimeKey(event, timeKey)) return false;
-      return true;
+      if (!matchesSearch(event)) return false;
+      if (selectedDate) return this.eventMatchesSelectedDate(event, selectedDate);
+      return matchesTimeKey(event, timeKey);
     });
 
-    // --- Counts berechnen ---
     const timeCounts = {
       all: baseForTime.length,
       today: 0,
@@ -939,33 +917,28 @@ if (timeKey !== "all") {
       later: 0
     };
 
-    for (const ev of baseForTime) {
-      const k = getBucketForEvent(ev);
-      if (k === "today") timeCounts.today++;
-      else if (k === "week") timeCounts.week++;
-      else if (k === "weekend") timeCounts.weekend++;
-      else if (k === "nextweek") timeCounts.nextweek++;
-      else if (k === "later") timeCounts.later++;
+    for (const event of baseForTime) {
+      const bucket = this.getBucketForEvent(event);
+      if (bucket in timeCounts) timeCounts[bucket] += 1;
     }
 
     const catCounts = {};
-    for (const c of this.canonicalCategories) catCounts[c] = 0;
-    for (const ev of baseForCat) {
-      const evCatRaw = (ev?.kategorie || "").trim();
-      const c = this.normalizeCategory(evCatRaw);
-      catCounts[c] = (catCounts[c] ?? 0) + 1;
+    for (const category of this.canonicalCategories) catCounts[category] = 0;
+    for (const event of baseForCat) {
+      const rawCategory = (event?.kategorie || "").trim();
+      const canonical = this.normalizeCategory(rawCategory);
+      if (canonical) catCounts[canonical] = (catCounts[canonical] ?? 0) + 1;
     }
 
-    // --- Auto-Healing: aktiver Filter darf nicht in 0 Ergebnissen „stecken bleiben“ ---
-    const activeTimeOk = (timeKey === "all") ? true : ((timeCounts[timeKey] ?? 0) > 0);
-    if (!activeTimeOk) {
+    const activeTimeOk = timeKey === "all" ? true : ((timeCounts[timeKey] ?? 0) > 0);
+    if (!selectedDate && !activeTimeOk) {
       this.filters.zeitraum = "all";
       return this.applyFilters();
     }
 
     if (catNeedle) {
-      const canon = this.normalizeCategory(catNeedle) || catNeedle;
-      const activeCatOk = (catCounts[canon] ?? 0) > 0;
+      const canonical = this.normalizeCategory(catNeedle) || catNeedle;
+      const activeCatOk = (catCounts[canonical] ?? 0) > 0;
       if (!activeCatOk) {
         this.filters.kategorie = "";
         return this.applyFilters();
@@ -975,61 +948,66 @@ if (timeKey !== "all") {
     const timeButtons = this.getFacetButtons("time");
     const catButtons = this.getFacetButtons("category");
 
-    timeButtons.forEach((btn) => {
-      const key = this.getFacetButtonValue(btn, "time");
-      const cnt = timeCounts[key] ?? 0;
-      const enabled = (key === "all") ? true : cnt > 0;
-      const withCount = btn.classList.contains("filter-sheet-option");
-      this.setFacetButtonState(btn, { enabled, count: cnt, withCount });
+    timeButtons.forEach((button) => {
+      const key = this.getFacetButtonValue(button, "time");
+      const count = timeCounts[key] ?? 0;
+      const enabled = key === "all" ? true : count > 0;
+      const withCount = button.classList.contains("filter-sheet-option");
+      this.setFacetButtonState(button, { enabled, count, withCount });
     });
 
-    catButtons.forEach((btn) => {
-      const raw = this.getFacetButtonValue(btn, "category");
-      const withCount = btn.classList.contains("filter-sheet-option");
+    catButtons.forEach((button) => {
+      const raw = this.getFacetButtonValue(button, "category");
+      const withCount = button.classList.contains("filter-sheet-option");
 
       if (!raw) {
-        this.setFacetButtonState(btn, { enabled: true, count: baseForCat.length, withCount });
+        this.setFacetButtonState(button, { enabled: true, count: baseForCat.length, withCount });
         return;
       }
 
-      const canon = this.normalizeCategory(raw) || raw;
-      const cnt = catCounts[canon] ?? 0;
-      this.setFacetButtonState(btn, { enabled: cnt > 0, count: cnt, withCount });
+      const canonical = this.normalizeCategory(raw) || raw;
+      const count = catCounts[canonical] ?? 0;
+      this.setFacetButtonState(button, { enabled: count > 0, count, withCount });
     });
 
     const sortCategoryContainer = (container) => {
       if (!container) return;
 
-      const allBtn = container.querySelector('[data-category=""]');
-      const catBtns = Array.from(container.querySelectorAll('[data-category]'))
-        .filter((btn) => this.getFacetButtonValue(btn, "category").length > 0);
+      const allButton = container.querySelector('[data-category=""]');
+      const categoryButtons = Array.from(container.querySelectorAll('[data-category]'))
+        .filter((button) => this.getFacetButtonValue(button, "category").length > 0);
 
-      catBtns.sort((a, b) => {
-        const ac = this.normalizeCategory(this.getFacetButtonValue(a, "category")) || this.getFacetButtonValue(a, "category");
-        const bc = this.normalizeCategory(this.getFacetButtonValue(b, "category")) || this.getFacetButtonValue(b, "category");
-        const ca = catCounts[ac] ?? 0;
-        const cb = catCounts[bc] ?? 0;
-        if (cb !== ca) return cb - ca;
-        return this.canonicalCategories.indexOf(ac) - this.canonicalCategories.indexOf(bc);
+      categoryButtons.sort((a, b) => {
+        const aCategory = this.normalizeCategory(this.getFacetButtonValue(a, "category")) || this.getFacetButtonValue(a, "category");
+        const bCategory = this.normalizeCategory(this.getFacetButtonValue(b, "category")) || this.getFacetButtonValue(b, "category");
+        const aCount = catCounts[aCategory] ?? 0;
+        const bCount = catCounts[bCategory] ?? 0;
+        if (bCount !== aCount) return bCount - aCount;
+        return this.canonicalCategories.indexOf(aCategory) - this.canonicalCategories.indexOf(bCategory);
       });
 
-      if (allBtn) container.appendChild(allBtn);
-      for (const btn of catBtns) container.appendChild(btn);
+      if (allButton) container.appendChild(allButton);
+      for (const button of categoryButtons) container.appendChild(button);
     };
 
     sortCategoryContainer(ui.catSheet.querySelector(".filter-sheet__body"));
     sortCategoryContainer(document.querySelector("#popover-category .filter-popover__panel"));
 
-    const activeTimeBtn = timeButtons.find((btn) => this.getFacetButtonValue(btn, "time") === this.filters.zeitraum)
-      || timeButtons.find((btn) => this.getFacetButtonValue(btn, "time") === "all");
-    const activeCatBtn = catButtons.find((btn) => this.getFacetButtonValue(btn, "category") === this.filters.kategorie)
-      || catButtons.find((btn) => this.getFacetButtonValue(btn, "category") === "");
+    const activeTimeBtn = selectedDate
+      ? null
+      : (
+        timeButtons.find((button) => this.getFacetButtonValue(button, "time") === this.filters.zeitraum)
+        || timeButtons.find((button) => this.getFacetButtonValue(button, "time") === "all")
+      );
+
+    const activeCatBtn = catButtons.find((button) => this.getFacetButtonValue(button, "category") === this.filters.kategorie)
+      || catButtons.find((button) => this.getFacetButtonValue(button, "category") === "");
 
     this.setActiveOption(ui.timeSheet, activeTimeBtn);
     this.setActiveOption(ui.catSheet, activeCatBtn);
+    this.syncDateFilterUI();
   },
-
-  /* === END BLOCK: FILTER UI HELPERS + FACETS (canonical + counts + disabled) === */
+  /* === END BLOCK: FILTER_BAR_UI_STATE_V4 === */
 
   /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 | Zweck: stellt die fehlende resetFacetFilters()-Methode korrekt wieder her, setzt nur Zeit/Kategorie zurück, synchronisiert aktive Optionen in Sheet+Popover und belässt die Suche unangetastet; Umfang: ersetzt den kaputten Tail ab dem losen Reset-Code bis inkl. refresh() === */
   resetFacetFilters() {
@@ -1037,6 +1015,7 @@ if (timeKey !== "all") {
 
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
+    this.filters.selectedDate = "";
 
     if (ui.timeSheet) {
       this.setActiveOption(
@@ -1068,6 +1047,7 @@ if (timeKey !== "all") {
 
     this._openDesktopPopover = null;
     document.body.classList.remove("is-sheet-open");
+    this.syncDateFilterUI();
 
     this.applyFilters();
 

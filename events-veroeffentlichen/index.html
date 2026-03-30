@@ -12,6 +12,14 @@
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#8BCF4A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/style.css?v=1">
   <!-- === END BLOCK: SEO_BASICS_PUBLISH_PAGE_V4 === -->
 </head>
@@ -34,22 +42,27 @@
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
-          <!-- === BEGIN BLOCK: PUBLISH_HERO_LEAD_V13_COPY_POLISH | Zweck: strafft den Hero-Lead sprachlich minimal ohne Layoutänderung; Umfang: Hero-Lead-Absatz === -->
+<!-- === BEGIN BLOCK: PUBLISH_ENTERPRISE_CONTENT_V16 | Zweck: konsolidiert den Publish-Content nach fehlerhaft doppelter Einfügung und stellt Hero, Benefits, Membership, Einstieg und Fallback wieder als genau einen sauberen Seitenfluss her; Umfang: kompletter Main-Inhalt von /events-veroeffentlichen/ === -->
           <p class="content-lead">
-            Der Start läuft aktuell per Mail im Rahmen einer aktiven Mitgliedschaft. <span class="publish-hero-lead-break" aria-hidden="true"></span>Jedes Event wird vor der Veröffentlichung redaktionell geprüft.
+            Wenn deine Events bereits online gepflegt werden, prüfen wir den passenden Weg für eine möglichst einfache Übernahme.
           </p>
-          <!-- === END BLOCK: PUBLISH_HERO_LEAD_V13_COPY_POLISH === -->
 
-          <!-- === BEGIN BLOCK: PUBLISH_HERO_EARLY_CTA | Zweck: bringt den primären CTA auf Mobile früh in den ersten Viewport ohne Desktop-Layout zu beeinflussen === -->
           <div class="publish-hero-cta">
             <a
               class="content-cta content-cta--primary"
-              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Als%20Veranstalter%20starten&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20als%20Veranstalter%20bei%20Bocholt%20erleben%20starten.%0A%0AName%20des%20Veranstalters%20%2F%20der%20Location%3A%0AAnsprechpartner%3A%0ARechnungsdaten%3A%0AWebsite%2C%20Kalender%20oder%20Eventquelle%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Ver%C3%B6ffentlichung%20anfragen&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20die%20Ver%C3%B6ffentlichung%20meiner%20Events%20bei%20Bocholt%20erleben%20anfragen.%0A%0AOrganisation%20%2F%20Veranstalter%3A%0AWebsite%2C%20Eventkalender%20oder%20bestehende%20Datenquelle%3A%0AAnsprechpartner%3A%0AWie%20oft%20erscheinen%20neue%20Events%3A%0ABeispiel-Link%20zu%20einem%20Termin%20(optional)%3A%0AWeitere%20Hinweise%20(optional)%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
             >
-              Jetzt per Mail starten
+              Veröffentlichung anfragen
             </a>
           </div>
-          <!-- === END BLOCK: PUBLISH_HERO_EARLY_CTA === -->
+
+          <p class="content-note publish-hero-meta">
+            Der Button öffnet eine vorbereitete Anfrage per E-Mail.
+          </p>
+
+          <p class="content-note publish-hero-trust">
+            Bestehende Eventdaten sind die Grundlage. Doppelte Pflege soll möglichst vermieden werden.
+          </p>
         </div>
       </div>
     </header>
@@ -59,18 +72,22 @@
         <h2 id="publish-benefits">Warum sich Bocholt erleben für Veranstalter lohnt</h2>
       </div>
 
-      <ul class="publish-benefits-grid" aria-label="Heutige Vorteile für Veranstalter">
+      <ul class="publish-benefits-grid" aria-label="Vorteile für Veranstalter">
         <li>
-          <strong>Mehr Sichtbarkeit in Bocholt und Umgebung</strong>
-          <span>Deine Events erscheinen dort, wo Menschen aktiv nach Veranstaltungen in Bocholt und Umgebung suchen.</span>
+          <strong>Möglichst keine doppelte Pflege</strong>
+          <span>Bestehende Eventdaten dienen nach Möglichkeit als Grundlage, damit zusätzlicher Pflegeaufwand gering bleibt.</span>
         </li>
         <li>
-          <strong>Neue Besucher erreichen</strong>
-          <span>Du erreichst nicht nur Stammgäste, sondern auch Menschen, die dein Angebot noch nicht kennen.</span>
+          <strong>Sichtbarkeit in Bocholt und Umgebung</strong>
+          <span>Deine Termine erscheinen dort, wo Menschen aktiv nach passenden Veranstaltungen in Bocholt und Umgebung suchen.</span>
         </li>
         <li>
-          <strong>Kuratiertes Umfeld</strong>
-          <span>Deine Events erscheinen auf einer gepflegten Plattform mit ausgewählten, relevanten Veranstaltungen.</span>
+          <strong>Sauberer Veröffentlichungsrahmen</strong>
+          <span>Events werden vor Veröffentlichung auf Plausibilität und Vollständigkeit geprüft.</span>
+        </li>
+        <li>
+          <strong>Pragmatischer Weg je nach Quelle</strong>
+          <span>Je nach Website, Kalender oder Datenstand richten wir den passenden Veröffentlichungsweg für dich ein.</span>
         </li>
       </ul>
     </section>
@@ -86,59 +103,79 @@
             <li>
               <strong>Starter</strong>
               <span>9,99&nbsp;€ / Monat · bis zu 3 Events</span>
+              <small>Für kleine Veranstalter mit wenigen aktiven Terminen.</small>
             </li>
             <li>
               <strong>Aktiv</strong>
               <span>19,99&nbsp;€ / Monat · bis zu 8 Events</span>
+              <small>Für regelmäßige Veranstalter mit laufendem Programm.</small>
             </li>
             <li>
               <strong>Unbegrenzt</strong>
               <span>29,99&nbsp;€ / Monat · unbegrenzt</span>
+              <small>Für Häuser, Locations und Veranstalter mit vielen laufenden Terminen.</small>
             </li>
           </ul>
 
           <p class="content-note publish-plans-note">
             Alle Pakete sind monatlich kündbar. Aktuell erfolgt die Abrechnung per Rechnung.
           </p>
+
+          <p class="content-note publish-plans-note">
+            Alle Pakete beinhalten die Prüfung des passenden Veröffentlichungswegs, die strukturierte Übernahme im vereinbarten
+            Rahmen und eine redaktionelle Prüfung vor Veröffentlichung.
+          </p>
         </section>
       </div>
     </section>
 
-    <!-- === BEGIN BLOCK: PUBLISH_START_CARD_V13_COPY_POLISH | Zweck: strafft den Einleitungssatz im Startbereich und behält den 2-Schritte-Ablauf unverändert bei; Umfang: kompletter Start-Card-Bereich === -->
     <section class="content-card publish-start-card" aria-labelledby="publish-start">
       <div class="publish-section-head">
-        <h2 id="publish-start">So startest du</h2>
-        <p class="content-note">Zum Start nutzt du einfach den Button oben.</p>
+        <h2 id="publish-start">So funktioniert der Einstieg</h2>
+        <p class="content-note">Bestehende Eventdaten sind die Grundlage. Doppelte Pflege soll nach Möglichkeit vermieden werden.</p>
       </div>
 
       <div class="publish-steps-flow">
         <section class="publish-step" aria-labelledby="publish-step-1">
-          <h3 id="publish-step-1">1. Quelle und Lösung klären</h3>
-          <p>Wir prüfen die Quelle, legen den passenden Rahmen fest und stimmen die Rechnungsdaten ab.</p>
+          <h3 id="publish-step-1">1. Bestehende Quelle senden</h3>
+          <p>Du schickst uns deine Website, deinen Eventkalender oder eine vorhandene Datenquelle.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-2">
-          <h3 id="publish-step-2">2. Events strukturiert übernehmen</h3>
-          <p>Danach übernehmen wir neue Termine und Änderungen strukturiert aus deiner Website, deinem Kalender oder einer passenden Vorlage.</p>
+          <h3 id="publish-step-2">2. Übernahmemöglichkeit prüfen</h3>
+          <p>Wir prüfen, wie sich deine Termine zuverlässig und mit möglichst wenig Zusatzaufwand übernehmen lassen.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-step-3">
+          <h3 id="publish-step-3">3. Passenden Weg festlegen</h3>
+          <p>Je nach Ausgangslage setzen wir auf direkte Übernahme, abgestimmte Übernahme oder einen pragmatischen Alternativweg.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-step-4">
+          <h3 id="publish-step-4">4. Termine strukturiert übernehmen</h3>
+          <p>Danach laufen neue Events und Änderungen im vereinbarten Rahmen möglichst standardisiert weiter.</p>
         </section>
       </div>
     </section>
-    <!-- === END BLOCK: PUBLISH_START_CARD_V13_COPY_POLISH === -->
 
-    <!-- === BEGIN BLOCK: PUBLISH_FINAL_HELP_BLOCK_V13 | Zweck: führt "Noch Fragen?" als einzigen bereinigten Abschlussblock ohne Zusatztext und ohne doppelten Alt-Restblock; Umfang: finaler Abschlussbereich innerhalb von /events-veroeffentlichen/ === -->
     <section class="content-card publish-final-card publish-final-card--help" aria-labelledby="publish-final-secondary">
-      <h2 id="publish-final-secondary">Noch Fragen?</h2>
+      <h2 id="publish-final-secondary">Keine passende Quelle?</h2>
+
+      <p class="content-note">
+        Wenn aktuell keine geeignete Website, Eventübersicht oder technische Datenquelle vorliegt, finden wir mit dir einen
+        einfachen alternativen Weg.
+      </p>
 
       <div class="content-actions content-actions--inline publish-final-actions">
         <a
           class="content-cta"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Frage%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20noch%20eine%20Frage%20zu%20Bocholt%20erleben%20als%20Veranstalter.%0A%0AMeine%20Frage%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Direkter%20Kontakt%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20aktuell%20keine%20passende%20Website%20oder%20strukturierte%20Datenquelle%20und%20m%C3%B6chte%20trotzdem%20Events%20bei%20Bocholt%20erleben%20ver%C3%B6ffentlichen.%0A%0AOrganisation%20%2F%20Veranstalter%3A%0AAnsprechpartner%3A%0AKurze%20Info%20zu%20den%20Events%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
         >
-          Schreib uns eine Mail
+          Direkt Kontakt aufnehmen
         </a>
       </div>
     </section>
-    <!-- === END BLOCK: PUBLISH_FINAL_HELP_BLOCK_V13 === -->
+<!-- === END BLOCK: PUBLISH_ENTERPRISE_CONTENT_V16 === -->
   </main>
   <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V12 === -->
 </body>

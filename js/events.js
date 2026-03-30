@@ -555,11 +555,11 @@ function createCard(event) {
   /* === END BLOCK: DESKTOP_CARD_BEHAVIOR_AND_CONTENT_V2 === */
 }
 
-/* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) ===
+/* === BEGIN BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later + exact date) ===
 Zweck:
 - Saubere, app-typische Zeit-Sections ohne doppelte Header (Buckets werden vorab gesammelt).
-- Reihenfolge: Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später
-- Keine Lücken (z.B. Donnerstag verschwindet nicht), kein „Demnächst“ doppelt.
+- Reihenfolge: Heute → Diese Woche → Dieses Wochenende → Nächste Woche → Später.
+- Bei exakter Datumsauswahl genau eine Datums-Section statt relativer Buckets.
 Umfang:
 - Ersetzt ausschließlich die Section-Logik in renderList(list).
 === */
@@ -581,14 +581,76 @@ function renderList(list) {
     const btn = document.getElementById("empty-reset-btn");
     if (btn) {
       btn.addEventListener("click", () => {
-        if (window.FilterModule?.resetFilters) {
-          window.FilterModule.resetFilters();
+        if (window.FilterModule?.resetFacetFilters) {
+          window.FilterModule.resetFacetFilters();
           return;
         }
         const resetPill = document.getElementById("filter-reset-pill");
         if (resetPill) resetPill.click();
       });
     }
+    return;
+  }
+
+  const createFeedPublishEntry = () => {
+    const link = document.createElement("a");
+    link.className = "feed-publish-entry";
+    link.href = "/events-veroeffentlichen/";
+    link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+
+    const label = document.createElement("span");
+    label.className = "feed-publish-entry__label";
+    label.textContent = "Für Veranstalter";
+
+    const main = document.createElement("span");
+    main.className = "feed-publish-entry__main";
+
+    const title = document.createElement("span");
+    title.className = "feed-publish-entry__title";
+    title.textContent = "Event veröffentlichen";
+
+    const chevron = document.createElement("span");
+    chevron.className = "feed-publish-entry__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "›";
+
+    main.append(title, chevron);
+    link.append(label, main);
+
+    return link;
+  };
+
+  const createSectionHeader = (label) => {
+    const h = document.createElement("div");
+    h.className = "events-section-title";
+    h.textContent = label;
+    return h;
+  };
+
+  const selectedDate = String(window.FilterModule?.filters?.selectedDate || "").trim();
+  if (selectedDate) {
+    const selectedDateObj = parseISODateLocal(selectedDate);
+    const selectedLabel = selectedDateObj
+      ? `Am ${new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "2-digit", month: "long" }).format(selectedDateObj)}`
+      : "Am gewählten Datum";
+
+    const section = document.createElement("section");
+    section.className = "events-feed-group";
+    section.setAttribute("aria-label", selectedLabel);
+
+    const grid = document.createElement("div");
+    grid.className = "events-feed-group__grid";
+
+    section.appendChild(createSectionHeader(selectedLabel));
+    for (const ev of list) {
+      grid.appendChild(createCard(ev));
+    }
+    section.appendChild(grid);
+
+    const frag = document.createDocumentFragment();
+    frag.appendChild(section);
+    frag.appendChild(createFeedPublishEntry());
+    c.appendChild(frag);
     return;
   }
 
@@ -690,13 +752,7 @@ function renderList(list) {
 
   const order = ["today", "week", "weekend", "nextweek", "later"];
   const frag = document.createDocumentFragment();
-
-  const createSectionHeader = (key) => {
-    const h = document.createElement("div");
-    h.className = "events-section-title";
-    h.textContent = bucketLabel[key] || key;
-    return h;
-  };
+  let hasInsertedFeedPublishEntry = false;
 
   for (const key of order) {
     if (!buckets[key] || buckets[key].length === 0) continue;
@@ -708,7 +764,7 @@ function renderList(list) {
     const grid = document.createElement("div");
     grid.className = "events-feed-group__grid";
 
-    section.appendChild(createSectionHeader(key));
+    section.appendChild(createSectionHeader(bucketLabel[key] || key));
 
     for (const ev of buckets[key]) {
       grid.appendChild(createCard(ev));
@@ -716,11 +772,16 @@ function renderList(list) {
 
     section.appendChild(grid);
     frag.appendChild(section);
+
+    if (!hasInsertedFeedPublishEntry) {
+      frag.appendChild(createFeedPublishEntry());
+      hasInsertedFeedPublishEntry = true;
+    }
   }
 
   c.appendChild(frag);
 }
-/* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later) === */
+/* === END BLOCK: EVENT LIST SECTIONS (dynamic headers: today/weekend/soon/later + exact date) === */
 
 /* === BEGIN BLOCK: GS-01 SKELETON RENDER (stable feed while loading) ===
 Zweck: Während Fetch laufen Skeleton-Cards in #event-cards rendern (kein Layout-Jump).

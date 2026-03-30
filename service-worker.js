@@ -113,9 +113,13 @@ const STATIC_ASSETS = [
   "/data/events.json",
   "/data/locations.json",
 
+  "/apple-touch-icon.png",
+  "/favicon.ico",
+
   "/icons/app/icon-180.png",
   "/icons/app/icon-192.png",
   "/icons/app/icon-512.png",
+  "/icons/app/icon-maskable-512.png",
 
   "/icons/favicon/favicon.ico",
   "/icons/favicon/icon-32.png"
