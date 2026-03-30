@@ -228,7 +228,7 @@
 
 .content-card--primary{
   background: color-mix(in srgb, white 86%, var(--color-primary-muted));
-  border-color: rgba(139,207,74,0.42);
+  border-color: var(--ui-border-primary);
   box-shadow:
     0 10px 24px rgba(92,122,46,0.05),
     0 1px 0 rgba(255,255,255,0.76) inset;
@@ -312,14 +312,14 @@
   content: counter(step);
   font-size: 0.86rem;
   font-weight: 800;
-  border: 1px solid rgba(139,207,74,0.45);
+  border: 1px solid color-mix(in srgb, transparent 55%, var(--color-primary));
 }
 
 .locations-benefits li::before{
   content: "✓";
   font-size: 0.8rem;
   font-weight: 900;
-  border: 1px solid rgba(139,207,74,0.35);
+  border: 1px solid color-mix(in srgb, transparent 65%, var(--color-primary));
 }
 
 /* ACTIONS + CTA -------------------------------------------------------- */
@@ -380,7 +380,7 @@
 .content-cta--primary{
   background: var(--cmp-btn-primary-bg);
   color: var(--cmp-btn-primary-fg);
-  border-color: rgba(139,207,74,0.52);
+  border-color: color-mix(in srgb, transparent 48%, var(--color-primary));
   box-shadow: var(--cmp-btn-primary-shadow);
 }
 
@@ -397,7 +397,7 @@
 
   .content-cta--primary:hover{
     background: color-mix(in srgb, var(--cmp-btn-primary-bg) 88%, white);
-    border-color: rgba(139,207,74,0.62);
+    border-color: color-mix(in srgb, transparent 38%, var(--color-primary));
   }
 }
 
