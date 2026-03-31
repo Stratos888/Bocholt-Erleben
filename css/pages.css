@@ -660,7 +660,7 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V19_CONSOLIDATED | Zweck: konsolidiert den kompletten Mobile-/Tablet-Basisvertrag von /events-veroeffentlichen/ nach fehlerhaft verschachtelter Publish-CSS und stellt wieder genau einen sauberen Seitenfluss für Hero, Benefits, Membership, Einstieg und Abschluss her; Umfang: ersetzt den gesamten bisherigen page--publish-Basisblock außerhalb der Desktop-Breakpoints inklusive CTA-Polish === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V20_FINAL_POLISH | Zweck: schließt den verbleibenden Mobile-Restgap auf /events-veroeffentlichen/ mit verdichtetem Hero, kompakteren Benefit-/Membership-Cards und scanbarerem Einstiegsblock, ohne den bestehenden Seitenvertrag zu brechen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints inklusive CTA-Polish === */
 .page--publish{
   --subpage-stack-gap: 12px;
   --subpage-card-gap: 10px;
@@ -682,7 +682,7 @@
 }
 
 .page--publish .content-hero--panel{
-  padding: 16px 17px 15px;
+  padding: 16px 17px 14px;
 }
 
 .page--publish .publish-hero-layout{
@@ -693,32 +693,32 @@
 
 .page--publish .publish-hero-copy{
   display: grid;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
   margin: 0;
-  max-width: 42ch;
+  max-width: 41ch;
   font-size: 0.93rem;
-  line-height: 1.38;
+  line-height: 1.36;
   text-wrap: pretty;
 }
 
 .page--publish .publish-hero-meta{
-  max-width: 42ch;
+  max-width: 41ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.81rem;
-  line-height: 1.28;
+  font-size: 0.80rem;
+  line-height: 1.24;
 }
 
 .page--publish .publish-hero-trust{
-  max-width: 42ch;
+  max-width: 41ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.8rem;
-  line-height: 1.28;
+  font-size: 0.79rem;
+  line-height: 1.24;
 }
 
 .page--publish .publish-hero-lead-break{
@@ -739,8 +739,8 @@
 
 .page--publish .publish-section-head{
   display: grid;
-  gap: 4px;
-  padding-bottom: 10px;
+  gap: 3px;
+  padding-bottom: 9px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
@@ -750,12 +750,12 @@
 }
 
 .page--publish .publish-section-head .content-note{
-  line-height: 1.38;
+  line-height: 1.34;
 }
 
 .page--publish .publish-benefits-grid{
   display: grid;
-  gap: 8px;
+  gap: 7px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -763,7 +763,7 @@
 
 .page--publish .publish-benefits-grid li{
   display: grid;
-  gap: 3px;
+  gap: 2px;
   align-content: start;
   min-height: 100%;
   padding: 10px 12px;
@@ -777,29 +777,29 @@
   color: var(--color-text-primary);
   font-size: 0.88rem;
   font-weight: 760;
-  line-height: 1.18;
+  line-height: 1.16;
 }
 
 .page--publish .publish-benefits-grid span{
   color: var(--cmp-copy-color);
-  font-size: 0.86rem;
-  line-height: 1.34;
+  font-size: 0.85rem;
+  line-height: 1.30;
 }
 
 .page--publish .publish-membership-layout{
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .page--publish .publish-membership-intro{
-  max-width: 44ch;
-  font-size: 0.86rem;
-  line-height: 1.36;
+  max-width: 42ch;
+  font-size: 0.84rem;
+  line-height: 1.32;
 }
 
 .page--publish .publish-plans{
@@ -812,9 +812,9 @@
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 4px;
+  gap: 3px;
   margin: 0;
-  padding: 12px 13px;
+  padding: 11px 12px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
   background: rgba(255,255,255,0.52);
@@ -823,26 +823,26 @@
 
 .page--publish .publish-plans strong{
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   font-weight: 780;
-  line-height: 1.16;
+  line-height: 1.14;
 }
 
 .page--publish .publish-plans span{
   color: var(--cmp-copy-color);
-  font-size: 0.9rem;
-  line-height: 1.28;
+  font-size: 0.89rem;
+  line-height: 1.24;
 }
 
 .page--publish .publish-plans li small{
   color: var(--cmp-copy-color);
-  font-size: 0.84rem;
-  line-height: 1.32;
+  font-size: 0.83rem;
+  line-height: 1.28;
 }
 
 .page--publish .publish-plans-note{
   max-width: none;
-  line-height: 1.38;
+  line-height: 1.34;
 }
 
 .page--publish .publish-rules-list{
@@ -858,7 +858,7 @@
   margin: 0;
   color: var(--cmp-copy-color);
   font-size: 0.89rem;
-  line-height: 1.46;
+  line-height: 1.44;
 }
 
 .page--publish .publish-rules-list strong{
@@ -883,28 +883,28 @@
 
 .page--publish .publish-step{
   display: grid;
-  gap: 4px;
+  gap: 3px;
   align-content: start;
-  padding: 0 0 10px;
+  padding: 0 0 9px;
 }
 
 .page--publish .publish-step + .publish-step{
-  padding-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-step h3{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: 0.91rem;
   font-weight: 760;
-  line-height: 1.2;
+  line-height: 1.18;
 }
 
 .page--publish .publish-step p{
   margin: 0;
-  max-width: 78ch;
-  line-height: 1.42;
+  max-width: 76ch;
+  line-height: 1.36;
 }
 
 .page--publish .publish-final-card--help{
@@ -914,8 +914,8 @@
 .page--publish .publish-final-card--help h2{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 1.02rem;
-  line-height: 1.18;
+  font-size: 1.01rem;
+  line-height: 1.16;
 }
 
 .page--publish .publish-final-actions{
@@ -987,7 +987,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V19_CONSOLIDATED === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V20_FINAL_POLISH === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
