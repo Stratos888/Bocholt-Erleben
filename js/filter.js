@@ -242,6 +242,38 @@ const FilterModule = {
     };
   },
 
+  getDateScrollHost(module) {
+    if (!module) return null;
+    return module.closest(".filter-sheet__body") || module.closest(".filter-popover__panel") || null;
+  },
+
+  revealDateModule(module, behavior = "smooth") {
+    if (!module) return;
+
+    const scrollHost = this.getDateScrollHost(module);
+    const parts = this.getDateModuleParts(module);
+    const anchor = parts.trigger || module;
+    if (!scrollHost || !anchor) return;
+
+    window.requestAnimationFrame(() => {
+      const hostRect = scrollHost.getBoundingClientRect();
+      const anchorRect = anchor.getBoundingClientRect();
+      const topGap = module.closest(".filter-sheet__body") ? 12 : 10;
+      const nextTop = scrollHost.scrollTop + (anchorRect.top - hostRect.top) - topGap;
+
+      scrollHost.scrollTo({
+        top: Math.max(0, nextTop),
+        behavior
+      });
+    });
+  },
+
+  repositionOpenDesktopPopover() {
+    if (typeof this._repositionDesktopPopover === "function") {
+      this._repositionDesktopPopover();
+    }
+  },
+
   closeDatePickers() {
     const ui = this._ui || {};
     (ui.dateModules || []).forEach((module) => {
@@ -255,18 +287,24 @@ const FilterModule = {
   openDatePicker(module) {
     if (!module) return;
     this.closeDatePickers();
+
     const parts = this.getDateModuleParts(module);
     this.setActiveDatePickerMonth(this.filters.selectedDate || this.getTodayIso());
+
     module.classList.add("is-open");
     if (parts.trigger) parts.trigger.setAttribute("aria-expanded", "true");
     if (parts.panel) parts.panel.hidden = false;
+
     this.renderDateCalendars();
+    this.repositionOpenDesktopPopover();
+    this.revealDateModule(module);
   },
 
   toggleDatePicker(module) {
     if (!module) return;
     if (module.classList.contains("is-open")) {
       this.closeDatePickers();
+      this.repositionOpenDesktopPopover();
       return;
     }
     this.openDatePicker(module);
@@ -340,7 +378,7 @@ const FilterModule = {
 
     this.renderDateCalendars();
   },
-/* === END BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V2 === */
+/* === END BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V3 === */
 
   /**
    * Init: Event Listeners registrieren
@@ -486,100 +524,75 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       this.updateFilterBarUI(timeValue, catValue, resetPill);
     });
 
-   /* === BEGIN BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) ===
-Zweck:
-- Desktop: Popover statt Bottom-Sheet
-- Mobile: unverändert Sheets
-Umfang:
-- ersetzt nur Öffnungslogik der Filter-Pills
-=== */
+    // Exaktes Datum (integrierter Kalender in Sheet + Popover)
+    (this._ui.dateModules || []).forEach((module) => {
+      const parts = this.getDateModuleParts(module);
 
-const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
+      parts.trigger?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.toggleDatePicker(module);
+      });
 
-const getPopover = (type) => document.getElementById(`popover-${type}`);
+      parts.prev?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), -1));
+        this.renderDateCalendars();
+        this.repositionOpenDesktopPopover();
+        this.revealDateModule(module, "auto");
+      });
 
-const openPopover = (type, triggerEl) => {
-  const pop = getPopover(type);
-  if (!pop || !triggerEl) return;
+      parts.next?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), 1));
+        this.renderDateCalendars();
+        this.repositionOpenDesktopPopover();
+        this.revealDateModule(module, "auto");
+      });
 
-  closeAllPopovers();
+      parts.today?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const todayIso = this.getTodayIso();
+        this.filters.selectedDate = todayIso;
+        this.filters.zeitraum = "all";
+        this.setActiveDatePickerMonth(todayIso);
+        this.closeDatePickers();
+        this.syncDateFilterUI();
+        this.applyFilters();
+        this.updateFilterBarUI(timeValue, catValue, resetPill);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
+      });
 
-  const rect = triggerEl.getBoundingClientRect();
-  const top = rect.bottom + window.scrollY + 8;
-  const left = rect.left + window.scrollX;
+      parts.grid?.addEventListener("click", (event) => {
+        const dayButton = event.target.closest("[data-date-value]");
+        if (!dayButton || dayButton.disabled) return;
+        event.preventDefault();
+        event.stopPropagation();
 
-  pop.style.top = `${top}px`;
-  pop.style.left = `${left}px`;
-  pop.hidden = false;
+        const isoDate = (dayButton.getAttribute("data-date-value") || "").trim();
+        if (!isoDate) return;
 
-  triggerEl.setAttribute("aria-expanded", "true");
-  this._openDesktopPopover = type;
-};
+        this.filters.selectedDate = isoDate;
+        this.filters.zeitraum = "all";
+        this.setActiveDatePickerMonth(isoDate);
+        this.closeDatePickers();
+        this.syncDateFilterUI();
+        this.applyFilters();
+        this.updateFilterBarUI(timeValue, catValue, resetPill);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
+      });
+    });
 
-const closePopover = (type) => {
-  const pop = getPopover(type);
-  if (!pop) return;
-
-  pop.hidden = true;
-  this.closeDatePickers();
-
-  const trigger = type === "time" ? timePill : catPill;
-  if (trigger) trigger.setAttribute("aria-expanded", "false");
-
-  this._openDesktopPopover = null;
-};
-
-const closeAllPopovers = () => {
-  closePopover("time");
-  closePopover("category");
-};
-
-// CLICK HANDLER (ADAPTIV)
-timePill.addEventListener("click", () => {
-  if (!isDesktop()) return openSheet(timeSheet);
-  openPopover("time", timePill);
-});
-
-catPill.addEventListener("click", () => {
-  if (!isDesktop()) return openSheet(catSheet);
-  openPopover("category", catPill);
-});
-
-// OUTSIDE CLICK (DESKTOP ONLY)
-document.addEventListener("click", (e) => {
-  if (!isDesktop()) return;
-
-  const open = this._openDesktopPopover;
-  if (!open) return;
-
-  const pop = getPopover(open);
-  const trigger = open === "time" ? timePill : catPill;
-
-  if (
-    pop &&
-    !pop.contains(e.target) &&
-    trigger &&
-    !trigger.contains(e.target)
-  ) {
-    closePopover(open);
-  }
-});
-
-// ESC erweitert (für Popover)
-document.addEventListener("keydown", (e) => {
-  if (e.key !== "Escape") return;
-  this.closeDatePickers();
-  if (this._openDesktopPopover) closeAllPopovers();
-});
-
-// RESIZE SAFETY
-window.addEventListener("resize", () => {
-  if (!isDesktop()) {
-    closeAllPopovers();
-  }
-});
-
-/* === END BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) === */
+    /* === BEGIN BLOCK: FILTER_RESET_PILL_HANDLER_V2 | Zweck: koppelt das globale X an einen reinen Facetten-Reset, während die Suche als lokales Search-Feld-Verhalten bestehen bleibt; Umfang: ersetzt ausschließlich den Click-Handler des globalen Reset-Pills === */
+    resetPill.addEventListener("click", () => {
+      this.resetFacetFilters();
+    });
+    /* === END BLOCK: FILTER_RESET_PILL_HANDLER_V2 === */
 
     // Close on overlay + close button (data-close-sheet)
     const wireSheetClose = (sheetEl) => {
@@ -633,71 +646,7 @@ window.addEventListener("resize", () => {
       });
     });
 
-    // Exaktes Datum (integrierter Kalender in Sheet + Popover)
-    (this._ui.dateModules || []).forEach((module) => {
-      const parts = this.getDateModuleParts(module);
-
-      parts.trigger?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.toggleDatePicker(module);
-      });
-
-      parts.prev?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), -1));
-        this.renderDateCalendars();
-      });
-
-      parts.next?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), 1));
-        this.renderDateCalendars();
-      });
-
-      parts.today?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const todayIso = this.getTodayIso();
-        this.filters.selectedDate = todayIso;
-        this.filters.zeitraum = "all";
-        this.setActiveDatePickerMonth(todayIso);
-        this.closeDatePickers();
-        this.syncDateFilterUI();
-        this.applyFilters();
-        this.updateFilterBarUI(timeValue, catValue, resetPill);
-        if (isDesktop()) closeAllPopovers();
-        else closeSheet(timeSheet);
-      });
-
-      parts.grid?.addEventListener("click", (event) => {
-        const dayButton = event.target.closest("[data-date-value]");
-        if (!dayButton || dayButton.disabled) return;
-        event.preventDefault();
-        event.stopPropagation();
-
-        const isoDate = (dayButton.getAttribute("data-date-value") || "").trim();
-        if (!isoDate) return;
-
-        this.filters.selectedDate = isoDate;
-        this.filters.zeitraum = "all";
-        this.setActiveDatePickerMonth(isoDate);
-        this.closeDatePickers();
-        this.syncDateFilterUI();
-        this.applyFilters();
-        this.updateFilterBarUI(timeValue, catValue, resetPill);
-        if (isDesktop()) closeAllPopovers();
-        else closeSheet(timeSheet);
-      });
-    });
-
-    /* === BEGIN BLOCK: FILTER_RESET_PILL_HANDLER_V2 | Zweck: koppelt das globale X an einen reinen Facetten-Reset, während die Suche als lokales Search-Feld-Verhalten bestehen bleibt; Umfang: ersetzt ausschließlich den Click-Handler des globalen Reset-Pills === */
-    resetPill.addEventListener("click", () => {
-      this.resetFacetFilters();
-    });
-    /* === END BLOCK: FILTER_RESET_PILL_HANDLER_V2 === */
+});
 
     // Initial render
     this.syncDateFilterUI();
