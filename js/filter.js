@@ -524,6 +524,177 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       this.updateFilterBarUI(timeValue, catValue, resetPill);
     });
 
+    /* === BEGIN BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) ===
+Zweck:
+- Desktop: Popover statt Bottom-Sheet
+- Mobile: unverändert Sheets
+- Desktop-Popover bleibt per Flip/Shift vollständig im Viewport
+Umfang:
+- ersetzt nur Öffnungslogik der Filter-Pills
+=== */
+
+    const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
+
+    const getPopover = (type) => document.getElementById(`popover-${type}`);
+
+    const positionPopover = (type, triggerEl) => {
+      const pop = getPopover(type);
+      const panel = pop?.querySelector(".filter-popover__panel");
+      if (!pop || !panel || !triggerEl) return;
+
+      const EDGE_MARGIN = 16;
+      const POPOVER_GAP = 8;
+      const MIN_POPOVER_HEIGHT = 260;
+
+      const rect = triggerEl.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      pop.hidden = false;
+      pop.style.visibility = "hidden";
+      pop.style.top = "0px";
+      pop.style.left = "0px";
+      pop.dataset.side = "bottom";
+
+      panel.style.maxHeight = `${Math.max(MIN_POPOVER_HEIGHT, viewportHeight - EDGE_MARGIN * 2)}px`;
+
+      const measuredRect = pop.getBoundingClientRect();
+      const popWidth = measuredRect.width;
+      const naturalHeight = measuredRect.height;
+
+      const spaceBelow = Math.max(0, viewportHeight - rect.bottom - EDGE_MARGIN - POPOVER_GAP);
+      const spaceAbove = Math.max(0, rect.top - EDGE_MARGIN - POPOVER_GAP);
+
+      let side = "bottom";
+      if (spaceBelow < naturalHeight && spaceAbove > spaceBelow) {
+        side = "top";
+      }
+
+      const availableHeight = side === "top" ? spaceAbove : spaceBelow;
+      const panelMaxHeight = Math.max(
+        MIN_POPOVER_HEIGHT,
+        Math.min(viewportHeight - EDGE_MARGIN * 2, availableHeight || viewportHeight - EDGE_MARGIN * 2)
+      );
+
+      panel.style.maxHeight = `${Math.round(panelMaxHeight)}px`;
+
+      const finalHeight = pop.getBoundingClientRect().height;
+      let top = side === "top"
+        ? rect.top + window.scrollY - finalHeight - POPOVER_GAP
+        : rect.bottom + window.scrollY + POPOVER_GAP;
+
+      const minTop = window.scrollY + EDGE_MARGIN;
+      const maxTop = window.scrollY + viewportHeight - finalHeight - EDGE_MARGIN;
+      top = Math.min(Math.max(top, minTop), Math.max(minTop, maxTop));
+
+      let left = rect.left + window.scrollX;
+      const minLeft = window.scrollX + EDGE_MARGIN;
+      const maxLeft = window.scrollX + viewportWidth - popWidth - EDGE_MARGIN;
+      left = Math.min(Math.max(left, minLeft), Math.max(minLeft, maxLeft));
+
+      pop.style.top = `${Math.round(top)}px`;
+      pop.style.left = `${Math.round(left)}px`;
+      pop.style.visibility = "";
+      pop.dataset.side = side;
+    };
+
+    const openPopover = (type, triggerEl) => {
+      const pop = getPopover(type);
+      if (!pop || !triggerEl) return;
+
+      closeAllPopovers();
+
+      pop.hidden = false;
+      triggerEl.setAttribute("aria-expanded", "true");
+      this._openDesktopPopover = type;
+      positionPopover(type, triggerEl);
+    };
+
+    const closePopover = (type) => {
+      const pop = getPopover(type);
+      if (!pop) return;
+
+      pop.hidden = true;
+      pop.style.visibility = "";
+      pop.dataset.side = "";
+      this.closeDatePickers();
+
+      const trigger = type === "time" ? timePill : catPill;
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+
+      this._openDesktopPopover = null;
+    };
+
+    const closeAllPopovers = () => {
+      closePopover("time");
+      closePopover("category");
+    };
+
+    this._repositionDesktopPopover = () => {
+      if (!isDesktop()) return;
+      const open = this._openDesktopPopover;
+      if (!open) return;
+      const trigger = open === "time" ? timePill : catPill;
+      if (!trigger) return;
+      positionPopover(open, trigger);
+    };
+
+    timePill.addEventListener("click", () => {
+      if (!isDesktop()) {
+        openSheet(timeSheet);
+        return;
+      }
+      openPopover("time", timePill);
+    });
+
+    catPill.addEventListener("click", () => {
+      if (!isDesktop()) {
+        openSheet(catSheet);
+        return;
+      }
+      openPopover("category", catPill);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!isDesktop()) return;
+
+      const open = this._openDesktopPopover;
+      if (!open) return;
+
+      const pop = getPopover(open);
+      const trigger = open === "time" ? timePill : catPill;
+
+      if (
+        pop &&
+        !pop.contains(e.target) &&
+        trigger &&
+        !trigger.contains(e.target)
+      ) {
+        closePopover(open);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      this.closeDatePickers();
+      if (this._openDesktopPopover) closeAllPopovers();
+    });
+
+    window.addEventListener("resize", () => {
+      if (!isDesktop()) {
+        closeAllPopovers();
+        return;
+      }
+      this._repositionDesktopPopover();
+    });
+
+    window.addEventListener("scroll", () => {
+      if (!isDesktop() || !this._openDesktopPopover) return;
+      this._repositionDesktopPopover();
+    }, { passive: true });
+
+    /* === END BLOCK: DESKTOP POPOVER SWITCH (adaptive filter UI) === */
+
     // Exaktes Datum (integrierter Kalender in Sheet + Popover)
     (this._ui.dateModules || []).forEach((module) => {
       const parts = this.getDateModuleParts(module);
