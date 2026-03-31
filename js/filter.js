@@ -23,18 +23,14 @@
 // END: FILE_HEADER_FILTER
 
 
-/* === BEGIN BLOCK: FILTER MODULE STATE (init flag) ===
-Zweck: Stabiler Zustand für Auto-Bootstrap + Schutz gegen doppelte Init.
-Umfang: Ersetzt nur die ersten Properties im FilterModule-Objekt.
-=== */
+/* === BEGIN BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V2 | Zweck: erweitert den Filterzustand um einen integrierten Monatskalender und kapselt alle Datumshilfen zentral; Umfang: ersetzt die ersten Properties + Date-Helper innerhalb des FilterModules === */
 const FilterModule = {
   _isInit: false,
+  _datePickerMonth: "",
   allEvents: [],
   filteredEvents: [],
-/* === END BLOCK: FILTER MODULE STATE (init flag) === */
 
-
-filters: {
+  filters: {
     searchText: "",
     location: "",     // Ort-Filter später (aktuell immer leer)
     kategorie: "",    // Single
@@ -42,7 +38,6 @@ filters: {
     selectedDate: ""  // exact day YYYY-MM-DD
   },
 
-  /* === BEGIN BLOCK: FILTER_DATE_HELPERS_V1 | Zweck: zentrale Helpers für exakte Datumsauswahl, Bucket-Berechnung und UI-Sync ohne doppelte Logik; Umfang: nur Datums-/Zeit-Helper innerhalb des FilterModules === */
   getTodayIso() {
     const today = new Date();
     const year = today.getFullYear();
@@ -63,6 +58,57 @@ filters: {
     const date = new Date(year, month - 1, day);
     date.setHours(0, 0, 0, 0);
     return date;
+  },
+
+  toIsoLocal(value) {
+    const day = value instanceof Date ? new Date(value) : this.toLocalDay(value);
+    if (!day) return "";
+    day.setHours(0, 0, 0, 0);
+    const year = day.getFullYear();
+    const month = String(day.getMonth() + 1).padStart(2, "0");
+    const date = String(day.getDate()).padStart(2, "0");
+    return `${year}-${month}-${date}`;
+  },
+
+  getMonthKey(value) {
+    const day = value instanceof Date ? new Date(value) : this.toLocalDay(value);
+    if (!day) return "";
+    return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}`;
+  },
+
+  parseMonthKey(value) {
+    const match = String(value || "").trim().match(/^(\d{4})-(\d{2})$/);
+    if (!match) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    if (!year || !month) return null;
+    const date = new Date(year, month - 1, 1);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  },
+
+  clampMonthKey(value) {
+    const candidate = this.parseMonthKey(value);
+    const min = this.parseMonthKey(this.getMonthKey(this.getTodayIso()));
+    if (!candidate || !min) return this.getMonthKey(this.getTodayIso());
+    return candidate < min ? this.getMonthKey(min) : this.getMonthKey(candidate);
+  },
+
+  shiftMonthKey(value, delta) {
+    const base = this.parseMonthKey(value) || this.parseMonthKey(this.getMonthKey(this.getTodayIso()));
+    if (!base) return this.getMonthKey(this.getTodayIso());
+    base.setMonth(base.getMonth() + delta);
+    return this.clampMonthKey(this.getMonthKey(base));
+  },
+
+  getActiveDatePickerMonth() {
+    if (this._datePickerMonth) return this.clampMonthKey(this._datePickerMonth);
+    if (this.filters.selectedDate) return this.clampMonthKey(this.getMonthKey(this.filters.selectedDate));
+    return this.getMonthKey(this.getTodayIso());
+  },
+
+  setActiveDatePickerMonth(value) {
+    this._datePickerMonth = this.clampMonthKey(value);
   },
 
   addDaysLocal(base, days) {
@@ -174,10 +220,101 @@ filters: {
 
     const formats = {
       short: { day: "2-digit", month: "long" },
-      long: { weekday: "short", day: "2-digit", month: "long", year: "numeric" }
+      long: { weekday: "short", day: "2-digit", month: "long", year: "numeric" },
+      aria: { weekday: "long", day: "2-digit", month: "long", year: "numeric" },
+      month: { month: "long", year: "numeric" }
     };
 
     return new Intl.DateTimeFormat("de-DE", formats[variant] || formats.long).format(day).replace(/\s+/g, " ").trim();
+  },
+
+  getDateModuleParts(module) {
+    if (!module) return {};
+    return {
+      trigger: module.querySelector("[data-date-trigger]"),
+      text: module.querySelector("[data-date-trigger-text]"),
+      panel: module.querySelector("[data-date-panel]"),
+      monthLabel: module.querySelector("[data-date-month-label]"),
+      grid: module.querySelector("[data-date-grid]"),
+      prev: module.querySelector('[data-date-nav="prev"]'),
+      next: module.querySelector('[data-date-nav="next"]'),
+      today: module.querySelector("[data-date-today]")
+    };
+  },
+
+  closeDatePickers() {
+    const ui = this._ui || {};
+    (ui.dateModules || []).forEach((module) => {
+      const parts = this.getDateModuleParts(module);
+      module.classList.remove("is-open");
+      if (parts.trigger) parts.trigger.setAttribute("aria-expanded", "false");
+      if (parts.panel) parts.panel.hidden = true;
+    });
+  },
+
+  openDatePicker(module) {
+    if (!module) return;
+    this.closeDatePickers();
+    const parts = this.getDateModuleParts(module);
+    this.setActiveDatePickerMonth(this.filters.selectedDate || this.getTodayIso());
+    module.classList.add("is-open");
+    if (parts.trigger) parts.trigger.setAttribute("aria-expanded", "true");
+    if (parts.panel) parts.panel.hidden = false;
+    this.renderDateCalendars();
+  },
+
+  toggleDatePicker(module) {
+    if (!module) return;
+    if (module.classList.contains("is-open")) {
+      this.closeDatePickers();
+      return;
+    }
+    this.openDatePicker(module);
+  },
+
+  renderDateCalendars() {
+    const ui = this._ui || {};
+    const monthKey = this.getActiveDatePickerMonth();
+    const monthStart = this.parseMonthKey(monthKey);
+    if (!monthStart) return;
+
+    const todayIso = this.getTodayIso();
+    const selectedIso = String(this.filters.selectedDate || "").trim();
+    const firstGridDay = new Date(monthStart);
+    const weekdayOffset = (firstGridDay.getDay() + 6) % 7;
+    firstGridDay.setDate(firstGridDay.getDate() - weekdayOffset);
+    firstGridDay.setHours(0, 0, 0, 0);
+
+    (ui.dateModules || []).forEach((module) => {
+      const parts = this.getDateModuleParts(module);
+      if (!parts.grid || !parts.monthLabel) return;
+
+      parts.monthLabel.textContent = this.formatSelectedDateLabel(this.toIsoLocal(monthStart), "month");
+      if (parts.prev) parts.prev.disabled = this.shiftMonthKey(monthKey, -1) === monthKey;
+
+      parts.grid.innerHTML = "";
+
+      for (let i = 0; i < 42; i += 1) {
+        const date = this.addDaysLocal(firstGridDay, i);
+        const iso = this.toIsoLocal(date);
+        const dayButton = document.createElement("button");
+        dayButton.type = "button";
+        dayButton.className = "filter-date-day";
+        dayButton.textContent = String(date.getDate());
+        dayButton.dataset.dateValue = iso;
+        dayButton.setAttribute("aria-label", this.formatSelectedDateLabel(iso, "aria"));
+
+        if (date.getMonth() !== monthStart.getMonth()) dayButton.classList.add("is-outside");
+        if (iso === todayIso) dayButton.classList.add("is-today");
+        if (iso === selectedIso) dayButton.classList.add("is-selected");
+        if (iso < todayIso) {
+          dayButton.disabled = true;
+          dayButton.classList.add("is-disabled");
+        }
+
+        parts.grid.appendChild(dayButton);
+      }
+    });
   },
 
   syncDateFilterUI() {
@@ -187,33 +324,23 @@ filters: {
     const triggerLabel = hasSelectedDate
       ? (this.formatSelectedDateLabel(selectedDate, "long") || selectedDate)
       : "Datum auswählen";
-    const minDate = this.getTodayIso();
-
-    (ui.dateInputs || []).forEach((input) => {
-      if (!input) return;
-      input.min = minDate;
-      if (input.value !== selectedDate) input.value = selectedDate;
-      input.setAttribute(
-        "aria-label",
-        hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen"
-      );
-    });
-
-    (ui.dateTexts || []).forEach((node) => {
-      node.textContent = triggerLabel;
-    });
-
-    (ui.dateTriggers || []).forEach((trigger) => {
-      const label = hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen";
-      trigger.setAttribute("aria-label", label);
-      trigger.setAttribute("title", hasSelectedDate ? triggerLabel : "Datum auswählen");
-    });
 
     (ui.dateModules || []).forEach((module) => {
+      const parts = this.getDateModuleParts(module);
       module.classList.toggle("is-active", hasSelectedDate);
+      if (parts.text) parts.text.textContent = triggerLabel;
+      if (parts.trigger) {
+        const label = hasSelectedDate ? `Gewähltes Datum: ${triggerLabel}` : "Bestimmtes Datum auswählen";
+        parts.trigger.setAttribute("aria-label", label);
+        parts.trigger.setAttribute("title", hasSelectedDate ? triggerLabel : "Datum auswählen");
+        parts.trigger.setAttribute("aria-expanded", module.classList.contains("is-open") ? "true" : "false");
+      }
+      if (parts.panel) parts.panel.hidden = !module.classList.contains("is-open");
     });
+
+    this.renderDateCalendars();
   },
-  /* === END BLOCK: FILTER_DATE_HELPERS_V1 === */
+/* === END BLOCK: FILTER MODULE STATE + DATE PICKER HELPERS_V2 === */
 
   /**
    * Init: Event Listeners registrieren
@@ -319,20 +446,12 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
     //        und der Mobile-3-Spalten-State stabil gegen die richtige Row laufen.
     // Umfang: Ersetzt nur den UI-Refs-Store.
     // END: FILTER_UI_REFS_STORE
-// BEGIN: FILTER_UI_REFS_STORE
-    // Zweck: UI-Referenzen persistent im Modul speichern, damit Facet-Counts/Disabled-States
-    //        und der Mobile-3-Spalten-State stabil gegen die richtige Row laufen.
-    // Umfang: Ersetzt nur den UI-Refs-Store.
-    // END: FILTER_UI_REFS_STORE
     this._ui = {
       searchRow: document.querySelector(".desktop-hero__search-row"),
       searchInput,
       timePill, timeValue, timeSheet,
       catPill,  catValue,  catSheet,
       resetPill,
-      dateTriggers: Array.from(document.querySelectorAll("[data-date-trigger]")),
-      dateInputs: Array.from(document.querySelectorAll("[data-date-input]")),
-      dateTexts: Array.from(document.querySelectorAll("[data-date-trigger-text]")),
       dateModules: Array.from(document.querySelectorAll("[data-date-module]"))
     };
 
@@ -342,17 +461,19 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
     this.filters.selectedDate = "";
-
+    this._datePickerMonth = this.getMonthKey(this.getTodayIso());
 
     // Sheet helper
     const openSheet = (sheetEl) => {
+      if (!sheetEl) return;
       sheetEl.hidden = false;
       document.body.classList.add("is-sheet-open");
     };
 
     const closeSheet = (sheetEl) => {
+      if (!sheetEl) return;
       sheetEl.hidden = true;
-      // Scroll lock nur entfernen, wenn beide Sheets zu sind
+      this.closeDatePickers();
       if (timeSheet.hidden && catSheet.hidden) {
         document.body.classList.remove("is-sheet-open");
       }
@@ -384,7 +505,6 @@ const openPopover = (type, triggerEl) => {
   closeAllPopovers();
 
   const rect = triggerEl.getBoundingClientRect();
-
   const top = rect.bottom + window.scrollY + 8;
   const left = rect.left + window.scrollX;
 
@@ -393,7 +513,6 @@ const openPopover = (type, triggerEl) => {
   pop.hidden = false;
 
   triggerEl.setAttribute("aria-expanded", "true");
-
   this._openDesktopPopover = type;
 };
 
@@ -402,6 +521,7 @@ const closePopover = (type) => {
   if (!pop) return;
 
   pop.hidden = true;
+  this.closeDatePickers();
 
   const trigger = type === "time" ? timePill : catPill;
   if (trigger) trigger.setAttribute("aria-expanded", "false");
@@ -415,12 +535,12 @@ const closeAllPopovers = () => {
 };
 
 // CLICK HANDLER (ADAPTIV)
-timePill.addEventListener("click", (e) => {
+timePill.addEventListener("click", () => {
   if (!isDesktop()) return openSheet(timeSheet);
   openPopover("time", timePill);
 });
 
-catPill.addEventListener("click", (e) => {
+catPill.addEventListener("click", () => {
   if (!isDesktop()) return openSheet(catSheet);
   openPopover("category", catPill);
 });
@@ -448,10 +568,8 @@ document.addEventListener("click", (e) => {
 // ESC erweitert (für Popover)
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-
-  if (this._openDesktopPopover) {
-    closeAllPopovers();
-  }
+  this.closeDatePickers();
+  if (this._openDesktopPopover) closeAllPopovers();
 });
 
 // RESIZE SAFETY
@@ -490,6 +608,7 @@ window.addEventListener("resize", () => {
         const v = (btn.getAttribute("data-time") || "all").trim();
         this.filters.zeitraum = v;
         this.filters.selectedDate = "";
+        this.closeDatePickers();
         this.syncDateFilterUI();
         this.applyFilters();
         this.setActiveOption(timeSheet, btn);
@@ -514,47 +633,63 @@ window.addEventListener("resize", () => {
       });
     });
 
-    // Exaktes Datum (Sheet + Popover)
-    (this._ui.dateTriggers || []).forEach((trigger) => {
-      trigger.addEventListener("click", (event) => {
+    // Exaktes Datum (integrierter Kalender in Sheet + Popover)
+    (this._ui.dateModules || []).forEach((module) => {
+      const parts = this.getDateModuleParts(module);
+
+      parts.trigger?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-
-        const module = trigger.closest("[data-date-module]");
-        const input = module?.querySelector("[data-date-input]");
-        if (!input) return;
-
-        input.min = this.getTodayIso();
-
-        if (typeof input.showPicker === "function") {
-          try {
-            input.showPicker();
-            return;
-          } catch (_) {
-            // Fallback below
-          }
-        }
-
-        input.focus({ preventScroll: true });
-        input.click();
+        this.toggleDatePicker(module);
       });
-    });
 
-    (this._ui.dateInputs || []).forEach((input) => {
-      input.min = this.getTodayIso();
+      parts.prev?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), -1));
+        this.renderDateCalendars();
+      });
 
-      input.addEventListener("change", () => {
-        const value = (input.value || "").trim();
-        this.filters.selectedDate = value;
-        if (value) this.filters.zeitraum = "all";
+      parts.next?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.setActiveDatePickerMonth(this.shiftMonthKey(this.getActiveDatePickerMonth(), 1));
+        this.renderDateCalendars();
+      });
+
+      parts.today?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const todayIso = this.getTodayIso();
+        this.filters.selectedDate = todayIso;
+        this.filters.zeitraum = "all";
+        this.setActiveDatePickerMonth(todayIso);
+        this.closeDatePickers();
         this.syncDateFilterUI();
         this.applyFilters();
         this.updateFilterBarUI(timeValue, catValue, resetPill);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
+      });
 
-        if (value) {
-          if (isDesktop()) closeAllPopovers();
-          else closeSheet(timeSheet);
-        }
+      parts.grid?.addEventListener("click", (event) => {
+        const dayButton = event.target.closest("[data-date-value]");
+        if (!dayButton || dayButton.disabled) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const isoDate = (dayButton.getAttribute("data-date-value") || "").trim();
+        if (!isoDate) return;
+
+        this.filters.selectedDate = isoDate;
+        this.filters.zeitraum = "all";
+        this.setActiveDatePickerMonth(isoDate);
+        this.closeDatePickers();
+        this.syncDateFilterUI();
+        this.applyFilters();
+        this.updateFilterBarUI(timeValue, catValue, resetPill);
+        if (isDesktop()) closeAllPopovers();
+        else closeSheet(timeSheet);
       });
     });
 
@@ -579,7 +714,6 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     debugLog("Filter module initialized (Top-App pills + sheets)");
   },
   /* === END BLOCK: FILTER INIT FINALIZE + PROOF LOGS === */
-
 
 
 /**
@@ -1009,13 +1143,14 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
   },
   /* === END BLOCK: FILTER_BAR_UI_STATE_V4 === */
 
-  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V5 | Zweck: stellt die fehlende resetFacetFilters()-Methode korrekt wieder her, setzt nur Zeit/Kategorie zurück, synchronisiert aktive Optionen in Sheet+Popover und belässt die Suche unangetastet; Umfang: ersetzt den kaputten Tail ab dem losen Reset-Code bis inkl. refresh() === */
+  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V6 | Zweck: setzt Zeit/Kategorie/exaktes Datum zurück und schließt den integrierten Kalenderzustand sauber mit; Umfang: ersetzt resetFacetFilters() === */
   resetFacetFilters() {
     const ui = this._ui || {};
 
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
     this.filters.selectedDate = "";
+    this._datePickerMonth = this.getMonthKey(this.getTodayIso());
 
     if (ui.timeSheet) {
       this.setActiveOption(
@@ -1047,6 +1182,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
     this._openDesktopPopover = null;
     document.body.classList.remove("is-sheet-open");
+    this.closeDatePickers();
     this.syncDateFilterUI();
 
     this.applyFilters();
@@ -1059,6 +1195,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
 
     debugLog("Facet filters reset");
   },
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V6 === */
 
   /**
    * Events neu laden (z. B. nach Airtable-Update)
