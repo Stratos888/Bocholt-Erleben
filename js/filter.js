@@ -646,8 +646,6 @@ Umfang: Guard direkt nach dem Einsammeln der UI-Elemente.
       });
     });
 
-});
-
     // Initial render
     this.syncDateFilterUI();
     this.applyFilters();
