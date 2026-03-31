@@ -4,8 +4,8 @@
   "description": "Aktuelle Veranstaltungen in Bocholt: Konzerte, Kultur, Kneipen-Events und mehr.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F2F6EC",
-  "theme_color": "#F2F6EC",
+  "background_color": "#F3F2E6",
+  "theme_color": "#F3F2E6",
   "orientation": "portrait-primary",
   "icons": [
     {

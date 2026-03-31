@@ -1,7 +1,7 @@
 /* === BEGIN BLOCK: HOME_CSS_STEP_4 | Purpose: isolate home/start-page feed, hero, search-row and responsive layout into a dedicated owner file while preserving validated mobile filter-row behavior | Scope: home feed layout, hero layout, desktop/narrow desktop hero variants === */
 /* EVENTS LIST LAYOUT (full-bleed feed + labels without frames) */
 
-/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 | Purpose: keep homepage feed groups vertically stacked, preserve the existing mobile card flow and establish a calmer brand-consistent base visual system for labels and cards before desktop-specific polish | Scope: viewport guardrails, feed section ownership, top-level group stack, per-group card container behavior and feed-card base styling === */
+/* === BEGIN BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V4 | Purpose: hält die Homepage-Feed-Gruppen weiterhin stabil, zieht aber die mobile Brand-Warm-Hierarchie für Card, Rail und Date-Badge auf den Desktop-Qualitätsstand; Scope: viewport guardrails, feed section ownership, top-level group stack, per-group card container behavior and feed-card base styling === */
 /* Guardrail: nichts darf breiter als der Viewport werden */
 .events-section,
 .events-section-title,
@@ -16,38 +16,22 @@
 
 /* Feed-Container: full-bleed, keine eigene “Surface” */
 .events-section{
-/* SECTION */
   padding: var(--feed-section-pad-top) var(--gutter) 0;
-
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 }
 
-
-/* Abschnittsüberschrift: Label ohne Rahmen (ruhig, Top-App Pattern) */
-/* SECTION */
-
-/* SECTION */
-
 /* SECTION HEADER (FINAL ENTERPRISE RHYTHM) */
-
 .events-section-title{
-
   margin: var(--feed-title-mt) 0 var(--feed-title-mb);
-
   font-weight: 780;
   font-size: 0.76rem;
-
   letter-spacing: 0.135em;
-
   text-transform: uppercase;
-
-  color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
+  color: color-mix(in srgb, var(--brand-green-800) 84%, var(--brand-gold-300) 16%);
   text-shadow: 0 1px 0 rgba(255,255,255,0.38);
-
 }
-
 
 /* Top-Level-Feed: Gruppen immer untereinander */
 .event-cards-grid{
@@ -55,7 +39,6 @@
   flex-direction: column;
   gap: clamp(22px, 2.2vw, 30px);
   width: 100%;
-
   padding: 0;
   background: transparent;
   border-radius: 0;
@@ -74,7 +57,6 @@
   flex-direction: column;
   gap: var(--feed-cards-gap);
   width: 100%;
-
   padding: 0;
   background: transparent;
   border-radius: 0;
@@ -82,41 +64,42 @@
 }
 
 .event-card{
-  background: linear-gradient(180deg, rgba(255,255,255,0.968) 0%, rgba(251,252,248,0.95) 100%);
-  border-color: color-mix(in srgb, rgba(24,40,30,0.075) 72%, var(--brand-gold-200) 28%);
+  background: linear-gradient(180deg, rgba(255,255,252,0.986) 0%, rgba(250,252,244,0.972) 100%);
+  border-color: color-mix(in srgb, rgba(47,69,33,0.12) 74%, var(--brand-gold-200) 26%);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.88) inset,
-    0 8px 18px rgba(12,24,18,0.038);
+    0 8px 18px rgba(16,28,10,0.040);
 }
 
 .event-card::before{
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, white 60%, var(--color-primary-muted)) 0%,
-    color-mix(in srgb, white 72%, var(--color-primary-muted)) 100%
+    rgba(229,237,211,0.976) 0%,
+    rgba(220,231,198,0.968) 100%
   );
-  opacity: 0.94;
-  box-shadow: inset -1px 0 0 rgba(24,40,30,0.042);
+  opacity: 0.96;
+  box-shadow: inset -1px 0 0 rgba(24,40,30,0.050);
 }
 
 .event-date-badge{
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
-    color-mix(in srgb, white 66%, var(--color-primary-muted)) 100%
+    rgba(252,253,248,0.994) 0%,
+    rgba(241,247,229,0.986) 100%
   );
-  color: rgba(24,40,30,0.90);
+  color: rgba(24,40,30,0.92);
   box-shadow:
-    inset 0 0 0 1px rgba(24,40,30,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.82);
+    inset 0 0 0 1px rgba(24,40,30,0.062),
+    inset 0 1px 0 rgba(255,255,255,0.86),
+    0 1px 2px rgba(12,24,18,0.026);
 }
 
 .event-date-badge__wday{
-  color: rgba(68,86,72,0.58);
+  color: rgba(74,91,71,0.64);
 }
 
 .event-date-badge__month{
-  color: rgba(68,86,72,0.56);
+  color: rgba(74,91,71,0.62);
 }
 
 .event-title{
@@ -126,7 +109,52 @@
 .event-card-desc{
   color: rgba(31,41,51,0.78);
 }
-/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V3 === */
+
+@media (max-width: 899.98px){
+  .events-section-title{
+    color: color-mix(in srgb, var(--brand-green-800) 88%, var(--brand-gold-300) 12%);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.44);
+  }
+
+  .event-card{
+    background: linear-gradient(180deg, rgba(255,255,252,0.992) 0%, rgba(250,252,243,0.976) 100%);
+    border-color: color-mix(in srgb, rgba(47,69,33,0.14) 74%, var(--brand-gold-200) 26%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 8px 18px rgba(16,28,10,0.042);
+  }
+
+  .event-card::before{
+    background: linear-gradient(
+      180deg,
+      rgba(230,238,212,0.986) 0%,
+      rgba(220,231,198,0.982) 100%
+    );
+    opacity: 0.98;
+    box-shadow: inset -1px 0 0 rgba(24,40,30,0.054);
+  }
+
+  .event-date-badge{
+    background: linear-gradient(
+      180deg,
+      rgba(252,253,248,0.996) 0%,
+      rgba(241,247,229,0.988) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.068),
+      inset 0 1px 0 rgba(255,255,255,0.88),
+      0 1px 2px rgba(12,24,18,0.028);
+  }
+
+  .event-date-badge__wday{
+    color: rgba(75,92,72,0.66);
+  }
+
+  .event-date-badge__month{
+    color: rgba(75,92,72,0.64);
+  }
+}
+/* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V4 === */
 
 /* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
 /* Mobile search-row layout intentionally consolidated later in DESKTOP_HERO_STRUCTURE_V8 to avoid same-specificity override collisions. */
@@ -548,7 +576,7 @@
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8_RESPONSIVE === */
 /* === END BLOCK: DESKTOP_HERO_STRUCTURE_V8 === */
 
-/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V3 | Zweck: entfernt den technischen/placeholder-artigen Look (dashed border) und erzeugt einen ruhigen, hochwertigen Service-Block mit klarer Systemzugehörigkeit; Umfang: mobile-only Styling für den Feed-CTA === */
+/* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V4 | Zweck: zieht den mobilen Veranstalter-Einstieg auf denselben Brand-Warm-Standard wie Cards und Feed, ohne Desktop oder Unterseiten zu verändern; Umfang: nur mobile-only Styling für den Feed-CTA === */
 
 .mobile-publish-card,
 .mobile-publish-strip,
@@ -566,28 +594,21 @@
 
     column-gap: 12px;
     row-gap: 5px;
-
     width: 100%;
-
-    /* 🔴 wichtiger Rhythmus */
     margin: 6px 0 4px;
-
     padding: 12px 14px;
 
-    /* 🔴 saubere, ruhige Fläche */
-border: 1px solid color-mix(in srgb, rgba(24,40,30,0.16) 70%, var(--brand-gold-200) 30%);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.14) 74%, var(--brand-gold-200) 26%);
     border-radius: 14px;
 
-background:
-  linear-gradient(
-    180deg,
-    color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
-    color-mix(in srgb, white 82%, var(--color-primary-muted)) 100%
-  );
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.994) 0%,
+      rgba(248,250,238,0.976) 100%
+    );
 
-    /* 🔴 sehr leichter Depth statt Card-Look */
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.7) inset;
+      0 1px 0 rgba(255,255,255,0.78) inset;
 
     color: var(--color-text-primary);
     text-decoration: none;
@@ -601,13 +622,11 @@ background:
 
   .feed-publish-entry__label{
     grid-area: label;
-
     font-size: 10px;
     font-weight: 780;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-
-    color: color-mix(in srgb, var(--color-text-muted) 85%, var(--brand-green-900) 15%);
+    color: color-mix(in srgb, var(--brand-green-900) 72%, var(--color-text-muted) 28%);
   }
 
   .feed-publish-entry__main{
@@ -616,36 +635,29 @@ background:
 
   .feed-publish-entry__title{
     grid-area: title;
-
     font-size: 0.98rem;
     font-weight: 760;
     line-height: 1.2;
-
     color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
   }
 
-.feed-publish-entry__chevron{
-  grid-area: chevron;
-
-  align-self: center;
-  justify-self: end;
-
-  font-size: 17px;
-  opacity: 0.75;
-
-  /* leichter Brand-Touch */
-  color: color-mix(in srgb, var(--brand-green-900) 60%, var(--color-text-muted) 40%);
-}
+  .feed-publish-entry__chevron{
+    grid-area: chevron;
+    align-self: center;
+    justify-self: end;
+    font-size: 17px;
+    opacity: 0.78;
+    color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
+  }
 
   @media (hover: hover){
     .feed-publish-entry:hover{
-      border-color: color-mix(in srgb, rgba(24,40,30,0.18) 70%, var(--brand-gold-200) 30%);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in srgb, white 88%, var(--color-primary-muted)) 0%,
-          color-mix(in srgb, white 82%, var(--color-primary-muted)) 100%
-        );
+      border-color: color-mix(in srgb, rgba(47,69,33,0.18) 74%, var(--brand-gold-200) 26%);
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.996) 0%,
+        rgba(249,251,240,0.980) 100%
+      );
     }
   }
 
@@ -659,7 +671,7 @@ background:
   }
 }
 
-/* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V3 === */
+/* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V4 === */
 /* === BEGIN BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 | Zweck: entfernt grüne Unterstreichung (Tap/Active-Link-Decoration) beim Klick auf den Feed-CTA; Umfang: nur feed-publish-entry Link-Zustände === */
 
 .feed-publish-entry,
@@ -684,17 +696,17 @@ background:
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 | Purpose: überführt den final geprüften Brand-Warm-Stand aus dem Theme-Lab nachhaltig in die produktive Desktop-Home, inklusive Header-, Hero-, Panel- und Feed-Hierarchie; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
     padding-left: 32px;
     padding-right: 32px;
-    background: linear-gradient(180deg, rgba(248,249,242,0.97) 0%, rgba(243,246,236,0.93) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.06) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(248,248,241,0.990) 0%, rgba(241,244,232,0.974) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.84) inset,
-      0 10px 22px rgba(22,39,61,0.038);
+      0 10px 22px rgba(24,37,16,0.032);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -703,16 +715,16 @@ background:
     gap: 11px;
   }
 
-  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 | Zweck: färbt auf der Startseite den Desktop-Header ruhiger und markenkonsistenter ein, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
+  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 | Zweck: koppelt den Desktop-Header der Home final an die Brand-Warm-DNA, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
   .app-header{
     min-height: 60px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(248,249,242,0.982) 0%, rgba(242,246,236,0.95) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.07) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(248,248,241,0.992) 0%, rgba(241,244,232,0.976) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
-      0 8px 18px rgba(22,39,61,0.030);
+      0 8px 18px rgba(24,37,16,0.030);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
@@ -727,12 +739,12 @@ background:
     border-radius: 7px;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.58) inset,
-      0 2px 6px rgba(22,39,61,0.032);
+      0 2px 6px rgba(24,37,16,0.032);
   }
 
   .app-title{
     max-width: none;
-    color: color-mix(in srgb, var(--brand-green-900) 78%, #16273d 22%);
+    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
     font-size: 1.24rem;
     font-weight: 710;
     letter-spacing: -0.028em;
@@ -742,7 +754,7 @@ background:
   .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 === */
+  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 === */
 
   .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
@@ -753,13 +765,13 @@ background:
     --hero-bg-brightness-active: 0.968;
     --hero-bg-saturate-active: 1.035;
     --hero-bg-contrast-active: 1.03;
-    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(242,246,236,0.958) 100%);
-    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.15) 70%, var(--brand-gold-200) 30%);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.986) 0%, rgba(247,250,243,0.968) 100%);
-    --hero-control-border: color-mix(in srgb, rgba(24,40,30,0.11) 76%, var(--brand-gold-200) 24%);
+    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
+    --hero-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+    --hero-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+    --hero-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
     --hero-control-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
-      0 10px 22px rgba(10,24,16,0.034);
+      0 10px 22px rgba(16,28,10,0.032);
     position: relative;
     isolation: isolate;
     overflow: visible;
@@ -774,7 +786,7 @@ background:
     box-shadow: none;
   }
 
-/* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 | Zweck: schließt den letzten verbleibenden Desktop-Farb-Gap, indem der linke Hero-Fade auf breiten Desktops deutlich transparenter, natürlicher und weniger kreidig wird; Umfang: nur Desktop-Hero-Overlay im V29-Block, keine Geometrieänderung === */
+  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 | Zweck: überführt den final validierten Brand-Warm-Hero-Wash in die produktive Desktop-Home und reduziert den Rest-Milchschleier systemisch; Umfang: nur Desktop-Hero-Overlay im V30-Block, keine Geometrieänderung === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -784,10 +796,10 @@ background:
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(246,248,240,0.974) 0%, rgba(246,248,240,0.964) 5%, rgba(246,248,240,0.78) 9%, rgba(245,247,238,0.40) 14%, rgba(244,246,236,0.14) 19%, rgba(244,246,236,0.03) 24%, rgba(244,246,236,0.00) 30%),
-      radial-gradient(44% 56% at 15% 28%, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.075) 34%, rgba(245,248,239,0.018) 58%, rgba(245,248,239,0.00) 76%),
-      linear-gradient(180deg, rgba(245,248,239,0.11) 0%, rgba(245,248,239,0.03) 18%, rgba(245,248,239,0.00) 42%, rgba(245,248,239,0.04) 100%),
-      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.04) 0%, rgba(240,222,137,0.00) 12%),
+      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 80%, white) 0%, color-mix(in srgb, #EEF1E3 80%, white) 5%, color-mix(in srgb, #EEF1E3 60%, white) 10%, color-mix(in srgb, #EEF1E3 20%, transparent) 16%, color-mix(in srgb, #EEF1E3 5%, transparent) 22%, rgba(255,255,255,0) 28%),
+      radial-gradient(44% 56% at 15% 28%, color-mix(in srgb, #EEF1E3 18%, white) 0%, color-mix(in srgb, #EEF1E3 7%, transparent) 38%, rgba(255,255,255,0) 72%),
+      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 9%, white) 0%, rgba(255,255,255,0) 42%, color-mix(in srgb, #EEF1E3 4%, transparent) 100%),
+      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
@@ -810,12 +822,12 @@ background:
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.072) 0%, rgba(240,222,137,0.00) 13%),
-      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.028) 0%, rgba(216,178,52,0.00) 12%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, rgba(246,249,241,0.075) 100%);
+      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
+      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
     pointer-events: none;
   }
-/* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 === */
+  /* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 === */
 
   .desktop-entry{
     display: block;
@@ -834,7 +846,7 @@ background:
 
   .desktop-entry__title{
     max-width: 30rem;
-    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
+    color: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
@@ -842,7 +854,7 @@ background:
 
   .desktop-entry__text{
     max-width: 29rem;
-    color: rgba(24,40,30,0.84);
+    color: rgba(24,40,30,0.86);
     font-size: 0.99rem;
     line-height: 1.42;
   }
@@ -869,9 +881,9 @@ background:
     padding: 14px 14px 12px;
     border: 1px solid var(--hero-panel-border);
     border-radius: 22px;
-    background: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(243,247,239,0.956) 100%);
+    background: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
     box-shadow:
-      0 20px 40px rgba(22,39,61,0.078),
+      0 20px 40px rgba(16,28,10,0.076),
       0 1px 0 rgba(255,255,255,0.93) inset;
     -webkit-backdrop-filter: blur(9px);
     backdrop-filter: blur(9px);
@@ -885,7 +897,7 @@ background:
     border-radius: 17px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.28) 0%,
       rgba(255,255,255,0.06) 100%
     );
   }
@@ -937,7 +949,7 @@ background:
     border: 1px solid var(--hero-control-border);
     border-radius: 16px;
     background: var(--hero-control-bg);
-    color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
@@ -945,7 +957,7 @@ background:
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(82,101,89,0.74);
+    color: rgba(80,95,78,0.74);
     font-weight: 620;
   }
 
@@ -981,7 +993,7 @@ background:
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
-    color: color-mix(in srgb, var(--brand-green-900) 84%, #16273d 16%);
+    color: color-mix(in srgb, var(--brand-green-900) 88%, var(--brand-gold-300) 12%);
     font-size: 0.95rem;
     font-weight: 780;
     line-height: 1.08;
@@ -995,7 +1007,7 @@ background:
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(84,100,89,0.48);
+    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
     font-size: 0.98rem;
     line-height: 1;
     margin-left: 0;
@@ -1018,7 +1030,7 @@ background:
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 68%, var(--brand-gold-200) 32%);
+    border-top: 1px solid color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
   }
 
   .desktop-hero__action,
@@ -1029,14 +1041,14 @@ background:
     border-radius: 11px;
     font-size: 0.84rem;
     font-weight: 680;
-    border: 1px solid color-mix(in srgb, rgba(24,40,30,0.11) 78%, var(--brand-gold-200) 22%);
-    background: linear-gradient(180deg, rgba(255,255,255,0.982) 0%, rgba(246,249,242,0.958) 100%);
-    color: rgba(24,40,30,0.84);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+    color: rgba(24,40,30,0.86);
     text-decoration: none;
-    -webkit-text-fill-color: rgba(24,40,30,0.84);
+    -webkit-text-fill-color: rgba(24,40,30,0.86);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(10,24,16,0.024);
+      0 4px 10px rgba(16,28,10,0.032);
   }
 
   .desktop-hero__action .desktop-hero__icon{
@@ -1045,30 +1057,30 @@ background:
     opacity: 0.68;
   }
 
-/* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 | Zweck: zieht auf Desktop Feed-Fläche, Karten, Rail, Date-Badge und Text-Hierarchie visuell auf denselben Qualitätsstand wie den finalisierten Hero, ohne Geometrie zu ändern; Umfang: nur Desktop-Feed-Surface im V29-Block === */
+  /* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 | Zweck: überführt die final validierte Brand-Warm-Flächenhierarchie aus dem Theme-Lab in den produktiven Desktop-Feed; Umfang: nur Desktop-Feed-Surface im V30-Block === */
   .events-section{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 28%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 16%, var(--color-primary-muted)) 58%,
-      color-mix(in srgb, white 12%, var(--color-primary-muted)) 100%
+      #E9EDDC 0%,
+      #E1E7D2 58%,
+      #DAE1C9 100%
     );
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
   }
 
   .event-card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.978) 0%, rgba(252,253,249,0.958) 100%);
-    border-color: color-mix(in srgb, rgba(24,40,30,0.085) 70%, var(--brand-gold-200) 30%);
+    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(250,252,243,0.978) 100%);
+    border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 10px 24px rgba(12,24,18,0.045);
+      0 10px 24px rgba(16,28,10,0.046);
   }
 
   .event-card::before{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+      rgba(230,238,212,0.988) 0%,
+      rgba(220,231,198,0.988) 100%
     );
     opacity: 0.96;
     box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
@@ -1077,8 +1089,8 @@ background:
   .event-date-badge{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 42%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 60%, var(--color-primary-muted)) 100%
+      rgba(252,253,248,0.996) 0%,
+      rgba(241,247,229,0.988) 100%
     );
     color: rgba(24,40,30,0.92);
     box-shadow:
@@ -1088,11 +1100,11 @@ background:
   }
 
   .event-date-badge__wday{
-    color: rgba(67,84,71,0.62);
+    color: rgba(75,92,72,0.64);
   }
 
   .event-date-badge__month{
-    color: rgba(67,84,71,0.60);
+    color: rgba(75,92,72,0.62);
   }
 
   .event-title{
@@ -1102,19 +1114,19 @@ background:
   .event-card-desc{
     color: rgba(31,41,51,0.76);
   }
-/* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 === */
+  /* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 === */
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover,
     .desktop-hero__actions .desktop-hero__action:link:hover,
     .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(22,39,61,0.13) 76%, var(--brand-gold-200) 24%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
-      color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+      border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,241,0.982) 100%);
+      color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(22,39,61,0.026);
+        0 8px 18px rgba(16,28,10,0.030);
     }
   }
 }
@@ -1161,7 +1173,7 @@ background:
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
@@ -1281,7 +1293,7 @@ background:
   }
 }
 /* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
-/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V2 | Purpose: hält Desktop-Filter-Popover inkl. integriertem Kalender vollständig im Viewport und erlaubt internes Scrollen statt abgeschnittener Fläche; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
     display: none !important;
@@ -1291,7 +1303,16 @@ background:
     position: absolute;
     z-index: 1300;
     min-width: 0;
+    max-width: calc(100vw - 32px);
     pointer-events: auto;
+  }
+
+  .filter-popover[data-side="top"] .filter-popover__panel{
+    transform-origin: bottom left;
+  }
+
+  .filter-popover[data-side="bottom"] .filter-popover__panel{
+    transform-origin: top left;
   }
 
   #popover-time{
@@ -1314,6 +1335,10 @@ background:
       0 1px 0 rgba(255,255,255,0.96) inset;
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    max-height: calc(100dvh - 32px);
   }
 
   .filter-popover__panel button{
@@ -1409,6 +1434,33 @@ background:
     font-size: 0.92rem;
     font-weight: 630;
   }
+
+  .filter-date-module--popover .filter-date-panel{
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow:
+      0 14px 28px rgba(22,39,61,0.07),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .filter-date-module--popover .filter-date-day{
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+  }
+
+  .filter-date-module--popover .filter-date-weekdays span{
+    font-size: 0.72rem;
+  }
+
+  .filter-date-module--popover .filter-date-nav{
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .filter-date-module--popover .filter-date-action{
     min-height: 34px;
     padding: 0 12px;
     font-size: 0.82rem;
@@ -1420,7 +1472,7 @@ background:
     display: none !important;
   }
 }
-/* === END BLOCK: DESKTOP_FILTER_POPOVER_V1 === */
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V2 === */
 
 /* === BEGIN BLOCK: HOME_EMPTY_STATE_ALIGN_V1 | Zweck: entfernt im Home-Empty-State den zusätzlichen Reset-Button visuell, zieht den Empty-State auf dieselbe Rail/Breite wie Search und Feed und zentriert den Text nur auf Mobile; Umfang: nur Home-Empty-State im Event-Feed === */
 #event-cards .empty-state{
@@ -1468,59 +1520,59 @@ background:
 /* === BEGIN BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 | Zweck: ergänzt drei neue Enterprise-nahe Theme-Lab-Farbwelten mit stärkerer Icon-Anbindung, wärmeren Flächen und klarerer Ebenentrennung; Umfang: nur Preview-Overrides für /?themePreview=..., produktiver Standard bleibt unverändert === */
 
 html[data-theme-preview="brand-warm"]{
-  --color-background: #EFF1E4;
-  --color-primary-muted: #E8EDD6;
-  --preview-theme-color: #F4F3E8;
-  --preview-page-bg: #EFF1E4;
+  --color-background: #EEF1E3;
+  --color-primary-muted: #E5ECD2;
+  --preview-theme-color: #F3F2E6;
+  --preview-page-bg: #EEF1E3;
 
-  --preview-header-top: rgba(248,248,241,0.988);
-  --preview-header-bottom: rgba(242,244,234,0.972);
-  --preview-header-border: rgba(53,74,38,0.10);
-  --preview-header-shadow: rgba(30,41,20,0.028);
+  --preview-header-top: rgba(248,248,241,0.992);
+  --preview-header-bottom: rgba(241,244,232,0.976);
+  --preview-header-border: rgba(47,69,33,0.11);
+  --preview-header-shadow: rgba(24,37,16,0.030);
 
-  --preview-stack-bg: rgba(244,246,237,0.952);
-  --preview-stack-border: rgba(53,74,38,0.10);
-  --preview-stack-shadow: rgba(30,41,20,0.046);
+  --preview-stack-bg: rgba(242,246,235,0.958);
+  --preview-stack-border: rgba(47,69,33,0.11);
+  --preview-stack-shadow: rgba(24,37,16,0.050);
 
-  --preview-feed-top: #ECEFDF;
-  --preview-feed-mid: #E7EBD7;
-  --preview-feed-bottom: #E2E7D0;
+  --preview-feed-top: #E9EDDC;
+  --preview-feed-mid: #E1E7D2;
+  --preview-feed-bottom: #DAE1C9;
 
-  --preview-card-top: rgba(255,254,249,0.988);
-  --preview-card-bottom: rgba(250,251,241,0.970);
-  --preview-card-border: color-mix(in srgb, rgba(53,74,38,0.13) 72%, var(--brand-gold-200) 28%);
-  --preview-card-shadow: rgba(20,32,12,0.038);
+  --preview-card-top: rgba(255,255,252,0.994);
+  --preview-card-bottom: rgba(250,252,243,0.978);
+  --preview-card-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+  --preview-card-shadow: rgba(16,28,10,0.046);
 
-  --preview-rail-top: rgba(239,245,224,0.980);
-  --preview-rail-bottom: rgba(232,240,212,0.980);
+  --preview-rail-top: rgba(230,238,212,0.988);
+  --preview-rail-bottom: rgba(220,231,198,0.988);
 
-  --preview-badge-top: rgba(243,248,231,0.980);
-  --preview-badge-bottom: rgba(236,243,219,0.980);
+  --preview-badge-top: rgba(252,253,248,0.996);
+  --preview-badge-bottom: rgba(241,247,229,0.988);
 
-  --preview-service-top: rgba(255,254,249,0.988);
-  --preview-service-bottom: rgba(248,250,238,0.970);
+  --preview-service-top: rgba(255,255,252,0.994);
+  --preview-service-bottom: rgba(248,250,238,0.976);
 
-  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 86%, var(--brand-gold-300) 14%);
-  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
-  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
-  --preview-text-strong: rgba(24,40,30,0.84);
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 89%, var(--brand-gold-300) 11%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
+  --preview-text-strong: rgba(24,40,30,0.86);
 
-  --preview-panel-top: rgba(249,250,243,0.982);
-  --preview-panel-bottom: rgba(241,245,232,0.962);
-  --preview-panel-border: color-mix(in srgb, rgba(53,74,38,0.14) 72%, var(--brand-gold-200) 28%);
-  --preview-panel-shadow: rgba(20,32,12,0.066);
-  --preview-panel-sheen-top: rgba(255,255,255,0.26);
+  --preview-panel-top: rgba(249,250,243,0.986);
+  --preview-panel-bottom: rgba(239,244,229,0.968);
+  --preview-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+  --preview-panel-shadow: rgba(16,28,10,0.076);
+  --preview-panel-sheen-top: rgba(255,255,255,0.28);
   --preview-panel-sheen-bottom: rgba(255,255,255,0.06);
 
-  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.990) 0%, rgba(247,250,239,0.972) 100%);
-  --preview-control-border: color-mix(in srgb, rgba(53,74,38,0.11) 72%, var(--brand-gold-200) 28%);
-  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(20,32,12,0.028);
+  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(16,28,10,0.032);
 
-  --preview-hero-fade-a: color-mix(in srgb, #EFF1E4 88%, white);
-  --preview-hero-fade-b: color-mix(in srgb, #EFF1E4 74%, white);
-  --preview-hero-fade-c: color-mix(in srgb, #EFF1E4 34%, transparent);
-  --preview-hero-fade-d: color-mix(in srgb, #EFF1E4 10%, transparent);
-  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 16%, transparent);
+  --preview-hero-fade-a: color-mix(in srgb, #EEF1E3 80%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #EEF1E3 60%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #EEF1E3 20%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #EEF1E3 5%, transparent);
+  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 12%, transparent);
 }
 
 html[data-theme-preview="civic-gold"]{
