@@ -660,77 +660,7 @@
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V15_MOBILE_COMPACT_CLEAN_END | Zweck: reduziert auf /events-veroeffentlichen/ die Mobile-Gesamtscrolllänge weiter durch kompakteren Intro-Block, sauber kalibrierte Benefit-Divider und einen vereinfachten Abschluss ohne entkernten Wrapper; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
-.page--publish{
-  --subpage-stack-gap: 12px;
-  --subpage-card-gap: 8px;
-  --subpage-card-pad-y: 14px;
-  --subpage-hero-gap: 8px;
-}
-
-.page--publish .content-hero,
-.page--publish .publish-benefits-card,
-.page--publish .publish-membership-card,
-.page--publish .publish-start-card,
-.page--publish .publish-final-card{
-  width: min(100%, var(--subpage-body-max));
-  justify-self: stretch;
-}
-
-.page--publish .content-hero{
-  --subpage-hero-gap: 0;
-}
-
-.page--publish .content-hero--panel{
-  padding: 16px 17px 18px;
-}
-
-.page--publish .publish-hero-layout{
-  display: grid;
-  gap: 6px;
-  align-items: start;
-}
-
-.page--publish .publish-hero-copy{
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-
-.page--publish .publish-hero-copy .content-lead{
-  margin: 0;
-  max-width: 58ch;
-  font-size: 0.93rem;
-  line-height: 1.42;
-  text-wrap: pretty;
-}
-
-.page--publish .publish-hero-lead-break{
-  display: none;
-}
-
-.page--publish .publish-hero-cta{
-  display: none;
-}
-
-.page--publish .publish-benefits-card,
-.page--publish .publish-membership-card,
-.page--publish .publish-start-card,
-.page--publish .publish-final-card{
-  gap: 10px;
-}
-
-.page--publish .publish-section-head{
-  display: grid;
-  gap: 4px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--cmp-divider-strong);
-}
-
-.page--publish .publish-section-head h2{
-  margin: 0;
-  line-height: 1.16;
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V18_10OF10_MOBILE | Zweck: bringt /events-veroeffentlichen/ auf Mobile durch kompakteren Hero, straffere Benefit-Cards und klarer priorisierte Membership näher an einen 10/10-Funnel; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints inklusive CTA-Polish === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V19_CONSOLIDATED | Zweck: konsolidiert den kompletten Mobile-/Tablet-Basisvertrag von /events-veroeffentlichen/ nach fehlerhaft verschachtelter Publish-CSS und stellt wieder genau einen sauberen Seitenfluss für Hero, Benefits, Membership, Einstieg und Abschluss her; Umfang: ersetzt den gesamten bisherigen page--publish-Basisblock außerhalb der Desktop-Breakpoints inklusive CTA-Polish === */
 .page--publish{
   --subpage-stack-gap: 12px;
   --subpage-card-gap: 10px;
@@ -840,10 +770,6 @@
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
   background: rgba(255,255,255,0.52);
-}
-
-.page--publish .publish-benefits-grid li + li{
-  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-benefits-grid strong{
@@ -1061,82 +987,7 @@
   background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
   box-shadow: var(--ui-shadow-cta-active);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V18_10OF10_MOBILE === */
-.page--publish .publish-final-actions{
-  display: grid;
-  gap: 8px;
-  justify-items: stretch;
-}
-
-.page--publish .publish-final-actions .content-cta,
-.page--publish .publish-final-actions .content-cta--primary{
-  width: 100%;
-  min-width: 0;
-}
-
-.page--publish .publish-hero-cta .content-cta--primary,
-.page--publish .publish-final-actions .content-cta,
-.page--publish .publish-final-actions .content-cta--primary{
-  min-height: 46px;
-  padding-inline: 16px;
-  border-radius: var(--cmp-btn-radius);
-  border: 1px solid var(--ui-border-primary);
-  background: var(--color-primary-muted);
-  color: var(--color-text-primary);
-  font-size: var(--cmp-btn-font-size);
-  font-weight: var(--cmp-btn-font-weight);
-  box-shadow: var(--ui-shadow-cta);
-}
-
-.page--publish .publish-hero-cta .content-cta--primary:visited,
-.page--publish .publish-final-actions .content-cta:visited,
-.page--publish .publish-final-actions .content-cta--primary:visited{
-  color: var(--color-text-primary);
-}
-
-@media (max-width: 899.98px){
-  .page--publish .content-hero h1{
-    font-size: clamp(1.34rem, 5.6vw, 1.52rem);
-    line-height: 1.04;
-    letter-spacing: -0.03em;
-    white-space: nowrap;
-  }
-
-  .page--publish .publish-hero-cta{
-    display: block;
-    margin-top: 4px;
-  }
-
-  .page--publish .publish-hero-cta .content-cta,
-  .page--publish .publish-hero-cta .content-cta--primary{
-    width: 100%;
-    min-width: 0;
-  }
-
-  .page--publish .publish-final-card--help{
-    padding-top: 13px;
-    padding-bottom: 13px;
-  }
-}
-
-@media (hover: hover){
-  .page--publish .publish-hero-cta .content-cta--primary:hover,
-  .page--publish .publish-final-actions .content-cta:hover,
-  .page--publish .publish-final-actions .content-cta--primary:hover{
-    background: color-mix(in srgb, var(--color-primary-muted) 82%, white);
-    border-color: var(--ui-border-primary);
-    color: var(--color-text-primary);
-  }
-}
-
-.page--publish .publish-hero-cta .content-cta--primary:active,
-.page--publish .publish-final-actions .content-cta:active,
-.page--publish .publish-final-actions .content-cta--primary:active{
-  transform: translateY(1px);
-  background: color-mix(in srgb, var(--color-primary-muted) 90%, white);
-  box-shadow: var(--ui-shadow-cta-active);
-}
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V16_BUTTON_POLISH === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V19_CONSOLIDATED === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
