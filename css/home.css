@@ -1495,59 +1495,59 @@ background:
 /* === BEGIN BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 | Zweck: ergänzt drei neue Enterprise-nahe Theme-Lab-Farbwelten mit stärkerer Icon-Anbindung, wärmeren Flächen und klarerer Ebenentrennung; Umfang: nur Preview-Overrides für /?themePreview=..., produktiver Standard bleibt unverändert === */
 
 html[data-theme-preview="brand-warm"]{
-  --color-background: #EFF1E4;
-  --color-primary-muted: #E8EDD6;
-  --preview-theme-color: #F4F3E8;
-  --preview-page-bg: #EFF1E4;
+  --color-background: #EEF1E3;
+  --color-primary-muted: #E6ECD4;
+  --preview-theme-color: #F3F2E7;
+  --preview-page-bg: #EEF1E3;
 
-  --preview-header-top: rgba(248,248,241,0.988);
-  --preview-header-bottom: rgba(242,244,234,0.972);
-  --preview-header-border: rgba(53,74,38,0.10);
-  --preview-header-shadow: rgba(30,41,20,0.028);
+  --preview-header-top: rgba(248,248,241,0.990);
+  --preview-header-bottom: rgba(241,244,233,0.974);
+  --preview-header-border: rgba(49,71,34,0.11);
+  --preview-header-shadow: rgba(26,39,17,0.030);
 
-  --preview-stack-bg: rgba(244,246,237,0.952);
-  --preview-stack-border: rgba(53,74,38,0.10);
-  --preview-stack-shadow: rgba(30,41,20,0.046);
+  --preview-stack-bg: rgba(243,246,236,0.956);
+  --preview-stack-border: rgba(49,71,34,0.11);
+  --preview-stack-shadow: rgba(26,39,17,0.050);
 
-  --preview-feed-top: #ECEFDF;
-  --preview-feed-mid: #E7EBD7;
-  --preview-feed-bottom: #E2E7D0;
+  --preview-feed-top: #EAEEDE;
+  --preview-feed-mid: #E3E8D5;
+  --preview-feed-bottom: #DCE2CD;
 
-  --preview-card-top: rgba(255,254,249,0.988);
-  --preview-card-bottom: rgba(250,251,241,0.970);
-  --preview-card-border: color-mix(in srgb, rgba(53,74,38,0.13) 72%, var(--brand-gold-200) 28%);
-  --preview-card-shadow: rgba(20,32,12,0.038);
+  --preview-card-top: rgba(255,255,252,0.992);
+  --preview-card-bottom: rgba(250,252,244,0.976);
+  --preview-card-border: color-mix(in srgb, rgba(49,71,34,0.15) 74%, var(--brand-gold-200) 26%);
+  --preview-card-shadow: rgba(18,30,11,0.044);
 
-  --preview-rail-top: rgba(239,245,224,0.980);
-  --preview-rail-bottom: rgba(232,240,212,0.980);
+  --preview-rail-top: rgba(231,239,214,0.985);
+  --preview-rail-bottom: rgba(223,234,202,0.985);
 
-  --preview-badge-top: rgba(243,248,231,0.980);
-  --preview-badge-bottom: rgba(236,243,219,0.980);
+  --preview-badge-top: rgba(252,253,248,0.995);
+  --preview-badge-bottom: rgba(242,247,231,0.986);
 
-  --preview-service-top: rgba(255,254,249,0.988);
-  --preview-service-bottom: rgba(248,250,238,0.970);
+  --preview-service-top: rgba(255,255,252,0.992);
+  --preview-service-bottom: rgba(248,250,239,0.974);
 
-  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 86%, var(--brand-gold-300) 14%);
-  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
-  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
-  --preview-text-strong: rgba(24,40,30,0.84);
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 88%, var(--brand-gold-300) 12%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 86%, var(--brand-gold-300) 14%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
+  --preview-text-strong: rgba(24,40,30,0.85);
 
-  --preview-panel-top: rgba(249,250,243,0.982);
-  --preview-panel-bottom: rgba(241,245,232,0.962);
-  --preview-panel-border: color-mix(in srgb, rgba(53,74,38,0.14) 72%, var(--brand-gold-200) 28%);
-  --preview-panel-shadow: rgba(20,32,12,0.066);
-  --preview-panel-sheen-top: rgba(255,255,255,0.26);
+  --preview-panel-top: rgba(249,250,243,0.984);
+  --preview-panel-bottom: rgba(240,245,231,0.966);
+  --preview-panel-border: color-mix(in srgb, rgba(49,71,34,0.15) 74%, var(--brand-gold-200) 26%);
+  --preview-panel-shadow: rgba(18,30,11,0.070);
+  --preview-panel-sheen-top: rgba(255,255,255,0.27);
   --preview-panel-sheen-bottom: rgba(255,255,255,0.06);
 
-  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.990) 0%, rgba(247,250,239,0.972) 100%);
-  --preview-control-border: color-mix(in srgb, rgba(53,74,38,0.11) 72%, var(--brand-gold-200) 28%);
-  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(20,32,12,0.028);
+  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.992) 0%, rgba(247,250,239,0.974) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(49,71,34,0.12) 74%, var(--brand-gold-200) 26%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(18,30,11,0.030);
 
-  --preview-hero-fade-a: color-mix(in srgb, #EFF1E4 88%, white);
-  --preview-hero-fade-b: color-mix(in srgb, #EFF1E4 74%, white);
-  --preview-hero-fade-c: color-mix(in srgb, #EFF1E4 34%, transparent);
-  --preview-hero-fade-d: color-mix(in srgb, #EFF1E4 10%, transparent);
-  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 16%, transparent);
+  --preview-hero-fade-a: color-mix(in srgb, #EEF1E3 84%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #EEF1E3 68%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #EEF1E3 28%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #EEF1E3 8%, transparent);
+  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 14%, transparent);
 }
 
 html[data-theme-preview="civic-gold"]{
