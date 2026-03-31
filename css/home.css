@@ -1509,58 +1509,58 @@ background:
 
 html[data-theme-preview="brand-warm"]{
   --color-background: #EEF1E3;
-  --color-primary-muted: #E6ECD4;
-  --preview-theme-color: #F3F2E7;
+  --color-primary-muted: #E5ECD2;
+  --preview-theme-color: #F3F2E6;
   --preview-page-bg: #EEF1E3;
 
-  --preview-header-top: rgba(248,248,241,0.990);
-  --preview-header-bottom: rgba(241,244,233,0.974);
-  --preview-header-border: rgba(49,71,34,0.11);
-  --preview-header-shadow: rgba(26,39,17,0.030);
+  --preview-header-top: rgba(248,248,241,0.992);
+  --preview-header-bottom: rgba(241,244,232,0.976);
+  --preview-header-border: rgba(47,69,33,0.11);
+  --preview-header-shadow: rgba(24,37,16,0.030);
 
-  --preview-stack-bg: rgba(243,246,236,0.956);
-  --preview-stack-border: rgba(49,71,34,0.11);
-  --preview-stack-shadow: rgba(26,39,17,0.050);
+  --preview-stack-bg: rgba(242,246,235,0.958);
+  --preview-stack-border: rgba(47,69,33,0.11);
+  --preview-stack-shadow: rgba(24,37,16,0.050);
 
-  --preview-feed-top: #EAEEDE;
-  --preview-feed-mid: #E3E8D5;
-  --preview-feed-bottom: #DCE2CD;
+  --preview-feed-top: #E9EDDC;
+  --preview-feed-mid: #E1E7D2;
+  --preview-feed-bottom: #DAE1C9;
 
-  --preview-card-top: rgba(255,255,252,0.992);
-  --preview-card-bottom: rgba(250,252,244,0.976);
-  --preview-card-border: color-mix(in srgb, rgba(49,71,34,0.15) 74%, var(--brand-gold-200) 26%);
-  --preview-card-shadow: rgba(18,30,11,0.044);
+  --preview-card-top: rgba(255,255,252,0.994);
+  --preview-card-bottom: rgba(250,252,243,0.978);
+  --preview-card-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+  --preview-card-shadow: rgba(16,28,10,0.046);
 
-  --preview-rail-top: rgba(231,239,214,0.985);
-  --preview-rail-bottom: rgba(223,234,202,0.985);
+  --preview-rail-top: rgba(230,238,212,0.988);
+  --preview-rail-bottom: rgba(220,231,198,0.988);
 
-  --preview-badge-top: rgba(252,253,248,0.995);
-  --preview-badge-bottom: rgba(242,247,231,0.986);
+  --preview-badge-top: rgba(252,253,248,0.996);
+  --preview-badge-bottom: rgba(241,247,229,0.988);
 
-  --preview-service-top: rgba(255,255,252,0.992);
-  --preview-service-bottom: rgba(248,250,239,0.974);
+  --preview-service-top: rgba(255,255,252,0.994);
+  --preview-service-bottom: rgba(248,250,238,0.976);
 
-  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 88%, var(--brand-gold-300) 12%);
-  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 86%, var(--brand-gold-300) 14%);
-  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
-  --preview-text-strong: rgba(24,40,30,0.85);
+  --preview-section-title: color-mix(in srgb, var(--brand-green-800) 89%, var(--brand-gold-300) 11%);
+  --preview-accent-strong: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
+  --preview-title-strong: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
+  --preview-text-strong: rgba(24,40,30,0.86);
 
-  --preview-panel-top: rgba(249,250,243,0.984);
-  --preview-panel-bottom: rgba(240,245,231,0.966);
-  --preview-panel-border: color-mix(in srgb, rgba(49,71,34,0.15) 74%, var(--brand-gold-200) 26%);
-  --preview-panel-shadow: rgba(18,30,11,0.070);
-  --preview-panel-sheen-top: rgba(255,255,255,0.27);
+  --preview-panel-top: rgba(249,250,243,0.986);
+  --preview-panel-bottom: rgba(239,244,229,0.968);
+  --preview-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+  --preview-panel-shadow: rgba(16,28,10,0.076);
+  --preview-panel-sheen-top: rgba(255,255,255,0.28);
   --preview-panel-sheen-bottom: rgba(255,255,255,0.06);
 
-  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.992) 0%, rgba(247,250,239,0.974) 100%);
-  --preview-control-border: color-mix(in srgb, rgba(49,71,34,0.12) 74%, var(--brand-gold-200) 26%);
-  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(18,30,11,0.030);
+  --preview-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+  --preview-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
+  --preview-control-shadow: 0 1px 0 rgba(255,255,255,0.97) inset, 0 10px 22px rgba(16,28,10,0.032);
 
-  --preview-hero-fade-a: color-mix(in srgb, #EEF1E3 84%, white);
-  --preview-hero-fade-b: color-mix(in srgb, #EEF1E3 68%, white);
-  --preview-hero-fade-c: color-mix(in srgb, #EEF1E3 28%, transparent);
-  --preview-hero-fade-d: color-mix(in srgb, #EEF1E3 8%, transparent);
-  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 14%, transparent);
+  --preview-hero-fade-a: color-mix(in srgb, #EEF1E3 80%, white);
+  --preview-hero-fade-b: color-mix(in srgb, #EEF1E3 60%, white);
+  --preview-hero-fade-c: color-mix(in srgb, #EEF1E3 20%, transparent);
+  --preview-hero-fade-d: color-mix(in srgb, #EEF1E3 5%, transparent);
+  --preview-hero-glow: color-mix(in srgb, var(--brand-gold-200) 12%, transparent);
 }
 
 html[data-theme-preview="civic-gold"]{
