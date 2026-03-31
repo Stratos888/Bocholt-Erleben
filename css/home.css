@@ -684,17 +684,17 @@ background:
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 | Purpose: kalibriert den Home-only Brand-Polish auf Desktop rein farblich nach 1024/1440/1920-Proof, reduziert den kreidigen Hero-Schleier, stärkt Icon→Hero→Feed-Farbkonsistenz und trennt Feed/Karten definierter; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 | Purpose: überführt den final geprüften Brand-Warm-Stand aus dem Theme-Lab nachhaltig in die produktive Desktop-Home, inklusive Header-, Hero-, Panel- und Feed-Hierarchie; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
 @media (min-width: 900px){
   .app-header{
     min-height: 62px;
     padding-left: 32px;
     padding-right: 32px;
-    background: linear-gradient(180deg, rgba(248,249,242,0.97) 0%, rgba(243,246,236,0.93) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.06) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(248,248,241,0.990) 0%, rgba(241,244,232,0.974) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.84) inset,
-      0 10px 22px rgba(22,39,61,0.038);
+      0 10px 22px rgba(24,37,16,0.032);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -703,16 +703,16 @@ background:
     gap: 11px;
   }
 
-  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 | Zweck: färbt auf der Startseite den Desktop-Header ruhiger und markenkonsistenter ein, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
+  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 | Zweck: koppelt den Desktop-Header der Home final an die Brand-Warm-DNA, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
   .app-header{
     min-height: 60px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(248,249,242,0.982) 0%, rgba(242,246,236,0.95) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(22,39,61,0.07) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(248,248,241,0.992) 0%, rgba(241,244,232,0.976) 100%);
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
-      0 8px 18px rgba(22,39,61,0.030);
+      0 8px 18px rgba(24,37,16,0.030);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
@@ -727,12 +727,12 @@ background:
     border-radius: 7px;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.58) inset,
-      0 2px 6px rgba(22,39,61,0.032);
+      0 2px 6px rgba(24,37,16,0.032);
   }
 
   .app-title{
     max-width: none;
-    color: color-mix(in srgb, var(--brand-green-900) 78%, #16273d 22%);
+    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
     font-size: 1.24rem;
     font-weight: 710;
     letter-spacing: -0.028em;
@@ -742,7 +742,7 @@ background:
   .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V2 === */
+  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 === */
 
   .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
@@ -753,13 +753,13 @@ background:
     --hero-bg-brightness-active: 0.968;
     --hero-bg-saturate-active: 1.035;
     --hero-bg-contrast-active: 1.03;
-    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(242,246,236,0.958) 100%);
-    --hero-panel-border: color-mix(in srgb, rgba(24,40,30,0.15) 70%, var(--brand-gold-200) 30%);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,255,0.986) 0%, rgba(247,250,243,0.968) 100%);
-    --hero-control-border: color-mix(in srgb, rgba(24,40,30,0.11) 76%, var(--brand-gold-200) 24%);
+    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
+    --hero-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+    --hero-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+    --hero-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
     --hero-control-shadow:
       0 1px 0 rgba(255,255,255,0.98) inset,
-      0 10px 22px rgba(10,24,16,0.034);
+      0 10px 22px rgba(16,28,10,0.032);
     position: relative;
     isolation: isolate;
     overflow: visible;
@@ -774,7 +774,7 @@ background:
     box-shadow: none;
   }
 
-/* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 | Zweck: schließt den letzten verbleibenden Desktop-Farb-Gap, indem der linke Hero-Fade auf breiten Desktops deutlich transparenter, natürlicher und weniger kreidig wird; Umfang: nur Desktop-Hero-Overlay im V29-Block, keine Geometrieänderung === */
+  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 | Zweck: überführt den final validierten Brand-Warm-Hero-Wash in die produktive Desktop-Home und reduziert den Rest-Milchschleier systemisch; Umfang: nur Desktop-Hero-Overlay im V30-Block, keine Geometrieänderung === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -784,10 +784,10 @@ background:
     right: calc(50% - 50vw);
     z-index: -4;
     background-image:
-      linear-gradient(90deg, rgba(246,248,240,0.974) 0%, rgba(246,248,240,0.964) 5%, rgba(246,248,240,0.78) 9%, rgba(245,247,238,0.40) 14%, rgba(244,246,236,0.14) 19%, rgba(244,246,236,0.03) 24%, rgba(244,246,236,0.00) 30%),
-      radial-gradient(44% 56% at 15% 28%, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.075) 34%, rgba(245,248,239,0.018) 58%, rgba(245,248,239,0.00) 76%),
-      linear-gradient(180deg, rgba(245,248,239,0.11) 0%, rgba(245,248,239,0.03) 18%, rgba(245,248,239,0.00) 42%, rgba(245,248,239,0.04) 100%),
-      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.04) 0%, rgba(240,222,137,0.00) 12%),
+      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 80%, white) 0%, color-mix(in srgb, #EEF1E3 80%, white) 5%, color-mix(in srgb, #EEF1E3 60%, white) 10%, color-mix(in srgb, #EEF1E3 20%, transparent) 16%, color-mix(in srgb, #EEF1E3 5%, transparent) 22%, rgba(255,255,255,0) 28%),
+      radial-gradient(44% 56% at 15% 28%, color-mix(in srgb, #EEF1E3 18%, white) 0%, color-mix(in srgb, #EEF1E3 7%, transparent) 38%, rgba(255,255,255,0) 72%),
+      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 9%, white) 0%, rgba(255,255,255,0) 42%, color-mix(in srgb, #EEF1E3 4%, transparent) 100%),
+      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
       var(--hero-bg-image-active);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
@@ -810,12 +810,12 @@ background:
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, rgba(240,222,137,0.072) 0%, rgba(240,222,137,0.00) 13%),
-      radial-gradient(circle at 84% 56%, rgba(216,178,52,0.028) 0%, rgba(216,178,52,0.00) 12%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, rgba(246,249,241,0.075) 100%);
+      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
+      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
     pointer-events: none;
   }
-/* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V1 === */
+  /* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 === */
 
   .desktop-entry{
     display: block;
@@ -834,7 +834,7 @@ background:
 
   .desktop-entry__title{
     max-width: 30rem;
-    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
+    color: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
@@ -842,7 +842,7 @@ background:
 
   .desktop-entry__text{
     max-width: 29rem;
-    color: rgba(24,40,30,0.84);
+    color: rgba(24,40,30,0.86);
     font-size: 0.99rem;
     line-height: 1.42;
   }
@@ -869,9 +869,9 @@ background:
     padding: 14px 14px 12px;
     border: 1px solid var(--hero-panel-border);
     border-radius: 22px;
-    background: linear-gradient(180deg, rgba(249,250,245,0.976) 0%, rgba(243,247,239,0.956) 100%);
+    background: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
     box-shadow:
-      0 20px 40px rgba(22,39,61,0.078),
+      0 20px 40px rgba(16,28,10,0.076),
       0 1px 0 rgba(255,255,255,0.93) inset;
     -webkit-backdrop-filter: blur(9px);
     backdrop-filter: blur(9px);
@@ -885,7 +885,7 @@ background:
     border-radius: 17px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.28) 0%,
       rgba(255,255,255,0.06) 100%
     );
   }
@@ -937,7 +937,7 @@ background:
     border: 1px solid var(--hero-control-border);
     border-radius: 16px;
     background: var(--hero-control-bg);
-    color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+    color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
@@ -945,7 +945,7 @@ background:
   }
 
   .top-stack #search-filter::placeholder{
-    color: rgba(82,101,89,0.74);
+    color: rgba(80,95,78,0.74);
     font-weight: 620;
   }
 
@@ -981,7 +981,7 @@ background:
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
-    color: color-mix(in srgb, var(--brand-green-900) 84%, #16273d 16%);
+    color: color-mix(in srgb, var(--brand-green-900) 88%, var(--brand-gold-300) 12%);
     font-size: 0.95rem;
     font-weight: 780;
     line-height: 1.08;
@@ -995,7 +995,7 @@ background:
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: rgba(84,100,89,0.48);
+    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
     font-size: 0.98rem;
     line-height: 1;
     margin-left: 0;
@@ -1018,7 +1018,7 @@ background:
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding-top: 8px;
-    border-top: 1px solid color-mix(in srgb, rgba(117,133,108,0.18) 68%, var(--brand-gold-200) 32%);
+    border-top: 1px solid color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
   }
 
   .desktop-hero__action,
@@ -1029,14 +1029,14 @@ background:
     border-radius: 11px;
     font-size: 0.84rem;
     font-weight: 680;
-    border: 1px solid color-mix(in srgb, rgba(24,40,30,0.11) 78%, var(--brand-gold-200) 22%);
-    background: linear-gradient(180deg, rgba(255,255,255,0.982) 0%, rgba(246,249,242,0.958) 100%);
-    color: rgba(24,40,30,0.84);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
+    color: rgba(24,40,30,0.86);
     text-decoration: none;
-    -webkit-text-fill-color: rgba(24,40,30,0.84);
+    -webkit-text-fill-color: rgba(24,40,30,0.86);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(10,24,16,0.024);
+      0 4px 10px rgba(16,28,10,0.032);
   }
 
   .desktop-hero__action .desktop-hero__icon{
@@ -1045,30 +1045,30 @@ background:
     opacity: 0.68;
   }
 
-/* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 | Zweck: zieht auf Desktop Feed-Fläche, Karten, Rail, Date-Badge und Text-Hierarchie visuell auf denselben Qualitätsstand wie den finalisierten Hero, ohne Geometrie zu ändern; Umfang: nur Desktop-Feed-Surface im V29-Block === */
+  /* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 | Zweck: überführt die final validierte Brand-Warm-Flächenhierarchie aus dem Theme-Lab in den produktiven Desktop-Feed; Umfang: nur Desktop-Feed-Surface im V30-Block === */
   .events-section{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 28%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 16%, var(--color-primary-muted)) 58%,
-      color-mix(in srgb, white 12%, var(--color-primary-muted)) 100%
+      #E9EDDC 0%,
+      #E1E7D2 58%,
+      #DAE1C9 100%
     );
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
   }
 
   .event-card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.978) 0%, rgba(252,253,249,0.958) 100%);
-    border-color: color-mix(in srgb, rgba(24,40,30,0.085) 70%, var(--brand-gold-200) 30%);
+    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(250,252,243,0.978) 100%);
+    border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.92) inset,
-      0 10px 24px rgba(12,24,18,0.045);
+      0 10px 24px rgba(16,28,10,0.046);
   }
 
   .event-card::before{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+      rgba(230,238,212,0.988) 0%,
+      rgba(220,231,198,0.988) 100%
     );
     opacity: 0.96;
     box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
@@ -1077,8 +1077,8 @@ background:
   .event-date-badge{
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, white 42%, var(--color-primary-muted)) 0%,
-      color-mix(in srgb, white 60%, var(--color-primary-muted)) 100%
+      rgba(252,253,248,0.996) 0%,
+      rgba(241,247,229,0.988) 100%
     );
     color: rgba(24,40,30,0.92);
     box-shadow:
@@ -1088,11 +1088,11 @@ background:
   }
 
   .event-date-badge__wday{
-    color: rgba(67,84,71,0.62);
+    color: rgba(75,92,72,0.64);
   }
 
   .event-date-badge__month{
-    color: rgba(67,84,71,0.60);
+    color: rgba(75,92,72,0.62);
   }
 
   .event-title{
@@ -1102,19 +1102,19 @@ background:
   .event-card-desc{
     color: rgba(31,41,51,0.76);
   }
-/* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V1 === */
+  /* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 === */
 
   @media (hover: hover){
     .desktop-hero__actions .desktop-hero__action:hover,
     .desktop-hero__actions .desktop-hero__action:link:hover,
     .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(22,39,61,0.13) 76%, var(--brand-gold-200) 24%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,246,0.968) 100%);
-      color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, #16273d 18%);
+      border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,241,0.982) 100%);
+      color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
       box-shadow:
         0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(22,39,61,0.026);
+        0 8px 18px rgba(16,28,10,0.030);
     }
   }
 }
@@ -1161,7 +1161,7 @@ background:
     min-width: 46px;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V29 === */
+/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 === */
 
 /* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
 @media (min-width: 900px) and (max-width: 1024px){
