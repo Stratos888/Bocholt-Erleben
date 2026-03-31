@@ -273,11 +273,12 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
 
-/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V2 | Zweck: gestaltet den integrierten Monatskalender für Mobile/Overlay passend zum UI-System; Umfang: ersetzt nur die Wann-Datums-UI direkt vor den hidden-Regeln === */
+/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V3 | Zweck: macht den integrierten Kalender auf Mobile kompakter und viewport-sicher, ohne das Designsystem zu verlassen; Umfang: ersetzt nur die Wann-Datums-UI direkt vor den hidden-Regeln === */
 .filter-date-module{
   display: grid;
   gap: 10px;
   margin-top: 14px;
+  scroll-margin-block: 12px;
 }
 
 .filter-date-module__divider{
@@ -496,7 +497,51 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     background: rgba(226,236,216,0.98);
   }
 }
-/* === END BLOCK: FILTER_DATE_EXACT_UI_V2 === */
+
+@media (max-width: 899.98px){
+  .filter-date-panel{
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .filter-date-panel__header{
+    grid-template-columns: 36px 1fr 36px;
+    gap: 6px;
+  }
+
+  .filter-date-nav{
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .filter-date-weekdays,
+  .filter-date-grid{
+    gap: 4px;
+  }
+
+  .filter-date-weekdays span{
+    min-height: 18px;
+    font-size: 0.72rem;
+  }
+
+  .filter-date-day{
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+  }
+
+  .filter-date-actions{
+    margin-top: 2px;
+  }
+
+  .filter-date-action{
+    min-height: 34px;
+    font-size: 0.84rem;
+  }
+}
+/* === END BLOCK: FILTER_DATE_EXACT_UI_V3 === */
 
 /* hidden muss immer wirken */
 .filter-pill[hidden]{ display: none !important; }
