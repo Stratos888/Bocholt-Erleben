@@ -1281,7 +1281,7 @@ background:
   }
 }
 /* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
-/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V1 | Purpose: adds desktop-only anchored filter popover styling for time/category while preserving mobile sheets and existing homepage hero rhythm; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V2 | Purpose: hält Desktop-Filter-Popover inkl. integriertem Kalender vollständig im Viewport und erlaubt internes Scrollen statt abgeschnittener Fläche; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
     display: none !important;
@@ -1291,7 +1291,16 @@ background:
     position: absolute;
     z-index: 1300;
     min-width: 0;
+    max-width: calc(100vw - 32px);
     pointer-events: auto;
+  }
+
+  .filter-popover[data-side="top"] .filter-popover__panel{
+    transform-origin: bottom left;
+  }
+
+  .filter-popover[data-side="bottom"] .filter-popover__panel{
+    transform-origin: top left;
   }
 
   #popover-time{
@@ -1314,6 +1323,10 @@ background:
       0 1px 0 rgba(255,255,255,0.96) inset;
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    max-height: calc(100dvh - 32px);
   }
 
   .filter-popover__panel button{
@@ -1447,7 +1460,7 @@ background:
     display: none !important;
   }
 }
-/* === END BLOCK: DESKTOP_FILTER_POPOVER_V1 === */
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V2 === */
 
 /* === BEGIN BLOCK: HOME_EMPTY_STATE_ALIGN_V1 | Zweck: entfernt im Home-Empty-State den zusätzlichen Reset-Button visuell, zieht den Empty-State auf dieselbe Rail/Breite wie Search und Feed und zentriert den Text nur auf Mobile; Umfang: nur Home-Empty-State im Event-Feed === */
 #event-cards .empty-state{
