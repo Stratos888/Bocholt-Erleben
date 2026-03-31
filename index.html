@@ -216,15 +216,29 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
       <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
       <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 | Zweck: vereinfacht den Mobile-Wann-Filter auf einen einzigen klaren Datums-Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Zeit-Sheet === -->
+      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 | Zweck: ersetzt den nativen Mobile-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Sheet; Umfang: nur Datumsmodul im Zeit-Sheet === -->
       <div class="filter-date-module" data-date-module>
         <div class="filter-date-module__divider" aria-hidden="true"></div>
-        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
+        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
           <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+          <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
         </button>
-        <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
+        <div class="filter-date-panel" data-date-panel hidden>
+          <div class="filter-date-panel__header">
+            <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
+            <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+            <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
+          </div>
+          <div class="filter-date-weekdays" aria-hidden="true">
+            <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+          </div>
+          <div class="filter-date-grid" data-date-grid></div>
+          <div class="filter-date-actions">
+            <button type="button" class="filter-date-action" data-date-today>Heute</button>
+          </div>
+        </div>
       </div>
-      <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V1 === -->
+      <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 === -->
     </div>
   </div>
 </div>
@@ -446,15 +460,29 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
     <button data-time="weekend">Dieses Wochenende</button>
     <button data-time="nextweek">Nächste Woche</button>
     <button data-time="later">Später</button>
-    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 | Zweck: vereinfacht den Desktop-Datumsfilter auf einen einzigen klaren Trigger ohne redundante Überschrift oder Extra-Reset; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
+    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 | Zweck: ersetzt den nativen Desktop-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Popover; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
     <div class="filter-popover__divider" aria-hidden="true"></div>
     <div class="filter-date-module filter-date-module--popover" data-date-module>
-      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen">
+      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
         <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+        <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
       </button>
-      <input type="date" class="filter-date-trigger__input" data-date-input aria-label="Bestimmtes Datum auswählen">
+      <div class="filter-date-panel" data-date-panel hidden>
+        <div class="filter-date-panel__header">
+          <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
+          <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+          <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
+        </div>
+        <div class="filter-date-weekdays" aria-hidden="true">
+          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+        </div>
+        <div class="filter-date-grid" data-date-grid></div>
+        <div class="filter-date-actions">
+          <button type="button" class="filter-date-action" data-date-today>Heute</button>
+        </div>
+      </div>
     </div>
-    <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V1 === -->
+    <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 === -->
   </div>
 </div>
 
