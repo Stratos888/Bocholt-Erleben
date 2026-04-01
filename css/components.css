@@ -1125,7 +1125,7 @@
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
-/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V1 | Zweck: zieht Aktivitätenseite systemisch auf Home-/Event-DNA inkl. kompakter Cards, echter Tabbar und Activity-Detailpanel-Bausteinen; Umfang: ersetzt den kompletten Activities-Komponentenblock konsolidiert === */
+/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V2 | Zweck: zieht die Aktivitätenseite final auf die Event-DNA, beruhigt den Desktop-Einstieg, fixiert die echte Activity-Grid-Ownership gegen home.css und verdichtet die Feed-Cards ohne Mobile-Regressions; Umfang: ersetzt den kompletten Activities-Komponentenblock konsolidiert === */
 .page--activities{
   padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
@@ -1143,25 +1143,30 @@
   padding-top: 10px;
 }
 
-.activity-cards-grid{
+.page--activities .activity-cards-grid{
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.discovery-card--compact{
+.page--activities .discovery-card--compact{
   overflow: hidden;
 }
 
-.discovery-card--compact .event-card-body{
+.page--activities .discovery-card--compact .event-card-body{
   gap: 4px;
 }
 
-.discovery-card--compact .event-title{
+.page--activities .discovery-card--compact .event-title{
   margin: 0;
 }
 
-.discovery-card--compact .event-card-desc{
+.page--activities .discovery-card--compact .event-card-desc{
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.94rem;
@@ -1173,7 +1178,7 @@
   overflow: hidden;
 }
 
-.activity-card-thumb{
+.page--activities .activity-card-thumb{
   width: 42px;
   height: 42px;
 
@@ -1189,23 +1194,23 @@
     inset 0 1px 0 rgba(255,255,255,0.80);
 }
 
-.activity-card-thumb img{
+.page--activities .activity-card-thumb img{
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.activity-card-thumb--fallback,
-.activity-detail__media--fallback{
+.page--activities .activity-card-thumb--fallback,
+.page--activities .activity-detail__media--fallback{
   position: relative;
   display: grid;
   place-items: center;
   overflow: hidden;
 }
 
-.activity-card-thumb--fallback::before,
-.activity-detail__media--fallback::before{
+.page--activities .activity-card-thumb--fallback::before,
+.page--activities .activity-detail__media--fallback::before{
   content: "";
   position: absolute;
   inset: 0;
@@ -1215,56 +1220,60 @@
   pointer-events: none;
 }
 
-.activity-card-thumb--natur,
-.activity-detail__media--natur{
+.page--activities .activity-card-thumb--natur,
+.page--activities .activity-detail__media--natur{
   background: linear-gradient(160deg, rgba(219,236,211,0.98) 0%, rgba(171,205,150,0.98) 100%);
 }
 
-.activity-card-thumb--freizeitorte,
-.activity-detail__media--freizeitorte{
+.page--activities .activity-card-thumb--freizeitorte,
+.page--activities .activity-detail__media--freizeitorte{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
 }
 
-.activity-card-thumb--sport-bewegung,
-.activity-detail__media--sport-bewegung{
+.page--activities .activity-card-thumb--sport-bewegung,
+.page--activities .activity-detail__media--sport-bewegung{
   background: linear-gradient(160deg, rgba(220,235,228,0.98) 0%, rgba(159,201,181,0.98) 100%);
 }
 
-.activity-card-thumb--kultur,
-.activity-detail__media--kultur{
+.page--activities .activity-card-thumb--kultur,
+.page--activities .activity-detail__media--kultur{
   background: linear-gradient(160deg, rgba(237,232,219,0.98) 0%, rgba(215,199,163,0.98) 100%);
 }
 
-.activity-card-thumb__label{
+.page--activities .activity-card-thumb__label{
   position: relative;
   z-index: 1;
 
-  max-width: 34px;
-  padding: 0 4px;
+  max-width: 32px;
+  padding: 0 3px;
 
   color: var(--color-text-primary);
-  font-size: 0.57rem;
+  font-size: 0.56rem;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.04;
   text-align: center;
-  letter-spacing: 0.02em;
-  word-break: break-word;
+  letter-spacing: 0.015em;
+
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
-.activity-card-quiet{
+.page--activities .activity-card-quiet{
+  margin-top: 2px;
   color: var(--color-text-secondary);
   font-size: 0.86rem;
   line-height: 1.35;
   font-weight: 620;
 }
 
-.activity-card-tags{
+.page--activities .activity-card-tags{
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.discovery-chip{
+.page--activities .discovery-chip{
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -1494,7 +1503,7 @@
 }
 
 @media (max-width: 899.98px){
-  .activity-card-tags{
+  .page--activities .activity-card-tags{
     display: none;
   }
 }
@@ -1504,12 +1513,84 @@
     padding-bottom: 0;
   }
 
-  .activity-cards-grid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+  .page--activities .desktop-hero{
+    min-height: auto;
+    gap: 12px;
+    padding-top: 14px;
+    padding-bottom: 8px;
   }
 
-  .bottom-tabbar{
+  .page--activities .desktop-hero::before,
+  .page--activities .desktop-hero::after{
+    content: none;
+  }
+
+  .page--activities .desktop-entry__content{
+    max-width: 46rem;
+    gap: 8px;
+  }
+
+  .page--activities .desktop-entry__title{
+    max-width: none;
+    font-size: clamp(2.08rem, 1.9rem + 0.46vw, 2.48rem);
+    line-height: 1.01;
+    letter-spacing: -0.045em;
+  }
+
+  .page--activities .desktop-entry__text{
+    max-width: 44rem;
+    color: rgba(24,40,30,0.82);
+    font-size: 0.98rem;
+    line-height: 1.46;
+  }
+
+  .page--activities .desktop-entry__text br{
+    display: none;
+  }
+
+  .page--activities .top-stack{
+    width: 100%;
+    max-width: none;
+    padding: 12px 12px 10px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(249,250,243,0.992) 0%, rgba(239,244,229,0.978) 100%);
+    box-shadow:
+      0 14px 30px rgba(16,28,10,0.052),
+      0 1px 0 rgba(255,255,255,0.92) inset;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .page--activities .top-stack::before{
+    inset: 6px;
+    border-radius: 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.04) 100%
+    );
+  }
+
+  .page--activities .activity-cards-grid{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .page--activities .discovery-card--compact .event-card-body{
+    gap: 3px;
+  }
+
+  .page--activities .discovery-card--compact .event-card-desc,
+  .page--activities .activity-card-tags{
+    display: none;
+  }
+
+  .page--activities .activity-card-quiet{
+    font-size: 0.89rem;
+    font-weight: 680;
+  }
+
+  .page--activities .bottom-tabbar{
     display: none;
   }
 
@@ -1517,6 +1598,13 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V1 === */
+
+@media (min-width: 1280px){
+  .page--activities .activity-cards-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+  }
+}
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V2 === */
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS === */
