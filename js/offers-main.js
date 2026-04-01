@@ -26,6 +26,7 @@ const OffersApp = {
 
   refs: {
     searchInput: null,
+    searchRow: null,
     situationPill: null,
     categoryPill: null,
     resetPill: null,
@@ -76,6 +77,7 @@ const OffersApp = {
 
   cacheRefs() {
     this.refs.searchInput = document.getElementById("search-filter");
+    this.refs.searchRow = document.querySelector(".desktop-hero__search-row");
     this.refs.situationPill = document.getElementById("offer-situation-pill");
     this.refs.categoryPill = document.getElementById("offer-category-pill");
     this.refs.resetPill = document.getElementById("offer-reset-pill");
@@ -245,10 +247,16 @@ const OffersApp = {
     ].join("");
   },
 
+  // BEGIN: FILTER_SHEET_LOCK_HELPERS
+  setSheetLock(isOpen) {
+    document.documentElement.classList.toggle("is-sheet-open", isOpen);
+    document.body.classList.toggle("is-sheet-open", isOpen);
+  },
+
   openSheet(sheetEl) {
     if (!sheetEl) return;
     sheetEl.hidden = false;
-    document.body.classList.add("is-sheet-open");
+    this.setSheetLock(true);
   },
 
   closeSheet(sheetEl) {
@@ -261,9 +269,10 @@ const OffersApp = {
       (!categorySheet || categorySheet.hidden);
 
     if (allClosed) {
-      document.body.classList.remove("is-sheet-open");
+      this.setSheetLock(false);
     }
   },
+  // END: FILTER_SHEET_LOCK_HELPERS
 
   setActiveOption(container, attrName, activeValue) {
     if (!container) return;
@@ -274,8 +283,10 @@ const OffersApp = {
     });
   },
 
+  // BEGIN: FILTER_BAR_STATE_SYNC
   updateFilterBarUI() {
-    const { situationValue, categoryValue, resetPill } = this.refs;
+    const { searchRow, situationValue, categoryValue, resetPill } = this.refs;
+    const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
 
     if (situationValue) {
       situationValue.textContent = this.activeSituation || "Alle";
@@ -286,10 +297,14 @@ const OffersApp = {
     }
 
     if (resetPill) {
-      const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
       resetPill.hidden = !hasActiveFilters;
     }
+
+    if (searchRow) {
+      searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
+    }
   },
+  // END: FILTER_BAR_STATE_SYNC
 
   resetFilters() {
     this.searchTerm = "";
