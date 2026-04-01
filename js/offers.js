@@ -1,156 +1,108 @@
 // BEGIN: FILE_HEADER_OFFERS
 // Datei: js/offers.js
-// Zweck: Angebots-Cards anzeigen (Rendering = Anzeigen)
-// Verantwortlich für:
-// - Aus einer Angebots-Liste DOM-Karten bauen und im Container anzeigen
-// - Interaktion: Klick/Enter/Space → (optional) Link öffnen
-//
-// Nicht verantwortlich für:
-// - Daten laden (liegt in js/offers-main.js)
-// - Filter-State / Filter-UI (derzeit nicht Teil von Angebote)
-//
-// Contract:
-// - bekommt bereits normalisierte Offers von js/offers-main.js
-// - öffentliche API: OfferCards.render(offers)
+// Zweck:
+// - Rendert Activity Cards im Feed der Aktivitäten-Seite
+// - Öffnet das Activity-Detailpanel bei Klick/Enter/Space
 // END: FILE_HEADER_OFFERS
-
 
 const OfferCards = (() => {
   let container = null;
 
-  /* === BEGIN BLOCK: HTML_ESCAPE (pure helper) ===
-  Zweck: XSS-sicheres Escaping für Text, der via innerHTML gesetzt wird.
-  Umfang: Lokaler Helper (kein this-Binding-Risiko).
-  === */
-  function escapeHtml(value) {
-    const s = value == null ? "" : String(value);
-    return s.replace(/[&<>"']/g, (ch) => {
-      switch (ch) {
-        case "&":
-          return "&amp;";
-        case "<":
-          return "&lt;";
-        case ">":
-          return "&gt;";
-        case '"':
-          return "&quot;";
-        case "'":
-          return "&#39;";
-        default:
-          return ch;
-      }
-    });
-  }
-  /* === END BLOCK: HTML_ESCAPE (pure helper) === */
-
-  /* === BEGIN BLOCK: CONTAINER_LOOKUP (offers) ===
-  Zweck: Einheitliche Container-Auflösung für Angebotsseite.
-  Umfang: Nutzt #offer-cards als Ziel.
-  === */
   function ensureContainer() {
     if (!container) container = document.getElementById("offer-cards");
     return container;
   }
-  /* === END BLOCK: CONTAINER_LOOKUP (offers) === */
 
-      /* === BEGIN BLOCK: CATEGORY_ICON (optional, neutral) ===
-  Zweck: Kategorie-Icon-Zuordnung für die finalen Hauptkategorien (rein dekorativ).
-  Umfang: Feste Map; unbekannt => leer.
-  === */
-  function getCategoryIcon(category) {
-    const c = (category || "").toString().trim().toLowerCase();
-    if (!c) return "";
-
-    const map = {
-      baden: "🏊",
-      natur: "🌿",
-      familie: "👨‍👩‍👧‍👦",
-      freizeit: "🎯",
-      kultur: "🎭"
-    };
-
-    return map[c] || "";
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+      switch (ch) {
+        case "&": return "&amp;";
+        case "<": return "&lt;";
+        case ">": return "&gt;";
+        case '"': return "&quot;";
+        case "'": return "&#39;";
+        default: return ch;
+      }
+    });
   }
-  /* === END BLOCK: CATEGORY_ICON (optional, neutral) === */
 
-  /* === BEGIN BLOCK: CREATE_CARD (offers → event-card DNA) ===
-  Zweck: Offer-Cards minimal nach PROJECT.md:
-  - Titel
-  - Hauptkategorie
-  - Location
-  - Kategorie-Icon
-  Interaktion:
-  - Klick/Enter/Space → Offer-Detailpanel (window.OfferDetailPanel.show)
-  Umfang: Erzeugt .event-card mit .event-title + .event-meta + .event-location.
-  === */
+  function slugify(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9äöüß]+/gi, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function renderMedia(offer) {
+    if (offer.image) {
+      return `
+        <div class="discovery-card__media">
+          <img src="${escapeHtml(offer.image)}" alt="${escapeHtml(offer.title)}" loading="lazy">
+        </div>
+      `.trim();
+    }
+
+    const modifier = slugify(offer.kategorie || "aktivitaet");
+    const shortLabel = escapeHtml((offer.kategorie || "Aktivität").split("&")[0].trim());
+
+    return `
+      <div class="discovery-card__media discovery-card__media--fallback discovery-card__media--${modifier}">
+        <span class="discovery-card__media-label">${shortLabel}</span>
+      </div>
+    `.trim();
+  }
+
+  function renderTags(tags) {
+    const visibleTags = (Array.isArray(tags) ? tags : []).slice(0, 4);
+    if (!visibleTags.length) return "";
+    return `
+      <div class="discovery-card__chips">
+        ${visibleTags.map((tag) => `<span class="discovery-chip">${escapeHtml(tag)}</span>`).join("")}
+      </div>
+    `.trim();
+  }
+
+  function renderMeta(offer) {
+    const parts = [offer.duration, offer.mode, offer.price].filter(Boolean).slice(0, 3);
+    if (!parts.length) return "";
+    return `<div class="discovery-card__meta">${parts.map(escapeHtml).join(" · ")}</div>`;
+  }
+
   function createCard(offer) {
-    const card = document.createElement("div");
-    card.className = "event-card";
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
+    const article = document.createElement("article");
+    article.className = "event-card discovery-card";
+    article.tabIndex = 0;
+    article.setAttribute("role", "button");
+    article.setAttribute("aria-label", `Aktivität anzeigen: ${offer.title}`);
 
-    const title = (offer?.title || "").toString().trim();
-    const category = (offer?.kategorie || "").toString().trim();
-    const location = (offer?.location || "").toString().trim();
+    article.innerHTML = `
+      ${renderMedia(offer)}
+      <div class="discovery-card__body">
+        <h2 class="discovery-card__title">${escapeHtml(offer.title)}</h2>
+        <div class="discovery-card__place">${escapeHtml(offer.location)}</div>
+        <p class="discovery-card__description">${escapeHtml(offer.description)}</p>
+        ${renderTags(offer.tags)}
+        ${renderMeta(offer)}
+      </div>
+    `.trim();
 
-    card.setAttribute("aria-label", `Angebot anzeigen: ${title || "Ohne Titel"}`);
-
-    const icon = getCategoryIcon(category);
-    if (icon) {
-      const iconEl = document.createElement("span");
-      iconEl.className = "event-category-icon";
-      iconEl.setAttribute("role", "img");
-      iconEl.setAttribute("aria-label", `Kategorie: ${category}`);
-      iconEl.textContent = icon;
-      card.appendChild(iconEl);
-    }
-
-    const titleEl = document.createElement("div");
-    titleEl.className = "event-title";
-    titleEl.textContent = title || "Ohne Titel";
-    card.appendChild(titleEl);
-
-    const metaEl = document.createElement("div");
-    metaEl.className = "event-meta";
-    metaEl.textContent = category || "";
-    card.appendChild(metaEl);
-
-    if (location) {
-      const locWrap = document.createElement("div");
-      locWrap.className = "event-location";
-
-      const locText = document.createElement("div");
-      locText.className = "event-location-text";
-      locText.textContent = location;
-      locWrap.appendChild(locText);
-
-      card.appendChild(locWrap);
-    }
-
-    /* === BEGIN BLOCK: OFFERCARD OPEN DETAILPANEL === */
     const open = () => {
-      if (window.OfferDetailPanel?.show) window.OfferDetailPanel.show(offer);
+      if (window.OfferDetailPanel?.show) {
+        window.OfferDetailPanel.show(offer);
+      }
     };
 
-    card.addEventListener("click", open);
-    card.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      e.preventDefault();
+    article.addEventListener("click", open);
+    article.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
       open();
     });
-    /* === END BLOCK: OFFERCARD OPEN DETAILPANEL === */
 
-    return card;
+    return article;
   }
-  /* === END BLOCK: CREATE_CARD (offers → event-card DNA) === */
 
-
-
-
-  /* === BEGIN BLOCK: RENDER (offers) ===
-  Zweck: Rendert komplette Angebotsliste in #offer-cards inkl. Empty-State.
-  Umfang: Clears container + fügt Cards hinzu.
-  === */
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -158,14 +110,15 @@ const OfferCards = (() => {
     target.innerHTML = "";
 
     const list = Array.isArray(offers) ? offers : [];
-    if (list.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "content-card";
-      empty.innerHTML = `
-        <h2>Keine Angebote gefunden</h2>
-        <p>Aktuell sind noch keine Angebote hinterlegt.</p>
+    if (!list.length) {
+      target.innerHTML = `
+        <section class="empty-state">
+          <div class="empty-state__card">
+            <h2 class="empty-state__title">Keine Aktivitäten gefunden</h2>
+            <p class="empty-state__text">Passe Suche oder Filter an, um weitere Freizeitideen für Bocholt und Umgebung zu sehen.</p>
+          </div>
+        </section>
       `.trim();
-      target.appendChild(empty);
       return;
     }
 
@@ -173,12 +126,8 @@ const OfferCards = (() => {
       target.appendChild(createCard(offer));
     }
   }
-  /* === END BLOCK: RENDER (offers) === */
 
-  return {
-    render
-  };
+  return { render };
 })();
 
-// Export (browser global)
 window.OfferCards = OfferCards;
