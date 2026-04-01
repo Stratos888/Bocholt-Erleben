@@ -55,12 +55,12 @@ Umfang:
 <!-- === END BLOCK: HEADER (logo/title + install + about) === -->
 
 <main class="page page--activities">
-  <!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS (home-dna, no hero overload) ===
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS (home-dna, no hero overload) ===
   Zweck:
   - übernimmt die Home-Grammatik (Intro + top-stack + Search + 2 Controls)
   - bleibt mobile-first kompakt
   Umfang:
-  - oberer Bereich der Aktivitätenseite
+  - oberer Bereich der Aktivitätenseite inkl. Activity-Filter-Sheets
   === -->
   <section class="desktop-hero activities-hero" aria-label="Aktivitäten finden">
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
@@ -75,12 +75,12 @@ Umfang:
     <div class="top-stack activities-top-stack">
       <div class="desktop-hero__search-row activities-controls" aria-label="Suche und Filter">
         <div class="events-filter desktop-hero__search-slot">
-          <label class="desktop-hero__search-field" for="activity-search-filter">
+          <label class="desktop-hero__search-field" for="search-filter">
             <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
             <input
-              id="activity-search-filter"
+              id="search-filter"
               type="search"
-              placeholder="Aktivitäten suchen"
+              placeholder="Aktivität oder Ort suchen"
               aria-label="Aktivitäten suchen"
               autocomplete="off"
               inputmode="search"
@@ -88,22 +88,60 @@ Umfang:
           </label>
         </div>
 
-        <label class="activity-filter" for="offer-situation">
-          <span class="activity-filter__label">Situation</span>
-          <select id="offer-situation" class="activity-filter__select" aria-label="Situation filtern">
-            <option value="">Alle</option>
-          </select>
-        </label>
+        <button
+          type="button"
+          class="filter-pill desktop-hero__toolbar-pill"
+          id="offer-situation-pill"
+          aria-haspopup="dialog"
+          aria-controls="sheet-situation"
+        >
+          <span class="filter-pill__label">Situation</span>
+          <span class="filter-pill__value" id="offer-situation-value">Alle</span>
+        </button>
 
-        <label class="activity-filter" for="offer-category">
-          <span class="activity-filter__label">Bereich</span>
-          <select id="offer-category" class="activity-filter__select" aria-label="Bereich filtern">
-            <option value="">Alle</option>
-          </select>
-        </label>
+        <button
+          type="button"
+          class="filter-pill desktop-hero__toolbar-pill"
+          id="offer-category-pill"
+          aria-haspopup="dialog"
+          aria-controls="sheet-category"
+        >
+          <span class="filter-pill__label">Bereich</span>
+          <span class="filter-pill__value" id="offer-category-value">Alle</span>
+        </button>
+
+        <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" hidden>
+          Zurücksetzen
+        </button>
       </div>
     </div>
   </section>
+
+  <div class="filter-sheet" id="sheet-situation" role="dialog" aria-modal="true" aria-label="Situation auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Situation</div>
+        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      </div>
+      <div class="filter-sheet__body" id="sheet-situation-options">
+        <button type="button" class="filter-sheet-option is-active" data-situation="">Alle</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Bereich auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Bereich</div>
+        <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      </div>
+      <div class="filter-sheet__body" id="sheet-category-options">
+        <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+      </div>
+    </div>
+  </div>
   <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS (home-dna, no hero overload) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
