@@ -3,13 +3,14 @@
 // Zweck:
 // - Bootstrapping für Aktivitäten-Seite (/angebote/)
 // - Lädt /data/offers.json, normalisiert Aktivitätsdaten und rendert den Feed
-// - Bindet Suche + 2 Primärfilter (Situation + Bereich)
+// - Bindet Suche + 2 Primärfilter (Situation + Bereich) im gleichen Pill-/Sheet-Modell wie die Event-Seite
 //
 // Verantwortlich für:
 // - Daten laden + Fehlerbehandlung
 // - Normalisierung
 // - Such-/Filter-State
 // - Render-Aufruf an window.OfferCards
+// - Activity Filter Pills + Sheets
 //
 // Nicht verantwortlich für:
 // - Card-Markup (js/offers.js)
@@ -23,8 +24,22 @@ const OffersApp = {
   activeSituation: "",
   activeCategory: "",
 
+  refs: {
+    searchInput: null,
+    situationPill: null,
+    categoryPill: null,
+    resetPill: null,
+    situationValue: null,
+    categoryValue: null,
+    situationSheet: null,
+    categorySheet: null,
+    situationOptions: null,
+    categoryOptions: null
+  },
+
   async init() {
     debugLog?.("=== ACTIVITIES - APP START ===");
+    this.cacheRefs();
     this.showLoading(true);
 
     try {
@@ -48,6 +63,7 @@ const OffersApp = {
       this.bindControls();
       this.populateSituationOptions();
       this.populateCategoryOptions();
+      this.updateFilterBarUI();
       this.applyFilterAndRender();
       this.showLoading(false);
 
@@ -56,6 +72,19 @@ const OffersApp = {
       console.error("Activities initialization failed:", error);
       this.showError("Fehler beim Laden der Aktivitäten. Bitte Seite neu laden.");
     }
+  },
+
+  cacheRefs() {
+    this.refs.searchInput = document.getElementById("search-filter");
+    this.refs.situationPill = document.getElementById("offer-situation-pill");
+    this.refs.categoryPill = document.getElementById("offer-category-pill");
+    this.refs.resetPill = document.getElementById("offer-reset-pill");
+    this.refs.situationValue = document.getElementById("offer-situation-value");
+    this.refs.categoryValue = document.getElementById("offer-category-value");
+    this.refs.situationSheet = document.getElementById("sheet-situation");
+    this.refs.categorySheet = document.getElementById("sheet-category");
+    this.refs.situationOptions = document.getElementById("sheet-situation-options");
+    this.refs.categoryOptions = document.getElementById("sheet-category-options");
   },
 
   normalizeOffer(raw) {
@@ -96,9 +125,16 @@ const OffersApp = {
   },
 
   bindControls() {
-    const searchInput = document.getElementById("activity-search-filter");
-    const situationSelect = document.getElementById("offer-situation");
-    const categorySelect = document.getElementById("offer-category");
+    const {
+      searchInput,
+      situationPill,
+      categoryPill,
+      resetPill,
+      situationSheet,
+      categorySheet,
+      situationOptions,
+      categoryOptions
+    } = this.refs;
 
     if (searchInput) {
       searchInput.addEventListener("input", () => {
@@ -107,55 +143,170 @@ const OffersApp = {
       });
     }
 
-    if (situationSelect) {
-      situationSelect.addEventListener("change", () => {
-        this.activeSituation = String(situationSelect.value || "").trim();
+    if (situationPill && situationSheet) {
+      situationPill.addEventListener("click", () => {
+        if (!situationSheet.hidden) {
+          this.closeSheet(situationSheet);
+          return;
+        }
+        this.closeSheet(categorySheet);
+        this.openSheet(situationSheet);
+      });
+    }
+
+    if (categoryPill && categorySheet) {
+      categoryPill.addEventListener("click", () => {
+        if (!categorySheet.hidden) {
+          this.closeSheet(categorySheet);
+          return;
+        }
+        this.closeSheet(situationSheet);
+        this.openSheet(categorySheet);
+      });
+    }
+
+    if (resetPill) {
+      resetPill.addEventListener("click", () => {
+        this.resetFilters();
+      });
+    }
+
+    [situationSheet, categorySheet].forEach((sheetEl) => {
+      if (!sheetEl) return;
+
+      sheetEl.addEventListener("click", (event) => {
+        const closeTrigger = event.target.closest("[data-close-sheet]");
+        if (closeTrigger) {
+          this.closeSheet(sheetEl);
+        }
+      });
+    });
+
+    if (situationOptions) {
+      situationOptions.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-situation]");
+        if (!button) return;
+
+        this.activeSituation = String(button.getAttribute("data-situation") || "").trim();
+        this.setActiveOption(situationOptions, "data-situation", this.activeSituation);
+        this.closeSheet(situationSheet);
         this.applyFilterAndRender();
       });
     }
 
-    if (categorySelect) {
-      categorySelect.addEventListener("change", () => {
-        this.activeCategory = String(categorySelect.value || "").trim();
+    if (categoryOptions) {
+      categoryOptions.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-category]");
+        if (!button) return;
+
+        this.activeCategory = String(button.getAttribute("data-category") || "").trim();
+        this.setActiveOption(categoryOptions, "data-category", this.activeCategory);
+        this.closeSheet(categorySheet);
         this.applyFilterAndRender();
       });
     }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      this.closeSheet(situationSheet);
+      this.closeSheet(categorySheet);
+    });
   },
 
   populateSituationOptions() {
-    const select = document.getElementById("offer-situation");
-    if (!select) return;
-
-    while (select.options.length > 1) select.remove(1);
+    const target = this.refs.situationOptions;
+    if (!target) return;
 
     const situations = Array.from(
       new Set(this.offers.flatMap((offer) => offer.tags || []).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b, "de"));
 
-    for (const situation of situations) {
-      const option = document.createElement("option");
-      option.value = situation;
-      option.textContent = situation;
-      select.appendChild(option);
-    }
+    target.innerHTML = [
+      `<button type="button" class="filter-sheet-option is-active" data-situation="">Alle</button>`,
+      ...situations.map((situation) => (
+        `<button type="button" class="filter-sheet-option" data-situation="${this.escapeHtmlAttr(situation)}">${this.escapeHtml(situation)}</button>`
+      ))
+    ].join("");
   },
 
   populateCategoryOptions() {
-    const select = document.getElementById("offer-category");
-    if (!select) return;
-
-    while (select.options.length > 1) select.remove(1);
+    const target = this.refs.categoryOptions;
+    if (!target) return;
 
     const categories = Array.from(
       new Set(this.offers.map((offer) => offer.kategorie).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b, "de"));
 
-    for (const category of categories) {
-      const option = document.createElement("option");
-      option.value = category;
-      option.textContent = category;
-      select.appendChild(option);
+    target.innerHTML = [
+      `<button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>`,
+      ...categories.map((category) => (
+        `<button type="button" class="filter-sheet-option" data-category="${this.escapeHtmlAttr(category)}">${this.escapeHtml(category)}</button>`
+      ))
+    ].join("");
+  },
+
+  openSheet(sheetEl) {
+    if (!sheetEl) return;
+    sheetEl.hidden = false;
+    document.body.classList.add("is-sheet-open");
+  },
+
+  closeSheet(sheetEl) {
+    if (!sheetEl) return;
+    sheetEl.hidden = true;
+
+    const { situationSheet, categorySheet } = this.refs;
+    const allClosed =
+      (!situationSheet || situationSheet.hidden) &&
+      (!categorySheet || categorySheet.hidden);
+
+    if (allClosed) {
+      document.body.classList.remove("is-sheet-open");
     }
+  },
+
+  setActiveOption(container, attrName, activeValue) {
+    if (!container) return;
+
+    container.querySelectorAll(".filter-sheet-option").forEach((button) => {
+      const value = String(button.getAttribute(attrName) || "").trim();
+      button.classList.toggle("is-active", value === activeValue);
+    });
+  },
+
+  updateFilterBarUI() {
+    const { situationValue, categoryValue, resetPill } = this.refs;
+
+    if (situationValue) {
+      situationValue.textContent = this.activeSituation || "Alle";
+    }
+
+    if (categoryValue) {
+      categoryValue.textContent = this.activeCategory || "Alle";
+    }
+
+    if (resetPill) {
+      const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
+      resetPill.hidden = !hasActiveFilters;
+    }
+  },
+
+  resetFilters() {
+    this.searchTerm = "";
+    this.activeSituation = "";
+    this.activeCategory = "";
+
+    if (this.refs.searchInput) {
+      this.refs.searchInput.value = "";
+    }
+
+    this.setActiveOption(this.refs.situationOptions, "data-situation", "");
+    this.setActiveOption(this.refs.categoryOptions, "data-category", "");
+
+    this.closeSheet(this.refs.situationSheet);
+    this.closeSheet(this.refs.categorySheet);
+
+    this.applyFilterAndRender();
   },
 
   matchesSearch(offer) {
@@ -198,6 +349,7 @@ const OffersApp = {
       return;
     }
 
+    this.updateFilterBarUI();
     this.showLoading(false);
     window.OfferCards.render(this.filteredOffers);
   },
@@ -231,6 +383,23 @@ const OffersApp = {
       </div>
     `.trim();
     loadingEl.style.display = "flex";
+  },
+
+  escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+      switch (ch) {
+        case "&": return "&amp;";
+        case "<": return "&lt;";
+        case ">": return "&gt;";
+        case '"': return "&quot;";
+        case "'": return "&#39;";
+        default: return ch;
+      }
+    });
+  },
+
+  escapeHtmlAttr(value) {
+    return this.escapeHtml(value);
   }
 };
 
