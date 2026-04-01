@@ -3,12 +3,14 @@
 // Zweck:
 // - Activity-Detailpanel für die Aktivitäten-Seite
 // - Reused Overlay-/Panel-Familie des Event-Detailpanels
+// - Nutzt den gleichen Scroll-Container wie das Event-Detailpanel
 // END: FILE_HEADER_OFFERS_DETAILS
 
 const OfferDetailPanel = {
   panel: null,
   overlay: null,
   content: null,
+  body: null,
   closeBtn: null,
   _isInit: false,
   _lastFocusEl: null,
@@ -23,18 +25,22 @@ const OfferDetailPanel = {
       <div id="event-detail-panel" class="detail-panel hidden" hidden>
         <div class="detail-panel-overlay"></div>
         <div class="detail-panel-content">
+          <div class="detail-panel-grabber" aria-hidden="true"></div>
           <button class="detail-panel-close" aria-label="Schließen">&times;</button>
-          <div id="detail-content"></div>
+          <div class="detail-panel-body">
+            <div id="detail-content"></div>
+          </div>
         </div>
       </div>
     `.trim();
 
     this.panel = document.getElementById("event-detail-panel");
     this.overlay = this.panel?.querySelector(".detail-panel-overlay");
+    this.body = this.panel?.querySelector(".detail-panel-body");
     this.content = document.getElementById("detail-content");
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
 
-    if (!this.panel || !this.overlay || !this.content || !this.closeBtn) return;
+    if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
 
     this.overlay.addEventListener("click", (event) => {
       if (event.target === this.overlay) this.hide();
@@ -56,7 +62,7 @@ const OfferDetailPanel = {
 
   show(offer) {
     if (!this._isInit) this.init();
-    if (!this.panel || !this.content) return;
+    if (!this.panel || !this.content || !this.body) return;
 
     this._lastFocusEl =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -66,8 +72,11 @@ const OfferDetailPanel = {
     this.panel.classList.remove("hidden");
     this.panel.removeAttribute("hidden");
 
+    this.body.scrollTop = 0;
+
     requestAnimationFrame(() => {
       this.panel.classList.add("active");
+      document.documentElement.classList.add("is-panel-open");
       document.body.classList.add("is-panel-open");
       this.closeBtn.focus();
     });
@@ -77,11 +86,13 @@ const OfferDetailPanel = {
     if (!this.panel) return;
 
     this.panel.classList.remove("active");
+    document.documentElement.classList.remove("is-panel-open");
     document.body.classList.remove("is-panel-open");
 
     window.setTimeout(() => {
       this.panel.classList.add("hidden");
       this.panel.setAttribute("hidden", "");
+      if (this.body) this.body.scrollTop = 0;
       if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
         this._lastFocusEl.focus();
       }
