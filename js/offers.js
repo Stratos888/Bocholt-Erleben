@@ -35,6 +35,23 @@ const OfferCards = (() => {
       .replace(/^-+|-+$/g, "");
   }
 
+  // BEGIN: ACTIVITY_CARD_THUMB_LABEL_MAPPING
+  function getThumbLabel(category) {
+    const normalized = String(category || "").trim().toLowerCase();
+
+    if (!normalized) return "Aktiv";
+    if (normalized.includes("sport")) return "Sport";
+    if (normalized.includes("natur")) return "Natur";
+    if (normalized.includes("kultur")) return "Kultur";
+    if (normalized.includes("freizeit")) return "Freizeit";
+
+    return String(category || "Aktiv")
+      .split("&")[0]
+      .split("/")[0]
+      .trim();
+  }
+  // END: ACTIVITY_CARD_THUMB_LABEL_MAPPING
+
   function renderThumb(offer) {
     if (offer.image) {
       return `
@@ -45,7 +62,7 @@ const OfferCards = (() => {
     }
 
     const modifier = slugify(offer.kategorie || "aktivitaet");
-    const shortLabel = escapeHtml((offer.kategorie || "Aktivität").split("&")[0].trim());
+    const shortLabel = escapeHtml(getThumbLabel(offer.kategorie));
 
     return `
       <div class="activity-card-thumb activity-card-thumb--fallback activity-card-thumb--${modifier}">
