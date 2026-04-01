@@ -1,164 +1,145 @@
 // BEGIN: FILE_HEADER_OFFERS_MAIN
 // Datei: js/offers-main.js
 // Zweck:
-// - Bootstrapping für Angebote-Seite
-// - Lädt Angebots-Daten (Fetch) und hält die vollständige Offer-Liste
-// - Übergibt normalisierte Daten an OfferCards.render (Rendering liegt in js/offers.js)
+// - Bootstrapping für Aktivitäten-Seite (/angebote/)
+// - Lädt /data/offers.json, normalisiert Aktivitätsdaten und rendert den Feed
+// - Bindet Suche + 2 Primärfilter (Situation + Bereich)
 //
 // Verantwortlich für:
-// - Daten laden + Fehlerbehandlung (Loading/Empty/Error UI)
-// - Normalisierung auf kanonische Felder (title/category/location/hint/url)
+// - Daten laden + Fehlerbehandlung
+// - Normalisierung
+// - Such-/Filter-State
+// - Render-Aufruf an window.OfferCards
 //
 // Nicht verantwortlich für:
-// - Card-Layout (liegt in js/offers.js)
-// - Filter/Details (derzeit nicht Teil von Angebote)
-//
-// Contract:
-// - benutzt /data/offers.json als Datenquelle (no-store)
-// - erwartet #loading im DOM (wie Startseite)
+// - Card-Markup (js/offers.js)
+// - Detailpanel-Markup (js/offers-details.js)
 // END: FILE_HEADER_OFFERS_MAIN
-
 
 const OffersApp = {
   offers: [],
   filteredOffers: [],
+  searchTerm: "",
+  activeSituation: "",
   activeCategory: "",
-  activeTag: "",
 
   async init() {
-    debugLog?.("=== OFFERS - APP START ===");
-
+    debugLog?.("=== ACTIVITIES - APP START ===");
     this.showLoading(true);
 
     try {
-      /* === BEGIN BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) ===
-Zweck:
-- Lädt /data/offers.json (no-store)
-- Unterstützt beide Root-Formate:
-  (A) Array-Root: [ {...}, {...} ]
-  (B) Objekt-Root: { offers: [ {...}, {...} ] }
-- Normalisiert Felder konsistent zu Events:
-  - kategorie
-  - description Pflicht
-  - url Pflicht
-  - tags optional (Array)
-Umfang: Gesamter fetch/parse/normalize/validation Block in OffersApp.init().
-=== */
       const response = await fetch("/data/offers.json", { cache: "no-store" });
-
       if (!response.ok) {
         throw new Error(`offers.json load failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      const rawOffers = Array.isArray(data) ? data : (Array.isArray(data?.offers) ? data.offers : []);
 
-      const rawOffers = Array.isArray(data)
-        ? data
-        : (Array.isArray(data?.offers) ? data.offers : []);
+      this.offers = rawOffers
+        .map(this.normalizeOffer)
+        .filter(Boolean);
 
-      const normalizeOffer = (o) => {
-        const obj = o && typeof o === "object" ? o : {};
-
-        const id = (obj.id ?? "").toString().trim();
-        const title = (obj.title ?? obj.name ?? "").toString().trim();
-        const kategorie = (obj.kategorie ?? obj.category ?? "").toString().trim();
-        const location = (obj.location ?? obj.ort ?? "").toString().trim();
-        const hint = (obj.hint ?? obj.zeit ?? obj.note ?? "").toString().trim();
-        const description = (obj.description ?? "").toString().trim();
-        const url = (obj.url ?? obj.link ?? "").toString().trim();
-
-        const rawTags = Array.isArray(obj.tags) ? obj.tags : [];
-        const tags = rawTags
-          .map((t) => (t == null ? "" : String(t)).trim())
-          .filter(Boolean);
-
-        return {
-          ...obj,
-          id,
-          title,
-          kategorie,
-          location,
-          hint,
-          description,
-          url,
-          tags
-        };
-      };
-
-      this.offers = rawOffers.map(normalizeOffer);
-
-      // Pflichtfelder prüfen (Fail-Fast)
-      const invalid = this.offers.filter((o) => !o.title || !o.kategorie || !o.description || !o.url);
-      if (invalid.length > 0) {
-        console.error("Invalid offers (missing required fields):", invalid);
-        this.showError("Angebote-Daten sind unvollständig (Pflichtfelder fehlen).");
-        return;
-      }
-      /* === END BLOCK: OFFERS FETCH + NORMALIZE (events-consistent, required fields) === */
-
-      if (this.offers.length === 0) {
+      if (!this.offers.length) {
         this.showNoOffers();
         return;
       }
 
-      // Filter initialisieren
-      this.bindFilters();
+      this.bindControls();
+      this.populateSituationOptions();
       this.populateCategoryOptions();
-      this.populateTagOptions(); // initial (alle Tags)
-
-      // Initial render (ohne Filter)
       this.applyFilterAndRender();
-
       this.showLoading(false);
 
-      debugLog?.(`=== OFFERS READY - ${this.offers.length} offers loaded ===`);
+      debugLog?.(`=== ACTIVITIES READY - ${this.offers.length} activities loaded ===`);
     } catch (error) {
-      console.error("Offers initialization failed:", error);
-      this.showError("Fehler beim Laden der Angebote. Bitte Seite neu laden.");
+      console.error("Activities initialization failed:", error);
+      this.showError("Fehler beim Laden der Aktivitäten. Bitte Seite neu laden.");
     }
   },
 
-  /* === BEGIN BLOCK: FILTER_BIND (category + tag) ===
-Zweck:
-- Kategorie/Tag Dropdowns binden
-- Bei Kategorie-Wechsel: Tag-Optionen facettieren + ggf. ungültigen Tag resetten
-- Re-render nach jeder Änderung
-Umfang: Nur Filter-Logik.
-=== */
-  bindFilters() {
-    const catSelect = document.getElementById("offer-category");
-    const tagSelect = document.getElementById("offer-tag");
+  normalizeOffer(raw) {
+    const obj = raw && typeof raw === "object" ? raw : {};
+    const id = String(obj.id || "").trim();
+    const title = String(obj.title || "").trim();
+    const kategorie = String(obj.kategorie || obj.category || "").trim();
+    const location = String(obj.location || obj.place_name || obj.ort || "").trim();
+    const description = String(obj.description || "").trim();
+    const url = String(obj.url || obj.link || "").trim();
 
-    if (catSelect) {
-      catSelect.addEventListener("change", () => {
-        this.activeCategory = (catSelect.value || "").toString();
+    if (!id || !title || !kategorie || !location || !description || !url) {
+      return null;
+    }
 
-        // Tag-Optionen abhängig von Kategorie aktualisieren
-        this.populateTagOptions();
+    const normalizeArray = (value) =>
+      Array.isArray(value)
+        ? value.map((item) => String(item || "").trim()).filter(Boolean)
+        : [];
 
-        // Falls aktiver Tag in dieser Kategorie nicht vorkommt → reset
-        if (this.activeTag && !this.getAvailableTagsForCurrentCategory().includes(this.activeTag)) {
-          this.activeTag = "";
-          if (tagSelect) tagSelect.value = "";
-        }
+    return {
+      id,
+      title,
+      kategorie,
+      location,
+      description,
+      url,
+      tags: normalizeArray(obj.tags),
+      audience: normalizeArray(obj.audience),
+      image: String(obj.image || "").trim(),
+      duration: String(obj.duration || "").trim(),
+      mode: String(obj.mode || "").trim(),
+      price: String(obj.price || "").trim(),
+      area: String(obj.area || "").trim(),
+      season: String(obj.season || "").trim(),
+      hint: String(obj.hint || "").trim()
+    };
+  },
 
+  bindControls() {
+    const searchInput = document.getElementById("activity-search-filter");
+    const situationSelect = document.getElementById("offer-situation");
+    const categorySelect = document.getElementById("offer-category");
+
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        this.searchTerm = String(searchInput.value || "").trim().toLowerCase();
         this.applyFilterAndRender();
       });
     }
 
-    if (tagSelect) {
-      tagSelect.addEventListener("change", () => {
-        this.activeTag = (tagSelect.value || "").toString();
+    if (situationSelect) {
+      situationSelect.addEventListener("change", () => {
+        this.activeSituation = String(situationSelect.value || "").trim();
+        this.applyFilterAndRender();
+      });
+    }
+
+    if (categorySelect) {
+      categorySelect.addEventListener("change", () => {
+        this.activeCategory = String(categorySelect.value || "").trim();
         this.applyFilterAndRender();
       });
     }
   },
-  /* === END BLOCK: FILTER_BIND (category + tag) === */
 
-  /* === BEGIN BLOCK: FILTER_OPTIONS (category) ===
-Zweck: Kategorie-Dropdown aus Angeboten befüllen (einmal beim Init).
-Umfang: Sortierte Unique-Liste.
-=== */
+  populateSituationOptions() {
+    const select = document.getElementById("offer-situation");
+    if (!select) return;
+
+    while (select.options.length > 1) select.remove(1);
+
+    const situations = Array.from(
+      new Set(this.offers.flatMap((offer) => offer.tags || []).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b, "de"));
+
+    for (const situation of situations) {
+      const option = document.createElement("option");
+      option.value = situation;
+      option.textContent = situation;
+      select.appendChild(option);
+    }
+  },
+
   populateCategoryOptions() {
     const select = document.getElementById("offer-category");
     if (!select) return;
@@ -166,135 +147,95 @@ Umfang: Sortierte Unique-Liste.
     while (select.options.length > 1) select.remove(1);
 
     const categories = Array.from(
-      new Set(this.offers.map((o) => o.kategorie).filter(Boolean))
+      new Set(this.offers.map((offer) => offer.kategorie).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b, "de"));
 
-    for (const cat of categories) {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
-      select.appendChild(opt);
+    for (const category of categories) {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      select.appendChild(option);
     }
   },
-  /* === END BLOCK: FILTER_OPTIONS (category) === */
 
-  /* === BEGIN BLOCK: FILTER_OPTIONS (tag, faceted) ===
-Zweck:
-- Aktivitäts-Dropdown aus offers[].tags befüllen
-- Facettierung: Wenn Kategorie aktiv ist, nur Tags zeigen, die in dieser Kategorie vorkommen
-Umfang: Sortierte Unique-Liste, inkl. "Alle".
-=== */
-  populateTagOptions() {
-    const select = document.getElementById("offer-tag");
-    if (!select) return;
+  matchesSearch(offer) {
+    if (!this.searchTerm) return true;
 
-    while (select.options.length > 1) select.remove(1);
+    const haystack = [
+      offer.title,
+      offer.location,
+      offer.description,
+      offer.kategorie,
+      offer.area,
+      offer.duration,
+      offer.mode,
+      offer.price,
+      offer.hint,
+      ...(offer.tags || []),
+      ...(offer.audience || [])
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
 
-    const tags = this.getAvailableTagsForCurrentCategory()
-      .slice()
-      .sort((a, b) => a.localeCompare(b, "de"));
-
-    for (const tag of tags) {
-      const opt = document.createElement("option");
-      opt.value = tag;
-      opt.textContent = tag;
-      select.appendChild(opt);
-    }
+    return haystack.includes(this.searchTerm);
   },
-  /* === END BLOCK: FILTER_OPTIONS (tag, faceted) === */
 
-  /* === BEGIN BLOCK: TAGS_AVAILABLE (helper) ===
-Zweck: Liefert die verfügbaren Tags abhängig von der aktiven Kategorie.
-Umfang: Helper für Facettierung + Validierung.
-=== */
-  getAvailableTagsForCurrentCategory() {
-    const cat = (this.activeCategory || "").trim();
-
-    const base = !cat
-      ? this.offers
-      : this.offers.filter((o) => o.kategorie === cat);
-
-    const all = [];
-    for (const o of base) {
-      if (Array.isArray(o.tags)) {
-        for (const t of o.tags) all.push(t);
-      }
-    }
-
-    return Array.from(new Set(all.filter(Boolean)));
-  },
-  /* === END BLOCK: TAGS_AVAILABLE (helper) === */
-
-  /* === BEGIN BLOCK: FILTER_APPLY + RENDER (AND) ===
-Zweck:
-- Filter anwenden und OfferCards rendern
-- Logik: Kategorie AND Tag (wenn gesetzt)
-Umfang: Nur Filter + Render.
-=== */
   applyFilterAndRender() {
-    const cat = (this.activeCategory || "").trim();
-    const tag = (this.activeTag || "").trim();
+    const situation = this.activeSituation;
+    const category = this.activeCategory;
 
-    this.filteredOffers = this.offers.filter((o) => {
-      if (cat && o.kategorie !== cat) return false;
-      if (tag && !(Array.isArray(o.tags) && o.tags.includes(tag))) return false;
+    this.filteredOffers = this.offers.filter((offer) => {
+      if (situation && !(offer.tags || []).includes(situation)) return false;
+      if (category && offer.kategorie !== category) return false;
+      if (!this.matchesSearch(offer)) return false;
       return true;
     });
 
     if (typeof window.OfferCards?.render !== "function") {
-      console.error("❌ OfferCards.render missing – js/offers.js not loaded or has an error.");
-      this.showError("Angebote konnten nicht angezeigt werden (Render-Modul fehlt).");
+      console.error("OfferCards.render missing");
+      this.showError("Aktivitäten konnten nicht angezeigt werden.");
       return;
     }
 
-    OfferCards.render(this.filteredOffers);
+    this.showLoading(false);
+    window.OfferCards.render(this.filteredOffers);
   },
-  /* === END BLOCK: FILTER_APPLY + RENDER (AND) === */
 
   showLoading(show) {
     const loadingEl = document.getElementById("loading");
-    if (loadingEl) {
-      loadingEl.style.display = show ? "flex" : "none";
-    }
+    if (!loadingEl) return;
+    loadingEl.style.display = show ? "flex" : "none";
   },
 
   showNoOffers() {
     const loadingEl = document.getElementById("loading");
-    if (loadingEl) {
-      loadingEl.innerHTML = `
-        <div class="info-message">
-          <p>📭 Aktuell sind keine Angebote verfügbar.</p>
-          <p><small>Bald findest du hier passende Angebote für Bocholt.</small></p>
-        </div>
-      `;
-      loadingEl.style.display = "flex";
-    }
+    if (!loadingEl) return;
+
+    loadingEl.innerHTML = `
+      <div class="info-message">
+        <p>📭 Aktuell sind noch keine Aktivitäten hinterlegt.</p>
+        <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung.</small></p>
+      </div>
+    `.trim();
+    loadingEl.style.display = "flex";
   },
 
   showError(message) {
     const loadingEl = document.getElementById("loading");
-    if (loadingEl) {
-      loadingEl.innerHTML = `
-        <div class="error-message">
-          <p>⚠️ ${message}</p>
-        </div>
-      `;
-      loadingEl.style.display = "flex";
-    }
+    if (!loadingEl) return;
+
+    loadingEl.innerHTML = `
+      <div class="error-message">
+        <p>⚠️ ${message}</p>
+      </div>
+    `.trim();
+    loadingEl.style.display = "flex";
   }
 };
 
-
-
-// App starten sobald DOM ready
-/* === BEGIN BLOCK: OFFERS APP BOOTSTRAP (DOM first, deterministic) ===
-Zweck: Angebote erst nach DOMReady initialisieren.
-Umfang: Start-Hook am Dateiende.
-=== */
 document.addEventListener("DOMContentLoaded", () => {
   OffersApp.init();
 });
-/* === END BLOCK: OFFERS APP BOOTSTRAP (DOM first, deterministic) === */
 
-
-debugLog?.("Offers main module loaded - waiting for DOM ready");
+debugLog?.("Activities main module loaded - waiting for DOM ready");
