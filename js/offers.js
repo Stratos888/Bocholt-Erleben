@@ -1,7 +1,8 @@
 // BEGIN: FILE_HEADER_OFFERS
 // Datei: js/offers.js
 // Zweck:
-// - Rendert Activity Cards im Feed der Aktivitäten-Seite
+// - Rendert kompakte Activity Cards im Feed der Aktivitäten-Seite
+// - Nutzt bewusst die Event-Card-DNA statt der großen Discovery-Card-Fläche
 // - Öffnet das Activity-Detailpanel bei Klick/Enter/Space
 // END: FILE_HEADER_OFFERS
 
@@ -34,10 +35,10 @@ const OfferCards = (() => {
       .replace(/^-+|-+$/g, "");
   }
 
-  function renderMedia(offer) {
+  function renderThumb(offer) {
     if (offer.image) {
       return `
-        <div class="discovery-card__media">
+        <div class="activity-card-thumb">
           <img src="${escapeHtml(offer.image)}" alt="${escapeHtml(offer.title)}" loading="lazy">
         </div>
       `.trim();
@@ -47,43 +48,47 @@ const OfferCards = (() => {
     const shortLabel = escapeHtml((offer.kategorie || "Aktivität").split("&")[0].trim());
 
     return `
-      <div class="discovery-card__media discovery-card__media--fallback discovery-card__media--${modifier}">
-        <span class="discovery-card__media-label">${shortLabel}</span>
+      <div class="activity-card-thumb activity-card-thumb--fallback activity-card-thumb--${modifier}">
+        <span class="activity-card-thumb__label">${shortLabel}</span>
       </div>
     `.trim();
   }
 
   function renderTags(tags) {
-    const visibleTags = (Array.isArray(tags) ? tags : []).slice(0, 4);
+    const visibleTags = (Array.isArray(tags) ? tags : []).filter(Boolean).slice(0, 3);
     if (!visibleTags.length) return "";
     return `
-      <div class="discovery-card__chips">
+      <div class="activity-card-tags">
         ${visibleTags.map((tag) => `<span class="discovery-chip">${escapeHtml(tag)}</span>`).join("")}
       </div>
     `.trim();
   }
 
-  function renderMeta(offer) {
+  function renderQuietMeta(offer) {
     const parts = [offer.duration, offer.mode, offer.price].filter(Boolean).slice(0, 3);
     if (!parts.length) return "";
-    return `<div class="discovery-card__meta">${parts.map(escapeHtml).join(" · ")}</div>`;
+    return `<div class="activity-card-quiet">${parts.map(escapeHtml).join(" · ")}</div>`;
   }
 
   function createCard(offer) {
     const article = document.createElement("article");
-    article.className = "event-card discovery-card";
+    article.className = "event-card discovery-card--compact";
     article.tabIndex = 0;
     article.setAttribute("role", "button");
     article.setAttribute("aria-label", `Aktivität anzeigen: ${offer.title}`);
 
     article.innerHTML = `
-      ${renderMedia(offer)}
-      <div class="discovery-card__body">
-        <h2 class="discovery-card__title">${escapeHtml(offer.title)}</h2>
-        <div class="discovery-card__place">${escapeHtml(offer.location)}</div>
-        <p class="discovery-card__description">${escapeHtml(offer.description)}</p>
+      ${renderThumb(offer)}
+      <div class="event-card-body">
+        <h2 class="event-title">
+          <span class="event-title__text">${escapeHtml(offer.title)}</span>
+        </h2>
+        <div class="event-meta">
+          <span class="event-meta__place">${escapeHtml(offer.location)}</span>
+        </div>
+        <p class="event-card-desc">${escapeHtml(offer.description)}</p>
         ${renderTags(offer.tags)}
-        ${renderMeta(offer)}
+        ${renderQuietMeta(offer)}
       </div>
     `.trim();
 
