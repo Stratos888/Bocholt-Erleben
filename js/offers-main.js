@@ -3,18 +3,7 @@
 // Zweck:
 // - Bootstrapping für Aktivitäten-Seite (/angebote/)
 // - Lädt /data/offers.json, normalisiert Aktivitätsdaten und rendert den Feed
-// - Bindet Suche + 2 Primärfilter (Situation + Bereich) im gleichen Pill-/Sheet-Modell wie die Event-Seite
-//
-// Verantwortlich für:
-// - Daten laden + Fehlerbehandlung
-// - Normalisierung
-// - Such-/Filter-State
-// - Render-Aufruf an window.OfferCards
-// - Activity Filter Pills + Sheets
-//
-// Nicht verantwortlich für:
-// - Card-Markup (js/offers.js)
-// - Detailpanel-Markup (js/offers-details.js)
+// - Bindet Suche + 2 Primärfilter im gleichen Mobile-Sheet-/Desktop-Popover-Modell wie die Event-Seite
 // END: FILE_HEADER_OFFERS_MAIN
 
 const OffersApp = {
@@ -23,6 +12,7 @@ const OffersApp = {
   searchTerm: "",
   activeSituation: "",
   activeCategory: "",
+  activeDesktopPopover: "",
 
   refs: {
     searchInput: null,
@@ -34,8 +24,16 @@ const OffersApp = {
     categoryValue: null,
     situationSheet: null,
     categorySheet: null,
-    situationOptions: null,
-    categoryOptions: null
+    situationSheetOptions: null,
+    categorySheetOptions: null,
+    situationPopover: null,
+    categoryPopover: null,
+    situationPopoverOptions: null,
+    categoryPopoverOptions: null
+  },
+
+  isDesktopViewport() {
+    return window.matchMedia("(min-width: 900px)").matches;
   },
 
   async init() {
@@ -85,8 +83,12 @@ const OffersApp = {
     this.refs.categoryValue = document.getElementById("offer-category-value");
     this.refs.situationSheet = document.getElementById("sheet-situation");
     this.refs.categorySheet = document.getElementById("sheet-category");
-    this.refs.situationOptions = document.getElementById("sheet-situation-options");
-    this.refs.categoryOptions = document.getElementById("sheet-category-options");
+    this.refs.situationSheetOptions = document.getElementById("sheet-situation-options");
+    this.refs.categorySheetOptions = document.getElementById("sheet-category-options");
+    this.refs.situationPopover = document.getElementById("popover-situation");
+    this.refs.categoryPopover = document.getElementById("popover-offer-category");
+    this.refs.situationPopoverOptions = document.getElementById("popover-situation-options");
+    this.refs.categoryPopoverOptions = document.getElementById("popover-offer-category-options");
   },
 
   normalizeOffer(raw) {
@@ -134,8 +136,10 @@ const OffersApp = {
       resetPill,
       situationSheet,
       categorySheet,
-      situationOptions,
-      categoryOptions
+      situationSheetOptions,
+      categorySheetOptions,
+      situationPopoverOptions,
+      categoryPopoverOptions
     } = this.refs;
 
     if (searchInput) {
@@ -145,25 +149,25 @@ const OffersApp = {
       });
     }
 
-    if (situationPill && situationSheet) {
-      situationPill.addEventListener("click", () => {
-        if (!situationSheet.hidden) {
-          this.closeSheet(situationSheet);
+    if (situationPill) {
+      situationPill.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (this.isDesktopViewport()) {
+          this.toggleDesktopPopover("situation");
           return;
         }
-        this.closeSheet(categorySheet);
-        this.openSheet(situationSheet);
+        this.toggleSheet("situation");
       });
     }
 
-    if (categoryPill && categorySheet) {
-      categoryPill.addEventListener("click", () => {
-        if (!categorySheet.hidden) {
-          this.closeSheet(categorySheet);
+    if (categoryPill) {
+      categoryPill.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (this.isDesktopViewport()) {
+          this.toggleDesktopPopover("category");
           return;
         }
-        this.closeSheet(situationSheet);
-        this.openSheet(categorySheet);
+        this.toggleSheet("category");
       });
     }
 
@@ -184,70 +188,112 @@ const OffersApp = {
       });
     });
 
-    if (situationOptions) {
-      situationOptions.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-situation]");
-        if (!button) return;
+    this.bindOptionContainer(situationSheetOptions, "data-situation", (value) => {
+      this.activeSituation = value;
+      this.syncSituationSelection();
+      this.closeSheet(this.refs.situationSheet);
+      this.closeAllDesktopPopovers();
+      this.applyFilterAndRender();
+    });
 
-        this.activeSituation = String(button.getAttribute("data-situation") || "").trim();
-        this.setActiveOption(situationOptions, "data-situation", this.activeSituation);
-        this.closeSheet(situationSheet);
-        this.applyFilterAndRender();
-      });
-    }
+    this.bindOptionContainer(categorySheetOptions, "data-category", (value) => {
+      this.activeCategory = value;
+      this.syncCategorySelection();
+      this.closeSheet(this.refs.categorySheet);
+      this.closeAllDesktopPopovers();
+      this.applyFilterAndRender();
+    });
 
-    if (categoryOptions) {
-      categoryOptions.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-category]");
-        if (!button) return;
+    this.bindOptionContainer(situationPopoverOptions, "data-situation", (value) => {
+      this.activeSituation = value;
+      this.syncSituationSelection();
+      this.closeAllDesktopPopovers();
+      this.applyFilterAndRender();
+    });
 
-        this.activeCategory = String(button.getAttribute("data-category") || "").trim();
-        this.setActiveOption(categoryOptions, "data-category", this.activeCategory);
-        this.closeSheet(categorySheet);
-        this.applyFilterAndRender();
-      });
-    }
+    this.bindOptionContainer(categoryPopoverOptions, "data-category", (value) => {
+      this.activeCategory = value;
+      this.syncCategorySelection();
+      this.closeAllDesktopPopovers();
+      this.applyFilterAndRender();
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      this.closeSheet(situationSheet);
-      this.closeSheet(categorySheet);
+      this.closeAllTransientUI();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!this.isDesktopViewport()) return;
+
+      const insidePill = event.target.closest("#offer-situation-pill, #offer-category-pill");
+      const insidePopover = event.target.closest("#popover-situation, #popover-offer-category");
+      if (insidePill || insidePopover) return;
+
+      this.closeAllDesktopPopovers();
+    });
+
+    window.addEventListener("resize", () => {
+      if (!this.isDesktopViewport()) {
+        this.closeAllDesktopPopovers();
+      } else {
+        this.repositionOpenDesktopPopover();
+      }
+      this.updateFilterBarUI();
+    }, { passive: true });
+
+    window.addEventListener("scroll", () => {
+      this.repositionOpenDesktopPopover();
+    }, { passive: true });
+  },
+
+  bindOptionContainer(container, attrName, onSelect) {
+    if (!container) return;
+
+    container.addEventListener("click", (event) => {
+      const button = event.target.closest(`[${attrName}]`);
+      if (!button) return;
+      onSelect(String(button.getAttribute(attrName) || "").trim());
+    });
+  },
+
+  populateButtons(targets, attrName, values) {
+    const markup = [
+      `<button type="button" class="filter-sheet-option is-active" ${attrName}="">Alle</button>`,
+      ...values.map((value) => (
+        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}">${this.escapeHtml(value)}</button>`
+      ))
+    ].join("");
+
+    targets.forEach((target) => {
+      if (target) target.innerHTML = markup;
     });
   },
 
   populateSituationOptions() {
-    const target = this.refs.situationOptions;
-    if (!target) return;
-
     const situations = Array.from(
       new Set(this.offers.flatMap((offer) => offer.tags || []).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b, "de"));
 
-    target.innerHTML = [
-      `<button type="button" class="filter-sheet-option is-active" data-situation="">Alle</button>`,
-      ...situations.map((situation) => (
-        `<button type="button" class="filter-sheet-option" data-situation="${this.escapeHtmlAttr(situation)}">${this.escapeHtml(situation)}</button>`
-      ))
-    ].join("");
+    this.populateButtons(
+      [this.refs.situationSheetOptions, this.refs.situationPopoverOptions],
+      "data-situation",
+      situations
+    );
   },
 
   populateCategoryOptions() {
-    const target = this.refs.categoryOptions;
-    if (!target) return;
-
     const categories = Array.from(
       new Set(this.offers.map((offer) => offer.kategorie).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b, "de"));
 
-    target.innerHTML = [
-      `<button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>`,
-      ...categories.map((category) => (
-        `<button type="button" class="filter-sheet-option" data-category="${this.escapeHtmlAttr(category)}">${this.escapeHtml(category)}</button>`
-      ))
-    ].join("");
+    this.populateButtons(
+      [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions],
+      "data-category",
+      categories
+    );
   },
 
-  // BEGIN: FILTER_SHEET_LOCK_HELPERS
   setSheetLock(isOpen) {
     document.documentElement.classList.toggle("is-sheet-open", isOpen);
     document.body.classList.toggle("is-sheet-open", isOpen);
@@ -272,20 +318,169 @@ const OffersApp = {
       this.setSheetLock(false);
     }
   },
-  // END: FILTER_SHEET_LOCK_HELPERS
+
+  toggleSheet(key) {
+    const isSituation = key === "situation";
+    const current = isSituation ? this.refs.situationSheet : this.refs.categorySheet;
+    const other = isSituation ? this.refs.categorySheet : this.refs.situationSheet;
+    if (!current) return;
+
+    if (!current.hidden) {
+      this.closeSheet(current);
+      return;
+    }
+
+    this.closeSheet(other);
+    this.openSheet(current);
+  },
+
+  getDesktopPopoverRefs(key) {
+    if (key === "situation") {
+      return {
+        pill: this.refs.situationPill,
+        popover: this.refs.situationPopover
+      };
+    }
+
+    return {
+      pill: this.refs.categoryPill,
+      popover: this.refs.categoryPopover
+    };
+  },
+
+  positionDesktopPopover(popover, pill) {
+    if (!popover || !pill || popover.hidden) return;
+
+    const panel = popover.querySelector(".filter-popover__panel");
+    if (!panel) return;
+
+    const previousVisibility = popover.style.visibility;
+    popover.style.visibility = "hidden";
+    popover.style.left = "0px";
+    popover.style.top = "0px";
+
+    const pillRect = pill.getBoundingClientRect();
+    const panelRect = popover.getBoundingClientRect();
+    const popoverWidth = Math.max(panelRect.width, popover.offsetWidth, 240);
+    const popoverHeight = Math.max(panel.scrollHeight, panelRect.height, 120);
+
+    const viewportLeft = window.scrollX + 16;
+    const viewportRight = window.scrollX + window.innerWidth - 16;
+    const viewportTop = window.scrollY + 16;
+    const viewportBottom = window.scrollY + window.innerHeight - 16;
+
+    let left = pillRect.left + window.scrollX;
+    if (left + popoverWidth > viewportRight) {
+      left = viewportRight - popoverWidth;
+    }
+    if (left < viewportLeft) {
+      left = viewportLeft;
+    }
+
+    let top = pillRect.bottom + window.scrollY + 8;
+    let side = "bottom";
+
+    if (top + popoverHeight > viewportBottom) {
+      const topCandidate = pillRect.top + window.scrollY - popoverHeight - 8;
+      if (topCandidate >= viewportTop) {
+        top = topCandidate;
+        side = "top";
+      } else {
+        top = Math.max(viewportTop, viewportBottom - popoverHeight);
+      }
+    }
+
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.top = `${Math.round(top)}px`;
+    popover.dataset.side = side;
+    popover.style.visibility = previousVisibility;
+  },
+
+  setPillExpanded(pill, isExpanded) {
+    if (!pill) return;
+    pill.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+  },
+
+  openDesktopPopover(key) {
+    const { pill, popover } = this.getDesktopPopoverRefs(key);
+    if (!pill || !popover) return;
+
+    this.closeAllDesktopPopovers();
+    popover.hidden = false;
+    this.positionDesktopPopover(popover, pill);
+    this.setPillExpanded(pill, true);
+    this.activeDesktopPopover = key;
+  },
+
+  closeDesktopPopover(key) {
+    const { pill, popover } = this.getDesktopPopoverRefs(key);
+    if (popover) {
+      popover.hidden = true;
+      popover.style.left = "";
+      popover.style.top = "";
+      popover.style.visibility = "";
+      popover.dataset.side = "bottom";
+    }
+    this.setPillExpanded(pill, false);
+    if (this.activeDesktopPopover === key) {
+      this.activeDesktopPopover = "";
+    }
+  },
+
+  toggleDesktopPopover(key) {
+    if (this.activeDesktopPopover === key) {
+      this.closeDesktopPopover(key);
+      return;
+    }
+    this.openDesktopPopover(key);
+  },
+
+  repositionOpenDesktopPopover() {
+    if (!this.activeDesktopPopover || !this.isDesktopViewport()) return;
+    const { pill, popover } = this.getDesktopPopoverRefs(this.activeDesktopPopover);
+    if (!pill || !popover || popover.hidden) return;
+    this.positionDesktopPopover(popover, pill);
+  },
+
+  closeAllDesktopPopovers() {
+    this.closeDesktopPopover("situation");
+    this.closeDesktopPopover("category");
+  },
+
+  closeAllTransientUI() {
+    this.closeSheet(this.refs.situationSheet);
+    this.closeSheet(this.refs.categorySheet);
+    this.closeAllDesktopPopovers();
+  },
 
   setActiveOption(container, attrName, activeValue) {
     if (!container) return;
 
-    container.querySelectorAll(".filter-sheet-option").forEach((button) => {
+    container.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
       const value = String(button.getAttribute(attrName) || "").trim();
       button.classList.toggle("is-active", value === activeValue);
     });
   },
 
-  // BEGIN: FILTER_BAR_STATE_SYNC
+  syncSituationSelection() {
+    this.setActiveOption(this.refs.situationSheetOptions, "data-situation", this.activeSituation);
+    this.setActiveOption(this.refs.situationPopoverOptions, "data-situation", this.activeSituation);
+  },
+
+  syncCategorySelection() {
+    this.setActiveOption(this.refs.categorySheetOptions, "data-category", this.activeCategory);
+    this.setActiveOption(this.refs.categoryPopoverOptions, "data-category", this.activeCategory);
+  },
+
   updateFilterBarUI() {
-    const { searchRow, situationValue, categoryValue, resetPill } = this.refs;
+    const {
+      searchRow,
+      situationValue,
+      categoryValue,
+      resetPill,
+      situationPill,
+      categoryPill
+    } = this.refs;
     const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
 
     if (situationValue) {
@@ -303,8 +498,15 @@ const OffersApp = {
     if (searchRow) {
       searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
     }
+
+    if (situationPill) {
+      situationPill.classList.toggle("is-active", !!this.activeSituation);
+    }
+
+    if (categoryPill) {
+      categoryPill.classList.toggle("is-active", !!this.activeCategory);
+    }
   },
-  // END: FILTER_BAR_STATE_SYNC
 
   resetFilters() {
     this.searchTerm = "";
@@ -315,12 +517,9 @@ const OffersApp = {
       this.refs.searchInput.value = "";
     }
 
-    this.setActiveOption(this.refs.situationOptions, "data-situation", "");
-    this.setActiveOption(this.refs.categoryOptions, "data-category", "");
-
-    this.closeSheet(this.refs.situationSheet);
-    this.closeSheet(this.refs.categorySheet);
-
+    this.syncSituationSelection();
+    this.syncCategorySelection();
+    this.closeAllTransientUI();
     this.applyFilterAndRender();
   },
 
@@ -382,7 +581,7 @@ const OffersApp = {
     loadingEl.innerHTML = `
       <div class="info-message">
         <p>📭 Aktuell sind noch keine Aktivitäten hinterlegt.</p>
-        <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung.</small></p>
+        <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung zu sehen.</small></p>
       </div>
     `.trim();
     loadingEl.style.display = "flex";
