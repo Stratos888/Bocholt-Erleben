@@ -1,7 +1,7 @@
 // BEGIN: FILE_HEADER_OFFERS_DETAILS
 // Datei: js/offers-details.js
 // Zweck:
-/// - Activity-Detailpanel für Mobile
+// - Activity-Detailpanel nur für Mobile
 // - Desktop wird bewusst vom Panel entkoppelt und öffnet direkt die Ziel-URL
 // - Nutzt dieselbe Kategorie-/Meta-Logik wie die Cards
 // END: FILE_HEADER_OFFERS_DETAILS
@@ -130,6 +130,7 @@ const OfferDetailPanel = {
     }
 
     return {
+      rawLabel: String(offer?.kategorie || "Aktivität").trim() || "Aktivität",
       label: String(offer?.kategorie || "Aktivität").trim() || "Aktivität",
       iconKey: "pin",
       modifier: "aktivitaet"
@@ -144,7 +145,7 @@ const OfferDetailPanel = {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
       ? window.Icons.svg(visual.iconKey, { className: "activity-detail__media-icon-svg" })
-      : "";
+      : this.escapeHtml(visual.label.slice(0, 1));
 
     if (offer.image) {
       return `
@@ -156,8 +157,7 @@ const OfferDetailPanel = {
 
     return `
       <div class="activity-detail__media activity-detail__media--fallback activity-detail__media--${visual.modifier}">
-        <div class="activity-detail__media-icon">${iconHtml || this.escapeHtml(visual.label.slice(0, 1))}</div>
-        <div class="activity-detail__media-label">${this.escapeHtml(visual.label)}</div>
+        <div class="activity-detail__media-icon" aria-hidden="true">${iconHtml}</div>
       </div>
     `.trim();
   },
@@ -166,18 +166,18 @@ const OfferDetailPanel = {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
       ? window.Icons.svg(visual.iconKey, { className: "activity-detail__category-icon-svg" })
-      : "";
+      : this.escapeHtml(visual.label.slice(0, 1));
 
     return `
       <div class="activity-detail__category activity-detail__category--${visual.modifier}">
-        <span class="activity-detail__category-icon" aria-hidden="true">${iconHtml || this.escapeHtml(visual.label.slice(0, 1))}</span>
+        <span class="activity-detail__category-icon" aria-hidden="true">${iconHtml}</span>
         <span class="activity-detail__category-label">${this.escapeHtml(visual.label)}</span>
       </div>
     `.trim();
   },
 
-  renderInfoGrid(offer) {
-    const items = [
+  renderFacts(offer) {
+    const rows = [
       ["Drinnen / Draußen", offer.mode],
       ["Kosten", offer.price],
       ["Geeignet für", (offer.audience || []).join(" · ")],
@@ -186,12 +186,12 @@ const OfferDetailPanel = {
       ["Hinweis", offer.hint]
     ].filter(([, value]) => String(value || "").trim());
 
-    if (!items.length) return "";
+    if (!rows.length) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${items.map(([label, value]) => `
-          <div class="activity-detail__fact">
+        ${rows.map(([label, value]) => `
+          <div class="activity-detail__fact-row">
             <div class="activity-detail__fact-label">${this.escapeHtml(label)}</div>
             <div class="activity-detail__fact-value">${this.escapeHtml(value)}</div>
           </div>
@@ -222,12 +222,11 @@ const OfferDetailPanel = {
         </header>
 
         <div class="activity-detail__body">
-          ${this.renderInfoGrid(offer)}
+          ${this.renderFacts(offer)}
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
-
           <div class="activity-detail__actions">
             <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
-            <a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>
+            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>` : ""}
           </div>
         </div>
       </article>
