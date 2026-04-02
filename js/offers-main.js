@@ -257,11 +257,18 @@ const OffersApp = {
     });
   },
 
-  populateButtons(targets, attrName, values) {
+  getCategoryDisplayLabel(rawValue) {
+    if (window.OfferVisuals?.getCategoryPresentation) {
+      return window.OfferVisuals.getCategoryPresentation(rawValue).label;
+    }
+    return String(rawValue || "").trim();
+  },
+
+  populateButtons(targets, attrName, entries) {
     const markup = [
       `<button type="button" class="filter-sheet-option is-active" ${attrName}="">Alle</button>`,
-      ...values.map((value) => (
-        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}">${this.escapeHtml(value)}</button>`
+      ...entries.map(({ value, label }) => (
+        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}">${this.escapeHtml(label)}</button>`
       ))
     ].join("");
 
@@ -273,7 +280,9 @@ const OffersApp = {
   populateSituationOptions() {
     const situations = Array.from(
       new Set(this.offers.flatMap((offer) => offer.tags || []).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b, "de"));
+    )
+      .sort((a, b) => a.localeCompare(b, "de"))
+      .map((value) => ({ value, label: value }));
 
     this.populateButtons(
       [this.refs.situationSheetOptions, this.refs.situationPopoverOptions],
@@ -285,7 +294,9 @@ const OffersApp = {
   populateCategoryOptions() {
     const categories = Array.from(
       new Set(this.offers.map((offer) => offer.kategorie).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b, "de"));
+    )
+      .map((value) => ({ value, label: this.getCategoryDisplayLabel(value) }))
+      .sort((a, b) => a.label.localeCompare(b.label, "de"));
 
     this.populateButtons(
       [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions],
@@ -488,7 +499,7 @@ const OffersApp = {
     }
 
     if (categoryValue) {
-      categoryValue.textContent = this.activeCategory || "Alle";
+      categoryValue.textContent = this.activeCategory ? this.getCategoryDisplayLabel(this.activeCategory) : "Alle";
     }
 
     if (resetPill) {
@@ -581,7 +592,7 @@ const OffersApp = {
     loadingEl.innerHTML = `
       <div class="info-message">
         <p>📭 Aktuell sind noch keine Aktivitäten hinterlegt.</p>
-        <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung zu sehen.</small></p>
+        <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung.</small></p>
       </div>
     `.trim();
     loadingEl.style.display = "flex";
