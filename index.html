@@ -423,20 +423,38 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 
 
-    <!-- PWA Service Worker Registration -->
+    <!-- === BEGIN BLOCK: PWA_SERVICE_WORKER_REGISTRATION_PROD_ONLY_V1 ===
+    Zweck:
+    - registriert den Service Worker nur auf Live/Prod
+    - verhindert Service-Worker-/Cache-Probleme auf staging bei UI-Tests
+    Umfang:
+    - ersetzt den bisherigen globalen SW-Registrierungsblock in index.html
+    === -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('✅ Service Worker registered:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('❌ Service Worker registration failed:', error);
-                    });
-            });
+      (() => {
+        const isProdHost =
+          location.hostname === 'bocholt-erleben.de' ||
+          location.hostname === 'www.bocholt-erleben.de';
+
+        if (!isProdHost) {
+          console.log('ℹ️ Service Worker auf diesem Host deaktiviert:', location.hostname);
+          return;
         }
+
+        if (!('serviceWorker' in navigator)) return;
+
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+              console.log('✅ Service Worker registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('❌ Service Worker registration failed:', error);
+            });
+        });
+      })();
     </script>
+    <!-- === END BLOCK: PWA_SERVICE_WORKER_REGISTRATION_PROD_ONLY_V1 === -->
    <!-- BEGIN: FILTER_SHEET_WIRING -->
 <!-- Inline wiring removed. Sheet open/close logic is owned by js/filter.js (single source of truth). -->
 <!-- END: FILTER_SHEET_WIRING -->
