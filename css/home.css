@@ -228,10 +228,9 @@
     padding-top: 4px;
   }
 
-  .desktop-hero .top-stack{
-    width: 100%;
-    max-width: none;
-  }
+  /* === BEGIN BLOCK: DESKTOP_TOP_STACK_WIDTH_OWNER_NOTE_V1 | Zweck: entfernt den frühen konkurrierenden Width-Owner für den Desktop-Top-Stack; Umfang: dokumentiert, dass Breite/Max-Breite nur noch im konsolidierten Desktop-Top-Shell-Block definiert werden === */
+  /* Width/max-width for .top-stack are intentionally owned only by DESKTOP_TOP_SHELL_OWNER_CLEANUP_V32. */
+  /* === END BLOCK: DESKTOP_TOP_STACK_WIDTH_OWNER_NOTE_V1 === */
 
   .event-cards-grid{
     max-width: 1128px;
@@ -696,98 +695,96 @@
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 | Purpose: überführt den final geprüften Brand-Warm-Stand aus dem Theme-Lab nachhaltig in die produktive Desktop-Home, inklusive Header-, Hero-, Panel- und Feed-Hierarchie; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V32 | Zweck: konsolidiert die komplette Desktop-Top-Shell als einen einzigen Owner für Home und Aktivitäten, entfernt doppelte Header-Owner in home.css, richtet Copy und Search auf dieselbe linke Achse aus und ersetzt den sichtbaren Panel-Klotz durch eine weich auslaufende Surface-Zone; Umfang: Desktop-Header, Hero, Search-Panel, Actions sowie Desktop-Feed-Surface für Home und Aktivitäten inkl. Narrow-Desktop === */
 @media (min-width: 900px){
-  .app-header{
-    min-height: 62px;
-    padding-left: 32px;
-    padding-right: 32px;
-    background: linear-gradient(180deg, rgba(248,248,241,0.990) 0%, rgba(241,244,232,0.974) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.84) inset,
-      0 10px 22px rgba(24,37,16,0.032);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-top-shell-max: 1128px;
+    --desktop-copy-surface-max: 35rem;
+    --desktop-copy-max: 31rem;
+    --desktop-panel-pill-w: 180px;
+    --desktop-panel-gap: 10px;
+    --desktop-panel-height: 58px;
   }
 
-  .header-left{
-    gap: 11px;
-  }
-
-  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 | Zweck: koppelt den Desktop-Header der Home final an die Brand-Warm-DNA, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
-  .app-header{
-    min-height: 60px;
+  body.is-tabbar-hidden .app-header,
+  body.page-route-activities .app-header{
+    min-height: 58px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(248,248,241,0.992) 0%, rgba(241,244,232,0.976) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(
+      180deg,
+      rgba(248,248,241,0.992) 0%,
+      rgba(242,244,235,0.978) 100%
+    );
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 78%, var(--brand-gold-200) 22%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
-      0 8px 18px rgba(24,37,16,0.030);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+      0 6px 16px rgba(16,28,10,0.024);
+    -webkit-backdrop-filter: blur(10px) saturate(1.03);
+    backdrop-filter: blur(10px) saturate(1.03);
   }
 
-  .header-left{
+  body.is-tabbar-hidden .header-left,
+  body.page-route-activities .header-left{
     gap: 9px;
   }
 
-  .app-logo{
-    width: 28px;
-    height: 28px;
+  body.is-tabbar-hidden .app-logo,
+  body.page-route-activities .app-logo{
+    width: 27px;
+    height: 27px;
     border-radius: 7px;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.58) inset,
-      0 2px 6px rgba(24,37,16,0.032);
+      0 2px 5px rgba(24,37,16,0.028);
   }
 
-  .app-title{
+  body.is-tabbar-hidden .app-title,
+  body.page-route-activities .app-title{
     max-width: none;
     color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
-    font-size: 1.24rem;
+    font-size: 1.19rem;
     font-weight: 710;
-    letter-spacing: -0.028em;
-    line-height: 1.04;
+    letter-spacing: -0.03em;
+    line-height: 1.03;
   }
 
-  .header-right{
+  body.is-tabbar-hidden .header-right,
+  body.page-route-activities .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 === */
 
-  .desktop-hero{
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
     --hero-bg-size-active: var(--hero-bg-size-desktop);
     --hero-bg-position-active: 79.25% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
-    --hero-bg-brightness-active: 0.968;
-    --hero-bg-saturate-active: 1.035;
-    --hero-bg-contrast-active: 1.03;
-    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
-    --hero-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
-    --hero-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
-    --hero-control-shadow:
-      0 1px 0 rgba(255,255,255,0.98) inset,
-      0 10px 22px rgba(16,28,10,0.032);
+
     position: relative;
     isolation: isolate;
     overflow: visible;
+
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
-    min-height: 424px;
-    padding: 22px 32px 14px;
+    gap: 10px;
+
+    max-width: var(--desktop-top-shell-max);
+    min-height: 404px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 18px 32px 12px;
+
     background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
-/* === BEGIN BLOCK: HOME_DESKTOP_HERO_READING_ZONE_V7 | Zweck: hält Copy und Search auf derselben linken Achse, entfernt den sichtbaren Hero-Block als eigenes Objekt und ersetzt ihn durch eine weich auslaufende Reading-Zone mit deutlich subtilerer Milchglaswirkung; Umfang: Desktop-Hero-Scrim, Copy-Surface und gemeinsame Titel/Lead-Lesefläche für Events und Aktivitäten === */
-  .desktop-hero::before{
+  body.is-tabbar-hidden .desktop-hero::before,
+  body.page-route-activities .desktop-hero::before{
     content: "";
     position: absolute;
     top: 0;
@@ -808,7 +805,8 @@
     pointer-events: none;
   }
 
-  .desktop-hero::after{
+  body.is-tabbar-hidden .desktop-hero::after,
+  body.page-route-activities .desktop-hero::after{
     content: "";
     position: absolute;
     top: 0;
@@ -819,43 +817,49 @@
     background:
       linear-gradient(
         90deg,
-        rgba(242,245,239,0.56) 0%,
-        rgba(242,245,239,0.52) 7%,
-        rgba(242,245,239,0.38) 14%,
-        rgba(242,245,239,0.22) 21%,
-        rgba(242,245,239,0.10) 27%,
-        rgba(242,245,239,0.03) 32%,
-        rgba(242,245,239,0.00) 37%
+        rgba(242,245,239,0.72) 0%,
+        rgba(242,245,239,0.58) 8%,
+        rgba(242,245,239,0.36) 17%,
+        rgba(242,245,239,0.16) 26%,
+        rgba(242,245,239,0.05) 33%,
+        rgba(242,245,239,0.00) 39%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.06) 0%,
-        rgba(247,249,244,0.02) 42%,
+        rgba(247,249,244,0.10) 0%,
+        rgba(247,249,244,0.03) 44%,
         rgba(247,249,244,0.00) 100%
       ),
-      radial-gradient(circle at 72% 22%, rgba(225,213,150,0.028) 0%, rgba(225,213,150,0.00) 15%);
+      radial-gradient(circle at 72% 22%, rgba(225,213,150,0.024) 0%, rgba(225,213,150,0.00) 15%);
     pointer-events: none;
   }
 
-  .desktop-entry{
-    display: grid;
-    justify-self: center;
+  body.is-tabbar-hidden .desktop-entry,
+  body.page-route-activities .desktop-entry,
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  body.is-tabbar-hidden .desktop-entry,
+  body.page-route-activities .desktop-entry{
     align-self: start;
-    width: min(100%, 910px);
-    min-width: 0;
     padding: 0;
     position: relative;
     z-index: 1;
   }
 
-  .desktop-entry__inner{
+  body.is-tabbar-hidden .desktop-entry__inner,
+  body.page-route-activities .desktop-entry__inner{
     position: relative;
     display: grid;
     gap: 0;
     justify-self: start;
-    width: min(100%, 30.75rem);
-    max-width: 30.75rem;
-    padding: 12px 0 10px;
+    width: min(100%, var(--desktop-copy-surface-max));
+    max-width: var(--desktop-copy-surface-max);
+    padding: 6px 0 8px;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -866,36 +870,48 @@
     overflow: visible;
   }
 
-  .desktop-entry__inner::before{
+  body.is-tabbar-hidden .desktop-entry__inner::before,
+  body.page-route-activities .desktop-entry__inner::before{
     content: "";
     position: absolute;
-    inset: -22px -30px -20px -18px;
+    inset: -22px -40px -18px -16px;
     z-index: -1;
-    border-radius: 38px;
+    border-radius: 40px;
     background:
-      radial-gradient(86% 98% at 18% 36%, rgba(247,249,243,0.40) 0%, rgba(247,249,243,0.26) 32%, rgba(247,249,243,0.14) 52%, rgba(247,249,243,0.05) 68%, rgba(247,249,243,0.00) 82%),
-      linear-gradient(90deg, rgba(247,249,243,0.15) 0%, rgba(247,249,243,0.08) 42%, rgba(247,249,243,0.02) 66%, rgba(247,249,243,0.00) 100%);
+      radial-gradient(
+        90% 100% at 16% 36%,
+        rgba(247,249,243,0.46) 0%,
+        rgba(247,249,243,0.30) 34%,
+        rgba(247,249,243,0.16) 54%,
+        rgba(247,249,243,0.06) 69%,
+        rgba(247,249,243,0.00) 82%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(247,249,243,0.15) 0%,
+        rgba(247,249,243,0.08) 42%,
+        rgba(247,249,243,0.02) 66%,
+        rgba(247,249,243,0.00) 100%
+      );
     filter: blur(22px);
     pointer-events: none;
   }
 
-  .desktop-entry__inner::after{
+  body.is-tabbar-hidden .desktop-entry__inner::after,
+  body.page-route-activities .desktop-entry__inner::after{
     content: none;
   }
 
-  .desktop-entry__content{
+  body.is-tabbar-hidden .desktop-entry__content,
+  body.page-route-activities .desktop-entry__content{
     position: relative;
     z-index: 1;
-    max-width: 23.5rem;
+    max-width: var(--desktop-copy-max);
     gap: 10px;
   }
 
-  .desktop-entry__eyebrow{
-    margin-bottom: 0;
-  }
-
-  .desktop-entry__title{
-    max-width: 23.25rem;
+  body.is-tabbar-hidden .desktop-entry__title{
+    max-width: 30rem;
     color: #14301F;
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
@@ -903,118 +919,158 @@
     text-shadow: 0 1px 0 rgba(255,255,255,0.12);
   }
 
-  .desktop-entry__text{
-    max-width: 22.25rem;
+  body.page-route-activities .desktop-entry__title{
+    max-width: 27.5rem;
+    color: #14301F;
+    font-size: clamp(2.90rem, 2.74rem + 0.74vw, 3.62rem);
+    line-height: 0.95;
+    letter-spacing: -0.058em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
     color: rgba(20,33,25,0.90);
     font-size: 0.99rem;
     line-height: 1.42;
     font-weight: 580;
   }
 
-  .desktop-entry__text br{
+  body.is-tabbar-hidden .desktop-entry__text{
+    max-width: 23rem;
+  }
+
+  body.page-route-activities .desktop-entry__text{
+    max-width: 27rem;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__text br,
+  body.page-route-activities .desktop-entry__text br{
     display: none;
   }
 
-  .desktop-entry__text--lead{
-    gap: 6px;
-  }
-/* === END BLOCK: HOME_DESKTOP_HERO_READING_ZONE_V7 === */
-
-  .top-stack{
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
     position: relative;
     top: auto;
     z-index: 1;
     align-self: start;
-    justify-self: stretch;
     display: grid;
-    gap: 8px;
-    width: min(100%, 910px);
-    max-width: 910px;
+    gap: 10px;
     margin-top: 0;
-    padding: 14px 14px 12px;
-    border: 1px solid var(--hero-panel-border);
-    border-radius: 22px;
-    background: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
-    box-shadow:
-      0 20px 40px rgba(16,28,10,0.076),
-      0 1px 0 rgba(255,255,255,0.93) inset;
-    -webkit-backdrop-filter: blur(9px);
-    backdrop-filter: blur(9px);
+    padding: 8px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    overflow: visible;
   }
 
-  .top-stack::before{
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
     content: "";
     position: absolute;
-    inset: 8px;
+    inset: -10px -14px -14px -14px;
     z-index: -1;
-    border-radius: 17px;
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,255,0.28) 0%,
-      rgba(255,255,255,0.06) 100%
-    );
+    border-radius: 32px;
+    background:
+      radial-gradient(
+        120% 140% at 12% 16%,
+        rgba(251,252,248,0.80) 0%,
+        rgba(248,250,243,0.60) 34%,
+        rgba(245,248,239,0.34) 56%,
+        rgba(245,248,239,0.12) 72%,
+        rgba(245,248,239,0.00) 84%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(249,250,245,0.12) 0%,
+        rgba(249,250,245,0.00) 100%
+      );
+    filter: blur(18px);
+    pointer-events: none;
   }
 
-  .desktop-hero__panel-head{
+  body.is-tabbar-hidden .desktop-hero__panel-head,
+  body.page-route-activities .desktop-hero__panel-head{
     display: block;
-    padding: 0 4px 0;
+    padding: 0;
   }
 
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 172px 172px;
+  body.is-tabbar-hidden .desktop-hero__search-row,
+  body.page-route-activities .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) var(--desktop-panel-pill-w) var(--desktop-panel-pill-w);
     align-items: stretch;
-    gap: 8px;
+    gap: var(--desktop-panel-gap);
   }
 
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 172px 172px 48px;
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) var(--desktop-panel-pill-w) var(--desktop-panel-pill-w) 48px;
   }
 
-  .top-stack .events-filter{
+  body.is-tabbar-hidden .top-stack .events-filter,
+  body.page-route-activities .top-stack .events-filter{
     position: relative;
     z-index: 1;
     padding: 0;
     gap: 0;
   }
 
-  .desktop-hero__search-field .desktop-hero__icon--search{
+  body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
+  body.page-route-activities .desktop-hero__search-field .desktop-hero__icon--search{
     position: absolute;
     left: 21px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(78,97,87,0.78);
+    color: rgba(78,97,87,0.76);
     width: 18px;
     height: 18px;
     z-index: 2;
     pointer-events: none;
   }
 
-  .top-stack #search-filter,
-  .desktop-hero__toolbar-pill{
-    height: 56px;
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .top-stack #search-filter,
+  body.page-route-activities .desktop-hero__toolbar-pill{
+    height: var(--desktop-panel-height);
   }
 
-  .top-stack #search-filter{
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.page-route-activities .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
     padding: 0 18px 0 46px;
-    border: 1px solid var(--hero-control-border);
-    border-radius: 16px;
-    background: var(--hero-control-bg);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border-radius: 17px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.926) 0%,
+      rgba(248,250,243,0.808) 100%
+    );
     color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: 0.99rem;
     font-weight: 610;
     letter-spacing: -0.012em;
-    box-shadow: var(--hero-control-shadow);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 8px 20px rgba(16,28,10,0.026);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
 
-  .top-stack #search-filter::placeholder{
-    color: rgba(80,95,78,0.74);
+  body.is-tabbar-hidden .top-stack #search-filter::placeholder,
+  body.page-route-activities .top-stack #search-filter::placeholder{
+    color: rgba(80,95,78,0.72);
     font-weight: 620;
   }
 
-  .desktop-hero__toolbar-pill{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__toolbar-pill{
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
@@ -1022,15 +1078,24 @@
     justify-content: stretch;
     column-gap: 8px;
     row-gap: 2px;
-    padding: 8px 13px 8px;
-    border: 1px solid var(--hero-control-border);
-    border-radius: 16px;
-    background: var(--hero-control-bg);
-    box-shadow: var(--hero-control-shadow);
+    padding: 8px 13px;
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border-radius: 17px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.922) 0%,
+      rgba(248,250,243,0.802) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 8px 20px rgba(16,28,10,0.026);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     text-align: left;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__label{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__label,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label{
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
@@ -1042,7 +1107,8 @@
     white-space: nowrap;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__value{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__value,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__value{
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
@@ -1055,7 +1121,8 @@
     text-overflow: ellipsis;
   }
 
-  .desktop-hero__toolbar-pill::after{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill::after,
+  body.page-route-activities .desktop-hero__toolbar-pill::after{
     content: "›";
     grid-column: 2;
     grid-row: 1 / span 2;
@@ -1066,52 +1133,71 @@
     margin-left: 0;
   }
 
-  .desktop-hero__search-row > .filter-pill--reset{
-    grid-column: auto;
+  body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
     width: 48px;
     min-width: 48px;
-    min-height: 56px;
+    min-height: var(--desktop-panel-height);
     justify-self: stretch;
     align-self: stretch;
-    border: 1px solid var(--hero-control-border);
-    background: var(--hero-control-bg);
-    box-shadow: var(--hero-control-shadow);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.922) 0%,
+      rgba(248,250,243,0.802) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 8px 20px rgba(16,28,10,0.026);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
 
-  .desktop-hero__actions{
+  body.is-tabbar-hidden .desktop-hero__actions,
+  body.page-route-activities .desktop-hero__actions{
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    padding-top: 8px;
-    border-top: 1px solid color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+    gap: 8px;
+    padding-top: 0;
+    border-top: 0;
   }
 
-  .desktop-hero__action,
-  .desktop-hero__action:link,
-  .desktop-hero__action:visited{
-    min-height: 36px;
+  body.is-tabbar-hidden .desktop-hero__action,
+  body.is-tabbar-hidden .desktop-hero__action:link,
+  body.is-tabbar-hidden .desktop-hero__action:visited,
+  body.page-route-activities .desktop-hero__action,
+  body.page-route-activities .desktop-hero__action:link,
+  body.page-route-activities .desktop-hero__action:visited{
+    min-height: 40px;
     padding: 0 12px;
-    border-radius: 11px;
+    border-radius: 13px;
     font-size: 0.84rem;
     font-weight: 680;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
-    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
-    color: rgba(24,40,30,0.86);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.890) 0%,
+      rgba(246,250,238,0.748) 100%
+    );
+    color: rgba(24,40,30,0.84);
     text-decoration: none;
-    -webkit-text-fill-color: rgba(24,40,30,0.86);
+    -webkit-text-fill-color: rgba(24,40,30,0.84);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(16,28,10,0.032);
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 6px 14px rgba(16,28,10,0.022);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
   }
 
-  .desktop-hero__action .desktop-hero__icon{
+  body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action .desktop-hero__icon{
     width: 14px;
     height: 14px;
-    opacity: 0.68;
+    opacity: 0.66;
   }
 
-  /* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 | Zweck: überführt die final validierte Brand-Warm-Flächenhierarchie aus dem Theme-Lab in den produktiven Desktop-Feed; Umfang: nur Desktop-Feed-Surface im V30-Block === */
-  .events-section{
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
     background: linear-gradient(
       180deg,
       #E9EDDC 0%,
@@ -1121,7 +1207,8 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
   }
 
-  .event-card{
+  body.is-tabbar-hidden .event-card,
+  body.page-route-activities .event-card{
     background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(250,252,243,0.978) 100%);
     border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
     box-shadow:
@@ -1129,7 +1216,8 @@
       0 10px 24px rgba(16,28,10,0.046);
   }
 
-  .event-card::before{
+  body.is-tabbar-hidden .event-card::before,
+  body.page-route-activities .event-card::before{
     background: linear-gradient(
       180deg,
       rgba(230,238,212,0.988) 0%,
@@ -1139,7 +1227,8 @@
     box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
   }
 
-  .event-date-badge{
+  body.is-tabbar-hidden .event-date-badge,
+  body.page-route-activities .event-date-badge{
     background: linear-gradient(
       180deg,
       rgba(252,253,248,0.996) 0%,
@@ -1152,231 +1241,201 @@
       0 1px 2px rgba(12,24,18,0.028);
   }
 
-  .event-date-badge__wday{
+  body.is-tabbar-hidden .event-date-badge__wday,
+  body.page-route-activities .event-date-badge__wday{
     color: rgba(75,92,72,0.64);
   }
 
-  .event-date-badge__month{
+  body.is-tabbar-hidden .event-date-badge__month,
+  body.page-route-activities .event-date-badge__month{
     color: rgba(75,92,72,0.62);
   }
 
-  .event-title{
+  body.is-tabbar-hidden .event-title,
+  body.page-route-activities .event-title{
     color: rgba(21,37,28,0.93);
   }
 
-  .event-card-desc{
+  body.is-tabbar-hidden .event-card-desc,
+  body.page-route-activities .event-card-desc{
     color: rgba(31,41,51,0.76);
   }
-  /* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 === */
 
   @media (hover: hover){
-    .desktop-hero__actions .desktop-hero__action:hover,
-    .desktop-hero__actions .desktop-hero__action:link:hover,
-    .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,241,0.982) 100%);
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, rgba(47,69,33,0.14) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.94) 0%,
+        rgba(248,251,241,0.84) 100%
+      );
       color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
       -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(16,28,10,0.030);
+        0 1px 0 rgba(255,255,255,0.92) inset,
+        0 10px 22px rgba(16,28,10,0.026);
     }
   }
 }
 
-@media (min-width: 900px) and (max-width: 1199.98px){
-  .desktop-hero{
-    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: 86.75% 9.5%;
-    min-height: 396px;
-    padding-top: 20px;
-    padding-bottom: 14px;
-  }
-
-  .desktop-entry__content{
-    max-width: 30rem;
-  }
-
-  .desktop-entry__title{
-    max-width: 27rem;
-    font-size: clamp(2.78rem, 2.58rem + 0.68vw, 3.32rem);
-  }
-
-  .desktop-entry__text{
-    max-width: 24.5rem;
-    font-size: 0.96rem;
-    line-height: 1.40;
-  }
-
-  .top-stack{
-    width: 100%;
-    max-width: none;
-  }
-
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 164px 164px;
-  }
-
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 164px 164px 46px;
-  }
-
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: 46px;
-    min-width: 46px;
-  }
-}
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 === */
-
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V31 | Zweck: hält im Narrow-Desktop die linke Achse exakt auf Search-Niveau, nimmt den milchigen Scrim weiter zurück und ersetzt den sichtbaren Hero-Block durch eine weich auslaufende Reading-Zone ohne harte Kartenkante; Umfang: 900–1024px Hero-Scrim, Copy-Surface und enge Desktop-Geometrie === */
 @media (min-width: 900px) and (max-width: 1024px){
-  .desktop-hero{
-    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: 89.5% 10%;
-    gap: 12px;
-    min-height: 380px;
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-copy-surface-max: 31rem;
+    --desktop-copy-max: 25rem;
+    --desktop-panel-pill-w: 156px;
+    --desktop-panel-gap: 8px;
+    --desktop-panel-height: 54px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 382px;
     padding-left: 24px;
     padding-right: 24px;
     padding-top: 16px;
-    padding-bottom: 14px;
+    padding-bottom: 12px;
+    gap: 9px;
   }
 
-  .desktop-hero::after{
+  body.is-tabbar-hidden .desktop-hero::after,
+  body.page-route-activities .desktop-hero::after{
     background:
       linear-gradient(
         90deg,
-        rgba(242,245,239,0.60) 0%,
-        rgba(242,245,239,0.56) 8%,
-        rgba(242,245,239,0.40) 15%,
-        rgba(242,245,239,0.22) 22%,
-        rgba(242,245,239,0.09) 28%,
-        rgba(242,245,239,0.03) 33%,
-        rgba(242,245,239,0.00) 38%
+        rgba(242,245,239,0.76) 0%,
+        rgba(242,245,239,0.62) 9%,
+        rgba(242,245,239,0.40) 17%,
+        rgba(242,245,239,0.18) 26%,
+        rgba(242,245,239,0.05) 33%,
+        rgba(242,245,239,0.00) 39%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.07) 0%,
-        rgba(247,249,244,0.02) 42%,
+        rgba(247,249,244,0.11) 0%,
+        rgba(247,249,244,0.03) 44%,
         rgba(247,249,244,0.00) 100%
       ),
-      radial-gradient(circle at 72% 22%, rgba(225,213,150,0.028) 0%, rgba(225,213,150,0.00) 15%);
+      radial-gradient(circle at 72% 22%, rgba(225,213,150,0.024) 0%, rgba(225,213,150,0.00) 15%);
   }
 
-  .desktop-entry__inner{
-    width: min(100%, 26rem);
-    max-width: 26rem;
-    padding: 10px 0 8px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    overflow: visible;
+  body.is-tabbar-hidden .desktop-entry__inner,
+  body.page-route-activities .desktop-entry__inner{
+    padding: 4px 0 6px;
   }
 
-  .desktop-entry__inner::before{
-    inset: -18px -22px -18px -14px;
+  body.is-tabbar-hidden .desktop-entry__inner::before,
+  body.page-route-activities .desktop-entry__inner::before{
+    inset: -18px -26px -16px -12px;
     border-radius: 32px;
-    background:
-      radial-gradient(86% 98% at 18% 36%, rgba(247,249,243,0.38) 0%, rgba(247,249,243,0.24) 32%, rgba(247,249,243,0.12) 52%, rgba(247,249,243,0.04) 68%, rgba(247,249,243,0.00) 82%),
-      linear-gradient(90deg, rgba(247,249,243,0.14) 0%, rgba(247,249,243,0.07) 42%, rgba(247,249,243,0.02) 66%, rgba(247,249,243,0.00) 100%);
     filter: blur(18px);
   }
 
-  .desktop-entry__content{
-    max-width: 20.75rem;
+  body.is-tabbar-hidden .desktop-entry__content,
+  body.page-route-activities .desktop-entry__content{
     gap: 8px;
   }
 
-  .desktop-entry__title{
-    max-width: 20.5rem;
-    font-size: clamp(2.28rem, 2.14rem + 0.42vw, 2.74rem);
+  body.is-tabbar-hidden .desktop-entry__title{
+    max-width: 25rem;
+    font-size: clamp(2.38rem, 2.24rem + 0.46vw, 2.84rem);
     line-height: 0.98;
   }
 
-  .desktop-entry__text{
-    max-width: 18.75rem;
-    font-size: 0.90rem;
+  body.page-route-activities .desktop-entry__title{
+    max-width: 23rem;
+    font-size: clamp(2.26rem, 2.14rem + 0.40vw, 2.64rem);
+    line-height: 0.98;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
+    max-width: 20rem;
+    font-size: 0.91rem;
     line-height: 1.38;
   }
 
-  .desktop-entry__lead-line{
-    white-space: normal;
+  body.page-route-activities .desktop-entry__text{
+    max-width: 23rem;
   }
 
-  .top-stack{
-    margin-top: 0;
-    padding: 10px 11px 9px;
-    border-radius: 20px;
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
+    padding-top: 6px;
+    gap: 8px;
   }
 
-  .top-stack::before{
-    inset: 7px;
-    border-radius: 14px;
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
+    inset: -8px -10px -10px -10px;
+    border-radius: 26px;
+    filter: blur(14px);
   }
 
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 156px 156px;
-    gap: 6px;
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) var(--desktop-panel-pill-w) var(--desktop-panel-pill-w) 44px;
   }
 
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 156px 156px 44px;
-  }
-
-  .desktop-hero__search-field .desktop-hero__icon--search{
+  body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
+  body.page-route-activities .desktop-hero__search-field .desktop-hero__icon--search{
     left: 19px;
     width: 17px;
     height: 17px;
   }
 
-  .top-stack #search-filter,
-  .desktop-hero__toolbar-pill{
-    height: 54px;
-  }
-
-  .top-stack #search-filter{
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.page-route-activities .top-stack #search-filter{
     padding-left: 42px;
     padding-right: 16px;
     font-size: 0.96rem;
     border-radius: 15px;
   }
 
-  .desktop-hero__toolbar-pill{
-    padding: 7px 11px 7px;
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__toolbar-pill{
+    padding: 7px 11px;
     column-gap: 7px;
-    border-radius: 14px;
+    border-radius: 15px;
   }
 
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: 44px;
-    min-width: 44px;
-    min-height: 54px;
-  }
-
-  .desktop-hero__toolbar-pill .filter-pill__label{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__label,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label{
     font-size: 0.64rem;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__value{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__value,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__value{
     font-size: 0.88rem;
   }
 
-  .desktop-hero__actions{
-    gap: 5px;
-    padding-top: 8px;
+  body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
+    width: 44px;
+    min-width: 44px;
+    min-height: var(--desktop-panel-height);
   }
 
-  .desktop-hero__action{
-    min-height: 34px;
-    padding-left: 9px;
-    padding-right: 9px;
-    border-radius: 10px;
+  body.is-tabbar-hidden .desktop-hero__actions,
+  body.page-route-activities .desktop-hero__actions{
+    gap: 6px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action,
+  body.page-route-activities .desktop-hero__action{
+    min-height: 36px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 11px;
     font-size: 0.80rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V31 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V32 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
