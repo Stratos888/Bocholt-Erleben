@@ -786,7 +786,7 @@
     box-shadow: none;
   }
 
-  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_COPY_CONTRAST_POLISH_V1 | Zweck: hält den validierten Desktop-Hero-Wash global stabil und hebt auf /angebote/ H1 + Lead kontraststärker und motivunabhängiger heraus; Umfang: Desktop-Hero-Overlay + Desktop-Entry-Typografie im Desktop-Breakpoint === */
+/* === BEGIN BLOCK: HOME_DESKTOP_HERO_READING_ZONE_V2 | Zweck: ersetzt den diffusen linken Weißfader durch eine einheitliche Reading-Zone für Events und Aktivitäten, vereinheitlicht Hero-Titel/-Lead farblich und macht die Copy motivunabhängig lesbar; Umfang: Desktop-Hero-Bild, Overlay-Scrim und Copy-Surface im Desktop-Breakpoint === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -795,21 +795,16 @@
     left: calc(50% - 50vw);
     right: calc(50% - 50vw);
     z-index: -4;
-    background-image:
-      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 80%, white) 0%, color-mix(in srgb, #EEF1E3 80%, white) 5%, color-mix(in srgb, #EEF1E3 60%, white) 10%, color-mix(in srgb, #EEF1E3 20%, transparent) 16%, color-mix(in srgb, #EEF1E3 5%, transparent) 22%, rgba(255,255,255,0) 28%),
-      radial-gradient(44% 56% at 15% 28%, color-mix(in srgb, #EEF1E3 18%, white) 0%, color-mix(in srgb, #EEF1E3 7%, transparent) 38%, rgba(255,255,255,0) 72%),
-      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 9%, white) 0%, rgba(255,255,255,0) 42%, color-mix(in srgb, #EEF1E3 4%, transparent) 100%),
-      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
-      var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-image: var(--hero-bg-image-active);
+    background-repeat: no-repeat;
+    background-position: var(--hero-bg-position-active);
+    background-size: var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
-      saturate(var(--hero-bg-saturate-active))
-      brightness(var(--hero-bg-brightness-active))
-      contrast(var(--hero-bg-contrast-active));
+      saturate(0.96)
+      brightness(0.915)
+      contrast(0.97);
     pointer-events: none;
   }
 
@@ -822,37 +817,50 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
-      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
+      linear-gradient(90deg,
+        rgba(240,244,236,0.95) 0%,
+        rgba(240,244,236,0.93) 10%,
+        rgba(240,244,236,0.88) 19%,
+        rgba(240,244,236,0.78) 28%,
+        rgba(240,244,236,0.58) 36%,
+        rgba(240,244,236,0.34) 44%,
+        rgba(240,244,236,0.14) 52%,
+        rgba(240,244,236,0.00) 62%
+      ),
+      linear-gradient(180deg,
+        rgba(247,249,244,0.24) 0%,
+        rgba(247,249,244,0.10) 34%,
+        rgba(247,249,244,0.04) 100%
+      ),
+      radial-gradient(circle at 73% 22%, rgba(225,213,150,0.08) 0%, rgba(225,213,150,0.00) 15%);
     pointer-events: none;
-  }
-
-  body.page-route-activities .desktop-hero::before{
-    background-image:
-      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 92%, white) 0%, color-mix(in srgb, #EEF1E3 92%, white) 7%, color-mix(in srgb, #EEF1E3 76%, white) 13%, color-mix(in srgb, #EEF1E3 44%, white) 20%, color-mix(in srgb, #EEF1E3 16%, transparent) 28%, rgba(255,255,255,0) 38%),
-      radial-gradient(52% 64% at 16% 27%, color-mix(in srgb, #EEF1E3 28%, white) 0%, color-mix(in srgb, #EEF1E3 11%, transparent) 42%, rgba(255,255,255,0) 78%),
-      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 12%, white) 0%, rgba(255,255,255,0) 46%, color-mix(in srgb, #EEF1E3 5%, transparent) 100%),
-      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
-      var(--hero-bg-image-active);
-  }
-
-  body.page-route-activities .desktop-hero::after{
-    background:
-      radial-gradient(circle at 18% 24%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 18%),
-      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
-      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
   }
 
   .desktop-entry{
     display: block;
     min-width: 0;
     padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .desktop-entry__inner{
+    display: grid;
+    gap: 0;
+    width: fit-content;
+    max-width: min(36rem, 100%);
+    padding: 18px 22px 18px 16px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(247,249,243,0.74) 0%, rgba(243,247,239,0.58) 100%);
+    box-shadow:
+      0 18px 40px rgba(14,24,12,0.05),
+      0 1px 0 rgba(255,255,255,0.58) inset;
+    backdrop-filter: blur(10px) saturate(1.04);
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
   }
 
   .desktop-entry__content{
-    max-width: 35rem;
+    max-width: 30rem;
     gap: 10px;
   }
 
@@ -861,30 +869,20 @@
   }
 
   .desktop-entry__title{
-    max-width: 30rem;
-    color: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
+    max-width: 29rem;
+    color: #14301F;
     font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
-  }
-
-  body.page-route-activities .desktop-entry__title{
-    max-width: 29rem;
-    color: color-mix(in srgb, var(--brand-green-900) 97%, black 3%);
     text-shadow: 0 1px 0 rgba(255,255,255,0.22);
   }
 
   .desktop-entry__text{
-    max-width: 29rem;
-    color: rgba(24,40,30,0.86);
+    max-width: 27rem;
+    color: rgba(20,33,25,0.92);
     font-size: 0.99rem;
-    line-height: 1.42;
-  }
-
-  body.page-route-activities .desktop-entry__text{
-    max-width: 28rem;
-    color: rgba(24,40,30,0.94);
-    font-weight: 560;
+    line-height: 1.44;
+    font-weight: 580;
   }
 
   .desktop-entry__text br{
@@ -894,7 +892,7 @@
   .desktop-entry__text--lead{
     gap: 6px;
   }
-  /* === END BLOCK: HOME_DESKTOP_HERO_COPY_CONTRAST_POLISH_V1 === */
+/* === END BLOCK: HOME_DESKTOP_HERO_READING_ZONE_V2 === */
 
   .top-stack{
     position: relative;
@@ -1204,7 +1202,7 @@
 }
 /* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
+/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V27 | Zweck: hält die neue Hero-Reading-Zone auch auf 900–1024px stabil, entfernt den alten Fade-Override und skaliert Copy-Surface + Typografie kontrolliert herunter; Umfang: Narrow-Desktop-Hero für Home und Aktivitäten === */
 @media (min-width: 900px) and (max-width: 1024px){
   .desktop-hero{
     --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
@@ -1217,20 +1215,33 @@
     padding-bottom: 14px;
   }
 
-  .desktop-hero::before{
-    background-image:
-      linear-gradient(90deg, rgba(246,248,240,0.986) 0%, rgba(246,248,240,0.976) 8%, rgba(246,248,240,0.86) 14%, rgba(245,247,238,0.54) 20%, rgba(244,246,236,0.22) 27%, rgba(244,246,236,0.06) 34%, rgba(244,246,236,0.00) 40%),
-      radial-gradient(42% 54% at 16% 28%, rgba(245,248,239,0.28) 0%, rgba(245,248,239,0.12) 40%, rgba(245,248,239,0.03) 64%, rgba(245,248,239,0.00) 80%),
-      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.015) 42%, rgba(245,248,239,0.07) 100%),
-      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.05) 0%, rgba(240,222,137,0.00) 14%),
-      var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+  .desktop-hero::after{
+    background:
+      linear-gradient(90deg,
+        rgba(240,244,236,0.97) 0%,
+        rgba(240,244,236,0.95) 13%,
+        rgba(240,244,236,0.90) 23%,
+        rgba(240,244,236,0.80) 33%,
+        rgba(240,244,236,0.58) 42%,
+        rgba(240,244,236,0.28) 51%,
+        rgba(240,244,236,0.00) 61%
+      ),
+      linear-gradient(180deg,
+        rgba(247,249,244,0.26) 0%,
+        rgba(247,249,244,0.11) 34%,
+        rgba(247,249,244,0.04) 100%
+      ),
+      radial-gradient(circle at 73% 22%, rgba(225,213,150,0.08) 0%, rgba(225,213,150,0.00) 15%);
+  }
+
+  .desktop-entry__inner{
+    max-width: min(27rem, 100%);
+    padding: 14px 16px 14px 12px;
+    border-radius: 20px;
   }
 
   .desktop-entry__content{
-    max-width: 26rem;
+    max-width: 24.25rem;
     gap: 8px;
   }
 
@@ -1241,7 +1252,7 @@
   }
 
   .desktop-entry__text{
-    max-width: 20.25rem;
+    max-width: 19.75rem;
     font-size: 0.90rem;
     line-height: 1.38;
   }
@@ -1321,7 +1332,7 @@
     font-size: 0.80rem;
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
+/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V27 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
