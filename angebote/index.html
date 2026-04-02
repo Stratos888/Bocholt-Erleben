@@ -30,7 +30,7 @@ Umfang:
 <!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
 </head>
 
-<body>
+<body class="page-route-activities">
 <!-- === BEGIN BLOCK: HEADER (logo/title + install + about) ===
 Zweck:
 - Gleiche Header-DNA wie Home
@@ -55,15 +55,15 @@ Umfang:
 <!-- === END BLOCK: HEADER (logo/title + install + about) === -->
 
 <main class="page page--activities">
-<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V2 (mobile parity + desktop popovers) ===
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V3 (event-shell parity) ===
 Zweck:
-- Mobile bleibt im Sheet-Modell wie Events
-- Desktop bekommt direkt an der Pill verankerte Popovers wie die Eventseite
-- Struktur bleibt Home-DNA, aber ohne Parallel-UI
+- Aktivitäten nutzt dieselbe Search-/Filter-Shell wie Events
+- Mobile bleibt Sheet-basiert, Desktop bleibt Popover-basiert
+- keine eigene Parallel-DNA mehr im oberen Suchbereich
 Umfang:
-- oberer Bereich der Aktivitätenseite inkl. Sheets + Desktop-Popovers
+- Intro + Search-/Filter-Shell bis zur Search-Row
 === -->
-  <section class="desktop-hero activities-hero" aria-label="Aktivitäten finden">
+  <section class="desktop-hero" aria-label="Suche und Einführung">
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
       <div class="desktop-entry__inner">
         <div class="desktop-entry__content">
@@ -73,8 +73,8 @@ Umfang:
       </div>
     </section>
 
-    <div class="top-stack activities-top-stack">
-      <div class="desktop-hero__search-row activities-controls" aria-label="Suche und Filter">
+    <div class="top-stack desktop-hero__panel">
+      <div class="desktop-hero__search-row" aria-label="Suche und Filter">
         <div class="events-filter desktop-hero__search-slot">
           <label class="desktop-hero__search-field" for="search-filter">
             <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
