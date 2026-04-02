@@ -1293,7 +1293,7 @@
   }
 }
 /* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
-/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V2 | Purpose: hält Desktop-Filter-Popover inkl. integriertem Kalender vollständig im Viewport und erlaubt internes Scrollen statt abgeschnittener Fläche; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
     display: none !important;
@@ -1315,11 +1315,13 @@
     transform-origin: top left;
   }
 
-  #popover-time{
+  #popover-time,
+  #popover-situation{
     width: min(280px, calc(100vw - 32px));
   }
 
-  #popover-category{
+  #popover-category,
+  #popover-offer-category{
     width: min(332px, calc(100vw - 32px));
   }
 
@@ -1403,7 +1405,9 @@
   }
 
   #filter-time-pill[aria-expanded="true"],
-  #filter-category-pill[aria-expanded="true"]{
+  #filter-category-pill[aria-expanded="true"],
+  #offer-situation-pill[aria-expanded="true"],
+  #offer-category-pill[aria-expanded="true"]{
     border-color: rgba(111,135,88,0.22);
     background: rgba(255,255,255,0.985);
     box-shadow:
@@ -1472,7 +1476,7 @@
     display: none !important;
   }
 }
-/* === END BLOCK: DESKTOP_FILTER_POPOVER_V2 === */
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V3 === */
 
 /* === BEGIN BLOCK: HOME_EMPTY_STATE_ALIGN_V1 | Zweck: entfernt im Home-Empty-State den zusätzlichen Reset-Button visuell, zieht den Empty-State auf dieselbe Rail/Breite wie Search und Feed und zentriert den Text nur auf Mobile; Umfang: nur Home-Empty-State im Event-Feed === */
 #event-cards .empty-state{
