@@ -1,9 +1,9 @@
 // BEGIN: FILE_HEADER_OFFERS_DETAILS
 // Datei: js/offers-details.js
 // Zweck:
-// - Activity-Detailpanel für die Aktivitäten-Seite
-// - Reused Overlay-/Panel-Familie des Event-Detailpanels
-// - Nutzt den gleichen Scroll-Container wie das Event-Detailpanel
+/// - Activity-Detailpanel für Mobile
+// - Desktop wird bewusst vom Panel entkoppelt und öffnet direkt die Ziel-URL
+// - Nutzt dieselbe Kategorie-/Meta-Logik wie die Cards
 // END: FILE_HEADER_OFFERS_DETAILS
 
 const OfferDetailPanel = {
@@ -14,6 +14,10 @@ const OfferDetailPanel = {
   closeBtn: null,
   _isInit: false,
   _lastFocusEl: null,
+
+  isDesktopViewport() {
+    return window.matchMedia("(min-width: 900px)").matches;
+  },
 
   init() {
     if (this._isInit) return;
@@ -61,6 +65,15 @@ const OfferDetailPanel = {
   },
 
   show(offer) {
+    const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.url)
+      : String(offer?.url || "").trim();
+
+    if (this.isDesktopViewport() && primaryUrl) {
+      window.open(primaryUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (!this._isInit) this.init();
     if (!this.panel || !this.content || !this.body) return;
 
@@ -71,7 +84,6 @@ const OfferDetailPanel = {
 
     this.panel.classList.remove("hidden");
     this.panel.removeAttribute("hidden");
-
     this.body.scrollTop = 0;
 
     requestAnimationFrame(() => {
@@ -112,12 +124,16 @@ const OfferDetailPanel = {
     });
   },
 
-  slugify(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9äöüß]+/gi, "-")
-      .replace(/^-+|-+$/g, "");
+  getVisual(offer) {
+    if (window.OfferVisuals?.getCategoryPresentation) {
+      return window.OfferVisuals.getCategoryPresentation(offer?.kategorie);
+    }
+
+    return {
+      label: String(offer?.kategorie || "Aktivität").trim() || "Aktivität",
+      iconKey: "pin",
+      modifier: "aktivitaet"
+    };
   },
 
   buildMapsUrl(location) {
@@ -125,6 +141,11 @@ const OfferDetailPanel = {
   },
 
   renderMedia(offer) {
+    const visual = this.getVisual(offer);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-detail__media-icon-svg" })
+      : "";
+
     if (offer.image) {
       return `
         <div class="activity-detail__media">
@@ -133,33 +154,33 @@ const OfferDetailPanel = {
       `.trim();
     }
 
-    const modifier = this.slugify(offer.kategorie || "aktivitaet");
-    const shortLabel = this.escapeHtml((offer.kategorie || "Aktivität").split("&")[0].trim());
-
     return `
-      <div class="activity-detail__media activity-detail__media--fallback activity-detail__media--${modifier}">
-        <span class="activity-detail__media-label">${shortLabel}</span>
+      <div class="activity-detail__media activity-detail__media--fallback activity-detail__media--${visual.modifier}">
+        <div class="activity-detail__media-icon">${iconHtml || this.escapeHtml(visual.label.slice(0, 1))}</div>
+        <div class="activity-detail__media-label">${this.escapeHtml(visual.label)}</div>
       </div>
     `.trim();
   },
 
-  renderTags(tags) {
-    const list = Array.isArray(tags) ? tags.filter(Boolean) : [];
-    if (!list.length) return "";
+  renderCategoryBadge(offer) {
+    const visual = this.getVisual(offer);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-detail__category-icon-svg" })
+      : "";
+
     return `
-      <div class="activity-detail__chips">
-        ${list.map((tag) => `<span class="discovery-chip">${this.escapeHtml(tag)}</span>`).join("")}
+      <div class="activity-detail__category activity-detail__category--${visual.modifier}">
+        <span class="activity-detail__category-icon" aria-hidden="true">${iconHtml || this.escapeHtml(visual.label.slice(0, 1))}</span>
+        <span class="activity-detail__category-label">${this.escapeHtml(visual.label)}</span>
       </div>
     `.trim();
   },
 
   renderInfoGrid(offer) {
     const items = [
-      ["Typische Dauer", offer.duration],
       ["Drinnen / Draußen", offer.mode],
       ["Kosten", offer.price],
       ["Geeignet für", (offer.audience || []).join(" · ")],
-      ["Bereich", offer.kategorie],
       ["Lage", offer.area],
       ["Saison", offer.season],
       ["Hinweis", offer.hint]
@@ -181,21 +202,28 @@ const OfferDetailPanel = {
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer.location);
-    const websiteUrl = offer.url;
+    const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer.url)
+      : String(offer.url || "").trim();
+    const metaLine = window.OfferVisuals?.buildMetaLine
+      ? window.OfferVisuals.buildMetaLine(offer)
+      : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
+    const description = String(offer?.description || "").trim();
 
     this.content.innerHTML = `
       <article class="activity-detail">
         ${this.renderMedia(offer)}
 
         <header class="activity-detail__header">
+          ${this.renderCategoryBadge(offer)}
           <h2 class="activity-detail__title">${this.escapeHtml(offer.title)}</h2>
           <div class="activity-detail__place">${this.escapeHtml(offer.location)}</div>
-          ${this.renderTags(offer.tags)}
+          ${metaLine ? `<div class="activity-detail__meta">${this.escapeHtml(metaLine)}</div>` : ""}
         </header>
 
         <div class="activity-detail__body">
-          <p class="activity-detail__description">${this.escapeHtml(offer.description)}</p>
           ${this.renderInfoGrid(offer)}
+          ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
 
           <div class="activity-detail__actions">
             <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
