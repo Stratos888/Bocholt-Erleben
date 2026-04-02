@@ -1125,9 +1125,12 @@
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
-/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V4 | Zweck: zieht Aktivitäten final auf Event-Shell + Event-Card-Logik, entfernt den linken Rail, setzt das Kategorie-Icon oben rechts, verdichtet das Mobile-Panel auf kompakte Faktenzeilen und blendet die Tabbar auf Desktop korrekt aus; Umfang: kompletter Activities-Komponentenblock konsolidiert === */
+/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V5 | Zweck: stabilisiert die Activities-Shell auf Event-Niveau, entfernt den zusätzlichen Top-Balken durch volle Main-Ownership und stellt die mobile Bottom-Tabbar als echte Komponente wieder her; Umfang: kompletter Activities-Komponentenblock konsolidiert === */
 .page--activities{
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 calc(88px + env(safe-area-inset-bottom, 0px));
 }
 
 .page--activities .loading-container{
@@ -1140,7 +1143,7 @@
 }
 
 .page--activities .events-section{
-  padding-top: 10px;
+  padding-top: 14px;
 }
 
 .page--activities .activity-cards-grid{
@@ -1226,6 +1229,22 @@
 }
 
 body.page-route-activities > .bottom-tabbar{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 980;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+
+  padding:
+    10px
+    calc(var(--gutter) + 2px)
+    calc(10px + env(safe-area-inset-bottom, 0px));
+
   background: linear-gradient(180deg, rgba(247,249,242,0.965) 0%, rgba(239,244,232,0.985) 100%);
   border-top: 1px solid rgba(24,40,30,0.08);
   box-shadow:
@@ -1234,11 +1253,60 @@ body.page-route-activities > .bottom-tabbar{
 }
 
 body.page-route-activities > .bottom-tabbar .bottom-tabbar__item{
-  border-color: rgba(24,40,30,0.08);
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+
+  border: 1px solid rgba(24,40,30,0.08);
+  border-radius: 16px;
   background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(246,248,241,0.92) 100%);
   box-shadow:
     0 8px 18px rgba(0,0,0,0.03),
     0 1px 0 rgba(255,255,255,0.76) inset;
+
+  color: rgba(24,40,30,0.76);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__item:hover,
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__item:visited,
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__item:active{
+  color: rgba(24,40,30,0.76);
+  text-decoration: none;
+}
+
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__icon svg{
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__icon svg path{
+  fill: currentColor;
+}
+
+body.page-route-activities > .bottom-tabbar .bottom-tabbar__label{
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active,
@@ -1547,6 +1615,6 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item[aria-current="p
     gap: 18px 20px;
   }
 }
-/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V4 === */
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V5 === */
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS === */
