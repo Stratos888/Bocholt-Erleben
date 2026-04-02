@@ -55,13 +55,14 @@ Umfang:
 <!-- === END BLOCK: HEADER (logo/title + install + about) === -->
 
 <main class="page page--activities">
-<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS (home-dna, no hero overload) ===
-  Zweck:
-  - übernimmt die Home-Grammatik (Intro + top-stack + Search + 2 Controls)
-  - bleibt mobile-first kompakt
-  Umfang:
-  - oberer Bereich der Aktivitätenseite inkl. Activity-Filter-Sheets
-  === -->
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V2 (mobile parity + desktop popovers) ===
+Zweck:
+- Mobile bleibt im Sheet-Modell wie Events
+- Desktop bekommt direkt an der Pill verankerte Popovers wie die Eventseite
+- Struktur bleibt Home-DNA, aber ohne Parallel-UI
+Umfang:
+- oberer Bereich der Aktivitätenseite inkl. Sheets + Desktop-Popovers
+=== -->
   <section class="desktop-hero activities-hero" aria-label="Aktivitäten finden">
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
       <div class="desktop-entry__inner">
@@ -93,7 +94,9 @@ Umfang:
           class="filter-pill desktop-hero__toolbar-pill"
           id="offer-situation-pill"
           aria-haspopup="dialog"
-          aria-controls="sheet-situation"
+          aria-expanded="false"
+          aria-controls="popover-situation"
+          data-filter-key="situation"
         >
           <span class="filter-pill__label">Situation</span>
           <span class="filter-pill__value" id="offer-situation-value">Alle</span>
@@ -104,7 +107,9 @@ Umfang:
           class="filter-pill desktop-hero__toolbar-pill"
           id="offer-category-pill"
           aria-haspopup="dialog"
-          aria-controls="sheet-category"
+          aria-expanded="false"
+          aria-controls="popover-offer-category"
+          data-filter-key="category"
         >
           <span class="filter-pill__label">Bereich</span>
           <span class="filter-pill__value" id="offer-category-value">Alle</span>
@@ -142,7 +147,15 @@ Umfang:
       </div>
     </div>
   </div>
-  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS (home-dna, no hero overload) === -->
+
+  <div id="popover-situation" class="filter-popover" hidden>
+    <div class="filter-popover__panel" id="popover-situation-options" aria-label="Situation auswählen"></div>
+  </div>
+
+  <div id="popover-offer-category" class="filter-popover" hidden>
+    <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Bereich auswählen"></div>
+  </div>
+  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V2 (mobile parity + desktop popovers) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
     <div class="loading-spinner" aria-hidden="true"></div>
@@ -189,21 +202,23 @@ Umfang: Bottom Tab Bar.
 </nav>
 <!-- === END BLOCK: BOTTOM TAB BAR (Events/Aktivitäten) === -->
 
-<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order) ===
+<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V2) ===
 Zweck:
+- gemeinsame Icon-Registry auch auf Aktivitätenseite verfügbar
 - Reihenfolge garantiert:
-  1) config / pwa / modal
-  2) offers-details (Panel API)
-  3) offers (Cards)
-  4) offers-main (Filter + Boot)
+  1) config / pwa / modal / icons
+  2) offers (shared visuals + cards)
+  3) offers-details (mobile panel)
+  4) offers-main (filter + boot)
 === -->
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<script src="/js/icons.js?v=2026-02-04-1" defer></script>
 
-<script src="/js/offers-details.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers.js?v=2026-02-04-1" defer></script>
+<script src="/js/offers-details.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers-main.js?v=2026-02-04-1" defer></script>
-<!-- === END BLOCK: JS INCLUDES (activities page final order) === -->
+<!-- === END BLOCK: JS INCLUDES (activities page final order V2) === -->
 </body>
 </html>
