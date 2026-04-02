@@ -54,14 +54,14 @@ Umfang:
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + about) === -->
 
-<main class="page page--activities">
-<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V3 (event-shell parity) ===
+<main class="page--activities">
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) ===
 Zweck:
-- Aktivitäten nutzt dieselbe Search-/Filter-Shell wie Events
-- Mobile bleibt Sheet-basiert, Desktop bleibt Popover-basiert
-- keine eigene Parallel-DNA mehr im oberen Suchbereich
+- entfernt die generische .page-Hülle, damit kein zusätzlicher Balken/Top-Abstand zwischen Header und Hero entsteht
+- zieht Aktivitäten oben strukturell auf dieselbe Shell wie Events
+- ergänzt die zweite Service-Zeile für Desktop-Parität
 Umfang:
-- Intro + Search-/Filter-Shell bis zur Search-Row
+- Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
   <section class="desktop-hero" aria-label="Suche und Einführung">
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
@@ -119,6 +119,28 @@ Umfang:
           Zurücksetzen
         </button>
       </div>
+
+      <div class="desktop-hero__actions" aria-label="Service">
+        <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
+          <span class="desktop-hero__icon desktop-hero__icon--publish" aria-hidden="true"></span>
+          <span>Event veröffentlichen</span>
+        </a>
+
+        <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
+          <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
+          <span>Mehr erfahren</span>
+        </a>
+
+        <button
+          type="button"
+          class="desktop-hero__action desktop-hero__action--app"
+          data-pwa-install-trigger
+          aria-label="Als App installieren"
+        >
+          <span class="desktop-hero__icon desktop-hero__icon--app" aria-hidden="true"></span>
+          <span>Als App nutzen</span>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -155,7 +177,7 @@ Umfang:
   <div id="popover-offer-category" class="filter-popover" hidden>
     <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Bereich auswählen"></div>
   </div>
-  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V2 (mobile parity + desktop popovers) === -->
+  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
     <div class="loading-spinner" aria-hidden="true"></div>
