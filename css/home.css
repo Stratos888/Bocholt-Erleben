@@ -786,7 +786,7 @@
     box-shadow: none;
   }
 
-  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 | Zweck: überführt den final validierten Brand-Warm-Hero-Wash in die produktive Desktop-Home und reduziert den Rest-Milchschleier systemisch; Umfang: nur Desktop-Hero-Overlay im V30-Block, keine Geometrieänderung === */
+  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_COPY_CONTRAST_POLISH_V1 | Zweck: hält den validierten Desktop-Hero-Wash global stabil und hebt auf /angebote/ H1 + Lead kontraststärker und motivunabhängiger heraus; Umfang: Desktop-Hero-Overlay + Desktop-Entry-Typografie im Desktop-Breakpoint === */
   .desktop-hero::before{
     content: "";
     position: absolute;
@@ -827,7 +827,23 @@
       linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
     pointer-events: none;
   }
-  /* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 === */
+
+  body.page-route-activities .desktop-hero::before{
+    background-image:
+      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 92%, white) 0%, color-mix(in srgb, #EEF1E3 92%, white) 7%, color-mix(in srgb, #EEF1E3 76%, white) 13%, color-mix(in srgb, #EEF1E3 44%, white) 20%, color-mix(in srgb, #EEF1E3 16%, transparent) 28%, rgba(255,255,255,0) 38%),
+      radial-gradient(52% 64% at 16% 27%, color-mix(in srgb, #EEF1E3 28%, white) 0%, color-mix(in srgb, #EEF1E3 11%, transparent) 42%, rgba(255,255,255,0) 78%),
+      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 12%, white) 0%, rgba(255,255,255,0) 46%, color-mix(in srgb, #EEF1E3 5%, transparent) 100%),
+      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
+      var(--hero-bg-image-active);
+  }
+
+  body.page-route-activities .desktop-hero::after{
+    background:
+      radial-gradient(circle at 18% 24%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 18%),
+      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
+      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
+      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
+  }
 
   .desktop-entry{
     display: block;
@@ -852,11 +868,23 @@
     letter-spacing: -0.06em;
   }
 
+  body.page-route-activities .desktop-entry__title{
+    max-width: 29rem;
+    color: color-mix(in srgb, var(--brand-green-900) 97%, black 3%);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.22);
+  }
+
   .desktop-entry__text{
     max-width: 29rem;
     color: rgba(24,40,30,0.86);
     font-size: 0.99rem;
     line-height: 1.42;
+  }
+
+  body.page-route-activities .desktop-entry__text{
+    max-width: 28rem;
+    color: rgba(24,40,30,0.94);
+    font-weight: 560;
   }
 
   .desktop-entry__text br{
@@ -866,6 +894,7 @@
   .desktop-entry__text--lead{
     gap: 6px;
   }
+  /* === END BLOCK: HOME_DESKTOP_HERO_COPY_CONTRAST_POLISH_V1 === */
 
   .top-stack{
     position: relative;
