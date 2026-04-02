@@ -1,19 +1,12 @@
 // BEGIN: FILE_HEADER_OFFERS
 // Datei: js/offers.js
 // Zweck:
-// - Rendert kompakte Activity Cards im Feed der Aktivitäten-Seite
-// - Nutzt bewusst die Event-Card-DNA statt der großen Discovery-Card-Fläche
-// - Öffnet das Activity-Detailpanel bei Klick/Enter/Space
+// - Rendert Activity Cards für Mobile + Desktop
+// - Nutzt auf Mobile das Detailpanel, auf Desktop direkten Ziel-Open wie bei Events
+// - Stellt die visuelle Kategorie-Logik zentral über window.OfferVisuals bereit
 // END: FILE_HEADER_OFFERS
 
-const OfferCards = (() => {
-  let container = null;
-
-  function ensureContainer() {
-    if (!container) container = document.getElementById("offer-cards");
-    return container;
-  }
-
+const OfferVisuals = (() => {
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => {
       switch (ch) {
@@ -27,6 +20,21 @@ const OfferCards = (() => {
     });
   }
 
+  function normalizeHttpUrl(raw) {
+    const value = String(raw || "").trim();
+    if (!value) return "";
+
+    try {
+      return new URL(value).href;
+    } catch (_) {
+      try {
+        return new URL(`https://${value}`).href;
+      } catch (_) {
+        return "";
+      }
+    }
+  }
+
   function slugify(value) {
     return String(value || "")
       .trim()
@@ -35,91 +43,147 @@ const OfferCards = (() => {
       .replace(/^-+|-+$/g, "");
   }
 
-  // BEGIN: ACTIVITY_CARD_THUMB_LABEL_MAPPING
-  function getThumbLabel(category) {
+  // BEGIN: ACTIVITY_CATEGORY_PRESENTATION
+  function getCategoryPresentation(category) {
     const normalized = String(category || "").trim().toLowerCase();
 
-    if (!normalized) return "Aktiv";
-    if (normalized.includes("sport")) return "Sport";
-    if (normalized.includes("natur")) return "Natur";
-    if (normalized.includes("kultur")) return "Kultur";
-    if (normalized.includes("freizeit")) return "Freizeit";
+    if (normalized.includes("sport")) {
+      return { label: "Aktiv", iconKey: "cat-sport", modifier: "sport-bewegung" };
+    }
 
-    return String(category || "Aktiv")
-      .split("&")[0]
-      .split("/")[0]
-      .trim();
+    if (normalized.includes("natur")) {
+      return { label: "Natur", iconKey: "cat-nature", modifier: "natur" };
+    }
+
+    if (normalized.includes("kultur")) {
+      return { label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
+    }
+
+    if (normalized.includes("freizeit")) {
+      return { label: "Freizeit", iconKey: "pin", modifier: "freizeitorte" };
+    }
+
+    return {
+      label: String(category || "Aktivität").trim() || "Aktivität",
+      iconKey: "pin",
+      modifier: slugify(category || "aktivitaet") || "aktivitaet"
+    };
   }
-  // END: ACTIVITY_CARD_THUMB_LABEL_MAPPING
+  // END: ACTIVITY_CATEGORY_PRESENTATION
+
+  function buildMetaLine(offer) {
+    return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
+  }
+
+  return {
+    escapeHtml,
+    normalizeHttpUrl,
+    getCategoryPresentation,
+    buildMetaLine
+  };
+})();
+
+window.OfferVisuals = OfferVisuals;
+
+const OfferCards = (() => {
+  let container = null;
+
+  const isDesktopViewport = () => window.matchMedia("(min-width: 900px)").matches;
+
+  function ensureContainer() {
+    if (!container) container = document.getElementById("offer-cards");
+    return container;
+  }
 
   function renderThumb(offer) {
+    const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-card-thumb__icon-svg" })
+      : `<span class="activity-card-thumb__fallback-letter">${OfferVisuals.escapeHtml(visual.label.slice(0, 1))}</span>`;
+
     if (offer.image) {
       return `
-        <div class="activity-card-thumb">
-          <img src="${escapeHtml(offer.image)}" alt="${escapeHtml(offer.title)}" loading="lazy">
+        <div class="activity-card-thumb activity-card-thumb--image">
+          <img src="${OfferVisuals.escapeHtml(offer.image)}" alt="${OfferVisuals.escapeHtml(offer.title)}" loading="lazy">
         </div>
       `.trim();
     }
 
-    const modifier = slugify(offer.kategorie || "aktivitaet");
-    const shortLabel = escapeHtml(getThumbLabel(offer.kategorie));
-
     return `
-      <div class="activity-card-thumb activity-card-thumb--fallback activity-card-thumb--${modifier}">
-        <span class="activity-card-thumb__label">${shortLabel}</span>
+      <div class="activity-card-thumb activity-card-thumb--fallback activity-card-thumb--${visual.modifier}" aria-hidden="true">
+        <span class="activity-card-thumb__icon">${iconHtml}</span>
       </div>
     `.trim();
   }
 
-  function renderTags(tags) {
-    const visibleTags = (Array.isArray(tags) ? tags : []).filter(Boolean).slice(0, 3);
-    if (!visibleTags.length) return "";
-    return `
-      <div class="activity-card-tags">
-        ${visibleTags.map((tag) => `<span class="discovery-chip">${escapeHtml(tag)}</span>`).join("")}
-      </div>
-    `.trim();
+  function renderDescription(offer) {
+    const text = String(offer?.description || "").trim();
+    if (!text) return "";
+    return `<p class="event-card-desc">${OfferVisuals.escapeHtml(text)}</p>`;
   }
 
-  function renderQuietMeta(offer) {
-    const parts = [offer.duration, offer.mode, offer.price].filter(Boolean).slice(0, 3);
-    if (!parts.length) return "";
-    return `<div class="activity-card-quiet">${parts.map(escapeHtml).join(" · ")}</div>`;
+  function openPrimaryDesktopTarget(url) {
+    if (!url) return false;
+
+    try {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   function createCard(offer) {
     const article = document.createElement("article");
+    const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
+    const primaryUrl = OfferVisuals.normalizeHttpUrl(offer.url);
+    const metaLine = OfferVisuals.buildMetaLine(offer);
+
     article.className = "event-card discovery-card--compact";
     article.tabIndex = 0;
     article.setAttribute("role", "button");
-    article.setAttribute("aria-label", `Aktivität anzeigen: ${offer.title}`);
+    article.setAttribute(
+      "aria-label",
+      primaryUrl ? `Aktivität öffnen: ${offer.title}` : `Aktivität anzeigen: ${offer.title}`
+    );
 
     article.innerHTML = `
       ${renderThumb(offer)}
       <div class="event-card-body">
+        <div class="activity-card-kicker">${OfferVisuals.escapeHtml(visual.label)}</div>
         <h2 class="event-title">
-          <span class="event-title__text">${escapeHtml(offer.title)}</span>
+          <span class="event-title__text">${OfferVisuals.escapeHtml(offer.title)}</span>
         </h2>
         <div class="event-meta">
-          <span class="event-meta__place">${escapeHtml(offer.location)}</span>
+          <span class="event-meta__place">${OfferVisuals.escapeHtml(offer.location)}</span>
         </div>
-        <p class="event-card-desc">${escapeHtml(offer.description)}</p>
-        ${renderTags(offer.tags)}
-        ${renderQuietMeta(offer)}
+        ${renderDescription(offer)}
+        ${metaLine ? `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(metaLine)}</div>` : ""}
       </div>
     `.trim();
 
-    const open = () => {
+    const open = (event) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (isDesktopViewport()) {
+        if (openPrimaryDesktopTarget(primaryUrl)) return;
+      }
+
       if (window.OfferDetailPanel?.show) {
         window.OfferDetailPanel.show(offer);
+        return;
       }
+
+      openPrimaryDesktopTarget(primaryUrl);
     };
 
     article.addEventListener("click", open);
     article.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      open();
+      open(event);
     });
 
     return article;
