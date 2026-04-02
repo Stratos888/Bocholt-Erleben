@@ -43,33 +43,33 @@ const OfferVisuals = (() => {
       .replace(/^-+|-+$/g, "");
   }
 
-  // BEGIN: ACTIVITY_CATEGORY_PRESENTATION
   function getCategoryPresentation(category) {
-    const normalized = String(category || "").trim().toLowerCase();
+    const raw = String(category || "").trim();
+    const normalized = raw.toLowerCase();
 
     if (normalized.includes("sport")) {
-      return { label: "Aktiv", iconKey: "cat-sport", modifier: "sport-bewegung" };
+      return { rawLabel: raw || "Sport & Bewegung", label: "Aktiv", iconKey: "cat-sport", modifier: "sport-bewegung" };
     }
 
     if (normalized.includes("natur")) {
-      return { label: "Natur", iconKey: "cat-nature", modifier: "natur" };
+      return { rawLabel: raw || "Natur", label: "Natur", iconKey: "cat-nature", modifier: "natur" };
     }
 
     if (normalized.includes("kultur")) {
-      return { label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
+      return { rawLabel: raw || "Kultur", label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
     }
 
     if (normalized.includes("freizeit")) {
-      return { label: "Freizeit", iconKey: "pin", modifier: "freizeitorte" };
+      return { rawLabel: raw || "Freizeitorte", label: "Freizeit", iconKey: "pin", modifier: "freizeitorte" };
     }
 
     return {
-      label: String(category || "Aktivität").trim() || "Aktivität",
+      rawLabel: raw || "Aktivität",
+      label: raw || "Aktivität",
       iconKey: "pin",
-      modifier: slugify(category || "aktivitaet") || "aktivitaet"
+      modifier: slugify(raw || "aktivitaet") || "aktivitaet"
     };
   }
-  // END: ACTIVITY_CATEGORY_PRESENTATION
 
   function buildMetaLine(offer) {
     return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
@@ -78,6 +78,7 @@ const OfferVisuals = (() => {
   return {
     escapeHtml,
     normalizeHttpUrl,
+    slugify,
     getCategoryPresentation,
     buildMetaLine
   };
@@ -95,25 +96,12 @@ const OfferCards = (() => {
     return container;
   }
 
-  function renderThumb(offer) {
-    const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
+  function renderCategoryIcon(visual) {
     const iconHtml = window.Icons?.svg
-      ? window.Icons.svg(visual.iconKey, { className: "activity-card-thumb__icon-svg" })
-      : `<span class="activity-card-thumb__fallback-letter">${OfferVisuals.escapeHtml(visual.label.slice(0, 1))}</span>`;
+      ? window.Icons.svg(visual.iconKey, { className: "activity-card-category-icon-svg" })
+      : `<span class="activity-card-category-icon-fallback">${OfferVisuals.escapeHtml(visual.label.slice(0, 1))}</span>`;
 
-    if (offer.image) {
-      return `
-        <div class="activity-card-thumb activity-card-thumb--image">
-          <img src="${OfferVisuals.escapeHtml(offer.image)}" alt="${OfferVisuals.escapeHtml(offer.title)}" loading="lazy">
-        </div>
-      `.trim();
-    }
-
-    return `
-      <div class="activity-card-thumb activity-card-thumb--fallback activity-card-thumb--${visual.modifier}" aria-hidden="true">
-        <span class="activity-card-thumb__icon">${iconHtml}</span>
-      </div>
-    `.trim();
+    return `<span class="event-category-icon activity-card-category-icon" aria-hidden="true">${iconHtml}</span>`;
   }
 
   function renderDescription(offer) {
@@ -124,13 +112,8 @@ const OfferCards = (() => {
 
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
-
-    try {
-      window.open(url, "_blank", "noopener,noreferrer");
-      return true;
-    } catch (_) {
-      return false;
-    }
+    window.open(url, "_blank", "noopener,noreferrer");
+    return true;
   }
 
   function createCard(offer) {
@@ -148,11 +131,11 @@ const OfferCards = (() => {
     );
 
     article.innerHTML = `
-      ${renderThumb(offer)}
       <div class="event-card-body">
         <div class="activity-card-kicker">${OfferVisuals.escapeHtml(visual.label)}</div>
         <h2 class="event-title">
           <span class="event-title__text">${OfferVisuals.escapeHtml(offer.title)}</span>
+          ${renderCategoryIcon(visual)}
         </h2>
         <div class="event-meta">
           <span class="event-meta__place">${OfferVisuals.escapeHtml(offer.location)}</span>
@@ -168,8 +151,8 @@ const OfferCards = (() => {
         event.stopPropagation();
       }
 
-      if (isDesktopViewport()) {
-        if (openPrimaryDesktopTarget(primaryUrl)) return;
+      if (isDesktopViewport() && openPrimaryDesktopTarget(primaryUrl)) {
+        return;
       }
 
       if (window.OfferDetailPanel?.show) {
