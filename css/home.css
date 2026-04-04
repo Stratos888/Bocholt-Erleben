@@ -834,22 +834,27 @@
     pointer-events: none;
   }
 
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_VISIBILITY_FIX_V1 | Zweck: hebt den globalen display-none-Default der Hero-Copy im konsolidierten Desktop-Owner sauber auf und hält Copy + Panel weiterhin auf derselben Breitenlogik; Umfang: nur Desktop-Top-Shell-Ownership für .desktop-entry und .top-stack === */
   body.is-tabbar-hidden .desktop-entry,
-  body.page-route-activities .desktop-entry,
+  body.page-route-activities .desktop-entry{
+    display: grid;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-self: stretch;
+    align-self: start;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
   body.is-tabbar-hidden .top-stack,
   body.page-route-activities .top-stack{
     width: 100%;
     max-width: none;
     justify-self: stretch;
   }
-
-  body.is-tabbar-hidden .desktop-entry,
-  body.page-route-activities .desktop-entry{
-    align-self: start;
-    padding: 0;
-    position: relative;
-    z-index: 1;
-  }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_COPY_VISIBILITY_FIX_V1 === */
 
   body.is-tabbar-hidden .desktop-entry__inner,
   body.page-route-activities .desktop-entry__inner{
