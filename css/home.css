@@ -695,7 +695,7 @@
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V36 | Zweck: schließt den finalen Desktop-Home-Restgap durch unsichtbareren linken Fade, leisere CTA-Reihe, minimal souveränere Wide-Desktop-Komposition und leicht entschärfte Narrow-Desktop-Hierarchie; Umfang: Desktop-Header, Hero, Search-Panel, Actions und Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V37 | Zweck: stellt einen gemeinsamen Desktop-Rail-Contract für Home- und Aktivitäten-Suche plus Feed her, erhöht die Lesbarkeit der Home-Copy nachhaltig und zieht die Event-/Aktivitäten-Feeds auf dieselbe Rail wie die Search-Elemente; Umfang: Desktop-Header, Hero, Search-Panel, Copy-Lesbarkeit sowie Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
   body.page-route-activities{
@@ -703,6 +703,7 @@
     --desktop-copy-surface-max: 33.25rem;
     --desktop-copy-max: 28.75rem;
     --desktop-stack-shell-max: 1028px;
+    --desktop-feed-shell-max: 1092px;
     --desktop-panel-gap: 8px;
     --desktop-panel-height: 56px;
     --desktop-reset-w: 46px;
@@ -817,22 +818,22 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.54) 0%,
-        rgba(243,246,240,0.39) 5.5%,
-        rgba(243,246,240,0.21) 10.5%,
-        rgba(243,246,240,0.09) 15.5%,
-        rgba(243,246,240,0.025) 20.5%,
-        rgba(243,246,240,0.00) 25%
+        rgba(243,246,240,0.60) 0%,
+        rgba(243,246,240,0.46) 6%,
+        rgba(243,246,240,0.26) 12%,
+        rgba(243,246,240,0.11) 18%,
+        rgba(243,246,240,0.03) 23%,
+        rgba(243,246,240,0.00) 28%
       ),
       radial-gradient(
-        50% 74% at 13% 28%,
-        rgba(247,249,243,0.10) 0%,
-        rgba(247,249,243,0.035) 42%,
+        56% 80% at 13% 28%,
+        rgba(247,249,243,0.13) 0%,
+        rgba(247,249,243,0.05) 42%,
         rgba(247,249,243,0.00) 74%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.015) 0%,
+        rgba(247,249,244,0.018) 0%,
         rgba(247,249,244,0.00) 56%,
         rgba(233,237,220,0.10) 75%,
         rgba(233,237,220,0.22) 90%,
@@ -853,21 +854,28 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.72) 0%,
-        rgba(243,246,240,0.58) 7%,
-        rgba(243,246,240,0.34) 14%,
-        rgba(243,246,240,0.14) 21%,
-        rgba(243,246,240,0.04) 27%,
-        rgba(243,246,240,0.00) 33%
+        rgba(243,246,240,0.60) 0%,
+        rgba(243,246,240,0.46) 6%,
+        rgba(243,246,240,0.26) 12%,
+        rgba(243,246,240,0.11) 18%,
+        rgba(243,246,240,0.03) 23%,
+        rgba(243,246,240,0.00) 28%
+      ),
+      radial-gradient(
+        56% 80% at 13% 28%,
+        rgba(247,249,243,0.13) 0%,
+        rgba(247,249,243,0.05) 42%,
+        rgba(247,249,243,0.00) 74%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.05) 0%,
+        rgba(247,249,244,0.018) 0%,
         rgba(247,249,244,0.00) 56%,
-        rgba(233,237,220,0.12) 76%,
-        rgba(233,237,220,0.48) 100%
+        rgba(233,237,220,0.10) 75%,
+        rgba(233,237,220,0.22) 90%,
+        rgba(233,237,220,0.34) 100%
       ),
-      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 15%);
+      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.012) 0%, rgba(225,213,150,0.00) 15%);
     pointer-events: none;
   }
 
@@ -914,48 +922,50 @@
   body.is-tabbar-hidden .desktop-entry__inner::before{
     content: "";
     position: absolute;
-    inset: -8px -11px -7px -3px;
+    inset: -11px -18px -10px -6px;
     z-index: -1;
-    border-radius: 26px;
+    border-radius: 30px;
     background:
       radial-gradient(
-        68% 84% at 10% 36%,
-        rgba(247,249,243,0.10) 0%,
-        rgba(247,249,243,0.04) 36%,
-        rgba(247,249,243,0.01) 58%,
-        rgba(247,249,243,0.00) 76%
+        74% 90% at 11% 36%,
+        rgba(247,249,243,0.24) 0%,
+        rgba(247,249,243,0.12) 34%,
+        rgba(247,249,243,0.05) 54%,
+        rgba(247,249,243,0.015) 68%,
+        rgba(247,249,243,0.00) 80%
       ),
       linear-gradient(
         90deg,
-        rgba(247,249,243,0.022) 0%,
-        rgba(247,249,243,0.010) 42%,
-        rgba(247,249,243,0.00) 70%
+        rgba(247,249,243,0.08) 0%,
+        rgba(247,249,243,0.03) 44%,
+        rgba(247,249,243,0.00) 74%
       );
-    filter: blur(8px);
+    filter: blur(11px);
     pointer-events: none;
   }
 
   body.page-route-activities .desktop-entry__inner::before{
     content: "";
     position: absolute;
-    inset: -12px -18px -9px -6px;
+    inset: -11px -18px -10px -6px;
     z-index: -1;
     border-radius: 30px;
     background:
       radial-gradient(
-        76% 92% at 12% 34%,
-        rgba(247,249,243,0.22) 0%,
-        rgba(247,249,243,0.10) 36%,
-        rgba(247,249,243,0.03) 60%,
-        rgba(247,249,243,0.00) 78%
+        74% 90% at 11% 36%,
+        rgba(247,249,243,0.24) 0%,
+        rgba(247,249,243,0.12) 34%,
+        rgba(247,249,243,0.05) 54%,
+        rgba(247,249,243,0.015) 68%,
+        rgba(247,249,243,0.00) 80%
       ),
       linear-gradient(
         90deg,
-        rgba(247,249,243,0.05) 0%,
-        rgba(247,249,243,0.02) 44%,
+        rgba(247,249,243,0.08) 0%,
+        rgba(247,249,243,0.03) 44%,
         rgba(247,249,243,0.00) 74%
       );
-    filter: blur(12px);
+    filter: blur(11px);
     pointer-events: none;
   }
 
@@ -968,37 +978,44 @@
   }
 
   body.is-tabbar-hidden .desktop-entry__title{
-    max-width: 27.9rem;
-    color: #14301F;
+    max-width: 27.8rem;
+    color: #122C1D;
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
     line-height: 0.95;
     letter-spacing: -0.064em;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.10);
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 16px rgba(247,249,243,0.18);
   }
 
   body.page-route-activities .desktop-entry__title{
-    max-width: 26.25rem;
-    color: #14301F;
-    font-size: clamp(2.92rem, 2.74rem + 0.66vw, 3.54rem);
-    line-height: 0.94;
-    letter-spacing: -0.06em;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.14);
+    max-width: 27.8rem;
+    color: #122C1D;
+    font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
+    line-height: 0.95;
+    letter-spacing: -0.064em;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 16px rgba(247,249,243,0.18);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    color: rgba(20,33,25,0.86);
+    color: rgba(18,31,24,0.90);
     font-size: 0.98rem;
-    line-height: 1.40;
-    font-weight: 575;
+    line-height: 1.42;
+    font-weight: 585;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.16),
+      0 0 12px rgba(247,249,243,0.14);
   }
 
   body.is-tabbar-hidden .desktop-entry__text{
-    max-width: 21.75rem;
+    max-width: 21.9rem;
   }
 
   body.page-route-activities .desktop-entry__text{
-    max-width: 25rem;
+    max-width: 21.9rem;
   }
 
   body.is-tabbar-hidden .desktop-entry__text br,
@@ -1025,7 +1042,8 @@
     overflow: visible;
   }
 
-  body.is-tabbar-hidden .top-stack::before{
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
     content: "";
     position: absolute;
     inset: -4px -6px -6px -6px;
@@ -1045,29 +1063,6 @@
         rgba(248,250,243,0.00) 100%
       );
     filter: blur(5px);
-    pointer-events: none;
-  }
-
-  body.page-route-activities .top-stack::before{
-    content: "";
-    position: absolute;
-    inset: -5px -7px -7px -7px;
-    z-index: -1;
-    border-radius: 24px;
-    background:
-      radial-gradient(
-        114% 126% at 12% 12%,
-        rgba(250,252,247,0.20) 0%,
-        rgba(248,250,243,0.10) 32%,
-        rgba(246,249,240,0.03) 54%,
-        rgba(246,249,240,0.00) 74%
-      ),
-      linear-gradient(
-        180deg,
-        rgba(250,252,247,0.05) 0%,
-        rgba(248,250,243,0.00) 100%
-      );
-    filter: blur(7px);
     pointer-events: none;
   }
 
@@ -1098,7 +1093,8 @@
     gap: var(--desktop-panel-gap);
   }
 
-  body.is-tabbar-hidden .desktop-hero__search-row::before{
+  body.is-tabbar-hidden .desktop-hero__search-row::before,
+  body.page-route-activities .desktop-hero__search-row::before{
     content: "";
     position: absolute;
     inset: -3px -4px -3px -4px;
@@ -1117,28 +1113,6 @@
         rgba(251,252,248,0.00) 100%
       );
     filter: blur(4px);
-    pointer-events: none;
-  }
-
-  body.page-route-activities .desktop-hero__search-row::before{
-    content: "";
-    position: absolute;
-    inset: -4px -5px -4px -5px;
-    z-index: -1;
-    border-radius: 18px;
-    background:
-      radial-gradient(
-        116% 150% at 15% 10%,
-        rgba(251,252,248,0.12) 0%,
-        rgba(249,251,245,0.05) 36%,
-        rgba(247,250,242,0.00) 70%
-      ),
-      linear-gradient(
-        180deg,
-        rgba(251,252,248,0.03) 0%,
-        rgba(251,252,248,0.00) 100%
-      );
-    filter: blur(6px);
     pointer-events: none;
   }
 
@@ -1350,7 +1324,11 @@
     }
   }
 
-  body.is-tabbar-hidden .events-section{
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
+    max-width: var(--desktop-feed-shell-max);
+    padding-left: 32px;
+    padding-right: 32px;
     background:
       linear-gradient(
         180deg,
@@ -1369,14 +1347,9 @@
       inset 0 8px 16px rgba(247,249,242,0.08);
   }
 
-  body.page-route-activities .events-section{
-    background: linear-gradient(
-      180deg,
-      #E9EDDC 0%,
-      #E2E8D4 58%,
-      #DBE2CB 100%
-    );
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+  body.is-tabbar-hidden .event-cards-grid,
+  body.page-route-activities .event-cards-grid{
+    max-width: none;
   }
 
   body.is-tabbar-hidden .event-card,
@@ -1440,6 +1413,7 @@
     --desktop-copy-surface-max: 29.5rem;
     --desktop-copy-max: 23.1rem;
     --desktop-stack-shell-max: 100%;
+    --desktop-feed-shell-max: 100%;
     --desktop-panel-gap: 6px;
     --desktop-panel-height: 54px;
     --desktop-reset-w: 44px;
@@ -1455,26 +1429,27 @@
     gap: 10px;
   }
 
-  body.is-tabbar-hidden .desktop-hero::after{
+  body.is-tabbar-hidden .desktop-hero::after,
+  body.page-route-activities .desktop-hero::after{
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.57) 0%,
-        rgba(243,246,240,0.42) 6.5%,
-        rgba(243,246,240,0.24) 12.5%,
-        rgba(243,246,240,0.10) 18%,
-        rgba(243,246,240,0.03) 22.5%,
-        rgba(243,246,240,0.00) 27%
+        rgba(243,246,240,0.62) 0%,
+        rgba(243,246,240,0.47) 7%,
+        rgba(243,246,240,0.28) 13%,
+        rgba(243,246,240,0.12) 18.5%,
+        rgba(243,246,240,0.035) 23%,
+        rgba(243,246,240,0.00) 27.5%
       ),
       radial-gradient(
-        58% 82% at 11% 30%,
-        rgba(247,249,243,0.10) 0%,
-        rgba(247,249,243,0.035) 44%,
+        60% 84% at 11% 30%,
+        rgba(247,249,243,0.14) 0%,
+        rgba(247,249,243,0.05) 44%,
         rgba(247,249,243,0.00) 76%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.018) 0%,
+        rgba(247,249,244,0.02) 0%,
         rgba(247,249,244,0.00) 56%,
         rgba(233,237,220,0.10) 78%,
         rgba(233,237,220,0.24) 92%,
@@ -1482,34 +1457,10 @@
       );
   }
 
-  body.page-route-activities .desktop-hero::after{
-    background:
-      linear-gradient(
-        90deg,
-        rgba(243,246,240,0.74) 0%,
-        rgba(243,246,240,0.58) 8%,
-        rgba(243,246,240,0.36) 15%,
-        rgba(243,246,240,0.16) 22%,
-        rgba(243,246,240,0.05) 28%,
-        rgba(243,246,240,0.00) 34%
-      ),
-      linear-gradient(
-        180deg,
-        rgba(247,249,244,0.05) 0%,
-        rgba(247,249,244,0.00) 56%,
-        rgba(233,237,220,0.12) 78%,
-        rgba(233,237,220,0.48) 100%
-      );
-  }
-
-  body.is-tabbar-hidden .desktop-entry__inner::before{
-    inset: -8px -10px -7px -3px;
-    filter: blur(7px);
-  }
-
+  body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
-    inset: -12px -16px -9px -5px;
-    filter: blur(10px);
+    inset: -9px -13px -8px -4px;
+    filter: blur(8px);
   }
 
   body.is-tabbar-hidden .desktop-entry__content,
@@ -1517,30 +1468,22 @@
     gap: 9px;
   }
 
-  body.is-tabbar-hidden .desktop-entry__title{
+  body.is-tabbar-hidden .desktop-entry__title,
+  body.page-route-activities .desktop-entry__title{
     max-width: 23.85rem;
     font-size: clamp(2.28rem, 2.14rem + 0.42vw, 2.66rem);
-    line-height: 0.98;
-  }
-
-  body.page-route-activities .desktop-entry__title{
-    max-width: 22.25rem;
-    font-size: clamp(2.28rem, 2.14rem + 0.40vw, 2.62rem);
     line-height: 0.98;
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
     font-size: 0.90rem;
-    line-height: 1.36;
+    line-height: 1.38;
   }
 
-  body.is-tabbar-hidden .desktop-entry__text{
-    max-width: 18.9rem;
-  }
-
+  body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 22rem;
+    max-width: 18.9rem;
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1549,28 +1492,18 @@
     padding-top: 0;
   }
 
-  body.is-tabbar-hidden .top-stack::before{
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
     inset: -3px -5px -5px -5px;
     border-radius: 20px;
     filter: blur(5px);
   }
 
-  body.page-route-activities .top-stack::before{
-    inset: -4px -6px -6px -6px;
-    border-radius: 22px;
-    filter: blur(6px);
-  }
-
-  body.is-tabbar-hidden .desktop-hero__search-row::before{
+  body.is-tabbar-hidden .desktop-hero__search-row::before,
+  body.page-route-activities .desktop-hero__search-row::before{
     inset: -2px -3px -2px -3px;
     border-radius: 15px;
     filter: blur(4px);
-  }
-
-  body.page-route-activities .desktop-hero__search-row::before{
-    inset: -3px -4px -3px -4px;
-    border-radius: 16px;
-    filter: blur(5px);
   }
 
   body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
@@ -1629,34 +1562,46 @@
       0 1px 0 rgba(255,255,255,0.74) inset,
       0 2px 6px rgba(16,28,10,0.010);
   }
+
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 @media (min-width: 1600px){
-  body.is-tabbar-hidden{
+  body.is-tabbar-hidden,
+  body.page-route-activities{
     --desktop-copy-surface-max: 34.2rem;
     --desktop-copy-max: 29.5rem;
     --desktop-stack-shell-max: 1044px;
+    --desktop-feed-shell-max: 1108px;
   }
 
-  body.is-tabbar-hidden .desktop-hero{
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
     min-height: 414px;
     padding-top: 21px;
   }
 
-  body.is-tabbar-hidden .desktop-entry__title{
+  body.is-tabbar-hidden .desktop-entry__title,
+  body.page-route-activities .desktop-entry__title{
     max-width: 29rem;
     font-size: clamp(3.04rem, 2.92rem + 0.44vw, 4rem);
   }
 
-  body.is-tabbar-hidden .desktop-entry__text{
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
     max-width: 22.4rem;
   }
 
-  body.is-tabbar-hidden .top-stack{
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
     gap: 6px;
   }
 }
-/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V36 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V37 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
