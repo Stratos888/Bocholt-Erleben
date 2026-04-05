@@ -695,7 +695,7 @@
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V33 | Zweck: finalisiert die Desktop-Top-Shell als klar gestaffelte Enterprise-Hierarchie, reduziert die milchige Hero-Fläche, ordnet Copy/Search/CTA sauber in einer gemeinsamen Komposition und beruhigt den Übergang in den Feed; Umfang: Desktop-Header, Hero, Search-Panel, Actions sowie Desktop-Feed-Surface für Home und Aktivitäten inkl. Narrow-Desktop === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V34 | Zweck: konsolidiert den Desktop-Top-Shell-Owner nachhaltig in einer einzigen finalen Fassung, reduziert auf Home die milchige Hero-Fläche, bindet Search ruhiger in die Hero-Komposition ein, macht die CTA-Reihe leiser und kontrolliert den Hero-zu-Feed-Übergang ohne fragilen Adjacent-Selector; Umfang: Desktop-Header, Hero, Search-Panel, Actions sowie Desktop-Feed-Surface für Home und Aktivitäten inkl. Narrow-Desktop === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
   body.page-route-activities{
@@ -1201,86 +1201,106 @@
     opacity: 0.56;
   }
 
-  /* === BEGIN BLOCK: DESKTOP_HOME_TOP_SHELL_FINAL_POLISH_V34 | Zweck: finalisiert auf Home den Desktop-Top-Shell-Restgap mit präziserem Hero-Fade, stärker eingebundener Search-Zeile, leiserer CTA-Reihe und kontrollierterem Hero-zu-Feed-Übergang; Umfang: überschreibt nur Home-Desktop-Top-Shell-Werte innerhalb des bestehenden V33-Owners, ohne Aktivitätenseite oder Mobile anzufassen === */
+  @media (hover: hover){
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, rgba(47,69,33,0.12) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.86) 0%,
+        rgba(248,251,241,0.68) 100%
+      );
+      color: color-mix(in srgb, var(--brand-green-900) 89%, var(--brand-gold-300) 11%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 89%, var(--brand-gold-300) 11%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.90) inset,
+        0 8px 18px rgba(16,28,10,0.020);
+    }
+  }
+
   body.is-tabbar-hidden .desktop-hero{
     gap: 12px;
-    min-height: 420px;
-    padding-top: 20px;
-    padding-bottom: 14px;
+    min-height: 414px;
+    padding-top: 19px;
+    padding-bottom: 13px;
   }
 
   body.is-tabbar-hidden .desktop-hero::after{
     background:
       radial-gradient(
-        90% 118% at 10% 36%,
-        rgba(244,247,241,0.74) 0%,
-        rgba(244,247,241,0.50) 18%,
-        rgba(244,247,241,0.24) 33%,
-        rgba(244,247,241,0.08) 46%,
-        rgba(244,247,241,0.00) 60%
+        88% 120% at 8% 36%,
+        rgba(244,247,241,0.68) 0%,
+        rgba(244,247,241,0.44) 16%,
+        rgba(244,247,241,0.20) 31%,
+        rgba(244,247,241,0.06) 44%,
+        rgba(244,247,241,0.00) 58%
       ),
       linear-gradient(
         90deg,
-        rgba(244,247,242,0.38) 0%,
-        rgba(244,247,242,0.24) 11%,
-        rgba(244,247,242,0.10) 22%,
-        rgba(244,247,242,0.00) 32%
+        rgba(244,247,242,0.30) 0%,
+        rgba(244,247,242,0.18) 10%,
+        rgba(244,247,242,0.07) 20%,
+        rgba(244,247,242,0.00) 30%
       ),
       linear-gradient(
         180deg,
         rgba(247,249,244,0.03) 0%,
-        rgba(247,249,244,0.00) 56%,
-        rgba(233,237,220,0.10) 78%,
-        rgba(233,237,220,0.36) 92%,
-        rgba(233,237,220,0.50) 100%
+        rgba(247,249,244,0.00) 55%,
+        rgba(233,237,220,0.12) 76%,
+        rgba(233,237,220,0.32) 90%,
+        rgba(233,237,220,0.44) 100%
       ),
-      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 15%);
+      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.016) 0%, rgba(225,213,150,0.00) 15%);
   }
 
   body.is-tabbar-hidden .desktop-entry__inner::before{
-    inset: -12px -18px -10px -6px;
+    inset: -11px -18px -10px -6px;
     border-radius: 30px;
     background:
       radial-gradient(
-        78% 90% at 11% 36%,
-        rgba(247,249,243,0.26) 0%,
-        rgba(247,249,243,0.15) 34%,
-        rgba(247,249,243,0.07) 52%,
-        rgba(247,249,243,0.02) 64%,
+        76% 90% at 11% 36%,
+        rgba(247,249,243,0.24) 0%,
+        rgba(247,249,243,0.14) 34%,
+        rgba(247,249,243,0.06) 52%,
+        rgba(247,249,243,0.015) 64%,
         rgba(247,249,243,0.00) 78%
       ),
       linear-gradient(
         90deg,
-        rgba(247,249,243,0.07) 0%,
-        rgba(247,249,243,0.03) 44%,
+        rgba(247,249,243,0.06) 0%,
+        rgba(247,249,243,0.025) 44%,
         rgba(247,249,243,0.00) 74%
       );
-    filter: blur(12px);
+    filter: blur(11px);
   }
 
   body.is-tabbar-hidden .top-stack{
-    gap: 7px;
+    gap: 6px;
     padding-top: 1px;
   }
 
   body.is-tabbar-hidden .top-stack::before{
-    inset: -6px -8px -8px -8px;
-    border-radius: 26px;
+    inset: -5px -7px -7px -7px;
+    border-radius: 24px;
     background:
       radial-gradient(
-        122% 124% at 12% 10%,
-        rgba(250,252,247,0.30) 0%,
-        rgba(248,250,243,0.18) 30%,
-        rgba(246,249,240,0.08) 50%,
+        118% 124% at 12% 10%,
+        rgba(250,252,247,0.26) 0%,
+        rgba(248,250,243,0.15) 30%,
+        rgba(246,249,240,0.06) 50%,
         rgba(246,249,240,0.00) 72%
       ),
       linear-gradient(
         180deg,
-        rgba(250,252,247,0.12) 0%,
-        rgba(248,250,243,0.03) 46%,
+        rgba(250,252,247,0.08) 0%,
+        rgba(248,250,243,0.02) 46%,
         rgba(248,250,243,0.00) 100%
       );
-    filter: blur(10px);
+    filter: blur(8px);
   }
 
   body.is-tabbar-hidden .desktop-hero__search-row{
@@ -1292,54 +1312,36 @@
   body.is-tabbar-hidden .desktop-hero__search-row::before{
     content: "";
     position: absolute;
-    inset: -6px -8px -6px -8px;
+    inset: -4px -6px -4px -6px;
     z-index: -1;
-    border-radius: 22px;
+    border-radius: 20px;
     background:
       radial-gradient(
-        118% 160% at 16% 8%,
-        rgba(251,252,248,0.28) 0%,
-        rgba(249,251,245,0.15) 34%,
-        rgba(247,250,242,0.06) 54%,
+        116% 154% at 15% 9%,
+        rgba(251,252,248,0.22) 0%,
+        rgba(249,251,245,0.10) 34%,
+        rgba(247,250,242,0.03) 56%,
         rgba(247,250,242,0.00) 76%
       ),
       linear-gradient(
         180deg,
-        rgba(251,252,248,0.08) 0%,
+        rgba(251,252,248,0.05) 0%,
         rgba(251,252,248,0.00) 100%
       );
-    filter: blur(10px);
+    filter: blur(8px);
     pointer-events: none;
   }
 
   body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search{
-    color: rgba(69,88,78,0.72);
+    color: rgba(67,86,76,0.70);
   }
 
   body.is-tabbar-hidden .top-stack #search-filter{
-    border-color: color-mix(in srgb, rgba(47,69,33,0.11) 76%, var(--brand-gold-200) 24%);
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,253,0.92) 0%,
-      rgba(249,251,245,0.78) 100%
-    );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.90) inset,
-      0 10px 22px rgba(16,28,10,0.024);
-    -webkit-backdrop-filter: blur(9px);
-    backdrop-filter: blur(9px);
-  }
-
-  body.is-tabbar-hidden .top-stack #search-filter::placeholder{
-    color: rgba(72,90,79,0.72);
-  }
-
-  body.is-tabbar-hidden .desktop-hero__toolbar-pill{
     border-color: color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.88) 0%,
-      rgba(248,250,243,0.72) 100%
+      rgba(255,255,253,0.90) 0%,
+      rgba(249,251,245,0.78) 100%
     );
     box-shadow:
       0 1px 0 rgba(255,255,255,0.90) inset,
@@ -1348,23 +1350,23 @@
     backdrop-filter: blur(8px);
   }
 
+  body.is-tabbar-hidden .top-stack #search-filter::placeholder{
+    color: rgba(72,90,79,0.71);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
   body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset{
     border-color: color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,252,0.88) 0%,
-      rgba(248,250,243,0.72) 100%
-    );
     box-shadow:
       0 1px 0 rgba(255,255,255,0.90) inset,
-      0 8px 18px rgba(16,28,10,0.022);
+      0 7px 16px rgba(16,28,10,0.020);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
 
   body.is-tabbar-hidden .desktop-hero__actions{
-    gap: 9px;
-    padding-top: 1px;
+    gap: 8px;
+    padding-top: 0;
   }
 
   body.is-tabbar-hidden .desktop-hero__action,
@@ -1374,39 +1376,38 @@
     border-color: color-mix(in srgb, rgba(47,69,33,0.06) 76%, var(--brand-gold-200) 24%);
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.64) 0%,
-      rgba(246,250,238,0.46) 100%
+      rgba(255,255,252,0.60) 0%,
+      rgba(246,250,238,0.42) 100%
     );
-    color: rgba(24,40,30,0.70);
-    -webkit-text-fill-color: rgba(24,40,30,0.70);
+    color: rgba(24,40,30,0.68);
+    -webkit-text-fill-color: rgba(24,40,30,0.68);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.78) inset,
-      0 2px 10px rgba(16,28,10,0.012);
+      0 1px 0 rgba(255,255,255,0.76) inset,
+      0 2px 8px rgba(16,28,10,0.010);
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
   }
 
   body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon{
-    opacity: 0.46;
+    opacity: 0.42;
   }
 
-  body.is-tabbar-hidden .desktop-hero + .events-section{
-    position: relative;
+  body.is-tabbar-hidden .events-section{
     background:
       linear-gradient(
         180deg,
-        rgba(240,243,232,0.56) 0%,
-        rgba(233,237,220,0.22) 9%,
-        rgba(233,237,220,0.00) 36px
+        rgba(239,243,231,0.54) 0%,
+        rgba(233,237,220,0.18) 28px,
+        rgba(233,237,220,0.00) 56px
       ),
       linear-gradient(
         180deg,
         #E8ECD9 0%,
-        #E2E8D4 54%,
+        #E2E8D4 58%,
         #DBE2CB 100%
       );
     box-shadow:
-      inset 0 12px 20px rgba(247,249,242,0.14),
+      inset 0 10px 18px rgba(247,249,242,0.13),
       inset 0 1px 0 rgba(255,255,255,0.38);
   }
 
@@ -1414,20 +1415,19 @@
     body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
     body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
     body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(47,69,33,0.09) 76%, var(--brand-gold-200) 24%);
+      border-color: color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
       background: linear-gradient(
         180deg,
-        rgba(255,255,254,0.74) 0%,
-        rgba(248,251,241,0.56) 100%
+        rgba(255,255,254,0.68) 0%,
+        rgba(248,251,241,0.50) 100%
       );
       color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
       -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.84) inset,
-        0 6px 14px rgba(16,28,10,0.016);
+        0 1px 0 rgba(255,255,255,0.82) inset,
+        0 5px 12px rgba(16,28,10,0.014);
     }
   }
-  /* === END BLOCK: DESKTOP_HOME_TOP_SHELL_FINAL_POLISH_V34 === */
 
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
@@ -1492,27 +1492,6 @@
   body.is-tabbar-hidden .event-card-desc,
   body.page-route-activities .event-card-desc{
     color: rgba(31,41,51,0.76);
-  }
-
-  @media (hover: hover){
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(47,69,33,0.12) 76%, var(--brand-gold-200) 24%);
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.86) 0%,
-        rgba(248,251,241,0.68) 100%
-      );
-      color: color-mix(in srgb, var(--brand-green-900) 89%, var(--brand-gold-300) 11%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 89%, var(--brand-gold-300) 11%);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.90) inset,
-        0 8px 18px rgba(16,28,10,0.020);
-    }
   }
 }
 
@@ -1673,9 +1652,8 @@
     font-size: 0.79rem;
   }
 
-  /* === BEGIN BLOCK: DESKTOP_HOME_TOP_SHELL_FINAL_POLISH_NARROW_V34 | Zweck: skaliert die Home-only Final-Polish-Werte für 900-1024px, damit der Desktop-Hero auch im Narrow-Desktop kontrolliert und ruhig bleibt; Umfang: überschreibt nur Home-Desktop-Top-Shell-Werte innerhalb des bestehenden V33-Owners === */
   body.is-tabbar-hidden .desktop-hero{
-    min-height: 392px;
+    min-height: 390px;
     padding-top: 17px;
     padding-bottom: 12px;
     gap: 10px;
@@ -1684,34 +1662,34 @@
   body.is-tabbar-hidden .desktop-hero::after{
     background:
       radial-gradient(
-        96% 122% at 10% 36%,
-        rgba(244,247,241,0.76) 0%,
-        rgba(244,247,241,0.54) 18%,
-        rgba(244,247,241,0.28) 33%,
-        rgba(244,247,241,0.10) 46%,
-        rgba(244,247,241,0.00) 60%
+        94% 122% at 9% 36%,
+        rgba(244,247,241,0.72) 0%,
+        rgba(244,247,241,0.48) 17%,
+        rgba(244,247,241,0.24) 32%,
+        rgba(244,247,241,0.08) 45%,
+        rgba(244,247,241,0.00) 59%
       ),
       linear-gradient(
         90deg,
-        rgba(244,247,242,0.42) 0%,
-        rgba(244,247,242,0.28) 12%,
-        rgba(244,247,242,0.12) 23%,
-        rgba(244,247,242,0.00) 34%
+        rgba(244,247,242,0.34) 0%,
+        rgba(244,247,242,0.20) 11%,
+        rgba(244,247,242,0.08) 22%,
+        rgba(244,247,242,0.00) 32%
       ),
       linear-gradient(
         180deg,
         rgba(247,249,244,0.04) 0%,
         rgba(247,249,244,0.00) 56%,
         rgba(233,237,220,0.12) 78%,
-        rgba(233,237,220,0.38) 92%,
-        rgba(233,237,220,0.52) 100%
+        rgba(233,237,220,0.34) 91%,
+        rgba(233,237,220,0.46) 100%
       ),
-      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 15%);
+      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.016) 0%, rgba(225,213,150,0.00) 15%);
   }
 
   body.is-tabbar-hidden .desktop-entry__inner::before{
-    inset: -12px -18px -10px -6px;
-    filter: blur(11px);
+    inset: -11px -17px -10px -6px;
+    filter: blur(10px);
   }
 
   body.is-tabbar-hidden .top-stack{
@@ -1721,7 +1699,7 @@
   body.is-tabbar-hidden .top-stack::before{
     inset: -5px -7px -7px -7px;
     border-radius: 22px;
-    filter: blur(9px);
+    filter: blur(8px);
   }
 
   body.is-tabbar-hidden .desktop-hero__search-row{
@@ -1729,31 +1707,30 @@
   }
 
   body.is-tabbar-hidden .desktop-hero__search-row::before{
-    inset: -5px -7px -5px -7px;
-    border-radius: 20px;
-    filter: blur(9px);
+    inset: -4px -6px -4px -6px;
+    border-radius: 18px;
+    filter: blur(8px);
   }
 
   body.is-tabbar-hidden .desktop-hero__toolbar-pill,
   body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset{
     box-shadow:
       0 1px 0 rgba(255,255,255,0.88) inset,
-      0 7px 15px rgba(16,28,10,0.020);
+      0 6px 14px rgba(16,28,10,0.018);
   }
 
   body.is-tabbar-hidden .desktop-hero__actions{
-    gap: 7px;
+    gap: 6px;
   }
 
   body.is-tabbar-hidden .desktop-hero__action{
     min-height: 35px;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.76) inset,
-      0 2px 8px rgba(16,28,10,0.010);
+      0 1px 0 rgba(255,255,255,0.74) inset,
+      0 2px 7px rgba(16,28,10,0.010);
   }
-  /* === END BLOCK: DESKTOP_HOME_TOP_SHELL_FINAL_POLISH_NARROW_V34 === */
 }
-/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V33 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V34 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
