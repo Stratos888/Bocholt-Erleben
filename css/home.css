@@ -695,15 +695,14 @@
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V37 | Zweck: stellt einen gemeinsamen Desktop-Rail-Contract für Home- und Aktivitäten-Suche plus Feed her, erhöht die Lesbarkeit der Home-Copy nachhaltig und zieht die Event-/Aktivitäten-Feeds auf dieselbe Rail wie die Search-Elemente; Umfang: Desktop-Header, Hero, Search-Panel, Copy-Lesbarkeit sowie Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 | Zweck: vereinheitlicht Hero und Feed auf eine gemeinsame Desktop-Shell, stabilisiert die linke Copy-Lesbarkeit über eine lokale Contrast-Surface statt globalem Milchglas und hält Home sowie Aktivitäten auf demselben nachhaltigen Desktop-Contract; Umfang: Desktop-Header, Hero, Search-Panel, Copy-Lesbarkeit sowie Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
   body.page-route-activities{
-    --desktop-top-shell-max: 1128px;
-    --desktop-copy-surface-max: 33.25rem;
-    --desktop-copy-max: 28.75rem;
-    --desktop-stack-shell-max: 1028px;
-    --desktop-feed-shell-max: 1092px;
+    --desktop-shell-max: 1092px;
+    --desktop-shell-pad-x: 32px;
+    --desktop-copy-surface-max: 33.5rem;
+    --desktop-copy-max: 28.5rem;
     --desktop-panel-gap: 8px;
     --desktop-panel-height: 56px;
     --desktop-reset-w: 46px;
@@ -773,11 +772,11 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
 
-    max-width: var(--desktop-top-shell-max);
+    max-width: var(--desktop-shell-max);
     min-height: 410px;
     margin-left: auto;
     margin-right: auto;
-    padding: 20px 32px 14px;
+    padding: 20px var(--desktop-shell-pad-x) 14px;
 
     background: none;
     border: 0;
@@ -807,42 +806,7 @@
     pointer-events: none;
   }
 
-  body.is-tabbar-hidden .desktop-hero::after{
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: calc(50% - 50vw);
-    right: calc(50% - 50vw);
-    z-index: -3;
-    background:
-      linear-gradient(
-        90deg,
-        rgba(243,246,240,0.60) 0%,
-        rgba(243,246,240,0.46) 6%,
-        rgba(243,246,240,0.26) 12%,
-        rgba(243,246,240,0.11) 18%,
-        rgba(243,246,240,0.03) 23%,
-        rgba(243,246,240,0.00) 28%
-      ),
-      radial-gradient(
-        56% 80% at 13% 28%,
-        rgba(247,249,243,0.13) 0%,
-        rgba(247,249,243,0.05) 42%,
-        rgba(247,249,243,0.00) 74%
-      ),
-      linear-gradient(
-        180deg,
-        rgba(247,249,244,0.018) 0%,
-        rgba(247,249,244,0.00) 56%,
-        rgba(233,237,220,0.10) 75%,
-        rgba(233,237,220,0.22) 90%,
-        rgba(233,237,220,0.34) 100%
-      ),
-      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.012) 0%, rgba(225,213,150,0.00) 15%);
-    pointer-events: none;
-  }
-
+  body.is-tabbar-hidden .desktop-hero::after,
   body.page-route-activities .desktop-hero::after{
     content: "";
     position: absolute;
@@ -854,24 +818,24 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.60) 0%,
-        rgba(243,246,240,0.46) 6%,
-        rgba(243,246,240,0.26) 12%,
-        rgba(243,246,240,0.11) 18%,
-        rgba(243,246,240,0.03) 23%,
+        rgba(243,246,240,0.66) 0%,
+        rgba(243,246,240,0.52) 6%,
+        rgba(243,246,240,0.30) 12%,
+        rgba(243,246,240,0.13) 18%,
+        rgba(243,246,240,0.035) 23%,
         rgba(243,246,240,0.00) 28%
       ),
       radial-gradient(
-        56% 80% at 13% 28%,
-        rgba(247,249,243,0.13) 0%,
-        rgba(247,249,243,0.05) 42%,
+        58% 82% at 13% 28%,
+        rgba(247,249,243,0.16) 0%,
+        rgba(247,249,243,0.06) 42%,
         rgba(247,249,243,0.00) 74%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.018) 0%,
+        rgba(247,249,244,0.02) 0%,
         rgba(247,249,244,0.00) 56%,
-        rgba(233,237,220,0.10) 75%,
+        rgba(233,237,220,0.10) 76%,
         rgba(233,237,220,0.22) 90%,
         rgba(233,237,220,0.34) 100%
       ),
@@ -894,10 +858,10 @@
 
   body.is-tabbar-hidden .top-stack,
   body.page-route-activities .top-stack{
-    width: min(100%, var(--desktop-stack-shell-max));
-    max-width: var(--desktop-stack-shell-max);
+    width: 100%;
+    max-width: none;
     min-width: 0;
-    justify-self: start;
+    justify-self: stretch;
   }
 
   body.is-tabbar-hidden .desktop-entry__inner,
@@ -919,53 +883,29 @@
     overflow: visible;
   }
 
-  body.is-tabbar-hidden .desktop-entry__inner::before{
-    content: "";
-    position: absolute;
-    inset: -11px -18px -10px -6px;
-    z-index: -1;
-    border-radius: 30px;
-    background:
-      radial-gradient(
-        74% 90% at 11% 36%,
-        rgba(247,249,243,0.24) 0%,
-        rgba(247,249,243,0.12) 34%,
-        rgba(247,249,243,0.05) 54%,
-        rgba(247,249,243,0.015) 68%,
-        rgba(247,249,243,0.00) 80%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(247,249,243,0.08) 0%,
-        rgba(247,249,243,0.03) 44%,
-        rgba(247,249,243,0.00) 74%
-      );
-    filter: blur(11px);
-    pointer-events: none;
-  }
-
+  body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
     content: "";
     position: absolute;
-    inset: -11px -18px -10px -6px;
+    inset: -14px -24px -12px -10px;
     z-index: -1;
-    border-radius: 30px;
+    border-radius: 32px;
     background:
       radial-gradient(
-        74% 90% at 11% 36%,
-        rgba(247,249,243,0.24) 0%,
-        rgba(247,249,243,0.12) 34%,
-        rgba(247,249,243,0.05) 54%,
-        rgba(247,249,243,0.015) 68%,
-        rgba(247,249,243,0.00) 80%
+        76% 94% at 10% 36%,
+        rgba(247,249,243,0.30) 0%,
+        rgba(247,249,243,0.17) 32%,
+        rgba(247,249,243,0.08) 52%,
+        rgba(247,249,243,0.025) 68%,
+        rgba(247,249,243,0.00) 82%
       ),
       linear-gradient(
         90deg,
-        rgba(247,249,243,0.08) 0%,
-        rgba(247,249,243,0.03) 44%,
+        rgba(247,249,243,0.11) 0%,
+        rgba(247,249,243,0.045) 42%,
         rgba(247,249,243,0.00) 74%
       );
-    filter: blur(11px);
+    filter: blur(13px);
     pointer-events: none;
   }
 
@@ -974,48 +914,31 @@
     position: relative;
     z-index: 1;
     max-width: var(--desktop-copy-max);
-    gap: 11px;
+    gap: 10px;
   }
 
-  body.is-tabbar-hidden .desktop-entry__title{
-    max-width: 27.8rem;
-    color: #122C1D;
-    font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
-    line-height: 0.95;
-    letter-spacing: -0.064em;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.18),
-      0 0 16px rgba(247,249,243,0.18);
-  }
-
+  body.is-tabbar-hidden .desktop-entry__title,
   body.page-route-activities .desktop-entry__title{
-    max-width: 27.8rem;
-    color: #122C1D;
+    max-width: 27.5rem;
+    color: #10281B;
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
     line-height: 0.95;
     letter-spacing: -0.064em;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.18),
-      0 0 16px rgba(247,249,243,0.18);
+      0 1px 0 rgba(255,255,255,0.22),
+      0 0 18px rgba(247,249,243,0.22);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    color: rgba(18,31,24,0.90);
-    font-size: 0.98rem;
-    line-height: 1.42;
-    font-weight: 585;
+    max-width: 20.8rem;
+    color: rgba(16,29,23,0.94);
+    font-size: 0.985rem;
+    line-height: 1.44;
+    font-weight: 600;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.16),
-      0 0 12px rgba(247,249,243,0.14);
-  }
-
-  body.is-tabbar-hidden .desktop-entry__text{
-    max-width: 21.9rem;
-  }
-
-  body.page-route-activities .desktop-entry__text{
-    max-width: 21.9rem;
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 14px rgba(247,249,243,0.18);
   }
 
   body.is-tabbar-hidden .desktop-entry__text br,
@@ -1326,9 +1249,9 @@
 
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
-    max-width: var(--desktop-feed-shell-max);
-    padding-left: 32px;
-    padding-right: 32px;
+    max-width: var(--desktop-shell-max);
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
     background:
       linear-gradient(
         180deg,
@@ -1410,10 +1333,10 @@
 @media (min-width: 900px) and (max-width: 1024px){
   body.is-tabbar-hidden,
   body.page-route-activities{
+    --desktop-shell-max: 1028px;
+    --desktop-shell-pad-x: 24px;
     --desktop-copy-surface-max: 29.5rem;
     --desktop-copy-max: 23.1rem;
-    --desktop-stack-shell-max: 100%;
-    --desktop-feed-shell-max: 100%;
     --desktop-panel-gap: 6px;
     --desktop-panel-height: 54px;
     --desktop-reset-w: 44px;
@@ -1422,8 +1345,8 @@
   body.is-tabbar-hidden .desktop-hero,
   body.page-route-activities .desktop-hero{
     min-height: 384px;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
     padding-top: 18px;
     padding-bottom: 12px;
     gap: 10px;
@@ -1434,17 +1357,17 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.62) 0%,
-        rgba(243,246,240,0.47) 7%,
-        rgba(243,246,240,0.28) 13%,
-        rgba(243,246,240,0.12) 18.5%,
-        rgba(243,246,240,0.035) 23%,
+        rgba(243,246,240,0.68) 0%,
+        rgba(243,246,240,0.52) 7%,
+        rgba(243,246,240,0.31) 13%,
+        rgba(243,246,240,0.13) 18.5%,
+        rgba(243,246,240,0.04) 23%,
         rgba(243,246,240,0.00) 27.5%
       ),
       radial-gradient(
         60% 84% at 11% 30%,
-        rgba(247,249,243,0.14) 0%,
-        rgba(247,249,243,0.05) 44%,
+        rgba(247,249,243,0.17) 0%,
+        rgba(247,249,243,0.06) 44%,
         rgba(247,249,243,0.00) 76%
       ),
       linear-gradient(
@@ -1459,8 +1382,8 @@
 
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
-    inset: -9px -13px -8px -4px;
-    filter: blur(8px);
+    inset: -11px -16px -9px -6px;
+    filter: blur(9px);
   }
 
   body.is-tabbar-hidden .desktop-entry__content,
@@ -1477,13 +1400,9 @@
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    font-size: 0.90rem;
-    line-height: 1.38;
-  }
-
-  body.is-tabbar-hidden .desktop-entry__text,
-  body.page-route-activities .desktop-entry__text{
-    max-width: 18.9rem;
+    max-width: 18.7rem;
+    font-size: 0.91rem;
+    line-height: 1.40;
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1565,18 +1484,18 @@
 
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
   }
 }
 
 @media (min-width: 1600px){
   body.is-tabbar-hidden,
   body.page-route-activities{
+    --desktop-shell-max: 1108px;
+    --desktop-shell-pad-x: 32px;
     --desktop-copy-surface-max: 34.2rem;
     --desktop-copy-max: 29.5rem;
-    --desktop-stack-shell-max: 1044px;
-    --desktop-feed-shell-max: 1108px;
   }
 
   body.is-tabbar-hidden .desktop-hero,
@@ -1593,7 +1512,7 @@
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 22.4rem;
+    max-width: 21.8rem;
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1601,7 +1520,7 @@
     gap: 6px;
   }
 }
-/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V37 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
