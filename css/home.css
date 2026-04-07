@@ -883,6 +883,7 @@
     overflow: visible;
   }
 
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V2 | Zweck: verankert die Desktop-Copy auf einer lokalen Contrast-Surface direkt unter H1 und Lead statt über breit streuende Hero-Aufhellung; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners === */
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
     content: "";
@@ -893,19 +894,19 @@
     background:
       radial-gradient(
         76% 94% at 10% 36%,
-        rgba(247,249,243,0.30) 0%,
-        rgba(247,249,243,0.17) 32%,
-        rgba(247,249,243,0.08) 52%,
-        rgba(247,249,243,0.025) 68%,
+        rgba(247,249,243,0.22) 0%,
+        rgba(247,249,243,0.10) 32%,
+        rgba(247,249,243,0.04) 52%,
+        rgba(247,249,243,0.01) 68%,
         rgba(247,249,243,0.00) 82%
       ),
       linear-gradient(
         90deg,
-        rgba(247,249,243,0.11) 0%,
-        rgba(247,249,243,0.045) 42%,
+        rgba(247,249,243,0.08) 0%,
+        rgba(247,249,243,0.03) 42%,
         rgba(247,249,243,0.00) 74%
       );
-    filter: blur(13px);
+    filter: blur(10px);
     pointer-events: none;
   }
 
@@ -915,6 +916,36 @@
     z-index: 1;
     max-width: var(--desktop-copy-max);
     gap: 10px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+    isolation: isolate;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__content::before,
+  body.page-route-activities .desktop-entry__content::before{
+    content: "";
+    position: absolute;
+    inset: -14px -22px -18px -14px;
+    z-index: -1;
+    border-radius: 28px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(249,251,246,0.74) 0%,
+        rgba(249,251,246,0.52) 34%,
+        rgba(249,251,246,0.22) 58%,
+        rgba(249,251,246,0.05) 76%,
+        rgba(249,251,246,0.00) 90%
+      ),
+      radial-gradient(
+        92% 108% at 18% 38%,
+        rgba(250,252,248,0.54) 0%,
+        rgba(249,251,246,0.28) 42%,
+        rgba(248,250,245,0.10) 64%,
+        rgba(248,250,245,0.00) 84%
+      );
+    filter: blur(10px);
+    pointer-events: none;
   }
 
   body.is-tabbar-hidden .desktop-entry__title,
@@ -922,29 +953,30 @@
     max-width: 27.5rem;
     color: #10281B;
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
-    line-height: 0.95;
-    letter-spacing: -0.064em;
+    line-height: 0.96;
+    letter-spacing: -0.06em;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.22),
-      0 0 18px rgba(247,249,243,0.22);
+      0 1px 0 rgba(255,255,255,0.24),
+      0 0 20px rgba(248,250,245,0.28);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 20.8rem;
-    color: rgba(16,29,23,0.94);
-    font-size: 0.985rem;
-    line-height: 1.44;
-    font-weight: 600;
+    max-width: 21.1rem;
+    color: rgba(14,26,20,0.95);
+    font-size: 1rem;
+    line-height: 1.46;
+    font-weight: 615;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.18),
-      0 0 14px rgba(247,249,243,0.18);
+      0 1px 0 rgba(255,255,255,0.20),
+      0 0 15px rgba(248,250,245,0.20);
   }
 
   body.is-tabbar-hidden .desktop-entry__text br,
   body.page-route-activities .desktop-entry__text br{
     display: none;
   }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V2 === */
 
   body.is-tabbar-hidden .top-stack,
   body.page-route-activities .top-stack{
@@ -1039,6 +1071,7 @@
     pointer-events: none;
   }
 
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_RESET_SLOT_CONTRACT_V2 | Zweck: hält auf Desktop den Reset bei aktivem Search-/Filter-State fest im rechten Slot und gibt Search plus Pills denselben Grid-Contract auf Events und Aktivitäten; Umfang: nur Desktop-Search-Row, Search-Control, Toolbar-Pills und Reset-Control innerhalb des Top-Shell-Owners === */
   body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset,
   body.page-route-activities .desktop-hero__search-row.has-active-filter-reset{
     grid-template-columns:
@@ -1046,6 +1079,25 @@
       minmax(0, calc(((100% - var(--desktop-reset-w) - var(--desktop-panel-gap)) - (5 * var(--desktop-panel-gap))) / 6))
       minmax(0, calc(((100% - var(--desktop-reset-w) - var(--desktop-panel-gap)) - (5 * var(--desktop-panel-gap))) / 6))
       var(--desktop-reset-w);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot{
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__toolbar-pill{
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset{
+    grid-column: 4;
+    grid-row: 1;
   }
 
   body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
@@ -1169,6 +1221,7 @@
     min-height: var(--desktop-panel-height);
     justify-self: stretch;
     align-self: stretch;
+    overflow: hidden;
     border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
     border-radius: 18px;
     background: linear-gradient(
@@ -1182,6 +1235,7 @@
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_RESET_SLOT_CONTRACT_V2 === */
 
   body.is-tabbar-hidden .desktop-hero__actions,
   body.page-route-activities .desktop-hero__actions{
@@ -1330,6 +1384,7 @@
   }
 }
 
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V1 | Zweck: stabilisiert im Narrow-Desktop die Copy-Lesbarkeit auf 1044 und hält den Reset-Slot visuell ruhig, ohne den Rail-Contract anzufassen; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
   body.is-tabbar-hidden,
   body.page-route-activities{
@@ -1357,17 +1412,17 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.68) 0%,
-        rgba(243,246,240,0.52) 7%,
-        rgba(243,246,240,0.31) 13%,
-        rgba(243,246,240,0.13) 18.5%,
-        rgba(243,246,240,0.04) 23%,
+        rgba(243,246,240,0.60) 0%,
+        rgba(243,246,240,0.42) 7%,
+        rgba(243,246,240,0.20) 13%,
+        rgba(243,246,240,0.08) 18.5%,
+        rgba(243,246,240,0.02) 23%,
         rgba(243,246,240,0.00) 27.5%
       ),
       radial-gradient(
-        60% 84% at 11% 30%,
-        rgba(247,249,243,0.17) 0%,
-        rgba(247,249,243,0.06) 44%,
+        58% 82% at 11% 30%,
+        rgba(247,249,243,0.13) 0%,
+        rgba(247,249,243,0.04) 44%,
         rgba(247,249,243,0.00) 76%
       ),
       linear-gradient(
@@ -1382,27 +1437,38 @@
 
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
-    inset: -11px -16px -9px -6px;
-    filter: blur(9px);
+    inset: -9px -12px -8px -4px;
+    filter: blur(7px);
   }
 
   body.is-tabbar-hidden .desktop-entry__content,
   body.page-route-activities .desktop-entry__content{
-    gap: 9px;
+    gap: 10px;
+    padding-top: 7px;
+    padding-bottom: 10px;
   }
 
   body.is-tabbar-hidden .desktop-entry__title,
   body.page-route-activities .desktop-entry__title{
     max-width: 23.85rem;
-    font-size: clamp(2.28rem, 2.14rem + 0.42vw, 2.66rem);
-    line-height: 0.98;
+    font-size: clamp(2.3rem, 2.14rem + 0.46vw, 2.7rem);
+    line-height: 1;
+    letter-spacing: -0.056em;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.26),
+      0 0 22px rgba(248,250,245,0.34);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 18.7rem;
-    font-size: 0.91rem;
-    line-height: 1.40;
+    max-width: 19.6rem;
+    color: rgba(11,24,18,0.96);
+    font-size: 0.96rem;
+    line-height: 1.48;
+    font-weight: 625;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.22),
+      0 0 16px rgba(248,250,245,0.24);
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1488,6 +1554,7 @@
     padding-right: var(--desktop-shell-pad-x);
   }
 }
+/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V1 === */
 
 @media (min-width: 1600px){
   body.is-tabbar-hidden,
