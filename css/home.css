@@ -882,7 +882,7 @@
     isolation: isolate;
     overflow: visible;
   }
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V5 | Zweck: zieht den gemeinsamen Desktop-Copy-Owner auf einen kompakteren, ruhigeren Events-Stand zusammen, damit Events und Angebote trotz unterschiedlicher Textlängen optisch näher zusammenrücken; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners ab 900px === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V6 | Zweck: entkoppelt die gemeinsame Desktop-Lesefläche stärker vom Foto darunter, damit adaptive Größe erhalten bleibt, aber Events und Angebote bei gleicher Schriftfarbe gleichwertig lesbar wirken; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners ab 900px === */
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
     content: none;
@@ -906,26 +906,27 @@
   body.page-route-activities .desktop-entry__content::before{
     content: "";
     position: absolute;
-    inset: -10px -12px -11px -10px;
+    inset: -9px -11px -10px -9px;
     z-index: -1;
-    border-radius: 24px;
+    border-radius: 22px;
     background:
       linear-gradient(
         90deg,
-        rgba(247,249,242,0.68) 0%,
-        rgba(247,249,242,0.52) 28%,
-        rgba(247,249,242,0.26) 52%,
-        rgba(247,249,242,0.08) 68%,
-        rgba(247,249,242,0.00) 82%
+        rgba(238,242,231,0.74) 0%,
+        rgba(238,242,231,0.62) 26%,
+        rgba(237,241,230,0.40) 50%,
+        rgba(236,240,229,0.18) 68%,
+        rgba(236,240,229,0.03) 82%,
+        rgba(236,240,229,0.00) 90%
       ),
       radial-gradient(
-        92% 112% at 15% 35%,
-        rgba(249,250,245,0.50) 0%,
-        rgba(248,250,244,0.22) 44%,
-        rgba(248,250,244,0.06) 66%,
-        rgba(248,250,244,0.00) 84%
+        90% 108% at 14% 34%,
+        rgba(240,244,234,0.44) 0%,
+        rgba(239,243,232,0.20) 46%,
+        rgba(238,242,231,0.06) 68%,
+        rgba(238,242,231,0.00) 84%
       );
-    filter: blur(5px);
+    filter: blur(3px);
     pointer-events: none;
   }
 
@@ -941,9 +942,7 @@
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
     line-height: 0.98;
     letter-spacing: -0.056em;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.10),
-      0 0 8px rgba(248,250,245,0.08);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.06);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
@@ -953,16 +952,14 @@
     font-size: 1.01rem;
     line-height: 1.46;
     font-weight: 620;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.08),
-      0 0 6px rgba(248,250,245,0.06);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.05);
   }
 
   body.is-tabbar-hidden .desktop-entry__text br,
   body.page-route-activities .desktop-entry__text br{
     display: none;
   }
-/* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V5 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V6 === */
 
   body.is-tabbar-hidden .top-stack,
   body.page-route-activities .top-stack{
@@ -1370,7 +1367,7 @@
   }
 }
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V4 | Zweck: zieht die gemeinsame Narrow-Desktop-Copy-Surface ebenfalls auf den kompakteren Events-Stand zusammen, damit Angebote trotz längerem Lead nicht weicher oder größer wirken; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 | Zweck: stabilisiert auf 900–1024px die adaptive Copy-Surface gegen unterschiedliche Bildhelligkeit, damit Angebote nicht weißer wirkt als Events, ohne Geometrie oder Rail-Contract zu verändern; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
   body.is-tabbar-hidden,
   body.page-route-activities{
@@ -1437,25 +1434,26 @@
 
   body.is-tabbar-hidden .desktop-entry__content::before,
   body.page-route-activities .desktop-entry__content::before{
-    inset: -8px -8px -9px -8px;
-    border-radius: 20px;
+    inset: -7px -7px -8px -7px;
+    border-radius: 18px;
     background:
       linear-gradient(
         90deg,
-        rgba(247,249,242,0.62) 0%,
-        rgba(247,249,242,0.48) 28%,
-        rgba(247,249,242,0.24) 52%,
-        rgba(247,249,242,0.07) 69%,
-        rgba(247,249,242,0.00) 83%
+        rgba(238,242,231,0.70) 0%,
+        rgba(238,242,231,0.58) 28%,
+        rgba(237,241,230,0.36) 52%,
+        rgba(236,240,229,0.15) 69%,
+        rgba(236,240,229,0.02) 83%,
+        rgba(236,240,229,0.00) 90%
       ),
       radial-gradient(
-        90% 108% at 14% 35%,
-        rgba(249,250,245,0.44) 0%,
-        rgba(248,250,244,0.20) 44%,
-        rgba(248,250,244,0.05) 66%,
-        rgba(248,250,244,0.00) 84%
+        88% 104% at 14% 35%,
+        rgba(240,244,234,0.38) 0%,
+        rgba(239,243,232,0.18) 44%,
+        rgba(238,242,231,0.05) 66%,
+        rgba(238,242,231,0.00) 84%
       );
-    filter: blur(4px);
+    filter: blur(3px);
   }
 
   body.is-tabbar-hidden .desktop-entry__content::after,
@@ -1469,9 +1467,7 @@
     font-size: clamp(2.34rem, 2.16rem + 0.48vw, 2.74rem);
     line-height: 1;
     letter-spacing: -0.052em;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.10),
-      0 0 7px rgba(248,250,245,0.08);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.06);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
@@ -1481,9 +1477,7 @@
     font-size: 1rem;
     line-height: 1.48;
     font-weight: 620;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.08),
-      0 0 6px rgba(248,250,245,0.06);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.05);
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1569,7 +1563,7 @@
     padding-right: var(--desktop-shell-pad-x);
   }
 }
-/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V4 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 === */
 
 @media (min-width: 1600px){
   body.is-tabbar-hidden,
