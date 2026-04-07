@@ -64,19 +64,20 @@ Umfang:
 - Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
   <section class="desktop-hero" aria-label="Suche und Einführung">
+    <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 | Zweck: entfernt die doppelte desktop-entry__content-Verschachtelung im Activities-Hero, damit die gemeinsame Contrast-Surface nur einmal greift und optisch auf den Events-Stand zurückfällt; Umfang: nur Hero-Copy-Struktur von /angebote/ bis vor den Top-Stack === -->
     <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
       <div class="desktop-entry__inner">
-        <div class="desktop-entry__content">
-        <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V2 (natural wraps) === -->
+        <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
         <div class="desktop-entry__content">
           <h1 class="desktop-entry__title">Aktivitäten in Bocholt</h1>
           <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation.</p>
         </div>
-        <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V2 (natural wraps) === -->
+        <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
       </div>
     </section>
 
     <div class="top-stack desktop-hero__panel">
+    <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
       <div class="desktop-hero__search-row" aria-label="Suche und Filter">
         <div class="events-filter desktop-hero__search-slot">
           <label class="desktop-hero__search-field" for="search-filter">
