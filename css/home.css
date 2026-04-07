@@ -883,41 +883,23 @@
     overflow: visible;
   }
 
-  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V2 | Zweck: verankert die Desktop-Copy auf einer lokalen Contrast-Surface direkt unter H1 und Lead statt über breit streuende Hero-Aufhellung; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V3 | Zweck: macht den Copy-Container selbst zum einzigen Desktop-Owner der Lesefläche, damit H1 und Lead bei normalen Text- und Breitenänderungen automatisch korrekt mitwachsen und Mobile unberührt bleibt; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners ab 900px === */
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
-    content: "";
-    position: absolute;
-    inset: -14px -24px -12px -10px;
-    z-index: -1;
-    border-radius: 32px;
-    background:
-      radial-gradient(
-        76% 94% at 10% 36%,
-        rgba(247,249,243,0.22) 0%,
-        rgba(247,249,243,0.10) 32%,
-        rgba(247,249,243,0.04) 52%,
-        rgba(247,249,243,0.01) 68%,
-        rgba(247,249,243,0.00) 82%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(247,249,243,0.08) 0%,
-        rgba(247,249,243,0.03) 42%,
-        rgba(247,249,243,0.00) 74%
-      );
-    filter: blur(10px);
-    pointer-events: none;
+    content: none;
   }
 
   body.is-tabbar-hidden .desktop-entry__content,
   body.page-route-activities .desktop-entry__content{
     position: relative;
     z-index: 1;
-    max-width: var(--desktop-copy-max);
-    gap: 10px;
-    padding-top: 6px;
-    padding-bottom: 8px;
+    display: inline-grid;
+    justify-self: start;
+    width: fit-content;
+    max-width: min(100%, var(--desktop-copy-max));
+    gap: 11px;
+    padding-top: 8px;
+    padding-bottom: 10px;
     isolation: isolate;
   }
 
@@ -925,26 +907,44 @@
   body.page-route-activities .desktop-entry__content::before{
     content: "";
     position: absolute;
-    inset: -14px -22px -18px -14px;
+    inset: -16px -18px -18px -16px;
     z-index: -1;
-    border-radius: 28px;
+    border-radius: 30px;
     background:
       linear-gradient(
         90deg,
-        rgba(249,251,246,0.74) 0%,
-        rgba(249,251,246,0.52) 34%,
-        rgba(249,251,246,0.22) 58%,
-        rgba(249,251,246,0.05) 76%,
-        rgba(249,251,246,0.00) 90%
+        rgba(250,251,247,0.86) 0%,
+        rgba(250,251,247,0.70) 30%,
+        rgba(250,251,247,0.38) 56%,
+        rgba(250,251,247,0.11) 74%,
+        rgba(250,251,247,0.00) 88%
       ),
       radial-gradient(
-        92% 108% at 18% 38%,
-        rgba(250,252,248,0.54) 0%,
-        rgba(249,251,246,0.28) 42%,
-        rgba(248,250,245,0.10) 64%,
-        rgba(248,250,245,0.00) 84%
+        96% 118% at 16% 34%,
+        rgba(251,252,248,0.72) 0%,
+        rgba(250,251,247,0.42) 44%,
+        rgba(249,250,246,0.14) 68%,
+        rgba(249,250,246,0.00) 86%
       );
-    filter: blur(10px);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__content::after,
+  body.page-route-activities .desktop-entry__content::after{
+    content: "";
+    position: absolute;
+    inset: -6px -10px -10px -10px;
+    z-index: -1;
+    border-radius: 22px;
+    background:
+      radial-gradient(
+        88% 100% at 14% 34%,
+        rgba(255,255,255,0.28) 0%,
+        rgba(255,255,255,0.14) 50%,
+        rgba(255,255,255,0.00) 82%
+      );
+    filter: blur(4px);
     pointer-events: none;
   }
 
@@ -953,30 +953,30 @@
     max-width: 27.5rem;
     color: #10281B;
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
-    line-height: 0.96;
-    letter-spacing: -0.06em;
+    line-height: 0.97;
+    letter-spacing: -0.058em;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.24),
-      0 0 20px rgba(248,250,245,0.28);
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 14px rgba(248,250,245,0.16);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 21.1rem;
-    color: rgba(14,26,20,0.95);
-    font-size: 1rem;
-    line-height: 1.46;
-    font-weight: 615;
+    max-width: 21.4rem;
+    color: rgba(14,26,20,0.97);
+    font-size: 1.02rem;
+    line-height: 1.50;
+    font-weight: 620;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.20),
-      0 0 15px rgba(248,250,245,0.20);
+      0 1px 0 rgba(255,255,255,0.14),
+      0 0 12px rgba(248,250,245,0.12);
   }
 
   body.is-tabbar-hidden .desktop-entry__text br,
   body.page-route-activities .desktop-entry__text br{
     display: none;
   }
-  /* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V2 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V3 === */
 
   body.is-tabbar-hidden .top-stack,
   body.page-route-activities .top-stack{
@@ -1384,7 +1384,7 @@
   }
 }
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V1 | Zweck: stabilisiert im Narrow-Desktop die Copy-Lesbarkeit auf 1044 und hält den Reset-Slot visuell ruhig, ohne den Rail-Contract anzufassen; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V2 | Zweck: koppelt die Lesefläche auf 900–1024px vollständig an den echten Copy-Container, damit H1 und Lead bei Text- oder Breitenänderungen stabil lesbar bleiben, ohne Mobile oder den Rail-Contract zu beeinflussen; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
   body.is-tabbar-hidden,
   body.page-route-activities{
@@ -1412,22 +1412,21 @@
     background:
       linear-gradient(
         90deg,
-        rgba(243,246,240,0.60) 0%,
-        rgba(243,246,240,0.42) 7%,
-        rgba(243,246,240,0.20) 13%,
-        rgba(243,246,240,0.08) 18.5%,
-        rgba(243,246,240,0.02) 23%,
-        rgba(243,246,240,0.00) 27.5%
+        rgba(243,246,240,0.34) 0%,
+        rgba(243,246,240,0.20) 7%,
+        rgba(243,246,240,0.08) 13%,
+        rgba(243,246,240,0.02) 18.5%,
+        rgba(243,246,240,0.00) 24%
       ),
       radial-gradient(
-        58% 82% at 11% 30%,
-        rgba(247,249,243,0.13) 0%,
-        rgba(247,249,243,0.04) 44%,
+        56% 78% at 11% 30%,
+        rgba(247,249,243,0.08) 0%,
+        rgba(247,249,243,0.02) 44%,
         rgba(247,249,243,0.00) 76%
       ),
       linear-gradient(
         180deg,
-        rgba(247,249,244,0.02) 0%,
+        rgba(247,249,244,0.01) 0%,
         rgba(247,249,244,0.00) 56%,
         rgba(233,237,220,0.10) 78%,
         rgba(233,237,220,0.24) 92%,
@@ -1437,38 +1436,82 @@
 
   body.is-tabbar-hidden .desktop-entry__inner::before,
   body.page-route-activities .desktop-entry__inner::before{
-    inset: -9px -12px -8px -4px;
-    filter: blur(7px);
+    content: none;
   }
 
   body.is-tabbar-hidden .desktop-entry__content,
   body.page-route-activities .desktop-entry__content{
-    gap: 10px;
-    padding-top: 7px;
+    display: inline-grid;
+    justify-self: start;
+    width: fit-content;
+    max-width: min(100%, var(--desktop-copy-max));
+    gap: 11px;
+    padding-top: 8px;
     padding-bottom: 10px;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__content::before,
+  body.page-route-activities .desktop-entry__content::before{
+    inset: -14px -14px -18px -14px;
+    border-radius: 26px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(250,251,247,0.90) 0%,
+        rgba(250,251,247,0.76) 30%,
+        rgba(250,251,247,0.44) 56%,
+        rgba(250,251,247,0.14) 74%,
+        rgba(250,251,247,0.00) 88%
+      ),
+      radial-gradient(
+        96% 116% at 15% 36%,
+        rgba(251,252,248,0.78) 0%,
+        rgba(250,251,247,0.48) 42%,
+        rgba(249,250,246,0.18) 66%,
+        rgba(249,250,246,0.00) 86%
+      );
+    filter: blur(7px);
+  }
+
+  body.is-tabbar-hidden .desktop-entry__content::after,
+  body.page-route-activities .desktop-entry__content::after{
+    content: "";
+    position: absolute;
+    inset: -5px -8px -10px -8px;
+    z-index: -1;
+    border-radius: 20px;
+    background:
+      radial-gradient(
+        86% 98% at 14% 34%,
+        rgba(255,255,255,0.34) 0%,
+        rgba(255,255,255,0.18) 48%,
+        rgba(255,255,255,0.00) 82%
+      );
+    filter: blur(4px);
+    pointer-events: none;
   }
 
   body.is-tabbar-hidden .desktop-entry__title,
   body.page-route-activities .desktop-entry__title{
-    max-width: 23.85rem;
-    font-size: clamp(2.3rem, 2.14rem + 0.46vw, 2.7rem);
-    line-height: 1;
-    letter-spacing: -0.056em;
+    max-width: 23.9rem;
+    font-size: clamp(2.34rem, 2.16rem + 0.48vw, 2.74rem);
+    line-height: 0.99;
+    letter-spacing: -0.054em;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.26),
-      0 0 22px rgba(248,250,245,0.34);
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 14px rgba(248,250,245,0.18);
   }
 
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
-    max-width: 19.6rem;
-    color: rgba(11,24,18,0.96);
-    font-size: 0.96rem;
-    line-height: 1.48;
-    font-weight: 625;
+    max-width: 20.2rem;
+    color: rgba(11,24,18,0.98);
+    font-size: 1rem;
+    line-height: 1.50;
+    font-weight: 620;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.22),
-      0 0 16px rgba(248,250,245,0.24);
+      0 1px 0 rgba(255,255,255,0.16),
+      0 0 12px rgba(248,250,245,0.14);
   }
 
   body.is-tabbar-hidden .top-stack,
@@ -1554,7 +1597,7 @@
     padding-right: var(--desktop-shell-pad-x);
   }
 }
-/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V1 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V2 === */
 
 @media (min-width: 1600px){
   body.is-tabbar-hidden,
