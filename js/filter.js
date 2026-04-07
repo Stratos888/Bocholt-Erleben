@@ -1079,7 +1079,7 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
   },
   /* === END BLOCK: FILTER_FACET_SYNC_HELPERS_V2 === */
 
-/* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V4 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und Date-UI strikt synchron zum Facettenzustand; Umfang: ersetzt updateFilterBarUI() und updateFacetOptionStates() für Zeitraum + exaktes Datum === */
+/* === BEGIN BLOCK: FILTER_BAR_UI_STATE_V5 | Zweck: hält Pill-Labels, Reset-Sichtbarkeit und Date-UI synchron zu Suche plus Facetten, damit Home denselben Desktop-Active-State wie Aktivitäten nutzt; Umfang: ersetzt updateFilterBarUI() und updateFacetOptionStates() für Zeitraum + exaktes Datum === */
   updateFilterBarUI(timeValueEl, catValueEl, resetEl) {
     const timeMap = {
       all: "Alle",
@@ -1093,7 +1093,13 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     const timeKey = (this.filters.zeitraum || "all").trim();
     const selectedDate = (this.filters.selectedDate || "").trim();
     const cat = (this.filters.kategorie || "").trim();
-    const hasActiveFacetFilters = timeKey !== "all" || cat.length > 0 || selectedDate.length > 0;
+    const searchNeedle = (this.filters.searchText || "").trim();
+    const hasActiveFilters = (
+      searchNeedle.length > 0 ||
+      timeKey !== "all" ||
+      cat.length > 0 ||
+      selectedDate.length > 0
+    );
 
     const ui = this._ui || {};
     const rowEl = ui.searchRow || document.querySelector(".desktop-hero__search-row");
@@ -1110,11 +1116,11 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     if (catValueEl) catValueEl.textContent = cat ? cat : "Alle";
 
     if (rowEl) {
-      rowEl.classList.toggle("has-active-filter-reset", hasActiveFacetFilters);
+      rowEl.classList.toggle("has-active-filter-reset", hasActiveFilters);
     }
 
     if (resetEl) {
-      resetEl.hidden = !hasActiveFacetFilters;
+      resetEl.hidden = !hasActiveFilters;
     }
 
     this.syncDateFilterUI();
@@ -1259,16 +1265,22 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     this.setActiveOption(ui.catSheet, activeCatBtn);
     this.syncDateFilterUI();
   },
-  /* === END BLOCK: FILTER_BAR_UI_STATE_V4 === */
+  /* === END BLOCK: FILTER_BAR_UI_STATE_V5 === */
 
-  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V6 | Zweck: setzt Zeit/Kategorie/exaktes Datum zurück und schließt den integrierten Kalenderzustand sauber mit; Umfang: ersetzt resetFacetFilters() === */
+  /* === BEGIN BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V7 | Zweck: setzt Suche, Zeit, Kategorie und exaktes Datum gemeinsam zurück, damit der Desktop-Reset exakt denselben Clear-Contract wie bei Aktivitäten erfüllt; Umfang: ersetzt resetFacetFilters() === */
   resetFacetFilters() {
     const ui = this._ui || {};
+    const searchInput = ui.searchInput || document.getElementById("search-filter");
 
+    this.filters.searchText = "";
     this.filters.kategorie = "";
     this.filters.zeitraum = "all";
     this.filters.selectedDate = "";
     this._datePickerMonth = this.getMonthKey(this.getTodayIso());
+
+    if (searchInput) {
+      searchInput.value = "";
+    }
 
     if (ui.timeSheet) {
       this.setActiveOption(
@@ -1311,9 +1323,9 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       ui.resetPill || document.getElementById("filter-reset-pill")
     );
 
-    debugLog("Facet filters reset");
+    debugLog("Filters and search reset");
   },
-  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V6 === */
+  /* === END BLOCK: FILTER_RESET_AND_REFRESH_TAIL_V7 === */
 
   /**
    * Events neu laden (z. B. nach Airtable-Update)
