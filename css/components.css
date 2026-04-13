@@ -1315,6 +1315,10 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
     0 12px 22px rgba(14,20,17,0.08);
 }
 
+#event-detail-panel .activity-detail__media--freizeit-familie{
+  background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
+}
+
 @media (min-width: 900px){
   .page--activities{
     padding-bottom: 0;
@@ -1456,7 +1460,7 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
     background: linear-gradient(135deg, rgba(225,239,233,0.98), rgba(198,223,212,0.92));
   }
 
-  .page--activities .activity-card-media--freizeitorte,
+  .page--activities .activity-card-media--freizeit-familie,
   .page--activities .activity-card-media--aktivitaet{
     background: linear-gradient(135deg, rgba(234,237,228,0.98), rgba(217,224,208,0.92));
   }
