@@ -75,12 +75,44 @@ const OfferVisuals = (() => {
     return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
   }
 
+  function toSingleLine(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function pickSupportingLabel(offer) {
+    const audience = Array.isArray(offer?.audience)
+      ? offer.audience.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
+
+    if (audience.length) {
+      if (audience.some((entry) => entry.toLowerCase() === "familien")) return "Für Familien";
+      return `Geeignet für ${audience[0]}`;
+    }
+
+    const season = toSingleLine(offer?.season);
+    if (season) return season;
+
+    const hint = toSingleLine(offer?.hint);
+    if (hint) return hint;
+
+    return "";
+  }
+
+  function buildFactItems(offer) {
+    return [offer?.duration, offer?.mode, offer?.price]
+      .map((entry) => toSingleLine(entry))
+      .filter(Boolean)
+      .slice(0, 3);
+  }
+
   return {
     escapeHtml,
     normalizeHttpUrl,
     slugify,
     getCategoryPresentation,
-    buildMetaLine
+    buildMetaLine,
+    buildFactItems,
+    pickSupportingLabel
   };
 })();
 
@@ -110,6 +142,50 @@ const OfferCards = (() => {
     return `<p class="event-card-desc">${OfferVisuals.escapeHtml(text)}</p>`;
   }
 
+  function renderFactChips(offer) {
+    const items = OfferVisuals.buildFactItems(offer);
+    if (!items.length) return "";
+
+    return `
+      <div class="activity-card-facts" aria-label="Wichtige Informationen">
+        ${items.map((item) => `<span class="activity-card-fact">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+      </div>
+    `.trim();
+  }
+
+  function renderSupportingLine(offer) {
+    const supporting = OfferVisuals.pickSupportingLabel(offer);
+    if (!supporting) return "";
+    return `<div class="activity-card-supporting">${OfferVisuals.escapeHtml(supporting)}</div>`;
+  }
+
+  function renderMedia(offer, visual) {
+    const imageUrl = OfferVisuals.normalizeHttpUrl(offer?.image);
+    const modifier = OfferVisuals.escapeHtml(visual.modifier);
+    const label = OfferVisuals.escapeHtml(visual.label);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-card-media-icon-svg" })
+      : `<span class="activity-card-media-icon-fallback">${OfferVisuals.escapeHtml(visual.label.slice(0, 1))}</span>`;
+
+    if (imageUrl) {
+      return `
+        <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
+          <img class="activity-card-media__image" src="${OfferVisuals.escapeHtml(imageUrl)}" alt="" loading="lazy" decoding="async">
+        </div>
+      `.trim();
+    }
+
+    return `
+      <div class="activity-card-media activity-card-media--fallback activity-card-media--${modifier}" aria-hidden="true">
+        <div class="activity-card-media__scrim"></div>
+        <div class="activity-card-media__content">
+          <span class="activity-card-media__icon">${iconHtml}</span>
+          <span class="activity-card-media__label">${label}</span>
+        </div>
+      </div>
+    `.trim();
+  }
+
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
     window.open(url, "_blank", "noopener,noreferrer");
@@ -120,9 +196,8 @@ const OfferCards = (() => {
     const article = document.createElement("article");
     const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
     const primaryUrl = OfferVisuals.normalizeHttpUrl(offer.url);
-    const metaLine = OfferVisuals.buildMetaLine(offer);
 
-    article.className = "event-card discovery-card--compact";
+    article.className = "event-card discovery-card--compact activity-card--rich";
     article.tabIndex = 0;
     article.setAttribute("role", "button");
     article.setAttribute(
@@ -131,17 +206,19 @@ const OfferCards = (() => {
     );
 
     article.innerHTML = `
+      ${renderMedia(offer, visual)}
       <div class="event-card-body">
         <div class="activity-card-kicker">${OfferVisuals.escapeHtml(visual.label)}</div>
         <h2 class="event-title">
           <span class="event-title__text">${OfferVisuals.escapeHtml(offer.title)}</span>
           ${renderCategoryIcon(visual)}
         </h2>
+        ${renderDescription(offer)}
         <div class="event-meta">
           <span class="event-meta__place">${OfferVisuals.escapeHtml(offer.location)}</span>
         </div>
-        ${renderDescription(offer)}
-        ${metaLine ? `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(metaLine)}</div>` : ""}
+        ${renderFactChips(offer)}
+        ${renderSupportingLine(offer)}
       </div>
     `.trim();
 
