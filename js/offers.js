@@ -176,7 +176,15 @@ function renderSupportingLine(offer) {
     if (imageUrl) {
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
-          <img class="activity-card-media__image" src="${OfferVisuals.escapeHtml(imageUrl)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+<img
+  class="activity-card-media__image"
+  src="${OfferVisuals.escapeHtml(imageUrl)}"
+  alt=""
+  loading="lazy"
+  decoding="async"
+  referrerpolicy="no-referrer"
+  style="--activity-image-pos-x:${OfferVisuals.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(offer?.image_position_y || "50%")};"
+>
         </div>
       `.trim();
     }
