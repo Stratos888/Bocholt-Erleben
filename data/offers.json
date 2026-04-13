@@ -12,6 +12,8 @@
       "description": "Ruhige Runde am Wasser mit viel Platz für spontane Bewegung, kurze Auszeiten und entspanntes Draußensein.",
       "url": "https://www.bocholt.de/aasee",
       "image": "https://upload.wikimedia.org/wikipedia/commons/2/28/2015-04-27_Aasee_Bocholt_Westfalen_11.jpg",
+      "image_position_x": "46%",
+      "image_position_y": "56%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:2015-04-27_Aasee_Bocholt_Westfalen_11.jpg",
       "image_author": "Ziko van Dijk",
       "image_license": "CC BY-SA 4.0",
@@ -25,7 +27,7 @@
       "season": "Ganzjährig",
       "hint": "Gut spontan machbar",
       "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "mit-kindern-an-den-aasee",
       "title": "Mit Kindern an den Aasee",
@@ -34,6 +36,8 @@
       "description": "Wasser, Wege und viel freie Fläche machen den Aasee zu einer unkomplizierten Idee für einen lockeren Familiennachmittag.",
       "url": "https://www.bocholt.de/aasee",
       "image": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Aasee_Bocholt_-_Strand.jpg",
+      "image_position_x": "52%",
+      "image_position_y": "55%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Aasee_Bocholt_-_Strand.jpg",
       "image_author": "Odna",
       "image_license": "CC BY-SA 3.0",
@@ -47,7 +51,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Besonders angenehm bei gutem Wetter",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "waldspaziergang-im-stadtwald",
       "title": "Waldspaziergang im Stadtwald",
@@ -56,8 +60,10 @@
       "description": "Ruhige Wege durch den Wald direkt am Aasee – gut für eine kleine Pause, frische Luft und spontane Naturzeit.",
       "url": "https://www.bocholt.de/Aasee-und-Stadtwald",
       "image": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Voormalig_spoorlijn_naar_Bocholt%2C_omgezet_tot_onverharde_weg_met_fietspad_-_Woold_-_20430044_-_RCE.jpg",
+      "image_position_x": "50%",
+      "image_position_y": "57%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Voormalig_spoorlijn_naar_Bocholt,_omgezet_tot_onverharde_weg_met_fietspad_-_Woold_-_20430044_-_RCE.jpg",
-      "image_author": "Rijksdienst voor het Cultureel Erfgoed",
+      "image_author": "Rijksdienst voor das Cultureel Erfgoed",
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Rijksdienst voor het Cultureel Erfgoed, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": ["Draußen", "Natur", "Kostenlos"],
@@ -69,7 +75,7 @@
       "season": "Ganzjährig",
       "hint": "Ruhiger als viele zentrale Orte",
       "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "kultur-im-textilwerk",
       "title": "Industriekultur im Textilwerk",
@@ -78,6 +84,8 @@
       "description": "Für Regentage oder kulturelle Freizeit eignet sich das Textilwerk als starke Bocholt-Idee mit lokalem Bezug und klarer Atmosphäre.",
       "url": "https://textilwerk.lwl.org/",
       "image": "https://upload.wikimedia.org/wikipedia/commons/1/17/2025-04-17_Textilwerk_Bocholt_Weberei_01.jpg",
+      "image_position_x": "54%",
+      "image_position_y": "58%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:2025-04-17_Textilwerk_Bocholt_Weberei_01.jpg",
       "image_author": "Ziko van Dijk",
       "image_license": "CC BY-SA 4.0",
@@ -91,7 +99,7 @@
       "season": "Ganzjährig",
       "hint": "Vor dem Besuch Öffnungszeiten prüfen",
       "cardFacts": ["1–2 Std", "Indoor", "Eintritt"]
-    },
+    },,
     {
       "id": "entspannt-zum-hilgelo",
       "title": "Entspannt zum Hilgelo",
@@ -100,6 +108,8 @@
       "description": "Natursee mit Strandbereichen nahe der Grenze – als lockere Sommeridee zum Baden, Entspannen und Draußensein.",
       "url": "https://www.leisurelands.nl/nl/ontdek-recreatiegebieden-leisurelands/achterhoek/hilgelo",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hilgelo%20Meddo.jpg",
+      "image_position_x": "49%",
+      "image_position_y": "62%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Hilgelo_Meddo.jpg",
       "image_author": "Ciell",
       "image_license": "CC BY-SA 3.0",
@@ -113,7 +123,7 @@
       "season": "Vor allem Sommer",
       "hint": "Eher als kleiner Ausflug geeignet",
       "cardFacts": ["Halber Tag", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "wandern-im-burloer-venn",
       "title": "Wandern im Burloer Venn",
@@ -122,6 +132,8 @@
       "description": "Grenznahe Moor- und Heidelandschaft mit viel Ruhe, weitem Blick und einem spürbar anderen Naturcharakter als rund um Bocholt selbst.",
       "url": "https://www.bocholt.de/Burloer-Venn",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331%20Burlo-Vardingholter%20Venn%2C%20Borken%20%2800892%29.jpg",
+      "image_position_x": "58%",
+      "image_position_y": "55%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:20190331_Burlo-Vardingholter_Venn%2C_Borken_%2800892%29.jpg",
       "image_author": "Günter Seggebäing",
       "image_license": "CC BY-SA 3.0",
@@ -135,7 +147,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Besonders stark bei ruhigem Wetter",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "grenzwandern-auf-dem-noaberpad",
       "title": "Grenzwandern auf dem Noaberpad",
@@ -144,6 +156,8 @@
       "description": "Der Fernwanderweg entlang der deutsch-niederländischen Grenze eignet sich für eine klare, sportlichere Touridee mit viel Weite und wenig Stadtgefühl.",
       "url": "https://www.bocholt.de/Naoberpad",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Noaberpad%20near%20Gronau%20at%20Dutch-German%20border.jpg",
+      "image_position_x": "41%",
+      "image_position_y": "56%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Noaberpad_near_Gronau_at_Dutch-German_border.jpg",
       "image_author": "MartinD",
       "image_license": "CC BY-SA 4.0",
@@ -157,7 +171,7 @@
       "season": "Ganzjährig",
       "hint": "Eher für eine längere Tour gedacht",
       "cardFacts": ["2+ Std", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "naturtour-durch-die-bekendelle",
       "title": "Naturtour durch die Bekendelle",
@@ -166,6 +180,8 @@
       "description": "Bachlauf, Wald und eine ungewöhnlich ruhige Landschaft machen die Bekendelle zu einer starken Naturidee auf der niederländischen Seite.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/naturgebiete/bekendelle",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bovenslinge.JPG",
+      "image_position_x": "56%",
+      "image_position_y": "58%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Bovenslinge.JPG",
       "image_author": "Arch",
       "image_license": "Public Domain",
@@ -179,7 +195,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Gut für ruhige Naturbeobachtung",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },
+    },,
     {
       "id": "rundweg-rund-um-t-hilgelo",
       "title": "Rundweg rund um ’t Hilgelo",
@@ -188,6 +204,8 @@
       "description": "Der Weg rund um den See ist eine einfache, klare Bewegungsidee für einen lockeren Spaziergang oder eine kleine aktive Runde in Grenznähe.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/erholungssee-het-hilgelo",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hilgelo%20Meddo.jpg",
+      "image_position_x": "50%",
+      "image_position_y": "60%",
       "image_source_page": "https://commons.wikimedia.org/wiki/File:Hilgelo_Meddo.jpg",
       "image_author": "Ciell",
       "image_license": "CC BY-SA 3.0",
