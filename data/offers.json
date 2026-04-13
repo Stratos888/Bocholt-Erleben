@@ -17,7 +17,7 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Ziko van Dijk, CC BY-SA 4.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "52%",
+      "image_position_y": "56%",
       "tags": ["Draußen", "Natur", "Kostenlos"],
       "audience": ["Allein", "Zu zweit", "Familien"],
       "duration": "30–60 Min",
@@ -41,7 +41,7 @@
       "image_license": "CC BY-SA 3.0",
       "image_credit": "Odna, CC BY-SA 3.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "50%",
+      "image_position_y": "57%",
       "tags": ["Mit Kindern", "Draußen", "Kostenlos"],
       "audience": ["Familien"],
       "duration": "1–2 Std",
@@ -50,7 +50,7 @@
       "area": "Bocholt",
       "season": "Frühling bis Herbst",
       "hint": "Besonders angenehm bei gutem Wetter",
-      "cardFacts": ["Mit Kindern", "Outdoor", "Kostenlos"]
+      "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
     },
     {
       "id": "waldspaziergang-im-stadtwald",
@@ -65,7 +65,7 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Rijksdienst voor het Cultureel Erfgoed, CC BY-SA 4.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "58%",
+      "image_position_y": "63%",
       "tags": ["Draußen", "Natur", "Kostenlos"],
       "audience": ["Allein", "Zu zweit", "Familien"],
       "duration": "30–60 Min",
@@ -76,6 +76,7 @@
       "hint": "Ruhiger als viele zentrale Orte",
       "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
     },
+    {
     {
       "id": "kultur-im-textilwerk",
       "title": "Industriekultur im Textilwerk",
@@ -89,7 +90,7 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Ziko van Dijk, CC BY-SA 4.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "36%",
+      "image_position_y": "44%",
       "tags": ["Bei Regen", "Kultur", "Indoor"],
       "audience": ["Allein", "Zu zweit", "Familien"],
       "duration": "1–2 Std",
@@ -98,7 +99,7 @@
       "area": "Bocholt",
       "season": "Ganzjährig",
       "hint": "Vor dem Besuch Öffnungszeiten prüfen",
-      "cardFacts": ["Bei Regen", "Indoor", "Eintritt"]
+      "cardFacts": ["1–2 Std", "Indoor", "Eintritt"]
     },
     {
       "id": "baden-am-proebstingsee",
@@ -175,6 +176,13 @@
       "location": "’t Hilgelo, Winterswijk",
       "description": "Natursee mit Strandbereichen nahe der Grenze – als lockere Sommeridee zum Baden, Entspannen und Draußensein.",
       "url": "https://www.leisurelands.nl/nl/ontdek-recreatiegebieden-leisurelands/achterhoek/hilgelo",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hilgelo%20Meddo.jpg",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Hilgelo_Meddo.jpg",
+      "image_author": "Ciell",
+      "image_license": "CC BY-SA 3.0",
+      "image_credit": "Ciell, CC BY-SA 3.0, via Wikimedia Commons",
+      "image_position_x": "50%",
+      "image_position_y": "56%",
       "tags": ["Draußen", "Sommer", "Zu zweit"],
       "audience": ["Zu zweit", "Familien", "Gruppen"],
       "duration": "Halber Tag",
@@ -183,7 +191,7 @@
       "area": "Umgebung",
       "season": "Vor allem Sommer",
       "hint": "Eher als kleiner Ausflug geeignet",
-      "cardFacts": ["Sommer", "Outdoor", "Baden"]
+      "cardFacts": ["Halber Tag", "Outdoor", "Kostenlos"]
     },
     {
       "id": "wandern-im-burloer-venn",
@@ -198,7 +206,7 @@
       "image_license": "CC BY-SA 3.0",
       "image_credit": "Günter Seggebäing, CC BY-SA 3.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "54%",
+      "image_position_y": "60%",
       "tags": ["Natur", "Wandern", "Ausflug"],
       "audience": ["Allein", "Zu zweit", "Naturfans"],
       "duration": "1–2 Std",
@@ -207,8 +215,9 @@
       "area": "Umgebung",
       "season": "Frühling bis Herbst",
       "hint": "Besonders stark bei ruhigem Wetter",
-      "cardFacts": ["1–2 Std", "Outdoor", "Ausflug"]
+      "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
     },
+    {
     {
       "id": "grenzwandern-auf-dem-noaberpad",
       "title": "Grenzwandern auf dem Noaberpad",
@@ -222,7 +231,7 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "MartinD, CC BY-SA 4.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "58%",
+      "image_position_y": "72%",
       "tags": ["Wandern", "Grenze", "Aktiv"],
       "audience": ["Allein", "Zu zweit", "Aktive"],
       "duration": "2+ Std",
@@ -231,7 +240,7 @@
       "area": "Umgebung",
       "season": "Ganzjährig",
       "hint": "Eher für eine längere Tour gedacht",
-      "cardFacts": ["2+ Std", "Outdoor", "Aktiv"]
+      "cardFacts": ["2+ Std", "Outdoor", "Kostenlos"]
     },
     {
       "id": "naturtour-durch-die-bekendelle",
@@ -246,7 +255,7 @@
       "image_license": "Public Domain",
       "image_credit": "Arch, Public Domain, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "62%",
+      "image_position_y": "74%",
       "tags": ["Natur", "Wald", "Ausflug"],
       "audience": ["Allein", "Zu zweit", "Naturfans"],
       "duration": "1–2 Std",
@@ -255,7 +264,7 @@
       "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
       "hint": "Gut für ruhige Naturbeobachtung",
-      "cardFacts": ["1–2 Std", "Outdoor", "Ausflug"]
+      "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
     },
     {
       "id": "rundweg-rund-um-t-hilgelo",
@@ -270,7 +279,7 @@
       "image_license": "CC BY-SA 3.0",
       "image_credit": "Ciell, CC BY-SA 3.0, via Wikimedia Commons",
       "image_position_x": "50%",
-      "image_position_y": "42%",
+      "image_position_y": "60%",
       "tags": ["Spazieren", "See", "Outdoor"],
       "audience": ["Allein", "Zu zweit", "Familien"],
       "duration": "45–60 Min",
@@ -279,7 +288,7 @@
       "area": "NL-Umgebung",
       "season": "Ganzjährig",
       "hint": "Gut als lockere Runde ohne viel Planung",
-      "cardFacts": ["45–60 Min", "Outdoor", "Spazieren"]
+      "cardFacts": ["45–60 Min", "Outdoor", "Kostenlos"]
     }
   ]
 }
