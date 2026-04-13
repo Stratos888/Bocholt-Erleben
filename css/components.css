@@ -1381,9 +1381,10 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
   width: 100%;
   height: 100%;
   min-height: 188px;
-  object-fit: cover;
+  object-fit: var(--activity-image-fit, cover);
   object-position: var(--activity-image-pos-x, 50%) var(--activity-image-pos-y, 50%);
-  transform: scale(1.01);
+  transform: none;
+  background: rgba(232,236,224,0.92);
 }
 
   .page--activities .activity-card-media__scrim{
