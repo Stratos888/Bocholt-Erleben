@@ -568,244 +568,239 @@ Eher nicht aufnehmen:
     "notes": "manual chat search v3"
   }
 ]
-Pflicht für FINAL
+```
 
+### Pflicht für FINAL
 Diese Felder müssen für FINAL belastbar gesetzt sein:
+- `title`
+- `date`
+- `city`
+- `location`
+- `kategorie_suggestion`
+- `url`
+- `description`
+- `source_name`
+- `source_url`
+- `notes`
 
-title
-date
-city
-location
-kategorie_suggestion
-url
-description
-source_name
-source_url
-notes
-Feldregeln
-title
+### Feldregeln
 
+#### `title`
 Klarer Eventtitel, nicht generisch.
 
-date
+#### `date`
+Immer `YYYY-MM-DD`.
 
-Immer YYYY-MM-DD.
+#### `endDate`
+Nur wenn belastbar bekannt.  
+Bei Mehrtages-Events ist ein belastbares `endDate` für FINAL erforderlich.
 
-endDate
-
-Nur wenn belastbar bekannt.
-Bei Mehrtages-Events ist ein belastbares endDate für FINAL erforderlich.
-
-time
-
+#### `time`
 Nur wenn eindeutig belegt und regelkonform.
 
-city
-
+#### `city`
 Sauber setzen, wenn eindeutig.
 
-location
-
+#### `location`
 Möglichst konkret, aber nur wenn belastbar.
 
-kategorie_suggestion
-
+#### `kategorie_suggestion`
 Es sollen nach Möglichkeit direkt die kanonischen Projektkategorien verwendet werden:
 
-Märkte & Feste
-Kultur & Kunst
-Musik & Bühne
-Kinder & Familie
-Sport & Bewegung
-Natur & Draußen
-Innenstadt & Leben
-Sonstiges
+- Märkte & Feste
+- Kultur & Kunst
+- Musik & Bühne
+- Kinder & Familie
+- Sport & Bewegung
+- Natur & Draußen
+- Innenstadt & Leben
+- Sonstiges
 
 Keine freien Fantasie-Kategorien, keine Werbebegriffe und keine unnötig feingranularen Unterkategorien.
 
 Wenn ein Event nicht eindeutig zuordenbar ist:
+- die sachlich nächstpassende kanonische Kategorie wählen
+- im Zweifel `Sonstiges`
 
-die sachlich nächstpassende kanonische Kategorie wählen
-im Zweifel Sonstiges
-url
-
+#### `url`
 Nur event-spezifische Detailseite oder gleichwertig event-spezifische Unterseite.
 
-source_url
-
+#### `source_url`
 Beste belastbare Quell-URL.
 
-description
-
-Kurz, neutral, facts-only.
-1–2 Sätze, maximal 200 Zeichen.
+#### `description`
+Kurz, neutral, facts-only.  
+1–2 Sätze, maximal 200 Zeichen.  
 Keine Werbesprache, keine Zitate, keine Halluzinationen, keine Copy-Paste-Formulierungen.
 
-notes
-
+#### `notes`
 Immer setzen auf:
+- `manual chat search v3`
 
-manual chat search v3
-17. ID-Regel – bewusst downstream
+---
 
-Die folgende Regel ist fachlich gültig, gehört aber nicht in dieses Kandidaten-Schema für data/inbox_manual.json.
+## 17. ID-Regel – bewusst downstream
+Die folgende Regel ist **fachlich gültig**, gehört aber **nicht** in dieses Kandidaten-Schema für `data/inbox_manual.json`.
 
-Die deterministische id ist eine Downstream-Regel für finale Event-Datensätze, nicht für diese Kandidatenliste.
+Die deterministische `id` ist eine **Downstream-Regel für finale Event-Datensätze**, nicht für diese Kandidatenliste.
 
 Regeln downstream:
-
-nur lowercase
-Umlaute normieren
-Sonderzeichen entfernen
-Wörter mit Bindestrich trennen
-genau ein Datum am Ende im Format YYYY-MM-DD
-keine doppelten Jahresbestandteile
-keine doppelten Bindestriche
+- nur lowercase
+- Umlaute normieren
+- Sonderzeichen entfernen
+- Wörter mit Bindestrich trennen
+- genau ein Datum am Ende im Format `YYYY-MM-DD`
+- keine doppelten Jahresbestandteile
+- keine doppelten Bindestriche
 
 Beispiel:
+- `slug-2026-04-26`
 
-slug-2026-04-26
+Diese Regel wird **nicht** im Suchkandidaten-Output erzwungen, damit die bestehende Inbox-/PWA-Pipeline unverändert kompatibel bleibt.
 
-Diese Regel wird nicht im Suchkandidaten-Output erzwungen, damit die bestehende Inbox-/PWA-Pipeline unverändert kompatibel bleibt.
+---
 
-18. Mengenregel
-
+## 18. Mengenregel
 Für einen normalen Suchlauf:
-
-lieber weniger, aber sauber
-keine Fülltreffer
-keine fragwürdigen Grenzfälle nur für mehr Menge
+- lieber **weniger, aber sauber**
+- keine Fülltreffer
+- keine fragwürdigen Grenzfälle nur für mehr Menge
 
 Zielgröße:
+- **10 bis 25 gute FINAL-Kandidaten**
+- wenn nicht genug gute Events vorhanden sind, dann auch weniger
 
-10 bis 25 gute FINAL-Kandidaten
-wenn nicht genug gute Events vorhanden sind, dann auch weniger
-19. Review statt Raten
+---
 
+## 19. Review statt Raten
 Wenn eines dieser Probleme vorliegt:
-
-URL nicht eindeutig detailseitig
-Mehrtages-Logik unklar
-Zeit widersprüchlich
-Beschreibung nicht belastbar formulierbar
-Ort / Location nicht eindeutig
-Scope unklar
-Datumslogik unsicher
-Quelle nicht belastbar genug
-URL nur Übersicht statt Detail
-Pflichtfelder für FINAL nicht vollständig sicher
+- URL nicht eindeutig detailseitig
+- Mehrtages-Logik unklar
+- Zeit widersprüchlich
+- Beschreibung nicht belastbar formulierbar
+- Ort / Location nicht eindeutig
+- Scope unklar
+- Datumslogik unsicher
+- Quelle nicht belastbar genug
+- URL nur Übersicht statt Detail
+- Pflichtfelder für FINAL nicht vollständig sicher
 
 Dann gilt:
-
-im manuellen Prüfmodus: REVIEW NÖTIG
-im Automationsmodus: nicht ausgeben
+- im manuellen Prüfmodus: **REVIEW NÖTIG**
+- im Automationsmodus: **nicht ausgeben**
 
 Nie unsichere Datensätze direkt in FINAL mischen.
 
-20. Harte Endprüfung vor Ausgabe
+---
 
+## 20. Harte Endprüfung vor Ausgabe
 Vor FINAL jede Zeile gegen diese Checkliste prüfen:
 
- keine Leerzeile
- Pflichtfelder für FINAL gefüllt
- URL ist event-spezifisch und nicht bloß generische Übersicht
- Mehrtages-Event korrekt in date / endDate
- time regelkonform
- Beschreibung sachlich und quellenbasiert
- Scope korrekt oder explizite Ausnahme
- keine Halluzination
- 100% sicher oder sonst Review / Ausschluss
- keine Dublette gegen Bestand / Inbox / Archiv / Manual / Session
+- [ ] keine Leerzeile
+- [ ] Pflichtfelder für FINAL gefüllt
+- [ ] URL ist event-spezifisch und nicht bloß generische Übersicht
+- [ ] Mehrtages-Event korrekt in `date` / `endDate`
+- [ ] `time` regelkonform
+- [ ] Beschreibung sachlich und quellenbasiert
+- [ ] Scope korrekt oder explizite Ausnahme
+- [ ] keine Halluzination
+- [ ] 100% sicher oder sonst Review / Ausschluss
+- [ ] keine Dublette gegen Bestand / Inbox / Archiv / Manual / Session
 
 Nur Zeilen, die alle relevanten Punkte bestehen, dürfen in FINAL.
 
-21. Ausgabeformat
-Manueller Prüfmodus
+---
 
+## 21. Ausgabeformat
+
+### Manueller Prüfmodus
 Ausgabe immer in zwei Blöcken:
 
-FINAL FREIGEGEBEN
-REVIEW NÖTIG
+1. **FINAL FREIGEGEBEN**
+2. **REVIEW NÖTIG**
 
 Regeln:
+- `FINAL FREIGEGEBEN` bevorzugt als JSON-Array im Kandidaten-Schema
+- `REVIEW NÖTIG` getrennt davon
+- keine unsicheren Datensätze in FINAL
+- nur FINAL darf in `data/inbox_manual.json`
 
-FINAL FREIGEGEBEN bevorzugt als JSON-Array im Kandidaten-Schema
-REVIEW NÖTIG getrennt davon
-keine unsicheren Datensätze in FINAL
-nur FINAL darf in data/inbox_manual.json
-Automationsmodus
-
-Ausgabe muss direkt als JSON für data/inbox_manual.json erfolgen.
+### Automationsmodus
+Ausgabe muss direkt als JSON für `data/inbox_manual.json` erfolgen.
 
 Formatregeln:
+- Ausgabe **nur als JSON-Array**
+- keine Einleitung
+- keine Erklärung
+- keine Kommentare
+- keine zusätzlichen Texte außerhalb des JSON
+- kein REVIEW-Block
+- nur FINAL-Datensätze
 
-Ausgabe nur als JSON-Array
-keine Einleitung
-keine Erklärung
-keine Kommentare
-keine zusätzlichen Texte außerhalb des JSON
-kein REVIEW-Block
-nur FINAL-Datensätze
-22. Ausgabehinweis nach jedem manuellen Suchlauf
+---
 
-Nach jedem manuellen Suchlauf soll nach dem FINAL-Block zusätzlich kurz und eindeutig darauf hingewiesen werden:
+## 22. Ausgabehinweis nach jedem manuellen Suchlauf
+Nach jedem **manuellen** Suchlauf soll nach dem FINAL-Block zusätzlich kurz und eindeutig darauf hingewiesen werden:
 
-Nur den Block FINAL FREIGEGEBEN vollständig in data/inbox_manual.json kopieren. Nicht in data/inbox.json und nicht in data/inbox.tsv einfügen. Danach den Workflow Manual KI Event Intake starten.
+> Nur den Block `FINAL FREIGEGEBEN` vollständig in `data/inbox_manual.json` kopieren. Nicht in `data/inbox.json` und nicht in `data/inbox.tsv` einfügen. Danach den Workflow `Manual KI Event Intake` starten.
 
 Wenn im selben Chat ein weiterer Suchlauf folgt, muss zusätzlich intern beachtet werden:
 
-Alle bereits in diesem Chat gelieferten FINAL-Kandidaten gelten als temporärer Session-Bestand. Ein weiterer Suchlauf darf nur neue Delta-Kandidaten liefern.
+> Alle bereits in diesem Chat gelieferten FINAL-Kandidaten gelten als temporärer Session-Bestand. Ein weiterer Suchlauf darf nur neue Delta-Kandidaten liefern.
 
 Wenn für den Suchlauf nicht alle Referenzdateien vorhanden sind, soll zusätzlich vorher klar darauf hingewiesen werden:
 
-Für sauberes Dedupe brauche ich zusätzlich den aktuellen Bestands-Export (events.tsv oder ersatzweise data/events.json), inbox.tsv, inbox_archive.tsv und gegebenenfalls data/inbox_manual.json aus deinem aktuellen Stand.
+> Für sauberes Dedupe brauche ich zusätzlich den aktuellen Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus deinem aktuellen Stand.
 
-Im Automationsmodus entfällt dieser Ausgabehinweis vollständig.
+Im **Automationsmodus** entfällt dieser Ausgabehinweis vollständig.
 
-23. Wöchentliche Arbeitsroutine
-A. Manuell im Chat
-Neues Chat-Fenster öffnen
-Diese Dateien mitgeben:
-bocholt-erleben_eventsuche_regelwerk_v3.md
-events.tsv oder ersatzweise data/events.json
-inbox.tsv bzw. data/inbox.tsv
-inbox_archive.tsv
-data/inbox_manual.json (wenn dort bereits Kandidaten liegen)
-Suchlauf starten lassen
-Nur den Block FINAL FREIGEGEBEN vollständig in data/inbox_manual.json kopieren
-Wenn im selben Chat direkt weitergesucht wird:
-bisherigen FINAL-Output als Session-Bestand behandeln
-nur Delta-Kandidaten liefern lassen
-neues FINAL-Delta in data/inbox_manual.json ergänzen
-Workflow Manual KI Event Intake starten
-Inbox Review PWA vollständig kuratieren
-Vor dem nächsten Suchlauf wieder gegen den aktuellen Bestand, die offene Inbox, das Archiv und ggf. data/inbox_manual.json dedupen
-B. Automationslauf
-Regelwerk + aktuelle Referenzdaten werden automatisch geladen
-Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen
-Ausgabe enthält ausschließlich FINAL-JSON
-JSON wird nach data/inbox_manual.json geschrieben
-Danach folgt der bestehende Intake-/Review-Prozess
-24. Zusätzliche Prozessregel
+---
 
+## 23. Wöchentliche Arbeitsroutine
+
+### A. Manuell im Chat
+1. Neues Chat-Fenster öffnen
+2. Diese Dateien mitgeben:
+   - `bocholt-erleben_eventsuche_regelwerk_v3.md`
+   - `events.tsv` oder ersatzweise `data/events.json`
+   - `inbox.tsv` bzw. `data/inbox.tsv`
+   - `inbox_archive.tsv`
+   - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
+3. Suchlauf starten lassen
+4. Nur den Block `FINAL FREIGEGEBEN` vollständig in `data/inbox_manual.json` kopieren
+5. Wenn im selben Chat direkt weitergesucht wird:
+   - bisherigen FINAL-Output als Session-Bestand behandeln
+   - nur Delta-Kandidaten liefern lassen
+   - neues FINAL-Delta in `data/inbox_manual.json` ergänzen
+6. Workflow **Manual KI Event Intake** starten
+7. Inbox Review PWA vollständig kuratieren
+8. Vor dem nächsten Suchlauf wieder gegen den aktuellen Bestand, die offene Inbox, das Archiv und ggf. `data/inbox_manual.json` dedupen
+
+### B. Automationslauf
+1. Regelwerk + aktuelle Referenzdaten werden automatisch geladen
+2. Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen
+3. Ausgabe enthält ausschließlich FINAL-JSON
+4. JSON wird nach `data/inbox_manual.json` geschrieben
+5. Danach folgt der bestehende Intake-/Review-Prozess
+
+---
+
+## 24. Zusätzliche Prozessregel
 Vor einem neuen Suchlauf sollte die Inbox möglichst vollständig kuratiert sein.
 
 Das heißt:
-
-offene Review-Reste möglichst zuerst abarbeiten
-erst danach nächsten Suchlauf starten
+- offene Review-Reste möglichst zuerst abarbeiten
+- erst danach nächsten Suchlauf starten
 
 Wichtig:
-
-verworfene oder übernommene Fälle bleiben für künftige Suchläufe dedupe-relevant über inbox_archive.tsv
-inbox_archive.tsv ist kein optionales Nice-to-have, sondern Pflichtbestand für saubere Folgeläufe
-ohne Archiv-Datei ist das Dedupe unvollständig
+- verworfene oder übernommene Fälle bleiben für künftige Suchläufe dedupe-relevant über `inbox_archive.tsv`
+- `inbox_archive.tsv` ist kein optionales Nice-to-have, sondern Pflichtbestand für saubere Folgeläufe
+- ohne Archiv-Datei ist das Dedupe unvollständig
 
 Wenn ausnahmsweise mehrere Suchläufe innerhalb desselben Chats vor dem Intake gemacht werden, dann gilt zusätzlich:
-
-data/inbox_manual.json vor dem Folgelauf wieder mitgeben
-gegen alle bereits im Chat gelieferten FINAL-Kandidaten dedupen
-bereits gelieferte FINAL-Kandidaten nicht erneut ausgeben
-nur echte Delta-Kandidaten ergänzen
+- `data/inbox_manual.json` vor dem Folgelauf wieder mitgeben
+- gegen alle bereits im Chat gelieferten FINAL-Kandidaten dedupen
+- bereits gelieferte FINAL-Kandidaten nicht erneut ausgeben
+- nur echte Delta-Kandidaten ergänzen
 
 So bleibt der Prozess übersichtlich und das Risiko wiederholter Kandidaten sinkt.
