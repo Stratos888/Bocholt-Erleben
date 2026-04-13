@@ -69,7 +69,7 @@ Regel:
 
 ## Wichtige Arbeitslogik
 
-### Die KI-Suche deduped gegen Live-Bestand, offene Review-Basis, Entscheidungs-Archiv, Manual-Bestand und Chat-Session-Bestand.
+### Die KI-Suche deduped gegen Live-Bestand, offene Review-Basis, Entscheidungs-Archiv, Manual-Bestand und Chat-Session-Bestand
 Damit ein Suchlauf sauber funktioniert, müssen immer diese Referenzen berücksichtigt werden:
 
 1. **dieses Regelwerk**
@@ -300,12 +300,11 @@ Wenn **keine Detailseite existiert**, eine Übersichtsseite aber:
 3. Datum, Ort, Titel und belastbare Einordnung daraus 100% sicher hervorgehen,
 
 dann gilt:
-
 - im **manuellen Prüfmodus**: als **REVIEW NÖTIG**
 - im **Automationsmodus**: **nicht ausgeben**
 
 Für FINAL gilt damit praktisch:
-- **Nur Detailseite oder gleichwertig event-spezifische Unterseite**
+- **nur Detailseite oder gleichwertig event-spezifische Unterseite**
 
 ---
 
@@ -569,7 +568,6 @@ Eher nicht aufnehmen:
     "notes": "manual chat search v3"
   }
 ]
-
 Pflicht für FINAL
 
 Diese Felder müssen für FINAL belastbar gesetzt sein:
