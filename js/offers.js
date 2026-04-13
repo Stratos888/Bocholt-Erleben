@@ -99,6 +99,14 @@ const OfferVisuals = (() => {
   }
 
   function buildFactItems(offer) {
+    const curatedFacts = Array.isArray(offer?.cardFacts)
+      ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
+
+    if (curatedFacts.length) {
+      return curatedFacts.slice(0, 3);
+    }
+
     return [offer?.duration, offer?.mode, offer?.price]
       .map((entry) => toSingleLine(entry))
       .filter(Boolean)
