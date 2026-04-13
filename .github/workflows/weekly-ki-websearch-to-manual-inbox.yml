@@ -1,13 +1,14 @@
-# === BEGIN BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json only) ===
+# === BEGIN BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json + trigger intake) ===
 # Datei: .github/workflows/weekly-ki-websearch-to-manual-inbox.yml
 # Zweck:
 # - Startet die echte KI-Eventsuche automatisch 1x pro Woche
 # - Nutzt den neuen Responses/Web-Search-Runner
-# - Schreibt nur data/inbox_manual.json zurück ins Repo
+# - Schreibt data/inbox_manual.json zurück ins Repo
+# - Triggert danach automatisch den bestehenden Workflow "Manual KI Event Intake"
 # Umfang:
-# - Noch kein automatischer Import in den Inbox-Sheet-Tab
-# - Manual KI Event Intake bleibt vorerst separater nächster Schritt
-# === END BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json only) ===
+# - Kein Parser-/Venue-Suchkern
+# - Handoff in den bestehenden Intake-Flow direkt nach erfolgreichem Commit
+# === END BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json + trigger intake) ===
 
 name: Weekly KI Websearch → Manual Inbox
 
@@ -19,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: weekly-ki-websearch-manual-inbox
@@ -106,10 +108,12 @@ jobs:
       # Zweck:
       # - Commitet nur die erzeugte data/inbox_manual.json zurück ins Repo
       # - Kein Commit, wenn sich nichts geändert hat
+      # - Liefert did_commit als Output für den automatischen Handoff
       # Umfang:
       # - nur data/inbox_manual.json
       # === END BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
       - name: Commit generated manual inbox JSON
+        id: commit_manual_json
         run: |
           set -e
           git config user.name "github-actions[bot]"
@@ -119,8 +123,33 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No manual inbox changes to commit."
+            echo "did_commit=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git commit -m "chore: generate weekly KI websearch manual inbox"
           git push
+          echo "did_commit=true" >> "$GITHUB_OUTPUT"
+
+      # === BEGIN BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE (automatic handoff into inbox review flow) ===
+      # Zweck:
+      # - Startet nach erfolgreichem Commit automatisch den bestehenden Intake-Workflow
+      # - Nutzt denselben Repo-Ref wie der Wochenlauf
+      # Umfang:
+      # - Nur Trigger; Import/Deploy bleibt im bestehenden Workflow
+      # === END BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE (automatic handoff into inbox review flow) ===
+      - name: Trigger Manual KI Event Intake
+        if: steps.commit_manual_json.outputs.did_commit == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          TARGET_REF: ${{ github.ref_name }}
+        run: |
+          set -e
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/manual-ki-intake.yml/dispatches" \
+            -d "{\"ref\":\"$TARGET_REF\"}"
+          echo "✅ Manual KI Event Intake workflow dispatched."
