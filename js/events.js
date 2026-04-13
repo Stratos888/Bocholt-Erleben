@@ -678,17 +678,12 @@ function renderList(list) {
     return t;
   };
 
-  const getNextWeekendRange = (base) => {
-    const day = base.getDay();
-    const daysUntilFriday = ((5 - day) + 7) % 7;
-    const start = addDays(base, daysUntilFriday);
-    start.setHours(0, 0, 0, 0);
-
-    const end = addDays(start, 2);
-    end.setHours(23, 59, 59, 999);
-
-    return { start, end };
-  };
+  /* === BEGIN BLOCK: RENDER_LIST_WEEKEND_RANGE_REUSE_V1 ===
+  Zweck: renderList nutzt die bereits global definierte, robuste Weekend-Range-Logik.
+  Umfang: entfernt die lokale Doppelimplementierung, damit "Dieses Wochenende" am Sa/So das aktuelle Wochenende bleibt.
+  === */
+  /* renderList verwendet bewusst die globale Funktion getNextWeekendRange(today). */
+  /* === END BLOCK: RENDER_LIST_WEEKEND_RANGE_REUSE_V1 === */
 
   const endOfDay = (d) => {
     const t = new Date(d);
