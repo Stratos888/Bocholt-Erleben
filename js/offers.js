@@ -51,16 +51,16 @@ const OfferVisuals = (() => {
       return { rawLabel: raw || "Sport & Bewegung", label: "Aktiv", iconKey: "cat-sport", modifier: "sport-bewegung" };
     }
 
-    if (normalized.includes("natur")) {
-      return { rawLabel: raw || "Natur", label: "Natur", iconKey: "cat-nature", modifier: "natur" };
+    if (normalized.includes("natur") || normalized.includes("drau")) {
+      return { rawLabel: raw || "Natur & Draußen", label: "Natur", iconKey: "cat-nature", modifier: "natur" };
     }
 
     if (normalized.includes("kultur")) {
       return { rawLabel: raw || "Kultur", label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
     }
 
-    if (normalized.includes("freizeit")) {
-      return { rawLabel: raw || "Freizeitorte", label: "Freizeit", iconKey: "pin", modifier: "freizeitorte" };
+    if (normalized.includes("freizeit") || normalized.includes("famil")) {
+      return { rawLabel: raw || "Freizeit & Familie", label: "Freizeit", iconKey: "pin", modifier: "freizeit-familie" };
     }
 
     return {
@@ -170,7 +170,7 @@ const OfferCards = (() => {
     if (imageUrl) {
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
-          <img class="activity-card-media__image" src="${OfferVisuals.escapeHtml(imageUrl)}" alt="" loading="lazy" decoding="async">
+          <img class="activity-card-media__image" src="${OfferVisuals.escapeHtml(imageUrl)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
         </div>
       `.trim();
     }
