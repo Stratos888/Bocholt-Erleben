@@ -153,11 +153,9 @@ const OfferCards = (() => {
     `.trim();
   }
 
-  function renderSupportingLine(offer) {
-    const supporting = OfferVisuals.pickSupportingLabel(offer);
-    if (!supporting) return "";
-    return `<div class="activity-card-supporting">${OfferVisuals.escapeHtml(supporting)}</div>`;
-  }
+function renderSupportingLine(offer) {
+  return "";
+}
 
   function renderMedia(offer, visual) {
     const imageUrl = OfferVisuals.normalizeHttpUrl(offer?.image);
