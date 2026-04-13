@@ -27,7 +27,7 @@
       "season": "Ganzjährig",
       "hint": "Gut spontan machbar",
       "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "mit-kindern-an-den-aasee",
       "title": "Mit Kindern an den Aasee",
@@ -51,7 +51,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Besonders angenehm bei gutem Wetter",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "waldspaziergang-im-stadtwald",
       "title": "Waldspaziergang im Stadtwald",
@@ -75,7 +75,7 @@
       "season": "Ganzjährig",
       "hint": "Ruhiger als viele zentrale Orte",
       "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "kultur-im-textilwerk",
       "title": "Industriekultur im Textilwerk",
@@ -99,7 +99,7 @@
       "season": "Ganzjährig",
       "hint": "Vor dem Besuch Öffnungszeiten prüfen",
       "cardFacts": ["1–2 Std", "Indoor", "Eintritt"]
-    },,
+    },
     {
       "id": "entspannt-zum-hilgelo",
       "title": "Entspannt zum Hilgelo",
@@ -123,7 +123,7 @@
       "season": "Vor allem Sommer",
       "hint": "Eher als kleiner Ausflug geeignet",
       "cardFacts": ["Halber Tag", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "wandern-im-burloer-venn",
       "title": "Wandern im Burloer Venn",
@@ -147,7 +147,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Besonders stark bei ruhigem Wetter",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "grenzwandern-auf-dem-noaberpad",
       "title": "Grenzwandern auf dem Noaberpad",
@@ -171,7 +171,7 @@
       "season": "Ganzjährig",
       "hint": "Eher für eine längere Tour gedacht",
       "cardFacts": ["2+ Std", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "naturtour-durch-die-bekendelle",
       "title": "Naturtour durch die Bekendelle",
@@ -195,7 +195,7 @@
       "season": "Frühling bis Herbst",
       "hint": "Gut für ruhige Naturbeobachtung",
       "cardFacts": ["1–2 Std", "Outdoor", "Kostenlos"]
-    },,
+    },
     {
       "id": "rundweg-rund-um-t-hilgelo",
       "title": "Rundweg rund um ’t Hilgelo",
