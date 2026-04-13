@@ -23,7 +23,8 @@
       "price": "Kostenlos",
       "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Gut spontan machbar"
+      "hint": "Gut spontan machbar",
+      "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
     },
     {
       "id": "mit-kindern-an-den-aasee",
@@ -44,7 +45,8 @@
       "price": "Kostenlos",
       "area": "Bocholt",
       "season": "Frühling bis Herbst",
-      "hint": "Besonders angenehm bei gutem Wetter"
+      "hint": "Besonders angenehm bei gutem Wetter",
+      "cardFacts": ["Mit Kindern", "Outdoor", "Kostenlos"]
     },
     {
       "id": "waldspaziergang-im-stadtwald",
@@ -65,7 +67,8 @@
       "price": "Kostenlos",
       "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Ruhiger als viele zentrale Orte"
+      "hint": "Ruhiger als viele zentrale Orte",
+      "cardFacts": ["30–60 Min", "Outdoor", "Kostenlos"]
     },
     {
       "id": "kultur-im-textilwerk",
@@ -86,7 +89,8 @@
       "price": "Eintritt",
       "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Vor dem Besuch Öffnungszeiten prüfen"
+      "hint": "Vor dem Besuch Öffnungszeiten prüfen",
+      "cardFacts": ["Bei Regen", "Indoor", "Eintritt"]
     },
     {
       "id": "baden-am-proebstingsee",
@@ -102,7 +106,8 @@
       "price": "Kostenlos",
       "area": "Umgebung",
       "season": "Vor allem Sommer",
-      "hint": "Besonders gut an warmen Tagen"
+      "hint": "Besonders gut an warmen Tagen",
+      "cardFacts": ["Sommer", "Outdoor", "Kostenlos"]
     },
     {
       "id": "natur-erleben-im-zwillbrocker-venn",
@@ -118,7 +123,8 @@
       "price": "Kostenlos",
       "area": "Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für ruhige Naturbeobachtung"
+      "hint": "Gut für ruhige Naturbeobachtung",
+      "cardFacts": ["1–2 Std", "Outdoor", "Ausflug"]
     },
     {
       "id": "wandern-in-der-hohen-mark",
@@ -134,7 +140,8 @@
       "price": "Kostenlos",
       "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Eher für mehr Zeit am Stück"
+      "hint": "Eher für mehr Zeit am Stück",
+      "cardFacts": ["Halber Tag", "Outdoor", "Aktiv"]
     },
     {
       "id": "radfahren-entlang-der-bocholter-aa",
@@ -150,7 +157,8 @@
       "price": "Kostenlos",
       "area": "Bocholt & Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für flache, entspannte Touren"
+      "hint": "Gut für flache, entspannte Touren",
+      "cardFacts": ["1–2 Std", "Outdoor", "Aktiv"]
     },
     {
       "id": "entspannt-zum-hilgelo",
@@ -166,7 +174,8 @@
       "price": "Kostenlos",
       "area": "Umgebung",
       "season": "Vor allem Sommer",
-      "hint": "Eher als kleiner Ausflug geeignet"
+      "hint": "Eher als kleiner Ausflug geeignet",
+      "cardFacts": ["Sommer", "Outdoor", "Baden"]
     }
   ]
 }
