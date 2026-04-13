@@ -183,7 +183,7 @@ function renderSupportingLine(offer) {
   loading="lazy"
   decoding="async"
   referrerpolicy="no-referrer"
-  style="--activity-image-pos-x:${OfferVisuals.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(offer?.image_position_y || "50%")};"
+  style="--activity-image-pos-x:${OfferVisuals.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(offer?.image_fit || "cover")};"
 >
         </div>
       `.trim();
