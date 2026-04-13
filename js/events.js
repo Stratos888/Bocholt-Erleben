@@ -654,12 +654,19 @@ function renderList(list) {
     return;
   }
 
+  /* === BEGIN BLOCK: RENDER_LIST_EFFECTIVE_DAY_V1 ===
+  Zweck: Section-Bucketing nutzt dieselbe range-aware Datumsbasis wie Sortierung/Filterung.
+  Umfang: Laufende Mehrtages-Events werden im Feed als "heute" gruppiert statt nur nach Startdatum.
+  === */
   const toDay = (ev) => {
-    const d = parseISODateLocal(ev?.date);
+    const d = getEffectiveDate(ev);
     if (!d) return null;
-    d.setHours(0, 0, 0, 0);
-    return d;
+
+    const day = new Date(d);
+    day.setHours(0, 0, 0, 0);
+    return day;
   };
+  /* === END BLOCK: RENDER_LIST_EFFECTIVE_DAY_V1 === */
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
