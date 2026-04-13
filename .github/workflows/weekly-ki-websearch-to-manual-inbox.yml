@@ -1,0 +1,126 @@
+# === BEGIN BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json only) ===
+# Datei: .github/workflows/weekly-ki-websearch-to-manual-inbox.yml
+# Zweck:
+# - Startet die echte KI-Eventsuche automatisch 1x pro Woche
+# - Nutzt den neuen Responses/Web-Search-Runner
+# - Schreibt nur data/inbox_manual.json zurück ins Repo
+# Umfang:
+# - Noch kein automatischer Import in den Inbox-Sheet-Tab
+# - Manual KI Event Intake bleibt vorerst separater nächster Schritt
+# === END BLOCK: WEEKLY KI WEBSEARCH TO MANUAL INBOX WORKFLOW (schedule + dispatch -> generate inbox_manual.json only) ===
+
+name: Weekly KI Websearch → Manual Inbox
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Montag 05:15 UTC
+    - cron: "15 5 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-ki-websearch-manual-inbox
+  cancel-in-progress: false
+
+jobs:
+  weekly_ki_websearch_manual_inbox:
+    name: Generate data/inbox_manual.json via weekly KI web search
+    runs-on: ubuntu-latest
+
+    steps:
+      # === BEGIN BLOCK: CHECKOUT REPOSITORY (input + commit target) ===
+      # Zweck:
+      # - Holt den aktuellen Repo-Stand
+      # - Erlaubt Rückschreiben von data/inbox_manual.json
+      # Umfang:
+      # - Checkout mit voller History für sicheren Push
+      # === END BLOCK: CHECKOUT REPOSITORY (input + commit target) ===
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # === BEGIN BLOCK: SETUP PYTHON RUNTIME (runner execution runtime) ===
+      # Zweck:
+      # - Stellt Python für den neuen KI-Runner bereit
+      # Umfang:
+      # - Python 3.11
+      # === END BLOCK: SETUP PYTHON RUNTIME (runner execution runtime) ===
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # === BEGIN BLOCK: INSTALL RUNNER DEPENDENCIES (responses api + google sheets) ===
+      # Zweck:
+      # - Installiert nur die Dependencies für den neuen Wochen-Runner
+      # Umfang:
+      # - Google Sheets API
+      # - OpenAI Python SDK
+      # === END BLOCK: INSTALL RUNNER DEPENDENCIES (responses api + google sheets) ===
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth openai
+
+      # === BEGIN BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR (rulebook + snapshots + web search -> inbox_manual.json) ===
+      # Zweck:
+      # - Exportiert aktuelle Events/Inbox/Archiv-Snapshots aus Google Sheets
+      # - Führt die echte KI-Eventsuche mit Web Search aus
+      # - Schreibt nur data/inbox_manual.json
+      # Umfang:
+      # - Kein Import in data/inbox.tsv
+      # - Kein Build von data/inbox.json
+      # === END BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR (rulebook + snapshots + web search -> inbox_manual.json) ===
+      - name: Run weekly KI websearch to manual inbox
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+          OPENAI_MODEL: gpt-5
+          EVENT_RULEBOOK_PATH: bocholt-erleben_eventsuche_regelwerk_v3.md
+          MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
+
+          TAB_EVENTS: Events
+          TAB_INBOX: Inbox
+          TAB_ARCHIVE: Inbox_Archive
+
+          MAX_NEW_CANDIDATES: "40"
+          SEARCH_WINDOW_DAYS: "180"
+          ALLOW_RADIUS_KM: "20"
+
+          FAIL_ON_PENDING_INBOX: "true"
+          FAIL_ON_PENDING_MANUAL: "true"
+        run: |
+          set -e
+          python scripts/weekly-ki-websearch-to-manual-inbox.py
+
+          echo "=== inbox_manual.json (head) ==="
+          head -n 200 data/inbox_manual.json || true
+
+      # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
+      # Zweck:
+      # - Commitet nur die erzeugte data/inbox_manual.json zurück ins Repo
+      # - Kein Commit, wenn sich nichts geändert hat
+      # Umfang:
+      # - nur data/inbox_manual.json
+      # === END BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
+      - name: Commit generated manual inbox JSON
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/inbox_manual.json
+
+          if git diff --cached --quiet; then
+            echo "No manual inbox changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: generate weekly KI websearch manual inbox"
+          git push
