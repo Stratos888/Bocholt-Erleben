@@ -80,6 +80,7 @@ const OfferDetailPanel = {
     this._lastFocusEl =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
+    this.panel.setAttribute("data-detail-type", "activity");
     this.renderContent(offer);
 
     this.panel.classList.remove("hidden");
@@ -104,6 +105,7 @@ const OfferDetailPanel = {
     window.setTimeout(() => {
       this.panel.classList.add("hidden");
       this.panel.setAttribute("hidden", "");
+      this.panel.removeAttribute("data-detail-type");
       if (this.body) this.body.scrollTop = 0;
       if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
         this._lastFocusEl.focus();
@@ -197,16 +199,23 @@ const OfferDetailPanel = {
       ["Lage", offer.area],
       ["Saison", offer.season],
       ["Hinweis", offer.hint]
-    ].filter(([, value]) => String(value || "").trim());
+    ]
+      .map(([label, value]) => {
+        const text = String(value || "").trim();
+        if (!text) return null;
+        const isWide = label === "Geeignet für" || label === "Hinweis";
+        return { label, value: text, isWide };
+      })
+      .filter(Boolean);
 
     if (!rows.length) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${rows.map(([label, value]) => `
-          <div class="activity-detail__fact-row">
-            <div class="activity-detail__fact-label">${this.escapeHtml(label)}</div>
-            <div class="activity-detail__fact-value">${this.escapeHtml(value)}</div>
+        ${rows.map((row) => `
+          <div class="activity-detail__fact-row${row.isWide ? " activity-detail__fact-row--wide" : ""}">
+            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
           </div>
         `).join("")}
       </div>
@@ -235,8 +244,8 @@ const OfferDetailPanel = {
         </header>
 
         <div class="activity-detail__body">
-          ${this.renderFacts(offer)}
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
+          ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
             <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
             ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>` : ""}
