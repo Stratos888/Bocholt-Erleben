@@ -141,16 +141,28 @@ const OfferDetailPanel = {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location || "")}`;
   },
 
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
   renderMedia(offer) {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
       ? window.Icons.svg(visual.iconKey, { className: "activity-detail__media-icon-svg" })
       : this.escapeHtml(visual.label.slice(0, 1));
+    const imageUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.image)
+      : String(offer?.image || "").trim();
 
-    if (offer.image) {
+    if (imageUrl) {
       return `
-        <div class="activity-detail__media">
-          <img src="${this.escapeHtml(offer.image)}" alt="${this.escapeHtml(offer.title)}" loading="lazy">
+        <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
+          <img
+            class="activity-detail__media-image"
+            src="${this.escapeHtml(imageUrl)}"
+            alt="${this.escapeHtml(offer.title)}"
+            loading="eager"
+            decoding="async"
+            referrerpolicy="no-referrer"
+            style="--activity-image-pos-x:${this.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${this.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${this.escapeHtml(offer?.image_fit || "cover")};"
+          >
         </div>
       `.trim();
     }
@@ -161,6 +173,7 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
+  /* === END BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 === */
 
   renderCategoryBadge(offer) {
     const visual = this.getVisual(offer);
