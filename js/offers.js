@@ -208,7 +208,7 @@ function renderSupportingLine(offer) {
     const desktop = isDesktopViewport();
 
     const eagerCount = desktop ? 4 : 2;
-    const highPriorityCount = desktop ? 2 : 1;
+    const highPriorityCount = desktop ? 4 : 1;
 
     return {
       loading: cardIndex < eagerCount ? "eager" : "lazy",
