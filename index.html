@@ -83,6 +83,8 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
  <div class="header-right">
     <!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
     <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
+      <span class="pwa-install-button__icon" data-ui-icon="download" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">App</span>
     </button>
     <!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
  
@@ -98,7 +100,10 @@ Umfang:
   class="pwa-install-button"
   href="/ueber/"
   aria-label="Über Bocholt erleben"
-></a>
+>
+  <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
+  <span class="pwa-install-button__label">Info</span>
+</a>
 <!-- === END BLOCK: HEADER ABOUT CTA (opens about page) === -->
 
 
@@ -148,7 +153,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     <div class="desktop-hero__search-row" aria-label="Suche und Filter">
       <div class="events-filter desktop-hero__search-slot">
         <label class="desktop-hero__search-field" for="search-filter">
-          <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
+          <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
           <input
             id="search-filter"
             type="search"
@@ -170,8 +175,8 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         <span class="filter-pill__value" id="filter-category-value">Alle</span>
       </button>
 
-      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" hidden>
-        Zurücksetzen
+      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" aria-label="Filter zurücksetzen" hidden>
+        <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
       </button>
     </div>
 
@@ -181,12 +186,12 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
-        <span class="desktop-hero__icon desktop-hero__icon--publish" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
         <span>Event veröffentlichen</span>
       </a>
 
       <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
-        <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
         <span>Mehr erfahren</span>
       </a>
 
@@ -196,7 +201,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         data-pwa-install-trigger
         aria-label="Als App installieren"
       >
-        <span class="desktop-hero__icon desktop-hero__icon--app" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="smartphone" aria-hidden="true"></span>
         <span>Als App nutzen</span>
       </button>
     </div>
@@ -209,7 +214,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
   <div class="filter-sheet__card">
     <div class="filter-sheet__header">
       <div class="filter-sheet__title">Wann?</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
     </div>
     <div class="filter-sheet__body">
       <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
@@ -250,7 +255,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
   <div class="filter-sheet__card">
     <div class="filter-sheet__header">
       <div class="filter-sheet__title">Kategorie</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
     </div>
     <div class="filter-sheet__body">
       <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
@@ -291,7 +296,7 @@ Umfang:
     <div class="detail-panel-content">
       <div class="detail-panel-header">
         <div class="detail-panel-handle" aria-hidden="true"></div>
-        <button class="detail-panel-close" type="button" aria-label="Schließen">×</button>
+        <button class="detail-panel-close" type="button" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
 
       <div class="detail-panel-body">
@@ -319,7 +324,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
     <div class="modal-card" role="dialog" aria-modal="true" aria-label="Events veröffentlichen">
       <div class="modal-header">
         <h2 class="modal-title">Events veröffentlichen</h2>
-        <button type="button" class="modal-close" data-modal-close aria-label="Schließen">×</button>
+        <button type="button" class="modal-close" data-modal-close aria-label="Schließen"><span class="modal-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
 
       <div class="modal-body">
@@ -361,20 +366,12 @@ Umfang: ersetzt nur die Bottom Tab Bar.
 === -->
 <nav class="bottom-tabbar" aria-label="Hauptnavigation">
   <a class="bottom-tabbar__item is-active" href="/" aria-current="page">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 6H4.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5ZM6 6h12V5H6v1Z"/>
-      </svg>
-    </span>
+    <span class="bottom-tabbar__icon" data-ui-icon="calendar-days" aria-hidden="true"></span>
     <span class="bottom-tabbar__label">Events</span>
   </a>
 
   <a class="bottom-tabbar__item" href="/angebote/">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M3 12.5C3 8.358 6.358 5 10.5 5c1.878 0 3.594.69 4.91 1.83L18.086 4.5A1 1 0 1 1 19.5 5.914L16.823 8.59A7.47 7.47 0 0 1 18 12.5C18 16.642 14.642 20 10.5 20S3 16.642 3 12.5Zm7.5-5.5A5.5 5.5 0 1 0 16 12.5 5.5 5.5 0 0 0 10.5 7Zm9.793 10.379 1.914 1.914a1 1 0 0 1-1.414 1.414l-1.914-1.914a1 1 0 0 1 1.414-1.414Z"/>
-      </svg>
-    </span>
+    <span class="bottom-tabbar__icon" data-ui-icon="compass" aria-hidden="true"></span>
     <span class="bottom-tabbar__label">Aktivitäten</span>
   </a>
 </nav>
