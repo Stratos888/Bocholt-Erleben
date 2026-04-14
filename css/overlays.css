@@ -865,7 +865,28 @@ Umfang:
 }
 /* END Detailpanel: Scroll+Gutter+Reserve */
 
-/* === BEGIN BLOCK: ACTIVITIES_MOBILE_DETAIL_LAYOUT_V1 | Zweck: gibt dem Mobile-Activity-Detailpanel eine saubere eigene Bild-/Inhaltsstruktur mit korrektem Crop und ruhiger Card-DNA | Umfang: ergänzt nur Activity-Detail-Inhalt innerhalb des bestehenden #event-detail-panel === */
+/* === BEGIN BLOCK: ACTIVITIES_MOBILE_DETAIL_LAYOUT_V2 | Zweck: finaler Mobile-Polish für das Activity-Detailpanel mit kompakterer Faktenhierarchie, ruhigerem Close-Button und besser balanciertem Top-Bereich | Umfang: ersetzt nur den Activity-Detail-Block im Overlay-CSS === */
+#event-detail-panel[data-detail-type="activity"] .detail-panel-close{
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: calc(var(--gutter) - 2px);
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  background: rgba(255,255,255,0.88) !important;
+  border: 1px solid rgba(23,39,30,0.10) !important;
+  color: rgba(31,41,51,0.72) !important;
+  box-shadow:
+    0 10px 22px rgba(12,22,17,0.10),
+    0 1px 0 rgba(255,255,255,0.76) inset !important;
+}
+
+#event-detail-panel[data-detail-type="activity"] .detail-panel-close:active{
+  box-shadow:
+    0 8px 16px rgba(12,22,17,0.08),
+    0 1px 0 rgba(255,255,255,0.76) inset !important;
+}
+
 #event-detail-panel .activity-detail{
   display: grid;
   gap: 0;
@@ -875,12 +896,12 @@ Umfang:
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 22px;
   background: linear-gradient(135deg, rgba(229,237,229,0.96), rgba(213,226,216,0.92));
   box-shadow: 0 12px 28px rgba(12,22,17,0.08);
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 }
 
 #event-detail-panel .activity-detail__media-image{
@@ -929,9 +950,9 @@ Umfang:
 
 #event-detail-panel .activity-detail__header{
   display: grid;
-  gap: 10px;
-  padding: 0 0 14px;
-  margin: 0 0 14px;
+  gap: 8px;
+  padding: 0 0 12px;
+  margin: 0 0 12px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
@@ -941,7 +962,7 @@ Umfang:
   gap: 8px;
   width: fit-content;
   max-width: 100%;
-  min-height: 32px;
+  min-height: 30px;
   padding: 0 12px;
   border-radius: 999px;
   background: rgba(247,248,243,0.96);
@@ -966,8 +987,8 @@ Umfang:
 
 #event-detail-panel .activity-detail__title{
   margin: 0;
-  font-size: 1.18rem;
-  line-height: 1.2;
+  font-size: 1.14rem;
+  line-height: 1.18;
   font-weight: 820;
   letter-spacing: -0.015em;
   color: rgba(31,41,51,0.92);
@@ -976,67 +997,75 @@ Umfang:
 #event-detail-panel .activity-detail__place{
   font-size: 14px;
   line-height: 1.35;
-  font-weight: 650;
-  color: rgba(31,41,51,0.78);
+  font-weight: 680;
+  color: rgba(31,41,51,0.80);
 }
 
 #event-detail-panel .activity-detail__meta{
   font-size: 13px;
   line-height: 1.35;
-  font-weight: 600;
-  color: rgba(31,41,51,0.58);
+  font-weight: 650;
+  color: rgba(31,41,51,0.56);
 }
 
 #event-detail-panel .activity-detail__body{
   display: grid;
-  gap: 14px;
-}
-
-#event-detail-panel .activity-detail__facts{
-  display: grid;
-  gap: 10px;
-}
-
-#event-detail-panel .activity-detail__fact-row{
-  display: grid;
-  gap: 3px;
-  padding: 0;
-}
-
-#event-detail-panel .activity-detail__fact-label{
-  font-size: 11px;
-  line-height: 1.3;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  color: rgba(31,41,51,0.50);
-  text-transform: uppercase;
-}
-
-#event-detail-panel .activity-detail__fact-value{
-  font-size: 14px;
-  line-height: 1.45;
-  font-weight: 600;
-  color: rgba(31,41,51,0.84);
+  gap: 12px;
 }
 
 #event-detail-panel .activity-detail__description{
   margin: 0;
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.52;
+  color: rgba(31,41,51,0.84);
+}
+
+#event-detail-panel .activity-detail__facts{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#event-detail-panel .activity-detail__fact-row{
+  display: grid;
+  gap: 4px;
+  padding: 12px 12px 11px;
+  border-radius: 14px;
+  background: rgba(247,248,243,0.92);
+  box-shadow: inset 0 0 0 1px rgba(23,39,30,0.07);
+}
+
+#event-detail-panel .activity-detail__fact-row--wide{
+  grid-column: 1 / -1;
+}
+
+#event-detail-panel .activity-detail__fact-label{
+  font-size: 10.5px;
+  line-height: 1.25;
+  font-weight: 820;
+  letter-spacing: 0.04em;
+  color: rgba(31,41,51,0.48);
+  text-transform: uppercase;
+}
+
+#event-detail-panel .activity-detail__fact-value{
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
   color: rgba(31,41,51,0.84);
 }
 
 #event-detail-panel .activity-detail__actions{
   display: grid;
   gap: 10px;
-  padding: 6px 0 2px;
+  padding: 4px 0 2px;
 }
 
 #event-detail-panel .activity-detail__action{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: 46px;
   padding: 0 16px;
   border-radius: var(--ui-radius-sm);
   border: 1px solid rgba(23,39,30,0.10);
@@ -1059,17 +1088,26 @@ Umfang:
   outline-offset: var(--cmp-focus-outline-offset);
 }
 
+@media (max-width: 389px){
+  #event-detail-panel .activity-detail__facts{
+    grid-template-columns: 1fr;
+  }
+
+  #event-detail-panel .activity-detail__fact-row--wide{
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 899px){
   #event-detail-panel .activity-detail__media{
-    aspect-ratio: 16 / 9;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
   #event-detail-panel .activity-detail__title{
-    font-size: 1.10rem;
+    font-size: 1.08rem;
   }
 }
-/* === END BLOCK: ACTIVITIES_MOBILE_DETAIL_LAYOUT_V1 === */
+/* === END BLOCK: ACTIVITIES_MOBILE_DETAIL_LAYOUT_V2 === */
 
 /* === BEGIN BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING | Purpose: consolidate detail source/link area into one clean DS-02 link cluster without UI redesign | Scope: detail-links wrapper, rows, hover, focus, labels, values, ext icon === */
 #event-detail-panel .detail-links{
