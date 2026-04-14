@@ -20,6 +20,7 @@ const OfferVisuals = (() => {
     });
   }
 
+  /* === BEGIN BLOCK: OFFERS_LOCAL_IMAGE_URL_SUPPORT_V1 | Zweck: erlaubt neben http/https auch lokale Asset-Pfade für Activity-Bilder auf Live + Staging | Umfang: ersetzt nur die URL-Normalisierung in js/offers.js === */
   function normalizeHttpUrl(raw) {
     const value = String(raw || "").trim();
     if (!value) return "";
@@ -28,12 +29,17 @@ const OfferVisuals = (() => {
       return new URL(value).href;
     } catch (_) {
       try {
-        return new URL(`https://${value}`).href;
+        return new URL(value, window.location.href).href;
       } catch (_) {
-        return "";
+        try {
+          return new URL(`https://${value}`).href;
+        } catch (_) {
+          return "";
+        }
       }
     }
   }
+  /* === END BLOCK: OFFERS_LOCAL_IMAGE_URL_SUPPORT_V1 === */
 
   function slugify(value) {
     return String(value || "")
