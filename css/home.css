@@ -425,38 +425,22 @@
 }
 
 .desktop-hero__icon{
-  display: inline-block;
+  --ui-icon-size: 18px;
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  background-color: currentColor;
+  color: currentColor;
   opacity: 0.82;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
 }
 
-.desktop-hero__icon--search{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--publish{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--app{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--info{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+.desktop-hero__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 .desktop-hero__toolbar-pill{
