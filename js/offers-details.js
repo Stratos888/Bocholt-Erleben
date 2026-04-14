@@ -191,36 +191,54 @@ const OfferDetailPanel = {
     `.trim();
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 | Zweck: ersetzt die formularartige Faktenliste durch eine kompaktere, redaktionellere Facts-Struktur mit kurzem Grid + längeren Textsektionen | Umfang: ersetzt nur renderFacts(offer) === */
   renderFacts(offer) {
-    const rows = [
-      ["Drinnen / Draußen", offer.mode],
-      ["Kosten", offer.price],
-      ["Geeignet für", (offer.audience || []).join(" · ")],
-      ["Lage", offer.area],
+    const gridRows = [
       ["Saison", offer.season],
+      ["Region", offer.area]
+    ]
+      .map(([label, value]) => {
+        const text = String(value || "").trim();
+        if (!text) return null;
+        return { label, value: text };
+      })
+      .filter(Boolean);
+
+    const sections = [
+      ["Geeignet für", (offer.audience || []).join(" · ")],
       ["Hinweis", offer.hint]
     ]
       .map(([label, value]) => {
         const text = String(value || "").trim();
         if (!text) return null;
-        const isWide = label === "Geeignet für" || label === "Hinweis";
-        return { label, value: text, isWide };
+        return { label, value: text };
       })
       .filter(Boolean);
 
-    if (!rows.length) return "";
+    if (!gridRows.length && !sections.length) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${rows.map((row) => `
-          <div class="activity-detail__fact-row${row.isWide ? " activity-detail__fact-row--wide" : ""}">
+        ${gridRows.length ? `
+          <div class="activity-detail__facts-grid">
+            ${gridRows.map((row) => `
+              <div class="activity-detail__fact-row">
+                <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+                <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : ""}
+        ${sections.map((row) => `
+          <section class="activity-detail__fact-section">
             <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
             <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
-          </div>
+          </section>
         `).join("")}
       </div>
     `.trim();
   },
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 === */
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer.location);
