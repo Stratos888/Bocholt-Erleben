@@ -39,7 +39,15 @@ const OffersApp = {
   async init() {
     debugLog?.("=== ACTIVITIES - APP START ===");
     this.cacheRefs();
-    this.showLoading(true);
+
+    /* === BEGIN BLOCK: ACTIVITIES_LOADING_START_PARITY_V1 | Zweck: Desktop-Laden an Events angleichen – Skeleton im Feed statt Vollbild-Overlay; Mobile bleibt unverändert | Umfang: ersetzt nur den Loading-Start in init() === */
+    if (this.isDesktopViewport() && typeof window.OfferCards?.renderSkeleton === "function") {
+      window.OfferCards.renderSkeleton(8);
+      this.showLoading(false);
+    } else {
+      this.showLoading(true);
+    }
+    /* === END BLOCK: ACTIVITIES_LOADING_START_PARITY_V1 === */
 
     try {
       const response = await fetch("/data/offers.json", { cache: "no-store" });
@@ -171,13 +179,19 @@ const OffersApp = {
       });
     }
 
+    /* === BEGIN BLOCK: ACTIVITIES_RESET_EVENT_BRIDGE_V1 | Zweck: verbindet Reset-Pill und Empty-State-Reset nachhaltig über ein gemeinsames Event | Umfang: ersetzt nur diesen Reset-Listener-Abschnitt in bindControls() === */
     if (resetPill) {
       resetPill.addEventListener("click", () => {
         this.resetFilters();
       });
     }
 
+    window.addEventListener("offers:reset-filters", () => {
+      this.resetFilters();
+    });
+
     [situationSheet, categorySheet].forEach((sheetEl) => {
+    /* === END BLOCK: ACTIVITIES_RESET_EVENT_BRIDGE_V1 === */
       if (!sheetEl) return;
 
       sheetEl.addEventListener("click", (event) => {
@@ -579,12 +593,17 @@ const OffersApp = {
     window.OfferCards.render(this.filteredOffers);
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {
     const loadingEl = document.getElementById("loading");
     if (!loadingEl) return;
+
+    loadingEl.setAttribute("aria-busy", show ? "true" : "false");
     loadingEl.style.display = show ? "flex" : "none";
   },
+  /* === END BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_NO_OFFERS_A11Y_V1 | Zweck: angleicht den No-Data-Status an die Event-Seite an und beendet aria-busy sauber | Umfang: ersetzt nur showNoOffers() === */
   showNoOffers() {
     const loadingEl = document.getElementById("loading");
     if (!loadingEl) return;
@@ -595,20 +614,33 @@ const OffersApp = {
         <p><small>Bald findest du hier mehr Freizeitideen für Bocholt und Umgebung.</small></p>
       </div>
     `.trim();
+
+    loadingEl.setAttribute("aria-busy", "false");
     loadingEl.style.display = "flex";
   },
+  /* === END BLOCK: ACTIVITIES_NO_OFFERS_A11Y_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_ERROR_STATE_RETRY_V1 | Zweck: gleicht Error-State der Aktivitäten-Seite an Events an, inkl. Retry-CTA | Umfang: ersetzt nur showError(message) === */
   showError(message) {
     const loadingEl = document.getElementById("loading");
     if (!loadingEl) return;
 
     loadingEl.innerHTML = `
-      <div class="error-message">
+      <div class="error-message" role="alert">
         <p>⚠️ ${message}</p>
+        <button type="button" class="empty-state__btn" id="offer-error-retry-btn">Erneut versuchen</button>
       </div>
     `.trim();
+
+    loadingEl.setAttribute("aria-busy", "false");
     loadingEl.style.display = "flex";
+
+    const btn = document.getElementById("offer-error-retry-btn");
+    if (btn) {
+      btn.addEventListener("click", () => location.reload());
+    }
   },
+  /* === END BLOCK: ACTIVITIES_ERROR_STATE_RETRY_V1 === */
 
   escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => {
