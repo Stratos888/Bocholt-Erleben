@@ -269,6 +269,58 @@ function renderSupportingLine(offer) {
     return article;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 | Zweck: ergänzt Desktop-Skeletons und gleicht Empty-State mit Reset-CTA an die Event-Seite an | Umfang: ersetzt nur Render-/Export-Block des OfferCards-Moduls === */
+  function createSkeletonCard() {
+    const article = document.createElement("article");
+    article.className = "event-card discovery-card--compact activity-card--rich is-skeleton";
+    article.tabIndex = -1;
+    article.setAttribute("aria-hidden", "true");
+
+    article.innerHTML = `
+      <div class="activity-card-media activity-card-media--image" aria-hidden="true">
+        <div class="activity-card-skeleton-media skel-block"></div>
+      </div>
+      <div class="event-card-body">
+        <div class="activity-card-kicker">
+          <span class="skel-line skel-line--sm" style="width:64px"></span>
+        </div>
+        <h2 class="event-title">
+          <span class="event-title__text">
+            <span class="skel-line" style="width:72%"></span>
+          </span>
+        </h2>
+        <div class="event-card-desc">
+          <span class="skel-line" style="width:96%"></span>
+          <span class="skel-line" style="width:78%; margin-top:8px;"></span>
+        </div>
+        <div class="event-meta">
+          <span class="event-meta__place">
+            <span class="skel-line skel-line--sm" style="width:38%"></span>
+          </span>
+        </div>
+        <div class="activity-card-facts" aria-hidden="true">
+          <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:56px"></span></span>
+          <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:62px"></span></span>
+          <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:68px"></span></span>
+        </div>
+      </div>
+    `.trim();
+
+    return article;
+  }
+
+  function renderSkeleton(count = 8) {
+    const target = ensureContainer();
+    if (!target) return;
+
+    target.innerHTML = "";
+
+    const n = Math.max(1, Math.min(12, Number(count) || 8));
+    for (let i = 0; i < n; i++) {
+      target.appendChild(createSkeletonCard());
+    }
+  }
+
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -279,12 +331,20 @@ function renderSupportingLine(offer) {
     if (!list.length) {
       target.innerHTML = `
         <section class="empty-state">
-          <div class="empty-state__card">
-            <h2 class="empty-state__title">Keine Aktivitäten gefunden</h2>
-            <p class="empty-state__text">Passe Suche oder Filter an, um weitere Freizeitideen für Bocholt und Umgebung zu sehen.</p>
+          <div class="empty-state__card" role="status" aria-live="polite">
+            <div class="empty-state__title">Keine Aktivitäten gefunden</div>
+            <div class="empty-state__text">Filter anpassen oder zurücksetzen.</div>
+            <button type="button" class="empty-state__btn" id="empty-reset-btn">Filter zurücksetzen</button>
           </div>
         </section>
       `.trim();
+
+      const btn = document.getElementById("empty-reset-btn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          window.dispatchEvent(new CustomEvent("offers:reset-filters"));
+        });
+      }
       return;
     }
 
@@ -293,7 +353,8 @@ function renderSupportingLine(offer) {
     }
   }
 
-  return { render };
+  return { render, renderSkeleton };
+  /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();
 
 window.OfferCards = OfferCards;
