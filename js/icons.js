@@ -47,10 +47,12 @@ Umfang:
     `,
 
     // Category icons (canonical keys)
+    /* === BEGIN BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 | Zweck: ersetzt die schwächeren Kategorie-Icons global durch klarere, kleinere und ruhiger lesbare Formen | Umfang: ersetzt nur die Kategorie-Icon-Definitionen von cat-market bis cat-city === */
     "cat-market": `
-      <circle cx="8" cy="21" r="1" />
-      <circle cx="19" cy="21" r="1" />
-      <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+      <path d="M4 9h16" />
+      <path d="M5 9v10h14V9" />
+      <path d="M4.5 9 6 5h12l1.5 4" />
+      <path d="M9 19v-5h6v5" />
     `,
     "cat-culture": `
       <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
@@ -59,9 +61,9 @@ Umfang:
       <path d="M13 11v2" />
     `,
     "cat-music": `
-      <path d="M12 19v3" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <rect x="9" y="2" width="6" height="13" rx="3" />
+      <path d="M9 18V5l10-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
     `,
     "cat-food": `
       <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
@@ -69,28 +71,35 @@ Umfang:
       <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
     `,
     "cat-kids": `
-      <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
-      <path d="M15 12h.01" />
-      <path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5S14.6 8 13.5 8c-.8 0-1.5-.4-1.5-1" />
-      <path d="M9 12h.01" />
+      <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="10" cy="7" r="3" />
+      <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M14 4.13a4 4 0 0 1 0 5.74" />
     `,
-
-    // Remaining categories keep existing until we map them explicitly (still same stroke/tokens via .ui-icon-svg)
     "cat-sport": `
-      <path d="M6 8c0-2.2 1.8-4 4-4h1c2.2 0 4 1.8 4 4v.5" />
-      <path d="M8 20h8" />
-      <path d="M9 20V9.5a2.5 2.5 0 0 1 5 0V20" />
+      <path d="M6 9v6" />
+      <path d="M4 10v4" />
+      <path d="M10 8v8" />
+      <path d="M14 8v8" />
+      <path d="M18 9v6" />
+      <path d="M20 10v4" />
+      <path d="M10 12h4" />
     `,
     "cat-nature": `
-      <path d="M12 20c-4.6 0-7-3.2-7-7.2C5 8.1 8.6 5 14.2 5c2.1 0 3.7.5 4.8 1.1 0 6.8-2.7 13.9-7 13.9Z" />
-      <path d="M12 20c0-4.8 1.6-8.8 5.2-12.3" />
-      <path d="M10.2 12.8c1.5.1 3-.1 4.5-.8" />
+      <path d="M6 20C17 20 20 8 20 4 16 4 6 7 6 20Z" />
+      <path d="M6 20c4-6 8-10 14-16" />
     `,
     "cat-city": `
-      <path d="M4.5 20V8.5l7.5-3 7.5 3V20" />
-      <path d="M7.5 20V13h3v7" />
-      <path d="M13.5 10h2M13.5 13h2M13.5 16h2" />
+      <path d="M3 21h18" />
+      <path d="M5 21V7l7-4 7 4v14" />
+      <path d="M9 9h.01" />
+      <path d="M9 13h.01" />
+      <path d="M9 17h.01" />
+      <path d="M15 9h.01" />
+      <path d="M15 13h.01" />
+      <path d="M15 17h.01" />
     `,
+    /* === END BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 === */
   };
 /* eslint-enable max-len */
 /* END BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE) */
@@ -98,15 +107,19 @@ Umfang:
   // Category → icon key (canonical mapping; app-wide)
   // Canonical Category → IconKey
   // WICHTIG: Hier nur noch kanonische Kategorien aus FilterModule!
+  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V1 | Zweck: ergänzt neben den Event-Kategorien auch die aktuellen Activity-Kategorien als globale kanonische Icon-Aliases | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
   const CATEGORY_ICON_KEY = {
     "Märkte & Feste": "cat-market",
     "Kinder & Familie": "cat-kids",
+    "Freizeit & Familie": "cat-kids",
     "Musik & Bühne": "cat-music",
     "Kultur & Kunst": "cat-culture",
+    "Kultur": "cat-culture",
     "Sport & Bewegung": "cat-sport",
     "Natur & Draußen": "cat-nature",
     "Innenstadt & Leben": "cat-city",
   };
+  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V1 === */
 
   const svg = (name, { className = "" } = {}) => {
     const body = ICONS[name] || ICONS.external;
