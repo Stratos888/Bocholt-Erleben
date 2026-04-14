@@ -30,7 +30,7 @@ const OfferDetailPanel = {
         <div class="detail-panel-overlay"></div>
         <div class="detail-panel-content">
           <div class="detail-panel-grabber" aria-hidden="true"></div>
-          <button class="detail-panel-close" aria-label="Schließen">&times;</button>
+<button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
           <div class="detail-panel-body">
             <div id="detail-content"></div>
           </div>
