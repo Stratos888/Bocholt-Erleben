@@ -171,7 +171,52 @@ function renderSupportingLine(offer) {
   return "";
 }
 
-  function renderMedia(offer, visual) {
+  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 | Zweck: priorisiert erste sichtbare Bilder, setzt für externe Bildquellen Connection Hints und lässt den Rest bewusst lazy | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
+  const preconnectedImageOrigins = new Set();
+
+  function ensureImageOriginHints(imageUrl) {
+    try {
+      const url = new URL(imageUrl, window.location.href);
+      if (!url.origin || url.origin === window.location.origin) return;
+      if (preconnectedImageOrigins.has(url.origin)) return;
+
+      const head = document.head;
+      if (!head) return;
+
+      if (!head.querySelector(`link[rel="dns-prefetch"][href="${url.origin}"]`)) {
+        const dnsPrefetch = document.createElement("link");
+        dnsPrefetch.rel = "dns-prefetch";
+        dnsPrefetch.href = url.origin;
+        head.appendChild(dnsPrefetch);
+      }
+
+      if (!head.querySelector(`link[rel="preconnect"][href="${url.origin}"]`)) {
+        const preconnect = document.createElement("link");
+        preconnect.rel = "preconnect";
+        preconnect.href = url.origin;
+        preconnect.crossOrigin = "anonymous";
+        head.appendChild(preconnect);
+      }
+
+      preconnectedImageOrigins.add(url.origin);
+    } catch (_) {}
+  }
+
+  function getImageLoadingProfile(index) {
+    const numericIndex = Number(index);
+    const cardIndex = Number.isFinite(numericIndex) ? numericIndex : Number.MAX_SAFE_INTEGER;
+    const desktop = isDesktopViewport();
+
+    const eagerCount = desktop ? 4 : 2;
+    const highPriorityCount = desktop ? 2 : 1;
+
+    return {
+      loading: cardIndex < eagerCount ? "eager" : "lazy",
+      fetchPriority: cardIndex < highPriorityCount ? "high" : "auto"
+    };
+  }
+
+  function renderMedia(offer, visual, index) {
     const imageUrl = OfferVisuals.normalizeHttpUrl(offer?.image);
     const modifier = OfferVisuals.escapeHtml(visual.modifier);
     const label = OfferVisuals.escapeHtml(visual.label);
@@ -180,13 +225,17 @@ function renderSupportingLine(offer) {
       : `<span class="activity-card-media-icon-fallback">${OfferVisuals.escapeHtml(visual.label.slice(0, 1))}</span>`;
 
     if (imageUrl) {
+      ensureImageOriginHints(imageUrl);
+      const { loading, fetchPriority } = getImageLoadingProfile(index);
+
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
 <img
   class="activity-card-media__image"
   src="${OfferVisuals.escapeHtml(imageUrl)}"
   alt=""
-  loading="lazy"
+  loading="${loading}"
+  fetchpriority="${fetchPriority}"
   decoding="async"
   referrerpolicy="no-referrer"
   style="--activity-image-pos-x:${OfferVisuals.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(offer?.image_fit || "cover")};"
@@ -205,6 +254,7 @@ function renderSupportingLine(offer) {
       </div>
     `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 === */
 
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
@@ -212,7 +262,8 @@ function renderSupportingLine(offer) {
     return true;
   }
 
-  function createCard(offer) {
+  /* === BEGIN BLOCK: ACTIVITIES_CREATECARD_IMAGE_PRIORITY_PLUMBING_V1 | Zweck: reicht den Render-Index bis in renderMedia() durch, ohne Card-Verhalten zu verändern | Umfang: ersetzt nur createCard() === */
+  function createCard(offer, index) {
     const article = document.createElement("article");
     const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
     const primaryUrl = OfferVisuals.normalizeHttpUrl(offer.url);
@@ -226,7 +277,7 @@ function renderSupportingLine(offer) {
     );
 
     article.innerHTML = `
-      ${renderMedia(offer, visual)}
+      ${renderMedia(offer, visual, index)}
       <div class="event-card-body">
         <div class="activity-card-kicker">${OfferVisuals.escapeHtml(visual.label)}</div>
         <h2 class="event-title">
@@ -268,6 +319,7 @@ function renderSupportingLine(offer) {
 
     return article;
   }
+  /* === END BLOCK: ACTIVITIES_CREATECARD_IMAGE_PRIORITY_PLUMBING_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 | Zweck: ergänzt Desktop-Skeletons und gleicht Empty-State mit Reset-CTA an die Event-Seite an | Umfang: ersetzt nur Render-/Export-Block des OfferCards-Moduls === */
   function createSkeletonCard() {
@@ -321,6 +373,7 @@ function renderSupportingLine(offer) {
     }
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 | Zweck: reicht Card-Indizes an die Bildlogik weiter, damit erste sichtbare Bilder priorisiert laden | Umfang: ersetzt nur render(offers) + Return-Zeile === */
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -348,12 +401,13 @@ function renderSupportingLine(offer) {
       return;
     }
 
-    for (const offer of list) {
-      target.appendChild(createCard(offer));
-    }
+    list.forEach((offer, index) => {
+      target.appendChild(createCard(offer, index));
+    });
   }
 
   return { render, renderSkeleton };
+  /* === END BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 === */
   /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();
 
