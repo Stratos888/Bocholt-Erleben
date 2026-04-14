@@ -152,6 +152,22 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   outline-offset: var(--cmp-focus-outline-offset);
 }
 
+.filter-sheet__close .filter-sheet__close-icon{
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
+}
+
+.filter-sheet__close .filter-sheet__close-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
 /* Body: single source of truth */
 .filter-sheet__body{
   padding: 10px 12px 14px;
@@ -1213,9 +1229,22 @@ Umfang:
 }
 
 #event-detail-panel .detail-link-ext{
+  --ui-icon-size: 14px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
   opacity: 0.48;
   transform: none;
   color: var(--cmp-link-color-muted);
+}
+
+#event-detail-panel .detail-link-ext > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 /* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
@@ -1375,15 +1404,26 @@ Umfang:
 
 #event-detail-panel .detail-meta-rows a.detail-meta-row.is-location .detail-meta-ext{
   opacity: 0.50;
-  font-weight: 800;
-  font-size: 14px;
-  line-height: 1;
   align-self: center;
   padding-left: 0;
   transform: none;
 }
 
 #event-detail-panel .detail-meta-rows .detail-meta-ext{
+  --ui-icon-size: 14px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  opacity: 0.42;
+  transform: translateY(1px);
+  color: var(--cmp-link-color-muted);
+}
+
+#event-detail-panel .detail-meta-rows .detail-meta-ext > .ui-icon-svg{
   opacity: 0.42;
   font-weight: 800;
   font-size: 14px;
@@ -1812,6 +1852,22 @@ Umfang:
 .modal-close:focus-visible{
   outline: 2px solid var(--cmp-focus-ring-neutral);
   outline-offset: var(--cmp-focus-outline-offset);
+}
+
+.modal-close .modal-close__icon{
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
+}
+
+.modal-close .modal-close__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 /* === END BLOCK: DS-02_MODAL_CLOSE_STATES_MAPPING === */
 /* (removed) title clamp is defined in EVENT CARD FINAL LAYOUT only */
