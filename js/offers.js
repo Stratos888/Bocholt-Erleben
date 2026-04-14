@@ -65,9 +65,11 @@ const OfferVisuals = (() => {
       return { rawLabel: raw || "Kultur", label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
     }
 
+    /* === BEGIN BLOCK: OFFERS_CATEGORY_ICON_FAMILY_V1 | Zweck: verwendet für Freizeit & Familie global ein eigenes Kategorie-Icon statt des generischen Pins | Umfang: ersetzt nur den Freizeit/Familie-Branch in getCategoryPresentation() === */
     if (normalized.includes("freizeit") || normalized.includes("famil")) {
-      return { rawLabel: raw || "Freizeit & Familie", label: "Freizeit", iconKey: "pin", modifier: "freizeit-familie" };
+      return { rawLabel: raw || "Freizeit & Familie", label: "Freizeit", iconKey: "cat-kids", modifier: "freizeit-familie" };
     }
+    /* === END BLOCK: OFFERS_CATEGORY_ICON_FAMILY_V1 === */
 
     return {
       rawLabel: raw || "Aktivität",
