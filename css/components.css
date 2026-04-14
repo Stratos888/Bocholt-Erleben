@@ -878,38 +878,30 @@
 }
 
 /* Icon base */
-.header-right > .pwa-install-button::before{
-  content: "";
+.header-right > .pwa-install-button .pwa-install-button__icon{
+  --ui-icon-size: var(--hdr-icon-size);
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
 
   width: var(--hdr-icon-size);
   height: var(--hdr-icon-size);
 
   flex: 0 0 auto;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  background-color: currentColor;
+  color: currentColor;
   opacity: 0.82;
-
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
 }
 
-/* Install (button) */
-.header-right > button.pwa-install-button::before{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
+.header-right > .pwa-install-button .pwa-install-button__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
-.header-right > button.pwa-install-button::after{ content: "App"; }
 
-.header-right > a.pwa-install-button::before{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+.header-right > .pwa-install-button .pwa-install-button__label{
+  display: inline-block;
 }
-.header-right > a.pwa-install-button::after{ content: "Info"; }
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
 /* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS | Purpose: absorb remaining event-card meta/location and filter-control detail rules from legacy.css so component DNA stays self-owned; Scope: event-meta base, tiny-card override, location row, filters-bar helper, pill subparts, reset icon states === */
@@ -1086,25 +1078,25 @@
 
 /* Icon: bewusst wie UI-Icon behandelt (kein “Textbutton”-Look) */
 .filter-pill--reset{ font-size: 0; }
-.filter-pill--reset::before{
-  content: "";
-  display: block;
-
-  width: 16px;
-  height: 16px;
+.filter-pill--reset .filter-pill__reset-icon{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
 
   position: absolute;
   left: 50%;
   top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   transform: translate(-50%, -50%);
-
   color: rgba(31,41,51,0.62);
+}
 
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-  background-size: 15px 15px;
-
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+.filter-pill--reset .filter-pill__reset-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 @media (hover: hover){
@@ -1115,7 +1107,7 @@
       0 8px 18px rgba(10,24,16,0.050),
       0 1px 0 rgba(255,255,255,0.76) inset;
   }
-  .filter-pill--reset:hover::before{
+  .filter-pill--reset:hover .filter-pill__reset-icon{
     color: rgba(24,40,30,0.74);
   }
 }
