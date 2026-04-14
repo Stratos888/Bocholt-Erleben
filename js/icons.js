@@ -1,33 +1,68 @@
 /* BEGIN BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH)
 Zweck:
-- Zentrale Icon-Registry als einzige Quelle für SVG-Icons (state-of-the-art line icons).
+- Zentrale Lucide-nahe Icon-Registry als einzige Quelle für SVG-Icons.
 - Appweit konsistente Icons: 24x24 viewBox, stroke=currentColor, round caps/joins.
 - Tokens steuern Darstellung (Größe/Stroke/Opacity) ausschließlich via CSS.
 Umfang:
-- Exportiert window.Icons.svg(name, { className }) und window.Icons.categoryKey(categoryName).
+- Exportiert window.Icons.svg(name, { className }), window.Icons.categoryKey(categoryName) und window.Icons.hydrate(root).
 */
 (() => {
   "use strict";
 
   const escAttr = (s) => String(s || "").replace(/"/g, "&quot;");
 
-  // Keep the set small & curated: only what the app uses.
-  // Rules: 24x24 grid, fill="none", stroke="currentColor", round caps/joins.
-/* BEGIN BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE)
-Zweck:
-- Ersetzt die bisherigen handgebauten Icons durch saubere, moderne Line-Icons (Lucide-Formen).
-- Beibehaltung der Token-Steuerung (Größe/Stroke/Opacity) via CSS.
-Umfang:
-- UI-Icons + häufige Kategorie-Icons (Detailpanel & Cards).
-*/
-/* eslint-disable max-len */
+  /* BEGIN BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE)
+  Zweck:
+  - Saubere, moderne Line-Icons für Header, Hero, Filter, Tabbar, Detailpanel und Kategorien.
+  - Beibehaltung der Token-Steuerung (Größe/Stroke/Opacity) via CSS.
+  Umfang:
+  - UI-Icons + häufige Kategorie-Icons (Detailpanel & Cards).
+  */
+  /* eslint-disable max-len */
   const ICONS = {
-    // UI icons (used in cards, detailpanel actions, etc.)
     calendar: `
       <path d="M8 2v4" />
       <path d="M16 2v4" />
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M3 10h18" />
+    `,
+    "calendar-days": `
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M8 14h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 18h.01" />
+      <path d="M12 18h.01" />
+      <path d="M16 18h.01" />
+    `,
+    search: `
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    `,
+    plus: `
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    `,
+    smartphone: `
+      <rect width="10" height="18" x="7" y="3" rx="2" />
+      <path d="M11 17h2" />
+    `,
+    info: `
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    `,
+    download: `
+      <path d="M12 3v10" />
+      <path d="m8 9 4 4 4-4" />
+      <path d="M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" />
+    `,
+    x: `
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
     `,
     pin: `
       <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
@@ -45,8 +80,11 @@ Umfang:
       <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
       <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
     `,
+    compass: `
+      <circle cx="12" cy="12" r="9" />
+      <path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z" />
+    `,
 
-    // Category icons (canonical keys)
     /* === BEGIN BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 | Zweck: ersetzt die schwächeren Kategorie-Icons global durch klarere, kleinere und ruhiger lesbare Formen | Umfang: ersetzt nur die Kategorie-Icon-Definitionen von cat-market bis cat-city === */
     "cat-market": `
       <path d="M4 9h16" />
@@ -101,12 +139,9 @@ Umfang:
     `,
     /* === END BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 === */
   };
-/* eslint-enable max-len */
-/* END BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE) */
+  /* eslint-enable max-len */
+  /* END BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE) */
 
-  // Category → icon key (canonical mapping; app-wide)
-  // Canonical Category → IconKey
-  // WICHTIG: Hier nur noch kanonische Kategorien aus FilterModule!
   /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V1 | Zweck: ergänzt neben den Event-Kategorien auch die aktuellen Activity-Kategorien als globale kanonische Icon-Aliases | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
   const CATEGORY_ICON_KEY = {
     "Märkte & Feste": "cat-market",
@@ -125,7 +160,6 @@ Umfang:
     const body = ICONS[name] || ICONS.external;
     const cls = `ui-icon-svg${className ? " " + escAttr(className) : ""}`;
 
-    // NOTE: Styling is driven by CSS tokens (size/stroke/color/opacity).
     return `
       <svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         ${body}
@@ -138,6 +172,24 @@ Umfang:
     return CATEGORY_ICON_KEY[canonicalCategory] || "calendar";
   };
 
-  window.Icons = { svg, categoryKey };
+  const hydrate = (root = document) => {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+
+    root.querySelectorAll("[data-ui-icon]").forEach((node) => {
+      const name = String(node.getAttribute("data-ui-icon") || "").trim();
+      if (!name) return;
+
+      const svgClass = String(node.getAttribute("data-ui-icon-svg-class") || "").trim();
+      node.innerHTML = svg(name, { className: svgClass });
+    });
+  };
+
+  window.Icons = { svg, categoryKey, hydrate };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => hydrate(document), { once: true });
+  } else {
+    hydrate(document);
+  }
 })();
- /* END BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH) */
+/* END BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH) */
