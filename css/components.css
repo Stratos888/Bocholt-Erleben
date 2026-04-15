@@ -1137,7 +1137,7 @@
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
-/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V7 | Zweck: finaler Desktop-Polish für Activity-Cards mit leichterer Vertikalbalance, ruhigerem Premium-Header und präziserer Content-Hierarchie; Umfang: kompletter Activities-Komponentenblock konsolidiert === */
+/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V8 | Zweck: entfernt auf /angebote/ die zusätzliche äußere Mobile-Page-Surface um den Top-Stack und zieht die seitlichen Gutter gezielt auf Feed/Loading/Empty-State, damit der Filterbereich wieder wie auf der Events-Seite voll bis an die Kanten läuft | Umfang: ersetzt nur den oberen Layout-/Width-/Padding-Teil des Activities-Komponentenblocks === */
 .page--activities{
   display: grid;
   gap: 14px;
@@ -1146,7 +1146,7 @@
   margin: 0;
   padding:
     0
-    var(--gutter)
+    0
     calc(88px + env(safe-area-inset-bottom));
 }
 
@@ -1181,6 +1181,16 @@
   max-width: none;
   width: 100%;
 }
+
+@media (max-width: 899.98px){
+  .page--activities .events-section,
+  .page--activities .activity-feed-section,
+  .page--activities .loading-container,
+  .page--activities .empty-state{
+    padding-inline: var(--gutter);
+  }
+}
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V8 === */
 
 /* === BEGIN BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 | Zweck: entfernt die route-spezifische Shell-Überschreibung für Activities vollständig, damit Filter-Sheets und Filter-Popover wieder ausschließlich vom globalen Overlay-Owner kommen | Umfang: ersetzt nur den bisherigen .page--activities .filter-sheet/.filter-popover-Block === */
 /* bewusst leer: Activities bekommt hier keine eigene Filter-Sheet-/Popover-Shell mehr */
