@@ -289,7 +289,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   box-shadow: 0 0 0 3px var(--cmp-input-focus-ring);
 }
 
-/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_V3 | Zweck: macht den integrierten Kalender auf Mobile kompakter und viewport-sicher, ohne das Designsystem zu verlassen; Umfang: ersetzt nur die Wann-Datums-UI direkt vor den hidden-Regeln === */
+/* === BEGIN BLOCK: FILTER_DATE_EXACT_UI_LUCIDE_V4 | Zweck: zieht die gesamte Wann-Datums-UI auf globale Lucide-Icon-Slots und optimiert die Icon-Größen für Trigger- und Monatsnavigation ohne Layoutbruch; Umfang: ersetzt nur die Wann-Datums-UI direkt vor den hidden-Regeln === */
 .filter-date-module{
   display: grid;
   gap: 10px;
@@ -331,11 +331,23 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
 }
 
 .filter-date-trigger__chevron{
+  --ui-icon-size: var(--ui-icon-size-sm);
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ui-icon-size-sm);
+  height: var(--ui-icon-size-sm);
   color: rgba(22,39,61,0.68);
-  font-size: 1.1rem;
-  line-height: 1;
+  line-height: 0;
   transition: transform 160ms ease;
+}
+
+.filter-date-trigger__chevron > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 .filter-date-module.is-open .filter-date-trigger__chevron{
@@ -391,10 +403,28 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
   justify-content: center;
   width: 40px;
   height: 40px;
+  padding: 0;
   border-radius: 12px;
   background: rgba(241,245,236,0.94);
   box-shadow: inset 0 0 0 1px rgba(111,135,88,0.12);
   cursor: pointer;
+}
+
+.filter-date-nav__icon{
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ui-icon-size-md);
+  height: var(--ui-icon-size-md);
+  line-height: 0;
+}
+
+.filter-date-nav__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 .filter-date-nav[disabled]{
@@ -532,6 +562,14 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     border-radius: 10px;
   }
 
+  .filter-date-nav__icon{
+    --ui-icon-size: var(--ui-icon-size-sm);
+    --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+    width: var(--ui-icon-size-sm);
+    height: var(--ui-icon-size-sm);
+  }
+
   .filter-date-weekdays,
   .filter-date-grid{
     gap: 4px;
@@ -557,7 +595,7 @@ body.is-panel-open .top-stack{ z-index: 900 !important; } /* Detailpanel hat ohn
     font-size: 0.84rem;
   }
 }
-/* === END BLOCK: FILTER_DATE_EXACT_UI_V3 === */
+/* === END BLOCK: FILTER_DATE_EXACT_UI_LUCIDE_V4 === */
 
 /* hidden muss immer wirken */
 .filter-pill[hidden]{ display: none !important; }
