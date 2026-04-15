@@ -1030,7 +1030,8 @@ Umfang:
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.72;
+  opacity: 1;
+  color: rgba(23,39,30,0.88);
 }
 
 #event-detail-panel .activity-detail__category-label{
@@ -1335,8 +1336,8 @@ Umfang:
 
   padding: calc((var(--dp-indicator-size) - var(--ui-icon-size-lg)) / 2);
 
-  opacity: 0.72;
-  color: rgba(31,41,51,0.72);
+  opacity: 1;
+  color: rgba(31,41,51,0.88);
 
   font-size: 0;
   line-height: 0;
@@ -1345,8 +1346,6 @@ Umfang:
   cursor: default;
   user-select: none;
   pointer-events: none;
-
-  transform: translateY(1px);
 }
 
 #event-detail-panel .detail-category-icon svg{
