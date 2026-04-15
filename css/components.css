@@ -1058,14 +1058,12 @@
   height: 100%;
 }
 
+/* === BEGIN BLOCK: FILTER_PILL_TEXT_CHEVRON_FALLBACK_OFF_V1 | Zweck: entfernt den letzten textbasierten Chevron-Fallback aus dem globalen Filter-Pill-System; Umfang: ersetzt nur den bisherigen ::after-Fallback === */
 .filter-pill:not(:has(.filter-pill__chevron))::after{
-  content: "›";
-  margin-left: 2px;
-  color: rgba(31,41,51,0.40);
-  font-size: 18px;
-  line-height: 1;
-  transform: translateY(-1px);
+  content: none;
+  display: none;
 }
+/* === END BLOCK: FILTER_PILL_TEXT_CHEVRON_FALLBACK_OFF_V1 === */
 
 .filter-pill.is-active{
   border-color: color-mix(in srgb, transparent 58%, var(--color-primary));
