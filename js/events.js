@@ -594,33 +594,37 @@ function renderList(list) {
     return;
   }
 
-  const createFeedPublishEntry = () => {
-    const link = document.createElement("a");
-    link.className = "feed-publish-entry";
-    link.href = "/events-veroeffentlichen/";
-    link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+/* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 | Zweck: ersetzt den textbasierten Chevron im mobilen Veranstalter-Entry durch ein globales Lucide-SVG; Umfang: ersetzt nur createFeedPublishEntry() === */
+const createFeedPublishEntry = () => {
+  const link = document.createElement("a");
+  link.className = "feed-publish-entry";
+  link.href = "/events-veroeffentlichen/";
+  link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
 
-    const label = document.createElement("span");
-    label.className = "feed-publish-entry__label";
-    label.textContent = "Für Veranstalter";
+  const label = document.createElement("span");
+  label.className = "feed-publish-entry__label";
+  label.textContent = "Für Veranstalter";
 
-    const main = document.createElement("span");
-    main.className = "feed-publish-entry__main";
+  const main = document.createElement("span");
+  main.className = "feed-publish-entry__main";
 
-    const title = document.createElement("span");
-    title.className = "feed-publish-entry__title";
-    title.textContent = "Event veröffentlichen";
+  const title = document.createElement("span");
+  title.className = "feed-publish-entry__title";
+  title.textContent = "Event veröffentlichen";
 
-    const chevron = document.createElement("span");
-    chevron.className = "feed-publish-entry__chevron";
-    chevron.setAttribute("aria-hidden", "true");
-    chevron.textContent = "›";
+  const chevron = document.createElement("span");
+  chevron.className = "feed-publish-entry__chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.innerHTML = window.Icons?.svg
+    ? window.Icons.svg("chevron-right", { className: "feed-publish-entry__chevron-svg" })
+    : "";
 
-    main.append(title, chevron);
-    link.append(label, main);
+  main.append(title, chevron);
+  link.append(label, main);
 
-    return link;
-  };
+  return link;
+};
+/* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 === */
 
   const createSectionHeader = (label) => {
     const h = document.createElement("div");
