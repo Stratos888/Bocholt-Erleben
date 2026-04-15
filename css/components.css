@@ -1182,14 +1182,9 @@
   width: 100%;
 }
 
-.page--activities .filter-sheet,
-.page--activities .filter-popover{
-  inset: auto;
-  width: 100%;
-  min-height: 220px;
-  border-radius: 18px;
-  background: rgba(245,247,250,0.72);
-}
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 | Zweck: entfernt die route-spezifische Shell-Überschreibung für Activities vollständig, damit Filter-Sheets und Filter-Popover wieder ausschließlich vom globalen Overlay-Owner kommen | Umfang: ersetzt nur den bisherigen .page--activities .filter-sheet/.filter-popover-Block === */
+/* bewusst leer: Activities bekommt hier keine eigene Filter-Sheet-/Popover-Shell mehr */
+/* === END BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 === */
 
 .page--activities .events-section{
   padding-top: 14px;
