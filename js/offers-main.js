@@ -281,11 +281,12 @@ const OffersApp = {
     return String(rawValue || "").trim();
   },
 
+  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 | Zweck: zieht die Activities-Facets bei Counts/Disabled-State auf den Event-Stand und hält Merkmal/Kategorie anhand der jeweils anderen aktiven Filter konsistent; Umfang: ersetzt die Facet-Rendering- und Apply-Logik von populateButtons() bis applyFilterAndRender() === */
   populateButtons(targets, attrName, entries) {
     const markup = [
-      `<button type="button" class="filter-sheet-option is-active" ${attrName}="">Alle</button>`,
+      `<button type="button" class="filter-sheet-option is-active" ${attrName}="" data-label="Alle">Alle</button>`,
       ...entries.map(({ value, label }) => (
-        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}">${this.escapeHtml(label)}</button>`
+        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}" data-label="${this.escapeHtmlAttr(label)}">${this.escapeHtml(label)}</button>`
       ))
     ].join("");
 
@@ -320,6 +321,121 @@ const OffersApp = {
       "data-category",
       categories
     );
+  },
+
+  getFacetButtons(group) {
+    const attrName = group === "situation" ? "data-situation" : "data-category";
+    const targets = group === "situation"
+      ? [this.refs.situationSheetOptions, this.refs.situationPopoverOptions]
+      : [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions];
+
+    const result = [];
+    const seen = new Set();
+
+    targets.forEach((target) => {
+      if (!target) return;
+      target.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
+        if (seen.has(button)) return;
+        seen.add(button);
+        result.push(button);
+      });
+    });
+
+    return result;
+  },
+
+  getFacetButtonValue(button, group) {
+    if (!button) return "";
+    return String(
+      group === "situation"
+        ? button.getAttribute("data-situation")
+        : button.getAttribute("data-category")
+    ).trim();
+  },
+
+  setFacetButtonState(button, { enabled, count }) {
+    if (!button) return;
+
+    const baseLabel = String(button.getAttribute("data-label") || button.textContent || "")
+      .trim()
+      .replace(/\s*\(\d+\)\s*$/, "");
+
+    button.setAttribute("data-label", baseLabel);
+    button.textContent = `${baseLabel} (${count})`;
+    button.disabled = !enabled;
+    button.setAttribute("aria-disabled", enabled ? "false" : "true");
+    button.classList.toggle("is-disabled", !enabled);
+
+    if (!enabled) {
+      button.classList.remove("is-active");
+    }
+  },
+
+  updateFacetOptionStates() {
+    const searchNeedle = String(this.searchTerm || "").trim().toLowerCase();
+    const activeSituation = String(this.activeSituation || "").trim();
+    const activeCategory = String(this.activeCategory || "").trim();
+
+    const matchesSearch = (offer) => {
+      if (!searchNeedle) return true;
+      return this.matchesSearch(offer);
+    };
+
+    const baseForSituations = this.offers.filter((offer) => {
+      if (activeCategory && offer.kategorie !== activeCategory) return false;
+      return matchesSearch(offer);
+    });
+
+    const baseForCategories = this.offers.filter((offer) => {
+      if (activeSituation && !(offer.tags || []).includes(activeSituation)) return false;
+      return matchesSearch(offer);
+    });
+
+    const situationCounts = { all: baseForSituations.length };
+    baseForSituations.forEach((offer) => {
+      Array.from(new Set(offer.tags || [])).forEach((tag) => {
+        situationCounts[tag] = (situationCounts[tag] || 0) + 1;
+      });
+    });
+
+    const categoryCounts = { all: baseForCategories.length };
+    baseForCategories.forEach((offer) => {
+      const category = String(offer.kategorie || "").trim();
+      if (!category) return;
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+
+    if (activeSituation && (situationCounts[activeSituation] || 0) === 0) {
+      this.activeSituation = "";
+      this.applyFilterAndRender();
+      return false;
+    }
+
+    if (activeCategory && (categoryCounts[activeCategory] || 0) === 0) {
+      this.activeCategory = "";
+      this.applyFilterAndRender();
+      return false;
+    }
+
+    this.getFacetButtons("situation").forEach((button) => {
+      const value = this.getFacetButtonValue(button, "situation");
+      const count = value ? (situationCounts[value] || 0) : baseForSituations.length;
+      this.setFacetButtonState(button, {
+        enabled: !value || count > 0,
+        count
+      });
+    });
+
+    this.getFacetButtons("category").forEach((button) => {
+      const value = this.getFacetButtonValue(button, "category");
+      const count = value ? (categoryCounts[value] || 0) : baseForCategories.length;
+      this.setFacetButtonState(button, {
+        enabled: !value || count > 0,
+        count
+      });
+    });
+
+    return true;
   },
 
   setSheetLock(isOpen) {
@@ -591,10 +707,15 @@ const OffersApp = {
       return;
     }
 
+    if (!this.updateFacetOptionStates()) {
+      return;
+    }
+
     this.updateFilterBarUI();
     this.showLoading(false);
     window.OfferCards.render(this.filteredOffers);
   },
+  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {
