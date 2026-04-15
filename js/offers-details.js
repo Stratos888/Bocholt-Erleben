@@ -19,7 +19,7 @@ const OfferDetailPanel = {
     return window.matchMedia("(min-width: 900px)").matches;
   },
 
-  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 | Zweck: hydriert dynamisch erzeugte data-ui-icon-Knoten im Activity-Detailpanel sofort nach dem Mount | Umfang: ersetzt nur init() Setup bis vor die Event-Listener === */
+  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 | Zweck: mountet das Activity-Detailpanel sauber, hydriert das Close-Icon direkt nach dem Insert und lässt die Listener innerhalb von init() | Umfang: ersetzt die gesamte init()-Methode === */
   init() {
     if (this._isInit) return;
 
@@ -50,8 +50,25 @@ const OfferDetailPanel = {
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
 
     if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
-  }
-  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 === */
+
+    this.overlay.addEventListener("click", (event) => {
+      if (event.target === this.overlay) this.hide();
+    });
+
+    this.closeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      this.hide();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.panel.classList.contains("active")) {
+        this.hide();
+      }
+    });
+
+    this._isInit = true;
+  },
+  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 === */
 
     this.overlay.addEventListener("click", (event) => {
       if (event.target === this.overlay) this.hide();
