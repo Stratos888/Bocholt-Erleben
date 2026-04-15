@@ -332,20 +332,22 @@ function createCard(event) {
     dateLabel = formatDate(event.date);
   }
 
-  const startDateObj = parseISODateLocal(event?.date);
-  const weekdayShort = startDateObj
+  /* === BEGIN BLOCK: EVENT_CARD_BADGE_EFFECTIVE_DATE_V1 | Purpose: Badge-Datum an die range-aware Feed-Logik angleichen, damit laufende Mehrtages-Events unter "Heute" auch das heutige Datum im Badge zeigen | Scope: ersetzt nur die Badge-Datumsbasis innerhalb von createCard === */
+  const badgeDateObj = getEffectiveDate(event) || parseISODateLocal(event?.date);
+  const weekdayShort = badgeDateObj
     ? new Intl.DateTimeFormat("de-DE", { weekday: "short" })
-        .format(startDateObj)
+        .format(badgeDateObj)
         .replace(".", "")
         .toUpperCase()
     : "";
-  const dayNum = startDateObj ? String(startDateObj.getDate()).padStart(2, "0") : "";
-  const monthShort = startDateObj
+  const dayNum = badgeDateObj ? String(badgeDateObj.getDate()).padStart(2, "0") : "";
+  const monthShort = badgeDateObj
     ? new Intl.DateTimeFormat("de-DE", { month: "short" })
-        .format(startDateObj)
+        .format(badgeDateObj)
         .replace(".", "")
         .toUpperCase()
     : "";
+  /* === END BLOCK: EVENT_CARD_BADGE_EFFECTIVE_DATE_V1 === */
 
   const badge = document.createElement("div");
   badge.className = "event-date-badge";
