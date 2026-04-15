@@ -70,23 +70,6 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 === */
 
-    this.overlay.addEventListener("click", (event) => {
-      if (event.target === this.overlay) this.hide();
-    });
-
-    this.closeBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      this.hide();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && this.panel.classList.contains("active")) {
-        this.hide();
-      }
-    });
-
-    this._isInit = true;
-  },
 
   show(offer) {
     const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
