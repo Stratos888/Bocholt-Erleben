@@ -19,32 +19,39 @@
 // - erhält ein einzelnes Offer-Objekt (z. B. OfferDetailPanel.show(offer))
 // END: FILE_HEADER_OFFERS_DETAILS
 
-const OfferDetailPanel = {
-  panel: null,
-  overlay: null,
-  content: null,
-  closeBtn: null,
-
-  _isInit: false,
-  _lastFocusEl: null,
-  _onKeyDown: null,
-  _onOverlayClick: null,
-  _onCloseClick: null,
-
+  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 | Zweck: hydriert dynamisch erzeugte data-ui-icon-Knoten im Activity-Detailpanel sofort nach dem Mount | Umfang: ersetzt nur init() Setup bis vor die Event-Listener === */
   init() {
     if (this._isInit) return;
 
-    /* === BEGIN BLOCK: OFFER DETAIL DOM (create + attach to #offer-detail-root) ===
-    Zweck: Detailpanel auf der Angebotsseite als Overlay unter <body> einhängen (PROJECT.md).
-    Umfang: Erzeugt Panel-HTML (id/class identisch zum Event-Panel für CSS-Reuse).
-    === */
     const root = document.getElementById("offer-detail-root");
-    if (!root) {
-      console.warn("OfferDetailPanel: #offer-detail-root not found");
-      return;
+    if (!root) return;
+
+    root.innerHTML = `
+      <div id="event-detail-panel" class="detail-panel hidden" hidden>
+        <div class="detail-panel-overlay"></div>
+        <div class="detail-panel-content">
+          <div class="detail-panel-grabber" aria-hidden="true"></div>
+          <button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
+          <div class="detail-panel-body">
+            <div id="detail-content"></div>
+          </div>
+        </div>
+      </div>
+    `.trim();
+
+    if (window.Icons && typeof window.Icons.hydrate === "function") {
+      window.Icons.hydrate(root);
     }
 
-    // Reuse der bestehenden DetailPanel-CSS (scoped auf #event-detail-panel)
+    this.panel = document.getElementById("event-detail-panel");
+    this.overlay = this.panel?.querySelector(".detail-panel-overlay");
+    this.body = this.panel?.querySelector(".detail-panel-body");
+    this.content = document.getElementById("detail-content");
+    this.closeBtn = this.panel?.querySelector(".detail-panel-close");
+
+    if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
+  }
+  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 === */
     // -> auf Angebotsseite existiert kein Event-Panel, daher konfliktfrei.
     root.innerHTML = `
       <div id="event-detail-panel" class="detail-panel hidden" hidden>
