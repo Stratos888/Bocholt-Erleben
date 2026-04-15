@@ -1,23 +1,23 @@
 // BEGIN: FILE_HEADER_OFFERS_DETAILS
 // Datei: js/offers-details.js
 // Zweck:
-// - Anzeige eines einzelnen Angebots im Detail-Panel (Offers)
-// - Öffnen/Schließen des Panels (Overlay, ESC, Close)
-// - Darstellung aller Offer-Details (Beschreibung, Links)
-//
-// Verantwortlich für:
-// - Detail-Panel DOM (wird in #offer-detail-root erzeugt)
-// - Panel-Interaktion (Open/Close)
-// - Darstellung eines Offers
-//
-// Nicht verantwortlich für:
-// - Offer-Listen oder Offer-Filter
-// - Filter-State oder Filter-UI
-// - Laden von Offer-Daten
-//
-// Contract:
-// - erhält ein einzelnes Offer-Objekt (z. B. OfferDetailPanel.show(offer))
+// - Activity-Detailpanel nur für Mobile
+// - Desktop wird bewusst vom Panel entkoppelt und öffnet direkt die Ziel-URL
+// - Nutzt dieselbe Kategorie-/Meta-Logik wie die Cards
 // END: FILE_HEADER_OFFERS_DETAILS
+
+const OfferDetailPanel = {
+  panel: null,
+  overlay: null,
+  content: null,
+  body: null,
+  closeBtn: null,
+  _isInit: false,
+  _lastFocusEl: null,
+
+  isDesktopViewport() {
+    return window.matchMedia("(min-width: 900px)").matches;
+  },
 
   /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 | Zweck: hydriert dynamisch erzeugte data-ui-icon-Knoten im Activity-Detailpanel sofort nach dem Mount | Umfang: ersetzt nur init() Setup bis vor die Event-Listener === */
   init() {
@@ -52,194 +52,233 @@
     if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
   }
   /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 === */
-    // -> auf Angebotsseite existiert kein Event-Panel, daher konfliktfrei.
-    root.innerHTML = `
-      <div id="event-detail-panel" class="detail-panel hidden" hidden>
-        <div class="detail-panel-overlay"></div>
-        <div class="detail-panel-content">
-          <button class="detail-panel-close" aria-label="Schließen">&times;</button>
-          <div id="detail-content"></div>
-        </div>
-      </div>
-    `;
-    /* === END BLOCK: OFFER DETAIL DOM (create + attach to #offer-detail-root) === */
 
-    this.panel = document.getElementById("event-detail-panel");
-    this.overlay = this.panel?.querySelector(".detail-panel-overlay");
-    this.content = document.getElementById("detail-content");
-    this.closeBtn = this.panel?.querySelector(".detail-panel-close");
+    this.overlay.addEventListener("click", (event) => {
+      if (event.target === this.overlay) this.hide();
+    });
 
-    if (!this.panel || !this.overlay || !this.content) {
-      console.warn("OfferDetailPanel: elements not found");
-      return;
-    }
-
-    this._onCloseClick = (e) => {
-      e.preventDefault();
+    this.closeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
       this.hide();
-    };
-    if (this.closeBtn) this.closeBtn.addEventListener("click", this._onCloseClick);
+    });
 
-    this._onOverlayClick = (e) => {
-      if (e.target === this.overlay) this.hide();
-    };
-    this.overlay.addEventListener("click", this._onOverlayClick);
-
-    this._onKeyDown = (e) => {
-      if (e.key !== "Escape") return;
-      if (!this.panel.classList.contains("active")) return;
-      this.hide();
-    };
-    document.addEventListener("keydown", this._onKeyDown);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.panel.classList.contains("active")) {
+        this.hide();
+      }
+    });
 
     this._isInit = true;
   },
 
   show(offer) {
-    /* === BEGIN BLOCK: OFFER DETAIL SHOW (ensure init + open) ===
-    Zweck: Panel robust öffnen (init + hidden/[hidden] entfernen + Focus-Handling).
-    Umfang: show(offer) komplett.
-    === */
-    if (!this._isInit) this.init();
+    const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.url)
+      : String(offer?.url || "").trim();
 
-    if (!this.panel || !this.content) {
-      console.error("❌ OfferDetailPanel.show aborted: panel/content missing", {
-        hasPanel: !!this.panel,
-        hasContent: !!this.content,
-        isInit: this._isInit
-      });
+    if (this.isDesktopViewport() && primaryUrl) {
+      window.open(primaryUrl, "_blank", "noopener,noreferrer");
       return;
     }
+
+    if (!this._isInit) this.init();
+    if (!this.panel || !this.content || !this.body) return;
 
     this._lastFocusEl =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
+    this.panel.setAttribute("data-detail-type", "activity");
     this.renderContent(offer);
 
     this.panel.classList.remove("hidden");
     this.panel.removeAttribute("hidden");
+    this.body.scrollTop = 0;
 
     requestAnimationFrame(() => {
       this.panel.classList.add("active");
+      document.documentElement.classList.add("is-panel-open");
       document.body.classList.add("is-panel-open");
-      if (this.closeBtn) this.closeBtn.focus();
+      this.closeBtn.focus();
     });
-    /* === END BLOCK: OFFER DETAIL SHOW (ensure init + open) === */
   },
 
   hide() {
     if (!this.panel) return;
 
     this.panel.classList.remove("active");
+    document.documentElement.classList.remove("is-panel-open");
     document.body.classList.remove("is-panel-open");
-
-    const sheet = this.panel.querySelector(".detail-panel-content");
-    let ms = 260;
-    if (sheet) {
-      const dur = getComputedStyle(sheet).transitionDuration || "";
-      const first = dur.split(",")[0].trim();
-      if (first.endsWith("ms")) ms = Math.max(0, parseFloat(first));
-      if (first.endsWith("s")) ms = Math.max(0, parseFloat(first) * 1000);
-      if (!Number.isFinite(ms) || ms <= 0) ms = 260;
-      ms = Math.round(ms + 40);
-    }
 
     window.setTimeout(() => {
       this.panel.classList.add("hidden");
       this.panel.setAttribute("hidden", "");
-
+      this.panel.removeAttribute("data-detail-type");
+      if (this.body) this.body.scrollTop = 0;
       if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
         this._lastFocusEl.focus();
       }
-      this._lastFocusEl = null;
-    }, ms);
+    }, 280);
   },
+
+  escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+      switch (ch) {
+        case "&": return "&amp;";
+        case "<": return "&lt;";
+        case ">": return "&gt;";
+        case '"': return "&quot;";
+        case "'": return "&#39;";
+        default: return ch;
+      }
+    });
+  },
+
+  getVisual(offer) {
+    if (window.OfferVisuals?.getCategoryPresentation) {
+      return window.OfferVisuals.getCategoryPresentation(offer?.kategorie);
+    }
+
+    return {
+      rawLabel: String(offer?.kategorie || "Aktivität").trim() || "Aktivität",
+      label: String(offer?.kategorie || "Aktivität").trim() || "Aktivität",
+      iconKey: "pin",
+      modifier: "aktivitaet"
+    };
+  },
+
+  buildMapsUrl(location) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location || "")}`;
+  },
+
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
+  renderMedia(offer) {
+    const visual = this.getVisual(offer);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-detail__media-icon-svg" })
+      : this.escapeHtml(visual.label.slice(0, 1));
+    const imageUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.image)
+      : String(offer?.image || "").trim();
+
+    if (imageUrl) {
+      return `
+        <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
+          <img
+            class="activity-detail__media-image"
+            src="${this.escapeHtml(imageUrl)}"
+            alt="${this.escapeHtml(offer.title)}"
+            loading="eager"
+            decoding="async"
+            referrerpolicy="no-referrer"
+            style="--activity-image-pos-x:${this.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${this.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${this.escapeHtml(offer?.image_fit || "cover")};"
+          >
+        </div>
+      `.trim();
+    }
+
+    return `
+      <div class="activity-detail__media activity-detail__media--fallback activity-detail__media--${visual.modifier}">
+        <div class="activity-detail__media-icon" aria-hidden="true">${iconHtml}</div>
+      </div>
+    `.trim();
+  },
+  /* === END BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 === */
+
+  renderCategoryBadge(offer) {
+    const visual = this.getVisual(offer);
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg(visual.iconKey, { className: "activity-detail__category-icon-svg" })
+      : this.escapeHtml(visual.label.slice(0, 1));
+
+    return `
+      <div class="activity-detail__category activity-detail__category--${visual.modifier}">
+        <span class="activity-detail__category-icon" aria-hidden="true">${iconHtml}</span>
+        <span class="activity-detail__category-label">${this.escapeHtml(visual.label)}</span>
+      </div>
+    `.trim();
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 | Zweck: ersetzt die formularartige Faktenliste durch eine kompaktere, redaktionellere Facts-Struktur mit kurzem Grid + längeren Textsektionen | Umfang: ersetzt nur renderFacts(offer) === */
+  renderFacts(offer) {
+    const gridRows = [
+      ["Saison", offer.season],
+      ["Region", offer.area]
+    ]
+      .map(([label, value]) => {
+        const text = String(value || "").trim();
+        if (!text) return null;
+        return { label, value: text };
+      })
+      .filter(Boolean);
+
+    const sections = [
+      ["Geeignet für", (offer.audience || []).join(" · ")],
+      ["Hinweis", offer.hint]
+    ]
+      .map(([label, value]) => {
+        const text = String(value || "").trim();
+        if (!text) return null;
+        return { label, value: text };
+      })
+      .filter(Boolean);
+
+    if (!gridRows.length && !sections.length) return "";
+
+    return `
+      <div class="activity-detail__facts">
+        ${gridRows.length ? `
+          <div class="activity-detail__facts-grid">
+            ${gridRows.map((row) => `
+              <div class="activity-detail__fact-row">
+                <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+                <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : ""}
+        ${sections.map((row) => `
+          <section class="activity-detail__fact-section">
+            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+          </section>
+        `).join("")}
+      </div>
+    `.trim();
+  },
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 === */
 
   renderContent(offer) {
-    /* === BEGIN BLOCK: OFFER DETAIL RENDER (final fields, no pills) ===
-    Zweck: Offer-Detailpanel nach PROJECT.md:
-    - vollständige Beschreibung
-    - Zur Location (url) + Maps-Fallback
-    - Card bleibt minimal, Details nur hier
-    Umfang: renderContent(offer) komplett.
-    === */
-    const o = offer && typeof offer === "object" ? offer : {};
-
-    const title = (o.title || "").toString().trim() || "Ohne Titel";
-    const category = (o.kategorie || "").toString().trim();
-    const location = (o.location || "").toString().trim();
-    const description = (o.description || "").toString().trim();
-    const hint = (o.hint || "").toString().trim();
-    const url = (o.url || "").toString().trim();
-
-    const iconMap = {
-      Baden: "🏊",
-      Natur: "🌿",
-      Familie: "👨‍👩‍👧‍👦",
-      Freizeit: "🎯",
-      Kultur: "🎭"
-    };
-    const categoryIcon = category ? (iconMap[category] || "") : "";
-
-    const isHttpUrl = (u) => /^https?:\/\//i.test(u || "");
-    const safeUrl = (u) => (isHttpUrl(u) ? u : "");
-
-    const mapsHref = (() => {
-      if (!location) return "";
-      if (window.Locations?.getMapsFallback) return window.Locations.getMapsFallback(location);
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-    })();
-
-    const subline = [category, location].filter(Boolean).join(" · ");
+    const mapsUrl = this.buildMapsUrl(offer.location);
+    const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer.url)
+      : String(offer.url || "").trim();
+    const metaLine = window.OfferVisuals?.buildMetaLine
+      ? window.OfferVisuals.buildMetaLine(offer)
+      : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
+    const description = String(offer?.description || "").trim();
 
     this.content.innerHTML = `
-      <div class="detail-header">
-        <h2>${this.escape(title)}</h2>
+      <article class="activity-detail">
+        ${this.renderMedia(offer)}
 
-        ${categoryIcon ? `
-          <span class="detail-category-icon" role="img" aria-label="Kategorie: ${this.escape(category)}">
-            ${categoryIcon}
-          </span>
-        ` : ""}
-      </div>
+        <header class="activity-detail__header">
+          ${this.renderCategoryBadge(offer)}
+          <h2 class="activity-detail__title">${this.escapeHtml(offer.title)}</h2>
+          <div class="activity-detail__place">${this.escapeHtml(offer.location)}</div>
+          ${metaLine ? `<div class="activity-detail__meta">${this.escapeHtml(metaLine)}</div>` : ""}
+        </header>
 
-      ${subline ? `<div class="detail-subline">${this.escape(subline)}</div>` : ""}
-
-      ${description ? `<div class="detail-description">${this.escape(description)}</div>` : ""}
-
-               ${hint ? `
-        <div class="detail-meta">
-          <div class="detail-hint">${this.escape(hint)}</div>
+        <div class="activity-detail__body">
+          ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
+          ${this.renderFacts(offer)}
+          <div class="activity-detail__actions">
+            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
+            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>` : ""}
+          </div>
         </div>
-      ` : ""}
-
-      <div class="detail-actions">
-        ${safeUrl(url) ? `
-          <a class="detail-link-btn" href="${safeUrl(url)}" target="_blank" rel="noopener">
-            Zur Location
-          </a>
-        ` : ""}
-
-
-        ${mapsHref ? `
-          <a class="detail-link-btn" href="${mapsHref}" target="_blank" rel="noopener">
-            In Maps öffnen
-          </a>
-        ` : ""}
-      </div>
-    `;
-    /* === END BLOCK: OFFER DETAIL RENDER (final fields, no pills) === */
-  },
-
-  escape(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+      </article>
+    `.trim();
   }
 };
 
-// global (offers.js erwartet window.OfferDetailPanel?.show)
 window.OfferDetailPanel = OfferDetailPanel;
