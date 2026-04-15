@@ -198,8 +198,18 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 | Zweck: ersetzt die formularartige Faktenliste durch eine kompaktere, redaktionellere Facts-Struktur mit kurzem Grid + längeren Textsektionen | Umfang: ersetzt nur renderFacts(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert die ortsbezogenen Basis-Merkmale im Activity-Detailpanel vor weicheren Zielgruppenangaben und hält die restlichen Facts kompakt; Umfang: ersetzt nur renderFacts(offer) === */
   renderFacts(offer) {
+    const primarySections = [
+      ["Merkmale", (offer.tags || []).join(" · ")]
+    ]
+      .map(([label, value]) => {
+        const text = String(value || "").trim();
+        if (!text) return null;
+        return { label, value: text };
+      })
+      .filter(Boolean);
+
     const gridRows = [
       ["Saison", offer.season],
       ["Region", offer.area]
@@ -211,7 +221,7 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    const sections = [
+    const secondarySections = [
       ["Geeignet für", (offer.audience || []).join(" · ")],
       ["Hinweis", offer.hint]
     ]
@@ -222,10 +232,16 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    if (!gridRows.length && !sections.length) return "";
+    if (!primarySections.length && !gridRows.length && !secondarySections.length) return "";
 
     return `
       <div class="activity-detail__facts">
+        ${primarySections.map((row) => `
+          <section class="activity-detail__fact-section">
+            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+          </section>
+        `).join("")}
         ${gridRows.length ? `
           <div class="activity-detail__facts-grid">
             ${gridRows.map((row) => `
@@ -236,7 +252,7 @@ const OfferDetailPanel = {
             `).join("")}
           </div>
         ` : ""}
-        ${sections.map((row) => `
+        ${secondarySections.map((row) => `
           <section class="activity-detail__fact-section">
             <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
             <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
@@ -245,7 +261,7 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 === */
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer.location);
