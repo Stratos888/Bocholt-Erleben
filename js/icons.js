@@ -173,30 +173,3 @@ Umfang:
   }
 })();
 /* END BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH) */
-
-  const categoryKey = (canonicalCategory) => {
-    if (!canonicalCategory) return "calendar";
-    return CATEGORY_ICON_KEY[canonicalCategory] || "calendar";
-  };
-
-  const hydrate = (root = document) => {
-    if (!root || typeof root.querySelectorAll !== "function") return;
-
-    root.querySelectorAll("[data-ui-icon]").forEach((node) => {
-      const name = String(node.getAttribute("data-ui-icon") || "").trim();
-      if (!name) return;
-
-      const svgClass = String(node.getAttribute("data-ui-icon-svg-class") || "").trim();
-      node.innerHTML = svg(name, { className: svgClass });
-    });
-  };
-
-  window.Icons = { svg, categoryKey, hydrate };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => hydrate(document), { once: true });
-  } else {
-    hydrate(document);
-  }
-})();
-/* END BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH) */
