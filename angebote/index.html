@@ -60,6 +60,7 @@ Zweck:
 - entfernt die generische .page-Hülle, damit kein zusätzlicher Balken/Top-Abstand zwischen Header und Hero entsteht
 - zieht Aktivitäten oben strukturell auf dieselbe Shell wie Events
 - ergänzt die zweite Service-Zeile für Desktop-Parität
+- benennt die Activities-Filter konsistent auf Merkmal + Kategorie um, ohne die aktuelle Lucide-/Chevron-Logik zurückzubauen
 Umfang:
 - Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
@@ -93,7 +94,7 @@ Umfang:
           </label>
         </div>
 
-<!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: bereinigt die doppelte Bereich-Pill auf /angebote/ und hält genau eine Situation-Pill plus genau eine Bereich-Pill mit expliziten globalen Lucide-Chevrons; Umfang: ersetzt nur den kompletten Aktivitäten-Filter-Pill-Block direkt vor der Reset-Pill === -->
+<!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: bereinigt die doppelte Bereich-Pill auf /angebote/ und hält genau eine Merkmal-Pill plus genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: ersetzt nur den kompletten Aktivitäten-Filter-Pill-Block direkt vor der Reset-Pill === -->
 <button
   type="button"
   class="filter-pill desktop-hero__toolbar-pill"
@@ -103,7 +104,7 @@ Umfang:
   aria-controls="popover-situation"
   data-filter-key="situation"
 >
-  <span class="filter-pill__label">Situation</span>
+  <span class="filter-pill__label">Merkmal</span>
   <span class="filter-pill__value" id="offer-situation-value">Alle</span>
   <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
 </button>
@@ -117,7 +118,7 @@ Umfang:
   aria-controls="popover-offer-category"
   data-filter-key="category"
 >
-  <span class="filter-pill__label">Bereich</span>
+  <span class="filter-pill__label">Kategorie</span>
   <span class="filter-pill__value" id="offer-category-value">Alle</span>
   <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
 </button>
@@ -151,11 +152,11 @@ Umfang:
     </div>
   </section>
 
-  <div class="filter-sheet" id="sheet-situation" role="dialog" aria-modal="true" aria-label="Situation auswählen" hidden>
+  <div class="filter-sheet" id="sheet-situation" role="dialog" aria-modal="true" aria-label="Merkmal auswählen" hidden>
     <div class="filter-sheet__overlay" data-close-sheet></div>
     <div class="filter-sheet__card">
       <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Situation</div>
+        <div class="filter-sheet__title">Merkmal</div>
 <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
       <div class="filter-sheet__body" id="sheet-situation-options">
@@ -164,11 +165,11 @@ Umfang:
     </div>
   </div>
 
-  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Bereich auswählen" hidden>
+  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
     <div class="filter-sheet__overlay" data-close-sheet></div>
     <div class="filter-sheet__card">
       <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Bereich</div>
+        <div class="filter-sheet__title">Kategorie</div>
 <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
       <div class="filter-sheet__body" id="sheet-category-options">
@@ -178,11 +179,11 @@ Umfang:
   </div>
 
   <div id="popover-situation" class="filter-popover" hidden>
-    <div class="filter-popover__panel" id="popover-situation-options" aria-label="Situation auswählen"></div>
+    <div class="filter-popover__panel" id="popover-situation-options" aria-label="Merkmal auswählen"></div>
   </div>
 
   <div id="popover-offer-category" class="filter-popover" hidden>
-    <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Bereich auswählen"></div>
+    <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Kategorie auswählen"></div>
   </div>
   <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) === -->
 
