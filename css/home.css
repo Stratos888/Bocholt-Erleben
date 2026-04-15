@@ -1186,17 +1186,26 @@
     text-overflow: ellipsis;
   }
 
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_FILTER_CHEVRON_OWNER_V1 | Zweck: stellt im Desktop-Top-Shell den echten Lucide-Chevron als einzigen Owner her und entfernt den textbasierten Pseudo-Chevron, damit Events und Activities dieselbe Pill-Logik und mehr Textbreite bekommen | Umfang: ersetzt nur den bisherigen ::after-Chevron-Block der Toolbar-Pills === */
   body.is-tabbar-hidden .desktop-hero__toolbar-pill::after,
   body.page-route-activities .desktop-hero__toolbar-pill::after{
-    content: "›";
+    content: none;
+    display: none;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__chevron,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__chevron{
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
-    font-size: 0.96rem;
-    line-height: 1;
+    justify-self: end;
+    width: 16px;
+    height: 16px;
     margin-left: 0;
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    transform: none;
   }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_FILTER_CHEVRON_OWNER_V1 === */
 
   body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset,
   body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
