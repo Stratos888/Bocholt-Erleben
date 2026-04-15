@@ -99,10 +99,18 @@
         </p>
       </div>
 
-      <nav class="content-links" aria-label="Rechtliches">
-        <a class="content-link" href="/impressum/">Impressum</a>
-        <a class="content-link" href="/datenschutz/">Datenschutz</a>
-      </nav>
+<!-- === BEGIN BLOCK: ABOUT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 | Zweck: ersetzt die impliziten CSS-Text-Chevrons der rechtlichen Deep-Links durch explizite globale Lucide-Icons; Umfang: nur die beiden content-link Einträge === -->
+<nav class="content-links" aria-label="Rechtliches">
+  <a class="content-link" href="/impressum/">
+    <span class="content-link__label">Impressum</span>
+    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </a>
+  <a class="content-link" href="/datenschutz/">
+    <span class="content-link__label">Datenschutz</span>
+    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </a>
+</nav>
+<!-- === END BLOCK: ABOUT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 === -->
     </section>
   </main>
   <!-- === END BLOCK: ABOUT_PAGE_REFERENCE_V5 === -->
