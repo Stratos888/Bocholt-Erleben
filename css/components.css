@@ -1021,6 +1021,7 @@
   flex-wrap: nowrap;
 }
 
+/* === BEGIN BLOCK: FILTER_PILL_CHEVRON_SLOT_PREP_V1 | Zweck: bereitet die Filter-Pills auf echte globale Lucide-Chevrons vor und hält bis zum HTML-Patch einen sauberen Fallback ohne Doppelanzeige | Umfang: ersetzt nur Label/Value/Chevron-Rendering der Filter-Pills === */
 /* Pills: exakte Höhe, Padding vertikal = 0 */
 
 .filter-pill__label{
@@ -1037,7 +1038,27 @@
   text-overflow: ellipsis;
 }
 
-.filter-pill::after{
+.filter-pill__chevron{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 2px;
+  color: rgba(31,41,51,0.40);
+  transform: translateY(-1px);
+}
+
+.filter-pill__chevron > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+.filter-pill:not(:has(.filter-pill__chevron))::after{
   content: "›";
   margin-left: 2px;
   color: rgba(31,41,51,0.40);
@@ -1057,6 +1078,7 @@
 .filter-pill.is-active .filter-pill__value{
   color: color-mix(in srgb, var(--color-text-primary) 82%, var(--color-primary));
 }
+/* === END BLOCK: FILTER_PILL_CHEVRON_SLOT_PREP_V1 === */
 
 @media (hover: hover){
   .filter-pill:hover{
