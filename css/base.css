@@ -97,6 +97,7 @@
 
   --eventcard-meta-lines: 2;
 
+  /* === BEGIN BLOCK: GLOBAL_LUCIDE_ICON_TOKENS_V1 | Zweck: vereinheitlicht globale Icon-Größen und zieht Stroke/Opacity auf Lucide-konformes Basisniveau, ohne die bestehende Layout-Geometrie unnötig zu verschieben | Umfang: appweite Icon-Tokens für Größe, Stroke, Header und Event-Category === */
   /* Icons */
   --ui-tap-target: 44px;
 
@@ -104,19 +105,20 @@
   --ui-icon-size-md: 18px;
   --ui-icon-size-lg: 22px;
 
-  --ui-icon-stroke-sm: 1.75;
-  --ui-icon-stroke-md: 1.85;
+  --ui-icon-stroke-sm: 2;
+  --ui-icon-stroke-md: 2;
   --ui-icon-stroke-lg: 2;
 
   --ui-icon-size: var(--ui-icon-size-md);
   --ui-icon-stroke: var(--ui-icon-stroke-md);
 
-  --ui-icon-opacity: 0.92;
+  --ui-icon-opacity: 1;
   --ui-icon-filter-emoji: grayscale(1) saturate(0) brightness(0.55);
 
   --hdr-icon-size: var(--ui-icon-size-md);
   --eventcard-category-size: var(--ui-icon-size-sm);
-  --eventcard-category-opacity: 0.72;
+  --eventcard-category-opacity: 1;
+  /* === END BLOCK: GLOBAL_LUCIDE_ICON_TOKENS_V1 === */
 
   /* Typography */
   --font-event-title: 18px;
@@ -494,7 +496,7 @@ footer a:hover {
   }
 }
 
-/* APP-WIDE SVG ICON BASE (Single Source of Truth: window.Icons → class ui-icon-svg) */
+/* === BEGIN BLOCK: GLOBAL_LUCIDE_SVG_BASE_V1 | Zweck: zieht alle appweiten SVG-Icons auf konsistentes Lucide-Rendering ohne komponentenspezifische Größen zu verändern | Umfang: globale ui-icon-svg Basis inkl. echter non-scaling-stroke Anwendung auf die Shape-Nodes === */
 svg.ui-icon-svg{
   width: var(--ui-icon-size);
   height: var(--ui-icon-size);
@@ -503,14 +505,20 @@ svg.ui-icon-svg{
   flex: 0 0 auto;
 
   fill: none;
+  color: inherit;
   stroke: currentColor;
   stroke-width: var(--ui-icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
 
   opacity: var(--ui-icon-opacity);
+  shape-rendering: geometricPrecision;
+}
+
+svg.ui-icon-svg *{
   vector-effect: non-scaling-stroke;
 }
+/* === END BLOCK: GLOBAL_LUCIDE_SVG_BASE_V1 === */
 
 /* ============================================
    HEADER + MODAL (NO OVERFLOW MENU)
