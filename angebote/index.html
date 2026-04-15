@@ -93,18 +93,35 @@ Umfang:
           </label>
         </div>
 
-        <button
-          type="button"
-          class="filter-pill desktop-hero__toolbar-pill"
-          id="offer-situation-pill"
-          aria-haspopup="dialog"
-          aria-expanded="false"
-          aria-controls="popover-situation"
-          data-filter-key="situation"
-        >
-          <span class="filter-pill__label">Situation</span>
-          <span class="filter-pill__value" id="offer-situation-value">Alle</span>
-        </button>
+<!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V1 | Zweck: zieht auch die Aktivitäten-Filter-Pills vollständig auf explizite globale Lucide-Chevrons; Umfang: ersetzt nur Situation- und Bereich-Pill === -->
+<button
+  type="button"
+  class="filter-pill desktop-hero__toolbar-pill"
+  id="offer-situation-pill"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="popover-situation"
+  data-filter-key="situation"
+>
+  <span class="filter-pill__label">Situation</span>
+  <span class="filter-pill__value" id="offer-situation-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+
+<button
+  type="button"
+  class="filter-pill desktop-hero__toolbar-pill"
+  id="offer-category-pill"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="popover-offer-category"
+  data-filter-key="category"
+>
+  <span class="filter-pill__label">Bereich</span>
+  <span class="filter-pill__value" id="offer-category-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+<!-- === END BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V1 === -->
 
         <button
           type="button"
