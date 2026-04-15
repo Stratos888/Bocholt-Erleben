@@ -612,26 +612,43 @@
     color: color-mix(in srgb, var(--brand-green-900) 72%, var(--color-text-muted) 28%);
   }
 
-  .feed-publish-entry__main{
-    display: contents;
-  }
+/* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 | Zweck: stellt den mobilen Veranstalter-Entry auf echten SVG-Chevron-Slot um und hält Größe/Gewichtung systemisch konsistent; Umfang: ersetzt nur main/title/chevron-Styling des Feed-CTA === */
+.feed-publish-entry__main{
+  display: contents;
+}
 
-  .feed-publish-entry__title{
-    grid-area: title;
-    font-size: 0.98rem;
-    font-weight: 760;
-    line-height: 1.2;
-    color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
-  }
+.feed-publish-entry__title{
+  grid-area: title;
+  font-size: 0.98rem;
+  font-weight: 760;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
+}
 
-  .feed-publish-entry__chevron{
-    grid-area: chevron;
-    align-self: center;
-    justify-self: end;
-    font-size: 17px;
-    opacity: 0.78;
-    color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
-  }
+.feed-publish-entry__chevron{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  grid-area: chevron;
+  align-self: center;
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 16px;
+  height: 16px;
+
+  opacity: 0.88;
+  color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
+}
+
+.feed-publish-entry__chevron > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+/* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 === */
 
   @media (hover: hover){
     .feed-publish-entry:hover{
