@@ -81,12 +81,12 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     <span class="app-title">Bocholt erleben</span>
   </div>
  <div class="header-right">
-    <!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
-    <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
-      <span class="pwa-install-button__icon" data-ui-icon="download" aria-hidden="true"></span>
-      <span class="pwa-install-button__label">App</span>
-    </button>
-    <!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
+<!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
+<button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
+  <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
+  <span class="pwa-install-button__label">App</span>
+</button>
+<!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
  
 
 <!-- === BEGIN BLOCK: HEADER ABOUT CTA (opens about page) ===
@@ -136,16 +136,16 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V9 | Zweck: verankert den mobilen Veranstalter-CTA als Utility-Row im Top-Stack statt im Feed; Scope: ersetzt nur den Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX | Zweck: entfernt die doppelte Kategorie-Pill, zieht den Hero auf eindeutige Filter-IDs und nutzt für die App-Aktion nur noch das globale semantische Install-Icon; Umfang: ersetzt den kompletten Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
   <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
-              <!-- === BEGIN BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
-        <div class="desktop-entry__content">
-          <h1 class="desktop-entry__title">Veranstaltungen in Bocholt</h1>
-          <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort.</p>
-        </div>
-        <!-- === END BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
+      <!-- === BEGIN BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
+      <div class="desktop-entry__content">
+        <h1 class="desktop-entry__title">Veranstaltungen in Bocholt</h1>
+        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort.</p>
+      </div>
+      <!-- === END BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
     </div>
   </section>
 
@@ -165,24 +165,19 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         </label>
       </div>
 
-<!-- === BEGIN BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V1 | Zweck: ersetzt die impliziten Text-Chevrons der beiden Hero-Filter-Pills durch explizite globale Lucide-Icons; Umfang: nur Wann- und Kategorie-Pill im Home-Top-Stack === -->
-<button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-  <span class="filter-pill__label">Wann?</span>
-  <span class="filter-pill__value" id="filter-time-value">Alle</span>
-  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-</button>
-
-<button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
-  <span class="filter-pill__label">Kategorie</span>
-  <span class="filter-pill__value" id="filter-category-value">Alle</span>
-  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-</button>
-<!-- === END BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V1 === -->
+      <!-- === BEGIN BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: hält im Hero genau eine Wann-Pill und genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: nur Hero-Filter-Pills === -->
+      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+        <span class="filter-pill__label">Wann?</span>
+        <span class="filter-pill__value" id="filter-time-value">Alle</span>
+        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </button>
 
       <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
         <span class="filter-pill__label">Kategorie</span>
         <span class="filter-pill__value" id="filter-category-value">Alle</span>
+        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </button>
+      <!-- === END BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 === -->
 
       <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" aria-label="Filter zurücksetzen" hidden>
         <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
@@ -210,13 +205,13 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         data-pwa-install-trigger
         aria-label="Als App installieren"
       >
-        <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="smartphone" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
         <span>Als App nutzen</span>
       </button>
     </div>
   </div>
 </section>
-<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V9 === -->
+<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX === -->
 
 <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
   <div class="filter-sheet__overlay" data-close-sheet></div>
