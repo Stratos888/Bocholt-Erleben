@@ -2,21 +2,32 @@
 Zweck:
 - Zentrale offizielle Lucide-Registry als einzige Quelle für SVG-Icons.
 - Appweit konsistente Icons: 24x24 viewBox, stroke=currentColor, round caps/joins.
-- Kategorie-Tokens bleiben stabil, werden intern aber nur noch auf offizielle Lucide-Basisicons aufgelöst.
+- Zentrale Alias- und Kategorie-Normalisierung, damit Cards, Detailpanel, Header, Hero, Filter und Activities dieselben Icon-Keys nutzen.
 Umfang:
-- Exportiert window.Icons.svg(name, { className }), window.Icons.categoryKey(categoryName) und window.Icons.hydrate(root).
+- Exportiert window.Icons.svg(name, { className }), window.Icons.resolve(name), window.Icons.categoryKey(categoryName), window.Icons.categoryMeta(categoryName) und window.Icons.hydrate(root).
 */
 (() => {
   "use strict";
 
   const escAttr = (s) => String(s || "").replace(/"/g, "&quot;");
 
+  const normalizeKey = (value) => String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/&/g, " und ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
   /* BEGIN BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE)
   Zweck:
   - Nur offizielle Lucide-Basisicons in der Registry halten.
-  - Projekt-Kategorie-Tokens nicht mehr als eigene SVG-Formen zeichnen, sondern nur noch per Alias auf offizielle Lucide-Icons mappen.
+  - Alle appweiten UI-Icons über echte SVG-Nodes statt Textzeichen oder Emoji versorgen.
   Umfang:
-  - UI-Icons + offizielle Lucide-Basisicons für Cards, Detailpanel, Hero, Header und Tabbar.
+  - UI-Icons + Kategorie-Basisicons für Cards, Detailpanel, Hero, Header, Filter und Tabbar.
   */
   /* eslint-disable max-len */
   const ICONS = {
@@ -104,12 +115,30 @@ Umfang:
     activity: `
       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     `,
+    "chevron-right": `
+      <path d="m9 18 6-6-6-6" />
+    `,
+    "chevron-left": `
+      <path d="m15 18-6-6 6-6" />
+    `,
   };
   /* eslint-enable max-len */
   /* END BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE) */
 
-  /* === BEGIN BLOCK: ICON TOKEN ALIASES (CATEGORY TOKENS → OFFICIAL LUCIDE) | Zweck: hält bestehende Projekt-Tokens stabil, rendert intern aber nur noch offizielle Lucide-Basisicons | Umfang: neue zentrale Alias-Map für cat-* Tokens === */
+  /* === BEGIN BLOCK: ICON TOKEN ALIASES (SEMANTIC TOKENS → OFFICIAL LUCIDE) | Zweck: hält globale semantische Tokens stabil und rendert intern nur offizielle Lucide-Basisicons | Umfang: UI-Tokens, Navigations-Tokens und Kategorie-Tokens === */
   const ICON_ALIASES = {
+    close: "x",
+    reset: "x",
+    website: "external",
+    source: "external",
+    location: "pin",
+    "link-external": "external",
+    "app-install": "download",
+    "app-device": "smartphone",
+    "disclosure-right": "chevron-right",
+    "disclosure-left": "chevron-left",
+    "filter-next": "chevron-right",
+    "filter-prev": "chevron-left",
     "cat-market": "ticket",
     "cat-culture": "ticket",
     "cat-music": "music",
@@ -118,25 +147,101 @@ Umfang:
     "cat-sport": "activity",
     "cat-nature": "compass",
     "cat-city": "pin",
+    "cat-default": "calendar",
   };
-  /* === END BLOCK: ICON TOKEN ALIASES (CATEGORY TOKENS → OFFICIAL LUCIDE) === */
+  /* === END BLOCK: ICON TOKEN ALIASES (SEMANTIC TOKENS → OFFICIAL LUCIDE) === */
 
-  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V3 | Zweck: hält die kanonischen Projektkategorien stabil auf bestehende Projekt-Tokens gemappt; die eigentliche Form kommt ausschließlich über ICON_ALIASES aus offiziellen Lucide-Basisicons | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
-  const CATEGORY_ICON_KEY = {
-    "Märkte & Feste": "cat-market",
-    "Kinder & Familie": "cat-kids",
-    "Freizeit & Familie": "cat-kids",
-    "Musik & Bühne": "cat-music",
-    "Kultur & Kunst": "cat-culture",
-    "Kultur": "cat-culture",
-    "Sport & Bewegung": "cat-sport",
-    "Natur & Draußen": "cat-nature",
-    "Innenstadt & Leben": "cat-city",
+  /* === BEGIN BLOCK: CATEGORY NORMALIZATION MAP (RAW + CANONICAL → STABLE TOKENS) | Zweck: sorgt dafür, dass Event-Cards, Detailpanel und Activities dieselben Kategorien global gleich auflösen | Umfang: alle aktuell im Datenbestand und UI relevanten Kategorien/Fallbacks === */
+  const CATEGORY_META = {
+    markt: { token: "cat-market", canonical: "Markt", family: "market" },
+    maerkte: { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
+    "maerkte-feste": { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
+    feste: { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
+    highlights: { token: "cat-market", canonical: "Highlights", family: "market" },
+
+    kinder: { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
+    familie: { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
+    "kinder-familie": { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
+    "freizeit-familie": { token: "cat-kids", canonical: "Freizeit & Familie", family: "kids" },
+    freizeit: { token: "cat-kids", canonical: "Freizeit & Familie", family: "kids" },
+
+    musik: { token: "cat-music", canonical: "Musik & Bühne", family: "music" },
+    "musik-buehne": { token: "cat-music", canonical: "Musik & Bühne", family: "music" },
+    "musik-und-buehne": { token: "cat-music", canonical: "Musik & Bühne", family: "music" },
+
+    kultur: { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
+    "kultur-kunst": { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
+    "kultur-und-kunst": { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
+    kunst: { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
+
+    sport: { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
+    bewegung: { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
+    "sport-bewegung": { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
+    "sport-und-bewegung": { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
+
+    natur: { token: "cat-nature", canonical: "Natur & Draußen", family: "nature" },
+    draussen: { token: "cat-nature", canonical: "Natur & Draußen", family: "nature" },
+    "natur-draussen": { token: "cat-nature", canonical: "Natur & Draußen", family: "nature" },
+    "natur-und-draussen": { token: "cat-nature", canonical: "Natur & Draußen", family: "nature" },
+
+    innenstadt: { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
+    leben: { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
+    "innenstadt-leben": { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
+    "innenstadt-und-leben": { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
+
+    wirtschaft: { token: "cat-city", canonical: "Wirtschaft", family: "city" },
+
+    aktivitaet: { token: "cat-default", canonical: "Aktivität", family: "default" },
+    aktivitaeten: { token: "cat-default", canonical: "Aktivität", family: "default" },
   };
-  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V3 === */
+  /* === END BLOCK: CATEGORY NORMALIZATION MAP (RAW + CANONICAL → STABLE TOKENS) === */
+
+  const resolve = (name) => {
+    let current = String(name || "").trim();
+    const seen = new Set();
+
+    while (current && ICON_ALIASES[current] && !seen.has(current)) {
+      seen.add(current);
+      current = ICON_ALIASES[current];
+    }
+
+    return current;
+  };
+
+  const categoryMeta = (categoryName) => {
+    const normalized = normalizeKey(categoryName);
+
+    if (!normalized) {
+      return {
+        raw: "",
+        normalized: "",
+        token: "cat-default",
+        icon: resolve("cat-default"),
+        canonical: "",
+        family: "default",
+      };
+    }
+
+    const meta = CATEGORY_META[normalized] || {
+      token: "cat-default",
+      canonical: String(categoryName || "").trim(),
+      family: "default",
+    };
+
+    return {
+      raw: String(categoryName || "").trim(),
+      normalized,
+      token: meta.token,
+      icon: resolve(meta.token),
+      canonical: meta.canonical,
+      family: meta.family,
+    };
+  };
+
+  const categoryKey = (categoryName) => categoryMeta(categoryName).token || "cat-default";
 
   const svg = (name, { className = "" } = {}) => {
-    const resolvedName = ICON_ALIASES[name] || name;
+    const resolvedName = resolve(name);
     const body = ICONS[resolvedName] || ICONS.external;
     const cls = `ui-icon-svg${className ? " " + escAttr(className) : ""}`;
 
@@ -145,11 +250,6 @@ Umfang:
         ${body}
       </svg>
     `;
-  };
-
-  const categoryKey = (canonicalCategory) => {
-    if (!canonicalCategory) return "calendar";
-    return CATEGORY_ICON_KEY[canonicalCategory] || "calendar";
   };
 
   const hydrate = (root = document) => {
@@ -164,7 +264,7 @@ Umfang:
     });
   };
 
-  window.Icons = { svg, categoryKey, hydrate };
+  window.Icons = { svg, resolve, categoryKey, categoryMeta, hydrate };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => hydrate(document), { once: true });
