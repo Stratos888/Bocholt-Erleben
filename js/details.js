@@ -992,7 +992,6 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
             </div>
 
             <div class="detail-meta-rows" aria-label="Event-Infos">
-              /* === BEGIN BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V2 | Zweck: korrigiert den Meta-Block im Event-Detailpanel vollständig; Location nutzt Pin + External, Datum/Uhrzeit nutzt Calendar | Umfang: ersetzt den gesamten detail-meta-rows-Inhalt === */
               ${vm.locationLabel ? `
                 ${vm.maps ? `
                   <a
@@ -1026,7 +1025,6 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                   <span class="detail-meta-text">${escapeHtml(dateTimeLabel)}</span>
                 </div>
               ` : ""}
-              /* === END BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V2 === */
             </div>
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
