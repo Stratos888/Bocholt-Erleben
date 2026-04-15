@@ -19,6 +19,7 @@ const OfferDetailPanel = {
     return window.matchMedia("(min-width: 900px)").matches;
   },
 
+  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 | Zweck: hydriert dynamisch erzeugte data-ui-icon-Knoten im Activity-Detailpanel sofort nach dem Mount | Umfang: ersetzt nur init() Setup bis vor die Event-Listener === */
   init() {
     if (this._isInit) return;
 
@@ -30,13 +31,17 @@ const OfferDetailPanel = {
         <div class="detail-panel-overlay"></div>
         <div class="detail-panel-content">
           <div class="detail-panel-grabber" aria-hidden="true"></div>
-<button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
+          <button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
           <div class="detail-panel-body">
             <div id="detail-content"></div>
           </div>
         </div>
       </div>
     `.trim();
+
+    if (window.Icons && typeof window.Icons.hydrate === "function") {
+      window.Icons.hydrate(root);
+    }
 
     this.panel = document.getElementById("event-detail-panel");
     this.overlay = this.panel?.querySelector(".detail-panel-overlay");
@@ -45,6 +50,8 @@ const OfferDetailPanel = {
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
 
     if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
+  }
+  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 === */
 
     this.overlay.addEventListener("click", (event) => {
       if (event.target === this.overlay) this.hide();
