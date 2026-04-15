@@ -992,46 +992,42 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
             </div>
 
             <div class="detail-meta-rows" aria-label="Event-Infos">
+              /* === BEGIN BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V2 | Zweck: korrigiert den Meta-Block im Event-Detailpanel vollständig; Location nutzt Pin + External, Datum/Uhrzeit nutzt Calendar | Umfang: ersetzt den gesamten detail-meta-rows-Inhalt === */
               ${vm.locationLabel ? `
                 ${vm.maps ? `
                   <a
-                  <!-- === BEGIN BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V1 | Zweck: entfernt den letzten Legacy-Textpfeil und korrigiert Datum/Uhrzeit auf Kalender-Icon | Umfang: ersetzt nur die Location-/Datetime-Meta-Zeilen === -->
-                  ${vm.locationLabel ? `
-                    ${vm.maps ? `
-                      <a
-                        class="detail-meta-row is-location"
-                        href="${escapeHtml(vm.maps)}"
-                        target="_blank"
-                        rel="noopener"
-                        aria-label="Ort in Karten öffnen"
-                      >
-                        <span class="detail-meta-icon" aria-hidden="true">
-                          ${iconSvg("pin", "is-chip")}
-                        </span>
-                        <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
-                        <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
-                      </a>
-                    ` : `
-                      <div class="detail-meta-row is-location is-static" aria-label="Ort">
-                        <span class="detail-meta-icon" aria-hidden="true">
-                          ${iconSvg("pin", "is-chip")}
-                        </span>
-                        <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
-                      </div>
-                    `}
-                  ` : ""}
+                    class="detail-meta-row is-location"
+                    href="${escapeHtml(vm.maps)}"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Ort in Karten öffnen"
+                  >
+                    <span class="detail-meta-icon" aria-hidden="true">
+                      ${iconSvg("pin", "is-chip")}
+                    </span>
+                    <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
+                    <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
+                  </a>
+                ` : `
+                  <div class="detail-meta-row is-location is-static" aria-label="Ort">
+                    <span class="detail-meta-icon" aria-hidden="true">
+                      ${iconSvg("pin", "is-chip")}
+                    </span>
+                    <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
+                  </div>
+                `}
+              ` : ""}
 
-                  ${dateTimeLabel ? `
-                    <div class="detail-meta-row is-datetime" aria-label="Datum und Uhrzeit">
-                      <span class="detail-meta-icon" aria-hidden="true">
-                        ${iconSvg("calendar", "is-chip")}
-                      </span>
-                      <span class="detail-meta-text">${escapeHtml(dateTimeLabel)}</span>
-                    </div>
-                  ` : ""}
-                  <!-- === END BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V1 === -->
+              ${dateTimeLabel ? `
+                <div class="detail-meta-row is-datetime" aria-label="Datum und Uhrzeit">
+                  <span class="detail-meta-icon" aria-hidden="true">
+                    ${iconSvg("calendar", "is-chip")}
+                  </span>
+                  <span class="detail-meta-text">${escapeHtml(dateTimeLabel)}</span>
+                </div>
+              ` : ""}
+              /* === END BLOCK: DETAIL_PANEL_META_ICON_MAPPING_LUCIDE_V2 === */
             </div>
-          </div>
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
 
