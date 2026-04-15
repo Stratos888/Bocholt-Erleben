@@ -165,10 +165,19 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         </label>
       </div>
 
-      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-        <span class="filter-pill__label">Wann?</span>
-        <span class="filter-pill__value" id="filter-time-value">Alle</span>
-      </button>
+<!-- === BEGIN BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V1 | Zweck: ersetzt die impliziten Text-Chevrons der beiden Hero-Filter-Pills durch explizite globale Lucide-Icons; Umfang: nur Wann- und Kategorie-Pill im Home-Top-Stack === -->
+<button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
+  <span class="filter-pill__label">Wann?</span>
+  <span class="filter-pill__value" id="filter-time-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+
+<button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
+  <span class="filter-pill__label">Kategorie</span>
+  <span class="filter-pill__value" id="filter-category-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+<!-- === END BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V1 === -->
 
       <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
         <span class="filter-pill__label">Kategorie</span>
@@ -223,29 +232,33 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
       <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
       <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 | Zweck: ersetzt den nativen Mobile-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Sheet; Umfang: nur Datumsmodul im Zeit-Sheet === -->
-      <div class="filter-date-module" data-date-module>
-        <div class="filter-date-module__divider" aria-hidden="true"></div>
-        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-          <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-          <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
-        </button>
-        <div class="filter-date-panel" data-date-panel hidden>
-          <div class="filter-date-panel__header">
-            <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
-            <div class="filter-date-month-label" data-date-month-label>März 2026</div>
-            <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
-          </div>
-          <div class="filter-date-weekdays" aria-hidden="true">
-            <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-          </div>
-          <div class="filter-date-grid" data-date-grid></div>
-          <div class="filter-date-actions">
-            <button type="button" class="filter-date-action" data-date-today>Heute</button>
-          </div>
-        </div>
-      </div>
-      <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 === -->
+<!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 | Zweck: ersetzt alle Text-Chevrons im mobilen Datumsmodul durch globale Lucide-Icons; Umfang: nur Datumsmodul im Zeit-Sheet === -->
+<div class="filter-date-module" data-date-module>
+  <div class="filter-date-module__divider" aria-hidden="true"></div>
+  <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
+    <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+    <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </button>
+  <div class="filter-date-panel" data-date-panel hidden>
+    <div class="filter-date-panel__header">
+      <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span>
+      </button>
+      <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+      <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="filter-date-weekdays" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div class="filter-date-grid" data-date-grid></div>
+    <div class="filter-date-actions">
+      <button type="button" class="filter-date-action" data-date-today>Heute</button>
+    </div>
+  </div>
+</div>
+<!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 === -->
     </div>
   </div>
 </div>
@@ -475,29 +488,33 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
     <button data-time="weekend">Dieses Wochenende</button>
     <button data-time="nextweek">Nächste Woche</button>
     <button data-time="later">Später</button>
-    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 | Zweck: ersetzt den nativen Desktop-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Popover; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
-    <div class="filter-popover__divider" aria-hidden="true"></div>
-    <div class="filter-date-module filter-date-module--popover" data-date-module>
-      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-        <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-        <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
+<!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_LUCIDE_V1 | Zweck: ersetzt alle Text-Chevrons im Desktop-Datumsmodul durch globale Lucide-Icons; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
+<div class="filter-popover__divider" aria-hidden="true"></div>
+<div class="filter-date-module filter-date-module--popover" data-date-module>
+  <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
+    <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+    <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </button>
+  <div class="filter-date-panel" data-date-panel hidden>
+    <div class="filter-date-panel__header">
+      <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span>
       </button>
-      <div class="filter-date-panel" data-date-panel hidden>
-        <div class="filter-date-panel__header">
-          <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
-          <div class="filter-date-month-label" data-date-month-label>März 2026</div>
-          <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
-        </div>
-        <div class="filter-date-weekdays" aria-hidden="true">
-          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-        </div>
-        <div class="filter-date-grid" data-date-grid></div>
-        <div class="filter-date-actions">
-          <button type="button" class="filter-date-action" data-date-today>Heute</button>
-        </div>
-      </div>
+      <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+      <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </button>
     </div>
-    <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 === -->
+    <div class="filter-date-weekdays" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div class="filter-date-grid" data-date-grid></div>
+    <div class="filter-date-actions">
+      <button type="button" class="filter-date-action" data-date-today>Heute</button>
+    </div>
+  </div>
+</div>
+<!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_LUCIDE_V1 === -->
   </div>
 </div>
 
