@@ -11,12 +11,12 @@ Umfang:
 
   const escAttr = (s) => String(s || "").replace(/"/g, "&quot;");
 
-  /* BEGIN BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE)
+  /* BEGIN BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE)
   Zweck:
-  - Saubere, moderne Line-Icons für Header, Hero, Filter, Tabbar, Detailpanel und Kategorien.
-  - Beibehaltung der Token-Steuerung (Größe/Stroke/Opacity) via CSS.
+  - Zentrale Registry mit offiziell ausgerichteten Lucide-Formen für UI-Icons und Kategorie-Icons.
+  - Keine Lucide-nahen Eigenformen mehr für die primären sichtbaren Projekt-Icons.
   Umfang:
-  - UI-Icons + häufige Kategorie-Icons (Detailpanel & Cards).
+  - UI-Icons + kanonische Kategorie-Icons für Cards, Detailpanel, Hero, Header und Tabbar.
   */
   /* eslint-disable max-len */
   const ICONS = {
@@ -39,16 +39,16 @@ Umfang:
       <path d="M16 18h.01" />
     `,
     search: `
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
     `,
     plus: `
       <path d="M12 5v14" />
       <path d="M5 12h14" />
     `,
     smartphone: `
-      <rect width="10" height="18" x="7" y="3" rx="2" />
-      <path d="M11 17h2" />
+      <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+      <path d="M12 18h.01" />
     `,
     info: `
       <circle cx="12" cy="12" r="10" />
@@ -56,9 +56,9 @@ Umfang:
       <path d="M12 8h.01" />
     `,
     download: `
-      <path d="M12 3v10" />
-      <path d="m8 9 4 4 4-4" />
-      <path d="M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M12 15V3" />
     `,
     x: `
       <path d="M6 6l12 12" />
@@ -81,16 +81,48 @@ Umfang:
       <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
     `,
     compass: `
-      <circle cx="12" cy="12" r="9" />
-      <path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z" />
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    `,
+    ticket: `
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+      <path d="M13 5v2" />
+      <path d="M13 17v2" />
+      <path d="M13 11v2" />
+    `,
+    music: `
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+    `,
+    users: `
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    `,
+    activity: `
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    `,
+    "utensils-crossed": `
+      <path d="m16 2-1.5 1.5" />
+      <path d="M17.5 3.5 19 2" />
+      <path d="m21 8-5-5" />
+      <path d="m3 22 9-9" />
+      <path d="M6.5 8.5 10 12" />
+      <path d="m8 7 8-8" />
+      <path d="m14 8 1-1" />
+      <path d="m7 21 1-1" />
+      <path d="m5 19-3 3" />
+      <path d="M14.5 12.5 22 20" />
     `,
 
-    /* === BEGIN BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 | Zweck: ersetzt die schwächeren Kategorie-Icons global durch klarere, kleinere und ruhiger lesbare Formen | Umfang: ersetzt nur die Kategorie-Icon-Definitionen von cat-market bis cat-city === */
+    /* === BEGIN BLOCK: ICONS_CATEGORY_SET_OFFICIAL_LUCIDE_V2 | Zweck: Kategorie-Tokens werden auf offizielle bzw. offiziell ausgerichtete Lucide-Formen normalisiert | Umfang: ersetzt nur die Projekt-Kategorie-Token cat-market bis cat-city === */
     "cat-market": `
-      <path d="M4 9h16" />
-      <path d="M5 9v10h14V9" />
-      <path d="M4.5 9 6 5h12l1.5 4" />
-      <path d="M9 19v-5h6v5" />
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+      <path d="M13 5v2" />
+      <path d="M13 17v2" />
+      <path d="M13 11v2" />
     `,
     "cat-culture": `
       <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
@@ -99,50 +131,52 @@ Umfang:
       <path d="M13 11v2" />
     `,
     "cat-music": `
-      <path d="M9 18V5l10-2v13" />
+      <path d="M9 18V5l12-2v13" />
       <circle cx="6" cy="18" r="3" />
       <circle cx="18" cy="16" r="3" />
     `,
     "cat-food": `
-      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
-      <path d="M7 2v20" />
-      <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+      <path d="m16 2-1.5 1.5" />
+      <path d="M17.5 3.5 19 2" />
+      <path d="m21 8-5-5" />
+      <path d="m3 22 9-9" />
+      <path d="M6.5 8.5 10 12" />
+      <path d="m8 7 8-8" />
+      <path d="m14 8 1-1" />
+      <path d="m7 21 1-1" />
+      <path d="m5 19-3 3" />
+      <path d="M14.5 12.5 22 20" />
     `,
     "cat-kids": `
-      <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="10" cy="7" r="3" />
-      <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M14 4.13a4 4 0 0 1 0 5.74" />
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     `,
     "cat-sport": `
-      <path d="M6 9v6" />
-      <path d="M4 10v4" />
-      <path d="M10 8v8" />
-      <path d="M14 8v8" />
-      <path d="M18 9v6" />
-      <path d="M20 10v4" />
-      <path d="M10 12h4" />
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     `,
     "cat-nature": `
-      <path d="M6 20C17 20 20 8 20 4 16 4 6 7 6 20Z" />
-      <path d="M6 20c4-6 8-10 14-16" />
+      <path d="m17 14 3 3-3 3" />
+      <path d="M8 17h12" />
+      <path d="m7 14 5-5 5 5" />
+      <path d="m12 2 5 5H7l5-5Z" />
+      <path d="M12 17v5" />
     `,
     "cat-city": `
-      <path d="M3 21h18" />
-      <path d="M5 21V7l7-4 7 4v14" />
-      <path d="M9 9h.01" />
-      <path d="M9 13h.01" />
-      <path d="M9 17h.01" />
-      <path d="M15 9h.01" />
-      <path d="M15 13h.01" />
-      <path d="M15 17h.01" />
+      <path d="M6 22V4c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v18" />
+      <path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2" />
+      <path d="M10 6h4" />
+      <path d="M10 10h4" />
+      <path d="M10 14h4" />
+      <path d="M10 18h4" />
     `,
-    /* === END BLOCK: ICONS_CATEGORY_SET_LUCIDE_CLEANUP_V1 === */
+    /* === END BLOCK: ICONS_CATEGORY_SET_OFFICIAL_LUCIDE_V2 === */
   };
   /* eslint-enable max-len */
-  /* END BLOCK: ICON DEFINITIONS (LUCIDE-SHAPES, APP-WIDE) */
+  /* END BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE) */
 
-  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V1 | Zweck: ergänzt neben den Event-Kategorien auch die aktuellen Activity-Kategorien als globale kanonische Icon-Aliases | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
+  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V2 | Zweck: hält die kanonischen Projektkategorien stabil auf den finalen Lucide-Token-Alias gemappt | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
   const CATEGORY_ICON_KEY = {
     "Märkte & Feste": "cat-market",
     "Kinder & Familie": "cat-kids",
@@ -154,7 +188,7 @@ Umfang:
     "Natur & Draußen": "cat-nature",
     "Innenstadt & Leben": "cat-city",
   };
-  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V1 === */
+  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V2 === */
 
   const svg = (name, { className = "" } = {}) => {
     const body = ICONS[name] || ICONS.external;
