@@ -891,7 +891,7 @@
   justify-content: center;
 
   color: currentColor;
-  opacity: 0.82;
+  opacity: 1;
 }
 
 .header-right > .pwa-install-button .pwa-install-button__icon > .ui-icon-svg{
@@ -1249,7 +1249,7 @@
   width: 20px;
   height: 20px;
   margin-top: 2px;
-  opacity: 0.72;
+  opacity: 1;
   transform: none;
 }
 
@@ -1555,11 +1555,11 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
     line-height: 1.18;
   }
 
-  .page--activities .event-title .activity-card-category-icon{
-    width: 20px;
-    height: 20px;
-    opacity: 0.52;
-  }
+.page--activities .event-title .activity-card-category-icon{
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+}
 
   .page--activities .discovery-card--compact .event-card-desc{
     display: -webkit-box;
