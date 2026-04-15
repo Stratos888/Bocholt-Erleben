@@ -115,12 +115,43 @@ Umfang:
     activity: `
       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     `,
+    palette: `
+      <circle cx="13.5" cy="6.5" r=".5" />
+      <circle cx="17.5" cy="10.5" r=".5" />
+      <circle cx="8.5" cy="7.5" r=".5" />
+      <circle cx="6.5" cy="12.5" r=".5" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    `,
+    trees: `
+      <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z" />
+      <path d="M7 16v6" />
+      <path d="M13 19v3" />
+      <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5" />
+    `,
+    building: `
+      <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+      <path d="M9 22v-4h6v4" />
+      <path d="M8 6h.01" />
+      <path d="M16 6h.01" />
+      <path d="M12 6h.01" />
+      <path d="M12 10h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 10h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 10h.01" />
+      <path d="M8 14h.01" />
+    `,
+    "shopping-cart": `
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    `,
     "chevron-right": `
       <path d="m9 18 6-6-6-6" />
     `,
     "chevron-left": `
       <path d="m15 18-6-6 6-6" />
-    `,
+    `
   };
   /* eslint-enable max-len */
   /* END BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE) */
@@ -133,21 +164,26 @@ Umfang:
     source: "external",
     location: "pin",
     "link-external": "external",
+
     "app-install": "download",
-    "app-device": "smartphone",
+    "app-device": "download",
+
     "disclosure-right": "chevron-right",
     "disclosure-left": "chevron-left",
     "filter-next": "chevron-right",
     "filter-prev": "chevron-left",
+
     "cat-market": "ticket",
-    "cat-culture": "ticket",
+    "cat-culture": "palette",
     "cat-music": "music",
-    "cat-food": "ticket",
+    "cat-food": "shopping-cart",
     "cat-kids": "users",
     "cat-sport": "activity",
-    "cat-nature": "compass",
-    "cat-city": "pin",
-    "cat-default": "calendar",
+    "cat-nature": "trees",
+    "cat-city": "building",
+    "cat-business": "building",
+    "cat-activity": "compass",
+    "cat-default": "calendar"
   };
   /* === END BLOCK: ICON TOKEN ALIASES (SEMANTIC TOKENS → OFFICIAL LUCIDE) === */
 
@@ -156,13 +192,16 @@ Umfang:
     markt: { token: "cat-market", canonical: "Markt", family: "market" },
     maerkte: { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
     "maerkte-feste": { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
+    "maerkte-und-feste": { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
     feste: { token: "cat-market", canonical: "Märkte & Feste", family: "market" },
     highlights: { token: "cat-market", canonical: "Highlights", family: "market" },
 
     kinder: { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
     familie: { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
     "kinder-familie": { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
+    "kinder-und-familie": { token: "cat-kids", canonical: "Kinder & Familie", family: "kids" },
     "freizeit-familie": { token: "cat-kids", canonical: "Freizeit & Familie", family: "kids" },
+    "freizeit-und-familie": { token: "cat-kids", canonical: "Freizeit & Familie", family: "kids" },
     freizeit: { token: "cat-kids", canonical: "Freizeit & Familie", family: "kids" },
 
     musik: { token: "cat-music", canonical: "Musik & Bühne", family: "music" },
@@ -170,9 +209,9 @@ Umfang:
     "musik-und-buehne": { token: "cat-music", canonical: "Musik & Bühne", family: "music" },
 
     kultur: { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
+    kunst: { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
     "kultur-kunst": { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
     "kultur-und-kunst": { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
-    kunst: { token: "cat-culture", canonical: "Kultur & Kunst", family: "culture" },
 
     sport: { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
     bewegung: { token: "cat-sport", canonical: "Sport & Bewegung", family: "sport" },
@@ -189,10 +228,10 @@ Umfang:
     "innenstadt-leben": { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
     "innenstadt-und-leben": { token: "cat-city", canonical: "Innenstadt & Leben", family: "city" },
 
-    wirtschaft: { token: "cat-city", canonical: "Wirtschaft", family: "city" },
+    wirtschaft: { token: "cat-business", canonical: "Wirtschaft", family: "business" },
 
-    aktivitaet: { token: "cat-default", canonical: "Aktivität", family: "default" },
-    aktivitaeten: { token: "cat-default", canonical: "Aktivität", family: "default" },
+    aktivitaet: { token: "cat-activity", canonical: "Aktivität", family: "activity" },
+    aktivitaeten: { token: "cat-activity", canonical: "Aktivität", family: "activity" }
   };
   /* === END BLOCK: CATEGORY NORMALIZATION MAP (RAW + CANONICAL → STABLE TOKENS) === */
 
@@ -209,7 +248,8 @@ Umfang:
   };
 
   const categoryMeta = (categoryName) => {
-    const normalized = normalizeKey(categoryName);
+    const raw = String(categoryName || "").trim();
+    const normalized = normalizeKey(raw);
 
     if (!normalized) {
       return {
@@ -218,23 +258,23 @@ Umfang:
         token: "cat-default",
         icon: resolve("cat-default"),
         canonical: "",
-        family: "default",
+        family: "default"
       };
     }
 
     const meta = CATEGORY_META[normalized] || {
       token: "cat-default",
-      canonical: String(categoryName || "").trim(),
-      family: "default",
+      canonical: raw,
+      family: "default"
     };
 
     return {
-      raw: String(categoryName || "").trim(),
+      raw,
       normalized,
       token: meta.token,
       icon: resolve(meta.token),
       canonical: meta.canonical,
-      family: meta.family,
+      family: meta.family
     };
   };
 
