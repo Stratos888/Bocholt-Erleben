@@ -49,35 +49,56 @@ const OfferVisuals = (() => {
       .replace(/^-+|-+$/g, "");
   }
 
-  function getCategoryPresentation(category) {
-    const raw = String(category || "").trim();
-    const normalized = raw.toLowerCase();
+function getCategoryPresentation(category) {
+  const raw = String(category || "").trim();
+  const fallbackLabel = raw || "Aktivität";
 
-    if (normalized.includes("sport")) {
-      return { rawLabel: raw || "Sport & Bewegung", label: "Aktiv", iconKey: "cat-sport", modifier: "sport-bewegung" };
+  if (window.Icons && typeof window.Icons.categoryMeta === "function") {
+    const meta = window.Icons.categoryMeta(raw);
+
+    if (meta && meta.token) {
+      const labelByFamily = {
+        market: "Markt",
+        kids: "Freizeit",
+        music: "Musik",
+        culture: "Kultur",
+        sport: "Aktiv",
+        nature: "Natur",
+        city: "Lokal",
+        business: "Wirtschaft",
+        activity: "Aktivität",
+        default: fallbackLabel
+      };
+
+      const modifierByFamily = {
+        market: "markt",
+        kids: "freizeit-familie",
+        music: "musik",
+        culture: "kultur",
+        sport: "sport-bewegung",
+        nature: "natur",
+        city: "innenstadt-leben",
+        business: "wirtschaft",
+        activity: "aktivitaet",
+        default: slugify(meta.canonical || raw || "aktivitaet") || "aktivitaet"
+      };
+
+      return {
+        rawLabel: meta.canonical || fallbackLabel,
+        label: labelByFamily[meta.family] || fallbackLabel,
+        iconKey: meta.token,
+        modifier: modifierByFamily[meta.family] || slugify(meta.canonical || raw || "aktivitaet") || "aktivitaet"
+      };
     }
-
-    if (normalized.includes("natur") || normalized.includes("drau")) {
-      return { rawLabel: raw || "Natur & Draußen", label: "Natur", iconKey: "cat-nature", modifier: "natur" };
-    }
-
-    if (normalized.includes("kultur")) {
-      return { rawLabel: raw || "Kultur", label: "Kultur", iconKey: "cat-culture", modifier: "kultur" };
-    }
-
-    /* === BEGIN BLOCK: OFFERS_CATEGORY_ICON_FAMILY_V1 | Zweck: verwendet für Freizeit & Familie global ein eigenes Kategorie-Icon statt des generischen Pins | Umfang: ersetzt nur den Freizeit/Familie-Branch in getCategoryPresentation() === */
-    if (normalized.includes("freizeit") || normalized.includes("famil")) {
-      return { rawLabel: raw || "Freizeit & Familie", label: "Freizeit", iconKey: "cat-kids", modifier: "freizeit-familie" };
-    }
-    /* === END BLOCK: OFFERS_CATEGORY_ICON_FAMILY_V1 === */
-
-    return {
-      rawLabel: raw || "Aktivität",
-      label: raw || "Aktivität",
-      iconKey: "pin",
-      modifier: slugify(raw || "aktivitaet") || "aktivitaet"
-    };
   }
+
+  return {
+    rawLabel: fallbackLabel,
+    label: fallbackLabel,
+    iconKey: "cat-activity",
+    modifier: slugify(fallbackLabel) || "aktivitaet"
+  };
+}
 
   function buildMetaLine(offer) {
     return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
