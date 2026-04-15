@@ -1,8 +1,8 @@
 /* BEGIN BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH)
 Zweck:
-- Zentrale Lucide-nahe Icon-Registry als einzige Quelle für SVG-Icons.
+- Zentrale offizielle Lucide-Registry als einzige Quelle für SVG-Icons.
 - Appweit konsistente Icons: 24x24 viewBox, stroke=currentColor, round caps/joins.
-- Tokens steuern Darstellung (Größe/Stroke/Opacity) ausschließlich via CSS.
+- Kategorie-Tokens bleiben stabil, werden intern aber nur noch auf offizielle Lucide-Basisicons aufgelöst.
 Umfang:
 - Exportiert window.Icons.svg(name, { className }), window.Icons.categoryKey(categoryName) und window.Icons.hydrate(root).
 */
@@ -13,10 +13,10 @@ Umfang:
 
   /* BEGIN BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE)
   Zweck:
-  - Zentrale Registry mit offiziell ausgerichteten Lucide-Formen für UI-Icons und Kategorie-Icons.
-  - Keine Lucide-nahen Eigenformen mehr für die primären sichtbaren Projekt-Icons.
+  - Nur offizielle Lucide-Basisicons in der Registry halten.
+  - Projekt-Kategorie-Tokens nicht mehr als eigene SVG-Formen zeichnen, sondern nur noch per Alias auf offizielle Lucide-Icons mappen.
   Umfang:
-  - UI-Icons + kanonische Kategorie-Icons für Cards, Detailpanel, Hero, Header und Tabbar.
+  - UI-Icons + offizielle Lucide-Basisicons für Cards, Detailpanel, Hero, Header und Tabbar.
   */
   /* eslint-disable max-len */
   const ICONS = {
@@ -40,7 +40,7 @@ Umfang:
     `,
     search: `
       <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
+      <path d="m21 21-4.34-4.34" />
     `,
     plus: `
       <path d="M12 5v14" />
@@ -77,8 +77,8 @@ Umfang:
       <circle cx="18" cy="5" r="3" />
       <circle cx="6" cy="12" r="3" />
       <circle cx="18" cy="19" r="3" />
-      <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
-      <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+      <path d="m8.59 13.51 6.83 3.98" />
+      <path d="m15.41 6.51-6.82 3.98" />
     `,
     compass: `
       <circle cx="12" cy="12" r="10" />
@@ -104,79 +104,24 @@ Umfang:
     activity: `
       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     `,
-    "utensils-crossed": `
-      <path d="m16 2-1.5 1.5" />
-      <path d="M17.5 3.5 19 2" />
-      <path d="m21 8-5-5" />
-      <path d="m3 22 9-9" />
-      <path d="M6.5 8.5 10 12" />
-      <path d="m8 7 8-8" />
-      <path d="m14 8 1-1" />
-      <path d="m7 21 1-1" />
-      <path d="m5 19-3 3" />
-      <path d="M14.5 12.5 22 20" />
-    `,
-
-    /* === BEGIN BLOCK: ICONS_CATEGORY_SET_OFFICIAL_LUCIDE_V2 | Zweck: Kategorie-Tokens werden auf offizielle bzw. offiziell ausgerichtete Lucide-Formen normalisiert | Umfang: ersetzt nur die Projekt-Kategorie-Token cat-market bis cat-city === */
-    "cat-market": `
-      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-      <path d="M13 5v2" />
-      <path d="M13 17v2" />
-      <path d="M13 11v2" />
-    `,
-    "cat-culture": `
-      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-      <path d="M13 5v2" />
-      <path d="M13 17v2" />
-      <path d="M13 11v2" />
-    `,
-    "cat-music": `
-      <path d="M9 18V5l12-2v13" />
-      <circle cx="6" cy="18" r="3" />
-      <circle cx="18" cy="16" r="3" />
-    `,
-    "cat-food": `
-      <path d="m16 2-1.5 1.5" />
-      <path d="M17.5 3.5 19 2" />
-      <path d="m21 8-5-5" />
-      <path d="m3 22 9-9" />
-      <path d="M6.5 8.5 10 12" />
-      <path d="m8 7 8-8" />
-      <path d="m14 8 1-1" />
-      <path d="m7 21 1-1" />
-      <path d="m5 19-3 3" />
-      <path d="M14.5 12.5 22 20" />
-    `,
-    "cat-kids": `
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    `,
-    "cat-sport": `
-      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-    `,
-    "cat-nature": `
-      <path d="m17 14 3 3-3 3" />
-      <path d="M8 17h12" />
-      <path d="m7 14 5-5 5 5" />
-      <path d="m12 2 5 5H7l5-5Z" />
-      <path d="M12 17v5" />
-    `,
-    "cat-city": `
-      <path d="M6 22V4c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v18" />
-      <path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2" />
-      <path d="M10 6h4" />
-      <path d="M10 10h4" />
-      <path d="M10 14h4" />
-      <path d="M10 18h4" />
-    `,
-    /* === END BLOCK: ICONS_CATEGORY_SET_OFFICIAL_LUCIDE_V2 === */
   };
   /* eslint-enable max-len */
   /* END BLOCK: ICON DEFINITIONS (OFFICIAL LUCIDE NODES, APP-WIDE) */
 
-  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V2 | Zweck: hält die kanonischen Projektkategorien stabil auf den finalen Lucide-Token-Alias gemappt | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
+  /* === BEGIN BLOCK: ICON TOKEN ALIASES (CATEGORY TOKENS → OFFICIAL LUCIDE) | Zweck: hält bestehende Projekt-Tokens stabil, rendert intern aber nur noch offizielle Lucide-Basisicons | Umfang: neue zentrale Alias-Map für cat-* Tokens === */
+  const ICON_ALIASES = {
+    "cat-market": "ticket",
+    "cat-culture": "ticket",
+    "cat-music": "music",
+    "cat-food": "ticket",
+    "cat-kids": "users",
+    "cat-sport": "activity",
+    "cat-nature": "compass",
+    "cat-city": "pin",
+  };
+  /* === END BLOCK: ICON TOKEN ALIASES (CATEGORY TOKENS → OFFICIAL LUCIDE) === */
+
+  /* === BEGIN BLOCK: ICONS_CATEGORY_KEY_ALIASES_V3 | Zweck: hält die kanonischen Projektkategorien stabil auf bestehende Projekt-Tokens gemappt; die eigentliche Form kommt ausschließlich über ICON_ALIASES aus offiziellen Lucide-Basisicons | Umfang: ersetzt nur CATEGORY_ICON_KEY === */
   const CATEGORY_ICON_KEY = {
     "Märkte & Feste": "cat-market",
     "Kinder & Familie": "cat-kids",
@@ -188,10 +133,11 @@ Umfang:
     "Natur & Draußen": "cat-nature",
     "Innenstadt & Leben": "cat-city",
   };
-  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V2 === */
+  /* === END BLOCK: ICONS_CATEGORY_KEY_ALIASES_V3 === */
 
   const svg = (name, { className = "" } = {}) => {
-    const body = ICONS[name] || ICONS.external;
+    const resolvedName = ICON_ALIASES[name] || name;
+    const body = ICONS[resolvedName] || ICONS.external;
     const cls = `ui-icon-svg${className ? " " + escAttr(className) : ""}`;
 
     return `
@@ -200,6 +146,33 @@ Umfang:
       </svg>
     `;
   };
+
+  const categoryKey = (canonicalCategory) => {
+    if (!canonicalCategory) return "calendar";
+    return CATEGORY_ICON_KEY[canonicalCategory] || "calendar";
+  };
+
+  const hydrate = (root = document) => {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+
+    root.querySelectorAll("[data-ui-icon]").forEach((node) => {
+      const name = String(node.getAttribute("data-ui-icon") || "").trim();
+      if (!name) return;
+
+      const svgClass = String(node.getAttribute("data-ui-icon-svg-class") || "").trim();
+      node.innerHTML = svg(name, { className: svgClass });
+    });
+  };
+
+  window.Icons = { svg, categoryKey, hydrate };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => hydrate(document), { once: true });
+  } else {
+    hydrate(document);
+  }
+})();
+/* END BLOCK: ICONS REGISTRY (APP-WIDE SINGLE SOURCE OF TRUTH) */
 
   const categoryKey = (canonicalCategory) => {
     if (!canonicalCategory) return "calendar";
