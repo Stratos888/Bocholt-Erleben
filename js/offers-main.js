@@ -40,14 +40,14 @@ const OffersApp = {
     debugLog?.("=== ACTIVITIES - APP START ===");
     this.cacheRefs();
 
-    /* === BEGIN BLOCK: ACTIVITIES_LOADING_START_PARITY_V1 | Zweck: Desktop-Laden an Events angleichen – Skeleton im Feed statt Vollbild-Overlay; Mobile bleibt unverändert | Umfang: ersetzt nur den Loading-Start in init() === */
-    if (this.isDesktopViewport() && typeof window.OfferCards?.renderSkeleton === "function") {
+    /* === BEGIN BLOCK: ACTIVITIES_LOADING_START_PARITY_V2 | Zweck: gleicht Aktivitäten vollständig an die Event-Seite an – auf allen Viewports sofort Skeleton im Feed, Spinner nur noch als Fallback/Error/No-Data | Umfang: ersetzt nur den Loading-Start in init() === */
+    if (typeof window.OfferCards?.renderSkeleton === "function") {
       window.OfferCards.renderSkeleton(8);
       this.showLoading(false);
     } else {
       this.showLoading(true);
     }
-    /* === END BLOCK: ACTIVITIES_LOADING_START_PARITY_V1 === */
+    /* === END BLOCK: ACTIVITIES_LOADING_START_PARITY_V2 === */
 
     try {
       const response = await fetch("/data/offers.json", { cache: "no-store" });
