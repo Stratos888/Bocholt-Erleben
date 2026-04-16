@@ -1075,7 +1075,7 @@ Umfang:
   color: rgba(31,41,51,0.84);
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 | Zweck: wandelt den unteren Faktenbereich von formularartigen Einzelblöcken zu einer kompakteren, redaktionelleren Info-Struktur | Umfang: ersetzt nur Facts-/Fact-Styles im Activity-Detailpanel === */
+/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert scanbare Merkmals-Chips und hält die restlichen Facts im Activity-Detailpanel kompakt; Umfang: ersetzt nur Facts-/Fact-Styles im Activity-Detailpanel === */
 #event-detail-panel .activity-detail__facts{
   display: grid;
   gap: 14px;
@@ -1100,9 +1100,13 @@ Umfang:
 
 #event-detail-panel .activity-detail__fact-section{
   display: grid;
-  gap: 4px;
+  gap: 7px;
   padding-top: 12px;
   border-top: 1px solid var(--cmp-divider-strong);
+}
+
+#event-detail-panel .activity-detail__fact-section--tags{
+  gap: 9px;
 }
 
 #event-detail-panel .activity-detail__fact-label{
@@ -1124,7 +1128,29 @@ Umfang:
 #event-detail-panel .activity-detail__fact-section .activity-detail__fact-value{
   font-weight: 650;
 }
-/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 === */
+
+#event-detail-panel .activity-detail__tag-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#event-detail-panel .activity-detail__tag{
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: rgba(244,247,242,0.96);
+  border: 1px solid rgba(18,34,26,0.065);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+  color: rgba(31,41,51,0.84);
+  font-size: 0.84rem;
+  font-weight: 760;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 === */
 
 #event-detail-panel .activity-detail__actions{
   display: grid;
