@@ -30,7 +30,7 @@ Umfang:
 <!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
 </head>
 
-<body class="page-route-activities">
+<body class="page-route-activities has-bottom-tabbar">
 <!-- === BEGIN BLOCK: HEADER (logo/title + install + about) ===
 Zweck:
 - Gleiche Header-DNA wie Home
@@ -207,28 +207,16 @@ Umfang:
 <div id="offer-detail-root"></div>
 <!-- === END BLOCK: OVERLAY ROOTS (activities) === -->
 
-<!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Aktivitäten) ===
-Zweck: Primäre Navigation der zwei Haupt-Nutzseiten.
-Umfang: Bottom Tab Bar.
-=== -->
-<nav class="bottom-tabbar" aria-label="Hauptnavigation">
-  <a class="bottom-tabbar__item" href="/">
-    <span class="bottom-tabbar__icon" data-ui-icon="calendar-days" aria-hidden="true"></span>
-    <span class="bottom-tabbar__label">Events</span>
-  </a>
+<!-- === BEGIN BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 | Zweck: stellt den dedizierten Root direkt unter <body> für die zentral gerenderte mobile Primary-Navigation bereit | Umfang: genau ein Root-Container für die Bottom Tab Bar === -->
+<div id="bottom-tabbar-root"></div>
+<!-- === END BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 === -->
 
-  <a class="bottom-tabbar__item is-active" href="/angebote/" aria-current="page">
-    <span class="bottom-tabbar__icon" data-ui-icon="compass" aria-hidden="true"></span>
-    <span class="bottom-tabbar__label">Aktivitäten</span>
-  </a>
-</nav>
-<!-- === END BLOCK: BOTTOM TAB BAR (Events/Aktivitäten) === -->
-
-<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V2) ===
+<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V3) ===
 Zweck:
 - gemeinsame Icon-Registry auch auf Aktivitätenseite verfügbar
+- rendert die mobile Primary-Navigation zentral aus genau einer JS-Quelle
 - Reihenfolge garantiert:
-  1) config / pwa / modal / icons
+  1) config / pwa / modal / icons / bottom-tabbar
   2) offers (shared visuals + cards)
   3) offers-details (mobile panel)
   4) offers-main (filter + boot)
@@ -237,10 +225,11 @@ Zweck:
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
 <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+<script src="/js/bottom-tabbar.js?v=2026-04-16-1" defer></script>
 
 <script src="/js/offers.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers-details.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers-main.js?v=2026-02-04-1" defer></script>
-<!-- === END BLOCK: JS INCLUDES (activities page final order V2) === -->
+<!-- === END BLOCK: JS INCLUDES (activities page final order V3) === -->
 </body>
 </html>
