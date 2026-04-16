@@ -198,17 +198,11 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert die ortsbezogenen Basis-Merkmale im Activity-Detailpanel vor weicheren Zielgruppenangaben und hält die restlichen Facts kompakt; Umfang: ersetzt nur renderFacts(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert konkrete Ortsmerkmale als scanbare Chips und entfernt die weicheren Zielgruppenangaben aus dem Activity-Detailpanel; Umfang: ersetzt nur renderFacts(offer) === */
   renderFacts(offer) {
-    const primarySections = [
-      ["Merkmale", (offer.tags || []).join(" · ")]
-    ]
-      .map(([label, value]) => {
-        const text = String(value || "").trim();
-        if (!text) return null;
-        return { label, value: text };
-      })
-      .filter(Boolean);
+    const primaryTags = Array.isArray(offer?.tags)
+      ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean)
+      : [];
 
     const gridRows = [
       ["Saison", offer.season],
@@ -221,8 +215,7 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    const secondarySections = [
-      ["Geeignet für", (offer.audience || []).join(" · ")],
+    const sections = [
       ["Hinweis", offer.hint]
     ]
       .map(([label, value]) => {
@@ -232,16 +225,18 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    if (!primarySections.length && !gridRows.length && !secondarySections.length) return "";
+    if (!primaryTags.length && !gridRows.length && !sections.length) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${primarySections.map((row) => `
-          <section class="activity-detail__fact-section">
-            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
-            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+        ${primaryTags.length ? `
+          <section class="activity-detail__fact-section activity-detail__fact-section--tags">
+            <div class="activity-detail__fact-label">Merkmale</div>
+            <div class="activity-detail__tag-list" aria-label="Merkmale vor Ort">
+              ${primaryTags.map((tag) => `<span class="activity-detail__tag">${this.escapeHtml(tag)}</span>`).join("")}
+            </div>
           </section>
-        `).join("")}
+        ` : ""}
         ${gridRows.length ? `
           <div class="activity-detail__facts-grid">
             ${gridRows.map((row) => `
@@ -252,7 +247,7 @@ const OfferDetailPanel = {
             `).join("")}
           </div>
         ` : ""}
-        ${secondarySections.map((row) => `
+        ${sections.map((row) => `
           <section class="activity-detail__fact-section">
             <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
             <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
