@@ -1288,7 +1288,7 @@
   font-weight: 670;
 }
 
-/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V1 | Zweck: macht die Bottom Tab Bar zum globalen mobilen Primary-Nav-Owner mit zentralem Reserve-Space, identischer Shell und route-unabhängiger Komponentendefinition | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-State und Desktop-Off === */
+/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V2 | Zweck: hebt die Bottom Tab Bar auf ein ruhigeres Enterprise-Niveau mit leichterer Shell, neutraleren Inactive-States und einem zentralen Active Indicator statt voller Card-in-Card-Fläche | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
 body.has-bottom-tabbar{
   padding-bottom: var(--btb-reserve);
 }
@@ -1329,36 +1329,66 @@ body.has-bottom-tabbar{
   border-radius: var(--btb-shell-radius);
   background: linear-gradient(180deg, var(--btb-shell-bg-start) 0%, var(--btb-shell-bg-end) 100%);
   box-shadow: var(--btb-shell-shadow);
-  backdrop-filter: blur(18px) saturate(1.05);
-  -webkit-backdrop-filter: blur(18px) saturate(1.05);
+  backdrop-filter: blur(18px) saturate(1.02);
+  -webkit-backdrop-filter: blur(18px) saturate(1.02);
 }
 
-.bottom-tabbar__item{
+.bottom-tabbar__item,
+.bottom-tabbar__item:link,
+.bottom-tabbar__item:visited{
+  position: relative;
+  isolation: isolate;
   min-height: var(--btb-item-minh);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
+  padding: 5px 10px 6px;
   border-radius: var(--btb-item-radius);
   color: var(--btb-item-fg);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition:
-    background-color 160ms ease,
     color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    opacity 160ms ease;
+}
+
+.bottom-tabbar__item::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--btb-item-indicator-w);
+  height: calc(100% - 10px);
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--btb-item-indicator-border);
+  border-radius: calc(var(--btb-item-radius) - 4px);
+  background: var(--btb-item-indicator-bg);
+  box-shadow: var(--btb-item-indicator-shadow);
+  opacity: 0;
+  transition:
+    opacity 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+  z-index: 0;
+}
+
+.bottom-tabbar__item > *{
+  position: relative;
+  z-index: 1;
 }
 
 .bottom-tabbar__item[aria-current="page"],
-.bottom-tabbar__item.is-active{
+.bottom-tabbar__item.is-active,
+.bottom-tabbar__item[aria-current="page"]:visited,
+.bottom-tabbar__item.is-active:visited{
   color: var(--btb-item-fg-active);
-  background: var(--btb-item-bg-active);
-  box-shadow:
-    inset 0 0 0 1px var(--btb-item-border-active),
-    var(--btb-item-shadow-active);
-  transform: translateY(-1px);
+}
+
+.bottom-tabbar__item[aria-current="page"]::before,
+.bottom-tabbar__item.is-active::before{
+  opacity: 1;
 }
 
 .bottom-tabbar__icon{
@@ -1383,19 +1413,29 @@ body.has-bottom-tabbar{
 
 .bottom-tabbar__item:focus-visible{
   outline: none;
+}
+
+.bottom-tabbar__item:focus-visible::before{
+  opacity: 1;
   box-shadow:
-    inset 0 0 0 1px rgba(24,40,30,0.12),
-    0 0 0 4px var(--ui-focus-ring),
-    var(--btb-item-shadow-active);
+    var(--btb-item-indicator-shadow),
+    0 0 0 4px var(--ui-focus-ring);
 }
 
 @media (hover: hover) and (pointer: fine){
-  .bottom-tabbar__item:hover{
+  .bottom-tabbar__item:hover,
+  .bottom-tabbar__item:hover:visited{
     color: var(--color-text-primary);
-    background: rgba(255,255,255,0.82);
-    box-shadow:
-      inset 0 0 0 1px rgba(24,40,30,0.08),
-      0 8px 18px rgba(10,24,16,0.07);
+  }
+
+  .bottom-tabbar__item:hover::before{
+    opacity: 0.72;
+    background: rgba(255,255,255,0.78);
+  }
+
+  .bottom-tabbar__item[aria-current="page"]:hover::before,
+  .bottom-tabbar__item.is-active:hover::before{
+    opacity: 1;
   }
 }
 
@@ -1408,7 +1448,7 @@ body.has-bottom-tabbar{
     display: none;
   }
 }
-/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V1 === */
+/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V2 === */
 
 #event-detail-panel .activity-detail__media--freizeit-familie{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
