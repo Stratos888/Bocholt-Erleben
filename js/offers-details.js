@@ -146,9 +146,12 @@ const OfferDetailPanel = {
     };
   },
 
-  buildMapsUrl(location) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location || "")}`;
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MAPS_QUERY_V1 | Zweck: nutzt für Activities bevorzugt einen verifizierten maps_query-Startpunkt statt der generischen Ortsangabe; Umfang: ersetzt nur buildMapsUrl(...) === */
+  buildMapsUrl(offer) {
+    const query = String(offer?.maps_query || offer?.location || "").trim();
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   },
+  /* === END BLOCK: OFFERS_DETAIL_MAPS_QUERY_V1 === */
 
   /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
   renderMedia(offer) {
@@ -254,7 +257,7 @@ const OfferDetailPanel = {
   /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
 
   renderContent(offer) {
-    const mapsUrl = this.buildMapsUrl(offer.location);
+    const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
       ? window.OfferVisuals.normalizeHttpUrl(offer.url)
       : String(offer.url || "").trim();
