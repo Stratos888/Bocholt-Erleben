@@ -1206,27 +1206,35 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
     const timeButtons = this.getFacetButtons("time");
     const catButtons = this.getFacetButtons("category");
 
+    /* === BEGIN BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V1 | Zweck: entkoppelt das Events-Facet-Counting von der Mobile-Sheet-Klasse, damit Desktop-Popover dieselben Counts wie Mobile anzeigen und die bestehende Sortierung sichtbar konsistent wirkt; Umfang: ersetzt nur die Count-State-Schleifen für Zeit- und Kategorie-Facets in updateFacetOptionStates() === */
     timeButtons.forEach((button) => {
       const key = this.getFacetButtonValue(button, "time");
       const count = timeCounts[key] ?? 0;
       const enabled = key === "all" ? true : count > 0;
-      const withCount = button.classList.contains("filter-sheet-option");
-      this.setFacetButtonState(button, { enabled, count, withCount });
+      this.setFacetButtonState(button, { enabled, count, withCount: true });
     });
 
     catButtons.forEach((button) => {
       const raw = this.getFacetButtonValue(button, "category");
-      const withCount = button.classList.contains("filter-sheet-option");
 
       if (!raw) {
-        this.setFacetButtonState(button, { enabled: true, count: baseForCat.length, withCount });
+        this.setFacetButtonState(button, {
+          enabled: true,
+          count: baseForCat.length,
+          withCount: true
+        });
         return;
       }
 
       const canonical = this.normalizeCategory(raw) || raw;
       const count = catCounts[canonical] ?? 0;
-      this.setFacetButtonState(button, { enabled: count > 0, count, withCount });
+      this.setFacetButtonState(button, {
+        enabled: count > 0,
+        count,
+        withCount: true
+      });
     });
+    /* === END BLOCK: EVENTS_DESKTOP_FACET_COUNTS_PARITY_V1 === */
 
     const sortCategoryContainer = (container) => {
       if (!container) return;
