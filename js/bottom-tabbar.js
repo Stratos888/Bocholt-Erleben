@@ -1,11 +1,13 @@
-/* === BEGIN BLOCK: BOTTOM_TABBAR_RENDERER_V2 | Zweck: rendert die mobile Primary-Navigation zentral, setzt den Active-State automatisch und wärmt beim Wechsel die Zielroute inkl. Kern-Daten vor, damit Tabs auf Mobile spürbar schneller reagieren | Umfang: komplette Bottom-Tab-Bar-Logik inkl. Root-Rendering, Path-Normalisierung, Warmup/Prefetch und Icon-Hydration === */
+/* === BEGIN BLOCK: BOTTOM_TABBAR_RENDERER_V2 | Zweck: verhindert Reload auf dem bereits aktiven Tab und wärmt die jeweils andere Route zentral per Prefetch/Prerender vor, damit Mobile-Tabwechsel mit der aktuellen MPA-Struktur maximal direkt wirken | Umfang: komplette Bottom-Tab-Bar-Logik inkl. Root-Rendering, Path-Normalisierung, Active-Tab-Guard, Prefetch/Prerender und Icon-Hydration === */
 (() => {
   "use strict";
 
   const ROOT_ID = "bottom-tabbar-root";
   const BODY_CLASS = "has-bottom-tabbar";
   const ROUTE_CLASS_PREFIX = "bottom-tabbar-route-";
-  const prefetched = new Set();
+  const SPECULATION_RULES_ID = "bottom-tabbar-speculation-rules";
+
+  const warmedUrls = new Set();
 
   const ITEMS = [
     {
@@ -65,20 +67,38 @@
     `;
   }
 
-  function prefetchUrl(url) {
-    const href = String(url || "").trim();
-    if (!href || prefetched.has(href)) return;
-
-    prefetched.add(href);
-
+  function supportsSpeculationRules() {
     try {
+      return !!(
+        window.HTMLScriptElement &&
+        typeof window.HTMLScriptElement.supports === "function" &&
+        window.HTMLScriptElement.supports("speculationrules")
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function addDocumentPrefetch(href) {
+    const normalizedHref = normalizePath(href);
+    if (!normalizedHref || warmedUrls.has(`doc:${normalizedHref}`) || !document.head) return;
+
+    const existing = document.head.querySelector(`link[rel="prefetch"][href="${normalizedHref}"]`);
+    if (!existing) {
       const link = document.createElement("link");
       link.rel = "prefetch";
-      link.href = href;
+      link.href = normalizedHref;
       document.head.appendChild(link);
-    } catch (_) {
-      // no-op
     }
+
+    warmedUrls.add(`doc:${normalizedHref}`);
+  }
+
+  function warmDataUrl(url) {
+    const href = String(url || "").trim();
+    if (!href || warmedUrls.has(`data:${href}`)) return;
+
+    warmedUrls.add(`data:${href}`);
 
     try {
       fetch(href, {
@@ -90,35 +110,85 @@
     }
   }
 
-  function warmItem(item) {
-    if (!item) return;
-    prefetchUrl(item.href);
-    (item.prefetch || []).forEach(prefetchUrl);
-  }
+  function applyPrerenderRules(urls) {
+    if (!supportsSpeculationRules() || !document.head) return;
 
-  function bindWarmup(root, activeItem) {
-    const anchors = root.querySelectorAll(".bottom-tabbar__item[data-tab-key]");
+    const normalizedUrls = Array.from(
+      new Set(
+        (Array.isArray(urls) ? urls : [])
+          .map((url) => normalizePath(url))
+          .filter(Boolean)
+      )
+    );
 
-    anchors.forEach((anchor) => {
-      const item = ITEMS.find((entry) => entry.key === anchor.getAttribute("data-tab-key"));
-      if (!item || item.key === activeItem?.key) return;
+    if (!normalizedUrls.length) return;
 
-      const warm = () => warmItem(item);
+    const existing = document.getElementById(SPECULATION_RULES_ID);
+    if (existing) existing.remove();
 
-      anchor.addEventListener("pointerdown", warm, { once: true });
-      anchor.addEventListener("touchstart", warm, { once: true, passive: true });
-      anchor.addEventListener("pointerenter", warm, { once: true });
-      anchor.addEventListener("focus", warm, { once: true });
+    const script = document.createElement("script");
+    script.type = "speculationrules";
+    script.id = SPECULATION_RULES_ID;
+    script.textContent = JSON.stringify({
+      prerender: [
+        {
+          source: "list",
+          urls: normalizedUrls
+        }
+      ]
     });
 
-    const inactiveItems = ITEMS.filter((item) => item.key !== activeItem?.key);
-    const idleWarmup = () => inactiveItems.forEach(warmItem);
+    document.head.appendChild(script);
+  }
 
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(idleWarmup, { timeout: 1200 });
-    } else {
-      window.setTimeout(idleWarmup, 450);
+  function warmItem(item) {
+    if (!item) return;
+    addDocumentPrefetch(item.href);
+    (item.prefetch || []).forEach(warmDataUrl);
+  }
+
+  function warmInactiveRoutes(activeKey) {
+    const inactiveItems = ITEMS.filter((item) => item.key !== activeKey);
+
+    const run = () => {
+      inactiveItems.forEach(warmItem);
+      applyPrerenderRules(inactiveItems.map((item) => item.href));
+    };
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(run, { timeout: 1200 });
+      return;
     }
+
+    window.setTimeout(run, 220);
+  }
+
+  function bindTabBehavior(root, activeItem) {
+    if (!root || !activeItem) return;
+
+    root.querySelectorAll(".bottom-tabbar__item[data-tab-key]").forEach((link) => {
+      const key = String(link.getAttribute("data-tab-key") || "").trim();
+      const item = ITEMS.find((entry) => entry.key === key);
+      if (!item) return;
+
+      if (item.key === activeItem.key) {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+        return;
+      }
+
+      const warm = () => {
+        warmItem(item);
+        applyPrerenderRules([item.href]);
+      };
+
+      link.addEventListener("pointerdown", warm, { once: true });
+      link.addEventListener("pointerenter", warm, { once: true });
+      link.addEventListener("touchstart", warm, { once: true, passive: true });
+      link.addEventListener("focus", warm, { once: true });
+    });
   }
 
   function render() {
@@ -149,11 +219,12 @@
       </nav>
     `;
 
+    bindTabBehavior(root, activeItem);
+    warmInactiveRoutes(activeItem.key);
+
     if (window.Icons && typeof window.Icons.hydrate === "function") {
       window.Icons.hydrate(root);
     }
-
-    bindWarmup(root, activeItem);
   }
 
   if (document.readyState === "loading") {
