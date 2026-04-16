@@ -1,8 +1,9 @@
-/* === BEGIN BLOCK: BOTTOM_TABBAR_RENDERER_V2 | Zweck: verhindert Reload auf dem bereits aktiven Tab und wärmt die jeweils andere Route zentral per Prefetch/Prerender vor, damit Mobile-Tabwechsel mit der aktuellen MPA-Struktur maximal direkt wirken | Umfang: komplette Bottom-Tab-Bar-Logik inkl. Root-Rendering, Path-Normalisierung, Active-Tab-Guard, Prefetch/Prerender und Icon-Hydration === */
+/* === BEGIN BLOCK: BOTTOM_SHELL_NAV_RENDERER_V3 | Zweck: rendert mobile Bottom-Navigation und Desktop-Bereichs-Navigation aus genau einer zentralen Route-Definition, verhindert Reload auf dem aktiven Ziel und wärmt die Gegenseite per Prefetch/Prerender vor | Umfang: kompletter zentrale Shell-Navigation inkl. Mobile/Desktop-Rendering, Path-Normalisierung, Active-Guard, Warmup und Icon-Hydration === */
 (() => {
   "use strict";
 
-  const ROOT_ID = "bottom-tabbar-root";
+  const BOTTOM_ROOT_ID = "bottom-tabbar-root";
+  const DESKTOP_ROOT_ID = "desktop-section-nav-root";
   const BODY_CLASS = "has-bottom-tabbar";
   const ROUTE_CLASS_PREFIX = "bottom-tabbar-route-";
   const SPECULATION_RULES_ID = "bottom-tabbar-speculation-rules";
@@ -54,17 +55,6 @@
     [...body.classList]
       .filter((cls) => cls.startsWith(ROUTE_CLASS_PREFIX))
       .forEach((cls) => body.classList.remove(cls));
-  }
-
-  function createItemMarkup(item, activeKey) {
-    const isActive = item.key === activeKey;
-
-    return `
-      <a class="bottom-tabbar__item${isActive ? " is-active" : ""}" href="${item.href}" data-tab-key="${item.key}"${isActive ? ' aria-current="page"' : ""}>
-        <span class="bottom-tabbar__icon" data-ui-icon="${item.icon}" aria-hidden="true"></span>
-        <span class="bottom-tabbar__label">${item.label}</span>
-      </a>
-    `;
   }
 
   function supportsSpeculationRules() {
@@ -163,10 +153,29 @@
     window.setTimeout(run, 220);
   }
 
-  function bindTabBehavior(root, activeItem) {
+  function createBottomItemMarkup(item, activeKey) {
+    const isActive = item.key === activeKey;
+
+    return `
+      <a class="bottom-tabbar__item${isActive ? " is-active" : ""}" href="${item.href}" data-tab-key="${item.key}"${isActive ? ' aria-current="page"' : ""}>
+        <span class="bottom-tabbar__icon" data-ui-icon="${item.icon}" aria-hidden="true"></span>
+        <span class="bottom-tabbar__label">${item.label}</span>
+      </a>
+    `;
+  }
+
+  function createDesktopItemMarkup(item, activeKey) {
+    const isActive = item.key === activeKey;
+
+    return `
+      <a class="desktop-section-nav__item${isActive ? " is-active" : ""}" href="${item.href}" data-tab-key="${item.key}"${isActive ? ' aria-current="page"' : ""}>${item.label}</a>
+    `;
+  }
+
+  function bindNavBehavior(root, activeItem) {
     if (!root || !activeItem) return;
 
-    root.querySelectorAll(".bottom-tabbar__item[data-tab-key]").forEach((link) => {
+    root.querySelectorAll("[data-tab-key]").forEach((link) => {
       const key = String(link.getAttribute("data-tab-key") || "").trim();
       const item = ITEMS.find((entry) => entry.key === key);
       if (!item) return;
@@ -191,11 +200,54 @@
     });
   }
 
-  function render() {
-    const root = document.getElementById(ROOT_ID);
-    const body = document.body;
+  function hideRoot(root) {
+    if (!root) return;
+    root.innerHTML = "";
+    root.hidden = true;
+  }
 
-    if (!root || !body) return;
+  function renderBottomNav(root, activeItem) {
+    if (!root || !activeItem) return;
+
+    root.hidden = false;
+    root.setAttribute("data-bottom-tabbar-route", activeItem.key);
+    root.innerHTML = `
+      <nav class="bottom-tabbar" aria-label="Hauptnavigation">
+        <div class="bottom-tabbar__inner" style="--bottom-tab-count: ${ITEMS.length};">
+          ${ITEMS.map((item) => createBottomItemMarkup(item, activeItem.key)).join("")}
+        </div>
+      </nav>
+    `;
+
+    bindNavBehavior(root, activeItem);
+
+    if (window.Icons && typeof window.Icons.hydrate === "function") {
+      window.Icons.hydrate(root);
+    }
+  }
+
+  function renderDesktopNav(root, activeItem) {
+    if (!root || !activeItem) return;
+
+    root.hidden = false;
+    root.setAttribute("data-desktop-section-nav-route", activeItem.key);
+    root.innerHTML = `
+      <nav class="desktop-section-nav" aria-label="Bereiche">
+        <div class="desktop-section-nav__inner">
+          ${ITEMS.map((item) => createDesktopItemMarkup(item, activeItem.key)).join("")}
+        </div>
+      </nav>
+    `;
+
+    bindNavBehavior(root, activeItem);
+  }
+
+  function render() {
+    const body = document.body;
+    const bottomRoot = document.getElementById(BOTTOM_ROOT_ID);
+    const desktopRoot = document.getElementById(DESKTOP_ROOT_ID);
+
+    if (!body) return;
 
     const pathname = normalizePath(window.location.pathname);
     const activeItem = getActiveItem(pathname);
@@ -203,28 +255,16 @@
     clearBodyState(body);
 
     if (!activeItem) {
-      root.innerHTML = "";
-      root.hidden = true;
+      hideRoot(bottomRoot);
+      hideRoot(desktopRoot);
       return;
     }
 
-    root.hidden = false;
     body.classList.add(BODY_CLASS, `${ROUTE_CLASS_PREFIX}${activeItem.key}`);
-    root.setAttribute("data-bottom-tabbar-route", activeItem.key);
-    root.innerHTML = `
-      <nav class="bottom-tabbar" aria-label="Hauptnavigation">
-        <div class="bottom-tabbar__inner" style="--bottom-tab-count: ${ITEMS.length};">
-          ${ITEMS.map((item) => createItemMarkup(item, activeItem.key)).join("")}
-        </div>
-      </nav>
-    `;
 
-    bindTabBehavior(root, activeItem);
+    renderBottomNav(bottomRoot, activeItem);
+    renderDesktopNav(desktopRoot, activeItem);
     warmInactiveRoutes(activeItem.key);
-
-    if (window.Icons && typeof window.Icons.hydrate === "function") {
-      window.Icons.hydrate(root);
-    }
   }
 
   if (document.readyState === "loading") {
@@ -233,4 +273,4 @@
     render();
   }
 })();
-/* === END BLOCK: BOTTOM_TABBAR_RENDERER_V2 === */
+/* === END BLOCK: BOTTOM_SHELL_NAV_RENDERER_V3 === */
