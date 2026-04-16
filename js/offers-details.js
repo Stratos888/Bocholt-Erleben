@@ -146,12 +146,18 @@ const OfferDetailPanel = {
     };
   },
 
-  /* === BEGIN BLOCK: OFFERS_DETAIL_MAPS_QUERY_V1 | Zweck: nutzt für Activities bevorzugt einen verifizierten maps_query-Startpunkt statt der generischen Ortsangabe; Umfang: ersetzt nur buildMapsUrl(...) === */
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MAPS_URL_V2 | Zweck: erzwingt für Activities konkrete Navigation per directions-URL und erlaubt optional einen exakt hinterlegten maps_url-Override; Umfang: ersetzt nur buildMapsUrl(...) === */
   buildMapsUrl(offer) {
-    const query = String(offer?.maps_query || offer?.location || "").trim();
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    const explicitUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.maps_url)
+      : String(offer?.maps_url || "").trim();
+
+    if (explicitUrl) return explicitUrl;
+
+    const destination = String(offer?.maps_query || offer?.location || "").trim();
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
   },
-  /* === END BLOCK: OFFERS_DETAIL_MAPS_QUERY_V1 === */
+  /* === END BLOCK: OFFERS_DETAIL_MAPS_URL_V2 === */
 
   /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
   renderMedia(offer) {
@@ -261,6 +267,8 @@ const OfferDetailPanel = {
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
       ? window.OfferVisuals.normalizeHttpUrl(offer.url)
       : String(offer.url || "").trim();
+    const mapsLabel = String(offer?.maps_label || "Zum Startpunkt navigieren").trim();
+    const websiteLabel = String(offer?.website_label || "Website / Infos").trim();
     const metaLine = window.OfferVisuals?.buildMetaLine
       ? window.OfferVisuals.buildMetaLine(offer)
       : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
@@ -281,8 +289,8 @@ const OfferDetailPanel = {
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
           ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
-            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
-            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>` : ""}
+            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(mapsLabel)}</a>
+            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(websiteLabel)}</a>` : ""}
           </div>
         </div>
       </article>
