@@ -101,6 +101,20 @@
   --btb-reserve: calc(var(--btb-item-minh) + (var(--btb-shell-pad) * 2) + var(--btb-offset-bottom) + env(safe-area-inset-bottom) + 12px);
   /* === END BLOCK: BOTTOM_TABBAR_TOKENS_V3 === */
 
+  /* === BEGIN BLOCK: DESKTOP_SECTION_NAV_TOKENS_V1 | Zweck: definiert die zentrale Desktop-Bereichs-Navigation als ruhige, text-first Shell direkt unter dem Header | Umfang: nur Tokens für Geometrie, Farben und Active-State der Desktop-Section-Nav === */
+  --dsn-minh: 46px;
+  --dsn-gap: 22px;
+  --dsn-item-pad-x: 2px;
+  --dsn-border: rgba(24,40,30,0.08);
+  --dsn-bg-start: rgba(248,248,241,0.92);
+  --dsn-bg-end: rgba(243,245,236,0.84);
+  --dsn-shadow: 0 1px 0 rgba(255,255,255,0.82) inset;
+  --dsn-fg: rgba(24,40,30,0.64);
+  --dsn-fg-hover: rgba(24,40,30,0.84);
+  --dsn-fg-active: var(--color-text-primary);
+  --dsn-indicator: color-mix(in srgb, var(--brand-lime-400) 72%, var(--brand-gold-200) 28%);
+  /* === END BLOCK: DESKTOP_SECTION_NAV_TOKENS_V1 === */
+
   /* Cards */
   --radius-card: 12px;
   --shadow-card:
