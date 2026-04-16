@@ -281,7 +281,7 @@ const OffersApp = {
     return String(rawValue || "").trim();
   },
 
-  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 | Zweck: zieht die Activities-Facets bei Counts/Disabled-State auf den Event-Stand und hält Merkmal/Kategorie anhand der jeweils anderen aktiven Filter konsistent; Umfang: ersetzt die Facet-Rendering- und Apply-Logik von populateButtons() bis applyFilterAndRender() === */
+  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_PARITY_V2 | Zweck: konsolidiert die Activities-Facetlogik, priorisiert Merkmal/Kategorie nach Trefferstärke und hält Counts/Disabled-State ohne doppelte Owner-Blöcke stabil; Umfang: ersetzt die komplette Facet-Rendering- und Apply-Logik von populateButtons() bis direkt vor showLoading(show) === */
   populateButtons(targets, attrName, entries) {
     const markup = [
       `<button type="button" class="filter-sheet-option is-active" ${attrName}="" data-label="Alle">Alle</button>`,
@@ -371,6 +371,40 @@ const OffersApp = {
     }
   },
 
+  sortFacetContainers(group, countMap) {
+    const attrName = group === "situation" ? "data-situation" : "data-category";
+    const targets = group === "situation"
+      ? [this.refs.situationSheetOptions, this.refs.situationPopoverOptions]
+      : [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions];
+
+    targets.forEach((target) => {
+      if (!target) return;
+
+      const allButton = target.querySelector(`.filter-sheet-option[${attrName}=""]`);
+      const buttons = Array.from(target.querySelectorAll(`.filter-sheet-option[${attrName}]`))
+        .filter((button) => this.getFacetButtonValue(button, group).length > 0);
+
+      buttons.sort((a, b) => {
+        const aValue = this.getFacetButtonValue(a, group);
+        const bValue = this.getFacetButtonValue(b, group);
+        const aCount = countMap[aValue] || 0;
+        const bCount = countMap[bValue] || 0;
+        if (bCount !== aCount) return bCount - aCount;
+
+        const aLabel = String(a.getAttribute("data-label") || a.textContent || "")
+          .trim()
+          .replace(/\s*\(\d+\)\s*$/, "");
+        const bLabel = String(b.getAttribute("data-label") || b.textContent || "")
+          .trim()
+          .replace(/\s*\(\d+\)\s*$/, "");
+        return aLabel.localeCompare(bLabel, "de");
+      });
+
+      if (allButton) target.appendChild(allButton);
+      buttons.forEach((button) => target.appendChild(button));
+    });
+  },
+
   updateFacetOptionStates() {
     const searchNeedle = String(this.searchTerm || "").trim().toLowerCase();
     const activeSituation = String(this.activeSituation || "").trim();
@@ -434,6 +468,11 @@ const OffersApp = {
         count
       });
     });
+
+    this.sortFacetContainers("situation", situationCounts);
+    this.sortFacetContainers("category", categoryCounts);
+    this.syncSituationSelection();
+    this.syncCategorySelection();
 
     return true;
   },
@@ -715,145 +754,7 @@ const OffersApp = {
     this.showLoading(false);
     window.OfferCards.render(this.filteredOffers);
   },
-  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 === */
-
-  repositionOpenDesktopPopover() {
-    if (!this.activeDesktopPopover || !this.isDesktopViewport()) return;
-    const { pill, popover } = this.getDesktopPopoverRefs(this.activeDesktopPopover);
-    if (!pill || !popover || popover.hidden) return;
-    this.positionDesktopPopover(popover, pill);
-  },
-
-  closeAllDesktopPopovers() {
-    this.closeDesktopPopover("situation");
-    this.closeDesktopPopover("category");
-  },
-
-  closeAllTransientUI() {
-    this.closeSheet(this.refs.situationSheet);
-    this.closeSheet(this.refs.categorySheet);
-    this.closeAllDesktopPopovers();
-  },
-
-  setActiveOption(container, attrName, activeValue) {
-    if (!container) return;
-
-    container.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
-      const value = String(button.getAttribute(attrName) || "").trim();
-      button.classList.toggle("is-active", value === activeValue);
-    });
-  },
-
-  syncSituationSelection() {
-    this.setActiveOption(this.refs.situationSheetOptions, "data-situation", this.activeSituation);
-    this.setActiveOption(this.refs.situationPopoverOptions, "data-situation", this.activeSituation);
-  },
-
-  syncCategorySelection() {
-    this.setActiveOption(this.refs.categorySheetOptions, "data-category", this.activeCategory);
-    this.setActiveOption(this.refs.categoryPopoverOptions, "data-category", this.activeCategory);
-  },
-
-  updateFilterBarUI() {
-    const {
-      searchRow,
-      situationValue,
-      categoryValue,
-      resetPill,
-      situationPill,
-      categoryPill
-    } = this.refs;
-    const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
-
-    if (situationValue) {
-      situationValue.textContent = this.activeSituation || "Alle";
-    }
-
-    if (categoryValue) {
-      categoryValue.textContent = this.activeCategory ? this.getCategoryDisplayLabel(this.activeCategory) : "Alle";
-    }
-
-    if (resetPill) {
-      resetPill.hidden = !hasActiveFilters;
-    }
-
-    if (searchRow) {
-      searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
-    }
-
-    if (situationPill) {
-      situationPill.classList.toggle("is-active", !!this.activeSituation);
-    }
-
-    if (categoryPill) {
-      categoryPill.classList.toggle("is-active", !!this.activeCategory);
-    }
-  },
-
-  resetFilters() {
-    this.searchTerm = "";
-    this.activeSituation = "";
-    this.activeCategory = "";
-
-    if (this.refs.searchInput) {
-      this.refs.searchInput.value = "";
-    }
-
-    this.syncSituationSelection();
-    this.syncCategorySelection();
-    this.closeAllTransientUI();
-    this.applyFilterAndRender();
-  },
-
-  matchesSearch(offer) {
-    if (!this.searchTerm) return true;
-
-    const haystack = [
-      offer.title,
-      offer.location,
-      offer.description,
-      offer.kategorie,
-      offer.area,
-      offer.duration,
-      offer.mode,
-      offer.price,
-      offer.hint,
-      ...(offer.tags || []),
-      ...(offer.audience || [])
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    return haystack.includes(this.searchTerm);
-  },
-
-  applyFilterAndRender() {
-    const situation = this.activeSituation;
-    const category = this.activeCategory;
-
-    this.filteredOffers = this.offers.filter((offer) => {
-      if (situation && !(offer.tags || []).includes(situation)) return false;
-      if (category && offer.kategorie !== category) return false;
-      if (!this.matchesSearch(offer)) return false;
-      return true;
-    });
-
-    if (typeof window.OfferCards?.render !== "function") {
-      console.error("OfferCards.render missing");
-      this.showError("Aktivitäten konnten nicht angezeigt werden.");
-      return;
-    }
-
-    if (!this.updateFacetOptionStates()) {
-      return;
-    }
-
-    this.updateFilterBarUI();
-    this.showLoading(false);
-    window.OfferCards.render(this.filteredOffers);
-  },
-  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 === */
+  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V2 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {
