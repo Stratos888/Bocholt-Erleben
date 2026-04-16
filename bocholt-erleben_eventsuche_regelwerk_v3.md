@@ -238,6 +238,182 @@ Diese Quellen gelten aktuell als **FREIGEGEBEN_LOW_MONETIZATION**:
 - Quartettverein Bocholt
 
 Wichtig:
+- diese Quellen sind **kein aktiver Sales-Fokus**
+- sie sind bewusst freigegeben, weil ihr Content-Wert hoch und ihre voraussichtliche Zahlungsbereitschaft eher niedrig bis höchstens mittel ist
+
+### Entscheidungsregel
+Ein Event darf nur dann aufgenommen werden, wenn:
+
+- es aus einer offiziellen, neutralen oder bewusst freigegebenen Quelle belastbar belegt ist,
+- und der Eintrag **nicht primär nur die Sichtbarkeit eines klar kundennahen, potenziell zahlungsfähigen Einzelanbieters erhöht**.
+
+### Harte Schutzregel gegen neutrale Kalender als Hintertür
+Eine offizielle oder neutrale Quelle hebt den Monetarisierungsschutz des **Eventorts / Veranstalters** nicht automatisch auf.
+
+Regel:
+- steht ein Event zwar in einer offiziellen oder neutralen Quelle, ist aber erkennbar vor allem Promo für eine einzelne kundennähere Gastro-, Club-, Bar-, Privat- oder Eventlocation, dann: **nicht aufnehmen**
+- Gleiches gilt für klar kommerzielle Einzelveranstalter, wenn der Hauptnutzen des Eintrags faktisch Reichweite für diesen Anbieter ist
+- eine neutrale Quelle allein ist also **keine automatische Freigabe** kundennaher Eventorte
+
+### Zulässige Ausnahme
+Eine Aufnahme ist trotz kundennäherem Eventort nur dann zulässig, wenn mindestens einer dieser Punkte erfüllt ist:
+
+- die Quelle selbst ist bewusst als **FREIGEGEBEN_LOW_MONETIZATION** klassifiziert,
+- das Event hat eine **eigenständige öffentliche Relevanz** und ist nicht bloß Venue-Promo,
+- oder das Event ist Teil einer klar öffentlichen, kuratierten oder institutionell geprägten Veranstaltungslogik.
+
+Beispiele für eher zulässige Ausnahmen:
+- Stadtfest
+- etablierte Kulturreihe
+- offiziell kuratierte Konzert- oder Theaterreihe
+- klar öffentlich relevantes Sonderevent
+
+Wenn unklar ist, ob ein Event trotz neutraler Quelle faktisch doch nur kundennähere Einzelpromo ist:
+
+- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
+- im **Automationsmodus**: **nicht ausgeben**
+
+Im Zweifel gilt weiterhin:
+
+- **konservativ entscheiden**
+- **lieber weglassen**
+
+## 6. Rechtlich konservative Quellenregel
+Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch oder ausdrücklich freigegeben** und **für den konkreten Termin belastbar** ist.
+
+Bevorzugte FINAL-Quellen:
+- offizielle Veranstalterseiten
+- offizielle kommunale / öffentliche Veranstaltungskalender
+- offizielle Stadt-, Kultur- oder Tourismusseiten
+- offizielle Eventseiten des Veranstalters
+- offizielle Presse-/Infoseiten, wenn ein konkretes Event mit belastbaren Fakten erkennbar ist
+
+### Discovery-Hinweis-Regel
+Folgende Quellen dürfen zur **Entdeckung** neuer Events genutzt werden:
+
+- fremde Eventkalender
+- redaktionelle Übersichtsseiten
+- allgemeine Kulturkalender
+- Ticketseiten
+- Social-/Hinweisseiten mit klar erkennbarem Eventbezug
+
+Aber:
+- solche Seiten sind **nicht automatisch FINAL-Quellen**
+- FINAL nur nach Verifikation auf einer **offiziellen Detailseite** oder gleichwertig **event-spezifischen Unterseite**
+- wenn keine belastbare offizielle oder gleichwertige FINAL-Quelle auffindbar ist:
+  - im **manuellen Prüfmodus**: **REVIEW NÖTIG**
+  - im **Automationsmodus**: **nicht ausgeben**
+
+Nicht oder nur sehr zurückhaltend nutzen:
+- fremde kommerzielle Eventkalender als reine Abschöpfungsquelle
+- Seiten mit unklaren Rechteverhältnissen
+- Seiten, bei denen nur durch Kopieren längerer Texte ein brauchbarer Eintrag möglich wäre
+- Seiten mit stark redaktionell aufbereiteten Inhalten, wenn keine reine Faktenübernahme möglich ist
+
+### Übernahmeregel
+Nur übernehmen:
+
+- Titel
+- Datum
+- Uhrzeit
+- Ort
+- Stadt
+- Quelle
+- Quellink
+- kurze sachliche Einordnung
+
+Nicht übernehmen:
+
+- längere Originalbeschreibungen
+- Werbetexte
+- redaktionelle Einleitungen
+- individuell formulierte fremde Fließtexte
+
+---
+
+## 6A. Quellenklassifikation und Suchbahnen
+
+### Grundregel
+Die KI-Suche arbeitet **nicht** als starre Closed-Whitelist.
+
+Stattdessen gilt:
+- bekannte starke Quellen aktiv mitnehmen
+- bewusst freigegebene Low-Monetization-Quellen aktiv mitnehmen
+- zusätzlich immer offen nach neuen passenden Quellen suchen
+
+### Verbindliche Suchbahnen
+Jeder Suchlauf soll in **drei Suchbahnen** gedacht werden:
+
+1. **CORE**
+2. **FREIGEGEBEN_LOW_MONETIZATION**
+3. **DISCOVERY**
+
+### Suchbahn A – CORE
+CORE umfasst bekannte, belastbare, strategisch unkritische Quellen mit hohem Ertrag.
+
+Regel:
+- CORE-Quellen bilden das stabile Grundrauschen der Suche
+- sie sollen aktiv und regelmäßig geprüft werden
+- bevorzugt zuerst offizielle und neutrale Quellen mit hoher Relevanz im Suchgebiet
+
+### Suchbahn B – FREIGEGEBEN_LOW_MONETIZATION
+Diese Suchbahn umfasst bewusst freigegebene Kulturquellen mit hoher Inhaltsqualität und niedriger bis höchstens mittlerer Monetarisierungswahrscheinlichkeit.
+
+Regel:
+- diese Quellen dürfen aktiv gesucht werden
+- sie sind **bewusste Ausnahmen** innerhalb des Monetarisierungsschutzes
+- sie sind **kein** genereller Wegfall des Monetarisierungsschutzes
+
+### Suchbahn C – DISCOVERY
+DISCOVERY umfasst neue, bisher nicht klassifizierte Quellen im Suchgebiet.
+
+Regel:
+- DISCOVERY ist ausdrücklich erlaubt und gewünscht
+- neue Quellen dürfen gefunden und für einzelne Events genutzt werden, wenn alle übrigen Qualitätsregeln erfüllt sind
+- neue Quellen dürfen aber nicht automatisch dauerhaft als Normalquelle behandelt werden
+- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE oder FREIGEGEBEN_LOW_MONETIZATION übernommen werden
+
+### Harte Regel gegen Closed-Whitelist-Verengung
+Die KI-Suche darf **nicht** nur bekannte Quellen mechanisch abarbeiten.
+
+Regel:
+- bekannte Quellen aktiv nutzen
+- aber immer zusätzlich offen für neue passende Quellen im Suchgebiet bleiben
+
+### Zielgewichtung
+Als Zielbild gilt:
+
+- **ca. 60 % CORE**
+- **ca. 25 % FREIGEGEBEN_LOW_MONETIZATION**
+- **ca. 15 % DISCOVERY**
+
+Wenn gerade klare Content-Lücken bestehen, darf temporär auch gelten:
+
+- **ca. 50 % CORE**
+- **ca. 30 % FREIGEGEBEN_LOW_MONETIZATION**
+- **ca. 20 % DISCOVERY**
+
+DISCOVERY darf jedoch **nicht vollständig auf null gesetzt** werden.
+
+### Operative Startpunkte für die Suche
+CORE zuerst aktiv prüfen:
+
+- offizielle Veranstaltungs- und Kulturkalender der Städte im Suchgebiet
+- offizielle Seiten größerer Kulturhäuser, Theater, Museen und Musikschulen im Suchgebiet
+- alle bereits im aktuellen Projektbestand etablierten neutralen oder offiziellen Quellen
+
+Zusätzlich bewusst aktiv prüfen:
+
+- Kulturort Alte Molkerei
+- KuKuG Bocholt
+- Fontane-Kreis Bocholt
+- Koppelkerk Bredevoort
+- Nationaal Onderduikmuseum Aalten
+- Klein Theater Dinxperlo
+- Schloss Ringenberg
+- Quartettverein Bocholt
+
+Wichtig:
 - diese Liste ist **keine exklusive Whitelist**
 - sie definiert nur Quellen, die aktiv mitgedacht werden sollen
 
