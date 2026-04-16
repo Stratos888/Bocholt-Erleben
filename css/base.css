@@ -69,6 +69,36 @@
   --topstack-pad-bottom: 4px;
   --offline-badge-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px);
 
+  /* === BEGIN BLOCK: BOTTOM_TABBAR_TOKENS_V1 | Zweck: zentralisiert Geometrie, Safe-Area, Surface und Reserve der mobilen Primary-Navigation | Umfang: nur globale Tokens der Bottom Tab Bar === */
+  --btb-z: 980;
+  --btb-maxw: 680px;
+  --btb-offset-bottom: 10px;
+  --btb-shell-gap: 8px;
+  --btb-shell-pad: 7px;
+  --btb-shell-radius: 22px;
+  --btb-shell-border: rgba(24,40,30,0.11);
+  --btb-shell-bg-start: rgba(246,248,243,0.78);
+  --btb-shell-bg-end: rgba(246,248,243,0.96);
+  --btb-shell-shadow:
+    0 18px 40px rgba(10,24,16,0.12),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+
+  --btb-item-minh: 58px;
+  --btb-item-radius: 16px;
+  --btb-item-fg: rgba(24,40,30,0.68);
+  --btb-item-fg-active: var(--color-text-primary);
+  --btb-item-bg-active: rgba(255,255,255,0.92);
+  --btb-item-border-active: rgba(24,40,30,0.10);
+  --btb-item-shadow-active:
+    0 10px 22px rgba(10,24,16,0.08),
+    0 1px 0 rgba(255,255,255,0.82) inset;
+
+  --btb-icon-size: 20px;
+  --btb-label-size: 12px;
+  --btb-label-weight: 760;
+  --btb-reserve: calc(var(--btb-item-minh) + (var(--btb-shell-pad) * 2) + var(--btb-offset-bottom) + env(safe-area-inset-bottom) + 16px);
+  /* === END BLOCK: BOTTOM_TABBAR_TOKENS_V1 === */
+
   /* Cards */
   --radius-card: 12px;
   --shadow-card:
