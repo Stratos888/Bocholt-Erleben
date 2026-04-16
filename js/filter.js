@@ -172,35 +172,60 @@ const FilterModule = {
     return new Date(startDay);
   },
 
+  /* === BEGIN BLOCK: FILTER_TIME_PRESET_MATCHING_V1 | Zweck: definiert sichtbare Zeit-Presets als echte Zeiträume, damit „Diese Woche“ heute bis Sonntag umfasst und „Wochenende“ parallel nutzbar bleibt; Umfang: ersetzt getBucketForEvent() und ergänzt getTimePresetRange() + eventMatchesTimeKey() === */
+  getTimePresetRange(key, baseDate = this.toLocalDay(this.getTodayIso())) {
+    const today = baseDate ? new Date(baseDate) : null;
+    if (!today) return null;
+    today.setHours(0, 0, 0, 0);
+
+    const endThisWeek = this.endOfWeekLocal(today);
+    const weekend = this.getNextWeekendRange(today);
+    const nextWeekStart = this.addDaysLocal(endThisWeek, 1);
+    const nextWeekEnd = this.endOfDay(this.addDaysLocal(nextWeekStart, 6));
+
+    switch (key) {
+      case "today":
+        return { start: today, end: this.endOfDay(today) };
+      case "week":
+        return { start: today, end: endThisWeek };
+      case "weekend":
+        return weekend;
+      case "nextweek":
+        return { start: nextWeekStart, end: nextWeekEnd };
+      case "later":
+        return { start: this.addDaysLocal(nextWeekEnd, 1), end: null };
+      default:
+        return null;
+    }
+  },
+
+  eventMatchesTimeKey(event, key) {
+    if (key === "all") return true;
+
+    const effectiveDay = this.getEventEffectiveDay(event);
+    if (!effectiveDay) return false;
+    effectiveDay.setHours(0, 0, 0, 0);
+
+    const range = this.getTimePresetRange(key);
+    if (!range?.start) return false;
+
+    if (key === "later") return effectiveDay >= range.start;
+    return effectiveDay >= range.start && effectiveDay <= range.end;
+  },
+
   getBucketForEvent(event) {
     const effectiveDay = this.getEventEffectiveDay(event);
     if (!effectiveDay) return "later";
 
     effectiveDay.setHours(0, 0, 0, 0);
 
-    const today = this.toLocalDay(this.getTodayIso());
-    if (!today) return "later";
-
-    const weekday = today.getDay();
-    const hasThisWeek = weekday >= 1 && weekday <= 4;
-    const thisWeekStart = this.addDaysLocal(today, 1);
-    let thisWeekEnd = null;
-
-    if (hasThisWeek) {
-      thisWeekEnd = this.endOfDay(this.addDaysLocal(today, 4 - weekday));
-    }
-
-    const weekend = this.getNextWeekendRange(today);
-    const endThisWeek = this.endOfWeekLocal(today);
-    const nextWeekStart = this.addDaysLocal(endThisWeek, 1);
-    const nextWeekEnd = this.endOfDay(this.addDaysLocal(nextWeekStart, 6));
-
-    if (effectiveDay.getTime() === today.getTime()) return "today";
-    if (hasThisWeek && thisWeekEnd && effectiveDay >= thisWeekStart && effectiveDay <= thisWeekEnd) return "week";
-    if (effectiveDay >= weekend.start && effectiveDay <= weekend.end) return "weekend";
-    if (effectiveDay >= nextWeekStart && effectiveDay <= nextWeekEnd) return "nextweek";
+    if (this.eventMatchesTimeKey(event, "today")) return "today";
+    if (this.eventMatchesTimeKey(event, "weekend")) return "weekend";
+    if (this.eventMatchesTimeKey(event, "nextweek")) return "nextweek";
+    if (this.eventMatchesTimeKey(event, "week")) return "week";
     return "later";
   },
+  /* === END BLOCK: FILTER_TIME_PRESET_MATCHING_V1 === */
 
   eventMatchesSelectedDate(event, isoDate) {
     const selectedDay = this.toLocalDay(isoDate);
@@ -863,11 +888,13 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
         if (evCat !== filterCat && evCatRaw !== filterRaw) return false;
       }
 
+      /* === BEGIN BLOCK: FILTER_TIME_PRESET_APPLY_V1 | Zweck: wendet sichtbare Zeit-Filter über echte Zeiträume an, damit „Diese Woche“ korrekt heute bis Sonntag umfasst; Umfang: ersetzt nur die Zeit-Filter-Prüfung in applyFilters() === */
       if (selectedDate) {
         if (!this.eventMatchesSelectedDate(event, selectedDate)) return false;
-      } else if (timeKey !== "all") {
-        if (this.getBucketForEvent(event) !== timeKey) return false;
+      } else if (!this.eventMatchesTimeKey(event, timeKey)) {
+        return false;
       }
+      /* === END BLOCK: FILTER_TIME_PRESET_APPLY_V1 === */
 
       return true;
     });
@@ -1151,9 +1178,9 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       return evCat === filterCat || evCatRaw === catNeedle;
     };
 
+    /* === BEGIN BLOCK: FILTER_TIME_PRESET_COUNTS_V1 | Zweck: berechnet sichtbare Zeit-Facets über echte Zeiträume statt über exklusive Buckets, damit „Diese Woche“ korrekt heute bis Sonntag umfasst und die Counts konsistent bleiben; Umfang: ersetzt matchesTimeKey() + timeCounts-Aufbau in updateFacetOptionStates() === */
     const matchesTimeKey = (event, key) => {
-      if (key === "all") return true;
-      return this.getBucketForEvent(event) === key;
+      return this.eventMatchesTimeKey(event, key);
     };
 
     const baseForTime = (this.allEvents || []).filter((event) => {
@@ -1175,9 +1202,10 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       later: 0
     };
 
-    for (const event of baseForTime) {
-      const bucket = this.getBucketForEvent(event);
-      if (bucket in timeCounts) timeCounts[bucket] += 1;
+    for (const key of ["today", "week", "weekend", "nextweek", "later"]) {
+      timeCounts[key] = baseForTime.filter((event) => matchesTimeKey(event, key)).length;
+    }
+    /* === END BLOCK: FILTER_TIME_PRESET_COUNTS_V1 === */
     }
 
     const catCounts = {};
