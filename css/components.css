@@ -1448,7 +1448,7 @@ body.has-bottom-tabbar{
 }
 /* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 === */
 
-/* === BEGIN BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V1 | Zweck: bringt auf Desktop eine sichtbare, ruhige Bereichs-Navigation direkt unter den Header und trennt damit Utility, Bereichswechsel und Content systematisch | Umfang: kompletter visueller Owner der Desktop-Section-Nav inkl. Root, Items, Active-State, Hover, Focus und Mobile-Off === */
+/* === BEGIN BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V2 | Zweck: poliert die Desktop-Bereichs-Navigation auf fast-finales Enterprise-Niveau, indem der Strip sticky unter dem Header bleibt, die Cluster-Geometrie kompakter und bewusster wird und der Active-State souveräner verankert ist | Umfang: kompletter visueller Owner der Desktop-Section-Nav inkl. Sticky-Strip, Cluster-Baseline, Items, Active-State, Hover, Focus und Mobile-Off === */
 #desktop-section-nav-root{
   display: none;
 }
@@ -1456,11 +1456,14 @@ body.has-bottom-tabbar{
 @media (min-width: 900px){
   #desktop-section-nav-root{
     display: block;
-    position: relative;
-    z-index: 960;
-    background: linear-gradient(180deg, var(--dsn-bg-start) 0%, var(--dsn-bg-end) 100%);
-    border-bottom: 1px solid var(--dsn-border);
-    box-shadow: var(--dsn-shadow);
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--dsn-sticky-top));
+    z-index: 990;
+    background: linear-gradient(180deg, var(--dsn-strip-bg-start) 0%, var(--dsn-strip-bg-end) 100%);
+    border-bottom: 1px solid var(--dsn-strip-border);
+    box-shadow: var(--dsn-strip-shadow);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
 
   #desktop-section-nav-root:empty{
@@ -1475,10 +1478,24 @@ body.has-bottom-tabbar{
   }
 
   .desktop-section-nav__inner{
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--dsn-gap);
+    width: max-content;
     min-height: var(--dsn-minh);
+    padding-inline: var(--dsn-cluster-pad-x);
+  }
+
+  .desktop-section-nav__inner::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--dsn-cluster-line);
   }
 
   .desktop-section-nav__item,
@@ -1492,9 +1509,9 @@ body.has-bottom-tabbar{
     color: var(--dsn-fg);
     text-decoration: none;
     white-space: nowrap;
-    font-size: 0.97rem;
-    font-weight: 700;
-    letter-spacing: -0.012em;
+    font-size: 1rem;
+    font-weight: 760;
+    letter-spacing: -0.014em;
     line-height: 1;
     transition: color 160ms ease;
   }
@@ -1504,12 +1521,12 @@ body.has-bottom-tabbar{
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
-    height: 2px;
+    bottom: -1px;
+    height: var(--dsn-indicator-h);
     border-radius: 999px;
     background: var(--dsn-indicator);
     opacity: 0;
-    transform: scaleX(0.56);
+    transform: scaleX(0.62);
     transform-origin: center;
     transition:
       opacity 160ms ease,
@@ -1542,7 +1559,7 @@ body.has-bottom-tabbar{
     }
   }
 }
-/* === END BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V1 === */
+/* === END BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V2 === */
 
 #event-detail-panel .activity-detail__media--freizeit-familie{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
