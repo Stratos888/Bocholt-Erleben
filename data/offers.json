@@ -9,6 +9,7 @@
       "title": "Aasee erleben",
       "kategorie": "Freizeit & Familie",
       "location": "Aasee Bocholt",
+      "maps_query": "Uhlandstraße 39, 46395 Bocholt",
       "description": "Der Aasee bündelt Wasser, Wege und Freizeitangebote an einem Ort und eignet sich für einen unkomplizierten Ausflug in Bocholt.",
       "url": "https://www.bocholt.de/aasee",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aasee_Bocholt_-_Strand.jpg",
@@ -42,6 +43,7 @@
       "title": "Burloer Venn entdecken",
       "kategorie": "Natur & Draußen",
       "location": "Burlo, Borken",
+      "maps_query": "Vennweg, 46325 Borken-Burlo",
       "description": "Das Burloer Venn bietet eine grenznahe Moorlandschaft mit Rundweg und Naturerlebnis abseits der bekannteren Standardziele.",
       "url": "https://www.bocholt.de/Burloer-Venn",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331%20Burlo-Vardingholter%20Venn%2C%20Borken%20%2800892%29.jpg",
@@ -69,11 +71,12 @@
         "Natur"
       ]
     },
-       {
+    {
       "id": "hilgelo-erleben",
       "title": "Hilgelo erleben",
       "kategorie": "Freizeit & Familie",
       "location": "’t Hilgelo, Winterswijk",
+      "maps_query": "Waliënsestraat 137, 7103 EA Winterswijk",
       "description": "Der See nahe der Grenze verbindet Strand, Wasser und eine lockere Ausflugsatmosphäre für wärmere Tage.",
       "url": "https://www.hilgelomeer.de/a-erholungsgebiet-t-hilgelo",
       "image": "/assets/activities/20250704_203925.jpg",
@@ -108,8 +111,9 @@
       "title": "Heelweg entdecken",
       "kategorie": "Kultur",
       "location": "Dinxperlo / Suderwick",
+      "maps_query": "Heelweg, Dinxperlo",
       "description": "Die sichtbare Grenze im Straßenraum macht die Heelweg zu einem ungewöhnlichen Ort für einen kurzen Spaziergang mit Grenzgeschichte.",
-      "url": "https://achterhoek.nl/heelweg-dinxperlo",
+      "url": "https://achterhoek.nl/Paneel-Dinxperlo",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Heelweg%20Dinxperlo.jpg",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -139,6 +143,7 @@
       "title": "Vestingpark St. Bernardus erleben",
       "kategorie": "Kultur",
       "location": "Bredevoort",
+      "maps_query": "Kruittorenstraat 8-10, 7126 BH Bredevoort",
       "description": "Der öffentliche Park in Bredevoort verbindet ruhiges Spazieren mit historischem Charakter und markanter Kulisse.",
       "url": "https://vvvaalten-bredevoort-dinxperlo.nl/Vestingpark-St.-Bernardus-te-Bredevoort",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bredevoort%20%28NL%29%2C%20Vestingpark%20Sint%20Bernardus%20--%202018%20--%201882.jpg",
