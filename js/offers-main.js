@@ -717,6 +717,144 @@ const OffersApp = {
   },
   /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 === */
 
+  repositionOpenDesktopPopover() {
+    if (!this.activeDesktopPopover || !this.isDesktopViewport()) return;
+    const { pill, popover } = this.getDesktopPopoverRefs(this.activeDesktopPopover);
+    if (!pill || !popover || popover.hidden) return;
+    this.positionDesktopPopover(popover, pill);
+  },
+
+  closeAllDesktopPopovers() {
+    this.closeDesktopPopover("situation");
+    this.closeDesktopPopover("category");
+  },
+
+  closeAllTransientUI() {
+    this.closeSheet(this.refs.situationSheet);
+    this.closeSheet(this.refs.categorySheet);
+    this.closeAllDesktopPopovers();
+  },
+
+  setActiveOption(container, attrName, activeValue) {
+    if (!container) return;
+
+    container.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
+      const value = String(button.getAttribute(attrName) || "").trim();
+      button.classList.toggle("is-active", value === activeValue);
+    });
+  },
+
+  syncSituationSelection() {
+    this.setActiveOption(this.refs.situationSheetOptions, "data-situation", this.activeSituation);
+    this.setActiveOption(this.refs.situationPopoverOptions, "data-situation", this.activeSituation);
+  },
+
+  syncCategorySelection() {
+    this.setActiveOption(this.refs.categorySheetOptions, "data-category", this.activeCategory);
+    this.setActiveOption(this.refs.categoryPopoverOptions, "data-category", this.activeCategory);
+  },
+
+  updateFilterBarUI() {
+    const {
+      searchRow,
+      situationValue,
+      categoryValue,
+      resetPill,
+      situationPill,
+      categoryPill
+    } = this.refs;
+    const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
+
+    if (situationValue) {
+      situationValue.textContent = this.activeSituation || "Alle";
+    }
+
+    if (categoryValue) {
+      categoryValue.textContent = this.activeCategory ? this.getCategoryDisplayLabel(this.activeCategory) : "Alle";
+    }
+
+    if (resetPill) {
+      resetPill.hidden = !hasActiveFilters;
+    }
+
+    if (searchRow) {
+      searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
+    }
+
+    if (situationPill) {
+      situationPill.classList.toggle("is-active", !!this.activeSituation);
+    }
+
+    if (categoryPill) {
+      categoryPill.classList.toggle("is-active", !!this.activeCategory);
+    }
+  },
+
+  resetFilters() {
+    this.searchTerm = "";
+    this.activeSituation = "";
+    this.activeCategory = "";
+
+    if (this.refs.searchInput) {
+      this.refs.searchInput.value = "";
+    }
+
+    this.syncSituationSelection();
+    this.syncCategorySelection();
+    this.closeAllTransientUI();
+    this.applyFilterAndRender();
+  },
+
+  matchesSearch(offer) {
+    if (!this.searchTerm) return true;
+
+    const haystack = [
+      offer.title,
+      offer.location,
+      offer.description,
+      offer.kategorie,
+      offer.area,
+      offer.duration,
+      offer.mode,
+      offer.price,
+      offer.hint,
+      ...(offer.tags || []),
+      ...(offer.audience || [])
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(this.searchTerm);
+  },
+
+  applyFilterAndRender() {
+    const situation = this.activeSituation;
+    const category = this.activeCategory;
+
+    this.filteredOffers = this.offers.filter((offer) => {
+      if (situation && !(offer.tags || []).includes(situation)) return false;
+      if (category && offer.kategorie !== category) return false;
+      if (!this.matchesSearch(offer)) return false;
+      return true;
+    });
+
+    if (typeof window.OfferCards?.render !== "function") {
+      console.error("OfferCards.render missing");
+      this.showError("Aktivitäten konnten nicht angezeigt werden.");
+      return;
+    }
+
+    if (!this.updateFacetOptionStates()) {
+      return;
+    }
+
+    this.updateFilterBarUI();
+    this.showLoading(false);
+    window.OfferCards.render(this.filteredOffers);
+  },
+  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V1 === */
+
   /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {
     const loadingEl = document.getElementById("loading");
