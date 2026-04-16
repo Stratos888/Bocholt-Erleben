@@ -65,7 +65,7 @@ Umfang: Ersetzt nur den stylesheet-link (keine anderen Assets).
 
 
 </head>
-<body class="is-tabbar-hidden">
+<body class="is-tabbar-hidden has-bottom-tabbar">
 
 <!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
 Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
@@ -81,10 +81,12 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     <span class="app-title">Bocholt erleben</span>
   </div>
  <div class="header-right">
-    <!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
-    <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
-    </button>
-    <!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
+<!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
+<button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
+  <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
+  <span class="pwa-install-button__label">App</span>
+</button>
+<!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
  
 
 <!-- === BEGIN BLOCK: HEADER ABOUT CTA (opens about page) ===
@@ -98,7 +100,10 @@ Umfang:
   class="pwa-install-button"
   href="/ueber/"
   aria-label="Über Bocholt erleben"
-></a>
+>
+  <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
+  <span class="pwa-install-button__label">Info</span>
+</a>
 <!-- === END BLOCK: HEADER ABOUT CTA (opens about page) === -->
 
 
@@ -107,9 +112,9 @@ Umfang:
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
 
-
-
-
+<!-- === BEGIN BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 | Zweck: stellt direkt unter dem globalen Header einen dedizierten Root für die zentrale Desktop-Bereichs-Navigation bereit | Umfang: genau ein Root-Container für die Desktop-Section-Nav === -->
+<div id="desktop-section-nav-root"></div>
+<!-- === END BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 === -->
 
  <!-- === BEGIN BLOCK: INTRO REMOVED (Search is functional hero) ===
 Zweck: Kein Hero/Intro unter dem Header (Redundanz mit App-Titel + Search Placeholder vermeiden).
@@ -131,14 +136,16 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     </div>
     <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
 
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V9 | Zweck: verankert den mobilen Veranstalter-CTA als Utility-Row im Top-Stack statt im Feed; Scope: ersetzt nur den Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
+<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX | Zweck: entfernt die doppelte Kategorie-Pill, zieht den Hero auf eindeutige Filter-IDs und nutzt für die App-Aktion nur noch das globale semantische Install-Icon; Umfang: ersetzt den kompletten Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
 <section class="desktop-hero" aria-label="Suche und Einführung">
   <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
     <div class="desktop-entry__inner">
+      <!-- === BEGIN BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
       <div class="desktop-entry__content">
         <h1 class="desktop-entry__title">Veranstaltungen in Bocholt</h1>
-        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen<br>in Bocholt aktuell an einem Ort.</p>
+        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort.</p>
       </div>
+      <!-- === END BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
     </div>
   </section>
 
@@ -146,7 +153,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     <div class="desktop-hero__search-row" aria-label="Suche und Filter">
       <div class="events-filter desktop-hero__search-slot">
         <label class="desktop-hero__search-field" for="search-filter">
-          <span class="desktop-hero__icon desktop-hero__icon--search" aria-hidden="true"></span>
+          <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
           <input
             id="search-filter"
             type="search"
@@ -158,18 +165,22 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         </label>
       </div>
 
+      <!-- === BEGIN BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: hält im Hero genau eine Wann-Pill und genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: nur Hero-Filter-Pills === -->
       <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
         <span class="filter-pill__label">Wann?</span>
         <span class="filter-pill__value" id="filter-time-value">Alle</span>
+        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </button>
 
       <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
         <span class="filter-pill__label">Kategorie</span>
         <span class="filter-pill__value" id="filter-category-value">Alle</span>
+        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </button>
+      <!-- === END BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 === -->
 
-      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" hidden>
-        Zurücksetzen
+      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" aria-label="Filter zurücksetzen" hidden>
+        <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
       </button>
     </div>
 
@@ -179,12 +190,12 @@ Umfang: Entfernt die <section class="intro"> vollständig.
 
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
-        <span class="desktop-hero__icon desktop-hero__icon--publish" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
         <span>Event veröffentlichen</span>
       </a>
 
       <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
-        <span class="desktop-hero__icon desktop-hero__icon--info" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
         <span>Mehr erfahren</span>
       </a>
 
@@ -194,20 +205,20 @@ Umfang: Entfernt die <section class="intro"> vollständig.
         data-pwa-install-trigger
         aria-label="Als App installieren"
       >
-        <span class="desktop-hero__icon desktop-hero__icon--app" aria-hidden="true"></span>
+        <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
         <span>Als App nutzen</span>
       </button>
     </div>
   </div>
 </section>
-<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V9 === -->
+<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX === -->
 
 <div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
   <div class="filter-sheet__overlay" data-close-sheet></div>
   <div class="filter-sheet__card">
     <div class="filter-sheet__header">
       <div class="filter-sheet__title">Wann?</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
     </div>
     <div class="filter-sheet__body">
       <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
@@ -216,29 +227,33 @@ Umfang: Entfernt die <section class="intro"> vollständig.
       <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
       <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
       <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-      <!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 | Zweck: ersetzt den nativen Mobile-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Sheet; Umfang: nur Datumsmodul im Zeit-Sheet === -->
-      <div class="filter-date-module" data-date-module>
-        <div class="filter-date-module__divider" aria-hidden="true"></div>
-        <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-          <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-          <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
-        </button>
-        <div class="filter-date-panel" data-date-panel hidden>
-          <div class="filter-date-panel__header">
-            <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
-            <div class="filter-date-month-label" data-date-month-label>März 2026</div>
-            <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
-          </div>
-          <div class="filter-date-weekdays" aria-hidden="true">
-            <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-          </div>
-          <div class="filter-date-grid" data-date-grid></div>
-          <div class="filter-date-actions">
-            <button type="button" class="filter-date-action" data-date-today>Heute</button>
-          </div>
-        </div>
-      </div>
-      <!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_V2 === -->
+<!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 | Zweck: ersetzt alle Text-Chevrons im mobilen Datumsmodul durch globale Lucide-Icons; Umfang: nur Datumsmodul im Zeit-Sheet === -->
+<div class="filter-date-module" data-date-module>
+  <div class="filter-date-module__divider" aria-hidden="true"></div>
+  <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
+    <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+    <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </button>
+  <div class="filter-date-panel" data-date-panel hidden>
+    <div class="filter-date-panel__header">
+      <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span>
+      </button>
+      <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+      <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="filter-date-weekdays" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div class="filter-date-grid" data-date-grid></div>
+    <div class="filter-date-actions">
+      <button type="button" class="filter-date-action" data-date-today>Heute</button>
+    </div>
+  </div>
+</div>
+<!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 === -->
     </div>
   </div>
 </div>
@@ -248,7 +263,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
   <div class="filter-sheet__card">
     <div class="filter-sheet__header">
       <div class="filter-sheet__title">Kategorie</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen">×</button>
+      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
     </div>
     <div class="filter-sheet__body">
       <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
@@ -289,7 +304,7 @@ Umfang:
     <div class="detail-panel-content">
       <div class="detail-panel-header">
         <div class="detail-panel-handle" aria-hidden="true"></div>
-        <button class="detail-panel-close" type="button" aria-label="Schließen">×</button>
+        <button class="detail-panel-close" type="button" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
 
       <div class="detail-panel-body">
@@ -317,7 +332,7 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
     <div class="modal-card" role="dialog" aria-modal="true" aria-label="Events veröffentlichen">
       <div class="modal-header">
         <h2 class="modal-title">Events veröffentlichen</h2>
-        <button type="button" class="modal-close" data-modal-close aria-label="Schließen">×</button>
+        <button type="button" class="modal-close" data-modal-close aria-label="Schließen"><span class="modal-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
       </div>
 
       <div class="modal-body">
@@ -353,32 +368,9 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 
 
 
-    <!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
-Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar, ohne Filter-Pills.
-Umfang: Fügt eine Bottom Tab Bar direkt vor dem Footer ein. Keine bestehenden Blöcke ändern.
-=== -->
-<nav class="bottom-tabbar" aria-label="Hauptnavigation">
-  <a class="bottom-tabbar__item is-active" href="/" aria-current="page">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <!-- Calendar icon -->
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 6H4.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5ZM6 6h12V5H6v1Z"/>
-      </svg>
-    </span>
-    <span class="bottom-tabbar__label">Events</span>
-  </a>
-
-  <a class="bottom-tabbar__item" href="/angebote/">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <!-- Compass/Map icon -->
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M12 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm3.8 4.7a1 1 0 0 1 1.3 1.3l-2.1 5.2a1 1 0 0 1-.6.6l-5.2 2.1a1 1 0 0 1-1.3-1.3l2.1-5.2a1 1 0 0 1 .6-.6l5.2-2.1Zm-4.1 2.8-1.3 3.2 3.2-1.3 1.3-3.2-3.2 1.3Z"/>
-      </svg>
-    </span>
-    <span class="bottom-tabbar__label">Angebote</span>
-  </a>
-</nav>
-<!-- === END BLOCK: BOTTOM TAB BAR (Events/Angebote) === -->
+<!-- === BEGIN BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 | Zweck: stellt den dedizierten Root direkt unter <body> für die zentral gerenderte mobile Primary-Navigation bereit | Umfang: genau ein Root-Container für die Bottom Tab Bar === -->
+<div id="bottom-tabbar-root"></div>
+<!-- === END BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 === -->
 
 <!-- FOOTER -->
 
@@ -394,8 +386,8 @@ Umfang: Fügt eine Bottom Tab Bar direkt vor dem Footer ein. Keine bestehenden B
         <!-- CUSTOM JAVASCRIPT MODULES -->
 <!-- CUSTOM JAVASCRIPT MODULES -->
 <!-- === BEGIN BLOCK: CACHE-BUSTED JS INCLUDES ===
-Zweck: Stabile Lade-Reihenfolge (Config → Icons → UI/Renderer → Filter → Main),
-       damit Icons/DetailPanel/Renderer garantiert verfügbar sind, bevor main.js startet.
+Zweck: Stabile Lade-Reihenfolge (Config → Icons → UI/Renderer → Filter → Bottom Tab Bar → Main),
+       damit Icons/DetailPanel/Renderer und die mobile Primary-Navigation garantiert verfügbar sind, bevor main.js startet.
 Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 === -->
 <script src="config.js?v=2026-02-04-1"></script>
@@ -415,6 +407,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/seo-schema.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<script src="/js/bottom-tabbar.js?v=2026-04-16-1"></script>
 
 <!-- Boot zuletzt -->
 <script src="js/main.js?v=2026-02-04-1"></script>
@@ -423,20 +416,38 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 
 
 
-    <!-- PWA Service Worker Registration -->
+    <!-- === BEGIN BLOCK: PWA_SERVICE_WORKER_REGISTRATION_PROD_ONLY_V1 ===
+    Zweck:
+    - registriert den Service Worker nur auf Live/Prod
+    - verhindert Service-Worker-/Cache-Probleme auf staging bei UI-Tests
+    Umfang:
+    - ersetzt den bisherigen globalen SW-Registrierungsblock in index.html
+    === -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('✅ Service Worker registered:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('❌ Service Worker registration failed:', error);
-                    });
-            });
+      (() => {
+        const isProdHost =
+          location.hostname === 'bocholt-erleben.de' ||
+          location.hostname === 'www.bocholt-erleben.de';
+
+        if (!isProdHost) {
+          console.log('ℹ️ Service Worker auf diesem Host deaktiviert:', location.hostname);
+          return;
         }
+
+        if (!('serviceWorker' in navigator)) return;
+
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+              console.log('✅ Service Worker registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('❌ Service Worker registration failed:', error);
+            });
+        });
+      })();
     </script>
+    <!-- === END BLOCK: PWA_SERVICE_WORKER_REGISTRATION_PROD_ONLY_V1 === -->
    <!-- BEGIN: FILTER_SHEET_WIRING -->
 <!-- Inline wiring removed. Sheet open/close logic is owned by js/filter.js (single source of truth). -->
 <!-- END: FILTER_SHEET_WIRING -->
@@ -460,29 +471,33 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
     <button data-time="weekend">Dieses Wochenende</button>
     <button data-time="nextweek">Nächste Woche</button>
     <button data-time="later">Später</button>
-    <!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 | Zweck: ersetzt den nativen Desktop-Datepicker durch einen integrierten, gestylten Monatskalender im Wann-Popover; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
-    <div class="filter-popover__divider" aria-hidden="true"></div>
-    <div class="filter-date-module filter-date-module--popover" data-date-module>
-      <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-        <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-        <span class="filter-date-trigger__chevron" aria-hidden="true">›</span>
+<!-- === BEGIN BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_LUCIDE_V1 | Zweck: ersetzt alle Text-Chevrons im Desktop-Datumsmodul durch globale Lucide-Icons; Umfang: nur Datumsmodul im Desktop-Time-Popover === -->
+<div class="filter-popover__divider" aria-hidden="true"></div>
+<div class="filter-date-module filter-date-module--popover" data-date-module>
+  <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
+    <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
+    <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </button>
+  <div class="filter-date-panel" data-date-panel hidden>
+    <div class="filter-date-panel__header">
+      <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span>
       </button>
-      <div class="filter-date-panel" data-date-panel hidden>
-        <div class="filter-date-panel__header">
-          <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">‹</button>
-          <div class="filter-date-month-label" data-date-month-label>März 2026</div>
-          <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">›</button>
-        </div>
-        <div class="filter-date-weekdays" aria-hidden="true">
-          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-        </div>
-        <div class="filter-date-grid" data-date-grid></div>
-        <div class="filter-date-actions">
-          <button type="button" class="filter-date-action" data-date-today>Heute</button>
-        </div>
-      </div>
+      <div class="filter-date-month-label" data-date-month-label>März 2026</div>
+      <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">
+        <span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </button>
     </div>
-    <!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_V2 === -->
+    <div class="filter-date-weekdays" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div class="filter-date-grid" data-date-grid></div>
+    <div class="filter-date-actions">
+      <button type="button" class="filter-date-action" data-date-today>Heute</button>
+    </div>
+  </div>
+</div>
+<!-- === END BLOCK: DESKTOP_TIME_POPOVER_DATE_MODULE_LUCIDE_V1 === -->
   </div>
 </div>
 

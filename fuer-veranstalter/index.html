@@ -56,12 +56,23 @@
         </a>
       </div>
 
-      <nav class="content-links" aria-label="Alternative Navigation">
-        <a class="content-link" href="/ueber/">Zu Über Bocholt erleben</a>
-        <a class="content-link" href="/">Zurück zu den Events</a>
-      </nav>
+<!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 | Zweck: ersetzt die impliziten CSS-Text-Chevrons der Redirect-Navigation durch explizite globale Lucide-Icons; Umfang: nur die beiden content-link Einträge === -->
+<nav class="content-links" aria-label="Alternative Navigation">
+  <a class="content-link" href="/ueber/">
+    <span class="content-link__label">Zu Über Bocholt erleben</span>
+    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </a>
+  <a class="content-link" href="/">
+    <span class="content-link__label">Zurück zu den Events</span>
+    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+  </a>
+</nav>
+<!-- === END BLOCK: ORGANIZER_REDIRECT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 === -->
     </header>
   </main>
   <!-- === END BLOCK: ORGANIZER_REDIRECT_BODY_V2 === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_ICON_RUNTIME_V1 | Zweck: lädt die globale Icon-Registry auch auf /fuer-veranstalter/, damit explizite data-ui-icon-Slots wie content-link__chevron tatsächlich als Lucide-SVG gerendert werden; Umfang: nur Script-Include direkt vor </body> === -->
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_REDIRECT_ICON_RUNTIME_V1 === -->
 </body>
 </html>

@@ -19,7 +19,7 @@ const OfferDetailPanel = {
     return window.matchMedia("(min-width: 900px)").matches;
   },
 
-  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 | Zweck: hydriert dynamisch erzeugte data-ui-icon-Knoten im Activity-Detailpanel sofort nach dem Mount | Umfang: ersetzt nur init() Setup bis vor die Event-Listener === */
+  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 | Zweck: mountet das Activity-Detailpanel sauber, hydriert das Close-Icon direkt nach dem Insert und lässt die Listener innerhalb von init() | Umfang: ersetzt die gesamte init()-Methode === */
   init() {
     if (this._isInit) return;
 
@@ -50,8 +50,6 @@ const OfferDetailPanel = {
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
 
     if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
-  }
-  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V1 === */
 
     this.overlay.addEventListener("click", (event) => {
       if (event.target === this.overlay) this.hide();
@@ -70,6 +68,8 @@ const OfferDetailPanel = {
 
     this._isInit = true;
   },
+  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 === */
+
 
   show(offer) {
     const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
@@ -146,9 +146,18 @@ const OfferDetailPanel = {
     };
   },
 
-  buildMapsUrl(location) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location || "")}`;
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MAPS_URL_V2 | Zweck: erzwingt für Activities konkrete Navigation per directions-URL und erlaubt optional einen exakt hinterlegten maps_url-Override; Umfang: ersetzt nur buildMapsUrl(...) === */
+  buildMapsUrl(offer) {
+    const explicitUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(offer?.maps_url)
+      : String(offer?.maps_url || "").trim();
+
+    if (explicitUrl) return explicitUrl;
+
+    const destination = String(offer?.maps_query || offer?.location || "").trim();
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
   },
+  /* === END BLOCK: OFFERS_DETAIL_MAPS_URL_V2 === */
 
   /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
   renderMedia(offer) {
@@ -198,9 +207,13 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 | Zweck: ersetzt die formularartige Faktenliste durch eine kompaktere, redaktionellere Facts-Struktur mit kurzem Grid + längeren Textsektionen | Umfang: ersetzt nur renderFacts(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 | Zweck: priorisiert Merkmale weiter, fasst Saison/Region in einer kompakten Kurzinfo zusammen und macht den Hinweis weniger formularartig; Umfang: ersetzt nur renderFacts(offer) === */
   renderFacts(offer) {
-    const gridRows = [
+    const primaryTags = window.OfferVisuals?.getRankedTagItems
+      ? window.OfferVisuals.getRankedTagItems(offer)
+      : (Array.isArray(offer?.tags) ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean) : []);
+
+    const metaItems = [
       ["Saison", offer.season],
       ["Region", offer.area]
     ]
@@ -211,30 +224,38 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    const sections = [
-      ["Geeignet für", (offer.audience || []).join(" · ")],
-      ["Hinweis", offer.hint]
-    ]
-      .map(([label, value]) => {
-        const text = String(value || "").trim();
-        if (!text) return null;
-        return { label, value: text };
-      })
-      .filter(Boolean);
+    const note = String(offer?.hint || "").trim();
 
-    if (!gridRows.length && !sections.length) return "";
+    if (!primaryTags.length && !metaItems.length && !note) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${gridRows.length ? `
-          <div class="activity-detail__facts-grid">
-            ${gridRows.map((row) => `
-              <div class="activity-detail__fact-row">
-                <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
-                <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
-              </div>
-            `).join("")}
-          </div>
+        ${primaryTags.length ? `
+          <section class="activity-detail__fact-section activity-detail__fact-section--tags">
+            <div class="activity-detail__fact-label">Merkmale</div>
+            <div class="activity-detail__tag-list" aria-label="Merkmale vor Ort">
+              ${primaryTags.map((tag) => `<span class="activity-detail__tag">${this.escapeHtml(tag)}</span>`).join("")}
+            </div>
+          </section>
+        ` : ""}
+        ${metaItems.length ? `
+          <section class="activity-detail__fact-section activity-detail__fact-section--meta">
+            <div class="activity-detail__fact-label">Kurzinfo</div>
+            <div class="activity-detail__meta-list">
+              ${metaItems.map((item) => `
+                <div class="activity-detail__meta-chip">
+                  <span class="activity-detail__meta-key">${this.escapeHtml(item.label)}</span>
+                  <span class="activity-detail__meta-value">${this.escapeHtml(item.value)}</span>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        ` : ""}
+        ${note ? `
+          <section class="activity-detail__fact-callout" aria-label="Gut zu wissen">
+            <div class="activity-detail__fact-label">Gut zu wissen</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(note)}</div>
+          </section>
         ` : ""}
         ${sections.map((row) => `
           <section class="activity-detail__fact-section">
@@ -245,13 +266,15 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V1 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
 
   renderContent(offer) {
-    const mapsUrl = this.buildMapsUrl(offer.location);
+    const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
       ? window.OfferVisuals.normalizeHttpUrl(offer.url)
       : String(offer.url || "").trim();
+    const mapsLabel = String(offer?.maps_label || "Zum Startpunkt navigieren").trim();
+    const websiteLabel = String(offer?.website_label || "Website / Infos").trim();
     const metaLine = window.OfferVisuals?.buildMetaLine
       ? window.OfferVisuals.buildMetaLine(offer)
       : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
@@ -272,8 +295,8 @@ const OfferDetailPanel = {
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
           ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
-            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">In Maps öffnen</a>
-            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website / Infos</a>` : ""}
+            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(mapsLabel)}</a>
+            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(websiteLabel)}</a>` : ""}
           </div>
         </div>
       </article>

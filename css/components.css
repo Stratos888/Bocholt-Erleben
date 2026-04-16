@@ -878,38 +878,30 @@
 }
 
 /* Icon base */
-.header-right > .pwa-install-button::before{
-  content: "";
+.header-right > .pwa-install-button .pwa-install-button__icon{
+  --ui-icon-size: var(--hdr-icon-size);
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
 
   width: var(--hdr-icon-size);
   height: var(--hdr-icon-size);
 
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: currentColor;
+  opacity: 1;
+}
+
+.header-right > .pwa-install-button .pwa-install-button__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+.header-right > .pwa-install-button .pwa-install-button__label{
   display: inline-block;
-
-  background-color: currentColor;
-  opacity: 0.82;
-
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
 }
-
-/* Install (button) */
-.header-right > button.pwa-install-button::before{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 3v10m0 0l-4-4m4 4l4-4M5 17v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1'/%3E%3C/svg%3E");
-}
-.header-right > button.pwa-install-button::after{ content: "App"; }
-
-.header-right > a.pwa-install-button::before{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
-}
-.header-right > a.pwa-install-button::after{ content: "Info"; }
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
 /* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS | Purpose: absorb remaining event-card meta/location and filter-control detail rules from legacy.css so component DNA stays self-owned; Scope: event-meta base, tiny-card override, location row, filters-bar helper, pill subparts, reset icon states === */
@@ -1029,6 +1021,7 @@
   flex-wrap: nowrap;
 }
 
+/* === BEGIN BLOCK: FILTER_PILL_CHEVRON_SLOT_PREP_V1 | Zweck: bereitet die Filter-Pills auf echte globale Lucide-Chevrons vor und hält bis zum HTML-Patch einen sauberen Fallback ohne Doppelanzeige | Umfang: ersetzt nur Label/Value/Chevron-Rendering der Filter-Pills === */
 /* Pills: exakte Höhe, Padding vertikal = 0 */
 
 .filter-pill__label{
@@ -1045,14 +1038,32 @@
   text-overflow: ellipsis;
 }
 
-.filter-pill::after{
-  content: "›";
+.filter-pill__chevron{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   margin-left: 2px;
   color: rgba(31,41,51,0.40);
-  font-size: 18px;
-  line-height: 1;
   transform: translateY(-1px);
 }
+
+.filter-pill__chevron > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+/* === BEGIN BLOCK: FILTER_PILL_TEXT_CHEVRON_FALLBACK_OFF_V1 | Zweck: entfernt den letzten textbasierten Chevron-Fallback aus dem globalen Filter-Pill-System; Umfang: ersetzt nur den bisherigen ::after-Fallback === */
+.filter-pill:not(:has(.filter-pill__chevron))::after{
+  content: none;
+  display: none;
+}
+/* === END BLOCK: FILTER_PILL_TEXT_CHEVRON_FALLBACK_OFF_V1 === */
 
 .filter-pill.is-active{
   border-color: color-mix(in srgb, transparent 58%, var(--color-primary));
@@ -1065,6 +1076,7 @@
 .filter-pill.is-active .filter-pill__value{
   color: color-mix(in srgb, var(--color-text-primary) 82%, var(--color-primary));
 }
+/* === END BLOCK: FILTER_PILL_CHEVRON_SLOT_PREP_V1 === */
 
 @media (hover: hover){
   .filter-pill:hover{
@@ -1086,25 +1098,25 @@
 
 /* Icon: bewusst wie UI-Icon behandelt (kein “Textbutton”-Look) */
 .filter-pill--reset{ font-size: 0; }
-.filter-pill--reset::before{
-  content: "";
-  display: block;
-
-  width: 16px;
-  height: 16px;
+.filter-pill--reset .filter-pill__reset-icon{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
 
   position: absolute;
   left: 50%;
   top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   transform: translate(-50%, -50%);
-
   color: rgba(31,41,51,0.62);
+}
 
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
-  background-size: 15px 15px;
-
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M6%206%20L18%2018%20M18%206%20L6%2018%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+.filter-pill--reset .filter-pill__reset-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 @media (hover: hover){
@@ -1115,7 +1127,7 @@
       0 8px 18px rgba(10,24,16,0.050),
       0 1px 0 rgba(255,255,255,0.76) inset;
   }
-  .filter-pill--reset:hover::before{
+  .filter-pill--reset:hover .filter-pill__reset-icon{
     color: rgba(24,40,30,0.74);
   }
 }
@@ -1125,4 +1137,725 @@
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
+/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V9 | Zweck: entfernt auf /angebote/ die zusätzliche äußere Mobile-Page-Surface um den Top-Stack, zieht die seitlichen Gutter gezielt auf Feed/Loading/Empty-State und übergibt den unteren Reserve-Space vollständig an den globalen Bottom-Tab-Bar-Owner | Umfang: ersetzt nur den oberen Layout-/Width-/Padding-Teil des Activities-Komponentenblocks === */
+.page--activities{
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page--activities .desktop-hero{
+  width: min(100%, 1280px);
+  margin: 0 auto;
+}
+
+.page--activities .events-section,
+.page--activities .activity-feed-section{
+  width: min(100%, 1280px);
+  margin: 0 auto;
+}
+
+.page--activities .events-section{
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.page--activities .loading-container{
+  width: min(100%, 1280px);
+  margin: 0 auto;
+}
+
+.page--activities .empty-state{
+  width: 100%;
+  margin: 0;
+}
+
+.page--activities .empty-state__card{
+  max-width: none;
+  width: 100%;
+}
+
+@media (max-width: 899.98px){
+  .page--activities .events-section,
+  .page--activities .activity-feed-section,
+  .page--activities .loading-container,
+  .page--activities .empty-state{
+    padding-inline: var(--gutter);
+  }
+}
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V9 === */
+
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 | Zweck: entfernt die route-spezifische Shell-Überschreibung für Activities vollständig, damit Filter-Sheets und Filter-Popover wieder ausschließlich vom globalen Overlay-Owner kommen | Umfang: ersetzt nur den bisherigen .page--activities .filter-sheet/.filter-popover-Block === */
+/* bewusst leer: Activities bekommt hier keine eigene Filter-Sheet-/Popover-Shell mehr */
+/* === END BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 === */
+
+.page--activities .events-section{
+  padding-top: 14px;
+}
+
+.page--activities .activity-cards-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.page--activities .discovery-card--compact{
+  --rail-w: 0px;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 0;
+  align-items: start;
+  min-height: 96px;
+  padding: 14px;
+  overflow: hidden;
+}
+
+.page--activities .discovery-card--compact::before{
+  content: none;
+  display: none;
+}
+
+.page--activities .activity-card-media{
+  display: none;
+}
+
+.page--activities .discovery-card--compact .event-card-body{
+  gap: 4px;
+}
+
+.page--activities .discovery-card--compact .event-title{
+  margin: 0;
+}
+
+.page--activities .activity-card-kicker{
+  margin: 0 0 1px;
+  color: rgba(84,100,89,0.78);
+  font-size: 0.68rem;
+  font-weight: 820;
+  line-height: 1.15;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page--activities .event-title .activity-card-category-icon{
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  opacity: 1;
+  transform: none;
+}
+
+.page--activities .activity-card-category-icon-svg{
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.page--activities .activity-card-category-icon-fallback{
+  display: inline-block;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(24,40,30,0.72);
+}
+
+.page--activities .discovery-card--compact .event-card-desc{
+  display: none;
+  margin: 2px 0 0;
+  color: rgba(31,41,51,0.76);
+  font-size: 0.95rem;
+  line-height: 1.44;
+}
+
+.page--activities .activity-card-facts,
+.page--activities .activity-card-supporting{
+  display: none;
+}
+
+.page--activities .activity-card-quiet{
+  margin-top: 2px;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.38;
+  font-weight: 670;
+}
+
+/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 | Zweck: finalisiert die Bottom Tab Bar visuell zu einer flacheren, strafferen Mobile-Shell mit breit integriertem Active-Indicator und ausgewogener Präsenz beider Tabs | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
+body.has-bottom-tabbar{
+  padding-bottom: var(--btb-reserve);
+}
+
+#bottom-tabbar-root{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--btb-z);
+  pointer-events: none;
+}
+
+#bottom-tabbar-root:empty{
+  display: none;
+}
+
+.bottom-tabbar{
+  pointer-events: none;
+  width: 100%;
+  padding:
+    0
+    max(var(--gutter), env(safe-area-inset-right))
+    calc(var(--btb-offset-bottom) + env(safe-area-inset-bottom))
+    max(var(--gutter), env(safe-area-inset-left));
+}
+
+.bottom-tabbar__inner{
+  pointer-events: auto;
+  width: min(100%, var(--btb-maxw));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--bottom-tab-count, 2), minmax(0, 1fr));
+  gap: var(--btb-shell-gap);
+  align-items: stretch;
+  padding: var(--btb-shell-pad);
+  border: 1px solid var(--btb-shell-border);
+  border-radius: var(--btb-shell-radius);
+  background: linear-gradient(180deg, var(--btb-shell-bg-start) 0%, var(--btb-shell-bg-end) 100%);
+  box-shadow: var(--btb-shell-shadow);
+  backdrop-filter: blur(16px) saturate(1.02);
+  -webkit-backdrop-filter: blur(16px) saturate(1.02);
+}
+
+.bottom-tabbar__item,
+.bottom-tabbar__item:link,
+.bottom-tabbar__item:visited{
+  position: relative;
+  isolation: isolate;
+  min-height: var(--btb-item-minh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 10px 5px;
+  border-radius: var(--btb-item-radius);
+  color: var(--btb-item-fg);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.bottom-tabbar__item::before{
+  content: "";
+  position: absolute;
+  inset:
+    var(--btb-item-indicator-inset-y)
+    var(--btb-item-indicator-inset-x);
+  border: 1px solid var(--btb-item-indicator-border);
+  border-radius: calc(var(--btb-item-radius) - 3px);
+  background: var(--btb-item-indicator-bg);
+  box-shadow: var(--btb-item-indicator-shadow);
+  opacity: 0;
+  transition:
+    opacity 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+  z-index: 0;
+}
+
+.bottom-tabbar__item > *{
+  position: relative;
+  z-index: 1;
+}
+
+.bottom-tabbar__item[aria-current="page"],
+.bottom-tabbar__item.is-active,
+.bottom-tabbar__item[aria-current="page"]:visited,
+.bottom-tabbar__item.is-active:visited{
+  color: var(--btb-item-fg-active);
+}
+
+.bottom-tabbar__item[aria-current="page"]::before,
+.bottom-tabbar__item.is-active::before{
+  opacity: 1;
+}
+
+.bottom-tabbar__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btb-icon-size);
+  height: var(--btb-icon-size);
+}
+
+.bottom-tabbar__icon .ui-icon-svg{
+  width: var(--btb-icon-size);
+  height: var(--btb-icon-size);
+}
+
+.bottom-tabbar__label{
+  font-size: var(--btb-label-size);
+  font-weight: var(--btb-label-weight);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+}
+
+.bottom-tabbar__item:focus-visible{
+  outline: none;
+}
+
+.bottom-tabbar__item:focus-visible::before{
+  opacity: 1;
+  box-shadow:
+    var(--btb-item-indicator-shadow),
+    0 0 0 4px var(--ui-focus-ring);
+}
+
+@media (hover: hover) and (pointer: fine){
+  .bottom-tabbar__item:hover,
+  .bottom-tabbar__item:hover:visited{
+    color: var(--color-text-primary);
+  }
+
+  .bottom-tabbar__item:hover::before{
+    opacity: 0.66;
+    background: rgba(255,255,255,0.80);
+  }
+
+  .bottom-tabbar__item[aria-current="page"]:hover::before,
+  .bottom-tabbar__item.is-active:hover::before{
+    opacity: 1;
+  }
+}
+
+@media (min-width: 900px){
+  body.has-bottom-tabbar{
+    padding-bottom: 0;
+  }
+
+  #bottom-tabbar-root{
+    display: none;
+  }
+}
+/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 === */
+
+/* === BEGIN BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V2 | Zweck: poliert die Desktop-Bereichs-Navigation auf fast-finales Enterprise-Niveau, indem der Strip sticky unter dem Header bleibt, die Cluster-Geometrie kompakter und bewusster wird und der Active-State souveräner verankert ist | Umfang: kompletter visueller Owner der Desktop-Section-Nav inkl. Sticky-Strip, Cluster-Baseline, Items, Active-State, Hover, Focus und Mobile-Off === */
+#desktop-section-nav-root{
+  display: none;
+}
+
+@media (min-width: 900px){
+  #desktop-section-nav-root{
+    display: block;
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--dsn-sticky-top));
+    z-index: 990;
+    background: linear-gradient(180deg, var(--dsn-strip-bg-start) 0%, var(--dsn-strip-bg-end) 100%);
+    border-bottom: 1px solid var(--dsn-strip-border);
+    box-shadow: var(--dsn-strip-shadow);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  #desktop-section-nav-root:empty{
+    display: none;
+  }
+
+  .desktop-section-nav{
+    box-sizing: border-box;
+    width: min(100%, var(--desktop-shell-max, 1092px));
+    margin: 0 auto;
+    padding-inline: var(--desktop-shell-pad-x, 32px);
+  }
+
+  .desktop-section-nav__inner{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--dsn-gap);
+    width: max-content;
+    min-height: var(--dsn-minh);
+    padding-inline: var(--dsn-cluster-pad-x);
+  }
+
+  .desktop-section-nav__inner::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--dsn-cluster-line);
+  }
+
+  .desktop-section-nav__item,
+  .desktop-section-nav__item:link,
+  .desktop-section-nav__item:visited{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--dsn-minh);
+    padding-inline: var(--dsn-item-pad-x);
+    color: var(--dsn-fg);
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 760;
+    letter-spacing: -0.014em;
+    line-height: 1;
+    transition: color 160ms ease;
+  }
+
+  .desktop-section-nav__item::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: var(--dsn-indicator-h);
+    border-radius: 999px;
+    background: var(--dsn-indicator);
+    opacity: 0;
+    transform: scaleX(0.62);
+    transform-origin: center;
+    transition:
+      opacity 160ms ease,
+      transform 180ms ease;
+  }
+
+  .desktop-section-nav__item[aria-current="page"],
+  .desktop-section-nav__item.is-active,
+  .desktop-section-nav__item[aria-current="page"]:visited,
+  .desktop-section-nav__item.is-active:visited{
+    color: var(--dsn-fg-active);
+  }
+
+  .desktop-section-nav__item[aria-current="page"]::after,
+  .desktop-section-nav__item.is-active::after{
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .desktop-section-nav__item:focus-visible{
+    outline: none;
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px var(--ui-focus-ring);
+  }
+
+  @media (hover: hover) and (pointer: fine){
+    .desktop-section-nav__item:hover,
+    .desktop-section-nav__item:hover:visited{
+      color: var(--dsn-fg-hover);
+    }
+  }
+}
+/* === END BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V2 === */
+
+#event-detail-panel .activity-detail__media--freizeit-familie{
+  background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
+}
+
+@media (min-width: 900px){
+  .page--activities{
+    padding-bottom: 0;
+  }
+
+  .page--activities .activity-feed-section{
+    max-width: 1140px;
+  }
+
+  .page--activities .activity-cards-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  .page--activities .discovery-card--compact{
+    min-height: 100%;
+    padding: 0;
+    border-radius: 24px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.985) 0%, rgba(250,251,247,0.97) 100%);
+    border: 1px solid rgba(18,34,26,0.075);
+    box-shadow:
+      0 18px 40px rgba(12,22,17,0.075),
+      0 1px 0 rgba(255,255,255,0.82) inset;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      background 160ms ease;
+  }
+
+  @media (hover: hover){
+    .page--activities .discovery-card--compact:hover{
+      transform: translateY(-3px);
+      border-color: rgba(18,34,26,0.11);
+      box-shadow:
+        0 24px 48px rgba(12,22,17,0.10),
+        0 1px 0 rgba(255,255,255,0.86) inset;
+    }
+  }
+
+  .page--activities .discovery-card--compact:focus-visible{
+    outline: 2px solid var(--cmp-focus-ring-brand);
+    outline-offset: 3px;
+  }
+
+  /* === BEGIN BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_V2 | Zweck: ergänzt für Desktop ein event-paritätisches Skeleton-System, ohne die reale Activity-Card-Optik zu verändern | Umfang: ersetzt nur Media-/Image-Block im Desktop-Activity-Bereich === */
+  .page--activities .activity-card-media{
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid rgba(18,34,26,0.055);
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(229,237,229,0.96), rgba(213,226,216,0.92));
+  }
+
+  .page--activities .activity-card-media::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 58%, rgba(12,22,17,0.06) 100%);
+  }
+
+  .page--activities .activity-card-media__image{
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--activity-image-fit, cover);
+    object-position: var(--activity-image-pos-x, 50%) var(--activity-image-pos-y, 50%);
+    transform: none;
+    background: rgba(232,236,224,0.92);
+  }
+
+  .page--activities .activity-card--rich.is-skeleton{
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
+    transform: none;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton:hover{
+    transform: none;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .activity-card-skeleton-media{
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .event-title{
+    display: block;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .event-title__text,
+  .page--activities .activity-card--rich.is-skeleton .event-meta__place{
+    display: block;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .event-card-desc{
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .activity-card-category-icon{
+    display: none;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .activity-card-facts{
+    display: flex;
+  }
+
+  .page--activities .activity-card--rich.is-skeleton .activity-card-fact{
+    min-width: 70px;
+  }
+  /* === END BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_V2 === */
+
+  .page--activities .activity-card-media__scrim{
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(18,30,24,0.015) 0%, rgba(18,30,24,0.09) 100%);
+  }
+
+  .page--activities .activity-card-media__content{
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .page--activities .activity-card-media__icon{
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(18,34,26,0.78);
+    background: rgba(255,255,255,0.70);
+    box-shadow:
+      inset 0 0 0 1px rgba(18,34,26,0.05),
+      0 8px 18px rgba(12,22,17,0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .page--activities .activity-card-media-icon-svg{
+    display: block;
+    width: 19px;
+    height: 19px;
+  }
+
+  .page--activities .activity-card-media-icon-fallback{
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .page--activities .activity-card-media__label{
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 11px;
+    border-radius: 999px;
+    color: rgba(18,34,26,0.82);
+    background: rgba(255,255,255,0.70);
+    box-shadow:
+      inset 0 0 0 1px rgba(18,34,26,0.05),
+      0 8px 18px rgba(12,22,17,0.07);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 0.76rem;
+    font-weight: 760;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .page--activities .activity-card-media--natur{
+    background: linear-gradient(135deg, rgba(222,236,220,0.98), rgba(198,219,197,0.92));
+  }
+
+  .page--activities .activity-card-media--kultur{
+    background: linear-gradient(135deg, rgba(230,232,239,0.98), rgba(211,218,229,0.92));
+  }
+
+  .page--activities .activity-card-media--sport-bewegung{
+    background: linear-gradient(135deg, rgba(225,239,233,0.98), rgba(198,223,212,0.92));
+  }
+
+  .page--activities .activity-card-media--freizeit-familie,
+  .page--activities .activity-card-media--aktivitaet{
+    background: linear-gradient(135deg, rgba(234,237,228,0.98), rgba(217,224,208,0.92));
+  }
+
+  .page--activities .discovery-card--compact .event-card-body{
+    gap: 8px;
+    padding: 16px 18px 18px;
+  }
+
+  .page--activities .activity-card-kicker{
+    margin-bottom: 2px;
+    color: rgba(84,100,89,0.74);
+    font-size: 0.70rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+  }
+
+  .page--activities .discovery-card--compact .event-title{
+    font-size: 1.18rem;
+    line-height: 1.18;
+  }
+
+.page--activities .event-title .activity-card-category-icon{
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+}
+
+  .page--activities .discovery-card--compact .event-card-desc{
+    display: -webkit-box;
+    margin: 0;
+    color: rgba(31,41,51,0.79);
+    font-size: 0.95rem;
+    line-height: 1.48;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .page--activities .discovery-card--compact .event-meta{
+    margin-top: 1px;
+  }
+
+  .page--activities .activity-card-facts{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1px;
+  }
+
+  .page--activities .activity-card-fact{
+    display: inline-flex;
+    align-items: center;
+    min-height: 29px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(244,247,242,0.92);
+    border: 1px solid rgba(18,34,26,0.065);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+    color: rgba(31,41,51,0.82);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .page--activities .activity-card-supporting{
+    display: block;
+    min-height: 1.25em;
+    margin-top: 0;
+    color: rgba(78,94,85,0.78);
+    font-size: 0.89rem;
+    line-height: 1.38;
+    font-weight: 610;
+  }
+
+  .page--activities .activity-card-quiet{
+    display: none;
+  }
+
+  #bottom-tabbar-root{
+    display: none;
+  }
+}
+
+@media (min-width: 1360px){
+  .page--activities .activity-cards-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 24px;
+  }
+}
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V7 === */
+
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS === */

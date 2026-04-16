@@ -1002,21 +1002,15 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                     aria-label="Ort in Karten öffnen"
                   >
                     <span class="detail-meta-icon" aria-hidden="true">
-                      <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
-                      </svg>
+                      ${iconSvg("pin", "is-chip")}
                     </span>
                     <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
-                    <span class="detail-meta-ext" aria-hidden="true">↗</span>
+                    <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
                   </a>
                 ` : `
                   <div class="detail-meta-row is-location is-static" aria-label="Ort">
                     <span class="detail-meta-icon" aria-hidden="true">
-                      <svg class="detail-icon-svg is-chip" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="M12 10.5a2 2 0 1 0 0.001 0z" fill="none" stroke="currentColor" stroke-width="2"/>
-                      </svg>
+                      ${iconSvg("pin", "is-chip")}
                     </span>
                     <span class="detail-meta-text">${escapeHtml(vm.locationLabel)}</span>
                   </div>
@@ -1032,7 +1026,6 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                 </div>
               ` : ""}
             </div>
-          </div>
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
 
@@ -1042,7 +1035,7 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                 <a class="detail-link" href="${escapeHtml(normWebsite)}" target="_blank" rel="noopener">
                   <span class="detail-link-label">Website</span>
                   <span class="detail-link-value">${escapeHtml(websiteHostLabel)}</span>
-                  <span class="detail-link-ext" aria-hidden="true">↗</span>
+                  <span class="detail-link-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
                 </a>
               ` : ""}
 
@@ -1050,7 +1043,7 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                 <a class="detail-link" href="${escapeHtml(normSource)}" target="_blank" rel="noopener">
                   <span class="detail-link-label">Quelle</span>
                   <span class="detail-link-value">${escapeHtml(sourceHostLabel)}</span>
-                  <span class="detail-link-ext" aria-hidden="true">↗</span>
+                  <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
                 </a>
               ` : ""}
             </div>

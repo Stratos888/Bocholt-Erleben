@@ -228,50 +228,135 @@
     padding-top: 4px;
   }
 
-  .desktop-hero .top-stack{
-    width: 100%;
-    max-width: none;
-  }
+  /* === BEGIN BLOCK: DESKTOP_TOP_STACK_WIDTH_OWNER_NOTE_V1 | Zweck: entfernt den frühen konkurrierenden Width-Owner für den Desktop-Top-Stack; Umfang: dokumentiert, dass Breite/Max-Breite nur noch im konsolidierten Desktop-Top-Shell-Block definiert werden === */
+  /* Width/max-width for .top-stack are intentionally owned only by DESKTOP_TOP_SHELL_OWNER_CLEANUP_V32. */
+  /* === END BLOCK: DESKTOP_TOP_STACK_WIDTH_OWNER_NOTE_V1 === */
 
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_ENRICHMENT_V1 | Zweck: reichert die Desktop-Event-Cards als echte Entscheidungs-Preview für den Direktlink-Flow an, ohne Mobile oder Grid-Logik zu verändern; Umfang: nur Desktop-Typografie, Zusatzmeta, CTA-Zeile und Card-Höhe auf der Homepage === */
   .event-cards-grid{
     max-width: 1128px;
   }
 
   .event-card{
     height: 100%;
-    align-items: start;
+    align-items: stretch;
   }
 
   .event-card-body{
-    gap: 5px;
+    gap: 8px;
+    height: 100%;
+    padding-top: 1px;
   }
 
   .event-title{
-    font-size: 1.02rem;
-    line-height: 1.2;
+    font-size: 1.04rem;
+    line-height: 1.22;
   }
 
   .event-title__text{
     -webkit-line-clamp: 2;
   }
 
+  .event-meta{
+    font-size: 0.92rem;
+    line-height: 1.32;
+  }
+
   .event-card-desc{
     margin: 0;
-    color: rgba(31,41,51,0.78);
+    color: rgba(31,41,51,0.80);
     font-size: 0.95rem;
-    line-height: 1.38;
+    line-height: 1.46;
 
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 
     overflow: hidden;
   }
 
-  .event-card-meta-quiet,
-  .event-card-actions{
-    display: none !important;
+  .event-card-meta-quiet{
+    display: block;
+    margin: 1px 0 0;
+
+    font-size: 0.74rem;
+    font-weight: 760;
+    line-height: 1.28;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(67,82,63,0.66);
   }
+
+  .event-card-actions{
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+
+    margin-top: auto;
+    padding-top: 10px;
+
+    border-top: 1px solid rgba(31,41,51,0.08);
+  }
+
+  .event-card-action{
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 30px;
+    padding: 0;
+
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: rgba(58,73,61,0.88);
+    text-decoration: none;
+
+    cursor: pointer;
+  }
+
+  .event-card-action:hover{
+    color: rgba(36,54,40,0.96);
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
+
+  .event-card-action:focus-visible{
+    outline: 2px solid var(--cmp-focus-ring-brand);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .event-card-action--primary{
+    color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
+  }
+
+  .event-card-action--primary::after{
+    content: "↗";
+    font-size: 0.94em;
+    line-height: 1;
+  }
+
+  .event-card-actions > button.event-card-action{
+    display: none;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_ENRICHMENT_V1 === */
+}
+
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_SINGLE_COLUMN_HEIGHT_V1 | Zweck: nutzt die zusätzliche Breite im 1-Spalten-Desktop für eine ruhigere, informationsstärkere Card-Höhe; Umfang: nur Min-Height der Homepage-Event-Cards zwischen 900px und 1279.98px === */
+  .event-card{
+    min-height: 174px;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_SINGLE_COLUMN_HEIGHT_V1 === */
 }
 
 @media (min-width: 1280px) {
@@ -285,6 +370,12 @@
   .events-feed-group__grid > .event-card{
     height: 100%;
   }
+
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_TWO_COLUMN_HEIGHT_V1 | Zweck: stabilisiert im 2-Spalten-Desktop die angereicherte Card-Hierarchie ohne unnötig große Flächen zu erzeugen; Umfang: nur Min-Height der Homepage-Event-Cards ab 1280px === */
+  .event-card{
+    min-height: 188px;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_TWO_COLUMN_HEIGHT_V1 === */
 }
 /* === END BLOCK: DESKTOP_HERO_FRAME_V16 === */
 /* ============================================
@@ -426,38 +517,22 @@
 }
 
 .desktop-hero__icon{
-  display: inline-block;
+  --ui-icon-size: 18px;
+  --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  background-color: currentColor;
-  opacity: 0.82;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  color: currentColor;
+  opacity: 1;
 }
 
-.desktop-hero__icon--search{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M20 20l-3.5-3.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--publish{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--app{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='10' height='18' rx='2' ry='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M11 17h2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-.desktop-hero__icon--info{
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 16v-5M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z'/%3E%3C/svg%3E");
+.desktop-hero__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
 }
 
 .desktop-hero__toolbar-pill{
@@ -629,26 +704,43 @@
     color: color-mix(in srgb, var(--brand-green-900) 72%, var(--color-text-muted) 28%);
   }
 
-  .feed-publish-entry__main{
-    display: contents;
-  }
+/* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 | Zweck: stellt den mobilen Veranstalter-Entry auf echten SVG-Chevron-Slot um und hält Größe/Gewichtung systemisch konsistent; Umfang: ersetzt nur main/title/chevron-Styling des Feed-CTA === */
+.feed-publish-entry__main{
+  display: contents;
+}
 
-  .feed-publish-entry__title{
-    grid-area: title;
-    font-size: 0.98rem;
-    font-weight: 760;
-    line-height: 1.2;
-    color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
-  }
+.feed-publish-entry__title{
+  grid-area: title;
+  font-size: 0.98rem;
+  font-weight: 760;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
+}
 
-  .feed-publish-entry__chevron{
-    grid-area: chevron;
-    align-self: center;
-    justify-self: end;
-    font-size: 17px;
-    opacity: 0.78;
-    color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
-  }
+.feed-publish-entry__chevron{
+  --ui-icon-size: 16px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+
+  grid-area: chevron;
+  align-self: center;
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 16px;
+  height: 16px;
+
+  opacity: 0.88;
+  color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
+}
+
+.feed-publish-entry__chevron > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+/* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 === */
 
   @media (hover: hover){
     .feed-publish-entry:hover{
@@ -696,98 +788,97 @@
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 | Purpose: überführt den final geprüften Brand-Warm-Stand aus dem Theme-Lab nachhaltig in die produktive Desktop-Home, inklusive Header-, Hero-, Panel- und Feed-Hierarchie; Scope: desktop-only homepage hero, header and search module; mobile remains untouched === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 | Zweck: vereinheitlicht Hero und Feed auf eine gemeinsame Desktop-Shell, stabilisiert die linke Copy-Lesbarkeit über eine lokale Contrast-Surface statt globalem Milchglas und hält Home sowie Aktivitäten auf demselben nachhaltigen Desktop-Contract; Umfang: Desktop-Header, Hero, Search-Panel, Copy-Lesbarkeit sowie Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
 @media (min-width: 900px){
-  .app-header{
-    min-height: 62px;
-    padding-left: 32px;
-    padding-right: 32px;
-    background: linear-gradient(180deg, rgba(248,248,241,0.990) 0%, rgba(241,244,232,0.974) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.84) inset,
-      0 10px 22px rgba(24,37,16,0.032);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1092px;
+    --desktop-shell-pad-x: 32px;
+    --desktop-copy-surface-max: 33.5rem;
+    --desktop-copy-max: 28.5rem;
+    --desktop-panel-gap: 8px;
+    --desktop-panel-height: 56px;
+    --desktop-reset-w: 46px;
   }
 
-  .header-left{
-    gap: 11px;
-  }
-
-  /* === BEGIN BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 | Zweck: koppelt den Desktop-Header der Home final an die Brand-Warm-DNA, ohne Geometrie oder Sichtbarkeit zu verändern; Umfang: nur Header-Override im Desktop-Hero-Breakpoint === */
-  .app-header{
-    min-height: 60px;
+  body.is-tabbar-hidden .app-header,
+  body.page-route-activities .app-header{
+    min-height: 58px;
     padding-left: 28px;
     padding-right: 28px;
-    background: linear-gradient(180deg, rgba(248,248,241,0.992) 0%, rgba(241,244,232,0.976) 100%);
-    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    background: linear-gradient(
+      180deg,
+      rgba(248,248,241,0.994) 0%,
+      rgba(242,244,235,0.984) 100%
+    );
+    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 80%, var(--brand-gold-200) 20%);
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.86) inset,
-      0 8px 18px rgba(24,37,16,0.030);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 6px 16px rgba(16,28,10,0.022);
+    -webkit-backdrop-filter: blur(9px) saturate(1.02);
+    backdrop-filter: blur(9px) saturate(1.02);
   }
 
-  .header-left{
+  body.is-tabbar-hidden .header-left,
+  body.page-route-activities .header-left{
     gap: 9px;
   }
 
-  .app-logo{
-    width: 28px;
-    height: 28px;
+  body.is-tabbar-hidden .app-logo,
+  body.page-route-activities .app-logo{
+    width: 27px;
+    height: 27px;
     border-radius: 7px;
     box-shadow:
       0 1px 0 rgba(255,255,255,0.58) inset,
-      0 2px 6px rgba(24,37,16,0.032);
+      0 2px 5px rgba(24,37,16,0.028);
   }
 
-  .app-title{
+  body.is-tabbar-hidden .app-title,
+  body.page-route-activities .app-title{
     max-width: none;
-    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
-    font-size: 1.24rem;
+    color: color-mix(in srgb, var(--brand-green-900) 88%, var(--brand-gold-300) 12%);
+    font-size: 1.18rem;
     font-weight: 710;
-    letter-spacing: -0.028em;
-    line-height: 1.04;
+    letter-spacing: -0.03em;
+    line-height: 1.03;
   }
 
-  .header-right{
+  body.is-tabbar-hidden .header-right,
+  body.page-route-activities .header-right{
     display: none;
   }
-  /* === END BLOCK: HOME_HEADER_LOCKUP_ENTERPRISE_V3 === */
 
-  .desktop-hero{
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
     --hero-bg-size-active: var(--hero-bg-size-desktop);
-    --hero-bg-position-active: 79.25% 8%;
+    --hero-bg-position-active: 78.8% 8%;
     --hero-bg-opacity-active: var(--hero-bg-opacity-desktop);
     --hero-bg-blur-active: var(--hero-bg-blur-desktop);
-    --hero-bg-brightness-active: 0.968;
-    --hero-bg-saturate-active: 1.035;
-    --hero-bg-contrast-active: 1.03;
-    --hero-panel-bg: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
-    --hero-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-    --hero-control-bg: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
-    --hero-control-border: color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
-    --hero-control-shadow:
-      0 1px 0 rgba(255,255,255,0.98) inset,
-      0 10px 22px rgba(16,28,10,0.032);
+
     position: relative;
     isolation: isolate;
     overflow: visible;
+
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
-    min-height: 424px;
-    padding: 22px 32px 14px;
+    gap: 12px;
+
+    max-width: var(--desktop-shell-max);
+    min-height: 410px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px var(--desktop-shell-pad-x) 14px;
+
     background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
-  /* === BEGIN BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 | Zweck: überführt den final validierten Brand-Warm-Hero-Wash in die produktive Desktop-Home und reduziert den Rest-Milchschleier systemisch; Umfang: nur Desktop-Hero-Overlay im V30-Block, keine Geometrieänderung === */
-  .desktop-hero::before{
+  body.is-tabbar-hidden .desktop-hero::before,
+  body.page-route-activities .desktop-hero::before{
     content: "";
     position: absolute;
     top: 0;
@@ -795,25 +886,21 @@
     left: calc(50% - 50vw);
     right: calc(50% - 50vw);
     z-index: -4;
-    background-image:
-      linear-gradient(90deg, color-mix(in srgb, #EEF1E3 80%, white) 0%, color-mix(in srgb, #EEF1E3 80%, white) 5%, color-mix(in srgb, #EEF1E3 60%, white) 10%, color-mix(in srgb, #EEF1E3 20%, transparent) 16%, color-mix(in srgb, #EEF1E3 5%, transparent) 22%, rgba(255,255,255,0) 28%),
-      radial-gradient(44% 56% at 15% 28%, color-mix(in srgb, #EEF1E3 18%, white) 0%, color-mix(in srgb, #EEF1E3 7%, transparent) 38%, rgba(255,255,255,0) 72%),
-      linear-gradient(180deg, color-mix(in srgb, #EEF1E3 9%, white) 0%, rgba(255,255,255,0) 42%, color-mix(in srgb, #EEF1E3 4%, transparent) 100%),
-      radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--brand-gold-200) 12%, transparent) 0%, rgba(255,255,255,0) 12%),
-      var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+    background-image: var(--hero-bg-image-active);
+    background-repeat: no-repeat;
+    background-position: var(--hero-bg-position-active);
+    background-size: var(--hero-bg-size-active);
     opacity: var(--hero-bg-opacity-active);
     filter:
       blur(var(--hero-bg-blur-active))
-      saturate(var(--hero-bg-saturate-active))
-      brightness(var(--hero-bg-brightness-active))
-      contrast(var(--hero-bg-contrast-active));
+      saturate(0.97)
+      brightness(0.935)
+      contrast(1);
     pointer-events: none;
   }
 
-  .desktop-hero::after{
+  body.is-tabbar-hidden .desktop-hero::after,
+  body.page-route-activities .desktop-hero::after{
     content: "";
     position: absolute;
     top: 0;
@@ -822,146 +909,325 @@
     right: calc(50% - 50vw);
     z-index: -3;
     background:
-      radial-gradient(circle at 69% 22%, color-mix(in srgb, var(--brand-gold-200) 9%, transparent) 0%, rgba(255,255,255,0) 14%),
-      radial-gradient(circle at 84% 56%, color-mix(in srgb, var(--brand-gold-200) 4%, transparent) 0%, rgba(255,255,255,0) 13%),
-      linear-gradient(180deg, rgba(248,250,243,0.00) 76%, color-mix(in srgb, #EEF1E3 8%, transparent) 100%);
+      linear-gradient(
+        90deg,
+        rgba(243,246,240,0.66) 0%,
+        rgba(243,246,240,0.52) 6%,
+        rgba(243,246,240,0.30) 12%,
+        rgba(243,246,240,0.13) 18%,
+        rgba(243,246,240,0.035) 23%,
+        rgba(243,246,240,0.00) 28%
+      ),
+      radial-gradient(
+        58% 82% at 13% 28%,
+        rgba(247,249,243,0.16) 0%,
+        rgba(247,249,243,0.06) 42%,
+        rgba(247,249,243,0.00) 74%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(247,249,244,0.02) 0%,
+        rgba(247,249,244,0.00) 56%,
+        rgba(233,237,220,0.10) 76%,
+        rgba(233,237,220,0.22) 90%,
+        rgba(233,237,220,0.34) 100%
+      ),
+      radial-gradient(circle at 71% 21%, rgba(225,213,150,0.012) 0%, rgba(225,213,150,0.00) 15%);
     pointer-events: none;
   }
-  /* === END BLOCK: HOME_DESKTOP_HERO_FADE_FINAL_CLOSE_V2 === */
 
-  .desktop-entry{
-    display: block;
+  body.is-tabbar-hidden .desktop-entry,
+  body.page-route-activities .desktop-entry{
+    display: grid;
+    width: 100%;
+    max-width: none;
     min-width: 0;
+    justify-self: stretch;
+    align-self: start;
     padding: 0;
+    position: relative;
+    z-index: 1;
   }
 
-  .desktop-entry__content{
-    max-width: 35rem;
-    gap: 10px;
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-self: stretch;
   }
 
-  .desktop-entry__eyebrow{
-    margin-bottom: 0;
+  body.is-tabbar-hidden .desktop-entry__inner,
+  body.page-route-activities .desktop-entry__inner{
+    position: relative;
+    display: grid;
+    gap: 0;
+    justify-self: start;
+    width: min(100%, var(--desktop-copy-surface-max));
+    max-width: var(--desktop-copy-surface-max);
+    padding: 2px 0 4px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    isolation: isolate;
+    overflow: visible;
+  }
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V6 | Zweck: entkoppelt die gemeinsame Desktop-Lesefläche stärker vom Foto darunter, damit adaptive Größe erhalten bleibt, aber Events und Angebote bei gleicher Schriftfarbe gleichwertig lesbar wirken; Umfang: nur Copy-Container, H1 und Lead innerhalb des Top-Shell-Owners ab 900px === */
+  body.is-tabbar-hidden .desktop-entry__inner::before,
+  body.page-route-activities .desktop-entry__inner::before{
+    content: none;
   }
 
-  .desktop-entry__title{
-    max-width: 30rem;
-    color: color-mix(in srgb, var(--brand-green-900) 93%, var(--brand-gold-300) 7%);
-    font-size: clamp(3.05rem, 2.84rem + 0.92vw, 4rem);
-    line-height: 0.95;
-    letter-spacing: -0.06em;
+  body.is-tabbar-hidden .desktop-entry__content,
+  body.page-route-activities .desktop-entry__content{
+    position: relative;
+    z-index: 1;
+    display: inline-grid;
+    justify-self: start;
+    width: fit-content;
+    max-width: min(100%, var(--desktop-copy-max));
+    gap: 9px;
+    padding-top: 6px;
+    padding-bottom: 7px;
+    isolation: isolate;
   }
 
-  .desktop-entry__text{
-    max-width: 29rem;
-    color: rgba(24,40,30,0.86);
-    font-size: 0.99rem;
-    line-height: 1.42;
+  body.is-tabbar-hidden .desktop-entry__content::before,
+  body.page-route-activities .desktop-entry__content::before{
+    content: "";
+    position: absolute;
+    inset: -9px -11px -10px -9px;
+    z-index: -1;
+    border-radius: 22px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(238,242,231,0.74) 0%,
+        rgba(238,242,231,0.62) 26%,
+        rgba(237,241,230,0.40) 50%,
+        rgba(236,240,229,0.18) 68%,
+        rgba(236,240,229,0.03) 82%,
+        rgba(236,240,229,0.00) 90%
+      ),
+      radial-gradient(
+        90% 108% at 14% 34%,
+        rgba(240,244,234,0.44) 0%,
+        rgba(239,243,232,0.20) 46%,
+        rgba(238,242,231,0.06) 68%,
+        rgba(238,242,231,0.00) 84%
+      );
+    filter: blur(3px);
+    pointer-events: none;
   }
 
-  .desktop-entry__text br{
-    display: block;
+  body.is-tabbar-hidden .desktop-entry__content::after,
+  body.page-route-activities .desktop-entry__content::after{
+    content: none;
   }
 
-  .desktop-entry__text--lead{
-    gap: 6px;
+  body.is-tabbar-hidden .desktop-entry__title,
+  body.page-route-activities .desktop-entry__title{
+    max-width: 27.5rem;
+    color: #10281B;
+    font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
+    line-height: 0.98;
+    letter-spacing: -0.056em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.06);
   }
 
-  .top-stack{
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
+    max-width: 21.4rem;
+    color: rgba(14,26,20,0.97);
+    font-size: 1.01rem;
+    line-height: 1.46;
+    font-weight: 620;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  body.is-tabbar-hidden .desktop-entry__text br,
+  body.page-route-activities .desktop-entry__text br{
+    display: none;
+  }
+/* === END BLOCK: DESKTOP_TOP_SHELL_COPY_CONTRAST_SURFACE_V6 === */
+
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
     position: relative;
     top: auto;
     z-index: 1;
     align-self: start;
-    justify-self: stretch;
     display: grid;
-    gap: 8px;
-    width: min(100%, 910px);
-    max-width: 910px;
+    gap: 7px;
     margin-top: 0;
-    padding: 14px 14px 12px;
-    border: 1px solid var(--hero-panel-border);
-    border-radius: 22px;
-    background: linear-gradient(180deg, rgba(249,250,243,0.986) 0%, rgba(239,244,229,0.968) 100%);
-    box-shadow:
-      0 20px 40px rgba(16,28,10,0.076),
-      0 1px 0 rgba(255,255,255,0.93) inset;
-    -webkit-backdrop-filter: blur(9px);
-    backdrop-filter: blur(9px);
+    padding: 1px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    overflow: visible;
   }
 
-  .top-stack::before{
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
     content: "";
     position: absolute;
-    inset: 8px;
+    inset: -4px -6px -6px -6px;
     z-index: -1;
-    border-radius: 17px;
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,255,0.28) 0%,
-      rgba(255,255,255,0.06) 100%
-    );
+    border-radius: 22px;
+    background:
+      radial-gradient(
+        112% 124% at 12% 12%,
+        rgba(250,252,247,0.13) 0%,
+        rgba(248,250,243,0.06) 32%,
+        rgba(246,249,240,0.018) 54%,
+        rgba(246,249,240,0.00) 74%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(250,252,247,0.03) 0%,
+        rgba(248,250,243,0.00) 100%
+      );
+    filter: blur(5px);
+    pointer-events: none;
   }
 
-  .desktop-hero__panel-head{
-    display: block;
-    padding: 0 4px 0;
+  body.is-tabbar-hidden .desktop-hero__panel-head,
+  body.page-route-activities .desktop-hero__panel-head{
+    display: none;
+    padding: 0;
   }
 
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 172px 172px;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 172px 172px 48px;
-  }
-
-  .top-stack .events-filter{
+  body.is-tabbar-hidden .top-stack .events-filter,
+  body.page-route-activities .top-stack .events-filter{
     position: relative;
     z-index: 1;
     padding: 0;
     gap: 0;
   }
 
-  .desktop-hero__search-field .desktop-hero__icon--search{
+  body.is-tabbar-hidden .desktop-hero__search-row,
+  body.page-route-activities .desktop-hero__search-row{
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns:
+      minmax(0, calc((100% * 2 / 3) - (var(--desktop-panel-gap) / 3)))
+      minmax(0, calc((100% - (5 * var(--desktop-panel-gap))) / 6))
+      minmax(0, calc((100% - (5 * var(--desktop-panel-gap))) / 6));
+    align-items: stretch;
+    gap: var(--desktop-panel-gap);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row::before,
+  body.page-route-activities .desktop-hero__search-row::before{
+    content: "";
     position: absolute;
-    left: 21px;
+    inset: -3px -4px -3px -4px;
+    z-index: -1;
+    border-radius: 16px;
+    background:
+      radial-gradient(
+        116% 148% at 15% 10%,
+        rgba(251,252,248,0.07) 0%,
+        rgba(249,251,245,0.025) 36%,
+        rgba(247,250,242,0.00) 70%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(251,252,248,0.016) 0%,
+        rgba(251,252,248,0.00) 100%
+      );
+    filter: blur(4px);
+    pointer-events: none;
+  }
+
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_RESET_SLOT_CONTRACT_V2 | Zweck: hält auf Desktop den Reset bei aktivem Search-/Filter-State fest im rechten Slot und gibt Search plus Pills denselben Grid-Contract auf Events und Aktivitäten; Umfang: nur Desktop-Search-Row, Search-Control, Toolbar-Pills und Reset-Control innerhalb des Top-Shell-Owners === */
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns:
+      minmax(0, calc((((100% - var(--desktop-reset-w) - var(--desktop-panel-gap)) * 2) / 3) - (var(--desktop-panel-gap) / 3)))
+      minmax(0, calc(((100% - var(--desktop-reset-w) - var(--desktop-panel-gap)) - (5 * var(--desktop-panel-gap))) / 6))
+      minmax(0, calc(((100% - var(--desktop-reset-w) - var(--desktop-panel-gap)) - (5 * var(--desktop-panel-gap))) / 6))
+      var(--desktop-reset-w);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot{
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__toolbar-pill{
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset{
+    grid-column: 4;
+    grid-row: 1;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
+  body.page-route-activities .desktop-hero__search-field .desktop-hero__icon--search{
+    position: absolute;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(78,97,87,0.78);
+    color: rgba(69,87,77,0.70);
     width: 18px;
     height: 18px;
     z-index: 2;
     pointer-events: none;
   }
 
-  .top-stack #search-filter,
-  .desktop-hero__toolbar-pill{
-    height: 56px;
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .top-stack #search-filter,
+  body.page-route-activities .desktop-hero__toolbar-pill{
+    height: var(--desktop-panel-height);
   }
 
-  .top-stack #search-filter{
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.page-route-activities .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
     padding: 0 18px 0 46px;
-    border: 1px solid var(--hero-control-border);
-    border-radius: 16px;
-    background: var(--hero-control-bg);
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,253,0.94) 0%,
+      rgba(249,251,245,0.84) 100%
+    );
     color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
-    font-size: 0.99rem;
+    font-size: 0.98rem;
     font-weight: 610;
     letter-spacing: -0.012em;
-    box-shadow: var(--hero-control-shadow);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.92) inset,
+      0 8px 18px rgba(16,28,10,0.024);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
 
-  .top-stack #search-filter::placeholder{
-    color: rgba(80,95,78,0.74);
-    font-weight: 620;
+  body.is-tabbar-hidden .top-stack #search-filter::placeholder,
+  body.page-route-activities .top-stack #search-filter::placeholder{
+    color: rgba(74,91,80,0.72);
+    font-weight: 605;
   }
 
-  .desktop-hero__toolbar-pill{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__toolbar-pill{
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
@@ -969,106 +1235,187 @@
     justify-content: stretch;
     column-gap: 8px;
     row-gap: 2px;
-    padding: 8px 13px 8px;
-    border: 1px solid var(--hero-control-border);
-    border-radius: 16px;
-    background: var(--hero-control-bg);
-    box-shadow: var(--hero-control-shadow);
+    padding: 7px 12px;
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,252,0.93) 0%,
+      rgba(248,250,243,0.82) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 7px 16px rgba(16,28,10,0.022);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     text-align: left;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__label{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__label,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label{
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
-    color: rgba(84,100,89,0.80);
-    font-size: 0.67rem;
+    color: rgba(84,100,89,0.78);
+    font-size: 0.64rem;
     font-weight: 760;
     line-height: 1;
-    letter-spacing: 0.015em;
+    letter-spacing: 0.02em;
     white-space: nowrap;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__value{
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__value,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__value{
     grid-column: 1;
     grid-row: 2;
     min-width: 0;
     color: color-mix(in srgb, var(--brand-green-900) 88%, var(--brand-gold-300) 12%);
-    font-size: 0.95rem;
-    font-weight: 780;
+    font-size: 0.93rem;
+    font-weight: 765;
     line-height: 1.08;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .desktop-hero__toolbar-pill::after{
-    content: "›";
+  /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_FILTER_CHEVRON_OWNER_V1 | Zweck: stellt im Desktop-Top-Shell den echten Lucide-Chevron als einzigen Owner her und entfernt den textbasierten Pseudo-Chevron, damit Events und Activities dieselbe Pill-Logik und mehr Textbreite bekommen | Umfang: ersetzt nur den bisherigen ::after-Chevron-Block der Toolbar-Pills === */
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill::after,
+  body.page-route-activities .desktop-hero__toolbar-pill::after{
+    content: none;
+    display: none;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__chevron,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__chevron{
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
-    color: color-mix(in srgb, var(--brand-green-900) 87%, var(--brand-gold-300) 13%);
-    font-size: 0.98rem;
-    line-height: 1;
+    justify-self: end;
+    width: 16px;
+    height: 16px;
     margin-left: 0;
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    transform: none;
   }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_FILTER_CHEVRON_OWNER_V1 === */
 
-  .desktop-hero__search-row > .filter-pill--reset{
-    grid-column: auto;
-    width: 48px;
-    min-width: 48px;
-    min-height: 56px;
+  body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--desktop-reset-w);
+    min-width: var(--desktop-reset-w);
+    min-height: var(--desktop-panel-height);
     justify-self: stretch;
     align-self: stretch;
-    border: 1px solid var(--hero-control-border);
-    background: var(--hero-control-bg);
-    box-shadow: var(--hero-control-shadow);
-  }
-
-  .desktop-hero__actions{
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    padding-top: 8px;
-    border-top: 1px solid color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-  }
-
-  .desktop-hero__action,
-  .desktop-hero__action:link,
-  .desktop-hero__action:visited{
-    min-height: 36px;
-    padding: 0 12px;
-    border-radius: 11px;
-    font-size: 0.84rem;
-    font-weight: 680;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.13) 76%, var(--brand-gold-200) 24%);
-    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(246,250,238,0.976) 100%);
-    color: rgba(24,40,30,0.86);
-    text-decoration: none;
-    -webkit-text-fill-color: rgba(24,40,30,0.86);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 4px 10px rgba(16,28,10,0.032);
-  }
-
-  .desktop-hero__action .desktop-hero__icon{
-    width: 14px;
-    height: 14px;
-    opacity: 0.68;
-  }
-
-  /* === BEGIN BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 | Zweck: überführt die final validierte Brand-Warm-Flächenhierarchie aus dem Theme-Lab in den produktiven Desktop-Feed; Umfang: nur Desktop-Feed-Surface im V30-Block === */
-  .events-section{
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border-radius: 18px;
     background: linear-gradient(
       180deg,
-      #E9EDDC 0%,
-      #E1E7D2 58%,
-      #DAE1C9 100%
+      rgba(255,255,252,0.92) 0%,
+      rgba(248,250,243,0.80) 100%
     );
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.90) inset,
+      0 7px 16px rgba(16,28,10,0.020);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  /* === END BLOCK: DESKTOP_TOP_SHELL_RESET_SLOT_CONTRACT_V2 === */
+
+  body.is-tabbar-hidden .desktop-hero__actions,
+  body.page-route-activities .desktop-hero__actions{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, calc((100% / 3) - ((2 * var(--desktop-panel-gap)) / 3))));
+    gap: var(--desktop-panel-gap);
+    padding-top: 0;
+    border-top: 0;
   }
 
-  .event-card{
+  body.is-tabbar-hidden .desktop-hero__action,
+  body.is-tabbar-hidden .desktop-hero__action:link,
+  body.is-tabbar-hidden .desktop-hero__action:visited,
+  body.page-route-activities .desktop-hero__action,
+  body.page-route-activities .desktop-hero__action:link,
+  body.page-route-activities .desktop-hero__action:visited{
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 14px;
+    font-size: 0.80rem;
+    font-weight: 650;
+    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.05) 78%, var(--brand-gold-200) 22%);
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,253,0.62) 0%,
+      rgba(247,250,241,0.50) 100%
+    );
+    color: rgba(24,40,30,0.64);
+    text-decoration: none;
+    -webkit-text-fill-color: rgba(24,40,30,0.64);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.74) inset,
+      0 2px 7px rgba(16,28,10,0.010);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action .desktop-hero__icon{
+    width: 14px;
+    height: 14px;
+    opacity: 0.34;
+  }
+
+  @media (hover: hover){
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, rgba(47,69,33,0.08) 76%, var(--brand-gold-200) 24%);
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,254,0.74) 0%,
+        rgba(248,251,241,0.60) 100%
+      );
+      color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.80) inset,
+        0 4px 10px rgba(16,28,10,0.014);
+    }
+  }
+
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
+    max-width: var(--desktop-shell-max);
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,243,231,0.36) 0%,
+        rgba(233,237,220,0.10) 40px,
+        rgba(233,237,220,0.00) 84px
+      ),
+      linear-gradient(
+        180deg,
+        #E8ECD9 0%,
+        #E2E8D4 58%,
+        #DBE2CB 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.38),
+      inset 0 8px 16px rgba(247,249,242,0.08);
+  }
+
+  body.is-tabbar-hidden .event-cards-grid,
+  body.page-route-activities .event-cards-grid{
+    max-width: none;
+  }
+
+  body.is-tabbar-hidden .event-card,
+  body.page-route-activities .event-card{
     background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(250,252,243,0.978) 100%);
     border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
     box-shadow:
@@ -1076,7 +1423,8 @@
       0 10px 24px rgba(16,28,10,0.046);
   }
 
-  .event-card::before{
+  body.is-tabbar-hidden .event-card::before,
+  body.page-route-activities .event-card::before{
     background: linear-gradient(
       180deg,
       rgba(230,238,212,0.988) 0%,
@@ -1086,7 +1434,8 @@
     box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
   }
 
-  .event-date-badge{
+  body.is-tabbar-hidden .event-date-badge,
+  body.page-route-activities .event-date-badge{
     background: linear-gradient(
       180deg,
       rgba(252,253,248,0.996) 0%,
@@ -1099,201 +1448,258 @@
       0 1px 2px rgba(12,24,18,0.028);
   }
 
-  .event-date-badge__wday{
+  body.is-tabbar-hidden .event-date-badge__wday,
+  body.page-route-activities .event-date-badge__wday{
     color: rgba(75,92,72,0.64);
   }
 
-  .event-date-badge__month{
+  body.is-tabbar-hidden .event-date-badge__month,
+  body.page-route-activities .event-date-badge__month{
     color: rgba(75,92,72,0.62);
   }
 
-  .event-title{
+  body.is-tabbar-hidden .event-title,
+  body.page-route-activities .event-title{
     color: rgba(21,37,28,0.93);
   }
 
-  .event-card-desc{
+  body.is-tabbar-hidden .event-card-desc,
+  body.page-route-activities .event-card-desc{
     color: rgba(31,41,51,0.76);
   }
-  /* === END BLOCK: HOME_FEED_VISUAL_SYSTEM_DESKTOP_V2 === */
-
-  @media (hover: hover){
-    .desktop-hero__actions .desktop-hero__action:hover,
-    .desktop-hero__actions .desktop-hero__action:link:hover,
-    .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,251,241,0.982) 100%);
-      color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.94) inset,
-        0 8px 18px rgba(16,28,10,0.030);
-    }
-  }
 }
 
-@media (min-width: 900px) and (max-width: 1199.98px){
-  .desktop-hero{
-    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: 86.75% 9.5%;
-    min-height: 396px;
-    padding-top: 20px;
-    padding-bottom: 14px;
-  }
-
-  .desktop-entry__content{
-    max-width: 30rem;
-  }
-
-  .desktop-entry__title{
-    max-width: 27rem;
-    font-size: clamp(2.78rem, 2.58rem + 0.68vw, 3.32rem);
-  }
-
-  .desktop-entry__text{
-    max-width: 24.5rem;
-    font-size: 0.96rem;
-    line-height: 1.40;
-  }
-
-  .top-stack{
-    width: 100%;
-    max-width: none;
-  }
-
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 164px 164px;
-  }
-
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 164px 164px 46px;
-  }
-
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: 46px;
-    min-width: 46px;
-  }
-}
-/* === END BLOCK: DESKTOP_HERO_DESKTOP_LAYOUT_V30 === */
-
-/* === BEGIN BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 | Purpose: kalibriert für 900–1024px den Hero-Fade farblich wärmer und klarer, ohne die enge Desktop-Geometrie zu ändern; Scope: only narrow-desktop focal-point and color-surface refinement between 900px and 1024px === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 | Zweck: stabilisiert auf 900–1024px die adaptive Copy-Surface gegen unterschiedliche Bildhelligkeit, damit Angebote nicht weißer wirkt als Events, ohne Geometrie oder Rail-Contract zu verändern; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
-  .desktop-hero{
-    --hero-bg-size-active: var(--hero-bg-size-desktop-narrow);
-    --hero-bg-position-active: 89.5% 10%;
-    gap: 12px;
-    min-height: 380px;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-top: 16px;
-    padding-bottom: 14px;
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1028px;
+    --desktop-shell-pad-x: 24px;
+    --desktop-copy-surface-max: 29.5rem;
+    --desktop-copy-max: 23.1rem;
+    --desktop-panel-gap: 6px;
+    --desktop-panel-height: 54px;
+    --desktop-reset-w: 44px;
   }
 
-  .desktop-hero::before{
-    background-image:
-      linear-gradient(90deg, rgba(246,248,240,0.986) 0%, rgba(246,248,240,0.976) 8%, rgba(246,248,240,0.86) 14%, rgba(245,247,238,0.54) 20%, rgba(244,246,236,0.22) 27%, rgba(244,246,236,0.06) 34%, rgba(244,246,236,0.00) 40%),
-      radial-gradient(42% 54% at 16% 28%, rgba(245,248,239,0.28) 0%, rgba(245,248,239,0.12) 40%, rgba(245,248,239,0.03) 64%, rgba(245,248,239,0.00) 80%),
-      linear-gradient(180deg, rgba(245,248,239,0.18) 0%, rgba(245,248,239,0.06) 18%, rgba(245,248,239,0.015) 42%, rgba(245,248,239,0.07) 100%),
-      radial-gradient(circle at 70% 22%, rgba(240,222,137,0.05) 0%, rgba(240,222,137,0.00) 14%),
-      var(--hero-bg-image-active);
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-position: left top, left top, center top, 70% 22%, var(--hero-bg-position-active);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, var(--hero-bg-size-active);
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 384px;
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
+    padding-top: 18px;
+    padding-bottom: 12px;
+    gap: 10px;
   }
 
-  .desktop-entry__content{
-    max-width: 26rem;
-    gap: 8px;
+  body.is-tabbar-hidden .desktop-hero::after,
+  body.page-route-activities .desktop-hero::after{
+    background:
+      linear-gradient(
+        90deg,
+        rgba(243,246,240,0.22) 0%,
+        rgba(243,246,240,0.12) 6%,
+        rgba(243,246,240,0.04) 12%,
+        rgba(243,246,240,0.00) 18%
+      ),
+      radial-gradient(
+        52% 74% at 11% 30%,
+        rgba(247,249,243,0.05) 0%,
+        rgba(247,249,243,0.01) 44%,
+        rgba(247,249,243,0.00) 74%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(247,249,244,0.00) 0%,
+        rgba(247,249,244,0.00) 56%,
+        rgba(233,237,220,0.09) 78%,
+        rgba(233,237,220,0.22) 92%,
+        rgba(233,237,220,0.34) 100%
+      );
   }
 
-  .desktop-entry__title{
-    max-width: 22.5rem;
-    font-size: clamp(2.28rem, 2.14rem + 0.42vw, 2.74rem);
-    line-height: 0.98;
+  body.is-tabbar-hidden .desktop-entry__inner::before,
+  body.page-route-activities .desktop-entry__inner::before{
+    content: none;
   }
 
-  .desktop-entry__text{
-    max-width: 20.25rem;
-    font-size: 0.90rem;
-    line-height: 1.38;
+  body.is-tabbar-hidden .desktop-entry__content,
+  body.page-route-activities .desktop-entry__content{
+    display: inline-grid;
+    justify-self: start;
+    width: fit-content;
+    max-width: min(100%, var(--desktop-copy-max));
+    gap: 9px;
+    padding-top: 6px;
+    padding-bottom: 7px;
   }
 
-  .desktop-entry__lead-line{
-    white-space: normal;
+  body.is-tabbar-hidden .desktop-entry__content::before,
+  body.page-route-activities .desktop-entry__content::before{
+    inset: -7px -7px -8px -7px;
+    border-radius: 18px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(238,242,231,0.70) 0%,
+        rgba(238,242,231,0.58) 28%,
+        rgba(237,241,230,0.36) 52%,
+        rgba(236,240,229,0.15) 69%,
+        rgba(236,240,229,0.02) 83%,
+        rgba(236,240,229,0.00) 90%
+      ),
+      radial-gradient(
+        88% 104% at 14% 35%,
+        rgba(240,244,234,0.38) 0%,
+        rgba(239,243,232,0.18) 44%,
+        rgba(238,242,231,0.05) 66%,
+        rgba(238,242,231,0.00) 84%
+      );
+    filter: blur(3px);
   }
 
-  .top-stack{
-    margin-top: 0;
-    padding: 10px 11px 9px;
-    border-radius: 20px;
+  body.is-tabbar-hidden .desktop-entry__content::after,
+  body.page-route-activities .desktop-entry__content::after{
+    content: none;
   }
 
-  .top-stack::before{
-    inset: 7px;
-    border-radius: 14px;
+  body.is-tabbar-hidden .desktop-entry__title,
+  body.page-route-activities .desktop-entry__title{
+    max-width: 23.9rem;
+    font-size: clamp(2.34rem, 2.16rem + 0.48vw, 2.74rem);
+    line-height: 1;
+    letter-spacing: -0.052em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.06);
   }
 
-  .desktop-hero__search-row{
-    grid-template-columns: minmax(0, 1fr) 156px 156px;
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
+    max-width: 20.2rem;
+    color: rgba(11,24,18,0.98);
+    font-size: 1rem;
+    line-height: 1.48;
+    font-weight: 620;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
     gap: 6px;
+    padding-top: 0;
   }
 
-  .desktop-hero__search-row.has-active-filter-reset{
-    grid-template-columns: minmax(0, 1fr) 156px 156px 44px;
+  body.is-tabbar-hidden .top-stack::before,
+  body.page-route-activities .top-stack::before{
+    inset: -3px -5px -5px -5px;
+    border-radius: 20px;
+    filter: blur(5px);
   }
 
-  .desktop-hero__search-field .desktop-hero__icon--search{
-    left: 19px;
+  body.is-tabbar-hidden .desktop-hero__search-row::before,
+  body.page-route-activities .desktop-hero__search-row::before{
+    inset: -2px -3px -2px -3px;
+    border-radius: 15px;
+    filter: blur(4px);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search,
+  body.page-route-activities .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 18px;
     width: 17px;
     height: 17px;
   }
 
-  .top-stack #search-filter,
-  .desktop-hero__toolbar-pill{
-    height: 54px;
-  }
-
-  .top-stack #search-filter{
-    padding-left: 42px;
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.page-route-activities .top-stack #search-filter{
+    padding-left: 40px;
     padding-right: 16px;
-    font-size: 0.96rem;
-    border-radius: 15px;
+    font-size: 0.95rem;
+    border-radius: 16px;
   }
 
-  .desktop-hero__toolbar-pill{
-    padding: 7px 11px 7px;
-    column-gap: 7px;
-    border-radius: 14px;
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill,
+  body.page-route-activities .desktop-hero__toolbar-pill{
+    padding: 7px 11px;
+    column-gap: 6px;
+    border-radius: 16px;
   }
 
-  .desktop-hero__search-row > .filter-pill--reset{
-    width: 44px;
-    min-width: 44px;
-    min-height: 54px;
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__label,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label{
+    font-size: 0.62rem;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__label{
-    font-size: 0.64rem;
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__value,
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__value{
+    font-size: 0.87rem;
   }
 
-  .desktop-hero__toolbar-pill .filter-pill__value{
-    font-size: 0.88rem;
+  body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset,
+  body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--desktop-reset-w);
+    min-width: var(--desktop-reset-w);
+    min-height: var(--desktop-panel-height);
+    border-radius: 16px;
   }
 
-  .desktop-hero__actions{
-    gap: 5px;
-    padding-top: 8px;
+  body.is-tabbar-hidden .desktop-hero__actions,
+  body.page-route-activities .desktop-hero__actions{
+    gap: var(--desktop-panel-gap);
   }
 
-  .desktop-hero__action{
-    min-height: 34px;
-    padding-left: 9px;
-    padding-right: 9px;
-    border-radius: 10px;
-    font-size: 0.80rem;
+  body.is-tabbar-hidden .desktop-hero__action,
+  body.page-route-activities .desktop-hero__action{
+    min-height: 35px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.74) inset,
+      0 2px 6px rgba(16,28,10,0.010);
+  }
+
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
+    padding-left: var(--desktop-shell-pad-x);
+    padding-right: var(--desktop-shell-pad-x);
   }
 }
-/* === END BLOCK: DESKTOP_HERO_NARROW_DESKTOP_V26 === */
-/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V2 | Purpose: hält Desktop-Filter-Popover inkl. integriertem Kalender vollständig im Viewport und erlaubt internes Scrollen statt abgeschnittener Fläche; Scope: only desktop filter popovers, trigger open-state and popover option styling on the homepage === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 === */
+
+@media (min-width: 1600px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1108px;
+    --desktop-shell-pad-x: 32px;
+    --desktop-copy-surface-max: 34.2rem;
+    --desktop-copy-max: 29.5rem;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 414px;
+    padding-top: 21px;
+  }
+
+  body.is-tabbar-hidden .desktop-entry__title,
+  body.page-route-activities .desktop-entry__title{
+    max-width: 29rem;
+    font-size: clamp(3.04rem, 2.92rem + 0.44vw, 4rem);
+  }
+
+  body.is-tabbar-hidden .desktop-entry__text,
+  body.page-route-activities .desktop-entry__text{
+    max-width: 21.8rem;
+  }
+
+  body.is-tabbar-hidden .top-stack,
+  body.page-route-activities .top-stack{
+    gap: 6px;
+  }
+}
+/* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 === */
+/* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
   .filter-popover[hidden]{
     display: none !important;
@@ -1315,11 +1721,13 @@
     transform-origin: top left;
   }
 
-  #popover-time{
+  #popover-time,
+  #popover-situation{
     width: min(280px, calc(100vw - 32px));
   }
 
-  #popover-category{
+  #popover-category,
+  #popover-offer-category{
     width: min(332px, calc(100vw - 32px));
   }
 
@@ -1403,7 +1811,9 @@
   }
 
   #filter-time-pill[aria-expanded="true"],
-  #filter-category-pill[aria-expanded="true"]{
+  #filter-category-pill[aria-expanded="true"],
+  #offer-situation-pill[aria-expanded="true"],
+  #offer-category-pill[aria-expanded="true"]{
     border-color: rgba(111,135,88,0.22);
     background: rgba(255,255,255,0.985);
     box-shadow:
@@ -1472,7 +1882,7 @@
     display: none !important;
   }
 }
-/* === END BLOCK: DESKTOP_FILTER_POPOVER_V2 === */
+/* === END BLOCK: DESKTOP_FILTER_POPOVER_V3 === */
 
 /* === BEGIN BLOCK: HOME_EMPTY_STATE_ALIGN_V1 | Zweck: entfernt im Home-Empty-State den zusätzlichen Reset-Button visuell, zieht den Empty-State auf dieselbe Rail/Breite wie Search und Feed und zentriert den Text nur auf Mobile; Umfang: nur Home-Empty-State im Event-Feed === */
 #event-cards .empty-state{

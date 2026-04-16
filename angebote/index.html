@@ -3,26 +3,11 @@
 <head>
 <link rel="canonical" href="https://bocholt-erleben.de/angebote/">
 <meta charset="UTF-8">
-<!-- === BEGIN BLOCK: OFFERS DISABLED (silent redirect) ===
-Zweck: Angebote-Seite ist unfertig → User sollen sie nicht sehen (auch bei Direktaufruf).
-Umfang: noindex + sehr früher Redirect nach / (ohne Hinweistext).
-=== -->
-<meta name="robots" content="noindex, nofollow">
-<script>
-  (function () {
-    try { window.location.replace("/"); } catch (e) { window.location.href = "/"; }
-  })();
-</script>
-<noscript>
-  <meta http-equiv="refresh" content="0;url=/">
-</noscript>
-<!-- === END BLOCK: OFFERS DISABLED (silent redirect) === -->
-  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Dauerhafte Angebote in Bocholt & Umgebung: Museen, Ausflugsziele, Kinderangebote und mehr – übersichtlich und schnell.">
 
-<!-- PWA Meta Tags -->
-<meta name="theme-color" content="#8BCF4A">
+<meta name="description" content="Aktivitäten in Bocholt und Umgebung: Natur, Kultur, Freizeitideen und Unternehmungen – passend zu deiner Situation und schnell gefunden.">
+
+<meta name="theme-color" content="#F3F2E6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
@@ -33,23 +18,25 @@ Umfang: noindex + sehr früher Redirect nach / (ohne Hinweistext).
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
-<title>Angebote in Bocholt – dauerhaft geöffnet & Freizeitideen</title>
+<title>Aktivitäten in Bocholt – Freizeit, Natur, Kultur & Ideen</title>
 
-	<!-- === BEGIN BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) ===
-	Zweck:
-	- Vereinheitlicht den stylesheet-link mit dem restlichen Projekt
-	Umfang:
-	- Ersetzt nur den stylesheet-link
-	=== -->
-	<link rel="stylesheet" href="/css/style.css?v=1">
-	<!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
-
+<!-- === BEGIN BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) ===
+Zweck:
+- Vereinheitlicht den stylesheet-link mit dem restlichen Projekt
+Umfang:
+- Ersetzt nur den stylesheet-link
+=== -->
+<link rel="stylesheet" href="/css/style.css?v=1">
+<!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
 </head>
 
-<body>
-<!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
-Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
-Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Menü.
+<body class="page-route-activities has-bottom-tabbar">
+<!-- === BEGIN BLOCK: HEADER (logo/title + install + about) ===
+Zweck:
+- Gleiche Header-DNA wie Home
+- Keine Sonderlogik nur für Aktivitäten
+Umfang:
+- kompletter Header
 === -->
 <header class="app-header">
   <div class="header-left">
@@ -60,137 +47,236 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     >
     <span class="app-title">Bocholt erleben</span>
   </div>
-
   <div class="header-right">
-    <button type="button" class="pwa-install-button">
-      Installieren
-    </button>
-
-    <!-- === BEGIN BLOCK: HEADER PUBLISH CTA (link to publish page) ===
-Zweck: Primärer CTA führt direkt zur Aktionsseite (kein Modal).
-Umfang: Ersetzt nur den bisherigen "Events veröffentlichen"-Button im Header.
-=== -->
-    <a
-      class="pwa-install-button"
-      href="/events-veroeffentlichen/"
-    >
-      Veröffentlichen
-    </a>
-    <!-- === END BLOCK: HEADER PUBLISH CTA (link to publish page) === -->
+    <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren"><span class="pwa-install-button__icon" data-ui-icon="download" aria-hidden="true"></span><span class="pwa-install-button__label">App</span></button>
+    <a class="pwa-install-button" href="/ueber/" aria-label="Über Bocholt erleben"><span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span><span class="pwa-install-button__label">Info</span></a>
   </div>
 </header>
-<!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
+<!-- === END BLOCK: HEADER (logo/title + install + about) === -->
 
-<!-- === BEGIN BLOCK: OFFERS VIEW (data-driven, cards + filter + detail host) ===
-Zweck:
-- Angebotsliste dynamisch aus /data/offers.json rendern (Cards)
-- Kategorie-Filter analog zu Events (minimal, mobile-first)
-- Host für Detailansicht (Overlay wird später über JS befüllt / geöffnet)
-Umfang: Ersetzt den kompletten bisherigen Main-Content der Angebotsseite.
-=== -->
-<main class="page">
-  <div class="content-hero">
-    <p class="content-kicker">Ideen für draußen</p>
-    <h1>Angebote in Bocholt</h1>
-    <p class="content-lead">
-      Badeseen, Natur und Wege – als schnelle Ideenliste.
-    </p>
-  </div>
+<!-- === BEGIN BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 | Zweck: stellt direkt unter dem globalen Header einen dedizierten Root für die zentrale Desktop-Bereichs-Navigation bereit | Umfang: genau ein Root-Container für die Desktop-Section-Nav === -->
+<div id="desktop-section-nav-root"></div>
+<!-- === END BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 === -->
 
-   <!-- === BEGIN BLOCK: OFFERS FILTER BAR (category + tag) ===
+<main class="page--activities">
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) ===
 Zweck:
-- Zwei Filter wie State of the Art: Kategorie (Haupt) + Aktivität (Tag/Intent)
-- Mobile-first, ruhig, keine Pills auf Cards
+- entfernt die generische .page-Hülle, damit kein zusätzlicher Balken/Top-Abstand zwischen Header und Hero entsteht
+- zieht Aktivitäten oben strukturell auf dieselbe Shell wie Events
+- ergänzt die zweite Service-Zeile für Desktop-Parität
+- benennt die Activities-Filter konsistent auf Merkmal + Kategorie um, ohne die aktuelle Lucide-/Chevron-Logik zurückzubauen
 Umfang:
-- ersetzt ausschließlich den bisherigen Filter-Section-Block
+- Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
-  <section class="filter-bar" aria-label="Filter">
-    <div class="filter-row">
-      <label class="filter-label" for="offer-category">Kategorie</label>
-      <select id="offer-category" class="filter-select">
-        <option value="">Alle</option>
-      </select>
-    </div>
+  <section class="desktop-hero" aria-label="Suche und Einführung">
+    <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 | Zweck: entfernt die doppelte desktop-entry__content-Verschachtelung im Activities-Hero, damit die gemeinsame Contrast-Surface nur einmal greift und optisch auf den Events-Stand zurückfällt; Umfang: nur Hero-Copy-Struktur von /angebote/ bis vor den Top-Stack === -->
+    <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
+      <div class="desktop-entry__inner">
+        <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
+        <div class="desktop-entry__content">
+          <h1 class="desktop-entry__title">Aktivitäten in Bocholt</h1>
+          <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation.</p>
+        </div>
+        <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
+      </div>
+    </section>
 
-    <div class="filter-row">
-      <label class="filter-label" for="offer-tag">Aktivität</label>
-      <select id="offer-tag" class="filter-select">
-        <option value="">Alle</option>
-      </select>
+    <div class="top-stack desktop-hero__panel">
+    <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
+      <div class="desktop-hero__search-row" aria-label="Suche und Filter">
+        <div class="events-filter desktop-hero__search-slot">
+          <label class="desktop-hero__search-field" for="search-filter">
+            <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
+            <input
+              id="search-filter"
+              type="search"
+              placeholder="Aktivität oder Ort suchen"
+              aria-label="Aktivitäten suchen"
+              autocomplete="off"
+              inputmode="search"
+            >
+          </label>
+        </div>
+
+<!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: bereinigt die doppelte Bereich-Pill auf /angebote/ und hält genau eine Merkmal-Pill plus genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: ersetzt nur den kompletten Aktivitäten-Filter-Pill-Block direkt vor der Reset-Pill === -->
+<button
+  type="button"
+  class="filter-pill desktop-hero__toolbar-pill"
+  id="offer-situation-pill"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="popover-situation"
+  data-filter-key="situation"
+>
+  <span class="filter-pill__label">Merkmal</span>
+  <span class="filter-pill__value" id="offer-situation-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+
+<button
+  type="button"
+  class="filter-pill desktop-hero__toolbar-pill"
+  id="offer-category-pill"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="popover-offer-category"
+  data-filter-key="category"
+>
+  <span class="filter-pill__label">Kategorie</span>
+  <span class="filter-pill__value" id="offer-category-value">Alle</span>
+  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+</button>
+
+<button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
+          <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="desktop-hero__actions" aria-label="Service">
+        <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
+          <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
+          <span>Event veröffentlichen</span>
+        </a>
+
+        <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
+          <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
+          <span>Mehr erfahren</span>
+        </a>
+
+        <button
+          type="button"
+          class="desktop-hero__action desktop-hero__action--app"
+          data-pwa-install-trigger
+          aria-label="Als App installieren"
+        >
+          <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="smartphone" aria-hidden="true"></span>
+          <span>Als App nutzen</span>
+        </button>
+      </div>
     </div>
   </section>
-  <!-- === END BLOCK: OFFERS FILTER BAR (category + tag) === -->
 
-
-  <!-- LOADING / EMPTY / ERROR (wird von js/offers-main.js befüllt) -->
-  <div id="loading" class="loading-container">
-    <div class="loading-spinner"></div>
-    <p>Angebote werden geladen...</p>
+  <div class="filter-sheet" id="sheet-situation" role="dialog" aria-modal="true" aria-label="Merkmal auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Merkmal</div>
+<button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
+      </div>
+      <div class="filter-sheet__body" id="sheet-situation-options">
+        <button type="button" class="filter-sheet-option is-active" data-situation="">Alle</button>
+      </div>
+    </div>
   </div>
 
-  <!-- OFFER CARDS SECTION -->
-  <section class="events-section" aria-label="Angebote">
-    <div id="offer-cards" class="event-cards-grid">
-      <!-- Offer cards werden hier dynamisch eingefügt -->
+  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
+    <div class="filter-sheet__overlay" data-close-sheet></div>
+    <div class="filter-sheet__card">
+      <div class="filter-sheet__header">
+        <div class="filter-sheet__title">Kategorie</div>
+<button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
+      </div>
+      <div class="filter-sheet__body" id="sheet-category-options">
+        <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
+      </div>
     </div>
+  </div>
+
+  <div id="popover-situation" class="filter-popover" hidden>
+    <div class="filter-popover__panel" id="popover-situation-options" aria-label="Merkmal auswählen"></div>
+  </div>
+
+  <div id="popover-offer-category" class="filter-popover" hidden>
+    <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Kategorie auswählen"></div>
+  </div>
+  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) === -->
+
+  <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <p>Aktivitäten werden geladen...</p>
+  </div>
+
+  <section class="events-section activity-feed-section" aria-label="Aktivitäten">
+    <div id="offer-cards" class="event-cards-grid activity-cards-grid"></div>
   </section>
+
+  <!-- === BEGIN BLOCK: ACTIVITIES_INITIAL_SKELETON_SEED_V1 | Zweck: zeigt auf /angebote/ bereits während HTML-Parse sofort Skeleton-Cards im Feed, damit der erste Wechsel per Bottom Tab Bar nicht leer/spinnerlastig wirkt | Umfang: genau ein früher Inline-Seed für #offer-cards vor den defer-Skripten === -->
+  <script>
+    (function () {
+      const grid = document.getElementById("offer-cards");
+      if (!grid || grid.children.length) return;
+
+      const card = `
+        <article class="event-card discovery-card--compact activity-card--rich is-skeleton" tabindex="-1" aria-hidden="true">
+          <div class="activity-card-media activity-card-media--image" aria-hidden="true">
+            <div class="activity-card-skeleton-media skel-block"></div>
+          </div>
+          <div class="event-card-body">
+            <div class="activity-card-kicker">
+              <span class="skel-line skel-line--sm" style="width:64px"></span>
+            </div>
+            <h2 class="event-title">
+              <span class="event-title__text">
+                <span class="skel-line" style="width:72%"></span>
+              </span>
+            </h2>
+            <div class="event-card-desc">
+              <span class="skel-line" style="width:96%"></span>
+              <span class="skel-line" style="width:78%; margin-top:8px;"></span>
+            </div>
+            <div class="event-meta">
+              <span class="event-meta__place">
+                <span class="skel-line skel-line--sm" style="width:38%"></span>
+              </span>
+            </div>
+            <div class="activity-card-facts" aria-hidden="true">
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:56px"></span></span>
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:62px"></span></span>
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:68px"></span></span>
+            </div>
+          </div>
+        </article>
+      `.trim();
+
+      grid.innerHTML = new Array(8).fill(card).join("");
+    })();
+  </script>
+  <!-- === END BLOCK: ACTIVITIES_INITIAL_SKELETON_SEED_V1 === -->
 </main>
 
-<!-- === BEGIN BLOCK: OVERLAY ROOTS (offers) ===
+<!-- === BEGIN BLOCK: OVERLAY ROOTS (activities) ===
 Zweck:
 - Dedizierter Overlay-Root direkt unter <body> gemäß Architekturregel
 - wird von js/offers-details.js benutzt
-- verhindert Sticky/Transform/Backdrop Bugs
 Umfang:
-- genau ein Root-Container für Offer-Detailpanel
+- genau ein Root-Container für Activity-Detailpanel
 === -->
 <div id="offer-detail-root"></div>
-<!-- === END BLOCK: OVERLAY ROOTS (offers) === -->
+<!-- === END BLOCK: OVERLAY ROOTS (activities) === -->
 
-<!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Angebote) ===
-Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar, ohne Filter-Pills.
-Umfang: Fügt eine Bottom Tab Bar direkt vor den Script-Includes ein.
-=== -->
-<nav class="bottom-tabbar" aria-label="Hauptnavigation">
-  <a class="bottom-tabbar__item" href="/">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13A2.5 2.5 0 0 1 19.5 22h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 6H4.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5ZM6 6h12V5H6v1Z"/>
-      </svg>
-    </span>
-    <span class="bottom-tabbar__label">Events</span>
-  </a>
+<!-- === BEGIN BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 | Zweck: stellt den dedizierten Root direkt unter <body> für die zentral gerenderte mobile Primary-Navigation bereit | Umfang: genau ein Root-Container für die Bottom Tab Bar === -->
+<div id="bottom-tabbar-root"></div>
+<!-- === END BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 === -->
 
-  <a class="bottom-tabbar__item is-active" href="/angebote/" aria-current="page">
-    <span class="bottom-tabbar__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
-        <path d="M12 2a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm0 2a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm3.8 4.7a1 1 0 0 1 1.3 1.3l-2.1 5.2a1 1 0 0 1-.6.6l-5.2 2.1a1 1 0 0 1-1.3-1.3l2.1-5.2a1 1 0 0 1 .6-.6l5.2-2.1Zm-4.1 2.8-1.3 3.2 3.2-1.3 1.3-3.2-3.2 1.3Z"/>
-      </svg>
-    </span>
-    <span class="bottom-tabbar__label">Angebote</span>
-  </a>
-</nav>
-<!-- === END BLOCK: BOTTOM TAB BAR (Events/Angebote) === -->
-
-<!-- === BEGIN BLOCK: JS INCLUDES (offers page final order) ===
+<!-- === BEGIN BLOCK: JS INCLUDES (activities page final order V3) ===
 Zweck:
+- gemeinsame Icon-Registry auch auf Aktivitätenseite verfügbar
+- rendert die mobile Primary-Navigation zentral aus genau einer JS-Quelle
 - Reihenfolge garantiert:
-  1) config / pwa / modal
-  2) offers-details (Panel API)
-  3) offers (Cards)
-  4) offers-main (Filter + Boot)
-- alles defer → keine Render-Blocker
+  1) config / pwa / modal / icons / bottom-tabbar
+  2) offers (shared visuals + cards)
+  3) offers-details (mobile panel)
+  4) offers-main (filter + boot)
 === -->
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<script src="/js/icons.js?v=2026-02-04-1" defer></script>
+<script src="/js/bottom-tabbar.js?v=2026-04-16-1" defer></script>
 
-<script src="/js/offers-details.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers.js?v=2026-02-04-1" defer></script>
+<script src="/js/offers-details.js?v=2026-02-04-1" defer></script>
 <script src="/js/offers-main.js?v=2026-02-04-1" defer></script>
-<!-- === END BLOCK: JS INCLUDES (offers page final order) === -->
-
-
+<!-- === END BLOCK: JS INCLUDES (activities page final order V3) === -->
 </body>
-
 </html>

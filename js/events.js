@@ -332,20 +332,22 @@ function createCard(event) {
     dateLabel = formatDate(event.date);
   }
 
-  const startDateObj = parseISODateLocal(event?.date);
-  const weekdayShort = startDateObj
+  /* === BEGIN BLOCK: EVENT_CARD_BADGE_EFFECTIVE_DATE_V1 | Purpose: Badge-Datum an die range-aware Feed-Logik angleichen, damit laufende Mehrtages-Events unter "Heute" auch das heutige Datum im Badge zeigen | Scope: ersetzt nur die Badge-Datumsbasis innerhalb von createCard === */
+  const badgeDateObj = getEffectiveDate(event) || parseISODateLocal(event?.date);
+  const weekdayShort = badgeDateObj
     ? new Intl.DateTimeFormat("de-DE", { weekday: "short" })
-        .format(startDateObj)
+        .format(badgeDateObj)
         .replace(".", "")
         .toUpperCase()
     : "";
-  const dayNum = startDateObj ? String(startDateObj.getDate()).padStart(2, "0") : "";
-  const monthShort = startDateObj
+  const dayNum = badgeDateObj ? String(badgeDateObj.getDate()).padStart(2, "0") : "";
+  const monthShort = badgeDateObj
     ? new Intl.DateTimeFormat("de-DE", { month: "short" })
-        .format(startDateObj)
+        .format(badgeDateObj)
         .replace(".", "")
         .toUpperCase()
     : "";
+  /* === END BLOCK: EVENT_CARD_BADGE_EFFECTIVE_DATE_V1 === */
 
   const badge = document.createElement("div");
   badge.className = "event-date-badge";
@@ -592,33 +594,37 @@ function renderList(list) {
     return;
   }
 
-  const createFeedPublishEntry = () => {
-    const link = document.createElement("a");
-    link.className = "feed-publish-entry";
-    link.href = "/events-veroeffentlichen/";
-    link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+/* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 | Zweck: ersetzt den textbasierten Chevron im mobilen Veranstalter-Entry durch ein globales Lucide-SVG; Umfang: ersetzt nur createFeedPublishEntry() === */
+const createFeedPublishEntry = () => {
+  const link = document.createElement("a");
+  link.className = "feed-publish-entry";
+  link.href = "/events-veroeffentlichen/";
+  link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
 
-    const label = document.createElement("span");
-    label.className = "feed-publish-entry__label";
-    label.textContent = "Für Veranstalter";
+  const label = document.createElement("span");
+  label.className = "feed-publish-entry__label";
+  label.textContent = "Für Veranstalter";
 
-    const main = document.createElement("span");
-    main.className = "feed-publish-entry__main";
+  const main = document.createElement("span");
+  main.className = "feed-publish-entry__main";
 
-    const title = document.createElement("span");
-    title.className = "feed-publish-entry__title";
-    title.textContent = "Event veröffentlichen";
+  const title = document.createElement("span");
+  title.className = "feed-publish-entry__title";
+  title.textContent = "Event veröffentlichen";
 
-    const chevron = document.createElement("span");
-    chevron.className = "feed-publish-entry__chevron";
-    chevron.setAttribute("aria-hidden", "true");
-    chevron.textContent = "›";
+  const chevron = document.createElement("span");
+  chevron.className = "feed-publish-entry__chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.innerHTML = window.Icons?.svg
+    ? window.Icons.svg("chevron-right", { className: "feed-publish-entry__chevron-svg" })
+    : "";
 
-    main.append(title, chevron);
-    link.append(label, main);
+  main.append(title, chevron);
+  link.append(label, main);
 
-    return link;
-  };
+  return link;
+};
+/* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 === */
 
   const createSectionHeader = (label) => {
     const h = document.createElement("div");
@@ -654,12 +660,19 @@ function renderList(list) {
     return;
   }
 
+  /* === BEGIN BLOCK: RENDER_LIST_EFFECTIVE_DAY_V1 ===
+  Zweck: Section-Bucketing nutzt dieselbe range-aware Datumsbasis wie Sortierung/Filterung.
+  Umfang: Laufende Mehrtages-Events werden im Feed als "heute" gruppiert statt nur nach Startdatum.
+  === */
   const toDay = (ev) => {
-    const d = parseISODateLocal(ev?.date);
+    const d = getEffectiveDate(ev);
     if (!d) return null;
-    d.setHours(0, 0, 0, 0);
-    return d;
+
+    const day = new Date(d);
+    day.setHours(0, 0, 0, 0);
+    return day;
   };
+  /* === END BLOCK: RENDER_LIST_EFFECTIVE_DAY_V1 === */
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -678,17 +691,12 @@ function renderList(list) {
     return t;
   };
 
-  const getNextWeekendRange = (base) => {
-    const day = base.getDay();
-    const daysUntilFriday = ((5 - day) + 7) % 7;
-    const start = addDays(base, daysUntilFriday);
-    start.setHours(0, 0, 0, 0);
-
-    const end = addDays(start, 2);
-    end.setHours(23, 59, 59, 999);
-
-    return { start, end };
-  };
+  /* === BEGIN BLOCK: RENDER_LIST_WEEKEND_RANGE_REUSE_V1 ===
+  Zweck: renderList nutzt die bereits global definierte, robuste Weekend-Range-Logik.
+  Umfang: entfernt die lokale Doppelimplementierung, damit "Dieses Wochenende" am Sa/So das aktuelle Wochenende bleibt.
+  === */
+  /* renderList verwendet bewusst die globale Funktion getNextWeekendRange(today). */
+  /* === END BLOCK: RENDER_LIST_WEEKEND_RANGE_REUSE_V1 === */
 
   const endOfDay = (d) => {
     const t = new Date(d);

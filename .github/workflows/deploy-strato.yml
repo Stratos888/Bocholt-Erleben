@@ -53,6 +53,11 @@ jobs:
       #   - Exportiert gezielt die Tabs "Events" und "Inbox" via Sheets API.
       # Sicherheit:
       #   - Abbruch bei Auth-/Read-Fehlern oder fehlenden Pflichtspalten.
+      # === BEGIN BLOCK: GOOGLE SHEET → TSV EXPORTS (Events + Inbox, fail-fast + retry-hardened) ===
+      # Zweck:
+      #   - Google Sheet bleibt die einzige Quelle (Fail-Fast, kein Fallback).
+      #   - Transiente Read-/Timeout-Probleme werden sauber per Timeout + Retry + Backoff gehärtet.
+      #   - Echte Strukturfehler (fehlende ENV, ungültiges JSON, fehlende Header) bleiben sofort fail-fast.
       - name: Install deps (Google Sheets API)
         shell: bash
         run: |
@@ -60,7 +65,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth
 
-      - name: Export Events tab to data/events.tsv (fail-fast)
+      - name: Export Events tab to data/events.tsv (fail-fast, retry-hardened)
+        timeout-minutes: 6
         shell: bash
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
@@ -68,59 +74,102 @@ jobs:
         run: |
           set -e
           python - <<'PY'
-          import csv, json, os, sys
+          # === BEGIN BLOCK: EVENTS_TAB_EXPORT_RETRY_HARDENED ===
+          import csv, json, os, sys, time, socket, ssl
           from google.oauth2 import service_account
           from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
 
           sheet_id = os.environ.get("SHEET_ID", "").strip()
           sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+
           if not sheet_id:
-            print("❌ ENV SHEET_ID fehlt.", file=sys.stderr); sys.exit(1)
+              fail("ENV SHEET_ID fehlt.")
           if not sa_json:
-            print("❌ ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.", file=sys.stderr); sys.exit(1)
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
 
           try:
-            sa_info = json.loads(sa_json)
+              sa_info = json.loads(sa_json)
           except Exception:
-            print("❌ GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.", file=sys.stderr); sys.exit(1)
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
+
+          socket.setdefaulttimeout(90)
 
           scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
           creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
           service = build("sheets", "v4", credentials=creds, cache_discovery=False)
 
-          # Tab "Events" gezielt lesen
+          def fetch_values_with_retry(range_name, label, attempts=4):
+              last_exc = None
+
+              for attempt in range(1, attempts + 1):
+                  try:
+                      print(f"↻ {label}: Versuch {attempt}/{attempts}")
+                      res = service.spreadsheets().values().get(
+                          spreadsheetId=sheet_id,
+                          range=range_name,
+                          majorDimension="ROWS"
+                      ).execute(num_retries=4)
+                      return res.get("values", []) or []
+
+                  except HttpError as exc:
+                      status = getattr(exc.resp, "status", None)
+                      retryable = status in (408, 429, 500, 502, 503, 504)
+                      last_exc = exc
+
+                      if (not retryable) or attempt >= attempts:
+                          raise
+
+                      wait_s = attempt * 5
+                      print(f"⚠️ {label}: HttpError {status}, Retry in {wait_s}s", file=sys.stderr)
+                      time.sleep(wait_s)
+
+                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as exc:
+                      last_exc = exc
+
+                      if attempt >= attempts:
+                          raise
+
+                      wait_s = attempt * 5
+                      print(f"⚠️ {label}: {type(exc).__name__}, Retry in {wait_s}s", file=sys.stderr)
+                      time.sleep(wait_s)
+
+              raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
+
           rng = "Events!A:ZZ"
-          res = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=rng).execute()
-          values = res.get("values", []) or []
+          values = fetch_values_with_retry(rng, "Events-Tab")
+
           if not values:
-            print("❌ Events-Tab ist leer oder nicht lesbar.", file=sys.stderr); sys.exit(1)
+              fail("Events-Tab ist leer oder nicht lesbar.")
 
           header = [h.strip() for h in (values[0] or [])]
-          required = ["id","title","date","city","location","kategorie"]
+          required = ["id", "title", "date", "city", "location", "kategorie"]
           missing = [c for c in required if c not in header]
           if missing:
-            print(f"❌ Events-Header unvollständig. Fehlende Spalten: {missing}. Header={header}", file=sys.stderr)
-            sys.exit(1)
+              fail(f"Events-Header unvollständig. Fehlende Spalten: {missing}. Header={header}")
 
-          # Datenzeilen normalisieren (auf Header-Länge), komplett leere Zeilen entfernen
           rows = []
           for r in values[1:]:
-            r = (r or [])
-            row = [ (r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header)) ]
-            if any(v for v in row):
-              rows.append(row)
+              r = (r or [])
+              row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
+              if any(v for v in row):
+                  rows.append(row)
 
           if not rows:
-            print("❌ Events-Tab enthält keine Datenzeilen (nur Header).", file=sys.stderr)
-            sys.exit(1)
+              fail("Events-Tab enthält keine Datenzeilen (nur Header).")
 
           out_path = "data/events.tsv"
           with open(out_path, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f, delimiter="\t", lineterminator="\n")
-            w.writerow(header)
-            w.writerows(rows)
+              w = csv.writer(f, delimiter="\t", lineterminator="\n")
+              w.writerow(header)
+              w.writerows(rows)
 
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
+          # === END BLOCK: EVENTS_TAB_EXPORT_RETRY_HARDENED ===
           PY
           test -s data/events.tsv
       # === BEGIN BLOCK: DEPLOY_ENV_DECISION_V4 | Zweck: main/live und staging nutzen denselben funktionierenden SFTP-Server/User; nur das Zielverzeichnis unterscheidet sich wieder ===
@@ -144,7 +193,8 @@ jobs:
           echo "Deploy target dir: $TARGET_DIR"
           echo "Environment: $ENV_NAME"
       # === END BLOCK: DEPLOY_ENV_DECISION_V4 ===
-      - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows)
+      - name: Export Inbox tab to data/inbox.tsv (fail-fast, allow empty rows, retry-hardened)
+        timeout-minutes: 6
         shell: bash
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
@@ -152,56 +202,103 @@ jobs:
         run: |
           set -e
           python - <<'PY'
-          import csv, json, os, sys
+          # === BEGIN BLOCK: INBOX_TAB_EXPORT_RETRY_HARDENED ===
+          import csv, json, os, sys, time, socket, ssl
           from google.oauth2 import service_account
           from googleapiclient.discovery import build
+          from googleapiclient.errors import HttpError
+
+          def fail(msg):
+              print(f"❌ {msg}", file=sys.stderr)
+              sys.exit(1)
 
           sheet_id = os.environ.get("SHEET_ID", "").strip()
           sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+
           if not sheet_id:
-            print("❌ ENV SHEET_ID fehlt.", file=sys.stderr); sys.exit(1)
+              fail("ENV SHEET_ID fehlt.")
           if not sa_json:
-            print("❌ ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.", file=sys.stderr); sys.exit(1)
+              fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
 
           try:
-            sa_info = json.loads(sa_json)
+              sa_info = json.loads(sa_json)
           except Exception:
-            print("❌ GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.", file=sys.stderr); sys.exit(1)
+              fail("GOOGLE_SERVICE_ACCOUNT_JSON ist kein gültiges JSON.")
+
+          socket.setdefaulttimeout(90)
 
           scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
           creds = service_account.Credentials.from_service_account_info(sa_info, scopes=scopes)
           service = build("sheets", "v4", credentials=creds, cache_discovery=False)
 
+          def fetch_values_with_retry(range_name, label, attempts=4):
+              last_exc = None
+
+              for attempt in range(1, attempts + 1):
+                  try:
+                      print(f"↻ {label}: Versuch {attempt}/{attempts}")
+                      res = service.spreadsheets().values().get(
+                          spreadsheetId=sheet_id,
+                          range=range_name,
+                          majorDimension="ROWS"
+                      ).execute(num_retries=4)
+                      return res.get("values", []) or []
+
+                  except HttpError as exc:
+                      status = getattr(exc.resp, "status", None)
+                      retryable = status in (408, 429, 500, 502, 503, 504)
+                      last_exc = exc
+
+                      if (not retryable) or attempt >= attempts:
+                          raise
+
+                      wait_s = attempt * 5
+                      print(f"⚠️ {label}: HttpError {status}, Retry in {wait_s}s", file=sys.stderr)
+                      time.sleep(wait_s)
+
+                  except (TimeoutError, socket.timeout, ssl.SSLError, OSError) as exc:
+                      last_exc = exc
+
+                      if attempt >= attempts:
+                          raise
+
+                      wait_s = attempt * 5
+                      print(f"⚠️ {label}: {type(exc).__name__}, Retry in {wait_s}s", file=sys.stderr)
+                      time.sleep(wait_s)
+
+              raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
+
           rng = "Inbox!A:ZZ"
-          res = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=rng).execute()
-          values = res.get("values", []) or []
+          values = fetch_values_with_retry(rng, "Inbox-Tab")
+
           if not values:
-            print("❌ Inbox-Tab ist leer oder nicht lesbar.", file=sys.stderr); sys.exit(1)
+              fail("Inbox-Tab ist leer oder nicht lesbar.")
 
           header = [h.strip() for h in (values[0] or [])]
-          required = ["status","title","source_url","created_at"]
+          required = ["status", "title", "source_url", "created_at"]
           missing = [c for c in required if c not in header]
           if missing:
-            print(f"❌ Inbox-Header unvollständig. Fehlende Spalten: {missing}. Header={header}", file=sys.stderr)
-            sys.exit(1)
+              fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing}. Header={header}")
 
           rows = []
           for r in values[1:]:
-            r = (r or [])
-            row = [ (r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header)) ]
-            if any(v for v in row):
-              rows.append(row)
+              r = (r or [])
+              row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
+              if any(v for v in row):
+                  rows.append(row)
 
           out_path = "data/inbox.tsv"
           with open(out_path, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f, delimiter="\t", lineterminator="\n")
-            w.writerow(header)
-            if rows:
-              w.writerows(rows)
+              w = csv.writer(f, delimiter="\t", lineterminator="\n")
+              w.writerow(header)
+              if rows:
+                  w.writerows(rows)
 
           print(f"✅ Export OK: {len(rows)} Zeilen nach {out_path}")
+          # === END BLOCK: INBOX_TAB_EXPORT_RETRY_HARDENED ===
           PY
           test -s data/inbox.tsv
+      # === END BLOCK: GOOGLE SHEET → TSV EXPORTS (Events + Inbox, fail-fast + retry-hardened) ===
       # === END BLOCK: GOOGLE SHEET → TSV EXPORTS (Events + Inbox, fail-fast) ===
 
       - name: Build events.json from events.tsv
