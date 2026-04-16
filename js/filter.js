@@ -1206,7 +1206,6 @@ Umfang: Ersetzt nur die letzten Zeilen von init() direkt vor dem return.
       timeCounts[key] = baseForTime.filter((event) => matchesTimeKey(event, key)).length;
     }
     /* === END BLOCK: FILTER_TIME_PRESET_COUNTS_V1 === */
-    }
 
     const catCounts = {};
     for (const category of this.canonicalCategories) catCounts[category] = 0;
