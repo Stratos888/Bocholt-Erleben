@@ -232,45 +232,131 @@
   /* Width/max-width for .top-stack are intentionally owned only by DESKTOP_TOP_SHELL_OWNER_CLEANUP_V32. */
   /* === END BLOCK: DESKTOP_TOP_STACK_WIDTH_OWNER_NOTE_V1 === */
 
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_ENRICHMENT_V1 | Zweck: reichert die Desktop-Event-Cards als echte Entscheidungs-Preview für den Direktlink-Flow an, ohne Mobile oder Grid-Logik zu verändern; Umfang: nur Desktop-Typografie, Zusatzmeta, CTA-Zeile und Card-Höhe auf der Homepage === */
   .event-cards-grid{
     max-width: 1128px;
   }
 
   .event-card{
     height: 100%;
-    align-items: start;
+    align-items: stretch;
   }
 
   .event-card-body{
-    gap: 5px;
+    gap: 8px;
+    height: 100%;
+    padding-top: 1px;
   }
 
   .event-title{
-    font-size: 1.02rem;
-    line-height: 1.2;
+    font-size: 1.04rem;
+    line-height: 1.22;
   }
 
   .event-title__text{
     -webkit-line-clamp: 2;
   }
 
+  .event-meta{
+    font-size: 0.92rem;
+    line-height: 1.32;
+  }
+
   .event-card-desc{
     margin: 0;
-    color: rgba(31,41,51,0.78);
+    color: rgba(31,41,51,0.80);
     font-size: 0.95rem;
-    line-height: 1.38;
+    line-height: 1.46;
 
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 
     overflow: hidden;
   }
 
-  .event-card-meta-quiet,
-  .event-card-actions{
-    display: none !important;
+  .event-card-meta-quiet{
+    display: block;
+    margin: 1px 0 0;
+
+    font-size: 0.74rem;
+    font-weight: 760;
+    line-height: 1.28;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(67,82,63,0.66);
   }
+
+  .event-card-actions{
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+
+    margin-top: auto;
+    padding-top: 10px;
+
+    border-top: 1px solid rgba(31,41,51,0.08);
+  }
+
+  .event-card-action{
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 30px;
+    padding: 0;
+
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: rgba(58,73,61,0.88);
+    text-decoration: none;
+
+    cursor: pointer;
+  }
+
+  .event-card-action:hover{
+    color: rgba(36,54,40,0.96);
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
+
+  .event-card-action:focus-visible{
+    outline: 2px solid var(--cmp-focus-ring-brand);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .event-card-action--primary{
+    color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
+  }
+
+  .event-card-action--primary::after{
+    content: "↗";
+    font-size: 0.94em;
+    line-height: 1;
+  }
+
+  .event-card-actions > button.event-card-action{
+    display: none;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_ENRICHMENT_V1 === */
+}
+
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_SINGLE_COLUMN_HEIGHT_V1 | Zweck: nutzt die zusätzliche Breite im 1-Spalten-Desktop für eine ruhigere, informationsstärkere Card-Höhe; Umfang: nur Min-Height der Homepage-Event-Cards zwischen 900px und 1279.98px === */
+  .event-card{
+    min-height: 174px;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_SINGLE_COLUMN_HEIGHT_V1 === */
 }
 
 @media (min-width: 1280px) {
@@ -284,6 +370,12 @@
   .events-feed-group__grid > .event-card{
     height: 100%;
   }
+
+  /* === BEGIN BLOCK: DESKTOP_EVENT_CARD_TWO_COLUMN_HEIGHT_V1 | Zweck: stabilisiert im 2-Spalten-Desktop die angereicherte Card-Hierarchie ohne unnötig große Flächen zu erzeugen; Umfang: nur Min-Height der Homepage-Event-Cards ab 1280px === */
+  .event-card{
+    min-height: 188px;
+  }
+  /* === END BLOCK: DESKTOP_EVENT_CARD_TWO_COLUMN_HEIGHT_V1 === */
 }
 /* === END BLOCK: DESKTOP_HERO_FRAME_V16 === */
 /* ============================================
