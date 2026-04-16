@@ -257,6 +257,12 @@ const OfferDetailPanel = {
             <div class="activity-detail__fact-value">${this.escapeHtml(note)}</div>
           </section>
         ` : ""}
+        ${sections.map((row) => `
+          <section class="activity-detail__fact-section">
+            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+          </section>
+        `).join("")}
       </div>
     `.trim();
   },
