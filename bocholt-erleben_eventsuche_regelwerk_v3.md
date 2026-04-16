@@ -112,15 +112,14 @@ Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese 
 - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze bekannte starke Quellen aktiv, suche zusätzlich bewusst in freigegebenen Low-Monetization-Kulturquellen und behalte einen offenen Discovery-Anteil bei. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze die bewusst freigegebenen Low-Monetization-Quellen aktiv mit, aber arbeite nicht als starre Closed-Whitelist. Discovery-Quellen dürfen gefunden werden, müssen aber für FINAL auf offizieller oder gleichwertig event-spezifischer Quelle verifiziert werden. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
 
 Wenn eine der Referenzdateien fehlt, soll vor dem Suchlauf klar darauf hingewiesen werden, dass für sauberes Dedupe zusätzlich noch der aktuelle Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Stand benötigt werden.
 
----
-
+Wenn zusätzlich eine operative Quellenliste oder ein aktueller `Sources`-Export mitgegeben wird, hat dieser für die Quellenauswahl Vorrang vor bloß impliziten Annahmen.
 ## Ziel
 Finde **neue, echte, veröffentlichungsreife Event-Kandidaten** für **Bocholt erleben**, die mit hoher Wahrscheinlichkeit relevant sind und **noch nicht in unserer Event-App oder Review-Basis enthalten** sind.
 
@@ -197,11 +196,14 @@ Nicht aufnehmen:
 ---
 
 ## 5. Monetarisierungsschutz
+Grundsatz:
+Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf **nicht pauschal normal bespielt** werden.
+
 Nicht aufnehmen:
 
-- Events von **potenziellen späteren zahlenden Kunden**, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
+- Events von potenziellen späteren zahlenden Kunden, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
 - Events, deren Hauptnutzen die Sichtbarkeit einer einzelnen potenziellen Kunden-Location erhöht
-- Eventorte potenzieller Kunden dürfen im KI-Suchlauf **nicht aktiv als zu beliefernde Eventorte** behandelt werden
+- Eventorte potenzieller Kunden, wenn sie im Suchlauf faktisch nur als Reichweitenziel dienen
 
 Besonders vorsichtig behandeln:
 
@@ -213,44 +215,89 @@ Besonders vorsichtig behandeln:
 - kommerzielle Veranstalter
 - sonstige Locations, die später für Event-Veröffentlichung zahlen könnten
 
-### Explizite Schutzregel
-Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf bewusst **nicht** als normale Eventquelle oder Eventort-Liste bespielt werden.
+### Zwei Klassen im Monetarisierungsschutz
 
-Dazu zählt ausdrücklich auch:
+#### A. GESPERRT_KUNDENNAH
+Diese Quellen oder Locations bleiben grundsätzlich gesperrt, wenn sie vor allem wie klassische potenzielle Reichweiten- oder Veröffentlichungs-Kunden wirken.
 
-- **Kulturort Alte Molkerei**
+Regel:
+- nicht aktiv als normale Eventquelle suchen
+- nicht aktiv als Eventort-Liste bespielen
+- im Zweifel weglassen
 
-Für solche Locations gilt konservativ:
+#### B. FREIGEGEBEN_LOW_MONETIZATION
+Diese Quellen dürfen trotz grundsätzlicher Kundennähe aktiv gesucht werden, wenn sie erkennbar eher kultur-, vereins-, stiftungs- oder gemeinwohlorientiert sind und ihre Monetarisierungswahrscheinlichkeit derzeit niedrig bis höchstens mittel erscheint.
 
-- **ohne explizite spätere Freigabe keine neuen Treffer als Eventort liefern**
-- **nicht aktiv nach deren Einzel-Events suchen**
-- **keine Treffer liefern, deren Hauptwert die Sichtbarkeit dieser Location erhöht**
-- **im Zweifel weglassen**
+Regel:
+- aktiv suchen erlaubt
+- Treffer daraus sind grundsätzlich zulässig
+- Freigabe gilt **quellenbezogen**, nicht pauschal für ähnliche kommerzielle Locations
+
+### Bewusst freigegebene Low-Monetization-Quellen
+Diese Quellen gelten aktuell als **FREIGEGEBEN_LOW_MONETIZATION**:
+
+- Kulturort Alte Molkerei
+- KuKuG Bocholt
+- Fontane-Kreis Bocholt
+- Koppelkerk Bredevoort
+- Nationaal Onderduikmuseum Aalten
+- Klein Theater Dinxperlo
+- Schloss Ringenberg
+- Quartettverein Bocholt
+
+Wichtig:
+- diese Quellen sind **kein aktiver Sales-Fokus**
+- sie sind bewusst freigegeben, weil ihr Content-Wert hoch und ihre voraussichtliche Zahlungsbereitschaft eher niedrig bis höchstens mittel ist
 
 ### Entscheidungsregel
-Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verschafft und kein klar öffentlich relevantes Stadt-/Kulturevent aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle ist:
+Wenn ein Event:
+
+- aus einer offiziellen oder neutralen Quelle stammt, **oder**
+- aus einer bewusst freigegebenen Low-Monetization-Quelle stammt,
+
+dann darf es aufgenommen werden, **wenn alle übrigen Qualitätsregeln erfüllt sind**.
+
+Wenn ein Event hingegen primär nur einer einzelnen potenziellen Kunden-Location Reichweite verschafft und **nicht** aus einer offiziellen, neutralen oder bewusst freigegebenen Quelle stammt:
 
 - **nicht aufnehmen**
 
-Im Zweifel:
+Wenn unklar ist, ob eine Quelle eher **GESPERRT_KUNDENNAH** oder **FREIGEGEBEN_LOW_MONETIZATION** ist:
 
-- **weglassen**
+- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
+- im **Automationsmodus**: **nicht ausgeben**
 
----
+Im Zweifel gilt weiterhin:
+
+- **konservativ entscheiden**
+- **lieber weglassen**
 
 ## 6. Rechtlich konservative Quellenregel
-Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch** und **für den konkreten Termin belastbar** ist.
+Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch oder ausdrücklich freigegeben** und **für den konkreten Termin belastbar** ist.
 
-Bevorzugte Quellen:
-
+Bevorzugte FINAL-Quellen:
 - offizielle Veranstalterseiten
 - offizielle kommunale / öffentliche Veranstaltungskalender
 - offizielle Stadt-, Kultur- oder Tourismusseiten
 - offizielle Eventseiten des Veranstalters
 - offizielle Presse-/Infoseiten, wenn ein konkretes Event mit belastbaren Fakten erkennbar ist
 
-Nicht oder nur sehr zurückhaltend nutzen:
+### Discovery-Hinweis-Regel
+Folgende Quellen dürfen zur **Entdeckung** neuer Events genutzt werden:
 
+- fremde Eventkalender
+- redaktionelle Übersichtsseiten
+- allgemeine Kulturkalender
+- Ticketseiten
+- Social-/Hinweisseiten mit klar erkennbarem Eventbezug
+
+Aber:
+- solche Seiten sind **nicht automatisch FINAL-Quellen**
+- FINAL nur nach Verifikation auf einer **offiziellen Detailseite** oder gleichwertig **event-spezifischen Unterseite**
+- wenn keine belastbare offizielle oder gleichwertige FINAL-Quelle auffindbar ist:
+  - im **manuellen Prüfmodus**: **REVIEW NÖTIG**
+  - im **Automationsmodus**: **nicht ausgeben**
+
+Nicht oder nur sehr zurückhaltend nutzen:
 - fremde kommerzielle Eventkalender als reine Abschöpfungsquelle
 - Seiten mit unklaren Rechteverhältnissen
 - Seiten, bei denen nur durch Kopieren längerer Texte ein brauchbarer Eintrag möglich wäre
@@ -277,7 +324,91 @@ Nicht übernehmen:
 
 ---
 
-## 7. URL-Regel
+## 6A. Quellenklassifikation und Suchbahnen
+
+### Grundregel
+Die KI-Suche arbeitet **nicht** als starre Closed-Whitelist.
+
+Stattdessen gilt:
+- bekannte starke Quellen aktiv mitnehmen
+- bewusst freigegebene Low-Monetization-Quellen aktiv mitnehmen
+- zusätzlich immer offen nach neuen passenden Quellen suchen
+
+### Verbindliche Suchbahnen
+Jeder Suchlauf soll in **drei Suchbahnen** gedacht werden:
+
+1. **CORE**
+2. **FREIGEGEBEN_LOW_MONETIZATION**
+3. **DISCOVERY**
+
+### Suchbahn A – CORE
+CORE umfasst bekannte, belastbare, strategisch unkritische Quellen mit hohem Ertrag.
+
+Regel:
+- CORE-Quellen bilden das stabile Grundrauschen der Suche
+- sie sollen aktiv und regelmäßig geprüft werden
+- bevorzugt zuerst offizielle und neutrale Quellen mit hoher Relevanz im Suchgebiet
+
+### Suchbahn B – FREIGEGEBEN_LOW_MONETIZATION
+Diese Suchbahn umfasst bewusst freigegebene Kulturquellen mit hoher Inhaltsqualität und niedriger bis höchstens mittlerer Monetarisierungswahrscheinlichkeit.
+
+Regel:
+- diese Quellen dürfen aktiv gesucht werden
+- sie sind **bewusste Ausnahmen** innerhalb des Monetarisierungsschutzes
+- sie sind **kein** genereller Wegfall des Monetarisierungsschutzes
+
+### Suchbahn C – DISCOVERY
+DISCOVERY umfasst neue, bisher nicht klassifizierte Quellen im Suchgebiet.
+
+Regel:
+- DISCOVERY ist ausdrücklich erlaubt und gewünscht
+- neue Quellen dürfen gefunden und für einzelne Events genutzt werden, wenn alle übrigen Qualitätsregeln erfüllt sind
+- neue Quellen dürfen aber nicht automatisch dauerhaft als Normalquelle behandelt werden
+- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE oder FREIGEGEBEN_LOW_MONETIZATION übernommen werden
+
+### Harte Regel gegen Closed-Whitelist-Verengung
+Die KI-Suche darf **nicht** nur bekannte Quellen mechanisch abarbeiten.
+
+Regel:
+- bekannte Quellen aktiv nutzen
+- aber immer zusätzlich offen für neue passende Quellen im Suchgebiet bleiben
+
+### Zielgewichtung
+Als Zielbild gilt:
+
+- **ca. 60 % CORE**
+- **ca. 25 % FREIGEGEBEN_LOW_MONETIZATION**
+- **ca. 15 % DISCOVERY**
+
+Wenn gerade klare Content-Lücken bestehen, darf temporär auch gelten:
+
+- **ca. 50 % CORE**
+- **ca. 30 % FREIGEGEBEN_LOW_MONETIZATION**
+- **ca. 20 % DISCOVERY**
+
+DISCOVERY darf jedoch **nicht vollständig auf null gesetzt** werden.
+
+### Operative Startpunkte für die Suche
+CORE zuerst aktiv prüfen:
+
+- offizielle Veranstaltungs- und Kulturkalender der Städte im Suchgebiet
+- offizielle Seiten größerer Kulturhäuser, Theater, Museen und Musikschulen im Suchgebiet
+- alle bereits im aktuellen Projektbestand etablierten neutralen oder offiziellen Quellen
+
+Zusätzlich bewusst aktiv prüfen:
+
+- Kulturort Alte Molkerei
+- KuKuG Bocholt
+- Fontane-Kreis Bocholt
+- Koppelkerk Bredevoort
+- Nationaal Onderduikmuseum Aalten
+- Klein Theater Dinxperlo
+- Schloss Ringenberg
+- Quartettverein Bocholt
+
+Wichtig:
+- diese Liste ist **keine exklusive Whitelist**
+- sie definiert nur Quellen, die aktiv mitgedacht werden sollen
 Bevorzugt ist **nur eine event-spezifische Detailseite**.
 
 Nicht erlaubt als finale `url` oder `source_url` für FINAL:
