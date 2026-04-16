@@ -69,20 +69,20 @@
         "Natur"
       ]
     },
-    {
+       {
       "id": "hilgelo-erleben",
       "title": "Hilgelo erleben",
       "kategorie": "Freizeit & Familie",
       "location": "’t Hilgelo, Winterswijk",
       "description": "Der See nahe der Grenze verbindet Strand, Wasser und eine lockere Ausflugsatmosphäre für wärmere Tage.",
       "url": "https://www.hilgelomeer.de/a-erholungsgebiet-t-hilgelo",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/HDR%20hilgelo%20002%20-%20Flickr%20-%20saimens.jpg",
-      "image_position_x": "52%",
-      "image_position_y": "52%",
-      "image_source_page": "https://commons.wikimedia.org/wiki/File:HDR_hilgelo_002_-_Flickr_-_saimens.jpg",
-      "image_author": "Saimen",
-      "image_license": "CC BY-SA 2.0",
-      "image_credit": "Saimen, CC BY-SA 2.0, via Wikimedia Commons",
+      "image": "/assets/activities/20250704_203925.jpg",
+      "image_position_x": "50%",
+      "image_position_y": "54%",
+      "image_source_page": "",
+      "image_author": "",
+      "image_license": "",
+      "image_credit": "",
       "tags": [
         "Strand",
         "Badesee",
