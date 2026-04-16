@@ -1288,7 +1288,7 @@
   font-weight: 670;
 }
 
-/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V2 | Zweck: hebt die Bottom Tab Bar auf ein ruhigeres Enterprise-Niveau mit leichterer Shell, neutraleren Inactive-States und einem zentralen Active Indicator statt voller Card-in-Card-Fläche | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
+/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 | Zweck: finalisiert die Bottom Tab Bar visuell zu einer flacheren, strafferen Mobile-Shell mit breit integriertem Active-Indicator und ausgewogener Präsenz beider Tabs | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
 body.has-bottom-tabbar{
   padding-bottom: var(--btb-reserve);
 }
@@ -1329,8 +1329,8 @@ body.has-bottom-tabbar{
   border-radius: var(--btb-shell-radius);
   background: linear-gradient(180deg, var(--btb-shell-bg-start) 0%, var(--btb-shell-bg-end) 100%);
   box-shadow: var(--btb-shell-shadow);
-  backdrop-filter: blur(18px) saturate(1.02);
-  -webkit-backdrop-filter: blur(18px) saturate(1.02);
+  backdrop-filter: blur(16px) saturate(1.02);
+  -webkit-backdrop-filter: blur(16px) saturate(1.02);
 }
 
 .bottom-tabbar__item,
@@ -1343,8 +1343,8 @@ body.has-bottom-tabbar{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 5px 10px 6px;
+  gap: 3px;
+  padding: 4px 10px 5px;
   border-radius: var(--btb-item-radius);
   color: var(--btb-item-fg);
   text-decoration: none;
@@ -1357,13 +1357,11 @@ body.has-bottom-tabbar{
 .bottom-tabbar__item::before{
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--btb-item-indicator-w);
-  height: calc(100% - 10px);
-  transform: translate(-50%, -50%);
+  inset:
+    var(--btb-item-indicator-inset-y)
+    var(--btb-item-indicator-inset-x);
   border: 1px solid var(--btb-item-indicator-border);
-  border-radius: calc(var(--btb-item-radius) - 4px);
+  border-radius: calc(var(--btb-item-radius) - 3px);
   background: var(--btb-item-indicator-bg);
   box-shadow: var(--btb-item-indicator-shadow);
   opacity: 0;
@@ -1429,8 +1427,8 @@ body.has-bottom-tabbar{
   }
 
   .bottom-tabbar__item:hover::before{
-    opacity: 0.72;
-    background: rgba(255,255,255,0.78);
+    opacity: 0.66;
+    background: rgba(255,255,255,0.80);
   }
 
   .bottom-tabbar__item[aria-current="page"]:hover::before,
@@ -1448,7 +1446,7 @@ body.has-bottom-tabbar{
     display: none;
   }
 }
-/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V2 === */
+/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 === */
 
 #event-detail-panel .activity-detail__media--freizeit-familie{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
