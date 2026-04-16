@@ -1075,38 +1075,31 @@ Umfang:
   color: rgba(31,41,51,0.84);
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert scanbare Merkmals-Chips und hält die restlichen Facts im Activity-Detailpanel kompakt; Umfang: ersetzt nur Facts-/Fact-Styles im Activity-Detailpanel === */
+/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 | Zweck: priorisiert Merkmals-Chips, bündelt Kurzinfo kompakter und zieht den Hinweis in eine ruhigere Callout-Fläche; Umfang: ersetzt nur Facts-/Fact-Styles im Activity-Detailpanel === */
 #event-detail-panel .activity-detail__facts{
   display: grid;
   gap: 14px;
 }
 
-#event-detail-panel .activity-detail__facts-grid{
+#event-detail-panel .activity-detail__fact-section,
+#event-detail-panel .activity-detail__fact-callout{
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 18px;
-  padding: 2px 0 0;
-}
-
-#event-detail-panel .activity-detail__fact-row{
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-#event-detail-panel .activity-detail__fact-section{
-  display: grid;
-  gap: 7px;
+  gap: 9px;
   padding-top: 12px;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
+#event-detail-panel .activity-detail__fact-section:first-child{
+  padding-top: 0;
+  border-top: 0;
+}
+
 #event-detail-panel .activity-detail__fact-section--tags{
   gap: 9px;
+}
+
+#event-detail-panel .activity-detail__fact-section--meta{
+  gap: 10px;
 }
 
 #event-detail-panel .activity-detail__fact-label{
@@ -1121,12 +1114,8 @@ Umfang:
 #event-detail-panel .activity-detail__fact-value{
   font-size: 14px;
   line-height: 1.46;
-  font-weight: 700;
+  font-weight: 680;
   color: rgba(31,41,51,0.84);
-}
-
-#event-detail-panel .activity-detail__fact-section .activity-detail__fact-value{
-  font-weight: 650;
 }
 
 #event-detail-panel .activity-detail__tag-list{
@@ -1150,7 +1139,60 @@ Umfang:
   line-height: 1;
   white-space: nowrap;
 }
-/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 === */
+
+#event-detail-panel .activity-detail__meta-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#event-detail-panel .activity-detail__meta-chip{
+  display: inline-grid;
+  gap: 3px;
+  min-width: 124px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: rgba(246,248,243,0.92);
+  border: 1px solid rgba(18,34,26,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+}
+
+#event-detail-panel .activity-detail__meta-key{
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(31,41,51,0.46);
+  text-transform: uppercase;
+}
+
+#event-detail-panel .activity-detail__meta-value{
+  font-size: 14px;
+  line-height: 1.34;
+  font-weight: 700;
+  color: rgba(31,41,51,0.84);
+}
+
+#event-detail-panel .activity-detail__fact-callout{
+  gap: 6px;
+  padding: 13px 14px;
+  border: 1px solid rgba(18,34,26,0.06);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(246,248,243,0.94), rgba(243,246,240,0.90));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+}
+
+@media (max-width: 479px){
+  #event-detail-panel .activity-detail__meta-list{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #event-detail-panel .activity-detail__meta-chip{
+    min-width: 0;
+  }
+}
+/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
 
 #event-detail-panel .activity-detail__actions{
   display: grid;
