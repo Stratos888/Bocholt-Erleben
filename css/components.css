@@ -1137,17 +1137,14 @@
 }
 
 /* Fokus: gleiche “DNA” wie der Rest (Focus-Ring Token) */
-/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V8 | Zweck: entfernt auf /angebote/ die zusätzliche äußere Mobile-Page-Surface um den Top-Stack und zieht die seitlichen Gutter gezielt auf Feed/Loading/Empty-State, damit der Filterbereich wieder wie auf der Events-Seite voll bis an die Kanten läuft | Umfang: ersetzt nur den oberen Layout-/Width-/Padding-Teil des Activities-Komponentenblocks === */
+/* === BEGIN BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V9 | Zweck: entfernt auf /angebote/ die zusätzliche äußere Mobile-Page-Surface um den Top-Stack, zieht die seitlichen Gutter gezielt auf Feed/Loading/Empty-State und übergibt den unteren Reserve-Space vollständig an den globalen Bottom-Tab-Bar-Owner | Umfang: ersetzt nur den oberen Layout-/Width-/Padding-Teil des Activities-Komponentenblocks === */
 .page--activities{
   display: grid;
   gap: 14px;
   width: 100%;
   max-width: none;
   margin: 0;
-  padding:
-    0
-    0
-    calc(88px + env(safe-area-inset-bottom));
+  padding: 0;
 }
 
 .page--activities .desktop-hero{
@@ -1190,7 +1187,7 @@
     padding-inline: var(--gutter);
   }
 }
-/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V8 === */
+/* === END BLOCK: ACTIVITIES_COMPONENT_SYSTEM_V9 === */
 
 /* === BEGIN BLOCK: ACTIVITIES_FILTER_SHELL_OWNER_CLEANUP_V2 | Zweck: entfernt die route-spezifische Shell-Überschreibung für Activities vollständig, damit Filter-Sheets und Filter-Popover wieder ausschließlich vom globalen Overlay-Owner kommen | Umfang: ersetzt nur den bisherigen .page--activities .filter-sheet/.filter-popover-Block === */
 /* bewusst leer: Activities bekommt hier keine eigene Filter-Sheet-/Popover-Shell mehr */
@@ -1291,46 +1288,127 @@
   font-weight: 670;
 }
 
-body.page-route-activities > .bottom-tabbar{
+/* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V1 | Zweck: macht die Bottom Tab Bar zum globalen mobilen Primary-Nav-Owner mit zentralem Reserve-Space, identischer Shell und route-unabhängiger Komponentendefinition | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-State und Desktop-Off === */
+body.has-bottom-tabbar{
+  padding-bottom: var(--btb-reserve);
+}
+
+#bottom-tabbar-root{
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 980;
+  z-index: var(--btb-z);
+  pointer-events: none;
+}
 
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  align-items: stretch;
+#bottom-tabbar-root:empty{
+  display: none;
+}
 
+.bottom-tabbar{
+  pointer-events: none;
+  width: 100%;
   padding:
-    10px
-    calc(var(--gutter) + 2px)
-    calc(10px + env(safe-area-inset-bottom));
-
-  background:
-    linear-gradient(180deg, rgba(246,248,243,0.08) 0%, rgba(246,248,243,0.82) 18%, rgba(246,248,243,0.96) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(20,28,24,0.08);
-  box-shadow: 0 -10px 24px rgba(14,20,17,0.08);
+    0
+    max(var(--gutter), env(safe-area-inset-right))
+    calc(var(--btb-offset-bottom) + env(safe-area-inset-bottom))
+    max(var(--gutter), env(safe-area-inset-left));
 }
 
-body.page-route-activities > .bottom-tabbar .bottom-tabbar__item{
-  min-height: 56px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.7);
+.bottom-tabbar__inner{
+  pointer-events: auto;
+  width: min(100%, var(--btb-maxw));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--bottom-tab-count, 2), minmax(0, 1fr));
+  gap: var(--btb-shell-gap);
+  align-items: stretch;
+  padding: var(--btb-shell-pad);
+  border: 1px solid var(--btb-shell-border);
+  border-radius: var(--btb-shell-radius);
+  background: linear-gradient(180deg, var(--btb-shell-bg-start) 0%, var(--btb-shell-bg-end) 100%);
+  box-shadow: var(--btb-shell-shadow);
+  backdrop-filter: blur(18px) saturate(1.05);
+  -webkit-backdrop-filter: blur(18px) saturate(1.05);
+}
+
+.bottom-tabbar__item{
+  min-height: var(--btb-item-minh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: var(--btb-item-radius);
+  color: var(--btb-item-fg);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.bottom-tabbar__item[aria-current="page"],
+.bottom-tabbar__item.is-active{
+  color: var(--btb-item-fg-active);
+  background: var(--btb-item-bg-active);
   box-shadow:
-    inset 0 0 0 1px rgba(23,39,30,0.07),
-    0 8px 18px rgba(14,20,17,0.05);
+    inset 0 0 0 1px var(--btb-item-border-active),
+    var(--btb-item-shadow-active);
+  transform: translateY(-1px);
 }
 
-body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
-  background: rgba(255,255,255,0.92);
-  box-shadow:
-    inset 0 0 0 1px rgba(23,39,30,0.09),
-    0 12px 22px rgba(14,20,17,0.08);
+.bottom-tabbar__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btb-icon-size);
+  height: var(--btb-icon-size);
 }
+
+.bottom-tabbar__icon .ui-icon-svg{
+  width: var(--btb-icon-size);
+  height: var(--btb-icon-size);
+}
+
+.bottom-tabbar__label{
+  font-size: var(--btb-label-size);
+  font-weight: var(--btb-label-weight);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+}
+
+.bottom-tabbar__item:focus-visible{
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(24,40,30,0.12),
+    0 0 0 4px var(--ui-focus-ring),
+    var(--btb-item-shadow-active);
+}
+
+@media (hover: hover) and (pointer: fine){
+  .bottom-tabbar__item:hover{
+    color: var(--color-text-primary);
+    background: rgba(255,255,255,0.82);
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.08),
+      0 8px 18px rgba(10,24,16,0.07);
+  }
+}
+
+@media (min-width: 900px){
+  body.has-bottom-tabbar{
+    padding-bottom: 0;
+  }
+
+  #bottom-tabbar-root{
+    display: none;
+  }
+}
+/* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V1 === */
 
 #event-detail-panel .activity-detail__media--freizeit-familie{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
@@ -1616,7 +1694,7 @@ body.page-route-activities > .bottom-tabbar .bottom-tabbar__item.is-active{
     display: none;
   }
 
-  body.page-route-activities > .bottom-tabbar{
+  #bottom-tabbar-root{
     display: none;
   }
 }
