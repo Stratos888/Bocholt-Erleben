@@ -100,6 +100,7 @@ function getCategoryPresentation(category) {
   };
 }
 
+  /* === BEGIN BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V1 | Zweck: priorisiert konkrete Ortsmerkmale auf Activity-Cards und entfernt die bisherige Zielgruppen-/Hint-Logik als Hauptsignal; Umfang: ersetzt nur die Helper von buildMetaLine() bis renderSupportingLine() === */
   function buildMetaLine(offer) {
     return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
   }
@@ -108,15 +109,17 @@ function getCategoryPresentation(category) {
     return String(value || "").replace(/\s+/g, " ").trim();
   }
 
-  function pickSupportingLabel(offer) {
-    const audience = Array.isArray(offer?.audience)
-      ? offer.audience.map((entry) => toSingleLine(entry)).filter(Boolean)
+  function buildPrimaryTagItems(offer, limit = 3) {
+    const tags = Array.isArray(offer?.tags)
+      ? offer.tags.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
-    if (audience.length) {
-      if (audience.some((entry) => entry.toLowerCase() === "familien")) return "Für Familien";
-      return `Geeignet für ${audience[0]}`;
-    }
+    return tags.slice(0, Math.max(0, Number(limit) || 0));
+  }
+
+  function pickSupportingLabel(offer) {
+    const primaryTags = buildPrimaryTagItems(offer, 2);
+    if (primaryTags.length) return primaryTags.join(" · ");
 
     const season = toSingleLine(offer?.season);
     if (season) return season;
@@ -128,6 +131,11 @@ function getCategoryPresentation(category) {
   }
 
   function buildFactItems(offer) {
+    const primaryTags = buildPrimaryTagItems(offer, 3);
+    if (primaryTags.length) {
+      return primaryTags;
+    }
+
     const curatedFacts = Array.isArray(offer?.cardFacts)
       ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
@@ -184,16 +192,18 @@ const OfferCards = (() => {
     if (!items.length) return "";
 
     return `
-      <div class="activity-card-facts" aria-label="Wichtige Informationen">
+      <div class="activity-card-facts" aria-label="Wichtige Merkmale">
         ${items.map((item) => `<span class="activity-card-fact">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
       </div>
     `.trim();
   }
 
 function renderSupportingLine(offer) {
-  return "";
+  const text = OfferVisuals.pickSupportingLabel(offer);
+  if (!text) return "";
+  return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
 }
-
+  /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V1 === */
   /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 | Zweck: priorisiert erste sichtbare Bilder, setzt für externe Bildquellen Connection Hints und lässt den Rest bewusst lazy | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
