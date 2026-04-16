@@ -198,13 +198,13 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 | Zweck: priorisiert konkrete Ortsmerkmale als scanbare Chips und entfernt die weicheren Zielgruppenangaben aus dem Activity-Detailpanel; Umfang: ersetzt nur renderFacts(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 | Zweck: priorisiert Merkmale weiter, fasst Saison/Region in einer kompakten Kurzinfo zusammen und macht den Hinweis weniger formularartig; Umfang: ersetzt nur renderFacts(offer) === */
   renderFacts(offer) {
-    const primaryTags = Array.isArray(offer?.tags)
-      ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean)
-      : [];
+    const primaryTags = window.OfferVisuals?.getRankedTagItems
+      ? window.OfferVisuals.getRankedTagItems(offer)
+      : (Array.isArray(offer?.tags) ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean) : []);
 
-    const gridRows = [
+    const metaItems = [
       ["Saison", offer.season],
       ["Region", offer.area]
     ]
@@ -215,17 +215,9 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    const sections = [
-      ["Hinweis", offer.hint]
-    ]
-      .map(([label, value]) => {
-        const text = String(value || "").trim();
-        if (!text) return null;
-        return { label, value: text };
-      })
-      .filter(Boolean);
+    const note = String(offer?.hint || "").trim();
 
-    if (!primaryTags.length && !gridRows.length && !sections.length) return "";
+    if (!primaryTags.length && !metaItems.length && !note) return "";
 
     return `
       <div class="activity-detail__facts">
@@ -237,26 +229,29 @@ const OfferDetailPanel = {
             </div>
           </section>
         ` : ""}
-        ${gridRows.length ? `
-          <div class="activity-detail__facts-grid">
-            ${gridRows.map((row) => `
-              <div class="activity-detail__fact-row">
-                <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
-                <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
-              </div>
-            `).join("")}
-          </div>
-        ` : ""}
-        ${sections.map((row) => `
-          <section class="activity-detail__fact-section">
-            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
-            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
+        ${metaItems.length ? `
+          <section class="activity-detail__fact-section activity-detail__fact-section--meta">
+            <div class="activity-detail__fact-label">Kurzinfo</div>
+            <div class="activity-detail__meta-list">
+              ${metaItems.map((item) => `
+                <div class="activity-detail__meta-chip">
+                  <span class="activity-detail__meta-key">${this.escapeHtml(item.label)}</span>
+                  <span class="activity-detail__meta-value">${this.escapeHtml(item.value)}</span>
+                </div>
+              `).join("")}
+            </div>
           </section>
-        `).join("")}
+        ` : ""}
+        ${note ? `
+          <section class="activity-detail__fact-callout" aria-label="Gut zu wissen">
+            <div class="activity-detail__fact-label">Gut zu wissen</div>
+            <div class="activity-detail__fact-value">${this.escapeHtml(note)}</div>
+          </section>
+        ` : ""}
       </div>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V2 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer.location);
