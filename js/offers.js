@@ -100,7 +100,7 @@ function getCategoryPresentation(category) {
   };
 }
 
-  /* === BEGIN BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V1 | Zweck: priorisiert konkrete Ortsmerkmale auf Activity-Cards und entfernt die bisherige Zielgruppen-/Hint-Logik als Hauptsignal; Umfang: ersetzt nur die Helper von buildMetaLine() bis renderSupportingLine() === */
+  /* === BEGIN BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 | Zweck: priorisiert auf Activity-Cards die nützlichsten Ortsmerkmale vor generischen Tags und hält Mobile/Desktop bei derselben Discovery-Logik; Umfang: ersetzt nur die Helper von buildMetaLine() bis renderSupportingLine() === */
   function buildMetaLine(offer) {
     return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
   }
@@ -109,16 +109,51 @@ function getCategoryPresentation(category) {
     return String(value || "").replace(/\s+/g, " ").trim();
   }
 
-  function buildPrimaryTagItems(offer, limit = 3) {
+  function getTagPriority(tag) {
+    const value = toSingleLine(tag);
+    const priorityMap = {
+      "Spielplatz": 10,
+      "Badebucht": 12,
+      "Badesee": 14,
+      "Strand": 16,
+      "Spaziergang": 18,
+      "Snacks & Getränke": 20,
+      "Café": 21,
+      "Restaurant": 22,
+      "Wassersport": 24,
+      "Aussicht": 26,
+      "Vogelbeobachtung": 28,
+      "Spielgeräte": 30,
+      "Moor": 32,
+      "Grenze": 34,
+      "Grenzort": 36,
+      "Geschichte": 38,
+      "Naturpfad": 40,
+      "Rundweg": 42,
+      "Park": 44,
+      "Natur": 46
+    };
+
+    return priorityMap[value] ?? 500;
+  }
+
+  function getRankedTagItems(offer, limit = Infinity) {
     const tags = Array.isArray(offer?.tags)
       ? offer.tags.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
-    return tags.slice(0, Math.max(0, Number(limit) || 0));
+    const uniqueTags = Array.from(new Set(tags));
+    uniqueTags.sort((a, b) => {
+      const delta = getTagPriority(a) - getTagPriority(b);
+      if (delta !== 0) return delta;
+      return a.localeCompare(b, "de");
+    });
+
+    return uniqueTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : uniqueTags.length));
   }
 
   function pickSupportingLabel(offer) {
-    const primaryTags = buildPrimaryTagItems(offer, 2);
+    const primaryTags = getRankedTagItems(offer, 2);
     if (primaryTags.length) return primaryTags.join(" · ");
 
     const season = toSingleLine(offer?.season);
@@ -131,7 +166,7 @@ function getCategoryPresentation(category) {
   }
 
   function buildFactItems(offer) {
-    const primaryTags = buildPrimaryTagItems(offer, 3);
+    const primaryTags = getRankedTagItems(offer, 3);
     if (primaryTags.length) {
       return primaryTags;
     }
@@ -157,7 +192,8 @@ function getCategoryPresentation(category) {
     getCategoryPresentation,
     buildMetaLine,
     buildFactItems,
-    pickSupportingLabel
+    pickSupportingLabel,
+    getRankedTagItems
   };
 })();
 
@@ -198,12 +234,12 @@ const OfferCards = (() => {
     `.trim();
   }
 
-function renderSupportingLine(offer) {
-  const text = OfferVisuals.pickSupportingLabel(offer);
-  if (!text) return "";
-  return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
-}
-  /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V1 === */
+  function renderSupportingLine(offer) {
+    const text = OfferVisuals.pickSupportingLabel(offer);
+    if (!text) return "";
+    return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
+  }
+  /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
   /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 | Zweck: priorisiert erste sichtbare Bilder, setzt für externe Bildquellen Connection Hints und lässt den Rest bewusst lazy | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
