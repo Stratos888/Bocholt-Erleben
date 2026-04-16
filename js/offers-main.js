@@ -99,6 +99,7 @@ const OffersApp = {
     this.refs.categoryPopoverOptions = document.getElementById("popover-offer-category-options");
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_PRESERVE_V1 | Zweck: erhält alle kuratierten Activity-Felder aus data/offers.json beim Normalisieren, damit Detailpanel-CTAs, Maps-Startpunkte und vorbereitete Card-Facts produktiv korrekt funktionieren | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
   normalizeOffer(raw) {
     const obj = raw && typeof raw === "object" ? raw : {};
     const id = String(obj.id || "").trim();
@@ -124,12 +125,20 @@ const OffersApp = {
       location,
       description,
       url,
+      maps_query: String(obj.maps_query || "").trim(),
+      maps_label: String(obj.maps_label || "").trim(),
+      website_label: String(obj.website_label || "").trim(),
       tags: normalizeArray(obj.tags),
       audience: normalizeArray(obj.audience),
+      cardFacts: normalizeArray(obj.cardFacts),
       image: String(obj.image || "").trim(),
       image_position_x: String(obj.image_position_x || "").trim(),
       image_position_y: String(obj.image_position_y || "").trim(),
       image_fit: String(obj.image_fit || "").trim(),
+      image_source_page: String(obj.image_source_page || "").trim(),
+      image_author: String(obj.image_author || "").trim(),
+      image_license: String(obj.image_license || "").trim(),
+      image_credit: String(obj.image_credit || "").trim(),
       duration: String(obj.duration || "").trim(),
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
@@ -138,6 +147,7 @@ const OffersApp = {
       hint: String(obj.hint || "").trim()
     };
   },
+  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_PRESERVE_V1 === */
 
   bindControls() {
     const {
