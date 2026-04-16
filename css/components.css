@@ -1448,6 +1448,102 @@ body.has-bottom-tabbar{
 }
 /* === END BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 === */
 
+/* === BEGIN BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V1 | Zweck: bringt auf Desktop eine sichtbare, ruhige Bereichs-Navigation direkt unter den Header und trennt damit Utility, Bereichswechsel und Content systematisch | Umfang: kompletter visueller Owner der Desktop-Section-Nav inkl. Root, Items, Active-State, Hover, Focus und Mobile-Off === */
+#desktop-section-nav-root{
+  display: none;
+}
+
+@media (min-width: 900px){
+  #desktop-section-nav-root{
+    display: block;
+    position: relative;
+    z-index: 960;
+    background: linear-gradient(180deg, var(--dsn-bg-start) 0%, var(--dsn-bg-end) 100%);
+    border-bottom: 1px solid var(--dsn-border);
+    box-shadow: var(--dsn-shadow);
+  }
+
+  #desktop-section-nav-root:empty{
+    display: none;
+  }
+
+  .desktop-section-nav{
+    box-sizing: border-box;
+    width: min(100%, var(--desktop-shell-max, 1092px));
+    margin: 0 auto;
+    padding-inline: var(--desktop-shell-pad-x, 32px);
+  }
+
+  .desktop-section-nav__inner{
+    display: flex;
+    align-items: center;
+    gap: var(--dsn-gap);
+    min-height: var(--dsn-minh);
+  }
+
+  .desktop-section-nav__item,
+  .desktop-section-nav__item:link,
+  .desktop-section-nav__item:visited{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--dsn-minh);
+    padding-inline: var(--dsn-item-pad-x);
+    color: var(--dsn-fg);
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 0.97rem;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    line-height: 1;
+    transition: color 160ms ease;
+  }
+
+  .desktop-section-nav__item::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--dsn-indicator);
+    opacity: 0;
+    transform: scaleX(0.56);
+    transform-origin: center;
+    transition:
+      opacity 160ms ease,
+      transform 180ms ease;
+  }
+
+  .desktop-section-nav__item[aria-current="page"],
+  .desktop-section-nav__item.is-active,
+  .desktop-section-nav__item[aria-current="page"]:visited,
+  .desktop-section-nav__item.is-active:visited{
+    color: var(--dsn-fg-active);
+  }
+
+  .desktop-section-nav__item[aria-current="page"]::after,
+  .desktop-section-nav__item.is-active::after{
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .desktop-section-nav__item:focus-visible{
+    outline: none;
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px var(--ui-focus-ring);
+  }
+
+  @media (hover: hover) and (pointer: fine){
+    .desktop-section-nav__item:hover,
+    .desktop-section-nav__item:hover:visited{
+      color: var(--dsn-fg-hover);
+    }
+  }
+}
+/* === END BLOCK: DESKTOP_SECTION_NAV_COMPONENT_OWNER_V1 === */
+
 #event-detail-panel .activity-detail__media--freizeit-familie{
   background: linear-gradient(160deg, rgba(230,239,207,0.98) 0%, rgba(205,223,150,0.98) 100%);
 }
