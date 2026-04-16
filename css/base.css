@@ -69,34 +69,37 @@
   --topstack-pad-bottom: 4px;
   --offline-badge-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 6px);
 
-  /* === BEGIN BLOCK: BOTTOM_TABBAR_TOKENS_V2 | Zweck: bringt die Bottom Tab Bar auf ein leichteres, state-of-the-art Primary-Nav-Niveau mit klarer Active-Indicator-Logik statt schwerer Card-in-Card-Optik | Umfang: nur globale Tokens der Bottom Tab Bar === */
+    /* === BEGIN BLOCK: BOTTOM_TABBAR_TOKENS_V3 | Zweck: strafft die Bottom Tab Bar auf einen fast-finalen Enterprise-Stand mit flacherer Shell, breiterem Active-Indicator und ausgewogenerem Inactive-State | Umfang: nur globale Tokens der Bottom Tab Bar === */
   --btb-z: 980;
-  --btb-maxw: 640px;
-  --btb-offset-bottom: 8px;
-  --btb-shell-gap: 6px;
-  --btb-shell-pad: 5px;
-  --btb-shell-radius: 20px;
-  --btb-shell-border: rgba(24,40,30,0.09);
-  --btb-shell-bg-start: rgba(247,249,244,0.68);
-  --btb-shell-bg-end: rgba(247,249,244,0.90);
+  --btb-maxw: 620px;
+  --btb-offset-bottom: 7px;
+  --btb-shell-gap: 4px;
+  --btb-shell-pad: 4px;
+  --btb-shell-radius: 18px;
+  --btb-shell-border: rgba(24,40,30,0.08);
+  --btb-shell-bg-start: rgba(247,249,244,0.58);
+  --btb-shell-bg-end: rgba(247,249,244,0.84);
   --btb-shell-shadow:
-    0 8px 24px rgba(10,24,16,0.08),
-    0 1px 0 rgba(255,255,255,0.74) inset;
+    0 6px 18px rgba(10,24,16,0.055),
+    0 1px 0 rgba(255,255,255,0.72) inset;
 
-  --btb-item-minh: 52px;
-  --btb-item-radius: 15px;
-  --btb-item-fg: rgba(24,40,30,0.62);
+  --btb-item-minh: 50px;
+  --btb-item-radius: 14px;
+  --btb-item-fg: rgba(24,40,30,0.68);
   --btb-item-fg-active: var(--color-text-primary);
-  --btb-item-indicator-w: clamp(86px, 62%, 124px);
-  --btb-item-indicator-bg: rgba(255,255,255,0.90);
-  --btb-item-indicator-border: rgba(24,40,30,0.08);
-  --btb-item-indicator-shadow: 0 1px 0 rgba(255,255,255,0.82) inset;
+  --btb-item-indicator-inset-x: 3px;
+  --btb-item-indicator-inset-y: 3px;
+  --btb-item-indicator-bg: rgba(255,255,255,0.92);
+  --btb-item-indicator-border: rgba(24,40,30,0.075);
+  --btb-item-indicator-shadow:
+    0 1px 0 rgba(255,255,255,0.84) inset,
+    0 1px 2px rgba(10,24,16,0.03);
 
   --btb-icon-size: 19px;
-  --btb-label-size: 11.5px;
+  --btb-label-size: 11.75px;
   --btb-label-weight: 760;
-  --btb-reserve: calc(var(--btb-item-minh) + (var(--btb-shell-pad) * 2) + var(--btb-offset-bottom) + env(safe-area-inset-bottom) + 14px);
-  /* === END BLOCK: BOTTOM_TABBAR_TOKENS_V2 === */
+  --btb-reserve: calc(var(--btb-item-minh) + (var(--btb-shell-pad) * 2) + var(--btb-offset-bottom) + env(safe-area-inset-bottom) + 12px);
+  /* === END BLOCK: BOTTOM_TABBAR_TOKENS_V3 === */
 
   /* Cards */
   --radius-card: 12px;
