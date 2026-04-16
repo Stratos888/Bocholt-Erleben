@@ -195,6 +195,49 @@ Umfang:
   <section class="events-section activity-feed-section" aria-label="Aktivitäten">
     <div id="offer-cards" class="event-cards-grid activity-cards-grid"></div>
   </section>
+
+  <!-- === BEGIN BLOCK: ACTIVITIES_INITIAL_SKELETON_SEED_V1 | Zweck: zeigt auf /angebote/ bereits während HTML-Parse sofort Skeleton-Cards im Feed, damit der erste Wechsel per Bottom Tab Bar nicht leer/spinnerlastig wirkt | Umfang: genau ein früher Inline-Seed für #offer-cards vor den defer-Skripten === -->
+  <script>
+    (function () {
+      const grid = document.getElementById("offer-cards");
+      if (!grid || grid.children.length) return;
+
+      const card = `
+        <article class="event-card discovery-card--compact activity-card--rich is-skeleton" tabindex="-1" aria-hidden="true">
+          <div class="activity-card-media activity-card-media--image" aria-hidden="true">
+            <div class="activity-card-skeleton-media skel-block"></div>
+          </div>
+          <div class="event-card-body">
+            <div class="activity-card-kicker">
+              <span class="skel-line skel-line--sm" style="width:64px"></span>
+            </div>
+            <h2 class="event-title">
+              <span class="event-title__text">
+                <span class="skel-line" style="width:72%"></span>
+              </span>
+            </h2>
+            <div class="event-card-desc">
+              <span class="skel-line" style="width:96%"></span>
+              <span class="skel-line" style="width:78%; margin-top:8px;"></span>
+            </div>
+            <div class="event-meta">
+              <span class="event-meta__place">
+                <span class="skel-line skel-line--sm" style="width:38%"></span>
+              </span>
+            </div>
+            <div class="activity-card-facts" aria-hidden="true">
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:56px"></span></span>
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:62px"></span></span>
+              <span class="activity-card-fact"><span class="skel-line skel-line--sm" style="width:68px"></span></span>
+            </div>
+          </div>
+        </article>
+      `.trim();
+
+      grid.innerHTML = new Array(8).fill(card).join("");
+    })();
+  </script>
+  <!-- === END BLOCK: ACTIVITIES_INITIAL_SKELETON_SEED_V1 === -->
 </main>
 
 <!-- === BEGIN BLOCK: OVERLAY ROOTS (activities) ===
