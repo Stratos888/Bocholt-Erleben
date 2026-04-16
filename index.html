@@ -65,7 +65,7 @@ Umfang: Ersetzt nur den stylesheet-link (keine anderen Assets).
 
 
 </head>
-<body class="is-tabbar-hidden">
+<body class="is-tabbar-hidden has-bottom-tabbar">
 
 <!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
 Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
@@ -368,22 +368,9 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
 
 
 
-<!-- === BEGIN BLOCK: BOTTOM TAB BAR (Events/Aktivitäten) ===
-Zweck: Primäre Navigation auf Top-App-Niveau (2 Tabs), immer sichtbar.
-Umfang: ersetzt nur die Bottom Tab Bar.
-=== -->
-<nav class="bottom-tabbar" aria-label="Hauptnavigation">
-  <a class="bottom-tabbar__item is-active" href="/" aria-current="page">
-    <span class="bottom-tabbar__icon" data-ui-icon="calendar-days" aria-hidden="true"></span>
-    <span class="bottom-tabbar__label">Events</span>
-  </a>
-
-  <a class="bottom-tabbar__item" href="/angebote/">
-    <span class="bottom-tabbar__icon" data-ui-icon="compass" aria-hidden="true"></span>
-    <span class="bottom-tabbar__label">Aktivitäten</span>
-  </a>
-</nav>
-<!-- === END BLOCK: BOTTOM TAB BAR (Events/Aktivitäten) === -->
+<!-- === BEGIN BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 | Zweck: stellt den dedizierten Root direkt unter <body> für die zentral gerenderte mobile Primary-Navigation bereit | Umfang: genau ein Root-Container für die Bottom Tab Bar === -->
+<div id="bottom-tabbar-root"></div>
+<!-- === END BLOCK: BOTTOM_TABBAR_ROOT_SLOT_V1 === -->
 
 <!-- FOOTER -->
 
@@ -399,8 +386,8 @@ Umfang: ersetzt nur die Bottom Tab Bar.
         <!-- CUSTOM JAVASCRIPT MODULES -->
 <!-- CUSTOM JAVASCRIPT MODULES -->
 <!-- === BEGIN BLOCK: CACHE-BUSTED JS INCLUDES ===
-Zweck: Stabile Lade-Reihenfolge (Config → Icons → UI/Renderer → Filter → Main),
-       damit Icons/DetailPanel/Renderer garantiert verfügbar sind, bevor main.js startet.
+Zweck: Stabile Lade-Reihenfolge (Config → Icons → UI/Renderer → Filter → Bottom Tab Bar → Main),
+       damit Icons/DetailPanel/Renderer und die mobile Primary-Navigation garantiert verfügbar sind, bevor main.js startet.
 Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 === -->
 <script src="config.js?v=2026-02-04-1"></script>
@@ -420,6 +407,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/seo-schema.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
+<script src="/js/bottom-tabbar.js?v=2026-04-16-1"></script>
 
 <!-- Boot zuletzt -->
 <script src="js/main.js?v=2026-02-04-1"></script>
