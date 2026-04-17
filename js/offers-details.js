@@ -310,5 +310,9 @@ const OfferDetailPanel = {
       </article>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V6 === */
+/* === BEGIN BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 | Zweck: registriert das Activity-Detailpanel wieder global, damit Card-Klicks auf Mobile das Panel öffnen statt in den URL-Fallback zu laufen; Umfang: ersetzt nur das Dateiende von js/offers-details.js === */
+};
+
+window.OfferDetailPanel = OfferDetailPanel;
+/* === END BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 === */
 };
