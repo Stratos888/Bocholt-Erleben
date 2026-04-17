@@ -1,0 +1,619 @@
+/* === BEGIN FILE: js/feedback.js | Zweck: globales Feedback-System mit Formspree-Free-Direct-Submit, kontextbezogenen Meldewegen und robusten Fehlerzuständen; Umfang: komplette neue Datei === */
+(() => {
+  "use strict";
+
+  const cfg = {
+    formspreeEndpoint: "",
+    fallbackEmail: "",
+    minMessageLength: 12,
+    successAutoCloseMs: 1400,
+    sourceLabel: "bocholt-erleben-web",
+    privacyUrl: "/datenschutz/",
+    ...(window.CONFIG && window.CONFIG.feedback ? window.CONFIG.feedback : {})
+  };
+
+  const endpoint = String(cfg.formspreeEndpoint || "").trim();
+  if (!endpoint) return;
+
+  const TYPE_META = {
+    bug: {
+      label: "Bug melden",
+      icon: "feedback-bug",
+      prompt: "Was funktioniert nicht richtig?",
+      placeholder: "Beschreibe kurz, was passiert ist und was stattdessen erwartet wurde."
+    },
+    data_issue: {
+      label: "Falsche Information",
+      icon: "feedback-data",
+      prompt: "Welche Information ist falsch oder veraltet?",
+      placeholder: "Zum Beispiel falsche Uhrzeit, falscher Ort, kaputter Link oder nicht mehr aktueller Eintrag."
+    },
+    idea: {
+      label: "Idee oder Wunsch",
+      icon: "feedback-idea",
+      prompt: "Was würde dir die Nutzung verbessern?",
+      placeholder: "Zum Beispiel bessere Sortierung, fehlender Filter oder eine nützliche Zusatzinfo."
+    },
+    missing: {
+      label: "Etwas fehlt",
+      icon: "plus",
+      prompt: "Was fehlt dir aktuell?",
+      placeholder: "Zum Beispiel ein fehlendes Event, eine Aktivität, ein Ort oder eine Funktion."
+    }
+  };
+
+  const state = {
+    type: "idea",
+    shell: null,
+    form: null,
+    refs: {},
+    opener: null,
+    submitting: false,
+    observer: null,
+    inlineMounted: false,
+    launcherMounted: false,
+    initialized: false
+  };
+
+  const safeText = (value) => String(value ?? "").trim();
+  const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
+
+  const icon = (name, className = "") => {
+    if (window.Icons && typeof window.Icons.svg === "function") {
+      return window.Icons.svg(name, { className });
+    }
+    return "";
+  };
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+  function pageType() {
+    const path = window.location.pathname || "/";
+    if (path === "/" || path === "/index.html") return "events";
+    if (path.startsWith("/angebote")) return "activities";
+    if (path.startsWith("/ueber")) return "about";
+    if (path.startsWith("/events-veroeffentlichen")) return "publish";
+    if (path.startsWith("/impressum")) return "imprint";
+    if (path.startsWith("/datenschutz")) return "privacy";
+    return "page";
+  }
+
+  function createButton({ className, label, iconKey, attrs = {} }) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = className;
+    btn.innerHTML = `${icon(iconKey, "feedback-btn__icon")}<span class="feedback-btn__label">${escapeHtml(label)}</span>`;
+    Object.entries(attrs).forEach(([key, value]) => btn.setAttribute(key, value));
+    return btn;
+  }
+
+  function ensureLauncher() {
+    if (state.launcherMounted || document.querySelector(".feedback-launcher")) return;
+    const launcher = createButton({
+      className: "feedback-launcher",
+      label: "Feedback",
+      iconKey: "feedback",
+      attrs: {
+        "aria-label": "Feedback geben",
+        "data-feedback-open": "global"
+      }
+    });
+    document.body.appendChild(launcher);
+    state.launcherMounted = true;
+  }
+
+  function ensureInlineEntry() {
+    if (state.inlineMounted || isDesktop()) return;
+    const main = document.querySelector("main");
+    if (!main) return;
+
+    const entry = document.createElement("section");
+    entry.className = "feedback-inline-entry";
+    entry.setAttribute("aria-label", "Feedback geben");
+    entry.innerHTML = `
+      <div class="feedback-inline-entry__copy">
+        <strong>Fehler entdeckt oder Idee?</strong>
+        <p>Geht direkt hier in wenigen Sekunden.</p>
+      </div>
+    `;
+
+    const trigger = createButton({
+      className: "feedback-inline-entry__button",
+      label: "Feedback geben",
+      iconKey: "feedback",
+      attrs: {
+        "aria-label": "Feedback geben",
+        "data-feedback-open": "global"
+      }
+    });
+
+    entry.appendChild(trigger);
+    main.insertAdjacentElement("afterend", entry);
+    state.inlineMounted = true;
+  }
+
+  function ensureModalShell() {
+    if (state.shell) return;
+
+    let overlayRoot = document.getElementById("feedback-overlay-root");
+    if (!overlayRoot) {
+      overlayRoot = document.createElement("div");
+      overlayRoot.id = "feedback-overlay-root";
+      document.body.appendChild(overlayRoot);
+    }
+
+    const shell = document.createElement("div");
+    shell.className = "feedback-modal-shell";
+    shell.hidden = true;
+    shell.innerHTML = `
+      <div class="feedback-modal-shell__overlay" data-feedback-close></div>
+      <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+        <div class="feedback-modal__header">
+          <div class="feedback-modal__header-copy">
+            <h2 id="feedback-modal-title" class="feedback-modal__title">Feedback geben</h2>
+            <p class="feedback-modal__subtitle">Direkt hier senden – ohne Mailprogramm und ohne Seitenwechsel.</p>
+          </div>
+          <button type="button" class="feedback-modal__close" aria-label="Feedback schließen" data-feedback-close>
+            ${icon("x", "feedback-modal__close-icon")}
+          </button>
+        </div>
+
+        <form class="feedback-form" action="${escapeHtml(endpoint)}" method="POST" novalidate>
+          <div class="feedback-type-grid" role="radiogroup" aria-label="Feedback-Art"></div>
+
+          <div class="feedback-context-box" hidden>
+            <div class="feedback-context-box__label">Bezug</div>
+            <div class="feedback-context-box__value"></div>
+          </div>
+
+          <label class="feedback-field">
+            <span class="feedback-field__label" data-feedback-prompt></span>
+            <textarea
+              class="feedback-field__control feedback-field__control--textarea"
+              name="message"
+              rows="5"
+              minlength="8"
+              required
+              data-feedback-field="message"
+            ></textarea>
+            <span class="feedback-field__error" data-feedback-error="message"></span>
+          </label>
+
+          <details class="feedback-optional">
+            <summary>Optional: E-Mail für Rückfragen</summary>
+            <label class="feedback-field feedback-field--optional">
+              <span class="feedback-field__label">E-Mail</span>
+              <input class="feedback-field__control" type="email" name="email" inputmode="email" autocomplete="email" placeholder="name@beispiel.de" data-feedback-field="email">
+              <span class="feedback-field__error" data-feedback-error="email"></span>
+            </label>
+          </details>
+
+          <div class="feedback-honeypot" aria-hidden="true">
+            <label for="feedback-company">Bitte frei lassen</label>
+            <input id="feedback-company" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+          </div>
+
+          <input type="hidden" name="subject" value="">
+          <input type="hidden" name="feedback_type" value="">
+          <input type="hidden" name="feedback_type_label" value="">
+          <input type="hidden" name="source_label" value="">
+          <input type="hidden" name="page_type" value="">
+          <input type="hidden" name="page_url" value="">
+          <input type="hidden" name="route" value="">
+          <input type="hidden" name="context_title" value="">
+          <input type="hidden" name="context_subtitle" value="">
+          <input type="hidden" name="search_query" value="">
+          <input type="hidden" name="filters" value="">
+          <input type="hidden" name="viewport" value="">
+          <input type="hidden" name="submitted_at" value="">
+
+          <div class="feedback-form__meta">
+            <p class="feedback-form__hint">Seite, Filter, Bezug und Bildschirmbreite werden automatisch mitgesendet.</p>
+            <p class="feedback-form__privacy">Mit dem Absenden werden deine Angaben zur Bearbeitung über Formspree an Bocholt erleben übermittelt. Details in der <a href="${escapeHtml(cfg.privacyUrl || "/datenschutz/")}">Datenschutzerklärung</a>.</p>
+          </div>
+
+          <div class="feedback-form__status" aria-live="polite"></div>
+
+          <div class="feedback-form__actions">
+            <button type="button" class="feedback-secondary-btn" data-feedback-close>Abbrechen</button>
+            <button type="submit" class="feedback-primary-btn">
+              <span class="feedback-primary-btn__icon" aria-hidden="true">${icon("feedback-submit", "feedback-primary-btn__icon-svg")}</span>
+              <span class="feedback-primary-btn__label">Absenden</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    overlayRoot.appendChild(shell);
+    state.shell = shell;
+    state.form = shell.querySelector(".feedback-form");
+    state.refs.typeGrid = shell.querySelector(".feedback-type-grid");
+    state.refs.prompt = shell.querySelector("[data-feedback-prompt]");
+    state.refs.contextBox = shell.querySelector(".feedback-context-box");
+    state.refs.contextValue = shell.querySelector(".feedback-context-box__value");
+    state.refs.status = shell.querySelector(".feedback-form__status");
+    state.refs.message = shell.querySelector('[name="message"]');
+    state.refs.email = shell.querySelector('[name="email"]');
+    state.refs.subject = shell.querySelector('[name="subject"]');
+    state.refs.feedbackType = shell.querySelector('[name="feedback_type"]');
+    state.refs.feedbackTypeLabel = shell.querySelector('[name="feedback_type_label"]');
+    state.refs.sourceLabel = shell.querySelector('[name="source_label"]');
+    state.refs.pageType = shell.querySelector('[name="page_type"]');
+    state.refs.pageUrl = shell.querySelector('[name="page_url"]');
+    state.refs.route = shell.querySelector('[name="route"]');
+    state.refs.contextTitle = shell.querySelector('[name="context_title"]');
+    state.refs.contextSubtitle = shell.querySelector('[name="context_subtitle"]');
+    state.refs.searchQuery = shell.querySelector('[name="search_query"]');
+    state.refs.filters = shell.querySelector('[name="filters"]');
+    state.refs.viewport = shell.querySelector('[name="viewport"]');
+    state.refs.submittedAt = shell.querySelector('[name="submitted_at"]');
+    state.refs.submit = shell.querySelector(".feedback-primary-btn");
+    renderTypeOptions();
+    syncTypeUi();
+  }
+
+  function renderTypeOptions() {
+    if (!state.refs.typeGrid) return;
+    state.refs.typeGrid.innerHTML = Object.entries(TYPE_META).map(([key, meta]) => `
+      <button
+        type="button"
+        class="feedback-type-chip${key === state.type ? " is-active" : ""}"
+        data-feedback-type="${key}"
+        role="radio"
+        aria-checked="${key === state.type ? "true" : "false"}"
+      >
+        <span class="feedback-type-chip__icon" aria-hidden="true">${icon(meta.icon, "feedback-type-chip__icon-svg")}</span>
+        <span class="feedback-type-chip__label">${escapeHtml(meta.label)}</span>
+      </button>
+    `).join("");
+  }
+
+  function getEventPanelContext() {
+    const panel = document.querySelector("#overlay-root #event-detail-panel:not(.hidden)");
+    if (!panel) return null;
+    const title = safeText(panel.querySelector(".detail-title")?.textContent);
+    if (!title) return null;
+    const location = safeText(panel.querySelector(".detail-meta-row.is-location .detail-meta-text")?.textContent);
+    const datetime = safeText(panel.querySelector(".detail-meta-row.is-datetime .detail-meta-text")?.textContent);
+    return {
+      entityType: "event",
+      entityTitle: title,
+      entitySubtitle: [location, datetime].filter(Boolean).join(" · ")
+    };
+  }
+
+  function getOfferPanelContext() {
+    const panel = document.querySelector("#offer-detail-root #event-detail-panel:not(.hidden)");
+    if (!panel) return null;
+    const title = safeText(panel.querySelector(".activity-detail__title")?.textContent);
+    if (!title) return null;
+    const location = safeText(panel.querySelector(".activity-detail__place")?.textContent);
+    const meta = safeText(panel.querySelector(".activity-detail__meta")?.textContent);
+    return {
+      entityType: "activity",
+      entityTitle: title,
+      entitySubtitle: [location, meta].filter(Boolean).join(" · ")
+    };
+  }
+
+  function getActiveContext() {
+    return getOfferPanelContext() || getEventPanelContext() || null;
+  }
+
+  function getSearchValue() {
+    return safeText(document.querySelector("#search-filter")?.value);
+  }
+
+  function getFilters() {
+    const items = [];
+    const add = (label, value) => {
+      const clean = safeText(value);
+      if (!clean || clean === "Alle") return;
+      items.push(`${label}: ${clean}`);
+    };
+
+    add("Wann", document.getElementById("filter-time-value")?.textContent);
+    add("Kategorie", document.getElementById("filter-category-value")?.textContent);
+    add("Merkmal", document.getElementById("offer-situation-value")?.textContent);
+    add("Kategorie", document.getElementById("offer-category-value")?.textContent);
+
+    return items.join(" | ");
+  }
+
+  function contextSummary() {
+    const context = getActiveContext();
+    if (!context) return "Aktuelle Seite";
+    return [context.entityTitle, context.entitySubtitle].filter(Boolean).join(" · ");
+  }
+
+  function syncTypeUi() {
+    const meta = TYPE_META[state.type];
+    if (!meta || !state.refs.prompt) return;
+
+    state.refs.prompt.textContent = meta.prompt;
+    state.refs.message.placeholder = meta.placeholder;
+
+    state.refs.typeGrid.querySelectorAll("[data-feedback-type]").forEach((node) => {
+      const active = node.getAttribute("data-feedback-type") === state.type;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-checked", active ? "true" : "false");
+    });
+
+    const summary = contextSummary();
+    state.refs.contextValue.textContent = summary;
+    state.refs.contextBox.hidden = !summary;
+  }
+
+  function clearErrors() {
+    state.form?.querySelectorAll("[data-feedback-error]").forEach((node) => {
+      node.textContent = "";
+      node.removeAttribute("data-active");
+    });
+    state.form?.querySelectorAll("[data-feedback-field]").forEach((node) => {
+      node.removeAttribute("aria-invalid");
+    });
+  }
+
+  function setFieldError(name, message) {
+    const field = state.form?.querySelector(`[data-feedback-field="${name}"]`);
+    const error = state.form?.querySelector(`[data-feedback-error="${name}"]`);
+    if (field) field.setAttribute("aria-invalid", "true");
+    if (error) {
+      error.textContent = message;
+      error.setAttribute("data-active", "true");
+    }
+  }
+
+  function setStatus(message, kind = "neutral", allowHtml = false) {
+    if (!state.refs.status) return;
+    state.refs.status.className = `feedback-form__status is-${kind}`;
+    if (allowHtml) {
+      state.refs.status.innerHTML = message;
+    } else {
+      state.refs.status.textContent = message;
+    }
+  }
+
+  function fillHiddenFields() {
+    const context = getActiveContext();
+    const search = getSearchValue();
+    const filters = getFilters();
+    const summary = context ? context.entityTitle : pageType();
+
+    state.refs.feedbackType.value = state.type;
+    state.refs.feedbackTypeLabel.value = TYPE_META[state.type]?.label || state.type;
+    state.refs.sourceLabel.value = safeText(cfg.sourceLabel || "bocholt-erleben-web");
+    state.refs.pageType.value = pageType();
+    state.refs.pageUrl.value = window.location.href;
+    state.refs.route.value = window.location.pathname;
+    state.refs.contextTitle.value = context?.entityTitle || "";
+    state.refs.contextSubtitle.value = context?.entitySubtitle || "";
+    state.refs.searchQuery.value = search;
+    state.refs.filters.value = filters;
+    state.refs.viewport.value = `${window.innerWidth}x${window.innerHeight}`;
+    state.refs.submittedAt.value = new Date().toISOString();
+    state.refs.subject.value = `[Bocholt erleben] ${TYPE_META[state.type]?.label || "Feedback"} · ${summary}`;
+  }
+
+  function openModal(opener = null, forcedType = null) {
+    ensureModalShell();
+    state.opener = opener;
+    state.type = TYPE_META[forcedType] ? forcedType : "idea";
+    clearErrors();
+    setStatus("");
+    syncTypeUi();
+    state.shell.hidden = false;
+    document.documentElement.classList.add("is-feedback-open");
+    document.body.classList.add("is-feedback-open");
+    requestAnimationFrame(() => state.refs.message.focus());
+  }
+
+  function closeModal() {
+    if (!state.shell) return;
+    state.shell.hidden = true;
+    document.documentElement.classList.remove("is-feedback-open");
+    document.body.classList.remove("is-feedback-open");
+    clearErrors();
+    setStatus("");
+    if (state.opener && typeof state.opener.focus === "function") {
+      state.opener.focus({ preventScroll: true });
+    }
+  }
+
+  function validateForm() {
+    clearErrors();
+    const message = safeText(state.refs.message.value);
+    const email = safeText(state.refs.email.value);
+    let valid = true;
+
+    if (message.length < Number(cfg.minMessageLength || 12)) {
+      setFieldError("message", `Bitte etwas genauer beschreiben (mindestens ${Number(cfg.minMessageLength || 12)} Zeichen).`);
+      valid = false;
+    }
+
+    if (email) {
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailValid) {
+        setFieldError("email", "Bitte eine gültige E-Mail-Adresse eingeben oder das Feld leer lassen.");
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
+  async function submitForm(event) {
+    event.preventDefault();
+    if (state.submitting) return;
+
+    if (!validateForm()) {
+      setStatus("Bitte die markierten Felder prüfen.", "error");
+      return;
+    }
+
+    fillHiddenFields();
+
+    const formData = new FormData(state.form);
+    state.submitting = true;
+    state.refs.submit.disabled = true;
+    setStatus("Feedback wird gesendet…", "neutral");
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Accept: "application/json"
+        },
+        body: formData
+      });
+
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (error) {
+        payload = null;
+      }
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          const fallbackEmail = safeText(cfg.fallbackEmail);
+          const fallbackHtml = fallbackEmail
+            ? `Das Feedback-Limit ist aktuell erreicht. Bitte später erneut versuchen oder direkt an <a href="mailto:${escapeHtml(fallbackEmail)}">${escapeHtml(fallbackEmail)}</a> schreiben.`
+            : "Das Feedback-Limit ist aktuell erreicht. Bitte später erneut versuchen.";
+          setStatus(fallbackHtml, "error", true);
+          return;
+        }
+
+        const firstError = Array.isArray(payload?.errors) ? payload.errors[0] : null;
+        if (firstError?.field) {
+          setFieldError(firstError.field, firstError.message || "Bitte Eingabe prüfen.");
+          setStatus("Bitte die markierten Felder prüfen.", "error");
+        } else {
+          setStatus(firstError?.message || "Absenden hat nicht geklappt. Bitte später erneut versuchen.", "error");
+        }
+        return;
+      }
+
+      state.form.reset();
+      state.type = "idea";
+      renderTypeOptions();
+      syncTypeUi();
+      setStatus("Danke. Dein Feedback wurde gesendet.", "success");
+      window.setTimeout(closeModal, Number(cfg.successAutoCloseMs || 1400));
+    } catch (error) {
+      console.error("Feedback submit failed", error);
+      setStatus("Absenden hat nicht geklappt. Bitte Verbindung prüfen und erneut versuchen.", "error");
+    } finally {
+      state.submitting = false;
+      state.refs.submit.disabled = false;
+    }
+  }
+
+  function ensureEventPanelTrigger() {
+    const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
+    if (!inner || inner.querySelector(".feedback-context-trigger")) return;
+    const trigger = createButton({
+      className: "feedback-context-trigger feedback-context-trigger--event",
+      label: "Info falsch oder Problem?",
+      iconKey: "feedback-data",
+      attrs: {
+        "aria-label": "Feedback zu diesem Event geben",
+        "data-feedback-open": "data_issue"
+      }
+    });
+    inner.appendChild(trigger);
+  }
+
+  function ensureOfferPanelTrigger() {
+    const actions = document.querySelector("#offer-detail-root #event-detail-panel:not(.hidden) .activity-detail__actions");
+    if (!actions || actions.querySelector(".feedback-context-trigger")) return;
+    const trigger = createButton({
+      className: "activity-detail__action activity-detail__action--feedback feedback-context-trigger",
+      label: "Info falsch?",
+      iconKey: "feedback-data",
+      attrs: {
+        "aria-label": "Feedback zu dieser Aktivität geben",
+        "data-feedback-open": "data_issue"
+      }
+    });
+    actions.appendChild(trigger);
+  }
+
+  function refreshContextTriggers() {
+    ensureEventPanelTrigger();
+    ensureOfferPanelTrigger();
+    if (state.shell && !state.shell.hidden) {
+      syncTypeUi();
+    }
+  }
+
+  function bindEvents() {
+    document.addEventListener("click", (event) => {
+      const openTrigger = event.target.closest("[data-feedback-open]");
+      if (openTrigger) {
+        event.preventDefault();
+        const forcedType = openTrigger.getAttribute("data-feedback-open");
+        openModal(openTrigger, forcedType === "global" ? null : forcedType);
+        return;
+      }
+
+      if (event.target.closest("[data-feedback-close]")) {
+        event.preventDefault();
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.shell && !state.shell.hidden) {
+        closeModal();
+      }
+    });
+
+    state.form.addEventListener("submit", submitForm);
+    state.refs.typeGrid.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-feedback-type]");
+      if (!chip) return;
+      state.type = chip.getAttribute("data-feedback-type");
+      syncTypeUi();
+    });
+
+    window.addEventListener("resize", () => {
+      if (!isDesktop() && !state.inlineMounted) ensureInlineEntry();
+    });
+  }
+
+  function startObserver() {
+    if (state.observer) return;
+    state.observer = new MutationObserver(() => refreshContextTriggers());
+    state.observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "hidden"]
+    });
+  }
+
+  function init() {
+    if (state.initialized) return;
+    ensureLauncher();
+    ensureInlineEntry();
+    ensureModalShell();
+    bindEvents();
+    refreshContextTriggers();
+    startObserver();
+    state.initialized = true;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+/* === END FILE: js/feedback.js === */
