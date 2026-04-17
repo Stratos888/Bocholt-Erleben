@@ -315,4 +315,3 @@ const OfferDetailPanel = {
 
 window.OfferDetailPanel = OfferDetailPanel;
 /* === END BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 === */
-};
