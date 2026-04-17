@@ -20,32 +20,32 @@
   const endpoint = String(cfg.formspreeEndpoint || "").trim();
   if (!endpoint) return;
 
-  const TYPE_META = {
-    bug: {
-      label: "Bug melden",
-      icon: "feedback-bug",
-      prompt: "Was funktioniert nicht richtig?",
-      placeholder: "Beschreibe kurz, was passiert ist und was stattdessen erwartet wurde."
-    },
-    data_issue: {
-      label: "Falsche Information",
-      icon: "feedback-data",
-      prompt: "Welche Information ist falsch oder veraltet?",
-      placeholder: "Zum Beispiel falsche Uhrzeit, falscher Ort, kaputter Link oder nicht mehr aktueller Eintrag."
-    },
-    idea: {
-      label: "Idee oder Wunsch",
-      icon: "feedback-idea",
-      prompt: "Was würde dir die Nutzung verbessern?",
-      placeholder: "Zum Beispiel bessere Sortierung, fehlender Filter oder eine nützliche Zusatzinfo."
-    },
-    missing: {
-      label: "Etwas fehlt",
-      icon: "plus",
-      prompt: "Was fehlt dir aktuell?",
-      placeholder: "Zum Beispiel ein fehlendes Event, eine Aktivität, ein Ort oder eine Funktion."
-    }
-  };
+const TYPE_META = {
+  bug: {
+    label: "Bug melden",
+    icon: "feedback-bug",
+    prompt: "Was funktioniert nicht richtig?",
+    placeholder: "Beschreibe kurz den Fehler und was eigentlich hätte passieren sollen."
+  },
+  data_issue: {
+    label: "Falsche Information",
+    icon: "feedback-data",
+    prompt: "Welche Information ist falsch oder veraltet?",
+    placeholder: "Zum Beispiel falsche Uhrzeit, falscher Ort, kaputter Link oder nicht mehr aktueller Eintrag."
+  },
+  idea: {
+    label: "Idee oder Wunsch",
+    icon: "feedback-idea",
+    prompt: "Was wünschst du dir oder was sollte verbessert werden?",
+    placeholder: "Zum Beispiel bessere Sortierung, fehlender Filter oder eine nützliche Zusatzinfo."
+  },
+  missing: {
+    label: "Etwas fehlt",
+    icon: "plus",
+    prompt: "Was fehlt dir aktuell?",
+    placeholder: "Zum Beispiel ein fehlendes Event, eine Aktivität, ein Ort oder eine Funktion."
+  }
+};
 
   const state = {
     type: "",
@@ -113,35 +113,35 @@
     state.launcherMounted = true;
   }
 
-  function ensureInlineEntry() {
-    if (state.inlineMounted || isDesktop()) return;
-    const main = document.querySelector("main");
-    if (!main) return;
+function ensureInlineEntry() {
+  if (state.inlineMounted || isDesktop()) return;
+  const main = document.querySelector("main");
+  if (!main) return;
 
-    const entry = document.createElement("section");
-    entry.className = "feedback-inline-entry";
-    entry.setAttribute("aria-label", "Feedback geben");
-    entry.innerHTML = `
-      <div class="feedback-inline-entry__copy">
-        <strong>Fehler entdeckt oder Idee?</strong>
-        <p>Geht direkt hier in wenigen Sekunden.</p>
-      </div>
-    `;
+  const entry = document.createElement("section");
+  entry.className = "feedback-inline-entry";
+  entry.setAttribute("aria-label", "Feedback geben");
+  entry.innerHTML = `
+    <div class="feedback-inline-entry__copy">
+      <strong>Fehler entdeckt oder Idee?</strong>
+      <p>Nimm dir bitte ein paar Sekunden.</p>
+    </div>
+  `;
 
-    const trigger = createButton({
-      className: "feedback-inline-entry__button",
-      label: "Feedback geben",
-      iconKey: "feedback",
-      attrs: {
-        "aria-label": "Feedback geben",
-        "data-feedback-open": "global"
-      }
-    });
+  const trigger = createButton({
+    className: "feedback-inline-entry__button",
+    label: "Feedback geben",
+    iconKey: "feedback",
+    attrs: {
+      "aria-label": "Feedback geben",
+      "data-feedback-open": "global"
+    }
+  });
 
-    entry.appendChild(trigger);
-    main.insertAdjacentElement("afterend", entry);
-    state.inlineMounted = true;
-  }
+  entry.appendChild(trigger);
+  main.insertAdjacentElement("afterend", entry);
+  state.inlineMounted = true;
+}
 
   function ensureModalShell() {
     if (state.shell) return;
@@ -160,7 +160,7 @@
         <div class="feedback-modal__header">
           <div class="feedback-modal__header-copy">
             <h2 id="feedback-modal-title" class="feedback-modal__title">Feedback geben</h2>
-            <p class="feedback-modal__subtitle">Direkt hier senden – ohne Mailprogramm und ohne Seitenwechsel.</p>
+<p class="feedback-modal__subtitle">Direkt senden – ohne Mailprogramm oder Seitenwechsel.</p>
           </div>
           <button type="button" class="feedback-modal__close" aria-label="Feedback schließen" data-feedback-close>
             ${icon("x", "feedback-modal__close-icon")}
@@ -653,16 +653,23 @@ function openModal(opener = null, forcedType = null) {
   }
   /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V3 === */
 
-/* === BEGIN BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V2 | Zweck: verschiebt panelinterne Feedback-Trigger in ruhige Utility-Slots und reduziert ihre sprachliche/visuelle Dominanz gegenüber Hauptaktionen; Umfang: ersetzt ensureEventPanelTrigger() und ensureOfferPanelTrigger() in js/feedback.js === */
+/* === BEGIN BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V3 | Zweck: positioniert panelinterne Feedback-Wege bewusst als tertiäre Utility-Aktion außerhalb der Haupt-CTA-Logik und reduziert dadurch CTA-Konkurrenz auf Mobile; Umfang: ersetzt ensureEventPanelTrigger() und ensureOfferPanelTrigger() in js/feedback.js === */
 function ensureEventPanelTrigger() {
   const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
   if (!inner) return;
 
+  const primaryActions = inner.querySelector(".detail-actions");
   let slot = inner.querySelector(".feedback-context-slot--event");
+
   if (!slot) {
     slot = document.createElement("div");
     slot.className = "feedback-context-slot feedback-context-slot--event";
-    inner.appendChild(slot);
+
+    if (primaryActions) {
+      primaryActions.insertAdjacentElement("beforebegin", slot);
+    } else {
+      inner.appendChild(slot);
+    }
   }
 
   if (slot.querySelector(".feedback-context-trigger")) return;
@@ -682,20 +689,20 @@ function ensureEventPanelTrigger() {
 
 function ensureOfferPanelTrigger() {
   const body = document.querySelector("#offer-detail-root #event-detail-panel:not(.hidden) .activity-detail__body");
-  const actions = body?.querySelector(".activity-detail__actions");
-  if (!body || !actions) return;
+  const primaryActions = body?.querySelector(".activity-detail__actions");
+  if (!body || !primaryActions) return;
 
   let slot = body.querySelector(".feedback-context-slot--activity");
   if (!slot) {
     slot = document.createElement("div");
     slot.className = "feedback-context-slot feedback-context-slot--activity";
-    body.appendChild(slot);
+    primaryActions.insertAdjacentElement("afterend", slot);
   }
 
   if (slot.querySelector(".feedback-context-trigger")) return;
 
   const trigger = createButton({
-    className: "activity-detail__action activity-detail__action--feedback feedback-context-trigger feedback-context-trigger--activity",
+    className: "feedback-context-trigger feedback-context-trigger--activity",
     label: "Info korrigieren",
     iconKey: "feedback-data",
     attrs: {
@@ -706,7 +713,7 @@ function ensureOfferPanelTrigger() {
 
   slot.appendChild(trigger);
 }
-/* === END BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V2 === */
+/* === END BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V3 === */
 
   /* === BEGIN BLOCK: FEEDBACK_CONTEXT_REFRESH_DECOUPLE_MODAL_V1 | Zweck: entkoppelt die globale Observer-Refresh-Logik von der Feedback-Modal-UI, damit DOM-Mutationen des Modals keinen Re-Entry mehr auslösen und die Seite nicht blockieren | Umfang: ersetzt nur refreshContextTriggers() in js/feedback.js === */
   function refreshContextTriggers() {
