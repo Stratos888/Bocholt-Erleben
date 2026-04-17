@@ -2740,74 +2740,16 @@ body.is-feedback-open{
 }
 
 @media (max-width: 899px){
-.feedback-modal__header{
-  position: relative;
-  display: block;
-  margin-bottom: 10px;
-  padding-right: 56px;
-}
-
-.feedback-modal__header-copy{
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.feedback-modal__title{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: clamp(1.18rem, 1.03rem + 0.42vw, 1.4rem);
-  line-height: 1.12;
-  font-weight: 850;
-  letter-spacing: -0.02em;
-}
-
-.feedback-modal__subtitle{
-  margin: 0;
-  max-width: none;
-  color: var(--color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.34;
-}
-
-.feedback-modal__close{
-  appearance: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  border: 1px solid rgba(31,41,51,0.10);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.82);
-  color: rgba(31,41,51,0.78);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
-  cursor: pointer;
-}
-
-.feedback-modal__close-icon{
-  width: 18px;
-  height: 18px;
-}
-
-.feedback-modal__close-icon > .ui-icon-svg{
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-@media (max-width: 899px){
   .feedback-modal__header{
+    position: relative;
+    display: block;
     margin-bottom: 8px;
     padding-right: 52px;
   }
 
   .feedback-modal__header-copy{
     gap: 2px;
+    padding-top: 0;
   }
 
   .feedback-modal__title{
@@ -2816,11 +2758,15 @@ body.is-feedback-open{
   }
 
   .feedback-modal__subtitle{
+    max-width: none;
     font-size: 0.89rem;
     line-height: 1.28;
   }
 
   .feedback-modal__close{
+    position: absolute;
+    top: 0;
+    right: 0;
     width: 40px;
     height: 40px;
     min-width: 40px;
