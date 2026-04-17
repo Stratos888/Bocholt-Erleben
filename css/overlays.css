@@ -2865,17 +2865,11 @@ body.is-feedback-open{
   display: none;
 }
 
-.feedback-form.is-success .feedback-primary-btn{
+/* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_NO_REDUNDANT_FOOTER_ACTION_V1 | Zweck: entfernt im auto-schließenden Success-State den redundanten Footer-Schließen-CTA und lässt nur den Header-Close als optionale Sofort-Beendigung bestehen; Umfang: ersetzt nur Success-Actions im Feedback-Modal in css/overlays.css === */
+.feedback-form.is-success .feedback-form__actions{
   display: none;
 }
-
-.feedback-form.is-success .feedback-form__actions{
-  justify-content: flex-end;
-}
-
-.feedback-form.is-success .feedback-secondary-btn{
-  min-width: 120px;
-}
+/* === END BLOCK: FEEDBACK_SUCCESS_STATE_NO_REDUNDANT_FOOTER_ACTION_V1 === */
 
 .feedback-form__actions{
   display: flex;
