@@ -331,11 +331,13 @@
     return items.join(" | ");
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_CONTEXT_SUMMARY_HIDE_REDUNDANT_PAGE_V1 | Zweck: zeigt den Bezug nur noch dann an, wenn wirklich ein konkreter Event- oder Activity-Kontext vorliegt, statt pauschal „Aktuelle Seite“ auszuspielen; Umfang: ersetzt nur contextSummary() in js/feedback.js === */
   function contextSummary() {
     const context = getActiveContext();
-    if (!context) return "Aktuelle Seite";
+    if (!context) return "";
     return [context.entityTitle, context.entitySubtitle].filter(Boolean).join(" · ");
   }
+  /* === END BLOCK: FEEDBACK_CONTEXT_SUMMARY_HIDE_REDUNDANT_PAGE_V1 === */
 
   /* === BEGIN BLOCK: FEEDBACK_TYPE_UI_OPTIONAL_DEFAULT_V1 | Zweck: unterstützt einen leeren Startzustand ohne Vorauswahl und stellt trotzdem eine klare generische Führung für Textfeld und Chips bereit | Umfang: ersetzt nur syncTypeUi() === */
   function syncTypeUi() {
@@ -420,12 +422,14 @@
   }
   /* === END BLOCK: FEEDBACK_STATUS_AND_SUCCESS_HELPERS_V1 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 | Zweck: erzeugt einen lesbareren Betreff und hält die Nutzdaten semantisch sauber, bevor technische Felder später gezielt entfernt werden | Umfang: ersetzt nur fillHiddenFields() === */
+  /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CONTEXTLESS_UI_V2 | Zweck: entfernt den nutzerseitig redundanten Standard-Bezug „Aktuelle Seite“, behält aber für Mails weiterhin einen sauberen Fallback-Betreff auf Basis des Seitentyps; Umfang: ersetzt nur fillHiddenFields() in js/feedback.js === */
   function fillHiddenFields() {
     const context = getActiveContext();
     const search = getSearchValue();
     const filters = getFilters();
-    const summary = contextSummary();
+    const summary = context
+      ? [context.entityTitle, context.entitySubtitle].filter(Boolean).join(" · ")
+      : pageType();
 
     state.refs.feedbackType.value = state.type;
     state.refs.feedbackTypeLabel.value = TYPE_META[state.type]?.label || "Feedback";
@@ -441,13 +445,19 @@
     state.refs.submittedAt.value = new Date().toISOString();
     state.refs.subject.value = `[Bocholt erleben] ${TYPE_META[state.type]?.label || "Feedback"} · ${summary}`;
   }
-  /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 === */
+  /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CONTEXTLESS_UI_V2 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V2 | Zweck: öffnet das Modal ohne Alt-Timer oder alten Success-State und hält kontextbezogene Vorauswahl weiterhin intakt; Umfang: ersetzt openModal() in js/feedback.js === */
+  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V3 | Zweck: öffnet das Modal immer mit sauber zurückgesetztem Optional-Details-State und ohne Alt-Success, während kontextbezogene Vorauswahl erhalten bleibt; Umfang: ersetzt openModal() in js/feedback.js === */
   function openModal(opener = null, forcedType = null) {
     ensureModalShell();
     clearCloseTimer();
     setFormSuccessState(false);
+
+    const optionalDetails = state.form?.querySelector(".feedback-optional");
+    if (optionalDetails) {
+      optionalDetails.open = false;
+    }
+
     state.opener = opener;
     state.type = TYPE_META[forcedType] ? forcedType : "";
     clearErrors();
@@ -465,7 +475,7 @@
       try { state.refs.message?.focus(); } catch (_) {}
     });
   }
-  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V2 === */
+  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V3 === */
 
   /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V2 | Zweck: räumt beim Schließen zusätzlich Success-State und Auto-Close-Timer robust auf, ohne den normalen Draft-Flow zu beschädigen; Umfang: ersetzt closeModal() in js/feedback.js === */
   function closeModal() {
@@ -524,10 +534,14 @@
   }
   /* === END BLOCK: FEEDBACK_VALIDATE_REQUIRED_TYPE_V1 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V2 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren Success-State im selben Modal, hält den Flow nicht-modal und schließt erst nach gut sichtbarer Bestätigung automatisch; Umfang: resetFormUiState(), pruneFormData() und submitForm() in js/feedback.js === */
+  /* === BEGIN BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V3 | Zweck: setzt den Feedback-Dialog nach jedem Öffnen sauber zurück, verhindert offen bleibende Optional-Details und macht den auto-schließenden Success-State etwas lesbarer, ohne zusätzlichen Footer-CTA; Umfang: resetFormUiState(), pruneFormData() und submitForm() in js/feedback.js === */
   function resetFormUiState() {
     clearCloseTimer();
     state.form.reset();
+    const optionalDetails = state.form?.querySelector(".feedback-optional");
+    if (optionalDetails) {
+      optionalDetails.open = false;
+    }
     state.type = "";
     renderTypeOptions();
     setFormSuccessState(false);
@@ -615,7 +629,7 @@
         </div>
       `, "success", true);
 
-      const closeDelayMs = Math.max(Number(cfg.successAutoCloseMs || 1400), 2600);
+      const closeDelayMs = Math.max(Number(cfg.successAutoCloseMs || 1400), 3200);
       clearCloseTimer();
       state.closeTimer = window.setTimeout(() => {
         resetFormUiState();
@@ -631,7 +645,7 @@
       }
     }
   }
-  /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V2 === */
+  /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V3 === */
 
   function ensureEventPanelTrigger() {
     const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
