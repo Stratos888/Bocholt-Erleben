@@ -151,6 +151,37 @@ Umfang:
     `,
     "chevron-left": `
       <path d="m15 18-6-6 6-6" />
+    `,
+    "message-square": `
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    `,
+    bug: `
+      <path d="m8 2 1.88 1.88" />
+      <path d="M14.12 3.88 16 2" />
+      <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+      <path d="M12 20c-3.31 0-6-2.69-6-6V8h12v6c0 3.31-2.69 6-6 6" />
+      <path d="M4 13H2" />
+      <path d="M6 9H3" />
+      <path d="M10 13h4" />
+      <path d="M18 13h2" />
+      <path d="M21 9h-3" />
+    `,
+    "triangle-alert": `
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    `,
+    lightbulb: `
+      <path d="M15 14c.2-.6.6-1.1 1-1.5a6 6 0 1 0-8 0c.4.4.8.9 1 1.5" />
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+    `,
+    check: `
+      <path d="M20 6 9 17l-5-5" />
+    `,
+    "send-horizontal": `
+      <path d="m3 3 3 9-3 9 19-9Z" />
+      <path d="M6 12h16" />
     `
   };
   /* eslint-enable max-len */
@@ -164,6 +195,12 @@ Umfang:
     source: "external",
     location: "pin",
     "link-external": "external",
+    feedback: "message-square",
+    "feedback-idea": "lightbulb",
+    "feedback-bug": "bug",
+    "feedback-data": "triangle-alert",
+    "feedback-submit": "send-horizontal",
+    "feedback-success": "check",
 
     "app-install": "download",
     "app-device": "download",
