@@ -207,7 +207,7 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V4 | Zweck: entfernt den belegbar defekten Restverweis auf die nicht mehr existierende Variable sections und rendert nur die tatsächlich definierten Faktenbereiche; Umfang: ersetzt nur renderFacts(offer) in js/offers-details.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V5 | Zweck: behebt den defekten Restverweis in renderFacts(), integriert Standard-Icons in die CTAs und hält die Action-Struktur linksgeführt/konsistent; Umfang: ersetzt nur renderFacts(offer) und renderContent(offer) in js/offers-details.js === */
   renderFacts(offer) {
     const primaryTags = window.OfferVisuals?.getRankedTagItems
       ? window.OfferVisuals.getRankedTagItems(offer)
@@ -260,7 +260,6 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
-/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V4 === */
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
@@ -273,6 +272,13 @@ const OfferDetailPanel = {
       ? window.OfferVisuals.buildMetaLine(offer)
       : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
     const description = String(offer?.description || "").trim();
+
+    const mapsIcon = window.Icons?.svg
+      ? window.Icons.svg("compass", { className: "activity-detail__action-icon-svg" })
+      : "";
+    const websiteIcon = window.Icons?.svg
+      ? window.Icons.svg("external", { className: "activity-detail__action-icon-svg" })
+      : "";
 
     this.content.innerHTML = `
       <article class="activity-detail">
@@ -289,13 +295,19 @@ const OfferDetailPanel = {
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
           ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
-            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(mapsLabel)}</a>
-            ${websiteUrl ? `<a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(websiteLabel)}</a>` : ""}
+            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">
+              <span class="activity-detail__action-icon" aria-hidden="true">${mapsIcon}</span>
+              <span class="activity-detail__action-label">${this.escapeHtml(mapsLabel)}</span>
+            </a>
+            ${websiteUrl ? `
+              <a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">
+                <span class="activity-detail__action-icon" aria-hidden="true">${websiteIcon}</span>
+                <span class="activity-detail__action-label">${this.escapeHtml(websiteLabel)}</span>
+              </a>
+            ` : ""}
           </div>
         </div>
       </article>
     `.trim();
   }
-};
-
-window.OfferDetailPanel = OfferDetailPanel;
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V5 === */
