@@ -48,7 +48,7 @@
   };
 
   const state = {
-    type: "idea",
+    type: "",
     shell: null,
     form: null,
     refs: {},
@@ -168,6 +168,7 @@
 
         <form class="feedback-form" action="${escapeHtml(endpoint)}" method="POST" novalidate>
           <div class="feedback-type-grid" role="radiogroup" aria-label="Feedback-Art"></div>
+          <span class="feedback-field__error" data-feedback-error="type"></span>
 
           <div class="feedback-context-box" hidden>
             <div class="feedback-context-box__label">Bezug</div>
@@ -335,12 +336,15 @@
     return [context.entityTitle, context.entitySubtitle].filter(Boolean).join(" · ");
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_TYPE_UI_OPTIONAL_DEFAULT_V1 | Zweck: unterstützt einen leeren Startzustand ohne Vorauswahl und stellt trotzdem eine klare generische Führung für Textfeld und Chips bereit | Umfang: ersetzt nur syncTypeUi() === */
   function syncTypeUi() {
-    const meta = TYPE_META[state.type];
-    if (!meta || !state.refs.prompt) return;
+    if (!state.refs.prompt || !state.refs.typeGrid) return;
 
-    state.refs.prompt.textContent = meta.prompt;
-    state.refs.message.placeholder = meta.placeholder;
+    const meta = TYPE_META[state.type] || null;
+    state.refs.prompt.textContent = meta ? meta.prompt : "Worum geht es?";
+    state.refs.message.placeholder = meta
+      ? meta.placeholder
+      : "Beschreibe kurz dein Feedback und wähle oben die passende Art aus.";
 
     state.refs.typeGrid.querySelectorAll("[data-feedback-type]").forEach((node) => {
       const active = node.getAttribute("data-feedback-type") === state.type;
@@ -348,10 +352,19 @@
       node.setAttribute("aria-checked", active ? "true" : "false");
     });
 
+    if (meta) {
+      const typeError = state.form?.querySelector('[data-feedback-error="type"]');
+      if (typeError) {
+        typeError.textContent = "";
+        typeError.removeAttribute("data-active");
+      }
+    }
+
     const summary = contextSummary();
     state.refs.contextValue.textContent = summary;
     state.refs.contextBox.hidden = !summary;
   }
+  /* === END BLOCK: FEEDBACK_TYPE_UI_OPTIONAL_DEFAULT_V1 === */
 
   function clearErrors() {
     state.form?.querySelectorAll("[data-feedback-error]").forEach((node) => {
@@ -383,14 +396,15 @@
     }
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 | Zweck: erzeugt einen lesbareren Betreff und hält die Nutzdaten semantisch sauber, bevor technische Felder später gezielt entfernt werden | Umfang: ersetzt nur fillHiddenFields() === */
   function fillHiddenFields() {
     const context = getActiveContext();
     const search = getSearchValue();
     const filters = getFilters();
-    const summary = context ? context.entityTitle : pageType();
+    const summary = contextSummary();
 
     state.refs.feedbackType.value = state.type;
-    state.refs.feedbackTypeLabel.value = TYPE_META[state.type]?.label || state.type;
+    state.refs.feedbackTypeLabel.value = TYPE_META[state.type]?.label || "Feedback";
     state.refs.sourceLabel.value = safeText(cfg.sourceLabel || "bocholt-erleben-web");
     state.refs.pageType.value = pageType();
     state.refs.pageUrl.value = window.location.href;
@@ -403,11 +417,13 @@
     state.refs.submittedAt.value = new Date().toISOString();
     state.refs.subject.value = `[Bocholt erleben] ${TYPE_META[state.type]?.label || "Feedback"} · ${summary}`;
   }
+  /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 === */
 
+  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V1 | Zweck: globale Feedback-Öffnung startet ohne Vorauswahl, kontextbezogene Trigger dürfen weiterhin eine passende Kategorie vorbelegen | Umfang: ersetzt nur openModal() === */
   function openModal(opener = null, forcedType = null) {
     ensureModalShell();
     state.opener = opener;
-    state.type = TYPE_META[forcedType] ? forcedType : "idea";
+    state.type = TYPE_META[forcedType] ? forcedType : "";
     clearErrors();
     setStatus("");
     syncTypeUi();
@@ -425,6 +441,7 @@
       try { state.refs.message?.focus(); } catch (_) {}
     });
   }
+  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V1 === */
 
   function closeModal() {
     if (!state.shell) return;
@@ -445,11 +462,17 @@
     }
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_VALIDATE_REQUIRED_TYPE_V1 | Zweck: macht die Auswahl der Feedback-Art beim globalen Einstieg verpflichtend und prüft zusätzlich weiterhin Nachricht und optionale E-Mail | Umfang: ersetzt nur validateForm() === */
   function validateForm() {
     clearErrors();
     const message = safeText(state.refs.message.value);
     const email = safeText(state.refs.email.value);
     let valid = true;
+
+    if (!TYPE_META[state.type]) {
+      setFieldError("type", "Bitte zuerst auswählen, worum es geht.");
+      valid = false;
+    }
 
     if (message.length < Number(cfg.minMessageLength || 12)) {
       setFieldError("message", `Bitte etwas genauer beschreiben (mindestens ${Number(cfg.minMessageLength || 12)} Zeichen).`);
@@ -466,6 +489,29 @@
 
     return valid;
   }
+  /* === END BLOCK: FEEDBACK_VALIDATE_REQUIRED_TYPE_V1 === */
+
+  /* === BEGIN BLOCK: FEEDBACK_SUBMIT_SUCCESS_AND_MAIL_CLEANUP_V1 | Zweck: macht den Erfolgszustand sichtbar, schließt erst verzögert und reduziert Formspree-Free-Mailballast durch Entfernen leerer bzw. technischer Felder | Umfang: ersetzt submitFlow in js/feedback.js === */
+  function resetFormUiState() {
+    state.form.reset();
+    state.type = "";
+    renderTypeOptions();
+    syncTypeUi();
+    clearErrors();
+    setStatus("");
+  }
+
+  function pruneFormData(formData) {
+    ["source_label", "feedback_type", "route", "viewport", "submitted_at"].forEach((key) => {
+      formData.delete(key);
+    });
+
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      if (typeof value === "string" && !safeText(value)) {
+        formData.delete(key);
+      }
+    });
+  }
 
   async function submitForm(event) {
     event.preventDefault();
@@ -479,6 +525,8 @@
     fillHiddenFields();
 
     const formData = new FormData(state.form);
+    pruneFormData(formData);
+
     state.submitting = true;
     state.refs.submit.disabled = true;
     setStatus("Feedback wird gesendet…", "neutral");
@@ -519,12 +567,13 @@
         return;
       }
 
-      state.form.reset();
-      state.type = "idea";
-      renderTypeOptions();
-      syncTypeUi();
       setStatus("Danke. Dein Feedback wurde gesendet.", "success");
-      window.setTimeout(closeModal, Number(cfg.successAutoCloseMs || 1400));
+
+      const closeDelayMs = Math.max(Number(cfg.successAutoCloseMs || 1400), 2400);
+      window.setTimeout(() => {
+        resetFormUiState();
+        closeModal();
+      }, closeDelayMs);
     } catch (error) {
       console.error("Feedback submit failed", error);
       setStatus("Absenden hat nicht geklappt. Bitte Verbindung prüfen und erneut versuchen.", "error");
@@ -533,6 +582,7 @@
       state.refs.submit.disabled = false;
     }
   }
+  /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_AND_MAIL_CLEANUP_V1 === */
 
   function ensureEventPanelTrigger() {
     const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
