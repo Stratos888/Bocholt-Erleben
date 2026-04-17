@@ -2479,8 +2479,8 @@ body.is-feedback-open{
   line-height: 1.42;
 }
 
-.feedback-inline-entry__button,
-.feedback-context-trigger{
+/* === BEGIN BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V2 | Zweck: trennt starken globalen Inline-Einstieg von ruhigen panelinternen Feedbackaktionen und reduziert deren visuelle Dominanz auf Mobile/Detailpanels; Umfang: ersetzt nur die Inline-/Context-Trigger-Sektion im Feedback-UI von css/overlays.css === */
+.feedback-inline-entry__button{
   appearance: none;
   display: inline-flex;
   align-items: center;
@@ -2504,14 +2504,76 @@ body.is-feedback-open{
   cursor: pointer;
 }
 
-.feedback-context-trigger{
-  width: 100%;
+.feedback-context-slot{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.feedback-context-slot--event{
   margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--cmp-divider-color);
+}
+
+.feedback-context-slot--activity{
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+.feedback-context-trigger{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  width: auto;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 0 12px;
+
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.62);
+  box-shadow: none;
+
+  color: rgba(31,41,51,0.74);
+  font: inherit;
+  font-size: 0.87rem;
+  font-weight: 720;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.feedback-context-trigger .feedback-btn__icon{
+  width: 16px;
+  height: 16px;
+  color: rgba(31,41,51,0.58);
 }
 
 #event-detail-panel .activity-detail__action--feedback{
-  width: 100%;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
 }
+
+@media (max-width: 899px){
+  .feedback-context-slot--event{
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .feedback-context-trigger{
+    min-height: 42px;
+    padding: 0 13px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.72);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.78);
+  }
+}
+/* === END BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V2 === */
 
 .feedback-modal-shell{
   position: fixed;
@@ -2532,6 +2594,7 @@ body.is-feedback-open{
   backdrop-filter: blur(8px);
 }
 
+/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V1 | Zweck: zieht das Feedback-UI auf Mobile in eine saubere Bottom-Sheet-Geometrie mit stabilem Einstieg oben, ohne Desktop-Dialoglogik zu verlieren; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
 .feedback-modal{
   position: absolute;
   left: 50%;
@@ -2541,6 +2604,9 @@ body.is-feedback-open{
   width: min(calc(100% - 24px), 620px);
   max-height: min(88vh, 860px);
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-padding-top: 20px;
 
   padding: 18px 18px 16px;
 
@@ -2550,6 +2616,43 @@ body.is-feedback-open{
   box-shadow:
     0 32px 70px rgba(0,0,0,0.18),
     0 1px 0 rgba(255,255,255,0.82) inset;
+}
+
+@media (max-width: 899px){
+  .feedback-modal{
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    transform: none;
+
+    width: 100%;
+    max-height: min(92dvh, 840px);
+
+    padding: 30px 16px calc(16px + env(safe-area-inset-bottom));
+
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
+
+    box-shadow:
+      0 -24px 52px rgba(0,0,0,0.18),
+      0 1px 0 rgba(255,255,255,0.82) inset;
+  }
+
+  .feedback-modal::before{
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(31,41,51,0.14);
+  }
 }
 
 .feedback-modal__header{
