@@ -55,6 +55,7 @@
     opener: null,
     submitting: false,
     observer: null,
+    closeTimer: null,
     inlineMounted: false,
     launcherMounted: false,
     initialized: false
@@ -386,15 +387,38 @@
     }
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_STATUS_AND_SUCCESS_HELPERS_V1 | Zweck: ergänzt robusten Success-State mit Timer-Cleanup und Modal-interner Success-Umschaltung, ohne das bestehende Fehler-/Validierungsverhalten zu verändern; Umfang: ersetzt setStatus() und ergänzt Helper in js/feedback.js === */
   function setStatus(message, kind = "neutral", allowHtml = false) {
     if (!state.refs.status) return;
-    state.refs.status.className = `feedback-form__status is-${kind}`;
+    state.refs.status.className = message ? `feedback-form__status is-${kind}` : "feedback-form__status";
     if (allowHtml) {
       state.refs.status.innerHTML = message;
     } else {
       state.refs.status.textContent = message;
     }
   }
+
+  function clearCloseTimer() {
+    if (!state.closeTimer) return;
+    window.clearTimeout(state.closeTimer);
+    state.closeTimer = null;
+  }
+
+  function setFormSuccessState(active) {
+    if (!state.form) return;
+
+    state.form.classList.toggle("is-success", active);
+
+    const secondary = state.form.querySelector(".feedback-secondary-btn");
+    if (secondary) {
+      secondary.textContent = active ? "Schließen" : "Abbrechen";
+    }
+
+    if (state.refs.submit) {
+      state.refs.submit.disabled = active || state.submitting;
+    }
+  }
+  /* === END BLOCK: FEEDBACK_STATUS_AND_SUCCESS_HELPERS_V1 === */
 
   /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 | Zweck: erzeugt einen lesbareren Betreff und hält die Nutzdaten semantisch sauber, bevor technische Felder später gezielt entfernt werden | Umfang: ersetzt nur fillHiddenFields() === */
   function fillHiddenFields() {
@@ -419,48 +443,57 @@
   }
   /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V1 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V1 | Zweck: globale Feedback-Öffnung startet ohne Vorauswahl, kontextbezogene Trigger dürfen weiterhin eine passende Kategorie vorbelegen | Umfang: ersetzt nur openModal() === */
+  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V2 | Zweck: öffnet das Modal ohne Alt-Timer oder alten Success-State und hält kontextbezogene Vorauswahl weiterhin intakt; Umfang: ersetzt openModal() in js/feedback.js === */
   function openModal(opener = null, forcedType = null) {
     ensureModalShell();
+    clearCloseTimer();
+    setFormSuccessState(false);
     state.opener = opener;
     state.type = TYPE_META[forcedType] ? forcedType : "";
     clearErrors();
     setStatus("");
     syncTypeUi();
 
-    /* === BEGIN BLOCK: FEEDBACK_MODAL_OPEN_STATE_SYNC_V1 | Zweck: synchronisiert beim Öffnen den visuellen und logischen Zustand des Feedback-Modals, damit Observer und Escape-Handling nur bei wirklich offenem Modal greifen | Umfang: nur Open-State in openModal() === */
     state.shell.hidden = false;
     state.shell.classList.add("is-active");
     state.shell.setAttribute("aria-hidden", "false");
 
     document.documentElement.classList.add("is-feedback-open");
     document.body.classList.add("is-feedback-open");
-    /* === END BLOCK: FEEDBACK_MODAL_OPEN_STATE_SYNC_V1 === */
 
     requestAnimationFrame(() => {
       try { state.refs.message?.focus(); } catch (_) {}
     });
   }
-  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V1 === */
+  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V2 === */
 
+  /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V2 | Zweck: räumt beim Schließen zusätzlich Success-State und Auto-Close-Timer robust auf, ohne den normalen Draft-Flow zu beschädigen; Umfang: ersetzt closeModal() in js/feedback.js === */
   function closeModal() {
     if (!state.shell) return;
 
-    /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V1 | Zweck: synchronisiert beim Schließen den visuellen und logischen Zustand des Feedback-Modals, damit Refresh-/Observer-Logik danach nicht weiter im Open-State läuft | Umfang: nur Close-State in closeModal() === */
+    const hadSuccessState = state.form?.classList.contains("is-success");
+    clearCloseTimer();
+
     state.shell.classList.remove("is-active");
     state.shell.hidden = true;
     state.shell.setAttribute("aria-hidden", "true");
 
     document.documentElement.classList.remove("is-feedback-open");
     document.body.classList.remove("is-feedback-open");
-    clearErrors();
-    setStatus("");
-    /* === END BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V1 === */
+
+    if (hadSuccessState) {
+      resetFormUiState();
+    } else {
+      setFormSuccessState(false);
+      clearErrors();
+      setStatus("");
+    }
 
     if (state.opener && typeof state.opener.focus === "function") {
       state.opener.focus({ preventScroll: true });
     }
   }
+  /* === END BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V2 === */
 
   /* === BEGIN BLOCK: FEEDBACK_VALIDATE_REQUIRED_TYPE_V1 | Zweck: macht die Auswahl der Feedback-Art beim globalen Einstieg verpflichtend und prüft zusätzlich weiterhin Nachricht und optionale E-Mail | Umfang: ersetzt nur validateForm() === */
   function validateForm() {
@@ -491,11 +524,13 @@
   }
   /* === END BLOCK: FEEDBACK_VALIDATE_REQUIRED_TYPE_V1 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_SUBMIT_SUCCESS_AND_MAIL_CLEANUP_V1 | Zweck: macht den Erfolgszustand sichtbar, schließt erst verzögert und reduziert Formspree-Free-Mailballast durch Entfernen leerer bzw. technischer Felder | Umfang: ersetzt submitFlow in js/feedback.js === */
+  /* === BEGIN BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V2 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren Success-State im selben Modal, hält den Flow nicht-modal und schließt erst nach gut sichtbarer Bestätigung automatisch; Umfang: resetFormUiState(), pruneFormData() und submitForm() in js/feedback.js === */
   function resetFormUiState() {
+    clearCloseTimer();
     state.form.reset();
     state.type = "";
     renderTypeOptions();
+    setFormSuccessState(false);
     syncTypeUi();
     clearErrors();
     setStatus("");
@@ -528,6 +563,7 @@
     pruneFormData(formData);
 
     state.submitting = true;
+    setFormSuccessState(false);
     state.refs.submit.disabled = true;
     setStatus("Feedback wird gesendet…", "neutral");
 
@@ -567,10 +603,21 @@
         return;
       }
 
-      setStatus("Danke. Dein Feedback wurde gesendet.", "success");
+      setFormSuccessState(true);
+      setStatus(`
+        <div class="feedback-success-card" role="status">
+          <span class="feedback-success-card__icon" aria-hidden="true">${icon("feedback-success", "feedback-success-card__icon-svg")}</span>
+          <span class="feedback-success-card__body">
+            <strong class="feedback-success-card__title">Feedback gesendet</strong>
+            <span class="feedback-success-card__text">Danke — deine Rückmeldung ist angekommen.</span>
+            <span class="feedback-success-card__meta">Das Fenster schließt sich automatisch.</span>
+          </span>
+        </div>
+      `, "success", true);
 
-      const closeDelayMs = Math.max(Number(cfg.successAutoCloseMs || 1400), 2400);
-      window.setTimeout(() => {
+      const closeDelayMs = Math.max(Number(cfg.successAutoCloseMs || 1400), 2600);
+      clearCloseTimer();
+      state.closeTimer = window.setTimeout(() => {
         resetFormUiState();
         closeModal();
       }, closeDelayMs);
@@ -579,10 +626,12 @@
       setStatus("Absenden hat nicht geklappt. Bitte Verbindung prüfen und erneut versuchen.", "error");
     } finally {
       state.submitting = false;
-      state.refs.submit.disabled = false;
+      if (!state.form?.classList.contains("is-success")) {
+        state.refs.submit.disabled = false;
+      }
     }
   }
-  /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_AND_MAIL_CLEANUP_V1 === */
+  /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V2 === */
 
   function ensureEventPanelTrigger() {
     const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
