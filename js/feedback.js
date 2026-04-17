@@ -437,35 +437,51 @@
   }
   /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CONTEXTLESS_UI_V2 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V3 | Zweck: öffnet das Modal immer mit sauber zurückgesetztem Optional-Details-State und ohne Alt-Success, während kontextbezogene Vorauswahl erhalten bleibt; Umfang: ersetzt openModal() in js/feedback.js === */
-  function openModal(opener = null, forcedType = null) {
-    ensureModalShell();
-    clearCloseTimer();
-    setFormSuccessState(false);
+/* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V4 | Zweck: startet das Feedback-UI auf Mobile immer am klaren Dialoganfang ohne sofortige Tastaturöffnung und hält Desktop-Autofokus nur dort, wo er sinnvoll ist; Umfang: ersetzt openModal() in js/feedback.js === */
+function openModal(opener = null, forcedType = null) {
+  ensureModalShell();
+  clearCloseTimer();
+  setFormSuccessState(false);
 
-    const optionalDetails = state.form?.querySelector(".feedback-optional");
-    if (optionalDetails) {
-      optionalDetails.open = false;
+  const optionalDetails = state.form?.querySelector(".feedback-optional");
+  if (optionalDetails) {
+    optionalDetails.open = false;
+  }
+
+  const dialog = state.shell?.querySelector(".feedback-modal");
+  const closeButton = state.shell?.querySelector(".feedback-modal__close");
+  if (dialog) {
+    dialog.scrollTop = 0;
+  }
+
+  state.opener = opener;
+  state.type = TYPE_META[forcedType] ? forcedType : "";
+  clearErrors();
+  setStatus("");
+  syncTypeUi();
+
+  state.shell.hidden = false;
+  state.shell.classList.add("is-active");
+  state.shell.setAttribute("aria-hidden", "false");
+
+  document.documentElement.classList.add("is-feedback-open");
+  document.body.classList.add("is-feedback-open");
+
+  requestAnimationFrame(() => {
+    if (dialog) {
+      dialog.scrollTop = 0;
     }
 
-    state.opener = opener;
-    state.type = TYPE_META[forcedType] ? forcedType : "";
-    clearErrors();
-    setStatus("");
-    syncTypeUi();
-
-    state.shell.hidden = false;
-    state.shell.classList.add("is-active");
-    state.shell.setAttribute("aria-hidden", "false");
-
-    document.documentElement.classList.add("is-feedback-open");
-    document.body.classList.add("is-feedback-open");
-
-    requestAnimationFrame(() => {
-      try { state.refs.message?.focus(); } catch (_) {}
-    });
-  }
-  /* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V3 === */
+    try {
+      if (isDesktop()) {
+        state.refs.message?.focus();
+      } else {
+        closeButton?.focus({ preventScroll: true });
+      }
+    } catch (_) {}
+  });
+}
+/* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V4 === */
 
   /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V2 | Zweck: räumt beim Schließen zusätzlich Success-State und Auto-Close-Timer robust auf, ohne den normalen Draft-Flow zu beschädigen; Umfang: ersetzt closeModal() in js/feedback.js === */
   function closeModal() {
@@ -637,35 +653,60 @@
   }
   /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V3 === */
 
-  function ensureEventPanelTrigger() {
-    const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
-    if (!inner || inner.querySelector(".feedback-context-trigger")) return;
-    const trigger = createButton({
-      className: "feedback-context-trigger feedback-context-trigger--event",
-      label: "Info falsch oder Problem?",
-      iconKey: "feedback-data",
-      attrs: {
-        "aria-label": "Feedback zu diesem Event geben",
-        "data-feedback-open": "data_issue"
-      }
-    });
-    inner.appendChild(trigger);
+/* === BEGIN BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V2 | Zweck: verschiebt panelinterne Feedback-Trigger in ruhige Utility-Slots und reduziert ihre sprachliche/visuelle Dominanz gegenüber Hauptaktionen; Umfang: ersetzt ensureEventPanelTrigger() und ensureOfferPanelTrigger() in js/feedback.js === */
+function ensureEventPanelTrigger() {
+  const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
+  if (!inner) return;
+
+  let slot = inner.querySelector(".feedback-context-slot--event");
+  if (!slot) {
+    slot = document.createElement("div");
+    slot.className = "feedback-context-slot feedback-context-slot--event";
+    inner.appendChild(slot);
   }
 
-  function ensureOfferPanelTrigger() {
-    const actions = document.querySelector("#offer-detail-root #event-detail-panel:not(.hidden) .activity-detail__actions");
-    if (!actions || actions.querySelector(".feedback-context-trigger")) return;
-    const trigger = createButton({
-      className: "activity-detail__action activity-detail__action--feedback feedback-context-trigger",
-      label: "Info falsch?",
-      iconKey: "feedback-data",
-      attrs: {
-        "aria-label": "Feedback zu dieser Aktivität geben",
-        "data-feedback-open": "data_issue"
-      }
-    });
-    actions.appendChild(trigger);
+  if (slot.querySelector(".feedback-context-trigger")) return;
+
+  const trigger = createButton({
+    className: "feedback-context-trigger feedback-context-trigger--event",
+    label: "Info korrigieren",
+    iconKey: "feedback-data",
+    attrs: {
+      "aria-label": "Info zu diesem Event korrigieren",
+      "data-feedback-open": "data_issue"
+    }
+  });
+
+  slot.appendChild(trigger);
+}
+
+function ensureOfferPanelTrigger() {
+  const body = document.querySelector("#offer-detail-root #event-detail-panel:not(.hidden) .activity-detail__body");
+  const actions = body?.querySelector(".activity-detail__actions");
+  if (!body || !actions) return;
+
+  let slot = body.querySelector(".feedback-context-slot--activity");
+  if (!slot) {
+    slot = document.createElement("div");
+    slot.className = "feedback-context-slot feedback-context-slot--activity";
+    body.appendChild(slot);
   }
+
+  if (slot.querySelector(".feedback-context-trigger")) return;
+
+  const trigger = createButton({
+    className: "activity-detail__action activity-detail__action--feedback feedback-context-trigger feedback-context-trigger--activity",
+    label: "Info korrigieren",
+    iconKey: "feedback-data",
+    attrs: {
+      "aria-label": "Info zu dieser Aktivität korrigieren",
+      "data-feedback-open": "data_issue"
+    }
+  });
+
+  slot.appendChild(trigger);
+}
+/* === END BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V2 === */
 
   /* === BEGIN BLOCK: FEEDBACK_CONTEXT_REFRESH_DECOUPLE_MODAL_V1 | Zweck: entkoppelt die globale Observer-Refresh-Logik von der Feedback-Modal-UI, damit DOM-Mutationen des Modals keinen Re-Entry mehr auslösen und die Seite nicht blockieren | Umfang: ersetzt nur refreshContextTriggers() in js/feedback.js === */
   function refreshContextTriggers() {
