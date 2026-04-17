@@ -2610,7 +2610,7 @@ body.is-feedback-open{
   backdrop-filter: blur(8px);
 }
 
-/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V2 | Zweck: hält die Feedback-Oberfläche als sauberes Mobile-Sheet, reduziert oberen Leerlauf und bewahrt trotzdem eine stabile Dialoggeometrie; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
+/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V3 | Zweck: trennt äußere Sheet-Geometrie von innerer Scroll-Fläche, damit die Radius-Ecken sauber bleiben und Mobile-Start/Scroll stabil sind; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
 .feedback-modal{
   position: absolute;
   left: 50%;
@@ -2619,12 +2619,7 @@ body.is-feedback-open{
 
   width: min(calc(100% - 24px), 620px);
   max-height: min(88vh, 860px);
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  scroll-padding-top: 16px;
-
-  padding: 18px 18px 16px;
+  overflow: hidden;
 
   border: 1px solid rgba(31,41,51,0.08);
   border-radius: 24px;
@@ -2632,6 +2627,15 @@ body.is-feedback-open{
   box-shadow:
     0 32px 70px rgba(0,0,0,0.18),
     0 1px 0 rgba(255,255,255,0.82) inset;
+}
+
+.feedback-modal__scroll{
+  max-height: inherit;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-padding-top: 16px;
+  padding: 18px 18px 16px;
 }
 
 @media (max-width: 899px){
@@ -2644,8 +2648,7 @@ body.is-feedback-open{
 
     width: 100%;
     max-height: min(90dvh, 820px);
-
-    padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
+    overflow: hidden;
 
     border-left: 0;
     border-right: 0;
@@ -2656,6 +2659,11 @@ body.is-feedback-open{
     box-shadow:
       0 -24px 52px rgba(0,0,0,0.18),
       0 1px 0 rgba(255,255,255,0.82) inset;
+  }
+
+  .feedback-modal__scroll{
+    max-height: min(90dvh, 820px);
+    padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
   }
 
   .feedback-modal::before{
@@ -2670,7 +2678,7 @@ body.is-feedback-open{
     background: rgba(31,41,51,0.14);
   }
 }
-/* === END BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V2 === */
+/* === END BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V3 === */
 
 .feedback-modal__header{
   display: grid;
@@ -2732,14 +2740,74 @@ body.is-feedback-open{
 }
 
 @media (max-width: 899px){
+.feedback-modal__header{
+  position: relative;
+  display: block;
+  margin-bottom: 10px;
+  padding-right: 56px;
+}
+
+.feedback-modal__header-copy{
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.feedback-modal__title{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.18rem, 1.03rem + 0.42vw, 1.4rem);
+  line-height: 1.12;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.feedback-modal__subtitle{
+  margin: 0;
+  max-width: none;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.34;
+}
+
+.feedback-modal__close{
+  appearance: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  color: rgba(31,41,51,0.78);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+
+.feedback-modal__close-icon{
+  width: 18px;
+  height: 18px;
+}
+
+.feedback-modal__close-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 899px){
   .feedback-modal__header{
-    gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    padding-right: 52px;
   }
 
   .feedback-modal__header-copy{
-    gap: 3px;
-    padding-top: 0;
+    gap: 2px;
   }
 
   .feedback-modal__title{
@@ -2748,9 +2816,8 @@ body.is-feedback-open{
   }
 
   .feedback-modal__subtitle{
-    max-width: 24ch;
     font-size: 0.89rem;
-    line-height: 1.3;
+    line-height: 1.28;
   }
 
   .feedback-modal__close{
@@ -3092,7 +3159,13 @@ body.is-feedback-open{
     width: 100%;
     max-height: 90dvh;
     border-radius: 24px 24px 0 0;
-    padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .feedback-modal__scroll{
+    max-height: 90dvh;
+    padding: 24px 16px calc(16px + env(safe-area-inset-bottom, 0px));
   }
 
   .feedback-type-grid{
