@@ -207,7 +207,7 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 | Zweck: priorisiert Merkmale weiter, fasst Saison/Region in einer kompakten Kurzinfo zusammen und macht den Hinweis weniger formularartig; Umfang: ersetzt nur renderFacts(offer) === */
+/* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V4 | Zweck: entfernt den belegbar defekten Restverweis auf die nicht mehr existierende Variable sections und rendert nur die tatsächlich definierten Faktenbereiche; Umfang: ersetzt nur renderFacts(offer) in js/offers-details.js === */
   renderFacts(offer) {
     const primaryTags = window.OfferVisuals?.getRankedTagItems
       ? window.OfferVisuals.getRankedTagItems(offer)
@@ -257,16 +257,10 @@ const OfferDetailPanel = {
             <div class="activity-detail__fact-value">${this.escapeHtml(note)}</div>
           </section>
         ` : ""}
-        ${sections.map((row) => `
-          <section class="activity-detail__fact-section">
-            <div class="activity-detail__fact-label">${this.escapeHtml(row.label)}</div>
-            <div class="activity-detail__fact-value">${this.escapeHtml(row.value)}</div>
-          </section>
-        `).join("")}
       </div>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
+/* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V4 === */
 
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
