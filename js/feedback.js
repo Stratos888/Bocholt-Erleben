@@ -145,16 +145,13 @@
   function ensureModalShell() {
     if (state.shell) return;
 
-    let overlayRoot = document.getElementById("feedback-overlay-root");
-    if (!overlayRoot) {
-      overlayRoot = document.createElement("div");
-      overlayRoot.id = "feedback-overlay-root";
-      document.body.appendChild(overlayRoot);
-    }
+    const overlayRoot =
+      document.getElementById("overlay-root") ||
+      document.body;
 
     const shell = document.createElement("div");
     shell.className = "feedback-modal-shell";
-    shell.hidden = true;
+    shell.setAttribute("aria-hidden", "true");
     shell.innerHTML = `
       <div class="feedback-modal-shell__overlay" data-feedback-close></div>
       <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
@@ -413,19 +410,29 @@
     clearErrors();
     setStatus("");
     syncTypeUi();
-    state.shell.hidden = false;
+
+    state.shell.classList.add("is-active");
+    state.shell.setAttribute("aria-hidden", "false");
+
     document.documentElement.classList.add("is-feedback-open");
     document.body.classList.add("is-feedback-open");
-    requestAnimationFrame(() => state.refs.message.focus());
+
+    requestAnimationFrame(() => {
+      try { state.refs.message?.focus(); } catch (_) {}
+    });
   }
 
   function closeModal() {
     if (!state.shell) return;
-    state.shell.hidden = true;
+
+    state.shell.classList.remove("is-active");
+    state.shell.setAttribute("aria-hidden", "true");
+
     document.documentElement.classList.remove("is-feedback-open");
     document.body.classList.remove("is-feedback-open");
     clearErrors();
     setStatus("");
+
     if (state.opener && typeof state.opener.focus === "function") {
       state.opener.focus({ preventScroll: true });
     }
