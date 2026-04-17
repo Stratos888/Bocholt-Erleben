@@ -564,13 +564,12 @@
     actions.appendChild(trigger);
   }
 
+  /* === BEGIN BLOCK: FEEDBACK_CONTEXT_REFRESH_DECOUPLE_MODAL_V1 | Zweck: entkoppelt die globale Observer-Refresh-Logik von der Feedback-Modal-UI, damit DOM-Mutationen des Modals keinen Re-Entry mehr auslösen und die Seite nicht blockieren | Umfang: ersetzt nur refreshContextTriggers() in js/feedback.js === */
   function refreshContextTriggers() {
     ensureEventPanelTrigger();
     ensureOfferPanelTrigger();
-    if (state.shell && !state.shell.hidden) {
-      syncTypeUi();
-    }
   }
+  /* === END BLOCK: FEEDBACK_CONTEXT_REFRESH_DECOUPLE_MODAL_V1 === */
 
   function bindEvents() {
     document.addEventListener("click", (event) => {
