@@ -157,17 +157,18 @@ function ensureInlineEntry() {
     shell.innerHTML = `
       <div class="feedback-modal-shell__overlay" data-feedback-close></div>
       <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
-        <div class="feedback-modal__header">
-          <div class="feedback-modal__header-copy">
-            <h2 id="feedback-modal-title" class="feedback-modal__title">Feedback geben</h2>
-<p class="feedback-modal__subtitle">Direkt senden – ohne Mailprogramm oder Seitenwechsel.</p>
+        <div class="feedback-modal__scroll">
+          <div class="feedback-modal__header">
+            <div class="feedback-modal__header-copy">
+              <h2 id="feedback-modal-title" class="feedback-modal__title">Feedback geben</h2>
+              <p class="feedback-modal__subtitle">Direkt senden – ohne Mailprogramm oder Seitenwechsel.</p>
+            </div>
+            <button type="button" class="feedback-modal__close" aria-label="Feedback schließen" data-feedback-close>
+              ${icon("x", "feedback-modal__close-icon")}
+            </button>
           </div>
-          <button type="button" class="feedback-modal__close" aria-label="Feedback schließen" data-feedback-close>
-            ${icon("x", "feedback-modal__close-icon")}
-          </button>
-        </div>
 
-        <form class="feedback-form" action="${escapeHtml(endpoint)}" method="POST" novalidate>
+          <form class="feedback-form" action="${escapeHtml(endpoint)}" method="POST" novalidate>
           <div class="feedback-type-grid" role="radiogroup" aria-label="Feedback-Art"></div>
           <span class="feedback-field__error" data-feedback-error="type"></span>
 
@@ -227,6 +228,7 @@ function ensureInlineEntry() {
             </button>
           </div>
         </form>
+        </div>
       </div>
     `;
 
@@ -437,7 +439,7 @@ function ensureInlineEntry() {
   }
   /* === END BLOCK: FEEDBACK_HIDDEN_FIELDS_CONTEXTLESS_UI_V2 === */
 
-/* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V4 | Zweck: startet das Feedback-UI auf Mobile immer am klaren Dialoganfang ohne sofortige Tastaturöffnung und hält Desktop-Autofokus nur dort, wo er sinnvoll ist; Umfang: ersetzt openModal() in js/feedback.js === */
+/* === BEGIN BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V5 | Zweck: setzt beim Öffnen die neue innere Scroll-Fläche sauber auf Start zurück und hält den Mobile-Einstieg oben stabil; Umfang: ersetzt openModal() in js/feedback.js === */
 function openModal(opener = null, forcedType = null) {
   ensureModalShell();
   clearCloseTimer();
@@ -448,10 +450,10 @@ function openModal(opener = null, forcedType = null) {
     optionalDetails.open = false;
   }
 
-  const dialog = state.shell?.querySelector(".feedback-modal");
+  const scrollSurface = state.shell?.querySelector(".feedback-modal__scroll");
   const closeButton = state.shell?.querySelector(".feedback-modal__close");
-  if (dialog) {
-    dialog.scrollTop = 0;
+  if (scrollSurface) {
+    scrollSurface.scrollTop = 0;
   }
 
   state.opener = opener;
@@ -468,8 +470,8 @@ function openModal(opener = null, forcedType = null) {
   document.body.classList.add("is-feedback-open");
 
   requestAnimationFrame(() => {
-    if (dialog) {
-      dialog.scrollTop = 0;
+    if (scrollSurface) {
+      scrollSurface.scrollTop = 0;
     }
 
     try {
@@ -481,7 +483,7 @@ function openModal(opener = null, forcedType = null) {
     } catch (_) {}
   });
 }
-/* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V4 === */
+/* === END BLOCK: FEEDBACK_OPEN_WITH_OPTIONAL_PRESELECT_V5 === */
 
   /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V2 | Zweck: räumt beim Schließen zusätzlich Success-State und Auto-Close-Timer robust auf, ohne den normalen Draft-Flow zu beschädigen; Umfang: ersetzt closeModal() in js/feedback.js === */
   function closeModal() {
@@ -653,7 +655,7 @@ function openModal(opener = null, forcedType = null) {
   }
   /* === END BLOCK: FEEDBACK_SUBMIT_SUCCESS_STATE_ENTERPRISE_V3 === */
 
-/* === BEGIN BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V3 | Zweck: positioniert panelinterne Feedback-Wege bewusst als tertiäre Utility-Aktion außerhalb der Haupt-CTA-Logik und reduziert dadurch CTA-Konkurrenz auf Mobile; Umfang: ersetzt ensureEventPanelTrigger() und ensureOfferPanelTrigger() in js/feedback.js === */
+/* === BEGIN BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V4 | Zweck: benennt die panelinterne Datenkorrektur semantisch sauber um, ohne die tertiäre Utility-Hierarchie zu verändern; Umfang: ersetzt ensureEventPanelTrigger() und ensureOfferPanelTrigger() in js/feedback.js === */
 function ensureEventPanelTrigger() {
   const inner = document.querySelector("#overlay-root #event-detail-panel:not(.hidden) .detail-panel-inner");
   if (!inner) return;
@@ -676,10 +678,10 @@ function ensureEventPanelTrigger() {
 
   const trigger = createButton({
     className: "feedback-context-trigger feedback-context-trigger--event",
-    label: "Info korrigieren",
+    label: "Falsche Info melden",
     iconKey: "feedback-data",
     attrs: {
-      "aria-label": "Info zu diesem Event korrigieren",
+      "aria-label": "Falsche Info zu diesem Event melden",
       "data-feedback-open": "data_issue"
     }
   });
@@ -703,17 +705,17 @@ function ensureOfferPanelTrigger() {
 
   const trigger = createButton({
     className: "feedback-context-trigger feedback-context-trigger--activity",
-    label: "Info korrigieren",
+    label: "Falsche Info melden",
     iconKey: "feedback-data",
     attrs: {
-      "aria-label": "Info zu dieser Aktivität korrigieren",
+      "aria-label": "Falsche Info zu dieser Aktivität melden",
       "data-feedback-open": "data_issue"
     }
   });
 
   slot.appendChild(trigger);
 }
-/* === END BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V3 === */
+/* === END BLOCK: FEEDBACK_CONTEXT_TRIGGER_HIERARCHY_V4 === */
 
   /* === BEGIN BLOCK: FEEDBACK_CONTEXT_REFRESH_DECOUPLE_MODAL_V1 | Zweck: entkoppelt die globale Observer-Refresh-Logik von der Feedback-Modal-UI, damit DOM-Mutationen des Modals keinen Re-Entry mehr auslösen und die Seite nicht blockieren | Umfang: ersetzt nur refreshContextTriggers() in js/feedback.js === */
   function refreshContextTriggers() {
