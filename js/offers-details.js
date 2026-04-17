@@ -207,7 +207,7 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V5 | Zweck: behebt den defekten Restverweis in renderFacts(), integriert Standard-Icons in die CTAs und hält die Action-Struktur linksgeführt/konsistent; Umfang: ersetzt nur renderFacts(offer) und renderContent(offer) in js/offers-details.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V6 | Zweck: behebt den defekten sections-Referenzfehler, integriert Standard-Icons in die CTAs und liefert syntaktisch sauberen Abschluss des Detailpanel-Objekts; Umfang: ersetzt renderFacts(offer) und renderContent(offer) in js/offers-details.js === */
   renderFacts(offer) {
     const primaryTags = window.OfferVisuals?.getRankedTagItems
       ? window.OfferVisuals.getRankedTagItems(offer)
@@ -277,7 +277,7 @@ const OfferDetailPanel = {
       ? window.Icons.svg("compass", { className: "activity-detail__action-icon-svg" })
       : "";
     const websiteIcon = window.Icons?.svg
-      ? window.Icons.svg("external", { className: "activity-detail__action-icon-svg" })
+      ? window.Icons.svg("external-link", { className: "activity-detail__action-icon-svg" })
       : "";
 
     this.content.innerHTML = `
@@ -310,4 +310,5 @@ const OfferDetailPanel = {
       </article>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V5 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V6 === */
+};
