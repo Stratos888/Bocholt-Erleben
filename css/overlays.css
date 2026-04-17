@@ -2771,6 +2771,7 @@ body.is-feedback-open{
   text-underline-offset: 0.12em;
 }
 
+/* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren modal-internen Success-State mit Lucide-Erfolgsicon, ruhiger Positivfläche und reduzierter Nach-Aktion-Komplexität; Umfang: ersetzt Status-/Action-Bereich des Feedback-Formulars in css/overlays.css === */
 .feedback-form__status{
   min-height: 1.25em;
   font-size: 0.88rem;
@@ -2778,8 +2779,63 @@ body.is-feedback-open{
 }
 
 .feedback-form__status.is-success{
+  min-height: 0;
+}
+
+.feedback-success-card{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(70,92,63,0.18);
+  border-radius: 18px;
+  background: color-mix(in srgb, white 84%, var(--color-primary-muted));
+  box-shadow:
+    0 18px 36px rgba(0,0,0,0.05),
+    0 1px 0 rgba(255,255,255,0.84) inset;
+}
+
+.feedback-success-card__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(70,92,63,0.18);
+  border-radius: 999px;
+  background: color-mix(in srgb, white 58%, var(--color-primary-muted));
   color: #1d6b3d;
-  font-weight: 700;
+}
+
+.feedback-success-card__icon > .ui-icon-svg{
+  width: 20px;
+  height: 20px;
+}
+
+.feedback-success-card__body{
+  display: grid;
+  gap: 4px;
+}
+
+.feedback-success-card__title{
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 820;
+}
+
+.feedback-success-card__text{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.feedback-success-card__meta{
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .feedback-form__status.is-error{
@@ -2796,12 +2852,38 @@ body.is-feedback-open{
   color: var(--color-text-secondary);
 }
 
+.feedback-form.is-success{
+  gap: 16px;
+}
+
+.feedback-form.is-success .feedback-type-grid,
+.feedback-form.is-success [data-feedback-error="type"],
+.feedback-form.is-success .feedback-context-box,
+.feedback-form.is-success .feedback-field,
+.feedback-form.is-success .feedback-optional,
+.feedback-form.is-success .feedback-form__meta{
+  display: none;
+}
+
+.feedback-form.is-success .feedback-primary-btn{
+  display: none;
+}
+
+.feedback-form.is-success .feedback-form__actions{
+  justify-content: flex-end;
+}
+
+.feedback-form.is-success .feedback-secondary-btn{
+  min-width: 120px;
+}
+
 .feedback-form__actions{
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
 }
+/* === END BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 === */
 
 .feedback-secondary-btn,
 .feedback-primary-btn{
