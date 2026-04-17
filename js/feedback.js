@@ -151,6 +151,7 @@
 
     const shell = document.createElement("div");
     shell.className = "feedback-modal-shell";
+    shell.hidden = true;
     shell.setAttribute("aria-hidden", "true");
     shell.innerHTML = `
       <div class="feedback-modal-shell__overlay" data-feedback-close></div>
@@ -411,11 +412,14 @@
     setStatus("");
     syncTypeUi();
 
+    /* === BEGIN BLOCK: FEEDBACK_MODAL_OPEN_STATE_SYNC_V1 | Zweck: synchronisiert beim Öffnen den visuellen und logischen Zustand des Feedback-Modals, damit Observer und Escape-Handling nur bei wirklich offenem Modal greifen | Umfang: nur Open-State in openModal() === */
+    state.shell.hidden = false;
     state.shell.classList.add("is-active");
     state.shell.setAttribute("aria-hidden", "false");
 
     document.documentElement.classList.add("is-feedback-open");
     document.body.classList.add("is-feedback-open");
+    /* === END BLOCK: FEEDBACK_MODAL_OPEN_STATE_SYNC_V1 === */
 
     requestAnimationFrame(() => {
       try { state.refs.message?.focus(); } catch (_) {}
@@ -425,13 +429,16 @@
   function closeModal() {
     if (!state.shell) return;
 
+    /* === BEGIN BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V1 | Zweck: synchronisiert beim Schließen den visuellen und logischen Zustand des Feedback-Modals, damit Refresh-/Observer-Logik danach nicht weiter im Open-State läuft | Umfang: nur Close-State in closeModal() === */
     state.shell.classList.remove("is-active");
+    state.shell.hidden = true;
     state.shell.setAttribute("aria-hidden", "true");
 
     document.documentElement.classList.remove("is-feedback-open");
     document.body.classList.remove("is-feedback-open");
     clearErrors();
     setStatus("");
+    /* === END BLOCK: FEEDBACK_MODAL_CLOSE_STATE_SYNC_V1 === */
 
     if (state.opener && typeof state.opener.focus === "function") {
       state.opener.focus({ preventScroll: true });
