@@ -392,41 +392,41 @@
         "Schlosspark"
       ]
     },
-    {
-      "id": "anholter-schweiz-erleben",
-      "title": "Anholter Schweiz erleben",
-      "kategorie": "Freizeit & Familie",
-      "location": "Isselburg-Anholt",
-      "maps_query": "Pferdehorster Str. 1, 46419 Isselburg",
-      "maps_label": "Zum Haupteingang des Wildparks",
-      "description": "Der Biotopwildpark Anholter Schweiz ist ein dauerhaft nutzbares Natur- und Tiererlebnis mit Wegen, Tiergehegen und klarem Familienfokus.",
-      "url": "https://www.wildpark-nrw.de/",
-      "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Isselburg%20Anholt%20-%20Anholter%20Schweiz%20a%2025%20ies.jpg",
-      "image_position_x": "50%",
-      "image_position_y": "50%",
-      "image_source_page": "https://commons.wikimedia.org/wiki/File:Isselburg_Anholt_-_Anholter_Schweiz_a_25_ies.jpg",
-      "image_author": "Frank Vincentz",
-      "image_license": "CC BY-SA 3.0",
-      "image_credit": "Frank Vincentz, CC BY-SA 3.0, via Wikimedia Commons",
-      "tags": [
-        "Wildpark",
-        "Tiere",
-        "Wald",
-        "Familienfreundlich"
-      ],
-      "duration": "2–4 Std",
-      "mode": "Outdoor",
-      "price": "",
-      "area": "Umgebung",
-      "season": "Ganzjährig",
-      "hint": "Sehr stark für Familien und entspannte Naturtage.",
-      "cardFacts": [
-        "2–4 Std",
-        "Outdoor",
-        "Wildpark"
-      ]
-    },
+{
+  "id": "anholter-schweiz-erleben",
+  "title": "Anholter Schweiz erleben",
+  "kategorie": "Freizeit & Familie",
+  "location": "Isselburg-Anholt",
+  "maps_query": "Pferdehorster Str. 1, 46419 Isselburg",
+  "maps_label": "Zum Haupteingang des Wildparks",
+  "description": "Der Biotopwildpark Anholter Schweiz ist ein dauerhaft nutzbares Natur- und Tiererlebnis mit Wegen, Tiergehegen und klarem Familienfokus.",
+  "url": "https://www.wildpark-nrw.de/",
+  "website_label": "Website / Infos (DE)",
+  "image": "https://www.wildpark-nrw.de/wp-content/uploads/2024/12/impressionen6-495x400.webp",
+  "image_position_x": "50%",
+  "image_position_y": "52%",
+  "image_source_page": "https://www.wildpark-nrw.de/",
+  "image_author": "Biotopwildpark Anholter Schweiz",
+  "image_license": "Mit Freigabe des Rechteinhabers",
+  "image_credit": "Bild mit Freigabe des Biotopwildparks Anholter Schweiz verwendet",
+  "tags": [
+    "Wildpark",
+    "Tiere",
+    "Wald",
+    "Familienfreundlich"
+  ],
+  "duration": "2–4 Std",
+  "mode": "Outdoor",
+  "price": "",
+  "area": "Umgebung",
+  "season": "Ganzjährig",
+  "hint": "Sehr stark für Familien und entspannte Naturtage.",
+  "cardFacts": [
+    "2–4 Std",
+    "Outdoor",
+    "Wildpark"
+  ]
+},
     {
       "id": "villa-mondriaan-winterswijk-erleben",
       "title": "Villa Mondriaan Winterswijk erleben",
@@ -462,41 +462,41 @@
         "Kunst"
       ]
     },
-    {
-      "id": "museumfabriek-winterswijk-erleben",
-      "title": "MuseumFabriek Winterswijk erleben",
-      "kategorie": "Kultur",
-      "location": "Winterswijk",
-      "maps_query": "Laan van Hilbelink 6-10, 7101 WG Winterswijk, Niederlande",
-      "maps_label": "Zur MuseumFabriek",
-      "description": "Die MuseumFabriek erzählt Winterswijk in einer alten Textilfabrik und ist als eigenständig besuchbares Museum ein starker Kulturbaustein für die Seite.",
-      "url": "https://museumfabriekwinterswijk.nl/de/",
-      "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/2026-03-17%20MuseumFabriek%20Winterswijk%2037.jpg",
-      "image_position_x": "50%",
-      "image_position_y": "50%",
-      "image_source_page": "https://commons.wikimedia.org/wiki/File:2026-03-17_MuseumFabriek_Winterswijk_37.jpg",
-      "image_author": "Ziko van Dijk",
-      "image_license": "CC BY-SA 4.0",
-      "image_credit": "Ziko van Dijk, CC BY-SA 4.0, via Wikimedia Commons",
-      "tags": [
-        "Museum",
-        "Geschichte",
-        "Textil",
-        "Fabrik"
-      ],
-      "duration": "1–2 Std",
-      "mode": "Indoor",
-      "price": "",
-      "area": "NL-Umgebung",
-      "season": "Ganzjährig",
-      "hint": "Besonders passend, wenn du Winterswijk nicht nur als Einkaufsort zeigen willst.",
-      "cardFacts": [
-        "1–2 Std",
-        "Indoor",
-        "Museum"
-      ]
-    },
+{
+  "id": "museumfabriek-winterswijk-erleben",
+  "title": "MuseumFabriek Winterswijk erleben",
+  "kategorie": "Kultur",
+  "location": "Winterswijk",
+  "maps_query": "Laan van Hilbelink 6-10, 7101 WG Winterswijk, Niederlande",
+  "maps_label": "Zur MuseumFabriek",
+  "description": "Die MuseumFabriek erzählt Winterswijk in einer alten Textilfabrik und ist als eigenständig besuchbares Museum ein starker Kulturbaustein für die Seite.",
+  "url": "https://museumfabriekwinterswijk.nl/de/",
+  "website_label": "Website / Infos (DE)",
+  "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Museumfabriek%20Winterswijk.jpg",
+  "image_position_x": "50%",
+  "image_position_y": "52%",
+  "image_source_page": "https://commons.wikimedia.org/wiki/File:Museumfabriek_Winterswijk.jpg",
+  "image_author": "Ciell",
+  "image_license": "CC BY-SA 4.0",
+  "image_credit": "Ciell, CC BY-SA 4.0, via Wikimedia Commons",
+  "tags": [
+    "Museum",
+    "Geschichte",
+    "Textil",
+    "Fabrik"
+  ],
+  "duration": "1–2 Std",
+  "mode": "Indoor",
+  "price": "",
+  "area": "NL-Umgebung",
+  "season": "Ganzjährig",
+  "hint": "Besonders passend, wenn du Winterswijk nicht nur als Einkaufsort zeigen willst.",
+  "cardFacts": [
+    "1–2 Std",
+    "Indoor",
+    "Museum"
+  ]
+},
     {
       "id": "zwillbrocker-venn-flamingos-entdecken",
       "title": "Zwillbrocker Venn & Flamingos entdecken",
