@@ -2479,7 +2479,7 @@ body.is-feedback-open{
   line-height: 1.42;
 }
 
-/* === BEGIN BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V2 | Zweck: trennt starken globalen Inline-Einstieg von ruhigen panelinternen Feedbackaktionen und reduziert deren visuelle Dominanz auf Mobile/Detailpanels; Umfang: ersetzt nur die Inline-/Context-Trigger-Sektion im Feedback-UI von css/overlays.css === */
+/* === BEGIN BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V3 | Zweck: belässt den globalen Inline-Einstieg klar sichtbar, demotet Detailpanel-Feedback aber auf eine echte tertiäre Utility-Aktion ohne CTA-Anmutung; Umfang: ersetzt nur die Inline-/Context-Trigger-Sektion im Feedback-UI von css/overlays.css === */
 .feedback-inline-entry__button{
   appearance: none;
   display: inline-flex;
@@ -2511,14 +2511,14 @@ body.is-feedback-open{
 }
 
 .feedback-context-slot--event{
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--cmp-divider-color);
+  margin: 8px 0 10px;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .feedback-context-slot--activity{
-  margin-top: 4px;
-  padding-top: 4px;
+  margin-top: 10px;
+  padding-top: 0;
 }
 
 .feedback-context-trigger{
@@ -2526,31 +2526,36 @@ body.is-feedback-open{
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 7px;
 
   width: auto;
-  min-height: 40px;
+  min-height: 36px;
   max-width: 100%;
-  padding: 0 12px;
+  padding: 6px 0;
 
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.62);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 
-  color: rgba(31,41,51,0.74);
+  color: rgba(31,41,51,0.64);
   font: inherit;
-  font-size: 0.87rem;
-  font-weight: 720;
-  line-height: 1;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.25;
   text-decoration: none;
+  text-align: left;
   cursor: pointer;
 }
 
 .feedback-context-trigger .feedback-btn__icon{
-  width: 16px;
-  height: 16px;
-  color: rgba(31,41,51,0.58);
+  width: 15px;
+  height: 15px;
+  color: rgba(31,41,51,0.48);
+}
+
+.feedback-context-trigger .feedback-btn__label{
+  min-width: 0;
 }
 
 #event-detail-panel .activity-detail__action--feedback{
@@ -2559,21 +2564,32 @@ body.is-feedback-open{
   max-width: 100%;
 }
 
+@media (hover: hover){
+  .feedback-context-trigger:hover{
+    color: rgba(31,41,51,0.84);
+  }
+
+  .feedback-context-trigger:hover .feedback-btn__icon{
+    color: rgba(31,41,51,0.70);
+  }
+}
+
 @media (max-width: 899px){
   .feedback-context-slot--event{
-    margin-top: 10px;
-    padding-top: 10px;
+    margin: 6px 0 10px;
+  }
+
+  .feedback-context-slot--activity{
+    margin-top: 8px;
   }
 
   .feedback-context-trigger{
-    min-height: 42px;
-    padding: 0 13px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.72);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.78);
+    min-height: 38px;
+    padding: 8px 0;
+    font-size: 0.83rem;
   }
 }
-/* === END BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V2 === */
+/* === END BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V3 === */
 
 .feedback-modal-shell{
   position: fixed;
@@ -2594,7 +2610,7 @@ body.is-feedback-open{
   backdrop-filter: blur(8px);
 }
 
-/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V1 | Zweck: zieht das Feedback-UI auf Mobile in eine saubere Bottom-Sheet-Geometrie mit stabilem Einstieg oben, ohne Desktop-Dialoglogik zu verlieren; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
+/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V2 | Zweck: hält die Feedback-Oberfläche als sauberes Mobile-Sheet, reduziert oberen Leerlauf und bewahrt trotzdem eine stabile Dialoggeometrie; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
 .feedback-modal{
   position: absolute;
   left: 50%;
@@ -2606,7 +2622,7 @@ body.is-feedback-open{
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  scroll-padding-top: 20px;
+  scroll-padding-top: 16px;
 
   padding: 18px 18px 16px;
 
@@ -2627,9 +2643,9 @@ body.is-feedback-open{
     transform: none;
 
     width: 100%;
-    max-height: min(92dvh, 840px);
+    max-height: min(90dvh, 820px);
 
-    padding: 30px 16px calc(16px + env(safe-area-inset-bottom));
+    padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
 
     border-left: 0;
     border-right: 0;
@@ -2645,43 +2661,47 @@ body.is-feedback-open{
   .feedback-modal::before{
     content: "";
     position: absolute;
-    top: 10px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
+    width: 38px;
     height: 5px;
     border-radius: 999px;
     background: rgba(31,41,51,0.14);
   }
 }
+/* === END BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V2 === */
 
 .feedback-modal__header{
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .feedback-modal__header-copy{
   display: grid;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 1px;
 }
 
 .feedback-modal__title{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: clamp(1.24rem, 1.08rem + 0.45vw, 1.48rem);
-  line-height: 1.14;
+  font-size: clamp(1.18rem, 1.03rem + 0.42vw, 1.4rem);
+  line-height: 1.12;
   font-weight: 850;
   letter-spacing: -0.02em;
 }
 
 .feedback-modal__subtitle{
   margin: 0;
+  max-width: 32ch;
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.92rem;
+  line-height: 1.34;
 }
 
 .feedback-modal__close{
@@ -2708,6 +2728,36 @@ body.is-feedback-open{
 .feedback-modal__close-icon > .ui-icon-svg{
   width: 100%;
   height: 100%;
+  display: block;
+}
+
+@media (max-width: 899px){
+  .feedback-modal__header{
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .feedback-modal__header-copy{
+    gap: 3px;
+    padding-top: 0;
+  }
+
+  .feedback-modal__title{
+    font-size: 1.12rem;
+    line-height: 1.14;
+  }
+
+  .feedback-modal__subtitle{
+    max-width: 24ch;
+    font-size: 0.89rem;
+    line-height: 1.3;
+  }
+
+  .feedback-modal__close{
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
 }
 
 .feedback-form{
