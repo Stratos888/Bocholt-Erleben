@@ -2517,6 +2517,11 @@ body.is-feedback-open{
   position: fixed;
   inset: 0;
   z-index: 10040;
+  display: none;
+}
+
+.feedback-modal-shell.is-active{
+  display: block;
 }
 
 .feedback-modal-shell__overlay{
