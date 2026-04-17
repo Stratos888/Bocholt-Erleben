@@ -2363,4 +2363,832 @@ html.is-offline .offline-badge{
   object-fit: contain !important;
 }
 /* === END BLOCK: DS-02_ICON_SYSTEM_GUARD_CLUSTER_MAPPING === */
+
+/* === BEGIN BLOCK: FEEDBACK_WIDGET_SYSTEM_V1 | Zweck: globales Feedback-Widget mit ruhigem Desktop-Launcher, mobilem Inline-Einstieg, modalem Direktformular und kontextbezogenen Triggern; Umfang: komplette Feedback-UI inklusive Overlay, Formularzuständen und Triggern === */
+html.is-feedback-open,
+body.is-feedback-open{
+  overflow: hidden;
+}
+
+.feedback-launcher{
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right, 0px) + 14px);
+  bottom: max(18px, env(safe-area-inset-bottom, 0px) + 14px);
+  z-index: 10030;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  min-height: 46px;
+  padding: 0 16px;
+
+  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 999px;
+  background: color-mix(in srgb, white 94%, var(--color-primary-muted));
+  box-shadow:
+    0 16px 34px rgba(0,0,0,0.12),
+    0 1px 0 rgba(255,255,255,0.76) inset;
+
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.feedback-launcher .feedback-btn__icon,
+.feedback-inline-entry__button .feedback-btn__icon,
+.feedback-context-trigger .feedback-btn__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.feedback-launcher .feedback-btn__icon > .ui-icon-svg,
+.feedback-inline-entry__button .feedback-btn__icon > .ui-icon-svg,
+.feedback-context-trigger .feedback-btn__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover){
+  .feedback-launcher:hover{
+    transform: translateY(-1px);
+    border-color: rgba(31,41,51,0.16);
+    background: color-mix(in srgb, white 97%, var(--color-primary-muted));
+    box-shadow:
+      0 18px 38px rgba(0,0,0,0.14),
+      0 1px 0 rgba(255,255,255,0.82) inset;
+  }
+}
+
+.feedback-launcher:active{
+  transform: translateY(0);
+}
+
+.feedback-launcher:focus-visible,
+.feedback-inline-entry__button:focus-visible,
+.feedback-context-trigger:focus-visible,
+.feedback-modal__close:focus-visible,
+.feedback-primary-btn:focus-visible,
+.feedback-secondary-btn:focus-visible,
+.feedback-type-chip:focus-visible{
+  outline: 2px solid var(--cmp-focus-ring-brand);
+  outline-offset: 3px;
+}
+
+.feedback-inline-entry{
+  display: grid;
+  gap: 12px;
+
+  width: min(100% - 32px, 720px);
+  margin: 18px auto 0;
+  padding: 14px 14px;
+
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 18px;
+  background: color-mix(in srgb, white 93%, var(--color-primary-muted));
+  box-shadow: 0 10px 26px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.76) inset;
+}
+
+.feedback-inline-entry__copy{
+  display: grid;
+  gap: 4px;
+}
+
+.feedback-inline-entry__copy strong{
+  color: var(--color-text-primary);
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+
+.feedback-inline-entry__copy p{
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.42;
+}
+
+/* === BEGIN BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V3 | Zweck: belässt den globalen Inline-Einstieg klar sichtbar, demotet Detailpanel-Feedback aber auf eine echte tertiäre Utility-Aktion ohne CTA-Anmutung; Umfang: ersetzt nur die Inline-/Context-Trigger-Sektion im Feedback-UI von css/overlays.css === */
+.feedback-inline-entry__button{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 0 14px;
+
+  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.88);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.82) inset;
+
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.93rem;
+  font-weight: 780;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.feedback-context-slot{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.feedback-context-slot--event{
+  margin: 8px 0 10px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.feedback-context-slot--activity{
+  margin-top: 10px;
+  padding-top: 0;
+}
+
+.feedback-context-trigger{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+
+  width: auto;
+  min-height: 36px;
+  max-width: 100%;
+  padding: 6px 0;
+
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+
+  color: rgba(31,41,51,0.64);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.feedback-context-trigger .feedback-btn__icon{
+  width: 15px;
+  height: 15px;
+  color: rgba(31,41,51,0.48);
+}
+
+.feedback-context-trigger .feedback-btn__label{
+  min-width: 0;
+}
+
+#event-detail-panel .activity-detail__action--feedback{
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (hover: hover){
+  .feedback-context-trigger:hover{
+    color: rgba(31,41,51,0.84);
+  }
+
+  .feedback-context-trigger:hover .feedback-btn__icon{
+    color: rgba(31,41,51,0.70);
+  }
+}
+
+@media (max-width: 899px){
+  .feedback-context-slot--event{
+    margin: 6px 0 10px;
+  }
+
+  .feedback-context-slot--activity{
+    margin-top: 8px;
+  }
+
+  .feedback-context-trigger{
+    min-height: 38px;
+    padding: 8px 0;
+    font-size: 0.83rem;
+  }
+}
+/* === END BLOCK: FEEDBACK_INLINE_AND_CONTEXT_TRIGGER_HIERARCHY_V3 === */
+
+.feedback-modal-shell{
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  display: none;
+}
+
+.feedback-modal-shell.is-active{
+  display: block;
+}
+
+.feedback-modal-shell__overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(18,24,20,0.34);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* === BEGIN BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V3 | Zweck: trennt äußere Sheet-Geometrie von innerer Scroll-Fläche, damit die Radius-Ecken sauber bleiben und Mobile-Start/Scroll stabil sind; Umfang: ersetzt nur .feedback-modal plus Mobile-Override direkt davor in css/overlays.css === */
+.feedback-modal{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(calc(100% - 24px), 620px);
+  max-height: min(88vh, 860px);
+  overflow: hidden;
+
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 24px;
+  background: color-mix(in srgb, white 95%, var(--color-primary-muted));
+  box-shadow:
+    0 32px 70px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.82) inset;
+}
+
+.feedback-modal__scroll{
+  max-height: inherit;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-padding-top: 16px;
+  padding: 18px 18px 16px;
+}
+
+@media (max-width: 899px){
+  .feedback-modal{
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    transform: none;
+
+    width: 100%;
+    max-height: min(90dvh, 820px);
+    overflow: hidden;
+
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
+
+    box-shadow:
+      0 -24px 52px rgba(0,0,0,0.18),
+      0 1px 0 rgba(255,255,255,0.82) inset;
+  }
+
+  .feedback-modal__scroll{
+    max-height: min(90dvh, 820px);
+    padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .feedback-modal::before{
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(31,41,51,0.14);
+  }
+}
+/* === END BLOCK: FEEDBACK_MODAL_MOBILE_SHEET_POSITIONING_V3 === */
+
+.feedback-modal__header{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.feedback-modal__header-copy{
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.feedback-modal__title{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.18rem, 1.03rem + 0.42vw, 1.4rem);
+  line-height: 1.12;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.feedback-modal__subtitle{
+  margin: 0;
+  max-width: 32ch;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.34;
+}
+
+.feedback-modal__close{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  color: rgba(31,41,51,0.78);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+
+.feedback-modal__close-icon{
+  width: 18px;
+  height: 18px;
+}
+
+.feedback-modal__close-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 899px){
+.feedback-modal__header{
+  position: relative;
+  display: block;
+  margin-bottom: 10px;
+  padding-right: 56px;
+}
+
+.feedback-modal__header-copy{
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.feedback-modal__title{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.18rem, 1.03rem + 0.42vw, 1.4rem);
+  line-height: 1.12;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.feedback-modal__subtitle{
+  margin: 0;
+  max-width: none;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.34;
+}
+
+.feedback-modal__close{
+  appearance: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border: 1px solid rgba(31,41,51,0.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  color: rgba(31,41,51,0.78);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+
+.feedback-modal__close-icon{
+  width: 18px;
+  height: 18px;
+}
+
+.feedback-modal__close-icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 899px){
+  .feedback-modal__header{
+    margin-bottom: 8px;
+    padding-right: 52px;
+  }
+
+  .feedback-modal__header-copy{
+    gap: 2px;
+  }
+
+  .feedback-modal__title{
+    font-size: 1.12rem;
+    line-height: 1.14;
+  }
+
+  .feedback-modal__subtitle{
+    font-size: 0.89rem;
+    line-height: 1.28;
+  }
+
+  .feedback-modal__close{
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+}
+
+.feedback-form{
+  display: grid;
+  gap: 14px;
+}
+
+.feedback-type-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.feedback-type-chip{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.76);
+  color: rgba(31,41,51,0.88);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.feedback-type-chip__icon{
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+}
+
+.feedback-type-chip__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+.feedback-type-chip.is-active{
+  border-color: rgba(70,92,63,0.24);
+  background: color-mix(in srgb, white 84%, var(--color-primary-muted));
+  box-shadow: 0 12px 24px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.84) inset;
+  transform: translateY(-1px);
+}
+
+.feedback-context-box{
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(31,41,51,0.06);
+}
+
+.feedback-context-box__label{
+  color: rgba(78,94,85,0.78);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.feedback-context-box__value{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  line-height: 1.42;
+  font-weight: 700;
+}
+
+.feedback-field{
+  display: grid;
+  gap: 8px;
+}
+
+.feedback-field__label{
+  color: var(--color-text-primary);
+  font-size: 0.93rem;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.feedback-field__control{
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(31,41,51,0.12);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.96rem;
+  line-height: 1.4;
+}
+
+.feedback-field__control--textarea{
+  min-height: 144px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  resize: vertical;
+}
+
+.feedback-field__control[aria-invalid="true"]{
+  border-color: rgba(163,37,37,0.48);
+  box-shadow: 0 0 0 3px rgba(163,37,37,0.10);
+}
+
+.feedback-field__error{
+  min-height: 1.1em;
+  color: #8d1f1f;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.feedback-optional{
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.66);
+  border: 1px solid rgba(31,41,51,0.06);
+}
+
+.feedback-optional > summary{
+  cursor: pointer;
+  color: rgba(31,41,51,0.82);
+  font-size: 0.9rem;
+  font-weight: 760;
+}
+
+.feedback-honeypot{
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.feedback-form__meta{
+  display: grid;
+  gap: 6px;
+}
+
+.feedback-form__hint,
+.feedback-form__privacy{
+  margin: 0;
+  color: rgba(78,94,85,0.88);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.feedback-form__privacy a{
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+/* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren modal-internen Success-State mit Lucide-Erfolgsicon, ruhiger Positivfläche und reduzierter Nach-Aktion-Komplexität; Umfang: ersetzt Status-/Action-Bereich des Feedback-Formulars in css/overlays.css === */
+.feedback-form__status{
+  min-height: 1.25em;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.feedback-form__status.is-success{
+  min-height: 0;
+}
+
+.feedback-success-card{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(70,92,63,0.18);
+  border-radius: 18px;
+  background: color-mix(in srgb, white 84%, var(--color-primary-muted));
+  box-shadow:
+    0 18px 36px rgba(0,0,0,0.05),
+    0 1px 0 rgba(255,255,255,0.84) inset;
+}
+
+.feedback-success-card__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(70,92,63,0.18);
+  border-radius: 999px;
+  background: color-mix(in srgb, white 58%, var(--color-primary-muted));
+  color: #1d6b3d;
+}
+
+.feedback-success-card__icon > .ui-icon-svg{
+  width: 20px;
+  height: 20px;
+}
+
+.feedback-success-card__body{
+  display: grid;
+  gap: 4px;
+}
+
+.feedback-success-card__title{
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 820;
+}
+
+.feedback-success-card__text{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.feedback-success-card__meta{
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.feedback-form__status.is-error{
+  color: #8d1f1f;
+  font-weight: 700;
+}
+
+.feedback-form__status.is-error a{
+  color: inherit;
+  text-decoration: underline;
+}
+
+.feedback-form__status.is-neutral{
+  color: var(--color-text-secondary);
+}
+
+.feedback-form.is-success{
+  gap: 16px;
+}
+
+.feedback-form.is-success .feedback-type-grid,
+.feedback-form.is-success [data-feedback-error="type"],
+.feedback-form.is-success .feedback-context-box,
+.feedback-form.is-success .feedback-field,
+.feedback-form.is-success .feedback-optional,
+.feedback-form.is-success .feedback-form__meta{
+  display: none;
+}
+
+/* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_NO_REDUNDANT_FOOTER_ACTION_V1 | Zweck: entfernt im auto-schließenden Success-State den redundanten Footer-Schließen-CTA und lässt nur den Header-Close als optionale Sofort-Beendigung bestehen; Umfang: ersetzt nur Success-Actions im Feedback-Modal in css/overlays.css === */
+.feedback-form.is-success .feedback-form__actions{
+  display: none;
+}
+/* === END BLOCK: FEEDBACK_SUCCESS_STATE_NO_REDUNDANT_FOOTER_ACTION_V1 === */
+
+.feedback-form__actions{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+/* === END BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 === */
+
+.feedback-secondary-btn,
+.feedback-primary-btn{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.feedback-secondary-btn{
+  border: 1px solid rgba(31,41,51,0.10);
+  background: rgba(255,255,255,0.82);
+  color: rgba(31,41,51,0.86);
+}
+
+.feedback-primary-btn{
+  border: 1px solid rgba(70,92,63,0.18);
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+  box-shadow: var(--ui-shadow-cta);
+}
+
+.feedback-primary-btn:disabled{
+  opacity: 0.68;
+  cursor: wait;
+}
+
+.feedback-primary-btn__icon{
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.feedback-primary-btn__icon > .ui-icon-svg{
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 899.98px){
+  .feedback-launcher{
+    display: none;
+  }
+
+  .feedback-modal{
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-height: 90dvh;
+    border-radius: 24px 24px 0 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .feedback-modal__scroll{
+    max-height: 90dvh;
+    padding: 24px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .feedback-type-grid{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feedback-form__actions{
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .feedback-secondary-btn,
+  .feedback-primary-btn,
+  .feedback-inline-entry__button{
+    width: 100%;
+  }
+}
+
+@media (min-width: 900px){
+  .feedback-inline-entry{
+    display: none;
+  }
+}
+/* === END BLOCK: FEEDBACK_WIDGET_SYSTEM_V1 === */
+
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS === */

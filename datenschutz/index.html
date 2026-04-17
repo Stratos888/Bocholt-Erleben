@@ -82,13 +82,26 @@
     </section>
 
     <section class="content-card" aria-labelledby="privacy-contact">
-      <h2 id="privacy-contact">4. Kontaktaufnahme per E-Mail</h2>
+      <h2 id="privacy-contact">4. Kontaktaufnahme und Feedbackformular</h2>
       <p>
         Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Angaben
         (z. B. E-Mail-Adresse und Inhalt der Nachricht), um Ihre Anfrage zu bearbeiten.
         Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen bzw. Vertragserfüllung)
         oder Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung von Anfragen),
         je nach Inhalt Ihrer Anfrage.
+      </p>
+      <p>
+        Wenn Sie das Feedbackformular auf dieser Website nutzen, werden die von Ihnen eingegebenen Angaben
+        sowie kontextbezogene technische Angaben (z. B. aktuelle Seite, Bezug zum geöffneten Eintrag,
+        Suchbegriff, aktive Filter, Bildschirmbreite und Zeitpunkt der Übermittlung) zur technischen Entgegennahme
+        und Weiterleitung an den Formular-Dienst Formspree übermittelt. Sofern Sie optional eine E-Mail-Adresse
+        angeben, wird diese zur Bearbeitung Ihrer Rückmeldung und als Reply-To-Adresse für eingehende Benachrichtigungen verwendet.
+      </p>
+      <p>
+        Formspree speichert Formulareinsendungen im eigenen System und kann diese zusätzlich an die von uns hinterlegte
+        Ziel-E-Mail-Adresse weiterleiten. Nach Angaben von Formspree werden die Dienste über Amazon Web Services (AWS)
+        in den USA betrieben. Rechtsgrundlage für die Verarbeitung ist Art. 6 Abs. 1 lit. f DSGVO
+        (berechtigtes Interesse an der qualitätsgesicherten Bearbeitung von Feedback und Fehlermeldungen).
       </p>
     </section>
 
@@ -115,6 +128,10 @@
     </section>
   </main>
   <!-- === END BLOCK: PRIVACY_PAGE_SUBPAGE_ALIGNMENT_V2 === -->
-</body>
+  <!-- === BEGIN BLOCK: PRIVACY_PAGE_GLOBAL_RUNTIME_V1 | Zweck: lädt die globale Runtime für Config, Icons und Feedback auch auf dieser Unterseite; Umfang: Script-Includes direkt vor </body> und Bereinigung des doppelten body-Endtags === -->
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <!-- === END BLOCK: PRIVACY_PAGE_GLOBAL_RUNTIME_V1 === -->
 </body>
 </html>

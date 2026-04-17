@@ -29,6 +29,17 @@ const CONFIG = {
     showFilters: true
   },
 
+  /* === BEGIN BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 | Zweck: zentraler Runtime-Contract für das globale Feedback-System mit Formspree Free; Umfang: nur öffentliche Client-Konfiguration, keine Secrets === */
+  feedback: {
+    formspreeEndpoint: "https://formspree.io/f/mrerpwjy",
+    fallbackEmail: "",
+    minMessageLength: 12,
+    successAutoCloseMs: 1400,
+    sourceLabel: "bocholt-erleben-web",
+    privacyUrl: "/datenschutz/"
+  },
+  /* === END BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 === */
+
   // Debug Mode (nur lokal aktiv)
   debug: IS_LOCAL
 };
