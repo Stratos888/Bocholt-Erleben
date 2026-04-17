@@ -2,6 +2,11 @@
 (() => {
   "use strict";
 
+  const runtimeFeedbackConfig =
+    (typeof CONFIG !== "undefined" && CONFIG && CONFIG.feedback)
+      ? CONFIG.feedback
+      : ((window.CONFIG && window.CONFIG.feedback) ? window.CONFIG.feedback : {});
+
   const cfg = {
     formspreeEndpoint: "",
     fallbackEmail: "",
@@ -9,7 +14,7 @@
     successAutoCloseMs: 1400,
     sourceLabel: "bocholt-erleben-web",
     privacyUrl: "/datenschutz/",
-    ...(window.CONFIG && window.CONFIG.feedback ? window.CONFIG.feedback : {})
+    ...runtimeFeedbackConfig
   };
 
   const endpoint = String(cfg.formspreeEndpoint || "").trim();
