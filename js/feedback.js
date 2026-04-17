@@ -171,11 +171,6 @@
           <div class="feedback-type-grid" role="radiogroup" aria-label="Feedback-Art"></div>
           <span class="feedback-field__error" data-feedback-error="type"></span>
 
-          <div class="feedback-context-box" hidden>
-            <div class="feedback-context-box__label">Bezug</div>
-            <div class="feedback-context-box__value"></div>
-          </div>
-
           <label class="feedback-field">
             <span class="feedback-field__label" data-feedback-prompt></span>
             <textarea
@@ -240,8 +235,6 @@
     state.form = shell.querySelector(".feedback-form");
     state.refs.typeGrid = shell.querySelector(".feedback-type-grid");
     state.refs.prompt = shell.querySelector("[data-feedback-prompt]");
-    state.refs.contextBox = shell.querySelector(".feedback-context-box");
-    state.refs.contextValue = shell.querySelector(".feedback-context-box__value");
     state.refs.status = shell.querySelector(".feedback-form__status");
     state.refs.message = shell.querySelector('[name="message"]');
     state.refs.email = shell.querySelector('[name="email"]');
@@ -363,9 +356,6 @@
       }
     }
 
-    const summary = contextSummary();
-    state.refs.contextValue.textContent = summary;
-    state.refs.contextBox.hidden = !summary;
   }
   /* === END BLOCK: FEEDBACK_TYPE_UI_OPTIONAL_DEFAULT_V1 === */
 
@@ -422,7 +412,7 @@
   }
   /* === END BLOCK: FEEDBACK_STATUS_AND_SUCCESS_HELPERS_V1 === */
 
-  /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CONTEXTLESS_UI_V2 | Zweck: entfernt den nutzerseitig redundanten Standard-Bezug „Aktuelle Seite“, behält aber für Mails weiterhin einen sauberen Fallback-Betreff auf Basis des Seitentyps; Umfang: ersetzt nur fillHiddenFields() in js/feedback.js === */
+  /* === BEGIN BLOCK: FEEDBACK_HIDDEN_FIELDS_CLEAN_SUBJECT_V2 | Zweck: trennt den internen Mail-Betreff vom entfernten UI-Bezug und nutzt ohne konkreten Kontext weiterhin einen sauberen Seitentyp-Fallback | Umfang: ersetzt nur den Kopf von fillHiddenFields() in js/feedback.js === */
   function fillHiddenFields() {
     const context = getActiveContext();
     const search = getSearchValue();
