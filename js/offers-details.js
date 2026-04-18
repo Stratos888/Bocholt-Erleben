@@ -159,28 +159,63 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: OFFERS_DETAIL_MAPS_URL_V2 === */
 
-  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 | Zweck: normalisiert lokale/externe Bildpfade auch im Mobile-Detailpanel und übernimmt dieselben Fokalpunkt-Variablen wie die Cards | Umfang: ersetzt nur renderMedia(offer) === */
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_WITH_SYMBOLIC_LABEL_AND_CREDIT_V2 | Zweck: nutzt im Activity-Detailpanel dieselbe zentrale Bildauflösung wie die Cards und kennzeichnet generische Motive dezent nur hier als Symbolbild inkl. Credit/Bildquelle | Umfang: ersetzt nur renderMedia(offer) === */
   renderMedia(offer) {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
       ? window.Icons.svg(visual.iconKey, { className: "activity-detail__media-icon-svg" })
       : this.escapeHtml(visual.label.slice(0, 1));
-    const imageUrl = window.OfferVisuals?.normalizeHttpUrl
-      ? window.OfferVisuals.normalizeHttpUrl(offer?.image)
-      : String(offer?.image || "").trim();
+    const imageData = window.OfferVisuals?.resolveImageData
+      ? window.OfferVisuals.resolveImageData(offer)
+      : {
+          url: String(offer?.image || "").trim(),
+          positionX: String(offer?.image_position_x || "50%").trim() || "50%",
+          positionY: String(offer?.image_position_y || "50%").trim() || "50%",
+          fit: String(offer?.image_fit || "cover").trim() || "cover",
+          sourcePage: String(offer?.image_source_page || "").trim(),
+          author: String(offer?.image_author || "").trim(),
+          license: String(offer?.image_license || "").trim(),
+          credit: String(offer?.image_credit || "").trim(),
+          isSymbolic: false,
+          note: ""
+        };
 
-    if (imageUrl) {
+    if (imageData.url) {
+      const sourceUrl = window.OfferVisuals?.normalizeHttpUrl
+        ? window.OfferVisuals.normalizeHttpUrl(imageData.sourcePage)
+        : String(imageData.sourcePage || "").trim();
+
+      const metaLine = [
+        imageData.isSymbolic ? (String(imageData.note || "").trim() || "Symbolbild") : "",
+        String(imageData.credit || "").trim()
+      ].filter(Boolean).join(" · ");
+
       return `
-        <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
-          <img
-            class="activity-detail__media-image"
-            src="${this.escapeHtml(imageUrl)}"
-            alt="${this.escapeHtml(offer.title)}"
-            loading="eager"
-            decoding="async"
-            referrerpolicy="no-referrer"
-            style="--activity-image-pos-x:${this.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${this.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${this.escapeHtml(offer?.image_fit || "cover")};"
-          >
+        <div class="activity-detail__media-shell">
+          <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
+            <img
+              class="activity-detail__media-image"
+              src="${this.escapeHtml(imageData.url)}"
+              alt="${this.escapeHtml(imageData.isSymbolic ? `${offer.title} – Symbolbild` : offer.title)}"
+              loading="eager"
+              decoding="async"
+              referrerpolicy="no-referrer"
+              style="--activity-image-pos-x:${this.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${this.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${this.escapeHtml(imageData.fit || "cover")};"
+            >
+          </div>
+          ${(metaLine || sourceUrl) ? `
+            <div class="activity-detail__media-meta" aria-label="Bildhinweis">
+              ${metaLine ? `<span class="activity-detail__media-note">${this.escapeHtml(metaLine)}</span>` : ""}
+              ${sourceUrl ? `
+                <a
+                  class="activity-detail__media-source"
+                  href="${this.escapeHtml(sourceUrl)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Bildquelle</a>
+              ` : ""}
+            </div>
+          ` : ""}
         </div>
       `.trim();
     }
@@ -191,7 +226,7 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
-  /* === END BLOCK: OFFERS_DETAIL_MEDIA_NORMALIZED_IMAGE_V1 === */
+  /* === END BLOCK: OFFERS_DETAIL_MEDIA_WITH_SYMBOLIC_LABEL_AND_CREDIT_V2 === */
 
   renderCategoryBadge(offer) {
     const visual = this.getVisual(offer);
