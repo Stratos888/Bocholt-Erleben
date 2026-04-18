@@ -20,7 +20,7 @@ const OfferVisuals = (() => {
     });
   }
 
-  /* === BEGIN BLOCK: OFFERS_LOCAL_IMAGE_URL_SUPPORT_V1 | Zweck: erlaubt neben http/https auch lokale Asset-Pfade für Activity-Bilder auf Live + Staging | Umfang: ersetzt nur die URL-Normalisierung in js/offers.js === */
+  /* === BEGIN BLOCK: OFFERS_CENTRAL_IMAGE_RESOLVER_WITH_GENERIC_COMMONS_POOL_V2 | Zweck: bündelt Normalisierung, generische Commons-Symbolbilder und die zentrale Bildauflösung für Activities nachhaltig an einer Stelle, damit Cards + Detailpanel dieselbe Bildquelle und dieselbe Metadatenlogik verwenden | Umfang: ersetzt nur den bisherigen URL-Normalisierungsblock in js/offers.js === */
   function normalizeHttpUrl(raw) {
     const value = String(raw || "").trim();
     if (!value) return "";
@@ -39,7 +39,210 @@ const OfferVisuals = (() => {
       }
     }
   }
-  /* === END BLOCK: OFFERS_LOCAL_IMAGE_URL_SUPPORT_V1 === */
+
+  function normalizeBoolean(value) {
+    if (typeof value === "boolean") return value;
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
+  }
+
+  function normalizeLookupKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[äÄ]/g, "ae")
+      .replace(/[öÖ]/g, "oe")
+      .replace(/[üÜ]/g, "ue")
+      .replace(/[ß]/g, "ss")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  const GENERIC_ACTIVITY_IMAGES = Object.freeze({
+    "park-green": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/D%C3%BClmen%2C%20Wildpark%2C%20Baumgruppe%20--%202024%20--%206306.jpg",
+      positionX: "50%",
+      positionY: "52%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:D%C3%BClmen,_Wildpark,_Baumgruppe_--_2024_--_6306.jpg",
+      author: "Dietmar Rabich",
+      license: "CC BY-SA 4.0",
+      credit: "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "forest-path": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Forest%20path%20%28009%29.jpg",
+      positionX: "50%",
+      positionY: "56%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Forest_path_(009).jpg",
+      author: "XxeoN472000",
+      license: "CC BY-SA 4.0",
+      credit: "XxeoN472000, CC BY-SA 4.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "trail-signs": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Trail%20signs%20in%20forest.jpg",
+      positionX: "50%",
+      positionY: "50%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Trail_signs_in_forest.jpg",
+      author: "Tiia Monto",
+      license: "CC BY-SA 3.0",
+      credit: "Tiia Monto, CC BY-SA 3.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "playground-wood": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Indian%20Boundary%20Park%20-%20Wooden%20Playground%201.jpg",
+      positionX: "50%",
+      positionY: "50%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Indian_Boundary_Park_-_Wooden_Playground_1.jpg",
+      author: "Chicagoshim",
+      license: "CC BY-SA 4.0",
+      credit: "Chicagoshim, CC BY-SA 4.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "adventure-playground": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Adventure%20Playground.jpg",
+      positionX: "50%",
+      positionY: "52%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Adventure_Playground.jpg",
+      author: "Atelierdreiseitl",
+      license: "CC BY-SA 3.0",
+      credit: "Atelierdreiseitl, CC BY-SA 3.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "ropes-course": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Malta%20-%20Attard%20-%20Ta%27%20Qali%20BOV%20Adventure%20Park%20-%20High%20Ropes%20Course%2001%20ies.jpg",
+      positionX: "50%",
+      positionY: "42%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Malta_-_Attard_-_Ta%27_Qali_BOV_Adventure_Park_-_High_Ropes_Course_01_ies.jpg",
+      author: "Frank Vincentz",
+      license: "CC BY-SA 3.0",
+      credit: "Frank Vincentz, CC BY-SA 3.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "soccer-field": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Medart%20Recreation%20Park%20soccer%20field.jpg",
+      positionX: "50%",
+      positionY: "58%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Medart_Recreation_Park_soccer_field.jpg",
+      author: "The Bushranger",
+      license: "CC BY-SA 4.0",
+      credit: "The Bushranger, CC BY-SA 4.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "water-play": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/Wasserspielplatz%20Wasserspr%C3%BChfeld%20Berlin%2010v10.jpg",
+      positionX: "50%",
+      positionY: "54%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Wasserspielplatz_Wasserspr%C3%BChfeld_Berlin_10v10.jpg",
+      author: "Singlespeedfahrer",
+      license: "CC0 1.0",
+      credit: "Singlespeedfahrer, CC0 1.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    },
+    "historic-alley": {
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/European%20alley.jpg",
+      positionX: "50%",
+      positionY: "52%",
+      fit: "cover",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:European_alley.jpg",
+      author: "Tom O'Neill",
+      license: "CC BY 2.0",
+      credit: "Tom O'Neill, CC BY 2.0, via Wikimedia Commons",
+      note: "Symbolbild"
+    }
+  });
+
+  function inferGenericImageKey(offer) {
+    const explicitKey = normalizeLookupKey(offer?.visual_key || offer?.image_visual_key || "");
+    if (explicitKey && GENERIC_ACTIVITY_IMAGES[explicitKey]) return explicitKey;
+
+    const haystack = [
+      offer?.id,
+      offer?.title,
+      offer?.location,
+      offer?.description,
+      offer?.kategorie,
+      ...(Array.isArray(offer?.tags) ? offer.tags : [])
+    ]
+      .map((entry) => String(entry || "").trim().toLowerCase())
+      .join(" ");
+
+    if (/(wasserspiel|sprueh|sprüh|splash|wasserpark)/i.test(haystack)) return "water-play";
+    if (/(maerchenspielplatz|märchenspielplatz|spielplatz)/i.test(haystack)) return "playground-wood";
+    if (/(bauspielplatz|abenteuerspielplatz|abenteuer\-?spielplatz|babaluu)/i.test(haystack)) return "adventure-playground";
+    if (/(seilgarten|tiefseilgarten|hochseilgarten|zipline|kletterpark)/i.test(haystack)) return "ropes-course";
+    if (/(soccer|fussball|fußball|bolzplatz|sportfeld)/i.test(haystack)) return "soccer-field";
+    if (/(gaengeskes|gängeskes|handwerk|gasse|innenstadt|altstadt|shopping|bummel)/i.test(haystack)) return "historic-alley";
+    if (/(waldlehrpfad|mysterium|olle kerkpatt|entdeckerweg|rundweg|wanderweg|noaberpad|pfad)/i.test(haystack)) return "trail-signs";
+    if (/(stadtwald|buergerpark|bürgerpark|park|freizeitanlage)/i.test(haystack)) return "park-green";
+    if (/(mtb|mountainbike|waldweg|wald|trail)/i.test(haystack)) return "forest-path";
+
+    const category = String(offer?.kategorie || "").trim().toLowerCase();
+    if (category.includes("freizeit")) return "playground-wood";
+    if (category.includes("sport")) return "forest-path";
+    if (category.includes("kultur")) return "historic-alley";
+    if (category.includes("natur")) return "forest-path";
+
+    return "";
+  }
+
+  function resolveImageData(offer) {
+    const explicitUrl = normalizeHttpUrl(offer?.image);
+    if (explicitUrl) {
+      return {
+        url: explicitUrl,
+        positionX: String(offer?.image_position_x || "50%").trim() || "50%",
+        positionY: String(offer?.image_position_y || "50%").trim() || "50%",
+        fit: String(offer?.image_fit || "cover").trim() || "cover",
+        sourcePage: String(offer?.image_source_page || "").trim(),
+        author: String(offer?.image_author || "").trim(),
+        license: String(offer?.image_license || "").trim(),
+        credit: String(offer?.image_credit || "").trim(),
+        isSymbolic: normalizeBoolean(offer?.image_is_symbolic),
+        note: String(offer?.image_note || "").trim()
+      };
+    }
+
+    const genericKey = inferGenericImageKey(offer);
+    const genericImage = genericKey ? GENERIC_ACTIVITY_IMAGES[genericKey] : null;
+
+    if (genericImage) {
+      return {
+        url: normalizeHttpUrl(genericImage.url),
+        positionX: genericImage.positionX || "50%",
+        positionY: genericImage.positionY || "50%",
+        fit: genericImage.fit || "cover",
+        sourcePage: genericImage.sourcePage || "",
+        author: genericImage.author || "",
+        license: genericImage.license || "",
+        credit: genericImage.credit || "",
+        isSymbolic: true,
+        note: genericImage.note || "Symbolbild"
+      };
+    }
+
+    return {
+      url: "",
+      positionX: "50%",
+      positionY: "50%",
+      fit: "cover",
+      sourcePage: "",
+      author: "",
+      license: "",
+      credit: "",
+      isSymbolic: false,
+      note: ""
+    };
+  }
+  /* === END BLOCK: OFFERS_CENTRAL_IMAGE_RESOLVER_WITH_GENERIC_COMMONS_POOL_V2 === */
 
   function slugify(value) {
     return String(value || "")
@@ -188,6 +391,7 @@ function getCategoryPresentation(category) {
   return {
     escapeHtml,
     normalizeHttpUrl,
+    resolveImageData,
     slugify,
     getCategoryPresentation,
     buildMetaLine,
@@ -240,7 +444,7 @@ const OfferCards = (() => {
     return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
   }
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
-  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 | Zweck: priorisiert erste sichtbare Bilder, setzt für externe Bildquellen Connection Hints und lässt den Rest bewusst lazy | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
+  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 | Zweck: nutzt für Activity-Cards die zentrale Bildauflösung inkl. generischer Commons-Symbolbilder, ohne Card-Layout oder Ladeprioritäten zu fragmentieren | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
   function ensureImageOriginHints(imageUrl) {
@@ -286,7 +490,8 @@ const OfferCards = (() => {
   }
 
   function renderMedia(offer, visual, index) {
-    const imageUrl = OfferVisuals.normalizeHttpUrl(offer?.image);
+    const imageData = OfferVisuals.resolveImageData(offer);
+    const imageUrl = imageData.url;
     const modifier = OfferVisuals.escapeHtml(visual.modifier);
     const label = OfferVisuals.escapeHtml(visual.label);
     const iconHtml = window.Icons?.svg
@@ -307,7 +512,7 @@ const OfferCards = (() => {
   fetchpriority="${fetchPriority}"
   decoding="async"
   referrerpolicy="no-referrer"
-  style="--activity-image-pos-x:${OfferVisuals.escapeHtml(offer?.image_position_x || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(offer?.image_position_y || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(offer?.image_fit || "cover")};"
+  style="--activity-image-pos-x:${OfferVisuals.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(imageData.fit || "cover")};"
 >
         </div>
       `.trim();
@@ -323,7 +528,7 @@ const OfferCards = (() => {
       </div>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_V1 === */
+  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 === */
 
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
