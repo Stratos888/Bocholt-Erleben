@@ -99,7 +99,7 @@ const OffersApp = {
     this.refs.categoryPopoverOptions = document.getElementById("popover-offer-category-options");
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_PRESERVE_V1 | Zweck: erhält alle kuratierten Activity-Felder aus data/offers.json beim Normalisieren, damit Detailpanel-CTAs, Maps-Startpunkte und vorbereitete Card-Facts produktiv korrekt funktionieren | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_VISUAL_FALLBACK_META_V2 | Zweck: erweitert die Activity-Normalisierung um nachhaltige Bild-Fallback-Metadaten (visual_key, Symbolbild-Flag, Bildhinweis), damit Cards + Detailpanel zentral auf denselben Resolver zugreifen können | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
   normalizeOffer(raw) {
     const obj = raw && typeof raw === "object" ? raw : {};
     const id = String(obj.id || "").trim();
@@ -117,6 +117,12 @@ const OffersApp = {
       Array.isArray(value)
         ? value.map((item) => String(item || "").trim()).filter(Boolean)
         : [];
+
+    const normalizeBoolean = (value) => {
+      if (typeof value === "boolean") return value;
+      const normalized = String(value || "").trim().toLowerCase();
+      return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
+    };
 
     return {
       id,
@@ -139,6 +145,9 @@ const OffersApp = {
       image_author: String(obj.image_author || "").trim(),
       image_license: String(obj.image_license || "").trim(),
       image_credit: String(obj.image_credit || "").trim(),
+      visual_key: String(obj.visual_key || obj.image_visual_key || "").trim(),
+      image_is_symbolic: normalizeBoolean(obj.image_is_symbolic),
+      image_note: String(obj.image_note || "").trim(),
       duration: String(obj.duration || "").trim(),
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
@@ -147,7 +156,7 @@ const OffersApp = {
       hint: String(obj.hint || "").trim()
     };
   },
-  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_PRESERVE_V1 === */
+  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_VISUAL_FALLBACK_META_V2 === */
 
   bindControls() {
     const {
