@@ -159,7 +159,7 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: OFFERS_DETAIL_MAPS_URL_V2 === */
 
-  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_WITH_SYMBOLIC_LABEL_AND_CREDIT_V2 | Zweck: nutzt im Activity-Detailpanel dieselbe zentrale Bildauflösung wie die Cards und kennzeichnet generische Motive dezent nur hier als Symbolbild inkl. Credit/Bildquelle | Umfang: ersetzt nur renderMedia(offer) === */
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 | Zweck: trennt im Activity-Detailpanel visuell ruhige Symbolbild-Kennzeichnung auf dem Bild von einem separaten, einklappbaren Bildnachweis im Footer-Bereich; Umfang: ersetzt renderMedia(offer) und ergänzt renderImageAttribution(offer) === */
   renderMedia(offer) {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
@@ -181,14 +181,9 @@ const OfferDetailPanel = {
         };
 
     if (imageData.url) {
-      const sourceUrl = window.OfferVisuals?.normalizeHttpUrl
-        ? window.OfferVisuals.normalizeHttpUrl(imageData.sourcePage)
-        : String(imageData.sourcePage || "").trim();
-
-      const metaLine = [
-        imageData.isSymbolic ? (String(imageData.note || "").trim() || "Symbolbild") : "",
-        String(imageData.credit || "").trim()
-      ].filter(Boolean).join(" · ");
+      const symbolicLabel = imageData.isSymbolic
+        ? (String(imageData.note || "").trim() || "Symbolbild")
+        : "";
 
       return `
         <div class="activity-detail__media-shell">
@@ -202,20 +197,10 @@ const OfferDetailPanel = {
               referrerpolicy="no-referrer"
               style="--activity-image-pos-x:${this.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${this.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${this.escapeHtml(imageData.fit || "cover")};"
             >
+            ${symbolicLabel ? `
+              <span class="activity-detail__media-badge">${this.escapeHtml(symbolicLabel)}</span>
+            ` : ""}
           </div>
-          ${(metaLine || sourceUrl) ? `
-            <div class="activity-detail__media-meta" aria-label="Bildhinweis">
-              ${metaLine ? `<span class="activity-detail__media-note">${this.escapeHtml(metaLine)}</span>` : ""}
-              ${sourceUrl ? `
-                <a
-                  class="activity-detail__media-source"
-                  href="${this.escapeHtml(sourceUrl)}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >Bildquelle</a>
-              ` : ""}
-            </div>
-          ` : ""}
         </div>
       `.trim();
     }
@@ -226,7 +211,80 @@ const OfferDetailPanel = {
       </div>
     `.trim();
   },
-  /* === END BLOCK: OFFERS_DETAIL_MEDIA_WITH_SYMBOLIC_LABEL_AND_CREDIT_V2 === */
+
+  renderImageAttribution(offer) {
+    const imageData = window.OfferVisuals?.resolveImageData
+      ? window.OfferVisuals.resolveImageData(offer)
+      : {
+          sourcePage: String(offer?.image_source_page || "").trim(),
+          author: String(offer?.image_author || "").trim(),
+          license: String(offer?.image_license || "").trim(),
+          credit: String(offer?.image_credit || "").trim(),
+          isSymbolic: false,
+          note: ""
+        };
+
+    const sourceUrl = window.OfferVisuals?.normalizeHttpUrl
+      ? window.OfferVisuals.normalizeHttpUrl(imageData.sourcePage)
+      : String(imageData.sourcePage || "").trim();
+    const author = String(imageData.author || "").trim();
+    const license = String(imageData.license || "").trim();
+    const credit = String(imageData.credit || "").trim();
+    const note = imageData.isSymbolic ? (String(imageData.note || "").trim() || "Symbolbild") : "";
+    const showCredit = credit && (!author || !license);
+    const infoIcon = window.Icons?.svg
+      ? window.Icons.svg("info", { className: "activity-detail__media-attribution-icon-svg" })
+      : "";
+
+    if (!note && !author && !license && !showCredit && !sourceUrl) return "";
+
+    return `
+      <details class="activity-detail__media-attribution">
+        <summary class="activity-detail__media-attribution-toggle">
+          <span class="activity-detail__media-attribution-toggle-main">
+            <span class="activity-detail__media-attribution-icon" aria-hidden="true">${infoIcon}</span>
+            <span>Bildnachweis</span>
+          </span>
+          <span class="activity-detail__media-attribution-toggle-secondary">Details</span>
+        </summary>
+        <div class="activity-detail__media-attribution-panel">
+          ${note ? `
+            <div class="activity-detail__media-attribution-row">
+              <div class="activity-detail__media-attribution-key">Hinweis</div>
+              <div class="activity-detail__media-attribution-value">${this.escapeHtml(note)}</div>
+            </div>
+          ` : ""}
+          ${author ? `
+            <div class="activity-detail__media-attribution-row">
+              <div class="activity-detail__media-attribution-key">Urheber</div>
+              <div class="activity-detail__media-attribution-value">${this.escapeHtml(author)}</div>
+            </div>
+          ` : ""}
+          ${license ? `
+            <div class="activity-detail__media-attribution-row">
+              <div class="activity-detail__media-attribution-key">Lizenz</div>
+              <div class="activity-detail__media-attribution-value">${this.escapeHtml(license)}</div>
+            </div>
+          ` : ""}
+          ${showCredit ? `
+            <div class="activity-detail__media-attribution-row">
+              <div class="activity-detail__media-attribution-key">Nachweis</div>
+              <div class="activity-detail__media-attribution-value">${this.escapeHtml(credit)}</div>
+            </div>
+          ` : ""}
+          ${sourceUrl ? `
+            <div class="activity-detail__media-attribution-row">
+              <div class="activity-detail__media-attribution-key">Quelle</div>
+              <div class="activity-detail__media-attribution-value">
+                <a class="activity-detail__media-attribution-link" href="${this.escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Original / Quelle öffnen</a>
+              </div>
+            </div>
+          ` : ""}
+        </div>
+      </details>
+    `.trim();
+  },
+  /* === END BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 === */
 
   renderCategoryBadge(offer) {
     const visual = this.getVisual(offer);
@@ -296,6 +354,7 @@ const OfferDetailPanel = {
     `.trim();
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 | Zweck: verschiebt den Bildnachweis im Activity-Detailpanel aus dem Hero-Bereich in einen ruhigen Footer-Slot nach den Kerninhalten und CTAs; Umfang: ersetzt nur renderContent(offer) === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
@@ -341,10 +400,12 @@ const OfferDetailPanel = {
               </a>
             ` : ""}
           </div>
+          ${this.renderImageAttribution(offer)}
         </div>
       </article>
     `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 === */
 /* === BEGIN BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 | Zweck: registriert das Activity-Detailpanel wieder global, damit Card-Klicks auf Mobile das Panel öffnen statt in den URL-Fallback zu laufen; Umfang: ersetzt nur das Dateiende von js/offers-details.js === */
 };
 
