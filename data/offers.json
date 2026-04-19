@@ -894,6 +894,8 @@
       "image_author": "Denis Zastanceanu",
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Denis Zastanceanu, CC BY-SA 4.0, via Wikimedia Commons",
+      "image_is_symbolic": true,
+      "image_note": "Symbolbild",
       "tags": [
         "Erlebnisweg",
         "Rätsel",
@@ -929,6 +931,8 @@
       "image_author": "Chicagoshim",
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Chicagoshim, CC BY-SA 4.0, via Wikimedia Commons",
+      "image_is_symbolic": true,
+      "image_note": "Symbolbild",
       "tags": [
         "Spielplatz",
         "Holzspielgeräte",
@@ -1067,6 +1071,8 @@
       "image_author": "Denis Zastanceanu",
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Denis Zastanceanu, CC BY-SA 4.0, via Wikimedia Commons",
+      "image_is_symbolic": true,
+      "image_note": "Symbolbild",
       "tags": [
         "Mountainbike",
         "Singletracks",
