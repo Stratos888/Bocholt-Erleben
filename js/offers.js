@@ -501,6 +501,9 @@ const OfferCards = (() => {
     if (imageUrl) {
       ensureImageOriginHints(imageUrl);
       const { loading, fetchPriority } = getImageLoadingProfile(index);
+      const symbolicLabel = imageData.isSymbolic
+        ? OfferVisuals.escapeHtml(String(imageData.note || "").trim() || "Symbolbild")
+        : "";
 
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
@@ -514,6 +517,7 @@ const OfferCards = (() => {
   referrerpolicy="no-referrer"
   style="--activity-image-pos-x:${OfferVisuals.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(imageData.fit || "cover")};"
 >
+          ${symbolicLabel ? `<span class="activity-card-media__badge">${symbolicLabel}</span>` : ""}
         </div>
       `.trim();
     }
