@@ -1613,7 +1613,7 @@ body.has-bottom-tabbar{
     outline-offset: 3px;
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_V2 | Zweck: ergänzt für Desktop ein event-paritätisches Skeleton-System, ohne die reale Activity-Card-Optik zu verändern | Umfang: ersetzt nur Media-/Image-Block im Desktop-Activity-Bereich === */
+  /* === BEGIN BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_WITH_SYMBOLIC_BADGE_V3 | Zweck: ergänzt im Desktop-Activity-Feed eine ruhige Symbolbild-Badge direkt im Bild, ohne die bestehende Card-Geometrie zu verändern; Umfang: ersetzt nur den Desktop-Media-/Image-Block im Activity-Bereich === */
   .page--activities .activity-card-media{
     position: relative;
     display: block;
@@ -1643,49 +1643,29 @@ body.has-bottom-tabbar{
     background: rgba(232,236,224,0.92);
   }
 
-  .page--activities .activity-card--rich.is-skeleton{
-    cursor: default;
-    user-select: none;
-    pointer-events: none;
-    transform: none;
+  .page--activities .activity-card-media__badge{
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(244,246,239,0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+      inset 0 0 0 1px rgba(18,34,26,0.06),
+      0 8px 18px rgba(12,22,17,0.07);
+    color: rgba(34,50,41,0.84);
+    font-size: 0.74rem;
+    font-weight: 760;
+    line-height: 1;
+    letter-spacing: 0.02em;
   }
-
-  .page--activities .activity-card--rich.is-skeleton:hover{
-    transform: none;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .activity-card-skeleton-media{
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .event-title{
-    display: block;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .event-title__text,
-  .page--activities .activity-card--rich.is-skeleton .event-meta__place{
-    display: block;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .event-card-desc{
-    display: block;
-    -webkit-line-clamp: unset;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .activity-card-category-icon{
-    display: none;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .activity-card-facts{
-    display: flex;
-  }
-
-  .page--activities .activity-card--rich.is-skeleton .activity-card-fact{
-    min-width: 70px;
-  }
-  /* === END BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_V2 === */
+  /* === END BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_WITH_SYMBOLIC_BADGE_V3 === */
 
   .page--activities .activity-card-media__scrim{
     position: absolute;

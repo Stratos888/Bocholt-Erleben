@@ -935,6 +935,13 @@ Umfang:
   gap: 0;
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_DETAIL_MEDIA_ATTRIBUTION_ENTERPRISE_UI_V1 | Zweck: ersetzt die sichtbare Credit-Zeile im Activity-Detailpanel durch eine leise Symbolbild-Badge im Bild und einen einklappbaren Footer-Bildnachweis; Umfang: ersetzt nur den Activity-Media-/Attribution-Styleslot === */
+#event-detail-panel .activity-detail__media-shell{
+  display: grid;
+  gap: 0;
+  margin: 0 0 14px;
+}
+
 #event-detail-panel .activity-detail__media{
   position: relative;
   display: block;
@@ -944,7 +951,7 @@ Umfang:
   border-radius: 22px;
   background: linear-gradient(135deg, rgba(229,237,229,0.96), rgba(213,226,216,0.92));
   box-shadow: 0 12px 28px rgba(12,22,17,0.08);
-  margin: 0 0 14px;
+  margin: 0;
 }
 
 #event-detail-panel .activity-detail__media-image{
@@ -954,6 +961,154 @@ Umfang:
   object-fit: var(--activity-image-fit, cover);
   object-position: var(--activity-image-pos-x, 50%) var(--activity-image-pos-y, 50%);
   background: rgba(232,236,224,0.92);
+}
+
+#event-detail-panel .activity-detail__media-badge{
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(244,246,239,0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(23,39,30,0.08), 0 6px 18px rgba(12,22,17,0.08);
+  color: rgba(38,50,42,0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#event-detail-panel .activity-detail__media-attribution{
+  margin: 18px 0 0;
+  border-top: 1px solid rgba(24,40,31,0.09);
+  padding-top: 14px;
+}
+
+#event-detail-panel .activity-detail__media-attribution > summary{
+  list-style: none;
+}
+
+#event-detail-panel .activity-detail__media-attribution > summary::-webkit-details-marker{
+  display: none;
+}
+
+#event-detail-panel .activity-detail__media-attribution-toggle{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0;
+  padding: 0 18px 0 0;
+  color: rgba(58,72,63,0.78);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#event-detail-panel .activity-detail__media-attribution-toggle::after{
+  content: "";
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid rgba(58,72,63,0.6);
+  border-bottom: 1.5px solid rgba(58,72,63,0.6);
+  transform: translateY(-60%) rotate(45deg);
+  transition: transform 180ms ease;
+}
+
+#event-detail-panel .activity-detail__media-attribution[open] .activity-detail__media-attribution-toggle::after{
+  transform: translateY(-30%) rotate(225deg);
+}
+
+#event-detail-panel .activity-detail__media-attribution-toggle-main{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+#event-detail-panel .activity-detail__media-attribution-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: rgba(60,83,69,0.82);
+  flex: 0 0 auto;
+}
+
+#event-detail-panel .activity-detail__media-attribution-icon-svg{
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.9;
+}
+
+#event-detail-panel .activity-detail__media-attribution-toggle-secondary{
+  color: rgba(96,109,101,0.72);
+  font-size: 0.76rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+#event-detail-panel .activity-detail__media-attribution-panel{
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(246,247,242,0.82);
+  box-shadow: inset 0 0 0 1px rgba(24,40,31,0.06);
+}
+
+#event-detail-panel .activity-detail__media-attribution-row{
+  display: grid;
+  grid-template-columns: minmax(74px, 92px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+#event-detail-panel .activity-detail__media-attribution-row + .activity-detail__media-attribution-row{
+  margin-top: 10px;
+}
+
+#event-detail-panel .activity-detail__media-attribution-key{
+  color: rgba(90,103,95,0.86);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+#event-detail-panel .activity-detail__media-attribution-value{
+  min-width: 0;
+  color: rgba(42,55,47,0.84);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+#event-detail-panel .activity-detail__media-attribution-link{
+  color: rgba(38,86,62,0.9);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+#event-detail-panel .activity-detail__media-attribution-link:hover,
+#event-detail-panel .activity-detail__media-attribution-link:focus-visible{
+  text-decoration: underline;
+}
+/* === END BLOCK: ACTIVITIES_DETAIL_MEDIA_ATTRIBUTION_ENTERPRISE_UI_V1 === */
+
+#event-detail-panel .activity-detail__media--fallback{
+  display: grid;
+  place-items: center;
+  min-height: 220px;
 }
 
 #event-detail-panel .activity-detail__media--fallback{
@@ -2517,8 +2672,9 @@ body.is-feedback-open{
 }
 
 .feedback-context-slot--activity{
-  margin-top: 10px;
-  padding-top: 0;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .feedback-context-trigger{
@@ -2580,7 +2736,8 @@ body.is-feedback-open{
   }
 
   .feedback-context-slot--activity{
-    margin-top: 8px;
+    margin-top: 10px;
+    padding-top: 12px;
   }
 
   .feedback-context-trigger{
