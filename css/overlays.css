@@ -2672,8 +2672,9 @@ body.is-feedback-open{
 }
 
 .feedback-context-slot--activity{
-  margin-top: 10px;
-  padding-top: 0;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
 .feedback-context-trigger{
@@ -2735,7 +2736,8 @@ body.is-feedback-open{
   }
 
   .feedback-context-slot--activity{
-    margin-top: 8px;
+    margin-top: 10px;
+    padding-top: 12px;
   }
 
   .feedback-context-trigger{
