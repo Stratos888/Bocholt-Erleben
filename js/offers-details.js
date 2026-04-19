@@ -159,7 +159,7 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: OFFERS_DETAIL_MAPS_URL_V2 === */
 
-  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 | Zweck: trennt im Activity-Detailpanel visuell ruhige Symbolbild-Kennzeichnung auf dem Bild von einem separaten, einklappbaren Bildnachweis im Footer-Bereich; Umfang: ersetzt renderMedia(offer) und ergänzt renderImageAttribution(offer) === */
+  /* === BEGIN BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 | Zweck: trennt Symbolbild-Kennzeichnung auf dem Bild von einem separaten Bildnachweis im Footer des Activity-Detailpanels; Umfang: ersetzt renderMedia(offer) und ergänzt renderImageAttribution(offer) === */
   renderMedia(offer) {
     const visual = this.getVisual(offer);
     const iconHtml = window.Icons?.svg
@@ -354,7 +354,7 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 | Zweck: verschiebt den Bildnachweis im Activity-Detailpanel aus dem Hero-Bereich in einen ruhigen Footer-Slot nach den Kerninhalten und CTAs; Umfang: ersetzt nur renderContent(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 | Zweck: verschiebt den Bildnachweis im Activity-Detailpanel in einen ruhigen Footer-Slot nach Kerninhalt, CTAs und Feedback; Umfang: ersetzt nur renderContent(offer) === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
