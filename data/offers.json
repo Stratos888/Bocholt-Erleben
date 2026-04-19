@@ -673,7 +673,7 @@
     },
     {
       "id": "bocholter-aa-radweg-erleben",
-      "title": "Bocholter-Aa-Radweg radeln",
+      "title": "Bocholter-Aa-Radweg",
       "kategorie": "Sport & Bewegung",
       "location": "Bocholt & Umgebung",
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
@@ -707,7 +707,7 @@
     },
     {
       "id": "kubaai-aa-promenade-aktiv-erleben",
-      "title": "Kubaai / Aa-Promenade entdecken",
+      "title": "Kubaai / Aa-Promenade erleben",
       "kategorie": "Sport & Bewegung",
       "location": "Bocholt",
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
@@ -1052,7 +1052,7 @@
     },
     {
       "id": "mtb-route-winterswijk",
-      "title": "MTB-Route Winterswijk fahren",
+      "title": "MTB-Route Winterswijk",
       "kategorie": "Sport & Bewegung",
       "location": "Winterswijk",
       "maps_query": "Winterswijk, Niederlande",
