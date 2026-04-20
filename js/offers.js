@@ -485,7 +485,7 @@ const OfferCards = (() => {
     return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
   }
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
-  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 | Zweck: nutzt für Activity-Cards die zentrale Bildauflösung inkl. generischer Commons-Symbolbilder, ohne Card-Layout oder Ladeprioritäten zu fragmentieren | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
+  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 | Zweck: behaelt die bestehende Bildlade-Logik der Activity-Cards bei und ergänzt belastbare Alt-Texte fuer Suchmaschinen und Barrierefreiheit, ohne Kartenlayout oder Ladeprioritäten zu verändern | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
   function ensureImageOriginHints(imageUrl) {
@@ -530,6 +530,24 @@ const OfferCards = (() => {
     };
   }
 
+  function buildActivityImageAltText(offer, imageData) {
+    const title = String(offer?.title || "").trim();
+    const location = String(offer?.location || "").trim();
+    const note = String(imageData?.note || "").trim();
+
+    if (imageData?.isSymbolic) {
+      if (title && location) return `Symbolbild für ${title} – ${location}`;
+      if (title) return `Symbolbild für ${title}`;
+      return "Symbolbild für Aktivität in Bocholt und Umgebung";
+    }
+
+    if (title && location) return `${title} – ${location}`;
+    if (title) return title;
+    if (location) return `Aktivität in ${location}`;
+    if (note) return note;
+    return "Aktivität in Bocholt und Umgebung";
+  }
+
   function renderMedia(offer, visual, index) {
     const imageData = OfferVisuals.resolveImageData(offer);
     const imageUrl = imageData.url;
@@ -545,13 +563,14 @@ const OfferCards = (() => {
       const symbolicLabel = imageData.isSymbolic
         ? OfferVisuals.escapeHtml(String(imageData.note || "").trim() || "Symbolbild")
         : "";
+      const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
 
       return `
-        <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
+        <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}">
 <img
   class="activity-card-media__image"
   src="${OfferVisuals.escapeHtml(imageUrl)}"
-  alt=""
+  alt="${imageAlt}"
   loading="${loading}"
   fetchpriority="${fetchPriority}"
   decoding="async"
@@ -573,7 +592,7 @@ const OfferCards = (() => {
       </div>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 === */
+  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 === */
 
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
