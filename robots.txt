@@ -1,4 +1,0 @@
-# === BEGIN BLOCK: STAGING_ROBOTS_BLOCK_ALL_V1 | Zweck: Staging komplett für Bots sperren, damit keine Testumgebung indexiert wird | Umfang: gesamte Datei robots.txt auf Staging ===
-User-agent: *
-Disallow: /
-# === END BLOCK: STAGING_ROBOTS_BLOCK_ALL_V1 ===
