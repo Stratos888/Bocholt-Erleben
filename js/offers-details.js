@@ -300,15 +300,14 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_AND_ACTION_ICONS_V6 | Zweck: behebt den defekten sections-Referenzfehler, integriert Standard-Icons in die CTAs und liefert syntaktisch sauberen Abschluss des Detailpanel-Objekts; Umfang: ersetzt renderFacts(offer) und renderContent(offer) in js/offers-details.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_STREAMLINED_V7 | Zweck: entfernt Region und Gut-zu-wissen vollständig aus dem Activity-Detailpanel und belässt dort nur noch konkrete Detail-Tags plus Saison als kurze strukturierte Info | Umfang: ersetzt nur renderFacts(offer) in js/offers-details.js === */
   renderFacts(offer) {
     const primaryTags = window.OfferVisuals?.getRankedTagItems
       ? window.OfferVisuals.getRankedTagItems(offer)
       : (Array.isArray(offer?.tags) ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean) : []);
 
     const metaItems = [
-      ["Saison", offer.season],
-      ["Region", offer.area]
+      ["Saison", offer.season]
     ]
       .map(([label, value]) => {
         const text = String(value || "").trim();
@@ -317,9 +316,7 @@ const OfferDetailPanel = {
       })
       .filter(Boolean);
 
-    const note = String(offer?.hint || "").trim();
-
-    if (!primaryTags.length && !metaItems.length && !note) return "";
+    if (!primaryTags.length && !metaItems.length) return "";
 
     return `
       <div class="activity-detail__facts">
@@ -344,15 +341,10 @@ const OfferDetailPanel = {
             </div>
           </section>
         ` : ""}
-        ${note ? `
-          <section class="activity-detail__fact-callout" aria-label="Gut zu wissen">
-            <div class="activity-detail__fact-label">Gut zu wissen</div>
-            <div class="activity-detail__fact-value">${this.escapeHtml(note)}</div>
-          </section>
-        ` : ""}
       </div>
     `.trim();
   },
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_STREAMLINED_V7 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 | Zweck: verschiebt den Bildnachweis im Activity-Detailpanel in einen ruhigen Footer-Slot nach Kerninhalt, CTAs und Feedback; Umfang: ersetzt nur renderContent(offer) === */
   renderContent(offer) {
