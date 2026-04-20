@@ -27,12 +27,16 @@
         "Restaurant",
         "Spielplatz"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Spielplatz",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Frühling bis Herbst",
-      "hint": "Vor allem stark für spontane Zeit am Wasser und kurze Wege.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -62,12 +66,14 @@
         "Natur",
         "Vogelbeobachtung"
       ],
+      "filter_tags": [
+        "Tiere",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Besonders stark bei ruhigem Wetter",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -99,12 +105,16 @@
         "Wassersport",
         "Snacks & Getränke"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Spielplatz",
+        "Wandern & Spazieren"
+      ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Vor allem Sommer",
-      "hint": "Besonders passend bei gutem Wetter",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
@@ -134,12 +144,13 @@
         "Weberei",
         "Spinnerei"
       ],
+      "filter_tags": [
+        "Indoor"
+      ],
       "duration": "1–3 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Gut auch bei wechselhaftem Wetter.",
       "cardFacts": [
         "1–3 Std",
         "Indoor",
@@ -169,12 +180,13 @@
         "Werkstätten",
         "Führungen"
       ],
+      "filter_tags": [
+        "Indoor"
+      ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Eher ruhig und lokal als groß inszeniert.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -204,12 +216,13 @@
         "Geschichte",
         "Grenzort"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Ganzjährig",
-      "hint": "Sehr gut als kurzer besonderer Grenzspaziergang.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -239,12 +252,13 @@
         "Geschichte",
         "Aussicht"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Eher ruhig und entschleunigt als actionreich",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -274,12 +288,11 @@
         "Buchcafé",
         "Kultur"
       ],
+      "filter_tags": [],
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders passend zum Stöbern und für eine Kaffeepause.",
       "cardFacts": [
         "1–3 Std",
         "Indoor & Outdoor",
@@ -309,12 +322,13 @@
         "Ausstellung",
         "Zweiter Weltkrieg"
       ],
+      "filter_tags": [
+        "Indoor"
+      ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Inhaltlich stärker und ernster als ein klassischer Freizeitausflug.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -344,12 +358,11 @@
         "Kulturort",
         "Führungen"
       ],
+      "filter_tags": [],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gut kombinierbar mit einem kleinen Rundgang durch Ringenberg.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -379,12 +392,13 @@
         "Spaziergang",
         "Geschichte"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders stark für einen ruhigen Ausflug mit historischer Kulisse.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -414,12 +428,14 @@
         "Wald",
         "Familienfreundlich"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Tiere"
+      ],
       "duration": "2–4 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Sehr stark für Familien und entspannte Naturtage.",
       "cardFacts": [
         "2–4 Std",
         "Outdoor",
@@ -449,12 +465,13 @@
         "Mondriaan",
         "Ausstellung"
       ],
+      "filter_tags": [
+        "Indoor"
+      ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gute Schlechtwetter-Activity mit klarem Kulturprofil.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -484,12 +501,13 @@
         "Textil",
         "Fabrik"
       ],
+      "filter_tags": [
+        "Indoor"
+      ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders passend, wenn du Winterswijk nicht nur als Einkaufsort zeigen willst.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -519,12 +537,14 @@
         "Vogelbeobachtung",
         "Aussichtskanzeln"
       ],
+      "filter_tags": [
+        "Tiere",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Einer der stärksten Naturkandidaten für die Seite.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -554,12 +574,13 @@
         "Natur",
         "Bohlenweg"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "1,5–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Stark für ruhige Natur- und Moorerlebnisse.",
       "cardFacts": [
         "1,5–3 Std",
         "Outdoor",
@@ -589,12 +610,13 @@
         "Grenzpfähle",
         "Natur"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Besonders gut als kompakter Natur-Ausflug.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -624,12 +646,13 @@
         "Grenzort",
         "Natur"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "3–5 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Frühling bis Herbst",
-      "hint": "Eher Halbtages-Tour als kurzer Abstecher.",
       "cardFacts": [
         "3–5 Std",
         "Outdoor",
@@ -659,12 +682,11 @@
         "Restaurants",
         "Arkaden"
       ],
+      "filter_tags": [],
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Stark für spontanes Bummeln, Verweilen und kleine Pausen in der Stadt.",
       "cardFacts": [
         "1–3 Std",
         "Indoor & Outdoor",
@@ -693,12 +715,14 @@
         "Bocholter Aa",
         "Lauschtour"
       ],
+      "filter_tags": [
+        "Wasser",
+        "Radfahren"
+      ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt & Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Vor allem stark für längere Bewegungsrunden entlang der Aa.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
@@ -727,12 +751,14 @@
         "TextilWerk",
         "Brücken"
       ],
+      "filter_tags": [
+        "Wasser",
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Am stärksten als kurzer aktiver Stadtspaziergang mit Wasserbezug.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -761,12 +787,11 @@
         "Wald",
         "Nordic Walking"
       ],
+      "filter_tags": [],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Sinnvoll für ruhige Bewegung und kleine Naturauszeiten direkt in Bocholt.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -795,12 +820,13 @@
         "Grenze",
         "Schmugglerwege"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für grenznahe Wanderabschnitte mit viel Landschaft und Weggefühl.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
@@ -830,12 +856,16 @@
         "Restaurant",
         "Rodelberg"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Tiere",
+        "Spielplatz",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Sehr stark für Familien, Spaziergänge und spontane Naherholung im Grünen.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -865,12 +895,13 @@
         "Teich",
         "Totholz"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Ruhige, kleine Natur-Activity mit Lerncharakter.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -902,12 +933,14 @@
         "Natur",
         "Familie"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für einen familienfreundlichen Weg mit etwas mehr Entdeckercharakter.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -939,12 +972,14 @@
         "Rutsche",
         "Schaukeln"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Spielplatz"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Klarer lokaler Familienstopp im Grenzraum Suderwick.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -974,12 +1009,14 @@
         "Obstbaumwiese",
         "Lehrbienenstand"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gut für einen ruhigen Nahbereich-Ausflug ohne großen Planungsaufwand.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -1008,12 +1045,14 @@
         "Rätsel",
         "Stadtroute"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gute Familien-Activity für Kinder mit spielerischem Stadterkunden.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -1042,12 +1081,13 @@
         "Handwerk",
         "Monumentale Gebäude"
       ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
       "duration": "1,5 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Stadtentdecken mit klarer Handwerks- und Ortsgeschichte.",
       "cardFacts": [
         "1,5 Std",
         "Outdoor",
@@ -1078,12 +1118,13 @@
         "Singletracks",
         "Naturlandschaft"
       ],
+      "filter_tags": [
+        "Radfahren"
+      ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Spezial-Activity für Bewegung und sportlichere Ausflüge.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
