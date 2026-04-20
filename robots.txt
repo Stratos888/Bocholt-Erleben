@@ -1,0 +1,10 @@
+# === BEGIN BLOCK: ROBOTS_BASELINE_V1 | Zweck: minimale, sichere Robots-Basis für öffentliche Indexierung; erlaubt normale Suche und OAI-SearchBot, sperrt GPTBot vorerst | Umfang: neue Datei /robots.txt ===
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: *
+Allow: /
+# === END BLOCK: ROBOTS_BASELINE_V1 ===
