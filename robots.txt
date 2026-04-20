@@ -1,4 +1,4 @@
-# === BEGIN BLOCK: ROBOTS_BASELINE_V1 | Zweck: minimale, sichere Robots-Basis für öffentliche Indexierung; erlaubt normale Suche und OAI-SearchBot, sperrt GPTBot vorerst | Umfang: neue Datei /robots.txt ===
+# === BEGIN BLOCK: LIVE_ROBOTS_BASELINE_V2 | Zweck: produktive Robots-Basis fuer Live; erlaubt oeffentliche Suche und OAI-SearchBot, sperrt GPTBot, verweist auf Live-Sitemap | Umfang: gesamte Datei robots.txt auf Main ===
 User-agent: GPTBot
 Disallow: /
 
@@ -7,4 +7,6 @@ Allow: /
 
 User-agent: *
 Allow: /
-# === END BLOCK: ROBOTS_BASELINE_V1 ===
+
+Sitemap: https://bocholt-erleben.de/sitemap.xml
+# === END BLOCK: LIVE_ROBOTS_BASELINE_V2 ===
