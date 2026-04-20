@@ -70,7 +70,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH_PAGE_FUNNEL_V12 | Zweck: strafft /events-veroeffentlichen/ inhaltlich weiter, entfernt den kompletten "So funktioniert's"-Block, reduziert den Startbereich auf 2 Schritte und bereinigt den Abschlussblock; Umfang: kompletter <body>-Inhalt dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS | Zweck: richtet /events-veroeffentlichen/ auf den verbindlichen V1-Funnel mit klarem Zwei-Wege-Einstieg, Link-first-Standardweg, Einzeltermin-Option und sauberer Profi-Anbindung aus; Umfang: kompletter sichtbarer Seitenblock unter <body> bis vor die globalen Script-Includes === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -87,26 +87,29 @@
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
-<!-- === BEGIN BLOCK: PUBLISH_ENTERPRISE_CONTENT_V18 | Zweck: schließt den verbleibenden Copy-Restgap im Publish-Funnel mit präziserem Hero-Mikrotext und kompakterer Membership-/Einstiegsführung, ohne den bestehenden Seitenvertrag umzubauen; Umfang: kompletter Main-Inhalt von /events-veroeffentlichen/ === -->
           <p class="content-lead">
-            Wenn deine Events bereits online gepflegt werden, prüfen wir den passenden Weg für eine möglichst einfache Übernahme.
+            Zwei Wege, ein klarer Einstieg: Standardmäßig reichst du dein Event zuerst über einen Link ein. Für regelmäßige
+            Veranstalter mit eigener Datenquelle gibt es zusätzlich die automatische Anbindung als Profi-Pfad.
           </p>
 
-          <div class="publish-hero-cta">
+          <div class="content-actions content-actions--inline publish-hero-cta">
             <a
               class="content-cta content-cta--primary"
-              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Ver%C3%B6ffentlichung%20anfragen&body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20die%20Ver%C3%B6ffentlichung%20meiner%20Events%20bei%20Bocholt%20erleben%20anfragen.%0A%0AOrganisation%20%2F%20Veranstalter%3A%0AWebsite%2C%20Eventkalender%20oder%20bestehende%20Datenquelle%3A%0AAnsprechpartner%3A%0AWie%20oft%20erscheinen%20neue%20Events%3A%0ABeispiel-Link%20zu%20einem%20Termin%20(optional)%3A%0AWeitere%20Hinweise%20(optional)%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Event%20einreichen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20ein%20Event%20bei%20Bocholt%20erleben%20einreichen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AAnsprechpartner%3A%0AGew%C3%BCnschtes%20Modell%3A%0A-%20Einzeltermin%20ver%C3%B6ffentlichen%20%289%2C90%20%E2%82%AC%29%0A-%20Starter%20%289%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Aktiv%20%2819%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Unbegrenzt%20%2829%2C99%20%E2%82%AC%20/%20Monat%29%0A%0ALink%20zum%20Event%20oder%20Kalender%3A%0A%0AFallback%2C%20falls%20kein%20passender%20Link%20vorhanden%20ist%3A%0ATitel%3A%0ADatum%3A%0AUhrzeit%3A%0AOrt%3A%0AKurzbeschreibung%3A%0AWebsite%20oder%20Ticketlink%3A%0A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
             >
-              Veröffentlichung anfragen
+              Event einreichen
+            </a>
+            <a class="content-cta" href="#publish-automation">
+              Automatische Anbindung
             </a>
           </div>
 
           <p class="content-note publish-hero-meta">
-            Vorbereitete Anfrage per E-Mail.
+            Standardweg: Link-first mit manueller Fallback-Eingabe. Profi-Pfad: API, Feed, CSV oder iCal nur nach individueller Prüfung.
           </p>
 
           <p class="content-note publish-hero-trust">
-            Bestehende Eventdaten dienen als Grundlage. Zusätzliche Pflege soll möglichst entfallen.
+            Öffentliche Pakete richten sich nach veröffentlichten Terminen pro Monat. Alle Einreichungen werden vor Veröffentlichung geprüft.
           </p>
         </div>
       </div>
@@ -119,107 +122,134 @@
 
       <ul class="publish-benefits-grid" aria-label="Vorteile für Veranstalter">
         <li>
-          <strong>Möglichst keine doppelte Pflege</strong>
-          <span>Bestehende Eventdaten dienen nach Möglichkeit als Grundlage, damit zusätzlicher Pflegeaufwand gering bleibt.</span>
+          <strong>Einfacher Standardweg</strong>
+          <span>Im Normalfall reicht zuerst ein Link zum Event oder Kalender. Nur wenn dort etwas fehlt, brauchen wir zusätzliche Angaben.</span>
         </li>
         <li>
           <strong>Sichtbarkeit in Bocholt und Umgebung</strong>
           <span>Deine Termine erscheinen dort, wo Menschen aktiv nach passenden Veranstaltungen in Bocholt und Umgebung suchen.</span>
         </li>
         <li>
-          <strong>Sauberer Veröffentlichungsrahmen</strong>
-          <span>Events werden vor Veröffentlichung auf Plausibilität und Vollständigkeit geprüft.</span>
+          <strong>Saubere Veröffentlichung</strong>
+          <span>Alle Termine werden vor Veröffentlichung auf Plausibilität, Vollständigkeit und Verständlichkeit geprüft.</span>
         </li>
         <li>
-          <strong>Pragmatischer Weg je nach Quelle</strong>
-          <span>Je nach Website, Kalender oder Datenstand richten wir den passenden Veröffentlichungsweg für dich ein.</span>
+          <strong>Profi-Pfad bei Bedarf</strong>
+          <span>Für regelmäßige Veranstalter mit eigener Datenquelle prüfen wir zusätzlich eine automatische Anbindung als zweiten Weg.</span>
         </li>
       </ul>
     </section>
 
-    <section class="content-card publish-membership-card" aria-labelledby="publish-membership">
+    <section class="content-card publish-membership-card" aria-labelledby="publish-prices">
       <div class="publish-section-head">
-        <h2 id="publish-membership">Mitgliedschaft</h2>
-        <p class="content-note publish-membership-intro">Monatlich kündbar, mit Prüfung und strukturierter Übernahme im vereinbarten Rahmen.</p>
+        <h2 id="publish-prices">Preise</h2>
+        <p class="content-note publish-membership-intro">Monatlich kündbare Mitgliedschaften plus Einzeltermin-Option für einmalige Veröffentlichungen.</p>
       </div>
 
       <div class="publish-membership-layout">
-        <section class="publish-membership-block" aria-label="Monatliche Pakete">
-          <ul class="publish-plans" aria-label="Monatliche Pakete">
+        <section class="publish-membership-block" aria-label="Preise für Veranstalter">
+          <ul class="publish-plans" aria-label="Preise für Veranstalter">
+            <li>
+              <strong>Einzeltermin veröffentlichen</strong>
+              <span>9,90&nbsp;€ einmalig</span>
+              <small>Für einzelne Termine ohne laufende Mitgliedschaft.</small>
+            </li>
             <li>
               <strong>Starter</strong>
-              <span>9,99&nbsp;€ / Monat · bis zu 3 Events</span>
-              <small>Für kleine Veranstalter mit wenigen aktiven Terminen.</small>
+              <span>9,99&nbsp;€ / Monat · bis zu 3 veröffentlichte Termine pro Monat</span>
+              <small>Für kleine Veranstalter mit wenigen neuen Veröffentlichungen.</small>
             </li>
             <li>
               <strong>Aktiv</strong>
-              <span>19,99&nbsp;€ / Monat · bis zu 8 Events</span>
+              <span>19,99&nbsp;€ / Monat · bis zu 8 veröffentlichte Termine pro Monat</span>
               <small>Für regelmäßige Veranstalter mit laufendem Programm.</small>
             </li>
             <li>
               <strong>Unbegrenzt</strong>
-              <span>29,99&nbsp;€ / Monat · unbegrenzt</span>
-              <small>Für Häuser, Locations und Veranstalter mit vielen laufenden Terminen.</small>
+              <span>29,99&nbsp;€ / Monat · unbegrenzt veröffentlichte Termine pro Monat</span>
+              <small>Für Veranstalter, Häuser und Locations mit vielen laufenden Terminen.</small>
             </li>
           </ul>
 
           <p class="content-note publish-plans-note">
-            Alle Pakete beinhalten die Prüfung des passenden Veröffentlichungswegs, die strukturierte Übernahme im vereinbarten
-            Rahmen und eine redaktionelle Prüfung vor Veröffentlichung.
+            Die automatische Anbindung ist kein separates öffentliches Paket, sondern der sekundäre Profi-Pfad innerhalb des passenden Modells.
           </p>
         </section>
       </div>
     </section>
 
-    <section class="content-card publish-start-card" aria-labelledby="publish-start">
+    <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
-        <h2 id="publish-start">So funktioniert der Einstieg</h2>
-        <p class="content-note">Bestehende Eventdaten sind die Grundlage.</p>
+        <h2 id="publish-submit-title">1. Event einreichen</h2>
+        <p class="content-note">Standardweg: erst Link senden, nur bei Bedarf manuell ergänzen.</p>
       </div>
 
       <div class="publish-steps-flow">
         <section class="publish-step" aria-labelledby="publish-step-1">
-          <h3 id="publish-step-1">1. Bestehende Quelle senden</h3>
-          <p>Du schickst uns deine Website, deinen Eventkalender oder eine vorhandene Datenquelle.</p>
+          <h3 id="publish-step-1">Link zuerst</h3>
+          <p>Schicke uns zuerst den Link zu deinem Event, Kalender, deiner Landingpage oder Ticketseite.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-2">
-          <h3 id="publish-step-2">2. Übernahmemöglichkeit prüfen</h3>
-          <p>Wir prüfen, wie sich deine Termine zuverlässig und mit möglichst wenig Zusatzaufwand übernehmen lassen.</p>
+          <h3 id="publish-step-2">Fallback nur wenn nötig</h3>
+          <p>Falls der Link nicht alle Angaben enthält, ergänzt du Titel, Datum, Uhrzeit, Ort und Website oder Ticketlink direkt in derselben Anfrage.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-3">
-          <h3 id="publish-step-3">3. Passenden Weg festlegen</h3>
-          <p>Je nach Ausgangslage setzen wir auf direkte Übernahme, abgestimmte Übernahme oder einen pragmatischen Alternativweg.</p>
+          <h3 id="publish-step-3">Passendes Modell wählen</h3>
+          <p>Für einzelne Termine nutzt du den Einzeltermin. Für laufende Veröffentlichungen wählst du Starter, Aktiv oder Unbegrenzt.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-4">
-          <h3 id="publish-step-4">4. Termine strukturiert übernehmen</h3>
-          <p>Danach laufen neue Events und Änderungen im vereinbarten Rahmen möglichst standardisiert weiter.</p>
+          <h3 id="publish-step-4">Prüfung vor Veröffentlichung</h3>
+          <p>Wir prüfen die Angaben und melden uns, falls etwas fehlt oder der Profi-Pfad für deine Quelle sinnvoller ist.</p>
         </section>
+      </div>
+
+      <div class="content-actions content-actions--inline publish-final-actions">
+        <a
+          class="content-cta content-cta--primary"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Event%20einreichen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20ein%20Event%20bei%20Bocholt%20erleben%20einreichen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AAnsprechpartner%3A%0AGew%C3%BCnschtes%20Modell%3A%0A-%20Einzeltermin%20ver%C3%B6ffentlichen%20%289%2C90%20%E2%82%AC%29%0A-%20Starter%20%289%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Aktiv%20%2819%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Unbegrenzt%20%2829%2C99%20%E2%82%AC%20/%20Monat%29%0A%0ALink%20zum%20Event%20oder%20Kalender%3A%0A%0AFallback%2C%20falls%20kein%20passender%20Link%20vorhanden%20ist%3A%0ATitel%3A%0ADatum%3A%0AUhrzeit%3A%0AOrt%3A%0AKurzbeschreibung%3A%0AWebsite%20oder%20Ticketlink%3A%0A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+        >
+          Event jetzt einreichen
+        </a>
       </div>
     </section>
 
-    <section class="content-card publish-final-card publish-final-card--help" aria-labelledby="publish-final-secondary">
-      <h2 id="publish-final-secondary">Keine passende Quelle?</h2>
+    <section class="content-card publish-final-card publish-final-card--help" id="publish-automation" aria-labelledby="publish-automation-title">
+      <div class="publish-section-head">
+        <h2 id="publish-automation-title">2. Automatische Anbindung anfragen</h2>
+        <p class="content-note">Sekundärer Profi-Pfad für Veranstalter mit regelmäßigen Terminen und eigener Datenquelle.</p>
+      </div>
 
-      <p class="content-note">
-        Wenn aktuell keine geeignete Website, Eventübersicht oder technische Datenquelle vorliegt, finden wir mit dir einen
-        einfachen alternativen Weg.
-      </p>
+      <div class="publish-steps-flow">
+        <section class="publish-step" aria-labelledby="publish-automation-step-1">
+          <h3 id="publish-automation-step-1">Geeignete Quelle mitbringen</h3>
+          <p>Dieser Weg ist gedacht für API, Feed, CSV, iCal oder eine vergleichbare verlässliche Quelle.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-automation-step-2">
+          <h3 id="publish-automation-step-2">Quelle prüfen lassen</h3>
+          <p>Wir prüfen, ob sich deine Termine zuverlässig übernehmen lassen und welcher Weg für deine Struktur sinnvoll ist.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-automation-step-3">
+          <h3 id="publish-automation-step-3">Im passenden Modell weiterführen</h3>
+          <p>Auch bei automatischer Anbindung gelten die öffentlichen Modelle über veröffentlichte Termine pro Monat.</p>
+        </section>
+      </div>
 
       <div class="content-actions content-actions--inline publish-final-actions">
         <a
           class="content-cta"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Direkter%20Kontakt%20als%20Veranstalter&body=Hallo%20Mathias%2C%0A%0Aich%20habe%20aktuell%20keine%20passende%20Website%20oder%20strukturierte%20Datenquelle%20und%20m%C3%B6chte%20trotzdem%20Events%20bei%20Bocholt%20erleben%20ver%C3%B6ffentlichen.%0A%0AOrganisation%20%2F%20Veranstalter%3A%0AAnsprechpartner%3A%0AKurze%20Info%20zu%20den%20Events%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
+          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Automatische%20Anbindung%20anfragen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20eine%20automatische%20Anbindung%20f%C3%BCr%20unsere%20Termine%20bei%20Bocholt%20erleben%20anfragen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AWebsite%3A%0AAnsprechpartner%3A%0ATechnischer%20Ansprechpartner%20%28optional%29%3A%0AGesch%C3%A4tzte%20Anzahl%20ver%C3%B6ffentlichter%20Termine%20pro%20Monat%3A%0A%0AVorhandene%20Quelle%3A%0A-%20API%0A-%20Feed%0A-%20CSV%0A-%20iCal%0A-%20Sonstiges%0A%0ALink%20zur%20Quelle%20oder%20zu%20Beispielterminen%3A%0AAktualisierungsrhythmus%3A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
         >
-          Direkt Kontakt aufnehmen
+          Automatische Anbindung anfragen
         </a>
       </div>
     </section>
-<!-- === END BLOCK: PUBLISH_ENTERPRISE_CONTENT_V18 === -->
   </main>
-  <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V12 === -->
+  <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS === -->
   <!-- === BEGIN BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V1 | Zweck: lädt die globale Runtime für Config, Icons und Feedback auch auf dieser Unterseite; Umfang: Script-Includes direkt vor </body> === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
