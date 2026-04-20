@@ -336,13 +336,39 @@ jobs:
           rm -rf deploy
           mkdir -p deploy
 
-          # === BEGIN BLOCK: SYNC REPO TO deploy/ (clean staging) ===
+          # === BEGIN BLOCK: SYNC_REPO_AND_INJECT_ENV_SPECIFIC_ROBOTS_SITEMAP_V1 | Zweck: deploy/ wird sauber aus dem Repo aufgebaut, aber robots.txt und sitemap.xml werden fail-fast immer umgebungsabhaengig aus Templates injiziert; Root-Dateien im Branch koennen dadurch kuenftig nichts mehr versehentlich ueberschreiben | Umfang: ersetzt nur den bisherigen rsync-Block im Step "Prepare deploy folder" ===
           rsync -a \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="deploy" \
+            --exclude="deploy-templates" \
+            --exclude="robots.txt" \
+            --exclude="sitemap.xml" \
             ./ deploy/
-          # === END BLOCK: SYNC REPO TO deploy/ (clean staging) ===
+
+          if [ "$DEPLOY_ENV_NAME" = "staging" ]; then
+            cp deploy-templates/robots.staging.txt deploy/robots.txt
+            cp deploy-templates/sitemap.staging.xml deploy/sitemap.xml
+
+            grep -q '^User-agent: \*$' deploy/robots.txt
+            grep -q '^Disallow: /$' deploy/robots.txt
+          else
+            cp deploy-templates/robots.live.txt deploy/robots.txt
+            cp deploy-templates/sitemap.live.xml deploy/sitemap.xml
+
+            grep -q '^User-agent: GPTBot$' deploy/robots.txt
+            grep -q '^Sitemap: https://bocholt-erleben.de/sitemap.xml$' deploy/robots.txt
+            grep -q '<loc>https://bocholt-erleben.de/</loc>' deploy/sitemap.xml
+          fi
+
+          test -s deploy/robots.txt
+          test -s deploy/sitemap.xml
+
+          echo "=== PROOF robots.txt ==="
+          cat deploy/robots.txt || true
+          echo "=== PROOF sitemap.xml (head) ==="
+          sed -n '1,40p' deploy/sitemap.xml || true
+          # === END BLOCK: SYNC_REPO_AND_INJECT_ENV_SPECIFIC_ROBOTS_SITEMAP_V1 ===
 
                  # === BEGIN BLOCK: BUILD_ID CACHE-BUSTING + NORMALIZE + GUARD (HTML ASSETS) ===
           # Zweck:
