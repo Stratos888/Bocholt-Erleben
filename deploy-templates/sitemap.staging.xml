@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- === BEGIN BLOCK: DEPLOY_TEMPLATE_SITEMAP_STAGING_V1 | Zweck: neutrale Staging-Sitemap ohne oeffentliche URLs; dient nur als sichere Platzhalter-Datei fuer Staging-Deploys | Umfang: gesamte Datei deploy-templates/sitemap.staging.xml === -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+</urlset>
+<!-- === END BLOCK: DEPLOY_TEMPLATE_SITEMAP_STAGING_V1 === -->
