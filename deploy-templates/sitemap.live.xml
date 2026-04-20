@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- === BEGIN BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V1 | Zweck: produktive Live-Sitemap fuer die aktuell wichtigsten oeffentlichen Kernseiten | Umfang: gesamte Datei deploy-templates/sitemap.live.xml === -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://bocholt-erleben.de/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/angebote/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/ueber/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/events-veroeffentlichen/</loc>
+  </url>
+</urlset>
+<!-- === END BLOCK: DEPLOY_TEMPLATE_SITEMAP_LIVE_V1 === -->
