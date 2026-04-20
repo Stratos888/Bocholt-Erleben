@@ -1,0 +1,17 @@
+<!-- === BEGIN BLOCK: SITEMAP_BASELINE_V1 | Zweck: minimale Sitemap für die aktuell wichtigen öffentlichen Kernseiten | Umfang: neue Datei /sitemap.xml === -->
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://bocholt-erleben.de/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/angebote/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/ueber/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/events-veroeffentlichen/</loc>
+  </url>
+</urlset>
+<!-- === END BLOCK: SITEMAP_BASELINE_V1 === -->
