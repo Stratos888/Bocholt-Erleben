@@ -1,0 +1,4 @@
+# === BEGIN BLOCK: DEPLOY_TEMPLATE_ROBOTS_STAGING_V1 | Zweck: sperrt Staging komplett fuer Bots, damit keine Testumgebung indexiert wird | Umfang: gesamte Datei deploy-templates/robots.staging.txt ===
+User-agent: *
+Disallow: /
+# === END BLOCK: DEPLOY_TEMPLATE_ROBOTS_STAGING_V1 ===

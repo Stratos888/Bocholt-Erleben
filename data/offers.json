@@ -10,8 +10,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Aasee Bocholt",
       "maps_query": "Uhlandstraße 39, 46395 Bocholt",
-      "maps_label": "Zum Aasee-Startpunkt an der Uhlandstraße",
-      "description": "Der Aasee steht in dieser Liste bewusst für den See selbst: Badebucht, Uferwege, Gastronomie und unkomplizierte Freizeit direkt am Wasser.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Aasee ist ein Naherholungsgebiet mit Badebucht, Uferwegen, Gastronomie und viel Platz für Freizeit am Wasser.",
       "url": "https://www.bocholt.de/aasee",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aasee_Bocholt_-_Strand.jpg",
@@ -23,16 +23,20 @@
       "image_credit": "Odna, CC BY-SA 3.0, via Wikimedia Commons",
       "tags": [
         "Badebucht",
+        "Spielplatz",
         "Rundweg",
-        "Restaurant",
-        "Spielplatz"
+        "Restaurant"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Spielplatz",
+        "Wandern & Spazieren"
       ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Frühling bis Herbst",
-      "hint": "Vor allem stark für spontane Zeit am Wasser und kurze Wege.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -45,8 +49,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Burlo, Borken",
       "maps_query": "Parkplatz am Vennweg nahe Kloster Mariengarden, 46325 Borken-Burlo",
-      "maps_label": "Zum Parkplatz am Vennweg",
-      "description": "Das Burloer Venn bietet eine grenznahe Moorlandschaft mit Rundweg und Naturerlebnis abseits der bekannteren Standardziele.",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Das Burloer Venn ist ein Moorgebiet nahe der Grenze mit Rundweg.",
       "url": "https://www.bocholt.de/Burloer-Venn",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331%20Burlo-Vardingholter%20Venn%2C%20Borken%20%2800892%29.jpg",
@@ -57,17 +61,18 @@
       "image_license": "CC BY-SA 3.0",
       "image_credit": "Günter Seggebäing, CC BY-SA 3.0, via Wikimedia Commons",
       "tags": [
-        "Rundweg",
         "Moor",
-        "Natur",
+        "Rundweg",
         "Vogelbeobachtung"
+      ],
+      "filter_tags": [
+        "Tiere",
+        "Wandern & Spazieren"
       ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Besonders stark bei ruhigem Wetter",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -80,8 +85,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "’t Hilgelo, Winterswijk",
       "maps_query": "Waliënsestraat 137, 7103 EA Winterswijk, Niederlande",
-      "maps_label": "Zum Hilgelo-Startpunkt",
-      "description": "Der See nahe der Grenze verbindet Strand, Wasser und eine lockere Ausflugsatmosphäre für wärmere Tage.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Hilgelo ist ein Badesee mit Strand, Spiel- und Liegeflächen sowie Angeboten wie Schwimmen, Surfen und Tauchen.",
       "url": "https://www.hilgelomeer.de/a-erholungsgebiet-t-hilgelo",
       "website_label": "Website / Infos (DE)",
       "image": "/assets/activities/20250704_203925.jpg",
@@ -95,16 +100,18 @@
         "Strand",
         "Badesee",
         "Spielgeräte",
-        "Rundweg",
-        "Wassersport",
-        "Snacks & Getränke"
+        "Wassersport"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Spielplatz",
+        "Wandern & Spazieren"
       ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Vor allem Sommer",
-      "hint": "Besonders passend bei gutem Wetter",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
@@ -117,8 +124,8 @@
       "kategorie": "Kultur",
       "location": "Bocholt",
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
-      "maps_label": "Zum Museumsparkplatz der Weberei",
-      "description": "Das Textilwerk verbindet Weberei und Spinnerei zu einer starken Industriekultur-Activity zwischen Innenstadt und Aasee.",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Das Textilwerk Bocholt umfasst die Weberei und die historische Spinnerei Herding an zwei Standorten in Bocholt.",
       "url": "https://textilwerk.lwl.org/de/besuch/allgemeine-informationen/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bocholt%2C_Spinnerei_Hammersen.jpg",
@@ -129,17 +136,17 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Hans Börsting, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Museum",
-        "Industriekultur",
         "Weberei",
-        "Spinnerei"
+        "Spinnerei",
+        "Industriekultur"
+      ],
+      "filter_tags": [
+        "Indoor"
       ],
       "duration": "1–3 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Gut auch bei wechselhaftem Wetter.",
       "cardFacts": [
         "1–3 Std",
         "Indoor",
@@ -152,8 +159,8 @@
       "kategorie": "Kultur",
       "location": "Bocholt",
       "maps_query": "Köcherstraße 4, 46395 Bocholt",
-      "maps_label": "Zum Museum in der Köcherstraße",
-      "description": "Das Handwerksmuseum zeigt historische Berufe, Werkstätten und Vorführungen und ergänzt den Bocholt-Fokus sehr gut um lokales Handwerk.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Das Handwerksmuseum in Bocholt zeigt historische Berufe und Werkstätten.",
       "url": "https://bocholter-handwerksmuseum.de/museum/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Handwerksmuseum%20Bocholt.jpg",
@@ -164,17 +171,17 @@
       "image_license": "CC BY-SA 3.0",
       "image_credit": "Stahlkocher, CC BY-SA 3.0, via Wikimedia Commons",
       "tags": [
-        "Museum",
-        "Handwerk",
         "Werkstätten",
-        "Führungen"
+        "Führungen",
+        "Historische Berufe"
+      ],
+      "filter_tags": [
+        "Indoor"
       ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Eher ruhig und lokal als groß inszeniert.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -187,10 +194,10 @@
       "kategorie": "Kultur",
       "location": "Dinxperlo / Suderwick",
       "maps_query": "Hahnerfeld 23, 46419 Isselburg-Anholt",
-      "maps_label": "Zum Startpunkt Brüggenhütte",
-      "description": "Der Grenzort Dinxperlo–Suderwick eignet sich für einen kurzen eigenständigen Spaziergang entlang der sichtbar markierten Grenze mit viel Alltags- und Ortsgeschichte.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Grenzort Dinxperlo–Suderwick eignet sich für einen kurzen Spaziergang entlang der Grenze mit Stationen zur Grenzgeschichte.",
       "url": "https://dinxperwick.info/de/entlang-der-grenze/",
-      "website_label": "Spaziergang / Infos (DE)",
+      "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/2021-03-24%20Dinxperlo%20Suderwick%2003.jpg",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -200,16 +207,15 @@
       "image_credit": "Ziko, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
         "Grenze",
-        "Spaziergang",
-        "Geschichte",
-        "Grenzort"
+        "Geschichte"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Ganzjährig",
-      "hint": "Sehr gut als kurzer besonderer Grenzspaziergang.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -222,10 +228,10 @@
       "kategorie": "Kultur",
       "location": "Bredevoort",
       "maps_query": "Kruittorenstraat 8-10, 7126 BH Bredevoort, Niederlande",
-      "maps_label": "Zum Parkeingang an der Kruittorenstraat",
-      "description": "Der öffentliche Park in Bredevoort verbindet ruhiges Spazieren mit historischem Charakter und markanter Kulisse.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Der Vestingpark St. Bernardus ist ein Park zum Spazierengehen auf den ehemaligen Verteidigungswällen von Bredevoort.",
       "url": "https://heerlyckheid.com/de/informationen/vestingpark-pfad/",
-      "website_label": "Infos zum Vestingpark (DE)",
+      "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bredevoort%20%28NL%29%2C%20Vestingpark%20Sint%20Bernardus%20--%202018%20--%201882.jpg",
       "image_position_x": "50%",
       "image_position_y": "52%",
@@ -234,17 +240,16 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Park",
-        "Spaziergang",
         "Geschichte",
         "Aussicht"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Eher ruhig und entschleunigt als actionreich",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -257,8 +262,8 @@
       "kategorie": "Kultur",
       "location": "Bredevoort",
       "maps_query": "Koppelstraat 35, 7126 AG Bredevoort, Niederlande",
-      "maps_label": "Zum Startpunkt an der Koppelkerk",
-      "description": "Bredevoort lässt sich auch jenseits des Vestingparks als Bücherstadt erleben – mit Antiquariaten, Buchcafé und der Koppelkerk als Kulturanker.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Bredevoort ist als Bücherstadt bekannt; rund um die Koppelkerk gibt es Buchmärkte und ein Buchcafé.",
       "url": "https://koppelkerk.nl/boeken-bredevoort/",
       "website_label": "Offizielle Seite (NL)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bredevoort%20%28NL%29%2C%20Koppelkerk%20--%202018%20--%201812.jpg",
@@ -269,17 +274,15 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Bücher",
         "Antiquariate",
         "Buchcafé",
-        "Kultur"
+        "Koppelkerk"
       ],
+      "filter_tags": [],
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders passend zum Stöbern und für eine Kaffeepause.",
       "cardFacts": [
         "1–3 Std",
         "Indoor & Outdoor",
@@ -292,8 +295,8 @@
       "kategorie": "Kultur",
       "location": "Aalten",
       "maps_query": "Markt 12-16, 7121 CS Aalten, Niederlande",
-      "maps_label": "Zum Museum am Markt",
-      "description": "Das Museum in Aalten erzählt die Geschichte von Untertauchen, Freiheit und Widerstand direkt an der deutsch-niederländischen Grenze.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Das Unterduikmuseum Aalten erzählt die Geschichte von Untertauchen, Freiheit und Widerstand an der deutsch-niederländischen Grenze.",
       "url": "https://nationaalonderduikmuseum.nl/de/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Nationaal%20Onderduikmuseum.jpg",
@@ -304,17 +307,17 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "R.neerhof, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Museum",
-        "Geschichte",
+        "Zweiter Weltkrieg",
         "Ausstellung",
-        "Zweiter Weltkrieg"
+        "Widerstand"
+      ],
+      "filter_tags": [
+        "Indoor"
       ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Inhaltlich stärker und ernster als ein klassischer Freizeitausflug.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -327,8 +330,8 @@
       "kategorie": "Kultur",
       "location": "Hamminkeln-Ringenberg",
       "maps_query": "Schlossstraße 8, 46499 Hamminkeln",
-      "maps_label": "Zum Schloss an der Schlossstraße",
-      "description": "Schloss Ringenberg verbindet Wasserschloss, Geschichte und Kulturort zu einem gut erreichbaren Ausflugsziel südlich von Bocholt.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Schloss Ringenberg ist ein Wasserschloss und Kulturort in Hamminkeln-Ringenberg.",
       "url": "https://www.meinschlossringenberg.de/das-schloss/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hamminkeln-Ringenberg-Schloss_Ringenberg_01.jpg",
@@ -339,17 +342,15 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Dat doris, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Schloss",
+        "Führungen",
         "Geschichte",
-        "Kulturort",
-        "Führungen"
+        "Kulturort"
       ],
+      "filter_tags": [],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gut kombinierbar mit einem kleinen Rundgang durch Ringenberg.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -362,8 +363,8 @@
       "kategorie": "Kultur",
       "location": "Isselburg-Anholt",
       "maps_query": "Schloss 1, 46419 Isselburg-Anholt",
-      "maps_label": "Zum Besucherparkplatz der Wasserburg",
-      "description": "Der historische Landschaftspark der Wasserburg Anholt eignet sich für einen eigenständigen Besuch mit viel Parkkulisse, Geschichte und ruhiger Schlossatmosphäre.",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Die Wasserburg Anholt ist eine Schlossanlage mit Schlosspark in Isselburg-Anholt.",
       "url": "https://www.wasserburg-anholt.de/index.php/de/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Wasserburg%20Anholt.JPG",
@@ -376,15 +377,15 @@
       "tags": [
         "Schlosspark",
         "Landschaftspark",
-        "Spaziergang",
         "Geschichte"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders stark für einen ruhigen Ausflug mit historischer Kulisse.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -397,8 +398,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Isselburg-Anholt",
       "maps_query": "Pferdehorster Str. 1, 46419 Isselburg",
-      "maps_label": "Zum Haupteingang des Wildparks",
-      "description": "Der Biotopwildpark Anholter Schweiz ist ein dauerhaft nutzbares Natur- und Tiererlebnis mit Wegen, Tiergehegen und klarem Familienfokus.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Die Anholter Schweiz ist ein Biotopwildpark mit Wegen und Tiergehegen.",
       "url": "https://www.wildpark-nrw.de/",
       "website_label": "Website / Infos (DE)",
       "image": "https://www.wildpark-nrw.de/wp-content/uploads/2024/12/impressionen6-495x400.webp",
@@ -411,15 +412,16 @@
       "tags": [
         "Wildpark",
         "Tiere",
-        "Wald",
         "Familienfreundlich"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Tiere"
       ],
       "duration": "2–4 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Sehr stark für Familien und entspannte Naturtage.",
       "cardFacts": [
         "2–4 Std",
         "Outdoor",
@@ -432,8 +434,8 @@
       "kategorie": "Kultur",
       "location": "Winterswijk",
       "maps_query": "Zonnebrink 4, 7101 NC Winterswijk, Niederlande",
-      "maps_label": "Zur Villa Mondriaan",
-      "description": "Die Villa Mondriaan ist ein regulär geöffnetes Museum zu den frühen Jahren Piet Mondriaans und ergänzt die Activities sauber um einen starken Kunstort.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Die Villa Mondriaan ist ein Museum zu den frühen Jahren Piet Mondriaans mit wechselnden Ausstellungen in Winterswijk.",
       "url": "https://villamondriaan.nl/de/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Villa%20Mondriaan.jpeg",
@@ -444,17 +446,17 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Bert Nijman, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Museum",
         "Kunst",
-        "Mondriaan",
-        "Ausstellung"
+        "Ausstellung",
+        "Piet Mondriaan"
+      ],
+      "filter_tags": [
+        "Indoor"
       ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gute Schlechtwetter-Activity mit klarem Kulturprofil.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -467,8 +469,8 @@
       "kategorie": "Kultur",
       "location": "Winterswijk",
       "maps_query": "Laan van Hilbelink 6-10, 7101 WG Winterswijk, Niederlande",
-      "maps_label": "Zur MuseumFabriek",
-      "description": "Die MuseumFabriek erzählt Winterswijk in einer alten Textilfabrik und ist als eigenständig besuchbares Museum ein starker Kulturbaustein für die Seite.",
+      "maps_label": "Zum Eingang navigieren",
+      "description": "Die MuseumFabriek Winterswijk verbindet Ortsgeschichte und Industriegeschichte in einer alten Textilfabrik.",
       "url": "https://museumfabriekwinterswijk.nl/de/",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Museumfabriek%20Winterswijk.jpg",
@@ -479,17 +481,17 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Ciell, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Museum",
+        "Textilfabrik",
         "Geschichte",
-        "Textil",
-        "Fabrik"
+        "Ausstellung"
+      ],
+      "filter_tags": [
+        "Indoor"
       ],
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Besonders passend, wenn du Winterswijk nicht nur als Einkaufsort zeigen willst.",
       "cardFacts": [
         "1–2 Std",
         "Indoor",
@@ -502,8 +504,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Zwillbrock, Vreden",
       "maps_query": "Zwillbrock 10, 48691 Vreden",
-      "maps_label": "Zum Startpunkt an der Biologischen Station",
-      "description": "Das Zwillbrocker Venn bietet einen eigenständig nutzbaren Rundwanderweg mit Aussichtskanzeln, Vogelbeobachtung und den für die Region besonderen Flamingos.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Das Zwillbrocker Venn bietet einen Rundweg mit Aussichtskanzeln sowie Vogelbeobachtung und Flamingos.",
       "url": "https://www.bszwillbrock.de/de/biologische-station-zwillbrock/tourismus/zu-gast-in-zwillbrock/rund-um-das-zwillbrocker-venn/der-rundwanderweg/",
       "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Mixed%20flamingo%20group%2C%20Zwillbrocker%20Venn%2C%20Vreden%2C%20Kreis%20Borken%2C%20NRW%2C%20Germany.jpg",
@@ -514,17 +516,19 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "EvaVOR, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Rundweg",
         "Flamingos",
         "Vogelbeobachtung",
-        "Aussichtskanzeln"
+        "Aussichtskanzeln",
+        "Rundweg"
+      ],
+      "filter_tags": [
+        "Tiere",
+        "Wandern & Spazieren"
       ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Einer der stärksten Naturkandidaten für die Seite.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -537,8 +541,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Winterswijk",
       "maps_query": "Arrasveldweg, Winterswijk (GD), Niederlande",
-      "maps_label": "Zum Parkplatz Arrasveldweg",
-      "description": "Das Korenburgerveen ist ein ausgedehntes Moorgebiet bei Winterswijk und lässt sich über markierte Wanderwege und Bohlenabschnitte eigenständig entdecken.",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Das Korenburgerveen ist ein Moorgebiet bei Winterswijk mit markierten Wanderwegen und Bohlenabschnitten.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/naturgebiete/korenburgerveen",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk%20%28NL%29%2C%20Korenburgerveen%20--%202014%20--%203076.jpg",
@@ -550,16 +554,16 @@
       "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
         "Moor",
-        "Wanderwege",
-        "Natur",
-        "Bohlenweg"
+        "Bohlenweg",
+        "Wanderwege"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "1,5–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Stark für ruhige Natur- und Moorerlebnisse.",
       "cardFacts": [
         "1,5–3 Std",
         "Outdoor",
@@ -572,8 +576,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Winterswijk-Woold",
       "maps_query": "Kuipersweg, 7108 BD Winterswijk (GD), Niederlande",
-      "maps_label": "Zum Parkplatz Kuipersweg",
-      "description": "Das Wooldse Veen ist ein empfindliches Hochmoorgebiet mit Bohlenweg, Grenzpfählen und starkem Naturprofil auf kleinem Raum.",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Das Wooldse Veen ist ein Hochmoorgebiet mit Bohlenweg und Grenzpfählen.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/naturgebiete/wooldse-veen",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bohlenweg%20im%20Wooldse%20Veen.JPG",
@@ -586,15 +590,15 @@
       "tags": [
         "Moor",
         "Bohlenweg",
-        "Grenzpfähle",
-        "Natur"
+        "Grenzpfähle"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Besonders gut als kompakter Natur-Ausflug.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -607,8 +611,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Dinxperlo / Suderwick",
       "maps_query": "Aaltenseweg, Dinxperlo, Niederlande",
-      "maps_label": "Zum Startpunkt TOP Welinkbos",
-      "description": "Die ausgeschilderte GrenzenLos-Route macht die Grenzgeschichte von Dinxperlo und Suderwick als eigenständige längere Wanderung erlebbar.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Die GrenzenLos-Route führt als längere Wanderung durch das Grenzgebiet von Dinxperlo und Suderwick.",
       "url": "https://achterhoekferien.de/grenzenlos-wandelen",
       "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Welinkbos.jpg",
@@ -619,17 +623,16 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Plaatjebijeenpraatje, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Wanderroute",
         "Grenzgeschichte",
-        "Grenzort",
-        "Natur"
+        "Wanderroute"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "3–5 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Frühling bis Herbst",
-      "hint": "Eher Halbtages-Tour als kurzer Abstecher.",
       "cardFacts": [
         "3–5 Std",
         "Outdoor",
@@ -642,8 +645,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Bocholt",
       "maps_query": "Markt 1, 46395 Bocholt",
-      "maps_label": "Zum Startpunkt am Historischen Rathaus",
-      "description": "Die Bocholter Innenstadt verbindet Fußgängerzonen, historische Innenstadt, Neutorplatz und Shopping-Arkaden mit Cafés und Restaurants zu einer alltagstauglichen Stadt-Activity.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Die Bocholter Innenstadt verbindet Fußgängerzonen, Arkaden, Cafés und Restaurants.",
       "url": "https://www.bocholt.de/shopping",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rathaus%20Bocholt%20am%20Marktplatz.jpg",
@@ -659,12 +662,11 @@
         "Restaurants",
         "Arkaden"
       ],
+      "filter_tags": [],
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Stark für spontanes Bummeln, Verweilen und kleine Pausen in der Stadt.",
       "cardFacts": [
         "1–3 Std",
         "Indoor & Outdoor",
@@ -677,8 +679,8 @@
       "kategorie": "Sport & Bewegung",
       "location": "Bocholt & Umgebung",
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
-      "maps_label": "Zum Startpunkt am TextilWerk / an der Aa",
-      "description": "Der Radweg Bocholter Aa ist in dieser Liste die klare Strecken- und Bewegungs-Activity – für längere Runden oder einzelne Abschnitte entlang des Flusses.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der ausgeschilderte Radweg „Bocholter Aa“ führt entlang des Flusses auf ruhigen Wegen.",
       "url": "https://www.bocholt.de/Radweg-Bocholter-Aa",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aasee-Bocholt.jpg",
@@ -689,16 +691,17 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Jacek Halicki, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Radroute",
         "Bocholter Aa",
         "Lauschtour"
+      ],
+      "filter_tags": [
+        "Wasser",
+        "Radfahren"
       ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt & Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Vor allem stark für längere Bewegungsrunden entlang der Aa.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
@@ -711,10 +714,10 @@
       "kategorie": "Sport & Bewegung",
       "location": "Bocholt",
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
-      "maps_label": "Zum Startpunkt am TextilWerk / Kubaai",
-      "description": "Kubaai steht hier für den urbanen Aa-Abschnitt zwischen Innenstadt, TextilWerk und Aasee – mit Brücken, Wegen und direkter Verbindung durch das neue Quartier.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Kubaai und die Aa-Promenade verbinden Innenstadt, TextilWerk und Aasee über Wege und Brücken entlang der Aa.",
       "url": "https://www.bocholt.de/umwelt-und-bauen/stadtentwicklung/bauprojekt-kubaai/pressespiegel-kubaai",
-      "website_label": "Infos zu Kubaai (DE)",
+      "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bocholt%20TextilWerk%20Kubaai%204.jpg",
       "image_position_x": "50%",
       "image_position_y": "52%",
@@ -724,15 +727,17 @@
       "image_credit": "Ingo G. Krasenbrink, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
         "Aa-Promenade",
-        "TextilWerk",
-        "Brücken"
+        "Brücken",
+        "TextilWerk"
+      ],
+      "filter_tags": [
+        "Wasser",
+        "Wandern & Spazieren"
       ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Am stärksten als kurzer aktiver Stadtspaziergang mit Wasserbezug.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -745,8 +750,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Bocholt",
       "maps_query": "Hohenhorster Straße, 46397 Bocholt",
-      "maps_label": "Zum Startpunkt an den Hohenhorster Bergen",
-      "description": "Die Hohenhorster Berge ergänzen Bocholt um ein ruhiges Natur- und Bewegungsziel mit Waldprofil direkt am Aasee- und Stadtwald-Rand.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Die Hohenhorster Berge liegen am Rand von Aasee und Stadtwald und sind über ruhige Wege erreichbar.",
       "url": "https://www.bocholt.de/Aasee-und-Stadtwald",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Yasminhohenhorst4.JPG",
@@ -757,16 +762,16 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Elisa S.aus B., CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Natur",
         "Wald",
         "Nordic Walking"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Sinnvoll für ruhige Bewegung und kleine Naturauszeiten direkt in Bocholt.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -779,8 +784,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Bocholt / Grenzregion",
       "maps_query": "Barlo, Bocholt, Deutschland",
-      "maps_label": "Zum Bocholt-nahen Einstieg in Barlo",
-      "description": "Der Noaberpad folgt ehemaligen Schmugglerwegen entlang der deutsch-niederländischen Grenze und verbindet auf dem Bocholt-nahen Abschnitt Winterswijk, Barlo, Stadtwald, Aasee und Innenstadt.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Noaberpad folgt entlang der deutsch-niederländischen Grenze historischen Schmugglerpfaden.",
       "url": "https://www.bocholt.de/Naoberpad",
       "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Noaberpad%20near%20Gronau%20at%20Dutch-German%20border.jpg",
@@ -791,20 +796,20 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "MartinD, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Wanderroute",
-        "Grenze",
-        "Schmugglerwege"
+        "Schmugglerwege",
+        "Grenze"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "Grenzregion",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für grenznahe Wanderabschnitte mit viel Landschaft und Weggefühl.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
-        "Wanderroute"
+        "Grenzroute"
       ]
     },
     {
@@ -813,8 +818,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Bocholt",
       "maps_query": "Stadtwald Bocholt, 46397 Bocholt",
-      "maps_label": "Zum Stadtwald Bocholt",
-      "description": "Der Stadtwald ist in dieser Liste der klare Familien- und Waldbaustein: mit Teichen, Spazierwegen, Tiergehegen, großem Spielplatz, Steak-Restaurant und Rodelberg.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Stadtwald Bocholt bietet Spazierwege, Tiergehege, Spielplatz, Restaurant und Rodelberg.",
       "url": "https://www.bocholt.de/Aasee-und-Stadtwald",
       "website_label": "Website / Infos (DE)",
       "image": "https://img3.oastatic.com/img2/73101409/600x300r/variant.webp",
@@ -827,15 +832,19 @@
       "tags": [
         "Spielplatz",
         "Tiergehege",
-        "Restaurant",
-        "Rodelberg"
+        "Rodelberg",
+        "Restaurant"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Tiere",
+        "Spielplatz",
+        "Wandern & Spazieren"
       ],
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Sehr stark für Familien, Spaziergänge und spontane Naherholung im Grünen.",
       "cardFacts": [
         "1–3 Std",
         "Outdoor",
@@ -848,8 +857,8 @@
       "kategorie": "Natur & Draußen",
       "location": "Bocholt",
       "maps_query": "Waldlehrpfad am Vossenpand, Bocholt",
-      "maps_label": "Zum Waldlehrpfad am Vossenpand",
-      "description": "Der frei nutzbare Waldlehrpfad am Vossenpand ordnet 20 heimische Baumarten entlang des Wegs an und ergänzt dies um kleinen Teich und Totholz als Lernstationen.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Waldlehrpfad am Vossenpand ist ein beschilderter Rundweg mit Infos zur heimischen Tier- und Pflanzenwelt und zu unterschiedlichen Lebensräumen.",
       "url": "https://www.bocholt.de/waldlehrpfad",
       "website_label": "Website / Infos (DE)",
       "image": "https://www.presse-service.de/data.aspx/medien/276787V.jpg",
@@ -862,15 +871,15 @@
       "tags": [
         "Naturlehrpfad",
         "Baumarten",
-        "Teich",
-        "Totholz"
+        "Teich"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Ruhige, kleine Natur-Activity mit Lerncharakter.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -883,8 +892,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Bocholt-Barlo",
       "maps_query": "Olle Kerkpatt, Bocholt-Barlo",
-      "maps_label": "Zum Erlebnisweg in Bocholt-Barlo",
-      "description": "Der Erlebnisweg Olle Kerkpatt führt Familien in Bocholt-Barlo über Natur, Entdeckungen und Rätsel durch ein abwechslungsreiches Umfeld.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Erlebnisweg Olle Kerkpatt führt Familien mit Rätseln und Naturerlebnissen durch Bocholt-Barlo.",
       "url": "https://www.bocholt.de/Olle-Kerkpatt-Erlebnisweg",
       "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Forest%20path%20and%20trees.jpg",
@@ -897,17 +906,17 @@
       "image_is_symbolic": true,
       "image_note": "Symbolbild",
       "tags": [
-        "Erlebnisweg",
         "Rätsel",
-        "Natur",
-        "Familie"
+        "Natur"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
       ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Frühling bis Herbst",
-      "hint": "Gut für einen familienfreundlichen Weg mit etwas mehr Entdeckercharakter.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -920,10 +929,10 @@
       "kategorie": "Freizeit & Familie",
       "location": "Bocholt-Suderwick",
       "maps_query": "Wiggerstraße, 46399 Bocholt-Suderwick",
-      "maps_label": "Zum Märchenspielplatz an der Wiggerstraße",
-      "description": "Der Märchenspielplatz in Suderwick bietet Holzspielgeräte, Rutsche, Klettermöglichkeiten, Schaukeln und ein Spielehaus als klaren Familienort im Grenzdorf.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Märchenspielplatz in Suderwick bietet Holzspielgeräte, Rutsche, Schaukeln und ein Spielehaus.",
       "url": "https://dinxperwick.info/de/suderwicker-maerchenspielplatz-eroeffnet/",
-      "website_label": "Infos zum Märchenspielplatz",
+      "website_label": "Website / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Indian%20Boundary%20Park%20-%20Wooden%20Playground%201.jpg",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -934,17 +943,19 @@
       "image_is_symbolic": true,
       "image_note": "Symbolbild",
       "tags": [
-        "Spielplatz",
         "Holzspielgeräte",
         "Rutsche",
-        "Schaukeln"
+        "Schaukeln",
+        "Spielehaus"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Spielplatz"
       ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Bocholt",
       "season": "Ganzjährig",
-      "hint": "Klarer lokaler Familienstopp im Grenzraum Suderwick.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -957,8 +968,8 @@
       "kategorie": "Freizeit & Familie",
       "location": "Rhede",
       "maps_query": "Bürgerpark Rhede, 46414 Rhede",
-      "maps_label": "Zum Bürgerpark Rhede",
-      "description": "Der Bürgerpark Rhede ist ein öffentlicher Park mit Wildblumenwiese, Obstbaumwiese und Lehrbienenstand als ruhiger Aufenthalts- und Familienort im nahen Umkreis.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Der Bürgerpark Rhede ist ein öffentlicher Park mit Wildblumenwiese, Obstbaumwiese und Lehrbienenstand.",
       "url": "https://www.rhede.de/portal/seiten/buergerpark-rhede-900000627-28220.html",
       "website_label": "Website / Infos (DE)",
       "image": "https://img.oastatic.com/img2/73101800/600x300r/variant.jpg",
@@ -969,17 +980,18 @@
       "image_license": "CC BY-SA",
       "image_credit": "Dagmar Beckmann, CC BY-SA, Naturpark Hohe Mark e.V. via Outdooractive",
       "tags": [
-        "Park",
         "Wildblumenwiese",
         "Obstbaumwiese",
         "Lehrbienenstand"
       ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
-      "area": "Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gut für einen ruhigen Nahbereich-Ausflug ohne großen Planungsaufwand.",
       "cardFacts": [
         "45–90 Min",
         "Outdoor",
@@ -992,10 +1004,10 @@
       "kategorie": "Freizeit & Familie",
       "location": "Winterswijk",
       "maps_query": "Vrijheidspark, Winterswijk, Niederlande",
-      "maps_label": "Zum Startpunkt im Vrijheidspark",
-      "description": "Die digitale Kinderroute „Das Mysterium von Winterswijk“ startet im Vrijheidspark und führt mit Onno der Eule über Orte und Gebäude durch Winterswijk.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Die digitale Kinderroute „Das Mysterium von Winterswijk“ führt mit Onno der Eule durch Winterswijk.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/wandern/das-mysterium-von-winterswijk",
-      "website_label": "Website / Infos (DE)",
+      "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk%2C_kerktoren_van_de_Jacobskerk_RM39053_vanaf_het_Vrijheidspark_IMG_2598_2022-07-18_17.51.jpg",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -1005,15 +1017,16 @@
       "image_credit": "Michielverbeek, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
         "Kinderroute",
-        "Rätsel",
-        "Stadtroute"
+        "Rätsel"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
       ],
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Gute Familien-Activity für Kinder mit spielerischem Stadterkunden.",
       "cardFacts": [
         "1–2 Std",
         "Outdoor",
@@ -1026,10 +1039,10 @@
       "kategorie": "Kultur",
       "location": "Winterswijk",
       "maps_query": "Mevrouw Kuipers-Rietbergplein, Winterswijk, Niederlande",
-      "maps_label": "Zum Startpunkt im Vrijheidspark",
-      "description": "Die Wanderroute Handwerk in Winterswijk beginnt im Vrijheidspark, führt etwa 3 Kilometer durch den Ort und erzählt an monumentalen Gebäuden die Handwerksgeschichte Winterswijks.",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Die Wanderroute „Handwerk in Winterswijk“ führt durch den Ort und erzählt lokale Handwerksgeschichte.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/wandern/handwerk-in-winterswijk",
-      "website_label": "Website / Infos (DE)",
+      "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk%2C_voormalige_gemeentehuis_%28nu_VVVkantoor%29_GM0294-66_IMG_2585_2022-07-18_17.34.jpg",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -1038,20 +1051,20 @@
       "image_license": "CC BY-SA 4.0",
       "image_credit": "Michielverbeek, CC BY-SA 4.0, via Wikimedia Commons",
       "tags": [
-        "Wanderroute",
         "Handwerk",
         "Monumentale Gebäude"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
       ],
       "duration": "1,5 Std",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Ganzjährig",
-      "hint": "Stadtentdecken mit klarer Handwerks- und Ortsgeschichte.",
       "cardFacts": [
         "1,5 Std",
         "Outdoor",
-        "Handwerk"
+        "Stadtroute"
       ]
     },
     {
@@ -1060,10 +1073,10 @@
       "kategorie": "Sport & Bewegung",
       "location": "Winterswijk",
       "maps_query": "Winterswijk, Niederlande",
-      "maps_label": "Zu den Startpunkten der MTB-Route",
-      "description": "Die kostenlose MTB-Route Winterswijk ist 38 Kilometer lang, überwiegend unbefestigt und bietet 12 Kilometer Singletracks durch den Nationalen Landschaftspark.",
+      "maps_label": "Zu den Startpunkten navigieren",
+      "description": "Die MTB-Route Winterswijk ist rund 38 Kilometer lang und bietet viele Singletracks.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/mountainbiking",
-      "website_label": "Website / Infos (DE)",
+      "website_label": "Route / Infos (DE)",
       "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Forest%20path%20and%20trees.jpg",
       "image_position_x": "50%",
       "image_position_y": "56%",
@@ -1078,16 +1091,17 @@
         "Singletracks",
         "Naturlandschaft"
       ],
+      "filter_tags": [
+        "Radfahren"
+      ],
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
-      "area": "NL-Umgebung",
       "season": "Frühling bis Herbst",
-      "hint": "Spezial-Activity für Bewegung und sportlichere Ausflüge.",
       "cardFacts": [
         "Halber Tag",
         "Outdoor",
-        "MTB"
+        "38 km"
       ]
     }
   ]

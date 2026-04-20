@@ -1,0 +1,12 @@
+# === BEGIN BLOCK: DEPLOY_TEMPLATE_ROBOTS_LIVE_V1 | Zweck: produktive Robots-Regeln fuer Live; erlaubt oeffentliche Suche und OAI-SearchBot, sperrt GPTBot und verweist auf die Live-Sitemap | Umfang: gesamte Datei deploy-templates/robots.live.txt ===
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://bocholt-erleben.de/sitemap.xml
+# === END BLOCK: DEPLOY_TEMPLATE_ROBOTS_LIVE_V1 ===

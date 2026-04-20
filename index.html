@@ -36,21 +36,29 @@ Umfang: Ersetzt nur den bisherigen Manifest-Link-Block im <head> und ergänzt de
 </script>
 <!-- === END BLOCK: PWA ICON + META BASICS (home) === -->
 
-<!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG) ===
-
-Zweck: Optimiert Google-Snippet (Title/Description) + Social/AI Preview (Open Graph).
-Umfang: Ersetzt viewport/description/title und ergänzt OG-Metadaten.
+<!-- === BEGIN BLOCK: HOME_HEAD_SOCIAL_PREVIEW_ENRICHMENT_V1 | Zweck: ergänzt auf der Startseite fehlende Social-/Preview-Metadaten für bessere externe Vorschauen und klareres Seitenverständnis, ohne sichtbaren Seiteninhalt zu verändern | Umfang: ersetzt nur den bestehenden SEO-Snippet-Block im Head === -->
+<!-- === BEGIN BLOCK: SEO SNIPPET (title + meta description + OG/Twitter) ===
+Zweck: Optimiert Google-Snippet (Title/Description) sowie Social-/AI-Preview (Open Graph + Twitter).
+Umfang: ersetzt nur den bestehenden SEO-Snippet-Block.
 === -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bocholt erleben – Events & Termine in Bocholt heute</title>
 <meta name="description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
 
+<meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Bocholt erleben">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bocholt-erleben.de/">
 <meta property="og:title" content="Bocholt erleben – Events & Termine in Bocholt heute">
 <meta property="og:description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
-<!-- === END BLOCK: SEO SNIPPET (title + meta description + OG) === -->
+<meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bocholt erleben – Events & Termine in Bocholt heute">
+<meta name="twitter:description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
+<meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
+<!-- === END BLOCK: SEO SNIPPET (title + meta description + OG/Twitter) === -->
+<!-- === END BLOCK: HOME_HEAD_SOCIAL_PREVIEW_ENRICHMENT_V1 === -->
 
     
         <!-- Custom CSS -->

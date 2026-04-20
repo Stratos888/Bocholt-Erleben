@@ -99,7 +99,7 @@ const OffersApp = {
     this.refs.categoryPopoverOptions = document.getElementById("popover-offer-category-options");
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_VISUAL_FALLBACK_META_V2 | Zweck: erweitert die Activity-Normalisierung um nachhaltige Bild-Fallback-Metadaten (visual_key, Symbolbild-Flag, Bildhinweis), damit Cards + Detailpanel zentral auf denselben Resolver zugreifen können | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_FILTER_TAGS_V3 | Zweck: trennt detailreiche Tags von den neuen kompakten Filter-Tags und entfernt die nicht mehr genutzten area-/hint-Felder sauber aus der Activity-Normalisierung | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
   normalizeOffer(raw) {
     const obj = raw && typeof raw === "object" ? raw : {};
     const id = String(obj.id || "").trim();
@@ -135,6 +135,7 @@ const OffersApp = {
       maps_label: String(obj.maps_label || "").trim(),
       website_label: String(obj.website_label || "").trim(),
       tags: normalizeArray(obj.tags),
+      filter_tags: normalizeArray(obj.filter_tags),
       audience: normalizeArray(obj.audience),
       cardFacts: normalizeArray(obj.cardFacts),
       image: String(obj.image || "").trim(),
@@ -151,12 +152,10 @@ const OffersApp = {
       duration: String(obj.duration || "").trim(),
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
-      area: String(obj.area || "").trim(),
-      season: String(obj.season || "").trim(),
-      hint: String(obj.hint || "").trim()
+      season: String(obj.season || "").trim()
     };
   },
-  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_VISUAL_FALLBACK_META_V2 === */
+  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_FILTER_TAGS_V3 === */
 
   bindControls() {
     const {
@@ -300,7 +299,7 @@ const OffersApp = {
     return String(rawValue || "").trim();
   },
 
-  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_PARITY_V2 | Zweck: konsolidiert die Activities-Facetlogik, priorisiert Merkmal/Kategorie nach Trefferstärke und hält Counts/Disabled-State ohne doppelte Owner-Blöcke stabil; Umfang: ersetzt die komplette Facet-Rendering- und Apply-Logik von populateButtons() bis direkt vor showLoading(show) === */
+  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_WITH_FILTER_TAGS_V3 | Zweck: stellt die Activities-Merkmalsfilter auf kontrollierte filter_tags um, entfernt area-/hint-Abhängigkeiten aus Suche und Facet-Logik und hält Counts/Disabled-State stabil | Umfang: ersetzt die komplette Facet-Rendering- und Apply-Logik von populateButtons() bis direkt vor showLoading(show) in js/offers-main.js === */
   populateButtons(targets, attrName, entries) {
     const markup = [
       `<button type="button" class="filter-sheet-option is-active" ${attrName}="" data-label="Alle">Alle</button>`,
@@ -316,7 +315,7 @@ const OffersApp = {
 
   populateSituationOptions() {
     const situations = Array.from(
-      new Set(this.offers.flatMap((offer) => offer.tags || []).filter(Boolean))
+      new Set(this.offers.flatMap((offer) => offer.filter_tags || []).filter(Boolean))
     )
       .sort((a, b) => a.localeCompare(b, "de"))
       .map((value) => ({ value, label: value }));
@@ -440,13 +439,13 @@ const OffersApp = {
     });
 
     const baseForCategories = this.offers.filter((offer) => {
-      if (activeSituation && !(offer.tags || []).includes(activeSituation)) return false;
+      if (activeSituation && !(offer.filter_tags || []).includes(activeSituation)) return false;
       return matchesSearch(offer);
     });
 
     const situationCounts = { all: baseForSituations.length };
     baseForSituations.forEach((offer) => {
-      Array.from(new Set(offer.tags || [])).forEach((tag) => {
+      Array.from(new Set(offer.filter_tags || [])).forEach((tag) => {
         situationCounts[tag] = (situationCounts[tag] || 0) + 1;
       });
     });
@@ -733,12 +732,11 @@ const OffersApp = {
       offer.location,
       offer.description,
       offer.kategorie,
-      offer.area,
       offer.duration,
       offer.mode,
       offer.price,
-      offer.hint,
       ...(offer.tags || []),
+      ...(offer.filter_tags || []),
       ...(offer.audience || [])
     ]
       .filter(Boolean)
@@ -753,7 +751,7 @@ const OffersApp = {
     const category = this.activeCategory;
 
     this.filteredOffers = this.offers.filter((offer) => {
-      if (situation && !(offer.tags || []).includes(situation)) return false;
+      if (situation && !(offer.filter_tags || []).includes(situation)) return false;
       if (category && offer.kategorie !== category) return false;
       if (!this.matchesSearch(offer)) return false;
       return true;
@@ -773,7 +771,7 @@ const OffersApp = {
     this.showLoading(false);
     window.OfferCards.render(this.filteredOffers);
   },
-  /* === END BLOCK: OFFERS_FACET_COUNTS_PARITY_V2 === */
+  /* === END BLOCK: OFFERS_FACET_COUNTS_WITH_FILTER_TAGS_V3 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {

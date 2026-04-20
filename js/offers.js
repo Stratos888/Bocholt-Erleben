@@ -303,13 +303,30 @@ function getCategoryPresentation(category) {
   };
 }
 
-  /* === BEGIN BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 | Zweck: priorisiert auf Activity-Cards die nützlichsten Ortsmerkmale vor generischen Tags und hält Mobile/Desktop bei derselben Discovery-Logik; Umfang: ersetzt nur die Helper von buildMetaLine() bis renderSupportingLine() === */
-  function buildMetaLine(offer) {
-    return [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
+  /* === BEGIN BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V3 | Zweck: bereinigt Activity-Tags systemisch um redundante Titel-/Kategorie-Wiederholungen und macht saisonale Einschränkungen optional für die Detail-Meta nutzbar | Umfang: ersetzt nur die Helper von buildMetaLine() bis buildFactItems() in js/offers.js === */
+  function buildMetaLine(offer, options = {}) {
+    const includeSeasonalRestriction = !!options.includeSeasonalRestriction;
+    const metaParts = [offer?.duration, offer?.mode, offer?.price]
+      .map((entry) => toSingleLine(entry))
+      .filter(Boolean);
+
+    const season = toSingleLine(offer?.season);
+    if (includeSeasonalRestriction && season && season !== "Ganzjährig") {
+      metaParts.push(season);
+    }
+
+    return metaParts.join(" · ");
   }
 
   function toSingleLine(value) {
     return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function normalizeComparable(value) {
+    return toSingleLine(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
   }
 
   function getTagPriority(tag) {
@@ -319,7 +336,6 @@ function getCategoryPresentation(category) {
       "Badebucht": 12,
       "Badesee": 14,
       "Strand": 16,
-      "Spaziergang": 18,
       "Snacks & Getränke": 20,
       "Café": 21,
       "Restaurant": 22,
@@ -333,26 +349,53 @@ function getCategoryPresentation(category) {
       "Geschichte": 38,
       "Naturpfad": 40,
       "Rundweg": 42,
-      "Park": 44,
-      "Natur": 46
+      "Bohlenweg": 44,
+      "Wildblumenwiese": 46,
+      "Werkstätten": 48,
+      "Führungen": 50,
+      "Lehrbienenstand": 52,
+      "Schmugglerwege": 54,
+      "Lauschtour": 56,
+      "Brücken": 58
     };
 
     return priorityMap[value] ?? 500;
   }
 
-  function getRankedTagItems(offer, limit = Infinity) {
+  function getMeaningfulTagItems(offer) {
     const tags = Array.isArray(offer?.tags)
       ? offer.tags.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
 
     const uniqueTags = Array.from(new Set(tags));
-    uniqueTags.sort((a, b) => {
+    const titleNeedle = normalizeComparable(offer?.title);
+    const categoryNeedle = normalizeComparable(offer?.kategorie);
+    const genericFormatTags = new Set(["spaziergang", "wanderroute", "radroute", "erlebnisweg"]);
+
+    const filteredTags = uniqueTags.filter((tag) => {
+      const tagNeedle = normalizeComparable(tag);
+      if (!tagNeedle) return false;
+
+      if (uniqueTags.length <= 1) return true;
+      if (genericFormatTags.has(tagNeedle)) return false;
+      if (titleNeedle.includes(tagNeedle)) return false;
+      if (categoryNeedle.includes(tagNeedle)) return false;
+
+      return true;
+    });
+
+    return filteredTags.length ? filteredTags : uniqueTags;
+  }
+
+  function getRankedTagItems(offer, limit = Infinity) {
+    const meaningfulTags = getMeaningfulTagItems(offer);
+    meaningfulTags.sort((a, b) => {
       const delta = getTagPriority(a) - getTagPriority(b);
       if (delta !== 0) return delta;
       return a.localeCompare(b, "de");
     });
 
-    return uniqueTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : uniqueTags.length));
+    return meaningfulTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : meaningfulTags.length));
   }
 
   function pickSupportingLabel(offer) {
@@ -360,10 +403,7 @@ function getCategoryPresentation(category) {
     if (primaryTags.length) return primaryTags.join(" · ");
 
     const season = toSingleLine(offer?.season);
-    if (season) return season;
-
-    const hint = toSingleLine(offer?.hint);
-    if (hint) return hint;
+    if (season && season !== "Ganzjährig") return season;
 
     return "";
   }
@@ -387,6 +427,7 @@ function getCategoryPresentation(category) {
       .filter(Boolean)
       .slice(0, 3);
   }
+  /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V3 === */
 
   return {
     escapeHtml,
@@ -444,7 +485,7 @@ const OfferCards = (() => {
     return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
   }
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
-  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 | Zweck: nutzt für Activity-Cards die zentrale Bildauflösung inkl. generischer Commons-Symbolbilder, ohne Card-Layout oder Ladeprioritäten zu fragmentieren | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
+  /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 | Zweck: behaelt die bestehende Bildlade-Logik der Activity-Cards bei und ergänzt belastbare Alt-Texte fuer Suchmaschinen und Barrierefreiheit, ohne Kartenlayout oder Ladeprioritäten zu verändern | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
 
   function ensureImageOriginHints(imageUrl) {
@@ -489,6 +530,24 @@ const OfferCards = (() => {
     };
   }
 
+  function buildActivityImageAltText(offer, imageData) {
+    const title = String(offer?.title || "").trim();
+    const location = String(offer?.location || "").trim();
+    const note = String(imageData?.note || "").trim();
+
+    if (imageData?.isSymbolic) {
+      if (title && location) return `Symbolbild für ${title} – ${location}`;
+      if (title) return `Symbolbild für ${title}`;
+      return "Symbolbild für Aktivität in Bocholt und Umgebung";
+    }
+
+    if (title && location) return `${title} – ${location}`;
+    if (title) return title;
+    if (location) return `Aktivität in ${location}`;
+    if (note) return note;
+    return "Aktivität in Bocholt und Umgebung";
+  }
+
   function renderMedia(offer, visual, index) {
     const imageData = OfferVisuals.resolveImageData(offer);
     const imageUrl = imageData.url;
@@ -504,13 +563,14 @@ const OfferCards = (() => {
       const symbolicLabel = imageData.isSymbolic
         ? OfferVisuals.escapeHtml(String(imageData.note || "").trim() || "Symbolbild")
         : "";
+      const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
 
       return `
-        <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}" aria-hidden="true">
+        <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}">
 <img
   class="activity-card-media__image"
   src="${OfferVisuals.escapeHtml(imageUrl)}"
-  alt=""
+  alt="${imageAlt}"
   loading="${loading}"
   fetchpriority="${fetchPriority}"
   decoding="async"
@@ -532,7 +592,7 @@ const OfferCards = (() => {
       </div>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V2 === */
+  /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 === */
 
   function openPrimaryDesktopTarget(url) {
     if (!url) return false;
