@@ -300,53 +300,34 @@ const OfferDetailPanel = {
     `.trim();
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_STREAMLINED_V7 | Zweck: entfernt Region und Gut-zu-wissen vollständig aus dem Activity-Detailpanel und belässt dort nur noch konkrete Detail-Tags plus Saison als kurze strukturierte Info | Umfang: ersetzt nur renderFacts(offer) in js/offers-details.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_FACTS_TAGS_ONLY_V8 | Zweck: entfernt den künstlichen Kurzinfo-Block vollständig und zeigt im Activity-Detailpanel nur noch die semantisch bereinigten Detail-Merkmale | Umfang: ersetzt nur renderFacts(offer) in js/offers-details.js === */
   renderFacts(offer) {
     const primaryTags = window.OfferVisuals?.getRankedTagItems
-      ? window.OfferVisuals.getRankedTagItems(offer)
-      : (Array.isArray(offer?.tags) ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean) : []);
+      ? window.OfferVisuals.getRankedTagItems(offer, 4)
+      : Array.from(
+          new Set(
+            Array.isArray(offer?.tags)
+              ? offer.tags.map((entry) => String(entry || "").trim()).filter(Boolean)
+              : []
+          )
+        ).slice(0, 4);
 
-    const metaItems = [
-      ["Saison", offer.season]
-    ]
-      .map(([label, value]) => {
-        const text = String(value || "").trim();
-        if (!text) return null;
-        return { label, value: text };
-      })
-      .filter(Boolean);
-
-    if (!primaryTags.length && !metaItems.length) return "";
+    if (!primaryTags.length) return "";
 
     return `
       <div class="activity-detail__facts">
-        ${primaryTags.length ? `
-          <section class="activity-detail__fact-section activity-detail__fact-section--tags">
-            <div class="activity-detail__fact-label">Merkmale</div>
-            <div class="activity-detail__tag-list" aria-label="Merkmale vor Ort">
-              ${primaryTags.map((tag) => `<span class="activity-detail__tag">${this.escapeHtml(tag)}</span>`).join("")}
-            </div>
-          </section>
-        ` : ""}
-        ${metaItems.length ? `
-          <section class="activity-detail__fact-section activity-detail__fact-section--meta">
-            <div class="activity-detail__fact-label">Kurzinfo</div>
-            <div class="activity-detail__meta-list">
-              ${metaItems.map((item) => `
-                <div class="activity-detail__meta-chip">
-                  <span class="activity-detail__meta-key">${this.escapeHtml(item.label)}</span>
-                  <span class="activity-detail__meta-value">${this.escapeHtml(item.value)}</span>
-                </div>
-              `).join("")}
-            </div>
-          </section>
-        ` : ""}
+        <section class="activity-detail__fact-section activity-detail__fact-section--tags">
+          <div class="activity-detail__fact-label">Merkmale</div>
+          <div class="activity-detail__tag-list" aria-label="Merkmale vor Ort">
+            ${primaryTags.map((tag) => `<span class="activity-detail__tag">${this.escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </section>
       </div>
     `.trim();
   },
-  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_STREAMLINED_V7 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_TAGS_ONLY_V8 === */
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 | Zweck: verschiebt den Bildnachweis im Activity-Detailpanel in einen ruhigen Footer-Slot nach Kerninhalt, CTAs und Feedback; Umfang: ersetzt nur renderContent(offer) === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 | Zweck: verschiebt saisonale Einschränkungen aus dem alten Kurzinfo-Block in die obere Meta-Zeile und lässt Ganzjährig dort bewusst weg | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
@@ -354,9 +335,16 @@ const OfferDetailPanel = {
       : String(offer.url || "").trim();
     const mapsLabel = String(offer?.maps_label || "Zum Startpunkt navigieren").trim();
     const websiteLabel = String(offer?.website_label || "Website / Infos").trim();
+
+    const season = String(offer?.season || "").trim();
+    const fallbackMetaParts = [offer?.duration, offer?.mode, offer?.price].filter(Boolean);
+    if (season && season !== "Ganzjährig") {
+      fallbackMetaParts.push(season);
+    }
+
     const metaLine = window.OfferVisuals?.buildMetaLine
-      ? window.OfferVisuals.buildMetaLine(offer)
-      : [offer?.duration, offer?.mode, offer?.price].filter(Boolean).join(" · ");
+      ? window.OfferVisuals.buildMetaLine(offer, { includeSeasonalRestriction: true })
+      : fallbackMetaParts.join(" · ");
     const description = String(offer?.description || "").trim();
 
     const mapsIcon = window.Icons?.svg
@@ -397,7 +385,7 @@ const OfferDetailPanel = {
       </article>
     `.trim();
   }
-  /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_FOOTER_ATTRIBUTION_V1 === */
+  /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 === */
 /* === BEGIN BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 | Zweck: registriert das Activity-Detailpanel wieder global, damit Card-Klicks auf Mobile das Panel öffnen statt in den URL-Fallback zu laufen; Umfang: ersetzt nur das Dateiende von js/offers-details.js === */
 };
 
