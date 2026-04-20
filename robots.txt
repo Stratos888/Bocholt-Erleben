@@ -7,4 +7,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://bocholt-erleben.de/sitemap.xml
 # === END BLOCK: ROBOTS_BASELINE_V1 ===
