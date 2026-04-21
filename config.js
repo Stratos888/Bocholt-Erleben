@@ -29,7 +29,7 @@ const CONFIG = {
     showFilters: true
   },
 
-  /* === BEGIN BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 | Zweck: zentraler Runtime-Contract für das globale Feedback-System mit Formspree Free; Umfang: nur öffentliche Client-Konfiguration, keine Secrets === */
+  /* === BEGIN BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V1 | Zweck: hält die öffentliche Runtime-Konfiguration für Feedback und Veranstalter-Funnel zentral in config.js, damit Seiten und Skripte nur noch konsumieren und keine Stripe-/Mailto-Runtime lokal doppeln; Umfang: ersetzt den bisherigen Feedback-Block plus den direkten Debug-Eintrag innerhalb von CONFIG === */
   feedback: {
     formspreeEndpoint: "https://formspree.io/f/mrerpwjy",
     fallbackEmail: "",
@@ -38,10 +38,23 @@ const CONFIG = {
     sourceLabel: "bocholt-erleben-web",
     privacyUrl: "/datenschutz/"
   },
-  /* === END BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 === */
+
+  publishFunnel: {
+    automationEmail: "mathias@bocholt-erleben.de",
+    storageKey: "be_publish_checkout_context_v1",
+    successUrl: "/events-veroeffentlichen/erfolg/",
+    cancelUrl: "/events-veroeffentlichen/abgebrochen/",
+    paymentLinks: {
+      single: "",
+      starter: "",
+      active: "",
+      unlimited: ""
+    }
+  },
 
   // Debug Mode (nur lokal aktiv)
   debug: IS_LOCAL
+  /* === END BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V1 === */
 };
 
 // Helper: Log nur wenn debug = true
