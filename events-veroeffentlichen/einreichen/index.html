@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V1 | Zweck: definiert den Head für die dedizierte Standardweg-Route /events-veroeffentlichen/einreichen/ als saubere Intake-Seite vor Stripe; Umfang: kompletter Head dieser Datei === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Event einreichen | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen."
+  >
+
+  <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#F3F2E6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bocholt erleben">
+  <meta property="og:title" content="Event einreichen | Bocholt erleben">
+  <meta property="og:description" content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen.">
+  <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
+  <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Event einreichen | Bocholt erleben">
+  <meta name="twitter:description" content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen.">
+  <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Event einreichen",
+    "description": "Standardweg für Veranstalter bei Bocholt erleben mit Intake vor Stripe-Zahlung.",
+    "url": "https://bocholt-erleben.de/events-veroeffentlichen/einreichen/",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Bocholt erleben",
+      "url": "https://bocholt-erleben.de/"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V1 === -->
+</head>
+
+<body>
+  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 | Zweck: rendert die dedizierte Standardweg-Route mit Link-first-Intake und Stripe-Vorbereitung, getrennt von Landing und Profi-Pfad; Umfang: kompletter Body dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--publish">
+    <header class="content-hero content-hero--panel">
+      <div class="publish-hero-layout">
+        <div class="publish-hero-copy">
+          <p class="content-kicker">Standardweg für Veranstalter</p>
+          <h1>Event einreichen</h1>
+          <p class="content-lead">
+            Das ist der normale Weg für einzelne Termine und laufende Mitgliedschaften: erst Event-Link oder Fallback-Angaben erfassen,
+            danach mit dem passenden Modell zur Zahlung weitergehen.
+          </p>
+
+          <div class="content-actions content-actions--inline publish-hero-cta">
+            <a class="content-cta" href="/events-veroeffentlichen/">
+              Zur Übersicht
+            </a>
+            <a class="content-cta" href="/events-veroeffentlichen/anbindung/">
+              Automatische Anbindung
+            </a>
+          </div>
+
+          <p class="content-note publish-hero-meta">
+            Link-first bleibt der Standard: Im Idealfall genügt ein sauberer Event-Link. Nur wenn dort Informationen fehlen, brauchen wir Fallback-Angaben.
+          </p>
+
+          <p class="content-note publish-hero-trust">
+            Zahlung und Veröffentlichung sind bewusst getrennt: Der Kauf bestätigt dein Modell, die Veröffentlichung erfolgt erst nach inhaltlicher Prüfung.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section class="content-card publish-benefits-card" aria-labelledby="publish-standard-way">
+      <div class="publish-section-head">
+        <h2 id="publish-standard-way">So funktioniert der Standardweg</h2>
+      </div>
+
+      <div class="publish-steps-flow">
+        <section class="publish-step" aria-labelledby="publish-step-1">
+          <h3 id="publish-step-1">1. Angaben erfassen</h3>
+          <p>Wir erfassen zuerst Veranstalter, E-Mail und Event-Link beziehungsweise die nötigen Fallback-Angaben.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-step-2">
+          <h3 id="publish-step-2">2. Passendes Modell wählen</h3>
+          <p>Danach geht es mit Einzeltermin, Starter, Aktiv oder Unbegrenzt in den passenden Stripe-Checkout.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-step-3">
+          <h3 id="publish-step-3">3. Inhaltliche Prüfung</h3>
+          <p>Nach der Zahlung prüfen wir Plausibilität, Vollständigkeit und Verständlichkeit vor der Veröffentlichung.</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="content-card publish-membership-card" aria-labelledby="publish-prices">
+      <div class="publish-section-head">
+        <h2 id="publish-prices">Preise</h2>
+        <p class="content-note publish-membership-intro">Einmalig für einzelne Termine oder monatlich für laufende Veröffentlichungen.</p>
+      </div>
+
+      <div class="publish-membership-layout">
+        <section class="publish-membership-block" aria-label="Preise für Veranstalter">
+          <ul class="publish-plans" aria-label="Preise für Veranstalter">
+            <li>
+              <strong>Einzeltermin veröffentlichen</strong>
+              <span>9,90&nbsp;€ einmalig</span>
+              <small>Für einzelne Termine ohne laufende Mitgliedschaft.</small>
+            </li>
+            <li>
+              <strong>Starter</strong>
+              <span>9,99&nbsp;€ / Monat · bis zu 3 veröffentlichte Termine pro Monat</span>
+              <small>Für kleine Veranstalter mit wenigen neuen Veröffentlichungen.</small>
+            </li>
+            <li>
+              <strong>Aktiv</strong>
+              <span>19,99&nbsp;€ / Monat · bis zu 8 veröffentlichte Termine pro Monat</span>
+              <small>Für regelmäßige Veranstalter mit laufendem Programm.</small>
+            </li>
+            <li>
+              <strong>Unbegrenzt</strong>
+              <span>29,99&nbsp;€ / Monat · unbegrenzt veröffentlichte Termine pro Monat</span>
+              <small>Für Veranstalter, Häuser und Locations mit vielen laufenden Terminen.</small>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </section>
+
+    <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
+      <div class="publish-section-head">
+        <h2 id="publish-submit-title">Event-Daten erfassen</h2>
+        <p class="content-note">Standardweg: erst Angaben erfassen, dann mit dem passenden Modell zu Stripe weitergehen.</p>
+      </div>
+
+      <form class="content-form" id="publish-standard-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field" for="publish-standard-plan">
+            <span class="content-field__label">Gewünschtes Modell *</span>
+            <select class="content-field__control" id="publish-standard-plan" name="plan" required>
+              <option value="">Bitte wählen</option>
+              <option value="single">Einzeltermin veröffentlichen · 9,90 € einmalig</option>
+              <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
+              <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
+              <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt veröffentlichte Termine pro Monat</option>
+            </select>
+          </label>
+
+          <label class="content-field" for="publish-standard-organization">
+            <span class="content-field__label">Veranstalter / Organisation *</span>
+            <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
+
+          <label class="content-field" for="publish-standard-contact">
+            <span class="content-field__label">Ansprechpartner</span>
+            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
+          </label>
+
+          <label class="content-field" for="publish-standard-email">
+            <span class="content-field__label">E-Mail für Stripe und Rückfragen *</span>
+            <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-event-link">
+            <span class="content-field__label">Event-Link oder Kalender-Link</span>
+            <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
+          </label>
+        </div>
+
+        <div class="content-form-section-head">
+          <h3>Fallback nur wenn nötig</h3>
+          <p class="content-note">Wenn kein sauberer Link vorhanden ist oder dort wichtige Informationen fehlen, ergänze bitte die wichtigsten Angaben direkt hier.</p>
+        </div>
+
+        <div class="content-form-grid">
+          <label class="content-field" for="publish-standard-title">
+            <span class="content-field__label">Titel</span>
+            <input class="content-field__control" id="publish-standard-title" name="title" type="text">
+          </label>
+
+          <label class="content-field" for="publish-standard-date">
+            <span class="content-field__label">Datum</span>
+            <input class="content-field__control" id="publish-standard-date" name="date" type="date">
+          </label>
+
+          <label class="content-field" for="publish-standard-time">
+            <span class="content-field__label">Uhrzeit</span>
+            <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
+          </label>
+
+          <label class="content-field" for="publish-standard-place">
+            <span class="content-field__label">Ort</span>
+            <input class="content-field__control" id="publish-standard-place" name="place" type="text">
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-website">
+            <span class="content-field__label">Website- oder Ticketlink</span>
+            <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-description">
+            <span class="content-field__label">Kurzbeschreibung</span>
+            <textarea class="content-field__control" id="publish-standard-description" name="description" rows="4"></textarea>
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-notes">
+            <span class="content-field__label">Weitere Hinweise</span>
+            <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="3"></textarea>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline publish-final-actions">
+          <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
+            Weiter zur Zahlung
+          </button>
+        </div>
+
+        <p class="content-form-note">
+          Beim Klick wird deine E-Mail an Stripe vorbefüllt. Falls kein Event-Link vorhanden ist, brauchen wir für den Standardweg mindestens Titel, Datum und Ort.
+        </p>
+      </form>
+    </section>
+
+    <nav class="content-links" aria-label="Weitere Veranstalter-Navigation">
+      <a class="content-link" href="/events-veroeffentlichen/">
+        <span class="content-link__label">Zur Übersicht für Veranstalter</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+      <a class="content-link" href="/events-veroeffentlichen/anbindung/">
+        <span class="content-link__label">Zur automatischen Anbindung</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
+  </main>
+
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/publish-funnel.js?v=2026-04-21-1" defer></script>
+  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 === -->
+</body>
+</html>
