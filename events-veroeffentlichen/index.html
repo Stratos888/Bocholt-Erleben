@@ -100,17 +100,16 @@
             Veranstalter mit eigener Datenquelle gibt es zusätzlich die automatische Anbindung als Profi-Pfad.
           </p>
 
-          <div class="content-actions content-actions--inline publish-hero-cta">
-            <a
-              class="content-cta content-cta--primary"
-              href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Event%20einreichen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20ein%20Event%20bei%20Bocholt%20erleben%20einreichen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AAnsprechpartner%3A%0AGew%C3%BCnschtes%20Modell%3A%0A-%20Einzeltermin%20ver%C3%B6ffentlichen%20%289%2C90%20%E2%82%AC%29%0A-%20Starter%20%289%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Aktiv%20%2819%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Unbegrenzt%20%2829%2C99%20%E2%82%AC%20/%20Monat%29%0A%0ALink%20zum%20Event%20oder%20Kalender%3A%0A%0AFallback%2C%20falls%20kein%20passender%20Link%20vorhanden%20ist%3A%0ATitel%3A%0ADatum%3A%0AUhrzeit%3A%0AOrt%3A%0AKurzbeschreibung%3A%0AWebsite%20oder%20Ticketlink%3A%0A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-            >
-              Event einreichen
-            </a>
-            <a class="content-cta" href="#publish-automation">
-              Automatische Anbindung
-            </a>
-          </div>
+<!-- === BEGIN BLOCK: PUBLISH_HERO_CTA_CONSUMER_V1 | Zweck: richtet die Hero-CTAs auf die neuen Funnel-Pfade aus, damit der Standardweg nicht mehr per Mailto am Intake vorbei läuft; Umfang: nur CTA-Gruppe im Hero von /events-veroeffentlichen/ === -->
+<div class="content-actions content-actions--inline publish-hero-cta">
+  <a class="content-cta content-cta--primary" href="#publish-submit">
+    Event einreichen
+  </a>
+  <a class="content-cta" href="#publish-automation">
+    Automatische Anbindung
+  </a>
+</div>
+<!-- === END BLOCK: PUBLISH_HERO_CTA_CONSUMER_V1 === -->
 
           <p class="content-note publish-hero-meta">
             Standardweg: Link-first mit manueller Fallback-Eingabe. Profi-Pfad: API, Feed, CSV oder iCal nur nach individueller Prüfung.
@@ -387,187 +386,11 @@
     <!-- === END BLOCK: PUBLISH_AUTOMATION_FORM_CONSUMER_V2 === -->
   </main>
   <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS === -->
-  <!-- === BEGIN BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V3_STRIPE_INTAKE | Zweck: ergänzt /events-veroeffentlichen/ um clientseitige Intake-Validierung, Stripe-Weiterleitung für den Standardweg und Mailto-Vorbereitung für den Profi-Pfad; Umfang: Runtime plus globale Script-Includes direkt vor </body> === -->
-  <script>
-    (() => {
-      const STRIPE_PAYMENT_LINKS = Object.freeze({
-        single: "",
-        starter: "",
-        active: "",
-        unlimited: ""
-      });
-
-      const STORAGE_KEY = "be_publish_checkout_context_v1";
-
-      const byId = (id) => document.getElementById(id);
-      const getValue = (id) => String(byId(id)?.value || "").trim();
-      const hasValue = (value) => String(value || "").trim().length > 0;
-
-      const slugify = (value) =>
-        String(value || "")
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "_")
-          .replace(/^_+|_+$/g, "")
-          .slice(0, 40);
-
-      const getStandardPlanLink = (plan) => {
-        switch (plan) {
-          case "single":
-            return STRIPE_PAYMENT_LINKS.single;
-          case "starter":
-            return STRIPE_PAYMENT_LINKS.starter;
-          case "active":
-            return STRIPE_PAYMENT_LINKS.active;
-          case "unlimited":
-            return STRIPE_PAYMENT_LINKS.unlimited;
-          default:
-            return "";
-        }
-      };
-
-      const buildClientReferenceId = (plan, organization) =>
-        `be_publish_${plan}_${Date.now().toString(36)}_${slugify(organization)}`.slice(0, 120);
-
-      const buildMailto = (subject, body) =>
-        `mailto:mathias@bocholt-erleben.de?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-      const joinLines = (lines) => lines.filter((line) => hasValue(line)).join("\n");
-      const lineIf = (label, value) => (hasValue(value) ? `${label}: ${value}` : "");
-
-      const bindStandardPath = () => {
-        const form = byId("publish-standard-form");
-        const trigger = byId("publish-standard-pay");
-
-        if (!form || !trigger) return;
-
-        trigger.addEventListener("click", (event) => {
-          event.preventDefault();
-
-          if (!form.reportValidity()) return;
-
-          const plan = getValue("publish-standard-plan");
-          const organization = getValue("publish-standard-organization");
-          const contact = getValue("publish-standard-contact");
-          const email = getValue("publish-standard-email");
-          const eventLink = getValue("publish-standard-event-link");
-          const title = getValue("publish-standard-title");
-          const date = getValue("publish-standard-date");
-          const time = getValue("publish-standard-time");
-          const place = getValue("publish-standard-place");
-          const website = getValue("publish-standard-website");
-          const description = getValue("publish-standard-description");
-          const notes = getValue("publish-standard-notes");
-
-          if (!hasValue(plan)) {
-            window.alert("Bitte wähle zuerst ein Modell aus.");
-            return;
-          }
-
-          if (!hasValue(eventLink) && !(hasValue(title) && hasValue(date) && hasValue(place))) {
-            window.alert("Bitte hinterlege mindestens einen Event-Link oder ergänze im Fallback Titel, Datum und Ort.");
-            return;
-          }
-
-          const paymentLink = getStandardPlanLink(plan);
-
-          if (!hasValue(paymentLink)) {
-            window.alert("Für dieses Modell ist noch kein Stripe-Zahlungslink hinterlegt. Bitte trage die vier echten Stripe-Links zuerst im Runtime-Block dieser Datei ein.");
-            return;
-          }
-
-          const leadId = buildClientReferenceId(plan, organization);
-          const checkoutContext = {
-            leadId,
-            plan,
-            organization,
-            contact,
-            email,
-            eventLink,
-            title,
-            date,
-            time,
-            place,
-            website,
-            description,
-            notes,
-            savedAt: new Date().toISOString()
-          };
-
-          try {
-            window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(checkoutContext));
-          } catch (error) {
-            console.warn("Checkout-Kontext konnte nicht in sessionStorage gespeichert werden.", error);
-          }
-
-          const url = new URL(paymentLink);
-          url.searchParams.set("locked_prefilled_email", email);
-          url.searchParams.set("client_reference_id", leadId);
-
-          window.location.href = url.toString();
-        });
-      };
-
-      const bindAutomationPath = () => {
-        const form = byId("publish-automation-form");
-        const trigger = byId("publish-automation-submit");
-
-        if (!form || !trigger) return;
-
-        trigger.addEventListener("click", (event) => {
-          event.preventDefault();
-
-          if (!form.reportValidity()) return;
-
-          const organization = getValue("publish-automation-organization");
-          const website = getValue("publish-automation-website");
-          const contact = getValue("publish-automation-contact");
-          const email = getValue("publish-automation-email");
-          const techContact = getValue("publish-automation-tech-contact");
-          const monthlyVolume = getValue("publish-automation-volume");
-          const sourceType = getValue("publish-automation-source-type");
-          const sourceLink = getValue("publish-automation-source-link");
-          const cadence = getValue("publish-automation-cadence");
-          const notes = getValue("publish-automation-notes");
-
-          if (!hasValue(sourceLink) && !hasValue(website)) {
-            window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
-            return;
-          }
-
-          const body = joinLines([
-            "Hallo Mathias,",
-            "",
-            "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
-            "",
-            lineIf("Organisation / Veranstalter", organization),
-            lineIf("Website", website),
-            lineIf("Ansprechpartner", contact),
-            lineIf("E-Mail", email),
-            lineIf("Technischer Ansprechpartner", techContact),
-            lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", monthlyVolume),
-            lineIf("Vorhandene Quelle", sourceType),
-            lineIf("Link zur Quelle oder zu Beispielterminen", sourceLink),
-            lineIf("Aktualisierungsrhythmus", cadence),
-            "",
-            lineIf("Weitere Hinweise (optional)", notes),
-            "",
-            "Viele Grüße"
-          ]);
-
-          window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
-        });
-      };
-
-      bindStandardPath();
-      bindAutomationPath();
-    })();
-  </script>
+  <!-- === BEGIN BLOCK: PUBLISH_PAGE_RUNTIME_OWNER_CHAIN_V1 | Zweck: entfernt die seitenlokale Inline-Funnel-Logik und bindet stattdessen die zentrale Owner-Kette aus config.js und js/publish-funnel.js ein; Umfang: kompletter Runtime-Block direkt vor </body> === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V3_STRIPE_INTAKE === -->
-  <!-- === END BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V1 === -->
+  <script src="/js/publish-funnel.js?v=2026-04-21-1" defer></script>
+  <!-- === END BLOCK: PUBLISH_PAGE_RUNTIME_OWNER_CHAIN_V1 === -->
 </body>
 </html>
