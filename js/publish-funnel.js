@@ -1,0 +1,234 @@
+/* === BEGIN FILE: js/publish-funnel.js | Zweck: zentraler JS-Owner für den Veranstalter-Funnel mit Stripe-Weiterleitung im Standardweg und Mailto-Vorbereitung im Profi-Pfad; Umfang: komplette neue Datei === */
+(() => {
+  "use strict";
+
+  const runtimeConfig =
+    (typeof CONFIG !== "undefined" && CONFIG && CONFIG.publishFunnel)
+      ? CONFIG.publishFunnel
+      : ((window.CONFIG && window.CONFIG.publishFunnel) ? window.CONFIG.publishFunnel : (window.BE_PUBLISH_FUNNEL_CONFIG || {}));
+
+  const cfg = {
+    automationEmail: "mathias@bocholt-erleben.de",
+    storageKey: "be_publish_checkout_context_v1",
+    paymentLinks: {
+      single: "",
+      starter: "",
+      active: "",
+      unlimited: ""
+    },
+    ...runtimeConfig,
+    paymentLinks: {
+      single: "",
+      starter: "",
+      active: "",
+      unlimited: "",
+      ...(runtimeConfig && runtimeConfig.paymentLinks ? runtimeConfig.paymentLinks : {})
+    }
+  };
+
+  const byId = (id) => document.getElementById(id);
+  const safeText = (value) => String(value ?? "").trim();
+  const hasValue = (value) => safeText(value).length > 0;
+
+  function isPublishRoute() {
+    const path = window.location.pathname || "/";
+    return path.startsWith("/events-veroeffentlichen/");
+  }
+
+  function slugify(value) {
+    return safeText(value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 40);
+  }
+
+  function lineIf(label, value) {
+    return hasValue(value) ? `${label}: ${safeText(value)}` : "";
+  }
+
+  function joinLines(lines) {
+    return lines.filter((line) => hasValue(line)).join("\n");
+  }
+
+  function buildMailto(subject, body) {
+    return `mailto:${encodeURIComponent(cfg.automationEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function buildLeadId(plan, organization) {
+    return `be_publish_${safeText(plan)}_${Date.now().toString(36)}_${slugify(organization)}`.slice(0, 120);
+  }
+
+  function getPlanPaymentLink(plan) {
+    switch (safeText(plan)) {
+      case "single":
+        return safeText(cfg.paymentLinks.single);
+      case "starter":
+        return safeText(cfg.paymentLinks.starter);
+      case "active":
+        return safeText(cfg.paymentLinks.active);
+      case "unlimited":
+        return safeText(cfg.paymentLinks.unlimited);
+      default:
+        return "";
+    }
+  }
+
+  function persistCheckoutContext(context) {
+    try {
+      window.sessionStorage.setItem(cfg.storageKey, JSON.stringify(context));
+    } catch (error) {
+      console.warn("Publish funnel: checkout context could not be stored.", error);
+    }
+  }
+
+  function buildStandardContext() {
+    return {
+      plan: safeText(byId("publish-standard-plan")?.value),
+      organization: safeText(byId("publish-standard-organization")?.value),
+      contact: safeText(byId("publish-standard-contact")?.value),
+      email: safeText(byId("publish-standard-email")?.value),
+      eventLink: safeText(byId("publish-standard-event-link")?.value),
+      title: safeText(byId("publish-standard-title")?.value),
+      date: safeText(byId("publish-standard-date")?.value),
+      time: safeText(byId("publish-standard-time")?.value),
+      place: safeText(byId("publish-standard-place")?.value),
+      website: safeText(byId("publish-standard-website")?.value),
+      description: safeText(byId("publish-standard-description")?.value),
+      notes: safeText(byId("publish-standard-notes")?.value)
+    };
+  }
+
+  function buildAutomationContext() {
+    return {
+      organization: safeText(byId("publish-automation-organization")?.value),
+      website: safeText(byId("publish-automation-website")?.value),
+      contact: safeText(byId("publish-automation-contact")?.value),
+      email: safeText(byId("publish-automation-email")?.value),
+      techContact: safeText(byId("publish-automation-tech-contact")?.value),
+      monthlyVolume: safeText(byId("publish-automation-volume")?.value),
+      sourceType: safeText(byId("publish-automation-source-type")?.value),
+      sourceLink: safeText(byId("publish-automation-source-link")?.value),
+      cadence: safeText(byId("publish-automation-cadence")?.value),
+      notes: safeText(byId("publish-automation-notes")?.value)
+    };
+  }
+
+  function validateStandardContext(context) {
+    if (!hasValue(context.plan)) {
+      window.alert("Bitte wähle zuerst ein Modell aus.");
+      return false;
+    }
+
+    if (!hasValue(context.eventLink) && !(hasValue(context.title) && hasValue(context.date) && hasValue(context.place))) {
+      window.alert("Bitte hinterlege mindestens einen Event-Link oder ergänze im Fallback Titel, Datum und Ort.");
+      return false;
+    }
+
+    const paymentLink = getPlanPaymentLink(context.plan);
+    if (!hasValue(paymentLink)) {
+      window.alert("Für dieses Modell ist noch kein Stripe-Zahlungslink hinterlegt.");
+      return false;
+    }
+
+    return true;
+  }
+
+  function bindStandardPath() {
+    const form = byId("publish-standard-form");
+    const trigger = byId("publish-standard-pay");
+
+    if (!form || !trigger) return;
+
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
+
+      const context = buildStandardContext();
+      if (!validateStandardContext(context)) return;
+
+      const paymentLink = getPlanPaymentLink(context.plan);
+      const leadId = buildLeadId(context.plan, context.organization);
+
+      persistCheckoutContext({
+        leadId,
+        ...context,
+        savedAt: new Date().toISOString()
+      });
+
+      let targetUrl;
+      try {
+        targetUrl = new URL(paymentLink);
+      } catch (error) {
+        console.warn("Publish funnel: invalid payment link.", error);
+        window.alert("Der Stripe-Zahlungslink ist ungültig konfiguriert.");
+        return;
+      }
+
+      if (hasValue(context.email)) {
+        targetUrl.searchParams.set("prefilled_email", context.email);
+      }
+      targetUrl.searchParams.set("client_reference_id", leadId);
+
+      window.location.href = targetUrl.toString();
+    });
+  }
+
+  function bindAutomationPath() {
+    const form = byId("publish-automation-form");
+    const trigger = byId("publish-automation-submit");
+
+    if (!form || !trigger) return;
+
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
+
+      const context = buildAutomationContext();
+
+      if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
+        window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
+        return;
+      }
+
+      const body = joinLines([
+        "Hallo Mathias,",
+        "",
+        "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
+        "",
+        lineIf("Organisation / Veranstalter", context.organization),
+        lineIf("Website", context.website),
+        lineIf("Ansprechpartner", context.contact),
+        lineIf("E-Mail", context.email),
+        lineIf("Technischer Ansprechpartner", context.techContact),
+        lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", context.monthlyVolume),
+        lineIf("Vorhandene Quelle", context.sourceType),
+        lineIf("Link zur Quelle oder zu Beispielterminen", context.sourceLink),
+        lineIf("Aktualisierungsrhythmus", context.cadence),
+        "",
+        lineIf("Weitere Hinweise (optional)", context.notes),
+        "",
+        "Viele Grüße"
+      ]);
+
+      window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
+    });
+  }
+
+  function init() {
+    if (!isPublishRoute()) return;
+    bindStandardPath();
+    bindAutomationPath();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+/* === END FILE: js/publish-funnel.js === */
