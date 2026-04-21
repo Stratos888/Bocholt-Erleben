@@ -78,7 +78,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS | Zweck: richtet /events-veroeffentlichen/ auf den verbindlichen V1-Funnel mit klarem Zwei-Wege-Einstieg, Link-first-Standardweg, Einzeltermin-Option und sauberer Profi-Anbindung aus; Umfang: kompletter sichtbarer Seitenblock unter <body> bis vor die globalen Script-Includes === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_V2 | Zweck: baut /events-veroeffentlichen/ von der bisherigen Mischseite zu einer reinen Übersichts- und Wegwahl-Route um, damit Standardweg und Profi-Pfad auf eigene Unterseiten verteilt werden; Umfang: kompletter Body-Inhaltsblock dieser Datei ab bestehendem Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -96,61 +96,91 @@
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
           <p class="content-lead">
-            Zwei Wege, ein klarer Einstieg: Standardmäßig reichst du dein Event zuerst über einen Link ein. Für regelmäßige
-            Veranstalter mit eigener Datenquelle gibt es zusätzlich die automatische Anbindung als Profi-Pfad.
+            Zwei Wege, ein klarer Einstieg: Für die meisten Veranstalter ist der Standardweg mit Event-Link und anschließender Zahlung richtig.
+            Für API, Feed, CSV oder iCal gibt es einen getrennten Profi-Pfad mit vorheriger Prüfung.
           </p>
 
-<!-- === BEGIN BLOCK: PUBLISH_HERO_CTA_CONSUMER_V1 | Zweck: richtet die Hero-CTAs auf die neuen Funnel-Pfade aus, damit der Standardweg nicht mehr per Mailto am Intake vorbei läuft; Umfang: nur CTA-Gruppe im Hero von /events-veroeffentlichen/ === -->
-<div class="content-actions content-actions--inline publish-hero-cta">
-  <a class="content-cta content-cta--primary" href="#publish-submit">
-    Event einreichen
-  </a>
-  <a class="content-cta" href="#publish-automation">
-    Automatische Anbindung
-  </a>
-</div>
-<!-- === END BLOCK: PUBLISH_HERO_CTA_CONSUMER_V1 === -->
+          <div class="content-actions content-actions--inline publish-hero-cta">
+            <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/einreichen/">
+              Event einreichen
+            </a>
+            <a class="content-cta" href="/events-veroeffentlichen/anbindung/">
+              Automatische Anbindung
+            </a>
+          </div>
 
           <p class="content-note publish-hero-meta">
             Standardweg: Link-first mit manueller Fallback-Eingabe. Profi-Pfad: API, Feed, CSV oder iCal nur nach individueller Prüfung.
           </p>
 
           <p class="content-note publish-hero-trust">
-            Öffentliche Pakete richten sich nach veröffentlichten Terminen pro Monat. Alle Einreichungen werden vor Veröffentlichung geprüft.
+            Öffentliche Modelle richten sich nach veröffentlichten Terminen pro Monat. Zahlung und Veröffentlichung bleiben bewusst getrennt:
+            Erst das Modell, dann die inhaltliche Prüfung.
           </p>
         </div>
       </div>
     </header>
 
-    <section class="content-card publish-benefits-card" aria-labelledby="publish-benefits">
+    <section class="content-card publish-benefits-card" aria-labelledby="publish-route-choice">
       <div class="publish-section-head">
-        <h2 id="publish-benefits">Warum sich Bocholt erleben für Veranstalter lohnt</h2>
+        <h2 id="publish-route-choice">Welcher Weg passt zu dir?</h2>
+        <p class="content-note">Diese Seite erklärt nur den Ablauf. Die eigentliche Eingabe passiert auf den jeweiligen Unterseiten.</p>
       </div>
 
-      <ul class="publish-benefits-grid" aria-label="Vorteile für Veranstalter">
+      <ul class="publish-benefits-grid" aria-label="Wegwahl für Veranstalter">
         <li>
-          <strong>Einfacher Standardweg</strong>
-          <span>Im Normalfall reicht zuerst ein Link zum Event oder Kalender. Nur wenn dort etwas fehlt, brauchen wir zusätzliche Angaben.</span>
+          <strong>Standardweg: Event einreichen</strong>
+          <span>Für einzelne Termine und normale laufende Veröffentlichungen. Erst Event-Link oder Fallback-Angaben erfassen, dann mit dem passenden Modell zu Stripe weitergehen.</span>
+          <div class="content-actions content-actions--inline">
+            <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/einreichen/">
+              Zum Standardweg
+            </a>
+          </div>
         </li>
         <li>
-          <strong>Sichtbarkeit in Bocholt und Umgebung</strong>
-          <span>Deine Termine erscheinen dort, wo Menschen aktiv nach passenden Veranstaltungen in Bocholt und Umgebung suchen.</span>
-        </li>
-        <li>
-          <strong>Saubere Veröffentlichung</strong>
-          <span>Alle Termine werden vor Veröffentlichung auf Plausibilität, Vollständigkeit und Verständlichkeit geprüft.</span>
-        </li>
-        <li>
-          <strong>Profi-Pfad bei Bedarf</strong>
-          <span>Für regelmäßige Veranstalter mit eigener Datenquelle prüfen wir zusätzlich eine automatische Anbindung als zweiten Weg.</span>
+          <strong>Profi-Pfad: Automatische Anbindung</strong>
+          <span>Für Veranstalter mit eigener strukturierter Quelle wie API, Feed, CSV oder iCal. Erst Quelle prüfen lassen, dann den operativen Weg festlegen.</span>
+          <div class="content-actions content-actions--inline">
+            <a class="content-cta" href="/events-veroeffentlichen/anbindung/">
+              Zum Profi-Pfad
+            </a>
+          </div>
         </li>
       </ul>
+    </section>
+
+    <section class="content-card publish-benefits-card" aria-labelledby="publish-process-overview">
+      <div class="publish-section-head">
+        <h2 id="publish-process-overview">So läuft der Funnel ab</h2>
+      </div>
+
+      <div class="publish-steps-flow">
+        <section class="publish-step" aria-labelledby="publish-overview-step-1">
+          <h3 id="publish-overview-step-1">1. Richtigen Weg wählen</h3>
+          <p>Standardweg für normale Event-Einreichungen, Profi-Pfad für technische Quellen und wiederkehrende Anbindungen.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-overview-step-2">
+          <h3 id="publish-overview-step-2">2. Angaben oder Quelle erfassen</h3>
+          <p>Beim Standardweg erfassen wir Event-Link und Fallback-Daten. Beim Profi-Pfad reichen Veranstalter ihre Quelle zur Prüfung ein.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-overview-step-3">
+          <h3 id="publish-overview-step-3">3. Modell oder Umsetzung festlegen</h3>
+          <p>Im Standardweg folgt danach der passende Stripe-Checkout. Beim Profi-Pfad entscheiden wir nach der Prüfung über die geeignete operative Anbindung.</p>
+        </section>
+
+        <section class="publish-step" aria-labelledby="publish-overview-step-4">
+          <h3 id="publish-overview-step-4">4. Inhaltlich prüfen</h3>
+          <p>Vor der Veröffentlichung prüfen wir Plausibilität, Vollständigkeit und Verständlichkeit, damit die Darstellung auf Bocholt erleben sauber bleibt.</p>
+        </section>
+      </div>
     </section>
 
     <section class="content-card publish-membership-card" aria-labelledby="publish-prices">
       <div class="publish-section-head">
         <h2 id="publish-prices">Preise</h2>
-        <p class="content-note publish-membership-intro">Monatlich kündbare Mitgliedschaften plus Einzeltermin-Option für einmalige Veröffentlichungen.</p>
+        <p class="content-note publish-membership-intro">Einmalig für einzelne Termine oder monatlich für laufende Veröffentlichungen.</p>
       </div>
 
       <div class="publish-membership-layout">
@@ -179,218 +209,27 @@
           </ul>
 
           <p class="content-note publish-plans-note">
-            Die automatische Anbindung ist kein separates öffentliches Paket, sondern der sekundäre Profi-Pfad innerhalb des passenden Modells.
+            Die automatische Anbindung ist kein separates öffentliches Sofortkauf-Paket, sondern ein prüfpflichtiger Profi-Pfad innerhalb des passenden Modells.
           </p>
         </section>
       </div>
     </section>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_FORM_CONSUMER_V2 | Zweck: stellt den Standardweg auf die zentralen Shared-Form-Komponenten um und hält die Route selbst nur noch als Consumer für den Stripe-Intake; Umfang: kompletter Abschnitt 1 „Event einreichen“ === -->
-    <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
-      <div class="publish-section-head">
-        <h2 id="publish-submit-title">1. Event einreichen</h2>
-        <p class="content-note">Standardweg: erst Angaben erfassen, dann mit dem passenden Modell zu Stripe weitergehen.</p>
-      </div>
-
-      <div class="publish-steps-flow">
-        <section class="publish-step" aria-labelledby="publish-step-1">
-          <h3 id="publish-step-1">Vor der Zahlung erfassen</h3>
-          <p>Damit der Kauf später sauber zugeordnet werden kann, erfassen wir zuerst Veranstalter, E-Mail und Event-Link beziehungsweise die nötigen Fallback-Angaben.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-step-2">
-          <h3 id="publish-step-2">Danach zu Stripe</h3>
-          <p>Erst nach dieser Intake-Stufe gehst du mit dem gewählten Modell in den passenden Stripe-Checkout für Einzeltermin oder Mitgliedschaft.</p>
-        </section>
-      </div>
-
-      <form class="content-form" id="publish-standard-form" novalidate>
-        <div class="content-form-grid">
-          <label class="content-field" for="publish-standard-plan">
-            <span class="content-field__label">Gewünschtes Modell *</span>
-            <select class="content-field__control" id="publish-standard-plan" name="plan" required>
-              <option value="">Bitte wählen</option>
-              <option value="single">Einzeltermin veröffentlichen · 9,90 € einmalig</option>
-              <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
-              <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
-              <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt veröffentlichte Termine pro Monat</option>
-            </select>
-          </label>
-
-          <label class="content-field" for="publish-standard-organization">
-            <span class="content-field__label">Veranstalter / Organisation *</span>
-            <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
-          </label>
-
-          <label class="content-field" for="publish-standard-contact">
-            <span class="content-field__label">Ansprechpartner</span>
-            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
-          </label>
-
-          <label class="content-field" for="publish-standard-email">
-            <span class="content-field__label">E-Mail für Stripe und Rückfragen *</span>
-            <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-          </label>
-
-          <label class="content-field content-field--full" for="publish-standard-event-link">
-            <span class="content-field__label">Event-Link oder Kalender-Link</span>
-            <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
-          </label>
-        </div>
-
-        <div class="content-form-section-head">
-          <h3>Fallback nur wenn nötig</h3>
-          <p class="content-note">Wenn kein sauberer Link vorhanden ist oder dort wichtige Informationen fehlen, ergänze bitte die wichtigsten Angaben direkt hier.</p>
-        </div>
-
-        <div class="content-form-grid">
-          <label class="content-field" for="publish-standard-title">
-            <span class="content-field__label">Titel</span>
-            <input class="content-field__control" id="publish-standard-title" name="title" type="text">
-          </label>
-
-          <label class="content-field" for="publish-standard-date">
-            <span class="content-field__label">Datum</span>
-            <input class="content-field__control" id="publish-standard-date" name="date" type="date">
-          </label>
-
-          <label class="content-field" for="publish-standard-time">
-            <span class="content-field__label">Uhrzeit</span>
-            <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
-          </label>
-
-          <label class="content-field" for="publish-standard-place">
-            <span class="content-field__label">Ort</span>
-            <input class="content-field__control" id="publish-standard-place" name="place" type="text">
-          </label>
-
-          <label class="content-field content-field--full" for="publish-standard-website">
-            <span class="content-field__label">Website- oder Ticketlink</span>
-            <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
-          </label>
-
-          <label class="content-field content-field--full" for="publish-standard-description">
-            <span class="content-field__label">Kurzbeschreibung</span>
-            <textarea class="content-field__control" id="publish-standard-description" name="description" rows="4"></textarea>
-          </label>
-
-          <label class="content-field content-field--full" for="publish-standard-notes">
-            <span class="content-field__label">Weitere Hinweise</span>
-            <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="3"></textarea>
-          </label>
-        </div>
-
-        <div class="content-actions content-actions--inline publish-final-actions">
-          <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-            Weiter zur Zahlung
-          </button>
-        </div>
-
-        <p class="content-form-note">
-          Beim Klick wird deine E-Mail an Stripe vorbefüllt. Falls kein Event-Link vorhanden ist, brauchen wir für den Standardweg mindestens Titel, Datum und Ort.
-        </p>
-      </form>
-    </section>
-    <!-- === END BLOCK: PUBLISH_STANDARD_FORM_CONSUMER_V2 === -->
-
-    <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_FORM_CONSUMER_V2 | Zweck: stellt den Profi-Pfad auf die zentralen Shared-Form-Komponenten um und hält die Route selbst nur noch als Consumer; Umfang: kompletter Abschnitt 2 „Automatische Anbindung anfragen“ === -->
-    <section class="content-card publish-final-card publish-final-card--help" id="publish-automation" aria-labelledby="publish-automation-title">
-      <div class="publish-section-head">
-        <h2 id="publish-automation-title">2. Automatische Anbindung anfragen</h2>
-        <p class="content-note">Sekundärer Profi-Pfad: erst Quelle prüfen, dann entscheiden wir über die passende operative Anbindung.</p>
-      </div>
-
-      <div class="publish-steps-flow">
-        <section class="publish-step" aria-labelledby="publish-automation-step-1">
-          <h3 id="publish-automation-step-1">Geeignete Quelle mitbringen</h3>
-          <p>Dieser Weg ist für API, Feed, CSV, iCal oder eine vergleichbare strukturierte Quelle gedacht.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-automation-step-2">
-          <h3 id="publish-automation-step-2">Prüfung vor Umsetzung</h3>
-          <p>Die automatische Anbindung bleibt bewusst prüfpflichtig. Nicht jede Quelle ist stabil oder sauber genug für eine laufende Übernahme.</p>
-        </section>
-      </div>
-
-      <form class="content-form" id="publish-automation-form" novalidate>
-        <div class="content-form-grid">
-          <label class="content-field" for="publish-automation-organization">
-            <span class="content-field__label">Veranstalter / Organisation *</span>
-            <input class="content-field__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
-          </label>
-
-          <label class="content-field" for="publish-automation-contact">
-            <span class="content-field__label">Ansprechpartner *</span>
-            <input class="content-field__control" id="publish-automation-contact" name="contact" type="text" autocomplete="name" required>
-          </label>
-
-          <label class="content-field" for="publish-automation-email">
-            <span class="content-field__label">E-Mail *</span>
-            <input class="content-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-          </label>
-
-          <label class="content-field" for="publish-automation-tech-contact">
-            <span class="content-field__label">Technischer Ansprechpartner</span>
-            <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
-          </label>
-
-          <label class="content-field" for="publish-automation-volume">
-            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
-            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
-          </label>
-
-          <label class="content-field" for="publish-automation-source-type">
-            <span class="content-field__label">Vorhandene Quelle *</span>
-            <select class="content-field__control" id="publish-automation-source-type" name="sourceType" required>
-              <option value="">Bitte wählen</option>
-              <option value="API">API</option>
-              <option value="Feed">Feed</option>
-              <option value="CSV">CSV</option>
-              <option value="iCal">iCal</option>
-              <option value="Sonstiges">Sonstiges</option>
-            </select>
-          </label>
-
-          <label class="content-field content-field--full" for="publish-automation-website">
-            <span class="content-field__label">Website</span>
-            <input class="content-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
-          </label>
-
-          <label class="content-field content-field--full" for="publish-automation-source-link">
-            <span class="content-field__label">Link zur Quelle oder zu Beispielterminen</span>
-            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
-          </label>
-
-          <label class="content-field" for="publish-automation-cadence">
-            <span class="content-field__label">Aktualisierungsrhythmus</span>
-            <input class="content-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
-          </label>
-
-          <label class="content-field content-field--full" for="publish-automation-notes">
-            <span class="content-field__label">Weitere Hinweise</span>
-            <textarea class="content-field__control" id="publish-automation-notes" name="notes" rows="4"></textarea>
-          </label>
-        </div>
-
-        <div class="content-actions content-actions--inline publish-final-actions">
-          <button class="content-cta" id="publish-automation-submit" type="button">
-            Anfrage per E-Mail vorbereiten
-          </button>
-        </div>
-
-        <p class="content-form-note">
-          Dieser Weg bleibt bewusst manuell und prüfpflichtig. Erst nach Sichtung der Quelle entscheiden wir, ob und wie eine automatische Anbindung sinnvoll ist.
-        </p>
-      </form>
-    </section>
-    <!-- === END BLOCK: PUBLISH_AUTOMATION_FORM_CONSUMER_V2 === -->
+    <nav class="content-links" aria-label="Wegwahl für Veranstalter">
+      <a class="content-link" href="/events-veroeffentlichen/einreichen/">
+        <span class="content-link__label">Standardweg: Event einreichen</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+      <a class="content-link" href="/events-veroeffentlichen/anbindung/">
+        <span class="content-link__label">Profi-Pfad: Automatische Anbindung anfragen</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
   </main>
-  <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS === -->
-  <!-- === BEGIN BLOCK: PUBLISH_PAGE_RUNTIME_OWNER_CHAIN_V1 | Zweck: entfernt die seitenlokale Inline-Funnel-Logik und bindet stattdessen die zentrale Owner-Kette aus config.js und js/publish-funnel.js ein; Umfang: kompletter Runtime-Block direkt vor </body> === -->
+
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <script src="/js/publish-funnel.js?v=2026-04-21-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_PAGE_RUNTIME_OWNER_CHAIN_V1 === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_ROUTE_V2 === -->
 </body>
 </html>
