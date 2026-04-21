@@ -68,7 +68,7 @@
     </a>
   </header>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_FOCUS_CLEANUP_V1 | Zweck: verschlankt die Standardweg-Seite zu einer echten Arbeitsroute ohne redundante Landing-, Preis- und Navigationsblöcke; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/einreichen/ === -->
+    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_FOCUS_CLEANUP_V2 | Zweck: verdichtet die Standardweg-Seite zu einer klaren Arbeitsroute mit weniger Wiederholung und ruhigerer Hierarchie, ohne neue UI-Muster einzuführen; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/einreichen/ === -->
     <main class="page page--publish">
       <header class="content-hero content-hero--panel">
         <div class="publish-hero-layout">
@@ -76,17 +76,18 @@
             <p class="content-kicker">Standardweg für Veranstalter</p>
             <h1>Event einreichen</h1>
             <p class="content-lead">
-              Das ist der normale Weg für einzelne Termine und laufende Mitgliedschaften: erst Event-Link oder Fallback-Angaben erfassen,
+              Für einzelne Termine und normale laufende Veröffentlichungen: zuerst Event-Link oder Fallback-Angaben erfassen,
               danach mit dem passenden Modell zur Zahlung weitergehen.
             </p>
 
             <p class="content-note publish-hero-meta">
-              Im Idealfall genügt ein sauberer Event-Link. Nur wenn dort wichtige Informationen fehlen, brauchen wir zusätzliche Fallback-Angaben.
+              Im Idealfall genügt ein sauberer Event-Link. Nur wenn dort Informationen fehlen, brauchen wir zusätzliche Fallback-Angaben.
             </p>
 
             <p class="content-note publish-hero-trust">
-              Nicht der richtige Weg? Für API, Feed, CSV oder iCal nutze stattdessen den
-              <a href="/events-veroeffentlichen/anbindung/">Profi-Pfad für automatische Anbindung</a>.
+              Für API, Feed, CSV oder iCal ist stattdessen der
+              <a href="/events-veroeffentlichen/anbindung/">Profi-Pfad für automatische Anbindung</a>
+              gedacht.
             </p>
           </div>
         </div>
@@ -96,7 +97,7 @@
         <div class="publish-section-head">
           <h2 id="publish-submit-title">Event-Daten erfassen</h2>
           <p class="content-note">
-            Zuerst erfassen wir die Angaben für den Standardweg. Danach geht es mit Einzeltermin, Starter, Aktiv oder Unbegrenzt in den passenden Stripe-Checkout.
+            Danach geht es mit Einzeltermin, Starter, Aktiv oder Unbegrenzt in den passenden Stripe-Checkout.
           </p>
         </div>
 
@@ -183,12 +184,12 @@
           </div>
 
           <p class="content-form-note">
-            Beim Klick wird deine E-Mail an Stripe vorbefüllt. Falls kein Event-Link vorhanden ist, brauchen wir für den Standardweg mindestens Titel, Datum und Ort.
+            Für den Standardweg brauchen wir entweder einen Event-Link oder alternativ Titel, Datum und Ort als Fallback.
           </p>
         </form>
       </section>
     </main>
-    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_FOCUS_CLEANUP_V1 === -->
+    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_FOCUS_CLEANUP_V2 === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
