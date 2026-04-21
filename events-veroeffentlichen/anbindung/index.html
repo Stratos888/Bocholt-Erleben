@@ -69,6 +69,7 @@
   </header>
 
   <main class="page page--publish">
+    <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FOCUS_CLEANUP_V1 | Zweck: schärft die Profi-Route zu einer klaren prüfpflichtigen Anfrage-Seite mit weniger Redundanz und stärkerer Abgrenzung zum Standardweg; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/anbindung/ === -->
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
@@ -79,21 +80,13 @@
             technisch und inhaltlich sauber genug für eine laufende Übernahme sind.
           </p>
 
-          <div class="content-actions content-actions--inline publish-hero-cta">
-            <a class="content-cta" href="/events-veroeffentlichen/">
-              Zur Übersicht
-            </a>
-            <a class="content-cta" href="/events-veroeffentlichen/einreichen/">
-              Standardweg
-            </a>
-          </div>
-
           <p class="content-note publish-hero-meta">
-            Die automatische Anbindung ist bewusst kein normaler Sofortkauf. Erst nach Prüfung der Quelle entscheiden wir über den passenden operativen Weg.
+            Das ist bewusst kein normaler Sofortkauf. Zuerst brauchen wir eine belastbare Quelle, danach entscheiden wir über die geeignete operative Umsetzung.
           </p>
 
           <p class="content-note publish-hero-trust">
-            Ziel ist nicht nur technische Erreichbarkeit, sondern eine belastbare, verständliche und dauerhaft pflegbare Terminquelle.
+            Nicht der richtige Weg? Für normale Einreichungen mit Event-Link nutze stattdessen den
+            <a href="/events-veroeffentlichen/einreichen/">Standardweg für Veranstalter</a>.
           </p>
         </div>
       </div>
@@ -102,6 +95,7 @@
     <section class="content-card publish-benefits-card" aria-labelledby="publish-automation-explainer">
       <div class="publish-section-head">
         <h2 id="publish-automation-explainer">Wann dieser Weg sinnvoll ist</h2>
+        <p class="content-note">Diese Anfrage lohnt sich nur, wenn eine Quelle dauerhaft gepflegt wird und technisch belastbar ist.</p>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Geeignete Fälle für die automatische Anbindung">
@@ -115,7 +109,7 @@
         </li>
         <li>
           <strong>Technischer Ansprechpartner</strong>
-          <span>Hilfreich, wenn jemand Rückfragen zur Quelle, zum Format oder zur Aktualisierung beantworten kann.</span>
+          <span>Hilfreich, wenn Rückfragen zu Quelle, Format oder Aktualisierung schnell geklärt werden können.</span>
         </li>
         <li>
           <strong>Prüfpflicht vor Umsetzung</strong>
@@ -124,33 +118,12 @@
       </ul>
     </section>
 
-    <section class="content-card publish-membership-card" aria-labelledby="publish-automation-process">
-      <div class="publish-section-head">
-        <h2 id="publish-automation-process">So läuft der Profi-Pfad ab</h2>
-      </div>
-
-      <div class="publish-steps-flow">
-        <section class="publish-step" aria-labelledby="publish-automation-step-1">
-          <h3 id="publish-automation-step-1">1. Quelle einreichen</h3>
-          <p>Du sendest uns Website, Quelle, Umfang und technische Hinweise für die erste Prüfung.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-automation-step-2">
-          <h3 id="publish-automation-step-2">2. Technisch und inhaltlich prüfen</h3>
-          <p>Wir prüfen Format, Aktualisierungslogik, Verständlichkeit und ob die Daten für Bocholt erleben sauber nutzbar sind.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-automation-step-3">
-          <h3 id="publish-automation-step-3">3. Passenden Weg festlegen</h3>
-          <p>Erst danach entscheiden wir, ob eine automatische Anbindung sinnvoll ist und welches Modell dazu passt.</p>
-        </section>
-      </div>
-    </section>
-
     <section class="content-card publish-final-card publish-final-card--help" id="publish-automation-request" aria-labelledby="publish-automation-request-title">
       <div class="publish-section-head">
         <h2 id="publish-automation-request-title">Quelle zur Prüfung einreichen</h2>
-        <p class="content-note">Sekundärer Profi-Pfad: Erst nach Sichtung der Quelle entscheiden wir über die geeignete Umsetzung.</p>
+        <p class="content-note">
+          Bitte beschreibe die Datenquelle so, dass wir Format, Umfang und Aktualisierungslogik möglichst schnell einordnen können.
+        </p>
       </div>
 
       <form class="content-form" id="publish-automation-form" novalidate>
@@ -175,11 +148,6 @@
             <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
           </label>
 
-          <label class="content-field" for="publish-automation-volume">
-            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
-            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
-          </label>
-
           <label class="content-field" for="publish-automation-source-type">
             <span class="content-field__label">Vorhandene Quelle *</span>
             <select class="content-field__control" id="publish-automation-source-type" name="sourceType" required>
@@ -190,6 +158,11 @@
               <option value="iCal">iCal</option>
               <option value="Sonstiges">Sonstiges</option>
             </select>
+          </label>
+
+          <label class="content-field" for="publish-automation-volume">
+            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
+            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
           </label>
 
           <label class="content-field content-field--full" for="publish-automation-website">
@@ -224,17 +197,7 @@
         </p>
       </form>
     </section>
-
-    <nav class="content-links" aria-label="Weitere Veranstalter-Navigation">
-      <a class="content-link" href="/events-veroeffentlichen/">
-        <span class="content-link__label">Zur Übersicht für Veranstalter</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-      <a class="content-link" href="/events-veroeffentlichen/einreichen/">
-        <span class="content-link__label">Zum Standardweg</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-    </nav>
+    <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FOCUS_CLEANUP_V1 === -->
   </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
