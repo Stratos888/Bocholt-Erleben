@@ -29,7 +29,7 @@ const CONFIG = {
     showFilters: true
   },
 
-  /* === BEGIN BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V1 | Zweck: hält die öffentliche Runtime-Konfiguration für Feedback und Veranstalter-Funnel zentral in config.js, damit Seiten und Skripte nur noch konsumieren und keine Stripe-/Mailto-Runtime lokal doppeln; Umfang: ersetzt den bisherigen Feedback-Block plus den direkten Debug-Eintrag innerhalb von CONFIG === */
+  /* === BEGIN BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V2 | Zweck: hält die öffentliche Runtime-Konfiguration für Feedback und Veranstalter-Funnel zentral in config.js und befüllt den Standardweg mit den echten Sandbox-Stripe-Links; Umfang: ersetzt den bisherigen Feedback-Block plus den direkten Debug-Eintrag innerhalb von CONFIG === */
   feedback: {
     formspreeEndpoint: "https://formspree.io/f/mrerpwjy",
     fallbackEmail: "",
@@ -45,16 +45,16 @@ const CONFIG = {
     successUrl: "/events-veroeffentlichen/erfolg/",
     cancelUrl: "/events-veroeffentlichen/abgebrochen/",
     paymentLinks: {
-      single: "",
-      starter: "",
-      active: "",
-      unlimited: ""
+      single: "https://buy.stripe.com/test_8x200ifJM901gdw9Ql8Ra00",
+      starter: "https://buy.stripe.com/test_14A28q1SWccdgdw6E98Ra01",
+      active: "https://buy.stripe.com/test_00w4gybtw9011iC9Ql8Ra02",
+      unlimited: "https://buy.stripe.com/test_6oUfZgcxAb89f9saUp8Ra03"
     }
   },
 
   // Debug Mode (nur lokal aktiv)
   debug: IS_LOCAL
-  /* === END BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V1 === */
+  /* === END BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V2 === */
 };
 
 // Helper: Log nur wenn debug = true
