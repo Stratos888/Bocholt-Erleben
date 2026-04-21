@@ -189,79 +189,381 @@
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">1. Event einreichen</h2>
-        <p class="content-note">Standardweg: erst Link senden, nur bei Bedarf manuell ergänzen.</p>
+        <p class="content-note">Standardweg: erst Angaben erfassen, dann mit dem passenden Modell zu Stripe weitergehen.</p>
       </div>
 
       <div class="publish-steps-flow">
         <section class="publish-step" aria-labelledby="publish-step-1">
-          <h3 id="publish-step-1">Link zuerst</h3>
-          <p>Schicke uns zuerst den Link zu deinem Event, Kalender, deiner Landingpage oder Ticketseite.</p>
+          <h3 id="publish-step-1">Vor der Zahlung erfassen</h3>
+          <p>Damit der Kauf später sauber zugeordnet werden kann, erfassen wir zuerst Veranstalter, E-Mail und Event-Link beziehungsweise die nötigen Fallback-Angaben.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-step-2">
-          <h3 id="publish-step-2">Fallback nur wenn nötig</h3>
-          <p>Falls der Link nicht alle Angaben enthält, ergänzt du Titel, Datum, Uhrzeit, Ort und Website oder Ticketlink direkt in derselben Anfrage.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-step-3">
-          <h3 id="publish-step-3">Passendes Modell wählen</h3>
-          <p>Für einzelne Termine nutzt du den Einzeltermin. Für laufende Veröffentlichungen wählst du Starter, Aktiv oder Unbegrenzt.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-step-4">
-          <h3 id="publish-step-4">Prüfung vor Veröffentlichung</h3>
-          <p>Wir prüfen die Angaben und melden uns, falls etwas fehlt oder der Profi-Pfad für deine Quelle sinnvoller ist.</p>
+          <h3 id="publish-step-2">Danach zu Stripe</h3>
+          <p>Erst nach dieser Intake-Stufe gehst du mit dem gewählten Modell in den passenden Stripe-Checkout für Einzeltermin oder Mitgliedschaft.</p>
         </section>
       </div>
 
-      <div class="content-actions content-actions--inline publish-final-actions">
-        <a
-          class="content-cta content-cta--primary"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Event%20einreichen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20ein%20Event%20bei%20Bocholt%20erleben%20einreichen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AAnsprechpartner%3A%0AGew%C3%BCnschtes%20Modell%3A%0A-%20Einzeltermin%20ver%C3%B6ffentlichen%20%289%2C90%20%E2%82%AC%29%0A-%20Starter%20%289%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Aktiv%20%2819%2C99%20%E2%82%AC%20/%20Monat%29%0A-%20Unbegrenzt%20%2829%2C99%20%E2%82%AC%20/%20Monat%29%0A%0ALink%20zum%20Event%20oder%20Kalender%3A%0A%0AFallback%2C%20falls%20kein%20passender%20Link%20vorhanden%20ist%3A%0ATitel%3A%0ADatum%3A%0AUhrzeit%3A%0AOrt%3A%0AKurzbeschreibung%3A%0AWebsite%20oder%20Ticketlink%3A%0A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-        >
-          Event jetzt einreichen
-        </a>
-      </div>
+      <form class="publish-intake-form" id="publish-standard-form" novalidate>
+        <div class="publish-form-grid">
+          <label class="publish-field" for="publish-standard-plan">
+            <span class="publish-field__label">Gewünschtes Modell *</span>
+            <select class="publish-field__control" id="publish-standard-plan" name="plan" required>
+              <option value="">Bitte wählen</option>
+              <option value="single">Einzeltermin veröffentlichen · 9,90 € einmalig</option>
+              <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
+              <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
+              <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt veröffentlichte Termine pro Monat</option>
+            </select>
+          </label>
+
+          <label class="publish-field" for="publish-standard-organization">
+            <span class="publish-field__label">Veranstalter / Organisation *</span>
+            <input class="publish-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
+
+          <label class="publish-field" for="publish-standard-contact">
+            <span class="publish-field__label">Ansprechpartner</span>
+            <input class="publish-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
+          </label>
+
+          <label class="publish-field" for="publish-standard-email">
+            <span class="publish-field__label">E-Mail für Stripe und Rückfragen *</span>
+            <input class="publish-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-standard-event-link">
+            <span class="publish-field__label">Event-Link oder Kalender-Link</span>
+            <input class="publish-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
+          </label>
+        </div>
+
+        <div class="publish-section-head publish-section-head--sub">
+          <h3>Fallback nur wenn nötig</h3>
+          <p class="content-note">Wenn kein sauberer Link vorhanden ist oder dort wichtige Informationen fehlen, ergänze bitte die wichtigsten Angaben direkt hier.</p>
+        </div>
+
+        <div class="publish-form-grid">
+          <label class="publish-field" for="publish-standard-title">
+            <span class="publish-field__label">Titel</span>
+            <input class="publish-field__control" id="publish-standard-title" name="title" type="text">
+          </label>
+
+          <label class="publish-field" for="publish-standard-date">
+            <span class="publish-field__label">Datum</span>
+            <input class="publish-field__control" id="publish-standard-date" name="date" type="date">
+          </label>
+
+          <label class="publish-field" for="publish-standard-time">
+            <span class="publish-field__label">Uhrzeit</span>
+            <input class="publish-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
+          </label>
+
+          <label class="publish-field" for="publish-standard-place">
+            <span class="publish-field__label">Ort</span>
+            <input class="publish-field__control" id="publish-standard-place" name="place" type="text">
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-standard-website">
+            <span class="publish-field__label">Website- oder Ticketlink</span>
+            <input class="publish-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-standard-description">
+            <span class="publish-field__label">Kurzbeschreibung</span>
+            <textarea class="publish-field__control publish-field__control--textarea" id="publish-standard-description" name="description" rows="4"></textarea>
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-standard-notes">
+            <span class="publish-field__label">Weitere Hinweise</span>
+            <textarea class="publish-field__control publish-field__control--textarea" id="publish-standard-notes" name="notes" rows="3"></textarea>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline publish-final-actions">
+          <a class="content-cta content-cta--primary" href="#" id="publish-standard-pay">
+            Weiter zur Zahlung
+          </a>
+        </div>
+
+        <p class="content-note publish-form-note">
+          Beim Klick wird deine E-Mail an Stripe vorbefüllt. Falls kein Event-Link vorhanden ist, brauchen wir für den Standardweg mindestens Titel, Datum und Ort.
+        </p>
+      </form>
     </section>
 
     <section class="content-card publish-final-card publish-final-card--help" id="publish-automation" aria-labelledby="publish-automation-title">
       <div class="publish-section-head">
         <h2 id="publish-automation-title">2. Automatische Anbindung anfragen</h2>
-        <p class="content-note">Sekundärer Profi-Pfad für Veranstalter mit regelmäßigen Terminen und eigener Datenquelle.</p>
+        <p class="content-note">Sekundärer Profi-Pfad: erst Quelle prüfen, dann entscheiden wir über die passende operative Anbindung.</p>
       </div>
 
       <div class="publish-steps-flow">
         <section class="publish-step" aria-labelledby="publish-automation-step-1">
           <h3 id="publish-automation-step-1">Geeignete Quelle mitbringen</h3>
-          <p>Dieser Weg ist gedacht für API, Feed, CSV, iCal oder eine vergleichbare verlässliche Quelle.</p>
+          <p>Dieser Weg ist für API, Feed, CSV, iCal oder eine vergleichbare strukturierte Quelle gedacht.</p>
         </section>
 
         <section class="publish-step" aria-labelledby="publish-automation-step-2">
-          <h3 id="publish-automation-step-2">Quelle prüfen lassen</h3>
-          <p>Wir prüfen, ob sich deine Termine zuverlässig übernehmen lassen und welcher Weg für deine Struktur sinnvoll ist.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-automation-step-3">
-          <h3 id="publish-automation-step-3">Im passenden Modell weiterführen</h3>
-          <p>Auch bei automatischer Anbindung gelten die öffentlichen Modelle über veröffentlichte Termine pro Monat.</p>
+          <h3 id="publish-automation-step-2">Prüfung vor Umsetzung</h3>
+          <p>Die automatische Anbindung bleibt bewusst prüfpflichtig. Nicht jede Quelle ist stabil oder sauber genug für eine laufende Übernahme.</p>
         </section>
       </div>
 
-      <div class="content-actions content-actions--inline publish-final-actions">
-        <a
-          class="content-cta"
-          href="mailto:mathias@bocholt-erleben.de?subject=Bocholt%20erleben%20-%20Automatische%20Anbindung%20anfragen&amp;body=Hallo%20Mathias%2C%0A%0Aich%20m%C3%B6chte%20eine%20automatische%20Anbindung%20f%C3%BCr%20unsere%20Termine%20bei%20Bocholt%20erleben%20anfragen.%0A%0AOrganisation%20/%20Veranstalter%3A%0AWebsite%3A%0AAnsprechpartner%3A%0ATechnischer%20Ansprechpartner%20%28optional%29%3A%0AGesch%C3%A4tzte%20Anzahl%20ver%C3%B6ffentlichter%20Termine%20pro%20Monat%3A%0A%0AVorhandene%20Quelle%3A%0A-%20API%0A-%20Feed%0A-%20CSV%0A-%20iCal%0A-%20Sonstiges%0A%0ALink%20zur%20Quelle%20oder%20zu%20Beispielterminen%3A%0AAktualisierungsrhythmus%3A%0AWeitere%20Hinweise%20%28optional%29%3A%0A%0AViele%20Gr%C3%BC%C3%9Fe"
-        >
-          Automatische Anbindung anfragen
-        </a>
-      </div>
+      <form class="publish-intake-form" id="publish-automation-form" novalidate>
+        <div class="publish-form-grid">
+          <label class="publish-field" for="publish-automation-organization">
+            <span class="publish-field__label">Veranstalter / Organisation *</span>
+            <input class="publish-field__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
+
+          <label class="publish-field" for="publish-automation-contact">
+            <span class="publish-field__label">Ansprechpartner *</span>
+            <input class="publish-field__control" id="publish-automation-contact" name="contact" type="text" autocomplete="name" required>
+          </label>
+
+          <label class="publish-field" for="publish-automation-email">
+            <span class="publish-field__label">E-Mail *</span>
+            <input class="publish-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          </label>
+
+          <label class="publish-field" for="publish-automation-tech-contact">
+            <span class="publish-field__label">Technischer Ansprechpartner</span>
+            <input class="publish-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
+          </label>
+
+          <label class="publish-field" for="publish-automation-volume">
+            <span class="publish-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
+            <input class="publish-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
+          </label>
+
+          <label class="publish-field" for="publish-automation-source-type">
+            <span class="publish-field__label">Vorhandene Quelle *</span>
+            <select class="publish-field__control" id="publish-automation-source-type" name="sourceType" required>
+              <option value="">Bitte wählen</option>
+              <option value="API">API</option>
+              <option value="Feed">Feed</option>
+              <option value="CSV">CSV</option>
+              <option value="iCal">iCal</option>
+              <option value="Sonstiges">Sonstiges</option>
+            </select>
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-automation-website">
+            <span class="publish-field__label">Website</span>
+            <input class="publish-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-automation-source-link">
+            <span class="publish-field__label">Link zur Quelle oder zu Beispielterminen</span>
+            <input class="publish-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="publish-field" for="publish-automation-cadence">
+            <span class="publish-field__label">Aktualisierungsrhythmus</span>
+            <input class="publish-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
+          </label>
+
+          <label class="publish-field publish-field--full" for="publish-automation-notes">
+            <span class="publish-field__label">Weitere Hinweise</span>
+            <textarea class="publish-field__control publish-field__control--textarea" id="publish-automation-notes" name="notes" rows="4"></textarea>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline publish-final-actions">
+          <a class="content-cta" href="#" id="publish-automation-submit">
+            Anfrage per E-Mail vorbereiten
+          </a>
+        </div>
+
+        <p class="content-note publish-form-note">
+          Dieser Weg bleibt bewusst manuell und prüfpflichtig. Erst nach Sichtung der Quelle entscheiden wir, ob und wie eine automatische Anbindung sinnvoll ist.
+        </p>
+      </form>
     </section>
   </main>
   <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS === -->
-  <!-- === BEGIN BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V1 | Zweck: lädt die globale Runtime für Config, Icons und Feedback auch auf dieser Unterseite; Umfang: Script-Includes direkt vor </body> === -->
+  <!-- === BEGIN BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V3_STRIPE_INTAKE | Zweck: ergänzt /events-veroeffentlichen/ um clientseitige Intake-Validierung, Stripe-Weiterleitung für den Standardweg und Mailto-Vorbereitung für den Profi-Pfad; Umfang: Runtime plus globale Script-Includes direkt vor </body> === -->
+  <script>
+    (() => {
+      const STRIPE_PAYMENT_LINKS = Object.freeze({
+        single: "",
+        starter: "",
+        active: "",
+        unlimited: ""
+      });
+
+      const STORAGE_KEY = "be_publish_checkout_context_v1";
+
+      const byId = (id) => document.getElementById(id);
+      const getValue = (id) => String(byId(id)?.value || "").trim();
+      const hasValue = (value) => String(value || "").trim().length > 0;
+
+      const slugify = (value) =>
+        String(value || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "")
+          .slice(0, 40);
+
+      const getStandardPlanLink = (plan) => {
+        switch (plan) {
+          case "single":
+            return STRIPE_PAYMENT_LINKS.single;
+          case "starter":
+            return STRIPE_PAYMENT_LINKS.starter;
+          case "active":
+            return STRIPE_PAYMENT_LINKS.active;
+          case "unlimited":
+            return STRIPE_PAYMENT_LINKS.unlimited;
+          default:
+            return "";
+        }
+      };
+
+      const buildClientReferenceId = (plan, organization) =>
+        `be_publish_${plan}_${Date.now().toString(36)}_${slugify(organization)}`.slice(0, 120);
+
+      const buildMailto = (subject, body) =>
+        `mailto:mathias@bocholt-erleben.de?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      const joinLines = (lines) => lines.filter((line) => hasValue(line)).join("\n");
+      const lineIf = (label, value) => (hasValue(value) ? `${label}: ${value}` : "");
+
+      const bindStandardPath = () => {
+        const form = byId("publish-standard-form");
+        const trigger = byId("publish-standard-pay");
+
+        if (!form || !trigger) return;
+
+        trigger.addEventListener("click", (event) => {
+          event.preventDefault();
+
+          if (!form.reportValidity()) return;
+
+          const plan = getValue("publish-standard-plan");
+          const organization = getValue("publish-standard-organization");
+          const contact = getValue("publish-standard-contact");
+          const email = getValue("publish-standard-email");
+          const eventLink = getValue("publish-standard-event-link");
+          const title = getValue("publish-standard-title");
+          const date = getValue("publish-standard-date");
+          const time = getValue("publish-standard-time");
+          const place = getValue("publish-standard-place");
+          const website = getValue("publish-standard-website");
+          const description = getValue("publish-standard-description");
+          const notes = getValue("publish-standard-notes");
+
+          if (!hasValue(plan)) {
+            window.alert("Bitte wähle zuerst ein Modell aus.");
+            return;
+          }
+
+          if (!hasValue(eventLink) && !(hasValue(title) && hasValue(date) && hasValue(place))) {
+            window.alert("Bitte hinterlege mindestens einen Event-Link oder ergänze im Fallback Titel, Datum und Ort.");
+            return;
+          }
+
+          const paymentLink = getStandardPlanLink(plan);
+
+          if (!hasValue(paymentLink)) {
+            window.alert("Für dieses Modell ist noch kein Stripe-Zahlungslink hinterlegt. Bitte trage die vier echten Stripe-Links zuerst im Runtime-Block dieser Datei ein.");
+            return;
+          }
+
+          const leadId = buildClientReferenceId(plan, organization);
+          const checkoutContext = {
+            leadId,
+            plan,
+            organization,
+            contact,
+            email,
+            eventLink,
+            title,
+            date,
+            time,
+            place,
+            website,
+            description,
+            notes,
+            savedAt: new Date().toISOString()
+          };
+
+          try {
+            window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(checkoutContext));
+          } catch (error) {
+            console.warn("Checkout-Kontext konnte nicht in sessionStorage gespeichert werden.", error);
+          }
+
+          const url = new URL(paymentLink);
+          url.searchParams.set("locked_prefilled_email", email);
+          url.searchParams.set("client_reference_id", leadId);
+
+          window.location.href = url.toString();
+        });
+      };
+
+      const bindAutomationPath = () => {
+        const form = byId("publish-automation-form");
+        const trigger = byId("publish-automation-submit");
+
+        if (!form || !trigger) return;
+
+        trigger.addEventListener("click", (event) => {
+          event.preventDefault();
+
+          if (!form.reportValidity()) return;
+
+          const organization = getValue("publish-automation-organization");
+          const website = getValue("publish-automation-website");
+          const contact = getValue("publish-automation-contact");
+          const email = getValue("publish-automation-email");
+          const techContact = getValue("publish-automation-tech-contact");
+          const monthlyVolume = getValue("publish-automation-volume");
+          const sourceType = getValue("publish-automation-source-type");
+          const sourceLink = getValue("publish-automation-source-link");
+          const cadence = getValue("publish-automation-cadence");
+          const notes = getValue("publish-automation-notes");
+
+          if (!hasValue(sourceLink) && !hasValue(website)) {
+            window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
+            return;
+          }
+
+          const body = joinLines([
+            "Hallo Mathias,",
+            "",
+            "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
+            "",
+            lineIf("Organisation / Veranstalter", organization),
+            lineIf("Website", website),
+            lineIf("Ansprechpartner", contact),
+            lineIf("E-Mail", email),
+            lineIf("Technischer Ansprechpartner", techContact),
+            lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", monthlyVolume),
+            lineIf("Vorhandene Quelle", sourceType),
+            lineIf("Link zur Quelle oder zu Beispielterminen", sourceLink),
+            lineIf("Aktualisierungsrhythmus", cadence),
+            "",
+            lineIf("Weitere Hinweise (optional)", notes),
+            "",
+            "Viele Grüße"
+          ]);
+
+          window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
+        });
+      };
+
+      bindStandardPath();
+      bindAutomationPath();
+    })();
+  </script>
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <!-- === END BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V3_STRIPE_INTAKE === -->
   <!-- === END BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V1 === -->
 </body>
 </html>
