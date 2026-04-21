@@ -186,6 +186,7 @@
       </div>
     </section>
 
+    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_FORM_CONSUMER_V2 | Zweck: stellt den Standardweg auf die zentralen Shared-Form-Komponenten um und hält die Route selbst nur noch als Consumer für den Stripe-Intake; Umfang: kompletter Abschnitt 1 „Event einreichen“ === -->
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">1. Event einreichen</h2>
@@ -204,11 +205,11 @@
         </section>
       </div>
 
-      <form class="publish-intake-form" id="publish-standard-form" novalidate>
-        <div class="publish-form-grid">
-          <label class="publish-field" for="publish-standard-plan">
-            <span class="publish-field__label">Gewünschtes Modell *</span>
-            <select class="publish-field__control" id="publish-standard-plan" name="plan" required>
+      <form class="content-form" id="publish-standard-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field" for="publish-standard-plan">
+            <span class="content-field__label">Gewünschtes Modell *</span>
+            <select class="content-field__control" id="publish-standard-plan" name="plan" required>
               <option value="">Bitte wählen</option>
               <option value="single">Einzeltermin veröffentlichen · 9,90 € einmalig</option>
               <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
@@ -217,81 +218,83 @@
             </select>
           </label>
 
-          <label class="publish-field" for="publish-standard-organization">
-            <span class="publish-field__label">Veranstalter / Organisation *</span>
-            <input class="publish-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
+          <label class="content-field" for="publish-standard-organization">
+            <span class="content-field__label">Veranstalter / Organisation *</span>
+            <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
           </label>
 
-          <label class="publish-field" for="publish-standard-contact">
-            <span class="publish-field__label">Ansprechpartner</span>
-            <input class="publish-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
+          <label class="content-field" for="publish-standard-contact">
+            <span class="content-field__label">Ansprechpartner</span>
+            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
           </label>
 
-          <label class="publish-field" for="publish-standard-email">
-            <span class="publish-field__label">E-Mail für Stripe und Rückfragen *</span>
-            <input class="publish-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          <label class="content-field" for="publish-standard-email">
+            <span class="content-field__label">E-Mail für Stripe und Rückfragen *</span>
+            <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-standard-event-link">
-            <span class="publish-field__label">Event-Link oder Kalender-Link</span>
-            <input class="publish-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
+          <label class="content-field content-field--full" for="publish-standard-event-link">
+            <span class="content-field__label">Event-Link oder Kalender-Link</span>
+            <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
           </label>
         </div>
 
-        <div class="publish-section-head publish-section-head--sub">
+        <div class="content-form-section-head">
           <h3>Fallback nur wenn nötig</h3>
           <p class="content-note">Wenn kein sauberer Link vorhanden ist oder dort wichtige Informationen fehlen, ergänze bitte die wichtigsten Angaben direkt hier.</p>
         </div>
 
-        <div class="publish-form-grid">
-          <label class="publish-field" for="publish-standard-title">
-            <span class="publish-field__label">Titel</span>
-            <input class="publish-field__control" id="publish-standard-title" name="title" type="text">
+        <div class="content-form-grid">
+          <label class="content-field" for="publish-standard-title">
+            <span class="content-field__label">Titel</span>
+            <input class="content-field__control" id="publish-standard-title" name="title" type="text">
           </label>
 
-          <label class="publish-field" for="publish-standard-date">
-            <span class="publish-field__label">Datum</span>
-            <input class="publish-field__control" id="publish-standard-date" name="date" type="date">
+          <label class="content-field" for="publish-standard-date">
+            <span class="content-field__label">Datum</span>
+            <input class="content-field__control" id="publish-standard-date" name="date" type="date">
           </label>
 
-          <label class="publish-field" for="publish-standard-time">
-            <span class="publish-field__label">Uhrzeit</span>
-            <input class="publish-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
+          <label class="content-field" for="publish-standard-time">
+            <span class="content-field__label">Uhrzeit</span>
+            <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
           </label>
 
-          <label class="publish-field" for="publish-standard-place">
-            <span class="publish-field__label">Ort</span>
-            <input class="publish-field__control" id="publish-standard-place" name="place" type="text">
+          <label class="content-field" for="publish-standard-place">
+            <span class="content-field__label">Ort</span>
+            <input class="content-field__control" id="publish-standard-place" name="place" type="text">
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-standard-website">
-            <span class="publish-field__label">Website- oder Ticketlink</span>
-            <input class="publish-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          <label class="content-field content-field--full" for="publish-standard-website">
+            <span class="content-field__label">Website- oder Ticketlink</span>
+            <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-standard-description">
-            <span class="publish-field__label">Kurzbeschreibung</span>
-            <textarea class="publish-field__control publish-field__control--textarea" id="publish-standard-description" name="description" rows="4"></textarea>
+          <label class="content-field content-field--full" for="publish-standard-description">
+            <span class="content-field__label">Kurzbeschreibung</span>
+            <textarea class="content-field__control" id="publish-standard-description" name="description" rows="4"></textarea>
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-standard-notes">
-            <span class="publish-field__label">Weitere Hinweise</span>
-            <textarea class="publish-field__control publish-field__control--textarea" id="publish-standard-notes" name="notes" rows="3"></textarea>
+          <label class="content-field content-field--full" for="publish-standard-notes">
+            <span class="content-field__label">Weitere Hinweise</span>
+            <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="3"></textarea>
           </label>
         </div>
 
         <div class="content-actions content-actions--inline publish-final-actions">
-          <a class="content-cta content-cta--primary" href="#" id="publish-standard-pay">
+          <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
             Weiter zur Zahlung
-          </a>
+          </button>
         </div>
 
-        <p class="content-note publish-form-note">
+        <p class="content-form-note">
           Beim Klick wird deine E-Mail an Stripe vorbefüllt. Falls kein Event-Link vorhanden ist, brauchen wir für den Standardweg mindestens Titel, Datum und Ort.
         </p>
       </form>
     </section>
+    <!-- === END BLOCK: PUBLISH_STANDARD_FORM_CONSUMER_V2 === -->
 
+    <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_FORM_CONSUMER_V2 | Zweck: stellt den Profi-Pfad auf die zentralen Shared-Form-Komponenten um und hält die Route selbst nur noch als Consumer; Umfang: kompletter Abschnitt 2 „Automatische Anbindung anfragen“ === -->
     <section class="content-card publish-final-card publish-final-card--help" id="publish-automation" aria-labelledby="publish-automation-title">
       <div class="publish-section-head">
         <h2 id="publish-automation-title">2. Automatische Anbindung anfragen</h2>
@@ -310,36 +313,36 @@
         </section>
       </div>
 
-      <form class="publish-intake-form" id="publish-automation-form" novalidate>
-        <div class="publish-form-grid">
-          <label class="publish-field" for="publish-automation-organization">
-            <span class="publish-field__label">Veranstalter / Organisation *</span>
-            <input class="publish-field__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
+      <form class="content-form" id="publish-automation-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field" for="publish-automation-organization">
+            <span class="content-field__label">Veranstalter / Organisation *</span>
+            <input class="content-field__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
           </label>
 
-          <label class="publish-field" for="publish-automation-contact">
-            <span class="publish-field__label">Ansprechpartner *</span>
-            <input class="publish-field__control" id="publish-automation-contact" name="contact" type="text" autocomplete="name" required>
+          <label class="content-field" for="publish-automation-contact">
+            <span class="content-field__label">Ansprechpartner *</span>
+            <input class="content-field__control" id="publish-automation-contact" name="contact" type="text" autocomplete="name" required>
           </label>
 
-          <label class="publish-field" for="publish-automation-email">
-            <span class="publish-field__label">E-Mail *</span>
-            <input class="publish-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          <label class="content-field" for="publish-automation-email">
+            <span class="content-field__label">E-Mail *</span>
+            <input class="content-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
           </label>
 
-          <label class="publish-field" for="publish-automation-tech-contact">
-            <span class="publish-field__label">Technischer Ansprechpartner</span>
-            <input class="publish-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
+          <label class="content-field" for="publish-automation-tech-contact">
+            <span class="content-field__label">Technischer Ansprechpartner</span>
+            <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
           </label>
 
-          <label class="publish-field" for="publish-automation-volume">
-            <span class="publish-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
-            <input class="publish-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
+          <label class="content-field" for="publish-automation-volume">
+            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
+            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
           </label>
 
-          <label class="publish-field" for="publish-automation-source-type">
-            <span class="publish-field__label">Vorhandene Quelle *</span>
-            <select class="publish-field__control" id="publish-automation-source-type" name="sourceType" required>
+          <label class="content-field" for="publish-automation-source-type">
+            <span class="content-field__label">Vorhandene Quelle *</span>
+            <select class="content-field__control" id="publish-automation-source-type" name="sourceType" required>
               <option value="">Bitte wählen</option>
               <option value="API">API</option>
               <option value="Feed">Feed</option>
@@ -349,38 +352,39 @@
             </select>
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-automation-website">
-            <span class="publish-field__label">Website</span>
-            <input class="publish-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          <label class="content-field content-field--full" for="publish-automation-website">
+            <span class="content-field__label">Website</span>
+            <input class="content-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-automation-source-link">
-            <span class="publish-field__label">Link zur Quelle oder zu Beispielterminen</span>
-            <input class="publish-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
+          <label class="content-field content-field--full" for="publish-automation-source-link">
+            <span class="content-field__label">Link zur Quelle oder zu Beispielterminen</span>
+            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
           </label>
 
-          <label class="publish-field" for="publish-automation-cadence">
-            <span class="publish-field__label">Aktualisierungsrhythmus</span>
-            <input class="publish-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
+          <label class="content-field" for="publish-automation-cadence">
+            <span class="content-field__label">Aktualisierungsrhythmus</span>
+            <input class="content-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
           </label>
 
-          <label class="publish-field publish-field--full" for="publish-automation-notes">
-            <span class="publish-field__label">Weitere Hinweise</span>
-            <textarea class="publish-field__control publish-field__control--textarea" id="publish-automation-notes" name="notes" rows="4"></textarea>
+          <label class="content-field content-field--full" for="publish-automation-notes">
+            <span class="content-field__label">Weitere Hinweise</span>
+            <textarea class="content-field__control" id="publish-automation-notes" name="notes" rows="4"></textarea>
           </label>
         </div>
 
         <div class="content-actions content-actions--inline publish-final-actions">
-          <a class="content-cta" href="#" id="publish-automation-submit">
+          <button class="content-cta" id="publish-automation-submit" type="button">
             Anfrage per E-Mail vorbereiten
-          </a>
+          </button>
         </div>
 
-        <p class="content-note publish-form-note">
+        <p class="content-form-note">
           Dieser Weg bleibt bewusst manuell und prüfpflichtig. Erst nach Sichtung der Quelle entscheiden wir, ob und wie eine automatische Anbindung sinnvoll ist.
         </p>
       </form>
     </section>
+    <!-- === END BLOCK: PUBLISH_AUTOMATION_FORM_CONSUMER_V2 === -->
   </main>
   <!-- === END BLOCK: PUBLISH_PAGE_FUNNEL_V21_V1_TWO_PATHS === -->
   <!-- === BEGIN BLOCK: PUBLISH_PAGE_GLOBAL_RUNTIME_V3_STRIPE_INTAKE | Zweck: ergänzt /events-veroeffentlichen/ um clientseitige Intake-Validierung, Stripe-Weiterleitung für den Standardweg und Mailto-Vorbereitung für den Profi-Pfad; Umfang: Runtime plus globale Script-Includes direkt vor </body> === -->
