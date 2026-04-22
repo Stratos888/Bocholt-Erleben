@@ -69,7 +69,7 @@
   </header>
 
   <main class="page page--publish">
-    <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FOCUS_CLEANUP_V2 | Zweck: schärft die Profi-Route zu einer klaren prüfpflichtigen Anfrage-Seite mit weniger Redundanz und stärkerer Abgrenzung zum Standardweg; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/anbindung/ === -->
+    <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_MOBILE_ENTERPRISE_V3 | Zweck: schärft /events-veroeffentlichen/anbindung/ zu einer klaren mobilen Profi-Route mit sachlicherem Einstieg, kompakter Eignungsprüfung und technischerer Formularreihenfolge; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/anbindung/ === -->
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
@@ -77,6 +77,10 @@
           <h1>Automatische Anbindung anfragen</h1>
           <p class="content-lead">
             Dieser Weg ist für Veranstalter mit eigener Datenquelle gedacht. Wir prüfen zuerst, ob API, Feed, CSV oder iCal
+            technisch und inhaltlich sauber genug für eine laufende Übernahme sind.
+          </p>
+
+          <p Wir prüfen zuerst, ob API, Feed, CSV oder iCal
             technisch und inhaltlich sauber genug für eine laufende Übernahme sind.
           </p>
 
@@ -94,8 +98,8 @@
 
     <section class="content-card publish-benefits-card" aria-labelledby="publish-automation-explainer">
       <div class="publish-section-head">
-        <h2 id="publish-automation-explainer">Wann dieser Weg sinnvoll ist</h2>
-        <p class="content-note">Diese Anfrage lohnt sich nur, wenn eine Quelle dauerhaft gepflegt wird und technisch belastbar ist.</p>
+        <h2 id="publish-automation-explainer">Geeignet, wenn …</h2>
+        <p class="content-note">Dieser Weg lohnt sich nur, wenn die Quelle dauerhaft gepflegt wird und technisch belastbar ist.</p>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Geeignete Fälle für die automatische Anbindung">
@@ -108,12 +112,8 @@
           <span>Sinnvoll vor allem dann, wenn laufend neue veröffentlichte Termine pro Monat entstehen.</span>
         </li>
         <li>
-          <strong>Technischer Ansprechpartner</strong>
-          <span>Hilfreich, wenn Rückfragen zu Quelle, Format oder Aktualisierung schnell geklärt werden können.</span>
-        </li>
-        <li>
-          <strong>Prüfpflicht vor Umsetzung</strong>
-          <span>Nicht jede Quelle ist stabil, vollständig oder semantisch sauber genug für eine belastbare Automatisierung.</span>
+          <strong>Technische Rückfragen möglich</strong>
+          <span>Hilfreich, wenn jemand Quelle, Format und Aktualisierung schnell einordnen kann.</span>
         </li>
       </ul>
     </section>
@@ -143,11 +143,6 @@
             <input class="content-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
           </label>
 
-          <label class="content-field" for="publish-automation-tech-contact">
-            <span class="content-field__label">Technischer Ansprechpartner</span>
-            <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
-          </label>
-
           <label class="content-field" for="publish-automation-source-type">
             <span class="content-field__label">Vorhandene Quelle *</span>
             <select class="content-field__control" id="publish-automation-source-type" name="sourceType" required>
@@ -160,9 +155,9 @@
             </select>
           </label>
 
-          <label class="content-field" for="publish-automation-volume">
-            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
-            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
+          <label class="content-field content-field--full" for="publish-automation-source-link">
+            <span class="content-field__label">Link zur Quelle oder zu Beispielterminen</span>
+            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
           </label>
 
           <label class="content-field content-field--full" for="publish-automation-website">
@@ -170,14 +165,19 @@
             <input class="content-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
           </label>
 
-          <label class="content-field content-field--full" for="publish-automation-source-link">
-            <span class="content-field__label">Link zur Quelle oder zu Beispielterminen</span>
-            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
-          </label>
-
           <label class="content-field" for="publish-automation-cadence">
             <span class="content-field__label">Aktualisierungsrhythmus</span>
             <input class="content-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
+          </label>
+
+          <label class="content-field" for="publish-automation-volume">
+            <span class="content-field__label">Geschätzte veröffentlichte Termine pro Monat</span>
+            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
+          </label>
+
+          <label class="content-field" for="publish-automation-tech-contact">
+            <span class="content-field__label">Technischer Ansprechpartner</span>
+            <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
           </label>
 
           <label class="content-field content-field--full" for="publish-automation-notes">
@@ -197,7 +197,8 @@
         </p>
       </form>
     </section>
-    <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FOCUS_CLEANUP_V2 === -->
+    <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_MOBILE_ENTERPRISE_V3 === -->
+  </main>
   </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
