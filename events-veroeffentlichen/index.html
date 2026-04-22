@@ -78,7 +78,7 @@
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_V2 | Zweck: baut /events-veroeffentlichen/ von der bisherigen Mischseite zu einer reinen Übersichts- und Wegwahl-Route um, damit Standardweg und Profi-Pfad auf eigene Unterseiten verteilt werden; Umfang: kompletter Body-Inhaltsblock dieser Datei ab bestehendem Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V1 | Zweck: verdichtet /events-veroeffentlichen/ zu einer klaren mobilen Einstiegs- und Wegwahl-Seite mit starker Entscheidungszone und ruhiger sekundärer Preisorientierung; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -96,16 +96,12 @@
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
           <p class="content-lead">
-            Zwei Wege, ein klarer Einstieg: Für die meisten Veranstalter ist der Standardweg mit Event-Link und passendem Modell richtig.
+            Für die meisten Veranstalter ist der Standardweg mit Event-Link und passendem Modell richtig.
             Für API, Feed, CSV oder iCal gibt es einen getrennten Profi-Pfad mit vorheriger Prüfung.
           </p>
 
-          <p class="content-note publish-hero-meta">
-            Diese Seite ist bewusst nur der Einstieg. Die eigentliche Eingabe passiert auf den jeweiligen Unterseiten.
-          </p>
-
           <p class="content-note publish-hero-trust">
-            Zahlung und Veröffentlichung bleiben getrennt: Erst wird der passende Weg gewählt, danach folgen Modell, Prüfung und Veröffentlichung.
+            Diese Seite ist nur der Einstieg. Die eigentliche Eingabe passiert auf den jeweiligen Unterseiten.
           </p>
         </div>
       </div>
@@ -176,34 +172,6 @@
         </section>
       </div>
     </section>
-
-    <section class="content-card publish-benefits-card" aria-labelledby="publish-process-overview">
-      <div class="publish-section-head">
-        <h2 id="publish-process-overview">So läuft es ab</h2>
-      </div>
-
-      <div class="publish-steps-flow">
-        <section class="publish-step" aria-labelledby="publish-overview-step-1">
-          <h3 id="publish-overview-step-1">1. Richtigen Weg wählen</h3>
-          <p>Standardweg für normale Event-Einreichungen, Profi-Pfad für technische Quellen und wiederkehrende Anbindungen.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-overview-step-2">
-          <h3 id="publish-overview-step-2">2. Angaben oder Quelle erfassen</h3>
-          <p>Beim Standardweg erfassen wir Event-Link und Fallback-Daten. Beim Profi-Pfad reichen Veranstalter ihre Quelle zur Prüfung ein.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-overview-step-3">
-          <h3 id="publish-overview-step-3">3. Modell oder Umsetzung festlegen</h3>
-          <p>Im Standardweg folgt danach der passende Stripe-Checkout. Beim Profi-Pfad entscheiden wir nach der Prüfung über die geeignete operative Anbindung.</p>
-        </section>
-
-        <section class="publish-step" aria-labelledby="publish-overview-step-4">
-          <h3 id="publish-overview-step-4">4. Inhaltlich prüfen</h3>
-          <p>Vor der Veröffentlichung prüfen wir Plausibilität, Vollständigkeit und Verständlichkeit, damit die Darstellung auf Bocholt erleben sauber bleibt.</p>
-        </section>
-      </div>
-    </section>
   </main>
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
@@ -211,5 +179,6 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === END BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V1 === -->
 </body>
 </html>
