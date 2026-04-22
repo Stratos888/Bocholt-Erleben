@@ -1093,50 +1093,63 @@ select.content-field__control{
 }
 
 .page--organizers{
-  --subpage-stack-gap: 14px;
-  --subpage-card-pad-y: 16px;
-  --subpage-hero-gap: 9px;
+  --subpage-stack-gap: 12px;
+  --subpage-card-pad-y: 14px;
+  --subpage-hero-gap: 8px;
 }
 
 .page--organizers .content-hero--panel{
-  padding: 16px 16px 14px;
+  padding: 15px 15px 13px;
+}
+
+.page--organizers .content-kicker{
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
 }
 
 .page--organizers .content-hero h1{
-  max-width: 11ch;
-  line-height: 0.98;
+  max-width: 10.5ch;
+  font-size: clamp(1.28rem, 5.3vw, 1.42rem);
+  line-height: 0.99;
   letter-spacing: -0.035em;
 }
 
 .page--organizers .content-lead{
-  max-width: 36ch;
-  font-size: 0.94rem;
-  line-height: 1.38;
+  max-width: 34ch;
+  font-size: 0.92rem;
+  line-height: 1.34;
 }
 
 .page--organizers .content-note{
-  max-width: 42ch;
-  font-size: 0.80rem;
-  line-height: 1.30;
+  max-width: 39ch;
+  font-size: 0.79rem;
+  line-height: 1.28;
+}
+
+.page--organizers .content-actions{
+  margin-top: 2px;
 }
 
 .page--organizers .content-actions .content-cta,
 .page--organizers .content-actions .content-cta--primary{
+  width: 100%;
   min-height: 44px;
   padding-inline: 15px;
 }
 
 .page--organizers .content-card--primary{
-  gap: 8px;
+  gap: 7px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 
 .page--organizers .content-card--primary h2{
-  font-size: 1rem;
-  line-height: 1.20;
+  font-size: 0.98rem;
+  line-height: 1.18;
 }
 
 .page--organizers .content-card--primary p{
-  line-height: 1.38;
+  line-height: 1.34;
 }
 
 @media (max-width: 899.98px){
