@@ -7,8 +7,12 @@
       ? CONFIG.publishFunnel
       : ((window.CONFIG && window.CONFIG.publishFunnel) ? window.CONFIG.publishFunnel : (window.BE_PUBLISH_FUNNEL_CONFIG || {}));
 
+  /* === BEGIN BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 | Zweck: erweitert den zentralen Veranstalter-Funnel um einen Formspree-basierten Profi-Pfad mit Inline-Status, sauberem Submit-State und Mailto-Fallback, ohne den Standardweg zu verändern; Umfang: Runtime-Config, Helper und Bindings bis vor init() in js/publish-funnel.js === */
   const cfg = {
     automationEmail: "mathias@bocholt-erleben.de",
+    automationFormspreeEndpoint: "",
+    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Quelle und melden uns, falls noch Angaben fehlen.",
+    automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
     storageKey: "be_publish_checkout_context_v1",
     paymentLinks: {
       single: "",
@@ -76,6 +80,10 @@
     }
   }
 
+  function getAutomationEndpoint() {
+    return safeText(cfg.automationFormspreeEndpoint);
+  }
+
   function persistCheckoutContext(context) {
     try {
       window.sessionStorage.setItem(cfg.storageKey, JSON.stringify(context));
@@ -116,6 +124,119 @@
     };
   }
 
+  function buildAutomationSummary(context) {
+    return joinLines([
+      "Hallo Mathias,",
+      "",
+      "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
+      "",
+      lineIf("Organisation / Veranstalter", context.organization),
+      lineIf("Ansprechpartner", context.contact),
+      lineIf("E-Mail", context.email),
+      lineIf("Vorhandene Quelle", context.sourceType),
+      lineIf("Link zur Quelle oder zu Beispielterminen", context.sourceLink),
+      lineIf("Website", context.website),
+      lineIf("Aktualisierungsrhythmus", context.cadence),
+      lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", context.monthlyVolume),
+      lineIf("Technischer Ansprechpartner", context.techContact),
+      "",
+      lineIf("Weitere Hinweise (optional)", context.notes),
+      "",
+      "Viele Grüße"
+    ]);
+  }
+
+  function ensureAutomationStatusNode(form) {
+    let statusNode = form.querySelector("[data-publish-automation-status]");
+    if (statusNode) return statusNode;
+
+    statusNode = document.createElement("p");
+    statusNode.className = "content-form-note";
+    statusNode.hidden = true;
+    statusNode.setAttribute("data-publish-automation-status", "");
+    statusNode.setAttribute("aria-live", "polite");
+
+    const referenceNode =
+      form.querySelector(".publish-final-actions")?.nextElementSibling ||
+      form.querySelector(".publish-final-actions");
+
+    if (referenceNode) {
+      referenceNode.insertAdjacentElement("beforebegin", statusNode);
+    } else {
+      form.appendChild(statusNode);
+    }
+
+    return statusNode;
+  }
+
+  function setAutomationStatus(form, kind, message) {
+    const statusNode = ensureAutomationStatusNode(form);
+    statusNode.hidden = false;
+    statusNode.textContent = safeText(message);
+    statusNode.dataset.state = kind === "error" ? "error" : "success";
+    statusNode.setAttribute("aria-live", kind === "error" ? "assertive" : "polite");
+  }
+
+  function clearAutomationStatus(form) {
+    const statusNode = form.querySelector("[data-publish-automation-status]");
+    if (!statusNode) return;
+    statusNode.hidden = true;
+    statusNode.textContent = "";
+    delete statusNode.dataset.state;
+  }
+
+  function setAutomationSubmitting(trigger, isSubmitting) {
+    if (!trigger) return;
+    if (!trigger.dataset.defaultLabel) {
+      trigger.dataset.defaultLabel = trigger.textContent || "Anfrage per E-Mail vorbereiten";
+    }
+
+    trigger.disabled = isSubmitting;
+    trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
+    trigger.textContent = isSubmitting ? "Anfrage wird gesendet ..." : trigger.dataset.defaultLabel;
+  }
+
+  function buildAutomationPayload(context) {
+    const formData = new FormData();
+    formData.append("subject", "Bocholt erleben - Automatische Anbindung anfragen");
+    formData.append("request_type", "publish_automation_request");
+    formData.append("source_label", "bocholt-erleben-web");
+    formData.append("page_url", window.location.href);
+    formData.append("route", window.location.pathname || "/events-veroeffentlichen/anbindung/");
+    formData.append("organization", context.organization);
+    formData.append("contact", context.contact);
+    formData.append("email", context.email);
+    formData.append("source_type", context.sourceType);
+    formData.append("source_link", context.sourceLink);
+    formData.append("website", context.website);
+    formData.append("cadence", context.cadence);
+    formData.append("monthly_volume", context.monthlyVolume);
+    formData.append("tech_contact", context.techContact);
+    formData.append("notes", context.notes);
+    formData.append("message", buildAutomationSummary(context));
+    formData.append("submitted_at", new Date().toISOString());
+    return formData;
+  }
+
+  async function submitAutomationFormspree(context) {
+    const endpoint = getAutomationEndpoint();
+    if (!endpoint) return { mode: "mailto_fallback" };
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json"
+      },
+      body: buildAutomationPayload(context)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Formspree request failed with status ${response.status}`);
+    }
+
+    return { mode: "formspree" };
+  }
+
   function validateStandardContext(context) {
     if (!hasValue(context.plan)) {
       window.alert("Bitte wähle zuerst ein Modell aus.");
@@ -130,6 +251,15 @@
     const paymentLink = getPlanPaymentLink(context.plan);
     if (!hasValue(paymentLink)) {
       window.alert("Für dieses Modell ist noch kein Stripe-Zahlungslink hinterlegt.");
+      return false;
+    }
+
+    return true;
+  }
+
+  function validateAutomationContext(context) {
+    if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
+      window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
       return false;
     }
 
@@ -183,41 +313,37 @@
 
     if (!form || !trigger) return;
 
-    trigger.addEventListener("click", (event) => {
+    trigger.addEventListener("click", async (event) => {
       event.preventDefault();
 
       if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
 
       const context = buildAutomationContext();
+      if (!validateAutomationContext(context)) return;
 
-      if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
-        window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
-        return;
+      clearAutomationStatus(form);
+      setAutomationSubmitting(trigger, true);
+
+      try {
+        const result = await submitAutomationFormspree(context);
+
+        if (result.mode === "mailto_fallback") {
+          const body = buildAutomationSummary(context);
+          window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
+          return;
+        }
+
+        form.reset();
+        setAutomationStatus(form, "success", safeText(cfg.automationSuccessMessage) || "Anfrage erfolgreich gesendet.");
+      } catch (error) {
+        console.warn("Publish funnel: automation request failed.", error);
+        setAutomationStatus(form, "error", safeText(cfg.automationErrorMessage) || "Die Anfrage konnte gerade nicht gesendet werden.");
+      } finally {
+        setAutomationSubmitting(trigger, false);
       }
-
-      const body = joinLines([
-        "Hallo Mathias,",
-        "",
-        "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
-        "",
-        lineIf("Organisation / Veranstalter", context.organization),
-        lineIf("Website", context.website),
-        lineIf("Ansprechpartner", context.contact),
-        lineIf("E-Mail", context.email),
-        lineIf("Technischer Ansprechpartner", context.techContact),
-        lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", context.monthlyVolume),
-        lineIf("Vorhandene Quelle", context.sourceType),
-        lineIf("Link zur Quelle oder zu Beispielterminen", context.sourceLink),
-        lineIf("Aktualisierungsrhythmus", context.cadence),
-        "",
-        lineIf("Weitere Hinweise (optional)", context.notes),
-        "",
-        "Viele Grüße"
-      ]);
-
-      window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
     });
   }
+  /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 === */
 
   function init() {
     if (!isPublishRoute()) return;
