@@ -804,12 +804,12 @@ select.content-field__control{
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V21_V1_FUNNEL | Zweck: richtet die mobile und allgemeine Basis von /events-veroeffentlichen/ auf den verbindlichen V1-Zwei-Wege-Funnel mit Link-first-Standardweg, Einzeltermin-Option und ruhigerer Schrittkarten-Logik aus; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V22_HIERARCHY_POLISH | Zweck: hebt die Veranstalter-Routen auf das Standard-UI-Niveau des Projekts, reduziert visuelle Redundanz und stärkt nur die echten Arbeits-/Anfrageflächen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--publish{
-  --subpage-stack-gap: 12px;
+  --subpage-stack-gap: 14px;
   --subpage-card-gap: 10px;
-  --subpage-card-pad-y: 14px;
-  --subpage-hero-gap: 8px;
+  --subpage-card-pad-y: 15px;
+  --subpage-hero-gap: 9px;
 }
 
 .page--publish .content-hero,
@@ -826,7 +826,7 @@ select.content-field__control{
 }
 
 .page--publish .content-hero--panel{
-  padding: 16px 17px 14px;
+  padding: 17px 17px 15px;
 }
 
 .page--publish .publish-hero-layout{
@@ -837,32 +837,38 @@ select.content-field__control{
 
 .page--publish .publish-hero-copy{
   display: grid;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
   margin: 0;
-  max-width: 43ch;
-  font-size: 0.93rem;
-  line-height: 1.38;
+  max-width: 44ch;
+  font-size: 0.95rem;
+  line-height: 1.40;
   text-wrap: pretty;
 }
 
 .page--publish .publish-hero-meta{
-  max-width: 45ch;
+  max-width: 46ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.80rem;
-  line-height: 1.28;
+  font-size: 0.81rem;
+  line-height: 1.30;
 }
 
 .page--publish .publish-hero-trust{
-  max-width: 45ch;
+  max-width: 46ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.79rem;
-  line-height: 1.28;
+  font-size: 0.80rem;
+  line-height: 1.30;
+}
+
+.page--publish .publish-hero-trust a{
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
 }
 
 .page--publish .publish-hero-cta{
@@ -885,13 +891,21 @@ select.content-field__control{
 .page--publish .publish-membership-card,
 .page--publish .publish-start-card,
 .page--publish .publish-final-card{
-  gap: 10px;
+  gap: 11px;
+}
+
+.page--publish .publish-start-card,
+.page--publish .publish-final-card--help{
+  border-color: color-mix(in srgb, var(--cmp-divider-strong) 74%, var(--color-primary));
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.76) inset,
+    0 8px 18px rgba(22,39,61,0.04);
 }
 
 .page--publish .publish-section-head{
   display: grid;
-  gap: 4px;
-  padding-bottom: 10px;
+  gap: 5px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
@@ -906,7 +920,7 @@ select.content-field__control{
 
 .page--publish .publish-benefits-grid{
   display: grid;
-  gap: 8px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -914,19 +928,22 @@ select.content-field__control{
 
 .page--publish .publish-benefits-grid li{
   display: grid;
-  gap: 3px;
+  gap: 5px;
   align-content: start;
   min-height: 100%;
-  padding: 10px 12px;
+  padding: 12px 13px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
-  background: rgba(255,255,255,0.52);
+  background: rgba(255,255,255,0.56);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 6px 14px rgba(22,39,61,0.018);
 }
 
 .page--publish .publish-benefits-grid strong{
   display: block;
   color: var(--color-text-primary);
-  font-size: 0.88rem;
+  font-size: 0.89rem;
   font-weight: 760;
   line-height: 1.16;
 }
@@ -934,17 +951,21 @@ select.content-field__control{
 .page--publish .publish-benefits-grid span{
   color: var(--cmp-copy-color);
   font-size: 0.85rem;
-  line-height: 1.30;
+  line-height: 1.32;
+}
+
+.page--publish .publish-benefits-grid .content-actions{
+  margin-top: 3px;
 }
 
 .page--publish .publish-membership-layout{
   display: grid;
-  gap: 8px;
+  gap: 9px;
 }
 
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 8px;
+  gap: 9px;
 }
 
 .page--publish .publish-membership-intro{
@@ -955,7 +976,7 @@ select.content-field__control{
 
 .page--publish .publish-plans{
   display: grid;
-  gap: 8px;
+  gap: 9px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -963,18 +984,20 @@ select.content-field__control{
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 4px;
+  gap: 5px;
   margin: 0;
-  padding: 11px 12px;
+  padding: 12px 13px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
-  background: rgba(255,255,255,0.52);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+  background: rgba(255,255,255,0.56);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 6px 14px rgba(22,39,61,0.018);
 }
 
 .page--publish .publish-plans li:first-child{
-  border-color: color-mix(in srgb, var(--cmp-divider-strong) 72%, var(--color-primary));
-  background: color-mix(in srgb, rgba(255,255,255,0.62) 84%, var(--color-primary-muted));
+  border-color: color-mix(in srgb, var(--cmp-divider-strong) 70%, var(--color-primary));
+  background: color-mix(in srgb, rgba(255,255,255,0.66) 84%, var(--color-primary-muted));
 }
 
 .page--publish .publish-plans strong{
@@ -987,13 +1010,13 @@ select.content-field__control{
 .page--publish .publish-plans span{
   color: var(--cmp-copy-color);
   font-size: 0.89rem;
-  line-height: 1.26;
+  line-height: 1.28;
 }
 
 .page--publish .publish-plans li small{
   color: var(--cmp-copy-color);
   font-size: 0.83rem;
-  line-height: 1.28;
+  line-height: 1.30;
 }
 
 .page--publish .publish-plans-note{
@@ -1003,23 +1026,20 @@ select.content-field__control{
 
 .page--publish .publish-steps-flow{
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .page--publish .publish-step{
   display: grid;
-  gap: 4px;
+  gap: 5px;
   align-content: start;
-  padding: 11px 12px;
+  padding: 12px 13px;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 18px;
-  background: rgba(255,255,255,0.48);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.68) inset;
-}
-
-.page--publish .publish-step + .publish-step{
-  padding-top: 11px;
-  border-top: 1px solid var(--cmp-divider-strong);
+  background: rgba(255,255,255,0.50);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.70) inset,
+    0 6px 14px rgba(22,39,61,0.016);
 }
 
 .page--publish .publish-step h3{
@@ -1037,7 +1057,7 @@ select.content-field__control{
 }
 
 .page--publish .publish-final-card--help{
-  gap: 9px;
+  gap: 10px;
 }
 
 .page--publish .publish-final-card--help h2{
@@ -1045,6 +1065,14 @@ select.content-field__control{
   color: var(--color-text-primary);
   font-size: 1.01rem;
   line-height: 1.16;
+}
+
+.page--publish .content-form{
+  gap: 15px;
+}
+
+.page--publish .content-form-grid{
+  gap: 13px;
 }
 
 .page--publish .publish-final-actions{
@@ -1066,7 +1094,7 @@ select.content-field__control{
     padding-bottom: 13px;
   }
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V21_V1_FUNNEL === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V22_HIERARCHY_POLISH === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
@@ -1343,9 +1371,9 @@ select.content-field__control{
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_DESKTOP_V7 === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V14_V1_FUNNEL | Zweck: stellt /events-veroeffentlichen/ auf Desktop auf den verbindlichen V1-Funnel mit zwei Hero-CTAs, 2x2-Preislogik und kartenbasierter Schrittführung um; Umfang: nur page--publish im 900px-Breakpoint === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V15_HIERARCHY_POLISH | Zweck: ordnet /events-veroeffentlichen/ auf Desktop klarer als ruhige Wegwahl-/Arbeitsseitenfamilie ein und stärkt nur die tatsächlichen Formularflächen; Umfang: nur page--publish im 900px-Breakpoint === */
 .page--publish{
-  --subpage-body-max: 1108px;
+  --subpage-body-max: 1088px;
 }
 
 .page--publish .content-hero--panel{
@@ -1361,34 +1389,21 @@ select.content-field__control{
 }
 
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 60ch;
+  max-width: 58ch;
   font-size: 0.98rem;
   line-height: 1.46;
 }
 
 .page--publish .publish-hero-copy .publish-hero-meta{
-  max-width: 60ch;
+  max-width: 56ch;
   font-size: 0.86rem;
   line-height: 1.34;
 }
 
 .page--publish .publish-hero-copy .publish-hero-trust{
-  max-width: 60ch;
+  max-width: 56ch;
   font-size: 0.84rem;
   line-height: 1.34;
-}
-
-.page--publish .publish-hero-cta{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.page--publish .publish-hero-cta .content-cta,
-.page--publish .publish-hero-cta .content-cta--primary{
-  width: auto;
-  min-width: clamp(224px, 20vw, 272px);
 }
 
 .page--publish .publish-section-head{
@@ -1414,7 +1429,7 @@ select.content-field__control{
 }
 
 .page--publish .publish-membership-intro{
-  max-width: 68ch;
+  max-width: 64ch;
 }
 
 .page--publish .publish-plans{
@@ -1430,23 +1445,17 @@ select.content-field__control{
 }
 
 .page--publish .publish-plans-note{
-  max-width: 74ch;
+  max-width: 70ch;
   white-space: normal;
 }
 
-.page--publish .publish-start-card .publish-steps-flow,
-.page--publish .publish-final-card .publish-steps-flow{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+.page--publish .content-form{
+  gap: 16px;
 }
 
-.page--publish .publish-step{
-  min-height: 100%;
-  padding: 15px 16px;
-}
-
-.page--publish .publish-final-card--help{
-  gap: 10px;
+.page--publish .content-form-grid{
+  column-gap: 18px;
+  row-gap: 16px;
 }
 
 .page--publish .publish-final-actions{
@@ -1458,7 +1467,7 @@ select.content-field__control{
   width: auto;
   min-width: clamp(232px, 18vw, 268px);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V14_V1_FUNNEL === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_DESKTOP_V15_HIERARCHY_POLISH === */
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_DESKTOP_V11 | Zweck: setzt auf Desktop den deterministischen /info/-Render-Contract mit fixer rechter Hero-Breite, harter CTA-Breite und präziser Abschlussarchitektur um; Umfang: nur page--info im 900px-Breakpoint === */
   .page--info .content-hero--panel{
@@ -1553,21 +1562,21 @@ select.content-field__control{
     align-content: start;
   }
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V14_V1_FUNNEL | Zweck: kalibriert /events-veroeffentlichen/ auf Wide-Desktop für den V1-Zwei-Wege-Funnel mit ruhiger Hero-Dosierung, belastbarer 2x2-Preisarchitektur und breiterer Profi-Pfad-Struktur; Umfang: nur page--publish ab 1024px === */
+/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V15_HIERARCHY_POLISH | Zweck: kalibriert /events-veroeffentlichen/ auf Wide-Desktop ruhiger und näher an das übrige Subpage-Niveau, ohne neue UI-Muster einzuführen; Umfang: nur page--publish ab 1024px === */
 .page--publish .publish-hero-copy .content-lead{
-  max-width: 64ch;
+  max-width: 62ch;
 }
 
 .page--publish .publish-hero-copy .publish-hero-meta{
-  max-width: 62ch;
+  max-width: 58ch;
 }
 
 .page--publish .publish-hero-copy .publish-hero-trust{
-  max-width: 62ch;
+  max-width: 58ch;
 }
 
 .page--publish .publish-section-head .content-note{
-  max-width: 58ch;
+  max-width: 56ch;
 }
 
 .page--publish .publish-benefits-grid{
@@ -1587,23 +1596,14 @@ select.content-field__control{
 }
 
 .page--publish .publish-plans-note{
-  max-width: 78ch;
-}
-
-.page--publish .publish-final-card .publish-steps-flow{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.page--publish .publish-hero-cta .content-cta,
-.page--publish .publish-hero-cta .content-cta--primary{
-  min-width: clamp(238px, 18vw, 288px);
+  max-width: 74ch;
 }
 
 .page--publish .publish-final-actions .content-cta,
 .page--publish .publish-final-actions .content-cta--primary{
   min-width: clamp(232px, 18vw, 272px);
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V14_V1_FUNNEL === */
+/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_WIDE_V15_HIERARCHY_POLISH === */
 }
 
 @media (min-width: 1280px){
