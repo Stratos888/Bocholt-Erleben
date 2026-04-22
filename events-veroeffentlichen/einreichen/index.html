@@ -68,7 +68,7 @@
     </a>
   </header>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V3 | Zweck: schärft /events-veroeffentlichen/einreichen/ zu einer klaren mobilen Arbeitsroute mit reduziertem Vorlauf, fokussierter Form-Hierarchie und klar sekundärem Fallback; Umfang: kompletter Main-Bereich der Route /events-veroeffentlichen/einreichen/ === -->
+    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V4 | Zweck: reduziert den Standardweg auf eine mobile task-first Arbeitsroute mit minimalem Vorlauf, klarer Primärlogik und sichtbar sekundärem Fallback; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
     <main class="page page--publish">
       <header class="content-hero content-hero--panel">
         <div class="publish-hero-layout">
@@ -76,17 +76,10 @@
             <p class="content-kicker">Standardweg für Veranstalter</p>
             <h1>Event einreichen</h1>
             <p class="content-lead">
-              Für einzelne Termine und normale laufende Veröffentlichungen: zuerst die Angaben erfassen, danach mit dem passenden Modell zur Zahlung weitergehen.
+              Angaben erfassen, dann mit dem passenden Modell zur Zahlung weitergehen.
             </p>
-
-            <p class="content-note publish-hero-meta">
-              Im Idealfall genügt ein sauberer Event-Link. Nur wenn dort wichtige Informationen fehlen, brauchen wir zusätzliche Fallback-Angaben.
-            </p>
-
             <p class="content-note publish-hero-trust">
-              Für API, Feed, CSV oder iCal ist stattdessen der
-              <a href="/events-veroeffentlichen/anbindung/">Profi-Pfad für automatische Anbindung</a>
-              gedacht.
+              Ein sauberer Event-Link reicht oft schon. Fallback nur bei fehlenden Infos.
             </p>
           </div>
         </div>
@@ -94,9 +87,9 @@
 
       <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
         <div class="publish-section-head">
-          <h2 id="publish-submit-title">Event erfassen</h2>
+          <h2 id="publish-submit-title">Angaben erfassen</h2>
           <p class="content-note">
-            Für den Standardweg reichen im Normalfall Modell, Veranstalter, E-Mail und ein Event-Link.
+            Pflicht: Modell, Veranstalter, E-Mail. Event-Link möglichst direkt mitliefern.
           </p>
         </div>
 
@@ -137,7 +130,7 @@
           <div class="content-form-section-head">
             <h3>Fallback nur wenn nötig</h3>
             <p class="content-note">
-              Nur wenn kein sauberer Link vorhanden ist oder dort wichtige Informationen fehlen, ergänze bitte die wichtigsten Angaben direkt hier.
+              Nur ergänzen, wenn der Link wichtige Informationen nicht enthält.
             </p>
           </div>
 
@@ -185,11 +178,12 @@
           </div>
 
           <p class="content-form-note">
-            Für den Standardweg brauchen wir entweder einen Event-Link oder alternativ Titel, Datum und Ort als Fallback.
+            Erforderlich: Event-Link oder alternativ Titel, Datum und Ort.
           </p>
         </form>
       </section>
     </main>
+    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V4 === -->
     <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V3 === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
