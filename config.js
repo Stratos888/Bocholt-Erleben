@@ -41,6 +41,9 @@ const CONFIG = {
 
   publishFunnel: {
     automationEmail: "mathias@bocholt-erleben.de",
+    automationFormspreeEndpoint: "",
+    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Quelle und melden uns, falls noch Angaben fehlen.",
+    automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
     storageKey: "be_publish_checkout_context_v1",
     successUrl: "/events-veroeffentlichen/erfolg/",
     cancelUrl: "/events-veroeffentlichen/abgebrochen/",
