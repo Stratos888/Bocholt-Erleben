@@ -262,9 +262,10 @@
     line-height: 1.32;
   }
 
+  /* === BEGIN BLOCK: HOME_SHARED_CARD_ACTION_COPY_TOKEN_CONSUMERS_V1 | Zweck: zieht die wiederkehrende Body-/Meta-/Action-Copy der Events-/Aktivitäten-Feed-Cards auf zentrale Home-Copy- und Divider-Tokens, damit diese UI-DNA nicht mehr lokal hart codiert wird; Umfang: gemeinsame Card-Text- und Action-Zeile im Feed-Owner === */
   .event-card-desc{
     margin: 0;
-    color: rgba(31,41,51,0.80);
+    color: color-mix(in srgb, var(--home-copy-secondary) 94%, rgba(31,41,51,0.80) 6%);
     font-size: 0.95rem;
     line-height: 1.46;
 
@@ -284,7 +285,7 @@
     line-height: 1.28;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(67,82,63,0.66);
+    color: color-mix(in srgb, var(--home-copy-muted) 92%, rgba(67,82,63,0.66) 8%);
   }
 
   .event-card-actions{
@@ -296,7 +297,7 @@
     margin-top: auto;
     padding-top: 10px;
 
-    border-top: 1px solid rgba(31,41,51,0.08);
+    border-top: 1px solid color-mix(in srgb, var(--home-rail-divider) 76%, rgba(31,41,51,0.08) 24%);
   }
 
   .event-card-action{
@@ -317,14 +318,14 @@
     font-size: 0.88rem;
     font-weight: 700;
     line-height: 1.2;
-    color: rgba(58,73,61,0.88);
+    color: color-mix(in srgb, var(--home-copy-body) 92%, rgba(58,73,61,0.88) 8%);
     text-decoration: none;
 
     cursor: pointer;
   }
 
   .event-card-action:hover{
-    color: rgba(36,54,40,0.96);
+    color: color-mix(in srgb, var(--home-copy-contrast) 94%, rgba(36,54,40,0.96) 6%);
     text-decoration: underline;
     text-underline-offset: 0.14em;
   }
@@ -338,6 +339,7 @@
   .event-card-action--primary{
     color: color-mix(in srgb, var(--brand-green-800) 82%, var(--brand-gold-300) 18%);
   }
+  /* === END BLOCK: HOME_SHARED_CARD_ACTION_COPY_TOKEN_CONSUMERS_V1 === */
 
   .event-card-action--primary::after{
     content: "↗";
@@ -453,141 +455,151 @@
   text-transform: uppercase;
 }
 
-.desktop-entry__title{
-  margin: 0;
-  max-width: none;
-  color: #16311F;
-  font-size: clamp(2.8rem, 2.24rem + 1.78vw, 5rem);
-  font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.065em;
-  white-space: normal;
-  text-wrap: balance;
-  overflow: visible;
-}
-
-.desktop-entry__text{
-  margin: 0;
-  color: rgba(24,40,30,0.82);
-  font-size: 1rem;
-  font-weight: 560;
-  line-height: 1.42;
-}
-
-.desktop-entry__text--lead{
-  display: grid;
-  gap: 4px;
-  max-width: none;
-}
-
-.desktop-entry__lead-line{
-  display: block;
-  white-space: nowrap;
-}
-
-.desktop-entry__facts,
-.desktop-entry__aside,
-.desktop-entry__actions,
-.desktop-entry__cta,
-.desktop-entry__app-link,
-.desktop-hero__panel-head,
-.desktop-hero__actions{
-  display: none;
-}
-
-.desktop-hero__panel-kicker{
-  margin: 0;
-  color: rgba(22,39,61,0.56);
-  font-size: 0.8rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.desktop-hero__search-row{
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-}
-
-.desktop-hero__search-slot{
-  min-width: 0;
-}
-
-.desktop-hero__search-field{
-  min-width: 0;
-}
-
-.desktop-hero__icon{
-  --ui-icon-size: 18px;
-  --ui-icon-stroke: var(--ui-icon-stroke-md);
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
-  color: currentColor;
-  opacity: 1;
-}
-
-.desktop-hero__icon > .ui-icon-svg{
-  width: 100%;
-  height: 100%;
-}
-
-.desktop-hero__toolbar-pill{
-  min-width: 0;
-}
-
-.desktop-hero__action{
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 56px;
-  padding: 0 18px;
-  border: 1px solid rgba(24,40,30,0.11);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(242,246,237,0.88) 100%);
-  color: var(--color-text-primary);
-  font: inherit;
-  font-size: 0.95rem;
-  font-weight: 720;
-  line-height: 1;
-  text-decoration: none;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.94) inset,
-    0 10px 24px rgba(10,24,16,0.045);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    border-color 140ms ease,
-    background-color 140ms ease,
-    color 140ms ease,
-    transform 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.desktop-hero__action--publish,
-.desktop-hero__action--info,
-.desktop-hero__action--app{
-  color: var(--color-text-primary);
-  font: inherit;
-}
-
-@media (hover: hover){
-  .desktop-hero__action:hover{
-    border-color: rgba(24,40,30,0.16);
-    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(246,249,242,0.92) 100%);
-    color: #16311F;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.97) inset,
-      0 14px 28px rgba(10,24,16,0.058);
+  /* === BEGIN BLOCK: HOME_SHARED_DESKTOP_COPY_AND_ACTION_TOKEN_CONSUMERS_V1 | Zweck: zieht Desktop-Hero-Copy und Hero-Actions der Events-/Aktivitäten-Hauptseiten auf zentrale Home-Surface-/Copy-Tokens, damit finale Farb- und Action-DNA nicht mehr lokal hart codiert wird; Umfang: gemeinsame Desktop-Title-/Lead-/Kicker- sowie Action-Basis vor den späteren breakpoint-spezifischen Dosierungen === */
+  .desktop-entry__title{
+    margin: 0;
+    max-width: none;
+    color: var(--home-copy-contrast);
+    font-size: clamp(2.8rem, 2.24rem + 1.78vw, 5rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.065em;
+    white-space: normal;
+    text-wrap: balance;
+    overflow: visible;
   }
+
+  .desktop-entry__text{
+    margin: 0;
+    color: var(--home-copy-body);
+    font-size: 1rem;
+    font-weight: 560;
+    line-height: 1.42;
+  }
+
+  .desktop-entry__text--lead{
+    display: grid;
+    gap: 4px;
+    max-width: none;
+  }
+
+  .desktop-entry__lead-line{
+    display: block;
+    white-space: nowrap;
+  }
+
+  .desktop-entry__facts,
+  .desktop-entry__aside,
+  .desktop-entry__actions,
+  .desktop-entry__cta,
+  .desktop-entry__app-link,
+  .desktop-hero__panel-head,
+  .desktop-hero__actions{
+    display: none;
+  }
+
+  .desktop-hero__panel-kicker{
+    margin: 0;
+    color: color-mix(in srgb, var(--home-copy-secondary) 74%, white 26%);
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .desktop-hero__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .desktop-hero__search-slot{
+    min-width: 0;
+  }
+
+  .desktop-hero__search-field{
+    min-width: 0;
+  }
+
+  .desktop-hero__icon{
+    --ui-icon-size: 18px;
+    --ui-icon-stroke: var(--ui-icon-stroke-md);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    color: currentColor;
+    opacity: 1;
+  }
+
+  .desktop-hero__icon > .ui-icon-svg{
+    width: 100%;
+    height: 100%;
+  }
+
+  .desktop-hero__toolbar-pill{
+    min-width: 0;
+  }
+
+  .desktop-hero__action{
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    padding: 0 18px;
+    border: 1px solid var(--home-action-border);
+    border-radius: 18px;
+    background: linear-gradient(180deg, var(--home-action-bg-start) 0%, color-mix(in srgb, var(--home-action-bg-end) 98%, rgba(242,246,237,0.88) 2%) 100%);
+    color: var(--home-copy-strong);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 720;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: var(--home-action-shadow);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease,
+      transform 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .desktop-hero__action--publish,
+  .desktop-hero__action--info,
+  .desktop-hero__action--app{
+    color: var(--home-copy-strong);
+    font: inherit;
+  }
+
+  @media (hover: hover){
+    .desktop-hero__action:hover{
+      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(24,40,30,0.16) 14%);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--home-action-bg-start) 99%, rgba(255,255,255,0.96) 1%) 0%, color-mix(in srgb, var(--home-action-bg-end) 98%, rgba(246,249,242,0.92) 2%) 100%);
+      color: var(--home-copy-contrast);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.97) inset,
+        0 14px 28px rgba(10,24,16,0.058);
+    }
+  }
+
+  .desktop-hero__action:active{
+    transform: translateY(1px);
+  }
+
+  .desktop-hero__action:focus-visible{
+    outline: 2px solid var(--cmp-btn-focus-ring);
+    outline-offset: 3px;
+  }
+  /* === END BLOCK: HOME_SHARED_DESKTOP_COPY_AND_ACTION_TOKEN_CONSUMERS_V1 === */
 }
 
 .desktop-hero__action:active{
@@ -663,6 +675,7 @@
 }
 
 @media (max-width: 899.98px){
+  /* === BEGIN BLOCK: HOME_SHARED_MOBILE_PUBLISH_ENTRY_TOKEN_CONSUMERS_V1 | Zweck: zieht den mobilen Veranstalter-Entry der Events-Hauptseite auf dieselben zentralen Home-Surface-/Copy-Tokens wie die übrigen Hauptseitenflächen, ohne die validierte Optik zu verändern; Umfang: nur mobile feed-publish-entry Surface-/Copy-Consumer === */
   .feed-publish-entry{
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -676,13 +689,13 @@
     margin: 6px 0 4px;
     padding: 12px 14px;
 
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.14) 74%, var(--brand-gold-200) 26%);
+    border: 1px solid var(--home-action-border);
     border-radius: 14px;
 
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.994) 0%,
-      rgba(248,250,238,0.976) 100%
+      var(--home-action-bg-start) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 98%, rgba(248,250,238,0.976) 2%) 100%
     );
 
     box-shadow:
@@ -704,54 +717,54 @@
     font-weight: 780;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--brand-green-900) 72%, var(--color-text-muted) 28%);
+    color: color-mix(in srgb, var(--home-copy-strong) 72%, var(--color-text-muted) 28%);
   }
 
-/* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 | Zweck: stellt den mobilen Veranstalter-Entry auf echten SVG-Chevron-Slot um und hält Größe/Gewichtung systemisch konsistent; Umfang: ersetzt nur main/title/chevron-Styling des Feed-CTA === */
-.feed-publish-entry__main{
-  display: contents;
-}
+  /* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 | Zweck: stellt den mobilen Veranstalter-Entry auf echten SVG-Chevron-Slot um und hält Größe/Gewichtung systemisch konsistent; Umfang: ersetzt nur main/title/chevron-Styling des Feed-CTA === */
+  .feed-publish-entry__main{
+    display: contents;
+  }
 
-.feed-publish-entry__title{
-  grid-area: title;
-  font-size: 0.98rem;
-  font-weight: 760;
-  line-height: 1.2;
-  color: color-mix(in srgb, var(--color-text-primary) 92%, var(--brand-green-900) 8%);
-}
+  .feed-publish-entry__title{
+    grid-area: title;
+    font-size: 0.98rem;
+    font-weight: 760;
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--home-copy-contrast) 92%, var(--brand-green-900) 8%);
+  }
 
-.feed-publish-entry__chevron{
-  --ui-icon-size: 16px;
-  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+  .feed-publish-entry__chevron{
+    --ui-icon-size: 16px;
+    --ui-icon-stroke: var(--ui-icon-stroke-sm);
 
-  grid-area: chevron;
-  align-self: center;
-  justify-self: end;
+    grid-area: chevron;
+    align-self: center;
+    justify-self: end;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-  width: 16px;
-  height: 16px;
+    width: 16px;
+    height: 16px;
 
-  opacity: 0.88;
-  color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
-}
+    opacity: 0.88;
+    color: color-mix(in srgb, var(--brand-green-900) 74%, var(--brand-gold-300) 26%);
+  }
 
-.feed-publish-entry__chevron > .ui-icon-svg{
-  width: 100%;
-  height: 100%;
-}
-/* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 === */
+  .feed-publish-entry__chevron > .ui-icon-svg{
+    width: 100%;
+    height: 100%;
+  }
+  /* === END BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_STYLE_V1 === */
 
   @media (hover: hover){
     .feed-publish-entry:hover{
-      border-color: color-mix(in srgb, rgba(47,69,33,0.18) 74%, var(--brand-gold-200) 26%);
+      border-color: color-mix(in srgb, var(--home-action-border) 88%, rgba(47,69,33,0.18) 12%);
       background: linear-gradient(
         180deg,
-        rgba(255,255,255,0.996) 0%,
-        rgba(249,251,240,0.980) 100%
+        color-mix(in srgb, var(--home-action-bg-start) 99%, rgba(255,255,255,0.996) 1%) 0%,
+        color-mix(in srgb, var(--home-action-bg-end) 98%, rgba(249,251,240,0.980) 2%) 100%
       );
     }
   }
@@ -764,6 +777,7 @@
     outline: 2px solid var(--cmp-btn-focus-ring);
     outline-offset: 3px;
   }
+  /* === END BLOCK: HOME_SHARED_MOBILE_PUBLISH_ENTRY_TOKEN_CONSUMERS_V1 === */
 }
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_DEFERRED_IN_FEED_V4 === */
