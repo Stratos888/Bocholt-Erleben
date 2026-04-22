@@ -41,7 +41,7 @@ const CONFIG = {
 
   publishFunnel: {
     automationEmail: "mathias@bocholt-erleben.de",
-    automationFormspreeEndpoint: "",
+    automationFormspreeEndpoint: "https://formspree.io/f/mjgjadzy",
     automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Quelle und melden uns, falls noch Angaben fehlen.",
     automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
     storageKey: "be_publish_checkout_context_v1",
