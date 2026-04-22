@@ -804,7 +804,7 @@ select.content-field__control{
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V24 | Zweck: bringt die fünf Veranstalter-Routen auf einen final deutlich reduzierten Mobile-Zielzustand mit weniger Textgewicht, weniger vertikaler Länge, schärferer Task-Priorität und ohne Feedback-Ablenkung; Umfang: kompletter Mobile-Ownerblock für page--publish und page--organizers außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V25 | Zweck: bringt die Veranstalter-Routen auf einen state-of-the-art Mobile-Formzustand mit besserem Header-Umbruch, kompakteren aber weiterhin gut tappbaren Feldern, kleineren Textareas und ohne Feedback-Ablenkung im Funnel; Umfang: kompletter Mobile-Ownerblock für page--publish und page--organizers außerhalb der Desktop-Breakpoints === */
 .page--publish{
   --subpage-stack-gap: 10px;
   --subpage-card-gap: 8px;
@@ -876,7 +876,7 @@ select.content-field__control{
 .page--publish .publish-final-actions .content-cta--primary{
   width: 100%;
   min-width: 0;
-  min-height: 42px;
+  min-height: 44px;
   padding-inline: 14px;
 }
 
@@ -1027,11 +1027,40 @@ select.content-field__control{
 }
 
 .page--publish .content-form{
-  gap: 11px;
+  gap: 10px;
 }
 
 .page--publish .content-form-grid{
-  gap: 10px;
+  gap: 8px;
+}
+
+.page--publish .content-field{
+  gap: 4px;
+}
+
+.page--publish .content-field__label{
+  font-size: 0.80rem;
+  line-height: 1.18;
+}
+
+.page--publish .content-field__control{
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 15px;
+  line-height: 1.28;
+}
+
+.page--publish textarea.content-field__control{
+  min-height: 92px;
+}
+
+.page--publish #publish-standard-description,
+.page--publish #publish-automation-notes{
+  min-height: 96px;
+}
+
+.page--publish #publish-standard-notes{
+  min-height: 84px;
 }
 
 .page--publish .content-form-section-head{
@@ -1052,8 +1081,8 @@ select.content-field__control{
   justify-items: stretch;
 }
 
-.page--publish .feedback-inline-entry,
-.page--organizers .feedback-inline-entry{
+main.page--publish + .feedback-inline-entry,
+main.page--organizers + .feedback-inline-entry{
   display: none !important;
 }
 
@@ -1073,14 +1102,16 @@ select.content-field__control{
 }
 
 .page--organizers .content-hero h1{
-  max-width: 9.6ch;
-  font-size: clamp(1.18rem, 4.9vw, 1.34rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  max-width: 12.6ch;
+  font-size: clamp(1.24rem, 5.2vw, 1.46rem);
+  line-height: 0.94;
+  letter-spacing: -0.036em;
+  text-wrap: balance;
+  hyphens: none;
 }
 
 .page--organizers .content-lead{
-  max-width: 31ch;
+  max-width: 32ch;
   font-size: 0.88rem;
   line-height: 1.26;
 }
@@ -1098,7 +1129,7 @@ select.content-field__control{
 .page--organizers .content-actions .content-cta,
 .page--organizers .content-actions .content-cta--primary{
   width: 100%;
-  min-height: 42px;
+  min-height: 44px;
   padding-inline: 14px;
 }
 
@@ -1130,7 +1161,7 @@ select.content-field__control{
     padding-bottom: 11px;
   }
 }
-/* === END BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V24 === */
+/* === END BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V25 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
