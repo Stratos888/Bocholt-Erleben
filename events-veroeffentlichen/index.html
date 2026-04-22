@@ -90,16 +90,17 @@
     </a>
   </header>
 
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V2 | Zweck: reduziert die Veranstalter-Übersicht auf eine echte mobile Entscheidungsseite mit minimalem Intro, dominanter Wegwahl und ruhiger Preisorientierung; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Event veröffentlichen</h1>
           <p class="content-lead">
-            Für die meisten Veranstalter ist der Standardweg mit Event-Link richtig. Für API, Feed, CSV oder iCal gibt es einen getrennten Profi-Pfad mit vorheriger Prüfung.
+            Standardweg für normale Termine. Profi-Pfad für strukturierte Quellen wie API, Feed, CSV oder iCal.
           </p>
           <p class="content-note publish-hero-trust">
-            Diese Seite ist nur der Einstieg. Die eigentliche Eingabe passiert auf den jeweiligen Unterseiten.
+            Wähle jetzt den passenden Weg.
           </p>
         </div>
       </div>
@@ -107,13 +108,13 @@
 
     <section class="content-card publish-benefits-card" aria-labelledby="publish-route-choice">
       <div class="publish-section-head">
-        <h2 id="publish-route-choice">Welcher Weg passt zu dir?</h2>
+        <h2 id="publish-route-choice">Weg wählen</h2>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Wegwahl für Veranstalter">
         <li>
-          <strong>Standardweg: Event einreichen</strong>
-          <span>Für einzelne Termine und normale laufende Veröffentlichungen.</span>
+          <strong>Event einreichen</strong>
+          <span>Für einzelne Termine und normale Veröffentlichungen.</span>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/einreichen/">
               Event einreichen
@@ -121,8 +122,8 @@
           </div>
         </li>
         <li>
-          <strong>Profi-Pfad: Automatische Anbindung</strong>
-          <span>Für strukturierte Quellen wie API, Feed, CSV oder iCal.</span>
+          <strong>Automatische Anbindung</strong>
+          <span>Für strukturierte Quellen und laufende Übernahme.</span>
           <div class="content-actions content-actions--inline">
             <a class="content-cta" href="/events-veroeffentlichen/anbindung/">
               Automatische Anbindung anfragen
@@ -134,7 +135,7 @@
 
     <section class="content-card publish-membership-card" aria-labelledby="publish-prices">
       <div class="publish-section-head">
-        <h2 id="publish-prices">Preise</h2>
+        <h2 id="publish-prices">Modelle und Preise</h2>
         <p class="content-note publish-membership-intro">Einmalig oder monatlich – je nach Bedarf.</p>
       </div>
 
@@ -142,34 +143,35 @@
         <section class="publish-membership-block" aria-label="Preise für Veranstalter">
           <ul class="publish-plans" aria-label="Preise für Veranstalter">
             <li>
-              <strong>Einzeltermin veröffentlichen</strong>
+              <strong>Einzeltermin</strong>
               <span>9,90&nbsp;€ einmalig</span>
               <small>Für einzelne Termine.</small>
             </li>
             <li>
               <strong>Starter</strong>
-              <span>9,99&nbsp;€ / Monat · bis zu 3 veröffentlichte Termine pro Monat</span>
+              <span>9,99&nbsp;€ / Monat · bis zu 3 Termine</span>
               <small>Für kleine Veranstalter.</small>
             </li>
             <li>
               <strong>Aktiv</strong>
-              <span>19,99&nbsp;€ / Monat · bis zu 8 veröffentlichte Termine pro Monat</span>
+              <span>19,99&nbsp;€ / Monat · bis zu 8 Termine</span>
               <small>Für regelmäßige Veröffentlichungen.</small>
             </li>
             <li>
               <strong>Unbegrenzt</strong>
-              <span>29,99&nbsp;€ / Monat · unbegrenzt veröffentlichte Termine pro Monat</span>
+              <span>29,99&nbsp;€ / Monat · unbegrenzt</span>
               <small>Für viele laufende Termine.</small>
             </li>
           </ul>
 
           <p class="content-note publish-plans-note">
-            Automatische Anbindung wird nach Prüfung innerhalb des passenden Modells umgesetzt.
+            Anbindung wird nach Prüfung innerhalb des passenden Modells umgesetzt.
           </p>
         </section>
       </div>
     </section>
   </main>
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V2 === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
