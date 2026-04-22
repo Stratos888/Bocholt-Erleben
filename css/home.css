@@ -63,31 +63,30 @@
   box-shadow: none;
 }
 
+/* === BEGIN BLOCK: HOME_SHARED_MOBILE_FEED_TOKEN_CONSUMERS_V1 | Zweck: zieht die wiederkehrenden Mobile-Feed-/Card-/Badge-/Copy-Surfaces der Events-/Aktivitäten-Hauptseiten auf zentrale Home-Surface-Tokens, ohne die validierte Mobile-Optik zu verändern; Umfang: Basis- und Mobile-Card-Flächen im Feed-Owner === */
 .event-card{
-  background: linear-gradient(180deg, rgba(255,255,252,0.986) 0%, rgba(250,252,244,0.972) 100%);
-  border-color: color-mix(in srgb, rgba(47,69,33,0.12) 74%, var(--brand-gold-200) 26%);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.88) inset,
-    0 8px 18px rgba(16,28,10,0.040);
+  background: linear-gradient(180deg, var(--home-panel-bg-start) 0%, var(--home-panel-bg-end) 100%);
+  border-color: var(--home-panel-border);
+  box-shadow: var(--home-panel-shadow);
 }
 
 .event-card::before{
   background: linear-gradient(
     180deg,
-    rgba(229,237,211,0.976) 0%,
-    rgba(220,231,198,0.968) 100%
+    var(--home-rail-bg-start) 0%,
+    var(--home-rail-bg-end) 100%
   );
   opacity: 0.96;
-  box-shadow: inset -1px 0 0 rgba(24,40,30,0.050);
+  box-shadow: inset -1px 0 0 var(--home-rail-divider);
 }
 
 .event-date-badge{
   background: linear-gradient(
     180deg,
-    rgba(252,253,248,0.994) 0%,
-    rgba(241,247,229,0.986) 100%
+    var(--home-action-bg-start) 0%,
+    color-mix(in srgb, var(--home-action-bg-end) 78%, rgba(241,247,229,0.986) 22%) 100%
   );
-  color: rgba(24,40,30,0.92);
+  color: var(--home-copy-strong);
   box-shadow:
     inset 0 0 0 1px rgba(24,40,30,0.062),
     inset 0 1px 0 rgba(255,255,255,0.86),
@@ -95,19 +94,19 @@
 }
 
 .event-date-badge__wday{
-  color: rgba(74,91,71,0.64);
+  color: var(--home-copy-muted);
 }
 
 .event-date-badge__month{
-  color: rgba(74,91,71,0.62);
+  color: var(--home-copy-subtle);
 }
 
 .event-title{
-  color: rgba(23,39,29,0.92);
+  color: var(--home-copy-contrast);
 }
 
 .event-card-desc{
-  color: rgba(31,41,51,0.78);
+  color: var(--home-copy-secondary);
 }
 
 @media (max-width: 899.98px){
@@ -117,8 +116,8 @@
   }
 
   .event-card{
-    background: linear-gradient(180deg, rgba(255,255,252,0.992) 0%, rgba(250,252,243,0.976) 100%);
-    border-color: color-mix(in srgb, rgba(47,69,33,0.14) 74%, var(--brand-gold-200) 26%);
+    background: linear-gradient(180deg, var(--home-panel-bg-start) 0%, color-mix(in srgb, var(--home-panel-bg-end) 99%, rgba(250,252,243,0.976) 1%) 100%);
+    border-color: color-mix(in srgb, var(--home-panel-border) 94%, rgba(47,69,33,0.14) 6%);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.90) inset,
       0 8px 18px rgba(16,28,10,0.042);
@@ -127,18 +126,18 @@
   .event-card::before{
     background: linear-gradient(
       180deg,
-      rgba(230,238,212,0.986) 0%,
-      rgba(220,231,198,0.982) 100%
+      color-mix(in srgb, var(--home-rail-bg-start) 99%, rgba(230,238,212,0.986) 1%) 0%,
+      color-mix(in srgb, var(--home-rail-bg-end) 99%, rgba(220,231,198,0.982) 1%) 100%
     );
     opacity: 0.98;
-    box-shadow: inset -1px 0 0 rgba(24,40,30,0.054);
+    box-shadow: inset -1px 0 0 color-mix(in srgb, var(--home-rail-divider) 96%, rgba(24,40,30,0.054) 4%);
   }
 
   .event-date-badge{
     background: linear-gradient(
       180deg,
-      rgba(252,253,248,0.996) 0%,
-      rgba(241,247,229,0.988) 100%
+      color-mix(in srgb, var(--home-action-bg-start) 99%, rgba(252,253,248,0.996) 1%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 86%, rgba(241,247,229,0.988) 14%) 100%
     );
     box-shadow:
       inset 0 0 0 1px rgba(24,40,30,0.068),
@@ -147,13 +146,14 @@
   }
 
   .event-date-badge__wday{
-    color: rgba(75,92,72,0.66);
+    color: color-mix(in srgb, var(--home-copy-muted) 96%, rgba(75,92,72,0.66) 4%);
   }
 
   .event-date-badge__month{
-    color: rgba(75,92,72,0.64);
+    color: color-mix(in srgb, var(--home-copy-subtle) 96%, rgba(75,92,72,0.64) 4%);
   }
 }
+/* === END BLOCK: HOME_SHARED_MOBILE_FEED_TOKEN_CONSUMERS_V1 === */
 /* === END BLOCK: EVENT_FEED_LAYOUT_DESKTOP_2UP_OWNER_V4 === */
 
 /* === BEGIN BLOCK: MOBILE_SEARCH_ROW_OWNERSHIP_NOTE | Purpose: remove early duplicate mobile search-row layout so the final winning mobile owner lives only later next to the base DESKTOP_HERO_STRUCTURE_V8 rule; Scope: replaces the old early mobile duplicate block === */
@@ -387,7 +387,7 @@
   margin: 0;
 }
 
-/* === BEGIN BLOCK: HOME_TOP_STACK_STICKY_OFFSET_FIX_V1 | Zweck: synchronisiert auf Mobile den sticky Top-Offset des Filterbereichs mit der realen Header-Höhe und verhindert das nachgewiesene 2px-Hochrutschen beim Scrollen/Pull; Umfang: ersetzt nur den globalen .top-stack-Basisblock und ergänzt den Mobile-Offset-Fix === */
+/* === BEGIN BLOCK: HOME_SHARED_MOBILE_TOPSTACK_TOKEN_CONSUMERS_V1 | Zweck: stellt die mobile sticky Top-Stack-Surface der Events-/Aktivitäten-Hauptseiten auf zentrale Toolbar-Tokens um, ohne die validierte Sticky-Geometrie zu verändern; Umfang: nur globaler .top-stack-Basisblock === */
 /* TOP STACK (search as hero, reduced section feel) */
 .top-stack{
   position: sticky;
@@ -396,19 +396,22 @@
 
   padding: 4px var(--gutter) var(--topstack-pad-bottom);
 
-  background: rgba(243,247,239,0.96);
+  background: linear-gradient(
+    180deg,
+    var(--home-toolbar-bg-start) 0%,
+    var(--home-toolbar-bg-end) 100%
+  );
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 
-  border-bottom: 1px solid rgba(24,40,30,0.09);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.78) inset,
-    0 8px 18px rgba(10,24,16,0.05);
+  border-bottom: 1px solid var(--home-toolbar-border);
+  box-shadow: var(--home-toolbar-shadow);
 
   /* wichtig: kein transform → reduziert sticky „rubberband wobble“ auf Android */
   transform: none;
   contain: none;
 }
+/* === END BLOCK: HOME_SHARED_MOBILE_TOPSTACK_TOKEN_CONSUMERS_V1 === */
 
 @media (max-width: 899.98px){
   .top-stack{
@@ -801,6 +804,7 @@
     --desktop-reset-w: 46px;
   }
 
+  /* === BEGIN BLOCK: HOME_SHARED_DESKTOP_HEADER_TOKEN_CONSUMERS_V1 | Zweck: stellt den gemeinsamen Desktop-Header der Events-/Aktivitäten-Hauptseiten auf zentrale Shell- und Copy-Tokens um, damit dieselbe Surface-DNA nur noch an einer Stelle gepflegt wird; Umfang: Desktop-Header, Logo-Shadow und Titel-Copy ab 900px === */
   body.is-tabbar-hidden .app-header,
   body.page-route-activities .app-header{
     min-height: 58px;
@@ -808,13 +812,11 @@
     padding-right: 28px;
     background: linear-gradient(
       180deg,
-      rgba(248,248,241,0.994) 0%,
-      rgba(242,244,235,0.984) 100%
+      var(--home-shell-bg-start) 0%,
+      var(--home-shell-bg-end) 100%
     );
-    border-bottom: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 80%, var(--brand-gold-200) 20%);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.88) inset,
-      0 6px 16px rgba(16,28,10,0.022);
+    border-bottom: 1px solid var(--home-shell-border);
+    box-shadow: var(--home-shell-shadow);
     -webkit-backdrop-filter: blur(9px) saturate(1.02);
     backdrop-filter: blur(9px) saturate(1.02);
   }
@@ -837,12 +839,18 @@
   body.is-tabbar-hidden .app-title,
   body.page-route-activities .app-title{
     max-width: none;
-    color: color-mix(in srgb, var(--brand-green-900) 88%, var(--brand-gold-300) 12%);
+    color: var(--home-copy-strong);
     font-size: 1.18rem;
     font-weight: 710;
     letter-spacing: -0.03em;
     line-height: 1.03;
   }
+
+  body.is-tabbar-hidden .header-right,
+  body.page-route-activities .header-right{
+    display: none;
+  }
+  /* === END BLOCK: HOME_SHARED_DESKTOP_HEADER_TOKEN_CONSUMERS_V1 === */
 
   body.is-tabbar-hidden .header-right,
   body.page-route-activities .header-right{
@@ -1028,10 +1036,11 @@
     content: none;
   }
 
+  /* === BEGIN BLOCK: HOME_SHARED_COPY_TOKEN_CONSUMERS_V1 | Zweck: zieht die zentrale Desktop-Hero-Copy der Events-/Aktivitäten-Hauptseiten auf semantische Copy-Tokens, damit Farbe und Kontrast nicht mehr lokal hart codiert werden; Umfang: Desktop-Title- und Lead-Copy der gemeinsamen Top-Shell ab 900px === */
   body.is-tabbar-hidden .desktop-entry__title,
   body.page-route-activities .desktop-entry__title{
     max-width: 27.5rem;
-    color: #10281B;
+    color: var(--home-copy-contrast);
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
     line-height: 0.98;
     letter-spacing: -0.056em;
@@ -1041,12 +1050,13 @@
   body.is-tabbar-hidden .desktop-entry__text,
   body.page-route-activities .desktop-entry__text{
     max-width: 21.4rem;
-    color: rgba(14,26,20,0.97);
+    color: color-mix(in srgb, var(--home-copy-contrast) 96%, #000 4%);
     font-size: 1.01rem;
     line-height: 1.46;
     font-weight: 620;
     text-shadow: 0 1px 0 rgba(255,255,255,0.05);
   }
+  /* === END BLOCK: HOME_SHARED_COPY_TOKEN_CONSUMERS_V1 === */
 
   body.is-tabbar-hidden .desktop-entry__text br,
   body.page-route-activities .desktop-entry__text br{
@@ -1196,33 +1206,32 @@
     height: var(--desktop-panel-height);
   }
 
+  /* === BEGIN BLOCK: HOME_SHARED_TOPSHELL_CONTROL_TOKEN_CONSUMERS_V1 | Zweck: stellt Search-, Toolbar-, Reset- und Action-Surfaces der Events-/Aktivitäten-Hauptseiten auf zentrale Home-/UI-Tokens um, damit die wiederkehrenden Controls künftig nur noch dosiert statt lokal neu eingefärbt werden; Umfang: Desktop-Top-Shell-Control-Flächen ab 900px === */
   body.is-tabbar-hidden .top-stack #search-filter,
   body.page-route-activities .top-stack #search-filter{
     width: 100%;
     max-width: none;
     margin: 0;
     padding: 0 18px 0 46px;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border: 1px solid var(--home-toolbar-border);
     border-radius: 18px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,253,0.94) 0%,
-      rgba(249,251,245,0.84) 100%
+      var(--home-toolbar-bg-start) 0%,
+      var(--home-toolbar-bg-end) 100%
     );
     color: color-mix(in srgb, var(--brand-green-900) 90%, var(--brand-gold-300) 10%);
     font-size: 0.98rem;
     font-weight: 610;
     letter-spacing: -0.012em;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 8px 18px rgba(16,28,10,0.024);
+    box-shadow: var(--home-toolbar-shadow);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
 
   body.is-tabbar-hidden .top-stack #search-filter::placeholder,
   body.page-route-activities .top-stack #search-filter::placeholder{
-    color: rgba(74,91,80,0.72);
+    color: color-mix(in srgb, var(--home-copy-muted) 88%, white 12%);
     font-weight: 605;
   }
 
@@ -1236,16 +1245,14 @@
     column-gap: 8px;
     row-gap: 2px;
     padding: 7px 12px;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border: 1px solid var(--home-toolbar-border);
     border-radius: 18px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.93) 0%,
-      rgba(248,250,243,0.82) 100%
+      var(--home-toolbar-bg-start) 0%,
+      color-mix(in srgb, var(--home-toolbar-bg-end) 98%, rgba(248,250,243,0.82) 2%) 100%
     );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.90) inset,
-      0 7px 16px rgba(16,28,10,0.022);
+    box-shadow: var(--home-toolbar-shadow);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     text-align: left;
@@ -1256,7 +1263,7 @@
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
-    color: rgba(84,100,89,0.78);
+    color: color-mix(in srgb, var(--home-copy-muted) 92%, var(--home-copy-body) 8%);
     font-size: 0.64rem;
     font-weight: 760;
     line-height: 1;
@@ -1307,16 +1314,14 @@
     justify-self: stretch;
     align-self: stretch;
     overflow: hidden;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+    border: 1px solid var(--home-action-border);
     border-radius: 18px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.92) 0%,
-      rgba(248,250,243,0.80) 100%
+      var(--home-action-bg-start) 0%,
+      var(--home-action-bg-end) 100%
     );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.90) inset,
-      0 7px 16px rgba(16,28,10,0.020);
+    box-shadow: var(--home-action-shadow);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
@@ -1342,21 +1347,48 @@
     border-radius: 14px;
     font-size: 0.80rem;
     font-weight: 650;
-    border: 1px solid color-mix(in srgb, rgba(47,69,33,0.05) 78%, var(--brand-gold-200) 22%);
+    border: 1px solid var(--home-action-border);
     background: linear-gradient(
       180deg,
-      rgba(255,255,253,0.62) 0%,
-      rgba(247,250,241,0.50) 100%
+      var(--home-action-bg-start) 0%,
+      var(--home-action-bg-end) 100%
     );
-    color: rgba(24,40,30,0.64);
+    color: var(--home-copy-muted);
     text-decoration: none;
-    -webkit-text-fill-color: rgba(24,40,30,0.64);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.74) inset,
-      0 2px 7px rgba(16,28,10,0.010);
+    -webkit-text-fill-color: var(--home-copy-muted);
+    box-shadow: var(--home-action-shadow);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
   }
+
+  body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action .desktop-hero__icon{
+    width: 14px;
+    height: 14px;
+    opacity: 0.34;
+  }
+
+  @media (hover: hover){
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
+    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
+      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(47,69,33,0.08) 14%);
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-action-bg-start) 92%, white 8%) 0%,
+        color-mix(in srgb, var(--home-action-bg-end) 96%, rgba(248,251,241,0.60) 4%) 100%
+      );
+      color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.80) inset,
+        0 4px 10px rgba(16,28,10,0.014);
+    }
+  }
+  /* === END BLOCK: HOME_SHARED_TOPSHELL_CONTROL_TOKEN_CONSUMERS_V1 === */
 
   body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
   body.page-route-activities .desktop-hero__action .desktop-hero__icon{
@@ -1386,6 +1418,7 @@
     }
   }
 
+  /* === BEGIN BLOCK: HOME_SHARED_FEED_SURFACE_TOKEN_CONSUMERS_V1 | Zweck: zieht die wiederkehrenden Feed-/Card-/Badge-/Copy-Surfaces von Events und Aktivitäten auf die zentralen Home-Surface-Tokens, ohne die validierte Optik zu verändern; Umfang: Desktop-Feed-Surface sowie Card-/Badge-/Copy-Flächen der Hauptseiten === */
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
     max-width: var(--desktop-shell-max);
@@ -1400,9 +1433,9 @@
       ),
       linear-gradient(
         180deg,
-        #E8ECD9 0%,
-        #E2E8D4 58%,
-        #DBE2CB 100%
+        var(--home-rail-bg-start) 0%,
+        var(--home-rail-bg-end) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 88%, rgba(219,226,203,0.988) 12%) 100%
       );
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.38),
@@ -1416,32 +1449,30 @@
 
   body.is-tabbar-hidden .event-card,
   body.page-route-activities .event-card{
-    background: linear-gradient(180deg, rgba(255,255,252,0.994) 0%, rgba(250,252,243,0.978) 100%);
-    border-color: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.92) inset,
-      0 10px 24px rgba(16,28,10,0.046);
+    background: linear-gradient(180deg, var(--home-panel-bg-start) 0%, var(--home-panel-bg-end) 100%);
+    border-color: var(--home-panel-border);
+    box-shadow: var(--home-panel-shadow);
   }
 
   body.is-tabbar-hidden .event-card::before,
   body.page-route-activities .event-card::before{
     background: linear-gradient(
       180deg,
-      rgba(230,238,212,0.988) 0%,
-      rgba(220,231,198,0.988) 100%
+      var(--home-rail-bg-start) 0%,
+      var(--home-rail-bg-end) 100%
     );
     opacity: 0.96;
-    box-shadow: inset -1px 0 0 rgba(24,40,30,0.052);
+    box-shadow: inset -1px 0 0 var(--home-rail-divider);
   }
 
   body.is-tabbar-hidden .event-date-badge,
   body.page-route-activities .event-date-badge{
     background: linear-gradient(
       180deg,
-      rgba(252,253,248,0.996) 0%,
-      rgba(241,247,229,0.988) 100%
+      var(--home-action-bg-start) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 78%, rgba(241,247,229,0.988) 22%) 100%
     );
-    color: rgba(24,40,30,0.92);
+    color: var(--home-copy-strong);
     box-shadow:
       inset 0 0 0 1px rgba(24,40,30,0.062),
       inset 0 1px 0 rgba(255,255,255,0.86),
@@ -1450,23 +1481,24 @@
 
   body.is-tabbar-hidden .event-date-badge__wday,
   body.page-route-activities .event-date-badge__wday{
-    color: rgba(75,92,72,0.64);
+    color: var(--home-copy-muted);
   }
 
   body.is-tabbar-hidden .event-date-badge__month,
   body.page-route-activities .event-date-badge__month{
-    color: rgba(75,92,72,0.62);
+    color: var(--home-copy-subtle);
   }
 
   body.is-tabbar-hidden .event-title,
   body.page-route-activities .event-title{
-    color: rgba(21,37,28,0.93);
+    color: var(--home-copy-contrast);
   }
 
   body.is-tabbar-hidden .event-card-desc,
   body.page-route-activities .event-card-desc{
-    color: rgba(31,41,51,0.76);
+    color: var(--home-copy-secondary);
   }
+  /* === END BLOCK: HOME_SHARED_FEED_SURFACE_TOKEN_CONSUMERS_V1 === */
 }
 
 /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 | Zweck: stabilisiert auf 900–1024px die adaptive Copy-Surface gegen unterschiedliche Bildhelligkeit, damit Angebote nicht weißer wirkt als Events, ohne Geometrie oder Rail-Contract zu verändern; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
