@@ -852,11 +852,6 @@
   }
   /* === END BLOCK: HOME_SHARED_DESKTOP_HEADER_TOKEN_CONSUMERS_V1 === */
 
-  body.is-tabbar-hidden .header-right,
-  body.page-route-activities .header-right{
-    display: none;
-  }
-
   body.is-tabbar-hidden .desktop-hero,
   body.page-route-activities .desktop-hero{
     --hero-bg-image-active: var(--hero-bg-image-desktop);
@@ -1361,33 +1356,6 @@
     backdrop-filter: blur(4px);
   }
 
-  body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
-  body.page-route-activities .desktop-hero__action .desktop-hero__icon{
-    width: 14px;
-    height: 14px;
-    opacity: 0.34;
-  }
-
-  @media (hover: hover){
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:hover,
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:link:hover,
-    body.is-tabbar-hidden .desktop-hero__actions .desktop-hero__action:visited:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:link:hover,
-    body.page-route-activities .desktop-hero__actions .desktop-hero__action:visited:hover{
-      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(47,69,33,0.08) 14%);
-      background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--home-action-bg-start) 92%, white 8%) 0%,
-        color-mix(in srgb, var(--home-action-bg-end) 96%, rgba(248,251,241,0.60) 4%) 100%
-      );
-      color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.80) inset,
-        0 4px 10px rgba(16,28,10,0.014);
-    }
-  }
   /* === END BLOCK: HOME_SHARED_TOPSHELL_CONTROL_TOKEN_CONSUMERS_V1 === */
 
   body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon,
