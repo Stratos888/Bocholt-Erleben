@@ -187,6 +187,7 @@
   --dp-actionbar-pad-y: var(--space-sm);
   --dp-actionbar-reserve: calc(var(--dp-actionbar-h) + var(--dp-safe-bottom) + 24px);
 
+  /* === BEGIN BLOCK: UI_AND_HOME_SURFACE_TOKENS_V1 | Zweck: zentralisiert die wiederkehrenden Border-, Surface-, Shadow- und Hauptseiten-Surface-Tokens für Events/Aktivitäten, damit home.css künftig dieselben Werte konsumiert statt lokale Farb-Hardcodes zu mischen; Umfang: ersetzt den UI-Control-Tokens-Block und ergänzt semantische Home-/Activities-Surface-Tokens ohne beabsichtigte UI-Änderung === */
   /* UI controls */
   --ui-radius-sm: 12px;
   --ui-radius-md: 14px;
@@ -241,6 +242,47 @@
     0 1px 0 rgba(255,255,255,0.82) inset;
 
   --ui-control-ring-active: rgba(143,203,59,0.10);
+
+  /* Main pages: Events / Aktivitäten shared surface DNA */
+  --home-shell-bg-start: rgba(248,248,241,0.994);
+  --home-shell-bg-end: rgba(242,244,235,0.984);
+  --home-shell-border: color-mix(in srgb, rgba(47,69,33,0.10) 80%, var(--brand-gold-200) 20%);
+  --home-shell-shadow:
+    0 1px 0 rgba(255,255,255,0.88) inset,
+    0 6px 16px rgba(16,28,10,0.022);
+
+  --home-panel-bg-start: rgba(255,255,252,0.994);
+  --home-panel-bg-end: rgba(250,252,243,0.978);
+  --home-panel-border: color-mix(in srgb, rgba(47,69,33,0.16) 76%, var(--brand-gold-200) 24%);
+  --home-panel-shadow:
+    0 1px 0 rgba(255,255,255,0.92) inset,
+    0 10px 24px rgba(16,28,10,0.046);
+
+  --home-rail-bg-start: rgba(230,238,212,0.988);
+  --home-rail-bg-end: rgba(220,231,198,0.988);
+  --home-rail-divider: rgba(24,40,30,0.052);
+
+  --home-toolbar-bg-start: rgba(255,255,253,0.94);
+  --home-toolbar-bg-end: rgba(249,251,245,0.84);
+  --home-toolbar-border: color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+  --home-toolbar-shadow:
+    0 1px 0 rgba(255,255,255,0.92) inset,
+    0 8px 18px rgba(16,28,10,0.024);
+
+  --home-action-bg-start: rgba(255,255,252,0.92);
+  --home-action-bg-end: rgba(248,250,243,0.80);
+  --home-action-border: color-mix(in srgb, rgba(47,69,33,0.10) 76%, var(--brand-gold-200) 24%);
+  --home-action-shadow:
+    0 1px 0 rgba(255,255,255,0.90) inset,
+    0 7px 16px rgba(16,28,10,0.020);
+
+  --home-copy-strong: rgba(24,40,30,0.92);
+  --home-copy-body: rgba(24,40,30,0.82);
+  --home-copy-muted: rgba(75,92,72,0.64);
+  --home-copy-subtle: rgba(75,92,72,0.62);
+  --home-copy-contrast: rgba(21,37,28,0.93);
+  --home-copy-secondary: rgba(31,41,51,0.76);
+  /* === END BLOCK: UI_AND_HOME_SURFACE_TOKENS_V1 === */
 
   /* Close button DNA */
   --ui-close-size: var(--ui-tap-target);
