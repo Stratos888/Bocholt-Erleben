@@ -804,12 +804,12 @@ select.content-field__control{
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V22_HIERARCHY_POLISH | Zweck: hebt die Veranstalter-Routen auf das Standard-UI-Niveau des Projekts, reduziert visuelle Redundanz und stärkt nur die echten Arbeits-/Anfrageflächen; Umfang: kompletter page--publish-Basisblock außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V23 | Zweck: bringt die Veranstalter-Routen auf Mobile dichter und ruhiger näher an das bestehende Subpage-Niveau, ohne neue UI-Muster einzuführen; Umfang: mobile Basis für page--publish und page--organizers außerhalb der Desktop-Breakpoints === */
 .page--publish{
-  --subpage-stack-gap: 14px;
+  --subpage-stack-gap: 12px;
   --subpage-card-gap: 10px;
-  --subpage-card-pad-y: 15px;
-  --subpage-hero-gap: 9px;
+  --subpage-card-pad-y: 14px;
+  --subpage-hero-gap: 8px;
 }
 
 .page--publish .content-hero,
@@ -826,7 +826,7 @@ select.content-field__control{
 }
 
 .page--publish .content-hero--panel{
-  padding: 17px 17px 15px;
+  padding: 16px 16px 14px;
 }
 
 .page--publish .publish-hero-layout{
@@ -837,32 +837,32 @@ select.content-field__control{
 
 .page--publish .publish-hero-copy{
   display: grid;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
   margin: 0;
-  max-width: 44ch;
-  font-size: 0.95rem;
-  line-height: 1.40;
+  max-width: 42ch;
+  font-size: 0.93rem;
+  line-height: 1.38;
   text-wrap: pretty;
 }
 
 .page--publish .publish-hero-meta{
-  max-width: 46ch;
+  max-width: 44ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.81rem;
-  line-height: 1.30;
+  font-size: 0.79rem;
+  line-height: 1.28;
 }
 
 .page--publish .publish-hero-trust{
-  max-width: 46ch;
+  max-width: 44ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.80rem;
-  line-height: 1.30;
+  font-size: 0.79rem;
+  line-height: 1.28;
 }
 
 .page--publish .publish-hero-trust a{
@@ -874,7 +874,7 @@ select.content-field__control{
 .page--publish .publish-hero-cta{
   display: grid;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .page--publish .publish-hero-cta .content-cta,
@@ -883,29 +883,29 @@ select.content-field__control{
 .page--publish .publish-final-actions .content-cta--primary{
   width: 100%;
   min-width: 0;
-  min-height: 46px;
-  padding-inline: 16px;
+  min-height: 44px;
+  padding-inline: 15px;
 }
 
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
 .page--publish .publish-start-card,
 .page--publish .publish-final-card{
-  gap: 11px;
+  gap: 10px;
 }
 
 .page--publish .publish-start-card,
 .page--publish .publish-final-card--help{
-  border-color: color-mix(in srgb, var(--cmp-divider-strong) 74%, var(--color-primary));
+  border-color: color-mix(in srgb, var(--cmp-divider-strong) 72%, var(--color-primary));
   box-shadow:
     0 1px 0 rgba(255,255,255,0.76) inset,
-    0 8px 18px rgba(22,39,61,0.04);
+    0 6px 16px rgba(22,39,61,0.034);
 }
 
 .page--publish .publish-section-head{
   display: grid;
-  gap: 5px;
-  padding-bottom: 12px;
+  gap: 4px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
@@ -915,12 +915,12 @@ select.content-field__control{
 }
 
 .page--publish .publish-section-head .content-note{
-  line-height: 1.34;
+  line-height: 1.32;
 }
 
 .page--publish .publish-benefits-grid{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -928,16 +928,16 @@ select.content-field__control{
 
 .page--publish .publish-benefits-grid li{
   display: grid;
-  gap: 5px;
+  gap: 4px;
   align-content: start;
   min-height: 100%;
-  padding: 12px 13px;
+  padding: 11px 12px;
   border: 1px solid var(--cmp-divider-strong);
-  border-radius: 18px;
+  border-radius: 17px;
   background: rgba(255,255,255,0.56);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.72) inset,
-    0 6px 14px rgba(22,39,61,0.018);
+    0 5px 12px rgba(22,39,61,0.016);
 }
 
 .page--publish .publish-benefits-grid strong{
@@ -950,33 +950,33 @@ select.content-field__control{
 
 .page--publish .publish-benefits-grid span{
   color: var(--cmp-copy-color);
-  font-size: 0.85rem;
-  line-height: 1.32;
+  font-size: 0.84rem;
+  line-height: 1.30;
 }
 
 .page--publish .publish-benefits-grid .content-actions{
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .page--publish .publish-membership-layout{
   display: grid;
-  gap: 9px;
+  gap: 8px;
 }
 
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 9px;
+  gap: 8px;
 }
 
 .page--publish .publish-membership-intro{
-  max-width: 42ch;
-  font-size: 0.84rem;
-  line-height: 1.32;
+  max-width: 41ch;
+  font-size: 0.83rem;
+  line-height: 1.30;
 }
 
 .page--publish .publish-plans{
   display: grid;
-  gap: 9px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -984,15 +984,15 @@ select.content-field__control{
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 5px;
+  gap: 4px;
   margin: 0;
-  padding: 12px 13px;
+  padding: 11px 12px;
   border: 1px solid var(--cmp-divider-strong);
-  border-radius: 18px;
+  border-radius: 17px;
   background: rgba(255,255,255,0.56);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.72) inset,
-    0 6px 14px rgba(22,39,61,0.018);
+    0 5px 12px rgba(22,39,61,0.016);
 }
 
 .page--publish .publish-plans li:first-child{
@@ -1002,50 +1002,50 @@ select.content-field__control{
 
 .page--publish .publish-plans strong{
   color: var(--color-text-primary);
-  font-size: 0.94rem;
+  font-size: 0.93rem;
   font-weight: 780;
   line-height: 1.14;
 }
 
 .page--publish .publish-plans span{
   color: var(--cmp-copy-color);
-  font-size: 0.89rem;
-  line-height: 1.28;
+  font-size: 0.88rem;
+  line-height: 1.26;
 }
 
 .page--publish .publish-plans li small{
   color: var(--cmp-copy-color);
-  font-size: 0.83rem;
-  line-height: 1.30;
+  font-size: 0.82rem;
+  line-height: 1.28;
 }
 
 .page--publish .publish-plans-note{
   max-width: none;
-  line-height: 1.34;
+  line-height: 1.32;
 }
 
 .page--publish .publish-steps-flow{
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .page--publish .publish-step{
   display: grid;
-  gap: 5px;
+  gap: 4px;
   align-content: start;
-  padding: 12px 13px;
+  padding: 11px 12px;
   border: 1px solid var(--cmp-divider-strong);
-  border-radius: 18px;
+  border-radius: 17px;
   background: rgba(255,255,255,0.50);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.70) inset,
-    0 6px 14px rgba(22,39,61,0.016);
+    0 5px 12px rgba(22,39,61,0.014);
 }
 
 .page--publish .publish-step h3{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.91rem;
+  font-size: 0.90rem;
   font-weight: 760;
   line-height: 1.18;
 }
@@ -1053,26 +1053,37 @@ select.content-field__control{
 .page--publish .publish-step p{
   margin: 0;
   max-width: 76ch;
-  line-height: 1.36;
+  line-height: 1.34;
 }
 
 .page--publish .publish-final-card--help{
-  gap: 10px;
+  gap: 9px;
 }
 
 .page--publish .publish-final-card--help h2{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 1.01rem;
+  font-size: 1rem;
   line-height: 1.16;
 }
 
 .page--publish .content-form{
-  gap: 15px;
+  gap: 13px;
 }
 
 .page--publish .content-form-grid{
-  gap: 13px;
+  gap: 12px;
+}
+
+.page--publish .content-form-section-head{
+  gap: 3px;
+  padding-top: 0;
+}
+
+.page--publish .content-form-note{
+  max-width: 44ch;
+  font-size: 0.79rem;
+  line-height: 1.30;
 }
 
 .page--publish .publish-final-actions{
@@ -1081,20 +1092,67 @@ select.content-field__control{
   justify-items: stretch;
 }
 
+.page--organizers{
+  --subpage-stack-gap: 14px;
+  --subpage-card-pad-y: 16px;
+  --subpage-hero-gap: 9px;
+}
+
+.page--organizers .content-hero--panel{
+  padding: 16px 16px 14px;
+}
+
+.page--organizers .content-hero h1{
+  max-width: 11ch;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.page--organizers .content-lead{
+  max-width: 36ch;
+  font-size: 0.94rem;
+  line-height: 1.38;
+}
+
+.page--organizers .content-note{
+  max-width: 42ch;
+  font-size: 0.80rem;
+  line-height: 1.30;
+}
+
+.page--organizers .content-actions .content-cta,
+.page--organizers .content-actions .content-cta--primary{
+  min-height: 44px;
+  padding-inline: 15px;
+}
+
+.page--organizers .content-card--primary{
+  gap: 8px;
+}
+
+.page--organizers .content-card--primary h2{
+  font-size: 1rem;
+  line-height: 1.20;
+}
+
+.page--organizers .content-card--primary p{
+  line-height: 1.38;
+}
+
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
-    font-size: clamp(1.34rem, 5.6vw, 1.5rem);
+    font-size: clamp(1.30rem, 5.4vw, 1.46rem);
     line-height: 1.03;
     letter-spacing: -0.03em;
     white-space: nowrap;
   }
 
   .page--publish .publish-final-card--help{
-    padding-top: 13px;
-    padding-bottom: 13px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 }
-/* === END BLOCK: PUBLISH_PAGE_RESPONSIVE_BASE_V22_HIERARCHY_POLISH === */
+/* === END BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V23 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
