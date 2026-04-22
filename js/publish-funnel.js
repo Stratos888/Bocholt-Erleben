@@ -188,7 +188,7 @@
   function setAutomationSubmitting(trigger, isSubmitting) {
     if (!trigger) return;
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Anfrage per E-Mail vorbereiten";
+      trigger.dataset.defaultLabel = trigger.textContent || "Anfrage senden";
     }
 
     trigger.disabled = isSubmitting;
