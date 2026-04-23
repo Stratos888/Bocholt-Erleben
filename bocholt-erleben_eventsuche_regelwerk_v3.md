@@ -188,14 +188,11 @@ Nicht aufnehmen:
 ---
 
 ## 5. Monetarisierungsschutz
-Grundsatz:
-Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf **nicht pauschal normal bespielt** werden.
-
 Nicht aufnehmen:
 
-- Events von potenziellen späteren zahlenden Kunden, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
+- Events von **potenziellen späteren zahlenden Kunden**, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
 - Events, deren Hauptnutzen die Sichtbarkeit einer einzelnen potenziellen Kunden-Location erhöht
-- Eventorte potenzieller Kunden, wenn sie im Suchlauf faktisch nur als Reichweitenziel dienen
+- Eventorte potenzieller Kunden dürfen im KI-Suchlauf **nicht aktiv als zu beliefernde Eventorte** behandelt werden
 
 Besonders vorsichtig behandeln:
 
@@ -207,77 +204,38 @@ Besonders vorsichtig behandeln:
 - kommerzielle Veranstalter
 - sonstige Locations, die später für Event-Veröffentlichung zahlen könnten
 
-### Zwei Klassen im Monetarisierungsschutz
+### Explizite Schutzregel
+Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf bewusst **nicht** als normale Eventquelle oder Eventort-Liste bespielt werden.
 
-#### A. GESPERRT_KUNDENNAH
-Diese Quellen oder Locations bleiben grundsätzlich gesperrt, wenn sie vor allem wie klassische potenzielle Reichweiten- oder Veröffentlichungs-Kunden wirken.
+Dazu zählt ausdrücklich auch:
 
-Regel:
-- nicht aktiv als normale Eventquelle suchen
-- nicht aktiv als Eventort-Liste bespielen
-- im Zweifel weglassen
+- **Kulturort Alte Molkerei**
 
-#### B. FREIGEGEBEN_LOW_MONETIZATION
-Diese Quellen dürfen trotz grundsätzlicher Kundennähe aktiv gesucht werden, wenn sie erkennbar eher kultur-, vereins-, stiftungs- oder gemeinwohlorientiert sind und ihre Monetarisierungswahrscheinlichkeit derzeit niedrig bis höchstens mittel erscheint.
+Für solche Locations gilt konservativ:
 
-Regel:
-- aktiv suchen erlaubt
-- Treffer daraus sind grundsätzlich zulässig
-- Freigabe gilt **quellenbezogen**, nicht pauschal für ähnliche kommerzielle Locations
+- **ohne explizite spätere Freigabe keine neuen Treffer als Eventort liefern**
+- **nicht aktiv nach deren Einzel-Events suchen**
+- **keine Treffer liefern, deren Hauptwert die Sichtbarkeit dieser Location erhöht**
+- **im Zweifel weglassen**
 
-### Bewusst freigegebene Low-Monetization-Quellen
-Diese Quellen gelten aktuell als **FREIGEGEBEN_LOW_MONETIZATION**:
+### Neutrale-Quellen-Ausnahme
+Ein Event an einer potenziell geschützten oder später monetarisierungsrelevanten Venue darf trotzdem aufgenommen werden, wenn **alle** folgenden Punkte erfüllt sind:
 
-- Kulturort Alte Molkerei
-- KuKuG Bocholt
-- Fontane-Kreis Bocholt
-- Koppelkerk Bredevoort
-- Nationaal Onderduikmuseum Aalten
-- Klein Theater Dinxperlo
-- Schloss Ringenberg
-- Quartettverein Bocholt
-
-Wichtig:
-- diese Quellen sind **kein aktiver Sales-Fokus**
-- sie sind bewusst freigegeben, weil ihr Content-Wert hoch und ihre voraussichtliche Zahlungsbereitschaft eher niedrig bis höchstens mittel ist
+1. die Quelle ist **neutral oder offiziell**  
+   (z. B. kommunaler Veranstaltungskalender, offizielle Stadt-/Kultur-/Tourismusseite, sonstige offizielle Drittquelle)
+2. der Event wird **nicht** über die Venue selbst als aktive Suchquelle eingespeist
+3. der Event hat **eigenständigen öffentlichen Eventcharakter**
+4. Titel, Datum, Ort und Eventcharakter sind belastbar belegt
+5. der Treffer dient erkennbar **nicht primär der Venue-Promo**, sondern der neutralen Eventinformation
 
 ### Entscheidungsregel
-Ein Event darf nur dann aufgenommen werden, wenn:
+Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verschafft und kein klar öffentlich relevantes Stadt-/Kulturevent aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle ist:
 
-- es aus einer offiziellen, neutralen oder bewusst freigegebenen Quelle belastbar belegt ist,
-- und der Eintrag **nicht primär nur die Sichtbarkeit eines klar kundennahen, potenziell zahlungsfähigen Einzelanbieters erhöht**.
+- **nicht aufnehmen**
 
-### Harte Schutzregel gegen neutrale Kalender als Hintertür
-Eine offizielle oder neutrale Quelle hebt den Monetarisierungsschutz des **Eventorts / Veranstalters** nicht automatisch auf.
+Im Zweifel:
 
-Regel:
-- steht ein Event zwar in einer offiziellen oder neutralen Quelle, ist aber erkennbar vor allem Promo für eine einzelne kundennähere Gastro-, Club-, Bar-, Privat- oder Eventlocation, dann: **nicht aufnehmen**
-- Gleiches gilt für klar kommerzielle Einzelveranstalter, wenn der Hauptnutzen des Eintrags faktisch Reichweite für diesen Anbieter ist
-- eine neutrale Quelle allein ist also **keine automatische Freigabe** kundennaher Eventorte
-
-### Zulässige Ausnahme
-Eine Aufnahme ist trotz kundennäherem Eventort nur dann zulässig, wenn mindestens einer dieser Punkte erfüllt ist:
-
-- die Quelle selbst ist bewusst als **FREIGEGEBEN_LOW_MONETIZATION** klassifiziert,
-- das Event hat eine **eigenständige öffentliche Relevanz** und ist nicht bloß Venue-Promo,
-- oder das Event ist Teil einer klar öffentlichen, kuratierten oder institutionell geprägten Veranstaltungslogik.
-
-Beispiele für eher zulässige Ausnahmen:
-- Stadtfest
-- etablierte Kulturreihe
-- offiziell kuratierte Konzert- oder Theaterreihe
-- klar öffentlich relevantes Sonderevent
-
-Wenn unklar ist, ob ein Event trotz neutraler Quelle faktisch doch nur kundennähere Einzelpromo ist:
-
-- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
-- im **Automationsmodus**: **nicht ausgeben**
-
-Im Zweifel gilt weiterhin:
-
-- **konservativ entscheiden**
-- **lieber weglassen**
-
+- **weglassen**
 ## 6. Rechtlich konservative Quellenregel
 Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch oder ausdrücklich freigegeben** und **für den konkreten Termin belastbar** ist.
 
@@ -420,37 +378,54 @@ Wichtig:
 ---
 
 ## 7. URL-Regel
-
-Bevorzugt ist **nur eine event-spezifische Detailseite**.
+Bevorzugt ist **eine event-spezifische Detailseite**.
 
 Nicht erlaubt als finale `url` oder `source_url` für FINAL:
 
 - Startseite einer Stadt / Institution
 - allgemeine Veranstaltungsübersicht
-- Jubiläums- oder Kampagnenseite ohne klaren Event-Detailfokus
 - generische Homepage ohne direkten Eventbezug
+- reine Saison-/Programmübersicht ohne klar trennbaren Eventblock
 - Terminlisten-Seiten, wenn daraus kein einzelner Termin eindeutig und vollständig belegbar ist
 
 ### Reihenfolge
-Es gilt:
+Es gilt grundsätzlich:
 
-**Detailseite > eindeutige Event-Unterseite > sonst nicht FINAL**
+**klassische Event-Detailseite > offizielle event-spezifische Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
 
-### Ausnahme-Regel
-Wenn **keine Detailseite existiert**, eine Übersichtsseite aber:
-1. das Event eindeutig identifizierbar macht,
-2. keine bessere Quelle existiert,
-3. Datum, Ort, Titel und belastbare Einordnung daraus 100% sicher hervorgehen,
+### FINAL-fähige Alternativen zur klassischen Detailseite
 
-dann gilt:
-- im **manuellen Prüfmodus**: als **REVIEW NÖTIG**
+#### A. Offizielle event-spezifische Info-/News-Seite
+Eine offizielle Info-, Presse- oder News-Seite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
+
+1. offizieller oder neutraler Absender
+2. klarer Fokus auf **genau dieses Event**
+3. Titel, Datum und Ort sind belastbar erkennbar
+4. der Eventcharakter ist klar
+5. keine wesentliche FINAL-Pflichtfeldlücke
+6. keine bessere Detailseite verfügbar
+
+#### B. Offizieller klar trennbarer Eventblock auf einer Programmseite
+Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
+
+1. offizieller oder neutraler Absender
+2. der Einzeltermin ist auf der Seite **klar separat abgrenzbar**
+3. Titel, Datum, Uhrzeit (falls vorhanden), Ort und Eventcharakter sind im Einzelblock belastbar
+4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
+5. keine bessere Detailseite verfügbar
+
+### REVIEW statt FINAL
+Wenn eine Quelle zwar vielversprechend ist, aber einer dieser Punkte nicht sicher erfüllt ist:
+
+- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
 - im **Automationsmodus**: **nicht ausgeben**
 
-Für FINAL gilt damit praktisch:
-- **nur Detailseite oder gleichwertig event-spezifische Unterseite**
+Für FINAL gilt damit:
 
----
-
+- klassische Detailseite ist der Regelfall
+- offizielle event-spezifische Info-/News-Seiten sind zulässig
+- offizielle klar trennbare Eventblöcke auf Programmseiten sind eng begrenzt zulässig
+- generische Übersichten bleiben unzulässig
 ## 8. Beschreibungs-Regel
 Beschreibungen müssen streng quellenbasiert und sachlich sein.
 
@@ -558,7 +533,7 @@ Wenn mehrere konkrete Termine vorkommen:
 - bei gleichem Eventtitel an mehreren Tagen **mehrere Einträge** erzeugen
 - bei gleichem Datum mit mehreren Startzeiten **mehrere Einträge** erzeugen
 
-### Mehrtages-Events
+### Mehrtages-Events – Grundlogik
 Wenn ein Event über mehrere Tage läuft:
 - `date` = erster Tag
 - `endDate` = letzter Tag
@@ -567,6 +542,29 @@ Wenn ein Event über mehrere Tage läuft:
 Wenn `endDate` nicht belastbar belegt ist:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
+
+### Wichtige Unterscheidung bei Mehrtagesevents
+
+#### A. Ein zusammenhängendes Mehrtagesevent
+Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tagesinstanzen daraus macht, darf ein einzelner Mehrtageseintrag verwendet werden.
+
+#### B. Tages- oder slotbezogene Einzelinstanzen
+Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Tageszeiten nennt, dann gilt:
+
+- **nicht** als ein Sammel-Eintrag zusammenziehen
+- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
+
+Das gilt besonders, wenn:
+- pro Tag unterschiedliche Startzeiten genannt werden
+- Programmpunkte klar getrennt sind
+- ein Nutzer realistisch einzelne Tage separat besuchen würde
+
+### Ausstellungen / Märkte / längere Formate
+Bei Ausstellungen, Märkten oder ähnlichen Formaten mit Laufzeit über mehrere Tage gilt:
+
+- ein einzelner Mehrtageseintrag ist erlaubt, wenn das Format als zusammenhängendes Event dargestellt wird
+- unterschiedliche tägliche Öffnungszeiten machen den Event **nicht automatisch** zu mehreren Instanzen
+- wenn aber einzelne Veranstaltungstage als eigene Programmpunkte oder Sondertermine ausgewiesen sind, müssen diese getrennt behandelt werden
 
 Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
 - **nicht FINAL übernehmen**
@@ -583,20 +581,28 @@ Dabei exakt unterscheiden:
 - Einlass
 - Warm-up
 - Veranstaltungszeitraum
+- Öffnungszeiten
 
-Wenn mehrere Zeitangaben existieren, nur die **für das Event relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
+Wenn mehrere Zeitangaben existieren, nur die **für die konkrete Instanz relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
 
 Keine Zeit raten.  
 Keine Zeit aus ähnlichen Events übernehmen.
 
-### Mehrtages-Event
-Wenn die Quelle eine **einheitliche Zeitangabe für das gesamte Mehrtages-Event** nennt:
+### Mehrtages-Event mit einheitlicher Zeit
+Wenn die Quelle eine **einheitliche Zeitangabe** für das gesamte Mehrtagesevent nennt:
 - `time` darf gesetzt werden
 
-Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt:
-- `time` leer lassen
+### Mehrtages-Event mit unterschiedlichen Tageszeiten
+Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt, dann gilt:
 
-Niemals nur die Uhrzeit des ersten Tages als allgemeine Event-Zeit setzen.
+- wenn die Tage als eigenständige besuchbare Instanzen verstanden werden können: **pro Tag eigener Eintrag**
+- wenn das Event als zusammenhängendes Format dargestellt wird und die Zeitlogik nicht sinnvoll instanzbasiert auflösbar ist: `time` leer lassen
+
+### Öffnungszeiten vs. Event-Startzeit
+Öffnungszeiten dürfen nicht mit einer Startzeit verwechselt werden.
+
+- Eine reine Öffnungszeit ist nur dann als `time` sinnvoll, wenn das Format genau so als besuchbare Zeitspanne des Events kommuniziert wird
+- Bei klassischen Bühnen-/Vortrags-/Konzertformaten ist die eigentliche Startzeit zu bevorzugen
 
 ### Mehrere Slots / Läufe / Startzeiten
 Wenn es gibt:
@@ -609,12 +615,7 @@ Dann gilt:
 - stattdessen **pro Termin / Slot einen eigenen JSON-Eintrag**
 - pro Eintrag die jeweils konkrete `time` setzen
 
-Nur wenn für die konkrete Instanz keine eindeutige Startzeit belegbar ist:
-- `time` weglassen
-
 Ein identischer `source_url` darf mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
-
----
 
 ## 13. Scope-/Radius-Regel
 Standard:
@@ -673,7 +674,33 @@ Besonders wichtig:
 
 ---
 
-## 15. Priorisierung
+## 15. Suchabdeckung und Priorisierung
+
+### Ziel
+Die Suche soll nicht nur präzise, sondern auch **möglichst vollständig** sein.
+
+Das heißt:
+- möglichst alle guten, belastbaren Events im Suchgebiet finden
+- aber nur dann übernehmen, wenn sie regelkonform und belastbar sind
+
+### Suchabdeckung
+Ein qualitativ guter Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen.
+
+Die Suche soll möglichst drei Suchrichtungen abdecken:
+
+1. **CORE**
+   - offizielle kommunale / öffentliche Veranstaltungskalender
+   - offizielle Stadt-, Kultur-, Tourismus- oder Institutionsseiten
+
+2. **RECOVERY**
+   - offizielle event-spezifische News-/Info-Seiten
+   - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
+
+3. **DISCOVERY**
+   - zusätzliche belastbare, neue oder weniger offensichtliche Quellen im Radius
+   - nur wenn sie den Qualitäts- und Monetarisierungsregeln entsprechen
+
+### Priorisierung
 Bevorzugt aufnehmen:
 - lokale und regionale Events mit klarem Bezug zu Bocholt
 - Events mit hoher öffentlicher Relevanz
@@ -681,15 +708,15 @@ Bevorzugt aufnehmen:
 - Events mit klarer Terminierung
 - Events aus offiziellen oder neutralen Quellen
 - Events, die für normale Nutzer realistisch interessant sind
+- Events mit hohem Mehrwert für die Kuratierungs-PWA
 
-Eher nicht aufnehmen:
+Eher zurückstellen oder nur nachrangig aufnehmen:
 - grenzwertige Mini-Termine
 - schwach belegte Einträge
 - stark werbliche Seiten
 - stark kommerzielle Einzelpromo
-- unklare oder halb vollständige Events
-
----
+- sehr nischige Spezialfälle mit geringem PWA-Nutzen
+- einseitige Mehrfachausbeute aus derselben Quelle, wenn gleichzeitig stärkere Alternativen verfügbar sind
 
 ## 16. Kandidaten-Schema für `data/inbox_manual.json`
 
@@ -806,21 +833,22 @@ Diese Regel wird **nicht** im Suchkandidaten-Output erzwungen, damit die bestehe
 ## 18. Mengenregel
 Für einen normalen Suchlauf gilt:
 
-- lieber **sauber statt künstlich gefüllt**
+- lieber **sauber und vollständig** als künstlich knapp
 - keine Fülltreffer
 - keine fragwürdigen Grenzfälle nur für mehr Menge
 
-### Zielgröße
-- typischerweise **10 bis 25 gute FINAL-Kandidaten**
+### Wichtige Klarstellung
+Die Suchqualität soll **nicht** durch eine künstlich zu kleine Zielmenge begrenzt werden.
 
-Wichtig:
-- diese Zielgröße ist **eine Orientierung, keine harte Obergrenze**
-- wenn mehr saubere, dedupte und regelkonforme Kandidaten vorhanden sind, dürfen **auch mehr als 25** geliefert werden
-- wenn weniger gute Events vorhanden sind, dann entsprechend weniger
+Das heißt:
+- wenn mehr gute, belastbare FINAL-Kandidaten vorhanden sind, dürfen auch mehr geliefert werden
+- eine numerische Obergrenze ist in erster Linie ein **Laufparameter**, nicht eine Qualitätsregel
+- Vollständigkeit geht vor künstlicher Verknappung
 
-Ziel bleibt:
-- **möglichst viele gute Events**
-- aber **keine Qualitätsabsenkung nur für höhere Menge**
+### Praktische Orientierung
+- 10 bis 25 gute FINAL-Kandidaten sind ein typischer Richtwert
+- wenn belastbar mehr starke Kandidaten vorhanden sind, dürfen auch mehr geliefert werden
+- wenn nur wenige gute Kandidaten existieren, dann entsprechend weniger
 
 ## 19. Review statt Raten
 Wenn eines dieser Probleme vorliegt:
