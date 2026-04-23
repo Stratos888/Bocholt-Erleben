@@ -114,7 +114,7 @@ const TYPE_META = {
   }
 
 function ensureInlineEntry() {
-  if (state.inlineMounted || isDesktop()) return;
+  if (state.inlineMounted || isDesktop() || pageType() === "publish") return;
   const main = document.querySelector("main");
   if (!main) return;
 
