@@ -124,8 +124,6 @@ Wenn zusätzlich eine operative Quellenliste oder ein aktueller `Sources`-Export
 ---
 
 ## 1. Suchgebiet
-
-## 1. Suchgebiet
 Suche nur Events aus:
 
 - **Bocholt**
@@ -655,8 +653,6 @@ Dann gilt:
 Ein identischer `source_url` darf mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
 
 ---
-
-## 13. Scope-/Radius-Regel
 
 ## 13. Scope-/Radius-Regel
 Standard:
