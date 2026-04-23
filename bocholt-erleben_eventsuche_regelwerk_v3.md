@@ -408,28 +408,14 @@ Nicht FINAL-fähig ist die Seite nur dann, wenn sie **überwiegend**:
 
 ist.
 
-#### B. Tages- oder slotbezogene Einzelinstanzen
-Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Startblöcke nennt, dann gilt:
+#### B. Offizieller klar trennbarer Eventblock auf einer Programmseite
+Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
 
-- **nicht** als ein Sammel-Eintrag zusammenziehen
-- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
-
-Das gilt besonders, wenn:
-- pro Tag unterschiedliche Startzeiten genannt werden
-- Programmpunkte klar getrennt sind
-- Jugend-/Familien-/Abend-/Seniorenblöcke o. ä. separat ausgewiesen sind
-- ein Nutzer realistisch einzelne Blöcke separat besuchen würde
-
-### Harte Instanzprüfung vor FINAL
-Für FINAL gilt zwingend:
-
-- **ein Eintrag = genau eine besuchbare Instanz**
-
-Wenn eine Quelle mehrere konkrete Tage oder Blöcke mit jeweils eigener Zeit nennt, dann ist ein Sammel-Eintrag **nicht FINAL-fähig**.
-
-Dann gilt nur:
-- sauber in einzelne Instanzen aufteilen
-- oder, wenn das nicht belastbar modellierbar ist: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
+1. offizieller oder neutraler Absender
+2. der Einzeltermin ist auf der Seite **klar separat abgrenzbar**
+3. Titel, Datum, Uhrzeit (falls vorhanden), Ort und Eventcharakter sind im Einzelblock belastbar
+4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
+5. keine bessere Detailseite verfügbar
 ### Mehrtermin-Seiten
 Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
 
