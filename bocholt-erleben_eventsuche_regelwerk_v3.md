@@ -607,6 +607,17 @@ Das gilt besonders, wenn:
 - Jugend-/Familien-/Abend-/Seniorenblöcke o. ä. separat ausgewiesen sind
 - ein Nutzer realistisch einzelne Blöcke separat besuchen würde
 
+### Harte Instanzprüfung vor FINAL
+Für FINAL gilt zwingend:
+
+- **ein Eintrag = genau eine besuchbare Instanz**
+
+Wenn eine Quelle mehrere konkrete Tage oder Blöcke mit jeweils eigener Zeit nennt, dann ist ein Sammel-Eintrag **nicht FINAL-fähig**.
+
+Dann gilt nur:
+- sauber in einzelne Instanzen aufteilen
+- oder, wenn das nicht belastbar modellierbar ist: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
+
 ### Mehrtermin-Seiten mit sichtbarer Einzelinstanz
 Wenn eine Seite mehrere Termine desselben Formats enthält, ist das **kein automatischer Ausschluss**.
 
