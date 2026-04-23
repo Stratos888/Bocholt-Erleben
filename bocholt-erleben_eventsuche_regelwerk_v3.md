@@ -391,19 +391,24 @@ Nicht erlaubt als finale `url` oder `source_url` für FINAL:
 ### Reihenfolge
 Es gilt grundsätzlich:
 
-**klassische Event-Detailseite > offizielle event-spezifische Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
+**klassische Event-Detailseite > offizielle event-spezifische Endnutzer-Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
 
 ### FINAL-fähige Alternativen zur klassischen Detailseite
 
-#### A. Offizielle event-spezifische Info-/News-Seite
+#### A. Offizielle event-spezifische Endnutzer-Info-/News-Seite
 Eine offizielle Info-, Presse- oder News-Seite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
 
 1. offizieller oder neutraler Absender
 2. klarer Fokus auf **genau dieses Event**
-3. Titel, Datum und Ort sind belastbar erkennbar
-4. der Eventcharakter ist klar
-5. keine wesentliche FINAL-Pflichtfeldlücke
-6. keine bessere Detailseite verfügbar
+3. die Seite beschreibt erkennbar den **Besuch des Events** und ist nicht primär:
+   - Anmeldeaufruf
+   - Organisationshinweis
+   - bloße Registrierungsseite
+   - reine Save-the-Date-Seite ohne ausreichende Nutzerdaten
+4. Titel, Datum und Ort sind belastbar erkennbar
+5. der Eventcharakter ist klar
+6. keine wesentliche FINAL-Pflichtfeldlücke
+7. keine bessere Detailseite verfügbar
 
 #### B. Offizieller klar trennbarer Eventblock auf einer Programmseite
 Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
@@ -414,6 +419,18 @@ Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite is
 4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
 5. keine bessere Detailseite verfügbar
 
+### Mehrtermin-Seiten
+Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
+
+Wenn auf derselben Seite **eine konkrete sichtbare Einzelinstanz** mit
+- Titel
+- Datum
+- ggf. Uhrzeit
+- Ort
+- Eventcharakter
+
+klar belegt ist, dann darf **diese Einzelinstanz FINAL-fähig** sein, auch wenn auf derselben Seite weitere Termine desselben Formats existieren.
+
 ### REVIEW statt FINAL
 Wenn eine Quelle zwar vielversprechend ist, aber einer dieser Punkte nicht sicher erfüllt ist:
 
@@ -423,7 +440,7 @@ Wenn eine Quelle zwar vielversprechend ist, aber einer dieser Punkte nicht siche
 Für FINAL gilt damit:
 
 - klassische Detailseite ist der Regelfall
-- offizielle event-spezifische Info-/News-Seiten sind zulässig
+- offizielle event-spezifische Endnutzer-Info-/News-Seiten sind eng begrenzt zulässig
 - offizielle klar trennbare Eventblöcke auf Programmseiten sind eng begrenzt zulässig
 - generische Übersichten bleiben unzulässig
 ## 8. Beschreibungs-Regel
@@ -510,112 +527,75 @@ Das gilt besonders für:
 - `location`
 - `city`
 
-Wenn durch das Weglassen die FINAL-Fähigkeit verloren geht:
+### Safe-location-Regel
+Bei Ortsangaben darf immer nur die **höchste sicher belegte Granularität** ausgegeben werden.
+
+Beispiel:
+- wenn nur `Koppelkerk` sicher belegt ist, dann **nicht** `Koppelkerk Kerkzaal` ausgeben
+- wenn nur der Ort oder das Festivalgelände sicher ist, dann **nicht** eine feinere Unterlocation erfinden oder unsicher verdichten
+
+Lieber:
+- gröber, aber sicher  
+als
+- feiner, aber nicht 100% belastbar
+
+### Canonical-URL-Regel
+Für FINAL soll nach Möglichkeit die **stabilste belastbare kanonische Event-URL** verwendet werden.
+
+Das heißt:
+- nicht irgendein ähnlicher Pfad
+- nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
+- bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
+
+Wenn die URL nicht stabil genug verifiziert werden kann:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
----
+Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
+- im manuellen Prüfmodus: **REVIEW NÖTIG**
+- im Automationsmodus: **nicht ausgeben**
+  
+## 10. Verifikationsregel
+**Felder nur setzen, wenn sie direkt und eindeutig aus der Quelle verifizierbar sind.**
 
-## 11. Datums-, Instanz- und Mehrtages-Regel
+Wenn ein Feld nicht eindeutig belegt ist:
+- **Feld weglassen**
+- **nicht raten**
+- **nicht aus Vermutung ergänzen**
 
-### Grundregel
-Ein JSON-Objekt repräsentiert genau **eine konkrete, besuchbare Termin-Instanz**.
+Das gilt besonders für:
+- `time`
+- `endDate`
+- `location`
+- `city`
 
-Verwende:
-- das **tatsächliche Veranstaltungsdatum**
-- nicht das Veröffentlichungsdatum einer Pressemeldung
-- nicht das Änderungsdatum einer Seite
-- nicht ein unsicher abgeleitetes Datum
+### Safe-location-Regel
+Bei Ortsangaben darf immer nur die **höchste sicher belegte Granularität** ausgegeben werden.
 
-### Mehrere Termine
-Wenn mehrere konkrete Termine vorkommen:
-- jeden klar genannten Termin als **eigenen JSON-Eintrag** ausgeben
-- bei gleichem Eventtitel an mehreren Tagen **mehrere Einträge** erzeugen
-- bei gleichem Datum mit mehreren Startzeiten **mehrere Einträge** erzeugen
+Beispiel:
+- wenn nur `Koppelkerk` sicher belegt ist, dann **nicht** `Koppelkerk Kerkzaal` ausgeben
+- wenn nur der Ort oder das Festivalgelände sicher ist, dann **nicht** eine feinere Unterlocation erfinden oder unsicher verdichten
 
-### Mehrtages-Events – Grundlogik
-Wenn ein Event über mehrere Tage läuft:
-- `date` = erster Tag
-- `endDate` = letzter Tag
-- `description` muss das **gesamte Event** beschreiben, nicht nur den Auftaktag
+Lieber:
+- gröber, aber sicher  
+als
+- feiner, aber nicht 100% belastbar
 
-Wenn `endDate` nicht belastbar belegt ist:
+### Canonical-URL-Regel
+Für FINAL soll nach Möglichkeit die **stabilste belastbare kanonische Event-URL** verwendet werden.
+
+Das heißt:
+- nicht irgendein ähnlicher Pfad
+- nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
+- bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
+
+Wenn die URL nicht stabil genug verifiziert werden kann:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
-### Wichtige Unterscheidung bei Mehrtagesevents
-
-#### A. Ein zusammenhängendes Mehrtagesevent
-Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tagesinstanzen daraus macht, darf ein einzelner Mehrtageseintrag verwendet werden.
-
-#### B. Tages- oder slotbezogene Einzelinstanzen
-Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Tageszeiten nennt, dann gilt:
-
-- **nicht** als ein Sammel-Eintrag zusammenziehen
-- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
-
-Das gilt besonders, wenn:
-- pro Tag unterschiedliche Startzeiten genannt werden
-- Programmpunkte klar getrennt sind
-- ein Nutzer realistisch einzelne Tage separat besuchen würde
-
-### Ausstellungen / Märkte / längere Formate
-Bei Ausstellungen, Märkten oder ähnlichen Formaten mit Laufzeit über mehrere Tage gilt:
-
-- ein einzelner Mehrtageseintrag ist erlaubt, wenn das Format als zusammenhängendes Event dargestellt wird
-- unterschiedliche tägliche Öffnungszeiten machen den Event **nicht automatisch** zu mehreren Instanzen
-- wenn aber einzelne Veranstaltungstage als eigene Programmpunkte oder Sondertermine ausgewiesen sind, müssen diese getrennt behandelt werden
-
-Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
-- **nicht FINAL übernehmen**
-
----
-
-## 12. Zeit-Regel
-
-### Allgemein
-`time` darf nur eingetragen werden, wenn die Quelle die Uhrzeit klar und eindeutig nennt.
-
-Dabei exakt unterscheiden:
-- Beginn
-- Einlass
-- Warm-up
-- Veranstaltungszeitraum
-- Öffnungszeiten
-
-Wenn mehrere Zeitangaben existieren, nur die **für die konkrete Instanz relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
-
-Keine Zeit raten.  
-Keine Zeit aus ähnlichen Events übernehmen.
-
-### Mehrtages-Event mit einheitlicher Zeit
-Wenn die Quelle eine **einheitliche Zeitangabe** für das gesamte Mehrtagesevent nennt:
-- `time` darf gesetzt werden
-
-### Mehrtages-Event mit unterschiedlichen Tageszeiten
-Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt, dann gilt:
-
-- wenn die Tage als eigenständige besuchbare Instanzen verstanden werden können: **pro Tag eigener Eintrag**
-- wenn das Event als zusammenhängendes Format dargestellt wird und die Zeitlogik nicht sinnvoll instanzbasiert auflösbar ist: `time` leer lassen
-
-### Öffnungszeiten vs. Event-Startzeit
-Öffnungszeiten dürfen nicht mit einer Startzeit verwechselt werden.
-
-- Eine reine Öffnungszeit ist nur dann als `time` sinnvoll, wenn das Format genau so als besuchbare Zeitspanne des Events kommuniziert wird
-- Bei klassischen Bühnen-/Vortrags-/Konzertformaten ist die eigentliche Startzeit zu bevorzugen
-
-### Mehrere Slots / Läufe / Startzeiten
-Wenn es gibt:
-- mehrere Startzeiten
-- mehrere Läufe / Slots / Blöcke
-- denselben Eventtitel an mehreren Tagen
-
-Dann gilt:
-- **nicht zu einem Sammel-Eintrag komprimieren**
-- stattdessen **pro Termin / Slot einen eigenen JSON-Eintrag**
-- pro Eintrag die jeweils konkrete `time` setzen
-
-Ein identischer `source_url` darf mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
+Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
+- im manuellen Prüfmodus: **REVIEW NÖTIG**
+- im Automationsmodus: **nicht ausgeben**
 
 ## 13. Scope-/Radius-Regel
 Standard:
