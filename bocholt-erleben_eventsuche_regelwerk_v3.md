@@ -386,24 +386,50 @@ Eine offizielle Info-, Presse- oder News-Seite ist FINAL-fähig, wenn **alle** f
 
 1. offizieller oder neutraler Absender
 2. klarer Fokus auf **genau dieses Event**
-3. die Seite beschreibt erkennbar den **Besuch des Events** und ist nicht primär:
-   - Anmeldeaufruf
-   - Organisationshinweis
-   - bloße Registrierungsseite
-   - reine Save-the-Date-Seite ohne ausreichende Nutzerdaten
+3. die Seite beschreibt erkennbar den **Besuch des Events**
 4. Titel, Datum und Ort sind belastbar erkennbar
 5. der Eventcharakter ist klar
 6. keine wesentliche FINAL-Pflichtfeldlücke
 7. keine bessere Detailseite verfügbar
 
-#### B. Offizieller klar trennbarer Eventblock auf einer Programmseite
-Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
+### Wichtige Klarstellung zum Besucherfokus
+Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite **nicht automatisch ungeeignet**.
 
-1. offizieller oder neutraler Absender
-2. der Einzeltermin ist auf der Seite **klar separat abgrenzbar**
-3. Titel, Datum, Uhrzeit (falls vorhanden), Ort und Eventcharakter sind im Einzelblock belastbar
-4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
-5. keine bessere Detailseite verfügbar
+Eine solche Seite bleibt FINAL-fähig, wenn:
+- sie klar auch für Besucher gedacht ist
+- die besucherrelevanten Kerndaten vollständig und belastbar vorhanden sind
+- der Hauptfokus weiterhin auf dem Event selbst liegt
+
+Nicht FINAL-fähig ist die Seite nur dann, wenn sie **überwiegend**:
+- bloßer Anmeldeaufruf
+- reiner Organisationshinweis
+- bloße Registrierungsseite
+- reine Save-the-Date-Seite ohne ausreichende Nutzerdaten
+
+ist.
+
+#### B. Tages- oder slotbezogene Einzelinstanzen
+Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Startblöcke nennt, dann gilt:
+
+- **nicht** als ein Sammel-Eintrag zusammenziehen
+- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
+
+Das gilt besonders, wenn:
+- pro Tag unterschiedliche Startzeiten genannt werden
+- Programmpunkte klar getrennt sind
+- Jugend-/Familien-/Abend-/Seniorenblöcke o. ä. separat ausgewiesen sind
+- ein Nutzer realistisch einzelne Blöcke separat besuchen würde
+
+### Harte Instanzprüfung vor FINAL
+Für FINAL gilt zwingend:
+
+- **ein Eintrag = genau eine besuchbare Instanz**
+
+Wenn eine Quelle mehrere konkrete Tage oder Blöcke mit jeweils eigener Zeit nennt, dann ist ein Sammel-Eintrag **nicht FINAL-fähig**.
+
+Dann gilt nur:
+- sauber in einzelne Instanzen aufteilen
+- oder, wenn das nicht belastbar modellierbar ist: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
 
 ### Mehrtermin-Seiten
 Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
@@ -533,7 +559,16 @@ Das heißt:
 - nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
 - bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
 
-Wenn die URL nicht stabil genug verifiziert werden kann:
+### Harte Instanz-URL-Regel
+Eine URL ist nur dann FINAL-tauglich, wenn sie **erkennbar zur gewählten Instanz passt**.
+
+Nicht FINAL-tauglich sind insbesondere:
+- datumsfremde Pfade
+- instanzfremde URLs
+- URLs, die sichtbar auf einen anderen Termin desselben Formats verweisen
+- URLs, bei denen die konkrete Zielinstanz nicht sauber verifizierbar ist
+
+Wenn die URL nicht stabil genug oder nicht instanzpassend verifiziert werden kann:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
