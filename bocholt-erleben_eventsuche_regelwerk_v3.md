@@ -430,7 +430,6 @@ Wenn eine Quelle mehrere konkrete Tage oder Blöcke mit jeweils eigener Zeit nen
 Dann gilt nur:
 - sauber in einzelne Instanzen aufteilen
 - oder, wenn das nicht belastbar modellierbar ist: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
-
 ### Mehrtermin-Seiten
 Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
 
