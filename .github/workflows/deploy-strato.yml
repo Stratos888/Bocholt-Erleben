@@ -330,6 +330,17 @@ jobs:
 
       - name: Prepare deploy folder
         shell: bash
+        env:
+          LIVE_DB_HOST: ${{ secrets.LIVE_DB_HOST }}
+          LIVE_DB_PORT: ${{ secrets.LIVE_DB_PORT }}
+          LIVE_DB_NAME: ${{ secrets.LIVE_DB_NAME }}
+          LIVE_DB_USER: ${{ secrets.LIVE_DB_USER }}
+          LIVE_DB_PASSWORD: ${{ secrets.LIVE_DB_PASSWORD }}
+          STAGING_DB_HOST: ${{ secrets.STAGING_DB_HOST }}
+          STAGING_DB_PORT: ${{ secrets.STAGING_DB_PORT }}
+          STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
+          STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
+          STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
         run: |
           set -e
 
@@ -434,14 +445,78 @@ jobs:
 
 
 
-          # Version file (TXT instead of JSON)
+          # === BEGIN BLOCK: BUILD_VERSION_AND_INJECT_PRIVATE_PHP_CONFIG_V1 | Zweck: schreibt build.txt und injiziert private api/_config.php nur im Deploy-Artefakt aus GitHub-Secrets; Umfang: ersetzt den bisherigen reinen Version-file-Block innerhalb "Prepare deploy folder" ===
           mkdir -p deploy/meta
           printf '%s\n' "$BUILD_ID" > deploy/meta/build.txt
+
+          mkdir -p deploy/api
+
+          if [ "$DEPLOY_ENV_NAME" = "staging" ]; then
+            APP_DB_HOST="$STAGING_DB_HOST"
+            APP_DB_PORT="${STAGING_DB_PORT:-3306}"
+            APP_DB_NAME="$STAGING_DB_NAME"
+            APP_DB_USER="$STAGING_DB_USER"
+            APP_DB_PASSWORD="$STAGING_DB_PASSWORD"
+          else
+            APP_DB_HOST="$LIVE_DB_HOST"
+            APP_DB_PORT="${LIVE_DB_PORT:-3306}"
+            APP_DB_NAME="$LIVE_DB_NAME"
+            APP_DB_USER="$LIVE_DB_USER"
+            APP_DB_PASSWORD="$LIVE_DB_PASSWORD"
+          fi
+
+          test -n "$APP_DB_HOST"
+          test -n "$APP_DB_NAME"
+          test -n "$APP_DB_USER"
+          test -n "$APP_DB_PASSWORD"
+
+          APP_ENV="$DEPLOY_ENV_NAME"
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD
+
+          python - <<'PY'
+          # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===
+          import base64
+          import json
+          import os
+          from pathlib import Path
+
+          payload = {
+              "app_env": os.environ["APP_ENV"],
+              "db": {
+                  "host": os.environ["APP_DB_HOST"],
+                  "port": int(os.environ.get("APP_DB_PORT", "3306") or "3306"),
+                  "name": os.environ["APP_DB_NAME"],
+                  "user": os.environ["APP_DB_USER"],
+                  "password": os.environ["APP_DB_PASSWORD"],
+                  "charset": "utf8mb4",
+              },
+          }
+
+          encoded = base64.b64encode(
+              json.dumps(payload, ensure_ascii=False).encode("utf-8")
+          ).decode("ascii")
+
+          content = f"""<?php
+          declare(strict_types=1);
+          /* === BEGIN FILE: api/_config.php | Zweck: private Laufzeitkonfiguration fuer Backend und Datenbank; Umfang: komplette serverseitige Datei, nur im Deploy-Artefakt vorhanden === */
+          return json_decode(base64_decode('{encoded}'), true, 512, JSON_THROW_ON_ERROR);
+          /* === END FILE: api/_config.php === */
+          """
+
+          path = Path("deploy/api/_config.php")
+          path.write_text(content, encoding="utf-8")
+          # === END BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 ===
+          PY
+
+          test -s deploy/api/_config.php
 
           echo "=== DEPLOY CONTENTS ==="
           ls -la deploy
           echo "=== meta/build.txt ==="
           cat deploy/meta/build.txt
+          echo "=== api directory ==="
+          ls -la deploy/api
+          # === END BLOCK: BUILD_VERSION_AND_INJECT_PRIVATE_PHP_CONFIG_V1 ===
 
       - name: Install lftp
         shell: bash
