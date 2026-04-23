@@ -244,7 +244,7 @@
     }
 
     if (!hasValue(context.eventLink) && !(hasValue(context.title) && hasValue(context.date) && hasValue(context.place))) {
-      window.alert("Bitte hinterlege mindestens einen Event-Link oder ergänze im Fallback Titel, Datum und Ort.");
+      window.alert("Bitte füge einen Event-Link ein. Wenn dort wichtige Angaben fehlen, ergänze Titel, Datum und Ort direkt im Formular.");
       return false;
     }
 
@@ -259,7 +259,7 @@
 
   function validateAutomationContext(context) {
     if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
-      window.alert("Bitte hinterlege mindestens die Website oder direkt einen Link zur vorhandenen Datenquelle.");
+      window.alert("Bitte gib mindestens einen Link zu deiner Quelle oder Website an.");
       return false;
     }
 
