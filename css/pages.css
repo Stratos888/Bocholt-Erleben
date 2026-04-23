@@ -380,7 +380,7 @@
 .content-cta--primary{
   background: var(--cmp-btn-primary-bg);
   color: var(--cmp-btn-primary-fg);
-  border-color: color-mix(in srgb, transparent 48%, var(--color-primary));
+  border-color: var(--cmp-btn-primary-border);
   box-shadow: var(--cmp-btn-primary-shadow);
 }
 
@@ -389,26 +389,15 @@
 }
 
 @media (hover: hover){
-  .content-cta:hover{
-    background: var(--ui-surface-soft-hover);
-    border-color: var(--ui-border-strong);
-    text-decoration: none;
-  }
-
   .content-cta--primary:hover{
-    background: color-mix(in srgb, var(--cmp-btn-primary-bg) 88%, white);
-    border-color: color-mix(in srgb, transparent 38%, var(--color-primary));
+    background: color-mix(in srgb, var(--cmp-btn-primary-bg) 90%, white);
+    border-color: var(--cmp-btn-primary-border);
   }
-}
-
-.content-cta:active{
-  transform: translateY(1px);
-  background: var(--ui-surface-soft-active);
-  box-shadow: var(--ui-shadow-soft);
 }
 
 .content-cta--primary:active{
-  background: color-mix(in srgb, var(--cmp-btn-primary-bg) 90%, black 4%);
+  background: color-mix(in srgb, var(--cmp-btn-primary-bg) 92%, var(--color-primary-muted) 8%);
+  box-shadow: var(--ui-shadow-cta-active);
 }
 
 /* === BEGIN BLOCK: CONTENT_FORM_SHARED_COMPONENTS_V1 | Zweck: führt zentrale, seitenübergreifend wiederverwendbare Formular-Bausteine für Content-/Subpages ein, damit Veranstalter-Funnel und künftige Formseiten nicht mit route-spezifischen Einzelstyles arbeiten; Umfang: generische form primitives direkt im globalen Pages-Component-Layer vor den seitenbezogenen Overrides === */
