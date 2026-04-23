@@ -299,8 +299,9 @@
   --cmp-btn-font-size: var(--ui-font-size-control);
   --cmp-btn-font-weight: var(--ui-font-weight-control);
   --cmp-btn-focus-ring: var(--ui-focus-ring);
-  --cmp-btn-primary-bg: var(--color-primary);
+  --cmp-btn-primary-bg: color-mix(in srgb, white 94%, var(--color-primary-muted));
   --cmp-btn-primary-fg: var(--color-text-primary);
+  --cmp-btn-primary-border: var(--ui-border-primary);
   --cmp-btn-primary-shadow: var(--ui-shadow-cta);
   --cmp-btn-secondary-bg: var(--ui-control-bg-strong);
   --cmp-btn-secondary-fg: var(--color-text-primary);
