@@ -804,12 +804,12 @@ select.content-field__control{
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_BASE_V9_MOBILE_H1_AND_LEGAL_ALIGN === */
 
-/* === BEGIN BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V25 | Zweck: bringt die Veranstalter-Routen auf einen state-of-the-art Mobile-Formzustand mit besserem Header-Umbruch, kompakteren aber weiterhin gut tappbaren Feldern, kleineren Textareas und ohne Feedback-Ablenkung im Funnel; Umfang: kompletter Mobile-Ownerblock für page--publish und page--organizers außerhalb der Desktop-Breakpoints === */
+/* === BEGIN BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V27 | Zweck: bringt die drei relevanten Veranstalter-Routen auf einen konsistenten Mobile-Zustand mit klarerer CTA-Systematik, kompakteren Formularen, reduzierter Copy und verständlicher Zusatzlogik; Umfang: kompletter Mobile-Ownerblock für page--publish und unveränderte Organizer-Basisregeln darunter === */
 .page--publish{
-  --subpage-stack-gap: 10px;
-  --subpage-card-gap: 8px;
-  --subpage-card-pad-y: 13px;
-  --subpage-hero-gap: 6px;
+  --subpage-stack-gap: 8px;
+  --subpage-card-gap: 6px;
+  --subpage-card-pad-y: 12px;
+  --subpage-hero-gap: 4px;
 }
 
 .page--publish .content-hero,
@@ -826,7 +826,7 @@ select.content-field__control{
 }
 
 .page--publish .content-hero--panel{
-  padding: 14px 14px 12px;
+  padding: 12px 12px 10px;
 }
 
 .page--publish .publish-hero-layout{
@@ -837,25 +837,25 @@ select.content-field__control{
 
 .page--publish .publish-hero-copy{
   display: grid;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
 .page--publish .publish-hero-copy .content-lead{
   margin: 0;
-  max-width: 37ch;
-  font-size: 0.90rem;
-  line-height: 1.30;
+  max-width: 34ch;
+  font-size: 0.88rem;
+  line-height: 1.24;
   text-wrap: pretty;
 }
 
 .page--publish .publish-hero-meta,
 .page--publish .publish-hero-trust{
-  max-width: 39ch;
+  max-width: 37ch;
   margin: 0;
   color: var(--cmp-link-color-muted);
-  font-size: 0.76rem;
-  line-height: 1.22;
+  font-size: 0.75rem;
+  line-height: 1.18;
 }
 
 .page--publish .publish-hero-trust a{
@@ -864,27 +864,11 @@ select.content-field__control{
   text-underline-offset: 0.14em;
 }
 
-.page--publish .publish-hero-cta{
-  display: grid;
-  gap: 8px;
-  margin-top: 1px;
-}
-
-.page--publish .publish-hero-cta .content-cta,
-.page--publish .publish-hero-cta .content-cta--primary,
-.page--publish .publish-final-actions .content-cta,
-.page--publish .publish-final-actions .content-cta--primary{
-  width: 100%;
-  min-width: 0;
-  min-height: 44px;
-  padding-inline: 14px;
-}
-
 .page--publish .publish-benefits-card,
 .page--publish .publish-membership-card,
 .page--publish .publish-start-card,
 .page--publish .publish-final-card{
-  gap: 8px;
+  gap: 7px;
 }
 
 .page--publish .publish-start-card,
@@ -897,24 +881,24 @@ select.content-field__control{
 
 .page--publish .publish-section-head{
   display: grid;
-  gap: 3px;
-  padding-bottom: 8px;
+  gap: 2px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
 
 .page--publish .publish-section-head h2{
   margin: 0;
-  line-height: 1.10;
+  line-height: 1.08;
 }
 
 .page--publish .publish-section-head .content-note{
-  font-size: 0.81rem;
-  line-height: 1.24;
+  font-size: 0.79rem;
+  line-height: 1.20;
 }
 
 .page--publish .publish-benefits-grid{
   display: grid;
-  gap: 7px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -939,34 +923,45 @@ select.content-field__control{
   color: var(--color-text-primary);
   font-size: 0.88rem;
   font-weight: 760;
-  line-height: 1.14;
+  line-height: 1.12;
 }
 
 .page--publish .publish-benefits-grid span{
   color: var(--cmp-copy-color);
-  font-size: 0.82rem;
-  line-height: 1.24;
+  font-size: 0.81rem;
+  line-height: 1.20;
 }
 
 .page--publish .publish-benefits-grid .content-actions{
-  margin-top: 2px;
+  margin-top: 4px;
+  justify-items: stretch;
+}
+
+.page--publish .publish-benefits-grid .content-cta,
+.page--publish .publish-benefits-grid .content-cta--primary,
+.page--publish .publish-final-actions .content-cta,
+.page--publish .publish-final-actions .content-cta--primary{
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding-inline: 14px;
 }
 
 .page--publish .publish-membership-layout,
 .page--publish .publish-membership-block{
   display: grid;
-  gap: 7px;
+  gap: 6px;
 }
 
 .page--publish .publish-membership-intro{
-  max-width: 38ch;
-  font-size: 0.80rem;
-  line-height: 1.22;
+  max-width: 36ch;
+  font-size: 0.78rem;
+  line-height: 1.18;
 }
 
 .page--publish .publish-plans{
   display: grid;
-  gap: 7px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -974,7 +969,7 @@ select.content-field__control{
 
 .page--publish .publish-plans li{
   display: grid;
-  gap: 3px;
+  gap: 2px;
   margin: 0;
   padding: 10px 11px;
   border: 1px solid var(--cmp-divider-strong);
@@ -992,98 +987,111 @@ select.content-field__control{
 
 .page--publish .publish-plans strong{
   color: var(--color-text-primary);
-  font-size: 0.91rem;
+  font-size: 0.89rem;
   font-weight: 780;
-  line-height: 1.12;
+  line-height: 1.10;
 }
 
 .page--publish .publish-plans span{
   color: var(--cmp-copy-color);
-  font-size: 0.86rem;
-  line-height: 1.22;
+  font-size: 0.83rem;
+  line-height: 1.18;
 }
 
 .page--publish .publish-plans li small{
   color: var(--cmp-copy-color);
-  font-size: 0.79rem;
-  line-height: 1.22;
+  font-size: 0.77rem;
+  line-height: 1.18;
 }
 
 .page--publish .publish-plans-note{
-  max-width: 38ch;
-  font-size: 0.80rem;
-  line-height: 1.22;
-}
-
-.page--publish .publish-final-card--help{
-  gap: 8px;
-}
-
-.page--publish .publish-final-card--help h2{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.98rem;
-  line-height: 1.14;
+  max-width: 36ch;
+  font-size: 0.77rem;
+  line-height: 1.18;
 }
 
 .page--publish .content-form{
-  gap: 10px;
-}
-
-.page--publish .content-form-grid{
   gap: 8px;
 }
 
+.page--publish .content-form-grid{
+  gap: 7px;
+}
+
 .page--publish .content-field{
-  gap: 4px;
+  gap: 3px;
 }
 
 .page--publish .content-field__label{
-  font-size: 0.80rem;
+  font-size: 0.79rem;
+  line-height: 1.16;
+}
+
+.page--publish .content-field__hint{
+  margin: 1px 0 0;
+  font-size: 0.72rem;
   line-height: 1.18;
 }
 
 .page--publish .content-field__control{
   min-height: 44px;
-  padding: 10px 12px;
-  border-radius: 15px;
-  line-height: 1.28;
+  padding: 8px 12px;
+  border-radius: 14px;
+  line-height: 1.22;
 }
 
 .page--publish textarea.content-field__control{
-  min-height: 92px;
+  min-height: 72px;
 }
 
 .page--publish #publish-standard-description,
 .page--publish #publish-automation-notes{
-  min-height: 96px;
+  min-height: 76px;
 }
 
 .page--publish #publish-standard-notes{
-  min-height: 84px;
+  min-height: 60px;
 }
 
-.page--publish .content-form-section-head{
-  gap: 2px;
-  padding-top: 0;
+.page--publish .publish-optional-fields{
+  display: grid;
+  gap: 0;
+  margin: 2px 0 0;
+  padding: 8px 10px 10px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.44);
 }
 
-.page--publish .content-form-section-head .content-note,
-.page--publish .content-form-note{
-  max-width: 39ch;
-  font-size: 0.76rem;
-  line-height: 1.22;
+.page--publish .publish-optional-fields summary{
+  cursor: pointer;
+  list-style: none;
+  color: var(--color-text-primary);
+  font-size: 0.80rem;
+  font-weight: 720;
+  line-height: 1.18;
+}
+
+.page--publish .publish-optional-fields summary::-webkit-details-marker{
+  display: none;
+}
+
+.page--publish .publish-optional-fields__body{
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .page--publish .publish-final-actions{
   display: grid;
-  gap: 8px;
+  gap: 7px;
   justify-items: stretch;
 }
 
-main.page--publish + .feedback-inline-entry,
-main.page--organizers + .feedback-inline-entry{
-  display: none !important;
+.page--publish .content-form-note{
+  max-width: 36ch;
+  font-size: 0.74rem;
+  line-height: 1.18;
 }
 
 .page--organizers{
@@ -1150,18 +1158,20 @@ main.page--organizers + .feedback-inline-entry{
 
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
-    font-size: clamp(1.18rem, 4.9vw, 1.34rem);
-    line-height: 1.01;
-    letter-spacing: -0.032em;
-    white-space: nowrap;
+    max-width: 16ch;
+    font-size: clamp(1.14rem, 4.7vw, 1.30rem);
+    line-height: 0.98;
+    letter-spacing: -0.028em;
+    white-space: normal;
+    text-wrap: balance;
   }
 
   .page--publish .publish-final-card--help{
-    padding-top: 11px;
-    padding-bottom: 11px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
-/* === END BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V25 === */
+/* === END BLOCK: PUBLISH_AND_ORGANIZER_MOBILE_POLISH_V27 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
 .info-hero-layout{
