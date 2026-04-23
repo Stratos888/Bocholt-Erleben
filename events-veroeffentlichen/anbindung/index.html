@@ -68,18 +68,14 @@
     </a>
   </header>
 
-  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_MOBILE_ENTERPRISE_V5 | Zweck: reduziert den Profi-Pfad auf eine mobile Prüfroute mit minimalem Vorlauf, kompakter Eignungsprüfung, schnellerem Form-Einstieg und sauberer Formspree-Logik; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_MOBILE_ENTERPRISE_V6 | Zweck: richtet die Anbindungsroute ohne Profi-Pfad-Lead als klare technische Anfrage aus, erklärt die Modelllogik verständlich und verdichtet Copy, Karten und Formular auf den eigentlichen Anbahnungs-Task; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
-          <p class="content-kicker">Profi-Pfad für Veranstalter</p>
           <h1>Automatische Anbindung anfragen</h1>
-          <p class="content-lead">
-            Für API, Feed, CSV oder iCal. Wir prüfen zuerst Quelle und Übernahmelogik.
-          </p>
           <p class="content-note publish-hero-trust">
-            Kein Sofortkauf: erst Prüfung, dann operative Entscheidung.
+            Wenn Termine regelmäßig aus einer eigenen Quelle übernommen werden sollen, kannst du die Anbindung vorab anfragen. Das passende Modell klären wir nach der Prüfung.
           </p>
         </div>
       </div>
@@ -87,26 +83,26 @@
 
     <section class="content-card publish-benefits-card" aria-labelledby="publish-automation-explainer">
       <div class="publish-section-head">
-        <h2 id="publish-automation-explainer">Sinnvoll, wenn …</h2>
+        <h2 id="publish-automation-explainer">Das passt, wenn …</h2>
       </div>
 
       <ul class="publish-benefits-grid" aria-label="Geeignete Fälle für die automatische Anbindung">
         <li>
-          <strong>Strukturierte Quelle</strong>
+          <strong>Eigene strukturierte Quelle</strong>
           <span>Zum Beispiel API, Feed, CSV oder iCal.</span>
         </li>
         <li>
-          <strong>Laufender Betrieb</strong>
-          <span>Vor allem sinnvoll bei regelmäßigen neuen Terminen.</span>
+          <strong>Regelmäßige neue Termine</strong>
+          <span>Vor allem sinnvoll, wenn laufend neue Termine entstehen.</span>
         </li>
       </ul>
     </section>
 
     <section class="content-card publish-final-card publish-final-card--help" id="publish-automation-request" aria-labelledby="publish-automation-request-title">
       <div class="publish-section-head">
-        <h2 id="publish-automation-request-title">Quelle zur Prüfung einreichen</h2>
+        <h2 id="publish-automation-request-title">Anbindung anfragen</h2>
         <p class="content-note">
-          Beschreibe Quelle und Aktualisierungslogik so, dass wir die Übernahme schnell einordnen können.
+          Je klarer Quelle und Aktualisierungslogik beschrieben sind, desto schneller können wir den nächsten Schritt einschätzen.
         </p>
       </div>
 
@@ -115,6 +111,73 @@
           <label class="content-field" for="publish-automation-organization">
             <span class="content-field__label">Veranstalter / Organisation *</span>
             <input class="content-field__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
+
+          <label class="content-field" for="publish-automation-contact">
+            <span class="content-field__label">Ansprechpartner *</span>
+            <input class="content-field__control" id="publish-automation-contact" name="contact" type="text" autocomplete="name" required>
+          </label>
+
+          <label class="content-field" for="publish-automation-email">
+            <span class="content-field__label">E-Mail-Adresse *</span>
+            <input class="content-field__control" id="publish-automation-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+            <p class="content-field__hint">Für Rückfragen oder Klärung.</p>
+          </label>
+
+          <label class="content-field" for="publish-automation-source-type">
+            <span class="content-field__label">Vorhandene Quelle *</span>
+            <select class="content-field__control" id="publish-automation-source-type" name="sourceType" required>
+              <option value="">Bitte wählen</option>
+              <option value="API">API</option>
+              <option value="Feed">Feed</option>
+              <option value="CSV">CSV</option>
+              <option value="iCal">iCal</option>
+              <option value="Sonstiges">Sonstiges</option>
+            </select>
+          </label>
+
+          <label class="content-field content-field--full" for="publish-automation-source-link">
+            <span class="content-field__label">Link zur Quelle oder zu Beispielterminen</span>
+            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://...">
+            <p class="content-field__hint">Am besten die konkrete URL, über die wir Termine oder Beispieldaten prüfen können.</p>
+          </label>
+
+          <label class="content-field content-field--full" for="publish-automation-website">
+            <span class="content-field__label">Website (optional)</span>
+            <input class="content-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="content-field" for="publish-automation-cadence">
+            <span class="content-field__label">Aktualisierungsrhythmus</span>
+            <input class="content-field__control" id="publish-automation-cadence" name="cadence" type="text" placeholder="z. B. täglich / wöchentlich">
+          </label>
+
+          <label class="content-field" for="publish-automation-volume">
+            <span class="content-field__label">Ungefähre Termine pro Monat</span>
+            <input class="content-field__control" id="publish-automation-volume" name="volume" type="text" placeholder="z. B. 12">
+          </label>
+
+          <label class="content-field" for="publish-automation-tech-contact">
+            <span class="content-field__label">Technischer Ansprechpartner (optional)</span>
+            <input class="content-field__control" id="publish-automation-tech-contact" name="techContact" type="text">
+          </label>
+
+          <label class="content-field content-field--full" for="publish-automation-notes">
+            <span class="content-field__label">Weitere Hinweise (optional)</span>
+            <textarea class="content-field__control" id="publish-automation-notes" name="notes" rows="3"></textarea>
+            <p class="content-field__hint">Zum Beispiel Besonderheiten der Quelle oder offene Fragen.</p>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline publish-final-actions">
+          <button class="content-cta content-cta--primary" id="publish-automation-submit" type="button">
+            Anfrage senden
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+  <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_MOBILE_ENTERPRISE_V6 === -->eld__control" id="publish-automation-organization" name="organization" type="text" autocomplete="organization" required>
           </label>
 
           <label class="content-field" for="publish-automation-contact">
