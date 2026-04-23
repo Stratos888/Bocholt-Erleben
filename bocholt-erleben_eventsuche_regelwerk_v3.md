@@ -112,15 +112,18 @@ Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese 
 - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze bekannte starke Quellen aktiv, suche zusätzlich bewusst in freigegebenen Low-Monetization-Kulturquellen und behalte einen offenen Discovery-Anteil bei. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Arbeite immer in drei Suchrichtungen: `CORE`, `RECOVERY` und `DISCOVERY`. Decke CORE zuerst systematisch ab, nutze RECOVERY gezielt für offizielle event-spezifische Endnutzer-Info-/News-Seiten sowie offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten und behalte zusätzlich einen offenen Discovery-Anteil bei. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze die bewusst freigegebenen Low-Monetization-Quellen aktiv mit, aber arbeite nicht als starre Closed-Whitelist. Discovery-Quellen dürfen gefunden werden, müssen aber für FINAL auf offizieller oder gleichwertig event-spezifischer Quelle verifiziert werden. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
+> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Arbeite immer in drei Suchrichtungen: `CORE`, `RECOVERY` und `DISCOVERY`. Decke CORE zuerst systematisch ab. Nutze RECOVERY gezielt für offizielle event-spezifische Endnutzer-Info-/News-Seiten sowie offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten. Discovery-Quellen dürfen gefunden werden, müssen aber für FINAL auf offizieller oder gleichwertig event-spezifischer Quelle verifiziert werden. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
 
 Wenn eine der Referenzdateien fehlt, soll vor dem Suchlauf klar darauf hingewiesen werden, dass für sauberes Dedupe zusätzlich noch der aktuelle Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Stand benötigt werden.
 
 Wenn zusätzlich eine operative Quellenliste oder ein aktueller `Sources`-Export mitgegeben wird, hat dieser für die Quellenauswahl Vorrang vor bloß impliziten Annahmen.
+
 ---
+
+## 1. Suchgebiet
 
 ## 1. Suchgebiet
 Suche nur Events aus:
@@ -289,24 +292,24 @@ Nicht übernehmen:
 
 ---
 
-## 6A. Quellenklassifikation und Suchbahnen
+## 6A. Quellenklassifikation und Suchrichtungen
 
 ### Grundregel
 Die KI-Suche arbeitet **nicht** als starre Closed-Whitelist.
 
 Stattdessen gilt:
 - bekannte starke Quellen aktiv mitnehmen
-- bewusst freigegebene Low-Monetization-Quellen aktiv mitnehmen
-- zusätzlich immer offen nach neuen passenden Quellen suchen
+- zusätzlich gezielt offizielle event-spezifische Recovery-Quellen nutzen
+- außerdem offen nach neuen passenden Quellen suchen
 
-### Verbindliche Suchbahnen
-Jeder Suchlauf soll in **drei Suchbahnen** gedacht werden:
+### Verbindliche Suchrichtungen
+Jeder Suchlauf soll in **drei Suchrichtungen** gedacht werden:
 
 1. **CORE**
-2. **FREIGEGEBEN_LOW_MONETIZATION**
+2. **RECOVERY**
 3. **DISCOVERY**
 
-### Suchbahn A – CORE
+### Suchrichtung A – CORE
 CORE umfasst bekannte, belastbare, strategisch unkritische Quellen mit hohem Ertrag.
 
 Regel:
@@ -314,22 +317,26 @@ Regel:
 - sie sollen aktiv und regelmäßig geprüft werden
 - bevorzugt zuerst offizielle und neutrale Quellen mit hoher Relevanz im Suchgebiet
 
-### Suchbahn B – FREIGEGEBEN_LOW_MONETIZATION
-Diese Suchbahn umfasst bewusst freigegebene Kulturquellen mit hoher Inhaltsqualität und niedriger bis höchstens mittlerer Monetarisierungswahrscheinlichkeit.
+### Suchrichtung B – RECOVERY
+RECOVERY umfasst Quellen und Seitentypen, die nicht immer klassische Event-Detailseiten sind, aber für Recall wichtig sind, wenn sie belastbare Einzelinstanzen liefern.
+
+Dazu zählen:
+- offizielle event-spezifische Endnutzer-Info-/News-Seiten
+- offizielle klar trennbare Eventblöcke auf Programm-, Saison- oder Übersichtsseiten
 
 Regel:
-- diese Quellen dürfen aktiv gesucht werden
-- sie sind **bewusste Ausnahmen** innerhalb des Monetarisierungsschutzes
-- sie sind **kein** genereller Wegfall des Monetarisierungsschutzes
+- RECOVERY ist ausdrücklich erlaubt
+- RECOVERY darf gute Events retten, die sonst durch zu strenge Detailseitenlogik verloren gehen würden
+- RECOVERY ist kein Freifahrtschein für generische Übersichtsseiten
 
-### Suchbahn C – DISCOVERY
+### Suchrichtung C – DISCOVERY
 DISCOVERY umfasst neue, bisher nicht klassifizierte Quellen im Suchgebiet.
 
 Regel:
 - DISCOVERY ist ausdrücklich erlaubt und gewünscht
 - neue Quellen dürfen gefunden und für einzelne Events genutzt werden, wenn alle übrigen Qualitätsregeln erfüllt sind
 - neue Quellen dürfen aber nicht automatisch dauerhaft als Normalquelle behandelt werden
-- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE oder FREIGEGEBEN_LOW_MONETIZATION übernommen werden
+- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE übernommen werden
 
 ### Harte Regel gegen Closed-Whitelist-Verengung
 Die KI-Suche darf **nicht** nur bekannte Quellen mechanisch abarbeiten.
@@ -338,44 +345,25 @@ Regel:
 - bekannte Quellen aktiv nutzen
 - aber immer zusätzlich offen für neue passende Quellen im Suchgebiet bleiben
 
-### Zielgewichtung
+### Zielbild
 Als Zielbild gilt:
+- CORE zuerst systematisch abdecken
+- danach RECOVERY gezielt nutzen
+- zusätzlich DISCOVERY offen mitführen
 
-- **ca. 60 % CORE**
-- **ca. 25 % FREIGEGEBEN_LOW_MONETIZATION**
-- **ca. 15 % DISCOVERY**
-
-Wenn gerade klare Content-Lücken bestehen, darf temporär auch gelten:
-
-- **ca. 50 % CORE**
-- **ca. 30 % FREIGEGEBEN_LOW_MONETIZATION**
-- **ca. 20 % DISCOVERY**
-
-DISCOVERY darf jedoch **nicht vollständig auf null gesetzt** werden.
+Wichtig:
+- DISCOVERY darf nicht vollständig auf null gesetzt werden
+- ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
 
 ### Operative Startpunkte für die Suche
 CORE zuerst aktiv prüfen:
-
 - offizielle Veranstaltungs- und Kulturkalender der Städte im Suchgebiet
 - offizielle Seiten größerer Kulturhäuser, Theater, Museen und Musikschulen im Suchgebiet
 - alle bereits im aktuellen Projektbestand etablierten neutralen oder offiziellen Quellen
 
-Zusätzlich bewusst aktiv prüfen:
-
-- Kulturort Alte Molkerei
-- KuKuG Bocholt
-- Fontane-Kreis Bocholt
-- Koppelkerk Bredevoort
-- Nationaal Onderduikmuseum Aalten
-- Klein Theater Dinxperlo
-- Schloss Ringenberg
-- Quartettverein Bocholt
-
 Wichtig:
-- diese Liste ist **keine exklusive Whitelist**
-- sie definiert nur Quellen, die aktiv mitgedacht werden sollen
-
----
+- dies ist **keine exklusive Whitelist**
+- es definiert nur den verpflichtenden stabilen Startpunkt der Suche
 
 ## 7. URL-Regel
 Bevorzugt ist **eine event-spezifische Detailseite**.
@@ -554,48 +542,121 @@ Wenn die URL nicht stabil genug verifiziert werden kann:
 Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
-  
-## 10. Verifikationsregel
-**Felder nur setzen, wenn sie direkt und eindeutig aus der Quelle verifizierbar sind.**
 
-Wenn ein Feld nicht eindeutig belegt ist:
-- **Feld weglassen**
-- **nicht raten**
-- **nicht aus Vermutung ergänzen**
+---
 
-Das gilt besonders für:
-- `time`
-- `endDate`
-- `location`
-- `city`
+## 11. Datums-, Instanz- und Mehrtages-Regel
 
-### Safe-location-Regel
-Bei Ortsangaben darf immer nur die **höchste sicher belegte Granularität** ausgegeben werden.
+### Grundregel
+Ein JSON-Objekt repräsentiert genau **eine konkrete, besuchbare Termin-Instanz**.
 
-Beispiel:
-- wenn nur `Koppelkerk` sicher belegt ist, dann **nicht** `Koppelkerk Kerkzaal` ausgeben
-- wenn nur der Ort oder das Festivalgelände sicher ist, dann **nicht** eine feinere Unterlocation erfinden oder unsicher verdichten
+Verwende:
+- das **tatsächliche Veranstaltungsdatum**
+- nicht das Veröffentlichungsdatum einer Pressemeldung
+- nicht das Änderungsdatum einer Seite
+- nicht ein unsicher abgeleitetes Datum
 
-Lieber:
-- gröber, aber sicher  
-als
-- feiner, aber nicht 100% belastbar
+### Mehrere Termine
+Wenn mehrere konkrete Termine vorkommen:
+- jeden klar genannten Termin als **eigenen JSON-Eintrag** ausgeben
+- bei gleichem Eventtitel an mehreren Tagen **mehrere Einträge** erzeugen
+- bei gleichem Datum mit mehreren Startzeiten **mehrere Einträge** erzeugen
 
-### Canonical-URL-Regel
-Für FINAL soll nach Möglichkeit die **stabilste belastbare kanonische Event-URL** verwendet werden.
+### Mehrtages-Events – Grundlogik
+Wenn ein Event über mehrere Tage läuft:
+- `date` = erster Tag
+- `endDate` = letzter Tag
+- `description` muss das **gesamte Event** beschreiben, nicht nur den Auftaktag
 
-Das heißt:
-- nicht irgendein ähnlicher Pfad
-- nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
-- bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
-
-Wenn die URL nicht stabil genug verifiziert werden kann:
+Wenn `endDate` nicht belastbar belegt ist:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
-Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
-- im manuellen Prüfmodus: **REVIEW NÖTIG**
-- im Automationsmodus: **nicht ausgeben**
+### Wichtige Unterscheidung bei Mehrtagesevents
+
+#### A. Ein zusammenhängendes Mehrtagesevent
+Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tagesinstanzen daraus macht, darf ein einzelner Mehrtageseintrag verwendet werden.
+
+#### B. Tages- oder slotbezogene Einzelinstanzen
+Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Startblöcke nennt, dann gilt:
+
+- **nicht** als ein Sammel-Eintrag zusammenziehen
+- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
+
+Das gilt besonders, wenn:
+- pro Tag unterschiedliche Startzeiten genannt werden
+- Programmpunkte klar getrennt sind
+- Jugend-/Familien-/Abend-/Seniorenblöcke o. ä. separat ausgewiesen sind
+- ein Nutzer realistisch einzelne Blöcke separat besuchen würde
+
+### Mehrtermin-Seiten mit sichtbarer Einzelinstanz
+Wenn eine Seite mehrere Termine desselben Formats enthält, ist das **kein automatischer Ausschluss**.
+
+Wenn die aktuell sichtbare Einzelinstanz klar belegt ist, dann darf genau diese Instanz übernommen werden, auch wenn:
+- dieselbe Seite weitere Termine desselben Formats enthält
+- ein Link wie „weitere Termine anzeigen“ vorhanden ist
+
+### Ausstellungen / Märkte / längere Formate
+Bei Ausstellungen, Märkten oder ähnlichen Formaten mit Laufzeit über mehrere Tage gilt:
+
+- ein einzelner Mehrtageseintrag ist erlaubt, wenn das Format als zusammenhängendes Event dargestellt wird
+- unterschiedliche tägliche Öffnungszeiten machen den Event **nicht automatisch** zu mehreren Instanzen
+- wenn aber einzelne Veranstaltungstage als eigene Programmpunkte oder Sondertermine ausgewiesen sind, müssen diese getrennt behandelt werden
+
+Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
+- **nicht FINAL übernehmen**
+
+---
+
+## 12. Zeit-Regel
+
+### Allgemein
+`time` darf nur eingetragen werden, wenn die Quelle die Uhrzeit klar und eindeutig nennt.
+
+Dabei exakt unterscheiden:
+- Beginn
+- Einlass
+- Warm-up
+- Veranstaltungszeitraum
+- Öffnungszeiten
+
+Wenn mehrere Zeitangaben existieren, nur die **für die konkrete Instanz relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
+
+Keine Zeit raten.  
+Keine Zeit aus ähnlichen Events übernehmen.
+
+### Mehrtages-Event mit einheitlicher Zeit
+Wenn die Quelle eine **einheitliche Zeitangabe** für das gesamte Mehrtagesevent nennt:
+- `time` darf gesetzt werden
+
+### Mehrtages-Event mit unterschiedlichen Tageszeiten
+Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt, dann gilt:
+
+- wenn die Tage oder Blöcke als eigenständige besuchbare Instanzen verstanden werden können: **pro Tag / Block eigener Eintrag**
+- wenn das Event als zusammenhängendes Format dargestellt wird und die Zeitlogik nicht sinnvoll instanzbasiert auflösbar ist: `time` leer lassen
+
+### Öffnungszeiten vs. Event-Startzeit
+Öffnungszeiten dürfen nicht mit einer Startzeit verwechselt werden.
+
+- Eine reine Öffnungszeit ist nur dann als `time` sinnvoll, wenn das Format genau so als besuchbare Zeitspanne des Events kommuniziert wird
+- Bei klassischen Bühnen-/Vortrags-/Konzertformaten ist die eigentliche Startzeit zu bevorzugen
+
+### Mehrere Slots / Läufe / Startzeiten
+Wenn es gibt:
+- mehrere Startzeiten
+- mehrere Läufe / Slots / Blöcke
+- denselben Eventtitel an mehreren Tagen
+
+Dann gilt:
+- **nicht zu einem Sammel-Eintrag komprimieren**
+- stattdessen **pro Termin / Slot einen eigenen JSON-Eintrag**
+- pro Eintrag die jeweils konkrete `time` setzen
+
+Ein identischer `source_url` darf mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
+
+---
+
+## 13. Scope-/Radius-Regel
 
 ## 13. Scope-/Radius-Regel
 Standard:
