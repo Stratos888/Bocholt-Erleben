@@ -68,18 +68,14 @@
     </a>
   </header>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V4 | Zweck: reduziert den Standardweg auf eine mobile task-first Arbeitsroute mit minimalem Vorlauf, klarer Primärlogik und sichtbar sekundärem Fallback; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
+    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V5 | Zweck: richtet die Einreichen-Route kompromisslos task-first aus, entfernt Standardweg-/Fallback-Wording aus dem sichtbaren Einstieg und verlagert Zusatzangaben in eine reduzierte, verständliche Zusatzlogik; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
     <main class="page page--publish">
       <header class="content-hero content-hero--panel">
         <div class="publish-hero-layout">
           <div class="publish-hero-copy">
-            <p class="content-kicker">Standardweg für Veranstalter</p>
             <h1>Event einreichen</h1>
-            <p class="content-lead">
-              Angaben erfassen, dann mit dem passenden Modell zur Zahlung weitergehen.
-            </p>
             <p class="content-note publish-hero-trust">
-              Ein sauberer Event-Link reicht oft schon. Fallback nur bei fehlenden Infos.
+              Am besten direkt den Event-Link eintragen. Zusätzliche Angaben brauchst du nur, wenn dort etwas fehlt.
             </p>
           </div>
         </div>
@@ -87,9 +83,9 @@
 
       <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
         <div class="publish-section-head">
-          <h2 id="publish-submit-title">Angaben erfassen</h2>
+          <h2 id="publish-submit-title">Event-Daten</h2>
           <p class="content-note">
-            Pflicht: Modell, Veranstalter, E-Mail. Event-Link möglichst direkt mitliefern.
+            Pflicht sind Modell, Veranstalter und E-Mail-Adresse.
           </p>
         </div>
 
@@ -117,74 +113,71 @@
             </label>
 
             <label class="content-field" for="publish-standard-email">
-              <span class="content-field__label">E-Mail für Stripe und Rückfragen *</span>
+              <span class="content-field__label">E-Mail-Adresse *</span>
               <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+              <p class="content-field__hint">Für Rückfragen oder Klärung.</p>
             </label>
 
             <label class="content-field content-field--full" for="publish-standard-event-link">
               <span class="content-field__label">Event-Link oder Kalender-Link</span>
               <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
+              <p class="content-field__hint">Am besten direkt die Seite, auf der Titel, Datum und Ort stehen.</p>
             </label>
           </div>
 
-          <div class="content-form-section-head">
-            <h3>Fallback nur wenn nötig</h3>
-            <p class="content-note">
-              Nur ergänzen, wenn der Link wichtige Informationen nicht enthält.
-            </p>
-          </div>
+          <details class="publish-optional-fields">
+            <summary>Zusätzliche Angaben, falls im Event-Link etwas fehlt</summary>
+            <div class="publish-optional-fields__body">
+              <div class="content-form-grid">
+                <label class="content-field" for="publish-standard-title">
+                  <span class="content-field__label">Titel</span>
+                  <input class="content-field__control" id="publish-standard-title" name="title" type="text">
+                </label>
 
-          <div class="content-form-grid">
-            <label class="content-field" for="publish-standard-title">
-              <span class="content-field__label">Titel</span>
-              <input class="content-field__control" id="publish-standard-title" name="title" type="text">
-            </label>
+                <label class="content-field" for="publish-standard-date">
+                  <span class="content-field__label">Datum</span>
+                  <input class="content-field__control" id="publish-standard-date" name="date" type="date">
+                </label>
 
-            <label class="content-field" for="publish-standard-date">
-              <span class="content-field__label">Datum</span>
-              <input class="content-field__control" id="publish-standard-date" name="date" type="date">
-            </label>
+                <label class="content-field" for="publish-standard-time">
+                  <span class="content-field__label">Uhrzeit</span>
+                  <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
+                </label>
 
-            <label class="content-field" for="publish-standard-time">
-              <span class="content-field__label">Uhrzeit</span>
-              <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
-            </label>
+                <label class="content-field" for="publish-standard-place">
+                  <span class="content-field__label">Ort</span>
+                  <input class="content-field__control" id="publish-standard-place" name="place" type="text">
+                </label>
 
-            <label class="content-field" for="publish-standard-place">
-              <span class="content-field__label">Ort</span>
-              <input class="content-field__control" id="publish-standard-place" name="place" type="text">
-            </label>
+                <label class="content-field content-field--full" for="publish-standard-website">
+                  <span class="content-field__label">Website oder Ticketlink</span>
+                  <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
+                </label>
 
-            <label class="content-field content-field--full" for="publish-standard-website">
-              <span class="content-field__label">Website- oder Ticketlink</span>
-              <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
-            </label>
+                <label class="content-field content-field--full" for="publish-standard-description">
+                  <span class="content-field__label">Kurzbeschreibung</span>
+                  <textarea class="content-field__control" id="publish-standard-description" name="description" rows="3"></textarea>
+                  <p class="content-field__hint">Kurz und sachlich, am besten 1 bis 3 Sätze.</p>
+                </label>
 
-            <label class="content-field content-field--full" for="publish-standard-description">
-              <span class="content-field__label">Kurzbeschreibung</span>
-              <textarea class="content-field__control" id="publish-standard-description" name="description" rows="4"></textarea>
-            </label>
-
-            <label class="content-field content-field--full" for="publish-standard-notes">
-              <span class="content-field__label">Weitere Hinweise</span>
-              <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="3"></textarea>
-            </label>
-          </div>
+                <label class="content-field content-field--full" for="publish-standard-notes">
+                  <span class="content-field__label">Weitere Hinweise (optional)</span>
+                  <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="2"></textarea>
+                  <p class="content-field__hint">Nur wenn noch etwas Wichtiges ergänzt werden muss.</p>
+                </label>
+              </div>
+            </div>
+          </details>
 
           <div class="content-actions content-actions--inline publish-final-actions">
             <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
               Weiter zur Zahlung
             </button>
           </div>
-
-          <p class="content-form-note">
-            Erforderlich: Event-Link oder alternativ Titel, Datum und Ort.
-          </p>
         </form>
       </section>
     </main>
-    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V4 === -->
-    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V3 === -->
+    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V5 === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
