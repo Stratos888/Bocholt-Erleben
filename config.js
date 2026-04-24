@@ -69,13 +69,51 @@ function formatDate(dateString) {
   });
 }
 
-/* === BEGIN BLOCK: GA4_BOOTSTRAP_V1 | Zweck: bindet das Google-Tag zentral nur auf Live-Domains ein und lässt staging bewusst ungetrackt | Umfang: ergänzt nur die schlanke Laufzeit-Initialisierung in config.js === */
+/* === BEGIN BLOCK: GA4_BOOTSTRAP_AND_OUTBOUND_HELPER_V2 | Zweck: bindet das Google-Tag zentral nur auf Live-Domains ein, lässt staging bewusst ungetrackt und stellt eine schlanke globale Helper-Funktion für saubere outbound_click-Events bereit | Umfang: ersetzt nur den bisherigen GA4-Bootstrap-Block in config.js === */
 function shouldEnableAnalytics() {
   if (typeof window === "undefined" || typeof document === "undefined") return false;
   if (IS_LOCAL) return false;
 
   const host = String(window.location.hostname || "").toLowerCase();
   return CONFIG.analytics.enabledHosts.includes(host);
+}
+
+function sanitizeAnalyticsValue(value, maxLength = 200) {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  return text.slice(0, maxLength);
+}
+
+function getDomainFromUrl(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./i, "");
+  } catch (_) {
+    return "";
+  }
+}
+
+function trackOutboundClick(payload = {}) {
+  if (!shouldEnableAnalytics()) return;
+  if (typeof window.gtag !== "function") return;
+
+  const destinationUrl = sanitizeAnalyticsValue(payload.destinationUrl || payload.url, 500);
+  const destinationDomain = sanitizeAnalyticsValue(
+    payload.destinationDomain || getDomainFromUrl(destinationUrl),
+    120
+  );
+
+  window.gtag("event", "outbound_click", {
+    outbound_type: sanitizeAnalyticsValue(payload.outboundType, 40) || "external",
+    entity_type: sanitizeAnalyticsValue(payload.entityType, 40) || "",
+    entity_id: sanitizeAnalyticsValue(payload.entityId, 120) || "",
+    entity_title: sanitizeAnalyticsValue(payload.entityTitle, 150) || "",
+    destination_domain: destinationDomain,
+    destination_url: destinationUrl,
+    page_path: sanitizeAnalyticsValue(
+      typeof window !== "undefined" ? window.location.pathname : "",
+      200
+    )
+  });
 }
 
 function initAnalytics() {
@@ -103,13 +141,16 @@ function initAnalytics() {
   script.setAttribute("data-owner", "bocholt-erleben-ga4");
   document.head.appendChild(script);
 
+  window.BEAnalytics = window.BEAnalytics || {};
+  window.BEAnalytics.trackOutboundClick = trackOutboundClick;
+
   debugLog("GA4 initialized", {
     measurementId: CONFIG.analytics.measurementId
   });
 }
 
 initAnalytics();
-/* === END BLOCK: GA4_BOOTSTRAP_V1 === */
+/* === END BLOCK: GA4_BOOTSTRAP_AND_OUTBOUND_HELPER_V2 === */
 
 debugLog("Config loaded successfully", {
   ui: CONFIG.ui,
