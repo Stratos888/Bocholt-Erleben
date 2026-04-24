@@ -384,7 +384,14 @@ function createCard(event) {
   const locTextRaw = String(event?.location || "").trim();
 
   const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
-  const timeLine = timeText || (isRange ? String(dateLabel).trim() : "");
+  const timeLine = (() => {
+    if (isRange) {
+      if (dateLabel && timeText) return `${dateLabel} · ${timeText}`;
+      return String(dateLabel).trim();
+    }
+    if (timeText) return timeText;
+    return String(dateLabel).trim();
+  })();
 
   const cityRaw = String(city || "").trim();
   const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
@@ -406,7 +413,6 @@ function createCard(event) {
     placeEl.textContent = placeLine;
     meta.appendChild(placeEl);
   }
-
   const h3 = document.createElement("h3");
   h3.className = "event-title";
 
