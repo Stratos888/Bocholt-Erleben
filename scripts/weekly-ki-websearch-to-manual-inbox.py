@@ -436,8 +436,11 @@ Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv
 
 Harte Prüfregeln vor FINAL:
 - Ein FINAL-Eintrag darf genau nur eine besuchbare Instanz repräsentieren
-- Wenn eine Quelle mehrere Tage oder Blöcke mit eigenen Zeiten nennt, darf kein Sammel-Eintrag in FINAL landen
+- Wenn eine Quelle mehrere Tage oder Blöcke mit eigenen Zeiten nennt, darf kein Sammel-Eintrag in FINAL landen, wenn diese Tage oder Blöcke als eigenständige besuchbare Instanzen zu verstehen sind
 - Dann nur: sauber splitten oder weglassen
+- Wenn ein Event als zusammenhängendes Mehrtagesevent bestehen bleibt, darf `time` nur gesetzt werden, wenn die Zeitangabe wirklich einheitlich für das gesamte Event gilt
+- Wenn pro Tag unterschiedliche Zeiten genannt werden, das Event aber als zusammenhängendes Mehrtagesevent bestehen bleibt, muss `time` leer bleiben
+- Niemals die erste sichtbare Tageszeit oder irgendeine Einzelzeit als allgemeine `time` für ein zusammenhängendes Mehrtagesevent übernehmen
 - Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig
 - Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen
 - Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen
@@ -446,50 +449,6 @@ Harte Prüfregeln vor FINAL:
 - Wenn Scope unklar ist: nicht ausgeben
 - Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben
 - Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben
-
-Redaktionelle Qualitäts-Schwelle für FINAL:
-Ein Kandidat ist nur dann FINAL-tauglich, wenn er nicht nur formal korrekt ist, sondern auch einen klaren Mehrwert für die Kuratierungs-PWA hat.
-
-Nicht ausreichend für FINAL ist ein Termin, wenn er hauptsächlich:
-- formal korrekt, aber für normale Nutzer nur schwach interessant ist
-- sehr speziell, nischig oder kleinteilig wirkt
-- eher wie ein interner, edukativer oder halbgeschlossener Spezialtermin wirkt
-- eher wie eine Vorschau-, Programm- oder Hintergrundseite ohne starken Event-Zug wirkt
-- eher eine Dauer-/Ausstellungspräsenz als ein wirklich starker Event-Kandidat ist
-- eher eine kleine Kurs-, Workshop-, Resilienz-, Seminar- oder Mitmach-Einheit mit begrenztem Breiteninteresse ist
-- eher eine Innenstadt-/Marketing-/Shopping-Aktion ohne klar starken Eventcharakter ist
-
-Besonders streng behandeln:
-- länger laufende Ausstellungen
-- Vorschau-/Museumseinträge
-- Kurse
-- Workshops
-- Resilienz-, Bildungs- oder Spezialformate
-- kleine Ferienprogramme
-- Innenstadtaktionen
-- Handels- und Promotionsformate
-
-Solche Fälle nur dann FINAL, wenn zusätzlich mindestens einer dieser Punkte klar erfüllt ist:
-- hohe öffentliche Relevanz für Bocholt oder den Nahraum
-- klarer Eventcharakter mit starkem Besuchsanlass
-- außergewöhnlich hoher PWA-Nutzen
-- deutliche Breitenattraktivität
-- besondere lokale Relevanz oder Stadtbedeutung
-- starkes öffentliches Programm statt bloßer Hintergrund-/Informationsseite
-
-Bevorzugt in FINAL:
-- Stadtfeste
-- Märkte
-- Festivals
-- Konzerte
-- Theater / Bühne
-- familienrelevante Großtermine
-- Innenstadtfeste mit klarem Programm
-- Messen mit klarer Besucherrelevanz
-- Open-Air-Events
-- besondere Aktionstage / Tage der offenen Tür / öffentlich starke Kulturtermine
-- klar sichtbare Highlights mit Bocholt- oder Nahraum-Relevanz
-
 Priorisierung:
 Priorisiere FINAL-Kandidaten nach:
 1. öffentlicher Relevanz
@@ -523,6 +482,8 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 - Ort sicher?
 - ist die Ortsgranularität wirklich sicher?
 - Zeit nur wenn eindeutig?
+- gilt die Zeit wirklich für das gesamte Event?
+- falls Mehrtagesevent mit unterschiedlichen Tageszeiten: muss `time` leer bleiben?
 - repräsentiert der Eintrag genau eine besuchbare Instanz?
 - Mehrtageslogik korrekt?
 - Beschreibung neutral, sachlich und quellenbasiert?
@@ -531,7 +492,6 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 - ist der Quellenmix gesund?
 - ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
-
 [KONTEXT_BUNDLE]
 {context_bundle}
 [/KONTEXT_BUNDLE]
