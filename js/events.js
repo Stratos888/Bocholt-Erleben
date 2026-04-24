@@ -298,18 +298,26 @@ function createCard(event) {
     };
   };
 
-     /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 | Purpose: remove the synthetic hidden-anchor click path and open desktop event targets only via window.open in a new tab; Scope: replaces only the desktop external-open helper inside createCard === */
-  const openPrimaryDesktopTarget = (url) => {
+     /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_WITH_ANALYTICS_V3 | Purpose: keeps the desktop direct-open behavior for event cards, but sends a clean outbound analytics event before opening the external target; Scope: replaces only the desktop external-open helper inside createCard === */
+  const openPrimaryDesktopTarget = (url, analyticsPayload = null) => {
     if (!url) return false;
 
     try {
+      if (
+        analyticsPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(analyticsPayload);
+      }
+
       window.open(url, "_blank", "noopener,noreferrer");
       return true;
     } catch (_) {
       return false;
     }
   };
-  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 === */
+  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_WITH_ANALYTICS_V3 === */
   const resolveCity = (ev) => {
     if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
 
@@ -445,6 +453,15 @@ function createCard(event) {
   );
   const calendarUrl = buildGoogleCalendarUrl(event);
   const sharePayload = buildSharePayload(event, primaryUrl);
+  const primaryOutboundPayload = primaryUrl
+    ? {
+        outboundType: "website",
+        entityType: "event",
+        entityId: String(event?.id || "").trim(),
+        entityTitle: String(event?.title || "").trim(),
+        destinationUrl: primaryUrl
+      }
+    : null;
 
   card.setAttribute("role", "button");
   card.setAttribute(
@@ -464,7 +481,16 @@ function createCard(event) {
     primaryLink.rel = "noopener";
     primaryLink.textContent = "Zur Veranstaltung";
     primaryLink.setAttribute("aria-label", `Zur Veranstaltung: ${event?.title || "Event"}`);
-    primaryLink.addEventListener("click", (e) => e.stopPropagation());
+    primaryLink.addEventListener("click", (e) => {
+      if (
+        primaryOutboundPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(primaryOutboundPayload);
+      }
+      e.stopPropagation();
+    });
     actions.appendChild(primaryLink);
   }
 
@@ -528,8 +554,10 @@ function createCard(event) {
 
     if (isDesktopViewport()) {
       if (primaryUrl) {
-        openPrimaryDesktopTarget(primaryUrl);
+        openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
       }
+      return;
+    }
       return;
     }
 
