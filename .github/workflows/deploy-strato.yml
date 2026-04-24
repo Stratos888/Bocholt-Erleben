@@ -341,6 +341,16 @@ jobs:
           STAGING_DB_NAME: ${{ secrets.STAGING_DB_NAME }}
           STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
           STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+          LIVE_STRIPE_SECRET_KEY: ${{ secrets.LIVE_STRIPE_SECRET_KEY }}
+          LIVE_STRIPE_PRICE_SINGLE: ${{ secrets.LIVE_STRIPE_PRICE_SINGLE }}
+          LIVE_STRIPE_PRICE_STARTER: ${{ secrets.LIVE_STRIPE_PRICE_STARTER }}
+          LIVE_STRIPE_PRICE_ACTIVE: ${{ secrets.LIVE_STRIPE_PRICE_ACTIVE }}
+          LIVE_STRIPE_PRICE_UNLIMITED: ${{ secrets.LIVE_STRIPE_PRICE_UNLIMITED }}
+          STAGING_STRIPE_SECRET_KEY: ${{ secrets.STAGING_STRIPE_SECRET_KEY }}
+          STAGING_STRIPE_PRICE_SINGLE: ${{ secrets.STAGING_STRIPE_PRICE_SINGLE }}
+          STAGING_STRIPE_PRICE_STARTER: ${{ secrets.STAGING_STRIPE_PRICE_STARTER }}
+          STAGING_STRIPE_PRICE_ACTIVE: ${{ secrets.STAGING_STRIPE_PRICE_ACTIVE }}
+          STAGING_STRIPE_PRICE_UNLIMITED: ${{ secrets.STAGING_STRIPE_PRICE_UNLIMITED }}
         run: |
           set -e
 
@@ -457,21 +467,45 @@ jobs:
             APP_DB_NAME="$STAGING_DB_NAME"
             APP_DB_USER="$STAGING_DB_USER"
             APP_DB_PASSWORD="$STAGING_DB_PASSWORD"
+
+            APP_STRIPE_SECRET_KEY="$STAGING_STRIPE_SECRET_KEY"
+            APP_STRIPE_PRICE_SINGLE="$STAGING_STRIPE_PRICE_SINGLE"
+            APP_STRIPE_PRICE_STARTER="$STAGING_STRIPE_PRICE_STARTER"
+            APP_STRIPE_PRICE_ACTIVE="$STAGING_STRIPE_PRICE_ACTIVE"
+            APP_STRIPE_PRICE_UNLIMITED="$STAGING_STRIPE_PRICE_UNLIMITED"
+
+            APP_BASE_URL="https://staging.bocholt-erleben.de"
           else
             APP_DB_HOST="$LIVE_DB_HOST"
             APP_DB_PORT="${LIVE_DB_PORT:-3306}"
             APP_DB_NAME="$LIVE_DB_NAME"
             APP_DB_USER="$LIVE_DB_USER"
             APP_DB_PASSWORD="$LIVE_DB_PASSWORD"
+
+            APP_STRIPE_SECRET_KEY="$LIVE_STRIPE_SECRET_KEY"
+            APP_STRIPE_PRICE_SINGLE="$LIVE_STRIPE_PRICE_SINGLE"
+            APP_STRIPE_PRICE_STARTER="$LIVE_STRIPE_PRICE_STARTER"
+            APP_STRIPE_PRICE_ACTIVE="$LIVE_STRIPE_PRICE_ACTIVE"
+            APP_STRIPE_PRICE_UNLIMITED="$LIVE_STRIPE_PRICE_UNLIMITED"
+
+            APP_BASE_URL="https://bocholt-erleben.de"
           fi
 
           test -n "$APP_DB_HOST"
           test -n "$APP_DB_NAME"
           test -n "$APP_DB_USER"
           test -n "$APP_DB_PASSWORD"
+          test -n "$APP_STRIPE_SECRET_KEY"
+          test -n "$APP_STRIPE_PRICE_SINGLE"
+          test -n "$APP_STRIPE_PRICE_STARTER"
+          test -n "$APP_STRIPE_PRICE_ACTIVE"
+          test -n "$APP_STRIPE_PRICE_UNLIMITED"
 
           APP_ENV="$DEPLOY_ENV_NAME"
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD
+          APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
+          APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
+
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===
@@ -482,6 +516,11 @@ jobs:
 
           payload = {
               "app_env": os.environ["APP_ENV"],
+              "app": {
+                  "base_url": os.environ["APP_BASE_URL"],
+                  "success_url": os.environ["APP_SUCCESS_URL"],
+                  "cancel_url": os.environ["APP_CANCEL_URL"],
+              },
               "db": {
                   "host": os.environ["APP_DB_HOST"],
                   "port": int(os.environ.get("APP_DB_PORT", "3306") or "3306"),
@@ -489,6 +528,15 @@ jobs:
                   "user": os.environ["APP_DB_USER"],
                   "password": os.environ["APP_DB_PASSWORD"],
                   "charset": "utf8mb4",
+              },
+              "stripe": {
+                  "secret_key": os.environ["APP_STRIPE_SECRET_KEY"],
+                  "prices": {
+                      "single": os.environ["APP_STRIPE_PRICE_SINGLE"],
+                      "starter": os.environ["APP_STRIPE_PRICE_STARTER"],
+                      "active": os.environ["APP_STRIPE_PRICE_ACTIVE"],
+                      "unlimited": os.environ["APP_STRIPE_PRICE_UNLIMITED"],
+                  },
               },
           }
 
