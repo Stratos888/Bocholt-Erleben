@@ -327,7 +327,7 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_TAGS_ONLY_V8 === */
 
-  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 | Zweck: verschiebt saisonale Einschränkungen aus dem alten Kurzinfo-Block in die obere Meta-Zeile und lässt Ganzjährig dort bewusst weg | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 | Zweck: ergänzt im Activity-Detailpanel sauberes Outbound-Tracking für Maps- und Website-Links, ohne sichtbare UI oder Linkziele zu verändern | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
     const websiteUrl = window.OfferVisuals?.normalizeHttpUrl
@@ -354,6 +354,39 @@ const OfferDetailPanel = {
       ? window.Icons.svg("external-link", { className: "activity-detail__action-icon-svg" })
       : "";
 
+    const baseOutboundPayload = {
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim()
+    };
+
+    const mapsOutboundPayload = mapsUrl
+      ? {
+          ...baseOutboundPayload,
+          outboundType: "maps",
+          destinationUrl: mapsUrl
+        }
+      : null;
+
+    const websiteOutboundPayload = websiteUrl
+      ? {
+          ...baseOutboundPayload,
+          outboundType: "website",
+          destinationUrl: websiteUrl
+        }
+      : null;
+
+    const buildOutboundDataAttrs = (payload) => {
+      if (!payload) return "";
+      return [
+        `data-outbound-type="${this.escapeHtml(payload.outboundType || "")}"`,
+        `data-entity-type="${this.escapeHtml(payload.entityType || "")}"`,
+        `data-entity-id="${this.escapeHtml(payload.entityId || "")}"`,
+        `data-entity-title="${this.escapeHtml(payload.entityTitle || "")}"`,
+        `data-destination-url="${this.escapeHtml(payload.destinationUrl || "")}"`
+      ].join(" ");
+    };
+
     this.content.innerHTML = `
       <article class="activity-detail">
         ${this.renderMedia(offer)}
@@ -369,12 +402,24 @@ const OfferDetailPanel = {
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
           ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
-            <a class="activity-detail__action" href="${this.escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">
+            <a
+              class="activity-detail__action"
+              href="${this.escapeHtml(mapsUrl)}"
+              target="_blank"
+              rel="noopener noreferrer"
+              ${buildOutboundDataAttrs(mapsOutboundPayload)}
+            >
               <span class="activity-detail__action-icon" aria-hidden="true">${mapsIcon}</span>
               <span class="activity-detail__action-label">${this.escapeHtml(mapsLabel)}</span>
             </a>
             ${websiteUrl ? `
-              <a class="activity-detail__action activity-detail__action--secondary" href="${this.escapeHtml(websiteUrl)}" target="_blank" rel="noopener noreferrer">
+              <a
+                class="activity-detail__action activity-detail__action--secondary"
+                href="${this.escapeHtml(websiteUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                ${buildOutboundDataAttrs(websiteOutboundPayload)}
+              >
                 <span class="activity-detail__action-icon" aria-hidden="true">${websiteIcon}</span>
                 <span class="activity-detail__action-label">${this.escapeHtml(websiteLabel)}</span>
               </a>
@@ -384,7 +429,22 @@ const OfferDetailPanel = {
         </div>
       </article>
     `.trim();
+
+    this.content.querySelectorAll("a[data-outbound-type]").forEach((link) => {
+      link.addEventListener("click", () => {
+        if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+
+        window.BEAnalytics.trackOutboundClick({
+          outboundType: String(link.dataset.outboundType || "").trim(),
+          entityType: String(link.dataset.entityType || "").trim(),
+          entityId: String(link.dataset.entityId || "").trim(),
+          entityTitle: String(link.dataset.entityTitle || "").trim(),
+          destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+        });
+      });
+    });
   }
+  /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 === */
   /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 === */
 /* === BEGIN BLOCK: OFFERS_DETAIL_GLOBAL_EXPORT_V1 | Zweck: registriert das Activity-Detailpanel wieder global, damit Card-Klicks auf Mobile das Panel öffnen statt in den URL-Fallback zu laufen; Umfang: ersetzt nur das Dateiende von js/offers-details.js === */
 };
