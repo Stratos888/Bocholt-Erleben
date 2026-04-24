@@ -29,7 +29,7 @@ const CONFIG = {
     showFilters: true
   },
 
-  /* === BEGIN BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V2 | Zweck: hält die öffentliche Runtime-Konfiguration für Feedback und Veranstalter-Funnel zentral in config.js und befüllt den Standardweg mit den echten Sandbox-Stripe-Links; Umfang: ersetzt den bisherigen Feedback-Block plus den direkten Debug-Eintrag innerhalb von CONFIG === */
+  /* === BEGIN BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 | Zweck: zentraler Runtime-Contract für das globale Feedback-System mit Formspree Free; Umfang: nur öffentliche Client-Konfiguration, keine Secrets === */
   feedback: {
     formspreeEndpoint: "https://formspree.io/f/mrerpwjy",
     fallbackEmail: "",
@@ -38,26 +38,18 @@ const CONFIG = {
     sourceLabel: "bocholt-erleben-web",
     privacyUrl: "/datenschutz/"
   },
+  /* === END BLOCK: FEEDBACK_FORMSPREE_CONFIG_V1 === */
 
-  publishFunnel: {
-    automationEmail: "mathias@bocholt-erleben.de",
-    automationFormspreeEndpoint: "https://formspree.io/f/mjgjadzy",
-    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Quelle und melden uns, falls noch Angaben fehlen.",
-    automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
-    storageKey: "be_publish_checkout_context_v1",
-    successUrl: "/events-veroeffentlichen/erfolg/",
-    cancelUrl: "/events-veroeffentlichen/abgebrochen/",
-    paymentLinks: {
-      single: "https://buy.stripe.com/test_8x200ifJM901gdw9Ql8Ra00",
-      starter: "https://buy.stripe.com/test_14A28q1SWccdgdw6E98Ra01",
-      active: "https://buy.stripe.com/test_00w4gybtw9011iC9Ql8Ra02",
-      unlimited: "https://buy.stripe.com/test_6oUfZgcxAb89f9saUp8Ra03"
-    }
+  /* === BEGIN BLOCK: GA4_RUNTIME_CONFIG_V1 | Zweck: zentrale, umgebungsbewusste GA4-Basiskonfiguration; live aktiv, lokal und staging aus | Umfang: nur öffentliche Runtime-Konfiguration, keine Secrets === */
+  analytics: {
+    measurementId: "G-Y6QLCQ4HXT",
+    enabledHosts: ["bocholt-erleben.de", "www.bocholt-erleben.de"],
+    scriptUrl: "https://www.googletagmanager.com/gtag/js?id=G-Y6QLCQ4HXT"
   },
+  /* === END BLOCK: GA4_RUNTIME_CONFIG_V1 === */
 
   // Debug Mode (nur lokal aktiv)
   debug: IS_LOCAL
-  /* === END BLOCK: FEEDBACK_AND_PUBLISH_FUNNEL_RUNTIME_CONFIG_V2 === */
 };
 
 // Helper: Log nur wenn debug = true
@@ -66,6 +58,65 @@ function debugLog(message, data = null) {
     console.log(`[DEBUG] ${message}`, data || "");
   }
 }
+
+// Helper: Datum in deutsches Format
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+/* === BEGIN BLOCK: GA4_BOOTSTRAP_V1 | Zweck: bindet das Google-Tag zentral nur auf Live-Domains ein und lässt staging bewusst ungetrackt | Umfang: ergänzt nur die schlanke Laufzeit-Initialisierung in config.js === */
+function shouldEnableAnalytics() {
+  if (typeof window === "undefined" || typeof document === "undefined") return false;
+  if (IS_LOCAL) return false;
+
+  const host = String(window.location.hostname || "").toLowerCase();
+  return CONFIG.analytics.enabledHosts.includes(host);
+}
+
+function initAnalytics() {
+  if (!shouldEnableAnalytics()) {
+    debugLog("GA4 disabled for current host", {
+      host: typeof window !== "undefined" ? window.location.hostname : ""
+    });
+    return;
+  }
+
+  if (window.__beAnalyticsInitialized) return;
+  window.__beAnalyticsInitialized = true;
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function gtag() {
+    window.dataLayer.push(arguments);
+  };
+
+  window.gtag("js", new Date());
+  window.gtag("config", CONFIG.analytics.measurementId);
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = CONFIG.analytics.scriptUrl;
+  script.setAttribute("data-owner", "bocholt-erleben-ga4");
+  document.head.appendChild(script);
+
+  debugLog("GA4 initialized", {
+    measurementId: CONFIG.analytics.measurementId
+  });
+}
+
+initAnalytics();
+/* === END BLOCK: GA4_BOOTSTRAP_V1 === */
+
+debugLog("Config loaded successfully", {
+  ui: CONFIG.ui,
+  features: CONFIG.features,
+  analyticsEnabled: shouldEnableAnalytics(),
+  debug: CONFIG.debug
+});
 
 // Helper: Datum in deutsches Format
 function formatDate(dateString) {
