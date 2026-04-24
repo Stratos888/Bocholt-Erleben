@@ -342,11 +342,13 @@ jobs:
           STAGING_DB_USER: ${{ secrets.STAGING_DB_USER }}
           STAGING_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
           LIVE_STRIPE_SECRET_KEY: ${{ secrets.LIVE_STRIPE_SECRET_KEY }}
+          LIVE_STRIPE_WEBHOOK_SECRET: ${{ secrets.LIVE_STRIPE_WEBHOOK_SECRET }}
           LIVE_STRIPE_PRICE_SINGLE: ${{ secrets.LIVE_STRIPE_PRICE_SINGLE }}
           LIVE_STRIPE_PRICE_STARTER: ${{ secrets.LIVE_STRIPE_PRICE_STARTER }}
           LIVE_STRIPE_PRICE_ACTIVE: ${{ secrets.LIVE_STRIPE_PRICE_ACTIVE }}
           LIVE_STRIPE_PRICE_UNLIMITED: ${{ secrets.LIVE_STRIPE_PRICE_UNLIMITED }}
           STAGING_STRIPE_SECRET_KEY: ${{ secrets.STAGING_STRIPE_SECRET_KEY }}
+          STAGING_STRIPE_WEBHOOK_SECRET: ${{ secrets.STAGING_STRIPE_WEBHOOK_SECRET }}
           STAGING_STRIPE_PRICE_SINGLE: ${{ secrets.STAGING_STRIPE_PRICE_SINGLE }}
           STAGING_STRIPE_PRICE_STARTER: ${{ secrets.STAGING_STRIPE_PRICE_STARTER }}
           STAGING_STRIPE_PRICE_ACTIVE: ${{ secrets.STAGING_STRIPE_PRICE_ACTIVE }}
@@ -469,6 +471,7 @@ jobs:
             APP_DB_PASSWORD="$STAGING_DB_PASSWORD"
 
             APP_STRIPE_SECRET_KEY="$STAGING_STRIPE_SECRET_KEY"
+            APP_STRIPE_WEBHOOK_SECRET="$STAGING_STRIPE_WEBHOOK_SECRET"
             APP_STRIPE_PRICE_SINGLE="$STAGING_STRIPE_PRICE_SINGLE"
             APP_STRIPE_PRICE_STARTER="$STAGING_STRIPE_PRICE_STARTER"
             APP_STRIPE_PRICE_ACTIVE="$STAGING_STRIPE_PRICE_ACTIVE"
@@ -483,6 +486,7 @@ jobs:
             APP_DB_PASSWORD="$LIVE_DB_PASSWORD"
 
             APP_STRIPE_SECRET_KEY="$LIVE_STRIPE_SECRET_KEY"
+            APP_STRIPE_WEBHOOK_SECRET="$LIVE_STRIPE_WEBHOOK_SECRET"
             APP_STRIPE_PRICE_SINGLE="$LIVE_STRIPE_PRICE_SINGLE"
             APP_STRIPE_PRICE_STARTER="$LIVE_STRIPE_PRICE_STARTER"
             APP_STRIPE_PRICE_ACTIVE="$LIVE_STRIPE_PRICE_ACTIVE"
@@ -498,6 +502,7 @@ jobs:
           [ -n "$APP_DB_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_DB_PASSWORD"; exit 1; }
 
           [ -n "$APP_STRIPE_SECRET_KEY" ] || { echo "❌ Missing required secret/value: APP_STRIPE_SECRET_KEY"; exit 1; }
+          [ -n "$APP_STRIPE_WEBHOOK_SECRET" ] || { echo "❌ Missing required secret/value: APP_STRIPE_WEBHOOK_SECRET"; exit 1; }
           [ -n "$APP_STRIPE_PRICE_SINGLE" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_SINGLE"; exit 1; }
           [ -n "$APP_STRIPE_PRICE_STARTER" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_STARTER"; exit 1; }
           [ -n "$APP_STRIPE_PRICE_ACTIVE" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_ACTIVE"; exit 1; }
@@ -508,7 +513,7 @@ jobs:
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
           APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===
@@ -534,6 +539,7 @@ jobs:
               },
               "stripe": {
                   "secret_key": os.environ["APP_STRIPE_SECRET_KEY"],
+                  "webhook_secret": os.environ["APP_STRIPE_WEBHOOK_SECRET"],
                   "prices": {
                       "single": os.environ["APP_STRIPE_PRICE_SINGLE"],
                       "starter": os.environ["APP_STRIPE_PRICE_STARTER"],
