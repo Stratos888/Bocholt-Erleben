@@ -371,25 +371,117 @@ def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_re
         ]
     )
 
-    system_prompt = (
-        "Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus. "
-        "Nutze aktiv die Websuche, suche systematisch und liefere nur neue Delta-Kandidaten. "
-        "Halte das Regelwerk strikt ein. Kein Fließtext, keine Kommentare im Ergebnis."
-    )
+    system_prompt = """
+Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
 
-    user_prompt = (
-        f"[REGELWERK]\n{rulebook_text}\n[/REGELWERK]\n\n"
-        "[AUFGABE]\n"
-        f"Suche neue, echte, veröffentlichungsreife Events für Bocholt erleben ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft.\n"
-        f"Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis, inklusive niederländischer Orte innerhalb dieses Radius.\n"
-        f"Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten.\n"
-        "Suche systematisch über offizielle kommunale Kalender, offizielle Veranstalterseiten, offizielle Kultur-/Museumsseiten und offizielle NL-Seiten im Radius.\n"
-        "Deduped strikt gegen Bestand, offene Inbox, Archiv und vorhandene Manual-Kandidaten aus dem Kontext-Bundle.\n"
-        "Jedes Objekt muss genau eine konkrete Termin-Instanz repräsentieren.\n"
-        "Beschreibungen müssen kurz, neutral, facts-only und neu formuliert sein.\n"
-        "[/AUFGABE]\n\n"
-        f"{context_bundle}"
-    )
+Arbeite streng, konservativ und produktionsnah.
+Nutze aktiv die Websuche.
+Halte das beigefügte Regelwerk strikt ein.
+Liefere nur neue Delta-Kandidaten.
+Im Automationsmodus gilt:
+- nur FINAL
+- nur JSON
+- kein REVIEW
+- kein Fließtext
+- keine Kommentare
+""".strip()
+
+    user_prompt = f"""
+[REGELWERK]
+{rulebook_text}
+[/REGELWERK]
+
+[AUFGABE]
+Simuliere den späteren automatisierten Suchlauf für Bocholt erleben so nah wie möglich.
+
+Rahmen:
+- Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
+- Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis inklusive niederländischer Orte innerhalb dieses Radius
+- Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten
+- Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
+- Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
+- Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
+
+Suchsteuerung:
+- Arbeite mit drei Suchrichtungen:
+  1. CORE
+  2. RECOVERY
+  3. DISCOVERY
+- Decke CORE zuerst systematisch ab
+- Nutze RECOVERY gezielt für:
+  - offizielle event-spezifische Endnutzer-Info-/News-Seiten
+  - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
+- Nutze DISCOVERY zusätzlich, aber nicht als Ersatz für fehlende CORE-Abdeckung
+- Arbeite nicht als starre Closed-Whitelist
+- Achte auf gesunden Quellenmix; ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
+- Discovery darf nicht vollständig auf null gesetzt werden
+- Maximal 2 FINAL-Kandidaten pro Quelle
+- Nur wenn eine Quelle außergewöhnlich stark ist und kein besserer Mix verfügbar ist, maximal 3
+
+Recovery-Pass vor Verwerfen:
+Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv:
+1. eine bessere offizielle Detailseite zu finden
+2. eine stabilere, kanonischere und instanzpassende Event-URL zu finden
+3. die höchste sicher belegte Ortsgranularität zu bestimmen
+4. bei Mehrtermin-Seiten zu prüfen, ob die sichtbare Einzelinstanz trotzdem sauber FINAL-fähig ist
+5. bei offiziellen Info-/News-Seiten zu prüfen, ob trotz zusätzlicher Orga-/CTA-/Aussteller-Elemente ein klarer Besucherfokus vorliegt
+
+Harte Prüfregeln vor FINAL:
+- Ein FINAL-Eintrag darf genau nur eine besuchbare Instanz repräsentieren
+- Wenn eine Quelle mehrere Tage oder Blöcke mit eigenen Zeiten nennt, darf kein Sammel-Eintrag in FINAL landen
+- Dann nur: sauber splitten oder weglassen
+- Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig
+- Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen
+- Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen
+- Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite nicht automatisch ungeeignet
+- Vorschau-/Teaser-/Save-the-date-Seiten nur dann FINAL, wenn Titel, Datum, Ort und Besucherfokus im gleichen klaren sichtbaren Kernblock belastbar sind
+- Wenn Scope unklar ist: nicht ausgeben
+- Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben
+- Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben
+
+Priorisierung:
+Priorisiere FINAL-Kandidaten nach:
+1. öffentlicher Relevanz
+2. Bocholt-Nähe
+3. Breiteninteresse
+4. PWA-Nutzen
+5. Faktenvollständigkeit / Quellensauberkeit
+
+Output-Regeln:
+- Gib ausschließlich neue FINAL-Datensätze aus
+- Gib ausschließlich ein JSON-Objekt mit dem Schlüssel "candidates" zurück
+- Jeder candidate muss dem vorgegebenen Schema entsprechen
+- Keine zusätzlichen Schlüssel
+- Keine Einleitung
+- Keine Erklärung
+- Keine Kommentare
+- Keine REVIEW-Fälle
+- Keine EXCLUDE-Fälle
+- Keine unsicheren Datensätze
+- Keine bereits vorhandenen oder bereits entschiedenen Dubletten
+
+Zusätzliche interne Pflichtprüfung vor Aufnahme:
+- echtes Event?
+- belastbare Quelle?
+- event-spezifische URL oder zulässige offizielle Ausnahme?
+- ist die URL wirklich instanzpassend?
+- Datum sicher?
+- Ort sicher?
+- ist die Ortsgranularität wirklich sicher?
+- Zeit nur wenn eindeutig?
+- repräsentiert der Eintrag genau eine besuchbare Instanz?
+- Mehrtageslogik korrekt?
+- Beschreibung neutral, sachlich und quellenbasiert?
+- keine Dublette?
+- wirklich nützlich für die Kuratierungs-PWA?
+- ist der Quellenmix gesund?
+- ist der Kandidat stark genug oder nur formal korrekt?
+- gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
+
+[KONTEXT_BUNDLE]
+{context_bundle}
+[/KONTEXT_BUNDLE]
+""".strip()
 
     return [
         {"role": "system", "content": system_prompt},
