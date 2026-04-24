@@ -545,7 +545,7 @@ function createCard(event) {
   card.appendChild(badge);
   card.appendChild(body);
 
-   /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 | Purpose: handle the original card interaction explicitly so desktop opens only a new tab while the current homepage stays untouched; Mobile detail-panel behavior remains unchanged | Scope: replaces openCard plus card click/keyboard wiring inside createCard === */
+  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
@@ -558,8 +558,6 @@ function createCard(event) {
       }
       return;
     }
-      return;
-    }
 
     if (window.DetailPanel?.show) {
       window.DetailPanel.show(event);
@@ -567,10 +565,10 @@ function createCard(event) {
     }
 
     if (primaryUrl) {
-      openPrimaryDesktopTarget(primaryUrl);
+      openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     }
   };
-  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 === */
+  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
 
   card.addEventListener("click", (e) => {
     openCard(e);
