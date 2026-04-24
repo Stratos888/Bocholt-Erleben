@@ -237,6 +237,7 @@
     return { mode: "formspree" };
   }
 
+  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 | Zweck: ersetzt den alten Payment-Link-Flow durch den serverseitigen Submission->Checkout-Flow; Umfang: Standard-Validierung, API-Helper, Submit-State und bindStandardPath in js/publish-funnel.js === */
   function validateStandardContext(context) {
     if (!hasValue(context.plan)) {
       window.alert("Bitte wähle zuerst ein Modell aus.");
@@ -248,13 +249,74 @@
       return false;
     }
 
-    const paymentLink = getPlanPaymentLink(context.plan);
-    if (!hasValue(paymentLink)) {
-      window.alert("Für dieses Modell ist noch kein Stripe-Zahlungslink hinterlegt.");
-      return false;
+    return true;
+  }
+
+  async function postPublishApiJson(url, payload) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const rawText = await response.text();
+    let data = null;
+
+    try {
+      data = rawText ? JSON.parse(rawText) : null;
+    } catch (error) {
+      data = null;
     }
 
-    return true;
+    if (!response.ok) {
+      const message =
+        safeText(data?.message) ||
+        safeText(data?.error_message) ||
+        `Request failed with status ${response.status}`;
+
+      const requestError = new Error(message);
+      requestError.responseStatus = response.status;
+      requestError.responsePayload = data;
+      throw requestError;
+    }
+
+    if (!data || typeof data !== "object") {
+      throw new Error("API response is invalid.");
+    }
+
+    return data;
+  }
+
+  function buildStandardSubmissionPayload(context) {
+    return {
+      requested_model_key: context.plan,
+      organization_name: context.organization,
+      contact_name: context.contact,
+      email: context.email,
+      event_url: context.eventLink,
+      title: context.title,
+      start_date: context.date,
+      time_text: context.time,
+      location_name: context.place,
+      ticket_url: context.website,
+      description_text: context.description,
+      notes_text: context.notes
+    };
+  }
+
+  function setStandardSubmitting(trigger, isSubmitting) {
+    if (!trigger) return;
+
+    if (!trigger.dataset.defaultLabel) {
+      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Zahlung";
+    }
+
+    trigger.disabled = isSubmitting;
+    trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
+    trigger.textContent = isSubmitting ? "Weiterleitung wird vorbereitet ..." : trigger.dataset.defaultLabel;
   }
 
   function validateAutomationContext(context) {
@@ -272,7 +334,7 @@
 
     if (!form || !trigger) return;
 
-    trigger.addEventListener("click", (event) => {
+    trigger.addEventListener("click", async (event) => {
       event.preventDefault();
 
       if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
@@ -280,32 +342,47 @@
       const context = buildStandardContext();
       if (!validateStandardContext(context)) return;
 
-      const paymentLink = getPlanPaymentLink(context.plan);
-      const leadId = buildLeadId(context.plan, context.organization);
+      setStandardSubmitting(trigger, true);
 
-      persistCheckoutContext({
-        leadId,
-        ...context,
-        savedAt: new Date().toISOString()
-      });
-
-      let targetUrl;
       try {
-        targetUrl = new URL(paymentLink);
+        const initResult = await postPublishApiJson(
+          "/api/submissions/init.php",
+          buildStandardSubmissionPayload(context)
+        );
+
+        const submissionId = Number(initResult?.data?.submission_id || 0);
+        const paymentReferenceKey = safeText(initResult?.data?.payment_reference_key);
+
+        if (submissionId <= 0) {
+          throw new Error("Submission konnte nicht angelegt werden.");
+        }
+
+        persistCheckoutContext({
+          submissionId,
+          paymentReferenceKey,
+          ...context,
+          savedAt: new Date().toISOString()
+        });
+
+        const checkoutResult = await postPublishApiJson(
+          "/api/stripe/create-checkout-session.php",
+          { submission_id: submissionId }
+        );
+
+        const checkoutUrl = safeText(checkoutResult?.data?.checkout_url);
+        if (!hasValue(checkoutUrl)) {
+          throw new Error("Checkout-URL fehlt.");
+        }
+
+        window.location.href = checkoutUrl;
       } catch (error) {
-        console.warn("Publish funnel: invalid payment link.", error);
-        window.alert("Der Stripe-Zahlungslink ist ungültig konfiguriert.");
-        return;
+        console.warn("Publish funnel: standard checkout init failed.", error);
+        window.alert(safeText(error?.message) || "Die Zahlung konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+        setStandardSubmitting(trigger, false);
       }
-
-      if (hasValue(context.email)) {
-        targetUrl.searchParams.set("prefilled_email", context.email);
-      }
-      targetUrl.searchParams.set("client_reference_id", leadId);
-
-      window.location.href = targetUrl.toString();
     });
   }
+  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 === */
 
   function bindAutomationPath() {
     const form = byId("publish-automation-form");
