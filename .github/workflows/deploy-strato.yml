@@ -491,15 +491,18 @@ jobs:
             APP_BASE_URL="https://bocholt-erleben.de"
           fi
 
-          test -n "$APP_DB_HOST"
-          test -n "$APP_DB_NAME"
-          test -n "$APP_DB_USER"
-          test -n "$APP_DB_PASSWORD"
-          test -n "$APP_STRIPE_SECRET_KEY"
-          test -n "$APP_STRIPE_PRICE_SINGLE"
-          test -n "$APP_STRIPE_PRICE_STARTER"
-          test -n "$APP_STRIPE_PRICE_ACTIVE"
-          test -n "$APP_STRIPE_PRICE_UNLIMITED"
+          # === BEGIN BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 | Zweck: fail-fast mit klarer Fehlmeldung statt stillem exit 1 bei fehlenden DB-/Stripe-Secrets; Umfang: ersetzt die bisherigen nackten test -n Checks im Prepare-deploy-Step ===
+          [ -n "$APP_DB_HOST" ] || { echo "❌ Missing required secret/value: APP_DB_HOST"; exit 1; }
+          [ -n "$APP_DB_NAME" ] || { echo "❌ Missing required secret/value: APP_DB_NAME"; exit 1; }
+          [ -n "$APP_DB_USER" ] || { echo "❌ Missing required secret/value: APP_DB_USER"; exit 1; }
+          [ -n "$APP_DB_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_DB_PASSWORD"; exit 1; }
+
+          [ -n "$APP_STRIPE_SECRET_KEY" ] || { echo "❌ Missing required secret/value: APP_STRIPE_SECRET_KEY"; exit 1; }
+          [ -n "$APP_STRIPE_PRICE_SINGLE" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_SINGLE"; exit 1; }
+          [ -n "$APP_STRIPE_PRICE_STARTER" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_STARTER"; exit 1; }
+          [ -n "$APP_STRIPE_PRICE_ACTIVE" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_ACTIVE"; exit 1; }
+          [ -n "$APP_STRIPE_PRICE_UNLIMITED" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_UNLIMITED"; exit 1; }
+          # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
           APP_ENV="$DEPLOY_ENV_NAME"
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
