@@ -158,6 +158,7 @@ const getCategoryIcon = (categoryRaw) => {
     const title = trimOrEmpty(e.title || e.name || e.summary) || "Event";
     const city = trimOrEmpty(e.city || e.stadt || e.locationCity || "Bocholt");
     const date = trimOrEmpty(e.date || e.datum || e.startDate || "");
+    const endDate = trimOrEmpty(e.endDate || e.enddatum || "");
 
     const timeRaw = trimOrEmpty(e.time || e.uhrzeit || e.startTime || "");
     const endTimeRaw = trimOrEmpty(e.endTime || e.ende || "");
@@ -167,7 +168,6 @@ const getCategoryIcon = (categoryRaw) => {
     const endTime = endTimeRaw || parsed.end || "";
 
     const timeRange = (() => {
-      // Keep current behavior: if we have both start+end => "start–end"; else show start (which may already include a range if unparsable)
       if (startTime && endTime) return `${startTime}–${endTime}`;
       return startTime || "";
     })();
@@ -184,17 +184,16 @@ const getCategoryIcon = (categoryRaw) => {
 
     const homepage = getLocationHomepage(locationName);
 
-    // Route (Maps) only when we have a meaningful location; avoids city-only links
     const routeQuery = locationName ? [locationName, city].filter(Boolean).join(" ") : "";
     const maps = routeQuery ? toMapsUrl(routeQuery) : "";
 
-    // Kalender-Payload (ICS/Export-Implementierung folgt später)
     const canCalendar = Boolean(title && date);
     const calendarPayload = canCalendar ? {
       title,
-      date,         // erwartetes Format in unseren Daten: YYYY-MM-DD
-      startTime,    // optional
-      endTime,      // optional
+      date,
+      endDate,
+      startTime,
+      endTime,
       location: locationName || city,
       description: desc,
     } : null;
@@ -212,7 +211,6 @@ Umfang:
 
 const rawUrl = normalizeHttpUrl(
   trimOrEmpty(
-    // bevorzugt explizite Source-Felder, sonst generisches url/link
     e.source_url || e.sourceUrl || e.url || e.link || e.website || e.website_url || e.websiteUrl || ""
   )
 );
@@ -232,15 +230,12 @@ const scoreSourceUrl = (u) => {
 
     let score = 0;
 
-    // konkrete Event-Detailseiten bevorzugen
     if (/\/veranstaltungskalender\//i.test(path)) score += 100;
     if (/\/programm\//i.test(path)) score += 90;
 
-    // offizielle Bocholter Quellen leicht bevorzugen, aber nicht erzwingen
     if (/(^|\.)bocholt\.de$/i.test(host)) score += 20;
     if (/(^|\.)stadttheater-bocholt\.de$/i.test(host)) score += 15;
 
-    // spezifischere Pfade bevorzugen
     score += segs;
 
     return score;
@@ -253,7 +248,6 @@ const sourceUrl = sourceCandidates.length
   ? sourceCandidates.slice().sort((a, b) => scoreSourceUrl(b) - scoreSourceUrl(a))[0]
   : "";
 
-// Website: externe Homepage aus locations.json, nur wenn sinnvoll von Quelle verschieden
 const websiteUrl = (() => {
   const hp = normalizeHttpUrl(homepage) || "";
   if (!hp) return "";
@@ -261,10 +255,19 @@ const websiteUrl = (() => {
   return hp;
 })();
 
-// Share: Text + beste URL (Website bevorzugt, sonst Quelle, sonst leer)
+const shareDateText = (() => {
+  if (date && endDate && endDate !== date) {
+    return `${date} bis ${endDate}${timeRange ? ` · ${timeRange}` : ""}`;
+  }
+  if (date) {
+    return `${date}${timeRange ? ` · ${timeRange}` : ""}`;
+  }
+  return "";
+})();
+
 const shareParts = [
   title,
-  date ? `📅 ${date}${timeRange ? ` · ${timeRange}` : ""}` : "",
+  shareDateText ? `📅 ${shareDateText}` : "",
   locationLabel ? `📍 ${locationLabel}` : "",
 ].filter(Boolean);
 
@@ -272,7 +275,6 @@ const shareText = shareParts.join("\n");
 const shareUrl = websiteUrl || sourceUrl || "";
 const sharePayload = { title, text: shareText, url: shareUrl };
 
-// Actions (Actionbar: exakt 2 CTAs max)
 const actions = [
   ...(canCalendar ? [{
     type: "calendar",
@@ -292,10 +294,10 @@ const actions = [
 /* === END BLOCK: ENTERPRISE V2 LINKS + SHARE (source always visible, no route CTA) === */
 
     return {
-      // current render fields (keep stable to avoid UI regression)
       title,
       city,
       date,
+      endDate,
       startTime,
       endTime,
       timeRange,
@@ -308,17 +310,12 @@ const actions = [
       desc,
       homepage,
       maps,
-
-      // enterprise v2 link model (render uses these)
       websiteUrl,
       sourceUrl,
       sharePayload,
-
-      // future usage
       actions,
     };
   };
-  // === END BLOCK: toEventDetailVM (VIEWMODEL NORMALIZER) ===
 
   // === END BLOCK: DETAILPANEL HELPERS (pure utils) ===
 
@@ -767,7 +764,6 @@ const actions = [
         if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
         const [y, m, d] = s.split("-").map(n => parseInt(n, 10));
-        // UTC, damit es nicht durch TZ/DST kippt
         const dt = new Date(Date.UTC(y, m - 1, d));
 
         try {
@@ -780,7 +776,6 @@ const actions = [
             month: "short",
           }).format(dt);
 
-          // Jahr nur zeigen, wenn nicht aktuelles Jahr (ruhiger)
           if (y !== currentYear) {
             const yr = new Intl.DateTimeFormat("de-DE", { year: "numeric" }).format(dt);
             return `${base} ${yr}`;
@@ -791,10 +786,16 @@ const actions = [
           return s;
         }
       };
+
       const dateLabel = formatDateLabelDE(vm.date);
+      const endDateLabel = formatDateLabelDE(vm.endDate);
+      const rangeDateLabel = (() => {
+        if (vm.date && vm.endDate && vm.endDate !== vm.date) {
+          return `${dateLabel || vm.date} – ${endDateLabel || vm.endDate}`;
+        }
+        return dateLabel || vm.date || "";
+      })();
       // === END BLOCK: DATE LABEL (DE, user-friendly) ===
-
-
 /* BEGIN PATCH ICONS-DETAILS-ICONS-WRAPPER-V1
    Zweck: Detailpanel-Icons zentral aus window.Icons.svg() beziehen (keine Inline-SVG-Definitionen in details.js).
    Umfang: Ersetzt iconSvg() Block komplett, API bleibt kompatibel (type, extraClass).
@@ -925,12 +926,11 @@ const iconSvg = (type, extraClass = "") => {
       === */
 
       const dateTimeLabel = (() => {
-        const d = dateLabel || vm.date || "";
+        const d = rangeDateLabel || vm.date || "";
         if (!d) return "";
         if (vm.timeRange) return `${d} · ${vm.timeRange}`;
-        return `${d} · ganztägig`;
+        return d;
       })();
-
       const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
       const normSource = normalizeHttpUrl(vm.sourceUrl || "");
 
