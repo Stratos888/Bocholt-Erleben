@@ -168,26 +168,40 @@ function swh_handle_checkout_completed(PDO $pdo, array $event): void
     }
 
     $newStatus = $paymentStatus === 'paid' ? 'paid' : 'checkout_started';
+    $paidFlag = $paymentStatus === 'paid' ? 1 : 0;
+
+    $customerIdValue = $customerId !== '' ? $customerId : null;
+    $subscriptionIdValue = $subscriptionId !== '' ? $subscriptionId : null;
 
     $update = $pdo->prepare(
         'UPDATE submissions
          SET
             status = :status,
             stripe_checkout_session_id = :stripe_checkout_session_id,
-            stripe_customer_id = CASE WHEN :stripe_customer_id = "" THEN stripe_customer_id ELSE :stripe_customer_id END,
-            stripe_subscription_id = CASE WHEN :stripe_subscription_id = "" THEN stripe_subscription_id ELSE :stripe_subscription_id END,
+            stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
+            stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
             paid_at = CASE WHEN :paid_flag = 1 THEN CURRENT_TIMESTAMP ELSE paid_at END
          WHERE id = :submission_id'
     );
 
-    $update->execute([
-        ':status' => $newStatus,
-        ':stripe_checkout_session_id' => $sessionId,
-        ':stripe_customer_id' => $customerId,
-        ':stripe_subscription_id' => $subscriptionId,
-        ':paid_flag' => $paymentStatus === 'paid' ? 1 : 0,
-        ':submission_id' => $submissionId,
-    ]);
+    $update->bindValue(':status', $newStatus, PDO::PARAM_STR);
+    $update->bindValue(':stripe_checkout_session_id', $sessionId, PDO::PARAM_STR);
+
+    if ($customerIdValue === null) {
+        $update->bindValue(':stripe_customer_id', null, PDO::PARAM_NULL);
+    } else {
+        $update->bindValue(':stripe_customer_id', $customerIdValue, PDO::PARAM_STR);
+    }
+
+    if ($subscriptionIdValue === null) {
+        $update->bindValue(':stripe_subscription_id', null, PDO::PARAM_NULL);
+    } else {
+        $update->bindValue(':stripe_subscription_id', $subscriptionIdValue, PDO::PARAM_STR);
+    }
+
+    $update->bindValue(':paid_flag', $paidFlag, PDO::PARAM_INT);
+    $update->bindValue(':submission_id', $submissionId, PDO::PARAM_INT);
+    $update->execute();
 }
 
 $pdo = null;
