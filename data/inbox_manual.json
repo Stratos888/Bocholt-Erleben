@@ -1,1 +1,43 @@
-[]
+[
+  {
+    "title": "Sonder-Ausstellung \"Behind Beauty\" im LWL-Museum Textilwerk Spinnerei",
+    "date": "2026-04-25",
+    "endDate": "2026-06-27",
+    "time": "10:00",
+    "city": "Bocholt",
+    "location": "LWL-MUSEUM Textilwerk | Spinnerei",
+    "kategorie_suggestion": "Kultur & Kunst",
+    "url": "https://www.bocholt.de/veranstaltungskalender/sonder-ausstellung-behind-beauty-im-lwl-museum-textilwerk-spinnerei?event=88564",
+    "description": "Ausstellung im Textilwerk Bocholt zur Schönheitsindustrie mit interaktiven Stationen und Einblicken in Werbung, Medien und Konsum.",
+    "source_name": "Stadt Bocholt – Veranstaltungskalender",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/sonder-ausstellung-behind-beauty-im-lwl-museum-textilwerk-spinnerei?event=88564",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Borken lädt ein",
+    "date": "2026-08-16",
+    "time": "10:00",
+    "city": "Borken",
+    "location": "Innenstadt",
+    "kategorie_suggestion": "Innenstadt & Leben",
+    "url": "https://www.borken.de/de/wirtschaft/veranstaltungen/borken-laedt-ein.php",
+    "description": "Innenstadtveranstaltung in Borken mit Aktionstag und Kindertrödelmarkt.",
+    "source_name": "Kreisstadt Borken",
+    "source_url": "https://www.borken.de/de/wirtschaft/veranstaltungen/borken-laedt-ein.php",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Sommermalschule",
+    "date": "2026-07-27",
+    "endDate": "2026-07-31",
+    "time": "10:00",
+    "city": "Bocholt",
+    "location": "Kunsthaus, Osterstraße 69",
+    "kategorie_suggestion": "Kinder & Familie",
+    "url": "https://www.bocholt.de/sommermalschule",
+    "description": "Kreativkurs für Kinder im Kunsthaus Bocholt mit Malerei und Gestalten in einer fünftägigen Sommerferienwoche.",
+    "source_name": "Stadt Bocholt",
+    "source_url": "https://www.bocholt.de/sommermalschule",
+    "notes": "manual chat search v3"
+  }
+]
