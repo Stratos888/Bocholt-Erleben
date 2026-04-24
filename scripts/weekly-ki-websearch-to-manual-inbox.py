@@ -374,7 +374,7 @@ def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_re
     system_prompt = """
 Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
 
-Arbeite streng, konservativ und produktionsnah.
+Arbeite streng, konservativ, produktionsnah und redaktionell anspruchsvoll.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Liefere nur neue Delta-Kandidaten.
@@ -384,6 +384,12 @@ Im Automationsmodus gilt:
 - kein REVIEW
 - kein Fließtext
 - keine Kommentare
+
+Wichtig:
+Nicht jeder formal korrekte Termin ist FINAL-tauglich.
+FINAL bedeutet hier:
+- formal belastbar
+- und zugleich redaktionell stark genug für die Kuratierungs-PWA
 """.strip()
 
     user_prompt = f"""
@@ -401,6 +407,7 @@ Rahmen:
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
 - Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
+- Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
 Suchsteuerung:
 - Arbeite mit drei Suchrichtungen:
@@ -417,6 +424,7 @@ Suchsteuerung:
 - Discovery darf nicht vollständig auf null gesetzt werden
 - Maximal 2 FINAL-Kandidaten pro Quelle
 - Nur wenn eine Quelle außergewöhnlich stark ist und kein besserer Mix verfügbar ist, maximal 3
+- Verwende die verbleibende Quote nicht für schwache Restkandidaten
 
 Recovery-Pass vor Verwerfen:
 Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv:
@@ -439,6 +447,49 @@ Harte Prüfregeln vor FINAL:
 - Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben
 - Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben
 
+Redaktionelle Qualitäts-Schwelle für FINAL:
+Ein Kandidat ist nur dann FINAL-tauglich, wenn er nicht nur formal korrekt ist, sondern auch einen klaren Mehrwert für die Kuratierungs-PWA hat.
+
+Nicht ausreichend für FINAL ist ein Termin, wenn er hauptsächlich:
+- formal korrekt, aber für normale Nutzer nur schwach interessant ist
+- sehr speziell, nischig oder kleinteilig wirkt
+- eher wie ein interner, edukativer oder halbgeschlossener Spezialtermin wirkt
+- eher wie eine Vorschau-, Programm- oder Hintergrundseite ohne starken Event-Zug wirkt
+- eher eine Dauer-/Ausstellungspräsenz als ein wirklich starker Event-Kandidat ist
+- eher eine kleine Kurs-, Workshop-, Resilienz-, Seminar- oder Mitmach-Einheit mit begrenztem Breiteninteresse ist
+- eher eine Innenstadt-/Marketing-/Shopping-Aktion ohne klar starken Eventcharakter ist
+
+Besonders streng behandeln:
+- länger laufende Ausstellungen
+- Vorschau-/Museumseinträge
+- Kurse
+- Workshops
+- Resilienz-, Bildungs- oder Spezialformate
+- kleine Ferienprogramme
+- Innenstadtaktionen
+- Handels- und Promotionsformate
+
+Solche Fälle nur dann FINAL, wenn zusätzlich mindestens einer dieser Punkte klar erfüllt ist:
+- hohe öffentliche Relevanz für Bocholt oder den Nahraum
+- klarer Eventcharakter mit starkem Besuchsanlass
+- außergewöhnlich hoher PWA-Nutzen
+- deutliche Breitenattraktivität
+- besondere lokale Relevanz oder Stadtbedeutung
+- starkes öffentliches Programm statt bloßer Hintergrund-/Informationsseite
+
+Bevorzugt in FINAL:
+- Stadtfeste
+- Märkte
+- Festivals
+- Konzerte
+- Theater / Bühne
+- familienrelevante Großtermine
+- Innenstadtfeste mit klarem Programm
+- Messen mit klarer Besucherrelevanz
+- Open-Air-Events
+- besondere Aktionstage / Tage der offenen Tür / öffentlich starke Kulturtermine
+- klar sichtbare Highlights mit Bocholt- oder Nahraum-Relevanz
+
 Priorisierung:
 Priorisiere FINAL-Kandidaten nach:
 1. öffentlicher Relevanz
@@ -446,6 +497,9 @@ Priorisiere FINAL-Kandidaten nach:
 3. Breiteninteresse
 4. PWA-Nutzen
 5. Faktenvollständigkeit / Quellensauberkeit
+
+Wenn ein Kandidat zwar formal korrekt, aber redaktionell schwach ist:
+- nicht ausgeben
 
 Output-Regeln:
 - Gib ausschließlich neue FINAL-Datensätze aus
@@ -475,7 +529,7 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 - keine Dublette?
 - wirklich nützlich für die Kuratierungs-PWA?
 - ist der Quellenmix gesund?
-- ist der Kandidat stark genug oder nur formal korrekt?
+- ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
 
 [KONTEXT_BUNDLE]
