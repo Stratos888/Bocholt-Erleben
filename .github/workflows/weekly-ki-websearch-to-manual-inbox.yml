@@ -70,7 +70,7 @@ jobs:
           TAB_INBOX: Inbox
           TAB_ARCHIVE: Inbox_Archive
 
-          MAX_NEW_CANDIDATES: "40"
+          MAX_NEW_CANDIDATES: "8"
           SEARCH_WINDOW_DAYS: "180"
           ALLOW_RADIUS_KM: "20"
 
