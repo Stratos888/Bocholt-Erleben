@@ -931,7 +931,7 @@ const iconSvg = (type, extraClass = "") => {
         return `${d} · ganztägig`;
       })();
 
-           const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
+      const normWebsite = normalizeHttpUrl(vm.websiteUrl || "");
       const normSource = normalizeHttpUrl(vm.sourceUrl || "");
 
       const canonicalLinkKey = (u) => {
@@ -983,6 +983,49 @@ const iconSvg = (type, extraClass = "") => {
 
       const showSource = Boolean(normSource);
 
+      /* === BEGIN BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 | Zweck: erzeugt saubere Analytics-Payloads und data-Attribute für Event-Detaillinks (Maps / Website / Quelle), ohne sichtbare UI zu verändern | Umfang: nur Renderlogik im Detailpanel === */
+      const baseOutboundPayload = {
+        entityType: "event",
+        entityId: String(event?.id || "").trim(),
+        entityTitle: String(vm.title || "").trim()
+      };
+
+      const mapsOutboundPayload = vm.maps
+        ? {
+            ...baseOutboundPayload,
+            outboundType: "maps",
+            destinationUrl: vm.maps
+          }
+        : null;
+
+      const websiteOutboundPayload = showWebsite
+        ? {
+            ...baseOutboundPayload,
+            outboundType: "website",
+            destinationUrl: normWebsite
+          }
+        : null;
+
+      const sourceOutboundPayload = showSource
+        ? {
+            ...baseOutboundPayload,
+            outboundType: "website",
+            destinationUrl: normSource
+          }
+        : null;
+
+      const buildOutboundDataAttrs = (payload) => {
+        if (!payload) return "";
+        return [
+          `data-outbound-type="${escapeHtml(payload.outboundType || "")}"`,
+          `data-entity-type="${escapeHtml(payload.entityType || "")}"`,
+          `data-entity-id="${escapeHtml(payload.entityId || "")}"`,
+          `data-entity-title="${escapeHtml(payload.entityTitle || "")}"`,
+          `data-destination-url="${escapeHtml(payload.destinationUrl || "")}"`
+        ].join(" ");
+      };
+      /* === END BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 === */
+
       const html = `
         <div class="detail-panel-inner">
           <div class="detail-header">
@@ -1000,6 +1043,7 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                     target="_blank"
                     rel="noopener"
                     aria-label="Ort in Karten öffnen"
+                    ${buildOutboundDataAttrs(mapsOutboundPayload)}
                   >
                     <span class="detail-meta-icon" aria-hidden="true">
                       ${iconSvg("pin", "is-chip")}
@@ -1032,7 +1076,13 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
           ${(showWebsite || showSource) ? `
             <div class="detail-links" aria-label="Links">
               ${showWebsite ? `
-                <a class="detail-link" href="${escapeHtml(normWebsite)}" target="_blank" rel="noopener">
+                <a
+                  class="detail-link"
+                  href="${escapeHtml(normWebsite)}"
+                  target="_blank"
+                  rel="noopener"
+                  ${buildOutboundDataAttrs(websiteOutboundPayload)}
+                >
                   <span class="detail-link-label">Website</span>
                   <span class="detail-link-value">${escapeHtml(websiteHostLabel)}</span>
                   <span class="detail-link-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
@@ -1040,7 +1090,13 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
               ` : ""}
 
               ${showSource ? `
-                <a class="detail-link" href="${escapeHtml(normSource)}" target="_blank" rel="noopener">
+                <a
+                  class="detail-link"
+                  href="${escapeHtml(normSource)}"
+                  target="_blank"
+                  rel="noopener"
+                  ${buildOutboundDataAttrs(sourceOutboundPayload)}
+                >
                   <span class="detail-link-label">Quelle</span>
                   <span class="detail-link-value">${escapeHtml(sourceHostLabel)}</span>
                   <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
@@ -1052,6 +1108,20 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
       `;
 
       this.content.innerHTML = html;
+
+      this.content.querySelectorAll("a[data-outbound-type]").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+
+          window.BEAnalytics.trackOutboundClick({
+            outboundType: String(link.dataset.outboundType || "").trim(),
+            entityType: String(link.dataset.entityType || "").trim(),
+            entityId: String(link.dataset.entityId || "").trim(),
+            entityTitle: String(link.dataset.entityTitle || "").trim(),
+            destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+          });
+        });
+      });
 
       /* === END BLOCK: ENTERPRISE V2 DETAIL CONTENT (meta compaction + no redundancy) === */
 
