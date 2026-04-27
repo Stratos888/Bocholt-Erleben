@@ -448,12 +448,15 @@ Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv
 5. bei offiziellen Info-/News-Seiten zu prüfen, ob trotz zusätzlicher Orga-/CTA-/Aussteller-Elemente ein klarer Besucherfokus vorliegt
 
 Harte Prüfregeln vor FINAL:
-- Ein FINAL-Eintrag darf genau nur eine besuchbare Instanz repräsentieren
-- Wenn eine Quelle mehrere Tage oder Blöcke mit eigenen Zeiten nennt, darf kein Sammel-Eintrag in FINAL landen
-- Dann nur: sauber splitten oder weglassen
-- Wenn ein Event als zusammenhängendes Mehrtagesevent bestehen bleibt, darf `time` nur gesetzt werden, wenn die Zeitangabe wirklich einheitlich für das gesamte Event gilt
-- Wenn pro Tag unterschiedliche Zeiten genannt werden, das Event aber als zusammenhängendes Mehrtagesevent bestehen bleibt, muss `time` leer bleiben
-- Niemals die erste sichtbare Tageszeit oder irgendeine Einzelzeit als allgemeine `time` für ein zusammenhängendes Mehrtagesevent übernehmen
+- Ein FINAL-Eintrag repräsentiert entweder genau eine einzelne besuchbare Termin-Instanz oder genau ein zusammenhängendes Mehrtagesevent.
+- Zusammenhängende Mehrtagesevents bleiben ein Eintrag mit `date` und `endDate`, wenn die Quelle sie klar als ein zusammenhängendes Event darstellt.
+- Unterschiedliche tägliche Zeiten oder Öffnungszeiten erzwingen bei zusammenhängenden Mehrtagesevents nicht automatisch ein Splitting.
+- Splitten nur dann, wenn Tage, Slots oder Programmpunkte als eigenständige separat besuchbare Instanzen zu verstehen sind.
+- `time` ist ausschließlich eine Startzeit im Format `HH:MM`.
+- Niemals Zeiträume wie `16:00–23:59`, `13:00-20:00` oder Öffnungszeitspannen in `time` ausgeben.
+- Wenn ein Event als zusammenhängendes Mehrtagesevent bestehen bleibt und pro Tag unterschiedliche Zeiten nennt, muss `time` leer bleiben.
+- Wenn ein Event als zusammenhängendes Mehrtagesevent eine wirklich einheitliche Startzeit für das gesamte Event nennt, darf `time` als `HH:MM` gesetzt werden.
+- Niemals die erste sichtbare Tageszeit oder irgendeine Einzelzeit als allgemeine `time` für ein zusammenhängendes Mehrtagesevent übernehmen.
 - Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig
 - Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen
 - Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen
@@ -661,25 +664,61 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
 # Umfang:
 # - Nur Sicherungsnetz hinter der KI-Suche
 # === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
-def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str]]:
-    source_urls: set[str] = set()
-    with_time: set[str] = set()
-    without_time: set[str] = set()
+# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_RANGE_AWARE_V3 | Zweck: FINAL-Validierung, Zeitformat, Laufzeitfenster und Instanz-Dedupe regelwerkskonform absichern | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
+def occurrence_fp(title: str, date_value: str, time_value: str, location: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+        norm(time_value),
+        norm_key(location),
+    ])
+
+
+def occurrence_fp_no_time(title: str, date_value: str, location: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+        "",
+        norm_key(location),
+    ])
+
+
+def source_occurrence_fp(source_url: str, url: str, title: str, date_value: str, time_value: str, location: str) -> str:
+    source_key = norm_key(canonical_url(source_url) or canonical_url(url))
+    if not source_key:
+        return ""
+
+    return "|".join([
+        source_key,
+        norm_key(title),
+        norm(date_value),
+        norm(time_value),
+        norm_key(location),
+    ])
+
+
+def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str], set[str]]:
+    source_occurrences: set[str] = set()
+    exact_occurrences: set[str] = set()
+    no_time_occurrences_all: set[str] = set()
+    no_time_occurrences_missing_time: set[str] = set()
 
     for group in groups:
         for rec in group:
-            if rec.source_url or rec.url:
-                source_urls.add(norm_key(rec.source_url or rec.url))
+            fp = occurrence_fp(rec.title, rec.date, rec.time, rec.location)
+            fp_no_time = occurrence_fp_no_time(rec.title, rec.date, rec.location)
+            src_fp = source_occurrence_fp(rec.source_url, rec.url, rec.title, rec.date, rec.time, rec.location)
 
-            fp = "|".join([norm_key(rec.title), rec.date, rec.time, norm_key(rec.location)])
-            fp_no_time = "|".join([norm_key(rec.title), rec.date, "", norm_key(rec.location)])
-
+            if src_fp and src_fp != "|||||":
+                source_occurrences.add(src_fp)
             if fp != "|||":
-                with_time.add(fp)
+                exact_occurrences.add(fp)
             if fp_no_time != "|||":
-                without_time.add(fp_no_time)
+                no_time_occurrences_all.add(fp_no_time)
+            if not norm(rec.time) and fp_no_time != "|||":
+                no_time_occurrences_missing_time.add(fp_no_time)
 
-    return source_urls, with_time, without_time
+    return source_occurrences, exact_occurrences, no_time_occurrences_all, no_time_occurrences_missing_time
 
 
 def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
@@ -698,7 +737,21 @@ def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
     return out
 
 
-# === BEGIN BLOCK: LOCAL_FINAL_FIELD_VALIDATION_V2 | Zweck: lokale FINAL-Pflichtfeldprüfung an Regelwerk angleichen | Umfang: prüft alle verpflichtenden FINAL-Felder vor dem Schreiben in inbox_manual.json ===
+def candidate_in_window(item: Dict[str, str], start: date, end: date) -> bool:
+    start_date = parse_iso_date(item.get("date", ""))
+    if not start_date:
+        return False
+
+    end_date = parse_iso_date(item.get("endDate", "")) if item.get("endDate") else start_date
+    if not end_date:
+        return False
+
+    if end_date < start_date:
+        return False
+
+    return start_date <= end and end_date >= start
+
+
 def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
     required = [
         "title",
@@ -719,29 +772,29 @@ def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
         return False
     if item.get("endDate") and not parse_iso_date(item.get("endDate", "")):
         return False
-    if not date_in_window(item["date"], start, end):
-        return False
     if item.get("time") and not re.match(r"^\d{2}:\d{2}$", item["time"]):
+        return False
+    if not candidate_in_window(item, start, end):
         return False
 
     return True
-# === END BLOCK: LOCAL_FINAL_FIELD_VALIDATION_V2 ===
 
 
 def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
-    existing_source_urls, existing_fps, existing_fps_without_time = existing_sets(
+    existing_source_occurrences, existing_exact, existing_no_time_all, existing_no_time_missing = existing_sets(
         events_records,
         inbox_records,
         archive_records,
         manual_records,
     )
 
-    batch_source_urls: set[str] = set()
-    batch_fps: set[str] = set()
-    batch_fps_without_time: set[str] = set()
+    batch_source_occurrences: set[str] = set()
+    batch_exact: set[str] = set()
+    batch_no_time_all: set[str] = set()
+    batch_no_time_missing: set[str] = set()
 
     out: List[Dict[str, str]] = []
 
@@ -753,26 +806,46 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
         if not valid_candidate(item, start, end):
             continue
 
-        source_url_key = norm_key(item.get("source_url", "") or item.get("url", ""))
-        fp = "|".join([norm_key(item.get("title", "")), item.get("date", ""), item.get("time", ""), norm_key(item.get("location", ""))])
-        fp_no_time = "|".join([norm_key(item.get("title", "")), item.get("date", ""), "", norm_key(item.get("location", ""))])
+        title = item.get("title", "")
+        date_value = item.get("date", "")
+        time_value = item.get("time", "")
+        location = item.get("location", "")
+        has_time = bool(norm(time_value))
 
-        if source_url_key and (source_url_key in existing_source_urls or source_url_key in batch_source_urls):
+        fp = occurrence_fp(title, date_value, time_value, location)
+        fp_no_time = occurrence_fp_no_time(title, date_value, location)
+        src_fp = source_occurrence_fp(
+            item.get("source_url", ""),
+            item.get("url", ""),
+            title,
+            date_value,
+            time_value,
+            location,
+        )
+
+        if src_fp and (src_fp in existing_source_occurrences or src_fp in batch_source_occurrences):
             continue
-        if fp in existing_fps or fp in batch_fps:
-            continue
-        if fp_no_time in existing_fps_without_time or fp_no_time in batch_fps_without_time:
-            continue
+
+        if has_time:
+            if fp in existing_exact or fp in batch_exact:
+                continue
+            if fp_no_time in existing_no_time_missing or fp_no_time in batch_no_time_missing:
+                continue
+        else:
+            if fp_no_time in existing_no_time_all or fp_no_time in batch_no_time_all:
+                continue
 
         out.append({k: v for k, v in item.items() if v != ""})
 
-        if source_url_key:
-            batch_source_urls.add(source_url_key)
-        batch_fps.add(fp)
-        batch_fps_without_time.add(fp_no_time)
+        if src_fp:
+            batch_source_occurrences.add(src_fp)
+        batch_exact.add(fp)
+        batch_no_time_all.add(fp_no_time)
+        if not has_time:
+            batch_no_time_missing.add(fp_no_time)
 
     return out
-# === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
+# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_RANGE_AWARE_V3 ===
 
 
 # === BEGIN BLOCK: RESPONSE SUMMARY + OUTPUT WRITE ===
