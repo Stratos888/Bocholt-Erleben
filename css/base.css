@@ -395,6 +395,11 @@
   --space-5: var(--space-xl);
 }
 /* === END BLOCK: TOKEN_CONTRACT_ROOT === */
+/* === BEGIN BLOCK: GLOBAL_HIDDEN_ATTRIBUTE_ENFORCEMENT_V1 | Zweck: erzwingt projektweit, dass HTML-Elemente mit hidden-Attribut unabhängig von Komponentenregeln wirklich unsichtbar bleiben; Umfang: globale Baseregel für [hidden] === */
+[hidden]{
+  display: none !important;
+}
+/* === END BLOCK: GLOBAL_HIDDEN_ATTRIBUTE_ENFORCEMENT_V1 === */
 /**
  * STYLE.CSS – Bocholt erleben (MVP frozen)
  * Ziel: ruhig, modern, funktional, konsistent
