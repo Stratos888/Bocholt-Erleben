@@ -1098,26 +1098,28 @@ select.content-field__control{
   letter-spacing: 0.12em;
 }
 
+/* === BEGIN BLOCK: ORGANIZER_HERO_TEXT_WIDTH_REBALANCE_V1 | Zweck: verschiebt auf Organizer-Seiten den Umbruch im Hero nach hinten und hält Lead/Note ruhiger; Umfang: ersetzt die Organizer-Hero-Typografie in css/pages.css === */
 .page--organizers .content-hero h1{
-  max-width: 12.6ch;
+  max-width: 16.8ch;
   font-size: clamp(1.24rem, 5.2vw, 1.46rem);
-  line-height: 0.94;
+  line-height: 0.96;
   letter-spacing: -0.036em;
   text-wrap: balance;
   hyphens: none;
 }
 
 .page--organizers .content-lead{
-  max-width: 32ch;
+  max-width: 38ch;
   font-size: 0.88rem;
   line-height: 1.26;
 }
 
 .page--organizers .content-note{
-  max-width: 35ch;
+  max-width: 41ch;
   font-size: 0.76rem;
   line-height: 1.22;
 }
+/* === END BLOCK: ORGANIZER_HERO_TEXT_WIDTH_REBALANCE_V1 === */
 
 .page--organizers .content-actions{
   margin-top: 1px;
