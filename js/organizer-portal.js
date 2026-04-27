@@ -184,9 +184,10 @@
       loginSubmit.textContent = isSubmitting ? "Wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
     };
 
+    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 | Zweck: enttechnisiert alle nutzerseitigen Magic-Link-Texte zu Zugangslink-Sprache und korrigiert den Fallback-Link im Login-Flow; Umfang: ersetzt den Token- und Request-Abschnitt in handleLoginPage === */
     if (token) {
       if (loginNote) {
-        loginNote.textContent = "Der Zugangslink wird geprüft. Danach leiten wir direkt in den Veranstalterbereich weiter.";
+        loginNote.textContent = "Der Zugangslink wird geprüft. Danach leiten wir direkt in deinen Statusbereich weiter.";
       }
 
       try {
@@ -200,8 +201,8 @@
           return;
         } catch (_ignored) {
           setLoginResult(
-            safeText(error?.message) || "Der Magic Link konnte nicht eingelöst werden.",
-          { href: "/fuer-veranstalter/dashboard/", label: "Trotzdem zum Veranstalterbereich", icon: "chevron-right" }
+            safeText(error?.message) || "Der Zugangslink konnte nicht eingelöst werden.",
+            [{ href: "/fuer-veranstalter/dashboard/", label: "Trotzdem zum Statusbereich", icon: "chevron-right" }]
           );
         }
       }
@@ -235,7 +236,7 @@
         if (safeText(data.magic_link_url)) {
           links.push({
             href: data.magic_link_url,
-            label: "Magic Link direkt öffnen",
+            label: "Zugangslink direkt öffnen",
             icon: "chevron-right"
           });
         }
@@ -254,6 +255,7 @@
         setSubmitting(false);
       }
     });
+    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 === */
   }
 
   function renderDashboard(data) {
