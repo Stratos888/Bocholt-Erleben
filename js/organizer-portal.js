@@ -191,17 +191,17 @@
 
       try {
         await consumeMagicLink(token);
-        window.location.replace("/veranstalter/");
+        window.location.replace("/fuer-veranstalter/dashboard/");
         return;
       } catch (error) {
         try {
           await tryLoadPortalState();
-          window.location.replace("/veranstalter/");
+          window.location.replace("/fuer-veranstalter/dashboard/");
           return;
         } catch (_ignored) {
           setLoginResult(
             safeText(error?.message) || "Der Magic Link konnte nicht eingelöst werden.",
-            [{ href: "/veranstalter/", label: "Trotzdem zum Veranstalterbereich", icon: "chevron-right" }]
+          { href: "/fuer-veranstalter/dashboard/", label: "Trotzdem zum Veranstalterbereich", icon: "chevron-right" }
           );
         }
       }
