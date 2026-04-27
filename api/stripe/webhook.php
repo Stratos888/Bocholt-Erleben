@@ -149,6 +149,239 @@ function swh_mark_event_failed(PDO $pdo, int $webhookEventId, string $message): 
     ]);
 }
 
+function swh_get_plan_quota_config(string $planKey): array
+{
+    return match ($planKey) {
+        'single' => [
+            'included_publications' => 1,
+            'is_unlimited' => 0,
+        ],
+        'starter' => [
+            'included_publications' => 3,
+            'is_unlimited' => 0,
+        ],
+        'active' => [
+            'included_publications' => 8,
+            'is_unlimited' => 0,
+        ],
+        'unlimited' => [
+            'included_publications' => 0,
+            'is_unlimited' => 1,
+        ],
+        default => throw new RuntimeException('Unsupported plan key for entitlement handling.'),
+    };
+}
+
+function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            organizer_id,
+            requested_model_key,
+            payment_kind,
+            payment_reference_key,
+            stripe_checkout_session_id,
+            stripe_customer_id,
+            stripe_subscription_id
+         FROM submissions
+         WHERE id = :submission_id
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':submission_id' => $submissionId,
+    ]);
+
+    $row = $statement->fetch();
+    if (!is_array($row)) {
+        throw new RuntimeException('Submission for checkout handling was not found.');
+    }
+
+    return $row;
+}
+
+function swh_upsert_single_entitlement(PDO $pdo, array $submission): void
+{
+    $paymentReferenceKey = trim((string)($submission['payment_reference_key'] ?? ''));
+    if ($paymentReferenceKey === '') {
+        throw new RuntimeException('Single entitlement source reference is missing.');
+    }
+
+    $insert = $pdo->prepare(
+        'INSERT INTO publication_entitlements (
+            organizer_id,
+            source_type,
+            source_reference,
+            source_submission_id,
+            subscription_id,
+            plan_key,
+            status,
+            period_start,
+            period_end,
+            included_publications,
+            consumed_publications,
+            is_unlimited
+        ) VALUES (
+            :organizer_id,
+            :source_type,
+            :source_reference,
+            :source_submission_id,
+            NULL,
+            :plan_key,
+            :status,
+            NULL,
+            NULL,
+            :included_publications,
+            0,
+            0
+        )
+        ON DUPLICATE KEY UPDATE
+            organizer_id = VALUES(organizer_id),
+            source_submission_id = COALESCE(source_submission_id, VALUES(source_submission_id)),
+            plan_key = VALUES(plan_key),
+            status = VALUES(status),
+            updated_at = CURRENT_TIMESTAMP'
+    );
+
+    $insert->execute([
+        ':organizer_id' => (int)$submission['organizer_id'],
+        ':source_type' => 'single_submission',
+        ':source_reference' => $paymentReferenceKey,
+        ':source_submission_id' => (int)$submission['id'],
+        ':plan_key' => 'single',
+        ':status' => 'active',
+        ':included_publications' => 1,
+    ]);
+}
+
+function swh_upsert_subscription_record(PDO $pdo, array $submission, string $subscriptionId, string $customerId): int
+{
+    $planKey = trim((string)($submission['requested_model_key'] ?? ''));
+    if ($planKey === '') {
+        throw new RuntimeException('Subscription plan key is missing.');
+    }
+
+    $insert = $pdo->prepare(
+        'INSERT INTO subscriptions (
+            organizer_id,
+            source_provider,
+            stripe_subscription_id,
+            stripe_customer_id,
+            plan_key,
+            status,
+            current_period_start,
+            current_period_end,
+            cancel_at_period_end,
+            canceled_at
+        ) VALUES (
+            :organizer_id,
+            :source_provider,
+            :stripe_subscription_id,
+            :stripe_customer_id,
+            :plan_key,
+            :status,
+            NULL,
+            NULL,
+            0,
+            NULL
+        )
+        ON DUPLICATE KEY UPDATE
+            id = LAST_INSERT_ID(id),
+            organizer_id = VALUES(organizer_id),
+            stripe_customer_id = VALUES(stripe_customer_id),
+            plan_key = VALUES(plan_key),
+            status = VALUES(status),
+            cancel_at_period_end = 0,
+            canceled_at = NULL,
+            updated_at = CURRENT_TIMESTAMP'
+    );
+
+    $insert->execute([
+        ':organizer_id' => (int)$submission['organizer_id'],
+        ':source_provider' => 'stripe',
+        ':stripe_subscription_id' => $subscriptionId,
+        ':stripe_customer_id' => $customerId !== '' ? $customerId : null,
+        ':plan_key' => $planKey,
+        ':status' => 'active',
+    ]);
+
+    return (int)$pdo->lastInsertId();
+}
+
+function swh_upsert_subscription_entitlement(PDO $pdo, array $submission, int $subscriptionRowId, string $subscriptionId): void
+{
+    $planKey = trim((string)($submission['requested_model_key'] ?? ''));
+    $quotaConfig = swh_get_plan_quota_config($planKey);
+
+    $insert = $pdo->prepare(
+        'INSERT INTO publication_entitlements (
+            organizer_id,
+            source_type,
+            source_reference,
+            source_submission_id,
+            subscription_id,
+            plan_key,
+            status,
+            period_start,
+            period_end,
+            included_publications,
+            consumed_publications,
+            is_unlimited
+        ) VALUES (
+            :organizer_id,
+            :source_type,
+            :source_reference,
+            :source_submission_id,
+            :subscription_id,
+            :plan_key,
+            :status,
+            NULL,
+            NULL,
+            :included_publications,
+            0,
+            :is_unlimited
+        )
+        ON DUPLICATE KEY UPDATE
+            organizer_id = VALUES(organizer_id),
+            source_submission_id = COALESCE(source_submission_id, VALUES(source_submission_id)),
+            subscription_id = VALUES(subscription_id),
+            plan_key = VALUES(plan_key),
+            status = VALUES(status),
+            is_unlimited = VALUES(is_unlimited),
+            updated_at = CURRENT_TIMESTAMP'
+    );
+
+    $insert->execute([
+        ':organizer_id' => (int)$submission['organizer_id'],
+        ':source_type' => 'subscription',
+        ':source_reference' => $subscriptionId,
+        ':source_submission_id' => (int)$submission['id'],
+        ':subscription_id' => $subscriptionRowId,
+        ':plan_key' => $planKey,
+        ':status' => 'active',
+        ':included_publications' => (int)$quotaConfig['included_publications'],
+        ':is_unlimited' => (int)$quotaConfig['is_unlimited'],
+    ]);
+}
+
+function swh_materialize_paid_entitlements(PDO $pdo, array $submission, string $customerId, string $subscriptionId): void
+{
+    $planKey = trim((string)($submission['requested_model_key'] ?? ''));
+
+    if ($planKey === 'single') {
+        swh_upsert_single_entitlement($pdo, $submission);
+        return;
+    }
+
+    if ($subscriptionId === '') {
+        throw new RuntimeException('Stripe subscription id is missing for subscription entitlement.');
+    }
+
+    $subscriptionRowId = swh_upsert_subscription_record($pdo, $submission, $subscriptionId, $customerId);
+    swh_upsert_subscription_entitlement($pdo, $submission, $subscriptionRowId, $subscriptionId);
+}
+
 function swh_handle_checkout_completed(PDO $pdo, array $event): void
 {
     $object = $event['data']['object'] ?? null;
@@ -166,6 +399,8 @@ function swh_handle_checkout_completed(PDO $pdo, array $event): void
     if ($sessionId === '' || $submissionId <= 0) {
         throw new RuntimeException('Stripe checkout session metadata is incomplete.');
     }
+
+    $submission = swh_fetch_submission_for_checkout_handling($pdo, $submissionId);
 
     $newStatus = $paymentStatus === 'paid' ? 'paid' : 'checkout_started';
     $paidFlag = $paymentStatus === 'paid' ? 1 : 0;
@@ -202,6 +437,18 @@ function swh_handle_checkout_completed(PDO $pdo, array $event): void
     $update->bindValue(':paid_flag', $paidFlag, PDO::PARAM_INT);
     $update->bindValue(':submission_id', $submissionId, PDO::PARAM_INT);
     $update->execute();
+
+    if ($paidFlag === 1) {
+        $submission['stripe_checkout_session_id'] = $sessionId;
+        if ($customerId !== '') {
+            $submission['stripe_customer_id'] = $customerId;
+        }
+        if ($subscriptionId !== '') {
+            $submission['stripe_subscription_id'] = $subscriptionId;
+        }
+
+        swh_materialize_paid_entitlements($pdo, $submission, $customerId, $subscriptionId);
+    }
 }
 
 $pdo = null;
