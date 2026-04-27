@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V1 | Zweck: definiert den SEO-/PWA-/Meta-Head für den minimalen Veranstalter-Login per Magic Link; Umfang: kompletter Head dieser Datei === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Veranstalter-Zugang | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Geschützter Veranstalter-Zugang für eingereichte und veröffentlichte Termine bei Bocholt erleben."
+  >
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="canonical" href="https://bocholt-erleben.de/veranstalter/login/">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#F3F2E6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V1 === -->
+</head>
+
+<body>
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BODY_V1 | Zweck: rendert die kleinstmögliche Veranstalter-Login-Seite mit Magic-Link-Anforderung und Token-Einlösung; Umfang: kompletter Body dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--organizers" data-organizer-page="login">
+    <header class="content-hero content-hero--panel">
+      <p class="content-kicker">Veranstalter-Zugang</p>
+      <h1>Per Link einloggen.</h1>
+      <p class="content-lead">
+        Gib die E-Mail-Adresse deines Veranstalterkontos ein. Du erhältst einen einmaligen Zugangslink für deinen Veranstalterbereich.
+      </p>
+      <p class="content-note" id="organizer-login-note">
+        Dort siehst du den Status deiner Einreichungen und dein aktuell verfügbares Veröffentlichungs-Kontingent.
+      </p>
+    </header>
+
+    <section class="content-card content-card--primary" aria-labelledby="organizer-login-form-head">
+      <div class="content-form-section-head">
+        <h2 id="organizer-login-form-head">Magic Link anfordern</h2>
+      </div>
+
+      <form class="content-form" id="organizer-login-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field content-field--full" for="organizer-login-email">
+            <span class="content-field__label">E-Mail-Adresse</span>
+            <input
+              class="content-field__control"
+              id="organizer-login-email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              required
+            >
+            <p class="content-field__hint">Nutze die E-Mail-Adresse, über die du bereits eingereicht oder gekauft hast.</p>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline">
+          <button class="content-cta content-cta--primary" id="organizer-login-submit" type="submit">
+            Zugangslink anfordern
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="content-card content-card--primary" id="organizer-login-result" aria-labelledby="organizer-login-result-head" hidden>
+      <h2 id="organizer-login-result-head">Nächster Schritt</h2>
+      <p id="organizer-login-result-text"></p>
+      <nav class="content-links" id="organizer-login-result-links" hidden></nav>
+    </section>
+
+    <nav class="content-links" aria-label="Veranstalter-Navigation">
+      <a class="content-link" href="/events-veroeffentlichen/">
+        <span class="content-link__label">Zurück zu Event veröffentlichen</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
+  </main>
+
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-04-27-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_LOGIN_BODY_V1 === -->
+</body>
+</html>
