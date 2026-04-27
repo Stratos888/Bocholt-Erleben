@@ -202,7 +202,7 @@ try {
                 'email' => (string)$magicLink['email'],
                 'default_plan_key' => $magicLink['default_plan_key'] !== null ? (string)$magicLink['default_plan_key'] : null,
             ],
-            'redirect_path' => '/veranstalter/',
+'redirect_path' => '/fuer-veranstalter/dashboard/',
         ],
     ]);
 } catch (InvalidArgumentException $error) {
