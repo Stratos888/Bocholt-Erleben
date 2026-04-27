@@ -70,8 +70,12 @@ REQUIRED_JSON_KEYS = [
     "date",
     "city",
     "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
     "source_name",
     "source_url",
+    "notes",
 ]
 # === END BLOCK: CONFIG + FIXED MANUAL SCHEMA (aligned to Inbox TSV columns) ===
 
