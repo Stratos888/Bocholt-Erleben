@@ -40,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TMP_DIR = ROOT / ".tmp" / "weekly-ki-eventsuche"
 
 REGELWERK_PATH = Path(os.environ.get("EVENT_RULEBOOK_PATH", str(ROOT / "bocholt-erleben_eventsuche_regelwerk_v3.md")))
+SOURCES_REGISTER_PATH = Path(os.environ.get("EVENT_SOURCES_REGISTER_PATH", str(ROOT / "eventsuche_quellenregister_v1.md")))
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
 
 TMP_EVENTS_TSV_PATH = Path(os.environ.get("TMP_EVENTS_TSV_PATH", str(TMP_DIR / "events.tsv")))
@@ -358,7 +359,14 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
-def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
+def build_messages(
+    rulebook_text: str,
+    sources_register_text: str,
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
@@ -377,6 +385,7 @@ Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
 Arbeite streng, konservativ, produktionsnah und redaktionell anspruchsvoll.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
+Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Liefere nur neue Delta-Kandidaten.
 Im Automationsmodus gilt:
 - nur FINAL
@@ -386,16 +395,20 @@ Im Automationsmodus gilt:
 - keine Kommentare
 
 Wichtig:
-Nicht jeder formal korrekte Termin ist FINAL-tauglich.
-FINAL bedeutet hier:
-- formal belastbar
-- und zugleich redaktionell stark genug für die Kuratierungs-PWA
+- Nicht jeder formal korrekte Termin ist FINAL-tauglich.
+- FINAL bedeutet hier: formal belastbar und zugleich redaktionell stark genug für die Kuratierungs-PWA.
+- Das Quellenregister ist keine starre Whitelist.
+- Gute neue Quellen außerhalb des Registers bleiben erlaubt, wenn sie das Regelwerk erfüllen.
 """.strip()
 
     user_prompt = f"""
 [REGELWERK]
 {rulebook_text}
 [/REGELWERK]
+
+[QUELLENREGISTER]
+{sources_register_text}
+[/QUELLENREGISTER]
 
 [AUFGABE]
 Simuliere den späteren automatisierten Suchlauf für Bocholt erleben so nah wie möglich.
@@ -409,6 +422,19 @@ Rahmen:
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
+Operative Quellensteuerung:
+- Nutze das Quellenregister als Gewichtung, nicht als harte Whitelist
+- Prüfe zuerst CORE-HIGH
+- danach CORE-MID
+- danach RECOVERY gezielt
+- führe DISCOVERY-SEED aktiv ergänzend mit
+- halte DISCOVERY-OPEN ausdrücklich offen
+- LOW-VALUE nicht aktiv priorisieren
+- EXCLUDE / GESPERRT nicht aktiv als Quelle nutzen
+- Gute neue Quellen außerhalb des Registers bleiben erlaubt, wenn sie regelkonforme starke Kandidaten liefern
+- DISCOVERY darf nicht auf null gesetzt werden
+- Ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
+
 Suchsteuerung:
 - Arbeite mit drei Suchrichtungen:
   1. CORE
@@ -420,8 +446,6 @@ Suchsteuerung:
   - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
 - Nutze DISCOVERY zusätzlich, aber nicht als Ersatz für fehlende CORE-Abdeckung
 - Arbeite nicht als starre Closed-Whitelist
-- Achte auf gesunden Quellenmix; ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
-- Discovery darf nicht vollständig auf null gesetzt werden
 - Maximal 2 FINAL-Kandidaten pro Quelle
 - Nur wenn eine Quelle außergewöhnlich stark ist und kein besserer Mix verfügbar ist, maximal 3
 - Verwende die verbleibende Quote nicht für schwache Restkandidaten
@@ -449,6 +473,50 @@ Harte Prüfregeln vor FINAL:
 - Wenn Scope unklar ist: nicht ausgeben
 - Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben
 - Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben
+
+Redaktionelle Qualitäts-Schwelle für FINAL:
+Ein Kandidat ist nur dann FINAL-tauglich, wenn er nicht nur formal korrekt ist, sondern auch einen klaren Mehrwert für die Kuratierungs-PWA hat.
+
+Nicht ausreichend für FINAL ist ein Termin, wenn er hauptsächlich:
+- formal korrekt, aber für normale Nutzer nur schwach interessant ist
+- sehr speziell, nischig oder kleinteilig wirkt
+- eher wie ein interner, edukativer oder halbgeschlossener Spezialtermin wirkt
+- eher wie eine Vorschau-, Programm- oder Hintergrundseite ohne starken Event-Zug wirkt
+- eher eine Dauer-/Ausstellungspräsenz als ein wirklich starker Event-Kandidat ist
+- eher eine kleine Kurs-, Workshop-, Resilienz-, Seminar- oder Mitmach-Einheit mit begrenztem Breiteninteresse ist
+- eher eine Innenstadt-/Marketing-/Shopping-Aktion ohne klar starken Eventcharakter ist
+
+Besonders streng behandeln:
+- länger laufende Ausstellungen
+- Vorschau-/Museumseinträge
+- Kurse
+- Workshops
+- Resilienz-, Bildungs- oder Spezialformate
+- kleine Ferienprogramme
+- Innenstadtaktionen
+- Handels- und Promotionsformate
+
+Solche Fälle nur dann FINAL, wenn zusätzlich mindestens einer dieser Punkte klar erfüllt ist:
+- hohe öffentliche Relevanz für Bocholt oder den Nahraum
+- klarer Eventcharakter mit starkem Besuchsanlass
+- außergewöhnlich hoher PWA-Nutzen
+- deutliche Breitenattraktivität
+- besondere lokale Relevanz oder Stadtbedeutung
+- starkes öffentliches Programm statt bloßer Hintergrund-/Informationsseite
+
+Bevorzugt in FINAL:
+- Stadtfeste
+- Märkte
+- Festivals
+- Konzerte
+- Theater / Bühne
+- familienrelevante Großtermine
+- Innenstadtfeste mit klarem Programm
+- Messen mit klarer Besucherrelevanz
+- Open-Air-Events
+- besondere Aktionstage / Tage der offenen Tür / öffentlich starke Kulturtermine
+- klar sichtbare Highlights mit Bocholt- oder Nahraum-Relevanz
+
 Priorisierung:
 Priorisiere FINAL-Kandidaten nach:
 1. öffentlicher Relevanz
@@ -492,6 +560,7 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 - ist der Quellenmix gesund?
 - ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
+
 [KONTEXT_BUNDLE]
 {context_bundle}
 [/KONTEXT_BUNDLE]
@@ -769,9 +838,21 @@ def main() -> None:
     if not REGELWERK_PATH.exists():
         fail(f"Regelwerk fehlt: {REGELWERK_PATH}")
 
+    if not SOURCES_REGISTER_PATH.exists():
+        fail(f"Quellenregister fehlt: {SOURCES_REGISTER_PATH}")
+
     rulebook_text = REGELWERK_PATH.read_text(encoding="utf-8")
+    sources_register_text = SOURCES_REGISTER_PATH.read_text(encoding="utf-8")
+
     raw_candidates, response = search_with_openai(
-        build_messages(rulebook_text, events_records, inbox_records, archive_records, manual_records)
+        build_messages(
+            rulebook_text,
+            sources_register_text,
+            events_records,
+            inbox_records,
+            archive_records,
+            manual_records,
+        )
     )
 
     delta = filter_delta(raw_candidates, events_records, inbox_records, archive_records, manual_records)
