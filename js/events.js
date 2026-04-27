@@ -775,20 +775,42 @@ const createFeedPublishEntry = () => {
     later: "Später"
   };
 
-  const pickBucket = (day) => {
-    if (!day) return "later";
-    if (day.getTime() === today.getTime()) return "today";
-    if (hasThisWeek && day >= thisWeekStart && day <= thisWeekEnd) return "week";
-    if (day >= weekendStart && day <= weekendEnd) return "weekend";
-    if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
+  /* === BEGIN BLOCK: EVENT_FEED_BUCKET_RANGE_OVERLAP_V2 | Zweck: Feed-Gruppierung für Mehrtagesevents laufzeitbasiert machen, damit aktive Tage in passende Zeitgruppen fallen | Umfang: ersetzt pickBucket(day) und die Bucket-Zuweisung in renderList() === */
+  const getEventRange = (ev) => {
+    const start = parseISODateLocal(ev?.date);
+    if (!start) return null;
+
+    const endBase = ev?.endDate ? parseISODateLocal(ev.endDate) : new Date(start);
+    if (!endBase) return null;
+
+    const end = endOfDay(endBase);
+    if (end < start) return null;
+
+    return { start, end };
+  };
+
+  const overlaps = (range, start, end) => {
+    if (!range || !start || !end) return false;
+    return range.end >= start && range.start <= end;
+  };
+
+  const pickBucket = (ev) => {
+    const range = getEventRange(ev);
+    if (!range) return "later";
+
+    const todayEnd = endOfDay(today);
+    if (overlaps(range, today, todayEnd)) return "today";
+    if (hasThisWeek && overlaps(range, thisWeekStart, thisWeekEnd)) return "week";
+    if (overlaps(range, weekendStart, weekendEnd)) return "weekend";
+    if (overlaps(range, nextWeekStart, nextWeekEnd)) return "nextweek";
     return "later";
   };
 
   for (const ev of list) {
-    const day = toDay(ev);
-    const key = pickBucket(day);
+    const key = pickBucket(ev);
     buckets[key].push(ev);
   }
+  /* === END BLOCK: EVENT_FEED_BUCKET_RANGE_OVERLAP_V2 === */
 
   const order = ["today", "week", "weekend", "nextweek", "later"];
   const frag = document.createDocumentFragment();
