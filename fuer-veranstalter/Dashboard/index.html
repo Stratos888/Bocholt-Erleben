@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V1 | Zweck: definiert den SEO-/PWA-/Meta-Head für den minimalen Veranstalterbereich; Umfang: kompletter Head dieser Datei === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Veranstalterbereich | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Geschützter Veranstalterbereich für Status, Kontingent und zuletzt eingereichte Termine bei Bocholt erleben."
+  >
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="canonical" href="https://bocholt-erleben.de/veranstalter/">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#F3F2E6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V1 === -->
+</head>
+
+<body>
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_BODY_V1 | Zweck: rendert den kleinstmöglichen Veranstalterbereich mit Organizer-Identität, Kontingent und letzten Einreichungen; Umfang: kompletter Body dieser Datei === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--organizers" data-organizer-page="dashboard">
+    <header class="content-hero content-hero--panel">
+      <p class="content-kicker">Veranstalterbereich</p>
+      <h1 id="organizer-dashboard-title">Veranstalterbereich</h1>
+      <p class="content-lead" id="organizer-dashboard-lead">
+        Wir laden gerade deinen aktuellen Stand.
+      </p>
+      <p class="content-note" id="organizer-dashboard-note">
+        Sichtbar sind nur die wichtigsten Informationen zu Konto, Kontingent und letzten Einreichungen.
+      </p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
+          Neues Event einreichen
+        </a>
+      </div>
+    </header>
+
+    <section class="content-card content-card--primary" id="organizer-dashboard-auth-required" aria-labelledby="organizer-dashboard-auth-required-head" hidden>
+      <h2 id="organizer-dashboard-auth-required-head">Zugang erforderlich</h2>
+      <p>Für diesen Bereich wird ein gültiger Magic Link benötigt.</p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" href="/veranstalter/login/">
+          Zum Login
+        </a>
+      </div>
+    </section>
+
+    <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
+      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
+        <h2 id="organizer-dashboard-account-head">Konto</h2>
+        <p id="organizer-account-name">–</p>
+        <p id="organizer-account-email">–</p>
+        <p id="organizer-account-plan">–</p>
+      </section>
+
+      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
+        <h2 id="organizer-dashboard-quota-head">Verfügbares Kontingent</h2>
+        <p id="organizer-quota-period">–</p>
+        <p id="organizer-quota-summary">–</p>
+        <p id="organizer-quota-remaining">–</p>
+      </section>
+    </div>
+
+    <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
+      <h2 id="organizer-dashboard-submissions-head">Letzte Einreichungen</h2>
+      <nav class="content-links" id="organizer-dashboard-submissions-list"></nav>
+      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine Einreichungen vorhanden.</p>
+    </section>
+
+    <nav class="content-links" aria-label="Veranstalter-Navigation">
+      <a class="content-link" href="/veranstalter/login/">
+        <span class="content-link__label">Neuen Magic Link anfordern</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+      <a class="content-link" href="/events-veroeffentlichen/">
+        <span class="content-link__label">Zurück zu Event veröffentlichen</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
+  </main>
+
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-04-27-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V1 === -->
+</body>
+</html>
