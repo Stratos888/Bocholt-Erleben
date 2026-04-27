@@ -101,25 +101,28 @@ Folgeläufe dürfen **nur neue Delta-Kandidaten** liefern.
 
 ---
 
+<!-- === BEGIN BLOCK: BEDIENREGEL_NEUE_CHATS_PRODUKTION_ONLY_V2 | Zweck: neue Chat-Suchläufe auf Regelwerk plus Quellenregister und production-only Benchmark ausrichten | Umfang: ersetzt alte CORE/RECOVERY/DISCOVERY-Mischanweisung === -->
 ## Bedienregel für neue Chats
 
 Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese Dateien mitgegeben werden:
 
 - `bocholt-erleben_eventsuche_regelwerk_v3.md`
+- `eventsuche_quellenregister_v1.md`
 - `events.tsv` oder ersatzweise `data/events.json`
 - `inbox.tsv` bzw. `data/inbox.tsv`
 - `inbox_archive.tsv`
 - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Arbeite immer in drei Suchrichtungen: `CORE`, `RECOVERY` und `DISCOVERY`. Decke CORE zuerst systematisch ab, nutze RECOVERY gezielt für offizielle event-spezifische Endnutzer-Info-/News-Seiten sowie offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten und behalte zusätzlich einen offenen Discovery-Anteil bei. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk und das beigefügte Quellenregister. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Wenn der Lauf ein Weekly-Produktionslauf oder ein staging-naher Produktionsbenchmark ist, arbeite als reiner Produktionslauf: aktive Suche nur über `CORE-HIGH`, `CORE-MID` und `RECOVERY`. Suche `DISCOVERY-SEED` und `DISCOVERY-OPEN` nicht aktiv als Ergänzungspass. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Arbeite immer in drei Suchrichtungen: `CORE`, `RECOVERY` und `DISCOVERY`. Decke CORE zuerst systematisch ab. Nutze RECOVERY gezielt für offizielle event-spezifische Endnutzer-Info-/News-Seiten sowie offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten. Discovery-Quellen dürfen gefunden werden, müssen aber für FINAL auf offizieller oder gleichwertig event-spezifischer Quelle verifiziert werden. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
+> Nutze das beigefügte Regelwerk und das beigefügte Quellenregister. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Simuliere einen reinen Weekly-Produktionslauf: decke `CORE-HIGH`, `CORE-MID` und `RECOVERY` systematisch ab. Suche `DISCOVERY-SEED` und `DISCOVERY-OPEN` nicht aktiv. Nutze neue Quellen außerhalb des Registers nur dann, wenn sie bei der Verifikation eines ohnehin starken Produktionskandidaten auftauchen und alle Regelwerkskriterien erfüllen. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
 
 Wenn eine der Referenzdateien fehlt, soll vor dem Suchlauf klar darauf hingewiesen werden, dass für sauberes Dedupe zusätzlich noch der aktuelle Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Stand benötigt werden.
 
-Wenn zusätzlich eine operative Quellenliste oder ein aktueller `Sources`-Export mitgegeben wird, hat dieser für die Quellenauswahl Vorrang vor bloß impliziten Annahmen.
+Wenn zusätzlich eine operative Quellenliste, ein aktueller `Sources`-Export oder das Quellenregister mitgegeben wird, hat diese Quellensteuerung Vorrang vor bloß impliziten Annahmen.
+<!-- === END BLOCK: BEDIENREGEL_NEUE_CHATS_PRODUKTION_ONLY_V2 === -->
 
 ---
 
