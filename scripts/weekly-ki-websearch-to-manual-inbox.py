@@ -698,8 +698,20 @@ def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
     return out
 
 
+# === BEGIN BLOCK: LOCAL_FINAL_FIELD_VALIDATION_V2 | Zweck: lokale FINAL-Pflichtfeldprüfung an Regelwerk angleichen | Umfang: prüft alle verpflichtenden FINAL-Felder vor dem Schreiben in inbox_manual.json ===
 def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
-    required = ["title", "date", "city", "location", "source_name", "source_url"]
+    required = [
+        "title",
+        "date",
+        "city",
+        "location",
+        "kategorie_suggestion",
+        "url",
+        "description",
+        "source_name",
+        "source_url",
+        "notes",
+    ]
     if any(not norm(item.get(k, "")) for k in required):
         return False
 
@@ -713,6 +725,7 @@ def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
         return False
 
     return True
+# === END BLOCK: LOCAL_FINAL_FIELD_VALIDATION_V2 ===
 
 
 def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
