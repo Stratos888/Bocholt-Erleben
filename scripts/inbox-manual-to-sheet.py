@@ -1,4 +1,4 @@
-# === BEGIN BLOCK: MANUAL INBOX IMPORTER (JSON -> local TSV Inbox, curation-first) ===
+# === BEGIN BLOCK: MANUAL INBOX IMPORTER (JSON -> local TSV Inbox, curation-first) === 
 # Datei: scripts/inbox-manual-to-sheet.py
 # Zweck:
 # - Liest data/inbox_manual.json
