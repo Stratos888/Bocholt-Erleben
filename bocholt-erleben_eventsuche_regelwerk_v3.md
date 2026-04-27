@@ -588,33 +588,42 @@ Wenn `endDate` nicht belastbar belegt ist:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
+<!-- === BEGIN BLOCK: MEHRTAGES_INSTANZLOGIK_V2 | Zweck: zusammenhängende Mehrtagesevents, Tagesinstanzen und Slot-Instanzen eindeutig trennen | Umfang: ersetzt die bisherige Mehrtages-Unterscheidung und harte Instanzprüfung === -->
 ### Wichtige Unterscheidung bei Mehrtagesevents
 
 #### A. Ein zusammenhängendes Mehrtagesevent
-Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tagesinstanzen daraus macht, darf ein einzelner Mehrtageseintrag verwendet werden.
+Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tages-/Slot-Instanzen daraus macht, wird ein einzelner Mehrtageseintrag verwendet.
+
+Dann gilt:
+- `date` = erster Tag
+- `endDate` = letzter Tag
+- `description` beschreibt das gesamte Event
+- `time` nur setzen, wenn eine einheitliche Startzeit für das gesamte Event belastbar ist
+- bei unterschiedlichen Tageszeiten oder Öffnungszeiten bleibt `time` leer
+
+Unterschiedliche tägliche Öffnungszeiten oder Tageszeiten machen ein zusammenhängendes Mehrtagesevent **nicht automatisch** zu mehreren FINAL-Einträgen.
 
 #### B. Tages- oder slotbezogene Einzelinstanzen
-Wenn die Quelle pro Tag oder pro Slot unterschiedliche, eigenständige besuchbare Programmpunkte oder klar verschiedene Startblöcke nennt, dann gilt:
+Wenn die Quelle pro Tag, Slot oder Programmpunkt eigenständige separat besuchbare Instanzen ausweist, dann gilt:
 
 - **nicht** als ein Sammel-Eintrag zusammenziehen
 - stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
+- pro Eintrag nur die konkret belegte Startzeit als `HH:MM` setzen
 
 Das gilt besonders, wenn:
-- pro Tag unterschiedliche Startzeiten genannt werden
 - Programmpunkte klar getrennt sind
-- Jugend-/Familien-/Abend-/Seniorenblöcke o. ä. separat ausgewiesen sind
-- ein Nutzer realistisch einzelne Blöcke separat besuchen würde
+- unterschiedliche Zielgruppenblöcke separat ausgewiesen sind
+- mehrere Läufe / Slots / Startzeiten separat buchbar oder separat besuchbar sind
+- ein Nutzer realistisch einzelne Blöcke separat auswählt
 
 ### Harte Instanzprüfung vor FINAL
 Für FINAL gilt zwingend:
 
-- **ein Eintrag = genau eine besuchbare Instanz**
-
-Wenn eine Quelle mehrere konkrete Tage oder Blöcke mit jeweils eigener Zeit nennt, dann ist ein Sammel-Eintrag **nicht FINAL-fähig**.
-
-Dann gilt nur:
-- sauber in einzelne Instanzen aufteilen
-- oder, wenn das nicht belastbar modellierbar ist: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
+- ein Eintrag muss fachlich eindeutig modelliert sein
+- zusammenhängendes Mehrtagesevent = ein Eintrag mit `date` / `endDate`
+- eigenständige Tages-/Slot-Instanz = eigener Eintrag
+- bei Unsicherheit: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
+<!-- === END BLOCK: MEHRTAGES_INSTANZLOGIK_V2 === -->
 
 ### Mehrtermin-Seiten mit sichtbarer Einzelinstanz
 Wenn eine Seite mehrere Termine desselben Formats enthält, ist das **kein automatischer Ausschluss**.
@@ -637,30 +646,39 @@ Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
 
 ## 12. Zeit-Regel
 
+<!-- === BEGIN BLOCK: TIME_FIELD_FORMAT_RULE_V2 | Zweck: time eindeutig als Startzeit definieren und Zeitspannen ausschließen | Umfang: ersetzt allgemeine Zeit-Regel === -->
 ### Allgemein
-`time` darf nur eingetragen werden, wenn die Quelle die Uhrzeit klar und eindeutig nennt.
+`time` darf nur eingetragen werden, wenn die Quelle eine Startzeit klar und eindeutig nennt.
+
+Format:
+- erlaubt: `HH:MM`
+- nicht erlaubt: Zeiträume wie `16:00–23:59`
+- nicht erlaubt: Öffnungszeiten als Zeitspanne
+- nicht erlaubt: Einlass, Warm-up oder sonstige Nebenzeiten als Startzeit
 
 Dabei exakt unterscheiden:
-- Beginn
+- Beginn / Startzeit
 - Einlass
 - Warm-up
 - Veranstaltungszeitraum
 - Öffnungszeiten
 
-Wenn mehrere Zeitangaben existieren, nur die **für die konkrete Instanz relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
-
 Keine Zeit raten.  
 Keine Zeit aus ähnlichen Events übernehmen.
+<!-- === END BLOCK: TIME_FIELD_FORMAT_RULE_V2 === -->
 
-### Mehrtages-Event mit einheitlicher Zeit
-Wenn die Quelle eine **einheitliche Zeitangabe** für das gesamte Mehrtagesevent nennt:
-- `time` darf gesetzt werden
+<!-- === BEGIN BLOCK: MEHRTAGES_TIME_RULE_V2 | Zweck: Zeitregel für zusammenhängende Mehrtagesevents und Tages-/Slot-Instanzen konsolidieren | Umfang: ersetzt Mehrtages-Zeitregel === -->
+### Mehrtages-Event mit einheitlicher Startzeit
+Wenn die Quelle eine **einheitliche Startzeit** für das gesamte zusammenhängende Mehrtagesevent nennt:
+- `time` darf als `HH:MM` gesetzt werden
 
 ### Mehrtages-Event mit unterschiedlichen Tageszeiten
 Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt, dann gilt:
 
-- wenn die Tage oder Blöcke als eigenständige besuchbare Instanzen verstanden werden können: **pro Tag / Block eigener Eintrag**
-- wenn das Event als zusammenhängendes Format dargestellt wird und die Zeitlogik nicht sinnvoll instanzbasiert auflösbar ist: `time` leer lassen
+- wenn die Tage oder Blöcke als eigenständige separat besuchbare Instanzen verstanden werden können: **pro Tag / Block eigener Eintrag**
+- wenn das Event als zusammenhängendes Format dargestellt wird und die Tage nicht als eigenständige Instanzen modelliert werden sollen: **ein Mehrtageseintrag mit `date` und `endDate`, aber `time` leer**
+- keine einzelne Tageszeit darf stellvertretend als allgemeine `time` für das gesamte Mehrtagesevent gesetzt werden
+<!-- === END BLOCK: MEHRTAGES_TIME_RULE_V2 === -->
 
 ### Öffnungszeiten vs. Event-Startzeit
 Öffnungszeiten dürfen nicht mit einer Startzeit verwechselt werden.
