@@ -290,6 +290,7 @@ Nicht übernehmen:
 
 ---
 
+<!-- === BEGIN BLOCK: QUELLENKLASSIFIKATION_PRODUKTION_DISCOVERY_TRENNUNG_V1 | Zweck: Suchrichtungen in Weekly-Produktion und separate Quellen-Discovery trennen | Umfang: ersetzt die bisherige Drei-Suchrichtungen-Pflicht für jeden Lauf === -->
 ## 6A. Quellenklassifikation und Suchrichtungen
 
 ### Grundregel
@@ -297,71 +298,68 @@ Die KI-Suche arbeitet **nicht** als starre Closed-Whitelist.
 
 Stattdessen gilt:
 - bekannte starke Quellen aktiv mitnehmen
-- zusätzlich gezielt offizielle event-spezifische Recovery-Quellen nutzen
-- außerdem offen nach neuen passenden Quellen suchen
+- gezielt offizielle event-spezifische Recovery-Quellen nutzen
+- neue gute Quellen außerhalb des Registers nicht pauschal ausschließen
+- Weekly-Produktion und Quellen-Discovery logisch trennen
 
-### Verbindliche Suchrichtungen
-Jeder Suchlauf soll in **drei Suchrichtungen** gedacht werden:
+### Zwei getrennte Arbeitsarten
 
-1. **CORE**
-2. **RECOVERY**
-3. **DISCOVERY**
+#### A. Weekly-Produktionslauf
+Der Weekly-Produktionslauf ist ein reiner Produktionslauf.
 
-### Suchrichtung A – CORE
-CORE umfasst bekannte, belastbare, strategisch unkritische Quellen mit hohem Ertrag.
-
-Regel:
-- CORE-Quellen bilden das stabile Grundrauschen der Suche
-- sie sollen aktiv und regelmäßig geprüft werden
-- bevorzugt zuerst offizielle und neutrale Quellen mit hoher Relevanz im Suchgebiet
-
-### Suchrichtung B – RECOVERY
-RECOVERY umfasst Quellen und Seitentypen, die nicht immer klassische Event-Detailseiten sind, aber für Recall wichtig sind, wenn sie belastbare Einzelinstanzen liefern.
-
-Dazu zählen:
-- offizielle event-spezifische Endnutzer-Info-/News-Seiten
-- offizielle klar trennbare Eventblöcke auf Programm-, Saison- oder Übersichtsseiten
+Aktiv genutzt werden:
+1. **CORE-HIGH**
+2. **CORE-MID**
+3. **RECOVERY**
 
 Regel:
-- RECOVERY ist ausdrücklich erlaubt
-- RECOVERY darf gute Events retten, die sonst durch zu strenge Detailseitenlogik verloren gehen würden
-- RECOVERY ist kein Freifahrtschein für generische Übersichtsseiten
+- CORE-HIGH zuerst systematisch prüfen
+- danach CORE-MID streng nach Relevanz und Breiteninteresse prüfen
+- danach RECOVERY gezielt nutzen
+- keine aktive Suche über DISCOVERY-SEED
+- keine aktive Suche über DISCOVERY-OPEN
+- kein Discovery-Ergänzungspass zur künstlichen Auffüllung
 
-### Suchrichtung C – DISCOVERY
-DISCOVERY umfasst neue, bisher nicht klassifizierte Quellen im Suchgebiet.
+#### B. Quellen-Discovery
+Quellen-Discovery ist ein separater Arbeitsmodus.
 
-Regel:
-- DISCOVERY ist ausdrücklich erlaubt und gewünscht
-- neue Quellen dürfen gefunden und für einzelne Events genutzt werden, wenn alle übrigen Qualitätsregeln erfüllt sind
-- neue Quellen dürfen aber nicht automatisch dauerhaft als Normalquelle behandelt werden
-- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE übernommen werden
+Ziel:
+- neue Quellen finden
+- neue Quellen bewerten
+- Quellenregister verbessern
+- wiederholt starke Quellen bewusst hochstufen
+
+Quellen-Discovery darf offen arbeiten:
+- DISCOVERY-SEED
+- DISCOVERY-OPEN
+- neue bisher nicht klassifizierte Quellen im Suchgebiet
+
+Aber:
+- neue Quellen werden nicht automatisch dauerhaft als Normalquelle behandelt
+- eine neue Quelle wird erst nach Bewertung bewusst in `RECOVERY`, `CORE-MID` oder `CORE-HIGH` übernommen
+- Quellen-Discovery ist nicht dazu da, dem Weekly-Produktionslauf hinten einzelne Rest-Events anzuhängen
 
 ### Harte Regel gegen Closed-Whitelist-Verengung
-Die KI-Suche darf **nicht** nur bekannte Quellen mechanisch abarbeiten.
+Auch der Weekly-Produktionslauf ist keine starre Closed-Whitelist.
 
-Regel:
-- bekannte Quellen aktiv nutzen
-- aber immer zusätzlich offen für neue passende Quellen im Suchgebiet bleiben
+Das heißt:
+- Das Quellenregister steuert Priorität und Suchrichtung.
+- Gute neue Quellen außerhalb des Registers sind nicht verboten.
+- Im Weekly-Produktionslauf werden sie aber nicht aktiv als Discovery-Hauptmodus gesucht.
+- Wenn eine neue Quelle bei der Verifikation eines ohnehin starken Produktionskandidaten auftaucht und alle Regeln erfüllt, darf sie genutzt werden.
+- Wenn die Quelle selbst der eigentliche Fund ist, gehört sie in den separaten Quellen-Discovery-Modus.
 
-### Zielbild
-Als Zielbild gilt:
-- CORE zuerst systematisch abdecken
-- danach RECOVERY gezielt nutzen
-- zusätzlich DISCOVERY offen mitführen
-
-Wichtig:
-- DISCOVERY darf nicht vollständig auf null gesetzt werden
-- ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
-
-### Operative Startpunkte für die Suche
+### Operative Startpunkte für die Weekly-Produktion
 CORE zuerst aktiv prüfen:
 - offizielle Veranstaltungs- und Kulturkalender der Städte im Suchgebiet
 - offizielle Seiten größerer Kulturhäuser, Theater, Museen und Musikschulen im Suchgebiet
 - alle bereits im aktuellen Projektbestand etablierten neutralen oder offiziellen Quellen
+- alle im Quellenregister als `CORE-HIGH`, `CORE-MID` oder `RECOVERY` klassifizierten Quellen
 
 Wichtig:
 - dies ist **keine exklusive Whitelist**
-- es definiert nur den verpflichtenden stabilen Startpunkt der Suche
+- es definiert den stabilen Startpunkt und Suchrahmen des Weekly-Produktionslaufs
+<!-- === END BLOCK: QUELLENKLASSIFIKATION_PRODUKTION_DISCOVERY_TRENNUNG_V1 === -->
 
 ## 7. URL-Regel
 Bevorzugt ist **eine event-spezifische Detailseite**.
@@ -742,6 +740,7 @@ Besonders wichtig:
 
 ---
 
+<!-- === BEGIN BLOCK: SUCHABDECKUNG_PRODUKTION_ONLY_V1 | Zweck: Suchabdeckung auf Weekly-Produktion ohne aktive Discovery konsolidieren | Umfang: ersetzt CORE/RECOVERY/DISCOVERY-Mischlogik durch production-only Abdeckung plus separate Quellen-Discovery === -->
 ## 15. Suchabdeckung und Priorisierung
 
 ### Ziel
@@ -750,23 +749,32 @@ Die Suche soll nicht nur präzise, sondern auch **möglichst vollständig** sein
 Das heißt:
 - möglichst alle guten, belastbaren Events im Suchgebiet finden
 - aber nur dann übernehmen, wenn sie regelkonform und belastbar sind
+- im Weekly-Produktionslauf keine künstliche Auffüllung mit schwachen Restkandidaten
 
-### Suchabdeckung
-Ein qualitativ guter Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen.
+### Suchabdeckung im Weekly-Produktionslauf
+Ein qualitativ guter Weekly-Produktionslauf soll die starken bekannten und bewusst gewichteten Suchbereiche systematisch abdecken.
 
-Die Suche soll möglichst drei Suchrichtungen abdecken:
+Aktiv zu prüfen sind:
 
-1. **CORE**
-   - offizielle kommunale / öffentliche Veranstaltungskalender
-   - offizielle Stadt-, Kultur-, Tourismus- oder Institutionsseiten
+1. **CORE-HIGH**
+   - wiederholt starke, offizielle oder neutrale Quellen
+   - hoher PWA-Nutzen
+   - hohe Trefferqualität
 
-2. **RECOVERY**
+2. **CORE-MID**
+   - regelmäßig brauchbare Quellen
+   - streng nach Breiteninteresse und PWA-Nutzen filtern
+
+3. **RECOVERY**
    - offizielle event-spezifische News-/Info-Seiten
    - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
+   - nur mit sauberer Instanz-, URL-, Datums- und Besucherfokus-Prüfung
 
-3. **DISCOVERY**
-   - zusätzliche belastbare, neue oder weniger offensichtliche Quellen im Radius
-   - nur wenn sie den Qualitäts- und Monetarisierungsregeln entsprechen
+### Quellen-Discovery
+`DISCOVERY-SEED` und `DISCOVERY-OPEN` sind für Quellen-Discovery weiterhin zulässig, aber nicht als aktiver Hauptsuchmodus im Weekly-Produktionslauf.
+
+Gute neue Quellen außerhalb des Registers bleiben grundsätzlich erlaubt.  
+Sie sollen jedoch separat bewertet und bei wiederholter Qualität bewusst ins Quellenregister hochgestuft werden.
 
 ### Priorisierung
 Bevorzugt aufnehmen:
@@ -785,6 +793,7 @@ Eher zurückstellen oder nur nachrangig aufnehmen:
 - stark kommerzielle Einzelpromo
 - sehr nischige Spezialfälle mit geringem PWA-Nutzen
 - einseitige Mehrfachausbeute aus derselben Quelle, wenn gleichzeitig stärkere Alternativen verfügbar sind
+<!-- === END BLOCK: SUCHABDECKUNG_PRODUKTION_ONLY_V1 === -->
 
 ## 16. Kandidaten-Schema für `data/inbox_manual.json`
 
@@ -1002,12 +1011,14 @@ Im **Automationsmodus** entfällt dieser Ausgabehinweis vollständig.
 
 ---
 
+<!-- === BEGIN BLOCK: WOCHENROUTINE_PRODUKTION_DISCOVERY_TRENNUNG_V1 | Zweck: Weekly-Produktion und Quellen-Discovery operativ trennen | Umfang: ersetzt die Automationsroutine durch production-only Logik plus separaten Discovery-Modus === -->
 ## 23. Wöchentliche Arbeitsroutine
 
 ### A. Manuell im Chat
 1. Neues Chat-Fenster öffnen
 2. Diese Dateien mitgeben:
    - `bocholt-erleben_eventsuche_regelwerk_v3.md`
+   - `eventsuche_quellenregister_v1.md`
    - `events.tsv` oder ersatzweise `data/events.json`
    - `inbox.tsv` bzw. `data/inbox.tsv`
    - `inbox_archive.tsv`
@@ -1022,12 +1033,30 @@ Im **Automationsmodus** entfällt dieser Ausgabehinweis vollständig.
 7. Inbox Review PWA vollständig kuratieren
 8. Vor dem nächsten Suchlauf wieder gegen den aktuellen Bestand, die offene Inbox, das Archiv und ggf. `data/inbox_manual.json` dedupen
 
-### B. Automationslauf
-1. Regelwerk + aktuelle Referenzdaten werden automatisch geladen
-2. Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen
-3. Ausgabe enthält ausschließlich FINAL-JSON
-4. JSON wird nach `data/inbox_manual.json` geschrieben
-5. Danach folgt der bestehende Intake-/Review-Prozess
+### B. Automationslauf / Weekly-Produktionslauf
+1. Regelwerk, Quellenregister und aktuelle Referenzdaten werden automatisch geladen.
+2. Der Weekly-Lauf ist ein reiner Produktionslauf.
+3. Aktive Quellensteuerung im Weekly-Lauf:
+   - `CORE-HIGH`
+   - `CORE-MID`
+   - `RECOVERY`
+4. `DISCOVERY-SEED` und `DISCOVERY-OPEN` werden im Weekly-Produktionslauf nicht aktiv gesucht.
+5. Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen.
+6. Ausgabe enthält ausschließlich FINAL-JSON.
+7. JSON wird nach `data/inbox_manual.json` geschrieben.
+8. Danach folgt der bestehende Intake-/Review-Prozess.
+
+### C. Quellen-Discovery separat
+Quellen-Discovery ist ein eigener Arbeitsmodus.
+
+Ziel:
+- neue Quellen finden
+- neue Quellen bewerten
+- Quellenregister verbessern
+- starke Quellen später bewusst hochstufen
+
+Quellen-Discovery dient nicht dazu, dem Weekly-Produktionslauf hinten zusätzliche Eventtreffer anzuhängen.
+<!-- === END BLOCK: WOCHENROUTINE_PRODUKTION_DISCOVERY_TRENNUNG_V1 === -->
 
 ---
 
