@@ -8,12 +8,16 @@ Wichtig:
 - Es schließt gute neue Quellen **nicht** aus
 - Es dient nur der **operativen Steuerung und Gewichtung** der Suche
 
+<!-- === BEGIN BLOCK: QUELLENREGISTER_GRUNDPRINZIP_PRODUKTION_ONLY_V1 | Zweck: Grundprinzip auf Weekly-Produktion ohne aktive Discovery ausrichten | Umfang: ersetzt alte Discovery-immer-offen-Regel === -->
 Grundprinzip:
-- CORE zuerst systematisch prüfen
-- RECOVERY gezielt danach prüfen
-- DISCOVERY immer offen mitführen
+- Weekly-Produktionslauf: CORE-HIGH zuerst systematisch prüfen
+- danach CORE-MID streng priorisiert prüfen
+- danach RECOVERY gezielt prüfen
+- DISCOVERY-SEED und DISCOVERY-OPEN nicht aktiv im Weekly-Produktionslauf suchen
+- Quellen-Discovery als separaten Arbeitsmodus behandeln
 - LOW-VALUE nicht aktiv priorisieren
 - EXCLUDE / GESPERRT nicht aktiv als Quelle nutzen
+<!-- === END BLOCK: QUELLENREGISTER_GRUNDPRINZIP_PRODUKTION_ONLY_V1 === -->
 
 ---
 
@@ -42,18 +46,23 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 
 ---
 
+<!-- === BEGIN BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_V1 | Zweck: Grundregeln an production-only Weekly-Lauf anpassen | Umfang: ersetzt Discovery-darf-nicht-null-Regel durch getrennte Produktions- und Discovery-Logik === -->
 ## Grundregeln für die Nutzung
 
 1. Dieses Register ersetzt **nicht** das Regelwerk.
 2. Gute neue Quellen außerhalb des Registers bleiben erlaubt.
-3. DISCOVERY darf nicht auf null gesetzt werden.
+3. FINAL entscheidet immer das Regelwerk, nicht dieses Register.
 4. Eine Quelle wird nicht wegen ihres Status automatisch FINAL-fähig.
-5. FINAL entscheidet immer das Regelwerk, nicht dieses Register.
-6. Dieses Register steuert nur:
+5. Im Weekly-Produktionslauf wird aktiv nur über `CORE-HIGH`, `CORE-MID` und `RECOVERY` gesucht.
+6. `DISCOVERY-SEED` und `DISCOVERY-OPEN` werden im Weekly-Produktionslauf nicht aktiv als Suchmodus genutzt.
+7. Für separate Quellen-Discovery-Läufe bleiben `DISCOVERY-SEED`, `DISCOVERY-OPEN` und neue Quellen außerhalb des Registers zulässig.
+8. Dieses Register steuert:
    - wo zuerst gesucht wird
    - wo Recovery sinnvoll ist
    - welche Quellen eher wenig bringen
    - welche Quellen nicht aktiv benutzt werden sollen
+   - welche Quellen separat für Discovery beobachtet werden können
+<!-- === END BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_V1 === -->
 
 ---
 
@@ -371,14 +380,24 @@ behandelt, nicht sofort als CORE.
 
 ---
 
+<!-- === BEGIN BLOCK: OPERATIVE_NUTZUNG_PRODUKTION_ONLY_V1 | Zweck: Register-Nutzung für Weekly-Produktion und separate Quellen-Discovery trennen | Umfang: ersetzt die bisherige Discovery-immer-mitführen-Regel === -->
 ## Operative Nutzung für die nächsten Testläufe
 
+### Weekly-Produktionslauf
 1. CORE-HIGH immer zuerst aktiv prüfen
-2. danach CORE-MID
-3. dann RECOVERY gezielt
-4. DISCOVERY immer offen mitführen
-5. LOW-VALUE nicht aktiv priorisieren
-6. EXCLUDE / GESPERRT nicht aktiv als Quelle verwenden
+2. danach CORE-MID streng priorisiert prüfen
+3. dann RECOVERY gezielt prüfen
+4. DISCOVERY-SEED nicht aktiv als Weekly-Suchmodus nutzen
+5. DISCOVERY-OPEN nicht aktiv als Weekly-Suchmodus nutzen
+6. LOW-VALUE nicht aktiv priorisieren
+7. EXCLUDE / GESPERRT nicht aktiv als Quelle verwenden
+
+### Quellen-Discovery
+Für separate Quellen-Discovery-Läufe bleiben erlaubt:
+- DISCOVERY-SEED
+- DISCOVERY-OPEN
+- neue gute Quellen außerhalb des Registers
 
 Wichtig:
-Dieses Register soll die Suche systematischer machen, aber neue gute Quellen nicht ausschließen.
+Dieses Register soll die Weekly-Produktion systematischer machen, ohne gute neue Quellen grundsätzlich auszuschließen. Neue Quellen werden aber separat entdeckt, bewertet und erst danach bewusst hochgestuft.
+<!-- === END BLOCK: OPERATIVE_NUTZUNG_PRODUKTION_ONLY_V1 === -->
