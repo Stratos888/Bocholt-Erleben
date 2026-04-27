@@ -56,6 +56,15 @@ MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "40"))
 SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "180"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
+PRODUCTION_PASS_MAX = max(
+    1,
+    min(MAX_NEW_CANDIDATES, int(os.environ.get("PRODUCTION_PASS_MAX", str(max(1, MAX_NEW_CANDIDATES - 2))))),
+)
+DISCOVERY_PASS_MAX = max(
+    0,
+    min(MAX_NEW_CANDIDATES, int(os.environ.get("DISCOVERY_PASS_MAX", "2"))),
+)
+
 FAIL_ON_PENDING_INBOX = os.environ.get("FAIL_ON_PENDING_INBOX", "true").lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
 
@@ -337,7 +346,7 @@ def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
 def build_manifest(label: str, records: List[RefRecord], start: date, end: date) -> str:
     lines = [f"[{label}]"]
     for rec in records:
-        if not rec.date or not date_in_window(rec.date, start, end):
+        if rec.date and not date_in_window(rec.date, start, end):
             continue
         lines.append(
             " | ".join(
@@ -359,6 +368,29 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
+def build_candidate_manifest(label: str, candidates: List[Dict[str, str]]) -> str:
+    lines = [f"[{label}]"]
+    if not candidates:
+        lines.append("<empty>")
+    else:
+        for item in candidates:
+            lines.append(
+                " | ".join(
+                    [
+                        f"title={norm(item.get('title', ''))}",
+                        f"date={norm(item.get('date', ''))}",
+                        f"time={norm(item.get('time', ''))}",
+                        f"city={norm(item.get('city', ''))}",
+                        f"location={norm(item.get('location', ''))}",
+                        f"source_url={canonical_url(item.get('source_url', ''))}",
+                        f"url={canonical_url(item.get('url', ''))}",
+                    ]
+                )
+            )
+    lines.append(f"[/{label}]")
+    return "\n".join(lines)
+
+
 def build_messages(
     rulebook_text: str,
     sources_register_text: str,
@@ -366,6 +398,9 @@ def build_messages(
     inbox_records: List[RefRecord],
     archive_records: List[RefRecord],
     manual_records: List[RefRecord],
+    pass_mode: str,
+    pass_limit: int,
+    prior_selected: List[Dict[str, str]],
 ) -> List[Dict[str, str]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
@@ -376,8 +411,36 @@ def build_messages(
             build_manifest("OFFENE_INBOX", inbox_records, start, end),
             build_manifest("ARCHIV", archive_records, start, end),
             build_manifest("MANUAL_JSON", manual_records, start, end),
+            build_candidate_manifest("PRIOR_SELECTED", prior_selected),
         ]
     )
+
+    if pass_mode == "production":
+        pass_title = "PASS 1 = PRODUKTION"
+        pass_instructions = f"""
+- Dies ist der Produktionspass.
+- Ziel: die stärksten stabilen FINAL-Kandidaten.
+- Nutze zuerst und aktiv:
+  - CORE-HIGH
+  - CORE-MID
+  - RECOVERY
+- DISCOVERY in diesem Pass nicht als Hauptsuchmodus verwenden.
+- Liefere höchstens {pass_limit} Kandidaten.
+- Bevorzuge starke Bocholt-/Nahraum-Highlights vor mittleren Regionaltreffern.
+- Wenn du zwischen einem starken städtischen Highlight und einem formal sauberen, aber schwächeren Spezialtermin wählen musst, nimm das Highlight.
+"""
+    else:
+        pass_title = "PASS 2 = DISCOVERY-ERGÄNZUNG"
+        pass_instructions = f"""
+- Dies ist der Discovery-Ergänzungspass.
+- PRIOR_SELECTED enthält die bereits aus PASS 1 ausgewählten Produktionskandidaten.
+- Suche jetzt offen ergänzend über DISCOVERY-SEED und DISCOVERY-OPEN.
+- Gute neue Quellen außerhalb des Registers bleiben erlaubt.
+- Nutze diesen Pass nicht für schwache Restkandidaten.
+- Liefere nur Kandidaten, die die Produktionsauswahl sinnvoll ergänzen und klar stark genug sind.
+- Wenn keine klar starken Discovery-Ergänzungen vorhanden sind, liefere weniger oder keine Kandidaten.
+- Liefere höchstens {pass_limit} Kandidaten.
+"""
 
     system_prompt = """
 Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
@@ -385,7 +448,7 @@ Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
 Arbeite streng, konservativ, produktionsnah und redaktionell anspruchsvoll.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
-Nutze das beigefügte Quellenregister als operative Quellensteuerung.
+Nutze das beigefügte Quellenregister als operative Quellensteuerung, nicht als starre Whitelist.
 Liefere nur neue Delta-Kandidaten.
 Im Automationsmodus gilt:
 - nur FINAL
@@ -397,8 +460,6 @@ Im Automationsmodus gilt:
 Wichtig:
 - Nicht jeder formal korrekte Termin ist FINAL-tauglich.
 - FINAL bedeutet hier: formal belastbar und zugleich redaktionell stark genug für die Kuratierungs-PWA.
-- Das Quellenregister ist keine starre Whitelist.
-- Gute neue Quellen außerhalb des Registers bleiben erlaubt, wenn sie das Regelwerk erfüllen.
 """.strip()
 
     user_prompt = f"""
@@ -410,45 +471,29 @@ Wichtig:
 {sources_register_text}
 [/QUELLENREGISTER]
 
+[PASS]
+{pass_title}
+[/PASS]
+
 [AUFGABE]
 Simuliere den späteren automatisierten Suchlauf für Bocholt erleben so nah wie möglich.
 
 Rahmen:
 - Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
 - Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis inklusive niederländischer Orte innerhalb dieses Radius
-- Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten
+- Liefere in diesem Pass höchstens {pass_limit} neue Delta-Kandidaten
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
-- Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
+- Deduped zusätzlich gegen PRIOR_SELECTED
+- Deduped zusätzlich innerhalb des aktuellen Passes gegen bereits ausgewählte Kandidaten
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
 Operative Quellensteuerung:
 - Nutze das Quellenregister als Gewichtung, nicht als harte Whitelist
-- Prüfe zuerst CORE-HIGH
-- danach CORE-MID
-- danach RECOVERY gezielt
-- führe DISCOVERY-SEED aktiv ergänzend mit
-- halte DISCOVERY-OPEN ausdrücklich offen
-- LOW-VALUE nicht aktiv priorisieren
-- EXCLUDE / GESPERRT nicht aktiv als Quelle nutzen
 - Gute neue Quellen außerhalb des Registers bleiben erlaubt, wenn sie regelkonforme starke Kandidaten liefern
 - DISCOVERY darf nicht auf null gesetzt werden
 - Ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
-
-Suchsteuerung:
-- Arbeite mit drei Suchrichtungen:
-  1. CORE
-  2. RECOVERY
-  3. DISCOVERY
-- Decke CORE zuerst systematisch ab
-- Nutze RECOVERY gezielt für:
-  - offizielle event-spezifische Endnutzer-Info-/News-Seiten
-  - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
-- Nutze DISCOVERY zusätzlich, aber nicht als Ersatz für fehlende CORE-Abdeckung
-- Arbeite nicht als starre Closed-Whitelist
-- Maximal 2 FINAL-Kandidaten pro Quelle
-- Nur wenn eine Quelle außergewöhnlich stark ist und kein besserer Mix verfügbar ist, maximal 3
-- Verwende die verbleibende Quote nicht für schwache Restkandidaten
+{pass_instructions}
 
 Recovery-Pass vor Verwerfen:
 Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv:
@@ -844,7 +889,8 @@ def main() -> None:
     rulebook_text = REGELWERK_PATH.read_text(encoding="utf-8")
     sources_register_text = SOURCES_REGISTER_PATH.read_text(encoding="utf-8")
 
-    raw_candidates, response = search_with_openai(
+    production_limit = min(MAX_NEW_CANDIDATES, PRODUCTION_PASS_MAX)
+    production_raw, production_response = search_with_openai(
         build_messages(
             rulebook_text,
             sources_register_text,
@@ -852,18 +898,79 @@ def main() -> None:
             inbox_records,
             archive_records,
             manual_records,
+            "production",
+            production_limit,
+            [],
         )
     )
+    production_delta = filter_delta(
+        production_raw,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )[:production_limit]
 
-    delta = filter_delta(raw_candidates, events_records, inbox_records, archive_records, manual_records)
+    production_records = [
+        RefRecord(
+            norm(item.get("title", "")),
+            norm(item.get("date", "")),
+            norm(item.get("time", "")),
+            norm(item.get("city", "")),
+            norm(item.get("location", "")),
+            canonical_url(item.get("url", "")),
+            canonical_url(item.get("source_url", "")),
+            "",
+        )
+        for item in production_delta
+    ]
+
+    remaining_slots = max(0, MAX_NEW_CANDIDATES - len(production_delta))
+    discovery_limit = min(remaining_slots, DISCOVERY_PASS_MAX)
+
+    discovery_delta: List[Dict[str, str]] = []
+    discovery_response = None
+
+    if discovery_limit > 0:
+        discovery_raw, discovery_response = search_with_openai(
+            build_messages(
+                rulebook_text,
+                sources_register_text,
+                events_records,
+                inbox_records,
+                archive_records,
+                manual_records + production_records,
+                "discovery",
+                discovery_limit,
+                production_delta,
+            )
+        )
+        discovery_delta = filter_delta(
+            discovery_raw,
+            events_records,
+            inbox_records,
+            archive_records,
+            manual_records + production_records,
+        )[:discovery_limit]
+
+    delta = (production_delta + discovery_delta)[:MAX_NEW_CANDIDATES]
 
     ensure_parent(MANUAL_JSON_PATH)
     MANUAL_JSON_PATH.write_text(json.dumps(delta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    source_urls = collect_response_sources(response)
+    source_urls = collect_response_sources(production_response)
+    if discovery_response is not None:
+        source_urls.extend(collect_response_sources(discovery_response))
+        source_urls = list(dict.fromkeys(source_urls))
+
     print(
         "WEEKLY KI EVENTSUCHE SUMMARY\n"
         f"- model: {OPENAI_MODEL}\n"
+        f"- max_new_candidates: {MAX_NEW_CANDIDATES}\n"
+        f"- production_pass_limit: {production_limit}\n"
+        f"- discovery_pass_limit: {discovery_limit}\n"
+        f"- production_selected: {len(production_delta)}\n"
+        f"- discovery_selected: {len(discovery_delta)}\n"
         f"- written_manual_json: {len(delta)}\n"
         f"- output_file: {MANUAL_JSON_PATH}\n"
         f"- cited_web_sources: {len(source_urls)}"
@@ -872,4 +979,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-# === END BLOCK: MAIN ENTRYPOINT ===
