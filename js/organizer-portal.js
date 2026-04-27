@@ -261,64 +261,139 @@
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
     const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
 
-    if (authRequiredCard) authRequiredCard.hidden = true;
+    if (authRequiredCard) {
+      authRequiredCard.hidden = true;
+      authRequiredCard.setAttribute("hidden", "");
+    }
     if (summaryGrid) summaryGrid.hidden = false;
     if (submissionsCard) submissionsCard.hidden = false;
 
     const organizer = data?.organizer || {};
     const quota = data?.quota || {};
+    const subscription = data?.subscription || null;
     const submissions = Array.isArray(data?.recent_submissions) ? data.recent_submissions : [];
+
+    const latestSubmission = submissions[0] || null;
+    const defaultPlanKey = safeText(organizer.default_plan_key).toLowerCase();
+    const isSingleStatusView =
+      defaultPlanKey === "single" &&
+      !subscription &&
+      !quota.has_unlimited;
+
+    const latestTitleText = latestSubmission
+      ? safeText(latestSubmission.title) || "Ohne Titel"
+      : "Noch keine Einreichung";
+    const latestStatusText = latestSubmission
+      ? formatStatusLabel(latestSubmission.status)
+      : "Noch kein Status";
+    const latestDateText = latestSubmission
+      ? formatDate(latestSubmission.start_date)
+      : "–";
+    const latestLocationText = latestSubmission
+      ? safeText(latestSubmission.location_name)
+      : "";
 
     const title = document.getElementById("organizer-dashboard-title");
     const lead = document.getElementById("organizer-dashboard-lead");
     const note = document.getElementById("organizer-dashboard-note");
+    const accountHead = document.getElementById("organizer-dashboard-account-head");
     const accountName = document.getElementById("organizer-account-name");
     const accountEmail = document.getElementById("organizer-account-email");
     const accountPlan = document.getElementById("organizer-account-plan");
+    const quotaHead = document.getElementById("organizer-dashboard-quota-head");
     const quotaPeriod = document.getElementById("organizer-quota-period");
     const quotaSummary = document.getElementById("organizer-quota-summary");
     const quotaRemaining = document.getElementById("organizer-quota-remaining");
+    const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
     const submissionsList = document.getElementById("organizer-dashboard-submissions-list");
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
 
     if (title) {
-      title.textContent = safeText(organizer.organization_name) || "Veranstalterbereich";
+      title.textContent = isSingleStatusView
+        ? "Deine Einreichungen im Blick."
+        : safeText(organizer.organization_name) || "Veranstalterbereich";
     }
 
     if (lead) {
       const email = safeText(organizer.email);
-      lead.textContent = email
-        ? `Eingeloggt für ${email}.`
-        : "Eingeloggt im Veranstalterbereich.";
+
+      if (isSingleStatusView) {
+        lead.textContent = latestSubmission
+          ? `${latestStatusText} · ${latestDateText}`
+          : (email ? `Verknüpft mit ${email}.` : "Statusübersicht für deine Einreichungen.");
+      } else {
+        lead.textContent = email
+          ? `Eingeloggt für ${email}.`
+          : "Eingeloggt im Veranstalterbereich.";
+      }
     }
 
     if (note) {
-      note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
+      const email = safeText(organizer.email);
+
+      if (isSingleStatusView) {
+        note.textContent = email
+          ? `Verknüpft mit ${email}. Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.`
+          : "Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.";
+      } else {
+        note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
+      }
+    }
+
+    if (accountHead) {
+      accountHead.textContent = isSingleStatusView ? "Letzter Stand" : "Veranstalter";
     }
 
     if (accountName) {
-      accountName.textContent = safeText(organizer.organization_name) || "–";
+      accountName.textContent = isSingleStatusView
+        ? latestTitleText
+        : safeText(organizer.organization_name) || "–";
     }
 
     if (accountEmail) {
-      accountEmail.textContent = safeText(organizer.email) || "–";
+      accountEmail.textContent = isSingleStatusView
+        ? `${latestStatusText} · ${latestDateText}`
+        : safeText(organizer.email) || "–";
     }
 
     if (accountPlan) {
-      const planLabel = formatPlanLabel(organizer.default_plan_key);
-      accountPlan.textContent = `Standardmodell: ${planLabel}`;
+      if (isSingleStatusView) {
+        accountPlan.textContent = latestLocationText
+          ? `Ort: ${latestLocationText}`
+          : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
+      } else {
+        const planLabel = formatPlanLabel(organizer.default_plan_key);
+        accountPlan.textContent = `Standardmodell: ${planLabel}`;
+      }
+    }
+
+    if (quotaHead) {
+      quotaHead.textContent = isSingleStatusView ? "Verfügbarkeit" : "Verfügbares Kontingent";
     }
 
     if (quotaPeriod) {
-      const start = formatDateTime(quota.current_period_start);
-      const end = formatDateTime(quota.current_period_end);
-      quotaPeriod.textContent = quota.current_period_start || quota.current_period_end
-        ? `Zeitraum: ${start} bis ${end}`
-        : "Zeitraum: aktuell kein aktiver Abo-Zeitraum";
+      if (isSingleStatusView) {
+        quotaPeriod.textContent = latestSubmission
+          ? `Termin: ${latestDateText}`
+          : "Einzeltermin";
+      } else {
+        const start = formatDateTime(quota.current_period_start);
+        const end = formatDateTime(quota.current_period_end);
+        quotaPeriod.textContent = quota.current_period_start || quota.current_period_end
+          ? `Zeitraum: ${start} bis ${end}`
+          : "Zeitraum: aktuell kein aktiver Abo-Zeitraum";
+      }
     }
 
     if (quotaSummary) {
-      if (quota.has_unlimited) {
+      if (isSingleStatusView) {
+        const includedTotal = Number(quota.included_total || 0);
+        const consumedTotal = Number(quota.consumed_total || 0);
+
+        quotaSummary.textContent = includedTotal === 0 && consumedTotal === 0
+          ? "Noch kein bezahlter Einzeltermin."
+          : `Einzeltermine: ${includedTotal} · verbraucht: ${consumedTotal}`;
+      } else if (quota.has_unlimited) {
         quotaSummary.textContent = `Kontingent: unbegrenzt · verbraucht: ${Number(quota.consumed_total || 0)}`;
       } else {
         quotaSummary.textContent = `Kontingent: ${Number(quota.included_total || 0)} · verbraucht: ${Number(quota.consumed_total || 0)}`;
@@ -326,9 +401,17 @@
     }
 
     if (quotaRemaining) {
-      quotaRemaining.textContent = quota.has_unlimited
-        ? "Verbleibend: unbegrenzt"
-        : `Verbleibend: ${Number(quota.remaining_total || 0)}`;
+      if (quota.has_unlimited) {
+        quotaRemaining.textContent = "Verbleibend: unbegrenzt";
+      } else if (isSingleStatusView) {
+        quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)}`;
+      } else {
+        quotaRemaining.textContent = `Verbleibend: ${Number(quota.remaining_total || 0)}`;
+      }
+    }
+
+    if (submissionsHead) {
+      submissionsHead.textContent = "Letzte Einreichungen";
     }
 
     if (submissionsList && submissionsEmpty) {
@@ -382,7 +465,11 @@
 
       if (summaryGrid) summaryGrid.hidden = true;
       if (submissionsCard) submissionsCard.hidden = true;
-      if (authRequiredCard) authRequiredCard.hidden = false;
+
+      if (authRequiredCard) {
+        authRequiredCard.hidden = false;
+        authRequiredCard.removeAttribute("hidden");
+      }
     }
   }
 
