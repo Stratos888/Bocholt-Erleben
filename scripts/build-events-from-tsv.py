@@ -30,7 +30,7 @@ OUT_JSON_PATH = ROOT / "data" / "events.json"
 
 RE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")  # slug-like
-RE_TIME = re.compile(r"^\s*(\d{1,2})[:.](\d{2})\s*$")
+RE_TIME = re.compile(r"^\s*(\d{1,2})[:.](\d{2})(?:\s*[-–]\s*(\d{1,2})[:.](\d{2}))?\s*$")
 
 CANONICAL_CATEGORIES = [
     "Märkte & Feste",
@@ -162,11 +162,13 @@ def validate_date(iso: str, rowno: int) -> None:
         fail(f"Zeile {rowno}: date ist kein gültiges Datum: {iso!r}")
 
 
+# === BEGIN BLOCK: BUILD_EVENTS_TIME_VALIDATION_LEGACY_COMPAT_V2 | Zweck: finale Events-TSV weiter mit bestehenden Zeitspannen kompatibel halten | Umfang: validiert Startzeit oder Zeitspanne im finalen Events-Build; Weekly-/Manual-Import bleibt davon unberührt ===
 def validate_time(t: str, rowno: int) -> None:
     if not t:
         return
     if not RE_TIME.match(t):
-        fail(f"Zeile {rowno}: time hat ein unerwartetes Format. Erlaubt ist nur eine Startzeit wie '19:30', keine Zeitspanne: {t!r}")
+        fail(f"Zeile {rowno}: time hat ein unerwartetes Format. Erlaubt sind z.B. '19:30' oder '19:30–22:00': {t!r}")
+# === END BLOCK: BUILD_EVENTS_TIME_VALIDATION_LEGACY_COMPAT_V2 ===
 
 def parse_time_minutes(t: str) -> Optional[int]:
     if not t:
