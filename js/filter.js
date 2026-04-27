@@ -1,4 +1,4 @@
-// BEGIN: FILE_HEADER_FILTER
+// BEGIN: FILE_HEADER_FILTER 
 // Datei: js/filter.js
 // Zweck:
 // - Zentrale Filter-Steuerung (Single Source of Truth)
