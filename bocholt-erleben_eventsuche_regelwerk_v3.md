@@ -1,4 +1,4 @@
-# Bocholt erleben – Regelwerk v3 für manuelle und automatisierte KI-Eventsuche
+# Bocholt erleben – Regelwerk v3 für manuelle und automatisierte KI-Eventsuche 
 
 ## Zweck
 Dieses Regelwerk dient für manuelle und automatisierte KI-Suchläufe, um neue, echte, veröffentlichungsreife Event-Kandidaten für **Bocholt erleben** zu finden.
