@@ -78,7 +78,7 @@ function opml_hash_token(string $token): string
 
 function opml_build_magic_link_url(string $baseUrl, string $token): string
 {
-    return $baseUrl . '/veranstalter/login/?token=' . rawurlencode($token);
+return $baseUrl . '/fuer-veranstalter/login/?token=' . rawurlencode($token);
 }
 
 try {
