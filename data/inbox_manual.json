@@ -1,1 +1,68 @@
-[]
+[
+  {
+    "title": "Tag der Architektur",
+    "date": "2026-06-27",
+    "endDate": "2026-06-28",
+    "time": "10:30",
+    "city": "Bocholt",
+    "location": "LernWerk Bocholt - Veranstaltungssaal",
+    "kategorie_suggestion": "Kultur & Kunst",
+    "url": "https://www.bocholt.de/veranstaltungskalender/tag-der-architektur",
+    "description": "Aktionstag im LernWerk Bocholt mit offener Besichtigung, Führungen und Ausstellung an zwei Tagen.",
+    "source_name": "Stadt Bocholt – Veranstaltungskalender",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/tag-der-architektur",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Familiensonntag im FARB - Internationaler Museumstag",
+    "date": "2026-05-17",
+    "time": "14:30",
+    "city": "Borken",
+    "location": "FARB",
+    "kategorie_suggestion": "Kinder & Familie",
+    "url": "https://farb.borken.de/farb/veranstaltungen/termine/event_41558.php",
+    "description": "Familiennachmittag im FARB mit Sonderführung, Mitmach-Angeboten und Museumscafé.",
+    "source_name": "FARB",
+    "source_url": "https://farb.borken.de/farb/veranstaltungen/termine/event_41558.php",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Kinoabend und Picknick",
+    "date": "2026-06-20",
+    "time": "18:00",
+    "city": "Borken",
+    "location": "Segelflugplatz Borken-Hoxfeld",
+    "kategorie_suggestion": "Kultur & Kunst",
+    "url": "https://farb.borken.de/farb/veranstaltungen/termine/event_44692.php",
+    "description": "Open-Air-Kino mit Picknickcharakter auf dem Segelflugplatz Borken-Hoxfeld im Rahmen der Picknicktage.",
+    "source_name": "FARB",
+    "source_url": "https://farb.borken.de/farb/veranstaltungen/termine/event_44692.php",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "17. International Fencing Camp Bocholt",
+    "date": "2026-08-16",
+    "endDate": "2026-08-23",
+    "city": "Bocholt",
+    "location": "Europahaus Bocholt",
+    "kategorie_suggestion": "Sport & Bewegung",
+    "url": "https://www.bocholt.de/veranstaltungskalender/17-international-fencing-camp-bocholt",
+    "description": "Internationales Fechtcamp im Europahaus Bocholt mit mehrtägigem Trainingsprogramm.",
+    "source_name": "Stadt Bocholt – Veranstaltungskalender",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/17-international-fencing-camp-bocholt",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Paulus - mit Ecken und Kanten",
+    "date": "2026-06-28",
+    "time": "17:00",
+    "city": "Bocholt",
+    "location": "Pfarrkirche St. Norbert",
+    "kategorie_suggestion": "Musik & Bühne",
+    "url": "https://www.bocholt.de/veranstaltungskalender/paulus-mit-ecken-und-kanten",
+    "description": "Singspiel für Solo, Chor, Band und Orchester in der Pfarrkirche St. Norbert.",
+    "source_name": "Stadt Bocholt – Veranstaltungskalender",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/paulus-mit-ecken-und-kanten",
+    "notes": "manual chat search v3"
+  }
+]
