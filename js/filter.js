@@ -172,7 +172,7 @@ const FilterModule = {
     return new Date(startDay);
   },
 
-  /* === BEGIN BLOCK: FILTER_TIME_PRESET_MATCHING_V1 | Zweck: definiert sichtbare Zeit-Presets als echte Zeiträume, damit „Diese Woche“ heute bis Sonntag umfasst und „Wochenende“ parallel nutzbar bleibt; Umfang: ersetzt getBucketForEvent() und ergänzt getTimePresetRange() + eventMatchesTimeKey() === */
+/* === BEGIN BLOCK: FILTER_TIME_PRESET_MATCHING_RANGE_AWARE_V2 | Zweck: Zeitfilter inklusive Alle-Filter laufzeitbewusst machen, damit abgelaufene Mehrtagesevents nicht sichtbar bleiben | Umfang: ersetzt getTimePresetRange(), eventMatchesTimeKey() und getBucketForEvent() === */
   getTimePresetRange(key, baseDate = this.toLocalDay(this.getTodayIso())) {
     const today = baseDate ? new Date(baseDate) : null;
     if (!today) return null;
@@ -199,7 +199,22 @@ const FilterModule = {
     }
   },
 
+  eventIsCurrentOrFuture(event) {
+    const startDay = this.toLocalDay(event?.date || event?.datum || "");
+    if (!startDay) return false;
+
+    const rawEnd = event?.endDate || event?.endDatum || "";
+    const endBase = rawEnd ? this.toLocalDay(rawEnd) : new Date(startDay);
+    if (!endBase) return false;
+
+    const today = this.toLocalDay(this.getTodayIso());
+    if (!today) return false;
+
+    return this.endOfDay(endBase) >= today;
+  },
+
   eventMatchesTimeKey(event, key) {
+    if (!this.eventIsCurrentOrFuture(event)) return false;
     if (key === "all") return true;
 
     const effectiveDay = this.getEventEffectiveDay(event);
@@ -225,7 +240,7 @@ const FilterModule = {
     if (this.eventMatchesTimeKey(event, "week")) return "week";
     return "later";
   },
-  /* === END BLOCK: FILTER_TIME_PRESET_MATCHING_V1 === */
+/* === END BLOCK: FILTER_TIME_PRESET_MATCHING_RANGE_AWARE_V2 === */
 
   eventMatchesSelectedDate(event, isoDate) {
     const selectedDay = this.toLocalDay(isoDate);
