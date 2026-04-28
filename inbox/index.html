@@ -463,40 +463,6 @@ Umfang:
     }
     // === END BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
 
-          if (res && res.ok) {
-            setStatus(isApprove ? "Übernommen." : "Verworfen.");
-            await loadAndShow();
-            return resolve();
-          }
-
-          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
-
-          if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
-            sessionToken = "";
-            refreshLock();
-            setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
-            renderCurrent(totalLoaded);
-            return resolve();
-          }
-
-          setStatus("Serverfehler: " + err);
-          renderCurrent(totalLoaded);
-          return resolve();
-
-        } catch (e) {
-          console.error(e);
-          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
-          renderCurrent(totalLoaded);
-          return resolve();
-        } finally {
-          if (btnOk) btnOk.disabled = false;
-          if (btnNo) btnNo.disabled = false;
-          if (btnOpen) btnOpen.disabled = false;
-          if (btnDeploy) btnDeploy.disabled = false;
-        }
-      });
-    }
-
     async function triggerDeploy() {
       const btnDeploy = document.getElementById("deployBtn");
       if (btnDeploy) btnDeploy.disabled = true;
