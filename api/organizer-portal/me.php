@@ -220,6 +220,7 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
             updated_at
          FROM submissions
          WHERE organizer_id = :organizer_id
+           AND submission_kind = "event"
          ORDER BY id DESC
          LIMIT 25'
     );
