@@ -66,6 +66,7 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 
 ---
 
+<!-- === BEGIN BLOCK: QUELLENREGISTER_HISTORIE_KONSOLIDIERUNG_V2 | Zweck: Quellenregister aus realer Events-/Inbox-/Archiv-/Benchmark-Historie konsolidieren | Umfang: ersetzt CORE-HIGH bis operative Nutzung vollständig === -->
 ## CORE-HIGH
 
 ### Stadt Bocholt – Veranstaltungskalender / offizielle Event-Detailseiten
@@ -78,11 +79,19 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Technische Stabilität: hoch
 - Strategierisiko: niedrig
 - Warum:
-  - wiederholt starke lokale Treffer
-  - hohe Relevanz für Bocholt erleben
+  - mit Abstand stärkste historisch belegte Quelle
+  - liefert lokale Bocholt-Kerntreffer
   - offizielle Quelle
+  - wiederholt starke Highlights und Basisbestand
+- Risiken:
+  - vereinzelt Parameter-/Slug-Varianten
+  - nicht jede offizielle Seite ist automatisch FINAL-fähig
+  - englische Kalender-/News-Varianten können kanonisch schwächer sein
 - Einsatzregel:
-  - in jedem Lauf früh und systematisch prüfen
+  - in jedem Weekly-Produktionslauf zuerst systematisch prüfen
+  - bevorzugt deutsche, kanonische Detailseiten verwenden
+  - bei mehreren URLs immer die stabilste erreichbare deutschsprachige Event-URL wählen
+  - keine 404-/Suchsnippet-/Parameter-URL als FINAL übernehmen
 
 ### AaltenDagen
 - Quelle / Muster:
@@ -95,9 +104,16 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Warum:
   - klarer Stadtfest-/Seriencharakter
   - regional relevant
-  - hoher Nutzwert
+  - wiederholt gute Benchmark-Treffer
+  - mehrere echte Tagesinstanzen möglich
+- Risiken:
+  - eine gemeinsame Seite kann mehrere Termine enthalten
+  - Tagesblöcke können unterschiedliche Zeiten haben
 - Einsatzregel:
   - in Saisonläufen aktiv mitführen
+  - einzelne AaltenDag-Termine dürfen eigene Einträge sein, wenn Datum/Instanz getrennt sind
+  - gleiche `source_url` ist zulässig, wenn Datum/Instanz unterschiedlich ist
+  - `time` nur setzen, wenn eine eindeutige Startzeit für die konkrete Instanz belegt ist; sonst leer lassen
 
 ---
 
@@ -108,33 +124,120 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - `rhede.de/regional/veranstaltungen/detail-*`
 - Status: CORE-MID
 - Eventqualität: mittel bis hoch
+- PWA-Nutzen: mittel bis hoch
+- Technische Stabilität: mittel
+- Strategierisiko: niedrig
+- Warum:
+  - historisch mehrere Live-Treffer
+  - offizielle Quelle
+  - einzelne starke Stadt-/Kultur-/Innenstadttermine
+- Risiken:
+  - nicht jeder Treffer ist breit genug
+  - Zeitangaben können Zeiträume sein und dürfen nicht ungeprüft in `time`
+  - teils kleine Führungen, Krammärkte oder Standardformate
+- Einsatzregel:
+  - regelmäßig prüfen
+  - nur starke oder öffentlich relevante Termine in FINAL
+  - `time` nur als Startzeit `HH:MM`, keine Zeitspannen
+  - kleine Führungen, Routine-/Standardmärkte und schwache Sonderfälle eher REVIEW oder weglassen
+
+### Isselburg – offizielle Veranstaltungsseiten
+- Quelle / Muster:
+  - `isselburg.de/de/veranstaltungen/termine/*`
+- Status: CORE-MID
+- Eventqualität: mittel
 - PWA-Nutzen: mittel
 - Technische Stabilität: mittel
 - Strategierisiko: niedrig
 - Warum:
-  - offizielle Quelle
-  - einzelne gute Treffer
-- Risiko:
-  - nicht jeder Treffer ist stark genug
+  - historisch mehrere Live-Treffer
+  - offizielle Quelle im Nahraum
+- Risiken:
+  - Canonical-/Instanz-URL-Probleme
+  - wiederkehrende Führungen können falsche Datums-/URL-Zuordnung erzeugen
+  - Scope/PWA-Nutzen nicht immer stark
 - Einsatzregel:
-  - regelmäßig prüfen, aber streng priorisieren
+  - aktiv prüfen, aber mit harter URL-/Instanzprüfung
+  - keine datumsfremden URLs übernehmen
+  - bei Führungs-/Serienformaten nur sauber belegte Einzelinstanzen
 
-### FARB Borken – klassische Veranstaltungsdetailseiten
+### Stadt Hamminkeln – offizielle Veranstaltungsseiten
+- Quelle / Muster:
+  - `hamminkeln.de/*`
+- Status: CORE-MID
+- Eventqualität: mittel
+- PWA-Nutzen: mittel
+- Technische Stabilität: mittel
+- Strategierisiko: niedrig
+- Warum:
+  - historisch mehrere Live-Treffer
+  - kann im erweiterten Nahraum brauchbare Kultur-/Markt-/Bühnenformate liefern
+- Risiken:
+  - Scope zum Bocholt-Kern teils grenzwertig
+  - nicht jeder Treffer ist für Bocholt-Nutzer relevant genug
+- Einsatzregel:
+  - regelmäßig, aber nachrangig prüfen
+  - nur bei klarer Bocholt-/Nahraum-Relevanz und starkem Eventcharakter in FINAL
+
+### Stadttheater Bocholt
+- Quelle / Muster:
+  - `stadttheater-bocholt.de/programm/*`
+- Status: CORE-MID
+- Eventqualität: mittel bis hoch
+- PWA-Nutzen: mittel bis hoch
+- Technische Stabilität: hoch
+- Strategierisiko: niedrig bis mittel
+- Warum:
+  - historisch mehrere gute Kultur-/Bühnen-Treffer
+  - lokaler Bocholt-Bezug
+- Risiken:
+  - veranstalter-/ticketnah
+  - nicht jede Programmliste ist automatisch eine saubere Eventinstanz
+- Einsatzregel:
+  - für starke Bühnen-/Kulturtermine aktiv prüfen
+  - nur konkrete Eventdetailseiten übernehmen
+  - bei Ticket-/Programmübersichten keine unsicheren Instanzen ableiten
+
+### FARB Borken – Veranstaltungsdetailseiten
 - Quelle / Muster:
   - `farb.borken.de/.../veranstaltungen/termine/*`
+  - `farb.borken.de/de/veranstaltungen/*`
 - Status: CORE-MID
 - Eventqualität: mittel
 - PWA-Nutzen: mittel
 - Technische Stabilität: mittel bis hoch
 - Strategierisiko: niedrig
 - Warum:
-  - mehrfach saubere Detailseiten
-  - brauchbar für den Nahraum
-- Risiko:
-  - gemischte Relevanz
-  - etliche formal korrekte, aber nicht sehr starke Treffer
+  - historisch Live-, Review- und Benchmark-Treffer
+  - offizielle Kulturquelle im Nahraum
+- Risiken:
+  - gemischte Qualität
+  - Ausstellungen, Führungen und Museumsformate können formal korrekt, aber PWA-schwach sein
+  - Vorschau-/Museumsseiten sind oft keine starken Eventseiten
 - Einsatzregel:
-  - aktiv prüfen, aber stärker nach Breiteninteresse filtern
+  - aktiv prüfen, aber stark nach Breiteninteresse filtern
+  - Open-Air-/Familien-/Sonderformate bevorzugen
+  - reine Ausstellungen, kleine Führungen und Preview-Seiten nur bei starkem Besuchsanlass
+
+### Borken 800 / offizielle Jubiläumsseiten
+- Quelle / Muster:
+  - `800.borken.de/*`
+- Status: CORE-MID
+- Eventqualität: mittel bis hoch
+- PWA-Nutzen: mittel
+- Technische Stabilität: mittel
+- Strategierisiko: niedrig
+- Warum:
+  - historisch mehrere Live-Treffer
+  - offizielle kampagnen-/jubiläumsbezogene Quelle
+- Risiken:
+  - saison-/kampagnenartig
+  - nicht dauerhaft als normale Quelle belastbar
+  - nicht jeder Termin hat Bocholt-Nähe oder Breiteninteresse
+- Einsatzregel:
+  - während aktiver Jubiläums-/Kampagnenphase prüfen
+  - nur starke, öffentlich relevante Einzeltermine übernehmen
+  - nach Ende der Kampagne runterstufen oder entfernen
 
 ---
 
@@ -143,38 +246,49 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 ### Stadt Bocholt – offizielle Event-News-/Info-Seiten
 - Quelle / Muster:
   - `bocholt.de/*` außerhalb klassischer Kalenderdetailseiten mit klarem Eventfokus
+  - `bocholt.de/kulturtage`
+  - `bocholt.de/Interkulturellewoche`
+  - thematische Bocholt-News-/Info-Seiten mit konkretem Eventbezug
 - Status: RECOVERY
 - Eventqualität: mittel bis hoch
 - PWA-Nutzen: mittel bis hoch
 - Technische Stabilität: hoch
 - Strategierisiko: niedrig
 - Warum:
-  - kann gute Events retten, die nicht als klassische Detailseite vorliegen
-- Risiko:
+  - kann starke Events retten, die nicht als klassische Kalenderdetailseite vorliegen
+- Risiken:
   - Save-the-date
   - Vorschau-/Teaserlogik
-  - Orga-/CTA-Blöcke
+  - Orga-/CTA-/Anmeldeseiten
+  - englische oder parameterlastige Varianten können schwächer sein
 - Einsatzregel:
-  - nur FINAL, wenn Titel + Datum + Ort + Besucherfokus im klaren sichtbaren Kernblock vorhanden sind
+  - nur FINAL, wenn Titel, Datum, Ort und Besucherfokus im klaren sichtbaren Kernblock vorhanden sind
+  - bevorzugt deutsche kanonische URL nutzen
+  - generische Info-/Übersichtsseiten nur bei klar trennbarem Eventblock
 
-### Stadt Rhede – offizielle Event-News-/Info-Seiten
+### Stadt Rhede – offizielle Event-News-/Info-Seiten und offizieller Ticketkontext
 - Quelle / Muster:
   - `rhede.de/*` mit event-spezifischem Fokus
+  - `stadtrhede.ticket.io/*` nur bei offiziell erkennbarem Rhede-/Stadt-Kontext
 - Status: RECOVERY
 - Eventqualität: mittel
 - PWA-Nutzen: mittel
 - Technische Stabilität: mittel
-- Strategierisiko: niedrig
+- Strategierisiko: niedrig bis mittel
 - Warum:
-  - kann einzelne gute Events liefern
-- Risiko:
-  - Abruf-/Stabilitätsprobleme
+  - kann einzelne gute Kultur-/Bühnen-Termine retten
+- Risiken:
+  - Ticketseiten sind keine bevorzugten FINAL-Quellen
+  - Detailbasis und offizielle Einordnung müssen sauber sein
 - Einsatzregel:
-  - nur mit sauberer Instanz- und URL-Prüfung
+  - zuerst bessere offizielle Rhede-Detailseite suchen
+  - Ticketseite nur nutzen, wenn sie offiziell zuordenbar, instanzsicher und regelkonform ist
+  - keine Ticketshop-Only-Treffer ohne belastbare Eventeinordnung
 
 ### Koppelkerk
 - Quelle / Muster:
   - `koppelkerk.nl/agenda/*`
+  - `koppelkerk.nl/evenementen/*`
 - Status: RECOVERY
 - Eventqualität: mittel
 - PWA-Nutzen: niedrig bis mittel
@@ -182,28 +296,62 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Strategierisiko: niedrig
 - Warum:
   - liefert echte Eventdetailseiten
-  - wiederholt formal saubere Treffer
-- Risiko:
-  - oft eher nischig
-  - nicht immer stark für die PWA
+  - wiederholt formal saubere Benchmark-Treffer
+  - besonders Buchmärkte und einzelne Konzerte können relevant sein
+- Risiken:
+  - oft nischig
+  - viele kleine Kultur-/Buch-/Vortragsformate mit begrenztem PWA-Nutzen
+  - Ortsgranularität nicht feiner setzen als belegt
 - Einsatzregel:
   - gezielt prüfen, aber nur starke Treffer in FINAL
+  - Bücherbörsen/Märkte eher geeignet
+  - kleine Buchvorstellungen, Spezialkonzerte oder Nischenformate nur bei erkennbarem Breiteninteresse
 
-### Isselburg – offizielle Veranstaltungsseiten
+### Saisonale starke Einzelseiten im Suchradius
 - Quelle / Muster:
-  - `isselburg.de/de/veranstaltungen/termine/*`
+  - `wijnfeest-aalten.nl/*`
+  - `countryfair.de/*`
+  - `bredevoortschittert.nl/*`
+  - `cityart-bocholt.de/*`
+  - `oldtimertreffenaalten.nl/*`
+  - `grensmarktdinxperlo.com/*`
+- Status: RECOVERY
+- Eventqualität: mittel bis hoch
+- PWA-Nutzen: mittel bis hoch
+- Technische Stabilität: gemischt
+- Strategierisiko: niedrig
+- Warum:
+  - historisch oder benchmarkseitig starke Einzel-/Saisonformate
+  - oft echte Highlights im Radius
+- Risiken:
+  - keine normalen Kalenderquellen
+  - Seiten können jährlich wechseln
+  - Datums-/Jahresbezug muss exakt geprüft werden
+  - Scope muss je Ort streng geprüft werden
+- Einsatzregel:
+  - in Backfill-/Saisonläufen gezielt prüfen
+  - nur konkrete Jahresinstanz übernehmen
+  - bei fehlendem Jahr, unsicherer Aktualität oder unklarer Terminseite REVIEW bzw. weglassen
+  - nicht als generische Dauerquelle missverstehen
+
+### Öffentliche Kultur-/Museums-/Institutionenquellen
+- Quelle / Muster:
+  - `textilwerk.lwl.org/*`
+  - offizielle öffentliche Museums-, Bibliotheks-, Kultur- oder Bildungseinrichtungsseiten im Suchradius
 - Status: RECOVERY
 - Eventqualität: mittel
-- PWA-Nutzen: niedrig bis mittel
+- PWA-Nutzen: mittel
 - Technische Stabilität: mittel
 - Strategierisiko: niedrig
 - Warum:
-  - offizielle Quelle
-  - punktuell brauchbar
-- Risiko:
-  - Canonical-/Instanz-URL-Probleme
+  - kann starke öffentliche Kulturtermine liefern
+- Risiken:
+  - viele Ausstellungen, Führungen, Kurs- oder Bildungsformate
+  - nicht jeder Termin hat Eventcharakter oder Breiteninteresse
 - Einsatzregel:
-  - nur mit harter URL-/Instanzprüfung
+  - nur konkrete, öffentlich relevante Eventinstanzen übernehmen
+  - Ausstellungen und Dauerformate nur bei starkem Besuchsanlass
+  - kleine Bildungs-/Kursformate zurückstellen
 
 ---
 
@@ -220,8 +368,9 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Warum:
   - gut als Signalgeber für neue Kandidaten
 - Einsatzregel:
-  - zur Entdeckung erlaubt
-  - nicht blind direkt FINAL
+  - zur Quellen-Discovery erlaubt
+  - im Weekly-Produktionslauf nicht aktiv suchen
+  - FINAL nur nach offizieller oder gleichwertig event-spezifischer Verifikation
 
 ### Allgemeine Kulturkalender / regionale Eventübersichten
 - Quelle / Muster:
@@ -233,23 +382,29 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Technische Stabilität: gemischt
 - Strategierisiko: niedrig
 - Warum:
-  - kann neue Kandidaten liefern
+  - kann neue Kandidaten und neue Quellen liefern
 - Einsatzregel:
-  - nur Discovery, FINAL nur nach offizieller Verifikation
+  - nur Quellen-Discovery
+  - nicht als Weekly-Hauptsuchmodus
+  - FINAL nur nach offizieller oder gleichwertig event-spezifischer Verifikation
 
-### Ticketseiten / Ticketshops
+### Ticketseiten / Ticketshops allgemein
 - Quelle / Muster:
-  - Ticketseiten mit Eventbezug
+  - Ticketshops mit Eventbezug
+  - `reservix.de/*`
+  - sonstige externe Ticketplattformen
 - Status: DISCOVERY-SEED
 - Eventqualität: gemischt
 - PWA-Nutzen: gemischt
 - Technische Stabilität: mittel
-- Strategierisiko: niedrig
+- Strategierisiko: mittel
 - Warum:
   - oft guter Frühindikator
 - Einsatzregel:
   - nie blind direkt FINAL
-  - nur Discovery-Hinweis
+  - im Weekly-Produktionslauf nicht aktiv als Quelle nutzen
+  - nur als Hinweis nutzen und nach offizieller Detailseite suchen
+  - Ausnahme nur bei eindeutig offizieller kommunaler Ticketseite und instanzsicherem Eventbezug
 
 ---
 
@@ -269,6 +424,11 @@ dann kann sie später hochgestuft werden:
 - dann ggf. zu `RECOVERY`
 - später zu `CORE-MID` oder `CORE-HIGH`
 
+Wichtig:
+- Im Weekly-Produktionslauf wird DISCOVERY-OPEN nicht aktiv als Suchmodus genutzt.
+- Im Aufbau-/Backfill-Kontext dürfen neue Quellen als Nebenfund dokumentiert werden.
+- Die Quelle selbst wird erst nach Bewertung ins Register übernommen.
+
 ---
 
 ## LOW-VALUE
@@ -283,16 +443,18 @@ dann kann sie später hochgestuft werden:
 - Technische Stabilität: hoch
 - Strategierisiko: niedrig
 - Warum:
+  - historisch bzw. benchmarkseitig eher schwache Spezial-/Workshop-Treffer
   - häufig zu speziell
   - oft wenig Breitenrelevanz
 - Einsatzregel:
   - nicht aktiv priorisieren
-  - nur bei ungewöhnlich hoher öffentlicher Relevanz berücksichtigen
+  - nur bei außergewöhnlich hoher öffentlicher Relevanz berücksichtigen
 
 ### Museums-/Vorschau-/Ausstellungs-Unterseiten mit dünnem Eventcharakter
 - Quelle / Muster:
   - `museum/Vorschau/*`
   - Preview-/Vorschau-Seiten
+  - reine Ausstellungsankündigungen ohne starken Eventzug
 - Status: LOW-VALUE
 - Eventqualität: formal oft okay, inhaltlich oft zu schwach
 - PWA-Nutzen: niedrig bis mittel
@@ -300,15 +462,18 @@ dann kann sie später hochgestuft werden:
 - Strategierisiko: niedrig
 - Warum:
   - erhöht Risiko für formal korrekte, aber schwache FINALs
+  - in Benchmarks mehrfach als problematische Fülltreffer sichtbar
 - Einsatzregel:
   - nicht aktiv priorisieren
   - nur mit starkem Besucherfokus und klarer Relevanz berücksichtigen
 
-### Kleine Spezialformate / Workshops / Bildungsformate
+### Kleine Spezialformate / Workshops / Bildungsformate / Führungen
 - Quelle / Muster:
   - Workshops
   - Resilienzformate
   - kleine Spezialtermine
+  - kleine Führungen
+  - Beratungs-/Informationsformate
 - Status: LOW-VALUE
 - Eventqualität: gemischt
 - PWA-Nutzen: meist niedrig
@@ -316,8 +481,26 @@ dann kann sie später hochgestuft werden:
 - Strategierisiko: niedrig
 - Warum:
   - häufig nicht stark genug für FINAL
+  - erzeugt bei freier Suche viele formal korrekte, aber schwache Kandidaten
 - Einsatzregel:
+  - nicht aktiv priorisieren
   - nur bei außergewöhnlicher lokaler oder öffentlicher Relevanz berücksichtigen
+
+### Direkte Vereins-/Chor-/Kleinstveranstalterseiten
+- Quelle / Muster:
+  - `shanty-chor-bocholt.de/*`
+  - ähnliche direkte Kleinstveranstalter-/Vereinsseiten
+- Status: LOW-VALUE
+- Eventqualität: gemischt
+- PWA-Nutzen: niedrig bis mittel
+- Technische Stabilität: gemischt
+- Strategierisiko: mittel
+- Warum:
+  - kann einzelne echte Termine liefern
+  - oft aber nischig, veranstalternah oder nicht breit genug
+- Einsatzregel:
+  - nicht aktiv priorisieren
+  - nur bei starkem öffentlichem Eventcharakter oder neutraler Drittquelle berücksichtigen
 
 ---
 
@@ -334,12 +517,15 @@ dann kann sie später hochgestuft werden:
 
 ### Kulturort Alte Molkerei – venue-zentrierte direkte Quellen
 - Quelle / Muster:
+  - `alte-molkerei.info/*`
   - venue-eigene Seiten / direkte Promo
 - Status: EXCLUDE / GESPERRT
 - Warum:
   - ausdrücklich geschützte Venue
+  - historisch zwar Eventsignale vorhanden, aber strategisch nicht als normale Quelle bespielen
 - Einsatzregel:
   - nicht aktiv suchen
+  - direkte Venue-Quelle nicht als Weekly-Quelle nutzen
   - nur neutrale/offizielle Drittquellen-Ausnahme nach Regelwerk kann einzelne Events retten
 
 ### Social-only / Hinweis-only ohne offizielle Verifikation
@@ -354,6 +540,17 @@ dann kann sie später hochgestuft werden:
 - Einsatzregel:
   - allenfalls Discovery-Hinweis, nie direkt FINAL
 
+### Test-/Dummy-/nicht reale Quellen
+- Quelle / Muster:
+  - `example.com/*`
+  - manuelle Smoke-Test-Datensätze
+- Status: EXCLUDE / GESPERRT
+- Warum:
+  - keine reale Quelle
+  - nur technische Testdaten
+- Einsatzregel:
+  - niemals für Suche, FINAL oder Quellenbewertung nutzen
+
 ---
 
 ## Pflege-Regeln
@@ -363,12 +560,15 @@ Eine Quelle kann hochgestuft werden, wenn sie in mehreren Läufen:
 - wiederholt starke FINALs liefert
 - technisch stabil ist
 - strategisch unkritisch ist
+- keine auffälligen URL-/Instanzfehler produziert
 
 ### Quelle runterstufen
 Eine Quelle sollte runtergestuft werden, wenn sie:
 - wiederholt nur schwache, formal korrekte Treffer liefert
 - wenig PWA-Nutzen bringt
 - technisch problematisch ist
+- viele Review-/Verwerfen-Fälle erzeugt
+- Monetarisierungs- oder Venue-Risiken verstärkt
 
 ### Neue Quelle aufnehmen
 Eine neue Quelle wird zunächst als:
@@ -378,19 +578,40 @@ oder
 
 behandelt, nicht sofort als CORE.
 
+Ausnahme:
+Wenn eine Quelle aus realer Bestandshistorie bereits mehrfach starke Live-/FINAL-Treffer geliefert hat, darf sie direkt als `CORE-MID` oder `RECOVERY` klassifiziert werden.
+
 ---
 
-<!-- === BEGIN BLOCK: OPERATIVE_NUTZUNG_PRODUKTION_ONLY_V1 | Zweck: Register-Nutzung für Weekly-Produktion und separate Quellen-Discovery trennen | Umfang: ersetzt die bisherige Discovery-immer-mitführen-Regel === -->
 ## Operative Nutzung für die nächsten Testläufe
 
-### Weekly-Produktionslauf
-1. CORE-HIGH immer zuerst aktiv prüfen
-2. danach CORE-MID streng priorisiert prüfen
-3. dann RECOVERY gezielt prüfen
-4. DISCOVERY-SEED nicht aktiv als Weekly-Suchmodus nutzen
-5. DISCOVERY-OPEN nicht aktiv als Weekly-Suchmodus nutzen
-6. LOW-VALUE nicht aktiv priorisieren
-7. EXCLUDE / GESPERRT nicht aktiv als Quelle verwenden
+### Aufbau-/Backfill-Produktionslauf
+1. CORE-HIGH zuerst systematisch prüfen
+2. danach CORE-MID systematisch prüfen
+3. danach RECOVERY gezielt prüfen
+4. bekannte saisonale starke Einzelseiten aus RECOVERY mitnehmen
+5. DISCOVERY-SEED nicht aktiv als Hauptsuchmodus nutzen
+6. DISCOVERY-OPEN nicht aktiv als Hauptsuchmodus nutzen
+7. LOW-VALUE nicht aktiv priorisieren
+8. EXCLUDE / GESPERRT nicht aktiv als Quelle verwenden
+
+Ziel:
+- den aktuellen 180-Tage-Zeitraum im Suchradius systematisch abgrasen
+- gute Quellen dürfen mehrere echte Instanzen liefern
+- keine künstliche Quellenbegrenzung
+- keine schwachen Fülltreffer
+
+### Normaler Weekly-Delta-Lauf
+1. CORE-HIGH zuerst prüfen
+2. CORE-MID prüfen
+3. RECOVERY prüfen
+4. Dedupe gegen Bestand, Inbox, Archiv und Manual-Puffer strikt anwenden
+5. nur neue Delta-Kandidaten liefern
+
+Ziel:
+- neue gute Events seit dem letzten Lauf finden
+- keine Wiederholung bereits entschiedener Fälle
+- weniger Backfill, mehr Delta-Qualität
 
 ### Quellen-Discovery
 Für separate Quellen-Discovery-Läufe bleiben erlaubt:
@@ -400,4 +621,4 @@ Für separate Quellen-Discovery-Läufe bleiben erlaubt:
 
 Wichtig:
 Dieses Register soll die Weekly-Produktion systematischer machen, ohne gute neue Quellen grundsätzlich auszuschließen. Neue Quellen werden aber separat entdeckt, bewertet und erst danach bewusst hochgestuft.
-<!-- === END BLOCK: OPERATIVE_NUTZUNG_PRODUKTION_ONLY_V1 === -->
+<!-- === END BLOCK: QUELLENREGISTER_HISTORIE_KONSOLIDIERUNG_V2 === -->
