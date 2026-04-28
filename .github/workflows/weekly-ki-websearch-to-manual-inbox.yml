@@ -54,8 +54,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth openai
 
-      # === BEGIN BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR (rulebook + snapshots + web search -> inbox_manual.json) ===
-      # === END BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR (rulebook + snapshots + web search -> inbox_manual.json) ===
+      # === BEGIN BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
+      # === END BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
       - name: Run weekly KI websearch to manual inbox
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
@@ -65,6 +65,7 @@ jobs:
           OPENAI_MODEL: gpt-5.4
           EVENT_RULEBOOK_PATH: bocholt-erleben_eventsuche_regelwerk_v3.md
           MANUAL_INBOX_JSON_PATH: data/inbox_manual.json
+          SOURCE_CANDIDATES_JSON_PATH: data/source_candidates.json
 
           TAB_EVENTS: Events
           TAB_INBOX: Inbox
@@ -83,31 +84,40 @@ jobs:
           echo "=== inbox_manual.json (head) ==="
           head -n 200 data/inbox_manual.json || true
 
-      # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
-      # === END BLOCK: COMMIT GENERATED MANUAL INBOX JSON (review buffer only) ===
-      - name: Commit generated manual inbox JSON
+          echo "=== source_candidates.json (head) ==="
+          head -n 200 data/source_candidates.json || true
+
+      # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
+      # === END BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
+      - name: Commit generated manual inbox and source candidates
         id: commit_manual_json
         run: |
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/inbox_manual.json
+          git add data/inbox_manual.json data/source_candidates.json
+
+          if git diff --cached --quiet -- data/inbox_manual.json; then
+            echo "manual_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "manual_changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
           if git diff --cached --quiet; then
-            echo "No manual inbox changes to commit."
+            echo "No generated inbox/source changes to commit."
             echo "did_commit=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          git commit -m "chore: generate weekly KI websearch manual inbox"
+          git commit -m "chore: generate weekly KI websearch outputs"
           git push
           echo "did_commit=true" >> "$GITHUB_OUTPUT"
 
-      # === BEGIN BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE (automatic handoff into inbox review flow) ===
-      # === END BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE (automatic handoff into inbox review flow) ===
+      # === BEGIN BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE ONLY FOR EVENT CHANGES ===
+      # === END BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE ONLY FOR EVENT CHANGES ===
       - name: Trigger Manual KI Event Intake
-        if: steps.commit_manual_json.outputs.did_commit == 'true'
+        if: steps.commit_manual_json.outputs.manual_changed == 'true'
         env:
           WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
