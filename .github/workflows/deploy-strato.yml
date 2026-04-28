@@ -353,6 +353,20 @@ jobs:
           STAGING_STRIPE_PRICE_STARTER: ${{ secrets.STAGING_STRIPE_PRICE_STARTER }}
           STAGING_STRIPE_PRICE_ACTIVE: ${{ secrets.STAGING_STRIPE_PRICE_ACTIVE }}
           STAGING_STRIPE_PRICE_UNLIMITED: ${{ secrets.STAGING_STRIPE_PRICE_UNLIMITED }}
+          STAGING_MAIL_FROM_NAME: ${{ secrets.STAGING_MAIL_FROM_NAME }}
+          STAGING_MAIL_FROM_ADDRESS: ${{ secrets.STAGING_MAIL_FROM_ADDRESS }}
+          STAGING_MAIL_SMTP_USERNAME: ${{ secrets.STAGING_MAIL_SMTP_USERNAME }}
+          STAGING_MAIL_SMTP_PASSWORD: ${{ secrets.STAGING_MAIL_SMTP_PASSWORD }}
+          LIVE_STRIPE_SECRET_KEY: ${{ secrets.LIVE_STRIPE_SECRET_KEY }}
+          LIVE_STRIPE_WEBHOOK_SECRET: ${{ secrets.LIVE_STRIPE_WEBHOOK_SECRET }}
+          LIVE_STRIPE_PRICE_SINGLE: ${{ secrets.LIVE_STRIPE_PRICE_SINGLE }}
+          LIVE_STRIPE_PRICE_STARTER: ${{ secrets.LIVE_STRIPE_PRICE_STARTER }}
+          LIVE_STRIPE_PRICE_ACTIVE: ${{ secrets.LIVE_STRIPE_PRICE_ACTIVE }}
+          LIVE_STRIPE_PRICE_UNLIMITED: ${{ secrets.LIVE_STRIPE_PRICE_UNLIMITED }}
+          LIVE_MAIL_FROM_NAME: ${{ secrets.LIVE_MAIL_FROM_NAME }}
+          LIVE_MAIL_FROM_ADDRESS: ${{ secrets.LIVE_MAIL_FROM_ADDRESS }}
+          LIVE_MAIL_SMTP_USERNAME: ${{ secrets.LIVE_MAIL_SMTP_USERNAME }}
+          LIVE_MAIL_SMTP_PASSWORD: ${{ secrets.LIVE_MAIL_SMTP_PASSWORD }}
         run: |
           set -e
 
@@ -477,6 +491,14 @@ jobs:
             APP_STRIPE_PRICE_ACTIVE="$STAGING_STRIPE_PRICE_ACTIVE"
             APP_STRIPE_PRICE_UNLIMITED="$STAGING_STRIPE_PRICE_UNLIMITED"
 
+            APP_MAIL_FROM_NAME="$STAGING_MAIL_FROM_NAME"
+            APP_MAIL_FROM_ADDRESS="$STAGING_MAIL_FROM_ADDRESS"
+            APP_MAIL_SMTP_HOST="smtp.strato.de"
+            APP_MAIL_SMTP_PORT="465"
+            APP_MAIL_SMTP_ENCRYPTION="ssl"
+            APP_MAIL_SMTP_USERNAME="$STAGING_MAIL_SMTP_USERNAME"
+            APP_MAIL_SMTP_PASSWORD="$STAGING_MAIL_SMTP_PASSWORD"
+
             APP_BASE_URL="https://staging.bocholt-erleben.de"
           else
             APP_DB_HOST="$LIVE_DB_HOST"
@@ -491,6 +513,14 @@ jobs:
             APP_STRIPE_PRICE_STARTER="$LIVE_STRIPE_PRICE_STARTER"
             APP_STRIPE_PRICE_ACTIVE="$LIVE_STRIPE_PRICE_ACTIVE"
             APP_STRIPE_PRICE_UNLIMITED="$LIVE_STRIPE_PRICE_UNLIMITED"
+
+            APP_MAIL_FROM_NAME="$LIVE_MAIL_FROM_NAME"
+            APP_MAIL_FROM_ADDRESS="$LIVE_MAIL_FROM_ADDRESS"
+            APP_MAIL_SMTP_HOST="smtp.strato.de"
+            APP_MAIL_SMTP_PORT="465"
+            APP_MAIL_SMTP_ENCRYPTION="ssl"
+            APP_MAIL_SMTP_USERNAME="$LIVE_MAIL_SMTP_USERNAME"
+            APP_MAIL_SMTP_PASSWORD="$LIVE_MAIL_SMTP_PASSWORD"
 
             APP_BASE_URL="https://bocholt-erleben.de"
           fi
@@ -507,13 +537,21 @@ jobs:
           [ -n "$APP_STRIPE_PRICE_STARTER" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_STARTER"; exit 1; }
           [ -n "$APP_STRIPE_PRICE_ACTIVE" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_ACTIVE"; exit 1; }
           [ -n "$APP_STRIPE_PRICE_UNLIMITED" ] || { echo "❌ Missing required secret/value: APP_STRIPE_PRICE_UNLIMITED"; exit 1; }
+
+          [ -n "$APP_MAIL_FROM_NAME" ] || { echo "❌ Missing required secret/value: APP_MAIL_FROM_NAME"; exit 1; }
+          [ -n "$APP_MAIL_FROM_ADDRESS" ] || { echo "❌ Missing required secret/value: APP_MAIL_FROM_ADDRESS"; exit 1; }
+          [ -n "$APP_MAIL_SMTP_HOST" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_HOST"; exit 1; }
+          [ -n "$APP_MAIL_SMTP_PORT" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_PORT"; exit 1; }
+          [ -n "$APP_MAIL_SMTP_ENCRYPTION" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_ENCRYPTION"; exit 1; }
+          [ -n "$APP_MAIL_SMTP_USERNAME" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_USERNAME"; exit 1; }
+          [ -n "$APP_MAIL_SMTP_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_PASSWORD"; exit 1; }
           # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
           APP_ENV="$DEPLOY_ENV_NAME"
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
           APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===
@@ -546,6 +584,15 @@ jobs:
                       "active": os.environ["APP_STRIPE_PRICE_ACTIVE"],
                       "unlimited": os.environ["APP_STRIPE_PRICE_UNLIMITED"],
                   },
+              },
+              "mail": {
+                  "from_name": os.environ["APP_MAIL_FROM_NAME"],
+                  "from_address": os.environ["APP_MAIL_FROM_ADDRESS"],
+                  "smtp_host": os.environ["APP_MAIL_SMTP_HOST"],
+                  "smtp_port": int(os.environ["APP_MAIL_SMTP_PORT"]),
+                  "smtp_encryption": os.environ["APP_MAIL_SMTP_ENCRYPTION"],
+                  "smtp_username": os.environ["APP_MAIL_SMTP_USERNAME"],
+                  "smtp_password": os.environ["APP_MAIL_SMTP_PASSWORD"],
               },
           }
 
