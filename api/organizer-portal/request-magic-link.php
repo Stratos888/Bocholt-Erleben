@@ -242,26 +242,6 @@ try {
         'error_message' => $error->getMessage(),
     ]);
 }
-} catch (InvalidArgumentException $error) {
-    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
 
-    be_json_response(422, [
-        'status' => 'error',
-        'message' => $error->getMessage(),
-    ]);
-} catch (Throwable $error) {
-    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
-    be_json_response(500, [
-        'status' => 'error',
-        'message' => 'Magic link request failed.',
-        'error_class' => get_class($error),
-        'error_message' => $error->getMessage(),
-    ]);
-}
 
 /* === END FILE: api/organizer-portal/request-magic-link.php === */
