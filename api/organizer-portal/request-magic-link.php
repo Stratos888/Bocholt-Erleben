@@ -78,7 +78,29 @@ function opml_hash_token(string $token): string
 
 function opml_build_magic_link_url(string $baseUrl, string $token): string
 {
-return $baseUrl . '/fuer-veranstalter/login/?token=' . rawurlencode($token);
+    return $baseUrl . '/fuer-veranstalter/login/?token=' . rawurlencode($token);
+}
+
+function opml_build_mail_subject(): string
+{
+    return 'Dein Zugangslink für Bocholt erleben';
+}
+
+function opml_build_mail_body(string $magicLinkUrl, string $expiresAtUtc): string
+{
+    return implode("\n", [
+        'Hallo,',
+        '',
+        'hier ist dein Zugangslink für den Veranstalterbereich von Bocholt erleben:',
+        $magicLinkUrl,
+        '',
+        'Der Link ist gültig bis (UTC): ' . $expiresAtUtc,
+        '',
+        'Wenn du diesen Link nicht angefordert hast, kannst du diese E-Mail ignorieren.',
+        '',
+        'Viele Grüße',
+        'Bocholt erleben',
+    ]);
 }
 
 try {
@@ -173,6 +195,13 @@ try {
     $baseUrl = opml_base_url();
     $magicLinkUrl = opml_build_magic_link_url($baseUrl, $token);
 
+    be_send_mail(
+        (string)$organizer['email'],
+        opml_build_mail_subject(),
+        opml_build_mail_body($magicLinkUrl, $expiresAt),
+        (string)$organizer['organization_name']
+    );
+
     $config = be_get_config();
     $appEnv = (string)($config['app_env'] ?? 'unknown');
 
@@ -182,6 +211,7 @@ try {
             'organizer_id' => $organizerId,
             'magic_link_id' => $magicLinkId,
             'expires_at_utc' => $expiresAt,
+            'mail_delivery' => 'attempted',
         ],
     ];
 
@@ -191,6 +221,27 @@ try {
     }
 
     be_json_response(201, $response);
+} catch (InvalidArgumentException $error) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    be_json_response(422, [
+        'status' => 'error',
+        'message' => $error->getMessage(),
+    ]);
+} catch (Throwable $error) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    be_json_response(500, [
+        'status' => 'error',
+        'message' => 'Magic link request failed.',
+        'error_class' => get_class($error),
+        'error_message' => $error->getMessage(),
+    ]);
+}
 } catch (InvalidArgumentException $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
