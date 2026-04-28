@@ -262,6 +262,99 @@ function scs_ensure_stripe_customer(PDO $pdo, array $submission, string $secretK
     return $customerId;
 }
 
+function scs_fetch_matching_active_subscription_entitlement(PDO $pdo, array $submission): ?array
+{
+    $modelKey = trim((string)($submission['requested_model_key'] ?? ''));
+    if ($modelKey === '' || $modelKey === 'single') {
+        return null;
+    }
+
+    $statement = $pdo->prepare(
+        'SELECT
+            pe.id,
+            pe.organizer_id,
+            pe.subscription_id,
+            pe.plan_key,
+            pe.status,
+            pe.period_start,
+            pe.period_end,
+            pe.included_publications,
+            pe.consumed_publications,
+            pe.is_unlimited,
+            s.stripe_subscription_id,
+            s.stripe_customer_id
+         FROM publication_entitlements pe
+         INNER JOIN subscriptions s ON s.id = pe.subscription_id
+         WHERE pe.organizer_id = :organizer_id
+           AND pe.source_type = :source_type
+           AND pe.status = :status
+           AND pe.plan_key = :plan_key
+           AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
+           AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())
+           AND (pe.is_unlimited = 1 OR pe.consumed_publications < pe.included_publications)
+         ORDER BY
+            CASE WHEN pe.is_unlimited = 1 THEN 1 ELSE 0 END,
+            pe.period_end ASC,
+            pe.id ASC
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':organizer_id' => (int)$submission['organizer_id'],
+        ':source_type' => 'subscription',
+        ':status' => 'active',
+        ':plan_key' => $modelKey,
+    ]);
+
+    $row = $statement->fetch();
+    return is_array($row) ? $row : null;
+}
+
+function scs_build_existing_subscription_redirect_url(string $baseUrl, string $paymentReferenceKey): string
+{
+    return rtrim($baseUrl, '/') . '/events-veroeffentlichen/erfolg/?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription';
+}
+
+function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $submission, array $entitlement, string $customerId): void
+{
+    $subscriptionId = trim((string)($entitlement['stripe_subscription_id'] ?? ''));
+    $effectiveCustomerId = trim((string)($entitlement['stripe_customer_id'] ?? ''));
+
+    if ($effectiveCustomerId === '') {
+        $effectiveCustomerId = $customerId;
+    }
+
+    $statement = $pdo->prepare(
+        'UPDATE submissions
+         SET
+            status = :status,
+            stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
+            stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
+            paid_at = CASE
+                WHEN paid_at IS NULL THEN CURRENT_TIMESTAMP
+                ELSE paid_at
+            END,
+            updated_at = CURRENT_TIMESTAMP
+         WHERE id = :submission_id'
+    );
+
+    if ($effectiveCustomerId === '') {
+        $statement->bindValue(':stripe_customer_id', null, PDO::PARAM_NULL);
+    } else {
+        $statement->bindValue(':stripe_customer_id', $effectiveCustomerId, PDO::PARAM_STR);
+    }
+
+    if ($subscriptionId === '') {
+        $statement->bindValue(':stripe_subscription_id', null, PDO::PARAM_NULL);
+    } else {
+        $statement->bindValue(':stripe_subscription_id', $subscriptionId, PDO::PARAM_STR);
+    }
+
+    $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
+    $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
+    $statement->execute();
+}
+
 function scs_create_checkout_session(array $submission, string $customerId, array $stripeConfig, array $appConfig): array
 {
     $modelKey = (string)$submission['requested_model_key'];
@@ -304,6 +397,7 @@ function scs_create_checkout_session(array $submission, string $customerId, arra
         'url' => $sessionUrl,
         'price_id' => $priceId,
         'mode' => $mode,
+        'checkout_required' => true,
     ];
 }
 
@@ -321,6 +415,31 @@ try {
     scs_assert_submission_ready($submission);
 
     $customerId = scs_ensure_stripe_customer($pdo, $submission, $stripeConfig['secret_key']);
+
+    $existingSubscriptionEntitlement = scs_fetch_matching_active_subscription_entitlement($pdo, $submission);
+
+    if (is_array($existingSubscriptionEntitlement)) {
+        scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
+        $pdo->commit();
+
+        be_json_response(200, [
+            'status' => 'ok',
+            'data' => [
+                'submission_id' => $submissionId,
+                'submission_status' => 'paid',
+                'requested_model_key' => (string)$submission['requested_model_key'],
+                'payment_kind' => (string)$submission['payment_kind'],
+                'stripe_customer_id' => $customerId,
+                'checkout_required' => false,
+                'redirect_url' => scs_build_existing_subscription_redirect_url(
+                    $appConfig['base_url'],
+                    (string)$submission['payment_reference_key']
+                ),
+                'used_existing_subscription' => true,
+            ],
+        ]);
+    }
+
     $checkoutSession = scs_create_checkout_session($submission, $customerId, $stripeConfig, $appConfig);
 
     $updateSubmission = $pdo->prepare(
@@ -352,9 +471,31 @@ try {
             'payment_kind' => (string)$submission['payment_kind'],
             'stripe_customer_id' => $customerId,
             'stripe_checkout_session_id' => $checkoutSession['id'],
+            'checkout_required' => true,
             'checkout_url' => $checkoutSession['url'],
         ],
     ]);
+} catch (InvalidArgumentException $error) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    be_json_response(422, [
+        'status' => 'error',
+        'message' => $error->getMessage(),
+    ]);
+} catch (Throwable $error) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    be_json_response(500, [
+        'status' => 'error',
+        'message' => 'Checkout session creation failed.',
+        'error_class' => get_class($error),
+        'error_message' => $error->getMessage(),
+    ]);
+}
 } catch (InvalidArgumentException $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
