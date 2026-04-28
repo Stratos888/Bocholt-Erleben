@@ -369,7 +369,19 @@
           { submission_id: submissionId }
         );
 
+        const checkoutRequired = checkoutResult?.data?.checkout_required !== false;
+        const redirectUrl = safeText(checkoutResult?.data?.redirect_url);
         const checkoutUrl = safeText(checkoutResult?.data?.checkout_url);
+
+        if (!checkoutRequired) {
+          if (!hasValue(redirectUrl)) {
+            throw new Error("Redirect-URL fehlt.");
+          }
+
+          window.location.href = redirectUrl;
+          return;
+        }
+
         if (!hasValue(checkoutUrl)) {
           throw new Error("Checkout-URL fehlt.");
         }
