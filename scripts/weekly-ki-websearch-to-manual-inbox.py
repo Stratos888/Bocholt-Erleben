@@ -42,6 +42,7 @@ TMP_DIR = ROOT / ".tmp" / "weekly-ki-eventsuche"
 REGELWERK_PATH = Path(os.environ.get("EVENT_RULEBOOK_PATH", str(ROOT / "bocholt-erleben_eventsuche_regelwerk_v3.md")))
 SOURCES_REGISTER_PATH = Path(os.environ.get("EVENT_SOURCES_REGISTER_PATH", str(ROOT / "eventsuche_quellenregister_v1.md")))
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
+SOURCE_CANDIDATES_JSON_PATH = Path(os.environ.get("SOURCE_CANDIDATES_JSON_PATH", str(ROOT / "data" / "source_candidates.json")))
 
 TMP_EVENTS_TSV_PATH = Path(os.environ.get("TMP_EVENTS_TSV_PATH", str(TMP_DIR / "events.tsv")))
 TMP_INBOX_TSV_PATH = Path(os.environ.get("TMP_INBOX_TSV_PATH", str(TMP_DIR / "inbox.tsv")))
@@ -361,7 +362,7 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_ONLY_V1 | Zweck: Weekly-Lauf auf reinen Produktionsprompt zurückbauen | Umfang: entfernt Discovery-Pass-Logik, prior_selected und Pass-Steuerung; behält nur quellengeführte Produktionssuche ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SOURCE_LEARNING_V1 | Zweck: Produktionslauf um halbautomatisches Quellenlernen erweitern | Umfang: hält Event-Output streng und ergänzt separaten source_candidates-Kanal ===
 def build_messages(
     rulebook_text: str,
     sources_register_text: str,
@@ -390,18 +391,21 @@ Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Liefere nur neue Delta-Kandidaten.
-Im Automationsmodus gilt:
+
+Im Automationsmodus gilt für Events:
 - nur FINAL
-- nur JSON
 - kein REVIEW
 - kein Fließtext
 - keine Kommentare
 
+Zusätzlich sammelst du neue Quellen separat als source_candidates.
+source_candidates sind keine Events und dürfen niemals in die Event-Inbox gemischt werden.
+
 Wichtig:
 - Nicht jeder formal korrekte Termin ist FINAL-tauglich.
 - FINAL bedeutet hier: formal belastbar und zugleich redaktionell stark genug für die Kuratierungs-PWA.
-- Dieser Lauf ist ein PRODUKTIONSLAUF.
-- Discovery neuer Quellen gehört nicht in diesen Lauf, sondern in den separaten Source-Scout-/Quellenprozess.
+- Dieser Lauf ist ein PRODUKTIONSLAUF mit kontrolliertem Quellenlernen.
+- Neue Quellen dürfen als Nebenfund dokumentiert werden, werden aber nicht automatisch dauerhaft ins Quellenregister übernommen.
 """.strip()
 
     user_prompt = f"""
@@ -430,16 +434,21 @@ Operative Quellensteuerung für den Produktionslauf:
 - Prüfe zuerst CORE-HIGH
 - danach CORE-MID
 - danach RECOVERY gezielt
-- DISCOVERY-SEED und DISCOVERY-OPEN in diesem Lauf nicht aktiv als Suchmodus verwenden
 - LOW-VALUE nicht aktiv priorisieren
 - EXCLUDE / GESPERRT nicht aktiv als Quelle nutzen
-- Dieser Produktionslauf soll sich auf bekannte, bewertete und stabile Quellen konzentrieren
-- Ziel ist eine starke, saubere Wochenausbeute, nicht das Entdecken neuer Quellen
-- Ein Lauf soll nicht fast ausschließlich aus einem einzelnen Quellencluster bestehen
-- Maximal 2 FINAL-Kandidaten pro Quelle
-- Nur wenn eine Quelle außergewöhnlich stark ist und kein besserer Mix verfügbar ist, maximal 3
+- Gute Quellen dürfen mehrere echte Instanzen liefern, wenn diese regelkonform und stark sind
+- Keine harte Quellenbegrenzung, aber keine schwachen Fülltreffer aus einer Quelle
+- Kontrollierte offene Suche ist erlaubt, wenn sie ein starkes Event findet und die Quelle separat als source_candidate dokumentiert wird
 
-Recovery-Pass vor Verwerfen:
+Kontrolliertes Quellenlernen:
+- Das Quellenregister ist keine Closed-Whitelist.
+- Wenn du bei der Eventsuche eine gute neue Quelle außerhalb des Registers findest, darfst du sie als source_candidate dokumentieren.
+- Eine neue Quelle darf nur dann zu source_candidates, wenn sie mindestens ein starkes, regelkonformes oder fast regelkonformes Event im Suchgebiet belegt.
+- source_candidates dürfen keine Social-only-, Ticketshop-only-, Venue-Promo- oder klar gesperrten Quellen sein.
+- source_candidates sind nur Vorschläge für spätere Registerpflege, keine automatische Freigabe.
+- Nimm bekannte Quellen aus dem Quellenregister nicht erneut als source_candidate auf.
+
+Recovery-Prüfung vor Verwerfen:
 Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv:
 1. eine bessere offizielle Detailseite zu finden
 2. eine stabilere, kanonischere und instanzpassende Event-URL zu finden
@@ -457,14 +466,14 @@ Harte Prüfregeln vor FINAL:
 - Wenn ein Event als zusammenhängendes Mehrtagesevent bestehen bleibt und pro Tag unterschiedliche Zeiten nennt, muss `time` leer bleiben.
 - Wenn ein Event als zusammenhängendes Mehrtagesevent eine wirklich einheitliche Startzeit für das gesamte Event nennt, darf `time` als `HH:MM` gesetzt werden.
 - Niemals die erste sichtbare Tageszeit oder irgendeine Einzelzeit als allgemeine `time` für ein zusammenhängendes Mehrtagesevent übernehmen.
-- Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig
-- Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen
-- Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen
-- Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite nicht automatisch ungeeignet
-- Vorschau-/Teaser-/Save-the-date-Seiten nur dann FINAL, wenn Titel, Datum, Ort und Besucherfokus im gleichen klaren sichtbaren Kernblock belastbar sind
-- Wenn Scope unklar ist: nicht ausgeben
-- Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben
-- Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben
+- Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig.
+- Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen.
+- Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen.
+- Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite nicht automatisch ungeeignet.
+- Vorschau-/Teaser-/Save-the-date-Seiten nur dann FINAL, wenn Titel, Datum, Ort und Besucherfokus im gleichen klaren sichtbaren Kernblock belastbar sind.
+- Wenn Scope unklar ist: nicht ausgeben.
+- Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben.
+- Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben.
 
 Redaktionelle Qualitäts-Schwelle für FINAL:
 Ein Kandidat ist nur dann FINAL-tauglich, wenn er nicht nur formal korrekt ist, sondern auch einen klaren Mehrwert für die Kuratierungs-PWA hat.
@@ -521,19 +530,19 @@ Wenn ein Kandidat zwar formal korrekt, aber redaktionell schwach ist:
 - nicht ausgeben
 
 Output-Regeln:
-- Gib ausschließlich neue FINAL-Datensätze aus
-- Gib ausschließlich ein JSON-Objekt mit dem Schlüssel "candidates" zurück
-- Jeder candidate muss dem vorgegebenen Schema entsprechen
-- Keine zusätzlichen Schlüssel
-- Keine Einleitung
-- Keine Erklärung
-- Keine Kommentare
-- Keine REVIEW-Fälle
-- Keine EXCLUDE-Fälle
-- Keine unsicheren Datensätze
-- Keine bereits vorhandenen oder bereits entschiedenen Dubletten
+- Gib ausschließlich ein JSON-Objekt mit den Schlüsseln "candidates" und "source_candidates" zurück.
+- "candidates" enthält nur neue FINAL-Events.
+- "source_candidates" enthält nur neue Quellenvorschläge, keine Events für die Inbox.
+- Keine zusätzlichen Schlüssel.
+- Keine Einleitung.
+- Keine Erklärung.
+- Keine Kommentare.
+- Keine REVIEW-Fälle.
+- Keine EXCLUDE-Fälle.
+- Keine unsicheren Event-Datensätze.
+- Keine bereits vorhandenen oder bereits entschiedenen Event-Dubletten.
 
-Zusätzliche interne Pflichtprüfung vor Aufnahme:
+Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - echtes Event?
 - belastbare Quelle?
 - event-spezifische URL oder zulässige offizielle Ausnahme?
@@ -549,9 +558,17 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 - Beschreibung neutral, sachlich und quellenbasiert?
 - keine Dublette?
 - wirklich nützlich für die Kuratierungs-PWA?
-- ist der Quellenmix gesund?
 - ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
+
+Zusätzliche interne Pflichtprüfung vor Quellenvorschlag:
+- Quelle noch nicht im Quellenregister enthalten?
+- Quelle belegt mindestens ein starkes oder fast starkes Event im Suchgebiet?
+- Quelle ist nicht Social-only?
+- Quelle ist nicht Ticketshop-only ohne offizielle Einordnung?
+- Quelle ist keine direkte Venue-Promo einer geschützten oder monetarisierungsrelevanten Location?
+- Quelle ist nicht EXCLUDE / GESPERRT?
+- Quelle hat eine plausible Einsatzregel für spätere Registerpflege?
 
 [KONTEXT_BUNDLE]
 {context_bundle}
@@ -562,7 +579,7 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_ONLY_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SOURCE_LEARNING_V1 ===
 # === END BLOCK: PROMPT BUNDLE BUILDERS ===
 
 
@@ -574,7 +591,8 @@ Zusätzliche interne Pflichtprüfung vor Aufnahme:
 # Umfang:
 # - Nur der Modellaufruf + Rohantwort-Extraktion
 # === END BLOCK: OPENAI SEARCH CALL ===
-def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, Any]], Any]:
+# === BEGIN BLOCK: OPENAI SEARCH CALL WITH SOURCE CANDIDATES V1 | Zweck: Responses-Output um separaten source_candidates-Kanal erweitern | Umfang: candidates bleiben Event-Importdaten, source_candidates nur Quellen-Merkliste ===
+def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], Any]:
     api_key = norm(os.environ.get("OPENAI_API_KEY", ""))
     if not api_key:
         fail("ENV OPENAI_API_KEY fehlt.")
@@ -630,9 +648,54 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
                                     "notes",
                                 ],
                             },
-                        }
+                        },
+                        "source_candidates": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": {
+                                    "domain": {"type": "string"},
+                                    "source_name": {"type": "string"},
+                                    "source_url_pattern": {"type": "string"},
+                                    "example_url": {"type": "string"},
+                                    "suggested_status": {"type": "string"},
+                                    "quality_signal": {"type": "string"},
+                                    "risk_signal": {"type": "string"},
+                                    "reason": {"type": "string"},
+                                    "usage_rule": {"type": "string"},
+                                    "evidence_events": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": False,
+                                            "properties": {
+                                                "title": {"type": "string"},
+                                                "date": {"type": "string"},
+                                                "url": {"type": "string"},
+                                            },
+                                            "required": ["title", "date", "url"],
+                                        },
+                                    },
+                                    "notes": {"type": "string"},
+                                },
+                                "required": [
+                                    "domain",
+                                    "source_name",
+                                    "source_url_pattern",
+                                    "example_url",
+                                    "suggested_status",
+                                    "quality_signal",
+                                    "risk_signal",
+                                    "reason",
+                                    "usage_rule",
+                                    "evidence_events",
+                                    "notes",
+                                ],
+                            },
+                        },
                     },
-                    "required": ["candidates"],
+                    "required": ["candidates", "source_candidates"],
                 },
             }
         },
@@ -652,8 +715,12 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
     if not isinstance(raw_candidates, list):
         fail("OpenAI-Antwort enthält kein gültiges candidates-Array.")
 
-    return raw_candidates, response
-# === END BLOCK: OPENAI SEARCH CALL ===
+    raw_source_candidates = payload.get("source_candidates", []) if isinstance(payload, dict) else []
+    if not isinstance(raw_source_candidates, list):
+        fail("OpenAI-Antwort enthält kein gültiges source_candidates-Array.")
+
+    return raw_candidates, raw_source_candidates, response
+# === END BLOCK: OPENAI SEARCH CALL WITH SOURCE CANDIDATES V1 ===
 
 
 # === BEGIN BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
@@ -847,7 +914,193 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
     return out
 # === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_RANGE_AWARE_V3 ===
 
+# === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_V1 | Zweck: neue Quellenkandidaten separat sammeln, ohne sie automatisch produktiv freizugeben | Umfang: liest/normalisiert/merged data/source_candidates.json ===
+def source_domain(raw_url: str) -> str:
+    raw = norm(raw_url)
+    if not raw:
+        return ""
 
+    try:
+        parsed = urlparse(raw)
+        if not parsed.netloc and not raw.startswith(("http://", "https://")):
+            parsed = urlparse("https://" + raw)
+    except Exception:
+        return ""
+
+    netloc = parsed.netloc.lower().strip()
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+    return netloc
+
+
+def source_key_from_item(item: Dict[str, Any]) -> str:
+    domain = norm_key(item.get("domain", "")) or source_domain(str(item.get("example_url", "")))
+    pattern = norm_key(item.get("source_url_pattern", ""))
+    return "|".join([domain, pattern])
+
+
+def source_known_in_register(item: Dict[str, Any], sources_register_text: str) -> bool:
+    register = norm_key(sources_register_text)
+    domain = norm_key(item.get("domain", ""))
+    pattern = norm_key(item.get("source_url_pattern", ""))
+    compact_pattern = pattern.replace("/*", "").strip()
+
+    if domain and domain in register:
+        return True
+    if compact_pattern and compact_pattern in register:
+        return True
+    return False
+
+
+def read_source_candidates() -> List[Dict[str, Any]]:
+    if not SOURCE_CANDIDATES_JSON_PATH.exists():
+        return []
+
+    try:
+        raw = json.loads(SOURCE_CANDIDATES_JSON_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        fail(f"data/source_candidates.json ist ungültig: {exc}")
+
+    if not isinstance(raw, list):
+        fail("data/source_candidates.json muss ein JSON-Array sein.")
+
+    return [item for item in raw if isinstance(item, dict)]
+
+
+def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, Any] | None:
+    if not isinstance(item, dict):
+        return None
+
+    evidence_events = item.get("evidence_events", [])
+    if not isinstance(evidence_events, list):
+        evidence_events = []
+
+    clean_evidence: List[Dict[str, str]] = []
+    for ev in evidence_events[:5]:
+        if not isinstance(ev, dict):
+            continue
+        clean_evidence.append(
+            {
+                "title": norm(ev.get("title", "")),
+                "date": norm(ev.get("date", "")),
+                "url": canonical_url(ev.get("url", "")),
+            }
+        )
+
+    example_url = canonical_url(item.get("example_url", ""))
+    domain = norm(item.get("domain", "")) or source_domain(example_url)
+    if domain.startswith("www."):
+        domain = domain[4:]
+
+    out: Dict[str, Any] = {
+        "domain": domain,
+        "source_name": norm(item.get("source_name", "")),
+        "source_url_pattern": norm(item.get("source_url_pattern", "")) or (f"{domain}/*" if domain else ""),
+        "example_url": example_url,
+        "suggested_status": norm(item.get("suggested_status", "")) or "NEW-SOURCE-CANDIDATE",
+        "quality_signal": norm(item.get("quality_signal", "")),
+        "risk_signal": norm(item.get("risk_signal", "")),
+        "reason": norm(item.get("reason", "")),
+        "usage_rule": norm(item.get("usage_rule", "")),
+        "evidence_events": clean_evidence,
+        "first_seen": today.isoformat(),
+        "last_seen": today.isoformat(),
+        "found_via": "weekly-ki-websearch",
+        "status": "neu",
+        "notes": norm(item.get("notes", "")),
+    }
+
+    required = [
+        "domain",
+        "source_name",
+        "source_url_pattern",
+        "example_url",
+        "suggested_status",
+        "reason",
+        "usage_rule",
+    ]
+    if any(not norm(out.get(k, "")) for k in required):
+        return None
+    if not clean_evidence:
+        return None
+
+    return out
+
+
+def merge_source_candidates(
+    raw_source_candidates: List[Dict[str, Any]],
+    sources_register_text: str,
+) -> tuple[List[Dict[str, Any]], int]:
+    existing = read_source_candidates()
+    today = datetime.now().date()
+
+    by_key: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+
+    for item in existing:
+        if not isinstance(item, dict):
+            continue
+        key = source_key_from_item(item)
+        if not key.strip("|"):
+            continue
+        if key not in by_key:
+            by_key[key] = item
+            order.append(key)
+
+    added = 0
+    for raw in raw_source_candidates:
+        item = normalize_source_candidate(raw, today)
+        if not item:
+            continue
+        if source_known_in_register(item, sources_register_text):
+            continue
+
+        key = source_key_from_item(item)
+        if not key.strip("|"):
+            continue
+
+        if key in by_key:
+            current = by_key[key]
+            current["last_seen"] = today.isoformat()
+
+            existing_evidence = current.get("evidence_events", [])
+            if not isinstance(existing_evidence, list):
+                existing_evidence = []
+
+            seen_ev = {
+                "|".join(
+                    [
+                        norm_key(ev.get("title", "")),
+                        norm(ev.get("date", "")),
+                        canonical_url(ev.get("url", "")),
+                    ]
+                )
+                for ev in existing_evidence
+                if isinstance(ev, dict)
+            }
+
+            for ev in item["evidence_events"]:
+                ev_key = "|".join(
+                    [
+                        norm_key(ev.get("title", "")),
+                        norm(ev.get("date", "")),
+                        canonical_url(ev.get("url", "")),
+                    ]
+                )
+                if ev_key and ev_key not in seen_ev:
+                    existing_evidence.append(ev)
+                    seen_ev.add(ev_key)
+
+            current["evidence_events"] = existing_evidence[:10]
+            continue
+
+        by_key[key] = item
+        order.append(key)
+        added += 1
+
+    merged = [by_key[key] for key in order]
+    return merged, added
+# === END BLOCK: SOURCE_CANDIDATE_LEARNING_V1 ===
 # === BEGIN BLOCK: RESPONSE SUMMARY + OUTPUT WRITE ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
@@ -897,7 +1150,7 @@ def collect_response_sources(response: Any) -> List[str]:
 # Umfang:
 # - Noch kein automatischer Intake-Trigger; nur data/inbox_manual.json als Ergebnis
 # === END BLOCK: MAIN ENTRYPOINT ===
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_ONLY_V1 | Zweck: Weekly-Lauf auf einen einzigen Produktionspass zurückbauen | Umfang: entfernt Discovery-Ausführung vollständig und schreibt nur Produktionsdelta nach data/inbox_manual.json ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_LEARNING_V1 | Zweck: Produktionslauf schreibt Event-Delta und sammelt neue Quellenkandidaten separat | Umfang: ergänzt data/source_candidates.json ohne automatisches Register-Update ===
 def main() -> None:
     export_current_snapshots()
 
@@ -921,7 +1174,7 @@ def main() -> None:
     rulebook_text = REGELWERK_PATH.read_text(encoding="utf-8")
     sources_register_text = SOURCES_REGISTER_PATH.read_text(encoding="utf-8")
 
-    raw_candidates, response = search_with_openai(
+    raw_candidates, raw_source_candidates, response = search_with_openai(
         build_messages(
             rulebook_text,
             sources_register_text,
@@ -940,8 +1193,19 @@ def main() -> None:
         manual_records,
     )[:MAX_NEW_CANDIDATES]
 
+    merged_source_candidates, added_source_candidates = merge_source_candidates(
+        raw_source_candidates,
+        sources_register_text,
+    )
+
     ensure_parent(MANUAL_JSON_PATH)
     MANUAL_JSON_PATH.write_text(json.dumps(delta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    ensure_parent(SOURCE_CANDIDATES_JSON_PATH)
+    SOURCE_CANDIDATES_JSON_PATH.write_text(
+        json.dumps(merged_source_candidates, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     source_urls = collect_response_sources(response)
 
@@ -952,10 +1216,14 @@ def main() -> None:
         f"- production_selected: {len(delta)}\n"
         f"- written_manual_json: {len(delta)}\n"
         f"- output_file: {MANUAL_JSON_PATH}\n"
+        f"- source_candidates_file: {SOURCE_CANDIDATES_JSON_PATH}\n"
+        f"- source_candidates_returned: {len(raw_source_candidates)}\n"
+        f"- source_candidates_added: {added_source_candidates}\n"
+        f"- source_candidates_total: {len(merged_source_candidates)}\n"
         f"- cited_web_sources: {len(source_urls)}"
     )
 
 
 if __name__ == "__main__":
     main()
-# === END BLOCK: WEEKLY_PRODUCTION_MAIN_ONLY_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_LEARNING_V1 ===
