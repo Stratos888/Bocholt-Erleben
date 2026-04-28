@@ -32,7 +32,15 @@ Umfang:
        - Nur Styles für diese Seite.
     === END BLOCK: FINAL REVIEW UI CSS (minimal, readable) === */
 
-    .wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
+    /* === BEGIN BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 ===
+       Zweck:
+       - Zeigt alle entscheidungsrelevanten Kandidatendaten lesbar an
+       - Ergänzt Review-Grid, URL-Block und Ablehnungsgrund-Auswahl
+       Umfang:
+       - Nur Styles für inbox/index.html
+    === END BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 === */
+
+    .wrap { max-width: 820px; margin: 0 auto; padding: 14px; }
     .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .brand { display:flex; align-items:baseline; gap:10px; }
     .title { font-weight: 700; }
@@ -45,19 +53,32 @@ Umfang:
 
     .status { margin-top: 10px; font-size: 13px; }
     .card { margin-top: 12px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
-    .card h1 { margin: 0 0 10px 0; font-size: 18px; line-height: 1.25; }
+    .card h1 { margin: 0 0 12px 0; font-size: 20px; line-height: 1.25; }
 
-    .meta { font-size: 14px; line-height: 1.35; margin: 0 0 10px 0; }
-    .meta .line { margin: 3px 0; }
+    .reviewGrid { display:grid; gap:7px; margin: 0 0 12px 0; }
+    .reviewRow { display:grid; grid-template-columns: minmax(110px, 160px) 1fr; gap:10px; font-size:14px; line-height:1.35; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.08); }
+    .reviewLabel { font-weight:700; opacity:.78; }
+    .reviewValue { min-width:0; overflow-wrap:anywhere; }
 
-    .descTitle { margin: 10px 0 6px; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; opacity: .8; }
+    .descTitle { margin: 14px 0 6px; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; opacity: .8; }
     .desc { white-space: pre-wrap; font-size: 14px; line-height: 1.4; margin: 0 0 12px 0; }
+
+    .urlBox { margin: 10px 0 12px; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.035); font-size: 13px; line-height: 1.35; }
+    .urlLine { overflow-wrap:anywhere; margin: 4px 0; }
+
+    .rejectBox { margin: 10px 0 0; display:grid; gap:6px; }
+    .rejectLabel { font-size: 12px; letter-spacing:.02em; text-transform: uppercase; opacity:.8; }
+    .rejectSelect { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.18); background: transparent; font: inherit; }
 
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
     .actions .btn { flex: 1 1 160px; padding: 12px; font-size: 15px; }
-    .sourceBtn { flex: 1 1 100%; }
+    .sourceBtn { flex: 1 1 240px; }
 
     .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+
+    @media (max-width: 560px) {
+      .reviewRow { grid-template-columns: 1fr; gap:2px; }
+    }
   </style>
 </head>
 
@@ -111,17 +132,18 @@ Umfang:
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
 
+    // === BEGIN BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
+    // Zweck:
+    // - Bindet Reload und Deploy genau einmal
+    // Umfang:
+    // - Entfernt den doppelten Deploy-Listener
     document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
     document.getElementById("deployBtn").addEventListener("click", async () => {
       const ok = await ensureUnlocked();
       if (!ok) return;
       await triggerDeploy();
     });
-document.getElementById("deployBtn").addEventListener("click", async () => {
-  const ok = await ensureUnlocked();
-  if (!ok) return;
-  await triggerDeploy();
-});
+    // === END BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
 
     function setStatus(msg) {
       elStatus.textContent = msg || "";
@@ -198,13 +220,21 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         return;
       }
 
+      // === BEGIN BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
+      // Zweck:
+      // - Zeigt alle entscheidungsrelevanten Eventdaten inkl. endDate, Kategorie, URLs, Dedupe-Hinweise
+      // - Verwerfen verlangt festen deutschen Ablehnungsgrund
+      // Umfang:
+      // - Ersetzt den Rendering-Teil innerhalb renderCurrent(totalCount) ab const it=current bis Button-Listener
       const it = current;
 
-      // Meta: klar & schnell scanbar
-      const dateTime = [
-        (it.date || "").trim(),
-        (it.time || "").trim()
-      ].filter(Boolean).join(" · ");
+      const date = (it.date || "").trim();
+      const endDate = (it.endDate || "").trim();
+      const time = (it.time || "").trim();
+
+      const eventType = endDate ? "Mehrtagesevent" : "Einzeltermin";
+      const dateLine = endDate ? `${date || "?"} bis ${endDate}` : date;
+      const timeLine = time || (endDate ? "keine einheitliche Startzeit / nicht angegeben" : "nicht angegeben");
 
       const placeLine = [
         (it.city || "").trim(),
@@ -214,24 +244,77 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       const sourceLine = (it.source_name || "").trim();
       const desc = (it.description || "").trim();
 
-      const urlToOpen = (it.url || it.source_url || "").trim();
-      const openDisabled = !urlToOpen;
+      const eventUrl = (it.url || "").trim();
+      const sourceUrl = (it.source_url || "").trim();
+      const openEventDisabled = !eventUrl;
+      const openSourceDisabled = !sourceUrl;
+
+      const rejectOptions = [
+        ["", "Ablehnungsgrund auswählen …"],
+        ["DUBLETTE", "DUBLETTE – Event ist bereits vorhanden oder schon entschieden"],
+        ["DATUM_FALSCH", "DATUM_FALSCH – Datum falsch oder nicht sicher belegbar"],
+        ["ZEIT_FALSCH", "ZEIT_FALSCH – Uhrzeit falsch, Zeitspanne falsch oder Zeit nicht belegbar"],
+        ["URL_FALSCH", "URL_FALSCH – URL falsch, 404, falscher Termin oder nicht instanzpassend"],
+        ["QUELLE_ZU_SCHWACH", "QUELLE_ZU_SCHWACH – Quelle zu allgemein, unsicher oder keine echte Detailseite"],
+        ["KEIN_EVENT", "KEIN_EVENT – kein echtes Event, eher Info, Öffnungszeit, Kursliste oder Promo"],
+        ["ZU_NISCHIG", "ZU_NISCHIG – formal korrekt, aber zu wenig Nutzerwert"],
+        ["AUSSERHALB_SCOPE", "AUSSERHALB_SCOPE – außerhalb Radius oder nicht relevant genug"],
+        ["MONETARISIERUNGSSCHUTZ", "MONETARISIERUNGSSCHUTZ – geschützte Venue / direkte Promo potenzieller Kunden"],
+        ["BOT_FEHLER_SONSTIGES", "BOT_FEHLER_SONSTIGES – Bot hat falsch extrahiert oder modelliert"],
+        ["SONSTIGES", "SONSTIGES – nur wenn kein anderer Grund passt"]
+      ];
+
+      const rejectOptionsHtml = rejectOptions.map(([value, label]) => {
+        return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+      }).join("");
+
+      const infoRows = [
+        ["Typ", eventType],
+        ["Laufzeit", dateLine],
+        ["Startzeit", timeLine],
+        ["Ort", placeLine],
+        ["Kategorie", (it.kategorie_suggestion || "").trim()],
+        ["Quelle", sourceLine],
+        ["Match Score", (it.match_score || "").trim()],
+        ["Matched Event ID", (it.matched_event_id || "").trim()],
+        ["ID-Vorschlag", (it.id_suggestion || "").trim()],
+        ["Eingang", (it.created_at || "").trim()],
+        ["Notes", (it.notes || "").trim()]
+      ].filter(([, value]) => value);
+
+      const infoRowsHtml = infoRows.map(([label, value]) => `
+        <div class="reviewRow">
+          <div class="reviewLabel">${escapeHtml(label)}</div>
+          <div class="reviewValue">${escapeHtml(value)}</div>
+        </div>
+      `).join("");
 
       elOne.innerHTML = `
         <article class="card">
           <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
 
-          <div class="meta">
-            ${dateTime ? `<div class="line">📅 ${escapeHtml(dateTime)}</div>` : ``}
-            ${placeLine ? `<div class="line">📍 ${escapeHtml(placeLine)}</div>` : ``}
-            ${sourceLine ? `<div class="line muted">Quelle: <strong>${escapeHtml(sourceLine)}</strong></div>` : ``}
+          <div class="reviewGrid">
+            ${infoRowsHtml}
           </div>
 
-          <div class="descTitle">Extrahierter Text</div>
+          <div class="descTitle">Beschreibung / extrahierter Text</div>
           <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
 
+          <div class="urlBox">
+            ${eventUrl ? `<div class="urlLine"><strong>Event-URL:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
+            ${sourceUrl ? `<div class="urlLine"><strong>Source-URL:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
+          </div>
+
+          <div class="rejectBox">
+            <label class="rejectLabel" for="rejectReason">Ablehnungsgrund beim Verwerfen</label>
+            <select id="rejectReason" class="rejectSelect">
+              ${rejectOptionsHtml}
+            </select>
+          </div>
+
           <div class="actions">
-            <button id="btnOpen" class="btn sourceBtn" type="button" ${openDisabled ? "disabled" : ""}>Quelle öffnen</button>
+            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Event-URL öffnen</button>
+            <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Source-URL öffnen</button>
             <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
             <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
           </div>
@@ -240,13 +323,19 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         </article>
       `;
 
-      document.getElementById("btnOpen").addEventListener("click", () => {
-        if (!urlToOpen) return;
-        window.open(urlToOpen, "_blank", "noopener,noreferrer");
+      document.getElementById("btnOpenEvent").addEventListener("click", () => {
+        if (!eventUrl) return;
+        window.open(eventUrl, "_blank", "noopener,noreferrer");
+      });
+
+      document.getElementById("btnOpenSource").addEventListener("click", () => {
+        if (!sourceUrl) return;
+        window.open(sourceUrl, "_blank", "noopener,noreferrer");
       });
 
       document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
+      // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
 
     async function approveReject(status) {
@@ -281,6 +370,12 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       }
     }
 
+    // === BEGIN BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
+    // Zweck:
+    // - Übernehmen bleibt direkter Approve-Import
+    // - Verwerfen sendet verpflichtend ablehnungsgrund an Apps Script
+    // Umfang:
+    // - Ersetzt writeStatus(it, newStatus)
     function writeStatus(it, newStatus) {
       return new Promise(async (resolve) => {
         if (!it.row_number) {
@@ -290,26 +385,83 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
 
         const btnOk = document.getElementById("btnOk");
         const btnNo = document.getElementById("btnNo");
-        const btnOpen = document.getElementById("btnOpen");
+        const btnOpenEvent = document.getElementById("btnOpenEvent");
+        const btnOpenSource = document.getElementById("btnOpenSource");
         const btnDeploy = document.getElementById("deployBtn");
+
         if (btnOk) btnOk.disabled = true;
         if (btnNo) btnNo.disabled = true;
-        if (btnOpen) btnOpen.disabled = true;
+        if (btnOpenEvent) btnOpenEvent.disabled = true;
+        if (btnOpenSource) btnOpenSource.disabled = true;
         if (btnDeploy) btnDeploy.disabled = true;
 
         try {
           const isApprove = String(newStatus) === "übernehmen";
 
-          const res = await jsonp(API_URL, isApprove ? {
-            action: "approve",
-            token: sessionToken,
-            row_number: String(it.row_number)
-          } : {
-            action: "setStatus",
-            token: sessionToken,
-            row_number: String(it.row_number),
-            status: String(newStatus)
-          });
+          let payload;
+
+          if (isApprove) {
+            payload = {
+              action: "approve",
+              token: sessionToken,
+              row_number: String(it.row_number)
+            };
+          } else {
+            const reasonSelect = document.getElementById("rejectReason");
+            const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
+
+            if (!ablehnungsgrund) {
+              alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
+              renderCurrent(totalLoaded);
+              return resolve();
+            }
+
+            payload = {
+              action: "setStatus",
+              token: sessionToken,
+              row_number: String(it.row_number),
+              status: String(newStatus),
+              ablehnungsgrund: ablehnungsgrund
+            };
+          }
+
+          const res = await jsonp(API_URL, payload);
+
+          if (res && res.ok) {
+            setStatus(isApprove ? "Übernommen." : "Verworfen.");
+            await loadAndShow();
+            return resolve();
+          }
+
+          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+
+          if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+            sessionToken = "";
+            refreshLock();
+            setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+            renderCurrent(totalLoaded);
+            return resolve();
+          }
+
+          setStatus("Serverfehler: " + err);
+          renderCurrent(totalLoaded);
+          return resolve();
+
+        } catch (e) {
+          console.error(e);
+          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+          renderCurrent(totalLoaded);
+          return resolve();
+        } finally {
+          if (btnOk) btnOk.disabled = false;
+          if (btnNo) btnNo.disabled = false;
+          if (btnOpenEvent) btnOpenEvent.disabled = false;
+          if (btnOpenSource) btnOpenSource.disabled = false;
+          if (btnDeploy) btnDeploy.disabled = false;
+        }
+      });
+    }
+    // === END BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
 
           if (res && res.ok) {
             setStatus(isApprove ? "Übernommen." : "Verworfen.");
