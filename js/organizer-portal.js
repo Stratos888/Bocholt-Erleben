@@ -172,8 +172,10 @@
     const loginEmail = document.getElementById("organizer-login-email");
     const loginNote = document.getElementById("organizer-login-note");
 
-    const params = new URLSearchParams(window.location.search);
-    const token = safeText(params.get("token"));
+const params = new URLSearchParams(window.location.search);
+const token = safeText(params.get("token"));
+const membershipStarted = safeText(params.get("membership_started")) === "1";
+const prefillEmail = safeText(params.get("email"));
 
     const setSubmitting = (isSubmitting) => {
       if (!loginSubmit) return;
@@ -183,7 +185,16 @@
       loginSubmit.disabled = isSubmitting;
       loginSubmit.textContent = isSubmitting ? "Wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
     };
+if (loginEmail && prefillEmail && !safeText(loginEmail.value)) {
+  loginEmail.value = prefillEmail;
+}
 
+if (membershipStarted) {
+  setLoginResult(
+    "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um in deinen Veranstalterbereich zu kommen."
+  );
+}
+    
     /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 | Zweck: enttechnisiert alle nutzerseitigen Magic-Link-Texte zu Zugangslink-Sprache und korrigiert den Fallback-Link im Login-Flow; Umfang: ersetzt den Token- und Request-Abschnitt in handleLoginPage === */
     if (token) {
       if (loginNote) {
@@ -308,7 +319,8 @@
     const quotaRemaining = document.getElementById("organizer-quota-remaining");
     const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
     const submissionsList = document.getElementById("organizer-dashboard-submissions-list");
-    const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
+const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
+const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
 
     if (title) {
       title.textContent = isSingleStatusView
@@ -341,7 +353,16 @@
         note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
       }
     }
+if (dashboardPrimaryCta) {
+  const subscriptionPlanKey = safeText(subscription?.plan_key).toLowerCase();
+  const effectivePlanKey = subscriptionPlanKey || defaultPlanKey || "single";
+  const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
+    ? effectivePlanKey
+    : "single";
 
+  dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
+}
+    
     if (accountHead) {
       accountHead.textContent = isSingleStatusView ? "Letzter Stand" : "Veranstalter";
     }
