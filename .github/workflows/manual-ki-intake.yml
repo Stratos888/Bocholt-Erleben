@@ -193,7 +193,7 @@ jobs:
               if any(v for v in row):
                   existing_rows.append(dict(zip(header, row)))
 
-          # === BEGIN BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_KEYS_V1 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben | Umfang: ersetzt source_url-only Dedupe durch source_url+date ===
+          # === BEGIN BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben und Skip-Gründe messen | Umfang: ersetzt source_url-only Dedupe-Vorbereitung ===
           existing_source_date_keys = set()
           existing_fps = set()
 
@@ -212,6 +212,24 @@ jobs:
               )
               if fp != "||":
                   existing_fps.add(fp)
+
+          created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+          rows_to_append = []
+          skipped = 0
+          skip_reasons = {}
+          skipped_details = []
+
+          def mark_skipped(item, reason):
+              nonlocal skipped
+              skipped += 1
+              skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
+              skipped_details.append({
+                  "reason": reason,
+                  "title": norm(item.get("title", "")),
+                  "date": norm(item.get("date", "")),
+                  "source_url": canonical_url(item.get("source_url", "")),
+              })
+          # === END BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 ===
           # === END BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_KEYS_V1 ===
 
           created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -242,13 +260,7 @@ jobs:
               end_date_value = norm(normalized.get("endDate", ""))
               if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
                   fail(f"Element #{idx}: invalid_endDate_format")
-
-              normalized["status"] = "review"
-              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
-              normalized["source_url"] = canonical_url(normalized.get("source_url", ""))
-              normalized["url"] = canonical_url(normalized.get("url", ""))
-
-               # === BEGIN BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_KEYS_V1 | Zweck: beim Append source_url+date statt nur source_url deduplizieren | Umfang: erlaubt Serieninstanzen mit gleicher Quelle und unterschiedlichem Datum ===
+              # === BEGIN BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 | Zweck: source_url+date statt nur source_url deduplizieren und Skip-Gründe protokollieren | Umfang: erlaubt Serieninstanzen mit gleicher Quelle und unterschiedlichem Datum ===
               source_date_key = "|".join([
                   norm_key(normalized["source_url"]),
                   norm(normalized.get("date", "")),
@@ -261,11 +273,11 @@ jobs:
               )
 
               if source_date_key and source_date_key in existing_source_date_keys:
-                  skipped += 1
+                  mark_skipped(normalized, "duplicate_source_date")
                   continue
 
               if fp != "||" and fp in existing_fps:
-                  skipped += 1
+                  mark_skipped(normalized, "duplicate_title_date_location")
                   continue
 
               row_map = {col: "" for col in header}
@@ -279,9 +291,25 @@ jobs:
                   existing_source_date_keys.add(source_date_key)
               if fp != "||":
                   existing_fps.add(fp)
+              # === END BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 ===
+              row_map = {col: "" for col in header}
+              for col in header:
+                  if col in normalized:
+                      row_map[col] = normalized[col]
+
+              rows_to_append.append([row_map.get(col, "") for col in header])
+
+              if source_date_key:
+                  existing_source_date_keys.add(source_date_key)
+              if fp != "||":
+                  existing_fps.add(fp)
               # === END BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_KEYS_V1 ===
 
-          if not rows_to_append:
+          info(f"Append OK: appended={len(rows_to_append)} skipped={skipped} skip_reasons={json.dumps(skip_reasons, ensure_ascii=False)}")
+          if skipped_details:
+              info("Skipped details:")
+              for item in skipped_details[:40]:
+                  info(json.dumps(item, ensure_ascii=False))
               info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
               sys.exit(0)
 
