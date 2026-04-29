@@ -80,25 +80,129 @@
     }
   }
 
+  /* === BEGIN BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_V1 | Zweck: liest optionale Portal-Session, fuellt bekannte Veranstalterdaten vor und sperrt das Modell bei aktivem Abo; Umfang: Plan-Preset-, Portal- und Modell-Lock-Helfer === */
   function getAutomationEndpoint() {
     return safeText(cfg.automationFormspreeEndpoint);
   }
-function applyPlanPresetFromUrl() {
-  const planSelect = byId("publish-standard-plan");
-  if (!planSelect) return;
 
-  const params = new URLSearchParams(window.location.search);
-  const requestedPlan = safeText(params.get("plan")).toLowerCase();
-  if (!requestedPlan) return;
+  function getAllowedPlanKeys() {
+    return ["single", "starter", "active", "unlimited"];
+  }
 
-  const allowedPlans = ["single", "starter", "active", "unlimited"];
-  if (!allowedPlans.includes(requestedPlan)) return;
+  function formatPlanLabel(planKey) {
+    const key = safeText(planKey).toLowerCase();
 
-  const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === requestedPlan);
-  if (!hasOption) return;
+    return ({
+      single: "Einzeltermin",
+      starter: "Starter",
+      active: "Aktiv",
+      unlimited: "Dauerhaft"
+    })[key] || key;
+  }
 
-  planSelect.value = requestedPlan;
-}
+  function ensurePlanLockHint(message) {
+    const planSelect = byId("publish-standard-plan");
+    if (!planSelect) return;
+
+    let hint = document.getElementById("publish-standard-plan-lock-hint");
+    if (!hint) {
+      hint = document.createElement("p");
+      hint.id = "publish-standard-plan-lock-hint";
+      hint.className = "content-form-note";
+      planSelect.insertAdjacentElement("afterend", hint);
+    }
+
+    hint.textContent = message;
+  }
+
+  function applyPlanPresetFromUrl() {
+    const planSelect = byId("publish-standard-plan");
+    if (!planSelect) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedPlan = safeText(params.get("plan")).toLowerCase();
+    if (!requestedPlan) return;
+
+    const allowedPlans = getAllowedPlanKeys();
+    if (!allowedPlans.includes(requestedPlan)) return;
+
+    const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === requestedPlan);
+    if (!hasOption) return;
+
+    planSelect.value = requestedPlan;
+  }
+
+  async function tryLoadOrganizerPortalState() {
+    const response = await fetch("/api/organizer-portal/me.php", {
+      method: "GET",
+      credentials: "same-origin",
+      headers: {
+        Accept: "application/json"
+      }
+    });
+
+    if (response.status === 401) {
+      return null;
+    }
+
+    const rawText = await response.text();
+    let data = null;
+
+    try {
+      data = rawText ? JSON.parse(rawText) : null;
+    } catch (_error) {
+      data = null;
+    }
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return data?.data || null;
+  }
+
+  async function syncStandardFormWithPortalSession() {
+    const pageMode = safeText(document.body?.dataset.publishMode).toLowerCase();
+    if (pageMode !== "standard") return;
+
+    const portalData = await tryLoadOrganizerPortalState();
+    if (!portalData || typeof portalData !== "object") return;
+
+    const organizer = portalData.organizer || {};
+    const subscription = portalData.subscription || null;
+
+    const planSelect = byId("publish-standard-plan");
+    const organizationField = byId("publish-standard-organization");
+    const contactField = byId("publish-standard-contact");
+    const emailField = byId("publish-standard-email");
+
+    if (organizationField && !hasValue(organizationField.value)) {
+      organizationField.value = safeText(organizer.organization_name);
+    }
+
+    if (contactField && !hasValue(contactField.value)) {
+      contactField.value = safeText(organizer.contact_name);
+    }
+
+    if (emailField && !hasValue(emailField.value)) {
+      emailField.value = safeText(organizer.email);
+    }
+
+    const activePlanKey = safeText(subscription?.plan_key).toLowerCase();
+    if (!planSelect || !["starter", "active", "unlimited"].includes(activePlanKey)) return;
+
+    const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === activePlanKey);
+    if (!hasOption) return;
+
+    planSelect.value = activePlanKey;
+    planSelect.disabled = true;
+    planSelect.setAttribute("aria-disabled", "true");
+
+    ensurePlanLockHint(
+      `Dein aktives Modell ${formatPlanLabel(activePlanKey)} wird für diese Einreichung automatisch verwendet. Tarifwechsel oder Kündigung machst du im Veranstalterbereich.`
+    );
+  }
+  /* === END BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_V1 === */
   
   function persistCheckoutContext(context) {
     try {
@@ -450,12 +554,16 @@ function applyPlanPresetFromUrl() {
   }
   /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 === */
 
-function init() {
-  if (!isPublishRoute()) return;
-  applyPlanPresetFromUrl();
-  bindStandardPath();
-  bindAutomationPath();
-}
+  /* === BEGIN BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V1 | Zweck: synchronisiert vor dem Binden des Formulars die aktive Veranstalter-Session; Umfang: Initialisierung am Dateiende === */
+  async function initPublishFunnel() {
+    applyPlanPresetFromUrl();
+    await syncStandardFormWithPortalSession();
+    bindAutomationPath();
+    bindStandardPath();
+  }
+
+  void initPublishFunnel();
+  /* === END BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V1 === */
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
