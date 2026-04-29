@@ -139,28 +139,64 @@ function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
     return is_array($row) ? $row : null;
 }
 
-function opm_fetch_quota_summary(PDO $pdo, int $organizerId): array
+function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubscription = null): array
 {
-    $statement = $pdo->prepare(
-        'SELECT
-            COUNT(*) AS entitlement_count,
-            MAX(CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
-            COALESCE(SUM(included_publications), 0) AS included_total,
-            COALESCE(SUM(consumed_publications), 0) AS consumed_total,
-            MIN(period_start) AS current_period_start,
-            MAX(period_end) AS current_period_end
-         FROM publication_entitlements
-         WHERE organizer_id = :organizer_id
-           AND status = "active"
-           AND (period_start IS NULL OR period_start <= UTC_TIMESTAMP())
-           AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())'
-    );
+    $subscriptionId = 0;
+    $subscriptionStatus = strtolower(trim((string)($activeSubscription['status'] ?? '')));
 
-    $statement->execute([
-        ':organizer_id' => $organizerId,
-    ]);
+    if (
+        is_array($activeSubscription)
+        && in_array($subscriptionStatus, ['active', 'trialing'], true)
+        && (int)($activeSubscription['id'] ?? 0) > 0
+    ) {
+        $subscriptionId = (int)$activeSubscription['id'];
+    }
+
+    if ($subscriptionId > 0) {
+        $statement = $pdo->prepare(
+            'SELECT
+                COUNT(*) AS entitlement_count,
+                MAX(CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
+                COALESCE(SUM(included_publications), 0) AS included_total,
+                COALESCE(SUM(consumed_publications), 0) AS consumed_total,
+                MIN(period_start) AS current_period_start,
+                MAX(period_end) AS current_period_end
+             FROM publication_entitlements
+             WHERE organizer_id = :organizer_id
+               AND subscription_id = :subscription_id
+               AND source_type = "subscription"
+               AND status = "active"
+               AND (period_start IS NULL OR period_start <= UTC_TIMESTAMP())
+               AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())'
+        );
+
+        $statement->execute([
+            ':organizer_id' => $organizerId,
+            ':subscription_id' => $subscriptionId,
+        ]);
+    } else {
+        $statement = $pdo->prepare(
+            'SELECT
+                COUNT(*) AS entitlement_count,
+                MAX(CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
+                COALESCE(SUM(included_publications), 0) AS included_total,
+                COALESCE(SUM(consumed_publications), 0) AS consumed_total,
+                MIN(period_start) AS current_period_start,
+                MAX(period_end) AS current_period_end
+             FROM publication_entitlements
+             WHERE organizer_id = :organizer_id
+               AND status = "active"
+               AND (period_start IS NULL OR period_start <= UTC_TIMESTAMP())
+               AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())'
+        );
+
+        $statement->execute([
+            ':organizer_id' => $organizerId,
+        ]);
+    }
 
     $row = $statement->fetch();
+
     if (!is_array($row)) {
         return [
             'entitlement_count' => 0,
@@ -244,7 +280,7 @@ try {
 
     $organizerId = (int)$sessionRow['organizer_id'];
     $activeSubscription = opm_fetch_active_subscription($pdo, $organizerId);
-    $quotaSummary = opm_fetch_quota_summary($pdo, $organizerId);
+$quotaSummary = opm_fetch_quota_summary($pdo, $organizerId, $activeSubscription);
     $recentSubmissions = opm_fetch_recent_submissions($pdo, $organizerId);
 
     be_json_response(200, [
