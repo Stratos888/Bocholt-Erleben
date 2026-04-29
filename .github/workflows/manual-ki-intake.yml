@@ -193,7 +193,7 @@ jobs:
               if any(v for v in row):
                   existing_rows.append(dict(zip(header, row)))
 
-          # === BEGIN BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben und Skip-Gründe messen | Umfang: ersetzt source_url-only Dedupe-Vorbereitung ===
+          # === BEGIN BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben, Append-Dubletten verhindern und Skip-Gründe loggen | Umfang: ersetzt Dedupe-, Loop- und Append-Abschnitt vollständig ===
           existing_source_date_keys = set()
           existing_fps = set()
 
@@ -215,13 +215,10 @@ jobs:
 
           created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
           rows_to_append = []
-          skipped = 0
           skip_reasons = {}
           skipped_details = []
 
           def mark_skipped(item, reason):
-              nonlocal skipped
-              skipped += 1
               skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
               skipped_details.append({
                   "reason": reason,
@@ -229,12 +226,6 @@ jobs:
                   "date": norm(item.get("date", "")),
                   "source_url": canonical_url(item.get("source_url", "")),
               })
-          # === END BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 ===
-          # === END BLOCK: MANUAL_INTAKE_DEDUPE_SOURCE_DATE_KEYS_V1 ===
-
-          created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-          rows_to_append = []
-          skipped = 0
 
           for idx, item in enumerate(raw, start=1):
               if not isinstance(item, dict):
@@ -249,6 +240,9 @@ jobs:
                   else:
                       fail(f"Element #{idx}: Feld '{key}' ist kein skalarer Wert.")
 
+              normalized["url"] = canonical_url(normalized.get("url", ""))
+              normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
+
               missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]
               if missing_required:
                   fail(f"Element #{idx}: missing_required={','.join(missing_required)}")
@@ -260,11 +254,11 @@ jobs:
               end_date_value = norm(normalized.get("endDate", ""))
               if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
                   fail(f"Element #{idx}: invalid_endDate_format")
-              # === BEGIN BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 | Zweck: source_url+date statt nur source_url deduplizieren und Skip-Gründe protokollieren | Umfang: erlaubt Serieninstanzen mit gleicher Quelle und unterschiedlichem Datum ===
+
               source_date_key = "|".join([
                   norm_key(normalized["source_url"]),
-                  norm(normalized.get("date", "")),
-              ]) if normalized["source_url"] and norm(normalized.get("date", "")) else ""
+                  date_value,
+              ]) if normalized["source_url"] and date_value else ""
 
               fp = dedupe_fp(
                   normalized.get("title", ""),
@@ -291,25 +285,15 @@ jobs:
                   existing_source_date_keys.add(source_date_key)
               if fp != "||":
                   existing_fps.add(fp)
-              # === END BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_DIAGNOSTICS_V1 ===
-              row_map = {col: "" for col in header}
-              for col in header:
-                  if col in normalized:
-                      row_map[col] = normalized[col]
 
-              rows_to_append.append([row_map.get(col, "") for col in header])
-
-              if source_date_key:
-                  existing_source_date_keys.add(source_date_key)
-              if fp != "||":
-                  existing_fps.add(fp)
-              # === END BLOCK: MANUAL_INTAKE_APPEND_DEDUPE_SOURCE_DATE_KEYS_V1 ===
-
+          skipped = len(skipped_details)
           info(f"Append OK: appended={len(rows_to_append)} skipped={skipped} skip_reasons={json.dumps(skip_reasons, ensure_ascii=False)}")
           if skipped_details:
               info("Skipped details:")
               for item in skipped_details[:40]:
                   info(json.dumps(item, ensure_ascii=False))
+
+          if not rows_to_append:
               info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
               sys.exit(0)
 
@@ -322,6 +306,7 @@ jobs:
           ).execute()
 
           info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
+          # === END BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 ===
           PY
 
       # === BEGIN BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===
