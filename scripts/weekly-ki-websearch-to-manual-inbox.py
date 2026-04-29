@@ -1199,7 +1199,7 @@ def filter_delta(
     return selected
 # === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_DIAGNOSTICS_V1 ===
 
-# === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_V1 | Zweck: neue Quellenkandidaten separat sammeln, ohne sie automatisch produktiv freizugeben | Umfang: liest/normalisiert/merged data/source_candidates.json ===
+# === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_DIAGNOSTICS_V2 | Zweck: neue Quellenkandidaten separat sammeln und Annahme-/Ablehnungsgründe diagnostizieren | Umfang: ersetzt Source-Candidate-Normalisierung und Merge vollständig ===
 def source_domain(raw_url: str) -> str:
     raw = norm(raw_url)
     if not raw:
@@ -1252,10 +1252,48 @@ def read_source_candidates() -> List[Dict[str, Any]]:
     return [item for item in raw if isinstance(item, dict)]
 
 
-# === BEGIN BLOCK: SOURCE_CANDIDATE_NORMALIZATION_OUTPUT_SAFE_V2 | Zweck: Quellenkandidaten einzeilig, URL-sauber und merge-stabil normalisieren | Umfang: ersetzt normalize_source_candidate vollständig ===
-def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, Any] | None:
+def source_candidate_diag_summary(
+    raw: Dict[str, Any] | None,
+    reason: str,
+    stage: str,
+    normalized: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    data = normalized if normalized is not None else (raw if isinstance(raw, dict) else {})
+    evidence_events = data.get("evidence_events", []) if isinstance(data, dict) else []
+    if not isinstance(evidence_events, list):
+        evidence_events = []
+
+    evidence_titles: List[str] = []
+    for ev in evidence_events[:5]:
+        if isinstance(ev, dict):
+            title = clean_output_text(ev.get("title", ""))
+            date_value = clean_output_text(ev.get("date", ""))
+            if title or date_value:
+                evidence_titles.append(f"{date_value} | {title}".strip())
+
+    example_url = canonical_url(data.get("example_url", "")) if isinstance(data, dict) else ""
+    domain = clean_output_text(data.get("domain", "")) if isinstance(data, dict) else ""
+    if not domain and example_url:
+        domain = source_domain(example_url)
+    if domain.startswith("www."):
+        domain = domain[4:]
+
+    return {
+        "stage": stage,
+        "reason": reason,
+        "domain": domain,
+        "source_name": clean_output_text(data.get("source_name", "")) if isinstance(data, dict) else "",
+        "source_url_pattern": clean_output_text(data.get("source_url_pattern", "")) if isinstance(data, dict) else "",
+        "example_url": example_url,
+        "suggested_status": clean_output_text(data.get("suggested_status", "")) if isinstance(data, dict) else "",
+        "evidence_events_count": len(evidence_events),
+        "evidence_event_titles": evidence_titles,
+    }
+
+
+def normalize_source_candidate_with_reason(item: Dict[str, Any], today: date) -> tuple[Dict[str, Any] | None, str]:
     if not isinstance(item, dict):
-        return None
+        return None, "non_object_source_candidate"
 
     evidence_events = item.get("evidence_events", [])
     if not isinstance(evidence_events, list):
@@ -1305,24 +1343,32 @@ def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, A
         "reason",
         "usage_rule",
     ]
-    if any(not norm(out.get(k, "")) for k in required):
-        return None
+    missing_required = [k for k in required if not norm(out.get(k, ""))]
+    if missing_required:
+        return out, "missing_required:" + ",".join(missing_required)
     if not clean_evidence:
+        return out, "missing_evidence_events"
+
+    return out, ""
+
+
+def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, Any] | None:
+    normalized, reason = normalize_source_candidate_with_reason(item, today)
+    if reason:
         return None
-
-    return out
-# === END BLOCK: SOURCE_CANDIDATE_NORMALIZATION_OUTPUT_SAFE_V2 ===
+    return normalized
 
 
-def merge_source_candidates(
+def merge_source_candidates_with_diagnostics(
     raw_source_candidates: List[Dict[str, Any]],
     sources_register_text: str,
-) -> tuple[List[Dict[str, Any]], int]:
+) -> tuple[List[Dict[str, Any]], int, List[Dict[str, Any]]]:
     existing = read_source_candidates()
     today = datetime.now().date()
 
     by_key: Dict[str, Dict[str, Any]] = {}
     order: List[str] = []
+    diagnostics: List[Dict[str, Any]] = []
 
     for item in existing:
         if not isinstance(item, dict):
@@ -1336,14 +1382,21 @@ def merge_source_candidates(
 
     added = 0
     for raw in raw_source_candidates:
-        item = normalize_source_candidate(raw, today)
-        if not item:
+        item, reason = normalize_source_candidate_with_reason(raw, today)
+        if reason:
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, reason, "validation", item))
             continue
+        if item is None:
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "normalization_failed", "validation"))
+            continue
+
         if source_known_in_register(item, sources_register_text):
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "known_in_register", "register", item))
             continue
 
         key = source_key_from_item(item)
         if not key.strip("|"):
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "empty_source_key", "validation", item))
             continue
 
         if key in by_key:
@@ -1379,15 +1432,25 @@ def merge_source_candidates(
                     seen_ev.add(ev_key)
 
             current["evidence_events"] = existing_evidence[:10]
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "merged_existing_candidate", "merge", item))
             continue
 
         by_key[key] = item
         order.append(key)
         added += 1
+        diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "added", "added", item))
 
     merged = [by_key[key] for key in order]
+    return merged, added, diagnostics
+
+
+def merge_source_candidates(
+    raw_source_candidates: List[Dict[str, Any]],
+    sources_register_text: str,
+) -> tuple[List[Dict[str, Any]], int]:
+    merged, added, _diagnostics = merge_source_candidates_with_diagnostics(raw_source_candidates, sources_register_text)
     return merged, added
-# === END BLOCK: SOURCE_CANDIDATE_LEARNING_V1 ===
+# === END BLOCK: SOURCE_CANDIDATE_LEARNING_DIAGNOSTICS_V2 ===
 # === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_AND_COVERAGE_AUDIT_V1 | Zweck: Raw-/Selected-/Drop-Diagnose und passive Coverage-Targets nach dem Lauf auswerten | Umfang: ergänzt Diagnoseausgabe ohne Suchprompt zu beeinflussen ===
 def count_by_key(items: List[Dict[str, Any]], key: str) -> Dict[str, int]:
     out: Dict[str, int] = {}
@@ -1574,12 +1637,14 @@ def coverage_audit(
     return audit
 
 
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_SUMMARY_WITH_SOURCE_CANDIDATES_V2 | Zweck: Event-, Coverage- und Source-Candidate-Diagnose zentral in JSON und Log zusammenführen | Umfang: ersetzt build_weekly_diagnostics und print_weekly_diagnostics_summary ===
 def build_weekly_diagnostics(
     raw_candidates: List[Dict[str, Any]],
     raw_source_candidates: List[Dict[str, Any]],
     selected_candidates: List[Dict[str, str]],
     drop_diagnostics: List[Dict[str, str]],
     coverage: List[Dict[str, str]],
+    source_candidate_diagnostics: List[Dict[str, Any]],
 ) -> Dict[str, Any]:
     dropped = [item for item in drop_diagnostics if item.get("reason") != "selected"]
     return {
@@ -1597,6 +1662,14 @@ def build_weekly_diagnostics(
             f"{item.get('reason', '')} | {item.get('date', '')} | {item.get('title', '')}".strip()
             for item in dropped[:80]
         ],
+        "source_candidate_reasons": count_by_key(source_candidate_diagnostics, "reason"),
+        "source_candidate_stage_counts": count_by_key(source_candidate_diagnostics, "stage"),
+        "source_candidates_added": sum(1 for item in source_candidate_diagnostics if item.get("reason") == "added"),
+        "source_candidate_summaries": [
+            f"{item.get('reason', '')} | {item.get('domain', '')} | {item.get('source_name', '')}".strip()
+            for item in source_candidate_diagnostics[:80]
+        ],
+        "source_candidate_diagnostics": source_candidate_diagnostics,
         "coverage_targets_total": len(coverage),
         "coverage_status_counts": count_by_key(coverage, "status"),
         "coverage_audit": coverage,
@@ -1610,11 +1683,14 @@ def print_weekly_diagnostics_summary(diagnostics: Dict[str, Any]) -> None:
         f"- selected_candidates: {diagnostics.get('selected_candidates', 0)}\n"
         f"- dropped_candidates: {diagnostics.get('dropped_candidates', 0)}\n"
         f"- drop_reasons: {json.dumps(diagnostics.get('drop_reasons', {}), ensure_ascii=False)}\n"
+        f"- raw_source_candidates_returned: {diagnostics.get('raw_source_candidates_returned', 0)}\n"
+        f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
+        f"- source_candidate_stage_counts: {json.dumps(diagnostics.get('source_candidate_stage_counts', {}), ensure_ascii=False)}\n"
         f"- coverage_targets_total: {diagnostics.get('coverage_targets_total', 0)}\n"
         f"- coverage_status_counts: {json.dumps(diagnostics.get('coverage_status_counts', {}), ensure_ascii=False)}\n"
         f"- diagnostics_file: {DIAGNOSTICS_JSON_PATH}"
     )
-# === END BLOCK: WEEKLY_DIAGNOSTICS_AND_COVERAGE_AUDIT_V1 ===
+# === END BLOCK: WEEKLY_DIAGNOSTICS_SUMMARY_WITH_SOURCE_CANDIDATES_V2 ===
 # === BEGIN BLOCK: RESPONSE SUMMARY + OUTPUT WRITE ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
@@ -1664,7 +1740,7 @@ def collect_response_sources(response: Any) -> List[str]:
 # Umfang:
 # - Noch kein automatischer Intake-Trigger; nur data/inbox_manual.json als Ergebnis
 # === END BLOCK: MAIN ENTRYPOINT ===
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_DIAGNOSTICS_V1 | Zweck: Produktionslauf schreibt Event-/Quellen-Output und erzeugt passive Diagnose für Raw/Filter/Coverage | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_DIAGNOSTICS_V2 | Zweck: Produktionslauf schreibt Event-/Quellen-Output und erzeugt passive Diagnose inkl. Source-Candidate-Gründe | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
 def main() -> None:
     export_current_snapshots()
 
@@ -1708,7 +1784,7 @@ def main() -> None:
     )
     delta = filtered_delta[:MAX_NEW_CANDIDATES]
 
-    merged_source_candidates, added_source_candidates = merge_source_candidates(
+    merged_source_candidates, added_source_candidates, source_candidate_diagnostics = merge_source_candidates_with_diagnostics(
         raw_source_candidates,
         sources_register_text,
     )
@@ -1730,6 +1806,7 @@ def main() -> None:
         delta,
         drop_diagnostics,
         coverage,
+        source_candidate_diagnostics,
     )
 
     ensure_parent(MANUAL_JSON_PATH)
@@ -1761,6 +1838,7 @@ def main() -> None:
         f"- source_candidates_returned: {len(raw_source_candidates)}\n"
         f"- source_candidates_added: {added_source_candidates}\n"
         f"- source_candidates_total: {len(merged_source_candidates)}\n"
+        f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
         f"- cited_web_sources: {len(source_urls)}"
     )
     print_weekly_diagnostics_summary(diagnostics)
@@ -1768,4 +1846,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_DIAGNOSTICS_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_DIAGNOSTICS_V2 ===
