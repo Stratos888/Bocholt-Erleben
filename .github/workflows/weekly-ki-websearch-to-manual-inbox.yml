@@ -87,6 +87,22 @@ jobs:
           echo "=== source_candidates.json (head) ==="
           head -n 200 data/source_candidates.json || true
 
+          echo "=== weekly_event_diagnostics.json ==="
+          cat .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json || true
+      # === BEGIN BLOCK: UPLOAD WEEKLY EVENT DIAGNOSTICS ARTIFACT_V1 ===
+      # Zweck:
+      # - Macht Diagnose-JSON aus dem Weekly-Lauf direkt als GitHub-Artefakt verfügbar
+      # - Beeinflusst nicht Commit, Intake oder Deploy
+      # Umfang:
+      # - Nur Observability
+      # === END BLOCK: UPLOAD WEEKLY EVENT DIAGNOSTICS ARTIFACT_V1 ===
+      - name: Upload weekly event diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weekly-event-diagnostics
+          path: .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json
+          if-no-files-found: ignore
       # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
       # === END BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
       - name: Commit generated manual inbox and source candidates
