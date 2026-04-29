@@ -153,12 +153,11 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
     }
 
     if ($subscriptionId > 0) {
-        $statement = $pdo->prepare(
+        $entitlementStatement = $pdo->prepare(
             'SELECT
                 COUNT(*) AS entitlement_count,
                 MAX(CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
                 COALESCE(SUM(included_publications), 0) AS included_total,
-                COALESCE(SUM(consumed_publications), 0) AS consumed_total,
                 MIN(period_start) AS current_period_start,
                 MAX(period_end) AS current_period_end
              FROM publication_entitlements
@@ -170,17 +169,34 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
                AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())'
         );
 
-        $statement->execute([
+        $entitlementStatement->execute([
+            ':organizer_id' => $organizerId,
+            ':subscription_id' => $subscriptionId,
+        ]);
+
+        $consumptionStatement = $pdo->prepare(
+            'SELECT
+                COALESCE(SUM(pc.units), 0) AS consumed_total
+             FROM publication_consumptions pc
+             INNER JOIN publication_entitlements pe ON pe.id = pc.entitlement_id
+             WHERE pe.organizer_id = :organizer_id
+               AND pe.subscription_id = :subscription_id
+               AND pe.source_type = "subscription"
+               AND pe.status = "active"
+               AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
+               AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())'
+        );
+
+        $consumptionStatement->execute([
             ':organizer_id' => $organizerId,
             ':subscription_id' => $subscriptionId,
         ]);
     } else {
-        $statement = $pdo->prepare(
+        $entitlementStatement = $pdo->prepare(
             'SELECT
                 COUNT(*) AS entitlement_count,
                 MAX(CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
                 COALESCE(SUM(included_publications), 0) AS included_total,
-                COALESCE(SUM(consumed_publications), 0) AS consumed_total,
                 MIN(period_start) AS current_period_start,
                 MAX(period_end) AS current_period_end
              FROM publication_entitlements
@@ -190,14 +206,30 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
                AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())'
         );
 
-        $statement->execute([
+        $entitlementStatement->execute([
+            ':organizer_id' => $organizerId,
+        ]);
+
+        $consumptionStatement = $pdo->prepare(
+            'SELECT
+                COALESCE(SUM(pc.units), 0) AS consumed_total
+             FROM publication_consumptions pc
+             INNER JOIN publication_entitlements pe ON pe.id = pc.entitlement_id
+             WHERE pe.organizer_id = :organizer_id
+               AND pe.status = "active"
+               AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
+               AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())'
+        );
+
+        $consumptionStatement->execute([
             ':organizer_id' => $organizerId,
         ]);
     }
 
-    $row = $statement->fetch();
+    $entitlementRow = $entitlementStatement->fetch();
+    $consumptionRow = $consumptionStatement->fetch();
 
-    if (!is_array($row)) {
+    if (!is_array($entitlementRow)) {
         return [
             'entitlement_count' => 0,
             'has_unlimited' => false,
@@ -209,10 +241,10 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
         ];
     }
 
-    $entitlementCount = (int)($row['entitlement_count'] ?? 0);
-    $hasUnlimited = ((int)($row['has_unlimited'] ?? 0)) === 1;
-    $includedTotal = (int)($row['included_total'] ?? 0);
-    $consumedTotal = (int)($row['consumed_total'] ?? 0);
+    $entitlementCount = (int)($entitlementRow['entitlement_count'] ?? 0);
+    $hasUnlimited = ((int)($entitlementRow['has_unlimited'] ?? 0)) === 1;
+    $includedTotal = (int)($entitlementRow['included_total'] ?? 0);
+    $consumedTotal = is_array($consumptionRow) ? (int)($consumptionRow['consumed_total'] ?? 0) : 0;
     $remainingTotal = $hasUnlimited ? null : max(0, $includedTotal - $consumedTotal);
 
     return [
@@ -221,8 +253,8 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
         'included_total' => $includedTotal,
         'consumed_total' => $consumedTotal,
         'remaining_total' => $remainingTotal,
-        'current_period_start' => $row['current_period_start'] !== null ? (string)$row['current_period_start'] : null,
-        'current_period_end' => $row['current_period_end'] !== null ? (string)$row['current_period_end'] : null,
+        'current_period_start' => $entitlementRow['current_period_start'] !== null ? (string)$entitlementRow['current_period_start'] : null,
+        'current_period_end' => $entitlementRow['current_period_end'] !== null ? (string)$entitlementRow['current_period_end'] : null,
     ];
 }
 
