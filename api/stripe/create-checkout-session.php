@@ -262,7 +262,7 @@ function scs_ensure_stripe_customer(PDO $pdo, array $submission, string $secretK
     return $customerId;
 }
 
-/* === BEGIN BLOCK: STRIPE_CHECKOUT_ACTIVE_SUBSCRIPTION_REUSE_V3 | Zweck: verwendet vorhandene aktive Abos fuer Event-Einreichungen robust weiter und hält das Checkout-Handling syntaktisch und schematisch konsistent; Umfang: Abo-Entitlement-Fetch, Paid-Marking und kompletter Endpoint-Entrypoint === */
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V4 | Zweck: vermeidet doppelte PDO-Named-Parameter und findet ein nutzbares aktives Abo-Kontingent; Umfang: komplette Funktion === */
 function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submission): ?array
 {
     $organizerId = (int)($submission['organizer_id'] ?? 0);
@@ -298,7 +298,7 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
            )
          ORDER BY
             CASE
-                WHEN :requested_plan_key <> "" AND pe.plan_key = :requested_plan_key THEN 0
+                WHEN :requested_plan_key_check <> "" AND pe.plan_key = :requested_plan_key_value THEN 0
                 ELSE 1
             END ASC,
             pe.is_unlimited DESC,
@@ -309,19 +309,22 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
 
     $statement->execute([
         ':organizer_id' => $organizerId,
-        ':requested_plan_key' => $requestedPlanKey,
+        ':requested_plan_key_check' => $requestedPlanKey,
+        ':requested_plan_key_value' => $requestedPlanKey,
     ]);
 
     $row = $statement->fetch(PDO::FETCH_ASSOC);
 
     return is_array($row) ? $row : null;
 }
+/* === END BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V4 === */
 
 function scs_build_existing_subscription_redirect_url(string $baseUrl, string $paymentReferenceKey): string
 {
     return rtrim($baseUrl, '/') . '/events-veroeffentlichen/erfolg/?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription';
 }
 
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V4 | Zweck: vermeidet doppelte PDO-Named-Parameter und setzt Event-Submission bei aktivem Abo sauber auf bezahlt; Umfang: komplette Funktion === */
 function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $submission, array $entitlement, string $customerId): void
 {
     $stripeSubscriptionId = trim((string)($entitlement['stripe_subscription_id'] ?? ''));
@@ -338,8 +341,8 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
             status = :status,
             payment_kind = :payment_kind,
             requested_model_key = CASE
-                WHEN :resolved_model_key = "" THEN requested_model_key
-                ELSE :resolved_model_key
+                WHEN :resolved_model_key_check = "" THEN requested_model_key
+                ELSE :resolved_model_key_value
             END,
             stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
             stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
@@ -350,6 +353,12 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
             updated_at = CURRENT_TIMESTAMP
          WHERE id = :submission_id'
     );
+
+    $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
+    $statement->bindValue(':payment_kind', 'subscription', PDO::PARAM_STR);
+    $statement->bindValue(':resolved_model_key_check', $resolvedModelKey, PDO::PARAM_STR);
+    $statement->bindValue(':resolved_model_key_value', $resolvedModelKey, PDO::PARAM_STR);
+    $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
 
     if ($effectiveCustomerId === '') {
         $statement->bindValue(':stripe_customer_id', null, PDO::PARAM_NULL);
@@ -363,12 +372,9 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
         $statement->bindValue(':stripe_subscription_id', $stripeSubscriptionId, PDO::PARAM_STR);
     }
 
-    $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
-    $statement->bindValue(':payment_kind', 'subscription', PDO::PARAM_STR);
-    $statement->bindValue(':resolved_model_key', $resolvedModelKey, PDO::PARAM_STR);
-    $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
     $statement->execute();
 }
+/* === END BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V4 === */
 
 function scs_create_checkout_session(array $submission, string $customerId, array $stripeConfig, array $appConfig): array
 {
