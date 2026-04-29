@@ -16,8 +16,8 @@ name: Weekly KI Websearch → Manual Inbox
 on:
   workflow_dispatch:
   schedule:
-    # Montag 05:15 UTC
-    - cron: "15 5 * * 1"
+    # Dienstag 05:15 UTC = 07:15 MESZ / 06:15 MEZ
+    - cron: "15 5 * * 2"
 
 permissions:
   contents: write
@@ -75,7 +75,9 @@ jobs:
           SEARCH_WINDOW_DAYS: "180"
           ALLOW_RADIUS_KM: "20"
 
-          FAIL_ON_PENDING_INBOX: "true"
+          # === BEGIN BLOCK: WEEKLY_PENDING_INBOX_WARN_ENV_V1 | Zweck: offene Inbox nur warnen, nicht blockieren; Dedupe gegen Inbox bleibt aktiv | Umfang: ersetzt alte FAIL_ON_PENDING_INBOX-Env durch WARN_ON_PENDING_INBOX ===
+          WARN_ON_PENDING_INBOX: "true"
+          # === END BLOCK: WEEKLY_PENDING_INBOX_WARN_ENV_V1 ===
           FAIL_ON_PENDING_MANUAL: "true"
         run: |
           set -e
