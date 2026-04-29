@@ -39,14 +39,18 @@ from openai import OpenAI
 ROOT = Path(__file__).resolve().parents[1]
 TMP_DIR = ROOT / ".tmp" / "weekly-ki-eventsuche"
 
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_PATH_CONFIG_V1 | Zweck: Output-, Quellen- und passive Diagnosepfade zentral konfigurieren | Umfang: ergänzt Coverage-Targets und Diagnose-JSON ohne Suchprompt-Einfluss ===
 REGELWERK_PATH = Path(os.environ.get("EVENT_RULEBOOK_PATH", str(ROOT / "bocholt-erleben_eventsuche_regelwerk_v3.md")))
 SOURCES_REGISTER_PATH = Path(os.environ.get("EVENT_SOURCES_REGISTER_PATH", str(ROOT / "eventsuche_quellenregister_v1.md")))
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
 SOURCE_CANDIDATES_JSON_PATH = Path(os.environ.get("SOURCE_CANDIDATES_JSON_PATH", str(ROOT / "data" / "source_candidates.json")))
+COVERAGE_TARGETS_JSON_PATH = Path(os.environ.get("COVERAGE_TARGETS_JSON_PATH", str(ROOT / "data" / "event_coverage_targets.json")))
+DIAGNOSTICS_JSON_PATH = Path(os.environ.get("WEEKLY_DIAGNOSTICS_JSON_PATH", str(TMP_DIR / "weekly_event_diagnostics.json")))
 
 TMP_EVENTS_TSV_PATH = Path(os.environ.get("TMP_EVENTS_TSV_PATH", str(TMP_DIR / "events.tsv")))
 TMP_INBOX_TSV_PATH = Path(os.environ.get("TMP_INBOX_TSV_PATH", str(TMP_DIR / "inbox.tsv")))
 TMP_ARCHIVE_TSV_PATH = Path(os.environ.get("TMP_ARCHIVE_TSV_PATH", str(TMP_DIR / "inbox_archive.tsv")))
+# === END BLOCK: WEEKLY_DIAGNOSTICS_PATH_CONFIG_V1 ===
 
 TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
@@ -886,12 +890,26 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
 # Umfang:
 # - Nur Sicherungsnetz hinter der KI-Suche
 # === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
-# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_OUTPUT_SAFE_V4 | Zweck: Pflichtfelder, Einzeilen-Strings, URL-Trim, Zeitformat und interne Dedupe technisch absichern | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
+# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_DIAGNOSTICS_V1 | Zweck: Pflichtfelder, Einzeilen-Strings, URL-Trim, Zeitformat, interne Dedupe und Drop-Gründe technisch diagnostizieren | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
 CANDIDATE_OUTPUT_FIELDS = [
     "title",
     "date",
     "endDate",
     "time",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
+    "source_name",
+    "source_url",
+    "notes",
+]
+
+
+CANDIDATE_REQUIRED_NON_EMPTY_FIELDS = [
+    "title",
+    "date",
     "city",
     "location",
     "kategorie_suggestion",
@@ -1016,44 +1034,59 @@ def candidate_in_window(item: Dict[str, str], start: date, end: date) -> bool:
     return start_date <= end and end_date >= start
 
 
-def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
-    if any(field not in item for field in CANDIDATE_OUTPUT_FIELDS):
-        return False
+def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> str:
+    missing_fields = [field for field in CANDIDATE_OUTPUT_FIELDS if field not in item]
+    if missing_fields:
+        return "missing_output_field:" + ",".join(missing_fields)
 
-    required_non_empty = [
-        "title",
-        "date",
-        "city",
-        "location",
-        "kategorie_suggestion",
-        "url",
-        "description",
-        "source_name",
-        "source_url",
-        "notes",
-    ]
-    if any(not norm(item.get(k, "")) for k in required_non_empty):
-        return False
+    missing_required = [field for field in CANDIDATE_REQUIRED_NON_EMPTY_FIELDS if not norm(item.get(field, ""))]
+    if missing_required:
+        return "missing_required:" + ",".join(missing_required)
 
     if not parse_iso_date(item.get("date", "")):
-        return False
+        return "invalid_date"
     if item.get("endDate") and not parse_iso_date(item.get("endDate", "")):
-        return False
+        return "invalid_endDate"
+    if item.get("endDate"):
+        start_date = parse_iso_date(item.get("date", ""))
+        end_date = parse_iso_date(item.get("endDate", ""))
+        if start_date and end_date and end_date < start_date:
+            return "endDate_before_date"
     if item.get("time") and not re.match(r"^\d{2}:\d{2}$", item["time"]):
-        return False
+        return "bad_time"
     if not candidate_in_window(item, start, end):
-        return False
+        return "out_of_window"
 
-    return True
+    return ""
 
 
-def filter_delta(
+def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
+    return candidate_invalid_reason(item, start, end) == ""
+
+
+def candidate_diag_summary(item: Dict[str, Any], reason: str, stage: str) -> Dict[str, str]:
+    normalized = normalize_candidate(item) if isinstance(item, dict) else {field: "" for field in CANDIDATE_OUTPUT_FIELDS}
+    return {
+        "stage": stage,
+        "reason": reason,
+        "title": clean_output_text(normalized.get("title", "")),
+        "date": clean_output_text(normalized.get("date", "")),
+        "endDate": clean_output_text(normalized.get("endDate", "")),
+        "time": clean_output_text(normalized.get("time", "")),
+        "city": clean_output_text(normalized.get("city", "")),
+        "location": clean_output_text(normalized.get("location", "")),
+        "url": canonical_url(normalized.get("url", "")),
+        "source_url": canonical_url(normalized.get("source_url", "")),
+    }
+
+
+def filter_delta_with_diagnostics(
     raw_candidates: List[Dict[str, Any]],
     events_records: List[RefRecord],
     inbox_records: List[RefRecord],
     archive_records: List[RefRecord],
     manual_records: List[RefRecord],
-) -> List[Dict[str, str]]:
+) -> tuple[List[Dict[str, str]], List[Dict[str, str]]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
@@ -1072,13 +1105,17 @@ def filter_delta(
     batch_title_dates: set[str] = set()
 
     out: List[Dict[str, str]] = []
+    diagnostics: List[Dict[str, str]] = []
 
     for raw in raw_candidates:
         if not isinstance(raw, dict):
+            diagnostics.append(candidate_diag_summary({}, "non_object_raw_candidate", "validation"))
             continue
 
         item = normalize_candidate(raw)
-        if not valid_candidate(item, start, end):
+        invalid_reason = candidate_invalid_reason(item, start, end)
+        if invalid_reason:
+            diagnostics.append(candidate_diag_summary(item, invalid_reason, "validation"))
             continue
 
         title = item.get("title", "")
@@ -1100,25 +1137,37 @@ def filter_delta(
             location,
         )
 
-        if title_date in existing_title_dates or title_date in batch_title_dates:
+        drop_reason = ""
+        if title_date in existing_title_dates:
+            drop_reason = "existing_title_date"
+        elif title_date in batch_title_dates:
+            drop_reason = "batch_title_date"
+        elif src_date and src_date in batch_source_dates:
+            drop_reason = "batch_source_date"
+        elif src_fp and src_fp in existing_source_occurrences:
+            drop_reason = "existing_source_occurrence"
+        elif src_fp and src_fp in batch_source_occurrences:
+            drop_reason = "batch_source_occurrence"
+        elif has_time and fp in existing_exact:
+            drop_reason = "existing_exact_occurrence"
+        elif has_time and fp in batch_exact:
+            drop_reason = "batch_exact_occurrence"
+        elif has_time and fp_no_time in existing_no_time_missing:
+            drop_reason = "existing_no_time_missing_occurrence"
+        elif has_time and fp_no_time in batch_no_time_missing:
+            drop_reason = "batch_no_time_missing_occurrence"
+        elif not has_time and fp_no_time in existing_no_time_all:
+            drop_reason = "existing_no_time_occurrence"
+        elif not has_time and fp_no_time in batch_no_time_all:
+            drop_reason = "batch_no_time_occurrence"
+
+        if drop_reason:
+            diagnostics.append(candidate_diag_summary(item, drop_reason, "dedupe"))
             continue
 
-        if src_date and src_date in batch_source_dates:
-            continue
-
-        if src_fp and (src_fp in existing_source_occurrences or src_fp in batch_source_occurrences):
-            continue
-
-        if has_time:
-            if fp in existing_exact or fp in batch_exact:
-                continue
-            if fp_no_time in existing_no_time_missing or fp_no_time in batch_no_time_missing:
-                continue
-        else:
-            if fp_no_time in existing_no_time_all or fp_no_time in batch_no_time_all:
-                continue
-
-        out.append({field: item.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS})
+        selected = {field: item.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
+        out.append(selected)
+        diagnostics.append(candidate_diag_summary(selected, "selected", "selected"))
 
         if src_fp:
             batch_source_occurrences.add(src_fp)
@@ -1130,8 +1179,25 @@ def filter_delta(
         if not has_time:
             batch_no_time_missing.add(fp_no_time)
 
-    return out
-# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_OUTPUT_SAFE_V4 ===
+    return out, diagnostics
+
+
+def filter_delta(
+    raw_candidates: List[Dict[str, Any]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
+    selected, _diagnostics = filter_delta_with_diagnostics(
+        raw_candidates,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )
+    return selected
+# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_DIAGNOSTICS_V1 ===
 
 # === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_V1 | Zweck: neue Quellenkandidaten separat sammeln, ohne sie automatisch produktiv freizugeben | Umfang: liest/normalisiert/merged data/source_candidates.json ===
 def source_domain(raw_url: str) -> str:
@@ -1322,6 +1388,233 @@ def merge_source_candidates(
     merged = [by_key[key] for key in order]
     return merged, added
 # === END BLOCK: SOURCE_CANDIDATE_LEARNING_V1 ===
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_AND_COVERAGE_AUDIT_V1 | Zweck: Raw-/Selected-/Drop-Diagnose und passive Coverage-Targets nach dem Lauf auswerten | Umfang: ergänzt Diagnoseausgabe ohne Suchprompt zu beeinflussen ===
+def count_by_key(items: List[Dict[str, Any]], key: str) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for item in items:
+        value = clean_output_text(item.get(key, "")) if isinstance(item, dict) else ""
+        value = value or "<empty>"
+        out[value] = out.get(value, 0) + 1
+    return dict(sorted(out.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+def candidate_title_list(items: List[Dict[str, Any]], limit: int = 40) -> List[str]:
+    titles: List[str] = []
+    for item in items[:limit]:
+        if isinstance(item, dict):
+            title = clean_output_text(item.get("title", ""))
+            date_value = clean_output_text(item.get("date", ""))
+            if title or date_value:
+                titles.append(f"{date_value} | {title}".strip())
+    return titles
+
+
+def read_coverage_targets() -> List[Dict[str, Any]]:
+    if not COVERAGE_TARGETS_JSON_PATH.exists():
+        return []
+
+    try:
+        raw = json.loads(COVERAGE_TARGETS_JSON_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        fail(f"data/event_coverage_targets.json ist ungültig: {exc}")
+
+    if not isinstance(raw, list):
+        fail("data/event_coverage_targets.json muss ein JSON-Array sein.")
+
+    return [item for item in raw if isinstance(item, dict)]
+
+
+def target_aliases(target: Dict[str, Any]) -> List[str]:
+    aliases: List[str] = []
+    for value in [target.get("title", ""), *(target.get("aliases", []) if isinstance(target.get("aliases", []), list) else [])]:
+        cleaned = clean_output_text(value)
+        if cleaned:
+            aliases.append(cleaned)
+    return aliases
+
+
+def target_matches_title(target: Dict[str, Any], title: str) -> bool:
+    title_key = norm_key(title)
+    if not title_key:
+        return False
+
+    for alias in target_aliases(target):
+        alias_key = norm_key(alias)
+        if alias_key and (alias_key in title_key or title_key in alias_key):
+            return True
+    return False
+
+
+def target_matches_url(target: Dict[str, Any], url_value: str) -> bool:
+    hint = norm_key(target.get("source_hint", ""))
+    url_key = norm_key(canonical_url(url_value))
+    return bool(hint and url_key and hint in url_key)
+
+
+def target_matches_candidate(target: Dict[str, Any], item: Dict[str, Any]) -> bool:
+    expected_date = norm(target.get("expected_date", ""))
+    item_date = norm(item.get("date", ""))
+    if expected_date and item_date != expected_date:
+        return False
+
+    return (
+        target_matches_title(target, clean_output_text(item.get("title", "")))
+        or target_matches_url(target, item.get("url", ""))
+        or target_matches_url(target, item.get("source_url", ""))
+    )
+
+
+def target_matches_record(target: Dict[str, Any], rec: RefRecord) -> bool:
+    expected_date = norm(target.get("expected_date", ""))
+    if expected_date and rec.date != expected_date:
+        return False
+
+    return (
+        target_matches_title(target, rec.title)
+        or target_matches_url(target, rec.url)
+        or target_matches_url(target, rec.source_url)
+    )
+
+
+def first_matching_record_status(target: Dict[str, Any], label: str, records: List[RefRecord]) -> Dict[str, str] | None:
+    for rec in records:
+        if target_matches_record(target, rec):
+            return {
+                "status": label,
+                "matched_title": rec.title,
+                "matched_date": rec.date,
+                "matched_url": rec.source_url or rec.url,
+            }
+    return None
+
+
+def coverage_audit(
+    targets: List[Dict[str, Any]],
+    raw_candidates: List[Dict[str, Any]],
+    selected_candidates: List[Dict[str, str]],
+    drop_diagnostics: List[Dict[str, str]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
+    audit: List[Dict[str, str]] = []
+
+    for target in targets:
+        target_id = clean_output_text(target.get("id", "")) or norm_key(target.get("title", ""))
+        title = clean_output_text(target.get("title", ""))
+        priority = clean_output_text(target.get("priority", "")) or "should"
+        cluster = clean_output_text(target.get("cluster", ""))
+
+        selected_match = next((item for item in selected_candidates if target_matches_candidate(target, item)), None)
+        if selected_match:
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": "FOUND_SELECTED",
+                "matched_title": clean_output_text(selected_match.get("title", "")),
+                "matched_date": clean_output_text(selected_match.get("date", "")),
+                "matched_url": canonical_url(selected_match.get("source_url", "") or selected_match.get("url", "")),
+                "drop_reason": "",
+            })
+            continue
+
+        raw_match = next((item for item in raw_candidates if isinstance(item, dict) and target_matches_candidate(target, normalize_candidate(item))), None)
+        if raw_match:
+            raw_norm = normalize_candidate(raw_match)
+            drop_match = next((d for d in drop_diagnostics if target_matches_candidate(target, d) and d.get("reason") != "selected"), None)
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": "FOUND_RAW_DROPPED",
+                "matched_title": clean_output_text(raw_norm.get("title", "")),
+                "matched_date": clean_output_text(raw_norm.get("date", "")),
+                "matched_url": canonical_url(raw_norm.get("source_url", "") or raw_norm.get("url", "")),
+                "drop_reason": clean_output_text(drop_match.get("reason", "unknown_drop_reason")) if drop_match else "unknown_drop_reason",
+            })
+            continue
+
+        for label, records in [
+            ("IN_EVENTS", events_records),
+            ("IN_INBOX", inbox_records),
+            ("IN_INBOX_ARCHIVE", archive_records),
+            ("IN_MANUAL_JSON", manual_records),
+        ]:
+            record_match = first_matching_record_status(target, label, records)
+            if record_match:
+                audit.append({
+                    "id": target_id,
+                    "title": title,
+                    "priority": priority,
+                    "cluster": cluster,
+                    "status": label,
+                    "matched_title": clean_output_text(record_match.get("matched_title", "")),
+                    "matched_date": clean_output_text(record_match.get("matched_date", "")),
+                    "matched_url": canonical_url(record_match.get("matched_url", "")),
+                    "drop_reason": "",
+                })
+                break
+        else:
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": "MISSING_FROM_RAW",
+                "matched_title": "",
+                "matched_date": "",
+                "matched_url": "",
+                "drop_reason": "",
+            })
+
+    return audit
+
+
+def build_weekly_diagnostics(
+    raw_candidates: List[Dict[str, Any]],
+    raw_source_candidates: List[Dict[str, Any]],
+    selected_candidates: List[Dict[str, str]],
+    drop_diagnostics: List[Dict[str, str]],
+    coverage: List[Dict[str, str]],
+) -> Dict[str, Any]:
+    dropped = [item for item in drop_diagnostics if item.get("reason") != "selected"]
+    return {
+        "generated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+        "model": OPENAI_MODEL,
+        "max_new_candidates": MAX_NEW_CANDIDATES,
+        "raw_candidates_returned": len(raw_candidates),
+        "raw_source_candidates_returned": len(raw_source_candidates),
+        "selected_candidates": len(selected_candidates),
+        "dropped_candidates": len(dropped),
+        "drop_reasons": count_by_key(dropped, "reason"),
+        "raw_candidate_titles": candidate_title_list([normalize_candidate(item) for item in raw_candidates if isinstance(item, dict)]),
+        "selected_candidate_titles": candidate_title_list(selected_candidates),
+        "dropped_candidate_titles": [
+            f"{item.get('reason', '')} | {item.get('date', '')} | {item.get('title', '')}".strip()
+            for item in dropped[:80]
+        ],
+        "coverage_targets_total": len(coverage),
+        "coverage_status_counts": count_by_key(coverage, "status"),
+        "coverage_audit": coverage,
+    }
+
+
+def print_weekly_diagnostics_summary(diagnostics: Dict[str, Any]) -> None:
+    print(
+        "WEEKLY KI EVENTSUCHE DIAGNOSTICS\n"
+        f"- raw_candidates_returned: {diagnostics.get('raw_candidates_returned', 0)}\n"
+        f"- selected_candidates: {diagnostics.get('selected_candidates', 0)}\n"
+        f"- dropped_candidates: {diagnostics.get('dropped_candidates', 0)}\n"
+        f"- drop_reasons: {json.dumps(diagnostics.get('drop_reasons', {}), ensure_ascii=False)}\n"
+        f"- coverage_targets_total: {diagnostics.get('coverage_targets_total', 0)}\n"
+        f"- coverage_status_counts: {json.dumps(diagnostics.get('coverage_status_counts', {}), ensure_ascii=False)}\n"
+        f"- diagnostics_file: {DIAGNOSTICS_JSON_PATH}"
+    )
+# === END BLOCK: WEEKLY_DIAGNOSTICS_AND_COVERAGE_AUDIT_V1 ===
 # === BEGIN BLOCK: RESPONSE SUMMARY + OUTPUT WRITE ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
@@ -1371,7 +1664,7 @@ def collect_response_sources(response: Any) -> List[str]:
 # Umfang:
 # - Noch kein automatischer Intake-Trigger; nur data/inbox_manual.json als Ergebnis
 # === END BLOCK: MAIN ENTRYPOINT ===
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_LEARNING_V1 | Zweck: Produktionslauf schreibt Event-Delta und sammelt neue Quellenkandidaten separat | Umfang: ergänzt data/source_candidates.json ohne automatisches Register-Update ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_DIAGNOSTICS_V1 | Zweck: Produktionslauf schreibt Event-/Quellen-Output und erzeugt passive Diagnose für Raw/Filter/Coverage | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
 def main() -> None:
     export_current_snapshots()
 
@@ -1406,17 +1699,37 @@ def main() -> None:
         )
     )
 
-    delta = filter_delta(
+    filtered_delta, drop_diagnostics = filter_delta_with_diagnostics(
         raw_candidates,
         events_records,
         inbox_records,
         archive_records,
         manual_records,
-    )[:MAX_NEW_CANDIDATES]
+    )
+    delta = filtered_delta[:MAX_NEW_CANDIDATES]
 
     merged_source_candidates, added_source_candidates = merge_source_candidates(
         raw_source_candidates,
         sources_register_text,
+    )
+
+    coverage_targets = read_coverage_targets()
+    coverage = coverage_audit(
+        coverage_targets,
+        raw_candidates,
+        delta,
+        drop_diagnostics,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )
+    diagnostics = build_weekly_diagnostics(
+        raw_candidates,
+        raw_source_candidates,
+        delta,
+        drop_diagnostics,
+        coverage,
     )
 
     ensure_parent(MANUAL_JSON_PATH)
@@ -1428,12 +1741,19 @@ def main() -> None:
         encoding="utf-8",
     )
 
+    ensure_parent(DIAGNOSTICS_JSON_PATH)
+    DIAGNOSTICS_JSON_PATH.write_text(
+        json.dumps(diagnostics, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
     source_urls = collect_response_sources(response)
 
     print(
         "WEEKLY KI EVENTSUCHE SUMMARY\n"
         f"- model: {OPENAI_MODEL}\n"
         f"- max_new_candidates: {MAX_NEW_CANDIDATES}\n"
+        f"- raw_candidates_returned: {len(raw_candidates)}\n"
         f"- production_selected: {len(delta)}\n"
         f"- written_manual_json: {len(delta)}\n"
         f"- output_file: {MANUAL_JSON_PATH}\n"
@@ -1443,8 +1763,9 @@ def main() -> None:
         f"- source_candidates_total: {len(merged_source_candidates)}\n"
         f"- cited_web_sources: {len(source_urls)}"
     )
+    print_weekly_diagnostics_summary(diagnostics)
 
 
 if __name__ == "__main__":
     main()
-# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_LEARNING_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_DIAGNOSTICS_V1 ===
