@@ -362,7 +362,7 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SOURCE_LEARNING_V1 | Zweck: Produktionslauf um halbautomatisches Quellenlernen erweitern | Umfang: hält Event-Output streng und ergänzt separaten source_candidates-Kanal ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V2 | Zweck: Produktionslauf mit Quellenlernen um verpflichtende Backfill-Abdeckungslogik erweitern | Umfang: ersetzt build_messages vollständig, hält Event-/Quellen-Output getrennt ===
 def build_messages(
     rulebook_text: str,
     sources_register_text: str,
@@ -384,13 +384,21 @@ def build_messages(
     )
 
     system_prompt = """
-Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus.
+Du führst die KI-Eventsuche für Bocholt erleben aus.
 
-Arbeite streng, konservativ, produktionsnah und redaktionell anspruchsvoll.
+Arbeite streng, konservativ, produktionsnah, quellenbasiert und systematisch.
 Nutze aktiv die Websuche.
 Halte das beigefügte Regelwerk strikt ein.
 Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Liefere nur neue Delta-Kandidaten.
+
+Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
+- Ziel ist nicht nur irgendeine gute Trefferliste.
+- Ziel ist möglichst vollständige Abdeckung der starken Quellen- und Eventcluster im 180-Tage-Fenster.
+- Du musst die definierten Quellencluster systematisch prüfen, bevor du den Lauf abschließt.
+- Keine künstliche Auffüllung mit schwachen Treffern.
+- Wenn eine Quelle viele echte starke Instanzen liefert, dürfen mehrere Instanzen ausgegeben werden.
+- Wenn eine Quelle nur schwache oder bereits bekannte Treffer liefert, gib daraus nichts aus.
 
 Im Automationsmodus gilt für Events:
 - nur FINAL
@@ -404,7 +412,6 @@ source_candidates sind keine Events und dürfen niemals in die Event-Inbox gemis
 Wichtig:
 - Nicht jeder formal korrekte Termin ist FINAL-tauglich.
 - FINAL bedeutet hier: formal belastbar und zugleich redaktionell stark genug für die Kuratierungs-PWA.
-- Dieser Lauf ist ein PRODUKTIONSLAUF mit kontrolliertem Quellenlernen.
 - Neue Quellen dürfen als Nebenfund dokumentiert werden, werden aber nicht automatisch dauerhaft ins Quellenregister übernommen.
 """.strip()
 
@@ -418,7 +425,7 @@ Wichtig:
 [/QUELLENREGISTER]
 
 [AUFGABE]
-Simuliere den späteren automatisierten Produktionslauf für Bocholt erleben so nah wie möglich.
+Simuliere den späteren automatisierten Aufbau-/Backfill-Produktionslauf für Bocholt erleben so nah wie möglich.
 
 Rahmen:
 - Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
@@ -429,7 +436,75 @@ Rahmen:
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
-Operative Quellensteuerung für den Produktionslauf:
+Ziel dieses Laufs:
+- möglichst viele wirklich gute neue Event-Kandidaten im aktuellen 180-Tage-Fenster finden
+- bekannte starke Eventcluster systematisch abarbeiten
+- nicht nach den ersten plausiblen Treffern abbrechen
+- nur dann keine Kandidaten aus einem Cluster liefern, wenn dort keine neuen, starken, regelkonformen Delta-Kandidaten übrig sind
+
+Verpflichtende Abdeckungs-Checkliste vor Abschluss:
+Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus diesen Clustern neue starke Delta-Kandidaten vorhanden sind:
+
+1. Bocholt CORE-HIGH:
+   - `bocholt.de/veranstaltungskalender/*`
+   - `bocholt.de/freizeit-und-tourismus/veranstaltungen/*`
+   - starke Stadt-Bocholt-Detailseiten
+   - besonders: Feste, Festivals, Familienformate, Kultur, Musik, Innenstadt, Märkte, Open-Air
+
+2. Bocholt RECOVERY:
+   - offizielle Bocholt-Info-/News-/Themen-Seiten mit klarem Eventfokus
+   - bekannte starke Recovery-Muster wie Kulturtage, Interkulturelle Woche, Weinfest, Aasee, Kirmes, Innenstadt- und Familienformate
+   - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
+
+3. Rhede CORE-MID:
+   - `rhede.de/regional/veranstaltungen/detail-*`
+   - starke öffentliche Stadt-/Kultur-/Innenstadttermine
+   - kleine Führungen, Standardmärkte und nischige Einzeltermine nur bei klarer öffentlicher Relevanz
+
+4. Aalten / NL-Nahraum:
+   - `aaltendagen.nl/*`
+   - starke Serien-/Stadtfesttage als getrennte Tagesinstanzen, wenn Datum/Instanz getrennt sind
+   - `time` nur setzen, wenn Startzeit für die konkrete Instanz eindeutig ist; sonst leer
+
+5. Borken / FARB / Jubiläums-/Kulturquellen:
+   - `farb.borken.de/...`
+   - `800.borken.de/...`
+   - nur starke öffentliche Formate übernehmen
+   - Ausstellungen, Vorschau- und Museumsseiten streng filtern
+
+6. Bredevoort / Koppelkerk:
+   - `koppelkerk.nl/agenda/*`
+   - `koppelkerk.nl/evenementen/*`
+   - Bücherbörsen, Märkte und klare öffentliche Kulturtermine prüfen
+   - kleine Spezial-/Buch-/Nischenformate nur bei erkennbarem Breiteninteresse
+
+7. Isselburg / Hamminkeln / Randgebiet:
+   - offizielle kommunale Veranstaltungsseiten
+   - nur bei klarer Nähe, starkem Eventcharakter und sicherer Instanz-URL übernehmen
+   - keine falschen Datums-/Serien-URLs übernehmen
+
+8. Saisonale starke Einzelseiten aus dem Quellenregister:
+   - `wijnfeest-aalten.nl/*`
+   - `countryfair.de/*`
+   - `bredevoortschittert.nl/*`
+   - `cityart-bocholt.de/*`
+   - `oldtimertreffenaalten.nl/*`
+   - `grensmarktdinxperlo.com/*`
+   - nur konkrete Jahresinstanz übernehmen
+   - bei unsicherem Jahr, unklarer Aktualität oder fehlender Detailbasis nicht als FINAL ausgeben
+
+9. Kontrollierte offene Suche:
+   - Suche ergänzend nach starken Eventmustern im Suchgebiet, z. B. Festival, Markt, Open Air, Stadtfest, Familienfest, Kultur, Konzert, Theater, Ausstellung mit Eventcharakter
+   - Wenn dabei eine neue gute Quelle auftaucht, dokumentiere sie nur in source_candidates
+   - Neue Quelle nur als Eventquelle nutzen, wenn sie regelkonform, erreichbar, instanzpassend und nicht gesperrt ist
+
+Abdeckungsregel:
+- Bevor du final ausgibst, prüfe, ob naheliegende starke Bocholt- und Nahraum-Highlights im Zeitraum fehlen.
+- Wenn ein naheliegendes starkes Highlight fehlt, suche aktiv nach einer belastbaren Quelle.
+- Gib es nur dann nicht aus, wenn es bereits in BESTAND_EVENTS, OFFENE_INBOX, ARCHIV oder MANUAL_JSON enthalten ist oder nicht FINAL-sicher belegbar ist.
+- Wenn ein bekannter starker Treffer ausgeschlossen wird, muss der Ausschluss auf Dedupe, Regelwerksausschluss oder fehlende FINAL-Sicherheit beruhen, nicht auf ausgelassener Suche.
+
+Operative Quellensteuerung:
 - Nutze das Quellenregister als Gewichtung, nicht als starre Whitelist
 - Prüfe zuerst CORE-HIGH
 - danach CORE-MID
@@ -556,7 +631,7 @@ Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - repräsentiert der Eintrag genau eine besuchbare Instanz?
 - Mehrtageslogik korrekt?
 - Beschreibung neutral, sachlich und quellenbasiert?
-- keine Dublette?
+- keine Dublette gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON?
 - wirklich nützlich für die Kuratierungs-PWA?
 - ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
@@ -579,7 +654,7 @@ Zusätzliche interne Pflichtprüfung vor Quellenvorschlag:
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SOURCE_LEARNING_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V2 ===
 # === END BLOCK: PROMPT BUNDLE BUILDERS ===
 
 
