@@ -165,30 +165,32 @@ function obp_fetch_manageable_customer(PDO $pdo, int $organizerId): array
 
 function obp_stripe_api_request(string $secretKey, string $path, array $payload): array
 {
-    $curl = curl_init('https://api.stripe.com/v1/' . ltrim($path, '/'));
-    if ($curl === false) {
-        throw new RuntimeException('Stripe cURL init failed.');
-    }
+    $endpoint = 'https://api.stripe.com/v1/' . ltrim($path, '/');
 
-    curl_setopt_array($curl, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-        CURLOPT_USERPWD => $secretKey . ':',
-        CURLOPT_POSTFIELDS => http_build_query($payload),
-        CURLOPT_HTTPHEADER => [
-            'Accept: application/json',
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'ignore_errors' => true,
+            'header' => implode("\r\n", [
+                'Authorization: Bearer ' . $secretKey,
+                'Content-Type: application/x-www-form-urlencoded',
+                'Accept: application/json',
+            ]),
+            'content' => http_build_query($payload, '', '&', PHP_QUERY_RFC3986),
+            'timeout' => 30,
         ],
-        CURLOPT_TIMEOUT => 30,
     ]);
 
-    $responseBody = curl_exec($curl);
-    $statusCode = (int)curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-    $curlError = curl_error($curl);
-    curl_close($curl);
+    $responseBody = @file_get_contents($endpoint, false, $context);
+    $headers = $http_response_header ?? [];
 
-    if ($responseBody === false) {
-        throw new RuntimeException('Stripe API request failed: ' . $curlError);
+    if (!is_string($responseBody)) {
+        throw new RuntimeException('Stripe API request failed without response body.');
+    }
+
+    $statusCode = 0;
+    if (!empty($headers[0]) && preg_match('~HTTP/\S+\s+(\d{3})~', (string)$headers[0], $matches) === 1) {
+        $statusCode = (int)$matches[1];
     }
 
     $decoded = json_decode($responseBody, true);
