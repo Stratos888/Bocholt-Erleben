@@ -119,11 +119,50 @@
     }
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_PORTAL_BILLING_PORTAL_HELPERS_V1 | Zweck: laedt Portal-State und oeffnet bei Bedarf das Stripe Billing Portal; Umfang: API-Helfer fuer Dashboard/Portal === */
   async function tryLoadPortalState() {
     return requestJson("/api/organizer-portal/me.php", {
       method: "GET"
     });
   }
+
+  async function createBillingPortalSession() {
+    return requestJson("/api/organizer-portal/create-billing-portal-session.php", {
+      method: "POST"
+    });
+  }
+
+  async function openBillingPortal(trigger) {
+    const button = trigger instanceof HTMLElement ? trigger : null;
+
+    if (button && !button.dataset.defaultLabel) {
+      button.dataset.defaultLabel = button.textContent || "Tarif ändern oder Abo kündigen";
+    }
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Weiterleitung wird vorbereitet …";
+    }
+
+    try {
+      const result = await createBillingPortalSession();
+      const redirectUrl = safeText(result?.data?.redirect_url);
+
+      if (!redirectUrl) {
+        throw new Error("Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
+      }
+
+      window.location.href = redirectUrl;
+    } catch (error) {
+      window.alert(safeText(error?.message) || "Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = button.dataset.defaultLabel || "Tarif ändern oder Abo kündigen";
+      }
+    }
+  }
+  /* === END BLOCK: ORGANIZER_PORTAL_BILLING_PORTAL_HELPERS_V1 === */
 
   function setLoginResult(message, links = []) {
     const resultCard = document.getElementById("organizer-login-result");
@@ -269,6 +308,7 @@ if (membershipStarted) {
     /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 === */
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_ACTIONS_V2 | Zweck: zeigt im Dashboard fuer aktive Abos eine Verwaltungsaktion an und rendert das effektive Modell sauber; Umfang: komplette renderDashboard-Funktion === */
   function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
@@ -288,9 +328,13 @@ if (membershipStarted) {
 
     const latestSubmission = submissions[0] || null;
     const defaultPlanKey = safeText(organizer.default_plan_key).toLowerCase();
+    const subscriptionPlanKey = safeText(subscription?.plan_key).toLowerCase();
+    const hasManageableSubscription = ["starter", "active", "unlimited"].includes(subscriptionPlanKey);
+    const effectivePlanKey = hasManageableSubscription ? subscriptionPlanKey : (defaultPlanKey || "single");
+
     const isSingleStatusView =
-      defaultPlanKey === "single" &&
-      !subscription &&
+      effectivePlanKey === "single" &&
+      !hasManageableSubscription &&
       !quota.has_unlimited;
 
     const latestTitleText = latestSubmission
@@ -319,8 +363,9 @@ if (membershipStarted) {
     const quotaRemaining = document.getElementById("organizer-quota-remaining");
     const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
     const submissionsList = document.getElementById("organizer-dashboard-submissions-list");
-const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
-const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
+    const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
+    const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
+    const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
 
     if (title) {
       title.textContent = isSingleStatusView
@@ -343,6 +388,166 @@ const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary
     }
 
     if (note) {
+      const email = safeText(organizer.email);
+
+      if (isSingleStatusView) {
+        note.textContent = email
+          ? `Verknüpft mit ${email}. Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.`
+          : "Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.";
+      } else if (hasManageableSubscription) {
+        note.textContent = "Sichtbar sind Kontingent, Status, die letzten Einreichungen und die Abo-Verwaltung.";
+      } else {
+        note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
+      }
+    }
+
+    if (dashboardPrimaryCta) {
+      const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
+        ? effectivePlanKey
+        : "single";
+
+      dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
+    }
+
+    if (dashboardActions) {
+      let manageSubscriptionButton = document.getElementById("organizer-dashboard-manage-subscription");
+
+      if (hasManageableSubscription) {
+        if (!manageSubscriptionButton) {
+          manageSubscriptionButton = document.createElement("button");
+          manageSubscriptionButton.type = "button";
+          manageSubscriptionButton.id = "organizer-dashboard-manage-subscription";
+          manageSubscriptionButton.className = "content-cta";
+          manageSubscriptionButton.textContent = "Tarif ändern oder Abo kündigen";
+          dashboardActions.appendChild(manageSubscriptionButton);
+        }
+
+        manageSubscriptionButton.hidden = false;
+        manageSubscriptionButton.disabled = false;
+        manageSubscriptionButton.onclick = () => {
+          void openBillingPortal(manageSubscriptionButton);
+        };
+      } else if (manageSubscriptionButton) {
+        manageSubscriptionButton.remove();
+      }
+    }
+
+    if (accountHead) {
+      accountHead.textContent = isSingleStatusView ? "Letzter Stand" : "Veranstalter";
+    }
+
+    if (accountName) {
+      accountName.textContent = isSingleStatusView
+        ? latestTitleText
+        : safeText(organizer.organization_name) || "–";
+    }
+
+    if (accountEmail) {
+      accountEmail.textContent = isSingleStatusView
+        ? `${latestStatusText} · ${latestDateText}`
+        : safeText(organizer.email) || "–";
+    }
+
+    if (accountPlan) {
+      if (isSingleStatusView) {
+        accountPlan.textContent = latestLocationText
+          ? `Ort: ${latestLocationText}`
+          : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
+      } else if (hasManageableSubscription) {
+        accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
+      } else {
+        const planLabel = formatPlanLabel(organizer.default_plan_key);
+        accountPlan.textContent = `Standardmodell: ${planLabel}`;
+      }
+    }
+
+    if (quotaHead) {
+      quotaHead.textContent = isSingleStatusView ? "Verfügbarkeit" : "Verfügbares Kontingent";
+    }
+
+    if (quotaPeriod) {
+      if (isSingleStatusView) {
+        quotaPeriod.textContent = latestSubmission
+          ? `Termin: ${latestDateText}`
+          : "Einzeltermin";
+      } else {
+        const start = formatDateTime(quota.current_period_start);
+        const end = formatDateTime(quota.current_period_end);
+        quotaPeriod.textContent = quota.current_period_start || quota.current_period_end
+          ? `Zeitraum: ${start} bis ${end}`
+          : "Zeitraum: aktuell kein aktiver Abo-Zeitraum";
+      }
+    }
+
+    if (quotaSummary) {
+      if (isSingleStatusView) {
+        const includedTotal = Number(quota.included_total || 0);
+        const consumedTotal = Number(quota.consumed_total || 0);
+
+        quotaSummary.textContent = includedTotal === 0 && consumedTotal === 0
+          ? "Noch kein bezahlter Einzeltermin."
+          : `Einzeltermine: ${includedTotal} · verbraucht: ${consumedTotal}`;
+      } else if (quota.has_unlimited) {
+        quotaSummary.textContent = `Kontingent: unbegrenzt · verbraucht: ${Number(quota.consumed_total || 0)}`;
+      } else {
+        quotaSummary.textContent = `Kontingent: ${Number(quota.included_total || 0)} · verbraucht: ${Number(quota.consumed_total || 0)}`;
+      }
+    }
+
+    if (quotaRemaining) {
+      if (quota.has_unlimited) {
+        quotaRemaining.textContent = "Verbleibend: unbegrenzt";
+      } else if (isSingleStatusView) {
+        quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)}`;
+      } else {
+        quotaRemaining.textContent = `Verbleibend: ${Number(quota.remaining_total || 0)}`;
+      }
+    }
+
+    if (submissionsHead) {
+      submissionsHead.textContent = "Letzte Einreichungen";
+    }
+
+    if (submissionsList && submissionsEmpty) {
+      submissionsList.innerHTML = "";
+
+      if (!submissions.length) {
+        submissionsEmpty.hidden = false;
+      } else {
+        submissionsEmpty.hidden = true;
+
+        submissions.slice(0, 8).forEach((submission) => {
+          const titleText = safeText(submission.title) || "Ohne Titel";
+          const statusText = formatStatusLabel(submission.status);
+          const dateText = formatDate(submission.start_date);
+          const metaText = `${statusText} · ${dateText}`;
+
+          const hasEventUrl = safeText(submission.event_url) !== "";
+          const row = document.createElement(hasEventUrl ? "a" : "div");
+          row.className = "content-link";
+
+          if (hasEventUrl) {
+            row.href = submission.event_url;
+            row.target = "_blank";
+            row.rel = "noopener noreferrer";
+          }
+
+          row.innerHTML = `
+            <span class="content-link__label">
+              <strong>${escapeHtml(titleText)}</strong><br>
+              <small>${escapeHtml(metaText)}</small>
+            </span>
+            <span class="content-link__chevron" data-ui-icon="${hasEventUrl ? "external" : "chevron-right"}" aria-hidden="true"></span>
+          `;
+
+          submissionsList.appendChild(row);
+        });
+
+        hydrateIcons(submissionsList);
+      }
+    }
+  }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_ACTIONS_V2 === */
       const email = safeText(organizer.email);
 
       if (isSingleStatusView) {
