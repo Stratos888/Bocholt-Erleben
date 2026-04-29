@@ -554,21 +554,25 @@
   }
   /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 === */
 
-  /* === BEGIN BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V1 | Zweck: synchronisiert vor dem Binden des Formulars die aktive Veranstalter-Session; Umfang: Initialisierung am Dateiende === */
+  /* === BEGIN BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V2 | Zweck: startet den Publish-Funnel nach DOM-Bereitschaft und synchronisiert dabei optional die aktive Veranstalter-Session; Umfang: Initialisierung am Dateiende === */
   async function initPublishFunnel() {
+    if (!isPublishRoute()) return;
+
     applyPlanPresetFromUrl();
     await syncStandardFormWithPortalSession();
     bindAutomationPath();
     bindStandardPath();
   }
 
-  void initPublishFunnel();
-  /* === END BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V1 === */
+  function bootPublishFunnel() {
+    void initPublishFunnel();
+  }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, { once: true });
+    document.addEventListener("DOMContentLoaded", bootPublishFunnel, { once: true });
   } else {
-    init();
+    bootPublishFunnel();
   }
+  /* === END BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V2 === */
 })();
 /* === END FILE: js/publish-funnel.js === */
