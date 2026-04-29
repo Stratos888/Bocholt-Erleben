@@ -1,0 +1,242 @@
+[
+  {
+    "id": "eroeffnung-sandbachpark-2026",
+    "title": "Eröffnung: Sandbachpark",
+    "aliases": ["Eröffnung Sandbachpark", "Sandbachpark"],
+    "expected_date": "2026-04-29",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/eroeffnung-sandbachpark",
+    "priority": "should",
+    "cluster": "bocholt-core-high"
+  },
+  {
+    "id": "bands-in-town-2026",
+    "title": "Bands in town",
+    "aliases": ["Bands in town 2026"],
+    "expected_date": "2026-04-30",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/bands-in-town-2026",
+    "priority": "should",
+    "cluster": "bocholt-core-high"
+  },
+  {
+    "id": "internationales-familienfest-textilwerk-2026",
+    "title": "Internationales Familienfest am LWL-Museum Textilwerk",
+    "aliases": ["Internationales Familienfest", "Familienfest am TextilWerk"],
+    "expected_date": "2026-05-01",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/familienfest",
+    "priority": "must",
+    "cluster": "bocholt-core-high"
+  },
+  {
+    "id": "city-food-festival-bocholt-2026",
+    "title": "City Food Festival",
+    "aliases": ["City Food Festival Bocholt"],
+    "expected_date": "2026-05-29",
+    "expected_endDate": "2026-05-31",
+    "source_hint": "bocholt.de/veranstaltungskalender/city-food-festival",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "farm-country-fair-2026",
+    "title": "Farm & Country Fair",
+    "aliases": ["Farm & Country Fair 2026"],
+    "expected_date": "2026-06-26",
+    "expected_endDate": "2026-06-28",
+    "source_hint": "countryfair.de",
+    "priority": "must",
+    "cluster": "seasonal-register-source"
+  },
+  {
+    "id": "bocholter-kulturspaziergang-2026",
+    "title": "1. Bocholter Kulturspaziergang",
+    "aliases": ["Bocholter Kulturspaziergang", "Stimmen der Stadt"],
+    "expected_date": "2026-06-30",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/1-bocholter-kulturspaziergang",
+    "priority": "should",
+    "cluster": "bocholt-core-high"
+  },
+  {
+    "id": "bocholter-weinfest-2026",
+    "title": "Bocholter Weinfest",
+    "aliases": ["29. Bocholter Weinfest", "Weinfest Bocholt"],
+    "expected_date": "2026-07-24",
+    "expected_endDate": "2026-07-26",
+    "source_hint": "bocholt.de/freizeit-und-tourismus/veranstaltungen/weinfest",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "aaltendag-2026-07-30",
+    "title": "1e AaltenDag",
+    "aliases": ["AaltenDag 2026 - 1. AaltenDag", "AaltenDagen 2026"],
+    "expected_date": "2026-07-30",
+    "expected_endDate": "",
+    "source_hint": "aaltendagen.nl",
+    "priority": "must",
+    "cluster": "aalten-core-high"
+  },
+  {
+    "id": "dick-brave-schlosspark-2026",
+    "title": "Dick Brave - Open Air im Schlosspark",
+    "aliases": ["Dick Brave Open Air", "Open Air im Schlosspark"],
+    "expected_date": "2026-08-01",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/dick-brave-open-air-im-schlosspark",
+    "priority": "should",
+    "cluster": "bocholt-core-high"
+  },
+  {
+    "id": "aaltendag-2026-08-06",
+    "title": "2e AaltenDag",
+    "aliases": ["AaltenDag 2026 - 2. AaltenDag", "AaltenDagen 2026"],
+    "expected_date": "2026-08-06",
+    "expected_endDate": "",
+    "source_hint": "aaltendagen.nl",
+    "priority": "must",
+    "cluster": "aalten-core-high"
+  },
+  {
+    "id": "aaltendag-2026-08-13",
+    "title": "3e AaltenDag",
+    "aliases": ["AaltenDag 2026 - 3. AaltenDag", "AaltenDagen 2026"],
+    "expected_date": "2026-08-13",
+    "expected_endDate": "",
+    "source_hint": "aaltendagen.nl",
+    "priority": "must",
+    "cluster": "aalten-core-high"
+  },
+  {
+    "id": "bocholter-aasee-festival-2026",
+    "title": "Bocholter Aasee-Festival",
+    "aliases": ["Aasee-Festival", "Aasee Festival"],
+    "expected_date": "2026-08-14",
+    "expected_endDate": "2026-08-16",
+    "source_hint": "bocholt.de/veranstaltungskalender/aasee-festival-1",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "aaltendag-2026-08-20",
+    "title": "4e AaltenDag",
+    "aliases": ["AaltenDag 2026 - 4. AaltenDag", "AaltenDagen 2026"],
+    "expected_date": "2026-08-20",
+    "expected_endDate": "",
+    "source_hint": "aaltendagen.nl",
+    "priority": "must",
+    "cluster": "aalten-core-high"
+  },
+  {
+    "id": "bocholter-csd-2026",
+    "title": "2. Bocholter CSD",
+    "aliases": ["Bocholter CSD", "CSD Bocholt"],
+    "expected_date": "2026-08-22",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/2-bocholter-csd",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "pinksterboekenmarkt-bredevoort-2026",
+    "title": "Internationale Pinksterboekenmarkt",
+    "aliases": ["Internationale Pinkster Boekenmarkt", "Pinksterboekenmarkt Bredevoort"],
+    "expected_date": "2026-05-25",
+    "expected_endDate": "",
+    "source_hint": "koppelkerk.nl",
+    "priority": "must",
+    "cluster": "koppelkerk-books"
+  },
+  {
+    "id": "zomerboekenmarkt-bredevoort-2026",
+    "title": "Internationale Zomerboekenmarkt",
+    "aliases": ["Internationale Zomer Boekenmarkt", "Zomerboekenmarkt Bredevoort"],
+    "expected_date": "2026-07-12",
+    "expected_endDate": "",
+    "source_hint": "koppelkerk.nl",
+    "priority": "must",
+    "cluster": "koppelkerk-books"
+  },
+  {
+    "id": "augustusboekenmarkt-bredevoort-2026",
+    "title": "Internationale Augustusboekenmarkt",
+    "aliases": ["Internationale Augustus Boekenmarkt", "Augustusboekenmarkt Bredevoort"],
+    "expected_date": "2026-08-23",
+    "expected_endDate": "",
+    "source_hint": "koppelkerk.nl",
+    "priority": "must",
+    "cluster": "koppelkerk-books"
+  },
+  {
+    "id": "bocholter-kulturtage-2026",
+    "title": "Bocholter Kulturtage",
+    "aliases": ["Kulturtage Bocholt"],
+    "expected_date": "2026-08-26",
+    "expected_endDate": "2026-08-30",
+    "source_hint": "bocholt.de/kulturtage",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "open-air-marktplatz-2026",
+    "title": "OPEN AIR am Marktplatz",
+    "aliases": ["25 Jahre Alte Molkerei", "Open Air am Marktplatz"],
+    "expected_date": "2026-08-29",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/open-air-am-marktplatz",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "cityart-bocholt-2026",
+    "title": "CityArt Bocholt",
+    "aliases": ["Bocholter Kunstmarkt", "CityArt Bocholt - Bocholter Kunstmarkt"],
+    "expected_date": "2026-08-30",
+    "expected_endDate": "",
+    "source_hint": "cityart-bocholt.de",
+    "priority": "must",
+    "cluster": "seasonal-register-source"
+  },
+  {
+    "id": "wattextra-open-air-bahia-2026",
+    "title": "WattExtra Open Air am Bahia",
+    "aliases": ["WattExtra Open Air-Konzert am Bahia", "WattExtra Open Air"],
+    "expected_date": "2026-09-05",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/wattextra-open-air-konzert-2026",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "weltkindertagsfest-interkulturelle-woche-2026",
+    "title": "Weltkindertagsfest / Eröffnung Interkulturelle Woche",
+    "aliases": ["Weltkindertagsfest", "Eröffnung Interkulturelle Woche"],
+    "expected_date": "2026-09-18",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/Interkulturellewoche",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "bredevoort-leuchtet-2026",
+    "title": "Bredevoort Leuchtet",
+    "aliases": ["Bredevoort Schittert", "Bredevoort Leuchtet 2026"],
+    "expected_date": "2026-09-25",
+    "expected_endDate": "2026-09-27",
+    "source_hint": "bredevoortschittert.nl",
+    "priority": "must",
+    "cluster": "seasonal-register-source"
+  },
+  {
+    "id": "herfstboekenmarkt-bredevoort-2026",
+    "title": "Internationale Herfstboekenmarkt",
+    "aliases": ["Internationale Herfst Boekenmarkt", "Herfstboekenmarkt Bredevoort"],
+    "expected_date": "2026-10-18",
+    "expected_endDate": "",
+    "source_hint": "koppelkerk.nl",
+    "priority": "must",
+    "cluster": "koppelkerk-books"
+  }
+]
