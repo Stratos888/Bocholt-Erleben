@@ -341,9 +341,12 @@ function asm_insert_membership_submission(PDO $pdo, int $organizerId, string $pl
     ];
 }
 
-function asm_build_success_url(string $baseUrl, string $paymentReferenceKey): string
+function asm_build_success_url(string $baseUrl, string $paymentReferenceKey, string $emailInput): string
 {
-    return $baseUrl . '/fuer-veranstalter/login/?membership_started=1&submission_ref=' . rawurlencode($paymentReferenceKey);
+    return $baseUrl
+        . '/fuer-veranstalter/login/?membership_started=1'
+        . '&submission_ref=' . rawurlencode($paymentReferenceKey)
+        . '&email=' . rawurlencode($emailInput);
 }
 
 function asm_build_cancel_url(string $baseUrl): string
@@ -400,7 +403,11 @@ try {
         'mode' => 'subscription',
         'customer' => $customerId,
         'client_reference_id' => $membershipSubmission['payment_reference_key'],
-        'success_url' => asm_build_success_url($appConfig['base_url'], $membershipSubmission['payment_reference_key']),
+'success_url' => asm_build_success_url(
+    $appConfig['base_url'],
+    $membershipSubmission['payment_reference_key'],
+    $emailInput
+),
         'cancel_url' => asm_build_cancel_url($appConfig['base_url']),
         'line_items[0][price]' => (string)$stripeConfig['prices'][$planKey],
         'line_items[0][quantity]' => '1',
