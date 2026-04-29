@@ -309,7 +309,7 @@ if (membershipStarted) {
   }
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_ACTIONS_V2 | Zweck: zeigt im Dashboard fuer aktive Abos eine Verwaltungsaktion an und rendert das effektive Modell sauber; Umfang: komplette renderDashboard-Funktion === */
-  function renderDashboard(data) {
+   function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
     const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
@@ -332,11 +332,6 @@ if (membershipStarted) {
     const hasManageableSubscription = ["starter", "active", "unlimited"].includes(subscriptionPlanKey);
     const effectivePlanKey = hasManageableSubscription ? subscriptionPlanKey : (defaultPlanKey || "single");
 
-    const isSingleStatusView =
-      effectivePlanKey === "single" &&
-      !hasManageableSubscription &&
-      !quota.has_unlimited;
-
     const latestTitleText = latestSubmission
       ? safeText(latestSubmission.title) || "Ohne Titel"
       : "Noch keine Einreichung";
@@ -349,6 +344,11 @@ if (membershipStarted) {
     const latestLocationText = latestSubmission
       ? safeText(latestSubmission.location_name)
       : "";
+
+    const isSingleStatusView =
+      effectivePlanKey === "single" &&
+      !hasManageableSubscription &&
+      !quota.has_unlimited;
 
     const title = document.getElementById("organizer-dashboard-title");
     const lead = document.getElementById("organizer-dashboard-lead");
@@ -455,140 +455,6 @@ if (membershipStarted) {
           : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
       } else if (hasManageableSubscription) {
         accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
-      } else {
-        const planLabel = formatPlanLabel(organizer.default_plan_key);
-        accountPlan.textContent = `Standardmodell: ${planLabel}`;
-      }
-    }
-
-    if (quotaHead) {
-      quotaHead.textContent = isSingleStatusView ? "Verfügbarkeit" : "Verfügbares Kontingent";
-    }
-
-    if (quotaPeriod) {
-      if (isSingleStatusView) {
-        quotaPeriod.textContent = latestSubmission
-          ? `Termin: ${latestDateText}`
-          : "Einzeltermin";
-      } else {
-        const start = formatDateTime(quota.current_period_start);
-        const end = formatDateTime(quota.current_period_end);
-        quotaPeriod.textContent = quota.current_period_start || quota.current_period_end
-          ? `Zeitraum: ${start} bis ${end}`
-          : "Zeitraum: aktuell kein aktiver Abo-Zeitraum";
-      }
-    }
-
-    if (quotaSummary) {
-      if (isSingleStatusView) {
-        const includedTotal = Number(quota.included_total || 0);
-        const consumedTotal = Number(quota.consumed_total || 0);
-
-        quotaSummary.textContent = includedTotal === 0 && consumedTotal === 0
-          ? "Noch kein bezahlter Einzeltermin."
-          : `Einzeltermine: ${includedTotal} · verbraucht: ${consumedTotal}`;
-      } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Kontingent: unbegrenzt · verbraucht: ${Number(quota.consumed_total || 0)}`;
-      } else {
-        quotaSummary.textContent = `Kontingent: ${Number(quota.included_total || 0)} · verbraucht: ${Number(quota.consumed_total || 0)}`;
-      }
-    }
-
-    if (quotaRemaining) {
-      if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Verbleibend: unbegrenzt";
-      } else if (isSingleStatusView) {
-        quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)}`;
-      } else {
-        quotaRemaining.textContent = `Verbleibend: ${Number(quota.remaining_total || 0)}`;
-      }
-    }
-
-    if (submissionsHead) {
-      submissionsHead.textContent = "Letzte Einreichungen";
-    }
-
-    if (submissionsList && submissionsEmpty) {
-      submissionsList.innerHTML = "";
-
-      if (!submissions.length) {
-        submissionsEmpty.hidden = false;
-      } else {
-        submissionsEmpty.hidden = true;
-
-        submissions.slice(0, 8).forEach((submission) => {
-          const titleText = safeText(submission.title) || "Ohne Titel";
-          const statusText = formatStatusLabel(submission.status);
-          const dateText = formatDate(submission.start_date);
-          const metaText = `${statusText} · ${dateText}`;
-
-          const hasEventUrl = safeText(submission.event_url) !== "";
-          const row = document.createElement(hasEventUrl ? "a" : "div");
-          row.className = "content-link";
-
-          if (hasEventUrl) {
-            row.href = submission.event_url;
-            row.target = "_blank";
-            row.rel = "noopener noreferrer";
-          }
-
-          row.innerHTML = `
-            <span class="content-link__label">
-              <strong>${escapeHtml(titleText)}</strong><br>
-              <small>${escapeHtml(metaText)}</small>
-            </span>
-            <span class="content-link__chevron" data-ui-icon="${hasEventUrl ? "external" : "chevron-right"}" aria-hidden="true"></span>
-          `;
-
-          submissionsList.appendChild(row);
-        });
-
-        hydrateIcons(submissionsList);
-      }
-    }
-  }
-  /* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_ACTIONS_V2 === */
-      const email = safeText(organizer.email);
-
-      if (isSingleStatusView) {
-        note.textContent = email
-          ? `Verknüpft mit ${email}. Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.`
-          : "Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.";
-      } else {
-        note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
-      }
-    }
-if (dashboardPrimaryCta) {
-  const subscriptionPlanKey = safeText(subscription?.plan_key).toLowerCase();
-  const effectivePlanKey = subscriptionPlanKey || defaultPlanKey || "single";
-  const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
-    ? effectivePlanKey
-    : "single";
-
-  dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
-}
-    
-    if (accountHead) {
-      accountHead.textContent = isSingleStatusView ? "Letzter Stand" : "Veranstalter";
-    }
-
-    if (accountName) {
-      accountName.textContent = isSingleStatusView
-        ? latestTitleText
-        : safeText(organizer.organization_name) || "–";
-    }
-
-    if (accountEmail) {
-      accountEmail.textContent = isSingleStatusView
-        ? `${latestStatusText} · ${latestDateText}`
-        : safeText(organizer.email) || "–";
-    }
-
-    if (accountPlan) {
-      if (isSingleStatusView) {
-        accountPlan.textContent = latestLocationText
-          ? `Ort: ${latestLocationText}`
-          : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
       } else {
         const planLabel = formatPlanLabel(organizer.default_plan_key);
         accountPlan.textContent = `Standardmodell: ${planLabel}`;
