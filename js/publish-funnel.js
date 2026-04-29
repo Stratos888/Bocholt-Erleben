@@ -83,7 +83,23 @@
   function getAutomationEndpoint() {
     return safeText(cfg.automationFormspreeEndpoint);
   }
+function applyPlanPresetFromUrl() {
+  const planSelect = byId("publish-standard-plan");
+  if (!planSelect) return;
 
+  const params = new URLSearchParams(window.location.search);
+  const requestedPlan = safeText(params.get("plan")).toLowerCase();
+  if (!requestedPlan) return;
+
+  const allowedPlans = ["single", "starter", "active", "unlimited"];
+  if (!allowedPlans.includes(requestedPlan)) return;
+
+  const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === requestedPlan);
+  if (!hasOption) return;
+
+  planSelect.value = requestedPlan;
+}
+  
   function persistCheckoutContext(context) {
     try {
       window.sessionStorage.setItem(cfg.storageKey, JSON.stringify(context));
@@ -434,11 +450,12 @@
   }
   /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 === */
 
-  function init() {
-    if (!isPublishRoute()) return;
-    bindStandardPath();
-    bindAutomationPath();
-  }
+function init() {
+  if (!isPublishRoute()) return;
+  applyPlanPresetFromUrl();
+  bindStandardPath();
+  bindAutomationPath();
+}
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
