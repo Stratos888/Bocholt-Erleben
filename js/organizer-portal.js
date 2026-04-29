@@ -74,6 +74,17 @@
     })[key] || key || "–";
   }
 
+  function formatSubmissionStatusLabel(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+    const paymentKind = safeText(submission?.payment_kind).toLowerCase();
+
+    if (statusKey === "paid" && paymentKind === "subscription") {
+      return "Event eingereicht";
+    }
+
+    return formatStatusLabel(statusKey);
+  }
+
   function formatDate(value) {
     const text = safeText(value);
     if (!text) return "–";
@@ -111,6 +122,16 @@
     }
 
     return text;
+  }
+
+  function formatSubmissionMetaDate(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+
+    if (statusKey === "approved") {
+      return formatDate(submission?.start_date);
+    }
+
+    return formatDate(submission?.created_at || submission?.updated_at || submission?.start_date);
   }
 
   function hydrateIcons(root = document) {
@@ -518,9 +539,9 @@ if (membershipStarted) {
 
         submissions.slice(0, 8).forEach((submission) => {
           const titleText = safeText(submission.title) || "Ohne Titel";
-          const statusText = formatStatusLabel(submission.status);
-          const dateText = formatDate(submission.start_date);
-          const metaText = `${statusText} · ${dateText}`;
+          const statusText = formatSubmissionStatusLabel(submission);
+          const metaDateText = formatSubmissionMetaDate(submission);
+          const metaText = `${statusText} · ${metaDateText}`;
 
           const hasEventUrl = safeText(submission.event_url) !== "";
           const row = document.createElement(hasEventUrl ? "a" : "div");
