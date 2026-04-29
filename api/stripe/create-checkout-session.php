@@ -262,12 +262,15 @@ function scs_ensure_stripe_customer(PDO $pdo, array $submission, string $secretK
     return $customerId;
 }
 
-function scs_fetch_matching_active_subscription_entitlement(PDO $pdo, array $submission): ?array
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V2 | Zweck: liefert fuer einen Organizer ein nutzbares aktives Abo-Kontingent und bevorzugt dabei das passende Modell; Umfang: komplette Funktion === */
+function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submission): ?array
 {
-    $modelKey = trim((string)($submission['requested_model_key'] ?? ''));
-    if ($modelKey === '' || $modelKey === 'single') {
+    $organizerId = (int)($submission['organizer_id'] ?? 0);
+    if ($organizerId <= 0) {
         return null;
     }
+
+    $requestedPlanKey = trim((string)($submission['requested_model_key'] ?? ''));
 
     $statement = $pdo->prepare(
         'SELECT
@@ -275,85 +278,88 @@ function scs_fetch_matching_active_subscription_entitlement(PDO $pdo, array $sub
             pe.organizer_id,
             pe.subscription_id,
             pe.plan_key,
-            pe.status,
+            pe.included_count,
+            pe.consumed_count,
+            pe.is_unlimited,
             pe.period_start,
             pe.period_end,
-            pe.included_publications,
-            pe.consumed_publications,
-            pe.is_unlimited,
             s.stripe_subscription_id,
             s.stripe_customer_id
          FROM publication_entitlements pe
          INNER JOIN subscriptions s ON s.id = pe.subscription_id
          WHERE pe.organizer_id = :organizer_id
-           AND pe.source_type = :source_type
-           AND pe.status = :status
-           AND pe.plan_key = :plan_key
-           AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
-           AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())
-           AND (pe.is_unlimited = 1 OR pe.consumed_publications < pe.included_publications)
+           AND pe.source_type = "subscription"
+           AND pe.status = "active"
+           AND pe.period_start <= UTC_TIMESTAMP()
+           AND pe.period_end >= UTC_TIMESTAMP()
+           AND (
+                pe.is_unlimited = 1
+                OR pe.consumed_count < pe.included_count
+           )
          ORDER BY
-            CASE WHEN pe.is_unlimited = 1 THEN 1 ELSE 0 END,
+            CASE
+                WHEN :requested_plan_key <> "" AND pe.plan_key = :requested_plan_key THEN 0
+                ELSE 1
+            END ASC,
+            pe.is_unlimited DESC,
             pe.period_end ASC,
             pe.id ASC
          LIMIT 1'
     );
 
     $statement->execute([
-        ':organizer_id' => (int)$submission['organizer_id'],
-        ':source_type' => 'subscription',
-        ':status' => 'active',
-        ':plan_key' => $modelKey,
+        ':organizer_id' => $organizerId,
+        ':requested_plan_key' => $requestedPlanKey,
     ]);
 
-    $row = $statement->fetch();
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+
     return is_array($row) ? $row : null;
 }
+/* === END BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V2 === */
 
 function scs_build_existing_subscription_redirect_url(string $baseUrl, string $paymentReferenceKey): string
 {
     return rtrim($baseUrl, '/') . '/events-veroeffentlichen/erfolg/?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription';
 }
 
-function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $submission, array $entitlement, string $customerId): void
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V2 | Zweck: setzt Submission bei vorhandenem aktivem Abo sauber auf bezahlt und schreibt das effektive Modell zurueck; Umfang: komplette Funktion === */
+function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $submission, array $entitlement, ?string $customerId): void
 {
-    $subscriptionId = trim((string)($entitlement['stripe_subscription_id'] ?? ''));
-    $effectiveCustomerId = trim((string)($entitlement['stripe_customer_id'] ?? ''));
-
-    if ($effectiveCustomerId === '') {
-        $effectiveCustomerId = $customerId;
-    }
+    $subscriptionId = isset($entitlement['subscription_id']) ? (int)$entitlement['subscription_id'] : null;
+    $effectiveCustomerId = $customerId ?: trim((string)($entitlement['stripe_customer_id'] ?? ''));
+    $resolvedModelKey = trim((string)($entitlement['plan_key'] ?? ''));
 
     $statement = $pdo->prepare(
         'UPDATE submissions
          SET
             status = :status,
+            payment_kind = :payment_kind,
+            requested_model_key = CASE
+                WHEN :resolved_model_key = "" THEN requested_model_key
+                ELSE :resolved_model_key
+            END,
             stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
             stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
-            paid_at = CASE
-                WHEN paid_at IS NULL THEN CURRENT_TIMESTAMP
-                ELSE paid_at
-            END,
-            updated_at = CURRENT_TIMESTAMP
+            entitlement_source_type = :entitlement_source_type,
+            entitlement_source_id = :entitlement_source_id,
+            paid_at = COALESCE(paid_at, UTC_TIMESTAMP()),
+            updated_at = UTC_TIMESTAMP()
          WHERE id = :submission_id'
     );
 
-    if ($effectiveCustomerId === '') {
-        $statement->bindValue(':stripe_customer_id', null, PDO::PARAM_NULL);
-    } else {
-        $statement->bindValue(':stripe_customer_id', $effectiveCustomerId, PDO::PARAM_STR);
-    }
-
-    if ($subscriptionId === '') {
-        $statement->bindValue(':stripe_subscription_id', null, PDO::PARAM_NULL);
-    } else {
-        $statement->bindValue(':stripe_subscription_id', $subscriptionId, PDO::PARAM_STR);
-    }
-
-    $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
-    $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
-    $statement->execute();
+    $statement->execute([
+        ':status' => 'paid',
+        ':payment_kind' => 'subscription',
+        ':resolved_model_key' => $resolvedModelKey,
+        ':stripe_customer_id' => $effectiveCustomerId !== '' ? $effectiveCustomerId : null,
+        ':stripe_subscription_id' => $subscriptionId !== null ? (string)$subscriptionId : null,
+        ':entitlement_source_type' => 'subscription',
+        ':entitlement_source_id' => isset($entitlement['id']) ? (string)$entitlement['id'] : null,
+        ':submission_id' => (string)$submission['id'],
+    ]);
 }
+/* === END BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V2 === */
 
 function scs_create_checkout_session(array $submission, string $customerId, array $stripeConfig, array $appConfig): array
 {
@@ -401,6 +407,7 @@ function scs_create_checkout_session(array $submission, string $customerId, arra
     ];
 }
 
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_ENTRYPOINT_AND_ERROR_HANDLING_V2 | Zweck: repariert den kaputten Endpoint und nutzt vorhandene aktive Abos automatisch fuer Event-Einreichungen; Umfang: kompletter Try/Catch-Entrypoint === */
 try {
     $input = scs_read_json_body();
     $submissionId = scs_required_positive_int($input, 'submission_id', 'submission_id');
@@ -415,20 +422,24 @@ try {
     scs_assert_submission_ready($submission);
 
     $customerId = scs_ensure_stripe_customer($pdo, $submission, $stripeConfig['secret_key']);
-
-    $existingSubscriptionEntitlement = scs_fetch_matching_active_subscription_entitlement($pdo, $submission);
+    $existingSubscriptionEntitlement = scs_fetch_usable_active_subscription_entitlement($pdo, $submission);
 
     if (is_array($existingSubscriptionEntitlement)) {
         scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
         $pdo->commit();
+
+        $resolvedModelKey = trim((string)($existingSubscriptionEntitlement['plan_key'] ?? ''));
+        $effectiveModelKey = $resolvedModelKey !== ''
+            ? $resolvedModelKey
+            : (string)$submission['requested_model_key'];
 
         be_json_response(200, [
             'status' => 'ok',
             'data' => [
                 'submission_id' => $submissionId,
                 'submission_status' => 'paid',
-                'requested_model_key' => (string)$submission['requested_model_key'],
-                'payment_kind' => (string)$submission['payment_kind'],
+                'requested_model_key' => $effectiveModelKey,
+                'payment_kind' => 'subscription',
                 'stripe_customer_id' => $customerId,
                 'checkout_required' => false,
                 'redirect_url' => scs_build_existing_subscription_redirect_url(
@@ -496,26 +507,6 @@ try {
         'error_message' => $error->getMessage(),
     ]);
 }
-} catch (InvalidArgumentException $error) {
-    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
-    be_json_response(422, [
-        'status' => 'error',
-        'message' => $error->getMessage(),
-    ]);
-} catch (Throwable $error) {
-    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
-    be_json_response(500, [
-        'status' => 'error',
-        'message' => 'Checkout session creation failed.',
-        'error_class' => get_class($error),
-        'error_message' => $error->getMessage(),
-    ]);
-}
+/* === END BLOCK: STRIPE_CHECKOUT_ENTRYPOINT_AND_ERROR_HANDLING_V2 === */
 
 /* === END FILE: api/stripe/create-checkout-session.php === */
