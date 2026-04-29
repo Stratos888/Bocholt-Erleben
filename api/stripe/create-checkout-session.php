@@ -279,22 +279,31 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
             pe.subscription_id,
             pe.plan_key,
             pe.included_publications,
-            pe.consumed_publications,
+            COALESCE(pcsum.consumed_units, 0) AS consumed_units,
             pe.is_unlimited,
             pe.period_start,
             pe.period_end,
             s.stripe_subscription_id,
-            s.stripe_customer_id
+            s.stripe_customer_id,
+            s.status AS subscription_status
          FROM publication_entitlements pe
          INNER JOIN subscriptions s ON s.id = pe.subscription_id
+         LEFT JOIN (
+            SELECT
+                entitlement_id,
+                COALESCE(SUM(units), 0) AS consumed_units
+            FROM publication_consumptions
+            GROUP BY entitlement_id
+         ) pcsum ON pcsum.entitlement_id = pe.id
          WHERE pe.organizer_id = :organizer_id
            AND pe.source_type = "subscription"
            AND pe.status = "active"
+           AND s.status IN ("active", "trialing")
            AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
            AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())
            AND (
                 pe.is_unlimited = 1
-                OR pe.consumed_publications < pe.included_publications
+                OR COALESCE(pcsum.consumed_units, 0) < pe.included_publications
            )
          ORDER BY
             CASE
