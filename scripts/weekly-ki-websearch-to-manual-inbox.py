@@ -56,15 +56,18 @@ TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V2 | Zweck: Aufbau-/Backfill-Lauf mit höherem Kandidatenlimit für echte Clusterabdeckung | Umfang: setzt Backfill-Zielkorridor auf 24 Kandidaten, Guards bleiben unverändert ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V3 | Zweck: Aufbau-/Backfill-Lauf mit Diagnose; offene Inbox warnt nur noch, Manual-Puffer bleibt harter Guard | Umfang: setzt Backfill-Zielkorridor und Guard-/Warn-Konfiguration ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
 MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
 SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "180"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
-FAIL_ON_PENDING_INBOX = os.environ.get("FAIL_ON_PENDING_INBOX", "true").lower() in {"1", "true", "yes"}
+WARN_ON_PENDING_INBOX = os.environ.get(
+    "WARN_ON_PENDING_INBOX",
+    os.environ.get("FAIL_ON_PENDING_INBOX", "true"),
+).lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
-# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V2 ===
+# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V3 ===
 
 ALLOWED_CATEGORIES = {
     "Märkte & Feste",
@@ -326,20 +329,25 @@ def read_manual_records() -> List[RefRecord]:
 # === END BLOCK: DATA LOADERS ===
 
 
-# === BEGIN BLOCK: PRE-RUN GUARDS ===
+# === BEGIN BLOCK: PRE_RUN_GUARDS_PENDING_INBOX_AS_DEDUPE_BASIS_V1 | Zweck: offene Inbox-Zeilen zählen, aber nicht mehr als Lauf-Blocker behandeln | Umfang: Manual-Puffer-Guard bleibt unverändert, Inbox bleibt Dedupe-Bestand ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
-# - Verhindert neue Suchläufe, wenn Review- oder Manual-Puffer noch offen sind
-# - Entspricht der Prozessregel des Regelwerks
+# - Zählt offene Review-Fälle in der Inbox für Observability
+# - Erhält Kompatibilität zu has_pending_inbox_rows(...)
+# - Die offene Inbox wird weiterhin in Prompt, lokalem Dedupe und Intake-Dedupe berücksichtigt
 # Umfang:
-# - Nur Guard-Checks
-# === END BLOCK: PRE-RUN GUARDS ===
+# - Nur Guard-/Zähl-Helper
+def is_pending_inbox_record(rec: RefRecord) -> bool:
+    return norm_key(rec.status) not in {"übernommen", "verworfen"}
+
+
+def count_pending_inbox_rows(records: List[RefRecord]) -> int:
+    return sum(1 for rec in records if is_pending_inbox_record(rec))
+
+
 def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
-    for rec in records:
-        if norm_key(rec.status) not in {"übernommen", "verworfen"}:
-            return True
-    return False
-# === END BLOCK: PRE-RUN GUARDS ===
+    return count_pending_inbox_rows(records) > 0
+# === END BLOCK: PRE_RUN_GUARDS_PENDING_INBOX_AS_DEDUPE_BASIS_V1 ===
 
 
 # === BEGIN BLOCK: PROMPT BUNDLE BUILDERS ===
@@ -1749,8 +1757,14 @@ def main() -> None:
     archive_records = read_tsv_records(TMP_ARCHIVE_TSV_PATH, {})
     manual_records = read_manual_records()
 
-    if FAIL_ON_PENDING_INBOX and has_pending_inbox_rows(inbox_records):
-        fail("Inbox enthält noch offene Review-Fälle. Wochenlauf wird bewusst abgebrochen.")
+    # === BEGIN BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 | Zweck: offene Review-Inbox nicht mehr blockieren, aber weiterhin als Dedupe-/Prompt-Bestand nutzen | Umfang: ersetzt harten Abbruch bei offener Inbox durch Warnlog ===
+    pending_inbox_rows = count_pending_inbox_rows(inbox_records)
+    if WARN_ON_PENDING_INBOX and pending_inbox_rows:
+        info(
+            f"Inbox enthält {pending_inbox_rows} offene Review-Fälle. "
+            "Weekly-Lauf wird fortgesetzt; OFFENE_INBOX bleibt Prompt-, Dedupe- und Intake-Bestand."
+        )
+    # === END BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 ===
 
     if FAIL_ON_PENDING_MANUAL and manual_records:
         fail("data/inbox_manual.json ist nicht leer. Wochenlauf wird bewusst abgebrochen.")
