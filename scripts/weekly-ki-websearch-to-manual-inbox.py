@@ -52,15 +52,15 @@ TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_CLEANUP_V1 | Zweck: Weekly-Lauf auf reinen Produktionsmodus zurückbauen | Umfang: entfernt Discovery-Pass-Konfiguration, behält nur produktionsrelevante Laufparameter ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V2 | Zweck: Aufbau-/Backfill-Lauf mit höherem Kandidatenlimit für echte Clusterabdeckung | Umfang: setzt Backfill-Zielkorridor auf 24 Kandidaten, Guards bleiben unverändert ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
-MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "40"))
+MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
 SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "180"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
 FAIL_ON_PENDING_INBOX = os.environ.get("FAIL_ON_PENDING_INBOX", "true").lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
-# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_CLEANUP_V1 ===
+# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V2 ===
 
 ALLOWED_CATEGORIES = {
     "Märkte & Feste",
@@ -97,10 +97,18 @@ def norm(value: Any) -> str:
 
 def norm_key(value: Any) -> str:
     return re.sub(r"\s+", " ", norm(value)).lower()
+# === BEGIN BLOCK: OUTPUT_TEXT_NORMALIZATION_HELPERS_V1 | Zweck: Modelltexte für JSON/Inbox-Ausgabe einzeilig und URL-sicher normalisieren | Umfang: ergänzt lokale Helper ohne globale norm()-Semantik zu verändern ===
+def clean_output_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", norm(value))
 
 
+def clean_url_text(value: Any) -> str:
+    return re.sub(r"\s+", "", norm(value))
+# === END BLOCK: OUTPUT_TEXT_NORMALIZATION_HELPERS_V1 ===
+
+# === BEGIN BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 | Zweck: URLs vor Parsing/JSON-Ausgabe von Whitespace und Trackingparametern bereinigen | Umfang: ersetzt canonical_url vollständig ===
 def canonical_url(raw: str) -> str:
-    raw = norm(raw)
+    raw = clean_url_text(raw)
     if not raw:
         return ""
     try:
@@ -122,6 +130,7 @@ def canonical_url(raw: str) -> str:
         fragment="",
     )
     return urlunparse(cleaned).rstrip("/")
+# === END BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 ===
 
 
 def parse_iso_date(raw: str) -> date | None:
@@ -362,7 +371,7 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V2 | Zweck: Produktionslauf mit Quellenlernen um verpflichtende Backfill-Abdeckungslogik erweitern | Umfang: ersetzt build_messages vollständig, hält Event-/Quellen-Output getrennt ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V3 | Zweck: Aufbau-/Backfill-Lauf mit 24er Zielkorridor, Pflicht-Cluster-Abdeckung und hartem Output-Vertrag | Umfang: ersetzt build_messages vollständig, hält Event-/Quellen-Output getrennt ===
 def build_messages(
     rulebook_text: str,
     sources_register_text: str,
@@ -393,9 +402,9 @@ Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Liefere nur neue Delta-Kandidaten.
 
 Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
-- Ziel ist nicht nur irgendeine gute Trefferliste.
 - Ziel ist möglichst vollständige Abdeckung der starken Quellen- und Eventcluster im 180-Tage-Fenster.
 - Du musst die definierten Quellencluster systematisch prüfen, bevor du den Lauf abschließt.
+- Du darfst und sollst mehr als 12 Kandidaten liefern, wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind.
 - Keine künstliche Auffüllung mit schwachen Treffern.
 - Wenn eine Quelle viele echte starke Instanzen liefert, dürfen mehrere Instanzen ausgegeben werden.
 - Wenn eine Quelle nur schwache oder bereits bekannte Treffer liefert, gib daraus nichts aus.
@@ -403,8 +412,8 @@ Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter 
 Im Automationsmodus gilt für Events:
 - nur FINAL
 - kein REVIEW
-- kein Fließtext
-- keine Kommentare
+- kein Fließtext außerhalb des JSON
+- keine Kommentare außerhalb des JSON
 
 Zusätzlich sammelst du neue Quellen separat als source_candidates.
 source_candidates sind keine Events und dürfen niemals in die Event-Inbox gemischt werden.
@@ -431,6 +440,8 @@ Rahmen:
 - Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
 - Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis inklusive niederländischer Orte innerhalb dieses Radius
 - Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten
+- Wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind, liefere mehr als 12
+- Wenn weniger als {MAX_NEW_CANDIDATES} starke FINAL-Kandidaten vorhanden sind, liefere weniger
 - Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
 - Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
 - Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
@@ -454,6 +465,11 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
 2. Bocholt RECOVERY:
    - offizielle Bocholt-Info-/News-/Themen-Seiten mit klarem Eventfokus
    - bekannte starke Recovery-Muster wie Kulturtage, Interkulturelle Woche, Weinfest, Aasee, Kirmes, Innenstadt- und Familienformate
+   - diese Recovery-URLs explizit prüfen:
+     - `https://www.bocholt.de/kulturtage`
+     - `https://www.bocholt.de/Interkulturellewoche`
+     - `https://www.bocholt.de/freizeit-und-tourismus/veranstaltungen/weinfest`
+     - `https://www.bocholt.de/veranstaltungskalender/aasee-festival-1`
    - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
 
 3. Rhede CORE-MID:
@@ -463,20 +479,26 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
 
 4. Aalten / NL-Nahraum:
    - `aaltendagen.nl/*`
-   - starke Serien-/Stadtfesttage als getrennte Tagesinstanzen, wenn Datum/Instanz getrennt sind
-   - `time` nur setzen, wenn Startzeit für die konkrete Instanz eindeutig ist; sonst leer
+   - alle belegbaren AaltenDagen 2026 im 180-Tage-Fenster aktiv prüfen
+   - AaltenDag-Termine als getrennte Tagesinstanzen ausgeben, wenn Datum/Instanz getrennt sind
+   - bei AaltenDag keine einzelne Tagesblock-Zeit als allgemeine Startzeit verwenden, wenn mehrere Tagesblöcke genannt sind; dann `time` leer lassen
 
 5. Borken / FARB / Jubiläums-/Kulturquellen:
-   - `farb.borken.de/...`
-   - `800.borken.de/...`
+   - `farb.borken.de`
+   - `800.borken.de`
    - nur starke öffentliche Formate übernehmen
    - Ausstellungen, Vorschau- und Museumsseiten streng filtern
 
 6. Bredevoort / Koppelkerk:
    - `koppelkerk.nl/agenda/*`
    - `koppelkerk.nl/evenementen/*`
-   - Bücherbörsen, Märkte und klare öffentliche Kulturtermine prüfen
-   - kleine Spezial-/Buch-/Nischenformate nur bei erkennbarem Breiteninteresse
+   - alle belegbaren Koppelkerk-Bücherbörsen im 180-Tage-Fenster aktiv prüfen:
+     - Internationale Pinksterboekenmarkt
+     - Internationale Zomerboekenmarkt
+     - Internationale Augustusboekenmarkt
+     - Internationale Herfstboekenmarkt
+   - Bücherbörsen und Märkte bevorzugt als `Märkte & Feste` kategorisieren
+   - kleine Buchvorstellungen, Spezialkonzerte oder Nischenformate nur bei erkennbarem Breiteninteresse
 
 7. Isselburg / Hamminkeln / Randgebiet:
    - offizielle kommunale Veranstaltungsseiten
@@ -498,38 +520,43 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
    - Wenn dabei eine neue gute Quelle auftaucht, dokumentiere sie nur in source_candidates
    - Neue Quelle nur als Eventquelle nutzen, wenn sie regelkonform, erreichbar, instanzpassend und nicht gesperrt ist
 
-Abdeckungsregel:
-- Bevor du final ausgibst, prüfe, ob naheliegende starke Bocholt- und Nahraum-Highlights im Zeitraum fehlen.
-- Wenn ein naheliegendes starkes Highlight fehlt, suche aktiv nach einer belastbaren Quelle.
-- Gib es nur dann nicht aus, wenn es bereits in BESTAND_EVENTS, OFFENE_INBOX, ARCHIV oder MANUAL_JSON enthalten ist oder nicht FINAL-sicher belegbar ist.
-- Wenn ein bekannter starker Treffer ausgeschlossen wird, muss der Ausschluss auf Dedupe, Regelwerksausschluss oder fehlende FINAL-Sicherheit beruhen, nicht auf ausgelassener Suche.
+Pflichtprüfung bekannter Highlight-Cluster:
+Vor der finalen Ausgabe aktiv prüfen, ob diese starken Kandidaten vorhanden, bereits entschieden oder nicht FINAL-sicher sind:
+- Bocholter Weinfest
+- Bocholter Aasee-Festival
+- 2. Bocholter CSD
+- Bocholter Kulturtage
+- OPEN AIR am Marktplatz
+- Weltkindertagsfest / Eröffnung Interkulturelle Woche
+- City Food Festival
+- WattExtra Open Air am Bahia
+- CityArt Bocholt
+- Farm & Country Fair
+- Bredevoort Leuchtet
+- alle AaltenDagen 2026 im Zeitraum
+- alle Koppelkerk-Bücherbörsen 2026 im Zeitraum
+- starke neue Stadt-Bocholt-Kultur-/Familien-/Open-Air-Termine
 
-Operative Quellensteuerung:
-- Nutze das Quellenregister als Gewichtung, nicht als starre Whitelist
-- Prüfe zuerst CORE-HIGH
-- danach CORE-MID
-- danach RECOVERY gezielt
-- LOW-VALUE nicht aktiv priorisieren
-- EXCLUDE / GESPERRT nicht aktiv als Quelle nutzen
-- Gute Quellen dürfen mehrere echte Instanzen liefern, wenn diese regelkonform und stark sind
-- Keine harte Quellenbegrenzung, aber keine schwachen Fülltreffer aus einer Quelle
-- Kontrollierte offene Suche ist erlaubt, wenn sie ein starkes Event findet und die Quelle separat als source_candidate dokumentiert wird
+Wenn einer dieser Kandidaten nicht in candidates erscheint, darf das nur einen dieser Gründe haben:
+- bereits in BESTAND_EVENTS vorhanden
+- bereits in OFFENE_INBOX vorhanden
+- bereits in ARCHIV entschieden
+- bereits in MANUAL_JSON vorhanden
+- außerhalb Zeitraum
+- nicht FINAL-sicher belegbar
+- wegen Regelwerk ausgeschlossen
 
-Kontrolliertes Quellenlernen:
-- Das Quellenregister ist keine Closed-Whitelist.
-- Wenn du bei der Eventsuche eine gute neue Quelle außerhalb des Registers findest, darfst du sie als source_candidate dokumentieren.
-- Eine neue Quelle darf nur dann zu source_candidates, wenn sie mindestens ein starkes, regelkonformes oder fast regelkonformes Event im Suchgebiet belegt.
-- source_candidates dürfen keine Social-only-, Ticketshop-only-, Venue-Promo- oder klar gesperrten Quellen sein.
-- source_candidates sind nur Vorschläge für spätere Registerpflege, keine automatische Freigabe.
-- Nimm bekannte Quellen aus dem Quellenregister nicht erneut als source_candidate auf.
+Konkrete Einzeltermine vor Sammelklammern:
+- Wenn eine Quelle eine Themenwoche oder Reihe enthält, bevorzuge konkrete starke Einzeltermine.
+- Bei `Interkulturelle Woche` nicht automatisch die ganze Woche als Event ausgeben.
+- Wenn der konkrete Einzeltermin `Weltkindertagsfest / Eröffnung Interkulturelle Woche` mit Datum, Uhrzeit und Ort belegbar ist, gib diesen Einzeltermin aus.
+- Die ganze Interkulturelle Woche nur ausgeben, wenn kein konkreter starker Einzeltermin sauber extrahierbar ist.
 
-Recovery-Prüfung vor Verwerfen:
-Wenn ein Kandidat fast FINAL-fähig wirkt, dann versuche vor dem Verwerfen aktiv:
-1. eine bessere offizielle Detailseite zu finden
-2. eine stabilere, kanonischere und instanzpassende Event-URL zu finden
-3. die höchste sicher belegte Ortsgranularität zu bestimmen
-4. bei Mehrtermin-Seiten zu prüfen, ob die sichtbare Einzelinstanz trotzdem sauber FINAL-fähig ist
-5. bei offiziellen Info-/News-Seiten zu prüfen, ob trotz zusätzlicher Orga-/CTA-/Aussteller-Elemente ein klarer Besucherfokus vorliegt
+Keine Routine-Fülltreffer:
+- Regelmäßig wiederkehrende Standardmärkte, Krammärkte, Wochenmärkte, Routine-Führungen, Standardkurse und reine Serienformate NICHT massenhaft als FINAL ausgeben.
+- Solche Formate nur aufnehmen, wenn sie einen klar besonderen Eventcharakter, außergewöhnliche öffentliche Relevanz oder deutlichen PWA-Nutzen haben.
+- Mehrere normale Krammarkt-Termine aus derselben generischen Quelle nicht als Backfill-Füllmasse ausgeben.
+- Wenn starke Highlight-Kandidaten verfügbar sind, haben sie Vorrang vor Routine-/Serienterminen.
 
 Harte Prüfregeln vor FINAL:
 - Ein FINAL-Eintrag repräsentiert entweder genau eine einzelne besuchbare Termin-Instanz oder genau ein zusammenhängendes Mehrtagesevent.
@@ -604,18 +631,70 @@ Priorisiere FINAL-Kandidaten nach:
 Wenn ein Kandidat zwar formal korrekt, aber redaktionell schwach ist:
 - nicht ausgeben
 
-Output-Regeln:
-- Gib ausschließlich ein JSON-Objekt mit den Schlüsseln "candidates" und "source_candidates" zurück.
-- "candidates" enthält nur neue FINAL-Events.
-- "source_candidates" enthält nur neue Quellenvorschläge, keine Events für die Inbox.
-- Keine zusätzlichen Schlüssel.
-- Keine Einleitung.
-- Keine Erklärung.
+Output-Vertrag:
+Gib ausschließlich ein valides JSON-Objekt mit genau diesen zwei Schlüsseln zurück:
+
+{{
+  "candidates": [],
+  "source_candidates": []
+}}
+
+Jeder Eintrag in candidates MUSS exakt diese Felder enthalten:
+- title
+- date
+- endDate
+- time
+- city
+- location
+- kategorie_suggestion
+- url
+- description
+- source_name
+- source_url
+- notes
+
+Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
+Lasse niemals ein Pflichtfeld weg.
+
+Beispiele:
+- Ein-Tages-Event ohne Enddatum: "endDate": ""
+- Event ohne sichere Startzeit: "time": ""
+- Mehrtagesevent ohne einheitliche Startzeit: "time": ""
+
+Jeder Eintrag in source_candidates MUSS exakt diese Felder enthalten:
+- domain
+- source_name
+- source_url_pattern
+- example_url
+- suggested_status
+- quality_signal
+- risk_signal
+- reason
+- usage_rule
+- evidence_events
+- notes
+
+Jeder Eintrag in evidence_events MUSS exakt diese Felder enthalten:
+- title
+- date
+- url
+
+Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
+Lasse niemals ein Pflichtfeld weg.
+
+JSON-Strenge:
+- Gib ausschließlich valides JSON nach RFC 8259 zurück.
+- Keine Markdown-Codeblöcke.
+- Keine Erklärung vor oder nach dem JSON.
 - Keine Kommentare.
-- Keine REVIEW-Fälle.
-- Keine EXCLUDE-Fälle.
-- Keine unsicheren Event-Datensätze.
-- Keine bereits vorhandenen oder bereits entschiedenen Event-Dubletten.
+- Keine Tabellen.
+- Keine Zeilenumbrüche innerhalb von Stringwerten.
+- Keine sichtbaren Umbrüche in description, notes, url oder source_url.
+- URLs müssen getrimmt sein: keine Leerzeichen, keine Zeilenumbrüche.
+- Anführungszeichen innerhalb von Texten müssen korrekt escaped werden.
+- Jeder String muss gültig JSON-escaped sein.
+- Das Ergebnis muss direkt mit JSON.parse parsebar sein.
+- Die Antwort muss mit `{{` beginnen und mit `}}` enden.
 
 Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - echtes Event?
@@ -632,6 +711,7 @@ Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
 - Mehrtageslogik korrekt?
 - Beschreibung neutral, sachlich und quellenbasiert?
 - keine Dublette gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON?
+- keine Dublette innerhalb des aktuellen Outputs?
 - wirklich nützlich für die Kuratierungs-PWA?
 - ist der Kandidat nicht nur korrekt, sondern auch stark genug?
 - gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
@@ -654,7 +734,7 @@ Zusätzliche interne Pflichtprüfung vor Quellenvorschlag:
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V2 ===
+# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V3 ===
 # === END BLOCK: PROMPT BUNDLE BUILDERS ===
 
 
@@ -806,7 +886,23 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
 # Umfang:
 # - Nur Sicherungsnetz hinter der KI-Suche
 # === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
-# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_RANGE_AWARE_V3 | Zweck: FINAL-Validierung, Zeitformat, Laufzeitfenster und Instanz-Dedupe regelwerkskonform absichern | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
+# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_OUTPUT_SAFE_V4 | Zweck: Pflichtfelder, Einzeilen-Strings, URL-Trim, Zeitformat und interne Dedupe technisch absichern | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
+CANDIDATE_OUTPUT_FIELDS = [
+    "title",
+    "date",
+    "endDate",
+    "time",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
+    "source_name",
+    "source_url",
+    "notes",
+]
+
+
 def occurrence_fp(title: str, date_value: str, time_value: str, location: str) -> str:
     return "|".join([
         norm_key(title),
@@ -825,6 +921,23 @@ def occurrence_fp_no_time(title: str, date_value: str, location: str) -> str:
     ])
 
 
+def title_date_fp(title: str, date_value: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+    ])
+
+
+def source_date_fp(source_url: str, url: str, date_value: str) -> str:
+    source_key = norm_key(canonical_url(source_url) or canonical_url(url))
+    if not source_key:
+        return ""
+    return "|".join([
+        source_key,
+        norm(date_value),
+    ])
+
+
 def source_occurrence_fp(source_url: str, url: str, title: str, date_value: str, time_value: str, location: str) -> str:
     source_key = norm_key(canonical_url(source_url) or canonical_url(url))
     if not source_key:
@@ -839,17 +952,19 @@ def source_occurrence_fp(source_url: str, url: str, title: str, date_value: str,
     ])
 
 
-def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str], set[str]]:
+def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str], set[str], set[str]]:
     source_occurrences: set[str] = set()
     exact_occurrences: set[str] = set()
     no_time_occurrences_all: set[str] = set()
     no_time_occurrences_missing_time: set[str] = set()
+    title_dates: set[str] = set()
 
     for group in groups:
         for rec in group:
             fp = occurrence_fp(rec.title, rec.date, rec.time, rec.location)
             fp_no_time = occurrence_fp_no_time(rec.title, rec.date, rec.location)
             src_fp = source_occurrence_fp(rec.source_url, rec.url, rec.title, rec.date, rec.time, rec.location)
+            title_date = title_date_fp(rec.title, rec.date)
 
             if src_fp and src_fp != "|||||":
                 source_occurrences.add(src_fp)
@@ -859,24 +974,31 @@ def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str
                 no_time_occurrences_all.add(fp_no_time)
             if not norm(rec.time) and fp_no_time != "|||":
                 no_time_occurrences_missing_time.add(fp_no_time)
+            if title_date != "|":
+                title_dates.add(title_date)
 
-    return source_occurrences, exact_occurrences, no_time_occurrences_all, no_time_occurrences_missing_time
+    return source_occurrences, exact_occurrences, no_time_occurrences_all, no_time_occurrences_missing_time, title_dates
 
 
 def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
-    out = {k: norm(v) for k, v in item.items()}
-    out.setdefault("endDate", "")
-    out.setdefault("time", "")
+    out: Dict[str, str] = {}
 
-    out["source_url"] = canonical_url(out.get("source_url", ""))
-    out["url"] = canonical_url(out.get("url", "")) or out["source_url"]
-    out["source_url"] = out["source_url"] or out["url"]
+    for field in CANDIDATE_OUTPUT_FIELDS:
+        if field in {"url", "source_url"}:
+            out[field] = canonical_url(item.get(field, ""))
+        else:
+            out[field] = clean_output_text(item.get(field, ""))
+
+    out["url"] = canonical_url(out.get("url", "")) or canonical_url(out.get("source_url", ""))
+    out["source_url"] = canonical_url(out.get("source_url", "")) or out["url"]
 
     if out.get("kategorie_suggestion", "") not in ALLOWED_CATEGORIES:
         out["kategorie_suggestion"] = "Sonstiges"
 
-    out["notes"] = "manual chat search v3"
-    return out
+    if not out.get("notes"):
+        out["notes"] = "manual chat search v3"
+
+    return {field: out.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
 
 
 def candidate_in_window(item: Dict[str, str], start: date, end: date) -> bool:
@@ -895,7 +1017,10 @@ def candidate_in_window(item: Dict[str, str], start: date, end: date) -> bool:
 
 
 def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
-    required = [
+    if any(field not in item for field in CANDIDATE_OUTPUT_FIELDS):
+        return False
+
+    required_non_empty = [
         "title",
         "date",
         "city",
@@ -907,7 +1032,7 @@ def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
         "source_url",
         "notes",
     ]
-    if any(not norm(item.get(k, "")) for k in required):
+    if any(not norm(item.get(k, "")) for k in required_non_empty):
         return False
 
     if not parse_iso_date(item.get("date", "")):
@@ -922,11 +1047,17 @@ def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
     return True
 
 
-def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
+def filter_delta(
+    raw_candidates: List[Dict[str, Any]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
-    existing_source_occurrences, existing_exact, existing_no_time_all, existing_no_time_missing = existing_sets(
+    existing_source_occurrences, existing_exact, existing_no_time_all, existing_no_time_missing, existing_title_dates = existing_sets(
         events_records,
         inbox_records,
         archive_records,
@@ -934,9 +1065,11 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
     )
 
     batch_source_occurrences: set[str] = set()
+    batch_source_dates: set[str] = set()
     batch_exact: set[str] = set()
     batch_no_time_all: set[str] = set()
     batch_no_time_missing: set[str] = set()
+    batch_title_dates: set[str] = set()
 
     out: List[Dict[str, str]] = []
 
@@ -956,6 +1089,8 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
 
         fp = occurrence_fp(title, date_value, time_value, location)
         fp_no_time = occurrence_fp_no_time(title, date_value, location)
+        title_date = title_date_fp(title, date_value)
+        src_date = source_date_fp(item.get("source_url", ""), item.get("url", ""), date_value)
         src_fp = source_occurrence_fp(
             item.get("source_url", ""),
             item.get("url", ""),
@@ -964,6 +1099,12 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
             time_value,
             location,
         )
+
+        if title_date in existing_title_dates or title_date in batch_title_dates:
+            continue
+
+        if src_date and src_date in batch_source_dates:
+            continue
 
         if src_fp and (src_fp in existing_source_occurrences or src_fp in batch_source_occurrences):
             continue
@@ -977,17 +1118,20 @@ def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefR
             if fp_no_time in existing_no_time_all or fp_no_time in batch_no_time_all:
                 continue
 
-        out.append({k: v for k, v in item.items() if v != ""})
+        out.append({field: item.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS})
 
         if src_fp:
             batch_source_occurrences.add(src_fp)
+        if src_date:
+            batch_source_dates.add(src_date)
         batch_exact.add(fp)
         batch_no_time_all.add(fp_no_time)
+        batch_title_dates.add(title_date)
         if not has_time:
             batch_no_time_missing.add(fp_no_time)
 
     return out
-# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_RANGE_AWARE_V3 ===
+# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_OUTPUT_SAFE_V4 ===
 
 # === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_V1 | Zweck: neue Quellenkandidaten separat sammeln, ohne sie automatisch produktiv freizugeben | Umfang: liest/normalisiert/merged data/source_candidates.json ===
 def source_domain(raw_url: str) -> str:
@@ -1042,6 +1186,7 @@ def read_source_candidates() -> List[Dict[str, Any]]:
     return [item for item in raw if isinstance(item, dict)]
 
 
+# === BEGIN BLOCK: SOURCE_CANDIDATE_NORMALIZATION_OUTPUT_SAFE_V2 | Zweck: Quellenkandidaten einzeilig, URL-sauber und merge-stabil normalisieren | Umfang: ersetzt normalize_source_candidate vollständig ===
 def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, Any] | None:
     if not isinstance(item, dict):
         return None
@@ -1056,33 +1201,33 @@ def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, A
             continue
         clean_evidence.append(
             {
-                "title": norm(ev.get("title", "")),
-                "date": norm(ev.get("date", "")),
+                "title": clean_output_text(ev.get("title", "")),
+                "date": clean_output_text(ev.get("date", "")),
                 "url": canonical_url(ev.get("url", "")),
             }
         )
 
     example_url = canonical_url(item.get("example_url", ""))
-    domain = norm(item.get("domain", "")) or source_domain(example_url)
+    domain = clean_output_text(item.get("domain", "")) or source_domain(example_url)
     if domain.startswith("www."):
         domain = domain[4:]
 
     out: Dict[str, Any] = {
         "domain": domain,
-        "source_name": norm(item.get("source_name", "")),
-        "source_url_pattern": norm(item.get("source_url_pattern", "")) or (f"{domain}/*" if domain else ""),
+        "source_name": clean_output_text(item.get("source_name", "")),
+        "source_url_pattern": clean_output_text(item.get("source_url_pattern", "")) or (f"{domain}/*" if domain else ""),
         "example_url": example_url,
-        "suggested_status": norm(item.get("suggested_status", "")) or "NEW-SOURCE-CANDIDATE",
-        "quality_signal": norm(item.get("quality_signal", "")),
-        "risk_signal": norm(item.get("risk_signal", "")),
-        "reason": norm(item.get("reason", "")),
-        "usage_rule": norm(item.get("usage_rule", "")),
+        "suggested_status": clean_output_text(item.get("suggested_status", "")) or "NEW-SOURCE-CANDIDATE",
+        "quality_signal": clean_output_text(item.get("quality_signal", "")),
+        "risk_signal": clean_output_text(item.get("risk_signal", "")),
+        "reason": clean_output_text(item.get("reason", "")),
+        "usage_rule": clean_output_text(item.get("usage_rule", "")),
         "evidence_events": clean_evidence,
         "first_seen": today.isoformat(),
         "last_seen": today.isoformat(),
         "found_via": "weekly-ki-websearch",
         "status": "neu",
-        "notes": norm(item.get("notes", "")),
+        "notes": clean_output_text(item.get("notes", "")),
     }
 
     required = [
@@ -1100,6 +1245,7 @@ def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, A
         return None
 
     return out
+# === END BLOCK: SOURCE_CANDIDATE_NORMALIZATION_OUTPUT_SAFE_V2 ===
 
 
 def merge_source_candidates(
