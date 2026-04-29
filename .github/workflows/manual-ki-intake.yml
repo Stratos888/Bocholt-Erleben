@@ -240,8 +240,12 @@ jobs:
                   else:
                       fail(f"Element #{idx}: Feld '{key}' ist kein skalarer Wert.")
 
+              # === BEGIN BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 | Zweck: importierte Manual-KI-Zeilen sicher als Review-Fälle mit Zeitstempel schreiben | Umfang: ergänzt Status/created_at und kanonisiert URLs ===
+              normalized["status"] = "review"
+              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
               normalized["url"] = canonical_url(normalized.get("url", ""))
               normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
+              # === END BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 ===
 
               missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]
               if missing_required:
