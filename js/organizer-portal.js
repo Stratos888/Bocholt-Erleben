@@ -494,9 +494,17 @@ if (membershipStarted) {
       } else {
         const start = formatDateTime(quota.current_period_start);
         const end = formatDateTime(quota.current_period_end);
-        quotaPeriod.textContent = quota.current_period_start || quota.current_period_end
-          ? `Zeitraum: ${start} bis ${end}`
-          : "Zeitraum: aktuell kein aktiver Abo-Zeitraum";
+        const subscriptionStatus = safeText(subscription?.status).toLowerCase();
+
+        if (quota.current_period_start || quota.current_period_end) {
+          quotaPeriod.textContent = `Zeitraum: ${start} bis ${end}`;
+        } else if (subscriptionStatus === "active" || subscriptionStatus === "trialing") {
+          quotaPeriod.textContent = "Status: aktive Mitgliedschaft";
+        } else if (subscriptionStatus === "past_due") {
+          quotaPeriod.textContent = "Status: Zahlungsproblem im Abo – bitte Tarif verwalten";
+        } else {
+          quotaPeriod.textContent = "Status: aktuell kein aktiver Abo-Zeitraum";
+        }
       }
     }
 
