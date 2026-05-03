@@ -483,7 +483,12 @@ if (membershipStarted) {
           ? `Ort: ${latestLocationText}`
           : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
       } else if (hasManageableSubscription) {
-        accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
+        const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
+        const periodEnd = formatDateTime(subscription?.current_period_end);
+
+        accountPlan.textContent = cancelAtPeriodEnd && periodEnd !== "–"
+          ? `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · gekündigt zum ${periodEnd}`
+          : `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
       } else {
         const planLabel = formatPlanLabel(organizer.default_plan_key);
         accountPlan.textContent = `Standardmodell: ${planLabel}`;
@@ -500,11 +505,14 @@ if (membershipStarted) {
           ? `Termin: ${latestDateText}`
           : "Einzeltermin";
       } else {
-        const start = formatDateTime(quota.current_period_start);
-        const end = formatDateTime(quota.current_period_end);
+        const start = formatDateTime(quota.current_period_start || subscription?.current_period_start);
+        const end = formatDateTime(quota.current_period_end || subscription?.current_period_end);
         const subscriptionStatus = safeText(subscription?.status).toLowerCase();
+        const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
 
-        if (quota.current_period_start || quota.current_period_end) {
+        if (cancelAtPeriodEnd && end !== "–") {
+          quotaPeriod.textContent = `Status: gekündigt zum ${end}`;
+        } else if (quota.current_period_start || quota.current_period_end || subscription?.current_period_start || subscription?.current_period_end) {
           quotaPeriod.textContent = `Zeitraum: ${start} bis ${end}`;
         } else if (subscriptionStatus === "active" || subscriptionStatus === "trialing") {
           quotaPeriod.textContent = "Status: aktive Mitgliedschaft";
