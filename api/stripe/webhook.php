@@ -480,6 +480,7 @@ function swh_plan_key_from_subscription_object(array $subscriptionObject, array 
     return '';
 }
 
+/* === BEGIN BLOCK: STRIPE_SUBSCRIPTION_PERIOD_FALLBACK_V1 | Zweck: liest Periodenbeginn und -ende für Subscription-Webhooks robust aus Top-Level oder fallback aus items.data[0]; Umfang: Timestamp-Helfer und Kopf der Subscription-Sync-Funktion === */
 function swh_timestamp_to_mysql_datetime(mixed $value): ?string
 {
     if (!is_numeric($value)) {
@@ -492,6 +493,34 @@ function swh_timestamp_to_mysql_datetime(mixed $value): ?string
     }
 
     return gmdate('Y-m-d H:i:s', $timestamp);
+}
+
+function swh_extract_subscription_period_bounds(array $subscriptionObject): array
+{
+    $currentPeriodStart = $subscriptionObject['current_period_start'] ?? null;
+    $currentPeriodEnd = $subscriptionObject['current_period_end'] ?? null;
+
+    if (
+        (!is_numeric($currentPeriodStart) || (int)$currentPeriodStart <= 0)
+        || (!is_numeric($currentPeriodEnd) || (int)$currentPeriodEnd <= 0)
+    ) {
+        $firstItem = $subscriptionObject['items']['data'][0] ?? null;
+
+        if (is_array($firstItem)) {
+            if (!is_numeric($currentPeriodStart) || (int)$currentPeriodStart <= 0) {
+                $currentPeriodStart = $firstItem['current_period_start'] ?? null;
+            }
+
+            if (!is_numeric($currentPeriodEnd) || (int)$currentPeriodEnd <= 0) {
+                $currentPeriodEnd = $firstItem['current_period_end'] ?? null;
+            }
+        }
+    }
+
+    return [
+        'current_period_start' => swh_timestamp_to_mysql_datetime($currentPeriodStart),
+        'current_period_end' => swh_timestamp_to_mysql_datetime($currentPeriodEnd),
+    ];
 }
 
 function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $stripeConfig): void
@@ -514,9 +543,13 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $planKey = swh_plan_key_from_subscription_object($object, $stripeConfig);
     $customerId = trim((string)($object['customer'] ?? ''));
     $cancelAtPeriodEnd = !empty($object['cancel_at_period_end']) ? 1 : 0;
-    $currentPeriodStart = swh_timestamp_to_mysql_datetime($object['current_period_start'] ?? null);
-    $currentPeriodEnd = swh_timestamp_to_mysql_datetime($object['current_period_end'] ?? null);
+
+    $periodBounds = swh_extract_subscription_period_bounds($object);
+    $currentPeriodStart = $periodBounds['current_period_start'];
+    $currentPeriodEnd = $periodBounds['current_period_end'];
+
     $canceledAt = swh_timestamp_to_mysql_datetime($object['canceled_at'] ?? null);
+/* === END BLOCK: STRIPE_SUBSCRIPTION_PERIOD_FALLBACK_V1 === */
 
     $find = $pdo->prepare(
         'SELECT
