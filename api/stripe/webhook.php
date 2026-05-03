@@ -26,8 +26,16 @@ function swh_get_stripe_config(): array
         throw new RuntimeException('Stripe webhook secret is missing.');
     }
 
+    $prices = is_array($stripe['prices'] ?? null) ? $stripe['prices'] : [];
+
     return [
         'webhook_secret' => $secret,
+        'prices' => [
+            'single' => trim((string)($prices['single'] ?? '')),
+            'starter' => trim((string)($prices['starter'] ?? '')),
+            'active' => trim((string)($prices['active'] ?? '')),
+            'unlimited' => trim((string)($prices['unlimited'] ?? '')),
+        ],
     ];
 }
 
@@ -450,7 +458,142 @@ function swh_handle_checkout_completed(PDO $pdo, array $event): void
         swh_materialize_paid_entitlements($pdo, $submission, $customerId, $subscriptionId);
     }
 }
+function swh_plan_key_from_subscription_object(array $subscriptionObject, array $stripeConfig): string
+{
+    $items = $subscriptionObject['items']['data'] ?? [];
+    $priceId = '';
 
+    if (is_array($items) && isset($items[0]) && is_array($items[0])) {
+        $priceId = trim((string)($items[0]['price']['id'] ?? ''));
+    }
+
+    foreach (($stripeConfig['prices'] ?? []) as $planKey => $configuredPriceId) {
+        if ($planKey === 'single') {
+            continue;
+        }
+
+        if ($priceId !== '' && $priceId === trim((string)$configuredPriceId)) {
+            return (string)$planKey;
+        }
+    }
+
+    return '';
+}
+
+function swh_timestamp_to_mysql_datetime(mixed $value): ?string
+{
+    if (!is_numeric($value)) {
+        return null;
+    }
+
+    $timestamp = (int)$value;
+    if ($timestamp <= 0) {
+        return null;
+    }
+
+    return gmdate('Y-m-d H:i:s', $timestamp);
+}
+
+function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $stripeConfig): void
+{
+    $object = $event['data']['object'] ?? null;
+    if (!is_array($object)) {
+        throw new RuntimeException('Stripe subscription object is missing.');
+    }
+
+    $stripeSubscriptionId = trim((string)($object['id'] ?? ''));
+    if ($stripeSubscriptionId === '') {
+        throw new RuntimeException('Stripe subscription id is missing.');
+    }
+
+    $status = trim((string)($object['status'] ?? ''));
+    if ($status === '') {
+        $status = 'unknown';
+    }
+
+    $planKey = swh_plan_key_from_subscription_object($object, $stripeConfig);
+    $customerId = trim((string)($object['customer'] ?? ''));
+    $cancelAtPeriodEnd = !empty($object['cancel_at_period_end']) ? 1 : 0;
+    $currentPeriodStart = swh_timestamp_to_mysql_datetime($object['current_period_start'] ?? null);
+    $currentPeriodEnd = swh_timestamp_to_mysql_datetime($object['current_period_end'] ?? null);
+    $canceledAt = swh_timestamp_to_mysql_datetime($object['canceled_at'] ?? null);
+
+    $find = $pdo->prepare(
+        'SELECT
+            id,
+            organizer_id,
+            plan_key
+         FROM subscriptions
+         WHERE stripe_subscription_id = :stripe_subscription_id
+         LIMIT 1'
+    );
+
+    $find->execute([
+        ':stripe_subscription_id' => $stripeSubscriptionId,
+    ]);
+
+    $subscriptionRow = $find->fetch(PDO::FETCH_ASSOC);
+    if (!is_array($subscriptionRow)) {
+        return;
+    }
+
+    $subscriptionRowId = (int)$subscriptionRow['id'];
+    $effectivePlanKey = $planKey !== '' ? $planKey : (string)$subscriptionRow['plan_key'];
+    $quotaConfig = swh_get_plan_quota_config($effectivePlanKey);
+    $entitlementStatus = in_array($status, ['active', 'trialing'], true) ? 'active' : 'paused';
+
+    $updateSubscription = $pdo->prepare(
+        'UPDATE subscriptions
+         SET
+            stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
+            plan_key = :plan_key,
+            status = :status,
+            current_period_start = :current_period_start,
+            current_period_end = :current_period_end,
+            cancel_at_period_end = :cancel_at_period_end,
+            canceled_at = :canceled_at,
+            updated_at = CURRENT_TIMESTAMP
+         WHERE id = :id'
+    );
+
+    if ($customerId === '') {
+        $updateSubscription->bindValue(':stripe_customer_id', null, PDO::PARAM_NULL);
+    } else {
+        $updateSubscription->bindValue(':stripe_customer_id', $customerId, PDO::PARAM_STR);
+    }
+
+    $updateSubscription->bindValue(':plan_key', $effectivePlanKey, PDO::PARAM_STR);
+    $updateSubscription->bindValue(':status', $status, PDO::PARAM_STR);
+    $updateSubscription->bindValue(':current_period_start', $currentPeriodStart, $currentPeriodStart === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $updateSubscription->bindValue(':current_period_end', $currentPeriodEnd, $currentPeriodEnd === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $updateSubscription->bindValue(':cancel_at_period_end', $cancelAtPeriodEnd, PDO::PARAM_INT);
+    $updateSubscription->bindValue(':canceled_at', $canceledAt, $canceledAt === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $updateSubscription->bindValue(':id', $subscriptionRowId, PDO::PARAM_INT);
+    $updateSubscription->execute();
+
+    $updateEntitlement = $pdo->prepare(
+        'UPDATE publication_entitlements
+         SET
+            plan_key = :plan_key,
+            status = :status,
+            period_start = :period_start,
+            period_end = :period_end,
+            included_publications = :included_publications,
+            is_unlimited = :is_unlimited,
+            updated_at = CURRENT_TIMESTAMP
+         WHERE subscription_id = :subscription_id
+           AND source_type = "subscription"'
+    );
+
+    $updateEntitlement->bindValue(':plan_key', $effectivePlanKey, PDO::PARAM_STR);
+    $updateEntitlement->bindValue(':status', $entitlementStatus, PDO::PARAM_STR);
+    $updateEntitlement->bindValue(':period_start', $currentPeriodStart, $currentPeriodStart === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $updateEntitlement->bindValue(':period_end', $currentPeriodEnd, $currentPeriodEnd === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $updateEntitlement->bindValue(':included_publications', (int)$quotaConfig['included_publications'], PDO::PARAM_INT);
+    $updateEntitlement->bindValue(':is_unlimited', (int)$quotaConfig['is_unlimited'], PDO::PARAM_INT);
+    $updateEntitlement->bindValue(':subscription_id', $subscriptionRowId, PDO::PARAM_INT);
+    $updateEntitlement->execute();
+}
 $pdo = null;
 $webhookEventId = null;
 
@@ -482,6 +625,10 @@ try {
 
     if ($eventType === 'checkout.session.completed') {
         swh_handle_checkout_completed($pdo, $event);
+    }
+
+    if (in_array($eventType, ['customer.subscription.updated', 'customer.subscription.deleted'], true)) {
+        swh_sync_subscription_from_stripe_event($pdo, $event, $stripeConfig);
     }
 
     swh_mark_event_processed($pdo, $webhookEventId);
