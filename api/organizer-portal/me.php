@@ -120,7 +120,6 @@ function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
             created_at,
             updated_at
          FROM subscriptions
-         FROM subscriptions
          WHERE organizer_id = :organizer_id
          ORDER BY
             CASE
