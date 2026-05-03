@@ -480,7 +480,6 @@ function swh_plan_key_from_subscription_object(array $subscriptionObject, array 
     return '';
 }
 
-/* === BEGIN BLOCK: STRIPE_SUBSCRIPTION_PERIOD_FALLBACK_V1 | Zweck: liest Periodenbeginn und -ende für Subscription-Webhooks robust aus Top-Level oder fallback aus items.data[0]; Umfang: Timestamp-Helfer und Kopf der Subscription-Sync-Funktion === */
 function swh_timestamp_to_mysql_datetime(mixed $value): ?string
 {
     if (!is_numeric($value)) {
@@ -495,23 +494,43 @@ function swh_timestamp_to_mysql_datetime(mixed $value): ?string
     return gmdate('Y-m-d H:i:s', $timestamp);
 }
 
+function swh_plan_key_from_price_id(string $priceId, array $stripeConfig): string
+{
+    $normalizedPriceId = trim($priceId);
+    if ($normalizedPriceId === '') {
+        return '';
+    }
+
+    foreach (($stripeConfig['prices'] ?? []) as $planKey => $configuredPriceId) {
+        if ($planKey === 'single') {
+            continue;
+        }
+
+        if ($normalizedPriceId === trim((string)$configuredPriceId)) {
+            return (string)$planKey;
+        }
+    }
+
+    return '';
+}
+
 function swh_extract_subscription_period_bounds(array $subscriptionObject): array
 {
     $currentPeriodStart = $subscriptionObject['current_period_start'] ?? null;
     $currentPeriodEnd = $subscriptionObject['current_period_end'] ?? null;
 
-    if (
-        (!is_numeric($currentPeriodStart) || (int)$currentPeriodStart <= 0)
-        || (!is_numeric($currentPeriodEnd) || (int)$currentPeriodEnd <= 0)
-    ) {
+    $missingStart = !is_numeric($currentPeriodStart) || (int)$currentPeriodStart <= 0;
+    $missingEnd = !is_numeric($currentPeriodEnd) || (int)$currentPeriodEnd <= 0;
+
+    if ($missingStart || $missingEnd) {
         $firstItem = $subscriptionObject['items']['data'][0] ?? null;
 
         if (is_array($firstItem)) {
-            if (!is_numeric($currentPeriodStart) || (int)$currentPeriodStart <= 0) {
+            if ($missingStart) {
                 $currentPeriodStart = $firstItem['current_period_start'] ?? null;
             }
 
-            if (!is_numeric($currentPeriodEnd) || (int)$currentPeriodEnd <= 0) {
+            if ($missingEnd) {
                 $currentPeriodEnd = $firstItem['current_period_end'] ?? null;
             }
         }
@@ -521,6 +540,88 @@ function swh_extract_subscription_period_bounds(array $subscriptionObject): arra
         'current_period_start' => swh_timestamp_to_mysql_datetime($currentPeriodStart),
         'current_period_end' => swh_timestamp_to_mysql_datetime($currentPeriodEnd),
     ];
+}
+
+function swh_sync_subscription_schedule_from_stripe_event(PDO $pdo, array $event, array $stripeConfig): void
+{
+    $object = $event['data']['object'] ?? null;
+    if (!is_array($object)) {
+        return;
+    }
+
+    $stripeSubscriptionId = trim((string)($object['subscription'] ?? ''));
+    if ($stripeSubscriptionId === '') {
+        return;
+    }
+
+    $find = $pdo->prepare(
+        'SELECT
+            id
+         FROM subscriptions
+         WHERE stripe_subscription_id = :stripe_subscription_id
+         LIMIT 1'
+    );
+
+    $find->execute([
+        ':stripe_subscription_id' => $stripeSubscriptionId,
+    ]);
+
+    $subscriptionRow = $find->fetch(PDO::FETCH_ASSOC);
+    if (!is_array($subscriptionRow)) {
+        return;
+    }
+
+    $subscriptionRowId = (int)$subscriptionRow['id'];
+    $phases = is_array($object['phases'] ?? null) ? $object['phases'] : [];
+    $nowTs = time();
+
+    $pendingPlanKey = null;
+    $pendingEffectiveAt = null;
+
+    foreach ($phases as $phase) {
+        if (!is_array($phase)) {
+            continue;
+        }
+
+        $phaseStart = (int)($phase['start_date'] ?? 0);
+        if ($phaseStart <= $nowTs) {
+            continue;
+        }
+
+        $phaseItems = is_array($phase['items'] ?? null) ? $phase['items'] : [];
+        $firstItem = $phaseItems[0] ?? null;
+        if (!is_array($firstItem)) {
+            continue;
+        }
+
+        $priceId = trim((string)($firstItem['price'] ?? ''));
+        if ($priceId === '') {
+            $priceId = trim((string)($firstItem['plan'] ?? ''));
+        }
+
+        $resolvedPlanKey = swh_plan_key_from_price_id($priceId, $stripeConfig);
+        if ($resolvedPlanKey === '') {
+            continue;
+        }
+
+        $pendingPlanKey = $resolvedPlanKey;
+        $pendingEffectiveAt = swh_timestamp_to_mysql_datetime($phaseStart);
+        break;
+    }
+
+    $update = $pdo->prepare(
+        'UPDATE subscriptions
+         SET
+            pending_plan_key = :pending_plan_key,
+            pending_change_effective_at = :pending_change_effective_at,
+            updated_at = CURRENT_TIMESTAMP
+         WHERE id = :id'
+    );
+
+    $update->bindValue(':pending_plan_key', $pendingPlanKey, $pendingPlanKey === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $update->bindValue(':pending_change_effective_at', $pendingEffectiveAt, $pendingEffectiveAt === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $update->bindValue(':id', $subscriptionRowId, PDO::PARAM_INT);
+    $update->execute();
 }
 
 function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $stripeConfig): void
@@ -549,7 +650,6 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $currentPeriodEnd = $periodBounds['current_period_end'];
 
     $canceledAt = swh_timestamp_to_mysql_datetime($object['canceled_at'] ?? null);
-/* === END BLOCK: STRIPE_SUBSCRIPTION_PERIOD_FALLBACK_V1 === */
 
     $find = $pdo->prepare(
         'SELECT
@@ -604,6 +704,21 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $updateSubscription->bindValue(':id', $subscriptionRowId, PDO::PARAM_INT);
     $updateSubscription->execute();
 
+    if ($cancelAtPeriodEnd === 1) {
+        $clearPending = $pdo->prepare(
+            'UPDATE subscriptions
+             SET
+                pending_plan_key = NULL,
+                pending_change_effective_at = NULL,
+                updated_at = CURRENT_TIMESTAMP
+             WHERE id = :id'
+        );
+
+        $clearPending->execute([
+            ':id' => $subscriptionRowId,
+        ]);
+    }
+
     $updateEntitlement = $pdo->prepare(
         'UPDATE publication_entitlements
          SET
@@ -627,6 +742,7 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $updateEntitlement->bindValue(':subscription_id', $subscriptionRowId, PDO::PARAM_INT);
     $updateEntitlement->execute();
 }
+
 $pdo = null;
 $webhookEventId = null;
 
@@ -663,6 +779,36 @@ try {
     if (in_array($eventType, ['customer.subscription.updated', 'customer.subscription.deleted'], true)) {
         swh_sync_subscription_from_stripe_event($pdo, $event, $stripeConfig);
     }
+
+    if (in_array($eventType, ['subscription_schedule.created', 'subscription_schedule.updated', 'subscription_schedule.released', 'subscription_schedule.canceled', 'subscription_schedule.completed'], true)) {
+        swh_sync_subscription_schedule_from_stripe_event($pdo, $event, $stripeConfig);
+    }
+
+    swh_mark_event_processed($pdo, $webhookEventId);
+    $pdo->commit();
+
+    be_json_response(200, [
+        'status' => 'ok',
+        'received' => true,
+        'event_type' => $eventType,
+    ]);
+} catch (Throwable $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    if ($pdo instanceof PDO && is_int($webhookEventId) && $webhookEventId > 0) {
+        try {
+            swh_mark_event_failed($pdo, $webhookEventId, $error->getMessage());
+        } catch (Throwable) {
+        }
+    }
+
+    be_json_response(400, [
+        'status' => 'error',
+        'message' => $error->getMessage(),
+    ]);
+}
 
     swh_mark_event_processed($pdo, $webhookEventId);
     $pdo->commit();
