@@ -484,11 +484,17 @@ if (membershipStarted) {
           : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
       } else if (hasManageableSubscription) {
         const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
-        const periodEnd = formatDateTime(subscription?.current_period_end);
+        const currentPeriodEndDate = formatDate(safeText(subscription?.current_period_end).split(" ")[0]);
+        const pendingPlanKey = safeText(subscription?.pending_plan_key).toLowerCase();
+        const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
-        accountPlan.textContent = cancelAtPeriodEnd && periodEnd !== "–"
-          ? `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · gekündigt zum ${periodEnd}`
-          : `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
+        if (cancelAtPeriodEnd && currentPeriodEndDate !== "–") {
+          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · gekündigt zum ${currentPeriodEndDate}`;
+        } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
+          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
+        } else {
+          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
+        }
       } else {
         const planLabel = formatPlanLabel(organizer.default_plan_key);
         accountPlan.textContent = `Standardmodell: ${planLabel}`;
@@ -505,14 +511,18 @@ if (membershipStarted) {
           ? `Termin: ${latestDateText}`
           : "Einzeltermin";
       } else {
-        const start = formatDateTime(quota.current_period_start || subscription?.current_period_start);
-        const end = formatDateTime(quota.current_period_end || subscription?.current_period_end);
+        const start = formatDate(safeText(quota.current_period_start || subscription?.current_period_start).split(" ")[0]);
+        const end = formatDate(safeText(quota.current_period_end || subscription?.current_period_end).split(" ")[0]);
         const subscriptionStatus = safeText(subscription?.status).toLowerCase();
         const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
+        const pendingPlanKey = safeText(subscription?.pending_plan_key).toLowerCase();
+        const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
         if (cancelAtPeriodEnd && end !== "–") {
           quotaPeriod.textContent = `Status: gekündigt zum ${end}`;
-        } else if (quota.current_period_start || quota.current_period_end || subscription?.current_period_start || subscription?.current_period_end) {
+        } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
+          quotaPeriod.textContent = `Status: Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
+        } else if ((quota.current_period_start || subscription?.current_period_start) && (quota.current_period_end || subscription?.current_period_end)) {
           quotaPeriod.textContent = `Zeitraum: ${start} bis ${end}`;
         } else if (subscriptionStatus === "active" || subscriptionStatus === "trialing") {
           quotaPeriod.textContent = "Status: aktive Mitgliedschaft";
