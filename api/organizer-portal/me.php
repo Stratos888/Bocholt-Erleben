@@ -110,13 +110,16 @@ function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
             stripe_subscription_id,
             stripe_customer_id,
             plan_key,
+            pending_plan_key,
             status,
             current_period_start,
             current_period_end,
+            pending_change_effective_at,
             cancel_at_period_end,
             canceled_at,
             created_at,
             updated_at
+         FROM subscriptions
          FROM subscriptions
          WHERE organizer_id = :organizer_id
          ORDER BY
