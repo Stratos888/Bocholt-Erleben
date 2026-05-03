@@ -173,7 +173,7 @@
         throw new Error("Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
       }
 
-      window.location.href = redirectUrl;
+      window.location.assign(redirectUrl);
     } catch (error) {
       window.alert(safeText(error?.message) || "Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
 
@@ -183,6 +183,14 @@
       }
     }
   }
+
+  window.addEventListener("pageshow", () => {
+    const billingButton = document.getElementById("organizer-dashboard-manage-subscription");
+    if (!billingButton) return;
+
+    billingButton.disabled = false;
+    billingButton.textContent = billingButton.dataset.defaultLabel || "Tarif ändern oder Abo kündigen";
+  });
   /* === END BLOCK: ORGANIZER_PORTAL_BILLING_PORTAL_HELPERS_V1 === */
 
   function setLoginResult(message, links = []) {
