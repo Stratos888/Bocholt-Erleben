@@ -162,6 +162,7 @@
   }
 
   async function syncStandardFormWithPortalSession() {
+    /* === BEGIN FUNCTION: syncStandardFormWithPortalSession | Zweck: uebernimmt aktive Veranstalter-Session und sperrt Abo-Reuse-Identitaetsfelder; Umfang: komplette Funktion === */
     const pageMode = safeText(document.body?.dataset.publishMode).toLowerCase();
     if (pageMode !== "standard") return;
 
@@ -176,17 +177,18 @@
     const contactField = byId("publish-standard-contact");
     const emailField = byId("publish-standard-email");
 
-    if (organizationField && !hasValue(organizationField.value)) {
-      organizationField.value = safeText(organizer.organization_name);
+    function lockField(field, value) {
+      if (!field) return;
+      field.value = safeText(value);
+      field.readOnly = true;
+      field.setAttribute("readonly", "readonly");
+      field.setAttribute("aria-readonly", "true");
+      field.dataset.portalLocked = "true";
     }
 
-    if (contactField && !hasValue(contactField.value)) {
-      contactField.value = safeText(organizer.contact_name);
-    }
-
-    if (emailField && !hasValue(emailField.value)) {
-      emailField.value = safeText(organizer.email);
-    }
+    lockField(organizationField, organizer.organization_name);
+    lockField(contactField, organizer.contact_name);
+    lockField(emailField, organizer.email);
 
     const activePlanKey = safeText(subscription?.plan_key).toLowerCase();
     if (!planSelect || !["starter", "active", "unlimited"].includes(activePlanKey)) return;
@@ -197,10 +199,12 @@
     planSelect.value = activePlanKey;
     planSelect.disabled = true;
     planSelect.setAttribute("aria-disabled", "true");
+    planSelect.dataset.portalLocked = "true";
 
     ensurePlanLockHint(
       `Dein aktives Modell ${formatPlanLabel(activePlanKey)} wird für diese Einreichung automatisch verwendet. Tarifwechsel oder Kündigung machst du im Veranstalterbereich.`
     );
+    /* === END FUNCTION: syncStandardFormWithPortalSession === */
   }
   /* === END BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_V1 === */
   
