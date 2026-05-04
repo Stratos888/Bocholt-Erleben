@@ -101,7 +101,160 @@ function pf_uuid_v4(): string
     );
 }
 
+function pf_get_portal_cookie_name(): string
+{
+    /* === BEGIN FUNCTION: pf_get_portal_cookie_name | Zweck: zentraler Cookie-Name fuer optionale Portal-Session im Einreichungs-Flow; Umfang: reine Konstantenfunktion === */
+    return 'be_organizer_portal_session';
+    /* === END FUNCTION: pf_get_portal_cookie_name === */
+}
+
+function pf_read_portal_session_token_or_null(): ?string
+{
+    /* === BEGIN FUNCTION: pf_read_portal_session_token_or_null | Zweck: liest optionale Portal-Session ohne oeffentliche Einreichungen zu blockieren; Umfang: Cookie-Validierung === */
+    $token = trim((string)($_COOKIE[pf_get_portal_cookie_name()] ?? ''));
+    if ($token === '') {
+        return null;
+    }
+
+    if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+        return null;
+    }
+
+    return $token;
+    /* === END FUNCTION: pf_read_portal_session_token_or_null === */
+}
+
+function pf_fetch_portal_session_or_null(PDO $pdo): ?array
+{
+    /* === BEGIN FUNCTION: pf_fetch_portal_session_or_null | Zweck: ermittelt gueltige eingeloggte Veranstalter-Session fuer Abo-Reuse; Umfang: Session- und Organizer-Lookup === */
+    $plainSessionToken = pf_read_portal_session_token_or_null();
+    if ($plainSessionToken === null) {
+        return null;
+    }
+
+    $statement = $pdo->prepare(
+        'SELECT
+            s.id AS portal_session_id,
+            s.organizer_id,
+            s.expires_at,
+            s.revoked_at,
+            o.organization_name,
+            o.contact_name,
+            o.email,
+            o.email_normalized,
+            o.default_plan_key
+         FROM organizer_portal_sessions s
+         INNER JOIN organizers o ON o.id = s.organizer_id
+         WHERE s.session_token_hash = :session_token_hash
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':session_token_hash' => hash('sha256', $plainSessionToken),
+    ]);
+
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    if (!is_array($row) || !empty($row['revoked_at'])) {
+        return null;
+    }
+
+    $expiresAt = trim((string)($row['expires_at'] ?? ''));
+    if ($expiresAt === '') {
+        return null;
+    }
+
+    $nowUtc = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $expiryUtc = new DateTimeImmutable($expiresAt, new DateTimeZone('UTC'));
+    if ($expiryUtc < $nowUtc) {
+        return null;
+    }
+
+    return $row;
+    /* === END FUNCTION: pf_fetch_portal_session_or_null === */
+}
+
+function pf_fetch_active_subscription_or_null(PDO $pdo, int $organizerId): ?array
+{
+    /* === BEGIN FUNCTION: pf_fetch_active_subscription_or_null | Zweck: findet nutzbare aktive Mitgliedschaft fuer eingeloggte Abo-Einreichungen; Umfang: Subscription-Lookup === */
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            plan_key,
+            status
+         FROM subscriptions
+         WHERE organizer_id = :organizer_id
+           AND status IN ("active", "trialing")
+         ORDER BY id DESC
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':organizer_id' => $organizerId,
+    ]);
+
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+    /* === END FUNCTION: pf_fetch_active_subscription_or_null === */
+}
+
+function pf_find_organizer_by_email(PDO $pdo, string $emailNormalized): ?array
+{
+    /* === BEGIN FUNCTION: pf_find_organizer_by_email | Zweck: verhindert stilles Ueberschreiben bestehender Veranstalterdaten; Umfang: reine E-Mail-Lookup-Funktion === */
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            organization_name,
+            contact_name,
+            email,
+            email_normalized,
+            default_plan_key
+         FROM organizers
+         WHERE email_normalized = :email_normalized
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':email_normalized' => $emailNormalized,
+    ]);
+
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+    /* === END FUNCTION: pf_find_organizer_by_email === */
+}
+
+function pf_insert_organizer(PDO $pdo, string $organizationName, ?string $contactName, string $emailInput, string $emailNormalized, string $defaultPlanKey): int
+{
+    /* === BEGIN FUNCTION: pf_insert_organizer | Zweck: legt neue Veranstalter ohne ON DUPLICATE UPDATE an; Umfang: Insert-only fuer neue E-Mail-Adressen === */
+    $statement = $pdo->prepare(
+        'INSERT INTO organizers (
+            organization_name,
+            contact_name,
+            email,
+            email_normalized,
+            default_plan_key
+        ) VALUES (
+            :organization_name,
+            :contact_name,
+            :email,
+            :email_normalized,
+            :default_plan_key
+        )'
+    );
+
+    $statement->execute([
+        ':organization_name' => $organizationName,
+        ':contact_name' => $contactName,
+        ':email' => $emailInput,
+        ':email_normalized' => $emailNormalized,
+        ':default_plan_key' => $defaultPlanKey,
+    ]);
+
+    return (int)$pdo->lastInsertId();
+    /* === END FUNCTION: pf_insert_organizer === */
+}
+
 try {
+    /* === BEGIN BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 | Zweck: verhindert Veranstalter-Overwrite und erzwingt unveraenderbare Abo-Reuse-Daten serverseitig; Umfang: kompletter try-Hauptblock bis vor Error-Handling === */
     $input = pf_read_json_body();
 
     $requestedModelKey = pf_validate_model_key(
@@ -133,37 +286,53 @@ try {
     $pdo = be_db();
     $pdo->beginTransaction();
 
-    $organizerUpsert = $pdo->prepare(
-        'INSERT INTO organizers (
-            organization_name,
-            contact_name,
-            email,
-            email_normalized,
-            default_plan_key
-        ) VALUES (
-            :organization_name,
-            :contact_name,
-            :email,
-            :email_normalized,
-            :default_plan_key
-        )
-        ON DUPLICATE KEY UPDATE
-            id = LAST_INSERT_ID(id),
-            organization_name = VALUES(organization_name),
-            contact_name = VALUES(contact_name),
-            email = VALUES(email),
-            default_plan_key = VALUES(default_plan_key)'
-    );
+    $portalSession = pf_fetch_portal_session_or_null($pdo);
+    $activeSubscription = null;
+    $organizerId = 0;
 
-    $organizerUpsert->execute([
-        ':organization_name' => $organizationName,
-        ':contact_name' => $contactName,
-        ':email' => $emailInput,
-        ':email_normalized' => $emailNormalized,
-        ':default_plan_key' => $requestedModelKey,
-    ]);
+    if (is_array($portalSession)) {
+        $organizerId = (int)$portalSession['organizer_id'];
+        $activeSubscription = pf_fetch_active_subscription_or_null($pdo, $organizerId);
 
-    $organizerId = (int)$pdo->lastInsertId();
+        if ($requestedModelKey !== 'single' && is_array($activeSubscription)) {
+            $organizationName = trim((string)$portalSession['organization_name']);
+            $contactName = pf_nullable_string($portalSession['contact_name'] ?? null);
+            $emailInput = trim((string)$portalSession['email']);
+            $emailNormalized = trim((string)$portalSession['email_normalized']);
+            $requestedModelKey = trim((string)$activeSubscription['plan_key']);
+            $paymentKind = 'subscription';
+        }
+    }
+
+    if ($organizerId <= 0) {
+        $existingOrganizer = pf_find_organizer_by_email($pdo, $emailNormalized);
+
+        if (is_array($existingOrganizer)) {
+            if ($requestedModelKey !== 'single') {
+                $pdo->rollBack();
+
+                be_json_response(409, [
+                    'status' => 'error',
+                    'message' => 'Für diese E-Mail existiert bereits ein Veranstalterbereich. Bitte logge dich ein oder fordere einen neuen Zugangslink an.',
+                    'data' => [
+                        'existing_organizer' => true,
+                        'login_url' => '/fuer-veranstalter/login/?email=' . rawurlencode($emailInput),
+                    ],
+                ]);
+            }
+
+            $organizerId = (int)$existingOrganizer['id'];
+        } else {
+            $organizerId = pf_insert_organizer(
+                $pdo,
+                $organizationName,
+                $contactName,
+                $emailInput,
+                $emailNormalized,
+                $requestedModelKey
+            );
+        }
+    }
 
     $submissionInsert = $pdo->prepare(
         'INSERT INTO submissions (
@@ -240,6 +409,7 @@ try {
             'payment_reference_key' => $paymentReferenceKey,
         ],
     ]);
+    /* === END BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 === */
 } catch (InvalidArgumentException $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
