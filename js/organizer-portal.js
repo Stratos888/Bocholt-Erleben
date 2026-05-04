@@ -140,7 +140,7 @@
     }
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_PORTAL_BILLING_PORTAL_HELPERS_V1 | Zweck: laedt Portal-State und oeffnet bei Bedarf das Stripe Billing Portal; Umfang: API-Helfer fuer Dashboard/Portal === */
+  /* === BEGIN BLOCK: ORGANIZER_PORTAL_SESSION_AND_BILLING_HELPERS_V2 | Zweck: laedt Portal-State, oeffnet Stripe Billing Portal und beendet die Veranstalter-Session; Umfang: API-/Session-Helfer fuer Dashboard/Portal === */
   async function tryLoadPortalState() {
     return requestJson("/api/organizer-portal/me.php", {
       method: "GET"
@@ -151,6 +151,58 @@
     return requestJson("/api/organizer-portal/create-billing-portal-session.php", {
       method: "POST"
     });
+  }
+
+  async function logoutOrganizerPortal(trigger) {
+    const button = trigger instanceof HTMLElement ? trigger : null;
+
+    if (button && !button.dataset.defaultLabel) {
+      button.dataset.defaultLabel = button.textContent || "Abmelden";
+    }
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Wird abgemeldet …";
+    }
+
+    try {
+      await requestJson("/api/organizer-portal/logout.php", {
+        method: "POST"
+      });
+
+      window.location.assign("/fuer-veranstalter/login/");
+    } catch (error) {
+      window.alert(safeText(error?.message) || "Abmelden war gerade nicht möglich.");
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = button.dataset.defaultLabel || "Abmelden";
+      }
+    }
+  }
+
+  function ensureDashboardLogoutLink() {
+    const navigation = pageRoot.querySelector('nav[aria-label="Veranstalter-Navigation"]');
+
+    if (!navigation || document.getElementById("organizer-dashboard-logout")) {
+      return;
+    }
+
+    const logoutButton = document.createElement("button");
+    logoutButton.type = "button";
+    logoutButton.id = "organizer-dashboard-logout";
+    logoutButton.className = "content-link";
+    logoutButton.innerHTML = `
+      <span class="content-link__label">Abmelden</span>
+      <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+    `;
+
+    logoutButton.addEventListener("click", () => {
+      void logoutOrganizerPortal(logoutButton);
+    });
+
+    navigation.insertBefore(logoutButton, navigation.firstElementChild);
+    hydrateIcons(logoutButton);
   }
 
   async function openBillingPortal(trigger) {
@@ -191,7 +243,7 @@
     billingButton.disabled = false;
     billingButton.textContent = billingButton.dataset.defaultLabel || "Tarif ändern oder Abo kündigen";
   });
-  /* === END BLOCK: ORGANIZER_PORTAL_BILLING_PORTAL_HELPERS_V1 === */
+  /* === END BLOCK: ORGANIZER_PORTAL_SESSION_AND_BILLING_HELPERS_V2 === */
 
   function setLoginResult(message, links = []) {
     const resultCard = document.getElementById("organizer-login-result");
@@ -603,10 +655,12 @@ if (membershipStarted) {
     }
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 | Zweck: laedt Dashboard-State und aktiviert bei gueltiger Session den Logout-Link; Umfang: komplette handleDashboardPage-Funktion === */
   async function handleDashboardPage() {
     try {
       const result = await tryLoadPortalState();
       renderDashboard(result?.data || {});
+      ensureDashboardLogoutLink();
     } catch (_error) {
       const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
       const summaryGrid = document.getElementById("organizer-dashboard-summary");
@@ -621,6 +675,7 @@ if (membershipStarted) {
       }
     }
   }
+  /* === END BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 === */
 
   hydrateIcons(document);
 
