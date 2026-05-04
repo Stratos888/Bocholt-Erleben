@@ -626,6 +626,7 @@ function swh_sync_subscription_schedule_from_stripe_event(PDO $pdo, array $event
 
 function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $stripeConfig): void
 {
+    /* === BEGIN FUNCTION: swh_sync_subscription_from_stripe_event | Zweck: synchronisiert Stripe-Subscription-Status inkl. geplanter Kuendigung ueber cancel_at; Umfang: komplette Funktion === */
     $object = $event['data']['object'] ?? null;
     if (!is_array($object)) {
         throw new RuntimeException('Stripe subscription object is missing.');
@@ -643,12 +644,20 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
 
     $planKey = swh_plan_key_from_subscription_object($object, $stripeConfig);
     $customerId = trim((string)($object['customer'] ?? ''));
-    $cancelAtPeriodEnd = !empty($object['cancel_at_period_end']) ? 1 : 0;
 
     $periodBounds = swh_extract_subscription_period_bounds($object);
     $currentPeriodStart = $periodBounds['current_period_start'];
     $currentPeriodEnd = $periodBounds['current_period_end'];
 
+    $cancelAtRaw = $object['cancel_at'] ?? null;
+    $cancelAtTimestamp = is_numeric($cancelAtRaw) ? (int)$cancelAtRaw : 0;
+    $hasFutureCancelAt = $cancelAtTimestamp > time();
+    $isStillServiceActive = in_array($status, ['active', 'trialing'], true);
+
+    $isScheduledCancellation = !empty($object['cancel_at_period_end'])
+        || ($isStillServiceActive && $hasFutureCancelAt);
+
+    $cancelAtPeriodEnd = $isScheduledCancellation ? 1 : 0;
     $canceledAt = swh_timestamp_to_mysql_datetime($object['canceled_at'] ?? null);
 
     $find = $pdo->prepare(
@@ -704,7 +713,7 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $updateSubscription->bindValue(':id', $subscriptionRowId, PDO::PARAM_INT);
     $updateSubscription->execute();
 
-    if ($cancelAtPeriodEnd === 1) {
+    if ($isScheduledCancellation) {
         $clearPending = $pdo->prepare(
             'UPDATE subscriptions
              SET
@@ -741,6 +750,7 @@ function swh_sync_subscription_from_stripe_event(PDO $pdo, array $event, array $
     $updateEntitlement->bindValue(':is_unlimited', (int)$quotaConfig['is_unlimited'], PDO::PARAM_INT);
     $updateEntitlement->bindValue(':subscription_id', $subscriptionRowId, PDO::PARAM_INT);
     $updateEntitlement->execute();
+    /* === END FUNCTION: swh_sync_subscription_from_stripe_event === */
 }
 
 $pdo = null;
