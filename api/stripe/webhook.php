@@ -810,30 +810,4 @@ try {
     ]);
 }
 
-    swh_mark_event_processed($pdo, $webhookEventId);
-    $pdo->commit();
-
-    be_json_response(200, [
-        'status' => 'ok',
-        'received' => true,
-        'event_type' => $eventType,
-    ]);
-} catch (Throwable $error) {
-    if ($pdo instanceof PDO && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-
-    if ($pdo instanceof PDO && is_int($webhookEventId) && $webhookEventId > 0) {
-        try {
-            swh_mark_event_failed($pdo, $webhookEventId, $error->getMessage());
-        } catch (Throwable) {
-        }
-    }
-
-    be_json_response(400, [
-        'status' => 'error',
-        'message' => $error->getMessage(),
-    ]);
-}
-
 /* === END FILE: api/stripe/webhook.php === */
