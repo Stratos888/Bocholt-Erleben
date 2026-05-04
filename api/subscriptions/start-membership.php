@@ -206,9 +206,33 @@ function asm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
     return is_array($row) ? $row : null;
 }
 
-function asm_ensure_organizer(PDO $pdo, string $organizationName, ?string $contactName, string $emailInput, string $emailNormalized): int
+function asm_find_organizer_by_email(PDO $pdo, string $emailNormalized): ?array
 {
-    $upsert = $pdo->prepare(
+    /* === BEGIN FUNCTION: asm_find_organizer_by_email | Zweck: findet bestehende Veranstalter eindeutig ueber normalisierte E-Mail; Umfang: reine Lookup-Funktion fuer Membership-Start === */
+    $statement = $pdo->prepare(
+        'SELECT
+            id,
+            organization_name,
+            email,
+            email_normalized
+         FROM organizers
+         WHERE email_normalized = :email_normalized
+         LIMIT 1'
+    );
+
+    $statement->execute([
+        ':email_normalized' => $emailNormalized,
+    ]);
+
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+    /* === END FUNCTION: asm_find_organizer_by_email === */
+}
+
+function asm_insert_organizer(PDO $pdo, string $organizationName, ?string $contactName, string $emailInput, string $emailNormalized): int
+{
+    /* === BEGIN FUNCTION: asm_insert_organizer | Zweck: legt neue Veranstalter ohne Upsert/Overwrite an; Umfang: Insert-only fuer Membership-Start === */
+    $insert = $pdo->prepare(
         'INSERT INTO organizers (
             organization_name,
             contact_name,
@@ -219,16 +243,10 @@ function asm_ensure_organizer(PDO $pdo, string $organizationName, ?string $conta
             :contact_name,
             :email,
             :email_normalized
-        )
-        ON DUPLICATE KEY UPDATE
-            id = LAST_INSERT_ID(id),
-            organization_name = VALUES(organization_name),
-            contact_name = VALUES(contact_name),
-            email = VALUES(email),
-            updated_at = CURRENT_TIMESTAMP'
+        )'
     );
 
-    $upsert->execute([
+    $insert->execute([
         ':organization_name' => $organizationName,
         ':contact_name' => $contactName,
         ':email' => $emailInput,
@@ -236,6 +254,7 @@ function asm_ensure_organizer(PDO $pdo, string $organizationName, ?string $conta
     ]);
 
     return (int)$pdo->lastInsertId();
+    /* === END FUNCTION: asm_insert_organizer === */
 }
 
 function asm_fetch_organizer(PDO $pdo, int $organizerId): array
@@ -369,26 +388,26 @@ try {
     $stripeConfig = asm_get_stripe_config();
     $appConfig = asm_get_app_config();
 
+    /* === BEGIN BLOCK: MEMBERSHIP_START_EXISTING_EMAIL_GUARD_V2 | Zweck: verhindert stilles Ueberschreiben bestehender Veranstalter bei gleicher E-Mail; Umfang: Organizer-Ermittlung vor Checkout === */
     $pdo->beginTransaction();
 
-    $organizerId = asm_ensure_organizer($pdo, $organizationName, $contactName, $emailInput, $emailNormalized);
-    $activeSubscription = asm_fetch_active_subscription($pdo, $organizerId);
+    $existingOrganizer = asm_find_organizer_by_email($pdo, $emailNormalized);
+    if (is_array($existingOrganizer)) {
+        $pdo->rollBack();
 
-    if (is_array($activeSubscription)) {
-        $pdo->commit();
-
-        be_json_response(200, [
-            'status' => 'ok',
+        be_json_response(409, [
+            'status' => 'error',
+            'message' => 'Für diese E-Mail existiert bereits ein Veranstalterbereich. Bitte logge dich ein oder fordere einen neuen Zugangslink an.',
             'data' => [
-                'organizer_id' => $organizerId,
-                'checkout_required' => false,
-                'used_existing_subscription' => true,
-                'redirect_url' => '/fuer-veranstalter/dashboard/',
+                'existing_organizer' => true,
+                'login_url' => '/fuer-veranstalter/login/?email=' . rawurlencode($emailInput),
             ],
         ]);
     }
 
+    $organizerId = asm_insert_organizer($pdo, $organizationName, $contactName, $emailInput, $emailNormalized);
     $organizer = asm_fetch_organizer($pdo, $organizerId);
+    /* === END BLOCK: MEMBERSHIP_START_EXISTING_EMAIL_GUARD_V2 === */
     $customerId = asm_ensure_stripe_customer($pdo, $organizer, $stripeConfig['secret_key']);
     $membershipSubmission = asm_insert_membership_submission(
         $pdo,
