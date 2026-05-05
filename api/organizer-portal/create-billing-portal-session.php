@@ -244,7 +244,7 @@ try {
 } catch (Throwable $error) {
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Billing portal session creation failed.',
+        'message' => 'Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden. Bitte versuche es erneut.',
         'error_class' => get_class($error),
         'error_message' => $error->getMessage(),
     ]);
