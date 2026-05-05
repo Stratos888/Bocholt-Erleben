@@ -202,7 +202,7 @@
     planSelect.dataset.portalLocked = "true";
 
     ensurePlanLockHint(
-      `Dein aktives Modell ${formatPlanLabel(activePlanKey)} wird für diese Einreichung automatisch verwendet. Tarifwechsel oder Kündigung machst du im Veranstalterbereich.`
+      `Deine aktive Mitgliedschaft ${formatPlanLabel(activePlanKey)} wird für diese Einreichung automatisch verwendet. Änderungen verwaltest du in deinem Veranstalterbereich.`
     );
     /* === END FUNCTION: syncStandardFormWithPortalSession === */
   }
