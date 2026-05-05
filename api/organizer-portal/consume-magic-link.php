@@ -221,7 +221,7 @@ try {
 
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Magic link consume failed.',
+        'message' => 'Der Zugangslink konnte gerade nicht eingelöst werden. Bitte fordere einen neuen Zugangslink an.',
         'error_class' => get_class($error),
         'error_message' => $error->getMessage(),
     ]);
