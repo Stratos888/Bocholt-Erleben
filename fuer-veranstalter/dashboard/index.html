@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V1 | Zweck: definiert den SEO-/PWA-/Meta-Head für den minimalen Veranstalterbereich; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V2_AREA_SPLIT | Zweck: neutralisiert den geschützten Bereich für Einreichungen und Mitgliedschaften ohne öffentliche Kontingent-/Abo-Sprache; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Veranstalterbereich | Bocholt erleben</title>
+  <title>Bereich | Bocholt erleben</title>
   <meta
     name="description"
-    content="Geschützter Veranstalterbereich für Status, Kontingent und zuletzt eingereichte Termine bei Bocholt erleben."
+    content="Geschützter Bereich für eigene Einreichungen und den Veranstalterbereich bei Bocholt erleben."
   >
   <meta name="robots" content="noindex, nofollow">
 
-<link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/dashboard/">
+  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/dashboard/">
   <link rel="manifest" href="/manifest.json">
 
   <meta name="theme-color" content="#F3F2E6">
@@ -25,11 +25,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V1 === -->
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V2_AREA_SPLIT === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_BODY_V1 | Zweck: rendert den kleinstmöglichen Veranstalterbereich mit Organizer-Identität, Kontingent und letzten Einreichungen; Umfang: kompletter Body dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT | Zweck: hält eine technische Bereichsroute bei, setzt statische Fallback-Sprache neutral und überlässt Einreichung/Veranstalterbereich-Trennung dem Runtime-Rendering; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -43,43 +43,43 @@
 
   <main class="page page--organizers" data-organizer-page="dashboard">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Statusbereich</p>
-      <h1 id="organizer-dashboard-title">Deine Einreichungen im Blick.</h1>
+      <p class="content-kicker" id="organizer-dashboard-kicker">Bereich</p>
+      <h1 id="organizer-dashboard-title">Wir laden deinen Bereich.</h1>
       <p class="content-lead" id="organizer-dashboard-lead">
-        Wir laden gerade den aktuellen Stand deiner Einreichungen.
+        Wir prüfen gerade, ob wir deine Einreichung oder deinen Veranstalterbereich anzeigen.
       </p>
       <p class="content-note" id="organizer-dashboard-note">
-        Für Einzeltermine ist dieser Bereich vor allem eine Statusübersicht. Bei Mitgliedschaften ist er die zentrale Übersicht für Kontingent und Einreichungen.
+        Der Inhalt richtet sich automatisch nach deiner E-Mail-Adresse.
       </p>
       <div class="content-actions content-actions--inline">
-<a class="content-cta content-cta--primary" id="organizer-dashboard-primary-cta" href="/events-veroeffentlichen/einreichen/">
-  Neues Event einreichen
-</a>
+        <a class="content-cta content-cta--primary" id="organizer-dashboard-primary-cta" href="/events-veroeffentlichen/einreichen/">
+          Neues Event einreichen
+        </a>
       </div>
     </header>
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_COPY_V1 | Zweck: ersetzt technische Magic-Link-Sprache im Auth-Fallback des Dashboards durch nutzernahe Zugangslink-Sprache; Umfang: ersetzt die Auth-Fallback-Karte im Dashboard === -->
+
     <section class="content-card content-card--primary" id="organizer-dashboard-auth-required" aria-labelledby="organizer-dashboard-auth-required-head" hidden>
       <h2 id="organizer-dashboard-auth-required-head">Zugang erforderlich</h2>
-      <p>Für diesen Bereich wird ein gültiger Zugangslink per E-Mail benötigt.</p>
+      <p>Fordere einen gültigen Zugangslink per E-Mail an, um deinen Bereich zu öffnen.</p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
-          Zum Login
+          Bereich öffnen
         </a>
       </div>
     </section>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_COPY_V1 === -->
+
 
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
-        <h2 id="organizer-dashboard-account-head">Veranstalter</h2>
+        <h2 id="organizer-dashboard-account-head">Bereich</h2>
         <p id="organizer-account-name">–</p>
         <p id="organizer-account-email">–</p>
         <p id="organizer-account-plan">–</p>
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
-        <h2 id="organizer-dashboard-quota-head">Verfügbares Kontingent</h2>
+        <h2 id="organizer-dashboard-quota-head">Status</h2>
         <p id="organizer-quota-period">–</p>
         <p id="organizer-quota-summary">–</p>
         <p id="organizer-quota-remaining">–</p>
@@ -87,18 +87,17 @@
     </div>
 
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
-      <h2 id="organizer-dashboard-submissions-head">Letzte Einreichungen</h2>
+      <h2 id="organizer-dashboard-submissions-head">Einreichungen</h2>
       <nav class="content-links" id="organizer-dashboard-submissions-list"></nav>
       <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine Einreichungen vorhanden.</p>
     </section>
     
-    <nav class="content-links" aria-label="Veranstalter-Navigation">
-      <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SECONDARY_LINK_COPY_V1 | Zweck: ersetzt technische Magic-Link-Sprache im sekundären Service-Link durch nutzernahe Zugangslink-Sprache; Umfang: ersetzt den ersten Sekundärlink im Dashboard === -->
+    <nav class="content-links" aria-label="Bereich-Navigation">
       <a class="content-link" href="/fuer-veranstalter/login/">
         <span class="content-link__label">Neuen Zugangslink anfordern</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </a>
-      <!-- === END BLOCK: ORGANIZER_DASHBOARD_SECONDARY_LINK_COPY_V1 === -->
+
       <a class="content-link" href="/events-veroeffentlichen/">
         <span class="content-link__label">Zurück zu Event veröffentlichen</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
@@ -109,9 +108,7 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: ORGANIZER_PORTAL_SCRIPT_VERSION_BUMP_V2 | Zweck: Cache-Busting fuer organizer-portal.js nach Logout-Ergaenzung; Umfang: genau eine Script-Zeile === -->
-<script src="/js/organizer-portal.js?v=2026-05-04-logout-1" defer></script>
-  <!-- === END BLOCK: ORGANIZER_PORTAL_SCRIPT_VERSION_BUMP_V2 === -->
-  <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V1 === -->
+  <script src="/js/organizer-portal.js?v=2026-05-04-area-copy-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>
 </html>
