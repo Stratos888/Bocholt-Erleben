@@ -435,7 +435,7 @@
     if (!trigger) return;
 
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Zahlung";
+      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Prüfung und Zahlung";
     }
 
     trigger.disabled = isSubmitting;
@@ -513,7 +513,7 @@
         window.location.href = checkoutUrl;
       } catch (error) {
         console.warn("Publish funnel: standard checkout init failed.", error);
-        window.alert(safeText(error?.message) || "Die Zahlung konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+        window.alert(safeText(error?.message) || "Der nächste Schritt konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
         setStandardSubmitting(trigger, false);
       }
     });
