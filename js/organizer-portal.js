@@ -593,26 +593,29 @@
       }
     }
 
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_APPROVED_PUBLICATION_COUNT_COPY_V1 | Zweck: macht im Dashboard klar, dass nur freigegebene Veröffentlichungen gezählt werden; Umfang: Quota-/Status-Texte in renderDashboard === */
     if (quotaSummary) {
       if (isSingleStatusView) {
         quotaSummary.textContent = latestSubmission
           ? "Einreichung erhalten. Veröffentlichung erst nach Prüfung."
           : "Noch keine Einreichung gefunden.";
       } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
+        quotaSummary.textContent = `Freigegebene Veröffentlichungen: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
       } else {
-        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
+        quotaSummary.textContent = `Freigegebene Veröffentlichungen: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
       }
     }
 
     if (quotaRemaining) {
       if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Weitere Veröffentlichungen: im üblichen Rahmen möglich";
+        quotaRemaining.textContent = "Gezählt werden freigegebene Veröffentlichungen. Weitere Termine sind im üblichen Rahmen möglich.";
       } else if (isSingleStatusView) {
         quotaRemaining.textContent = "Keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = `Noch veröffentlichbar: ${Number(quota.remaining_total || 0)}`;
+        quotaRemaining.textContent = `Noch veröffentlichbar nach Freigabe: ${Number(quota.remaining_total || 0)}`;
       }
+    }
+    /* === END BLOCK: ORGANIZER_DASHBOARD_APPROVED_PUBLICATION_COUNT_COPY_V1 === */
     }
 
     if (submissionsHead) {
