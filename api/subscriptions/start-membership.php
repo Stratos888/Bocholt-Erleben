@@ -492,7 +492,7 @@ try {
 
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Membership start failed.',
+        'message' => 'Die Mitgliedschaft konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.',
         'error_class' => get_class($error),
         'error_message' => $error->getMessage(),
     ]);
