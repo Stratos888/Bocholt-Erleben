@@ -41,7 +41,7 @@
       const message =
         safeText(data?.message) ||
         safeText(data?.error_message) ||
-        `Request failed with status ${response.status}`;
+        "request_failed";
 
       const requestError = new Error(message);
       requestError.status = response.status;
@@ -79,7 +79,7 @@
     const paymentKind = safeText(submission?.payment_kind).toLowerCase();
 
     if (statusKey === "paid" && paymentKind === "subscription") {
-      return "Event eingereicht";
+      return "Veranstaltung eingereicht";
     }
 
     return formatStatusLabel(statusKey);
@@ -172,7 +172,7 @@
 
       window.location.assign("/fuer-veranstalter/login/");
     } catch (error) {
-      window.alert(safeText(error?.message) || "Abmelden war gerade nicht möglich.");
+      window.alert("Abmelden war gerade nicht möglich. Bitte versuche es erneut.");
 
       if (button) {
         button.disabled = false;
@@ -222,12 +222,13 @@
       const redirectUrl = safeText(result?.data?.redirect_url);
 
       if (!redirectUrl) {
-        throw new Error("Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden.");
+        throw new Error("missing_billing_portal_redirect_url");
       }
 
       window.location.assign(redirectUrl);
     } catch (error) {
-      window.alert(safeText(error?.message) || "Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden.");
+      console.warn("Organizer portal: billing portal failed.", error);
+      window.alert("Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden. Bitte versuche es erneut.");
 
       if (button) {
         button.disabled = false;
@@ -300,10 +301,10 @@
     const setSubmitting = (isSubmitting) => {
       if (!loginSubmit) return;
       if (!loginSubmit.dataset.defaultLabel) {
-        loginSubmit.dataset.defaultLabel = loginSubmit.textContent || "Zugangslink anfordern";
+        loginSubmit.dataset.defaultLabel = loginSubmit.textContent || "Zugangslink per E-Mail erhalten";
       }
       loginSubmit.disabled = isSubmitting;
-      loginSubmit.textContent = isSubmitting ? "Wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
+      loginSubmit.textContent = isSubmitting ? "Zugangslink wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
     };
 
     if (loginEmail && prefillEmail && !safeText(loginEmail.value)) {
@@ -312,7 +313,7 @@
 
     if (membershipStarted) {
       setLoginResult(
-        "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um deinen Bereich zu öffnen."
+        "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um deine Einreichung oder deinen Veranstalterbereich zu öffnen."
       );
     }
 
@@ -333,8 +334,8 @@
           return;
         } catch (_ignored) {
           setLoginResult(
-            safeText(error?.message) || "Der Zugangslink konnte nicht eingelöst werden.",
-            [{ href: "/fuer-veranstalter/dashboard/", label: "Trotzdem Bereich öffnen", icon: "chevron-right" }]
+            "Der Zugangslink konnte nicht eingelöst werden. Bitte fordere einen neuen Zugangslink an.",
+            [{ href: "/fuer-veranstalter/login/", label: "Neuen Zugangslink anfordern", icon: "chevron-right" }]
           );
         }
       }
@@ -368,20 +369,20 @@
         if (safeText(data.magic_link_url)) {
           links.push({
             href: data.magic_link_url,
-            label: "Bereich direkt öffnen",
+            label: "Einreichung oder Veranstalterbereich öffnen",
             icon: "chevron-right"
           });
         }
 
         setLoginResult(
           safeText(data.magic_link_url)
-            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du deinen Bereich direkt öffnen."
+            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du deine Einreichung oder deinen Veranstalterbereich direkt öffnen."
             : "Der Zugangslink wurde angefordert. Bitte prüfe dein Postfach.",
           links
         );
       } catch (error) {
-        setLoginResult(
-          safeText(error?.message) || "Der Zugangslink konnte gerade nicht angefordert werden."
+        console.warn("Organizer portal: magic link request failed.", error);
+        setLoginResult("Dein Zugangslink konnte gerade nicht angefordert werden. Bitte prüfe die E-Mail-Adresse oder versuche es später erneut.");
         );
       } finally {
         setSubmitting(false);
@@ -468,7 +469,7 @@
       } else {
         lead.textContent = email
           ? `Eingeloggt für ${email}.`
-          : "Hier verwaltest du deine Mitgliedschaft und reichst neue Events ein.";
+          : "Hier verwaltest du deine Mitgliedschaft und reichst neue Veranstaltungen ein.";
       }
     }
 
@@ -492,7 +493,7 @@
         : "single";
 
       dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
-      dashboardPrimaryCta.textContent = isSingleStatusView ? "Weiteres Event veröffentlichen" : "Neues Event einreichen";
+      dashboardPrimaryCta.textContent = isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen";
     }
 
     if (dashboardActions) {
