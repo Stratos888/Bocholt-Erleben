@@ -52,7 +52,7 @@
       const message =
         safeText(data?.message) ||
         safeText(data?.error_message) ||
-        `Request failed with status ${response.status}`;
+        "request_failed";
 
       throw new Error(message);
     }
@@ -87,13 +87,13 @@
 
       const checkoutUrl = safeText(data.checkout_url);
       if (!checkoutUrl) {
-        throw new Error("Checkout-URL fehlt.");
+        throw new Error("missing_checkout_url");
       }
 
       window.location.href = checkoutUrl;
     } catch (error) {
-      showResult(safeText(error?.message) || "Die Mitgliedschaft konnte gerade nicht gestartet werden.");
-      setSubmitting(false);
+      console.warn("Organizer membership: start failed.", error);
+      showResult("Die Mitgliedschaft konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
     }
   });
 
