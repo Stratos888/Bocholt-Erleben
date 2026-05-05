@@ -91,7 +91,7 @@ function opml_build_mail_body(string $magicLinkUrl, string $expiresAtUtc): strin
     return implode("\n", [
         'Hallo,',
         '',
-        'hier ist dein Zugangslink für den Veranstalterbereich von Bocholt erleben:',
+        'hier ist dein Zugangslink für Bocholt erleben:',
         $magicLinkUrl,
         '',
         'Der Link ist gültig bis (UTC): ' . $expiresAtUtc,
