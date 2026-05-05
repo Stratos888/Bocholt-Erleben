@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V1 | Zweck: ersetzt die alte Redirect-Seite /fuer-veranstalter/ durch einen echten öffentlichen Einstieg für Mitgliedschaft und Login; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V2_REGULAR_PUBLISHING | Zweck: richtet /fuer-veranstalter/ als Mitgliedschaftsseite für regelmäßiges Veröffentlichen aus und entfernt Login als gleichwertigen Produktweg; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mitgliedschaft für Veranstalter | Bocholt erleben</title>
+  <title>Regelmäßig Events veröffentlichen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Mitgliedschaft starten oder als bestehender Veranstalter in den Veranstalterbereich von Bocholt erleben einloggen."
+    content="Mitgliedschaft für regelmäßige Event-Veröffentlichungen bei Bocholt erleben starten: monatlich veröffentlichte Termine für Vereine, Veranstalter und Locations."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/">
@@ -24,11 +24,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V1 === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V2_REGULAR_PUBLISHING === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V1 | Zweck: rendert den getrennten öffentlichen Einstieg für Mitgliedschaft und bestehenden Veranstalterzugang; Umfang: kompletter Body dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V2_REGULAR_PUBLISHING | Zweck: priorisiert die Mitgliedschaft als regelmäßigen Veröffentlichungsweg und setzt Bereich öffnen nur als sekundären Rückkehrpfad; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -42,26 +42,17 @@
 
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Für Veranstalter</p>
-      <h1>Mitgliedschaft oder Login.</h1>
+      <p class="content-kicker">Regelmäßig Events veröffentlichen</p>
+      <h1>Mitgliedschaft starten.</h1>
       <p class="content-lead">
-        Einzeltermine reichst du weiterhin direkt öffentlich ein. Für regelmäßige Termine startest du hier deine Mitgliedschaft oder meldest dich in deinem Veranstalterbereich an.
+        Für Vereine, Veranstalter und Locations, die regelmäßig Termine bei Bocholt erleben veröffentlichen möchten.
       </p>
     </header>
 
     <div class="content-grid content-grid--2">
-      <section class="content-card content-card--primary" aria-labelledby="organizer-existing-head">
-        <h2 id="organizer-existing-head">Bereits Veranstalter?</h2>
-        <p>Wenn du schon eine Mitgliedschaft oder frühere Einreichungen hast, kannst du dich per E-Mail-Link in deinen Bereich einloggen.</p>
-        <div class="content-actions content-actions--inline">
-          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
-            Zum Login
-          </a>
-        </div>
-      </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-membership-head">
-        <h2 id="organizer-membership-head">Mitgliedschaft starten</h2>
+        <h2 id="organizer-membership-head">Mitgliedschaft wählen</h2>
 
         <form class="content-form" id="organizer-membership-form" novalidate>
           <div class="content-form-grid">
@@ -83,9 +74,9 @@
             <label class="content-field content-field--full" for="organizer-membership-plan">
               <span class="content-field__label">Mitgliedschaft</span>
               <select class="content-field__control" id="organizer-membership-plan" name="plan" required>
-                <option value="starter">Starter · 9,99 € / Monat · bis zu 3 Termine</option>
-                <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 Termine</option>
-                <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt</option>
+                <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine</option>
+                <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine</option>
+                <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt veröffentlichte Termine</option>
               </select>
             </label>
           </div>
@@ -101,11 +92,25 @@
           <p id="organizer-membership-result-text"></p>
         </section>
       </section>
+      
+      <section class="content-card content-card--primary" aria-labelledby="organizer-existing-head">
+        <h2 id="organizer-existing-head">Schon eingereicht oder Mitglied?</h2>
+        <p>Öffne deinen Bereich per E-Mail-Link. Wir zeigen dir automatisch deine Einreichung oder deinen Veranstalterbereich.</p>
+        <div class="content-actions content-actions--inline">
+          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
+            Bereich öffnen
+          </a>
+        </div>
+      </section>
     </div>
 
     <nav class="content-links" aria-label="Alternative Navigation">
-      <a class="content-link" href="/events-veroeffentlichen/">
-        <span class="content-link__label">Zum öffentlichen Einzeltermin-Funnel</span>
+      <a class="content-link" href="/events-veroeffentlichen/einreichen/?plan=single">
+        <span class="content-link__label">Ein Event einmalig veröffentlichen</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+      <a class="content-link" href="/events-veroeffentlichen/anbindung/">
+        <span class="content-link__label">Automatische Anbindung für regelmäßige Termine anfragen</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </a>
       <a class="content-link" href="/">
@@ -117,6 +122,6 @@
 
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/organizer-membership.js?v=2026-05-04-identity-guard-1" defer></script>
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V1 === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V2_REGULAR_PUBLISHING === -->
 </body>
 </html>
