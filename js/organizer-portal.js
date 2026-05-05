@@ -568,7 +568,7 @@
       if (isSingleStatusView) {
         quotaPeriod.textContent = latestSubmission
           ? `Termin: ${latestDateText}`
-          : "Ein Event veröffentlichen";
+          : "Veranstaltung einreichen";
       } else {
         const start = formatDate(safeText(quota.current_period_start || subscription?.current_period_start).split(" ")[0]);
         const end = formatDate(safeText(quota.current_period_end || subscription?.current_period_end).split(" ")[0]);
