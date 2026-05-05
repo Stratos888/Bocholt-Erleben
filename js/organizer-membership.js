@@ -60,6 +60,7 @@
     return data;
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V1 | Zweck: bereitet Mitgliedschafts-Checkout vor und gibt den Button nach Fehlern wieder frei; Umfang: kompletter Submit-Handler des Mitgliedschaftsformulars === */
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -94,8 +95,11 @@
     } catch (error) {
       console.warn("Organizer membership: start failed.", error);
       showResult("Die Mitgliedschaft konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+    } finally {
+      setSubmitting(false);
     }
   });
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V1 === */
 
   /* === END FILE: js/organizer-membership.js === */
 })();
