@@ -317,7 +317,7 @@
       );
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V3_NEUTRAL_AREA | Zweck: hält den Login neutral als Bereich-Öffnen-Pfad und entfernt Statusbereich-/Veranstalterbereich-Vorentscheidung aus Token- und Request-Texten; Umfang: ersetzt den Token- und Request-Abschnitt in handleLoginPage === */
+    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V4_SYNTAX_SAFE_ACCESS_LINK | Zweck: rendert Login, Token-Einlösung und Magic-Link-Anforderung syntaktisch robust mit konkreter Einreichung-/Veranstalterbereich-Sprache; Umfang: kompletter Token- und Request-Abschnitt in handleLoginPage === */
     if (token) {
       if (loginNote) {
         loginNote.textContent = "Der Zugangslink wird geprüft. Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.";
@@ -328,6 +328,8 @@
         window.location.replace("/fuer-veranstalter/dashboard/");
         return;
       } catch (error) {
+        console.warn("Organizer portal: magic link consume failed.", error);
+
         try {
           await tryLoadPortalState();
           window.location.replace("/fuer-veranstalter/dashboard/");
@@ -383,12 +385,11 @@
       } catch (error) {
         console.warn("Organizer portal: magic link request failed.", error);
         setLoginResult("Dein Zugangslink konnte gerade nicht angefordert werden. Bitte prüfe die E-Mail-Adresse oder versuche es später erneut.");
-        );
       } finally {
         setSubmitting(false);
       }
     });
-    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V3_NEUTRAL_AREA === */
+    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V4_SYNTAX_SAFE_ACCESS_LINK === */
   }
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Meine Einreichung oder Mein Veranstalterbereich und ersetzt öffentliche Kontingent-/Abo-Sprache; Umfang: komplette renderDashboard-Funktion === */
