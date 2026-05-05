@@ -155,7 +155,7 @@ function obp_fetch_manageable_customer(PDO $pdo, int $organizerId): array
     }
 
     if ($customerId === '') {
-        throw new InvalidArgumentException('Fuer dieses Konto ist aktuell kein verwaltbares Abo vorhanden.');
+        throw new InvalidArgumentException('Für diese Mitgliedschaft ist aktuell keine Verwaltung verfügbar.');
     }
 
     $row['effective_stripe_customer_id'] = $customerId;
