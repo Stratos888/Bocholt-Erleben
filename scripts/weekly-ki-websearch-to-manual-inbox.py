@@ -56,10 +56,10 @@ TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V3 | Zweck: Aufbau-/Backfill-Lauf mit Diagnose; offene Inbox warnt nur noch, Manual-Puffer bleibt harter Guard | Umfang: setzt Backfill-Zielkorridor und Guard-/Warn-Konfiguration ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 | Zweck: Aufbau-/Backfill-Lauf mit 210-Tage-Suchfenster; offene Inbox warnt nur, Manual-Puffer bleibt harter Guard | Umfang: setzt Suchhorizont, Kandidatenlimit und Guard-/Warn-Konfiguration ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
 MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
-SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "180"))
+SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "210"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
 WARN_ON_PENDING_INBOX = os.environ.get(
@@ -67,7 +67,7 @@ WARN_ON_PENDING_INBOX = os.environ.get(
     os.environ.get("FAIL_ON_PENDING_INBOX", "true"),
 ).lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
-# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V3 ===
+# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 ===
 
 ALLOWED_CATEGORIES = {
     "Märkte & Feste",
@@ -414,7 +414,7 @@ Nutze das beigefügte Quellenregister als operative Quellensteuerung.
 Liefere nur neue Delta-Kandidaten.
 
 Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
-- Ziel ist möglichst vollständige Abdeckung der starken Quellen- und Eventcluster im 180-Tage-Fenster.
+- Ziel ist möglichst vollständige Abdeckung der starken Quellen- und Eventcluster im konfigurierten Suchzeitraum.
 - Du musst die definierten Quellencluster systematisch prüfen, bevor du den Lauf abschließt.
 - Du darfst und sollst mehr als 12 Kandidaten liefern, wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind.
 - Keine künstliche Auffüllung mit schwachen Treffern.
@@ -460,7 +460,7 @@ Rahmen:
 - Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
 
 Ziel dieses Laufs:
-- möglichst viele wirklich gute neue Event-Kandidaten im aktuellen 180-Tage-Fenster finden
+- möglichst viele wirklich gute neue Event-Kandidaten im aktuellen Suchzeitraum finden
 - bekannte starke Eventcluster systematisch abarbeiten
 - nicht nach den ersten plausiblen Treffern abbrechen
 - nur dann keine Kandidaten aus einem Cluster liefern, wenn dort keine neuen, starken, regelkonformen Delta-Kandidaten übrig sind
@@ -476,12 +476,15 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
 
 2. Bocholt RECOVERY:
    - offizielle Bocholt-Info-/News-/Themen-Seiten mit klarem Eventfokus
-   - bekannte starke Recovery-Muster wie Kulturtage, Interkulturelle Woche, Weinfest, Aasee, Kirmes, Innenstadt- und Familienformate
+   - bekannte starke Recovery-Muster wie Kulturtage, Interkulturelle Woche, Weinfest, Aasee, Kirmes, Lichtersonntag, Weihnachtsmarkt, Innenstadt- und Familienformate
    - diese Recovery-URLs explizit prüfen:
      - `https://www.bocholt.de/kulturtage`
      - `https://www.bocholt.de/Interkulturellewoche`
      - `https://www.bocholt.de/freizeit-und-tourismus/veranstaltungen/weinfest`
      - `https://www.bocholt.de/veranstaltungskalender/aasee-festival-1`
+     - `https://www.bocholt.de/veranstaltungskalender/kirmes-2026`
+     - `https://www.bocholt.de/veranstaltungskalender/lichtersonntag-2026`
+     - `https://www.bocholt.de/veranstaltungskalender/bocholter-weihnachtsmarkt-2026`
    - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
 
 3. Rhede CORE-MID:
@@ -491,7 +494,7 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
 
 4. Aalten / NL-Nahraum:
    - `aaltendagen.nl/*`
-   - alle belegbaren AaltenDagen 2026 im 180-Tage-Fenster aktiv prüfen
+   - alle belegbaren AaltenDagen 2026 im Suchzeitraum aktiv prüfen
    - AaltenDag-Termine als getrennte Tagesinstanzen ausgeben, wenn Datum/Instanz getrennt sind
    - bei AaltenDag keine einzelne Tagesblock-Zeit als allgemeine Startzeit verwenden, wenn mehrere Tagesblöcke genannt sind; dann `time` leer lassen
 
@@ -504,7 +507,7 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
 6. Bredevoort / Koppelkerk:
    - `koppelkerk.nl/agenda/*`
    - `koppelkerk.nl/evenementen/*`
-   - alle belegbaren Koppelkerk-Bücherbörsen im 180-Tage-Fenster aktiv prüfen:
+   - alle belegbaren Koppelkerk-Bücherbörsen im Suchzeitraum aktiv prüfen:
      - Internationale Pinksterboekenmarkt
      - Internationale Zomerboekenmarkt
      - Internationale Augustusboekenmarkt
@@ -540,6 +543,9 @@ Vor der finalen Ausgabe aktiv prüfen, ob diese starken Kandidaten vorhanden, be
 - Bocholter Kulturtage
 - OPEN AIR am Marktplatz
 - Weltkindertagsfest / Eröffnung Interkulturelle Woche
+- Bocholter Kirmes
+- Lichtersonntag
+- Bocholter Weihnachtsmarkt
 - City Food Festival
 - WattExtra Open Air am Bahia
 - CityArt Bocholt
@@ -1559,6 +1565,7 @@ def first_matching_record_status(target: Dict[str, Any], label: str, records: Li
     return None
 
 
+# === BEGIN BLOCK: COVERAGE_AUDIT_WITH_WINDOW_STATUS_V2 | Zweck: Coverage-Ziele gegen Selected/Raw/Bestand prüfen und abgelaufene bzw. außerhalb liegende Targets sauber diagnostizieren | Umfang: ersetzt coverage_audit vollständig ===
 def coverage_audit(
     targets: List[Dict[str, Any]],
     raw_candidates: List[Dict[str, Any]],
@@ -1570,12 +1577,15 @@ def coverage_audit(
     manual_records: List[RefRecord],
 ) -> List[Dict[str, str]]:
     audit: List[Dict[str, str]] = []
+    today = datetime.now().date()
+    window_end = today + timedelta(days=SEARCH_WINDOW_DAYS)
 
     for target in targets:
         target_id = clean_output_text(target.get("id", "")) or norm_key(target.get("title", ""))
         title = clean_output_text(target.get("title", ""))
         priority = clean_output_text(target.get("priority", "")) or "should"
         cluster = clean_output_text(target.get("cluster", ""))
+        expected_date_value = parse_iso_date(norm(target.get("expected_date", "")))
 
         selected_match = next((item for item in selected_candidates if target_matches_candidate(target, item)), None)
         if selected_match:
@@ -1630,19 +1640,33 @@ def coverage_audit(
                 })
                 break
         else:
+            if expected_date_value and expected_date_value < today:
+                status = "PAST_TARGET"
+                drop_reason = "target_before_run_date"
+                matched_date = expected_date_value.isoformat()
+            elif expected_date_value and expected_date_value > window_end:
+                status = "TARGET_OUT_OF_ACTIVE_WINDOW"
+                drop_reason = "target_after_search_window"
+                matched_date = expected_date_value.isoformat()
+            else:
+                status = "MISSING_FROM_RAW"
+                drop_reason = ""
+                matched_date = ""
+
             audit.append({
                 "id": target_id,
                 "title": title,
                 "priority": priority,
                 "cluster": cluster,
-                "status": "MISSING_FROM_RAW",
+                "status": status,
                 "matched_title": "",
-                "matched_date": "",
+                "matched_date": matched_date,
                 "matched_url": "",
-                "drop_reason": "",
+                "drop_reason": drop_reason,
             })
 
     return audit
+# === END BLOCK: COVERAGE_AUDIT_WITH_WINDOW_STATUS_V2 ===
 
 
 # === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_SUMMARY_WITH_SOURCE_CANDIDATES_V2 | Zweck: Event-, Coverage- und Source-Candidate-Diagnose zentral in JSON und Log zusammenführen | Umfang: ersetzt build_weekly_diagnostics und print_weekly_diagnostics_summary ===
