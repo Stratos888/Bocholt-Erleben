@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V1 | Zweck: definiert den SEO-/PWA-/Meta-Head für den minimalen Veranstalter-Login per Magic Link; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V2_NEUTRAL_AREA | Zweck: neutralisiert den Login als Bereich-Öffnen-Pfad für Einreichungen und Mitgliedschaften und korrigiert die kanonische URL; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Veranstalter-Zugang | Bocholt erleben</title>
+  <title>Bereich öffnen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Geschützter Veranstalter-Zugang für eingereichte und veröffentlichte Termine bei Bocholt erleben."
+    content="Bereich bei Bocholt erleben per E-Mail-Link öffnen: automatisch die eigene Einreichung oder den Veranstalterbereich anzeigen."
   >
   <meta name="robots" content="noindex, nofollow">
 
-  <link rel="canonical" href="https://bocholt-erleben.de/veranstalter/login/">
+  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/login/">
   <link rel="manifest" href="/manifest.json">
 
   <meta name="theme-color" content="#F3F2E6">
@@ -25,11 +25,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V1 === -->
+  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V2_NEUTRAL_AREA === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BODY_V1 | Zweck: rendert die kleinstmögliche Veranstalter-Login-Seite mit Magic-Link-Anforderung und Token-Einlösung; Umfang: kompletter Body dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BODY_V2_NEUTRAL_AREA | Zweck: macht den Zugang neutral als Bereich-Öffnen-Pfad und erklärt die automatische Anzeige von Einreichung oder Veranstalterbereich; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -43,14 +43,13 @@
 
   <main class="page page--organizers" data-organizer-page="login">
     <header class="content-hero content-hero--panel">
-      <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HERO_COPY_V2 | Zweck: enttechnisiert den Login für Nutzer, betont Status/Service statt Portal-Technik und ersetzt Magic-Link-Sprache; Umfang: ersetzt Hero und Formkopf im Login-Bereich === -->
-      <p class="content-kicker">Zugang per E-Mail</p>
-      <h1>Per E-Mail anmelden.</h1>
+      <p class="content-kicker">Bereich öffnen</p>
+      <h1>Per E-Mail-Link einloggen.</h1>
       <p class="content-lead">
-        Gib die E-Mail-Adresse deiner Einreichung oder Mitgliedschaft ein. Du erhältst einen einmaligen Zugangslink für deinen Statusbereich.
+        Gib die E-Mail-Adresse deiner Einreichung oder Mitgliedschaft ein. Wir senden dir einen einmaligen Zugangslink.
       </p>
       <p class="content-note" id="organizer-login-note">
-        Für Einzeltermine ist dieser Bereich nur eine Statusübersicht. Bei Mitgliedschaften zeigt er zusätzlich dein verfügbares Kontingent.
+        Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.
       </p>
     </header>
 
@@ -58,7 +57,7 @@
       <div class="content-form-section-head">
         <h2 id="organizer-login-form-head">Zugangslink anfordern</h2>
       </div>
-      <!-- === END BLOCK: ORGANIZER_LOGIN_HERO_COPY_V2 === -->
+
 
       <form class="content-form" id="organizer-login-form" novalidate>
         <div class="content-form-grid">
@@ -73,7 +72,7 @@
               autocomplete="email"
               required
             >
-            <p class="content-field__hint">Nutze die E-Mail-Adresse, über die du bereits eingereicht oder gekauft hast.</p>
+            <p class="content-field__hint">Nutze die E-Mail-Adresse, mit der du eingereicht oder deine Mitgliedschaft gestartet hast.</p>
           </label>
         </div>
 
@@ -91,7 +90,7 @@
       <nav class="content-links" id="organizer-login-result-links" hidden></nav>
     </section>
 
-    <nav class="content-links" aria-label="Veranstalter-Navigation">
+    <nav class="content-links" aria-label="Bereich-Navigation">
       <a class="content-link" href="/events-veroeffentlichen/">
         <span class="content-link__label">Zurück zu Event veröffentlichen</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
@@ -102,9 +101,7 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: ORGANIZER_PORTAL_SCRIPT_VERSION_BUMP_V1 | Zweck: Cache-Busting fuer organizer-portal.js; Umfang: genau eine Script-Zeile === -->
-<script src="/js/organizer-portal.js?v=2026-05-03-4" defer></script>
-  <!-- === END BLOCK: ORGANIZER_PORTAL_SCRIPT_VERSION_BUMP_V1 === -->
-  <!-- === END BLOCK: ORGANIZER_LOGIN_BODY_V1 === -->
+  <script src="/js/organizer-portal.js?v=2026-05-04-area-copy-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_LOGIN_BODY_V2_NEUTRAL_AREA === -->
 </body>
 </html>
