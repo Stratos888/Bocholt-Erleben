@@ -491,6 +491,7 @@
         ? effectivePlanKey
         : "single";
 
+      dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
       dashboardPrimaryCta.textContent = isSingleStatusView ? "Weiteres Event veröffentlichen" : "Neues Event einreichen";
     }
 
