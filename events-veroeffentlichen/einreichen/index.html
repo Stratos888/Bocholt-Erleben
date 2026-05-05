@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V1 | Zweck: definiert den Head für die dedizierte Standardweg-Route /events-veroeffentlichen/einreichen/ als saubere Intake-Seite vor Stripe; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V2_SERVICE_INTAKE | Zweck: positioniert die Einreichungsseite als serviceorientierte Prüfungsvorbereitung statt als Zahlungsformular; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Event einreichen | Bocholt erleben</title>
+  <title>Veranstaltung einreichen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen."
+    content="Veranstaltung bei Bocholt erleben einreichen: Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
@@ -22,14 +22,14 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
-  <meta property="og:title" content="Event einreichen | Bocholt erleben">
-  <meta property="og:description" content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen.">
+  <meta property="og:title" content="Veranstaltung einreichen | Bocholt erleben">
+  <meta property="og:description" content="Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Event einreichen | Bocholt erleben">
-  <meta name="twitter:description" content="Standardweg für Veranstalter: Event-Link oder Fallback-Angaben erfassen und danach mit dem passenden Modell zur Zahlung weitergehen.">
+  <meta name="twitter:title" content="Veranstaltung einreichen | Bocholt erleben">
+  <meta name="twitter:description" content="Veranstaltung einreichen, Angaben prüfen lassen und nach Freigabe auf Bocholt erleben veröffentlichen.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -40,8 +40,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Event einreichen",
-    "description": "Standardweg für Veranstalter bei Bocholt erleben mit Intake vor Stripe-Zahlung.",
+    "name": "Veranstaltung einreichen",
+    "description": "Veranstaltung bei Bocholt erleben einreichen: Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/einreichen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -52,7 +52,7 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V1 === -->
+  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V2_SERVICE_INTAKE === -->
 </head>
 
 <!-- === BEGIN BLOCK: PUBLISH_STANDARD_BODY_MODE_V1 | Zweck: markiert die Einreichungsseite als Standard-Funnel, damit eingeloggte Veranstalterdaten und aktives Abo synchronisiert werden; Umfang: body-Tag === -->
@@ -70,14 +70,14 @@
     </a>
   </header>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V5 | Zweck: richtet die Einreichen-Route kompromisslos task-first aus, entfernt Standardweg-/Fallback-Wording aus dem sichtbaren Einstieg und verlagert Zusatzangaben in eine reduzierte, verständliche Zusatzlogik; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
+    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_SERVICE_INTAKE_V1 | Zweck: dreht die Einreichungsroute von Modell-/Zahlungsfokus auf Prüfungsvorbereitung und Veröffentlichungsweg, ohne IDs oder Checkout-Logik zu ändern; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
     <main class="page page--publish">
       <header class="content-hero content-hero--panel">
         <div class="publish-hero-layout">
           <div class="publish-hero-copy">
-            <h1>Event einreichen</h1>
+            <h1>Veranstaltung einreichen</h1>
             <p class="content-note publish-hero-trust">
-              Am besten direkt den Event-Link eintragen. Zusätzliche Angaben brauchst du nur, wenn dort etwas fehlt.
+              Am besten direkt den Event-Link eintragen. Wir prüfen die Angaben und bereiten die Veröffentlichung nach Freigabe vor.
             </p>
           </div>
         </div>
@@ -85,23 +85,24 @@
 
       <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
         <div class="publish-section-head">
-          <h2 id="publish-submit-title">Event-Daten</h2>
+          <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
           <p class="content-note">
-            Pflicht sind Modell, Veranstalter und E-Mail-Adresse.
+            Pflicht sind Veröffentlichungsweg, Veranstalter und E-Mail-Adresse. Fehlende Eventdetails kannst du ergänzen.
           </p>
         </div>
 
         <form class="content-form" id="publish-standard-form" novalidate>
           <div class="content-form-grid">
             <label class="content-field" for="publish-standard-plan">
-              <span class="content-field__label">Gewünschtes Modell *</span>
+              <span class="content-field__label">Veröffentlichungsweg *</span>
               <select class="content-field__control" id="publish-standard-plan" name="plan" required>
                 <option value="">Bitte wählen</option>
-                <option value="single">Einzeltermin veröffentlichen · 9,90 € einmalig</option>
-                <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
-                <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
-                <option value="unlimited">Unbegrenzt · 29,99 € / Monat · unbegrenzt veröffentlichte Termine pro Monat</option>
+                <option value="single">Einzeltermin · 9,90 € einmalig</option>
+                <option value="starter">Starter · gelegentliche Termine · 9,99 € / Monat</option>
+                <option value="active">Aktiv · regelmäßiges Programm · 19,99 € / Monat</option>
+                <option value="unlimited">Dauerhaft · laufendes Programm · 29,99 € / Monat</option>
               </select>
+              <p class="content-field__hint">Der Veröffentlichungsweg bestimmt, ob es bei einem einzelnen Event bleibt oder eine Mitgliedschaft genutzt wird.</p>
             </label>
 
             <label class="content-field" for="publish-standard-organization">
@@ -117,13 +118,13 @@
             <label class="content-field" for="publish-standard-email">
               <span class="content-field__label">E-Mail-Adresse *</span>
               <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-              <p class="content-field__hint">Für Rückfragen oder Klärung.</p>
+              <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Statuszugang.</p>
             </label>
 
             <label class="content-field content-field--full" for="publish-standard-event-link">
               <span class="content-field__label">Event-Link oder Kalender-Link</span>
               <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
-              <p class="content-field__hint">Am besten direkt die Seite, auf der Titel, Datum und Ort stehen.</p>
+              <p class="content-field__hint">Am besten direkt die Seite, auf der Titel, Datum, Ort und Beschreibung stehen.</p>
             </label>
           </div>
 
@@ -173,19 +174,19 @@
 
           <div class="content-actions content-actions--inline publish-final-actions">
             <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-              Weiter zur Zahlung
+              Weiter zur Prüfung und Zahlung
             </button>
           </div>
         </form>
       </section>
     </main>
-    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_MOBILE_ENTERPRISE_V5 === -->
+    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_SERVICE_INTAKE_V1 === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 | Zweck: Cache-Busting fuer publish-funnel.js nach Identity-/Readonly-Fix; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-04-identity-guard-1" defer></script>
+  <script src="/js/publish-funnel.js?v=2026-05-05-service-copy-1" defer></script>
   <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 === -->
   <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 === -->
 </body>
