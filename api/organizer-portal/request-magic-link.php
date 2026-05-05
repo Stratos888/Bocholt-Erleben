@@ -237,7 +237,7 @@ try {
 
     be_json_response(500, [
         'status' => 'error',
-        'message' => 'Magic link request failed.',
+        'message' => 'Dein Zugangslink konnte gerade nicht angefordert werden. Bitte versuche es erneut.',
         'error_class' => get_class($error),
         'error_message' => $error->getMessage(),
     ]);
