@@ -67,7 +67,7 @@
     return ({
       draft: "Entwurf",
       checkout_started: "Zahlung gestartet",
-      paid: "Bezahlt",
+      paid: "Einreichung erhalten",
       in_review: "In Prüfung",
       approved: "Freigegeben",
       rejected: "Abgelehnt"
@@ -209,7 +209,7 @@
     const button = trigger instanceof HTMLElement ? trigger : null;
 
     if (button && !button.dataset.defaultLabel) {
-      button.dataset.defaultLabel = button.textContent || "Tarif ändern oder Abo kündigen";
+      button.dataset.defaultLabel = button.textContent || "Mitgliedschaft verwalten";
     }
 
     if (button) {
@@ -222,16 +222,16 @@
       const redirectUrl = safeText(result?.data?.redirect_url);
 
       if (!redirectUrl) {
-        throw new Error("Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
+        throw new Error("Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden.");
       }
 
       window.location.assign(redirectUrl);
     } catch (error) {
-      window.alert(safeText(error?.message) || "Die Abo-Verwaltung konnte gerade nicht geöffnet werden.");
+      window.alert(safeText(error?.message) || "Die Mitgliedschaftsverwaltung konnte gerade nicht geöffnet werden.");
 
       if (button) {
         button.disabled = false;
-        button.textContent = button.dataset.defaultLabel || "Tarif ändern oder Abo kündigen";
+        button.textContent = button.dataset.defaultLabel || "Mitgliedschaft verwalten";
       }
     }
   }
@@ -241,7 +241,7 @@
     if (!billingButton) return;
 
     billingButton.disabled = false;
-    billingButton.textContent = billingButton.dataset.defaultLabel || "Tarif ändern oder Abo kündigen";
+    billingButton.textContent = billingButton.dataset.defaultLabel || "Mitgliedschaft verwalten";
   });
   /* === END BLOCK: ORGANIZER_PORTAL_SESSION_AND_BILLING_HELPERS_V2 === */
 
@@ -292,10 +292,10 @@
     const loginEmail = document.getElementById("organizer-login-email");
     const loginNote = document.getElementById("organizer-login-note");
 
-const params = new URLSearchParams(window.location.search);
-const token = safeText(params.get("token"));
-const membershipStarted = safeText(params.get("membership_started")) === "1";
-const prefillEmail = safeText(params.get("email"));
+    const params = new URLSearchParams(window.location.search);
+    const token = safeText(params.get("token"));
+    const membershipStarted = safeText(params.get("membership_started")) === "1";
+    const prefillEmail = safeText(params.get("email"));
 
     const setSubmitting = (isSubmitting) => {
       if (!loginSubmit) return;
@@ -305,20 +305,21 @@ const prefillEmail = safeText(params.get("email"));
       loginSubmit.disabled = isSubmitting;
       loginSubmit.textContent = isSubmitting ? "Wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
     };
-if (loginEmail && prefillEmail && !safeText(loginEmail.value)) {
-  loginEmail.value = prefillEmail;
-}
 
-if (membershipStarted) {
-  setLoginResult(
-    "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um in deinen Veranstalterbereich zu kommen."
-  );
-}
-    
-    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 | Zweck: enttechnisiert alle nutzerseitigen Magic-Link-Texte zu Zugangslink-Sprache und korrigiert den Fallback-Link im Login-Flow; Umfang: ersetzt den Token- und Request-Abschnitt in handleLoginPage === */
+    if (loginEmail && prefillEmail && !safeText(loginEmail.value)) {
+      loginEmail.value = prefillEmail;
+    }
+
+    if (membershipStarted) {
+      setLoginResult(
+        "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um deinen Bereich zu öffnen."
+      );
+    }
+
+    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V3_NEUTRAL_AREA | Zweck: hält den Login neutral als Bereich-Öffnen-Pfad und entfernt Statusbereich-/Veranstalterbereich-Vorentscheidung aus Token- und Request-Texten; Umfang: ersetzt den Token- und Request-Abschnitt in handleLoginPage === */
     if (token) {
       if (loginNote) {
-        loginNote.textContent = "Der Zugangslink wird geprüft. Danach leiten wir direkt in deinen Statusbereich weiter.";
+        loginNote.textContent = "Der Zugangslink wird geprüft. Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.";
       }
 
       try {
@@ -333,7 +334,7 @@ if (membershipStarted) {
         } catch (_ignored) {
           setLoginResult(
             safeText(error?.message) || "Der Zugangslink konnte nicht eingelöst werden.",
-            [{ href: "/fuer-veranstalter/dashboard/", label: "Trotzdem zum Statusbereich", icon: "chevron-right" }]
+            [{ href: "/fuer-veranstalter/dashboard/", label: "Trotzdem Bereich öffnen", icon: "chevron-right" }]
           );
         }
       }
@@ -367,14 +368,14 @@ if (membershipStarted) {
         if (safeText(data.magic_link_url)) {
           links.push({
             href: data.magic_link_url,
-            label: "Zugangslink direkt öffnen",
+            label: "Bereich direkt öffnen",
             icon: "chevron-right"
           });
         }
 
         setLoginResult(
           safeText(data.magic_link_url)
-            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du ihn direkt öffnen."
+            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du deinen Bereich direkt öffnen."
             : "Der Zugangslink wurde angefordert. Bitte prüfe dein Postfach.",
           links
         );
@@ -386,10 +387,10 @@ if (membershipStarted) {
         setSubmitting(false);
       }
     });
-    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V2 === */
+    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V3_NEUTRAL_AREA === */
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_ACTIONS_V2 | Zweck: zeigt im Dashboard fuer aktive Abos eine Verwaltungsaktion an und rendert das effektive Modell sauber; Umfang: komplette renderDashboard-Funktion === */
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Meine Einreichung oder Mein Veranstalterbereich und ersetzt öffentliche Kontingent-/Abo-Sprache; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
@@ -430,7 +431,7 @@ if (membershipStarted) {
       effectivePlanKey === "single" &&
       !hasManageableSubscription &&
       !quota.has_unlimited;
-
+    const kicker = document.getElementById("organizer-dashboard-kicker");
     const title = document.getElementById("organizer-dashboard-title");
     const lead = document.getElementById("organizer-dashboard-lead");
     const note = document.getElementById("organizer-dashboard-note");
@@ -447,11 +448,14 @@ if (membershipStarted) {
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
     const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
     const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
+    if (kicker) {
+      kicker.textContent = isSingleStatusView ? "Meine Einreichung" : "Mein Veranstalterbereich";
+    }
 
     if (title) {
       title.textContent = isSingleStatusView
-        ? "Deine Einreichungen im Blick."
-        : safeText(organizer.organization_name) || "Veranstalterbereich";
+        ? "Meine Einreichung"
+        : safeText(organizer.organization_name) || "Mein Veranstalterbereich";
     }
 
     if (lead) {
@@ -460,11 +464,11 @@ if (membershipStarted) {
       if (isSingleStatusView) {
         lead.textContent = latestSubmission
           ? `${latestStatusText} · ${latestDateText}`
-          : (email ? `Verknüpft mit ${email}.` : "Statusübersicht für deine Einreichungen.");
+          : (email ? `Verknüpft mit ${email}.` : "Status deiner Einreichung.");
       } else {
         lead.textContent = email
           ? `Eingeloggt für ${email}.`
-          : "Eingeloggt im Veranstalterbereich.";
+          : "Hier verwaltest du deine Mitgliedschaft und reichst neue Events ein.";
       }
     }
 
@@ -473,12 +477,12 @@ if (membershipStarted) {
 
       if (isSingleStatusView) {
         note.textContent = email
-          ? `Verknüpft mit ${email}. Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.`
-          : "Für Einzeltermine dient dieser Bereich nur als Statusübersicht – kein dauerhaftes Konto nötig.";
+          ? `Verknüpft mit ${email}. Für Einzeltermine zeigen wir hier nur den Stand deiner Einreichung.`
+          : "Für Einzeltermine zeigen wir hier nur den Stand deiner Einreichung.";
       } else if (hasManageableSubscription) {
-        note.textContent = "Sichtbar sind Kontingent, Status, die letzten Einreichungen und die Abo-Verwaltung.";
+        note.textContent = "Sichtbar sind Mitgliedschaft, aktueller Zeitraum, veröffentlichte Termine und deine letzten Einreichungen.";
       } else {
-        note.textContent = "Sichtbar sind Kontingent, Status und die letzten Einreichungen.";
+        note.textContent = "Sichtbar sind Status und die letzten Einreichungen.";
       }
     }
 
@@ -487,7 +491,7 @@ if (membershipStarted) {
         ? effectivePlanKey
         : "single";
 
-      dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
+      dashboardPrimaryCta.textContent = isSingleStatusView ? "Weiteres Event veröffentlichen" : "Neues Event einreichen";
     }
 
     if (dashboardActions) {
@@ -499,7 +503,7 @@ if (membershipStarted) {
           manageSubscriptionButton.type = "button";
           manageSubscriptionButton.id = "organizer-dashboard-manage-subscription";
           manageSubscriptionButton.className = "content-cta";
-          manageSubscriptionButton.textContent = "Tarif ändern oder Abo kündigen";
+          manageSubscriptionButton.textContent = "Mitgliedschaft verwalten";
           dashboardActions.appendChild(manageSubscriptionButton);
         }
 
@@ -514,7 +518,7 @@ if (membershipStarted) {
     }
 
     if (accountHead) {
-      accountHead.textContent = isSingleStatusView ? "Letzter Stand" : "Veranstalter";
+      accountHead.textContent = isSingleStatusView ? "Einreichung" : "Veranstalter";
     }
 
     if (accountName) {
@@ -541,27 +545,27 @@ if (membershipStarted) {
         const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
         if (cancelAtPeriodEnd && currentPeriodEndDate !== "–") {
-          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · gekündigt zum ${currentPeriodEndDate}`;
+            accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)} · endet zum ${currentPeriodEndDate}`;
         } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
-          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)} · Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
+          accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)} · Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
         } else {
-          accountPlan.textContent = `Aktives Modell: ${formatPlanLabel(subscriptionPlanKey)}`;
+          accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)}`;
         }
       } else {
         const planLabel = formatPlanLabel(organizer.default_plan_key);
-        accountPlan.textContent = `Standardmodell: ${planLabel}`;
+        accountPlan.textContent = `Modell: ${planLabel}`;
       }
     }
 
     if (quotaHead) {
-      quotaHead.textContent = isSingleStatusView ? "Verfügbarkeit" : "Verfügbares Kontingent";
+      quotaHead.textContent = isSingleStatusView ? "Status" : "Veröffentlichte Termine";
     }
 
     if (quotaPeriod) {
       if (isSingleStatusView) {
         quotaPeriod.textContent = latestSubmission
           ? `Termin: ${latestDateText}`
-          : "Einzeltermin";
+          : "Ein Event veröffentlichen";
       } else {
         const start = formatDate(safeText(quota.current_period_start || subscription?.current_period_start).split(" ")[0]);
         const end = formatDate(safeText(quota.current_period_end || subscription?.current_period_end).split(" ")[0]);
@@ -571,48 +575,45 @@ if (membershipStarted) {
         const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
         if (cancelAtPeriodEnd && end !== "–") {
-          quotaPeriod.textContent = `Status: gekündigt zum ${end}`;
+          quotaPeriod.textContent = `Status: endet zum ${end}`;
         } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
           quotaPeriod.textContent = `Status: Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
         } else if ((quota.current_period_start || subscription?.current_period_start) && (quota.current_period_end || subscription?.current_period_end)) {
-          quotaPeriod.textContent = `Zeitraum: ${start} bis ${end}`;
+          quotaPeriod.textContent = `Aktueller Zeitraum: ${start} bis ${end}`;
         } else if (subscriptionStatus === "active" || subscriptionStatus === "trialing") {
           quotaPeriod.textContent = "Status: aktive Mitgliedschaft";
         } else if (subscriptionStatus === "past_due") {
-          quotaPeriod.textContent = "Status: Zahlungsproblem im Abo – bitte Tarif verwalten";
+          quotaPeriod.textContent = "Status: Zahlungsproblem – bitte Mitgliedschaft verwalten";
         } else {
-          quotaPeriod.textContent = "Status: aktuell kein aktiver Abo-Zeitraum";
+          quotaPeriod.textContent = "Status: aktuell kein aktiver Zeitraum";
         }
       }
     }
 
     if (quotaSummary) {
       if (isSingleStatusView) {
-        const includedTotal = Number(quota.included_total || 0);
-        const consumedTotal = Number(quota.consumed_total || 0);
-
-        quotaSummary.textContent = includedTotal === 0 && consumedTotal === 0
-          ? "Noch kein bezahlter Einzeltermin."
-          : `Einzeltermine: ${includedTotal} · verbraucht: ${consumedTotal}`;
+        quotaSummary.textContent = latestSubmission
+          ? "Einreichung erhalten. Veröffentlichung erst nach Prüfung."
+          : "Noch keine Einreichung gefunden.";
       } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Kontingent: unbegrenzt · verbraucht: ${Number(quota.consumed_total || 0)}`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · unbegrenzt möglich`;
       } else {
-        quotaSummary.textContent = `Kontingent: ${Number(quota.included_total || 0)} · verbraucht: ${Number(quota.consumed_total || 0)}`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
       }
     }
 
     if (quotaRemaining) {
       if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Verbleibend: unbegrenzt";
+        quotaRemaining.textContent = "Weitere Veröffentlichungen: unbegrenzt";
       } else if (isSingleStatusView) {
-        quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)}`;
+        quotaRemaining.textContent = "Keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = `Verbleibend: ${Number(quota.remaining_total || 0)}`;
+        quotaRemaining.textContent = `Noch veröffentlichbar: ${Number(quota.remaining_total || 0)}`;
       }
     }
 
     if (submissionsHead) {
-      submissionsHead.textContent = "Letzte Einreichungen";
+      submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Letzte Einreichungen";
     }
 
     if (submissionsList && submissionsEmpty) {
@@ -654,7 +655,7 @@ if (membershipStarted) {
       }
     }
   }
-
+  /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 === */
   /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 | Zweck: laedt Dashboard-State und aktiviert bei gueltiger Session den Logout-Link; Umfang: komplette handleDashboardPage-Funktion === */
   async function handleDashboardPage() {
     try {
