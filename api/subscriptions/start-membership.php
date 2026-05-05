@@ -397,7 +397,7 @@ try {
 
         be_json_response(409, [
             'status' => 'error',
-            'message' => 'Für diese E-Mail existiert bereits ein Veranstalterbereich. Bitte logge dich ein oder fordere einen neuen Zugangslink an.',
+            'message' => 'Für diese E-Mail gibt es bereits eine Einreichung oder Mitgliedschaft. Bitte öffne deinen Bereich per E-Mail-Link.',
             'data' => [
                 'existing_organizer' => true,
                 'login_url' => '/fuer-veranstalter/login/?email=' . rawurlencode($emailInput),
