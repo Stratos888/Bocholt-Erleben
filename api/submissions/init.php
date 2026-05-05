@@ -61,7 +61,7 @@ function pf_validate_model_key(string $modelKey): string
 {
     $allowed = ['single', 'starter', 'active', 'unlimited'];
     if (!in_array($modelKey, $allowed, true)) {
-        throw new InvalidArgumentException('Veröffentlichungsweg ist ungültig.');
+        throw new InvalidArgumentException('Einreichungsweg ist ungültig.');
     }
 
     return $modelKey;
@@ -258,7 +258,7 @@ try {
     $input = pf_read_json_body();
 
     $requestedModelKey = pf_validate_model_key(
-        pf_required_string($input, 'requested_model_key', 'Veröffentlichungsweg')
+        pf_required_string($input, 'requested_model_key', 'Einreichungsweg')
     );
 
     $organizationName = pf_required_string($input, 'organization_name', 'Veranstalter / Organisation');
