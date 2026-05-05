@@ -58,7 +58,7 @@
       single: "Einzeltermin",
       starter: "Starter",
       active: "Aktiv",
-      unlimited: "Unbegrenzt"
+      unlimited: "Dauerhaft"
     })[key] || "–";
   }
 
@@ -597,7 +597,7 @@
           ? "Einreichung erhalten. Veröffentlichung erst nach Prüfung."
           : "Noch keine Einreichung gefunden.";
       } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · unbegrenzt möglich`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
       } else {
         quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
       }
@@ -605,7 +605,7 @@
 
     if (quotaRemaining) {
       if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Weitere Veröffentlichungen: unbegrenzt";
+        quotaRemaining.textContent = "Weitere Veröffentlichungen: im üblichen Rahmen möglich";
       } else if (isSingleStatusView) {
         quotaRemaining.textContent = "Keine Mitgliedschaft aktiv.";
       } else {
