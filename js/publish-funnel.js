@@ -11,7 +11,7 @@
   const cfg = {
     automationEmail: "mathias@bocholt-erleben.de",
     automationFormspreeEndpoint: "",
-    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Quelle und melden uns, falls noch Angaben fehlen.",
+    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Termine und melden uns, falls noch Angaben fehlen.",
     automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
     storageKey: "be_publish_checkout_context_v1",
     paymentLinks: {
@@ -257,8 +257,8 @@
       lineIf("Organisation / Veranstalter", context.organization),
       lineIf("Ansprechpartner", context.contact),
       lineIf("E-Mail", context.email),
-      lineIf("Vorhandene Quelle", context.sourceType),
-      lineIf("Link zur Quelle oder zu Beispielterminen", context.sourceLink),
+      lineIf("Wo stehen die Termine?", context.sourceType),
+      lineIf("Link zu Terminen oder Beispielen", context.sourceLink),
       lineIf("Website", context.website),
       lineIf("Aktualisierungsrhythmus", context.cadence),
       lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", context.monthlyVolume),
@@ -322,7 +322,7 @@
 
   function buildAutomationPayload(context) {
     const formData = new FormData();
-    formData.append("subject", "Bocholt erleben - Automatische Anbindung anfragen");
+    formData.append("subject", "Bocholt erleben - Automatische Übernahme prüfen lassen");
     formData.append("request_type", "publish_automation_request");
     formData.append("source_label", "bocholt-erleben-web");
     formData.append("page_url", window.location.href);
@@ -355,7 +355,7 @@
     });
 
     if (!response.ok) {
-      throw new Error(`Formspree request failed with status ${response.status}`);
+      throw new Error("automation_request_failed");
     }
 
     return { mode: "formspree" };
@@ -364,12 +364,12 @@
   /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 | Zweck: ersetzt den alten Payment-Link-Flow durch den serverseitigen Submission->Checkout-Flow; Umfang: Standard-Validierung, API-Helper, Submit-State und bindStandardPath in js/publish-funnel.js === */
   function validateStandardContext(context) {
     if (!hasValue(context.plan)) {
-      window.alert("Bitte wähle zuerst ein Modell aus.");
+      window.alert("Bitte wähle zuerst einen Einreichungsweg aus.");
       return false;
     }
 
     if (!hasValue(context.eventLink) && !(hasValue(context.title) && hasValue(context.date) && hasValue(context.place))) {
-      window.alert("Bitte füge einen Event-Link ein. Wenn dort wichtige Angaben fehlen, ergänze Titel, Datum und Ort direkt im Formular.");
+      window.alert("Bitte füge einen Link zur Veranstaltung ein. Wenn dort wichtige Angaben fehlen, ergänze Titel, Datum und Ort direkt im Formular.");
       return false;
     }
 
@@ -399,7 +399,7 @@
       const message =
         safeText(data?.message) ||
         safeText(data?.error_message) ||
-        `Request failed with status ${response.status}`;
+        "request_failed";
 
       const requestError = new Error(message);
       requestError.responseStatus = response.status;
@@ -408,7 +408,7 @@
     }
 
     if (!data || typeof data !== "object") {
-      throw new Error("API response is invalid.");
+      throw new Error("invalid_api_response");
     }
 
     return data;
@@ -435,17 +435,17 @@
     if (!trigger) return;
 
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Prüfung und Zahlung";
+      trigger.dataset.defaultLabel = trigger.textContent || "Einreichung abschließen";
     }
 
     trigger.disabled = isSubmitting;
     trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
-    trigger.textContent = isSubmitting ? "Weiterleitung wird vorbereitet ..." : trigger.dataset.defaultLabel;
+    trigger.textContent = isSubmitting ? "Einreichung wird vorbereitet ..." : trigger.dataset.defaultLabel;
   }
 
   function validateAutomationContext(context) {
     if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
-      window.alert("Bitte gib mindestens einen Link zu deiner Quelle oder Website an.");
+      window.alert("Bitte gib mindestens einen Link zu deinen Terminen oder deiner Website an.");
       return false;
     }
 
@@ -478,7 +478,7 @@
         const paymentReferenceKey = safeText(initResult?.data?.payment_reference_key);
 
         if (submissionId <= 0) {
-          throw new Error("Submission konnte nicht angelegt werden.");
+          throw new Error("missing_submission_id");
         }
 
         persistCheckoutContext({
@@ -499,7 +499,7 @@
 
         if (!checkoutRequired) {
           if (!hasValue(redirectUrl)) {
-            throw new Error("Redirect-URL fehlt.");
+            throw new Error("missing_redirect_url");
           }
 
           window.location.href = redirectUrl;
@@ -507,13 +507,13 @@
         }
 
         if (!hasValue(checkoutUrl)) {
-          throw new Error("Checkout-URL fehlt.");
+          throw new Error("missing_checkout_url");
         }
 
         window.location.href = checkoutUrl;
       } catch (error) {
         console.warn("Publish funnel: standard checkout init failed.", error);
-        window.alert(safeText(error?.message) || "Der nächste Schritt konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+        window.alert("Der nächste Schritt konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
         setStandardSubmitting(trigger, false);
       }
     });
