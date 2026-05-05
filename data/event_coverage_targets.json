@@ -238,5 +238,35 @@
     "source_hint": "koppelkerk.nl",
     "priority": "must",
     "cluster": "koppelkerk-books"
+  },
+  {
+    "id": "bocholter-kirmes-2026",
+    "title": "Bocholter Kirmes",
+    "aliases": ["Bocholter Kirmes 2026", "Kirmes 2026", "Kirmes Bocholt"],
+    "expected_date": "2026-10-16",
+    "expected_endDate": "2026-10-19",
+    "source_hint": "bocholt.de/veranstaltungskalender/kirmes-2026",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "lichtersonntag-bocholt-2026",
+    "title": "Lichtersonntag",
+    "aliases": ["Lichtersonntag 2026", "Lichtersonntag Bocholt"],
+    "expected_date": "2026-11-08",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/lichtersonntag-2026",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
+  },
+  {
+    "id": "bocholter-weihnachtsmarkt-2026",
+    "title": "Bocholter Weihnachtsmarkt",
+    "aliases": ["Bocholter Weihnachtsmarkt 2026", "Weihnachtsmarkt Bocholt"],
+    "expected_date": "2026-11-26",
+    "expected_endDate": "",
+    "source_hint": "bocholt.de/veranstaltungskalender/bocholter-weihnachtsmarkt-2026",
+    "priority": "must",
+    "cluster": "bocholt-highlight"
   }
 ]
