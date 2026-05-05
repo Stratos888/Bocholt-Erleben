@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_HEAD_V1 | Zweck: definiert den SEO-/PWA-/Meta-Head für die transaktionale Erfolgsseite nach Stripe-Checkout; Umfang: kompletter Head dieser Datei === -->
+   <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_HEAD_V2_AREA_COPY | Zweck: macht die transaktionale Erfolgsseite neutral für Einzeltermin, Mitgliedschaft und Abo-Reuse ohne gekaufte-Mitgliedschaft-Mischsprache; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Zahlung erfolgreich | Event veröffentlichen in Bocholt</title>
+  <title>Bestätigung erhalten | Event veröffentlichen in Bocholt</title>
   <meta
     name="description"
-    content="Bestätigung nach erfolgreicher Zahlung für Einzeltermin oder Mitgliedschaft bei Bocholt erleben. Die Veröffentlichung wird danach inhaltlich geprüft."
+    content="Bestätigung nach Einreichung oder Zahlung bei Bocholt erleben. Die Veröffentlichung wird danach inhaltlich geprüft."
   >
   <meta name="robots" content="noindex, nofollow">
 
@@ -23,14 +23,14 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
-  <meta property="og:title" content="Zahlung erfolgreich | Event veröffentlichen in Bocholt">
-  <meta property="og:description" content="Bestätigung nach erfolgreicher Zahlung für Einzeltermin oder Mitgliedschaft bei Bocholt erleben.">
+  <meta property="og:title" content="Bestätigung erhalten | Event veröffentlichen in Bocholt">
+  <meta property="og:description" content="Bestätigung nach Einreichung oder Zahlung bei Bocholt erleben.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/erfolg/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Zahlung erfolgreich | Event veröffentlichen in Bocholt">
-  <meta name="twitter:description" content="Bestätigung nach erfolgreicher Zahlung für Einzeltermin oder Mitgliedschaft bei Bocholt erleben.">
+  <meta name="twitter:title" content="Bestätigung erhalten | Event veröffentlichen in Bocholt">
+  <meta name="twitter:description" content="Bestätigung nach Einreichung oder Zahlung bei Bocholt erleben.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -41,8 +41,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Zahlung erfolgreich",
-    "description": "Bestätigung nach erfolgreicher Zahlung für Einzeltermin oder Mitgliedschaft bei Bocholt erleben.",
+    "name": "Bestätigung erhalten",
+    "description": "Bestätigung nach Einreichung oder Zahlung bei Bocholt erleben.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/erfolg/",
     "isPartOf": {
       "@type": "WebSite",
@@ -53,7 +53,7 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: PUBLISH_SUCCESS_HEAD_V1 === -->
+  <!-- === END BLOCK: PUBLISH_SUCCESS_HEAD_V2_AREA_COPY === -->
 </head>
 
 <body>
@@ -69,23 +69,23 @@
     </a>
   </header>
 
-  <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V1 | Zweck: trennt den Erfolgspfad für echte Zahlungen von Einreichungen über bestehende Mitgliedschaft; Umfang: kompletter Main-Bereich plus zustandsabhängiges Inline-Script auf der Erfolgsseite === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V2_AREA_COPY | Zweck: trennt die allgemeine Bestätigung sauber von Einreichungen über bestehende Mitgliedschaft und vermeidet Kontingent-/Kauf-Mischsprache; Umfang: kompletter Main-Bereich plus zustandsabhängige Text- und CTA-Steuerung === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker" id="publish-success-kicker">Zahlung erfolgreich</p>
-      <h1 id="publish-success-title">Danke, die Zahlung ist eingegangen.</h1>
+      <p class="content-kicker" id="publish-success-kicker">Bestätigung erhalten</p>
+      <h1 id="publish-success-title">Danke, der Vorgang ist abgeschlossen.</h1>
 
       <p class="content-lead" id="publish-success-lead">
-        Einzeltermin oder Mitgliedschaft wurden erfolgreich gekauft. Die Veröffentlichung selbst erfolgt weiter erst nach Prüfung.
+        Deine Einreichung oder Mitgliedschaft wurde bestätigt. Die Veröffentlichung selbst erfolgt weiter erst nach Prüfung.
       </p>
 
       <p class="content-note" id="publish-success-note">
-        Die Zahlungsbestätigung erhältst du zusätzlich von Stripe.
+        Falls eine Zahlung nötig war, erhältst du die Zahlungsbestätigung zusätzlich von Stripe.
       </p>
 
       <div class="content-actions content-actions--inline">
-        <a class="content-cta content-cta--primary" id="publish-success-cta" href="/events-veroeffentlichen/">
-          Zurück zu Event veröffentlichen
+        <a class="content-cta content-cta--primary" id="publish-success-cta" href="/fuer-veranstalter/login/">
+          Bereich öffnen
         </a>
       </div>
     </header>
@@ -93,18 +93,18 @@
     <section class="content-card content-card--primary" aria-labelledby="publish-success-next-steps">
       <h2 id="publish-success-next-steps">Nächste Schritte</h2>
       <div id="publish-success-steps">
-        <p>1. Stripe bestätigt die Zahlung.</p>
-        <p>2. Wir ordnen den Kauf zu und melden uns nur, falls noch Angaben fehlen.</p>
+        <p>1. Wir prüfen die Angaben und melden uns nur, falls noch etwas fehlt.</p>
+        <p>2. Über „Bereich öffnen“ kannst du später deine Einreichung oder deinen Veranstalterbereich aufrufen.</p>
       </div>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V1 === -->
+  <!-- === END BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V2_AREA_COPY === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <script>
-    /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V1 | Zweck: schaltet die Erfolgsseite bei flow=existing-subscription von Zahlungsbestätigung auf Einreichungsbestätigung über aktive Mitgliedschaft um; Umfang: zustandsabhängige Text- und CTA-Steuerung auf /events-veroeffentlichen/erfolg/ === */
+     /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V2_AREA_COPY | Zweck: schaltet die Erfolgsseite bei flow=existing-subscription auf klare Einreichungsbestätigung über aktive Mitgliedschaft ohne Kontingent-Wording; Umfang: zustandsabhängige Text- und CTA-Steuerung auf /events-veroeffentlichen/erfolg/ === */
     (function () {
       const params = new URLSearchParams(window.location.search);
       const flow = String(params.get("flow") || "").trim().toLowerCase();
@@ -119,12 +119,12 @@
       const steps = document.getElementById("publish-success-steps");
 
       if (kicker) kicker.textContent = "Event eingereicht";
-      if (title) title.textContent = "Deine aktive Mitgliedschaft wurde verwendet.";
+      if (title) title.textContent = "Deine Mitgliedschaft wurde verwendet.";
       if (lead) {
         lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Dein Event wurde eingereicht und geht jetzt in die Prüfung.";
       }
       if (note) {
-        note.textContent = "Dein Kontingent wird erst bei Freigabe der Veröffentlichung belastet.";
+        note.textContent = "Die Veröffentlichung wird erst bei Freigabe als veröffentlichter Termin im aktuellen Zeitraum gezählt.";
       }
       if (cta) {
         cta.textContent = "Zum Veranstalterbereich";
@@ -136,7 +136,7 @@
 
       document.title = "Event eingereicht | Bocholt erleben";
     })();
-    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V1 === */
+    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V2_AREA_COPY === */
   </script>
 </body>
 </html>
