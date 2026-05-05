@@ -631,7 +631,7 @@ const createFeedPublishEntry = () => {
   const link = document.createElement("a");
   link.className = "feed-publish-entry";
   link.href = "/events-veroeffentlichen/";
-  link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+  link.setAttribute("aria-label", "Für Veranstalter – Event einreichen");
 
   const label = document.createElement("span");
   label.className = "feed-publish-entry__label";
@@ -642,7 +642,7 @@ const createFeedPublishEntry = () => {
 
   const title = document.createElement("span");
   title.className = "feed-publish-entry__title";
-  title.textContent = "Event veröffentlichen";
+  title.textContent = "Event einreichen";
 
   const chevron = document.createElement("span");
   chevron.className = "feed-publish-entry__chevron";
