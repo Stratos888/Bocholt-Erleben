@@ -87,14 +87,14 @@
         <div class="publish-section-head">
           <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
           <p class="content-note">
-            Pflicht sind Veröffentlichungsweg, Veranstalter und E-Mail-Adresse. Fehlende Eventdetails kannst du ergänzen.
+            Pflicht sind Einreichungsweg, Veranstalter und E-Mail-Adresse. Fehlende Angaben zur Veranstaltung kannst du ergänzen.
           </p>
         </div>
 
         <form class="content-form" id="publish-standard-form" novalidate>
           <div class="content-form-grid">
             <label class="content-field" for="publish-standard-plan">
-              <span class="content-field__label">Veröffentlichungsweg *</span>
+              <span class="content-field__label">Einreichungsweg *</span>
               <select class="content-field__control" id="publish-standard-plan" name="plan" required>
                 <option value="">Bitte wählen</option>
                 <option value="single">Einzeltermin · 9,90 € einmalig</option>
@@ -102,7 +102,7 @@
                 <option value="active">Aktiv · regelmäßiges Programm · 19,99 € / Monat</option>
                 <option value="unlimited">Dauerhaft · laufendes Programm · 29,99 € / Monat</option>
               </select>
-              <p class="content-field__hint">Der Veröffentlichungsweg bestimmt, ob es bei einem einzelnen Event bleibt oder eine Mitgliedschaft genutzt wird.</p>
+              <p class="content-field__hint">Der Einreichungsweg bestimmt, ob es bei einer einzelnen Veranstaltung bleibt oder eine Mitgliedschaft genutzt wird.</p>
             </label>
 
             <label class="content-field" for="publish-standard-organization">
@@ -118,18 +118,18 @@
             <label class="content-field" for="publish-standard-email">
               <span class="content-field__label">E-Mail-Adresse *</span>
               <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-              <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Statuszugang.</p>
+              <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Zugriff auf deine Einreichung.</p>
             </label>
 
             <label class="content-field content-field--full" for="publish-standard-event-link">
-              <span class="content-field__label">Event-Link oder Kalender-Link</span>
+              <span class="content-field__label">Link zur Veranstaltung oder zum Kalender</span>
               <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
               <p class="content-field__hint">Am besten direkt die Seite, auf der Titel, Datum, Ort und Beschreibung stehen.</p>
             </label>
           </div>
 
           <details class="publish-optional-fields">
-            <summary>Zusätzliche Angaben, falls im Event-Link etwas fehlt</summary>
+            <summary>Zusätzliche Angaben, falls im Link etwas fehlt</summary>
             <div class="publish-optional-fields__body">
               <div class="content-form-grid">
                 <label class="content-field" for="publish-standard-title">
@@ -174,8 +174,11 @@
 
           <div class="content-actions content-actions--inline publish-final-actions">
             <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-              Weiter zur Prüfung und Zahlung
+              Einreichung abschließen
             </button>
+            <p class="content-note">
+              Danach bestätigst du Zahlung oder Mitgliedschaft. Die Veröffentlichung erfolgt erst nach Prüfung und Freigabe.
+            </p>
           </div>
         </form>
       </section>
@@ -186,7 +189,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 | Zweck: Cache-Busting fuer publish-funnel.js nach Identity-/Readonly-Fix; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-05-service-copy-1" defer></script>
+  <script src="/js/publish-funnel.js?v=2026-05-05-final-wording-1" defer></script>
   <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 === -->
   <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 === -->
 </body>
