@@ -72,7 +72,7 @@ jobs:
           TAB_ARCHIVE: Inbox_Archive
 
           MAX_NEW_CANDIDATES: "24"
-          SEARCH_WINDOW_DAYS: "180"
+          SEARCH_WINDOW_DAYS: "210"
           ALLOW_RADIUS_KM: "20"
 
           # === BEGIN BLOCK: WEEKLY_PENDING_INBOX_WARN_ENV_V1 | Zweck: offene Inbox nur warnen, nicht blockieren; Dedupe gegen Inbox bleibt aktiv | Umfang: ersetzt alte FAIL_ON_PENDING_INBOX-Env durch WARN_ON_PENDING_INBOX ===
