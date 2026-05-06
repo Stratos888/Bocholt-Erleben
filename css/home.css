@@ -862,7 +862,7 @@
 
   body.is-tabbar-hidden .header-right,
   body.page-route-activities .header-right{
-    display: none;
+    display: inline-flex;
   }
   /* === END BLOCK: HOME_SHARED_DESKTOP_HEADER_TOKEN_CONSUMERS_V1 === */
 
