@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V2_SERVICE_INTAKE | Zweck: positioniert die Einreichungsseite als serviceorientierte Prüfungsvorbereitung statt als Zahlungsformular; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V3 | Zweck: positioniert die Einreichungsseite klar als Einzeltermin-Formular ohne Automations- oder Mitgliedschaftsversprechen; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Veranstaltung einreichen | Bocholt erleben</title>
+  <title>Einzelne Veranstaltung einreichen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Veranstaltung bei Bocholt erleben einreichen: Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen."
+    content="Einzelne Veranstaltung bei Bocholt erleben einreichen: wichtigste Angaben übermitteln, Zahlungsmethode bestätigen und anschließend prüfen lassen."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
@@ -22,14 +22,14 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
-  <meta property="og:title" content="Veranstaltung einreichen | Bocholt erleben">
-  <meta property="og:description" content="Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen.">
+  <meta property="og:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
+  <meta property="og:description" content="Einzelne Veranstaltung einreichen, Zahlungsmethode bestätigen und anschließend prüfen lassen.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Veranstaltung einreichen | Bocholt erleben">
-  <meta name="twitter:description" content="Veranstaltung einreichen, Angaben prüfen lassen und nach Freigabe auf Bocholt erleben veröffentlichen.">
+  <meta name="twitter:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
+  <meta name="twitter:description" content="Einzelne Veranstaltung einreichen, Zahlungsmethode bestätigen und anschließend prüfen lassen.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -40,8 +40,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Veranstaltung einreichen",
-    "description": "Veranstaltung bei Bocholt erleben einreichen: Event-Link oder fehlende Angaben übermitteln, prüfen lassen und den passenden Veröffentlichungsweg bestätigen.",
+    "name": "Einzelne Veranstaltung einreichen",
+    "description": "Einzelne Veranstaltung bei Bocholt erleben einreichen: wichtigste Angaben übermitteln, Zahlungsmethode bestätigen und anschließend prüfen lassen.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/einreichen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -52,13 +52,13 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_HEAD_V2_SERVICE_INTAKE === -->
+  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V3 === -->
 </head>
 
-<!-- === BEGIN BLOCK: PUBLISH_STANDARD_BODY_MODE_V1 | Zweck: markiert die Einreichungsseite als Standard-Funnel, damit eingeloggte Veranstalterdaten und aktives Abo synchronisiert werden; Umfang: body-Tag === -->
-<body data-publish-mode="standard">
-<!-- === END BLOCK: PUBLISH_STANDARD_BODY_MODE_V1 === -->
-  <!-- === BEGIN BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 | Zweck: rendert die dedizierte Standardweg-Route mit Link-first-Intake und Stripe-Vorbereitung, getrennt von Landing und Profi-Pfad; Umfang: kompletter Body dieser Datei === -->
+<!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_BODY_MODE_V1 | Zweck: markiert diese Route als reinen Einzeltermin-Weg ohne Mitgliedschafts-/Abo-Reuse im Formular; Umfang: body-Tag === -->
+<body data-publish-mode="single">
+<!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_MODE_V1 === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 | Zweck: rendert die Einzeltermin-Einreichung als kleines Formular mit Orts-/Berechtigungsprüfung und ohne Mitgliedschaftsauswahl; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -68,131 +68,126 @@
       >
       <span class="app-title">Bocholt erleben</span>
     </a>
+
+    <div class="header-right">
+      <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+        <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+        <span class="pwa-install-button__label">Zugang</span>
+      </a>
+    </div>
   </header>
 
-    <!-- === BEGIN BLOCK: PUBLISH_STANDARD_ROUTE_SERVICE_INTAKE_V1 | Zweck: dreht die Einreichungsroute von Modell-/Zahlungsfokus auf Prüfungsvorbereitung und Veröffentlichungsweg, ohne IDs oder Checkout-Logik zu ändern; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/einreichen/ === -->
-    <main class="page page--publish">
-      <header class="content-hero content-hero--panel">
-        <div class="publish-hero-layout">
-          <div class="publish-hero-copy">
-            <h1>Veranstaltung einreichen</h1>
-            <p class="content-note publish-hero-trust">
-              Am besten direkt den Event-Link eintragen. Wir prüfen die Angaben und bereiten die Veröffentlichung nach Freigabe vor.
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
-        <div class="publish-section-head">
-          <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
-          <p class="content-note">
-            Pflicht sind Einreichungsweg, Veranstalter und E-Mail-Adresse. Fehlende Angaben zur Veranstaltung kannst du ergänzen.
+  <main class="page page--publish">
+    <header class="content-hero content-hero--panel">
+      <div class="publish-hero-layout">
+        <div class="publish-hero-copy">
+          <h1>Einzelne Veranstaltung einreichen</h1>
+          <p class="content-lead">
+            Für einen einzelnen Termin ohne laufendes Modell. Trage die wichtigsten Angaben ein, damit wir die Veranstaltung prüfen können.
           </p>
         </div>
+      </div>
+    </header>
 
-        <form class="content-form" id="publish-standard-form" novalidate>
-          <div class="content-form-grid">
-            <label class="content-field" for="publish-standard-plan">
-              <span class="content-field__label">Einreichungsweg *</span>
-              <select class="content-field__control" id="publish-standard-plan" name="plan" required>
-                <option value="">Bitte wählen</option>
-                <option value="single">Einzeltermin · 9,90 € einmalig</option>
-                <option value="starter">Starter · gelegentliche Termine · 9,99 € / Monat</option>
-                <option value="active">Aktiv · regelmäßiges Programm · 19,99 € / Monat</option>
-                <option value="unlimited">Dauerhaft · laufendes Programm · 29,99 € / Monat</option>
-              </select>
-              <p class="content-field__hint">Der Einreichungsweg bestimmt, ob es bei einer einzelnen Veranstaltung bleibt oder eine Mitgliedschaft genutzt wird.</p>
-            </label>
+    <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
+      <div class="publish-section-head">
+        <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
+        <p class="content-note">
+          Pflicht sind Veranstalter, E-Mail-Adresse, Titel, Datum, Veranstaltungsort und ein öffentlicher Treffpunkt.
+        </p>
+      </div>
 
-            <label class="content-field" for="publish-standard-organization">
-              <span class="content-field__label">Veranstalter / Organisation *</span>
-              <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
-            </label>
-
-            <label class="content-field" for="publish-standard-contact">
-              <span class="content-field__label">Ansprechpartner</span>
-              <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
-            </label>
-
-            <label class="content-field" for="publish-standard-email">
-              <span class="content-field__label">E-Mail-Adresse *</span>
-              <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-              <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Zugriff auf deine Einreichung.</p>
-            </label>
-
-            <label class="content-field content-field--full" for="publish-standard-event-link">
-              <span class="content-field__label">Link zur Veranstaltung oder zum Kalender</span>
-              <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
-              <p class="content-field__hint">Am besten direkt die Seite, auf der Titel, Datum, Ort und Beschreibung stehen.</p>
-            </label>
+      <form class="content-form" id="publish-standard-form" novalidate>
+        <div class="content-form-grid">
+          <div class="content-field content-field--full" aria-labelledby="publish-standard-plan-label">
+            <span class="content-field__label" id="publish-standard-plan-label">Ausgewählter Weg</span>
+            <input id="publish-standard-plan" name="plan" type="hidden" value="single">
+            <p class="content-note">Einzeltermin · 9,90&nbsp;€ einmalig</p>
           </div>
 
-          <details class="publish-optional-fields">
-            <summary>Zusätzliche Angaben, falls im Link etwas fehlt</summary>
-            <div class="publish-optional-fields__body">
-              <div class="content-form-grid">
-                <label class="content-field" for="publish-standard-title">
-                  <span class="content-field__label">Titel</span>
-                  <input class="content-field__control" id="publish-standard-title" name="title" type="text">
-                </label>
+          <label class="content-field" for="publish-standard-organization">
+            <span class="content-field__label">Veranstalter / Organisation *</span>
+            <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
 
-                <label class="content-field" for="publish-standard-date">
-                  <span class="content-field__label">Datum</span>
-                  <input class="content-field__control" id="publish-standard-date" name="date" type="date">
-                </label>
+          <label class="content-field" for="publish-standard-email">
+            <span class="content-field__label">E-Mail-Adresse *</span>
+            <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+            <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Zugriff auf deine Einreichung.</p>
+          </label>
 
-                <label class="content-field" for="publish-standard-time">
-                  <span class="content-field__label">Uhrzeit</span>
-                  <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
-                </label>
+          <label class="content-field" for="publish-standard-title">
+            <span class="content-field__label">Titel der Veranstaltung *</span>
+            <input class="content-field__control" id="publish-standard-title" name="title" type="text" required>
+          </label>
 
-                <label class="content-field" for="publish-standard-place">
-                  <span class="content-field__label">Ort</span>
-                  <input class="content-field__control" id="publish-standard-place" name="place" type="text">
-                </label>
+          <label class="content-field" for="publish-standard-date">
+            <span class="content-field__label">Datum *</span>
+            <input class="content-field__control" id="publish-standard-date" name="date" type="date" required>
+          </label>
 
-                <label class="content-field content-field--full" for="publish-standard-website">
-                  <span class="content-field__label">Website oder Ticketlink</span>
-                  <input class="content-field__control" id="publish-standard-website" name="website" type="url" inputmode="url" placeholder="https://...">
-                </label>
+          <label class="content-field" for="publish-standard-time">
+            <span class="content-field__label">Uhrzeit</span>
+            <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
+          </label>
 
-                <label class="content-field content-field--full" for="publish-standard-description">
-                  <span class="content-field__label">Kurzbeschreibung</span>
-                  <textarea class="content-field__control" id="publish-standard-description" name="description" rows="3"></textarea>
-                  <p class="content-field__hint">Kurz und sachlich, am besten 1 bis 3 Sätze.</p>
-                </label>
+          <label class="content-field" for="publish-standard-place">
+            <span class="content-field__label">Veranstaltungsort / Location *</span>
+            <input class="content-field__control" id="publish-standard-place" name="place" type="text" required>
+          </label>
 
-                <label class="content-field content-field--full" for="publish-standard-notes">
-                  <span class="content-field__label">Weitere Hinweise (optional)</span>
-                  <textarea class="content-field__control" id="publish-standard-notes" name="notes" rows="2"></textarea>
-                  <p class="content-field__hint">Nur wenn noch etwas Wichtiges ergänzt werden muss.</p>
-                </label>
-              </div>
-            </div>
-          </details>
+          <label class="content-field content-field--full" for="publish-standard-place-address">
+            <span class="content-field__label">Adresse oder öffentlicher Treffpunkt *</span>
+            <input class="content-field__control" id="publish-standard-place-address" name="placeAddress" type="text" required>
+            <p class="content-field__hint">Bitte möglichst mit Straße, Hausnummer und Ort. Bei Routen oder Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben. Keine Privatadressen Dritter eintragen.</p>
+          </label>
 
-          <!-- === BEGIN BLOCK: PUBLISH_STANDARD_FINAL_ACTION_COPY_V2 | Zweck: erklärt den Folgeschritt nach Abschluss der Einreichung differenziert für Einzeltermin, neue Mitgliedschaft und aktive Mitgliedschaft; Umfang: finaler CTA-Block im Einreichungsformular === -->
-          <div class="content-actions content-actions--inline publish-final-actions">
-            <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-              Einreichung abschließen
-            </button>
-            <p class="content-note">
-              Beim Einzeltermin folgt die einmalige Zahlung. Bei einer Mitgliedschaft bestätigst du die monatliche Zahlung oder nutzt eine bereits aktive Mitgliedschaft. Die Veröffentlichung erfolgt erst nach Prüfung und Freigabe.
-            </p>
-          </div>
-          <!-- === END BLOCK: PUBLISH_STANDARD_FINAL_ACTION_COPY_V2 === -->
-        </form>
-      </section>
-    </main>
-    <!-- === END BLOCK: PUBLISH_STANDARD_ROUTE_SERVICE_INTAKE_V1 === -->
+          <label class="content-field content-field--full" for="publish-standard-event-link">
+            <span class="content-field__label">Link zur Veranstaltungsseite</span>
+            <input class="content-field__control" id="publish-standard-event-link" name="eventLink" type="url" inputmode="url" placeholder="https://...">
+            <p class="content-field__hint">Optional. Hilft besonders, wenn Ort oder Veranstalter geprüft werden müssen.</p>
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-description">
+            <span class="content-field__label">Kurze Beschreibung oder Hinweise</span>
+            <textarea class="content-field__control" id="publish-standard-description" name="description" rows="3"></textarea>
+            <p class="content-field__hint">Kurz und sachlich. Falls du noch keinen fertigen Beschreibungstext hast, reichen wichtige Hinweise.</p>
+          </label>
+
+          <label class="content-field" for="publish-standard-contact">
+            <span class="content-field__label">Ansprechperson</span>
+            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
+          </label>
+
+          <label class="content-field content-field--full" for="publish-standard-location-confirmed">
+            <span class="content-field__label">Bestätigung *</span>
+            <span class="content-field__hint">
+              <input id="publish-standard-location-confirmed" name="locationConfirmed" type="checkbox" required>
+              Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der angegebene Ort öffentlich als Veranstaltungsort oder Treffpunkt genannt werden darf.
+            </span>
+          </label>
+        </div>
+
+        <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V1 | Zweck: erklärt den nächsten Schritt für Einzeltermin-Einreichungen ohne Mitgliedschaftslogik; Umfang: finaler CTA-Block im Einreichungsformular === -->
+        <div class="content-actions content-actions--inline publish-final-actions">
+          <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
+            Einreichung abschließen
+          </button>
+          <p class="content-note">
+            Danach folgt die Zahlungsmethode. Die Einreichung wird anschließend geprüft.
+          </p>
+        </div>
+        <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V1 === -->
+      </form>
+    </section>
+  </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 | Zweck: Cache-Busting fuer publish-funnel.js nach Identity-/Readonly-Fix; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-05-final-wording-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V2 === -->
-  <!-- === END BLOCK: PUBLISH_SUBPAGE_STANDARD_BODY_V1 === -->
+  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V3 | Zweck: Cache-Busting fuer publish-funnel.js nach Einzeltermin-Formular- und Validierungsanpassung; Umfang: genau eine Script-Zeile === -->
+  <script src="/js/publish-funnel.js?v=2026-05-06-single-intake-1" defer></script>
+  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V3 === -->
+  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 === -->
 </body>
 </html>
