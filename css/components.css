@@ -903,7 +903,7 @@
   display: inline-block;
 }
 
-/* === BEGIN BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V3 | Zweck: hält mobile App/Info/Zugang erreichbar und reduziert den Desktop-Header auf den Rückkehrpfad Zugang; Umfang: responsive Regeln im bestehenden Header-Button-Owner === */
+/* === BEGIN BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V4 | Zweck: hält mobile App/Info/Zugang erreichbar und reduziert den Desktop-Header auf den Rückkehrpfad Zugang; Umfang: responsive Regeln im bestehenden Header-Button-Owner === */
 .header-right > .header-info-button,
 .header-right > .header-access-button{
   flex: 0 0 auto;
@@ -957,8 +957,7 @@
     gap: 6px;
   }
 }
-/* === END BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V3 === */
-/* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
+/* === END BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V4 === */
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
 /* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS | Purpose: absorb remaining event-card meta/location and filter-control detail rules from legacy.css so component DNA stays self-owned; Scope: event-meta base, tiny-card override, location row, filters-bar helper, pill subparts, reset icon states === */
