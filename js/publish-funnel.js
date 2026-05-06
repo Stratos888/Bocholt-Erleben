@@ -218,19 +218,30 @@ function applyPlanPresetFromUrl() {
     }
   }
 
-// === BEGIN FUNCTION: buildStandardContext | Zweck: liest die Standard-/Einzeltermin-Einreichung inklusive öffentlichem Treffpunkt und Berechtigungsbestätigung aus; Umfang: komplette Kontextfunktion ===
+// === BEGIN FUNCTION: buildStandardContext | Zweck: liest die Einzeltermin-Einreichung inklusive getrennten Ortsdaten und Berechtigungsbestätigung aus; Umfang: komplette Kontextfunktion ===
 function buildStandardContext() {
+  const placeStreet = safeText(byId("publish-standard-place-street")?.value);
+  const placeZip = safeText(byId("publish-standard-place-zip")?.value);
+  const placeCity = safeText(byId("publish-standard-place-city")?.value);
+  const placeAddress = [
+    placeStreet,
+    [placeZip, placeCity].filter(hasValue).join(" ")
+  ].filter(hasValue).join(", ");
+
   return {
     plan: safeText(byId("publish-standard-plan")?.value),
     organization: safeText(byId("publish-standard-organization")?.value),
-    contact: safeText(byId("publish-standard-contact")?.value),
+    contact: "",
     email: safeText(byId("publish-standard-email")?.value),
     eventLink: safeText(byId("publish-standard-event-link")?.value),
     title: safeText(byId("publish-standard-title")?.value),
     date: safeText(byId("publish-standard-date")?.value),
     time: safeText(byId("publish-standard-time")?.value),
     place: safeText(byId("publish-standard-place")?.value),
-    placeAddress: safeText(byId("publish-standard-place-address")?.value),
+    placeStreet,
+    placeZip,
+    placeCity,
+    placeAddress,
     website: safeText(byId("publish-standard-website")?.value),
     description: safeText(byId("publish-standard-description")?.value),
     notes: safeText(byId("publish-standard-notes")?.value),
@@ -238,16 +249,6 @@ function buildStandardContext() {
   };
 }
 // === END FUNCTION: buildStandardContext ===
-
-  function buildAutomationContext() {
-    return {
-      organization: safeText(byId("publish-automation-organization")?.value),
-      website: safeText(byId("publish-automation-website")?.value),
-      contact: safeText(byId("publish-automation-contact")?.value),
-      email: safeText(byId("publish-automation-email")?.value),
-      techContact: safeText(byId("publish-automation-tech-contact")?.value),
-      monthlyVolume: safeText(byId("publish-automation-volume")?.value),
-      sourceType: safeText(byId("publish-automation-source-type")?.value),
       sourceLink: safeText(byId("publish-automation-source-link")?.value),
       cadence: safeText(byId("publish-automation-cadence")?.value),
       notes: safeText(byId("publish-automation-notes")?.value)
@@ -380,13 +381,25 @@ function validateStandardContext(context) {
     return false;
   }
 
+// === BEGIN FUNCTION: validateStandardContext | Zweck: validiert den Einzeltermin-Weg mit getrennten Ortsdaten und ohne Mitgliedschaftsauswahl; Umfang: komplette Standard-Validierung ===
+function validateStandardContext(context) {
+  if (safeText(context.plan) !== "single") {
+    window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
+    return false;
+  }
+
+  if (!hasValue(context.organization) || !hasValue(context.email)) {
+    window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
+    return false;
+  }
+
   if (!hasValue(context.title) || !hasValue(context.date)) {
     window.alert("Bitte gib Titel und Datum der Veranstaltung an.");
     return false;
   }
 
-  if (!hasValue(context.place) || !hasValue(context.placeAddress)) {
-    window.alert("Bitte gib Veranstaltungsort und Adresse oder öffentlichen Treffpunkt an.");
+  if (!hasValue(context.place) || !hasValue(context.placeStreet) || !hasValue(context.placeZip) || !hasValue(context.placeCity)) {
+    window.alert("Bitte gib Veranstaltungsort, Straße oder Treffpunkt, PLZ und Ort an.");
     return false;
   }
 
@@ -398,16 +411,6 @@ function validateStandardContext(context) {
   return true;
 }
 // === END FUNCTION: validateStandardContext ===
-
-  async function postPublishApiJson(url, payload) {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
 
     const rawText = await response.text();
     let data = null;
@@ -448,6 +451,20 @@ function buildStandardSubmissionPayload(context) {
   ]);
 
   return {
+// === BEGIN FUNCTION: buildStandardSubmissionPayload | Zweck: baut den Einzeltermin-Payload und konserviert getrennte Ortsdaten sowie Ortsbestätigung bis zur späteren Review-Inbox-Anbindung in notes_text; Umfang: komplette Payload-Funktion ===
+function buildStandardSubmissionPayload(context) {
+  const notesText = joinLines([
+    lineIf("Straße / offizieller Treffpunkt", context.placeStreet),
+    lineIf("PLZ", context.placeZip),
+    lineIf("Ort", context.placeCity),
+    lineIf("Adresse zusammengesetzt", context.placeAddress),
+    context.locationConfirmed === true
+      ? "Ortsbestätigung: Einreicher bestätigt Berechtigung und öffentliche Nennung des Ortes."
+      : "",
+    lineIf("Weitere Hinweise", context.notes)
+  ]);
+
+  return {
     requested_model_key: "single",
     organization_name: context.organization,
     contact_name: context.contact,
@@ -463,20 +480,6 @@ function buildStandardSubmissionPayload(context) {
   };
 }
 // === END FUNCTION: buildStandardSubmissionPayload ===
-
-  function setStandardSubmitting(trigger, isSubmitting) {
-    if (!trigger) return;
-
-    if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Einreichung abschließen";
-    }
-
-    trigger.disabled = isSubmitting;
-    trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
-    trigger.textContent = isSubmitting ? "Einreichung wird vorbereitet ..." : trigger.dataset.defaultLabel;
-  }
-
-  function validateAutomationContext(context) {
     if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
       window.alert("Bitte gib mindestens einen Link zu deinen Terminen oder deiner Website an.");
       return false;
