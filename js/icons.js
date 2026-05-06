@@ -204,7 +204,8 @@ Umfang:
 
     "app-install": "download",
     "app-device": "download",
-
+    account: "users",
+    access: "users",
     "disclosure-right": "chevron-right",
     "disclosure-left": "chevron-left",
     "filter-next": "chevron-right",
