@@ -88,34 +88,23 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     >
     <span class="app-title">Bocholt erleben</span>
   </div>
- <div class="header-right">
-<!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
-<button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
-  <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
-  <span class="pwa-install-button__label">App</span>
-</button>
-<!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
- 
+  <div class="header-right">
+    <!-- === BEGIN BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 | Zweck: ergänzt die bestehende App-/Info-Utility-Leiste um einen kompakten Zugang für Einreichung oder Veranstalterbereich; Umfang: komplette header-right Utility-Gruppe === -->
+    <button type="button" class="pwa-install-button header-app-button" data-pwa-install-trigger aria-label="Als App installieren">
+      <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">App</span>
+    </button>
 
-<!-- === BEGIN BLOCK: HEADER ABOUT CTA (opens about page) ===
-Zweck:
-- Header-Button führt nicht mehr auf /info/, sondern direkt auf die kanonische Plattformseite /ueber/.
-- Entfernt den alten Info-Hub aus der primären IA.
-Umfang:
-- Ersetzt nur diesen Link-Block.
-=== -->
-<a
-  class="pwa-install-button"
-  href="/ueber/"
-  aria-label="Über Bocholt erleben"
->
-  <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
-  <span class="pwa-install-button__label">Info</span>
-</a>
-<!-- === END BLOCK: HEADER ABOUT CTA (opens about page) === -->
+    <a class="pwa-install-button header-info-button" href="/ueber/" aria-label="Über Bocholt erleben">
+      <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">Info</span>
+    </a>
 
-
-
+    <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+      <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">Zugang</span>
+    </a>
+    <!-- === END BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 === -->
   </div>
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
