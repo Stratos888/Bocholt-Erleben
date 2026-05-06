@@ -902,6 +902,55 @@
 .header-right > .pwa-install-button .pwa-install-button__label{
   display: inline-block;
 }
+
+/* === BEGIN BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V2 | Zweck: nutzt die bestehende Header-Button-DNA weiter und verdichtet Info/Zugang auf kleinen Breiten icon-only, damit der Titel nicht verdrängt wird; Umfang: ergänzende Responsive-Regeln im bestehenden Header-Button-Owner === */
+.header-right > .header-info-button,
+.header-right > .header-access-button{
+  flex: 0 0 auto;
+}
+
+@media (max-width: 520px){
+  .header-right > .header-access-button{
+    width: 34px;
+    min-width: 34px;
+    padding-inline: 0;
+  }
+
+  .header-right > .header-access-button .pwa-install-button__label{
+    display: none;
+  }
+}
+
+@media (max-width: 420px){
+  .header-right > .header-info-button{
+    width: 34px;
+    min-width: 34px;
+    padding-inline: 0;
+  }
+
+  .header-right > .header-info-button .pwa-install-button__label{
+    display: none;
+  }
+}
+
+@media (max-width: 340px){
+  .header-right > .header-app-button{
+    width: 34px;
+    min-width: 34px;
+    padding-inline: 0;
+  }
+
+  .header-right > .header-app-button .pwa-install-button__label{
+    display: none;
+  }
+}
+
+@media (max-width: 360px){
+  .header-right{
+    gap: 6px;
+  }
+}
+/* === END BLOCK: HEADER_UTILITY_RESPONSIVE_ACCESS_V2 === */
 /* === END BLOCK: DS-02_HEADER_BUTTON_MAPPING === */
 
 /* === BEGIN BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_COMPONENTS | Purpose: absorb remaining event-card meta/location and filter-control detail rules from legacy.css so component DNA stays self-owned; Scope: event-meta base, tiny-card override, location row, filters-bar helper, pill subparts, reset icon states === */
