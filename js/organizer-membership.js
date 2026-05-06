@@ -6,16 +6,34 @@
   const submitButton = document.getElementById("organizer-membership-submit");
   const resultCard = document.getElementById("organizer-membership-result");
   const resultText = document.getElementById("organizer-membership-result-text");
+  const planSelect = document.getElementById("organizer-membership-plan");
+  const planHint = document.getElementById("organizer-membership-plan-hint");
 
-  if (!form || !submitButton || !resultCard || !resultText) {
+  if (!form || !submitButton || !resultCard || !resultText || !planSelect) {
     return;
   }
 
   const safeText = (value) => String(value ?? "").trim();
 
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V1 | Zweck: zeigt unter der Modellauswahl nur die Kurzbeschreibung des aktuell gewählten Modells; Umfang: Modellhinweise und Change-Handler === */
+  const planDescriptions = {
+    starter: "Starter passt für gelegentliche Termine und kleine Veranstalter.",
+    active: "Aktiv passt für regelmäßige Programme mit mehreren Terminen im Monat.",
+    unlimited: "Dauerhaft passt für laufende Programme mit vielen Terminen im üblichen Rahmen."
+  };
+
+  function updatePlanHint() {
+    if (!planHint) return;
+    planHint.textContent = planDescriptions[safeText(planSelect.value)] || planDescriptions.starter;
+  }
+
+  planSelect.addEventListener("change", updatePlanHint);
+  updatePlanHint();
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V1 === */
+
   function setSubmitting(isSubmitting) {
     if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Mitgliedschaft starten";
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Weiter zur Zahlungsmethode";
     }
 
     submitButton.disabled = isSubmitting;
@@ -94,7 +112,7 @@
       window.location.href = checkoutUrl;
     } catch (error) {
       console.warn("Organizer membership: start failed.", error);
-      showResult("Die Mitgliedschaft konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+      showResult("Die Zahlungsmethode konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
     } finally {
       setSubmitting(false);
     }
