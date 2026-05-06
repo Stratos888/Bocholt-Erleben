@@ -115,22 +115,24 @@
     hint.textContent = message;
   }
 
-  function applyPlanPresetFromUrl() {
-    const planSelect = byId("publish-standard-plan");
-    if (!planSelect) return;
+// === BEGIN FUNCTION: applyPlanPresetFromUrl | Zweck: setzt URL-Plan-Presets nur bei echten Modell-Selects und lässt Einzeltermin-Hidden-Inputs unverändert; Umfang: komplette Funktion ===
+function applyPlanPresetFromUrl() {
+  const planSelect = byId("publish-standard-plan");
+  if (!planSelect || planSelect.tagName !== "SELECT") return;
 
-    const params = new URLSearchParams(window.location.search);
-    const requestedPlan = safeText(params.get("plan")).toLowerCase();
-    if (!requestedPlan) return;
+  const params = new URLSearchParams(window.location.search);
+  const requestedPlan = safeText(params.get("plan")).toLowerCase();
+  if (!requestedPlan) return;
 
-    const allowedPlans = getAllowedPlanKeys();
-    if (!allowedPlans.includes(requestedPlan)) return;
+  const allowedPlans = getAllowedPlanKeys();
+  if (!allowedPlans.includes(requestedPlan)) return;
 
-    const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === requestedPlan);
-    if (!hasOption) return;
+  const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === requestedPlan);
+  if (!hasOption) return;
 
-    planSelect.value = requestedPlan;
-  }
+  planSelect.value = requestedPlan;
+}
+// === END FUNCTION: applyPlanPresetFromUrl ===
 
   async function tryLoadOrganizerPortalState() {
     const response = await fetch("/api/organizer-portal/me.php", {
@@ -216,22 +218,26 @@
     }
   }
 
-  function buildStandardContext() {
-    return {
-      plan: safeText(byId("publish-standard-plan")?.value),
-      organization: safeText(byId("publish-standard-organization")?.value),
-      contact: safeText(byId("publish-standard-contact")?.value),
-      email: safeText(byId("publish-standard-email")?.value),
-      eventLink: safeText(byId("publish-standard-event-link")?.value),
-      title: safeText(byId("publish-standard-title")?.value),
-      date: safeText(byId("publish-standard-date")?.value),
-      time: safeText(byId("publish-standard-time")?.value),
-      place: safeText(byId("publish-standard-place")?.value),
-      website: safeText(byId("publish-standard-website")?.value),
-      description: safeText(byId("publish-standard-description")?.value),
-      notes: safeText(byId("publish-standard-notes")?.value)
-    };
-  }
+// === BEGIN FUNCTION: buildStandardContext | Zweck: liest die Standard-/Einzeltermin-Einreichung inklusive öffentlichem Treffpunkt und Berechtigungsbestätigung aus; Umfang: komplette Kontextfunktion ===
+function buildStandardContext() {
+  return {
+    plan: safeText(byId("publish-standard-plan")?.value),
+    organization: safeText(byId("publish-standard-organization")?.value),
+    contact: safeText(byId("publish-standard-contact")?.value),
+    email: safeText(byId("publish-standard-email")?.value),
+    eventLink: safeText(byId("publish-standard-event-link")?.value),
+    title: safeText(byId("publish-standard-title")?.value),
+    date: safeText(byId("publish-standard-date")?.value),
+    time: safeText(byId("publish-standard-time")?.value),
+    place: safeText(byId("publish-standard-place")?.value),
+    placeAddress: safeText(byId("publish-standard-place-address")?.value),
+    website: safeText(byId("publish-standard-website")?.value),
+    description: safeText(byId("publish-standard-description")?.value),
+    notes: safeText(byId("publish-standard-notes")?.value),
+    locationConfirmed: byId("publish-standard-location-confirmed")?.checked === true
+  };
+}
+// === END FUNCTION: buildStandardContext ===
 
   function buildAutomationContext() {
     return {
@@ -362,19 +368,36 @@
   }
 
   /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 | Zweck: ersetzt den alten Payment-Link-Flow durch den serverseitigen Submission->Checkout-Flow; Umfang: Standard-Validierung, API-Helper, Submit-State und bindStandardPath in js/publish-funnel.js === */
-  function validateStandardContext(context) {
-    if (!hasValue(context.plan)) {
-      window.alert("Bitte wähle zuerst einen Einreichungsweg aus.");
-      return false;
-    }
-
-    if (!hasValue(context.eventLink) && !(hasValue(context.title) && hasValue(context.date) && hasValue(context.place))) {
-      window.alert("Bitte füge einen Link zur Veranstaltung ein. Wenn dort wichtige Angaben fehlen, ergänze Titel, Datum und Ort direkt im Formular.");
-      return false;
-    }
-
-    return true;
+// === BEGIN FUNCTION: validateStandardContext | Zweck: validiert den Einzeltermin-Weg ohne Eventlink-Pflicht und ohne Mitgliedschaftsauswahl; Umfang: komplette Standard-Validierung ===
+function validateStandardContext(context) {
+  if (safeText(context.plan) !== "single") {
+    window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
+    return false;
   }
+
+  if (!hasValue(context.organization) || !hasValue(context.email)) {
+    window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
+    return false;
+  }
+
+  if (!hasValue(context.title) || !hasValue(context.date)) {
+    window.alert("Bitte gib Titel und Datum der Veranstaltung an.");
+    return false;
+  }
+
+  if (!hasValue(context.place) || !hasValue(context.placeAddress)) {
+    window.alert("Bitte gib Veranstaltungsort und Adresse oder öffentlichen Treffpunkt an.");
+    return false;
+  }
+
+  if (context.locationConfirmed !== true) {
+    window.alert("Bitte bestätige, dass du zur Einreichung berechtigt bist und der Ort öffentlich genannt werden darf.");
+    return false;
+  }
+
+  return true;
+}
+// === END FUNCTION: validateStandardContext ===
 
   async function postPublishApiJson(url, payload) {
     const response = await fetch(url, {
@@ -414,22 +437,32 @@
     return data;
   }
 
-  function buildStandardSubmissionPayload(context) {
-    return {
-      requested_model_key: context.plan,
-      organization_name: context.organization,
-      contact_name: context.contact,
-      email: context.email,
-      event_url: context.eventLink,
-      title: context.title,
-      start_date: context.date,
-      time_text: context.time,
-      location_name: context.place,
-      ticket_url: context.website,
-      description_text: context.description,
-      notes_text: context.notes
-    };
-  }
+// === BEGIN FUNCTION: buildStandardSubmissionPayload | Zweck: baut den Einzeltermin-Payload und konserviert Adresse/Treffpunkt sowie Ortsbestätigung bis zur späteren Review-Inbox-Anbindung in notes_text; Umfang: komplette Payload-Funktion ===
+function buildStandardSubmissionPayload(context) {
+  const notesText = joinLines([
+    lineIf("Adresse oder öffentlicher Treffpunkt", context.placeAddress),
+    context.locationConfirmed === true
+      ? "Ortsbestätigung: Einreicher bestätigt Berechtigung und öffentliche Nennung des Ortes."
+      : "",
+    lineIf("Weitere Hinweise", context.notes)
+  ]);
+
+  return {
+    requested_model_key: "single",
+    organization_name: context.organization,
+    contact_name: context.contact,
+    email: context.email,
+    event_url: context.eventLink,
+    title: context.title,
+    start_date: context.date,
+    time_text: context.time,
+    location_name: context.place,
+    ticket_url: context.website,
+    description_text: context.description,
+    notes_text: notesText
+  };
+}
+// === END FUNCTION: buildStandardSubmissionPayload ===
 
   function setStandardSubmitting(trigger, isSubmitting) {
     if (!trigger) return;
