@@ -936,68 +936,69 @@ select.content-field__control{
   padding-inline: 14px;
 }
 
-.page--publish .publish-membership-layout,
-.page--publish .publish-membership-block{
+/* === BEGIN BLOCK: PUBLISH_MODEL_OVERVIEW_LIST_V1 | Zweck: stellt die zwei Veröffentlichungsmodelle als integrierte Liste innerhalb einer Karte dar, nicht als verschachtelte Einzelkarten; Umfang: Modellliste und knapper Freigabehinweis auf /events-veroeffentlichen/ === */
+.page--publish .publish-model-list{
   display: grid;
-  gap: 6px;
-}
-
-.page--publish .publish-membership-intro{
-  max-width: 36ch;
-  font-size: 0.78rem;
-  line-height: 1.18;
-}
-
-.page--publish .publish-plans{
-  display: grid;
-  gap: 6px;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.page--publish .publish-plans li{
+.page--publish .publish-model-list li{
   display: grid;
-  gap: 2px;
+  gap: 9px;
   margin: 0;
-  padding: 10px 11px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 17px;
-  background: rgba(255,255,255,0.56);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 4px 10px rgba(22,39,61,0.014);
+  padding: 12px 0;
 }
 
-.page--publish .publish-plans li:first-child{
-  border-color: color-mix(in srgb, var(--cmp-divider-strong) 70%, var(--color-primary));
-  background: color-mix(in srgb, rgba(255,255,255,0.66) 84%, var(--color-primary-muted));
+.page--publish .publish-model-list li + li{
+  border-top: 1px solid var(--cmp-divider-strong);
 }
 
-.page--publish .publish-plans strong{
+.page--publish .publish-model-copy{
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page--publish .publish-model-list strong{
   color: var(--color-text-primary);
-  font-size: 0.89rem;
+  font-size: 0.92rem;
   font-weight: 780;
   line-height: 1.10;
 }
 
-.page--publish .publish-plans span{
+.page--publish .publish-model-list span{
   color: var(--cmp-copy-color);
-  font-size: 0.83rem;
+  font-size: 0.84rem;
   line-height: 1.18;
 }
 
-.page--publish .publish-plans li small{
+.page--publish .publish-model-list small{
   color: var(--cmp-copy-color);
   font-size: 0.77rem;
   line-height: 1.18;
 }
 
-.page--publish .publish-plans-note{
+.page--publish .publish-model-list .content-actions{
+  justify-items: stretch;
+}
+
+.page--publish .publish-model-list .content-cta,
+.page--publish .publish-model-list .content-cta--primary{
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding-inline: 14px;
+}
+
+.page--publish .publish-model-note{
   max-width: 36ch;
   font-size: 0.77rem;
   line-height: 1.18;
 }
+/* === END BLOCK: PUBLISH_MODEL_OVERVIEW_LIST_V1 === */
 
 .page--publish .content-form{
   gap: 8px;
@@ -1488,31 +1489,26 @@ select.content-field__control{
   padding: 16px 18px;
 }
 
-.page--publish .publish-membership-layout{
-  gap: 12px;
-}
-
-.page--publish .publish-membership-block{
-  gap: 12px;
-}
-
-.page--publish .publish-membership-intro{
-  max-width: 64ch;
-}
-
-.page--publish .publish-plans{
+.page--publish .publish-model-list{
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 0;
 }
 
-.page--publish .publish-plans li{
-  min-width: 0;
-  min-height: 100%;
+.page--publish .publish-model-list li{
   align-content: start;
-  padding: 15px 16px;
+  padding: 0 18px;
 }
 
-.page--publish .publish-plans-note{
+.page--publish .publish-model-list li:first-child{
+  padding-left: 0;
+}
+
+.page--publish .publish-model-list li + li{
+  border-top: 0;
+  border-left: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-model-note{
   max-width: 70ch;
   white-space: normal;
 }
@@ -1655,15 +1651,15 @@ select.content-field__control{
   padding: 18px 20px;
 }
 
-.page--publish .publish-membership-layout{
-  gap: 14px;
+.page--publish .publish-model-list li{
+  padding-inline: 20px;
 }
 
-.page--publish .publish-plans{
-  gap: 16px;
+.page--publish .publish-model-list li:first-child{
+  padding-left: 0;
 }
 
-.page--publish .publish-plans-note{
+.page--publish .publish-model-note{
   max-width: 74ch;
 }
 
