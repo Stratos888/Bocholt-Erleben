@@ -727,7 +727,7 @@ svg.ui-icon-svg *{
   }
 
   .header-right{
-    display: none;
+    display: inline-flex;
   }
 }
 
