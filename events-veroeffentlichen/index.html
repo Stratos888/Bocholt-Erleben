@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_HEAD_SEO_SOCIAL_SCHEMA_V10_VISIBILITY_MODELS | Zweck: richtet die Veranstalter-Einstiegsseite auf die zwei sichtbaren Veröffentlichungsmodelle aus; Umfang: kompletter SEO-/Head-Basisblock dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_HEAD_SEO_SOCIAL_SCHEMA_V11_VISIBILITY_MODELS | Zweck: richtet die Veranstalter-Einstiegsseite auf zwei klare Veröffentlichungsmodelle aus; Umfang: kompletter SEO-/Head-Basisblock dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Veranstaltungen sichtbar machen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Veranstaltungen bei Bocholt erleben sichtbar machen: einzelne Veranstaltung veröffentlichen lassen oder regelmäßig Veranstaltungen veröffentlichen lassen."
+    content="Veranstaltungen bei Bocholt erleben sichtbar machen: einzelne Veranstaltung veröffentlichen lassen oder regelmäßig Termine veröffentlichen lassen."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
@@ -23,7 +23,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
   <meta property="og:title" content="Veranstaltungen sichtbar machen | Bocholt erleben">
-  <meta property="og:description" content="Wähle, ob du eine einzelne Veranstaltung oder regelmäßig Veranstaltungen bei Bocholt erleben veröffentlichen lassen möchtest.">
+  <meta property="og:description" content="Wähle, ob du eine einzelne Veranstaltung oder regelmäßig Termine bei Bocholt erleben veröffentlichen lassen möchtest.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
@@ -41,7 +41,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Veranstaltungen sichtbar machen",
-    "description": "Veranstaltungen bei Bocholt erleben sichtbar machen: einzelne Veranstaltung veröffentlichen lassen oder regelmäßig Veranstaltungen veröffentlichen lassen.",
+    "description": "Veranstaltungen bei Bocholt erleben sichtbar machen: einzelne Veranstaltung veröffentlichen lassen oder regelmäßig Termine veröffentlichen lassen.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -66,11 +66,12 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=2026-05-06-header-hub-1">
-  <!-- === END BLOCK: PUBLISH_HEAD_SEO_SOCIAL_SCHEMA_V10_VISIBILITY_MODELS === -->
+  <!-- === END BLOCK: PUBLISH_HEAD_SEO_SOCIAL_SCHEMA_V11_VISIBILITY_MODELS === -->
 </head>
 
 <body>
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_MOBILE_ENTERPRISE_V1 | Zweck: verdichtet /events-veroeffentlichen/ zu einer klaren mobilen Einstiegs- und Wegwahl-Seite mit starker Entscheidungszone und ruhiger sekundärer Preisorientierung; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: PUBLISH_HEADER_WITH_ACCESS_UTILITY_V1 | Zweck: ergänzt den Rückkehrpfad Zugang im Header der Veranstalter-Einstiegsseite, damit der Inhaltsbereich nur die zwei Veröffentlichungsmodelle zeigt; Umfang: kompletter Header von /events-veroeffentlichen/ === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -80,9 +81,17 @@
       >
       <span class="app-title">Bocholt erleben</span>
     </a>
-  </header>
 
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_MODELS_V4 | Zweck: reduziert die Veranstalter-Einstiegsseite auf zwei Veröffentlichungsmodelle und den sekundären Zugang; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
+    <div class="header-right">
+      <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+        <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+        <span class="pwa-install-button__label">Zugang</span>
+      </a>
+    </div>
+  </header>
+  <!-- === END BLOCK: PUBLISH_HEADER_WITH_ACCESS_UTILITY_V1 === -->
+
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_MODELS_V5 | Zweck: reduziert die Veranstalter-Einstiegsseite auf zwei Veröffentlichungsmodelle und entfernt den Zugang als dritten Inhaltsweg; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
@@ -115,26 +124,20 @@
         </li>
         <li>
           <div class="publish-model-copy">
-            <strong>Regelmäßig Veranstaltungen veröffentlichen lassen</strong>
+            <strong>Regelmäßig Termine veröffentlichen lassen</strong>
             <span>ab 9,99&nbsp;€ / Monat</span>
             <small>Für Vereine, Veranstalter und Locations mit laufendem Programm.</small>
           </div>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/fuer-veranstalter/">
-              Möglichkeiten entdecken
+              Modelle ansehen
             </a>
           </div>
         </li>
       </ul>
     </section>
-
-    <nav class="content-links" aria-label="Bestehenden Zugang öffnen">
-      <a class="content-link" href="/fuer-veranstalter/login/">
-        <span class="content-link__label">Einreichung oder Veranstalterbereich öffnen</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-    </nav>
   </main>
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_MODELS_V5 === -->
   <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_MODELS_V4 === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
