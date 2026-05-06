@@ -89,21 +89,18 @@
       </div>
     </header>
 
+    <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V4 | Zweck: reduziert die Einreichung auf klare Pflichtfeld- und Kosteninformation ohne sichtbare Weg-Auswahl; Umfang: Formular-Kopf und versteckter Einzeltermin-Plan === -->
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
-        <p class="content-note">
-          Pflicht sind Veranstalter, E-Mail-Adresse, Titel, Datum, Veranstaltungsort und ein öffentlicher Treffpunkt.
-        </p>
+        <p class="content-note">Mit * markierte Felder sind Pflichtfelder.</p>
+        <p class="content-note"><strong>Kosten:</strong> 9,90&nbsp;€ einmalig</p>
       </div>
 
       <form class="content-form" id="publish-standard-form" novalidate>
+        <input id="publish-standard-plan" name="plan" type="hidden" value="single">
         <div class="content-form-grid">
-          <div class="content-field content-field--full" aria-labelledby="publish-standard-plan-label">
-            <span class="content-field__label" id="publish-standard-plan-label">Ausgewählter Weg</span>
-            <input id="publish-standard-plan" name="plan" type="hidden" value="single">
-            <p class="content-note">Einzeltermin · 9,90&nbsp;€ einmalig</p>
-          </div>
+    <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V4 === -->
 
           <label class="content-field" for="publish-standard-organization">
             <span class="content-field__label">Veranstalter / Organisation *</span>
@@ -136,11 +133,23 @@
             <input class="content-field__control" id="publish-standard-place" name="place" type="text" required>
           </label>
 
-          <label class="content-field content-field--full" for="publish-standard-place-address">
-            <span class="content-field__label">Adresse oder öffentlicher Treffpunkt *</span>
-            <input class="content-field__control" id="publish-standard-place-address" name="placeAddress" type="text" required>
-            <p class="content-field__hint">Bitte möglichst mit Straße, Hausnummer und Ort. Bei Routen oder Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben. Keine Privatadressen Dritter eintragen.</p>
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V2 | Zweck: trennt die Ortsdaten für spätere Maps-/Review-Prüfung in Treffpunkt, PLZ und Ort; Umfang: Adressfelder der Einzeltermin-Einreichung === -->
+          <label class="content-field content-field--full" for="publish-standard-place-street">
+            <span class="content-field__label">Straße und Hausnummer oder offizieller Treffpunkt *</span>
+            <input class="content-field__control" id="publish-standard-place-street" name="placeStreet" type="text" autocomplete="street-address" required>
+            <p class="content-field__hint">Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
           </label>
+
+          <label class="content-field" for="publish-standard-place-zip">
+            <span class="content-field__label">PLZ *</span>
+            <input class="content-field__control" id="publish-standard-place-zip" name="placeZip" type="text" inputmode="numeric" autocomplete="postal-code" required>
+          </label>
+
+          <label class="content-field" for="publish-standard-place-city">
+            <span class="content-field__label">Ort *</span>
+            <input class="content-field__control" id="publish-standard-place-city" name="placeCity" type="text" autocomplete="address-level2" required>
+          </label>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V2 === -->
 
           <label class="content-field content-field--full" for="publish-standard-event-link">
             <span class="content-field__label">Link zur Veranstaltungsseite</span>
@@ -163,7 +172,7 @@
             <span class="content-field__label">Bestätigung *</span>
             <span class="content-field__hint">
               <input id="publish-standard-location-confirmed" name="locationConfirmed" type="checkbox" required>
-              Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der angegebene Ort öffentlich als Veranstaltungsort oder Treffpunkt genannt werden darf.
+              Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
             </span>
           </label>
         </div>
