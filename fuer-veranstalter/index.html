@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V3_SERVICE_LEVELS | Zweck: positioniert die Mitgliedschaft als regelmäßigen Veröffentlichungsservice statt reinen Mengen-/Listingkauf; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V4_REGULAR_MODELS | Zweck: positioniert /fuer-veranstalter/ als Seite für regelmäßige Veröffentlichungsmodelle; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Regelmäßig Veranstaltungen einreichen | Bocholt erleben</title>
+  <title>Regelmäßig Termine veröffentlichen lassen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Mitgliedschaft für regelmäßige Veröffentlichungen bei Bocholt erleben: Veranstaltungen einreichen, prüfen und nach Freigabe sichtbar machen lassen."
+    content="Regelmäßig Termine bei Bocholt erleben veröffentlichen lassen: Modell wählen, Veranstalterdaten angeben und zur Zahlungsmethode wechseln."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/">
@@ -24,11 +24,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_HEAD_V3_SERVICE_LEVELS === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V4_REGULAR_MODELS === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V2_REGULAR_PUBLISHING | Zweck: priorisiert die Mitgliedschaft als regelmäßigen Veröffentlichungsweg und setzt Bereich öffnen nur als sekundären Rückkehrpfad; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_BODY_V3_REGULAR_MODELS | Zweck: schärft /fuer-veranstalter/ auf regelmäßige Veröffentlichungsmodelle, Vorab-Anbindung und Header-Zugang; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -38,22 +38,46 @@
       >
       <span class="app-title">Bocholt erleben</span>
     </a>
+
+    <div class="header-right">
+      <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+        <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+        <span class="pwa-install-button__label">Zugang</span>
+      </a>
+    </div>
   </header>
 
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Regelmäßig Veranstaltungen einreichen</p>
-      <h1>Veranstaltungen regelmäßig einreichen und veröffentlichen lassen.</h1>
+      <h1>Regelmäßig Termine veröffentlichen lassen</h1>
       <p class="content-lead">
-        Für Vereine, Veranstalter, Anbieter und Locations, die laufend Termine sichtbar machen möchten – mit Prüfung, Aufbereitung und Veröffentlichung nach Freigabe.
+        Für Vereine, Veranstalter und Locations mit laufendem Programm.
       </p>
     </header>
 
     <div class="content-grid content-grid--2">
+      <section class="content-card content-card--primary" aria-labelledby="organizer-service-head">
+        <h2 id="organizer-service-head">Was abgedeckt ist</h2>
+        <ul class="publish-benefits-grid" aria-label="Leistungen für regelmäßige Veröffentlichungen">
+          <li>
+            <strong>Regelmäßig veröffentlichen</strong>
+            <span>Reiche laufende Termine passend zu deinem Modell ein.</span>
+          </li>
+          <li>
+            <strong>Prüfen und aufbereiten</strong>
+            <span>Wir prüfen die Angaben und bereiten freigegebene Termine sauber für Bocholt erleben auf.</span>
+          </li>
+          <li>
+            <strong>Nach Umfang wählen</strong>
+            <span>Starter, Aktiv oder Dauerhaft richtet sich danach, wie viele Termine du regelmäßig sichtbar machen möchtest.</span>
+          </li>
+        </ul>
+      </section>
+
       <section class="content-card content-card--primary" aria-labelledby="organizer-membership-head">
-        <h2 id="organizer-membership-head">Mitgliedschaft wählen</h2>
+        <h2 id="organizer-membership-head">Modell wählen</h2>
         <p class="content-note">
-          Die Mitgliedschaft deckt regelmäßige Einreichung, Prüfung und Veröffentlichung ab. So musst du Termine nicht mehrfach pflegen und behältst deinen Status im Blick.
+          Wähle das passende Modell für dein regelmäßiges Programm. Danach geht es zur Zahlungsmethode.
         </p>
 
         <form class="content-form" id="organizer-membership-form" novalidate>
@@ -74,80 +98,50 @@
             </label>
 
             <label class="content-field content-field--full" for="organizer-membership-plan">
-              <span class="content-field__label">Mitgliedschaft</span>
+              <span class="content-field__label">Modell</span>
               <select class="content-field__control" id="organizer-membership-plan" name="plan" required>
-                <option value="starter">Starter · gelegentliche Termine · 9,99 € / Monat</option>
-                <option value="active">Aktiv · regelmäßiges Programm · 19,99 € / Monat</option>
-                <option value="unlimited">Dauerhaft · laufendes Programm · 29,99 € / Monat</option>
+                <option value="starter">Starter · 9,99 € / Monat</option>
+                <option value="active">Aktiv · 19,99 € / Monat</option>
+                <option value="unlimited">Dauerhaft · 29,99 € / Monat</option>
               </select>
-              <p class="content-field__hint">Starter passt für kleine Veranstalter, Aktiv für regelmäßige Programme, Dauerhaft für viele Termine im üblichen Rahmen.</p>
+              <p class="content-field__hint" id="organizer-membership-plan-hint">Starter passt für gelegentliche Termine und kleine Veranstalter.</p>
             </label>
           </div>
 
-          <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_PAYMENT_HINT_V1 | Zweck: macht transparent, dass nach der Mitgliedschaftsauswahl die monatliche Zahlung bestätigt wird; Umfang: CTA-Block im Mitgliedschaftsformular === -->
           <div class="content-actions content-actions--inline">
             <button class="content-cta content-cta--primary" id="organizer-membership-submit" type="submit">
-              Mitgliedschaft wählen
+              Weiter zur Zahlungsmethode
             </button>
           </div>
           <p class="content-note">
-            Danach wirst du zur monatlichen Zahlung weitergeleitet. Die Veröffentlichung einzelner Termine erfolgt weiterhin erst nach Prüfung und Freigabe.
+            Danach bestätigst du die monatliche Zahlung bei Stripe.
           </p>
-          <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_PAYMENT_HINT_V1 === -->
         </form>
 
         <section class="content-card content-card--primary" id="organizer-membership-result" hidden>
           <p id="organizer-membership-result-text"></p>
         </section>
       </section>
-
-      <section class="content-card content-card--primary" aria-labelledby="organizer-service-head">
-        <h2 id="organizer-service-head">Was die Mitgliedschaft abdeckt</h2>
-        <ul class="publish-benefits-grid" aria-label="Leistungen der Mitgliedschaft">
-          <li>
-            <strong>Einreichen</strong>
-            <span>Du reichst neue Termine ein oder lässt prüfen, ob wir sie aus deiner Website, deinem Kalender oder einer Datei übernehmen können.</span>
-          </li>
-          <li>
-            <strong>Prüfen</strong>
-            <span>Wir prüfen Plausibilität, lokale Relevanz und notwendige Angaben.</span>
-          </li>
-          <li>
-            <strong>Veröffentlichen</strong>
-            <span>Freigegebene Termine werden sauber auf Bocholt erleben sichtbar.</span>
-          </li>
-        </ul>
-      </section>
-
-      <section class="content-card content-card--primary" aria-labelledby="organizer-existing-head">
-        <h2 id="organizer-existing-head">Schon eingereicht oder Mitglied?</h2>
-        <p>Öffne deine Einreichung oder deinen Veranstalterbereich per E-Mail-Link.</p>
-        <div class="content-actions content-actions--inline">
-          <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
-            Einreichung oder Veranstalterbereich öffnen
-          </a>
-        </div>
-      </section>
     </div>
 
-    <nav class="content-links" aria-label="Alternative Navigation">
-      <a class="content-link" href="/events-veroeffentlichen/einreichen/?plan=single">
-        <span class="content-link__label">Einzelne Veranstaltung einreichen</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-      <a class="content-link" href="/events-veroeffentlichen/anbindung/">
-        <span class="content-link__label">Termine automatisch übernehmen lassen</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-      <a class="content-link" href="/events-veroeffentlichen/">
-        <span class="content-link__label">Zurück zur Einreichung</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-    </nav>
+    <section class="content-card content-card--primary" aria-labelledby="organizer-automation-head">
+      <h2 id="organizer-automation-head">Termine schon digital gepflegt?</h2>
+      <p>
+        Wenn deine Termine bereits auf einer Website, in einem Kalender oder in einer Datei stehen, kannst du vorab prüfen lassen, ob eine automatische Übernahme möglich ist.
+      </p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/anbindung/">
+          Anbindung prüfen lassen
+        </a>
+      </div>
+      <p class="content-note">
+        Die Anfrage ist kostenlos und löst noch keine Mitgliedschaft aus.
+      </p>
+    </section>
   </main>
 
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/organizer-membership.js?v=2026-05-05-freeze-stability-1" defer></script>
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_START_BODY_V2_REGULAR_PUBLISHING === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_BODY_V3_REGULAR_MODELS === -->
 </body>
 </html>
