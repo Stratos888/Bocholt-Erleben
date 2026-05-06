@@ -20,7 +20,7 @@
 // END: FILE_HEADER_PWA_INSTALL
 
 
-// === BEGIN BLOCK: MULTI INSTALL TRIGGERS (header + desktop entry) ===
+// === BEGIN BLOCK: MULTI_INSTALL_TRIGGERS_LAYOUT_SAFE_V2 | Zweck: steuert nur die PWA-Verfügbarkeit über hidden und überlässt das responsive Header-Layout vollständig CSS; Umfang: kompletter Install-Trigger-Controller ===
 (() => {
   const installButtons = Array.from(
     document.querySelectorAll("[data-pwa-install-trigger]")
@@ -32,7 +32,8 @@
 
   const setButtonsVisible = (isVisible) => {
     installButtons.forEach((button) => {
-      button.style.display = isVisible ? "inline-flex" : "none";
+      button.hidden = !isVisible;
+      button.setAttribute("aria-hidden", isVisible ? "false" : "true");
     });
   };
 
@@ -70,7 +71,7 @@
     deferredPrompt = null;
   });
 })();
-// === END BLOCK: MULTI INSTALL TRIGGERS (header + desktop entry) ===
+// === END BLOCK: MULTI_INSTALL_TRIGGERS_LAYOUT_SAFE_V2 ===
 
 
 
