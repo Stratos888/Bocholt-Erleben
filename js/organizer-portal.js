@@ -616,7 +616,6 @@
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_APPROVED_PUBLICATION_COUNT_COPY_V1 === */
-    }
 
     if (submissionsHead) {
       submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Letzte Einreichungen";
