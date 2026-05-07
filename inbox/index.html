@@ -277,9 +277,11 @@ Umfang:
       renderCurrent(totalCount);
     }
 
-    // === BEGIN BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V1 ===
+    // === BEGIN BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
     // Zweck:
-    // - Formatiert kuratierungsrelevante Datums-/Zeitwerte im deutschen Anzeigeformat
+    // - Formatiert Datum, Zeitraum und Uhrzeiten für Einzeltage und Mehrtagesevents im deutschen Anzeigeformat
+    // - Zeigt bei Mehrtagesevents ohne einheitliche Uhrzeit keinen falschen Startzeitwert an
+    // - Unterstützt optional detaillierte Zeitpläne aus schedule_text/time_details/zeiten, ohne bestehende Datenquellen zu ändern
     // - Entfernt technische Dopplungen aus Formular-Notizen
     // Umfang:
     // - Nur Anzeigehelfer für inbox/index.html, keine Daten-/API-Logik
@@ -304,17 +306,47 @@ Umfang:
       return raw;
     }
 
-    function formatGermanTime(value) {
+    function formatGermanTimeText(value) {
       const raw = trimValue(value);
       if (!raw) return "";
-      if (/uhr/i.test(raw)) return raw;
 
-      const timeMatch = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
-      if (timeMatch) {
-        return `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]} Uhr`;
+      let normalized = raw
+        .replace(/\s*[–—-]\s*/g, "–")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (/uhr/i.test(normalized)) return normalized;
+
+      const protectedRanges = [];
+      normalized = normalized.replace(/(\d{1,2}):(\d{2})(?::\d{2})?\s*–\s*(\d{1,2}):(\d{2})(?::\d{2})?/g, (_match, h1, m1, h2, m2) => {
+        const token = `__BE_TIME_RANGE_${protectedRanges.length}__`;
+        protectedRanges.push([
+          token,
+          `${String(h1).padStart(2, "0")}:${m1}–${String(h2).padStart(2, "0")}:${m2} Uhr`
+        ]);
+        return token;
+      });
+
+      normalized = normalized.replace(/\b(\d{1,2}):(\d{2})(?::\d{2})?\b/g, (_match, h, m) => {
+        return `${String(h).padStart(2, "0")}:${m} Uhr`;
+      });
+
+      for (const [token, replacement] of protectedRanges) {
+        normalized = normalized.replace(token, replacement);
       }
 
-      return raw;
+      return normalized;
+    }
+
+    function formatGermanDateTimeText(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const withGermanDates = raw.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (_match, year, month, day) => {
+        return `${day}.${month}.${year}`;
+      });
+
+      return formatGermanTimeText(withGermanDates);
     }
 
     function formatGermanDateTime(value) {
@@ -322,29 +354,50 @@ Umfang:
       if (!raw) return "";
 
       const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}:\d{2})(?::\d{2})?)?/);
-      if (!match) return raw;
+      if (!match) return formatGermanDateTimeText(raw);
 
       const datePart = `${match[3]}.${match[2]}.${match[1]}`;
-      const timePart = match[4] ? formatGermanTime(match[4]) : "";
+      const timePart = match[4] ? formatGermanTimeText(match[4]) : "";
 
       return timePart ? `${datePart}, ${timePart}` : datePart;
+    }
+
+    function isMultiDayEvent(date, endDate) {
+      const start = trimValue(date);
+      const end = trimValue(endDate);
+      return Boolean(start && end && start !== end);
     }
 
     function buildGermanDateRange(date, endDate) {
       const start = formatGermanDate(date);
       const end = formatGermanDate(endDate);
 
-      if (start && end) return `${start} bis ${end}`;
+      if (start && end && start !== end) return `${start} bis ${end}`;
       return start || end || "";
     }
 
-    function buildGermanTerminLine(date, endDate, time) {
-      const dateRange = buildGermanDateRange(date, endDate);
-      const timeLine = formatGermanTime(time);
+    function buildGermanTimeLine(item, date, endDate) {
+      const timeLine = formatGermanTimeText(item.time);
+      if (timeLine) return timeLine;
 
-      if (dateRange && timeLine) return `${dateRange} · ${timeLine}`;
-      if (dateRange) return `${dateRange} · keine Uhrzeit angegeben`;
-      return timeLine || "";
+      if (isMultiDayEvent(date, endDate)) {
+        return "keine einheitliche Uhrzeit angegeben – Beschreibung/Quelle prüfen";
+      }
+
+      return "keine Uhrzeit angegeben";
+    }
+
+    function buildScheduleDetails(item) {
+      const explicitSchedule = [
+        item.schedule_text,
+        item.scheduleText,
+        item.time_details,
+        item.timeDetails,
+        item.zeiten,
+        item.zeitdetails
+      ].map(trimValue).find(Boolean);
+
+      return explicitSchedule ? formatGermanDateTimeText(explicitSchedule) : "";
     }
 
     function buildCurationNote(item) {
@@ -375,7 +428,7 @@ Umfang:
 
       return hints.join(" · ");
     }
-    // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V1 ===
+    // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
 
     function renderCurrent(totalCount) {
       refreshLock();
@@ -400,14 +453,17 @@ Umfang:
       // - Verwerfen verlangt festen deutschen Ablehnungsgrund
       // Umfang:
       // - Ersetzt den Rendering-Teil innerhalb renderCurrent(totalCount) ab const it=current bis Button-Listener
-      /* === BEGIN BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V1 | Zweck: reduziert die Karte auf kuratierungsrelevante Daten und formatiert Datum/Zeit deutsch; Umfang: ersetzt Rohwert-Aufbereitung im Render-Block === */
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 | Zweck: trennt Datum/Zeitraum und Uhrzeit/Zeiten, damit Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt Rohwert-Aufbereitung im Render-Block === */
       const it = current;
 
       const date = trimValue(it.date);
       const endDate = trimValue(it.endDate);
-      const time = trimValue(it.time);
+      const isMultiDay = isMultiDayEvent(date, endDate);
+      const dateLabel = isMultiDay ? "Zeitraum" : "Datum";
+      const dateRangeLine = buildGermanDateRange(date, endDate);
+      const timeLine = buildGermanTimeLine(it, date, endDate);
+      const scheduleDetails = buildScheduleDetails(it);
 
-      const terminLine = buildGermanTerminLine(date, endDate, time);
       const placeLine = [
         trimValue(it.location),
         trimValue(it.city)
@@ -424,7 +480,7 @@ Umfang:
       const sourceUrl = trimValue(it.source_url);
       const openEventDisabled = !eventUrl;
       const openSourceDisabled = !sourceUrl;
-      /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V1 === */
+      /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 === */
 
       const rejectOptions = [
         ["", "Ablehnungsgrund auswählen …"],
@@ -455,10 +511,12 @@ Umfang:
         </div>
       ` : "";
 
-      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V1 | Zweck: zeigt nur kuratierungsrelevante Felder in deutscher Beschriftung; Umfang: ersetzt infoRows-Liste === */
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 | Zweck: zeigt Datum/Zeitraum und Uhrzeit/Zeiten getrennt, damit Einzeltage, Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt infoRows-Liste === */
       const infoRows = [
         ["Herkunft", originLabel],
-        ["Termin", terminLine],
+        [dateLabel, dateRangeLine],
+        [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
+        ["Zeitdetails laut Quelle", scheduleDetails],
         ["Ort", placeLine],
         ["Adresse/Treffpunkt", trimValue(it.location_address)],
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
@@ -468,7 +526,7 @@ Umfang:
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
       ].filter(([, value]) => value);
-      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V1 === */
+      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 === */
 
       const infoRowsHtml = infoRows.map(([label, value]) => `
         <div class="reviewRow">
