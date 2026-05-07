@@ -164,9 +164,12 @@ function applyPlanPresetFromUrl() {
   }
 
   async function syncStandardFormWithPortalSession() {
-    /* === BEGIN FUNCTION: syncStandardFormWithPortalSession | Zweck: uebernimmt aktive Veranstalter-Session und sperrt Abo-Reuse-Identitaetsfelder; Umfang: komplette Funktion === */
+    /* === BEGIN FUNCTION: syncStandardFormWithPortalSession | Zweck: übernimmt aktive Veranstalter-Session auch auf der Einzelterminseite und sperrt bekannte Stammdaten; Umfang: komplette Funktion === */
+    const form = byId("publish-standard-form");
+    if (!form) return;
+
     const pageMode = safeText(document.body?.dataset.publishMode).toLowerCase();
-    if (pageMode !== "standard") return;
+    if (!["single", "standard"].includes(pageMode)) return;
 
     const portalData = await tryLoadOrganizerPortalState();
     if (!portalData || typeof portalData !== "object") return;
@@ -174,14 +177,16 @@ function applyPlanPresetFromUrl() {
     const organizer = portalData.organizer || {};
     const subscription = portalData.subscription || null;
 
-    const planSelect = byId("publish-standard-plan");
+    const planField = byId("publish-standard-plan");
     const organizationField = byId("publish-standard-organization");
     const contactField = byId("publish-standard-contact");
     const emailField = byId("publish-standard-email");
 
     function lockField(field, value) {
-      if (!field) return;
-      field.value = safeText(value);
+      const normalizedValue = safeText(value);
+      if (!field || !normalizedValue) return;
+
+      field.value = normalizedValue;
       field.readOnly = true;
       field.setAttribute("readonly", "readonly");
       field.setAttribute("aria-readonly", "true");
@@ -193,15 +198,19 @@ function applyPlanPresetFromUrl() {
     lockField(emailField, organizer.email);
 
     const activePlanKey = safeText(subscription?.plan_key).toLowerCase();
-    if (!planSelect || !["starter", "active", "unlimited"].includes(activePlanKey)) return;
+    if (!planField || !["starter", "active", "unlimited"].includes(activePlanKey)) return;
 
-    const hasOption = Array.from(planSelect.options).some((option) => safeText(option.value) === activePlanKey);
+    planField.dataset.activeMembershipPlan = activePlanKey;
+
+    if (planField.tagName !== "SELECT") return;
+
+    const hasOption = Array.from(planField.options).some((option) => safeText(option.value) === activePlanKey);
     if (!hasOption) return;
 
-    planSelect.value = activePlanKey;
-    planSelect.disabled = true;
-    planSelect.setAttribute("aria-disabled", "true");
-    planSelect.dataset.portalLocked = "true";
+    planField.value = activePlanKey;
+    planField.disabled = true;
+    planField.setAttribute("aria-disabled", "true");
+    planField.dataset.portalLocked = "true";
 
     ensurePlanLockHint(
       `Deine aktive Mitgliedschaft ${formatPlanLabel(activePlanKey)} wird für diese Einreichung automatisch verwendet. Änderungen verwaltest du in deinem Veranstalterbereich.`
