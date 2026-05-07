@@ -277,6 +277,106 @@ Umfang:
       renderCurrent(totalCount);
     }
 
+    // === BEGIN BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V1 ===
+    // Zweck:
+    // - Formatiert kuratierungsrelevante Datums-/Zeitwerte im deutschen Anzeigeformat
+    // - Entfernt technische Dopplungen aus Formular-Notizen
+    // Umfang:
+    // - Nur Anzeigehelfer für inbox/index.html, keine Daten-/API-Logik
+    function trimValue(value) {
+      return String(value || "").trim();
+    }
+
+    function formatGermanDate(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) {
+        return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+      }
+
+      const germanMatch = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+      if (germanMatch) {
+        return `${germanMatch[1].padStart(2, "0")}.${germanMatch[2].padStart(2, "0")}.${germanMatch[3]}`;
+      }
+
+      return raw;
+    }
+
+    function formatGermanTime(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+      if (/uhr/i.test(raw)) return raw;
+
+      const timeMatch = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+      if (timeMatch) {
+        return `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]} Uhr`;
+      }
+
+      return raw;
+    }
+
+    function formatGermanDateTime(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}:\d{2})(?::\d{2})?)?/);
+      if (!match) return raw;
+
+      const datePart = `${match[3]}.${match[2]}.${match[1]}`;
+      const timePart = match[4] ? formatGermanTime(match[4]) : "";
+
+      return timePart ? `${datePart}, ${timePart}` : datePart;
+    }
+
+    function buildGermanDateRange(date, endDate) {
+      const start = formatGermanDate(date);
+      const end = formatGermanDate(endDate);
+
+      if (start && end) return `${start} bis ${end}`;
+      return start || end || "";
+    }
+
+    function buildGermanTerminLine(date, endDate, time) {
+      const dateRange = buildGermanDateRange(date, endDate);
+      const timeLine = formatGermanTime(time);
+
+      if (dateRange && timeLine) return `${dateRange} · ${timeLine}`;
+      if (dateRange) return `${dateRange} · keine Uhrzeit angegeben`;
+      return timeLine || "";
+    }
+
+    function buildCurationNote(item) {
+      const notes = trimValue(item.notes);
+      if (!notes) return "";
+
+      if (String(item.review_source || "") !== "submission_db") return notes;
+
+      const filteredLines = notes
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .filter((line) => !/^Adresse \/ offizieller Treffpunkt:/i.test(line))
+        .filter((line) => !/^PLZ:/i.test(line))
+        .filter((line) => !/^Stadt \/ Ort:/i.test(line))
+        .filter((line) => !/^Adresse zusammengesetzt:/i.test(line))
+        .filter((line) => !/^Ortsbestätigung:/i.test(line));
+
+      return filteredLines.join("\n");
+    }
+
+    function buildDedupeHint(item) {
+      const hints = [
+        trimValue(item.match_score) ? `Match-Score: ${trimValue(item.match_score)}` : "",
+        trimValue(item.matched_event_id) ? `Matched Event-ID: ${trimValue(item.matched_event_id)}` : "",
+        trimValue(item.id_suggestion) ? `ID-Vorschlag: ${trimValue(item.id_suggestion)}` : ""
+      ].filter(Boolean);
+
+      return hints.join(" · ");
+    }
+    // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V1 ===
+
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -300,28 +400,31 @@ Umfang:
       // - Verwerfen verlangt festen deutschen Ablehnungsgrund
       // Umfang:
       // - Ersetzt den Rendering-Teil innerhalb renderCurrent(totalCount) ab const it=current bis Button-Listener
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V1 | Zweck: reduziert die Karte auf kuratierungsrelevante Daten und formatiert Datum/Zeit deutsch; Umfang: ersetzt Rohwert-Aufbereitung im Render-Block === */
       const it = current;
 
-      const date = (it.date || "").trim();
-      const endDate = (it.endDate || "").trim();
-      const time = (it.time || "").trim();
+      const date = trimValue(it.date);
+      const endDate = trimValue(it.endDate);
+      const time = trimValue(it.time);
 
-      const eventType = endDate ? "Mehrtagesevent" : "Einzeltermin";
-      const dateLine = endDate ? `${date || "?"} bis ${endDate}` : date;
-      const timeLine = time || (endDate ? "keine einheitliche Startzeit / nicht angegeben" : "nicht angegeben");
-
+      const terminLine = buildGermanTerminLine(date, endDate, time);
       const placeLine = [
-        (it.city || "").trim(),
-        (it.location || "").trim()
-      ].filter(Boolean).join(" — ");
+        trimValue(it.location),
+        trimValue(it.city)
+      ].filter(Boolean).join(" · ");
 
-      const sourceLine = (it.source_name || "").trim();
-      const desc = (it.description || "").trim();
+      const sourceLine = trimValue(it.source_name);
+      const desc = trimValue(it.description);
+      const curationNote = buildCurationNote(it);
+      const dedupeHint = buildDedupeHint(it);
+      const submittedAt = formatGermanDateTime(it.created_at);
+      const descriptionTitle = String(it.review_source || "") === "submission_db" ? "Beschreibung / Hinweise" : "Beschreibung / extrahierter Text";
 
-      const eventUrl = (it.url || "").trim();
-      const sourceUrl = (it.source_url || "").trim();
+      const eventUrl = trimValue(it.url);
+      const sourceUrl = trimValue(it.source_url);
       const openEventDisabled = !eventUrl;
       const openSourceDisabled = !sourceUrl;
+      /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V1 === */
 
       const rejectOptions = [
         ["", "Ablehnungsgrund auswählen …"],
@@ -352,23 +455,20 @@ Umfang:
         </div>
       ` : "";
 
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V1 | Zweck: zeigt nur kuratierungsrelevante Felder in deutscher Beschriftung; Umfang: ersetzt infoRows-Liste === */
       const infoRows = [
         ["Herkunft", originLabel],
-        ["Typ", eventType],
-        ["Laufzeit", dateLine],
-        ["Startzeit", timeLine],
+        ["Termin", terminLine],
         ["Ort", placeLine],
-        ["Adresse/Treffpunkt", (it.location_address || "").trim()],
+        ["Adresse/Treffpunkt", trimValue(it.location_address)],
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
-        ["Kategorie", (it.kategorie_suggestion || "").trim()],
-        ["Quelle", sourceLine],
-        ["Match Score", (it.match_score || "").trim()],
-        ["Matched Event ID", (it.matched_event_id || "").trim()],
-        ["ID-Vorschlag", (it.id_suggestion || "").trim()],
-        ["Submission-ID", it.submission_id ? String(it.submission_id) : ""],
-        ["Eingang", (it.created_at || "").trim()],
-        ["Notes", (it.notes || "").trim()]
+        ["Kategorie-Vorschlag", trimValue(it.kategorie_suggestion)],
+        ["Quelle / Veranstalter", sourceLine],
+        ["Eingereicht am", submittedAt],
+        ["Prüfhinweis", curationNote],
+        ["Dubletten-/Importhinweis", dedupeHint]
       ].filter(([, value]) => value);
+      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V1 === */
 
       const infoRowsHtml = infoRows.map(([label, value]) => `
         <div class="reviewRow">
@@ -388,12 +488,12 @@ Umfang:
 
           ${reviewRiskHtml}
 
-          <div class="descTitle">Beschreibung / extrahierter Text</div>
+          <div class="descTitle">${escapeHtml(descriptionTitle)}</div>
           <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
 
           <div class="urlBox">
-            ${eventUrl ? `<div class="urlLine"><strong>Event-URL:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
-            ${sourceUrl ? `<div class="urlLine"><strong>Source-URL:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
+            ${eventUrl ? `<div class="urlLine"><strong>Veranstaltungslink:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
+            ${sourceUrl ? `<div class="urlLine"><strong>Quellenlink:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
           </div>
 
           <div class="rejectBox">
@@ -404,8 +504,8 @@ Umfang:
           </div>
 
           <div class="actions">
-            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Event-URL öffnen</button>
-            <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Source-URL öffnen</button>
+            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Veranstaltungslink öffnen</button>
+            <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
             <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
             <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
           </div>
