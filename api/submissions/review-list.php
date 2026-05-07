@@ -12,6 +12,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
     ]);
 }
 
+/* === BEGIN BLOCK: SUBMISSION_REVIEW_ENDPOINT_ACCESS_GUARD_V1 | Zweck: verhindert öffentlichen Zugriff auf DB-Review-Endpunkt; Umfang: prüft Review-Passwort nach Method-Check === */
+be_require_review_access();
+/* === END BLOCK: SUBMISSION_REVIEW_ENDPOINT_ACCESS_GUARD_V1 === */
+
 function srl_origin_label(string $origin): string
 {
     return match ($origin) {
