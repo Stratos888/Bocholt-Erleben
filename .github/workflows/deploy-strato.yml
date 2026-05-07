@@ -357,10 +357,14 @@ jobs:
           STAGING_MAIL_FROM_ADDRESS: ${{ secrets.STAGING_MAIL_FROM_ADDRESS }}
           STAGING_MAIL_SMTP_USERNAME: ${{ secrets.STAGING_MAIL_SMTP_USERNAME }}
           STAGING_MAIL_SMTP_PASSWORD: ${{ secrets.STAGING_MAIL_SMTP_PASSWORD }}
+          # === BEGIN BLOCK: REVIEW_PASSWORD_SECRETS_ENV_V1 | Zweck: macht Review-Passwort-Secrets für die private PHP-Config im Deploy-Artefakt verfügbar; Umfang: ergänzt Staging-/Live-Review-Secrets ===
           LIVE_MAIL_FROM_NAME: ${{ secrets.LIVE_MAIL_FROM_NAME }}
           LIVE_MAIL_FROM_ADDRESS: ${{ secrets.LIVE_MAIL_FROM_ADDRESS }}
           LIVE_MAIL_SMTP_USERNAME: ${{ secrets.LIVE_MAIL_SMTP_USERNAME }}
           LIVE_MAIL_SMTP_PASSWORD: ${{ secrets.LIVE_MAIL_SMTP_PASSWORD }}
+          STAGING_REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
+          LIVE_REVIEW_PASSWORD: ${{ secrets.LIVE_REVIEW_PASSWORD }}
+          # === END BLOCK: REVIEW_PASSWORD_SECRETS_ENV_V1 ===
         run: |
           set -e
 
@@ -493,7 +497,10 @@ jobs:
             APP_MAIL_SMTP_USERNAME="$STAGING_MAIL_SMTP_USERNAME"
             APP_MAIL_SMTP_PASSWORD="$STAGING_MAIL_SMTP_PASSWORD"
 
+            # === BEGIN BLOCK: STAGING_REVIEW_PASSWORD_ASSIGNMENT_V1 | Zweck: wählt das Staging-Review-Passwort für api/_config.php; Umfang: ergänzt APP_REVIEW_PASSWORD im Staging-Zweig ===
+            APP_REVIEW_PASSWORD="$STAGING_REVIEW_PASSWORD"
             APP_BASE_URL="https://staging.bocholt-erleben.de"
+            # === END BLOCK: STAGING_REVIEW_PASSWORD_ASSIGNMENT_V1 ===
           else
             APP_DB_HOST="$LIVE_DB_HOST"
             APP_DB_PORT="${LIVE_DB_PORT:-3306}"
@@ -516,7 +523,10 @@ jobs:
             APP_MAIL_SMTP_USERNAME="$LIVE_MAIL_SMTP_USERNAME"
             APP_MAIL_SMTP_PASSWORD="$LIVE_MAIL_SMTP_PASSWORD"
 
+            # === BEGIN BLOCK: LIVE_REVIEW_PASSWORD_ASSIGNMENT_V1 | Zweck: wählt das Live-Review-Passwort für api/_config.php; Umfang: ergänzt APP_REVIEW_PASSWORD im Live-Zweig ===
+            APP_REVIEW_PASSWORD="$LIVE_REVIEW_PASSWORD"
             APP_BASE_URL="https://bocholt-erleben.de"
+            # === END BLOCK: LIVE_REVIEW_PASSWORD_ASSIGNMENT_V1 ===
           fi
 
           # === BEGIN BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 | Zweck: fail-fast mit klarer Fehlmeldung statt stillem exit 1 bei fehlenden DB-/Stripe-Secrets; Umfang: ersetzt die bisherigen nackten test -n Checks im Prepare-deploy-Step ===
@@ -539,13 +549,16 @@ jobs:
           [ -n "$APP_MAIL_SMTP_ENCRYPTION" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_ENCRYPTION"; exit 1; }
           [ -n "$APP_MAIL_SMTP_USERNAME" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_USERNAME"; exit 1; }
           [ -n "$APP_MAIL_SMTP_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_MAIL_SMTP_PASSWORD"; exit 1; }
+          [ -n "$APP_REVIEW_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_REVIEW_PASSWORD"; exit 1; }
           # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
           APP_ENV="$DEPLOY_ENV_NAME"
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
           APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
+          # === BEGIN BLOCK: EXPORT_REVIEW_PASSWORD_TO_CONFIG_WRITER_V1 | Zweck: übergibt das Review-Passwort an den Python-Config-Writer; Umfang: ersetzt export-Zeile ===
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
+          # === END BLOCK: EXPORT_REVIEW_PASSWORD_TO_CONFIG_WRITER_V1 ===
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===
@@ -579,6 +592,7 @@ jobs:
                       "unlimited": os.environ["APP_STRIPE_PRICE_UNLIMITED"],
                   },
               },
+              # === BEGIN BLOCK: PRIVATE_CONFIG_REVIEW_PASSWORD_PAYLOAD_V1 | Zweck: schreibt Review-Passwort in die private api/_config.php des Deploy-Artefakts; Umfang: ergänzt review-Konfiguration ===
               "mail": {
                   "from_name": os.environ["APP_MAIL_FROM_NAME"],
                   "from_address": os.environ["APP_MAIL_FROM_ADDRESS"],
@@ -588,6 +602,10 @@ jobs:
                   "smtp_username": os.environ["APP_MAIL_SMTP_USERNAME"],
                   "smtp_password": os.environ["APP_MAIL_SMTP_PASSWORD"],
               },
+              "review": {
+                  "password": os.environ["APP_REVIEW_PASSWORD"],
+              },
+              # === END BLOCK: PRIVATE_CONFIG_REVIEW_PASSWORD_PAYLOAD_V1 ===
           }
 
           encoded = base64.b64encode(
