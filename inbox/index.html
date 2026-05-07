@@ -142,6 +142,7 @@ Umfang:
 
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
+    let reviewApiPassword = "";
 
     // === BEGIN BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
     // Zweck:
@@ -182,11 +183,18 @@ Umfang:
     // Umfang:
     // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
     async function fetchSubmissionReviewItems() {
+      if (!reviewApiPassword) {
+        return { items: [], total: 0, error: "submission_review_locked" };
+      }
+
       try {
         const response = await fetch(SUBMISSIONS_REVIEW_API_URL, {
           method: "GET",
           credentials: "same-origin",
-          headers: { Accept: "application/json" }
+          headers: {
+            Accept: "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          }
         });
 
         const rawText = await response.text();
@@ -443,6 +451,7 @@ Umfang:
           return false;
         }
         sessionToken = String(res.token || "");
+        reviewApiPassword = pw;
         refreshLock();
         setStatus("");
         return true;
@@ -525,6 +534,7 @@ Umfang:
 
           if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
             sessionToken = "";
+            reviewApiPassword = "";
             refreshLock();
             setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
             renderCurrent(totalLoaded);
@@ -559,12 +569,17 @@ Umfang:
     // Umfang:
     // - Ergänzt PHP-JSON-Schreibpfad für review_source=submission_db
     async function postJson(url, payload) {
+      if (!reviewApiPassword) {
+        throw new Error("review_api_locked");
+      }
+
       const response = await fetch(url, {
         method: "POST",
         credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json"
+          Accept: "application/json",
+          "X-BE-Review-Password": reviewApiPassword
         },
         body: JSON.stringify(payload)
       });
@@ -648,6 +663,7 @@ Umfang:
 
         if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
           sessionToken = "";
+          reviewApiPassword = "";
           refreshLock();
           setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
           return;
@@ -701,14 +717,24 @@ Umfang:
       });
     }
 
-    // Init
-    (function init() {
+    // === BEGIN BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_V1 ===
+    // Zweck:
+    // - Entsperrt die Kuratier-PWA beim Öffnen, damit DB-Review-Fälle nicht öffentlich und trotzdem sichtbar sind
+    // - Passwort bleibt nur im RAM und wird als Header an PHP-Review-Endpunkte gesendet
+    // Umfang:
+    // - Ersetzt Init-Block
+    (async function init() {
       refreshLock();
-      loadAndShow().catch(err => {
+
+      try {
+        await ensureUnlocked();
+        await loadAndShow();
+      } catch (err) {
         console.error(err);
         setStatus("Fehler beim Laden.");
-      });
+      }
     })();
+    // === END BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_V1 ===
   </script>
 </body>
 </html>
