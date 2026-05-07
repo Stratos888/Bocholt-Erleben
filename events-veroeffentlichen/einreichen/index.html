@@ -133,23 +133,25 @@
             <input class="content-field__control" id="publish-standard-place" name="place" type="text" required>
           </label>
 
-          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V2 | Zweck: trennt die Ortsdaten für spätere Maps-/Review-Prüfung in Treffpunkt, PLZ und Ort; Umfang: Adressfelder der Einzeltermin-Einreichung === -->
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V3 | Zweck: hält Adresse/Treffpunkt als ein flexibles Feld und stellt PLZ + Stadt/Ort platzsparend in einer gemeinsamen Zeile dar; Umfang: Adressfelder der Einzeltermin-Einreichung === -->
           <label class="content-field content-field--full" for="publish-standard-place-street">
-            <span class="content-field__label">Straße und Hausnummer oder offizieller Treffpunkt *</span>
+            <span class="content-field__label">Adresse / offizieller Treffpunkt *</span>
             <input class="content-field__control" id="publish-standard-place-street" name="placeStreet" type="text" autocomplete="street-address" required>
             <p class="content-field__hint">Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
           </label>
 
-          <label class="content-field" for="publish-standard-place-zip">
-            <span class="content-field__label">PLZ *</span>
-            <input class="content-field__control" id="publish-standard-place-zip" name="placeZip" type="text" inputmode="numeric" autocomplete="postal-code" required>
-          </label>
+          <div class="publish-locality-row content-field--full">
+            <label class="content-field publish-locality-row__zip" for="publish-standard-place-zip">
+              <span class="content-field__label">PLZ *</span>
+              <input class="content-field__control" id="publish-standard-place-zip" name="placeZip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" required>
+            </label>
 
-          <label class="content-field" for="publish-standard-place-city">
-            <span class="content-field__label">Ort *</span>
-            <input class="content-field__control" id="publish-standard-place-city" name="placeCity" type="text" autocomplete="address-level2" required>
-          </label>
-          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V2 === -->
+            <label class="content-field publish-locality-row__city" for="publish-standard-place-city">
+              <span class="content-field__label">Stadt / Ort *</span>
+              <input class="content-field__control" id="publish-standard-place-city" name="placeCity" type="text" autocomplete="address-level2" required>
+            </label>
+          </div>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V3 === -->
 
           <label class="content-field content-field--full" for="publish-standard-event-link">
             <span class="content-field__label">Link zur Veranstaltungsseite</span>
@@ -161,11 +163,6 @@
             <span class="content-field__label">Kurze Beschreibung oder Hinweise</span>
             <textarea class="content-field__control" id="publish-standard-description" name="description" rows="3"></textarea>
             <p class="content-field__hint">Kurz und sachlich. Falls du noch keinen fertigen Beschreibungstext hast, reichen wichtige Hinweise.</p>
-          </label>
-
-          <label class="content-field" for="publish-standard-contact">
-            <span class="content-field__label">Ansprechperson</span>
-            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name">
           </label>
 
           <label class="content-field content-field--full" for="publish-standard-location-confirmed">
