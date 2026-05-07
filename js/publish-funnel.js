@@ -464,6 +464,7 @@ function applyPlanPresetFromUrl() {
     return data;
   }
 
+  /* === BEGIN BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V1 | Zweck: sendet prüfpflichtige Ortsangaben als eigene Felder an die Submission-API; Umfang: ersetzt buildStandardSubmissionPayload ohne Änderung des Checkout-Flows === */
   function buildStandardSubmissionPayload(context) {
     const notesText = joinLines([
       lineIf("Adresse / offizieller Treffpunkt", context.placeStreet),
@@ -486,11 +487,14 @@ function applyPlanPresetFromUrl() {
       start_date: context.date,
       time_text: context.time,
       location_name: context.place,
+      location_address: context.placeAddress,
+      location_public_confirmed: context.locationConfirmed === true,
       ticket_url: context.website,
       description_text: context.description,
       notes_text: notesText
     };
   }
+  /* === END BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V1 === */
 
   function setStandardSubmitting(trigger, isSubmitting) {
     if (!trigger) return;
