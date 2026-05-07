@@ -67,6 +67,7 @@ function pf_validate_model_key(string $modelKey): string
     return $modelKey;
 }
 
+/* === BEGIN BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELD_HELPERS_V1 | Zweck: validiert optionale Datumswerte und normalisiert Boolean-Werte für prüfpflichtige Ortsfreigaben; Umfang: ersetzt pf_validate_date_or_null und ergänzt pf_boolish_to_int === */
 function pf_validate_date_or_null(?string $date): ?string
 {
     if ($date === null) {
@@ -82,6 +83,16 @@ function pf_validate_date_or_null(?string $date): ?string
 
     return $date;
 }
+
+function pf_boolish_to_int(mixed $value): int
+{
+    if ($value === true || $value === 1 || $value === '1' || $value === 'true' || $value === 'on' || $value === 'yes') {
+        return 1;
+    }
+
+    return 0;
+}
+/* === END BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELD_HELPERS_V1 === */
 
 function pf_uuid_v4(): string
 {
@@ -267,11 +278,14 @@ try {
     $emailInput = pf_required_string($input, 'email', 'E-Mail-Adresse');
     $emailNormalized = pf_normalize_email($emailInput);
 
+    /* === BEGIN BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELDS_FROM_INPUT_V1 | Zweck: übernimmt Review-Herkunftsfelder und prüfpflichtige Ortsangaben aus dem Formular, ohne bestehende Link-/Fallback-Validierung zu verschärfen; Umfang: ersetzt Event-Feld-Parsing bis payment_reference_key === */
     $eventUrl = pf_nullable_string($input['event_url'] ?? null);
     $title = pf_nullable_string($input['title'] ?? null);
     $startDate = pf_validate_date_or_null(pf_nullable_string($input['start_date'] ?? null));
     $timeText = pf_nullable_string($input['time_text'] ?? null);
     $locationName = pf_nullable_string($input['location_name'] ?? null);
+    $locationAddress = pf_nullable_string($input['location_address'] ?? null);
+    $locationPublicConfirmed = pf_boolish_to_int($input['location_public_confirmed'] ?? null);
     $ticketUrl = pf_nullable_string($input['ticket_url'] ?? null);
     $descriptionText = pf_nullable_string($input['description_text'] ?? null);
     $notesText = pf_nullable_string($input['notes_text'] ?? null);
@@ -281,7 +295,9 @@ try {
     }
 
     $paymentKind = $requestedModelKey === 'single' ? 'single' : 'subscription';
+    $intakeOrigin = $paymentKind === 'subscription' ? 'membership' : 'single_event';
     $paymentReferenceKey = pf_uuid_v4();
+    /* === END BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELDS_FROM_INPUT_V1 === */
 
     $pdo = be_db();
     $pdo->beginTransaction();
@@ -301,6 +317,7 @@ try {
             $emailNormalized = trim((string)$portalSession['email_normalized']);
             $requestedModelKey = trim((string)$activeSubscription['plan_key']);
             $paymentKind = 'subscription';
+            $intakeOrigin = 'membership';
         }
     }
 
@@ -341,6 +358,7 @@ try {
             status,
             requested_model_key,
             payment_kind,
+            intake_origin,
             payment_reference_key,
             organization_name_snapshot,
             contact_name_snapshot,
@@ -350,6 +368,8 @@ try {
             start_date,
             time_text,
             location_name,
+            location_address,
+            location_public_confirmed,
             ticket_url,
             description_text,
             notes_text
@@ -359,6 +379,7 @@ try {
             :status,
             :requested_model_key,
             :payment_kind,
+            :intake_origin,
             :payment_reference_key,
             :organization_name_snapshot,
             :contact_name_snapshot,
@@ -368,6 +389,8 @@ try {
             :start_date,
             :time_text,
             :location_name,
+            :location_address,
+            :location_public_confirmed,
             :ticket_url,
             :description_text,
             :notes_text
@@ -380,6 +403,7 @@ try {
         ':status' => 'draft',
         ':requested_model_key' => $requestedModelKey,
         ':payment_kind' => $paymentKind,
+        ':intake_origin' => $intakeOrigin,
         ':payment_reference_key' => $paymentReferenceKey,
         ':organization_name_snapshot' => $organizationName,
         ':contact_name_snapshot' => $contactName,
@@ -389,6 +413,8 @@ try {
         ':start_date' => $startDate,
         ':time_text' => $timeText,
         ':location_name' => $locationName,
+        ':location_address' => $locationAddress,
+        ':location_public_confirmed' => $locationPublicConfirmed,
         ':ticket_url' => $ticketUrl,
         ':description_text' => $descriptionText,
         ':notes_text' => $notesText,
@@ -406,6 +432,7 @@ try {
             'submission_status' => 'draft',
             'requested_model_key' => $requestedModelKey,
             'payment_kind' => $paymentKind,
+            'intake_origin' => $intakeOrigin,
             'payment_reference_key' => $paymentReferenceKey,
         ],
     ]);
