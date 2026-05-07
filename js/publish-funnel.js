@@ -218,37 +218,46 @@ function applyPlanPresetFromUrl() {
     }
   }
 
-// === BEGIN FUNCTION: buildStandardContext | Zweck: liest die Einzeltermin-Einreichung inklusive getrennten Ortsdaten und Berechtigungsbestätigung aus; Umfang: komplette Kontextfunktion ===
-function buildStandardContext() {
-  const placeStreet = safeText(byId("publish-standard-place-street")?.value);
-  const placeZip = safeText(byId("publish-standard-place-zip")?.value);
-  const placeCity = safeText(byId("publish-standard-place-city")?.value);
-  const placeAddress = [
-    placeStreet,
-    [placeZip, placeCity].filter(hasValue).join(" ")
-  ].filter(hasValue).join(", ");
+  // === BEGIN BLOCK: PUBLISH_SINGLE_AND_AUTOMATION_CONTEXTS_V4 | Zweck: konsolidiert Einzeltermin-Kontext, Automationsanfrage und Standard-Checkout-Helper ohne doppelte/halb eingefügte Funktionen; Umfang: kompletter Block von buildStandardContext bis setStandardSubmitting ===
+  function buildStandardContext() {
+    const placeStreet = safeText(byId("publish-standard-place-street")?.value);
+    const placeZip = safeText(byId("publish-standard-place-zip")?.value);
+    const placeCity = safeText(byId("publish-standard-place-city")?.value);
+    const placeAddress = [
+      placeStreet,
+      [placeZip, placeCity].filter(hasValue).join(" ")
+    ].filter(hasValue).join(", ");
 
-  return {
-    plan: safeText(byId("publish-standard-plan")?.value),
-    organization: safeText(byId("publish-standard-organization")?.value),
-    contact: "",
-    email: safeText(byId("publish-standard-email")?.value),
-    eventLink: safeText(byId("publish-standard-event-link")?.value),
-    title: safeText(byId("publish-standard-title")?.value),
-    date: safeText(byId("publish-standard-date")?.value),
-    time: safeText(byId("publish-standard-time")?.value),
-    place: safeText(byId("publish-standard-place")?.value),
-    placeStreet,
-    placeZip,
-    placeCity,
-    placeAddress,
-    website: safeText(byId("publish-standard-website")?.value),
-    description: safeText(byId("publish-standard-description")?.value),
-    notes: safeText(byId("publish-standard-notes")?.value),
-    locationConfirmed: byId("publish-standard-location-confirmed")?.checked === true
-  };
-}
-// === END FUNCTION: buildStandardContext ===
+    return {
+      plan: safeText(byId("publish-standard-plan")?.value),
+      organization: safeText(byId("publish-standard-organization")?.value),
+      contact: "",
+      email: safeText(byId("publish-standard-email")?.value),
+      eventLink: safeText(byId("publish-standard-event-link")?.value),
+      title: safeText(byId("publish-standard-title")?.value),
+      date: safeText(byId("publish-standard-date")?.value),
+      time: safeText(byId("publish-standard-time")?.value),
+      place: safeText(byId("publish-standard-place")?.value),
+      placeStreet,
+      placeZip,
+      placeCity,
+      placeAddress,
+      website: safeText(byId("publish-standard-website")?.value),
+      description: safeText(byId("publish-standard-description")?.value),
+      notes: safeText(byId("publish-standard-notes")?.value),
+      locationConfirmed: byId("publish-standard-location-confirmed")?.checked === true
+    };
+  }
+
+  function buildAutomationContext() {
+    return {
+      organization: safeText(byId("publish-automation-organization")?.value),
+      website: safeText(byId("publish-automation-website")?.value),
+      contact: safeText(byId("publish-automation-contact")?.value),
+      email: safeText(byId("publish-automation-email")?.value),
+      techContact: safeText(byId("publish-automation-tech-contact")?.value),
+      monthlyVolume: safeText(byId("publish-automation-volume")?.value),
+      sourceType: safeText(byId("publish-automation-source-type")?.value),
       sourceLink: safeText(byId("publish-automation-source-link")?.value),
       cadence: safeText(byId("publish-automation-cadence")?.value),
       notes: safeText(byId("publish-automation-notes")?.value)
@@ -368,49 +377,64 @@ function buildStandardContext() {
     return { mode: "formspree" };
   }
 
-  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 | Zweck: ersetzt den alten Payment-Link-Flow durch den serverseitigen Submission->Checkout-Flow; Umfang: Standard-Validierung, API-Helper, Submit-State und bindStandardPath in js/publish-funnel.js === */
-// === BEGIN FUNCTION: validateStandardContext | Zweck: validiert den Einzeltermin-Weg ohne Eventlink-Pflicht und ohne Mitgliedschaftsauswahl; Umfang: komplette Standard-Validierung ===
-function validateStandardContext(context) {
-  if (safeText(context.plan) !== "single") {
-    window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
-    return false;
+  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V2 | Zweck: validiert Einzeltermin-Einreichungen, bereitet den API-Payload vor und steuert den Submit-State; Umfang: Standard-Validierung, API-Helper, Payload-Builder und Submit-State === */
+  function validateStandardContext(context) {
+    if (safeText(context.plan) !== "single") {
+      window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
+      return false;
+    }
+
+    if (!hasValue(context.organization) || !hasValue(context.email)) {
+      window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
+      return false;
+    }
+
+    if (!hasValue(context.title) || !hasValue(context.date)) {
+      window.alert("Bitte gib Titel und Datum der Veranstaltung an.");
+      return false;
+    }
+
+    if (!hasValue(context.place) || !hasValue(context.placeStreet) || !hasValue(context.placeZip) || !hasValue(context.placeCity)) {
+      window.alert("Bitte gib Veranstaltungsort, Adresse oder Treffpunkt, PLZ und Stadt / Ort an.");
+      return false;
+    }
+
+    if (context.locationConfirmed !== true) {
+      window.alert("Bitte bestätige, dass du zur Einreichung berechtigt bist und der Ort öffentlich genannt werden darf.");
+      return false;
+    }
+
+    return true;
   }
 
-  if (!hasValue(context.organization) || !hasValue(context.email)) {
-    window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
-    return false;
+  function validateAutomationContext(context) {
+    if (!hasValue(context.organization) || !hasValue(context.email)) {
+      window.alert("Bitte gib Organisation und E-Mail-Adresse an.");
+      return false;
+    }
+
+    if (!hasValue(context.sourceType)) {
+      window.alert("Bitte wähle aus, wo deine Termine stehen.");
+      return false;
+    }
+
+    if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
+      window.alert("Bitte gib mindestens einen Link zu deinen Terminen oder deiner Website an.");
+      return false;
+    }
+
+    return true;
   }
 
-// === BEGIN FUNCTION: validateStandardContext | Zweck: validiert den Einzeltermin-Weg mit getrennten Ortsdaten und ohne Mitgliedschaftsauswahl; Umfang: komplette Standard-Validierung ===
-function validateStandardContext(context) {
-  if (safeText(context.plan) !== "single") {
-    window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
-    return false;
-  }
-
-  if (!hasValue(context.organization) || !hasValue(context.email)) {
-    window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
-    return false;
-  }
-
-  if (!hasValue(context.title) || !hasValue(context.date)) {
-    window.alert("Bitte gib Titel und Datum der Veranstaltung an.");
-    return false;
-  }
-
-  if (!hasValue(context.place) || !hasValue(context.placeStreet) || !hasValue(context.placeZip) || !hasValue(context.placeCity)) {
-    window.alert("Bitte gib Veranstaltungsort, Straße oder Treffpunkt, PLZ und Ort an.");
-    return false;
-  }
-
-  if (context.locationConfirmed !== true) {
-    window.alert("Bitte bestätige, dass du zur Einreichung berechtigt bist und der Ort öffentlich genannt werden darf.");
-    return false;
-  }
-
-  return true;
-}
-// === END FUNCTION: validateStandardContext ===
+  async function postPublishApiJson(url, payload) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
 
     const rawText = await response.text();
     let data = null;
@@ -440,53 +464,46 @@ function validateStandardContext(context) {
     return data;
   }
 
-// === BEGIN FUNCTION: buildStandardSubmissionPayload | Zweck: baut den Einzeltermin-Payload und konserviert Adresse/Treffpunkt sowie Ortsbestätigung bis zur späteren Review-Inbox-Anbindung in notes_text; Umfang: komplette Payload-Funktion ===
-function buildStandardSubmissionPayload(context) {
-  const notesText = joinLines([
-    lineIf("Adresse oder öffentlicher Treffpunkt", context.placeAddress),
-    context.locationConfirmed === true
-      ? "Ortsbestätigung: Einreicher bestätigt Berechtigung und öffentliche Nennung des Ortes."
-      : "",
-    lineIf("Weitere Hinweise", context.notes)
-  ]);
+  function buildStandardSubmissionPayload(context) {
+    const notesText = joinLines([
+      lineIf("Adresse / offizieller Treffpunkt", context.placeStreet),
+      lineIf("PLZ", context.placeZip),
+      lineIf("Stadt / Ort", context.placeCity),
+      lineIf("Adresse zusammengesetzt", context.placeAddress),
+      context.locationConfirmed === true
+        ? "Ortsbestätigung: Einreicher bestätigt Berechtigung und öffentliche Nennung des Ortes."
+        : "",
+      lineIf("Weitere Hinweise", context.notes)
+    ]);
 
-  return {
-// === BEGIN FUNCTION: buildStandardSubmissionPayload | Zweck: baut den Einzeltermin-Payload und konserviert getrennte Ortsdaten sowie Ortsbestätigung bis zur späteren Review-Inbox-Anbindung in notes_text; Umfang: komplette Payload-Funktion ===
-function buildStandardSubmissionPayload(context) {
-  const notesText = joinLines([
-    lineIf("Straße / offizieller Treffpunkt", context.placeStreet),
-    lineIf("PLZ", context.placeZip),
-    lineIf("Ort", context.placeCity),
-    lineIf("Adresse zusammengesetzt", context.placeAddress),
-    context.locationConfirmed === true
-      ? "Ortsbestätigung: Einreicher bestätigt Berechtigung und öffentliche Nennung des Ortes."
-      : "",
-    lineIf("Weitere Hinweise", context.notes)
-  ]);
+    return {
+      requested_model_key: "single",
+      organization_name: context.organization,
+      contact_name: context.contact,
+      email: context.email,
+      event_url: context.eventLink,
+      title: context.title,
+      start_date: context.date,
+      time_text: context.time,
+      location_name: context.place,
+      ticket_url: context.website,
+      description_text: context.description,
+      notes_text: notesText
+    };
+  }
 
-  return {
-    requested_model_key: "single",
-    organization_name: context.organization,
-    contact_name: context.contact,
-    email: context.email,
-    event_url: context.eventLink,
-    title: context.title,
-    start_date: context.date,
-    time_text: context.time,
-    location_name: context.place,
-    ticket_url: context.website,
-    description_text: context.description,
-    notes_text: notesText
-  };
-}
-// === END FUNCTION: buildStandardSubmissionPayload ===
-    if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
-      window.alert("Bitte gib mindestens einen Link zu deinen Terminen oder deiner Website an.");
-      return false;
+  function setStandardSubmitting(trigger, isSubmitting) {
+    if (!trigger) return;
+
+    if (!trigger.dataset.defaultLabel) {
+      trigger.dataset.defaultLabel = trigger.textContent || "Einreichung abschließen";
     }
 
-    return true;
+    trigger.disabled = isSubmitting;
+    trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
+    trigger.textContent = isSubmitting ? "Einreichung wird vorbereitet ..." : trigger.dataset.defaultLabel;
   }
+  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V2 === */
 
   function bindStandardPath() {
     const form = byId("publish-standard-form");
