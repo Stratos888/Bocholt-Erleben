@@ -349,6 +349,7 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
          SET
             status = :status,
             payment_kind = :payment_kind,
+            intake_origin = :intake_origin,
             requested_model_key = CASE
                 WHEN :resolved_model_key_check = "" THEN requested_model_key
                 ELSE :resolved_model_key_value
@@ -365,6 +366,7 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
 
     $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
     $statement->bindValue(':payment_kind', 'subscription', PDO::PARAM_STR);
+    $statement->bindValue(':intake_origin', 'membership', PDO::PARAM_STR);
     $statement->bindValue(':resolved_model_key_check', $resolvedModelKey, PDO::PARAM_STR);
     $statement->bindValue(':resolved_model_key_value', $resolvedModelKey, PDO::PARAM_STR);
     $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
