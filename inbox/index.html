@@ -45,6 +45,9 @@ Umfang:
     .brand { display:flex; align-items:baseline; gap:10px; }
     .title { font-weight: 700; }
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
+    .originBadge { display:inline-flex; align-items:center; width:max-content; margin:0 0 10px 0; padding:4px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.18); font-size:12px; font-weight:700; }
+    .riskBox { margin: 10px 0 12px; padding: 10px; border-radius: 12px; border: 1px solid rgba(160,0,0,.25); background: rgba(160,0,0,.04); font-size: 13px; line-height: 1.35; }
+    .riskBox ul { margin: 6px 0 0 18px; padding: 0; }
     .muted { opacity: .75; }
     .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
@@ -117,7 +120,15 @@ Umfang:
     // - Vollständige Logik für diese Seite (konsolidiert)
     // === END BLOCK: FINAL REVIEW LOGIC (storage-free, fixed API, auto-unlock) ===
 
+    // === BEGIN BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
+    // Zweck:
+    // - Bestehende KI-/Sheet-Inbox bleibt unverändert
+    // - Formular-Submissions werden zusätzlich aus der DB-Review-API geladen
+    // Umfang:
+    // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
+    const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+    // === END BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
 
     const elOne = document.getElementById("one");
     const elStatus = document.getElementById("statusLine");
@@ -163,6 +174,50 @@ Umfang:
       }
     }
 
+    // === BEGIN BLOCK: REVIEW_INBOX_LOAD_SHEET_AND_SUBMISSIONS_V1 ===
+    // Zweck:
+    // - Lädt bestehende KI-/Sheet-Fälle weiter über Apps Script
+    // - Lädt bezahlte Formular-Einreichungen zusätzlich aus MySQL über PHP-Review-API
+    // - Kennzeichnet Sheet-Fälle als ai_search, ohne Event-Kategorie zu verändern
+    // Umfang:
+    // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
+    async function fetchSubmissionReviewItems() {
+      try {
+        const response = await fetch(SUBMISSIONS_REVIEW_API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: { Accept: "application/json" }
+        });
+
+        const rawText = await response.text();
+        let data = null;
+
+        try {
+          data = rawText ? JSON.parse(rawText) : null;
+        } catch (_error) {
+          data = null;
+        }
+
+        if (!response.ok || !data || data.status !== "ok") {
+          return { items: [], total: 0, error: "submission_review_load_failed" };
+        }
+
+        const items = Array.isArray(data.data?.items) ? data.data.items : [];
+        return { items, total: Number(data.data?.total || items.length || 0), error: "" };
+      } catch (_error) {
+        return { items: [], total: 0, error: "submission_review_network_failed" };
+      }
+    }
+
+    function normalizeSheetReviewItem(item) {
+      return {
+        ...item,
+        review_source: item.review_source || "sheet_inbox",
+        intake_origin: item.intake_origin || "ai_search",
+        intake_origin_label: item.intake_origin_label || "KI-Suche"
+      };
+    }
+
     async function loadAndShow() {
       setStatus("Lade …");
       elOne.innerHTML = "";
@@ -171,7 +226,10 @@ Umfang:
       totalLoaded = 0;
 
       try {
-        const res = await jsonp(API_URL, { action: "listReview" });
+        const [res, submissionsResult] = await Promise.all([
+          jsonp(API_URL, { action: "listReview" }),
+          fetchSubmissionReviewItems()
+        ]);
 
         if (!res || !res.ok) {
           const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
@@ -182,11 +240,18 @@ Umfang:
           return;
         }
 
-        queue = Array.isArray(res.items) ? res.items : [];
-        totalLoaded = Number(res.total || queue.length || 0);
+        const sheetItems = Array.isArray(res.items) ? res.items.map(normalizeSheetReviewItem) : [];
+        const submissionItems = Array.isArray(submissionsResult.items) ? submissionsResult.items : [];
+
+        queue = [...submissionItems, ...sheetItems];
+        totalLoaded = Number(res.total || sheetItems.length || 0) + Number(submissionsResult.total || submissionItems.length || 0);
 
         refreshLock();
-        setStatus(queue.length ? "" : "Keine review-items.");
+        if (!queue.length && submissionsResult.error) {
+          setStatus("Keine review-items. DB-Review konnte nicht geladen werden: " + submissionsResult.error);
+        } else {
+          setStatus(queue.length ? "" : "Keine review-items.");
+        }
 
         showNext(totalLoaded);
       } catch (e) {
@@ -197,6 +262,7 @@ Umfang:
         refreshLock();
       }
     }
+    // === END BLOCK: REVIEW_INBOX_LOAD_SHEET_AND_SUBMISSIONS_V1 ===
 
     function showNext(totalCount) {
       current = queue.shift() || null;
@@ -268,16 +334,30 @@ Umfang:
         return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
       }).join("");
 
+      const originLabel = (it.intake_origin_label || "KI-Suche").trim();
+      const originBadgeHtml = `<span class="originBadge">${escapeHtml(originLabel)}</span>`;
+      const reviewRiskFlags = Array.isArray(it.review_risk_flags) ? it.review_risk_flags.filter(Boolean) : [];
+      const reviewRiskHtml = reviewRiskFlags.length ? `
+        <div class="riskBox">
+          <strong>Review-Risiko</strong>
+          <ul>${reviewRiskFlags.map((flag) => `<li>${escapeHtml(flag)}</li>`).join("")}</ul>
+        </div>
+      ` : "";
+
       const infoRows = [
+        ["Herkunft", originLabel],
         ["Typ", eventType],
         ["Laufzeit", dateLine],
         ["Startzeit", timeLine],
         ["Ort", placeLine],
+        ["Adresse/Treffpunkt", (it.location_address || "").trim()],
+        ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
         ["Kategorie", (it.kategorie_suggestion || "").trim()],
         ["Quelle", sourceLine],
         ["Match Score", (it.match_score || "").trim()],
         ["Matched Event ID", (it.matched_event_id || "").trim()],
         ["ID-Vorschlag", (it.id_suggestion || "").trim()],
+        ["Submission-ID", it.submission_id ? String(it.submission_id) : ""],
         ["Eingang", (it.created_at || "").trim()],
         ["Notes", (it.notes || "").trim()]
       ].filter(([, value]) => value);
@@ -291,11 +371,14 @@ Umfang:
 
       elOne.innerHTML = `
         <article class="card">
+          ${originBadgeHtml}
           <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
 
           <div class="reviewGrid">
             ${infoRowsHtml}
           </div>
+
+          ${reviewRiskHtml}
 
           <div class="descTitle">Beschreibung / extrahierter Text</div>
           <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
@@ -378,6 +461,11 @@ Umfang:
     // - Ersetzt writeStatus(it, newStatus)
     function writeStatus(it, newStatus) {
       return new Promise(async (resolve) => {
+        if (String(it.review_source || "") === "submission_db") {
+          await writeSubmissionStatus(it, newStatus);
+          return resolve();
+        }
+
         if (!it.row_number) {
           alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
           return resolve();
@@ -462,6 +550,76 @@ Umfang:
       });
     }
     // === END BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
+
+    // === BEGIN BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
+    // Zweck:
+    // - Übernimmt oder verwirft DB-Submissions ohne Apps-Script-Row-Nummer
+    // - Übernehmen nutzt bestehenden Approval-Endpunkt und bucht erst dann Kontingent
+    // - Verwerfen nutzt neuen Reject-Endpunkt ohne Kontingentverbrauch
+    // Umfang:
+    // - Ergänzt PHP-JSON-Schreibpfad für review_source=submission_db
+    async function postJson(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const rawText = await response.text();
+      let data = null;
+
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch (_error) {
+        data = null;
+      }
+
+      if (!response.ok || !data || data.status !== "ok") {
+        const message = data?.message || data?.error_message || "request_failed";
+        throw new Error(message);
+      }
+
+      return data;
+    }
+
+    async function writeSubmissionStatus(it, newStatus) {
+      const submissionId = Number(it.submission_id || 0);
+      if (submissionId <= 0) {
+        alert("Fehlt: submission_id im DB-Review-Fall.");
+        return;
+      }
+
+      const isApprove = String(newStatus) === "übernehmen";
+
+      if (isApprove) {
+        await postJson("/api/submissions/approve.php", { submission_id: submissionId });
+        setStatus("Submission geprüft und freigegeben.");
+        await loadAndShow();
+        return;
+      }
+
+      const reasonSelect = document.getElementById("rejectReason");
+      const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
+
+      if (!ablehnungsgrund) {
+        alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
+        renderCurrent(totalLoaded);
+        return;
+      }
+
+      await postJson("/api/submissions/reject.php", {
+        submission_id: submissionId,
+        reason: ablehnungsgrund
+      });
+
+      setStatus("Submission verworfen.");
+      await loadAndShow();
+    }
+    // === END BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
 
     async function triggerDeploy() {
       const btnDeploy = document.getElementById("deployBtn");
