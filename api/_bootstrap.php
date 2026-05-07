@@ -134,6 +134,57 @@ function be_json_response(int $statusCode, array $payload): never
     exit;
 }
 
+/* === BEGIN BLOCK: BACKEND_REVIEW_ACCESS_GUARD_V1 | Zweck: schützt Kuratier-DB-Endpunkte mit serverseitig konfiguriertem Review-Passwort; Umfang: ergänzt Helper für review-list/approve/reject === */
+function be_review_password(): string
+{
+    $config = be_get_config();
+
+    $password = trim((string)($config['review']['password'] ?? ''));
+    if ($password === '') {
+        $password = trim((string)($config['security']['review_password'] ?? ''));
+    }
+    if ($password === '') {
+        $password = trim((string)($config['review_password'] ?? ''));
+    }
+    if ($password === '') {
+        $password = trim((string)getenv('BE_REVIEW_PASSWORD'));
+    }
+
+    if ($password === '') {
+        throw new RuntimeException('Review password is not configured.');
+    }
+
+    return $password;
+}
+
+function be_request_header(string $name): string
+{
+    $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+    return trim((string)($_SERVER[$serverKey] ?? ''));
+}
+
+function be_require_review_access(): void
+{
+    try {
+        $expectedPassword = be_review_password();
+    } catch (Throwable $error) {
+        be_json_response(503, [
+            'status' => 'error',
+            'message' => 'Review access is not configured.',
+        ]);
+    }
+
+    $submittedPassword = be_request_header('X-BE-Review-Password');
+
+    if ($submittedPassword === '' || !hash_equals($expectedPassword, $submittedPassword)) {
+        be_json_response(401, [
+            'status' => 'error',
+            'message' => 'Review access denied.',
+        ]);
+    }
+}
+/* === END BLOCK: BACKEND_REVIEW_ACCESS_GUARD_V1 === */
+
 function be_mail_encode_header(string $value): string
 {
     $clean = trim(preg_replace('/[\r\n]+/', ' ', $value) ?? '');
