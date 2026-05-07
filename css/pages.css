@@ -1008,6 +1008,23 @@ select.content-field__control{
   gap: 7px;
 }
 
+/* === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_V1 | Zweck: stellt PLZ und Stadt/Ort in der Einzeltermin-Einreichung platzsparend nebeneinander dar, ohne Straße/Hausnummer technisch zu erzwingen; Umfang: lokale Formularzeile für PLZ + Stadt/Ort === */
+.page--publish .publish-locality-row{
+  display: grid;
+  grid-template-columns: minmax(74px, 88px) minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+}
+
+.page--publish .publish-locality-row__zip{
+  min-width: 0;
+}
+
+.page--publish .publish-locality-row__city{
+  min-width: 0;
+}
+/* === END BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_V1 === */
+
 .page--publish .content-field{
   gap: 3px;
 }
