@@ -126,13 +126,59 @@ function be_mail_config(): array
     ];
 }
 
+/* === BEGIN BLOCK: BACKEND_JSON_RESPONSE_DIAGNOSTIC_SANITIZER_V1 | Zweck: blendet technische Fehlerdetails außerhalb Staging/Development zentral aus; Umfang: ersetzt be_json_response und ergänzt sichere Diagnose-Env-Helfer === */
+function be_app_env_value(): string
+{
+    try {
+        $config = be_get_config();
+        $configuredEnv = strtolower(trim((string)($config['app_env'] ?? '')));
+        if ($configuredEnv !== '') {
+            return $configuredEnv;
+        }
+    } catch (Throwable $error) {
+        // Config kann bei Health-/Bootstrap-Fehlern fehlen. Dann nicht scheitern, sondern sicher fortfahren.
+    }
+
+    return strtolower(trim((string)(getenv('APP_ENV') ?: getenv('BE_APP_ENV') ?: '')));
+}
+
+function be_should_expose_diagnostics(): bool
+{
+    return in_array(be_app_env_value(), ['staging', 'development', 'dev', 'local', 'test'], true);
+}
+
+function be_sanitize_json_payload_for_public_response(array $payload): array
+{
+    if (be_should_expose_diagnostics()) {
+        return $payload;
+    }
+
+    $technicalKeys = [
+        'error_class',
+        'error_message',
+        'error_file',
+        'error_line',
+        'error_trace',
+        'exception',
+        'debug',
+        'trace',
+    ];
+
+    foreach ($technicalKeys as $key) {
+        unset($payload[$key]);
+    }
+
+    return $payload;
+}
+
 function be_json_response(int $statusCode, array $payload): never
 {
     http_response_code($statusCode);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    echo json_encode(be_sanitize_json_payload_for_public_response($payload), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     exit;
 }
+/* === END BLOCK: BACKEND_JSON_RESPONSE_DIAGNOSTIC_SANITIZER_V1 === */
 
 /* === BEGIN BLOCK: BACKEND_REVIEW_ACCESS_GUARD_V1 | Zweck: schützt Kuratier-DB-Endpunkte mit serverseitig konfiguriertem Review-Passwort; Umfang: ergänzt Helper für review-list/approve/reject === */
 function be_review_password(): string
