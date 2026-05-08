@@ -1157,6 +1157,7 @@ select.content-field__control{
 }
 /* === END BLOCK: ORGANIZER_HERO_TEXT_WIDTH_REBALANCE_V1 === */
 
+/* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V1 | Zweck: hält Organizer-Karten kompakt und markiert fehlende Pflichtfelder im Mitgliedschaftsformular ruhig über Feldrahmen und Sammelhinweis; Umfang: Organizer-Actions, Cards und Validierungszustände für /fuer-veranstalter/ === */
 .page--organizers .content-actions{
   margin-top: 1px;
 }
@@ -1182,6 +1183,20 @@ select.content-field__control{
 .page--organizers .content-card--primary p{
   line-height: 1.28;
 }
+
+.page--organizers .content-field[data-field-invalid="true"] .content-field__control{
+  border-color: rgba(163,37,37,0.58);
+  box-shadow:
+    0 0 0 3px rgba(163,37,37,0.12),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.page--organizers .organizer-validation-note{
+  max-width: none;
+  color: #8d1f1f;
+  font-weight: 720;
+}
+/* === END BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V1 === */
 
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
