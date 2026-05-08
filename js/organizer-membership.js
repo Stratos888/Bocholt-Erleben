@@ -9,11 +9,16 @@
   const planSelect = document.getElementById("organizer-membership-plan");
   const planHint = document.getElementById("organizer-membership-plan-hint");
 
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_FORM_VALIDATION_GUARD_V2 | Zweck: deaktiviert native Browser-Pflichtfeld-Bubbles zuverlässig und erzwingt die eigene rote Feldmarkierung; Umfang: Formular-Guard und safeText-Basis direkt nach DOM-Referenzen === */
   if (!form || !submitButton || !resultCard || !resultText || !planSelect) {
     return;
   }
 
+  form.noValidate = true;
+  submitButton.formNoValidate = true;
+
   const safeText = (value) => String(value ?? "").trim();
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_FORM_VALIDATION_GUARD_V2 === */
 
   /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_AND_SUBMIT_COPY_V3 | Zweck: hält Tarifhinweise und Button-Zustände konsistent mit veröffentlichten Terminen und Weiter-zur-Zahlungsmethode-Sprache; Umfang: Tarifhinweise, Change-Handler und Submit-Button-State === */
   const planDescriptions = {
