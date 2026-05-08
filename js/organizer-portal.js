@@ -522,6 +522,7 @@
     const accountPlan = document.getElementById("organizer-account-plan");
     const quotaHead = document.getElementById("organizer-dashboard-quota-head");
     const quotaPeriod = document.getElementById("organizer-quota-period");
+    const quotaChange = document.getElementById("organizer-quota-change");
     const quotaSummary = document.getElementById("organizer-quota-summary");
     const quotaRemaining = document.getElementById("organizer-quota-remaining");
     const submissionsHead = document.getElementById("organizer-dashboard-submissions-head");
@@ -529,8 +530,10 @@
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
     const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
     const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V3 | Zweck: entfernt den Dashboard-Kicker, zeigt oben nur den Veranstalternamen und hält den Hero knapp auf Mitgliedschaft und Einreichungen ausgerichtet; Umfang: Kicker-, Titel-, Lead- und Note-Texte in renderDashboard === */
     if (kicker) {
-      kicker.textContent = isSingleStatusView ? "Meine Einreichung" : "Mein Veranstalterbereich";
+      kicker.textContent = "";
+      kicker.hidden = true;
     }
 
     if (title) {
@@ -539,31 +542,26 @@
         : safeText(organizer.organization_name) || "Mein Veranstalterbereich";
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V2 | Zweck: macht Hero- und Hinweistext menschlicher und entfernt systemnahe Einzeltermin-Erklärungen; Umfang: Lead-/Note-Texte in renderDashboard === */
     if (lead) {
-      const email = safeText(organizer.email);
-
       if (isSingleStatusView) {
         lead.textContent = latestSubmission
           ? `${latestStatusText} · ${latestDateText}`
           : "Status deiner Einreichung.";
       } else {
-        lead.textContent = email
-          ? `E-Mail: ${email}`
-          : "Hier verwaltest du deine Mitgliedschaft und reichst neue Veranstaltungen ein.";
+        lead.textContent = "Hier siehst du deine Mitgliedschaft und letzte Einreichungen.";
       }
     }
 
     if (note) {
       if (isSingleStatusView) {
         note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
-      } else if (hasManageableSubscription) {
-        note.textContent = "Sichtbar sind Mitgliedschaft, aktueller Zeitraum, veröffentlichte Termine und letzte Einreichungen.";
+        note.hidden = false;
       } else {
-        note.textContent = "Sichtbar sind Status und letzte Einreichungen.";
+        note.textContent = "";
+        note.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V2 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V3 === */
 
     if (dashboardPrimaryCta) {
       const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
@@ -597,9 +595,9 @@
       }
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V2 | Zweck: entfernt systemnahe Verknüpft-/Modell-Sprache aus der Account-Karte; Umfang: Account-Karten-Texte in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 | Zweck: hält Meine Angaben auf Stammdaten begrenzt und verschiebt Mitgliedschaftsstatus vollständig in die Mitgliedschaftsübersicht; Umfang: Account-Karten-Texte in renderDashboard === */
     if (accountHead) {
-      accountHead.textContent = isSingleStatusView ? "Einreichung" : "Veranstalter";
+      accountHead.textContent = isSingleStatusView ? "Einreichung" : "Meine Angaben";
     }
 
     if (accountName) {
@@ -616,31 +614,20 @@
 
     if (accountPlan) {
       if (isSingleStatusView) {
+        accountPlan.hidden = false;
         accountPlan.textContent = latestLocationText
           ? `Ort: ${latestLocationText}`
           : `E-Mail: ${safeText(organizer.email) || "–"}`;
-      } else if (hasManageableSubscription) {
-        const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
-        const currentPeriodEndDate = formatDate(safeText(subscription?.current_period_end).split(" ")[0]);
-        const pendingPlanKey = safeText(subscription?.pending_plan_key).toLowerCase();
-        const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
-
-        if (cancelAtPeriodEnd && currentPeriodEndDate !== "–") {
-            accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)} · endet zum ${currentPeriodEndDate}`;
-        } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
-          accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)} · Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
-        } else {
-          accountPlan.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey)}`;
-        }
       } else {
-        const planLabel = formatPlanLabel(organizer.default_plan_key);
-        accountPlan.textContent = `Tarif: ${planLabel}`;
+        accountPlan.textContent = "";
+        accountPlan.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V2 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
 
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V3 | Zweck: bündelt Mitgliedschaft, geplante Änderungen und veröffentlichte Termine in einer klaren Übersicht ohne Dopplung in Meine Angaben; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
     if (quotaHead) {
-      quotaHead.textContent = isSingleStatusView ? "Status" : "Veröffentlichte Termine";
+      quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Mitgliedschaft";
     }
 
     if (quotaPeriod) {
@@ -649,7 +636,15 @@
           ? `Termin: ${latestDateText}`
           : "Veranstaltung einreichen";
       } else {
-        const start = formatDate(safeText(quota.current_period_start || subscription?.current_period_start).split(" ")[0]);
+        quotaPeriod.textContent = `Mitgliedschaft: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
+      }
+    }
+
+    if (quotaChange) {
+      if (isSingleStatusView) {
+        quotaChange.textContent = "";
+        quotaChange.hidden = true;
+      } else {
         const end = formatDate(safeText(quota.current_period_end || subscription?.current_period_end).split(" ")[0]);
         const subscriptionStatus = safeText(subscription?.status).toLowerCase();
         const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
@@ -657,44 +652,43 @@
         const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
         if (cancelAtPeriodEnd && end !== "–") {
-          quotaPeriod.textContent = `Status: endet zum ${end}`;
+          quotaChange.textContent = `Mitgliedschaft endet zum ${end}`;
+          quotaChange.hidden = false;
         } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
-          quotaPeriod.textContent = `Status: Wechsel zu ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
-        } else if ((quota.current_period_start || subscription?.current_period_start) && (quota.current_period_end || subscription?.current_period_end)) {
-          quotaPeriod.textContent = `Aktueller Zeitraum: ${start} bis ${end}`;
-        } else if (subscriptionStatus === "active" || subscriptionStatus === "trialing") {
-          quotaPeriod.textContent = "Status: aktive Mitgliedschaft";
+          quotaChange.textContent = `Geplanter Tarifwechsel: ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
+          quotaChange.hidden = false;
         } else if (subscriptionStatus === "past_due") {
-          quotaPeriod.textContent = "Status: Zahlungsproblem – bitte Mitgliedschaft verwalten";
+          quotaChange.textContent = "Zahlungsproblem – bitte Mitgliedschaft verwalten";
+          quotaChange.hidden = false;
         } else {
-          quotaPeriod.textContent = "Status: aktuell kein aktiver Zeitraum";
+          quotaChange.textContent = "";
+          quotaChange.hidden = true;
         }
       }
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_TERMS_COUNT_COPY_V2 | Zweck: ersetzt Veröffentlichungs-/Kontingent-Sprache durch veröffentlichte Termine und macht Prüfung/Freigabe klar; Umfang: Quota-/Status-Texte in renderDashboard === */
     if (quotaSummary) {
       if (isSingleStatusView) {
         quotaSummary.textContent = latestSubmission
           ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
           : "Noch keine Einreichung gefunden.";
       } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} im aktuellen Zeitraum`;
       } else {
-        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} im aktuellen Zeitraum`;
       }
     }
 
     if (quotaRemaining) {
       if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Weitere Termine sind im üblichen Rahmen möglich. Gezählt werden veröffentlichte Termine.";
+        quotaRemaining.textContent = "Weitere Einreichungen sind im üblichen Rahmen möglich. Gezählt werden veröffentlichte Termine nach Freigabe.";
       } else if (isSingleStatusView) {
-        quotaRemaining.textContent = "Für diesen Einzeltermin ist keine Mitgliedschaft aktiv.";
+        quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = `Noch verfügbar in diesem Zeitraum: ${Number(quota.remaining_total || 0)} veröffentlichte Termine.`;
+        quotaRemaining.textContent = `Noch verfügbar im aktuellen Zeitraum: ${Number(quota.remaining_total || 0)} veröffentlichte Termine.`;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_TERMS_COUNT_COPY_V2 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V3 === */
 
     if (submissionsHead) {
       submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Letzte Einreichungen";
