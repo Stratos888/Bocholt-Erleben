@@ -91,14 +91,14 @@
   </header>
   <!-- === END BLOCK: PUBLISH_HEADER_WITH_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V6 | Zweck: setzt die öffentliche Begriffsbasis für Einzeltermin, Mitgliedschaft und veröffentlichte Termine auf der Veranstalter-Einstiegsseite; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V7 | Zweck: finalisiert die sichtbare Wegwahl-Sprache für Einzelveranstaltung, Stripe-Zahlung, Statusansicht und Mitgliedschaft; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Veranstaltung einreichen</h1>
           <p class="content-lead">
-            Reiche einen einzelnen Termin ein oder starte eine Mitgliedschaft für regelmäßige Veröffentlichungen.
+            Reiche eine einzelne Veranstaltung ein oder starte eine Mitgliedschaft für regelmäßige Einreichungen.
           </p>
         </div>
       </div>
@@ -112,13 +112,13 @@
       <ul class="publish-model-list" aria-label="Wege für Veranstaltungen bei Bocholt erleben">
         <li>
           <div class="publish-model-copy">
-            <strong>Einzeltermin einreichen</strong>
-            <span>9,90&nbsp;€ einmalig</span>
-            <small>Für eine einzelne Veranstaltung ohne Mitgliedschaft. Die Veröffentlichung erfolgt nach Prüfung und Freigabe.</small>
+            <strong>Einzelne Veranstaltung einreichen</strong>
+            <span>9,90&nbsp;€ einmalig – Zahlung über Stripe</span>
+            <small>Die Veröffentlichung erfolgt nach Prüfung und Freigabe. Den Status deiner Einreichung kannst du später über „Bereich öffnen“ ansehen.</small>
           </div>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/einreichen/?plan=single">
-              Veranstaltung einreichen
+              Einzelne Veranstaltung einreichen
             </a>
           </div>
         </li>
@@ -130,15 +130,14 @@
           </div>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/fuer-veranstalter/">
-              Mitgliedschaften ansehen
+              Mitgliedschaft wählen
             </a>
           </div>
         </li>
       </ul>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V6 === -->
-  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_MODELS_V4 === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V7 === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
