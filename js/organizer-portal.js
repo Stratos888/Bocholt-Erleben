@@ -287,6 +287,7 @@
     });
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 | Zweck: finalisiert Login-Wording, deaktiviert native Browser-Bubbles und markiert fehlende E-Mail-Pflichtfelder analog zu den anderen Formularen; Umfang: komplette handleLoginPage-Funktion === */
   async function handleLoginPage() {
     const loginForm = document.getElementById("organizer-login-form");
     const loginSubmit = document.getElementById("organizer-login-submit");
@@ -301,17 +302,82 @@
     const setSubmitting = (isSubmitting) => {
       if (!loginSubmit) return;
       if (!loginSubmit.dataset.defaultLabel) {
-        loginSubmit.dataset.defaultLabel = loginSubmit.textContent || "Zugangslink per E-Mail erhalten";
+        loginSubmit.dataset.defaultLabel = loginSubmit.textContent || "Zugangslink senden";
       }
       loginSubmit.disabled = isSubmitting;
       loginSubmit.textContent = isSubmitting ? "Zugangslink wird vorbereitet ..." : loginSubmit.dataset.defaultLabel;
     };
 
+    function getLoginValidationStatus() {
+      let statusNode = loginForm.querySelector("[data-organizer-login-validation-status]");
+      if (statusNode) return statusNode;
+
+      statusNode = document.createElement("p");
+      statusNode.className = "content-form-note organizer-validation-note";
+      statusNode.hidden = true;
+      statusNode.setAttribute("data-organizer-login-validation-status", "");
+      statusNode.setAttribute("aria-live", "assertive");
+
+      const referenceNode = loginForm.querySelector(".content-actions");
+      if (referenceNode) {
+        referenceNode.insertAdjacentElement("beforebegin", statusNode);
+      } else {
+        loginForm.appendChild(statusNode);
+      }
+
+      return statusNode;
+    }
+
+    function setLoginValidationStatus(message) {
+      const statusNode = getLoginValidationStatus();
+      statusNode.hidden = false;
+      statusNode.textContent = safeText(message);
+    }
+
+    function clearLoginValidationStatus() {
+      const statusNode = loginForm.querySelector("[data-organizer-login-validation-status]");
+      if (!statusNode) return;
+      statusNode.hidden = true;
+      statusNode.textContent = "";
+    }
+
+    function clearLoginValidationState() {
+      if (loginEmail) {
+        loginEmail.removeAttribute("aria-invalid");
+        const field = loginEmail.closest(".content-field");
+        if (field) delete field.dataset.fieldInvalid;
+      }
+
+      clearLoginValidationStatus();
+    }
+
+    function markLoginEmailInvalid() {
+      if (!loginEmail) return;
+
+      loginEmail.setAttribute("aria-invalid", "true");
+      const field = loginEmail.closest(".content-field");
+      if (field) field.dataset.fieldInvalid = "true";
+
+      setLoginValidationStatus("Bitte fülle die markierten Pflichtfelder aus.");
+
+      if (typeof loginEmail.focus === "function") {
+        loginEmail.focus({ preventScroll: false });
+      }
+    }
+
+    function validateLoginForm() {
+      if (!loginEmail || !safeText(loginEmail.value) || !loginEmail.validity.valid) {
+        markLoginEmailInvalid();
+        return false;
+      }
+
+      return true;
+    }
+
     if (loginEmail && prefillEmail && !safeText(loginEmail.value)) {
       loginEmail.value = prefillEmail;
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V5_AREA_LINK | Zweck: rendert Login, Token-Einlösung und Magic-Link-Anforderung syntaktisch robust mit konkreter Einreichung-/Veranstalterbereich-Sprache; Umfang: Mitgliedschafts-Hinweis, Token- und Request-Abschnitt in handleLoginPage === */
     if (membershipStarted) {
       setLoginResult(
         "Deine Mitgliedschaft wurde gestartet. Fordere jetzt deinen Zugangslink an, um deinen Veranstalterbereich zu öffnen."
@@ -320,7 +386,7 @@
 
     if (token) {
       if (loginNote) {
-        loginNote.textContent = "Der Zugangslink wird geprüft. Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.";
+        loginNote.textContent = "Der Zugangslink wird geprüft. Danach öffnen wir automatisch den Status deiner Einreichung oder deinen Veranstalterbereich.";
       }
 
       try {
@@ -345,10 +411,23 @@
 
     if (!loginForm || !loginEmail) return;
 
+    loginForm.noValidate = true;
+    if (loginSubmit) loginSubmit.formNoValidate = true;
+
+    loginForm.addEventListener("input", () => {
+      clearLoginValidationState();
+    });
+
+    loginForm.addEventListener("change", () => {
+      clearLoginValidationState();
+    });
+
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      if (typeof loginForm.reportValidity === "function" && !loginForm.reportValidity()) {
+      clearLoginValidationState();
+
+      if (!validateLoginForm()) {
         return;
       }
 
@@ -371,14 +450,14 @@
         if (safeText(data.magic_link_url)) {
           links.push({
             href: data.magic_link_url,
-            label: "Einreichung oder Veranstalterbereich öffnen",
+            label: "Status oder Veranstalterbereich öffnen",
             icon: "chevron-right"
           });
         }
 
         setLoginResult(
           safeText(data.magic_link_url)
-            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du deine Einreichung oder deinen Veranstalterbereich direkt öffnen."
+            ? "Der Zugangslink wurde erzeugt. In dieser Staging-Umgebung kannst du den Status oder Veranstalterbereich direkt öffnen."
             : "Der Zugangslink wurde angefordert. Bitte prüfe dein Postfach.",
           links
         );
@@ -389,8 +468,8 @@
         setSubmitting(false);
       }
     });
-    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V5_AREA_LINK === */
   }
+  /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Meine Einreichung oder Mein Veranstalterbereich und ersetzt öffentliche Kontingent-/Abo-Sprache; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
