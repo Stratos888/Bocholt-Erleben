@@ -7,13 +7,13 @@
       ? CONFIG.publishFunnel
       : ((window.CONFIG && window.CONFIG.publishFunnel) ? window.CONFIG.publishFunnel : (window.BE_PUBLISH_FUNNEL_CONFIG || {}));
 
-  /* === BEGIN BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 | Zweck: erweitert den zentralen Veranstalter-Funnel um einen Formspree-basierten Profi-Pfad mit Inline-Status, sauberem Submit-State und Mailto-Fallback, ohne den Standardweg zu verändern; Umfang: Runtime-Config, Helper und Bindings bis vor init() in js/publish-funnel.js === */
+  /* === BEGIN BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V2 | Zweck: aktualisiert Standardmeldungen fuer die kostenlose Pruefung automatischer Uebernahme; Umfang: Runtime-Config Startwerte === */
   const cfg = {
     automationEmail: "mathias@bocholt-erleben.de",
     automationFormspreeEndpoint: "",
-    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Termine und melden uns, falls noch Angaben fehlen.",
+    automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Angaben und melden uns, falls noch etwas fehlt.",
     automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
-    storageKey: "be_publish_checkout_context_v1",
+  <!-- === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V2 === -->
     paymentLinks: {
       single: "",
       starter: "",
@@ -273,21 +273,22 @@ function applyPlanPresetFromUrl() {
     };
   }
 
+  /* === BEGIN BLOCK: PUBLISH_AUTOMATION_SUMMARY_STATUS_AND_VALIDATION_V2 | Zweck: aktualisiert Mail-/Status-Wording auf automatische Übernahme und stellt Validierungshelfer für rote Pflichtfeldmarkierung bereit; Umfang: Automation-Summary, Submit-Status und Feldvalidierung bis vor submitAutomationFormspree === */
   function buildAutomationSummary(context) {
     return joinLines([
       "Hallo Mathias,",
       "",
-      "ich möchte eine automatische Anbindung für unsere Termine bei Bocholt erleben anfragen.",
+      "ich möchte eine kostenlose Prüfung für eine automatische Übernahme unserer Veranstaltungen bei Bocholt erleben anfragen.",
       "",
       lineIf("Organisation / Veranstalter", context.organization),
-      lineIf("Ansprechpartner", context.contact),
+      lineIf("Ansprechperson", context.contact),
       lineIf("E-Mail", context.email),
-      lineIf("Wo stehen die Termine?", context.sourceType),
-      lineIf("Link zu Terminen oder Beispielen", context.sourceLink),
+      lineIf("Wo stehen die Veranstaltungen?", context.sourceType),
+      lineIf("Link zu Veranstaltungen / Beispielen", context.sourceLink),
       lineIf("Website", context.website),
       lineIf("Aktualisierungsrhythmus", context.cadence),
-      lineIf("Geschätzte Anzahl veröffentlichter Termine pro Monat", context.monthlyVolume),
-      lineIf("Technischer Ansprechpartner", context.techContact),
+      lineIf("Geschätzte Anzahl Veranstaltungen pro Monat", context.monthlyVolume),
+      lineIf("Technische Ansprechperson", context.techContact),
       "",
       lineIf("Weitere Hinweise (optional)", context.notes),
       "",
@@ -334,10 +335,90 @@ function applyPlanPresetFromUrl() {
     delete statusNode.dataset.state;
   }
 
+  function ensureAutomationValidationStatus(form) {
+    let statusNode = form.querySelector("[data-automation-validation-status]");
+    if (statusNode) return statusNode;
+
+    statusNode = document.createElement("p");
+    statusNode.className = "content-form-note publish-validation-note";
+    statusNode.hidden = true;
+    statusNode.setAttribute("data-automation-validation-status", "");
+    statusNode.setAttribute("aria-live", "assertive");
+
+    const referenceNode = form.querySelector(".publish-final-actions");
+    if (referenceNode) {
+      referenceNode.insertAdjacentElement("beforebegin", statusNode);
+    } else {
+      form.appendChild(statusNode);
+    }
+
+    return statusNode;
+  }
+
+  function setAutomationValidationStatus(form, message) {
+    const statusNode = ensureAutomationValidationStatus(form);
+    statusNode.hidden = false;
+    statusNode.textContent = safeText(message);
+  }
+
+  function clearAutomationValidationStatus(form) {
+    const statusNode = form.querySelector("[data-automation-validation-status]");
+    if (!statusNode) return;
+
+    statusNode.hidden = true;
+    statusNode.textContent = "";
+  }
+
+  function getAutomationField(control) {
+    return control?.closest?.(".content-field") || null;
+  }
+
+  function clearAutomationControlValidation(control) {
+    if (!control || !control.id || !control.id.startsWith("publish-automation-")) return;
+
+    control.removeAttribute("aria-invalid");
+
+    const field = getAutomationField(control);
+    if (field) {
+      delete field.dataset.fieldInvalid;
+    }
+
+    const form = control.closest("form");
+    if (form && !form.querySelector('[data-field-invalid="true"]')) {
+      clearAutomationValidationStatus(form);
+    }
+  }
+
+  function clearAutomationValidationState(form) {
+    form.querySelectorAll('[aria-invalid="true"]').forEach((control) => {
+      control.removeAttribute("aria-invalid");
+    });
+
+    form.querySelectorAll('[data-field-invalid="true"]').forEach((field) => {
+      delete field.dataset.fieldInvalid;
+    });
+
+    clearAutomationValidationStatus(form);
+  }
+
+  function markAutomationFieldInvalid(id) {
+    const control = byId(id);
+    if (!control) return null;
+
+    control.setAttribute("aria-invalid", "true");
+
+    const field = getAutomationField(control);
+    if (field) {
+      field.dataset.fieldInvalid = "true";
+    }
+
+    return control;
+  }
+
   function setAutomationSubmitting(trigger, isSubmitting) {
     if (!trigger) return;
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Anfrage senden";
+      trigger.dataset.defaultLabel = trigger.textContent || "Kostenlose Prüfung anfragen";
     }
 
     trigger.disabled = isSubmitting;
@@ -347,7 +428,7 @@ function applyPlanPresetFromUrl() {
 
   function buildAutomationPayload(context) {
     const formData = new FormData();
-    formData.append("subject", "Bocholt erleben - Automatische Übernahme prüfen lassen");
+    formData.append("subject", "Bocholt erleben - Automatische Übernahme kostenlos prüfen");
     formData.append("request_type", "publish_automation_request");
     formData.append("source_label", "bocholt-erleben-web");
     formData.append("page_url", window.location.href);
@@ -366,6 +447,7 @@ function applyPlanPresetFromUrl() {
     formData.append("submitted_at", new Date().toISOString());
     return formData;
   }
+  /* === END BLOCK: PUBLISH_AUTOMATION_SUMMARY_STATUS_AND_VALIDATION_V2 === */
 
   async function submitAutomationFormspree(context) {
     const endpoint = getAutomationEndpoint();
@@ -496,24 +578,32 @@ function applyPlanPresetFromUrl() {
     return false;
   }
 
-  function validateAutomationContext(context) {
-    if (!hasValue(context.organization) || !hasValue(context.email)) {
-      window.alert("Bitte gib Organisation und E-Mail-Adresse an.");
-      return false;
+  /* === BEGIN BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V2 | Zweck: validiert die Pflichtfelder der automatischen Übernahme ohne Browser-Bubble und markiert fehlende Felder rot; Umfang: komplette validateAutomationContext-Funktion === */
+  function validateAutomationContext(context, form) {
+    const emailControl = byId("publish-automation-email");
+    const invalidIds = [];
+
+    if (!hasValue(context.organization)) invalidIds.push("publish-automation-organization");
+    if (!hasValue(context.contact)) invalidIds.push("publish-automation-contact");
+    if (!hasValue(context.email) || (emailControl && !emailControl.validity.valid)) invalidIds.push("publish-automation-email");
+    if (!hasValue(context.sourceType)) invalidIds.push("publish-automation-source-type");
+    if (!hasValue(context.sourceLink)) invalidIds.push("publish-automation-source-link");
+
+    if (!invalidIds.length) return true;
+
+    const firstInvalidControl = invalidIds
+      .map((id) => markAutomationFieldInvalid(id))
+      .find(Boolean);
+
+    setAutomationValidationStatus(form, "Bitte fülle die markierten Pflichtfelder aus.");
+
+    if (firstInvalidControl && typeof firstInvalidControl.focus === "function") {
+      firstInvalidControl.focus({ preventScroll: false });
     }
 
-    if (!hasValue(context.sourceType)) {
-      window.alert("Bitte wähle aus, wo deine Termine stehen.");
-      return false;
-    }
-
-    if (!hasValue(context.sourceLink) && !hasValue(context.website)) {
-      window.alert("Bitte gib mindestens einen Link zu deinen Terminen oder deiner Website an.");
-      return false;
-    }
-
-    return true;
+    return false;
   }
+  /* === END BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V2 === */
 
   async function postPublishApiJson(url, payload) {
     const response = await fetch(url, {
@@ -673,21 +763,33 @@ function applyPlanPresetFromUrl() {
   }
   /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 === */
 
+  /* === BEGIN BLOCK: PUBLISH_AUTOMATION_BIND_FREE_CHECK_V2 | Zweck: bindet die kostenlose Prüfung mit eigener Pflichtfeldmarkierung, ohne native Browser-Popups; Umfang: kompletter bindAutomationPath-Handler === */
   function bindAutomationPath() {
     const form = byId("publish-automation-form");
     const trigger = byId("publish-automation-submit");
 
     if (!form || !trigger) return;
 
+    form.noValidate = true;
+    trigger.formNoValidate = true;
+
+    form.addEventListener("input", (event) => {
+      clearAutomationControlValidation(event.target);
+    });
+
+    form.addEventListener("change", (event) => {
+      clearAutomationControlValidation(event.target);
+    });
+
     trigger.addEventListener("click", async (event) => {
       event.preventDefault();
 
-      if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
+      clearAutomationValidationState(form);
+      clearAutomationStatus(form);
 
       const context = buildAutomationContext();
-      if (!validateAutomationContext(context)) return;
+      if (!validateAutomationContext(context, form)) return;
 
-      clearAutomationStatus(form);
       setAutomationSubmitting(trigger, true);
 
       try {
@@ -695,7 +797,7 @@ function applyPlanPresetFromUrl() {
 
         if (result.mode === "mailto_fallback") {
           const body = buildAutomationSummary(context);
-          window.location.href = buildMailto("Bocholt erleben - Automatische Anbindung anfragen", body);
+          window.location.href = buildMailto("Bocholt erleben - Automatische Übernahme kostenlos prüfen", body);
           return;
         }
 
@@ -709,6 +811,7 @@ function applyPlanPresetFromUrl() {
       }
     });
   }
+  /* === END BLOCK: PUBLISH_AUTOMATION_BIND_FREE_CHECK_V2 === */
   /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V1 === */
 
   /* === BEGIN BLOCK: PUBLISH_STANDARD_PORTAL_SYNC_BOOT_V2 | Zweck: startet den Publish-Funnel nach DOM-Bereitschaft und synchronisiert dabei optional die aktive Veranstalter-Session; Umfang: Initialisierung am Dateiende === */
