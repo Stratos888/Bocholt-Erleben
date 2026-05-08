@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V5_TARIFF_COPY | Zweck: positioniert /fuer-veranstalter/ sprachlich als Mitgliedschafts- und Tarifseite für regelmäßige Termine; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V6_REGULAR_SUBMISSIONS | Zweck: benennt die Mitgliedschaft konsistent als Weg für regelmäßige Einreichungen statt regelmäßige Termine; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mitgliedschaft für regelmäßige Termine | Bocholt erleben</title>
+  <title>Mitgliedschaft für regelmäßige Einreichungen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Mitgliedschaft bei Bocholt erleben starten: Tarif wählen, regelmäßige Termine einreichen und nach Prüfung veröffentlichen lassen."
+    content="Mitgliedschaft bei Bocholt erleben starten: Tarif wählen, regelmäßig Veranstaltungen einreichen und nach Prüfung veröffentlichen lassen."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/">
@@ -24,7 +24,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V5_TARIFF_COPY === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V6_REGULAR_SUBMISSIONS === -->
 </head>
 
 <body>
@@ -49,44 +49,43 @@
     <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEADER_AREA_ACCESS_V2 === -->
   </header>
 
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V5 | Zweck: ersetzt interne Modell-Sprache durch Mitgliedschaft/Tarif, erklärt Tarifumfang und grenzt automatische Anbindung als kostenlosen Prüfpfad ab; Umfang: kompletter Main-Bereich von /fuer-veranstalter/ === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V6 | Zweck: finalisiert Wording für Mitgliedschaft, Tarif, Pflichtfelder, Zahlungsmethode, Dashboard-Nutzen und automatische Übernahme; Umfang: kompletter Main-Bereich von /fuer-veranstalter/ inklusive Entfernung eines doppelten </main> === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <h1>Mitgliedschaft für regelmäßige Termine</h1>
+      <h1>Mitgliedschaft für regelmäßige Einreichungen</h1>
       <p class="content-lead">
-        Für Vereine, Veranstalter und Locations mit laufendem Programm. Wähle einen Tarif und reiche Termine zur Prüfung ein.
+        Für Vereine, Veranstalter und Locations mit laufendem Programm. Wähle einen Tarif, wenn du regelmäßig Veranstaltungen einreichen möchtest.
       </p>
     </header>
 
     <div class="content-grid content-grid--2">
       <section class="content-card content-card--primary" aria-labelledby="organizer-service-head">
-        <h2 id="organizer-service-head">Was die Mitgliedschaft abdeckt</h2>
-        <ul class="publish-benefits-grid" aria-label="Leistungen für regelmäßige Veröffentlichungen">
+        <h2 id="organizer-service-head">Was deckt die Mitgliedschaft ab?</h2>
+        <ul class="publish-benefits-grid" aria-label="Leistungen der Mitgliedschaft">
           <li>
-            <strong>Regelmäßig Termine einreichen</strong>
-            <span>Reiche laufende Veranstaltungen passend zu deinem Tarif ein.</span>
+            <strong>Regelmäßig Veranstaltungen einreichen</strong>
           </li>
           <li>
-            <strong>Prüfen und veröffentlichen</strong>
-            <span>Wir prüfen die Angaben, bereiten freigegebene Termine auf und veröffentlichen sie bei Bocholt erleben.</span>
+            <strong>Prüfung und Veröffentlichung durch Bocholt erleben</strong>
           </li>
           <li>
-            <strong>Nach Umfang wählen</strong>
-            <span>Gezählt werden veröffentlichte Termine im aktuellen Zeitraum. Dauerhaft ist für viele Termine im üblichen Rahmen gedacht.</span>
+            <strong>Veranstalterbereich für Übersicht und Verwaltung</strong>
+            <span>Sieh deine Einreichungen, den aktuellen Status, deine Mitgliedschaft und wie viele veröffentlichte Termine im aktuellen Zeitraum noch verfügbar sind.</span>
           </li>
         </ul>
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-membership-head">
         <h2 id="organizer-membership-head">Tarif wählen</h2>
+        <p class="content-note">Mit * markierte Felder sind Pflichtfelder.</p>
         <p class="content-note">
-          Wähle die passende Mitgliedschaft. Danach wirst du zu Stripe weitergeleitet und bestätigst dort die monatliche Zahlung.
+          Wähle die passende Mitgliedschaft. Im nächsten Schritt wirst du zu Stripe weitergeleitet und bestätigst dort die monatliche Zahlung.
         </p>
 
         <form class="content-form" id="organizer-membership-form" novalidate>
           <div class="content-form-grid">
             <label class="content-field content-field--full" for="organizer-membership-organization">
-              <span class="content-field__label">Veranstalter / Organisation</span>
+              <span class="content-field__label">Veranstalter / Organisation *</span>
               <input class="content-field__control" id="organizer-membership-organization" name="organization" type="text" required>
             </label>
 
@@ -96,16 +95,16 @@
             </label>
 
             <label class="content-field" for="organizer-membership-email">
-              <span class="content-field__label">E-Mail-Adresse</span>
+              <span class="content-field__label">E-Mail-Adresse *</span>
               <input class="content-field__control" id="organizer-membership-email" name="email" type="email" inputmode="email" autocomplete="email" required>
             </label>
 
             <label class="content-field content-field--full" for="organizer-membership-plan">
-              <span class="content-field__label">Tarif</span>
+              <span class="content-field__label">Tarif *</span>
               <select class="content-field__control" id="organizer-membership-plan" name="plan" required>
-                <option value="starter">Starter · 9,99 € / Monat · bis zu 3 Termine</option>
-                <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 Termine</option>
-                <option value="unlimited">Dauerhaft · 29,99 € / Monat · viele Termine im üblichen Rahmen</option>
+                <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
+                <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
+                <option value="unlimited">Dauerhaft · 29,99 € / Monat · viele veröffentlichte Termine im üblichen Rahmen</option>
               </select>
               <p class="content-field__hint" id="organizer-membership-plan-hint">Starter passt für bis zu 3 veröffentlichte Termine pro Monat.</p>
             </label>
@@ -113,11 +112,11 @@
 
           <div class="content-actions content-actions--inline">
             <button class="content-cta content-cta--primary" id="organizer-membership-submit" type="submit">
-              Zahlung bei Stripe abschließen
+              Weiter zur Zahlungsmethode
             </button>
           </div>
           <p class="content-note">
-            Nach erfolgreicher Zahlung kannst du Termine über deine Mitgliedschaft einreichen. Die Veröffentlichung erfolgt jeweils nach Prüfung.
+            Nach erfolgreicher Zahlung kannst du Veranstaltungen über deine Mitgliedschaft einreichen. Die Veröffentlichung erfolgt jeweils nach Prüfung.
           </p>
         </form>
 
@@ -128,28 +127,24 @@
     </div>
 
     <section class="content-card content-card--primary" aria-labelledby="organizer-automation-head">
-      <h2 id="organizer-automation-head">Automatische Übernahme prüfen</h2>
+      <h2 id="organizer-automation-head">Veranstaltungen automatisch übernehmen lassen?</h2>
       <p>
-        Wenn deine Termine bereits auf einer Website, in einem Kalender oder in einer Datei stehen, kannst du kostenlos prüfen lassen, ob eine regelmäßige Übernahme möglich ist.
+        Wenn deine Veranstaltungen bereits auf einer Website, in einem Kalender oder in einer Datei stehen, prüfen wir kostenlos, ob wir sie regelmäßig übernehmen können.
       </p>
       <p>
-        Das ist kein eigener Kaufweg. Welche Mitgliedschaft später passt, klären wir nach der Prüfung.
+        Das spart wiederholtes Ausfüllen. Eine Mitgliedschaft entsteht dadurch noch nicht; den passenden Tarif klären wir erst nach der Prüfung.
       </p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/anbindung/">
-          Kostenlose Anbindung prüfen
+          Automatische Übernahme kostenlos prüfen
         </a>
       </div>
-      <p class="content-note">
-        Die Anfrage löst keine Zahlung und keine Mitgliedschaft aus.
-      </p>
     </section>
   </main>
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V5 === -->
-  </main>
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V6 === -->
 
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
-  <script src="/js/organizer-membership.js?v=2026-05-05-freeze-stability-1" defer></script>
+  <script src="/js/organizer-membership.js?v=2026-05-08-membership-wording-1" defer></script>
   <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_BODY_V3_REGULAR_MODELS === -->
 </body>
 </html>
