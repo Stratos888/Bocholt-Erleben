@@ -361,6 +361,35 @@ Bestanden für normale Einzeltermine:
   - Links, falls vorhanden
 
 ---
+<!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_INBOX_LOCKED_STATE_2026_05_08 | Zweck: dokumentiert geprüften Sperrzustand der Kuratier-PWA nach Passwortabbruch; Umfang: Ergänzung zum Staging-Teststand Veranstalter-Funnel + Review-Bridge === -->
+
+### 17. Kuratier-PWA Sperrzustand nach Passwortabbruch
+
+Bestanden:
+
+- `/inbox/` fragt beim Öffnen nach Passwort.
+- Wird die Passwortabfrage abgebrochen oder durch Rausklicken geschlossen, lädt die Kuratier-PWA keine Review-Daten.
+- Die Kuratier-PWA bleibt im Status `gesperrt`.
+- Es erscheint ein Sperrhinweis mit Möglichkeit zum erneuten Laden.
+- Nach korrekter Passwort-Eingabe lädt die Inbox normal.
+- Direkter API-Aufruf ohne Passwort-Header bleibt blockiert:
+  - `/api/submissions/review-list.php`
+  - Ergebnis: `Review access denied.`
+
+Geprüfter Stand:
+
+- Datum: 2026-05-08
+- Umgebung: Staging
+- geprüfter ZIP-Stand: `Bocholt-Erleben-staging - 2026-05-08T081914.106.zip`
+- Ergebnis: bestanden
+
+Bewertung:
+
+- Die Kuratier-PWA zeigt nach abgebrochener Passwortabfrage keinen falschen Zustand `Fertig`.
+- Review-Daten werden nicht mehr ohne erfolgreiche Entsperrung geladen.
+- Der Sperrzustand ist damit für Staging funktional korrekt.
+
+<!-- === END BLOCK: TEST_STATUS_REVIEW_INBOX_LOCKED_STATE_2026_05_08 === -->
 
 ## Offene Tests / bekannte Lücken
 
