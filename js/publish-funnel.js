@@ -7,13 +7,12 @@
       ? CONFIG.publishFunnel
       : ((window.CONFIG && window.CONFIG.publishFunnel) ? window.CONFIG.publishFunnel : (window.BE_PUBLISH_FUNNEL_CONFIG || {}));
 
-  /* === BEGIN BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V2 | Zweck: aktualisiert Standardmeldungen fuer die kostenlose Pruefung automatischer Uebernahme; Umfang: Runtime-Config Startwerte === */
+  /* === BEGIN BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V3 | Zweck: hält Runtime-Config syntaktisch korrekt und aktualisiert Standardmeldungen fuer die kostenlose Pruefung automatischer Uebernahme; Umfang: kompletter cfg-Initialisierungsblock === */
   const cfg = {
     automationEmail: "mathias@bocholt-erleben.de",
     automationFormspreeEndpoint: "",
     automationSuccessMessage: "Anfrage erfolgreich gesendet. Wir prüfen deine Angaben und melden uns, falls noch etwas fehlt.",
     automationErrorMessage: "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut oder nutze alternativ die direkte Kontaktmöglichkeit.",
-  <!-- === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V2 === -->
     paymentLinks: {
       single: "",
       starter: "",
@@ -29,6 +28,7 @@
       ...(runtimeConfig && runtimeConfig.paymentLinks ? runtimeConfig.paymentLinks : {})
     }
   };
+  /* === END BLOCK: PUBLISH_FUNNEL_RUNTIME_AND_AUTOMATION_FORMSPREE_V3 === */
 
   const byId = (id) => document.getElementById(id);
   const safeText = (value) => String(value ?? "").trim();
