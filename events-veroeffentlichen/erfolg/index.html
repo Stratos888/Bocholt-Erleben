@@ -69,18 +69,17 @@
     </a>
   </header>
 
-  <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V3_SINGLE_COPY | Zweck: setzt die Default-Erfolgsseite klar auf bezahlten Einzeltermin und hält bestehende Mitgliedschaft über JS-Switch getrennt; Umfang: kompletter Main-Bereich plus zustandsfähige Textanker === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V4_EVENT_SUBMITTED_COPY | Zweck: finalisiert die Erfolgsseite ohne Kicker mit konsistenter Veranstaltung-/Prüfung-/Freigabe-Sprache für Einzelzahlung und Mitgliedschafts-Flow; Umfang: kompletter Main-Bereich plus zustandsfähige Textanker === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker" id="publish-success-kicker">Einreichung erhalten</p>
-      <h1 id="publish-success-title">Deine Zahlung wurde abgeschlossen.</h1>
+      <h1 id="publish-success-title">Deine Veranstaltung wurde eingereicht.</h1>
 
       <p class="content-lead" id="publish-success-lead">
-        Dein Einzeltermin wurde bezahlt und eingereicht. Wir prüfen die Angaben, bevor der Termin veröffentlicht wird.
+        Deine Zahlung wurde abgeschlossen. Wir prüfen deine Angaben, bevor die Veranstaltung veröffentlicht wird.
       </p>
 
       <p class="content-note" id="publish-success-note">
-        Die Zahlungsbestätigung erhältst du zusätzlich von Stripe. Die Veröffentlichung erfolgt erst nach Freigabe.
+        Die Zahlungsbestätigung erhältst du zusätzlich von Stripe. Den Status deiner Einreichung kannst du über „Bereich öffnen“ ansehen.
       </p>
 
       <div class="content-actions content-actions--inline">
@@ -93,51 +92,50 @@
     <section class="content-card content-card--primary" aria-labelledby="publish-success-next-steps">
       <h2 id="publish-success-next-steps">Nächste Schritte</h2>
       <div id="publish-success-steps">
-        <p>1. Wir prüfen die eingereichten Angaben.</p>
+        <p>1. Wir prüfen deine eingereichten Angaben.</p>
         <p>2. Falls noch etwas fehlt, melden wir uns per E-Mail.</p>
-        <p>3. Nach Freigabe wird der Termin bei Bocholt erleben veröffentlicht.</p>
+        <p>3. Nach Freigabe wird deine Veranstaltung bei Bocholt erleben veröffentlicht.</p>
       </div>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V3_SINGLE_COPY === -->
+  <!-- === END BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V4_EVENT_SUBMITTED_COPY === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <script>
-     /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V3_STATEFUL_COPY | Zweck: schärft die Erfolgsseite zustandsbezogen für Einzeltermin-Zahlung und Einreichung über aktive Mitgliedschaft; Umfang: kompletter zustandsabhängiger Text-Switch auf /events-veroeffentlichen/erfolg/ === */
+    /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V4_EXISTING_SUBSCRIPTION_COPY | Zweck: setzt den bestehenden-Mitgliedschaft-Flow auf dieselbe H1 und unterscheidet den Zustand nur über Lead, Hinweis, CTA und nächste Schritte; Umfang: kompletter zustandsabhängiger Text-Switch auf /events-veroeffentlichen/erfolg/ === */
     (function () {
       const params = new URLSearchParams(window.location.search);
       const flow = String(params.get("flow") || "").trim().toLowerCase();
 
       if (flow !== "existing-subscription") return;
 
-      const kicker = document.getElementById("publish-success-kicker");
       const title = document.getElementById("publish-success-title");
       const lead = document.getElementById("publish-success-lead");
       const note = document.getElementById("publish-success-note");
       const cta = document.getElementById("publish-success-cta");
       const steps = document.getElementById("publish-success-steps");
 
-      if (kicker) kicker.textContent = "Veranstaltung eingereicht";
-      if (title) title.textContent = "Deine aktive Mitgliedschaft wurde verwendet.";
+      if (title) title.textContent = "Deine Veranstaltung wurde eingereicht.";
       if (lead) {
-        lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Deine Veranstaltung wurde eingereicht und geht jetzt in die Prüfung.";
+        lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Sie läuft über deine aktive Mitgliedschaft.";
       }
       if (note) {
-        note.textContent = "Die Veröffentlichung erfolgt erst nach Freigabe. Erst dann zählt der Termin im aktuellen Zeitraum deiner Mitgliedschaft.";
+        note.textContent = "Wir prüfen deine Angaben, bevor die Veranstaltung veröffentlicht wird. Erst nach Freigabe zählt sie als veröffentlichter Termin im aktuellen Zeitraum.";
       }
       if (cta) {
         cta.textContent = "Veranstalterbereich öffnen";
         cta.setAttribute("href", "/fuer-veranstalter/dashboard/");
       }
       if (steps) {
-        steps.innerHTML = "<p>1. Deine aktive Mitgliedschaft deckt diese Einreichung bereits ab.</p><p>2. Wir prüfen die Angaben und melden uns nur, falls noch etwas fehlt.</p><p>3. Nach Freigabe wird der Termin veröffentlicht.</p>";
+        steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Mitgliedschaft.</p><p>2. Wir prüfen deine Angaben und melden uns nur, falls noch etwas fehlt.</p><p>3. Nach Freigabe wird deine Veranstaltung veröffentlicht.</p>";
       }
 
       document.title = "Veranstaltung eingereicht | Bocholt erleben";
     })();
-    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V3_STATEFUL_COPY === */
+    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V4_EXISTING_SUBSCRIPTION_COPY === */
+  </script>
   </script>
 </body>
 </html>
