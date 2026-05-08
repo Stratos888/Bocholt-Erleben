@@ -386,34 +386,114 @@ function applyPlanPresetFromUrl() {
     return { mode: "formspree" };
   }
 
-  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V2 | Zweck: validiert Einzeltermin-Einreichungen, bereitet den API-Payload vor und steuert den Submit-State; Umfang: Standard-Validierung, API-Helper, Payload-Builder und Submit-State === */
-  function validateStandardContext(context) {
-    if (safeText(context.plan) !== "single") {
-      window.alert("Diese Seite ist nur für einzelne Veranstaltungen vorgesehen.");
-      return false;
+  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 | Zweck: validiert einzelne Veranstaltung ohne Browser-Popup, markiert fehlende Pflichtfelder visuell und steuert den Weiter-zur-Zahlungsmethode-State; Umfang: Standard-Validierung, API-Helper, Payload-Builder, Submit-State und Bindung === */
+  function getStandardValidationStatus(form) {
+    let statusNode = form.querySelector("[data-standard-validation-status]");
+    if (statusNode) return statusNode;
+
+    statusNode = document.createElement("p");
+    statusNode.className = "content-form-note publish-validation-note";
+    statusNode.hidden = true;
+    statusNode.setAttribute("data-standard-validation-status", "");
+    statusNode.setAttribute("aria-live", "assertive");
+
+    const referenceNode = form.querySelector(".publish-final-actions");
+    if (referenceNode) {
+      referenceNode.insertAdjacentElement("beforebegin", statusNode);
+    } else {
+      form.appendChild(statusNode);
     }
 
-    if (!hasValue(context.organization) || !hasValue(context.email)) {
-      window.alert("Bitte gib Veranstalter und E-Mail-Adresse an.");
-      return false;
+    return statusNode;
+  }
+
+  function setStandardValidationStatus(form, message) {
+    const statusNode = getStandardValidationStatus(form);
+    statusNode.hidden = false;
+    statusNode.textContent = safeText(message);
+  }
+
+  function clearStandardValidationStatus(form) {
+    const statusNode = form.querySelector("[data-standard-validation-status]");
+    if (!statusNode) return;
+
+    statusNode.hidden = true;
+    statusNode.textContent = "";
+  }
+
+  function getStandardField(control) {
+    return control?.closest?.(".content-field") || null;
+  }
+
+  function clearStandardControlValidation(control) {
+    if (!control || !control.id || !control.id.startsWith("publish-standard-")) return;
+
+    control.removeAttribute("aria-invalid");
+
+    const field = getStandardField(control);
+    if (field) {
+      delete field.dataset.fieldInvalid;
     }
 
-    if (!hasValue(context.title) || !hasValue(context.date)) {
-      window.alert("Bitte gib Titel und Datum der Veranstaltung an.");
-      return false;
+    const form = control.closest("form");
+    if (form && !form.querySelector('[data-field-invalid="true"]')) {
+      clearStandardValidationStatus(form);
+    }
+  }
+
+  function clearStandardValidationState(form) {
+    form.querySelectorAll('[aria-invalid="true"]').forEach((control) => {
+      control.removeAttribute("aria-invalid");
+    });
+
+    form.querySelectorAll('[data-field-invalid="true"]').forEach((field) => {
+      delete field.dataset.fieldInvalid;
+    });
+
+    clearStandardValidationStatus(form);
+  }
+
+  function markStandardFieldInvalid(id) {
+    const control = byId(id);
+    if (!control) return null;
+
+    control.setAttribute("aria-invalid", "true");
+
+    const field = getStandardField(control);
+    if (field) {
+      field.dataset.fieldInvalid = "true";
     }
 
-    if (!hasValue(context.place) || !hasValue(context.placeStreet) || !hasValue(context.placeZip) || !hasValue(context.placeCity)) {
-      window.alert("Bitte gib Veranstaltungsort, Adresse oder Treffpunkt, PLZ und Stadt / Ort an.");
-      return false;
+    return control;
+  }
+
+  function validateStandardContext(context, form) {
+    const emailControl = byId("publish-standard-email");
+    const invalidIds = [];
+
+    if (!hasValue(context.organization)) invalidIds.push("publish-standard-organization");
+    if (!hasValue(context.email) || (emailControl && !emailControl.validity.valid)) invalidIds.push("publish-standard-email");
+    if (!hasValue(context.title)) invalidIds.push("publish-standard-title");
+    if (!hasValue(context.date)) invalidIds.push("publish-standard-date");
+    if (!hasValue(context.place)) invalidIds.push("publish-standard-place");
+    if (!hasValue(context.placeStreet)) invalidIds.push("publish-standard-place-street");
+    if (!hasValue(context.placeZip)) invalidIds.push("publish-standard-place-zip");
+    if (!hasValue(context.placeCity)) invalidIds.push("publish-standard-place-city");
+    if (context.locationConfirmed !== true) invalidIds.push("publish-standard-location-confirmed");
+
+    if (!invalidIds.length) return true;
+
+    const firstInvalidControl = invalidIds
+      .map((id) => markStandardFieldInvalid(id))
+      .find(Boolean);
+
+    setStandardValidationStatus(form, "Bitte fülle die markierten Pflichtfelder aus.");
+
+    if (firstInvalidControl && typeof firstInvalidControl.focus === "function") {
+      firstInvalidControl.focus({ preventScroll: false });
     }
 
-    if (context.locationConfirmed !== true) {
-      window.alert("Bitte bestätige, dass du zur Einreichung berechtigt bist und der Ort öffentlich genannt werden darf.");
-      return false;
-    }
-
-    return true;
+    return false;
   }
 
   function validateAutomationContext(context) {
@@ -473,10 +553,10 @@ function applyPlanPresetFromUrl() {
     return data;
   }
 
-  /* === BEGIN BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V1 | Zweck: sendet prüfpflichtige Ortsangaben als eigene Felder an die Submission-API; Umfang: ersetzt buildStandardSubmissionPayload ohne Änderung des Checkout-Flows === */
+  /* === BEGIN BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V2 | Zweck: sendet prüfpflichtige Ortsangaben als eigene Felder an die Submission-API; Umfang: ersetzt buildStandardSubmissionPayload ohne Änderung des Checkout-Flows === */
   function buildStandardSubmissionPayload(context) {
     const notesText = joinLines([
-      lineIf("Adresse / offizieller Treffpunkt", context.placeStreet),
+      lineIf("Straße, Hausnummer / offizieller Treffpunkt", context.placeStreet),
       lineIf("PLZ", context.placeZip),
       lineIf("Stadt / Ort", context.placeCity),
       lineIf("Adresse zusammengesetzt", context.placeAddress),
@@ -503,20 +583,19 @@ function applyPlanPresetFromUrl() {
       notes_text: notesText
     };
   }
-  /* === END BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V1 === */
+  /* === END BLOCK: PUBLISH_STANDARD_SUBMISSION_PAYLOAD_REVIEW_FIELDS_V2 === */
 
   function setStandardSubmitting(trigger, isSubmitting) {
     if (!trigger) return;
 
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Einreichung abschließen";
+      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Zahlungsmethode";
     }
 
     trigger.disabled = isSubmitting;
     trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
     trigger.textContent = isSubmitting ? "Einreichung wird vorbereitet ..." : trigger.dataset.defaultLabel;
   }
-  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V2 === */
 
   function bindStandardPath() {
     const form = byId("publish-standard-form");
@@ -524,13 +603,21 @@ function applyPlanPresetFromUrl() {
 
     if (!form || !trigger) return;
 
+    form.addEventListener("input", (event) => {
+      clearStandardControlValidation(event.target);
+    });
+
+    form.addEventListener("change", (event) => {
+      clearStandardControlValidation(event.target);
+    });
+
     trigger.addEventListener("click", async (event) => {
       event.preventDefault();
 
-      if (typeof form.reportValidity === "function" && !form.reportValidity()) return;
+      clearStandardValidationState(form);
 
       const context = buildStandardContext();
-      if (!validateStandardContext(context)) return;
+      if (!validateStandardContext(context, form)) return;
 
       setStandardSubmitting(trigger, true);
 
@@ -584,7 +671,7 @@ function applyPlanPresetFromUrl() {
       }
     });
   }
-  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V1 === */
+  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 === */
 
   function bindAutomationPath() {
     const form = byId("publish-automation-form");
