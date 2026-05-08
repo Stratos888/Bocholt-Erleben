@@ -313,8 +313,9 @@
 
     if (membershipStarted) {
       setLoginResult(
-        "Deine Mitgliedschaft wurde erfolgreich gestartet. Fordere jetzt deinen Zugangslink an, um deine Einreichung oder deinen Veranstalterbereich zu öffnen."
+        "Deine Mitgliedschaft wurde gestartet. Fordere jetzt deinen Zugangslink an, um deinen Veranstalterbereich zu öffnen."
       );
+    }
     }
 
     /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V4_SYNTAX_SAFE_ACCESS_LINK | Zweck: rendert Login, Token-Einlösung und Magic-Link-Anforderung syntaktisch robust mit konkreter Einreichung-/Veranstalterbereich-Sprache; Umfang: kompletter Token- und Request-Abschnitt in handleLoginPage === */
@@ -460,33 +461,31 @@
         : safeText(organizer.organization_name) || "Mein Veranstalterbereich";
     }
 
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V2 | Zweck: macht Hero- und Hinweistext menschlicher und entfernt systemnahe Einzeltermin-Erklärungen; Umfang: Lead-/Note-Texte in renderDashboard === */
     if (lead) {
       const email = safeText(organizer.email);
 
       if (isSingleStatusView) {
         lead.textContent = latestSubmission
           ? `${latestStatusText} · ${latestDateText}`
-          : (email ? `Verknüpft mit ${email}.` : "Status deiner Einreichung.");
+          : "Status deiner Einreichung.";
       } else {
         lead.textContent = email
-          ? `Eingeloggt für ${email}.`
+          ? `E-Mail: ${email}`
           : "Hier verwaltest du deine Mitgliedschaft und reichst neue Veranstaltungen ein.";
       }
     }
 
     if (note) {
-      const email = safeText(organizer.email);
-
       if (isSingleStatusView) {
-        note.textContent = email
-          ? `Verknüpft mit ${email}. Für Einzeltermine zeigen wir hier nur den Stand deiner Einreichung.`
-          : "Für Einzeltermine zeigen wir hier nur den Stand deiner Einreichung.";
+        note.textContent = "Hier siehst du den aktuellen Stand deiner Einreichung.";
       } else if (hasManageableSubscription) {
-        note.textContent = "Sichtbar sind Mitgliedschaft, aktueller Zeitraum, veröffentlichte Termine und deine letzten Einreichungen.";
+        note.textContent = "Sichtbar sind Mitgliedschaft, aktueller Zeitraum, veröffentlichte Termine und letzte Einreichungen.";
       } else {
-        note.textContent = "Sichtbar sind Status und die letzten Einreichungen.";
+        note.textContent = "Sichtbar sind Status und letzte Einreichungen.";
       }
     }
+    /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V2 === */
 
     if (dashboardPrimaryCta) {
       const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
@@ -520,6 +519,7 @@
       }
     }
 
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V2 | Zweck: entfernt systemnahe Verknüpft-/Modell-Sprache aus der Account-Karte; Umfang: Account-Karten-Texte in renderDashboard === */
     if (accountHead) {
       accountHead.textContent = isSingleStatusView ? "Einreichung" : "Veranstalter";
     }
@@ -540,7 +540,7 @@
       if (isSingleStatusView) {
         accountPlan.textContent = latestLocationText
           ? `Ort: ${latestLocationText}`
-          : `Verknüpft mit ${safeText(organizer.email) || "–"}`;
+          : `E-Mail: ${safeText(organizer.email) || "–"}`;
       } else if (hasManageableSubscription) {
         const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
         const currentPeriodEndDate = formatDate(safeText(subscription?.current_period_end).split(" ")[0]);
@@ -556,9 +556,10 @@
         }
       } else {
         const planLabel = formatPlanLabel(organizer.default_plan_key);
-        accountPlan.textContent = `Modell: ${planLabel}`;
+        accountPlan.textContent = `Tarif: ${planLabel}`;
       }
     }
+    /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V2 === */
 
     if (quotaHead) {
       quotaHead.textContent = isSingleStatusView ? "Status" : "Veröffentlichte Termine";
@@ -593,29 +594,29 @@
       }
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_APPROVED_PUBLICATION_COUNT_COPY_V1 | Zweck: macht im Dashboard klar, dass nur freigegebene Veröffentlichungen gezählt werden; Umfang: Quota-/Status-Texte in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_TERMS_COUNT_COPY_V2 | Zweck: ersetzt Veröffentlichungs-/Kontingent-Sprache durch veröffentlichte Termine und macht Prüfung/Freigabe klar; Umfang: Quota-/Status-Texte in renderDashboard === */
     if (quotaSummary) {
       if (isSingleStatusView) {
         quotaSummary.textContent = latestSubmission
-          ? "Einreichung erhalten. Veröffentlichung erst nach Prüfung."
+          ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
           : "Noch keine Einreichung gefunden.";
       } else if (quota.has_unlimited) {
-        quotaSummary.textContent = `Freigegebene Veröffentlichungen: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} · laufendes Programm`;
       } else {
-        quotaSummary.textContent = `Freigegebene Veröffentlichungen: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
+        quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)}`;
       }
     }
 
     if (quotaRemaining) {
       if (quota.has_unlimited) {
-        quotaRemaining.textContent = "Gezählt werden freigegebene Veröffentlichungen. Weitere Termine sind im üblichen Rahmen möglich.";
+        quotaRemaining.textContent = "Weitere Termine sind im üblichen Rahmen möglich. Gezählt werden veröffentlichte Termine.";
       } else if (isSingleStatusView) {
-        quotaRemaining.textContent = "Keine Mitgliedschaft aktiv.";
+        quotaRemaining.textContent = "Für diesen Einzeltermin ist keine Mitgliedschaft aktiv.";
       } else {
-        quotaRemaining.textContent = `Noch veröffentlichbar nach Freigabe: ${Number(quota.remaining_total || 0)}`;
+        quotaRemaining.textContent = `Noch verfügbar in diesem Zeitraum: ${Number(quota.remaining_total || 0)} veröffentlichte Termine.`;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_APPROVED_PUBLICATION_COUNT_COPY_V1 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_TERMS_COUNT_COPY_V2 === */
 
     if (submissionsHead) {
       submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Letzte Einreichungen";
