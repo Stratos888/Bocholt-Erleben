@@ -15,7 +15,7 @@
 
   const safeText = (value) => String(value ?? "").trim();
 
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V2 | Zweck: zeigt unter der Tarifauswahl den Umfang des aktuell gewählten Tarifs in öffentlicher Begriffssystematik; Umfang: Tarifhinweise und Change-Handler === */
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_AND_SUBMIT_COPY_V3 | Zweck: hält Tarifhinweise und Button-Zustände konsistent mit veröffentlichten Terminen und Weiter-zur-Zahlungsmethode-Sprache; Umfang: Tarifhinweise, Change-Handler und Submit-Button-State === */
   const planDescriptions = {
     starter: "Starter passt für bis zu 3 veröffentlichte Termine pro Monat.",
     active: "Aktiv passt für bis zu 8 veröffentlichte Termine pro Monat.",
@@ -29,20 +29,18 @@
 
   planSelect.addEventListener("change", updatePlanHint);
   updatePlanHint();
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V2 === */
 
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 | Zweck: nutzt Stripe-Zahlung statt abstrakter Zahlungsmethode als Fallback-Beschriftung; Umfang: Submit-Button-State der Mitgliedschaftsseite === */
   function setSubmitting(isSubmitting) {
     if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Zahlung bei Stripe abschließen";
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Weiter zur Zahlungsmethode";
     }
 
     submitButton.disabled = isSubmitting;
     submitButton.textContent = isSubmitting
-      ? "Zahlung wird vorbereitet ..."
+      ? "Weiterleitung wird vorbereitet ..."
       : submitButton.dataset.defaultLabel;
   }
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 === */
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_AND_SUBMIT_COPY_V3 === */
 
   function showResult(message) {
     resultText.textContent = message;
@@ -80,11 +78,126 @@
     return data;
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V2 | Zweck: bereitet Mitgliedschafts-Checkout vor, nutzt klares Stripe-Wording und gibt den Button nach Fehlern wieder frei; Umfang: kompletter Submit-Handler des Mitgliedschaftsformulars === */
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V3 | Zweck: validiert Mitgliedschafts-Pflichtfelder ohne Browser-Popup, markiert fehlende Felder und startet danach den Stripe-Zahlungsschritt; Umfang: kompletter Submit-Handler inklusive Validierungshelfern === */
+  function getValidationStatusNode() {
+    let statusNode = form.querySelector("[data-organizer-validation-status]");
+    if (statusNode) return statusNode;
+
+    statusNode = document.createElement("p");
+    statusNode.className = "content-form-note organizer-validation-note";
+    statusNode.hidden = true;
+    statusNode.setAttribute("data-organizer-validation-status", "");
+    statusNode.setAttribute("aria-live", "assertive");
+
+    const referenceNode = form.querySelector(".content-actions");
+    if (referenceNode) {
+      referenceNode.insertAdjacentElement("beforebegin", statusNode);
+    } else {
+      form.appendChild(statusNode);
+    }
+
+    return statusNode;
+  }
+
+  function setValidationMessage(message) {
+    const statusNode = getValidationStatusNode();
+    statusNode.hidden = false;
+    statusNode.textContent = safeText(message);
+  }
+
+  function clearValidationMessage() {
+    const statusNode = form.querySelector("[data-organizer-validation-status]");
+    if (!statusNode) return;
+
+    statusNode.hidden = true;
+    statusNode.textContent = "";
+  }
+
+  function getField(control) {
+    return control?.closest?.(".content-field") || null;
+  }
+
+  function clearControlValidation(control) {
+    if (!control || !control.id || !control.id.startsWith("organizer-membership-")) return;
+
+    control.removeAttribute("aria-invalid");
+
+    const field = getField(control);
+    if (field) {
+      delete field.dataset.fieldInvalid;
+    }
+
+    if (!form.querySelector('[data-field-invalid="true"]')) {
+      clearValidationMessage();
+    }
+  }
+
+  function clearValidationState() {
+    form.querySelectorAll('[aria-invalid="true"]').forEach((control) => {
+      control.removeAttribute("aria-invalid");
+    });
+
+    form.querySelectorAll('[data-field-invalid="true"]').forEach((field) => {
+      delete field.dataset.fieldInvalid;
+    });
+
+    clearValidationMessage();
+  }
+
+  function markFieldInvalid(id) {
+    const control = document.getElementById(id);
+    if (!control) return null;
+
+    control.setAttribute("aria-invalid", "true");
+
+    const field = getField(control);
+    if (field) {
+      field.dataset.fieldInvalid = "true";
+    }
+
+    return control;
+  }
+
+  function validateMembershipForm() {
+    const invalidIds = [];
+
+    const organization = document.getElementById("organizer-membership-organization");
+    const email = document.getElementById("organizer-membership-email");
+    const plan = document.getElementById("organizer-membership-plan");
+
+    if (!safeText(organization?.value)) invalidIds.push("organizer-membership-organization");
+    if (!safeText(email?.value) || (email && !email.validity.valid)) invalidIds.push("organizer-membership-email");
+    if (!safeText(plan?.value)) invalidIds.push("organizer-membership-plan");
+
+    if (!invalidIds.length) return true;
+
+    const firstInvalidControl = invalidIds
+      .map((id) => markFieldInvalid(id))
+      .find(Boolean);
+
+    setValidationMessage("Bitte fülle die markierten Pflichtfelder aus.");
+
+    if (firstInvalidControl && typeof firstInvalidControl.focus === "function") {
+      firstInvalidControl.focus({ preventScroll: false });
+    }
+
+    return false;
+  }
+
+  form.addEventListener("input", (event) => {
+    clearControlValidation(event.target);
+  });
+
+  form.addEventListener("change", (event) => {
+    clearControlValidation(event.target);
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (typeof form.reportValidity === "function" && !form.reportValidity()) {
+    clearValidationState();
+
+    if (!validateMembershipForm()) {
       return;
     }
 
@@ -114,12 +227,12 @@
       window.location.href = checkoutUrl;
     } catch (error) {
       console.warn("Organizer membership: start failed.", error);
-      showResult("Die Zahlung bei Stripe konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+      showResult("Der nächste Schritt konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
     } finally {
       setSubmitting(false);
     }
   });
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V2 === */
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V3 === */
 
   /* === END FILE: js/organizer-membership.js === */
 })();
