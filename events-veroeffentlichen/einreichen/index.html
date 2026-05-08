@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V4 | Zweck: positioniert die Einreichungsseite als Einzeltermin-Weg mit klarer Stripe-Zahlung, Prüfung und Veröffentlichung nach Freigabe; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V5 | Zweck: benennt die Seite konsistent als Einreichung einer einzelnen Veranstaltung und beschreibt den Weg zur Zahlungsmethode; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Einzeltermin einreichen | Bocholt erleben</title>
+  <title>Einzelne Veranstaltung einreichen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Einzeltermin bei Bocholt erleben einreichen: Veranstaltung übermitteln, Zahlung bei Stripe abschließen und anschließend prüfen lassen."
+    content="Einzelne Veranstaltung bei Bocholt erleben einreichen: Angaben übermitteln, zur Zahlungsmethode weitergehen und anschließend prüfen lassen."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
@@ -22,14 +22,14 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
-  <meta property="og:title" content="Einzeltermin einreichen | Bocholt erleben">
-  <meta property="og:description" content="Einzeltermin einreichen, Zahlung bei Stripe abschließen und anschließend prüfen lassen.">
+  <meta property="og:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
+  <meta property="og:description" content="Einzelne Veranstaltung einreichen, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Einzeltermin einreichen | Bocholt erleben">
-  <meta name="twitter:description" content="Einzeltermin einreichen, Zahlung bei Stripe abschließen und anschließend prüfen lassen.">
+  <meta name="twitter:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
+  <meta name="twitter:description" content="Einzelne Veranstaltung einreichen, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -40,8 +40,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Einzeltermin einreichen",
-    "description": "Einzeltermin bei Bocholt erleben einreichen: Veranstaltung übermitteln, Zahlung bei Stripe abschließen und anschließend prüfen lassen.",
+    "name": "Einzelne Veranstaltung einreichen",
+    "description": "Einzelne Veranstaltung bei Bocholt erleben einreichen: Angaben übermitteln, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/einreichen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -51,8 +51,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V4 === -->
+  <link rel="stylesheet" href="/css/style.css?v=2026-05-08-single-submit-2">
+  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V5 === -->
 </head>
 
 <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_BODY_MODE_V1 | Zweck: markiert diese Route als reinen Einzeltermin-Weg ohne Mitgliedschafts-/Abo-Reuse im Formular; Umfang: body-Tag === -->
@@ -78,29 +78,31 @@
   </header>
 
   <main class="page page--publish">
+    <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HERO_COPY_V6 | Zweck: gleicht den Seitentitel und Lead an die Einstiegsseite an; Umfang: Hero der Einzelveranstaltungs-Einreichung === -->
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
-          <h1>Einzeltermin einreichen</h1>
+          <h1>Einzelne Veranstaltung einreichen</h1>
           <p class="content-lead">
-            Für eine einzelne Veranstaltung ohne Mitgliedschaft. Trage die wichtigsten Angaben ein, damit wir deinen Termin prüfen können.
+            Trage alle notwendigen Angaben ein, damit wir deine Veranstaltung prüfen können.
           </p>
         </div>
       </div>
     </header>
+    <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HERO_COPY_V6 === -->
 
-    <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V5 | Zweck: beschreibt die Einzeltermin-Einreichung als einmaligen Kauf ohne Mitgliedschaft und ohne interne Modell-Sprache; Umfang: Formular-Kopf und versteckter Einzeltermin-Plan === -->
+    <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V6 | Zweck: entfernt redundante Ohne-Mitgliedschaft-Sprache und nennt Preis plus Stripe-Zahlung konsistent; Umfang: Formular-Kopf und versteckter Einzeltermin-Plan === -->
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
         <p class="content-note">Mit * markierte Felder sind Pflichtfelder.</p>
-        <p class="content-note"><strong>Einzeltermin:</strong> 9,90&nbsp;€ einmalig, keine Mitgliedschaft.</p>
+        <p class="content-note"><strong>9,90&nbsp;€ einmalig</strong> – Zahlung über Stripe.</p>
       </div>
 
       <form class="content-form" id="publish-standard-form" novalidate>
         <input id="publish-standard-plan" name="plan" type="hidden" value="single">
         <div class="content-form-grid">
-    <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V5 === -->
+    <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V6 === -->
 
           <label class="content-field" for="publish-standard-organization">
             <span class="content-field__label">Veranstalter / Organisation *</span>
@@ -133,9 +135,9 @@
             <input class="content-field__control" id="publish-standard-place" name="place" type="text" required>
           </label>
 
-          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V3 | Zweck: hält Adresse/Treffpunkt als ein flexibles Feld und stellt PLZ + Stadt/Ort platzsparend in einer gemeinsamen Zeile dar; Umfang: Adressfelder der Einzeltermin-Einreichung === -->
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V4 | Zweck: benennt das Adressfeld eindeutig als Straße/Hausnummer oder offizieller Treffpunkt; Umfang: Adressfelder der Einzelveranstaltungs-Einreichung === -->
           <label class="content-field content-field--full" for="publish-standard-place-street">
-            <span class="content-field__label">Adresse / offizieller Treffpunkt *</span>
+            <span class="content-field__label">Straße, Hausnummer / offizieller Treffpunkt *</span>
             <input class="content-field__control" id="publish-standard-place-street" name="placeStreet" type="text" autocomplete="street-address" required>
             <p class="content-field__hint">Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
           </label>
@@ -151,7 +153,7 @@
               <input class="content-field__control" id="publish-standard-place-city" name="placeCity" type="text" autocomplete="address-level2" required>
             </label>
           </div>
-          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V3 === -->
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_ADDRESS_FIELDS_V4 === -->
 
           <label class="content-field content-field--full" for="publish-standard-event-link">
             <span class="content-field__label">Link zur Veranstaltungsseite</span>
@@ -159,11 +161,13 @@
             <p class="content-field__hint">Optional. Hilft besonders, wenn Ort oder Veranstalter geprüft werden müssen.</p>
           </label>
 
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_DESCRIPTION_LABEL_V2 | Zweck: vereinheitlicht Beschreibung/Hinweise mit Slash-Schreibweise; Umfang: Beschreibungsfeld der Einreichung === -->
           <label class="content-field content-field--full" for="publish-standard-description">
-            <span class="content-field__label">Kurze Beschreibung oder Hinweise</span>
+            <span class="content-field__label">Kurze Beschreibung / Hinweise</span>
             <textarea class="content-field__control" id="publish-standard-description" name="description" rows="3"></textarea>
             <p class="content-field__hint">Kurz und sachlich. Falls du noch keinen fertigen Beschreibungstext hast, reichen wichtige Hinweise.</p>
           </label>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_DESCRIPTION_LABEL_V2 === -->
 
           <label class="content-field content-field--full" for="publish-standard-location-confirmed">
             <span class="content-field__label">Bestätigung *</span>
@@ -174,16 +178,16 @@
           </label>
         </div>
 
-        <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V2 | Zweck: benennt den Zahlungsübergang für Einzeltermine klar als Stripe-Zahlung und trennt Zahlung, Prüfung und Veröffentlichung; Umfang: finaler CTA-Block im Einreichungsformular === -->
+        <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V3 | Zweck: benennt den CTA als nächsten Schritt zur Zahlungsmethode statt als bereits abgeschlossene Zahlung; Umfang: finaler CTA-Block im Einreichungsformular === -->
         <div class="content-actions content-actions--inline publish-final-actions">
           <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-            Zahlung bei Stripe abschließen
+            Weiter zur Zahlungsmethode
           </button>
           <p class="content-note">
-            Du wirst zu Stripe weitergeleitet. Nach erfolgreicher Zahlung geht deine Einreichung in die Prüfung. Die Veröffentlichung erfolgt erst nach Freigabe.
+            Im nächsten Schritt wirst du zu Stripe weitergeleitet. Nach erfolgreicher Zahlung geht deine Einreichung in die Prüfung. Die Veröffentlichung erfolgt erst nach Freigabe.
           </p>
         </div>
-        <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V2 === -->
+        <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V3 === -->
       </form>
     </section>
   </main>
@@ -191,9 +195,9 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V3 | Zweck: Cache-Busting fuer publish-funnel.js nach Einzeltermin-Formular- und Validierungsanpassung; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-06-single-intake-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V3 === -->
+  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V4 | Zweck: Cache-Busting fuer publish-funnel.js nach Pflichtfeld-Markierung und CTA-Wording; Umfang: genau eine Script-Zeile === -->
+  <script src="/js/publish-funnel.js?v=2026-05-08-single-submit-2" defer></script>
+  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V4 === -->
   <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 === -->
 </body>
 </html>
