@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V2_NEUTRAL_AREA | Zweck: neutralisiert den Login als Bereich-Öffnen-Pfad für Einreichungen und Mitgliedschaften und korrigiert die kanonische URL; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V3_AREA_OPEN_COPY | Zweck: positioniert die Login-Seite als Bereich-öffnen-Seite für Einreichungsstatus und Veranstalterbereich; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Einreichung oder Veranstalterbereich öffnen | Bocholt erleben</title>
+  <title>Bereich öffnen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Einreichung oder Veranstalterbereich bei Bocholt erleben per E-Mail-Link öffnen."
+    content="Status einer Einreichung oder Veranstalterbereich bei Bocholt erleben per E-Mail-Zugangslink öffnen."
   >
   <meta name="robots" content="noindex, nofollow">
 
@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V2_NEUTRAL_AREA === -->
+  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V3_AREA_OPEN_COPY === -->
 </head>
 
 <body>
@@ -42,24 +42,24 @@
   </header>
 
   <main class="page page--organizers" data-organizer-page="login">
-    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HERO_ACCESS_LINK_COPY_V2 | Zweck: erklärt den Zugangslink konkret für Einreichung oder Veranstalterbereich und schließt HTML sauber; Umfang: kompletter Hero der Login-Seite === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HERO_AREA_OPEN_COPY_V3 | Zweck: benennt den Login als Bereich-öffnen-Pfad für Einreichungsstatus oder Veranstalterbereich; Umfang: kompletter Hero der Login-Seite === -->
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Zugangslink</p>
+      <p class="content-kicker">Bereich öffnen</p>
       <h1>Einreichung oder Veranstalterbereich öffnen.</h1>
       <p class="content-lead">
         Gib die E-Mail-Adresse deiner Einreichung oder Mitgliedschaft ein. Wir senden dir einen einmaligen Zugangslink.
       </p>
       <p class="content-note" id="organizer-login-note">
-        Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.
+        Danach zeigen wir dir automatisch den Status deiner Einreichung oder deinen Veranstalterbereich.
       </p>
     </header>
-    <!-- === END BLOCK: ORGANIZER_LOGIN_HERO_ACCESS_LINK_COPY_V2 === -->
+    <!-- === END BLOCK: ORGANIZER_LOGIN_HERO_AREA_OPEN_COPY_V3 === -->
 
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_FORM_COPY_V3 | Zweck: macht den Magic-Link als E-Mail-Zugangslink klar und vermeidet abstrakte Zugangssprache; Umfang: kompletter Formularbereich der Login-Seite === -->
     <section class="content-card content-card--primary" aria-labelledby="organizer-login-form-head">
       <div class="content-form-section-head">
         <h2 id="organizer-login-form-head">Zugangslink anfordern</h2>
       </div>
-
 
       <form class="content-form" id="organizer-login-form" novalidate>
         <div class="content-form-grid">
@@ -74,17 +74,18 @@
               autocomplete="email"
               required
             >
-            <p class="content-field__hint">Nutze die E-Mail-Adresse, mit der du eingereicht oder deine Mitgliedschaft gestartet hast.</p>
+            <p class="content-field__hint">Nutze die E-Mail-Adresse, mit der du deine Veranstaltung eingereicht oder deine Mitgliedschaft gestartet hast.</p>
           </label>
         </div>
 
         <div class="content-actions content-actions--inline">
           <button class="content-cta content-cta--primary" id="organizer-login-submit" type="submit">
-            Zugangslink per E-Mail erhalten
+            Zugangslink senden
           </button>
         </div>
       </form>
     </section>
+    <!-- === END BLOCK: ORGANIZER_LOGIN_FORM_COPY_V3 === -->
 
     <section class="content-card content-card--primary" id="organizer-login-result" aria-labelledby="organizer-login-result-head" hidden>
       <h2 id="organizer-login-result-head">Nächster Schritt</h2>
@@ -92,12 +93,14 @@
       <nav class="content-links" id="organizer-login-result-links" hidden></nav>
     </section>
 
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BACK_LINK_COPY_V2 | Zweck: führt neutral zur Auswahl zurück statt nur zur Einreichung; Umfang: untere Bereich-Navigation der Login-Seite === -->
     <nav class="content-links" aria-label="Bereich-Navigation">
       <a class="content-link" href="/events-veroeffentlichen/">
-        <span class="content-link__label">Zurück zur Einreichung</span>
+        <span class="content-link__label">Zurück zur Auswahl</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </a>
     </nav>
+    <!-- === END BLOCK: ORGANIZER_LOGIN_BACK_LINK_COPY_V2 === -->
   </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
