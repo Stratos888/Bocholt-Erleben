@@ -80,7 +80,7 @@
     return data;
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V1 | Zweck: bereitet Mitgliedschafts-Checkout vor und gibt den Button nach Fehlern wieder frei; Umfang: kompletter Submit-Handler des Mitgliedschaftsformulars === */
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V2 | Zweck: bereitet Mitgliedschafts-Checkout vor, nutzt klares Stripe-Wording und gibt den Button nach Fehlern wieder frei; Umfang: kompletter Submit-Handler des Mitgliedschaftsformulars === */
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -112,22 +112,14 @@
       }
 
       window.location.href = checkoutUrl;
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 | Zweck: nutzt Stripe-Zahlung statt abstrakter Zahlungsmethode als Fallback-Beschriftung; Umfang: Submit-Button-State der Mitgliedschaftsseite === */
-  function setSubmitting(isSubmitting) {
-    if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Zahlung bei Stripe abschließen";
-    }
-
-    submitButton.disabled = isSubmitting;
-    submitButton.textContent = isSubmitting
-      ? "Zahlung wird vorbereitet ..."
-      : submitButton.dataset.defaultLabel;
-  }
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 === */
+    } catch (error) {
+      console.warn("Organizer membership: start failed.", error);
+      showResult("Die Zahlung bei Stripe konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+    } finally {
       setSubmitting(false);
     }
   });
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V1 === */
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_RETRY_SAFE_V2 === */
 
   /* === END FILE: js/organizer-membership.js === */
 })();
