@@ -1008,7 +1008,7 @@ select.content-field__control{
   gap: 7px;
 }
 
-/* === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V2 | Zweck: stellt PLZ/Stadt kompakt dar und markiert fehlende Pflichtfelder der Einreichung ohne Browser-Popup sichtbar; Umfang: lokale Formularzeile, Publish-Form-Kompaktregeln und Validierungszustände === */
+/* === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V3 | Zweck: markiert fehlende Pflichtfelder ruhig über Feldrahmen und Checkbox, ohne Labels rot zu färben; Umfang: lokale Formularzeile, Publish-Form-Kompaktregeln und Validierungszustände === */
 .page--publish .publish-locality-row{
   display: grid;
   grid-template-columns: minmax(74px, 88px) minmax(0, 1fr);
@@ -1046,10 +1046,6 @@ select.content-field__control{
   line-height: 1.22;
 }
 
-.page--publish .content-field[data-field-invalid="true"] .content-field__label{
-  color: #8d1f1f;
-}
-
 .page--publish .content-field[data-field-invalid="true"] .content-field__control{
   border-color: rgba(163,37,37,0.58);
   box-shadow:
@@ -1080,7 +1076,7 @@ select.content-field__control{
 .page--publish #publish-standard-notes{
   min-height: 60px;
 }
-/* === END BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V2 === */
+/* === END BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V3 === */
 
 .page--publish .publish-optional-fields{
   display: grid;
