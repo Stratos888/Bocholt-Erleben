@@ -1157,7 +1157,7 @@ select.content-field__control{
 }
 /* === END BLOCK: ORGANIZER_HERO_TEXT_WIDTH_REBALANCE_V1 === */
 
-/* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V1 | Zweck: hält Organizer-Karten kompakt und markiert fehlende Pflichtfelder im Mitgliedschaftsformular ruhig über Feldrahmen und Sammelhinweis; Umfang: Organizer-Actions, Cards und Validierungszustände für /fuer-veranstalter/ === */
+/* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V2 | Zweck: übernimmt die ruhige Pflichtfeld-Markierung analog Einzelveranstaltungsformular für das Mitgliedschaftsformular; Umfang: Organizer-Actions, Cards und Validierungszustände für /fuer-veranstalter/ === */
 .page--organizers .content-actions{
   margin-top: 1px;
 }
@@ -1196,7 +1196,7 @@ select.content-field__control{
   color: #8d1f1f;
   font-weight: 720;
 }
-/* === END BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V1 === */
+/* === END BLOCK: ORGANIZER_MEMBERSHIP_COMPACT_AND_VALIDATION_V2 === */
 
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
