@@ -1008,7 +1008,7 @@ select.content-field__control{
   gap: 7px;
 }
 
-/* === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_V1 | Zweck: stellt PLZ und Stadt/Ort in der Einzeltermin-Einreichung platzsparend nebeneinander dar, ohne Straße/Hausnummer technisch zu erzwingen; Umfang: lokale Formularzeile für PLZ + Stadt/Ort === */
+/* === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V2 | Zweck: stellt PLZ/Stadt kompakt dar und markiert fehlende Pflichtfelder der Einreichung ohne Browser-Popup sichtbar; Umfang: lokale Formularzeile, Publish-Form-Kompaktregeln und Validierungszustände === */
 .page--publish .publish-locality-row{
   display: grid;
   grid-template-columns: minmax(74px, 88px) minmax(0, 1fr);
@@ -1023,7 +1023,6 @@ select.content-field__control{
 .page--publish .publish-locality-row__city{
   min-width: 0;
 }
-/* === END BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_V1 === */
 
 .page--publish .content-field{
   gap: 3px;
@@ -1047,6 +1046,28 @@ select.content-field__control{
   line-height: 1.22;
 }
 
+.page--publish .content-field[data-field-invalid="true"] .content-field__label{
+  color: #8d1f1f;
+}
+
+.page--publish .content-field[data-field-invalid="true"] .content-field__control{
+  border-color: rgba(163,37,37,0.58);
+  box-shadow:
+    0 0 0 3px rgba(163,37,37,0.12),
+    0 1px 0 rgba(255,255,255,0.72) inset;
+}
+
+.page--publish .content-field[data-field-invalid="true"] input[type="checkbox"][aria-invalid="true"]{
+  outline: 2px solid rgba(163,37,37,0.58);
+  outline-offset: 3px;
+}
+
+.page--publish .publish-validation-note{
+  max-width: none;
+  color: #8d1f1f;
+  font-weight: 720;
+}
+
 .page--publish textarea.content-field__control{
   min-height: 72px;
 }
@@ -1059,6 +1080,7 @@ select.content-field__control{
 .page--publish #publish-standard-notes{
   min-height: 60px;
 }
+/* === END BLOCK: PUBLISH_SINGLE_EVENT_LOCALITY_ROW_AND_VALIDATION_V2 === */
 
 .page--publish .publish-optional-fields{
   display: grid;
