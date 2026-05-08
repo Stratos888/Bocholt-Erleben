@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_CANCEL_HEAD_V3_PAYMENT_SELECTION_COPY | Zweck: beschreibt die Abbruchseite neutral für nicht abgeschlossene Einzeltermin- und Mitgliedschaftszahlungen; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_CANCEL_HEAD_V4_PAYMENT_NOT_COMPLETED_COPY | Zweck: beschreibt die Abbruchseite konsistent für nicht abgeschlossene Zahlung bei einzelner Veranstaltung oder Mitgliedschaft; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Zahlung nicht abgeschlossen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Der Zahlungsvorgang wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren und Einzeltermin oder Mitgliedschaft neu starten."
+    content="Die Zahlung wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren und eine einzelne Veranstaltung oder eine Mitgliedschaft neu starten."
   >
   <meta name="robots" content="noindex, nofollow">
 
@@ -24,13 +24,13 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
   <meta property="og:title" content="Zahlung nicht abgeschlossen | Bocholt erleben">
-  <meta property="og:description" content="Der Zahlungsvorgang wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren.">
+  <meta property="og:description" content="Die Zahlung wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/abgebrochen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Zahlung nicht abgeschlossen | Bocholt erleben">
-  <meta name="twitter:description" content="Der Zahlungsvorgang wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren.">
+  <meta name="twitter:description" content="Die Zahlung wurde nicht abgeschlossen. Du kannst zur Auswahl zurückkehren.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -42,7 +42,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Zahlung nicht abgeschlossen",
-    "description": "Abbruchseite für einen nicht abgeschlossenen Zahlungsvorgang bei Bocholt erleben.",
+    "description": "Abbruchseite für eine nicht abgeschlossene Zahlung bei Bocholt erleben.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/abgebrochen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -53,7 +53,7 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: PUBLISH_CANCEL_HEAD_V3_PAYMENT_SELECTION_COPY === -->
+  <!-- === END BLOCK: PUBLISH_CANCEL_HEAD_V4_PAYMENT_NOT_COMPLETED_COPY === -->
 </head>
 
 <body>
@@ -69,18 +69,17 @@
     </a>
   </header>
 
-  <!-- === BEGIN BLOCK: PUBLISH_CANCEL_ROUTE_PAYMENT_SELECTION_COPY_V2 | Zweck: führt nach abgebrochener Stripe-Zahlung neutral zur Auswahl zurück und deckt Einzeltermin sowie Mitgliedschaft sprachlich sauber ab; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/abgebrochen/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_CANCEL_ROUTE_PAYMENT_NOT_COMPLETED_COPY_V3 | Zweck: entfernt den Kicker und führt nach nicht abgeschlossener Zahlung konsistent zur Auswahl für einzelne Veranstaltung oder Mitgliedschaft zurück; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/abgebrochen/ === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Zahlung nicht abgeschlossen</p>
       <h1>Die Zahlung wurde nicht abgeschlossen.</h1>
 
       <p class="content-lead">
-        Der Vorgang wurde abgebrochen oder nicht vollständig abgeschlossen.
+        Es wurde keine Veranstaltung eingereicht und keine Mitgliedschaft aktiviert.
       </p>
 
       <p class="content-note">
-        Dadurch wurde keine neue Einreichung abgeschlossen und keine neue Mitgliedschaft aktiviert.
+        Du kannst zur Auswahl zurückgehen und den Vorgang erneut starten.
       </p>
 
       <div class="content-actions content-actions--inline">
@@ -93,11 +92,11 @@
     <section class="content-card content-card--primary" aria-labelledby="publish-cancel-next-steps">
       <h2 id="publish-cancel-next-steps">Nächste Schritte</h2>
       <p>1. Gehe zurück zur Auswahl.</p>
-      <p>2. Wähle erneut zwischen Einzeltermin und Mitgliedschaft.</p>
-      <p>3. Schließe die Zahlung bei Stripe ab, wenn du fortfahren möchtest.</p>
+      <p>2. Wähle „Einzelne Veranstaltung einreichen“ oder „Mitgliedschaft wählen“.</p>
+      <p>3. Gehe erneut zur Zahlungsmethode, wenn du fortfahren möchtest.</p>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_CANCEL_ROUTE_PAYMENT_SELECTION_COPY_V2 === -->
+  <!-- === END BLOCK: PUBLISH_CANCEL_ROUTE_PAYMENT_NOT_COMPLETED_COPY_V3 === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
