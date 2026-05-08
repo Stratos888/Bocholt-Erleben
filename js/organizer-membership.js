@@ -15,11 +15,11 @@
 
   const safeText = (value) => String(value ?? "").trim();
 
-  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V1 | Zweck: zeigt unter der Modellauswahl nur die Kurzbeschreibung des aktuell gewählten Modells; Umfang: Modellhinweise und Change-Handler === */
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V2 | Zweck: zeigt unter der Tarifauswahl den Umfang des aktuell gewählten Tarifs in öffentlicher Begriffssystematik; Umfang: Tarifhinweise und Change-Handler === */
   const planDescriptions = {
-    starter: "Starter passt für gelegentliche Termine und kleine Veranstalter.",
-    active: "Aktiv passt für regelmäßige Programme mit mehreren Terminen im Monat.",
-    unlimited: "Dauerhaft passt für laufende Programme mit vielen Terminen im üblichen Rahmen."
+    starter: "Starter passt für bis zu 3 veröffentlichte Termine pro Monat.",
+    active: "Aktiv passt für bis zu 8 veröffentlichte Termine pro Monat.",
+    unlimited: "Dauerhaft passt für viele veröffentlichte Termine im üblichen Rahmen."
   };
 
   function updatePlanHint() {
@@ -29,18 +29,20 @@
 
   planSelect.addEventListener("change", updatePlanHint);
   updatePlanHint();
-  /* === END BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V1 === */
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_PLAN_HINT_V2 === */
 
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 | Zweck: nutzt Stripe-Zahlung statt abstrakter Zahlungsmethode als Fallback-Beschriftung; Umfang: Submit-Button-State der Mitgliedschaftsseite === */
   function setSubmitting(isSubmitting) {
     if (!submitButton.dataset.defaultLabel) {
-      submitButton.dataset.defaultLabel = submitButton.textContent || "Weiter zur Zahlungsmethode";
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Zahlung bei Stripe abschließen";
     }
 
     submitButton.disabled = isSubmitting;
     submitButton.textContent = isSubmitting
-      ? "Wird vorbereitet ..."
+      ? "Zahlung wird vorbereitet ..."
       : submitButton.dataset.defaultLabel;
   }
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 === */
 
   function showResult(message) {
     resultText.textContent = message;
@@ -110,10 +112,18 @@
       }
 
       window.location.href = checkoutUrl;
-    } catch (error) {
-      console.warn("Organizer membership: start failed.", error);
-      showResult("Die Zahlungsmethode konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
-    } finally {
+  /* === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 | Zweck: nutzt Stripe-Zahlung statt abstrakter Zahlungsmethode als Fallback-Beschriftung; Umfang: Submit-Button-State der Mitgliedschaftsseite === */
+  function setSubmitting(isSubmitting) {
+    if (!submitButton.dataset.defaultLabel) {
+      submitButton.dataset.defaultLabel = submitButton.textContent || "Zahlung bei Stripe abschließen";
+    }
+
+    submitButton.disabled = isSubmitting;
+    submitButton.textContent = isSubmitting
+      ? "Zahlung wird vorbereitet ..."
+      : submitButton.dataset.defaultLabel;
+  }
+  /* === END BLOCK: ORGANIZER_MEMBERSHIP_SUBMIT_STATE_COPY_V2 === */
       setSubmitting(false);
     }
   });
