@@ -311,14 +311,13 @@
       loginEmail.value = prefillEmail;
     }
 
+    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V5_AREA_LINK | Zweck: rendert Login, Token-Einlösung und Magic-Link-Anforderung syntaktisch robust mit konkreter Einreichung-/Veranstalterbereich-Sprache; Umfang: Mitgliedschafts-Hinweis, Token- und Request-Abschnitt in handleLoginPage === */
     if (membershipStarted) {
       setLoginResult(
         "Deine Mitgliedschaft wurde gestartet. Fordere jetzt deinen Zugangslink an, um deinen Veranstalterbereich zu öffnen."
       );
     }
-    }
 
-    /* === BEGIN BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V4_SYNTAX_SAFE_ACCESS_LINK | Zweck: rendert Login, Token-Einlösung und Magic-Link-Anforderung syntaktisch robust mit konkreter Einreichung-/Veranstalterbereich-Sprache; Umfang: kompletter Token- und Request-Abschnitt in handleLoginPage === */
     if (token) {
       if (loginNote) {
         loginNote.textContent = "Der Zugangslink wird geprüft. Danach zeigen wir dir automatisch deine Einreichung oder deinen Veranstalterbereich.";
@@ -390,7 +389,7 @@
         setSubmitting(false);
       }
     });
-    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V4_SYNTAX_SAFE_ACCESS_LINK === */
+    /* === END BLOCK: ORGANIZER_LOGIN_COPY_AND_FALLBACK_V5_AREA_LINK === */
   }
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Meine Einreichung oder Mein Veranstalterbereich und ersetzt öffentliche Kontingent-/Abo-Sprache; Umfang: komplette renderDashboard-Funktion === */
