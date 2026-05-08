@@ -149,7 +149,14 @@ Umfang:
     // - Bindet Reload und Deploy genau einmal
     // Umfang:
     // - Entfernt den doppelten Deploy-Listener
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+    document.getElementById("reloadBtn").addEventListener("click", async () => {
+      const ok = await ensureUnlocked();
+      if (!ok) {
+        renderLockedState();
+        return;
+      }
+      await loadAndShow();
+    });
     document.getElementById("deployBtn").addEventListener("click", async () => {
       const ok = await ensureUnlocked();
       if (!ok) return;
@@ -174,6 +181,30 @@ Umfang:
         elLock.classList.add("muted");
       }
     }
+
+    // === BEGIN BLOCK: REVIEW_INBOX_LOCKED_STATE_V1 ===
+    // Zweck:
+    // - Zeigt einen echten Sperrzustand, wenn die Passwortabfrage abgebrochen wird
+    // - Verhindert sichtbares Laden von Review-Inhalten ohne erfolgreiche Entsperrung
+    // Umfang:
+    // - Ergänzt reinen UI-State ohne API-/Datenlogik
+    function renderLockedState() {
+      queue = [];
+      current = null;
+      totalLoaded = 0;
+      setStatus("Kuratier-Inbox gesperrt. Bitte neu laden und Passwort eingeben.");
+      elLeft.textContent = "";
+      elRight.textContent = "";
+      refreshLock();
+      elOne.innerHTML = `
+        <article class="card">
+          <h1>Gesperrt</h1>
+          <p class="muted">Die Kuratier-Inbox wird erst nach erfolgreicher Passwortabfrage geladen.</p>
+          <button class="btn" type="button" onclick="window.location.reload()">Neu laden und entsperren</button>
+        </article>
+      `;
+    }
+    // === END BLOCK: REVIEW_INBOX_LOCKED_STATE_V1 ===
 
     // === BEGIN BLOCK: REVIEW_INBOX_LOAD_SHEET_AND_SUBMISSIONS_V1 ===
     // Zweck:
@@ -227,6 +258,11 @@ Umfang:
     }
 
     async function loadAndShow() {
+      if (!isUnlocked() || !reviewApiPassword) {
+        renderLockedState();
+        return;
+      }
+
       setStatus("Lade …");
       elOne.innerHTML = "";
       queue = [];
@@ -875,24 +911,29 @@ Umfang:
       });
     }
 
-    // === BEGIN BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_V1 ===
+    // === BEGIN BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_REQUIRED_V2 ===
     // Zweck:
-    // - Entsperrt die Kuratier-PWA beim Öffnen, damit DB-Review-Fälle nicht öffentlich und trotzdem sichtbar sind
-    // - Passwort bleibt nur im RAM und wird als Header an PHP-Review-Endpunkte gesendet
+    // - Verhindert, dass die Kuratier-PWA nach abgebrochener Passwortabfrage trotzdem Inhalte lädt
+    // - Entsperrt die DB-Review-Endpunkte erst nach erfolgreicher Passwortprüfung
     // Umfang:
     // - Ersetzt Init-Block
     (async function init() {
       refreshLock();
 
       try {
-        await ensureUnlocked();
+        const ok = await ensureUnlocked();
+        if (!ok) {
+          renderLockedState();
+          return;
+        }
+
         await loadAndShow();
       } catch (err) {
         console.error(err);
         setStatus("Fehler beim Laden.");
       }
     })();
-    // === END BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_V1 ===
+    // === END BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_REQUIRED_V2 ===
   </script>
 </body>
 </html>
