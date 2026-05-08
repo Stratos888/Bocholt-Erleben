@@ -42,23 +42,20 @@
   </header>
 
   <main class="page page--organizers" data-organizer-page="dashboard">
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V3 | Zweck: konkretisiert den Ladezustand als Bereich-Öffnen statt abstrakten Zugang; Umfang: statischer Dashboard-Hero === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 | Zweck: entfernt den Kicker und hält den statischen Dashboard-Ladezustand konsistent mit Status/Veranstalterbereich; Umfang: statischer Dashboard-Hero === -->
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker" id="organizer-dashboard-kicker">Bereich öffnen</p>
       <h1 id="organizer-dashboard-title">Wir laden deine Angaben.</h1>
       <p class="content-lead" id="organizer-dashboard-lead">
         Wir öffnen den Status deiner Einreichung oder deinen Veranstalterbereich.
       </p>
-      <p class="content-note" id="organizer-dashboard-note">
-        Je nach E-Mail-Adresse zeigen wir dir die passenden Angaben.
-      </p>
+      <p class="content-note" id="organizer-dashboard-note" hidden></p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--primary" id="organizer-dashboard-primary-cta" href="/events-veroeffentlichen/einreichen/">
           Neue Veranstaltung einreichen
         </a>
       </div>
     </header>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V3 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 === -->
 
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 | Zweck: erklärt den fehlenden Login als notwendigen E-Mail-Zugangslink; Umfang: Auth-Required-Karte === -->
@@ -74,23 +71,24 @@
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
 
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V2 | Zweck: macht die statischen Dashboard-Karten verständlicher, bevor Runtime-Texte geladen werden; Umfang: beide Summary-Karten === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 | Zweck: trennt Stammdaten und Mitgliedschaftsübersicht klar, damit Tarifstatus nicht doppelt erscheint; Umfang: beide Summary-Karten === -->
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
         <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
         <p id="organizer-account-name">–</p>
         <p id="organizer-account-email">–</p>
-        <p id="organizer-account-plan">–</p>
+        <p id="organizer-account-plan" hidden>–</p>
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
-        <h2 id="organizer-dashboard-quota-head">Status & Zeitraum</h2>
+        <h2 id="organizer-dashboard-quota-head">Übersicht Mitgliedschaft</h2>
         <p id="organizer-quota-period">–</p>
+        <p id="organizer-quota-change" hidden>–</p>
         <p id="organizer-quota-summary">–</p>
         <p id="organizer-quota-remaining">–</p>
       </section>
     </div>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V2 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 === -->
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_COPY_V2 | Zweck: benennt die Liste als letzte Einreichungen statt generisch Einreichungen; Umfang: statischer Einreichungslisten-Block === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
@@ -100,25 +98,20 @@
     </section>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_COPY_V2 === -->
     
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V3 | Zweck: führt neutral zur Auswahl zurück und hält Zugangslink-Aktion klar; Umfang: untere Bereich-Navigation im Dashboard === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 | Zweck: entfernt den redundanten Zugangslink aus dem geöffneten Dashboard und lässt nur den Rückweg zur Auswahl; Umfang: untere Bereich-Navigation im Dashboard === -->
     <nav class="content-links" aria-label="Bereich-Navigation">
-      <a class="content-link" href="/fuer-veranstalter/login/">
-        <span class="content-link__label">Neuen Zugangslink anfordern</span>
-        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </a>
-
       <a class="content-link" href="/events-veroeffentlichen/">
         <span class="content-link__label">Zurück zur Auswahl</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </a>
     </nav>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V3 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 === -->
   </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <script src="/js/organizer-portal.js?v=2026-05-05-freeze-stability-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-05-08-dashboard-wording-1" defer></script>
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>
 </html>
