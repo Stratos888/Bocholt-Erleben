@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V2_AREA_SPLIT | Zweck: neutralisiert den geschützten Bereich für Einreichungen und Mitgliedschaften ohne öffentliche Kontingent-/Abo-Sprache; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY | Zweck: beschreibt die geschützte Seite als Status- und Veranstalterbereich ohne interne Kontingent-/Systemsprache; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Einreichung oder Veranstalterbereich | Bocholt erleben</title>
+  <title>Status & Veranstalterbereich | Bocholt erleben</title>
   <meta
     name="description"
-    content="Geschützter Bereich für eigene Einreichungen und den Veranstalterbereich bei Bocholt erleben."
+    content="Status eigener Einreichungen und Veranstalterbereich bei Bocholt erleben."
   >
   <meta name="robots" content="noindex, nofollow">
 
@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V2_AREA_SPLIT === -->
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY === -->
 </head>
 
 <body>
@@ -42,16 +42,15 @@
   </header>
 
   <main class="page page--organizers" data-organizer-page="dashboard">
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V3 | Zweck: konkretisiert den Ladezustand als Bereich-Öffnen statt abstrakten Zugang; Umfang: statischer Dashboard-Hero === -->
     <header class="content-hero content-hero--panel">
-      <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V1 | Zweck: konkretisiert den Ladezustand ohne abstrakten Bereich-Begriff; Umfang: statischer Dashboard-Hero bis Lead === -->
-      <p class="content-kicker" id="organizer-dashboard-kicker">Zugang</p>
+      <p class="content-kicker" id="organizer-dashboard-kicker">Bereich öffnen</p>
       <h1 id="organizer-dashboard-title">Wir laden deine Angaben.</h1>
       <p class="content-lead" id="organizer-dashboard-lead">
-        Wir prüfen gerade, ob wir deine Einreichung oder deinen Veranstalterbereich anzeigen.
+        Wir öffnen den Status deiner Einreichung oder deinen Veranstalterbereich.
       </p>
-      <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V1 === -->
       <p class="content-note" id="organizer-dashboard-note">
-        Der Inhalt richtet sich automatisch nach deiner E-Mail-Adresse.
+        Je nach E-Mail-Adresse zeigen wir dir die passenden Angaben.
       </p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--primary" id="organizer-dashboard-primary-cta" href="/events-veroeffentlichen/einreichen/">
@@ -59,41 +58,49 @@
         </a>
       </div>
     </header>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V3 === -->
 
 
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 | Zweck: erklärt den fehlenden Login als notwendigen E-Mail-Zugangslink; Umfang: Auth-Required-Karte === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-auth-required" aria-labelledby="organizer-dashboard-auth-required-head" hidden>
-      <h2 id="organizer-dashboard-auth-required-head">Zugang erforderlich</h2>
-      <p>Fordere einen gültigen Zugangslink per E-Mail an, um deine Einreichung oder deinen Veranstalterbereich zu öffnen.</p>
+      <h2 id="organizer-dashboard-auth-required-head">Zugangslink erforderlich</h2>
+      <p>Fordere einen gültigen Zugangslink per E-Mail an, um den Status deiner Einreichung oder deinen Veranstalterbereich zu öffnen.</p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
-          Zugangslink per E-Mail erhalten
+          Zugangslink senden
         </a>
       </div>
     </section>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
 
 
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V2 | Zweck: macht die statischen Dashboard-Karten verständlicher, bevor Runtime-Texte geladen werden; Umfang: beide Summary-Karten === -->
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
-        <h2 id="organizer-dashboard-account-head">Bereich</h2>
+        <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
         <p id="organizer-account-name">–</p>
         <p id="organizer-account-email">–</p>
         <p id="organizer-account-plan">–</p>
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
-        <h2 id="organizer-dashboard-quota-head">Status</h2>
+        <h2 id="organizer-dashboard-quota-head">Status & Zeitraum</h2>
         <p id="organizer-quota-period">–</p>
         <p id="organizer-quota-summary">–</p>
         <p id="organizer-quota-remaining">–</p>
       </section>
     </div>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V2 === -->
 
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_COPY_V2 | Zweck: benennt die Liste als letzte Einreichungen statt generisch Einreichungen; Umfang: statischer Einreichungslisten-Block === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
-      <h2 id="organizer-dashboard-submissions-head">Einreichungen</h2>
+      <h2 id="organizer-dashboard-submissions-head">Letzte Einreichungen</h2>
       <nav class="content-links" id="organizer-dashboard-submissions-list"></nav>
-      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine Einreichungen vorhanden.</p>
+      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine Einreichungen gefunden.</p>
     </section>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_COPY_V2 === -->
     
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V3 | Zweck: führt neutral zur Auswahl zurück und hält Zugangslink-Aktion klar; Umfang: untere Bereich-Navigation im Dashboard === -->
     <nav class="content-links" aria-label="Bereich-Navigation">
       <a class="content-link" href="/fuer-veranstalter/login/">
         <span class="content-link__label">Neuen Zugangslink anfordern</span>
@@ -101,10 +108,11 @@
       </a>
 
       <a class="content-link" href="/events-veroeffentlichen/">
-        <span class="content-link__label">Zurück zur Einreichung</span>
+        <span class="content-link__label">Zurück zur Auswahl</span>
         <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
       </a>
     </nav>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V3 === -->
   </main>
 
   <script src="/config.js?v=2026-02-04-1"></script>
