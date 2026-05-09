@@ -1143,14 +1143,17 @@ select.content-field__control{
   letter-spacing: 0.08em;
 }
 
+/* === BEGIN BLOCK: ORGANIZER_HERO_HEADLINE_WRAP_CALIBRATION_V1 | Zweck: verhindert zu frühe mobile Überschriftenumbrüche auf Veranstalter-, Login-, Dashboard- und Statusseiten ohne die globale Hero-Komponente zu verändern; Umfang: nur page--organizers Hero-H1-Basis === */
 .page--organizers .content-hero h1{
-  max-width: 22ch;
-  font-size: clamp(1.58rem, 7.4vw, 2.08rem);
-  line-height: 1.02;
-  letter-spacing: -0.038em;
-  text-wrap: balance;
+  max-width: 26ch;
+  font-size: clamp(1.52rem, 6.1vw, 1.86rem);
+  line-height: 1.04;
+  letter-spacing: -0.034em;
+  text-wrap: pretty;
+  overflow-wrap: normal;
   hyphens: none;
 }
+/* === END BLOCK: ORGANIZER_HERO_HEADLINE_WRAP_CALIBRATION_V1 === */
 
 .page--organizers .content-lead{
   max-width: 54ch;
@@ -1243,25 +1246,111 @@ select.content-field__control{
   font-weight: 760;
 }
 
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_LIST_AND_FOOTER_NAV_BASE_V1 | Zweck: konsolidiert Dashboard-Listenabstand und macht die Abschlussnavigation als ruhige Utility-Zeile konsistent mit Karten und Formularflächen; Umfang: Dashboard-Submissions-Liste plus letzter content-links-Block auf Organizer-Seiten === */
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 8px;
 }
 
+.page--organizers > nav.content-links:last-child{
+  width: min(100%, var(--subpage-body-max));
+  gap: 0;
+  margin-top: -2px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.page--organizers > nav.content-links:last-child .content-link{
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.56);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 5px 12px rgba(22,39,61,0.018);
+  font-size: 0.94rem;
+  font-weight: 760;
+}
+/* === END BLOCK: ORGANIZER_DASHBOARD_LIST_AND_FOOTER_NAV_BASE_V1 === */
+
+/* === BEGIN BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V1 | Zweck: verbessert mobile Headline-Umbrüche, Tarif-Select-Lesbarkeit, Abschlussnavigation und reduziert den Organizer-Feedback-Einstieg auf einen kompakten Button; Umfang: nur Mobile-Regeln für page--publish/page--organizers und direkt folgenden Feedback-Inline-Einstieg === */
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
-    max-width: 18ch;
-    font-size: clamp(1.34rem, 6.2vw, 1.62rem);
-    line-height: 1.02;
-    letter-spacing: -0.032em;
+    max-width: 24ch;
+    font-size: clamp(1.32rem, 5.65vw, 1.56rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
     white-space: normal;
-    text-wrap: balance;
+    text-wrap: pretty;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  .page--organizers .content-hero h1{
+    max-width: 24ch;
+    font-size: clamp(1.48rem, 5.95vw, 1.72rem);
+    line-height: 1.045;
+    letter-spacing: -0.032em;
+  }
+
+  .page--publish select.content-field__control{
+    padding-right: 34px;
+    font-size: 0.9rem;
+    line-height: 1.22;
+    text-overflow: ellipsis;
   }
 
   .page--publish .publish-final-card--help{
     padding-top: 12px;
     padding-bottom: 12px;
   }
+
+  .page--organizers > nav.content-links:last-child{
+    margin-top: -4px;
+  }
+
+  .page--organizers > nav.content-links:last-child .content-link{
+    min-height: 44px;
+    padding-inline: 13px;
+    border-radius: 15px;
+    font-size: 0.93rem;
+  }
+
+  .page--organizers > nav.content-links:last-child .content-link__chevron{
+    width: 15px;
+    height: 15px;
+    opacity: 0.78;
+  }
+
+  main.page--organizers + .feedback-inline-entry{
+    width: min(100% - 32px, 760px);
+    margin: 10px auto calc(var(--gutter) + 8px);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  main.page--organizers + .feedback-inline-entry .feedback-inline-entry__copy{
+    display: none;
+  }
+
+  main.page--organizers + .feedback-inline-entry .feedback-inline-entry__button{
+    width: 100%;
+    min-height: 44px;
+    border-color: var(--cmp-divider-strong);
+    border-radius: 15px;
+    background: rgba(255,255,255,0.64);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 5px 12px rgba(22,39,61,0.018);
+    color: var(--color-text-primary);
+    font-size: 0.93rem;
+    font-weight: 760;
+  }
 }
+/* === END BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V1 === */
 
 @media (min-width: 900px){
   .page--organizers{
@@ -1277,12 +1366,15 @@ select.content-field__control{
     padding: 24px 28px 22px;
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_DESKTOP_HERO_HEADLINE_WIDTH_CALIBRATION_V1 | Zweck: nutzt auf Desktop die Organizer-Hero-Fläche etwas besser, damit lange Überschriften nicht unnötig früh umbrechen; Umfang: nur page--organizers Hero-H1 im Desktop-Breakpoint === */
   .page--organizers .content-hero h1{
-    max-width: 20ch;
-    font-size: clamp(2.08rem, 1.78rem + 0.92vw, 2.72rem);
-    line-height: 1;
+    max-width: 24ch;
+    font-size: clamp(2.02rem, 1.72rem + 0.88vw, 2.62rem);
+    line-height: 1.01;
     letter-spacing: -0.04em;
+    text-wrap: balance;
   }
+  /* === END BLOCK: ORGANIZER_DESKTOP_HERO_HEADLINE_WIDTH_CALIBRATION_V1 === */
 
   .page--organizers .content-lead{
     max-width: 58ch;
