@@ -1246,7 +1246,48 @@ select.content-field__control{
   font-weight: 760;
 }
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_LIST_AND_FOOTER_NAV_BASE_V1 | Zweck: konsolidiert Dashboard-Listenabstand und macht die Abschlussnavigation als ruhige Utility-Zeile konsistent mit Karten und Formularflächen; Umfang: Dashboard-Submissions-Liste plus letzter content-links-Block auf Organizer-Seiten === */
+/* === BEGIN BLOCK: ORGANIZER_SERVICE_LIST_AUTH_TEXT_AND_FOOTER_NAV_V2 | Zweck: trennt nicht-klickbare Mitgliedschaftsleistungen optisch von Buttons, normalisiert den Auth-Hinweis im Dashboard und hält die Abschlussnavigation als ruhige Utility-Zeile; Umfang: Organizer-Leistungsliste, Dashboard-Auth-Karte, Dashboard-Liste und letzter content-links-Block auf Organizer-Seiten === */
+.page--organizers .content-card .publish-benefits-grid{
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.page--organizers .content-card .publish-benefits-grid li{
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  min-height: 0;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page--organizers .content-card .publish-benefits-grid li::before{
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: 0.48em;
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-muted) 66%, transparent);
+}
+
+.page--organizers .content-card .publish-benefits-grid strong{
+  font-size: 0.93rem;
+  font-weight: 720;
+  line-height: 1.26;
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-auth-required > p{
+  margin-block: 0;
+  color: var(--color-text-secondary);
+  font-weight: 520;
+  line-height: 1.45;
+}
+
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 8px;
 }
@@ -1271,9 +1312,9 @@ select.content-field__control{
   font-size: 0.94rem;
   font-weight: 760;
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_LIST_AND_FOOTER_NAV_BASE_V1 === */
+/* === END BLOCK: ORGANIZER_SERVICE_LIST_AUTH_TEXT_AND_FOOTER_NAV_V2 === */
 
-/* === BEGIN BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V1 | Zweck: verbessert mobile Headline-Umbrüche, Tarif-Select-Lesbarkeit, Abschlussnavigation und reduziert den Organizer-Feedback-Einstieg auf einen kompakten Button; Umfang: nur Mobile-Regeln für page--publish/page--organizers und direkt folgenden Feedback-Inline-Einstieg === */
+/* === BEGIN BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V2 | Zweck: verbessert mobile Headline-Umbrüche, Tarif-Select-Lesbarkeit und Abschlussnavigation, überlässt den Feedback-Einstieg aber wieder dem zentralen Feedback-Owner in overlays.css; Umfang: nur Mobile-Regeln für page--publish/page--organizers === */
 @media (max-width: 899.98px){
   .page--publish .content-hero h1{
     max-width: 24ch;
@@ -1293,7 +1334,8 @@ select.content-field__control{
     letter-spacing: -0.032em;
   }
 
-  .page--publish select.content-field__control{
+  .page--publish select.content-field__control,
+  .page--organizers select.content-field__control{
     padding-right: 34px;
     font-size: 0.9rem;
     line-height: 1.22;
@@ -1321,36 +1363,8 @@ select.content-field__control{
     height: 15px;
     opacity: 0.78;
   }
-
-  main.page--organizers + .feedback-inline-entry{
-    width: min(100% - 32px, 760px);
-    margin: 10px auto calc(var(--gutter) + 8px);
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  main.page--organizers + .feedback-inline-entry .feedback-inline-entry__copy{
-    display: none;
-  }
-
-  main.page--organizers + .feedback-inline-entry .feedback-inline-entry__button{
-    width: 100%;
-    min-height: 44px;
-    border-color: var(--cmp-divider-strong);
-    border-radius: 15px;
-    background: rgba(255,255,255,0.64);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.72) inset,
-      0 5px 12px rgba(22,39,61,0.018);
-    color: var(--color-text-primary);
-    font-size: 0.93rem;
-    font-weight: 760;
-  }
 }
-/* === END BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V1 === */
+/* === END BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V2 === */
 
 @media (min-width: 900px){
   .page--organizers{
