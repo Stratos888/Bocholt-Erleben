@@ -95,7 +95,9 @@
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
-        <p class="content-note">Mit * markierte Felder sind Pflichtfelder.</p>
+<!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V1 | Zweck: markiert den Pflichtfeld-Hinweis als kleine Formular-Meta-Information; Umfang: Pflichtfeld-Hinweis im Einzeltermin-Formular === -->
+<p class="content-note content-note--form-meta">Mit * markierte Felder sind Pflichtfelder.</p>
+<!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V1 === -->
         <p class="content-note"><strong>9,90&nbsp;€ einmalig</strong> – Zahlung über Stripe.</p>
       </div>
 
@@ -169,13 +171,15 @@
           </label>
           <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_DESCRIPTION_LABEL_V2 === -->
 
-          <label class="content-field content-field--full" for="publish-standard-location-confirmed">
-            <span class="content-field__label">Bestätigung *</span>
-            <span class="content-field__hint">
-              <input id="publish-standard-location-confirmed" name="locationConfirmed" type="checkbox" required>
-              Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
-            </span>
-          </label>
+<!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_CONFIRMATION_CHECKBOX_UI_V1 | Zweck: macht die Bestätigungs-Checkbox als saubere Formularzeile gestaltbar; Umfang: Bestätigungsfeld im Einzeltermin-Formular === -->
+<label class="content-field content-field--full content-field--checkbox" for="publish-standard-location-confirmed">
+  <span class="content-field__label">Bestätigung *</span>
+  <span class="content-field__hint">
+    <input id="publish-standard-location-confirmed" name="locationConfirmed" type="checkbox" required>
+    Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
+  </span>
+</label>
+<!-- === END BLOCK: PUBLISH_SINGLE_EVENT_CONFIRMATION_CHECKBOX_UI_V1 === -->
         </div>
 
         <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V3 | Zweck: benennt den CTA als nächsten Schritt zur Zahlungsmethode statt als bereits abgeschlossene Zahlung; Umfang: finaler CTA-Block im Einreichungsformular === -->
