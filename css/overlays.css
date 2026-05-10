@@ -3248,9 +3248,42 @@ body.is-feedback-open{
   height: 100%;
 }
 
+/* === BEGIN BLOCK: FEEDBACK_MOBILE_INLINE_UTILITY_BUTTON_V2 | Zweck: stellt den Inline-Feedback-Einstieg mobil als kompakten Utility-Button dar und vermeidet große Feedback-Karten am Seitenende; Umfang: Mobile-Regeln des zentralen Feedback-Widgets === */
 @media (max-width: 899.98px){
   .feedback-launcher{
     display: none;
+  }
+
+  .feedback-inline-entry{
+    display: flex;
+    justify-content: flex-end;
+    width: min(100% - 32px, 760px);
+    margin: 10px auto calc(var(--gutter) + 8px);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .feedback-inline-entry__copy{
+    display: none;
+  }
+
+  .feedback-inline-entry__button{
+    width: auto;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 15px;
+    border-color: var(--cmp-divider-strong);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.74);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.76) inset,
+      0 5px 12px rgba(22,39,61,0.018);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 760;
   }
 
   .feedback-modal{
@@ -3281,11 +3314,11 @@ body.is-feedback-open{
   }
 
   .feedback-secondary-btn,
-  .feedback-primary-btn,
-  .feedback-inline-entry__button{
+  .feedback-primary-btn{
     width: 100%;
   }
 }
+/* === END BLOCK: FEEDBACK_MOBILE_INLINE_UTILITY_BUTTON_V2 === */
 
 @media (min-width: 900px){
   .feedback-inline-entry{
