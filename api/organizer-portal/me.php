@@ -260,6 +260,7 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
     ];
 }
 
+/* === BEGIN BLOCK: ORGANIZER_PORTAL_FETCH_CURRENT_SUBMISSIONS_V1 | Zweck: liefert fuer das Dashboard nur aktuelle/relevante Einreichungen, sortiert nach neuester Einreichung; Umfang: ersetzt opm_fetch_recent_submissions() === */
 function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
 {
     $statement = $pdo->prepare(
@@ -291,8 +292,14 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
          FROM submissions
          WHERE organizer_id = :organizer_id
            AND submission_kind = "event"
-         ORDER BY id DESC
-         LIMIT 25'
+           AND (
+                status IN ("draft", "checkout_started", "paid", "in_review")
+                OR (start_date IS NOT NULL AND start_date >= CURRENT_DATE())
+           )
+         ORDER BY
+            COALESCE(created_at, updated_at, paid_at, approved_at, rejected_at) DESC,
+            id DESC
+         LIMIT 10'
     );
 
     $statement->execute([
@@ -302,6 +309,7 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
     $rows = $statement->fetchAll();
     return is_array($rows) ? $rows : [];
 }
+/* === END BLOCK: ORGANIZER_PORTAL_FETCH_CURRENT_SUBMISSIONS_V1 === */
 
 try {
     $plainSessionToken = opm_read_session_token_from_cookie();
