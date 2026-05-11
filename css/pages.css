@@ -1291,7 +1291,7 @@ select.content-field__control{
   font-weight: 760;
 }
 
-/* === BEGIN BLOCK: ORGANIZER_SERVICE_LIST_AUTH_TEXT_AND_FOOTER_NAV_V2 | Zweck: trennt nicht-klickbare Mitgliedschaftsleistungen optisch von Buttons, normalisiert den Auth-Hinweis im Dashboard und hält die Abschlussnavigation als ruhige Utility-Zeile; Umfang: Organizer-Leistungsliste, Dashboard-Auth-Karte, Dashboard-Liste und letzter content-links-Block auf Organizer-Seiten === */
+/* === BEGIN BLOCK: ORGANIZER_SERVICE_DASHBOARD_DETAILS_AND_FOOTER_NAV_V3 | Zweck: normalisiert Dashboard-Werte, macht Einreichungen als ruhige aufklappbare Statuszeilen nutzbar und hält Abschlussnavigation konsistent; Umfang: Organizer-Leistungsliste, Dashboard-Karten, Einreichungsdetails und letzter content-links-Block auf Organizer-Seiten === */
 .page--organizers .content-card .publish-benefits-grid{
   gap: 2px;
   padding-top: 2px;
@@ -1333,8 +1333,174 @@ select.content-field__control{
   line-height: 1.45;
 }
 
+.page--organizers[data-organizer-page="dashboard"] :is(
+  #organizer-account-name,
+  #organizer-account-email,
+  #organizer-account-plan,
+  #organizer-quota-period,
+  #organizer-quota-change,
+  #organizer-quota-summary,
+  #organizer-quota-remaining
+){
+  margin-block: 0;
+  font-weight: 520;
+  line-height: 1.42;
+}
+
+.page--organizers[data-organizer-page="dashboard"] :is(
+  #organizer-account-name,
+  #organizer-quota-period
+){
+  color: var(--color-text-primary);
+}
+
+.page--organizers[data-organizer-page="dashboard"] :is(
+  #organizer-account-email,
+  #organizer-account-plan,
+  #organizer-quota-change,
+  #organizer-quota-summary,
+  #organizer-quota-remaining
+){
+  color: var(--color-text-secondary);
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-remaining:not([hidden]){
+  color: var(--color-text-secondary);
+  font-weight: 520;
+}
+
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
+  gap: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row{
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  width: 100%;
+  min-height: 58px;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__label{
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__title{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 720;
+  line-height: 1.22;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__meta{
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 520;
+  line-height: 1.24;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row[aria-expanded="true"]{
+  border-color: var(--cmp-divider-strong);
+  background: rgba(255,255,255,0.52);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.68) inset;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row[aria-expanded="true"] .organizer-submission-row__chevron{
+  transform: rotate(90deg);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail{
+  display: grid;
+  gap: 9px;
+  margin: -2px 0 8px;
+  padding: 10px 12px 12px 15px;
+  border-left: 2px solid color-mix(in srgb, var(--color-primary) 46%, transparent);
+  border-radius: 0 14px 14px 0;
+  background: rgba(255,255,255,0.36);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail[hidden]{
+  display: none;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__status{
+  display: grid;
+  gap: 3px;
+  margin: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__status span{
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 680;
+  line-height: 1.28;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__status small{
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.32;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts{
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts div{
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
   gap: 8px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts dt{
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 640;
+  line-height: 1.25;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts dd{
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  font-weight: 520;
+  line-height: 1.25;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__link{
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.62);
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__link [data-ui-icon]{
+  --ui-icon-size: 14px;
+  --ui-icon-stroke: var(--ui-icon-stroke-sm);
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
 }
 
 .page--organizers > nav.content-links:last-child{
@@ -1357,7 +1523,7 @@ select.content-field__control{
   font-size: 0.94rem;
   font-weight: 760;
 }
-/* === END BLOCK: ORGANIZER_SERVICE_LIST_AUTH_TEXT_AND_FOOTER_NAV_V2 === */
+/* === END BLOCK: ORGANIZER_SERVICE_DASHBOARD_DETAILS_AND_FOOTER_NAV_V3 === */
 
 /* === BEGIN BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V2 | Zweck: verbessert mobile Headline-Umbrüche, Tarif-Select-Lesbarkeit und Abschlussnavigation, überlässt den Feedback-Einstieg aber wieder dem zentralen Feedback-Owner in overlays.css; Umfang: nur Mobile-Regeln für page--publish/page--organizers === */
 @media (max-width: 899.98px){
