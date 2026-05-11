@@ -49,7 +49,7 @@
     <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEADER_AREA_ACCESS_V2 === -->
   </header>
 
-  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V8 | Zweck: reduziert Redundanz, hält automatische Übernahme als kurzen Zusatzpfad und verdichtet Pflichtfeld-Meta auf der Mitgliedschaftsseite; Umfang: kompletter Main-Bereich von /fuer-veranstalter/ === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V9 | Zweck: hält automatische Übernahme als kurzen Zusatzpfad und positioniert Pflichtfeld-Meta ruhig in der Tarif-Kopfzeile; Umfang: kompletter Main-Bereich von /fuer-veranstalter/ === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
       <h1>Mitgliedschaft für regelmäßige Einreichungen</h1>
@@ -76,7 +76,7 @@
     <section class="content-card content-card--primary" aria-labelledby="organizer-automation-head">
       <h2 id="organizer-automation-head">Automatische Übernahme kostenlos prüfen</h2>
       <p>
-        Du pflegst viele Termine bereits an anderer Stelle? Dann kannst du zuerst kostenlos prüfen lassen, ob eine automatische Übernahme möglich ist.
+        Du pflegst Termine bereits an anderer Stelle? Dann kannst du kostenlos prüfen lassen, ob eine automatische Übernahme möglich ist.
       </p>
       <div class="content-actions content-actions--inline">
         <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/anbindung/">
@@ -86,8 +86,11 @@
     </section>
 
     <section class="content-card content-card--primary" aria-labelledby="organizer-membership-head">
-      <h2 id="organizer-membership-head">Tarif wählen</h2>
-      <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+      <div class="content-form-section-head content-form-section-head--form">
+        <h2 id="organizer-membership-head">Tarif wählen</h2>
+        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+      </div>
+
       <p class="content-note">
         Wähle die passende Mitgliedschaft. Im nächsten Schritt wirst du zu Stripe weitergeleitet und bestätigst dort die monatliche Zahlung.
       </p>
@@ -135,8 +138,7 @@
       </section>
     </section>
   </main>
-  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V8 === -->
-
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V9 === -->
   <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_FEEDBACK_SCRIPT_WIRING_V1 | Zweck: lädt Feedback und Konfiguration konsistent wie auf den übrigen Veranstalter-/Payment-Seiten; Umfang: Script-Imports am Ende von /fuer-veranstalter/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
