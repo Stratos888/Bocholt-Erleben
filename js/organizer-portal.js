@@ -777,6 +777,7 @@ if (submissionsList && submissionsEmpty) {
     `;
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_STATUS_VISIBILITY_V4 | Zweck: zeigt Speicher- und Fehlermeldungen zuverlässig sichtbar beim Änderungsformular; Umfang: komplette Statusausgabe für Inline-Edit === */
   function setEditStatus(form, message, variant = "info") {
     const statusNode = form.querySelector("[data-submission-edit-status]");
     if (!statusNode) return;
@@ -784,7 +785,12 @@ if (submissionsList && submissionsEmpty) {
     statusNode.hidden = false;
     statusNode.textContent = safeText(message);
     statusNode.dataset.statusVariant = variant;
+
+    window.requestAnimationFrame(() => {
+      statusNode.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
   }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_STATUS_VISIBILITY_V4 === */
 
   function clearEditValidation(form) {
     form.querySelectorAll("[aria-invalid='true']").forEach((control) => {
@@ -841,6 +847,7 @@ if (submissionsList && submissionsEmpty) {
     };
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V4 | Zweck: validiert nur zwingende Änderungsfelder und blockiert ältere/freigegebene Events nicht wegen fehlender Zusatzdaten; Umfang: komplette Edit-Form-Validierung === */
   function validateEditValues(form, values) {
     const invalidNames = [];
     const eventUrlControl = form.elements.event_url;
@@ -849,8 +856,6 @@ if (submissionsList && submissionsEmpty) {
     if (!values.title) invalidNames.push("title");
     if (!values.start_date) invalidNames.push("start_date");
     if (!values.location_name) invalidNames.push("location_name");
-    if (!values.location_address) invalidNames.push("location_address");
-    if (values.location_public_confirmed !== true) invalidNames.push("location_public_confirmed");
     if (values.event_url && eventUrlControl && !eventUrlControl.validity.valid) invalidNames.push("event_url");
 
     if (invalidNames.length) {
@@ -860,6 +865,7 @@ if (submissionsList && submissionsEmpty) {
 
     return true;
   }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V4 === */
 
   function setSaveButtonState(button, isSaving) {
     if (!button) return;
@@ -1020,8 +1026,8 @@ if (submissionsList && submissionsEmpty) {
           ` : ""}
         </div>
         ${canEdit ? `
+          <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V4 | Zweck: macht Adresse und Ortsbestätigung im Änderungsformular optional und zeigt Speicher-/Fehlermeldungen direkt vor den Aktionen; Umfang: komplettes Inline-Edit-Formular einer Einreichung === -->
           <form class="content-form organizer-submission-edit-form" id="${escapeHtml(editFormId)}" data-submission-edit-form hidden novalidate>
-            <p class="content-form-note organizer-validation-note" data-submission-edit-status hidden></p>
             <div class="content-form-grid">
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-title">
                 <span class="content-field__label">Titel der Veranstaltung *</span>
@@ -1040,9 +1046,9 @@ if (submissionsList && submissionsEmpty) {
                 <input class="content-field__control" id="${escapeHtml(editFormId)}-location" name="location_name" type="text" value="${escapeHtml(submission.location_name)}" required>
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-address">
-                <span class="content-field__label">Straße, Hausnummer / offizieller Treffpunkt *</span>
-                <input class="content-field__control" id="${escapeHtml(editFormId)}-address" name="location_address" type="text" value="${escapeHtml(submission.location_address)}" required>
-                <p class="content-field__hint">Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
+                <span class="content-field__label">Straße, Hausnummer / offizieller Treffpunkt</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-address" name="location_address" type="text" value="${escapeHtml(submission.location_address)}">
+                <p class="content-field__hint">Optional, aber hilfreich für die Prüfung. Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-event-url">
                 <span class="content-field__label">Link zur Veranstaltungsseite</span>
@@ -1053,18 +1059,20 @@ if (submissionsList && submissionsEmpty) {
                 <textarea class="content-field__control" id="${escapeHtml(editFormId)}-description" name="description_text" rows="3">${escapeHtml(submission.description_text)}</textarea>
               </label>
               <label class="content-field content-field--full content-field--checkbox" for="${escapeHtml(editFormId)}-confirmed">
-                <span class="content-field__label">Bestätigung *</span>
+                <span class="content-field__label">Bestätigung</span>
                 <span class="content-field__hint">
-                  <input id="${escapeHtml(editFormId)}-confirmed" name="location_public_confirmed" type="checkbox" ${Number(submission.location_public_confirmed || 0) === 1 ? "checked" : ""} required>
+                  <input id="${escapeHtml(editFormId)}-confirmed" name="location_public_confirmed" type="checkbox" ${Number(submission.location_public_confirmed || 0) === 1 ? "checked" : ""}>
                   Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
                 </span>
               </label>
             </div>
+            <p class="content-form-note organizer-validation-note" data-submission-edit-status hidden></p>
             <div class="content-actions content-actions--inline organizer-submission-edit-actions">
               <button class="content-cta content-cta--primary" type="submit">Änderung speichern</button>
               <button class="content-cta organizer-submission-edit-cancel" type="button" data-submission-edit-cancel>Abbrechen</button>
             </div>
           </form>
+          <!-- === END BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V4 === -->
         ` : `
           <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 | Zweck: erklärt, warum nur vergangene freigegebene oder abgelehnte Einreichungen nicht direkt änderbar sind; Umfang: Hinweistext für nicht editierbare Einreichungen === -->
           <p class="content-form-note organizer-submission-detail__locked-note">
