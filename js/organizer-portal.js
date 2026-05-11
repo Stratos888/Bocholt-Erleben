@@ -224,29 +224,27 @@ function normalizeExternalUrl(value) {
     }
   }
 
-  function ensureDashboardLogoutLink() {
-    const navigation = pageRoot.querySelector('nav[aria-label="Veranstalter-Navigation"]');
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEADER_LOGOUT_BUTTON_V1 | Zweck: aktiviert den statischen Abmelden-Button im Dashboard-Header nach erfolgreicher Session-Prüfung; Umfang: ersetzt ensureDashboardLogoutLink() === */
+  function ensureDashboardLogoutButton() {
+    const logoutButton = document.getElementById("organizer-dashboard-logout");
 
-    if (!navigation || document.getElementById("organizer-dashboard-logout")) {
+    if (!logoutButton) {
       return;
     }
 
-    const logoutButton = document.createElement("button");
-    logoutButton.type = "button";
-    logoutButton.id = "organizer-dashboard-logout";
-    logoutButton.className = "content-link";
-    logoutButton.innerHTML = `
-      <span class="content-link__label">Abmelden</span>
-      <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-    `;
+    logoutButton.hidden = false;
+    logoutButton.removeAttribute("hidden");
 
+    if (logoutButton.dataset.logoutBound === "true") {
+      return;
+    }
+
+    logoutButton.dataset.logoutBound = "true";
     logoutButton.addEventListener("click", () => {
       void logoutOrganizerPortal(logoutButton);
     });
-
-    navigation.insertBefore(logoutButton, navigation.firstElementChild);
-    hydrateIcons(logoutButton);
   }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_HEADER_LOGOUT_BUTTON_V1 === */
 
   async function openBillingPortal(trigger) {
     const button = trigger instanceof HTMLElement ? trigger : null;
@@ -812,16 +810,23 @@ if (submissionsList && submissionsEmpty) {
 /* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_DETAILS_V2 === */
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 === */
-  /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 | Zweck: laedt Dashboard-State und aktiviert bei gueltiger Session den Logout-Link; Umfang: komplette handleDashboardPage-Funktion === */
+  /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V3 | Zweck: lädt Dashboard-State und zeigt den Header-Abmelden-Button nur bei gültiger Session; Umfang: komplette handleDashboardPage-Funktion === */
   async function handleDashboardPage() {
+    const logoutButton = document.getElementById("organizer-dashboard-logout");
+
     try {
       const result = await tryLoadPortalState();
       renderDashboard(result?.data || {});
-      ensureDashboardLogoutLink();
+      ensureDashboardLogoutButton();
     } catch (_error) {
       const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
       const summaryGrid = document.getElementById("organizer-dashboard-summary");
       const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
+
+      if (logoutButton) {
+        logoutButton.hidden = true;
+        logoutButton.setAttribute("hidden", "");
+      }
 
       if (summaryGrid) summaryGrid.hidden = true;
       if (submissionsCard) submissionsCard.hidden = true;
@@ -832,7 +837,7 @@ if (submissionsList && submissionsEmpty) {
       }
     }
   }
-  /* === END BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 === */
+  /* === END BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V3 === */
 
   hydrateIcons(document);
 
