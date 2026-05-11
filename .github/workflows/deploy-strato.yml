@@ -357,14 +357,18 @@ jobs:
           STAGING_MAIL_FROM_ADDRESS: ${{ secrets.STAGING_MAIL_FROM_ADDRESS }}
           STAGING_MAIL_SMTP_USERNAME: ${{ secrets.STAGING_MAIL_SMTP_USERNAME }}
           STAGING_MAIL_SMTP_PASSWORD: ${{ secrets.STAGING_MAIL_SMTP_PASSWORD }}
-          # === BEGIN BLOCK: REVIEW_PASSWORD_SECRETS_ENV_V1 | Zweck: macht Review-Passwort-Secrets für die private PHP-Config im Deploy-Artefakt verfügbar; Umfang: ergänzt Staging-/Live-Review-Secrets ===
+          # === BEGIN BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 | Zweck: macht Review- und Search-Metrics-Secrets für Dashboard-V2 im Deploy-Artefakt verfügbar; Umfang: ergänzt Live-Mail-, Review-, Google-Search-Console- und Bing-Webmaster-Secrets ===
           LIVE_MAIL_FROM_NAME: ${{ secrets.LIVE_MAIL_FROM_NAME }}
           LIVE_MAIL_FROM_ADDRESS: ${{ secrets.LIVE_MAIL_FROM_ADDRESS }}
           LIVE_MAIL_SMTP_USERNAME: ${{ secrets.LIVE_MAIL_SMTP_USERNAME }}
           LIVE_MAIL_SMTP_PASSWORD: ${{ secrets.LIVE_MAIL_SMTP_PASSWORD }}
           STAGING_REVIEW_PASSWORD: ${{ secrets.STAGING_REVIEW_PASSWORD }}
           LIVE_REVIEW_PASSWORD: ${{ secrets.LIVE_REVIEW_PASSWORD }}
-          # === END BLOCK: REVIEW_PASSWORD_SECRETS_ENV_V1 ===
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SEARCH_METRICS_GOOGLE_SITE_URL: ${{ secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
+          SEARCH_METRICS_BING_SITE_URL: ${{ secrets.SEARCH_METRICS_BING_SITE_URL }}
+          BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+          # === END BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 ===
         run: |
           set -e
 
@@ -559,13 +563,170 @@ jobs:
           [ -n "$APP_REVIEW_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_REVIEW_PASSWORD"; exit 1; }
           # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
+          # === BEGIN BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V1 | Zweck: erzeugt data/search-metrics.json für Dashboard-V2 und bereitet danach die private PHP-Config vor; Umfang: ersetzt APP_ENV/URL-Zuweisung plus Export-Zeile im Prepare-deploy-Step ===
           APP_ENV="$DEPLOY_ENV_NAME"
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
           APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
 
-          # === BEGIN BLOCK: EXPORT_REVIEW_PASSWORD_TO_CONFIG_WRITER_V1 | Zweck: übergibt das Review-Passwort an den Python-Config-Writer; Umfang: ersetzt export-Zeile ===
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import re
+          import sys
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          def now_iso():
+              return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+          def source(status, site_url="", impressions=0, clicks=0, ctr=0.0, position=0.0, message=""):
+              return {
+                  "status": status,
+                  "site_url": site_url,
+                  "impressions": int(round(float(impressions or 0))),
+                  "clicks": int(round(float(clicks or 0))),
+                  "ctr": float(ctr or 0),
+                  "position": float(position or 0),
+                  "message": str(message or ""),
+              }
+
+          today = dt.datetime.now(dt.timezone.utc).date()
+          end_date = today - dt.timedelta(days=3)
+          start_date = end_date - dt.timedelta(days=27)
+          base_url = os.environ.get("APP_BASE_URL", "").strip().rstrip("/")
+          google_site = os.environ.get("SEARCH_METRICS_GOOGLE_SITE_URL", "").strip() or (base_url + "/" if base_url else "")
+          bing_site = os.environ.get("SEARCH_METRICS_BING_SITE_URL", "").strip() or base_url
+
+          result = {
+              "status": "not_configured",
+              "generated_at": now_iso(),
+              "period": {
+                  "start_date": start_date.isoformat(),
+                  "end_date": end_date.isoformat(),
+                  "days": 28,
+                  "note": "Google Search Console nutzt finalisierte Daten; Bing Webmaster QueryStats werden wöchentlich aktualisiert.",
+              },
+              "sources": {
+                  "google": source("not_configured", google_site, message="GOOGLE_SERVICE_ACCOUNT_JSON oder Search-Console-Zugriff fehlt."),
+                  "bing": source("not_configured", bing_site, message="BING_WEBMASTER_API_KEY oder Bing-Webmaster-Zugriff fehlt."),
+              },
+              "totals": {
+                  "impressions": 0,
+                  "clicks": 0,
+              },
+          }
+
+          def fetch_google():
+              service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+              if not service_account_json or not google_site:
+                  return source("not_configured", google_site, message="Google Search Console ist nicht vollständig konfiguriert.")
+
+              try:
+                  from google.oauth2 import service_account
+                  from googleapiclient.discovery import build
+
+                  service_account_info = json.loads(service_account_json)
+                  credentials = service_account.Credentials.from_service_account_info(
+                      service_account_info,
+                      scopes=["https://www.googleapis.com/auth/webmasters.readonly"],
+                  )
+                  service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
+                  response = service.searchanalytics().query(
+                      siteUrl=google_site,
+                      body={
+                          "startDate": start_date.isoformat(),
+                          "endDate": end_date.isoformat(),
+                          "dimensions": [],
+                          "type": "web",
+                          "aggregationType": "byProperty",
+                          "rowLimit": 1,
+                      },
+                  ).execute(num_retries=3)
+
+                  rows = response.get("rows") or []
+                  row = rows[0] if rows else {}
+                  return source(
+                      "ok",
+                      google_site,
+                      impressions=row.get("impressions", 0),
+                      clicks=row.get("clicks", 0),
+                      ctr=row.get("ctr", 0),
+                      position=row.get("position", 0),
+                  )
+              except Exception as exc:
+                  return source("error", google_site, message=f"Google Search Console Fehler: {type(exc).__name__}")
+
+          def parse_bing_date(value):
+              match = re.search(r"/Date\((\d+)", str(value or ""))
+              if not match:
+                  return None
+              timestamp_ms = int(match.group(1))
+              return dt.datetime.fromtimestamp(timestamp_ms / 1000, tz=dt.timezone.utc).date()
+
+          def fetch_bing():
+              api_key = os.environ.get("BING_WEBMASTER_API_KEY", "").strip()
+              if not api_key or not bing_site:
+                  return source("not_configured", bing_site, message="Bing Webmaster API ist nicht vollständig konfiguriert.")
+
+              try:
+                  params = urllib.parse.urlencode({"siteUrl": bing_site, "apikey": api_key})
+                  url = f"https://ssl.bing.com/webmaster/api.svc/json/GetQueryStats?{params}"
+                  request = urllib.request.Request(url, headers={"Accept": "application/json"})
+                  with urllib.request.urlopen(request, timeout=45) as response:
+                      payload = json.loads(response.read().decode("utf-8"))
+
+                  rows = payload.get("d") or []
+                  impressions = 0
+                  clicks = 0
+                  counted_rows = 0
+
+                  for row in rows:
+                      row_date = parse_bing_date(row.get("Date"))
+                      if row_date is not None and not (start_date <= row_date <= end_date):
+                          continue
+                      impressions += int(round(float(row.get("Impressions") or 0)))
+                      clicks += int(round(float(row.get("Clicks") or 0)))
+                      counted_rows += 1
+
+                  return source(
+                      "ok",
+                      bing_site,
+                      impressions=impressions,
+                      clicks=clicks,
+                      message=f"{counted_rows} QueryStats-Zeilen im Zeitraum summiert.",
+                  )
+              except Exception as exc:
+                  return source("error", bing_site, message=f"Bing Webmaster Fehler: {type(exc).__name__}")
+
+          result["sources"]["google"] = fetch_google()
+          result["sources"]["bing"] = fetch_bing()
+
+          source_statuses = [entry.get("status") for entry in result["sources"].values()]
+          if all(status == "ok" for status in source_statuses):
+              result["status"] = "ok"
+          elif any(status == "ok" for status in source_statuses):
+              result["status"] = "partial"
+          elif any(status == "error" for status in source_statuses):
+              result["status"] = "error"
+          else:
+              result["status"] = "not_configured"
+
+          result["totals"] = {
+              "impressions": sum(entry.get("impressions", 0) for entry in result["sources"].values()),
+              "clicks": sum(entry.get("clicks", 0) for entry in result["sources"].values()),
+          }
+
+          output_path = Path("deploy/data/search-metrics.json")
+          output_path.parent.mkdir(parents=True, exist_ok=True)
+          output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(f"=== search-metrics.json status: {result['status']} ===")
+          print(output_path.read_text(encoding="utf-8"))
+          PY
+
           export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
-          # === END BLOCK: EXPORT_REVIEW_PASSWORD_TO_CONFIG_WRITER_V1 ===
+          # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V1 ===
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===

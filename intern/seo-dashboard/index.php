@@ -403,17 +403,17 @@ $checkedAt = date('d.m.Y H:i');
       <article class="card card--third">
         <h2>Messung</h2>
         <span id="measurementStatus" class="status" data-state="warn"><span class="dot"></span><span>noch nicht bewertet</span></span>
-        <p class="muted small" style="margin-top:10px;">GA4-Outbound-Events sind im Code vorbereitet. Search-Console- und GA4-Werte werden in V1 manuell übernommen.</p>
+        <p class="muted small" style="margin-top:10px;">Google- und Bing-Suchdaten werden in V2 automatisch aus <code>/data/search-metrics.json</code> geladen. Outbound-Klicks und performende Events bleiben vorerst manuell.</p>
       </article>
 
       <article class="card card--third">
         <h2>Nächste Aktion</h2>
-        <p class="small"><strong>Nach Main-Deploy:</strong> robots, Sitemap, GA4 Pageview und mindestens einen echten externen Klick prüfen.</p>
+        <p class="small"><strong>Nach Deploy:</strong> Search-Metrics-JSON prüfen, Google-/Bing-Status kontrollieren und danach Outbound-/Event-Werte ergänzen.</p>
       </article>
 
       <article class="card card--wide">
         <h2>Live-Checks</h2>
-        <p class="muted small">Diese Checks prüfen nur technische Erreichbarkeit und offensichtliche Konfiguration. Indexierung und echte Nutzerzahlen kommen aus Google/Bing/GA4.</p>
+        <p class="muted small">Diese Checks prüfen technische Erreichbarkeit, offensichtliche Konfiguration und vorbereitete Analytics-Hooks. Echte Suchdaten kommen automatisiert aus Google Search Console und Bing Webmaster Tools.</p>
 
         <div class="checklist" id="checklist">
           <div class="check" data-check="status">
@@ -455,7 +455,7 @@ $checkedAt = date('d.m.Y H:i');
 
       <article class="card">
         <h2>Akquise-Ampel</h2>
-        <p class="muted small">Werte manuell aus Search Console, Bing Webmaster Tools und GA4 übernehmen. Speicherung erfolgt nur lokal in diesem Browser.</p>
+        <p class="muted small">Google- und Bing-Werte werden automatisch aus dem Search-Metrics-Export geladen. Outbound-Klicks und performende Events bleiben bis zur GA4-API-Anbindung als manuelle Monatswerte steuerbar.</p>
 
         <form id="metricForm" class="metricForm">
           <label>Google Impressionen/Monat<input name="googleImpressions" inputmode="numeric" type="number" min="0" step="1" /></label>
@@ -467,8 +467,9 @@ $checkedAt = date('d.m.Y H:i');
         </form>
 
         <div class="actions">
-          <button type="button" id="saveMetrics">Werte speichern</button>
-          <button type="button" id="resetMetrics" class="secondary">Zurücksetzen</button>
+          <button type="button" id="saveMetrics">Manuelle Werte speichern</button>
+          <button type="button" id="resetMetrics" class="secondary">Lokale Werte löschen</button>
+          <button type="button" id="reloadSearchMetrics" class="secondary">Search-Daten neu laden</button>
         </div>
 
         <div class="kpi">
@@ -478,7 +479,12 @@ $checkedAt = date('d.m.Y H:i');
           <div class="kpiBox"><div class="muted small">Ampel</div><div id="kpiStage" class="kpiValue">Rot</div></div>
         </div>
 
-        <p id="kpiExplanation" class="note small" style="margin-top:12px;">Noch keine Werte gespeichert.</p>
+        <p id="kpiExplanation" class="note small" style="margin-top:12px;">Noch keine Werte geladen.</p>
+      </article>
+
+      <article class="card card--half">
+        <h2>Search-Automatik</h2>
+        <div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div>
       </article>
 
       <article class="card card--half">
@@ -489,19 +495,11 @@ $checkedAt = date('d.m.Y H:i');
           <a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Pageviews, outbound_click</span></a>
         </div>
       </article>
-
-      <article class="card card--half">
-        <h2>Was dieses V1 bewusst nicht macht</h2>
-        <div class="note small">
-          <p><strong>Keine automatische Search-Console-/GA4-Auswertung.</strong></p>
-          <p style="margin-top:6px;">Dafür wären Google-OAuth/API-Anbindung und sichere serverseitige Token-Speicherung nötig. Für den aktuellen Stand reicht dieses interne Statusboard plus manuelle Monatswerte.</p>
-        </div>
-      </article>
     </section>
   </main>
 
   <script>
-    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V1 | Zweck: Browserseitige Live-Checks und lokale KPI-Ampel ohne externe API-Secrets; Umfang: nur diese interne Dashboard-Seite ===
+    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V2_SEARCH_AUTOMATION | Zweck: lädt Google-/Bing-Search-Metriken automatisch aus dem Deploy-Export und kombiniert sie mit manuellen GA4-/Event-Werten; Umfang: nur diese interne Dashboard-Seite ===
     const CHECKS = new Map();
 
     const CORE_PAGES = [
@@ -516,33 +514,52 @@ $checkedAt = date('d.m.Y H:i');
       "/datenschutz/"
     ];
 
-    const STORAGE_KEY = "be_internal_seo_metrics_v1";
+    const STORAGE_KEY = "be_internal_seo_metrics_v2";
+    const SEARCH_METRICS_URL = "/data/search-metrics.json";
+
+    const DEFAULT_METRICS = {
+      googleImpressions: 0,
+      googleClicks: 0,
+      bingImpressions: 0,
+      bingClicks: 0,
+      outboundClicks: 0,
+      performingEvents: 0
+    };
+
+    let currentMetrics = { ...DEFAULT_METRICS };
+
+    function metricNumber(value) {
+      const number = Number(value || 0);
+      return Number.isFinite(number) ? Math.max(0, Math.round(number)) : 0;
+    }
+
+    function formatMetric(value) {
+      return metricNumber(value).toLocaleString("de-DE");
+    }
 
     function setCheck(name, state, label, detail = "") {
-      CHECKS.set(name, state);
-
       const row = document.querySelector(`[data-check="${name}"]`);
       if (!row) return;
 
-      const badge = row.querySelector(".status");
-      badge.dataset.state = state;
-      badge.querySelector("span:last-child").textContent = label;
+      const status = row.querySelector(".status");
+      const statusLabel = status?.querySelector("span:last-child");
+      const code = row.querySelector("code");
 
-      if (detail) {
-        row.querySelector("code").textContent = detail;
-      }
+      if (status) status.dataset.state = state;
+      if (statusLabel) statusLabel.textContent = label;
+      if (detail && code) code.textContent = detail;
 
-      updateOverall();
+      CHECKS.set(name, state);
+      updateOverallStatus();
     }
 
-    function updateOverall() {
-      const values = Array.from(CHECKS.values());
-      const known = values.length >= 5;
-      const hasBad = values.includes("bad");
-      const hasWarn = values.includes("warn");
-
+    function updateOverallStatus() {
       const status = document.getElementById("overallStatus");
       const text = document.getElementById("overallText");
+      const values = Array.from(CHECKS.values());
+      const known = values.length > 0;
+      const hasBad = values.includes("bad");
+      const hasWarn = values.includes("warn");
 
       let state = "warn";
       let label = "Prüfung läuft";
@@ -550,7 +567,7 @@ $checkedAt = date('d.m.Y H:i');
 
       if (known && !hasBad && !hasWarn) {
         state = "good";
-        label = "technisch sauber";
+        label = "bereit";
         copy = "Robots, Sitemap, Build, Backend und GA4-Konfiguration wirken technisch erreichbar.";
       } else if (known && hasBad) {
         state = "bad";
@@ -688,7 +705,7 @@ $checkedAt = date('d.m.Y H:i');
       const form = document.getElementById("metricForm");
 
       return Object.fromEntries(
-        Array.from(new FormData(form).entries()).map(([key, value]) => [key, Number(value || 0)])
+        Array.from(new FormData(form).entries()).map(([key, value]) => [key, metricNumber(value)])
       );
     }
 
@@ -703,10 +720,10 @@ $checkedAt = date('d.m.Y H:i');
     }
 
     function classifyMetrics(metrics) {
-      const impressions = metrics.googleImpressions + metrics.bingImpressions;
-      const clicks = metrics.googleClicks + metrics.bingClicks;
-      const outbound = metrics.outboundClicks;
-      const performing = metrics.performingEvents;
+      const impressions = metricNumber(metrics.googleImpressions) + metricNumber(metrics.bingImpressions);
+      const clicks = metricNumber(metrics.googleClicks) + metricNumber(metrics.bingClicks);
+      const outbound = metricNumber(metrics.outboundClicks);
+      const performing = metricNumber(metrics.performingEvents);
 
       if (impressions >= 20000 && clicks >= 1000 && outbound >= 100 && performing >= 3) {
         return ["strong", "Stark", "Stark verkaufsfähig: Reichweite und Interaktion reichen für konkrete Veranstalter-Kommunikation."];
@@ -724,13 +741,13 @@ $checkedAt = date('d.m.Y H:i');
     }
 
     function renderMetrics(metrics) {
-      const impressions = metrics.googleImpressions + metrics.bingImpressions;
-      const clicks = metrics.googleClicks + metrics.bingClicks;
+      const impressions = metricNumber(metrics.googleImpressions) + metricNumber(metrics.bingImpressions);
+      const clicks = metricNumber(metrics.googleClicks) + metricNumber(metrics.bingClicks);
       const [state, label, copy] = classifyMetrics(metrics);
 
-      document.getElementById("kpiImpressions").textContent = String(impressions);
-      document.getElementById("kpiClicks").textContent = String(clicks);
-      document.getElementById("kpiOutbound").textContent = String(metrics.outboundClicks);
+      document.getElementById("kpiImpressions").textContent = formatMetric(impressions);
+      document.getElementById("kpiClicks").textContent = formatMetric(clicks);
+      document.getElementById("kpiOutbound").textContent = formatMetric(metrics.outboundClicks);
       document.getElementById("kpiStage").textContent = label;
       document.getElementById("kpiExplanation").textContent = copy;
 
@@ -739,28 +756,102 @@ $checkedAt = date('d.m.Y H:i');
       measurementStatus.querySelector("span:last-child").textContent = label;
     }
 
-    function loadMetrics() {
-      try {
-        const metrics = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    function applyMetrics(metrics) {
+      currentMetrics = {
+        ...DEFAULT_METRICS,
+        ...(metrics || {})
+      };
 
-        writeMetricsToForm(metrics);
-        renderMetrics({
-          googleImpressions: 0,
-          googleClicks: 0,
-          bingImpressions: 0,
-          bingClicks: 0,
-          outboundClicks: 0,
-          performingEvents: 0,
-          ...metrics
-        });
+      writeMetricsToForm(currentMetrics);
+      renderMetrics(currentMetrics);
+    }
+
+    function loadStoredMetrics() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       } catch (_) {
-        renderMetrics({
-          googleImpressions: 0,
-          googleClicks: 0,
-          bingImpressions: 0,
-          bingClicks: 0,
-          outboundClicks: 0,
-          performingEvents: 0
+        return {};
+      }
+    }
+
+    function sourceStatusLabel(status) {
+      if (status === "ok") return "ok";
+      if (status === "not_configured") return "nicht konfiguriert";
+      return "Fehler";
+    }
+
+    function renderSearchMetricsStatus(payload) {
+      const box = document.getElementById("searchMetricsStatus");
+      if (!box) return;
+
+      if (!payload) {
+        box.textContent = "Search-Daten werden geladen.";
+        return;
+      }
+
+      const google = payload.sources?.google || {};
+      const bing = payload.sources?.bing || {};
+      const period = payload.period || {};
+      const generatedAt = payload.generated_at ? new Date(payload.generated_at) : null;
+      const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime())
+        ? generatedAt.toLocaleString("de-DE")
+        : "unbekannt";
+
+      box.innerHTML = `
+        <p><strong>Status:</strong> ${payload.status || "unbekannt"}</p>
+        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${period.start_date || "?"} bis ${period.end_date || "?"}</p>
+        <p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p>
+        <p style="margin-top:10px;"><strong>Google:</strong> ${sourceStatusLabel(google.status)} · ${formatMetric(google.impressions)} Impressionen · ${formatMetric(google.clicks)} Klicks</p>
+        <p style="margin-top:6px;"><strong>Bing:</strong> ${sourceStatusLabel(bing.status)} · ${formatMetric(bing.impressions)} Impressionen · ${formatMetric(bing.clicks)} Klicks</p>
+        ${google.message ? `<p class="muted" style="margin-top:8px;">Google: ${google.message}</p>` : ""}
+        ${bing.message ? `<p class="muted" style="margin-top:4px;">Bing: ${bing.message}</p>` : ""}
+      `;
+    }
+
+    function extractSearchMetrics(payload) {
+      const google = payload.sources?.google || {};
+      const bing = payload.sources?.bing || {};
+      const metrics = {};
+
+      if (google.status === "ok") {
+        metrics.googleImpressions = metricNumber(google.impressions);
+        metrics.googleClicks = metricNumber(google.clicks);
+      }
+
+      if (bing.status === "ok") {
+        metrics.bingImpressions = metricNumber(bing.impressions);
+        metrics.bingClicks = metricNumber(bing.clicks);
+      }
+
+      return metrics;
+    }
+
+    async function loadSearchMetrics() {
+      renderSearchMetricsStatus(null);
+
+      try {
+        const res = await fetch(SEARCH_METRICS_URL, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const payload = await res.json();
+        const searchMetrics = extractSearchMetrics(payload);
+
+        applyMetrics({
+          ...currentMetrics,
+          ...searchMetrics
+        });
+        renderSearchMetricsStatus(payload);
+      } catch (error) {
+        renderSearchMetricsStatus({
+          status: "error",
+          generated_at: null,
+          period: {},
+          sources: {
+            google: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." },
+            bing: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." }
+          }
         });
       }
     }
@@ -769,34 +860,24 @@ $checkedAt = date('d.m.Y H:i');
       const metrics = readMetricsFromForm();
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(metrics));
-      renderMetrics(metrics);
+      applyMetrics(metrics);
     });
 
     document.getElementById("resetMetrics").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
-
-      writeMetricsToForm({
-        googleImpressions: "",
-        googleClicks: "",
-        bingImpressions: "",
-        bingClicks: "",
-        outboundClicks: "",
-        performingEvents: ""
-      });
-
-      renderMetrics({
-        googleImpressions: 0,
-        googleClicks: 0,
-        bingImpressions: 0,
-        bingClicks: 0,
-        outboundClicks: 0,
-        performingEvents: 0
-      });
+      applyMetrics(DEFAULT_METRICS);
+      loadSearchMetrics();
     });
 
-    loadMetrics();
+    document.getElementById("reloadSearchMetrics").addEventListener("click", () => {
+      loadSearchMetrics();
+    });
+
+    applyMetrics(loadStoredMetrics());
+    loadSearchMetrics();
     runChecks();
-    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V1 ===
+    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V2_SEARCH_AUTOMATION ===
+  </script>
   </script>
 <?php endif; ?>
 </body>

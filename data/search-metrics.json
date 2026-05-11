@@ -1,0 +1,34 @@
+{
+  "status": "not_configured",
+  "generated_at": null,
+  "period": {
+    "start_date": null,
+    "end_date": null,
+    "days": 28,
+    "note": "Wird im Deploy automatisch aus Google Search Console und Bing Webmaster Tools erzeugt."
+  },
+  "sources": {
+    "google": {
+      "status": "not_configured",
+      "site_url": "",
+      "impressions": 0,
+      "clicks": 0,
+      "ctr": 0,
+      "position": 0,
+      "message": "Search-Metrics-Export wurde noch nicht im Deploy erzeugt."
+    },
+    "bing": {
+      "status": "not_configured",
+      "site_url": "",
+      "impressions": 0,
+      "clicks": 0,
+      "ctr": 0,
+      "position": 0,
+      "message": "Search-Metrics-Export wurde noch nicht im Deploy erzeugt."
+    }
+  },
+  "totals": {
+    "impressions": 0,
+    "clicks": 0
+  }
+}
