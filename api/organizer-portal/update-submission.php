@@ -271,24 +271,22 @@ function osu_fetch_submission_response(PDO $pdo, int $organizerId, int $submissi
 try {
     $input = osu_read_json_body();
 
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V4 | Zweck: macht Adresse und Ortsbestätigung beim Ändern optional, damit bestehende freigegebene Zukunftstermine mit älteren Daten nicht blockieren; Umfang: Eingabe-Normalisierung und Pflichtfeldprüfung im Update-Endpunkt === */
     $submissionId = osu_required_positive_int($input, 'submission_id', 'Einreichung');
     $title = osu_required_string($input, 'title', 'Titel der Veranstaltung');
     $startDate = osu_validate_date_or_null(osu_required_string($input, 'start_date', 'Datum'));
     $timeText = osu_nullable_string($input['time_text'] ?? null);
     $locationName = osu_required_string($input, 'location_name', 'Veranstaltungsort / Location');
-    $locationAddress = osu_required_string($input, 'location_address', 'Straße, Hausnummer oder offizieller Treffpunkt');
+    $locationAddress = osu_nullable_string($input['location_address'] ?? null);
     $eventUrl = osu_validate_url_or_null(osu_nullable_string($input['event_url'] ?? null));
     $descriptionText = osu_nullable_string($input['description_text'] ?? null);
     $locationPublicConfirmed = osu_boolish_to_int($input['location_public_confirmed'] ?? null);
-
-    if ($locationPublicConfirmed !== 1) {
-        throw new InvalidArgumentException('Bitte bestätige, dass der Ort öffentlich genannt werden darf.');
-    }
 
     osu_assert_max_length($title, 255, 'Titel der Veranstaltung');
     osu_assert_max_length($timeText, 64, 'Uhrzeit');
     osu_assert_max_length($locationName, 255, 'Veranstaltungsort / Location');
     osu_assert_max_length($locationAddress, 255, 'Straße, Hausnummer oder offizieller Treffpunkt');
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V4 === */
 
     $plainSessionToken = osu_read_session_token_from_cookie();
     $sessionTokenHash = hash('sha256', $plainSessionToken);
@@ -303,7 +301,7 @@ try {
     $submission = osu_fetch_editable_submission($pdo, $organizerId, $submissionId);
     $nextEditCount = ((int)($submission['organizer_edit_count'] ?? 0)) + 1;
 
-    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V2 | Zweck: speichert Änderungen und setzt bereits freigegebene Zukunftstermine zurück in die Kuratierprüfung; Umfang: komplettes UPDATE-Statement für Veranstalteränderungen === */
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V4 | Zweck: speichert Änderungen und setzt bereits freigegebene Zukunftstermine zuverlässig zurück in die Kuratierprüfung; Umfang: komplettes UPDATE-Statement für Veranstalteränderungen === */
     $update = $pdo->prepare(
         'UPDATE submissions
          SET
@@ -315,9 +313,9 @@ try {
             location_address = :location_address,
             location_public_confirmed = :location_public_confirmed,
             description_text = :description_text,
-            status = CASE WHEN status = "approved" THEN "in_review" ELSE status END,
             approved_at = CASE WHEN status = "approved" THEN NULL ELSE approved_at END,
             review_started_at = CASE WHEN status = "approved" THEN NULL ELSE review_started_at END,
+            status = CASE WHEN status = "approved" THEN "in_review" ELSE status END,
             organizer_edited_at = UTC_TIMESTAMP(),
             organizer_edit_count = :organizer_edit_count,
             updated_at = CURRENT_TIMESTAMP
@@ -329,7 +327,7 @@ try {
                 OR (status = "approved" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
            )'
     );
-    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V2 === */
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V4 === */
 
     $update->execute([
         ':event_url' => $eventUrl,
@@ -345,9 +343,10 @@ try {
         ':organizer_id' => $organizerId,
     ]);
 
-    if ($update->rowCount() < 1) {
-        throw new RuntimeException('Submission update did not change a row.');
-    }
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_AFFECTED_ROWS_NOTE_V4 | Zweck: verhindert Fehlalarm, wenn MySQL bei identischen Eingaben 0 geänderte Zeilen meldet; Umfang: ersetzte rowCount-Fehlerprüfung === */
+    // MySQL kann 0 geänderte Zeilen melden, wenn eingereichte Werte bereits gespeichert waren.
+    // Die Berechtigungsprüfung ist vorher erfolgt; die Antwort wird aus der erneut geladenen Einreichung gebaut.
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_AFFECTED_ROWS_NOTE_V4 === */
 
     $updatedSubmission = osu_fetch_submission_response($pdo, $organizerId, $submissionId);
 
