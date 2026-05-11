@@ -668,7 +668,7 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V4 | Zweck: reduziert die Mitgliedschaftsübersicht auf ruhige Statuswerte ohne headlineartige Wertzeilen; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V5 | Zweck: hält Mitgliedschaftsstatus als ruhige Datenzeilen und vermeidet headlineartige Wertzeilen; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
 if (quotaHead) {
   quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Mitgliedschaft";
 }
@@ -731,22 +731,25 @@ if (quotaRemaining) {
     quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)} veröffentlichte Termine.`;
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V4 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V5 === */
 
-    if (submissionsHead) {
-      submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Letzte Einreichungen";
-    }
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_DETAILS_V2 | Zweck: zeigt aktuelle/relevante Einreichungen sortiert von neu nach alt und öffnet Details inline statt externe Links direkt zu öffnen; Umfang: Überschrift, Empty-State und komplette Rendering-Logik der Einreichungsliste in renderDashboard === */
+if (submissionsHead) {
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Aktuelle Einreichungen";
+}
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSION_INLINE_DETAILS_V1 | Zweck: macht letzte Einreichungen als aufklappbare Statusdetails nutzbar statt externe Links direkt zu öffnen; Umfang: komplette Rendering-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsList && submissionsEmpty) {
   submissionsList.innerHTML = "";
+  submissionsEmpty.textContent = isSingleStatusView
+    ? "Keine Einreichung gefunden."
+    : "Keine aktuellen Einreichungen gefunden.";
 
   if (!submissions.length) {
     submissionsEmpty.hidden = false;
   } else {
     submissionsEmpty.hidden = true;
 
-    submissions.slice(0, 8).forEach((submission, index) => {
+    submissions.slice(0, 10).forEach((submission, index) => {
       const titleText = safeText(submission.title) || "Ohne Titel";
       const statusText = formatSubmissionStatusLabel(submission);
       const metaDateText = formatSubmissionMetaDate(submission);
@@ -806,7 +809,7 @@ if (submissionsList && submissionsEmpty) {
     hydrateIcons(submissionsList);
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_SUBMISSION_INLINE_DETAILS_V1 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_DETAILS_V2 === */
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 === */
   /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V2 | Zweck: laedt Dashboard-State und aktiviert bei gueltiger Session den Logout-Link; Umfang: komplette handleDashboardPage-Funktion === */
