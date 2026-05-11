@@ -502,7 +502,7 @@ select.content-field__control{
   line-height: 1.18;
 }
 
-/* === BEGIN BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V2 | Zweck: trennt Pflichtfeld-Meta-Hinweise, Date/Time-Felder und Checkbox-Zeilen visuell von normalem Erklärungstext; Umfang: generische Content-Form-Primitives für Formularseiten === */
+/* === BEGIN BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V3 | Zweck: trennt Pflichtfeld-Meta-Hinweise, Date/Time-Felder und Checkbox-Zeilen visuell von normalem Erklärungstext; Umfang: generische Content-Form-Primitives für Formularseiten === */
 .content-form-note{
   margin: 0;
   color: var(--cmp-link-color-muted);
@@ -511,14 +511,13 @@ select.content-field__control{
 }
 
 .content-note--form-meta{
-  justify-self: start;
   max-width: none;
   margin: 0;
-  color: color-mix(in srgb, var(--cmp-link-color-muted) 88%, var(--color-text-primary));
-  font-size: 0.7rem;
-  font-weight: 720;
-  line-height: 1.12;
-  letter-spacing: 0.018em;
+  color: var(--cmp-link-color-muted);
+  font-size: 0.68rem;
+  font-weight: 640;
+  line-height: 1.1;
+  letter-spacing: 0.006em;
 }
 
 .content-field__control[type="date"],
@@ -553,7 +552,7 @@ select.content-field__control{
   margin: 0.12em 0 0;
   accent-color: var(--color-primary);
 }
-/* === END BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V2 === */
+/* === END BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V3 === */
 
 @media (min-width: 900px){
   .content-form-grid{
@@ -1495,17 +1494,36 @@ select.content-field__control{
   }
 }
 
-/* === BEGIN BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V2 | Zweck: finalisiert die Funnel-Hierarchie konsistent mit dem Subpage-System, stärkt Wegwahl-Meta statt Fließtext, verdichtet Pflichtfeld-Hinweise und stabilisiert Date/Time-Felder; Umfang: Publish-/Organizer-Seitenfamilie innerhalb des bestehenden pages.css-Owners === */
-.page--publish .publish-section-head .content-note--form-meta,
-.page--organizers .content-note--form-meta{
-  max-width: none;
-  font-size: 0.7rem;
-  line-height: 1.12;
+/* === BEGIN BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 | Zweck: finalisiert die Funnel-Hierarchie konsistent mit dem Subpage-System, positioniert Pflichtfeld-Meta ruhig in Formular-Kopfzeilen und stabilisiert Date/Time-Felder; Umfang: Publish-/Organizer-Seitenfamilie innerhalb des bestehenden pages.css-Owners === */
+.publish-section-head--form,
+.content-form-section-head--form{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  row-gap: 4px;
+  align-items: baseline;
 }
 
-.page--publish .publish-section-head .content-note--form-meta + .content-note:not(.content-note--form-meta),
-.page--organizers .content-note--form-meta + .content-note:not(.content-note--form-meta){
-  margin-top: 2px;
+.publish-section-head--form h2,
+.content-form-section-head--form h2,
+.content-form-section-head--form h3{
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.publish-section-head--form .content-note--form-meta,
+.content-form-section-head--form .content-note--form-meta{
+  grid-column: 2;
+  grid-row: 1;
+  align-self: baseline;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.publish-section-head--form .content-note:not(.content-note--form-meta),
+.content-form-section-head--form .content-note:not(.content-note--form-meta){
+  grid-column: 1 / -1;
 }
 
 .page--publish .publish-model-copy{
@@ -1592,12 +1610,6 @@ select.content-field__control{
 }
 
 @media (max-width: 899.98px){
-  .page--publish .publish-section-head .content-note--form-meta,
-  .page--organizers .content-note--form-meta{
-    font-size: 0.69rem;
-    line-height: 1.1;
-  }
-
   .page--publish .content-form-note{
     max-width: none;
     font-size: 0.78rem;
@@ -1609,8 +1621,20 @@ select.content-field__control{
   .page--publish .publish-date-time-row{
     grid-template-columns: minmax(0, 1fr);
   }
+
+  .publish-section-head--form,
+  .content-form-section-head--form{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .publish-section-head--form .content-note--form-meta,
+  .content-form-section-head--form .content-note--form-meta{
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
 }
-/* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V2 === */
+/* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
