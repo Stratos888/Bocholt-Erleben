@@ -8,6 +8,13 @@
 - If the user says manual edits were made or a patch was not applied, the current file content becomes the new truth.
 - Never patch without visible current code for the affected file(s).
 
+### Data source rule
+
+- Production/staging event and inbox data are sheet-first.
+- The deploy workflow exports the Google Sheet tabs `Events` and `Inbox` to `data/events.tsv` and `data/inbox.tsv`.
+- `data/events.json` and `data/inbox.json` are generated deploy artifacts consumed by the app at runtime.
+- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
+- Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
 ---
 
 ## 2. PROOF BEFORE PATCH
