@@ -189,7 +189,15 @@ Rules:
 - Broken asset references are fail-fast.
 - Validate on `staging` before `main`, except for urgent live hotfixes.
 
----
+Asset/versioning rules:
+
+- `css/style.css` is the public CSS entrypoint and must not be deleted.
+- `css/style.css` owns CSS import order only.
+- Do not patch `css/style.css` for normal visual changes unless the import order or actual CSS entrypoint changes.
+- Do not manually bump asset query versions in multiple HTML files for normal CSS/JS edits.
+- The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
+- Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
+
 
 ## 12. DEPRECATED PROMPT FILES
 
