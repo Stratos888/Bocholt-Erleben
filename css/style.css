@@ -1,7 +1,7 @@
-/* === BEGIN BLOCK: CSS_AGGREGATOR_HEADER_HUB_CACHE_V1 | Zweck: invalidiert gezielt die geänderten Komponenten-/Seiten-CSS-Dateien für Header und Veranstalter-Hub; Umfang: zentrale CSS-Import-Kette === */
+/* === BEGIN BLOCK: CSS_AGGREGATOR_FINAL_FUNNEL_UI_CACHE_V1 | Zweck: einmalige Aktualisierung der CSS-Imports für finalisierte Funnel-Hierarchie, Pflichtfeld-Meta und Anbindungsseite; Umfang: zentrale CSS-Import-Kette === */
 @import url("/css/base.css?v=2");
-@import url("/css/pages.css?v=2026-05-06-header-hub-1");
+@import url("/css/pages.css?v=2026-05-11-final-funnel-ui-1");
 @import url("/css/components.css?v=2026-05-06-header-hub-1");
 @import url("/css/home.css?v=2");
-@import url("/css/overlays.css?v=2");
-/* === END BLOCK: CSS_AGGREGATOR_HEADER_HUB_CACHE_V1 === */
+@import url("/css/overlays.css?v=2026-05-09-organizer-ui-polish-1");
+/* === END BLOCK: CSS_AGGREGATOR_FINAL_FUNNEL_UI_CACHE_V1 === */
