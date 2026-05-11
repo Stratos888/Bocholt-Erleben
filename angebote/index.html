@@ -65,7 +65,7 @@ Zweck:
 Umfang:
 - Ersetzt nur den stylesheet-link
 === -->
-<link rel="stylesheet" href="/css/style.css?v=1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-06-header-hub-1">
 <!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
 <!-- === END BLOCK: ACTIVITIES_HEAD_SEO_SOCIAL_SCHEMA_V1 === -->
 </head>
@@ -88,8 +88,11 @@ Umfang:
     <span class="app-title">Bocholt erleben</span>
   </div>
   <div class="header-right">
-    <button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren"><span class="pwa-install-button__icon" data-ui-icon="download" aria-hidden="true"></span><span class="pwa-install-button__label">App</span></button>
-    <a class="pwa-install-button" href="/ueber/" aria-label="Über Bocholt erleben"><span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span><span class="pwa-install-button__label">Info</span></a>
+    <!-- === BEGIN BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 | Zweck: ergänzt die bestehende App-/Info-Utility-Leiste um einen kompakten Zugang für Einreichung oder Veranstalterbereich; Umfang: komplette header-right Utility-Gruppe === -->
+    <button type="button" class="pwa-install-button header-app-button" data-pwa-install-trigger aria-label="Als App installieren"><span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span><span class="pwa-install-button__label">App</span></button>
+    <a class="pwa-install-button header-info-button" href="/ueber/" aria-label="Über Bocholt erleben"><span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span><span class="pwa-install-button__label">Info</span></a>
+    <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen"><span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span><span class="pwa-install-button__label">Zugang</span></a>
+    <!-- === END BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 === -->
   </div>
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + about) === -->
@@ -175,7 +178,7 @@ Umfang:
       <div class="desktop-hero__actions" aria-label="Service">
         <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
           <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
-          <span>Event veröffentlichen</span>
+          <span>Event einreichen</span>
         </a>
 
         <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
@@ -311,7 +314,7 @@ Zweck:
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
 <script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
-<script src="/js/icons.js?v=2026-02-04-1" defer></script>
+<script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script src="/js/bottom-tabbar.js?v=2026-04-16-1" defer></script>
 <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
 

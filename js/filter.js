@@ -1,4 +1,4 @@
-// BEGIN: FILE_HEADER_FILTER
+// BEGIN: FILE_HEADER_FILTER 
 // Datei: js/filter.js
 // Zweck:
 // - Zentrale Filter-Steuerung (Single Source of Truth)
@@ -172,7 +172,7 @@ const FilterModule = {
     return new Date(startDay);
   },
 
-  /* === BEGIN BLOCK: FILTER_TIME_PRESET_MATCHING_V1 | Zweck: definiert sichtbare Zeit-Presets als echte Zeiträume, damit „Diese Woche“ heute bis Sonntag umfasst und „Wochenende“ parallel nutzbar bleibt; Umfang: ersetzt getBucketForEvent() und ergänzt getTimePresetRange() + eventMatchesTimeKey() === */
+/* === BEGIN BLOCK: FILTER_TIME_PRESET_MATCHING_RANGE_AWARE_V2 | Zweck: Zeitfilter inklusive Alle-Filter laufzeitbewusst machen, damit abgelaufene Mehrtagesevents nicht sichtbar bleiben | Umfang: ersetzt getTimePresetRange(), eventMatchesTimeKey() und getBucketForEvent() === */
   getTimePresetRange(key, baseDate = this.toLocalDay(this.getTodayIso())) {
     const today = baseDate ? new Date(baseDate) : null;
     if (!today) return null;
@@ -199,33 +199,57 @@ const FilterModule = {
     }
   },
 
-  eventMatchesTimeKey(event, key) {
-    if (key === "all") return true;
+/* === BEGIN BLOCK: FILTER_TIME_RANGE_OVERLAP_V3 | Zweck: Zeitfilter für Mehrtagesevents laufzeitbasiert machen, damit Events an allen Tagen ihrer Laufzeit in passenden Presets sichtbar sind | Umfang: ersetzt eventIsCurrentOrFuture(), eventMatchesTimeKey() und getBucketForEvent() mit Range-Overlap-Logik === */
+  getEventActiveRange(event) {
+    const startDay = this.toLocalDay(event?.date || event?.datum || "");
+    if (!startDay) return null;
 
-    const effectiveDay = this.getEventEffectiveDay(event);
-    if (!effectiveDay) return false;
-    effectiveDay.setHours(0, 0, 0, 0);
+    const rawEnd = event?.endDate || event?.endDatum || "";
+    const endBase = rawEnd ? this.toLocalDay(rawEnd) : new Date(startDay);
+    if (!endBase) return null;
+
+    const endDay = this.endOfDay(endBase);
+    if (endDay < startDay) return null;
+
+    return { start: startDay, end: endDay };
+  },
+
+  rangesOverlap(activeRange, targetRange) {
+    if (!activeRange?.start || !activeRange?.end || !targetRange?.start) return false;
+    if (!targetRange.end) return activeRange.end >= targetRange.start;
+    return activeRange.end >= targetRange.start && activeRange.start <= targetRange.end;
+  },
+
+  eventIsCurrentOrFuture(event) {
+    const activeRange = this.getEventActiveRange(event);
+    const today = this.toLocalDay(this.getTodayIso());
+    if (!activeRange || !today) return false;
+
+    return activeRange.end >= today;
+  },
+
+  eventMatchesTimeKey(event, key) {
+    const activeRange = this.getEventActiveRange(event);
+    const today = this.toLocalDay(this.getTodayIso());
+    if (!activeRange || !today) return false;
+    if (activeRange.end < today) return false;
+    if (key === "all") return true;
 
     const range = this.getTimePresetRange(key);
     if (!range?.start) return false;
 
-    if (key === "later") return effectiveDay >= range.start;
-    return effectiveDay >= range.start && effectiveDay <= range.end;
+    return this.rangesOverlap(activeRange, range);
   },
 
   getBucketForEvent(event) {
-    const effectiveDay = this.getEventEffectiveDay(event);
-    if (!effectiveDay) return "later";
-
-    effectiveDay.setHours(0, 0, 0, 0);
-
     if (this.eventMatchesTimeKey(event, "today")) return "today";
     if (this.eventMatchesTimeKey(event, "weekend")) return "weekend";
     if (this.eventMatchesTimeKey(event, "nextweek")) return "nextweek";
     if (this.eventMatchesTimeKey(event, "week")) return "week";
     return "later";
   },
-  /* === END BLOCK: FILTER_TIME_PRESET_MATCHING_V1 === */
+/* === END BLOCK: FILTER_TIME_RANGE_OVERLAP_V3 === */
+/* === END BLOCK: FILTER_TIME_PRESET_MATCHING_RANGE_AWARE_V2 === */
 
   eventMatchesSelectedDate(event, isoDate) {
     const selectedDay = this.toLocalDay(isoDate);

@@ -193,13 +193,18 @@ jobs:
               if any(v for v in row):
                   existing_rows.append(dict(zip(header, row)))
 
-          existing_source_urls = set()
+          # === BEGIN BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 | Zweck: gleiche source_url für unterschiedliche Event-Daten erlauben, Append-Dubletten verhindern und Skip-Gründe loggen | Umfang: ersetzt Dedupe-, Loop- und Append-Abschnitt vollständig ===
+          existing_source_date_keys = set()
           existing_fps = set()
 
           for row in existing_rows:
               source_url = canonical_url(row.get("source_url", ""))
-              if source_url:
-                  existing_source_urls.add(norm_key(source_url))
+              date_value = norm(row.get("date", ""))
+              source_date_key = "|".join([norm_key(source_url), date_value]) if source_url and date_value else ""
+
+              if source_date_key:
+                  existing_source_date_keys.add(source_date_key)
+
               fp = dedupe_fp(
                   row.get("title", ""),
                   row.get("date", ""),
@@ -210,7 +215,17 @@ jobs:
 
           created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
           rows_to_append = []
-          skipped = 0
+          skip_reasons = {}
+          skipped_details = []
+
+          def mark_skipped(item, reason):
+              skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
+              skipped_details.append({
+                  "reason": reason,
+                  "title": norm(item.get("title", "")),
+                  "date": norm(item.get("date", "")),
+                  "source_url": canonical_url(item.get("source_url", "")),
+              })
 
           for idx, item in enumerate(raw, start=1):
               if not isinstance(item, dict):
@@ -225,6 +240,13 @@ jobs:
                   else:
                       fail(f"Element #{idx}: Feld '{key}' ist kein skalarer Wert.")
 
+              # === BEGIN BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 | Zweck: importierte Manual-KI-Zeilen sicher als Review-Fälle mit Zeitstempel schreiben | Umfang: ergänzt Status/created_at und kanonisiert URLs ===
+              normalized["status"] = "review"
+              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
+              normalized["url"] = canonical_url(normalized.get("url", ""))
+              normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
+              # === END BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 ===
+
               missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]
               if missing_required:
                   fail(f"Element #{idx}: missing_required={','.join(missing_required)}")
@@ -237,24 +259,23 @@ jobs:
               if end_date_value and not re.match(r"^\d{4}-\d{2}-\d{2}$", end_date_value):
                   fail(f"Element #{idx}: invalid_endDate_format")
 
-              normalized["status"] = "review"
-              normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
-              normalized["source_url"] = canonical_url(normalized.get("source_url", ""))
-              normalized["url"] = canonical_url(normalized.get("url", ""))
+              source_date_key = "|".join([
+                  norm_key(normalized["source_url"]),
+                  date_value,
+              ]) if normalized["source_url"] and date_value else ""
 
-              source_url_key = norm_key(normalized["source_url"])
               fp = dedupe_fp(
                   normalized.get("title", ""),
                   normalized.get("date", ""),
                   normalized.get("location", ""),
               )
 
-              if source_url_key and source_url_key in existing_source_urls:
-                  skipped += 1
+              if source_date_key and source_date_key in existing_source_date_keys:
+                  mark_skipped(normalized, "duplicate_source_date")
                   continue
 
               if fp != "||" and fp in existing_fps:
-                  skipped += 1
+                  mark_skipped(normalized, "duplicate_title_date_location")
                   continue
 
               row_map = {col: "" for col in header}
@@ -264,10 +285,17 @@ jobs:
 
               rows_to_append.append([row_map.get(col, "") for col in header])
 
-              if source_url_key:
-                  existing_source_urls.add(source_url_key)
+              if source_date_key:
+                  existing_source_date_keys.add(source_date_key)
               if fp != "||":
                   existing_fps.add(fp)
+
+          skipped = len(skipped_details)
+          info(f"Append OK: appended={len(rows_to_append)} skipped={skipped} skip_reasons={json.dumps(skip_reasons, ensure_ascii=False)}")
+          if skipped_details:
+              info("Skipped details:")
+              for item in skipped_details[:40]:
+                  info(json.dumps(item, ensure_ascii=False))
 
           if not rows_to_append:
               info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
@@ -282,6 +310,7 @@ jobs:
           ).execute()
 
           info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
+          # === END BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 ===
           PY
 
       # === BEGIN BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===

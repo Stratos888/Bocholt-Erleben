@@ -298,18 +298,26 @@ function createCard(event) {
     };
   };
 
-     /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 | Purpose: remove the synthetic hidden-anchor click path and open desktop event targets only via window.open in a new tab; Scope: replaces only the desktop external-open helper inside createCard === */
-  const openPrimaryDesktopTarget = (url) => {
+     /* === BEGIN BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_WITH_ANALYTICS_V3 | Purpose: keeps the desktop direct-open behavior for event cards, but sends a clean outbound analytics event before opening the external target; Scope: replaces only the desktop external-open helper inside createCard === */
+  const openPrimaryDesktopTarget = (url, analyticsPayload = null) => {
     if (!url) return false;
 
     try {
+      if (
+        analyticsPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(analyticsPayload);
+      }
+
       window.open(url, "_blank", "noopener,noreferrer");
       return true;
     } catch (_) {
       return false;
     }
   };
-  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_V2 === */
+  /* === END BLOCK: SAFE_DESKTOP_EXTERNAL_OPEN_WITH_ANALYTICS_V3 === */
   const resolveCity = (ev) => {
     if (ev?.city && String(ev.city).trim()) return String(ev.city).trim();
 
@@ -376,7 +384,14 @@ function createCard(event) {
   const locTextRaw = String(event?.location || "").trim();
 
   const isRange = !!(event?.date && event?.endDate && event.endDate !== event.date);
-  const timeLine = timeText || (isRange ? String(dateLabel).trim() : "");
+  const timeLine = (() => {
+    if (isRange) {
+      if (dateLabel && timeText) return `${dateLabel} · ${timeText}`;
+      return String(dateLabel).trim();
+    }
+    if (timeText) return timeText;
+    return String(dateLabel).trim();
+  })();
 
   const cityRaw = String(city || "").trim();
   const cityIsUseful = !!cityRaw && cityRaw !== "Bocholt";
@@ -398,7 +413,6 @@ function createCard(event) {
     placeEl.textContent = placeLine;
     meta.appendChild(placeEl);
   }
-
   const h3 = document.createElement("h3");
   h3.className = "event-title";
 
@@ -445,6 +459,15 @@ function createCard(event) {
   );
   const calendarUrl = buildGoogleCalendarUrl(event);
   const sharePayload = buildSharePayload(event, primaryUrl);
+  const primaryOutboundPayload = primaryUrl
+    ? {
+        outboundType: "website",
+        entityType: "event",
+        entityId: String(event?.id || "").trim(),
+        entityTitle: String(event?.title || "").trim(),
+        destinationUrl: primaryUrl
+      }
+    : null;
 
   card.setAttribute("role", "button");
   card.setAttribute(
@@ -464,7 +487,16 @@ function createCard(event) {
     primaryLink.rel = "noopener";
     primaryLink.textContent = "Zur Veranstaltung";
     primaryLink.setAttribute("aria-label", `Zur Veranstaltung: ${event?.title || "Event"}`);
-    primaryLink.addEventListener("click", (e) => e.stopPropagation());
+    primaryLink.addEventListener("click", (e) => {
+      if (
+        primaryOutboundPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(primaryOutboundPayload);
+      }
+      e.stopPropagation();
+    });
     actions.appendChild(primaryLink);
   }
 
@@ -519,7 +551,7 @@ function createCard(event) {
   card.appendChild(badge);
   card.appendChild(body);
 
-   /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 | Purpose: handle the original card interaction explicitly so desktop opens only a new tab while the current homepage stays untouched; Mobile detail-panel behavior remains unchanged | Scope: replaces openCard plus card click/keyboard wiring inside createCard === */
+  /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
   const openCard = (e) => {
     if (e) {
       e.preventDefault();
@@ -528,7 +560,7 @@ function createCard(event) {
 
     if (isDesktopViewport()) {
       if (primaryUrl) {
-        openPrimaryDesktopTarget(primaryUrl);
+        openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
       }
       return;
     }
@@ -539,10 +571,10 @@ function createCard(event) {
     }
 
     if (primaryUrl) {
-      openPrimaryDesktopTarget(primaryUrl);
+      openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     }
   };
-  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V2 === */
+  /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
 
   card.addEventListener("click", (e) => {
     openCard(e);
@@ -599,7 +631,7 @@ const createFeedPublishEntry = () => {
   const link = document.createElement("a");
   link.className = "feed-publish-entry";
   link.href = "/events-veroeffentlichen/";
-  link.setAttribute("aria-label", "Für Veranstalter – Event veröffentlichen");
+  link.setAttribute("aria-label", "Für Veranstalter – Event einreichen");
 
   const label = document.createElement("span");
   label.className = "feed-publish-entry__label";
@@ -610,7 +642,7 @@ const createFeedPublishEntry = () => {
 
   const title = document.createElement("span");
   title.className = "feed-publish-entry__title";
-  title.textContent = "Event veröffentlichen";
+  title.textContent = "Event einreichen";
 
   const chevron = document.createElement("span");
   chevron.className = "feed-publish-entry__chevron";
@@ -743,20 +775,42 @@ const createFeedPublishEntry = () => {
     later: "Später"
   };
 
-  const pickBucket = (day) => {
-    if (!day) return "later";
-    if (day.getTime() === today.getTime()) return "today";
-    if (hasThisWeek && day >= thisWeekStart && day <= thisWeekEnd) return "week";
-    if (day >= weekendStart && day <= weekendEnd) return "weekend";
-    if (day >= nextWeekStart && day <= nextWeekEnd) return "nextweek";
+  /* === BEGIN BLOCK: EVENT_FEED_BUCKET_RANGE_OVERLAP_V2 | Zweck: Feed-Gruppierung für Mehrtagesevents laufzeitbasiert machen, damit aktive Tage in passende Zeitgruppen fallen | Umfang: ersetzt pickBucket(day) und die Bucket-Zuweisung in renderList() === */
+  const getEventRange = (ev) => {
+    const start = parseISODateLocal(ev?.date);
+    if (!start) return null;
+
+    const endBase = ev?.endDate ? parseISODateLocal(ev.endDate) : new Date(start);
+    if (!endBase) return null;
+
+    const end = endOfDay(endBase);
+    if (end < start) return null;
+
+    return { start, end };
+  };
+
+  const overlaps = (range, start, end) => {
+    if (!range || !start || !end) return false;
+    return range.end >= start && range.start <= end;
+  };
+
+  const pickBucket = (ev) => {
+    const range = getEventRange(ev);
+    if (!range) return "later";
+
+    const todayEnd = endOfDay(today);
+    if (overlaps(range, today, todayEnd)) return "today";
+    if (hasThisWeek && overlaps(range, thisWeekStart, thisWeekEnd)) return "week";
+    if (overlaps(range, weekendStart, weekendEnd)) return "weekend";
+    if (overlaps(range, nextWeekStart, nextWeekEnd)) return "nextweek";
     return "later";
   };
 
   for (const ev of list) {
-    const day = toDay(ev);
-    const key = pickBucket(day);
+    const key = pickBucket(ev);
     buckets[key].push(ev);
   }
+  /* === END BLOCK: EVENT_FEED_BUCKET_RANGE_OVERLAP_V2 === */
 
   const order = ["today", "week", "weekend", "nextweek", "later"];
   const frag = document.createDocumentFragment();

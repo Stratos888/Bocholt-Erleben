@@ -66,7 +66,7 @@ Umfang: ersetzt nur den bestehenden SEO-Snippet-Block.
 Zweck: Einheitliches Cache-Busting über ?v=… (wird im Deploy auf BUILD_ID gesetzt).
 Umfang: Ersetzt nur den stylesheet-link (keine anderen Assets).
 === -->
-<link rel="stylesheet" href="/css/style.css?v=1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-06-header-hub-1">
 <!-- === END BLOCK: CSS CACHE BUSTING (build-id query, guard compatible) === -->
 
 
@@ -88,34 +88,23 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
     >
     <span class="app-title">Bocholt erleben</span>
   </div>
- <div class="header-right">
-<!-- === BEGIN BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
-<button type="button" class="pwa-install-button" data-pwa-install-trigger aria-label="Als App installieren">
-  <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
-  <span class="pwa-install-button__label">App</span>
-</button>
-<!-- === END BLOCK: HEADER INSTALL TRIGGER DATA HOOK (shared install logic) === -->
- 
+  <div class="header-right">
+    <!-- === BEGIN BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 | Zweck: ergänzt die bestehende App-/Info-Utility-Leiste um einen kompakten Zugang für Einreichung oder Veranstalterbereich; Umfang: komplette header-right Utility-Gruppe === -->
+    <button type="button" class="pwa-install-button header-app-button" data-pwa-install-trigger aria-label="Als App installieren">
+      <span class="pwa-install-button__icon" data-ui-icon="app-install" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">App</span>
+    </button>
 
-<!-- === BEGIN BLOCK: HEADER ABOUT CTA (opens about page) ===
-Zweck:
-- Header-Button führt nicht mehr auf /info/, sondern direkt auf die kanonische Plattformseite /ueber/.
-- Entfernt den alten Info-Hub aus der primären IA.
-Umfang:
-- Ersetzt nur diesen Link-Block.
-=== -->
-<a
-  class="pwa-install-button"
-  href="/ueber/"
-  aria-label="Über Bocholt erleben"
->
-  <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
-  <span class="pwa-install-button__label">Info</span>
-</a>
-<!-- === END BLOCK: HEADER ABOUT CTA (opens about page) === -->
+    <a class="pwa-install-button header-info-button" href="/ueber/" aria-label="Über Bocholt erleben">
+      <span class="pwa-install-button__icon" data-ui-icon="info" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">Info</span>
+    </a>
 
-
-
+    <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+      <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+      <span class="pwa-install-button__label">Zugang</span>
+    </a>
+    <!-- === END BLOCK: HEADER_UTILITY_ACTIONS_WITH_ACCESS_V2 === -->
   </div>
 </header>
 <!-- === END BLOCK: HEADER (logo/title + install + publish) === -->
@@ -199,7 +188,7 @@ Umfang: Entfernt die <section class="intro"> vollständig.
     <div class="desktop-hero__actions" aria-label="Service">
       <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
         <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
-        <span>Event veröffentlichen</span>
+        <span>Event einreichen</span>
       </a>
 
       <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
@@ -401,7 +390,7 @@ Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
 <script src="config.js?v=2026-02-04-1"></script>
 
 <!-- Icons (Single Source of Truth) -->
-<script src="/js/icons.js?v=2026-02-04-1"></script>
+<script src="/js/icons.js?v=2026-05-06-header-access-2"></script>
 
 <!-- UI/Renderer zuerst -->
 <script src="/js/details.js?v=2026-02-04-1"></script>

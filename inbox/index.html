@@ -32,11 +32,22 @@ Umfang:
        - Nur Styles für diese Seite.
     === END BLOCK: FINAL REVIEW UI CSS (minimal, readable) === */
 
-    .wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
+    /* === BEGIN BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 ===
+       Zweck:
+       - Zeigt alle entscheidungsrelevanten Kandidatendaten lesbar an
+       - Ergänzt Review-Grid, URL-Block und Ablehnungsgrund-Auswahl
+       Umfang:
+       - Nur Styles für inbox/index.html
+    === END BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 === */
+
+    .wrap { max-width: 820px; margin: 0 auto; padding: 14px; }
     .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .brand { display:flex; align-items:baseline; gap:10px; }
     .title { font-weight: 700; }
     .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
+    .originBadge { display:inline-flex; align-items:center; width:max-content; margin:0 0 10px 0; padding:4px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.18); font-size:12px; font-weight:700; }
+    .riskBox { margin: 10px 0 12px; padding: 10px; border-radius: 12px; border: 1px solid rgba(160,0,0,.25); background: rgba(160,0,0,.04); font-size: 13px; line-height: 1.35; }
+    .riskBox ul { margin: 6px 0 0 18px; padding: 0; }
     .muted { opacity: .75; }
     .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
@@ -45,19 +56,32 @@ Umfang:
 
     .status { margin-top: 10px; font-size: 13px; }
     .card { margin-top: 12px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
-    .card h1 { margin: 0 0 10px 0; font-size: 18px; line-height: 1.25; }
+    .card h1 { margin: 0 0 12px 0; font-size: 20px; line-height: 1.25; }
 
-    .meta { font-size: 14px; line-height: 1.35; margin: 0 0 10px 0; }
-    .meta .line { margin: 3px 0; }
+    .reviewGrid { display:grid; gap:7px; margin: 0 0 12px 0; }
+    .reviewRow { display:grid; grid-template-columns: minmax(110px, 160px) 1fr; gap:10px; font-size:14px; line-height:1.35; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.08); }
+    .reviewLabel { font-weight:700; opacity:.78; }
+    .reviewValue { min-width:0; overflow-wrap:anywhere; }
 
-    .descTitle { margin: 10px 0 6px; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; opacity: .8; }
+    .descTitle { margin: 14px 0 6px; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; opacity: .8; }
     .desc { white-space: pre-wrap; font-size: 14px; line-height: 1.4; margin: 0 0 12px 0; }
+
+    .urlBox { margin: 10px 0 12px; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.035); font-size: 13px; line-height: 1.35; }
+    .urlLine { overflow-wrap:anywhere; margin: 4px 0; }
+
+    .rejectBox { margin: 10px 0 0; display:grid; gap:6px; }
+    .rejectLabel { font-size: 12px; letter-spacing:.02em; text-transform: uppercase; opacity:.8; }
+    .rejectSelect { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.18); background: transparent; font: inherit; }
 
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
     .actions .btn { flex: 1 1 160px; padding: 12px; font-size: 15px; }
-    .sourceBtn { flex: 1 1 100%; }
+    .sourceBtn { flex: 1 1 240px; }
 
     .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+
+    @media (max-width: 560px) {
+      .reviewRow { grid-template-columns: 1fr; gap:2px; }
+    }
   </style>
 </head>
 
@@ -96,7 +120,15 @@ Umfang:
     // - Vollständige Logik für diese Seite (konsolidiert)
     // === END BLOCK: FINAL REVIEW LOGIC (storage-free, fixed API, auto-unlock) ===
 
+    // === BEGIN BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
+    // Zweck:
+    // - Bestehende KI-/Sheet-Inbox bleibt unverändert
+    // - Formular-Submissions werden zusätzlich aus der DB-Review-API geladen
+    // Umfang:
+    // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
+    const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+    // === END BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
 
     const elOne = document.getElementById("one");
     const elStatus = document.getElementById("statusLine");
@@ -110,18 +142,27 @@ Umfang:
 
     // Token nur im RAM (keine Storage APIs)
     let sessionToken = "";
+    let reviewApiPassword = "";
 
-    document.getElementById("reloadBtn").addEventListener("click", () => loadAndShow());
+    // === BEGIN BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
+    // Zweck:
+    // - Bindet Reload und Deploy genau einmal
+    // Umfang:
+    // - Entfernt den doppelten Deploy-Listener
+    document.getElementById("reloadBtn").addEventListener("click", async () => {
+      const ok = await ensureUnlocked();
+      if (!ok) {
+        renderLockedState();
+        return;
+      }
+      await loadAndShow();
+    });
     document.getElementById("deployBtn").addEventListener("click", async () => {
       const ok = await ensureUnlocked();
       if (!ok) return;
       await triggerDeploy();
     });
-document.getElementById("deployBtn").addEventListener("click", async () => {
-  const ok = await ensureUnlocked();
-  if (!ok) return;
-  await triggerDeploy();
-});
+    // === END BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
 
     function setStatus(msg) {
       elStatus.textContent = msg || "";
@@ -141,7 +182,87 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       }
     }
 
+    // === BEGIN BLOCK: REVIEW_INBOX_LOCKED_STATE_V1 ===
+    // Zweck:
+    // - Zeigt einen echten Sperrzustand, wenn die Passwortabfrage abgebrochen wird
+    // - Verhindert sichtbares Laden von Review-Inhalten ohne erfolgreiche Entsperrung
+    // Umfang:
+    // - Ergänzt reinen UI-State ohne API-/Datenlogik
+    function renderLockedState() {
+      queue = [];
+      current = null;
+      totalLoaded = 0;
+      setStatus("Kuratier-Inbox gesperrt. Bitte neu laden und Passwort eingeben.");
+      elLeft.textContent = "";
+      elRight.textContent = "";
+      refreshLock();
+      elOne.innerHTML = `
+        <article class="card">
+          <h1>Gesperrt</h1>
+          <p class="muted">Die Kuratier-Inbox wird erst nach erfolgreicher Passwortabfrage geladen.</p>
+          <button class="btn" type="button" onclick="window.location.reload()">Neu laden und entsperren</button>
+        </article>
+      `;
+    }
+    // === END BLOCK: REVIEW_INBOX_LOCKED_STATE_V1 ===
+
+    // === BEGIN BLOCK: REVIEW_INBOX_LOAD_SHEET_AND_SUBMISSIONS_V1 ===
+    // Zweck:
+    // - Lädt bestehende KI-/Sheet-Fälle weiter über Apps Script
+    // - Lädt bezahlte Formular-Einreichungen zusätzlich aus MySQL über PHP-Review-API
+    // - Kennzeichnet Sheet-Fälle als ai_search, ohne Event-Kategorie zu verändern
+    // Umfang:
+    // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
+    async function fetchSubmissionReviewItems() {
+      if (!reviewApiPassword) {
+        return { items: [], total: 0, error: "submission_review_locked" };
+      }
+
+      try {
+        const response = await fetch(SUBMISSIONS_REVIEW_API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          }
+        });
+
+        const rawText = await response.text();
+        let data = null;
+
+        try {
+          data = rawText ? JSON.parse(rawText) : null;
+        } catch (_error) {
+          data = null;
+        }
+
+        if (!response.ok || !data || data.status !== "ok") {
+          return { items: [], total: 0, error: "submission_review_load_failed" };
+        }
+
+        const items = Array.isArray(data.data?.items) ? data.data.items : [];
+        return { items, total: Number(data.data?.total || items.length || 0), error: "" };
+      } catch (_error) {
+        return { items: [], total: 0, error: "submission_review_network_failed" };
+      }
+    }
+
+    function normalizeSheetReviewItem(item) {
+      return {
+        ...item,
+        review_source: item.review_source || "sheet_inbox",
+        intake_origin: item.intake_origin || "ai_search",
+        intake_origin_label: item.intake_origin_label || "KI-Suche"
+      };
+    }
+
     async function loadAndShow() {
+      if (!isUnlocked() || !reviewApiPassword) {
+        renderLockedState();
+        return;
+      }
+
       setStatus("Lade …");
       elOne.innerHTML = "";
       queue = [];
@@ -149,7 +270,10 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       totalLoaded = 0;
 
       try {
-        const res = await jsonp(API_URL, { action: "listReview" });
+        const [res, submissionsResult] = await Promise.all([
+          jsonp(API_URL, { action: "listReview" }),
+          fetchSubmissionReviewItems()
+        ]);
 
         if (!res || !res.ok) {
           const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
@@ -160,11 +284,18 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
           return;
         }
 
-        queue = Array.isArray(res.items) ? res.items : [];
-        totalLoaded = Number(res.total || queue.length || 0);
+        const sheetItems = Array.isArray(res.items) ? res.items.map(normalizeSheetReviewItem) : [];
+        const submissionItems = Array.isArray(submissionsResult.items) ? submissionsResult.items : [];
+
+        queue = [...submissionItems, ...sheetItems];
+        totalLoaded = Number(res.total || sheetItems.length || 0) + Number(submissionsResult.total || submissionItems.length || 0);
 
         refreshLock();
-        setStatus(queue.length ? "" : "Keine review-items.");
+        if (!queue.length && submissionsResult.error) {
+          setStatus("Keine review-items. DB-Review konnte nicht geladen werden: " + submissionsResult.error);
+        } else {
+          setStatus(queue.length ? "" : "Keine review-items.");
+        }
 
         showNext(totalLoaded);
       } catch (e) {
@@ -175,11 +306,165 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         refreshLock();
       }
     }
+    // === END BLOCK: REVIEW_INBOX_LOAD_SHEET_AND_SUBMISSIONS_V1 ===
 
     function showNext(totalCount) {
       current = queue.shift() || null;
       renderCurrent(totalCount);
     }
+
+    // === BEGIN BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
+    // Zweck:
+    // - Formatiert Datum, Zeitraum und Uhrzeiten für Einzeltage und Mehrtagesevents im deutschen Anzeigeformat
+    // - Zeigt bei Mehrtagesevents ohne einheitliche Uhrzeit keinen falschen Startzeitwert an
+    // - Unterstützt optional detaillierte Zeitpläne aus schedule_text/time_details/zeiten, ohne bestehende Datenquellen zu ändern
+    // - Entfernt technische Dopplungen aus Formular-Notizen
+    // Umfang:
+    // - Nur Anzeigehelfer für inbox/index.html, keine Daten-/API-Logik
+    function trimValue(value) {
+      return String(value || "").trim();
+    }
+
+    function formatGermanDate(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) {
+        return `${isoMatch[3]}.${isoMatch[2]}.${isoMatch[1]}`;
+      }
+
+      const germanMatch = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+      if (germanMatch) {
+        return `${germanMatch[1].padStart(2, "0")}.${germanMatch[2].padStart(2, "0")}.${germanMatch[3]}`;
+      }
+
+      return raw;
+    }
+
+    function formatGermanTimeText(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      let normalized = raw
+        .replace(/\s*[–—-]\s*/g, "–")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (/uhr/i.test(normalized)) return normalized;
+
+      const protectedRanges = [];
+      normalized = normalized.replace(/(\d{1,2}):(\d{2})(?::\d{2})?\s*–\s*(\d{1,2}):(\d{2})(?::\d{2})?/g, (_match, h1, m1, h2, m2) => {
+        const token = `__BE_TIME_RANGE_${protectedRanges.length}__`;
+        protectedRanges.push([
+          token,
+          `${String(h1).padStart(2, "0")}:${m1}–${String(h2).padStart(2, "0")}:${m2} Uhr`
+        ]);
+        return token;
+      });
+
+      normalized = normalized.replace(/\b(\d{1,2}):(\d{2})(?::\d{2})?\b/g, (_match, h, m) => {
+        return `${String(h).padStart(2, "0")}:${m} Uhr`;
+      });
+
+      for (const [token, replacement] of protectedRanges) {
+        normalized = normalized.replace(token, replacement);
+      }
+
+      return normalized;
+    }
+
+    function formatGermanDateTimeText(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const withGermanDates = raw.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (_match, year, month, day) => {
+        return `${day}.${month}.${year}`;
+      });
+
+      return formatGermanTimeText(withGermanDates);
+    }
+
+    function formatGermanDateTime(value) {
+      const raw = trimValue(value);
+      if (!raw) return "";
+
+      const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}:\d{2})(?::\d{2})?)?/);
+      if (!match) return formatGermanDateTimeText(raw);
+
+      const datePart = `${match[3]}.${match[2]}.${match[1]}`;
+      const timePart = match[4] ? formatGermanTimeText(match[4]) : "";
+
+      return timePart ? `${datePart}, ${timePart}` : datePart;
+    }
+
+    function isMultiDayEvent(date, endDate) {
+      const start = trimValue(date);
+      const end = trimValue(endDate);
+      return Boolean(start && end && start !== end);
+    }
+
+    function buildGermanDateRange(date, endDate) {
+      const start = formatGermanDate(date);
+      const end = formatGermanDate(endDate);
+
+      if (start && end && start !== end) return `${start} bis ${end}`;
+      return start || end || "";
+    }
+
+    function buildGermanTimeLine(item, date, endDate) {
+      const timeLine = formatGermanTimeText(item.time);
+      if (timeLine) return timeLine;
+
+      if (isMultiDayEvent(date, endDate)) {
+        return "keine einheitliche Uhrzeit angegeben – Beschreibung/Quelle prüfen";
+      }
+
+      return "keine Uhrzeit angegeben";
+    }
+
+    function buildScheduleDetails(item) {
+      const explicitSchedule = [
+        item.schedule_text,
+        item.scheduleText,
+        item.time_details,
+        item.timeDetails,
+        item.zeiten,
+        item.zeitdetails
+      ].map(trimValue).find(Boolean);
+
+      return explicitSchedule ? formatGermanDateTimeText(explicitSchedule) : "";
+    }
+
+    function buildCurationNote(item) {
+      const notes = trimValue(item.notes);
+      if (!notes) return "";
+
+      if (String(item.review_source || "") !== "submission_db") return notes;
+
+      const filteredLines = notes
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .filter((line) => !/^Adresse \/ offizieller Treffpunkt:/i.test(line))
+        .filter((line) => !/^PLZ:/i.test(line))
+        .filter((line) => !/^Stadt \/ Ort:/i.test(line))
+        .filter((line) => !/^Adresse zusammengesetzt:/i.test(line))
+        .filter((line) => !/^Ortsbestätigung:/i.test(line));
+
+      return filteredLines.join("\n");
+    }
+
+    function buildDedupeHint(item) {
+      const hints = [
+        trimValue(item.match_score) ? `Match-Score: ${trimValue(item.match_score)}` : "",
+        trimValue(item.matched_event_id) ? `Matched Event-ID: ${trimValue(item.matched_event_id)}` : "",
+        trimValue(item.id_suggestion) ? `ID-Vorschlag: ${trimValue(item.id_suggestion)}` : ""
+      ].filter(Boolean);
+
+      return hints.join(" · ");
+    }
+    // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
 
     function renderCurrent(totalCount) {
       refreshLock();
@@ -198,40 +483,123 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         return;
       }
 
+      // === BEGIN BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
+      // Zweck:
+      // - Zeigt alle entscheidungsrelevanten Eventdaten inkl. endDate, Kategorie, URLs, Dedupe-Hinweise
+      // - Verwerfen verlangt festen deutschen Ablehnungsgrund
+      // Umfang:
+      // - Ersetzt den Rendering-Teil innerhalb renderCurrent(totalCount) ab const it=current bis Button-Listener
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 | Zweck: trennt Datum/Zeitraum und Uhrzeit/Zeiten, damit Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt Rohwert-Aufbereitung im Render-Block === */
       const it = current;
 
-      // Meta: klar & schnell scanbar
-      const dateTime = [
-        (it.date || "").trim(),
-        (it.time || "").trim()
-      ].filter(Boolean).join(" · ");
+      const date = trimValue(it.date);
+      const endDate = trimValue(it.endDate);
+      const isMultiDay = isMultiDayEvent(date, endDate);
+      const dateLabel = isMultiDay ? "Zeitraum" : "Datum";
+      const dateRangeLine = buildGermanDateRange(date, endDate);
+      const timeLine = buildGermanTimeLine(it, date, endDate);
+      const scheduleDetails = buildScheduleDetails(it);
 
       const placeLine = [
-        (it.city || "").trim(),
-        (it.location || "").trim()
-      ].filter(Boolean).join(" — ");
+        trimValue(it.location),
+        trimValue(it.city)
+      ].filter(Boolean).join(" · ");
 
-      const sourceLine = (it.source_name || "").trim();
-      const desc = (it.description || "").trim();
+      const sourceLine = trimValue(it.source_name);
+      const desc = trimValue(it.description);
+      const curationNote = buildCurationNote(it);
+      const dedupeHint = buildDedupeHint(it);
+      const submittedAt = formatGermanDateTime(it.created_at);
+      const descriptionTitle = String(it.review_source || "") === "submission_db" ? "Beschreibung / Hinweise" : "Beschreibung / extrahierter Text";
 
-      const urlToOpen = (it.url || it.source_url || "").trim();
-      const openDisabled = !urlToOpen;
+      const eventUrl = trimValue(it.url);
+      const sourceUrl = trimValue(it.source_url);
+      const openEventDisabled = !eventUrl;
+      const openSourceDisabled = !sourceUrl;
+      /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 === */
+
+      const rejectOptions = [
+        ["", "Ablehnungsgrund auswählen …"],
+        ["DUBLETTE", "DUBLETTE – Event ist bereits vorhanden oder schon entschieden"],
+        ["DATUM_FALSCH", "DATUM_FALSCH – Datum falsch oder nicht sicher belegbar"],
+        ["ZEIT_FALSCH", "ZEIT_FALSCH – Uhrzeit falsch, Zeitspanne falsch oder Zeit nicht belegbar"],
+        ["URL_FALSCH", "URL_FALSCH – URL falsch, 404, falscher Termin oder nicht instanzpassend"],
+        ["QUELLE_ZU_SCHWACH", "QUELLE_ZU_SCHWACH – Quelle zu allgemein, unsicher oder keine echte Detailseite"],
+        ["KEIN_EVENT", "KEIN_EVENT – kein echtes Event, eher Info, Öffnungszeit, Kursliste oder Promo"],
+        ["ZU_NISCHIG", "ZU_NISCHIG – formal korrekt, aber zu wenig Nutzerwert"],
+        ["AUSSERHALB_SCOPE", "AUSSERHALB_SCOPE – außerhalb Radius oder nicht relevant genug"],
+        ["MONETARISIERUNGSSCHUTZ", "MONETARISIERUNGSSCHUTZ – geschützte Venue / direkte Promo potenzieller Kunden"],
+        ["BOT_FEHLER_SONSTIGES", "BOT_FEHLER_SONSTIGES – Bot hat falsch extrahiert oder modelliert"],
+        ["SONSTIGES", "SONSTIGES – nur wenn kein anderer Grund passt"]
+      ];
+
+      const rejectOptionsHtml = rejectOptions.map(([value, label]) => {
+        return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+      }).join("");
+
+      const originLabel = (it.intake_origin_label || "KI-Suche").trim();
+      const originBadgeHtml = `<span class="originBadge">${escapeHtml(originLabel)}</span>`;
+      const reviewRiskFlags = Array.isArray(it.review_risk_flags) ? it.review_risk_flags.filter(Boolean) : [];
+      const reviewRiskHtml = reviewRiskFlags.length ? `
+        <div class="riskBox">
+          <strong>Review-Risiko</strong>
+          <ul>${reviewRiskFlags.map((flag) => `<li>${escapeHtml(flag)}</li>`).join("")}</ul>
+        </div>
+      ` : "";
+
+      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 | Zweck: zeigt Datum/Zeitraum und Uhrzeit/Zeiten getrennt, damit Einzeltage, Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt infoRows-Liste === */
+      const infoRows = [
+        ["Herkunft", originLabel],
+        [dateLabel, dateRangeLine],
+        [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
+        ["Zeitdetails laut Quelle", scheduleDetails],
+        ["Ort", placeLine],
+        ["Adresse/Treffpunkt", trimValue(it.location_address)],
+        ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
+        ["Kategorie-Vorschlag", trimValue(it.kategorie_suggestion)],
+        ["Quelle / Veranstalter", sourceLine],
+        ["Eingereicht am", submittedAt],
+        ["Prüfhinweis", curationNote],
+        ["Dubletten-/Importhinweis", dedupeHint]
+      ].filter(([, value]) => value);
+      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 === */
+
+      const infoRowsHtml = infoRows.map(([label, value]) => `
+        <div class="reviewRow">
+          <div class="reviewLabel">${escapeHtml(label)}</div>
+          <div class="reviewValue">${escapeHtml(value)}</div>
+        </div>
+      `).join("");
 
       elOne.innerHTML = `
         <article class="card">
+          ${originBadgeHtml}
           <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
 
-          <div class="meta">
-            ${dateTime ? `<div class="line">📅 ${escapeHtml(dateTime)}</div>` : ``}
-            ${placeLine ? `<div class="line">📍 ${escapeHtml(placeLine)}</div>` : ``}
-            ${sourceLine ? `<div class="line muted">Quelle: <strong>${escapeHtml(sourceLine)}</strong></div>` : ``}
+          <div class="reviewGrid">
+            ${infoRowsHtml}
           </div>
 
-          <div class="descTitle">Extrahierter Text</div>
+          ${reviewRiskHtml}
+
+          <div class="descTitle">${escapeHtml(descriptionTitle)}</div>
           <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
 
+          <div class="urlBox">
+            ${eventUrl ? `<div class="urlLine"><strong>Veranstaltungslink:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
+            ${sourceUrl ? `<div class="urlLine"><strong>Quellenlink:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
+          </div>
+
+          <div class="rejectBox">
+            <label class="rejectLabel" for="rejectReason">Ablehnungsgrund beim Verwerfen</label>
+            <select id="rejectReason" class="rejectSelect">
+              ${rejectOptionsHtml}
+            </select>
+          </div>
+
           <div class="actions">
-            <button id="btnOpen" class="btn sourceBtn" type="button" ${openDisabled ? "disabled" : ""}>Quelle öffnen</button>
+            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Veranstaltungslink öffnen</button>
+            <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
             <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
             <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
           </div>
@@ -240,13 +608,19 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         </article>
       `;
 
-      document.getElementById("btnOpen").addEventListener("click", () => {
-        if (!urlToOpen) return;
-        window.open(urlToOpen, "_blank", "noopener,noreferrer");
+      document.getElementById("btnOpenEvent").addEventListener("click", () => {
+        if (!eventUrl) return;
+        window.open(eventUrl, "_blank", "noopener,noreferrer");
+      });
+
+      document.getElementById("btnOpenSource").addEventListener("click", () => {
+        if (!sourceUrl) return;
+        window.open(sourceUrl, "_blank", "noopener,noreferrer");
       });
 
       document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
+      // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
     }
 
     async function approveReject(status) {
@@ -271,6 +645,7 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
           return false;
         }
         sessionToken = String(res.token || "");
+        reviewApiPassword = pw;
         refreshLock();
         setStatus("");
         return true;
@@ -281,8 +656,19 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       }
     }
 
+    // === BEGIN BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
+    // Zweck:
+    // - Übernehmen bleibt direkter Approve-Import
+    // - Verwerfen sendet verpflichtend ablehnungsgrund an Apps Script
+    // Umfang:
+    // - Ersetzt writeStatus(it, newStatus)
     function writeStatus(it, newStatus) {
       return new Promise(async (resolve) => {
+        if (String(it.review_source || "") === "submission_db") {
+          await writeSubmissionStatus(it, newStatus);
+          return resolve();
+        }
+
         if (!it.row_number) {
           alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
           return resolve();
@@ -290,26 +676,47 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
 
         const btnOk = document.getElementById("btnOk");
         const btnNo = document.getElementById("btnNo");
-        const btnOpen = document.getElementById("btnOpen");
+        const btnOpenEvent = document.getElementById("btnOpenEvent");
+        const btnOpenSource = document.getElementById("btnOpenSource");
         const btnDeploy = document.getElementById("deployBtn");
+
         if (btnOk) btnOk.disabled = true;
         if (btnNo) btnNo.disabled = true;
-        if (btnOpen) btnOpen.disabled = true;
+        if (btnOpenEvent) btnOpenEvent.disabled = true;
+        if (btnOpenSource) btnOpenSource.disabled = true;
         if (btnDeploy) btnDeploy.disabled = true;
 
         try {
           const isApprove = String(newStatus) === "übernehmen";
 
-          const res = await jsonp(API_URL, isApprove ? {
-            action: "approve",
-            token: sessionToken,
-            row_number: String(it.row_number)
-          } : {
-            action: "setStatus",
-            token: sessionToken,
-            row_number: String(it.row_number),
-            status: String(newStatus)
-          });
+          let payload;
+
+          if (isApprove) {
+            payload = {
+              action: "approve",
+              token: sessionToken,
+              row_number: String(it.row_number)
+            };
+          } else {
+            const reasonSelect = document.getElementById("rejectReason");
+            const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
+
+            if (!ablehnungsgrund) {
+              alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
+              renderCurrent(totalLoaded);
+              return resolve();
+            }
+
+            payload = {
+              action: "setStatus",
+              token: sessionToken,
+              row_number: String(it.row_number),
+              status: String(newStatus),
+              ablehnungsgrund: ablehnungsgrund
+            };
+          }
+
+          const res = await jsonp(API_URL, payload);
 
           if (res && res.ok) {
             setStatus(isApprove ? "Übernommen." : "Verworfen.");
@@ -321,6 +728,7 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
 
           if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
             sessionToken = "";
+            reviewApiPassword = "";
             refreshLock();
             setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
             renderCurrent(totalLoaded);
@@ -339,11 +747,88 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
         } finally {
           if (btnOk) btnOk.disabled = false;
           if (btnNo) btnNo.disabled = false;
-          if (btnOpen) btnOpen.disabled = false;
+          if (btnOpenEvent) btnOpenEvent.disabled = false;
+          if (btnOpenSource) btnOpenSource.disabled = false;
           if (btnDeploy) btnDeploy.disabled = false;
         }
       });
     }
+    // === END BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
+
+    // === BEGIN BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
+    // Zweck:
+    // - Übernimmt oder verwirft DB-Submissions ohne Apps-Script-Row-Nummer
+    // - Übernehmen nutzt bestehenden Approval-Endpunkt und bucht erst dann Kontingent
+    // - Verwerfen nutzt neuen Reject-Endpunkt ohne Kontingentverbrauch
+    // Umfang:
+    // - Ergänzt PHP-JSON-Schreibpfad für review_source=submission_db
+    async function postJson(url, payload) {
+      if (!reviewApiPassword) {
+        throw new Error("review_api_locked");
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-BE-Review-Password": reviewApiPassword
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const rawText = await response.text();
+      let data = null;
+
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch (_error) {
+        data = null;
+      }
+
+      if (!response.ok || !data || data.status !== "ok") {
+        const message = data?.message || data?.error_message || "request_failed";
+        throw new Error(message);
+      }
+
+      return data;
+    }
+
+    async function writeSubmissionStatus(it, newStatus) {
+      const submissionId = Number(it.submission_id || 0);
+      if (submissionId <= 0) {
+        alert("Fehlt: submission_id im DB-Review-Fall.");
+        return;
+      }
+
+      const isApprove = String(newStatus) === "übernehmen";
+
+      if (isApprove) {
+        await postJson("/api/submissions/approve.php", { submission_id: submissionId });
+        setStatus("Submission geprüft und freigegeben.");
+        await loadAndShow();
+        return;
+      }
+
+      const reasonSelect = document.getElementById("rejectReason");
+      const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
+
+      if (!ablehnungsgrund) {
+        alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
+        renderCurrent(totalLoaded);
+        return;
+      }
+
+      await postJson("/api/submissions/reject.php", {
+        submission_id: submissionId,
+        reason: ablehnungsgrund
+      });
+
+      setStatus("Submission verworfen.");
+      await loadAndShow();
+    }
+    // === END BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
 
     async function triggerDeploy() {
       const btnDeploy = document.getElementById("deployBtn");
@@ -372,6 +857,7 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
 
         if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
           sessionToken = "";
+          reviewApiPassword = "";
           refreshLock();
           setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
           return;
@@ -425,14 +911,29 @@ document.getElementById("deployBtn").addEventListener("click", async () => {
       });
     }
 
-    // Init
-    (function init() {
+    // === BEGIN BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_REQUIRED_V2 ===
+    // Zweck:
+    // - Verhindert, dass die Kuratier-PWA nach abgebrochener Passwortabfrage trotzdem Inhalte lädt
+    // - Entsperrt die DB-Review-Endpunkte erst nach erfolgreicher Passwortprüfung
+    // Umfang:
+    // - Ersetzt Init-Block
+    (async function init() {
       refreshLock();
-      loadAndShow().catch(err => {
+
+      try {
+        const ok = await ensureUnlocked();
+        if (!ok) {
+          renderLockedState();
+          return;
+        }
+
+        await loadAndShow();
+      } catch (err) {
         console.error(err);
         setStatus("Fehler beim Laden.");
-      });
+      }
     })();
+    // === END BLOCK: REVIEW_INBOX_INITIAL_UNLOCK_REQUIRED_V2 ===
   </script>
 </body>
 </html>

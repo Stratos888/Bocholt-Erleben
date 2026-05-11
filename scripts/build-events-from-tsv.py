@@ -162,12 +162,13 @@ def validate_date(iso: str, rowno: int) -> None:
         fail(f"Zeile {rowno}: date ist kein gültiges Datum: {iso!r}")
 
 
+# === BEGIN BLOCK: BUILD_EVENTS_TIME_VALIDATION_LEGACY_COMPAT_V2 | Zweck: finale Events-TSV weiter mit bestehenden Zeitspannen kompatibel halten | Umfang: validiert Startzeit oder Zeitspanne im finalen Events-Build; Weekly-/Manual-Import bleibt davon unberührt ===
 def validate_time(t: str, rowno: int) -> None:
     if not t:
         return
     if not RE_TIME.match(t):
-        fail(f"Zeile {rowno}: time hat ein unerwartetes Format (erlaubt z.B. '19:30' oder '19:30–22:00'): {t!r}")
-
+        fail(f"Zeile {rowno}: time hat ein unerwartetes Format. Erlaubt sind z.B. '19:30' oder '19:30–22:00': {t!r}")
+# === END BLOCK: BUILD_EVENTS_TIME_VALIDATION_LEGACY_COMPAT_V2 ===
 
 def parse_time_minutes(t: str) -> Optional[int]:
     if not t:
@@ -202,21 +203,15 @@ def main() -> None:
     if missing:
         fail(f"TSV Header unvollständig. Fehlende Spalten: {missing}. Erwartet mindestens: {REQUIRED_FIELDS}")
 
-       # === BEGIN BLOCK: DEDUPE + AUTO-SKIP PAST SINGLE-DAY EVENTS ===
-    # Zweck:
-    # - Zusätzliche, harte Duplikat-Regel: gleiche (url + date) darf nur einmal vorkommen.
-    # - Alte Ein-Tages-Events (date < heute UND endDate leer) werden NICHT veröffentlicht.
-    # Umfang:
-    # - Initialisiert zusätzliche Seen-Sets + Zähler für übersprungene Einträge.
-    # ===
+       # === BEGIN BLOCK: RANGE_AWARE_PUBLISHING_AND_OCCURRENCE_DEDUPE_V2 | Zweck: abgelaufene Events inkl. Mehrtagesevents entfernen und gleiche URL für verschiedene Instanzen erlauben | Umfang: ersetzt Dedupe-/Publish-Fenster-Validierung ===
     events: List[EventRow] = []
     seen_ids = set()
     seen_fingerprints = set()
-    seen_url_date = set()  # (normalized_url, date)
-    skipped_past_single_day = 0
+    seen_url_occurrences = set()
+    skipped_expired_events = 0
 
     today_date = datetime.now().date()
-    # === END BLOCK: DEDUPE + AUTO-SKIP PAST SINGLE-DAY EVENTS ===
+    # === END BLOCK: RANGE_AWARE_PUBLISHING_AND_OCCURRENCE_DEDUPE_V2 ===
 
     for idx, raw in enumerate(rows, start=2):  # Header ist Zeile 1
 
@@ -242,39 +237,45 @@ def main() -> None:
             fail(f"Zeile {idx}: duplicate id: {ev_id!r}")
         seen_ids.add(ev_id)
 
-                # === BEGIN BLOCK: RANGE-AWARE PUBLISHING + URL/DATE DEDUPE ===
-        # Zweck:
-        # - date/endDate validieren
-        # - alte Ein-Tages-Events automatisch aus events.json herausfiltern
-        # - harte Duplikate anhand (url + date) erkennen
-        # Umfang:
-        # - Erweitert nur die Validierungslogik, ohne Output-Schema zu ändern.
-        # ===
+                # === BEGIN BLOCK: RANGE_AWARE_PUBLISHING_AND_URL_OCCURRENCE_CHECK_V2 | Zweck: date/endDate prüfen, abgelaufene Events entfernen und URL-Dedupe instanzbasiert statt url+date ausführen | Umfang: ersetzt alte url+date-Dedupe-Logik ===
         validate_date(data["date"], idx)
+        start_d = datetime.strptime(data["date"], "%Y-%m-%d").date()
+
+        end_d = start_d
         if data.get("endDate", ""):
             validate_date(data["endDate"], idx)
+            end_d = datetime.strptime(data["endDate"], "%Y-%m-%d").date()
+            if end_d < start_d:
+                fail(f"Zeile {idx}: endDate liegt vor date: date={data['date']!r}, endDate={data['endDate']!r}")
+
         validate_time(data.get("time", ""), idx)
 
-        # Alte Ein-Tages-Events (ohne endDate) werden nicht veröffentlicht.
-        # (Events mit endDate bleiben bis inkl. endDate sichtbar – das macht das Frontend später korrekt.)
-        if not data.get("endDate", ""):
-            start_d = datetime.strptime(data["date"], "%Y-%m-%d").date()
-            if start_d < today_date:
-                skipped_past_single_day += 1
-                continue
+        # Events bleiben bis einschließlich endDate sichtbar.
+        # Abgelaufene Ein-Tages- und Mehrtagesevents werden nicht veröffentlicht.
+        if end_d < today_date:
+            skipped_expired_events += 1
+            continue
 
-        # Harte Duplikat-Regel: gleiche URL am gleichen Datum darf nur einmal vorkommen.
+        # Gleiche URL ist erlaubt, wenn es unterschiedliche Instanzen sind.
+        # Verboten bleibt nur dieselbe URL für dieselbe erkennbare Instanz.
         url_raw = (data.get("url", "") or "").strip()
         if url_raw:
             norm_url = url_raw.lower().rstrip("/")
-            key = (norm_url, data["date"])
-            if key in seen_url_date:
+            url_occurrence_key = (
+                norm_url,
+                data["title"].lower(),
+                data["date"],
+                (data.get("time", "") or "").lower(),
+                data["city"].lower(),
+                data["location"].lower(),
+            )
+            if url_occurrence_key in seen_url_occurrences:
                 fail(
-                    f"Zeile {idx}: Duplikat erkannt (url+date). "
-                    f"Bitte eine der Zeilen entfernen: url={url_raw!r}, date={data['date']!r}"
+                    f"Zeile {idx}: Duplikat erkannt (url+title+date+time+city+location). "
+                    f"Bitte eine der Zeilen entfernen: url={url_raw!r}, date={data['date']!r}, time={data.get('time','')!r}"
                 )
-            seen_url_date.add(key)
-        # === END BLOCK: RANGE-AWARE PUBLISHING + URL/DATE DEDUPE ===
+            seen_url_occurrences.add(url_occurrence_key)
+        # === END BLOCK: RANGE_AWARE_PUBLISHING_AND_URL_OCCURRENCE_CHECK_V2 ===
 
         cat = normalize_category(data["kategorie"])
 
@@ -342,13 +343,10 @@ def main() -> None:
 
     OUT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        # === BEGIN BLOCK: REPORT SKIPPED PAST SINGLE-DAY EVENTS ===
-    # Zweck: Transparenz im CI-Log, wenn alte Ein-Tages-Events automatisch nicht veröffentlicht wurden.
-    # Umfang: Log-Ausgabe, keine Build-Änderung.
-    # ===
-    if skipped_past_single_day:
-        print(f"ℹ️ Hinweis: {skipped_past_single_day} abgelaufene Ein-Tages-Events (ohne endDate) wurden nicht veröffentlicht.")
-    # === END BLOCK: REPORT SKIPPED PAST SINGLE-DAY EVENTS ===
+        # === BEGIN BLOCK: REPORT_SKIPPED_EXPIRED_EVENTS_V2 | Zweck: CI-Log für automatisch entfernte abgelaufene Events inklusive Mehrtagesevents | Umfang: ersetzt nur die Log-Ausgabe ===
+    if skipped_expired_events:
+        print(f"ℹ️ Hinweis: {skipped_expired_events} abgelaufene Events wurden nicht veröffentlicht.")
+    # === END BLOCK: REPORT_SKIPPED_EXPIRED_EVENTS_V2 ===
     print(f"✅ OK: {len(out)} Events geschrieben: {OUT_JSON_PATH}")
 
 

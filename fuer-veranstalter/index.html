@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_HEAD_V3 | Zweck: ergänzt Legacy-Redirect-Seite /fuer-veranstalter/ um Manifest, Favicons und Apple-Touch-Icon; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V6_REGULAR_SUBMISSIONS | Zweck: benennt die Mitgliedschaft konsistent als Weg für regelmäßige Einreichungen statt regelmäßige Termine; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Weiterleitung – Event veröffentlichen</title>
+  <title>Mitgliedschaft für regelmäßige Einreichungen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Diese Seite wurde zusammengeführt. Bitte nutze die Seite „Event veröffentlichen“ für den Start als Veranstalter."
+    content="Mitgliedschaft bei Bocholt erleben starten: Tarif wählen, regelmäßig Veranstaltungen einreichen und nach Prüfung veröffentlichen lassen."
   >
 
-  <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/">
-  <meta http-equiv="refresh" content="0; url=/events-veroeffentlichen/">
-  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/">
+  <meta name="robots" content="index,follow">
 
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#F3F2E6">
@@ -25,11 +24,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_REDIRECT_HEAD_V3 === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEAD_V6_REGULAR_SUBMISSIONS === -->
 </head>
 
 <body>
-  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_BODY_V2 | Zweck: rendert /fuer-veranstalter/ als robuste Redirect-Hülle ohne kaputtes HTML und ohne Verweis auf /info/; Umfang: kompletter Body dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_BODY_V3_REGULAR_MODELS | Zweck: schärft /fuer-veranstalter/ auf regelmäßige Veröffentlichungsmodelle, Vorab-Anbindung und Header-Zugang; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -39,40 +38,113 @@
       >
       <span class="app-title">Bocholt erleben</span>
     </a>
+
+    <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_HEADER_AREA_ACCESS_V2 | Zweck: benennt den Rückkehrpfad im Header als Bereich öffnen statt abstrakt Zugang; Umfang: Header-Aktionsbereich dieser Datei === -->
+    <div class="header-right">
+      <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Einreichung oder Veranstalterbereich öffnen">
+        <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
+        <span class="pwa-install-button__label">Bereich öffnen</span>
+      </a>
+    </div>
+    <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_HEADER_AREA_ACCESS_V2 === -->
   </header>
 
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V9 | Zweck: hält automatische Übernahme als kurzen Zusatzpfad und positioniert Pflichtfeld-Meta ruhig in der Tarif-Kopfzeile; Umfang: kompletter Main-Bereich von /fuer-veranstalter/ === -->
   <main class="page page--organizers">
     <header class="content-hero content-hero--panel">
-      <p class="content-kicker">Weiterleitung</p>
-      <h1>Diese Seite wurde zusammengeführt</h1>
-
+      <h1>Mitgliedschaft für regelmäßige Einreichungen</h1>
       <p class="content-lead">
-        Bitte nutze ab sofort die Seite „Event veröffentlichen“. Du wirst automatisch weitergeleitet.
+        Für Vereine, Veranstalter und Locations mit laufendem Programm. Wähle einen Tarif, wenn du regelmäßig Veranstaltungen einreichen möchtest.
       </p>
+    </header>
 
+    <section class="content-card content-card--primary" aria-labelledby="organizer-service-head">
+      <h2 id="organizer-service-head">Was deckt die Mitgliedschaft ab?</h2>
+      <ul class="publish-benefits-grid" aria-label="Leistungen der Mitgliedschaft">
+        <li>
+          <strong>Regelmäßig Veranstaltungen einreichen</strong>
+        </li>
+        <li>
+          <strong>Prüfung und Veröffentlichung durch Bocholt erleben</strong>
+        </li>
+        <li>
+          <strong>Veranstalterbereich für Übersicht und Verwaltung</strong>
+        </li>
+      </ul>
+    </section>
+
+    <section class="content-card content-card--primary" aria-labelledby="organizer-automation-head">
+      <h2 id="organizer-automation-head">Automatische Übernahme kostenlos prüfen</h2>
+      <p>
+        Du pflegst Termine bereits an anderer Stelle? Dann kannst du kostenlos prüfen lassen, ob eine automatische Übernahme möglich ist.
+      </p>
       <div class="content-actions content-actions--inline">
-        <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/">
-          Zum Veranstalter-Start
+        <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/anbindung/">
+          Automatische Übernahme prüfen
         </a>
       </div>
+    </section>
 
-<!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 | Zweck: ersetzt die impliziten CSS-Text-Chevrons der Redirect-Navigation durch explizite globale Lucide-Icons; Umfang: nur die beiden content-link Einträge === -->
-<nav class="content-links" aria-label="Alternative Navigation">
-  <a class="content-link" href="/ueber/">
-    <span class="content-link__label">Zu Über Bocholt erleben</span>
-    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-  </a>
-  <a class="content-link" href="/">
-    <span class="content-link__label">Zurück zu den Events</span>
-    <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-  </a>
-</nav>
-<!-- === END BLOCK: ORGANIZER_REDIRECT_CONTENT_LINKS_LUCIDE_CHEVRONS_V1 === -->
-    </header>
+    <section class="content-card content-card--primary" aria-labelledby="organizer-membership-head">
+      <div class="content-form-section-head content-form-section-head--form">
+        <h2 id="organizer-membership-head">Tarif wählen</h2>
+        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+      </div>
+
+      <p class="content-note">
+        Wähle die passende Mitgliedschaft. Im nächsten Schritt wirst du zu Stripe weitergeleitet und bestätigst dort die monatliche Zahlung.
+      </p>
+
+      <form class="content-form" id="organizer-membership-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field content-field--full" for="organizer-membership-organization">
+            <span class="content-field__label">Veranstalter / Organisation *</span>
+            <input class="content-field__control" id="organizer-membership-organization" name="organization" type="text" required>
+          </label>
+
+          <label class="content-field" for="organizer-membership-contact">
+            <span class="content-field__label">Ansprechperson</span>
+            <input class="content-field__control" id="organizer-membership-contact" name="contact" type="text">
+          </label>
+
+          <label class="content-field" for="organizer-membership-email">
+            <span class="content-field__label">E-Mail-Adresse *</span>
+            <input class="content-field__control" id="organizer-membership-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          </label>
+
+          <label class="content-field content-field--full" for="organizer-membership-plan">
+            <span class="content-field__label">Tarif *</span>
+            <select class="content-field__control" id="organizer-membership-plan" name="plan" required>
+              <option value="starter">Starter · 9,99 € / Monat · bis zu 3 veröffentlichte Termine pro Monat</option>
+              <option value="active">Aktiv · 19,99 € / Monat · bis zu 8 veröffentlichte Termine pro Monat</option>
+              <option value="unlimited">Dauerhaft · 29,99 € / Monat · viele veröffentlichte Termine im üblichen Rahmen</option>
+            </select>
+            <p class="content-field__hint" id="organizer-membership-plan-hint">Starter passt für bis zu 3 veröffentlichte Termine pro Monat.</p>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline">
+          <button class="content-cta content-cta--primary" id="organizer-membership-submit" type="submit">
+            Weiter zur Zahlungsmethode
+          </button>
+        </div>
+        <p class="content-note">
+          Nach erfolgreicher Zahlung kannst du Veranstaltungen über deine Mitgliedschaft einreichen. Die Veröffentlichung erfolgt jeweils nach Prüfung.
+        </p>
+      </form>
+
+      <section class="content-card content-card--primary" id="organizer-membership-result" hidden>
+        <p id="organizer-membership-result-text"></p>
+      </section>
+    </section>
   </main>
-  <!-- === END BLOCK: ORGANIZER_REDIRECT_BODY_V2 === -->
-  <!-- === BEGIN BLOCK: ORGANIZER_REDIRECT_ICON_RUNTIME_V1 | Zweck: lädt die globale Icon-Registry auch auf /fuer-veranstalter/, damit explizite data-ui-icon-Slots wie content-link__chevron tatsächlich als Lucide-SVG gerendert werden; Umfang: nur Script-Include direkt vor </body> === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V9 === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_FEEDBACK_SCRIPT_WIRING_V1 | Zweck: lädt Feedback und Konfiguration konsistent wie auf den übrigen Veranstalter-/Payment-Seiten; Umfang: Script-Imports am Ende von /fuer-veranstalter/ === -->
+  <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
-  <!-- === END BLOCK: ORGANIZER_REDIRECT_ICON_RUNTIME_V1 === -->
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/organizer-membership.js?v=2026-05-08-membership-wording-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_FEEDBACK_SCRIPT_WIRING_V1 === -->
+  <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_BODY_V3_REGULAR_MODELS === -->
 </body>
 </html>

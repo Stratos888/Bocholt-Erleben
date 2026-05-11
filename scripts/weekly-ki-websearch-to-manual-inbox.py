@@ -39,24 +39,35 @@ from openai import OpenAI
 ROOT = Path(__file__).resolve().parents[1]
 TMP_DIR = ROOT / ".tmp" / "weekly-ki-eventsuche"
 
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_PATH_CONFIG_V1 | Zweck: Output-, Quellen- und passive Diagnosepfade zentral konfigurieren | Umfang: ergänzt Coverage-Targets und Diagnose-JSON ohne Suchprompt-Einfluss ===
 REGELWERK_PATH = Path(os.environ.get("EVENT_RULEBOOK_PATH", str(ROOT / "bocholt-erleben_eventsuche_regelwerk_v3.md")))
+SOURCES_REGISTER_PATH = Path(os.environ.get("EVENT_SOURCES_REGISTER_PATH", str(ROOT / "eventsuche_quellenregister_v1.md")))
 MANUAL_JSON_PATH = Path(os.environ.get("MANUAL_INBOX_JSON_PATH", str(ROOT / "data" / "inbox_manual.json")))
+SOURCE_CANDIDATES_JSON_PATH = Path(os.environ.get("SOURCE_CANDIDATES_JSON_PATH", str(ROOT / "data" / "source_candidates.json")))
+COVERAGE_TARGETS_JSON_PATH = Path(os.environ.get("COVERAGE_TARGETS_JSON_PATH", str(ROOT / "data" / "event_coverage_targets.json")))
+DIAGNOSTICS_JSON_PATH = Path(os.environ.get("WEEKLY_DIAGNOSTICS_JSON_PATH", str(TMP_DIR / "weekly_event_diagnostics.json")))
 
 TMP_EVENTS_TSV_PATH = Path(os.environ.get("TMP_EVENTS_TSV_PATH", str(TMP_DIR / "events.tsv")))
 TMP_INBOX_TSV_PATH = Path(os.environ.get("TMP_INBOX_TSV_PATH", str(TMP_DIR / "inbox.tsv")))
 TMP_ARCHIVE_TSV_PATH = Path(os.environ.get("TMP_ARCHIVE_TSV_PATH", str(TMP_DIR / "inbox_archive.tsv")))
+# === END BLOCK: WEEKLY_DIAGNOSTICS_PATH_CONFIG_V1 ===
 
 TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
 
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 | Zweck: Aufbau-/Backfill-Lauf mit 210-Tage-Suchfenster; offene Inbox warnt nur, Manual-Puffer bleibt harter Guard | Umfang: setzt Suchhorizont, Kandidatenlimit und Guard-/Warn-Konfiguration ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
-MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "40"))
-SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "180"))
+MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
+SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "210"))
 ALLOW_RADIUS_KM = int(os.environ.get("ALLOW_RADIUS_KM", "20"))
 
-FAIL_ON_PENDING_INBOX = os.environ.get("FAIL_ON_PENDING_INBOX", "true").lower() in {"1", "true", "yes"}
+WARN_ON_PENDING_INBOX = os.environ.get(
+    "WARN_ON_PENDING_INBOX",
+    os.environ.get("FAIL_ON_PENDING_INBOX", "true"),
+).lower() in {"1", "true", "yes"}
 FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
+# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 ===
 
 ALLOWED_CATEGORIES = {
     "Märkte & Feste",
@@ -93,10 +104,18 @@ def norm(value: Any) -> str:
 
 def norm_key(value: Any) -> str:
     return re.sub(r"\s+", " ", norm(value)).lower()
+# === BEGIN BLOCK: OUTPUT_TEXT_NORMALIZATION_HELPERS_V1 | Zweck: Modelltexte für JSON/Inbox-Ausgabe einzeilig und URL-sicher normalisieren | Umfang: ergänzt lokale Helper ohne globale norm()-Semantik zu verändern ===
+def clean_output_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", norm(value))
 
 
+def clean_url_text(value: Any) -> str:
+    return re.sub(r"\s+", "", norm(value))
+# === END BLOCK: OUTPUT_TEXT_NORMALIZATION_HELPERS_V1 ===
+
+# === BEGIN BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 | Zweck: URLs vor Parsing/JSON-Ausgabe von Whitespace und Trackingparametern bereinigen | Umfang: ersetzt canonical_url vollständig ===
 def canonical_url(raw: str) -> str:
-    raw = norm(raw)
+    raw = clean_url_text(raw)
     if not raw:
         return ""
     try:
@@ -118,6 +137,7 @@ def canonical_url(raw: str) -> str:
         fragment="",
     )
     return urlunparse(cleaned).rstrip("/")
+# === END BLOCK: URL_CANONICALIZATION_OUTPUT_SAFE_V2 ===
 
 
 def parse_iso_date(raw: str) -> date | None:
@@ -309,20 +329,25 @@ def read_manual_records() -> List[RefRecord]:
 # === END BLOCK: DATA LOADERS ===
 
 
-# === BEGIN BLOCK: PRE-RUN GUARDS ===
+# === BEGIN BLOCK: PRE_RUN_GUARDS_PENDING_INBOX_AS_DEDUPE_BASIS_V1 | Zweck: offene Inbox-Zeilen zählen, aber nicht mehr als Lauf-Blocker behandeln | Umfang: Manual-Puffer-Guard bleibt unverändert, Inbox bleibt Dedupe-Bestand ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
-# - Verhindert neue Suchläufe, wenn Review- oder Manual-Puffer noch offen sind
-# - Entspricht der Prozessregel des Regelwerks
+# - Zählt offene Review-Fälle in der Inbox für Observability
+# - Erhält Kompatibilität zu has_pending_inbox_rows(...)
+# - Die offene Inbox wird weiterhin in Prompt, lokalem Dedupe und Intake-Dedupe berücksichtigt
 # Umfang:
-# - Nur Guard-Checks
-# === END BLOCK: PRE-RUN GUARDS ===
+# - Nur Guard-/Zähl-Helper
+def is_pending_inbox_record(rec: RefRecord) -> bool:
+    return norm_key(rec.status) not in {"übernommen", "verworfen"}
+
+
+def count_pending_inbox_rows(records: List[RefRecord]) -> int:
+    return sum(1 for rec in records if is_pending_inbox_record(rec))
+
+
 def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
-    for rec in records:
-        if norm_key(rec.status) not in {"übernommen", "verworfen"}:
-            return True
-    return False
-# === END BLOCK: PRE-RUN GUARDS ===
+    return count_pending_inbox_rows(records) > 0
+# === END BLOCK: PRE_RUN_GUARDS_PENDING_INBOX_AS_DEDUPE_BASIS_V1 ===
 
 
 # === BEGIN BLOCK: PROMPT BUNDLE BUILDERS ===
@@ -336,7 +361,7 @@ def has_pending_inbox_rows(records: List[RefRecord]) -> bool:
 def build_manifest(label: str, records: List[RefRecord], start: date, end: date) -> str:
     lines = [f"[{label}]"]
     for rec in records:
-        if not rec.date or not date_in_window(rec.date, start, end):
+        if rec.date and not date_in_window(rec.date, start, end):
             continue
         lines.append(
             " | ".join(
@@ -358,7 +383,15 @@ def build_manifest(label: str, records: List[RefRecord], start: date, end: date)
     return "\n".join(lines)
 
 
-def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V3 | Zweck: Aufbau-/Backfill-Lauf mit 24er Zielkorridor, Pflicht-Cluster-Abdeckung und hartem Output-Vertrag | Umfang: ersetzt build_messages vollständig, hält Event-/Quellen-Output getrennt ===
+def build_messages(
+    rulebook_text: str,
+    sources_register_text: str,
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
@@ -371,30 +404,355 @@ def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_re
         ]
     )
 
-    system_prompt = (
-        "Du führst die wöchentliche KI-Eventsuche für Bocholt erleben aus. "
-        "Nutze aktiv die Websuche, suche systematisch und liefere nur neue Delta-Kandidaten. "
-        "Halte das Regelwerk strikt ein. Kein Fließtext, keine Kommentare im Ergebnis."
-    )
+    system_prompt = """
+Du führst die KI-Eventsuche für Bocholt erleben aus.
 
-    user_prompt = (
-        f"[REGELWERK]\n{rulebook_text}\n[/REGELWERK]\n\n"
-        "[AUFGABE]\n"
-        f"Suche neue, echte, veröffentlichungsreife Events für Bocholt erleben ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft.\n"
-        f"Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis, inklusive niederländischer Orte innerhalb dieses Radius.\n"
-        f"Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten.\n"
-        "Suche systematisch über offizielle kommunale Kalender, offizielle Veranstalterseiten, offizielle Kultur-/Museumsseiten und offizielle NL-Seiten im Radius.\n"
-        "Deduped strikt gegen Bestand, offene Inbox, Archiv und vorhandene Manual-Kandidaten aus dem Kontext-Bundle.\n"
-        "Jedes Objekt muss genau eine konkrete Termin-Instanz repräsentieren.\n"
-        "Beschreibungen müssen kurz, neutral, facts-only und neu formuliert sein.\n"
-        "[/AUFGABE]\n\n"
-        f"{context_bundle}"
-    )
+Arbeite streng, konservativ, produktionsnah, quellenbasiert und systematisch.
+Nutze aktiv die Websuche.
+Halte das beigefügte Regelwerk strikt ein.
+Nutze das beigefügte Quellenregister als operative Quellensteuerung.
+Liefere nur neue Delta-Kandidaten.
+
+Dieser Lauf ist in der aktuellen Projektphase ein Aufbau-/Backfill-orientierter Produktionslauf:
+- Ziel ist möglichst vollständige Abdeckung der starken Quellen- und Eventcluster im konfigurierten Suchzeitraum.
+- Du musst die definierten Quellencluster systematisch prüfen, bevor du den Lauf abschließt.
+- Du darfst und sollst mehr als 12 Kandidaten liefern, wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind.
+- Keine künstliche Auffüllung mit schwachen Treffern.
+- Wenn eine Quelle viele echte starke Instanzen liefert, dürfen mehrere Instanzen ausgegeben werden.
+- Wenn eine Quelle nur schwache oder bereits bekannte Treffer liefert, gib daraus nichts aus.
+
+Im Automationsmodus gilt für Events:
+- nur FINAL
+- kein REVIEW
+- kein Fließtext außerhalb des JSON
+- keine Kommentare außerhalb des JSON
+
+Zusätzlich sammelst du neue Quellen separat als source_candidates.
+source_candidates sind keine Events und dürfen niemals in die Event-Inbox gemischt werden.
+
+Wichtig:
+- Nicht jeder formal korrekte Termin ist FINAL-tauglich.
+- FINAL bedeutet hier: formal belastbar und zugleich redaktionell stark genug für die Kuratierungs-PWA.
+- Neue Quellen dürfen als Nebenfund dokumentiert werden, werden aber nicht automatisch dauerhaft ins Quellenregister übernommen.
+""".strip()
+
+    user_prompt = f"""
+[REGELWERK]
+{rulebook_text}
+[/REGELWERK]
+
+[QUELLENREGISTER]
+{sources_register_text}
+[/QUELLENREGISTER]
+
+[AUFGABE]
+Simuliere den späteren automatisierten Aufbau-/Backfill-Produktionslauf für Bocholt erleben so nah wie möglich.
+
+Rahmen:
+- Zeitraum: ab heute bis {SEARCH_WINDOW_DAYS} Tage in die Zukunft
+- Suchgebiet: Bocholt + maximal ca. {ALLOW_RADIUS_KM} km Umkreis inklusive niederländischer Orte innerhalb dieses Radius
+- Liefere höchstens {MAX_NEW_CANDIDATES} neue Delta-Kandidaten
+- Wenn mehr als 12 starke FINAL-Kandidaten vorhanden sind, liefere mehr als 12
+- Wenn weniger als {MAX_NEW_CANDIDATES} starke FINAL-Kandidaten vorhanden sind, liefere weniger
+- Deduped strikt gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON
+- Deduped zusätzlich innerhalb des aktuellen Laufs gegen bereits ausgewählte Kandidaten
+- Liefere lieber weniger starke FINAL-Kandidaten als schwache oder unsichere Treffer
+- Fülle die Zielmenge niemals künstlich mit nur formal korrekten, aber schwachen Kandidaten auf
+
+Ziel dieses Laufs:
+- möglichst viele wirklich gute neue Event-Kandidaten im aktuellen Suchzeitraum finden
+- bekannte starke Eventcluster systematisch abarbeiten
+- nicht nach den ersten plausiblen Treffern abbrechen
+- nur dann keine Kandidaten aus einem Cluster liefern, wenn dort keine neuen, starken, regelkonformen Delta-Kandidaten übrig sind
+
+Verpflichtende Abdeckungs-Checkliste vor Abschluss:
+Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus diesen Clustern neue starke Delta-Kandidaten vorhanden sind:
+
+1. Bocholt CORE-HIGH:
+   - `bocholt.de/veranstaltungskalender/*`
+   - `bocholt.de/freizeit-und-tourismus/veranstaltungen/*`
+   - starke Stadt-Bocholt-Detailseiten
+   - besonders: Feste, Festivals, Familienformate, Kultur, Musik, Innenstadt, Märkte, Open-Air
+
+2. Bocholt RECOVERY:
+   - offizielle Bocholt-Info-/News-/Themen-Seiten mit klarem Eventfokus
+   - bekannte starke Recovery-Muster wie Kulturtage, Interkulturelle Woche, Weinfest, Aasee, Kirmes, Lichtersonntag, Weihnachtsmarkt, Innenstadt- und Familienformate
+   - diese Recovery-URLs explizit prüfen:
+     - `https://www.bocholt.de/kulturtage`
+     - `https://www.bocholt.de/Interkulturellewoche`
+     - `https://www.bocholt.de/freizeit-und-tourismus/veranstaltungen/weinfest`
+     - `https://www.bocholt.de/veranstaltungskalender/aasee-festival-1`
+     - `https://www.bocholt.de/veranstaltungskalender/kirmes-2026`
+     - `https://www.bocholt.de/veranstaltungskalender/lichtersonntag-2026`
+     - `https://www.bocholt.de/veranstaltungskalender/bocholter-weihnachtsmarkt-2026`
+   - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
+
+3. Rhede CORE-MID:
+   - `rhede.de/regional/veranstaltungen/detail-*`
+   - starke öffentliche Stadt-/Kultur-/Innenstadttermine
+   - kleine Führungen, Standardmärkte und nischige Einzeltermine nur bei klarer öffentlicher Relevanz
+
+4. Aalten / NL-Nahraum:
+   - `aaltendagen.nl/*`
+   - alle belegbaren AaltenDagen 2026 im Suchzeitraum aktiv prüfen
+   - AaltenDag-Termine als getrennte Tagesinstanzen ausgeben, wenn Datum/Instanz getrennt sind
+   - bei AaltenDag keine einzelne Tagesblock-Zeit als allgemeine Startzeit verwenden, wenn mehrere Tagesblöcke genannt sind; dann `time` leer lassen
+
+5. Borken / FARB / Jubiläums-/Kulturquellen:
+   - `farb.borken.de`
+   - `800.borken.de`
+   - nur starke öffentliche Formate übernehmen
+   - Ausstellungen, Vorschau- und Museumsseiten streng filtern
+
+6. Bredevoort / Koppelkerk:
+   - `koppelkerk.nl/agenda/*`
+   - `koppelkerk.nl/evenementen/*`
+   - alle belegbaren Koppelkerk-Bücherbörsen im Suchzeitraum aktiv prüfen:
+     - Internationale Pinksterboekenmarkt
+     - Internationale Zomerboekenmarkt
+     - Internationale Augustusboekenmarkt
+     - Internationale Herfstboekenmarkt
+   - Bücherbörsen und Märkte bevorzugt als `Märkte & Feste` kategorisieren
+   - kleine Buchvorstellungen, Spezialkonzerte oder Nischenformate nur bei erkennbarem Breiteninteresse
+
+7. Isselburg / Hamminkeln / Randgebiet:
+   - offizielle kommunale Veranstaltungsseiten
+   - nur bei klarer Nähe, starkem Eventcharakter und sicherer Instanz-URL übernehmen
+   - keine falschen Datums-/Serien-URLs übernehmen
+
+8. Saisonale starke Einzelseiten aus dem Quellenregister:
+   - `wijnfeest-aalten.nl/*`
+   - `countryfair.de/*`
+   - `bredevoortschittert.nl/*`
+   - `cityart-bocholt.de/*`
+   - `oldtimertreffenaalten.nl/*`
+   - `grensmarktdinxperlo.com/*`
+   - nur konkrete Jahresinstanz übernehmen
+   - bei unsicherem Jahr, unklarer Aktualität oder fehlender Detailbasis nicht als FINAL ausgeben
+
+9. Kontrollierte offene Suche:
+   - Suche ergänzend nach starken Eventmustern im Suchgebiet, z. B. Festival, Markt, Open Air, Stadtfest, Familienfest, Kultur, Konzert, Theater, Ausstellung mit Eventcharakter
+   - Wenn dabei eine neue gute Quelle auftaucht, dokumentiere sie nur in source_candidates
+   - Neue Quelle nur als Eventquelle nutzen, wenn sie regelkonform, erreichbar, instanzpassend und nicht gesperrt ist
+
+Pflichtprüfung bekannter Highlight-Cluster:
+Vor der finalen Ausgabe aktiv prüfen, ob diese starken Kandidaten vorhanden, bereits entschieden oder nicht FINAL-sicher sind:
+- Bocholter Weinfest
+- Bocholter Aasee-Festival
+- 2. Bocholter CSD
+- Bocholter Kulturtage
+- OPEN AIR am Marktplatz
+- Weltkindertagsfest / Eröffnung Interkulturelle Woche
+- Bocholter Kirmes
+- Lichtersonntag
+- Bocholter Weihnachtsmarkt
+- City Food Festival
+- WattExtra Open Air am Bahia
+- CityArt Bocholt
+- Farm & Country Fair
+- Bredevoort Leuchtet
+- alle AaltenDagen 2026 im Zeitraum
+- alle Koppelkerk-Bücherbörsen 2026 im Zeitraum
+- starke neue Stadt-Bocholt-Kultur-/Familien-/Open-Air-Termine
+
+Wenn einer dieser Kandidaten nicht in candidates erscheint, darf das nur einen dieser Gründe haben:
+- bereits in BESTAND_EVENTS vorhanden
+- bereits in OFFENE_INBOX vorhanden
+- bereits in ARCHIV entschieden
+- bereits in MANUAL_JSON vorhanden
+- außerhalb Zeitraum
+- nicht FINAL-sicher belegbar
+- wegen Regelwerk ausgeschlossen
+
+Konkrete Einzeltermine vor Sammelklammern:
+- Wenn eine Quelle eine Themenwoche oder Reihe enthält, bevorzuge konkrete starke Einzeltermine.
+- Bei `Interkulturelle Woche` nicht automatisch die ganze Woche als Event ausgeben.
+- Wenn der konkrete Einzeltermin `Weltkindertagsfest / Eröffnung Interkulturelle Woche` mit Datum, Uhrzeit und Ort belegbar ist, gib diesen Einzeltermin aus.
+- Die ganze Interkulturelle Woche nur ausgeben, wenn kein konkreter starker Einzeltermin sauber extrahierbar ist.
+
+Keine Routine-Fülltreffer:
+- Regelmäßig wiederkehrende Standardmärkte, Krammärkte, Wochenmärkte, Routine-Führungen, Standardkurse und reine Serienformate NICHT massenhaft als FINAL ausgeben.
+- Solche Formate nur aufnehmen, wenn sie einen klar besonderen Eventcharakter, außergewöhnliche öffentliche Relevanz oder deutlichen PWA-Nutzen haben.
+- Mehrere normale Krammarkt-Termine aus derselben generischen Quelle nicht als Backfill-Füllmasse ausgeben.
+- Wenn starke Highlight-Kandidaten verfügbar sind, haben sie Vorrang vor Routine-/Serienterminen.
+
+Harte Prüfregeln vor FINAL:
+- Ein FINAL-Eintrag repräsentiert entweder genau eine einzelne besuchbare Termin-Instanz oder genau ein zusammenhängendes Mehrtagesevent.
+- Zusammenhängende Mehrtagesevents bleiben ein Eintrag mit `date` und `endDate`, wenn die Quelle sie klar als ein zusammenhängendes Event darstellt.
+- Unterschiedliche tägliche Zeiten oder Öffnungszeiten erzwingen bei zusammenhängenden Mehrtagesevents nicht automatisch ein Splitting.
+- Splitten nur dann, wenn Tage, Slots oder Programmpunkte als eigenständige separat besuchbare Instanzen zu verstehen sind.
+- `time` ist ausschließlich eine Startzeit im Format `HH:MM`.
+- Niemals Zeiträume wie `16:00–23:59`, `13:00-20:00` oder Öffnungszeitspannen in `time` ausgeben.
+- Wenn ein Event als zusammenhängendes Mehrtagesevent bestehen bleibt und pro Tag unterschiedliche Zeiten nennt, muss `time` leer bleiben.
+- Wenn ein Event als zusammenhängendes Mehrtagesevent eine wirklich einheitliche Startzeit für das gesamte Event nennt, darf `time` als `HH:MM` gesetzt werden.
+- Niemals die erste sichtbare Tageszeit oder irgendeine Einzelzeit als allgemeine `time` für ein zusammenhängendes Mehrtagesevent übernehmen.
+- Wenn die URL erkennbar nicht zur gewählten Instanz passt, ist FINAL unzulässig.
+- Wenn eine Unterlocation nicht 100% sicher belegt ist, auf die sicher belegte Hauptlocation zurückfallen.
+- Offizielle event-spezifische Info-/News-Seiten bleiben FINAL-fähig, wenn sie klar auch für Besucher gedacht sind und Titel, Datum, Ort, Eventcharakter sauber tragen.
+- Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite nicht automatisch ungeeignet.
+- Vorschau-/Teaser-/Save-the-date-Seiten nur dann FINAL, wenn Titel, Datum, Ort und Besucherfokus im gleichen klaren sichtbaren Kernblock belastbar sind.
+- Wenn Scope unklar ist: nicht ausgeben.
+- Wenn Pflichtfelder nicht 100% sicher sind: nicht ausgeben.
+- Wenn eine Quelle vor allem eine monetarisierungsrelevante Venue promotet und kein neutraler/öffentlicher Drittquellen-Fall vorliegt: nicht ausgeben.
+
+Redaktionelle Qualitäts-Schwelle für FINAL:
+Ein Kandidat ist nur dann FINAL-tauglich, wenn er nicht nur formal korrekt ist, sondern auch einen klaren Mehrwert für die Kuratierungs-PWA hat.
+
+Nicht ausreichend für FINAL ist ein Termin, wenn er hauptsächlich:
+- formal korrekt, aber für normale Nutzer nur schwach interessant ist
+- sehr speziell, nischig oder kleinteilig wirkt
+- eher wie ein interner, edukativer oder halbgeschlossener Spezialtermin wirkt
+- eher wie eine Vorschau-, Programm- oder Hintergrundseite ohne starken Event-Zug wirkt
+- eher eine Dauer-/Ausstellungspräsenz als ein wirklich starker Event-Kandidat ist
+- eher eine kleine Kurs-, Workshop-, Resilienz-, Seminar- oder Mitmach-Einheit mit begrenztem Breiteninteresse ist
+- eher eine Innenstadt-/Marketing-/Shopping-Aktion ohne klar starken Eventcharakter ist
+
+Besonders streng behandeln:
+- länger laufende Ausstellungen
+- Vorschau-/Museumseinträge
+- Kurse
+- Workshops
+- Resilienz-, Bildungs- oder Spezialformate
+- kleine Ferienprogramme
+- Innenstadtaktionen
+- Handels- und Promotionsformate
+
+Solche Fälle nur dann FINAL, wenn zusätzlich mindestens einer dieser Punkte klar erfüllt ist:
+- hohe öffentliche Relevanz für Bocholt oder den Nahraum
+- klarer Eventcharakter mit starkem Besuchsanlass
+- außergewöhnlich hoher PWA-Nutzen
+- deutliche Breitenattraktivität
+- besondere lokale Relevanz oder Stadtbedeutung
+- starkes öffentliches Programm statt bloßer Hintergrund-/Informationsseite
+
+Bevorzugt in FINAL:
+- Stadtfeste
+- Märkte
+- Festivals
+- Konzerte
+- Theater / Bühne
+- familienrelevante Großtermine
+- Innenstadtfeste mit klarem Programm
+- Messen mit klarer Besucherrelevanz
+- Open-Air-Events
+- besondere Aktionstage / Tage der offenen Tür / öffentlich starke Kulturtermine
+- klar sichtbare Highlights mit Bocholt- oder Nahraum-Relevanz
+
+Priorisierung:
+Priorisiere FINAL-Kandidaten nach:
+1. öffentlicher Relevanz
+2. Bocholt-Nähe
+3. Breiteninteresse
+4. PWA-Nutzen
+5. Faktenvollständigkeit / Quellensauberkeit
+
+Wenn ein Kandidat zwar formal korrekt, aber redaktionell schwach ist:
+- nicht ausgeben
+
+Output-Vertrag:
+Gib ausschließlich ein valides JSON-Objekt mit genau diesen zwei Schlüsseln zurück:
+
+{{
+  "candidates": [],
+  "source_candidates": []
+}}
+
+Jeder Eintrag in candidates MUSS exakt diese Felder enthalten:
+- title
+- date
+- endDate
+- time
+- city
+- location
+- kategorie_suggestion
+- url
+- description
+- source_name
+- source_url
+- notes
+
+Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
+Lasse niemals ein Pflichtfeld weg.
+
+Beispiele:
+- Ein-Tages-Event ohne Enddatum: "endDate": ""
+- Event ohne sichere Startzeit: "time": ""
+- Mehrtagesevent ohne einheitliche Startzeit: "time": ""
+
+Jeder Eintrag in source_candidates MUSS exakt diese Felder enthalten:
+- domain
+- source_name
+- source_url_pattern
+- example_url
+- suggested_status
+- quality_signal
+- risk_signal
+- reason
+- usage_rule
+- evidence_events
+- notes
+
+Jeder Eintrag in evidence_events MUSS exakt diese Felder enthalten:
+- title
+- date
+- url
+
+Wenn ein Wert nicht vorhanden ist, setze ihn als leeren String "".
+Lasse niemals ein Pflichtfeld weg.
+
+JSON-Strenge:
+- Gib ausschließlich valides JSON nach RFC 8259 zurück.
+- Keine Markdown-Codeblöcke.
+- Keine Erklärung vor oder nach dem JSON.
+- Keine Kommentare.
+- Keine Tabellen.
+- Keine Zeilenumbrüche innerhalb von Stringwerten.
+- Keine sichtbaren Umbrüche in description, notes, url oder source_url.
+- URLs müssen getrimmt sein: keine Leerzeichen, keine Zeilenumbrüche.
+- Anführungszeichen innerhalb von Texten müssen korrekt escaped werden.
+- Jeder String muss gültig JSON-escaped sein.
+- Das Ergebnis muss direkt mit JSON.parse parsebar sein.
+- Die Antwort muss mit `{{` beginnen und mit `}}` enden.
+
+Zusätzliche interne Pflichtprüfung vor Event-Aufnahme:
+- echtes Event?
+- belastbare Quelle?
+- event-spezifische URL oder zulässige offizielle Ausnahme?
+- ist die URL wirklich instanzpassend?
+- Datum sicher?
+- Ort sicher?
+- ist die Ortsgranularität wirklich sicher?
+- Zeit nur wenn eindeutig?
+- gilt die Zeit wirklich für das gesamte Event?
+- falls Mehrtagesevent mit unterschiedlichen Tageszeiten: muss `time` leer bleiben?
+- repräsentiert der Eintrag genau eine besuchbare Instanz?
+- Mehrtageslogik korrekt?
+- Beschreibung neutral, sachlich und quellenbasiert?
+- keine Dublette gegen BESTAND_EVENTS, OFFENE_INBOX, ARCHIV und MANUAL_JSON?
+- keine Dublette innerhalb des aktuellen Outputs?
+- wirklich nützlich für die Kuratierungs-PWA?
+- ist der Kandidat nicht nur korrekt, sondern auch stark genug?
+- gibt es noch eine bessere offizielle Detailseite oder kanonischere URL?
+
+Zusätzliche interne Pflichtprüfung vor Quellenvorschlag:
+- Quelle noch nicht im Quellenregister enthalten?
+- Quelle belegt mindestens ein starkes oder fast starkes Event im Suchgebiet?
+- Quelle ist nicht Social-only?
+- Quelle ist nicht Ticketshop-only ohne offizielle Einordnung?
+- Quelle ist keine direkte Venue-Promo einer geschützten oder monetarisierungsrelevanten Location?
+- Quelle ist nicht EXCLUDE / GESPERRT?
+- Quelle hat eine plausible Einsatzregel für spätere Registerpflege?
+
+[KONTEXT_BUNDLE]
+{context_bundle}
+[/KONTEXT_BUNDLE]
+""".strip()
 
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
+# === END BLOCK: WEEKLY_PRODUCTION_PROMPT_WITH_SYSTEMATIC_BACKFILL_COVERAGE_V3 ===
 # === END BLOCK: PROMPT BUNDLE BUILDERS ===
 
 
@@ -406,7 +764,8 @@ def build_messages(rulebook_text: str, events_records: List[RefRecord], inbox_re
 # Umfang:
 # - Nur der Modellaufruf + Rohantwort-Extraktion
 # === END BLOCK: OPENAI SEARCH CALL ===
-def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, Any]], Any]:
+# === BEGIN BLOCK: OPENAI SEARCH CALL WITH SOURCE CANDIDATES V1 | Zweck: Responses-Output um separaten source_candidates-Kanal erweitern | Umfang: candidates bleiben Event-Importdaten, source_candidates nur Quellen-Merkliste ===
+def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], Any]:
     api_key = norm(os.environ.get("OPENAI_API_KEY", ""))
     if not api_key:
         fail("ENV OPENAI_API_KEY fehlt.")
@@ -462,9 +821,54 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
                                     "notes",
                                 ],
                             },
-                        }
+                        },
+                        "source_candidates": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": False,
+                                "properties": {
+                                    "domain": {"type": "string"},
+                                    "source_name": {"type": "string"},
+                                    "source_url_pattern": {"type": "string"},
+                                    "example_url": {"type": "string"},
+                                    "suggested_status": {"type": "string"},
+                                    "quality_signal": {"type": "string"},
+                                    "risk_signal": {"type": "string"},
+                                    "reason": {"type": "string"},
+                                    "usage_rule": {"type": "string"},
+                                    "evidence_events": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": False,
+                                            "properties": {
+                                                "title": {"type": "string"},
+                                                "date": {"type": "string"},
+                                                "url": {"type": "string"},
+                                            },
+                                            "required": ["title", "date", "url"],
+                                        },
+                                    },
+                                    "notes": {"type": "string"},
+                                },
+                                "required": [
+                                    "domain",
+                                    "source_name",
+                                    "source_url_pattern",
+                                    "example_url",
+                                    "suggested_status",
+                                    "quality_signal",
+                                    "risk_signal",
+                                    "reason",
+                                    "usage_rule",
+                                    "evidence_events",
+                                    "notes",
+                                ],
+                            },
+                        },
                     },
-                    "required": ["candidates"],
+                    "required": ["candidates", "source_candidates"],
                 },
             }
         },
@@ -484,8 +888,12 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
     if not isinstance(raw_candidates, list):
         fail("OpenAI-Antwort enthält kein gültiges candidates-Array.")
 
-    return raw_candidates, response
-# === END BLOCK: OPENAI SEARCH CALL ===
+    raw_source_candidates = payload.get("source_candidates", []) if isinstance(payload, dict) else []
+    if not isinstance(raw_source_candidates, list):
+        fail("OpenAI-Antwort enthält kein gültiges source_candidates-Array.")
+
+    return raw_candidates, raw_source_candidates, response
+# === END BLOCK: OPENAI SEARCH CALL WITH SOURCE CANDIDATES V1 ===
 
 
 # === BEGIN BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
@@ -496,107 +904,825 @@ def search_with_openai(messages: List[Dict[str, str]]) -> tuple[list[dict[str, A
 # Umfang:
 # - Nur Sicherungsnetz hinter der KI-Suche
 # === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
-def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str]]:
-    source_urls: set[str] = set()
-    with_time: set[str] = set()
-    without_time: set[str] = set()
+# === BEGIN BLOCK: LOCAL_POST_VALIDATION_DEDUPE_DIAGNOSTICS_V1 | Zweck: Pflichtfelder, Einzeilen-Strings, URL-Trim, Zeitformat, interne Dedupe und Drop-Gründe technisch diagnostizieren | Umfang: ersetzt lokale Post-Validation + Dedupe komplett ===
+CANDIDATE_OUTPUT_FIELDS = [
+    "title",
+    "date",
+    "endDate",
+    "time",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
+    "source_name",
+    "source_url",
+    "notes",
+]
+
+
+CANDIDATE_REQUIRED_NON_EMPTY_FIELDS = [
+    "title",
+    "date",
+    "city",
+    "location",
+    "kategorie_suggestion",
+    "url",
+    "description",
+    "source_name",
+    "source_url",
+    "notes",
+]
+
+
+def occurrence_fp(title: str, date_value: str, time_value: str, location: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+        norm(time_value),
+        norm_key(location),
+    ])
+
+
+def occurrence_fp_no_time(title: str, date_value: str, location: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+        "",
+        norm_key(location),
+    ])
+
+
+def title_date_fp(title: str, date_value: str) -> str:
+    return "|".join([
+        norm_key(title),
+        norm(date_value),
+    ])
+
+
+def source_date_fp(source_url: str, url: str, date_value: str) -> str:
+    source_key = norm_key(canonical_url(source_url) or canonical_url(url))
+    if not source_key:
+        return ""
+    return "|".join([
+        source_key,
+        norm(date_value),
+    ])
+
+
+def source_occurrence_fp(source_url: str, url: str, title: str, date_value: str, time_value: str, location: str) -> str:
+    source_key = norm_key(canonical_url(source_url) or canonical_url(url))
+    if not source_key:
+        return ""
+
+    return "|".join([
+        source_key,
+        norm_key(title),
+        norm(date_value),
+        norm(time_value),
+        norm_key(location),
+    ])
+
+
+def existing_sets(*groups: List[RefRecord]) -> tuple[set[str], set[str], set[str], set[str], set[str]]:
+    source_occurrences: set[str] = set()
+    exact_occurrences: set[str] = set()
+    no_time_occurrences_all: set[str] = set()
+    no_time_occurrences_missing_time: set[str] = set()
+    title_dates: set[str] = set()
 
     for group in groups:
         for rec in group:
-            if rec.source_url or rec.url:
-                source_urls.add(norm_key(rec.source_url or rec.url))
+            fp = occurrence_fp(rec.title, rec.date, rec.time, rec.location)
+            fp_no_time = occurrence_fp_no_time(rec.title, rec.date, rec.location)
+            src_fp = source_occurrence_fp(rec.source_url, rec.url, rec.title, rec.date, rec.time, rec.location)
+            title_date = title_date_fp(rec.title, rec.date)
 
-            fp = "|".join([norm_key(rec.title), rec.date, rec.time, norm_key(rec.location)])
-            fp_no_time = "|".join([norm_key(rec.title), rec.date, "", norm_key(rec.location)])
-
+            if src_fp and src_fp != "|||||":
+                source_occurrences.add(src_fp)
             if fp != "|||":
-                with_time.add(fp)
+                exact_occurrences.add(fp)
             if fp_no_time != "|||":
-                without_time.add(fp_no_time)
+                no_time_occurrences_all.add(fp_no_time)
+            if not norm(rec.time) and fp_no_time != "|||":
+                no_time_occurrences_missing_time.add(fp_no_time)
+            if title_date != "|":
+                title_dates.add(title_date)
 
-    return source_urls, with_time, without_time
+    return source_occurrences, exact_occurrences, no_time_occurrences_all, no_time_occurrences_missing_time, title_dates
 
 
 def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
-    out = {k: norm(v) for k, v in item.items()}
-    out.setdefault("endDate", "")
-    out.setdefault("time", "")
+    out: Dict[str, str] = {}
 
-    out["source_url"] = canonical_url(out.get("source_url", ""))
-    out["url"] = canonical_url(out.get("url", "")) or out["source_url"]
-    out["source_url"] = out["source_url"] or out["url"]
+    for field in CANDIDATE_OUTPUT_FIELDS:
+        if field in {"url", "source_url"}:
+            out[field] = canonical_url(item.get(field, ""))
+        else:
+            out[field] = clean_output_text(item.get(field, ""))
+
+    out["url"] = canonical_url(out.get("url", "")) or canonical_url(out.get("source_url", ""))
+    out["source_url"] = canonical_url(out.get("source_url", "")) or out["url"]
 
     if out.get("kategorie_suggestion", "") not in ALLOWED_CATEGORIES:
         out["kategorie_suggestion"] = "Sonstiges"
 
-    out["notes"] = "manual chat search v3"
-    return out
+    if not out.get("notes"):
+        out["notes"] = "manual chat search v3"
+
+    return {field: out.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
+
+
+def candidate_in_window(item: Dict[str, str], start: date, end: date) -> bool:
+    start_date = parse_iso_date(item.get("date", ""))
+    if not start_date:
+        return False
+
+    end_date = parse_iso_date(item.get("endDate", "")) if item.get("endDate") else start_date
+    if not end_date:
+        return False
+
+    if end_date < start_date:
+        return False
+
+    return start_date <= end and end_date >= start
+
+
+def candidate_invalid_reason(item: Dict[str, str], start: date, end: date) -> str:
+    missing_fields = [field for field in CANDIDATE_OUTPUT_FIELDS if field not in item]
+    if missing_fields:
+        return "missing_output_field:" + ",".join(missing_fields)
+
+    missing_required = [field for field in CANDIDATE_REQUIRED_NON_EMPTY_FIELDS if not norm(item.get(field, ""))]
+    if missing_required:
+        return "missing_required:" + ",".join(missing_required)
+
+    if not parse_iso_date(item.get("date", "")):
+        return "invalid_date"
+    if item.get("endDate") and not parse_iso_date(item.get("endDate", "")):
+        return "invalid_endDate"
+    if item.get("endDate"):
+        start_date = parse_iso_date(item.get("date", ""))
+        end_date = parse_iso_date(item.get("endDate", ""))
+        if start_date and end_date and end_date < start_date:
+            return "endDate_before_date"
+    if item.get("time") and not re.match(r"^\d{2}:\d{2}$", item["time"]):
+        return "bad_time"
+    if not candidate_in_window(item, start, end):
+        return "out_of_window"
+
+    return ""
 
 
 def valid_candidate(item: Dict[str, str], start: date, end: date) -> bool:
-    required = ["title", "date", "city", "location", "source_name", "source_url"]
-    if any(not norm(item.get(k, "")) for k in required):
-        return False
-
-    if not parse_iso_date(item.get("date", "")):
-        return False
-    if item.get("endDate") and not parse_iso_date(item.get("endDate", "")):
-        return False
-    if not date_in_window(item["date"], start, end):
-        return False
-    if item.get("time") and not re.match(r"^\d{2}:\d{2}$", item["time"]):
-        return False
-
-    return True
+    return candidate_invalid_reason(item, start, end) == ""
 
 
-def filter_delta(raw_candidates: List[Dict[str, Any]], events_records: List[RefRecord], inbox_records: List[RefRecord], archive_records: List[RefRecord], manual_records: List[RefRecord]) -> List[Dict[str, str]]:
+def candidate_diag_summary(item: Dict[str, Any], reason: str, stage: str) -> Dict[str, str]:
+    normalized = normalize_candidate(item) if isinstance(item, dict) else {field: "" for field in CANDIDATE_OUTPUT_FIELDS}
+    return {
+        "stage": stage,
+        "reason": reason,
+        "title": clean_output_text(normalized.get("title", "")),
+        "date": clean_output_text(normalized.get("date", "")),
+        "endDate": clean_output_text(normalized.get("endDate", "")),
+        "time": clean_output_text(normalized.get("time", "")),
+        "city": clean_output_text(normalized.get("city", "")),
+        "location": clean_output_text(normalized.get("location", "")),
+        "url": canonical_url(normalized.get("url", "")),
+        "source_url": canonical_url(normalized.get("source_url", "")),
+    }
+
+
+def filter_delta_with_diagnostics(
+    raw_candidates: List[Dict[str, Any]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> tuple[List[Dict[str, str]], List[Dict[str, str]]]:
     start = datetime.now().date()
     end = start + timedelta(days=SEARCH_WINDOW_DAYS)
 
-    existing_source_urls, existing_fps, existing_fps_without_time = existing_sets(
+    existing_source_occurrences, existing_exact, existing_no_time_all, existing_no_time_missing, existing_title_dates = existing_sets(
         events_records,
         inbox_records,
         archive_records,
         manual_records,
     )
 
-    batch_source_urls: set[str] = set()
-    batch_fps: set[str] = set()
-    batch_fps_without_time: set[str] = set()
+    batch_source_occurrences: set[str] = set()
+    batch_source_dates: set[str] = set()
+    batch_exact: set[str] = set()
+    batch_no_time_all: set[str] = set()
+    batch_no_time_missing: set[str] = set()
+    batch_title_dates: set[str] = set()
 
     out: List[Dict[str, str]] = []
+    diagnostics: List[Dict[str, str]] = []
 
     for raw in raw_candidates:
         if not isinstance(raw, dict):
+            diagnostics.append(candidate_diag_summary({}, "non_object_raw_candidate", "validation"))
             continue
 
         item = normalize_candidate(raw)
-        if not valid_candidate(item, start, end):
+        invalid_reason = candidate_invalid_reason(item, start, end)
+        if invalid_reason:
+            diagnostics.append(candidate_diag_summary(item, invalid_reason, "validation"))
             continue
 
-        source_url_key = norm_key(item.get("source_url", "") or item.get("url", ""))
-        fp = "|".join([norm_key(item.get("title", "")), item.get("date", ""), item.get("time", ""), norm_key(item.get("location", ""))])
-        fp_no_time = "|".join([norm_key(item.get("title", "")), item.get("date", ""), "", norm_key(item.get("location", ""))])
+        title = item.get("title", "")
+        date_value = item.get("date", "")
+        time_value = item.get("time", "")
+        location = item.get("location", "")
+        has_time = bool(norm(time_value))
 
-        if source_url_key and (source_url_key in existing_source_urls or source_url_key in batch_source_urls):
+        fp = occurrence_fp(title, date_value, time_value, location)
+        fp_no_time = occurrence_fp_no_time(title, date_value, location)
+        title_date = title_date_fp(title, date_value)
+        src_date = source_date_fp(item.get("source_url", ""), item.get("url", ""), date_value)
+        src_fp = source_occurrence_fp(
+            item.get("source_url", ""),
+            item.get("url", ""),
+            title,
+            date_value,
+            time_value,
+            location,
+        )
+
+        drop_reason = ""
+        if title_date in existing_title_dates:
+            drop_reason = "existing_title_date"
+        elif title_date in batch_title_dates:
+            drop_reason = "batch_title_date"
+        elif src_date and src_date in batch_source_dates:
+            drop_reason = "batch_source_date"
+        elif src_fp and src_fp in existing_source_occurrences:
+            drop_reason = "existing_source_occurrence"
+        elif src_fp and src_fp in batch_source_occurrences:
+            drop_reason = "batch_source_occurrence"
+        elif has_time and fp in existing_exact:
+            drop_reason = "existing_exact_occurrence"
+        elif has_time and fp in batch_exact:
+            drop_reason = "batch_exact_occurrence"
+        elif has_time and fp_no_time in existing_no_time_missing:
+            drop_reason = "existing_no_time_missing_occurrence"
+        elif has_time and fp_no_time in batch_no_time_missing:
+            drop_reason = "batch_no_time_missing_occurrence"
+        elif not has_time and fp_no_time in existing_no_time_all:
+            drop_reason = "existing_no_time_occurrence"
+        elif not has_time and fp_no_time in batch_no_time_all:
+            drop_reason = "batch_no_time_occurrence"
+
+        if drop_reason:
+            diagnostics.append(candidate_diag_summary(item, drop_reason, "dedupe"))
             continue
-        if fp in existing_fps or fp in batch_fps:
+
+        selected = {field: item.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
+        out.append(selected)
+        diagnostics.append(candidate_diag_summary(selected, "selected", "selected"))
+
+        if src_fp:
+            batch_source_occurrences.add(src_fp)
+        if src_date:
+            batch_source_dates.add(src_date)
+        batch_exact.add(fp)
+        batch_no_time_all.add(fp_no_time)
+        batch_title_dates.add(title_date)
+        if not has_time:
+            batch_no_time_missing.add(fp_no_time)
+
+    return out, diagnostics
+
+
+def filter_delta(
+    raw_candidates: List[Dict[str, Any]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
+    selected, _diagnostics = filter_delta_with_diagnostics(
+        raw_candidates,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )
+    return selected
+# === END BLOCK: LOCAL_POST_VALIDATION_DEDUPE_DIAGNOSTICS_V1 ===
+
+# === BEGIN BLOCK: SOURCE_CANDIDATE_LEARNING_DIAGNOSTICS_V2 | Zweck: neue Quellenkandidaten separat sammeln und Annahme-/Ablehnungsgründe diagnostizieren | Umfang: ersetzt Source-Candidate-Normalisierung und Merge vollständig ===
+def source_domain(raw_url: str) -> str:
+    raw = norm(raw_url)
+    if not raw:
+        return ""
+
+    try:
+        parsed = urlparse(raw)
+        if not parsed.netloc and not raw.startswith(("http://", "https://")):
+            parsed = urlparse("https://" + raw)
+    except Exception:
+        return ""
+
+    netloc = parsed.netloc.lower().strip()
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+    return netloc
+
+
+def source_key_from_item(item: Dict[str, Any]) -> str:
+    domain = norm_key(item.get("domain", "")) or source_domain(str(item.get("example_url", "")))
+    pattern = norm_key(item.get("source_url_pattern", ""))
+    return "|".join([domain, pattern])
+
+
+def source_known_in_register(item: Dict[str, Any], sources_register_text: str) -> bool:
+    register = norm_key(sources_register_text)
+    domain = norm_key(item.get("domain", ""))
+    pattern = norm_key(item.get("source_url_pattern", ""))
+    compact_pattern = pattern.replace("/*", "").strip()
+
+    if domain and domain in register:
+        return True
+    if compact_pattern and compact_pattern in register:
+        return True
+    return False
+
+
+def read_source_candidates() -> List[Dict[str, Any]]:
+    if not SOURCE_CANDIDATES_JSON_PATH.exists():
+        return []
+
+    try:
+        raw = json.loads(SOURCE_CANDIDATES_JSON_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        fail(f"data/source_candidates.json ist ungültig: {exc}")
+
+    if not isinstance(raw, list):
+        fail("data/source_candidates.json muss ein JSON-Array sein.")
+
+    return [item for item in raw if isinstance(item, dict)]
+
+
+def source_candidate_diag_summary(
+    raw: Dict[str, Any] | None,
+    reason: str,
+    stage: str,
+    normalized: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    data = normalized if normalized is not None else (raw if isinstance(raw, dict) else {})
+    evidence_events = data.get("evidence_events", []) if isinstance(data, dict) else []
+    if not isinstance(evidence_events, list):
+        evidence_events = []
+
+    evidence_titles: List[str] = []
+    for ev in evidence_events[:5]:
+        if isinstance(ev, dict):
+            title = clean_output_text(ev.get("title", ""))
+            date_value = clean_output_text(ev.get("date", ""))
+            if title or date_value:
+                evidence_titles.append(f"{date_value} | {title}".strip())
+
+    example_url = canonical_url(data.get("example_url", "")) if isinstance(data, dict) else ""
+    domain = clean_output_text(data.get("domain", "")) if isinstance(data, dict) else ""
+    if not domain and example_url:
+        domain = source_domain(example_url)
+    if domain.startswith("www."):
+        domain = domain[4:]
+
+    return {
+        "stage": stage,
+        "reason": reason,
+        "domain": domain,
+        "source_name": clean_output_text(data.get("source_name", "")) if isinstance(data, dict) else "",
+        "source_url_pattern": clean_output_text(data.get("source_url_pattern", "")) if isinstance(data, dict) else "",
+        "example_url": example_url,
+        "suggested_status": clean_output_text(data.get("suggested_status", "")) if isinstance(data, dict) else "",
+        "evidence_events_count": len(evidence_events),
+        "evidence_event_titles": evidence_titles,
+    }
+
+
+def normalize_source_candidate_with_reason(item: Dict[str, Any], today: date) -> tuple[Dict[str, Any] | None, str]:
+    if not isinstance(item, dict):
+        return None, "non_object_source_candidate"
+
+    evidence_events = item.get("evidence_events", [])
+    if not isinstance(evidence_events, list):
+        evidence_events = []
+
+    clean_evidence: List[Dict[str, str]] = []
+    for ev in evidence_events[:5]:
+        if not isinstance(ev, dict):
             continue
-        if fp_no_time in existing_fps_without_time or fp_no_time in batch_fps_without_time:
+        clean_evidence.append(
+            {
+                "title": clean_output_text(ev.get("title", "")),
+                "date": clean_output_text(ev.get("date", "")),
+                "url": canonical_url(ev.get("url", "")),
+            }
+        )
+
+    example_url = canonical_url(item.get("example_url", ""))
+    domain = clean_output_text(item.get("domain", "")) or source_domain(example_url)
+    if domain.startswith("www."):
+        domain = domain[4:]
+
+    out: Dict[str, Any] = {
+        "domain": domain,
+        "source_name": clean_output_text(item.get("source_name", "")),
+        "source_url_pattern": clean_output_text(item.get("source_url_pattern", "")) or (f"{domain}/*" if domain else ""),
+        "example_url": example_url,
+        "suggested_status": clean_output_text(item.get("suggested_status", "")) or "NEW-SOURCE-CANDIDATE",
+        "quality_signal": clean_output_text(item.get("quality_signal", "")),
+        "risk_signal": clean_output_text(item.get("risk_signal", "")),
+        "reason": clean_output_text(item.get("reason", "")),
+        "usage_rule": clean_output_text(item.get("usage_rule", "")),
+        "evidence_events": clean_evidence,
+        "first_seen": today.isoformat(),
+        "last_seen": today.isoformat(),
+        "found_via": "weekly-ki-websearch",
+        "status": "neu",
+        "notes": clean_output_text(item.get("notes", "")),
+    }
+
+    required = [
+        "domain",
+        "source_name",
+        "source_url_pattern",
+        "example_url",
+        "suggested_status",
+        "reason",
+        "usage_rule",
+    ]
+    missing_required = [k for k in required if not norm(out.get(k, ""))]
+    if missing_required:
+        return out, "missing_required:" + ",".join(missing_required)
+    if not clean_evidence:
+        return out, "missing_evidence_events"
+
+    return out, ""
+
+
+def normalize_source_candidate(item: Dict[str, Any], today: date) -> Dict[str, Any] | None:
+    normalized, reason = normalize_source_candidate_with_reason(item, today)
+    if reason:
+        return None
+    return normalized
+
+
+def merge_source_candidates_with_diagnostics(
+    raw_source_candidates: List[Dict[str, Any]],
+    sources_register_text: str,
+) -> tuple[List[Dict[str, Any]], int, List[Dict[str, Any]]]:
+    existing = read_source_candidates()
+    today = datetime.now().date()
+
+    by_key: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+    diagnostics: List[Dict[str, Any]] = []
+
+    for item in existing:
+        if not isinstance(item, dict):
+            continue
+        key = source_key_from_item(item)
+        if not key.strip("|"):
+            continue
+        if key not in by_key:
+            by_key[key] = item
+            order.append(key)
+
+    added = 0
+    for raw in raw_source_candidates:
+        item, reason = normalize_source_candidate_with_reason(raw, today)
+        if reason:
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, reason, "validation", item))
+            continue
+        if item is None:
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "normalization_failed", "validation"))
             continue
 
-        out.append({k: v for k, v in item.items() if v != ""})
+        if source_known_in_register(item, sources_register_text):
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "known_in_register", "register", item))
+            continue
 
-        if source_url_key:
-            batch_source_urls.add(source_url_key)
-        batch_fps.add(fp)
-        batch_fps_without_time.add(fp_no_time)
+        key = source_key_from_item(item)
+        if not key.strip("|"):
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "empty_source_key", "validation", item))
+            continue
 
-    return out
-# === END BLOCK: LOCAL POST-VALIDATION + DEDUPE ===
+        if key in by_key:
+            current = by_key[key]
+            current["last_seen"] = today.isoformat()
+
+            existing_evidence = current.get("evidence_events", [])
+            if not isinstance(existing_evidence, list):
+                existing_evidence = []
+
+            seen_ev = {
+                "|".join(
+                    [
+                        norm_key(ev.get("title", "")),
+                        norm(ev.get("date", "")),
+                        canonical_url(ev.get("url", "")),
+                    ]
+                )
+                for ev in existing_evidence
+                if isinstance(ev, dict)
+            }
+
+            for ev in item["evidence_events"]:
+                ev_key = "|".join(
+                    [
+                        norm_key(ev.get("title", "")),
+                        norm(ev.get("date", "")),
+                        canonical_url(ev.get("url", "")),
+                    ]
+                )
+                if ev_key and ev_key not in seen_ev:
+                    existing_evidence.append(ev)
+                    seen_ev.add(ev_key)
+
+            current["evidence_events"] = existing_evidence[:10]
+            diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "merged_existing_candidate", "merge", item))
+            continue
+
+        by_key[key] = item
+        order.append(key)
+        added += 1
+        diagnostics.append(source_candidate_diag_summary(raw if isinstance(raw, dict) else None, "added", "added", item))
+
+    merged = [by_key[key] for key in order]
+    return merged, added, diagnostics
 
 
+def merge_source_candidates(
+    raw_source_candidates: List[Dict[str, Any]],
+    sources_register_text: str,
+) -> tuple[List[Dict[str, Any]], int]:
+    merged, added, _diagnostics = merge_source_candidates_with_diagnostics(raw_source_candidates, sources_register_text)
+    return merged, added
+# === END BLOCK: SOURCE_CANDIDATE_LEARNING_DIAGNOSTICS_V2 ===
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_AND_COVERAGE_AUDIT_V1 | Zweck: Raw-/Selected-/Drop-Diagnose und passive Coverage-Targets nach dem Lauf auswerten | Umfang: ergänzt Diagnoseausgabe ohne Suchprompt zu beeinflussen ===
+def count_by_key(items: List[Dict[str, Any]], key: str) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for item in items:
+        value = clean_output_text(item.get(key, "")) if isinstance(item, dict) else ""
+        value = value or "<empty>"
+        out[value] = out.get(value, 0) + 1
+    return dict(sorted(out.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+def candidate_title_list(items: List[Dict[str, Any]], limit: int = 40) -> List[str]:
+    titles: List[str] = []
+    for item in items[:limit]:
+        if isinstance(item, dict):
+            title = clean_output_text(item.get("title", ""))
+            date_value = clean_output_text(item.get("date", ""))
+            if title or date_value:
+                titles.append(f"{date_value} | {title}".strip())
+    return titles
+
+
+def read_coverage_targets() -> List[Dict[str, Any]]:
+    if not COVERAGE_TARGETS_JSON_PATH.exists():
+        return []
+
+    try:
+        raw = json.loads(COVERAGE_TARGETS_JSON_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        fail(f"data/event_coverage_targets.json ist ungültig: {exc}")
+
+    if not isinstance(raw, list):
+        fail("data/event_coverage_targets.json muss ein JSON-Array sein.")
+
+    return [item for item in raw if isinstance(item, dict)]
+
+
+def target_aliases(target: Dict[str, Any]) -> List[str]:
+    aliases: List[str] = []
+    for value in [target.get("title", ""), *(target.get("aliases", []) if isinstance(target.get("aliases", []), list) else [])]:
+        cleaned = clean_output_text(value)
+        if cleaned:
+            aliases.append(cleaned)
+    return aliases
+
+
+def target_matches_title(target: Dict[str, Any], title: str) -> bool:
+    title_key = norm_key(title)
+    if not title_key:
+        return False
+
+    for alias in target_aliases(target):
+        alias_key = norm_key(alias)
+        if alias_key and (alias_key in title_key or title_key in alias_key):
+            return True
+    return False
+
+
+def target_matches_url(target: Dict[str, Any], url_value: str) -> bool:
+    hint = norm_key(target.get("source_hint", ""))
+    url_key = norm_key(canonical_url(url_value))
+    return bool(hint and url_key and hint in url_key)
+
+
+def target_matches_candidate(target: Dict[str, Any], item: Dict[str, Any]) -> bool:
+    expected_date = norm(target.get("expected_date", ""))
+    item_date = norm(item.get("date", ""))
+    if expected_date and item_date != expected_date:
+        return False
+
+    return (
+        target_matches_title(target, clean_output_text(item.get("title", "")))
+        or target_matches_url(target, item.get("url", ""))
+        or target_matches_url(target, item.get("source_url", ""))
+    )
+
+
+def target_matches_record(target: Dict[str, Any], rec: RefRecord) -> bool:
+    expected_date = norm(target.get("expected_date", ""))
+    if expected_date and rec.date != expected_date:
+        return False
+
+    return (
+        target_matches_title(target, rec.title)
+        or target_matches_url(target, rec.url)
+        or target_matches_url(target, rec.source_url)
+    )
+
+
+def first_matching_record_status(target: Dict[str, Any], label: str, records: List[RefRecord]) -> Dict[str, str] | None:
+    for rec in records:
+        if target_matches_record(target, rec):
+            return {
+                "status": label,
+                "matched_title": rec.title,
+                "matched_date": rec.date,
+                "matched_url": rec.source_url or rec.url,
+            }
+    return None
+
+
+# === BEGIN BLOCK: COVERAGE_AUDIT_WITH_WINDOW_STATUS_V2 | Zweck: Coverage-Ziele gegen Selected/Raw/Bestand prüfen und abgelaufene bzw. außerhalb liegende Targets sauber diagnostizieren | Umfang: ersetzt coverage_audit vollständig ===
+def coverage_audit(
+    targets: List[Dict[str, Any]],
+    raw_candidates: List[Dict[str, Any]],
+    selected_candidates: List[Dict[str, str]],
+    drop_diagnostics: List[Dict[str, str]],
+    events_records: List[RefRecord],
+    inbox_records: List[RefRecord],
+    archive_records: List[RefRecord],
+    manual_records: List[RefRecord],
+) -> List[Dict[str, str]]:
+    audit: List[Dict[str, str]] = []
+    today = datetime.now().date()
+    window_end = today + timedelta(days=SEARCH_WINDOW_DAYS)
+
+    for target in targets:
+        target_id = clean_output_text(target.get("id", "")) or norm_key(target.get("title", ""))
+        title = clean_output_text(target.get("title", ""))
+        priority = clean_output_text(target.get("priority", "")) or "should"
+        cluster = clean_output_text(target.get("cluster", ""))
+        expected_date_value = parse_iso_date(norm(target.get("expected_date", "")))
+
+        selected_match = next((item for item in selected_candidates if target_matches_candidate(target, item)), None)
+        if selected_match:
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": "FOUND_SELECTED",
+                "matched_title": clean_output_text(selected_match.get("title", "")),
+                "matched_date": clean_output_text(selected_match.get("date", "")),
+                "matched_url": canonical_url(selected_match.get("source_url", "") or selected_match.get("url", "")),
+                "drop_reason": "",
+            })
+            continue
+
+        raw_match = next((item for item in raw_candidates if isinstance(item, dict) and target_matches_candidate(target, normalize_candidate(item))), None)
+        if raw_match:
+            raw_norm = normalize_candidate(raw_match)
+            drop_match = next((d for d in drop_diagnostics if target_matches_candidate(target, d) and d.get("reason") != "selected"), None)
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": "FOUND_RAW_DROPPED",
+                "matched_title": clean_output_text(raw_norm.get("title", "")),
+                "matched_date": clean_output_text(raw_norm.get("date", "")),
+                "matched_url": canonical_url(raw_norm.get("source_url", "") or raw_norm.get("url", "")),
+                "drop_reason": clean_output_text(drop_match.get("reason", "unknown_drop_reason")) if drop_match else "unknown_drop_reason",
+            })
+            continue
+
+        for label, records in [
+            ("IN_EVENTS", events_records),
+            ("IN_INBOX", inbox_records),
+            ("IN_INBOX_ARCHIVE", archive_records),
+            ("IN_MANUAL_JSON", manual_records),
+        ]:
+            record_match = first_matching_record_status(target, label, records)
+            if record_match:
+                audit.append({
+                    "id": target_id,
+                    "title": title,
+                    "priority": priority,
+                    "cluster": cluster,
+                    "status": label,
+                    "matched_title": clean_output_text(record_match.get("matched_title", "")),
+                    "matched_date": clean_output_text(record_match.get("matched_date", "")),
+                    "matched_url": canonical_url(record_match.get("matched_url", "")),
+                    "drop_reason": "",
+                })
+                break
+        else:
+            if expected_date_value and expected_date_value < today:
+                status = "PAST_TARGET"
+                drop_reason = "target_before_run_date"
+                matched_date = expected_date_value.isoformat()
+            elif expected_date_value and expected_date_value > window_end:
+                status = "TARGET_OUT_OF_ACTIVE_WINDOW"
+                drop_reason = "target_after_search_window"
+                matched_date = expected_date_value.isoformat()
+            else:
+                status = "MISSING_FROM_RAW"
+                drop_reason = ""
+                matched_date = ""
+
+            audit.append({
+                "id": target_id,
+                "title": title,
+                "priority": priority,
+                "cluster": cluster,
+                "status": status,
+                "matched_title": "",
+                "matched_date": matched_date,
+                "matched_url": "",
+                "drop_reason": drop_reason,
+            })
+
+    return audit
+# === END BLOCK: COVERAGE_AUDIT_WITH_WINDOW_STATUS_V2 ===
+
+
+# === BEGIN BLOCK: WEEKLY_DIAGNOSTICS_SUMMARY_WITH_SOURCE_CANDIDATES_V2 | Zweck: Event-, Coverage- und Source-Candidate-Diagnose zentral in JSON und Log zusammenführen | Umfang: ersetzt build_weekly_diagnostics und print_weekly_diagnostics_summary ===
+def build_weekly_diagnostics(
+    raw_candidates: List[Dict[str, Any]],
+    raw_source_candidates: List[Dict[str, Any]],
+    selected_candidates: List[Dict[str, str]],
+    drop_diagnostics: List[Dict[str, str]],
+    coverage: List[Dict[str, str]],
+    source_candidate_diagnostics: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    dropped = [item for item in drop_diagnostics if item.get("reason") != "selected"]
+    return {
+        "generated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+        "model": OPENAI_MODEL,
+        "max_new_candidates": MAX_NEW_CANDIDATES,
+        "raw_candidates_returned": len(raw_candidates),
+        "raw_source_candidates_returned": len(raw_source_candidates),
+        "selected_candidates": len(selected_candidates),
+        "dropped_candidates": len(dropped),
+        "drop_reasons": count_by_key(dropped, "reason"),
+        "raw_candidate_titles": candidate_title_list([normalize_candidate(item) for item in raw_candidates if isinstance(item, dict)]),
+        "selected_candidate_titles": candidate_title_list(selected_candidates),
+        "dropped_candidate_titles": [
+            f"{item.get('reason', '')} | {item.get('date', '')} | {item.get('title', '')}".strip()
+            for item in dropped[:80]
+        ],
+        "source_candidate_reasons": count_by_key(source_candidate_diagnostics, "reason"),
+        "source_candidate_stage_counts": count_by_key(source_candidate_diagnostics, "stage"),
+        "source_candidates_added": sum(1 for item in source_candidate_diagnostics if item.get("reason") == "added"),
+        "source_candidate_summaries": [
+            f"{item.get('reason', '')} | {item.get('domain', '')} | {item.get('source_name', '')}".strip()
+            for item in source_candidate_diagnostics[:80]
+        ],
+        "source_candidate_diagnostics": source_candidate_diagnostics,
+        "coverage_targets_total": len(coverage),
+        "coverage_status_counts": count_by_key(coverage, "status"),
+        "coverage_audit": coverage,
+    }
+
+
+def print_weekly_diagnostics_summary(diagnostics: Dict[str, Any]) -> None:
+    print(
+        "WEEKLY KI EVENTSUCHE DIAGNOSTICS\n"
+        f"- raw_candidates_returned: {diagnostics.get('raw_candidates_returned', 0)}\n"
+        f"- selected_candidates: {diagnostics.get('selected_candidates', 0)}\n"
+        f"- dropped_candidates: {diagnostics.get('dropped_candidates', 0)}\n"
+        f"- drop_reasons: {json.dumps(diagnostics.get('drop_reasons', {}), ensure_ascii=False)}\n"
+        f"- raw_source_candidates_returned: {diagnostics.get('raw_source_candidates_returned', 0)}\n"
+        f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
+        f"- source_candidate_stage_counts: {json.dumps(diagnostics.get('source_candidate_stage_counts', {}), ensure_ascii=False)}\n"
+        f"- coverage_targets_total: {diagnostics.get('coverage_targets_total', 0)}\n"
+        f"- coverage_status_counts: {json.dumps(diagnostics.get('coverage_status_counts', {}), ensure_ascii=False)}\n"
+        f"- diagnostics_file: {DIAGNOSTICS_JSON_PATH}"
+    )
+# === END BLOCK: WEEKLY_DIAGNOSTICS_SUMMARY_WITH_SOURCE_CANDIDATES_V2 ===
 # === BEGIN BLOCK: RESPONSE SUMMARY + OUTPUT WRITE ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
 # Zweck:
@@ -646,6 +1772,7 @@ def collect_response_sources(response: Any) -> List[str]:
 # Umfang:
 # - Noch kein automatischer Intake-Trigger; nur data/inbox_manual.json als Ergebnis
 # === END BLOCK: MAIN ENTRYPOINT ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_DIAGNOSTICS_V2 | Zweck: Produktionslauf schreibt Event-/Quellen-Output und erzeugt passive Diagnose inkl. Source-Candidate-Gründe | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
 def main() -> None:
     export_current_snapshots()
 
@@ -654,8 +1781,14 @@ def main() -> None:
     archive_records = read_tsv_records(TMP_ARCHIVE_TSV_PATH, {})
     manual_records = read_manual_records()
 
-    if FAIL_ON_PENDING_INBOX and has_pending_inbox_rows(inbox_records):
-        fail("Inbox enthält noch offene Review-Fälle. Wochenlauf wird bewusst abgebrochen.")
+    # === BEGIN BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 | Zweck: offene Review-Inbox nicht mehr blockieren, aber weiterhin als Dedupe-/Prompt-Bestand nutzen | Umfang: ersetzt harten Abbruch bei offener Inbox durch Warnlog ===
+    pending_inbox_rows = count_pending_inbox_rows(inbox_records)
+    if WARN_ON_PENDING_INBOX and pending_inbox_rows:
+        info(
+            f"Inbox enthält {pending_inbox_rows} offene Review-Fälle. "
+            "Weekly-Lauf wird fortgesetzt; OFFENE_INBOX bleibt Prompt-, Dedupe- und Intake-Bestand."
+        )
+    # === END BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 ===
 
     if FAIL_ON_PENDING_MANUAL and manual_records:
         fail("data/inbox_manual.json ist nicht leer. Wochenlauf wird bewusst abgebrochen.")
@@ -663,26 +1796,92 @@ def main() -> None:
     if not REGELWERK_PATH.exists():
         fail(f"Regelwerk fehlt: {REGELWERK_PATH}")
 
+    if not SOURCES_REGISTER_PATH.exists():
+        fail(f"Quellenregister fehlt: {SOURCES_REGISTER_PATH}")
+
     rulebook_text = REGELWERK_PATH.read_text(encoding="utf-8")
-    raw_candidates, response = search_with_openai(
-        build_messages(rulebook_text, events_records, inbox_records, archive_records, manual_records)
+    sources_register_text = SOURCES_REGISTER_PATH.read_text(encoding="utf-8")
+
+    raw_candidates, raw_source_candidates, response = search_with_openai(
+        build_messages(
+            rulebook_text,
+            sources_register_text,
+            events_records,
+            inbox_records,
+            archive_records,
+            manual_records,
+        )
     )
 
-    delta = filter_delta(raw_candidates, events_records, inbox_records, archive_records, manual_records)
+    filtered_delta, drop_diagnostics = filter_delta_with_diagnostics(
+        raw_candidates,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )
+    delta = filtered_delta[:MAX_NEW_CANDIDATES]
+
+    merged_source_candidates, added_source_candidates, source_candidate_diagnostics = merge_source_candidates_with_diagnostics(
+        raw_source_candidates,
+        sources_register_text,
+    )
+
+    coverage_targets = read_coverage_targets()
+    coverage = coverage_audit(
+        coverage_targets,
+        raw_candidates,
+        delta,
+        drop_diagnostics,
+        events_records,
+        inbox_records,
+        archive_records,
+        manual_records,
+    )
+    diagnostics = build_weekly_diagnostics(
+        raw_candidates,
+        raw_source_candidates,
+        delta,
+        drop_diagnostics,
+        coverage,
+        source_candidate_diagnostics,
+    )
 
     ensure_parent(MANUAL_JSON_PATH)
     MANUAL_JSON_PATH.write_text(json.dumps(delta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    ensure_parent(SOURCE_CANDIDATES_JSON_PATH)
+    SOURCE_CANDIDATES_JSON_PATH.write_text(
+        json.dumps(merged_source_candidates, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    ensure_parent(DIAGNOSTICS_JSON_PATH)
+    DIAGNOSTICS_JSON_PATH.write_text(
+        json.dumps(diagnostics, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
     source_urls = collect_response_sources(response)
+
     print(
         "WEEKLY KI EVENTSUCHE SUMMARY\n"
         f"- model: {OPENAI_MODEL}\n"
+        f"- max_new_candidates: {MAX_NEW_CANDIDATES}\n"
+        f"- raw_candidates_returned: {len(raw_candidates)}\n"
+        f"- production_selected: {len(delta)}\n"
         f"- written_manual_json: {len(delta)}\n"
         f"- output_file: {MANUAL_JSON_PATH}\n"
+        f"- source_candidates_file: {SOURCE_CANDIDATES_JSON_PATH}\n"
+        f"- source_candidates_returned: {len(raw_source_candidates)}\n"
+        f"- source_candidates_added: {added_source_candidates}\n"
+        f"- source_candidates_total: {len(merged_source_candidates)}\n"
+        f"- source_candidate_reasons: {json.dumps(diagnostics.get('source_candidate_reasons', {}), ensure_ascii=False)}\n"
         f"- cited_web_sources: {len(source_urls)}"
     )
+    print_weekly_diagnostics_summary(diagnostics)
 
 
 if __name__ == "__main__":
     main()
-# === END BLOCK: MAIN ENTRYPOINT ===
+# === END BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_DIAGNOSTICS_V2 ===

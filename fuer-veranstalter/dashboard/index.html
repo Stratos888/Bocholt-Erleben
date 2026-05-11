@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY | Zweck: beschreibt die geschützte Seite als Status- und Veranstalterbereich ohne interne Kontingent-/Systemsprache; Umfang: kompletter Head dieser Datei === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Status & Veranstalterbereich | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Status eigener Einreichungen und Veranstalterbereich bei Bocholt erleben."
+  >
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/dashboard/">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#F3F2E6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY === -->
+</head>
+
+<body>
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT | Zweck: hält eine technische Bereichsroute bei, setzt statische Fallback-Sprache neutral und überlässt Einreichung/Veranstalterbereich-Trennung dem Runtime-Rendering; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEADER_WITH_LOGOUT_SLOT_V1 | Zweck: ergänzt im eingeloggten Veranstalterbereich einen sichtbaren Header-Platz für Abmelden; Umfang: kompletter App-Header der Dashboard-Seite === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+
+    <div class="header-right">
+      <button
+        class="pwa-install-button header-logout-button"
+        id="organizer-dashboard-logout"
+        type="button"
+        hidden
+      >
+        <span class="pwa-install-button__label">Abmelden</span>
+      </button>
+    </div>
+  </header>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEADER_WITH_LOGOUT_SLOT_V1 === -->
+
+  <main class="page page--organizers" data-organizer-page="dashboard">
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 | Zweck: entfernt den Kicker und hält den statischen Dashboard-Ladezustand konsistent mit Status/Veranstalterbereich; Umfang: statischer Dashboard-Hero === -->
+    <header class="content-hero content-hero--panel">
+      <h1 id="organizer-dashboard-title">Wir laden deine Angaben.</h1>
+      <p class="content-lead" id="organizer-dashboard-lead">
+        Wir öffnen den Status deiner Einreichung oder deinen Veranstalterbereich.
+      </p>
+      <p class="content-note" id="organizer-dashboard-note" hidden></p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" id="organizer-dashboard-primary-cta" href="/events-veroeffentlichen/einreichen/">
+          Neue Veranstaltung einreichen
+        </a>
+      </div>
+    </header>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 === -->
+
+
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 | Zweck: erklärt den fehlenden Login als notwendigen E-Mail-Zugangslink; Umfang: Auth-Required-Karte === -->
+    <section class="content-card content-card--primary" id="organizer-dashboard-auth-required" aria-labelledby="organizer-dashboard-auth-required-head" hidden>
+      <h2 id="organizer-dashboard-auth-required-head">Zugangslink erforderlich</h2>
+      <p>Fordere einen gültigen Zugangslink per E-Mail an, um den Status deiner Einreichung oder deinen Veranstalterbereich zu öffnen.</p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">
+          Zugangslink senden
+        </a>
+      </div>
+    </section>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
+
+
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 | Zweck: trennt Stammdaten und Mitgliedschaftsübersicht klar, damit Tarifstatus nicht doppelt erscheint; Umfang: beide Summary-Karten === -->
+    <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
+      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
+        <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
+        <p id="organizer-account-name">–</p>
+        <p id="organizer-account-email">–</p>
+        <p id="organizer-account-plan" hidden>–</p>
+      </section>
+
+      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
+        <h2 id="organizer-dashboard-quota-head">Übersicht Mitgliedschaft</h2>
+        <p id="organizer-quota-period">–</p>
+        <p id="organizer-quota-change" hidden>–</p>
+        <p id="organizer-quota-summary">–</p>
+        <p id="organizer-quota-remaining">–</p>
+      </section>
+    </div>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 === -->
+
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V3 | Zweck: benennt die Dashboard-Liste als aktuelle Einreichungen und nutzt eine neutrale Containerstruktur statt Navigation; Umfang: statischer Einreichungslisten-Block === -->
+    <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
+      <h2 id="organizer-dashboard-submissions-head">Aktuelle Einreichungen</h2>
+      <div class="content-links" id="organizer-dashboard-submissions-list"></div>
+      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Keine aktuellen Einreichungen gefunden.</p>
+    </section>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V3 === -->
+    
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 | Zweck: entfernt den redundanten Zugangslink aus dem geöffneten Dashboard und lässt nur den Rückweg zur Auswahl; Umfang: untere Bereich-Navigation im Dashboard === -->
+    <nav class="content-links" aria-label="Bereich-Navigation">
+      <a class="content-link" href="/events-veroeffentlichen/">
+        <span class="content-link__label">Zurück zur Auswahl</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 === -->
+  </main>
+
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-05-08-dashboard-wording-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HEAD_V4_STATUS_AREA_COPY | Zweck: benennt die Login-Seite konsistent als Status- oder Veranstalterbereich-Öffnung per Zugangslink; Umfang: kompletter Head dieser Datei === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Status oder Veranstalterbereich öffnen | Bocholt erleben</title>
+  <meta
+    name="description"
+    content="Status einer Einreichung oder Veranstalterbereich bei Bocholt erleben per einmaligem E-Mail-Zugangslink öffnen."
+  >
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="canonical" href="https://bocholt-erleben.de/fuer-veranstalter/login/">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="theme-color" content="#F3F2E6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bocholt erleben">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/css/style.css?v=1">
+  <!-- === END BLOCK: ORGANIZER_LOGIN_HEAD_V4_STATUS_AREA_COPY === -->
+</head>
+
+<body>
+  <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BODY_V2_NEUTRAL_AREA | Zweck: macht den Zugang neutral als Bereich-Öffnen-Pfad und erklärt die automatische Anzeige von Einreichung oder Veranstalterbereich; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img
+        src="/icons/app/icon-192.png"
+        alt="Bocholt erleben Logo"
+        class="app-logo"
+      >
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--organizers" data-organizer-page="login">
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_HERO_STATUS_AREA_COPY_V4 | Zweck: entfernt den Kicker und erklärt den E-Mail-Zugangslink ohne Passwortlogik; Umfang: kompletter Hero der Login-Seite === -->
+    <header class="content-hero content-hero--panel">
+      <h1>Status oder Veranstalterbereich öffnen.</h1>
+      <p class="content-lead">
+        Gib die E-Mail-Adresse ein, mit der du deine Veranstaltung eingereicht oder deine Mitgliedschaft gestartet hast.
+      </p>
+      <p class="content-note" id="organizer-login-note">
+        Du erhältst einen einmaligen Zugangslink per E-Mail. Ein Passwort ist nicht nötig.
+      </p>
+    </header>
+    <!-- === END BLOCK: ORGANIZER_LOGIN_HERO_STATUS_AREA_COPY_V4 === -->
+
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_FORM_COPY_V5 | Zweck: positioniert Pflichtfeld-Meta ruhig in der Zugangslink-Kopfzeile; Umfang: kompletter Formularbereich der Login-Seite === -->
+    <section class="content-card content-card--primary" aria-labelledby="organizer-login-form-head">
+      <div class="content-form-section-head content-form-section-head--form">
+        <h2 id="organizer-login-form-head">Zugangslink per E-Mail anfordern</h2>
+        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+      </div>
+
+      <form class="content-form" id="organizer-login-form" novalidate>
+        <div class="content-form-grid">
+          <label class="content-field content-field--full" for="organizer-login-email">
+            <span class="content-field__label">E-Mail-Adresse *</span>
+            <input
+              class="content-field__control"
+              id="organizer-login-email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              required
+            >
+            <p class="content-field__hint">
+              Nutze die E-Mail-Adresse, mit der du deine Veranstaltung eingereicht oder deine Mitgliedschaft gestartet hast.
+            </p>
+          </label>
+        </div>
+
+        <div class="content-actions content-actions--inline">
+          <button class="content-cta content-cta--primary" id="organizer-login-submit" type="submit">
+            Zugangslink senden
+          </button>
+        </div>
+      </form>
+    </section>
+    <!-- === END BLOCK: ORGANIZER_LOGIN_FORM_COPY_V5 === -->
+
+    <section class="content-card content-card--primary" id="organizer-login-result" aria-labelledby="organizer-login-result-head" hidden>
+      <h2 id="organizer-login-result-head">Nächster Schritt</h2>
+      <p id="organizer-login-result-text"></p>
+      <nav class="content-links" id="organizer-login-result-links" hidden></nav>
+    </section>
+
+    <!-- === BEGIN BLOCK: ORGANIZER_LOGIN_BACK_LINK_COPY_V2 | Zweck: führt neutral zur Auswahl zurück statt nur zur Einreichung; Umfang: untere Bereich-Navigation der Login-Seite === -->
+    <nav class="content-links" aria-label="Bereich-Navigation">
+      <a class="content-link" href="/events-veroeffentlichen/">
+        <span class="content-link__label">Zurück zur Auswahl</span>
+        <span class="content-link__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+      </a>
+    </nav>
+    <!-- === END BLOCK: ORGANIZER_LOGIN_BACK_LINK_COPY_V2 === -->
+  </main>
+
+  <script src="/config.js?v=2026-02-04-1"></script>
+  <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-05-08-login-wording-validation-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_LOGIN_BODY_V2_NEUTRAL_AREA === -->
+</body>
+</html>

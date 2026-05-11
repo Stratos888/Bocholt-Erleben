@@ -1,4 +1,4 @@
-# Bocholt erleben – Regelwerk v3 für manuelle und automatisierte KI-Eventsuche
+# Bocholt erleben – Regelwerk v3 für manuelle und automatisierte KI-Eventsuche 
 
 ## Zweck
 Dieses Regelwerk dient für manuelle und automatisierte KI-Suchläufe, um neue, echte, veröffentlichungsreife Event-Kandidaten für **Bocholt erleben** zu finden.
@@ -101,25 +101,29 @@ Folgeläufe dürfen **nur neue Delta-Kandidaten** liefern.
 
 ---
 
+<!-- === BEGIN BLOCK: BEDIENREGEL_NEUE_CHATS_PRODUKTION_ONLY_V2 | Zweck: neue Chat-Suchläufe auf Regelwerk plus Quellenregister und production-only Benchmark ausrichten | Umfang: ersetzt alte CORE/RECOVERY/DISCOVERY-Mischanweisung === -->
 ## Bedienregel für neue Chats
 
 Wenn ein neuer Suchlauf in einem neuen Chat gestartet wird, müssen immer diese Dateien mitgegeben werden:
 
 - `bocholt-erleben_eventsuche_regelwerk_v3.md`
+- `eventsuche_quellenregister_v1.md`
 - `events.tsv` oder ersatzweise `data/events.json`
 - `inbox.tsv` bzw. `data/inbox.tsv`
 - `inbox_archive.tsv`
 - `data/inbox_manual.json` (wenn dort bereits Kandidaten liegen)
 
 ### Standard-Arbeitsanweisung für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze bekannte starke Quellen aktiv, suche zusätzlich bewusst in freigegebenen Low-Monetization-Kulturquellen und behalte einen offenen Discovery-Anteil bei. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
+> Nutze das beigefügte Regelwerk und das beigefügte Quellenregister. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Wenn der Lauf ein Weekly-Produktionslauf oder ein staging-naher Produktionsbenchmark ist, arbeite als reiner Produktionslauf: aktive Suche nur über `CORE-HIGH`, `CORE-MID` und `RECOVERY`. Suche `DISCOVERY-SEED` und `DISCOVERY-OPEN` nicht aktiv als Ergänzungspass. Arbeite nicht als starre Closed-Whitelist. Berücksichtige alle Ausschluss-, Quellen-, Dedupe-, Stil- und Qualitätsregeln aus dem Regelwerk. Liefere nur neue Delta-Kandidaten. Im manuellen Prüfmodus in zwei Blöcken: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur `FINAL FREIGEGEBEN` darf in `data/inbox_manual.json`.
 
 ### Empfohlener Startprompt für neue Chats
-> Nutze das beigefügte Regelwerk. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Arbeite immer in drei Suchbahnen: `CORE`, `FREIGEGEBEN_LOW_MONETIZATION` und `DISCOVERY`. Nutze die bewusst freigegebenen Low-Monetization-Quellen aktiv mit, aber arbeite nicht als starre Closed-Whitelist. Discovery-Quellen dürfen gefunden werden, müssen aber für FINAL auf offizieller oder gleichwertig event-spezifischer Quelle verifiziert werden. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
+> Nutze das beigefügte Regelwerk und das beigefügte Quellenregister. Prüfe neue Events gegen `events.tsv` oder ersatzweise `data/events.json`, gegen `inbox.tsv`, gegen `inbox_archive.tsv`, gegen `data/inbox_manual.json` sofern vorhanden und gegen bereits im selben Chat gelieferte Kandidaten. Suche nur neue, echte, veröffentlichungsreife Events im Suchgebiet und Zeitraum des Regelwerks. Simuliere einen reinen Weekly-Produktionslauf: decke `CORE-HIGH`, `CORE-MID` und `RECOVERY` systematisch ab. Suche `DISCOVERY-SEED` und `DISCOVERY-OPEN` nicht aktiv. Nutze neue Quellen außerhalb des Registers nur dann, wenn sie bei der Verifikation eines ohnehin starken Produktionskandidaten auftauchen und alle Regelwerkskriterien erfüllen. Wende alle Quellen-, Dedupe-, Stil-, Beschreibungs-, URL- und Qualitätsregeln strikt an. Gib Ergebnisse im manuellen Prüfmodus immer in zwei Blöcken aus: `FINAL FREIGEGEBEN` und `REVIEW NÖTIG`. Nur der FINAL-Block darf importiert werden.
 
 Wenn eine der Referenzdateien fehlt, soll vor dem Suchlauf klar darauf hingewiesen werden, dass für sauberes Dedupe zusätzlich noch der aktuelle Bestands-Export (`events.tsv` oder ersatzweise `data/events.json`), `inbox.tsv`, `inbox_archive.tsv` und gegebenenfalls `data/inbox_manual.json` aus dem aktuellen Stand benötigt werden.
 
-Wenn zusätzlich eine operative Quellenliste oder ein aktueller `Sources`-Export mitgegeben wird, hat dieser für die Quellenauswahl Vorrang vor bloß impliziten Annahmen.
+Wenn zusätzlich eine operative Quellenliste, ein aktueller `Sources`-Export oder das Quellenregister mitgegeben wird, hat diese Quellensteuerung Vorrang vor bloß impliziten Annahmen.
+<!-- === END BLOCK: BEDIENREGEL_NEUE_CHATS_PRODUKTION_ONLY_V2 === -->
+
 ---
 
 ## 1. Suchgebiet
@@ -188,14 +192,11 @@ Nicht aufnehmen:
 ---
 
 ## 5. Monetarisierungsschutz
-Grundsatz:
-Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf **nicht pauschal normal bespielt** werden.
-
 Nicht aufnehmen:
 
-- Events von potenziellen späteren zahlenden Kunden, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
+- Events von **potenziellen späteren zahlenden Kunden**, wenn diese nicht aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle stammen
 - Events, deren Hauptnutzen die Sichtbarkeit einer einzelnen potenziellen Kunden-Location erhöht
-- Eventorte potenzieller Kunden, wenn sie im Suchlauf faktisch nur als Reichweitenziel dienen
+- Eventorte potenzieller Kunden dürfen im KI-Suchlauf **nicht aktiv als zu beliefernde Eventorte** behandelt werden
 
 Besonders vorsichtig behandeln:
 
@@ -207,77 +208,38 @@ Besonders vorsichtig behandeln:
 - kommerzielle Veranstalter
 - sonstige Locations, die später für Event-Veröffentlichung zahlen könnten
 
-### Zwei Klassen im Monetarisierungsschutz
+### Explizite Schutzregel
+Mögliche spätere zahlende Kundschaft soll im KI-Suchlauf bewusst **nicht** als normale Eventquelle oder Eventort-Liste bespielt werden.
 
-#### A. GESPERRT_KUNDENNAH
-Diese Quellen oder Locations bleiben grundsätzlich gesperrt, wenn sie vor allem wie klassische potenzielle Reichweiten- oder Veröffentlichungs-Kunden wirken.
+Dazu zählt ausdrücklich auch:
 
-Regel:
-- nicht aktiv als normale Eventquelle suchen
-- nicht aktiv als Eventort-Liste bespielen
-- im Zweifel weglassen
+- **Kulturort Alte Molkerei**
 
-#### B. FREIGEGEBEN_LOW_MONETIZATION
-Diese Quellen dürfen trotz grundsätzlicher Kundennähe aktiv gesucht werden, wenn sie erkennbar eher kultur-, vereins-, stiftungs- oder gemeinwohlorientiert sind und ihre Monetarisierungswahrscheinlichkeit derzeit niedrig bis höchstens mittel erscheint.
+Für solche Locations gilt konservativ:
 
-Regel:
-- aktiv suchen erlaubt
-- Treffer daraus sind grundsätzlich zulässig
-- Freigabe gilt **quellenbezogen**, nicht pauschal für ähnliche kommerzielle Locations
+- **ohne explizite spätere Freigabe keine neuen Treffer als Eventort liefern**
+- **nicht aktiv nach deren Einzel-Events suchen**
+- **keine Treffer liefern, deren Hauptwert die Sichtbarkeit dieser Location erhöht**
+- **im Zweifel weglassen**
 
-### Bewusst freigegebene Low-Monetization-Quellen
-Diese Quellen gelten aktuell als **FREIGEGEBEN_LOW_MONETIZATION**:
+### Neutrale-Quellen-Ausnahme
+Ein Event an einer potenziell geschützten oder später monetarisierungsrelevanten Venue darf trotzdem aufgenommen werden, wenn **alle** folgenden Punkte erfüllt sind:
 
-- Kulturort Alte Molkerei
-- KuKuG Bocholt
-- Fontane-Kreis Bocholt
-- Koppelkerk Bredevoort
-- Nationaal Onderduikmuseum Aalten
-- Klein Theater Dinxperlo
-- Schloss Ringenberg
-- Quartettverein Bocholt
-
-Wichtig:
-- diese Quellen sind **kein aktiver Sales-Fokus**
-- sie sind bewusst freigegeben, weil ihr Content-Wert hoch und ihre voraussichtliche Zahlungsbereitschaft eher niedrig bis höchstens mittel ist
+1. die Quelle ist **neutral oder offiziell**  
+   (z. B. kommunaler Veranstaltungskalender, offizielle Stadt-/Kultur-/Tourismusseite, sonstige offizielle Drittquelle)
+2. der Event wird **nicht** über die Venue selbst als aktive Suchquelle eingespeist
+3. der Event hat **eigenständigen öffentlichen Eventcharakter**
+4. Titel, Datum, Ort und Eventcharakter sind belastbar belegt
+5. der Treffer dient erkennbar **nicht primär der Venue-Promo**, sondern der neutralen Eventinformation
 
 ### Entscheidungsregel
-Ein Event darf nur dann aufgenommen werden, wenn:
+Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verschafft und kein klar öffentlich relevantes Stadt-/Kulturevent aus einer bewusst freigegebenen, neutralen oder offiziellen Quelle ist:
 
-- es aus einer offiziellen, neutralen oder bewusst freigegebenen Quelle belastbar belegt ist,
-- und der Eintrag **nicht primär nur die Sichtbarkeit eines klar kundennahen, potenziell zahlungsfähigen Einzelanbieters erhöht**.
+- **nicht aufnehmen**
 
-### Harte Schutzregel gegen neutrale Kalender als Hintertür
-Eine offizielle oder neutrale Quelle hebt den Monetarisierungsschutz des **Eventorts / Veranstalters** nicht automatisch auf.
+Im Zweifel:
 
-Regel:
-- steht ein Event zwar in einer offiziellen oder neutralen Quelle, ist aber erkennbar vor allem Promo für eine einzelne kundennähere Gastro-, Club-, Bar-, Privat- oder Eventlocation, dann: **nicht aufnehmen**
-- Gleiches gilt für klar kommerzielle Einzelveranstalter, wenn der Hauptnutzen des Eintrags faktisch Reichweite für diesen Anbieter ist
-- eine neutrale Quelle allein ist also **keine automatische Freigabe** kundennaher Eventorte
-
-### Zulässige Ausnahme
-Eine Aufnahme ist trotz kundennäherem Eventort nur dann zulässig, wenn mindestens einer dieser Punkte erfüllt ist:
-
-- die Quelle selbst ist bewusst als **FREIGEGEBEN_LOW_MONETIZATION** klassifiziert,
-- das Event hat eine **eigenständige öffentliche Relevanz** und ist nicht bloß Venue-Promo,
-- oder das Event ist Teil einer klar öffentlichen, kuratierten oder institutionell geprägten Veranstaltungslogik.
-
-Beispiele für eher zulässige Ausnahmen:
-- Stadtfest
-- etablierte Kulturreihe
-- offiziell kuratierte Konzert- oder Theaterreihe
-- klar öffentlich relevantes Sonderevent
-
-Wenn unklar ist, ob ein Event trotz neutraler Quelle faktisch doch nur kundennähere Einzelpromo ist:
-
-- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
-- im **Automationsmodus**: **nicht ausgeben**
-
-Im Zweifel gilt weiterhin:
-
-- **konservativ entscheiden**
-- **lieber weglassen**
-
+- **weglassen**
 ## 6. Rechtlich konservative Quellenregel
 Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch oder ausdrücklich freigegeben** und **für den konkreten Termin belastbar** ist.
 
@@ -331,126 +293,154 @@ Nicht übernehmen:
 
 ---
 
-## 6A. Quellenklassifikation und Suchbahnen
+<!-- === BEGIN BLOCK: QUELLENKLASSIFIKATION_PRODUKTION_DISCOVERY_TRENNUNG_V1 | Zweck: Suchrichtungen in Weekly-Produktion und separate Quellen-Discovery trennen | Umfang: ersetzt die bisherige Drei-Suchrichtungen-Pflicht für jeden Lauf === -->
+## 6A. Quellenklassifikation und Suchrichtungen
 
 ### Grundregel
 Die KI-Suche arbeitet **nicht** als starre Closed-Whitelist.
 
 Stattdessen gilt:
 - bekannte starke Quellen aktiv mitnehmen
-- bewusst freigegebene Low-Monetization-Quellen aktiv mitnehmen
-- zusätzlich immer offen nach neuen passenden Quellen suchen
+- gezielt offizielle event-spezifische Recovery-Quellen nutzen
+- neue gute Quellen außerhalb des Registers nicht pauschal ausschließen
+- Weekly-Produktion und Quellen-Discovery logisch trennen
 
-### Verbindliche Suchbahnen
-Jeder Suchlauf soll in **drei Suchbahnen** gedacht werden:
+### Zwei getrennte Arbeitsarten
 
-1. **CORE**
-2. **FREIGEGEBEN_LOW_MONETIZATION**
-3. **DISCOVERY**
+#### A. Weekly-Produktionslauf
+Der Weekly-Produktionslauf ist ein reiner Produktionslauf.
 
-### Suchbahn A – CORE
-CORE umfasst bekannte, belastbare, strategisch unkritische Quellen mit hohem Ertrag.
-
-Regel:
-- CORE-Quellen bilden das stabile Grundrauschen der Suche
-- sie sollen aktiv und regelmäßig geprüft werden
-- bevorzugt zuerst offizielle und neutrale Quellen mit hoher Relevanz im Suchgebiet
-
-### Suchbahn B – FREIGEGEBEN_LOW_MONETIZATION
-Diese Suchbahn umfasst bewusst freigegebene Kulturquellen mit hoher Inhaltsqualität und niedriger bis höchstens mittlerer Monetarisierungswahrscheinlichkeit.
+Aktiv genutzt werden:
+1. **CORE-HIGH**
+2. **CORE-MID**
+3. **RECOVERY**
 
 Regel:
-- diese Quellen dürfen aktiv gesucht werden
-- sie sind **bewusste Ausnahmen** innerhalb des Monetarisierungsschutzes
-- sie sind **kein** genereller Wegfall des Monetarisierungsschutzes
+- CORE-HIGH zuerst systematisch prüfen
+- danach CORE-MID streng nach Relevanz und Breiteninteresse prüfen
+- danach RECOVERY gezielt nutzen
+- keine aktive Suche über DISCOVERY-SEED
+- keine aktive Suche über DISCOVERY-OPEN
+- kein Discovery-Ergänzungspass zur künstlichen Auffüllung
 
-### Suchbahn C – DISCOVERY
-DISCOVERY umfasst neue, bisher nicht klassifizierte Quellen im Suchgebiet.
+#### B. Quellen-Discovery
+Quellen-Discovery ist ein separater Arbeitsmodus.
 
-Regel:
-- DISCOVERY ist ausdrücklich erlaubt und gewünscht
-- neue Quellen dürfen gefunden und für einzelne Events genutzt werden, wenn alle übrigen Qualitätsregeln erfüllt sind
-- neue Quellen dürfen aber nicht automatisch dauerhaft als Normalquelle behandelt werden
-- wenn sich eine neue Quelle wiederholt als hochwertig erweist, kann sie später bewusst in CORE oder FREIGEGEBEN_LOW_MONETIZATION übernommen werden
+Ziel:
+- neue Quellen finden
+- neue Quellen bewerten
+- Quellenregister verbessern
+- wiederholt starke Quellen bewusst hochstufen
+
+Quellen-Discovery darf offen arbeiten:
+- DISCOVERY-SEED
+- DISCOVERY-OPEN
+- neue bisher nicht klassifizierte Quellen im Suchgebiet
+
+Aber:
+- neue Quellen werden nicht automatisch dauerhaft als Normalquelle behandelt
+- eine neue Quelle wird erst nach Bewertung bewusst in `RECOVERY`, `CORE-MID` oder `CORE-HIGH` übernommen
+- Quellen-Discovery ist nicht dazu da, dem Weekly-Produktionslauf hinten einzelne Rest-Events anzuhängen
 
 ### Harte Regel gegen Closed-Whitelist-Verengung
-Die KI-Suche darf **nicht** nur bekannte Quellen mechanisch abarbeiten.
+Auch der Weekly-Produktionslauf ist keine starre Closed-Whitelist.
 
-Regel:
-- bekannte Quellen aktiv nutzen
-- aber immer zusätzlich offen für neue passende Quellen im Suchgebiet bleiben
+Das heißt:
+- Das Quellenregister steuert Priorität und Suchrichtung.
+- Gute neue Quellen außerhalb des Registers sind nicht verboten.
+- Im Weekly-Produktionslauf werden sie aber nicht aktiv als Discovery-Hauptmodus gesucht.
+- Wenn eine neue Quelle bei der Verifikation eines ohnehin starken Produktionskandidaten auftaucht und alle Regeln erfüllt, darf sie genutzt werden.
+- Wenn die Quelle selbst der eigentliche Fund ist, gehört sie in den separaten Quellen-Discovery-Modus.
 
-### Zielgewichtung
-Als Zielbild gilt:
-
-- **ca. 60 % CORE**
-- **ca. 25 % FREIGEGEBEN_LOW_MONETIZATION**
-- **ca. 15 % DISCOVERY**
-
-Wenn gerade klare Content-Lücken bestehen, darf temporär auch gelten:
-
-- **ca. 50 % CORE**
-- **ca. 30 % FREIGEGEBEN_LOW_MONETIZATION**
-- **ca. 20 % DISCOVERY**
-
-DISCOVERY darf jedoch **nicht vollständig auf null gesetzt** werden.
-
-### Operative Startpunkte für die Suche
+### Operative Startpunkte für die Weekly-Produktion
 CORE zuerst aktiv prüfen:
-
 - offizielle Veranstaltungs- und Kulturkalender der Städte im Suchgebiet
 - offizielle Seiten größerer Kulturhäuser, Theater, Museen und Musikschulen im Suchgebiet
 - alle bereits im aktuellen Projektbestand etablierten neutralen oder offiziellen Quellen
-
-Zusätzlich bewusst aktiv prüfen:
-
-- Kulturort Alte Molkerei
-- KuKuG Bocholt
-- Fontane-Kreis Bocholt
-- Koppelkerk Bredevoort
-- Nationaal Onderduikmuseum Aalten
-- Klein Theater Dinxperlo
-- Schloss Ringenberg
-- Quartettverein Bocholt
+- alle im Quellenregister als `CORE-HIGH`, `CORE-MID` oder `RECOVERY` klassifizierten Quellen
 
 Wichtig:
-- diese Liste ist **keine exklusive Whitelist**
-- sie definiert nur Quellen, die aktiv mitgedacht werden sollen
-
----
+- dies ist **keine exklusive Whitelist**
+- es definiert den stabilen Startpunkt und Suchrahmen des Weekly-Produktionslaufs
+<!-- === END BLOCK: QUELLENKLASSIFIKATION_PRODUKTION_DISCOVERY_TRENNUNG_V1 === -->
 
 ## 7. URL-Regel
-
-Bevorzugt ist **nur eine event-spezifische Detailseite**.
+Bevorzugt ist **eine event-spezifische Detailseite**.
 
 Nicht erlaubt als finale `url` oder `source_url` für FINAL:
 
 - Startseite einer Stadt / Institution
 - allgemeine Veranstaltungsübersicht
-- Jubiläums- oder Kampagnenseite ohne klaren Event-Detailfokus
 - generische Homepage ohne direkten Eventbezug
+- reine Saison-/Programmübersicht ohne klar trennbaren Eventblock
 - Terminlisten-Seiten, wenn daraus kein einzelner Termin eindeutig und vollständig belegbar ist
 
 ### Reihenfolge
-Es gilt:
+Es gilt grundsätzlich:
 
-**Detailseite > eindeutige Event-Unterseite > sonst nicht FINAL**
+**klassische Event-Detailseite > offizielle event-spezifische Endnutzer-Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
 
-### Ausnahme-Regel
-Wenn **keine Detailseite existiert**, eine Übersichtsseite aber:
-1. das Event eindeutig identifizierbar macht,
-2. keine bessere Quelle existiert,
-3. Datum, Ort, Titel und belastbare Einordnung daraus 100% sicher hervorgehen,
+### FINAL-fähige Alternativen zur klassischen Detailseite
 
-dann gilt:
-- im **manuellen Prüfmodus**: als **REVIEW NÖTIG**
+#### A. Offizielle event-spezifische Endnutzer-Info-/News-Seite
+Eine offizielle Info-, Presse- oder News-Seite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
+
+1. offizieller oder neutraler Absender
+2. klarer Fokus auf **genau dieses Event**
+3. die Seite beschreibt erkennbar den **Besuch des Events**
+4. Titel, Datum und Ort sind belastbar erkennbar
+5. der Eventcharakter ist klar
+6. keine wesentliche FINAL-Pflichtfeldlücke
+7. keine bessere Detailseite verfügbar
+
+### Wichtige Klarstellung zum Besucherfokus
+Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite **nicht automatisch ungeeignet**.
+
+Eine solche Seite bleibt FINAL-fähig, wenn:
+- sie klar auch für Besucher gedacht ist
+- die besucherrelevanten Kerndaten vollständig und belastbar vorhanden sind
+- der Hauptfokus weiterhin auf dem Event selbst liegt
+
+Nicht FINAL-fähig ist die Seite nur dann, wenn sie **überwiegend**:
+- bloßer Anmeldeaufruf
+- reiner Organisationshinweis
+- bloße Registrierungsseite
+- reine Save-the-Date-Seite ohne ausreichende Nutzerdaten
+
+ist.
+
+#### B. Offizieller klar trennbarer Eventblock auf einer Programmseite
+Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite ist FINAL-fähig, wenn **alle** folgenden Punkte erfüllt sind:
+
+1. offizieller oder neutraler Absender
+2. der Einzeltermin ist auf der Seite **klar separat abgrenzbar**
+3. Titel, Datum, Uhrzeit (falls vorhanden), Ort und Eventcharakter sind im Einzelblock belastbar
+4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
+5. keine bessere Detailseite verfügbar
+### Mehrtermin-Seiten
+Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
+
+Wenn auf derselben Seite **eine konkrete sichtbare Einzelinstanz** mit
+- Titel
+- Datum
+- ggf. Uhrzeit
+- Ort
+- Eventcharakter
+
+klar belegt ist, dann darf **diese Einzelinstanz FINAL-fähig** sein, auch wenn auf derselben Seite weitere Termine desselben Formats existieren.
+
+### REVIEW statt FINAL
+Wenn eine Quelle zwar vielversprechend ist, aber einer dieser Punkte nicht sicher erfüllt ist:
+
+- im **manuellen Prüfmodus**: **REVIEW NÖTIG**
 - im **Automationsmodus**: **nicht ausgeben**
 
-Für FINAL gilt damit praktisch:
-- **nur Detailseite oder gleichwertig event-spezifische Unterseite**
+Für FINAL gilt damit:
 
----
-
+- klassische Detailseite ist der Regelfall
+- offizielle event-spezifische Endnutzer-Info-/News-Seiten sind eng begrenzt zulässig
+- offizielle klar trennbare Eventblöcke auf Programmseiten sind eng begrenzt zulässig
+- generische Übersichten bleiben unzulässig
 ## 8. Beschreibungs-Regel
 Beschreibungen müssen streng quellenbasiert und sachlich sein.
 
@@ -535,7 +525,40 @@ Das gilt besonders für:
 - `location`
 - `city`
 
-Wenn durch das Weglassen die FINAL-Fähigkeit verloren geht:
+### Safe-location-Regel
+Bei Ortsangaben darf immer nur die **höchste sicher belegte Granularität** ausgegeben werden.
+
+Beispiel:
+- wenn nur `Koppelkerk` sicher belegt ist, dann **nicht** `Koppelkerk Kerkzaal` ausgeben
+- wenn nur der Ort oder das Festivalgelände sicher ist, dann **nicht** eine feinere Unterlocation erfinden oder unsicher verdichten
+
+Lieber:
+- gröber, aber sicher  
+als
+- feiner, aber nicht 100% belastbar
+
+### Canonical-URL-Regel
+Für FINAL soll nach Möglichkeit die **stabilste belastbare kanonische Event-URL** verwendet werden.
+
+Das heißt:
+- nicht irgendein ähnlicher Pfad
+- nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
+- bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
+
+### Harte Instanz-URL-Regel
+Eine URL ist nur dann FINAL-tauglich, wenn sie **erkennbar zur gewählten Instanz passt**.
+
+Nicht FINAL-tauglich sind insbesondere:
+- datumsfremde Pfade
+- instanzfremde URLs
+- URLs, die sichtbar auf einen anderen Termin desselben Formats verweisen
+- URLs, bei denen die konkrete Zielinstanz nicht sauber verifizierbar ist
+
+Wenn die URL nicht stabil genug oder nicht instanzpassend verifiziert werden kann:
+- im manuellen Prüfmodus: **REVIEW NÖTIG**
+- im Automationsmodus: **nicht ausgeben**
+
+Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
@@ -558,7 +581,7 @@ Wenn mehrere konkrete Termine vorkommen:
 - bei gleichem Eventtitel an mehreren Tagen **mehrere Einträge** erzeugen
 - bei gleichem Datum mit mehreren Startzeiten **mehrere Einträge** erzeugen
 
-### Mehrtages-Events
+### Mehrtages-Events – Grundlogik
 Wenn ein Event über mehrere Tage läuft:
 - `date` = erster Tag
 - `endDate` = letzter Tag
@@ -568,6 +591,57 @@ Wenn `endDate` nicht belastbar belegt ist:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
 
+<!-- === BEGIN BLOCK: MEHRTAGES_INSTANZLOGIK_V2 | Zweck: zusammenhängende Mehrtagesevents, Tagesinstanzen und Slot-Instanzen eindeutig trennen | Umfang: ersetzt die bisherige Mehrtages-Unterscheidung und harte Instanzprüfung === -->
+### Wichtige Unterscheidung bei Mehrtagesevents
+
+#### A. Ein zusammenhängendes Mehrtagesevent
+Wenn die Quelle das Event klar als **ein einziges zusammenhängendes Event** darstellt und keine eigenständigen Tages-/Slot-Instanzen daraus macht, wird ein einzelner Mehrtageseintrag verwendet.
+
+Dann gilt:
+- `date` = erster Tag
+- `endDate` = letzter Tag
+- `description` beschreibt das gesamte Event
+- `time` nur setzen, wenn eine einheitliche Startzeit für das gesamte Event belastbar ist
+- bei unterschiedlichen Tageszeiten oder Öffnungszeiten bleibt `time` leer
+
+Unterschiedliche tägliche Öffnungszeiten oder Tageszeiten machen ein zusammenhängendes Mehrtagesevent **nicht automatisch** zu mehreren FINAL-Einträgen.
+
+#### B. Tages- oder slotbezogene Einzelinstanzen
+Wenn die Quelle pro Tag, Slot oder Programmpunkt eigenständige separat besuchbare Instanzen ausweist, dann gilt:
+
+- **nicht** als ein Sammel-Eintrag zusammenziehen
+- stattdessen **pro Tag / Termin / Slot eigener JSON-Eintrag**
+- pro Eintrag nur die konkret belegte Startzeit als `HH:MM` setzen
+
+Das gilt besonders, wenn:
+- Programmpunkte klar getrennt sind
+- unterschiedliche Zielgruppenblöcke separat ausgewiesen sind
+- mehrere Läufe / Slots / Startzeiten separat buchbar oder separat besuchbar sind
+- ein Nutzer realistisch einzelne Blöcke separat auswählt
+
+### Harte Instanzprüfung vor FINAL
+Für FINAL gilt zwingend:
+
+- ein Eintrag muss fachlich eindeutig modelliert sein
+- zusammenhängendes Mehrtagesevent = ein Eintrag mit `date` / `endDate`
+- eigenständige Tages-/Slot-Instanz = eigener Eintrag
+- bei Unsicherheit: **REVIEW NÖTIG** im manuellen Prüfmodus bzw. **nicht ausgeben** im Automationsmodus
+<!-- === END BLOCK: MEHRTAGES_INSTANZLOGIK_V2 === -->
+
+### Mehrtermin-Seiten mit sichtbarer Einzelinstanz
+Wenn eine Seite mehrere Termine desselben Formats enthält, ist das **kein automatischer Ausschluss**.
+
+Wenn die aktuell sichtbare Einzelinstanz klar belegt ist, dann darf genau diese Instanz übernommen werden, auch wenn:
+- dieselbe Seite weitere Termine desselben Formats enthält
+- ein Link wie „weitere Termine anzeigen“ vorhanden ist
+
+### Ausstellungen / Märkte / längere Formate
+Bei Ausstellungen, Märkten oder ähnlichen Formaten mit Laufzeit über mehrere Tage gilt:
+
+- ein einzelner Mehrtageseintrag ist erlaubt, wenn das Format als zusammenhängendes Event dargestellt wird
+- unterschiedliche tägliche Öffnungszeiten machen den Event **nicht automatisch** zu mehreren Instanzen
+- wenn aber einzelne Veranstaltungstage als eigene Programmpunkte oder Sondertermine ausgewiesen sind, müssen diese getrennt behandelt werden
+
 Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
 - **nicht FINAL übernehmen**
 
@@ -575,28 +649,45 @@ Wenn kein belastbares Eventdatum einer konkreten Instanz erkennbar ist:
 
 ## 12. Zeit-Regel
 
+<!-- === BEGIN BLOCK: TIME_FIELD_FORMAT_RULE_V2 | Zweck: time eindeutig als Startzeit definieren und Zeitspannen ausschließen | Umfang: ersetzt allgemeine Zeit-Regel === -->
 ### Allgemein
-`time` darf nur eingetragen werden, wenn die Quelle die Uhrzeit klar und eindeutig nennt.
+`time` darf nur eingetragen werden, wenn die Quelle eine Startzeit klar und eindeutig nennt.
+
+Format:
+- erlaubt: `HH:MM`
+- nicht erlaubt: Zeiträume wie `16:00–23:59`
+- nicht erlaubt: Öffnungszeiten als Zeitspanne
+- nicht erlaubt: Einlass, Warm-up oder sonstige Nebenzeiten als Startzeit
 
 Dabei exakt unterscheiden:
-- Beginn
+- Beginn / Startzeit
 - Einlass
 - Warm-up
 - Veranstaltungszeitraum
-
-Wenn mehrere Zeitangaben existieren, nur die **für das Event relevante Hauptzeit** eintragen oder in der Beschreibung sauber unterscheiden.
+- Öffnungszeiten
 
 Keine Zeit raten.  
 Keine Zeit aus ähnlichen Events übernehmen.
+<!-- === END BLOCK: TIME_FIELD_FORMAT_RULE_V2 === -->
 
-### Mehrtages-Event
-Wenn die Quelle eine **einheitliche Zeitangabe für das gesamte Mehrtages-Event** nennt:
-- `time` darf gesetzt werden
+<!-- === BEGIN BLOCK: MEHRTAGES_TIME_RULE_V2 | Zweck: Zeitregel für zusammenhängende Mehrtagesevents und Tages-/Slot-Instanzen konsolidieren | Umfang: ersetzt Mehrtages-Zeitregel === -->
+### Mehrtages-Event mit einheitlicher Startzeit
+Wenn die Quelle eine **einheitliche Startzeit** für das gesamte zusammenhängende Mehrtagesevent nennt:
+- `time` darf als `HH:MM` gesetzt werden
 
-Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt:
-- `time` leer lassen
+### Mehrtages-Event mit unterschiedlichen Tageszeiten
+Wenn die Quelle **pro Tag unterschiedliche Zeiten** nennt, dann gilt:
 
-Niemals nur die Uhrzeit des ersten Tages als allgemeine Event-Zeit setzen.
+- wenn die Tage oder Blöcke als eigenständige separat besuchbare Instanzen verstanden werden können: **pro Tag / Block eigener Eintrag**
+- wenn das Event als zusammenhängendes Format dargestellt wird und die Tage nicht als eigenständige Instanzen modelliert werden sollen: **ein Mehrtageseintrag mit `date` und `endDate`, aber `time` leer**
+- keine einzelne Tageszeit darf stellvertretend als allgemeine `time` für das gesamte Mehrtagesevent gesetzt werden
+<!-- === END BLOCK: MEHRTAGES_TIME_RULE_V2 === -->
+
+### Öffnungszeiten vs. Event-Startzeit
+Öffnungszeiten dürfen nicht mit einer Startzeit verwechselt werden.
+
+- Eine reine Öffnungszeit ist nur dann als `time` sinnvoll, wenn das Format genau so als besuchbare Zeitspanne des Events kommuniziert wird
+- Bei klassischen Bühnen-/Vortrags-/Konzertformaten ist die eigentliche Startzeit zu bevorzugen
 
 ### Mehrere Slots / Läufe / Startzeiten
 Wenn es gibt:
@@ -608,9 +699,6 @@ Dann gilt:
 - **nicht zu einem Sammel-Eintrag komprimieren**
 - stattdessen **pro Termin / Slot einen eigenen JSON-Eintrag**
 - pro Eintrag die jeweils konkrete `time` setzen
-
-Nur wenn für die konkrete Instanz keine eindeutige Startzeit belegbar ist:
-- `time` weglassen
 
 Ein identischer `source_url` darf mehrfach vorkommen, wenn `date` und/oder `time` unterschiedlich sind.
 
@@ -673,7 +761,43 @@ Besonders wichtig:
 
 ---
 
-## 15. Priorisierung
+<!-- === BEGIN BLOCK: SUCHABDECKUNG_PRODUKTION_ONLY_V1 | Zweck: Suchabdeckung auf Weekly-Produktion ohne aktive Discovery konsolidieren | Umfang: ersetzt CORE/RECOVERY/DISCOVERY-Mischlogik durch production-only Abdeckung plus separate Quellen-Discovery === -->
+## 15. Suchabdeckung und Priorisierung
+
+### Ziel
+Die Suche soll nicht nur präzise, sondern auch **möglichst vollständig** sein.
+
+Das heißt:
+- möglichst alle guten, belastbaren Events im Suchgebiet finden
+- aber nur dann übernehmen, wenn sie regelkonform und belastbar sind
+- im Weekly-Produktionslauf keine künstliche Auffüllung mit schwachen Restkandidaten
+
+### Suchabdeckung im Weekly-Produktionslauf
+Ein qualitativ guter Weekly-Produktionslauf soll die starken bekannten und bewusst gewichteten Suchbereiche systematisch abdecken.
+
+Aktiv zu prüfen sind:
+
+1. **CORE-HIGH**
+   - wiederholt starke, offizielle oder neutrale Quellen
+   - hoher PWA-Nutzen
+   - hohe Trefferqualität
+
+2. **CORE-MID**
+   - regelmäßig brauchbare Quellen
+   - streng nach Breiteninteresse und PWA-Nutzen filtern
+
+3. **RECOVERY**
+   - offizielle event-spezifische News-/Info-Seiten
+   - offizielle klar trennbare Eventblöcke auf Programm- oder Saisonseiten
+   - nur mit sauberer Instanz-, URL-, Datums- und Besucherfokus-Prüfung
+
+### Quellen-Discovery
+`DISCOVERY-SEED` und `DISCOVERY-OPEN` sind für Quellen-Discovery weiterhin zulässig, aber nicht als aktiver Hauptsuchmodus im Weekly-Produktionslauf.
+
+Gute neue Quellen außerhalb des Registers bleiben grundsätzlich erlaubt.  
+Sie sollen jedoch separat bewertet und bei wiederholter Qualität bewusst ins Quellenregister hochgestuft werden.
+
+### Priorisierung
 Bevorzugt aufnehmen:
 - lokale und regionale Events mit klarem Bezug zu Bocholt
 - Events mit hoher öffentlicher Relevanz
@@ -681,15 +805,16 @@ Bevorzugt aufnehmen:
 - Events mit klarer Terminierung
 - Events aus offiziellen oder neutralen Quellen
 - Events, die für normale Nutzer realistisch interessant sind
+- Events mit hohem Mehrwert für die Kuratierungs-PWA
 
-Eher nicht aufnehmen:
+Eher zurückstellen oder nur nachrangig aufnehmen:
 - grenzwertige Mini-Termine
 - schwach belegte Einträge
 - stark werbliche Seiten
 - stark kommerzielle Einzelpromo
-- unklare oder halb vollständige Events
-
----
+- sehr nischige Spezialfälle mit geringem PWA-Nutzen
+- einseitige Mehrfachausbeute aus derselben Quelle, wenn gleichzeitig stärkere Alternativen verfügbar sind
+<!-- === END BLOCK: SUCHABDECKUNG_PRODUKTION_ONLY_V1 === -->
 
 ## 16. Kandidaten-Schema für `data/inbox_manual.json`
 
@@ -806,21 +931,22 @@ Diese Regel wird **nicht** im Suchkandidaten-Output erzwungen, damit die bestehe
 ## 18. Mengenregel
 Für einen normalen Suchlauf gilt:
 
-- lieber **sauber statt künstlich gefüllt**
+- lieber **sauber und vollständig** als künstlich knapp
 - keine Fülltreffer
 - keine fragwürdigen Grenzfälle nur für mehr Menge
 
-### Zielgröße
-- typischerweise **10 bis 25 gute FINAL-Kandidaten**
+### Wichtige Klarstellung
+Die Suchqualität soll **nicht** durch eine künstlich zu kleine Zielmenge begrenzt werden.
 
-Wichtig:
-- diese Zielgröße ist **eine Orientierung, keine harte Obergrenze**
-- wenn mehr saubere, dedupte und regelkonforme Kandidaten vorhanden sind, dürfen **auch mehr als 25** geliefert werden
-- wenn weniger gute Events vorhanden sind, dann entsprechend weniger
+Das heißt:
+- wenn mehr gute, belastbare FINAL-Kandidaten vorhanden sind, dürfen auch mehr geliefert werden
+- eine numerische Obergrenze ist in erster Linie ein **Laufparameter**, nicht eine Qualitätsregel
+- Vollständigkeit geht vor künstlicher Verknappung
 
-Ziel bleibt:
-- **möglichst viele gute Events**
-- aber **keine Qualitätsabsenkung nur für höhere Menge**
+### Praktische Orientierung
+- 10 bis 25 gute FINAL-Kandidaten sind ein typischer Richtwert
+- wenn belastbar mehr starke Kandidaten vorhanden sind, dürfen auch mehr geliefert werden
+- wenn nur wenige gute Kandidaten existieren, dann entsprechend weniger
 
 ## 19. Review statt Raten
 Wenn eines dieser Probleme vorliegt:
@@ -906,12 +1032,14 @@ Im **Automationsmodus** entfällt dieser Ausgabehinweis vollständig.
 
 ---
 
+<!-- === BEGIN BLOCK: WOCHENROUTINE_PRODUKTION_DISCOVERY_TRENNUNG_V1 | Zweck: Weekly-Produktion und Quellen-Discovery operativ trennen | Umfang: ersetzt die Automationsroutine durch production-only Logik plus separaten Discovery-Modus === -->
 ## 23. Wöchentliche Arbeitsroutine
 
 ### A. Manuell im Chat
 1. Neues Chat-Fenster öffnen
 2. Diese Dateien mitgeben:
    - `bocholt-erleben_eventsuche_regelwerk_v3.md`
+   - `eventsuche_quellenregister_v1.md`
    - `events.tsv` oder ersatzweise `data/events.json`
    - `inbox.tsv` bzw. `data/inbox.tsv`
    - `inbox_archive.tsv`
@@ -926,12 +1054,30 @@ Im **Automationsmodus** entfällt dieser Ausgabehinweis vollständig.
 7. Inbox Review PWA vollständig kuratieren
 8. Vor dem nächsten Suchlauf wieder gegen den aktuellen Bestand, die offene Inbox, das Archiv und ggf. `data/inbox_manual.json` dedupen
 
-### B. Automationslauf
-1. Regelwerk + aktuelle Referenzdaten werden automatisch geladen
-2. Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen
-3. Ausgabe enthält ausschließlich FINAL-JSON
-4. JSON wird nach `data/inbox_manual.json` geschrieben
-5. Danach folgt der bestehende Intake-/Review-Prozess
+### B. Automationslauf / Weekly-Produktionslauf
+1. Regelwerk, Quellenregister und aktuelle Referenzdaten werden automatisch geladen.
+2. Der Weekly-Lauf ist ein reiner Produktionslauf.
+3. Aktive Quellensteuerung im Weekly-Lauf:
+   - `CORE-HIGH`
+   - `CORE-MID`
+   - `RECOVERY`
+4. `DISCOVERY-SEED` und `DISCOVERY-OPEN` werden im Weekly-Produktionslauf nicht aktiv gesucht.
+5. Suchlauf startet nur, wenn Review-/Manual-Puffer dies zulassen.
+6. Ausgabe enthält ausschließlich FINAL-JSON.
+7. JSON wird nach `data/inbox_manual.json` geschrieben.
+8. Danach folgt der bestehende Intake-/Review-Prozess.
+
+### C. Quellen-Discovery separat
+Quellen-Discovery ist ein eigener Arbeitsmodus.
+
+Ziel:
+- neue Quellen finden
+- neue Quellen bewerten
+- Quellenregister verbessern
+- starke Quellen später bewusst hochstufen
+
+Quellen-Discovery dient nicht dazu, dem Weekly-Produktionslauf hinten zusätzliche Eventtreffer anzuhängen.
+<!-- === END BLOCK: WOCHENROUTINE_PRODUKTION_DISCOVERY_TRENNUNG_V1 === -->
 
 ---
 
