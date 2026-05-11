@@ -29,6 +29,10 @@ function srl_build_risk_flags(array $row): array
 {
     $flags = [];
 
+    if ((int)($row['organizer_edit_count'] ?? 0) > 0) {
+        $flags[] = 'Vom Veranstalter nachträglich geändert.';
+    }
+
     if (trim((string)($row['location_address'] ?? '')) === '') {
         $flags[] = 'Adresse oder öffentlicher Treffpunkt fehlt.';
     }
@@ -63,6 +67,8 @@ try {
             description_text,
             notes_text,
             paid_at,
+            organizer_edited_at,
+            organizer_edit_count,
             created_at,
             updated_at
          FROM submissions
@@ -111,6 +117,8 @@ try {
             'notes' => (string)($row['notes_text'] ?? ''),
             'created_at' => (string)($row['created_at'] ?? ''),
             'paid_at' => (string)($row['paid_at'] ?? ''),
+            'organizer_edited_at' => (string)($row['organizer_edited_at'] ?? ''),
+            'organizer_edit_count' => (int)($row['organizer_edit_count'] ?? 0),
             'review_risk_flags' => srl_build_risk_flags($row),
             'organizer_name' => (string)($row['organization_name_snapshot'] ?? ''),
             'organizer_email' => (string)($row['email_snapshot'] ?? ''),
