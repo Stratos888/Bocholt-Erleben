@@ -113,8 +113,9 @@ const TYPE_META = {
     state.launcherMounted = true;
   }
 
+/* === BEGIN BLOCK: FEEDBACK_INLINE_ENTRY_FUNNEL_PARITY_V1 | Zweck: erlaubt den mobilen Inline-Feedback-Einstieg auch auf Publish-/Payment-Funnel-Seiten, damit Feedback dort nicht durch den ausgeblendeten Launcher verschwindet; Umfang: ersetzt ensureInlineEntry() === */
 function ensureInlineEntry() {
-  if (state.inlineMounted || isDesktop() || pageType() === "publish") return;
+  if (state.inlineMounted || isDesktop()) return;
   const main = document.querySelector("main");
   if (!main) return;
 
@@ -142,6 +143,7 @@ function ensureInlineEntry() {
   main.insertAdjacentElement("afterend", entry);
   state.inlineMounted = true;
 }
+/* === END BLOCK: FEEDBACK_INLINE_ENTRY_FUNNEL_PARITY_V1 === */
 
   function ensureModalShell() {
     if (state.shell) return;
