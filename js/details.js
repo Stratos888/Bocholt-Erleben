@@ -529,6 +529,7 @@ const actions = [
 
 
     // show starts HALF
+    /* === BEGIN BLOCK: EVENT_DETAIL_VIEW_VALUE_METRIC_V1 | Zweck: zählt geöffnete Event-Detailpanels anonym für das interne Mehrwert-Dashboard; Umfang: ersetzt den Start von show(event) bis nach renderContent(event) === */
     show(event) {
       this.init();
       if (!this.panel || !this.sheet || !this.content) return;
@@ -538,6 +539,15 @@ const actions = [
 
       // render
       this.renderContent(event);
+
+      if (window.BEAnalytics && typeof window.BEAnalytics.trackValueMetric === "function") {
+        window.BEAnalytics.trackValueMetric("event_detail_view", {
+          entityType: "event",
+          entityId: String(event?.id || "").trim(),
+          entityTitle: String(event?.title || "").trim()
+        });
+      }
+      /* === END BLOCK: EVENT_DETAIL_VIEW_VALUE_METRIC_V1 === */
 
       // set snap start HALF (60% visible => translateY 40vh)
       this.setDragY(0);
