@@ -95,9 +95,9 @@
     <section class="content-card publish-start-card" id="publish-submit" aria-labelledby="publish-submit-title">
       <div class="publish-section-head">
         <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
-<!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V1 | Zweck: markiert den Pflichtfeld-Hinweis als kleine Formular-Meta-Information; Umfang: Pflichtfeld-Hinweis im Einzeltermin-Formular === -->
-<p class="content-note content-note--form-meta">Mit * markierte Felder sind Pflichtfelder.</p>
-<!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V1 === -->
+<!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V2 | Zweck: reduziert den Pflichtfeld-Hinweis auf eine kurze Meta-Markierung; Umfang: Pflichtfeld-Hinweis im Einzeltermin-Formular === -->
+<p class="content-note content-note--form-meta">* Pflichtfelder</p>
+<!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_META_REQUIRED_HINT_V2 === -->
         <p class="content-note"><strong>9,90&nbsp;€ einmalig</strong> – Zahlung über Stripe.</p>
       </div>
 
@@ -122,15 +122,19 @@
             <input class="content-field__control" id="publish-standard-title" name="title" type="text" required>
           </label>
 
-          <label class="content-field" for="publish-standard-date">
-            <span class="content-field__label">Datum *</span>
-            <input class="content-field__control" id="publish-standard-date" name="date" type="date" required>
-          </label>
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_DATE_TIME_ROW_V1 | Zweck: gruppiert Datum und Uhrzeit als zusammengehörige kurze Formularfelder; Umfang: Datum-/Uhrzeit-Felder der Einzelveranstaltungs-Einreichung === -->
+          <div class="publish-date-time-row content-field--full">
+            <label class="content-field" for="publish-standard-date">
+              <span class="content-field__label">Datum *</span>
+              <input class="content-field__control" id="publish-standard-date" name="date" type="date" required>
+            </label>
 
-          <label class="content-field" for="publish-standard-time">
-            <span class="content-field__label">Uhrzeit</span>
-            <input class="content-field__control" id="publish-standard-time" name="time" type="text" placeholder="z. B. 19:30 Uhr">
-          </label>
+            <label class="content-field" for="publish-standard-time">
+              <span class="content-field__label">Uhrzeit</span>
+              <input class="content-field__control" id="publish-standard-time" name="time" type="time">
+            </label>
+          </div>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_DATE_TIME_ROW_V1 === -->
 
           <label class="content-field" for="publish-standard-place">
             <span class="content-field__label">Veranstaltungsort / Location *</span>
