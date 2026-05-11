@@ -400,15 +400,16 @@ $checkedAt = date('d.m.Y H:i');
         <p id="overallText" class="muted small" style="margin-top:10px;">Live-Checks werden im Browser geprüft.</p>
       </article>
 
+      <!-- === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_GRID_V21 | Zweck: erweitert das interne Dashboard um eine getrennte Sicht auf Sichtbarkeit und Location-/Veranstalter-Nutzen; Umfang: ersetzt Messung-, Check-, Akquise- und Quellenbereich innerhalb von intern/seo-dashboard/index.php === -->
       <article class="card card--third">
         <h2>Messung</h2>
         <span id="measurementStatus" class="status" data-state="warn"><span class="dot"></span><span>noch nicht bewertet</span></span>
-        <p class="muted small" style="margin-top:10px;">Google- und Bing-Suchdaten werden in V2 automatisch aus <code>/data/search-metrics.json</code> geladen. Outbound-Klicks und performende Events bleiben vorerst manuell.</p>
+        <p class="muted small" style="margin-top:10px;">Google- und Bing-Suchdaten werden automatisch geladen. Standort-/Veranstalter-Nutzen wird bis zur GA4-API-Anbindung als manuelle Monatsauswertung geführt.</p>
       </article>
 
       <article class="card card--third">
         <h2>Nächste Aktion</h2>
-        <p class="small"><strong>Nach Deploy:</strong> Search-Metrics-JSON prüfen, Google-/Bing-Status kontrollieren und danach Outbound-/Event-Werte ergänzen.</p>
+        <p class="small"><strong>Jetzt sinnvoll:</strong> Outbound-, Maps-, Detail- und CTA-Werte monatlich ergänzen. Genau diese Werte sind später für Locations verkaufsfähig.</p>
       </article>
 
       <article class="card card--wide">
@@ -455,15 +456,20 @@ $checkedAt = date('d.m.Y H:i');
 
       <article class="card">
         <h2>Akquise-Ampel</h2>
-        <p class="muted small">Google- und Bing-Werte werden automatisch aus dem Search-Metrics-Export geladen. Outbound-Klicks und performende Events bleiben bis zur GA4-API-Anbindung als manuelle Monatswerte steuerbar.</p>
+        <p class="muted small">Die Ampel bewertet jetzt zwei Ebenen: Sichtbarkeit durch Google/Bing und echten Nutzen für Locations bzw. Veranstalter. Google- und Bing-Werte werden automatisch geladen; Nutzwerte bleiben vorerst manuell.</p>
 
         <form id="metricForm" class="metricForm">
           <label>Google Impressionen/Monat<input name="googleImpressions" inputmode="numeric" type="number" min="0" step="1" /></label>
           <label>Google Klicks/Monat<input name="googleClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
           <label>Bing Impressionen/Monat<input name="bingImpressions" inputmode="numeric" type="number" min="0" step="1" /></label>
           <label>Bing Klicks/Monat<input name="bingClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
-          <label>Outbound-Klicks/Monat<input name="outboundClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>Website-Klicks/Monat<input name="websiteClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>Maps-/Route-Klicks/Monat<input name="mapsClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>Event-Detail-Aufrufe/Monat<input name="detailViews" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>Location-Klicks/Monat<input name="locationClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>CTA-Klicks Veranstalter/Monat<input name="organizerCtaClicks" inputmode="numeric" type="number" min="0" step="1" /></label>
           <label>performende Events<input name="performingEvents" inputmode="numeric" type="number" min="0" step="1" /></label>
+          <label>performende Locations<input name="performingLocations" inputmode="numeric" type="number" min="0" step="1" /></label>
         </form>
 
         <div class="actions">
@@ -475,8 +481,15 @@ $checkedAt = date('d.m.Y H:i');
         <div class="kpi">
           <div class="kpiBox"><div class="muted small">Impressionen gesamt</div><div id="kpiImpressions" class="kpiValue">0</div></div>
           <div class="kpiBox"><div class="muted small">Klicks gesamt</div><div id="kpiClicks" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Outbound</div><div id="kpiOutbound" class="kpiValue">0</div></div>
+          <div class="kpiBox"><div class="muted small">Location-Nutzen</div><div id="kpiLocationValue" class="kpiValue">0</div></div>
           <div class="kpiBox"><div class="muted small">Ampel</div><div id="kpiStage" class="kpiValue">Rot</div></div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpiBox"><div class="muted small">Website-Klicks</div><div id="kpiWebsiteClicks" class="kpiValue">0</div></div>
+          <div class="kpiBox"><div class="muted small">Maps-/Route-Klicks</div><div id="kpiMapsClicks" class="kpiValue">0</div></div>
+          <div class="kpiBox"><div class="muted small">Detail-Aufrufe</div><div id="kpiDetailViews" class="kpiValue">0</div></div>
+          <div class="kpiBox"><div class="muted small">Veranstalter-CTA</div><div id="kpiOrganizerCtaClicks" class="kpiValue">0</div></div>
         </div>
 
         <p id="kpiExplanation" class="note small" style="margin-top:12px;">Noch keine Werte geladen.</p>
@@ -488,6 +501,11 @@ $checkedAt = date('d.m.Y H:i');
       </article>
 
       <article class="card card--half">
+        <h2>Location-/Veranstalter-Nutzen</h2>
+        <div id="locationValueStatus" class="note small">Noch keine Nutzwerte eingetragen.</div>
+      </article>
+
+      <article class="card card--half">
         <h2>Externe Messquellen</h2>
         <div class="linkList">
           <a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a>
@@ -495,11 +513,12 @@ $checkedAt = date('d.m.Y H:i');
           <a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Pageviews, outbound_click</span></a>
         </div>
       </article>
+      <!-- === END BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_GRID_V21 === -->
     </section>
   </main>
 
   <script>
-    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V2_SEARCH_AUTOMATION | Zweck: lädt Google-/Bing-Search-Metriken automatisch aus dem Deploy-Export und kombiniert sie mit manuellen GA4-/Event-Werten; Umfang: nur diese interne Dashboard-Seite ===
+    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V21_LOCATION_VALUE_GRID | Zweck: kombiniert automatische Google-/Bing-Sichtbarkeit mit manuell gepflegten Location-/Veranstalter-Nutzwerten; Umfang: ersetzt nur die interne Dashboard-Logik dieser Seite ===
     const CHECKS = new Map();
 
     const CORE_PAGES = [
@@ -514,7 +533,7 @@ $checkedAt = date('d.m.Y H:i');
       "/datenschutz/"
     ];
 
-    const STORAGE_KEY = "be_internal_seo_metrics_v2";
+    const STORAGE_KEY = "be_internal_seo_metrics_v21";
     const SEARCH_METRICS_URL = "/data/search-metrics.json";
 
     const DEFAULT_METRICS = {
@@ -522,8 +541,13 @@ $checkedAt = date('d.m.Y H:i');
       googleClicks: 0,
       bingImpressions: 0,
       bingClicks: 0,
-      outboundClicks: 0,
-      performingEvents: 0
+      websiteClicks: 0,
+      mapsClicks: 0,
+      detailViews: 0,
+      locationClicks: 0,
+      organizerCtaClicks: 0,
+      performingEvents: 0,
+      performingLocations: 0
     };
 
     let currentMetrics = { ...DEFAULT_METRICS };
@@ -719,59 +743,139 @@ $checkedAt = date('d.m.Y H:i');
       }
     }
 
+    function buildMetricModel(metrics) {
+      const safe = {
+        ...DEFAULT_METRICS,
+        ...(metrics || {})
+      };
+
+      const searchImpressions = metricNumber(safe.googleImpressions) + metricNumber(safe.bingImpressions);
+      const searchClicks = metricNumber(safe.googleClicks) + metricNumber(safe.bingClicks);
+      const directLocationValue =
+        metricNumber(safe.websiteClicks) +
+        metricNumber(safe.mapsClicks) +
+        metricNumber(safe.locationClicks) +
+        metricNumber(safe.organizerCtaClicks);
+
+      const engagementValue = directLocationValue + metricNumber(safe.detailViews);
+
+      return {
+        ...safe,
+        searchImpressions,
+        searchClicks,
+        directLocationValue,
+        engagementValue
+      };
+    }
+
     function classifyMetrics(metrics) {
-      const impressions = metricNumber(metrics.googleImpressions) + metricNumber(metrics.bingImpressions);
-      const clicks = metricNumber(metrics.googleClicks) + metricNumber(metrics.bingClicks);
-      const outbound = metricNumber(metrics.outboundClicks);
-      const performing = metricNumber(metrics.performingEvents);
+      const model = buildMetricModel(metrics);
 
-      if (impressions >= 20000 && clicks >= 1000 && outbound >= 100 && performing >= 3) {
-        return ["strong", "Stark", "Stark verkaufsfähig: Reichweite und Interaktion reichen für konkrete Veranstalter-Kommunikation."];
+      if (
+        model.searchImpressions >= 20000 &&
+        model.searchClicks >= 1000 &&
+        model.directLocationValue >= 120 &&
+        metricNumber(model.performingEvents) >= 20 &&
+        metricNumber(model.performingLocations) >= 5
+      ) {
+        return ["strong", "Stark", "Stark verkaufsfähig: Sichtbarkeit, Weiterleitungen und mehrere performende Locations sind belegbar."];
       }
 
-      if (impressions >= 10000 && clicks >= 500 && outbound >= 30 && performing >= 15) {
-        return ["good", "Grün", "Aktiv verkaufsfähig: mit Zahlen auf Veranstalter zugehen."];
+      if (
+        model.searchImpressions >= 10000 &&
+        model.searchClicks >= 500 &&
+        model.directLocationValue >= 50 &&
+        metricNumber(model.performingEvents) >= 10 &&
+        metricNumber(model.performingLocations) >= 3
+      ) {
+        return ["good", "Grün", "Aktiv verkaufsfähig: Die Plattform erzeugt messbaren Nutzen für Events und Locations."];
       }
 
-      if (impressions >= 3000 && clicks >= 150 && outbound >= 10 && performing >= 5) {
-        return ["warn", "Gelb", "Erste gezielte Akquise-Tests sind plausibel. Noch keine breite Verkaufsoffensive."];
+      if (
+        model.searchImpressions >= 3000 &&
+        model.searchClicks >= 150 &&
+        (
+          model.directLocationValue >= 10 ||
+          metricNumber(model.detailViews) >= 100 ||
+          metricNumber(model.performingEvents) >= 5
+        )
+      ) {
+        return ["warn", "Gelb", "Erste Akquise-Tests sind plausibel. Für Locations fehlen noch stärkere Nutzsignale wie Website-, Maps- oder Location-Klicks."];
       }
 
-      return ["bad", "Rot", "Noch nicht aktiv verkaufen. Erst Sichtbarkeit, Klicks und Beispiel-Events weiter aufbauen."];
+      return ["bad", "Rot", "Noch nicht aktiv verkaufen. Erst Sichtbarkeit und konkrete Nutzsignale für Locations weiter aufbauen."];
+    }
+
+    function renderLocationValue(metrics) {
+      const model = buildMetricModel(metrics);
+      const box = document.getElementById("locationValueStatus");
+      if (!box) return;
+
+      if (model.engagementValue <= 0 && metricNumber(model.performingEvents) <= 0 && metricNumber(model.performingLocations) <= 0) {
+        box.innerHTML = `
+          <p><strong>Status:</strong> noch keine Nutzwerte eingetragen</p>
+          <p style="margin-top:8px;">Für Location-Akquise fehlen noch Website-, Maps-, Detail-, Location- oder CTA-Werte.</p>
+        `;
+        return;
+      }
+
+      box.innerHTML = `
+        <p><strong>Direkter Location-Nutzen:</strong> ${formatMetric(model.directLocationValue)} Klicks</p>
+        <p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(model.detailViews)} Event-Detail-Aufrufe</p>
+        <p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(model.performingEvents)}</p>
+        <p style="margin-top:6px;"><strong>Performende Locations:</strong> ${formatMetric(model.performingLocations)}</p>
+        <p class="muted" style="margin-top:10px;">Verkaufsfähig wird die Zahl vor allem über Website-, Maps- und Location-Klicks, weil diese für Locations direkt nachvollziehbar sind.</p>
+      `;
     }
 
     function renderMetrics(metrics) {
-      const impressions = metricNumber(metrics.googleImpressions) + metricNumber(metrics.bingImpressions);
-      const clicks = metricNumber(metrics.googleClicks) + metricNumber(metrics.bingClicks);
-      const [state, label, copy] = classifyMetrics(metrics);
+      const model = buildMetricModel(metrics);
+      const [state, label, copy] = classifyMetrics(model);
 
-      document.getElementById("kpiImpressions").textContent = formatMetric(impressions);
-      document.getElementById("kpiClicks").textContent = formatMetric(clicks);
-      document.getElementById("kpiOutbound").textContent = formatMetric(metrics.outboundClicks);
+      document.getElementById("kpiImpressions").textContent = formatMetric(model.searchImpressions);
+      document.getElementById("kpiClicks").textContent = formatMetric(model.searchClicks);
+      document.getElementById("kpiLocationValue").textContent = formatMetric(model.directLocationValue);
       document.getElementById("kpiStage").textContent = label;
+      document.getElementById("kpiWebsiteClicks").textContent = formatMetric(model.websiteClicks);
+      document.getElementById("kpiMapsClicks").textContent = formatMetric(model.mapsClicks);
+      document.getElementById("kpiDetailViews").textContent = formatMetric(model.detailViews);
+      document.getElementById("kpiOrganizerCtaClicks").textContent = formatMetric(model.organizerCtaClicks);
       document.getElementById("kpiExplanation").textContent = copy;
 
       const measurementStatus = document.getElementById("measurementStatus");
       measurementStatus.dataset.state = state === "strong" ? "good" : state;
       measurementStatus.querySelector("span:last-child").textContent = label;
+
+      renderLocationValue(model);
     }
 
     function applyMetrics(metrics) {
-      currentMetrics = {
-        ...DEFAULT_METRICS,
-        ...(metrics || {})
-      };
-
+      currentMetrics = buildMetricModel(metrics);
       writeMetricsToForm(currentMetrics);
       renderMetrics(currentMetrics);
     }
 
     function loadStoredMetrics() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      } catch (_) {
-        return {};
-      }
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+        if (stored && typeof stored === "object") {
+          return stored;
+        }
+      } catch (_) {}
+
+      try {
+        const legacyStored = JSON.parse(localStorage.getItem("be_internal_seo_metrics_v2") || "{}");
+
+        if (legacyStored && typeof legacyStored === "object") {
+          return {
+            ...legacyStored,
+            websiteClicks: legacyStored.outboundClicks || 0
+          };
+        }
+      } catch (_) {}
+
+      return {};
     }
 
     function sourceStatusLabel(status) {
@@ -865,6 +969,7 @@ $checkedAt = date('d.m.Y H:i');
 
     document.getElementById("resetMetrics").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("be_internal_seo_metrics_v2");
       applyMetrics(DEFAULT_METRICS);
       loadSearchMetrics();
     });
@@ -876,8 +981,7 @@ $checkedAt = date('d.m.Y H:i');
     applyMetrics(loadStoredMetrics());
     loadSearchMetrics();
     runChecks();
-    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V2_SEARCH_AUTOMATION ===
-  </script>
+    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V21_LOCATION_VALUE_GRID ===
   </script>
 <?php endif; ?>
 </body>

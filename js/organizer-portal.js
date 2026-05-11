@@ -731,12 +731,227 @@ if (quotaRemaining) {
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V5 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_DETAILS_V2 | Zweck: zeigt aktuelle/relevante Einreichungen sortiert von neu nach alt und öffnet Details inline statt externe Links direkt zu öffnen; Umfang: Überschrift, Empty-State und komplette Rendering-Logik der Einreichungsliste in renderDashboard === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 | Zweck: zeigt aktuelle Einreichungen mit Details und erlaubt Veranstaltern das Ändern noch nicht freigegebener Eventdaten direkt im Dashboard; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
   submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Aktuelle Einreichungen";
 }
 
 if (submissionsList && submissionsEmpty) {
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_FRONTEND_V2 | Zweck: zeigt den Änderungsbutton auch für bereits freigegebene Zukunftstermine; Umfang: lokale Editierbarkeitsprüfung im Dashboard === */
+  const editableStatuses = new Set(["draft", "checkout_started", "paid", "in_review"]);
+
+  function isTodayOrFutureSubmission(submission) {
+    const startDate = safeText(submission?.start_date);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return false;
+
+    const now = new Date();
+    const year = String(now.getFullYear()).padStart(4, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return startDate >= `${year}-${month}-${day}`;
+  }
+
+  function isSubmissionEditable(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+    const kindKey = safeText(submission?.submission_kind || "event").toLowerCase();
+
+    if (kindKey !== "event") return false;
+    if (editableStatuses.has(statusKey)) return true;
+
+    return statusKey === "approved" && isTodayOrFutureSubmission(submission);
+  }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_FRONTEND_V2 === */
+
+  function renderSubmissionFactsHtml(values) {
+    const eventDateText = formatDate(values?.start_date);
+    const timeText = safeText(values?.time_text);
+    const locationText = safeText(values?.location_name);
+    const addressText = safeText(values?.location_address);
+
+    return `
+      ${eventDateText !== "–" ? `<div><dt>Termin</dt><dd>${escapeHtml(eventDateText)}</dd></div>` : ""}
+      ${timeText ? `<div><dt>Uhrzeit</dt><dd>${escapeHtml(timeText)}</dd></div>` : ""}
+      ${locationText ? `<div><dt>Ort</dt><dd>${escapeHtml(locationText)}</dd></div>` : ""}
+      ${addressText ? `<div><dt>Adresse</dt><dd>${escapeHtml(addressText)}</dd></div>` : ""}
+    `;
+  }
+
+  function setEditStatus(form, message, variant = "info") {
+    const statusNode = form.querySelector("[data-submission-edit-status]");
+    if (!statusNode) return;
+
+    statusNode.hidden = false;
+    statusNode.textContent = safeText(message);
+    statusNode.dataset.statusVariant = variant;
+  }
+
+  function clearEditValidation(form) {
+    form.querySelectorAll("[aria-invalid='true']").forEach((control) => {
+      control.removeAttribute("aria-invalid");
+    });
+
+    form.querySelectorAll(".content-field[data-field-invalid='true']").forEach((field) => {
+      delete field.dataset.fieldInvalid;
+    });
+
+    const statusNode = form.querySelector("[data-submission-edit-status]");
+    if (statusNode) {
+      statusNode.hidden = true;
+      statusNode.textContent = "";
+      delete statusNode.dataset.statusVariant;
+    }
+  }
+
+  function markEditInvalid(form, controlNames) {
+    const names = Array.from(new Set(controlNames));
+    let firstInvalidControl = null;
+
+    names.forEach((name) => {
+      const control = form.elements[name];
+      if (!control) return;
+
+      control.setAttribute("aria-invalid", "true");
+      const field = control.closest(".content-field");
+      if (field) field.dataset.fieldInvalid = "true";
+
+      if (!firstInvalidControl && typeof control.focus === "function") {
+        firstInvalidControl = control;
+      }
+    });
+
+    setEditStatus(form, "Bitte fülle die markierten Pflichtfelder aus.", "error");
+
+    if (firstInvalidControl) {
+      firstInvalidControl.focus({ preventScroll: false });
+    }
+  }
+
+  function readEditValues(form, submission) {
+    return {
+      submission_id: Number(submission?.id || 0),
+      title: safeText(form.elements.title?.value),
+      start_date: safeText(form.elements.start_date?.value),
+      time_text: safeText(form.elements.time_text?.value),
+      location_name: safeText(form.elements.location_name?.value),
+      location_address: safeText(form.elements.location_address?.value),
+      event_url: safeText(form.elements.event_url?.value),
+      description_text: safeText(form.elements.description_text?.value),
+      location_public_confirmed: form.elements.location_public_confirmed?.checked === true
+    };
+  }
+
+  function validateEditValues(form, values) {
+    const invalidNames = [];
+    const eventUrlControl = form.elements.event_url;
+
+    if (!values.submission_id) invalidNames.push("title");
+    if (!values.title) invalidNames.push("title");
+    if (!values.start_date) invalidNames.push("start_date");
+    if (!values.location_name) invalidNames.push("location_name");
+    if (!values.location_address) invalidNames.push("location_address");
+    if (values.location_public_confirmed !== true) invalidNames.push("location_public_confirmed");
+    if (values.event_url && eventUrlControl && !eventUrlControl.validity.valid) invalidNames.push("event_url");
+
+    if (invalidNames.length) {
+      markEditInvalid(form, invalidNames);
+      return false;
+    }
+
+    return true;
+  }
+
+  function setSaveButtonState(button, isSaving) {
+    if (!button) return;
+
+    if (!button.dataset.defaultLabel) {
+      button.dataset.defaultLabel = button.textContent || "Änderung speichern";
+    }
+
+    button.disabled = isSaving;
+    button.textContent = isSaving ? "Änderung wird gespeichert …" : button.dataset.defaultLabel;
+  }
+
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_RENDER_UPDATE_AFTER_EDIT_V2 | Zweck: aktualisiert nach dem Speichern Titel, Status, Metadaten, Fakten und Link ohne Neuladen; Umfang: komplette Render-Aktualisierung einer geänderten Einreichung === */
+  function updateRenderedSubmission(row, detail, submission, values, responseSubmission) {
+    const titleNode = row.querySelector(".organizer-submission-row__title");
+    const metaNode = row.querySelector(".organizer-submission-row__meta");
+    const statusNode = detail.querySelector(".organizer-submission-detail__status span");
+    const statusDescriptionNode = detail.querySelector(".organizer-submission-detail__status small");
+    const factsNode = detail.querySelector(".organizer-submission-detail__facts");
+    const changedNode = detail.querySelector("[data-submission-edited-note]");
+    const linkSlot = detail.querySelector("[data-submission-link-slot]");
+    const updated = responseSubmission || values;
+
+    submission.status = updated.status || submission.status;
+    submission.title = updated.title;
+    submission.start_date = updated.start_date;
+    submission.time_text = updated.time_text;
+    submission.location_name = updated.location_name;
+    submission.location_address = updated.location_address;
+    submission.location_public_confirmed = updated.location_public_confirmed;
+    submission.event_url = updated.event_url;
+    submission.description_text = updated.description_text;
+    submission.organizer_edited_at = updated.organizer_edited_at || submission.organizer_edited_at;
+    submission.organizer_edit_count = updated.organizer_edit_count || submission.organizer_edit_count || 1;
+
+    const nextStatusText = formatSubmissionStatusLabel(submission);
+    const nextMetaDateText = formatSubmissionMetaDate(submission);
+
+    if (titleNode) titleNode.textContent = safeText(submission.title) || "Ohne Titel";
+    if (metaNode) metaNode.textContent = `${nextStatusText} · ${nextMetaDateText}`;
+    if (statusNode) statusNode.textContent = `Status: ${nextStatusText}`;
+    if (statusDescriptionNode) statusDescriptionNode.textContent = formatSubmissionStatusDescription(submission);
+    if (factsNode) factsNode.innerHTML = renderSubmissionFactsHtml(submission);
+
+    if (changedNode) {
+      changedNode.hidden = false;
+      changedNode.textContent = "Zuletzt durch dich geändert. Wir prüfen die aktuelle Version.";
+    }
+
+    if (linkSlot) {
+      const nextEventUrl = normalizeExternalUrl(submission.event_url);
+      linkSlot.innerHTML = nextEventUrl
+        ? `<a class="organizer-submission-detail__link" href="${escapeHtml(nextEventUrl)}" target="_blank" rel="noopener noreferrer">
+            Eingereichten Link öffnen
+            <span data-ui-icon="external" aria-hidden="true"></span>
+          </a>`
+        : "";
+      hydrateIcons(linkSlot);
+    }
+  }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_RENDER_UPDATE_AFTER_EDIT_V2 === */
+
+  async function saveSubmissionEdit(form, saveButton, row, detail, submission) {
+    clearEditValidation(form);
+
+    const values = readEditValues(form, submission);
+    if (!validateEditValues(form, values)) {
+      return;
+    }
+
+    setSaveButtonState(saveButton, true);
+
+    try {
+      const result = await requestJson("/api/organizer-portal/update-submission.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(values)
+      });
+
+      updateRenderedSubmission(row, detail, submission, values, result?.data?.submission || null);
+      setEditStatus(form, "Änderung gespeichert. Wir prüfen die aktuelle Version deiner Einreichung.", "success");
+    } catch (error) {
+      console.warn("Organizer portal: submission update failed.", error);
+      const message = safeText(error?.payload?.message) || "Die Änderung konnte gerade nicht gespeichert werden. Bitte versuche es erneut.";
+      setEditStatus(form, message, "error");
+    } finally {
+      setSaveButtonState(saveButton, false);
+    }
+  }
+
   submissionsList.innerHTML = "";
   submissionsEmpty.textContent = isSingleStatusView
     ? "Keine Einreichung gefunden."
@@ -753,10 +968,11 @@ if (submissionsList && submissionsEmpty) {
       const metaDateText = formatSubmissionMetaDate(submission);
       const metaText = `${statusText} · ${metaDateText}`;
       const statusDescription = formatSubmissionStatusDescription(submission);
-      const eventDateText = formatDate(submission.start_date);
-      const locationText = safeText(submission.location_name);
       const eventUrl = normalizeExternalUrl(submission.event_url);
       const detailId = `organizer-submission-detail-${index}`;
+      const editFormId = `organizer-submission-edit-${safeText(submission.id) || index}`;
+      const hasOrganizerEdit = Number(submission.organizer_edit_count || 0) > 0;
+      const canEdit = isSubmissionEditable(submission);
 
       const row = document.createElement("button");
       row.type = "button";
@@ -782,16 +998,80 @@ if (submissionsList && submissionsEmpty) {
           <span>Status: ${escapeHtml(statusText)}</span>
           <small>${escapeHtml(statusDescription)}</small>
         </p>
+        <p class="content-form-note organizer-submission-detail__edited-note" data-submission-edited-note ${hasOrganizerEdit ? "" : "hidden"}>
+          Zuletzt durch dich geändert. Wir prüfen die aktuelle Version.
+        </p>
         <dl class="organizer-submission-detail__facts">
-          ${eventDateText !== "–" ? `<div><dt>Termin</dt><dd>${escapeHtml(eventDateText)}</dd></div>` : ""}
-          ${locationText ? `<div><dt>Ort</dt><dd>${escapeHtml(locationText)}</dd></div>` : ""}
+          ${renderSubmissionFactsHtml(submission)}
         </dl>
-        ${eventUrl ? `
-          <a class="organizer-submission-detail__link" href="${escapeHtml(eventUrl)}" target="_blank" rel="noopener noreferrer">
-            Eingereichten Link öffnen
-            <span data-ui-icon="external" aria-hidden="true"></span>
-          </a>
-        ` : ""}
+        <div class="organizer-submission-detail__actions">
+          <span data-submission-link-slot>
+            ${eventUrl ? `
+              <a class="organizer-submission-detail__link" href="${escapeHtml(eventUrl)}" target="_blank" rel="noopener noreferrer">
+                Eingereichten Link öffnen
+                <span data-ui-icon="external" aria-hidden="true"></span>
+              </a>
+            ` : ""}
+          </span>
+          ${canEdit ? `
+            <button class="organizer-submission-detail__link organizer-submission-detail__edit-toggle" type="button" aria-expanded="false" aria-controls="${escapeHtml(editFormId)}">
+              Angaben ändern
+            </button>
+          ` : ""}
+        </div>
+        ${canEdit ? `
+          <form class="content-form organizer-submission-edit-form" id="${escapeHtml(editFormId)}" data-submission-edit-form hidden novalidate>
+            <p class="content-form-note organizer-validation-note" data-submission-edit-status hidden></p>
+            <div class="content-form-grid">
+              <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-title">
+                <span class="content-field__label">Titel der Veranstaltung *</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-title" name="title" type="text" value="${escapeHtml(submission.title)}" required>
+              </label>
+              <label class="content-field" for="${escapeHtml(editFormId)}-date">
+                <span class="content-field__label">Datum *</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-date" name="start_date" type="date" value="${escapeHtml(submission.start_date)}" required>
+              </label>
+              <label class="content-field" for="${escapeHtml(editFormId)}-time">
+                <span class="content-field__label">Uhrzeit</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-time" name="time_text" type="text" inputmode="text" value="${escapeHtml(submission.time_text)}" placeholder="z. B. 19:00 Uhr">
+              </label>
+              <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-location">
+                <span class="content-field__label">Veranstaltungsort / Location *</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-location" name="location_name" type="text" value="${escapeHtml(submission.location_name)}" required>
+              </label>
+              <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-address">
+                <span class="content-field__label">Straße, Hausnummer / offizieller Treffpunkt *</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-address" name="location_address" type="text" value="${escapeHtml(submission.location_address)}" required>
+                <p class="content-field__hint">Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
+              </label>
+              <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-event-url">
+                <span class="content-field__label">Link zur Veranstaltungsseite</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-event-url" name="event_url" type="url" inputmode="url" value="${escapeHtml(submission.event_url)}" placeholder="https://...">
+              </label>
+              <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-description">
+                <span class="content-field__label">Kurze Beschreibung / Hinweise</span>
+                <textarea class="content-field__control" id="${escapeHtml(editFormId)}-description" name="description_text" rows="3">${escapeHtml(submission.description_text)}</textarea>
+              </label>
+              <label class="content-field content-field--full content-field--checkbox" for="${escapeHtml(editFormId)}-confirmed">
+                <span class="content-field__label">Bestätigung *</span>
+                <span class="content-field__hint">
+                  <input id="${escapeHtml(editFormId)}-confirmed" name="location_public_confirmed" type="checkbox" ${Number(submission.location_public_confirmed || 0) === 1 ? "checked" : ""} required>
+                  Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
+                </span>
+              </label>
+            </div>
+            <div class="content-actions content-actions--inline organizer-submission-edit-actions">
+              <button class="content-cta content-cta--primary" type="submit">Änderung speichern</button>
+              <button class="content-cta organizer-submission-edit-cancel" type="button" data-submission-edit-cancel>Abbrechen</button>
+            </div>
+          </form>
+        ` : `
+          <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 | Zweck: erklärt, warum nur vergangene freigegebene oder abgelehnte Einreichungen nicht direkt änderbar sind; Umfang: Hinweistext für nicht editierbare Einreichungen === -->
+          <p class="content-form-note organizer-submission-detail__locked-note">
+            Vergangene freigegebene oder abgelehnte Einreichungen können im Dashboard nicht mehr direkt geändert werden.
+          </p>
+          <!-- === END BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 === -->
+        `}
       `;
 
       row.addEventListener("click", () => {
@@ -800,6 +1080,35 @@ if (submissionsList && submissionsEmpty) {
         detail.hidden = isExpanded;
       });
 
+      const editToggle = detail.querySelector(".organizer-submission-detail__edit-toggle");
+      const editForm = detail.querySelector("[data-submission-edit-form]");
+
+      if (editToggle && editForm) {
+        editToggle.addEventListener("click", () => {
+          const isOpen = editToggle.getAttribute("aria-expanded") === "true";
+          editToggle.setAttribute("aria-expanded", isOpen ? "false" : "true");
+          editForm.hidden = isOpen;
+        });
+
+        editForm.addEventListener("input", () => clearEditValidation(editForm));
+        editForm.addEventListener("change", () => clearEditValidation(editForm));
+
+        editForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const saveButton = editForm.querySelector("button[type='submit']");
+          void saveSubmissionEdit(editForm, saveButton, row, detail, submission);
+        });
+
+        const cancelButton = editForm.querySelector("[data-submission-edit-cancel]");
+        if (cancelButton) {
+          cancelButton.addEventListener("click", () => {
+            clearEditValidation(editForm);
+            editForm.hidden = true;
+            editToggle.setAttribute("aria-expanded", "false");
+          });
+        }
+      }
+
       submissionsList.appendChild(row);
       submissionsList.appendChild(detail);
     });
@@ -807,7 +1116,7 @@ if (submissionsList && submissionsEmpty) {
     hydrateIcons(submissionsList);
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_DETAILS_V2 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 === */
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 === */
   /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V3 | Zweck: lädt Dashboard-State und zeigt den Header-Abmelden-Button nur bei gültiger Session; Umfang: komplette handleDashboardPage-Funktion === */
