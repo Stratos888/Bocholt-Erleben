@@ -737,13 +737,31 @@ if (submissionsHead) {
 }
 
 if (submissionsList && submissionsEmpty) {
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_FRONTEND_V2 | Zweck: zeigt den Änderungsbutton auch für bereits freigegebene Zukunftstermine; Umfang: lokale Editierbarkeitsprüfung im Dashboard === */
   const editableStatuses = new Set(["draft", "checkout_started", "paid", "in_review"]);
+
+  function isTodayOrFutureSubmission(submission) {
+    const startDate = safeText(submission?.start_date);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return false;
+
+    const now = new Date();
+    const year = String(now.getFullYear()).padStart(4, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return startDate >= `${year}-${month}-${day}`;
+  }
 
   function isSubmissionEditable(submission) {
     const statusKey = safeText(submission?.status).toLowerCase();
     const kindKey = safeText(submission?.submission_kind || "event").toLowerCase();
-    return kindKey === "event" && editableStatuses.has(statusKey);
+
+    if (kindKey !== "event") return false;
+    if (editableStatuses.has(statusKey)) return true;
+
+    return statusKey === "approved" && isTodayOrFutureSubmission(submission);
   }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_FRONTEND_V2 === */
 
   function renderSubmissionFactsHtml(values) {
     const eventDateText = formatDate(values?.start_date);
@@ -854,13 +872,18 @@ if (submissionsList && submissionsEmpty) {
     button.textContent = isSaving ? "Änderung wird gespeichert …" : button.dataset.defaultLabel;
   }
 
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_RENDER_UPDATE_AFTER_EDIT_V2 | Zweck: aktualisiert nach dem Speichern Titel, Status, Metadaten, Fakten und Link ohne Neuladen; Umfang: komplette Render-Aktualisierung einer geänderten Einreichung === */
   function updateRenderedSubmission(row, detail, submission, values, responseSubmission) {
     const titleNode = row.querySelector(".organizer-submission-row__title");
+    const metaNode = row.querySelector(".organizer-submission-row__meta");
+    const statusNode = detail.querySelector(".organizer-submission-detail__status span");
+    const statusDescriptionNode = detail.querySelector(".organizer-submission-detail__status small");
     const factsNode = detail.querySelector(".organizer-submission-detail__facts");
     const changedNode = detail.querySelector("[data-submission-edited-note]");
     const linkSlot = detail.querySelector("[data-submission-link-slot]");
     const updated = responseSubmission || values;
 
+    submission.status = updated.status || submission.status;
     submission.title = updated.title;
     submission.start_date = updated.start_date;
     submission.time_text = updated.time_text;
@@ -872,7 +895,13 @@ if (submissionsList && submissionsEmpty) {
     submission.organizer_edited_at = updated.organizer_edited_at || submission.organizer_edited_at;
     submission.organizer_edit_count = updated.organizer_edit_count || submission.organizer_edit_count || 1;
 
+    const nextStatusText = formatSubmissionStatusLabel(submission);
+    const nextMetaDateText = formatSubmissionMetaDate(submission);
+
     if (titleNode) titleNode.textContent = safeText(submission.title) || "Ohne Titel";
+    if (metaNode) metaNode.textContent = `${nextStatusText} · ${nextMetaDateText}`;
+    if (statusNode) statusNode.textContent = `Status: ${nextStatusText}`;
+    if (statusDescriptionNode) statusDescriptionNode.textContent = formatSubmissionStatusDescription(submission);
     if (factsNode) factsNode.innerHTML = renderSubmissionFactsHtml(submission);
 
     if (changedNode) {
@@ -891,6 +920,7 @@ if (submissionsList && submissionsEmpty) {
       hydrateIcons(linkSlot);
     }
   }
+  /* === END BLOCK: ORGANIZER_SUBMISSION_RENDER_UPDATE_AFTER_EDIT_V2 === */
 
   async function saveSubmissionEdit(form, saveButton, row, detail, submission) {
     clearEditValidation(form);
@@ -1036,9 +1066,11 @@ if (submissionsList && submissionsEmpty) {
             </div>
           </form>
         ` : `
+          <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 | Zweck: erklärt, warum nur vergangene freigegebene oder abgelehnte Einreichungen nicht direkt änderbar sind; Umfang: Hinweistext für nicht editierbare Einreichungen === -->
           <p class="content-form-note organizer-submission-detail__locked-note">
-            Freigegebene oder abgelehnte Einreichungen können im Dashboard nicht mehr direkt geändert werden.
+            Vergangene freigegebene oder abgelehnte Einreichungen können im Dashboard nicht mehr direkt geändert werden.
           </p>
+          <!-- === END BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 === -->
         `}
       `;
 
