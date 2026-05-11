@@ -91,14 +91,14 @@
   </header>
   <!-- === END BLOCK: PUBLISH_HEADER_WITH_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V7 | Zweck: finalisiert die sichtbare Wegwahl-Sprache für Einzelveranstaltung, Stripe-Zahlung, Statusansicht und Mitgliedschaft; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V8 | Zweck: ergänzt automatische Übernahme als dritten klaren Einstieg und trennt Titel, Kosten-Meta, Erklärung und CTA in der Wegwahl konsistent; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Veranstaltung einreichen</h1>
           <p class="content-lead">
-            Reiche eine einzelne Veranstaltung ein oder starte eine Mitgliedschaft für regelmäßige Einreichungen.
+            Reiche eine einzelne Veranstaltung ein, starte eine Mitgliedschaft oder prüfe eine automatische Übernahme.
           </p>
         </div>
       </div>
@@ -113,8 +113,8 @@
         <li>
           <div class="publish-model-copy">
             <strong>Einzelne Veranstaltung einreichen</strong>
-            <span>9,90&nbsp;€ einmalig – Zahlung über Stripe</span>
-            <small>Die Veröffentlichung erfolgt nach Prüfung und Freigabe. Den Status deiner Einreichung kannst du später über „Bereich öffnen“ ansehen.</small>
+            <span>9,90&nbsp;€ einmalig</span>
+            <small>Für einzelne Termine. Prüfung und Veröffentlichung erfolgen nach Freigabe.</small>
           </div>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/events-veroeffentlichen/einreichen/?plan=single">
@@ -126,7 +126,7 @@
           <div class="publish-model-copy">
             <strong>Mitgliedschaft für regelmäßige Termine</strong>
             <span>ab 9,99&nbsp;€ / Monat</span>
-            <small>Für Vereine, Veranstalter und Locations mit laufendem Programm. Gezählt werden veröffentlichte Termine im aktuellen Zeitraum.</small>
+            <small>Für Vereine, Veranstalter und Locations mit laufendem Programm.</small>
           </div>
           <div class="content-actions content-actions--inline">
             <a class="content-cta content-cta--primary" href="/fuer-veranstalter/">
@@ -134,10 +134,22 @@
             </a>
           </div>
         </li>
+        <li>
+          <div class="publish-model-copy">
+            <strong>Automatische Übernahme prüfen</strong>
+            <span>kostenlose Prüfung</span>
+            <small>Für Veranstalter, die Termine bereits auf einer Website, in einem Kalender oder in einer Datei pflegen.</small>
+          </div>
+          <div class="content-actions content-actions--inline">
+            <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/anbindung/">
+              Automatische Übernahme prüfen
+            </a>
+          </div>
+        </li>
       </ul>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V7 === -->
+  <!-- === END BLOCK: PUBLISH_OVERVIEW_VISIBILITY_PATHS_V8 === -->
 
   <!-- === BEGIN BLOCK: PUBLISH_OVERVIEW_ROUTE_RUNTIME_CHAIN_CLEANUP_V1 | Zweck: konsolidiert die Runtime-Chain der Veranstalter-Übersichtsseite auf genau eine Script-Ladekette, damit Feedback und globale Initialisierung nicht doppelt geladen werden; Umfang: Script-Block direkt vor </body> in /events-veroeffentlichen/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
