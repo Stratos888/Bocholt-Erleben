@@ -274,27 +274,28 @@ function applyPlanPresetFromUrl() {
   }
 
   /* === BEGIN BLOCK: PUBLISH_AUTOMATION_SUMMARY_STATUS_AND_VALIDATION_V2 | Zweck: aktualisiert Mail-/Status-Wording auf automatische Übernahme und stellt Validierungshelfer für rote Pflichtfeldmarkierung bereit; Umfang: Automation-Summary, Submit-Status und Feldvalidierung bis vor submitAutomationFormspree === */
-  function buildAutomationSummary(context) {
-    return joinLines([
-      "Hallo Mathias,",
-      "",
-      "ich möchte eine kostenlose Prüfung für eine automatische Übernahme unserer Veranstaltungen bei Bocholt erleben anfragen.",
-      "",
-      lineIf("Organisation / Veranstalter", context.organization),
-      lineIf("Ansprechperson", context.contact),
-      lineIf("E-Mail", context.email),
-      lineIf("Wo stehen die Veranstaltungen?", context.sourceType),
-      lineIf("Link zu Veranstaltungen / Beispielen", context.sourceLink),
-      lineIf("Website", context.website),
-      lineIf("Aktualisierungsrhythmus", context.cadence),
-      lineIf("Geschätzte Anzahl Veranstaltungen pro Monat", context.monthlyVolume),
-      lineIf("Technische Ansprechperson", context.techContact),
-      "",
-      lineIf("Weitere Hinweise (optional)", context.notes),
-      "",
-      "Viele Grüße"
-    ]);
-  }
+/* === BEGIN BLOCK: PUBLISH_AUTOMATION_SUMMARY_SOURCE_HINT_V1 | Zweck: benennt die optionale Quelle neutral als Link oder Hinweis, damit lokale Dateien/Tabellen korrekt abgebildet werden; Umfang: ersetzt buildAutomationSummary === */
+function buildAutomationSummary(context) {
+  return joinLines([
+    "Hallo Mathias,",
+    "",
+    "ich möchte eine kostenlose Prüfung für eine automatische Übernahme unserer Veranstaltungen bei Bocholt erleben anfragen.",
+    "",
+    lineIf("Organisation / Veranstalter", context.organization),
+    lineIf("Ansprechperson", context.contact),
+    lineIf("E-Mail", context.email),
+    lineIf("Wo stehen die Veranstaltungen?", context.sourceType),
+    lineIf("Link oder Hinweis zur Quelle", context.sourceLink),
+    lineIf("Aktualisierungsrhythmus", context.cadence),
+    lineIf("Geschätzte Anzahl Veranstaltungen pro Monat", context.monthlyVolume),
+    lineIf("Technische Ansprechperson", context.techContact),
+    "",
+    lineIf("Weitere Hinweise (optional)", context.notes),
+    "",
+    "Viele Grüße"
+  ]);
+}
+/* === END BLOCK: PUBLISH_AUTOMATION_SUMMARY_SOURCE_HINT_V1 === */
 
   function ensureAutomationStatusNode(form) {
     let statusNode = form.querySelector("[data-publish-automation-status]");
@@ -578,32 +579,31 @@ function applyPlanPresetFromUrl() {
     return false;
   }
 
-  /* === BEGIN BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V2 | Zweck: validiert die Pflichtfelder der automatischen Übernahme ohne Browser-Bubble und markiert fehlende Felder rot; Umfang: komplette validateAutomationContext-Funktion === */
-  function validateAutomationContext(context, form) {
-    const emailControl = byId("publish-automation-email");
-    const invalidIds = [];
+/* === BEGIN BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V3 | Zweck: validiert nur echte Pflichtfelder der automatischen Übernahme; Quellen-Link ist optional, weil lokale Dateien oder Tabellen keinen öffentlichen Link haben müssen; Umfang: komplette validateAutomationContext-Funktion === */
+function validateAutomationContext(context, form) {
+  const emailControl = byId("publish-automation-email");
+  const invalidIds = [];
 
-    if (!hasValue(context.organization)) invalidIds.push("publish-automation-organization");
-    if (!hasValue(context.contact)) invalidIds.push("publish-automation-contact");
-    if (!hasValue(context.email) || (emailControl && !emailControl.validity.valid)) invalidIds.push("publish-automation-email");
-    if (!hasValue(context.sourceType)) invalidIds.push("publish-automation-source-type");
-    if (!hasValue(context.sourceLink)) invalidIds.push("publish-automation-source-link");
+  if (!hasValue(context.organization)) invalidIds.push("publish-automation-organization");
+  if (!hasValue(context.contact)) invalidIds.push("publish-automation-contact");
+  if (!hasValue(context.email) || (emailControl && !emailControl.validity.valid)) invalidIds.push("publish-automation-email");
+  if (!hasValue(context.sourceType)) invalidIds.push("publish-automation-source-type");
 
-    if (!invalidIds.length) return true;
+  if (!invalidIds.length) return true;
 
-    const firstInvalidControl = invalidIds
-      .map((id) => markAutomationFieldInvalid(id))
-      .find(Boolean);
+  const firstInvalidControl = invalidIds
+    .map((id) => markAutomationFieldInvalid(id))
+    .find(Boolean);
 
-    setAutomationValidationStatus(form, "Bitte fülle die markierten Pflichtfelder aus.");
+  setAutomationValidationStatus(form, "Bitte fülle die markierten Pflichtfelder aus.");
 
-    if (firstInvalidControl && typeof firstInvalidControl.focus === "function") {
-      firstInvalidControl.focus({ preventScroll: false });
-    }
-
-    return false;
+  if (firstInvalidControl && typeof firstInvalidControl.focus === "function") {
+    firstInvalidControl.focus({ preventScroll: false });
   }
-  /* === END BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V2 === */
+
+  return false;
+}
+/* === END BLOCK: PUBLISH_AUTOMATION_VALIDATE_REQUIRED_FIELDS_V3 === */
 
   async function postPublishApiJson(url, payload) {
     const response = await fetch(url, {
