@@ -38,9 +38,9 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-1. Subpage system quality and consistency
-2. `/info/` as the reference-quality explanation + navigation hub
-3. Global design-system consolidation after subpage quality is stable
+1. Live-/SEO-Rollout finalisieren: robots, sitemap, indexierbare Kernseiten, Search-Console-/Bing- und Analytics-Proof.
+2. Danach globales UI-/UX-Konsistenz-Workpack mit Design-System-Konsolidierung.
+3. Danach Discovery-Ausbau: „Heute in Bocholt“, Aktivitäten und Orte/Locations.
 
 ---
 
@@ -64,18 +64,24 @@ The following workpack is intentionally on hold:
 
 ### Information architecture
 
-- `/info/` is a hybrid of explanation + direct CTA + navigation
-- `/events-veroeffentlichen/` is the canonical organizer funnel page
-- `/ueber/` exists for trust
-- Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture
-- The locations modal is final as an explanation / entry layer, not as a pricing table
+- `/` is the canonical event-discovery home.
+- `/angebote/` is the current canonical activities route until an explicit route migration is defined.
+- `/events-veroeffentlichen/` is the canonical organizer funnel overview.
+- `/events-veroeffentlichen/einreichen/` is the canonical single-event submission route.
+- `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
+- `/fuer-veranstalter/` is the canonical organizer membership route.
+- `/ueber/` is the canonical trust/explanation page.
+- `/info/` is legacy backup/redirect only and is not the current canonical information hub.
+- Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages.
+- Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture.
+- The locations modal is final as an explanation / entry layer, not as a pricing table.
 
 ---
 
 ## NEXT WORKPACK
 
-- Finish remaining subpage alignments against the current UI DNA
-- Then consolidate the global design system with CSS tokens + component mapping
-- Keep page-specific changes minimal during design-system consolidation
+- Complete live SEO rollout and measurement proof.
+- Then consolidate the global design system with CSS tokens + component mapping.
+- Keep page-specific changes minimal during design-system consolidation.
 
 <!-- === END CANONICAL MASTER FILE === -->

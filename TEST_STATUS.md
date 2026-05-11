@@ -391,39 +391,21 @@ Bewertung:
 
 <!-- === END BLOCK: TEST_STATUS_REVIEW_INBOX_LOCKED_STATE_2026_05_08 === -->
 
+## Ergänzender Teststand: KI-/Sheet-Inbox-Regression
+
+- Datum: 2026-05-11
+- Umgebung: Staging
+- Funktion: KI-/Sheet-Suchlauf → Google-Sheet-Inbox → Kuratier-PWA
+- Ergebnis: bestanden
+
+Bestanden:
+
+- letzter Suchlauf landete korrekt in der Inbox
+- Inbox-Fälle wurden in der Kuratier-PWA korrekt dargestellt
+- KI-/Sheet-Pfad ist dadurch nicht mehr offene Regression
+- KI-/Sheet-Darstellung ist kein Live-Blocker mehr
+
 ## Offene Tests / bekannte Lücken
-
-### KI-/Sheet-Fall Regression
-
-Noch offen, weil aktuell keine KI-/Sheet-Fälle in der Inbox vorhanden waren.
-
-Zu prüfen, sobald wieder ein KI-/Sheet-Fall vorhanden ist:
-
-- Badge `KI-Suche`
-- alter Apps-Script-Übernehmen/Verwerfen-Pfad funktioniert weiter
-- Quelle/Veranstaltungslink korrekt
-- Dubletten-/Importhinweis korrekt
-- keine Vermischung von Herkunft und Event-Kategorie
-
-### KI-/Sheet-Mehrtagesevents
-
-Anzeige ist vorbereitet, aber mangels echtem Testfall noch nicht praktisch belegt.
-
-Erwartete Anzeige:
-
-Einfaches Mehrtagesevent mit einheitlicher Uhrzeit:
-
-- `Zeitraum: 17.05.2026 bis 19.05.2026`
-- `Uhrzeit / Zeiten: 19:00 Uhr`
-
-Mehrtagesevent ohne einheitliche Uhrzeit:
-
-- `Zeitraum: 17.05.2026 bis 19.05.2026`
-- `Uhrzeit / Zeiten: keine einheitliche Uhrzeit angegeben – Beschreibung/Quelle prüfen`
-
-Falls später ein Detailfeld wie `schedule_text`, `time_details` oder `zeiten` vorhanden ist:
-
-- `Zeitdetails laut Quelle` wird angezeigt
 
 ### Live-Rollout
 
@@ -433,13 +415,23 @@ Vor Main/Live erforderlich:
 
 1. `LIVE_REVIEW_PASSWORD` in GitHub Secrets vorhanden
 2. Live-Datenbankmigration für `003_submission_intake_origin_location_review.sql` ausführen
-3. Live-Deploy
+3. Main/Live-Deploy ausführen und im Deploy-Log prüfen:
+   - Google Sheet `Events` → `data/events.tsv` → `data/events.json`
+   - Google Sheet `Inbox` → `data/inbox.tsv` → `data/inbox.json`
+   - `robots.txt` live aus `deploy-templates/robots.live.txt`
+   - `sitemap.xml` live aus `deploy-templates/sitemap.live.xml`
 4. Live-Smoke-Test:
    - `/api/submissions/review-list.php` → `Review access denied`
    - `/inbox/` → Passwortabfrage, danach Laden ohne 503
    - `/events-veroeffentlichen/` lädt
    - `/events-veroeffentlichen/einreichen/` lädt
+   - `/events-veroeffentlichen/anbindung/` lädt
    - `/fuer-veranstalter/` lädt
+5. SEO-/Analytics-Smoke-Test:
+   - `https://bocholt-erleben.de/robots.txt` erreichbar
+   - `https://bocholt-erleben.de/sitemap.xml` erreichbar
+   - GA4 lädt nur auf Live-Domain
+   - mindestens ein `outbound_click` wird bei externem Event-/Activity-Klick erfasst
 
 Keinen echten Live-Zahlungstest ohne bewusste Entscheidung.
 
@@ -462,17 +454,17 @@ Der Kernzielzustand ist auf Staging erfüllt:
 
 - eingereichte Einzelevents erscheinen in der Kuratier-PWA
 - eingereichte Mitgliedschafts-Events erscheinen in der Kuratier-PWA
+- KI-/Sheet-Fälle erscheinen korrekt in der Kuratier-PWA
 - Herkunft wird getrennt von Event-Kategorie angezeigt
-- Einzelevent / Mitgliedschaft werden korrekt unterschieden
+- Einzelevent / Mitgliedschaft / KI-Suche werden korrekt unterschieden
 - Verwerfen funktioniert
 - Übernehmen funktioniert
 - Kontingentverbrauch erfolgt erst bei Übernehmen
 - Review-Endpunkte sind gegen direkten öffentlichen Zugriff geschützt
+- Google-Sheet-basierter Inbox-Pfad ist praktisch geprüft
 
-Nicht vollständig belegt sind nur:
+Nicht vollständig belegt ist nur:
 
-- KI-/Sheet-Regression
-- KI-/Sheet-Mehrtagesevents
 - Live-Rollout
 
 <!-- === END FILE: TEST_STATUS.md === -->
