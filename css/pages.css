@@ -1333,6 +1333,12 @@ select.content-field__control{
   line-height: 1.45;
 }
 
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_DATA_ROWS_FINAL_V1 | Zweck: macht die Werte in Meine Angaben und Übersicht Mitgliedschaft zu ruhigen, einheitlichen Datenzeilen; Umfang: nur Dashboard-Summary-Karten === */
+.page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-summary .content-card--primary h2{
+  color: var(--color-text-primary);
+  font-weight: 760;
+}
+
 .page--organizers[data-organizer-page="dashboard"] :is(
   #organizer-account-name,
   #organizer-account-email,
@@ -1344,14 +1350,16 @@ select.content-field__control{
 ){
   margin-block: 0;
   color: var(--color-text-secondary);
-  font-weight: 520;
-  line-height: 1.42;
+  font-weight: 440;
+  line-height: 1.45;
+  letter-spacing: 0;
 }
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-quota-remaining:not([hidden]){
   color: var(--color-text-secondary);
-  font-weight: 520;
+  font-weight: 440;
 }
+/* === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_DATA_ROWS_FINAL_V1 === */
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
