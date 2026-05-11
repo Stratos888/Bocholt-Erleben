@@ -502,7 +502,7 @@ select.content-field__control{
   line-height: 1.18;
 }
 
-/* === BEGIN BLOCK: CONTENT_FORM_META_AND_CHECKBOX_PRIMITIVES_V1 | Zweck: trennt Pflichtfeld-Meta-Hinweise und Checkbox-Zeilen visuell von normalem Erklärungstext; Umfang: generische Content-Form-Primitives für Formularseiten === */
+/* === BEGIN BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V2 | Zweck: trennt Pflichtfeld-Meta-Hinweise, Date/Time-Felder und Checkbox-Zeilen visuell von normalem Erklärungstext; Umfang: generische Content-Form-Primitives für Formularseiten === */
 .content-form-note{
   margin: 0;
   color: var(--cmp-link-color-muted);
@@ -511,12 +511,29 @@ select.content-field__control{
 }
 
 .content-note--form-meta{
+  justify-self: start;
   max-width: none;
-  color: var(--cmp-link-color-muted);
-  font-size: 0.76rem;
-  line-height: 1.24;
-  font-weight: 560;
-  letter-spacing: 0.002em;
+  margin: 0;
+  color: color-mix(in srgb, var(--cmp-link-color-muted) 88%, var(--color-text-primary));
+  font-size: 0.7rem;
+  font-weight: 720;
+  line-height: 1.12;
+  letter-spacing: 0.018em;
+}
+
+.content-field__control[type="date"],
+.content-field__control[type="time"]{
+  color-scheme: light;
+  font-variant-numeric: tabular-nums;
+}
+
+.content-field__control[type="date"]::-webkit-calendar-picker-indicator,
+.content-field__control[type="time"]::-webkit-calendar-picker-indicator{
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  opacity: 0.78;
+  cursor: pointer;
 }
 
 .content-field--checkbox .content-field__hint{
@@ -536,7 +553,7 @@ select.content-field__control{
   margin: 0.12em 0 0;
   accent-color: var(--color-primary);
 }
-/* === END BLOCK: CONTENT_FORM_META_AND_CHECKBOX_PRIMITIVES_V1 === */
+/* === END BLOCK: CONTENT_FORM_META_DATE_TIME_AND_CHECKBOX_PRIMITIVES_V2 === */
 
 @media (min-width: 900px){
   .content-form-grid{
@@ -1478,17 +1495,60 @@ select.content-field__control{
   }
 }
 
-/* === BEGIN BLOCK: PUBLISH_ORGANIZER_TEXT_FLOW_AND_META_CALIBRATION_V1 | Zweck: verbreitert erklärende Texte auf Desktop, hält Pflichtfeld-Hinweise klein und verbessert Formular-Textfluss ohne manuelle Umbrüche; Umfang: Publish-/Organizer-Seitenfamilie innerhalb des bestehenden pages.css-Owners === */
+/* === BEGIN BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V2 | Zweck: finalisiert die Funnel-Hierarchie konsistent mit dem Subpage-System, stärkt Wegwahl-Meta statt Fließtext, verdichtet Pflichtfeld-Hinweise und stabilisiert Date/Time-Felder; Umfang: Publish-/Organizer-Seitenfamilie innerhalb des bestehenden pages.css-Owners === */
 .page--publish .publish-section-head .content-note--form-meta,
 .page--organizers .content-note--form-meta{
   max-width: none;
-  font-size: 0.76rem;
-  line-height: 1.24;
+  font-size: 0.7rem;
+  line-height: 1.12;
 }
 
 .page--publish .publish-section-head .content-note--form-meta + .content-note:not(.content-note--form-meta),
 .page--organizers .content-note--form-meta + .content-note:not(.content-note--form-meta){
-  margin-top: 1px;
+  margin-top: 2px;
+}
+
+.page--publish .publish-model-copy{
+  gap: 6px;
+}
+
+.page--publish .publish-model-list span{
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.56);
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.15;
+}
+
+.page--publish .publish-model-list small{
+  max-width: 54ch;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.34;
+}
+
+.page--publish .publish-date-time-row{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(106px, 0.72fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.page--publish .publish-date-time-row .content-field{
+  min-width: 0;
+}
+
+.page--publish .content-field__control[type="date"],
+.page--publish .content-field__control[type="time"]{
+  min-height: 46px;
+  padding-right: 12px;
 }
 
 @media (min-width: 900px){
@@ -1504,6 +1564,23 @@ select.content-field__control{
     max-width: min(78ch, 100%);
   }
 
+  .page--publish .publish-model-list.publish-model-list{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page--publish .publish-model-list.publish-model-list li{
+    padding-inline: 18px;
+  }
+
+  .page--publish .publish-model-list.publish-model-list li:first-child{
+    padding-left: 0;
+  }
+
+  .page--publish .publish-model-list.publish-model-list li + li{
+    border-top: 0;
+    border-left: 1px solid var(--cmp-divider-strong);
+  }
+
   .page--organizers .content-lead{
     max-width: min(68ch, 100%);
   }
@@ -1517,8 +1594,8 @@ select.content-field__control{
 @media (max-width: 899.98px){
   .page--publish .publish-section-head .content-note--form-meta,
   .page--organizers .content-note--form-meta{
-    font-size: 0.74rem;
-    line-height: 1.22;
+    font-size: 0.69rem;
+    line-height: 1.1;
   }
 
   .page--publish .content-form-note{
@@ -1527,7 +1604,13 @@ select.content-field__control{
     line-height: 1.34;
   }
 }
-/* === END BLOCK: PUBLISH_ORGANIZER_TEXT_FLOW_AND_META_CALIBRATION_V1 === */
+
+@media (max-width: 359.98px){
+  .page--publish .publish-date-time-row{
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V2 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
