@@ -76,14 +76,14 @@
   </header>
   <!-- === END BLOCK: PUBLISH_AUTOMATION_BODY_HEADER_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V9 | Zweck: entschärft die Anbindungsseite durch kürzere Hero-Erklärung, klarere Nutzenblöcke und kompaktere Formular-Einleitung; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V10 | Zweck: finalisiert die Anbindungsseite mit kurzem Hero, logisch passender Nutzenliste und optionalem Quellen-Link statt Pflichtlink; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Automatische Übernahme kostenlos prüfen</h1>
           <p class="content-note publish-hero-trust">
-            Wenn du Veranstaltungen bereits auf einer Website, in einem Kalender oder in einer Datei pflegst, prüfen wir kostenlos, ob eine automatische Übernahme möglich ist.
+            Wenn du Veranstaltungen bereits an anderer Stelle pflegst, prüfen wir kostenlos eine automatische Übernahme.
           </p>
         </div>
       </div>
@@ -96,22 +96,22 @@
 
       <ul class="publish-benefits-grid" aria-label="Geeignete Fälle für automatische Übernahme">
         <li>
-          <strong>Du pflegst Termine bereits digital</strong>
+          <strong>Du pflegst deine Veranstaltungen an anderer Stelle</strong>
           <span>Zum Beispiel auf einer Website, in einem Kalender, einer Datei oder einer Tabelle.</span>
         </li>
         <li>
-          <strong>Es gibt regelmäßig neue oder geänderte Termine</strong>
-          <span>Wir prüfen, ob sich doppelte Pflege reduzieren lässt.</span>
+          <strong>Bei regelmäßigen Änderungen</strong>
+          <span>Der manuelle Änderungsaufwand wird reduziert.</span>
         </li>
         <li>
-          <strong>Du möchtest den Aufwand vorab einschätzen</strong>
-          <span>Nach der Prüfung melden wir uns mit einer Einschätzung zurück.</span>
+          <strong>Bei vielen Veranstaltungen</strong>
+          <span>Du sparst dir doppelte Pflege.</span>
         </li>
       </ul>
     </section>
 
     <section class="content-card publish-start-card" id="publish-automation-request" aria-labelledby="publish-automation-request-title">
-      <div class="publish-section-head">
+      <div class="publish-section-head publish-section-head--form">
         <h2 id="publish-automation-request-title">Kostenlose Prüfung anfragen</h2>
         <p class="content-note content-note--form-meta">* Pflichtfelder</p>
         <p class="content-note">
@@ -149,15 +149,10 @@
             </select>
           </label>
 
-          <label class="content-field content-field--full" for="publish-automation-source-url">
-            <span class="content-field__label">Link zu deinen Veranstaltungen / Beispielen *</span>
-            <input class="content-field__control" id="publish-automation-source-url" name="sourceUrl" type="url" inputmode="url" placeholder="https://..." required>
-            <p class="content-field__hint">Am besten die konkrete URL, auf der wir deine Veranstaltungen prüfen können.</p>
-          </label>
-
-          <label class="content-field content-field--full" for="publish-automation-website">
-            <span class="content-field__label">Website (optional)</span>
-            <input class="content-field__control" id="publish-automation-website" name="website" type="url" inputmode="url" placeholder="https://...">
+          <label class="content-field content-field--full" for="publish-automation-source-link">
+            <span class="content-field__label">Link oder Hinweis zur Quelle (optional)</span>
+            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="text" inputmode="url" placeholder="z. B. Website-Link, Kalendername oder Datei liegt lokal vor">
+            <p class="content-field__hint">Falls kein öffentlicher Link vorhanden ist, reicht ein kurzer Hinweis.</p>
           </label>
 
           <label class="content-field" for="publish-automation-cadence">
@@ -191,7 +186,7 @@
       </form>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V9 === -->
+  <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V10 === -->
 
 
   <script src="/config.js?v=2026-02-04-1"></script>
