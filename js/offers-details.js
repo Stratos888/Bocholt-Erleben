@@ -71,6 +71,7 @@ const OfferDetailPanel = {
   /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 === */
 
 
+  /* === BEGIN BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V1 | Zweck: zählt geöffnete Activity-Detailpanels anonym für das interne Mehrwert-Dashboard; Umfang: ersetzt den Start von show(offer) bis nach renderContent(offer) === */
   show(offer) {
     const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
       ? window.OfferVisuals.normalizeHttpUrl(offer?.url)
@@ -90,6 +91,14 @@ const OfferDetailPanel = {
     this.panel.setAttribute("data-detail-type", "activity");
     this.renderContent(offer);
 
+    if (window.BEAnalytics && typeof window.BEAnalytics.trackValueMetric === "function") {
+      window.BEAnalytics.trackValueMetric("activity_detail_view", {
+        entityType: "activity",
+        entityId: String(offer?.id || "").trim(),
+        entityTitle: String(offer?.title || "").trim()
+      });
+    }
+    /* === END BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V1 === */
     this.panel.classList.remove("hidden");
     this.panel.removeAttribute("hidden");
     this.body.scrollTop = 0;
