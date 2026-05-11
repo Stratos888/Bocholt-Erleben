@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/organizer-portal/update-submission.php | Zweck: erlaubt eingeloggten Veranstaltern das Ändern noch nicht freigegebener Event-Einreichungen; Umfang: komplette Datei === */
+/* === BEGIN FILE: api/organizer-portal/update-submission.php | Zweck: erlaubt eingeloggten Veranstaltern das Ändern prüfbarer Event-Einreichungen und setzt bereits freigegebene Zukunftstermine nach Änderung zurück in die Prüfung; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
 
@@ -186,6 +186,7 @@ function osu_validate_url_or_null(?string $url): ?string
     return $url;
 }
 
+/* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_APPROVED_FUTURE_V2 | Zweck: erlaubt Änderungen an Entwürfen, offenen Einreichungen und bereits freigegebenen Zukunftsterminen; Umfang: komplette Editierbarkeitsprüfung für eine Submission === */
 function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissionId): array
 {
     $statement = $pdo->prepare(
@@ -194,6 +195,7 @@ function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissi
             organizer_id,
             submission_kind,
             status,
+            start_date,
             organizer_edit_count
          FROM submissions
          WHERE id = :submission_id
@@ -213,12 +215,22 @@ function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissi
     }
 
     $status = trim((string)($row['status'] ?? ''));
-    if (!in_array($status, ['draft', 'checkout_started', 'paid', 'in_review'], true)) {
-        throw new InvalidArgumentException('Diese Einreichung kann im Veranstalterbereich nicht mehr geändert werden.');
+    if (in_array($status, ['draft', 'checkout_started', 'paid', 'in_review'], true)) {
+        return $row;
     }
 
-    return $row;
+    if ($status === 'approved') {
+        $startDate = trim((string)($row['start_date'] ?? ''));
+        $todayUtc = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d');
+
+        if ($startDate !== '' && $startDate >= $todayUtc) {
+            return $row;
+        }
+    }
+
+    throw new InvalidArgumentException('Diese Einreichung kann im Veranstalterbereich nicht mehr geändert werden.');
 }
+/* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_APPROVED_FUTURE_V2 === */
 
 function osu_fetch_submission_response(PDO $pdo, int $organizerId, int $submissionId): array
 {
@@ -291,6 +303,7 @@ try {
     $submission = osu_fetch_editable_submission($pdo, $organizerId, $submissionId);
     $nextEditCount = ((int)($submission['organizer_edit_count'] ?? 0)) + 1;
 
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V2 | Zweck: speichert Änderungen und setzt bereits freigegebene Zukunftstermine zurück in die Kuratierprüfung; Umfang: komplettes UPDATE-Statement für Veranstalteränderungen === */
     $update = $pdo->prepare(
         'UPDATE submissions
          SET
@@ -302,14 +315,21 @@ try {
             location_address = :location_address,
             location_public_confirmed = :location_public_confirmed,
             description_text = :description_text,
+            status = CASE WHEN status = "approved" THEN "in_review" ELSE status END,
+            approved_at = CASE WHEN status = "approved" THEN NULL ELSE approved_at END,
+            review_started_at = CASE WHEN status = "approved" THEN NULL ELSE review_started_at END,
             organizer_edited_at = UTC_TIMESTAMP(),
             organizer_edit_count = :organizer_edit_count,
             updated_at = CURRENT_TIMESTAMP
          WHERE id = :submission_id
            AND organizer_id = :organizer_id
            AND submission_kind = "event"
-           AND status IN ("draft", "checkout_started", "paid", "in_review")'
+           AND (
+                status IN ("draft", "checkout_started", "paid", "in_review")
+                OR (status = "approved" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
+           )'
     );
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V2 === */
 
     $update->execute([
         ':event_url' => $eventUrl,
