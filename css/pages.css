@@ -1291,7 +1291,7 @@ select.content-field__control{
   font-weight: 760;
 }
 
-/* === BEGIN BLOCK: ORGANIZER_SERVICE_DASHBOARD_DETAILS_AND_FOOTER_NAV_V3 | Zweck: normalisiert Dashboard-Werte, macht Einreichungen als ruhige aufklappbare Statuszeilen nutzbar und hält Abschlussnavigation konsistent; Umfang: Organizer-Leistungsliste, Dashboard-Karten, Einreichungsdetails und letzter content-links-Block auf Organizer-Seiten === */
+/* === BEGIN BLOCK: ORGANIZER_SERVICE_DASHBOARD_CURRENT_LIST_AND_FOOTER_NAV_V4 | Zweck: normalisiert Dashboard-Datenzeilen, trennt aktuelle Einreichungen subtil und hält Einreichungsdetails ruhig aufklappbar; Umfang: Organizer-Leistungsliste, Dashboard-Karten, aktuelle Einreichungen und letzter content-links-Block auf Organizer-Seiten === */
 .page--organizers .content-card .publish-benefits-grid{
   gap: 2px;
   padding-top: 2px;
@@ -1343,25 +1343,9 @@ select.content-field__control{
   #organizer-quota-remaining
 ){
   margin-block: 0;
+  color: var(--color-text-secondary);
   font-weight: 520;
   line-height: 1.42;
-}
-
-.page--organizers[data-organizer-page="dashboard"] :is(
-  #organizer-account-name,
-  #organizer-quota-period
-){
-  color: var(--color-text-primary);
-}
-
-.page--organizers[data-organizer-page="dashboard"] :is(
-  #organizer-account-email,
-  #organizer-account-plan,
-  #organizer-quota-change,
-  #organizer-quota-summary,
-  #organizer-quota-remaining
-){
-  color: var(--color-text-secondary);
 }
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-quota-remaining:not([hidden]){
@@ -1379,12 +1363,16 @@ select.content-field__control{
   cursor: pointer;
   width: 100%;
   min-height: 58px;
-  padding: 11px 10px;
+  padding: 12px 10px;
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: 0;
   background: transparent;
   font: inherit;
   text-align: left;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row:not(:first-child){
+  border-top-color: var(--cmp-divider-strong);
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__label{
@@ -1409,6 +1397,7 @@ select.content-field__control{
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-row[aria-expanded="true"]{
   border-color: var(--cmp-divider-strong);
+  border-radius: 14px;
   background: rgba(255,255,255,0.52);
   box-shadow: 0 1px 0 rgba(255,255,255,0.68) inset;
 }
@@ -1523,7 +1512,7 @@ select.content-field__control{
   font-size: 0.94rem;
   font-weight: 760;
 }
-/* === END BLOCK: ORGANIZER_SERVICE_DASHBOARD_DETAILS_AND_FOOTER_NAV_V3 === */
+/* === END BLOCK: ORGANIZER_SERVICE_DASHBOARD_CURRENT_LIST_AND_FOOTER_NAV_V4 === */
 
 /* === BEGIN BLOCK: PUBLISH_ORGANIZER_MOBILE_HIERARCHY_AND_EXIT_POLISH_V2 | Zweck: verbessert mobile Headline-Umbrüche, Tarif-Select-Lesbarkeit und Abschlussnavigation, überlässt den Feedback-Einstieg aber wieder dem zentralen Feedback-Owner in overlays.css; Umfang: nur Mobile-Regeln für page--publish/page--organizers === */
 @media (max-width: 899.98px){
