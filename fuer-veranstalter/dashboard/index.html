@@ -30,6 +30,7 @@
 
 <body>
   <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT | Zweck: hält eine technische Bereichsroute bei, setzt statische Fallback-Sprache neutral und überlässt Einreichung/Veranstalterbereich-Trennung dem Runtime-Rendering; Umfang: kompletter Body-Inhaltsblock dieser Datei ab Header bis vor </body> === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEADER_WITH_LOGOUT_SLOT_V1 | Zweck: ergänzt im eingeloggten Veranstalterbereich einen sichtbaren Header-Platz für Abmelden; Umfang: kompletter App-Header der Dashboard-Seite === -->
   <header class="app-header">
     <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
       <img
@@ -39,7 +40,19 @@
       >
       <span class="app-title">Bocholt erleben</span>
     </a>
+
+    <div class="header-right">
+      <button
+        class="pwa-install-button header-logout-button"
+        id="organizer-dashboard-logout"
+        type="button"
+        hidden
+      >
+        <span class="pwa-install-button__label">Abmelden</span>
+      </button>
+    </div>
   </header>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEADER_WITH_LOGOUT_SLOT_V1 === -->
 
   <main class="page page--organizers" data-organizer-page="dashboard">
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 | Zweck: entfernt den Kicker und hält den statischen Dashboard-Ladezustand konsistent mit Status/Veranstalterbereich; Umfang: statischer Dashboard-Hero === -->
