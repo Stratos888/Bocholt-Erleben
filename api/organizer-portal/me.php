@@ -276,6 +276,8 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
             start_date,
             time_text,
             location_name,
+            location_address,
+            location_public_confirmed,
             ticket_url,
             description_text,
             notes_text,
@@ -287,6 +289,8 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
             review_started_at,
             approved_at,
             rejected_at,
+            organizer_edited_at,
+            organizer_edit_count,
             created_at,
             updated_at
          FROM submissions
