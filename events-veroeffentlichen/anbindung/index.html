@@ -76,14 +76,14 @@
   </header>
   <!-- === END BLOCK: PUBLISH_AUTOMATION_BODY_HEADER_AREA_ACCESS_V2 === -->
 
-  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V8 | Zweck: finalisiert die Anbindungsseite als kostenlose Prüfung automatischer Übernahme mit konsistentem Veranstaltungs-Wording und Pflichtfeld-Hinweis; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
+  <!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V9 | Zweck: entschärft die Anbindungsseite durch kürzere Hero-Erklärung, klarere Nutzenblöcke und kompaktere Formular-Einleitung; Umfang: kompletter Main-Bereich von /events-veroeffentlichen/anbindung/ === -->
   <main class="page page--publish">
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
           <h1>Automatische Übernahme kostenlos prüfen</h1>
           <p class="content-note publish-hero-trust">
-            Pflegst du deine Veranstaltungen bereits an anderer Stelle – zum Beispiel in einer Datei, einem Kalender oder auf einer Website? Dann prüfen wir, ob eine automatisierte Übernahme im Rahmen einer Mitgliedschaft möglich ist, um deinen Pflegeaufwand zu reduzieren.
+            Wenn du Veranstaltungen bereits auf einer Website, in einem Kalender oder in einer Datei pflegst, prüfen wir kostenlos, ob eine automatische Übernahme möglich ist.
           </p>
         </div>
       </div>
@@ -96,16 +96,16 @@
 
       <ul class="publish-benefits-grid" aria-label="Geeignete Fälle für automatische Übernahme">
         <li>
-          <strong>Du pflegst deine Veranstaltungen an anderer Stelle</strong>
-          <span>Auf einer Website, in einem Kalender, einer Datei oder einer Tabelle.</span>
+          <strong>Du pflegst Termine bereits digital</strong>
+          <span>Zum Beispiel auf einer Website, in einem Kalender, einer Datei oder einer Tabelle.</span>
         </li>
         <li>
-          <strong>Bei regelmäßigen Änderungen</strong>
-          <span>Der manuelle Änderungsaufwand wird reduziert.</span>
+          <strong>Es gibt regelmäßig neue oder geänderte Termine</strong>
+          <span>Wir prüfen, ob sich doppelte Pflege reduzieren lässt.</span>
         </li>
         <li>
-          <strong>Bei vielen Veranstaltungen</strong>
-          <span>Du sparst dir doppelte Pflege.</span>
+          <strong>Du möchtest den Aufwand vorab einschätzen</strong>
+          <span>Nach der Prüfung melden wir uns mit einer Einschätzung zurück.</span>
         </li>
       </ul>
     </section>
@@ -113,11 +113,9 @@
     <section class="content-card publish-start-card" id="publish-automation-request" aria-labelledby="publish-automation-request-title">
       <div class="publish-section-head">
         <h2 id="publish-automation-request-title">Kostenlose Prüfung anfragen</h2>
-<!-- === BEGIN BLOCK: PUBLISH_AUTOMATION_FORM_META_REQUIRED_HINT_V1 | Zweck: markiert den Pflichtfeld-Hinweis als kleine Formular-Meta-Information; Umfang: Pflichtfeld-Hinweis im Anfrageformular für automatische Übernahme === -->
-<p class="content-note content-note--form-meta">Mit * markierte Felder sind Pflichtfelder.</p>
-<!-- === END BLOCK: PUBLISH_AUTOMATION_FORM_META_REQUIRED_HINT_V1 === -->
+        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
         <p class="content-note">
-          Die Anfrage ist kostenlos. Wir prüfen zuerst, ob eine automatisierte Übernahme überhaupt möglich ist. Anschließend teilen wir dir eine mögliche Lösung und den Vorschlag für eine passende Mitgliedschaft mit.
+          Beschreibe kurz, wo deine Veranstaltungen gepflegt werden. Wir prüfen die Quelle und melden uns mit einer Einschätzung zurück.
         </p>
       </div>
 
@@ -151,9 +149,9 @@
             </select>
           </label>
 
-          <label class="content-field content-field--full" for="publish-automation-source-link">
+          <label class="content-field content-field--full" for="publish-automation-source-url">
             <span class="content-field__label">Link zu deinen Veranstaltungen / Beispielen *</span>
-            <input class="content-field__control" id="publish-automation-source-link" name="sourceLink" type="url" inputmode="url" placeholder="https://..." required>
+            <input class="content-field__control" id="publish-automation-source-url" name="sourceUrl" type="url" inputmode="url" placeholder="https://..." required>
             <p class="content-field__hint">Am besten die konkrete URL, auf der wir deine Veranstaltungen prüfen können.</p>
           </label>
 
@@ -193,7 +191,7 @@
       </form>
     </section>
   </main>
-  <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V8 === -->
+  <!-- === END BLOCK: PUBLISH_AUTOMATION_ROUTE_FREE_CHECK_V9 === -->
 
 
   <script src="/config.js?v=2026-02-04-1"></script>
