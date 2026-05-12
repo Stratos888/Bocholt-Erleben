@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $isUnlocked = (bool)($_SESSION['be_internal_seo_dashboard_unlocked'] ?? false);
 $checkedAt = date('d.m.Y H:i');
 
-/* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_METRICS_DB_V1 | Zweck: liest automatisierte First-Party-Nutzwert-Metriken aus der DB für das interne Dashboard; Umfang: ergänzt serverseitige Aggregation vor dem HTML === */
+/* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_METRICS_DB_V2 | Zweck: liest automatisierte First-Party-Nutzwert-Metriken für aktuellen und vorherigen 28-Tage-Zeitraum; Umfang: ersetzt serverseitige Aggregation vor dem HTML === */
 function be_seo_dashboard_value_metrics_schema(PDO $pdo): void
 {
     $pdo->exec(<<<'SQL'
@@ -75,59 +75,80 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
 SQL);
 }
 
+function be_seo_dashboard_periods(): array
+{
+    $currentEnd = new DateTimeImmutable('today', new DateTimeZone('UTC'));
+    $currentStart = $currentEnd->modify('-27 days');
+    $previousEnd = $currentStart->modify('-1 day');
+    $previousStart = $previousEnd->modify('-27 days');
+
+    return [
+        'current' => [
+            'start' => $currentStart,
+            'end' => $currentEnd,
+        ],
+        'previous' => [
+            'start' => $previousStart,
+            'end' => $previousEnd,
+        ],
+    ];
+}
+
+function be_seo_dashboard_empty_metrics(): array
+{
+    return [
+        'website_clicks' => 0,
+        'maps_clicks' => 0,
+        'location_clicks' => 0,
+        'organizer_cta_clicks' => 0,
+        'detail_views' => 0,
+        'performing_events' => 0,
+        'performing_locations' => 0,
+    ];
+}
+
 function be_seo_dashboard_empty_value_metrics(string $status = 'not_configured', string $message = ''): array
 {
-    $end = new DateTimeImmutable('today', new DateTimeZone('UTC'));
-    $start = $end->modify('-27 days');
+    $periods = be_seo_dashboard_periods();
 
     return [
         'status' => $status,
         'generated_at' => gmdate('c'),
         'period' => [
-            'start_date' => $start->format('Y-m-d'),
-            'end_date' => $end->format('Y-m-d'),
+            'start_date' => $periods['current']['start']->format('Y-m-d'),
+            'end_date' => $periods['current']['end']->format('Y-m-d'),
             'days' => 28,
         ],
-        'metrics' => [
-            'website_clicks' => 0,
-            'maps_clicks' => 0,
-            'location_clicks' => 0,
-            'organizer_cta_clicks' => 0,
-            'detail_views' => 0,
-            'performing_events' => 0,
-            'performing_locations' => 0,
+        'previous_period' => [
+            'start_date' => $periods['previous']['start']->format('Y-m-d'),
+            'end_date' => $periods['previous']['end']->format('Y-m-d'),
+            'days' => 28,
         ],
+        'metrics' => be_seo_dashboard_empty_metrics(),
+        'previous_metrics' => be_seo_dashboard_empty_metrics(),
         'message' => $message,
     ];
 }
 
-function be_seo_dashboard_read_value_metrics(): array
+function be_seo_dashboard_aggregate_value_metrics(PDO $pdo, string $startDate, string $endDate): array
 {
-    $valueMetrics = be_seo_dashboard_empty_value_metrics('ok');
-    $startDate = (string)$valueMetrics['period']['start_date'];
-    $endDate = (string)$valueMetrics['period']['end_date'];
-
-    try {
-        $pdo = be_db();
-        be_seo_dashboard_value_metrics_schema($pdo);
-
-        $statement = $pdo->prepare(<<<'SQL'
+    $statement = $pdo->prepare(<<<'SQL'
 SELECT metric_key, COALESCE(SUM(count_value), 0) AS total_count
 FROM value_metric_daily
 WHERE metric_date BETWEEN :start_date AND :end_date
 GROUP BY metric_key
 SQL);
-        $statement->execute([
-            ':start_date' => $startDate,
-            ':end_date' => $endDate,
-        ]);
+    $statement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+    ]);
 
-        $totals = [];
-        foreach ($statement->fetchAll() as $row) {
-            $totals[(string)$row['metric_key']] = (int)$row['total_count'];
-        }
+    $totals = [];
+    foreach ($statement->fetchAll() as $row) {
+        $totals[(string)$row['metric_key']] = (int)$row['total_count'];
+    }
 
-        $eventsStatement = $pdo->prepare(<<<'SQL'
+    $eventsStatement = $pdo->prepare(<<<'SQL'
 SELECT COUNT(*) AS total_count
 FROM (
     SELECT entity_id
@@ -140,13 +161,13 @@ FROM (
     HAVING SUM(count_value) > 0
 ) AS event_metrics
 SQL);
-        $eventsStatement->execute([
-            ':start_date' => $startDate,
-            ':end_date' => $endDate,
-        ]);
-        $performingEvents = (int)($eventsStatement->fetch()['total_count'] ?? 0);
+    $eventsStatement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+    ]);
+    $performingEvents = (int)($eventsStatement->fetch()['total_count'] ?? 0);
 
-        $locationsStatement = $pdo->prepare(<<<'SQL'
+    $locationsStatement = $pdo->prepare(<<<'SQL'
 SELECT COUNT(*) AS total_count
 FROM (
     SELECT COALESCE(NULLIF(destination_url, ''), NULLIF(entity_title, ''), NULLIF(entity_id, '')) AS location_key
@@ -157,21 +178,42 @@ FROM (
     HAVING location_key IS NOT NULL AND location_key <> '' AND SUM(count_value) > 0
 ) AS location_metrics
 SQL);
-        $locationsStatement->execute([
-            ':start_date' => $startDate,
-            ':end_date' => $endDate,
-        ]);
-        $performingLocations = (int)($locationsStatement->fetch()['total_count'] ?? 0);
+    $locationsStatement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+    ]);
+    $performingLocations = (int)($locationsStatement->fetch()['total_count'] ?? 0);
 
-        $valueMetrics['metrics'] = [
-            'website_clicks' => (int)($totals['website_click'] ?? 0),
-            'maps_clicks' => (int)($totals['maps_click'] ?? 0),
-            'location_clicks' => (int)($totals['location_click'] ?? 0),
-            'organizer_cta_clicks' => (int)($totals['organizer_cta_click'] ?? 0),
-            'detail_views' => (int)(($totals['event_detail_view'] ?? 0) + ($totals['activity_detail_view'] ?? 0)),
-            'performing_events' => $performingEvents,
-            'performing_locations' => $performingLocations,
-        ];
+    return [
+        'website_clicks' => (int)($totals['website_click'] ?? 0),
+        'maps_clicks' => (int)($totals['maps_click'] ?? 0),
+        'location_clicks' => (int)($totals['location_click'] ?? 0),
+        'organizer_cta_clicks' => (int)($totals['organizer_cta_click'] ?? 0),
+        'detail_views' => (int)(($totals['event_detail_view'] ?? 0) + ($totals['activity_detail_view'] ?? 0)),
+        'performing_events' => $performingEvents,
+        'performing_locations' => $performingLocations,
+    ];
+}
+
+function be_seo_dashboard_read_value_metrics(): array
+{
+    $valueMetrics = be_seo_dashboard_empty_value_metrics('ok');
+
+    try {
+        $pdo = be_db();
+        be_seo_dashboard_value_metrics_schema($pdo);
+
+        $valueMetrics['metrics'] = be_seo_dashboard_aggregate_value_metrics(
+            $pdo,
+            (string)$valueMetrics['period']['start_date'],
+            (string)$valueMetrics['period']['end_date']
+        );
+
+        $valueMetrics['previous_metrics'] = be_seo_dashboard_aggregate_value_metrics(
+            $pdo,
+            (string)$valueMetrics['previous_period']['start_date'],
+            (string)$valueMetrics['previous_period']['end_date']
+        );
 
         return $valueMetrics;
     } catch (Throwable $error) {
@@ -185,7 +227,7 @@ SQL);
 $valueMetrics = $isUnlocked
     ? be_seo_dashboard_read_value_metrics()
     : be_seo_dashboard_empty_value_metrics();
-/* === END BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_METRICS_DB_V1 === */
+/* === END BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_METRICS_DB_V2 === */
 ?>
 <!doctype html>
 <html lang="de">
@@ -537,122 +579,182 @@ $valueMetrics = $isUnlocked
         <p id="overallText" class="muted small" style="margin-top:10px;">Live-Checks werden im Browser geprüft.</p>
       </article>
 
-      <!-- === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_AUTOMATED_VALUE_GRID_V30 | Zweck: entfernt manuelle Nutzwertpflege und zeigt automatisierte Search- und First-Party-Mehrwert-Metriken; Umfang: ersetzt Messung-, Check-, Akquise- und Quellenbereich innerhalb von intern/seo-dashboard/index.php === -->
-      <article class="card card--third">
-        <h2>Messung</h2>
-        <span id="measurementStatus" class="status" data-state="warn"><span class="dot"></span><span>noch nicht bewertet</span></span>
-        <p class="muted small" style="margin-top:10px;">Google/Bing werden aus dem Deploy-Export geladen. Website-, Maps-, Detail- und CTA-Nutzwerte kommen automatisch aus dem eigenen anonymen Klick-Tracking.</p>
-      </article>
-
-      <article class="card card--third">
-        <h2>Nächste Aktion</h2>
-        <p class="small"><strong>Keine manuelle Pflege mehr:</strong> Ab jetzt zählt das Dashboard neue Nutzeraktionen automatisch. Nach Live-Klicks steigen die Nutzwerte von selbst.</p>
-      </article>
-
+      <!-- === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_AKQUISE_SNAPSHOT_V31 | Zweck: zeigt Akquise-Snapshot, 28-Tage-Vergleich, screenshotfähige Mehrwertkarte und eingeklappte Technikdetails; Umfang: ersetzt Dashboard-Hauptinhalt === -->
       <article class="card card--wide">
-        <h2>Live-Checks</h2>
-        <p class="muted small">Diese Checks prüfen technische Erreichbarkeit, offensichtliche Konfiguration, GA4 und den eigenen Nutzwert-Endpunkt. Search-Daten und Mehrwert-Daten werden getrennt, aber automatisch ausgewertet.</p>
-
-        <div class="checklist" id="checklist">
-          <div class="check" data-check="status">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>Backend-Status</strong><br><code>/api/status.php</code></div>
-            <a href="/api/status.php" target="_blank" rel="noopener">öffnen</a>
-          </div>
-
-          <div class="check" data-check="valueMetrics">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>Nutzwert-Tracking</strong><br><code>/api/value-track.php</code></div>
-            <span class="muted small">intern</span>
-          </div>
-
-          <div class="check" data-check="robots">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>Robots</strong><br><code>/robots.txt</code></div>
-            <a href="/robots.txt" target="_blank" rel="noopener">öffnen</a>
-          </div>
-
-          <div class="check" data-check="sitemap">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>Sitemap</strong><br><code>/sitemap.xml</code></div>
-            <a href="/sitemap.xml" target="_blank" rel="noopener">öffnen</a>
-          </div>
-
-          <div class="check" data-check="build">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>Build-Version</strong><br><code>/meta/build.txt</code></div>
-            <a href="/meta/build.txt" target="_blank" rel="noopener">öffnen</a>
-          </div>
-
-          <div class="check" data-check="analytics">
-            <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-            <div><strong>GA4-Konfiguration</strong><br><code>/config.js</code></div>
-            <a href="/config.js" target="_blank" rel="noopener">öffnen</a>
-          </div>
-        </div>
+        <h2>Akquise-Snapshot</h2>
+        <span id="snapshotStatus" class="status" data-state="warn"><span class="dot"></span><span>wird bewertet</span></span>
+        <p id="snapshotPeriod" class="muted small" style="margin-top:10px;">28-Tage-Auswertung wird geladen.</p>
+        <p id="snapshotReason" style="margin-top:12px;">Noch keine Bewertung geladen.</p>
+        <p id="snapshotNext" class="note small" style="margin-top:12px;">Nächster Hebel wird berechnet.</p>
       </article>
 
       <article class="card card--third">
-        <h2>Indexierbare Kernseiten</h2>
-        <div id="indexedPages" class="linkList"></div>
+        <h2>Für Screenshot / Akquise</h2>
+        <p id="proofStatus" class="small"><strong>Status:</strong> wird geladen</p>
+        <p id="proofPeriod" class="muted small" style="margin-top:8px;">Zeitraum wird geladen.</p>
+        <p id="proofSummary" style="margin-top:12px;">Mehrwertnachweis wird geladen.</p>
+        <p id="proofTrend" class="muted small" style="margin-top:10px;">Vergleich wird geladen.</p>
       </article>
 
       <article class="card">
-        <h2>Akquise-Ampel</h2>
-        <p class="muted small">Die Ampel bewertet automatisch zwei Ebenen: Sichtbarkeit durch Google/Bing und echten Nutzwert für Locations bzw. Veranstalter. Es gibt keine lokalen manuellen Werte mehr.</p>
+        <h2>Hauptzahlen</h2>
+        <p class="muted small">Aktueller 28-Tage-Zeitraum im Vergleich zum vorherigen 28-Tage-Zeitraum. Oben stehen nur Werte, die für Status, Entwicklung und spätere Akquise relevant sind.</p>
 
         <div class="kpi">
-          <div class="kpiBox"><div class="muted small">Impressionen gesamt</div><div id="kpiImpressions" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Klicks gesamt</div><div id="kpiClicks" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Location-Nutzen</div><div id="kpiLocationValue" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Ampel</div><div id="kpiStage" class="kpiValue">Rot</div></div>
+          <div class="kpiBox">
+            <div class="muted small">Sichtbarkeit</div>
+            <div id="kpiImpressions" class="kpiValue">0</div>
+            <div id="kpiImpressionsTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Such-Klicks</div>
+            <div id="kpiClicks" class="kpiValue">0</div>
+            <div id="kpiClicksTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Konkrete Nutzwert-Klicks</div>
+            <div id="kpiLocationValue" class="kpiValue">0</div>
+            <div id="kpiLocationValueTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Akquise-Status</div>
+            <div id="kpiStage" class="kpiValue">Rot</div>
+            <div id="kpiStageTrend" class="muted small">automatisch bewertet</div>
+          </div>
         </div>
 
         <div class="kpi">
-          <div class="kpiBox"><div class="muted small">Website-Klicks</div><div id="kpiWebsiteClicks" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Maps-/Route-Klicks</div><div id="kpiMapsClicks" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Detail-Aufrufe</div><div id="kpiDetailViews" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Veranstalter-CTA</div><div id="kpiOrganizerCtaClicks" class="kpiValue">0</div></div>
+          <div class="kpiBox">
+            <div class="muted small">Detail-Interesse</div>
+            <div id="kpiDetailViews" class="kpiValue">0</div>
+            <div id="kpiDetailViewsTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Website-Klicks</div>
+            <div id="kpiWebsiteClicks" class="kpiValue">0</div>
+            <div id="kpiWebsiteClicksTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Maps-/Route-Klicks</div>
+            <div id="kpiMapsClicks" class="kpiValue">0</div>
+            <div id="kpiMapsClicksTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Veranstalter-CTA</div>
+            <div id="kpiOrganizerCtaClicks" class="kpiValue">0</div>
+            <div id="kpiOrganizerCtaClicksTrend" class="muted small">vs. vorher: —</div>
+          </div>
         </div>
 
         <div class="kpi">
-          <div class="kpiBox"><div class="muted small">Location-Link-Klicks</div><div id="kpiLocationClicks" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">performende Events</div><div id="kpiPerformingEvents" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">performende Ziele/Locations</div><div id="kpiPerformingLocations" class="kpiValue">0</div></div>
-          <div class="kpiBox"><div class="muted small">Automatik</div><div id="kpiAutomation" class="kpiValue">aktiv</div></div>
+          <div class="kpiBox">
+            <div class="muted small">performende Events</div>
+            <div id="kpiPerformingEvents" class="kpiValue">0</div>
+            <div id="kpiPerformingEventsTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">performende Ziele/Locations</div>
+            <div id="kpiPerformingLocations" class="kpiValue">0</div>
+            <div id="kpiPerformingLocationsTrend" class="muted small">vs. vorher: —</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Location-Link-Klicks</div>
+            <div id="kpiLocationClicks" class="kpiValue">0</div>
+            <div id="kpiLocationClicksTrend" class="muted small">sekundär</div>
+          </div>
+          <div class="kpiBox">
+            <div class="muted small">Automatik</div>
+            <div id="kpiAutomation" class="kpiValue">aktiv</div>
+            <div class="muted small">DB + Search APIs</div>
+          </div>
         </div>
 
         <p id="kpiExplanation" class="note small" style="margin-top:12px;">Noch keine Werte geladen.</p>
       </article>
 
-      <article class="card card--half">
-        <h2>Search-Automatik</h2>
-        <div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div>
-      </article>
+      <details class="card" style="grid-column: span 12;">
+        <summary><strong>Technik, Quellen und Detailwerte anzeigen</strong></summary>
 
-      <article class="card card--half">
-        <h2>Location-/Veranstalter-Nutzen</h2>
-        <div id="locationValueStatus" class="note small">Nutzwerte werden geladen.</div>
-      </article>
+        <div class="grid" style="margin-top:14px;">
+          <article class="card card--wide">
+            <h2>Live-Checks</h2>
+            <p class="muted small">Technische Erreichbarkeit, Search-Automatik, GA4 und eigener Nutzwert-Endpunkt.</p>
 
-      <article class="card card--half">
-        <h2>Externe Messquellen</h2>
-        <div class="linkList">
-          <a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a>
-          <a class="linkItem" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"><strong>Bing Webmaster Tools</strong><span>Bing-Sichtbarkeit</span></a>
-          <a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Parallelmessung</span></a>
+            <div class="checklist" id="checklist">
+              <div class="check" data-check="status">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>Backend-Status</strong><br><code>/api/status.php</code></div>
+                <a href="/api/status.php" target="_blank" rel="noopener">öffnen</a>
+              </div>
+
+              <div class="check" data-check="valueMetrics">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>Nutzwert-Tracking</strong><br><code>/api/value-track.php</code></div>
+                <span class="muted small">intern</span>
+              </div>
+
+              <div class="check" data-check="robots">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>Robots</strong><br><code>/robots.txt</code></div>
+                <a href="/robots.txt" target="_blank" rel="noopener">öffnen</a>
+              </div>
+
+              <div class="check" data-check="sitemap">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>Sitemap</strong><br><code>/sitemap.xml</code></div>
+                <a href="/sitemap.xml" target="_blank" rel="noopener">öffnen</a>
+              </div>
+
+              <div class="check" data-check="build">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>Build-Version</strong><br><code>/meta/build.txt</code></div>
+                <a href="/meta/build.txt" target="_blank" rel="noopener">öffnen</a>
+              </div>
+
+              <div class="check" data-check="analytics">
+                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
+                <div><strong>GA4-Konfiguration</strong><br><code>/config.js</code></div>
+                <a href="/config.js" target="_blank" rel="noopener">öffnen</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card card--third">
+            <h2>Indexierbare Kernseiten</h2>
+            <div id="indexedPages" class="linkList"></div>
+          </article>
+
+          <article class="card card--half">
+            <h2>Search-Automatik</h2>
+            <div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div>
+          </article>
+
+          <article class="card card--half">
+            <h2>Location-/Veranstalter-Nutzen</h2>
+            <div id="locationValueStatus" class="note small">Nutzwerte werden geladen.</div>
+          </article>
+
+          <article class="card card--half">
+            <h2>Externe Messquellen</h2>
+            <div class="linkList">
+              <a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a>
+              <a class="linkItem" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"><strong>Bing Webmaster Tools</strong><span>Bing-Sichtbarkeit</span></a>
+              <a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Parallelmessung</span></a>
+            </div>
+          </article>
         </div>
-      </article>
+      </details>
 
       <script type="application/json" id="valueMetricsData"><?=
         json_encode($valueMetrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
       ?></script>
-      <!-- === END BLOCK: INTERNAL_SEO_DASHBOARD_AUTOMATED_VALUE_GRID_V30 === -->
+      <!-- === END BLOCK: INTERNAL_SEO_DASHBOARD_AKQUISE_SNAPSHOT_V31 === -->
     </section>
   </main>
 
   <script>
-    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V30_AUTOMATED_VALUE_METRICS | Zweck: kombiniert automatische Google-/Bing-Sichtbarkeit mit automatisierten First-Party-Nutzwerten; Umfang: ersetzt nur die interne Dashboard-Logik dieser Seite ===
+  <script>
+    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V31_AKQUISE_SNAPSHOT | Zweck: rendert Akquise-Snapshot, 28-Tage-Vergleich, Screenshot-Text und eingeklappte Technikdetails; Umfang: ersetzt nur Dashboard-Logik dieser Seite ===
     const CHECKS = new Map();
 
     const CORE_PAGES = [
@@ -684,6 +786,9 @@ $valueMetrics = $isUnlocked
     };
 
     let currentMetrics = { ...DEFAULT_METRICS };
+    let previousMetrics = { ...DEFAULT_METRICS };
+    let searchPeriodLabel = "aktueller 28-Tage-Zeitraum";
+    let valuePeriodLabel = "aktueller 28-Tage-Zeitraum";
 
     function metricNumber(value) {
       const number = Number(value || 0);
@@ -692,6 +797,11 @@ $valueMetrics = $isUnlocked
 
     function formatMetric(value) {
       return metricNumber(value).toLocaleString("de-DE");
+    }
+
+    function setText(id, value) {
+      const node = document.getElementById(id);
+      if (node) node.textContent = value;
     }
 
     function readJsonScript(id) {
@@ -703,6 +813,40 @@ $valueMetrics = $isUnlocked
       } catch (_) {
         return null;
       }
+    }
+
+    function formatPeriod(period) {
+      if (!period?.start_date || !period?.end_date) return "28-Tage-Zeitraum";
+      return `${period.start_date} bis ${period.end_date}`;
+    }
+
+    function formatDelta(current, previous, preferPercent = false) {
+      const currentValue = metricNumber(current);
+      const previousValue = metricNumber(previous);
+      const delta = currentValue - previousValue;
+
+      if (delta === 0) {
+        return "±0 vs. vorher";
+      }
+
+      const sign = delta > 0 ? "+" : "−";
+      const absolute = Math.abs(delta);
+
+      if (preferPercent && previousValue > 0) {
+        const percent = Math.round((absolute / previousValue) * 100);
+        return `${sign}${percent} % vs. vorher`;
+      }
+
+      return `${sign}${absolute.toLocaleString("de-DE")} vs. vorher`;
+    }
+
+    function setStatusPill(id, state, label) {
+      const node = document.getElementById(id);
+      if (!node) return;
+
+      node.dataset.state = state === "strong" ? "good" : state;
+      const text = node.querySelector("span:last-child");
+      if (text) text.textContent = label;
     }
 
     function setCheck(name, state, label, detail = "") {
@@ -944,6 +1088,30 @@ $valueMetrics = $isUnlocked
       return ["bad", "Rot", "Noch nicht aktiv verkaufen. Erst Sichtbarkeit und automatisch gemessene Nutzsignale für Locations weiter aufbauen."];
     }
 
+    function nextLever(model) {
+      if (model.directLocationValue < 10) {
+        return "Nächster Hebel: mehr Website-, Route-/Maps- und CTA-Klicks sammeln. Diese Werte sind für Locations am stärksten erklärbar.";
+      }
+
+      if (model.detailViews < 100) {
+        return "Nächster Hebel: mehr Detail-Aufrufe erzeugen, damit klarer wird, dass Nutzer einzelne Events und Aktivitäten wirklich prüfen.";
+      }
+
+      if (model.performingEvents < 5) {
+        return "Nächster Hebel: mehr unterschiedliche Events mit Interaktion aufbauen, damit der Nutzen nicht an einem Einzelfall hängt.";
+      }
+
+      if (model.performingLocations < 3) {
+        return "Nächster Hebel: mehr unterschiedliche Ziele/Locations mit Weiterleitungen aufbauen.";
+      }
+
+      return "Nächster Hebel: erste gezielte Akquise mit konkreten Beispielzahlen testen.";
+    }
+
+    function renderTrend(id, current, previous, preferPercent = false) {
+      setText(id, formatDelta(current, previous, preferPercent));
+    }
+
     function renderLocationValue(payload) {
       const box = document.getElementById("locationValueStatus");
       if (!box) return;
@@ -957,53 +1125,100 @@ $valueMetrics = $isUnlocked
       }
 
       const metrics = payload.metrics || {};
+      const previous = payload.previous_metrics || {};
       const websiteClicks = metricNumber(metrics.website_clicks);
       const mapsClicks = metricNumber(metrics.maps_clicks);
       const locationClicks = metricNumber(metrics.location_clicks);
       const organizerCtaClicks = metricNumber(metrics.organizer_cta_clicks);
       const detailViews = metricNumber(metrics.detail_views);
       const directLocationValue = websiteClicks + mapsClicks + locationClicks + organizerCtaClicks;
+      const previousDirectLocationValue =
+        metricNumber(previous.website_clicks) +
+        metricNumber(previous.maps_clicks) +
+        metricNumber(previous.location_clicks) +
+        metricNumber(previous.organizer_cta_clicks);
       const generatedAt = payload.generated_at ? new Date(payload.generated_at) : null;
       const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime())
         ? generatedAt.toLocaleString("de-DE")
         : "unbekannt";
 
+      valuePeriodLabel = formatPeriod(payload.period);
+
       box.innerHTML = `
         <p><strong>Status:</strong> ${payload.status || "ok"}</p>
-        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${payload.period?.start_date || "?"} bis ${payload.period?.end_date || "?"}</p>
+        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(payload.period)}</p>
+        <p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(payload.previous_period)}</p>
         <p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p>
-        <p style="margin-top:10px;"><strong>Direkter Location-Nutzen:</strong> ${formatMetric(directLocationValue)} Klicks</p>
-        <p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(detailViews)} Detail-Aufrufe</p>
-        <p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(metrics.performing_events)}</p>
-        <p style="margin-top:6px;"><strong>Performende Ziele/Locations:</strong> ${formatMetric(metrics.performing_locations)}</p>
+        <p style="margin-top:10px;"><strong>Direkter Nutzwert:</strong> ${formatMetric(directLocationValue)} Klicks (${formatDelta(directLocationValue, previousDirectLocationValue)})</p>
+        <p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(detailViews)} Detail-Aufrufe (${formatDelta(detailViews, previous.detail_views)})</p>
+        <p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(metrics.performing_events)} (${formatDelta(metrics.performing_events, previous.performing_events)})</p>
+        <p style="margin-top:6px;"><strong>Performende Ziele/Locations:</strong> ${formatMetric(metrics.performing_locations)} (${formatDelta(metrics.performing_locations, previous.performing_locations)})</p>
       `;
     }
 
-    function renderMetrics(metrics) {
+    function renderMetrics(metrics, previous) {
       const model = buildMetricModel(metrics);
+      const previousModel = buildMetricModel(previous);
       const [state, label, copy] = classifyMetrics(model);
 
-      document.getElementById("kpiImpressions").textContent = formatMetric(model.searchImpressions);
-      document.getElementById("kpiClicks").textContent = formatMetric(model.searchClicks);
-      document.getElementById("kpiLocationValue").textContent = formatMetric(model.directLocationValue);
-      document.getElementById("kpiStage").textContent = label;
-      document.getElementById("kpiWebsiteClicks").textContent = formatMetric(model.websiteClicks);
-      document.getElementById("kpiMapsClicks").textContent = formatMetric(model.mapsClicks);
-      document.getElementById("kpiDetailViews").textContent = formatMetric(model.detailViews);
-      document.getElementById("kpiOrganizerCtaClicks").textContent = formatMetric(model.organizerCtaClicks);
-      document.getElementById("kpiLocationClicks").textContent = formatMetric(model.locationClicks);
-      document.getElementById("kpiPerformingEvents").textContent = formatMetric(model.performingEvents);
-      document.getElementById("kpiPerformingLocations").textContent = formatMetric(model.performingLocations);
-      document.getElementById("kpiExplanation").textContent = copy;
+      setText("kpiImpressions", formatMetric(model.searchImpressions));
+      setText("kpiClicks", formatMetric(model.searchClicks));
+      setText("kpiLocationValue", formatMetric(model.directLocationValue));
+      setText("kpiStage", label);
+      setText("kpiWebsiteClicks", formatMetric(model.websiteClicks));
+      setText("kpiMapsClicks", formatMetric(model.mapsClicks));
+      setText("kpiDetailViews", formatMetric(model.detailViews));
+      setText("kpiOrganizerCtaClicks", formatMetric(model.organizerCtaClicks));
+      setText("kpiLocationClicks", formatMetric(model.locationClicks));
+      setText("kpiPerformingEvents", formatMetric(model.performingEvents));
+      setText("kpiPerformingLocations", formatMetric(model.performingLocations));
+      setText("kpiExplanation", copy);
+
+      renderTrend("kpiImpressionsTrend", model.searchImpressions, previousModel.searchImpressions, true);
+      renderTrend("kpiClicksTrend", model.searchClicks, previousModel.searchClicks, true);
+      renderTrend("kpiLocationValueTrend", model.directLocationValue, previousModel.directLocationValue);
+      renderTrend("kpiWebsiteClicksTrend", model.websiteClicks, previousModel.websiteClicks);
+      renderTrend("kpiMapsClicksTrend", model.mapsClicks, previousModel.mapsClicks);
+      renderTrend("kpiDetailViewsTrend", model.detailViews, previousModel.detailViews);
+      renderTrend("kpiOrganizerCtaClicksTrend", model.organizerCtaClicks, previousModel.organizerCtaClicks);
+      renderTrend("kpiLocationClicksTrend", model.locationClicks, previousModel.locationClicks);
+      renderTrend("kpiPerformingEventsTrend", model.performingEvents, previousModel.performingEvents);
+      renderTrend("kpiPerformingLocationsTrend", model.performingLocations, previousModel.performingLocations);
 
       const measurementStatus = document.getElementById("measurementStatus");
-      measurementStatus.dataset.state = state === "strong" ? "good" : state;
-      measurementStatus.querySelector("span:last-child").textContent = label;
+      if (measurementStatus) {
+        measurementStatus.dataset.state = state === "strong" ? "good" : state;
+        measurementStatus.querySelector("span:last-child").textContent = label;
+      }
+
+      setStatusPill("snapshotStatus", state, `${label} – ${label === "Rot" ? "noch nicht aktiv verkaufen" : "Akquise prüfen"}`);
+      setText("snapshotPeriod", `Suchdaten: ${searchPeriodLabel} · Nutzwerte: ${valuePeriodLabel}`);
+      setText("snapshotReason", copy);
+      setText("snapshotNext", nextLever(model));
+
+      setText("proofStatus", `Status: ${label}`);
+      setText("proofPeriod", `Suchdaten: ${searchPeriodLabel} · Nutzwerte: ${valuePeriodLabel}`);
+      setText(
+        "proofSummary",
+        `Bocholt erleben wurde ${formatMetric(model.searchImpressions)}-mal über Google/Bing sichtbar, erzeugte ${formatMetric(model.searchClicks)} Such-Klicks und ${formatMetric(model.directLocationValue)} konkrete Weiterleitungen bzw. Aktionen. Zusätzlich wurden ${formatMetric(model.detailViews)} Detail-Aufrufe, ${formatMetric(model.performingEvents)} performende Events und ${formatMetric(model.performingLocations)} performende Ziele/Locations gemessen.`
+      );
+      setText(
+        "proofTrend",
+        `Entwicklung: Sichtbarkeit ${formatDelta(model.searchImpressions, previousModel.searchImpressions, true)}, Such-Klicks ${formatDelta(model.searchClicks, previousModel.searchClicks, true)}, konkrete Nutzwert-Klicks ${formatDelta(model.directLocationValue, previousModel.directLocationValue)}.`
+      );
     }
 
-    function applyMetrics(metrics) {
-      currentMetrics = buildMetricModel(metrics);
-      renderMetrics(currentMetrics);
+    function applyMetrics(metrics = {}, previous = {}) {
+      currentMetrics = buildMetricModel({
+        ...currentMetrics,
+        ...metrics
+      });
+      previousMetrics = buildMetricModel({
+        ...previousMetrics,
+        ...previous
+      });
+
+      renderMetrics(currentMetrics, previousMetrics);
     }
 
     function sourceStatusLabel(status) {
@@ -1023,43 +1238,46 @@ $valueMetrics = $isUnlocked
 
       const google = payload.sources?.google || {};
       const bing = payload.sources?.bing || {};
+      const previousGoogle = payload.previous_sources?.google || {};
+      const previousBing = payload.previous_sources?.bing || {};
       const period = payload.period || {};
+      const previousPeriod = payload.previous_period || {};
       const generatedAt = payload.generated_at ? new Date(payload.generated_at) : null;
       const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime())
         ? generatedAt.toLocaleString("de-DE")
         : "unbekannt";
 
+      searchPeriodLabel = formatPeriod(period);
+
       box.innerHTML = `
         <p><strong>Status:</strong> ${payload.status || "unbekannt"}</p>
-        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${period.start_date || "?"} bis ${period.end_date || "?"}</p>
+        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(period)}</p>
+        <p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(previousPeriod)}</p>
         <p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p>
         <p style="margin-top:10px;"><strong>Google:</strong> ${sourceStatusLabel(google.status)} · ${formatMetric(google.impressions)} Impressionen · ${formatMetric(google.clicks)} Klicks</p>
-        <p style="margin-top:6px;"><strong>Bing:</strong> ${sourceStatusLabel(bing.status)} · ${formatMetric(bing.impressions)} Impressionen · ${formatMetric(bing.clicks)} Klicks</p>
+        <p style="margin-top:6px;"><strong>Google vorher:</strong> ${formatMetric(previousGoogle.impressions)} Impressionen · ${formatMetric(previousGoogle.clicks)} Klicks</p>
+        <p style="margin-top:10px;"><strong>Bing:</strong> ${sourceStatusLabel(bing.status)} · ${formatMetric(bing.impressions)} Impressionen · ${formatMetric(bing.clicks)} Klicks</p>
+        <p style="margin-top:6px;"><strong>Bing vorher:</strong> ${formatMetric(previousBing.impressions)} Impressionen · ${formatMetric(previousBing.clicks)} Klicks</p>
         ${google.message ? `<p class="muted" style="margin-top:8px;">Google: ${google.message}</p>` : ""}
         ${bing.message ? `<p class="muted" style="margin-top:4px;">Bing: ${bing.message}</p>` : ""}
       `;
     }
 
-    function extractSearchMetrics(payload) {
-      const google = payload.sources?.google || {};
-      const bing = payload.sources?.bing || {};
-      const metrics = {};
+    function extractSearchMetrics(payload, previous = false) {
+      const sources = previous ? (payload.previous_sources || {}) : (payload.sources || {});
+      const google = sources.google || {};
+      const bing = sources.bing || {};
 
-      if (google.status === "ok") {
-        metrics.googleImpressions = metricNumber(google.impressions);
-        metrics.googleClicks = metricNumber(google.clicks);
-      }
-
-      if (bing.status === "ok") {
-        metrics.bingImpressions = metricNumber(bing.impressions);
-        metrics.bingClicks = metricNumber(bing.clicks);
-      }
-
-      return metrics;
+      return {
+        googleImpressions: google.status === "ok" ? metricNumber(google.impressions) : 0,
+        googleClicks: google.status === "ok" ? metricNumber(google.clicks) : 0,
+        bingImpressions: bing.status === "ok" ? metricNumber(bing.impressions) : 0,
+        bingClicks: bing.status === "ok" ? metricNumber(bing.clicks) : 0
+      };
     }
 
-    function extractValueMetrics(payload) {
-      const metrics = payload?.metrics || {};
+    function extractValueMetrics(payload, key = "metrics") {
+      const metrics = payload?.[key] || {};
 
       return {
         websiteClicks: metricNumber(metrics.website_clicks),
@@ -1082,32 +1300,38 @@ $valueMetrics = $isUnlocked
         }
 
         const payload = await res.json();
-        const searchMetrics = extractSearchMetrics(payload);
+        const searchMetrics = extractSearchMetrics(payload, false);
+        const previousSearchMetrics = extractSearchMetrics(payload, true);
 
-        applyMetrics({
-          ...currentMetrics,
-          ...searchMetrics
-        });
         renderSearchMetricsStatus(payload);
+        applyMetrics(searchMetrics, previousSearchMetrics);
       } catch (error) {
         renderSearchMetricsStatus({
           status: "error",
           generated_at: null,
           period: {},
+          previous_period: {},
           sources: {
             google: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." },
             bing: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." }
+          },
+          previous_sources: {
+            google: { status: "error", impressions: 0, clicks: 0 },
+            bing: { status: "error", impressions: 0, clicks: 0 }
           }
         });
       }
     }
 
     const valuePayload = readJsonScript("valueMetricsData");
-    applyMetrics(extractValueMetrics(valuePayload));
+    currentMetrics = buildMetricModel(extractValueMetrics(valuePayload, "metrics"));
+    previousMetrics = buildMetricModel(extractValueMetrics(valuePayload, "previous_metrics"));
     renderLocationValue(valuePayload);
+    applyMetrics({}, {});
     loadSearchMetrics();
     runChecks();
-    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V30_AUTOMATED_VALUE_METRICS ===
+    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V31_AKQUISE_SNAPSHOT ===
+  </script>
   </script>
 <?php endif; ?>
 </body>
