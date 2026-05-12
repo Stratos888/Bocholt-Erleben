@@ -368,6 +368,14 @@ jobs:
           SEARCH_METRICS_GOOGLE_SITE_URL: ${{ secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
           SEARCH_METRICS_BING_SITE_URL: ${{ secrets.SEARCH_METRICS_BING_SITE_URL }}
           BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+          # === BEGIN BLOCK: INBOX_PUSH_SECRETS_ENV_V1 | Zweck: macht optionale Web-Push-Secrets im Deploy-Artefakt verfügbar; Umfang: ergänzt nur Env-Zugriff für private api/_config.php ===
+          STAGING_PUSH_VAPID_PUBLIC_KEY: ${{ secrets.STAGING_PUSH_VAPID_PUBLIC_KEY }}
+          STAGING_PUSH_VAPID_PRIVATE_KEY_PEM: ${{ secrets.STAGING_PUSH_VAPID_PRIVATE_KEY_PEM }}
+          STAGING_PUSH_SECRET: ${{ secrets.STAGING_PUSH_SECRET }}
+          LIVE_PUSH_VAPID_PUBLIC_KEY: ${{ secrets.LIVE_PUSH_VAPID_PUBLIC_KEY }}
+          LIVE_PUSH_VAPID_PRIVATE_KEY_PEM: ${{ secrets.LIVE_PUSH_VAPID_PRIVATE_KEY_PEM }}
+          LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
+          # === END BLOCK: INBOX_PUSH_SECRETS_ENV_V1 === 
           # === END BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 ===
         run: |
           set -e
