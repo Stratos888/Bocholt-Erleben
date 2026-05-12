@@ -225,6 +225,32 @@ self.addEventListener("message", (event) => {
   }
 });
 
+/* === BEGIN BLOCK: INBOX PUSH NOTIFICATION HANDLER V1 ===
+Zweck:
+- Zeigt eine einfache interne Pushmeldung, wenn neue Elemente in der Review-Inbox liegen.
+- Keine Detaildaten, kein Navigationszwang beim Klick.
+Umfang:
+- Ergänzt ausschließlich Push-/Notificationclick-Listener, ohne bestehende Cache-/Fetch-Logik zu ändern.
+=== */
+self.addEventListener("push", (event) => {
+  event.waitUntil(
+    self.registration.showNotification("Bocholt erleben", {
+      body: "Neue Elemente in der Inbox.",
+      tag: "be-inbox-new-items",
+      renotify: false,
+      requireInteraction: false,
+      icon: "/icons/app/icon-192.png",
+      badge: "/icons/favicon/icon-32.png",
+      data: { type: "inbox_update" }
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+});
+/* === END BLOCK: INBOX PUSH NOTIFICATION HANDLER V1 === */
+
 /* === BEGIN BLOCK: CACHING HELPERS (cache-busting works) ===
 Zweck: Cache-Busting darf NICHT durch ignoreSearch ausgehebelt werden.
 Umfang: cache.match ohne ignoreSearch, damit ?v=... wirklich neue Assets erzwingt.
