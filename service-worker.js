@@ -395,11 +395,15 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Daten: Network-First
-  if (url.pathname.startsWith("/data/") && url.pathname.endsWith(".json")) {
+  /* === BEGIN BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1 | Zweck: hält dynamische öffentliche DB-Events nach finaler Freigabe sofort aktuell; Umfang: erweitert die Network-First-Datenrouten um /api/events/public.php === */
+  if (
+    (url.pathname.startsWith("/data/") && url.pathname.endsWith(".json")) ||
+    url.pathname === "/api/events/public.php"
+  ) {
     event.respondWith(networkFirst(req));
     return;
   }
+  /* === END BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1 === */
 
   /* === BEGIN BLOCK: MANIFEST FETCH SAFETY (prevent 503 spam) ===
 Zweck: manifest.json darf niemals als 503 "Offline" enden,
