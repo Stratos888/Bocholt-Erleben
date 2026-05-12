@@ -51,6 +51,7 @@ jobs:
       # === BEGIN BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
       # === END BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
       - name: Append manual inbox JSON to Google Sheet Inbox
+        id: append_inbox_sheet
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
@@ -107,6 +108,11 @@ jobs:
           def info(msg: str) -> None:
               print(f"ℹ️  {msg}")
 
+          def set_output(name: str, value: str) -> None:
+              output_path = os.environ.get("GITHUB_OUTPUT", "").strip()
+              if output_path:
+                  with open(output_path, "a", encoding="utf-8") as f:
+                      f.write(f"{name}={value}\n")
           def norm(s: str) -> str:
               return (s or "").strip()
 
@@ -155,6 +161,7 @@ jobs:
 
           if not raw:
               info("data/inbox_manual.json ist leer. Nichts zu importieren.")
+              set_output("appended_count", "0")
               sys.exit(0)
 
           sheet_id = os.environ.get("SHEET_ID", "").strip()
@@ -299,6 +306,7 @@ jobs:
 
           if not rows_to_append:
               info(f"Keine neuen Zeilen zum Appenden. skipped={skipped}")
+              set_output("appended_count", "0")
               sys.exit(0)
 
           service.spreadsheets().values().append(
@@ -310,9 +318,53 @@ jobs:
           ).execute()
 
           info(f"Append OK: appended={len(rows_to_append)} skipped={skipped}")
+          set_output("appended_count", str(len(rows_to_append)))
           # === END BLOCK: MANUAL_INTAKE_SOURCE_DATE_DEDUPE_AND_SKIP_DIAGNOSTICS_V2 ===
           PY
 
+      # === BEGIN BLOCK: NOTIFY INBOX PUSH AFTER SHEET APPEND_V1 ===
+      # Zweck:
+      # - Sendet nach tatsächlich angehängten KI-Inbox-Zeilen genau eine einfache Pushmeldung.
+      # - Best-effort: Push-Ausfall darf Intake/Deploy nicht blockieren.
+      # Umfang:
+      # - Nur zusätzlicher API-Call; keine Änderung am Sheet-Append.
+      # === END BLOCK: NOTIFY INBOX PUSH AFTER SHEET APPEND_V1 ===
+      - name: Notify inbox push after appended KI candidates
+        if: steps.append_inbox_sheet.outputs.appended_count != '0'
+        env:
+          LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
+          STAGING_PUSH_SECRET: ${{ secrets.STAGING_PUSH_SECRET }}
+          APPENDED_COUNT: ${{ steps.append_inbox_sheet.outputs.appended_count }}
+        run: |
+          set -e
+
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            PUSH_URL="https://staging.bocholt-erleben.de/api/push/notify-inbox.php"
+            PUSH_SECRET="${STAGING_PUSH_SECRET:-}"
+          else
+            PUSH_URL="https://bocholt-erleben.de/api/push/notify-inbox.php"
+            PUSH_SECRET="${LIVE_PUSH_SECRET:-}"
+          fi
+
+          if [ -z "${PUSH_SECRET}" ]; then
+            echo "ℹ️ Push secret not configured. Skipping inbox push."
+            exit 0
+          fi
+
+          payload=$(python - <<'PY'
+          import json, os
+          print(json.dumps({
+              "source_type": "ki_inbox",
+              "source_key": f"manual-ki-intake:{os.environ.get('GITHUB_RUN_ID', '')}:{os.environ.get('APPENDED_COUNT', '0')}",
+          }))
+          PY
+          )
+
+          curl -sS -X POST "$PUSH_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-BE-Push-Secret: ${PUSH_SECRET}" \
+            --data "$payload" \
+            --max-time 15 || echo "⚠️ Inbox push call failed, intake continues."
       # === BEGIN BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===
       # === END BLOCK: RESET MANUAL INPUT BUFFER IN REPO + DEPLOY FLAG ===
       - name: Reset manual inbox buffer
