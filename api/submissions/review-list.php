@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/submissions/review-list.php | Zweck: liefert bezahlte Formular-Einreichungen als Review-Fälle für die Kuratier-PWA; Umfang: read-only JSON-Endpoint für submissions mit status paid/in_review === */
+/* === BEGIN FILE: api/submissions/review-list.php | Zweck: liefert DB-Submissions für die Review-Inbox inklusive Vorprüfung, Zahlungsfreigabe und bezahlter Veröffentlichungsprüfung; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
 
@@ -24,6 +24,20 @@ function srl_origin_label(string $origin): string
         default => 'Einzelevent',
     };
 }
+
+/* === BEGIN BLOCK: SUBMISSION_REVIEW_STATUS_LABELS_V1 | Zweck: übersetzt Submission-Status für die Review-Inbox; Umfang: Statuslabel-Helfer === */
+function srl_status_label(string $status): string
+{
+    return match ($status) {
+        'pending_review' => 'Neu eingereicht',
+        'payment_released' => 'Zur Zahlung freigegeben',
+        'checkout_started' => 'Zahlung gestartet',
+        'paid' => 'Bezahlt / veröffentlichungsbereit',
+        'in_review' => 'In Prüfung',
+        default => $status,
+    };
+}
+/* === END BLOCK: SUBMISSION_REVIEW_STATUS_LABELS_V1 === */
 
 function srl_build_risk_flags(array $row): array
 {
@@ -53,6 +67,7 @@ try {
             requested_model_key,
             payment_kind,
             intake_origin,
+            payment_reference_key,
             organization_name_snapshot,
             contact_name_snapshot,
             email_snapshot,
@@ -66,6 +81,9 @@ try {
             ticket_url,
             description_text,
             notes_text,
+            payment_released_at,
+            payment_start_token_expires_at,
+            payment_started_at,
             paid_at,
             organizer_edited_at,
             organizer_edit_count,
@@ -73,9 +91,19 @@ try {
             updated_at
          FROM submissions
          WHERE submission_kind = :submission_kind
-           AND status IN ("paid", "in_review")
-         ORDER BY paid_at ASC, created_at ASC
-         LIMIT 100'
+           AND status IN ("pending_review", "payment_released", "checkout_started", "paid", "in_review")
+         ORDER BY
+            CASE status
+                WHEN "pending_review" THEN 1
+                WHEN "paid" THEN 2
+                WHEN "in_review" THEN 3
+                WHEN "payment_released" THEN 4
+                WHEN "checkout_started" THEN 5
+                ELSE 9
+            END ASC,
+            COALESCE(paid_at, payment_released_at, created_at) ASC,
+            id ASC
+         LIMIT 150'
     );
 
     $statement->execute([
@@ -94,13 +122,16 @@ try {
         $ticketUrl = trim((string)($row['ticket_url'] ?? ''));
         $locationAddress = trim((string)($row['location_address'] ?? ''));
         $locationName = trim((string)($row['location_name'] ?? ''));
+        $status = (string)($row['status'] ?? '');
 
         $items[] = [
             'review_source' => 'submission_db',
             'submission_id' => (int)$row['id'],
-            'status' => (string)$row['status'],
+            'status' => $status,
+            'status_label' => srl_status_label($status),
             'intake_origin' => $origin,
             'intake_origin_label' => srl_origin_label($origin),
+            'payment_reference_key' => (string)($row['payment_reference_key'] ?? ''),
             'title' => (string)($row['title'] ?? ''),
             'date' => (string)($row['start_date'] ?? ''),
             'endDate' => '',
@@ -116,6 +147,9 @@ try {
             'description' => (string)($row['description_text'] ?? ''),
             'notes' => (string)($row['notes_text'] ?? ''),
             'created_at' => (string)($row['created_at'] ?? ''),
+            'payment_released_at' => (string)($row['payment_released_at'] ?? ''),
+            'payment_start_token_expires_at' => (string)($row['payment_start_token_expires_at'] ?? ''),
+            'payment_started_at' => (string)($row['payment_started_at'] ?? ''),
             'paid_at' => (string)($row['paid_at'] ?? ''),
             'organizer_edited_at' => (string)($row['organizer_edited_at'] ?? ''),
             'organizer_edit_count' => (int)($row['organizer_edit_count'] ?? 0),
