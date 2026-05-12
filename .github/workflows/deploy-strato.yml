@@ -368,6 +368,14 @@ jobs:
           SEARCH_METRICS_GOOGLE_SITE_URL: ${{ secrets.SEARCH_METRICS_GOOGLE_SITE_URL }}
           SEARCH_METRICS_BING_SITE_URL: ${{ secrets.SEARCH_METRICS_BING_SITE_URL }}
           BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+          # === BEGIN BLOCK: INBOX_PUSH_SECRETS_ENV_V1 | Zweck: macht optionale Web-Push-Secrets im Deploy-Artefakt verfügbar; Umfang: ergänzt nur Env-Zugriff für private api/_config.php ===
+          STAGING_PUSH_VAPID_PUBLIC_KEY: ${{ secrets.STAGING_PUSH_VAPID_PUBLIC_KEY }}
+          STAGING_PUSH_VAPID_PRIVATE_KEY_PEM: ${{ secrets.STAGING_PUSH_VAPID_PRIVATE_KEY_PEM }}
+          STAGING_PUSH_SECRET: ${{ secrets.STAGING_PUSH_SECRET }}
+          LIVE_PUSH_VAPID_PUBLIC_KEY: ${{ secrets.LIVE_PUSH_VAPID_PUBLIC_KEY }}
+          LIVE_PUSH_VAPID_PRIVATE_KEY_PEM: ${{ secrets.LIVE_PUSH_VAPID_PRIVATE_KEY_PEM }}
+          LIVE_PUSH_SECRET: ${{ secrets.LIVE_PUSH_SECRET }}
+          # === END BLOCK: INBOX_PUSH_SECRETS_ENV_V1 === 
           # === END BLOCK: SEARCH_METRICS_AND_REVIEW_SECRETS_ENV_V1 ===
         run: |
           set -e
@@ -512,6 +520,12 @@ jobs:
             APP_REVIEW_PASSWORD="$STAGING_REVIEW_PASSWORD"
             APP_BASE_URL="https://staging.bocholt-erleben.de"
             # === END BLOCK: STAGING_REVIEW_PASSWORD_ASSIGNMENT_V1 ===
+
+            # === BEGIN BLOCK: STAGING_INBOX_PUSH_CONFIG_ASSIGNMENT_V1 | Zweck: optionale Staging-Web-Push-Konfiguration für interne Inbox-Hinweise; Umfang: ergänzt optionale Push-Secrets ohne Deploy-Pflicht ===
+            APP_PUSH_VAPID_PUBLIC_KEY="${STAGING_PUSH_VAPID_PUBLIC_KEY:-}"
+            APP_PUSH_VAPID_PRIVATE_KEY_PEM="${STAGING_PUSH_VAPID_PRIVATE_KEY_PEM:-}"
+            APP_PUSH_SECRET="${STAGING_PUSH_SECRET:-}"
+            # === END BLOCK: STAGING_INBOX_PUSH_CONFIG_ASSIGNMENT_V1 ===
           else
             APP_DB_HOST="$LIVE_DB_HOST"
             APP_DB_PORT="${LIVE_DB_PORT:-3306}"
@@ -538,6 +552,12 @@ jobs:
             APP_REVIEW_PASSWORD="$LIVE_REVIEW_PASSWORD"
             APP_BASE_URL="https://bocholt-erleben.de"
             # === END BLOCK: LIVE_REVIEW_PASSWORD_ASSIGNMENT_V1 ===
+
+            # === BEGIN BLOCK: LIVE_INBOX_PUSH_CONFIG_ASSIGNMENT_V1 | Zweck: optionale Live-Web-Push-Konfiguration für interne Inbox-Hinweise; Umfang: ergänzt optionale Push-Secrets ohne Deploy-Pflicht ===
+            APP_PUSH_VAPID_PUBLIC_KEY="${LIVE_PUSH_VAPID_PUBLIC_KEY:-}"
+            APP_PUSH_VAPID_PRIVATE_KEY_PEM="${LIVE_PUSH_VAPID_PRIVATE_KEY_PEM:-}"
+            APP_PUSH_SECRET="${LIVE_PUSH_SECRET:-}"
+            # === END BLOCK: LIVE_INBOX_PUSH_CONFIG_ASSIGNMENT_V1 ===
           fi
 
           # === BEGIN BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 | Zweck: fail-fast mit klarer Fehlmeldung statt stillem exit 1 bei fehlenden DB-/Stripe-Secrets; Umfang: ersetzt die bisherigen nackten test -n Checks im Prepare-deploy-Step ===
@@ -750,7 +770,7 @@ jobs:
           print(output_path.read_text(encoding="utf-8"))
           PY
 
-          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
+          export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL APP_PUSH_VAPID_PUBLIC_KEY APP_PUSH_VAPID_PRIVATE_KEY_PEM APP_PUSH_SECRET
           # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 ===
 
           python - <<'PY'
@@ -798,6 +818,15 @@ jobs:
               "review": {
                   "password": os.environ["APP_REVIEW_PASSWORD"],
               },
+              # === BEGIN BLOCK: PRIVATE_CONFIG_INBOX_PUSH_PAYLOAD_V1 | Zweck: optionale Web-Push-Konfiguration für interne Inbox-Hinweise; Umfang: ergänzt push-Konfiguration ohne Pflicht-Secrets ===
+              "push": {
+                  "enabled": bool(os.environ.get("APP_PUSH_VAPID_PUBLIC_KEY", "").strip() and os.environ.get("APP_PUSH_VAPID_PRIVATE_KEY_PEM", "").strip()),
+                  "vapid_public_key": os.environ.get("APP_PUSH_VAPID_PUBLIC_KEY", "").strip(),
+                  "vapid_private_key_pem": os.environ.get("APP_PUSH_VAPID_PRIVATE_KEY_PEM", "").strip(),
+                  "subject": "mailto:info@bocholt-erleben.de",
+                  "secret": os.environ.get("APP_PUSH_SECRET", "").strip(),
+              },
+              # === END BLOCK: PRIVATE_CONFIG_INBOX_PUSH_PAYLOAD_V1 ===
               # === END BLOCK: PRIVATE_CONFIG_REVIEW_PASSWORD_PAYLOAD_V1 ===
           }
 

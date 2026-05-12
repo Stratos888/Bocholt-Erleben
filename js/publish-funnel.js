@@ -1,4 +1,4 @@
-/* === BEGIN FILE: js/publish-funnel.js | Zweck: zentraler JS-Owner für den Veranstalter-Funnel mit Stripe-Weiterleitung im Standardweg und Mailto-Vorbereitung im Profi-Pfad; Umfang: komplette neue Datei === */
+/* === BEGIN FILE: js/publish-funnel.js | Zweck: zentraler JS-Owner für den Veranstalter-Funnel mit prüfpflichtiger Einzeltermin-Einreichung und Mailto-Vorbereitung im Profi-Pfad; Umfang: komplette Datei === */
 (() => {
   "use strict";
 
@@ -469,7 +469,7 @@ function buildAutomationSummary(context) {
     return { mode: "formspree" };
   }
 
-  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 | Zweck: validiert einzelne Veranstaltung ohne Browser-Popup, markiert fehlende Pflichtfelder visuell und steuert den Weiter-zur-Zahlungsmethode-State; Umfang: Standard-Validierung, API-Helper, Payload-Builder, Submit-State und Bindung === */
+    /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_REVIEW_BEFORE_PAYMENT_V1 | Zweck: validiert einzelne Veranstaltung ohne Browser-Popup, markiert fehlende Pflichtfelder visuell und sendet die Einreichung zuerst zur redaktionellen Prüfung; Umfang: Standard-Validierung, API-Helper, Payload-Builder, Submit-State und Bindung === */
   function getStandardValidationStatus(form) {
     let statusNode = form.querySelector("[data-standard-validation-status]");
     if (statusNode) return statusNode;
@@ -679,12 +679,12 @@ function validateAutomationContext(context, form) {
     if (!trigger) return;
 
     if (!trigger.dataset.defaultLabel) {
-      trigger.dataset.defaultLabel = trigger.textContent || "Weiter zur Zahlungsmethode";
+      trigger.dataset.defaultLabel = trigger.textContent || "Zur Prüfung einreichen";
     }
 
     trigger.disabled = isSubmitting;
     trigger.setAttribute("aria-busy", isSubmitting ? "true" : "false");
-    trigger.textContent = isSubmitting ? "Einreichung wird vorbereitet ..." : trigger.dataset.defaultLabel;
+    trigger.textContent = isSubmitting ? "Einreichung wird gesendet ..." : trigger.dataset.defaultLabel;
   }
 
   function bindStandardPath() {
@@ -731,37 +731,21 @@ function validateAutomationContext(context, form) {
           savedAt: new Date().toISOString()
         });
 
-        const checkoutResult = await postPublishApiJson(
-          "/api/stripe/create-checkout-session.php",
-          { submission_id: submissionId }
-        );
-
-        const checkoutRequired = checkoutResult?.data?.checkout_required !== false;
-        const redirectUrl = safeText(checkoutResult?.data?.redirect_url);
-        const checkoutUrl = safeText(checkoutResult?.data?.checkout_url);
-
-        if (!checkoutRequired) {
-          if (!hasValue(redirectUrl)) {
-            throw new Error("missing_redirect_url");
-          }
-
-          window.location.href = redirectUrl;
-          return;
+        const targetUrl = new URL("/events-veroeffentlichen/erfolg/", window.location.origin);
+        targetUrl.searchParams.set("flow", "submitted");
+        if (hasValue(paymentReferenceKey)) {
+          targetUrl.searchParams.set("submission_ref", paymentReferenceKey);
         }
 
-        if (!hasValue(checkoutUrl)) {
-          throw new Error("missing_checkout_url");
-        }
-
-        window.location.href = checkoutUrl;
+        window.location.href = targetUrl.toString();
       } catch (error) {
-        console.warn("Publish funnel: standard checkout init failed.", error);
-        window.alert("Der nächste Schritt konnte gerade nicht vorbereitet werden. Bitte versuche es erneut.");
+        console.warn("Publish funnel: standard submission failed.", error);
+        window.alert("Die Einreichung konnte gerade nicht gesendet werden. Bitte versuche es erneut.");
         setStandardSubmitting(trigger, false);
       }
     });
   }
-  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 === */
+  /* === END BLOCK: STANDARD_PUBLISH_PATH_REVIEW_BEFORE_PAYMENT_V1 === */
 
   /* === BEGIN BLOCK: PUBLISH_AUTOMATION_BIND_FREE_CHECK_V2 | Zweck: bindet die kostenlose Prüfung mit eigener Pflichtfeldmarkierung, ohne native Browser-Popups; Umfang: kompletter bindAutomationPath-Handler === */
   function bindAutomationPath() {

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- === BEGIN FILE: zahlung-starten/index.html | Zweck: interne Zahlungsstart-Seite für freigegebene Einzelevent-Zahlungslinks; Umfang: komplette Seite === -->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zahlung starten | Bocholt erleben</title>
+  <meta name="description" content="Starte die Zahlung für einen freigegebenen Einzeltermin bei Bocholt erleben.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#F3F2E6">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/style.css?v=2026-05-12-review-before-payment-1">
+</head>
+<body>
+  <header class="app-header">
+    <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+      <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
+      <span class="app-title">Bocholt erleben</span>
+    </a>
+  </header>
+
+  <main class="page page--organizers">
+    <header class="content-hero content-hero--panel">
+      <h1 id="payment-start-title">Zahlung wird vorbereitet</h1>
+      <p class="content-lead" id="payment-start-lead">
+        Wir prüfen den Zahlungslink und leiten dich anschließend zur sicheren Zahlung weiter.
+      </p>
+      <p class="content-note" id="payment-start-note">
+        Die Zahlung bedeutet noch keine automatische Veröffentlichung. Nach der Zahlung erfolgt die finale redaktionelle Freigabe.
+      </p>
+      <div class="content-actions content-actions--inline">
+        <a class="content-cta content-cta--secondary" href="/events-veroeffentlichen/">Zur Übersicht</a>
+      </div>
+    </header>
+  </main>
+
+  <script>
+    (function () {
+      const title = document.getElementById("payment-start-title");
+      const lead = document.getElementById("payment-start-lead");
+      const note = document.getElementById("payment-start-note");
+
+      function setState(nextTitle, nextLead, nextNote) {
+        if (title) title.textContent = nextTitle;
+        if (lead) lead.textContent = nextLead;
+        if (note) note.textContent = nextNote;
+      }
+
+      async function startPayment() {
+        const params = new URLSearchParams(window.location.search);
+        const token = String(params.get("token") || "").trim();
+
+        if (!/^[a-f0-9]{64}$/.test(token)) {
+          setState(
+            "Zahlungslink ungültig",
+            "Der Zahlungslink ist ungültig oder unvollständig.",
+            "Bitte nutze den Link aus der E-Mail oder kontaktiere Bocholt erleben."
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/stripe/create-checkout-session.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+              payment_start_token: token
+            })
+          });
+
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || !payload || payload.status !== "ok") {
+            throw new Error(payload?.message || "checkout_failed");
+          }
+
+          const checkoutUrl = String(payload?.data?.checkout_url || "").trim();
+          if (!checkoutUrl) {
+            throw new Error("missing_checkout_url");
+          }
+
+          window.location.href = checkoutUrl;
+        } catch (error) {
+          console.warn("Payment start failed.", error);
+          setState(
+            "Zahlung konnte nicht gestartet werden",
+            "Der Zahlungslink ist möglicherweise abgelaufen oder die Einreichung wurde bereits verarbeitet.",
+            "Bitte kontaktiere Bocholt erleben, wenn das Problem bestehen bleibt."
+          );
+        }
+      }
+
+      startPayment();
+    })();
+  </script>
+</body>
+</html>
+<!-- === END FILE: zahlung-starten/index.html === -->

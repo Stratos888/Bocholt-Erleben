@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-/* === BEGIN FILE: api/stripe/create-checkout-session.php | Zweck: erzeugt serverseitig eine Stripe-Checkout-Session fuer eine vorhandene Submission und schreibt Stripe-Referenzen in die DB; Umfang: komplette Datei === */
+/* === BEGIN FILE: api/stripe/create-checkout-session.php | Zweck: erzeugt serverseitig Stripe-Checkout-Sessions für gültige interne Zahlungsstart-Links und bestehende Legacy-Submissions; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
-
+require dirname(__DIR__) . '/push/_lib.php';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
     be_json_response(405, [
@@ -52,7 +52,21 @@ function scs_required_positive_int(array $input, string $key, string $label): in
 
     return $intValue;
 }
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_PAYMENT_TOKEN_INPUT_V1 | Zweck: liest interne Zahlungsstart-Tokens ohne direkte Submission-ID für Einzeltermin-Zahlungen; Umfang: Token-Helfer nach Positive-Int-Validierung === */
+function scs_payment_start_token_or_null(array $input): ?string
+{
+    $token = trim((string)($input['payment_start_token'] ?? ''));
+    if ($token === '') {
+        return null;
+    }
 
+    if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+        throw new InvalidArgumentException('Zahlungslink ist ungültig.');
+    }
+
+    return $token;
+}
+/* === END BLOCK: STRIPE_CHECKOUT_PAYMENT_TOKEN_INPUT_V1 === */
 function scs_get_app_config(): array
 {
     $config = be_get_config();
@@ -111,6 +125,20 @@ function scs_get_stripe_config(): array
         'prices' => $mappedPrices,
     ];
 }
+function scs_notify_paid_submission_inbox_best_effort(int $submissionId): void
+{
+    /* === BEGIN FUNCTION: scs_notify_paid_submission_inbox_best_effort | Zweck: sendet nach Abo-Reuse eine einfache Inbox-Pushmeldung ohne Checkout-Flow zu blockieren; Umfang: best-effort Zusatzlogik === */
+    if ($submissionId <= 0) {
+        return;
+    }
+
+    try {
+        be_push_notify_inbox_best_effort('event_submission', 'submission:' . $submissionId . ':paid');
+    } catch (Throwable $error) {
+        error_log('Checkout push notification skipped: ' . $error->getMessage());
+    }
+    /* === END FUNCTION: scs_notify_paid_submission_inbox_best_effort === */
+}
 
 function scs_fetch_submission(PDO $pdo, int $submissionId): array
 {
@@ -121,10 +149,16 @@ function scs_fetch_submission(PDO $pdo, int $submissionId): array
             s.status,
             s.requested_model_key,
             s.payment_kind,
+            s.intake_origin,
             s.payment_reference_key,
+            s.payment_start_token_hash,
+            s.payment_start_token_expires_at,
             s.email_snapshot,
             s.organization_name_snapshot,
             s.title,
+            s.paid_at,
+            s.approved_at,
+            s.rejected_at,
             s.stripe_checkout_session_id,
             s.stripe_customer_id AS submission_stripe_customer_id,
             s.stripe_subscription_id,
@@ -150,15 +184,101 @@ function scs_fetch_submission(PDO $pdo, int $submissionId): array
     return $submission;
 }
 
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_FETCH_BY_PAYMENT_TOKEN_V1 | Zweck: lädt eine Einzelevent-Submission anhand des internen Zahlungsstart-Tokens; Umfang: Token-Hash-Abfrage für Checkout-Start === */
+function scs_fetch_submission_by_payment_start_token(PDO $pdo, string $token): array
+{
+    $statement = $pdo->prepare(
+        'SELECT
+            s.id,
+            s.organizer_id,
+            s.status,
+            s.requested_model_key,
+            s.payment_kind,
+            s.intake_origin,
+            s.payment_reference_key,
+            s.payment_start_token_hash,
+            s.payment_start_token_expires_at,
+            s.email_snapshot,
+            s.organization_name_snapshot,
+            s.title,
+            s.paid_at,
+            s.approved_at,
+            s.rejected_at,
+            s.stripe_checkout_session_id,
+            s.stripe_customer_id AS submission_stripe_customer_id,
+            s.stripe_subscription_id,
+            o.organization_name,
+            o.contact_name,
+            o.email,
+            o.stripe_customer_id AS organizer_stripe_customer_id
+        FROM submissions s
+        INNER JOIN organizers o ON o.id = s.organizer_id
+        WHERE s.payment_start_token_hash = :payment_start_token_hash
+        LIMIT 1'
+    );
+
+    $statement->execute([
+        ':payment_start_token_hash' => hash('sha256', $token),
+    ]);
+
+    $submission = $statement->fetch();
+    if (!is_array($submission)) {
+        throw new InvalidArgumentException('Zahlungslink wurde nicht gefunden.');
+    }
+
+    return $submission;
+}
+/* === END BLOCK: STRIPE_CHECKOUT_FETCH_BY_PAYMENT_TOKEN_V1 === */
+
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_ASSERT_PAYMENT_TOKEN_READY_V1 | Zweck: prüft interne Zahlungsstart-Links vor Stripe-Session-Erzeugung; Umfang: Einzelevent-Status- und Ablaufprüfung === */
+function scs_assert_payment_start_token_ready(array $submission): void
+{
+    if ((string)($submission['payment_kind'] ?? '') !== 'single') {
+        throw new InvalidArgumentException('Dieser Zahlungslink ist nur für Einzeltermine gültig.');
+    }
+
+    if ((string)($submission['intake_origin'] ?? '') !== 'single_event') {
+        throw new InvalidArgumentException('Dieser Zahlungslink gehört nicht zu einer Einzeltermin-Einreichung.');
+    }
+
+    $status = (string)($submission['status'] ?? '');
+    if ($status !== 'payment_released') {
+        throw new InvalidArgumentException('Diese Einreichung ist aktuell nicht zur Zahlung freigegeben.');
+    }
+
+    if (!empty($submission['paid_at'])) {
+        throw new InvalidArgumentException('Diese Einreichung wurde bereits bezahlt.');
+    }
+
+    if (!empty($submission['approved_at']) || !empty($submission['rejected_at'])) {
+        throw new InvalidArgumentException('Diese Einreichung ist bereits abgeschlossen.');
+    }
+
+    $expiresAtRaw = trim((string)($submission['payment_start_token_expires_at'] ?? ''));
+    if ($expiresAtRaw === '') {
+        throw new InvalidArgumentException('Zahlungslink ist nicht vollständig eingerichtet.');
+    }
+
+    $expiresAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $expiresAtRaw);
+    if (!$expiresAt instanceof DateTimeImmutable || $expiresAt < new DateTimeImmutable('now')) {
+        throw new InvalidArgumentException('Zahlungslink ist abgelaufen.');
+    }
+}
+/* === END BLOCK: STRIPE_CHECKOUT_ASSERT_PAYMENT_TOKEN_READY_V1 === */
+
 function scs_assert_submission_ready(array $submission): void
 {
+    $modelKey = (string)($submission['requested_model_key'] ?? '');
+    if ($modelKey === 'single' || (string)($submission['payment_kind'] ?? '') === 'single') {
+        throw new InvalidArgumentException('Einzeltermin-Zahlungen müssen über den internen Zahlungslink gestartet werden.');
+    }
+
     $status = (string)($submission['status'] ?? '');
     if (!in_array($status, ['draft', 'checkout_started'], true)) {
         throw new InvalidArgumentException('Submission ist für Checkout aktuell nicht freigegeben.');
     }
 
-    $modelKey = (string)($submission['requested_model_key'] ?? '');
-    if (!in_array($modelKey, ['single', 'starter', 'active', 'unlimited'], true)) {
+    if (!in_array($modelKey, ['starter', 'active', 'unlimited'], true)) {
         throw new InvalidArgumentException('Submission-Modell ist ungültig.');
     }
 
@@ -435,7 +555,7 @@ function scs_create_checkout_session(array $submission, string $customerId, arra
 
 try {
     $input = scs_read_json_body();
-    $submissionId = scs_required_positive_int($input, 'submission_id', 'submission_id');
+    $paymentStartToken = scs_payment_start_token_or_null($input);
 
     $pdo = be_db();
     $stripeConfig = scs_get_stripe_config();
@@ -443,16 +563,28 @@ try {
 
     $pdo->beginTransaction();
 
-    $submission = scs_fetch_submission($pdo, $submissionId);
-    scs_assert_submission_ready($submission);
+    if ($paymentStartToken !== null) {
+        $submission = scs_fetch_submission_by_payment_start_token($pdo, $paymentStartToken);
+        scs_assert_payment_start_token_ready($submission);
+    } else {
+        $submissionId = scs_required_positive_int($input, 'submission_id', 'submission_id');
+        $submission = scs_fetch_submission($pdo, $submissionId);
+        scs_assert_submission_ready($submission);
+    }
+
+    $submissionId = (int)$submission['id'];
 
     $customerId = scs_ensure_stripe_customer($pdo, $submission, $stripeConfig['secret_key']);
-    $existingSubscriptionEntitlement = scs_fetch_usable_active_subscription_entitlement($pdo, $submission);
+    $existingSubscriptionEntitlement = ((string)($submission['payment_kind'] ?? '') === 'subscription')
+        ? scs_fetch_usable_active_subscription_entitlement($pdo, $submission)
+        : null;
 
     if (is_array($existingSubscriptionEntitlement)) {
         scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
         $pdo->commit();
-
+        // === BEGIN BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 | Zweck: neue per aktiver Mitgliedschaft bezahlte Event-Einreichung best-effort per Push melden; Umfang: keine Änderung am Response-/Checkout-Verhalten ===
+        scs_notify_paid_submission_inbox_best_effort($submissionId);
+        // === END BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 ===
         $resolvedModelKey = trim((string)($existingSubscriptionEntitlement['plan_key'] ?? ''));
         $effectiveModelKey = $resolvedModelKey !== ''
             ? $resolvedModelKey
@@ -484,7 +616,12 @@ try {
             status = :status,
             stripe_customer_id = :stripe_customer_id,
             stripe_checkout_session_id = :stripe_checkout_session_id,
-            stripe_price_id = :stripe_price_id
+            stripe_price_id = :stripe_price_id,
+            payment_started_at = CASE
+                WHEN payment_started_at IS NULL THEN CURRENT_TIMESTAMP
+                ELSE payment_started_at
+            END,
+            updated_at = CURRENT_TIMESTAMP
          WHERE id = :submission_id'
     );
 

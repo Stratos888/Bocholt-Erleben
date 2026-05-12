@@ -51,6 +51,9 @@ Umfang:
     .muted { opacity: .75; }
     .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
+        /* === BEGIN BLOCK: INBOX_PUSH_BUTTON_STYLE_V1 | Zweck: kleine interne Push-Aktion ohne Layout-Umbau; Umfang: nur Button-State dieser Seite === */
+    .btn-push-active { border-color: rgba(0,120,0,.45); }
+    /* === END BLOCK: INBOX_PUSH_BUTTON_STYLE_V1 === */
     .btn-good { border-color: rgba(0,120,0,.45); }
     .btn-bad { border-color: rgba(160,0,0,.45); }
 
@@ -93,6 +96,12 @@ Umfang:
         <span id="lockState" class="pill muted">gesperrt</span>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <!-- === BEGIN BLOCK: INBOX_PUSH_BUTTON_V1 | Zweck: interne Push-Benachrichtigung für neue Inbox-Elemente aktivieren; Umfang: ein zusätzlicher Button ohne Änderung der Review-Aktionen === -->
+        <button id="pushBtn" class="btn" type="button">Push aktivieren</button>
+        <!-- === END BLOCK: INBOX_PUSH_BUTTON_V1 === -->
+                <!-- === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BUTTON_V1 | Zweck: diagnostiziert lokale Browser-/Android-Benachrichtigungen ohne Server-Push; Umfang: zusätzlicher interner Testbutton === -->
+        <button id="localPushTestBtn" class="btn" type="button">Lokale Testmeldung</button>
+        <!-- === END BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BUTTON_V1 === -->
         <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
         <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
       </div>
@@ -128,6 +137,13 @@ Umfang:
     // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
     const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+
+    /* === BEGIN BLOCK: INBOX_PUSH_ENDPOINTS_V1 | Zweck: interne Browser-Push-Registrierung nur für diese private Inbox-Seite; Umfang: Push-Endpunkt-Konstanten === */
+    const PUSH_CONFIG_API_URL = "/api/push/config.php";
+    const PUSH_SUBSCRIBE_API_URL = "/api/push/subscribe.php";
+    const PUSH_TEST_API_URL = "/api/push/test.php";
+    /* === END BLOCK: INBOX_PUSH_ENDPOINTS_V1 === */
+    
     // === END BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
 
     const elOne = document.getElementById("one");
@@ -135,7 +151,9 @@ Umfang:
     const elLock = document.getElementById("lockState");
     const elLeft = document.getElementById("progressLeft");
     const elRight = document.getElementById("progressRight");
-
+    const elPushBtn = document.getElementById("pushBtn");
+    const elLocalPushTestBtn = document.getElementById("localPushTestBtn");
+    
     let queue = [];
     let current = null;
     let totalLoaded = 0;
@@ -162,6 +180,25 @@ Umfang:
       if (!ok) return;
       await triggerDeploy();
     });
+
+    /* === BEGIN BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 | Zweck: registriert dieses Gerät für einfache Inbox-Pushmeldungen; Umfang: zusätzlicher Button-Listener ohne Review-Flow-Änderung === */
+    if (elPushBtn) {
+      elPushBtn.addEventListener("click", async () => {
+        const ok = await ensureUnlocked();
+        if (!ok) return;
+        await enableInboxPush();
+      });
+    }
+    /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
+        /* === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 | Zweck: testet lokale Notification-Anzeige auf genau diesem Gerät ohne Server-Push; Umfang: zusätzlicher Diagnose-Button === */
+    if (elLocalPushTestBtn) {
+      elLocalPushTestBtn.addEventListener("click", async () => {
+        const ok = await ensureUnlocked();
+        if (!ok) return;
+        await showLocalInboxNotificationTest();
+      });
+    }
+    /* === END BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 === */
     // === END BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
 
     function setStatus(msg) {
@@ -213,6 +250,226 @@ Umfang:
     // - Kennzeichnet Sheet-Fälle als ai_search, ohne Event-Kategorie zu verändern
     // Umfang:
     // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
+
+    // === BEGIN BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V2 ===
+    // Zweck:
+    // - Aktiviert Web Push nur nach erfolgreichem Review-Unlock.
+    // - Erkennt bestehende Browser-Subscriptions beim Neuladen der Inbox.
+    // - Erzwingt beim Aktivieren ein Service-Worker-Update, damit der aktuelle Push-Handler genutzt wird.
+    // Umfang:
+    // - Additiv; ändert keine Lade-/Approve-/Reject-Logik.
+    function urlBase64ToUint8Array(base64String) {
+      const padding = "=".repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+
+      return outputArray;
+    }
+
+    function setInboxPushButtonActive(isActive) {
+      if (!elPushBtn) return;
+
+      elPushBtn.textContent = isActive ? "Push aktiv" : "Push aktivieren";
+      elPushBtn.classList.toggle("btn-push-active", isActive);
+    }
+
+    async function fetchPushPublicKey() {
+      const response = await fetch(PUSH_CONFIG_API_URL, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "X-BE-Review-Password": reviewApiPassword
+        },
+        cache: "no-store"
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload || payload.status !== "ok" || !payload.data?.public_key) {
+        throw new Error(payload?.message || "push_config_failed");
+      }
+
+      return String(payload.data.public_key);
+    }
+
+    async function getInboxPushRegistration({ forceUpdate = false } = {}) {
+      if (!("serviceWorker" in navigator)) {
+        return null;
+      }
+
+      let registration = await navigator.serviceWorker.getRegistration("/");
+      if (!registration) {
+        registration = await navigator.serviceWorker.register("/service-worker.js", {
+          updateViaCache: "none"
+        });
+      }
+
+      if (forceUpdate && registration && typeof registration.update === "function") {
+        try {
+          await registration.update();
+        } catch (_error) {
+          // Service-Worker-Update darf die Inbox nicht blockieren.
+        }
+      }
+
+      if (registration?.waiting) {
+        try {
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        } catch (_error) {
+          // Best effort.
+        }
+      }
+
+      return await navigator.serviceWorker.ready;
+    }
+
+    async function refreshInboxPushState({ silent = false } = {}) {
+      if (!elPushBtn) return false;
+
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+        setInboxPushButtonActive(false);
+        if (!silent) setStatus("Push wird von diesem Browser nicht unterstützt.");
+        return false;
+      }
+
+      if (Notification.permission !== "granted") {
+        setInboxPushButtonActive(false);
+        return false;
+      }
+
+      try {
+        const registration = await getInboxPushRegistration({ forceUpdate: false });
+        const subscription = registration ? await registration.pushManager.getSubscription() : null;
+        const isActive = Boolean(subscription);
+
+        setInboxPushButtonActive(isActive);
+        return isActive;
+      } catch (error) {
+        console.warn("Push state check failed", error);
+        setInboxPushButtonActive(false);
+        return false;
+      }
+    }
+    async function showLocalInboxNotificationTest() {
+      /* === BEGIN FUNCTION: showLocalInboxNotificationTest | Zweck: prüft lokale Notification-Anzeige über den Service Worker ohne Remote-Push; Umfang: reine Diagnosefunktion für Mobile/Android === */
+      if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+        setStatus("Lokale Benachrichtigungen werden von diesem Browser nicht unterstützt.");
+        return;
+      }
+
+      if (window.isSecureContext !== true) {
+        setStatus("Lokale Benachrichtigungen benötigen HTTPS.");
+        return;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          setStatus("Benachrichtigungen wurden nicht erlaubt.");
+          return;
+        }
+
+        const registration = await getInboxPushRegistration({ forceUpdate: true });
+        await registration.showNotification("Bocholt erleben", {
+          body: "Lokale Testmeldung der Inbox.",
+          tag: `be-local-inbox-test-${Date.now()}`,
+          renotify: false,
+          silent: false,
+          requireInteraction: false,
+          timestamp: Date.now(),
+          icon: "/icons/app/icon-192.png",
+          badge: "/icons/favicon/icon-32.png",
+          data: {
+            type: "local_inbox_notification_test",
+            createdAt: Date.now()
+          }
+        });
+
+        setStatus("Lokale Testmeldung wurde ausgelöst.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Lokale Testmeldung fehlgeschlagen: " + (error?.message || error));
+      }
+      /* === END FUNCTION: showLocalInboxNotificationTest === */
+    }
+
+    async function sendInboxPushTest() {
+      await fetch(PUSH_TEST_API_URL, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "X-BE-Review-Password": reviewApiPassword
+        }
+      });
+    }
+
+    async function enableInboxPush() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+        setStatus("Push wird von diesem Browser nicht unterstützt.");
+        return;
+      }
+
+      if (window.isSecureContext !== true) {
+        setStatus("Push benötigt HTTPS.");
+        return;
+      }
+
+      if (elPushBtn) elPushBtn.disabled = true;
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          setInboxPushButtonActive(false);
+          setStatus("Push wurde nicht erlaubt.");
+          return;
+        }
+
+        const publicKey = await fetchPushPublicKey();
+        const registration = await getInboxPushRegistration({ forceUpdate: true });
+
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(publicKey)
+          });
+        }
+
+        const response = await fetch(PUSH_SUBSCRIBE_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          },
+          body: JSON.stringify({ subscription: subscription.toJSON() })
+        });
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || payload.status !== "ok") {
+          throw new Error(payload?.message || "push_subscribe_failed");
+        }
+
+        setInboxPushButtonActive(true);
+        setStatus("Push aktiviert. Testnachricht wird gesendet …");
+
+        await sendInboxPushTest();
+
+        setStatus("Push aktiviert.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Push konnte nicht aktiviert werden: " + (error?.message || error));
+        await refreshInboxPushState({ silent: true });
+      } finally {
+        if (elPushBtn) elPushBtn.disabled = false;
+      }
+    }
+    // === END BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V2 ===
+    
     async function fetchSubmissionReviewItems() {
       if (!reviewApiPassword) {
         return { items: [], total: 0, error: "submission_review_locked" };
@@ -284,18 +541,30 @@ Umfang:
           return;
         }
 
+        /* === BEGIN BLOCK: REVIEW_QUEUE_ORDER_WITH_WAITING_PAYMENTS_V1 | Zweck: hält zahlungswartende Einzelevents sichtbar, sortiert sie aber hinter aktive Review-Fälle und Sheet-Kandidaten; Umfang: Queue-Aufbau und Statusmeldung in loadAndShow === */
         const sheetItems = Array.isArray(res.items) ? res.items.map(normalizeSheetReviewItem) : [];
         const submissionItems = Array.isArray(submissionsResult.items) ? submissionsResult.items : [];
+        const waitingPaymentSubmissionItems = submissionItems.filter((item) => {
+          return ["payment_released", "checkout_started"].includes(trimValue(item.status));
+        });
+        const activeSubmissionItems = submissionItems.filter((item) => {
+          return !["payment_released", "checkout_started"].includes(trimValue(item.status));
+        });
 
-        queue = [...submissionItems, ...sheetItems];
+        queue = [...activeSubmissionItems, ...sheetItems, ...waitingPaymentSubmissionItems];
         totalLoaded = Number(res.total || sheetItems.length || 0) + Number(submissionsResult.total || submissionItems.length || 0);
 
         refreshLock();
         if (!queue.length && submissionsResult.error) {
           setStatus("Keine review-items. DB-Review konnte nicht geladen werden: " + submissionsResult.error);
+        } else if (waitingPaymentSubmissionItems.length > 0 && queue.length === waitingPaymentSubmissionItems.length) {
+          setStatus(`${waitingPaymentSubmissionItems.length} Einreichung(en) warten auf Zahlung. Keine weiteren aktiven Review-Fälle.`);
+        } else if (waitingPaymentSubmissionItems.length > 0) {
+          setStatus(`${waitingPaymentSubmissionItems.length} Einreichung(en) warten auf Zahlung und wurden ans Ende sortiert.`);
         } else {
           setStatus(queue.length ? "" : "Keine review-items.");
         }
+        /* === END BLOCK: REVIEW_QUEUE_ORDER_WITH_WAITING_PAYMENTS_V1 === */
 
         showNext(totalLoaded);
       } catch (e) {
@@ -312,7 +581,16 @@ Umfang:
       current = queue.shift() || null;
       renderCurrent(totalCount);
     }
+    /* === BEGIN BLOCK: REVIEW_DEFER_CURRENT_ITEM_V1 | Zweck: verschiebt den aktuell angezeigten Fall ans Ende der aktuellen Inbox-Sitzung, ohne DB- oder Sheet-Status zu ändern; Umfang: reine UI-Navigation === */
+    function deferCurrentItem() {
+      if (!current) return;
 
+      queue.push(current);
+      current = null;
+      setStatus("Fall ans Ende der aktuellen Ansicht verschoben.");
+      showNext(totalLoaded);
+    }
+    /* === END BLOCK: REVIEW_DEFER_CURRENT_ITEM_V1 === */
     // === BEGIN BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
     // Zweck:
     // - Formatiert Datum, Zeitraum und Uhrzeiten für Einzeltage und Mehrtagesevents im deutschen Anzeigeformat
@@ -465,7 +743,54 @@ Umfang:
       return hints.join(" · ");
     }
     // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
+    /* === BEGIN BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 | Zweck: übersetzt DB-Submission-Status in Review-Aktionen für Vorprüfung, Zahlungsfreigabe und finale Veröffentlichung; Umfang: Statuslabel- und Aktionshelper === */
+    function getSubmissionReviewState(item) {
+      if (String(item.review_source || "") !== "submission_db") {
+        return {
+          label: "KI-/Sheet-Fall",
+          actionMode: "sheet",
+          approveLabel: "✅ Übernehmen",
+          rejectLabel: "❌ Verwerfen"
+        };
+      }
 
+      const status = trimValue(item.status);
+      const labels = {
+        pending_review: "Neu eingereicht / Vorprüfung offen",
+        payment_released: "Zur Zahlung freigegeben",
+        checkout_started: "Zahlung gestartet / noch nicht bezahlt",
+        paid: "Bezahlt / veröffentlichungsbereit",
+        in_review: "Bezahlt / in redaktioneller Prüfung",
+        approved: "Veröffentlicht",
+        rejected: "Abgelehnt"
+      };
+
+      if (["pending_review", "payment_released", "checkout_started"].includes(status)) {
+        return {
+          label: labels[status] || status,
+          actionMode: "release_payment",
+          approveLabel: status === "pending_review" ? "Zur Zahlung freigeben" : "Zahlungslink erneut senden",
+          rejectLabel: "Ablehnen"
+        };
+      }
+
+      if (["paid", "in_review"].includes(status)) {
+        return {
+          label: labels[status] || status,
+          actionMode: "publish",
+          approveLabel: "Veröffentlichen",
+          rejectLabel: "Ablehnen"
+        };
+      }
+
+      return {
+        label: labels[status] || status || "Unbekannt",
+        actionMode: "unknown",
+        approveLabel: "Übernehmen",
+        rejectLabel: "Ablehnen"
+      };
+    }
+    /* === END BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 === */
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -538,6 +863,7 @@ Umfang:
       }).join("");
 
       const originLabel = (it.intake_origin_label || "KI-Suche").trim();
+      const reviewState = getSubmissionReviewState(it);
       const originBadgeHtml = `<span class="originBadge">${escapeHtml(originLabel)}</span>`;
       const reviewRiskFlags = Array.isArray(it.review_risk_flags) ? it.review_risk_flags.filter(Boolean) : [];
       const reviewRiskHtml = reviewRiskFlags.length ? `
@@ -547,9 +873,12 @@ Umfang:
         </div>
       ` : "";
 
-      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 | Zweck: zeigt Datum/Zeitraum und Uhrzeit/Zeiten getrennt, damit Einzeltage, Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt infoRows-Liste === */
       const infoRows = [
         ["Herkunft", originLabel],
+        ["Review-Status", reviewState.label],
+        ["Zahlungsfreigabe", trimValue(it.payment_released_at) ? formatGermanDateTime(it.payment_released_at) : ""],
+        ["Zahlungslink gültig bis", trimValue(it.payment_start_token_expires_at) ? formatGermanDateTime(it.payment_start_token_expires_at) : ""],
+        ["Zahlung gestartet", trimValue(it.payment_started_at) ? formatGermanDateTime(it.payment_started_at) : ""],
         [dateLabel, dateRangeLine],
         [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
         ["Zeitdetails laut Quelle", scheduleDetails],
@@ -562,7 +891,6 @@ Umfang:
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
       ].filter(([, value]) => value);
-      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 === */
 
       const infoRowsHtml = infoRows.map(([label, value]) => `
         <div class="reviewRow">
@@ -597,12 +925,15 @@ Umfang:
             </select>
           </div>
 
+          <!-- === BEGIN BLOCK: REVIEW_ACTION_BUTTONS_WITH_DEFER_V1 | Zweck: ergänzt eine lokale Später-prüfen-Aktion, damit wartende oder unklare Fälle die Review-Reihenfolge nicht blockieren; Umfang: kompletter Aktionsbutton-Block der Review-Karte === -->
           <div class="actions">
             <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Veranstaltungslink öffnen</button>
             <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
-            <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
-            <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
+            <button id="btnLater" class="btn" type="button">Später prüfen</button>
+            <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
+            <button id="btnOk" class="btn btn-good" type="button">${escapeHtml(reviewState.approveLabel)}</button>
           </div>
+          <!-- === END BLOCK: REVIEW_ACTION_BUTTONS_WITH_DEFER_V1 === -->
 
           ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Klick auf Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
         </article>
@@ -617,7 +948,9 @@ Umfang:
         if (!sourceUrl) return;
         window.open(sourceUrl, "_blank", "noopener,noreferrer");
       });
-
+      /* === BEGIN BLOCK: REVIEW_DEFER_BUTTON_BINDING_V1 | Zweck: bindet den Später-prüfen-Button an die lokale Zurückstellen-Funktion; Umfang: ein zusätzlicher Button-Listener im Render-Block === */
+      document.getElementById("btnLater").addEventListener("click", deferCurrentItem);
+      /* === END BLOCK: REVIEW_DEFER_BUTTON_BINDING_V1 === */
       document.getElementById("btnOk").addEventListener("click", () => approveReject("übernehmen"));
       document.getElementById("btnNo").addEventListener("click", () => approveReject("verworfen"));
       // === END BLOCK: RENDER COMPLETE REVIEW CARD WITH REJECTION REASONS V1 ===
@@ -656,104 +989,94 @@ Umfang:
       }
     }
 
-    // === BEGIN BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
-    // Zweck:
-    // - Übernehmen bleibt direkter Approve-Import
-    // - Verwerfen sendet verpflichtend ablehnungsgrund an Apps Script
-    // Umfang:
-    // - Ersetzt writeStatus(it, newStatus)
-    function writeStatus(it, newStatus) {
-      return new Promise(async (resolve) => {
+    /* === BEGIN BLOCK: WRITE_STATUS_WITH_DEFER_BUTTON_STATE_V2 | Zweck: schreibt Sheet- und DB-Review-Entscheidungen mit sauberem Button-State inklusive Später-prüfen-Button; Umfang: ersetzt writeStatus vollständig === */
+    function setReviewActionButtonsDisabled(disabled) {
+      ["btnOk", "btnNo", "btnLater", "deployBtn"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (button) button.disabled = disabled;
+      });
+
+      if (disabled) {
+        ["btnOpenEvent", "btnOpenSource"].forEach((id) => {
+          const button = document.getElementById(id);
+          if (button) button.disabled = true;
+        });
+      }
+    }
+
+    async function writeStatus(it, newStatus) {
+      setReviewActionButtonsDisabled(true);
+
+      try {
         if (String(it.review_source || "") === "submission_db") {
           await writeSubmissionStatus(it, newStatus);
-          return resolve();
+          return;
         }
 
         if (!it.row_number) {
           alert("Fehlt: row_number im Feed. Bitte Deploy prüfen.");
-          return resolve();
+          renderCurrent(totalLoaded);
+          return;
         }
 
-        const btnOk = document.getElementById("btnOk");
-        const btnNo = document.getElementById("btnNo");
-        const btnOpenEvent = document.getElementById("btnOpenEvent");
-        const btnOpenSource = document.getElementById("btnOpenSource");
-        const btnDeploy = document.getElementById("deployBtn");
+        const isApprove = String(newStatus) === "übernehmen";
+        let payload;
 
-        if (btnOk) btnOk.disabled = true;
-        if (btnNo) btnNo.disabled = true;
-        if (btnOpenEvent) btnOpenEvent.disabled = true;
-        if (btnOpenSource) btnOpenSource.disabled = true;
-        if (btnDeploy) btnDeploy.disabled = true;
+        if (isApprove) {
+          payload = {
+            action: "approve",
+            token: sessionToken,
+            row_number: String(it.row_number)
+          };
+        } else {
+          const reasonSelect = document.getElementById("rejectReason");
+          const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
 
-        try {
-          const isApprove = String(newStatus) === "übernehmen";
-
-          let payload;
-
-          if (isApprove) {
-            payload = {
-              action: "approve",
-              token: sessionToken,
-              row_number: String(it.row_number)
-            };
-          } else {
-            const reasonSelect = document.getElementById("rejectReason");
-            const ablehnungsgrund = reasonSelect ? String(reasonSelect.value || "").trim() : "";
-
-            if (!ablehnungsgrund) {
-              alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
-              renderCurrent(totalLoaded);
-              return resolve();
-            }
-
-            payload = {
-              action: "setStatus",
-              token: sessionToken,
-              row_number: String(it.row_number),
-              status: String(newStatus),
-              ablehnungsgrund: ablehnungsgrund
-            };
-          }
-
-          const res = await jsonp(API_URL, payload);
-
-          if (res && res.ok) {
-            setStatus(isApprove ? "Übernommen." : "Verworfen.");
-            await loadAndShow();
-            return resolve();
-          }
-
-          const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
-
-          if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
-            sessionToken = "";
-            reviewApiPassword = "";
-            refreshLock();
-            setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+          if (!ablehnungsgrund) {
+            alert("Bitte zuerst einen Ablehnungsgrund auswählen.");
             renderCurrent(totalLoaded);
-            return resolve();
+            return;
           }
 
-          setStatus("Serverfehler: " + err);
-          renderCurrent(totalLoaded);
-          return resolve();
-
-        } catch (e) {
-          console.error(e);
-          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
-          renderCurrent(totalLoaded);
-          return resolve();
-        } finally {
-          if (btnOk) btnOk.disabled = false;
-          if (btnNo) btnNo.disabled = false;
-          if (btnOpenEvent) btnOpenEvent.disabled = false;
-          if (btnOpenSource) btnOpenSource.disabled = false;
-          if (btnDeploy) btnDeploy.disabled = false;
+          payload = {
+            action: "setStatus",
+            token: sessionToken,
+            row_number: String(it.row_number),
+            status: String(newStatus),
+            ablehnungsgrund: ablehnungsgrund
+          };
         }
-      });
+
+        const res = await jsonp(API_URL, payload);
+
+        if (res && res.ok) {
+          setStatus(isApprove ? "Übernommen." : "Verworfen.");
+          await loadAndShow();
+          return;
+        }
+
+        const err = (res && (res.error || res.detail || JSON.stringify(res))) || "unknown_error";
+
+        if (res && (res.error === "invalid_or_expired_token" || res.error === "missing_token")) {
+          sessionToken = "";
+          reviewApiPassword = "";
+          refreshLock();
+          setStatus("Token ungültig/abgelaufen – bitte erneut klicken.");
+          renderCurrent(totalLoaded);
+          return;
+        }
+
+        setStatus("Serverfehler: " + err);
+        renderCurrent(totalLoaded);
+      } catch (e) {
+        console.error(e);
+        setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+        renderCurrent(totalLoaded);
+      } finally {
+        setReviewActionButtonsDisabled(false);
+      }
     }
-    // === END BLOCK: WRITE STATUS WITH REQUIRED REJECTION REASON V1 ===
+    /* === END BLOCK: WRITE_STATUS_WITH_DEFER_BUTTON_STATE_V2 === */
 
     // === BEGIN BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
     // Zweck:
@@ -805,8 +1128,17 @@ Umfang:
       const isApprove = String(newStatus) === "übernehmen";
 
       if (isApprove) {
+        const reviewState = getSubmissionReviewState(it);
+
+        if (reviewState.actionMode === "release_payment") {
+          await postJson("/api/submissions/release-payment.php", { submission_id: submissionId });
+          setStatus("Submission zur Zahlung freigegeben. Zahlungslink wurde versendet.");
+          await loadAndShow();
+          return;
+        }
+
         await postJson("/api/submissions/approve.php", { submission_id: submissionId });
-        setStatus("Submission geprüft und freigegeben.");
+        setStatus("Submission veröffentlicht. Verbrauch wurde gebucht.");
         await loadAndShow();
         return;
       }
@@ -825,7 +1157,7 @@ Umfang:
         reason: ablehnungsgrund
       });
 
-      setStatus("Submission verworfen.");
+      setStatus("Submission abgelehnt.");
       await loadAndShow();
     }
     // === END BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
@@ -927,6 +1259,7 @@ Umfang:
           return;
         }
 
+        await refreshInboxPushState({ silent: true });
         await loadAndShow();
       } catch (err) {
         console.error(err);

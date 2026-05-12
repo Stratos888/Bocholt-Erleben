@@ -56,7 +56,7 @@ TAB_EVENTS = os.environ.get("TAB_EVENTS", "Events")
 TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox")
 TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive")
 
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 | Zweck: Aufbau-/Backfill-Lauf mit 210-Tage-Suchfenster; offene Inbox warnt nur, Manual-Puffer bleibt harter Guard | Umfang: setzt Suchhorizont, Kandidatenlimit und Guard-/Warn-Konfiguration ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_CONFIG_APPEND_READY_V5 | Zweck: Aufbau-/Backfill-Lauf mit 210-Tage-Suchfenster; offene Inbox und Manual-Puffer blockieren nicht, sondern bleiben Dedupe-/Append-Bestand | Umfang: setzt Suchhorizont, Kandidatenlimit und Warn-/Kompatibilitätskonfiguration ===
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4").strip()
 MAX_NEW_CANDIDATES = int(os.environ.get("MAX_NEW_CANDIDATES", "24"))
 SEARCH_WINDOW_DAYS = int(os.environ.get("SEARCH_WINDOW_DAYS", "210"))
@@ -66,8 +66,8 @@ WARN_ON_PENDING_INBOX = os.environ.get(
     "WARN_ON_PENDING_INBOX",
     os.environ.get("FAIL_ON_PENDING_INBOX", "true"),
 ).lower() in {"1", "true", "yes"}
-FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "true").lower() in {"1", "true", "yes"}
-# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_BACKFILL_READY_V4 ===
+FAIL_ON_PENDING_MANUAL = os.environ.get("FAIL_ON_PENDING_MANUAL", "false").lower() in {"1", "true", "yes"}
+# === END BLOCK: WEEKLY_PRODUCTION_CONFIG_APPEND_READY_V5 ===
 
 ALLOWED_CATEGORIES = {
     "Märkte & Feste",
@@ -297,7 +297,8 @@ def read_tsv_records(path: Path, mapping: Dict[str, str]) -> List[RefRecord]:
     return records
 
 
-def read_manual_records() -> List[RefRecord]:
+# === BEGIN BLOCK: MANUAL_INBOX_BUFFER_LOADERS_APPEND_SAFE_V1 | Zweck: liest bestehende Manual-JSON-Einträge als erhaltbaren Puffer und zusätzlich als Dedupe-Records | Umfang: ersetzt read_manual_records vollständig und ergänzt read_manual_items/read_manual_records_from_items ===
+def read_manual_items() -> List[Dict[str, Any]]:
     if not MANUAL_JSON_PATH.exists():
         return []
 
@@ -309,10 +310,19 @@ def read_manual_records() -> List[RefRecord]:
     if not isinstance(raw, list):
         fail("data/inbox_manual.json muss ein JSON-Array sein.")
 
-    out: List[RefRecord] = []
-    for item in raw:
+    out: List[Dict[str, Any]] = []
+    for idx, item in enumerate(raw, start=1):
         if not isinstance(item, dict):
-            continue
+            fail(f"data/inbox_manual.json Element #{idx} ist kein Objekt.")
+        out.append(dict(item))
+
+    return out
+
+
+def read_manual_records_from_items(manual_items: List[Dict[str, Any]]) -> List[RefRecord]:
+    out: List[RefRecord] = []
+
+    for item in manual_items:
         out.append(
             RefRecord(
                 norm(item.get("title", "")),
@@ -325,7 +335,13 @@ def read_manual_records() -> List[RefRecord]:
                 norm(item.get("status", "")),
             )
         )
+
     return out
+
+
+def read_manual_records() -> List[RefRecord]:
+    return read_manual_records_from_items(read_manual_items())
+# === END BLOCK: MANUAL_INBOX_BUFFER_LOADERS_APPEND_SAFE_V1 ===
 # === END BLOCK: DATA LOADERS ===
 
 
@@ -1772,26 +1788,36 @@ def collect_response_sources(response: Any) -> List[str]:
 # Umfang:
 # - Noch kein automatischer Intake-Trigger; nur data/inbox_manual.json als Ergebnis
 # === END BLOCK: MAIN ENTRYPOINT ===
-# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_WITH_SOURCE_DIAGNOSTICS_V2 | Zweck: Produktionslauf schreibt Event-/Quellen-Output und erzeugt passive Diagnose inkl. Source-Candidate-Gründe | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
+# === BEGIN BLOCK: WEEKLY_PRODUCTION_MAIN_APPEND_MANUAL_BUFFER_V3 | Zweck: Weekly-Lauf bricht bei bestehendem Manual-Puffer nicht ab, nutzt ihn als Dedupe-Bestand und hängt neue Delta-Kandidaten hinten an | Umfang: ersetzt main vollständig, Suchprompt bleibt unverändert ===
 def main() -> None:
     export_current_snapshots()
 
     events_records = read_tsv_records(TMP_EVENTS_TSV_PATH, {"source_url": "url"})
     inbox_records = read_tsv_records(TMP_INBOX_TSV_PATH, {})
     archive_records = read_tsv_records(TMP_ARCHIVE_TSV_PATH, {})
-    manual_records = read_manual_records()
+    manual_items = read_manual_items()
+    manual_records = read_manual_records_from_items(manual_items)
 
-    # === BEGIN BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 | Zweck: offene Review-Inbox nicht mehr blockieren, aber weiterhin als Dedupe-/Prompt-Bestand nutzen | Umfang: ersetzt harten Abbruch bei offener Inbox durch Warnlog ===
+    # === BEGIN BLOCK: PENDING_INBOX_AND_MANUAL_CONTINUE_AS_DEDUPE_BASIS_V2 | Zweck: offene Inbox und bestehender Manual-Puffer blockieren den Weekly-Lauf nicht, bleiben aber Dedupe-/Prompt-Bestand | Umfang: ersetzt harten Abbruch bei bestehendem Manual-Puffer durch Warnlog ===
     pending_inbox_rows = count_pending_inbox_rows(inbox_records)
     if WARN_ON_PENDING_INBOX and pending_inbox_rows:
         info(
             f"Inbox enthält {pending_inbox_rows} offene Review-Fälle. "
             "Weekly-Lauf wird fortgesetzt; OFFENE_INBOX bleibt Prompt-, Dedupe- und Intake-Bestand."
         )
-    # === END BLOCK: PENDING_INBOX_CONTINUE_AS_DEDUPE_BASIS_V1 ===
 
-    if FAIL_ON_PENDING_MANUAL and manual_records:
-        fail("data/inbox_manual.json ist nicht leer. Wochenlauf wird bewusst abgebrochen.")
+    if manual_items:
+        if FAIL_ON_PENDING_MANUAL:
+            info(
+                f"data/inbox_manual.json enthält bereits {len(manual_items)} Einträge. "
+                "Weekly-Lauf wird fortgesetzt; neue Delta-Kandidaten werden hinten angehängt."
+            )
+        else:
+            info(
+                f"data/inbox_manual.json enthält bereits {len(manual_items)} Einträge. "
+                "Bestehender Puffer bleibt erhalten; neue Delta-Kandidaten werden hinten angehängt."
+            )
+    # === END BLOCK: PENDING_INBOX_AND_MANUAL_CONTINUE_AS_DEDUPE_BASIS_V2 ===
 
     if not REGELWERK_PATH.exists():
         fail(f"Regelwerk fehlt: {REGELWERK_PATH}")
@@ -1821,6 +1847,7 @@ def main() -> None:
         manual_records,
     )
     delta = filtered_delta[:MAX_NEW_CANDIDATES]
+    manual_output = manual_items + delta
 
     merged_source_candidates, added_source_candidates, source_candidate_diagnostics = merge_source_candidates_with_diagnostics(
         raw_source_candidates,
@@ -1848,7 +1875,7 @@ def main() -> None:
     )
 
     ensure_parent(MANUAL_JSON_PATH)
-    MANUAL_JSON_PATH.write_text(json.dumps(delta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    MANUAL_JSON_PATH.write_text(json.dumps(manual_output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     ensure_parent(SOURCE_CANDIDATES_JSON_PATH)
     SOURCE_CANDIDATES_JSON_PATH.write_text(
@@ -1870,7 +1897,9 @@ def main() -> None:
         f"- max_new_candidates: {MAX_NEW_CANDIDATES}\n"
         f"- raw_candidates_returned: {len(raw_candidates)}\n"
         f"- production_selected: {len(delta)}\n"
-        f"- written_manual_json: {len(delta)}\n"
+        f"- existing_manual_json: {len(manual_items)}\n"
+        f"- appended_manual_json: {len(delta)}\n"
+        f"- written_manual_json_total: {len(manual_output)}\n"
         f"- output_file: {MANUAL_JSON_PATH}\n"
         f"- source_candidates_file: {SOURCE_CANDIDATES_JSON_PATH}\n"
         f"- source_candidates_returned: {len(raw_source_candidates)}\n"
@@ -1880,6 +1909,7 @@ def main() -> None:
         f"- cited_web_sources: {len(source_urls)}"
     )
     print_weekly_diagnostics_summary(diagnostics)
+# === END BLOCK: WEEKLY_PRODUCTION_MAIN_APPEND_MANUAL_BUFFER_V3 ===
 
 
 if __name__ == "__main__":

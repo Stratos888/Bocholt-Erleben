@@ -3,13 +3,62 @@ declare(strict_types=1);
 /* === BEGIN FILE: api/stripe/webhook.php | Zweck: verarbeitet Stripe-Webhook-Events fuer Checkout-Abschluss, speichert Webhook-Events und materialisiert bezahlte Entitlements; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
-
+require dirname(__DIR__) . '/push/_lib.php';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
     be_json_response(405, [
         'status' => 'error',
         'message' => 'Method not allowed.',
     ]);
+}
+function swh_extract_paid_checkout_submission_id(array $event): int
+{
+    /* === BEGIN FUNCTION: swh_extract_paid_checkout_submission_id | Zweck: erkennt nach erfolgreichem Stripe-Checkout die betroffene Submission-ID für best-effort Inbox-Push; Umfang: reine Event-Auswertung ohne DB-Schreibzugriff === */
+    if (trim((string)($event['type'] ?? '')) !== 'checkout.session.completed') {
+        return 0;
+    }
+
+    $object = $event['data']['object'] ?? null;
+    if (!is_array($object)) {
+        return 0;
+    }
+
+    if (trim((string)($object['payment_status'] ?? '')) !== 'paid') {
+        return 0;
+    }
+
+    $metadata = is_array($object['metadata'] ?? null) ? $object['metadata'] : [];
+    return (int)($metadata['submission_id'] ?? 0);
+    /* === END FUNCTION: swh_extract_paid_checkout_submission_id === */
+}
+
+function swh_notify_paid_event_submission_inbox_best_effort(PDO $pdo, int $submissionId): void
+{
+    /* === BEGIN FUNCTION: swh_notify_paid_event_submission_inbox_best_effort | Zweck: sendet für bezahlte Event-Submissions eine einfache Inbox-Pushmeldung ohne Stripe-Webhook zu blockieren; Umfang: best-effort Zusatzlogik nach Commit === */
+    if ($submissionId <= 0) {
+        return;
+    }
+
+    try {
+        $statement = $pdo->prepare(
+            'SELECT id
+             FROM submissions
+             WHERE id = :submission_id
+               AND submission_kind = "event"
+               AND status = "paid"
+             LIMIT 1'
+        );
+        $statement->execute([':submission_id' => $submissionId]);
+
+        if (!$statement->fetch(PDO::FETCH_ASSOC)) {
+            return;
+        }
+
+        be_push_notify_inbox($pdo, 'event_submission', 'submission:' . $submissionId . ':paid', false);
+    } catch (Throwable $error) {
+        error_log('Stripe webhook push notification skipped: ' . $error->getMessage());
+    }
+    /* === END FUNCTION: swh_notify_paid_event_submission_inbox_best_effort === */
 }
 
 function swh_get_stripe_config(): array
@@ -793,10 +842,14 @@ try {
     if (in_array($eventType, ['subscription_schedule.created', 'subscription_schedule.updated', 'subscription_schedule.released', 'subscription_schedule.canceled', 'subscription_schedule.completed'], true)) {
         swh_sync_subscription_schedule_from_stripe_event($pdo, $event, $stripeConfig);
     }
-
+    $paidCheckoutSubmissionId = swh_extract_paid_checkout_submission_id($event);
     swh_mark_event_processed($pdo, $webhookEventId);
     $pdo->commit();
-
+    // === BEGIN BLOCK: STRIPE_WEBHOOK_INBOX_PUSH_AFTER_COMMIT_V1 | Zweck: meldet neue bezahlte Event-Submissions nach erfolgreichem Commit best-effort per Push; Umfang: keine Änderung an Stripe-Verarbeitung oder Webhook-Antwort ===
+    if ($paidCheckoutSubmissionId > 0) {
+        swh_notify_paid_event_submission_inbox_best_effort($pdo, $paidCheckoutSubmissionId);
+    }
+    // === END BLOCK: STRIPE_WEBHOOK_INBOX_PUSH_AFTER_COMMIT_V1 ===
     be_json_response(200, [
         'status' => 'ok',
         'received' => true,

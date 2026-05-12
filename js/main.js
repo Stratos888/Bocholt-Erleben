@@ -68,31 +68,35 @@ Umfang: Ersetzt nur diesen Loading-Start-Block.
 
         // Events von Airtable laden
         try {
-                      /* === BEGIN BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) ===
-Zweck: Sauberes Error-Handling bei events.json + Normalisierung auf kanonische Felder,
-       damit alle Module stabil mit { title, date, time, location, kategorie, beschreibung } arbeiten.
-       Unterstützt beide JSON-Formate:
-       (A) Array-Root: [ {...}, {...} ]
-       (B) Objekt-Root: { events: [ {...}, {...} ] }
-Umfang: Ersetzt nur den fetch/parse Block in App.init().
-=== */
-            const response = await fetch("/data/events.json", { cache: "no-store" });
+                      /* === BEGIN BLOCK: EVENTS_FETCH_MERGE_STATIC_AND_APPROVED_SUBMISSIONS_V1 | Zweck: lädt den Sheet-Feed plus final freigegebene DB-Submissions, damit veröffentlichte Einreichungen sofort öffentlich sichtbar werden; Umfang: ersetzt den bisherigen events.json-Fetch-/Normalisierungsblock === */
+            const fetchJsonNoStore = async (url, required) => {
+                try {
+                    const response = await fetch(url, { cache: "no-store" });
+                    if (!response.ok) {
+                        throw new Error(`${url} load failed: ${response.status} ${response.statusText}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (required) {
+                        throw error;
+                    }
+                    console.warn("Optional event source failed:", url, error);
+                    return null;
+                }
+            };
 
-            if (!response.ok) {
-                throw new Error(`events.json load failed: ${response.status} ${response.statusText}`);
-            }
-
-            const data = await response.json();
-
-            const rawEvents = Array.isArray(data)
-                ? data
-                : (Array.isArray(data?.events) ? data.events : []);
+            const extractEvents = (payload) => {
+                if (Array.isArray(payload)) return payload;
+                if (Array.isArray(payload?.events)) return payload.events;
+                if (Array.isArray(payload?.data?.events)) return payload.data.events;
+                return [];
+            };
 
             const normalizeEvent = (e) => {
                 const obj = e && typeof e === "object" ? e : {};
 
                 const title = (obj.title ?? obj.eventName ?? "").toString().trim();
-                const date = (obj.date ?? obj.datum ?? "").toString().trim(); // ISO YYYY-MM-DD erwartet
+                const date = (obj.date ?? obj.datum ?? "").toString().trim();
                 const time = (obj.time ?? obj.uhrzeit ?? obj.startzeit ?? "").toString().trim();
                 const location = (obj.location ?? obj.ort ?? "").toString().trim();
                 const kategorie = (obj.kategorie ?? obj.category ?? "").toString().trim();
@@ -111,8 +115,38 @@ Umfang: Ersetzt nur den fetch/parse Block in App.init().
                 };
             };
 
-            this.events = rawEvents.map(normalizeEvent);
-            /* === END BLOCK: EVENTS FETCH + NORMALIZE (robust, canonical fields) === */
+            const dedupeMergedEvents = (events) => {
+                const seen = new Set();
+                const out = [];
+
+                for (const event of events) {
+                    const idKey = String(event?.id || "").trim();
+                    const fallbackKey = [
+                        String(event?.title || "").trim().toLowerCase(),
+                        String(event?.date || "").trim(),
+                        String(event?.time || "").trim().toLowerCase(),
+                        String(event?.location || "").trim().toLowerCase()
+                    ].join("|");
+                    const key = idKey || fallbackKey;
+
+                    if (!key || seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(event);
+                }
+
+                return out;
+            };
+
+            const [sheetPayload, approvedSubmissionPayload] = await Promise.all([
+                fetchJsonNoStore("/data/events.json", true),
+                fetchJsonNoStore("/api/events/public.php", false)
+            ]);
+
+            const sheetEvents = extractEvents(sheetPayload).map(normalizeEvent);
+            const approvedSubmissionEvents = extractEvents(approvedSubmissionPayload).map(normalizeEvent);
+
+            this.events = dedupeMergedEvents([...sheetEvents, ...approvedSubmissionEvents]);
+            /* === END BLOCK: EVENTS_FETCH_MERGE_STATIC_AND_APPROVED_SUBMISSIONS_V1 === */
 
 
 

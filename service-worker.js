@@ -225,6 +225,39 @@ self.addEventListener("message", (event) => {
   }
 });
 
+/* === BEGIN BLOCK: INBOX PUSH NOTIFICATION HANDLER V2 ===
+Zweck:
+- Zeigt bei jedem empfangenen internen Inbox-Push eine einfache sichtbare Meldung.
+- Verhindert, dass mehrere Inbox-Pushes durch denselben Notification-Tag still zusammengeführt werden.
+Umfang:
+- Ersetzt nur den Push-/Notificationclick-Handler, ohne Cache-/Fetch-Logik zu ändern.
+=== */
+self.addEventListener("push", (event) => {
+  const createdAt = Date.now();
+
+  event.waitUntil(
+    self.registration.showNotification("Bocholt erleben", {
+      body: "Neue Elemente in der Inbox.",
+      tag: `be-inbox-new-items-${createdAt}`,
+      renotify: false,
+      silent: false,
+      requireInteraction: false,
+      timestamp: createdAt,
+      icon: "/icons/app/icon-192.png",
+      badge: "/icons/favicon/icon-32.png",
+      data: {
+        type: "inbox_update",
+        createdAt
+      }
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+});
+/* === END BLOCK: INBOX PUSH NOTIFICATION HANDLER V2 === */
+
 /* === BEGIN BLOCK: CACHING HELPERS (cache-busting works) ===
 Zweck: Cache-Busting darf NICHT durch ignoreSearch ausgehebelt werden.
 Umfang: cache.match ohne ignoreSearch, damit ?v=... wirklich neue Assets erzwingt.
@@ -362,11 +395,15 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Daten: Network-First
-  if (url.pathname.startsWith("/data/") && url.pathname.endsWith(".json")) {
+  /* === BEGIN BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1 | Zweck: hält dynamische öffentliche DB-Events nach finaler Freigabe sofort aktuell; Umfang: erweitert die Network-First-Datenrouten um /api/events/public.php === */
+  if (
+    (url.pathname.startsWith("/data/") && url.pathname.endsWith(".json")) ||
+    url.pathname === "/api/events/public.php"
+  ) {
     event.respondWith(networkFirst(req));
     return;
   }
+  /* === END BLOCK: PUBLIC_EVENT_FEED_NETWORK_FIRST_V1 === */
 
   /* === BEGIN BLOCK: MANIFEST FETCH SAFETY (prevent 503 spam) ===
 Zweck: manifest.json darf niemals als 503 "Offline" enden,

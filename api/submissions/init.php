@@ -232,7 +232,40 @@ function pf_find_organizer_by_email(PDO $pdo, string $emailNormalized): ?array
     return is_array($row) ? $row : null;
     /* === END FUNCTION: pf_find_organizer_by_email === */
 }
+/* === BEGIN BLOCK: PUBLISH_SUBMISSION_RECEIVED_MAIL_V1 | Zweck: sendet nach Einzeltermin-Einreichung eine Eingangsbestätigung ohne Zahlungsaufforderung; Umfang: Mail-Helfer für init.php === */
+function pf_send_submission_received_mail(array $submissionData): void
+{
+    $to = trim((string)($submissionData['email'] ?? ''));
+    if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return;
+    }
 
+    $title = trim((string)($submissionData['title'] ?? ''));
+    $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+
+    $body = implode("\n", [
+        'Hallo,',
+        '',
+        'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
+        '',
+        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        'Referenz: ' . $reference,
+        '',
+        'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
+        'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
+        'Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach redaktioneller Freigabe.',
+        '',
+        'Viele Grüße',
+        'Bocholt erleben',
+    ]);
+
+    try {
+        be_send_mail($to, 'Deine Veranstaltung wurde zur Prüfung eingereicht', $body);
+    } catch (Throwable $error) {
+        error_log('Submission received mail failed: ' . $error->getMessage());
+    }
+}
+/* === END BLOCK: PUBLISH_SUBMISSION_RECEIVED_MAIL_V1 === */
 function pf_insert_organizer(PDO $pdo, string $organizationName, ?string $contactName, string $emailInput, string $emailNormalized, string $defaultPlanKey): int
 {
     /* === BEGIN FUNCTION: pf_insert_organizer | Zweck: legt neue Veranstalter ohne ON DUPLICATE UPDATE an; Umfang: Insert-only fuer neue E-Mail-Adressen === */
@@ -400,7 +433,7 @@ try {
     $submissionInsert->execute([
         ':organizer_id' => $organizerId,
         ':submission_kind' => 'event',
-        ':status' => 'draft',
+        ':status' => $paymentKind === 'single' ? 'pending_review' : 'draft',
         ':requested_model_key' => $requestedModelKey,
         ':payment_kind' => $paymentKind,
         ':intake_origin' => $intakeOrigin,
@@ -423,19 +456,26 @@ try {
     $submissionId = (int)$pdo->lastInsertId();
 
     $pdo->commit();
-
-    be_json_response(201, [
-        'status' => 'ok',
-        'data' => [
-            'organizer_id' => $organizerId,
-            'submission_id' => $submissionId,
-            'submission_status' => 'draft',
-            'requested_model_key' => $requestedModelKey,
-            'payment_kind' => $paymentKind,
-            'intake_origin' => $intakeOrigin,
-            'payment_reference_key' => $paymentReferenceKey,
-        ],
+if ($paymentKind === 'single') {
+    pf_send_submission_received_mail([
+        'email' => $emailInput,
+        'title' => $title,
+        'payment_reference_key' => $paymentReferenceKey,
     ]);
+}
+be_json_response(201, [
+    'status' => 'ok',
+    'data' => [
+        'organizer_id' => $organizerId,
+        'submission_id' => $submissionId,
+        'submission_status' => $paymentKind === 'single' ? 'pending_review' : 'draft',
+        'checkout_required' => $paymentKind !== 'single',
+        'requested_model_key' => $requestedModelKey,
+        'payment_kind' => $paymentKind,
+        'intake_origin' => $intakeOrigin,
+        'payment_reference_key' => $paymentReferenceKey,
+    ],
+]);
     /* === END BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 === */
 } catch (InvalidArgumentException $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
