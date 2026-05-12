@@ -54,10 +54,16 @@ function sap_fetch_submission(PDO $pdo, int $submissionId): array
         'SELECT
             id,
             organizer_id,
+            submission_kind,
             status,
             requested_model_key,
             payment_kind,
             payment_reference_key,
+            email_snapshot,
+            title,
+            start_date,
+            location_name,
+            location_public_confirmed,
             approved_at,
             paid_at
          FROM submissions
@@ -87,6 +93,26 @@ function sap_assert_submission_approvable(array $submission): void
 
     if ($status !== 'approved' && empty($submission['paid_at'])) {
         throw new InvalidArgumentException('Submission ist noch nicht bezahlt.');
+    }
+
+    if ((string)($submission['submission_kind'] ?? '') !== 'event') {
+        throw new InvalidArgumentException('Nur Event-Submissions können veröffentlicht werden.');
+    }
+
+    if (trim((string)($submission['title'] ?? '')) === '') {
+        throw new InvalidArgumentException('Vor der Veröffentlichung fehlt der Veranstaltungstitel.');
+    }
+
+    if (trim((string)($submission['start_date'] ?? '')) === '') {
+        throw new InvalidArgumentException('Vor der Veröffentlichung fehlt das Veranstaltungsdatum.');
+    }
+
+    if (trim((string)($submission['location_name'] ?? '')) === '') {
+        throw new InvalidArgumentException('Vor der Veröffentlichung fehlt der Veranstaltungsort.');
+    }
+
+    if ((int)($submission['location_public_confirmed'] ?? 0) !== 1) {
+        throw new InvalidArgumentException('Vor der Veröffentlichung muss die öffentliche Ortsnennung bestätigt sein.');
     }
 }
 
@@ -283,7 +309,38 @@ function sap_mark_submission_approved(PDO $pdo, int $submissionId): void
         ':submission_id' => $submissionId,
     ]);
 }
+/* === BEGIN BLOCK: SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 | Zweck: informiert Einreicher nach finaler Veröffentlichung; Umfang: Mail-Helfer für approve.php === */
+function sap_send_publication_mail(array $submission): void
+{
+    $email = trim((string)($submission['email_snapshot'] ?? ''));
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return;
+    }
 
+    $title = trim((string)($submission['title'] ?? ''));
+    $reference = trim((string)($submission['payment_reference_key'] ?? ''));
+
+    $bodyLines = [
+        'Hallo,',
+        '',
+        'deine Veranstaltung wurde bei Bocholt erleben veröffentlicht.',
+        '',
+        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        'Referenz: ' . $reference,
+        '',
+        'Sie ist nun im öffentlichen Eventbereich sichtbar.',
+        '',
+        'Viele Grüße',
+        'Bocholt erleben',
+    ];
+
+    try {
+        be_send_mail($email, 'Deine Veranstaltung wurde veröffentlicht', implode("\n", $bodyLines));
+    } catch (Throwable $error) {
+        error_log('Submission publication mail failed: ' . $error->getMessage());
+    }
+}
+/* === END BLOCK: SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 === */
 function sap_build_quota_summary(PDO $pdo, int $organizerId): array
 {
     $statement = $pdo->prepare(
@@ -371,6 +428,8 @@ try {
 
     $pdo->commit();
 
+    sap_send_publication_mail($submission);
+
     be_json_response(200, [
         'status' => 'ok',
         'data' => [
@@ -379,6 +438,7 @@ try {
             'entitlement_id' => (int)$entitlement['id'],
             'consumption_id' => $consumptionId,
             'quota' => $quotaSummary,
+            'public_feed' => '/api/events/public.php',
         ],
     ]);
 } catch (InvalidArgumentException $error) {
