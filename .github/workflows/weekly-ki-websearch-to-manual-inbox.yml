@@ -75,10 +75,10 @@ jobs:
           SEARCH_WINDOW_DAYS: "210"
           ALLOW_RADIUS_KM: "20"
 
-          # === BEGIN BLOCK: WEEKLY_PENDING_INBOX_WARN_ENV_V1 | Zweck: offene Inbox nur warnen, nicht blockieren; Dedupe gegen Inbox bleibt aktiv | Umfang: ersetzt alte FAIL_ON_PENDING_INBOX-Env durch WARN_ON_PENDING_INBOX ===
+          # === BEGIN BLOCK: WEEKLY_PENDING_BUFFERS_WARN_ENV_V2 | Zweck: offene Inbox und bestehender Manual-Puffer nur als Dedupe-Bestand nutzen, nicht als Lauf-Blocker | Umfang: ersetzt Pending-Env-Konfiguration ===
           WARN_ON_PENDING_INBOX: "true"
-          # === END BLOCK: WEEKLY_PENDING_INBOX_WARN_ENV_V1 ===
-          FAIL_ON_PENDING_MANUAL: "true"
+          FAIL_ON_PENDING_MANUAL: "false"
+          # === END BLOCK: WEEKLY_PENDING_BUFFERS_WARN_ENV_V2 ===
         run: |
           set -e
           python scripts/weekly-ki-websearch-to-manual-inbox.py
@@ -105,8 +105,8 @@ jobs:
           name: weekly-event-diagnostics
           path: .tmp/weekly-ki-eventsuche/weekly_event_diagnostics.json
           if-no-files-found: ignore
-      # === BEGIN BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
-      # === END BLOCK: COMMIT GENERATED MANUAL INBOX AND SOURCE CANDIDATES ===
+      # === BEGIN BLOCK: COMMIT WEEKLY OUTPUTS AND EXPOSE MANUAL BUFFER STATE_V2 | Zweck: committet Weekly-Outputs und meldet zusätzlich, ob nach dem Lauf Manual-JSON-Einträge für den Intake vorhanden sind | Umfang: ersetzt Commit-Step vollständig ===
+      # === END BLOCK: COMMIT WEEKLY OUTPUTS AND EXPOSE MANUAL BUFFER STATE_V2 ===
       - name: Commit generated manual inbox and source candidates
         id: commit_manual_json
         run: |
@@ -122,6 +122,17 @@ jobs:
             echo "manual_changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+          MANUAL_HAS_ITEMS="$(python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("data/inbox_manual.json")
+          raw = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+          print("true" if isinstance(raw, list) and len(raw) > 0 else "false")
+          PY
+          )"
+          echo "manual_has_items=${MANUAL_HAS_ITEMS}" >> "$GITHUB_OUTPUT"
+
           if git diff --cached --quiet; then
             echo "No generated inbox/source changes to commit."
             echo "did_commit=false" >> "$GITHUB_OUTPUT"
@@ -132,10 +143,10 @@ jobs:
           git push
           echo "did_commit=true" >> "$GITHUB_OUTPUT"
 
-      # === BEGIN BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE ONLY FOR EVENT CHANGES ===
-      # === END BLOCK: TRIGGER EXISTING MANUAL KI EVENT INTAKE ONLY FOR EVENT CHANGES ===
+      # === BEGIN BLOCK: TRIGGER MANUAL KI EVENT INTAKE WHEN BUFFER HAS ITEMS_V2 | Zweck: startet Intake auch dann, wenn bestehende Manual-JSON-Einträge unverändert geblieben sind | Umfang: ersetzt Trigger-Bedingung ===
+      # === END BLOCK: TRIGGER MANUAL KI EVENT INTAKE WHEN BUFFER HAS ITEMS_V2 ===
       - name: Trigger Manual KI Event Intake
-        if: steps.commit_manual_json.outputs.manual_changed == 'true'
+        if: steps.commit_manual_json.outputs.manual_has_items == 'true'
         env:
           WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
