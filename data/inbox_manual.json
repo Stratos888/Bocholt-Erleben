@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "title": "TEST – Append-Puffer bleibt erhalten",
+    "date": "2026-06-25",
+    "endDate": "",
+    "time": "19:15",
+    "city": "Bocholt",
+    "location": "Testort Bocholt",
+    "kategorie_suggestion": "Innenstadt & Leben",
+    "url": "https://example.com/test-append-puffer-2026-06-25",
+    "description": "Technischer Testdatensatz. Dieses Event dient nur zur Prüfung, ob bestehende Manual-JSON-Einträge beim KI-Suchlauf erhalten bleiben und neue Funde angehängt werden.",
+    "source_name": "TEST Quelle",
+    "source_url": "https://example.com/test-append-puffer-2026-06-25",
+    "notes": "TEST_ONLY_manual_json_append_buffer"
+  }
+]
