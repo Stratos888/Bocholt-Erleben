@@ -563,7 +563,7 @@ jobs:
           [ -n "$APP_REVIEW_PASSWORD" ] || { echo "❌ Missing required secret/value: APP_REVIEW_PASSWORD"; exit 1; }
           # === END BLOCK: EXPLICIT_REQUIRED_ENV_CHECKS_V1 ===
 
-          # === BEGIN BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V1 | Zweck: erzeugt data/search-metrics.json für Dashboard-V2 und bereitet danach die private PHP-Config vor; Umfang: ersetzt APP_ENV/URL-Zuweisung plus Export-Zeile im Prepare-deploy-Step ===
+          # === BEGIN BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 | Zweck: erzeugt data/search-metrics.json mit aktuellem 28-Tage-Zeitraum plus vorherigem Vergleichszeitraum für Dashboard-V3.1; Umfang: ersetzt Search-Metrics-Export im Prepare-deploy-Step ===
           APP_ENV="$DEPLOY_ENV_NAME"
           APP_SUCCESS_URL="$APP_BASE_URL/events-veroeffentlichen/erfolg/"
           APP_CANCEL_URL="$APP_BASE_URL/events-veroeffentlichen/abgebrochen/"
@@ -573,7 +573,6 @@ jobs:
           import json
           import os
           import re
-          import sys
           import urllib.parse
           import urllib.request
           from pathlib import Path
@@ -593,8 +592,13 @@ jobs:
               }
 
           today = dt.datetime.now(dt.timezone.utc).date()
-          end_date = today - dt.timedelta(days=3)
-          start_date = end_date - dt.timedelta(days=27)
+
+          current_end = today - dt.timedelta(days=3)
+          current_start = current_end - dt.timedelta(days=27)
+
+          previous_end = current_start - dt.timedelta(days=1)
+          previous_start = previous_end - dt.timedelta(days=27)
+
           base_url = os.environ.get("APP_BASE_URL", "").strip().rstrip("/")
           google_site = os.environ.get("SEARCH_METRICS_GOOGLE_SITE_URL", "").strip() or (base_url + "/" if base_url else "")
           bing_site = os.environ.get("SEARCH_METRICS_BING_SITE_URL", "").strip() or base_url
@@ -603,12 +607,21 @@ jobs:
               "status": "not_configured",
               "generated_at": now_iso(),
               "period": {
-                  "start_date": start_date.isoformat(),
-                  "end_date": end_date.isoformat(),
+                  "start_date": current_start.isoformat(),
+                  "end_date": current_end.isoformat(),
                   "days": 28,
                   "note": "Google Search Console nutzt finalisierte Daten; Bing Webmaster QueryStats werden wöchentlich aktualisiert.",
               },
+              "previous_period": {
+                  "start_date": previous_start.isoformat(),
+                  "end_date": previous_end.isoformat(),
+                  "days": 28,
+              },
               "sources": {
+                  "google": source("not_configured", google_site, message="GOOGLE_SERVICE_ACCOUNT_JSON oder Search-Console-Zugriff fehlt."),
+                  "bing": source("not_configured", bing_site, message="BING_WEBMASTER_API_KEY oder Bing-Webmaster-Zugriff fehlt."),
+              },
+              "previous_sources": {
                   "google": source("not_configured", google_site, message="GOOGLE_SERVICE_ACCOUNT_JSON oder Search-Console-Zugriff fehlt."),
                   "bing": source("not_configured", bing_site, message="BING_WEBMASTER_API_KEY oder Bing-Webmaster-Zugriff fehlt."),
               },
@@ -616,9 +629,13 @@ jobs:
                   "impressions": 0,
                   "clicks": 0,
               },
+              "previous_totals": {
+                  "impressions": 0,
+                  "clicks": 0,
+              },
           }
 
-          def fetch_google():
+          def fetch_google(period_start, period_end):
               service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
               if not service_account_json or not google_site:
                   return source("not_configured", google_site, message="Google Search Console ist nicht vollständig konfiguriert.")
@@ -636,8 +653,8 @@ jobs:
                   response = service.searchanalytics().query(
                       siteUrl=google_site,
                       body={
-                          "startDate": start_date.isoformat(),
-                          "endDate": end_date.isoformat(),
+                          "startDate": period_start.isoformat(),
+                          "endDate": period_end.isoformat(),
                           "dimensions": [],
                           "type": "web",
                           "aggregationType": "byProperty",
@@ -665,7 +682,7 @@ jobs:
               timestamp_ms = int(match.group(1))
               return dt.datetime.fromtimestamp(timestamp_ms / 1000, tz=dt.timezone.utc).date()
 
-          def fetch_bing():
+          def fetch_bing(period_start, period_end):
               api_key = os.environ.get("BING_WEBMASTER_API_KEY", "").strip()
               if not api_key or not bing_site:
                   return source("not_configured", bing_site, message="Bing Webmaster API ist nicht vollständig konfiguriert.")
@@ -684,7 +701,7 @@ jobs:
 
                   for row in rows:
                       row_date = parse_bing_date(row.get("Date"))
-                      if row_date is not None and not (start_date <= row_date <= end_date):
+                      if row_date is not None and not (period_start <= row_date <= period_end):
                           continue
                       impressions += int(round(float(row.get("Impressions") or 0)))
                       clicks += int(round(float(row.get("Clicks") or 0)))
@@ -700,8 +717,11 @@ jobs:
               except Exception as exc:
                   return source("error", bing_site, message=f"Bing Webmaster Fehler: {type(exc).__name__}")
 
-          result["sources"]["google"] = fetch_google()
-          result["sources"]["bing"] = fetch_bing()
+          result["sources"]["google"] = fetch_google(current_start, current_end)
+          result["sources"]["bing"] = fetch_bing(current_start, current_end)
+
+          result["previous_sources"]["google"] = fetch_google(previous_start, previous_end)
+          result["previous_sources"]["bing"] = fetch_bing(previous_start, previous_end)
 
           source_statuses = [entry.get("status") for entry in result["sources"].values()]
           if all(status == "ok" for status in source_statuses):
@@ -718,6 +738,11 @@ jobs:
               "clicks": sum(entry.get("clicks", 0) for entry in result["sources"].values()),
           }
 
+          result["previous_totals"] = {
+              "impressions": sum(entry.get("impressions", 0) for entry in result["previous_sources"].values()),
+              "clicks": sum(entry.get("clicks", 0) for entry in result["previous_sources"].values()),
+          }
+
           output_path = Path("deploy/data/search-metrics.json")
           output_path.parent.mkdir(parents=True, exist_ok=True)
           output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -726,7 +751,7 @@ jobs:
           PY
 
           export APP_ENV APP_DB_HOST APP_DB_PORT APP_DB_NAME APP_DB_USER APP_DB_PASSWORD APP_STRIPE_SECRET_KEY APP_STRIPE_WEBHOOK_SECRET APP_STRIPE_PRICE_SINGLE APP_STRIPE_PRICE_STARTER APP_STRIPE_PRICE_ACTIVE APP_STRIPE_PRICE_UNLIMITED APP_MAIL_FROM_NAME APP_MAIL_FROM_ADDRESS APP_MAIL_SMTP_HOST APP_MAIL_SMTP_PORT APP_MAIL_SMTP_ENCRYPTION APP_MAIL_SMTP_USERNAME APP_MAIL_SMTP_PASSWORD APP_REVIEW_PASSWORD APP_BASE_URL APP_SUCCESS_URL APP_CANCEL_URL
-          # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V1 ===
+          # === END BLOCK: SEARCH_METRICS_EXPORT_AND_CONFIG_ENV_V2 ===
 
           python - <<'PY'
           # === BEGIN BLOCK: WRITE_PRIVATE_PHP_CONFIG_FROM_SECRETS_V1 | Zweck: erzeugt deploy/api/_config.php aus GitHub-Secrets ohne Klartext im Repo; Umfang: kompletter Config-Writer innerhalb Prepare deploy folder ===

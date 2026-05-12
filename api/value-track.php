@@ -111,6 +111,15 @@ if (!be_value_metrics_same_origin_allowed()) {
     ]);
 }
 
+/* === BEGIN BLOCK: VALUE_METRICS_SERVER_OPTOUT_V1 | Zweck: ignoriert eigene Geräte mit Opt-out-Cookie, damit interne Testklicks nicht in Nutzwert-Metriken landen; Umfang: ergänzt serverseitigen Guard vor Payload-Verarbeitung === */
+if (trim((string)($_COOKIE['be_value_metrics_opt_out'] ?? '')) === '1') {
+    be_json_response(200, [
+        'status' => 'ignored',
+        'reason' => 'opt_out',
+    ]);
+}
+/* === END BLOCK: VALUE_METRICS_SERVER_OPTOUT_V1 === */
+
 $rawBody = file_get_contents('php://input') ?: '';
 $payload = json_decode($rawBody, true);
 if (!is_array($payload)) {

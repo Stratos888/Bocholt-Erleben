@@ -89,6 +89,31 @@ function sanitizeMetricKey(value) {
   return sanitizeAnalyticsValue(value, 64).toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^[_-]+|[_-]+$/g, "");
 }
 
+/* === BEGIN BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V1 | Zweck: ermöglicht Ausschluss eigener Geräte aus dem internen Nutzwert-Tracking; Umfang: ergänzt nur Client-Opt-out-Helfer für First-Party-Metriken === */
+const VALUE_METRICS_OPT_OUT_KEY = "be_value_metrics_opt_out";
+
+function isValueMetricsOptedOut() {
+  try {
+    if (window.localStorage?.getItem(VALUE_METRICS_OPT_OUT_KEY) === "1") return true;
+  } catch (_) {}
+
+  return String(document.cookie || "")
+    .split(";")
+    .some((entry) => entry.trim() === `${VALUE_METRICS_OPT_OUT_KEY}=1`);
+}
+
+function setValueMetricsOptOut(enabled) {
+  try {
+    if (enabled) window.localStorage?.setItem(VALUE_METRICS_OPT_OUT_KEY, "1");
+    else window.localStorage?.removeItem(VALUE_METRICS_OPT_OUT_KEY);
+  } catch (_) {}
+
+  const maxAge = enabled ? 60 * 60 * 24 * 365 : 0;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${VALUE_METRICS_OPT_OUT_KEY}=${enabled ? "1" : ""}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
+}
+/* === END BLOCK: VALUE_METRICS_OPTOUT_HELPERS_V1 === */
+
 function getDomainFromUrl(url) {
   try {
     return new URL(url).hostname.replace(/^www\./i, "");
@@ -109,6 +134,7 @@ function sendValueMetric(metricKey, payload = {}) {
 
   const cleanMetricKey = sanitizeMetricKey(metricKey);
   if (!cleanMetricKey) return;
+  if (isValueMetricsOptedOut()) return;
 
   const endpoint = CONFIG.analytics.valueMetricsEndpoint || "/api/value-track.php";
   const destinationUrl = sanitizeAnalyticsValue(payload.destinationUrl || payload.url, 500);
@@ -282,6 +308,8 @@ function initAnalytics() {
   window.BEAnalytics = window.BEAnalytics || {};
   window.BEAnalytics.trackOutboundClick = trackOutboundClick;
   window.BEAnalytics.trackValueMetric = trackValueMetric;
+  window.BEAnalytics.setValueMetricsOptOut = setValueMetricsOptOut;
+  window.BEAnalytics.isValueMetricsOptedOut = isValueMetricsOptedOut;
 
   initOrganizerCtaTracking();
 
