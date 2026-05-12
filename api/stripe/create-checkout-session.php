@@ -3,7 +3,7 @@ declare(strict_types=1);
 /* === BEGIN FILE: api/stripe/create-checkout-session.php | Zweck: erzeugt serverseitig eine Stripe-Checkout-Session fuer eine vorhandene Submission und schreibt Stripe-Referenzen in die DB; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
-
+require dirname(__DIR__) . '/push/_lib.php';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
     be_json_response(405, [
@@ -110,6 +110,20 @@ function scs_get_stripe_config(): array
         'secret_key' => $secretKey,
         'prices' => $mappedPrices,
     ];
+}
+function scs_notify_paid_submission_inbox_best_effort(int $submissionId): void
+{
+    /* === BEGIN FUNCTION: scs_notify_paid_submission_inbox_best_effort | Zweck: sendet nach Abo-Reuse eine einfache Inbox-Pushmeldung ohne Checkout-Flow zu blockieren; Umfang: best-effort Zusatzlogik === */
+    if ($submissionId <= 0) {
+        return;
+    }
+
+    try {
+        be_push_notify_inbox_best_effort('event_submission', 'submission:' . $submissionId . ':paid');
+    } catch (Throwable $error) {
+        error_log('Checkout push notification skipped: ' . $error->getMessage());
+    }
+    /* === END FUNCTION: scs_notify_paid_submission_inbox_best_effort === */
 }
 
 function scs_fetch_submission(PDO $pdo, int $submissionId): array
@@ -452,7 +466,9 @@ try {
     if (is_array($existingSubscriptionEntitlement)) {
         scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
         $pdo->commit();
-
+        // === BEGIN BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 | Zweck: neue per aktiver Mitgliedschaft bezahlte Event-Einreichung best-effort per Push melden; Umfang: keine Änderung am Response-/Checkout-Verhalten ===
+        scs_notify_paid_submission_inbox_best_effort($submissionId);
+        // === END BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 ===
         $resolvedModelKey = trim((string)($existingSubscriptionEntitlement['plan_key'] ?? ''));
         $effectiveModelKey = $resolvedModelKey !== ''
             ? $resolvedModelKey
