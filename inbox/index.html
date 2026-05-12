@@ -240,10 +240,11 @@ Umfang:
     // Umfang:
     // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
 
-    // === BEGIN BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V1 ===
+    // === BEGIN BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V2 ===
     // Zweck:
     // - Aktiviert Web Push nur nach erfolgreichem Review-Unlock.
-    // - Speichert die Browser-Subscription serverseitig für einfache Inbox-Hinweise.
+    // - Erkennt bestehende Browser-Subscriptions beim Neuladen der Inbox.
+    // - Erzwingt beim Aktivieren ein Service-Worker-Update, damit der aktuelle Push-Handler genutzt wird.
     // Umfang:
     // - Additiv; ändert keine Lade-/Approve-/Reject-Logik.
     function urlBase64ToUint8Array(base64String) {
@@ -257,6 +258,13 @@ Umfang:
       }
 
       return outputArray;
+    }
+
+    function setInboxPushButtonActive(isActive) {
+      if (!elPushBtn) return;
+
+      elPushBtn.textContent = isActive ? "Push aktiv" : "Push aktivieren";
+      elPushBtn.classList.toggle("btn-push-active", isActive);
     }
 
     async function fetchPushPublicKey() {
@@ -277,6 +285,75 @@ Umfang:
       return String(payload.data.public_key);
     }
 
+    async function getInboxPushRegistration({ forceUpdate = false } = {}) {
+      if (!("serviceWorker" in navigator)) {
+        return null;
+      }
+
+      let registration = await navigator.serviceWorker.getRegistration("/");
+      if (!registration) {
+        registration = await navigator.serviceWorker.register("/service-worker.js", {
+          updateViaCache: "none"
+        });
+      }
+
+      if (forceUpdate && registration && typeof registration.update === "function") {
+        try {
+          await registration.update();
+        } catch (_error) {
+          // Service-Worker-Update darf die Inbox nicht blockieren.
+        }
+      }
+
+      if (registration?.waiting) {
+        try {
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        } catch (_error) {
+          // Best effort.
+        }
+      }
+
+      return await navigator.serviceWorker.ready;
+    }
+
+    async function refreshInboxPushState({ silent = false } = {}) {
+      if (!elPushBtn) return false;
+
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+        setInboxPushButtonActive(false);
+        if (!silent) setStatus("Push wird von diesem Browser nicht unterstützt.");
+        return false;
+      }
+
+      if (Notification.permission !== "granted") {
+        setInboxPushButtonActive(false);
+        return false;
+      }
+
+      try {
+        const registration = await getInboxPushRegistration({ forceUpdate: false });
+        const subscription = registration ? await registration.pushManager.getSubscription() : null;
+        const isActive = Boolean(subscription);
+
+        setInboxPushButtonActive(isActive);
+        return isActive;
+      } catch (error) {
+        console.warn("Push state check failed", error);
+        setInboxPushButtonActive(false);
+        return false;
+      }
+    }
+
+    async function sendInboxPushTest() {
+      await fetch(PUSH_TEST_API_URL, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "X-BE-Review-Password": reviewApiPassword
+        }
+      });
+    }
+
     async function enableInboxPush() {
       if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
         setStatus("Push wird von diesem Browser nicht unterstützt.");
@@ -293,18 +370,13 @@ Umfang:
       try {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
+          setInboxPushButtonActive(false);
           setStatus("Push wurde nicht erlaubt.");
           return;
         }
 
         const publicKey = await fetchPushPublicKey();
-
-        let registration = await navigator.serviceWorker.getRegistration("/");
-        if (!registration) {
-          registration = await navigator.serviceWorker.register("/service-worker.js");
-        }
-
-        registration = await navigator.serviceWorker.ready;
+        const registration = await getInboxPushRegistration({ forceUpdate: true });
 
         let subscription = await registration.pushManager.getSubscription();
         if (!subscription) {
@@ -329,29 +401,21 @@ Umfang:
           throw new Error(payload?.message || "push_subscribe_failed");
         }
 
-        if (elPushBtn) {
-          elPushBtn.textContent = "Push aktiv";
-          elPushBtn.classList.add("btn-push-active");
-        }
+        setInboxPushButtonActive(true);
         setStatus("Push aktiviert. Testnachricht wird gesendet …");
 
-        await fetch(PUSH_TEST_API_URL, {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "X-BE-Review-Password": reviewApiPassword
-          }
-        }).catch(() => null);
+        await sendInboxPushTest();
 
         setStatus("Push aktiviert.");
       } catch (error) {
         console.error(error);
         setStatus("Push konnte nicht aktiviert werden: " + (error?.message || error));
+        await refreshInboxPushState({ silent: true });
       } finally {
         if (elPushBtn) elPushBtn.disabled = false;
       }
     }
-    // === END BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V1 ===
+    // === END BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V2 ===
     
     async function fetchSubmissionReviewItems() {
       if (!reviewApiPassword) {
@@ -1067,6 +1131,7 @@ Umfang:
           return;
         }
 
+        await refreshInboxPushState({ silent: true });
         await loadAndShow();
       } catch (err) {
         console.error(err);
