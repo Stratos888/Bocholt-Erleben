@@ -405,6 +405,97 @@ Bestanden:
 - KI-/Sheet-Pfad ist dadurch nicht mehr offene Regression
 - KI-/Sheet-Darstellung ist kein Live-Blocker mehr
 
+<!-- === BEGIN BLOCK: TEST_STATUS_INBOX_PUSH_V1_2026_05_12 | Zweck: dokumentiert den eingeführten internen Push-Hinweis für neue Inbox-Elemente; Umfang: Staging-Stand, aktivierte Teile, Grenzen und offene Folgepunkte === -->
+
+## Ergänzender Teststand: Interne Push-Hinweise für neue Inbox-Elemente
+
+- Datum: 2026-05-12
+- Umgebung: Staging
+- Funktion: einfache interne Web-Push-Benachrichtigung bei neuen Inbox-/Review-Elementen
+- Ziel: reine Erinnerung, dass neue Elemente in der Inbox liegen
+- Push-Text: `Neue Elemente in der Inbox.`
+- Status: Staging technisch aktiviert
+
+### Umgesetzte technische Basis
+
+Neu bzw. ergänzt:
+
+- `api/push/_lib.php`
+- `api/push/config.php`
+- `api/push/subscribe.php`
+- `api/push/notify-inbox.php`
+- `api/push/test.php`
+- `service-worker.js` mit zusätzlichem Push-Handler
+- `/inbox/` mit internem Button `Push aktivieren`
+- Deploy-Konfiguration für optionale Push-Secrets
+- best-effort Push-Auslöser für:
+  - KI-/Sheet-Intake nach tatsächlich neu angehängten Inbox-Zeilen
+  - bezahlte Event-Submissions nach Stripe-Webhook
+  - Event-Submissions über aktive Mitgliedschaft ohne neuen Checkout
+
+### Datenbank
+
+In der Staging-Datenbank wurden die Push-Tabellen angelegt:
+
+- `push_subscriptions`
+- `review_notification_log`
+
+Die SQL-Migration liegt im Repo als Push-Inbox-Migration unter `api/sql/`.
+Falls die Datei lokal wegen bestehender Nummerierung als `006_...` angelegt wurde, ist der SQL-Inhalt maßgeblich.
+
+### Staging-Konfiguration
+
+Für Staging wurden GitHub-Secrets angelegt:
+
+- `STAGING_PUSH_VAPID_PUBLIC_KEY`
+- `STAGING_PUSH_VAPID_PRIVATE_KEY_PEM`
+- `STAGING_PUSH_SECRET`
+
+Der Deploy-Workflow übernimmt diese Werte in die private `api/_config.php`.
+
+### Bewusste Produktgrenze
+
+Die Pushmeldung ist absichtlich minimal:
+
+- kein Eventtitel
+- keine Quellenangabe
+- keine Detaildaten
+- kein verpflichtendes Öffnen der Inbox beim Klick
+- keine Benachrichtigungszentrale
+- keine User-/Rollenverwaltung
+
+Die Funktion dient nur als interner Hinweis, damit neue Inbox-Elemente nicht übersehen werden.
+
+### Aktueller Nutzungsmodus
+
+Aktuell wird nur die Staging-Inbox aktiv genutzt.
+
+Das ist ausreichend, solange neue Review-Arbeit praktisch über Staging geprüft und kuratiert wird.
+
+Live-Push ist erst erforderlich, wenn Live-Einreichungen direkt über die Live-Inbox überwacht werden sollen.
+
+### Offene Folgepunkte
+
+Noch nicht final abgeschlossen:
+
+1. Live-Datenbank ebenfalls mit den Push-Tabellen migrieren, sobald Live-Push genutzt werden soll.
+2. Live-Secrets setzen:
+   - `LIVE_PUSH_VAPID_PUBLIC_KEY`
+   - `LIVE_PUSH_VAPID_PRIVATE_KEY_PEM`
+   - `LIVE_PUSH_SECRET`
+3. Live-Deploy ausführen und Push in der Live-Inbox separat aktivieren.
+4. Beim nächsten echten KI-/Sheet-Intake prüfen, ob nach neuen angehängten Zeilen automatisch eine Pushmeldung kommt.
+5. Beim nächsten echten externen Event-Submission-Fall prüfen, ob nach Review-Relevanz automatisch eine Pushmeldung kommt.
+6. Spätere Aktivitätenanfragen müssen denselben zentralen Endpoint `/api/push/notify-inbox.php` bzw. die zentrale Push-Funktion anschließen.
+
+### Bewertung
+
+Der Push-Mechanismus ist bewusst als kleiner, zentraler Add-on-Mechanismus umgesetzt.
+
+Er ist nicht an einen bestimmten Inhaltstyp gebunden und kann später für Aktivitätenanfragen, Location-/Anbieteranfragen oder weitere Review-Quellen wiederverwendet werden.
+
+<!-- === END BLOCK: TEST_STATUS_INBOX_PUSH_V1_2026_05_12 === -->
+
 ## Offene Tests / bekannte Lücken
 
 ### Live-Rollout
