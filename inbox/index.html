@@ -722,7 +722,54 @@ Umfang:
       return hints.join(" · ");
     }
     // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
+    /* === BEGIN BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 | Zweck: übersetzt DB-Submission-Status in Review-Aktionen für Vorprüfung, Zahlungsfreigabe und finale Veröffentlichung; Umfang: Statuslabel- und Aktionshelper === */
+    function getSubmissionReviewState(item) {
+      if (String(item.review_source || "") !== "submission_db") {
+        return {
+          label: "KI-/Sheet-Fall",
+          actionMode: "sheet",
+          approveLabel: "✅ Übernehmen",
+          rejectLabel: "❌ Verwerfen"
+        };
+      }
 
+      const status = trimValue(item.status);
+      const labels = {
+        pending_review: "Neu eingereicht / Vorprüfung offen",
+        payment_released: "Zur Zahlung freigegeben",
+        checkout_started: "Zahlung gestartet / noch nicht bezahlt",
+        paid: "Bezahlt / veröffentlichungsbereit",
+        in_review: "Bezahlt / in redaktioneller Prüfung",
+        approved: "Veröffentlicht",
+        rejected: "Abgelehnt"
+      };
+
+      if (["pending_review", "payment_released", "checkout_started"].includes(status)) {
+        return {
+          label: labels[status] || status,
+          actionMode: "release_payment",
+          approveLabel: status === "pending_review" ? "Zur Zahlung freigeben" : "Zahlungslink erneut senden",
+          rejectLabel: "Ablehnen"
+        };
+      }
+
+      if (["paid", "in_review"].includes(status)) {
+        return {
+          label: labels[status] || status,
+          actionMode: "publish",
+          approveLabel: "Veröffentlichen",
+          rejectLabel: "Ablehnen"
+        };
+      }
+
+      return {
+        label: labels[status] || status || "Unbekannt",
+        actionMode: "unknown",
+        approveLabel: "Übernehmen",
+        rejectLabel: "Ablehnen"
+      };
+    }
+    /* === END BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 === */
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -795,6 +842,7 @@ Umfang:
       }).join("");
 
       const originLabel = (it.intake_origin_label || "KI-Suche").trim();
+      const reviewState = getSubmissionReviewState(it);
       const originBadgeHtml = `<span class="originBadge">${escapeHtml(originLabel)}</span>`;
       const reviewRiskFlags = Array.isArray(it.review_risk_flags) ? it.review_risk_flags.filter(Boolean) : [];
       const reviewRiskHtml = reviewRiskFlags.length ? `
@@ -804,9 +852,12 @@ Umfang:
         </div>
       ` : "";
 
-      /* === BEGIN BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 | Zweck: zeigt Datum/Zeitraum und Uhrzeit/Zeiten getrennt, damit Einzeltage, Mehrtagesevents und KI-Sheet-Fälle korrekt lesbar sind; Umfang: ersetzt infoRows-Liste === */
       const infoRows = [
         ["Herkunft", originLabel],
+        ["Review-Status", reviewState.label],
+        ["Zahlungsfreigabe", trimValue(it.payment_released_at) ? formatGermanDateTime(it.payment_released_at) : ""],
+        ["Zahlungslink gültig bis", trimValue(it.payment_start_token_expires_at) ? formatGermanDateTime(it.payment_start_token_expires_at) : ""],
+        ["Zahlung gestartet", trimValue(it.payment_started_at) ? formatGermanDateTime(it.payment_started_at) : ""],
         [dateLabel, dateRangeLine],
         [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
         ["Zeitdetails laut Quelle", scheduleDetails],
@@ -819,7 +870,6 @@ Umfang:
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
       ].filter(([, value]) => value);
-      /* === END BLOCK: REVIEW_DISPLAY_RELEVANT_INFO_ROWS_V2 === */
 
       const infoRowsHtml = infoRows.map(([label, value]) => `
         <div class="reviewRow">
@@ -857,8 +907,8 @@ Umfang:
           <div class="actions">
             <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Veranstaltungslink öffnen</button>
             <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
-            <button id="btnNo" class="btn btn-bad" type="button">❌ Verwerfen</button>
-            <button id="btnOk" class="btn btn-good" type="button">✅ Übernehmen</button>
+            <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
+            <button id="btnOk" class="btn btn-good" type="button">${escapeHtml(reviewState.approveLabel)}</button>
           </div>
 
           ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Klick auf Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
@@ -1062,8 +1112,17 @@ Umfang:
       const isApprove = String(newStatus) === "übernehmen";
 
       if (isApprove) {
+        const reviewState = getSubmissionReviewState(it);
+
+        if (reviewState.actionMode === "release_payment") {
+          await postJson("/api/submissions/release-payment.php", { submission_id: submissionId });
+          setStatus("Submission zur Zahlung freigegeben. Zahlungslink wurde versendet.");
+          await loadAndShow();
+          return;
+        }
+
         await postJson("/api/submissions/approve.php", { submission_id: submissionId });
-        setStatus("Submission geprüft und freigegeben.");
+        setStatus("Submission veröffentlicht. Verbrauch wurde gebucht.");
         await loadAndShow();
         return;
       }
@@ -1082,7 +1141,7 @@ Umfang:
         reason: ablehnungsgrund
       });
 
-      setStatus("Submission verworfen.");
+      setStatus("Submission abgelehnt.");
       await loadAndShow();
     }
     // === END BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
