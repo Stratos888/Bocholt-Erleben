@@ -515,33 +515,187 @@ Für den aktuellen Arbeitsmodus ist Staging-Push ausreichend und abgeschlossen.
 
 <!-- === END BLOCK: TEST_STATUS_INBOX_PUSH_V2_2026_05_12 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_SINGLE_EVENT_REVIEW_BEFORE_PAYMENT_E2E_2026_05_12 | Zweck: dokumentiert den final geprüften Einzelevent-Funnel mit Vorprüfung vor Zahlung, Zahlungslink und direkter öffentlicher DB-Veröffentlichung; Umfang: Staging-E2E, Live-Smoke, Architekturentscheidung und verbleibende Beobachtungspunkte === -->
+
+## Ergänzender Teststand: Einzelevent-Funnel mit Vorprüfung vor Zahlung
+
+- Datum: 2026-05-12
+- Umgebung: Staging E2E, Live Smoke
+- geprüfter ZIP-/Arbeitsstand: `Bocholt-Erleben-staging - 2026-05-12T201538.920.zip` plus anschließende Patches für Review-before-payment, Public-DB-Feed und Inbox-Ergonomie
+- Funktion: Einzeltermin / Einzelevent einreichen, vorprüfen, zur Zahlung freigeben, bezahlen, final veröffentlichen
+- Ergebnis: E2E auf Staging bestanden; Live-Smoke nach Main-Rollout bestanden
+- Status: V1 abgeschlossen
+
+### Zielzustand dieses Teststands
+
+Einzelevents laufen nicht mehr über Sofortzahlung.
+
+Geprüfter Zielablauf:
+
+1. Einzelevent-Formular absenden.
+2. Submission wird ohne Stripe-Redirect gespeichert.
+3. Status wird `pending_review`.
+4. Eingangsbestätigung per Mail wird versendet.
+5. Fall erscheint in der Kuratier-Inbox.
+6. Kurator-Aktion `Zur Zahlung freigeben`.
+7. Status wird `payment_released`.
+8. Zahlungslink-Mail mit internem Link `/zahlung-starten/?token=...` wird versendet.
+9. Interne Zahlungsstart-Seite prüft Token und erzeugt serverseitig eine frische Stripe Checkout Session.
+10. Stripe-Zahlung wird abgeschlossen.
+11. Stripe-Webhook setzt Submission auf `paid`.
+12. Fall erscheint in der Kuratier-Inbox als `Bezahlt / veröffentlichungsbereit`.
+13. Kurator-Aktion `Veröffentlichen`.
+14. Status wird `approved`.
+15. Verbrauch wird erst bei finaler Freigabe gebucht.
+16. Veröffentlichungs-Mail wird versendet.
+17. Event erscheint über `/api/events/public.php` im öffentlichen Eventbereich.
+
+### Verbindliche Produktlogik
+
+Der neue Zahlungslink-Flow gilt nur für Einzelevent-/Einzeltermin-Einreichungen:
+
+- `requested_model_key = single`
+- `payment_kind = single`
+- `intake_origin = single_event`
+
+Mitgliedschaften bleiben unverändert:
+
+1. Einreichung
+2. Prüfung
+3. finale Freigabe
+4. Verbrauch erst bei finaler Freigabe
+
+Zahlung bedeutet weiterhin keine automatische Veröffentlichung.
+
+### Verbindliche technische Architekturentscheidung
+
+Der öffentliche Eventfeed ist ab diesem Stand hybrid:
+
+1. Google Sheet / `data/events.json` für redaktionelle, KI-/Sheet- und manuell gepflegte Events.
+2. Approved DB-Submissions aus `/api/events/public.php` für Veranstalter-Einreichungen.
+
+Veranstalter-Einreichungen werden nach finaler Freigabe nicht ins Google Sheet geschrieben.
+
+Der V1-Publishing-Handoff für Veranstalter-Einreichungen ist:
+
+`submissions.status = approved`
+→ `/api/events/public.php`
+→ `js/main.js` mischt approved DB-Events zusätzlich in den öffentlichen Feed
+→ Event-Card erscheint ohne Sheet-Deploy im öffentlichen Eventbereich.
+
+### Geprüfte technische Basis
+
+Neu bzw. relevant ergänzt:
+
+- `api/sql/006_single_event_review_before_payment.sql`
+- `api/submissions/init.php`
+- `api/submissions/release-payment.php`
+- `api/submissions/review-list.php`
+- `api/submissions/reject.php`
+- `api/submissions/approve.php`
+- `api/stripe/create-checkout-session.php`
+- `api/events/public.php`
+- `zahlung-starten/index.html`
+- `events-veroeffentlichen/einreichen/index.html`
+- `events-veroeffentlichen/erfolg/index.html`
+- `events-veroeffentlichen/abgebrochen/index.html`
+- `inbox/index.html`
+- `js/publish-funnel.js`
+- `js/main.js`
+- `js/seo-schema.js`
+- `service-worker.js`
+
+### Bestandene Staging-E2E-Tests
+
+Bestanden:
+
+- Einzelevent wurde über `/events-veroeffentlichen/einreichen/` eingereicht.
+- Erfolgsseite zeigte `Deine Veranstaltung wurde zur Prüfung eingereicht`.
+- Eingangs-Mail wurde versendet.
+- Fall erschien in `/inbox/` mit Status `Neu eingereicht / Vorprüfung offen`.
+- Button `Zur Zahlung freigeben` erzeugte Zahlungsfreigabe.
+- Zahlungslink-Mail wurde versendet.
+- `/zahlung-starten/?token=...` leitete korrekt zu Stripe Checkout weiter.
+- Stripe-Zahlung wurde erfolgreich abgeschlossen.
+- Erfolgsseite zeigte `Danke, die Zahlung wurde abgeschlossen`.
+- Fall erschien in `/inbox/` mit Status `Bezahlt / veröffentlichungsbereit`.
+- Button `Veröffentlichen` setzte den Fall final frei.
+- Veröffentlichungs-Mail wurde versendet.
+- `/api/events/public.php` enthielt die freigegebene Submission als `submission_db_approved`.
+- Staging-Startseite zeigte die veröffentlichte Event-Card im öffentlichen Feed.
+- `publication_consumptions` enthielt genau einen Verbrauch für die veröffentlichte Submission.
+- Verbrauch wurde erst bei finalem `approved` gebucht.
+
+### Bestandene Kurator-UX-Tests
+
+Bestanden:
+
+- `pending_review` bleibt aktiv vorne, weil Kurator-Aktion nötig ist.
+- `payment_released` und `checkout_started` blockieren die aktive Kuratierung nicht mehr.
+- Wartende Zahlungsfälle werden ans Ende sortiert.
+- Button `Später prüfen` verschiebt den aktuellen Fall lokal ans Ende der aktuellen Ansicht.
+- `paid` bleibt aktiv sichtbar, weil final `Veröffentlichen` oder `Ablehnen` nötig ist.
+- `approved` und `rejected` verschwinden aus der Inbox.
+- KI-/Sheet-Inbox-Pfad bleibt unverändert nutzbar.
+
+### Bestandene Live-Smoke-Tests
+
+Bestanden nach Main-/Live-Rollout:
+
+- Live-DB-Migration `006_single_event_review_before_payment.sql` wurde ausgeführt.
+- `https://bocholt-erleben.de/api/events/public.php` liefert `status = ok`.
+- Live-DB-Feed lieferte erwartbar `total = 0`, solange keine approved Live-DB-Submissions existieren.
+- `https://bocholt-erleben.de/zahlung-starten/` lädt und zeigt ohne Token korrekt `Zahlungslink ungültig`.
+- `https://bocholt-erleben.de/events-veroeffentlichen/einreichen/` zeigt den neuen Vorprüfungsflow:
+  - `Einzeltermin zur Prüfung einreichen`
+  - `Zahlung erst nach redaktioneller Vorprüfung`
+  - Button `Zur Prüfung einreichen`
+- Live-Secrets für DB, Stripe, Mail und Review sind hinterlegt.
+- Live und Staging nutzen getrennte Datenbanken; Staging-Testevents erscheinen dadurch nicht automatisch live.
+
+### Live-Go-Live-Hinweise
+
+Für Live ist vor dem echten Produktivbetrieb erforderlich bzw. bereits berücksichtigt:
+
+- Live-DB-Migration `006_single_event_review_before_payment.sql` muss auf der Live-Datenbank ausgeführt sein.
+- Live-Stripe-Secrets müssen gesetzt sein:
+  - `LIVE_STRIPE_SECRET_KEY`
+  - `LIVE_STRIPE_WEBHOOK_SECRET`
+  - `LIVE_STRIPE_PRICE_SINGLE`
+  - `LIVE_STRIPE_PRICE_STARTER`
+  - `LIVE_STRIPE_PRICE_ACTIVE`
+  - `LIVE_STRIPE_PRICE_UNLIMITED`
+- Live-Mail-Secrets müssen gesetzt sein.
+- Live-Review-Passwort muss gesetzt sein.
+- Stripe-Live-Webhook muss auf `/api/stripe/webhook.php` zeigen.
+- Ein echter Live-Zahlungsfall ist erst bei realer Live-Zahlung vollständig bewiesen.
+
+### Verbleibende Beobachtungspunkte
+
+Keine offenen Entwicklungsblocker für den Einzelevent-Funnel.
+
+Bewusst nicht mit Testzahlung belegt:
+
+- echter Live-Zahlungslink
+- echte Live-Stripe-Zahlung
+- Live-Webhook auf `paid` bei realem Zahlungsvorgang
+
+Das ist kein Code-Blocker, da Staging-E2E bestanden ist und die Live-Stripe-Infrastruktur bereits produktiv genutzt wurde.
+
+---
+
 ## Offene Tests / bekannte Lücken
 
 ### Live-Rollout
 
-Noch nicht in diesem Teststand erfolgt.
+Der Einzelevent-Funnel ist live smoke-getestet.
 
-Vor Main/Live erforderlich:
+Noch nicht durch echten externen Produktivfall belegt:
 
-1. `LIVE_REVIEW_PASSWORD` in GitHub Secrets vorhanden
-2. Live-Datenbankmigration für `003_submission_intake_origin_location_review.sql` ausführen
-3. Main/Live-Deploy ausführen und im Deploy-Log prüfen:
-   - Google Sheet `Events` → `data/events.tsv` → `data/events.json`
-   - Google Sheet `Inbox` → `data/inbox.tsv` → `data/inbox.json`
-   - `robots.txt` live aus `deploy-templates/robots.live.txt`
-   - `sitemap.xml` live aus `deploy-templates/sitemap.live.xml`
-4. Live-Smoke-Test:
-   - `/api/submissions/review-list.php` → `Review access denied`
-   - `/inbox/` → Passwortabfrage, danach Laden ohne 503
-   - `/events-veroeffentlichen/` lädt
-   - `/events-veroeffentlichen/einreichen/` lädt
-   - `/events-veroeffentlichen/anbindung/` lädt
-   - `/fuer-veranstalter/` lädt
-5. SEO-/Analytics-Smoke-Test:
-   - `https://bocholt-erleben.de/robots.txt` erreichbar
-   - `https://bocholt-erleben.de/sitemap.xml` erreichbar
-   - GA4 lädt nur auf Live-Domain
-   - mindestens ein `outbound_click` wird bei externem Event-/Activity-Klick erfasst
+1. echter Live-Einzeltermin
+2. echte Live-Zahlung
+3. Live-Webhook setzt `paid`
+4. finale Live-Veröffentlichung erscheint über `/api/events/public.php` im öffentlichen Feed
 
 Keinen echten Live-Zahlungstest ohne bewusste Entscheidung.
 
@@ -560,21 +714,26 @@ Diese Punkte sind keine Blocker für den geprüften Kernflow:
 
 ## Aktueller Funktionsstatus
 
-Der Kernzielzustand ist auf Staging erfüllt:
+Der Kernzielzustand ist erfüllt:
 
-- eingereichte Einzelevents erscheinen in der Kuratier-PWA
-- eingereichte Mitgliedschafts-Events erscheinen in der Kuratier-PWA
-- KI-/Sheet-Fälle erscheinen korrekt in der Kuratier-PWA
-- Herkunft wird getrennt von Event-Kategorie angezeigt
-- Einzelevent / Mitgliedschaft / KI-Suche werden korrekt unterschieden
-- Verwerfen funktioniert
-- Übernehmen funktioniert
-- Kontingentverbrauch erfolgt erst bei Übernehmen
-- Review-Endpunkte sind gegen direkten öffentlichen Zugriff geschützt
-- Google-Sheet-basierter Inbox-Pfad ist praktisch geprüft
+- Einzelevents werden zuerst ohne Zahlung zur Vorprüfung eingereicht.
+- Zahlungslink wird nur nach Kurator-Freigabe erzeugt.
+- Zahlung erfolgt über internen Zahlungsstart-Link und serverseitig erzeugte Stripe Checkout Session.
+- Stripe-Webhook setzt bezahlte Einzelevents auf `paid`.
+- Finale Veröffentlichung erfolgt in der Kuratier-Inbox.
+- Verbrauch wird erst bei finaler Freigabe gebucht.
+- Approved DB-Submissions erscheinen über `/api/events/public.php` im öffentlichen Eventfeed.
+- Öffentlicher Feed ist hybrid: `data/events.json` plus approved DB-Submissions.
+- Mitgliedschaftslogik bleibt unverändert.
+- KI-/Sheet-Fälle bleiben unverändert im bisherigen Sheet-/Inbox-Pfad.
+- Review-Endpunkte sind gegen direkten öffentlichen Zugriff geschützt.
+- Google-Sheet-basierter Inbox-Pfad ist praktisch geprüft.
+- Einzelevent-Funnel ist als V1 abgeschlossen.
 
 Nicht vollständig belegt ist nur:
 
-- Live-Rollout
+- erster echter Live-Zahlungsfall mit realem externem Nutzer
+
+<!-- === END BLOCK: TEST_STATUS_SINGLE_EVENT_REVIEW_BEFORE_PAYMENT_E2E_2026_05_12 === -->
 
 <!-- === END FILE: TEST_STATUS.md === -->
