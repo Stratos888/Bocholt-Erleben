@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V5 | Zweck: benennt die Seite konsistent als Einreichung einer einzelnen Veranstaltung und beschreibt den Weg zur Zahlungsmethode; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V6_REVIEW_BEFORE_PAYMENT | Zweck: benennt die Seite konsistent als prüfpflichtige Einreichung einer einzelnen Veranstaltung ohne sofortigen Stripe-Checkout; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -22,14 +22,14 @@
   <meta property="og:locale" content="de_DE">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bocholt erleben">
-  <meta property="og:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
-  <meta property="og:description" content="Einzelne Veranstaltung einreichen, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.">
+  <meta property="og:title" content="Einzeltermin zur Prüfung einreichen | Bocholt erleben">
+  <meta property="og:description" content="Einzelne Veranstaltung einreichen: Zahlung erst nach redaktioneller Vorprüfung, Veröffentlichung nach Freigabe.">
   <meta property="og:url" content="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
   <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Einzelne Veranstaltung einreichen | Bocholt erleben">
-  <meta name="twitter:description" content="Einzelne Veranstaltung einreichen, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.">
+  <meta name="twitter:title" content="Einzeltermin zur Prüfung einreichen | Bocholt erleben">
+  <meta name="twitter:description" content="Einzelne Veranstaltung einreichen: Zahlung erst nach redaktioneller Vorprüfung, Veröffentlichung nach Freigabe.">
   <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
@@ -40,8 +40,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Einzelne Veranstaltung einreichen",
-    "description": "Einzelne Veranstaltung bei Bocholt erleben einreichen: Angaben übermitteln, zur Zahlungsmethode weitergehen und anschließend prüfen lassen.",
+    "name": "Einzeltermin zur Prüfung einreichen",
+    "description": "Einzelne Veranstaltung bei Bocholt erleben einreichen: Zahlung erst nach redaktioneller Vorprüfung, Veröffentlichung nach Freigabe.",
     "url": "https://bocholt-erleben.de/events-veroeffentlichen/einreichen/",
     "isPartOf": {
       "@type": "WebSite",
@@ -52,7 +52,7 @@
   </script>
 
   <link rel="stylesheet" href="/css/style.css?v=2026-05-08-single-submit-2">
-  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V5 === -->
+  <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_HEAD_V6_REVIEW_BEFORE_PAYMENT === -->
 </head>
 
 <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_BODY_MODE_V1 | Zweck: markiert diese Route als reinen Einzeltermin-Weg ohne Mitgliedschafts-/Abo-Reuse im Formular; Umfang: body-Tag === -->
@@ -203,7 +203,7 @@
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V5_REVIEW_BEFORE_PAYMENT | Zweck: Cache-Busting nach Umstellung auf Einreichung vor Zahlung; Umfang: genau eine Script-Zeile === -->
   <script src="/js/publish-funnel.js?v=2026-05-12-review-before-payment-1" defer></script>
-  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V4 === -->
+  <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V5_REVIEW_BEFORE_PAYMENT === -->
   <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 === -->
 </body>
 </html>
