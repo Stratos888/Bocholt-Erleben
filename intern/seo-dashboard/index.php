@@ -237,6 +237,7 @@ $valueMetrics = $isUnlocked
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <title>Internes SEO-Dashboard · Bocholt erleben</title>
   <style>
+    /* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_MOBILE_AKQUISE_CSS_V32 | Zweck: kompakte mobile Akquise-Ansicht mit Tooltip-Buttons und eingeklappten Technikdetails; Umfang: ersetzt kompletten Inline-Style der internen SEO-Seite === */
     :root {
       color-scheme: light;
       --bg: #f6f2ea;
@@ -260,284 +261,113 @@ $valueMetrics = $isUnlocked
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.45;
+      line-height: 1.42;
     }
 
     a { color: inherit; }
-
-    .wrap {
-      width: min(1180px, calc(100% - 28px));
-      margin: 0 auto;
-      padding: 22px 0 42px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: flex-start;
-      margin-bottom: 18px;
-    }
-
-    .eyebrow {
-      margin: 0 0 4px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(26px, 4vw, 38px);
-      line-height: 1.08;
-      letter-spacing: -.03em;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 18px;
-      line-height: 1.2;
-    }
-
     p { margin: 0; }
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 38px); line-height: 1.08; letter-spacing: -.03em; }
+    h2 { margin: 0 0 10px; font-size: 18px; line-height: 1.2; }
 
+    .wrap { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 36px; }
     .muted { color: var(--muted); }
     .small { font-size: 13px; }
+    .eyebrow { margin: 0 0 4px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
-    .logout {
+    .topbar { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+    .topActions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .logout,
+    .softButton {
       display: inline-flex;
       align-items: center;
-      min-height: 38px;
-      padding: 8px 12px;
+      justify-content: center;
+      min-height: 36px;
+      padding: 7px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: var(--surface);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 14px;
-    }
-
-    .card {
-      grid-column: span 12;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: 0 12px 32px rgba(45, 33, 20, .06);
-    }
-
-    .card--third { grid-column: span 4; }
-    .card--half { grid-column: span 6; }
-    .card--wide { grid-column: span 8; }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 28px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      font-size: 13px;
-      font-weight: 800;
-      background: var(--surface-2);
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--muted);
-    }
-
-    .status[data-state="good"] {
-      color: var(--good);
-      background: var(--soft-good);
-      border-color: rgba(15,107,61,.22);
-    }
-
-    .status[data-state="warn"] {
-      color: var(--warn);
-      background: var(--soft-warn);
-      border-color: rgba(138,90,0,.25);
-    }
-
-    .status[data-state="bad"] {
-      color: var(--bad);
-      background: var(--soft-bad);
-      border-color: rgba(155,28,28,.22);
-    }
-
-    .status[data-state="good"] .dot { background: var(--good); }
-    .status[data-state="warn"] .dot { background: var(--warn); }
-    .status[data-state="bad"] .dot { background: var(--bad); }
-
-    .checklist {
-      display: grid;
-      gap: 9px;
-      margin-top: 10px;
-    }
-
-    .check {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--surface-2);
-    }
-
-    .check code {
-      font-size: 12px;
-      color: var(--muted);
-      overflow-wrap: anywhere;
-    }
-
-    .metricForm {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    label {
-      display: grid;
-      gap: 5px;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-    }
-
-    input {
-      width: 100%;
-      min-height: 40px;
-      padding: 9px 11px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--surface-2);
-      font: inherit;
       color: var(--text);
-    }
-
-    button {
-      min-height: 40px;
-      padding: 9px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--text);
-      color: #fff;
-      font: inherit;
+      text-decoration: none;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
     }
 
-    button.secondary {
-      background: var(--surface-2);
-      color: var(--text);
-    }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+    .card { grid-column: span 12; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 14px; box-shadow: 0 12px 32px rgba(45, 33, 20, .06); }
+    .card--third { grid-column: span 4; }
+    .card--half { grid-column: span 6; }
+    .card--wide { grid-column: span 8; }
 
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
+    .snapshotGrid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    .statusLine { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-    .kpi {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
+    .status { display: inline-flex; align-items: center; gap: 7px; min-height: 27px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; font-weight: 800; background: var(--surface-2); }
+    .dot { width: 9px; height: 9px; border-radius: 999px; background: var(--muted); }
+    .status[data-state="good"] { color: var(--good); background: var(--soft-good); border-color: rgba(15,107,61,.22); }
+    .status[data-state="warn"] { color: var(--warn); background: var(--soft-warn); border-color: rgba(138,90,0,.25); }
+    .status[data-state="bad"] { color: var(--bad); background: var(--soft-bad); border-color: rgba(155,28,28,.22); }
+    .status[data-state="good"] .dot { background: var(--good); }
+    .status[data-state="warn"] .dot { background: var(--warn); }
+    .status[data-state="bad"] .dot { background: var(--bad); }
 
-    .kpiBox {
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: var(--surface-2);
-    }
+    .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+    .kpiBox { position: relative; min-width: 0; padding: 10px 11px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-2); }
+    .kpiLabel { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; line-height: 1.2; }
+    .kpiValue { margin-top: 5px; font-size: 23px; font-weight: 900; line-height: 1.05; letter-spacing: -.03em; }
+    .kpiTrend { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.25; }
 
-    .kpiValue {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -.03em;
-    }
+    .infoButton { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 21px; height: 21px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.72); color: var(--muted); font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; }
+    .infoButton[data-open="true"] { color: var(--text); background: var(--surface); }
+    .infoButton[data-open="true"]::after { content: attr(data-info); position: absolute; right: -4px; top: calc(100% + 8px); z-index: 50; width: min(280px, 76vw); padding: 10px 11px; border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--text); box-shadow: 0 18px 42px rgba(45,33,20,.16); font-size: 13px; font-weight: 650; line-height: 1.35; text-align: left; }
 
-    .linkList {
-      display: grid;
-      gap: 8px;
-      margin-top: 10px;
-    }
+    .note { padding: 10px; border-radius: 14px; background: rgba(255,255,255,.56); border: 1px solid var(--line); }
+    .proofBox { display: grid; gap: 9px; }
 
-    .linkItem {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--surface-2);
-      text-decoration: none;
-    }
+    .checklist { display: grid; gap: 9px; margin-top: 10px; }
+    .check { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+    .check code { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+    .linkList { display: grid; gap: 8px; margin-top: 10px; }
+    .linkItem { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); text-decoration: none; }
 
-    .note {
-      padding: 11px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.56);
-      border: 1px solid var(--line);
-    }
+    details.card { padding: 0; overflow: hidden; }
+    details.card > summary { list-style: none; cursor: pointer; padding: 14px; font-weight: 900; }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary::after { content: "anzeigen"; float: right; color: var(--muted); font-size: 12px; font-weight: 800; }
+    details.card[open] > summary::after { content: "ausblenden"; }
+    details.card > .detailsBody { padding: 0 14px 14px; }
 
-    .login {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 22px;
-    }
-
-    .loginCard {
-      width: min(440px, 100%);
-      padding: 22px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 18px 42px rgba(45, 33, 20, .10);
-    }
-
-    .loginCard form {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .error {
-      color: var(--bad);
-      font-weight: 800;
-    }
+    .login { min-height: 100vh; display: grid; place-items: center; padding: 22px; }
+    .loginCard { width: min(440px, 100%); padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 18px 42px rgba(45, 33, 20, .10); }
+    .loginCard form { display: grid; gap: 12px; margin-top: 16px; }
+    label { display: grid; gap: 5px; font-size: 12px; font-weight: 800; color: var(--muted); }
+    input { width: 100%; min-height: 40px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); font: inherit; color: var(--text); }
+    button { font: inherit; }
+    .error { color: var(--bad); font-weight: 800; }
 
     @media (max-width: 860px) {
-      .topbar { display: grid; }
+      .wrap { width: min(100% - 18px, 680px); padding: 10px 0 24px; }
+      .topbar { display: grid; gap: 10px; }
+      .topActions { justify-content: stretch; }
+      .logout,
+      .softButton { flex: 1 1 auto; min-height: 34px; padding: 7px 10px; }
+      .grid { gap: 10px; }
+      .card { padding: 12px; border-radius: 18px; }
       .card--third,
       .card--half,
       .card--wide { grid-column: span 12; }
-      .metricForm,
-      .kpi { grid-template-columns: 1fr; }
+      .snapshotGrid { grid-template-columns: 1fr; }
+      .kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+      .kpiBox { padding: 9px; border-radius: 14px; }
+      .kpiValue { font-size: 21px; }
+      .kpiLabel,
+      .kpiTrend { font-size: 11px; }
       .check,
-      .linkItem {
-        grid-template-columns: 1fr;
-        align-items: start;
-      }
+      .linkItem { grid-template-columns: 1fr; align-items: start; }
+      h1 { font-size: 25px; }
+      h2 { font-size: 17px; }
     }
+    /* === END BLOCK: INTERNAL_SEO_DASHBOARD_MOBILE_AKQUISE_CSS_V32 === */
   </style>
 </head>
 <body>
@@ -563,213 +393,156 @@ $valueMetrics = $isUnlocked
   </main>
 <?php else: ?>
   <main class="wrap">
+    <!-- === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_MOBILE_AKQUISE_LAYOUT_V32 | Zweck: reduziert das Dashboard auf Akquise-Snapshot, kompakte Hauptzahlen, Tooltips, Opt-out und eingeklappte Technik; Umfang: ersetzt kompletten eingeloggten Main-Inhalt bis zum Script-Start === -->
     <header class="topbar">
       <div>
         <p class="eyebrow">Internes Dashboard · Stand <?= h($checkedAt) ?></p>
         <h1>SEO- & Mehrwert-Status</h1>
-        <p class="muted" style="margin-top:8px; max-width:760px;">Private Betreiberansicht für Live-Rollout, Indexierung und Mehrwert-Messung. Diese Seite ist nicht verlinkt, nicht in der Sitemap und per <code>noindex</code> gesperrt.</p>
+        <p class="muted small" style="margin-top:7px; max-width:760px;">Kompakte Betreiberansicht für Sichtbarkeit, Akquise-Reife und automatisch gemessenen Mehrwert.</p>
       </div>
-      <a class="logout" href="/intern/seo-dashboard/?logout=1">Abmelden</a>
+      <div class="topActions">
+        <button type="button" id="optOutToggle" class="softButton">Eigenes Tracking ausschließen</button>
+        <a class="logout" href="/intern/seo-dashboard/?logout=1">Abmelden</a>
+      </div>
     </header>
 
     <section class="grid">
-      <article class="card card--third">
-        <h2>Gesamtstatus</h2>
-        <span id="overallStatus" class="status" data-state="warn"><span class="dot"></span><span>Prüfung läuft</span></span>
-        <p id="overallText" class="muted small" style="margin-top:10px;">Live-Checks werden im Browser geprüft.</p>
-      </article>
-
-      <!-- === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_AKQUISE_SNAPSHOT_V31 | Zweck: zeigt Akquise-Snapshot, 28-Tage-Vergleich, screenshotfähige Mehrwertkarte und eingeklappte Technikdetails; Umfang: ersetzt Dashboard-Hauptinhalt === -->
       <article class="card card--wide">
         <h2>Akquise-Snapshot</h2>
-        <span id="snapshotStatus" class="status" data-state="warn"><span class="dot"></span><span>wird bewertet</span></span>
+        <div class="statusLine">
+          <span id="snapshotStatus" class="status" data-state="warn"><span class="dot"></span><span>wird bewertet</span></span>
+          <span id="overallStatus" class="status" data-state="warn"><span class="dot"></span><span>Technik wird geprüft</span></span>
+        </div>
         <p id="snapshotPeriod" class="muted small" style="margin-top:10px;">28-Tage-Auswertung wird geladen.</p>
-        <p id="snapshotReason" style="margin-top:12px;">Noch keine Bewertung geladen.</p>
-        <p id="snapshotNext" class="note small" style="margin-top:12px;">Nächster Hebel wird berechnet.</p>
+        <p id="snapshotReason" style="margin-top:10px;">Noch keine Bewertung geladen.</p>
+        <p id="snapshotNext" class="note small" style="margin-top:10px;">Nächster Hebel wird berechnet.</p>
+        <p id="overallText" class="muted small" style="margin-top:8px;">Technik-Checks sind unten eingeklappt.</p>
       </article>
 
       <article class="card card--third">
         <h2>Für Screenshot / Akquise</h2>
-        <p id="proofStatus" class="small"><strong>Status:</strong> wird geladen</p>
-        <p id="proofPeriod" class="muted small" style="margin-top:8px;">Zeitraum wird geladen.</p>
-        <p id="proofSummary" style="margin-top:12px;">Mehrwertnachweis wird geladen.</p>
-        <p id="proofTrend" class="muted small" style="margin-top:10px;">Vergleich wird geladen.</p>
+        <div class="proofBox">
+          <p id="proofStatus" class="small"><strong>Status:</strong> wird geladen</p>
+          <p id="proofPeriod" class="muted small">Zeitraum wird geladen.</p>
+          <p id="proofSummary">Mehrwertnachweis wird geladen.</p>
+          <p id="proofTrend" class="muted small">Vergleich wird geladen.</p>
+        </div>
       </article>
 
       <article class="card">
         <h2>Hauptzahlen</h2>
-        <p class="muted small">Aktueller 28-Tage-Zeitraum im Vergleich zum vorherigen 28-Tage-Zeitraum. Oben stehen nur Werte, die für Status, Entwicklung und spätere Akquise relevant sind.</p>
+        <p class="muted small">Aktueller 28-Tage-Zeitraum im Vergleich zum vorherigen Zeitraum. Tippe auf ⓘ für die Erklärung einer Kennzahl.</p>
 
         <div class="kpi">
           <div class="kpiBox">
-            <div class="muted small">Sichtbarkeit</div>
+            <div class="kpiLabel"><span>Sichtbarkeit</span><button type="button" class="infoButton" data-info="Wie oft Bocholt erleben in Google und Bing angezeigt wurde. Das zeigt Reichweite, aber noch keinen echten Besuch." aria-label="Sichtbarkeit erklären">i</button></div>
             <div id="kpiImpressions" class="kpiValue">0</div>
-            <div id="kpiImpressionsTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiImpressionsTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Such-Klicks</div>
+            <div class="kpiLabel"><span>Such-Klicks</span><button type="button" class="infoButton" data-info="Wie oft Nutzer über Google oder Bing auf Bocholt erleben geklickt haben. Das zeigt echtes Suchinteresse." aria-label="Such-Klicks erklären">i</button></div>
             <div id="kpiClicks" class="kpiValue">0</div>
-            <div id="kpiClicksTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiClicksTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Konkrete Nutzwert-Klicks</div>
+            <div class="kpiLabel"><span>Nutzwert-Klicks</span><button type="button" class="infoButton" data-info="Summe aus Website-Klicks, Maps-/Route-Klicks, Location-Link-Klicks und Veranstalter-CTA. Das ist der wichtigste Wert für konkreten Mehrwert." aria-label="Nutzwert-Klicks erklären">i</button></div>
             <div id="kpiLocationValue" class="kpiValue">0</div>
-            <div id="kpiLocationValueTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiLocationValueTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Akquise-Status</div>
+            <div class="kpiLabel"><span>Status</span><button type="button" class="infoButton" data-info="Automatische Einschätzung, ob die Zahlen schon für aktive Veranstalter- oder Location-Akquise reichen." aria-label="Status erklären">i</button></div>
             <div id="kpiStage" class="kpiValue">Rot</div>
-            <div id="kpiStageTrend" class="muted small">automatisch bewertet</div>
+            <div id="kpiStageTrend" class="kpiTrend">automatisch bewertet</div>
           </div>
         </div>
 
         <div class="kpi">
           <div class="kpiBox">
-            <div class="muted small">Detail-Interesse</div>
+            <div class="kpiLabel"><span>Detail-Interesse</span><button type="button" class="infoButton" data-info="Wie oft Nutzer ein Event oder eine Aktivität genauer geöffnet haben. Das zeigt konkretes Interesse am Inhalt." aria-label="Detail-Interesse erklären">i</button></div>
             <div id="kpiDetailViews" class="kpiValue">0</div>
-            <div id="kpiDetailViewsTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiDetailViewsTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Website-Klicks</div>
+            <div class="kpiLabel"><span>Website-Klicks</span><button type="button" class="infoButton" data-info="Wie oft Nutzer von Bocholt erleben zu einer externen Website, Ticketseite oder Infoseite geklickt haben." aria-label="Website-Klicks erklären">i</button></div>
             <div id="kpiWebsiteClicks" class="kpiValue">0</div>
-            <div id="kpiWebsiteClicksTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiWebsiteClicksTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Maps-/Route-Klicks</div>
+            <div class="kpiLabel"><span>Route/Maps</span><button type="button" class="infoButton" data-info="Wie oft Nutzer eine Karte oder Route geöffnet haben. Das ist ein starkes Signal für Besuchsabsicht." aria-label="Route- und Maps-Klicks erklären">i</button></div>
             <div id="kpiMapsClicks" class="kpiValue">0</div>
-            <div id="kpiMapsClicksTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiMapsClicksTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Veranstalter-CTA</div>
+            <div class="kpiLabel"><span>Veranstalter-CTA</span><button type="button" class="infoButton" data-info="Wie oft Links wie Event veröffentlichen oder Veranstaltung einreichen geklickt wurden. Das zeigt Interesse von Veranstaltern." aria-label="Veranstalter-CTA erklären">i</button></div>
             <div id="kpiOrganizerCtaClicks" class="kpiValue">0</div>
-            <div id="kpiOrganizerCtaClicksTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiOrganizerCtaClicksTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
         </div>
 
         <div class="kpi">
           <div class="kpiBox">
-            <div class="muted small">performende Events</div>
+            <div class="kpiLabel"><span>performende Events</span><button type="button" class="infoButton" data-info="Wie viele unterschiedliche Events im Zeitraum mindestens eine relevante Interaktion hatten." aria-label="performende Events erklären">i</button></div>
             <div id="kpiPerformingEvents" class="kpiValue">0</div>
-            <div id="kpiPerformingEventsTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiPerformingEventsTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">performende Ziele/Locations</div>
+            <div class="kpiLabel"><span>performende Ziele</span><button type="button" class="infoButton" data-info="Wie viele unterschiedliche Ziele, Websites oder Locations relevante Klicks erhalten haben." aria-label="performende Ziele erklären">i</button></div>
             <div id="kpiPerformingLocations" class="kpiValue">0</div>
-            <div id="kpiPerformingLocationsTrend" class="muted small">vs. vorher: —</div>
+            <div id="kpiPerformingLocationsTrend" class="kpiTrend">vs. vorher: —</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Location-Link-Klicks</div>
+            <div class="kpiLabel"><span>Location-Links</span><button type="button" class="infoButton" data-info="Wie oft ein expliziter Location-Link geklickt wurde. Sekundär, solange Website- und Route-Klicks den Hauptnutzen abbilden." aria-label="Location-Links erklären">i</button></div>
             <div id="kpiLocationClicks" class="kpiValue">0</div>
-            <div id="kpiLocationClicksTrend" class="muted small">sekundär</div>
+            <div id="kpiLocationClicksTrend" class="kpiTrend">sekundär</div>
           </div>
           <div class="kpiBox">
-            <div class="muted small">Automatik</div>
+            <div class="kpiLabel"><span>Automatik</span><button type="button" class="infoButton" data-info="Search-Daten kommen aus Google/Bing. Nutzwert-Klicks werden anonym im eigenen Backend gezählt." aria-label="Automatik erklären">i</button></div>
             <div id="kpiAutomation" class="kpiValue">aktiv</div>
-            <div class="muted small">DB + Search APIs</div>
+            <div id="optOutStatus" class="kpiTrend">Eigenes Tracking: aktiv</div>
           </div>
         </div>
 
-        <p id="kpiExplanation" class="note small" style="margin-top:12px;">Noch keine Werte geladen.</p>
+        <p id="kpiExplanation" class="note small" style="margin-top:10px;">Noch keine Werte geladen.</p>
       </article>
 
-      <details class="card" style="grid-column: span 12;">
-        <summary><strong>Technik, Quellen und Detailwerte anzeigen</strong></summary>
-
-        <div class="grid" style="margin-top:14px;">
-          <article class="card card--wide">
-            <h2>Live-Checks</h2>
-            <p class="muted small">Technische Erreichbarkeit, Search-Automatik, GA4 und eigener Nutzwert-Endpunkt.</p>
-
-            <div class="checklist" id="checklist">
-              <div class="check" data-check="status">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>Backend-Status</strong><br><code>/api/status.php</code></div>
-                <a href="/api/status.php" target="_blank" rel="noopener">öffnen</a>
+      <details class="card">
+        <summary>Technik, Quellen und Detailwerte</summary>
+        <div class="detailsBody">
+          <div class="grid">
+            <article class="card card--wide">
+              <h2>Live-Checks</h2>
+              <p class="muted small">Technische Erreichbarkeit, Search-Automatik, GA4 und eigener Nutzwert-Endpunkt.</p>
+              <div class="checklist" id="checklist">
+                <div class="check" data-check="status"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>Backend-Status</strong><br><code>/api/status.php</code></div><a href="/api/status.php" target="_blank" rel="noopener">öffnen</a></div>
+                <div class="check" data-check="valueMetrics"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>Nutzwert-Tracking</strong><br><code>/api/value-track.php</code></div><span class="muted small">intern</span></div>
+                <div class="check" data-check="robots"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>Robots</strong><br><code>/robots.txt</code></div><a href="/robots.txt" target="_blank" rel="noopener">öffnen</a></div>
+                <div class="check" data-check="sitemap"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>Sitemap</strong><br><code>/sitemap.xml</code></div><a href="/sitemap.xml" target="_blank" rel="noopener">öffnen</a></div>
+                <div class="check" data-check="build"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>Build-Version</strong><br><code>/meta/build.txt</code></div><a href="/meta/build.txt" target="_blank" rel="noopener">öffnen</a></div>
+                <div class="check" data-check="analytics"><span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span><div><strong>GA4-Konfiguration</strong><br><code>/config.js</code></div><a href="/config.js" target="_blank" rel="noopener">öffnen</a></div>
               </div>
+            </article>
 
-              <div class="check" data-check="valueMetrics">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>Nutzwert-Tracking</strong><br><code>/api/value-track.php</code></div>
-                <span class="muted small">intern</span>
-              </div>
-
-              <div class="check" data-check="robots">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>Robots</strong><br><code>/robots.txt</code></div>
-                <a href="/robots.txt" target="_blank" rel="noopener">öffnen</a>
-              </div>
-
-              <div class="check" data-check="sitemap">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>Sitemap</strong><br><code>/sitemap.xml</code></div>
-                <a href="/sitemap.xml" target="_blank" rel="noopener">öffnen</a>
-              </div>
-
-              <div class="check" data-check="build">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>Build-Version</strong><br><code>/meta/build.txt</code></div>
-                <a href="/meta/build.txt" target="_blank" rel="noopener">öffnen</a>
-              </div>
-
-              <div class="check" data-check="analytics">
-                <span class="status" data-state="warn"><span class="dot"></span><span>offen</span></span>
-                <div><strong>GA4-Konfiguration</strong><br><code>/config.js</code></div>
-                <a href="/config.js" target="_blank" rel="noopener">öffnen</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="card card--third">
-            <h2>Indexierbare Kernseiten</h2>
-            <div id="indexedPages" class="linkList"></div>
-          </article>
-
-          <article class="card card--half">
-            <h2>Search-Automatik</h2>
-            <div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div>
-          </article>
-
-          <article class="card card--half">
-            <h2>Location-/Veranstalter-Nutzen</h2>
-            <div id="locationValueStatus" class="note small">Nutzwerte werden geladen.</div>
-          </article>
-
-          <article class="card card--half">
-            <h2>Externe Messquellen</h2>
-            <div class="linkList">
-              <a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a>
-              <a class="linkItem" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"><strong>Bing Webmaster Tools</strong><span>Bing-Sichtbarkeit</span></a>
-              <a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Parallelmessung</span></a>
-            </div>
-          </article>
+            <article class="card card--third"><h2>Indexierbare Kernseiten</h2><div id="indexedPages" class="linkList"></div></article>
+            <article class="card card--half"><h2>Search-Automatik</h2><div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div></article>
+            <article class="card card--half"><h2>Location-/Veranstalter-Nutzen</h2><div id="locationValueStatus" class="note small">Nutzwerte werden geladen.</div></article>
+            <article class="card card--half"><h2>Externe Messquellen</h2><div class="linkList"><a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a><a class="linkItem" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"><strong>Bing Webmaster Tools</strong><span>Bing-Sichtbarkeit</span></a><a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Parallelmessung</span></a></div></article>
+          </div>
         </div>
       </details>
 
       <script type="application/json" id="valueMetricsData"><?=
         json_encode($valueMetrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
       ?></script>
-      <!-- === END BLOCK: INTERNAL_SEO_DASHBOARD_AKQUISE_SNAPSHOT_V31 === -->
     </section>
+    <!-- === END BLOCK: INTERNAL_SEO_DASHBOARD_MOBILE_AKQUISE_LAYOUT_V32 === -->
   </main>
 
   <script>
-  <script>
-    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V31_AKQUISE_SNAPSHOT | Zweck: rendert Akquise-Snapshot, 28-Tage-Vergleich, Screenshot-Text und eingeklappte Technikdetails; Umfang: ersetzt nur Dashboard-Logik dieser Seite ===
+    // === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V32_MOBILE_TOOLTIP_OPTOUT | Zweck: rendert kompaktes Akquise-Dashboard, Tooltips, 28-Tage-Vergleich und internes Tracking-Opt-out; Umfang: ersetzt nur Dashboard-Logik dieser Seite ===
     const CHECKS = new Map();
-
-    const CORE_PAGES = [
-      "/",
-      "/angebote/",
-      "/events-veroeffentlichen/",
-      "/events-veroeffentlichen/einreichen/",
-      "/events-veroeffentlichen/anbindung/",
-      "/fuer-veranstalter/",
-      "/ueber/",
-      "/impressum/",
-      "/datenschutz/"
-    ];
-
+    const CORE_PAGES = ["/", "/angebote/", "/events-veroeffentlichen/", "/events-veroeffentlichen/einreichen/", "/events-veroeffentlichen/anbindung/", "/fuer-veranstalter/", "/ueber/", "/impressum/", "/datenschutz/"];
     const SEARCH_METRICS_URL = "/data/search-metrics.json";
+    const VALUE_OPT_OUT_KEY = "be_value_metrics_opt_out";
 
     const DEFAULT_METRICS = {
       googleImpressions: 0,
@@ -807,12 +580,7 @@ $valueMetrics = $isUnlocked
     function readJsonScript(id) {
       const node = document.getElementById(id);
       if (!node) return null;
-
-      try {
-        return JSON.parse(node.textContent || "{}");
-      } catch (_) {
-        return null;
-      }
+      try { return JSON.parse(node.textContent || "{}"); } catch (_) { return null; }
     }
 
     function formatPeriod(period) {
@@ -824,86 +592,102 @@ $valueMetrics = $isUnlocked
       const currentValue = metricNumber(current);
       const previousValue = metricNumber(previous);
       const delta = currentValue - previousValue;
-
-      if (delta === 0) {
-        return "±0 vs. vorher";
-      }
-
+      if (delta === 0) return "±0 vs. vorher";
       const sign = delta > 0 ? "+" : "−";
       const absolute = Math.abs(delta);
-
       if (preferPercent && previousValue > 0) {
-        const percent = Math.round((absolute / previousValue) * 100);
-        return `${sign}${percent} % vs. vorher`;
+        return `${sign}${Math.round((absolute / previousValue) * 100)} % vs. vorher`;
       }
-
       return `${sign}${absolute.toLocaleString("de-DE")} vs. vorher`;
     }
 
     function setStatusPill(id, state, label) {
       const node = document.getElementById(id);
       if (!node) return;
-
       node.dataset.state = state === "strong" ? "good" : state;
       const text = node.querySelector("span:last-child");
       if (text) text.textContent = label;
     }
 
+    function isValueMetricsOptedOut() {
+      try {
+        if (localStorage.getItem(VALUE_OPT_OUT_KEY) === "1") return true;
+      } catch (_) {}
+      return document.cookie.split(";").some((entry) => entry.trim() === `${VALUE_OPT_OUT_KEY}=1`);
+    }
+
+    function setValueMetricsOptOut(enabled) {
+      try {
+        if (enabled) localStorage.setItem(VALUE_OPT_OUT_KEY, "1");
+        else localStorage.removeItem(VALUE_OPT_OUT_KEY);
+      } catch (_) {}
+
+      const maxAge = enabled ? 60 * 60 * 24 * 365 : 0;
+      const secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie = `${VALUE_OPT_OUT_KEY}=${enabled ? "1" : ""}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
+      updateOptOutUi();
+    }
+
+    function updateOptOutUi() {
+      const optedOut = isValueMetricsOptedOut();
+      const button = document.getElementById("optOutToggle");
+      if (button) button.textContent = optedOut ? "Eigenes Tracking wieder einschließen" : "Eigenes Tracking ausschließen";
+      setText("optOutStatus", optedOut ? "Eigenes Tracking: ausgeschlossen" : "Eigenes Tracking: aktiv");
+    }
+
+    function initTooltips() {
+      document.addEventListener("click", (event) => {
+        const button = event.target instanceof Element ? event.target.closest(".infoButton") : null;
+        document.querySelectorAll(".infoButton[data-open='true']").forEach((item) => {
+          if (item !== button) item.removeAttribute("data-open");
+        });
+        if (!button) return;
+        event.preventDefault();
+        button.dataset.open = button.dataset.open === "true" ? "false" : "true";
+        if (button.dataset.open !== "true") button.removeAttribute("data-open");
+      });
+    }
+
     function setCheck(name, state, label, detail = "") {
       const row = document.querySelector(`[data-check="${name}"]`);
       if (!row) return;
-
       const status = row.querySelector(".status");
       const statusLabel = status?.querySelector("span:last-child");
       const code = row.querySelector("code");
-
       if (status) status.dataset.state = state;
       if (statusLabel) statusLabel.textContent = label;
       if (detail && code) code.textContent = detail;
-
       CHECKS.set(name, state);
       updateOverallStatus();
     }
 
     function updateOverallStatus() {
-      const status = document.getElementById("overallStatus");
-      const text = document.getElementById("overallText");
       const values = Array.from(CHECKS.values());
       const known = values.length > 0;
       const hasBad = values.includes("bad");
       const hasWarn = values.includes("warn");
-
       let state = "warn";
-      let label = "Prüfung läuft";
-      let copy = "Live-Checks werden im Browser geprüft.";
+      let label = "Technik läuft";
+      let copy = "Technik-Checks sind unten eingeklappt.";
 
       if (known && !hasBad && !hasWarn) {
         state = "good";
-        label = "bereit";
-        copy = "Robots, Sitemap, Build, Backend, GA4 und Nutzwert-Tracking wirken technisch erreichbar.";
+        label = "Technik ok";
+        copy = "Technik: Backend, Search, GA4 und Nutzwert-Tracking wirken erreichbar.";
       } else if (known && hasBad) {
         state = "bad";
-        label = "prüfen";
-        copy = "Mindestens ein technischer Check ist fehlgeschlagen.";
-      } else if (known) {
-        label = "teilweise offen";
-        copy = "Mindestens ein technischer Check ist noch nicht eindeutig grün.";
+        label = "Technik prüfen";
+        copy = "Technik: Mindestens ein Check ist fehlgeschlagen.";
       }
 
-      status.dataset.state = state;
-      status.querySelector("span:last-child").textContent = label;
-      text.textContent = copy;
+      setStatusPill("overallStatus", state, label);
+      setText("overallText", copy);
     }
 
     async function fetchText(path) {
       const res = await fetch(path, { cache: "no-store" });
       const text = await res.text();
-
-      return {
-        ok: res.ok,
-        status: res.status,
-        text
-      };
+      return { ok: res.ok, status: res.status, text };
     }
 
     function runValueMetricCheck(payload) {
@@ -911,7 +695,6 @@ $valueMetrics = $isUnlocked
         setCheck("valueMetrics", "bad", "Fehler", "/api/value-track.php · DB-Auswertung fehlerhaft");
         return;
       }
-
       setCheck("valueMetrics", "good", "ok", "/api/value-track.php · aggregierte DB-Metriken aktiv");
     }
 
@@ -919,241 +702,100 @@ $valueMetrics = $isUnlocked
       try {
         const res = await fetch("/api/status.php", { cache: "no-store" });
         const json = await res.json();
-
-        const ok = (
-          res.ok &&
-          json.status === "ok" &&
-          json.checks?.config &&
-          json.checks?.database
-        );
-
-        setCheck(
-          "status",
-          ok ? "good" : "bad",
-          ok ? "ok" : "Fehler",
-          `/api/status.php · ${json.app_env || "unknown"}`
-        );
-      } catch (_) {
-        setCheck("status", "bad", "Fehler");
-      }
+        const ok = res.ok && json.status === "ok" && json.checks?.config && json.checks?.database;
+        setCheck("status", ok ? "good" : "bad", ok ? "ok" : "Fehler", `/api/status.php · ${json.app_env || "unknown"}`);
+      } catch (_) { setCheck("status", "bad", "Fehler"); }
 
       runValueMetricCheck(readJsonScript("valueMetricsData"));
 
       try {
         const robots = await fetchText("/robots.txt");
-        const ok = (
-          robots.ok &&
-          /Sitemap:\s*https:\/\/bocholt-erleben\.de\/sitemap\.xml/i.test(robots.text) &&
-          /User-agent:\s*GPTBot/i.test(robots.text)
-        );
+        const ok = robots.ok && /Sitemap:\s*https:\/\/bocholt-erleben\.de\/sitemap\.xml/i.test(robots.text) && /User-agent:\s*GPTBot/i.test(robots.text);
         const internalBlocked = /Disallow:\s*\/intern\//i.test(robots.text);
-
-        setCheck(
-          "robots",
-          ok && internalBlocked ? "good" : "warn",
-          ok && internalBlocked ? "ok" : "prüfen",
-          internalBlocked ? "/robots.txt · intern gesperrt" : "/robots.txt · intern nicht gesperrt"
-        );
-      } catch (_) {
-        setCheck("robots", "bad", "Fehler");
-      }
+        setCheck("robots", ok && internalBlocked ? "good" : "warn", ok && internalBlocked ? "ok" : "prüfen", internalBlocked ? "/robots.txt · intern gesperrt" : "/robots.txt · intern nicht gesperrt");
+      } catch (_) { setCheck("robots", "bad", "Fehler"); }
 
       try {
         const sitemap = await fetchText("/sitemap.xml");
-        const urls = Array.from(sitemap.text.matchAll(/<loc>(.*?)<\/loc>/g)).map((m) => m[1]);
+        const urls = Array.from(sitemap.text.matchAll(/<loc>(.*?)<\/loc>/g)).map((match) => match[1]);
         const missing = CORE_PAGES.filter((path) => !urls.some((url) => url.endsWith(path)));
-
-        setCheck(
-          "sitemap",
-          sitemap.ok && missing.length === 0 ? "good" : "warn",
-          missing.length === 0 ? `${urls.length} URLs` : `${missing.length} fehlt`,
-          `/sitemap.xml · ${urls.length} URLs`
-        );
-
+        setCheck("sitemap", sitemap.ok && missing.length === 0 ? "good" : "warn", missing.length === 0 ? `${urls.length} URLs` : `${missing.length} fehlt`, `/sitemap.xml · ${urls.length} URLs`);
         renderIndexedPages(urls);
-      } catch (_) {
-        setCheck("sitemap", "bad", "Fehler");
-        renderIndexedPages([]);
-      }
+      } catch (_) { setCheck("sitemap", "bad", "Fehler"); renderIndexedPages([]); }
 
       try {
         const build = await fetchText("/meta/build.txt");
         const value = build.text.trim();
-
-        setCheck(
-          "build",
-          build.ok && value ? "good" : "warn",
-          value ? value : "nicht gefunden",
-          `/meta/build.txt · ${value || "leer"}`
-        );
-      } catch (_) {
-        setCheck("build", "bad", "Fehler");
-      }
+        setCheck("build", build.ok && value ? "good" : "warn", value ? value : "nicht gefunden", `/meta/build.txt · ${value || "leer"}`);
+      } catch (_) { setCheck("build", "bad", "Fehler"); }
 
       try {
         const config = await fetchText("/config.js");
-        const hasGa4 = /measurementId:\s*["']G-Y6QLCQ4HXT["']/.test(config.text);
-        const liveOnly = /enabledHosts:\s*\[[^\]]*bocholt-erleben\.de[^\]]*\]/.test(config.text);
-        const outbound = /trackOutboundClick/.test(config.text) && /outbound_click/.test(config.text);
-        const valueEndpoint = /valueMetricsEndpoint:\s*["']\/api\/value-track\.php["']/.test(config.text);
-        const ok = config.ok && hasGa4 && liveOnly && outbound && valueEndpoint;
-
-        setCheck(
-          "analytics",
-          ok ? "good" : "warn",
-          ok ? "ok" : "prüfen",
-          ok ? "GA4 + First-Party-Nutzwerttracking vorbereitet" : "Analytics-Konfiguration prüfen"
-        );
-      } catch (_) {
-        setCheck("analytics", "bad", "Fehler");
-      }
+        const ok = config.ok && /measurementId:\s*["']G-Y6QLCQ4HXT["']/.test(config.text) && /valueMetricsEndpoint:\s*["']\/api\/value-track\.php["']/.test(config.text) && /trackOutboundClick/.test(config.text);
+        setCheck("analytics", ok ? "good" : "warn", ok ? "ok" : "prüfen", ok ? "GA4 + First-Party-Nutzwerttracking vorbereitet" : "Analytics-Konfiguration prüfen");
+      } catch (_) { setCheck("analytics", "bad", "Fehler"); }
     }
 
     function renderIndexedPages(urls) {
       const box = document.getElementById("indexedPages");
+      if (!box) return;
       const visibleUrls = urls.length ? urls : CORE_PAGES.map((path) => `${location.origin}${path}`);
-
       box.innerHTML = visibleUrls.map((url) => {
         const path = new URL(url, location.origin).pathname;
-
-        return `
-          <a class="linkItem" href="${path}" target="_blank" rel="noopener">
-            <strong>${path}</strong>
-            <span>öffnen</span>
-          </a>
-        `;
+        return `<a class="linkItem" href="${path}" target="_blank" rel="noopener"><strong>${path}</strong><span>öffnen</span></a>`;
       }).join("");
     }
 
     function buildMetricModel(metrics) {
-      const safe = {
-        ...DEFAULT_METRICS,
-        ...(metrics || {})
-      };
-
+      const safe = { ...DEFAULT_METRICS, ...(metrics || {}) };
       const searchImpressions = metricNumber(safe.googleImpressions) + metricNumber(safe.bingImpressions);
       const searchClicks = metricNumber(safe.googleClicks) + metricNumber(safe.bingClicks);
-      const directLocationValue =
-        metricNumber(safe.websiteClicks) +
-        metricNumber(safe.mapsClicks) +
-        metricNumber(safe.locationClicks) +
-        metricNumber(safe.organizerCtaClicks);
-
+      const directLocationValue = metricNumber(safe.websiteClicks) + metricNumber(safe.mapsClicks) + metricNumber(safe.locationClicks) + metricNumber(safe.organizerCtaClicks);
       const engagementValue = directLocationValue + metricNumber(safe.detailViews);
-
-      return {
-        ...safe,
-        searchImpressions,
-        searchClicks,
-        directLocationValue,
-        engagementValue
-      };
+      return { ...safe, searchImpressions, searchClicks, directLocationValue, engagementValue };
     }
 
     function classifyMetrics(metrics) {
       const model = buildMetricModel(metrics);
-
-      if (
-        model.searchImpressions >= 20000 &&
-        model.searchClicks >= 1000 &&
-        model.directLocationValue >= 120 &&
-        metricNumber(model.performingEvents) >= 20 &&
-        metricNumber(model.performingLocations) >= 5
-      ) {
+      if (model.searchImpressions >= 20000 && model.searchClicks >= 1000 && model.directLocationValue >= 120 && metricNumber(model.performingEvents) >= 20 && metricNumber(model.performingLocations) >= 5) {
         return ["strong", "Stark", "Stark verkaufsfähig: Sichtbarkeit, Weiterleitungen und mehrere performende Ziele/Locations sind automatisch belegbar."];
       }
-
-      if (
-        model.searchImpressions >= 10000 &&
-        model.searchClicks >= 500 &&
-        model.directLocationValue >= 50 &&
-        metricNumber(model.performingEvents) >= 10 &&
-        metricNumber(model.performingLocations) >= 3
-      ) {
+      if (model.searchImpressions >= 10000 && model.searchClicks >= 500 && model.directLocationValue >= 50 && metricNumber(model.performingEvents) >= 10 && metricNumber(model.performingLocations) >= 3) {
         return ["good", "Grün", "Aktiv verkaufsfähig: Die Plattform erzeugt automatisch messbaren Nutzen für Events und Locations."];
       }
-
-      if (
-        model.searchImpressions >= 3000 &&
-        model.searchClicks >= 150 &&
-        (
-          model.directLocationValue >= 10 ||
-          metricNumber(model.detailViews) >= 100 ||
-          metricNumber(model.performingEvents) >= 5
-        )
-      ) {
+      if (model.searchImpressions >= 3000 && model.searchClicks >= 150 && (model.directLocationValue >= 10 || metricNumber(model.detailViews) >= 100 || metricNumber(model.performingEvents) >= 5)) {
         return ["warn", "Gelb", "Erste Akquise-Tests sind plausibel. Für Grün fehlen noch stärkere automatisch gemessene Website-, Maps- oder Location-Klicks."];
       }
-
       return ["bad", "Rot", "Noch nicht aktiv verkaufen. Erst Sichtbarkeit und automatisch gemessene Nutzsignale für Locations weiter aufbauen."];
     }
 
     function nextLever(model) {
-      if (model.directLocationValue < 10) {
-        return "Nächster Hebel: mehr Website-, Route-/Maps- und CTA-Klicks sammeln. Diese Werte sind für Locations am stärksten erklärbar.";
-      }
-
-      if (model.detailViews < 100) {
-        return "Nächster Hebel: mehr Detail-Aufrufe erzeugen, damit klarer wird, dass Nutzer einzelne Events und Aktivitäten wirklich prüfen.";
-      }
-
-      if (model.performingEvents < 5) {
-        return "Nächster Hebel: mehr unterschiedliche Events mit Interaktion aufbauen, damit der Nutzen nicht an einem Einzelfall hängt.";
-      }
-
-      if (model.performingLocations < 3) {
-        return "Nächster Hebel: mehr unterschiedliche Ziele/Locations mit Weiterleitungen aufbauen.";
-      }
-
+      if (model.directLocationValue < 10) return "Nächster Hebel: mehr Website-, Route-/Maps- und CTA-Klicks sammeln. Diese Werte sind für Locations am stärksten erklärbar.";
+      if (model.detailViews < 100) return "Nächster Hebel: mehr Detail-Aufrufe erzeugen, damit klarer wird, dass Nutzer einzelne Events und Aktivitäten wirklich prüfen.";
+      if (model.performingEvents < 5) return "Nächster Hebel: mehr unterschiedliche Events mit Interaktion aufbauen, damit der Nutzen nicht an einem Einzelfall hängt.";
+      if (model.performingLocations < 3) return "Nächster Hebel: mehr unterschiedliche Ziele/Locations mit Weiterleitungen aufbauen.";
       return "Nächster Hebel: erste gezielte Akquise mit konkreten Beispielzahlen testen.";
     }
 
-    function renderTrend(id, current, previous, preferPercent = false) {
-      setText(id, formatDelta(current, previous, preferPercent));
-    }
+    function renderTrend(id, current, previous, preferPercent = false) { setText(id, formatDelta(current, previous, preferPercent)); }
 
     function renderLocationValue(payload) {
       const box = document.getElementById("locationValueStatus");
       if (!box) return;
-
       if (!payload || payload.status === "error") {
-        box.innerHTML = `
-          <p><strong>Status:</strong> Fehler</p>
-          <p style="margin-top:8px;">${payload?.message || "Nutzwert-Metriken konnten nicht gelesen werden."}</p>
-        `;
+        box.innerHTML = `<p><strong>Status:</strong> Fehler</p><p style="margin-top:8px;">${payload?.message || "Nutzwert-Metriken konnten nicht gelesen werden."}</p>`;
         return;
       }
 
       const metrics = payload.metrics || {};
       const previous = payload.previous_metrics || {};
-      const websiteClicks = metricNumber(metrics.website_clicks);
-      const mapsClicks = metricNumber(metrics.maps_clicks);
-      const locationClicks = metricNumber(metrics.location_clicks);
-      const organizerCtaClicks = metricNumber(metrics.organizer_cta_clicks);
-      const detailViews = metricNumber(metrics.detail_views);
-      const directLocationValue = websiteClicks + mapsClicks + locationClicks + organizerCtaClicks;
-      const previousDirectLocationValue =
-        metricNumber(previous.website_clicks) +
-        metricNumber(previous.maps_clicks) +
-        metricNumber(previous.location_clicks) +
-        metricNumber(previous.organizer_cta_clicks);
+      const directLocationValue = metricNumber(metrics.website_clicks) + metricNumber(metrics.maps_clicks) + metricNumber(metrics.location_clicks) + metricNumber(metrics.organizer_cta_clicks);
+      const previousDirectLocationValue = metricNumber(previous.website_clicks) + metricNumber(previous.maps_clicks) + metricNumber(previous.location_clicks) + metricNumber(previous.organizer_cta_clicks);
       const generatedAt = payload.generated_at ? new Date(payload.generated_at) : null;
-      const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime())
-        ? generatedAt.toLocaleString("de-DE")
-        : "unbekannt";
-
+      const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime()) ? generatedAt.toLocaleString("de-DE") : "unbekannt";
       valuePeriodLabel = formatPeriod(payload.period);
 
-      box.innerHTML = `
-        <p><strong>Status:</strong> ${payload.status || "ok"}</p>
-        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(payload.period)}</p>
-        <p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(payload.previous_period)}</p>
-        <p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p>
-        <p style="margin-top:10px;"><strong>Direkter Nutzwert:</strong> ${formatMetric(directLocationValue)} Klicks (${formatDelta(directLocationValue, previousDirectLocationValue)})</p>
-        <p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(detailViews)} Detail-Aufrufe (${formatDelta(detailViews, previous.detail_views)})</p>
-        <p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(metrics.performing_events)} (${formatDelta(metrics.performing_events, previous.performing_events)})</p>
-        <p style="margin-top:6px;"><strong>Performende Ziele/Locations:</strong> ${formatMetric(metrics.performing_locations)} (${formatDelta(metrics.performing_locations, previous.performing_locations)})</p>
-      `;
+      box.innerHTML = `<p><strong>Status:</strong> ${payload.status || "ok"}</p><p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(payload.period)}</p><p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(payload.previous_period)}</p><p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p><p style="margin-top:10px;"><strong>Direkter Nutzwert:</strong> ${formatMetric(directLocationValue)} Klicks (${formatDelta(directLocationValue, previousDirectLocationValue)})</p><p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(metrics.detail_views)} Detail-Aufrufe (${formatDelta(metrics.detail_views, previous.detail_views)})</p><p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(metrics.performing_events)} (${formatDelta(metrics.performing_events, previous.performing_events)})</p><p style="margin-top:6px;"><strong>Performende Ziele/Locations:</strong> ${formatMetric(metrics.performing_locations)} (${formatDelta(metrics.performing_locations, previous.performing_locations)})</p>`;
     }
 
     function renderMetrics(metrics, previous) {
@@ -1185,39 +827,19 @@ $valueMetrics = $isUnlocked
       renderTrend("kpiPerformingEventsTrend", model.performingEvents, previousModel.performingEvents);
       renderTrend("kpiPerformingLocationsTrend", model.performingLocations, previousModel.performingLocations);
 
-      const measurementStatus = document.getElementById("measurementStatus");
-      if (measurementStatus) {
-        measurementStatus.dataset.state = state === "strong" ? "good" : state;
-        measurementStatus.querySelector("span:last-child").textContent = label;
-      }
-
       setStatusPill("snapshotStatus", state, `${label} – ${label === "Rot" ? "noch nicht aktiv verkaufen" : "Akquise prüfen"}`);
       setText("snapshotPeriod", `Suchdaten: ${searchPeriodLabel} · Nutzwerte: ${valuePeriodLabel}`);
       setText("snapshotReason", copy);
       setText("snapshotNext", nextLever(model));
-
       setText("proofStatus", `Status: ${label}`);
       setText("proofPeriod", `Suchdaten: ${searchPeriodLabel} · Nutzwerte: ${valuePeriodLabel}`);
-      setText(
-        "proofSummary",
-        `Bocholt erleben wurde ${formatMetric(model.searchImpressions)}-mal über Google/Bing sichtbar, erzeugte ${formatMetric(model.searchClicks)} Such-Klicks und ${formatMetric(model.directLocationValue)} konkrete Weiterleitungen bzw. Aktionen. Zusätzlich wurden ${formatMetric(model.detailViews)} Detail-Aufrufe, ${formatMetric(model.performingEvents)} performende Events und ${formatMetric(model.performingLocations)} performende Ziele/Locations gemessen.`
-      );
-      setText(
-        "proofTrend",
-        `Entwicklung: Sichtbarkeit ${formatDelta(model.searchImpressions, previousModel.searchImpressions, true)}, Such-Klicks ${formatDelta(model.searchClicks, previousModel.searchClicks, true)}, konkrete Nutzwert-Klicks ${formatDelta(model.directLocationValue, previousModel.directLocationValue)}.`
-      );
+      setText("proofSummary", `Bocholt erleben wurde ${formatMetric(model.searchImpressions)}-mal über Google/Bing sichtbar, erzeugte ${formatMetric(model.searchClicks)} Such-Klicks und ${formatMetric(model.directLocationValue)} konkrete Weiterleitungen bzw. Aktionen. Zusätzlich wurden ${formatMetric(model.detailViews)} Detail-Aufrufe, ${formatMetric(model.performingEvents)} performende Events und ${formatMetric(model.performingLocations)} performende Ziele/Locations gemessen.`);
+      setText("proofTrend", `Entwicklung: Sichtbarkeit ${formatDelta(model.searchImpressions, previousModel.searchImpressions, true)}, Such-Klicks ${formatDelta(model.searchClicks, previousModel.searchClicks, true)}, konkrete Nutzwert-Klicks ${formatDelta(model.directLocationValue, previousModel.directLocationValue)}.`);
     }
 
     function applyMetrics(metrics = {}, previous = {}) {
-      currentMetrics = buildMetricModel({
-        ...currentMetrics,
-        ...metrics
-      });
-      previousMetrics = buildMetricModel({
-        ...previousMetrics,
-        ...previous
-      });
-
+      currentMetrics = buildMetricModel({ ...currentMetrics, ...metrics });
+      previousMetrics = buildMetricModel({ ...previousMetrics, ...previous });
       renderMetrics(currentMetrics, previousMetrics);
     }
 
@@ -1230,12 +852,7 @@ $valueMetrics = $isUnlocked
     function renderSearchMetricsStatus(payload) {
       const box = document.getElementById("searchMetricsStatus");
       if (!box) return;
-
-      if (!payload) {
-        box.textContent = "Search-Daten werden geladen.";
-        return;
-      }
-
+      if (!payload) { box.textContent = "Search-Daten werden geladen."; return; }
       const google = payload.sources?.google || {};
       const bing = payload.sources?.bing || {};
       const previousGoogle = payload.previous_sources?.google || {};
@@ -1243,31 +860,15 @@ $valueMetrics = $isUnlocked
       const period = payload.period || {};
       const previousPeriod = payload.previous_period || {};
       const generatedAt = payload.generated_at ? new Date(payload.generated_at) : null;
-      const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime())
-        ? generatedAt.toLocaleString("de-DE")
-        : "unbekannt";
-
+      const generatedLabel = generatedAt && !Number.isNaN(generatedAt.getTime()) ? generatedAt.toLocaleString("de-DE") : "unbekannt";
       searchPeriodLabel = formatPeriod(period);
-
-      box.innerHTML = `
-        <p><strong>Status:</strong> ${payload.status || "unbekannt"}</p>
-        <p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(period)}</p>
-        <p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(previousPeriod)}</p>
-        <p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p>
-        <p style="margin-top:10px;"><strong>Google:</strong> ${sourceStatusLabel(google.status)} · ${formatMetric(google.impressions)} Impressionen · ${formatMetric(google.clicks)} Klicks</p>
-        <p style="margin-top:6px;"><strong>Google vorher:</strong> ${formatMetric(previousGoogle.impressions)} Impressionen · ${formatMetric(previousGoogle.clicks)} Klicks</p>
-        <p style="margin-top:10px;"><strong>Bing:</strong> ${sourceStatusLabel(bing.status)} · ${formatMetric(bing.impressions)} Impressionen · ${formatMetric(bing.clicks)} Klicks</p>
-        <p style="margin-top:6px;"><strong>Bing vorher:</strong> ${formatMetric(previousBing.impressions)} Impressionen · ${formatMetric(previousBing.clicks)} Klicks</p>
-        ${google.message ? `<p class="muted" style="margin-top:8px;">Google: ${google.message}</p>` : ""}
-        ${bing.message ? `<p class="muted" style="margin-top:4px;">Bing: ${bing.message}</p>` : ""}
-      `;
+      box.innerHTML = `<p><strong>Status:</strong> ${payload.status || "unbekannt"}</p><p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(period)}</p><p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(previousPeriod)}</p><p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p><p style="margin-top:10px;"><strong>Google:</strong> ${sourceStatusLabel(google.status)} · ${formatMetric(google.impressions)} Impressionen · ${formatMetric(google.clicks)} Klicks</p><p style="margin-top:6px;"><strong>Google vorher:</strong> ${formatMetric(previousGoogle.impressions)} Impressionen · ${formatMetric(previousGoogle.clicks)} Klicks</p><p style="margin-top:10px;"><strong>Bing:</strong> ${sourceStatusLabel(bing.status)} · ${formatMetric(bing.impressions)} Impressionen · ${formatMetric(bing.clicks)} Klicks</p><p style="margin-top:6px;"><strong>Bing vorher:</strong> ${formatMetric(previousBing.impressions)} Impressionen · ${formatMetric(previousBing.clicks)} Klicks</p>${google.message ? `<p class="muted" style="margin-top:8px;">Google: ${google.message}</p>` : ""}${bing.message ? `<p class="muted" style="margin-top:4px;">Bing: ${bing.message}</p>` : ""}`;
     }
 
     function extractSearchMetrics(payload, previous = false) {
       const sources = previous ? (payload.previous_sources || {}) : (payload.sources || {});
       const google = sources.google || {};
       const bing = sources.bing || {};
-
       return {
         googleImpressions: google.status === "ok" ? metricNumber(google.impressions) : 0,
         googleClicks: google.status === "ok" ? metricNumber(google.clicks) : 0,
@@ -1278,7 +879,6 @@ $valueMetrics = $isUnlocked
 
     function extractValueMetrics(payload, key = "metrics") {
       const metrics = payload?.[key] || {};
-
       return {
         websiteClicks: metricNumber(metrics.website_clicks),
         mapsClicks: metricNumber(metrics.maps_clicks),
@@ -1292,34 +892,14 @@ $valueMetrics = $isUnlocked
 
     async function loadSearchMetrics() {
       renderSearchMetricsStatus(null);
-
       try {
         const res = await fetch(SEARCH_METRICS_URL, { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const payload = await res.json();
-        const searchMetrics = extractSearchMetrics(payload, false);
-        const previousSearchMetrics = extractSearchMetrics(payload, true);
-
         renderSearchMetricsStatus(payload);
-        applyMetrics(searchMetrics, previousSearchMetrics);
-      } catch (error) {
-        renderSearchMetricsStatus({
-          status: "error",
-          generated_at: null,
-          period: {},
-          previous_period: {},
-          sources: {
-            google: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." },
-            bing: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." }
-          },
-          previous_sources: {
-            google: { status: "error", impressions: 0, clicks: 0 },
-            bing: { status: "error", impressions: 0, clicks: 0 }
-          }
-        });
+        applyMetrics(extractSearchMetrics(payload, false), extractSearchMetrics(payload, true));
+      } catch (_) {
+        renderSearchMetricsStatus({ status: "error", generated_at: null, period: {}, previous_period: {}, sources: { google: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." }, bing: { status: "error", impressions: 0, clicks: 0, message: "Search-Metrics-JSON konnte nicht geladen werden." } }, previous_sources: { google: { status: "error", impressions: 0, clicks: 0 }, bing: { status: "error", impressions: 0, clicks: 0 } } });
       }
     }
 
@@ -1328,10 +908,12 @@ $valueMetrics = $isUnlocked
     previousMetrics = buildMetricModel(extractValueMetrics(valuePayload, "previous_metrics"));
     renderLocationValue(valuePayload);
     applyMetrics({}, {});
+    initTooltips();
+    updateOptOutUi();
+    document.getElementById("optOutToggle")?.addEventListener("click", () => setValueMetricsOptOut(!isValueMetricsOptedOut()));
     loadSearchMetrics();
     runChecks();
-    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V31_AKQUISE_SNAPSHOT ===
-  </script>
+    // === END BLOCK: INTERNAL_SEO_DASHBOARD_LOGIC_V32_MOBILE_TOOLTIP_OPTOUT ===
   </script>
 <?php endif; ?>
 </body>
