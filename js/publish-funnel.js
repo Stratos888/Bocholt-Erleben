@@ -1,4 +1,4 @@
-/* === BEGIN FILE: js/publish-funnel.js | Zweck: zentraler JS-Owner für den Veranstalter-Funnel mit Stripe-Weiterleitung im Standardweg und Mailto-Vorbereitung im Profi-Pfad; Umfang: komplette neue Datei === */
+/* === BEGIN FILE: js/publish-funnel.js | Zweck: zentraler JS-Owner für den Veranstalter-Funnel mit prüfpflichtiger Einzeltermin-Einreichung und Mailto-Vorbereitung im Profi-Pfad; Umfang: komplette Datei === */
 (() => {
   "use strict";
 
@@ -469,7 +469,7 @@ function buildAutomationSummary(context) {
     return { mode: "formspree" };
   }
 
-  /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 | Zweck: validiert einzelne Veranstaltung ohne Browser-Popup, markiert fehlende Pflichtfelder visuell und steuert den Weiter-zur-Zahlungsmethode-State; Umfang: Standard-Validierung, API-Helper, Payload-Builder, Submit-State und Bindung === */
+    /* === BEGIN BLOCK: STANDARD_PUBLISH_PATH_REVIEW_BEFORE_PAYMENT_V1 | Zweck: validiert einzelne Veranstaltung ohne Browser-Popup, markiert fehlende Pflichtfelder visuell und sendet die Einreichung zuerst zur redaktionellen Prüfung; Umfang: Standard-Validierung, API-Helper, Payload-Builder, Submit-State und Bindung === */
   function getStandardValidationStatus(form) {
     let statusNode = form.querySelector("[data-standard-validation-status]");
     if (statusNode) return statusNode;
@@ -743,10 +743,9 @@ function validateAutomationContext(context, form) {
         window.alert("Die Einreichung konnte gerade nicht gesendet werden. Bitte versuche es erneut.");
         setStandardSubmitting(trigger, false);
       }
-      }
     });
   }
-  /* === END BLOCK: STANDARD_PUBLISH_PATH_BACKEND_CHECKOUT_V3 === */
+  /* === END BLOCK: STANDARD_PUBLISH_PATH_REVIEW_BEFORE_PAYMENT_V1 === */
 
   /* === BEGIN BLOCK: PUBLISH_AUTOMATION_BIND_FREE_CHECK_V2 | Zweck: bindet die kostenlose Prüfung mit eigener Pflichtfeldmarkierung, ohne native Browser-Popups; Umfang: kompletter bindAutomationPath-Handler === */
   function bindAutomationPath() {
