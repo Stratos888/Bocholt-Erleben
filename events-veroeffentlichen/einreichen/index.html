@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Einzelne Veranstaltung einreichen | Bocholt erleben</title>
+  <title>Einzeltermin zur Prüfung einreichen | Bocholt erleben</title>
   <meta
     name="description"
-    content="Einzelne Veranstaltung bei Bocholt erleben einreichen: Angaben übermitteln, zur Zahlungsmethode weitergehen und anschließend prüfen lassen."
+    content="Einzelne Veranstaltung bei Bocholt erleben einreichen: Zahlung erst nach redaktioneller Vorprüfung, Veröffentlichung nach Freigabe."
   >
 
   <link rel="canonical" href="https://bocholt-erleben.de/events-veroeffentlichen/einreichen/">
@@ -82,9 +82,9 @@
     <header class="content-hero content-hero--panel">
       <div class="publish-hero-layout">
         <div class="publish-hero-copy">
-          <h1>Einzelne Veranstaltung einreichen</h1>
+          <h1>Einzeltermin zur Prüfung einreichen</h1>
           <p class="content-lead">
-            Trage alle notwendigen Angaben ein, damit wir deine Veranstaltung prüfen können.
+            Trage alle notwendigen Angaben ein. Wir prüfen zuerst, ob die Veranstaltung grundsätzlich passt. Erst danach erhältst du einen Zahlungslink.
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@
       <div class="publish-section-head publish-section-head--form">
         <h2 id="publish-submit-title">Einreichung vorbereiten</h2>
         <p class="content-note content-note--form-meta">* Pflichtfelder</p>
-        <p class="content-note"><strong>9,90&nbsp;€ einmalig</strong> – Zahlung über Stripe.</p>
+        <p class="content-note"><strong>9,90&nbsp;€ einmalig</strong> – Zahlung erst nach redaktioneller Vorprüfung.</p>
       </div>
 
       <form class="content-form" id="publish-standard-form" novalidate>
@@ -184,16 +184,16 @@
 <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_CONFIRMATION_CHECKBOX_UI_V1 === -->
         </div>
 
-        <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V3 | Zweck: benennt den CTA als nächsten Schritt zur Zahlungsmethode statt als bereits abgeschlossene Zahlung; Umfang: finaler CTA-Block im Einreichungsformular === -->
-        <div class="content-actions content-actions--inline publish-final-actions">
-          <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
-            Weiter zur Zahlungsmethode
-          </button>
-          <p class="content-note">
-            Im nächsten Schritt wirst du zu Stripe weitergeleitet. Nach erfolgreicher Zahlung geht deine Einreichung in die Prüfung. Die Veröffentlichung erfolgt erst nach Freigabe.
-          </p>
-        </div>
-        <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V3 === -->
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V4_REVIEW_BEFORE_PAYMENT | Zweck: benennt den CTA als prüfpflichtige Einreichung ohne sofortigen Stripe-Checkout; Umfang: finaler CTA-Block im Einreichungsformular === -->
+          <div class="content-actions content-actions--inline publish-final-actions">
+            <button class="content-cta content-cta--primary" id="publish-standard-pay" type="button">
+              Zur Prüfung einreichen
+            </button>
+            <p class="content-note">
+              Nach der Einreichung prüfen wir die Veranstaltung zuerst. Wenn sie grundsätzlich passt, erhältst du per E-Mail einen Zahlungslink für den Einzeltermin.
+            </p>
+          </div>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V4_REVIEW_BEFORE_PAYMENT === -->
       </form>
     </section>
   </main>
@@ -201,8 +201,8 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V4 | Zweck: Cache-Busting fuer publish-funnel.js nach Pflichtfeld-Markierung und CTA-Wording; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-08-single-submit-2" defer></script>
+  <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V5_REVIEW_BEFORE_PAYMENT | Zweck: Cache-Busting nach Umstellung auf Einreichung vor Zahlung; Umfang: genau eine Script-Zeile === -->
+  <script src="/js/publish-funnel.js?v=2026-05-12-review-before-payment-1" defer></script>
   <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V4 === -->
   <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 === -->
 </body>
