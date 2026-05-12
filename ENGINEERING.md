@@ -10,11 +10,17 @@
 
 ### Data source rule
 
-- Production/staging event and inbox data are sheet-first.
-- The deploy workflow exports the Google Sheet tabs `Events` and `Inbox` to `data/events.tsv` and `data/inbox.tsv`.
-- `data/events.json` and `data/inbox.json` are generated deploy artifacts consumed by the app at runtime.
+- Production/staging event data is hybrid.
+- The public event feed consists of:
+  1. Google Sheet / generated `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
+  2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
+- Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
+- `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
 - A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
 - Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- The Kuratier-Inbox is also hybrid:
+  1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
+  2. DB submissions for organizer single-event and membership submissions.
 ---
 
 ## 2. PROOF BEFORE PATCH
