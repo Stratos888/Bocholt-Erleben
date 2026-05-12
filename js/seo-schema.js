@@ -2,42 +2,68 @@
 // Datei: js/seo-schema.js
 // Zweck:
 // - Erzeugt JSON-LD (SEO Schema) für Events
-// - Injiziert strukturierte Daten basierend auf /data/events.json
-//
-// Verantwortlich für:
-// - Aufbau und Einfügen von Event-Schema (JSON-LD)
-// - Defensive Checks (leere Daten → nichts injizieren)
-//
-// Nicht verantwortlich für:
-// - Event-Rendering (Cards/Kalender)
-// - Filter-State / Filter-UI
-// - Laden/Boot der App (main.js)
-//
-// Contract:
-// - liest /data/events.json (no-store) und erzeugt daraus JSON-LD
-// - verändert keine UI, nur <script type="application/ld+json"> im DOM
+// - Injiziert strukturierte Daten basierend auf /data/events.json und freigegebenen DB-Submissions
 // END: FILE_HEADER_SEO_SCHEMA
-
 
 (async function injectEventSchema() {
   try {
-    const res = await fetch('/data/events.json', { cache: 'no-store' });
-    if (!res.ok) return;
+    async function fetchJsonNoStore(url, required) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${url} failed: ${res.status}`);
+        return await res.json();
+      } catch (error) {
+        if (required) throw error;
+        return null;
+      }
+    }
 
-    const data = await res.json();
-    const events = Array.isArray(data.events) ? data.events : [];
+    function extractEvents(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (Array.isArray(payload?.events)) return payload.events;
+      if (Array.isArray(payload?.data?.events)) return payload.data.events;
+      return [];
+    }
+
+    function dedupeEvents(events) {
+      const seen = new Set();
+      const out = [];
+
+      for (const event of events) {
+        const idKey = String(event?.id || '').trim();
+        const fallbackKey = [
+          String(event?.title || '').trim().toLowerCase(),
+          String(event?.date || '').trim(),
+          String(event?.time || '').trim().toLowerCase(),
+          String(event?.location || '').trim().toLowerCase()
+        ].join('|');
+        const key = idKey || fallbackKey;
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(event);
+      }
+
+      return out;
+    }
+
+    const [sheetPayload, approvedSubmissionPayload] = await Promise.all([
+      fetchJsonNoStore('/data/events.json', true),
+      fetchJsonNoStore('/api/events/public.php', false)
+    ]);
+
+    const events = dedupeEvents([
+      ...extractEvents(sheetPayload),
+      ...extractEvents(approvedSubmissionPayload)
+    ]);
+
     if (!events.length) return;
 
-    // Maximal 30 Events ausgeben (MVP, verhindert riesige JSON-LD Blöcke)
     const slice = events.slice(0, 30);
-
     const nowIso = new Date().toISOString();
 
     const graph = slice
       .filter(e => e && e.id && e.title && e.date && e.location)
       .map(e => {
-        // date: YYYY-MM-DD, time: optionaler Display-String
-        // Für startDate nutzt SEO Schema am besten ISO. Ohne parsebare Uhrzeit → all-day Start.
         const startDate = `${e.date}T00:00:00+01:00`;
 
         const obj = {
@@ -52,7 +78,7 @@
             "name": String(e.location),
             "address": {
               "@type": "PostalAddress",
-              "addressLocality": "Bocholt",
+              "addressLocality": String(e.city || "Bocholt"),
               "addressCountry": "DE"
             }
           },
@@ -65,7 +91,6 @@
           }
         };
 
-        // optional: time als Zusatzinfo (Display)
         if (e.time) {
           obj["additionalProperty"] = [{
             "@type": "PropertyValue",
@@ -74,9 +99,7 @@
           }];
         }
 
-        // Entferne undefined-Felder
         Object.keys(obj).forEach(k => (obj[k] === undefined) && delete obj[k]);
-
         return obj;
       });
 
@@ -102,4 +125,3 @@
     // bewusst still
   }
 })();
-
