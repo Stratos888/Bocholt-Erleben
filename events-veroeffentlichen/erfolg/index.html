@@ -104,12 +104,11 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <script>
-    /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V4_EXISTING_SUBSCRIPTION_COPY | Zweck: setzt den bestehenden-Mitgliedschaft-Flow auf dieselbe H1 und unterscheidet den Zustand nur über Lead, Hinweis, CTA und nächste Schritte; Umfang: kompletter zustandsabhängiger Text-Switch auf /events-veroeffentlichen/erfolg/ === */
+    /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V5_REVIEW_BEFORE_PAYMENT | Zweck: unterscheidet eingereichte Einzeltermine, bezahlte Einzeltermine und bestehende Mitgliedschaften; Umfang: kompletter zustandsabhängiger Text-Switch auf /events-veroeffentlichen/erfolg/ === */
     (function () {
       const params = new URLSearchParams(window.location.search);
       const flow = String(params.get("flow") || "").trim().toLowerCase();
-
-      if (flow !== "existing-subscription") return;
+      const hasSession = Boolean(String(params.get("session_id") || "").trim());
 
       const title = document.getElementById("publish-success-title");
       const lead = document.getElementById("publish-success-lead");
@@ -117,25 +116,51 @@
       const cta = document.getElementById("publish-success-cta");
       const steps = document.getElementById("publish-success-steps");
 
-      if (title) title.textContent = "Deine Veranstaltung wurde eingereicht.";
-      if (lead) {
-        lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Sie läuft über deine aktive Mitgliedschaft.";
-      }
-      if (note) {
-        note.textContent = "Wir prüfen deine Angaben, bevor die Veranstaltung veröffentlicht wird. Erst nach Freigabe zählt sie als veröffentlichter Termin im aktuellen Zeitraum.";
-      }
-      if (cta) {
-        cta.textContent = "Veranstalterbereich öffnen";
-        cta.setAttribute("href", "/fuer-veranstalter/dashboard/");
-      }
-      if (steps) {
-        steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Mitgliedschaft.</p><p>2. Wir prüfen deine Angaben und melden uns nur, falls noch etwas fehlt.</p><p>3. Nach Freigabe wird deine Veranstaltung veröffentlicht.</p>";
+      if (flow === "submitted") {
+        if (title) title.textContent = "Deine Veranstaltung wurde zur Prüfung eingereicht.";
+        if (lead) lead.textContent = "Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.";
+        if (note) note.textContent = "Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend per E-Mail einen Zahlungslink für den Einzeltermin.";
+        if (cta) {
+          cta.textContent = "Weitere Veranstaltung einreichen";
+          cta.href = "/events-veroeffentlichen/einreichen/";
+        }
+        if (steps) {
+          steps.innerHTML = "<p>1. Redaktionelle Vorprüfung.</p><p>2. Zahlungslink bei grundsätzlicher Freigabe.</p><p>3. Zahlung, finale Prüfung und Veröffentlichung.</p>";
+        }
+        document.title = "Veranstaltung zur Prüfung eingereicht | Bocholt erleben";
+        return;
       }
 
-      document.title = "Veranstaltung eingereicht | Bocholt erleben";
+      if (flow === "existing-subscription") {
+        if (title) title.textContent = "Deine Veranstaltung wurde eingereicht.";
+        if (lead) lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Sie läuft über deine aktive Mitgliedschaft.";
+        if (note) note.textContent = "Wir prüfen deine Angaben, bevor die Veranstaltung veröffentlicht wird. Erst nach Freigabe zählt sie als veröffentlichter Termin im aktuellen Zeitraum.";
+        if (cta) {
+          cta.textContent = "Veranstalterbereich öffnen";
+          cta.href = "/fuer-veranstalter/dashboard/";
+        }
+        if (steps) {
+          steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Mitgliedschaft.</p><p>2. Wir prüfen deine Angaben und melden uns nur, falls noch etwas fehlt.</p><p>3. Nach Freigabe wird deine Veranstaltung veröffentlicht.</p>";
+        }
+        document.title = "Veranstaltung eingereicht | Bocholt erleben";
+        return;
+      }
+
+      if (hasSession) {
+        if (title) title.textContent = "Danke, die Zahlung wurde abgeschlossen.";
+        if (lead) lead.textContent = "Deine Zahlung wurde bestätigt. Die Veranstaltung wird jetzt final redaktionell geprüft.";
+        if (note) note.textContent = "Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach finaler Freigabe.";
+        if (cta) {
+          cta.textContent = "Weitere Veranstaltung einreichen";
+          cta.href = "/events-veroeffentlichen/einreichen/";
+        }
+        if (steps) {
+          steps.innerHTML = "<p>1. Zahlung wurde bestätigt.</p><p>2. Finale redaktionelle Prüfung.</p><p>3. Veröffentlichung nach Freigabe.</p>";
+        }
+        document.title = "Zahlung abgeschlossen | Bocholt erleben";
+      }
     })();
-    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V4_EXISTING_SUBSCRIPTION_COPY === */
-  </script>
+    /* === END BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V5_REVIEW_BEFORE_PAYMENT === */
   </script>
 </body>
 </html>
