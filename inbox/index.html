@@ -99,6 +99,9 @@ Umfang:
                 <!-- === BEGIN BLOCK: INBOX_PUSH_BUTTON_V1 | Zweck: interne Push-Benachrichtigung für neue Inbox-Elemente aktivieren; Umfang: ein zusätzlicher Button ohne Änderung der Review-Aktionen === -->
         <button id="pushBtn" class="btn" type="button">Push aktivieren</button>
         <!-- === END BLOCK: INBOX_PUSH_BUTTON_V1 === -->
+                <!-- === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BUTTON_V1 | Zweck: diagnostiziert lokale Browser-/Android-Benachrichtigungen ohne Server-Push; Umfang: zusätzlicher interner Testbutton === -->
+        <button id="localPushTestBtn" class="btn" type="button">Lokale Testmeldung</button>
+        <!-- === END BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BUTTON_V1 === -->
         <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
         <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
       </div>
@@ -149,7 +152,7 @@ Umfang:
     const elLeft = document.getElementById("progressLeft");
     const elRight = document.getElementById("progressRight");
     const elPushBtn = document.getElementById("pushBtn");
-
+    const elLocalPushTestBtn = document.getElementById("localPushTestBtn");
     
     let queue = [];
     let current = null;
@@ -187,7 +190,15 @@ Umfang:
       });
     }
     /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
-    
+        /* === BEGIN BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 | Zweck: testet lokale Notification-Anzeige auf genau diesem Gerät ohne Server-Push; Umfang: zusätzlicher Diagnose-Button === */
+    if (elLocalPushTestBtn) {
+      elLocalPushTestBtn.addEventListener("click", async () => {
+        const ok = await ensureUnlocked();
+        if (!ok) return;
+        await showLocalInboxNotificationTest();
+      });
+    }
+    /* === END BLOCK: INBOX_LOCAL_NOTIFICATION_TEST_BINDING_V1 === */
     // === END BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
 
     function setStatus(msg) {
@@ -342,6 +353,48 @@ Umfang:
         setInboxPushButtonActive(false);
         return false;
       }
+    }
+    async function showLocalInboxNotificationTest() {
+      /* === BEGIN FUNCTION: showLocalInboxNotificationTest | Zweck: prüft lokale Notification-Anzeige über den Service Worker ohne Remote-Push; Umfang: reine Diagnosefunktion für Mobile/Android === */
+      if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+        setStatus("Lokale Benachrichtigungen werden von diesem Browser nicht unterstützt.");
+        return;
+      }
+
+      if (window.isSecureContext !== true) {
+        setStatus("Lokale Benachrichtigungen benötigen HTTPS.");
+        return;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          setStatus("Benachrichtigungen wurden nicht erlaubt.");
+          return;
+        }
+
+        const registration = await getInboxPushRegistration({ forceUpdate: true });
+        await registration.showNotification("Bocholt erleben", {
+          body: "Lokale Testmeldung der Inbox.",
+          tag: `be-local-inbox-test-${Date.now()}`,
+          renotify: false,
+          silent: false,
+          requireInteraction: false,
+          timestamp: Date.now(),
+          icon: "/icons/app/icon-192.png",
+          badge: "/icons/favicon/icon-32.png",
+          data: {
+            type: "local_inbox_notification_test",
+            createdAt: Date.now()
+          }
+        });
+
+        setStatus("Lokale Testmeldung wurde ausgelöst.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Lokale Testmeldung fehlgeschlagen: " + (error?.message || error));
+      }
+      /* === END FUNCTION: showLocalInboxNotificationTest === */
     }
 
     async function sendInboxPushTest() {
