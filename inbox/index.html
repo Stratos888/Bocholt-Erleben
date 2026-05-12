@@ -51,6 +51,9 @@ Umfang:
     .muted { opacity: .75; }
     .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
+        /* === BEGIN BLOCK: INBOX_PUSH_BUTTON_STYLE_V1 | Zweck: kleine interne Push-Aktion ohne Layout-Umbau; Umfang: nur Button-State dieser Seite === */
+    .btn-push-active { border-color: rgba(0,120,0,.45); }
+    /* === END BLOCK: INBOX_PUSH_BUTTON_STYLE_V1 === */
     .btn-good { border-color: rgba(0,120,0,.45); }
     .btn-bad { border-color: rgba(160,0,0,.45); }
 
@@ -93,6 +96,9 @@ Umfang:
         <span id="lockState" class="pill muted">gesperrt</span>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <!-- === BEGIN BLOCK: INBOX_PUSH_BUTTON_V1 | Zweck: interne Push-Benachrichtigung für neue Inbox-Elemente aktivieren; Umfang: ein zusätzlicher Button ohne Änderung der Review-Aktionen === -->
+        <button id="pushBtn" class="btn" type="button">Push aktivieren</button>
+        <!-- === END BLOCK: INBOX_PUSH_BUTTON_V1 === -->
         <button id="deployBtn" class="btn" type="button">Deploy jetzt</button>
         <button id="reloadBtn" class="btn" type="button" aria-label="Reload">↻</button>
       </div>
@@ -128,6 +134,13 @@ Umfang:
     // - Nur Endpoint-Konstanten für inbox/index.html
     const API_URL  = "https://script.google.com/macros/s/AKfycbxU3MYnINbhk-1XFehzGRYeto3f4BH9fyL6RmMlQPwmTt_wciHoESRo27nx1-KSIAos/exec";
     const SUBMISSIONS_REVIEW_API_URL = "/api/submissions/review-list.php";
+
+    /* === BEGIN BLOCK: INBOX_PUSH_ENDPOINTS_V1 | Zweck: interne Browser-Push-Registrierung nur für diese private Inbox-Seite; Umfang: Push-Endpunkt-Konstanten === */
+    const PUSH_CONFIG_API_URL = "/api/push/config.php";
+    const PUSH_SUBSCRIBE_API_URL = "/api/push/subscribe.php";
+    const PUSH_TEST_API_URL = "/api/push/test.php";
+    /* === END BLOCK: INBOX_PUSH_ENDPOINTS_V1 === */
+    
     // === END BLOCK: REVIEW_INBOX_SOURCE_ENDPOINTS_V1 ===
 
     const elOne = document.getElementById("one");
@@ -135,7 +148,9 @@ Umfang:
     const elLock = document.getElementById("lockState");
     const elLeft = document.getElementById("progressLeft");
     const elRight = document.getElementById("progressRight");
+    const elPushBtn = document.getElementById("pushBtn");
 
+    
     let queue = [];
     let current = null;
     let totalLoaded = 0;
@@ -162,6 +177,17 @@ Umfang:
       if (!ok) return;
       await triggerDeploy();
     });
+
+    /* === BEGIN BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 | Zweck: registriert dieses Gerät für einfache Inbox-Pushmeldungen; Umfang: zusätzlicher Button-Listener ohne Review-Flow-Änderung === */
+    if (elPushBtn) {
+      elPushBtn.addEventListener("click", async () => {
+        const ok = await ensureUnlocked();
+        if (!ok) return;
+        await enableInboxPush();
+      });
+    }
+    /* === END BLOCK: INBOX_PUSH_BUTTON_BINDING_V1 === */
+    
     // === END BLOCK: REVIEW PAGE BUTTON BINDINGS V2 ===
 
     function setStatus(msg) {
@@ -213,6 +239,120 @@ Umfang:
     // - Kennzeichnet Sheet-Fälle als ai_search, ohne Event-Kategorie zu verändern
     // Umfang:
     // - Ersetzt loadAndShow und ergänzt Fetch-/Normalisierungshelfer
+
+    // === BEGIN BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V1 ===
+    // Zweck:
+    // - Aktiviert Web Push nur nach erfolgreichem Review-Unlock.
+    // - Speichert die Browser-Subscription serverseitig für einfache Inbox-Hinweise.
+    // Umfang:
+    // - Additiv; ändert keine Lade-/Approve-/Reject-Logik.
+    function urlBase64ToUint8Array(base64String) {
+      const padding = "=".repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+
+      return outputArray;
+    }
+
+    async function fetchPushPublicKey() {
+      const response = await fetch(PUSH_CONFIG_API_URL, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "X-BE-Review-Password": reviewApiPassword
+        },
+        cache: "no-store"
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload || payload.status !== "ok" || !payload.data?.public_key) {
+        throw new Error(payload?.message || "push_config_failed");
+      }
+
+      return String(payload.data.public_key);
+    }
+
+    async function enableInboxPush() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+        setStatus("Push wird von diesem Browser nicht unterstützt.");
+        return;
+      }
+
+      if (window.isSecureContext !== true) {
+        setStatus("Push benötigt HTTPS.");
+        return;
+      }
+
+      if (elPushBtn) elPushBtn.disabled = true;
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          setStatus("Push wurde nicht erlaubt.");
+          return;
+        }
+
+        const publicKey = await fetchPushPublicKey();
+
+        let registration = await navigator.serviceWorker.getRegistration("/");
+        if (!registration) {
+          registration = await navigator.serviceWorker.register("/service-worker.js");
+        }
+
+        registration = await navigator.serviceWorker.ready;
+
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(publicKey)
+          });
+        }
+
+        const response = await fetch(PUSH_SUBSCRIBE_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          },
+          body: JSON.stringify({ subscription: subscription.toJSON() })
+        });
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || payload.status !== "ok") {
+          throw new Error(payload?.message || "push_subscribe_failed");
+        }
+
+        if (elPushBtn) {
+          elPushBtn.textContent = "Push aktiv";
+          elPushBtn.classList.add("btn-push-active");
+        }
+        setStatus("Push aktiviert. Testnachricht wird gesendet …");
+
+        await fetch(PUSH_TEST_API_URL, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "X-BE-Review-Password": reviewApiPassword
+          }
+        }).catch(() => null);
+
+        setStatus("Push aktiviert.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Push konnte nicht aktiviert werden: " + (error?.message || error));
+      } finally {
+        if (elPushBtn) elPushBtn.disabled = false;
+      }
+    }
+    // === END BLOCK: INBOX_PUSH_REGISTRATION_HELPERS_V1 ===
+    
     async function fetchSubmissionReviewItems() {
       if (!reviewApiPassword) {
         return { items: [], total: 0, error: "submission_review_locked" };
