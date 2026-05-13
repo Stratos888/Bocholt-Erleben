@@ -186,8 +186,6 @@
       try {
         const result = await postJson("/api/submissions/init.php", buildFunnelPayload(form));
         const submissionId = result?.data?.submission_id;
-        form.reset();
-        $("#activity-plan-basic", form)?.click();
         setStatus(
           statusNode,
           submissionId
@@ -195,6 +193,8 @@
             : "Einreichung gespeichert. Wir prüfen die Eignung und senden dir bei Freigabe den Zahlungsstart per E-Mail.",
           "ok"
         );
+        statusNode?.scrollIntoView({ block: "center", behavior: "smooth" });
+      } catch (error) {
       } catch (error) {
         setStatus(statusNode, error && error.message ? error.message : "Einreichung konnte nicht gespeichert werden.", "error");
       } finally {
