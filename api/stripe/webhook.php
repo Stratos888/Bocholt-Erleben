@@ -44,9 +44,10 @@ function swh_notify_paid_event_submission_inbox_best_effort(PDO $pdo, int $submi
             'SELECT id
              FROM submissions
              WHERE id = :submission_id
-               AND submission_kind = "event"
+               AND submission_kind IN ("event", "activity")
                AND status = "paid"
              LIMIT 1'
+        );
         );
         $statement->execute([':submission_id' => $submissionId]);
 
@@ -84,6 +85,8 @@ function swh_get_stripe_config(): array
             'starter' => trim((string)($prices['starter'] ?? '')),
             'active' => trim((string)($prices['active'] ?? '')),
             'unlimited' => trim((string)($prices['unlimited'] ?? '')),
+            'activity_basic' => trim((string)($prices['activity_basic'] ?? '')),
+            'activity_plus' => trim((string)($prices['activity_plus'] ?? '')),
         ],
     ];
 }
@@ -225,6 +228,14 @@ function swh_get_plan_quota_config(string $planKey): array
             'included_publications' => 0,
             'is_unlimited' => 1,
         ],
+        'activity_basic' => [
+            'included_publications' => 1,
+            'is_unlimited' => 0,
+        ],
+        'activity_plus' => [
+            'included_publications' => 3,
+            'is_unlimited' => 0,
+        ],
         default => throw new RuntimeException('Unsupported plan key for entitlement handling.'),
     };
 }
@@ -235,6 +246,7 @@ function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId)
         'SELECT
             id,
             organizer_id,
+            submission_kind,
             requested_model_key,
             payment_kind,
             payment_reference_key,
