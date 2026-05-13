@@ -75,15 +75,31 @@
             })
           });
 
+          /* === BEGIN BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_URL_V1 | Zweck: akzeptiert Stripe-Checkout-URL oder Existing-Subscription-Redirect aus create-checkout-session; Umfang: ersetzt Payload-Auswertung nach fetch === */
           const payload = await response.json().catch(() => null);
           if (!response.ok || !payload || payload.status !== "ok") {
             throw new Error(payload?.message || "checkout_failed");
           }
 
           const checkoutUrl = String(payload?.data?.checkout_url || "").trim();
-          if (!checkoutUrl) {
-            throw new Error("missing_checkout_url");
+          const redirectUrl = String(payload?.data?.redirect_url || "").trim();
+
+          if (checkoutUrl) {
+            window.location.href = checkoutUrl;
+            return;
           }
+
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+            return;
+          }
+
+          throw new Error("missing_checkout_or_redirect_url");
+          /* === END BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_URL_V1 === */
+            return;
+          }
+
+          throw new Error("missing_checkout_or_redirect_url");
 
           window.location.href = checkoutUrl;
         } catch (error) {
