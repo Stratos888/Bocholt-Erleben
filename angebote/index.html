@@ -126,16 +126,16 @@ Umfang:
 
     <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
 
-    <!-- === BEGIN BLOCK: ACTIVITIES_DESKTOP_HERO_CONTROL_PARITY_V1 | Zweck: gleicht die Desktop-Control-Struktur der Aktivitätenseite an den finalen Events-Top-Shell-Contract an; Umfang: nur Top-Stack mit Suche, zwei Filter-Pills und rechter Service-Rail === -->
-    <div class="top-stack desktop-hero__panel">
-      <div class="desktop-hero__search-row" aria-label="Suche und Filter">
-        <div class="events-filter desktop-hero__search-slot">
+    <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HTML_V1 | Zweck: ersetzt die alten Einzel-Pills durch den semantischen Aktivitäten-Finder mit Suche, Schnellfiltern, Trefferzahl, aktiven Chips und ausklappbaren weiteren Filtern; Umfang: kompletter Desktop-Hero-Control-Block inklusive Entfernen der alten Filter-Sheets/Popovers === -->
+    <div class="top-stack desktop-hero__panel activity-finder" data-activity-finder>
+      <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Suche und Filter">
+        <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
           <label class="desktop-hero__search-field" for="search-filter">
             <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
             <input
               id="search-filter"
               type="search"
-              placeholder="Aktivität oder Ort suchen"
+              placeholder="Aktivität, Ort oder Stichwort suchen"
               aria-label="Aktivitäten suchen"
               autocomplete="off"
               inputmode="search"
@@ -143,48 +143,103 @@ Umfang:
           </label>
         </div>
 
-        <!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V3 | Zweck: hält im Aktivitäten-Hero genau eine Merkmal-Pill und genau eine Kategorie-Pill innerhalb der gemeinsamen Search-Row; Umfang: nur Aktivitäten-Filter-Pills plus Reset-Pill === -->
         <button
           type="button"
-          class="filter-pill desktop-hero__toolbar-pill"
-          id="offer-situation-pill"
-          aria-haspopup="dialog"
+          class="filter-pill activity-finder__advanced-toggle"
+          id="offer-advanced-filter-toggle"
           aria-expanded="false"
-          aria-controls="popover-situation"
-          data-filter-key="situation"
+          aria-controls="offer-advanced-filters"
         >
-          <span class="filter-pill__label">Merkmal</span>
-          <span class="filter-pill__value" id="offer-situation-value">Alle</span>
-          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-        </button>
-
-        <button
-          type="button"
-          class="filter-pill desktop-hero__toolbar-pill"
-          id="offer-category-pill"
-          aria-haspopup="dialog"
-          aria-expanded="false"
-          aria-controls="popover-offer-category"
-          data-filter-key="category"
-        >
-          <span class="filter-pill__label">Kategorie</span>
-          <span class="filter-pill__value" id="offer-category-value">Alle</span>
+          <span class="filter-pill__label">Weitere Filter</span>
+          <span class="filter-pill__value" id="offer-advanced-filter-count">Optional</span>
           <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
         </button>
 
         <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
           <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
         </button>
-        <!-- === END BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V3 === -->
+      </div>
+
+      <div class="activity-finder__quick" aria-label="Häufig gesuchte Aktivitätenfilter">
+        <div class="activity-finder__quick-label">Häufig gesucht</div>
+        <div class="activity-finder__quick-options" id="offer-quick-filters">
+          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Mit Kindern">Mit Kindern</button>
+          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Bei Regen">Bei Regen</button>
+          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Draußen">Draußen</button>
+          <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="Direkt in Bocholt">Direkt in Bocholt</button>
+          <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="In der Umgebung">In der Umgebung</button>
+        </div>
+      </div>
+
+      <div class="activity-finder__status-row" aria-live="polite" aria-atomic="true">
+        <div class="activity-finder__result-count" id="offer-result-count">Aktivitäten werden geladen</div>
+        <div class="activity-finder__active" id="offer-active-filters" hidden>
+          <span class="activity-finder__active-label">Aktive Filter</span>
+          <div class="activity-finder__active-list" id="offer-active-filter-list"></div>
+        </div>
+      </div>
+
+      <div class="activity-finder__advanced" id="offer-advanced-filters" hidden>
+        <div class="activity-finder__advanced-inner">
+          <fieldset class="activity-finder__group" data-filter-group="proximity">
+            <legend class="activity-finder__group-title">Ort / Nähe</legend>
+            <div class="activity-finder__group-options">
+              <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="Direkt in Bocholt">Direkt in Bocholt</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="In der Umgebung">In der Umgebung</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="Grenzregion / Niederlande">Grenzregion / Niederlande</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="activity-finder__group" data-filter-group="situation">
+            <legend class="activity-finder__group-title">Situation</legend>
+            <div class="activity-finder__group-options">
+              <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Mit Kindern">Mit Kindern</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Bei Regen">Bei Regen</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Draußen">Draußen</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="activity-finder__group" data-filter-group="activity_type">
+            <legend class="activity-finder__group-title">Aktivitätsart</legend>
+            <div class="activity-finder__group-options">
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Spazieren">Spazieren</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Radfahren">Radfahren</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Spielen">Spielen</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Kultur">Kultur</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Natur entdecken">Natur entdecken</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="activity_type" data-filter-value="Sport & Bewegung">Sport & Bewegung</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="activity-finder__group" data-filter-group="features">
+            <legend class="activity-finder__group-title">Ausstattung & Erlebnis</legend>
+            <div class="activity-finder__group-options">
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Spielplatz">Spielplatz</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Wasser">Wasser</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Tiere">Tiere</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Café">Café</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Baden">Baden</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Rundweg">Rundweg</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="features" data-filter-value="Aussicht">Aussicht</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="activity-finder__group" data-filter-group="effort">
+            <legend class="activity-finder__group-title">Aufwand</legend>
+            <div class="activity-finder__group-options">
+              <button type="button" class="activity-filter-chip" data-filter-group="effort" data-filter-value="Spontan">Spontan</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="effort" data-filter-value="Halber Tag">Halber Tag</button>
+              <button type="button" class="activity-filter-chip" data-filter-group="effort" data-filter-value="Längerer Ausflug">Längerer Ausflug</button>
+            </div>
+          </fieldset>
+        </div>
       </div>
 
       <div class="desktop-hero__actions" aria-label="Service">
-        <!-- === BEGIN BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 | Zweck: hält den Aktivitäten-Funnel als ersten Service-Link innerhalb der gemeinsamen Desktop-Service-Rail; Umfang: nur erster Aktivitäten-Service-Link === -->
         <a class="desktop-hero__action desktop-hero__action--publish" href="/angebote/sichtbar-werden/">
           <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
           <span>Als Aktivität sichtbar werden</span>
         </a>
-        <!-- === END BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 === -->
 
         <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
           <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
@@ -202,43 +257,7 @@ Umfang:
         </button>
       </div>
     </div>
-    <!-- === END BLOCK: ACTIVITIES_DESKTOP_HERO_CONTROL_PARITY_V1 === -->
-    </div>
-  </section>
-
-  <div class="filter-sheet" id="sheet-situation" role="dialog" aria-modal="true" aria-label="Merkmal auswählen" hidden>
-    <div class="filter-sheet__overlay" data-close-sheet></div>
-    <div class="filter-sheet__card">
-      <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Merkmal</div>
-<button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
-      </div>
-      <div class="filter-sheet__body" id="sheet-situation-options">
-        <button type="button" class="filter-sheet-option is-active" data-situation="">Alle</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
-    <div class="filter-sheet__overlay" data-close-sheet></div>
-    <div class="filter-sheet__card">
-      <div class="filter-sheet__header">
-        <div class="filter-sheet__title">Kategorie</div>
-<button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
-      </div>
-      <div class="filter-sheet__body" id="sheet-category-options">
-        <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="popover-situation" class="filter-popover" hidden>
-    <div class="filter-popover__panel" id="popover-situation-options" aria-label="Merkmal auswählen"></div>
-  </div>
-
-  <div id="popover-offer-category" class="filter-popover" hidden>
-    <div class="filter-popover__panel" id="popover-offer-category-options" aria-label="Kategorie auswählen"></div>
-  </div>
+    <!-- === END BLOCK: ACTIVITIES_FINDER_HTML_V1 === -->
   <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
