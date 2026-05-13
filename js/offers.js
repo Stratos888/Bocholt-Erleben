@@ -711,7 +711,37 @@ const OfferCards = (() => {
     }
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 | Zweck: reicht Card-Indizes an die Bildlogik weiter, damit erste sichtbare Bilder priorisiert laden | Umfang: ersetzt nur render(offers) + Return-Zeile === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 | Zweck: rendert den Aktivitäts-Funnel-Einstieg auf Mobile als Feed-Card im Stil der Event-veröffentlichen-Card statt als Hero-Service-Button; Umfang: ersetzt render(offers) + Return-Zeile und ergänzt createActivityPresenceEntry() === */
+  function createActivityPresenceEntry() {
+    const link = document.createElement("a");
+    link.className = "feed-publish-entry activity-presence-feed-entry";
+    link.href = "/angebote/sichtbar-werden/";
+    link.setAttribute("aria-label", "Für Anbieter – als Aktivität sichtbar werden");
+
+    const label = document.createElement("span");
+    label.className = "feed-publish-entry__label";
+    label.textContent = "Für Anbieter";
+
+    const main = document.createElement("span");
+    main.className = "feed-publish-entry__main";
+
+    const title = document.createElement("span");
+    title.className = "feed-publish-entry__title";
+    title.textContent = "Als Aktivität sichtbar werden";
+
+    const chevron = document.createElement("span");
+    chevron.className = "feed-publish-entry__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = window.Icons?.svg
+      ? window.Icons.svg("chevron-right", { className: "feed-publish-entry__chevron-svg" })
+      : "";
+
+    main.append(title, chevron);
+    link.append(label, main);
+
+    return link;
+  }
+
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -741,11 +771,14 @@ const OfferCards = (() => {
 
     list.forEach((offer, index) => {
       target.appendChild(createCard(offer, index));
+      if (index === 0) {
+        target.appendChild(createActivityPresenceEntry());
+      }
     });
   }
 
   return { render, renderSkeleton };
-  /* === END BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 === */
+  /* === END BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 === */
   /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();
 
