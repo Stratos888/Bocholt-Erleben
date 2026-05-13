@@ -530,7 +530,6 @@ try {
             'submission_kind' => $submissionKind,
         ]);
     }
-    }
     be_json_response(201, [
         'status' => 'ok',
         'data' => [
