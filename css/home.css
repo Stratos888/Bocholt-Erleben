@@ -3019,4 +3019,355 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 }
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
+/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V1 | Zweck: gestaltet den neuen semantischen Aktivitäten-Finder mit Schnellfiltern, aktiven Chips, Trefferzahl und ausklappbaren weiteren Filtern; Umfang: nur /angebote/ Finder-UI, keine Event-Filter, keine Card-Struktur === */
+body.page-route-activities .activity-finder{
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__search-row{
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__search-slot{
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle{
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
+  transition: transform 160ms ease;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle.is-active .filter-pill__chevron{
+  transform: rotate(90deg);
+}
+
+body.page-route-activities .activity-finder__quick{
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__quick-label,
+body.page-route-activities .activity-finder__active-label,
+body.page-route-activities .activity-finder__group-title{
+  margin: 0;
+  color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
+  font-size: 0.72rem;
+  font-weight: 780;
+  line-height: 1.15;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.page-route-activities .activity-finder__quick-options,
+body.page-route-activities .activity-finder__group-options,
+body.page-route-activities .activity-finder__active-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+}
+
+body.page-route-activities .activity-filter-chip,
+body.page-route-activities .activity-active-chip{
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 86%, transparent 14%);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--home-action-bg-start, #fff) 88%, rgba(248,250,243,0.78) 12%) 0%,
+    color-mix(in srgb, var(--home-action-bg-end, #f4f6ee) 86%, rgba(248,250,243,0.68) 14%) 100%
+  );
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 84%, var(--brand-gold-300, #b69b4c) 16%);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 680;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.68) inset,
+    0 2px 6px rgba(12,24,16,0.012);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+body.page-route-activities .activity-filter-chip.is-active{
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 24%, var(--home-action-border, rgba(24,40,30,0.14)) 76%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--brand-green-900, #18281e) 10%, rgba(255,255,255,0.94) 90%) 0%,
+    color-mix(in srgb, var(--brand-green-900, #18281e) 8%, rgba(244,248,238,0.94) 92%) 100%
+  );
+  color: var(--brand-green-900, #18281e);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.78) inset,
+    0 4px 10px rgba(12,24,16,0.03);
+}
+
+body.page-route-activities .activity-filter-chip.is-disabled,
+body.page-route-activities .activity-filter-chip[disabled]{
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+body.page-route-activities .activity-filter-chip:focus-visible,
+body.page-route-activities .activity-active-chip:focus-visible{
+  outline: 2px solid var(--cmp-btn-focus-ring, rgba(111,135,88,0.42));
+  outline-offset: 2px;
+}
+
+body.page-route-activities .activity-filter-chip:active,
+body.page-route-activities .activity-active-chip:active{
+  transform: translateY(1px);
+}
+
+body.page-route-activities .activity-active-chip{
+  min-height: 30px;
+  padding-inline: 10px;
+  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 18%, var(--home-action-border, rgba(24,40,30,0.14)) 82%);
+  background: rgba(255,255,255,0.72);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+body.page-route-activities .activity-finder__status-row{
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__result-count{
+  color: color-mix(in srgb, var(--home-copy-muted, #546459) 90%, var(--brand-green-900, #18281e) 10%);
+  font-size: 0.83rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+body.page-route-activities .activity-finder__active{
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__active[hidden],
+body.page-route-activities .activity-finder__advanced[hidden]{
+  display: none !important;
+}
+
+body.page-route-activities .activity-finder__advanced{
+  min-width: 0;
+}
+
+body.page-route-activities .activity-finder__advanced-inner{
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.76) 0%,
+    rgba(248,250,243,0.62) 100%
+  );
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 5px 14px rgba(12,24,16,0.018);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+body.page-route-activities .activity-finder__group{
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+@media (hover: hover){
+  body.page-route-activities .activity-filter-chip:not([disabled]):hover,
+  body.page-route-activities .activity-active-chip:hover{
+    border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 18%, var(--home-action-border, rgba(24,40,30,0.14)) 82%);
+    background: rgba(255,255,255,0.88);
+    color: var(--brand-green-900, #18281e);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.82) inset,
+      0 5px 12px rgba(12,24,16,0.028);
+  }
+}
+
+@media (max-width: 899.98px){
+  body.page-route-activities .activity-finder{
+    display: grid;
+    gap: 12px;
+  }
+
+  body.page-route-activities .activity-finder__search-row{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--cmp-input-minh, 48px);
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  body.page-route-activities .activity-finder__search-slot{
+    grid-column: 1 / -1;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle{
+    grid-column: 1;
+    width: 100%;
+  }
+
+  body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
+    grid-column: 2;
+    width: var(--cmp-input-minh, 48px);
+    min-width: var(--cmp-input-minh, 48px);
+  }
+
+  body.page-route-activities .activity-finder__quick-options,
+  body.page-route-activities .activity-finder__active-list{
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+    padding-bottom: 1px;
+  }
+
+  body.page-route-activities .activity-finder__quick-options::-webkit-scrollbar,
+  body.page-route-activities .activity-finder__active-list::-webkit-scrollbar{
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder__advanced-inner{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__actions{
+    display: none;
+  }
+}
+
+@media (min-width: 900px){
+  body.page-route-activities .top-stack.activity-finder{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
+    grid-template-areas:
+      "search actions"
+      "quick actions"
+      "status actions"
+      "advanced advanced";
+    grid-template-rows: auto auto auto auto;
+    column-gap: 8px;
+    row-gap: 8px;
+    align-items: start;
+  }
+
+  body.page-route-activities .activity-finder > .activity-finder__search-row{
+    grid-area: search;
+    grid-column: auto;
+    grid-row: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(168px, 210px);
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(168px, 210px) var(--desktop-reset-w, 42px);
+  }
+
+  body.page-route-activities .activity-finder__search-row > .activity-finder__search-slot,
+  body.page-route-activities .activity-finder__search-row.has-active-filter-reset > .activity-finder__search-slot{
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle{
+    grid-column: 2;
+    grid-row: 1;
+    height: var(--desktop-search-height, 66px);
+    border-radius: 18px;
+  }
+
+  body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
+    grid-column: 3;
+    grid-row: 1;
+    width: var(--desktop-reset-w, 42px);
+    min-width: var(--desktop-reset-w, 42px);
+    min-height: var(--desktop-search-height, 66px);
+    border-radius: 18px;
+  }
+
+  body.page-route-activities .activity-finder__quick{
+    grid-area: quick;
+    min-width: 0;
+  }
+
+  body.page-route-activities .activity-finder__status-row{
+    grid-area: status;
+    min-width: 0;
+  }
+
+  body.page-route-activities .activity-finder__advanced{
+    grid-area: advanced;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__actions{
+    grid-area: actions;
+    grid-column: auto;
+    grid-row: auto;
+    display: grid;
+    align-self: stretch;
+  }
+
+  body.page-route-activities .activity-finder__quick-options,
+  body.page-route-activities .activity-finder__active-list{
+    flex-wrap: wrap;
+  }
+
+  body.page-route-activities .activity-finder__advanced-inner{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  body.page-route-activities .activity-finder__group-options{
+    align-content: start;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1180px){
+  body.page-route-activities .activity-finder__advanced-inner{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1181px){
+  body.page-route-activities .activity-finder__status-row{
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V1 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
