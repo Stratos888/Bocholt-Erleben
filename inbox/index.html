@@ -744,6 +744,16 @@ Umfang:
     }
     // === END BLOCK: REVIEW_DISPLAY_GERMAN_FORMAT_HELPERS_V2 ===
     /* === BEGIN BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 | Zweck: übersetzt DB-Submission-Status in Review-Aktionen für Vorprüfung, Zahlungsfreigabe und finale Veröffentlichung; Umfang: Statuslabel- und Aktionshelper === */
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_HELPERS_V1 | Zweck: erkennt Aktivitaetspraesenzen und passt Review-Labels ohne neue Inbox-Architektur an; Umfang: ergänzt reine Helper vor getSubmissionReviewState === */
+    function isActivityPresenceItem(item) {
+      return String(item.review_source || "") === "submission_db" && String(item.submission_kind || "") === "activity";
+    }
+
+    function getPrimaryReviewLinkLabel(item) {
+      return isActivityPresenceItem(item) ? "Aktivitätslink öffnen" : "Veranstaltungslink öffnen";
+    }
+    /* === END BLOCK: ACTIVITY_PRESENCE_REVIEW_HELPERS_V1 === */
+
     function getSubmissionReviewState(item) {
       if (String(item.review_source || "") !== "submission_db") {
         return {
@@ -836,6 +846,8 @@ Umfang:
       const dedupeHint = buildDedupeHint(it);
       const submittedAt = formatGermanDateTime(it.created_at);
       const descriptionTitle = String(it.review_source || "") === "submission_db" ? "Beschreibung / Hinweise" : "Beschreibung / extrahierter Text";
+      const isActivityPresence = isActivityPresenceItem(it);
+      const primaryLinkLabel = getPrimaryReviewLinkLabel(it);
 
       const eventUrl = trimValue(it.url);
       const sourceUrl = trimValue(it.source_url);
@@ -843,7 +855,15 @@ Umfang:
       const openSourceDisabled = !sourceUrl;
       /* === END BLOCK: REVIEW_DISPLAY_CURATION_CORE_VALUES_V2 === */
 
-      const rejectOptions = [
+      const rejectOptions = isActivityPresence ? [
+        ["", "Ablehnungsgrund auswählen …"],
+        ["DUBLETTE", "DUBLETTE – Aktivität ist bereits vorhanden oder schon entschieden"],
+        ["KEINE_EIGENSTAENDIGE_AKTIVITAET", "KEINE_EIGENSTAENDIGE_AKTIVITAET – keine sinnvolle eigene Aktivitätskarte"],
+        ["EVENT_STATT_AKTIVITAET", "EVENT_STATT_AKTIVITAET – einzelner Termin statt dauerhafte Aktivität"],
+        ["AUSSERHALB_SCOPE", "AUSSERHALB_SCOPE – außerhalb Radius oder nicht relevant genug"],
+        ["QUELLE_ZU_SCHWACH", "QUELLE_ZU_SCHWACH – Angaben reichen für Prüfung nicht aus"],
+        ["SONSTIGES", "SONSTIGES – nur wenn kein anderer Grund passt"]
+      ] : [
         ["", "Ablehnungsgrund auswählen …"],
         ["DUBLETTE", "DUBLETTE – Event ist bereits vorhanden oder schon entschieden"],
         ["DATUM_FALSCH", "DATUM_FALSCH – Datum falsch oder nicht sicher belegbar"],
@@ -873,7 +893,21 @@ Umfang:
         </div>
       ` : "";
 
-      const infoRows = [
+      const infoRows = (isActivityPresence ? [
+        ["Herkunft", originLabel],
+        ["Review-Status", reviewState.label],
+        ["Zahlungsfreigabe", trimValue(it.payment_released_at) ? formatGermanDateTime(it.payment_released_at) : ""],
+        ["Zahlungslink gültig bis", trimValue(it.payment_start_token_expires_at) ? formatGermanDateTime(it.payment_start_token_expires_at) : ""],
+        ["Zahlung gestartet", trimValue(it.payment_started_at) ? formatGermanDateTime(it.payment_started_at) : ""],
+        ["Verfügbarkeit", timeLine || scheduleDetails],
+        ["Anbieter / Ort", placeLine],
+        ["Adresse/Treffpunkt", trimValue(it.location_address)],
+        ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
+        ["Quelle / Anbieter", sourceLine],
+        ["Eingereicht am", submittedAt],
+        ["Prüfhinweis", curationNote],
+        ["Dubletten-/Importhinweis", dedupeHint]
+      ] : [
         ["Herkunft", originLabel],
         ["Review-Status", reviewState.label],
         ["Zahlungsfreigabe", trimValue(it.payment_released_at) ? formatGermanDateTime(it.payment_released_at) : ""],
@@ -890,7 +924,7 @@ Umfang:
         ["Eingereicht am", submittedAt],
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
-      ].filter(([, value]) => value);
+      ]).filter(([, value]) => value);
 
       const infoRowsHtml = infoRows.map(([label, value]) => `
         <div class="reviewRow">
@@ -914,7 +948,7 @@ Umfang:
           <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
 
           <div class="urlBox">
-            ${eventUrl ? `<div class="urlLine"><strong>Veranstaltungslink:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
+            ${eventUrl ? `<div class="urlLine"><strong>${escapeHtml(primaryLinkLabel.replace(" öffnen", ""))}:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
             ${sourceUrl ? `<div class="urlLine"><strong>Quellenlink:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
           </div>
 
@@ -927,7 +961,7 @@ Umfang:
 
           <!-- === BEGIN BLOCK: REVIEW_ACTION_BUTTONS_WITH_DEFER_V1 | Zweck: ergänzt eine lokale Später-prüfen-Aktion, damit wartende oder unklare Fälle die Review-Reihenfolge nicht blockieren; Umfang: kompletter Aktionsbutton-Block der Review-Karte === -->
           <div class="actions">
-            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>Veranstaltungslink öffnen</button>
+            <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
             <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
             <button id="btnLater" class="btn" type="button">Später prüfen</button>
             <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
@@ -1132,13 +1166,13 @@ Umfang:
 
         if (reviewState.actionMode === "release_payment") {
           await postJson("/api/submissions/release-payment.php", { submission_id: submissionId });
-          setStatus("Submission zur Zahlung freigegeben. Zahlungslink wurde versendet.");
+          setStatus(isActivityPresenceItem(it) ? "Aktivitätspräsenz zur Zahlung freigegeben. Zahlungslink wurde versendet." : "Submission zur Zahlung freigegeben. Zahlungslink wurde versendet.");
           await loadAndShow();
           return;
         }
 
         await postJson("/api/submissions/approve.php", { submission_id: submissionId });
-        setStatus("Submission veröffentlicht. Verbrauch wurde gebucht.");
+        setStatus(isActivityPresenceItem(it) ? "Aktivitätspräsenz veröffentlicht. Verbrauch wurde gebucht." : "Submission veröffentlicht. Verbrauch wurde gebucht.");
         await loadAndShow();
         return;
       }
