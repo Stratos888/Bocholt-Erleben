@@ -292,12 +292,16 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
             organizer_edited_at,
             organizer_edit_count,
             created_at,
+            updated_at
+         FROM submissions
          WHERE organizer_id = :organizer_id
            AND submission_kind IN ("event", "activity")
            AND (
                 status IN ("pending_review", "payment_released", "draft", "checkout_started", "paid", "in_review", "approved", "rejected")
                 OR (submission_kind = "event" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
            )
+         ORDER BY
+            COALESCE(created_at, updated_at, paid_at, approved_at, rejected_at) DESC,
             id DESC
          LIMIT 10'
     );
