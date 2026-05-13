@@ -114,7 +114,6 @@ function sr_send_rejection_mail(array $submission, ?string $reason): void
         'Referenz: ' . $reference,
     ];
     /* === END BLOCK: ACTIVITY_PRESENCE_REJECTION_MAIL_COPY_V1 === */
-    ];
 
     if ($reason !== null && trim($reason) !== '') {
         $bodyLines[] = '';
