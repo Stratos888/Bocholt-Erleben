@@ -48,7 +48,6 @@ function swh_notify_paid_event_submission_inbox_best_effort(PDO $pdo, int $submi
                AND status = "paid"
              LIMIT 1'
         );
-        );
         $statement->execute([':submission_id' => $submissionId]);
 
         if (!$statement->fetch(PDO::FETCH_ASSOC)) {
