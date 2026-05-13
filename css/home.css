@@ -2103,6 +2103,381 @@
       0 1px 2px rgba(12,24,18,0.022);
   }
 }
+  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_TOP_SHELL_95_PARITY_V1 | Zweck: überträgt den finalen Desktop-Top-Shell-Contract der Events-Seite auf /angebote/: Suche über Filtern links, identische Service-Rail rechts, gleicher lokaler Hero-Textschutz; Umfang: nur Desktop-Aktivitäten ab 1024px, keine Mobile- oder Kartenstruktur-Änderung === */
+  body.page-route-activities{
+    --desktop-search-height: 66px;
+    --desktop-filter-height: 50px;
+    --desktop-service-action-height: 38px;
+    --desktop-service-action-gap: 5px;
+    --desktop-panel-gap: 8px;
+    --desktop-reset-w: 42px;
+    --desktop-service-rail-w: clamp(214px, 19.5vw, 232px);
+  }
+
+  body.page-route-activities .desktop-hero{
+    min-height: 412px;
+    padding-bottom: 16px;
+  }
+
+  body.page-route-activities .desktop-hero::before{
+    filter:
+      blur(var(--hero-bg-blur-active))
+      saturate(1.055)
+      brightness(0.974)
+      contrast(1.064);
+  }
+
+  body.page-route-activities .desktop-hero::after{
+    background:
+      linear-gradient(
+        90deg,
+        rgba(243,246,240,0.30) 0%,
+        rgba(243,246,240,0.19) 5%,
+        rgba(243,246,240,0.078) 10%,
+        rgba(243,246,240,0.018) 15%,
+        rgba(243,246,240,0.00) 21%
+      ),
+      radial-gradient(
+        34% 62% at 10% 28%,
+        rgba(247,249,243,0.052) 0%,
+        rgba(247,249,243,0.016) 42%,
+        rgba(247,249,243,0.00) 72%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(247,249,244,0.00) 0%,
+        rgba(247,249,244,0.00) 58%,
+        rgba(233,237,220,0.055) 79%,
+        rgba(233,237,220,0.135) 92%,
+        rgba(233,237,220,0.235) 100%
+      ),
+      radial-gradient(circle at 72% 18%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 17%);
+  }
+
+  body.page-route-activities .desktop-entry__content::before{
+    inset: -8px -12px -9px -8px;
+    border-radius: 19px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(238,242,231,0.60) 0%,
+        rgba(238,242,231,0.50) 28%,
+        rgba(237,241,230,0.31) 52%,
+        rgba(236,240,229,0.12) 69%,
+        rgba(236,240,229,0.018) 83%,
+        rgba(236,240,229,0.00) 91%
+      ),
+      radial-gradient(
+        78% 104% at 13% 40%,
+        rgba(240,244,234,0.30) 0%,
+        rgba(239,243,232,0.13) 44%,
+        rgba(238,242,231,0.034) 67%,
+        rgba(238,242,231,0.00) 84%
+      );
+    filter: blur(2.4px);
+  }
+
+  body.page-route-activities .desktop-entry__text{
+    color: rgba(7,22,15,0.99);
+    font-weight: 655;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 10px rgba(247,250,243,0.20);
+  }
+
+  body.page-route-activities .top-stack{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--desktop-service-rail-w);
+    grid-template-rows: var(--desktop-search-height) var(--desktop-filter-height);
+    column-gap: 8px;
+    row-gap: var(--desktop-panel-gap);
+    align-items: stretch;
+    gap: var(--desktop-panel-gap) 8px;
+  }
+
+  body.page-route-activities .top-stack::before{
+    inset: -2px -3px -4px -3px;
+    background: radial-gradient(
+      108% 118% at 12% 12%,
+      rgba(250,252,247,0.055) 0%,
+      rgba(248,250,243,0.018) 34%,
+      rgba(246,249,240,0.00) 72%
+    );
+    filter: blur(4px);
+  }
+
+  body.page-route-activities .desktop-hero__search-row{
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: var(--desktop-search-height) var(--desktop-filter-height);
+    gap: var(--desktop-panel-gap);
+    align-items: stretch;
+  }
+
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--desktop-reset-w);
+  }
+
+  body.page-route-activities .desktop-hero__search-row::before{
+    inset: -2px -3px -2px -3px;
+    border-radius: 18px;
+    background: radial-gradient(
+      110% 134% at 18% 8%,
+      rgba(251,252,248,0.034) 0%,
+      rgba(249,251,245,0.010) 38%,
+      rgba(247,250,242,0.00) 70%
+    );
+    filter: blur(3px);
+  }
+
+  body.page-route-activities .desktop-hero__search-row > .desktop-hero__search-slot,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot{
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  body.page-route-activities .desktop-hero__search-row > #offer-situation-pill,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > #offer-situation-pill{
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  body.page-route-activities .desktop-hero__search-row > #offer-category-pill,
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > #offer-category-pill{
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  body.page-route-activities .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset{
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  body.page-route-activities .top-stack #search-filter{
+    height: var(--desktop-search-height);
+    padding-left: 52px;
+    border-color: color-mix(in srgb, var(--home-toolbar-border) 82%, rgba(24,40,30,0.12) 18%);
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-toolbar-bg-start) 92%, white 8%) 0%,
+      color-mix(in srgb, var(--home-toolbar-bg-end) 94%, rgba(248,250,243,0.86) 6%) 100%
+    );
+    color: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
+    font-size: 1rem;
+    font-weight: 630;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.86) inset,
+      0 7px 16px rgba(12,24,16,0.032);
+  }
+
+  body.page-route-activities .top-stack #search-filter::placeholder{
+    color: color-mix(in srgb, var(--home-copy-muted) 84%, white 16%);
+    font-weight: 600;
+  }
+
+  body.page-route-activities .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 21px;
+    width: 19px;
+    height: 19px;
+    color: rgba(48,72,58,0.78);
+  }
+
+  body.page-route-activities .desktop-hero__toolbar-pill{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    height: var(--desktop-filter-height);
+    padding: 0 13px;
+    gap: 6px;
+    border-radius: 16px;
+    border-color: color-mix(in srgb, var(--home-action-border) 88%, rgba(24,40,30,0.08) 12%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(248,250,243,0.70) 10%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.66) 16%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.68) inset,
+      0 2px 6px rgba(12,24,16,0.010);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+  }
+
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label{
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: 0;
+    color: color-mix(in srgb, var(--home-copy-muted) 94%, var(--home-copy-body) 6%);
+    font-size: 0.76rem;
+    font-weight: 690;
+    line-height: 1;
+    letter-spacing: -0.006em;
+    white-space: nowrap;
+  }
+
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__label::after{
+    content: "·";
+    margin-left: 6px;
+    color: color-mix(in srgb, var(--home-copy-muted) 66%, transparent 34%);
+    font-size: 0.76rem;
+    font-weight: 640;
+  }
+
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__value{
+    flex: 1 1 auto;
+    min-width: 0;
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    font-size: 0.86rem;
+    font-weight: 705;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body.page-route-activities .desktop-hero__toolbar-pill .filter-pill__chevron{
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    color: color-mix(in srgb, var(--brand-green-900) 76%, var(--brand-gold-300) 24%);
+    opacity: 0.72;
+  }
+
+  body.page-route-activities .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--desktop-reset-w);
+    min-width: var(--desktop-reset-w);
+    min-height: var(--desktop-filter-height);
+    align-self: stretch;
+    justify-self: stretch;
+    border-radius: 15px;
+    border-color: color-mix(in srgb, var(--home-action-border) 90%, rgba(24,40,30,0.10) 10%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 94%, rgba(248,250,243,0.76) 6%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 88%, rgba(248,250,243,0.74) 12%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 3px 8px rgba(12,24,16,0.014);
+  }
+
+  body.page-route-activities .desktop-hero__actions{
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(3, var(--desktop-service-action-height));
+    gap: var(--desktop-service-action-gap);
+    align-self: stretch;
+    align-content: stretch;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  body.page-route-activities .desktop-hero__action,
+  body.page-route-activities .desktop-hero__action:link,
+  body.page-route-activities .desktop-hero__action:visited,
+  body.page-route-activities .desktop-hero__action--publish,
+  body.page-route-activities .desktop-hero__action--publish:link,
+  body.page-route-activities .desktop-hero__action--publish:visited,
+  body.page-route-activities .desktop-hero__action--info,
+  body.page-route-activities .desktop-hero__action--info:link,
+  body.page-route-activities .desktop-hero__action--info:visited,
+  body.page-route-activities .desktop-hero__action--app,
+  body.page-route-activities .desktop-hero__action--app:link,
+  body.page-route-activities .desktop-hero__action--app:visited{
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: var(--desktop-service-action-height);
+    padding: 0 12px;
+    gap: 7px;
+    border-radius: 12px;
+    border-color: color-mix(in srgb, var(--home-action-border) 78%, transparent 22%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 80%, rgba(248,250,243,0.56) 20%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 76%, rgba(248,250,243,0.52) 24%) 100%
+    );
+    color: color-mix(in srgb, var(--home-copy-muted) 88%, var(--home-copy-body) 12%);
+    -webkit-text-fill-color: color-mix(in srgb, var(--home-copy-muted) 88%, var(--home-copy-body) 12%);
+    font-size: 0.77rem;
+    font-weight: 625;
+    line-height: 1;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.58) inset,
+      0 2px 5px rgba(12,24,16,0.008);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 1;
+  }
+
+  body.page-route-activities .desktop-hero__action .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action--publish .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action--info .desktop-hero__icon,
+  body.page-route-activities .desktop-hero__action--app .desktop-hero__icon{
+    width: 15px;
+    height: 15px;
+    opacity: 0.76;
+  }
+
+  body.page-route-activities .desktop-hero__action span:last-child{
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (hover: hover){
+    body.page-route-activities .desktop-hero__action:hover{
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(24,40,30,0.12) 14%);
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(255,255,255,0.82) 10%) 0%,
+        color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.72) 16%) 100%
+      );
+      color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.72) inset,
+        0 5px 12px rgba(12,24,16,0.026);
+    }
+  }
+
+  body.page-route-activities .events-section{
+    margin-top: -10px;
+    padding-top: 13px;
+    border-radius: 22px 22px 0 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,243,231,0.145) 0%,
+        rgba(233,237,220,0.065) 32px,
+        rgba(233,237,220,0.00) 78px
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-rail-bg-start) 92%, rgba(247,249,244,0.82) 8%) 0%,
+        var(--home-rail-bg-end) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 88%, rgba(219,226,203,0.988) 12%) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 10px 18px rgba(247,249,242,0.05);
+  }
+  /* === END BLOCK: ACTIVITIES_DESKTOP_TOP_SHELL_95_PARITY_V1 === */
+}
 /* === END BLOCK: DESKTOP_HOME_TOP_SHELL_95_FINAL_POLISH_V1 === */
 /* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
