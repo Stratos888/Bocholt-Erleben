@@ -530,6 +530,7 @@ const OffersApp = {
     return score;
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_CONTEXT_V1 | Zweck: gibt den Activity-Cards die aktuell passenden aktiven Filter als sichtbare Passungsbegründung mit; Umfang: erweitert Relevanzsortierung um Render-Kontext, ohne Filterlogik zu verändern === */
   sortByRelevance(offers) {
     return [...offers].sort((a, b) => {
       const scoreDelta = this.rankOffer(b) - this.rankOffer(a);
@@ -537,6 +538,30 @@ const OffersApp = {
       return (a.sortIndex || 0) - (b.sortIndex || 0);
     });
   },
+
+  getActiveMatchLabels(offer) {
+    const orderedGroups = ["situation", "features", "proximity", "activity_type", "effort"];
+    const labels = [];
+
+    orderedGroups.forEach((group) => {
+      const available = new Set(this.getOfferFilterValues(offer, group));
+      this.getActiveValues(group).forEach((value) => {
+        if (available.has(value)) {
+          labels.push(value);
+        }
+      });
+    });
+
+    return Array.from(new Set(labels)).slice(0, 3);
+  },
+
+  withRenderedMatchContext(offer) {
+    return {
+      ...offer,
+      activeMatchLabels: this.getActiveMatchLabels(offer)
+    };
+  },
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_CONTEXT_V1 === */
 
   renderActiveFilterChips() {
     const { activeFilters, activeFilterList } = this.refs;
@@ -639,7 +664,7 @@ const OffersApp = {
 
     this.updateFinderUI();
     this.showLoading(false);
-    window.OfferCards.render(this.filteredOffers);
+    window.OfferCards.render(this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer)));
   },
   /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_OWNER_V1 === */
 
