@@ -134,6 +134,7 @@ try {
         $locationName = trim((string)($row['location_name'] ?? ''));
         $status = (string)($row['status'] ?? '');
 
+        $items[] = [
             /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_ITEM_META_V1 | Zweck: gibt Submission-Art und passendes Herkunftslabel an die Review-Inbox weiter; Umfang: ersetzt Meta-Felder im items-Array === */
             'review_source' => 'submission_db',
             'submission_id' => (int)$row['id'],
