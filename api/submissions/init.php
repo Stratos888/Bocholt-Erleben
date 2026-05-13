@@ -257,19 +257,27 @@ function pf_send_submission_received_mail(array $submissionData): void
         return;
     }
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 | Zweck: unterscheidet Eingangsbestätigung für Einzeltermin und Aktivitaetspraesenz; Umfang: ersetzt Mail-Body und Betreff in pf_send_submission_received_mail === */
     $title = trim((string)($submissionData['title'] ?? ''));
     $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+    $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
     $body = implode("\n", [
         'Hallo,',
         '',
-        'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
+        $isActivity
+            ? 'deine Aktivität wurde bei Bocholt erleben zur Prüfung eingereicht.'
+            : 'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
         '',
-        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
         'Referenz: ' . $reference,
         '',
-        'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
-        'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
+        $isActivity
+            ? 'Wir prüfen jetzt, ob die Aktivität grundsätzlich zu Bocholt erleben passt und als eigene Aktivitätskarte sinnvoll ist.'
+            : 'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
+        $isActivity
+            ? 'Wenn die Aktivität grundsätzlich passt, erhältst du anschließend einen Zahlungslink für die Aktivitätspräsenz.'
+            : 'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
         'Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach redaktioneller Freigabe.',
         '',
         'Viele Grüße',
@@ -277,7 +285,12 @@ function pf_send_submission_received_mail(array $submissionData): void
     ]);
 
     try {
-        be_send_mail($to, 'Deine Veranstaltung wurde zur Prüfung eingereicht', $body);
+        be_send_mail(
+            $to,
+            $isActivity ? 'Deine Aktivität wurde zur Prüfung eingereicht' : 'Deine Veranstaltung wurde zur Prüfung eingereicht',
+            $body
+        );
+    /* === END BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 === */
     } catch (Throwable $error) {
         error_log('Submission received mail failed: ' . $error->getMessage());
     }
@@ -514,7 +527,9 @@ try {
             'email' => $emailInput,
             'title' => $title,
             'payment_reference_key' => $paymentReferenceKey,
+            'submission_kind' => $submissionKind,
         ]);
+    }
     }
     be_json_response(201, [
         'status' => 'ok',
