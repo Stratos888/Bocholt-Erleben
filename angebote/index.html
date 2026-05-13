@@ -65,7 +65,7 @@ Zweck:
 Umfang:
 - Ersetzt nur den stylesheet-link
 === -->
-<link rel="stylesheet" href="/css/style.css?v=2026-05-06-header-hub-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-13-activity-feed-entry-2">
 <!-- === END BLOCK: CSS LINK ENTERPRISE V2 (consistent cache-busting) === -->
 <!-- === END BLOCK: ACTIVITIES_HEAD_SEO_SOCIAL_SCHEMA_V1 === -->
 </head>
@@ -175,12 +175,12 @@ Umfang:
         </button>
       </div>
 
-        <!-- === BEGIN BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V1 | Zweck: ergänzt den neuen Aktivitäten-Funnel als Einstieg auf der Aktivitätenseite; Umfang: ersetzt den bisherigen ersten Service-Link === -->
+      <div class="desktop-hero__actions" aria-label="Service">
+        <!-- === BEGIN BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 | Zweck: hält den Aktivitäten-Funnel als Desktop-Service-Action, während Mobile den Einstieg als Feed-Card rendert; Umfang: vollständiger Service-Action-Wrapper === -->
         <a class="desktop-hero__action desktop-hero__action--publish" href="/angebote/sichtbar-werden/">
           <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
           <span>Als Aktivität sichtbar werden</span>
         </a>
-        <!-- === END BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V1 === -->
 
         <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
           <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
@@ -196,6 +196,7 @@ Umfang:
           <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="smartphone" aria-hidden="true"></span>
           <span>Als App nutzen</span>
         </button>
+        <!-- === END BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 === -->
       </div>
     </div>
   </section>
