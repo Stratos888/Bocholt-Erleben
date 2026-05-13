@@ -185,18 +185,15 @@
 
       try {
         const result = await postJson("/api/submissions/init.php", buildFunnelPayload(form));
-        const submissionId = result?.data?.submission_id;
-        setStatus(
-          statusNode,
-          submissionId
-            ? `Einreichung gespeichert. Wir prüfen die Eignung und senden dir bei Freigabe den Zahlungsstart per E-Mail. Referenz: #${submissionId}`
-            : "Einreichung gespeichert. Wir prüfen die Eignung und senden dir bei Freigabe den Zahlungsstart per E-Mail.",
-          "ok"
-        );
-        statusNode?.scrollIntoView({ block: "center", behavior: "smooth" });
+        const submissionRef = result?.data?.payment_reference_key || "";
+        const targetUrl = new URL("/angebote/sichtbar-werden/erfolg/", window.location.origin);
+        targetUrl.searchParams.set("flow", "submitted");
+        if (submissionRef) {
+          targetUrl.searchParams.set("submission_ref", submissionRef);
+        }
+        window.location.href = targetUrl.toString();
       } catch (error) {
         setStatus(statusNode, error && error.message ? error.message : "Einreichung konnte nicht gespeichert werden.", "error");
-      } finally {
         setBusy(submitButton, false);
       }
     });
