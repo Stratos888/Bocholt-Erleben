@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_HEAD_V1 | Zweck: Erfolgsseite nach Zahlung einer Aktivitaetspraesenz; Umfang: kompletter Head === -->
+<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_HEAD_V2 | Zweck: Zustandsfaehige Erfolgsseite fuer Aktivitaetseinreichung und Zahlung; Umfang: kompletter Head === -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#F3F2E6">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
-<link rel="stylesheet" href="/css/style.css?v=2026-05-13-activity-presence-1">
-<title>Zahlung erhalten – Aktivitätspräsenz</title>
-<!-- === END BLOCK: ACTIVITY_SUCCESS_HEAD_V1 === -->
+<link rel="stylesheet" href="/css/style.css?v=2026-05-13-activity-success-state-1">
+<title>Aktivität eingereicht – Bocholt erleben</title>
+<!-- === END BLOCK: ACTIVITY_SUCCESS_HEAD_V2 === -->
 </head>
 <body>
-<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_BODY_V1 | Zweck: bestaetigt Zahlung und erklaert den naechsten redaktionellen Schritt; Umfang: kompletter Body === -->
+<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_BODY_V2 | Zweck: unterscheidet Aktivitaet eingereicht, Zahlung erhalten und bestehende Aktivitaetspraesenz; Umfang: kompletter Body === -->
 <header class="app-header">
   <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
     <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
@@ -22,20 +22,78 @@
 </header>
 
 <main class="page page--publish">
-  <section class="content-card">
+  <header class="content-hero content-hero--panel">
     <p class="content-kicker">Aktivitätspräsenz</p>
-    <h1>Zahlung erhalten</h1>
-    <p class="content-lead">Die Zahlung wurde über Stripe abgeschlossen. Deine Aktivität geht jetzt in die redaktionelle Aufbereitung und finale Prüfung.</p>
-    <p class="content-note">Die Belegung im Tarif zählt erst ab Veröffentlichung. Den Status findest du im Anbieterbereich.</p>
+    <h1 id="activity-success-title">Aktivität eingereicht</h1>
+    <p class="content-lead" id="activity-success-lead">Wir prüfen jetzt, ob die Aktivität grundsätzlich zu Bocholt erleben passt und als eigene Aktivitätskarte sinnvoll ist.</p>
+    <p class="content-note" id="activity-success-note">Wenn die Aktivität grundsätzlich passt, erhältst du anschließend per E-Mail einen Zahlungslink für die Aktivitätspräsenz.</p>
     <div class="content-actions content-actions--inline">
-      <a class="content-cta content-cta--primary" href="/fuer-veranstalter/login/">Bereich öffnen</a>
+      <a class="content-cta content-cta--primary" id="activity-success-cta" href="/angebote/sichtbar-werden/">Weitere Aktivität einreichen</a>
       <a class="content-cta content-cta--secondary" href="/angebote/">Zur Aktivitätenseite</a>
+    </div>
+  </header>
+
+  <section class="content-card content-card--primary" aria-labelledby="activity-success-next-steps-title">
+    <h2 id="activity-success-next-steps-title">Nächste Schritte</h2>
+    <div id="activity-success-steps">
+      <p>1. Redaktionelle Vorprüfung der Aktivität.</p>
+      <p>2. Zahlungslink bei grundsätzlicher Freigabe.</p>
+      <p>3. Zahlung, finale Aufbereitung und Veröffentlichung.</p>
     </div>
   </section>
 </main>
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
-<!-- === END BLOCK: ACTIVITY_SUCCESS_BODY_V1 === -->
+<script>
+  /* === BEGIN BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_V1 | Zweck: setzt Texte fuer eingereichte Aktivitaet, Zahlung und bestehende Aktivitaetspraesenz passend zum Funnelstatus; Umfang: kompletter zustandsabhaengiger Text-Switch === */
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const flow = String(params.get("flow") || "").trim().toLowerCase();
+    const hasSession = Boolean(String(params.get("session_id") || "").trim());
+
+    const title = document.getElementById("activity-success-title");
+    const lead = document.getElementById("activity-success-lead");
+    const note = document.getElementById("activity-success-note");
+    const cta = document.getElementById("activity-success-cta");
+    const steps = document.getElementById("activity-success-steps");
+
+    if (flow === "submitted") {
+      document.title = "Aktivität eingereicht | Bocholt erleben";
+      return;
+    }
+
+    if (flow === "existing-subscription") {
+      if (title) title.textContent = "Aktivität eingereicht";
+      if (lead) lead.textContent = "Für diese Einreichung war keine neue Zahlung nötig. Sie läuft über deine aktive Aktivitätspräsenz.";
+      if (note) note.textContent = "Wir prüfen und bereiten die Aktivität final auf. Erst nach Veröffentlichung zählt sie im aktuellen Zeitraum.";
+      if (cta) {
+        cta.textContent = "Bereich öffnen";
+        cta.href = "/fuer-veranstalter/login/";
+      }
+      if (steps) {
+        steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Aktivitätspräsenz.</p><p>2. Wir prüfen und bereiten die Angaben redaktionell auf.</p><p>3. Nach Freigabe wird die Aktivität veröffentlicht.</p>";
+      }
+      document.title = "Aktivität eingereicht | Bocholt erleben";
+      return;
+    }
+
+    if (hasSession) {
+      if (title) title.textContent = "Zahlung erhalten";
+      if (lead) lead.textContent = "Die Zahlung wurde über Stripe abgeschlossen. Deine Aktivität geht jetzt in die redaktionelle Aufbereitung und finale Prüfung.";
+      if (note) note.textContent = "Die Belegung im Tarif zählt erst ab Veröffentlichung. Den Status findest du im Anbieterbereich.";
+      if (cta) {
+        cta.textContent = "Bereich öffnen";
+        cta.href = "/fuer-veranstalter/login/";
+      }
+      if (steps) {
+        steps.innerHTML = "<p>1. Zahlung wurde bestätigt.</p><p>2. Redaktionelle Aufbereitung und finale Prüfung.</p><p>3. Veröffentlichung nach Freigabe.</p>";
+      }
+      document.title = "Zahlung erhalten | Bocholt erleben";
+    }
+  })();
+  /* === END BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_V1 === */
+</script>
+<!-- === END BLOCK: ACTIVITY_SUCCESS_BODY_V2 === -->
 </body>
 </html>
