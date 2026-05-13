@@ -58,13 +58,17 @@
       single: "Einzeltermin",
       starter: "Starter",
       active: "Aktiv",
-      unlimited: "Dauerhaft"
+      unlimited: "Dauerhaft",
+      activity_basic: "Aktivitätspräsenz Basis",
+      activity_plus: "Aktivitätspräsenz Plus"
     })[key] || "–";
   }
 
   function formatStatusLabel(status) {
     const key = safeText(status).toLowerCase();
     return ({
+      pending_review: "Eingereicht",
+      payment_released: "Zur Zahlung freigegeben",
       draft: "Entwurf",
       checkout_started: "Zahlung gestartet",
       paid: "Einreichung erhalten",
@@ -77,6 +81,16 @@
   function formatSubmissionStatusLabel(submission) {
     const statusKey = safeText(submission?.status).toLowerCase();
     const paymentKind = safeText(submission?.payment_kind).toLowerCase();
+    const submissionKind = safeText(submission?.submission_kind || "event").toLowerCase();
+
+    if (submissionKind === "activity") {
+      if (statusKey === "pending_review") return "Aktivität eingereicht";
+      if (statusKey === "payment_released") return "Zahlung freigegeben";
+      if (statusKey === "checkout_started") return "Zahlung gestartet";
+      if (statusKey === "paid" || statusKey === "in_review") return "Aktivität bezahlt – in Prüfung";
+      if (statusKey === "approved") return "Aktivität veröffentlicht";
+      if (statusKey === "rejected") return "Aktivität abgelehnt";
+    }
 
     if (statusKey === "paid" && paymentKind === "subscription") {
       return "Veranstaltung eingereicht";
@@ -138,6 +152,24 @@ function formatSubmissionMetaDate(submission) {
 function formatSubmissionStatusDescription(submission) {
   const statusKey = safeText(submission?.status).toLowerCase();
   const paymentKind = safeText(submission?.payment_kind).toLowerCase();
+  const submissionKind = safeText(submission?.submission_kind || "event").toLowerCase();
+
+  if (submissionKind === "activity") {
+    if (statusKey === "pending_review") return "Die Aktivität wurde eingereicht und wird auf Eignung geprüft.";
+    if (statusKey === "payment_released") return "Die Aktivität wurde zur Zahlung freigegeben. Der Zahlungsstart wurde per E-Mail gesendet.";
+    if (statusKey === "checkout_started") return "Die Zahlung wurde gestartet, aber noch nicht vollständig abgeschlossen.";
+    if (statusKey === "paid" || statusKey === "in_review") return "Die Aktivität ist bezahlt und wird redaktionell aufbereitet sowie final geprüft.";
+    if (statusKey === "approved") return "Die Aktivität wurde veröffentlicht.";
+    if (statusKey === "rejected") return "Die Aktivität wurde nicht veröffentlicht.";
+  }
+
+  if (statusKey === "pending_review") {
+    return "Die Einreichung wurde erhalten und wird vor der Zahlung geprüft.";
+  }
+
+  if (statusKey === "payment_released") {
+    return "Die Einreichung wurde zur Zahlung freigegeben. Der Zahlungsstart wurde per E-Mail gesendet.";
+  }
 
   if (statusKey === "draft") {
     return "Die Einreichung wurde begonnen, aber noch nicht abgeschlossen.";
@@ -533,9 +565,9 @@ function normalizeExternalUrl(value) {
     const latestSubmission = submissions[0] || null;
     const defaultPlanKey = safeText(organizer.default_plan_key).toLowerCase();
     const subscriptionPlanKey = safeText(subscription?.plan_key).toLowerCase();
-    const hasManageableSubscription = ["starter", "active", "unlimited"].includes(subscriptionPlanKey);
+    const hasManageableSubscription = ["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(subscriptionPlanKey);
     const effectivePlanKey = hasManageableSubscription ? subscriptionPlanKey : (defaultPlanKey || "single");
-
+    const isActivityPlanView = ["activity_basic", "activity_plus"].includes(effectivePlanKey);
     const latestTitleText = latestSubmission
       ? safeText(latestSubmission.title) || "Ohne Titel"
       : "Noch keine Einreichung";
@@ -543,7 +575,7 @@ function normalizeExternalUrl(value) {
       ? formatStatusLabel(latestSubmission.status)
       : "Noch kein Status";
     const latestDateText = latestSubmission
-      ? formatDate(latestSubmission.start_date)
+      ? formatDate(latestSubmission.start_date || latestSubmission.created_at)
       : "–";
     const latestLocationText = latestSubmission
       ? safeText(latestSubmission.location_name)
@@ -589,7 +621,9 @@ function normalizeExternalUrl(value) {
           ? `${latestStatusText} · ${latestDateText}`
           : "Status deiner Einreichung.";
       } else {
-        lead.textContent = "Hier siehst du deine Mitgliedschaft und letzte Einreichungen.";
+        lead.textContent = isActivityPlanView
+          ? "Hier siehst du deine Aktivitätspräsenz und letzte Einreichungen."
+          : "Hier siehst du deine Mitgliedschaft und letzte Einreichungen.";
       }
     }
 
@@ -605,12 +639,17 @@ function normalizeExternalUrl(value) {
     /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V3 === */
 
     if (dashboardPrimaryCta) {
-      const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
-        ? effectivePlanKey
-        : "single";
+      if (isActivityPlanView) {
+        dashboardPrimaryCta.href = "/angebote/sichtbar-werden/";
+        dashboardPrimaryCta.textContent = "Weitere Aktivität einreichen";
+      } else {
+        const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
+          ? effectivePlanKey
+          : "single";
 
-      dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
-      dashboardPrimaryCta.textContent = isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen";
+        dashboardPrimaryCta.href = `/events-veroeffentlichen/einreichen/?plan=${encodeURIComponent(prefilledPlan)}`;
+        dashboardPrimaryCta.textContent = isSingleStatusView ? "Weitere Veranstaltung einreichen" : "Neue Veranstaltung einreichen";
+      }
     }
 
     if (dashboardActions) {
@@ -666,9 +705,9 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V5 | Zweck: hält Mitgliedschaftsstatus als ruhige Datenzeilen und vermeidet headlineartige Wertzeilen; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V6 | Zweck: unterscheidet Mitgliedschafts- und Aktivitaetspraesenz-Uebersicht im Anbieterbereich; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
 if (quotaHead) {
-  quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Mitgliedschaft";
+  quotaHead.textContent = isSingleStatusView ? "Status" : (isActivityPlanView ? "Übersicht Aktivitätspräsenz" : "Übersicht Mitgliedschaft");
 }
 
 if (quotaPeriod) {
@@ -693,13 +732,13 @@ if (quotaChange) {
     const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
 
     if (cancelAtPeriodEnd && end !== "–") {
-      quotaChange.textContent = `Mitgliedschaft endet zum ${end}`;
+      quotaChange.textContent = `${isActivityPlanView ? "Aktivitätspräsenz" : "Mitgliedschaft"} endet zum ${end}`;
       quotaChange.hidden = false;
     } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
       quotaChange.textContent = `Geplanter Tarifwechsel: ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
       quotaChange.hidden = false;
     } else if (subscriptionStatus === "past_due") {
-      quotaChange.textContent = "Zahlungsproblem – bitte Mitgliedschaft verwalten";
+      quotaChange.textContent = "Zahlungsproblem – bitte verwalten";
       quotaChange.hidden = false;
     } else {
       quotaChange.textContent = "";
@@ -714,22 +753,24 @@ if (quotaSummary) {
       ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
       : "Noch keine Einreichung gefunden.";
   } else if (quota.has_unlimited) {
-    quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} im aktuellen Zeitraum`;
+    quotaSummary.textContent = `${isActivityPlanView ? "Veröffentlichte Aktivitäten" : "Veröffentlichte Termine"}: ${Number(quota.consumed_total || 0)} im aktuellen Zeitraum`;
   } else {
-    quotaSummary.textContent = `Veröffentlichte Termine: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} im aktuellen Zeitraum`;
+    quotaSummary.textContent = `${isActivityPlanView ? "Veröffentlichte Aktivitäten" : "Veröffentlichte Termine"}: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} im aktuellen Zeitraum`;
   }
 }
 
 if (quotaRemaining) {
   if (quota.has_unlimited) {
-    quotaRemaining.textContent = "Weitere Einreichungen sind möglich. Gezählt werden veröffentlichte Termine nach Freigabe.";
+    quotaRemaining.textContent = isActivityPlanView
+      ? "Weitere Einreichungen sind möglich. Gezählt werden veröffentlichte Aktivitäten nach Freigabe."
+      : "Weitere Einreichungen sind möglich. Gezählt werden veröffentlichte Termine nach Freigabe.";
   } else if (isSingleStatusView) {
     quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
   } else {
-    quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)} veröffentlichte Termine.`;
+    quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)} ${isActivityPlanView ? "veröffentlichte Aktivitäten" : "veröffentlichte Termine"}.`;
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V5 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V6 === */
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 | Zweck: zeigt aktuelle Einreichungen mit Details und erlaubt Veranstaltern das Ändern noch nicht freigegebener Eventdaten direkt im Dashboard; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
@@ -764,10 +805,19 @@ if (submissionsList && submissionsEmpty) {
   /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_FRONTEND_V2 === */
 
   function renderSubmissionFactsHtml(values) {
+    const submissionKind = safeText(values?.submission_kind || "event").toLowerCase();
     const eventDateText = formatDate(values?.start_date);
     const timeText = safeText(values?.time_text);
     const locationText = safeText(values?.location_name);
     const addressText = safeText(values?.location_address);
+
+    if (submissionKind === "activity") {
+      return `
+        ${timeText ? `<div><dt>Verfügbarkeit</dt><dd>${escapeHtml(timeText)}</dd></div>` : ""}
+        ${locationText ? `<div><dt>Anbieter / Ort</dt><dd>${escapeHtml(locationText)}</dd></div>` : ""}
+        ${addressText ? `<div><dt>Adresse</dt><dd>${escapeHtml(addressText)}</dd></div>` : ""}
+      `;
+    }
 
     return `
       ${eventDateText !== "–" ? `<div><dt>Termin</dt><dd>${escapeHtml(eventDateText)}</dd></div>` : ""}
@@ -916,7 +966,7 @@ if (submissionsList && submissionsEmpty) {
     }
 
     if (linkSlot) {
-      const nextEventUrl = normalizeExternalUrl(submission.event_url);
+      const nextEventUrl = normalizeExternalUrl(submission.event_url || submission.ticket_url);
       linkSlot.innerHTML = nextEventUrl
         ? `<a class="organizer-submission-detail__link" href="${escapeHtml(nextEventUrl)}" target="_blank" rel="noopener noreferrer">
             Eingereichten Link öffnen
