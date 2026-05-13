@@ -1738,26 +1738,38 @@
       radial-gradient(circle at 72% 18%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 17%);
   }
 
+  /* === BEGIN BLOCK: DESKTOP_HERO_LEAD_READABILITY_SURFACE_V2 | Zweck: stellt die Lead-Lesbarkeit im Desktop-Hero über alle geprüften Breiten wieder sicher, ohne den Hero erneut großflächig milchig zu machen; Umfang: nur lokale Textschutzfläche und Lead-Kontrast auf der Desktop-Home-Top-Shell === */
   body.is-tabbar-hidden .desktop-entry__content::before{
-    inset: -7px -5px -8px -7px;
-    border-radius: 18px;
+    inset: -8px -12px -9px -8px;
+    border-radius: 19px;
     background:
       linear-gradient(
         90deg,
-        rgba(238,242,231,0.42) 0%,
-        rgba(238,242,231,0.28) 25%,
-        rgba(237,241,230,0.12) 46%,
-        rgba(236,240,229,0.032) 63%,
-        rgba(236,240,229,0.00) 78%
+        rgba(238,242,231,0.60) 0%,
+        rgba(238,242,231,0.50) 28%,
+        rgba(237,241,230,0.31) 52%,
+        rgba(236,240,229,0.12) 69%,
+        rgba(236,240,229,0.018) 83%,
+        rgba(236,240,229,0.00) 91%
       ),
       radial-gradient(
-        72% 92% at 12% 34%,
-        rgba(240,244,234,0.145) 0%,
-        rgba(239,243,232,0.052) 42%,
-        rgba(238,242,231,0.00) 76%
+        78% 104% at 13% 40%,
+        rgba(240,244,234,0.30) 0%,
+        rgba(239,243,232,0.13) 44%,
+        rgba(238,242,231,0.034) 67%,
+        rgba(238,242,231,0.00) 84%
       );
-    filter: blur(2px);
+    filter: blur(2.4px);
   }
+
+  body.is-tabbar-hidden .desktop-entry__text{
+    color: rgba(7,22,15,0.99);
+    font-weight: 655;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.18),
+      0 0 10px rgba(247,250,243,0.20);
+  }
+  /* === END BLOCK: DESKTOP_HERO_LEAD_READABILITY_SURFACE_V2 === */
 
   body.is-tabbar-hidden .top-stack{
     display: grid;
