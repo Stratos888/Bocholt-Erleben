@@ -59,6 +59,7 @@ function sr_fetch_submission(PDO $pdo, int $submissionId): array
     $statement = $pdo->prepare(
         'SELECT
             id,
+            submission_kind,
             status,
             payment_kind,
             intake_origin,
@@ -97,16 +98,22 @@ function sr_send_rejection_mail(array $submission, ?string $reason): void
         return;
     }
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REJECTION_MAIL_COPY_V1 | Zweck: passt Ablehnungs-Mail je nach Submission-Art fuer Event oder Aktivitaet an; Umfang: ersetzt Titel/Referenz/Mail-Intro === */
     $title = trim((string)($submission['title'] ?? ''));
     $reference = trim((string)($submission['payment_reference_key'] ?? ''));
+    $isActivity = trim((string)($submission['submission_kind'] ?? 'event')) === 'activity';
 
     $bodyLines = [
         'Hallo,',
         '',
-        'deine Veranstaltung kann bei Bocholt erleben leider nicht veröffentlicht werden.',
+        $isActivity
+            ? 'deine Aktivität kann bei Bocholt erleben leider nicht veröffentlicht werden.'
+            : 'deine Veranstaltung kann bei Bocholt erleben leider nicht veröffentlicht werden.',
         '',
-        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
         'Referenz: ' . $reference,
+    ];
+    /* === END BLOCK: ACTIVITY_PRESENCE_REJECTION_MAIL_COPY_V1 === */
     ];
 
     if ($reason !== null && trim($reason) !== '') {
@@ -120,7 +127,7 @@ function sr_send_rejection_mail(array $submission, ?string $reason): void
     $bodyLines[] = 'Bocholt erleben';
 
     try {
-        be_send_mail($email, 'Deine Veranstaltung wurde nicht veröffentlicht', implode("\n", $bodyLines));
+        be_send_mail($email, $isActivity ? 'Deine Aktivität wurde nicht veröffentlicht' : 'Deine Veranstaltung wurde nicht veröffentlicht', implode("\n", $bodyLines));
     } catch (Throwable $error) {
         error_log('Submission rejection mail failed: ' . $error->getMessage());
     }
@@ -154,7 +161,7 @@ try {
             END,
             updated_at = CURRENT_TIMESTAMP
          WHERE id = :submission_id
-           AND submission_kind = :submission_kind
+           AND submission_kind IN ("event", "activity")
            AND status IN ("pending_review", "payment_released", "checkout_started", "paid", "in_review")'
     );
 
@@ -164,7 +171,6 @@ try {
     $statement->bindValue(':reason_value_new', $reasonValue, PDO::PARAM_STR);
     $statement->bindValue(':reason_value_append', $reasonValue, PDO::PARAM_STR);
     $statement->bindValue(':submission_id', $submissionId, PDO::PARAM_INT);
-    $statement->bindValue(':submission_kind', 'event', PDO::PARAM_STR);
     $statement->execute();
 
     if ($statement->rowCount() !== 1) {
