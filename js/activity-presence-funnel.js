@@ -195,7 +195,6 @@
         );
         statusNode?.scrollIntoView({ block: "center", behavior: "smooth" });
       } catch (error) {
-      } catch (error) {
         setStatus(statusNode, error && error.message ? error.message : "Einreichung konnte nicht gespeichert werden.", "error");
       } finally {
         setBusy(submitButton, false);
