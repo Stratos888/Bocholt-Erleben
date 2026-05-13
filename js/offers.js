@@ -408,25 +408,48 @@ function getCategoryPresentation(category) {
     return "";
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 | Zweck: priorisiert bei aktiven Filtern die konkret passenden Merkmale auf Activity-Cards; Umfang: ersetzt nur buildFactItems(offer), ohne Meta-/Tag-Helfer zu verändern === */
   function buildFactItems(offer) {
-    const primaryTags = getRankedTagItems(offer, 3);
-    if (primaryTags.length) {
-      return primaryTags;
-    }
+    const activeMatches = Array.isArray(offer?.activeMatchLabels)
+      ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
 
+    const primaryTags = getRankedTagItems(offer, 3);
     const curatedFacts = Array.isArray(offer?.cardFacts)
       ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
+
+    const fallbackFacts = [offer?.duration, offer?.mode, offer?.price]
+      .map((entry) => toSingleLine(entry))
+      .filter(Boolean);
+
+    if (activeMatches.length) {
+      const merged = [];
+      const seen = new Set();
+
+      [...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
+        const value = toSingleLine(entry);
+        const key = normalizeComparable(value);
+        if (!value || seen.has(key)) return;
+
+        seen.add(key);
+        merged.push(value);
+      });
+
+      return merged.slice(0, 3);
+    }
+
+    if (primaryTags.length) {
+      return primaryTags;
+    }
 
     if (curatedFacts.length) {
       return curatedFacts.slice(0, 3);
     }
 
-    return [offer?.duration, offer?.mode, offer?.price]
-      .map((entry) => toSingleLine(entry))
-      .filter(Boolean)
-      .slice(0, 3);
+    return fallbackFacts.slice(0, 3);
   }
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 === */
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V3 === */
 
   return {
@@ -468,16 +491,32 @@ const OfferCards = (() => {
     return `<p class="event-card-desc">${OfferVisuals.escapeHtml(text)}</p>`;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_CHIP_RENDER_V1 | Zweck: markiert aktuell passende Filtermerkmale auf Activity-Cards sichtbar, ohne die bestehende Fact-Chip-Struktur zu ersetzen; Umfang: ersetzt nur renderFactChips(offer) === */
   function renderFactChips(offer) {
     const items = OfferVisuals.buildFactItems(offer);
     if (!items.length) return "";
 
+    const activeMatches = new Set(
+      (Array.isArray(offer?.activeMatchLabels) ? offer.activeMatchLabels : [])
+        .map((entry) => String(entry || "").replace(/\s+/g, " ").trim())
+        .filter(Boolean)
+    );
+
     return `
-      <div class="activity-card-facts" aria-label="Wichtige Merkmale">
-        ${items.map((item) => `<span class="activity-card-fact">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+      <div class="activity-card-facts" aria-label="${activeMatches.size ? "Passende Merkmale" : "Wichtige Merkmale"}">
+        ${items.map((item) => {
+          const label = String(item || "").replace(/\s+/g, " ").trim();
+          const isMatch = activeMatches.has(label);
+          const className = isMatch
+            ? "activity-card-fact activity-card-fact--match"
+            : "activity-card-fact";
+
+          return `<span class="${className}">${OfferVisuals.escapeHtml(label)}</span>`;
+        }).join("")}
       </div>
     `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_CHIP_RENDER_V1 === */
 
   function renderSupportingLine(offer) {
     const text = OfferVisuals.pickSupportingLabel(offer);
