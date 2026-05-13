@@ -124,8 +124,10 @@ Umfang:
       </div>
     </section>
 
-    <div class="top-stack desktop-hero__panel">
     <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
+
+    <!-- === BEGIN BLOCK: ACTIVITIES_DESKTOP_HERO_CONTROL_PARITY_V1 | Zweck: gleicht die Desktop-Control-Struktur der Aktivitätenseite an den finalen Events-Top-Shell-Contract an; Umfang: nur Top-Stack mit Suche, zwei Filter-Pills und rechter Service-Rail === -->
+    <div class="top-stack desktop-hero__panel">
       <div class="desktop-hero__search-row" aria-label="Suche und Filter">
         <div class="events-filter desktop-hero__search-slot">
           <label class="desktop-hero__search-field" for="search-filter">
@@ -141,46 +143,48 @@ Umfang:
           </label>
         </div>
 
-<!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: bereinigt die doppelte Bereich-Pill auf /angebote/ und hält genau eine Merkmal-Pill plus genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: ersetzt nur den kompletten Aktivitäten-Filter-Pill-Block direkt vor der Reset-Pill === -->
-<button
-  type="button"
-  class="filter-pill desktop-hero__toolbar-pill"
-  id="offer-situation-pill"
-  aria-haspopup="dialog"
-  aria-expanded="false"
-  aria-controls="popover-situation"
-  data-filter-key="situation"
->
-  <span class="filter-pill__label">Merkmal</span>
-  <span class="filter-pill__value" id="offer-situation-value">Alle</span>
-  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-</button>
+        <!-- === BEGIN BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V3 | Zweck: hält im Aktivitäten-Hero genau eine Merkmal-Pill und genau eine Kategorie-Pill innerhalb der gemeinsamen Search-Row; Umfang: nur Aktivitäten-Filter-Pills plus Reset-Pill === -->
+        <button
+          type="button"
+          class="filter-pill desktop-hero__toolbar-pill"
+          id="offer-situation-pill"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="popover-situation"
+          data-filter-key="situation"
+        >
+          <span class="filter-pill__label">Merkmal</span>
+          <span class="filter-pill__value" id="offer-situation-value">Alle</span>
+          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        </button>
 
-<button
-  type="button"
-  class="filter-pill desktop-hero__toolbar-pill"
-  id="offer-category-pill"
-  aria-haspopup="dialog"
-  aria-expanded="false"
-  aria-controls="popover-offer-category"
-  data-filter-key="category"
->
-  <span class="filter-pill__label">Kategorie</span>
-  <span class="filter-pill__value" id="offer-category-value">Alle</span>
-  <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-</button>
+        <button
+          type="button"
+          class="filter-pill desktop-hero__toolbar-pill"
+          id="offer-category-pill"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="popover-offer-category"
+          data-filter-key="category"
+        >
+          <span class="filter-pill__label">Kategorie</span>
+          <span class="filter-pill__value" id="offer-category-value">Alle</span>
+          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        </button>
 
-<button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
+        <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
           <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
         </button>
+        <!-- === END BLOCK: OFFERS_FILTER_PILLS_LUCIDE_CHEVRONS_V3 === -->
       </div>
 
       <div class="desktop-hero__actions" aria-label="Service">
-        <!-- === BEGIN BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 | Zweck: hält den Aktivitäten-Funnel als Desktop-Service-Action, während Mobile den Einstieg als Feed-Card rendert; Umfang: vollständiger Service-Action-Wrapper === -->
+        <!-- === BEGIN BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 | Zweck: hält den Aktivitäten-Funnel als ersten Service-Link innerhalb der gemeinsamen Desktop-Service-Rail; Umfang: nur erster Aktivitäten-Service-Link === -->
         <a class="desktop-hero__action desktop-hero__action--publish" href="/angebote/sichtbar-werden/">
           <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
           <span>Als Aktivität sichtbar werden</span>
         </a>
+        <!-- === END BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 === -->
 
         <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
           <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
@@ -193,11 +197,12 @@ Umfang:
           data-pwa-install-trigger
           aria-label="Als App installieren"
         >
-          <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="smartphone" aria-hidden="true"></span>
+          <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
           <span>Als App nutzen</span>
         </button>
-        <!-- === END BLOCK: ACTIVITIES_ACTIVITY_PRESENCE_ENTRY_V2 === -->
       </div>
+    </div>
+    <!-- === END BLOCK: ACTIVITIES_DESKTOP_HERO_CONTROL_PARITY_V1 === -->
     </div>
   </section>
 
