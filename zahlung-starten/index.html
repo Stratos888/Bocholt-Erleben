@@ -38,6 +38,7 @@
   </main>
 
   <script>
+    /* === BEGIN BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_FLOW_V2 | Zweck: startet internen Zahlungslink und akzeptiert Stripe-Checkout-URL oder Existing-Subscription-Redirect; Umfang: kompletter Inline-Zahlungsstart === */
     (function () {
       const title = document.getElementById("payment-start-title");
       const lead = document.getElementById("payment-start-lead");
@@ -75,7 +76,6 @@
             })
           });
 
-          /* === BEGIN BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_URL_V1 | Zweck: akzeptiert Stripe-Checkout-URL oder Existing-Subscription-Redirect aus create-checkout-session; Umfang: ersetzt Payload-Auswertung nach fetch === */
           const payload = await response.json().catch(() => null);
           if (!response.ok || !payload || payload.status !== "ok") {
             throw new Error(payload?.message || "checkout_failed");
@@ -95,9 +95,20 @@
           }
 
           throw new Error("missing_checkout_or_redirect_url");
-          /* === END BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_URL_V1 === */
-            return;
-          }
+        } catch (error) {
+          console.warn("Payment start failed.", error);
+          setState(
+            "Zahlung konnte nicht gestartet werden",
+            "Der Zahlungslink ist möglicherweise abgelaufen oder die Einreichung wurde bereits verarbeitet.",
+            "Bitte kontaktiere Bocholt erleben, wenn das Problem bestehen bleibt."
+          );
+        }
+      }
+
+      startPayment();
+    })();
+    /* === END BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_FLOW_V2 === */
+  </script>
 
           throw new Error("missing_checkout_or_redirect_url");
 
