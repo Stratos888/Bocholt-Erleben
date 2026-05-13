@@ -33,6 +33,32 @@
         "Spielplatz",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Spielplatz",
+          "Wasser",
+          "Café",
+          "Baden",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
@@ -69,6 +95,26 @@
         "Tiere",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Tiere",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
@@ -108,6 +154,28 @@
         "Spielplatz",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Spielplatz",
+          "Wasser",
+          "Baden"
+        ],
+        "effort": [
+          "Halber Tag"
+        ]
+      },
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
@@ -143,6 +211,22 @@
       "filter_tags": [
         "Indoor"
       ],
+      "filter": {
+        "situation": [
+          "Bei Regen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Indoor",
       "price": "",
@@ -178,6 +262,21 @@
       "filter_tags": [
         "Indoor"
       ],
+      "filter": {
+        "situation": [
+          "Bei Regen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
@@ -212,6 +311,23 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt",
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -246,6 +362,24 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [
+          "Aussicht"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -279,6 +413,26 @@
         "Koppelkerk"
       ],
       "filter_tags": [],
+      "filter": {
+        "situation": [
+          "Bei Regen",
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [
+          "Café"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
@@ -314,6 +468,21 @@
       "filter_tags": [
         "Indoor"
       ],
+      "filter": {
+        "situation": [
+          "Bei Regen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
@@ -347,6 +516,22 @@
         "Kulturort"
       ],
       "filter_tags": [],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -382,6 +567,27 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
@@ -418,6 +624,28 @@
         "Mit Kindern",
         "Tiere"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Tiere",
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag"
+        ]
+      },
       "duration": "2–4 Std",
       "mode": "Outdoor",
       "price": "",
@@ -453,6 +681,21 @@
       "filter_tags": [
         "Indoor"
       ],
+      "filter": {
+        "situation": [
+          "Bei Regen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
@@ -488,6 +731,21 @@
       "filter_tags": [
         "Indoor"
       ],
+      "filter": {
+        "situation": [
+          "Bei Regen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Indoor",
       "price": "",
@@ -525,6 +783,27 @@
         "Tiere",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Tiere",
+          "Aussicht",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
@@ -560,6 +839,24 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag"
+        ]
+      },
       "duration": "1,5–3 Std",
       "mode": "Outdoor",
       "price": "",
@@ -595,6 +892,25 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
@@ -629,6 +945,27 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt",
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
       "duration": "3–5 Std",
       "mode": "Outdoor",
       "price": "",
@@ -663,6 +1000,26 @@
         "Arkaden"
       ],
       "filter_tags": [],
+      "filter": {
+        "situation": [
+          "Bei Regen",
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [
+          "Café"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Indoor & Outdoor",
       "price": "",
@@ -698,6 +1055,26 @@
         "Wasser",
         "Radfahren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt",
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Radfahren",
+          "Sport & Bewegung",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Wasser"
+        ],
+        "effort": [
+          "Halber Tag"
+        ]
+      },
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
@@ -734,6 +1111,26 @@
         "Wasser",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -768,6 +1165,26 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Sport & Bewegung",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
@@ -802,6 +1219,27 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt",
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
@@ -841,6 +1279,31 @@
         "Spielplatz",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Spielplatz",
+          "Tiere",
+          "Café",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–3 Std",
       "mode": "Outdoor",
       "price": "",
@@ -876,6 +1339,25 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -913,6 +1395,27 @@
         "Mit Kindern",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
@@ -952,6 +1455,24 @@
         "Mit Kindern",
         "Spielplatz"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Direkt in Bocholt"
+        ],
+        "activity_type": [
+          "Spielen"
+        ],
+        "features": [
+          "Spielplatz"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -988,6 +1509,24 @@
         "Mit Kindern",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "45–90 Min",
       "mode": "Outdoor",
       "price": "",
@@ -1023,6 +1562,27 @@
         "Mit Kindern",
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Kultur"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
       "duration": "1–2 Std",
       "mode": "Outdoor",
       "price": "",
@@ -1057,6 +1617,22 @@
       "filter_tags": [
         "Wandern & Spazieren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur"
+        ],
+        "features": [],
+        "effort": [
+          "Spontan"
+        ]
+      },
       "duration": "1,5 Std",
       "mode": "Outdoor",
       "price": "",
@@ -1094,6 +1670,24 @@
       "filter_tags": [
         "Radfahren"
       ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Radfahren",
+          "Sport & Bewegung",
+          "Natur entdecken"
+        ],
+        "features": [],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
       "duration": "Halber Tag",
       "mode": "Outdoor",
       "price": "",
