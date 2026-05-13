@@ -3324,6 +3324,43 @@ body.is-feedback-open{
   .feedback-inline-entry{
     display: none;
   }
+
+  /* === BEGIN BLOCK: FEEDBACK_DESKTOP_LAUNCHER_TERTIARY_POLISH_V1 | Zweck: reduziert den globalen Desktop-Feedback-Button auf eine tertiäre Hilfsfunktion, ohne Mobile-Inline-Feedback oder Modal-Logik zu verändern; Umfang: nur Desktop-Launcher ab 900px === */
+  .feedback-launcher{
+    right: max(16px, env(safe-area-inset-right, 0px) + 12px);
+    bottom: max(16px, env(safe-area-inset-bottom, 0px) + 12px);
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 13px;
+    border-color: rgba(31,41,51,0.075);
+    background: color-mix(in srgb, white 88%, var(--color-primary-muted));
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.68) inset,
+      0 7px 18px rgba(0,0,0,0.055);
+    color: color-mix(in srgb, var(--color-text-primary) 86%, rgba(58,70,66,0.66) 14%);
+    font-size: 0.84rem;
+    font-weight: 720;
+    opacity: 0.82;
+  }
+
+  .feedback-launcher .feedback-btn__icon{
+    width: 16px;
+    height: 16px;
+    opacity: 0.72;
+  }
+
+  @media (hover: hover){
+    .feedback-launcher:hover{
+      transform: translateY(-1px);
+      border-color: rgba(31,41,51,0.11);
+      background: color-mix(in srgb, white 92%, var(--color-primary-muted));
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.76) inset,
+        0 9px 22px rgba(0,0,0,0.075);
+      opacity: 0.92;
+    }
+  }
+  /* === END BLOCK: FEEDBACK_DESKTOP_LAUNCHER_TERTIARY_POLISH_V1 === */
 }
 /* === END BLOCK: FEEDBACK_WIDGET_SYSTEM_V1 === */
 
