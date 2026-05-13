@@ -804,7 +804,13 @@
 }
 
 /* === END BLOCK: MOBILE_PUBLISH_ENTRY_NO_UNDERLINE_FIX_V1 === */
-
+/* === BEGIN BLOCK: ACTIVITIES_MOBILE_HIDE_HERO_SERVICE_ACTIONS_V1 | Zweck: entfernt die Desktop-Service-Buttons auf Mobile aus dem Activities-Top-Stack, damit der Aktivitaets-Funnel-Einstieg wie im Events-Tab als Feed-Card erscheint; Umfang: nur mobile Activities-Hero-Actions === */
+@media (max-width: 899.98px){
+  body.page-route-activities .desktop-hero__actions{
+    display: none !important;
+  }
+}
+/* === END BLOCK: ACTIVITIES_MOBILE_HIDE_HERO_SERVICE_ACTIONS_V1 === */
 /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 | Zweck: vereinheitlicht Hero und Feed auf eine gemeinsame Desktop-Shell, stabilisiert die linke Copy-Lesbarkeit über eine lokale Contrast-Surface statt globalem Milchglas und hält Home sowie Aktivitäten auf demselben nachhaltigen Desktop-Contract; Umfang: Desktop-Header, Hero, Search-Panel, Copy-Lesbarkeit sowie Home-/Aktivitäten-Feed-Surface inkl. Narrow- und Wide-Desktop === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
