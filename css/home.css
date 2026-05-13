@@ -1686,6 +1686,315 @@
     gap: 6px;
   }
 }
+/* === BEGIN BLOCK: DESKTOP_HOME_TOP_SHELL_ENTERPRISE_POLISH_V1 | Zweck: finalisiert ausschließlich die Desktop-Startseiten-Top-Shell ab 1024px mit klarer Hero-/Suche-/CTA-Hierarchie, 4:1:1 Search-Contract, kräftigerem Hero-Bild, weicherem Feed-Übergang und integrierter Datumsschiene; Umfang: nur body.is-tabbar-hidden auf Desktop, keine Mobile-, Header-, Navigations- oder Inhaltsstruktur-Änderung === */
+@media (min-width: 1024px){
+  body.is-tabbar-hidden{
+    --desktop-panel-height: 68px;
+    --desktop-action-height: 46px;
+    --desktop-panel-gap: 8px;
+    --desktop-reset-w: 44px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero{
+    min-height: 418px;
+    padding-bottom: 18px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero::before{
+    filter:
+      blur(var(--hero-bg-blur-active))
+      saturate(1.04)
+      brightness(0.972)
+      contrast(1.055);
+  }
+
+  body.is-tabbar-hidden .desktop-hero::after{
+    background:
+      linear-gradient(
+        90deg,
+        rgba(243,246,240,0.42) 0%,
+        rgba(243,246,240,0.30) 5%,
+        rgba(243,246,240,0.15) 10%,
+        rgba(243,246,240,0.045) 16%,
+        rgba(243,246,240,0.00) 23%
+      ),
+      radial-gradient(
+        42% 74% at 12% 28%,
+        rgba(247,249,243,0.09) 0%,
+        rgba(247,249,243,0.035) 42%,
+        rgba(247,249,243,0.00) 72%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(247,249,244,0.00) 0%,
+        rgba(247,249,244,0.00) 58%,
+        rgba(233,237,220,0.07) 79%,
+        rgba(233,237,220,0.16) 92%,
+        rgba(233,237,220,0.27) 100%
+      ),
+      radial-gradient(circle at 72% 18%, rgba(225,213,150,0.018) 0%, rgba(225,213,150,0.00) 17%);
+  }
+
+  body.is-tabbar-hidden .desktop-entry__content::before{
+    inset: -8px -8px -9px -8px;
+    border-radius: 20px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(238,242,231,0.58) 0%,
+        rgba(238,242,231,0.42) 28%,
+        rgba(237,241,230,0.22) 52%,
+        rgba(236,240,229,0.075) 70%,
+        rgba(236,240,229,0.00) 86%
+      ),
+      radial-gradient(
+        84% 104% at 14% 34%,
+        rgba(240,244,234,0.24) 0%,
+        rgba(239,243,232,0.10) 44%,
+        rgba(238,242,231,0.00) 78%
+      );
+    filter: blur(2.5px);
+  }
+
+  body.is-tabbar-hidden .top-stack{
+    gap: 8px;
+  }
+
+  body.is-tabbar-hidden .top-stack::before{
+    inset: -3px -4px -5px -4px;
+    background: radial-gradient(
+      108% 118% at 12% 12%,
+      rgba(250,252,247,0.08) 0%,
+      rgba(248,250,243,0.032) 34%,
+      rgba(246,249,240,0.00) 72%
+    );
+    filter: blur(4px);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 4fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 4fr) minmax(0, 1fr) minmax(0, 1fr) var(--desktop-reset-w);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row::before{
+    inset: -2px -3px -2px -3px;
+    border-radius: 18px;
+    background: radial-gradient(
+      110% 134% at 18% 8%,
+      rgba(251,252,248,0.055) 0%,
+      rgba(249,251,245,0.018) 38%,
+      rgba(247,250,242,0.00) 70%
+    );
+    filter: blur(3px);
+  }
+
+  body.is-tabbar-hidden .top-stack #search-filter,
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill{
+    height: var(--desktop-panel-height);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 22px;
+    width: 20px;
+    height: 20px;
+    color: rgba(48,72,58,0.78);
+  }
+
+  body.is-tabbar-hidden .top-stack #search-filter{
+    padding-left: 54px;
+    border-color: color-mix(in srgb, var(--home-toolbar-border) 82%, rgba(24,40,30,0.16) 18%);
+    border-radius: 20px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-toolbar-bg-start) 96%, white 4%) 0%,
+      var(--home-toolbar-bg-end) 100%
+    );
+    color: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
+    font-size: 1.02rem;
+    font-weight: 630;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.94) inset,
+      0 11px 24px rgba(12,24,16,0.055);
+  }
+
+  body.is-tabbar-hidden .top-stack #search-filter::placeholder{
+    color: color-mix(in srgb, var(--home-copy-muted) 84%, white 16%);
+    font-weight: 600;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill{
+    padding: 8px 13px;
+    column-gap: 7px;
+    border-color: color-mix(in srgb, var(--home-action-border) 88%, rgba(24,40,30,0.08) 12%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 96%, rgba(248,250,243,0.78) 4%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 90%, rgba(248,250,243,0.76) 10%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.78) inset,
+      0 4px 10px rgba(12,24,16,0.018);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__label{
+    color: color-mix(in srgb, var(--home-copy-muted) 94%, var(--home-copy-body) 6%);
+    font-size: 0.62rem;
+    font-weight: 735;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__value{
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    font-size: 0.90rem;
+    font-weight: 715;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__toolbar-pill .filter-pill__chevron{
+    width: 15px;
+    height: 15px;
+    color: color-mix(in srgb, var(--brand-green-900) 76%, var(--brand-gold-300) 24%);
+    opacity: 0.72;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__search-row > .filter-pill--reset{
+    width: var(--desktop-reset-w);
+    min-width: var(--desktop-reset-w);
+    min-height: var(--desktop-panel-height);
+    border-color: color-mix(in srgb, var(--home-action-border) 90%, rgba(24,40,30,0.10) 10%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 94%, rgba(248,250,243,0.76) 6%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 88%, rgba(248,250,243,0.74) 12%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 3px 8px rgba(12,24,16,0.014);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__actions{
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr) minmax(0, 0.92fr);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action,
+  body.is-tabbar-hidden .desktop-hero__action:link,
+  body.is-tabbar-hidden .desktop-hero__action:visited{
+    min-height: var(--desktop-action-height);
+    padding: 0 12px;
+    gap: 7px;
+    border-radius: 14px;
+    border-color: color-mix(in srgb, var(--home-action-border) 84%, transparent 16%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 82%, rgba(248,250,243,0.58) 18%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 78%, rgba(248,250,243,0.54) 22%) 100%
+    );
+    color: color-mix(in srgb, var(--home-copy-muted) 92%, var(--home-copy-body) 8%);
+    -webkit-text-fill-color: color-mix(in srgb, var(--home-copy-muted) 92%, var(--home-copy-body) 8%);
+    font-size: 0.80rem;
+    font-weight: 620;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.66) inset,
+      0 3px 8px rgba(12,24,16,0.012);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action .desktop-hero__icon{
+    width: 15px;
+    height: 15px;
+    opacity: 0.70;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action--publish,
+  body.is-tabbar-hidden .desktop-hero__action--publish:link,
+  body.is-tabbar-hidden .desktop-hero__action--publish:visited{
+    color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+    -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 82%, var(--brand-gold-300) 18%);
+    font-weight: 670;
+    border-color: color-mix(in srgb, var(--home-action-border) 82%, rgba(24,40,30,0.12) 18%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(248,250,243,0.70) 10%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.68) 16%) 100%
+    );
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action--publish .desktop-hero__icon{
+    opacity: 0.82;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action--info{
+    opacity: 0.86;
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action--app{
+    opacity: 0.68;
+    font-weight: 595;
+    border-color: color-mix(in srgb, var(--home-action-border) 66%, transparent 34%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 70%, rgba(248,250,243,0.42) 30%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 64%, rgba(248,250,243,0.38) 36%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.54) inset,
+      0 2px 6px rgba(12,24,16,0.008);
+  }
+
+  body.is-tabbar-hidden .desktop-hero__action--app .desktop-hero__icon{
+    opacity: 0.58;
+  }
+
+  body.is-tabbar-hidden .events-section{
+    margin-top: -8px;
+    padding-top: 14px;
+    border-radius: 24px 24px 0 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,243,231,0.18) 0%,
+        rgba(233,237,220,0.08) 34px,
+        rgba(233,237,220,0.00) 82px
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-rail-bg-start) 92%, rgba(247,249,244,0.82) 8%) 0%,
+        var(--home-rail-bg-end) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 88%, rgba(219,226,203,0.988) 12%) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 10px 18px rgba(247,249,242,0.05);
+  }
+
+  body.is-tabbar-hidden .events-section-title{
+    margin-top: 0;
+  }
+
+  body.is-tabbar-hidden .event-card{
+    --rail-w: 54px;
+    column-gap: 10px;
+  }
+
+  body.is-tabbar-hidden .event-card::before{
+    opacity: 0.98;
+    box-shadow: inset -1px 0 0 color-mix(in srgb, var(--home-rail-divider) 84%, rgba(24,40,30,0.038) 16%);
+  }
+
+  body.is-tabbar-hidden .event-date-badge{
+    justify-self: end;
+    margin-right: 0;
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.066),
+      inset 0 1px 0 rgba(255,255,255,0.86),
+      0 1px 2px rgba(12,24,18,0.022);
+  }
+}
+/* === END BLOCK: DESKTOP_HOME_TOP_SHELL_ENTERPRISE_POLISH_V1 === */
 /* === END BLOCK: DESKTOP_TOP_SHELL_OWNER_CLEANUP_V38 === */
 /* === BEGIN BLOCK: DESKTOP_FILTER_POPOVER_V3 | Purpose: hält Desktop-Filter-Popover auf Home und Aktivitäten direkt an der jeweiligen Pill verankert, im Viewport und intern scrollbar; Scope: desktop filter popovers + active trigger state for events and activities === */
 @media (min-width: 900px){
