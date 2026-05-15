@@ -1104,7 +1104,11 @@ Umfang:
         renderCurrent(totalLoaded);
       } catch (e) {
         console.error(e);
-        setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+        if (String(it.review_source || "") === "submission_db") {
+          setStatus(normalizeSubmissionReviewError(e));
+        } else {
+          setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+        }
         renderCurrent(totalLoaded);
       } finally {
         setReviewActionButtonsDisabled(false);
@@ -1119,6 +1123,29 @@ Umfang:
     // - Verwerfen nutzt neuen Reject-Endpunkt ohne Kontingentverbrauch
     // Umfang:
     // - Ergänzt PHP-JSON-Schreibpfad für review_source=submission_db
+    /* === BEGIN BLOCK: SUBMISSION_REVIEW_JSON_ERROR_MESSAGES_V1 | Zweck: zeigt fachliche Backend-Fehler aus DB-Review-Aktionen direkt in der Inbox statt generischer Netz-/JSONP-Meldung; Umfang: ergänzt Error-Normalisierung und ersetzt postJson === */
+    function normalizeSubmissionReviewError(error) {
+      const message = String(error && error.message ? error.message : error || "").trim();
+
+      if (!message || message === "request_failed") {
+        return "Aktion konnte nicht ausgeführt werden. Bitte später erneut versuchen.";
+      }
+
+      if (message === "review_api_locked") {
+        return "Review ist gesperrt. Bitte erst entsperren.";
+      }
+
+      if (
+        /Zahlung wurde noch nicht bestätigt/i.test(message)
+        || /noch nicht bezahlt/i.test(message)
+        || /nicht freigabefähig/i.test(message)
+      ) {
+        return "Die Zahlung wurde noch nicht bestätigt. Bitte erst den Zahlungsstatus prüfen oder den Zahlungslink erneut senden.";
+      }
+
+      return message;
+    }
+
     async function postJson(url, payload) {
       if (!reviewApiPassword) {
         throw new Error("review_api_locked");
@@ -1151,6 +1178,7 @@ Umfang:
 
       return data;
     }
+    /* === END BLOCK: SUBMISSION_REVIEW_JSON_ERROR_MESSAGES_V1 === */
 
     async function writeSubmissionStatus(it, newStatus) {
       const submissionId = Number(it.submission_id || 0);
