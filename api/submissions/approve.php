@@ -247,23 +247,30 @@ function sap_fetch_active_subscription_entitlement(PDO $pdo, array $submission):
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_ENTITLEMENT_SCOPE_V1 === */
 
+/* === BEGIN BLOCK: SUBMISSION_APPROVAL_PICK_ENTITLEMENT_V2 | Zweck: wählt ein passendes Veröffentlichungs-Kontingent und meldet ausgeschöpfte Tarife als fachlichen 422-Fehler statt technischem 500; Umfang: ersetzt sap_pick_entitlement === */
 function sap_pick_entitlement(PDO $pdo, array $submission): array
 {
     $organizerId = (int)$submission['organizer_id'];
     $submissionId = (int)$submission['id'];
+    $submissionKind = trim((string)($submission['submission_kind'] ?? 'event'));
 
     $singleEntitlement = sap_fetch_specific_single_entitlement($pdo, $organizerId, $submissionId);
     if (is_array($singleEntitlement)) {
         return $singleEntitlement;
     }
 
-$subscriptionEntitlement = sap_fetch_active_subscription_entitlement($pdo, $submission);
+    $subscriptionEntitlement = sap_fetch_active_subscription_entitlement($pdo, $submission);
     if (is_array($subscriptionEntitlement)) {
         return $subscriptionEntitlement;
     }
 
-    throw new RuntimeException('Kein aktives Veröffentlichungs-Kontingent für diese Freigabe gefunden.');
+    if ($submissionKind === 'activity') {
+        throw new InvalidArgumentException('Für diese Aktivität ist im aktuellen Aktivitäts-Tarif kein freier Veröffentlichungsplatz mehr verfügbar. Bitte Tarif prüfen oder eine andere Aktivität zurückstellen.');
+    }
+
+    throw new InvalidArgumentException('Für diese Veranstaltung ist aktuell kein freies Veröffentlichungs-Kontingent verfügbar.');
 }
+/* === END BLOCK: SUBMISSION_APPROVAL_PICK_ENTITLEMENT_V2 === */
 
 function sap_increment_entitlement_consumption(PDO $pdo, array $entitlement): void
 {
