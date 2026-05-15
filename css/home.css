@@ -3334,18 +3334,42 @@ body.page-route-activities .activity-finder__group{
     margin-top: 1px;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_QUICKFILTER_GRID_V1 | Zweck: macht die kuratierten Schnellfilter auf Mobile vollständig sichtbar statt horizontal scrollbar; Umfang: nur Schnellfilter-Zeile im geschlossenen Aktivitäten-Finder === */
   body.page-route-activities .activity-finder__quick-options{
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
-    padding-bottom: 1px;
-    padding-inline-end: 18px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+    overflow: visible;
+    padding-bottom: 0;
+    padding-inline-end: 0;
   }
 
-  body.page-route-activities .activity-finder__quick-options::-webkit-scrollbar{
-    display: none;
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip{
+    width: 100%;
+    min-width: 0;
+    min-height: 31px;
+    padding-inline: 6px;
+    justify-content: center;
+    text-align: center;
+    font-size: clamp(0.70rem, 3.1vw, 0.76rem);
   }
+
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip.is-active::after{
+    margin-left: 4px;
+  }
+
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip[data-filter-value="Mit Kindern"],
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip[data-filter-value="Bei Regen"],
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip[data-filter-value="Draußen"]{
+    grid-column: span 2;
+  }
+
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip[data-filter-value="Direkt in Bocholt"],
+  body.page-route-activities .activity-finder__quick-options .activity-filter-chip[data-filter-value="In der Umgebung"]{
+    grid-column: span 3;
+  }
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_QUICKFILTER_GRID_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V1 | Zweck: begrenzt das geöffnete mobile Filterpanel oberhalb der Bottom-Tabbar und macht nur den Panel-Inhalt scrollbar; Umfang: nur mobile Advanced-Panel-Surface innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
   body.page-route-activities .activity-finder__advanced-inner{
