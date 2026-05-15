@@ -186,7 +186,7 @@ function osu_validate_url_or_null(?string $url): ?string
     return $url;
 }
 
-/* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_APPROVED_FUTURE_V2 | Zweck: erlaubt Änderungen an Entwürfen, offenen Einreichungen und bereits freigegebenen Zukunftsterminen; Umfang: komplette Editierbarkeitsprüfung für eine Submission === */
+/* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_ACTIVITY_SUPPORT_V1 | Zweck: erlaubt Änderungsanfragen für Events und Aktivitaetspraesenzen im Anbieterbereich; Umfang: ersetzt komplette Editierbarkeitsprüfung === */
 function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissionId): array
 {
     $statement = $pdo->prepare(
@@ -200,7 +200,7 @@ function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissi
          FROM submissions
          WHERE id = :submission_id
            AND organizer_id = :organizer_id
-           AND submission_kind = "event"
+           AND submission_kind IN ("event", "activity")
          LIMIT 1'
     );
 
@@ -214,7 +214,17 @@ function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissi
         throw new InvalidArgumentException('Einreichung wurde nicht gefunden.');
     }
 
+    $submissionKind = trim((string)($row['submission_kind'] ?? 'event'));
     $status = trim((string)($row['status'] ?? ''));
+
+    if ($submissionKind === 'activity') {
+        if (in_array($status, ['pending_review', 'payment_released', 'paid', 'in_review', 'approved'], true)) {
+            return $row;
+        }
+
+        throw new InvalidArgumentException('Diese Aktivität kann im Anbieterbereich nicht mehr geändert werden.');
+    }
+
     if (in_array($status, ['draft', 'checkout_started', 'paid', 'in_review'], true)) {
         return $row;
     }
@@ -230,15 +240,17 @@ function osu_fetch_editable_submission(PDO $pdo, int $organizerId, int $submissi
 
     throw new InvalidArgumentException('Diese Einreichung kann im Veranstalterbereich nicht mehr geändert werden.');
 }
-/* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_APPROVED_FUTURE_V2 === */
+/* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_ELIGIBILITY_ACTIVITY_SUPPORT_V1 === */
 
 function osu_fetch_submission_response(PDO $pdo, int $organizerId, int $submissionId): array
 {
     $statement = $pdo->prepare(
         'SELECT
             id,
+            submission_kind,
             status,
             event_url,
+            ticket_url,
             title,
             start_date,
             time_text,
@@ -271,22 +283,22 @@ function osu_fetch_submission_response(PDO $pdo, int $organizerId, int $submissi
 try {
     $input = osu_read_json_body();
 
-    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V4 | Zweck: macht Adresse und Ortsbestätigung beim Ändern optional, damit bestehende freigegebene Zukunftstermine mit älteren Daten nicht blockieren; Umfang: Eingabe-Normalisierung und Pflichtfeldprüfung im Update-Endpunkt === */
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V5 | Zweck: validiert Änderungsdaten für Events und Aktivitaetspraesenzen; Umfang: ersetzt Eingabe-Normalisierung und Pflichtfeldprüfung === */
     $submissionId = osu_required_positive_int($input, 'submission_id', 'Einreichung');
-    $title = osu_required_string($input, 'title', 'Titel der Veranstaltung');
-    $startDate = osu_validate_date_or_null(osu_required_string($input, 'start_date', 'Datum'));
+    $title = osu_required_string($input, 'title', 'Titel');
+    $startDate = osu_validate_date_or_null(osu_nullable_string($input['start_date'] ?? null));
     $timeText = osu_nullable_string($input['time_text'] ?? null);
-    $locationName = osu_required_string($input, 'location_name', 'Veranstaltungsort / Location');
+    $locationName = osu_required_string($input, 'location_name', 'Ort / Anbieter');
     $locationAddress = osu_nullable_string($input['location_address'] ?? null);
     $eventUrl = osu_validate_url_or_null(osu_nullable_string($input['event_url'] ?? null));
     $descriptionText = osu_nullable_string($input['description_text'] ?? null);
     $locationPublicConfirmed = osu_boolish_to_int($input['location_public_confirmed'] ?? null);
 
-    osu_assert_max_length($title, 255, 'Titel der Veranstaltung');
-    osu_assert_max_length($timeText, 64, 'Uhrzeit');
-    osu_assert_max_length($locationName, 255, 'Veranstaltungsort / Location');
-    osu_assert_max_length($locationAddress, 255, 'Straße, Hausnummer oder offizieller Treffpunkt');
-    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V4 === */
+    osu_assert_max_length($title, 255, 'Titel');
+    osu_assert_max_length($timeText, 255, 'Zeit / Verfügbarkeit');
+    osu_assert_max_length($locationName, 255, 'Ort / Anbieter');
+    osu_assert_max_length($locationAddress, 255, 'Adresse oder offizieller Treffpunkt');
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_INPUT_VALIDATION_V5 === */
 
     $plainSessionToken = osu_read_session_token_from_cookie();
     $sessionTokenHash = hash('sha256', $plainSessionToken);
@@ -299,15 +311,30 @@ try {
 
     $organizerId = (int)$sessionRow['organizer_id'];
     $submission = osu_fetch_editable_submission($pdo, $organizerId, $submissionId);
+
+    if ((string)($submission['submission_kind'] ?? 'event') === 'event' && $startDate === null) {
+        throw new InvalidArgumentException('Datum ist erforderlich.');
+    }
+
     $nextEditCount = ((int)($submission['organizer_edit_count'] ?? 0)) + 1;
 
-    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V4 | Zweck: speichert Änderungen und setzt bereits freigegebene Zukunftstermine zuverlässig zurück in die Kuratierprüfung; Umfang: komplettes UPDATE-Statement für Veranstalteränderungen === */
+    /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_UPDATE_ACTIVITY_SUPPORT_V1 | Zweck: erlaubt Änderungsanfragen für Events und Aktivitaetspraesenzen und setzt bereits veröffentlichte Einreichungen zurück in die Prüfung; Umfang: ersetzt komplettes UPDATE-Statement === */
     $update = $pdo->prepare(
         'UPDATE submissions
          SET
-            event_url = :event_url,
+            event_url = CASE
+                WHEN submission_kind = "activity" THEN event_url
+                ELSE :event_url
+            END,
+            ticket_url = CASE
+                WHEN submission_kind = "activity" THEN :event_url
+                ELSE ticket_url
+            END,
             title = :title,
-            start_date = :start_date,
+            start_date = CASE
+                WHEN submission_kind = "activity" THEN NULL
+                ELSE :start_date
+            END,
             time_text = :time_text,
             location_name = :location_name,
             location_address = :location_address,
@@ -321,13 +348,14 @@ try {
             updated_at = CURRENT_TIMESTAMP
          WHERE id = :submission_id
            AND organizer_id = :organizer_id
-           AND submission_kind = "event"
+           AND submission_kind IN ("event", "activity")
            AND (
-                status IN ("draft", "checkout_started", "paid", "in_review")
-                OR (status = "approved" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
+                status IN ("pending_review", "payment_released", "draft", "checkout_started", "paid", "in_review")
+                OR (submission_kind = "event" AND status = "approved" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
+                OR (submission_kind = "activity" AND status = "approved")
            )'
     );
-    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_REOPEN_APPROVED_FUTURE_V4 === */
+    /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_ACTIVITY_SUPPORT_V1 === */
 
     $update->execute([
         ':event_url' => $eventUrl,
@@ -354,7 +382,9 @@ try {
 
     be_json_response(200, [
         'status' => 'ok',
-        'message' => 'Änderung gespeichert. Wir prüfen die aktuelle Version deiner Einreichung.',
+        'message' => ((string)($updatedSubmission['submission_kind'] ?? 'event') === 'activity')
+            ? 'Änderung gespeichert. Wir prüfen die aktuelle Version deiner Aktivität.'
+            : 'Änderung gespeichert. Wir prüfen die aktuelle Version deiner Einreichung.',
         'data' => [
             'submission' => $updatedSubmission,
         ],
