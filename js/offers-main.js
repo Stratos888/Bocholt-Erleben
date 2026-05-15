@@ -21,10 +21,11 @@ const OffersApp = {
 
   filterGroupOrder: ["proximity", "situation", "activity_type", "features", "effort"],
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_GROUP_MODES_V2 | Zweck: macht Ort/Nähe, Aktivitätsart und Aufwand zu eindeutigen Umschalt-Filtern, damit weitere Klicks nicht unverständlich Trefferzahlen erhöhen; Umfang: nur Filtergruppen-Konfiguration === */
   filterGroups: Object.freeze({
     proximity: Object.freeze({
       label: "Ort / Nähe",
-      mode: "any",
+      mode: "single",
       options: Object.freeze(["Direkt in Bocholt", "In der Umgebung", "Grenzregion / Niederlande"])
     }),
     situation: Object.freeze({
@@ -34,7 +35,7 @@ const OffersApp = {
     }),
     activity_type: Object.freeze({
       label: "Aktivitätsart",
-      mode: "any",
+      mode: "single",
       options: Object.freeze(["Spazieren", "Radfahren", "Spielen", "Kultur", "Natur entdecken", "Sport & Bewegung"])
     }),
     features: Object.freeze({
@@ -44,10 +45,11 @@ const OffersApp = {
     }),
     effort: Object.freeze({
       label: "Aufwand",
-      mode: "any",
+      mode: "single",
       options: Object.freeze(["Spontan", "Halber Tag", "Längerer Ausflug"])
     })
   }),
+  /* === END BLOCK: ACTIVITIES_FINDER_GROUP_MODES_V2 === */
 
   refs: {
     finder: null,
@@ -379,18 +381,25 @@ const OffersApp = {
     return !!String(this.searchTerm || "").trim() || this.getActiveFilterCount() > 0;
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SINGLE_GROUP_TOGGLE_V1 | Zweck: verhindert unverständliche OR-Erweiterungen in eindeutigen Filtergruppen; Umfang: ersetzt nur toggleFilter(group, value) === */
   toggleFilter(group, value) {
     if (!this.isKnownFilter(group, value)) return;
 
     const set = this.getActiveSet(group);
+    const mode = this.filterGroups[group]?.mode || "all";
+
     if (set.has(value)) {
       set.delete(value);
     } else {
+      if (mode === "single") {
+        set.clear();
+      }
       set.add(value);
     }
 
     this.applyFilterAndRender();
   },
+  /* === END BLOCK: ACTIVITIES_FINDER_SINGLE_GROUP_TOGGLE_V1 === */
 
   removeFilter(group, value) {
     if (!this.isKnownFilter(group, value)) return;
@@ -451,18 +460,20 @@ const OffersApp = {
     return this.normalizeArray(offer?.filter?.[group]);
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MATCH_MODE_V2 | Zweck: wertet Single-Gruppen eindeutig aus und lässt nur ausdrücklich als OR definierte Gruppen verbreitern; Umfang: ersetzt nur matchesFilterGroup(offer, group, activeValues) === */
   matchesFilterGroup(offer, group, activeValues = this.getActiveValues(group)) {
     if (!activeValues.length) return true;
 
     const available = new Set(this.getOfferFilterValues(offer, group));
-    const mode = this.filterGroups[group]?.mode || "any";
+    const mode = this.filterGroups[group]?.mode || "all";
 
-    if (mode === "all") {
-      return activeValues.every((value) => available.has(value));
+    if (mode === "any") {
+      return activeValues.some((value) => available.has(value));
     }
 
-    return activeValues.some((value) => available.has(value));
+    return activeValues.every((value) => available.has(value));
   },
+  /* === END BLOCK: ACTIVITIES_FINDER_MATCH_MODE_V2 === */
 
   matchesFilterState(offer, filterState = this.activeFilters) {
     return this.filterGroupOrder.every((group) => {
@@ -482,6 +493,7 @@ const OffersApp = {
     return tokens.every((token) => offer.searchIndex.includes(token));
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_PROJECTED_COUNT_MODE_V2 | Zweck: berechnet Trefferzahlen für Single-Gruppen als Wechsel statt als zusätzliche OR-Erweiterung; Umfang: ersetzt nur createProjectedState(group, value) === */
   createProjectedState(group, value) {
     const projected = {};
     this.filterGroupOrder.forEach((key) => {
@@ -489,11 +501,15 @@ const OffersApp = {
     });
 
     if (!projected[group].has(value)) {
+      if (this.filterGroups[group]?.mode === "single") {
+        projected[group].clear();
+      }
       projected[group].add(value);
     }
 
     return projected;
   },
+  /* === END BLOCK: ACTIVITIES_FINDER_PROJECTED_COUNT_MODE_V2 === */
 
   countProjectedMatches(group, value) {
     if (!this.isKnownFilter(group, value)) return 0;
@@ -641,11 +657,15 @@ const OffersApp = {
       : `${count} Aktivitäten gefunden`;
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V1 | Zweck: hält Statuszeile im geöffneten Filterpanel synchron mit aktiven Filtern und blendet sie ohne aktive Filter aus; Umfang: ersetzt nur updateFinderUI() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V2 | Zweck: hält Finder-Klasse und Reset-Zeile robust synchron mit aktiven Filterwerten; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
     const hasActiveFilterValues = activeCount > 0;
+
+    if (this.refs.finder) {
+      this.refs.finder.classList.toggle("has-active-filters", hasActiveFilterValues);
+    }
 
     if (this.refs.resetPill) {
       this.refs.resetPill.hidden = !hasActiveFilters;
@@ -660,7 +680,11 @@ const OffersApp = {
     }
 
     if (this.refs.advancedSummary) {
-      this.refs.advancedSummary.hidden = !hasActiveFilterValues;
+      if (hasActiveFilterValues) {
+        this.refs.advancedSummary.removeAttribute("hidden");
+      } else {
+        this.refs.advancedSummary.setAttribute("hidden", "");
+      }
     }
 
     if (this.refs.advancedSummaryText) {
@@ -673,7 +697,7 @@ const OffersApp = {
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V2 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
