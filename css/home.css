@@ -3023,6 +3023,7 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 body.page-route-activities .top-stack.activity-finder{
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
   grid-template-areas:
     "search"
     "quick"
