@@ -324,10 +324,10 @@ try {
          SET
             event_url = CASE
                 WHEN submission_kind = "activity" THEN event_url
-                ELSE :event_url
+                ELSE :event_url_event
             END,
             ticket_url = CASE
-                WHEN submission_kind = "activity" THEN :event_url
+                WHEN submission_kind = "activity" THEN :event_url_ticket
                 ELSE ticket_url
             END,
             title = :title,
@@ -358,7 +358,8 @@ try {
     /* === END BLOCK: ORGANIZER_SUBMISSION_UPDATE_ACTIVITY_SUPPORT_V1 === */
 
     $update->execute([
-        ':event_url' => $eventUrl,
+        ':event_url_event' => $eventUrl,
+        ':event_url_ticket' => $eventUrl,
         ':title' => $title,
         ':start_date' => $startDate,
         ':time_text' => $timeText,
