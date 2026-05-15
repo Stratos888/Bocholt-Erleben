@@ -3019,21 +3019,79 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 }
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
-/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V1 | Zweck: gestaltet den neuen semantischen Aktivitäten-Finder mit Schnellfiltern, aktiven Chips, Trefferzahl und ausklappbaren weiteren Filtern; Umfang: nur /angebote/ Finder-UI, keine Event-Filter, keine Card-Struktur === */
-body.page-route-activities .activity-finder{
+/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V2 | Zweck: gestaltet den semantischen Aktivitäten-Finder stabil auf Mobile, Narrow-Desktop und Desktop; Umfang: kompletter /angebote/ Finder-UI-Owner mit Suche, Schnellfiltern, aktiven Chips, Trefferzahl und Inline-Advanced-Bereich === */
+body.page-route-activities .top-stack.activity-finder{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "search"
+    "quick"
+    "status"
+    "advanced";
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+  max-width: none;
   min-width: 0;
+}
+
+body.page-route-activities .activity-finder > .activity-finder__search-row{
+  grid-area: search;
+}
+
+body.page-route-activities .activity-finder > .activity-finder__quick{
+  grid-area: quick;
+}
+
+body.page-route-activities .activity-finder > .activity-finder__status-row{
+  grid-area: status;
+}
+
+body.page-route-activities .activity-finder > .activity-finder__advanced{
+  grid-area: advanced;
+}
+
+body.page-route-activities .activity-finder .desktop-hero__actions{
+  display: none;
 }
 
 body.page-route-activities .activity-finder__search-row{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--cmp-input-minh, 48px);
+  grid-template-rows: auto auto;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
   min-width: 0;
 }
 
-body.page-route-activities .activity-finder__search-slot{
+body.page-route-activities .activity-finder__search-row::before{
+  content: none;
+}
+
+body.page-route-activities .activity-finder__search-slot,
+body.page-route-activities .activity-finder__search-row.has-active-filter-reset > .activity-finder__search-slot{
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
   min-width: 0;
 }
 
 body.page-route-activities .activity-finder__advanced-toggle{
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
   min-width: 0;
+  justify-self: stretch;
+}
+
+body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
+  grid-column: 2;
+  grid-row: 2;
+  width: var(--cmp-input-minh, 48px);
+  min-width: var(--cmp-input-minh, 48px);
+  justify-self: stretch;
+  align-self: stretch;
 }
 
 body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
@@ -3047,6 +3105,7 @@ body.page-route-activities .activity-finder__advanced-toggle.is-active .filter-p
 body.page-route-activities .activity-finder__quick{
   display: grid;
   gap: 7px;
+  width: 100%;
   min-width: 0;
 }
 
@@ -3068,16 +3127,21 @@ body.page-route-activities .activity-finder__active-list{
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
 body.page-route-activities .activity-filter-chip,
 body.page-route-activities .activity-active-chip{
   appearance: none;
+  box-sizing: border-box;
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  min-width: 0;
+  max-width: 100%;
+  min-width: max-content;
   min-height: 34px;
   margin: 0;
   padding: 0 11px;
@@ -3153,6 +3217,7 @@ body.page-route-activities .activity-active-chip{
 body.page-route-activities .activity-finder__status-row{
   display: grid;
   gap: 8px;
+  width: 100%;
   min-width: 0;
 }
 
@@ -3175,11 +3240,13 @@ body.page-route-activities .activity-finder__advanced[hidden]{
 }
 
 body.page-route-activities .activity-finder__advanced{
+  width: 100%;
   min-width: 0;
 }
 
 body.page-route-activities .activity-finder__advanced-inner{
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   min-width: 0;
   padding: 11px;
@@ -3219,33 +3286,6 @@ body.page-route-activities .activity-finder__group{
 }
 
 @media (max-width: 899.98px){
-  body.page-route-activities .activity-finder{
-    display: grid;
-    gap: 12px;
-  }
-
-  body.page-route-activities .activity-finder__search-row{
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--cmp-input-minh, 48px);
-    gap: 8px;
-    align-items: stretch;
-  }
-
-  body.page-route-activities .activity-finder__search-slot{
-    grid-column: 1 / -1;
-  }
-
-  body.page-route-activities .activity-finder__advanced-toggle{
-    grid-column: 1;
-    width: 100%;
-  }
-
-  body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
-    grid-column: 2;
-    width: var(--cmp-input-minh, 48px);
-    min-width: var(--cmp-input-minh, 48px);
-  }
-
   body.page-route-activities .activity-finder__quick-options,
   body.page-route-activities .activity-finder__active-list{
     flex-wrap: nowrap;
@@ -3259,19 +3299,10 @@ body.page-route-activities .activity-finder__group{
   body.page-route-activities .activity-finder__active-list::-webkit-scrollbar{
     display: none;
   }
-
-  body.page-route-activities .activity-finder__advanced-inner{
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  body.page-route-activities .activity-finder .desktop-hero__actions{
-    display: none;
-  }
 }
 
 @media (min-width: 900px){
   body.page-route-activities .top-stack.activity-finder{
-    display: grid;
     grid-template-columns: minmax(0, 1fr) var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
     grid-template-areas:
       "search actions"
@@ -3285,11 +3316,9 @@ body.page-route-activities .activity-finder__group{
   }
 
   body.page-route-activities .activity-finder > .activity-finder__search-row{
-    grid-area: search;
-    grid-column: auto;
-    grid-row: auto;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(168px, 210px);
+    grid-template-rows: auto;
     gap: 8px;
     align-items: stretch;
   }
@@ -3320,31 +3349,10 @@ body.page-route-activities .activity-finder__group{
     border-radius: 18px;
   }
 
-  body.page-route-activities .activity-finder__quick{
-    grid-area: quick;
-    min-width: 0;
-  }
-
-  body.page-route-activities .activity-finder__status-row{
-    grid-area: status;
-    min-width: 0;
-  }
-
-  body.page-route-activities .activity-finder__advanced{
-    grid-area: advanced;
-  }
-
   body.page-route-activities .activity-finder .desktop-hero__actions{
     grid-area: actions;
-    grid-column: auto;
-    grid-row: auto;
     display: grid;
     align-self: stretch;
-  }
-
-  body.page-route-activities .activity-finder__quick-options,
-  body.page-route-activities .activity-finder__active-list{
-    flex-wrap: wrap;
   }
 
   body.page-route-activities .activity-finder__advanced-inner{
@@ -3369,5 +3377,5 @@ body.page-route-activities .activity-finder__group{
     align-items: start;
   }
 }
-/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V1 === */
+/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V2 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
