@@ -3303,16 +3303,25 @@ body.page-route-activities .activity-finder__advanced-inner{
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_CSS_V1 | Zweck: gestaltet die optionale Reset-Zeile im geöffneten Aktivitäten-Filterpanel leise und kompakt; Umfang: nur Summary-/Reset-Zeile vor den Advanced-Filtergruppen === */
+/* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_CSS_V2 | Zweck: macht die Reset-Zeile im geöffneten Aktivitäten-Filterpanel sichtbar, kontrastreich und unabhängig vom scrollbaren Filterinhalt; Umfang: nur Summary-/Reset-Zeile vor den Advanced-Filtergruppen === */
 body.page-route-activities .activity-finder__advanced-summary{
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   min-width: 0;
-  margin: 0 0 10px;
-  padding: 0 2px 10px;
-  border-bottom: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 56%, transparent 44%);
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 70%, transparent 30%);
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.985) 0%,
+    rgba(248,251,242,0.965) 100%
+  );
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.84) inset,
+    0 4px 12px rgba(12,24,16,0.025);
 }
 
 body.page-route-activities .activity-finder__advanced-summary[hidden]{
@@ -3321,11 +3330,11 @@ body.page-route-activities .activity-finder__advanced-summary[hidden]{
 
 body.page-route-activities .activity-finder__advanced-summary-text{
   min-width: 0;
-  color: color-mix(in srgb, var(--home-copy-muted, #546459) 90%, var(--brand-green-900, #18281e) 10%);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 84%, var(--home-copy-muted, #546459) 16%);
   font-size: 0.76rem;
   font-weight: 780;
   line-height: 1.1;
-  letter-spacing: 0.055em;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
 }
 
@@ -3338,16 +3347,16 @@ body.page-route-activities .activity-finder__advanced-reset{
   min-height: 30px;
   margin: 0;
   padding: 0 10px;
-  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 74%, transparent 26%);
+  border: 1px solid color-mix(in srgb, var(--brand-green-900, #18281e) 16%, var(--home-action-border, rgba(24,40,30,0.14)) 84%);
   border-radius: 999px;
-  background: rgba(255,255,255,0.72);
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 82%, var(--brand-gold-300, #b69b4c) 18%);
+  background: rgba(255,255,255,0.84);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 86%, var(--brand-gold-300, #b69b4c) 14%);
   font: inherit;
   font-size: 0.76rem;
-  font-weight: 720;
+  font-weight: 740;
   line-height: 1;
   white-space: nowrap;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.78) inset;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82) inset;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -3360,7 +3369,7 @@ body.page-route-activities .activity-finder__advanced-reset:focus-visible{
 body.page-route-activities .activity-finder__advanced-reset:active{
   transform: translateY(1px);
 }
-/* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_CSS_V1 === */
+/* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_CSS_V2 === */
 
 body.page-route-activities .activity-finder__group{
   display: grid;
@@ -3429,10 +3438,10 @@ body.page-route-activities .activity-finder__group{
   }
   /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_QUICKFILTER_GRID_V1 === */
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V1 | Zweck: begrenzt das geöffnete mobile Filterpanel oberhalb der Bottom-Tabbar und macht nur den Panel-Inhalt scrollbar; Umfang: nur mobile Advanced-Panel-Surface innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V2 | Zweck: begrenzt nur den scrollbaren Filterinhalt unterhalb der Reset-Zeile und hält Abstand zur Bottom-Tabbar; Umfang: nur mobile Advanced-Panel-Surface innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
   body.page-route-activities .activity-finder__advanced-inner{
     gap: 0;
-    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 18px);
+    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 64px);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -3451,7 +3460,7 @@ body.page-route-activities .activity-finder__group{
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V2 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V2 | Zweck: entfernt die doppelte Trennerlogik aus den Gruppenüberschriften und gibt dem mobilen Advanced-Filterpanel einen sauberen Gruppenrhythmus; Umfang: nur Group-Abstände und Group-Titel im geöffneten Aktivitäten-Filterpanel === */
   body.page-route-activities .activity-finder__advanced .activity-finder__group{
