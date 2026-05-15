@@ -218,7 +218,6 @@ function sap_fetch_active_subscription_entitlement(PDO $pdo, array $submission):
             id,
             organizer_id,
             source_type,
-            source_id,
             plan_key,
             status,
             included_publications,
