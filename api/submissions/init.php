@@ -3,7 +3,7 @@ declare(strict_types=1);
 /* === BEGIN FILE: api/submissions/init.php | Zweck: legt fuer den Publish-Funnel eine erste Organizer-/Submission-Kombination serverseitig an; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
-
+require dirname(__DIR__) . '/push/_lib.php';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
     be_json_response(405, [
@@ -530,6 +530,15 @@ try {
             'submission_kind' => $submissionKind,
         ]);
     }
+
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INBOX_PUSH_ON_SUBMIT_V1 | Zweck: sendet nach neuer pruefpflichtiger Aktivitaet eine interne Inbox-Pushmeldung; Umfang: best-effort Push nach erfolgreichem Commit === */
+    if ($submissionKind === 'activity') {
+        be_push_notify_inbox_best_effort('activity_submission', 'submission:' . $submissionId . ':pending_review');
+    } elseif ($paymentKind === 'single') {
+        be_push_notify_inbox_best_effort('event_submission', 'submission:' . $submissionId . ':pending_review');
+    }
+    /* === END BLOCK: ACTIVITY_PRESENCE_INBOX_PUSH_ON_SUBMIT_V1 === */
+
     be_json_response(201, [
         'status' => 'ok',
         'data' => [
