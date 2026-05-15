@@ -1360,7 +1360,93 @@ select.content-field__control{
   font-weight: 440;
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_DATA_ROWS_FINAL_V1 === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 | Zweck: gestaltet die Tarifübersicht im Anbieterbereich als kompakte Preistabelle mit Summenzeile und Leistungs-Bullets; Umfang: nur Dashboard-Tarifkarte === */
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-section-title{
+  display: block;
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+  font-size: 0.86rem;
+  font-weight: 780;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
 
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-table{
+  display: grid;
+  gap: 7px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-row,
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-label{
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-weight: 560;
+  line-height: 1.35;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-price,
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-price{
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total{
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 3px double var(--border-panel-strong);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-label{
+  color: var(--color-text-primary);
+  font-weight: 780;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullets{
+  display: grid;
+  gap: 8px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullet{
+  position: relative;
+  display: block;
+  padding-left: 17px;
+  color: var(--color-text-secondary);
+  font-weight: 520;
+  line-height: 1.4;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullet::before{
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-muted) 68%, transparent);
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-period,
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-summary{
+  display: grid;
+  gap: 8px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-change:not([hidden]){
+  display: block;
+}
+/* === END BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 === */
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_INLINE_EDIT_STYLES_V1 | Zweck: gestaltet aufklappbare Einreichungen inklusive direkter Änderungsmaske im Veranstalter-Dashboard; Umfang: komplette Submission-Liste, Detailansicht, Aktionen und Edit-Formular === */
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
