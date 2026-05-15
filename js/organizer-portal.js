@@ -708,76 +708,121 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V1 | Zweck: zeigt mehrere aktive Tarife, Monatsgesamtsumme und getrennte Kontingente im Anbieterbereich; Umfang: ersetzt komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
-const activeTariffLabels = activeSubscriptions
-  .map((item) => {
-    const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
-    const amount = safeText(item?.monthly_amount_label);
-    return amount ? `${label}: ${amount}` : label;
-  })
-  .filter(Boolean);
-const quotaLines = quotaByPlan
-  .map((item) => {
-    const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
-    const isActivityQuota = ["activity_basic", "activity_plus"].includes(safeText(item?.plan_key).toLowerCase());
-    const unitLabel = isActivityQuota ? "Aktivitäten" : "Termine";
-    const consumed = Number(item?.consumed_total || 0);
-    if (item?.has_unlimited) {
-      return `${label}: ${consumed} veröffentlichte ${unitLabel}, unbegrenzt`;
-    }
-    return `${label}: ${consumed} von ${Number(item?.included_total || 0)} veröffentlichte ${unitLabel}`;
-  })
-  .filter(Boolean);
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V2 | Zweck: rendert aktive Tarife als ruhige Preistabelle mit Summenlinie und getrennten Leistungs-Bullets statt Fliesstext; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
+    const tariffRows = activeSubscriptions
+      .map((item) => {
+        const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+        const amount = safeText(item?.monthly_amount_label);
+        if (!label) return null;
 
-if (quotaHead) {
-  quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Tarife";
-}
+        return {
+          label,
+          amount: amount || "–"
+        };
+      })
+      .filter(Boolean);
 
-if (quotaPeriod) {
-  if (isSingleStatusView) {
-    quotaPeriod.textContent = latestSubmission
-      ? `Termin: ${latestDateText}`
-      : "Veranstaltung einreichen";
-  } else if (activeTariffLabels.length > 0) {
-    quotaPeriod.textContent = `Aktive Tarife: ${activeTariffLabels.join(" · ")}`;
-  } else {
-    quotaPeriod.textContent = `Tarif: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
-  }
-}
+    const includedRows = quotaByPlan
+      .map((item) => {
+        const planKey = safeText(item?.plan_key).toLowerCase();
+        const isActivityQuota = ["activity_basic", "activity_plus"].includes(planKey);
+        const consumed = Number(item?.consumed_total || 0);
+        const included = Number(item?.included_total || 0);
 
-if (quotaChange) {
-  if (isSingleStatusView) {
-    quotaChange.textContent = "";
-    quotaChange.hidden = true;
-  } else {
+        if (isActivityQuota) {
+          if (item?.has_unlimited) {
+            return "Aktivitäten: unbegrenzt veröffentlichte Aktivitäten";
+          }
+
+          return `Aktivitäten: ${consumed} von ${included} veröffentlichten Aktivitäten genutzt`;
+        }
+
+        if (["starter", "active", "unlimited"].includes(planKey)) {
+          if (item?.has_unlimited) {
+            return "Events: unbegrenzt veröffentlichte Termine";
+          }
+
+          return `Events: ${consumed} von ${included} veröffentlichten Terminen genutzt`;
+        }
+
+        return "";
+      })
+      .filter(Boolean);
+
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
-    quotaChange.textContent = monthlyTotal ? `Gesamt: ${monthlyTotal}` : "";
-    quotaChange.hidden = !monthlyTotal;
-  }
-}
 
-if (quotaSummary) {
-  if (isSingleStatusView) {
-    quotaSummary.textContent = latestSubmission
-      ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
-      : "Noch keine Einreichung gefunden.";
-  } else if (quotaLines.length > 0) {
-    quotaSummary.textContent = quotaLines.join(" · ");
-  } else if (quota.has_unlimited) {
-    quotaSummary.textContent = `${isActivityPlanView ? "Veröffentlichte Aktivitäten" : "Veröffentlichte Termine"}: ${Number(quota.consumed_total || 0)} im aktuellen Zeitraum`;
-  } else {
-    quotaSummary.textContent = `${isActivityPlanView ? "Veröffentlichte Aktivitäten" : "Veröffentlichte Termine"}: ${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} im aktuellen Zeitraum`;
-  }
-}
+    if (quotaHead) {
+      quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Tarife";
+    }
 
-if (quotaRemaining) {
-  if (isSingleStatusView) {
-    quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
-  } else {
-    quotaRemaining.textContent = "Gezählt werden veröffentlichte Termine und Aktivitäten erst nach Freigabe.";
-  }
-}
-/* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V1 === */
+    if (quotaPeriod) {
+      quotaPeriod.hidden = false;
+
+      if (isSingleStatusView) {
+        quotaPeriod.textContent = latestSubmission
+          ? `Termin: ${latestDateText}`
+          : "Veranstaltung einreichen";
+      } else if (tariffRows.length > 0) {
+        quotaPeriod.innerHTML = `
+          <span class="organizer-tariff-section-title">Laufende Tarife</span>
+          <span class="organizer-tariff-table" role="list">
+            ${tariffRows.map((row) => `
+              <span class="organizer-tariff-row" role="listitem">
+                <span class="organizer-tariff-label">${escapeHtml(row.label)}</span>
+                <span class="organizer-tariff-price">${escapeHtml(row.amount)}</span>
+              </span>
+            `).join("")}
+          </span>
+        `;
+      } else {
+        quotaPeriod.textContent = `Tarif: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
+      }
+    }
+
+    if (quotaChange) {
+      if (isSingleStatusView || !monthlyTotal) {
+        quotaChange.textContent = "";
+        quotaChange.hidden = true;
+      } else {
+        quotaChange.hidden = false;
+        quotaChange.innerHTML = `
+          <span class="organizer-tariff-total" aria-label="Monatliche Gesamtsumme">
+            <span class="organizer-tariff-total-label">Monatlich gesamt</span>
+            <span class="organizer-tariff-total-price">${escapeHtml(monthlyTotal)}</span>
+          </span>
+        `;
+      }
+    }
+
+    if (quotaSummary) {
+      if (isSingleStatusView) {
+        quotaSummary.textContent = latestSubmission
+          ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
+          : "Noch keine Einreichung gefunden.";
+      } else if (includedRows.length > 0) {
+        quotaSummary.innerHTML = `
+          <span class="organizer-tariff-section-title">Enthalten</span>
+          <span class="organizer-tariff-bullets">
+            ${includedRows.map((line) => `
+              <span class="organizer-tariff-bullet">${escapeHtml(line)}</span>
+            `).join("")}
+          </span>
+        `;
+      } else if (quota.has_unlimited) {
+        quotaSummary.textContent = `${isActivityPlanView ? "Aktivitäten" : "Events"}: unbegrenzt`;
+      } else {
+        quotaSummary.textContent = `${Number(quota.consumed_total || 0)} von ${Number(quota.included_total || 0)} genutzt`;
+      }
+    }
+
+    if (quotaRemaining) {
+      if (isSingleStatusView) {
+        quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
+      } else {
+        quotaRemaining.textContent = "Gezählt wird erst nach redaktioneller Freigabe.";
+      }
+    }
+    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V2 === */
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 | Zweck: zeigt aktuelle Einreichungen mit Details und erlaubt Veranstaltern das Ändern noch nicht freigegebener Eventdaten direkt im Dashboard; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
