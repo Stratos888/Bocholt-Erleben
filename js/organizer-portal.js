@@ -560,6 +560,9 @@ function normalizeExternalUrl(value) {
     const organizer = data?.organizer || {};
     const quota = data?.quota || {};
     const subscription = data?.subscription || null;
+    const activeSubscriptions = Array.isArray(data?.active_subscriptions) ? data.active_subscriptions : [];
+    const quotaByPlan = Array.isArray(data?.quota_by_plan) ? data.quota_by_plan : [];
+    const billingSummary = data?.billing_summary || {};
     const submissions = Array.isArray(data?.recent_submissions) ? data.recent_submissions : [];
 
     const latestSubmission = submissions[0] || null;
@@ -705,9 +708,29 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V6 | Zweck: unterscheidet Mitgliedschafts- und Aktivitaetspraesenz-Uebersicht im Anbieterbereich; Umfang: komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V1 | Zweck: zeigt mehrere aktive Tarife, Monatsgesamtsumme und getrennte Kontingente im Anbieterbereich; Umfang: ersetzt komplette Quota-/Mitgliedschaftsübersicht in renderDashboard === */
+const activeTariffLabels = activeSubscriptions
+  .map((item) => {
+    const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+    const amount = safeText(item?.monthly_amount_label);
+    return amount ? `${label}: ${amount}` : label;
+  })
+  .filter(Boolean);
+const quotaLines = quotaByPlan
+  .map((item) => {
+    const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+    const isActivityQuota = ["activity_basic", "activity_plus"].includes(safeText(item?.plan_key).toLowerCase());
+    const unitLabel = isActivityQuota ? "Aktivitäten" : "Termine";
+    const consumed = Number(item?.consumed_total || 0);
+    if (item?.has_unlimited) {
+      return `${label}: ${consumed} veröffentlichte ${unitLabel}, unbegrenzt`;
+    }
+    return `${label}: ${consumed} von ${Number(item?.included_total || 0)} veröffentlichte ${unitLabel}`;
+  })
+  .filter(Boolean);
+
 if (quotaHead) {
-  quotaHead.textContent = isSingleStatusView ? "Status" : (isActivityPlanView ? "Übersicht Aktivitätspräsenz" : "Übersicht Mitgliedschaft");
+  quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Tarife";
 }
 
 if (quotaPeriod) {
@@ -715,6 +738,8 @@ if (quotaPeriod) {
     quotaPeriod.textContent = latestSubmission
       ? `Termin: ${latestDateText}`
       : "Veranstaltung einreichen";
+  } else if (activeTariffLabels.length > 0) {
+    quotaPeriod.textContent = `Aktive Tarife: ${activeTariffLabels.join(" · ")}`;
   } else {
     quotaPeriod.textContent = `Tarif: ${formatPlanLabel(subscriptionPlanKey || effectivePlanKey)}`;
   }
@@ -725,25 +750,9 @@ if (quotaChange) {
     quotaChange.textContent = "";
     quotaChange.hidden = true;
   } else {
-    const end = formatDate(safeText(quota.current_period_end || subscription?.current_period_end).split(" ")[0]);
-    const subscriptionStatus = safeText(subscription?.status).toLowerCase();
-    const cancelAtPeriodEnd = Number(subscription?.cancel_at_period_end || 0) === 1;
-    const pendingPlanKey = safeText(subscription?.pending_plan_key).toLowerCase();
-    const pendingDate = formatDate(safeText(subscription?.pending_change_effective_at).split(" ")[0]);
-
-    if (cancelAtPeriodEnd && end !== "–") {
-      quotaChange.textContent = `${isActivityPlanView ? "Aktivitätspräsenz" : "Mitgliedschaft"} endet zum ${end}`;
-      quotaChange.hidden = false;
-    } else if (pendingPlanKey && pendingPlanKey !== subscriptionPlanKey && pendingDate !== "–") {
-      quotaChange.textContent = `Geplanter Tarifwechsel: ${formatPlanLabel(pendingPlanKey)} ab ${pendingDate}`;
-      quotaChange.hidden = false;
-    } else if (subscriptionStatus === "past_due") {
-      quotaChange.textContent = "Zahlungsproblem – bitte verwalten";
-      quotaChange.hidden = false;
-    } else {
-      quotaChange.textContent = "";
-      quotaChange.hidden = true;
-    }
+    const monthlyTotal = safeText(billingSummary?.monthly_total_label);
+    quotaChange.textContent = monthlyTotal ? `Gesamt: ${monthlyTotal}` : "";
+    quotaChange.hidden = !monthlyTotal;
   }
 }
 
@@ -752,6 +761,8 @@ if (quotaSummary) {
     quotaSummary.textContent = latestSubmission
       ? "Einreichung erhalten. Die Veröffentlichung erfolgt nach Prüfung."
       : "Noch keine Einreichung gefunden.";
+  } else if (quotaLines.length > 0) {
+    quotaSummary.textContent = quotaLines.join(" · ");
   } else if (quota.has_unlimited) {
     quotaSummary.textContent = `${isActivityPlanView ? "Veröffentlichte Aktivitäten" : "Veröffentlichte Termine"}: ${Number(quota.consumed_total || 0)} im aktuellen Zeitraum`;
   } else {
@@ -760,17 +771,13 @@ if (quotaSummary) {
 }
 
 if (quotaRemaining) {
-  if (quota.has_unlimited) {
-    quotaRemaining.textContent = isActivityPlanView
-      ? "Weitere Einreichungen sind möglich. Gezählt werden veröffentlichte Aktivitäten nach Freigabe."
-      : "Weitere Einreichungen sind möglich. Gezählt werden veröffentlichte Termine nach Freigabe.";
-  } else if (isSingleStatusView) {
+  if (isSingleStatusView) {
     quotaRemaining.textContent = "Für diese Einreichung ist keine Mitgliedschaft aktiv.";
   } else {
-    quotaRemaining.textContent = `Noch verfügbar: ${Number(quota.remaining_total || 0)} ${isActivityPlanView ? "veröffentlichte Aktivitäten" : "veröffentlichte Termine"}.`;
+    quotaRemaining.textContent = "Gezählt werden veröffentlichte Termine und Aktivitäten erst nach Freigabe.";
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_MEMBERSHIP_OVERVIEW_COPY_V6 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V1 === */
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 | Zweck: zeigt aktuelle Einreichungen mit Details und erlaubt Veranstaltern das Ändern noch nicht freigegebener Eventdaten direkt im Dashboard; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
@@ -796,6 +803,10 @@ if (submissionsList && submissionsEmpty) {
   function isSubmissionEditable(submission) {
     const statusKey = safeText(submission?.status).toLowerCase();
     const kindKey = safeText(submission?.submission_kind || "event").toLowerCase();
+
+    if (kindKey === "activity") {
+      return ["pending_review", "payment_released", "paid", "in_review", "approved"].includes(statusKey);
+    }
 
     if (kindKey !== "event") return false;
     if (editableStatuses.has(statusKey)) return true;
@@ -884,10 +895,13 @@ if (submissionsList && submissionsEmpty) {
   }
 
   function readEditValues(form, submission) {
+    const kindKey = safeText(submission?.submission_kind || "event").toLowerCase();
+
     return {
       submission_id: Number(submission?.id || 0),
+      submission_kind: kindKey,
       title: safeText(form.elements.title?.value),
-      start_date: safeText(form.elements.start_date?.value),
+      start_date: kindKey === "activity" ? "" : safeText(form.elements.start_date?.value),
       time_text: safeText(form.elements.time_text?.value),
       location_name: safeText(form.elements.location_name?.value),
       location_address: safeText(form.elements.location_address?.value),
@@ -897,14 +911,15 @@ if (submissionsList && submissionsEmpty) {
     };
   }
 
-  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V4 | Zweck: validiert nur zwingende Änderungsfelder und blockiert ältere/freigegebene Events nicht wegen fehlender Zusatzdaten; Umfang: komplette Edit-Form-Validierung === */
+  /* === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V5 | Zweck: validiert Änderungsfelder getrennt für Events und Aktivitaetspraesenzen; Umfang: komplette Edit-Form-Validierung === */
   function validateEditValues(form, values) {
     const invalidNames = [];
     const eventUrlControl = form.elements.event_url;
+    const kindKey = safeText(values.submission_kind || "event").toLowerCase();
 
     if (!values.submission_id) invalidNames.push("title");
     if (!values.title) invalidNames.push("title");
-    if (!values.start_date) invalidNames.push("start_date");
+    if (kindKey !== "activity" && !values.start_date) invalidNames.push("start_date");
     if (!values.location_name) invalidNames.push("location_name");
     if (values.event_url && eventUrlControl && !eventUrlControl.validity.valid) invalidNames.push("event_url");
 
@@ -915,7 +930,7 @@ if (submissionsList && submissionsEmpty) {
 
     return true;
   }
-  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V4 === */
+  /* === END BLOCK: ORGANIZER_SUBMISSION_EDIT_VALIDATION_V5 === */
 
   function setSaveButtonState(button, isSaving) {
     if (!button) return;
@@ -947,6 +962,7 @@ if (submissionsList && submissionsEmpty) {
     submission.location_address = updated.location_address;
     submission.location_public_confirmed = updated.location_public_confirmed;
     submission.event_url = updated.event_url;
+    submission.ticket_url = updated.ticket_url || submission.ticket_url || updated.event_url;
     submission.description_text = updated.description_text;
     submission.organizer_edited_at = updated.organizer_edited_at || submission.organizer_edited_at;
     submission.organizer_edit_count = updated.organizer_edit_count || submission.organizer_edit_count || 1;
@@ -998,7 +1014,7 @@ if (submissionsList && submissionsEmpty) {
       });
 
       updateRenderedSubmission(row, detail, submission, values, result?.data?.submission || null);
-      setEditStatus(form, "Änderung gespeichert. Wir prüfen die aktuelle Version deiner Einreichung.", "success");
+      setEditStatus(form, safeText(result?.message) || "Änderung gespeichert. Wir prüfen die aktuelle Version deiner Einreichung.", "success");
     } catch (error) {
       console.warn("Organizer portal: submission update failed.", error);
       const message = safeText(error?.payload?.message) || "Die Änderung konnte gerade nicht gespeichert werden. Bitte versuche es erneut.";
@@ -1024,7 +1040,7 @@ if (submissionsList && submissionsEmpty) {
       const metaDateText = formatSubmissionMetaDate(submission);
       const metaText = `${statusText} · ${metaDateText}`;
       const statusDescription = formatSubmissionStatusDescription(submission);
-      const eventUrl = normalizeExternalUrl(submission.event_url);
+      const eventUrl = normalizeExternalUrl(submission.event_url || submission.ticket_url);
       const detailId = `organizer-submission-detail-${index}`;
       const editFormId = `organizer-submission-edit-${safeText(submission.id) || index}`;
       const hasOrganizerEdit = Number(submission.organizer_edit_count || 0) > 0;
@@ -1076,33 +1092,35 @@ if (submissionsList && submissionsEmpty) {
           ` : ""}
         </div>
         ${canEdit ? `
-          <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V4 | Zweck: macht Adresse und Ortsbestätigung im Änderungsformular optional und zeigt Speicher-/Fehlermeldungen direkt vor den Aktionen; Umfang: komplettes Inline-Edit-Formular einer Einreichung === -->
+          <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V5 | Zweck: zeigt passende Änderungsfelder für Events und Aktivitaetspraesenzen; Umfang: komplettes Inline-Edit-Formular einer Einreichung === -->
           <form class="content-form organizer-submission-edit-form" id="${escapeHtml(editFormId)}" data-submission-edit-form hidden novalidate>
             <div class="content-form-grid">
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-title">
-                <span class="content-field__label">Titel der Veranstaltung *</span>
+                <span class="content-field__label">${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "Name der Aktivität *" : "Titel der Veranstaltung *"}</span>
                 <input class="content-field__control" id="${escapeHtml(editFormId)}-title" name="title" type="text" value="${escapeHtml(submission.title)}" required>
               </label>
-              <label class="content-field" for="${escapeHtml(editFormId)}-date">
-                <span class="content-field__label">Datum *</span>
-                <input class="content-field__control" id="${escapeHtml(editFormId)}-date" name="start_date" type="date" value="${escapeHtml(submission.start_date)}" required>
-              </label>
+              ${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "" : `
+                <label class="content-field" for="${escapeHtml(editFormId)}-date">
+                  <span class="content-field__label">Datum *</span>
+                  <input class="content-field__control" id="${escapeHtml(editFormId)}-date" name="start_date" type="date" value="${escapeHtml(submission.start_date)}" required>
+                </label>
+              `}
               <label class="content-field" for="${escapeHtml(editFormId)}-time">
-                <span class="content-field__label">Uhrzeit</span>
-                <input class="content-field__control" id="${escapeHtml(editFormId)}-time" name="time_text" type="text" inputmode="text" value="${escapeHtml(submission.time_text)}" placeholder="z. B. 19:00 Uhr">
+                <span class="content-field__label">${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "Verfügbarkeit" : "Uhrzeit"}</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-time" name="time_text" type="text" inputmode="text" value="${escapeHtml(submission.time_text)}" placeholder="${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "z. B. ganzjährig buchbar" : "z. B. 19:00 Uhr"}">
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-location">
-                <span class="content-field__label">Veranstaltungsort / Location *</span>
+                <span class="content-field__label">${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "Anbieter / Ort der Aktivität *" : "Veranstaltungsort / Location *"}</span>
                 <input class="content-field__control" id="${escapeHtml(editFormId)}-location" name="location_name" type="text" value="${escapeHtml(submission.location_name)}" required>
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-address">
-                <span class="content-field__label">Straße, Hausnummer / offizieller Treffpunkt</span>
+                <span class="content-field__label">Adresse / offizieller Treffpunkt</span>
                 <input class="content-field__control" id="${escapeHtml(editFormId)}-address" name="location_address" type="text" value="${escapeHtml(submission.location_address)}">
-                <p class="content-field__hint">Optional, aber hilfreich für die Prüfung. Keine Privatadressen Dritter eintragen. Bei Outdoor-Terminen den offiziellen Start- oder Treffpunkt angeben.</p>
+                <p class="content-field__hint">Optional, aber hilfreich für die Prüfung. Keine Privatadressen Dritter eintragen. Bei Outdoor-Angeboten den offiziellen Start- oder Treffpunkt angeben.</p>
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-event-url">
-                <span class="content-field__label">Link zur Veranstaltungsseite</span>
-                <input class="content-field__control" id="${escapeHtml(editFormId)}-event-url" name="event_url" type="url" inputmode="url" value="${escapeHtml(submission.event_url)}" placeholder="https://...">
+                <span class="content-field__label">${safeText(submission.submission_kind || "event").toLowerCase() === "activity" ? "Website / Buchungslink" : "Link zur Veranstaltungsseite"}</span>
+                <input class="content-field__control" id="${escapeHtml(editFormId)}-event-url" name="event_url" type="url" inputmode="url" value="${escapeHtml(submission.event_url || submission.ticket_url)}" placeholder="https://...">
               </label>
               <label class="content-field content-field--full" for="${escapeHtml(editFormId)}-description">
                 <span class="content-field__label">Kurze Beschreibung / Hinweise</span>
@@ -1112,7 +1130,7 @@ if (submissionsList && submissionsEmpty) {
                 <span class="content-field__label">Bestätigung</span>
                 <span class="content-field__hint">
                   <input id="${escapeHtml(editFormId)}-confirmed" name="location_public_confirmed" type="checkbox" ${Number(submission.location_public_confirmed || 0) === 1 ? "checked" : ""}>
-                  Ich bestätige, dass ich berechtigt bin, diese Veranstaltung einzureichen, und dass der Ort öffentlich genannt werden darf.
+                  Ich bestätige, dass ich berechtigt bin, diese Einreichung zu ändern, und dass der Ort öffentlich genannt werden darf.
                 </span>
               </label>
             </div>
@@ -1122,7 +1140,7 @@ if (submissionsList && submissionsEmpty) {
               <button class="content-cta organizer-submission-edit-cancel" type="button" data-submission-edit-cancel>Abbrechen</button>
             </div>
           </form>
-          <!-- === END BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V4 === -->
+          <!-- === END BLOCK: ORGANIZER_SUBMISSION_EDIT_FORM_FIELDS_V5 === -->
         ` : `
           <!-- === BEGIN BLOCK: ORGANIZER_SUBMISSION_LOCKED_NOTE_COPY_V2 | Zweck: erklärt, warum nur vergangene freigegebene oder abgelehnte Einreichungen nicht direkt änderbar sind; Umfang: Hinweistext für nicht editierbare Einreichungen === -->
           <p class="content-form-note organizer-submission-detail__locked-note">
