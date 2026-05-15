@@ -79,7 +79,42 @@ Umfang:
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
     .actions .btn { flex: 1 1 160px; padding: 12px; font-size: 15px; }
     .sourceBtn { flex: 1 1 240px; }
+    /* === BEGIN BLOCK: REVIEW_CARD_NOTICE_UI_V1 | Zweck: macht fachliche Aktionsfehler direkt an den Review-Buttons sichtbar; Umfang: lokaler Hinweiscontainer in der Review-Karte === */
+    .reviewNotice {
+      margin: 12px 0 0;
+      padding: 12px 14px 12px 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(160, 0, 0, .36);
+      background: rgba(160, 0, 0, .075);
+      color: rgb(92, 20, 20);
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.35;
+      position: relative;
+      box-shadow: 0 10px 22px rgba(80, 25, 25, .08);
+    }
 
+    .reviewNotice::before {
+      content: "!";
+      position: absolute;
+      left: 13px;
+      top: 12px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgb(160, 0, 0);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .reviewNotice[hidden] {
+      display: none !important;
+    }
+    /* === END BLOCK: REVIEW_CARD_NOTICE_UI_V1 === */
     .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
 
     @media (max-width: 560px) {
@@ -204,7 +239,28 @@ Umfang:
     function setStatus(msg) {
       elStatus.textContent = msg || "";
     }
+    /* === BEGIN BLOCK: REVIEW_CARD_NOTICE_HELPER_V1 | Zweck: zeigt fachliche Aktionsmeldungen direkt in der aktuellen Karte nahe bei den Review-Buttons; Umfang: lokale Hinweissteuerung === */
+    function setReviewCardNotice(message, type = "error") {
+      const node = document.getElementById("reviewCardNotice");
+      if (!node) {
+        setStatus(message);
+        return;
+      }
 
+      const text = String(message || "").trim();
+      if (!text) {
+        node.hidden = true;
+        node.textContent = "";
+        node.className = "reviewNotice";
+        return;
+      }
+
+      node.hidden = false;
+      node.textContent = text;
+      node.className = `reviewNotice reviewNotice--${type}`;
+      node.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+    /* === END BLOCK: REVIEW_CARD_NOTICE_HELPER_V1 === */
     function isUnlocked() {
       return !!sessionToken;
     }
@@ -959,7 +1015,9 @@ Umfang:
             </select>
           </div>
 
-          <!-- === BEGIN BLOCK: REVIEW_ACTION_BUTTONS_WITH_DEFER_V1 | Zweck: ergänzt eine lokale Später-prüfen-Aktion, damit wartende oder unklare Fälle die Review-Reihenfolge nicht blockieren; Umfang: kompletter Aktionsbutton-Block der Review-Karte === -->
+          <!-- === BEGIN BLOCK: REVIEW_ACTION_BUTTONS_WITH_VISIBLE_NOTICE_V1 | Zweck: zeigt Aktionsfehler direkt an der aktuellen Review-Karte statt oben außerhalb des Sichtfelds; Umfang: Hinweisbereich plus Aktionsbutton-Block === -->
+          <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
+
           <div class="actions">
             <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
             <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink öffnen</button>
@@ -967,7 +1025,7 @@ Umfang:
             <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
             <button id="btnOk" class="btn btn-good" type="button">${escapeHtml(reviewState.approveLabel)}</button>
           </div>
-          <!-- === END BLOCK: REVIEW_ACTION_BUTTONS_WITH_DEFER_V1 === -->
+          <!-- === END BLOCK: REVIEW_ACTION_BUTTONS_WITH_VISIBLE_NOTICE_V1 === -->
 
           ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Klick auf Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
         </article>
@@ -1105,11 +1163,13 @@ Umfang:
       } catch (e) {
         console.error(e);
         if (String(it.review_source || "") === "submission_db") {
-          setStatus(normalizeSubmissionReviewError(e));
+          renderCurrent(totalLoaded);
+          setReviewCardNotice(normalizeSubmissionReviewError(e), "error");
+          setStatus("");
         } else {
           setStatus("Fehler beim Schreiben (Netz/JSONP): " + (e && e.message ? e.message : e));
+          renderCurrent(totalLoaded);
         }
-        renderCurrent(totalLoaded);
       } finally {
         setReviewActionButtonsDisabled(false);
       }
