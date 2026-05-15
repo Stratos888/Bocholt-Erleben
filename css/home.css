@@ -3347,9 +3347,16 @@ body.page-route-activities .activity-finder__group{
     display: none;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V1 | Zweck: begrenzt das geöffnete mobile Filterpanel oberhalb der Bottom-Tabbar und macht nur den Panel-Inhalt scrollbar; Umfang: nur mobile Advanced-Panel-Surface innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
   body.page-route-activities .activity-finder__advanced-inner{
     gap: 0;
-    padding: 11px;
+    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 18px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    padding: 11px 11px 16px;
     border-radius: 18px;
     background: linear-gradient(
       180deg,
@@ -3362,6 +3369,7 @@ body.page-route-activities .activity-finder__group{
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_VIEWPORT_LIMIT_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V2 | Zweck: entfernt die doppelte Trennerlogik aus den Gruppenüberschriften und gibt dem mobilen Advanced-Filterpanel einen sauberen Gruppenrhythmus; Umfang: nur Group-Abstände und Group-Titel im geöffneten Aktivitäten-Filterpanel === */
   body.page-route-activities .activity-finder__advanced .activity-finder__group{
