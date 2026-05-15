@@ -2103,6 +2103,7 @@
       0 1px 2px rgba(12,24,18,0.022);
   }
 }
+@media (min-width: 1024px){
   /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_TOP_SHELL_95_PARITY_V1 | Zweck: überträgt den finalen Desktop-Top-Shell-Contract der Events-Seite auf /angebote/: Suche über Filtern links, identische Service-Rail rechts, gleicher lokaler Hero-Textschutz; Umfang: nur Desktop-Aktivitäten ab 1024px, keine Mobile- oder Kartenstruktur-Änderung === */
   body.page-route-activities{
     --desktop-search-height: 66px;
