@@ -40,105 +40,81 @@ Umfang:
        - Nur Styles für inbox/index.html
     === END BLOCK: REVIEW UI LAYOUT WITH COMPLETE EVENT DATA V1 === */
 
-    /* === BEGIN BLOCK: REVIEW_INBOX_COMPACT_CARD_UI_V1 | Zweck: kompaktiert Header, trennt Flow- und Inhaltsdaten und gestaltet lokale Aktionshinweise; Umfang: zentrale Inbox-UI-Styles === */
-    .wrap { max-width: 820px; margin: 0 auto; padding: 14px; }
+    /* === BEGIN BLOCK: REVIEW_INBOX_WORKBENCH_UI_V2 | Zweck: macht die Inbox zur kompakten Review-Arbeitskarte mit klarer Priorisierung von Daten, Flow und Aktionen; Umfang: zentrale Inbox-UI-Styles === */
+    .wrap { max-width: 760px; margin: 0 auto; padding: 12px; }
     .top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-    .brand { display:flex; align-items:baseline; gap:10px; padding-top: 9px; }
-    .title { font-weight: 700; }
-    .inboxToolbar { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
-    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.18); font-size: 12px; }
-    .originBadge { display:inline-flex; align-items:center; width:max-content; margin:0 0 10px 0; padding:4px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.18); font-size:12px; font-weight:700; }
-    .riskBox { margin: 10px 0 12px; padding: 10px; border-radius: 12px; border: 1px solid rgba(160,0,0,.25); background: rgba(160,0,0,.04); font-size: 13px; line-height: 1.35; }
-    .riskBox ul { margin: 6px 0 0 18px; padding: 0; }
-    .muted { opacity: .75; }
-    .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; }
-    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .brand { display:flex; align-items:baseline; gap:10px; padding-top: 8px; }
+    .title { font-weight: 800; line-height: 1.1; }
+    .inboxToolbar { display:flex; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.16); font-size: 12px; }
+    .muted { opacity: .72; }
+    .status { margin-top: 8px; font-size: 13px; }
+
+    .btn { padding: 9px 11px; border-radius: 12px; border: 1px solid rgba(0,0,0,.18); background: transparent; cursor: pointer; font: inherit; }
+    .btn:disabled { opacity: .42; cursor: not-allowed; }
     .btn-push-active { border-color: rgba(0,120,0,.45); }
     .btn-good { border-color: rgba(0,120,0,.45); }
     .btn-bad { border-color: rgba(160,0,0,.45); }
 
-    .status { margin-top: 8px; font-size: 13px; }
     .card { margin-top: 12px; border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.02); }
-    .reviewCard h1 { margin: 0; font-size: 20px; line-height: 1.2; }
-    .reviewCardHead { margin-bottom: 12px; }
+    .reviewCard { display:grid; gap:12px; }
+    .reviewCardHead { display:grid; gap:8px; padding-bottom: 2px; }
+    .reviewCard h1 { margin: 0; font-size: 21px; line-height: 1.16; }
+    .reviewMetaLine { color: rgba(20,35,28,.78); font-size: 13px; line-height: 1.3; overflow-wrap:anywhere; }
 
-    .reviewSection { padding: 12px 0; border-top: 1px solid rgba(0,0,0,.09); }
-    .reviewSection:first-of-type { border-top: 0; padding-top: 0; }
-    .reviewSectionTitle { margin: 0 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; opacity: .72; }
-    .reviewGrid { display:grid; gap:0; margin: 0; }
-    .reviewRow { display:grid; grid-template-columns: minmax(105px, 150px) 1fr; gap:10px; font-size:14px; line-height:1.32; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,.07); }
-    .reviewRow:last-child { border-bottom: 0; }
-    .reviewLabel { font-weight:700; opacity:.78; }
+    .reviewBadgeRow { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .originBadge,
+    .reviewChip { display:inline-flex; align-items:center; width:max-content; padding:4px 9px; border-radius:999px; border:1px solid rgba(0,0,0,.15); font-size:12px; font-weight:760; line-height:1.1; }
+    .reviewChip--paid,
+    .reviewChip--approved { border-color: rgba(38,118,62,.35); background: rgba(38,118,62,.07); color: rgb(24,83,42); }
+    .reviewChip--waiting { border-color: rgba(155,112,0,.35); background: rgba(155,112,0,.08); color: rgb(92,65,15); }
+    .reviewChip--blocked,
+    .reviewChip--rejected { border-color: rgba(160,0,0,.32); background: rgba(160,0,0,.07); color: rgb(92,20,20); }
+
+    .reviewSection { border-top: 1px solid rgba(0,0,0,.09); padding-top: 11px; }
+    .reviewSectionTitle { margin: 0 0 8px; font-size: 12px; font-weight: 850; letter-spacing: .045em; text-transform: uppercase; opacity: .72; }
+    .reviewPrimaryGrid { display:grid; gap:7px; }
+    .reviewRow { display:grid; grid-template-columns: minmax(96px, 128px) 1fr; gap:10px; font-size:13.5px; line-height:1.26; padding: 3px 0; }
+    .reviewLabel { font-weight:760; opacity:.78; }
     .reviewValue { min-width:0; overflow-wrap:anywhere; }
 
-    .desc { white-space: pre-wrap; font-size: 14px; line-height: 1.38; margin: 0 0 10px 0; }
-    .urlBox { margin: 8px 0 0; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.035); font-size: 13px; line-height: 1.35; }
-    .urlLine { overflow-wrap:anywhere; margin: 4px 0; }
+    .desc { white-space: pre-wrap; font-size: 14px; line-height: 1.34; margin: 0; overflow-wrap:anywhere; }
+    .urlBox { display:grid; gap:5px; margin: 8px 0 0; padding: 9px 10px; border-radius: 12px; background: rgba(0,0,0,.035); font-size: 13px; line-height: 1.3; }
+    .urlLine { overflow-wrap:anywhere; }
 
-    .rejectBox { margin: 0 0 10px; display:grid; gap:6px; }
-    .rejectLabel { font-size: 12px; letter-spacing:.02em; text-transform: uppercase; opacity:.8; }
+    .reviewDisclosure { border-top: 1px solid rgba(0,0,0,.09); padding-top: 9px; }
+    .reviewDisclosure summary { cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:850; letter-spacing:.045em; text-transform:uppercase; opacity:.76; }
+    .reviewDisclosure summary::-webkit-details-marker { display:none; }
+    .reviewDisclosure summary::after { content:"›"; transform:rotate(90deg); font-size:18px; line-height:1; opacity:.7; }
+    .reviewDisclosure[open] summary::after { transform:rotate(-90deg); }
+    .reviewDisclosureBody { margin-top: 8px; }
+
+    .riskBox { margin: 0; padding: 9px 10px; border-radius: 12px; border: 1px solid rgba(160,0,0,.25); background: rgba(160,0,0,.04); font-size: 13px; line-height: 1.35; }
+    .riskBox ul { margin: 6px 0 0 18px; padding: 0; }
+
+    .rejectBox { display:grid; gap:6px; }
+    .rejectLabel { font-size: 12px; letter-spacing:.02em; text-transform: uppercase; opacity:.75; }
     .rejectSelect { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.18); background: transparent; font: inherit; }
-
-    .actions { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; margin-top: 10px; }
-    .actions .btn { min-width:0; padding: 10px; font-size: 14px; line-height: 1.15; }
+    .actions { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; margin-top: 8px; }
+    .actions .btn { min-width:0; padding: 9px 10px; font-size: 14px; line-height: 1.15; }
+    .actions .actionPrimary { grid-column: 1 / -1; font-weight: 800; }
     .sourceBtn { flex: unset; }
 
-    .reviewNotice {
-      margin: 10px 0;
-      padding: 11px 13px 11px 40px;
-      border-radius: 14px;
-      border: 1px solid rgba(160, 0, 0, .36);
-      background: rgba(160, 0, 0, .075);
-      color: rgb(92, 20, 20);
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.34;
-      position: relative;
-      box-shadow: 0 10px 22px rgba(80, 25, 25, .08);
-    }
-
-    .reviewNotice::before {
-      content: "!";
-      position: absolute;
-      left: 13px;
-      top: 11px;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      background: rgb(160, 0, 0);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .reviewNotice--success {
-      border-color: rgba(38, 118, 62, .38);
-      background: rgba(38, 118, 62, .085);
-      color: rgb(24, 83, 42);
-    }
-
-    .reviewNotice--success::before {
-      content: "✓";
-      background: rgb(38, 118, 62);
-    }
-
-    .reviewNotice[hidden] {
-      display: none !important;
-    }
-
+    .reviewNotice { margin: 9px 0; padding: 11px 13px 11px 40px; border-radius: 14px; border: 1px solid rgba(160, 0, 0, .36); background: rgba(160, 0, 0, .075); color: rgb(92, 20, 20); font-size: 14px; font-weight: 760; line-height: 1.34; position: relative; box-shadow: 0 10px 22px rgba(80, 25, 25, .08); }
+    .reviewNotice::before { content: "!"; position: absolute; left: 13px; top: 11px; width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; background: rgb(160, 0, 0); color: #fff; font-size: 12px; font-weight: 900; line-height: 1; }
+    .reviewNotice--success { border-color: rgba(38, 118, 62, .38); background: rgba(38, 118, 62, .085); color: rgb(24, 83, 42); }
+    .reviewNotice--success::before { content: "✓"; background: rgb(38, 118, 62); }
+    .reviewNotice[hidden] { display: none !important; }
     .footer { margin-top: 10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
 
     @media (max-width: 560px) {
-      .wrap { padding: 10px; }
+      .wrap { padding: 8px; }
       .top { align-items:flex-start; }
       .inboxToolbar .btn { padding: 8px 10px; }
-      .reviewRow { grid-template-columns: 1fr; gap:2px; }
+      .reviewRow { grid-template-columns: 1fr; gap:1px; }
       .actions { grid-template-columns: 1fr; }
     }
-    /* === END BLOCK: REVIEW_INBOX_COMPACT_CARD_UI_V1 === */
+    /* === END BLOCK: REVIEW_INBOX_WORKBENCH_UI_V2 === */
   </style>
 </head>
 
@@ -965,9 +941,13 @@ Umfang:
         </div>
       ` : "";
 
-      /* === BEGIN BLOCK: REVIEW_CARD_SECTIONED_ROWS_V1 | Zweck: trennt Flow-/Zahlungsdaten von kuratierbaren Event-/Aktivitätsdaten; Umfang: ersetzt infoRows/infoRowsHtml-Erzeugung und Kartenmarkup === */
+      /* === BEGIN BLOCK: REVIEW_CARD_WORKBENCH_LAYOUT_V2 | Zweck: verdichtet die Inbox-Karte zu einer kuratierbaren Arbeitsansicht mit priorisierten Daten, einklappbarem Flow und kompakter Aktionszone; Umfang: ersetzt Flow-/Datenzeilen und Kartenmarkup === */
+      const statusKey = trimValue(it.status);
+      const statusChipVariant = statusKey === "approved"
+        ? "approved"
+        : (["paid", "in_review"].includes(statusKey) ? "paid" : (["rejected"].includes(statusKey) ? "rejected" : "waiting"));
+
       const flowRows = [
-        ["Herkunft", originLabel],
         ["Review-Status", reviewState.label],
         ["Zahlungsfreigabe", trimValue(it.payment_released_at) ? formatGermanDateTime(it.payment_released_at) : ""],
         ["Zahlungslink gültig bis", trimValue(it.payment_start_token_expires_at) ? formatGermanDateTime(it.payment_start_token_expires_at) : ""],
@@ -975,24 +955,28 @@ Umfang:
         ["Bezahlt am", trimValue(it.paid_at) ? formatGermanDateTime(it.paid_at) : ""]
       ].filter(([, value]) => value);
 
-      const contentRows = (isActivityPresence ? [
-        ["Verfügbarkeit", timeLine || scheduleDetails],
+      const primaryRows = (isActivityPresence ? [
         ["Anbieter / Ort", placeLine],
-        ["Adresse/Treffpunkt", trimValue(it.location_address)],
+        ["Adresse", trimValue(it.location_address)],
+        ["Verfügbarkeit", timeLine || scheduleDetails],
+        ["Quelle / Anbieter", sourceLine]
+      ] : [
+        [dateLabel, dateRangeLine],
+        [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
+        ["Ort", placeLine],
+        ["Adresse", trimValue(it.location_address)],
+        ["Quelle / Veranstalter", sourceLine]
+      ]).filter(([, value]) => value);
+
+      const secondaryRows = (isActivityPresence ? [
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
-        ["Quelle / Anbieter", sourceLine],
         ["Eingereicht am", submittedAt],
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
       ] : [
-        [dateLabel, dateRangeLine],
-        [isMultiDay ? "Uhrzeit / Zeiten" : "Uhrzeit", timeLine],
-        ["Zeitdetails laut Quelle", scheduleDetails],
-        ["Ort", placeLine],
-        ["Adresse/Treffpunkt", trimValue(it.location_address)],
+        ["Zeitdetails", scheduleDetails],
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
-        ["Kategorie-Vorschlag", trimValue(it.kategorie_suggestion)],
-        ["Quelle / Veranstalter", sourceLine],
+        ["Kategorie", trimValue(it.kategorie_suggestion)],
         ["Eingereicht am", submittedAt],
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
@@ -1006,44 +990,61 @@ Umfang:
       `).join("");
 
       const flowRowsHtml = renderReviewRows(flowRows);
-      const contentRowsHtml = renderReviewRows(contentRows);
+      const primaryRowsHtml = renderReviewRows(primaryRows);
+      const secondaryRowsHtml = renderReviewRows(secondaryRows);
+      const metaLine = (isActivityPresence
+        ? [placeLine, timeLine || scheduleDetails]
+        : [dateRangeLine, timeLine, placeLine]
+      ).filter(Boolean).join(" · ");
 
       elOne.innerHTML = `
         <article class="card reviewCard">
           <header class="reviewCardHead">
-            ${originBadgeHtml}
+            <div class="reviewBadgeRow">
+              ${originBadgeHtml}
+              <span class="reviewChip reviewChip--${escapeHtml(statusChipVariant)}">${escapeHtml(reviewState.label)}</span>
+            </div>
             <h1>${escapeHtml(it.title || "(ohne Titel)")}</h1>
+            ${metaLine ? `<div class="reviewMetaLine">${escapeHtml(metaLine)}</div>` : ``}
           </header>
 
-          <section class="reviewSection reviewSection--flow" aria-label="Review- und Zahlungsstatus">
-            <div class="reviewSectionTitle">Flow / Zahlung</div>
-            <div class="reviewGrid reviewGrid--compact">
-              ${flowRowsHtml}
+          <section class="reviewSection reviewSection--data" aria-label="Event- und Aktivitätsdaten">
+            <div class="reviewSectionTitle">${isActivityPresence ? "Wichtige Aktivitätsdaten" : "Wichtige Eventdaten"}</div>
+            <div class="reviewPrimaryGrid">
+              ${primaryRowsHtml}
             </div>
           </section>
 
-          <section class="reviewSection reviewSection--data" aria-label="Event- und Aktivitätsdaten">
-            <div class="reviewSectionTitle">${isActivityPresence ? "Aktivitätsdaten" : "Eventdaten"}</div>
-            <div class="reviewGrid reviewGrid--compact">
-              ${contentRowsHtml}
+          <section class="reviewSection reviewSection--description" aria-label="Beschreibung und Links">
+            <div class="reviewSectionTitle">Beschreibung / Links</div>
+            <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
+            <div class="urlBox">
+              ${eventUrl ? `<div class="urlLine"><strong>${escapeHtml(primaryLinkLabel.replace(" öffnen", ""))}:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
+              ${sourceUrl ? `<div class="urlLine"><strong>Quelle:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
             </div>
           </section>
 
           ${reviewRiskHtml}
 
-          <section class="reviewSection reviewSection--description" aria-label="Beschreibung und Links">
-            <div class="reviewSectionTitle">Beschreibung / Links</div>
-            <p class="desc">${escapeHtml(desc || "(kein Text vorhanden)")}</p>
-
-            <div class="urlBox">
-              ${eventUrl ? `<div class="urlLine"><strong>${escapeHtml(primaryLinkLabel.replace(" öffnen", ""))}:</strong> ${escapeHtml(eventUrl)}</div>` : ``}
-              ${sourceUrl ? `<div class="urlLine"><strong>Quellenlink:</strong> ${escapeHtml(sourceUrl)}</div>` : ``}
+          <details class="reviewDisclosure reviewDisclosure--flow">
+            <summary>Flow / Zahlung</summary>
+            <div class="reviewDisclosureBody reviewGrid">
+              ${flowRowsHtml}
             </div>
-          </section>
+          </details>
+
+          ${secondaryRowsHtml ? `
+            <details class="reviewDisclosure reviewDisclosure--secondary">
+              <summary>Weitere Prüfdaten</summary>
+              <div class="reviewDisclosureBody reviewGrid">
+                ${secondaryRowsHtml}
+              </div>
+            </details>
+          ` : ``}
 
           <section class="reviewSection reviewSection--actions" aria-label="Review-Aktionen">
             <div class="rejectBox">
-              <label class="rejectLabel" for="rejectReason">Ablehnungsgrund beim Verwerfen</label>
+              <label class="rejectLabel" for="rejectReason">Ablehnungsgrund</label>
               <select id="rejectReason" class="rejectSelect">
                 ${rejectOptionsHtml}
               </select>
@@ -1052,18 +1053,18 @@ Umfang:
             <div id="reviewCardNotice" class="reviewNotice" hidden role="status" aria-live="polite"></div>
 
             <div class="actions actions--compact">
+              <button id="btnOk" class="btn btn-good actionPrimary" type="button">${escapeHtml(reviewState.approveLabel)}</button>
               <button id="btnOpenEvent" class="btn sourceBtn" type="button" ${openEventDisabled ? "disabled" : ""}>${escapeHtml(primaryLinkLabel)}</button>
-              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quellenlink</button>
+              <button id="btnOpenSource" class="btn sourceBtn" type="button" ${openSourceDisabled ? "disabled" : ""}>Quelle</button>
               <button id="btnLater" class="btn" type="button">Später</button>
               <button id="btnNo" class="btn btn-bad" type="button">${escapeHtml(reviewState.rejectLabel)}</button>
-              <button id="btnOk" class="btn btn-good" type="button">${escapeHtml(reviewState.approveLabel)}</button>
             </div>
           </section>
 
           ${isUnlocked() ? `` : `<div class="muted" style="margin-top:10px;">Beim ersten Klick auf Übernehmen/Verwerfen wird einmal nach Passwort gefragt.</div>`}
         </article>
       `;
-      /* === END BLOCK: REVIEW_CARD_SECTIONED_ROWS_V1 === */
+      /* === END BLOCK: REVIEW_CARD_WORKBENCH_LAYOUT_V2 === */
 
       document.getElementById("btnOpenEvent").addEventListener("click", () => {
         if (!eventUrl) return;
