@@ -123,6 +123,7 @@ function sap_assert_submission_approvable(array $submission): void
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_ASSERT_V1 === */
 
+/* === BEGIN BLOCK: SUBMISSION_APPROVAL_EXISTING_CONSUMPTION_LOOKUP_V2 | Zweck: erkennt bereits gebuchte Veröffentlichungsverbräuche für erneute Freigaben nach Änderungen; Umfang: ersetzt sap_fetch_existing_consumption === */
 function sap_fetch_existing_consumption(PDO $pdo, int $submissionId): ?array
 {
     $statement = $pdo->prepare(
@@ -143,9 +144,10 @@ function sap_fetch_existing_consumption(PDO $pdo, int $submissionId): ?array
         ':submission_id' => $submissionId,
     ]);
 
-    $row = $statement->fetch();
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
     return is_array($row) ? $row : null;
 }
+/* === END BLOCK: SUBMISSION_APPROVAL_EXISTING_CONSUMPTION_LOOKUP_V2 === */
 
 function sap_fetch_specific_single_entitlement(PDO $pdo, int $organizerId, int $submissionId): ?array
 {
@@ -443,12 +445,19 @@ try {
     $submission = sap_fetch_submission($pdo, $submissionId);
     sap_assert_submission_approvable($submission);
 
+    /* === BEGIN BLOCK: SUBMISSION_APPROVAL_REAPPROVE_EXISTING_CONSUMPTION_V2 | Zweck: erlaubt erneute Freigabe nach Anbieter-Änderung ohne neues Kontingent zu verbrauchen; Umfang: ersetzt Approval-Hauptlogik bis vor JSON-Erfolgsantwort === */
+    $wasAlreadyApproved = trim((string)($submission['status'] ?? '')) === 'approved';
     $existingConsumption = sap_fetch_existing_consumption($pdo, $submissionId);
 
     if (is_array($existingConsumption)) {
         sap_mark_submission_approved($pdo, $submissionId);
         $quotaSummary = sap_build_quota_summary($pdo, (int)$submission['organizer_id']);
+
         $pdo->commit();
+
+        if (!$wasAlreadyApproved) {
+            sap_send_publication_mail($submission);
+        }
 
         be_json_response(200, [
             'status' => 'ok',
@@ -458,6 +467,7 @@ try {
                 'consumption_id' => (int)$existingConsumption['id'],
                 'idempotent' => true,
                 'quota' => $quotaSummary,
+                'public_feed' => '/api/events/public.php',
             ],
         ]);
     }
@@ -476,7 +486,10 @@ try {
 
     $pdo->commit();
 
-    sap_send_publication_mail($submission);
+    if (!$wasAlreadyApproved) {
+        sap_send_publication_mail($submission);
+    }
+    /* === END BLOCK: SUBMISSION_APPROVAL_REAPPROVE_EXISTING_CONSUMPTION_V2 === */
 
     be_json_response(200, [
         'status' => 'ok',
