@@ -3019,17 +3019,15 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 }
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
-/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V3 | Zweck: konsolidiert den Aktivitäten-Finder kompakt auf Event-Control-DNA: kleinere Suche, keine doppelte Aktivfilter-Anzeige, keine sichtbaren 0-Treffer-Chips, kein separater Reset-X; Umfang: kompletter /angebote/ Finder-UI-Owner === */
-/* === BEGIN BLOCK: ACTIVITIES_FINDER_FLOW_ORDER_V4 | Zweck: vermeidet leere Advanced-Zeilen im geschlossenen Zustand und setzt den geöffneten Filterbereich direkt unter die Such-/Filterzeile; Umfang: nur Grid-Reihenfolge des Aktivitäten-Finders === */
+/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 | Zweck: konsolidiert den Aktivitäten-Finder kompakt auf Mobile: Suche + Filter in einer Zeile, kein leerer Advanced-Slot, opakes Inline-Filterpanel, keine doppelte Aktivfilter-Anzeige, keine sichtbaren 0-Treffer-Chips; Umfang: kompletter /angebote/ Finder-UI-Owner === */
 body.page-route-activities .top-stack.activity-finder{
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "search"
     "quick"
-    "status"
-    "advanced";
-  gap: 9px;
+    "status";
+  gap: 8px;
   align-items: stretch;
   width: 100%;
   max-width: none;
@@ -3059,7 +3057,6 @@ body.page-route-activities .activity-finder > .activity-finder__status-row{
 body.page-route-activities .activity-finder > .activity-finder__advanced{
   grid-area: advanced;
 }
-/* === END BLOCK: ACTIVITIES_FINDER_FLOW_ORDER_V4 === */
 
 body.page-route-activities .activity-finder .desktop-hero__actions{
   display: none;
@@ -3068,8 +3065,8 @@ body.page-route-activities .activity-finder .desktop-hero__actions{
 body.page-route-activities .activity-finder__search-row,
 body.page-route-activities .activity-finder__search-row.has-active-filter-reset{
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto;
   gap: 8px;
   align-items: stretch;
   width: 100%;
@@ -3090,20 +3087,20 @@ body.page-route-activities .activity-finder__search-row.has-active-filter-reset 
 
 body.page-route-activities .activity-finder .desktop-hero__search-field .desktop-hero__icon--search{
   left: 14px;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   color: rgba(95,107,115,0.74);
 }
 
 body.page-route-activities .activity-finder #search-filter{
   height: var(--cmp-input-minh);
   min-height: var(--cmp-input-minh);
-  padding: 0 var(--cmp-input-pad-x) 0 40px;
+  padding: 0 var(--cmp-input-pad-x) 0 38px;
   border-radius: var(--cmp-input-radius);
   border-color: var(--cmp-input-border-strong);
   background: var(--cmp-input-bg-strong);
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 650;
   line-height: var(--cmp-input-minh);
   box-shadow: var(--cmp-input-shadow-strong);
@@ -3116,12 +3113,29 @@ body.page-route-activities .activity-finder #search-filter::placeholder{
 
 body.page-route-activities .activity-finder__advanced-toggle,
 body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
-  grid-column: 1;
-  grid-row: 2;
-  width: 100%;
-  min-width: 0;
+  grid-column: 2;
+  grid-row: 1;
+  width: auto;
+  min-width: 82px;
+  max-width: 96px;
   min-height: var(--cmp-input-minh);
+  padding-inline: 12px;
+  border-radius: var(--cmp-input-radius);
   justify-self: stretch;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
+  font-size: 0;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::before{
+  content: "Filter";
+  font-size: 0.82rem;
+  font-weight: 760;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
+  display: none;
 }
 
 body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
@@ -3129,6 +3143,7 @@ body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
 }
 
 body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
+  margin-left: 2px;
   transition: transform 160ms ease;
 }
 
@@ -3141,6 +3156,7 @@ body.page-route-activities .activity-finder__quick{
   gap: 7px;
   width: 100%;
   min-width: 0;
+  margin-top: 2px;
 }
 
 body.page-route-activities .activity-finder__quick-label,
@@ -3178,7 +3194,7 @@ body.page-route-activities .activity-filter-chip{
   justify-content: center;
   max-width: 100%;
   min-width: max-content;
-  min-height: 32px;
+  min-height: 31px;
   margin: 0;
   padding: 0 10px;
   border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 86%, transparent 14%);
@@ -3261,6 +3277,8 @@ body.page-route-activities .activity-finder__advanced[hidden]{
 }
 
 body.page-route-activities .activity-finder__advanced{
+  position: relative;
+  z-index: 2;
   width: 100%;
   min-width: 0;
 }
@@ -3275,14 +3293,14 @@ body.page-route-activities .activity-finder__advanced-inner{
   border-radius: 18px;
   background: linear-gradient(
     180deg,
-    rgba(255,255,255,0.76) 0%,
-    rgba(248,250,243,0.62) 100%
+    rgba(255,255,255,0.985) 0%,
+    rgba(251,252,247,0.985) 100%
   );
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 5px 14px rgba(12,24,16,0.018);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+    0 1px 0 rgba(255,255,255,0.86) inset,
+    0 8px 20px rgba(12,24,16,0.045);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 body.page-route-activities .activity-finder__group{
@@ -3307,7 +3325,7 @@ body.page-route-activities .activity-finder__group{
 
 @media (max-width: 899.98px){
   body.page-route-activities .top-stack.activity-finder{
-    gap: 9px;
+    gap: 8px;
   }
 
   body.page-route-activities .activity-finder__quick-options{
@@ -3338,6 +3356,13 @@ body.page-route-activities .activity-finder__group{
     align-items: start;
   }
 
+  body.page-route-activities .top-stack.activity-finder:not(:has(.activity-finder__advanced:not([hidden]))){
+    grid-template-areas:
+      "search actions"
+      "quick actions"
+      "status actions";
+  }
+
   body.page-route-activities .activity-finder > .activity-finder__search-row,
   body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
     display: grid;
@@ -3357,8 +3382,24 @@ body.page-route-activities .activity-finder__group{
   body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
     grid-column: 2;
     grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: var(--cmp-input-minh);
+    padding-inline: 12px;
     border-radius: var(--cmp-input-radius);
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
+    font-size: inherit;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::before{
+    content: none;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
+    display: inline;
   }
 
   body.page-route-activities .activity-finder .desktop-hero__actions{
@@ -3382,5 +3423,5 @@ body.page-route-activities .activity-finder__group{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V3 === */
+/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
