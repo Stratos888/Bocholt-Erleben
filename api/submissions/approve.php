@@ -89,13 +89,23 @@ function sap_assert_submission_approvable(array $submission): void
     $status = trim((string)($submission['status'] ?? ''));
     $submissionKind = (string)($submission['submission_kind'] ?? 'event');
 
+    /* === BEGIN BLOCK: SUBMISSION_APPROVAL_PAYMENT_REQUIRED_MESSAGE_V1 | Zweck: liefert klare fachliche Fehlermeldung, wenn vor finaler Veröffentlichung noch keine Zahlung bestätigt ist; Umfang: ersetzt Status-/Paid-Guards === */
+    $paymentNotConfirmedMessage = $submissionKind === 'activity'
+        ? 'Die Zahlung wurde noch nicht bestätigt. Bitte erst den Zahlungsstatus prüfen oder den Zahlungslink erneut senden.'
+        : 'Die Zahlung wurde noch nicht bestätigt. Bitte erst den Zahlungsstatus prüfen oder den Zahlungslink erneut senden.';
+
+    if (in_array($status, ['pending_review', 'payment_released', 'checkout_started', 'draft'], true)) {
+        throw new InvalidArgumentException($paymentNotConfirmedMessage);
+    }
+
     if (!in_array($status, ['paid', 'in_review', 'approved'], true)) {
-        throw new InvalidArgumentException('Submission ist aktuell nicht freigabefähig.');
+        throw new InvalidArgumentException('Diese Einreichung ist aktuell nicht veröffentlichungsfähig.');
     }
 
     if (trim((string)($submission['paid_at'] ?? '')) === '') {
-        throw new InvalidArgumentException('Submission ist noch nicht bezahlt.');
+        throw new InvalidArgumentException($paymentNotConfirmedMessage);
     }
+    /* === END BLOCK: SUBMISSION_APPROVAL_PAYMENT_REQUIRED_MESSAGE_V1 === */
 
     if (!in_array($submissionKind, ['event', 'activity'], true)) {
         throw new InvalidArgumentException('Diese Submission-Art kann nicht veröffentlicht werden.');
