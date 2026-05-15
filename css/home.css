@@ -3020,19 +3020,28 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
 /* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V3 | Zweck: konsolidiert den Aktivitäten-Finder kompakt auf Event-Control-DNA: kleinere Suche, keine doppelte Aktivfilter-Anzeige, keine sichtbaren 0-Treffer-Chips, kein separater Reset-X; Umfang: kompletter /angebote/ Finder-UI-Owner === */
+/* === BEGIN BLOCK: ACTIVITIES_FINDER_FLOW_ORDER_V4 | Zweck: vermeidet leere Advanced-Zeilen im geschlossenen Zustand und setzt den geöffneten Filterbereich direkt unter die Such-/Filterzeile; Umfang: nur Grid-Reihenfolge des Aktivitäten-Finders === */
 body.page-route-activities .top-stack.activity-finder{
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "search"
-    "advanced"
     "quick"
-    "status";
-  gap: 10px;
+    "status"
+    "advanced";
+  gap: 9px;
   align-items: stretch;
   width: 100%;
   max-width: none;
   min-width: 0;
+}
+
+body.page-route-activities .top-stack.activity-finder:has(.activity-finder__advanced:not([hidden])){
+  grid-template-areas:
+    "search"
+    "advanced"
+    "quick"
+    "status";
 }
 
 body.page-route-activities .activity-finder > .activity-finder__search-row{
@@ -3050,6 +3059,7 @@ body.page-route-activities .activity-finder > .activity-finder__status-row{
 body.page-route-activities .activity-finder > .activity-finder__advanced{
   grid-area: advanced;
 }
+/* === END BLOCK: ACTIVITIES_FINDER_FLOW_ORDER_V4 === */
 
 body.page-route-activities .activity-finder .desktop-hero__actions{
   display: none;
