@@ -180,13 +180,13 @@ Umfang:
       </div>
 
       <div class="activity-finder__advanced" id="offer-advanced-filters" hidden>
+        <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_HTML_V2 | Zweck: ergänzt direkt im geöffneten Filterpanel eine sichtbare Reset-Zeile oberhalb des scrollbaren Filterinhalts; Umfang: nur Status-/Reset-Zeile vor dem Advanced-Inner === -->
+        <div class="activity-finder__advanced-summary" id="offer-advanced-filter-summary" hidden>
+          <span class="activity-finder__advanced-summary-text" id="offer-advanced-filter-summary-text">0 Filter aktiv</span>
+          <button type="button" class="activity-finder__advanced-reset" id="offer-advanced-filter-reset">Alle zurücksetzen</button>
+        </div>
+        <!-- === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_HTML_V2 === -->
         <div class="activity-finder__advanced-inner">
-          <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_HTML_V1 | Zweck: ergänzt im geöffneten Filterpanel eine leise Reset-Zeile für mehrere aktive Filter; Umfang: nur Status-/Reset-Zeile vor den Filtergruppen === -->
-          <div class="activity-finder__advanced-summary" id="offer-advanced-filter-summary" hidden>
-            <span class="activity-finder__advanced-summary-text" id="offer-advanced-filter-summary-text">0 Filter aktiv</span>
-            <button type="button" class="activity-finder__advanced-reset" id="offer-advanced-filter-reset">Alle zurücksetzen</button>
-          </div>
-          <!-- === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_HTML_V1 === -->
           <fieldset class="activity-finder__group" data-filter-group="proximity">
             <legend class="activity-finder__group-title">Ort / Nähe</legend>
             <div class="activity-finder__group-options">
