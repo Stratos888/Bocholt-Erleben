@@ -3368,9 +3368,11 @@ body.page-route-activities .activity-finder__group{
     gap: 8px;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_FIRST_GROUP_RHYTHM_FIX_V1 | Zweck: gleicht den Abstand zwischen erster Gruppenüberschrift und erstem Chip an den Rhythmus der Folgegruppen an; Umfang: nur erste Gruppe im mobilen Advanced-Filterpanel === */
   body.page-route-activities .activity-finder__advanced .activity-finder__group:first-child{
-    padding-top: 1px;
+    padding-top: 11px;
   }
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_FIRST_GROUP_RHYTHM_FIX_V1 === */
 
   body.page-route-activities .activity-finder__advanced .activity-finder__group + .activity-finder__group{
     margin-top: 12px;
