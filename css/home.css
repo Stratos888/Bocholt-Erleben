@@ -3324,9 +3324,14 @@ body.page-route-activities .activity-finder__group{
   }
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 | Zweck: ordnet den mobilen Aktivitäten-Finder final: kompakte Schnellfilter, besser ausgenutzte Advanced-Filterbreite, getrennte Gruppen, keine optische Unruhe im geöffneten Zustand; Umfang: nur Mobile-Layout innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 @media (max-width: 899.98px){
   body.page-route-activities .top-stack.activity-finder{
     gap: 8px;
+  }
+
+  body.page-route-activities .activity-finder__quick{
+    margin-top: 1px;
   }
 
   body.page-route-activities .activity-finder__quick-options{
@@ -3341,7 +3346,65 @@ body.page-route-activities .activity-finder__group{
   body.page-route-activities .activity-finder__quick-options::-webkit-scrollbar{
     display: none;
   }
+
+  body.page-route-activities .activity-finder__advanced-inner{
+    gap: 0;
+    padding: 11px;
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.992) 0%,
+      rgba(251,252,247,0.992) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 8px 20px rgba(12,24,16,0.045);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-finder__group{
+    gap: 8px;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-finder__group + .activity-finder__group{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 62%, transparent 38%);
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-finder__group-title{
+    padding-inline: 2px;
+    font-size: 0.70rem;
+    line-height: 1.1;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-finder__group-options{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-filter-chip{
+    width: 100%;
+    min-width: 0;
+    min-height: 31px;
+    padding-inline: 9px;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
+  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Natur entdecken"],
+  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Sport & Bewegung"],
+  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-inline: 12px;
+  }
 }
+/* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
 @media (min-width: 900px){
   body.page-route-activities .top-stack.activity-finder{
