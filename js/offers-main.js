@@ -57,6 +57,9 @@ const OffersApp = {
     advancedToggle: null,
     advancedPanel: null,
     advancedCount: null,
+    advancedSummary: null,
+    advancedSummaryText: null,
+    advancedReset: null,
     resultCount: null,
     activeFilters: null,
     activeFilterList: null
@@ -114,6 +117,9 @@ const OffersApp = {
     this.refs.advancedToggle = document.getElementById("offer-advanced-filter-toggle");
     this.refs.advancedPanel = document.getElementById("offer-advanced-filters");
     this.refs.advancedCount = document.getElementById("offer-advanced-filter-count");
+    this.refs.advancedSummary = document.getElementById("offer-advanced-filter-summary");
+    this.refs.advancedSummaryText = document.getElementById("offer-advanced-filter-summary-text");
+    this.refs.advancedReset = document.getElementById("offer-advanced-filter-reset");
     this.refs.resultCount = document.getElementById("offer-result-count");
     this.refs.activeFilters = document.getElementById("offer-active-filters");
     this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
@@ -299,6 +305,12 @@ const OffersApp = {
 
     if (resetPill) {
       resetPill.addEventListener("click", () => {
+        this.resetFilters();
+      });
+    }
+
+    if (this.refs.advancedReset) {
+      this.refs.advancedReset.addEventListener("click", () => {
         this.resetFilters();
       });
     }
@@ -629,9 +641,11 @@ const OffersApp = {
       : `${count} Aktivitäten gefunden`;
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V1 | Zweck: hält Statuszeile im geöffneten Filterpanel synchron mit aktiven Filtern und blendet sie ohne aktive Filter aus; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
+    const hasActiveFilterValues = activeCount > 0;
 
     if (this.refs.resetPill) {
       this.refs.resetPill.hidden = !hasActiveFilters;
@@ -642,13 +656,24 @@ const OffersApp = {
     }
 
     if (this.refs.advancedCount) {
-      this.refs.advancedCount.textContent = activeCount > 0 ? `${activeCount} aktiv` : "Optional";
+      this.refs.advancedCount.textContent = hasActiveFilterValues ? `${activeCount} aktiv` : "Optional";
+    }
+
+    if (this.refs.advancedSummary) {
+      this.refs.advancedSummary.hidden = !hasActiveFilterValues;
+    }
+
+    if (this.refs.advancedSummaryText) {
+      this.refs.advancedSummaryText.textContent = activeCount === 1
+        ? "1 Filter aktiv"
+        : `${activeCount} Filter aktiv`;
     }
 
     this.updateResultCount();
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
+  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V1 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
