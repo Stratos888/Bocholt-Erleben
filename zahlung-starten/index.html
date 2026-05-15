@@ -110,22 +110,7 @@
     /* === END BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_FLOW_V2 === */
   </script>
 
-          throw new Error("missing_checkout_or_redirect_url");
 
-          window.location.href = checkoutUrl;
-        } catch (error) {
-          console.warn("Payment start failed.", error);
-          setState(
-            "Zahlung konnte nicht gestartet werden",
-            "Der Zahlungslink ist möglicherweise abgelaufen oder die Einreichung wurde bereits verarbeitet.",
-            "Bitte kontaktiere Bocholt erleben, wenn das Problem bestehen bleibt."
-          );
-        }
-      }
-
-      startPayment();
-    })();
-  </script>
 </body>
 </html>
 <!-- === END FILE: zahlung-starten/index.html === -->
