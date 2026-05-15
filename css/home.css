@@ -3363,21 +3363,23 @@ body.page-route-activities .activity-finder__group{
     backdrop-filter: none;
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V1 | Zweck: gibt den mobilen Advanced-Filtergruppen sauberen Überschrift-/Trenner-/Chip-Rhythmus; Umfang: nur Group-Abstände und Group-Titel im geöffneten Aktivitäten-Filterpanel === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V2 | Zweck: entfernt die doppelte Trennerlogik aus den Gruppenüberschriften und gibt dem mobilen Advanced-Filterpanel einen sauberen Gruppenrhythmus; Umfang: nur Group-Abstände und Group-Titel im geöffneten Aktivitäten-Filterpanel === */
   body.page-route-activities .activity-finder__advanced .activity-finder__group{
-    gap: 9px;
+    gap: 8px;
+  }
+
+  body.page-route-activities .activity-finder__advanced .activity-finder__group:first-child{
+    padding-top: 1px;
   }
 
   body.page-route-activities .activity-finder__advanced .activity-finder__group + .activity-finder__group{
     margin-top: 12px;
-    padding-top: 12px;
+    padding-top: 11px;
     border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 58%, transparent 42%);
   }
 
   body.page-route-activities .activity-finder__advanced .activity-finder__group-title{
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     min-height: 12px;
     padding-inline: 2px;
     color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
@@ -3389,13 +3391,9 @@ body.page-route-activities .activity-finder__group{
   }
 
   body.page-route-activities .activity-finder__advanced .activity-finder__group-title::after{
-    content: "";
-    flex: 1 1 auto;
-    height: 1px;
-    min-width: 24px;
-    background: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 50%, transparent 50%);
+    content: none;
   }
-  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_GROUP_RHYTHM_FIX_V2 === */
 
   body.page-route-activities .activity-finder__advanced .activity-finder__group-options{
     display: grid;
@@ -3413,17 +3411,15 @@ body.page-route-activities .activity-finder__group{
     font-size: 0.75rem;
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_FULLWIDTH_CHIP_CENTER_V1 | Zweck: hält lange Filterchips über volle Breite, richtet deren Text aber konsistent wie alle anderen Chips mittig aus; Umfang: nur lange Full-Width-Chips im mobilen Advanced-Filterpanel === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_MOBILE_FULLWIDTH_CHIP_CENTER_V2 | Zweck: lässt nur wirklich lange Filterchips über volle Breite laufen und verhindert künstliche Treppen im Bereich Aktivitätsart; Umfang: nur lange Full-Width-Chips im mobilen Advanced-Filterpanel === */
   body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
-  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Natur entdecken"],
-  body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Sport & Bewegung"],
   body.page-route-activities .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
     grid-column: 1 / -1;
     justify-content: center;
     padding-inline: 12px;
     text-align: center;
   }
-  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_FULLWIDTH_CHIP_CENTER_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_FULLWIDTH_CHIP_CENTER_V2 === */
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
