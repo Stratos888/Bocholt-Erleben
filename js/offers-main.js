@@ -634,7 +634,7 @@ const OffersApp = {
     });
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_NARROWING_V1 | Zweck: zeigt Counts nur als Ergebnis nach zusätzlicher Verengung und blendet in exklusive Gruppen blockierte Alternativen aus; Umfang: ersetzt nur updateFilterButtonStates() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_ENTERPRISE_COUNT_CONTRACT | Zweck: trennt aktive Zustände und Auswahlprognosen eindeutig: aktive Chips zeigen nur Label + CSS-X, inaktive Chips zeigen Label + projizierte Trefferzahl; Umfang: ersetzt nur updateFilterButtonStates() === */
   updateFilterButtonStates() {
     this.getFilterButtons().forEach((button) => {
       const group = String(button.getAttribute("data-filter-group") || "").trim();
@@ -650,17 +650,24 @@ const OffersApp = {
       const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
       const count = this.countProjectedMatches(group, value);
       const disabled = !isActive && (isExclusiveBlocked || count === 0);
+      const countLabel = count === 1 ? "1 Aktivität" : `${count} Aktivitäten`;
 
-      button.textContent = `${baseLabel} (${count})`;
+      button.textContent = isActive ? baseLabel : `${baseLabel} (${count})`;
       button.classList.toggle("is-active", isActive);
       button.classList.toggle("is-disabled", disabled);
       button.classList.toggle("is-exclusive-blocked", isExclusiveBlocked);
       button.disabled = disabled;
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
       button.setAttribute("aria-disabled", disabled ? "true" : "false");
+      button.setAttribute(
+        "aria-label",
+        isActive
+          ? `Filter ${baseLabel} entfernen`
+          : `Filter ${baseLabel} aktivieren, danach ${countLabel}`
+      );
     });
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_NARROWING_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_ENTERPRISE_COUNT_CONTRACT === */
 
   updateResultCount() {
     const { resultCount } = this.refs;
