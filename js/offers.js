@@ -540,11 +540,23 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: ACTIVITIES_CARD_MATCH_CHIP_RENDER_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_RENDER_ENTERPRISE | Zweck: rendert die mobile Passungszeile in trennzeichensicheren Segmenten, damit keine abgetrennten Punkte am Zeilenende entstehen; Umfang: ersetzt nur renderSupportingLine(offer) === */
   function renderSupportingLine(offer) {
     const text = OfferVisuals.pickSupportingLabel(offer);
-    if (!text) return "";
-    return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
+    const items = String(text || "")
+      .split(/\s*·\s*/)
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+
+    if (!items.length) return "";
+
+    return `
+      <div class="activity-card-quiet" aria-label="Warum diese Aktivität passt">
+        ${items.map((item) => `<span class="activity-card-quiet__item">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+      </div>
+    `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_RENDER_ENTERPRISE === */
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
   /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 | Zweck: behaelt die bestehende Bildlade-Logik der Activity-Cards bei und ergänzt belastbare Alt-Texte fuer Suchmaschinen und Barrierefreiheit, ohne Kartenlayout oder Ladeprioritäten zu verändern | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
