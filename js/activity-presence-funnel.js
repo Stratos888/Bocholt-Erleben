@@ -212,7 +212,19 @@
         }
         window.location.href = targetUrl.toString();
       } catch (error) {
-        setStatus(statusNode, error && error.message ? error.message : "Einreichung konnte nicht gespeichert werden.", "error");
+        /* === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_ERROR_MESSAGE_V1 | Zweck: zeigt bei technischen Netzwerk-/Fetch-Fehlern eine nutzerverstaendliche Meldung statt Browser-Rohtext; Umfang: ersetzt nur die Fehlerausgabe im Submit-Catch === */
+        const rawMessage = error && error.message ? String(error.message) : "";
+        const technicalNetworkError = [
+          "failed to fetch",
+          "networkerror",
+          "load failed",
+          "net::"
+        ].some((token) => rawMessage.toLowerCase().includes(token));
+        const displayMessage = technicalNetworkError || rawMessage === ""
+          ? "Einreichung konnte nicht gespeichert werden. Bitte prüfe deine Verbindung und versuche es erneut."
+          : rawMessage;
+        setStatus(statusNode, displayMessage, "error");
+        /* === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_ERROR_MESSAGE_V1 === */
         setBusy(submitButton, false);
       }
     });
