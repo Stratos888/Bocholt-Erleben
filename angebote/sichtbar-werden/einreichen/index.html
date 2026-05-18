@@ -61,9 +61,6 @@
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
         <h1>Aktivität zur Prüfung einreichen</h1>
-        <p class="content-lead">
-          Trage die Angaben ein. Bezahlt wird erst nach Freigabe.
-        </p>
       </div>
     </div>
   </header>
@@ -157,7 +154,7 @@
         </div>
 
         <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
-          <h3>Beschreibung</h3>
+          <h3>Beschreibung und Verfügbarkeit</h3>
         </div>
 
         <label class="content-field content-field--full" for="activity-presence-description">
@@ -167,9 +164,15 @@
         </label>
 
         <label class="content-field content-field--full" for="activity-presence-duration">
-          <span class="content-field__label">Dauerhaft / regelmäßig buchbar *</span>
-          <textarea class="content-field__control" id="activity-presence-duration" name="duration" rows="3" required></textarea>
-          <p class="content-field__hint">Dauerhaft, saisonal oder regelmäßig verfügbar.</p>
+          <span class="content-field__label">Verfügbarkeit *</span>
+          <select class="content-field__control" id="activity-presence-duration" name="duration" required>
+            <option value="">Bitte auswählen</option>
+            <option value="Dauerhaft verfügbar">Dauerhaft verfügbar</option>
+            <option value="Regelmäßig buchbar">Regelmäßig buchbar</option>
+            <option value="Saisonal verfügbar">Saisonal verfügbar</option>
+            <option value="Nach Vereinbarung">Nach Vereinbarung</option>
+          </select>
+          <p class="content-field__hint">Details kannst du bei „Weitere Hinweise“ ergänzen.</p>
         </label>
 
         <label class="content-field content-field--full" for="activity-presence-notes">
@@ -182,7 +185,7 @@
           <span class="content-field__label">Bestätigung *</span>
           <span class="content-field__hint">
             <input id="activity-presence-confirmed" name="confirmed" type="checkbox" required>
-            Ich bestätige, dass ich berechtigt bin, diese Aktivität einzureichen, und dass der Standort öffentlich genannt werden darf.
+            Ich bestätige, dass ich berechtigt bin, diese Aktivität einzureichen, die Angaben korrekt sind und der Standort öffentlich genannt werden darf.
           </span>
         </label>
       </div>
@@ -201,7 +204,6 @@
   </section>
 </main>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_ENTERPRISE_FINAL_V4 === -->
-<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_EVENT_PARITY_V3 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
