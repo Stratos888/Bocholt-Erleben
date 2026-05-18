@@ -51,10 +51,10 @@ const OffersApp = {
     })
   }),
   /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 === */
-
   refs: {
     finder: null,
     searchInput: null,
+    searchClear: null,
     searchRow: null,
     resetPill: null,
     advancedToggle: null,
@@ -66,6 +66,7 @@ const OffersApp = {
     resultCount: null,
     activeFilters: null,
     activeFilterList: null
+  },
   },
 
   async init() {
@@ -112,9 +113,9 @@ const OffersApp = {
     }
   },
 
-  cacheRefs() {
     this.refs.finder = document.querySelector("[data-activity-finder]");
     this.refs.searchInput = document.getElementById("search-filter");
+    this.refs.searchClear = document.getElementById("offer-search-clear");
     this.refs.searchRow = document.querySelector(".desktop-hero__search-row");
     this.refs.resetPill = document.getElementById("offer-reset-pill");
     this.refs.advancedToggle = document.getElementById("offer-advanced-filter-toggle");
@@ -125,6 +126,7 @@ const OffersApp = {
     this.refs.advancedReset = document.getElementById("offer-advanced-filter-reset");
     this.refs.resultCount = document.getElementById("offer-result-count");
     this.refs.activeFilters = document.getElementById("offer-active-filters");
+    this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
     this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
   },
 
@@ -269,21 +271,37 @@ const OffersApp = {
 
     return offer;
   },
-
   bindControls() {
     const {
       finder,
       searchInput,
+      searchClear,
       resetPill,
       advancedToggle,
       activeFilterList
     } = this.refs;
-
+    } = this.refs;
+    /* === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 | Zweck: synchronisiert Freitextsuche und eigenen Clear-Button; Umfang: nur Search-Input- und Clear-Button-Events === */
     if (searchInput) {
       searchInput.addEventListener("input", () => {
         this.searchTerm = String(searchInput.value || "").trim();
         this.applyFilterAndRender();
       });
+    }
+
+    if (searchClear && searchInput) {
+      searchClear.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!String(searchInput.value || "").trim()) return;
+
+        searchInput.value = "";
+        this.searchTerm = "";
+        this.applyFilterAndRender();
+        searchInput.focus({ preventScroll: true });
+      });
+    }
+    /* === END BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 === */
     }
 
     if (finder) {
@@ -657,18 +675,20 @@ const OffersApp = {
     }
 
     resultCount.textContent = count === 1
-      ? "1 Aktivität gefunden"
-      : `${count} Aktivitäten gefunden`;
-  },
-
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V2 | Zweck: hält Finder-Klasse und Reset-Zeile robust synchron mit aktiven Filterwerten; Umfang: ersetzt nur updateFinderUI() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V1 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler und Reset-Zeile robust synchron mit Suchtext und aktiven Filterwerten; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
     const hasActiveFilterValues = activeCount > 0;
+    const hasSearchTerm = String(this.searchTerm || "").trim().length > 0;
 
     if (this.refs.finder) {
       this.refs.finder.classList.toggle("has-active-filters", hasActiveFilterValues);
+      this.refs.finder.classList.toggle("has-search-term", hasSearchTerm);
+    }
+
+    if (this.refs.searchClear) {
+      this.refs.searchClear.hidden = !hasSearchTerm;
     }
 
     if (this.refs.resetPill) {
@@ -677,6 +697,17 @@ const OffersApp = {
 
     if (this.refs.searchRow) {
       this.refs.searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
+    }
+
+    if (this.refs.advancedToggle) {
+      this.refs.advancedToggle.classList.toggle("has-active-filter-count", hasActiveFilterValues);
+      this.refs.advancedToggle.dataset.activeCount = hasActiveFilterValues ? String(activeCount) : "";
+      this.refs.advancedToggle.setAttribute(
+        "aria-label",
+        hasActiveFilterValues
+          ? `Weitere Filter, ${activeCount} Filter aktiv`
+          : "Weitere Filter"
+      );
     }
 
     if (this.refs.advancedCount) {
@@ -698,6 +729,10 @@ const OffersApp = {
     }
 
     this.updateResultCount();
+    this.updateFilterButtonStates();
+    this.renderActiveFilterChips();
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V1 === */
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
