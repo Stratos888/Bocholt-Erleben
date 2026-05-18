@@ -455,7 +455,7 @@ const OffersApp = {
     }
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V1 | Zweck: synchronisiert den geöffneten Zustand des erweiterten Filterpanels am Finder-Root, damit Schnellfilter und Trefferzeile im offenen Verwaltungsmodus ausgeblendet werden können; Umfang: ersetzt nur openAdvancedFilters() und closeAdvancedFilters() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V2 | Zweck: synchronisiert den geöffneten Zustand des erweiterten Filterpanels am Finder-Root und aktualisiert danach die Panel-Summary sofort; Umfang: ersetzt nur openAdvancedFilters() und closeAdvancedFilters() === */
   openAdvancedFilters() {
     const { advancedPanel, advancedToggle, finder } = this.refs;
     if (!advancedPanel) return;
@@ -471,6 +471,8 @@ const OffersApp = {
       advancedToggle.setAttribute("aria-expanded", "true");
       advancedToggle.classList.add("is-active");
     }
+
+    this.updateFinderUI();
   },
 
   closeAdvancedFilters() {
@@ -488,8 +490,10 @@ const OffersApp = {
       advancedToggle.setAttribute("aria-expanded", "false");
       advancedToggle.classList.remove("is-active");
     }
+
+    this.updateFinderUI();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V1 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V2 === */
 
   getOfferFilterValues(offer, group) {
     return this.normalizeArray(offer?.filter?.[group]);
@@ -736,7 +740,7 @@ const OffersApp = {
       : `${count} Aktivitäten gefunden`;
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V2 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler, Panel-Zustand und Reset-Zeile robust synchron; im geöffneten Panel enthält die Summary zusätzlich die aktuelle Trefferzahl, weil die externe Trefferzeile dann ausgeblendet wird; Umfang: ersetzt nur updateFinderUI() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V3 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler, Panel-Zustand und Reset-Zeile robust synchron; im geöffneten Panel enthält die Summary immer die aktuelle Trefferzahl, weil die externe Trefferzeile dann ausgeblendet wird; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
@@ -780,25 +784,35 @@ const OffersApp = {
     }
 
     if (this.refs.advancedSummary) {
-      if (hasActiveFilterValues) {
+      if (isAdvancedOpen || hasActiveFilters) {
         this.refs.advancedSummary.removeAttribute("hidden");
       } else {
         this.refs.advancedSummary.setAttribute("hidden", "");
       }
     }
 
+    if (this.refs.advancedReset) {
+      this.refs.advancedReset.hidden = !hasActiveFilters;
+    }
+
     if (this.refs.advancedSummaryText) {
-      const filterLabel = activeCount === 1
-        ? "1 Filter aktiv"
-        : `${activeCount} Filter aktiv`;
-      this.refs.advancedSummaryText.textContent = `${filterLabel} · ${resultLabel}`;
+      if (hasActiveFilterValues) {
+        const filterLabel = activeCount === 1
+          ? "1 Filter aktiv"
+          : `${activeCount} Filter aktiv`;
+        this.refs.advancedSummaryText.textContent = `${filterLabel} · ${resultLabel}`;
+      } else if (hasSearchTerm) {
+        this.refs.advancedSummaryText.textContent = `Suche aktiv · ${resultLabel}`;
+      } else {
+        this.refs.advancedSummaryText.textContent = resultLabel;
+      }
     }
 
     this.updateResultCount();
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V2 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V3 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
