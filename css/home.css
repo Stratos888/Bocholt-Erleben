@@ -3229,6 +3229,13 @@ body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value
 }
 /* === END BLOCK: ACTIVITIES_FILTER_BUTTON_BADGE_ALIGNMENT_V1 === */
 
+/* === BEGIN BLOCK: ACTIVITIES_GLOBAL_RESET_PILL_REMOVE_V1 | Zweck: entfernt den alten globalen Reset-X-Button aus dem Aktivitäten-Finder; Umfang: nur Legacy-Reset-Pill im Top-Stack, Suchfeld-X und Panel-Reset bleiben erhalten === */
+body.page-route-activities .top-stack.activity-finder #offer-reset-pill,
+body.page-route-activities .top-stack.activity-finder .filter-pill--reset{
+  display: none !important;
+}
+/* === END BLOCK: ACTIVITIES_GLOBAL_RESET_PILL_REMOVE_V1 === */
+
 body.page-route-activities .activity-finder__advanced-toggle.is-active .filter-pill__chevron{
   transform: rotate(90deg);
 }
