@@ -2104,7 +2104,12 @@ select.content-field__control{
   font-size: 0.82rem;
   line-height: 1.34;
 }
-
+@media (max-width: 520px){
+  .page--publish.page--activity-presence .activity-presence-guidance-list li{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
 @media (min-width: 760px){
   .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
     grid-template-columns: repeat(2, minmax(0, 1fr));
