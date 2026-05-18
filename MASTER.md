@@ -65,14 +65,17 @@ The following workpack is intentionally on hold:
 ### Information architecture
 
 - `/` is the canonical event-discovery home.
-- `/angebote/` is the current canonical activities route until an explicit route migration is defined.
+- `/angebote/` is the canonical activities route.
+- `/angebote/sichtbar-werden/` is the canonical activity-presence decision page.
+- `/angebote/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
+- `/angebote/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
 - `/events-veroeffentlichen/` is the canonical organizer funnel overview.
 - `/events-veroeffentlichen/einreichen/` is the canonical single-event submission route.
 - `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
 - `/fuer-veranstalter/` is the canonical organizer membership route.
 - `/ueber/` is the canonical trust/explanation page.
 - `/info/` is legacy backup/redirect only and is not the current canonical information hub.
-- Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages.
+- Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages unless explicitly promoted.
 - Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture.
 - The locations modal is final as an explanation / entry layer, not as a pricing table.
 
