@@ -3636,9 +3636,9 @@ body.page-route-activities .activity-finder__group{
     --desktop-service-rail-w: clamp(214px, 19.5vw, 232px);
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_HERO_IMAGE_BAND_FIX_V2 | Zweck: begrenzt das Aktivitäten-Hero-Foto im Desktop-Zustand stabil auf den eigentlichen Hero-/Control-Bereich, damit Schnellfilter und Trefferzahl auf einer ruhigen Lesefläche liegen; Umfang: nur Desktop-Bildbandhöhe der Aktivitätenseite ab 900px === */
+  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_HERO_IMAGE_BAND_FIX_V3 | Zweck: zieht das Aktivitäten-Hero-Foto auf Desktop wieder bis unter Schnellfilter und Trefferzahl, damit der sichtbare Hero-Contract mit der Eventseite übereinstimmt und beim Tabwechsel kein anderer Bildabschluss entsteht; Umfang: nur Desktop-Bildbandhöhe der Aktivitätenseite ab 900px === */
   body.page-route-activities{
-    --activities-desktop-hero-bg-h: clamp(344px, 23.5vw, 360px);
+    --activities-desktop-hero-bg-h: clamp(405px, 28.5vw, 424px);
   }
 
   body.page-route-activities .desktop-hero::before,
@@ -3646,7 +3646,7 @@ body.page-route-activities .activity-finder__group{
     bottom: auto;
     height: var(--activities-desktop-hero-bg-h);
   }
-  /* === END BLOCK: ACTIVITIES_DESKTOP_HERO_IMAGE_BAND_FIX_V2 === */
+  /* === END BLOCK: ACTIVITIES_DESKTOP_HERO_IMAGE_BAND_FIX_V3 === */
 
   /* === BEGIN BLOCK: DESKTOP_ACTIVITY_TOPSTACK_CLOSED_RHYTHM_V1 | Zweck: zieht Suche, Filter, Schnellfilter und Trefferzahl im geschlossenen Aktivitäten-Desktop-Finder enger zusammen, damit die Schnellfilter nicht visuell an den unteren Hero-Rand rutschen; Umfang: nur geschlossener Grid-Contract ab 900px === */
   body.is-tabbar-hidden .top-stack:not(.activity-finder),
@@ -3972,7 +3972,7 @@ body.page-route-activities .activity-finder__group{
     white-space: nowrap;
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_QUICKFILTER_READABILITY_AND_RHYTHM_V2 | Zweck: zieht Schnellfilter und Trefferzahl im geschlossenen Desktop-Finder aus dem unruhigen Foto-Kontext auf eine eigene ruhige Lesefläche und bindet sie enger an den Such-/Filterblock an; Umfang: nur geschlossener Activities-Finder ab 900px plus unveränderte Open-State-Ausblendung === */
+  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_QUICKFILTER_READABILITY_AND_RHYTHM_V3 | Zweck: integriert Schnellfilter und Trefferzahl im geschlossenen Desktop-Finder wieder in den Hero-Bildbereich, hält sie aber über eine dezente Lesefläche klar lesbar; Umfang: nur geschlossener Activities-Finder ab 900px plus unveränderte Open-State-Ausblendung === */
   body.page-route-activities .activity-finder__quick{
     grid-area: quick;
     position: relative;
@@ -3981,31 +3981,33 @@ body.page-route-activities .activity-finder__group{
     gap: 6px;
     width: 100%;
     min-width: 0;
-    margin-top: -2px;
-    padding: 7px 10px 4px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border) 68%, transparent 32%);
-    border-bottom: 0;
-    border-radius: 17px 17px 0 0;
-    background: linear-gradient(
-      180deg,
-      rgba(249,251,246,0.94) 0%,
-      rgba(243,248,237,0.90) 100%
-    );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.70) inset,
-      0 8px 18px rgba(12,24,16,0.026);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    margin-top: -4px;
+    padding: 5px 10px 2px;
+    border: 0;
+    border-radius: 16px 16px 0 0;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(244,248,238,0.74) 0%,
+        rgba(244,248,238,0.58) 46%,
+        rgba(244,248,238,0.30) 78%,
+        rgba(244,248,238,0.08) 100%
+      );
+    box-shadow: none;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
 
   body.page-route-activities .activity-finder__quick-label{
-    color: color-mix(in srgb, var(--home-copy-contrast) 92%, var(--brand-green-900) 8%);
+    color: color-mix(in srgb, var(--home-copy-contrast) 94%, var(--brand-green-900) 6%);
     font-size: 0.73rem;
     font-weight: 840;
     line-height: 1.05;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    text-shadow: none;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.26),
+      0 0 10px rgba(248,250,243,0.36);
   }
 
   body.page-route-activities .activity-finder__quick-options{
@@ -4014,17 +4016,17 @@ body.page-route-activities .activity-finder__group{
 
   body.page-route-activities .activity-finder__quick .activity-filter-chip{
     min-height: 30px;
-    border-color: color-mix(in srgb, var(--home-action-border) 94%, rgba(24,40,30,0.10) 6%);
+    border-color: color-mix(in srgb, var(--home-action-border) 92%, rgba(24,40,30,0.10) 8%);
     background: linear-gradient(
       180deg,
-      rgba(255,255,252,0.98) 0%,
-      rgba(248,251,242,0.94) 100%
+      rgba(255,255,252,0.94) 0%,
+      rgba(248,251,242,0.88) 100%
     );
     color: color-mix(in srgb, var(--home-copy-contrast) 88%, var(--brand-green-900) 12%);
     font-weight: 730;
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.78) inset,
-      0 3px 8px rgba(12,24,16,0.018);
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 3px 8px rgba(12,24,16,0.016);
   }
 
   body.page-route-activities .activity-finder__status-row{
@@ -4035,28 +4037,31 @@ body.page-route-activities .activity-finder__group{
     gap: 0;
     width: 100%;
     min-width: 0;
-    margin-top: -8px;
-    padding: 0 10px 7px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border) 68%, transparent 32%);
-    border-top: 0;
-    border-radius: 0 0 17px 17px;
-    background: linear-gradient(
-      180deg,
-      rgba(243,248,237,0.90) 0%,
-      rgba(239,245,232,0.86) 100%
-    );
-    box-shadow:
-      0 8px 18px rgba(12,24,16,0.020);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    margin-top: -7px;
+    padding: 0 10px 5px;
+    border: 0;
+    border-radius: 0 0 16px 16px;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(244,248,238,0.70) 0%,
+        rgba(244,248,238,0.52) 46%,
+        rgba(244,248,238,0.26) 78%,
+        rgba(244,248,238,0.06) 100%
+      );
+    box-shadow: none;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
   }
 
   body.page-route-activities .activity-finder__result-count{
-    color: color-mix(in srgb, var(--home-copy-contrast) 90%, var(--brand-green-900) 10%);
+    color: color-mix(in srgb, var(--home-copy-contrast) 92%, var(--brand-green-900) 8%);
     font-size: 0.84rem;
     font-weight: 840;
     line-height: 1.15;
-    text-shadow: none;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.22),
+      0 0 10px rgba(248,250,243,0.34);
   }
 
   body.page-route-activities .activity-finder.is-advanced-open .activity-finder__quick,
@@ -4075,7 +4080,7 @@ body.page-route-activities .activity-finder__group{
   body.page-route-activities .activity-finder__advanced-summary{
     margin: 0 0 8px;
   }
-  /* === END BLOCK: ACTIVITIES_DESKTOP_QUICKFILTER_READABILITY_AND_RHYTHM_V2 === */
+  /* === END BLOCK: ACTIVITIES_DESKTOP_QUICKFILTER_READABILITY_AND_RHYTHM_V3 === */
   body.page-route-activities .activity-finder__advanced-inner{
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
