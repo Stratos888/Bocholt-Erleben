@@ -1336,8 +1336,7 @@
   display: none;
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE | Zweck: stellt die mobile Passungszeile als sauber umbrechende Segmentreihe dar, ohne abgetrennte Trenner am Zeilenende; Umfang: nur activity-card-quiet Mobile-Darstellung === */
-/* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V2 | Zweck: stellt die mobile Passungsbegründung als ruhige Segmentreihe ohne umbrechende Trennzeichen dar; Umfang: nur activity-card-quiet Mobile-Darstellung === */
+/* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V3 | Zweck: stellt die mobile Passungsbegründung als ruhige Segmentreihe ohne Pseudo-Trenner dar; Umfang: konsolidiert activity-card-quiet vollständig und entfernt alte ::before-Trennerlogik === */
 .page--activities .activity-card-quiet{
   display: flex;
   flex-wrap: wrap;
@@ -1361,21 +1360,12 @@
   color: color-mix(in srgb, var(--color-text-secondary) 92%, var(--brand-green-900, #18281e) 8%);
   white-space: nowrap;
 }
-/* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V2 === */
-
-.page--activities .activity-card-quiet__item{
-  display: inline-flex;
-  align-items: baseline;
-  white-space: nowrap;
-}
 
 .page--activities .activity-card-quiet__item + .activity-card-quiet__item::before{
-  content: "·";
-  margin-right: 0.38em;
-  color: color-mix(in srgb, var(--color-text-secondary) 78%, transparent 22%);
-  font-weight: 680;
+  content: none;
+  display: none;
 }
-/* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE === */
+/* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V3 === */
 
 /* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 | Zweck: finalisiert die Bottom Tab Bar visuell zu einer flacheren, strafferen Mobile-Shell mit breit integriertem Active-Indicator und ausgewogener Präsenz beider Tabs | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
 body.has-bottom-tabbar{
