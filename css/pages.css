@@ -1953,7 +1953,7 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 === */
-/* === BEGIN BLOCK: ACTIVITY_PRESENCE_EVENT_PARITY_FUNNEL_V5 | Zweck: gleicht den Aktivitaetspraesenz-Funnel visuell an den Event-Funnel an und reduziert Sonderkarten auf wenige notwendige Brueckenklassen; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_ENTERPRISE_FINAL_FUNNEL_V6 | Zweck: finalisiert den Aktivitaetspraesenz-Funnel auf Event-Funnel-Niveau mit ruhiger Tarifwegwahl, kompakter Orientierung und minimalen Formularabschnittslabels; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
 .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
   grid-template-columns: minmax(0, 1fr);
 }
@@ -2074,6 +2074,25 @@ select.content-field__control{
   line-height: 1.22;
 }
 
+.page--publish.page--activity-presence .activity-presence-compact-section-head{
+  margin-top: 2px;
+  padding-top: 13px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish.page--activity-presence .content-form-grid > .activity-presence-compact-section-head:first-child{
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-compact-section-head h3{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1.14;
+}
+
 .page--publish.page--activity-presence .publish-final-actions{
   gap: 10px;
 }
@@ -2121,7 +2140,7 @@ select.content-field__control{
     border-left: 0;
   }
 }
-/* === END BLOCK: ACTIVITY_PRESENCE_EVENT_PARITY_FUNNEL_V5 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_ENTERPRISE_FINAL_FUNNEL_V6 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
