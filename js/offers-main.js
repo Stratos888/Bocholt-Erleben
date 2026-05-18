@@ -67,7 +67,6 @@ const OffersApp = {
     activeFilters: null,
     activeFilterList: null
   },
-  },
 
   async init() {
     debugLog?.("=== ACTIVITIES - APP START ===");
@@ -113,6 +112,7 @@ const OffersApp = {
     }
   },
 
+  cacheRefs() {
     this.refs.finder = document.querySelector("[data-activity-finder]");
     this.refs.searchInput = document.getElementById("search-filter");
     this.refs.searchClear = document.getElementById("offer-search-clear");
@@ -126,7 +126,6 @@ const OffersApp = {
     this.refs.advancedReset = document.getElementById("offer-advanced-filter-reset");
     this.refs.resultCount = document.getElementById("offer-result-count");
     this.refs.activeFilters = document.getElementById("offer-active-filters");
-    this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
     this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
   },
 
@@ -280,7 +279,7 @@ const OffersApp = {
       advancedToggle,
       activeFilterList
     } = this.refs;
-    } = this.refs;
+
     /* === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 | Zweck: synchronisiert Freitextsuche und eigenen Clear-Button; Umfang: nur Search-Input- und Clear-Button-Events === */
     if (searchInput) {
       searchInput.addEventListener("input", () => {
@@ -302,7 +301,6 @@ const OffersApp = {
       });
     }
     /* === END BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 === */
-    }
 
     if (finder) {
       finder.addEventListener("click", (event) => {
@@ -675,7 +673,11 @@ const OffersApp = {
     }
 
     resultCount.textContent = count === 1
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V1 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler und Reset-Zeile robust synchron mit Suchtext und aktiven Filterwerten; Umfang: ersetzt nur updateFinderUI() === */
+      ? "1 Aktivität gefunden"
+      : `${count} Aktivitäten gefunden`;
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V1 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler und Reset-Zeile robust synchron mit Suchtext und aktiven Filterwerten; Umfang: updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
@@ -733,10 +735,6 @@ const OffersApp = {
     this.renderActiveFilterChips();
   },
   /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V1 === */
-    this.updateFilterButtonStates();
-    this.renderActiveFilterChips();
-  },
-  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_RESET_STATE_V2 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
