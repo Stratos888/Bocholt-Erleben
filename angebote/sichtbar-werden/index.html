@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-reduction-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-event-parity-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_HEAD_V1 === -->
 </head>
 <body>
@@ -48,10 +48,6 @@
     <span class="app-title">Bocholt erleben</span>
   </a>
   <div class="header-right">
-    <a class="pwa-install-button header-info-button" href="/angebote/" aria-label="Zur Aktivitätenseite">
-      <span class="pwa-install-button__icon" data-ui-icon="map" aria-hidden="true"></span>
-      <span class="pwa-install-button__label">Aktivitäten</span>
-    </a>
     <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Bereich öffnen">
       <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
       <span class="pwa-install-button__label">Bereich öffnen</span>
@@ -59,88 +55,77 @@
   </div>
 </header>
 
-<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_REDUCTION_V2 | Zweck: reduziert die Aktivitaetspraesenz-Entscheidungsseite auf Hero, fruehe Tarifwahl, kompakte Aktivitaetsdefinition und kompakten Ablauf; Umfang: kompletter Main-Inhaltsbereich ohne Formular === -->
+<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_EVENT_PARITY_V3 | Zweck: richtet die Aktivitaetspraesenz-Entscheidungsseite am Event-Funnel aus: kurzer Hero, ruhige Tarif-Wegwahl, kompakte Orientierung; Umfang: kompletter Main-Inhaltsbereich ohne Formular === -->
 <main class="page page--publish page--activity-presence page--activity-presence-decision">
   <header class="content-hero content-hero--panel">
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
-        <p class="content-kicker">Aktivitätspräsenz</p>
-        <h1>Als Aktivität bei Bocholt erleben sichtbar werden</h1>
-        <p class="content-lead">Für dauerhaft verfügbare oder regelmäßig buchbare Angebote. Du zahlst erst nach Freigabe.</p>
-        <div class="activity-presence-hero-trust" aria-label="Wichtige Hinweise zur Aktivitätspräsenz">
-          <span>Eigene Aktivitätskarte</span>
-          <span>Prüfung vor Zahlung</span>
-          <span>Zählt erst nach Veröffentlichung</span>
-        </div>
+        <h1>Als Aktivität sichtbar werden</h1>
+        <p class="content-lead">
+          Für dauerhaft verfügbare oder regelmäßig buchbare Angebote. Bezahlt wird erst nach Freigabe.
+        </p>
       </div>
     </div>
   </header>
 
-  <section class="content-card publish-start-card activity-presence-tariff-section" aria-labelledby="activity-presence-plan-title">
+  <section class="content-card publish-membership-card publish-models-card activity-presence-tariff-section" aria-labelledby="activity-presence-plan-title">
     <div class="publish-section-head">
-      <h2 id="activity-presence-plan-title">Tarif wählen</h2>
-      <p class="content-note">Wähle, wie viele Aktivitäten du veröffentlichen möchtest. Bezahlt wird erst nach Freigabe.</p>
+      <h2 id="activity-presence-plan-title">Wähle den passenden Tarif</h2>
     </div>
 
-    <div class="activity-presence-tariff-grid" aria-label="Tarife der Aktivitätspräsenz">
-      <article class="activity-presence-tariff-card">
-        <div class="activity-presence-tariff-copy">
-          <h3>Aktivitätspräsenz Basis</h3>
-          <p class="activity-presence-price-pill">9,99&nbsp;€ / Monat</p>
-          <p>Für 1 veröffentlichte Aktivität.</p>
+    <ul class="publish-model-list activity-presence-tariff-list" aria-label="Tarife der Aktivitätspräsenz">
+      <li>
+        <div class="publish-model-copy">
+          <strong>Aktivitätspräsenz Basis</strong>
+          <span>9,99&nbsp;€ / Monat</span>
+          <small>Für 1 veröffentlichte Aktivität. Prüfung und Zahlung erfolgen vor der Veröffentlichung.</small>
         </div>
-        <div class="content-actions">
-          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_basic">Basis auswählen und Aktivität einreichen</a>
+        <div class="content-actions content-actions--inline">
+          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_basic">
+            Basis auswählen
+          </a>
         </div>
-      </article>
+      </li>
 
-      <article class="activity-presence-tariff-card">
-        <div class="activity-presence-tariff-copy">
-          <h3>Aktivitätspräsenz Plus</h3>
-          <p class="activity-presence-price-pill">19,99&nbsp;€ / Monat</p>
-          <p>Für bis zu 3 veröffentlichte Aktivitäten.</p>
+      <li>
+        <div class="publish-model-copy">
+          <strong>Aktivitätspräsenz Plus</strong>
+          <span>19,99&nbsp;€ / Monat</span>
+          <small>Für bis zu 3 veröffentlichte Aktivitäten. Prüfung und Zahlung erfolgen vor der Veröffentlichung.</small>
         </div>
-        <div class="content-actions">
-          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_plus">Plus auswählen und Aktivität einreichen</a>
+        <div class="content-actions content-actions--inline">
+          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_plus">
+            Plus auswählen
+          </a>
         </div>
-      </article>
-    </div>
+      </li>
+    </ul>
 
-    <p class="content-note activity-presence-plan-note">Erst veröffentlichte Aktivitäten zählen in deinem Tarif.</p>
+    <p class="content-note publish-model-note">Erst veröffentlichte Aktivitäten zählen in deinem Tarif.</p>
   </section>
 
-  <section class="content-card publish-membership-card" aria-labelledby="activity-presence-definition-title">
+  <section class="content-card publish-benefits-card activity-presence-guidance-card" aria-labelledby="activity-presence-guidance-title">
     <div class="publish-section-head">
-      <h2 id="activity-presence-definition-title">Was zählt als Aktivität?</h2>
-      <p class="content-note">Eine Aktivität ist ein dauerhaftes oder regelmäßig buchbares Angebot.</p>
+      <h2 id="activity-presence-guidance-title">Vor dem Einreichen</h2>
     </div>
 
-    <div class="activity-presence-compact-grid">
-      <div class="activity-presence-compact-column">
-        <h3>Passt</h3>
-        <p>Bouldern, Kindergeburtstag, regelmäßiger Kurs.</p>
-      </div>
-      <div class="activity-presence-compact-column activity-presence-compact-column--muted">
-        <h3>Passt nicht</h3>
-        <p>Einzeltermin, andere Öffnungszeiten, andere Preise oder kleine Textvarianten. Einzelne Termine sind Veranstaltungen.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="content-card publish-benefits-card" aria-labelledby="activity-presence-flow-title">
-    <div class="publish-section-head">
-      <h2 id="activity-presence-flow-title">So läuft es ab</h2>
-    </div>
-
-    <ol class="activity-presence-step-list" aria-label="Ablauf der Aktivitätspräsenz">
-      <li><strong>Einreichen</strong><span>Du sendest die Angaben zur Prüfung.</span></li>
-      <li><strong>Prüfung</strong><span>Wir prüfen, ob die Aktivität passt.</span></li>
-      <li><strong>Zahlungslink</strong><span>Bei Freigabe erhältst du den Link per E-Mail.</span></li>
-      <li><strong>Veröffentlichung</strong><span>Nach Zahlung bereiten wir die Karte auf.</span></li>
-    </ol>
+    <ul class="activity-presence-guidance-list" aria-label="Hinweise zur Aktivitätspräsenz">
+      <li>
+        <strong>Passt</strong>
+        <span>Dauerhafte oder regelmäßig buchbare Angebote, zum Beispiel Bouldern, Kindergeburtstag oder ein regelmäßiger Kurs.</span>
+      </li>
+      <li>
+        <strong>Passt nicht</strong>
+        <span>Einzeltermine, andere Preise, andere Öffnungszeiten oder kleine Textvarianten. Einzelne Termine sind Veranstaltungen.</span>
+      </li>
+      <li>
+        <strong>Ablauf</strong>
+        <span>Einreichen → Prüfung → Zahlungslink → Veröffentlichung.</span>
+      </li>
+    </ul>
   </section>
 </main>
-<!-- === END BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_REDUCTION_V2 === -->
+<!-- === END BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_EVENT_PARITY_V3 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
