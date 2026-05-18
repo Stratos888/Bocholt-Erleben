@@ -3623,25 +3623,33 @@ body.page-route-activities .activity-finder__group{
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
-/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V4 | Zweck: gleicht die Desktop-Aktivitäten-Filtergröße an den Event-Top-Shell-Contract an und verhindert, dass das Hero-Hintergrundbild beim geöffneten Filterpanel künstlich mitwächst; Umfang: kompletter später Desktop-Owner für Activities-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V1 | Zweck: setzt Events und Aktivitäten ab 900px auf denselben Desktop-Contract: Suche/Filter links, Service-Rail rechts, stabile Hero-Bildhöhe bei Aktivitäten und breites Advanced-Filter-Tray; Umfang: später Desktop-Owner für Events + Activities innerhalb home.css === */
 @media (min-width: 900px){
+  body.is-tabbar-hidden,
   body.page-route-activities{
-    --activities-desktop-search-h: var(--desktop-search-height, 66px);
-    --activities-desktop-filter-h: var(--desktop-filter-height, 50px);
-    --activities-desktop-action-h: var(--desktop-service-action-height, 38px);
-    --activities-desktop-action-gap: var(--desktop-service-action-gap, 5px);
-    --activities-desktop-rail-w: var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
+    --desktop-search-height: 66px;
+    --desktop-filter-height: 50px;
+    --desktop-service-action-height: 38px;
+    --desktop-service-action-gap: 5px;
+    --desktop-panel-gap: 8px;
+    --desktop-reset-w: 42px;
+    --desktop-service-rail-w: clamp(214px, 19.5vw, 232px);
+  }
+
+  body.page-route-activities{
     --activities-desktop-hero-bg-h: 412px;
   }
 
-  body.page-route-activities .desktop-hero:has(.activity-finder__advanced:not([hidden]))::before,
-  body.page-route-activities .desktop-hero:has(.activity-finder__advanced:not([hidden]))::after{
+  body.page-route-activities .desktop-hero::before,
+  body.page-route-activities .desktop-hero::after{
     bottom: auto;
     height: var(--activities-desktop-hero-bg-h);
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder),
   body.page-route-activities .top-stack.activity-finder{
-    grid-template-columns: minmax(0, 1fr) var(--activities-desktop-rail-w);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--desktop-service-rail-w);
     grid-template-areas:
       "search actions"
       "quick quick"
@@ -3654,53 +3662,96 @@ body.page-route-activities .activity-finder__group{
 
   body.page-route-activities .top-stack.activity-finder.is-advanced-open,
   body.page-route-activities .top-stack.activity-finder:has(.activity-finder__advanced:not([hidden])){
-    grid-template-columns: minmax(0, 1fr) var(--activities-desktop-rail-w);
     grid-template-areas:
       "search actions"
       "advanced advanced";
     grid-template-rows: auto auto;
-    column-gap: 8px;
     row-gap: 10px;
-    align-items: start;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row.has-active-filter-reset,
   body.page-route-activities .activity-finder > .activity-finder__search-row,
   body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
     grid-area: search;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows:
-      var(--activities-desktop-search-h)
-      var(--activities-desktop-filter-h);
-    gap: var(--desktop-panel-gap, 8px);
+      var(--desktop-search-height)
+      var(--desktop-filter-height);
+    gap: var(--desktop-panel-gap);
     align-items: stretch;
     width: 100%;
     min-width: 0;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row.has-active-filter-reset{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--desktop-reset-w);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row > .desktop-hero__search-slot,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > .desktop-hero__search-slot,
   body.page-route-activities .activity-finder__search-row > .activity-finder__search-slot,
   body.page-route-activities .activity-finder__search-row.has-active-filter-reset > .activity-finder__search-slot{
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 1;
     min-width: 0;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row > #filter-time-pill,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > #filter-time-pill{
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row > #filter-category-pill,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > #filter-category-pill{
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-row.has-active-filter-reset > .filter-pill--reset{
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle,
+  body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-field,
   body.page-route-activities .activity-finder .desktop-hero__search-field{
     position: relative;
     min-width: 0;
-    height: var(--activities-desktop-search-h);
+    height: var(--desktop-search-height);
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__search-field .desktop-hero__icon--search,
   body.page-route-activities .activity-finder .desktop-hero__search-field .desktop-hero__icon--search{
+    position: absolute;
     left: 21px;
+    top: 50%;
+    z-index: 2;
     width: 19px;
     height: 19px;
     color: rgba(48,72,58,0.78);
+    transform: translateY(-50%);
+    pointer-events: none;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) #search-filter,
   body.page-route-activities .activity-finder #search-filter{
-    height: var(--activities-desktop-search-h);
-    min-height: var(--activities-desktop-search-h);
+    width: 100%;
+    max-width: none;
+    height: var(--desktop-search-height);
+    min-height: var(--desktop-search-height);
+    margin: 0;
     padding: 0 42px 0 52px;
     border: 1px solid color-mix(in srgb, var(--home-toolbar-border) 82%, rgba(24,40,30,0.12) 18%);
     border-radius: 18px;
@@ -3712,12 +3763,13 @@ body.page-route-activities .activity-finder__group{
     color: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
     font-size: 1rem;
     font-weight: 630;
-    line-height: var(--activities-desktop-search-h);
+    line-height: var(--desktop-search-height);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.86) inset,
       0 7px 16px rgba(12,24,16,0.032);
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) #search-filter::placeholder,
   body.page-route-activities .activity-finder #search-filter::placeholder{
     color: color-mix(in srgb, var(--home-copy-muted) 84%, white 16%);
     font-weight: 600;
@@ -3729,10 +3781,9 @@ body.page-route-activities .activity-finder__group{
     height: 34px;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill,
   body.page-route-activities .activity-finder__advanced-toggle,
   body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
-    grid-column: 1;
-    grid-row: 2;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -3740,8 +3791,8 @@ body.page-route-activities .activity-finder__group{
     width: 100%;
     min-width: 0;
     max-width: none;
-    height: var(--activities-desktop-filter-h);
-    min-height: var(--activities-desktop-filter-h);
+    height: var(--desktop-filter-height);
+    min-height: var(--desktop-filter-height);
     padding: 0 13px;
     border-radius: 16px;
     border-color: color-mix(in srgb, var(--home-action-border) 88%, rgba(24,40,30,0.08) 12%);
@@ -3757,6 +3808,7 @@ body.page-route-activities .activity-finder__group{
     backdrop-filter: blur(5px);
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill .filter-pill__label,
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
     order: initial;
     display: inline-flex;
@@ -3776,6 +3828,16 @@ body.page-route-activities .activity-finder__group{
     display: none;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) #filter-time-pill .filter-pill__label{
+    font-size: 0;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) #filter-time-pill .filter-pill__label::before{
+    content: "Wann";
+    font-size: 0.76rem;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill .filter-pill__label::after,
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::after{
     content: "·";
     margin-left: 6px;
@@ -3789,6 +3851,7 @@ body.page-route-activities .activity-finder__group{
     display: none;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill .filter-pill__value,
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
     order: initial;
     display: inline;
@@ -3803,6 +3866,7 @@ body.page-route-activities .activity-finder__group{
     text-overflow: ellipsis;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill .filter-pill__chevron,
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
     order: initial;
     flex: 0 0 auto;
@@ -3818,12 +3882,13 @@ body.page-route-activities .activity-finder__group{
     transform: rotate(90deg);
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__actions,
   body.page-route-activities .activity-finder .desktop-hero__actions{
     grid-area: actions;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(3, var(--activities-desktop-action-h));
-    gap: var(--activities-desktop-action-gap);
+    grid-template-rows: repeat(3, var(--desktop-service-action-height));
+    gap: var(--desktop-service-action-gap);
     align-self: stretch;
     align-content: stretch;
     width: 100%;
@@ -3833,6 +3898,9 @@ body.page-route-activities .activity-finder__group{
     border-top: 0;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action:link,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action:visited,
   body.page-route-activities .activity-finder .desktop-hero__action,
   body.page-route-activities .activity-finder .desktop-hero__action:link,
   body.page-route-activities .activity-finder .desktop-hero__action:visited,
@@ -3851,7 +3919,7 @@ body.page-route-activities .activity-finder__group{
     width: 100%;
     min-width: 0;
     min-height: 0;
-    height: var(--activities-desktop-action-h);
+    height: var(--desktop-service-action-height);
     padding: 0 12px;
     gap: 7px;
     border-radius: 12px;
@@ -3876,6 +3944,7 @@ body.page-route-activities .activity-finder__group{
     opacity: 1;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action .desktop-hero__icon,
   body.page-route-activities .activity-finder .desktop-hero__action .desktop-hero__icon,
   body.page-route-activities .activity-finder .desktop-hero__action--publish .desktop-hero__icon,
   body.page-route-activities .activity-finder .desktop-hero__action--info .desktop-hero__icon,
@@ -3886,28 +3955,12 @@ body.page-route-activities .activity-finder__group{
     opacity: 0.76;
   }
 
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action span:last-child,
   body.page-route-activities .activity-finder .desktop-hero__action span:last-child{
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  @media (hover: hover){
-    body.page-route-activities .activity-finder .desktop-hero__action:hover{
-      transform: translateY(-1px);
-      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(24,40,30,0.12) 14%);
-      background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(255,255,255,0.82) 10%) 0%,
-        color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.72) 16%) 100%
-      );
-      color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
-      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.72) inset,
-        0 5px 12px rgba(12,24,16,0.026);
-    }
   }
 
   body.page-route-activities .activity-finder__quick{
@@ -3979,6 +4032,24 @@ body.page-route-activities .activity-finder__group{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V4 === */
+
+@media (min-width: 900px) and (hover: hover){
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action:hover,
+  body.page-route-activities .activity-finder .desktop-hero__action:hover{
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(24,40,30,0.12) 14%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(255,255,255,0.82) 10%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.72) 16%) 100%
+    );
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 5px 12px rgba(12,24,16,0.026);
+  }
+}
+/* === END BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V1 === */
 /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
