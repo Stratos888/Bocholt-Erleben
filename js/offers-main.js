@@ -583,21 +583,63 @@ const OffersApp = {
     });
   },
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 | Zweck: übersetzt aktive Filterwerte in verständliche Card-Merkmale, damit Ergebnis-Cards ihre Passung für Nutzer nachvollziehbar erklären; Umfang: ersetzt nur getActiveMatchLabels() und ergänzt lokalen Label-Mapper === */
+  getCardMatchLabel(offer, group, value) {
+    const normalizedTags = new Set(this.normalizeArray(offer?.tags));
+    const normalizedFacts = new Set(this.normalizeArray(offer?.cardFacts));
+
+    if (group === "situation" && value === "Mit Kindern") {
+      if (normalizedTags.has("Familienfreundlich")) return "Familienfreundlich";
+      return "Mit Kindern";
+    }
+
+    if (group === "situation" && value === "Draußen") {
+      if (normalizedFacts.has("Outdoor")) return "Draußen";
+      return "Draußen";
+    }
+
+    if (group === "situation" && value === "Bei Regen") {
+      if (normalizedFacts.has("Indoor")) return "Bei Regen";
+      return "Bei Regen";
+    }
+
+    if (group === "proximity" && value === "In der Umgebung") {
+      return "Umgebung";
+    }
+
+    if (group === "proximity" && value === "Grenzregion / Niederlande") {
+      return "Grenzregion";
+    }
+
+    if (group === "proximity" && value === "Direkt in Bocholt") {
+      return "Bocholt";
+    }
+
+    return value;
+  },
+
   getActiveMatchLabels(offer) {
     const orderedGroups = ["situation", "features", "proximity", "activity_type", "effort"];
     const labels = [];
+    const seen = new Set();
 
     orderedGroups.forEach((group) => {
       const available = new Set(this.getOfferFilterValues(offer, group));
       this.getActiveValues(group).forEach((value) => {
-        if (available.has(value)) {
-          labels.push(value);
-        }
+        if (!available.has(value)) return;
+
+        const label = this.getCardMatchLabel(offer, group, value);
+        const key = String(label || "").trim().toLowerCase();
+        if (!label || seen.has(key)) return;
+
+        seen.add(key);
+        labels.push(label);
       });
     });
 
-    return Array.from(new Set(labels)).slice(0, 3);
+    return labels.slice(0, 3);
   },
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 === */
 
   withRenderedMatchContext(offer) {
     return {
