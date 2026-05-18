@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-reduction-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-event-parity-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_HEAD_V1 === -->
 </head>
 <body>
@@ -48,10 +48,6 @@
     <span class="app-title">Bocholt erleben</span>
   </a>
   <div class="header-right">
-    <a class="pwa-install-button header-info-button" href="/angebote/" aria-label="Zur Aktivitätenseite">
-      <span class="pwa-install-button__icon" data-ui-icon="map" aria-hidden="true"></span>
-      <span class="pwa-install-button__label">Aktivitäten</span>
-    </a>
     <a class="pwa-install-button header-access-button" href="/fuer-veranstalter/login/" aria-label="Bereich öffnen">
       <span class="pwa-install-button__icon" data-ui-icon="account" aria-hidden="true"></span>
       <span class="pwa-install-button__label">Bereich öffnen</span>
@@ -59,28 +55,30 @@
   </div>
 </header>
 
-<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_REDUCTION_V2 | Zweck: reduziert die Formularseite auf kompakten Kopf, kompakte Tarifwahl und direkt sichtbares Formular; Umfang: kompletter Main-Inhaltsbereich mit unveraenderten Formular-IDs === -->
+<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_EVENT_PARITY_V3 | Zweck: richtet die Aktivitaetspraesenz-Formularseite am Event-Formular aus: kurzer Hero, eine Formularcard, kompakte Tarifwahl und weniger Erklaertext; Umfang: kompletter Main-Inhaltsbereich mit unveraenderten Formular-IDs === -->
 <main class="page page--publish page--activity-presence page--activity-presence-submit">
   <header class="content-hero content-hero--panel">
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
-        <p class="content-kicker">Aktivitätspräsenz</p>
         <h1>Aktivität zur Prüfung einreichen</h1>
-        <p class="content-lead">Trage die Angaben ein. Bezahlt wird erst nach Freigabe.</p>
+        <p class="content-lead">
+          Trage alle notwendigen Angaben ein. Wir prüfen zuerst, ob die Aktivität grundsätzlich passt. Erst danach erhältst du einen Zahlungslink.
+        </p>
       </div>
     </div>
   </header>
 
-  <form class="content-form activity-presence-form-shell" id="activity-presence-form" novalidate>
-    <section class="content-card publish-start-card" id="activity-presence-submit-section" aria-labelledby="activity-presence-submit-title">
-      <div class="publish-section-head publish-section-head--form">
-        <h2 id="activity-presence-submit-title">Einreichung vorbereiten</h2>
-        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
-        <p class="content-note"><strong>Tarif wählen</strong> – Zahlung erst nach Freigabe.</p>
-      </div>
+  <section class="content-card publish-start-card" id="activity-presence-submit-section" aria-labelledby="activity-presence-submit-title">
+    <div class="publish-section-head publish-section-head--form">
+      <h2 id="activity-presence-submit-title">Einreichung vorbereiten</h2>
+      <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+      <p class="content-note"><strong>Tarif auswählen</strong> – Zahlung erst nach Freigabe.</p>
+    </div>
 
+    <form class="content-form activity-presence-form-shell" id="activity-presence-form" novalidate>
       <fieldset class="activity-presence-inline-plan" aria-labelledby="activity-presence-plan-title">
-        <legend id="activity-presence-plan-title">Tarif auswählen</legend>
+        <legend id="activity-presence-plan-title">Tarif</legend>
+
         <div class="activity-presence-inline-plan-options" role="radiogroup" aria-label="Tarif für die Aktivitätspräsenz">
           <label class="activity-presence-inline-plan-option" for="activity-plan-basic">
             <input id="activity-plan-basic" name="activityPlan" type="radio" value="activity_basic" checked>
@@ -101,14 +99,15 @@
       </fieldset>
 
       <div class="content-form-grid">
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Deine Kontaktdaten</h3>
-          <p class="content-note">Für Rückfragen und den Anbieterbereich.</p>
-        </div>
-
         <label class="content-field" for="activity-presence-organization">
           <span class="content-field__label">Anbieter / Organisation *</span>
           <input class="content-field__control" id="activity-presence-organization" name="organization" type="text" autocomplete="organization" required>
+        </label>
+
+        <label class="content-field" for="activity-presence-email">
+          <span class="content-field__label">E-Mail-Adresse *</span>
+          <input class="content-field__control" id="activity-presence-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          <p class="content-field__hint">Für Rückfragen, Zahlungsfreigabe und späteren Zugriff.</p>
         </label>
 
         <label class="content-field" for="activity-presence-contact">
@@ -116,17 +115,7 @@
           <input class="content-field__control" id="activity-presence-contact" name="contact" type="text" autocomplete="name">
         </label>
 
-        <label class="content-field content-field--full" for="activity-presence-email">
-          <span class="content-field__label">E-Mail-Adresse *</span>
-          <input class="content-field__control" id="activity-presence-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-        </label>
-
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Aktivität und Standort</h3>
-          <p class="content-note">Name, Standort und Link.</p>
-        </div>
-
-        <label class="content-field content-field--full" for="activity-presence-title">
+        <label class="content-field" for="activity-presence-title">
           <span class="content-field__label">Name der Aktivität *</span>
           <input class="content-field__control" id="activity-presence-title" name="title" type="text" required>
           <p class="content-field__hint">Zum Beispiel: Bouldern, Kindergeburtstag oder SUP am See.</p>
@@ -159,15 +148,10 @@
           </label>
         </div>
 
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Beschreibung und Verfügbarkeit</h3>
-          <p class="content-note">Was Nutzer machen können und wann es verfügbar ist.</p>
-        </div>
-
         <label class="content-field content-field--full" for="activity-presence-description">
           <span class="content-field__label">Kurzbeschreibung der Aktivität *</span>
           <textarea class="content-field__control" id="activity-presence-description" name="description" rows="4" required></textarea>
-          <p class="content-field__hint">Kurz beschreiben, für wen die Aktivität geeignet ist.</p>
+          <p class="content-field__hint">Kurz beschreiben, was Nutzer dort machen können.</p>
         </label>
 
         <label class="content-field content-field--full" for="activity-presence-duration">
@@ -192,14 +176,19 @@
       </div>
 
       <div class="content-actions content-actions--inline publish-final-actions">
-        <button class="content-cta content-cta--primary" id="activity-presence-submit" type="button">Aktivität zur Prüfung einreichen</button>
-        <p class="content-note activity-presence-submit-note">Du zahlst nicht bei der Einreichung.</p>
+        <button class="content-cta content-cta--primary" id="activity-presence-submit" type="button">
+          Zur Prüfung einreichen
+        </button>
+        <p class="content-note activity-presence-submit-note">
+          Nach der Einreichung prüfen wir die Aktivität zuerst. Wenn sie grundsätzlich passt, erhältst du per E-Mail einen Zahlungslink.
+        </p>
       </div>
+
       <p class="content-note" id="activity-presence-status" aria-live="polite" hidden></p>
-    </section>
-  </form>
+    </form>
+  </section>
 </main>
-<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_REDUCTION_V2 === -->
+<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_EVENT_PARITY_V3 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
