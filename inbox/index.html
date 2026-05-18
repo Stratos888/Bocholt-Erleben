@@ -1311,11 +1311,15 @@ Umfang:
         it.approved_at = it.approved_at || new Date().toISOString();
 
         renderCurrent(totalLoaded);
-        setReviewCardNotice(
-          isActivityPresenceItem(it)
-            ? "Aktivitätspräsenz wurde veröffentlicht. Verbrauch wurde gebucht oder vorhandener Verbrauch wiederverwendet."
-            : "Submission wurde veröffentlicht. Verbrauch wurde gebucht oder vorhandener Verbrauch wiederverwendet.",
-          "success"
+          /* === BEGIN BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V1 | Zweck: entfernt internes Verbrauch-/Token-Wording aus der Veröffentlichungsmeldung; Umfang: ersetzt nur die Erfolgsmeldung nach Veröffentlichung === */
+          setItemStatus(
+            item,
+            result?.message || (currentKind === "activity"
+              ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
+              : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."),
+            "success"
+          );
+          /* === END BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V1 === */
         );
         setStatus("");
         return;
