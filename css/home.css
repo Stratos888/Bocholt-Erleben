@@ -3166,22 +3166,29 @@ body.page-route-activities .activity-search-clear:active{
   transform: translateY(-50%) scale(0.96);
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_BUTTON_BADGE_ALIGNMENT_V1 | Zweck: richtet Label, aktive-Filter-Badge und Chevron im mobilen Filterbutton sauber innerhalb der Pill aus; Umfang: nur Filterbutton im Aktivitäten-Finder === */
 body.page-route-activities .activity-finder__advanced-toggle,
 body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
   grid-column: 2;
   grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   width: auto;
-  min-width: 82px;
-  max-width: 96px;
+  min-width: 88px;
+  max-width: 110px;
   min-height: var(--cmp-input-minh);
-  padding-inline: 12px;
+  padding-inline: 10px;
   border-radius: var(--cmp-input-radius);
   justify-self: stretch;
 }
 
 body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
-  font-size: 0;
   order: 1;
+  flex: 0 0 auto;
+  min-width: 0;
+  font-size: 0;
 }
 
 body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::before{
@@ -3196,30 +3203,31 @@ body.page-route-activities .activity-finder__advanced-toggle.has-active-filter-c
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding-inline: 6px;
+  flex: 0 0 auto;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 5px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--brand-green-900, #18281e) 10%, rgba(255,255,255,0.92) 90%);
   color: var(--brand-green-900, #18281e);
-  font-size: 0.74rem;
-  font-weight: 800;
+  font-size: 0.70rem;
+  font-weight: 820;
   line-height: 1;
+}
+
+body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
+  order: 3;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin-left: 0;
+  transition: transform 160ms ease;
 }
 
 body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
   display: none;
 }
-/* === END BLOCK: ACTIVITIES_SEARCH_CLEAR_AND_FILTER_COUNT_CSS_V1 === */
-
-body.page-route-activities .activity-finder__search-row > .filter-pill--reset{
-  display: none !important;
-}
-
-body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
-  margin-left: 2px;
-  transition: transform 160ms ease;
-}
+/* === END BLOCK: ACTIVITIES_FILTER_BUTTON_BADGE_ALIGNMENT_V1 === */
 
 body.page-route-activities .activity-finder__advanced-toggle.is-active .filter-pill__chevron{
   transform: rotate(90deg);
