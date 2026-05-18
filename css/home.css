@@ -3619,37 +3619,43 @@ body.page-route-activities .activity-finder__group{
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
-/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_ENTERPRISE_CTA_ROW_V1 | Zweck: repariert die Desktop-Aktivitäten-Top-Shell, indem die Service-CTAs aus der gequetschten rechten Vertikalspalte in eine lesbare horizontale CTA-Zeile unterhalb der Filtersteuerung überführt werden; Umfang: kompletter Desktop-Owner für Aktivitäten-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
+/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_RAIL_V2 | Zweck: stellt die Desktop-Aktivitäten-Top-Shell auf Event-Parität: großer linker Such-/Filterbereich, rechte lesbare Service-Rail mit drei vertikal gestapelten CTAs, Schnellfilter und Trefferzahl darunter; Umfang: kompletter später Desktop-Owner für Activities-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 @media (min-width: 900px){
   body.page-route-activities .top-stack.activity-finder{
-    grid-template-columns: minmax(0, 1fr);
+    --activities-desktop-search-h: var(--desktop-search-height, var(--desktop-panel-height, 56px));
+    --activities-desktop-filter-h: var(--desktop-filter-height, 44px);
+    --activities-desktop-action-h: var(--desktop-service-action-height, 34px);
+    --activities-desktop-action-gap: var(--desktop-service-action-gap, 3px);
+    --activities-desktop-rail-w: var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
+
+    grid-template-columns: minmax(0, 1fr) var(--activities-desktop-rail-w);
     grid-template-areas:
-      "search"
-      "advanced"
-      "quick"
-      "status"
-      "actions";
-    grid-template-rows: auto;
-    column-gap: 0;
+      "search actions"
+      "advanced advanced"
+      "quick quick"
+      "status status";
+    grid-template-rows: auto auto auto auto;
+    column-gap: 8px;
     row-gap: 8px;
     align-items: start;
   }
 
   body.page-route-activities .top-stack.activity-finder:not(:has(.activity-finder__advanced:not([hidden]))){
     grid-template-areas:
-      "search"
-      "quick"
-      "status"
-      "actions";
+      "search actions"
+      "quick quick"
+      "status status";
   }
 
   body.page-route-activities .activity-finder > .activity-finder__search-row,
   body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
     grid-area: search;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(178px, 214px);
-    grid-template-rows: auto;
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows:
+      var(--activities-desktop-search-h)
+      var(--activities-desktop-filter-h);
+    gap: var(--desktop-panel-gap, 8px);
     align-items: stretch;
     width: 100%;
     min-width: 0;
@@ -3664,22 +3670,57 @@ body.page-route-activities .activity-finder__group{
 
   body.page-route-activities .activity-finder__advanced-toggle,
   body.page-route-activities .activity-finder__search-row.has-active-filter-reset .activity-finder__advanced-toggle{
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
     width: 100%;
     min-width: 0;
     max-width: none;
-    min-height: var(--cmp-input-minh);
-    padding-inline: 12px;
-    border-radius: var(--cmp-input-radius);
+    height: var(--activities-desktop-filter-h);
+    min-height: var(--activities-desktop-filter-h);
+    padding: 0 13px;
+    border-radius: 16px;
+    border-color: color-mix(in srgb, var(--home-action-border) 88%, rgba(24,40,30,0.08) 12%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(248,250,243,0.70) 10%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.66) 16%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.68) inset,
+      0 2px 6px rgba(12,24,16,0.010);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
   }
 
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
-    font-size: inherit;
+    order: initial;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: 0;
+    color: color-mix(in srgb, var(--home-copy-muted) 94%, var(--home-copy-body) 6%);
+    font-size: 0.76rem;
+    font-weight: 690;
+    line-height: 1;
+    letter-spacing: -0.006em;
+    white-space: nowrap;
   }
 
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::before{
     content: none;
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label::after{
+    content: "·";
+    margin-left: 6px;
+    color: color-mix(in srgb, var(--home-copy-muted) 66%, transparent 34%);
+    font-size: 0.76rem;
+    font-weight: 640;
   }
 
   body.page-route-activities .activity-finder__advanced-toggle.has-active-filter-count::before{
@@ -3688,7 +3729,124 @@ body.page-route-activities .activity-finder__group{
   }
 
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
+    order: initial;
     display: inline;
+    flex: 1 1 auto;
+    min-width: 0;
+    color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+    font-size: 0.86rem;
+    font-weight: 705;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle .filter-pill__chevron{
+    order: initial;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    color: color-mix(in srgb, var(--brand-green-900) 76%, var(--brand-gold-300) 24%);
+    opacity: 0.72;
+    transition: transform 160ms ease;
+  }
+
+  body.page-route-activities .activity-finder__advanced-toggle.is-active .filter-pill__chevron{
+    transform: rotate(90deg);
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__actions{
+    grid-area: actions;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(3, var(--activities-desktop-action-h));
+    gap: var(--activities-desktop-action-gap);
+    align-self: stretch;
+    align-content: stretch;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__action,
+  body.page-route-activities .activity-finder .desktop-hero__action:link,
+  body.page-route-activities .activity-finder .desktop-hero__action:visited,
+  body.page-route-activities .activity-finder .desktop-hero__action--publish,
+  body.page-route-activities .activity-finder .desktop-hero__action--publish:link,
+  body.page-route-activities .activity-finder .desktop-hero__action--publish:visited,
+  body.page-route-activities .activity-finder .desktop-hero__action--info,
+  body.page-route-activities .activity-finder .desktop-hero__action--info:link,
+  body.page-route-activities .activity-finder .desktop-hero__action--info:visited,
+  body.page-route-activities .activity-finder .desktop-hero__action--app,
+  body.page-route-activities .activity-finder .desktop-hero__action--app:link,
+  body.page-route-activities .activity-finder .desktop-hero__action--app:visited{
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: var(--activities-desktop-action-h);
+    padding: 0 12px;
+    gap: 7px;
+    border-radius: 12px;
+    border-color: color-mix(in srgb, var(--home-action-border) 78%, transparent 22%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 80%, rgba(248,250,243,0.56) 20%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 76%, rgba(248,250,243,0.52) 24%) 100%
+    );
+    color: color-mix(in srgb, var(--home-copy-muted) 88%, var(--home-copy-body) 12%);
+    -webkit-text-fill-color: color-mix(in srgb, var(--home-copy-muted) 88%, var(--home-copy-body) 12%);
+    font-size: 0.77rem;
+    font-weight: 625;
+    line-height: 1;
+    text-align: left;
+    white-space: nowrap;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.58) inset,
+      0 2px 5px rgba(12,24,16,0.008);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 1;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__action .desktop-hero__icon,
+  body.page-route-activities .activity-finder .desktop-hero__action--publish .desktop-hero__icon,
+  body.page-route-activities .activity-finder .desktop-hero__action--info .desktop-hero__icon,
+  body.page-route-activities .activity-finder .desktop-hero__action--app .desktop-hero__icon{
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    opacity: 0.76;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__action span:last-child{
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (hover: hover){
+    body.page-route-activities .activity-finder .desktop-hero__action:hover{
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--home-action-border) 86%, rgba(24,40,30,0.12) 14%);
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-action-bg-start) 90%, rgba(255,255,255,0.82) 10%) 0%,
+        color-mix(in srgb, var(--home-action-bg-end) 84%, rgba(248,250,243,0.72) 16%) 100%
+      );
+      color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+      -webkit-text-fill-color: color-mix(in srgb, var(--brand-green-900) 84%, var(--brand-gold-300) 16%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.72) inset,
+        0 5px 12px rgba(12,24,16,0.026);
+    }
   }
 
   body.page-route-activities .activity-finder__quick{
@@ -3701,48 +3859,6 @@ body.page-route-activities .activity-finder__group{
 
   body.page-route-activities .activity-finder__advanced{
     grid-area: advanced;
-  }
-
-  body.page-route-activities .activity-finder .desktop-hero__actions{
-    grid-area: actions;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
-    align-self: stretch;
-    margin-top: 2px;
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  body.page-route-activities .activity-finder .desktop-hero__action,
-  body.page-route-activities .activity-finder .desktop-hero__action:link,
-  body.page-route-activities .activity-finder .desktop-hero__action:visited{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    min-width: 0;
-    min-height: 40px;
-    padding: 0 14px;
-    border-radius: 15px;
-    font-size: 0.82rem;
-    font-weight: 720;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  body.page-route-activities .activity-finder .desktop-hero__action > span:last-child{
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  body.page-route-activities .activity-finder .desktop-hero__icon{
-    flex: 0 0 auto;
   }
 
   body.page-route-activities .activity-finder__advanced-inner{
@@ -3760,6 +3876,6 @@ body.page-route-activities .activity-finder__group{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_ENTERPRISE_CTA_ROW_V1 === */
+/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_RAIL_V2 === */
 /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
