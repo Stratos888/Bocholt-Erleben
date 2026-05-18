@@ -429,7 +429,6 @@ function getCategoryPresentation(category) {
     return "";
   }
   /* === END BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 === */
-  }
 
   /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 | Zweck: priorisiert bei aktiven Filtern die konkret passenden Merkmale auf Activity-Cards; Umfang: ersetzt nur buildFactItems(offer), ohne Meta-/Tag-Helfer zu verändern === */
   function buildFactItems(offer) {
