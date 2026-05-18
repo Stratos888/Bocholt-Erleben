@@ -458,8 +458,9 @@ function normalizeExternalUrl(value) {
     }
 
     if (token) {
+      /* === BEGIN BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_STRICT_SESSION_V1 | Zweck: verhindert, dass ein fehlgeschlagener Magic-Link alte Portal-Sessions öffnet; Umfang: ersetzt nur den Token-Consume-Zweig der Login-Seite === */
       if (loginNote) {
-        loginNote.textContent = "Der Zugangslink wird geprüft. Danach öffnen wir automatisch den Status deiner Einreichung oder deinen Veranstalterbereich.";
+        loginNote.textContent = "Der Zugangslink wird geprüft. Danach öffnen wir automatisch den passenden Anbieterbereich.";
       }
 
       try {
@@ -468,18 +469,13 @@ function normalizeExternalUrl(value) {
         return;
       } catch (error) {
         console.warn("Organizer portal: magic link consume failed.", error);
-
-        try {
-          await tryLoadPortalState();
-          window.location.replace("/fuer-veranstalter/dashboard/");
-          return;
-        } catch (_ignored) {
-          setLoginResult(
-            "Der Zugangslink konnte nicht eingelöst werden. Bitte fordere einen neuen Zugangslink an.",
-            [{ href: "/fuer-veranstalter/login/", label: "Neuen Zugangslink anfordern", icon: "chevron-right" }]
-          );
-        }
+        setLoginResult(
+          "Der Zugangslink konnte nicht eingelöst werden. Bitte fordere einen neuen Zugangslink an.",
+          [{ href: "/fuer-veranstalter/login/", label: "Neuen Zugangslink anfordern", icon: "chevron-right" }]
+        );
+        return;
       }
+      /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_STRICT_SESSION_V1 === */
     }
 
     if (!loginForm || !loginEmail) return;
