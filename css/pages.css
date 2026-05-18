@@ -1953,7 +1953,7 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 === */
-/* === BEGIN BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_POLISH_V2 | Zweck: verdichtet die oeffentliche Aktivitaetspraesenz-Entscheidungsseite mobil, schaerft Tarif-/Definition-/Formularhierarchie und staerkt die Bestaetigungszone; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_SPLIT_FUNNEL_V3 | Zweck: stuetzt den geteilten Aktivitaetspraesenz-Funnel mit Entscheidungsseite, Tarif-CTAs und fokussierter Formularseite; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
 .page--publish.page--activity-presence .activity-presence-hero-trust{
   display: flex;
   flex-wrap: wrap;
@@ -1975,10 +1975,36 @@ select.content-field__control{
   line-height: 1.14;
 }
 
-.page--publish.page--activity-presence .activity-presence-form-shell,
-.page--publish.page--activity-presence .activity-presence-plan-fieldset{
-  width: min(100%, var(--subpage-body-max));
-  justify-self: stretch;
+.page--publish.page--activity-presence .activity-presence-answer-grid{
+  display: grid;
+  gap: 8px;
+}
+
+.page--publish.page--activity-presence .activity-presence-answer-item{
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.58);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 4px 10px rgba(22,39,61,0.014);
+}
+
+.page--publish.page--activity-presence .activity-presence-answer-item h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 780;
+  line-height: 1.15;
+}
+
+.page--publish.page--activity-presence .activity-presence-answer-item p{
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.26;
 }
 
 .page--publish.page--activity-presence .activity-presence-flow-list li{
@@ -1995,6 +2021,128 @@ select.content-field__control{
 .page--publish.page--activity-presence .activity-presence-flow-list span{
   font-size: 0.79rem;
   line-height: 1.24;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-grid{
+  display: grid;
+  gap: 9px;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column{
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  padding: 10px 12px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.58);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 4px 10px rgba(22,39,61,0.014);
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column--muted{
+  background: rgba(255,255,255,0.44);
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 780;
+  line-height: 1.15;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column ul{
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column li{
+  padding: 7px 0;
+  border-top: 1px solid var(--cmp-divider-strong);
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.26;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column li:first-child{
+  border-top: 0;
+  padding-top: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-definition-column li:last-child{
+  padding-bottom: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-grid{
+  display: grid;
+  gap: 9px;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-card{
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 12px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 17px;
+  background: rgba(255,255,255,0.58);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.72) inset,
+    0 4px 10px rgba(22,39,61,0.014);
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-copy{
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-copy h3{
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1.14;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-copy p{
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.28;
+}
+
+.page--publish.page--activity-presence .activity-presence-price-pill{
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.64);
+  color: var(--color-text-primary) !important;
+  font-size: 0.78rem !important;
+  font-weight: 760;
+  line-height: 1.14 !important;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-card .content-actions,
+.page--publish.page--activity-presence .activity-presence-tariff-card .content-cta,
+.page--publish.page--activity-presence .activity-presence-tariff-card .content-cta--primary{
+  width: 100%;
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-form-shell,
+.page--publish.page--activity-presence .activity-presence-plan-fieldset{
+  width: min(100%, var(--subpage-body-max));
+  justify-self: stretch;
 }
 
 .page--publish.page--activity-presence .activity-presence-plan-fieldset{
@@ -2084,61 +2232,6 @@ select.content-field__control{
   line-height: 1.28;
 }
 
-.page--publish.page--activity-presence .activity-presence-definition-grid{
-  display: grid;
-  gap: 9px;
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column{
-  display: grid;
-  gap: 7px;
-  align-content: start;
-  padding: 10px 12px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.58);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 4px 10px rgba(22,39,61,0.014);
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column--muted{
-  background: rgba(255,255,255,0.44);
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column h3{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.9rem;
-  font-weight: 780;
-  line-height: 1.15;
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column ul{
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column li{
-  padding: 7px 0;
-  border-top: 1px solid var(--cmp-divider-strong);
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-  line-height: 1.26;
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column li:first-child{
-  border-top: 0;
-  padding-top: 0;
-}
-
-.page--publish.page--activity-presence .activity-presence-definition-column li:last-child{
-  padding-bottom: 0;
-}
-
 .page--publish.page--activity-presence .content-form-section-head{
   margin-top: 4px;
   padding-top: 12px;
@@ -2189,9 +2282,16 @@ select.content-field__control{
   line-height: 1.34;
 }
 
+@media (min-width: 700px){
+  .page--publish.page--activity-presence .activity-presence-answer-grid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 760px){
   .page--publish.page--activity-presence .activity-presence-plan-options,
-  .page--publish.page--activity-presence .activity-presence-definition-grid{
+  .page--publish.page--activity-presence .activity-presence-definition-grid,
+  .page--publish.page--activity-presence .activity-presence-tariff-grid{
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2201,7 +2301,7 @@ select.content-field__control{
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_POLISH_V2 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_SPLIT_FUNNEL_V3 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
