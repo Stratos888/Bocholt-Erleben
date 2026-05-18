@@ -166,6 +166,21 @@
       notes_text: buildNotes(form)
     };
   }
+  /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_V1 | Zweck: liest ?plan=activity_basic/activity_plus aus der URL und waehlt den passenden Tarif im bestehenden Formular vor; Umfang: reine Frontend-Vorauswahl ohne Payload- oder Backend-Aenderung === */
+  function applyPlanFromQuery(form) {
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
+
+    if (!["activity_basic", "activity_plus"].includes(plan)) {
+      return;
+    }
+
+    const node = form.querySelector(`input[name="activityPlan"][value="${plan}"]`);
+    if (node) {
+      node.checked = true;
+    }
+  }
+  /* === END BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_V1 === */
 
   function initFunnelPage() {
     const form = $("#activity-presence-form");
@@ -173,6 +188,10 @@
 
     const statusNode = $("#activity-presence-status");
     const submitButton = $("#activity-presence-submit");
+
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_CALL_V1 | Zweck: setzt den auf der Entscheidungsseite gewaehlten Tarif vor dem Absenden im Formular; Umfang: einmaliger Init-Aufruf auf Formularseiten === */
+    applyPlanFromQuery(form);
+    /* === END BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_CALL_V1 === */
 
     submitButton?.addEventListener("click", async () => {
       if (!validateFunnelForm(form)) {
