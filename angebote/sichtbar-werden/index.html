@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-decision-polish-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-split-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_HEAD_V1 === -->
 </head>
 <body>
@@ -59,14 +59,14 @@
   </div>
 </header>
 
-<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_FINAL_V1 | Zweck: finalisiert Wording, CTA-Hierarchie, Tarifentscheidung und Formularstruktur der Aktivitaetspraesenz-Entscheidungsseite; Umfang: kompletter Main-Inhaltsbereich ohne Backend-/JS-Umbau === -->
-<main class="page page--publish page--activity-presence">
+<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_SPLIT_V1 | Zweck: macht /angebote/sichtbar-werden/ zur reinen Produkt- und Entscheidungsseite ohne Formular; Umfang: kompletter Main-Inhaltsbereich mit Nutzen, Ablauf, Definition, Tarifen und CTA zur separaten Formularseite === -->
+<main class="page page--publish page--activity-presence page--activity-presence-decision">
   <header class="content-hero content-hero--panel">
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
         <p class="content-kicker">Aktivitätspräsenz</p>
         <h1>Als Aktivität bei Bocholt erleben sichtbar werden</h1>
-        <p class="content-lead">Reiche eine dauerhaft verfügbare oder regelmäßig buchbare Aktivität ein. Wir prüfen zuerst, ob sie zu Bocholt erleben passt. Erst nach Freigabe erhältst du einen Zahlungslink per E-Mail.</p>
+        <p class="content-lead">Für dauerhaft verfügbare oder regelmäßig buchbare Angebote, die als eigene Aktivitätskarte erscheinen sollen. Du reichst die Aktivität zuerst zur Prüfung ein. Eine Zahlung startet erst nach Freigabe.</p>
         <div class="activity-presence-hero-trust" aria-label="Wichtige Hinweise zur Aktivitätspräsenz">
           <span>Eigene Aktivitätskarte</span>
           <span>Prüfung vor Zahlung</span>
@@ -76,18 +76,39 @@
     </div>
   </header>
 
+  <section class="content-card publish-benefits-card activity-presence-answer-card" aria-labelledby="activity-presence-answer-title">
+    <div class="publish-section-head">
+      <h2 id="activity-presence-answer-title">Kurz erklärt</h2>
+      <p class="content-note">Die Aktivitätspräsenz ist für Angebote gedacht, die Nutzer unabhängig von einem einzelnen Datum entdecken, planen oder buchen können.</p>
+    </div>
+    <div class="activity-presence-answer-grid" aria-label="Kurzantworten zur Aktivitätspräsenz">
+      <article class="activity-presence-answer-item">
+        <h3>Was bekomme ich?</h3>
+        <p>Eine eigene Aktivitätskarte auf der Aktivitätenseite.</p>
+      </article>
+      <article class="activity-presence-answer-item">
+        <h3>Muss ich jetzt zahlen?</h3>
+        <p>Nein. Du erhältst erst nach positiver Prüfung einen Zahlungslink.</p>
+      </article>
+      <article class="activity-presence-answer-item">
+        <h3>Wann zählt die Aktivität?</h3>
+        <p>Erst nach Veröffentlichung zählt sie in deinem Tarif.</p>
+      </article>
+    </div>
+  </section>
+
   <section class="content-card publish-benefits-card" aria-labelledby="activity-presence-flow-title">
     <div class="publish-section-head">
       <h2 id="activity-presence-flow-title">So läuft die Aktivitätspräsenz ab</h2>
-      <p class="content-note">Du zahlst nicht bei der Einreichung. Erst wenn die Aktivität fachlich passt, erhältst du einen Zahlungslink.</p>
+      <p class="content-note">Du zahlst nicht bei der Einreichung. Wenn die Aktivität passt, erhältst du einen Zahlungslink.</p>
     </div>
     <ol class="publish-benefits-grid activity-presence-flow-list" aria-label="Ablauf der Aktivitätspräsenz">
       <li>
         <strong>1. Aktivität einreichen</strong>
-        <span>Du gibst die wichtigsten Daten zur Aktivität und zum Anbieter an.</span>
+        <span>Du gibst die wichtigsten Daten zur Aktivität, zum Standort und zum Anbieter an.</span>
       </li>
       <li>
-        <strong>2. Eignung wird geprüft</strong>
+        <strong>2. Wir prüfen die Aktivität</strong>
         <span>Wir prüfen, ob daraus eine eigene Aktivitätskarte entstehen kann.</span>
       </li>
       <li>
@@ -127,145 +148,44 @@
     </div>
   </section>
 
-  <form class="content-form activity-presence-form-shell" id="activity-presence-form" novalidate>
-    <fieldset class="content-card activity-presence-plan-fieldset" aria-labelledby="activity-presence-plan-title">
-      <legend id="activity-presence-plan-title">Tarif wählen</legend>
-      <p class="content-note">Du wählst den Tarif nur für die Prüfung aus. Bezahlt wird erst nach Freigabe.</p>
+  <section class="content-card publish-start-card activity-presence-tariff-section" aria-labelledby="activity-presence-plan-title">
+    <div class="publish-section-head">
+      <h2 id="activity-presence-plan-title">Tarif wählen</h2>
+      <p class="content-note">Du wählst den Tarif für die Prüfung aus. Bezahlt wird erst nach Freigabe.</p>
+    </div>
 
-      <div class="activity-presence-plan-options" role="radiogroup" aria-label="Tarif für die Aktivitätspräsenz">
-        <label class="activity-presence-plan-option" for="activity-plan-basic">
-          <input id="activity-plan-basic" name="activityPlan" type="radio" value="activity_basic" checked>
-          <span class="activity-presence-plan-copy">
-            <strong>Aktivitätspräsenz Basis</strong>
-            <span>9,99&nbsp;€ / Monat</span>
-            <small>Für 1 veröffentlichte Aktivität.</small>
-          </span>
-        </label>
-
-        <label class="activity-presence-plan-option" for="activity-plan-plus">
-          <input id="activity-plan-plus" name="activityPlan" type="radio" value="activity_plus">
-          <span class="activity-presence-plan-copy">
-            <strong>Aktivitätspräsenz Plus</strong>
-            <span>19,99&nbsp;€ / Monat</span>
-            <small>Für bis zu 3 veröffentlichte Aktivitäten.</small>
-          </span>
-        </label>
-      </div>
-
-      <p class="content-note activity-presence-plan-note">Die Aktivität zählt erst nach Veröffentlichung als Aktivität in deinem Tarif.</p>
-    </fieldset>
-
-    <section class="content-card publish-start-card" id="activity-presence-submit-section" aria-labelledby="activity-presence-submit-title">
-      <div class="publish-section-head publish-section-head--form">
-        <h2 id="activity-presence-submit-title">Aktivität zur Prüfung einreichen</h2>
-        <p class="content-note content-note--form-meta">* Pflichtfelder</p>
-      </div>
-
-      <div class="content-form-grid">
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Deine Kontaktdaten</h3>
-          <p class="content-note">Diese Angaben nutzen wir für Rückfragen, Zahlungsfreigabe und den späteren Anbieterbereich.</p>
+    <div class="activity-presence-tariff-grid" aria-label="Tarife der Aktivitätspräsenz">
+      <article class="activity-presence-tariff-card">
+        <div class="activity-presence-tariff-copy">
+          <h3>Aktivitätspräsenz Basis</h3>
+          <p class="activity-presence-price-pill">9,99&nbsp;€ / Monat</p>
+          <p>Für 1 veröffentlichte Aktivität.</p>
         </div>
-
-        <label class="content-field" for="activity-presence-organization">
-          <span class="content-field__label">Anbieter / Organisation *</span>
-          <input class="content-field__control" id="activity-presence-organization" name="organization" type="text" autocomplete="organization" required>
-        </label>
-
-        <label class="content-field" for="activity-presence-contact">
-          <span class="content-field__label">Ansprechpartner</span>
-          <input class="content-field__control" id="activity-presence-contact" name="contact" type="text" autocomplete="name">
-        </label>
-
-        <label class="content-field content-field--full" for="activity-presence-email">
-          <span class="content-field__label">E-Mail-Adresse *</span>
-          <input class="content-field__control" id="activity-presence-email" name="email" type="email" inputmode="email" autocomplete="email" required>
-        </label>
-
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Aktivität und Standort</h3>
-          <p class="content-note">Beschreibe die Aktivität so, dass daraus eine eigenständige Karte entstehen kann.</p>
+        <div class="content-actions">
+          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_basic">Basis auswählen und Aktivität einreichen</a>
         </div>
+      </article>
 
-        <label class="content-field content-field--full" for="activity-presence-title">
-          <span class="content-field__label">Name der Aktivität *</span>
-          <input class="content-field__control" id="activity-presence-title" name="title" type="text" required>
-          <p class="content-field__hint">Zum Beispiel: Bouldern und Klettern, Kindergeburtstag in der Kletterhalle oder SUP am See.</p>
-        </label>
-
-        <label class="content-field" for="activity-presence-location">
-          <span class="content-field__label">Name des Standorts *</span>
-          <input class="content-field__control" id="activity-presence-location" name="location" type="text" required>
-        </label>
-
-        <label class="content-field" for="activity-presence-url">
-          <span class="content-field__label">Website / Buchungslink</span>
-          <input class="content-field__control" id="activity-presence-url" name="url" type="url" inputmode="url" placeholder="https://...">
-        </label>
-
-        <label class="content-field content-field--full" for="activity-presence-address">
-          <span class="content-field__label">Adresse / offizieller Treffpunkt *</span>
-          <input class="content-field__control" id="activity-presence-address" name="address" type="text" autocomplete="street-address" required>
-        </label>
-
-        <div class="publish-locality-row content-field--full">
-          <label class="content-field publish-locality-row__zip" for="activity-presence-zip">
-            <span class="content-field__label">PLZ *</span>
-            <input class="content-field__control" id="activity-presence-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" required>
-          </label>
-
-          <label class="content-field publish-locality-row__city" for="activity-presence-city">
-            <span class="content-field__label">Stadt / Ort *</span>
-            <input class="content-field__control" id="activity-presence-city" name="city" type="text" autocomplete="address-level2" required>
-          </label>
+      <article class="activity-presence-tariff-card">
+        <div class="activity-presence-tariff-copy">
+          <h3>Aktivitätspräsenz Plus</h3>
+          <p class="activity-presence-price-pill">19,99&nbsp;€ / Monat</p>
+          <p>Für bis zu 3 veröffentlichte Aktivitäten.</p>
         </div>
-
-        <div class="content-form-section-head content-form-section-head--form content-field--full">
-          <h3>Beschreibung und Verfügbarkeit</h3>
-          <p class="content-note">Wichtig ist, was Nutzer regelmäßig machen können und wann die Aktivität grundsätzlich verfügbar ist.</p>
+        <div class="content-actions">
+          <a class="content-cta content-cta--primary" href="/angebote/sichtbar-werden/einreichen/?plan=activity_plus">Plus auswählen und Aktivität einreichen</a>
         </div>
+      </article>
+    </div>
 
-        <label class="content-field content-field--full" for="activity-presence-description">
-          <span class="content-field__label">Kurzbeschreibung der Aktivität *</span>
-          <textarea class="content-field__control" id="activity-presence-description" name="description" rows="4" required></textarea>
-          <p class="content-field__hint">Was kann man dort machen, für wen ist es geeignet und wie läuft der Besuch grob ab?</p>
-        </label>
-
-        <label class="content-field content-field--full" for="activity-presence-duration">
-          <span class="content-field__label">Dauerhaft / regelmäßig buchbar *</span>
-          <textarea class="content-field__control" id="activity-presence-duration" name="duration" rows="3" required></textarea>
-          <p class="content-field__hint">Beschreibe, ob die Aktivität dauerhaft, saisonal oder regelmäßig verfügbar ist.</p>
-        </label>
-
-        <label class="content-field content-field--full" for="activity-presence-notes">
-          <span class="content-field__label">Weitere Hinweise</span>
-          <textarea class="content-field__control" id="activity-presence-notes" name="notes" rows="3"></textarea>
-          <p class="content-field__hint">Optional: Preise, Zielgruppen, Voraussetzungen oder Besonderheiten.</p>
-        </label>
-
-        <label class="content-field content-field--full content-field--checkbox" for="activity-presence-confirmed">
-          <span class="content-field__label">Bestätigung *</span>
-          <span class="content-field__hint">
-            <input id="activity-presence-confirmed" name="confirmed" type="checkbox" required>
-            Ich bestätige, dass ich berechtigt bin, diese Aktivität einzureichen, und dass der Standort öffentlich genannt werden darf.
-          </span>
-        </label>
-      </div>
-
-      <div class="content-actions content-actions--inline publish-final-actions">
-        <p class="content-note activity-presence-submit-note">Du zahlst nicht bei der Einreichung. Nach positiver Prüfung erhältst du einen Zahlungslink per E-Mail.</p>
-        <button class="content-cta content-cta--primary" id="activity-presence-submit" type="button">Aktivität zur Prüfung einreichen</button>
-      </div>
-      <p class="content-note" id="activity-presence-status" aria-live="polite" hidden></p>
-    </section>
-  </form>
+    <p class="content-note activity-presence-plan-note">Erst veröffentlichte Aktivitäten zählen in deinem Tarif.</p>
+  </section>
 </main>
-<!-- === END BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_FINAL_V1 === -->
+<!-- === END BLOCK: ACTIVITY_PRESENCE_DECISION_PAGE_SPLIT_V1 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-<script src="/js/activity-presence-funnel.js?v=2026-05-13-activity-presence-1" defer></script>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_BODY_V1 === -->
 </body>
 </html>
