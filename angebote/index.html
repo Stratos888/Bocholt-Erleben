@@ -130,7 +130,8 @@ Umfang:
     <div class="top-stack desktop-hero__panel activity-finder" data-activity-finder>
       <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Suche und Filter">
         <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
-          <label class="desktop-hero__search-field" for="search-filter">
+          <!-- === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 | Zweck: ergänzt einen eigenen Clear-Button im Suchfeld, der ausschließlich die Freitextsuche löscht; Umfang: nur Search-Control im Aktivitäten-Finder === -->
+          <div class="desktop-hero__search-field activity-finder__search-field">
             <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
             <input
               id="search-filter"
@@ -140,7 +141,11 @@ Umfang:
               autocomplete="off"
               inputmode="search"
             >
-          </label>
+            <button type="button" class="activity-search-clear" id="offer-search-clear" aria-label="Freitextsuche löschen" hidden>
+              <span data-ui-icon="x" aria-hidden="true"></span>
+            </button>
+          </div>
+          <!-- === END BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 === -->
         </div>
 
         <button
