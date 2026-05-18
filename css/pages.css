@@ -1953,176 +1953,69 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 === */
-/* === BEGIN BLOCK: ACTIVITY_PRESENCE_REDUCTION_FUNNEL_V4 | Zweck: reduziert und hierarchisiert den geteilten Aktivitaetspraesenz-Funnel nach Event-Funnel-Referenz; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
-.page--publish.page--activity-presence .activity-presence-hero-trust{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 0;
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_EVENT_PARITY_FUNNEL_V5 | Zweck: gleicht den Aktivitaetspraesenz-Funnel visuell an den Event-Funnel an und reduziert Sonderkarten auf wenige notwendige Brueckenklassen; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
+.page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.page--publish.page--activity-presence .activity-presence-hero-trust span{
-  display: inline-flex;
-  align-items: center;
-  min-height: 25px;
-  padding: 3px 8px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.58);
-  color: var(--color-text-primary);
-  font-size: 0.74rem;
-  font-weight: 760;
-  line-height: 1.14;
-}
-
-.page--publish.page--activity-presence .activity-presence-tariff-grid{
-  display: grid;
-  gap: 9px;
-}
-
-.page--publish.page--activity-presence .activity-presence-tariff-card{
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: 12px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 17px;
-  background: rgba(255,255,255,0.58);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 4px 10px rgba(22,39,61,0.014);
-}
-
-.page--publish.page--activity-presence .activity-presence-tariff-copy{
-  display: grid;
-  gap: 5px;
+.page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li{
   min-width: 0;
 }
 
-.page--publish.page--activity-presence .activity-presence-tariff-copy h3{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.96rem;
-  font-weight: 800;
-  line-height: 1.14;
+.page--publish.page--activity-presence .activity-presence-tariff-list .content-cta{
+  min-height: 46px;
 }
 
-.page--publish.page--activity-presence .activity-presence-tariff-copy p{
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 0.82rem;
-  line-height: 1.28;
-}
-
-.page--publish.page--activity-presence .activity-presence-price-pill{
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 3px 8px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 999px;
-  background: rgba(255,255,255,0.64);
-  color: var(--color-text-primary) !important;
-  font-size: 0.78rem !important;
-  font-weight: 760;
-  line-height: 1.14 !important;
-}
-
-.page--publish.page--activity-presence .activity-presence-tariff-card .content-actions,
-.page--publish.page--activity-presence .activity-presence-tariff-card .content-cta,
-.page--publish.page--activity-presence .activity-presence-tariff-card .content-cta--primary{
-  width: 100%;
-  min-width: 0;
-}
-
-.page--publish.page--activity-presence .activity-presence-compact-grid{
+.page--publish.page--activity-presence .activity-presence-guidance-list{
   display: grid;
-  gap: 8px;
-}
-
-.page--publish.page--activity-presence .activity-presence-compact-column{
-  display: grid;
-  gap: 4px;
-  align-content: start;
-  padding: 10px 12px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.58);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.72) inset,
-    0 4px 10px rgba(22,39,61,0.014);
-}
-
-.page--publish.page--activity-presence .activity-presence-compact-column--muted{
-  background: rgba(255,255,255,0.44);
-}
-
-.page--publish.page--activity-presence .activity-presence-compact-column h3{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.9rem;
-  font-weight: 780;
-  line-height: 1.15;
-}
-
-.page--publish.page--activity-presence .activity-presence-compact-column p{
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-  line-height: 1.28;
-}
-
-.page--publish.page--activity-presence .activity-presence-step-list{
-  display: grid;
-  gap: 7px;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.page--publish.page--activity-presence .activity-presence-step-list li{
+.page--publish.page--activity-presence .activity-presence-guidance-list li{
   display: grid;
-  grid-template-columns: minmax(88px, auto) minmax(0, 1fr);
-  gap: 8px;
+  grid-template-columns: minmax(74px, auto) minmax(0, 1fr);
+  gap: 10px;
   align-items: baseline;
-  padding: 8px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--cmp-divider-strong);
 }
 
-.page--publish.page--activity-presence .activity-presence-step-list li:first-child{
+.page--publish.page--activity-presence .activity-presence-guidance-list li:first-child{
   border-top: 0;
   padding-top: 0;
 }
 
-.page--publish.page--activity-presence .activity-presence-step-list li:last-child{
+.page--publish.page--activity-presence .activity-presence-guidance-list li:last-child{
   padding-bottom: 0;
 }
 
-.page--publish.page--activity-presence .activity-presence-step-list strong{
+.page--publish.page--activity-presence .activity-presence-guidance-list strong{
   color: var(--color-text-primary);
   font-size: 0.84rem;
   font-weight: 780;
-  line-height: 1.18;
+  line-height: 1.16;
 }
 
-.page--publish.page--activity-presence .activity-presence-step-list span{
+.page--publish.page--activity-presence .activity-presence-guidance-list span{
   color: var(--color-text-secondary);
   font-size: 0.8rem;
-  line-height: 1.28;
+  line-height: 1.3;
 }
 
 .page--publish.page--activity-presence .activity-presence-form-shell{
-  width: min(100%, var(--subpage-body-max));
-  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
 }
 
 .page--publish.page--activity-presence .activity-presence-inline-plan{
   display: grid;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
-  margin: 0 0 14px;
-  padding: 0 0 14px;
+  margin: 0;
+  padding: 0 0 12px;
   border: 0;
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
@@ -2131,14 +2024,14 @@ select.content-field__control{
   margin: 0;
   padding: 0;
   color: var(--color-text-primary);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 780;
-  line-height: 1.15;
+  line-height: 1.14;
 }
 
 .page--publish.page--activity-presence .activity-presence-inline-plan-options{
   display: grid;
-  gap: 7px;
+  gap: 0;
 }
 
 .page--publish.page--activity-presence .activity-presence-inline-plan-option{
@@ -2147,20 +2040,19 @@ select.content-field__control{
   gap: 9px;
   align-items: start;
   min-width: 0;
-  padding: 9px 10px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  padding: 8px 0;
+  border-top: 1px solid var(--cmp-divider-strong);
   cursor: pointer;
 }
 
-.page--publish.page--activity-presence .activity-presence-inline-plan-option:has(input:checked){
-  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--cmp-divider-strong));
-  background: color-mix(in srgb, white 78%, var(--color-primary-muted));
+.page--publish.page--activity-presence .activity-presence-inline-plan-option:first-child{
+  border-top: 0;
+  padding-top: 2px;
 }
 
 .page--publish.page--activity-presence .activity-presence-inline-plan-option input{
   margin-top: 2px;
+  accent-color: var(--color-primary);
 }
 
 .page--publish.page--activity-presence .activity-presence-inline-plan-option span{
@@ -2182,44 +2074,6 @@ select.content-field__control{
   line-height: 1.22;
 }
 
-.page--publish.page--activity-presence .content-form-section-head{
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--cmp-divider-strong);
-}
-
-.page--publish.page--activity-presence .content-form-section-head:first-child{
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
-.page--publish.page--activity-presence .content-form-section-head h3{
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: 0.96rem;
-  font-weight: 780;
-  line-height: 1.14;
-}
-
-.page--publish.page--activity-presence .content-field--checkbox{
-  padding: 10px 11px;
-  border: 1px solid var(--cmp-divider-strong);
-  border-radius: 15px;
-  background: rgba(255,255,255,0.5);
-}
-
-.page--publish.page--activity-presence .content-field--checkbox .content-field__hint{
-  font-size: 0.8rem;
-  line-height: 1.32;
-}
-
-.page--publish.page--activity-presence .content-field--checkbox input[type="checkbox"]{
-  width: 18px;
-  height: 18px;
-  margin-top: 0.08em;
-}
-
 .page--publish.page--activity-presence .publish-final-actions{
   gap: 10px;
 }
@@ -2232,19 +2086,42 @@ select.content-field__control{
   line-height: 1.34;
 }
 
-@media (min-width: 700px){
-  .page--publish.page--activity-presence .activity-presence-compact-grid{
+@media (min-width: 760px){
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
 
-@media (min-width: 760px){
-  .page--publish.page--activity-presence .activity-presence-tariff-grid,
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li{
+    align-content: start;
+    padding: 0 18px;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li:first-child{
+    padding-left: 0;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li + li{
+    border-top: 0;
+    border-left: 1px solid var(--cmp-divider-strong);
+  }
+
   .page--publish.page--activity-presence .activity-presence-inline-plan-options{
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-inline-plan-option{
+    padding: 0 12px;
+    border-top: 0;
+    border-left: 1px solid var(--cmp-divider-strong);
+  }
+
+  .page--publish.page--activity-presence .activity-presence-inline-plan-option:first-child{
+    padding-left: 0;
+    border-left: 0;
   }
 }
-/* === END BLOCK: ACTIVITY_PRESENCE_REDUCTION_FUNNEL_V4 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_EVENT_PARITY_FUNNEL_V5 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */
