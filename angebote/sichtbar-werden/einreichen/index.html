@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-event-parity-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-enterprise-final-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_HEAD_V1 === -->
 </head>
 <body>
@@ -55,14 +55,14 @@
   </div>
 </header>
 
-<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_EVENT_PARITY_V3 | Zweck: richtet die Aktivitaetspraesenz-Formularseite am Event-Formular aus: kurzer Hero, eine Formularcard, kompakte Tarifwahl und weniger Erklaertext; Umfang: kompletter Main-Inhaltsbereich mit unveraenderten Formular-IDs === -->
+<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_ENTERPRISE_FINAL_V4 | Zweck: finalisiert die Aktivitaetspraesenz-Formularseite mit kurzem Hero, kompakter Tarifwahl, natuerlicher Feldreihenfolge und kleinen Abschnittslabels; Umfang: kompletter Main-Inhaltsbereich mit unveraenderten Formular-IDs === -->
 <main class="page page--publish page--activity-presence page--activity-presence-submit">
   <header class="content-hero content-hero--panel">
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
         <h1>Aktivität zur Prüfung einreichen</h1>
         <p class="content-lead">
-          Trage alle notwendigen Angaben ein. Wir prüfen zuerst, ob die Aktivität grundsätzlich passt. Erst danach erhältst du einen Zahlungslink.
+          Trage die Angaben ein. Bezahlt wird erst nach Freigabe.
         </p>
       </div>
     </div>
@@ -77,7 +77,7 @@
 
     <form class="content-form activity-presence-form-shell" id="activity-presence-form" novalidate>
       <fieldset class="activity-presence-inline-plan" aria-labelledby="activity-presence-plan-title">
-      <legend id="activity-presence-plan-title">Tarif auswählen</legend>
+        <legend id="activity-presence-plan-title">Tarif auswählen</legend>
 
         <div class="activity-presence-inline-plan-options" role="radiogroup" aria-label="Tarif für die Aktivitätspräsenz">
           <label class="activity-presence-inline-plan-option" for="activity-plan-basic">
@@ -99,9 +99,18 @@
       </fieldset>
 
       <div class="content-form-grid">
+        <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
+          <h3>Kontaktdaten</h3>
+        </div>
+
         <label class="content-field" for="activity-presence-organization">
           <span class="content-field__label">Anbieter / Organisation *</span>
           <input class="content-field__control" id="activity-presence-organization" name="organization" type="text" autocomplete="organization" required>
+        </label>
+
+        <label class="content-field" for="activity-presence-contact">
+          <span class="content-field__label">Ansprechpartner</span>
+          <input class="content-field__control" id="activity-presence-contact" name="contact" type="text" autocomplete="name">
         </label>
 
         <label class="content-field" for="activity-presence-email">
@@ -110,10 +119,9 @@
           <p class="content-field__hint">Für Rückfragen, Zahlungsfreigabe und späteren Zugriff.</p>
         </label>
 
-        <label class="content-field" for="activity-presence-contact">
-          <span class="content-field__label">Ansprechpartner</span>
-          <input class="content-field__control" id="activity-presence-contact" name="contact" type="text" autocomplete="name">
-        </label>
+        <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
+          <h3>Aktivität</h3>
+        </div>
 
         <label class="content-field" for="activity-presence-title">
           <span class="content-field__label">Name der Aktivität *</span>
@@ -146,6 +154,10 @@
             <span class="content-field__label">Stadt / Ort *</span>
             <input class="content-field__control" id="activity-presence-city" name="city" type="text" autocomplete="address-level2" required>
           </label>
+        </div>
+
+        <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
+          <h3>Beschreibung</h3>
         </div>
 
         <label class="content-field content-field--full" for="activity-presence-description">
@@ -188,6 +200,7 @@
     </form>
   </section>
 </main>
+<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_ENTERPRISE_FINAL_V4 === -->
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_EVENT_PARITY_V3 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
