@@ -3347,6 +3347,7 @@ body.page-route-activities .activity-filter-chip:active{
   transform: translateY(1px);
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_FINDER_OPEN_PANEL_FOCUS_CSS_V1 | Zweck: macht den geöffneten erweiterten Filter zum einzigen Filter-Arbeitsbereich und blendet doppelte Schnellfilter-/Trefferzeilen außerhalb des Panels aus; Umfang: ersetzt nur Statuszeile plus Open-State-Ausblendung im Aktivitäten-Finder === */
 body.page-route-activities .activity-finder__status-row{
   display: grid;
   gap: 0;
@@ -3360,6 +3361,12 @@ body.page-route-activities .activity-finder__result-count{
   font-weight: 700;
   line-height: 1.2;
 }
+
+body.page-route-activities .activity-finder.is-advanced-open .activity-finder__quick,
+body.page-route-activities .activity-finder.is-advanced-open .activity-finder__status-row{
+  display: none !important;
+}
+/* === END BLOCK: ACTIVITIES_FINDER_OPEN_PANEL_FOCUS_CSS_V1 === */
 
 body.page-route-activities .activity-finder__advanced[hidden]{
   display: none !important;
