@@ -398,7 +398,28 @@ function getCategoryPresentation(category) {
     return meaningfulTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : meaningfulTags.length));
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 | Zweck: nutzt bei aktiven Filtern die Card-Zeile auf Mobile als direkte Passungsbegründung statt nur als allgemeine Tag-Zeile; Umfang: ersetzt nur pickSupportingLabel(offer) === */
   function pickSupportingLabel(offer) {
+    const activeMatches = Array.isArray(offer?.activeMatchLabels)
+      ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
+
+    if (activeMatches.length) {
+      const merged = [];
+      const seen = new Set();
+
+      [...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
+        const value = toSingleLine(entry);
+        const key = normalizeComparable(value);
+        if (!value || seen.has(key)) return;
+
+        seen.add(key);
+        merged.push(value);
+      });
+
+      return merged.slice(0, 3).join(" · ");
+    }
+
     const primaryTags = getRankedTagItems(offer, 2);
     if (primaryTags.length) return primaryTags.join(" · ");
 
@@ -406,6 +427,8 @@ function getCategoryPresentation(category) {
     if (season && season !== "Ganzjährig") return season;
 
     return "";
+  }
+  /* === END BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 === */
   }
 
   /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 | Zweck: priorisiert bei aktiven Filtern die konkret passenden Merkmale auf Activity-Cards; Umfang: ersetzt nur buildFactItems(offer), ohne Meta-/Tag-Helfer zu verändern === */
