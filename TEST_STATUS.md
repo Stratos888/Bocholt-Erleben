@@ -735,5 +735,285 @@ Nicht vollständig belegt ist nur:
 - erster echter Live-Zahlungsfall mit realem externem Nutzer
 
 <!-- === END BLOCK: TEST_STATUS_SINGLE_EVENT_REVIEW_BEFORE_PAYMENT_E2E_2026_05_12 === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 | Zweck: dokumentiert den geprüften Aktivitäten-Funnel mit Aktivitätspräsenz, Review-before-payment, bestehender Subscription, Veröffentlichung, Änderung und finalem Wording-/UI-Zielzustand; Umfang: Staging-E2E, UI-Konsolidierung, bekannte Grenzen und finaler Smoke-Testbedarf === -->
 
+## Ergänzender Teststand: Aktivitäten-Funnel / Aktivitätspräsenz
+
+- Datum: 2026-05-18
+- Umgebung: Staging
+- geprüfter ZIP-/Arbeitsstand: `Bocholt-Erleben-staging (16).zip` plus anschließende Wording-/UI-Patches im Aktivitäten-Funnel
+- Funktion: Aktivitätspräsenz einreichen, prüfen, Zahlung freigeben, veröffentlichen, im Anbieterbereich verwalten und ändern
+- Ergebnis: Kernflow E2E im Chat-Stand geprüft; Wording/UI anschließend auf schlanken mobilen Enterprise-Funnel konsolidiert
+- Status: fachlich und funktional weitgehend abgenommen; finaler Smoke-Test nach letzter Patch-Anwendung erforderlich
+
+### Zielzustand dieses Teststands
+
+Der Aktivitäten-Funnel ist ein schlanker, mobiler Enterprise-Funnel.
+
+Kanonische Routen:
+
+1. `/angebote/sichtbar-werden/`
+2. `/angebote/sichtbar-werden/einreichen/`
+3. `/angebote/sichtbar-werden/erfolg/`
+
+Zielwirkung:
+Verstehen → Eignung prüfen → Tarif wählen → Formular ausfüllen → Prüfung abwarten
+
+Nicht gewünscht:
+
+lange Produkt-Erklärung → viele Hinweise → Formular
+Verbindliche Produktlogik
+
+Aktivitätspräsenzen sind eine eigene Produktlinie und getrennt von Event-Veröffentlichungen.
+
+Tarife:
+
+Tarif	Interner Schlüssel	Preis	Enthalten
+Aktivitätspräsenz Basis	activity_basic	9,99 € / Monat	1 veröffentlichte Aktivität
+Aktivitätspräsenz Plus	activity_plus	19,99 € / Monat	bis zu 3 veröffentlichte Aktivitäten
+
+Verbindliche Regeln:
+
+Zahlung erst nach Freigabe.
+Zahlungslink erst nach Eignungsprüfung.
+Veröffentlichung erst nach redaktioneller Aufbereitung und finaler Freigabe.
+Erst veröffentlichte Aktivitäten zählen in deinem Tarif.
+Abgelehnte Aktivitäts-Einreichungen zählen nicht.
+Noch nicht veröffentlichte Aktivitäts-Einreichungen zählen nicht.
+Bestehende aktive Aktivitätspräsenz kann für neue Einreichungen genutzt werden.
+Erneute Veröffentlichung nach Änderung darf keinen Doppelverbrauch auslösen.
+Final konsolidierter UI-/Wording-Zielzustand
+Entscheidungsseite /angebote/sichtbar-werden/
+
+Reihenfolge:
+
+Hero
+→ Eignungskarte
+→ Tarifwahl
+→ kurzer Ablaufblock
+
+Hero:
+
+Als Aktivität bei Bocholt erleben sichtbar werden
+Für dauerhaft verfügbare oder regelmäßig buchbare Angebote. Zahlung erst nach Freigabe.
+
+Eignungskarte:
+
+Für welche Angebote ist die Aktivitätspräsenz gedacht?
+
+Geeignet:
+
+Eigenständige Angebote, die dauerhaft, saisonal oder regelmäßig buchbar sind – z. B. Bouldern, Kindergeburtstage oder Kurse.
+
+Nicht geeignet:
+
+Einzeltermine, andere Preise, andere Öffnungszeiten oder kleine Textänderungen derselben Aktivität. Einzeltermine gehören in den Veranstaltungsbereich.
+
+Tarifwahl:
+
+Wähle den passenden Tarif
+
+Buttons:
+
+Basis auswählen
+Plus auswählen
+
+Ablauf:
+
+Einreichen → Prüfung → Zahlungslink → Aufbereitung → Veröffentlichung.
+Formularseite /angebote/sichtbar-werden/einreichen/
+
+Reihenfolge:
+
+Hero
+→ Einreichung vorbereiten
+→ Tarif für die Prüfung
+→ Formularabschnitte
+→ Bestätigung
+→ Button
+→ kurzer Zahlungs-/Prüfungshinweis
+
+Hero:
+
+Aktivität zur Prüfung einreichen
+Trage die Angaben ein. Zahlung erst nach Freigabe.
+
+Formularblock:
+
+Einreichung vorbereiten
+* Pflichtfelder
+Zahlung erst nach Freigabe.
+
+Tarifbereich:
+
+Tarif für die Prüfung
+
+Die Tarifauswahl bleibt sichtbar und änderbar.
+
+Verbindliche Feldreihenfolge:
+
+Kontaktdaten
+Anbieter / Organisation
+Ansprechpartner
+E-Mail-Adresse
+Aktivität
+Name der Aktivität
+Name des Standorts
+Website / Buchungslink
+Adresse / offizieller Treffpunkt
+PLZ
+Stadt / Ort
+Beschreibung und Verfügbarkeit
+Kurzbeschreibung der Aktivität
+Verfügbarkeit
+Weitere Hinweise
+Bestätigung
+
+Verfügbarkeit ist ein Dropdown mit:
+
+Bitte auswählen
+Dauerhaft verfügbar
+Regelmäßig buchbar
+Saisonal verfügbar
+Nach Vereinbarung buchbar
+
+Button:
+
+Zur Prüfung einreichen
+
+Hinweis unter Button:
+
+Nach der Einreichung prüfen wir die Aktivität zuerst. Wenn sie zu Bocholt erleben passt, erhältst du per E-Mail einen Zahlungslink.
+Erfolgsseite /angebote/sichtbar-werden/erfolg/
+
+Zu unterscheidende Zustände:
+
+flow=submitted
+Aktivität eingereicht
+keine Zahlung gestartet
+Prüfung vor Zahlungslink
+Prüfung → Zahlungslink → Aufbereitung/Veröffentlichung
+primärer CTA: Zur Aktivitätenseite
+sekundärer CTA: Weitere Aktivität einreichen
+flow=existing-subscription
+aktive Aktivitätspräsenz vorhanden
+keine neue Zahlung nötig
+redaktionelle Prüfung und Aufbereitung
+Veröffentlichung erst nach Freigabe
+primärer CTA: Anbieterbereich öffnen
+sekundärer CTA: Zur Aktivitätenseite
+session_id vorhanden
+Zahlung erhalten
+redaktionelle Aufbereitung und finale Prüfung
+Veröffentlichung erst nach Freigabe
+Aktivität zählt erst nach Veröffentlichung im Tarif
+primärer CTA: Anbieterbereich öffnen
+Bereits bestandene Staging-E2E-Funktionstests
+
+Im Chat-Stand wurden diese Kernfunktionen praktisch geprüft bzw. als erreicht dokumentiert:
+
+Einstieg über Aktivitätenseite:
+Feed-Card Als Aktivität sichtbar werden
+Weiterleitung auf /angebote/sichtbar-werden/
+Entscheidungsseite:
+Basis-Tarif führt zu /angebote/sichtbar-werden/einreichen/?plan=activity_basic
+Plus-Tarif führt zu /angebote/sichtbar-werden/einreichen/?plan=activity_plus
+Formularseite:
+?plan=activity_basic wählt Basis voraus
+?plan=activity_plus wählt Plus voraus
+Tarif kann im Formular geändert werden
+Pflichtfeldvalidierung greift
+Verfügbarkeit ist als Dropdown vorgesehen
+Einreichung führt auf die Erfolgsseite
+Mail:
+Eingangs-Mail nach Einreichung wurde geprüft
+Zahlungslink-Mail nach Zahlungsfreigabe wurde geprüft
+Review-Inbox:
+Aktivitäts-Einreichung erscheint in der Review-Inbox
+fachliche Fehler/Erfolge werden direkt an der Karte angezeigt
+Inbox bleibt nach Aktionen auf dem aktuellen Fall
+erst Später verschiebt weiter
+Zahlung kann freigegeben werden
+Veröffentlichung kann fachlich blockiert werden, wenn kein Platz im Aktivitätstarif frei ist
+Zahlungsflow:
+Zahlungslink führt auf /zahlung-starten/
+Stripe Checkout oder bestehende Aktivitätspräsenz wird korrekt genutzt
+Stripe-Webhook setzt Zahlung auf paid
+Veröffentlichung erfolgt erst nach finaler Inbox-Aktion
+Verbrauchs-/Zählungslogik:
+Verbrauch/Zählung wird erst bei Veröffentlichung gebucht
+volle Aktivitätspräsenz blockiert weitere Veröffentlichung fachlich
+erneute Veröffentlichung nach Anbieteränderung löst keinen Doppelverbrauch aus
+Anbieterbereich:
+Anbieterbereich zeigt Status der Aktivitäts-Einreichung
+Anbieter kann Aktivität ändern
+Änderung geht zurück in Prüfung
+erneute Veröffentlichung ohne Doppelverbrauch wurde geprüft
+mehrere Tarife und Monatssumme werden als kompakte Tarifkarte dargestellt
+Success-States:
+Standardfall flow=submitted unterscheidet Einreichung von Zahlung
+vorhandene aktive Aktivitätspräsenz kann ohne neue Zahlung genutzt werden
+Zahlungserfolg führt nicht zu automatischer Sofortveröffentlichung
+Bewusst getroffene Produkt- und UX-Entscheidungen
+Kein Foto-Upload im V1-Formular.
+Grund: Storage, Dateiprüfung, Bildrechte, Moderation, Datenschutz und Missbrauchsschutz wären ein eigener größerer Workpack.
+Fotos bleiben redaktionell bzw. werden später separat angefragt.
+Inhaltliche Verantwortlichkeit wird über die Bestätigung abgedeckt:
+berechtigt zur Einreichung
+Angaben korrekt
+Standort darf öffentlich genannt werden
+H1-Ausrichtung:
+linksbündiger Inhalt in zentrierter Card bleibt Standard
+keine mittige H1 für Service-/Formular-Funnels
+Tarifauswahl bleibt auf der Formularseite sichtbar und änderbar:
+nötig für Direktaufrufe
+nötig für Planwechsel vor Absenden
+robustere Funktionalität als versteckter Tarifwert
+Push für Aktivitäten bleibt best-effort:
+kein Blocker für den Aktivitäten-Funnel
+bestehender Push-Mechanismus kann später weiterverwendet werden
+Noch final zu prüfende Smoke-Tests nach letzter Patch-Anwendung
+
+Diese Punkte müssen im nächsten finalen Check noch einmal kurz bestätigt werden, ohne den gesamten E2E-Funnel neu konzeptionell aufzurollen:
+
+/angebote/sichtbar-werden/
+Zielreihenfolge Hero → Eignung → Tarifwahl → Ablauf
+finale Wording-Texte korrekt
+mobile Lesbarkeit der Eignungskarte
+/angebote/sichtbar-werden/einreichen/?plan=activity_basic
+Basis vorausgewählt
+Feldreihenfolge korrekt
+Verfügbarkeit-Dropdown vorhanden
+Pflichtfeldvalidierung greift
+/angebote/sichtbar-werden/einreichen/?plan=activity_plus
+Plus vorausgewählt
+Tarifwechsel wird korrekt übertragen
+/angebote/sichtbar-werden/erfolg/
+flow=submitted
+flow=existing-subscription
+session_id-Fall
+CTAs und Texte je Zustand korrekt
+Testeinreichung:
+Dropdown-Wert wird als Verfügbarkeit übertragen
+Erfolgsseite wird erreicht
+/angebote/
+Einstiegskarte Als Aktivität sichtbar werden bleibt kurz und korrekt
+Aktueller Funktionsstatus
+
+Der Aktivitäten-Funnel ist als V1 funktional aufgebaut und im Kern E2E geprüft.
+
+Nicht erneut vollständig neu zu prüfen sind:
+
+Grundarchitektur Submission → Review-Inbox
+Zahlungsfreigabe
+Zahlungslink
+Stripe Checkout / bestehende Subscription
+Webhook paid
+Inbox-Veröffentlichung
+Zählung erst bei Veröffentlichung
+Anbieteränderung → erneute Prüfung → Veröffentlichung ohne Doppelzählung
+
+Noch erforderlich ist ein finaler visueller und funktionaler Smoke-Test des letzten Wording-/UI-Stands.
+
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
 <!-- === END FILE: TEST_STATUS.md === -->
