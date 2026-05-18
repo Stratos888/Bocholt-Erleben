@@ -3623,15 +3623,24 @@ body.page-route-activities .activity-finder__group{
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
-/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V3 | Zweck: stellt die Desktop-Aktivitäten-Top-Shell auf Event-Parität und öffnet die erweiterten Filter als breites Inline-Tray über die volle Top-Shell-Breite; Umfang: kompletter später Desktop-Owner für Activities-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
+/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V4 | Zweck: gleicht die Desktop-Aktivitäten-Filtergröße an den Event-Top-Shell-Contract an und verhindert, dass das Hero-Hintergrundbild beim geöffneten Filterpanel künstlich mitwächst; Umfang: kompletter später Desktop-Owner für Activities-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 @media (min-width: 900px){
-  body.page-route-activities .top-stack.activity-finder{
-    --activities-desktop-search-h: var(--desktop-search-height, var(--desktop-panel-height, 56px));
-    --activities-desktop-filter-h: var(--desktop-filter-height, 44px);
-    --activities-desktop-action-h: var(--desktop-service-action-height, 34px);
-    --activities-desktop-action-gap: var(--desktop-service-action-gap, 3px);
+  body.page-route-activities{
+    --activities-desktop-search-h: var(--desktop-search-height, 66px);
+    --activities-desktop-filter-h: var(--desktop-filter-height, 50px);
+    --activities-desktop-action-h: var(--desktop-service-action-height, 38px);
+    --activities-desktop-action-gap: var(--desktop-service-action-gap, 5px);
     --activities-desktop-rail-w: var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
+    --activities-desktop-hero-bg-h: 412px;
+  }
 
+  body.page-route-activities .desktop-hero:has(.activity-finder__advanced:not([hidden]))::before,
+  body.page-route-activities .desktop-hero:has(.activity-finder__advanced:not([hidden]))::after{
+    bottom: auto;
+    height: var(--activities-desktop-hero-bg-h);
+  }
+
+  body.page-route-activities .top-stack.activity-finder{
     grid-template-columns: minmax(0, 1fr) var(--activities-desktop-rail-w);
     grid-template-areas:
       "search actions"
@@ -3674,6 +3683,50 @@ body.page-route-activities .activity-finder__group{
     grid-column: 1;
     grid-row: 1;
     min-width: 0;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__search-field{
+    position: relative;
+    min-width: 0;
+    height: var(--activities-desktop-search-h);
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__search-field .desktop-hero__icon--search{
+    left: 21px;
+    width: 19px;
+    height: 19px;
+    color: rgba(48,72,58,0.78);
+  }
+
+  body.page-route-activities .activity-finder #search-filter{
+    height: var(--activities-desktop-search-h);
+    min-height: var(--activities-desktop-search-h);
+    padding: 0 42px 0 52px;
+    border: 1px solid color-mix(in srgb, var(--home-toolbar-border) 82%, rgba(24,40,30,0.12) 18%);
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-toolbar-bg-start) 92%, white 8%) 0%,
+      color-mix(in srgb, var(--home-toolbar-bg-end) 94%, rgba(248,250,243,0.86) 6%) 100%
+    );
+    color: color-mix(in srgb, var(--brand-green-900) 92%, var(--brand-gold-300) 8%);
+    font-size: 1rem;
+    font-weight: 630;
+    line-height: var(--activities-desktop-search-h);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.86) inset,
+      0 7px 16px rgba(12,24,16,0.032);
+  }
+
+  body.page-route-activities .activity-finder #search-filter::placeholder{
+    color: color-mix(in srgb, var(--home-copy-muted) 84%, white 16%);
+    font-weight: 600;
+  }
+
+  body.page-route-activities .activity-search-clear{
+    right: 8px;
+    width: 34px;
+    height: 34px;
   }
 
   body.page-route-activities .activity-finder__advanced-toggle,
@@ -3926,6 +3979,6 @@ body.page-route-activities .activity-finder__group{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V3 === */
+/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_EVENT_PARITY_TRAY_V4 === */
 /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
