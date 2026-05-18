@@ -1337,16 +1337,31 @@
 }
 
 /* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE | Zweck: stellt die mobile Passungszeile als sauber umbrechende Segmentreihe dar, ohne abgetrennte Trenner am Zeilenende; Umfang: nur activity-card-quiet Mobile-Darstellung === */
+/* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V2 | Zweck: stellt die mobile Passungsbegründung als ruhige Segmentreihe ohne umbrechende Trennzeichen dar; Umfang: nur activity-card-quiet Mobile-Darstellung === */
 .page--activities .activity-card-quiet{
   display: flex;
   flex-wrap: wrap;
-  gap: 0 0.38em;
+  align-items: center;
+  gap: 4px 6px;
   margin-top: 2px;
   color: var(--color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.38;
-  font-weight: 670;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  font-weight: 680;
 }
+
+.page--activities .activity-card-quiet__item{
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 20px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-green-900, #18281e) 5%, transparent 95%);
+  color: color-mix(in srgb, var(--color-text-secondary) 92%, var(--brand-green-900, #18281e) 8%);
+  white-space: nowrap;
+}
+/* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V2 === */
 
 .page--activities .activity-card-quiet__item{
   display: inline-flex;
