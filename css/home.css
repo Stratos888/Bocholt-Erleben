@@ -3619,40 +3619,47 @@ body.page-route-activities .activity-finder__group{
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
+/* === BEGIN BLOCK: ACTIVITIES_DESKTOP_FINDER_ENTERPRISE_CTA_ROW_V1 | Zweck: repariert die Desktop-Aktivitäten-Top-Shell, indem die Service-CTAs aus der gequetschten rechten Vertikalspalte in eine lesbare horizontale CTA-Zeile unterhalb der Filtersteuerung überführt werden; Umfang: kompletter Desktop-Owner für Aktivitäten-Finder ab 900px innerhalb ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 @media (min-width: 900px){
   body.page-route-activities .top-stack.activity-finder{
-    grid-template-columns: minmax(0, 1fr) var(--desktop-service-rail-w, clamp(214px, 19.5vw, 232px));
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "search actions"
-      "advanced advanced"
-      "quick actions"
-      "status actions";
-    grid-template-rows: auto auto auto auto;
-    column-gap: 8px;
+      "search"
+      "advanced"
+      "quick"
+      "status"
+      "actions";
+    grid-template-rows: auto;
+    column-gap: 0;
     row-gap: 8px;
     align-items: start;
   }
 
   body.page-route-activities .top-stack.activity-finder:not(:has(.activity-finder__advanced:not([hidden]))){
     grid-template-areas:
-      "search actions"
-      "quick actions"
-      "status actions";
+      "search"
+      "quick"
+      "status"
+      "actions";
   }
 
   body.page-route-activities .activity-finder > .activity-finder__search-row,
   body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
+    grid-area: search;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(168px, 210px);
+    grid-template-columns: minmax(0, 1fr) minmax(178px, 214px);
     grid-template-rows: auto;
     gap: 8px;
     align-items: stretch;
+    width: 100%;
+    min-width: 0;
   }
 
   body.page-route-activities .activity-finder__search-row > .activity-finder__search-slot,
   body.page-route-activities .activity-finder__search-row.has-active-filter-reset > .activity-finder__search-slot{
     grid-column: 1;
     grid-row: 1;
+    min-width: 0;
   }
 
   body.page-route-activities .activity-finder__advanced-toggle,
@@ -3667,7 +3674,6 @@ body.page-route-activities .activity-finder__group{
     border-radius: var(--cmp-input-radius);
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_DESKTOP_FILTER_COUNT_RESET_V1 | Zweck: deaktiviert den mobilen Filterzähler-Badge auf Desktop, damit dort weiterhin der bestehende Value-Text wie „3 aktiv“ genutzt wird; Umfang: nur Desktop-Override für Filterbutton-Zähler === */
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__label{
     font-size: inherit;
   }
@@ -3684,12 +3690,59 @@ body.page-route-activities .activity-finder__group{
   body.page-route-activities .activity-finder__advanced-toggle .filter-pill__value{
     display: inline;
   }
-  /* === END BLOCK: ACTIVITIES_FINDER_DESKTOP_FILTER_COUNT_RESET_V1 === */
+
+  body.page-route-activities .activity-finder__quick{
+    grid-area: quick;
+  }
+
+  body.page-route-activities .activity-finder__status-row{
+    grid-area: status;
+  }
+
+  body.page-route-activities .activity-finder__advanced{
+    grid-area: advanced;
+  }
 
   body.page-route-activities .activity-finder .desktop-hero__actions{
     grid-area: actions;
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
     align-self: stretch;
+    margin-top: 2px;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__action,
+  body.page-route-activities .activity-finder .desktop-hero__action:link,
+  body.page-route-activities .activity-finder .desktop-hero__action:visited{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 0;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 15px;
+    font-size: 0.82rem;
+    font-weight: 720;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__action > span:last-child{
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.page-route-activities .activity-finder .desktop-hero__icon{
+    flex: 0 0 auto;
   }
 
   body.page-route-activities .activity-finder__advanced-inner{
@@ -3707,5 +3760,6 @@ body.page-route-activities .activity-finder__group{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* === END BLOCK: ACTIVITIES_DESKTOP_FINDER_ENTERPRISE_CTA_ROW_V1 === */
 /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
