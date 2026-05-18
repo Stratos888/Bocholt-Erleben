@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-split-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-reduction-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_HEAD_V1 === -->
 </head>
 <body>
@@ -59,60 +59,51 @@
   </div>
 </header>
 
-<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_V1 | Zweck: fokussiert die Einreichung auf Tarifzusammenfassung und Formular ohne lange Produktdefinition; Umfang: kompletter Main-Inhaltsbereich === -->
+<!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_REDUCTION_V2 | Zweck: reduziert die Formularseite auf kompakten Kopf, kompakte Tarifwahl und direkt sichtbares Formular; Umfang: kompletter Main-Inhaltsbereich mit unveraenderten Formular-IDs === -->
 <main class="page page--publish page--activity-presence page--activity-presence-submit">
   <header class="content-hero content-hero--panel">
     <div class="publish-hero-layout">
       <div class="publish-hero-copy">
         <p class="content-kicker">Aktivitätspräsenz</p>
         <h1>Aktivität zur Prüfung einreichen</h1>
-        <p class="content-lead">Du reichst jetzt die Angaben zur Prüfung ein. Bezahlt wird erst nach Freigabe.</p>
-        <div class="activity-presence-hero-trust" aria-label="Wichtige Hinweise zur Einreichung">
-          <span>Keine Zahlung bei Einreichung</span>
-          <span>Zahlungslink erst nach Freigabe</span>
-        </div>
+        <p class="content-lead">Trage die Angaben ein. Bezahlt wird erst nach Freigabe.</p>
       </div>
     </div>
   </header>
 
   <form class="content-form activity-presence-form-shell" id="activity-presence-form" novalidate>
-    <fieldset class="content-card activity-presence-plan-fieldset" aria-labelledby="activity-presence-plan-title">
-      <legend id="activity-presence-plan-title">Ausgewählter Tarif</legend>
-      <p class="content-note">Falls nötig, kannst du den Tarif vor dem Absenden ändern. Bezahlt wird erst nach Freigabe.</p>
-
-      <div class="activity-presence-plan-options" role="radiogroup" aria-label="Tarif für die Aktivitätspräsenz">
-        <label class="activity-presence-plan-option" for="activity-plan-basic">
-          <input id="activity-plan-basic" name="activityPlan" type="radio" value="activity_basic" checked>
-          <span class="activity-presence-plan-copy">
-            <strong>Aktivitätspräsenz Basis</strong>
-            <span>9,99&nbsp;€ / Monat</span>
-            <small>Für 1 veröffentlichte Aktivität.</small>
-          </span>
-        </label>
-
-        <label class="activity-presence-plan-option" for="activity-plan-plus">
-          <input id="activity-plan-plus" name="activityPlan" type="radio" value="activity_plus">
-          <span class="activity-presence-plan-copy">
-            <strong>Aktivitätspräsenz Plus</strong>
-            <span>19,99&nbsp;€ / Monat</span>
-            <small>Für bis zu 3 veröffentlichte Aktivitäten.</small>
-          </span>
-        </label>
-      </div>
-
-      <p class="content-note activity-presence-plan-note">Erst veröffentlichte Aktivitäten zählen in deinem Tarif.</p>
-    </fieldset>
-
     <section class="content-card publish-start-card" id="activity-presence-submit-section" aria-labelledby="activity-presence-submit-title">
       <div class="publish-section-head publish-section-head--form">
-        <h2 id="activity-presence-submit-title">Angaben zur Aktivität</h2>
+        <h2 id="activity-presence-submit-title">Einreichung vorbereiten</h2>
         <p class="content-note content-note--form-meta">* Pflichtfelder</p>
+        <p class="content-note"><strong>Tarif wählen</strong> – Zahlung erst nach Freigabe.</p>
       </div>
+
+      <fieldset class="activity-presence-inline-plan" aria-labelledby="activity-presence-plan-title">
+        <legend id="activity-presence-plan-title">Tarif auswählen</legend>
+        <div class="activity-presence-inline-plan-options" role="radiogroup" aria-label="Tarif für die Aktivitätspräsenz">
+          <label class="activity-presence-inline-plan-option" for="activity-plan-basic">
+            <input id="activity-plan-basic" name="activityPlan" type="radio" value="activity_basic" checked>
+            <span>
+              <strong>Basis</strong>
+              <small>9,99&nbsp;€ / Monat · 1 veröffentlichte Aktivität</small>
+            </span>
+          </label>
+
+          <label class="activity-presence-inline-plan-option" for="activity-plan-plus">
+            <input id="activity-plan-plus" name="activityPlan" type="radio" value="activity_plus">
+            <span>
+              <strong>Plus</strong>
+              <small>19,99&nbsp;€ / Monat · bis zu 3 veröffentlichte Aktivitäten</small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
 
       <div class="content-form-grid">
         <div class="content-form-section-head content-form-section-head--form content-field--full">
           <h3>Deine Kontaktdaten</h3>
-          <p class="content-note">Diese Angaben nutzen wir für Rückfragen, Zahlungsfreigabe und den späteren Anbieterbereich.</p>
+          <p class="content-note">Für Rückfragen und den Anbieterbereich.</p>
         </div>
 
         <label class="content-field" for="activity-presence-organization">
@@ -132,13 +123,13 @@
 
         <div class="content-form-section-head content-form-section-head--form content-field--full">
           <h3>Aktivität und Standort</h3>
-          <p class="content-note">Beschreibe die Aktivität so, dass daraus eine eigenständige Karte entstehen kann.</p>
+          <p class="content-note">Name, Standort und Link.</p>
         </div>
 
         <label class="content-field content-field--full" for="activity-presence-title">
           <span class="content-field__label">Name der Aktivität *</span>
           <input class="content-field__control" id="activity-presence-title" name="title" type="text" required>
-          <p class="content-field__hint">Zum Beispiel: Bouldern und Klettern, Kindergeburtstag in der Kletterhalle oder SUP am See.</p>
+          <p class="content-field__hint">Zum Beispiel: Bouldern, Kindergeburtstag oder SUP am See.</p>
         </label>
 
         <label class="content-field" for="activity-presence-location">
@@ -170,25 +161,25 @@
 
         <div class="content-form-section-head content-form-section-head--form content-field--full">
           <h3>Beschreibung und Verfügbarkeit</h3>
-          <p class="content-note">Wichtig ist, was Nutzer regelmäßig machen können und wann die Aktivität grundsätzlich verfügbar ist.</p>
+          <p class="content-note">Was Nutzer machen können und wann es verfügbar ist.</p>
         </div>
 
         <label class="content-field content-field--full" for="activity-presence-description">
           <span class="content-field__label">Kurzbeschreibung der Aktivität *</span>
           <textarea class="content-field__control" id="activity-presence-description" name="description" rows="4" required></textarea>
-          <p class="content-field__hint">Was kann man dort machen, für wen ist es geeignet und wie läuft der Besuch grob ab?</p>
+          <p class="content-field__hint">Kurz beschreiben, für wen die Aktivität geeignet ist.</p>
         </label>
 
         <label class="content-field content-field--full" for="activity-presence-duration">
           <span class="content-field__label">Dauerhaft / regelmäßig buchbar *</span>
           <textarea class="content-field__control" id="activity-presence-duration" name="duration" rows="3" required></textarea>
-          <p class="content-field__hint">Beschreibe, ob die Aktivität dauerhaft, saisonal oder regelmäßig verfügbar ist.</p>
+          <p class="content-field__hint">Dauerhaft, saisonal oder regelmäßig verfügbar.</p>
         </label>
 
         <label class="content-field content-field--full" for="activity-presence-notes">
           <span class="content-field__label">Weitere Hinweise</span>
           <textarea class="content-field__control" id="activity-presence-notes" name="notes" rows="3"></textarea>
-          <p class="content-field__hint">Optional: Preise, Zielgruppen, Voraussetzungen oder Besonderheiten.</p>
+          <p class="content-field__hint">Optional: Preise, Zielgruppen oder Besonderheiten.</p>
         </label>
 
         <label class="content-field content-field--full content-field--checkbox" for="activity-presence-confirmed">
@@ -201,14 +192,14 @@
       </div>
 
       <div class="content-actions content-actions--inline publish-final-actions">
-        <p class="content-note activity-presence-submit-note">Du zahlst nicht bei der Einreichung. Nach positiver Prüfung erhältst du einen Zahlungslink per E-Mail.</p>
         <button class="content-cta content-cta--primary" id="activity-presence-submit" type="button">Aktivität zur Prüfung einreichen</button>
+        <p class="content-note activity-presence-submit-note">Du zahlst nicht bei der Einreichung.</p>
       </div>
       <p class="content-note" id="activity-presence-status" aria-live="polite" hidden></p>
     </section>
   </form>
 </main>
-<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_V1 === -->
+<!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_REDUCTION_V2 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
