@@ -398,24 +398,33 @@ try {
     $activeSubscription = null;
     $organizerId = 0;
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PORTAL_SESSION_EMAIL_GUARD_V1 | Zweck: verhindert, dass eine alte Portal-Session oeffentliche Aktivitaetspraesenz-Einreichungen einer abweichenden Formular-E-Mail zuordnet; Umfang: ersetzt nur die Portal-Session-Uebernahme vor Organizer-Lookup === */
     if (is_array($portalSession)) {
-        $organizerId = (int)$portalSession['organizer_id'];
-        $activeSubscription = pf_fetch_active_subscription_or_null($pdo, $organizerId);
+        $portalSessionEmailNormalized = trim((string)($portalSession['email_normalized'] ?? ''));
+        $portalSessionMatchesInputEmail = $portalSessionEmailNormalized !== ''
+            && hash_equals($portalSessionEmailNormalized, $emailNormalized);
+        $mayUsePortalSession = $submissionKind !== 'activity' || $portalSessionMatchesInputEmail;
 
-        /* === BEGIN BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 | Zweck: bestehende Event-Abo-Reuse-Logik unveraendert lassen und Aktivitaetspraesenzen nicht auf Event-Mitgliedschaften umbiegen; Umfang: ersetzt Abo-Reuse-if === */
-        if ($submissionKind === 'event' && $requestedModelKey !== 'single' && is_array($activeSubscription)) {
-            $organizationName = trim((string)$portalSession['organization_name']);
-            $contactName = pf_nullable_string($portalSession['contact_name'] ?? null);
-            $emailInput = trim((string)$portalSession['email']);
-            $emailNormalized = trim((string)$portalSession['email_normalized']);
-            $requestedModelKey = trim((string)$activeSubscription['plan_key']);
-            $paymentKind = 'subscription';
-            $intakeOrigin = 'membership';
-            $initialStatus = 'draft';
-            $checkoutRequired = true;
+        if ($mayUsePortalSession) {
+            $organizerId = (int)$portalSession['organizer_id'];
+            $activeSubscription = pf_fetch_active_subscription_or_null($pdo, $organizerId);
+
+            /* === BEGIN BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 | Zweck: bestehende Event-Abo-Reuse-Logik unveraendert lassen und Aktivitaetspraesenzen nicht auf Event-Mitgliedschaften umbiegen; Umfang: Abo-Reuse-if === */
+            if ($submissionKind === 'event' && $requestedModelKey !== 'single' && is_array($activeSubscription)) {
+                $organizationName = trim((string)$portalSession['organization_name']);
+                $contactName = pf_nullable_string($portalSession['contact_name'] ?? null);
+                $emailInput = trim((string)$portalSession['email']);
+                $emailNormalized = trim((string)$portalSession['email_normalized']);
+                $requestedModelKey = trim((string)$activeSubscription['plan_key']);
+                $paymentKind = 'subscription';
+                $intakeOrigin = 'membership';
+                $initialStatus = 'draft';
+                $checkoutRequired = true;
+            }
+            /* === END BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 === */
         }
-        /* === END BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 === */
     }
+    /* === END BLOCK: ACTIVITY_PRESENCE_PORTAL_SESSION_EMAIL_GUARD_V1 === */
 
     if ($organizerId <= 0) {
         $existingOrganizer = pf_find_organizer_by_email($pdo, $emailNormalized);
