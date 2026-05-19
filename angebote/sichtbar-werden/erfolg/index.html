@@ -46,11 +46,12 @@
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script>
-  /* === BEGIN BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V2 | Zweck: setzt Status-Texte und CTAs fuer eingereichte Aktivitaet, aktive Aktivitaetspraesenz und abgeschlossene Zahlung konsistent zum finalen Aktivitaeten-Funnel; Umfang: kompletter zustandsabhaengiger Text-Switch === */
+  /* === BEGIN BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V3 | Zweck: setzt Status-Texte und fuehrt Anbieterbereich-CTAs mit E-Mail-Kontext in den passenden Account; Umfang: kompletter zustandsabhaengiger Text-Switch === */
   (function () {
     const params = new URLSearchParams(window.location.search);
     const flow = String(params.get("flow") || "").trim().toLowerCase();
     const hasSession = Boolean(String(params.get("session_id") || "").trim());
+    const email = String(params.get("email") || "").trim();
 
     const title = document.getElementById("activity-success-title");
     const lead = document.getElementById("activity-success-lead");
@@ -58,6 +59,11 @@
     const primaryCta = document.getElementById("activity-success-primary-cta");
     const secondaryCta = document.getElementById("activity-success-secondary-cta");
     const steps = document.getElementById("activity-success-steps");
+
+    function buildProviderLoginUrl() {
+      if (!email) return "/fuer-veranstalter/login/";
+      return "/fuer-veranstalter/login/?email=" + encodeURIComponent(email);
+    }
 
     function setPrimaryCta(label, href) {
       if (!primaryCta) return;
@@ -83,7 +89,7 @@
       if (steps) {
         steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Aktivitätspräsenz.</p><p>2. Wir prüfen die Aktivität und bereiten die Angaben redaktionell auf.</p><p>3. Nach Freigabe wird die Aktivität veröffentlicht.</p>";
       }
-      setPrimaryCta("Anbieterbereich öffnen", "/fuer-veranstalter/login/");
+      setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
       setSecondaryCta("Zur Aktivitätenseite", "/angebote/");
       document.title = "Aktivität eingereicht | Bocholt erleben";
       return;
@@ -96,12 +102,12 @@
       if (steps) {
         steps.innerHTML = "<p>1. Die Zahlung wurde bestätigt.</p><p>2. Redaktionelle Aufbereitung und finale Prüfung.</p><p>3. Veröffentlichung nach Freigabe.</p>";
       }
-      setPrimaryCta("Anbieterbereich öffnen", "/fuer-veranstalter/login/");
+      setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
       setSecondaryCta("Zur Aktivitätenseite", "/angebote/");
       document.title = "Zahlung erhalten | Bocholt erleben";
     }
   })();
-  /* === END BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V2 === */
+  /* === END BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V3 === */
 </script>
 <!-- === END BLOCK: ACTIVITY_SUCCESS_BODY_ENTERPRISE_FINAL_V3 === -->
 </body>
