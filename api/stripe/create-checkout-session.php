@@ -340,19 +340,6 @@ function scs_build_cancel_url(string $baseUrl, array $submission): string
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 === */
 
-function scs_build_cancel_url(string $baseUrl, array $submission): string
-{
-    $paymentReferenceKey = (string)$submission['payment_reference_key'];
-    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
-
-    if ($isActivity) {
-        return rtrim($baseUrl, '/') . '/angebote/sichtbar-werden/?cancelled=1&submission_ref=' . rawurlencode($paymentReferenceKey) . scs_activity_email_query_part($submission);
-    }
-
-    return rtrim($baseUrl, '/') . '/events-veroeffentlichen/abgebrochen/?submission_ref=' . rawurlencode($paymentReferenceKey);
-}
-/* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 === */
-
 function scs_stripe_api_request(string $secretKey, string $endpointPath, array $formData): array
 {
     $url = 'https://api.stripe.com/v1/' . ltrim($endpointPath, '/');
@@ -661,9 +648,15 @@ try {
         ? scs_fetch_usable_active_subscription_entitlement($pdo, $submission)
         : null;
 
+    if (is_array($existingSubscriptionEntitlement)) {
+        /* === BEGIN BLOCK: CHECKOUT_EXISTING_SUBSCRIPTION_REUSE_RESTORE_V3 | Zweck: stellt den bestehenden Abo-Reuse-Zweig wieder her und verhindert den Parse-Fatal im Checkout-Endpoint; Umfang: ersetzt nur den Existing-Subscription-Zweig nach Entitlement-Ermittlung === */
+        scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
+        $pdo->commit();
+
         // === BEGIN BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V2 | Zweck: neue per aktivem Tarif bezahlte Event- oder Aktivitaetseinreichung best-effort per Push melden; Umfang: keine Änderung am Response-/Checkout-Verhalten ===
         scs_notify_paid_submission_inbox_best_effort($submissionId, (string)($submission['submission_kind'] ?? 'event'));
         // === END BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V2 ===
+
         $resolvedModelKey = trim((string)($existingSubscriptionEntitlement['plan_key'] ?? ''));
         $effectiveModelKey = $resolvedModelKey !== ''
             ? $resolvedModelKey
@@ -685,6 +678,7 @@ try {
                 'used_existing_subscription' => true,
             ],
         ]);
+        /* === END BLOCK: CHECKOUT_EXISTING_SUBSCRIPTION_REUSE_RESTORE_V3 === */
     }
 
     $checkoutSession = scs_create_checkout_session($submission, $customerId, $stripeConfig, $appConfig);
