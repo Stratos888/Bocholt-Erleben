@@ -1305,21 +1305,18 @@ Umfang:
           return;
         }
 
-        /* === BEGIN BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V2 | Zweck: zeigt die Erfolgsmeldung nach DB-Veröffentlichung im vorhandenen Review-Card-Statusbereich ohne undefinierte Fremdvariablen; Umfang: ersetzt nur den Approve-Erfolgspfad nach approve.php === */
+        /* === BEGIN BLOCK: INBOX_DB_TERMINAL_STATUS_ADVANCE_V1 | Zweck: entfernt veröffentlichte/abgelehnte DB-Submissions sofort aus der aktuellen Inbox-Ansicht und vermeidet Bearbeitung bereits terminaler Fälle; Umfang: ersetzt nur Publish- und Reject-Erfolgspfad in writeSubmissionStatus === */
         await postJson("/api/submissions/approve.php", { submission_id: submissionId });
 
         it.status = "approved";
         it.approved_at = it.approved_at || new Date().toISOString();
 
-        renderCurrent(totalLoaded);
-        setReviewCardNotice(
+        setStatus(
           isActivityPresenceItem(it)
             ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
-            : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet.",
-          "success"
+            : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
         );
-        setStatus("");
-        /* === END BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V2 === */
+        showNext(totalLoaded);
         return;
       }
 
@@ -1337,11 +1334,15 @@ Umfang:
       });
 
       it.status = "rejected";
+      it.rejected_at = it.rejected_at || new Date().toISOString();
 
-      renderCurrent(totalLoaded);
-      setReviewCardNotice("Submission wurde abgelehnt.", "success");
-      setStatus("");
-    }
+      setStatus(
+        isActivityPresenceItem(it)
+          ? "Aktivitätspräsenz wurde abgelehnt und aus der Inbox entfernt."
+          : "Einreichung wurde abgelehnt und aus der Inbox entfernt."
+      );
+      showNext(totalLoaded);
+      /* === END BLOCK: INBOX_DB_TERMINAL_STATUS_ADVANCE_V1 === */
     // === END BLOCK: WRITE_SUBMISSION_REVIEW_STATUS_V1 ===
 
     async function triggerDeploy() {
