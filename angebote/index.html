@@ -97,11 +97,11 @@ Umfang:
 <!-- === END BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 === -->
 
 <main class="page--activities">
-<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V5 (desktop hero + filter card split) ===
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V6 (desktop hero + compact filterbar split) ===
 Zweck:
 - hält den Activities-Hero im gleichen Desktop-Contract wie Events
-- verlagert Schnellfilter, Trefferzahl und erweiterte Filter in eine eigene Filterkarte unterhalb des Heroes
-- verhindert unsichtbare/überlagerte Advanced-Filter auf Desktop
+- lässt den Hero nur Suche und Service führen
+- bündelt Schnellfilter, Trefferzahl und weitere Filter in einer kompakten Filterbar unterhalb des Heroes
 Umfang:
 - Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
@@ -121,9 +121,9 @@ Umfang:
 
       <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
 
-      <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HERO_HTML_V2 | Zweck: hält im Hero nur Suche, Advanced-Toggle und Service-Rail; Schnellfilter und Advanced-Panel liegen bewusst in der Filterkarte unter dem Hero === -->
+      <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HERO_HTML_V3 | Zweck: hält im Hero nur Suche und Service-Rail; alle Activities-Filter liegen geschlossen in der Filterbar unter dem Hero === -->
       <div class="top-stack desktop-hero__panel activity-finder">
-        <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Suche und Filter">
+        <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Aktivitäten suchen">
           <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
             <!-- === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 | Zweck: ergänzt einen eigenen Clear-Button im Suchfeld, der ausschließlich die Freitextsuche löscht; Umfang: nur Search-Control im Aktivitäten-Finder === -->
             <div class="desktop-hero__search-field activity-finder__search-field">
@@ -142,22 +142,6 @@ Umfang:
             </div>
             <!-- === END BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 === -->
           </div>
-
-          <button
-            type="button"
-            class="filter-pill activity-finder__advanced-toggle"
-            id="offer-advanced-filter-toggle"
-            aria-expanded="false"
-            aria-controls="offer-advanced-filters"
-          >
-            <span class="filter-pill__label">Weitere Filter</span>
-            <span class="filter-pill__value" id="offer-advanced-filter-count">Optional</span>
-            <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-          </button>
-
-          <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
-            <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
-          </button>
         </div>
 
         <div class="desktop-hero__actions" aria-label="Service">
@@ -182,28 +166,41 @@ Umfang:
           </button>
         </div>
       </div>
-      <!-- === END BLOCK: ACTIVITIES_FINDER_HERO_HTML_V2 === -->
+      <!-- === END BLOCK: ACTIVITIES_FINDER_HERO_HTML_V3 === -->
     </section>
 
-    <!-- === BEGIN BLOCK: ACTIVITIES_FILTER_CARD_HTML_V1 | Zweck: eigene Filterkarte unter dem Hero für Schnellfilter, Trefferzahl und ausklappbare weitere Filter; Umfang: kompletter sichtbarer Activities-Filterbereich === -->
+    <!-- === BEGIN BLOCK: ACTIVITIES_FILTER_BAR_HTML_V1 | Zweck: kompakte Desktop-Filterbar für Schnellfilter, Trefferzahl und ausklappbare weitere Filter; Umfang: kompletter sichtbarer Activities-Filterbereich === -->
     <section class="activity-finder-card" aria-label="Aktivitäten filtern">
       <div class="activity-finder-card__head">
-        <div class="activity-finder-card__copy">
-          <h2 class="activity-finder-card__title">Schnellfilter</h2>
-          <p class="activity-finder-card__text">Häufige Situationen direkt auswählen.</p>
-        </div>
+        <h2 class="activity-finder-card__title">Aktivitäten filtern</h2>
         <div class="activity-finder__result-count" id="offer-result-count" aria-live="polite" aria-atomic="true">Aktivitäten werden geladen</div>
       </div>
 
-      <div class="activity-finder__quick" aria-label="Häufig gesuchte Aktivitätenfilter">
-        <div class="activity-finder__quick-label">Schnellfilter</div>
-        <div class="activity-finder__quick-options" id="offer-quick-filters">
-          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Mit Kindern">Mit Kindern</button>
-          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Bei Regen">Bei Regen</button>
-          <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Draußen">Draußen</button>
-          <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="Direkt in Bocholt">Direkt in Bocholt</button>
-          <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="In der Umgebung">In der Umgebung</button>
+      <div class="activity-finder-card__controls">
+        <div class="activity-finder__quick" aria-label="Häufig gesuchte Aktivitätenfilter">
+          <div class="activity-finder__quick-label">Schnellfilter</div>
+          <div class="activity-finder__quick-options" id="offer-quick-filters">
+            <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Mit Kindern">Mit Kindern</button>
+            <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Bei Regen">Bei Regen</button>
+            <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Draußen">Draußen</button>
+            <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="Direkt in Bocholt">Direkt in Bocholt</button>
+            <button type="button" class="activity-filter-chip" data-filter-group="proximity" data-filter-value="In der Umgebung">In der Umgebung</button>
+          </div>
         </div>
+
+        <button
+          type="button"
+          class="filter-pill activity-finder__advanced-toggle activity-finder-card__toggle"
+          id="offer-advanced-filter-toggle"
+          aria-expanded="false"
+          aria-controls="offer-advanced-filters"
+        >
+          <span class="filter-pill__label">Weitere Filter</span>
+          <span class="filter-pill__value" id="offer-advanced-filter-count">Optional</span>
+          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+        </button>
+
+        <button type="button" class="activity-finder-card__reset" id="offer-reset-pill" hidden>Zurücksetzen</button>
       </div>
 
       <div class="activity-finder__status-row" aria-live="polite" aria-atomic="true">
@@ -275,9 +272,9 @@ Umfang:
         </div>
       </div>
     </section>
-    <!-- === END BLOCK: ACTIVITIES_FILTER_CARD_HTML_V1 === -->
+    <!-- === END BLOCK: ACTIVITIES_FILTER_BAR_HTML_V1 === -->
   </div>
-<!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V5 (desktop hero + filter card split) === -->
+<!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V6 (desktop hero + compact filterbar split) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
     <div class="loading-spinner" aria-hidden="true"></div>
