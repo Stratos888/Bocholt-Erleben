@@ -181,12 +181,29 @@ Rules:
 
 ---
 
-## 9. UI-POLISH RULE
+## 9. UI-POLISH / NO-HOTFIX RULE
 
 - UI-polish patches should be CSS-only unless root cause proves otherwise.
 - Do not spread small visual fixes across multiple files without proof.
+- Do not solve UI regressions by appending late override blocks when the affected component already has an owner block.
+- Prefer one consolidated owner replacement over stacked override chains.
+- A staging branch is for validating sustainable fixes, not for shipping quick temporary fixes.
+- If a patch creates this pattern, it is not acceptable as final implementation:
 
----
+```text
+base rule
+→ desktop override
+→ polish override
+→ mobile restore override
+→ later counter-override
+
+The correct pattern is:
+single owner block
+→ shared component base
+→ mobile contract
+→ desktop contract
+→ narrow/wide breakpoint refinements
+Before patching UI regressions, identify whether the real problem is a missing owner, conflicting owners, or a broken breakpoint boundary.
 
 ## 10. OVERLAY RULE
 
