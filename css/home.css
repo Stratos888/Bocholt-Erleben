@@ -3623,8 +3623,7 @@ body.page-route-activities .activity-finder__group{
 }
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
-/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V4 | Zweck: trennt gemeinsamen Desktop-Hero-Contract sauber von der Activities-Filterbar; Hero = Suche/Service, Filterbar = Schnellfilter/Trefferzahl/Advanced; Umfang: später Owner für Events + Activities innerhalb home.css === */
-body.page-route-activities .activity-finder-shell{
+/* === BEGIN BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V5 | Zweck: finalisiert gemeinsamen Desktop-Hero-Contract und macht die Activities-Filterbar zu einer kompakten Desktop-Toolbar statt touch-orientierter Chip-Karte; Umfang: später Owner für Events + Activities innerhalb home.css === */
   display: block;
   min-width: 0;
 }
@@ -4352,5 +4351,179 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 }
 /* === END BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V4 === */
-/* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_CSS_V4 === */
+/* === BEGIN BLOCK: ACTIVITIES_FILTERBAR_DESKTOP_ENTERPRISE_POLISH_V1 | Zweck: finaler Desktop-Polish der Activities-Filterbar: Chips auf Inhaltsbreite, weitere Filter inline, keine Mobile-Stretch-Optik, kompaktes Advanced-Panel; Umfang: nur Desktop-Filterbar unterhalb des Activities-Hero === */
+@media (min-width: 900px){
+  body.page-route-activities .activity-finder-card{
+    margin-top: 10px;
+    padding: 9px 16px 10px;
+    border-radius: 16px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.76) inset,
+      0 4px 12px rgba(12,24,16,0.026);
+  }
+
+  body.page-route-activities .activity-finder-card__head{
+    min-height: 18px;
+    align-items: baseline;
+  }
+
+  body.page-route-activities .activity-finder-card__title{
+    font-size: 0.82rem;
+    line-height: 1;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__result-count{
+    font-size: 0.70rem;
+    letter-spacing: 0.048em;
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick{
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip,
+  body.page-route-activities .activity-finder-card__toggle,
+  body.page-route-activities .activity-finder-card__reset{
+    width: auto;
+    min-width: max-content;
+    min-height: 27px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 730;
+    line-height: 1;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.62) inset;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle{
+    gap: 5px;
+    margin-left: 0;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle:not(.has-active-filter-count) .filter-pill__value{
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle.has-active-filter-count .filter-pill__value{
+    display: inline-flex;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__label::before{
+    font-size: 0.72rem;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle .filter-pill__chevron{
+    width: 12px;
+    height: 12px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced{
+    margin-top: 0;
+    padding-top: 8px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    gap: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(255,255,252,0.48);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.68) inset;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group{
+    gap: 6px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title{
+    font-size: 0.66rem;
+    letter-spacing: 0.075em;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
+    gap: 5px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip{
+    min-height: 26px;
+    padding-inline: 8px;
+    font-size: 0.71rem;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1099px){
+  body.page-route-activities .activity-finder-card{
+    padding-inline: 14px;
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick{
+    flex: 0 1 auto;
+    flex-basis: auto;
+    max-width: none;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    display: flex !important;
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip{
+    width: auto;
+    min-width: max-content;
+    grid-column: auto !important;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (min-width: 1100px){
+  body.page-route-activities .activity-finder-card__controls{
+    flex-wrap: nowrap;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    flex-wrap: nowrap;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1180px){
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1181px){
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+/* === END BLOCK: ACTIVITIES_FILTERBAR_DESKTOP_ENTERPRISE_POLISH_V1 === */
+/* === END BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V5 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
