@@ -3624,6 +3624,7 @@ body.page-route-activities .activity-finder__group{
 /* === END BLOCK: ACTIVITIES_FINDER_MOBILE_ADVANCED_ORDER_POLISH_V1 === */
 
 /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V5 | Zweck: finalisiert gemeinsamen Desktop-Hero-Contract und macht die Activities-Filterbar zu einer kompakten Desktop-Toolbar statt touch-orientierter Chip-Karte; Umfang: später Owner für Events + Activities innerhalb home.css === */
+body.page-route-activities .activity-finder-shell{
   display: block;
   min-width: 0;
 }
@@ -4525,5 +4526,240 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 }
 /* === END BLOCK: ACTIVITIES_FILTERBAR_DESKTOP_ENTERPRISE_POLISH_V1 === */
+/* === BEGIN BLOCK: DESKTOP_HERO_FILTER_FINAL_CRITIQUE_POLISH_V1 | Zweck: finaler gemeinsamer Desktop-Polish für Events und Aktivitäten: harte Sticky-Nav-Schnittkante gegen angeschnittenen Hero-Text, kompaktere Suche, ruhigere CTA-Rail, normale Ergebnis-Typografie und reduziertes Desktop-Advanced-Panel; Umfang: nur Desktop-Hero, Desktop-Service-Rail und Activities-Filterbar ab 900px === */
+@media (min-width: 900px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-search-height: 60px;
+    --desktop-filter-height: 46px;
+    --desktop-service-action-height: 34px;
+    --desktop-service-action-gap: 5px;
+    --desktop-panel-gap: 6px;
+    --desktop-service-rail-w: clamp(258px, 22vw, 286px);
+  }
+
+  body.is-tabbar-hidden #desktop-section-nav-root,
+  body.page-route-activities #desktop-section-nav-root{
+    background: linear-gradient(180deg, rgba(248,248,241,0.998) 0%, rgba(241,244,232,0.992) 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 1px 0 rgba(24,40,30,0.055),
+      0 10px 18px rgba(229,235,218,0.92);
+  }
+
+  body.is-tabbar-hidden #desktop-section-nav-root::after,
+  body.page-route-activities #desktop-section-nav-root::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    height: 18px;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(237,242,226,0.96) 0%, rgba(237,242,226,0.42) 58%, rgba(237,242,226,0) 100%);
+    pointer-events: none;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 398px;
+    padding-bottom: 12px;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder),
+  body.page-route-activities .top-stack.activity-finder{
+    height: calc(var(--desktop-search-height) + var(--desktop-panel-gap) + var(--desktop-filter-height));
+    column-gap: 10px;
+    row-gap: var(--desktop-panel-gap);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__search-row.has-active-filter-reset,
+  body.page-route-activities .activity-finder > .activity-finder__search-row,
+  body.page-route-activities .activity-finder > .activity-finder__search-row.has-active-filter-reset{
+    grid-template-rows: var(--desktop-search-height) var(--desktop-filter-height);
+    gap: var(--desktop-panel-gap);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) #search-filter,
+  body.page-route-activities .activity-finder #search-filter{
+    height: var(--desktop-search-height);
+    min-height: var(--desktop-search-height);
+    border-radius: 17px;
+    font-size: 0.96rem;
+    line-height: var(--desktop-search-height);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.82) inset,
+      0 5px 13px rgba(12,24,16,0.026);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__toolbar-pill{
+    height: var(--desktop-filter-height);
+    min-height: var(--desktop-filter-height);
+    border-radius: 15px;
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) > .desktop-hero__actions,
+  body.page-route-activities .activity-finder .desktop-hero__actions{
+    grid-template-rows: repeat(3, var(--desktop-service-action-height));
+    gap: var(--desktop-service-action-gap);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action:link,
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action:visited,
+  body.page-route-activities .activity-finder .desktop-hero__action,
+  body.page-route-activities .activity-finder .desktop-hero__action:link,
+  body.page-route-activities .activity-finder .desktop-hero__action:visited{
+    height: var(--desktop-service-action-height);
+    padding-inline: 11px;
+    gap: 6px;
+    border-radius: 11px;
+    font-size: 0.735rem;
+    font-weight: 690;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-action-bg-start) 82%, rgba(248,250,243,0.64) 18%) 0%,
+      color-mix(in srgb, var(--home-action-bg-end) 78%, rgba(248,250,243,0.58) 22%) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.60) inset,
+      0 2px 5px rgba(12,24,16,0.012);
+  }
+
+  body.is-tabbar-hidden .top-stack:not(.activity-finder) .desktop-hero__action span:last-child,
+  body.page-route-activities .activity-finder .desktop-hero__action span:last-child{
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  body.page-route-activities .activity-finder-card{
+    margin-top: 8px;
+    padding: 8px 14px 9px;
+    border-radius: 15px;
+    background: linear-gradient(
+      180deg,
+      rgba(249,251,244,0.78) 0%,
+      rgba(238,244,228,0.68) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.68) inset,
+      0 3px 10px rgba(12,24,16,0.020);
+  }
+
+  body.page-route-activities .activity-finder-card__head{
+    min-height: 17px;
+  }
+
+  body.page-route-activities .activity-finder-card__title{
+    font-size: 0.80rem;
+    font-weight: 810;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__result-count{
+    color: color-mix(in srgb, var(--brand-green-900, #18281e) 76%, var(--home-copy-muted, #546459) 24%);
+    font-size: 0.74rem;
+    font-weight: 740;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    gap: 5px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options{
+    gap: 5px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip,
+  body.page-route-activities .activity-finder-card__toggle,
+  body.page-route-activities .activity-finder-card__reset{
+    min-height: 26px;
+    padding-inline: 8px;
+    font-size: 0.70rem;
+    font-weight: 720;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle{
+    border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 14%, var(--home-action-border, rgba(24,40,30,0.14)) 86%);
+    background: rgba(255,255,252,0.82);
+    color: color-mix(in srgb, var(--brand-green-900, #18281e) 78%, var(--home-copy-muted, #546459) 22%);
+  }
+
+  body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__label::before{
+    font-size: 0.70rem;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced{
+    margin-top: 0;
+    padding-top: 7px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    gap: 8px 12px;
+    padding: 9px;
+    border-radius: 13px;
+    background: rgba(255,255,252,0.38);
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group{
+    gap: 5px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title{
+    font-size: 0.64rem;
+    letter-spacing: 0.07em;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
+    gap: 5px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip{
+    min-height: 25px;
+    padding-inline: 7px;
+    font-size: 0.69rem;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="situation"]{
+    display: none;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-group="proximity"][data-filter-value="Direkt in Bocholt"],
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-group="proximity"][data-filter-value="In der Umgebung"]{
+    display: none;
+  }
+
+  body.page-route-activities .events-section{
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1099px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-service-rail-w: clamp(244px, 27vw, 268px);
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    row-gap: 5px;
+  }
+}
+
+@media (min-width: 1181px){
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    grid-template-columns: 0.95fr 1.42fr 1.55fr 0.90fr;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="features"]{
+    grid-column: 3;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="effort"]{
+    grid-column: 4;
+  }
+}
+/* === END BLOCK: DESKTOP_HERO_FILTER_FINAL_CRITIQUE_POLISH_V1 === */
 /* === END BLOCK: DESKTOP_TOP_SHELL_EVENT_ACTIVITY_PARITY_900_V5 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
