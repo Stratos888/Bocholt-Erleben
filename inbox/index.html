@@ -1305,22 +1305,21 @@ Umfang:
           return;
         }
 
+        /* === BEGIN BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V2 | Zweck: zeigt die Erfolgsmeldung nach DB-Veröffentlichung im vorhandenen Review-Card-Statusbereich ohne undefinierte Fremdvariablen; Umfang: ersetzt nur den Approve-Erfolgspfad nach approve.php === */
         await postJson("/api/submissions/approve.php", { submission_id: submissionId });
 
         it.status = "approved";
         it.approved_at = it.approved_at || new Date().toISOString();
 
         renderCurrent(totalLoaded);
-          /* === BEGIN BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V1 | Zweck: entfernt internes Verbrauch-/Token-Wording aus der Veröffentlichungsmeldung; Umfang: ersetzt nur die Erfolgsmeldung nach Veröffentlichung === */
-          setItemStatus(
-            item,
-            result?.message || (currentKind === "activity"
-              ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
-              : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."),
-            "success"
-          );
-          /* === END BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V1 === */
+        setReviewCardNotice(
+          isActivityPresenceItem(it)
+            ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
+            : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet.",
+          "success"
+        );
         setStatus("");
+        /* === END BLOCK: INBOX_APPROVE_SUCCESS_COPY_ACTIVITY_PRESENCE_V2 === */
         return;
       }
 
