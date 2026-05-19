@@ -340,6 +340,19 @@ function scs_build_cancel_url(string $baseUrl, array $submission): string
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 === */
 
+function scs_build_cancel_url(string $baseUrl, array $submission): string
+{
+    $paymentReferenceKey = (string)$submission['payment_reference_key'];
+    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
+
+    if ($isActivity) {
+        return rtrim($baseUrl, '/') . '/angebote/sichtbar-werden/?cancelled=1&submission_ref=' . rawurlencode($paymentReferenceKey) . scs_activity_email_query_part($submission);
+    }
+
+    return rtrim($baseUrl, '/') . '/events-veroeffentlichen/abgebrochen/?submission_ref=' . rawurlencode($paymentReferenceKey);
+}
+/* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 === */
+
 function scs_stripe_api_request(string $secretKey, string $endpointPath, array $formData): array
 {
     $url = 'https://api.stripe.com/v1/' . ltrim($endpointPath, '/');
