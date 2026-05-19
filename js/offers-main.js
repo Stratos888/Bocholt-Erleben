@@ -779,9 +779,11 @@ const OffersApp = {
       );
     }
 
+    /* === BEGIN BLOCK: ACTIVITIES_FILTERBAR_TOGGLE_COUNT_TEXT_V1 | Zweck: entfernt „Optional“ aus dem Desktop-Filtertoggle; Zähler erscheint nur bei aktiven Filtern; Umfang: nur Textwert des Advanced-Count-Spans === */
     if (this.refs.advancedCount) {
-      this.refs.advancedCount.textContent = hasActiveFilterValues ? `${activeCount} aktiv` : "Optional";
+      this.refs.advancedCount.textContent = hasActiveFilterValues ? `${activeCount} aktiv` : "";
     }
+    /* === END BLOCK: ACTIVITIES_FILTERBAR_TOGGLE_COUNT_TEXT_V1 === */
 
     if (this.refs.advancedSummary) {
       if (hasActiveFilters) {
