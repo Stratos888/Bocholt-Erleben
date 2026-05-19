@@ -740,7 +740,7 @@ const OffersApp = {
       : `${count} Aktivitäten gefunden`;
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V3 | Zweck: hält Suchfeld-Clear-Button, Filterbutton-Zähler, Panel-Zustand und Reset-Zeile robust synchron; im geöffneten Panel enthält die Summary immer die aktuelle Trefferzahl, weil die externe Trefferzeile dann ausgeblendet wird; Umfang: ersetzt nur updateFinderUI() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V4 | Zweck: hält Suchfeld-Clear, Filterbutton-Zähler, Panel-Zustand und Reset robust synchron; vermeidet im geöffneten Desktop-Panel eine doppelte reine Trefferzeile, weil die Trefferzahl dauerhaft in der Filterbar steht; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
@@ -784,7 +784,7 @@ const OffersApp = {
     }
 
     if (this.refs.advancedSummary) {
-      if (isAdvancedOpen || hasActiveFilters) {
+      if (hasActiveFilters) {
         this.refs.advancedSummary.removeAttribute("hidden");
       } else {
         this.refs.advancedSummary.setAttribute("hidden", "");
@@ -804,7 +804,7 @@ const OffersApp = {
       } else if (hasSearchTerm) {
         this.refs.advancedSummaryText.textContent = `Suche aktiv · ${resultLabel}`;
       } else {
-        this.refs.advancedSummaryText.textContent = resultLabel;
+        this.refs.advancedSummaryText.textContent = "";
       }
     }
 
@@ -812,7 +812,7 @@ const OffersApp = {
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V3 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V4 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
