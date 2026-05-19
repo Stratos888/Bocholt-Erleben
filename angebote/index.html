@@ -97,71 +97,106 @@ Umfang:
 <!-- === END BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 === -->
 
 <main class="page--activities">
-<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) ===
+<!-- === BEGIN BLOCK: ACTIVITIES INTRO + CONTROLS V5 (desktop hero + filter card split) ===
 Zweck:
-- entfernt die generische .page-Hülle, damit kein zusätzlicher Balken/Top-Abstand zwischen Header und Hero entsteht
-- zieht Aktivitäten oben strukturell auf dieselbe Shell wie Events
-- ergänzt die zweite Service-Zeile für Desktop-Parität
-- benennt die Activities-Filter konsistent auf Merkmal + Kategorie um, ohne die aktuelle Lucide-/Chevron-Logik zurückzubauen
+- hält den Activities-Hero im gleichen Desktop-Contract wie Events
+- verlagert Schnellfilter, Trefferzahl und erweiterte Filter in eine eigene Filterkarte unterhalb des Heroes
+- verhindert unsichtbare/überlagerte Advanced-Filter auf Desktop
 Umfang:
 - Main-Start + kompletter Activities-Hero/Controls-Block bis vor Loading
 === -->
-  <section class="desktop-hero" aria-label="Suche und Einführung">
-    <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 | Zweck: entfernt die doppelte desktop-entry__content-Verschachtelung im Activities-Hero, damit die gemeinsame Contrast-Surface nur einmal greift und optisch auf den Events-Stand zurückfällt; Umfang: nur Hero-Copy-Struktur von /angebote/ bis vor den Top-Stack === -->
-    <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
-      <div class="desktop-entry__inner">
-        <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
-        <div class="desktop-entry__content">
-          <h1 class="desktop-entry__title">Aktivitäten in Bocholt</h1>
-          <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation.</p>
+  <div class="activity-finder-shell" data-activity-finder>
+    <section class="desktop-hero" aria-label="Suche und Einführung">
+      <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 | Zweck: entfernt die doppelte desktop-entry__content-Verschachtelung im Activities-Hero, damit die gemeinsame Contrast-Surface nur einmal greift und optisch auf den Events-Stand zurückfällt; Umfang: nur Hero-Copy-Struktur von /angebote/ bis vor den Top-Stack === -->
+      <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
+        <div class="desktop-entry__inner">
+          <!-- === BEGIN BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
+          <div class="desktop-entry__content">
+            <h1 class="desktop-entry__title">Aktivitäten in Bocholt</h1>
+            <p class="desktop-entry__text">Freizeitideen, Natur, Kultur und Unternehmungen in Bocholt und Umgebung – passend zu deiner Situation.</p>
+          </div>
+          <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
         </div>
-        <!-- === END BLOCK: ACTIVITIES_HERO_COPY_TEXT_V3 (single content owner) === -->
+      </section>
+
+      <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
+
+      <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HERO_HTML_V2 | Zweck: hält im Hero nur Suche, Advanced-Toggle und Service-Rail; Schnellfilter und Advanced-Panel liegen bewusst in der Filterkarte unter dem Hero === -->
+      <div class="top-stack desktop-hero__panel activity-finder">
+        <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Suche und Filter">
+          <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
+            <!-- === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 | Zweck: ergänzt einen eigenen Clear-Button im Suchfeld, der ausschließlich die Freitextsuche löscht; Umfang: nur Search-Control im Aktivitäten-Finder === -->
+            <div class="desktop-hero__search-field activity-finder__search-field">
+              <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
+              <input
+                id="search-filter"
+                type="search"
+                placeholder="Aktivität oder Ort"
+                aria-label="Aktivitäten suchen"
+                autocomplete="off"
+                inputmode="search"
+              >
+              <button type="button" class="activity-search-clear" id="offer-search-clear" aria-label="Freitextsuche löschen" hidden>
+                <span data-ui-icon="x" aria-hidden="true"></span>
+              </button>
+            </div>
+            <!-- === END BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 === -->
+          </div>
+
+          <button
+            type="button"
+            class="filter-pill activity-finder__advanced-toggle"
+            id="offer-advanced-filter-toggle"
+            aria-expanded="false"
+            aria-controls="offer-advanced-filters"
+          >
+            <span class="filter-pill__label">Weitere Filter</span>
+            <span class="filter-pill__value" id="offer-advanced-filter-count">Optional</span>
+            <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+          </button>
+
+          <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
+            <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="desktop-hero__actions" aria-label="Service">
+          <a class="desktop-hero__action desktop-hero__action--publish" href="/angebote/sichtbar-werden/">
+            <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
+            <span>Als Aktivität sichtbar werden</span>
+          </a>
+
+          <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
+            <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
+            <span>Mehr erfahren</span>
+          </a>
+
+          <button
+            type="button"
+            class="desktop-hero__action desktop-hero__action--app"
+            data-pwa-install-trigger
+            aria-label="Als App installieren"
+          >
+            <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
+            <span>Als App nutzen</span>
+          </button>
+        </div>
       </div>
+      <!-- === END BLOCK: ACTIVITIES_FINDER_HERO_HTML_V2 === -->
     </section>
 
-    <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
-
-    <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HTML_V1 | Zweck: ersetzt die alten Einzel-Pills durch den semantischen Aktivitäten-Finder mit Suche, Schnellfiltern, Trefferzahl, aktiven Chips und ausklappbaren weiteren Filtern; Umfang: kompletter Desktop-Hero-Control-Block inklusive Entfernen der alten Filter-Sheets/Popovers === -->
-    <div class="top-stack desktop-hero__panel activity-finder" data-activity-finder>
-      <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Suche und Filter">
-        <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
-          <!-- === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 | Zweck: ergänzt einen eigenen Clear-Button im Suchfeld, der ausschließlich die Freitextsuche löscht; Umfang: nur Search-Control im Aktivitäten-Finder === -->
-          <div class="desktop-hero__search-field activity-finder__search-field">
-            <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
-            <input
-              id="search-filter"
-              type="search"
-              placeholder="Aktivität oder Ort"
-              aria-label="Aktivitäten suchen"
-              autocomplete="off"
-              inputmode="search"
-            >
-            <button type="button" class="activity-search-clear" id="offer-search-clear" aria-label="Freitextsuche löschen" hidden>
-              <span data-ui-icon="x" aria-hidden="true"></span>
-            </button>
-          </div>
-          <!-- === END BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 === -->
+    <!-- === BEGIN BLOCK: ACTIVITIES_FILTER_CARD_HTML_V1 | Zweck: eigene Filterkarte unter dem Hero für Schnellfilter, Trefferzahl und ausklappbare weitere Filter; Umfang: kompletter sichtbarer Activities-Filterbereich === -->
+    <section class="activity-finder-card" aria-label="Aktivitäten filtern">
+      <div class="activity-finder-card__head">
+        <div class="activity-finder-card__copy">
+          <h2 class="activity-finder-card__title">Schnellfilter</h2>
+          <p class="activity-finder-card__text">Häufige Situationen direkt auswählen.</p>
         </div>
-
-        <button
-          type="button"
-          class="filter-pill activity-finder__advanced-toggle"
-          id="offer-advanced-filter-toggle"
-          aria-expanded="false"
-          aria-controls="offer-advanced-filters"
-        >
-          <span class="filter-pill__label">Weitere Filter</span>
-          <span class="filter-pill__value" id="offer-advanced-filter-count">Optional</span>
-          <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-        </button>
-
-        <button type="button" class="filter-pill filter-pill--reset" id="offer-reset-pill" aria-label="Filter zurücksetzen" hidden>
-          <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
-        </button>
+        <div class="activity-finder__result-count" id="offer-result-count" aria-live="polite" aria-atomic="true">Aktivitäten werden geladen</div>
       </div>
 
       <div class="activity-finder__quick" aria-label="Häufig gesuchte Aktivitätenfilter">
-      <div class="activity-finder__quick-label">Schnellfilter</div>
+        <div class="activity-finder__quick-label">Schnellfilter</div>
         <div class="activity-finder__quick-options" id="offer-quick-filters">
           <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Mit Kindern">Mit Kindern</button>
           <button type="button" class="activity-filter-chip" data-filter-group="situation" data-filter-value="Bei Regen">Bei Regen</button>
@@ -172,7 +207,6 @@ Umfang:
       </div>
 
       <div class="activity-finder__status-row" aria-live="polite" aria-atomic="true">
-        <div class="activity-finder__result-count" id="offer-result-count">Aktivitäten werden geladen</div>
         <div class="activity-finder__active" id="offer-active-filters" hidden>
           <span class="activity-finder__active-label">Aktive Filter</span>
           <div class="activity-finder__active-list" id="offer-active-filter-list"></div>
@@ -240,32 +274,10 @@ Umfang:
           </fieldset>
         </div>
       </div>
-
-      <div class="desktop-hero__actions" aria-label="Service">
-        <a class="desktop-hero__action desktop-hero__action--publish" href="/angebote/sichtbar-werden/">
-          <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
-          <span>Als Aktivität sichtbar werden</span>
-        </a>
-
-        <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
-          <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
-          <span>Mehr erfahren</span>
-        </a>
-
-        <button
-          type="button"
-          class="desktop-hero__action desktop-hero__action--app"
-          data-pwa-install-trigger
-          aria-label="Als App installieren"
-        >
-          <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
-          <span>Als App nutzen</span>
-        </button>
-      </div>
-    </div>
-    <!-- === END BLOCK: ACTIVITIES_FINDER_HTML_V1 === -->
-  </section>
-  <!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V4 (full event-shell parity) === -->
+    </section>
+    <!-- === END BLOCK: ACTIVITIES_FILTER_CARD_HTML_V1 === -->
+  </div>
+<!-- === END BLOCK: ACTIVITIES INTRO + CONTROLS V5 (desktop hero + filter card split) === -->
 
   <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
     <div class="loading-spinner" aria-hidden="true"></div>
