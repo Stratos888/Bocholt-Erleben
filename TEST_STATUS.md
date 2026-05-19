@@ -972,48 +972,106 @@ robustere Funktionalität als versteckter Tarifwert
 Push für Aktivitäten bleibt best-effort:
 kein Blocker für den Aktivitäten-Funnel
 bestehender Push-Mechanismus kann später weiterverwendet werden
-Noch final zu prüfende Smoke-Tests nach letzter Patch-Anwendung
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_FINAL_SMOKE_2026_05_19 | Zweck: dokumentiert den finalen Smoke-Test nach Account-Kontext-, Checkout-Endpoint- und Inbox-Terminalstatus-Fixes; Umfang: ersetzt den bisherigen offenen Smoke-Testbedarf durch den abgeschlossenen Prüfstand === -->
 
-Diese Punkte müssen im nächsten finalen Check noch einmal kurz bestätigt werden, ohne den gesamten E2E-Funnel neu konzeptionell aufzurollen:
+## Finaler Smoke-Test nach letzter Patch-Anwendung
 
-/angebote/sichtbar-werden/
-Zielreihenfolge Hero → Eignung → Tarifwahl → Ablauf
-finale Wording-Texte korrekt
-mobile Lesbarkeit der Eignungskarte
-/angebote/sichtbar-werden/einreichen/?plan=activity_basic
-Basis vorausgewählt
-Feldreihenfolge korrekt
-Verfügbarkeit-Dropdown vorhanden
-Pflichtfeldvalidierung greift
-/angebote/sichtbar-werden/einreichen/?plan=activity_plus
-Plus vorausgewählt
-Tarifwechsel wird korrekt übertragen
-/angebote/sichtbar-werden/erfolg/
-flow=submitted
-flow=existing-subscription
-session_id-Fall
-CTAs und Texte je Zustand korrekt
-Testeinreichung:
-Dropdown-Wert wird als Verfügbarkeit übertragen
-Erfolgsseite wird erreicht
-/angebote/
-Einstiegskarte Als Aktivität sichtbar werden bleibt kurz und korrekt
-Aktueller Funktionsstatus
+- Datum: 2026-05-19
+- Umgebung: Staging
+- Funktion: Aktivitäten-Funnel / Aktivitätspräsenz
+- Ergebnis: bestanden
+- Status: V1 abgeschlossen und eingefroren
 
-Der Aktivitäten-Funnel ist als V1 funktional aufgebaut und im Kern E2E geprüft.
+### Geprüfte finale Fixes
 
-Nicht erneut vollständig neu zu prüfen sind:
+Bestanden:
 
-Grundarchitektur Submission → Review-Inbox
-Zahlungsfreigabe
-Zahlungslink
-Stripe Checkout / bestehende Subscription
-Webhook paid
-Inbox-Veröffentlichung
-Zählung erst bei Veröffentlichung
-Anbieteränderung → erneute Prüfung → Veröffentlichung ohne Doppelzählung
+- `api/stripe/create-checkout-session.php` ist wieder lauffähig.
+- Empty-Body-Proof liefert kein leeres `500` mehr.
+- Empty-Body-Proof liefert kontrolliert JSON:
+  - HTTP `422`
+  - `submission_id is required.`
+- Zahlungsfreigabe erzeugt wieder einen Zahlungslink.
+- Zahlungslink führt zu Stripe Checkout.
+- Stripe Checkout zeigt:
+  - `Aktivitätspräsenz Basis`
+  - `9,99 € / Monat`
+- Zahlung führt auf die Aktivitäts-Erfolgsseite.
+- Erfolgsseite zeigt `Zahlung erhalten`.
+- CTA `Anbieterbereich öffnen` enthält den korrekten E-Mail-Kontext:
+  - `/fuer-veranstalter/login/?email=...`
+- Anbieterbereich öffnet den passenden Organizer-Account.
+- Dashboard zeigt die neue Aktivitäts-Einreichung im richtigen Account.
+- Aktivitäts-Einreichung wird als `Aktivität bezahlt – in Prüfung` angezeigt.
+- Terminalstatus-Fix in der Inbox funktioniert:
+  - abgelehnte Fälle verschwinden aus der aktuellen Inbox-Ansicht
+  - nach Reload bleiben abgelehnte Fälle aus der Inbox heraus
+  - kein erneuter Reject auf bereits abgelehnte Fälle
+  - kein Frontend-Abbruch durch undefinierte Statusfunktion
 
-Noch erforderlich ist ein finaler visueller und funktionaler Smoke-Test des letzten Wording-/UI-Stands.
+### Belegte Root-Cause-Korrekturen
 
+Korrigiert:
+
+- Alte Portal-Sessions überlagern den Magic-Link-Kontext nicht mehr bei fehlgeschlagener Magic-Link-Einlösung.
+- Aktivitäts-Einreichungen übernehmen keine abweichende alte Portal-Session mehr, wenn die Formular-E-Mail nicht zur Session-E-Mail passt.
+- Aktivitäts-Zahlungsrücksprünge führen den E-Mail-Kontext bis zur Erfolgsseite mit.
+- Der Anbieterbereich-CTA führt mit E-Mail-Prefill zum richtigen Login-Kontext.
+- Der Checkout-Endpoint antwortet wieder stabil mit JSON statt leerem `500`.
+- Terminale Review-Status werden im Inbox-Frontend nicht mehr als weiter bearbeitbare Karte stehen gelassen.
+
+### Geprüfte E2E-Kette
+
+Der finale Staging-Test belegt diese Kette:
+
+1. Aktivität einreichen.
+2. Eingangs-Mail wird versendet.
+3. Aktivität erscheint in der Review-Inbox.
+4. Zahlung wird freigegeben.
+5. Zahlungslink-Mail wird versendet.
+6. Zahlungslink öffnet Stripe Checkout.
+7. Zahlung wird abgeschlossen.
+8. Erfolgsseite zeigt Zahlungserhalt.
+9. Anbieterbereich-CTA führt in den richtigen Account-Kontext.
+10. Dashboard zeigt die Aktivität beim korrekten Organizer.
+11. Terminalstatus-Aktionen in der Inbox entfernen Fälle aus der aktiven Review-Ansicht.
+
+### Nicht erneut künstlich getestet
+
+Nicht erneut künstlich erzeugt wurde ein zusätzlicher bezahlter Testfall nur für eine weitere Veröffentlichungsaktion.
+
+Begründung:
+
+- Der Veröffentlichungspfad wurde zuvor backendseitig per SQL belegt.
+- Die betroffene Frontend-Terminalstatus-Logik wurde anschließend über den Ablehnen-Test erfolgreich verifiziert.
+- Ein erneuter Veröffentlichungs-Test hätte einen weiteren vollständigen Zahlungsfall erzeugt und keinen zusätzlichen Erkenntnisgewinn für den V1-Freeze geliefert.
+
+### Bekannte Nicht-Blocker
+
+Diese Punkte sind keine Blocker für den V1-Freeze:
+
+- Staging enthält mehrere Test-Abos im selben Organizer-Account.
+- Stripe-Sandbox kann testweise `webhook-test@example.com` anzeigen.
+- Alte Testdaten mit gleichen Organisationsnamen können verwirren, sind aber kein Funktionsfehler.
+- Produktlogik für spätere Abo-Bereinigung oder Upgrade-/Reuse-Komfort bleibt ein separater späterer Workpack.
+
+### Freeze-Entscheidung
+
+Der Aktivitäten-Funnel gilt damit als V1-funktional abgeschlossen.
+
+Eingefroren sind:
+
+- Entscheidungsseite `/angebote/sichtbar-werden/`
+- Formularseite `/angebote/sichtbar-werden/einreichen/`
+- Erfolgsseite `/angebote/sichtbar-werden/erfolg/`
+- Review-before-payment-Flow
+- Aktivitäts-Zahlungslink-Flow
+- Anbieterbereich-Kontext nach Zahlung
+- Dashboard-Anzeige der Aktivitäts-Einreichungen
+- Inbox-Terminalstatus-Verhalten für abgelehnte/veröffentlichte Fälle
+
+Weitere Änderungen an diesem Funnel nur noch bei konkretem Symptom oder neuer Produktanforderung.
+
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_FINAL_SMOKE_2026_05_19 === -->
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
 <!-- === END FILE: TEST_STATUS.md === -->
