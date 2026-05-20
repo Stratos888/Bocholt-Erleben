@@ -3579,7 +3579,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card__toggle{
-    display: inline-flex;
+    display: inline-flex !important;
   }
 
   body.page-route-activities .activity-finder-card__title{
