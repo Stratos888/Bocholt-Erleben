@@ -139,7 +139,15 @@ Do not mix feature work with unrelated UI polish in the same workpack.
 
 ## 6. PATCH OUTPUT CONTRACT
 
-- Output code/document changes as concrete replace instructions only.
+Preferred output format:
+
+- Use a unified Git patch when the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
+- The user validates first with `git apply --check patch.diff` before applying the patch.
+- The patch must be consolidated, owner-file focused, and free of unrelated edits.
+
+Fallback format:
+
+- Use concrete replace instructions when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
 - Always specify:
   - file
   - exact BEGIN line
