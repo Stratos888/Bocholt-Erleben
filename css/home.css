@@ -3155,8 +3155,8 @@ body.page-route-activities .activity-finder__mobile-toggle{
   grid-row: 1;
   gap: 5px;
   width: auto;
-  min-width: 88px;
-  max-width: 110px;
+  min-width: 86px;
+  max-width: 104px;
   min-height: var(--cmp-input-minh);
   margin: 0;
   padding: 0 10px;
@@ -3271,9 +3271,10 @@ body.page-route-activities .activity-finder-card__controls{
   min-width: 0;
 }
 
-body.page-route-activities .activity-finder-card .activity-finder__quick,
-body.page-route-activities .activity-finder-card .activity-finder__quick-options{
-  display: contents;
+body.page-route-activities .activity-finder-card .activity-finder__quick{
+  display: grid;
+  gap: 7px;
+  min-width: 0;
 }
 
 body.page-route-activities .activity-finder-card .activity-finder__quick-label{
@@ -3306,7 +3307,6 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
 }
 
 body.page-route-activities .activity-finder-card .activity-filter-chip,
-body.page-route-activities .activity-finder-card__reset,
 body.page-route-activities .activity-finder__advanced-reset{
   appearance: none;
   box-sizing: border-box;
@@ -3372,6 +3372,10 @@ body.page-route-activities .activity-finder-card__toggle{
   display: none;
 }
 
+body.page-route-activities .activity-finder-card__reset{
+  display: none !important;
+}
+
 body.page-route-activities .activity-filter-chip.is-active{
   border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 24%, var(--home-action-border, rgba(24,40,30,0.14)) 76%);
   background: linear-gradient(
@@ -3399,7 +3403,6 @@ body.page-route-activities .activity-filter-chip[disabled]:not(.is-active){
 
 body.page-route-activities .activity-filter-chip:focus-visible,
 body.page-route-activities .activity-finder__mobile-toggle:focus-visible,
-body.page-route-activities .activity-finder-card__reset:focus-visible,
 body.page-route-activities .activity-finder__advanced-reset:focus-visible{
   outline: 2px solid var(--cmp-btn-focus-ring, rgba(111,135,88,0.42));
   outline-offset: 2px;
@@ -3410,7 +3413,6 @@ body.page-route-activities .activity-finder__advanced-reset:active{
   transform: translateY(1px);
 }
 
-body.page-route-activities .activity-finder-card__reset[hidden],
 body.page-route-activities .activity-finder__advanced[hidden],
 body.page-route-activities .activity-finder__advanced-summary[hidden],
 body.page-route-activities .activity-finder__advanced-reset[hidden]{
@@ -3431,8 +3433,7 @@ body.page-route-activities .activity-finder-card .activity-finder__active[hidden
       "status";
   }
 
-  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card__controls .activity-filter-chip,
-  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card .activity-finder__quick-label,
+  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card__controls,
   body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card .activity-finder__result-count{
     display: none;
   }
