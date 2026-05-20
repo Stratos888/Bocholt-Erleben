@@ -3146,31 +3146,19 @@ body.page-route-activities .activity-search-clear:active{
 }
 
 body.page-route-activities .activity-finder__mobile-toggle{
-  appearance: none;
-  box-sizing: border-box;
+  grid-column: 2;
+  grid-row: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  grid-column: 2;
-  grid-row: 1;
   gap: 5px;
   width: auto;
   min-width: 88px;
   max-width: 110px;
   min-height: var(--cmp-input-minh);
-  margin: 0;
-  padding: 0 10px;
-  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
+  padding-inline: 10px;
   border-radius: var(--cmp-input-radius);
-  background: rgba(255,255,252,0.88);
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 78%, var(--home-copy-muted, #546459) 22%);
-  font: inherit;
-  line-height: 1;
-  white-space: nowrap;
-  box-shadow: var(--cmp-input-shadow-strong);
-  cursor: pointer;
   justify-self: stretch;
-  -webkit-tap-highlight-color: transparent;
 }
 
 body.page-route-activities .activity-finder__mobile-toggle .filter-pill__label{
@@ -3186,14 +3174,16 @@ body.page-route-activities .activity-finder__mobile-toggle .filter-pill__label::
   font-weight: 760;
 }
 
-body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value{
+body.page-route-activities .activity-finder__mobile-toggle.has-active-filter-count::before{
+  content: attr(data-active-count);
   order: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   min-width: 18px;
   height: 18px;
-  padding: 0 5px;
+  padding-inline: 5px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--brand-green-900, #18281e) 10%, rgba(255,255,255,0.92) 90%);
   color: var(--brand-green-900, #18281e);
@@ -3202,7 +3192,7 @@ body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value{
   line-height: 1;
 }
 
-body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value:empty{
+body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value{
   display: none;
 }
 
@@ -3212,8 +3202,6 @@ body.page-route-activities .activity-finder__mobile-toggle .filter-pill__chevron
   width: 14px;
   height: 14px;
   margin-left: 0;
-  color: currentColor;
-  opacity: 0.86;
   transition: transform 160ms ease;
 }
 
@@ -3237,6 +3225,13 @@ body.page-route-activities .activity-finder-card{
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])){
+  grid-template-areas:
+    "advanced"
+    "quick"
+    "status";
 }
 
 body.page-route-activities .activity-finder-card__head{
@@ -3268,19 +3263,21 @@ body.page-route-activities .activity-finder-card__controls{
   grid-area: quick;
   display: grid;
   gap: 7px;
+  width: 100%;
   min-width: 0;
+  margin-top: 2px;
 }
 
 body.page-route-activities .activity-finder-card .activity-finder__quick{
   display: grid;
   gap: 7px;
-  min-width: 0;
-}
-
-body.page-route-activities .activity-finder-card .activity-finder__quick-label{
-  display: block;
   width: 100%;
   min-width: 0;
+  margin: 0;
+}
+
+body.page-route-activities .activity-finder-card .activity-finder__quick-label,
+body.page-route-activities .activity-finder-card .activity-finder__group-title{
   margin: 0;
   color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
   font-size: 0.72rem;
@@ -3301,9 +3298,15 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 7px;
   width: 100%;
-  max-width: 100%;
-  min-width: 0;
   overflow: visible;
+  padding-bottom: 0;
+  padding-inline-end: 0;
+}
+
+body.page-route-activities .activity-finder-card .activity-finder__status-row,
+body.page-route-activities .activity-finder-card .activity-finder__active,
+body.page-route-activities .activity-finder-card .activity-finder__active[hidden]{
+  display: none !important;
 }
 
 body.page-route-activities .activity-finder-card .activity-filter-chip,
@@ -3331,7 +3334,6 @@ body.page-route-activities .activity-finder__advanced-reset{
   font-size: 0.78rem;
   font-weight: 680;
   line-height: 1;
-  text-align: center;
   white-space: nowrap;
   box-shadow:
     0 1px 0 rgba(255,255,255,0.68) inset,
@@ -3357,6 +3359,10 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
   font-size: clamp(0.70rem, 3.1vw, 0.76rem);
 }
 
+body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip.is-active::after{
+  margin-left: 4px;
+}
+
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Mit Kindern"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Bei Regen"],
 body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip[data-filter-value="Draußen"]{
@@ -3368,10 +3374,7 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-options
   grid-column: span 3;
 }
 
-body.page-route-activities .activity-finder-card__toggle{
-  display: none;
-}
-
+body.page-route-activities .activity-finder-card__toggle,
 body.page-route-activities .activity-finder-card__reset{
   display: none !important;
 }
@@ -3419,22 +3422,9 @@ body.page-route-activities .activity-finder__advanced-reset[hidden]{
   display: none !important;
 }
 
-body.page-route-activities .activity-finder-card .activity-finder__status-row,
-body.page-route-activities .activity-finder-card .activity-finder__active,
-body.page-route-activities .activity-finder-card .activity-finder__active[hidden]{
-  display: none !important;
-}
-
 @media (max-width: 899.98px){
-  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card{
-    grid-template-areas:
-      "advanced"
-      "quick"
-      "status";
-  }
-
-  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card__controls,
-  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card .activity-finder__result-count{
+  body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])) .activity-finder-card__controls,
+  body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])) .activity-finder__result-count{
     display: none;
   }
 }
@@ -3445,6 +3435,26 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced{
   z-index: 2;
   width: 100%;
   min-width: 0;
+}
+
+body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.985) 0%,
+    rgba(251,252,247,0.985) 100%
+  );
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.86) inset,
+    0 8px 20px rgba(12,24,16,0.045);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 body.page-route-activities .activity-finder-card .activity-finder__advanced-summary{
@@ -3487,92 +3497,82 @@ body.page-route-activities .activity-finder__advanced-reset{
   box-shadow: 0 1px 0 rgba(255,255,255,0.82) inset;
 }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  width: 100%;
-  min-width: 0;
-  max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 64px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
-  padding: 11px 11px 16px;
-  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
-  border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.992) 0%,
-    rgba(251,252,247,0.992) 100%
-  );
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.88) inset,
-    0 8px 20px rgba(12,24,16,0.045);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
+@media (max-width: 899.98px){
+  body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
+    gap: 0;
+    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 64px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    padding: 11px 11px 16px;
+    border-radius: 18px;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.992) 0%,
+      rgba(251,252,247,0.992) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.88) inset,
+      0 8px 20px rgba(12,24,16,0.045);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group{
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group{
+    gap: 8px;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group:first-child{
-  padding-top: 11px;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group:first-child{
+    padding-top: 11px;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group + .activity-finder__group{
-  margin-top: 12px;
-  padding-top: 11px;
-  border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 58%, transparent 42%);
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group + .activity-finder__group{
+    margin-top: 12px;
+    padding-top: 11px;
+    border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 58%, transparent 42%);
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title{
-  display: block;
-  min-height: 12px;
-  margin: 0;
-  padding-inline: 2px;
-  color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
-  font-size: 0.70rem;
-  font-weight: 790;
-  line-height: 1;
-  letter-spacing: 0.085em;
-  text-transform: uppercase;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title{
+    display: block;
+    min-height: 12px;
+    padding-inline: 2px;
+    color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
+    font-size: 0.70rem;
+    font-weight: 790;
+    line-height: 1;
+    letter-spacing: 0.085em;
+    text-transform: uppercase;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title::after{
-  content: none;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title::after{
+    content: none;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  width: 100%;
-  min-width: 0;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip{
-  width: 100%;
-  min-width: 0;
-  min-height: 31px;
-  padding-inline: 9px;
-  justify-content: center;
-  font-size: 0.75rem;
-}
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip{
+    width: 100%;
+    min-width: 0;
+    min-height: 31px;
+    padding-inline: 9px;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
 
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
-body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
-  grid-column: 1 / -1;
-  justify-content: center;
-  padding-inline: 12px;
-  text-align: center;
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
+    grid-column: 1 / -1;
+    justify-content: center;
+    padding-inline: 12px;
+    text-align: center;
+  }
 }
 
 @media (min-width: 900px){
