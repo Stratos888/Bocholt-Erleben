@@ -3865,7 +3865,13 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     padding-top: 0;
   }
 
-  body.page-route-activities .activity-finder-card{
+  body.page-route-activities .activity-finder-card,
+  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card,
+  body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])){
+    grid-template-areas:
+      "head"
+      "controls"
+      "advanced";
     width: min(calc(100% - 48px), var(--desktop-shell-max));
     margin: 8px auto 0;
     padding: 8px 14px 9px;
@@ -3882,6 +3888,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card__head{
+    grid-area: head;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -3890,21 +3897,31 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card__title{
+    display: block;
+    margin: 0;
     font-size: 0.80rem;
     font-weight: 810;
+    white-space: nowrap;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__result-count{
     flex: 0 0 auto;
+    width: auto;
+    margin: 0;
     font-size: 0.74rem;
     font-weight: 740;
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
   }
 
   body.page-route-activities .activity-finder-card__controls{
+    grid-area: controls;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 5px;
+    min-width: 0;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick{
@@ -3914,6 +3931,19 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     min-width: 0;
     max-width: 100%;
     margin: 0;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__quick-label{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__quick-options{
@@ -4138,4 +4168,5 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
       0 4px 10px rgba(12,24,16,0.024);
   }
 }
-/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V9 === *//* === END BLOCK: HOME_CSS_STEP_4 === */
+/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
+/* === END BLOCK: HOME_CSS_STEP_4 === */
