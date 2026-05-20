@@ -121,7 +121,7 @@ Umfang:
 
       <!-- === END BLOCK: ACTIVITIES_HERO_COPY_STRUCTURE_FIX_V1 === -->
 
-      <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HERO_HTML_V3 | Zweck: hält im Hero nur Suche und Service-Rail; alle Activities-Filter liegen geschlossen in der Filterbar unter dem Hero === -->
+      <!-- === BEGIN BLOCK: ACTIVITIES_FINDER_HERO_HTML_V4 | Zweck: Mobile führt Suche + Filterbutton in einer Zeile wie im ursprünglichen Zielzustand; Desktop hält im Hero nur Suche und Service-Rail, Filterbar bleibt unter dem Hero === -->
       <div class="top-stack desktop-hero__panel activity-finder">
         <div class="desktop-hero__search-row activity-finder__search-row" aria-label="Aktivitäten suchen">
           <div class="events-filter desktop-hero__search-slot activity-finder__search-slot">
@@ -142,6 +142,17 @@ Umfang:
             </div>
             <!-- === END BLOCK: ACTIVITIES_SEARCH_CLEAR_HTML_V1 === -->
           </div>
+
+          <button
+            type="button"
+            class="filter-pill activity-finder__advanced-toggle activity-finder__mobile-toggle"
+            aria-expanded="false"
+            aria-controls="offer-advanced-filters"
+          >
+            <span class="filter-pill__label">Filter</span>
+            <span class="filter-pill__value"></span>
+            <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
+          </button>
         </div>
 
         <div class="desktop-hero__actions" aria-label="Service">
@@ -166,7 +177,7 @@ Umfang:
           </button>
         </div>
       </div>
-      <!-- === END BLOCK: ACTIVITIES_FINDER_HERO_HTML_V3 === -->
+      <!-- === END BLOCK: ACTIVITIES_FINDER_HERO_HTML_V4 === -->
     </section>
 
     <!-- === BEGIN BLOCK: ACTIVITIES_FILTER_BAR_HTML_V1 | Zweck: kompakte Desktop-Filterbar für Schnellfilter, Trefferzahl und ausklappbare weitere Filter; Umfang: kompletter sichtbarer Activities-Filterbereich === -->
