@@ -3155,8 +3155,8 @@ body.page-route-activities .activity-finder__mobile-toggle{
   grid-row: 1;
   gap: 5px;
   width: auto;
-  min-width: 86px;
-  max-width: 104px;
+  min-width: 88px;
+  max-width: 110px;
   min-height: var(--cmp-input-minh);
   margin: 0;
   padding: 0 10px;
@@ -3231,7 +3231,7 @@ body.page-route-activities .activity-finder-card{
   gap: 8px;
   width: calc(100% - 24px);
   max-width: var(--desktop-shell-max, 1028px);
-  margin: 10px auto 14px;
+  margin: 1px auto 14px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -4140,5 +4140,4 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
       0 4px 10px rgba(12,24,16,0.024);
   }
 }
-/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V8 === */
-/* === END BLOCK: HOME_CSS_STEP_4 === */
+/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V9 === *//* === END BLOCK: HOME_CSS_STEP_4 === */
