@@ -149,6 +149,20 @@ Fallback format:
 
 - Use concrete replace instructions when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
 - Always specify:
+
+Baseline rule for Git patches:
+
+- Before a Git patch is created, the current repository state must be proven with:
+  - `git status --short`
+  - `git branch --show-current`
+  - `git pull --ff-only`
+  - `git rev-parse --short HEAD`
+- A Git patch may only be created against that proven branch and commit SHA, or against a fresh ZIP exported from that same state.
+- Every Git patch must be validated with `git apply --check patch.diff` before it is applied.
+- If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
+- In that case, re-check the current repository state and create a new patch from the updated baseline.
+
+Concrete replace instructions must:
   - file
   - exact BEGIN line
   - exact END line
