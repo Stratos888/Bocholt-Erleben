@@ -57,6 +57,7 @@ const OffersApp = {
     searchClear: null,
     searchRow: null,
     resetPill: null,
+    advancedToggles: [],
     advancedToggle: null,
     advancedPanel: null,
     advancedCount: null,
@@ -118,7 +119,8 @@ const OffersApp = {
     this.refs.searchClear = document.getElementById("offer-search-clear");
     this.refs.searchRow = document.querySelector(".desktop-hero__search-row");
     this.refs.resetPill = document.getElementById("offer-reset-pill");
-    this.refs.advancedToggle = document.getElementById("offer-advanced-filter-toggle");
+    this.refs.advancedToggles = Array.from(document.querySelectorAll(".activity-finder__advanced-toggle"));
+    this.refs.advancedToggle = this.refs.advancedToggles[0] || null;
     this.refs.advancedPanel = document.getElementById("offer-advanced-filters");
     this.refs.advancedCount = document.getElementById("offer-advanced-filter-count");
     this.refs.advancedSummary = document.getElementById("offer-advanced-filter-summary");
@@ -276,7 +278,6 @@ const OffersApp = {
       searchInput,
       searchClear,
       resetPill,
-      advancedToggle,
       activeFilterList
     } = this.refs;
 
@@ -315,12 +316,13 @@ const OffersApp = {
       });
     }
 
-    if (advancedToggle) {
-      advancedToggle.addEventListener("click", (event) => {
+    const toggles = Array.isArray(this.refs.advancedToggles) ? this.refs.advancedToggles : [];
+    toggles.forEach((toggle) => {
+      toggle.addEventListener("click", (event) => {
         event.preventDefault();
         this.toggleAdvancedFilters();
       });
-    }
+    });
 
     if (resetPill) {
       resetPill.addEventListener("click", () => {
@@ -455,9 +457,9 @@ const OffersApp = {
     }
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V2 | Zweck: synchronisiert den geöffneten Zustand des erweiterten Filterpanels am Finder-Root und aktualisiert danach die Panel-Summary sofort; Umfang: ersetzt nur openAdvancedFilters() und closeAdvancedFilters() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V3 | Zweck: synchronisiert geöffneten Zustand für Desktop- und Mobile-Filtertoggle gemeinsam; Umfang: ersetzt nur openAdvancedFilters() und closeAdvancedFilters() === */
   openAdvancedFilters() {
-    const { advancedPanel, advancedToggle, finder } = this.refs;
+    const { advancedPanel, finder } = this.refs;
     if (!advancedPanel) return;
 
     advancedPanel.hidden = false;
@@ -467,16 +469,11 @@ const OffersApp = {
       finder.classList.add("is-advanced-open");
     }
 
-    if (advancedToggle) {
-      advancedToggle.setAttribute("aria-expanded", "true");
-      advancedToggle.classList.add("is-active");
-    }
-
     this.updateFinderUI();
   },
 
   closeAdvancedFilters() {
-    const { advancedPanel, advancedToggle, finder } = this.refs;
+    const { advancedPanel, finder } = this.refs;
     if (!advancedPanel) return;
 
     advancedPanel.hidden = true;
@@ -486,14 +483,9 @@ const OffersApp = {
       finder.classList.remove("is-advanced-open");
     }
 
-    if (advancedToggle) {
-      advancedToggle.setAttribute("aria-expanded", "false");
-      advancedToggle.classList.remove("is-active");
-    }
-
     this.updateFinderUI();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V2 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V3 === */
 
   getOfferFilterValues(offer, group) {
     return this.normalizeArray(offer?.filter?.[group]);
@@ -740,15 +732,13 @@ const OffersApp = {
       : `${count} Aktivitäten gefunden`;
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V4 | Zweck: hält Suchfeld-Clear, Filterbutton-Zähler, Panel-Zustand und Reset robust synchron; vermeidet im geöffneten Desktop-Panel eine doppelte reine Trefferzeile, weil die Trefferzahl dauerhaft in der Filterbar steht; Umfang: ersetzt nur updateFinderUI() === */
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 | Zweck: synchronisiert Desktop- und Mobile-Filtertoggle gemeinsam; Mobile zeigt nur die Zahl, Desktop zeigt „x aktiv“, Summary bleibt ohne doppelte Trefferzeile; Umfang: ersetzt nur updateFinderUI() === */
   updateFinderUI() {
     const activeCount = this.getActiveFilterCount();
     const hasActiveFilters = this.hasActiveFilters();
     const hasActiveFilterValues = activeCount > 0;
     const hasSearchTerm = String(this.searchTerm || "").trim().length > 0;
     const isAdvancedOpen = !!(this.refs.advancedPanel && !this.refs.advancedPanel.hidden);
-    const resultCount = Array.isArray(this.filteredOffers) ? this.filteredOffers.length : 0;
-    const resultLabel = resultCount === 1 ? "1 Treffer" : `${resultCount} Treffer`;
 
     if (this.refs.finder) {
       this.refs.finder.classList.toggle("has-active-filters", hasActiveFilterValues);
@@ -768,22 +758,28 @@ const OffersApp = {
       this.refs.searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
     }
 
-    if (this.refs.advancedToggle) {
-      this.refs.advancedToggle.classList.toggle("has-active-filter-count", hasActiveFilterValues);
-      this.refs.advancedToggle.dataset.activeCount = hasActiveFilterValues ? String(activeCount) : "";
-      this.refs.advancedToggle.setAttribute(
+    const toggles = Array.isArray(this.refs.advancedToggles) ? this.refs.advancedToggles : [];
+    toggles.forEach((toggle) => {
+      const isMobileToggle = toggle.classList.contains("activity-finder__mobile-toggle");
+      const countEl = toggle.querySelector(".filter-pill__value");
+
+      toggle.classList.toggle("has-active-filter-count", hasActiveFilterValues);
+      toggle.dataset.activeCount = hasActiveFilterValues ? String(activeCount) : "";
+      toggle.setAttribute("aria-expanded", isAdvancedOpen ? "true" : "false");
+      toggle.classList.toggle("is-active", isAdvancedOpen);
+      toggle.setAttribute(
         "aria-label",
         hasActiveFilterValues
           ? `Weitere Filter, ${activeCount} Filter aktiv`
           : "Weitere Filter"
       );
-    }
 
-    /* === BEGIN BLOCK: ACTIVITIES_FILTERBAR_TOGGLE_COUNT_TEXT_V1 | Zweck: entfernt „Optional“ aus dem Desktop-Filtertoggle; Zähler erscheint nur bei aktiven Filtern; Umfang: nur Textwert des Advanced-Count-Spans === */
-    if (this.refs.advancedCount) {
-      this.refs.advancedCount.textContent = hasActiveFilterValues ? `${activeCount} aktiv` : "";
-    }
-    /* === END BLOCK: ACTIVITIES_FILTERBAR_TOGGLE_COUNT_TEXT_V1 === */
+      if (countEl) {
+        countEl.textContent = hasActiveFilterValues
+          ? (isMobileToggle ? String(activeCount) : `${activeCount} aktiv`)
+          : "";
+      }
+    });
 
     if (this.refs.advancedSummary) {
       if (hasActiveFilters) {
@@ -799,12 +795,11 @@ const OffersApp = {
 
     if (this.refs.advancedSummaryText) {
       if (hasActiveFilterValues) {
-        const filterLabel = activeCount === 1
+        this.refs.advancedSummaryText.textContent = activeCount === 1
           ? "1 Filter aktiv"
           : `${activeCount} Filter aktiv`;
-        this.refs.advancedSummaryText.textContent = `${filterLabel} · ${resultLabel}`;
       } else if (hasSearchTerm) {
-        this.refs.advancedSummaryText.textContent = `Suche aktiv · ${resultLabel}`;
+        this.refs.advancedSummaryText.textContent = "Suche aktiv";
       } else {
         this.refs.advancedSummaryText.textContent = "";
       }
@@ -814,7 +809,7 @@ const OffersApp = {
     this.updateFilterButtonStates();
     this.renderActiveFilterChips();
   },
-  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V4 === */
+  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 === */
 
   applyFilterAndRender() {
     this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
