@@ -3020,8 +3020,8 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 }
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
-/* === BEGIN BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V8 | Zweck: konsolidierter Owner für Activities-Hero-Suche, Activities-Filterbar und gemeinsamen Desktop-Hero-Contract; Mobile-first mit Rückführung auf den früheren kompakten Mobile-Zustand, danach Desktop; keine nachgelagerten Gegen-Overrides === */
-body.page-route-activities .activity-finder-shell{ 
+/* === BEGIN BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V9 | Zweck: konsolidierter Owner für Activities-Hero-Suche, Mobile-Filterzeile, Activities-Filterbar und gemeinsamen Desktop-Hero-Contract; Mobile stellt Suche + Filterbutton wieder in einer Zeile her, Desktop bleibt getrennt; keine nachgelagerten Gegen-Overrides === */
+body.page-route-activities .activity-finder-shell{
   display: block;
   min-width: 0;
 }
@@ -3043,8 +3043,8 @@ body.page-route-activities .activity-finder .desktop-hero__actions{
 body.page-route-activities .activity-finder__search-row,
 body.page-route-activities .activity-finder__search-row.has-active-filter-reset{
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
   align-items: stretch;
   width: 100%;
   min-width: 0;
@@ -3145,6 +3145,74 @@ body.page-route-activities .activity-search-clear:active{
   transform: translateY(-50%) scale(0.96);
 }
 
+body.page-route-activities .activity-finder__mobile-toggle{
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  grid-column: 2;
+  grid-row: 1;
+  gap: 6px;
+  width: auto;
+  min-width: max-content;
+  min-height: var(--cmp-input-minh);
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
+  border-radius: var(--cmp-input-radius);
+  background: rgba(255,255,252,0.88);
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 78%, var(--home-copy-muted, #546459) 22%);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: var(--cmp-input-shadow-strong);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.page-route-activities .activity-finder__mobile-toggle .filter-pill__label{
+  order: 1;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value{
+  order: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-green-900, #18281e) 10%, white 90%);
+  color: var(--brand-green-900, #18281e);
+  font-size: 0.66rem;
+  font-weight: 790;
+  line-height: 1;
+}
+
+body.page-route-activities .activity-finder__mobile-toggle .filter-pill__value:empty{
+  display: none;
+}
+
+body.page-route-activities .activity-finder__mobile-toggle .filter-pill__chevron{
+  order: 3;
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  color: currentColor;
+  opacity: 0.86;
+  transition: transform 160ms ease;
+}
+
+body.page-route-activities .activity-finder__mobile-toggle.is-active .filter-pill__chevron{
+  transform: rotate(90deg);
+}
+
 body.page-route-activities .activity-finder-card{
   box-sizing: border-box;
   display: grid;
@@ -3219,7 +3287,6 @@ body.page-route-activities .activity-finder-card .activity-finder__quick-label{
 }
 
 body.page-route-activities .activity-finder-card .activity-filter-chip,
-body.page-route-activities .activity-finder-card__toggle,
 body.page-route-activities .activity-finder-card__reset,
 body.page-route-activities .activity-finder__advanced-reset{
   appearance: none;
@@ -3261,11 +3328,7 @@ body.page-route-activities .activity-finder-card__controls .activity-filter-chip
 }
 
 body.page-route-activities .activity-finder-card__toggle{
-  order: 3;
-  gap: 6px;
-  border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 14%, var(--home-action-border, rgba(24,40,30,0.14)) 86%);
-  background: rgba(255,255,252,0.88);
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 78%, var(--home-copy-muted, #546459) 22%);
+  display: none;
 }
 
 body.page-route-activities .activity-filter-chip.is-active{
@@ -3294,70 +3357,11 @@ body.page-route-activities .activity-filter-chip[disabled]:not(.is-active){
 }
 
 body.page-route-activities .activity-filter-chip:focus-visible,
-body.page-route-activities .activity-finder-card__toggle:focus-visible,
+body.page-route-activities .activity-finder__mobile-toggle:focus-visible,
 body.page-route-activities .activity-finder-card__reset:focus-visible,
 body.page-route-activities .activity-finder__advanced-reset:focus-visible{
   outline: 2px solid var(--cmp-btn-focus-ring, rgba(111,135,88,0.42));
   outline-offset: 2px;
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__label{
-  order: 1;
-  flex: 0 0 auto;
-  min-width: 0;
-  font-size: 0;
-  font-weight: 760;
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__label::before{
-  content: "Weitere Filter";
-  display: inline;
-  font-size: 0.76rem;
-  font-weight: 760;
-}
-
-body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__label::before{
-  content: "Filter ausblenden";
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__label::after{
-  content: none;
-  display: none;
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__value{
-  order: 2;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--brand-green-900, #18281e) 10%, white 90%);
-  color: var(--brand-green-900, #18281e);
-  font-size: 0.65rem;
-  font-weight: 780;
-  line-height: 1;
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__value:empty{
-  display: none !important;
-}
-
-body.page-route-activities .activity-finder-card__toggle .filter-pill__chevron{
-  order: 3;
-  flex: 0 0 auto;
-  width: 12px;
-  height: 12px;
-  margin-left: 0;
-  color: currentColor;
-  opacity: 0.86;
-  transition: transform 160ms ease;
-}
-
-body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__chevron{
-  transform: rotate(90deg);
 }
 
 body.page-route-activities .activity-finder-card__reset[hidden],
@@ -3371,6 +3375,14 @@ body.page-route-activities .activity-finder-card .activity-finder__status-row,
 body.page-route-activities .activity-finder-card .activity-finder__active,
 body.page-route-activities .activity-finder-card .activity-finder__active[hidden]{
   display: none !important;
+}
+
+@media (max-width: 899.98px){
+  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card__controls .activity-filter-chip,
+  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card .activity-finder__quick-label,
+  body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card .activity-finder__result-count{
+    display: none;
+  }
 }
 
 body.page-route-activities .activity-finder-card .activity-finder__advanced{
@@ -3403,7 +3415,7 @@ body.page-route-activities .activity-finder__advanced-summary-text{
   font-weight: 760;
   line-height: 1.1;
   letter-spacing: 0;
-  text-transform: none;
+  text-transform: uppercase;
 }
 
 body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
@@ -3477,6 +3489,16 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px){
+  body.page-route-activities .activity-finder__mobile-toggle{
+    display: none !important;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle{
+    display: inline-flex;
   }
 }
 
