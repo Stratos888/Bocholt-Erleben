@@ -3020,8 +3020,7 @@ html[data-theme-preview] .desktop-hero__action .desktop-hero__icon{
 }
 
 /* === END BLOCK: HOME_THEME_LAB_PREVIEW_VARIANTS_V2 === */
-/* === BEGIN BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V6 | Zweck: konsolidierter Owner für Activities-Hero-Suche, Activities-Filterbar und gemeinsamen Desktop-Hero-Contract; Mobile-first, danach Desktop; keine nachgelagerten Gegen-Overrides === */
-body.page-route-activities .activity-finder-shell{
+/* === BEGIN BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V7 | Zweck: konsolidierter Owner für Activities-Hero-Suche, Activities-Filterbar und gemeinsamen Desktop-Hero-Contract; Mobile-first mit eigenem kompaktem Mobile-Contract, danach Desktop; keine nachgelagerten Gegen-Overrides === */body.page-route-activities .activity-finder-shell{
   display: block;
   min-width: 0;
 }
@@ -3148,13 +3147,13 @@ body.page-route-activities .activity-search-clear:active{
 body.page-route-activities .activity-finder-card{
   box-sizing: border-box;
   display: grid;
-  gap: 10px;
-  width: calc(100% - 32px);
+  gap: 8px;
+  width: calc(100% - 24px);
   max-width: var(--desktop-shell-max, 1028px);
-  margin: 12px auto 16px;
-  padding: 12px;
+  margin: 10px auto 14px;
+  padding: 10px;
   border: 1px solid color-mix(in srgb, var(--home-panel-border, rgba(24,40,30,0.14)) 72%, transparent 28%);
-  border-radius: 18px;
+  border-radius: 16px;
   background: linear-gradient(
     180deg,
     rgba(255,255,252,0.94) 0%,
@@ -3162,43 +3161,49 @@ body.page-route-activities .activity-finder-card{
   );
   box-shadow:
     0 1px 0 rgba(255,255,255,0.78) inset,
-    0 5px 14px rgba(12,24,16,0.026);
+    0 4px 12px rgba(12,24,16,0.024);
 }
 
 body.page-route-activities .activity-finder-card__head{
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: baseline;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 6px;
   min-width: 0;
 }
 
 body.page-route-activities .activity-finder-card__title{
+  flex: 0 0 auto;
   min-width: 0;
   margin: 0;
   color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 820;
-  line-height: 1.1;
-  letter-spacing: -0.008em;
-}
-
-body.page-route-activities .activity-finder-card .activity-finder__result-count{
-  min-width: max-content;
-  color: color-mix(in srgb, var(--brand-green-900, #18281e) 76%, var(--home-copy-muted, #546459) 24%);
-  font-size: clamp(0.62rem, 2.75vw, 0.70rem);
-  font-weight: 760;
-  line-height: 1;
-  letter-spacing: 0;
-  text-transform: none;
+  line-height: 1.05;
+  letter-spacing: -0.006em;
   white-space: nowrap;
 }
 
+body.page-route-activities .activity-finder-card .activity-finder__result-count{
+  flex: 1 1 auto;
+  min-width: 0;
+  color: color-mix(in srgb, var(--brand-green-900, #18281e) 74%, var(--home-copy-muted, #546459) 26%);
+  font-size: clamp(0.56rem, 2.45vw, 0.64rem);
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: right;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 body.page-route-activities .activity-finder-card__controls{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -3229,17 +3234,19 @@ body.page-route-activities .activity-finder__advanced-reset{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-width: 0;
-  min-height: 32px;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+  min-width: max-content;
+  min-height: 30px;
   margin: 0;
-  padding: 0 7px;
+  padding: 0 9px;
   border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 82%, transparent 18%);
   border-radius: 999px;
-  background: rgba(255,255,252,0.72);
+  background: rgba(255,255,252,0.76);
   color: color-mix(in srgb, var(--brand-green-900, #18281e) 86%, var(--brand-gold-300, #b69b4c) 14%);
   font: inherit;
-  font-size: clamp(0.68rem, 2.95vw, 0.74rem);
+  font-size: clamp(0.67rem, 2.85vw, 0.73rem);
   font-weight: 730;
   line-height: 1;
   text-align: center;
@@ -3314,7 +3321,7 @@ body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill_
 body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__label::before{
   content: "Filter ausblenden";
   display: inline;
-  font-size: clamp(0.68rem, 2.95vw, 0.74rem);
+  font-size: clamp(0.67rem, 2.85vw, 0.73rem);
   font-weight: 760;
 }
 
@@ -3326,7 +3333,7 @@ body.page-route-activities .activity-finder-card__toggle.has-active-filter-count
   order: 2;
   display: inline-flex !important;
   color: color-mix(in srgb, var(--home-copy-muted, #546459) 84%, var(--brand-green-900, #18281e) 16%);
-  font-size: 0.70rem;
+  font-size: 0.68rem;
   font-weight: 780;
   line-height: 1;
 }
@@ -3336,7 +3343,7 @@ body.page-route-activities .activity-finder-card__toggle .filter-pill__chevron{
   flex: 0 0 auto;
   width: 12px;
   height: 12px;
-  margin-left: 3px;
+  margin-left: 2px;
   color: currentColor;
   opacity: 0.86;
   transition: transform 160ms ease;
@@ -3353,10 +3360,6 @@ body.page-route-activities .activity-finder__advanced-reset[hidden]{
   display: none !important;
 }
 
-body.page-route-activities .activity-finder-card__reset{
-  grid-column: 1 / -1;
-}
-
 body.page-route-activities .activity-finder-card .activity-finder__status-row,
 body.page-route-activities .activity-finder-card .activity-finder__active,
 body.page-route-activities .activity-finder-card .activity-finder__active[hidden]{
@@ -3367,11 +3370,11 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced{
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
   min-width: 0;
   margin-top: 2px;
-  padding-top: 10px;
+  padding-top: 9px;
   border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 62%, transparent 38%);
 }
 
@@ -3388,7 +3391,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced-summ
 body.page-route-activities .activity-finder__advanced-summary-text{
   min-width: 0;
   color: color-mix(in srgb, var(--brand-green-900, #18281e) 82%, var(--home-copy-muted, #546459) 18%);
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 760;
   line-height: 1.1;
   letter-spacing: 0;
@@ -3398,7 +3401,7 @@ body.page-route-activities .activity-finder__advanced-summary-text{
 body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 9px;
   align-items: start;
   width: 100%;
   min-width: 0;
@@ -3409,7 +3412,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced-inne
   -webkit-overflow-scrolling: touch;
   padding: 10px 10px 14px;
   border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 66%, transparent 34%);
-  border-radius: 16px;
+  border-radius: 15px;
   background: rgba(255,255,252,0.72);
   box-shadow: 0 1px 0 rgba(255,255,255,0.76) inset;
 }
@@ -3426,7 +3429,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-title{
   margin: 0;
   color: color-mix(in srgb, var(--home-copy-muted, #546459) 88%, var(--brand-green-900, #18281e) 12%);
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 790;
   line-height: 1;
   letter-spacing: 0.075em;
@@ -3456,8 +3459,13 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 }
 
 @media (min-width: 600px) and (max-width: 899.98px){
+  body.page-route-activities .activity-finder-card{
+    width: calc(100% - 36px);
+    padding: 12px;
+  }
+
   body.page-route-activities .activity-finder-card__controls{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
@@ -4012,5 +4020,4 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
       0 4px 10px rgba(12,24,16,0.024);
   }
 }
-/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V6 === */
-/* === END BLOCK: HOME_CSS_STEP_4 === */
+/* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V7 === *//* === END BLOCK: HOME_CSS_STEP_4 === */
