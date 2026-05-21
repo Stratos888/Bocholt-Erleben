@@ -262,3 +262,59 @@ Canonical project control is limited to:
 - `ENGINEERING.md`
 - the uploaded ZIP
 - the active workpack input
+
+<!-- BEGIN PATCH_WORKFLOW_CORRECTION_V1 -->
+
+## Patch workflow correction
+
+For all future repo patches, use this order:
+
+1. First prove the current repo baseline:
+   - git status --short
+   - git branch --show-current
+   - git pull --ff-only
+   - git rev-parse --short HEAD
+
+2. Create patches only against the proven repo baseline.
+
+3. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
+
+4. For Git patches, always run:
+   - git apply --check patch.diff
+   - git apply patch.diff
+   - rm patch.diff
+   - git diff --check
+   - git diff -- <affected-file>
+
+5. If git apply --check fails:
+   - stop immediately
+   - verify the working tree
+   - inspect the current owner block
+   - do not retry with a similar large patch
+
+6. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
+
+7. A robust script patch must:
+   - target only the relevant owner file or owner block
+   - verify every selector/block uniquely before writing
+   - abort without writing if anything is missing or ambiguous
+   - end with git diff --check and git diff -- <affected-file>
+
+8. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
+
+9. After every failed patch attempt, run:
+   - git status --short
+   - git diff -- <affected-file>
+
+10. No blind retries.
+
+Correct sequence after a failed patch:
+
+failure
+-> verify working tree
+-> inspect current owner/block
+-> identify mismatch
+-> create smaller corrected patch
+-> validate fail-fast
+
+<!-- END PATCH_WORKFLOW_CORRECTION_V1 -->
