@@ -3918,7 +3918,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.page-route-activities .activity-finder-card__controls{
     grid-area: controls;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 5px;
     min-width: 0;
@@ -3973,9 +3973,29 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card__toggle{
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content;
+    max-width: max-content;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
     border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 14%, var(--home-action-border, rgba(24,40,30,0.14)) 86%);
     background: rgba(255,255,252,0.82);
     color: color-mix(in srgb, var(--brand-green-900, #18281e) 78%, var(--home-copy-muted, #546459) 22%);
+  }
+
+  body.page-route-activities .activity-finder-card__toggle .filter-pill__value:empty{
+    display: none !important;
+  }
+
+  body.page-route-activities .activity-finder-card__toggle .filter-pill__chevron{
+    flex: 0 0 auto;
+    width: 12px;
+    height: 12px;
+    margin-left: 0;
   }
 
   body.page-route-activities .activity-finder-card__toggle.is-active .filter-pill__label::before{
