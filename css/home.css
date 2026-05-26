@@ -4189,7 +4189,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V3 | Zweck: Desktop-Filter-Hierarchie systematisch bereinigen; Umfang: Desktop-Schnellfilter vollständig machen, erweiterten Desktop-Ort/Nähe-Block ausblenden, Filterbreite an Feed koppeln; Mobile bleibt funktional unverändert === */
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V4 | Zweck: Desktop-Filter-Surface an Activity-Cards angleichen; Umfang: nur Filterflächen-Materialität, bestehende Desktop-Hierarchie aus V3 bleibt erhalten, Mobile bleibt unverändert === */
 @media (max-width: 899.98px){
   body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip--desktop-only{
     display: none !important;
@@ -4269,16 +4269,16 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     margin: 9px auto 0;
     padding: 8px 12px 9px;
     gap: 7px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 46%, transparent 54%);
+    border: 1px solid rgba(18,34,26,0.058);
     border-radius: 16px;
     background: linear-gradient(
       180deg,
-      rgba(250,252,245,0.78) 0%,
-      rgba(239,246,228,0.62) 100%
+      rgba(255,255,255,0.91) 0%,
+      rgba(250,251,247,0.84) 100%
     );
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.66) inset,
-      0 4px 10px rgba(12,24,16,0.014);
+      0 1px 0 rgba(255,255,255,0.72) inset,
+      0 3px 8px rgba(12,24,16,0.010);
   }
 
   body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card,
@@ -4287,16 +4287,16 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     margin: 9px auto 0;
     padding: 10px 14px 12px;
     gap: 9px;
-    border-color: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 56%, transparent 44%);
+    border-color: rgba(18,34,26,0.068);
     border-radius: 18px;
     background: linear-gradient(
       180deg,
-      rgba(250,252,245,0.86) 0%,
-      rgba(239,246,228,0.72) 100%
+      rgba(255,255,255,0.935) 0%,
+      rgba(250,251,247,0.875) 100%
     );
     box-shadow:
-      0 1px 0 rgba(255,255,255,0.72) inset,
-      0 8px 18px rgba(12,24,16,0.022);
+      0 1px 0 rgba(255,255,255,0.76) inset,
+      0 5px 14px rgba(12,24,16,0.016);
   }
 
   body.page-route-activities .activity-finder-card__head{
@@ -4331,7 +4331,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 
   body.page-route-activities .activity-finder-card__toggle{
     padding: 0 10px;
-    background: rgba(255,255,252,0.86);
+    background: rgba(255,255,255,0.88);
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced{
@@ -4346,10 +4346,10 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.45fr) minmax(0, 0.82fr);
     gap: 9px 16px;
     padding: 10px 11px;
-    border-color: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 44%, transparent 56%);
+    border-color: rgba(18,34,26,0.046);
     border-radius: 14px;
-    background: rgba(255,255,252,0.44);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.60) inset;
+    background: rgba(255,255,255,0.40);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.58) inset;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="activity_type"]{
@@ -4381,7 +4381,7 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     text-align: center;
   }
 }
-/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V3 === */
+/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V4 === */
 
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
