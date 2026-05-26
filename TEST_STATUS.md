@@ -1073,5 +1073,120 @@ Eingefroren sind:
 Weitere Änderungen an diesem Funnel nur noch bei konkretem Symptom oder neuer Produktanforderung.
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_FINAL_SMOKE_2026_05_19 === -->
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_FINAL_SMOKE_2026_05_19 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26 | Zweck: dokumentiert Live-Go-live-Prüfung, Live/Staging-Inbox-Tab-Trennung und offenen echten Zahlungsbeweis; Umfang: Aktivitäten-Funnel, Sheet-Inbox-Trennung, Live-Basischecks === -->
+
+## Live-Readiness-Prüfung: Aktivitäten-Funnel und Inbox-Tab-Trennung
+
+- Datum: 2026-05-26
+- Umgebung: Staging und Live
+- Funktion: Aktivitäten-Funnel / Aktivitätspräsenz / Review-Inbox / Google-Sheet-Inbox-Trennung
+- Ergebnis: Live bis Stripe Checkout bestanden
+- Status: Go-live-fähig ohne echten Live-Zahlungsbeweis
+
+### Belegte Live-Basischecks
+
+Bestanden:
+
+- Live-DB-Schema vollständig.
+- Missing-only-Schema-Check liefert keine fehlenden Tabellen oder Spalten.
+- Nachmigration auf Live abgeschlossen:
+  - `submissions.organizer_edited_at`
+  - `submissions.organizer_edit_count`
+- GitHub Actions Main-Deploy erfolgreich.
+- Live-Status-Endpunkt liefert:
+  - `status: ok`
+  - `app_env: live`
+  - `checks.config: true`
+  - `checks.database: true`
+- Live-Checkout-Endpoint Empty-Body-Proof liefert kontrolliert:
+  - HTTP `422`
+  - `submission_id is required.`
+- Kein leerer `500` im Live-Checkout-Endpoint.
+
+### Belegte Google-Sheet-Inbox-Trennung
+
+Zielzustand:
+
+| Umgebung | Google-Sheet-Inbox-Tab | Archiv-Tab |
+|---|---|---|
+| `main` / Live | `Inbox` | `Inbox_Archive` |
+| `staging` | `Inbox_Staging` | `Inbox_Archive_Staging` |
+
+Bestanden:
+
+- Staging-Deploy-Log zeigt:
+  - `Google Sheet target resolved for staging.`
+  - `Inbox tab: Inbox_Staging`
+- Main-/Live-Deploy-Log zeigt:
+  - `Google Sheet target resolved for main.`
+  - `Inbox tab: Inbox`
+- Deploy-Workflow verwendet den resolved Tab tatsächlich für den Inbox-Export:
+  - `rng = f"{inbox_tab_name}!A:ZZ"`
+- `Inbox_Staging` war leer und die Staging-Inbox zeigte keine Live-/KI-Kandidaten mehr.
+- Live-Inbox zeigte weiterhin die Live-Einreichung aus dem produktiven Kontext.
+- Damit ist belegt: Staging liest nicht mehr den produktiven `Inbox`-Tab.
+
+### Belegte Live-Funnel-Kette bis Stripe Checkout
+
+Bestanden:
+
+1. Live-Formular `/angebote/sichtbar-werden/einreichen/?plan=activity_basic` geöffnet.
+2. Live-Aktivität eingereicht.
+3. Live-Erfolgsseite `Aktivität eingereicht` angezeigt.
+4. Eingangs-Mail `Deine Aktivität wurde zur Prüfung eingereicht` empfangen.
+5. Live-Inbox zeigt die Einreichung als `Aktivitätspräsenz`.
+6. Zahlungsfreigabe in der Live-Inbox funktioniert.
+7. Zahlungslink-Mail `Zahlung für deine Aktivitätspräsenz starten` empfangen.
+8. Live-Zahlungslink öffnet Stripe Checkout.
+9. Stripe Checkout zeigt:
+   - `Aktivitätspräsenz Basis`
+   - `9,99 € / Monat`
+   - monatliches Abo
+   - kein Sandbox-Hinweis
+10. Live-Inbox nutzt `Inbox`, Staging-Inbox nutzt `Inbox_Staging`.
+
+### Nicht live vollständig bewiesen
+
+Noch nicht mit echter Live-Zahlung geprüft:
+
+- echte Live-Zahlung
+- Live-Stripe-Webhook nach erfolgreicher Zahlung
+- Live-Erfolgsseite nach echter Zahlung
+- Live-Anbieterbereich nach echter Zahlung
+- Dashboard-Status nach echter Zahlung
+- Live-Veröffentlichung nach echter Zahlung
+
+Bewertung:
+
+- Bis Stripe Checkout ist der Live-Funnel belegt.
+- Vollständiger Live-E2E-Beweis benötigt eine echte Zahlung.
+- Der echte Zahlungstest ist ein separater, bewusster Smoke-Test und kein Blocker für den aktuellen Deploy-Stand.
+
+### Bekannte Nicht-Blocker
+
+- Staging- und Live-Inbox sind bewusst getrennt.
+- Live-Einreichungen sollen nicht in der Staging-Inbox erscheinen.
+- Staging-Inbox darf leer sein, wenn `Inbox_Staging` leer ist.
+- Mails sind Plain-Text-Mails; HTML-Mail-Design ist kein V1-Blocker.
+- Mail-Wording kann später poliert werden, ist aktuell aber funktional korrekt.
+- Stripe-Sandbox-/Testdaten aus früheren Staging-Tests sind kein Live-Blocker.
+- GitHub Actions hatte temporär Checkout-/Auth-Probleme; der spätere Main-Deploy war wieder erfolgreich.
+
+### Entscheidung
+
+Der Aktivitäten-Funnel und die Live/Staging-Inbox-Tab-Trennung gelten für den aktuellen Stand als ausreichend vorbereitet.
+
+Weitere Änderungen nur noch bei:
+
+- konkretem Live-Symptom,
+- bewusstem echten Live-Zahlungstest,
+- Mail-Template-Polish,
+- separater Testdaten-/Abo-Bereinigung,
+- neuer Produktanforderung.
+
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26 === -->
+
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
 <!-- === END FILE: TEST_STATUS.md === -->
