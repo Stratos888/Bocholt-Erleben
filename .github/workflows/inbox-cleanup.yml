@@ -35,5 +35,14 @@ jobs:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
+          set -e
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            export TAB_INBOX="Inbox_Staging"
+            export TAB_ARCHIVE="Inbox_Archive_Staging"
+          else
+            export TAB_INBOX="Inbox"
+            export TAB_ARCHIVE="Inbox_Archive"
+          fi
+          echo "Inbox cleanup tabs: ${TAB_INBOX} -> ${TAB_ARCHIVE}"
           python scripts/inbox-archive-cleanup.py
 # === END BLOCK: INBOX CLEANUP WORKFLOW (archive + delete finalized rows) ===

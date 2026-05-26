@@ -31,6 +31,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth
 
+      # === BEGIN BLOCK: INBOX_TO_EVENTS_MAIN_ONLY_GUARD_V1 | Zweck: verhindert, dass Staging-Test-Inbox-Zeilen in den produktiven Events-Tab importiert werden; Umfang: zusaetzlicher Fail-Fast-Guard vor dem Import ===
+      - name: Guard Inbox to Events production branch
+        run: |
+          set -e
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "❌ Inbox → Events Import darf nur auf main laufen. Staging-Inbox ist nur fuer Tests."
+            exit 1
+          fi
+      # === END BLOCK: INBOX_TO_EVENTS_MAIN_ONLY_GUARD_V1 ===
+
       - name: Run Inbox → Events import
         id: import
         env:

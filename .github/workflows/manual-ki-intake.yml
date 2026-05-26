@@ -48,15 +48,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth
 
-      # === BEGIN BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
-      # === END BLOCK: APPEND MANUAL JSON TO GOOGLE SHEET INBOX ===
+      # === BEGIN BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 | Zweck: verhindert, dass echte KI-Kandidaten aus staging in die Review-Kette laufen; Umfang: bricht Manual-KI-Intake außerhalb main hart ab ===
+      - name: Guard production KI intake branch
+        run: |
+          set -e
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "❌ Manual KI Event Intake darf nur auf main laufen. Staging ist nur für Tests."
+            exit 1
+          fi
+      # === END BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 ===
+
+      # === BEGIN BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 | Zweck: schreibt echte KI-Kandidaten ausschließlich auf main in den Live-Inbox-Tab und repariert den Run-Block; Umfang: ersetzt nur den Step-Kopf bis zum Python-Aufruf ===
       - name: Append manual inbox JSON to Google Sheet Inbox
         id: append_inbox_sheet
         env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -e
+          # === END BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 ===
           python - <<'PY'
           import json
           import os
@@ -338,13 +348,10 @@ jobs:
         run: |
           set -e
 
-          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            PUSH_URL="https://staging.bocholt-erleben.de/api/push/notify-inbox.php"
-            PUSH_SECRET="${STAGING_PUSH_SECRET:-}"
-          else
-            PUSH_URL="https://bocholt-erleben.de/api/push/notify-inbox.php"
-            PUSH_SECRET="${LIVE_PUSH_SECRET:-}"
-          fi
+          # === BEGIN BLOCK: KI_INTAKE_LIVE_PUSH_ONLY_V1 | Zweck: echte KI-Kandidaten melden ausschließlich die Live-Inbox; Umfang: ersetzt staging/live Push-Weiche ===
+          PUSH_URL="https://bocholt-erleben.de/api/push/notify-inbox.php"
+          PUSH_SECRET="${LIVE_PUSH_SECRET:-}"
+          # === END BLOCK: KI_INTAKE_LIVE_PUSH_ONLY_V1 ===
 
           if [ -z "${PUSH_SECRET}" ]; then
             echo "ℹ️ Push secret not configured. Skipping inbox push."
@@ -401,7 +408,7 @@ jobs:
         env:
           WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_REF: ${{ github.ref_name }}
+          TARGET_REF: main
         run: |
           set -e
 

@@ -1,1 +1,25 @@
-[]
+[
+  {
+    "domain": "rc77.de",
+    "source_name": "RC Bocholt 77",
+    "source_url_pattern": "https://www.rc77.de/*",
+    "example_url": "https://www.rc77.de",
+    "suggested_status": "DISCOVERY-SEED",
+    "quality_signal": "Offizieller Veranstalter eines öffentlich relevanten Radrennens im Bocholt-Nahraum.",
+    "risk_signal": "Für den gefundenen Bocholt-Kalendereintrag fehlte im sichtbaren Web-HTML die belastbare Datumsangabe; daher noch nicht als starke Produktionsquelle bestätigt.",
+    "reason": "Kann für künftige Verifikation sportbezogener Bocholt-Termine hilfreich sein, ist aber noch nicht registerreif.",
+    "usage_rule": "Nur zur Verifikation konkreter Einzeltermine nutzen; FINAL nur mit offizieller event-spezifischer Datums- und Ortsbelegung.",
+    "evidence_events": [
+      {
+        "title": "Radrenntag im I-Park Bocholt",
+        "date": "",
+        "url": "https://www.bocholt.de/veranstaltungskalender/radrenntag-im-i-park-bocholt"
+      }
+    ],
+    "first_seen": "2026-05-26",
+    "last_seen": "2026-05-26",
+    "found_via": "weekly-ki-websearch",
+    "status": "neu",
+    "notes": "Nebenfund im Backfill-Lauf; nicht als Event in candidates übernehmen."
+  }
+]
