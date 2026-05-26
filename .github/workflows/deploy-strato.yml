@@ -65,33 +65,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth
 
-      # === BEGIN BLOCK: DEPLOY_SHEET_ENV_TARGET_V1 | Zweck: trennt Live- und Staging-Sheet, damit echte KI-/Inbox-Daten nicht in der Staging-Inbox landen; Umfang: setzt BE_SHEET_ID vor Events-/Inbox-Export ===
-      - name: Resolve Google Sheet target
+      # === BEGIN BLOCK: DEPLOY_SHEET_AND_INBOX_TAB_TARGET_V2 | Zweck: nutzt ein gemeinsames Google Sheet, trennt aber Live-/Staging-Inbox ueber unterschiedliche Tabs; Umfang: setzt BE_SHEET_ID und INBOX_TAB_NAME fuer nachfolgende Exporte ===
+      - name: Resolve Google Sheet and Inbox tab target
         shell: bash
         env:
           LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
-          STAGING_SHEET_ID: ${{ secrets.STAGING_SHEET_ID }}
           LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
         run: |
           set -e
 
+          BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
+          if [ -z "$BE_SHEET_ID" ]; then
+            echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
+            exit 1
+          fi
+
           if [ "${GITHUB_REF_NAME}" = "staging" ]; then
-            BE_SHEET_ID="${STAGING_SHEET_ID:-}"
-            if [ -z "$BE_SHEET_ID" ]; then
-              echo "❌ STAGING_SHEET_ID fehlt. Staging darf nicht mehr das Live-Sheet lesen."
-              exit 1
-            fi
+            INBOX_TAB_NAME="Inbox_Staging"
           else
-            BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
-            if [ -z "$BE_SHEET_ID" ]; then
-              echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
-              exit 1
-            fi
+            INBOX_TAB_NAME="Inbox"
           fi
 
           echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
+          echo "INBOX_TAB_NAME=$INBOX_TAB_NAME" >> "$GITHUB_ENV"
           echo "✅ Google Sheet target resolved for ${GITHUB_REF_NAME}."
-      # === END BLOCK: DEPLOY_SHEET_ENV_TARGET_V1 ===
+          echo "Inbox tab: $INBOX_TAB_NAME"
+      # === END BLOCK: DEPLOY_SHEET_AND_INBOX_TAB_TARGET_V2 ===
 
       - name: Export Events tab to data/events.tsv (fail-fast, retry-hardened)
         timeout-minutes: 6
@@ -226,6 +225,7 @@ jobs:
         shell: bash
         env:
           SHEET_ID: ${{ env.BE_SHEET_ID }}
+          INBOX_TAB_NAME: ${{ env.INBOX_TAB_NAME }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -e
@@ -241,10 +241,13 @@ jobs:
               sys.exit(1)
 
           sheet_id = os.environ.get("SHEET_ID", "").strip()
+          inbox_tab_name = os.environ.get("INBOX_TAB_NAME", "Inbox").strip() or "Inbox"
           sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
 
           if not sheet_id:
               fail("ENV SHEET_ID fehlt.")
+          if not inbox_tab_name:
+              fail("ENV INBOX_TAB_NAME fehlt.")
           if not sa_json:
               fail("ENV GOOGLE_SERVICE_ACCOUNT_JSON fehlt.")
 
@@ -296,11 +299,11 @@ jobs:
 
               raise last_exc or RuntimeError(f"{label}: unbekannter Exportfehler")
 
-          rng = "Inbox!A:ZZ"
-          values = fetch_values_with_retry(rng, "Inbox-Tab")
+          rng = f"{inbox_tab_name}!A:ZZ"
+          values = fetch_values_with_retry(rng, f"{inbox_tab_name}-Tab")
 
           if not values:
-              fail("Inbox-Tab ist leer oder nicht lesbar.")
+              fail(f"{inbox_tab_name}-Tab ist leer oder nicht lesbar.")
 
           header = [h.strip() for h in (values[0] or [])]
           required = ["status", "title", "source_url", "created_at"]
