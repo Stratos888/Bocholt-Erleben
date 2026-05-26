@@ -20,7 +20,15 @@
 - Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
 - The Kuratier-Inbox is also hybrid:
   1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
-  2. DB submissions for organizer single-event and membership submissions.
+  2. DB submissions for organizer single-event, membership and activity-presence submissions.
+- Google-Sheet-Inbox data is separated by tab, not by separate sheet:
+  - `main` / live uses `Inbox` and `Inbox_Archive`.
+  - `staging` uses `Inbox_Staging` and `Inbox_Archive_Staging`.
+- Deploy must resolve the Inbox tab by branch and export from that resolved tab.
+- Staging must never read or write the live `Inbox` tab for KI-/Sheet candidates.
+- Production KI workflows run on `main` only and must target the live Inbox/push path.
+- `Inbox → Events` import is production-only and must not run on `staging`.
+
 ---
 
 ## 2. PROOF BEFORE PATCH
