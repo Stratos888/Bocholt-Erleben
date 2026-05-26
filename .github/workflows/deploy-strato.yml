@@ -65,11 +65,39 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth
 
+      # === BEGIN BLOCK: DEPLOY_SHEET_ENV_TARGET_V1 | Zweck: trennt Live- und Staging-Sheet, damit echte KI-/Inbox-Daten nicht in der Staging-Inbox landen; Umfang: setzt BE_SHEET_ID vor Events-/Inbox-Export ===
+      - name: Resolve Google Sheet target
+        shell: bash
+        env:
+          LIVE_SHEET_ID: ${{ secrets.LIVE_SHEET_ID }}
+          STAGING_SHEET_ID: ${{ secrets.STAGING_SHEET_ID }}
+          LEGACY_SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: |
+          set -e
+
+          if [ "${GITHUB_REF_NAME}" = "staging" ]; then
+            BE_SHEET_ID="${STAGING_SHEET_ID:-}"
+            if [ -z "$BE_SHEET_ID" ]; then
+              echo "❌ STAGING_SHEET_ID fehlt. Staging darf nicht mehr das Live-Sheet lesen."
+              exit 1
+            fi
+          else
+            BE_SHEET_ID="${LIVE_SHEET_ID:-${LEGACY_SHEET_ID:-}}"
+            if [ -z "$BE_SHEET_ID" ]; then
+              echo "❌ LIVE_SHEET_ID oder SHEET_ID fehlt."
+              exit 1
+            fi
+          fi
+
+          echo "BE_SHEET_ID=$BE_SHEET_ID" >> "$GITHUB_ENV"
+          echo "✅ Google Sheet target resolved for ${GITHUB_REF_NAME}."
+      # === END BLOCK: DEPLOY_SHEET_ENV_TARGET_V1 ===
+
       - name: Export Events tab to data/events.tsv (fail-fast, retry-hardened)
         timeout-minutes: 6
         shell: bash
         env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -e
@@ -197,7 +225,7 @@ jobs:
         timeout-minutes: 6
         shell: bash
         env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_ID: ${{ env.BE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -e
