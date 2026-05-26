@@ -44,7 +44,7 @@ function swh_notify_paid_event_submission_inbox_best_effort(PDO $pdo, int $submi
             'SELECT id
              FROM submissions
              WHERE id = :submission_id
-               AND submission_kind = "event"
+               AND submission_kind IN ("event", "activity")
                AND status = "paid"
              LIMIT 1'
         );
@@ -84,6 +84,8 @@ function swh_get_stripe_config(): array
             'starter' => trim((string)($prices['starter'] ?? '')),
             'active' => trim((string)($prices['active'] ?? '')),
             'unlimited' => trim((string)($prices['unlimited'] ?? '')),
+            'activity_basic' => trim((string)($prices['activity_basic'] ?? '')),
+            'activity_plus' => trim((string)($prices['activity_plus'] ?? '')),
         ],
     ];
 }
@@ -225,16 +227,48 @@ function swh_get_plan_quota_config(string $planKey): array
             'included_publications' => 0,
             'is_unlimited' => 1,
         ],
+        'activity_basic' => [
+            'included_publications' => 1,
+            'is_unlimited' => 0,
+        ],
+        'activity_plus' => [
+            'included_publications' => 3,
+            'is_unlimited' => 0,
+        ],
         default => throw new RuntimeException('Unsupported plan key for entitlement handling.'),
     };
 }
 
-function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId): array
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_WEBHOOK_SUBMISSION_RESOLUTION_V1 | Zweck: findet die bezahlte Submission robust per Metadata-ID, Payment-Referenz oder Stripe-Session-ID; Umfang: ersetzt swh_fetch_submission_for_checkout_handling === */
+function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId, string $paymentReferenceKey, string $sessionId): array
 {
+    $whereParts = [];
+    $params = [];
+
+    if ($submissionId > 0) {
+        $whereParts[] = 'id = :submission_id';
+        $params[':submission_id'] = $submissionId;
+    }
+
+    if ($paymentReferenceKey !== '') {
+        $whereParts[] = 'payment_reference_key = :payment_reference_key';
+        $params[':payment_reference_key'] = $paymentReferenceKey;
+    }
+
+    if ($sessionId !== '') {
+        $whereParts[] = 'stripe_checkout_session_id = :stripe_checkout_session_id';
+        $params[':stripe_checkout_session_id'] = $sessionId;
+    }
+
+    if ($whereParts === []) {
+        throw new RuntimeException('Stripe checkout session metadata is incomplete.');
+    }
+
     $statement = $pdo->prepare(
         'SELECT
             id,
             organizer_id,
+            submission_kind,
             requested_model_key,
             payment_kind,
             payment_reference_key,
@@ -242,13 +276,21 @@ function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId)
             stripe_customer_id,
             stripe_subscription_id
          FROM submissions
-         WHERE id = :submission_id
+         WHERE (' . implode(' OR ', $whereParts) . ')
+         ORDER BY
+            CASE
+                WHEN id = :order_submission_id THEN 0
+                ELSE 1
+            END ASC,
+            id DESC
          LIMIT 1'
     );
 
-    $statement->execute([
-        ':submission_id' => $submissionId,
-    ]);
+    foreach ($params as $key => $value) {
+        $statement->bindValue($key, $value, $key === ':submission_id' ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+    $statement->bindValue(':order_submission_id', $submissionId, PDO::PARAM_INT);
+    $statement->execute();
 
     $row = $statement->fetch();
     if (!is_array($row)) {
@@ -257,6 +299,7 @@ function swh_fetch_submission_for_checkout_handling(PDO $pdo, int $submissionId)
 
     return $row;
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_WEBHOOK_SUBMISSION_RESOLUTION_V1 === */
 
 function swh_upsert_single_entitlement(PDO $pdo, array $submission): void
 {
@@ -446,18 +489,26 @@ function swh_handle_checkout_completed(PDO $pdo, array $event): void
         throw new RuntimeException('Stripe checkout object is missing.');
     }
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_WEBHOOK_CHECKOUT_CONTEXT_V1 | Zweck: nutzt neben Metadata-ID auch client_reference_id als Fallback fuer Aktivitaetspraesenz-Checkouts; Umfang: ersetzt Checkout-Kontext-Ermittlung === */
     $sessionId = trim((string)($object['id'] ?? ''));
     $customerId = trim((string)($object['customer'] ?? ''));
     $paymentStatus = trim((string)($object['payment_status'] ?? ''));
     $subscriptionId = trim((string)($object['subscription'] ?? ''));
+    $clientReferenceId = trim((string)($object['client_reference_id'] ?? ''));
     $metadata = is_array($object['metadata'] ?? null) ? $object['metadata'] : [];
     $submissionId = (int)($metadata['submission_id'] ?? 0);
-
-    if ($sessionId === '' || $submissionId <= 0) {
-        throw new RuntimeException('Stripe checkout session metadata is incomplete.');
+    $paymentReferenceKey = trim((string)($metadata['payment_reference_key'] ?? ''));
+    if ($paymentReferenceKey === '') {
+        $paymentReferenceKey = $clientReferenceId;
     }
 
-    $submission = swh_fetch_submission_for_checkout_handling($pdo, $submissionId);
+    if ($sessionId === '') {
+        throw new RuntimeException('Stripe checkout session id is missing.');
+    }
+
+    $submission = swh_fetch_submission_for_checkout_handling($pdo, $submissionId, $paymentReferenceKey, $sessionId);
+    $submissionId = (int)$submission['id'];
+    /* === END BLOCK: ACTIVITY_PRESENCE_WEBHOOK_CHECKOUT_CONTEXT_V1 === */
 
     $newStatus = $paymentStatus === 'paid' ? 'paid' : 'checkout_started';
     $paidFlag = $paymentStatus === 'paid' ? 1 : 0;

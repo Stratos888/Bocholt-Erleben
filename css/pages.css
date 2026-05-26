@@ -1360,7 +1360,93 @@ select.content-field__control{
   font-weight: 440;
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_DATA_ROWS_FINAL_V1 === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 | Zweck: gestaltet die Tarifübersicht im Anbieterbereich als kompakte Preistabelle mit Summenzeile und Leistungs-Bullets; Umfang: nur Dashboard-Tarifkarte === */
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-section-title{
+  display: block;
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+  font-size: 0.86rem;
+  font-weight: 780;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
 
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-table{
+  display: grid;
+  gap: 7px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-row,
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-label{
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-weight: 560;
+  line-height: 1.35;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-price,
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-price{
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total{
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 3px double var(--border-panel-strong);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-label{
+  color: var(--color-text-primary);
+  font-weight: 780;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullets{
+  display: grid;
+  gap: 8px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullet{
+  position: relative;
+  display: block;
+  padding-left: 17px;
+  color: var(--color-text-secondary);
+  font-weight: 520;
+  line-height: 1.4;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullet::before{
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-muted) 68%, transparent);
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-period,
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-summary{
+  display: grid;
+  gap: 8px;
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-quota-change:not([hidden]){
+  display: block;
+}
+/* === END BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 === */
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_INLINE_EDIT_STYLES_V1 | Zweck: gestaltet aufklappbare Einreichungen inklusive direkter Änderungsmaske im Veranstalter-Dashboard; Umfang: komplette Submission-Liste, Detailansicht, Aktionen und Edit-Formular === */
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
@@ -1867,6 +1953,199 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: PUBLISH_ORGANIZER_FINAL_HIERARCHY_TEXTFLOW_AND_FIELD_CALIBRATION_V3 === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_ENTERPRISE_FINAL_FUNNEL_V6 | Zweck: finalisiert den Aktivitaetspraesenz-Funnel auf Event-Funnel-Niveau mit ruhiger Tarifwegwahl, kompakter Orientierung und minimalen Formularabschnittslabels; Umfang: nur .page--activity-presence innerhalb der bestehenden Publish-Seitenfamilie === */
+.page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li{
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-tariff-list .content-cta{
+  min-height: 46px;
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list{
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list li{
+  display: grid;
+  grid-template-columns: minmax(74px, auto) minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list li:first-child{
+  border-top: 0;
+  padding-top: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list li:last-child{
+  padding-bottom: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list strong{
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 780;
+  line-height: 1.16;
+}
+
+.page--publish.page--activity-presence .activity-presence-guidance-list span{
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.page--publish.page--activity-presence .activity-presence-form-shell{
+  width: 100%;
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan{
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan legend{
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 780;
+  line-height: 1.14;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-options{
+  display: grid;
+  gap: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option{
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  min-width: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--cmp-divider-strong);
+  cursor: pointer;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option:first-child{
+  border-top: 0;
+  padding-top: 2px;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option input{
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option span{
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option strong{
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
+  font-weight: 780;
+  line-height: 1.12;
+}
+
+.page--publish.page--activity-presence .activity-presence-inline-plan-option small{
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.22;
+}
+
+.page--publish.page--activity-presence .activity-presence-compact-section-head{
+  margin-top: 2px;
+  padding-top: 13px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish.page--activity-presence .content-form-grid > .activity-presence-compact-section-head:first-child{
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-compact-section-head h3{
+  color: var(--color-text-primary);
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1.14;
+}
+
+.page--publish.page--activity-presence .publish-final-actions{
+  gap: 10px;
+}
+
+.page--publish.page--activity-presence .activity-presence-submit-note{
+  max-width: none;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.34;
+}
+@media (max-width: 520px){
+  .page--publish.page--activity-presence .activity-presence-guidance-list li{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+@media (min-width: 760px){
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li{
+    align-content: start;
+    padding: 0 18px;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li:first-child{
+    padding-left: 0;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list li + li{
+    border-top: 0;
+    border-left: 1px solid var(--cmp-divider-strong);
+  }
+
+  .page--publish.page--activity-presence .activity-presence-inline-plan-options{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-inline-plan-option{
+    padding: 0 12px;
+    border-top: 0;
+    border-left: 1px solid var(--cmp-divider-strong);
+  }
+
+  .page--publish.page--activity-presence .activity-presence-inline-plan-option:first-child{
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+/* === END BLOCK: ACTIVITY_PRESENCE_ENTERPRISE_FINAL_FUNNEL_V6 === */
 /* === END BLOCK: PUBLISH_AND_ORGANIZER_PAGE_FAMILY_OWNER_V28 === */
 
 /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_BASE_V11 | Zweck: setzt die mobile Basis des deterministischen /info/-Render-Contracts mit kompakter Hero-Orientierung und enger geführter Abschlusszone um; Umfang: info-spezifische Grundregeln außerhalb der Desktop-Breakpoints === */

@@ -3,7 +3,7 @@ declare(strict_types=1);
 /* === BEGIN FILE: api/submissions/init.php | Zweck: legt fuer den Publish-Funnel eine erste Organizer-/Submission-Kombination serverseitig an; Umfang: komplette Datei === */
 
 require dirname(__DIR__) . '/_bootstrap.php';
-
+require dirname(__DIR__) . '/push/_lib.php';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
     be_json_response(405, [
@@ -57,15 +57,32 @@ function pf_normalize_email(string $email): string
     return $normalized;
 }
 
-function pf_validate_model_key(string $modelKey): string
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_MODEL_VALIDATION_V1 | Zweck: erweitert Einreichungen um Aktivitaetspraesenzen mit eigenen Modellschluesseln; Umfang: ersetzt pf_validate_model_key und ergänzt pf_validate_submission_kind === */
+function pf_validate_submission_kind(?string $submissionKind): string
 {
-    $allowed = ['single', 'starter', 'active', 'unlimited'];
+    $normalized = $submissionKind === null ? 'event' : mb_strtolower(trim($submissionKind));
+    $allowed = ['event', 'activity'];
+
+    if (!in_array($normalized, $allowed, true)) {
+        throw new InvalidArgumentException('Einreichungsart ist ungültig.');
+    }
+
+    return $normalized;
+}
+
+function pf_validate_model_key(string $modelKey, string $submissionKind): string
+{
+    $allowed = $submissionKind === 'activity'
+        ? ['activity_basic', 'activity_plus']
+        : ['single', 'starter', 'active', 'unlimited'];
+
     if (!in_array($modelKey, $allowed, true)) {
         throw new InvalidArgumentException('Einreichungsweg ist ungültig.');
     }
 
     return $modelKey;
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_MODEL_VALIDATION_V1 === */
 
 /* === BEGIN BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELD_HELPERS_V1 | Zweck: validiert optionale Datumswerte und normalisiert Boolean-Werte für prüfpflichtige Ortsfreigaben; Umfang: ersetzt pf_validate_date_or_null und ergänzt pf_boolish_to_int === */
 function pf_validate_date_or_null(?string $date): ?string
@@ -240,19 +257,27 @@ function pf_send_submission_received_mail(array $submissionData): void
         return;
     }
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 | Zweck: unterscheidet Eingangsbestätigung für Einzeltermin und Aktivitaetspraesenz; Umfang: ersetzt Mail-Body und Betreff in pf_send_submission_received_mail === */
     $title = trim((string)($submissionData['title'] ?? ''));
     $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+    $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
     $body = implode("\n", [
         'Hallo,',
         '',
-        'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
+        $isActivity
+            ? 'deine Aktivität wurde bei Bocholt erleben zur Prüfung eingereicht.'
+            : 'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
         '',
-        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
         'Referenz: ' . $reference,
         '',
-        'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
-        'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
+        $isActivity
+            ? 'Wir prüfen jetzt, ob die Aktivität grundsätzlich zu Bocholt erleben passt und als eigene Aktivitätskarte sinnvoll ist.'
+            : 'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
+        $isActivity
+            ? 'Wenn die Aktivität grundsätzlich passt, erhältst du anschließend einen Zahlungslink für die Aktivitätspräsenz.'
+            : 'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
         'Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach redaktioneller Freigabe.',
         '',
         'Viele Grüße',
@@ -260,7 +285,12 @@ function pf_send_submission_received_mail(array $submissionData): void
     ]);
 
     try {
-        be_send_mail($to, 'Deine Veranstaltung wurde zur Prüfung eingereicht', $body);
+        be_send_mail(
+            $to,
+            $isActivity ? 'Deine Aktivität wurde zur Prüfung eingereicht' : 'Deine Veranstaltung wurde zur Prüfung eingereicht',
+            $body
+        );
+    /* === END BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 === */
     } catch (Throwable $error) {
         error_log('Submission received mail failed: ' . $error->getMessage());
     }
@@ -301,9 +331,16 @@ try {
     /* === BEGIN BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 | Zweck: verhindert Veranstalter-Overwrite und erzwingt unveraenderbare Abo-Reuse-Daten serverseitig; Umfang: kompletter try-Hauptblock bis vor Error-Handling === */
     $input = pf_read_json_body();
 
-    $requestedModelKey = pf_validate_model_key(
-        pf_required_string($input, 'requested_model_key', 'Einreichungsweg')
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_SUBMISSION_KIND_PARSE_V1 | Zweck: liest Einreichungsart vor Tarifvalidierung, damit Aktivitaetspraesenzen eigene Modellschluessel nutzen koennen; Umfang: ersetzt requestedModelKey-Parsing === */
+    $submissionKind = pf_validate_submission_kind(
+        pf_nullable_string($input['submission_kind'] ?? null)
     );
+
+    $requestedModelKey = pf_validate_model_key(
+        pf_required_string($input, 'requested_model_key', 'Einreichungsweg'),
+        $submissionKind
+    );
+    /* === END BLOCK: ACTIVITY_PRESENCE_SUBMISSION_KIND_PARSE_V1 === */
 
     $organizationName = pf_required_string($input, 'organization_name', 'Veranstalter / Organisation');
     $contactName = pf_nullable_string($input['contact_name'] ?? null);
@@ -323,13 +360,35 @@ try {
     $descriptionText = pf_nullable_string($input['description_text'] ?? null);
     $notesText = pf_nullable_string($input['notes_text'] ?? null);
 
-    if ($eventUrl === null && ($title === null || $startDate === null || $locationName === null)) {
-        throw new InvalidArgumentException('Ohne Event-Link sind mindestens Titel, Datum und Ort erforderlich.');
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INPUT_VALIDATION_V1 | Zweck: trennt Event-Pflichtlogik von Aktivitaetspraesenz-Pflichtlogik und setzt passenden Startstatus; Umfang: ersetzt Validierung, paymentKind/intakeOrigin und paymentReferenceKey-Zuweisung === */
+    if ($submissionKind === 'activity') {
+        if ($title === null || $locationName === null || $locationAddress === null || $descriptionText === null) {
+            throw new InvalidArgumentException('Für eine Aktivitätspräsenz sind mindestens Name, Anbieter/Ort, Adresse oder Treffpunkt und Beschreibung erforderlich.');
+        }
+
+        if ($locationPublicConfirmed !== 1) {
+            throw new InvalidArgumentException('Bitte bestätige, dass die Aktivität eingereicht werden darf und der Ort öffentlich genannt werden darf.');
+        }
+
+        $eventUrl = null;
+        $startDate = null;
+        $paymentKind = 'subscription';
+        $intakeOrigin = 'activity_presence';
+        $initialStatus = 'pending_review';
+        $checkoutRequired = false;
+    } else {
+        if ($eventUrl === null && ($title === null || $startDate === null || $locationName === null)) {
+            throw new InvalidArgumentException('Ohne Event-Link sind mindestens Titel, Datum und Ort erforderlich.');
+        }
+
+        $paymentKind = $requestedModelKey === 'single' ? 'single' : 'subscription';
+        $intakeOrigin = $paymentKind === 'subscription' ? 'membership' : 'single_event';
+        $initialStatus = $paymentKind === 'single' ? 'pending_review' : 'draft';
+        $checkoutRequired = $paymentKind !== 'single';
     }
 
-    $paymentKind = $requestedModelKey === 'single' ? 'single' : 'subscription';
-    $intakeOrigin = $paymentKind === 'subscription' ? 'membership' : 'single_event';
     $paymentReferenceKey = pf_uuid_v4();
+    /* === END BLOCK: ACTIVITY_PRESENCE_INPUT_VALIDATION_V1 === */
     /* === END BLOCK: PUBLISH_SUBMISSION_REVIEW_FIELDS_FROM_INPUT_V1 === */
 
     $pdo = be_db();
@@ -339,26 +398,40 @@ try {
     $activeSubscription = null;
     $organizerId = 0;
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PORTAL_SESSION_EMAIL_GUARD_V1 | Zweck: verhindert, dass eine alte Portal-Session oeffentliche Aktivitaetspraesenz-Einreichungen einer abweichenden Formular-E-Mail zuordnet; Umfang: ersetzt nur die Portal-Session-Uebernahme vor Organizer-Lookup === */
     if (is_array($portalSession)) {
-        $organizerId = (int)$portalSession['organizer_id'];
-        $activeSubscription = pf_fetch_active_subscription_or_null($pdo, $organizerId);
+        $portalSessionEmailNormalized = trim((string)($portalSession['email_normalized'] ?? ''));
+        $portalSessionMatchesInputEmail = $portalSessionEmailNormalized !== ''
+            && hash_equals($portalSessionEmailNormalized, $emailNormalized);
+        $mayUsePortalSession = $submissionKind !== 'activity' || $portalSessionMatchesInputEmail;
 
-        if ($requestedModelKey !== 'single' && is_array($activeSubscription)) {
-            $organizationName = trim((string)$portalSession['organization_name']);
-            $contactName = pf_nullable_string($portalSession['contact_name'] ?? null);
-            $emailInput = trim((string)$portalSession['email']);
-            $emailNormalized = trim((string)$portalSession['email_normalized']);
-            $requestedModelKey = trim((string)$activeSubscription['plan_key']);
-            $paymentKind = 'subscription';
-            $intakeOrigin = 'membership';
+        if ($mayUsePortalSession) {
+            $organizerId = (int)$portalSession['organizer_id'];
+            $activeSubscription = pf_fetch_active_subscription_or_null($pdo, $organizerId);
+
+            /* === BEGIN BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 | Zweck: bestehende Event-Abo-Reuse-Logik unveraendert lassen und Aktivitaetspraesenzen nicht auf Event-Mitgliedschaften umbiegen; Umfang: Abo-Reuse-if === */
+            if ($submissionKind === 'event' && $requestedModelKey !== 'single' && is_array($activeSubscription)) {
+                $organizationName = trim((string)$portalSession['organization_name']);
+                $contactName = pf_nullable_string($portalSession['contact_name'] ?? null);
+                $emailInput = trim((string)$portalSession['email']);
+                $emailNormalized = trim((string)$portalSession['email_normalized']);
+                $requestedModelKey = trim((string)$activeSubscription['plan_key']);
+                $paymentKind = 'subscription';
+                $intakeOrigin = 'membership';
+                $initialStatus = 'draft';
+                $checkoutRequired = true;
+            }
+            /* === END BLOCK: EVENT_ONLY_MEMBERSHIP_REUSE_GUARD_V1 === */
         }
     }
+    /* === END BLOCK: ACTIVITY_PRESENCE_PORTAL_SESSION_EMAIL_GUARD_V1 === */
 
     if ($organizerId <= 0) {
         $existingOrganizer = pf_find_organizer_by_email($pdo, $emailNormalized);
 
         if (is_array($existingOrganizer)) {
-            if ($requestedModelKey !== 'single') {
+            /* === BEGIN BLOCK: EVENT_ONLY_EXISTING_ORGANIZER_BLOCK_V1 | Zweck: blockiert weiterhin neue Event-Mitgliedschaften mit vorhandener E-Mail, erlaubt aber Aktivitaetspraesenz-Einreichungen fuer bestehende Anbieter; Umfang: ersetzt existingOrganizer-Abzweig === */
+            if ($submissionKind === 'event' && $requestedModelKey !== 'single') {
                 $pdo->rollBack();
 
                 be_json_response(409, [
@@ -370,6 +443,7 @@ try {
                     ],
                 ]);
             }
+            /* === END BLOCK: EVENT_ONLY_EXISTING_ORGANIZER_BLOCK_V1 === */
 
             $organizerId = (int)$existingOrganizer['id'];
         } else {
@@ -432,8 +506,8 @@ try {
 
     $submissionInsert->execute([
         ':organizer_id' => $organizerId,
-        ':submission_kind' => 'event',
-        ':status' => $paymentKind === 'single' ? 'pending_review' : 'draft',
+        ':submission_kind' => $submissionKind,
+        ':status' => $initialStatus,
         ':requested_model_key' => $requestedModelKey,
         ':payment_kind' => $paymentKind,
         ':intake_origin' => $intakeOrigin,
@@ -456,26 +530,37 @@ try {
     $submissionId = (int)$pdo->lastInsertId();
 
     $pdo->commit();
-if ($paymentKind === 'single') {
-    pf_send_submission_received_mail([
-        'email' => $emailInput,
-        'title' => $title,
-        'payment_reference_key' => $paymentReferenceKey,
+
+    if ($paymentKind === 'single' || $submissionKind === 'activity') {
+        pf_send_submission_received_mail([
+            'email' => $emailInput,
+            'title' => $title,
+            'payment_reference_key' => $paymentReferenceKey,
+            'submission_kind' => $submissionKind,
+        ]);
+    }
+
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INBOX_PUSH_ON_SUBMIT_V1 | Zweck: sendet nach neuer pruefpflichtiger Aktivitaet eine interne Inbox-Pushmeldung; Umfang: best-effort Push nach erfolgreichem Commit === */
+    if ($submissionKind === 'activity') {
+        be_push_notify_inbox_best_effort('activity_submission', 'submission:' . $submissionId . ':pending_review');
+    } elseif ($paymentKind === 'single') {
+        be_push_notify_inbox_best_effort('event_submission', 'submission:' . $submissionId . ':pending_review');
+    }
+    /* === END BLOCK: ACTIVITY_PRESENCE_INBOX_PUSH_ON_SUBMIT_V1 === */
+
+    be_json_response(201, [
+        'status' => 'ok',
+        'data' => [
+            'organizer_id' => $organizerId,
+            'submission_id' => $submissionId,
+            'submission_status' => $initialStatus,
+            'checkout_required' => $checkoutRequired,
+            'requested_model_key' => $requestedModelKey,
+            'payment_kind' => $paymentKind,
+            'intake_origin' => $intakeOrigin,
+            'payment_reference_key' => $paymentReferenceKey,
+        ],
     ]);
-}
-be_json_response(201, [
-    'status' => 'ok',
-    'data' => [
-        'organizer_id' => $organizerId,
-        'submission_id' => $submissionId,
-        'submission_status' => $paymentKind === 'single' ? 'pending_review' : 'draft',
-        'checkout_required' => $paymentKind !== 'single',
-        'requested_model_key' => $requestedModelKey,
-        'payment_kind' => $paymentKind,
-        'intake_origin' => $intakeOrigin,
-        'payment_reference_key' => $paymentReferenceKey,
-    ],
-]);
     /* === END BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 === */
 } catch (InvalidArgumentException $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {

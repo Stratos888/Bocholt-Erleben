@@ -10,11 +10,17 @@
 
 ### Data source rule
 
-- Production/staging event and inbox data are sheet-first.
-- The deploy workflow exports the Google Sheet tabs `Events` and `Inbox` to `data/events.tsv` and `data/inbox.tsv`.
-- `data/events.json` and `data/inbox.json` are generated deploy artifacts consumed by the app at runtime.
+- Production/staging event data is hybrid.
+- The public event feed consists of:
+  1. Google Sheet / generated `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
+  2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
+- Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
+- `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
 - A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
 - Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- The Kuratier-Inbox is also hybrid:
+  1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
+  2. DB submissions for organizer single-event and membership submissions.
 ---
 
 ## 2. PROOF BEFORE PATCH
@@ -133,8 +139,30 @@ Do not mix feature work with unrelated UI polish in the same workpack.
 
 ## 6. PATCH OUTPUT CONTRACT
 
-- Output code/document changes as concrete replace instructions only.
+Preferred output format:
+
+- Use a unified Git patch when the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
+- The user validates first with `git apply --check patch.diff` before applying the patch.
+- The patch must be consolidated, owner-file focused, and free of unrelated edits.
+
+Fallback format:
+
+- Use concrete replace instructions when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
 - Always specify:
+
+Baseline rule for Git patches:
+
+- Before a Git patch is created, the current repository state must be proven with:
+  - `git status --short`
+  - `git branch --show-current`
+  - `git pull --ff-only`
+  - `git rev-parse --short HEAD`
+- A Git patch may only be created against that proven branch and commit SHA, or against a fresh ZIP exported from that same state.
+- Every Git patch must be validated with `git apply --check patch.diff` before it is applied.
+- If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
+- In that case, re-check the current repository state and create a new patch from the updated baseline.
+
+Concrete replace instructions must:
   - file
   - exact BEGIN line
   - exact END line
@@ -175,12 +203,29 @@ Rules:
 
 ---
 
-## 9. UI-POLISH RULE
+## 9. UI-POLISH / NO-HOTFIX RULE
 
 - UI-polish patches should be CSS-only unless root cause proves otherwise.
 - Do not spread small visual fixes across multiple files without proof.
+- Do not solve UI regressions by appending late override blocks when the affected component already has an owner block.
+- Prefer one consolidated owner replacement over stacked override chains.
+- A staging branch is for validating sustainable fixes, not for shipping quick temporary fixes.
+- If a patch creates this pattern, it is not acceptable as final implementation:
 
----
+```text
+base rule
+→ desktop override
+→ polish override
+→ mobile restore override
+→ later counter-override
+
+The correct pattern is:
+single owner block
+→ shared component base
+→ mobile contract
+→ desktop contract
+→ narrow/wide breakpoint refinements
+Before patching UI regressions, identify whether the real problem is a missing owner, conflicting owners, or a broken breakpoint boundary.
 
 ## 10. OVERLAY RULE
 
@@ -217,3 +262,59 @@ Canonical project control is limited to:
 - `ENGINEERING.md`
 - the uploaded ZIP
 - the active workpack input
+
+<!-- BEGIN PATCH_WORKFLOW_CORRECTION_V1 -->
+
+## Patch workflow correction
+
+For all future repo patches, use this order:
+
+1. First prove the current repo baseline:
+   - git status --short
+   - git branch --show-current
+   - git pull --ff-only
+   - git rev-parse --short HEAD
+
+2. Create patches only against the proven repo baseline.
+
+3. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
+
+4. For Git patches, always run:
+   - git apply --check patch.diff
+   - git apply patch.diff
+   - rm patch.diff
+   - git diff --check
+   - git diff -- <affected-file>
+
+5. If git apply --check fails:
+   - stop immediately
+   - verify the working tree
+   - inspect the current owner block
+   - do not retry with a similar large patch
+
+6. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
+
+7. A robust script patch must:
+   - target only the relevant owner file or owner block
+   - verify every selector/block uniquely before writing
+   - abort without writing if anything is missing or ambiguous
+   - end with git diff --check and git diff -- <affected-file>
+
+8. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
+
+9. After every failed patch attempt, run:
+   - git status --short
+   - git diff -- <affected-file>
+
+10. No blind retries.
+
+Correct sequence after a failed patch:
+
+failure
+-> verify working tree
+-> inspect current owner/block
+-> identify mismatch
+-> create smaller corrected patch
+-> validate fail-fast
+
+<!-- END PATCH_WORKFLOW_CORRECTION_V1 -->

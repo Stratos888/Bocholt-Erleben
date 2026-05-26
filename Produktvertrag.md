@@ -2,7 +2,7 @@
 
 # Produktvertrag – Bocholt erleben
 
-**Version:** 2.1  
+**Version:** 2.2  
 **Status:** verbindlich  
 **Gültig ab:** sofort  
 **Gültigkeit:** bis bewusst geändert  
@@ -256,106 +256,247 @@ Quelle einreichen
 
 ### 6.1 Zweck
 
-Eine Aktivitätspräsenz macht ein dauerhaft oder regelmäßig nutzbares Angebot als Aktivität auf Bocholt erleben sichtbar.
+Eine Aktivitätspräsenz macht ein dauerhaft verfügbares, saisonal verfügbares oder regelmäßig buchbares Angebot als Aktivität auf Bocholt erleben sichtbar.
 
-Eine Aktivitätspräsenz ist:
+Die Aktivitätspräsenz ist ein kuratierter Veröffentlichungs- und Aufbereitungsservice.
 
-1. redaktionell geprüft
-2. kuratiert
-3. dauerhaft angelegt
-4. nutzerorientiert beschrieben
-5. fachlich von Events getrennt
+Sie ist ausdrücklich nicht:
 
-Eine Aktivitätspräsenz ist nicht:
+1. ein Werbeeintrag,
+2. ein Branchenbucheintrag,
+3. eine Anzeige,
+4. eine Premium-Platzierung,
+5. ein automatisch gekaufter Eintrag,
+6. ein kostenloser Vorschlagsweg.
 
-1. ein Werbeeintrag
-2. ein Branchenbucheintrag
-3. eine Anzeige
-4. eine Premium-Platzierung
-5. ein automatisch gekaufter Eintrag
-6. ein Community-Vorschlag
+### 6.2 Öffentliche Hauptbotschaft
 
-### 6.2 Öffentliche Produktbezeichnung
-
-Verbindliche öffentliche Produktbezeichnung:
-
-```text
-Aktivitätspräsenz
-```
-
-Verbindliche öffentliche Hauptbotschaft:
+Verbindliche Hauptbotschaft auf der Entscheidungsseite:
 
 ```text
 Als Aktivität bei Bocholt erleben sichtbar werden
-```
 
-Geeignete CTA-Texte:
+Zulässige Kurzform auf der Aktivitätenliste oder in kleinen CTA-Karten:
+Als Aktivität sichtbar werden
 
-1. `Als Aktivität sichtbar werden`
-2. `Aktivitätspräsenz starten`
-3. `Aktivitätspräsenz prüfen lassen`
+Verbindlicher Lead der Entscheidungsseite:
+Für dauerhaft verfügbare oder regelmäßig buchbare Angebote. Zahlung erst nach Freigabe.
 
-Nicht verwenden:
+6.3 Kanonische Funnel-Routen
 
-1. `Ort vorschlagen`
-2. `Location eintragen`
-3. `Anzeige buchen`
-4. `Premium-Listing`
-5. `Werbeeintrag`
-6. `kostenlos eintragen`
-7. `Angebot vorschlagen`
+Der Aktivitäten-Funnel besteht aus drei öffentlichen Routen:
 
-### 6.3 Tarife
+Route	Rolle
+/angebote/sichtbar-werden/	Entscheidungsseite
+/angebote/sichtbar-werden/einreichen/	Formularseite
+/angebote/sichtbar-werden/erfolg/	Erfolgs- und Statusseite
 
-| Öffentlicher Tarif | Interner Modellschlüssel | Preis pro Monat | Enthalten |
-| --- | --- | ---: | --- |
-| Aktivitätspräsenz Basis | `activity_basic` | 9,99 € | 1 veröffentlichte Aktivität |
-| Aktivitätspräsenz Plus | `activity_plus` | 19,99 € | bis zu 3 veröffentlichte Aktivitäten |
+Die Entscheidungsseite beantwortet:
 
-### 6.4 Leistungsumfang
+Ist mein Angebot geeignet?
+Welcher Tarif passt?
+Was passiert nach der Einreichung?
 
-Eine Aktivitätspräsenz enthält:
+Die Formularseite ist fokussiert und darf keine zweite Produkt-Landingpage werden.
 
-1. Eignungsprüfung
-2. redaktionelle Kurzaufbereitung
-3. Darstellung auf der Aktivitätenseite
-4. Kategorie
-5. passende Merkmale
-6. Website-Link
-7. Navigations- oder Maps-Link
-8. Status im Anbieterbereich
-9. technische Erfassung von Website- und Maps-Klicks
-10. perspektivische Sichtbarkeit der Nutzwertdaten im Anbieterbereich
+6.4 Tarife
+Öffentlicher Tarif	Interner Modellschlüssel	Preis pro Monat	Enthalten
+Aktivitätspräsenz Basis	activity_basic	9,99 €	1 veröffentlichte Aktivität
+Aktivitätspräsenz Plus	activity_plus	19,99 €	bis zu 3 veröffentlichte Aktivitäten
 
-### 6.5 Verbindlicher Ablauf
+Öffentliche Tariftexte:
 
-```text
+Für 1 veröffentlichte Aktivität. Zahlung erst nach Freigabe.
+Für bis zu 3 veröffentlichte Aktivitäten. Zahlung erst nach Freigabe.
+
+Verbindlicher Hinweis:
+
+Erst veröffentlichte Aktivitäten zählen in deinem Tarif.
+6.5 Eignung
+
+Verbindliche Überschrift der Eignungskarte:
+
+Für welche Angebote ist die Aktivitätspräsenz gedacht?
+
+Geeignet:
+
+Eigenständige Angebote, die dauerhaft, saisonal oder regelmäßig buchbar sind – z. B. Bouldern, Kindergeburtstage oder Kurse.
+
+Nicht geeignet:
+
+Einzeltermine, andere Preise, andere Öffnungszeiten oder kleine Textänderungen derselben Aktivität. Einzeltermine gehören in den Veranstaltungsbereich.
+6.6 Was zählt als eine Aktivität?
+
+Eine veröffentlichte Aktivität ist ein eigenständiges dauerhaftes, saisonales oder regelmäßig buchbares Angebot, das als eigene Karte auf der Aktivitätenseite sinnvoll ist.
+
+Eine eigene Aktivität liegt vor, wenn:
+
+das Angebot eigenständig verständlich ist,
+Nutzer es unabhängig wahrnehmen, planen oder buchen können,
+es eine eigene Nutzungssituation erfüllt,
+es sinnvoll als eigene Aktivitätskarte dargestellt werden kann.
+
+Keine eigene Aktivität liegt vor bei:
+
+anderen Öffnungszeiten,
+anderen Preisen,
+kleinen Textänderungen,
+künstlicher Aufsplittung desselben Angebots,
+demselben Inhalt mit minimal anderer Beschreibung.
+
+Beispiele:
+
+Angebot	Zählung
+Bouldern und Klettern allgemein	1 Aktivität
+Kindergeburtstag in der Kletterhalle, dauerhaft buchbar	1 weitere Aktivität
+Kletterkurs für Anfänger, dauerhaft oder regelmäßig buchbar	1 weitere Aktivität
+einzelner Ferienkurs mit festem Datum	Veranstaltung, keine Aktivitätspräsenz
+andere Öffnungszeiten	keine eigene Aktivität
+andere Preise	keine eigene Aktivität
+kleine Textänderung desselben Angebots	keine eigene Aktivität
+6.7 Verbindlicher Ablauf
+
+Öffentlicher Kurzablauf:
+
+Einreichen → Prüfung → Zahlungslink → Aufbereitung → Veröffentlichung.
+
+Fachlicher Ablauf:
+
 Aktivität einreichen
 → Eignung prüfen
 → Zahlungsfreigabe oder Ablehnung
 → Zahlungslink per E-Mail
-→ Zahlung
+→ Zahlung oder bestehende Aktivitätspräsenz nutzen
 → redaktionelle Aufbereitung
 → finale Freigabe
 → Veröffentlichung als Aktivität
-→ Belegung/Zählung
-```
+→ Zählung im aktuellen Tarif
 
-### 6.6 Regeln
+Regeln:
 
-1. Aktivitätspräsenzen sind monatliche Abonnements.
-2. Aktivitätspräsenzen werden vor der Zahlung auf Eignung geprüft.
-3. Bei Ablehnung vor Zahlungsfreigabe entsteht kein Zahlungsfall.
-4. Nach Eignungsfreigabe erhält der Anbieter einen Zahlungslink.
-5. Nach Zahlung erfolgt die redaktionelle Aufbereitung.
-6. Veröffentlichung erfolgt erst nach finaler Freigabe.
-7. Belegung/Zählung erfolgt erst bei Veröffentlichung.
-8. Eine Aktivitätspräsenz zählt nicht gegen Event-Veröffentlichungen.
-9. Eine Event-Veröffentlichung zählt nicht gegen Aktivitätspräsenzen.
-10. Eine Aktivitätspräsenz darf nicht als gekaufte Empfehlung wirken.
+Aktivitätspräsenzen werden vor Zahlung auf Eignung geprüft.
+Bei Ablehnung vor Freigabe entsteht kein Zahlungsfall.
+Nach Eignungsfreigabe erhält der Anbieter einen Zahlungslink.
+Bei bestehender aktiver Aktivitätspräsenz ist keine neue Zahlung nötig.
+Nach Zahlung oder aktiver Aktivitätspräsenz erfolgt die redaktionelle Aufbereitung.
+Veröffentlichung erfolgt erst nach finaler Freigabe.
+Zählung erfolgt erst bei Veröffentlichung.
+Zahlung garantiert keine Veröffentlichung.
+Veröffentlichung darf nicht wie eine gekaufte Empfehlung wirken.
+6.8 Formularseite
 
----
+Verbindliche Formularseiten-Struktur:
 
+Hero
+→ Einreichung vorbereiten
+→ Tarif für die Prüfung
+→ Formularabschnitte
+→ Bestätigung
+→ Button
+→ kurzer Zahlungs-/Prüfungshinweis
+
+Hero:
+
+Aktivität zur Prüfung einreichen
+
+Lead:
+
+Trage die Angaben ein. Zahlung erst nach Freigabe.
+
+Formularblock:
+
+Einreichung vorbereiten
+* Pflichtfelder
+Zahlung erst nach Freigabe.
+
+Tarifbereich:
+
+Tarif für die Prüfung
+
+Die Tarifauswahl bleibt auf der Formularseite sichtbar und änderbar, damit Direktaufrufe und Planwechsel sauber funktionieren.
+
+Verbindliche Feldreihenfolge:
+
+Kontaktdaten
+Anbieter / Organisation
+Ansprechpartner
+E-Mail-Adresse
+Aktivität
+Name der Aktivität
+Name des Standorts
+Website / Buchungslink
+Adresse / offizieller Treffpunkt
+PLZ
+Stadt / Ort
+Beschreibung und Verfügbarkeit
+Kurzbeschreibung der Aktivität
+Verfügbarkeit
+Weitere Hinweise
+Bestätigung
+
+Verfügbarkeit ist ein Auswahlfeld mit diesen Optionen:
+
+Bitte auswählen
+Dauerhaft verfügbar
+Regelmäßig buchbar
+Saisonal verfügbar
+Nach Vereinbarung buchbar
+
+Button:
+
+Zur Prüfung einreichen
+
+Hinweis unter Button:
+
+Nach der Einreichung prüfen wir die Aktivität zuerst. Wenn sie zu Bocholt erleben passt, erhältst du per E-Mail einen Zahlungslink.
+6.9 Erfolgsseite
+
+Die Erfolgsseite unterscheidet fachlich drei Zustände.
+
+Standardfall flow=submitted:
+
+Aktivität eingereicht.
+Es wurde noch keine Zahlung gestartet.
+Prüfung vor Zahlungslink.
+Danach Zahlungslink, Aufbereitung und Veröffentlichung nach Freigabe.
+Primärer CTA: Zur Aktivitätenseite.
+Sekundärer CTA: Weitere Aktivität einreichen.
+
+Fall flow=existing-subscription:
+
+Aktivität eingereicht.
+Die Einreichung läuft über eine aktive Aktivitätspräsenz.
+Es ist keine neue Zahlung nötig.
+Redaktionelle Prüfung und Aufbereitung folgen.
+Veröffentlichung erst nach Freigabe.
+Primärer CTA: Anbieterbereich öffnen.
+Sekundärer CTA: Zur Aktivitätenseite.
+
+Fall session_id vorhanden:
+
+Zahlung erhalten.
+Redaktionelle Aufbereitung und finale Prüfung folgen.
+Veröffentlichung erst nach Freigabe.
+Die Aktivität zählt erst nach Veröffentlichung im Tarif.
+Primärer CTA: Anbieterbereich öffnen.
+6.10 Verantwortlichkeit und Foto-Upload
+
+Der Einreicher bestätigt im Formular:
+
+Ich bestätige, dass ich berechtigt bin, diese Aktivität einzureichen, die Angaben korrekt sind und der Standort öffentlich genannt werden darf.
+
+Im V1-Formular wird kein Foto-Upload eingebaut.
+
+Begründung:
+
+Foto-Upload erfordert Storage-Logik.
+Foto-Upload erfordert Größen- und Dateitypprüfung.
+Foto-Upload erfordert Rechte-/Lizenzprüfung.
+Foto-Upload erfordert Moderation.
+Foto-Upload erhöht Datenschutz- und Missbrauchsrisiken.
+Die öffentliche Aktivitätskarte entsteht weiterhin redaktionell.
+
+Fotos werden redaktionell ergänzt oder später nach Freigabe separat angefragt.
 ## 7. Definition: Event
 
 ### 7.1 Event-Definition
@@ -943,33 +1084,38 @@ Verwenden:
 Verwenden:
 
 1. Aktivitätspräsenz
-2. Als Aktivität sichtbar werden
-3. Aktivitätspräsenz starten
-4. Aktivitätspräsenz prüfen lassen
-5. veröffentlichte Aktivität
-6. dauerhaftes Angebot
-7. Anbieterbereich
-8. Website- und Maps-Klicks
+2. Aktivität
+3. veröffentlichte Aktivität
+4. Zahlung erst nach Freigabe
+5. Zahlungslink
+6. Aufbereitung
+7. Veröffentlichung
+8. Standort
+9. Anbieterbereich
+10. Zur Prüfung einreichen
+11. Als Aktivität bei Bocholt erleben sichtbar werden
+12. Als Aktivität sichtbar werden
 
 ### 21.3 Nicht als öffentliche Produktbotschaft verwenden
 
 Nicht verwenden:
 
-1. Token
-2. Kontingent
-3. Slot
-4. Entitlement
-5. Consumption
-6. Abo als Hauptbegriff
-7. Statusbereich als erklärter Systembegriff
-8. unbegrenzt als uneingeschränktes Serviceversprechen
-9. Ort vorschlagen
-10. Location eintragen
-11. Anzeige buchen
-12. Werbeeintrag
-13. Premium-Listing
-14. kostenlos eintragen
-
+1. Ort vorschlagen
+2. Location eintragen
+3. Anzeige buchen
+4. Werbeeintrag
+5. Premium-Listing
+6. kostenlos eintragen
+7. Angebot vorschlagen
+8. Verbrauch
+9. Token
+10. Zahlungsstart
+11. Kontingent
+12. Slot
+13. Entitlement
+14. Consumption
+15. Abo als Hauptbegriff
+16. unbegrenzt als uneingeschränktes Serviceversprechen
 ---
 
 ## 22. UI- und Umsetzungsregeln
@@ -1003,20 +1149,36 @@ Ort vorschlagen
 
 ### 22.3 Aktivitäts-Funnel
 
-Der Aktivitäts-Funnel soll sich strukturell am vorhandenen Event-/Veranstalter-Funnel orientieren.
+Der Aktivitäts-Funnel ist verbindlich schlank, mobil und an der Event-Funnel-DNA ausgerichtet.
 
-Mindestinhalte:
+Kanonische Routen:
 
-1. Erklärung der Aktivitätspräsenz
-2. Basis/Plus-Tarife
-3. Eignungskriterien
-4. Abgrenzung zu Events
-5. Formular zur Einreichung
-6. Hinweis auf Prüfung vor Zahlung
-7. Statuslogik im Anbieterbereich
+1. `/angebote/sichtbar-werden/` = Entscheidungsseite
+2. `/angebote/sichtbar-werden/einreichen/` = Formularseite
+3. `/angebote/sichtbar-werden/erfolg/` = Erfolgs-/Statusseite
 
----
+Verbindliche Reihenfolge Entscheidungsseite:
 
+```text
+Hero
+→ Eignungskarte
+→ Tarifwahl
+→ kurzer Ablaufblock
+
+Verbindliche Reihenfolge Formularseite:
+
+Hero
+→ Einreichung vorbereiten
+→ Tarif für die Prüfung
+→ Formularabschnitte
+→ Bestätigung
+→ Button
+→ kurzer Zahlungs-/Prüfungshinweis
+
+Keine langen zusätzlichen Erklärblöcke ergänzen.
+
+Die Zielwirkung ist:
+Verstehen → Eignung prüfen → Tarif wählen → Formular ausfüllen → Prüfung abwarten
 ## 23. Technische Zielregeln
 
 ### 23.1 Submission-Arten

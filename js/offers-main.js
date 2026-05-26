@@ -3,37 +3,70 @@
 // Zweck:
 // - Bootstrapping für Aktivitäten-Seite (/angebote/)
 // - Lädt /data/offers.json, normalisiert Aktivitätsdaten und rendert den Feed
-// - Bindet Suche + 2 Primärfilter im gleichen Mobile-Sheet-/Desktop-Popover-Modell wie die Event-Seite
+// - Steuert den semantischen Aktivitäten-Finder mit Suche, Schnellfiltern und kombinierbaren Filtergruppen
 // END: FILE_HEADER_OFFERS_MAIN
 
+/* === BEGIN BLOCK: ACTIVITIES_SEMANTIC_FINDER_OWNER_V1 | Zweck: ersetzt den alten Single-Filter-/Sheet-/Popover-Owner durch Suche, Schnellfilter, kombinierbare Filtergruppen, aktive Chips, Trefferzahl und Relevanzsortierung; Umfang: Datei-Anfang bis direkt vor showLoading(show) === */
 const OffersApp = {
   offers: [],
   filteredOffers: [],
   searchTerm: "",
-  activeSituation: "",
-  activeCategory: "",
-  activeDesktopPopover: "",
-
-  refs: {
-    searchInput: null,
-    searchRow: null,
-    situationPill: null,
-    categoryPill: null,
-    resetPill: null,
-    situationValue: null,
-    categoryValue: null,
-    situationSheet: null,
-    categorySheet: null,
-    situationSheetOptions: null,
-    categorySheetOptions: null,
-    situationPopover: null,
-    categoryPopover: null,
-    situationPopoverOptions: null,
-    categoryPopoverOptions: null
+  activeFilters: {
+    situation: new Set(),
+    proximity: new Set(),
+    activity_type: new Set(),
+    features: new Set(),
+    effort: new Set()
   },
 
-  isDesktopViewport() {
-    return window.matchMedia("(min-width: 900px)").matches;
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 | Zweck: definiert eine einheitliche Nutzerlogik: jeder weitere Filter verengt die Treffer; Ort/Nähe blockiert dabei parallele Alternativen, damit Schnellfilter nicht wie OR-Wechsel wirken; Umfang: Filterreihenfolge, Exklusivgruppen und Filtergruppen-Konfiguration === */
+  filterGroupOrder: ["proximity", "situation", "activity_type", "features", "effort"],
+  exclusiveFilterGroups: new Set(["proximity"]),
+
+  filterGroups: Object.freeze({
+    proximity: Object.freeze({
+      label: "Ort / Nähe",
+      mode: "all",
+      options: Object.freeze(["Direkt in Bocholt", "In der Umgebung", "Grenzregion / Niederlande"])
+    }),
+    situation: Object.freeze({
+      label: "Situation",
+      mode: "all",
+      options: Object.freeze(["Mit Kindern", "Bei Regen", "Draußen"])
+    }),
+    activity_type: Object.freeze({
+      label: "Aktivitätsart",
+      mode: "all",
+      options: Object.freeze(["Spazieren", "Radfahren", "Spielen", "Kultur", "Natur entdecken", "Sport & Bewegung"])
+    }),
+    features: Object.freeze({
+      label: "Ausstattung & Erlebnis",
+      mode: "all",
+      options: Object.freeze(["Spielplatz", "Wasser", "Tiere", "Café", "Baden", "Rundweg", "Aussicht"])
+    }),
+    effort: Object.freeze({
+      label: "Aufwand",
+      mode: "all",
+      options: Object.freeze(["Spontan", "Halber Tag", "Längerer Ausflug"])
+    })
+  }),
+  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_GROUP_CONTRACT_V1 === */
+  refs: {
+    finder: null,
+    searchInput: null,
+    searchClear: null,
+    searchRow: null,
+    resetPill: null,
+    advancedToggles: [],
+    advancedToggle: null,
+    advancedPanel: null,
+    advancedCount: null,
+    advancedSummary: null,
+    advancedSummaryText: null,
+    advancedReset: null,
+    resultCount: null,
+    activeFilters: null,
+    activeFilterList: null
   },
 
   async init() {
@@ -59,18 +92,17 @@ const OffersApp = {
       const rawOffers = Array.isArray(data) ? data : (Array.isArray(data?.offers) ? data.offers : []);
 
       this.offers = rawOffers
-        .map(this.normalizeOffer)
+        .map((raw, index) => this.normalizeOffer(raw, index))
         .filter(Boolean);
 
       if (!this.offers.length) {
         this.showNoOffers();
+        this.updateFinderUI();
         return;
       }
 
       this.bindControls();
-      this.populateSituationOptions();
-      this.populateCategoryOptions();
-      this.updateFilterBarUI();
+      this.initFilterButtonLabels();
       this.applyFilterAndRender();
       this.showLoading(false);
 
@@ -82,25 +114,94 @@ const OffersApp = {
   },
 
   cacheRefs() {
+    this.refs.finder = document.querySelector("[data-activity-finder]");
     this.refs.searchInput = document.getElementById("search-filter");
+    this.refs.searchClear = document.getElementById("offer-search-clear");
     this.refs.searchRow = document.querySelector(".desktop-hero__search-row");
-    this.refs.situationPill = document.getElementById("offer-situation-pill");
-    this.refs.categoryPill = document.getElementById("offer-category-pill");
     this.refs.resetPill = document.getElementById("offer-reset-pill");
-    this.refs.situationValue = document.getElementById("offer-situation-value");
-    this.refs.categoryValue = document.getElementById("offer-category-value");
-    this.refs.situationSheet = document.getElementById("sheet-situation");
-    this.refs.categorySheet = document.getElementById("sheet-category");
-    this.refs.situationSheetOptions = document.getElementById("sheet-situation-options");
-    this.refs.categorySheetOptions = document.getElementById("sheet-category-options");
-    this.refs.situationPopover = document.getElementById("popover-situation");
-    this.refs.categoryPopover = document.getElementById("popover-offer-category");
-    this.refs.situationPopoverOptions = document.getElementById("popover-situation-options");
-    this.refs.categoryPopoverOptions = document.getElementById("popover-offer-category-options");
+    this.refs.advancedToggles = Array.from(document.querySelectorAll(".activity-finder__advanced-toggle"));
+    this.refs.advancedToggle = this.refs.advancedToggles[0] || null;
+    this.refs.advancedPanel = document.getElementById("offer-advanced-filters");
+    this.refs.advancedCount = document.getElementById("offer-advanced-filter-count");
+    this.refs.advancedSummary = document.getElementById("offer-advanced-filter-summary");
+    this.refs.advancedSummaryText = document.getElementById("offer-advanced-filter-summary-text");
+    this.refs.advancedReset = document.getElementById("offer-advanced-filter-reset");
+    this.refs.resultCount = document.getElementById("offer-result-count");
+    this.refs.activeFilters = document.getElementById("offer-active-filters");
+    this.refs.activeFilterList = document.getElementById("offer-active-filter-list");
   },
 
-  /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_FILTER_TAGS_V3 | Zweck: trennt detailreiche Tags von den neuen kompakten Filter-Tags und entfernt die nicht mehr genutzten area-/hint-Felder sauber aus der Activity-Normalisierung | Umfang: ersetzt nur normalizeOffer() in js/offers-main.js === */
-  normalizeOffer(raw) {
+  normalizeArray(value) {
+    return Array.isArray(value)
+      ? value.map((item) => String(item || "").trim()).filter(Boolean)
+      : [];
+  },
+
+  normalizeBoolean(value) {
+    if (typeof value === "boolean") return value;
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
+  },
+
+  normalizeFilterModel(rawFilter, legacyTags = []) {
+    const source = rawFilter && typeof rawFilter === "object" ? rawFilter : {};
+    const result = {};
+
+    this.filterGroupOrder.forEach((group) => {
+      const allowed = new Set(this.filterGroups[group].options);
+      result[group] = this.normalizeArray(source[group]).filter((value) => allowed.has(value));
+    });
+
+    const hasStructuredValues = this.filterGroupOrder.some((group) => result[group].length > 0);
+    if (hasStructuredValues) return result;
+
+    const legacy = new Set(this.normalizeArray(legacyTags));
+    const add = (group, value) => {
+      if (!this.filterGroups[group]?.options.includes(value)) return;
+      if (!result[group].includes(value)) result[group].push(value);
+    };
+
+    if (legacy.has("Mit Kindern")) add("situation", "Mit Kindern");
+    if (legacy.has("Indoor")) add("situation", "Bei Regen");
+    if (legacy.has("Wandern & Spazieren") || legacy.has("Radfahren") || legacy.has("Wasser") || legacy.has("Spielplatz") || legacy.has("Tiere")) {
+      add("situation", "Draußen");
+    }
+    if (legacy.has("Wandern & Spazieren")) add("activity_type", "Spazieren");
+    if (legacy.has("Radfahren")) add("activity_type", "Radfahren");
+    if (legacy.has("Spielplatz")) add("activity_type", "Spielen");
+    if (legacy.has("Spielplatz")) add("features", "Spielplatz");
+    if (legacy.has("Wasser")) add("features", "Wasser");
+    if (legacy.has("Tiere")) add("features", "Tiere");
+
+    return result;
+  },
+
+  buildSearchText(parts) {
+    const source = this.normalizeArray(parts)
+      .join(" ")
+      .toLowerCase();
+
+    const aeVariant = source
+      .replace(/[ä]/g, "ae")
+      .replace(/[ö]/g, "oe")
+      .replace(/[ü]/g, "ue")
+      .replace(/[ß]/g, "ss");
+
+    const plainVariant = source
+      .replace(/[ä]/g, "a")
+      .replace(/[ö]/g, "o")
+      .replace(/[ü]/g, "u")
+      .replace(/[ß]/g, "ss");
+
+    return `${source} ${aeVariant} ${plainVariant}`
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  },
+
+  normalizeOffer(raw, index = 0) {
     const obj = raw && typeof raw === "object" ? raw : {};
     const id = String(obj.id || "").trim();
     const title = String(obj.title || "").trim();
@@ -113,18 +214,14 @@ const OffersApp = {
       return null;
     }
 
-    const normalizeArray = (value) =>
-      Array.isArray(value)
-        ? value.map((item) => String(item || "").trim()).filter(Boolean)
-        : [];
+    const tags = this.normalizeArray(obj.tags);
+    const filter_tags = this.normalizeArray(obj.filter_tags);
+    const audience = this.normalizeArray(obj.audience);
+    const cardFacts = this.normalizeArray(obj.cardFacts);
+    const filter = this.normalizeFilterModel(obj.filter, filter_tags);
+    const filterValues = this.filterGroupOrder.flatMap((group) => filter[group] || []);
 
-    const normalizeBoolean = (value) => {
-      if (typeof value === "boolean") return value;
-      const normalized = String(value || "").trim().toLowerCase();
-      return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
-    };
-
-    return {
+    const offer = {
       id,
       title,
       kategorie,
@@ -134,10 +231,11 @@ const OffersApp = {
       maps_query: String(obj.maps_query || "").trim(),
       maps_label: String(obj.maps_label || "").trim(),
       website_label: String(obj.website_label || "").trim(),
-      tags: normalizeArray(obj.tags),
-      filter_tags: normalizeArray(obj.filter_tags),
-      audience: normalizeArray(obj.audience),
-      cardFacts: normalizeArray(obj.cardFacts),
+      tags,
+      filter_tags,
+      filter,
+      audience,
+      cardFacts,
       image: String(obj.image || "").trim(),
       image_position_x: String(obj.image_position_x || "").trim(),
       image_position_y: String(obj.image_position_y || "").trim(),
@@ -147,587 +245,16 @@ const OffersApp = {
       image_license: String(obj.image_license || "").trim(),
       image_credit: String(obj.image_credit || "").trim(),
       visual_key: String(obj.visual_key || obj.image_visual_key || "").trim(),
-      image_is_symbolic: normalizeBoolean(obj.image_is_symbolic),
+      image_is_symbolic: this.normalizeBoolean(obj.image_is_symbolic),
       image_note: String(obj.image_note || "").trim(),
       duration: String(obj.duration || "").trim(),
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
-      season: String(obj.season || "").trim()
-    };
-  },
-  /* === END BLOCK: ACTIVITIES_NORMALIZE_OFFER_DATA_WITH_FILTER_TAGS_V3 === */
-
-  bindControls() {
-    const {
-      searchInput,
-      situationPill,
-      categoryPill,
-      resetPill,
-      situationSheet,
-      categorySheet,
-      situationSheetOptions,
-      categorySheetOptions,
-      situationPopoverOptions,
-      categoryPopoverOptions
-    } = this.refs;
-
-    if (searchInput) {
-      searchInput.addEventListener("input", () => {
-        this.searchTerm = String(searchInput.value || "").trim().toLowerCase();
-        this.applyFilterAndRender();
-      });
-    }
-
-    if (situationPill) {
-      situationPill.addEventListener("click", (event) => {
-        event.preventDefault();
-        if (this.isDesktopViewport()) {
-          this.toggleDesktopPopover("situation");
-          return;
-        }
-        this.toggleSheet("situation");
-      });
-    }
-
-    if (categoryPill) {
-      categoryPill.addEventListener("click", (event) => {
-        event.preventDefault();
-        if (this.isDesktopViewport()) {
-          this.toggleDesktopPopover("category");
-          return;
-        }
-        this.toggleSheet("category");
-      });
-    }
-
-    /* === BEGIN BLOCK: ACTIVITIES_RESET_EVENT_BRIDGE_V1 | Zweck: verbindet Reset-Pill und Empty-State-Reset nachhaltig über ein gemeinsames Event | Umfang: ersetzt nur diesen Reset-Listener-Abschnitt in bindControls() === */
-    if (resetPill) {
-      resetPill.addEventListener("click", () => {
-        this.resetFilters();
-      });
-    }
-
-    window.addEventListener("offers:reset-filters", () => {
-      this.resetFilters();
-    });
-
-    [situationSheet, categorySheet].forEach((sheetEl) => {
-    /* === END BLOCK: ACTIVITIES_RESET_EVENT_BRIDGE_V1 === */
-      if (!sheetEl) return;
-
-      sheetEl.addEventListener("click", (event) => {
-        const closeTrigger = event.target.closest("[data-close-sheet]");
-        if (closeTrigger) {
-          this.closeSheet(sheetEl);
-        }
-      });
-    });
-
-    this.bindOptionContainer(situationSheetOptions, "data-situation", (value) => {
-      this.activeSituation = value;
-      this.syncSituationSelection();
-      this.closeSheet(this.refs.situationSheet);
-      this.closeAllDesktopPopovers();
-      this.applyFilterAndRender();
-    });
-
-    this.bindOptionContainer(categorySheetOptions, "data-category", (value) => {
-      this.activeCategory = value;
-      this.syncCategorySelection();
-      this.closeSheet(this.refs.categorySheet);
-      this.closeAllDesktopPopovers();
-      this.applyFilterAndRender();
-    });
-
-    this.bindOptionContainer(situationPopoverOptions, "data-situation", (value) => {
-      this.activeSituation = value;
-      this.syncSituationSelection();
-      this.closeAllDesktopPopovers();
-      this.applyFilterAndRender();
-    });
-
-    this.bindOptionContainer(categoryPopoverOptions, "data-category", (value) => {
-      this.activeCategory = value;
-      this.syncCategorySelection();
-      this.closeAllDesktopPopovers();
-      this.applyFilterAndRender();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "Escape") return;
-      this.closeAllTransientUI();
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!this.isDesktopViewport()) return;
-
-      const insidePill = event.target.closest("#offer-situation-pill, #offer-category-pill");
-      const insidePopover = event.target.closest("#popover-situation, #popover-offer-category");
-      if (insidePill || insidePopover) return;
-
-      this.closeAllDesktopPopovers();
-    });
-
-    window.addEventListener("resize", () => {
-      if (!this.isDesktopViewport()) {
-        this.closeAllDesktopPopovers();
-      } else {
-        this.repositionOpenDesktopPopover();
-      }
-      this.updateFilterBarUI();
-    }, { passive: true });
-
-    window.addEventListener("scroll", () => {
-      this.repositionOpenDesktopPopover();
-    }, { passive: true });
-  },
-
-  bindOptionContainer(container, attrName, onSelect) {
-    if (!container) return;
-
-    container.addEventListener("click", (event) => {
-      const button = event.target.closest(`[${attrName}]`);
-      if (!button) return;
-      onSelect(String(button.getAttribute(attrName) || "").trim());
-    });
-  },
-
-  getCategoryDisplayLabel(rawValue) {
-    if (window.OfferVisuals?.getCategoryPresentation) {
-      return window.OfferVisuals.getCategoryPresentation(rawValue).label;
-    }
-    return String(rawValue || "").trim();
-  },
-
-  /* === BEGIN BLOCK: OFFERS_FACET_COUNTS_WITH_FILTER_TAGS_V3 | Zweck: stellt die Activities-Merkmalsfilter auf kontrollierte filter_tags um, entfernt area-/hint-Abhängigkeiten aus Suche und Facet-Logik und hält Counts/Disabled-State stabil | Umfang: ersetzt die komplette Facet-Rendering- und Apply-Logik von populateButtons() bis direkt vor showLoading(show) in js/offers-main.js === */
-  populateButtons(targets, attrName, entries) {
-    const markup = [
-      `<button type="button" class="filter-sheet-option is-active" ${attrName}="" data-label="Alle">Alle</button>`,
-      ...entries.map(({ value, label }) => (
-        `<button type="button" class="filter-sheet-option" ${attrName}="${this.escapeHtmlAttr(value)}" data-label="${this.escapeHtmlAttr(label)}">${this.escapeHtml(label)}</button>`
-      ))
-    ].join("");
-
-    targets.forEach((target) => {
-      if (target) target.innerHTML = markup;
-    });
-  },
-
-  populateSituationOptions() {
-    const situations = Array.from(
-      new Set(this.offers.flatMap((offer) => offer.filter_tags || []).filter(Boolean))
-    )
-      .sort((a, b) => a.localeCompare(b, "de"))
-      .map((value) => ({ value, label: value }));
-
-    this.populateButtons(
-      [this.refs.situationSheetOptions, this.refs.situationPopoverOptions],
-      "data-situation",
-      situations
-    );
-  },
-
-  populateCategoryOptions() {
-    const categories = Array.from(
-      new Set(this.offers.map((offer) => offer.kategorie).filter(Boolean))
-    )
-      .map((value) => ({ value, label: this.getCategoryDisplayLabel(value) }))
-      .sort((a, b) => a.label.localeCompare(b.label, "de"));
-
-    this.populateButtons(
-      [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions],
-      "data-category",
-      categories
-    );
-  },
-
-  getFacetButtons(group) {
-    const attrName = group === "situation" ? "data-situation" : "data-category";
-    const targets = group === "situation"
-      ? [this.refs.situationSheetOptions, this.refs.situationPopoverOptions]
-      : [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions];
-
-    const result = [];
-    const seen = new Set();
-
-    targets.forEach((target) => {
-      if (!target) return;
-      target.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
-        if (seen.has(button)) return;
-        seen.add(button);
-        result.push(button);
-      });
-    });
-
-    return result;
-  },
-
-  getFacetButtonValue(button, group) {
-    if (!button) return "";
-    return String(
-      group === "situation"
-        ? button.getAttribute("data-situation")
-        : button.getAttribute("data-category")
-    ).trim();
-  },
-
-  setFacetButtonState(button, { enabled, count }) {
-    if (!button) return;
-
-    const baseLabel = String(button.getAttribute("data-label") || button.textContent || "")
-      .trim()
-      .replace(/\s*\(\d+\)\s*$/, "");
-
-    button.setAttribute("data-label", baseLabel);
-    button.textContent = `${baseLabel} (${count})`;
-    button.disabled = !enabled;
-    button.setAttribute("aria-disabled", enabled ? "false" : "true");
-    button.classList.toggle("is-disabled", !enabled);
-
-    if (!enabled) {
-      button.classList.remove("is-active");
-    }
-  },
-
-  sortFacetContainers(group, countMap) {
-    const attrName = group === "situation" ? "data-situation" : "data-category";
-    const targets = group === "situation"
-      ? [this.refs.situationSheetOptions, this.refs.situationPopoverOptions]
-      : [this.refs.categorySheetOptions, this.refs.categoryPopoverOptions];
-
-    targets.forEach((target) => {
-      if (!target) return;
-
-      const allButton = target.querySelector(`.filter-sheet-option[${attrName}=""]`);
-      const buttons = Array.from(target.querySelectorAll(`.filter-sheet-option[${attrName}]`))
-        .filter((button) => this.getFacetButtonValue(button, group).length > 0);
-
-      buttons.sort((a, b) => {
-        const aValue = this.getFacetButtonValue(a, group);
-        const bValue = this.getFacetButtonValue(b, group);
-        const aCount = countMap[aValue] || 0;
-        const bCount = countMap[bValue] || 0;
-        if (bCount !== aCount) return bCount - aCount;
-
-        const aLabel = String(a.getAttribute("data-label") || a.textContent || "")
-          .trim()
-          .replace(/\s*\(\d+\)\s*$/, "");
-        const bLabel = String(b.getAttribute("data-label") || b.textContent || "")
-          .trim()
-          .replace(/\s*\(\d+\)\s*$/, "");
-        return aLabel.localeCompare(bLabel, "de");
-      });
-
-      if (allButton) target.appendChild(allButton);
-      buttons.forEach((button) => target.appendChild(button));
-    });
-  },
-
-  updateFacetOptionStates() {
-    const searchNeedle = String(this.searchTerm || "").trim().toLowerCase();
-    const activeSituation = String(this.activeSituation || "").trim();
-    const activeCategory = String(this.activeCategory || "").trim();
-
-    const matchesSearch = (offer) => {
-      if (!searchNeedle) return true;
-      return this.matchesSearch(offer);
+      season: String(obj.season || "").trim(),
+      sortIndex: Number.isFinite(Number(index)) ? Number(index) : 0
     };
 
-    const baseForSituations = this.offers.filter((offer) => {
-      if (activeCategory && offer.kategorie !== activeCategory) return false;
-      return matchesSearch(offer);
-    });
-
-    const baseForCategories = this.offers.filter((offer) => {
-      if (activeSituation && !(offer.filter_tags || []).includes(activeSituation)) return false;
-      return matchesSearch(offer);
-    });
-
-    const situationCounts = { all: baseForSituations.length };
-    baseForSituations.forEach((offer) => {
-      Array.from(new Set(offer.filter_tags || [])).forEach((tag) => {
-        situationCounts[tag] = (situationCounts[tag] || 0) + 1;
-      });
-    });
-
-    const categoryCounts = { all: baseForCategories.length };
-    baseForCategories.forEach((offer) => {
-      const category = String(offer.kategorie || "").trim();
-      if (!category) return;
-      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-    });
-
-    if (activeSituation && (situationCounts[activeSituation] || 0) === 0) {
-      this.activeSituation = "";
-      this.applyFilterAndRender();
-      return false;
-    }
-
-    if (activeCategory && (categoryCounts[activeCategory] || 0) === 0) {
-      this.activeCategory = "";
-      this.applyFilterAndRender();
-      return false;
-    }
-
-    this.getFacetButtons("situation").forEach((button) => {
-      const value = this.getFacetButtonValue(button, "situation");
-      const count = value ? (situationCounts[value] || 0) : baseForSituations.length;
-      this.setFacetButtonState(button, {
-        enabled: !value || count > 0,
-        count
-      });
-    });
-
-    this.getFacetButtons("category").forEach((button) => {
-      const value = this.getFacetButtonValue(button, "category");
-      const count = value ? (categoryCounts[value] || 0) : baseForCategories.length;
-      this.setFacetButtonState(button, {
-        enabled: !value || count > 0,
-        count
-      });
-    });
-
-    this.sortFacetContainers("situation", situationCounts);
-    this.sortFacetContainers("category", categoryCounts);
-    this.syncSituationSelection();
-    this.syncCategorySelection();
-
-    return true;
-  },
-
-  setSheetLock(isOpen) {
-    document.documentElement.classList.toggle("is-sheet-open", isOpen);
-    document.body.classList.toggle("is-sheet-open", isOpen);
-  },
-
-  openSheet(sheetEl) {
-    if (!sheetEl) return;
-    sheetEl.hidden = false;
-    this.setSheetLock(true);
-  },
-
-  closeSheet(sheetEl) {
-    if (!sheetEl) return;
-    sheetEl.hidden = true;
-
-    const { situationSheet, categorySheet } = this.refs;
-    const allClosed =
-      (!situationSheet || situationSheet.hidden) &&
-      (!categorySheet || categorySheet.hidden);
-
-    if (allClosed) {
-      this.setSheetLock(false);
-    }
-  },
-
-  toggleSheet(key) {
-    const isSituation = key === "situation";
-    const current = isSituation ? this.refs.situationSheet : this.refs.categorySheet;
-    const other = isSituation ? this.refs.categorySheet : this.refs.situationSheet;
-    if (!current) return;
-
-    if (!current.hidden) {
-      this.closeSheet(current);
-      return;
-    }
-
-    this.closeSheet(other);
-    this.openSheet(current);
-  },
-
-  getDesktopPopoverRefs(key) {
-    if (key === "situation") {
-      return {
-        pill: this.refs.situationPill,
-        popover: this.refs.situationPopover
-      };
-    }
-
-    return {
-      pill: this.refs.categoryPill,
-      popover: this.refs.categoryPopover
-    };
-  },
-
-  positionDesktopPopover(popover, pill) {
-    if (!popover || !pill || popover.hidden) return;
-
-    const panel = popover.querySelector(".filter-popover__panel");
-    if (!panel) return;
-
-    const previousVisibility = popover.style.visibility;
-    popover.style.visibility = "hidden";
-    popover.style.left = "0px";
-    popover.style.top = "0px";
-
-    const pillRect = pill.getBoundingClientRect();
-    const panelRect = popover.getBoundingClientRect();
-    const popoverWidth = Math.max(panelRect.width, popover.offsetWidth, 240);
-    const popoverHeight = Math.max(panel.scrollHeight, panelRect.height, 120);
-
-    const viewportLeft = window.scrollX + 16;
-    const viewportRight = window.scrollX + window.innerWidth - 16;
-    const viewportTop = window.scrollY + 16;
-    const viewportBottom = window.scrollY + window.innerHeight - 16;
-
-    let left = pillRect.left + window.scrollX;
-    if (left + popoverWidth > viewportRight) {
-      left = viewportRight - popoverWidth;
-    }
-    if (left < viewportLeft) {
-      left = viewportLeft;
-    }
-
-    let top = pillRect.bottom + window.scrollY + 8;
-    let side = "bottom";
-
-    if (top + popoverHeight > viewportBottom) {
-      const topCandidate = pillRect.top + window.scrollY - popoverHeight - 8;
-      if (topCandidate >= viewportTop) {
-        top = topCandidate;
-        side = "top";
-      } else {
-        top = Math.max(viewportTop, viewportBottom - popoverHeight);
-      }
-    }
-
-    popover.style.left = `${Math.round(left)}px`;
-    popover.style.top = `${Math.round(top)}px`;
-    popover.dataset.side = side;
-    popover.style.visibility = previousVisibility;
-  },
-
-  setPillExpanded(pill, isExpanded) {
-    if (!pill) return;
-    pill.setAttribute("aria-expanded", isExpanded ? "true" : "false");
-  },
-
-  openDesktopPopover(key) {
-    const { pill, popover } = this.getDesktopPopoverRefs(key);
-    if (!pill || !popover) return;
-
-    this.closeAllDesktopPopovers();
-    popover.hidden = false;
-    this.positionDesktopPopover(popover, pill);
-    this.setPillExpanded(pill, true);
-    this.activeDesktopPopover = key;
-  },
-
-  closeDesktopPopover(key) {
-    const { pill, popover } = this.getDesktopPopoverRefs(key);
-    if (popover) {
-      popover.hidden = true;
-      popover.style.left = "";
-      popover.style.top = "";
-      popover.style.visibility = "";
-      popover.dataset.side = "bottom";
-    }
-    this.setPillExpanded(pill, false);
-    if (this.activeDesktopPopover === key) {
-      this.activeDesktopPopover = "";
-    }
-  },
-
-  toggleDesktopPopover(key) {
-    if (this.activeDesktopPopover === key) {
-      this.closeDesktopPopover(key);
-      return;
-    }
-    this.openDesktopPopover(key);
-  },
-
-  repositionOpenDesktopPopover() {
-    if (!this.activeDesktopPopover || !this.isDesktopViewport()) return;
-    const { pill, popover } = this.getDesktopPopoverRefs(this.activeDesktopPopover);
-    if (!pill || !popover || popover.hidden) return;
-    this.positionDesktopPopover(popover, pill);
-  },
-
-  closeAllDesktopPopovers() {
-    this.closeDesktopPopover("situation");
-    this.closeDesktopPopover("category");
-  },
-
-  closeAllTransientUI() {
-    this.closeSheet(this.refs.situationSheet);
-    this.closeSheet(this.refs.categorySheet);
-    this.closeAllDesktopPopovers();
-  },
-
-  setActiveOption(container, attrName, activeValue) {
-    if (!container) return;
-
-    container.querySelectorAll(`.filter-sheet-option[${attrName}]`).forEach((button) => {
-      const value = String(button.getAttribute(attrName) || "").trim();
-      button.classList.toggle("is-active", value === activeValue);
-    });
-  },
-
-  syncSituationSelection() {
-    this.setActiveOption(this.refs.situationSheetOptions, "data-situation", this.activeSituation);
-    this.setActiveOption(this.refs.situationPopoverOptions, "data-situation", this.activeSituation);
-  },
-
-  syncCategorySelection() {
-    this.setActiveOption(this.refs.categorySheetOptions, "data-category", this.activeCategory);
-    this.setActiveOption(this.refs.categoryPopoverOptions, "data-category", this.activeCategory);
-  },
-
-  updateFilterBarUI() {
-    const {
-      searchRow,
-      situationValue,
-      categoryValue,
-      resetPill,
-      situationPill,
-      categoryPill
-    } = this.refs;
-    const hasActiveFilters = !!(this.searchTerm || this.activeSituation || this.activeCategory);
-
-    if (situationValue) {
-      situationValue.textContent = this.activeSituation || "Alle";
-    }
-
-    if (categoryValue) {
-      categoryValue.textContent = this.activeCategory ? this.getCategoryDisplayLabel(this.activeCategory) : "Alle";
-    }
-
-    if (resetPill) {
-      resetPill.hidden = !hasActiveFilters;
-    }
-
-    if (searchRow) {
-      searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
-    }
-
-    if (situationPill) {
-      situationPill.classList.toggle("is-active", !!this.activeSituation);
-    }
-
-    if (categoryPill) {
-      categoryPill.classList.toggle("is-active", !!this.activeCategory);
-    }
-  },
-
-  resetFilters() {
-    this.searchTerm = "";
-    this.activeSituation = "";
-    this.activeCategory = "";
-
-    if (this.refs.searchInput) {
-      this.refs.searchInput.value = "";
-    }
-
-    this.syncSituationSelection();
-    this.syncCategorySelection();
-    this.closeAllTransientUI();
-    this.applyFilterAndRender();
-  },
-
-  matchesSearch(offer) {
-    if (!this.searchTerm) return true;
-
-    const haystack = [
+    offer.searchIndex = this.buildSearchText([
       offer.title,
       offer.location,
       offer.description,
@@ -735,27 +262,560 @@ const OffersApp = {
       offer.duration,
       offer.mode,
       offer.price,
-      ...(offer.tags || []),
-      ...(offer.filter_tags || []),
-      ...(offer.audience || [])
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
+      offer.season,
+      ...offer.tags,
+      ...offer.filter_tags,
+      ...offer.audience,
+      ...offer.cardFacts,
+      ...filterValues
+    ]);
 
-    return haystack.includes(this.searchTerm);
+    return offer;
+  },
+  bindControls() {
+    const {
+      finder,
+      searchInput,
+      searchClear,
+      resetPill,
+      activeFilterList
+    } = this.refs;
+
+    /* === BEGIN BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 | Zweck: synchronisiert Freitextsuche und eigenen Clear-Button; Umfang: nur Search-Input- und Clear-Button-Events === */
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        this.searchTerm = String(searchInput.value || "").trim();
+        this.applyFilterAndRender();
+      });
+    }
+
+    if (searchClear && searchInput) {
+      searchClear.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!String(searchInput.value || "").trim()) return;
+
+        searchInput.value = "";
+        this.searchTerm = "";
+        this.applyFilterAndRender();
+        searchInput.focus({ preventScroll: true });
+      });
+    }
+    /* === END BLOCK: ACTIVITIES_SEARCH_CLEAR_BINDING_V1 === */
+
+    if (finder) {
+      finder.addEventListener("click", (event) => {
+        const filterButton = event.target.closest(".activity-filter-chip[data-filter-group][data-filter-value]");
+        if (!filterButton || !finder.contains(filterButton)) return;
+
+        event.preventDefault();
+        this.toggleFilter(
+          String(filterButton.getAttribute("data-filter-group") || "").trim(),
+          String(filterButton.getAttribute("data-filter-value") || "").trim()
+        );
+      });
+    }
+
+    const toggles = Array.isArray(this.refs.advancedToggles) ? this.refs.advancedToggles : [];
+    toggles.forEach((toggle) => {
+      toggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        this.toggleAdvancedFilters();
+      });
+    });
+
+    if (resetPill) {
+      resetPill.addEventListener("click", () => {
+        this.resetFilters();
+      });
+    }
+
+    if (this.refs.advancedReset) {
+      this.refs.advancedReset.addEventListener("click", () => {
+        this.resetFilters();
+      });
+    }
+
+    if (activeFilterList) {
+      activeFilterList.addEventListener("click", (event) => {
+        const chip = event.target.closest("[data-active-filter-group][data-active-filter-value]");
+        if (!chip) return;
+
+        event.preventDefault();
+        this.removeFilter(
+          String(chip.getAttribute("data-active-filter-group") || "").trim(),
+          String(chip.getAttribute("data-active-filter-value") || "").trim()
+        );
+      });
+    }
+
+    window.addEventListener("offers:reset-filters", () => {
+      this.resetFilters();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      this.closeAdvancedFilters();
+    });
+
+    window.addEventListener("resize", () => {
+      this.updateFinderUI();
+    }, { passive: true });
   },
 
-  applyFilterAndRender() {
-    const situation = this.activeSituation;
-    const category = this.activeCategory;
-
-    this.filteredOffers = this.offers.filter((offer) => {
-      if (situation && !(offer.filter_tags || []).includes(situation)) return false;
-      if (category && offer.kategorie !== category) return false;
-      if (!this.matchesSearch(offer)) return false;
-      return true;
+  initFilterButtonLabels() {
+    this.getFilterButtons().forEach((button) => {
+      const label = String(button.textContent || "").trim().replace(/\s*\(\d+\)\s*$/, "");
+      button.dataset.baseLabel = label;
+      button.setAttribute("aria-pressed", "false");
     });
+  },
+
+  getFilterButtons() {
+    return Array.from(document.querySelectorAll(".activity-filter-chip[data-filter-group][data-filter-value]"));
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_EXCLUSIVE_GROUP_HELPERS_V1 | Zweck: erkennt exklusive Filtergruppen, deren inaktive Alternativen bei aktiver Auswahl ausgeblendet werden; Umfang: ersetzt nur isKnownFilter plus ergänzende Helper === */
+  isKnownFilter(group, value) {
+    return !!this.filterGroups[group]?.options.includes(value);
+  },
+
+  isExclusiveFilterGroup(group) {
+    return this.exclusiveFilterGroups instanceof Set && this.exclusiveFilterGroups.has(group);
+  },
+
+  isBlockedByActiveExclusiveGroup(group, value) {
+    if (!this.isExclusiveFilterGroup(group)) return false;
+
+    const activeValues = this.getActiveValues(group);
+    return activeValues.length > 0 && !activeValues.includes(value);
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_EXCLUSIVE_GROUP_HELPERS_V1 === */
+
+  getActiveSet(group) {
+    if (!this.activeFilters[group]) {
+      this.activeFilters[group] = new Set();
+    }
+    return this.activeFilters[group];
+  },
+
+  getActiveValues(group) {
+    const set = this.getActiveSet(group);
+    const options = this.filterGroups[group]?.options || [];
+    return options.filter((value) => set.has(value));
+  },
+
+  getActiveFilterCount() {
+    return this.filterGroupOrder.reduce((sum, group) => sum + this.getActiveValues(group).length, 0);
+  },
+
+  hasActiveFilters() {
+    return !!String(this.searchTerm || "").trim() || this.getActiveFilterCount() > 0;
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_TOGGLE_V1 | Zweck: behandelt Filterchips als echte Eingrenzungen: erneuter Klick entfernt, neuer Klick fügt hinzu; Umfang: ersetzt nur toggleFilter(group, value) === */
+  toggleFilter(group, value) {
+    if (!this.isKnownFilter(group, value)) return;
+
+    const set = this.getActiveSet(group);
+    if (set.has(value)) {
+      set.delete(value);
+    } else {
+      set.add(value);
+    }
+
+    this.applyFilterAndRender();
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_TOGGLE_V1 === */
+
+  removeFilter(group, value) {
+    if (!this.isKnownFilter(group, value)) return;
+    this.getActiveSet(group).delete(value);
+    this.applyFilterAndRender();
+  },
+
+  resetFilters() {
+    this.searchTerm = "";
+    this.filterGroupOrder.forEach((group) => this.getActiveSet(group).clear());
+
+    if (this.refs.searchInput) {
+      this.refs.searchInput.value = "";
+    }
+
+    this.closeAdvancedFilters();
+    this.applyFilterAndRender();
+  },
+
+  toggleAdvancedFilters() {
+    const { advancedPanel } = this.refs;
+    if (!advancedPanel) return;
+
+    if (advancedPanel.hidden) {
+      this.openAdvancedFilters();
+    } else {
+      this.closeAdvancedFilters();
+    }
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V3 | Zweck: synchronisiert geöffneten Zustand für Desktop- und Mobile-Filtertoggle gemeinsam; Umfang: ersetzt nur openAdvancedFilters() und closeAdvancedFilters() === */
+  openAdvancedFilters() {
+    const { advancedPanel, finder } = this.refs;
+    if (!advancedPanel) return;
+
+    advancedPanel.hidden = false;
+    advancedPanel.classList.add("is-open");
+
+    if (finder) {
+      finder.classList.add("is-advanced-open");
+    }
+
+    this.updateFinderUI();
+  },
+
+  closeAdvancedFilters() {
+    const { advancedPanel, finder } = this.refs;
+    if (!advancedPanel) return;
+
+    advancedPanel.hidden = true;
+    advancedPanel.classList.remove("is-open");
+
+    if (finder) {
+      finder.classList.remove("is-advanced-open");
+    }
+
+    this.updateFinderUI();
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_ADVANCED_OPEN_STATE_V3 === */
+
+  getOfferFilterValues(offer, group) {
+    return this.normalizeArray(offer?.filter?.[group]);
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_NARROWING_MATCH_MODE_V1 | Zweck: wertet aktive Filter konsequent additiv aus; jeder weitere aktive Chip muss am Ergebnis vorhanden sein und kann Treffer nicht künstlich erweitern; Umfang: ersetzt nur matchesFilterGroup(offer, group, activeValues) === */
+  matchesFilterGroup(offer, group, activeValues = this.getActiveValues(group)) {
+    if (!activeValues.length) return true;
+
+    const available = new Set(this.getOfferFilterValues(offer, group));
+    return activeValues.every((value) => available.has(value));
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_NARROWING_MATCH_MODE_V1 === */
+
+  matchesFilterState(offer, filterState = this.activeFilters) {
+    return this.filterGroupOrder.every((group) => {
+      const values = this.filterGroups[group].options.filter((value) => filterState[group]?.has(value));
+      return this.matchesFilterGroup(offer, group, values);
+    });
+  },
+
+  matchesSearch(offer) {
+    const query = String(this.searchTerm || "").trim();
+    if (!query) return true;
+
+    const needle = this.buildSearchText([query]);
+    if (!needle) return true;
+
+    const tokens = needle.split(" ").filter(Boolean);
+    return tokens.every((token) => offer.searchIndex.includes(token));
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_PROJECTED_COUNT_NARROWING_V1 | Zweck: berechnet Trefferzahlen ausschließlich als zusätzliche Verengung; Umfang: ersetzt nur createProjectedState(group, value) === */
+  createProjectedState(group, value) {
+    const projected = {};
+    this.filterGroupOrder.forEach((key) => {
+      projected[key] = new Set(this.getActiveValues(key));
+    });
+
+    if (!projected[group].has(value)) {
+      projected[group].add(value);
+    }
+
+    return projected;
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_PROJECTED_COUNT_NARROWING_V1 === */
+
+  countProjectedMatches(group, value) {
+    if (!this.isKnownFilter(group, value)) return 0;
+
+    const isActive = this.getActiveSet(group).has(value);
+    const state = isActive ? this.activeFilters : this.createProjectedState(group, value);
+
+    return this.offers.filter((offer) => {
+      if (!this.matchesSearch(offer)) return false;
+      return this.matchesFilterState(offer, state);
+    }).length;
+  },
+
+  rankOffer(offer) {
+    let score = 0;
+
+    this.filterGroupOrder.forEach((group) => {
+      const activeValues = this.getActiveValues(group);
+      if (!activeValues.length) return;
+
+      const values = new Set(this.getOfferFilterValues(offer, group));
+      activeValues.forEach((value) => {
+        if (values.has(value)) {
+          if (group === "proximity") score += 18;
+          else if (group === "features") score += 14;
+          else if (group === "situation") score += 12;
+          else if (group === "activity_type") score += 10;
+          else if (group === "effort") score += 8;
+        }
+      });
+    });
+
+    if (!this.getActiveValues("proximity").length) {
+      const proximity = new Set(this.getOfferFilterValues(offer, "proximity"));
+      if (proximity.has("Direkt in Bocholt")) score += 6;
+      else if (proximity.has("In der Umgebung")) score += 3;
+    }
+
+    const visibleValueCount = [
+      ...(offer.tags || []),
+      ...(offer.cardFacts || []),
+      ...this.filterGroupOrder.flatMap((group) => this.getOfferFilterValues(offer, group))
+    ].filter(Boolean).length;
+
+    score += Math.min(visibleValueCount, 8) * 0.25;
+    return score;
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_CONTEXT_V1 | Zweck: gibt den Activity-Cards die aktuell passenden aktiven Filter als sichtbare Passungsbegründung mit; Umfang: erweitert Relevanzsortierung um Render-Kontext, ohne Filterlogik zu verändern === */
+  sortByRelevance(offers) {
+    return [...offers].sort((a, b) => {
+      const scoreDelta = this.rankOffer(b) - this.rankOffer(a);
+      if (scoreDelta !== 0) return scoreDelta;
+      return (a.sortIndex || 0) - (b.sortIndex || 0);
+    });
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 | Zweck: übersetzt aktive Filterwerte in verständliche Card-Merkmale, damit Ergebnis-Cards ihre Passung für Nutzer nachvollziehbar erklären; Umfang: ersetzt nur getActiveMatchLabels() und ergänzt lokalen Label-Mapper === */
+  getCardMatchLabel(offer, group, value) {
+    const normalizedTags = new Set(this.normalizeArray(offer?.tags));
+    const normalizedFacts = new Set(this.normalizeArray(offer?.cardFacts));
+
+    if (group === "situation" && value === "Mit Kindern") {
+      if (normalizedTags.has("Familienfreundlich")) return "Familienfreundlich";
+      return "Mit Kindern";
+    }
+
+    if (group === "situation" && value === "Draußen") {
+      if (normalizedFacts.has("Outdoor")) return "Draußen";
+      return "Draußen";
+    }
+
+    if (group === "situation" && value === "Bei Regen") {
+      if (normalizedFacts.has("Indoor")) return "Bei Regen";
+      return "Bei Regen";
+    }
+
+    if (group === "proximity" && value === "In der Umgebung") {
+      return "Umgebung";
+    }
+
+    if (group === "proximity" && value === "Grenzregion / Niederlande") {
+      return "Grenzregion";
+    }
+
+    if (group === "proximity" && value === "Direkt in Bocholt") {
+      return "Bocholt";
+    }
+
+    return value;
+  },
+
+  getActiveMatchLabels(offer) {
+    const orderedGroups = ["situation", "features", "proximity", "activity_type", "effort"];
+    const labels = [];
+    const seen = new Set();
+
+    orderedGroups.forEach((group) => {
+      const available = new Set(this.getOfferFilterValues(offer, group));
+      this.getActiveValues(group).forEach((value) => {
+        if (!available.has(value)) return;
+
+        const label = this.getCardMatchLabel(offer, group, value);
+        const key = String(label || "").trim().toLowerCase();
+        if (!label || seen.has(key)) return;
+
+        seen.add(key);
+        labels.push(label);
+      });
+    });
+
+    return labels.slice(0, 3);
+  },
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_LABELS_ENTERPRISE_V1 === */
+
+  withRenderedMatchContext(offer) {
+    return {
+      ...offer,
+      activeMatchLabels: this.getActiveMatchLabels(offer)
+    };
+  },
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_CONTEXT_V1 === */
+
+  renderActiveFilterChips() {
+    const { activeFilters, activeFilterList } = this.refs;
+    if (!activeFilters || !activeFilterList) return;
+
+    activeFilterList.innerHTML = "";
+    const activeEntries = [];
+
+    this.filterGroupOrder.forEach((group) => {
+      this.getActiveValues(group).forEach((value) => {
+        activeEntries.push({ group, value });
+      });
+    });
+
+    activeFilters.hidden = activeEntries.length === 0;
+
+    activeEntries.forEach(({ group, value }) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "activity-active-chip";
+      button.setAttribute("data-active-filter-group", group);
+      button.setAttribute("data-active-filter-value", value);
+      button.setAttribute("aria-label", `Filter ${value} entfernen`);
+      button.textContent = `${value} ×`;
+      activeFilterList.appendChild(button);
+    });
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_ENTERPRISE_COUNT_CONTRACT | Zweck: trennt aktive Zustände und Auswahlprognosen eindeutig: aktive Chips zeigen nur Label + CSS-X, inaktive Chips zeigen Label + projizierte Trefferzahl; Umfang: ersetzt nur updateFilterButtonStates() === */
+  updateFilterButtonStates() {
+    this.getFilterButtons().forEach((button) => {
+      const group = String(button.getAttribute("data-filter-group") || "").trim();
+      const value = String(button.getAttribute("data-filter-value") || "").trim();
+      if (!this.isKnownFilter(group, value)) return;
+
+      const baseLabel = String(button.dataset.baseLabel || button.textContent || value)
+        .trim()
+        .replace(/\s*\(\d+\)\s*$/, "");
+      button.dataset.baseLabel = baseLabel;
+
+      const isActive = this.getActiveSet(group).has(value);
+      const isExclusiveBlocked = this.isBlockedByActiveExclusiveGroup(group, value);
+      const count = this.countProjectedMatches(group, value);
+      const disabled = !isActive && (isExclusiveBlocked || count === 0);
+      const countLabel = count === 1 ? "1 Aktivität" : `${count} Aktivitäten`;
+
+      button.textContent = isActive ? baseLabel : `${baseLabel} (${count})`;
+      button.classList.toggle("is-active", isActive);
+      button.classList.toggle("is-disabled", disabled);
+      button.classList.toggle("is-exclusive-blocked", isExclusiveBlocked);
+      button.disabled = disabled;
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      button.setAttribute("aria-disabled", disabled ? "true" : "false");
+      button.setAttribute(
+        "aria-label",
+        isActive
+          ? `Filter ${baseLabel} entfernen`
+          : `Filter ${baseLabel} aktivieren, danach ${countLabel}`
+      );
+    });
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_BUTTON_STATE_ENTERPRISE_COUNT_CONTRACT === */
+
+  updateResultCount() {
+    const { resultCount } = this.refs;
+    if (!resultCount) return;
+
+    const count = this.filteredOffers.length;
+    if (count === 0) {
+      resultCount.textContent = "Keine Aktivitäten gefunden";
+      return;
+    }
+
+    resultCount.textContent = count === 1
+      ? "1 Aktivität gefunden"
+      : `${count} Aktivitäten gefunden`;
+  },
+
+  /* === BEGIN BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 | Zweck: synchronisiert Desktop- und Mobile-Filtertoggle gemeinsam; Mobile zeigt nur die Zahl, Desktop zeigt „x aktiv“, Summary bleibt ohne doppelte Trefferzeile; Umfang: ersetzt nur updateFinderUI() === */
+  updateFinderUI() {
+    const activeCount = this.getActiveFilterCount();
+    const hasActiveFilters = this.hasActiveFilters();
+    const hasActiveFilterValues = activeCount > 0;
+    const hasSearchTerm = String(this.searchTerm || "").trim().length > 0;
+    const isAdvancedOpen = !!(this.refs.advancedPanel && !this.refs.advancedPanel.hidden);
+
+    if (this.refs.finder) {
+      this.refs.finder.classList.toggle("has-active-filters", hasActiveFilterValues);
+      this.refs.finder.classList.toggle("has-search-term", hasSearchTerm);
+      this.refs.finder.classList.toggle("is-advanced-open", isAdvancedOpen);
+    }
+
+    if (this.refs.searchClear) {
+      this.refs.searchClear.hidden = !hasSearchTerm;
+    }
+
+    if (this.refs.resetPill) {
+      this.refs.resetPill.hidden = !hasActiveFilters;
+    }
+
+    if (this.refs.searchRow) {
+      this.refs.searchRow.classList.toggle("has-active-filter-reset", hasActiveFilters);
+    }
+
+    const toggles = Array.isArray(this.refs.advancedToggles) ? this.refs.advancedToggles : [];
+    toggles.forEach((toggle) => {
+      const isMobileToggle = toggle.classList.contains("activity-finder__mobile-toggle");
+      const countEl = toggle.querySelector(".filter-pill__value");
+
+      toggle.classList.toggle("has-active-filter-count", hasActiveFilterValues);
+      toggle.dataset.activeCount = hasActiveFilterValues ? String(activeCount) : "";
+      toggle.setAttribute("aria-expanded", isAdvancedOpen ? "true" : "false");
+      toggle.classList.toggle("is-active", isAdvancedOpen);
+      toggle.setAttribute(
+        "aria-label",
+        hasActiveFilterValues
+          ? `Weitere Filter, ${activeCount} Filter aktiv`
+          : "Weitere Filter"
+      );
+
+      if (countEl) {
+        countEl.textContent = hasActiveFilterValues
+          ? (isMobileToggle ? String(activeCount) : `${activeCount} aktiv`)
+          : "";
+      }
+    });
+
+    if (this.refs.advancedSummary) {
+      if (hasActiveFilters) {
+        this.refs.advancedSummary.removeAttribute("hidden");
+      } else {
+        this.refs.advancedSummary.setAttribute("hidden", "");
+      }
+    }
+
+    if (this.refs.advancedReset) {
+      this.refs.advancedReset.hidden = !hasActiveFilters;
+    }
+
+    if (this.refs.advancedSummaryText) {
+      if (hasActiveFilterValues) {
+        this.refs.advancedSummaryText.textContent = activeCount === 1
+          ? "1 Filter aktiv"
+          : `${activeCount} Filter aktiv`;
+      } else if (hasSearchTerm) {
+        this.refs.advancedSummaryText.textContent = "Suche aktiv";
+      } else {
+        this.refs.advancedSummaryText.textContent = "";
+      }
+    }
+
+    this.updateResultCount();
+    this.updateFilterButtonStates();
+    this.renderActiveFilterChips();
+  },
+  /* === END BLOCK: ACTIVITIES_FINDER_SEARCH_CLEAR_AND_FILTER_COUNT_STATE_V5 === */
+
+  applyFilterAndRender() {
+    this.filteredOffers = this.sortByRelevance(this.offers.filter((offer) => {
+      if (!this.matchesSearch(offer)) return false;
+      return this.matchesFilterState(offer);
+    }));
 
     if (typeof window.OfferCards?.render !== "function") {
       console.error("OfferCards.render missing");
@@ -763,15 +823,11 @@ const OffersApp = {
       return;
     }
 
-    if (!this.updateFacetOptionStates()) {
-      return;
-    }
-
-    this.updateFilterBarUI();
+    this.updateFinderUI();
     this.showLoading(false);
-    window.OfferCards.render(this.filteredOffers);
+    window.OfferCards.render(this.filteredOffers.map((offer) => this.withRenderedMatchContext(offer)));
   },
-  /* === END BLOCK: OFFERS_FACET_COUNTS_WITH_FILTER_TAGS_V3 === */
+  /* === END BLOCK: ACTIVITIES_SEMANTIC_FINDER_OWNER_V1 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SHOWLOADING_A11Y_V1 | Zweck: Loading-Overlay analog zur Event-Seite mit aria-busy steuern | Umfang: ersetzt nur showLoading(show) === */
   showLoading(show) {

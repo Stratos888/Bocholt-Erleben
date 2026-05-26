@@ -101,7 +101,37 @@ function opm_touch_portal_session(PDO $pdo, int $portalSessionId): void
     ]);
 }
 
-function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
+/* === BEGIN BLOCK: ORGANIZER_PORTAL_SUBSCRIPTION_OVERVIEW_SOURCE_V1 | Zweck: liefert neben der bisherigen Haupt-Subscription auch alle aktiven Tarif-Subscriptions und berechenbare Monatswerte; Umfang: ersetzt opm_fetch_active_subscription und ergänzt Subscription-Helper === */
+function opm_plan_label(string $planKey): string
+{
+    return match ($planKey) {
+        'starter' => 'Starter',
+        'active' => 'Aktiv',
+        'unlimited' => 'Dauerhaft',
+        'activity_basic' => 'Aktivitätspräsenz Basis',
+        'activity_plus' => 'Aktivitätspräsenz Plus',
+        default => $planKey,
+    };
+}
+
+function opm_plan_monthly_amount_cents(string $planKey): int
+{
+    return match ($planKey) {
+        'starter' => 999,
+        'active' => 1999,
+        'unlimited' => 2999,
+        'activity_basic' => 999,
+        'activity_plus' => 1999,
+        default => 0,
+    };
+}
+
+function opm_format_eur_monthly(int $amountCents): string
+{
+    return number_format($amountCents / 100, 2, ',', '.') . ' € / Monat';
+}
+
+function opm_fetch_active_subscriptions(PDO $pdo, int $organizerId): array
 {
     $statement = $pdo->prepare(
         'SELECT
@@ -121,6 +151,7 @@ function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
             updated_at
          FROM subscriptions
          WHERE organizer_id = :organizer_id
+           AND status IN ("active", "trialing", "past_due")
          ORDER BY
             CASE
                 WHEN status = "active" THEN 0
@@ -128,18 +159,83 @@ function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
                 WHEN status = "past_due" THEN 2
                 ELSE 3
             END,
+            CASE
+                WHEN plan_key IN ("starter", "active", "unlimited") THEN 0
+                WHEN plan_key IN ("activity_basic", "activity_plus") THEN 1
+                ELSE 2
+            END,
             current_period_end DESC,
-            id DESC
-         LIMIT 1'
+            id DESC'
     );
 
     $statement->execute([
         ':organizer_id' => $organizerId,
     ]);
 
-    $row = $statement->fetch();
-    return is_array($row) ? $row : null;
+    $rows = $statement->fetchAll();
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    return array_map(static function (array $row): array {
+        $planKey = trim((string)($row['plan_key'] ?? ''));
+        $amountCents = opm_plan_monthly_amount_cents($planKey);
+        $row['plan_label'] = opm_plan_label($planKey);
+        $row['monthly_amount_cents'] = $amountCents;
+        $row['monthly_amount_label'] = $amountCents > 0 ? opm_format_eur_monthly($amountCents) : null;
+        return $row;
+    }, $rows);
 }
+
+function opm_fetch_active_subscription(PDO $pdo, int $organizerId): ?array
+{
+    $subscriptions = opm_fetch_active_subscriptions($pdo, $organizerId);
+    return $subscriptions[0] ?? null;
+}
+
+function opm_build_billing_summary(array $subscriptions): array
+{
+    $items = [];
+    $monthlyTotalCents = 0;
+
+    foreach ($subscriptions as $subscription) {
+        if (!is_array($subscription)) {
+            continue;
+        }
+
+        $status = strtolower(trim((string)($subscription['status'] ?? '')));
+        if (!in_array($status, ['active', 'trialing', 'past_due'], true)) {
+            continue;
+        }
+
+        $planKey = trim((string)($subscription['plan_key'] ?? ''));
+        $amountCents = opm_plan_monthly_amount_cents($planKey);
+        $monthlyTotalCents += $amountCents;
+
+        $items[] = [
+            'subscription_id' => (int)($subscription['id'] ?? 0),
+            'plan_key' => $planKey,
+            'plan_label' => opm_plan_label($planKey),
+            'status' => $status,
+            'monthly_amount_cents' => $amountCents,
+            'monthly_amount_label' => $amountCents > 0 ? opm_format_eur_monthly($amountCents) : null,
+            'current_period_start' => $subscription['current_period_start'] ?? null,
+            'current_period_end' => $subscription['current_period_end'] ?? null,
+            'cancel_at_period_end' => (int)($subscription['cancel_at_period_end'] ?? 0),
+            'pending_plan_key' => $subscription['pending_plan_key'] ?? null,
+            'pending_change_effective_at' => $subscription['pending_change_effective_at'] ?? null,
+        ];
+    }
+
+    return [
+        'currency' => 'EUR',
+        'subscription_count' => count($items),
+        'monthly_total_cents' => $monthlyTotalCents,
+        'monthly_total_label' => opm_format_eur_monthly($monthlyTotalCents),
+        'items' => $items,
+    ];
+}
+/* === END BLOCK: ORGANIZER_PORTAL_SUBSCRIPTION_OVERVIEW_SOURCE_V1 === */
 
 function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubscription = null): array
 {
@@ -259,7 +355,70 @@ function opm_fetch_quota_summary(PDO $pdo, int $organizerId, ?array $activeSubsc
         'current_period_end' => $entitlementRow['current_period_end'] !== null ? (string)$entitlementRow['current_period_end'] : null,
     ];
 }
+/* === BEGIN BLOCK: ORGANIZER_PORTAL_QUOTA_BY_PLAN_V1 | Zweck: liefert Kontingente nach Tarifgruppe, damit Event- und Aktivitaetspraesenz-Tarife getrennt und zusammen darstellbar sind; Umfang: neue additive Quota-Auswertung === */
+function opm_fetch_quota_summary_by_plan(PDO $pdo, int $organizerId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT
+            pe.plan_key,
+            COUNT(*) AS entitlement_count,
+            MAX(CASE WHEN pe.is_unlimited = 1 THEN 1 ELSE 0 END) AS has_unlimited,
+            COALESCE(SUM(pe.included_publications), 0) AS included_total,
+            COALESCE(SUM(COALESCE(pcsum.consumed_units, 0)), 0) AS consumed_total,
+            MIN(pe.period_start) AS current_period_start,
+            MAX(pe.period_end) AS current_period_end
+         FROM publication_entitlements pe
+         LEFT JOIN (
+            SELECT
+                entitlement_id,
+                COALESCE(SUM(units), 0) AS consumed_units
+            FROM publication_consumptions
+            GROUP BY entitlement_id
+         ) pcsum ON pcsum.entitlement_id = pe.id
+         WHERE pe.organizer_id = :organizer_id
+           AND pe.source_type = "subscription"
+           AND pe.status = "active"
+           AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
+           AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())
+         GROUP BY pe.plan_key
+         ORDER BY
+            CASE
+                WHEN pe.plan_key IN ("starter", "active", "unlimited") THEN 0
+                WHEN pe.plan_key IN ("activity_basic", "activity_plus") THEN 1
+                ELSE 2
+            END,
+            pe.plan_key ASC'
+    );
 
+    $statement->execute([
+        ':organizer_id' => $organizerId,
+    ]);
+
+    $rows = $statement->fetchAll();
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    return array_map(static function (array $row): array {
+        $planKey = trim((string)($row['plan_key'] ?? ''));
+        $hasUnlimited = ((int)($row['has_unlimited'] ?? 0)) === 1;
+        $includedTotal = (int)($row['included_total'] ?? 0);
+        $consumedTotal = (int)($row['consumed_total'] ?? 0);
+
+        return [
+            'plan_key' => $planKey,
+            'plan_label' => opm_plan_label($planKey),
+            'entitlement_count' => (int)($row['entitlement_count'] ?? 0),
+            'has_unlimited' => $hasUnlimited,
+            'included_total' => $includedTotal,
+            'consumed_total' => $consumedTotal,
+            'remaining_total' => $hasUnlimited ? null : max(0, $includedTotal - $consumedTotal),
+            'current_period_start' => $row['current_period_start'] !== null ? (string)$row['current_period_start'] : null,
+            'current_period_end' => $row['current_period_end'] !== null ? (string)$row['current_period_end'] : null,
+        ];
+    }, $rows);
+}
+/* === END BLOCK: ORGANIZER_PORTAL_QUOTA_BY_PLAN_V1 === */
 /* === BEGIN BLOCK: ORGANIZER_PORTAL_FETCH_CURRENT_SUBMISSIONS_V1 | Zweck: liefert fuer das Dashboard nur aktuelle/relevante Einreichungen, sortiert nach neuester Einreichung; Umfang: ersetzt opm_fetch_recent_submissions() === */
 function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
 {
@@ -295,10 +454,10 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
             updated_at
          FROM submissions
          WHERE organizer_id = :organizer_id
-           AND submission_kind = "event"
+           AND submission_kind IN ("event", "activity")
            AND (
-                status IN ("draft", "checkout_started", "paid", "in_review")
-                OR (start_date IS NOT NULL AND start_date >= CURRENT_DATE())
+                status IN ("pending_review", "payment_released", "draft", "checkout_started", "paid", "in_review", "approved", "rejected")
+                OR (submission_kind = "event" AND start_date IS NOT NULL AND start_date >= CURRENT_DATE())
            )
          ORDER BY
             COALESCE(created_at, updated_at, paid_at, approved_at, rejected_at) DESC,
@@ -325,8 +484,13 @@ try {
     opm_touch_portal_session($pdo, (int)$sessionRow['portal_session_id']);
 
     $organizerId = (int)$sessionRow['organizer_id'];
-    $activeSubscription = opm_fetch_active_subscription($pdo, $organizerId);
-$quotaSummary = opm_fetch_quota_summary($pdo, $organizerId, $activeSubscription);
+    /* === BEGIN BLOCK: ORGANIZER_PORTAL_MULTI_TARIFF_PAYLOAD_V1 | Zweck: liefert Hauptsubscription weiterhin kompatibel und zusaetzlich alle aktiven Tarife, Tarif-Kontingente und Monatsgesamtsumme; Umfang: ersetzt Subscription-/Quota-Ermittlung im Response-Aufbau === */
+    $activeSubscriptions = opm_fetch_active_subscriptions($pdo, $organizerId);
+    $activeSubscription = $activeSubscriptions[0] ?? null;
+    $quotaSummary = opm_fetch_quota_summary($pdo, $organizerId, $activeSubscription);
+    $quotaByPlan = opm_fetch_quota_summary_by_plan($pdo, $organizerId);
+    $billingSummary = opm_build_billing_summary($activeSubscriptions);
+    /* === END BLOCK: ORGANIZER_PORTAL_MULTI_TARIFF_PAYLOAD_V1 === */
     $recentSubmissions = opm_fetch_recent_submissions($pdo, $organizerId);
 
     be_json_response(200, [
@@ -346,7 +510,10 @@ $quotaSummary = opm_fetch_quota_summary($pdo, $organizerId, $activeSubscription)
                 'last_seen_at_utc' => $sessionRow['last_seen_at'] !== null ? (string)$sessionRow['last_seen_at'] : null,
             ],
             'subscription' => $activeSubscription,
+            'active_subscriptions' => $activeSubscriptions,
             'quota' => $quotaSummary,
+            'quota_by_plan' => $quotaByPlan,
+            'billing_summary' => $billingSummary,
             'recent_submissions' => $recentSubmissions,
         ],
     ]);

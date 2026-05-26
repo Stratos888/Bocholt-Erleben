@@ -46,7 +46,7 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 
 ---
 
-<!-- === BEGIN BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_V1 | Zweck: Grundregeln an production-only Weekly-Lauf anpassen | Umfang: ersetzt Discovery-darf-nicht-null-Regel durch getrennte Produktions- und Discovery-Logik === -->
+<!-- === BEGIN BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_V1 | Zweck: Grundregeln an production-only Weekly-Lauf anpassen | Umfang: ersetzt Discovery-darf-nicht-null-Regel durch getrennte Produktions- und Discovery-<!-- === BEGIN BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_SPRACHPRIORITAET_V2 | Zweck: Grundregeln um deutsche Ziel-URL-Priorität bei NL-/mehrsprachigen Quellen ergänzen | Umfang: ersetzt Grundregeln für die Nutzung vollständig === -->
 ## Grundregeln für die Nutzung
 
 1. Dieses Register ersetzt **nicht** das Regelwerk.
@@ -56,13 +56,18 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 5. Im Weekly-Produktionslauf wird aktiv nur über `CORE-HIGH`, `CORE-MID` und `RECOVERY` gesucht.
 6. `DISCOVERY-SEED` und `DISCOVERY-OPEN` werden im Weekly-Produktionslauf nicht aktiv als Suchmodus genutzt.
 7. Für separate Quellen-Discovery-Läufe bleiben `DISCOVERY-SEED`, `DISCOVERY-OPEN` und neue Quellen außerhalb des Registers zulässig.
-8. Dieses Register steuert:
+8. Bei niederländischen oder mehrsprachigen Quellen gilt zusätzlich: Wenn eine stabile deutsche Eventdetailseite oder gleichwertige deutsche Event-/Infoseite derselben offiziellen Quelle und derselben konkreten Instanz existiert, muss diese als `url` bevorzugt werden.
+9. Deutsche Alternativen dürfen nur verwendet werden, wenn sie Titel/Eventbezug, Datum und Ort derselben konkreten Instanz belastbar belegen.
+10. Google-Translate-, Browser-Übersetzungs-, Sprachumschalter-, Suchsnippet-, Tracking- oder Weiterleitungs-URLs sind keine zulässigen deutschen FINAL-URLs.
+11. Wenn keine echte stabile deutsche Äquivalentseite existiert, bleibt die niederländische Originalseite zulässig.
+12. Dieses Register steuert:
    - wo zuerst gesucht wird
    - wo Recovery sinnvoll ist
    - welche Quellen eher wenig bringen
    - welche Quellen nicht aktiv benutzt werden sollen
    - welche Quellen separat für Discovery beobachtet werden können
-<!-- === END BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_V1 === -->
+   - bei welchen Quellen die deutsche Ziel-URL-Prüfung besonders wichtig ist
+<!-- === END BLOCK: GRUNDREGELN_REGISTER_PRODUKTION_ONLY_SPRACHPRIORITAET_V2 === -->
 
 ---
 
@@ -93,6 +98,7 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - bei mehreren URLs immer die stabilste erreichbare deutschsprachige Event-URL wählen
   - keine 404-/Suchsnippet-/Parameter-URL als FINAL übernehmen
 
+<!-- === BEGIN BLOCK: QUELLE_AALTENDAGEN_SPRACHPRIORITAET_V1 | Zweck: AaltenDagen um deutsche Zielseitenprüfung und Instanzsicherheit ergänzen | Umfang: ersetzt Quelle AaltenDagen vollständig === -->
 ### AaltenDagen
 - Quelle / Muster:
   - `aaltendagen.nl/*`
@@ -109,12 +115,17 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Risiken:
   - eine gemeinsame Seite kann mehrere Termine enthalten
   - Tagesblöcke können unterschiedliche Zeiten haben
+  - deutsche Varianten können fehlen, generisch sein oder nur Übersetzungs-/Sprachumschalter-Charakter haben
 - Einsatzregel:
   - in Saisonläufen aktiv mitführen
   - einzelne AaltenDag-Termine dürfen eigene Einträge sein, wenn Datum/Instanz getrennt sind
   - gleiche `source_url` ist zulässig, wenn Datum/Instanz unterschiedlich ist
   - `time` nur setzen, wenn eine eindeutige Startzeit für die konkrete Instanz belegt ist; sonst leer lassen
-
+  - vor FINAL aktiv prüfen, ob eine stabile deutsche Event-/Infoseite derselben konkreten AaltenDagen-Instanz existiert
+  - wenn eine stabile deutsche Seite dieselbe konkrete Tages-/Eventinstanz belegt, muss diese in `url`
+  - wenn keine echte stabile deutsche Äquivalentseite existiert, darf die niederländische Originalseite als `url` verwendet werden
+  - keine Google-Translate-, Browser-Übersetzungs-, Sprachumschalter- oder generische deutsche Startseite als `url` verwenden
+<!-- === END BLOCK: QUELLE_AALTENDAGEN_SPRACHPRIORITAET_V1 === -->
 ---
 
 ## CORE-MID
@@ -285,6 +296,7 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - Ticketseite nur nutzen, wenn sie offiziell zuordenbar, instanzsicher und regelkonform ist
   - keine Ticketshop-Only-Treffer ohne belastbare Eventeinordnung
 
+<!-- === BEGIN BLOCK: QUELLE_KOPPELKERK_SPRACHPRIORITAET_V1 | Zweck: Koppelkerk um deutsche Zielseitenprüfung bei Event-URLs ergänzen | Umfang: ersetzt Quelle Koppelkerk vollständig === -->
 ### Koppelkerk
 - Quelle / Muster:
   - `koppelkerk.nl/agenda/*`
@@ -302,11 +314,16 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - oft nischig
   - viele kleine Kultur-/Buch-/Vortragsformate mit begrenztem PWA-Nutzen
   - Ortsgranularität nicht feiner setzen als belegt
+  - deutsche Alternativseiten können fehlen oder nur allgemeine Informationen liefern
 - Einsatzregel:
   - gezielt prüfen, aber nur starke Treffer in FINAL
   - Bücherbörsen/Märkte eher geeignet
   - kleine Buchvorstellungen, Spezialkonzerte oder Nischenformate nur bei erkennbarem Breiteninteresse
-
+  - wenn eine stabile deutsche Koppelkerk-Seite dieselbe konkrete Eventinstanz mit Datum und Ort belegt, diese als `url` nutzen
+  - wenn keine stabile deutsche Eventseite existiert oder die deutsche Seite die konkrete Instanz nicht belegt, darf die niederländische Eventdetailseite verwendet werden
+  - keine generische deutsche Koppelkerk-Info-/Startseite als Ersatz für eine niederländische Eventdetailseite verwenden
+<!-- === END BLOCK: QUELLE_KOPPELKERK_SPRACHPRIORITAET_V1 === -->
+<!-- === BEGIN BLOCK: QUELLE_SAISONALE_EINZELSEITEN_SPRACHPRIORITAET_V1 | Zweck: saisonale NL-/mehrsprachige Highlightquellen um deutsche URL-Priorität ergänzen | Umfang: ersetzt Quelle Saisonale starke Einzelseiten vollständig === -->
 ### Saisonale starke Einzelseiten im Suchradius
 - Quelle / Muster:
   - `wijnfeest-aalten.nl/*`
@@ -328,11 +345,17 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - Seiten können jährlich wechseln
   - Datums-/Jahresbezug muss exakt geprüft werden
   - Scope muss je Ort streng geprüft werden
+  - NL-/mehrsprachige Seiten können deutsche Informationsseiten, niederländische Originalseiten und Übersetzungsvarianten parallel anbieten
 - Einsatzregel:
   - in Backfill-/Saisonläufen gezielt prüfen
   - nur konkrete Jahresinstanz übernehmen
   - bei fehlendem Jahr, unsicherer Aktualität oder unklarer Terminseite REVIEW bzw. weglassen
   - nicht als generische Dauerquelle missverstehen
+  - bei `bredevoortschittert.nl/*`, `wijnfeest-aalten.nl/*`, `oldtimertreffenaalten.nl/*` und `grensmarktdinxperlo.com/*` immer aktiv prüfen, ob eine stabile deutsche offizielle Event-/Infoseite derselben konkreten Instanz existiert
+  - wenn eine stabile deutsche Seite dieselbe Jahres-/Eventinstanz mit Datum und Ort belegt, muss diese in `url`
+  - wenn die deutsche Seite nur Startseite, Sprachumschalter, Browser-/Google-Translate-Variante oder allgemeine Image-/Info-Seite ist, bleibt die niederländische Originalseite zulässig
+  - keine deutsche URL erzwingen, wenn sie die konkrete Instanz nicht selbst belastbar belegt
+<!-- === END BLOCK: QUELLE_SAISONALE_EINZELSEITEN_SPRACHPRIORITAET_V1 === -->
 
 ### Öffentliche Kultur-/Museums-/Institutionenquellen
 - Quelle / Muster:
@@ -357,6 +380,7 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 
 ## DISCOVERY-SEED
 
+<!-- === BEGIN BLOCK: QUELLE_BREDEVOORT_NU_SPRACHPRIORITAET_V1 | Zweck: Discovery-Quelle Bredevoort.nu um deutsche Äquivalent-URL-Prüfung ergänzen | Umfang: ersetzt Quelle Bredevoort.nu vollständig === -->
 ### Bredevoort.nu / lokale Agenda-Portale
 - Quelle / Muster:
   - `bredevoort.nu/agenda/*`
@@ -367,11 +391,18 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
 - Strategierisiko: niedrig
 - Warum:
   - gut als Signalgeber für neue Kandidaten
+- Risiken:
+  - lokale Agenda-Portale können auf offizielle Veranstalterseiten verweisen
+  - Sprach-/Kanonik-Mix möglich
+  - nicht jede Agenda-Seite ist selbst die beste FINAL-URL
 - Einsatzregel:
   - zur Quellen-Discovery erlaubt
   - im Weekly-Produktionslauf nicht aktiv suchen
   - FINAL nur nach offizieller oder gleichwertig event-spezifischer Verifikation
-
+  - bei Bredevoort-/NL-Kandidaten immer prüfen, ob eine stabile deutsche offizielle Zielseite derselben Eventinstanz existiert
+  - wenn eine stabile deutsche offizielle Event-/Infoseite existiert und die konkrete Instanz belegt, diese als `url` nutzen
+  - wenn nur das Agenda-Portal oder eine niederländische Originalseite die Instanz belastbar belegt, deutsche generische Seiten nicht ersatzweise verwenden
+<!-- === END BLOCK: QUELLE_BREDEVOORT_NU_SPRACHPRIORITAET_V1 === -->
 ### Allgemeine Kulturkalender / regionale Eventübersichten
 - Quelle / Muster:
   - regionale Kulturübersichten

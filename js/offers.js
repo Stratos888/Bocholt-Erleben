@@ -398,7 +398,28 @@ function getCategoryPresentation(category) {
     return meaningfulTags.slice(0, Math.max(0, Number.isFinite(limit) ? limit : meaningfulTags.length));
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 | Zweck: nutzt bei aktiven Filtern die Card-Zeile auf Mobile als direkte Passungsbegründung statt nur als allgemeine Tag-Zeile; Umfang: ersetzt nur pickSupportingLabel(offer) === */
   function pickSupportingLabel(offer) {
+    const activeMatches = Array.isArray(offer?.activeMatchLabels)
+      ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
+
+    if (activeMatches.length) {
+      const merged = [];
+      const seen = new Set();
+
+      [...activeMatches, ...getRankedTagItems(offer, 3)].forEach((entry) => {
+        const value = toSingleLine(entry);
+        const key = normalizeComparable(value);
+        if (!value || seen.has(key)) return;
+
+        seen.add(key);
+        merged.push(value);
+      });
+
+      return merged.slice(0, 3).join(" · ");
+    }
+
     const primaryTags = getRankedTagItems(offer, 2);
     if (primaryTags.length) return primaryTags.join(" · ");
 
@@ -407,26 +428,50 @@ function getCategoryPresentation(category) {
 
     return "";
   }
+  /* === END BLOCK: ACTIVITIES_CARD_SUPPORTING_MATCH_SUMMARY_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 | Zweck: priorisiert bei aktiven Filtern die konkret passenden Merkmale auf Activity-Cards; Umfang: ersetzt nur buildFactItems(offer), ohne Meta-/Tag-Helfer zu verändern === */
   function buildFactItems(offer) {
-    const primaryTags = getRankedTagItems(offer, 3);
-    if (primaryTags.length) {
-      return primaryTags;
-    }
+    const activeMatches = Array.isArray(offer?.activeMatchLabels)
+      ? offer.activeMatchLabels.map((entry) => toSingleLine(entry)).filter(Boolean)
+      : [];
 
+    const primaryTags = getRankedTagItems(offer, 3);
     const curatedFacts = Array.isArray(offer?.cardFacts)
       ? offer.cardFacts.map((entry) => toSingleLine(entry)).filter(Boolean)
       : [];
+
+    const fallbackFacts = [offer?.duration, offer?.mode, offer?.price]
+      .map((entry) => toSingleLine(entry))
+      .filter(Boolean);
+
+    if (activeMatches.length) {
+      const merged = [];
+      const seen = new Set();
+
+      [...activeMatches, ...primaryTags, ...curatedFacts, ...fallbackFacts].forEach((entry) => {
+        const value = toSingleLine(entry);
+        const key = normalizeComparable(value);
+        if (!value || seen.has(key)) return;
+
+        seen.add(key);
+        merged.push(value);
+      });
+
+      return merged.slice(0, 3);
+    }
+
+    if (primaryTags.length) {
+      return primaryTags;
+    }
 
     if (curatedFacts.length) {
       return curatedFacts.slice(0, 3);
     }
 
-    return [offer?.duration, offer?.mode, offer?.price]
-      .map((entry) => toSingleLine(entry))
-      .filter(Boolean)
-      .slice(0, 3);
+    return fallbackFacts.slice(0, 3);
   }
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_FACT_PRIORITY_V1 === */
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V3 === */
 
   return {
@@ -468,22 +513,50 @@ const OfferCards = (() => {
     return `<p class="event-card-desc">${OfferVisuals.escapeHtml(text)}</p>`;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_CHIP_RENDER_V1 | Zweck: markiert aktuell passende Filtermerkmale auf Activity-Cards sichtbar, ohne die bestehende Fact-Chip-Struktur zu ersetzen; Umfang: ersetzt nur renderFactChips(offer) === */
   function renderFactChips(offer) {
     const items = OfferVisuals.buildFactItems(offer);
     if (!items.length) return "";
 
+    const activeMatches = new Set(
+      (Array.isArray(offer?.activeMatchLabels) ? offer.activeMatchLabels : [])
+        .map((entry) => String(entry || "").replace(/\s+/g, " ").trim())
+        .filter(Boolean)
+    );
+
     return `
-      <div class="activity-card-facts" aria-label="Wichtige Merkmale">
-        ${items.map((item) => `<span class="activity-card-fact">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+      <div class="activity-card-facts" aria-label="${activeMatches.size ? "Passende Merkmale" : "Wichtige Merkmale"}">
+        ${items.map((item) => {
+          const label = String(item || "").replace(/\s+/g, " ").trim();
+          const isMatch = activeMatches.has(label);
+          const className = isMatch
+            ? "activity-card-fact activity-card-fact--match"
+            : "activity-card-fact";
+
+          return `<span class="${className}">${OfferVisuals.escapeHtml(label)}</span>`;
+        }).join("")}
       </div>
     `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_CHIP_RENDER_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_RENDER_ENTERPRISE | Zweck: rendert die mobile Passungszeile in trennzeichensicheren Segmenten, damit keine abgetrennten Punkte am Zeilenende entstehen; Umfang: ersetzt nur renderSupportingLine(offer) === */
   function renderSupportingLine(offer) {
     const text = OfferVisuals.pickSupportingLabel(offer);
-    if (!text) return "";
-    return `<div class="activity-card-quiet">${OfferVisuals.escapeHtml(text)}</div>`;
+    const items = String(text || "")
+      .split(/\s*·\s*/)
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+
+    if (!items.length) return "";
+
+    return `
+      <div class="activity-card-quiet" aria-label="Warum diese Aktivität passt">
+        ${items.map((item) => `<span class="activity-card-quiet__item">${OfferVisuals.escapeHtml(item)}</span>`).join("")}
+      </div>
+    `.trim();
   }
+  /* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_RENDER_ENTERPRISE === */
   /* === END BLOCK: OFFERS_CARD_DISCOVERY_VALUE_V2 === */
   /* === BEGIN BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 | Zweck: behaelt die bestehende Bildlade-Logik der Activity-Cards bei und ergänzt belastbare Alt-Texte fuer Suchmaschinen und Barrierefreiheit, ohne Kartenlayout oder Ladeprioritäten zu verändern | Umfang: ersetzt nur Helper + renderMedia() vor openPrimaryDesktopTarget() === */
   const preconnectedImageOrigins = new Set();
@@ -711,7 +784,37 @@ const OfferCards = (() => {
     }
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 | Zweck: reicht Card-Indizes an die Bildlogik weiter, damit erste sichtbare Bilder priorisiert laden | Umfang: ersetzt nur render(offers) + Return-Zeile === */
+  /* === BEGIN BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 | Zweck: rendert den Aktivitäts-Funnel-Einstieg auf Mobile als Feed-Card im Stil der Event-veröffentlichen-Card statt als Hero-Service-Button; Umfang: ersetzt render(offers) + Return-Zeile und ergänzt createActivityPresenceEntry() === */
+  function createActivityPresenceEntry() {
+    const link = document.createElement("a");
+    link.className = "feed-publish-entry activity-presence-feed-entry";
+    link.href = "/angebote/sichtbar-werden/";
+    link.setAttribute("aria-label", "Für Anbieter – als Aktivität sichtbar werden");
+
+    const label = document.createElement("span");
+    label.className = "feed-publish-entry__label";
+    label.textContent = "Für Anbieter";
+
+    const main = document.createElement("span");
+    main.className = "feed-publish-entry__main";
+
+    const title = document.createElement("span");
+    title.className = "feed-publish-entry__title";
+    title.textContent = "Als Aktivität sichtbar werden";
+
+    const chevron = document.createElement("span");
+    chevron.className = "feed-publish-entry__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = window.Icons?.svg
+      ? window.Icons.svg("chevron-right", { className: "feed-publish-entry__chevron-svg" })
+      : "";
+
+    main.append(title, chevron);
+    link.append(label, main);
+
+    return link;
+  }
+
   function render(offers) {
     const target = ensureContainer();
     if (!target) return;
@@ -741,11 +844,14 @@ const OfferCards = (() => {
 
     list.forEach((offer, index) => {
       target.appendChild(createCard(offer, index));
+      if (index === 0) {
+        target.appendChild(createActivityPresenceEntry());
+      }
     });
   }
 
   return { render, renderSkeleton };
-  /* === END BLOCK: ACTIVITIES_RENDER_IMAGE_PRIORITY_PLUMBING_V1 === */
+  /* === END BLOCK: ACTIVITIES_MOBILE_PRESENCE_FEED_ENTRY_V1 === */
   /* === END BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 === */
 })();
 

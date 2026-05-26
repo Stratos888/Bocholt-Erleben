@@ -108,6 +108,8 @@ function scs_get_stripe_config(): array
         'starter' => trim((string)($prices['starter'] ?? '')),
         'active' => trim((string)($prices['active'] ?? '')),
         'unlimited' => trim((string)($prices['unlimited'] ?? '')),
+        'activity_basic' => trim((string)($prices['activity_basic'] ?? '')),
+        'activity_plus' => trim((string)($prices['activity_plus'] ?? '')),
     ];
 
     if ($secretKey === '') {
@@ -125,15 +127,17 @@ function scs_get_stripe_config(): array
         'prices' => $mappedPrices,
     ];
 }
-function scs_notify_paid_submission_inbox_best_effort(int $submissionId): void
+function scs_notify_paid_submission_inbox_best_effort(int $submissionId, string $submissionKind): void
 {
-    /* === BEGIN FUNCTION: scs_notify_paid_submission_inbox_best_effort | Zweck: sendet nach Abo-Reuse eine einfache Inbox-Pushmeldung ohne Checkout-Flow zu blockieren; Umfang: best-effort Zusatzlogik === */
+    /* === BEGIN FUNCTION: scs_notify_paid_submission_inbox_best_effort | Zweck: sendet nach Abo-Reuse die passende Inbox-Pushmeldung fuer Event- oder Aktivitaetseinreichungen; Umfang: best-effort Zusatzlogik === */
     if ($submissionId <= 0) {
         return;
     }
 
+    $eventType = $submissionKind === 'activity' ? 'activity_submission' : 'event_submission';
+
     try {
-        be_push_notify_inbox_best_effort('event_submission', 'submission:' . $submissionId . ':paid');
+        be_push_notify_inbox_best_effort($eventType, 'submission:' . $submissionId . ':paid');
     } catch (Throwable $error) {
         error_log('Checkout push notification skipped: ' . $error->getMessage());
     }
@@ -146,6 +150,7 @@ function scs_fetch_submission(PDO $pdo, int $submissionId): array
         'SELECT
             s.id,
             s.organizer_id,
+            s.submission_kind,
             s.status,
             s.requested_model_key,
             s.payment_kind,
@@ -191,6 +196,7 @@ function scs_fetch_submission_by_payment_start_token(PDO $pdo, string $token): a
         'SELECT
             s.id,
             s.organizer_id,
+            s.submission_kind,
             s.status,
             s.requested_model_key,
             s.payment_kind,
@@ -230,15 +236,22 @@ function scs_fetch_submission_by_payment_start_token(PDO $pdo, string $token): a
 }
 /* === END BLOCK: STRIPE_CHECKOUT_FETCH_BY_PAYMENT_TOKEN_V1 === */
 
-/* === BEGIN BLOCK: STRIPE_CHECKOUT_ASSERT_PAYMENT_TOKEN_READY_V1 | Zweck: prüft interne Zahlungsstart-Links vor Stripe-Session-Erzeugung; Umfang: Einzelevent-Status- und Ablaufprüfung === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_CHECKOUT_PAYMENT_TOKEN_READY_V1 | Zweck: erlaubt Zahlungsstart-Token fuer Einzeltermin und Aktivitaetspraesenz; Umfang: ersetzt STRIPE_CHECKOUT_ASSERT_PAYMENT_TOKEN_READY_V1 === */
 function scs_assert_payment_start_token_ready(array $submission): void
 {
-    if ((string)($submission['payment_kind'] ?? '') !== 'single') {
-        throw new InvalidArgumentException('Dieser Zahlungslink ist nur für Einzeltermine gültig.');
-    }
+    $submissionKind = (string)($submission['submission_kind'] ?? '');
+    $paymentKind = (string)($submission['payment_kind'] ?? '');
+    $intakeOrigin = (string)($submission['intake_origin'] ?? '');
+    $modelKey = (string)($submission['requested_model_key'] ?? '');
 
-    if ((string)($submission['intake_origin'] ?? '') !== 'single_event') {
-        throw new InvalidArgumentException('Dieser Zahlungslink gehört nicht zu einer Einzeltermin-Einreichung.');
+    $isSingleEvent = $submissionKind === 'event' && $paymentKind === 'single' && $intakeOrigin === 'single_event';
+    $isActivityPresence = $submissionKind === 'activity'
+        && $paymentKind === 'subscription'
+        && $intakeOrigin === 'activity_presence'
+        && in_array($modelKey, ['activity_basic', 'activity_plus'], true);
+
+    if (!$isSingleEvent && !$isActivityPresence) {
+        throw new InvalidArgumentException('Dieser Zahlungslink ist für diese Einreichung nicht gültig.');
     }
 
     $status = (string)($submission['status'] ?? '');
@@ -264,7 +277,7 @@ function scs_assert_payment_start_token_ready(array $submission): void
         throw new InvalidArgumentException('Zahlungslink ist abgelaufen.');
     }
 }
-/* === END BLOCK: STRIPE_CHECKOUT_ASSERT_PAYMENT_TOKEN_READY_V1 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_PAYMENT_TOKEN_READY_V1 === */
 
 function scs_assert_submission_ready(array $submission): void
 {
@@ -293,15 +306,39 @@ function scs_assert_submission_ready(array $submission): void
     }
 }
 
-function scs_build_success_url(string $baseUrl, string $paymentReferenceKey): string
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 | Zweck: koppelt Aktivitaets-Zahlungsrueckspruenge an die E-Mail der Einreichung, damit der Anbieterbereich den passenden Account-Kontext vorfuellen kann; Umfang: ersetzt scs_build_success_url und scs_build_cancel_url === */
+function scs_activity_email_query_part(array $submission): string
 {
-    return rtrim($baseUrl, '/') . '/events-veroeffentlichen/erfolg/?submission_ref=' . rawurlencode($paymentReferenceKey) . '&session_id={CHECKOUT_SESSION_ID}';
+    $email = trim((string)($submission['email_snapshot'] ?? ''));
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return '';
+    }
+
+    return '&email=' . rawurlencode($email);
 }
 
-function scs_build_cancel_url(string $baseUrl, string $paymentReferenceKey): string
+function scs_build_success_url(string $baseUrl, array $submission): string
 {
+    $paymentReferenceKey = (string)$submission['payment_reference_key'];
+    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
+    $path = $isActivity ? '/angebote/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
+    $emailPart = $isActivity ? scs_activity_email_query_part($submission) : '';
+
+    return rtrim($baseUrl, '/') . $path . '?submission_ref=' . rawurlencode($paymentReferenceKey) . '&session_id={CHECKOUT_SESSION_ID}' . $emailPart;
+}
+
+function scs_build_cancel_url(string $baseUrl, array $submission): string
+{
+    $paymentReferenceKey = (string)$submission['payment_reference_key'];
+    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
+
+    if ($isActivity) {
+        return rtrim($baseUrl, '/') . '/angebote/sichtbar-werden/?cancelled=1&submission_ref=' . rawurlencode($paymentReferenceKey) . scs_activity_email_query_part($submission);
+    }
+
     return rtrim($baseUrl, '/') . '/events-veroeffentlichen/abgebrochen/?submission_ref=' . rawurlencode($paymentReferenceKey);
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_CHECKOUT_RETURN_URLS_V2 === */
 
 function scs_stripe_api_request(string $secretKey, string $endpointPath, array $formData): array
 {
@@ -382,7 +419,18 @@ function scs_ensure_stripe_customer(PDO $pdo, array $submission, string $secretK
     return $customerId;
 }
 
-/* === BEGIN BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V4 | Zweck: vermeidet doppelte PDO-Named-Parameter und findet ein nutzbares aktives Abo-Kontingent; Umfang: komplette Funktion === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_FETCH_USABLE_ACTIVE_ENTITLEMENT_V1 | Zweck: trennt Event- und Aktivitaetspraesenz-Kontingente beim Checkout-/Abo-Reuse; Umfang: ersetzt STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V4 === */
+function scs_subscription_plan_keys_for_submission(array $submission): array
+{
+    $submissionKind = trim((string)($submission['submission_kind'] ?? 'event'));
+
+    if ($submissionKind === 'activity') {
+        return ['activity_basic', 'activity_plus'];
+    }
+
+    return ['starter', 'active', 'unlimited'];
+}
+
 function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submission): ?array
 {
     $organizerId = (int)($submission['organizer_id'] ?? 0);
@@ -391,6 +439,19 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
     }
 
     $requestedPlanKey = trim((string)($submission['requested_model_key'] ?? ''));
+    $planKeys = scs_subscription_plan_keys_for_submission($submission);
+    $planPlaceholders = [];
+    $params = [
+        ':organizer_id' => $organizerId,
+        ':requested_plan_key_check' => $requestedPlanKey,
+        ':requested_plan_key_value' => $requestedPlanKey,
+    ];
+
+    foreach ($planKeys as $index => $planKey) {
+        $placeholder = ':plan_key_' . $index;
+        $planPlaceholders[] = $placeholder;
+        $params[$placeholder] = $planKey;
+    }
 
     $statement = $pdo->prepare(
         'SELECT
@@ -418,6 +479,7 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
          WHERE pe.organizer_id = :organizer_id
            AND pe.source_type = "subscription"
            AND pe.status = "active"
+           AND pe.plan_key IN (' . implode(', ', $planPlaceholders) . ')
            AND s.status IN ("active", "trialing")
            AND (pe.period_start IS NULL OR pe.period_start <= UTC_TIMESTAMP())
            AND (pe.period_end IS NULL OR pe.period_end >= UTC_TIMESTAMP())
@@ -436,29 +498,34 @@ function scs_fetch_usable_active_subscription_entitlement(PDO $pdo, array $submi
          LIMIT 1'
     );
 
-    $statement->execute([
-        ':organizer_id' => $organizerId,
-        ':requested_plan_key_check' => $requestedPlanKey,
-        ':requested_plan_key_value' => $requestedPlanKey,
-    ]);
+    $statement->execute($params);
 
     $row = $statement->fetch(PDO::FETCH_ASSOC);
 
     return is_array($row) ? $row : null;
 }
-/* === END BLOCK: STRIPE_CHECKOUT_FETCH_USABLE_ACTIVE_ENTITLEMENT_V4 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_FETCH_USABLE_ACTIVE_ENTITLEMENT_V1 === */
 
-function scs_build_existing_subscription_redirect_url(string $baseUrl, string $paymentReferenceKey): string
+function scs_build_existing_subscription_redirect_url(string $baseUrl, array $submission): string
 {
-    return rtrim($baseUrl, '/') . '/events-veroeffentlichen/erfolg/?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription';
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_EXISTING_SUBSCRIPTION_REDIRECT_EMAIL_V1 | Zweck: fuehrt bestehende Aktivitaetspraesenz-Rueckspruenge mit E-Mail-Kontext in den passenden Anbieterbereich; Umfang: ersetzt nur den Existing-Subscription-Redirect-Builder === */
+    $paymentReferenceKey = (string)$submission['payment_reference_key'];
+    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
+    $path = $isActivity ? '/angebote/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
+    $emailPart = $isActivity ? scs_activity_email_query_part($submission) : '';
+
+    return rtrim($baseUrl, '/') . $path . '?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription' . $emailPart;
+    /* === END BLOCK: ACTIVITY_PRESENCE_EXISTING_SUBSCRIPTION_REDIRECT_EMAIL_V1 === */
 }
 
-/* === BEGIN BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V4 | Zweck: vermeidet doppelte PDO-Named-Parameter und setzt Event-Submission bei aktivem Abo sauber auf bezahlt; Umfang: komplette Funktion === */
+/* === BEGIN BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V5 | Zweck: setzt Abo-Reuse fuer Events und Aktivitaetspraesenzen mit korrekter Herkunft auf bezahlt; Umfang: komplette Funktion === */
 function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $submission, array $entitlement, string $customerId): void
 {
     $stripeSubscriptionId = trim((string)($entitlement['stripe_subscription_id'] ?? ''));
     $effectiveCustomerId = trim((string)($entitlement['stripe_customer_id'] ?? ''));
     $resolvedModelKey = trim((string)($entitlement['plan_key'] ?? ''));
+    $submissionKind = trim((string)($submission['submission_kind'] ?? 'event'));
+    $resolvedIntakeOrigin = $submissionKind === 'activity' ? 'activity_presence' : 'membership';
 
     if ($effectiveCustomerId === '') {
         $effectiveCustomerId = $customerId;
@@ -486,7 +553,7 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
 
     $statement->bindValue(':status', 'paid', PDO::PARAM_STR);
     $statement->bindValue(':payment_kind', 'subscription', PDO::PARAM_STR);
-    $statement->bindValue(':intake_origin', 'membership', PDO::PARAM_STR);
+    $statement->bindValue(':intake_origin', $resolvedIntakeOrigin, PDO::PARAM_STR);
     $statement->bindValue(':resolved_model_key_check', $resolvedModelKey, PDO::PARAM_STR);
     $statement->bindValue(':resolved_model_key_value', $resolvedModelKey, PDO::PARAM_STR);
     $statement->bindValue(':submission_id', (int)$submission['id'], PDO::PARAM_INT);
@@ -505,7 +572,7 @@ function scs_mark_submission_paid_from_active_subscription(PDO $pdo, array $subm
 
     $statement->execute();
 }
-/* === END BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V4 === */
+/* === END BLOCK: STRIPE_CHECKOUT_MARK_PAID_FROM_ACTIVE_SUBSCRIPTION_V5 === */
 
 function scs_create_checkout_session(array $submission, string $customerId, array $stripeConfig, array $appConfig): array
 {
@@ -518,14 +585,15 @@ function scs_create_checkout_session(array $submission, string $customerId, arra
         'mode' => $mode,
         'customer' => $customerId,
         'client_reference_id' => $paymentReferenceKey,
-        'success_url' => scs_build_success_url($appConfig['base_url'], $paymentReferenceKey),
-        'cancel_url' => scs_build_cancel_url($appConfig['base_url'], $paymentReferenceKey),
+        'success_url' => scs_build_success_url($appConfig['base_url'], $submission),
+        'cancel_url' => scs_build_cancel_url($appConfig['base_url'], $submission),
         'line_items[0][price]' => $priceId,
         'line_items[0][quantity]' => '1',
         'metadata[submission_id]' => (string)$submission['id'],
         'metadata[payment_reference_key]' => $paymentReferenceKey,
         'metadata[organizer_id]' => (string)$submission['organizer_id'],
         'metadata[requested_model_key]' => $modelKey,
+        'metadata[submission_kind]' => (string)($submission['submission_kind'] ?? 'event'),
     ];
 
     if ($mode === 'subscription') {
@@ -533,6 +601,7 @@ function scs_create_checkout_session(array $submission, string $customerId, arra
         $formData['subscription_data[metadata][payment_reference_key]'] = $paymentReferenceKey;
         $formData['subscription_data[metadata][organizer_id]'] = (string)$submission['organizer_id'];
         $formData['subscription_data[metadata][requested_model_key]'] = $modelKey;
+        $formData['subscription_data[metadata][submission_kind]'] = (string)($submission['submission_kind'] ?? 'event');
     }
 
     $session = scs_stripe_api_request($stripeConfig['secret_key'], 'checkout/sessions', $formData);
@@ -580,11 +649,14 @@ try {
         : null;
 
     if (is_array($existingSubscriptionEntitlement)) {
+        /* === BEGIN BLOCK: CHECKOUT_EXISTING_SUBSCRIPTION_REUSE_RESTORE_V3 | Zweck: stellt den bestehenden Abo-Reuse-Zweig wieder her und verhindert den Parse-Fatal im Checkout-Endpoint; Umfang: ersetzt nur den Existing-Subscription-Zweig nach Entitlement-Ermittlung === */
         scs_mark_submission_paid_from_active_subscription($pdo, $submission, $existingSubscriptionEntitlement, $customerId);
         $pdo->commit();
-        // === BEGIN BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 | Zweck: neue per aktiver Mitgliedschaft bezahlte Event-Einreichung best-effort per Push melden; Umfang: keine Änderung am Response-/Checkout-Verhalten ===
-        scs_notify_paid_submission_inbox_best_effort($submissionId);
-        // === END BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V1 ===
+
+        // === BEGIN BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V2 | Zweck: neue per aktivem Tarif bezahlte Event- oder Aktivitaetseinreichung best-effort per Push melden; Umfang: keine Änderung am Response-/Checkout-Verhalten ===
+        scs_notify_paid_submission_inbox_best_effort($submissionId, (string)($submission['submission_kind'] ?? 'event'));
+        // === END BLOCK: CHECKOUT_ACTIVE_SUBSCRIPTION_INBOX_PUSH_V2 ===
+
         $resolvedModelKey = trim((string)($existingSubscriptionEntitlement['plan_key'] ?? ''));
         $effectiveModelKey = $resolvedModelKey !== ''
             ? $resolvedModelKey
@@ -601,11 +673,12 @@ try {
                 'checkout_required' => false,
                 'redirect_url' => scs_build_existing_subscription_redirect_url(
                     $appConfig['base_url'],
-                    (string)$submission['payment_reference_key']
+                    $submission
                 ),
                 'used_existing_subscription' => true,
             ],
         ]);
+        /* === END BLOCK: CHECKOUT_EXISTING_SUBSCRIPTION_REUSE_RESTORE_V3 === */
     }
 
     $checkoutSession = scs_create_checkout_session($submission, $customerId, $stripeConfig, $appConfig);

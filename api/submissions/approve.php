@@ -83,39 +83,57 @@ function sap_fetch_submission(PDO $pdo, int $submissionId): array
     return $row;
 }
 
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_APPROVAL_ASSERT_V1 | Zweck: erlaubt finale Freigabe fuer bezahlte Events und Aktivitaetspraesenzen mit passenden Pflichtdaten; Umfang: ersetzt sap_assert_submission_approvable === */
 function sap_assert_submission_approvable(array $submission): void
 {
     $status = trim((string)($submission['status'] ?? ''));
+    $submissionKind = (string)($submission['submission_kind'] ?? 'event');
+
+    /* === BEGIN BLOCK: SUBMISSION_APPROVAL_PAYMENT_REQUIRED_MESSAGE_V1 | Zweck: liefert klare fachliche Fehlermeldung, wenn vor finaler Veröffentlichung noch keine Zahlung bestätigt ist; Umfang: ersetzt Status-/Paid-Guards === */
+    $paymentNotConfirmedMessage = $submissionKind === 'activity'
+        ? 'Die Zahlung wurde noch nicht bestätigt. Bitte erst den Zahlungsstatus prüfen oder den Zahlungslink erneut senden.'
+        : 'Die Zahlung wurde noch nicht bestätigt. Bitte erst den Zahlungsstatus prüfen oder den Zahlungslink erneut senden.';
+
+    if (in_array($status, ['pending_review', 'payment_released', 'checkout_started', 'draft'], true)) {
+        throw new InvalidArgumentException($paymentNotConfirmedMessage);
+    }
 
     if (!in_array($status, ['paid', 'in_review', 'approved'], true)) {
-        throw new InvalidArgumentException('Submission ist aktuell nicht freigabefähig.');
+        throw new InvalidArgumentException('Diese Einreichung ist aktuell nicht veröffentlichungsfähig.');
     }
 
-    if ($status !== 'approved' && empty($submission['paid_at'])) {
-        throw new InvalidArgumentException('Submission ist noch nicht bezahlt.');
+    if (trim((string)($submission['paid_at'] ?? '')) === '') {
+        throw new InvalidArgumentException($paymentNotConfirmedMessage);
     }
+    /* === END BLOCK: SUBMISSION_APPROVAL_PAYMENT_REQUIRED_MESSAGE_V1 === */
 
-    if ((string)($submission['submission_kind'] ?? '') !== 'event') {
-        throw new InvalidArgumentException('Nur Event-Submissions können veröffentlicht werden.');
+    if (!in_array($submissionKind, ['event', 'activity'], true)) {
+        throw new InvalidArgumentException('Diese Submission-Art kann nicht veröffentlicht werden.');
     }
 
     if (trim((string)($submission['title'] ?? '')) === '') {
-        throw new InvalidArgumentException('Vor der Veröffentlichung fehlt der Veranstaltungstitel.');
+        throw new InvalidArgumentException($submissionKind === 'activity'
+            ? 'Vor der Veröffentlichung fehlt der Aktivitätsname.'
+            : 'Vor der Veröffentlichung fehlt der Veranstaltungstitel.');
     }
 
-    if (trim((string)($submission['start_date'] ?? '')) === '') {
+    if ($submissionKind === 'event' && trim((string)($submission['start_date'] ?? '')) === '') {
         throw new InvalidArgumentException('Vor der Veröffentlichung fehlt das Veranstaltungsdatum.');
     }
 
     if (trim((string)($submission['location_name'] ?? '')) === '') {
-        throw new InvalidArgumentException('Vor der Veröffentlichung fehlt der Veranstaltungsort.');
+        throw new InvalidArgumentException($submissionKind === 'activity'
+            ? 'Vor der Veröffentlichung fehlt Anbieter oder Ort der Aktivität.'
+            : 'Vor der Veröffentlichung fehlt der Veranstaltungsort.');
     }
 
     if ((int)($submission['location_public_confirmed'] ?? 0) !== 1) {
         throw new InvalidArgumentException('Vor der Veröffentlichung muss die öffentliche Ortsnennung bestätigt sein.');
     }
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_ASSERT_V1 === */
 
+/* === BEGIN BLOCK: SUBMISSION_APPROVAL_EXISTING_CONSUMPTION_LOOKUP_V2 | Zweck: erkennt bereits gebuchte Veröffentlichungsverbräuche für erneute Freigaben nach Änderungen; Umfang: ersetzt sap_fetch_existing_consumption === */
 function sap_fetch_existing_consumption(PDO $pdo, int $submissionId): ?array
 {
     $statement = $pdo->prepare(
@@ -136,9 +154,10 @@ function sap_fetch_existing_consumption(PDO $pdo, int $submissionId): ?array
         ':submission_id' => $submissionId,
     ]);
 
-    $row = $statement->fetch();
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
     return is_array($row) ? $row : null;
 }
+/* === END BLOCK: SUBMISSION_APPROVAL_EXISTING_CONSUMPTION_LOOKUP_V2 === */
 
 function sap_fetch_specific_single_entitlement(PDO $pdo, int $organizerId, int $submissionId): ?array
 {
@@ -177,64 +196,93 @@ function sap_fetch_specific_single_entitlement(PDO $pdo, int $organizerId, int $
     return is_array($row) ? $row : null;
 }
 
-function sap_fetch_active_subscription_entitlement(PDO $pdo, int $organizerId): ?array
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_APPROVAL_ENTITLEMENT_SCOPE_V1 | Zweck: trennt Event- und Aktivitaetspraesenz-Kontingente bei finaler Freigabe; Umfang: ersetzt sap_fetch_active_subscription_entitlement und ergänzt Plan-Gruppen-Helfer === */
+function sap_subscription_plan_keys_for_submission(array $submission): array
 {
+    $submissionKind = trim((string)($submission['submission_kind'] ?? 'event'));
+
+    if ($submissionKind === 'activity') {
+        return ['activity_basic', 'activity_plus'];
+    }
+
+    return ['starter', 'active', 'unlimited'];
+}
+
+function sap_fetch_active_subscription_entitlement(PDO $pdo, array $submission): ?array
+{
+    $organizerId = (int)$submission['organizer_id'];
+    $planKeys = sap_subscription_plan_keys_for_submission($submission);
+    $planPlaceholders = [];
+    $params = [
+        ':organizer_id' => $organizerId,
+        ':status' => 'active',
+        ':source_type' => 'subscription',
+    ];
+
+    foreach ($planKeys as $index => $planKey) {
+        $placeholder = ':plan_key_' . $index;
+        $planPlaceholders[] = $placeholder;
+        $params[$placeholder] = $planKey;
+    }
+
     $statement = $pdo->prepare(
         'SELECT
             id,
             organizer_id,
             source_type,
-            source_reference,
-            source_submission_id,
-            subscription_id,
             plan_key,
             status,
-            period_start,
-            period_end,
             included_publications,
             consumed_publications,
-            is_unlimited
+            is_unlimited,
+            period_start,
+            period_end
          FROM publication_entitlements
          WHERE organizer_id = :organizer_id
            AND status = :status
            AND source_type = :source_type
+           AND plan_key IN (' . implode(', ', $planPlaceholders) . ')
            AND (period_start IS NULL OR period_start <= UTC_TIMESTAMP())
            AND (period_end IS NULL OR period_end >= UTC_TIMESTAMP())
            AND (is_unlimited = 1 OR consumed_publications < included_publications)
          ORDER BY
-            CASE WHEN is_unlimited = 1 THEN 1 ELSE 0 END,
+            is_unlimited ASC,
             period_end ASC,
             id ASC
          LIMIT 1'
     );
 
-    $statement->execute([
-        ':organizer_id' => $organizerId,
-        ':status' => 'active',
-        ':source_type' => 'subscription',
-    ]);
+    $statement->execute($params);
 
     $row = $statement->fetch();
     return is_array($row) ? $row : null;
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_ENTITLEMENT_SCOPE_V1 === */
 
+/* === BEGIN BLOCK: SUBMISSION_APPROVAL_PICK_ENTITLEMENT_V2 | Zweck: wählt ein passendes Veröffentlichungs-Kontingent und meldet ausgeschöpfte Tarife als fachlichen 422-Fehler statt technischem 500; Umfang: ersetzt sap_pick_entitlement === */
 function sap_pick_entitlement(PDO $pdo, array $submission): array
 {
     $organizerId = (int)$submission['organizer_id'];
     $submissionId = (int)$submission['id'];
+    $submissionKind = trim((string)($submission['submission_kind'] ?? 'event'));
 
     $singleEntitlement = sap_fetch_specific_single_entitlement($pdo, $organizerId, $submissionId);
     if (is_array($singleEntitlement)) {
         return $singleEntitlement;
     }
 
-    $subscriptionEntitlement = sap_fetch_active_subscription_entitlement($pdo, $organizerId);
+    $subscriptionEntitlement = sap_fetch_active_subscription_entitlement($pdo, $submission);
     if (is_array($subscriptionEntitlement)) {
         return $subscriptionEntitlement;
     }
 
-    throw new RuntimeException('Kein aktives Veröffentlichungs-Kontingent für diese Freigabe gefunden.');
+    if ($submissionKind === 'activity') {
+        throw new InvalidArgumentException('Für diese Aktivität ist im aktuellen Aktivitäts-Tarif kein freier Veröffentlichungsplatz mehr verfügbar. Bitte Tarif prüfen oder eine andere Aktivität zurückstellen.');
+    }
+
+    throw new InvalidArgumentException('Für diese Veranstaltung ist aktuell kein freies Veröffentlichungs-Kontingent verfügbar.');
 }
+/* === END BLOCK: SUBMISSION_APPROVAL_PICK_ENTITLEMENT_V2 === */
 
 function sap_increment_entitlement_consumption(PDO $pdo, array $entitlement): void
 {
@@ -310,6 +358,7 @@ function sap_mark_submission_approved(PDO $pdo, int $submissionId): void
     ]);
 }
 /* === BEGIN BLOCK: SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 | Zweck: informiert Einreicher nach finaler Veröffentlichung; Umfang: Mail-Helfer für approve.php === */
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_APPROVAL_PUBLICATION_MAIL_V1 | Zweck: informiert Einreicher nach finaler Veröffentlichung passend fuer Event oder Aktivitaet; Umfang: ersetzt SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 === */
 function sap_send_publication_mail(array $submission): void
 {
     $email = trim((string)($submission['email_snapshot'] ?? ''));
@@ -319,27 +368,38 @@ function sap_send_publication_mail(array $submission): void
 
     $title = trim((string)($submission['title'] ?? ''));
     $reference = trim((string)($submission['payment_reference_key'] ?? ''));
+    $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
 
     $bodyLines = [
         'Hallo,',
         '',
-        'deine Veranstaltung wurde bei Bocholt erleben veröffentlicht.',
+        $isActivity
+            ? 'deine Aktivität wurde bei Bocholt erleben veröffentlicht.'
+            : 'deine Veranstaltung wurde bei Bocholt erleben veröffentlicht.',
         '',
-        'Veranstaltung: ' . ($title !== '' ? $title : 'ohne Titel'),
+        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
         'Referenz: ' . $reference,
         '',
-        'Sie ist nun im öffentlichen Eventbereich sichtbar.',
+        $isActivity
+            ? 'Sie ist nun im öffentlichen Aktivitätenbereich sichtbar.'
+            : 'Sie ist nun im öffentlichen Eventbereich sichtbar.',
         '',
         'Viele Grüße',
         'Bocholt erleben',
     ];
 
     try {
-        be_send_mail($email, 'Deine Veranstaltung wurde veröffentlicht', implode("\n", $bodyLines));
+        be_send_mail(
+            $email,
+            $isActivity ? 'Deine Aktivität wurde veröffentlicht' : 'Deine Veranstaltung wurde veröffentlicht',
+            implode("\n", $bodyLines)
+        );
     } catch (Throwable $error) {
         error_log('Submission publication mail failed: ' . $error->getMessage());
     }
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_PUBLICATION_MAIL_V1 === */
+/* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_PUBLICATION_MAIL_V1 === */
 /* === END BLOCK: SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 === */
 function sap_build_quota_summary(PDO $pdo, int $organizerId): array
 {
@@ -395,12 +455,19 @@ try {
     $submission = sap_fetch_submission($pdo, $submissionId);
     sap_assert_submission_approvable($submission);
 
+    /* === BEGIN BLOCK: SUBMISSION_APPROVAL_REAPPROVE_EXISTING_CONSUMPTION_V2 | Zweck: erlaubt erneute Freigabe nach Anbieter-Änderung ohne neues Kontingent zu verbrauchen; Umfang: ersetzt Approval-Hauptlogik bis vor JSON-Erfolgsantwort === */
+    $wasAlreadyApproved = trim((string)($submission['status'] ?? '')) === 'approved';
     $existingConsumption = sap_fetch_existing_consumption($pdo, $submissionId);
 
     if (is_array($existingConsumption)) {
         sap_mark_submission_approved($pdo, $submissionId);
         $quotaSummary = sap_build_quota_summary($pdo, (int)$submission['organizer_id']);
+
         $pdo->commit();
+
+        if (!$wasAlreadyApproved) {
+            sap_send_publication_mail($submission);
+        }
 
         be_json_response(200, [
             'status' => 'ok',
@@ -410,6 +477,7 @@ try {
                 'consumption_id' => (int)$existingConsumption['id'],
                 'idempotent' => true,
                 'quota' => $quotaSummary,
+                'public_feed' => '/api/events/public.php',
             ],
         ]);
     }
@@ -428,7 +496,10 @@ try {
 
     $pdo->commit();
 
-    sap_send_publication_mail($submission);
+    if (!$wasAlreadyApproved) {
+        sap_send_publication_mail($submission);
+    }
+    /* === END BLOCK: SUBMISSION_APPROVAL_REAPPROVE_EXISTING_CONSUMPTION_V2 === */
 
     be_json_response(200, [
         'status' => 'ok',

@@ -1336,13 +1336,36 @@
   display: none;
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V3 | Zweck: stellt die mobile Passungsbegründung als ruhige Segmentreihe ohne Pseudo-Trenner dar; Umfang: konsolidiert activity-card-quiet vollständig und entfernt alte ::before-Trennerlogik === */
 .page--activities .activity-card-quiet{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
   margin-top: 2px;
   color: var(--color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.38;
-  font-weight: 670;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  font-weight: 680;
 }
+
+.page--activities .activity-card-quiet__item{
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 20px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-green-900, #18281e) 5%, transparent 95%);
+  color: color-mix(in srgb, var(--color-text-secondary) 92%, var(--brand-green-900, #18281e) 8%);
+  white-space: nowrap;
+}
+
+.page--activities .activity-card-quiet__item + .activity-card-quiet__item::before{
+  content: none;
+  display: none;
+}
+/* === END BLOCK: ACTIVITIES_CARD_QUIET_SEGMENT_CSS_ENTERPRISE_V3 === */
 
 /* === BEGIN BLOCK: BOTTOM_TABBAR_COMPONENT_OWNER_V3 | Zweck: finalisiert die Bottom Tab Bar visuell zu einer flacheren, strafferen Mobile-Shell mit breit integriertem Active-Indicator und ausgewogener Präsenz beider Tabs | Umfang: kompletter visueller Owner der Bottom Tab Bar inkl. Root, Items, Active-Indicator, Focus und Desktop-Off === */
 body.has-bottom-tabbar{
@@ -1851,6 +1874,7 @@ body.has-bottom-tabbar{
     margin-top: 1px;
   }
 
+  /* === BEGIN BLOCK: ACTIVITIES_CARD_MATCH_FACT_CSS_V1 | Zweck: ergänzt die optische Markierung für aktuell passende Filtermerkmale auf Activity-Cards; Umfang: ersetzt nur Basis-Fact-Chips und Match-Variante innerhalb Desktop-/Wide-Card-Layout === */
   .page--activities .activity-card-fact{
     display: inline-flex;
     align-items: center;
@@ -1866,6 +1890,16 @@ body.has-bottom-tabbar{
     line-height: 1;
     white-space: nowrap;
   }
+
+  .page--activities .activity-card-fact--match{
+    background: color-mix(in srgb, var(--brand-green-900, #18281e) 9%, rgba(244,247,242,0.96) 91%);
+    border-color: color-mix(in srgb, var(--brand-green-900, #18281e) 18%, rgba(18,34,26,0.065) 82%);
+    color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--brand-gold-300, #b69b4c) 12%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.88),
+      0 4px 10px rgba(12,24,16,0.035);
+  }
+  /* === END BLOCK: ACTIVITIES_CARD_MATCH_FACT_CSS_V1 === */
 
   .page--activities .activity-card-supporting{
     display: block;

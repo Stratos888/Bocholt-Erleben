@@ -38,6 +38,7 @@
   </main>
 
   <script>
+    /* === BEGIN BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_FLOW_V2 | Zweck: startet internen Zahlungslink und akzeptiert Stripe-Checkout-URL oder Existing-Subscription-Redirect; Umfang: kompletter Inline-Zahlungsstart === */
     (function () {
       const title = document.getElementById("payment-start-title");
       const lead = document.getElementById("payment-start-lead");
@@ -81,11 +82,19 @@
           }
 
           const checkoutUrl = String(payload?.data?.checkout_url || "").trim();
-          if (!checkoutUrl) {
-            throw new Error("missing_checkout_url");
+          const redirectUrl = String(payload?.data?.redirect_url || "").trim();
+
+          if (checkoutUrl) {
+            window.location.href = checkoutUrl;
+            return;
           }
 
-          window.location.href = checkoutUrl;
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+            return;
+          }
+
+          throw new Error("missing_checkout_or_redirect_url");
         } catch (error) {
           console.warn("Payment start failed.", error);
           setState(
@@ -98,7 +107,10 @@
 
       startPayment();
     })();
+    /* === END BLOCK: PAYMENT_START_CHECKOUT_OR_REDIRECT_FLOW_V2 === */
   </script>
+
+
 </body>
 </html>
 <!-- === END FILE: zahlung-starten/index.html === -->

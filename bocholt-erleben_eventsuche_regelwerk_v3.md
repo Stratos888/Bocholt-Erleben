@@ -364,6 +364,7 @@ Wichtig:
 - es definiert den stabilen Startpunkt und Suchrahmen des Weekly-Produktionslaufs
 <!-- === END BLOCK: QUELLENKLASSIFIKATION_PRODUKTION_DISCOVERY_TRENNUNG_V1 === -->
 
+<!-- === BEGIN BLOCK: URL_REGEL_DEUTSCHE_NL_PRIORITAET_V1 | Zweck: URL-Regel um harte deutsche Zielseiten-Priorität bei niederländischen und mehrsprachigen Events erweitern | Umfang: ersetzt Abschnitt 7 vollständig === -->
 ## 7. URL-Regel
 Bevorzugt ist **eine event-spezifische Detailseite**.
 
@@ -374,11 +375,37 @@ Nicht erlaubt als finale `url` oder `source_url` für FINAL:
 - generische Homepage ohne direkten Eventbezug
 - reine Saison-/Programmübersicht ohne klar trennbaren Eventblock
 - Terminlisten-Seiten, wenn daraus kein einzelner Termin eindeutig und vollständig belegbar ist
+- Google-Translate-URLs
+- Browser-Übersetzungs-URLs
+- Suchsnippet-URLs
+- Tracking-, Redirect- oder Parameter-URLs ohne kanonischen Zielwert
 
 ### Reihenfolge
 Es gilt grundsätzlich:
 
-**klassische Event-Detailseite > offizielle event-spezifische Endnutzer-Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
+**deutsche event-spezifische Detailseite derselben offiziellen Quelle > deutsche gleichwertig event-spezifische Info-/News-Seite derselben offiziellen Quelle > anderssprachige event-spezifische Detailseite > offizielle event-spezifische Endnutzer-Info-/News-Seite > offizieller klar trennbarer Eventblock auf einer Programmseite > sonst nicht FINAL**
+
+### Harte Sprachpriorität für niederländische und mehrsprachige Quellen
+Niederländische Events im Suchradius sind gültig. Für die Nutzerführung gilt aber eine harte Sprachpriorität:
+
+1. Wenn dieselbe offizielle Quelle eine stabile deutsche Eventdetailseite oder deutsche gleichwertige Event-/Infoseite für dieselbe konkrete Instanz anbietet, muss `url` diese deutsche Seite sein.
+2. Eine niederländische URL ist nur dann FINAL-tauglich, wenn keine echte stabile deutsche Äquivalentseite existiert oder die deutsche Seite die konkrete Instanz nicht belastbar belegt.
+3. Eine deutsche URL darf nur verwendet werden, wenn sie dieselbe konkrete Instanz belegt: gleicher Eventtitel oder eindeutig gleicher Eventbezug, gleiches Datum, gleicher Ort.
+4. Google-Translate-, Browser-Übersetzungs-, Sprachumschalter-, Suchsnippet-, Tracking- oder Weiterleitungs-URLs gelten nicht als stabile deutsche Event-URL.
+5. Eine generische deutsche Startseite oder allgemeine deutsche Infoseite darf eine niederländische Eventdetailseite nicht ersetzen.
+6. Wenn unklar ist, ob die deutsche und niederländische Seite dieselbe Instanz meinen, gilt:
+   - im manuellen Prüfmodus: **REVIEW NÖTIG**
+   - im Automationsmodus: **nicht ausgeben**
+
+### `url` versus `source_url`
+`url` ist die beste stabile Zielseite für Nutzer.
+
+`source_url` ist die beste belastbare Beleg-URL.
+
+Regel:
+- Wenn die deutsche Zielseite die Pflichtdaten selbst belegt, sollen `url` und `source_url` beide auf die deutsche Seite zeigen.
+- Wenn die deutsche Zielseite als Nutzerseite stabil ist, aber die niederländische Originalseite die vollständigere Belegseite ist, darf `source_url` niederländisch bleiben.
+- Wenn die deutsche Seite die konkrete Instanz nicht belastbar belegt, darf sie nicht als `url` gesetzt werden.
 
 ### FINAL-fähige Alternativen zur klassischen Detailseite
 
@@ -392,6 +419,7 @@ Eine offizielle Info-, Presse- oder News-Seite ist FINAL-fähig, wenn **alle** f
 5. der Eventcharakter ist klar
 6. keine wesentliche FINAL-Pflichtfeldlücke
 7. keine bessere Detailseite verfügbar
+8. bei niederländischen oder mehrsprachigen Quellen keine bessere stabile deutsche Event-/Infoseite derselben Instanz verfügbar
 
 ### Wichtige Klarstellung zum Besucherfokus
 Zusätzliche Organisations-, Anmelde-, Aussteller- oder CTA-Elemente machen eine offizielle event-spezifische Seite **nicht automatisch ungeeignet**.
@@ -417,6 +445,8 @@ Ein Eventblock auf einer offiziellen Programm-, Saison- oder Übersichtsseite is
 3. Titel, Datum, Uhrzeit (falls vorhanden), Ort und Eventcharakter sind im Einzelblock belastbar
 4. der Block ist nicht nur Teil einer unstrukturierten Sammelliste
 5. keine bessere Detailseite verfügbar
+6. bei niederländischen oder mehrsprachigen Quellen keine bessere stabile deutsche Event-/Infoseite derselben Instanz verfügbar
+
 ### Mehrtermin-Seiten
 Eine Seite mit mehreren Terminen desselben Formats ist **nicht automatisch REVIEW**.
 
@@ -438,9 +468,11 @@ Wenn eine Quelle zwar vielversprechend ist, aber einer dieser Punkte nicht siche
 Für FINAL gilt damit:
 
 - klassische Detailseite ist der Regelfall
+- deutsche event-spezifische Zielseiten sind bei niederländischen oder mehrsprachigen Quellen bevorzugt
 - offizielle event-spezifische Endnutzer-Info-/News-Seiten sind eng begrenzt zulässig
 - offizielle klar trennbare Eventblöcke auf Programmseiten sind eng begrenzt zulässig
 - generische Übersichten bleiben unzulässig
+<!-- === END BLOCK: URL_REGEL_DEUTSCHE_NL_PRIORITAET_V1 === -->
 ## 8. Beschreibungs-Regel
 Beschreibungen müssen streng quellenbasiert und sachlich sein.
 
@@ -537,6 +569,7 @@ Lieber:
 als
 - feiner, aber nicht 100% belastbar
 
+<!-- === BEGIN BLOCK: CANONICAL_URL_INSTANZ_SPRACHPRIORITAET_V1 | Zweck: kanonische URL-Regel um deutsche Ziel-URL-Priorität und harte Instanzprüfung ergänzen | Umfang: ersetzt Canonical-URL-Regel und harte Instanz-URL-Regel === -->
 ### Canonical-URL-Regel
 Für FINAL soll nach Möglichkeit die **stabilste belastbare kanonische Event-URL** verwendet werden.
 
@@ -544,6 +577,17 @@ Das heißt:
 - nicht irgendein ähnlicher Pfad
 - nicht unnötig parameterlastige Übergangs- oder Such-URLs, wenn eine stabilere Eventseite vorhanden ist
 - bei mehreren möglichen URLs die belastbarste und dauerhafteste Event-URL wählen
+- bei mehrsprachigen Quellen die stabile deutsche Event-/Infoseite bevorzugen, wenn sie dieselbe konkrete Instanz belastbar belegt
+
+### Harte Deutsch-URL-Regel für niederländische und mehrsprachige Quellen
+Wenn ein Event aus einer niederländischen oder mehrsprachigen Quelle stammt, muss vor FINAL aktiv geprüft werden, ob es eine stabile deutsche URL derselben offiziellen Quelle gibt.
+
+Für FINAL gilt:
+- existiert eine stabile deutsche Eventdetailseite oder gleichwertige deutsche Event-/Infoseite derselben konkreten Instanz, muss `url` auf diese deutsche Seite zeigen
+- existiert nur eine generische deutsche Startseite, eine Sprachumschalter-Seite, eine Browser-/Google-Translate-Variante oder eine deutsche Seite ohne belastbaren Instanznachweis, darf sie nicht als `url` verwendet werden
+- existiert keine echte stabile deutsche Äquivalentseite, darf die niederländische Originalseite verwendet werden
+- die deutsche URL darf nur verwendet werden, wenn Titel, Datum, Ort und Eventbezug zur gleichen konkreten Instanz eindeutig passen
+- keine bloße Übersetzungs- oder Komfort-URL darf die Instanzprüfung ersetzen
 
 ### Harte Instanz-URL-Regel
 Eine URL ist nur dann FINAL-tauglich, wenn sie **erkennbar zur gewählten Instanz passt**.
@@ -553,10 +597,12 @@ Nicht FINAL-tauglich sind insbesondere:
 - instanzfremde URLs
 - URLs, die sichtbar auf einen anderen Termin desselben Formats verweisen
 - URLs, bei denen die konkrete Zielinstanz nicht sauber verifizierbar ist
+- deutschsprachige Alternativseiten, die nur allgemein über Veranstalter, Ort, Saison oder Festival informieren, aber nicht die konkrete Eventinstanz belegen
 
-Wenn die URL nicht stabil genug oder nicht instanzpassend verifiziert werden kann:
+Wenn die URL nicht stabil genug, nicht instanzpassend oder sprachlich nicht sauber verifizierbar ist:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
 - im Automationsmodus: **nicht ausgeben**
+<!-- === END BLOCK: CANONICAL_URL_INSTANZ_SPRACHPRIORITAET_V1 === -->
 
 Wenn durch das Weglassen oder Zurückfallen auf die sicherere Feldgranularität die FINAL-Fähigkeit verloren geht:
 - im manuellen Prüfmodus: **REVIEW NÖTIG**
@@ -890,11 +936,20 @@ Wenn ein Event nicht eindeutig zuordenbar ist:
 - die sachlich nächstpassende kanonische Kategorie wählen
 - im Zweifel `Sonstiges`
 
+<!-- === BEGIN BLOCK: FELDREGELN_URL_SOURCE_URL_SPRACHPRIORITAET_V1 | Zweck: url und source_url für deutsche Zielseiten bei NL-/mehrsprachigen Quellen eindeutig definieren | Umfang: ersetzt Feldregeln für url und source_url === -->
 #### `url`
-Nur event-spezifische Detailseite oder gleichwertig event-spezifische Unterseite.
+Beste stabile, event-spezifische Zielseite für Nutzer.
+
+Bei niederländischen oder mehrsprachigen Quellen gilt:
+- wenn eine stabile deutsche Event-/Infoseite derselben offiziellen Quelle existiert und dieselbe konkrete Instanz mit Titel, Datum und Ort belegt, muss `url` diese deutsche Seite sein
+- wenn nur die niederländische Seite die konkrete Instanz belastbar belegt und keine echte stabile deutsche Äquivalentseite existiert, darf `url` niederländisch bleiben
+- Google-Translate-, Browser-Übersetzungs-, Suchsnippet-, Parameter-, Tracking- oder Weiterleitungs-URLs dürfen niemals als `url` gesetzt werden
 
 #### `source_url`
-Beste belastbare Quell-URL.
+Beste belastbare Beleg-URL.
+
+Bevorzugt ist `source_url` identisch mit der deutschen `url`, wenn diese die FINAL-Pflichtdaten selbst belegt. Wenn die deutsche Nutzerseite existiert, aber die niederländische Originalseite die stärkere Belegseite ist, darf `source_url` auf der niederländischen Originalquelle bleiben, solange `url` auf die stabile deutsche Nutzerseite zeigt.
+<!-- === END BLOCK: FELDREGELN_URL_SOURCE_URL_SPRACHPRIORITAET_V1 === -->
 
 #### `description`
 Kurz, neutral, facts-only.  
@@ -969,12 +1024,17 @@ Nie unsichere Datensätze direkt in FINAL mischen.
 
 ---
 
+<!-- === BEGIN BLOCK: HARTE_ENDPRUEFUNG_FINAL_URL_SPRACHE_V1 | Zweck: FINAL-Endprüfung um deutsche Ziel-URL-Priorität bei NL-/mehrsprachigen Quellen ergänzen | Umfang: ersetzt Abschnitt 20 vollständig === -->
 ## 20. Harte Endprüfung vor Ausgabe
 Vor FINAL jede Zeile gegen diese Checkliste prüfen:
 
 - [ ] keine Leerzeile
 - [ ] Pflichtfelder für FINAL gefüllt
 - [ ] URL ist event-spezifisch und nicht bloß generische Übersicht
+- [ ] bei niederländischen oder mehrsprachigen Quellen wurde aktiv geprüft, ob eine stabile deutsche URL derselben offiziellen Quelle existiert
+- [ ] wenn eine stabile deutsche Event-/Infoseite derselben konkreten Instanz existiert, steht diese in `url`
+- [ ] keine Google-Translate-, Browser-Übersetzungs-, Suchsnippet-, Tracking- oder Weiterleitungs-URL in `url`
+- [ ] `source_url` ist die beste belastbare Beleg-URL; bevorzugt identisch mit der deutschen `url`, sofern diese die Pflichtdaten selbst belegt
 - [ ] Mehrtages-Event korrekt in `date` / `endDate`
 - [ ] `time` regelkonform
 - [ ] Beschreibung sachlich und quellenbasiert
@@ -984,6 +1044,7 @@ Vor FINAL jede Zeile gegen diese Checkliste prüfen:
 - [ ] keine Dublette gegen Bestand / Inbox / Archiv / Manual / Session
 
 Nur Zeilen, die alle relevanten Punkte bestehen, dürfen in FINAL.
+<!-- === END BLOCK: HARTE_ENDPRUEFUNG_FINAL_URL_SPRACHE_V1 === -->
 
 ---
 

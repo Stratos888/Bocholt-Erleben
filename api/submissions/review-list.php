@@ -16,14 +16,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 be_require_review_access();
 /* === END BLOCK: SUBMISSION_REVIEW_ENDPOINT_ACCESS_GUARD_V1 === */
 
-function srl_origin_label(string $origin): string
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_LABELS_V1 | Zweck: kennzeichnet Aktivitaetspraesenzen in der Review-Inbox korrekt; Umfang: ersetzt srl_origin_label === */
+function srl_origin_label(string $origin, string $submissionKind = 'event'): string
 {
+    if ($submissionKind === 'activity' || $origin === 'activity_presence') {
+        return 'Aktivitätspräsenz';
+    }
+
     return match ($origin) {
         'membership' => 'Mitgliedschaft',
         'ai_search' => 'KI-Suche',
         default => 'Einzelevent',
     };
 }
+/* === END BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_LABELS_V1 === */
 
 /* === BEGIN BLOCK: SUBMISSION_REVIEW_STATUS_LABELS_V1 | Zweck: übersetzt Submission-Status für die Review-Inbox; Umfang: Statuslabel-Helfer === */
 function srl_status_label(string $status): string
@@ -63,6 +69,7 @@ try {
     $statement = $pdo->prepare(
         'SELECT
             id,
+            submission_kind,
             status,
             requested_model_key,
             payment_kind,
@@ -90,7 +97,7 @@ try {
             created_at,
             updated_at
          FROM submissions
-         WHERE submission_kind = :submission_kind
+         WHERE submission_kind IN ("event", "activity")
            AND status IN ("pending_review", "payment_released", "checkout_started", "paid", "in_review")
          ORDER BY
             CASE status
@@ -106,14 +113,17 @@ try {
          LIMIT 150'
     );
 
-    $statement->execute([
-        ':submission_kind' => 'event',
-    ]);
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_EXECUTE_V1 | Zweck: führt Review-Query ohne festen Event-Parameter aus, da Event und Aktivitaet geladen werden; Umfang: ersetzt execute-Parameterblock === */
+    $statement->execute();
+    /* === END BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_EXECUTE_V1 === */
 
     $items = [];
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_ROW_KIND_V1 | Zweck: liest Submission-Art je Review-Zeile für Aktivitaets-/Event-Unterscheidung; Umfang: ersetzt Schleifenstart inklusive Origin-Initialisierung === */
     while (($row = $statement->fetch(PDO::FETCH_ASSOC)) !== false) {
+        $submissionKind = trim((string)($row['submission_kind'] ?? 'event'));
         $origin = trim((string)($row['intake_origin'] ?? ''));
+    /* === END BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_ROW_KIND_V1 === */
         if ($origin === '') {
             $origin = ((string)($row['payment_kind'] ?? '') === 'subscription') ? 'membership' : 'single_event';
         }
@@ -125,12 +135,15 @@ try {
         $status = (string)($row['status'] ?? '');
 
         $items[] = [
+            /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_ITEM_META_V1 | Zweck: gibt Submission-Art und passendes Herkunftslabel an die Review-Inbox weiter; Umfang: ersetzt Meta-Felder im items-Array === */
             'review_source' => 'submission_db',
             'submission_id' => (int)$row['id'],
+            'submission_kind' => $submissionKind,
             'status' => $status,
             'status_label' => srl_status_label($status),
             'intake_origin' => $origin,
-            'intake_origin_label' => srl_origin_label($origin),
+            'intake_origin_label' => srl_origin_label($origin, $submissionKind),
+            /* === END BLOCK: ACTIVITY_PRESENCE_REVIEW_LIST_ITEM_META_V1 === */
             'payment_reference_key' => (string)($row['payment_reference_key'] ?? ''),
             'title' => (string)($row['title'] ?? ''),
             'date' => (string)($row['start_date'] ?? ''),
