@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "title": "Gesundheitsberufemesse",
+    "date": "2026-09-26",
+    "endDate": "",
+    "time": "10:00",
+    "city": "Bocholt",
+    "location": "LernWerk, Industriestraße 1",
+    "kategorie_suggestion": "Sonstiges",
+    "url": "https://www.bocholt.de/gesundheitsberufemesse",
+    "description": "Öffentliche Berufsmesse in Bocholt mit Unternehmen aus dem Gesundheitsbereich und Ausbildungsinformationen.",
+    "source_name": "Stadt Bocholt",
+    "source_url": "https://www.bocholt.de/gesundheitsberufemesse",
+    "notes": "manual chat search v3"
+  },
+  {
+    "title": "Verkaufsoffener Sonntag zum Weihnachtsmarkt 2026",
+    "date": "2026-12-13",
+    "endDate": "",
+    "time": "",
+    "city": "Bocholt",
+    "location": "Innenstadt",
+    "kategorie_suggestion": "Innenstadt & Leben",
+    "url": "https://www.bocholt.de/veranstaltungskalender/verkaufsoffener-sonntag-zum-weihnachtsmarkt-2026",
+    "description": "Verkaufsoffener Sonntag in der Bocholter Innenstadt während des Weihnachtsmarkts.",
+    "source_name": "Stadt Bocholt",
+    "source_url": "https://www.bocholt.de/veranstaltungskalender/verkaufsoffener-sonntag-zum-weihnachtsmarkt-2026",
+    "notes": "manual chat search v3"
+  }
+]
