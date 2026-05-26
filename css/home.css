@@ -4189,70 +4189,73 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V1 | Zweck: konsolidierter Activities-Filter-Polish nach Hero/Filter-Review; Umfang: nur Activities-Filterkarte Desktop/Mobile, keine JS- oder HTML-Änderung === */
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V2 | Zweck: korrigiert den Activities-Filter nach Sichtprüfung; Umfang: Mobile-Abstände, offenes Filterpanel, Nähe-Chip-Gewichtung und Desktop-Filterkarte; keine JS-Änderung === */
 @media (max-width: 899.98px){
+  body.page-route-activities .page--activities{
+    gap: 4px;
+  }
+
   body.page-route-activities .activity-finder-card{
-    margin: 3px auto 14px;
+    margin: 2px auto 0;
+  }
+
+  body.page-route-activities .events-section.activity-feed-section{
+    padding-top: 2px;
   }
 
   body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card,
   body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])){
-    margin-top: 9px;
-    padding: 8px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 72%, transparent 28%);
-    border-radius: 22px;
-    background: linear-gradient(
-      180deg,
-      rgba(250,252,246,0.82) 0%,
-      rgba(239,246,228,0.70) 100%
-    );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.74) inset,
-      0 8px 18px rgba(12,24,16,0.028);
+    margin: 8px auto 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced-summary{
-    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 66%, transparent 34%);
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,255,0.94) 0%,
-      rgba(248,251,242,0.90) 100%
-    );
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.76) inset,
-      0 2px 7px rgba(12,24,16,0.018);
+    margin: 0 0 7px;
+    padding: 7px 9px;
+    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 62%, transparent 38%);
+    border-radius: 15px;
+    background: rgba(255,255,252,0.92);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.74) inset;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
-    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 76px);
-    padding: 12px 11px 17px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 74%, transparent 26%);
-    background: linear-gradient(
-      180deg,
-      rgba(255,255,255,0.965) 0%,
-      rgba(251,252,247,0.945) 100%
-    );
+    max-height: calc(100dvh - var(--header-h, 56px) - var(--stack-gap, 0px) - var(--cmp-input-minh, 48px) - var(--btb-reserve, 92px) - 32px);
+    padding: 10px;
+    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 64%, transparent 36%);
+    border-radius: 18px;
+    background: rgba(255,255,252,0.965);
     box-shadow:
       0 1px 0 rgba(255,255,255,0.78) inset,
-      0 3px 9px rgba(12,24,16,0.022);
+      0 3px 9px rgba(12,24,16,0.018);
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group{
-    gap: 9px;
+    gap: 8px;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group:first-child{
-    padding-top: 8px;
+    padding-top: 0;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group + .activity-finder__group{
-    margin-top: 13px;
-    padding-top: 12px;
-    border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 50%, transparent 50%);
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 46%, transparent 54%);
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group-options{
-    gap: 8px;
+    gap: 7px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
+    grid-column: auto;
+    padding-inline: 9px;
+    text-align: center;
   }
 }
 
@@ -4333,8 +4336,15 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     padding-inline: 8px;
     font-size: 0.695rem;
   }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
+    grid-column: auto;
+    padding-inline: 8px;
+    text-align: center;
+  }
 }
-/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V1 === */
+/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V2 === */
 
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
