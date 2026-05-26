@@ -58,15 +58,15 @@ jobs:
           fi
       # === END BLOCK: MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1 ===
 
-      # === BEGIN BLOCK: APPEND MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V1 | Zweck: schreibt echte KI-Kandidaten ausschließlich in das Live-Sheet; Umfang: ersetzt Sheet-ID-Env des Append-Steps ===
+      # === BEGIN BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 | Zweck: schreibt echte KI-Kandidaten ausschließlich auf main in den Live-Inbox-Tab und repariert den Run-Block; Umfang: ersetzt nur den Step-Kopf bis zum Python-Aufruf ===
       - name: Append manual inbox JSON to Google Sheet Inbox
         id: append_inbox_sheet
         env:
           SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-      # === END BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V1 ===
           set -e
+          # === END BLOCK: APPEND_MANUAL_JSON_TO_LIVE_GOOGLE_SHEET_INBOX_V2 ===
           python - <<'PY'
           import json
           import os
