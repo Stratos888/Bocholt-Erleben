@@ -54,11 +54,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-api-python-client google-auth openai
 
+      # === BEGIN BLOCK: WEEKLY_KI_PRODUCTION_BRANCH_GUARD_V1 | Zweck: verhindert echte KI-Eventproduktion auf staging; Umfang: bricht Weekly-KI außerhalb main hart ab ===
+      - name: Guard production KI branch
+        run: |
+          set -e
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "❌ Weekly KI Websearch darf nur auf main laufen. Staging ist nur für Tests."
+            exit 1
+          fi
+      # === END BLOCK: WEEKLY_KI_PRODUCTION_BRANCH_GUARD_V1 ===
+
       # === BEGIN BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
       # === END BLOCK: RUN WEEKLY KI WEBSEARCH GENERATOR WITH SOURCE LEARNING ===
       - name: Run weekly KI websearch to manual inbox
         env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_ID: ${{ secrets.LIVE_SHEET_ID || secrets.SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -150,7 +160,7 @@ jobs:
         env:
           WORKFLOW_DISPATCH_TOKEN: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_REF: ${{ github.ref_name }}
+          TARGET_REF: main
         run: |
           set -e
 
