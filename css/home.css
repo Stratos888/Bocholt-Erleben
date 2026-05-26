@@ -4189,8 +4189,12 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V2 | Zweck: korrigiert den Activities-Filter nach Sichtprüfung; Umfang: Mobile-Abstände, offenes Filterpanel, Nähe-Chip-Gewichtung und Desktop-Filterkarte; keine JS-Änderung === */
+/* === BEGIN BLOCK: ACTIVITIES_FILTER_POLISH_V3 | Zweck: Desktop-Filter-Hierarchie systematisch bereinigen; Umfang: Desktop-Schnellfilter vollständig machen, erweiterten Desktop-Ort/Nähe-Block ausblenden, Filterbreite an Feed koppeln; Mobile bleibt funktional unverändert === */
 @media (max-width: 899.98px){
+  body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip--desktop-only{
+    display: none !important;
+  }
+
   body.page-route-activities .page--activities{
     gap: 4px;
   }
@@ -4260,31 +4264,48 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 }
 
 @media (min-width: 900px){
-  body.page-route-activities .activity-finder-card,
+  body.page-route-activities .activity-finder-card{
+    width: min(calc(100% - 48px), 1140px);
+    margin: 9px auto 0;
+    padding: 8px 12px 9px;
+    gap: 7px;
+    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 46%, transparent 54%);
+    border-radius: 16px;
+    background: linear-gradient(
+      180deg,
+      rgba(250,252,245,0.78) 0%,
+      rgba(239,246,228,0.62) 100%
+    );
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.66) inset,
+      0 4px 10px rgba(12,24,16,0.014);
+  }
+
   body.page-route-activities .activity-finder-shell.is-advanced-open .activity-finder-card,
   body.page-route-activities .activity-finder-card:has(.activity-finder__advanced:not([hidden])){
-    margin: 10px auto 0;
-    padding: 10px 15px 11px;
+    width: min(calc(100% - 48px), 1140px);
+    margin: 9px auto 0;
+    padding: 10px 14px 12px;
     gap: 9px;
-    border: 1px solid color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 60%, transparent 40%);
+    border-color: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 56%, transparent 44%);
     border-radius: 18px;
     background: linear-gradient(
       180deg,
-      rgba(250,252,245,0.88) 0%,
-      rgba(239,246,228,0.76) 100%
+      rgba(250,252,245,0.86) 0%,
+      rgba(239,246,228,0.72) 100%
     );
     box-shadow:
       0 1px 0 rgba(255,255,255,0.72) inset,
-      0 8px 18px rgba(12,24,16,0.024);
+      0 8px 18px rgba(12,24,16,0.022);
   }
 
   body.page-route-activities .activity-finder-card__head{
-    min-height: 18px;
+    min-height: 17px;
   }
 
   body.page-route-activities .activity-finder-card__title{
     color: color-mix(in srgb, var(--brand-green-900, #18281e) 88%, var(--home-copy-muted, #546459) 12%);
-    font-size: 0.79rem;
+    font-size: 0.78rem;
     font-weight: 820;
     letter-spacing: -0.006em;
   }
@@ -4303,9 +4324,9 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.page-route-activities .activity-finder-card .activity-finder__quick-options .activity-filter-chip,
   body.page-route-activities .activity-finder-card__toggle,
   body.page-route-activities .activity-finder-card__reset{
-    min-height: 28px;
-    padding: 0 9px;
-    font-size: 0.705rem;
+    min-height: 27px;
+    padding: 0 8px;
+    font-size: 0.70rem;
   }
 
   body.page-route-activities .activity-finder-card__toggle{
@@ -4314,16 +4335,33 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced{
-    padding-top: 8px;
+    padding-top: 7px;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="proximity"]{
+    display: none;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced-inner{
-    gap: 9px 13px;
-    padding: 10px;
-    border-color: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 54%, transparent 46%);
-    border-radius: 15px;
-    background: rgba(255,255,252,0.54);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.66) inset;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.45fr) minmax(0, 0.82fr);
+    gap: 9px 16px;
+    padding: 10px 11px;
+    border-color: color-mix(in srgb, var(--home-action-border, rgba(24,40,30,0.14)) 44%, transparent 56%);
+    border-radius: 14px;
+    background: rgba(255,255,252,0.44);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.60) inset;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="activity_type"]{
+    grid-column: 1;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="features"]{
+    grid-column: 2;
+  }
+
+  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group[data-filter-group="effort"]{
+    grid-column: 3;
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-finder__group,
@@ -4332,19 +4370,18 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   }
 
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip{
-    min-height: 27px;
+    min-height: 26px;
     padding-inline: 8px;
-    font-size: 0.695rem;
+    font-size: 0.69rem;
   }
 
-  body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Grenzregion / Niederlande"],
   body.page-route-activities .activity-finder-card .activity-finder__advanced .activity-filter-chip[data-filter-value="Längerer Ausflug"]{
     grid-column: auto;
     padding-inline: 8px;
     text-align: center;
   }
 }
-/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V2 === */
+/* === END BLOCK: ACTIVITIES_FILTER_POLISH_V3 === */
 
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
