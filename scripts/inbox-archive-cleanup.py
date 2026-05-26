@@ -28,8 +28,10 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 
-TAB_INBOX = "Inbox"
-TAB_ARCHIVE = "Inbox_Archive"
+# === BEGIN BLOCK: INBOX_CLEANUP_TAB_ENV_V1 | Zweck: erlaubt getrennte Live-/Staging-Inbox-Tabs im selben Google Sheet; Umfang: ersetzt feste Tabnamen durch optionale ENV-Werte ===
+TAB_INBOX = os.environ.get("TAB_INBOX", "Inbox").strip() or "Inbox"
+TAB_ARCHIVE = os.environ.get("TAB_ARCHIVE", "Inbox_Archive").strip() or "Inbox_Archive"
+# === END BLOCK: INBOX_CLEANUP_TAB_ENV_V1 ===
 
 FINAL_STATUSES = {"übernommen", "verworfen"}
 
