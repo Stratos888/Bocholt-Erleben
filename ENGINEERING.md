@@ -294,7 +294,9 @@ For all future repo patches, use this order:
    - git apply patch.diff
    - rm patch.diff
    - git diff --check
-   - git diff -- <affected-file>
+   - git --no-pager diff -- <affected-file>
+
+   Do not use plain `git diff -- <affected-file>` in Codespaces workflows, because it can open the terminal pager and look like a frozen command. If the pager opens anyway, exit it with `q`.
 
 5. If git apply --check fails:
    - stop immediately
@@ -308,13 +310,13 @@ For all future repo patches, use this order:
    - target only the relevant owner file or owner block
    - verify every selector/block uniquely before writing
    - abort without writing if anything is missing or ambiguous
-   - end with git diff --check and git diff -- <affected-file>
+   - end with git diff --check and git --no-pager diff -- <affected-file>
 
 8. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
 
 9. After every failed patch attempt, run:
    - git status --short
-   - git diff -- <affected-file>
+   - git --no-pager diff -- <affected-file>
 
 10. No blind retries.
 
