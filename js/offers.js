@@ -676,7 +676,10 @@ const OfferCards = (() => {
       entityType: "activity",
       entityId: String(offer?.id || "").trim(),
       entityTitle: String(offer?.title || "").trim(),
-      destinationUrl: primaryUrl
+      destinationUrl: primaryUrl,
+      ...(window.BEAnalytics?.buildReportingTargetPayload
+        ? window.BEAnalytics.buildReportingTargetPayload(offer)
+        : {})
     };
   }
 

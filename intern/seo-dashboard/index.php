@@ -51,6 +51,35 @@ $isUnlocked = (bool)($_SESSION['be_internal_seo_dashboard_unlocked'] ?? false);
 $checkedAt = date('d.m.Y H:i');
 
 /* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_VALUE_METRICS_DB_V2 | Zweck: liest automatisierte First-Party-Nutzwert-Metriken für aktuellen und vorherigen 28-Tage-Zeitraum; Umfang: ersetzt serverseitige Aggregation vor dem HTML === */
+/* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_SCHEMA_V1 | Zweck: hält Dashboard-Schema mit value-track.php synchron und ergänzt Reporting-Ziel-Spalten bei bestehenden Tabellen; Umfang: ersetzt Schema-Helfer === */
+function be_seo_dashboard_value_metrics_column_exists(PDO $pdo, string $columnName): bool
+{
+    $statement = $pdo->prepare(
+        'SELECT COUNT(*) AS total
+         FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "value_metric_daily"
+           AND COLUMN_NAME = :column_name'
+    );
+    $statement->execute([':column_name' => $columnName]);
+
+    return (int)($statement->fetch()['total'] ?? 0) > 0;
+}
+
+function be_seo_dashboard_value_metrics_index_exists(PDO $pdo, string $indexName): bool
+{
+    $statement = $pdo->prepare(
+        'SELECT COUNT(*) AS total
+         FROM INFORMATION_SCHEMA.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "value_metric_daily"
+           AND INDEX_NAME = :index_name'
+    );
+    $statement->execute([':index_name' => $indexName]);
+
+    return (int)($statement->fetch()['total'] ?? 0) > 0;
+}
+
 function be_seo_dashboard_value_metrics_schema(PDO $pdo): void
 {
     $pdo->exec(<<<'SQL'
@@ -62,6 +91,9 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     entity_id VARCHAR(191) NOT NULL DEFAULT '',
     entity_title VARCHAR(255) NULL,
     destination_url VARCHAR(1024) NULL,
+    reporting_target_type VARCHAR(40) NOT NULL DEFAULT '',
+    reporting_target_id VARCHAR(191) NOT NULL DEFAULT '',
+    reporting_target_title VARCHAR(255) NULL,
     page_path VARCHAR(255) NULL,
     bucket_hash CHAR(64) NOT NULL,
     count_value INT UNSIGNED NOT NULL DEFAULT 0,
@@ -70,10 +102,25 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     PRIMARY KEY (id),
     UNIQUE KEY uq_value_metric_daily_bucket (bucket_hash),
     KEY idx_value_metric_daily_date_key (metric_date, metric_key),
-    KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id)
+    KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id),
+    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL);
+
+    if (!be_seo_dashboard_value_metrics_column_exists($pdo, 'reporting_target_type')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_type VARCHAR(40) NOT NULL DEFAULT "" AFTER destination_url');
+    }
+    if (!be_seo_dashboard_value_metrics_column_exists($pdo, 'reporting_target_id')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_id VARCHAR(191) NOT NULL DEFAULT "" AFTER reporting_target_type');
+    }
+    if (!be_seo_dashboard_value_metrics_column_exists($pdo, 'reporting_target_title')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_title VARCHAR(255) NULL AFTER reporting_target_id');
+    }
+    if (!be_seo_dashboard_value_metrics_index_exists($pdo, 'idx_value_metric_daily_reporting_target')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)');
+    }
 }
+/* === END BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_SCHEMA_V1 === */
 
 function be_seo_dashboard_periods(): array
 {
@@ -126,6 +173,7 @@ function be_seo_dashboard_empty_value_metrics(string $status = 'not_configured',
         ],
         'metrics' => be_seo_dashboard_empty_metrics(),
         'previous_metrics' => be_seo_dashboard_empty_metrics(),
+        'reporting_targets' => [],
         'message' => $message,
     ];
 }
@@ -195,6 +243,67 @@ SQL);
     ];
 }
 
+/* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_AGGREGATION_V1 | Zweck: aggregiert Nutzwertdaten nach explizit zugeordneten Anbieter-/Location-Zielen und weist unklare Werte als nicht zugeordnet aus; Umfang: neue additive Auswertung === */
+function be_seo_dashboard_aggregate_reporting_targets(PDO $pdo, string $startDate, string $endDate): array
+{
+    $statement = $pdo->prepare(<<<'SQL'
+SELECT
+    CASE
+        WHEN reporting_target_type <> '' AND reporting_target_id <> '' THEN reporting_target_type
+        ELSE 'unassigned'
+    END AS target_type,
+    CASE
+        WHEN reporting_target_type <> '' AND reporting_target_id <> '' THEN reporting_target_id
+        ELSE 'unassigned'
+    END AS target_id,
+    CASE
+        WHEN reporting_target_type <> '' AND reporting_target_id <> '' THEN COALESCE(NULLIF(reporting_target_title, ''), reporting_target_id)
+        ELSE 'nicht zugeordnet'
+    END AS target_title,
+    COALESCE(SUM(CASE WHEN metric_key IN ('event_detail_view', 'activity_detail_view') THEN count_value ELSE 0 END), 0) AS detail_views,
+    COALESCE(SUM(CASE WHEN metric_key = 'website_click' THEN count_value ELSE 0 END), 0) AS website_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(count_value), 0) AS total_interactions,
+    COUNT(DISTINCT CASE WHEN entity_type <> '' AND entity_id <> '' THEN CONCAT(entity_type, ':', entity_id) ELSE NULL END) AS item_count
+FROM value_metric_daily
+WHERE metric_date BETWEEN :start_date AND :end_date
+GROUP BY target_type, target_id, target_title
+HAVING total_interactions > 0
+ORDER BY
+    CASE WHEN target_type = 'unassigned' THEN 1 ELSE 0 END ASC,
+    total_interactions DESC,
+    target_title ASC
+LIMIT 30
+SQL);
+    $statement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+    ]);
+
+    $rows = $statement->fetchAll();
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    return array_map(static function (array $row): array {
+        return [
+            'target_type' => (string)($row['target_type'] ?? 'unassigned'),
+            'target_id' => (string)($row['target_id'] ?? 'unassigned'),
+            'target_title' => (string)($row['target_title'] ?? 'nicht zugeordnet'),
+            'detail_views' => (int)($row['detail_views'] ?? 0),
+            'website_clicks' => (int)($row['website_clicks'] ?? 0),
+            'maps_clicks' => (int)($row['maps_clicks'] ?? 0),
+            'location_clicks' => (int)($row['location_clicks'] ?? 0),
+            'organizer_cta_clicks' => (int)($row['organizer_cta_clicks'] ?? 0),
+            'total_interactions' => (int)($row['total_interactions'] ?? 0),
+            'item_count' => (int)($row['item_count'] ?? 0),
+        ];
+    }, $rows);
+}
+/* === END BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_AGGREGATION_V1 === */
+
 function be_seo_dashboard_read_value_metrics(): array
 {
     $valueMetrics = be_seo_dashboard_empty_value_metrics('ok');
@@ -213,6 +322,12 @@ function be_seo_dashboard_read_value_metrics(): array
             $pdo,
             (string)$valueMetrics['previous_period']['start_date'],
             (string)$valueMetrics['previous_period']['end_date']
+        );
+
+        $valueMetrics['reporting_targets'] = be_seo_dashboard_aggregate_reporting_targets(
+            $pdo,
+            (string)$valueMetrics['period']['start_date'],
+            (string)$valueMetrics['period']['end_date']
         );
 
         return $valueMetrics;
@@ -323,6 +438,12 @@ $valueMetrics = $isUnlocked
 
     .note { padding: 10px; border-radius: 14px; background: rgba(255,255,255,.56); border: 1px solid var(--line); }
     .proofBox { display: grid; gap: 9px; }
+    .reportList { display: grid; gap: 8px; margin-top: 10px; }
+    .reportRow { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+    .reportRowTitle { font-weight: 900; overflow-wrap: anywhere; }
+    .reportRowMeta { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .reportRowValues { display: grid; gap: 4px; color: var(--muted); font-size: 12px; text-align: right; }
+    .reportRowValues strong { color: var(--text); }
 
     .checklist { display: grid; gap: 9px; margin-top: 10px; }
     .check { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
@@ -363,7 +484,9 @@ $valueMetrics = $isUnlocked
       .kpiLabel,
       .kpiTrend { font-size: 11px; }
       .check,
-      .linkItem { grid-template-columns: 1fr; align-items: start; }
+      .linkItem,
+      .reportRow { grid-template-columns: 1fr; align-items: start; }
+      .reportRowValues { text-align: left; }
       h1 { font-size: 25px; }
       h2 { font-size: 17px; }
     }
@@ -525,6 +648,7 @@ $valueMetrics = $isUnlocked
             <article class="card card--third"><h2>Indexierbare Kernseiten</h2><div id="indexedPages" class="linkList"></div></article>
             <article class="card card--half"><h2>Search-Automatik</h2><div id="searchMetricsStatus" class="note small">Search-Daten werden geladen.</div></article>
             <article class="card card--half"><h2>Location-/Veranstalter-Nutzen</h2><div id="locationValueStatus" class="note small">Nutzwerte werden geladen.</div></article>
+            <article class="card card--half"><h2>Zuordnung / Reporting-Ziele</h2><p class="muted small">Nur explizit zugeordnete Anbieter oder Locations werden als Ziel gezeigt. Alles andere bleibt bewusst nicht zugeordnet.</p><div id="reportingTargets" class="reportList"></div></article>
             <article class="card card--half"><h2>Externe Messquellen</h2><div class="linkList"><a class="linkItem" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Google Search Console</strong><span>Impressionen, Klicks, Seiten</span></a><a class="linkItem" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"><strong>Bing Webmaster Tools</strong><span>Bing-Sichtbarkeit</span></a><a class="linkItem" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"><strong>Google Analytics 4</strong><span>Parallelmessung</span></a></div></article>
           </div>
         </div>
@@ -798,6 +922,50 @@ $valueMetrics = $isUnlocked
       box.innerHTML = `<p><strong>Status:</strong> ${payload.status || "ok"}</p><p style="margin-top:6px;"><strong>Zeitraum:</strong> ${formatPeriod(payload.period)}</p><p style="margin-top:6px;"><strong>Vorher:</strong> ${formatPeriod(payload.previous_period)}</p><p style="margin-top:6px;"><strong>Aktualisiert:</strong> ${generatedLabel}</p><p style="margin-top:10px;"><strong>Direkter Nutzwert:</strong> ${formatMetric(directLocationValue)} Klicks (${formatDelta(directLocationValue, previousDirectLocationValue)})</p><p style="margin-top:6px;"><strong>Detail-Interesse:</strong> ${formatMetric(metrics.detail_views)} Detail-Aufrufe (${formatDelta(metrics.detail_views, previous.detail_views)})</p><p style="margin-top:6px;"><strong>Performende Events:</strong> ${formatMetric(metrics.performing_events)} (${formatDelta(metrics.performing_events, previous.performing_events)})</p><p style="margin-top:6px;"><strong>Performende Ziele/Locations:</strong> ${formatMetric(metrics.performing_locations)} (${formatDelta(metrics.performing_locations, previous.performing_locations)})</p>`;
     }
 
+    /* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_RENDER_V1 | Zweck: zeigt explizite Anbieter-/Location-Zuordnungen statt unklare Werte zu raten; Umfang: additive Dashboard-Detailliste === */
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function renderReportingTargets(payload) {
+      const box = document.getElementById("reportingTargets");
+      if (!box) return;
+
+      const rows = Array.isArray(payload?.reporting_targets) ? payload.reporting_targets : [];
+      if (!rows.length) {
+        box.innerHTML = `<div class="note small">Noch keine explizit zugeordneten Reporting-Ziele im aktuellen Zeitraum.</div>`;
+        return;
+      }
+
+      box.innerHTML = rows.map((row) => {
+        const directClicks = metricNumber(row.website_clicks) + metricNumber(row.maps_clicks) + metricNumber(row.location_clicks) + metricNumber(row.organizer_cta_clicks);
+        const typeLabel = row.target_type === "organizer"
+          ? "Anbieter"
+          : (row.target_type === "location" ? "Location" : "nicht zugeordnet");
+
+        return `
+          <div class="reportRow">
+            <div>
+              <div class="reportRowTitle">${escapeHtml(row.target_title || "nicht zugeordnet")}</div>
+              <div class="reportRowMeta">${escapeHtml(typeLabel)} · ${formatMetric(row.item_count)} Inhalt(e)</div>
+            </div>
+            <div class="reportRowValues">
+              <span><strong>${formatMetric(row.total_interactions)}</strong> Interaktionen gesamt</span>
+              <span>${formatMetric(row.detail_views)} Detail · ${formatMetric(directClicks)} Klicks</span>
+              <span>${formatMetric(row.website_clicks)} Website · ${formatMetric(row.maps_clicks)} Maps</span>
+            </div>
+          </div>
+        `.trim();
+      }).join("");
+    }
+    /* === END BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_RENDER_V1 === */
+
     function renderMetrics(metrics, previous) {
       const model = buildMetricModel(metrics);
       const previousModel = buildMetricModel(previous);
@@ -907,6 +1075,7 @@ $valueMetrics = $isUnlocked
     currentMetrics = buildMetricModel(extractValueMetrics(valuePayload, "metrics"));
     previousMetrics = buildMetricModel(extractValueMetrics(valuePayload, "previous_metrics"));
     renderLocationValue(valuePayload);
+    renderReportingTargets(valuePayload);
     applyMetrics({}, {});
     initTooltips();
     updateOptOutUi();

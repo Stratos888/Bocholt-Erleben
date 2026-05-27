@@ -122,6 +122,43 @@ function getDomainFromUrl(url) {
   }
 }
 
+/* === BEGIN BLOCK: VALUE_METRICS_REPORTING_TARGET_HELPERS_V1 | Zweck: normalisiert optionale Reporting-Ziele für Anbieter-/Location-Auswertungen; Umfang: ergänzt nur Analytics-Helfer ohne Pflichtdaten === */
+function normalizeReportingTargetPayload(payload = {}) {
+  const target = payload.reportingTarget || payload.reporting_target || {};
+
+  return {
+    reportingTargetType: sanitizeMetricKey(
+      payload.reportingTargetType ||
+      payload.reporting_target_type ||
+      target.type ||
+      target.reporting_target_type ||
+      ""
+    ),
+    reportingTargetId: sanitizeAnalyticsValue(
+      payload.reportingTargetId ||
+      payload.reporting_target_id ||
+      target.id ||
+      target.reporting_target_id ||
+      "",
+      191
+    ),
+    reportingTargetTitle: sanitizeAnalyticsValue(
+      payload.reportingTargetTitle ||
+      payload.reporting_target_title ||
+      target.title ||
+      target.name ||
+      target.reporting_target_title ||
+      "",
+      255
+    )
+  };
+}
+
+function buildReportingTargetPayload(source = {}) {
+  return normalizeReportingTargetPayload(source);
+}
+/* === END BLOCK: VALUE_METRICS_REPORTING_TARGET_HELPERS_V1 === */
+
 function emitGa4Event(eventName, params = {}) {
   if (!shouldEnableAnalytics()) return;
   if (typeof window.gtag !== "function") return;
@@ -138,6 +175,7 @@ function sendValueMetric(metricKey, payload = {}) {
 
   const endpoint = CONFIG.analytics.valueMetricsEndpoint || "/api/value-track.php";
   const destinationUrl = sanitizeAnalyticsValue(payload.destinationUrl || payload.url, 500);
+  const reportingTarget = normalizeReportingTargetPayload(payload);
 
   const body = JSON.stringify({
     metric_key: cleanMetricKey,
@@ -145,6 +183,9 @@ function sendValueMetric(metricKey, payload = {}) {
     entity_id: sanitizeAnalyticsValue(payload.entityId || payload.entity_id, 191),
     entity_title: sanitizeAnalyticsValue(payload.entityTitle || payload.entity_title, 255),
     destination_url: destinationUrl,
+    reporting_target_type: reportingTarget.reportingTargetType,
+    reporting_target_id: reportingTarget.reportingTargetId,
+    reporting_target_title: reportingTarget.reportingTargetTitle,
     page_path: sanitizeAnalyticsValue(
       typeof window !== "undefined" ? window.location.pathname : "",
       255
@@ -199,6 +240,7 @@ function trackOutboundClick(payload = {}) {
   const entityType = sanitizeAnalyticsValue(payload.entityType, 40) || "";
   const entityId = sanitizeAnalyticsValue(payload.entityId, 120) || "";
   const entityTitle = sanitizeAnalyticsValue(payload.entityTitle, 150) || "";
+  const reportingTarget = normalizeReportingTargetPayload(payload);
   const pagePath = sanitizeAnalyticsValue(
     typeof window !== "undefined" ? window.location.pathname : "",
     200
@@ -210,6 +252,9 @@ function trackOutboundClick(payload = {}) {
     entity_type: entityType,
     entity_id: entityId,
     entity_title: entityTitle,
+    reporting_target_type: reportingTarget.reportingTargetType,
+    reporting_target_id: reportingTarget.reportingTargetId,
+    reporting_target_title: reportingTarget.reportingTargetTitle,
     destination_domain: destinationDomain,
     destination_url: destinationUrl,
     page_path: pagePath
@@ -220,6 +265,9 @@ function trackOutboundClick(payload = {}) {
     entity_type: entityType,
     entity_id: entityId,
     entity_title: entityTitle,
+    reporting_target_type: reportingTarget.reportingTargetType,
+    reporting_target_id: reportingTarget.reportingTargetId,
+    reporting_target_title: reportingTarget.reportingTargetTitle,
     destination_domain: destinationDomain,
     page_path: pagePath
   });
@@ -229,7 +277,8 @@ function trackOutboundClick(payload = {}) {
     destinationUrl,
     entityType,
     entityId,
-    entityTitle
+    entityTitle,
+    ...reportingTarget
   });
 }
 
@@ -237,17 +286,25 @@ function trackValueMetric(metricKey, payload = {}) {
   const cleanMetricKey = sanitizeMetricKey(metricKey);
   if (!cleanMetricKey) return;
 
+  const reportingTarget = normalizeReportingTargetPayload(payload);
+
   emitGa4Event(`be_${cleanMetricKey}`, {
     entity_type: sanitizeAnalyticsValue(payload.entityType || payload.entity_type, 40),
     entity_id: sanitizeAnalyticsValue(payload.entityId || payload.entity_id, 120),
     entity_title: sanitizeAnalyticsValue(payload.entityTitle || payload.entity_title, 150),
+    reporting_target_type: reportingTarget.reportingTargetType,
+    reporting_target_id: reportingTarget.reportingTargetId,
+    reporting_target_title: reportingTarget.reportingTargetTitle,
     page_path: sanitizeAnalyticsValue(
       typeof window !== "undefined" ? window.location.pathname : "",
       200
     )
   });
 
-  sendValueMetric(cleanMetricKey, payload);
+  sendValueMetric(cleanMetricKey, {
+    ...payload,
+    ...reportingTarget
+  });
 }
 
 function isOrganizerCtaHref(href) {
@@ -308,6 +365,7 @@ function initAnalytics() {
   window.BEAnalytics = window.BEAnalytics || {};
   window.BEAnalytics.trackOutboundClick = trackOutboundClick;
   window.BEAnalytics.trackValueMetric = trackValueMetric;
+  window.BEAnalytics.buildReportingTargetPayload = buildReportingTargetPayload;
   window.BEAnalytics.setValueMetricsOptOut = setValueMetricsOptOut;
   window.BEAnalytics.isValueMetricsOptedOut = isValueMetricsOptedOut;
 
