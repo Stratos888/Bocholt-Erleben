@@ -38,9 +38,10 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-1. Live-/SEO-Rollout finalisieren: robots, sitemap, indexierbare Kernseiten, Search-Console-/Bing- und Analytics-Proof.
-2. Danach globales UI-/UX-Konsistenz-Workpack mit Design-System-Konsolidierung.
-3. Danach Discovery-Ausbau: „Heute in Bocholt“, Aktivitäten und Orte/Locations.
+1. Live-Messbasis konsolidieren: vorhandene Live-KPIs nicht mehr als fehlend behandeln, sondern Tracking-Qualität, Ziel-/Item-Zuordnung und auswertbare Veranstalter-/Location-Reports herstellen.
+2. Monetarisierungs-Readiness absichern: echten Live-Zahlungsfall bewusst testen, kritische Smoke-Tests automatisieren und Review-/Push-Flows gegen stille Ausfälle härten.
+3. Veranstalter-Nutzwert sichtbar machen: Anbieterbereich, Akquise-Kommunikation und Feedbackberichte so ausbauen, dass Reichweite, Interesse und konkrete Klicks belegbar werden.
+4. Danach Discovery-Ausbau: „Heute in Bocholt“, Aktivitäten und Orte/Locations.
 
 ---
 
@@ -83,8 +84,8 @@ The following workpack is intentionally on hold:
 
 ## NEXT WORKPACK
 
-- Complete live SEO rollout and measurement proof.
-- Then consolidate the global design system with CSS tokens + component mapping.
-- Keep page-specific changes minimal during design-system consolidation.
+- Work from `ROADMAP.md` as the tactical prioritized backlog.
+- First target: measured organizer value, not another broad visual-polish loop.
+- Keep page-specific changes minimal until the measurement/reporting and monetization smoke-test gaps are closed.
 
 <!-- === END CANONICAL MASTER FILE === -->

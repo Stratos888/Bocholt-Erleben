@@ -667,17 +667,45 @@ const OfferCards = (() => {
   }
   /* === END BLOCK: ACTIVITIES_IMAGE_LOADING_STRATEGY_WITH_RESOLVED_VISUALS_V3 === */
 
-  function openPrimaryDesktopTarget(url) {
-    if (!url) return false;
-    window.open(url, "_blank", "noopener,noreferrer");
-    return true;
+  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_DIRECT_OPEN_ANALYTICS_V1 | Zweck: zählt Desktop-Direktklicks auf Activity-Cards als anonymen website_click, bevor das externe Ziel geöffnet wird; Umfang: ersetzt nur openPrimaryDesktopTarget() und ergänzt den Card-Payload in createCard() === */
+  function buildPrimaryOutboundPayload(offer, primaryUrl) {
+    if (!primaryUrl) return null;
+
+    return {
+      outboundType: "website",
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim(),
+      destinationUrl: primaryUrl
+    };
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_CREATECARD_IMAGE_PRIORITY_PLUMBING_V1 | Zweck: reicht den Render-Index bis in renderMedia() durch, ohne Card-Verhalten zu verändern | Umfang: ersetzt nur createCard() === */
+  function openPrimaryDesktopTarget(url, analyticsPayload = null) {
+    if (!url) return false;
+
+    try {
+      if (
+        analyticsPayload &&
+        window.BEAnalytics &&
+        typeof window.BEAnalytics.trackOutboundClick === "function"
+      ) {
+        window.BEAnalytics.trackOutboundClick(analyticsPayload);
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+  /* === END BLOCK: ACTIVITIES_DESKTOP_DIRECT_OPEN_ANALYTICS_V1 === */
+
+  /* === BEGIN BLOCK: ACTIVITIES_CREATECARD_DESKTOP_ANALYTICS_PLUMBING_V2 | Zweck: reicht den Activity-Outbound-Payload in alle direkten Card-Open-Pfade durch, damit Desktop-Klicks und URL-Fallbacks messbar werden; Umfang: ersetzt nur createCard() === */
   function createCard(offer, index) {
     const article = document.createElement("article");
     const visual = OfferVisuals.getCategoryPresentation(offer.kategorie);
     const primaryUrl = OfferVisuals.normalizeHttpUrl(offer.url);
+    const primaryOutboundPayload = buildPrimaryOutboundPayload(offer, primaryUrl);
 
     article.className = "event-card discovery-card--compact activity-card--rich";
     article.tabIndex = 0;
@@ -710,7 +738,7 @@ const OfferCards = (() => {
         event.stopPropagation();
       }
 
-      if (isDesktopViewport() && openPrimaryDesktopTarget(primaryUrl)) {
+      if (isDesktopViewport() && openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload)) {
         return;
       }
 
@@ -719,7 +747,7 @@ const OfferCards = (() => {
         return;
       }
 
-      openPrimaryDesktopTarget(primaryUrl);
+      openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     };
 
     article.addEventListener("click", open);
@@ -730,7 +758,7 @@ const OfferCards = (() => {
 
     return article;
   }
-  /* === END BLOCK: ACTIVITIES_CREATECARD_IMAGE_PRIORITY_PLUMBING_V1 === */
+  /* === END BLOCK: ACTIVITIES_CREATECARD_DESKTOP_ANALYTICS_PLUMBING_V2 === */
 
   /* === BEGIN BLOCK: ACTIVITIES_SKELETON_AND_EMPTYSTATE_PARITY_V1 | Zweck: ergänzt Desktop-Skeletons und gleicht Empty-State mit Reset-CTA an die Event-Seite an | Umfang: ersetzt nur Render-/Export-Block des OfferCards-Moduls === */
   function createSkeletonCard() {

@@ -18,9 +18,18 @@
 - `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
 - A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
 - Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
 - The Kuratier-Inbox is also hybrid:
   1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
-  2. DB submissions for organizer single-event and membership submissions.
+  2. DB submissions for organizer single-event, membership and activity-presence submissions.
+- Google-Sheet-Inbox data is separated by tab, not by separate sheet:
+  - `main` / live uses `Inbox` and `Inbox_Archive`.
+  - `staging` uses `Inbox_Staging` and `Inbox_Archive_Staging`.
+- Deploy must resolve the Inbox tab by branch and export from that resolved tab.
+- Staging must never read or write the live `Inbox` tab for KI-/Sheet candidates.
+- Production KI workflows run on `main` only and must target the live Inbox/push path.
+- `Inbox → Events` import is production-only and must not run on `staging`.
+
 ---
 
 ## 2. PROOF BEFORE PATCH
@@ -39,7 +48,8 @@ Use this hierarchy when documents, screenshots, or repo leftovers create ambigui
 1. visible current code from the uploaded ZIP
 2. `Produktvertrag.md` for canonical product logic
 3. `MASTER.md` for strategic direction / frozen areas / current focus
-4. `ENGINEERING.md` for implementation rules and working modes
+4. `ROADMAP.md` for tactical prioritized workpacks / To-dos
+5. `ENGINEERING.md` for implementation rules and working modes
 
 Rules:
 
@@ -284,7 +294,9 @@ For all future repo patches, use this order:
    - git apply patch.diff
    - rm patch.diff
    - git diff --check
-   - git diff -- <affected-file>
+   - git --no-pager diff -- <affected-file>
+
+   Do not use plain `git diff -- <affected-file>` in Codespaces workflows, because it can open the terminal pager and look like a frozen command. If the pager opens anyway, exit it with `q`.
 
 5. If git apply --check fails:
    - stop immediately
@@ -298,13 +310,13 @@ For all future repo patches, use this order:
    - target only the relevant owner file or owner block
    - verify every selector/block uniquely before writing
    - abort without writing if anything is missing or ambiguous
-   - end with git diff --check and git diff -- <affected-file>
+   - end with git diff --check and git --no-pager diff -- <affected-file>
 
 8. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
 
 9. After every failed patch attempt, run:
    - git status --short
-   - git diff -- <affected-file>
+   - git --no-pager diff -- <affected-file>
 
 10. No blind retries.
 
