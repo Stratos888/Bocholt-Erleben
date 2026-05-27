@@ -223,6 +223,72 @@ Nächster sinnvoller Schritt:
 
 <!-- === END BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_REPORTING_TARGET_EXPANSION_2026_05_27 | Zweck: dokumentiert Live-Kontrolltest für weitere Activity-Reporting-Ziele; Umfang: Aasee-Payload, Erweiterbarkeit der Reporting-Ziel-Logik, Datenbasis-Wartepunkt === -->
+
+# Teststand: Erweiterte Activity-Reporting-Ziele
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Live
+- Funktion: Activity-Tracking mit expliziten Reporting-Zielen
+- geprüfter Inhalt: `Aasee erleben`
+- erwartetes Reporting-Ziel: `Aasee Bocholt`
+- Ergebnis: bestanden
+
+## Ziel des Tests
+
+Nach dem ersten Live-Beweis mit `Biotopwildpark Anholter Schweiz` wurde geprüft, ob die Reporting-Ziel-Logik auch für neu ergänzte Activities aus `data/offers.json` funktioniert.
+
+Damit sollte ausgeschlossen werden, dass nur ein einzelner Sonderfall korrekt läuft.
+
+---
+
+## Bestandene Prüfung
+
+Bestanden:
+
+- Live-Seite `/angebote/` lädt.
+- Activity `Aasee erleben` öffnet die Detailansicht.
+- `value-track.php` wird für `activity_detail_view` aufgerufen.
+- `value-track.php` wird für `website_click` aufgerufen.
+- Network-Payload enthält korrekt:
+  - `reporting_target_type: "location"`
+  - `reporting_target_id: "aasee-bocholt"`
+  - `reporting_target_title: "Aasee Bocholt"`
+
+Damit ist belegt:
+
+- `reporting_target` aus `data/offers.json` wird beim Normalisieren der Activities erhalten.
+- Das Frontend sendet Reporting-Ziele auch für neu ergänzte Activities.
+- Die Reporting-Ziel-Logik ist nicht auf `Anholter Schweiz` beschränkt.
+
+---
+
+## Bewertung
+
+Der technische Teil der Reporting-Ziel-Zuordnung ist live bewiesen.
+
+Die aktuellen Testklicks sind nur Funktionsbeweise. Sie werden nicht als Akquise-Erfolgsdaten bewertet.
+
+Für Akquise-/Feedbackberichte wird jetzt organische Datenbasis gesammelt.
+
+Nächste Bewertungslogik:
+
+- nach ca. 7 Tagen: Plausibilitätscheck der ersten echten Zielsignale
+- nach ca. 30 Tagen bzw. einem vollständigen 28-Tage-Zeitraum: prüfen, ob ein erster Feedbackbericht für eine Location belastbar ist
+
+Automatische Erinnerung:
+
+- 26.06.2026
+
+Offen:
+
+- erster screenshot- oder mailfähiger Feedbackbericht
+- echter Live-Zahlungsfall als separater P0-Test
+
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_REPORTING_TARGET_EXPANSION_2026_05_27 === -->
+
 # Teststand: Veranstalter-Funnel + Kuratier-PWA-Review-Bridge
 
 ## Stand

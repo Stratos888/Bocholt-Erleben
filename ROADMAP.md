@@ -121,6 +121,41 @@ Akzeptanzkriterien:
 - Eigene Testklicks bleiben ausgeschlossen.
 - Unklare Zuordnungen werden nicht geraten, sondern als `nicht zugeordnet` sichtbar gemacht.
 
+<!-- === BEGIN BLOCK: ROADMAP_REPORTING_TARGET_DATA_WAIT_2026_05_27 | Zweck: hält den Live-Beweis und den Datenbasis-Wartepunkt für Reporting-Ziele fest; Umfang: Akquise-Readiness, 28-/30-Tage-Datenlauf, nächster Feedbackbericht === -->
+
+### Status 2026-05-27 — Reporting-Ziele live bewiesen, Datenbasis läuft
+
+Belegt:
+
+- Explizite Reporting-Ziel-Zuordnung funktioniert live.
+- Erster Einzelbeweis: `Anholter Schweiz erleben` wird dem Ziel `Biotopwildpark Anholter Schweiz` zugeordnet.
+- Erweiterungsbeweis: zusätzlich ergänzte Ziele aus `data/offers.json` funktionieren ebenfalls live; geprüftes Beispiel: `Aasee erleben` mit Ziel `Aasee Bocholt`.
+- `value-track.php` erhält bei geprüften Activity-Requests korrekt:
+  - `reporting_target_type`
+  - `reporting_target_id`
+  - `reporting_target_title`
+- Das SEO-/Mehrwert-Dashboard trennt explizit zugeordnete Ziele von `nicht zugeordnet`.
+
+Bewertung:
+
+- Der technische Roadmap-Punkt `Item- und Anbieter-Zuordnung für Nutzwertdaten prüfen und härten` ist für Activities grundsätzlich bewiesen.
+- Testklicks dienen nur als Funktionsbeweis und sind kein Akquise-Beleg.
+- Für einen belastbaren Feedbackbericht werden jetzt organische Daten gesammelt.
+
+Nächste Datenprüfungen:
+
+- Kurzcheck nach ca. 7 Tagen: prüfen, ob erste echte Zielsignale plausibel einlaufen.
+- Hauptcheck nach ca. 30 Tagen bzw. nach einem vollständigen 28-Tage-Zeitraum: bewerten, ob ein erster Akquise-/Feedbackbericht belastbar erstellt werden kann.
+- Automatische Erinnerung ist für den 26.06.2026 angelegt.
+
+Bis dahin:
+
+- Kein großer Feedbackbericht auf Basis von Testklicks.
+- Weitere Reporting-Ziele nur gezielt ergänzen, wenn die Zuordnung fachlich eindeutig ist.
+- Nächster aktiver P0-Block kann unabhängig davon der echte Live-Zahlungsfall sein.
+
+<!-- === END BLOCK: ROADMAP_REPORTING_TARGET_DATA_WAIT_2026_05_27 === -->
+
 ### 3. Ersten Veranstalter-/Location-Feedbackbericht bauen
 
 Ziel:
