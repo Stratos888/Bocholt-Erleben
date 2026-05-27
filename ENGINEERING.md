@@ -18,6 +18,7 @@
 - `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
 - A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
 - Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
 - The Kuratier-Inbox is also hybrid:
   1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
   2. DB submissions for organizer single-event, membership and activity-presence submissions.
@@ -47,7 +48,8 @@ Use this hierarchy when documents, screenshots, or repo leftovers create ambigui
 1. visible current code from the uploaded ZIP
 2. `Produktvertrag.md` for canonical product logic
 3. `MASTER.md` for strategic direction / frozen areas / current focus
-4. `ENGINEERING.md` for implementation rules and working modes
+4. `ROADMAP.md` for tactical prioritized workpacks / To-dos
+5. `ENGINEERING.md` for implementation rules and working modes
 
 Rules:
 
