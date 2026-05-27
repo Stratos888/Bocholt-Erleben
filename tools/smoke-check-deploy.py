@@ -207,16 +207,66 @@ def check_checkout_validation(base_url: str) -> None:
     print("✅ Checkout-API Validierung: kontrollierter HTTP 422 statt 500")
 
 
-def check_review_endpoint_protected(base_url: str) -> None:
-    label = "Review-API Zugriffsschutz"
-    result = request_with_retries(build_url(base_url, "/api/submissions/review-list.php"))
-    require_status(result, {401}, label)
+def check_protected_json_endpoint(
+    base_url: str,
+    *,
+    path: str,
+    label: str,
+    method: str = "GET",
+    body: bytes | None = None,
+    expected_status: int = 401,
+) -> None:
+    headers = {"Content-Type": "application/json"} if body is not None else None
+    result = request_with_retries(
+        build_url(base_url, path),
+        method=method,
+        body=body,
+        headers=headers,
+    )
+    require_status(result, {expected_status}, label)
     payload = parse_json(result)
 
     if payload.get("status") != "error":
         raise AssertionError(f"{label}: unerwartete JSON-Struktur: {payload}")
 
-    print("✅ Review-API Zugriffsschutz: ohne Passwort nicht öffentlich erreichbar")
+    print(f"✅ {label}: ohne Berechtigung nicht öffentlich erreichbar")
+
+
+def check_review_endpoint_protected(base_url: str) -> None:
+    check_protected_json_endpoint(
+        base_url,
+        path="/api/submissions/review-list.php",
+        label="Review-API Zugriffsschutz",
+    )
+
+
+def check_push_endpoints_protected(base_url: str) -> None:
+    check_protected_json_endpoint(
+        base_url,
+        path="/api/push/config.php",
+        label="Push-Config Zugriffsschutz",
+    )
+    check_protected_json_endpoint(
+        base_url,
+        path="/api/push/subscribe.php",
+        label="Push-Subscribe Zugriffsschutz",
+        method="POST",
+        body=b"{}",
+    )
+    check_protected_json_endpoint(
+        base_url,
+        path="/api/push/test.php",
+        label="Push-Test Zugriffsschutz",
+        method="POST",
+        body=b"{}",
+    )
+    check_protected_json_endpoint(
+        base_url,
+        path="/api/push/notify-inbox.php",
+        label="Push-Notify Zugriffsschutz",
+        method="POST",
+        body=b"{}",
+    )
 
 
 def run(args: argparse.Namespace) -> None:
@@ -231,6 +281,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_public_events_api(base_url),
         lambda: check_checkout_validation(base_url),
         lambda: check_review_endpoint_protected(base_url),
+        lambda: check_push_endpoints_protected(base_url),
     ]
 
     print(f"=== Deploy-Smoke-Check: {base_url} ===")
