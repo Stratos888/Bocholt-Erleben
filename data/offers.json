@@ -603,6 +603,11 @@
       "title": "Anholter Schweiz erleben",
       "kategorie": "Freizeit & Familie",
       "location": "Isselburg-Anholt",
+      "reporting_target": {
+        "type": "location",
+        "id": "anholter-schweiz",
+        "title": "Biotopwildpark Anholter Schweiz"
+      },
       "maps_query": "Pferdehorster Str. 1, 46419 Isselburg",
       "maps_label": "Zum Eingang navigieren",
       "description": "Die Anholter Schweiz ist ein Biotopwildpark mit Wegen und Tiergehegen.",

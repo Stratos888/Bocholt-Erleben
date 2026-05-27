@@ -69,6 +69,24 @@ function public_events_location_label(array $row): string
     return $name !== '' ? $name : $address;
 }
 
+/* === BEGIN BLOCK: PUBLIC_EVENTS_REPORTING_TARGET_V1 | Zweck: gibt freigegebenen DB-Events ein stabiles internes Reporting-Ziel ohne rohe Organizer-ID; Umfang: ergänzt Helper für Tracking-Metadaten === */
+function public_events_reporting_target(array $row): array
+{
+    $organizerId = (int)($row['organizer_id'] ?? 0);
+    $organizationName = trim((string)($row['organization_name_snapshot'] ?? ''));
+
+    if ($organizerId <= 0 || $organizationName === '') {
+        return [];
+    }
+
+    return [
+        'reporting_target_type' => 'organizer',
+        'reporting_target_id' => 'organizer-' . substr(hash('sha256', 'organizer:' . $organizerId), 0, 16),
+        'reporting_target_title' => $organizationName,
+    ];
+}
+/* === END BLOCK: PUBLIC_EVENTS_REPORTING_TARGET_V1 === */
+
 function public_events_normalize_row(array $row): array
 {
     $url = trim((string)($row['ticket_url'] ?? ''));
@@ -93,6 +111,11 @@ function public_events_normalize_row(array $row): array
         $event['url'] = $url;
     }
 
+    $reportingTarget = public_events_reporting_target($row);
+    if ($reportingTarget !== []) {
+        $event += $reportingTarget;
+    }
+
     return $event;
 }
 
@@ -101,6 +124,8 @@ try {
     $statement = $pdo->prepare(
         'SELECT
             id,
+            organizer_id,
+            organization_name_snapshot,
             title,
             start_date,
             time_text,

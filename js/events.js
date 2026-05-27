@@ -465,7 +465,10 @@ function createCard(event) {
         entityType: "event",
         entityId: String(event?.id || "").trim(),
         entityTitle: String(event?.title || "").trim(),
-        destinationUrl: primaryUrl
+        destinationUrl: primaryUrl,
+        ...(window.BEAnalytics?.buildReportingTargetPayload
+          ? window.BEAnalytics.buildReportingTargetPayload(event)
+          : {})
       }
     : null;
 

@@ -95,7 +95,10 @@ const OfferDetailPanel = {
       window.BEAnalytics.trackValueMetric("activity_detail_view", {
         entityType: "activity",
         entityId: String(offer?.id || "").trim(),
-        entityTitle: String(offer?.title || "").trim()
+        entityTitle: String(offer?.title || "").trim(),
+        ...(window.BEAnalytics.buildReportingTargetPayload
+          ? window.BEAnalytics.buildReportingTargetPayload(offer)
+          : {})
       });
     }
     /* === END BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V1 === */
@@ -366,7 +369,10 @@ const OfferDetailPanel = {
     const baseOutboundPayload = {
       entityType: "activity",
       entityId: String(offer?.id || "").trim(),
-      entityTitle: String(offer?.title || "").trim()
+      entityTitle: String(offer?.title || "").trim(),
+      ...(window.BEAnalytics?.buildReportingTargetPayload
+        ? window.BEAnalytics.buildReportingTargetPayload(offer)
+        : {})
     };
 
     const mapsOutboundPayload = mapsUrl
@@ -392,6 +398,9 @@ const OfferDetailPanel = {
         `data-entity-type="${this.escapeHtml(payload.entityType || "")}"`,
         `data-entity-id="${this.escapeHtml(payload.entityId || "")}"`,
         `data-entity-title="${this.escapeHtml(payload.entityTitle || "")}"`,
+        `data-reporting-target-type="${this.escapeHtml(payload.reportingTargetType || "")}"`,
+        `data-reporting-target-id="${this.escapeHtml(payload.reportingTargetId || "")}"`,
+        `data-reporting-target-title="${this.escapeHtml(payload.reportingTargetTitle || "")}"`,
         `data-destination-url="${this.escapeHtml(payload.destinationUrl || "")}"`
       ].join(" ");
     };
@@ -448,6 +457,9 @@ const OfferDetailPanel = {
           entityType: String(link.dataset.entityType || "").trim(),
           entityId: String(link.dataset.entityId || "").trim(),
           entityTitle: String(link.dataset.entityTitle || "").trim(),
+          reportingTargetType: String(link.dataset.reportingTargetType || "").trim(),
+          reportingTargetId: String(link.dataset.reportingTargetId || "").trim(),
+          reportingTargetTitle: String(link.dataset.reportingTargetTitle || "").trim(),
           destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
         });
       });

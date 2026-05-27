@@ -68,6 +68,35 @@ function be_value_metrics_normalize_path(string $value): string
     return $clean;
 }
 
+/* === BEGIN BLOCK: VALUE_METRICS_REPORTING_TARGET_SCHEMA_V1 | Zweck: erweitert Nutzwert-Metriken um optionale Reporting-Ziele für Anbieter-/Location-Auswertungen; Umfang: ersetzt Schema-Helfer für value_metric_daily === */
+function be_value_metrics_table_column_exists(PDO $pdo, string $columnName): bool
+{
+    $statement = $pdo->prepare(
+        'SELECT COUNT(*) AS total
+         FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "value_metric_daily"
+           AND COLUMN_NAME = :column_name'
+    );
+    $statement->execute([':column_name' => $columnName]);
+
+    return (int)($statement->fetch()['total'] ?? 0) > 0;
+}
+
+function be_value_metrics_table_index_exists(PDO $pdo, string $indexName): bool
+{
+    $statement = $pdo->prepare(
+        'SELECT COUNT(*) AS total
+         FROM INFORMATION_SCHEMA.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "value_metric_daily"
+           AND INDEX_NAME = :index_name'
+    );
+    $statement->execute([':index_name' => $indexName]);
+
+    return (int)($statement->fetch()['total'] ?? 0) > 0;
+}
+
 function be_value_metrics_schema(PDO $pdo): void
 {
     $pdo->exec(<<<'SQL'
@@ -79,6 +108,9 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     entity_id VARCHAR(191) NOT NULL DEFAULT '',
     entity_title VARCHAR(255) NULL,
     destination_url VARCHAR(1024) NULL,
+    reporting_target_type VARCHAR(40) NOT NULL DEFAULT '',
+    reporting_target_id VARCHAR(191) NOT NULL DEFAULT '',
+    reporting_target_title VARCHAR(255) NULL,
     page_path VARCHAR(255) NULL,
     bucket_hash CHAR(64) NOT NULL,
     count_value INT UNSIGNED NOT NULL DEFAULT 0,
@@ -87,10 +119,25 @@ CREATE TABLE IF NOT EXISTS value_metric_daily (
     PRIMARY KEY (id),
     UNIQUE KEY uq_value_metric_daily_bucket (bucket_hash),
     KEY idx_value_metric_daily_date_key (metric_date, metric_key),
-    KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id)
+    KEY idx_value_metric_daily_entity (metric_date, entity_type, entity_id),
+    KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL);
+
+    if (!be_value_metrics_table_column_exists($pdo, 'reporting_target_type')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_type VARCHAR(40) NOT NULL DEFAULT "" AFTER destination_url');
+    }
+    if (!be_value_metrics_table_column_exists($pdo, 'reporting_target_id')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_id VARCHAR(191) NOT NULL DEFAULT "" AFTER reporting_target_type');
+    }
+    if (!be_value_metrics_table_column_exists($pdo, 'reporting_target_title')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD COLUMN reporting_target_title VARCHAR(255) NULL AFTER reporting_target_id');
+    }
+    if (!be_value_metrics_table_index_exists($pdo, 'idx_value_metric_daily_reporting_target')) {
+        $pdo->exec('ALTER TABLE value_metric_daily ADD KEY idx_value_metric_daily_reporting_target (metric_date, reporting_target_type, reporting_target_id)');
+    }
 }
+/* === END BLOCK: VALUE_METRICS_REPORTING_TARGET_SCHEMA_V1 === */
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -150,6 +197,9 @@ $entityType = be_value_metrics_clean_key((string)($payload['entity_type'] ?? '')
 $entityId = be_value_metrics_clean_text((string)($payload['entity_id'] ?? ''), 191);
 $entityTitle = be_value_metrics_clean_text((string)($payload['entity_title'] ?? ''), 255);
 $destinationUrl = be_value_metrics_clean_url((string)($payload['destination_url'] ?? ''), 1024);
+$reportingTargetType = be_value_metrics_clean_key((string)($payload['reporting_target_type'] ?? ''), 40);
+$reportingTargetId = be_value_metrics_clean_text((string)($payload['reporting_target_id'] ?? ''), 191);
+$reportingTargetTitle = be_value_metrics_clean_text((string)($payload['reporting_target_title'] ?? ''), 255);
 $pagePath = be_value_metrics_normalize_path((string)($payload['page_path'] ?? ''));
 $metricDate = gmdate('Y-m-d');
 
@@ -159,6 +209,8 @@ $bucketHash = hash('sha256', implode('|', [
     $entityType,
     $entityId,
     $destinationUrl,
+    $reportingTargetType,
+    $reportingTargetId,
     $pagePath,
 ]));
 
@@ -174,6 +226,9 @@ INSERT INTO value_metric_daily (
     entity_id,
     entity_title,
     destination_url,
+    reporting_target_type,
+    reporting_target_id,
+    reporting_target_title,
     page_path,
     bucket_hash,
     count_value
@@ -184,6 +239,9 @@ INSERT INTO value_metric_daily (
     :entity_id,
     :entity_title,
     :destination_url,
+    :reporting_target_type,
+    :reporting_target_id,
+    :reporting_target_title,
     :page_path,
     :bucket_hash,
     1
@@ -191,6 +249,7 @@ INSERT INTO value_metric_daily (
 ON DUPLICATE KEY UPDATE
     count_value = count_value + 1,
     entity_title = VALUES(entity_title),
+    reporting_target_title = VALUES(reporting_target_title),
     updated_at = CURRENT_TIMESTAMP
 SQL);
 
@@ -201,6 +260,9 @@ SQL);
         ':entity_id' => $entityId,
         ':entity_title' => $entityTitle !== '' ? $entityTitle : null,
         ':destination_url' => $destinationUrl !== '' ? $destinationUrl : null,
+        ':reporting_target_type' => $reportingTargetType,
+        ':reporting_target_id' => $reportingTargetId,
+        ':reporting_target_title' => $reportingTargetTitle !== '' ? $reportingTargetTitle : null,
         ':page_path' => $pagePath !== '' ? $pagePath : null,
         ':bucket_hash' => $bucketHash,
     ]);
