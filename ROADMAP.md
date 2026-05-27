@@ -251,6 +251,15 @@ Akzeptanzkriterien:
 
 ### 5. Review-/Push-Flows gegen stille Ausfälle prüfen
 
+Status 2026-05-27:
+
+- Technischer Zugriffsschutzteil ist in den Deploy-Smoke-Check integriert und für Staging sowie Live/Main bewiesen.
+- Review-Liste und Push-Endpunkte werden nach Deploys automatisch gegen versehentliche öffentliche Öffnung geprüft.
+- Staging-Proof: Commit `b858d2d` (`Harden push endpoint smoke checks`).
+- Live-/Main-Proof: Build `fb6efe5443b`.
+- Der tatsächliche Push-Versand ist damit noch nicht fachlich bewiesen.
+- Der eigentliche Flow-Proof bleibt: Einreichung speichern → Review-Inbox sichtbar → Push optional, aber nicht blockierend.
+
 Ziel:
 
 - Neue Einreichungen erzeugen zuverlässig Review-Arbeit und interne Hinweise.

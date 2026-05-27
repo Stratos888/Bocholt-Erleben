@@ -34,6 +34,74 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert erweiterten Review-/Push-Zugriffsschutz im Deploy-Smoke-Check; Umfang: Staging-Proof, Live-Proof, geprüfte Push-Endpunkte und offene fachliche Flow-Grenzen === -->
+
+# Teststand: Review-/Push-Zugriffsschutz im Deploy-Smoke-Check
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Staging und Live
+- Funktion: Review-/Push-Zugriffsschutz als Erweiterung des automatisierten Deploy-Smoke-Checks
+- relevante Stände:
+  - Staging: Commit `b858d2d` (`Harden push endpoint smoke checks`)
+  - Live/Main: Build `fb6efe5443b`
+- Ergebnis: bestanden
+
+## Ziel der geprüften Funktion
+
+Nach einem STRATO-Deploy soll automatisch sichtbar sein, ob Review- und Push-Endpunkte versehentlich öffentlich erreichbar sind.
+
+Der Test prüft Zugriffsschutz und kontrollierte Fehlerantworten. Er ist kein fachlicher Test des tatsächlichen Push-Versands.
+
+## Automatisch geprüfte Endpunkte
+
+Bestanden:
+
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- `/api/push/config.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/subscribe.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/test.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/notify-inbox.php` ist ohne Berechtigung bzw. Secret nicht öffentlich erreichbar.
+
+## Belegte Staging-Prüfung
+
+Bestanden mit Commit `b858d2d`:
+
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+- Alle Review-/Push-Zugriffsschutzchecks sind bestanden.
+
+## Belegte Live-/Main-Prüfung
+
+Bestanden mit Build `fb6efe5443b`:
+
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+- Alle Review-/Push-Zugriffsschutzchecks sind bestanden.
+
+## Bewertung
+
+Der technische Zugriffsschutzteil des Roadmap-Punkts `Review-/Push-Flows gegen stille Ausfälle prüfen` ist abgesichert.
+
+Damit ist nach Deploys automatisch sichtbar, ob Review-Liste und Push-Endpunkte versehentlich öffentlich offen sind.
+
+## Grenzen des Tests
+
+Nicht durch diesen Smoke-Check bewiesen:
+
+- tatsächlicher Push-Versand
+- erfolgreiche Anzeige einer neuen Einreichung in der Review-Inbox
+- fachlicher Nachweis, dass jede Einreichungsart gespeichert und sichtbar wird
+- Nachweis, dass ein Push-Fehler den Submission-Erfolg nicht blockiert
+
+## Nächste Prüfschritte
+
+Weiterhin offen:
+
+- Review-/Push-Flow manuell prüfen: Einreichung speichern → Review-Inbox sichtbar → Push optional, aber nicht blockierend.
+- Membership- und Activity-Presence-Einreichungen als eigene Inbox-Flow-Proofs prüfen.
+
+<!-- === END BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 | Zweck: dokumentiert automatisierte Deploy-Smoke-Checks nach STRATO-Upload für Staging und Live; Umfang: Workflow-Schritt, geprüfte Endpunkte, Proof-Commits und offene Grenzen === -->
 
 # Teststand: Automatisierte Deploy-Smoke-Checks nach STRATO-Upload
