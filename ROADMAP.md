@@ -47,6 +47,14 @@ Bewertung:
 - Für Veranstalter-Akquise braucht es zusätzlich auswertbare Anbieter-, Event-, Aktivitäts- und Location-Bezüge.
 - Für `Grün` fehlen laut Dashboard-Hinweis vor allem stärkere automatisch gemessene Website-, Maps- oder Location-Klicks.
 
+Zusatzbeleg 2026-05-27:
+
+- Reporting-Ziel-Zuordnung ist live technisch bewiesen.
+- `Anholter Schweiz erleben` sendet `reporting_target_type`, `reporting_target_id` und `reporting_target_title` im `value-track.php`-Payload.
+- Das interne Dashboard zeigt das explizite Ziel `Biotopwildpark Anholter Schweiz` getrennt von `nicht zugeordnet`.
+- Belegter Live-Wert nach Test: `2` Interaktionen gesamt, davon `1` Detail-Aufruf und `1` Website-Klick.
+- Eigenes Tracking wurde nach dem Beweistest wieder ausgeschlossen.
+
 ---
 
 ## P0 — Monetarisierungs- und Reporting-Readiness
@@ -75,6 +83,20 @@ Akzeptanzkriterien:
 - Veranstalter-Sicht, Kurator-Sicht und öffentliche Veröffentlichung sind einmal durchgehend belegt.
 
 ### 2. Item- und Anbieter-Zuordnung für Nutzwertdaten prüfen und härten
+
+Status 2026-05-27:
+
+- Erster Live-Beweis abgeschlossen.
+- Technische Kette ist für ein explizites Activity-Reporting-Ziel belegt:
+  - `data/offers.json`
+  - `js/offers-main.js`
+  - Frontend-Tracking-Payload
+  - `api/value-track.php`
+  - `value_metric_daily`
+  - internes SEO-/Mehrwert-Dashboard
+- Aktuell explizit zugeordnet: `Biotopwildpark Anholter Schweiz`.
+- Alle anderen nicht explizit zugeordneten Nutzwerte bleiben bewusst unter `nicht zugeordnet`.
+- Der nächste Schritt ist nicht erneutes Tracking-Grundgerüst, sondern gezielte Erweiterung weiterer sauber belegbarer Reporting-Ziele und danach der erste Feedbackbericht.
 
 Ziel:
 
@@ -124,6 +146,14 @@ Akzeptanzkriterien:
 - Export/Screenshot funktioniert mobil und desktop.
 
 ### 4. Kritische Deploy-Smoke-Tests automatisieren
+
+Status 2026-05-27:
+
+- Umgesetzt und für Staging sowie Live/Main praktisch bewiesen.
+- Workflow-Schritt `Smoke-check deployed site` läuft nach dem STRATO-SFTP-Upload.
+- Staging-Proof: Commit `9f5b8a6` (`Add deploy smoke checks`).
+- Live-/Main-Proof: Build `2b7f6daecf4c`.
+- Der Proof ist in `TEST_STATUS.md` dokumentiert.
 
 Ziel:
 

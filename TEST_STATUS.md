@@ -34,6 +34,195 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 | Zweck: dokumentiert automatisierte Deploy-Smoke-Checks nach STRATO-Upload für Staging und Live; Umfang: Workflow-Schritt, geprüfte Endpunkte, Proof-Commits und offene Grenzen === -->
+
+# Teststand: Automatisierte Deploy-Smoke-Checks nach STRATO-Upload
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Staging und Live
+- Funktion: Deploy-Smoke-Checks / GitHub Actions / STRATO-Deploy-Absicherung
+- relevante Stände:
+  - Staging: Commit `9f5b8a6` (`Add deploy smoke checks`)
+  - Live/Main: Build `2b7f6daecf4c`
+- Ergebnis: bestanden
+
+## Ziel der geprüften Funktion
+
+Nach einem STRATO-Deploy sollen zentrale öffentliche und geschützte Kernpfade automatisch geprüft werden, damit offensichtliche Laufzeit-, Upload-, Konfigurations- oder Zugriffsschutzfehler direkt im GitHub-Actions-Lauf sichtbar werden.
+
+Der Smoke-Check ist bewusst kein vollständiger End-to-End-Test mit echter Zahlung, sondern ein technischer Fail-Fast-Rauchmelder nach dem Upload.
+
+---
+
+## Umgesetzte technische Basis
+
+Bestanden:
+
+- Neues Skript vorhanden:
+  - `tools/smoke-check-deploy.py`
+- Deploy-Workflow enthält nach dem STRATO-SFTP-Upload den Schritt:
+  - `Smoke-check deployed site`
+- Der Workflow prüft abhängig von der Umgebung automatisch:
+  - Staging: `https://staging.bocholt-erleben.de`
+  - Live/Main: `https://bocholt-erleben.de`
+- Der Workflow prüft zusätzlich die deployte Build-Datei gegen den aktuellen Build:
+  - `/meta/build.txt`
+
+---
+
+## Belegte Staging-Prüfung
+
+Bestanden mit Commit `9f5b8a6`:
+
+- Build-Datei entspricht dem deployten Commit.
+- Startseite lädt mit HTTP `200` und HTML.
+- `/angebote/` lädt mit HTTP `200` und HTML.
+- `/events-veroeffentlichen/einreichen/` lädt mit HTTP `200` und HTML.
+- `/api/status.php` liefert:
+  - `status: ok`
+  - `config: ok`
+  - `database: ok`
+- `/api/events/public.php` liefert gültiges JSON mit kontrollierter Struktur.
+- `/api/stripe/create-checkout-session.php` liefert bei leerem JSON-Body kontrolliert HTTP `422` statt HTTP `500`.
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+
+---
+
+## Belegte Live-/Main-Prüfung
+
+Bestanden mit Build `2b7f6daecf4c`:
+
+- Build-Datei entspricht dem deployten Live-Build.
+- Startseite lädt mit HTTP `200` und HTML.
+- `/angebote/` lädt mit HTTP `200` und HTML.
+- `/events-veroeffentlichen/einreichen/` lädt mit HTTP `200` und HTML.
+- `/api/status.php` liefert:
+  - `status: ok`
+  - `config: ok`
+  - `database: ok`
+- `/api/events/public.php` liefert gültiges JSON mit kontrollierter Struktur.
+- `/api/stripe/create-checkout-session.php` liefert bei leerem JSON-Body kontrolliert HTTP `422` statt HTTP `500`.
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+
+---
+
+## Bewertung
+
+Der Roadmap-Punkt `Kritische Deploy-Smoke-Tests automatisieren` ist für Staging und Live/Main umgesetzt und praktisch bewiesen.
+
+Damit ist nach Deploys automatisch sichtbar, ob zentrale Seiten, Status-/DB-Prüfung, Public-Events-API, Checkout-Validierung und Review-Zugriffsschutz grundsätzlich funktionieren.
+
+`Public-Events-API: 0 DB-Events` ist in diesem Test kein Fehler. Der Smoke-Check bewertet hier Erreichbarkeit, JSON-Gültigkeit und Struktur, nicht die fachliche Datenmenge in der Datenbank.
+
+---
+
+## Grenzen des Smoke-Checks
+
+Nicht durch diesen Smoke-Check bewiesen:
+
+- echte Live-Zahlung
+- erfolgreicher Live-Stripe-Webhook nach Zahlung
+- Live-Erfolgsseite nach echter Zahlung
+- Anbieterbereich/Dashboard-Status nach echter Zahlung
+- finale Veröffentlichung nach echter Zahlung
+- fachliche Vollständigkeit der Event- oder Activity-Daten
+- tatsächlicher Push-Versand
+
+Diese Punkte bleiben separate Tests in P0.
+
+## Nächste technische Prüfschritte
+
+Weiterhin offen in diesem Chat:
+
+- Review-/Push-Flows gegen stille Ausfälle prüfen.
+- echten Live-Zahlungsfall bewusst vollständig testen.
+
+<!-- === END BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 | Zweck: dokumentiert Live-Beweis der Nutzwertmessung mit expliziter Reporting-Ziel-Zuordnung; Umfang: Activity-Tracking, value-track Payload, Dashboard-Zuordnung, Eigenes-Tracking-Status === -->
+
+# Teststand: Live-Nutzwert-Tracking und Reporting-Ziel-Zuordnung
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Live
+- Funktion: SEO-/Mehrwert-Dashboard, Nutzwert-Tracking, Activity-Reporting-Ziele
+- geprüfte Inhalte: `Anholter Schweiz erleben` / `Biotopwildpark Anholter Schweiz`
+- relevante Deploy-/Commit-Stände aus dem Testverlauf:
+  - `96fd109` = Reporting-Ziel-Felder und Dashboard-Zuordnung eingeführt
+  - `e8e2487` = `reporting_target` bleibt beim Normalisieren der Activities erhalten
+- Ergebnis: technisch live bewiesen
+
+## Ziel der geprüften Funktion
+
+Nutzwertsignale sollen nicht nur allgemein gezählt werden, sondern für explizit konfigurierte Ziele einem Anbieter oder einer Location zuordenbar sein.
+
+Für die Akquise ist entscheidend, dass künftig nicht nur Gesamtzahlen wie Website- oder Maps-Klicks sichtbar sind, sondern konkrete Ziele separat ausgewertet werden können.
+
+---
+
+## Belegte Live-Kette
+
+Bestanden:
+
+- Live-Seite `/angebote/` lädt nach Deploy.
+- Activity `Anholter Schweiz erleben` öffnet die Detailansicht.
+- `value-track.php` wird für `activity_detail_view` aufgerufen.
+- `value-track.php` wird für `website_click` aufgerufen.
+- Network-Payload enthält bei beiden Requests:
+  - `reporting_target_type: "location"`
+  - `reporting_target_id: "anholter-schweiz"`
+  - `reporting_target_title: "Biotopwildpark Anholter Schweiz"`
+- Das interne SEO-/Mehrwert-Dashboard zeigt den Bereich `Zuordnung / Reporting-Ziele`.
+- Das Dashboard trennt explizite Ziele von `nicht zugeordnet`.
+- Das Dashboard zeigt `Biotopwildpark Anholter Schweiz` als eigenes Reporting-Ziel.
+- Belegter Live-Wert nach Test:
+  - `2` Interaktionen gesamt
+  - `1` Detail-Aufruf
+  - `1` Website-Klick
+  - `0` Maps-Klicks
+- Eigenes Tracking wurde nach dem Test wieder ausgeschlossen.
+
+---
+
+## Bewertung
+
+Der Roadmap-Punkt `Item- und Anbieter-Zuordnung für Nutzwertdaten prüfen und härten` ist für das erste konkrete Activity-Ziel technisch bewiesen.
+
+Die Messung gilt allgemein weiter für Nutzwertsignale wie Detail-Aufrufe, Website-Klicks und Maps-/Routen-Klicks.
+
+Explizite Anbieter-/Location-Auswertung erscheint aber nur für Inhalte, bei denen bewusst ein Reporting-Ziel gepflegt ist. Aktuell ist als erstes Ziel belegt:
+
+- `Biotopwildpark Anholter Schweiz`
+
+Alle nicht explizit zugeordneten Nutzwerte bleiben korrekt unter:
+
+- `nicht zugeordnet`
+
+Das ist Absicht. Unklare Anbieter-/Location-Zuordnungen werden nicht geraten.
+
+---
+
+## Offene Folgepunkte
+
+Noch offen:
+
+- Weitere Activities nur dann mit `reporting_target` ergänzen, wenn die Zuordnung fachlich sauber und belegbar ist.
+- Historische Nutzwertdaten vor Einführung der Reporting-Ziele bleiben nicht rückwirkend zugeordnet.
+- Der erste mail- oder screenshotfähige Feedbackbericht für eine Location ist noch nicht gebaut.
+- Der echte Live-Zahlungsfall bleibt weiterhin ein separater P0-Test.
+
+Nächster sinnvoller Schritt:
+
+- ersten Feedbackbericht für `Biotopwildpark Anholter Schweiz` vorbereiten oder weitere sauber belegbare Reporting-Ziele auswählen.
+
+<!-- === END BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 === -->
+
 # Teststand: Veranstalter-Funnel + Kuratier-PWA-Review-Bridge
 
 ## Stand

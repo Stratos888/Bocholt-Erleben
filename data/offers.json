@@ -9,6 +9,11 @@
       "title": "Aasee erleben",
       "kategorie": "Freizeit & Familie",
       "location": "Aasee Bocholt",
+      "reporting_target": {
+        "type": "location",
+        "id": "aasee-bocholt",
+        "title": "Aasee Bocholt"
+      },
       "maps_query": "Uhlandstraße 39, 46395 Bocholt",
       "maps_label": "Zum Startpunkt navigieren",
       "description": "Der Aasee ist ein Naherholungsgebiet mit Badebucht, Uferwegen, Gastronomie und viel Platz für Freizeit am Wasser.",
@@ -191,6 +196,11 @@
       "title": "Textilwerk Bocholt",
       "kategorie": "Kultur",
       "location": "Bocholt",
+      "reporting_target": {
+        "type": "location",
+        "id": "textilwerk-bocholt",
+        "title": "LWL-Museum Textilwerk Bocholt"
+      },
       "maps_query": "Uhlandstraße 50, 46397 Bocholt",
       "maps_label": "Zum Parkplatz navigieren",
       "description": "Das Textilwerk Bocholt umfasst die Weberei und die historische Spinnerei Herding an zwei Standorten in Bocholt.",
@@ -242,6 +252,11 @@
       "title": "Handwerksmuseum Bocholt",
       "kategorie": "Kultur",
       "location": "Bocholt",
+      "reporting_target": {
+        "type": "location",
+        "id": "handwerksmuseum-bocholt",
+        "title": "Bocholter Handwerksmuseum"
+      },
       "maps_query": "Köcherstraße 4, 46395 Bocholt",
       "maps_label": "Zum Eingang navigieren",
       "description": "Das Handwerksmuseum in Bocholt zeigt historische Berufe und Werkstätten.",
@@ -448,6 +463,11 @@
       "title": "Unterduikmuseum Aalten",
       "kategorie": "Kultur",
       "location": "Aalten",
+      "reporting_target": {
+        "type": "location",
+        "id": "unterduikmuseum-aalten",
+        "title": "Nationaal Onderduikmuseum Aalten"
+      },
       "maps_query": "Markt 12-16, 7121 CS Aalten, Niederlande",
       "maps_label": "Zum Eingang navigieren",
       "description": "Das Unterduikmuseum Aalten erzählt die Geschichte von Untertauchen, Freiheit und Widerstand an der deutsch-niederländischen Grenze.",
@@ -498,6 +518,11 @@
       "title": "Schloss Ringenberg",
       "kategorie": "Kultur",
       "location": "Hamminkeln-Ringenberg",
+      "reporting_target": {
+        "type": "location",
+        "id": "schloss-ringenberg",
+        "title": "Schloss Ringenberg"
+      },
       "maps_query": "Schlossstraße 8, 46499 Hamminkeln",
       "maps_label": "Zum Eingang navigieren",
       "description": "Schloss Ringenberg ist ein Wasserschloss und Kulturort in Hamminkeln-Ringenberg.",
@@ -547,6 +572,11 @@
       "title": "Wasserburg Anholt",
       "kategorie": "Kultur",
       "location": "Isselburg-Anholt",
+      "reporting_target": {
+        "type": "location",
+        "id": "wasserburg-anholt",
+        "title": "Wasserburg Anholt"
+      },
       "maps_query": "Schloss 1, 46419 Isselburg-Anholt",
       "maps_label": "Zum Parkplatz navigieren",
       "description": "Die Wasserburg Anholt ist eine Schlossanlage mit Schlosspark in Isselburg-Anholt.",
@@ -666,6 +696,11 @@
       "title": "Villa Mondriaan Winterswijk",
       "kategorie": "Kultur",
       "location": "Winterswijk",
+      "reporting_target": {
+        "type": "location",
+        "id": "villa-mondriaan-winterswijk",
+        "title": "Villa Mondriaan Winterswijk"
+      },
       "maps_query": "Zonnebrink 4, 7101 NC Winterswijk, Niederlande",
       "maps_label": "Zum Eingang navigieren",
       "description": "Die Villa Mondriaan ist ein Museum zu den frühen Jahren Piet Mondriaans mit wechselnden Ausstellungen in Winterswijk.",
@@ -716,6 +751,11 @@
       "title": "MuseumFabriek Winterswijk",
       "kategorie": "Kultur",
       "location": "Winterswijk",
+      "reporting_target": {
+        "type": "location",
+        "id": "museumfabriek-winterswijk",
+        "title": "MuseumFabriek Winterswijk"
+      },
       "maps_query": "Laan van Hilbelink 6-10, 7101 WG Winterswijk, Niederlande",
       "maps_label": "Zum Eingang navigieren",
       "description": "Die MuseumFabriek Winterswijk verbindet Ortsgeschichte und Industriegeschichte in einer alten Textilfabrik.",
