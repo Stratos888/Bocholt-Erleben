@@ -289,6 +289,109 @@ Offen:
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_REPORTING_TARGET_EXPANSION_2026_05_27 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27 | Zweck: dokumentiert vollständigen Live-E2E-Test für Einzeltermin-Zahlung; Umfang: Einreichung, Review, Zahlungsfreigabe, Stripe-Zahlung, Veröffentlichung, Rücknahme/Cleanup === -->
+
+# Teststand: Live-Einzeltermin-Zahlung und Veröffentlichung
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Live
+- Funktion: Einzeltermin-Funnel / Review-first-Zahlung / Stripe-Live-Zahlung / Veröffentlichung / Cleanup
+- getesteter Titel: `Bocholt erleben – Info-Nachmittag für Veranstalter`
+- getestetes Datum: `14.11.2026`
+- getesteter Betrag: `9,90 €`
+- Referenz aus Mail: `f006f9f1-672b-4a15-a4a3-783501649a69`
+- Ergebnis: bestanden
+
+## Ziel des Tests
+
+Geprüft wurde, ob ein echter Einzeltermin live vollständig durch den bezahlten Funnel laufen kann:
+
+Einreichung → redaktionelle Vorprüfung → Zahlungsfreigabe → Zahlungslink-Mail → Stripe-Zahlung → Erfolgsseite → veröffentlichungsbereit → Veröffentlichung → öffentliche Sichtbarkeit.
+
+Zusätzlich wurde geprüft, ob ein bereits veröffentlichter Zukunftstermin ohne direkte DB-Korrektur wieder aus der öffentlichen Sichtbarkeit genommen und sauber abgeschlossen werden kann.
+
+---
+
+## Bestandene Prüfung
+
+Bestanden:
+
+- Live-Einreichung über den Einzeltermin-Funnel funktioniert.
+- Erfolgsseite nach Einreichung zeigt korrekt:
+  - Veranstaltung wurde zur Prüfung eingereicht.
+  - Zahlung folgt erst nach Prüfung per Zahlungslink.
+- Bestätigungsmail nach Einreichung kommt an.
+- Einreichung erscheint in der Review-Inbox mit Status sinngemäß `Neu eingereicht / Vorprüfung offen`.
+- Button `Zur Zahlung freigeben` funktioniert.
+- Inbox meldet:
+  - Zahlungslink wurde versendet.
+  - Veröffentlichung ist erst nach bestätigter Zahlung möglich.
+- Zahlungslink-Mail kommt an.
+- Stripe-Checkout öffnet live mit:
+  - Produkt/Leistung: Einzeltermin veröffentlichen
+  - Betrag: `9,90 €`
+- Stripe-Zahlung wurde erfolgreich abgeschlossen.
+- Erfolgsseite nach Zahlung zeigt korrekt:
+  - Zahlung wurde abgeschlossen.
+  - Veröffentlichung erfolgt erst nach finaler redaktioneller Freigabe.
+- Inbox zeigt danach Status sinngemäß:
+  - `Bezahlt / veröffentlichungsbereit`
+- Button `Veröffentlichen` funktioniert.
+- Inbox meldet erfolgreiche Veröffentlichung.
+- Veröffentlichungsmail kommt an.
+- Event ist danach im öffentlichen Eventbereich sichtbar.
+
+---
+
+## Bestandener Cleanup-/Rücknahme-Test
+
+Bestanden:
+
+- Der veröffentlichte Testtermin wurde über den Veranstalterbereich nachträglich geändert.
+- Die Änderung führte zur erneuten redaktionellen Prüfung.
+- Der Termin verschwand danach aus der öffentlichen Eventsuche.
+- In der Review-Inbox erschien der Eintrag wieder mit Review-Risiko:
+  - vom Veranstalter nachträglich geändert
+- Ablehnung aus der Review-Inbox funktioniert.
+- Ablehnungsgrund `SONSTIGES` wurde gesetzt.
+- Ablehnungsmail kommt an.
+- Der Testtermin ist damit nicht mehr öffentlich sichtbar und abgeschlossen.
+
+---
+
+## Bewertung
+
+Der P0-Live-Zahlungsfall für Einzeltermine ist praktisch bewiesen.
+
+Belegt ist insbesondere:
+
+- Review-first statt Sofortzahlung funktioniert live.
+- Zahlungsfreigabe per Review funktioniert live.
+- Zahlungslink-Mail funktioniert live.
+- Stripe-Live-Zahlung funktioniert mit korrektem Betrag.
+- Erfolgsseite nach Zahlung funktioniert.
+- Veröffentlichungsbereitschaft nach Zahlung wird korrekt erreicht.
+- Finale Veröffentlichung funktioniert.
+- Öffentliche Sichtbarkeit nach Veröffentlichung funktioniert.
+- Rücknahme aus öffentlicher Sichtbarkeit durch Veranstalteränderung funktioniert ohne manuelle DB-Korrektur.
+- Abschluss/Ablehnung nach Rücknahme funktioniert.
+
+Damit ist der bezahlte Einzeltermin-Kernfluss für spätere Akquise belastbar.
+
+---
+
+## Offene Folgepunkte
+
+Noch separat zu prüfen:
+
+- Mitgliedschafts-/Abo-Live-Test, falls aktive Vermarktung der Mitgliedschaft breiter gestartet wird.
+- `past_due` und echtes Periodenende bleiben gesonderte Stripe-/Billing-Fälle.
+- Test-/Proofstand in Roadmap berücksichtigen, aber keine weitere Codeänderung aus diesem Test ableiten.
+
+<!-- === END BLOCK: TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27 === -->
+
 # Teststand: Veranstalter-Funnel + Kuratier-PWA-Review-Bridge
 
 ## Stand
