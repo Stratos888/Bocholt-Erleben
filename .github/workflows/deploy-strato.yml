@@ -958,3 +958,20 @@ jobs:
           bye
           LFTP
       # === END BLOCK: STRATO_UPLOAD_V6 ===
+
+      # === BEGIN BLOCK: DEPLOY_HTTP_SMOKE_CHECK_V1 | Zweck: prüft nach STRATO-Upload zentrale Live-/Staging-Endpunkte fail-fast; Umfang: ruft tools/smoke-check-deploy.py gegen die gerade deployte Umgebung auf ===
+      - name: Smoke-check deployed site
+        shell: bash
+        run: |
+          set -e
+
+          if [ "$DEPLOY_ENV_NAME" = "staging" ]; then
+            SMOKE_BASE_URL="https://staging.bocholt-erleben.de"
+          else
+            SMOKE_BASE_URL="https://bocholt-erleben.de"
+          fi
+
+          python tools/smoke-check-deploy.py \
+            --base-url "$SMOKE_BASE_URL" \
+            --expected-build "$BUILD_ID"
+      # === END BLOCK: DEPLOY_HTTP_SMOKE_CHECK_V1 ===
