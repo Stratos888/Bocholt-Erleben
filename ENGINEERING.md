@@ -287,9 +287,12 @@ For all future repo patches, use this order:
 
 2. Create patches only against the proven repo baseline.
 
-3. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
+3. Default patch delivery is a copyable terminal block in chat. Use a temporary `patch.diff` in the repo for normal Git patches, or a guarded script patch when targeted replacements are safer.
+   Do not provide separate sandbox/download patch files unless the user explicitly requests a downloadable file.
 
-4. For Git patches, always run:
+4. If the user applies the patch in Codespaces, the repo baseline is more important than an uploaded ZIP.
+
+5. For Git patches, always run:
    - git apply --check patch.diff
    - git apply patch.diff
    - rm patch.diff
@@ -298,27 +301,27 @@ For all future repo patches, use this order:
 
    Do not use plain `git diff -- <affected-file>` in Codespaces workflows, because it can open the terminal pager and look like a frozen command. If the pager opens anyway, exit it with `q`.
 
-5. If git apply --check fails:
+6. If git apply --check fails:
    - stop immediately
    - verify the working tree
    - inspect the current owner block
    - do not retry with a similar large patch
 
-6. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
+7. For CSS/UI polish with many small declarations, prefer a robust script patch over a large Git diff.
 
-7. A robust script patch must:
+8. A robust script patch must:
    - target only the relevant owner file or owner block
    - verify every selector/block uniquely before writing
    - abort without writing if anything is missing or ambiguous
    - end with git diff --check and git --no-pager diff -- <affected-file>
 
-8. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
+9. If block markers are inconsistent, patch against the real current marker state. Marker cleanup must be explicit and must not change runtime behavior.
 
-9. After every failed patch attempt, run:
+10. After every failed patch attempt, run:
    - git status --short
    - git --no-pager diff -- <affected-file>
 
-10. No blind retries.
+11. No blind retries.
 
 Correct sequence after a failed patch:
 
