@@ -209,6 +209,36 @@ const OffersApp = {
     const location = String(obj.location || obj.place_name || obj.ort || "").trim();
     const description = String(obj.description || "").trim();
     const url = String(obj.url || obj.link || "").trim();
+    /* === BEGIN BLOCK: ACTIVITIES_NORMALIZE_REPORTING_TARGET_V1 | Zweck: bewahrt explizite Location-/Anbieter-Zuordnung aus data/offers.json für das Nutzwert-Tracking; Umfang: ergänzt nur Reporting-Ziel-Normalisierung in normalizeOffer() === */
+    const rawReportingTarget =
+      obj.reporting_target && typeof obj.reporting_target === "object"
+        ? obj.reporting_target
+        : obj.reportingTarget && typeof obj.reportingTarget === "object"
+          ? obj.reportingTarget
+          : {};
+
+    const reportingTarget = {
+      type: String(
+        rawReportingTarget.type ||
+        rawReportingTarget.reporting_target_type ||
+        rawReportingTarget.reportingTargetType ||
+        ""
+      ).trim(),
+      id: String(
+        rawReportingTarget.id ||
+        rawReportingTarget.reporting_target_id ||
+        rawReportingTarget.reportingTargetId ||
+        ""
+      ).trim(),
+      title: String(
+        rawReportingTarget.title ||
+        rawReportingTarget.name ||
+        rawReportingTarget.reporting_target_title ||
+        rawReportingTarget.reportingTargetTitle ||
+        ""
+      ).trim()
+    };
+    /* === END BLOCK: ACTIVITIES_NORMALIZE_REPORTING_TARGET_V1 === */
 
     if (!id || !title || !kategorie || !location || !description || !url) {
       return null;
@@ -251,6 +281,9 @@ const OffersApp = {
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
       season: String(obj.season || "").trim(),
+      ...(reportingTarget.type && reportingTarget.id && reportingTarget.title
+        ? { reporting_target: reportingTarget }
+        : {}),
       sortIndex: Number.isFinite(Number(index)) ? Number(index) : 0
     };
 
