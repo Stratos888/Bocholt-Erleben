@@ -255,10 +255,11 @@ Status 2026-05-27:
 
 - Technischer Zugriffsschutzteil ist in den Deploy-Smoke-Check integriert und für Staging sowie Live/Main bewiesen.
 - Review-Liste und Push-Endpunkte werden nach Deploys automatisch gegen versehentliche öffentliche Öffnung geprüft.
-- Staging-Proof: Commit `b858d2d` (`Harden push endpoint smoke checks`).
-- Live-/Main-Proof: Build `fb6efe5443b`.
-- Der tatsächliche Push-Versand ist damit noch nicht fachlich bewiesen.
-- Der eigentliche Flow-Proof bleibt: Einreichung speichern → Review-Inbox sichtbar → Push optional, aber nicht blockierend.
+- Einzeltermin-Flow ist durch den Live-E2E-Test `TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27` inklusive Review-Inbox-Sichtbarkeit bewiesen.
+- Activity-Presence-Flow ist durch die Live-Readiness-Prüfung `TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26` inklusive Live-Inbox-Sichtbarkeit bewiesen.
+- Event-Submissions aus aktiver Mitgliedschaft sind durch die dokumentierten Membership-Reuse-Tests inklusive `review-list.php`- und `/inbox/`-Sichtbarkeit bewiesen.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall, sondern starten den Abo-/Zahlungsflow.
+- Tatsächlicher Push-Versand bleibt optional und ist kein P0-Blocker, solange die Review-Inbox zuverlässig ist.
 
 Ziel:
 
@@ -270,9 +271,9 @@ Warum:
 
 Akzeptanzkriterien:
 
-- Single-Event-, Membership- und Activity-Presence-Einreichungen erscheinen zuverlässig in der Inbox.
-- Push ist best-effort, aber zentrale Auslöser sind nachvollziehbar.
-- Wenn Push nicht ausgelöst wird, muss die Review-Inbox trotzdem korrekt sein.
+- Einzeltermin-, Activity-Presence- und Event-Submissions aus aktiver Mitgliedschaft erscheinen zuverlässig in der Review-Inbox.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall, sondern starten den Abo-/Zahlungsflow.
+- Push ist best-effort; wenn Push nicht ausgelöst wird, muss die Review-Inbox trotzdem korrekt sein.
 
 ---
 

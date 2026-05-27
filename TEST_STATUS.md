@@ -34,25 +34,25 @@ Jeder Teststand muss enthalten:
 
 ---
 
-<!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert erweiterten Review-/Push-Zugriffsschutz im Deploy-Smoke-Check; Umfang: Staging-Proof, Live-Proof, geprüfte Push-Endpunkte und offene fachliche Flow-Grenzen === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert Review-/Push-Zugriffsschutz und fachliche Inbox-Flow-Einordnung; Umfang: Staging-Proof, Live-Proof, relevante Review-Fälle, bewusste Abgrenzung neuer Mitgliedschafts-Checkouts und offene Push-Versand-Grenzen === -->
 
-# Teststand: Review-/Push-Zugriffsschutz im Deploy-Smoke-Check
+# Teststand: Review-/Push-Zugriffsschutz und Inbox-Flow-Einordnung
 
 ## Stand
 
 - Datum: 2026-05-27
 - Umgebung: Staging und Live
-- Funktion: Review-/Push-Zugriffsschutz als Erweiterung des automatisierten Deploy-Smoke-Checks
+- Funktion: Review-/Push-Zugriffsschutz, Inbox-Sichtbarkeit relevanter Review-Fälle, stille-Ausfall-Abgrenzung
 - relevante Stände:
   - Staging: Commit `b858d2d` (`Harden push endpoint smoke checks`)
   - Live/Main: Build `fb6efe5443b`
-- Ergebnis: bestanden
+- Ergebnis: bestanden für Zugriffsschutz und fachliche Inbox-Sichtbarkeit der relevanten Review-Fälle
 
 ## Ziel der geprüften Funktion
 
 Nach einem STRATO-Deploy soll automatisch sichtbar sein, ob Review- und Push-Endpunkte versehentlich öffentlich erreichbar sind.
 
-Der Test prüft Zugriffsschutz und kontrollierte Fehlerantworten. Er ist kein fachlicher Test des tatsächlichen Push-Versands.
+Zusätzlich muss für die relevanten Review-Fälle belegt sein, dass Einreichungen nicht still verschwinden, sondern in der Review-Inbox sichtbar werden. Push ist dabei nur ein interner Hinweis, nicht die führende Datenquelle.
 
 ## Automatisch geprüfte Endpunkte
 
@@ -78,27 +78,39 @@ Bestanden mit Build `fb6efe5443b`:
 - GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
 - Alle Review-/Push-Zugriffsschutzchecks sind bestanden.
 
+## Fachliche Inbox-Flow-Belege
+
+Bestanden / bereits dokumentiert:
+
+- Einzeltermin: Der Block `TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27` belegt Live-Einreichung, Review-Inbox-Sichtbarkeit, Zahlungsfreigabe, echte Stripe-Zahlung, Veröffentlichung und Cleanup.
+- Aktivitätspräsenz: Der Block `TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26` belegt Live-Einreichung, Erfolgsseite, Eingangs-Mail und Live-Inbox-Sichtbarkeit als `Aktivitätspräsenz`.
+- Event-Submission aus aktiver Mitgliedschaft: Die dokumentierten Membership-Reuse-Tests belegen, dass eine Formular-Einreichung mit aktiver Mitgliedschaft keinen neuen Stripe Checkout auslöst, in `submissions` landet, von `review-list.php` geliefert und in `/inbox/` mit Badge `Mitgliedschaft` angezeigt wird.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall. Sie starten den Abo-/Zahlungsflow; der spätere Review-Fall entsteht erst bei einer Event-Submission aus aktiver Mitgliedschaft.
+
 ## Bewertung
 
-Der technische Zugriffsschutzteil des Roadmap-Punkts `Review-/Push-Flows gegen stille Ausfälle prüfen` ist abgesichert.
+Der Roadmap-Punkt `Review-/Push-Flows gegen stille Ausfälle prüfen` ist für P0 erfüllt.
 
-Damit ist nach Deploys automatisch sichtbar, ob Review-Liste und Push-Endpunkte versehentlich öffentlich offen sind.
+Belegt ist: Die relevanten Review-Fälle erscheinen in der Review-Inbox. Die Review-Inbox ist die führende Arbeitsquelle; Push ist nur ein zusätzlicher interner Hinweis. Ein nicht empfangener Push ist deshalb kein stiller Verlust, solange die Review-Inbox korrekt ist.
 
 ## Grenzen des Tests
 
-Nicht durch diesen Smoke-Check bewiesen:
+Nicht durch diesen Stand bewiesen:
 
-- tatsächlicher Push-Versand
-- erfolgreiche Anzeige einer neuen Einreichung in der Review-Inbox
-- fachlicher Nachweis, dass jede Einreichungsart gespeichert und sichtbar wird
-- Nachweis, dass ein Push-Fehler den Submission-Erfolg nicht blockiert
+- tatsächlicher Push-Versand in Live
+- erzwungener technischer Push-Fehler während einer neuen Submission
+- echte Live-Zahlung für Aktivitätspräsenz nach Zahlungslink
+
+Diese Punkte sind keine Blocker für den stille-Ausfall-Proof. Der tatsächliche Push-Versand bleibt optional, solange die Review-Inbox zuverlässig ist.
 
 ## Nächste Prüfschritte
 
-Weiterhin offen:
+Für Roadmap-Punkt 5 ist kein weiterer P0-Test nötig.
 
-- Review-/Push-Flow manuell prüfen: Einreichung speichern → Review-Inbox sichtbar → Push optional, aber nicht blockierend.
-- Membership- und Activity-Presence-Einreichungen als eigene Inbox-Flow-Proofs prüfen.
+Später optional:
+
+- tatsächlichen Live-Push-Versand prüfen, falls Live-Push aktiv genutzt werden soll
+- echte Live-Zahlung für Aktivitätspräsenz separat testen, wenn der Activity-Abo-Zahlungsbeweis priorisiert wird
 
 <!-- === END BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 === -->
 
