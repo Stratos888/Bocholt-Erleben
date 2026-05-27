@@ -147,6 +147,14 @@ Akzeptanzkriterien:
 
 ### 4. Kritische Deploy-Smoke-Tests automatisieren
 
+Status 2026-05-27:
+
+- Umgesetzt und für Staging sowie Live/Main praktisch bewiesen.
+- Workflow-Schritt `Smoke-check deployed site` läuft nach dem STRATO-SFTP-Upload.
+- Staging-Proof: Commit `9f5b8a6` (`Add deploy smoke checks`).
+- Live-/Main-Proof: Build `2b7f6daecf4c`.
+- Der Proof ist in `TEST_STATUS.md` dokumentiert.
+
 Ziel:
 
 - Nach Deploys werden Kernpfade automatisch geprüft.

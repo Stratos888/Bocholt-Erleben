@@ -34,6 +34,115 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 | Zweck: dokumentiert automatisierte Deploy-Smoke-Checks nach STRATO-Upload für Staging und Live; Umfang: Workflow-Schritt, geprüfte Endpunkte, Proof-Commits und offene Grenzen === -->
+
+# Teststand: Automatisierte Deploy-Smoke-Checks nach STRATO-Upload
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Staging und Live
+- Funktion: Deploy-Smoke-Checks / GitHub Actions / STRATO-Deploy-Absicherung
+- relevante Stände:
+  - Staging: Commit `9f5b8a6` (`Add deploy smoke checks`)
+  - Live/Main: Build `2b7f6daecf4c`
+- Ergebnis: bestanden
+
+## Ziel der geprüften Funktion
+
+Nach einem STRATO-Deploy sollen zentrale öffentliche und geschützte Kernpfade automatisch geprüft werden, damit offensichtliche Laufzeit-, Upload-, Konfigurations- oder Zugriffsschutzfehler direkt im GitHub-Actions-Lauf sichtbar werden.
+
+Der Smoke-Check ist bewusst kein vollständiger End-to-End-Test mit echter Zahlung, sondern ein technischer Fail-Fast-Rauchmelder nach dem Upload.
+
+---
+
+## Umgesetzte technische Basis
+
+Bestanden:
+
+- Neues Skript vorhanden:
+  - `tools/smoke-check-deploy.py`
+- Deploy-Workflow enthält nach dem STRATO-SFTP-Upload den Schritt:
+  - `Smoke-check deployed site`
+- Der Workflow prüft abhängig von der Umgebung automatisch:
+  - Staging: `https://staging.bocholt-erleben.de`
+  - Live/Main: `https://bocholt-erleben.de`
+- Der Workflow prüft zusätzlich die deployte Build-Datei gegen den aktuellen Build:
+  - `/meta/build.txt`
+
+---
+
+## Belegte Staging-Prüfung
+
+Bestanden mit Commit `9f5b8a6`:
+
+- Build-Datei entspricht dem deployten Commit.
+- Startseite lädt mit HTTP `200` und HTML.
+- `/angebote/` lädt mit HTTP `200` und HTML.
+- `/events-veroeffentlichen/einreichen/` lädt mit HTTP `200` und HTML.
+- `/api/status.php` liefert:
+  - `status: ok`
+  - `config: ok`
+  - `database: ok`
+- `/api/events/public.php` liefert gültiges JSON mit kontrollierter Struktur.
+- `/api/stripe/create-checkout-session.php` liefert bei leerem JSON-Body kontrolliert HTTP `422` statt HTTP `500`.
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+
+---
+
+## Belegte Live-/Main-Prüfung
+
+Bestanden mit Build `2b7f6daecf4c`:
+
+- Build-Datei entspricht dem deployten Live-Build.
+- Startseite lädt mit HTTP `200` und HTML.
+- `/angebote/` lädt mit HTTP `200` und HTML.
+- `/events-veroeffentlichen/einreichen/` lädt mit HTTP `200` und HTML.
+- `/api/status.php` liefert:
+  - `status: ok`
+  - `config: ok`
+  - `database: ok`
+- `/api/events/public.php` liefert gültiges JSON mit kontrollierter Struktur.
+- `/api/stripe/create-checkout-session.php` liefert bei leerem JSON-Body kontrolliert HTTP `422` statt HTTP `500`.
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+
+---
+
+## Bewertung
+
+Der Roadmap-Punkt `Kritische Deploy-Smoke-Tests automatisieren` ist für Staging und Live/Main umgesetzt und praktisch bewiesen.
+
+Damit ist nach Deploys automatisch sichtbar, ob zentrale Seiten, Status-/DB-Prüfung, Public-Events-API, Checkout-Validierung und Review-Zugriffsschutz grundsätzlich funktionieren.
+
+`Public-Events-API: 0 DB-Events` ist in diesem Test kein Fehler. Der Smoke-Check bewertet hier Erreichbarkeit, JSON-Gültigkeit und Struktur, nicht die fachliche Datenmenge in der Datenbank.
+
+---
+
+## Grenzen des Smoke-Checks
+
+Nicht durch diesen Smoke-Check bewiesen:
+
+- echte Live-Zahlung
+- erfolgreicher Live-Stripe-Webhook nach Zahlung
+- Live-Erfolgsseite nach echter Zahlung
+- Anbieterbereich/Dashboard-Status nach echter Zahlung
+- finale Veröffentlichung nach echter Zahlung
+- fachliche Vollständigkeit der Event- oder Activity-Daten
+- tatsächlicher Push-Versand
+
+Diese Punkte bleiben separate Tests in P0.
+
+## Nächste technische Prüfschritte
+
+Weiterhin offen in diesem Chat:
+
+- Review-/Push-Flows gegen stille Ausfälle prüfen.
+- echten Live-Zahlungsfall bewusst vollständig testen.
+
+<!-- === END BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 | Zweck: dokumentiert Live-Beweis der Nutzwertmessung mit expliziter Reporting-Ziel-Zuordnung; Umfang: Activity-Tracking, value-track Payload, Dashboard-Zuordnung, Eigenes-Tracking-Status === -->
 
 # Teststand: Live-Nutzwert-Tracking und Reporting-Ziel-Zuordnung
