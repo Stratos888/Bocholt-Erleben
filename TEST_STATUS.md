@@ -34,6 +34,86 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 | Zweck: dokumentiert Live-Beweis der Nutzwertmessung mit expliziter Reporting-Ziel-Zuordnung; Umfang: Activity-Tracking, value-track Payload, Dashboard-Zuordnung, Eigenes-Tracking-Status === -->
+
+# Teststand: Live-Nutzwert-Tracking und Reporting-Ziel-Zuordnung
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Live
+- Funktion: SEO-/Mehrwert-Dashboard, Nutzwert-Tracking, Activity-Reporting-Ziele
+- geprüfte Inhalte: `Anholter Schweiz erleben` / `Biotopwildpark Anholter Schweiz`
+- relevante Deploy-/Commit-Stände aus dem Testverlauf:
+  - `96fd109` = Reporting-Ziel-Felder und Dashboard-Zuordnung eingeführt
+  - `e8e2487` = `reporting_target` bleibt beim Normalisieren der Activities erhalten
+- Ergebnis: technisch live bewiesen
+
+## Ziel der geprüften Funktion
+
+Nutzwertsignale sollen nicht nur allgemein gezählt werden, sondern für explizit konfigurierte Ziele einem Anbieter oder einer Location zuordenbar sein.
+
+Für die Akquise ist entscheidend, dass künftig nicht nur Gesamtzahlen wie Website- oder Maps-Klicks sichtbar sind, sondern konkrete Ziele separat ausgewertet werden können.
+
+---
+
+## Belegte Live-Kette
+
+Bestanden:
+
+- Live-Seite `/angebote/` lädt nach Deploy.
+- Activity `Anholter Schweiz erleben` öffnet die Detailansicht.
+- `value-track.php` wird für `activity_detail_view` aufgerufen.
+- `value-track.php` wird für `website_click` aufgerufen.
+- Network-Payload enthält bei beiden Requests:
+  - `reporting_target_type: "location"`
+  - `reporting_target_id: "anholter-schweiz"`
+  - `reporting_target_title: "Biotopwildpark Anholter Schweiz"`
+- Das interne SEO-/Mehrwert-Dashboard zeigt den Bereich `Zuordnung / Reporting-Ziele`.
+- Das Dashboard trennt explizite Ziele von `nicht zugeordnet`.
+- Das Dashboard zeigt `Biotopwildpark Anholter Schweiz` als eigenes Reporting-Ziel.
+- Belegter Live-Wert nach Test:
+  - `2` Interaktionen gesamt
+  - `1` Detail-Aufruf
+  - `1` Website-Klick
+  - `0` Maps-Klicks
+- Eigenes Tracking wurde nach dem Test wieder ausgeschlossen.
+
+---
+
+## Bewertung
+
+Der Roadmap-Punkt `Item- und Anbieter-Zuordnung für Nutzwertdaten prüfen und härten` ist für das erste konkrete Activity-Ziel technisch bewiesen.
+
+Die Messung gilt allgemein weiter für Nutzwertsignale wie Detail-Aufrufe, Website-Klicks und Maps-/Routen-Klicks.
+
+Explizite Anbieter-/Location-Auswertung erscheint aber nur für Inhalte, bei denen bewusst ein Reporting-Ziel gepflegt ist. Aktuell ist als erstes Ziel belegt:
+
+- `Biotopwildpark Anholter Schweiz`
+
+Alle nicht explizit zugeordneten Nutzwerte bleiben korrekt unter:
+
+- `nicht zugeordnet`
+
+Das ist Absicht. Unklare Anbieter-/Location-Zuordnungen werden nicht geraten.
+
+---
+
+## Offene Folgepunkte
+
+Noch offen:
+
+- Weitere Activities nur dann mit `reporting_target` ergänzen, wenn die Zuordnung fachlich sauber und belegbar ist.
+- Historische Nutzwertdaten vor Einführung der Reporting-Ziele bleiben nicht rückwirkend zugeordnet.
+- Der erste mail- oder screenshotfähige Feedbackbericht für eine Location ist noch nicht gebaut.
+- Der echte Live-Zahlungsfall bleibt weiterhin ein separater P0-Test.
+
+Nächster sinnvoller Schritt:
+
+- ersten Feedbackbericht für `Biotopwildpark Anholter Schweiz` vorbereiten oder weitere sauber belegbare Reporting-Ziele auswählen.
+
+<!-- === END BLOCK: TEST_STATUS_LIVE_VALUE_REPORTING_TARGET_2026_05_27 === -->
+
 # Teststand: Veranstalter-Funnel + Kuratier-PWA-Review-Bridge
 
 ## Stand
