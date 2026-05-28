@@ -1723,3 +1723,40 @@ Bewertung:
 - Die Wirkungskarte bleibt erst dann für Aktivitätsanbieter sinnvoll, wenn Anbieteraccount und Activity-/Location-Reporting-Ziele sauber verknüpft sind.
 - Restbefund: Das Anbieter-Dashboard ist weiterhin strukturell zu unaufgeräumt und sollte als eigener Dashboard-V2-Workpack überarbeitet werden.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_IMPACT_CARD_HIDE_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 | Zweck: dokumentiert den Freeze-Stand des Anbieter-Dashboards nach Struktur-, Owner- und Handlungsorientierungs-Polish; Umfang: User-/Veranstalter-Dashboard auf Staging === -->
+## Anbieter-Dashboard V2 – Übersichtlichkeit und Handlungsorientierung – Staging-Freeze 2026-05-28
+
+Status: bestanden / vorerst gefreezt.
+
+Geprüfter Scope:
+- Anbieter-Dashboard `/fuer-veranstalter/dashboard/`
+- Activity-/Location-Testaccount mit Veranstaltungen und Aktivitätspräsenzen
+- Mobile-Ansicht
+- Desktop-/breite Ansicht
+- Einreichungen, Tarife, Organisation und Rücknavigation
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- Die frühere Trennung aus `Aktueller Stand` und `Einreichungen & Status` wurde zu einer gemeinsamen Karte `Einreichungen` konsolidiert.
+- Statuswerte sind direkt in der Einreichungskarte integriert:
+  - sichtbar
+  - in Prüfung
+  - Zahlung offen
+  - abgelehnt
+- Ein Handlungsbedarf-/Statushinweis ist sichtbar.
+- Die Einreichungsliste nutzt Status-Badges, unter anderem `Veröffentlicht` und `Abgelehnt`.
+- `Tarife & Veröffentlichungen` steht vor `Kontakt & Organisation`.
+- Die Activity-/Location-Wirkungskarte bleibt ausgeblendet, solange Activity-/Location-Reporting-Ziele nicht sauber mit Anbieteraccounts verknüpft sind.
+- Der CSS-Stand wurde als Owner-Cleanup konsolidiert:
+  - kein zusätzlicher später Override-Block für Dashboard-Hierarchie
+  - Tarifdarstellung bleibt im Tarif-Owner
+  - Einreichungsdarstellung bleibt im Einreichungs-Owner
+  - Summary-/Statusdarstellung liegt beim Einreichungsbereich
+
+Bewertung:
+- Der aktuelle Stand ist aus Nutzersicht deutlich klarer und handlungsorientierter als der Ausgangsstand.
+- Mobile bleibt nutzbar und übersichtlicher, ohne essenzielle Informationen zu entfernen.
+- Desktop ist ruhiger und logischer strukturiert.
+- Weitere Optimierungen am Anbieter-Dashboard werden vorerst zurückgestellt und nur bei konkretem neuem Befund wieder geöffnet.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 === -->
