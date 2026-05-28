@@ -120,6 +120,23 @@
     return text;
   }
 
+  function formatInteger(value) {
+    const number = Number.parseInt(value, 10);
+    if (!Number.isFinite(number)) return "0";
+    return new Intl.NumberFormat("de-DE").format(Math.max(0, number));
+  }
+
+  function metricValue(row, key) {
+    return Number.parseInt(row?.[key] ?? 0, 10) || 0;
+  }
+
+  function formatImpactPeriod(period) {
+    const start = formatDate(period?.start_date);
+    const end = formatDate(period?.end_date);
+    if (start === "–" && end === "–") return "Zeitraum: letzte 28 Tage";
+    return `Zeitraum: ${start} – ${end}`;
+  }
+
   function formatDateTime(value) {
     const text = safeText(value);
     if (!text) return "–";
@@ -540,17 +557,83 @@ function normalizeExternalUrl(value) {
   }
   /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
+  function renderOrganizerImpactCard(data, isSingleStatusView) {
+    const card = document.getElementById("organizer-dashboard-impact-card");
+    const periodNode = document.getElementById("organizer-impact-period");
+    const metricsNode = document.getElementById("organizer-impact-metrics");
+    const noteNode = document.getElementById("organizer-impact-note");
+
+    if (!card || !periodNode || !metricsNode || !noteNode) return;
+
+    if (isSingleStatusView) {
+      card.hidden = true;
+      card.setAttribute("hidden", "");
+      return;
+    }
+
+    const impact = data?.impact_summary || {};
+    const metrics = impact?.metrics || {};
+    const previous = impact?.previous_metrics || {};
+    const total = metricValue(metrics, "total_interactions");
+    const directClicks =
+      metricValue(metrics, "website_clicks") +
+      metricValue(metrics, "maps_clicks") +
+      metricValue(metrics, "location_clicks") +
+      metricValue(metrics, "organizer_cta_clicks");
+    const previousTotal = metricValue(previous, "total_interactions");
+    const totalDelta = total - previousTotal;
+    const deltaLabel = totalDelta > 0
+      ? `+${formatInteger(totalDelta)} gegenüber dem vorherigen Zeitraum`
+      : totalDelta < 0
+        ? `-${formatInteger(Math.abs(totalDelta))} gegenüber dem vorherigen Zeitraum`
+        : "kein Unterschied zum vorherigen Zeitraum";
+
+    card.hidden = false;
+    card.removeAttribute("hidden");
+    periodNode.textContent = formatImpactPeriod(impact?.period);
+
+    metricsNode.innerHTML = [
+      ["Interaktionen gesamt", total],
+      ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
+      ["Website-/Ticket-Klicks", metricValue(metrics, "website_clicks")],
+      ["Route/Maps", metricValue(metrics, "maps_clicks")]
+    ].map(([label, value]) => `
+      <span class="organizer-tariff-row" role="listitem">
+        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
+        <span class="organizer-tariff-price">${escapeHtml(formatInteger(value))}</span>
+      </span>
+    `).join("");
+
+    if (impact?.status === "not_configured" || impact?.status === "not_available") {
+      noteNode.textContent = impact?.message || "Die Nutzwert-Auswertung ist für diesen Bereich noch nicht verfügbar.";
+      return;
+    }
+
+    if (total > 0) {
+      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet oder weiterführende Links genutzt. Direkt erklärbare Klicks: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
+    } else {
+      noteNode.textContent = "Noch keine Nutzsignale im aktuellen Zeitraum. Die Messung läuft; Werte erscheinen, sobald veröffentlichte Inhalte angesehen oder weiterführende Links genutzt werden.";
+    }
+  }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 === */
+
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
     const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
+    const impactCard = document.getElementById("organizer-dashboard-impact-card");
 
     if (authRequiredCard) {
       authRequiredCard.hidden = true;
       authRequiredCard.setAttribute("hidden", "");
     }
     if (summaryGrid) summaryGrid.hidden = false;
+    if (impactCard) {
+      impactCard.hidden = true;
+      impactCard.setAttribute("hidden", "");
+    }
     if (submissionsCard) submissionsCard.hidden = false;
 
     const organizer = data?.organizer || {};
@@ -819,6 +902,8 @@ function normalizeExternalUrl(value) {
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
+
+    renderOrganizerImpactCard(data, isSingleStatusView);
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
@@ -1248,6 +1333,7 @@ if (submissionsList && submissionsEmpty) {
       const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
       const summaryGrid = document.getElementById("organizer-dashboard-summary");
       const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
+      const impactCard = document.getElementById("organizer-dashboard-impact-card");
 
       if (logoutButton) {
         logoutButton.hidden = true;
@@ -1255,6 +1341,7 @@ if (submissionsList && submissionsEmpty) {
       }
 
       if (summaryGrid) summaryGrid.hidden = true;
+      if (impactCard) impactCard.hidden = true;
       if (submissionsCard) submissionsCard.hidden = true;
 
       if (authRequiredCard) {
