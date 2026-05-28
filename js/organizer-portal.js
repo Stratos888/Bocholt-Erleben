@@ -558,7 +558,7 @@ function normalizeExternalUrl(value) {
   /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
-  function renderOrganizerImpactCard(data, isSingleStatusView) {
+  function renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView = false) {
     const card = document.getElementById("organizer-dashboard-impact-card");
     const periodNode = document.getElementById("organizer-impact-period");
     const metricsNode = document.getElementById("organizer-impact-metrics");
@@ -566,7 +566,7 @@ function normalizeExternalUrl(value) {
 
     if (!card || !periodNode || !metricsNode || !noteNode) return;
 
-    if (isSingleStatusView) {
+    if (isSingleStatusView || isActivityPlanView) {
       card.hidden = true;
       card.setAttribute("hidden", "");
       return;
@@ -903,7 +903,7 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
 
-    renderOrganizerImpactCard(data, isSingleStatusView);
+    renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView);
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
