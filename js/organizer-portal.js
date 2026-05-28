@@ -557,6 +557,128 @@ function normalizeExternalUrl(value) {
   }
   /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 | Zweck: verdichtet Anbieter-Dashboard-Status und gruppiert wiederholte Tarifzeilen; Umfang: additive Helper vor renderDashboard === */
+  function buildOrganizerTariffRows(activeSubscriptions) {
+    const grouped = new Map();
+
+    (Array.isArray(activeSubscriptions) ? activeSubscriptions : []).forEach((item) => {
+      const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+      const amount = safeText(item?.monthly_amount_label) || "–";
+      if (!label) return;
+
+      const key = `${label}||${amount}`;
+      const current = grouped.get(key) || { label, amount, count: 0 };
+      current.count += 1;
+      grouped.set(key, current);
+    });
+
+    return Array.from(grouped.values()).map((row) => ({
+      label: row.count > 1 ? `${formatInteger(row.count)} × ${row.label}` : row.label,
+      amount: row.count > 1 ? `${formatInteger(row.count)} × ${row.amount}` : row.amount
+    }));
+  }
+
+  function buildOrganizerIncludedRows(quotaByPlan) {
+    const buckets = {
+      events: { consumed: 0, included: 0, unlimited: false },
+      activities: { consumed: 0, included: 0, unlimited: false }
+    };
+
+    (Array.isArray(quotaByPlan) ? quotaByPlan : []).forEach((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      const bucket = ["activity_basic", "activity_plus"].includes(planKey) ? buckets.activities : buckets.events;
+
+      if (!["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(planKey)) return;
+
+      bucket.consumed += Number(item?.consumed_total || 0);
+      bucket.included += Number(item?.included_total || 0);
+      bucket.unlimited = bucket.unlimited || Boolean(item?.has_unlimited);
+    });
+
+    const rows = [];
+
+    if (buckets.events.unlimited) {
+      rows.push("Veranstaltungen: unbegrenzt veröffentlichte Termine");
+    } else if (buckets.events.consumed > 0 || buckets.events.included > 0) {
+      rows.push(`Veranstaltungen: ${formatInteger(buckets.events.consumed)} von ${formatInteger(buckets.events.included)} veröffentlichten Terminen genutzt`);
+    }
+
+    if (buckets.activities.unlimited) {
+      rows.push("Aktivitäten: unbegrenzt veröffentlichte Aktivitäten");
+    } else if (buckets.activities.consumed > 0 || buckets.activities.included > 0) {
+      rows.push(`Aktivitäten: ${formatInteger(buckets.activities.consumed)} von ${formatInteger(buckets.activities.included)} veröffentlichten Aktivitäten genutzt`);
+    }
+
+    return rows;
+  }
+
+  function isOrganizerPublishedSubmission(submission) {
+    return safeText(submission?.status).toLowerCase() === "approved";
+  }
+
+  function isOrganizerOpenSubmission(submission) {
+    return new Set(["draft", "checkout_started", "pending_review", "payment_released", "paid", "in_review"]).has(
+      safeText(submission?.status).toLowerCase()
+    );
+  }
+
+  function renderOrganizerOverviewCard(context) {
+    const card = document.getElementById("organizer-dashboard-overview-card");
+    const summary = document.getElementById("organizer-dashboard-overview-summary");
+    const list = document.getElementById("organizer-dashboard-overview-list");
+    const nextStep = document.getElementById("organizer-dashboard-next-step");
+
+    if (!card || !summary || !list || !nextStep) return;
+
+    const submissions = Array.isArray(context?.submissions) ? context.submissions : [];
+    const activeSubscriptions = Array.isArray(context?.activeSubscriptions) ? context.activeSubscriptions : [];
+    const publishedCount = submissions.filter(isOrganizerPublishedSubmission).length;
+    const openCount = submissions.filter(isOrganizerOpenSubmission).length;
+    const areaLabel = context?.isActivityPlanView ? "Aktivitäten" : "Veranstaltungen";
+    const latestSubmission = context?.latestSubmission || null;
+
+    card.hidden = false;
+    card.removeAttribute("hidden");
+
+    if (context?.isSingleStatusView) {
+      summary.textContent = latestSubmission
+        ? `${formatStatusLabel(latestSubmission.status)} · ${formatDate(latestSubmission.start_date || latestSubmission.created_at)}`
+        : "Noch keine Einreichung gefunden.";
+
+      list.innerHTML = [
+        ["Bereich", "Einzeltermin"],
+        ["Status", latestSubmission ? formatStatusLabel(latestSubmission.status) : "–"],
+        ["Ort", latestSubmission ? (safeText(latestSubmission.location_name) || "–") : "–"]
+      ].map(([label, value]) => `
+        <span class="organizer-tariff-row" role="listitem">
+          <span class="organizer-tariff-label">${escapeHtml(label)}</span>
+          <span class="organizer-tariff-price">${escapeHtml(value)}</span>
+        </span>
+      `).join("");
+
+      nextStep.textContent = "Öffne unten die Einreichung, um Status, Angaben und mögliche Änderungen zu prüfen.";
+      return;
+    }
+
+    summary.textContent = `${areaLabel}. ${activeSubscriptions.length > 0 ? `${formatInteger(activeSubscriptions.length)} aktive Tarife` : "Kein aktiver Tarif"}.`;
+
+    list.innerHTML = [
+      ["Sichtbar", formatInteger(publishedCount)],
+      ["In Prüfung", formatInteger(openCount)],
+      ["Aktive Tarife", activeSubscriptions.length > 0 ? formatInteger(activeSubscriptions.length) : "–"]
+    ].map(([label, value]) => `
+      <span class="organizer-tariff-row" role="listitem">
+        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
+        <span class="organizer-tariff-price">${escapeHtml(value)}</span>
+      </span>
+    `).join("");
+
+    nextStep.textContent = openCount > 0
+      ? "Prüfe zuerst offene Einreichungen. Veröffentlichte Inhalte zählen erst nach redaktioneller Freigabe."
+      : "Du kannst neue Inhalte einreichen oder bestehende Einreichungen unten prüfen.";
+  }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
+
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
   function renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView = false) {
     const card = document.getElementById("organizer-dashboard-impact-card");
@@ -624,12 +746,17 @@ function normalizeExternalUrl(value) {
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
     const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
     const impactCard = document.getElementById("organizer-dashboard-impact-card");
+    const overviewCard = document.getElementById("organizer-dashboard-overview-card");
 
     if (authRequiredCard) {
       authRequiredCard.hidden = true;
       authRequiredCard.setAttribute("hidden", "");
     }
     if (summaryGrid) summaryGrid.hidden = false;
+    if (overviewCard) {
+      overviewCard.hidden = true;
+      overviewCard.setAttribute("hidden", "");
+    }
     if (impactCard) {
       impactCard.hidden = true;
       impactCard.setAttribute("hidden", "");
@@ -788,45 +915,8 @@ function normalizeExternalUrl(value) {
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY === */
 
     /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY | Zweck: benennt Tarife und Veröffentlichungen verständlicher ohne Kontingent-/Token-Sprache; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
-    const tariffRows = activeSubscriptions
-      .map((item) => {
-        const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
-        const amount = safeText(item?.monthly_amount_label);
-        if (!label) return null;
-
-        return {
-          label,
-          amount: amount || "–"
-        };
-      })
-      .filter(Boolean);
-
-    const includedRows = quotaByPlan
-      .map((item) => {
-        const planKey = safeText(item?.plan_key).toLowerCase();
-        const isActivityQuota = ["activity_basic", "activity_plus"].includes(planKey);
-        const consumed = Number(item?.consumed_total || 0);
-        const included = Number(item?.included_total || 0);
-
-        if (isActivityQuota) {
-          if (item?.has_unlimited) {
-            return "Aktivitäten: unbegrenzt veröffentlichte Aktivitäten";
-          }
-
-          return `Aktivitäten: ${consumed} von ${included} veröffentlichten Aktivitäten genutzt`;
-        }
-
-        if (["starter", "active", "unlimited"].includes(planKey)) {
-          if (item?.has_unlimited) {
-            return "Veranstaltungen: unbegrenzt veröffentlichte Termine";
-          }
-
-          return `Veranstaltungen: ${consumed} von ${included} veröffentlichten Terminen genutzt`;
-        }
-
-        return "";
-      })
-      .filter(Boolean);
+    const tariffRows = buildOrganizerTariffRows(activeSubscriptions);
+    const includedRows = buildOrganizerIncludedRows(quotaByPlan);
 
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
 
@@ -902,6 +992,14 @@ function normalizeExternalUrl(value) {
       }
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
+
+    renderOrganizerOverviewCard({
+      isSingleStatusView,
+      isActivityPlanView,
+      activeSubscriptions,
+      submissions,
+      latestSubmission
+    });
 
     const hasActivityPresencePlan = activeSubscriptions.some((item) => {
       const planKey = safeText(item?.plan_key).toLowerCase();
@@ -1339,6 +1437,7 @@ if (submissionsList && submissionsEmpty) {
       const summaryGrid = document.getElementById("organizer-dashboard-summary");
       const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
       const impactCard = document.getElementById("organizer-dashboard-impact-card");
+      const overviewCard = document.getElementById("organizer-dashboard-overview-card");
 
       if (logoutButton) {
         logoutButton.hidden = true;
@@ -1346,6 +1445,7 @@ if (submissionsList && submissionsEmpty) {
       }
 
       if (summaryGrid) summaryGrid.hidden = true;
+      if (overviewCard) overviewCard.hidden = true;
       if (impactCard) impactCard.hidden = true;
       if (submissionsCard) submissionsCard.hidden = true;
 
