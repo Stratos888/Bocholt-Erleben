@@ -1700,3 +1700,26 @@ Bewertung:
 - Es wurden keine neuen Tracking-Endpunkte, keine neue Datenbanktabelle und kein Anbieterbereich-Umbau eingeführt.
 - Self-Service-Auswertung im Anbieterbereich bleibt ein späterer Schritt nach belastbarer Datenbasis und sauberer Rechte-/Ziel-Zuordnung.
 <!-- === END BLOCK: TEST_STATUS_INTERNAL_LOCATION_FEEDBACK_REPORT_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_IMPACT_CARD_HIDE_2026_05_28 | Zweck: dokumentiert den Staging-Proof zur Ausblendung der Wirkungskarte bei Aktivitätstarifen; Umfang: Anbieter-Dashboard, Aktivitätspräsenzen, Wirkungskarte === -->
+## Anbieter-Dashboard – Wirkungskarte bei Aktivitätstarifen ausgeblendet – Staging-Proof 2026-05-28
+
+Status: bestanden.
+
+Geprüfter Scope:
+- Anbieter-Dashboard `/fuer-veranstalter/dashboard/`
+- Account mit `Dauerhaft` plus mehreren `Aktivitätspräsenz Basis`-Tarifen
+- Karte `Meine Wirkung auf Bocholt erleben`
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- `Kontakt & Organisation` bleibt sichtbar.
+- `Tarife & Veröffentlichungen` bleibt sichtbar.
+- `Einreichungen & Status` bleibt sichtbar.
+- Die Karte `Meine Wirkung auf Bocholt erleben` ist bei diesem Activity-/Location-Testaccount nicht mehr sichtbar.
+
+Bewertung:
+- Der Sicherheitsfix verhindert eine irreführende Null-Auswertung für Aktivitätspräsenzen.
+- Die Wirkungskarte bleibt erst dann für Aktivitätsanbieter sinnvoll, wenn Anbieteraccount und Activity-/Location-Reporting-Ziele sauber verknüpft sind.
+- Restbefund: Das Anbieter-Dashboard ist weiterhin strukturell zu unaufgeräumt und sollte als eigener Dashboard-V2-Workpack überarbeitet werden.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_IMPACT_CARD_HIDE_2026_05_28 === -->
