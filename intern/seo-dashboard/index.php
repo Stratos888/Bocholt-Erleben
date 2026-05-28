@@ -174,6 +174,8 @@ function be_seo_dashboard_empty_value_metrics(string $status = 'not_configured',
         'metrics' => be_seo_dashboard_empty_metrics(),
         'previous_metrics' => be_seo_dashboard_empty_metrics(),
         'reporting_targets' => [],
+        'previous_reporting_targets' => [],
+        'configured_reporting_targets' => [],
         'message' => $message,
     ];
 }
@@ -304,6 +306,68 @@ SQL);
 }
 /* === END BLOCK: INTERNAL_SEO_DASHBOARD_REPORTING_TARGET_AGGREGATION_V1 === */
 
+/* === BEGIN BLOCK: INTERNAL_SEO_DASHBOARD_CONFIGURED_REPORTING_TARGETS_V1 | Zweck: liest konfigurierte Activity-Reporting-Ziele auch ohne aktuelle Messwerte für den Feedbackbericht; Umfang: additive Helfer === */
+function be_seo_dashboard_read_configured_reporting_targets(): array
+{
+    $path = __DIR__ . '/../../data/offers.json';
+    if (!is_file($path)) {
+        return [];
+    }
+
+    $decoded = json_decode((string)file_get_contents($path), true);
+    $offers = is_array($decoded['offers'] ?? null) ? $decoded['offers'] : [];
+    $targets = [];
+
+    foreach ($offers as $offer) {
+        if (!is_array($offer)) {
+            continue;
+        }
+
+        $target = $offer['reporting_target'] ?? null;
+        if (!is_array($target)) {
+            continue;
+        }
+
+        $type = trim((string)($target['type'] ?? ''));
+        $id = trim((string)($target['id'] ?? ''));
+        $title = trim((string)($target['title'] ?? ''));
+
+        if ($type === '' || $id === '') {
+            continue;
+        }
+
+        $key = $type . ':' . $id;
+        if (!isset($targets[$key])) {
+            $targets[$key] = [
+                'target_type' => $type,
+                'target_id' => $id,
+                'target_title' => $title !== '' ? $title : $id,
+                'detail_views' => 0,
+                'website_clicks' => 0,
+                'maps_clicks' => 0,
+                'location_clicks' => 0,
+                'organizer_cta_clicks' => 0,
+                'total_interactions' => 0,
+                'item_count' => 0,
+                'item_titles' => [],
+            ];
+        }
+
+        $targets[$key]['item_count']++;
+        $offerTitle = trim((string)($offer['title'] ?? ''));
+        if ($offerTitle !== '') {
+            $targets[$key]['item_titles'][] = $offerTitle;
+        }
+    }
+
+    uasort($targets, static function (array $left, array $right): int {
+        return strcasecmp((string)$left['target_title'], (string)$right['target_title']);
+    });
+
+    return array_values($targets);
+}
+/* === END BLOCK: INTERNAL_SEO_DASHBOARD_CONFIGURED_REPORTING_TARGETS_V1 === */
+
 function be_seo_dashboard_read_value_metrics(): array
 {
     $valueMetrics = be_seo_dashboard_empty_value_metrics('ok');
@@ -329,6 +393,14 @@ function be_seo_dashboard_read_value_metrics(): array
             (string)$valueMetrics['period']['start_date'],
             (string)$valueMetrics['period']['end_date']
         );
+
+        $valueMetrics['previous_reporting_targets'] = be_seo_dashboard_aggregate_reporting_targets(
+            $pdo,
+            (string)$valueMetrics['previous_period']['start_date'],
+            (string)$valueMetrics['previous_period']['end_date']
+        );
+
+        $valueMetrics['configured_reporting_targets'] = be_seo_dashboard_read_configured_reporting_targets();
 
         return $valueMetrics;
     } catch (Throwable $error) {
@@ -426,6 +498,21 @@ $valueMetrics = $isUnlocked
     .status[data-state="warn"] .dot { background: var(--warn); }
     .status[data-state="bad"] .dot { background: var(--bad); }
 
+    .compactStatusBar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: -2px 0 10px; }
+    .compactGuidance { max-width: 860px; margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+
+    .feedbackHeader { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 320px); gap: 12px; align-items: end; }
+    .targetSelect { width: 100%; min-height: 40px; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: inherit; font-weight: 750; }
+    .feedbackReport { display: grid; gap: 12px; margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-2); }
+    .feedbackReportHead { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+    .feedbackReportTitle { margin: 0; font-size: 20px; line-height: 1.15; letter-spacing: -.02em; }
+    .feedbackKpiGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .feedbackKpi { padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,250,242,.72); }
+    .feedbackKpiLabel { color: var(--muted); font-size: 12px; line-height: 1.2; }
+    .feedbackKpiValue { margin-top: 4px; font-size: 22px; font-weight: 900; line-height: 1; letter-spacing: -.03em; }
+    .feedbackText { display: grid; gap: 8px; color: var(--text); font-size: 14px; }
+    .feedbackEmpty { color: var(--muted); }
+
     .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
     .kpiBox { position: relative; min-width: 0; padding: 10px 11px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-2); }
     .kpiLabel { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; line-height: 1.2; }
@@ -478,6 +565,9 @@ $valueMetrics = $isUnlocked
       .card--half,
       .card--wide { grid-column: span 12; }
       .snapshotGrid { grid-template-columns: 1fr; }
+      .feedbackHeader { grid-template-columns: 1fr; align-items: start; }
+      .feedbackKpiGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feedbackReportTitle { font-size: 18px; }
       .kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
       .kpiBox { padding: 9px; border-radius: 14px; }
       .kpiValue { font-size: 21px; }
@@ -529,26 +619,29 @@ $valueMetrics = $isUnlocked
       </div>
     </header>
 
-    <section class="grid">
-      <article class="card card--wide">
-        <h2>Akquise-Snapshot</h2>
-        <div class="statusLine">
-          <span id="snapshotStatus" class="status" data-state="warn"><span class="dot"></span><span>wird bewertet</span></span>
-          <span id="overallStatus" class="status" data-state="warn"><span class="dot"></span><span>Technik wird geprüft</span></span>
-        </div>
-        <p id="snapshotPeriod" class="muted small" style="margin-top:10px;">28-Tage-Auswertung wird geladen.</p>
-        <p id="snapshotReason" style="margin-top:10px;">Noch keine Bewertung geladen.</p>
-        <p id="snapshotNext" class="note small" style="margin-top:10px;">Nächster Hebel wird berechnet.</p>
-        <p id="overallText" class="muted small" style="margin-top:8px;">Technik-Checks sind unten eingeklappt.</p>
-      </article>
+    <div class="compactStatusBar" aria-label="Dashboard-Status">
+      <span id="snapshotStatus" class="status" data-state="warn"><span class="dot"></span><span>wird bewertet</span></span>
+      <span id="overallStatus" class="status" data-state="warn"><span class="dot"></span><span>Technik wird geprüft</span></span>
+      <span id="topOptOutStatus" class="status" data-state="warn"><span class="dot"></span><span>Eigenes Tracking wird geprüft</span></span>
+    </div>
+    <p class="compactGuidance">Erst aktiv verkaufen, wenn konkrete Website-, Route-/Maps- oder CTA-Klicks sichtbar werden. Der Detailstatus bleibt einklappbar.</p>
 
-      <article class="card card--third">
-        <h2>Für Screenshot / Akquise</h2>
-        <div class="proofBox">
-          <p id="proofStatus" class="small"><strong>Status:</strong> wird geladen</p>
-          <p id="proofPeriod" class="muted small">Zeitraum wird geladen.</p>
-          <p id="proofSummary">Mehrwertnachweis wird geladen.</p>
-          <p id="proofTrend" class="muted small">Vergleich wird geladen.</p>
+    <section class="grid">
+      <article class="card">
+        <div class="feedbackHeader">
+          <div>
+            <h2>Location-Feedbackbericht</h2>
+            <p class="muted small">Interner, screenshotfähiger Einzelbericht für Akquise und spätere Anbieter-Auswertung. Zeigt nur echte gemessene Interaktionen, keine Besucherzahlen vor Ort.</p>
+          </div>
+          <label>
+            Reporting-Ziel auswählen
+            <select id="feedbackTargetSelect" class="targetSelect">
+              <option value="">Ziele werden geladen …</option>
+            </select>
+          </label>
+        </div>
+        <div id="feedbackReport" class="feedbackReport">
+          <p class="feedbackEmpty small">Feedbackbericht wird geladen.</p>
         </div>
       </article>
 
@@ -627,6 +720,31 @@ $valueMetrics = $isUnlocked
 
         <p id="kpiExplanation" class="note small" style="margin-top:10px;">Noch keine Werte geladen.</p>
       </article>
+
+      <details class="card">
+        <summary>Akquise-Gesamtstatus</summary>
+        <div class="detailsBody">
+          <div class="snapshotGrid">
+            <article class="card">
+              <h2>Akquise-Snapshot</h2>
+              <p id="snapshotPeriod" class="muted small">28-Tage-Auswertung wird geladen.</p>
+              <p id="snapshotReason" style="margin-top:10px;">Noch keine Bewertung geladen.</p>
+              <p id="snapshotNext" class="note small" style="margin-top:10px;">Nächster Hebel wird berechnet.</p>
+              <p id="overallText" class="muted small" style="margin-top:8px;">Technik-Checks sind unten eingeklappt.</p>
+            </article>
+
+            <article class="card">
+              <h2>Für Screenshot / Akquise</h2>
+              <div class="proofBox">
+                <p id="proofStatus" class="small"><strong>Status:</strong> wird geladen</p>
+                <p id="proofPeriod" class="muted small">Zeitraum wird geladen.</p>
+                <p id="proofSummary">Mehrwertnachweis wird geladen.</p>
+                <p id="proofTrend" class="muted small">Vergleich wird geladen.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
 
       <details class="card">
         <summary>Technik, Quellen und Detailwerte</summary>
@@ -757,6 +875,7 @@ $valueMetrics = $isUnlocked
       const button = document.getElementById("optOutToggle");
       if (button) button.textContent = optedOut ? "Eigenes Tracking wieder einschließen" : "Eigenes Tracking ausschließen";
       setText("optOutStatus", optedOut ? "Eigenes Tracking: ausgeschlossen" : "Eigenes Tracking: aktiv");
+      setStatusPill("topOptOutStatus", optedOut ? "good" : "warn", optedOut ? "Eigenes Tracking ausgeschlossen" : "Eigenes Tracking aktiv");
     }
 
     function initTooltips() {
@@ -933,6 +1052,138 @@ $valueMetrics = $isUnlocked
       }[char]));
     }
 
+    function reportingTargetKey(row) {
+      return `${row?.target_type || ""}:${row?.target_id || ""}`;
+    }
+
+    function normalizeReportingTarget(row) {
+      return {
+        target_type: String(row?.target_type || ""),
+        target_id: String(row?.target_id || ""),
+        target_title: String(row?.target_title || row?.target_id || "Unbenanntes Ziel"),
+        detail_views: metricNumber(row?.detail_views),
+        website_clicks: metricNumber(row?.website_clicks),
+        maps_clicks: metricNumber(row?.maps_clicks),
+        location_clicks: metricNumber(row?.location_clicks),
+        organizer_cta_clicks: metricNumber(row?.organizer_cta_clicks),
+        total_interactions: metricNumber(row?.total_interactions),
+        item_count: metricNumber(row?.item_count),
+        item_titles: Array.isArray(row?.item_titles) ? row.item_titles.filter(Boolean).map(String) : []
+      };
+    }
+
+    function collectFeedbackTargets(payload) {
+      const map = new Map();
+      const configuredRows = Array.isArray(payload?.configured_reporting_targets) ? payload.configured_reporting_targets : [];
+      const currentRows = Array.isArray(payload?.reporting_targets) ? payload.reporting_targets : [];
+
+      configuredRows.forEach((raw) => {
+        const row = normalizeReportingTarget(raw);
+        const key = reportingTargetKey(row);
+        if (!row.target_type || !row.target_id || row.target_type === "unassigned") return;
+        map.set(key, { ...row, configured: true });
+      });
+
+      currentRows.forEach((raw) => {
+        const row = normalizeReportingTarget(raw);
+        const key = reportingTargetKey(row);
+        if (!row.target_type || !row.target_id || row.target_type === "unassigned") return;
+        const existing = map.get(key) || {};
+        map.set(key, {
+          ...existing,
+          ...row,
+          configured: Boolean(existing.configured),
+          item_count: Math.max(metricNumber(existing.item_count), row.item_count),
+          item_titles: existing.item_titles?.length ? existing.item_titles : row.item_titles
+        });
+      });
+
+      return Array.from(map.values()).sort((left, right) => {
+        if (left.target_id === "biotopwildpark-anholter-schweiz") return -1;
+        if (right.target_id === "biotopwildpark-anholter-schweiz") return 1;
+        const byInteractions = metricNumber(right.total_interactions) - metricNumber(left.total_interactions);
+        if (byInteractions !== 0) return byInteractions;
+        return left.target_title.localeCompare(right.target_title, "de");
+      });
+    }
+
+    function findPreviousReportingTarget(payload, row) {
+      const rows = Array.isArray(payload?.previous_reporting_targets) ? payload.previous_reporting_targets : [];
+      const key = reportingTargetKey(row);
+      return normalizeReportingTarget(rows.find((candidate) => reportingTargetKey(candidate) === key) || {});
+    }
+
+    function feedbackTypeLabel(type) {
+      if (type === "organizer") return "Anbieter";
+      if (type === "location") return "Location";
+      return "Reporting-Ziel";
+    }
+
+    function renderFeedbackReport(payload, selectedKey = "") {
+      const select = document.getElementById("feedbackTargetSelect");
+      const report = document.getElementById("feedbackReport");
+      if (!select || !report) return;
+
+      if (!payload || payload.status === "error") {
+        select.innerHTML = `<option value="">Keine Daten verfügbar</option>`;
+        report.innerHTML = `<p class="feedbackEmpty small">${escapeHtml(payload?.message || "Nutzwert-Metriken konnten nicht gelesen werden.")}</p>`;
+        return;
+      }
+
+      const rows = collectFeedbackTargets(payload);
+      if (!rows.length) {
+        select.innerHTML = `<option value="">Keine Reporting-Ziele konfiguriert</option>`;
+        report.innerHTML = `<p class="feedbackEmpty small">Noch keine Reporting-Ziele für einen Einzelbericht vorhanden.</p>`;
+        return;
+      }
+
+      const currentKey = selectedKey && rows.some((row) => reportingTargetKey(row) === selectedKey)
+        ? selectedKey
+        : reportingTargetKey(rows[0]);
+
+      select.innerHTML = rows.map((row) => {
+        const key = reportingTargetKey(row);
+        return `<option value="${escapeHtml(key)}"${key === currentKey ? " selected" : ""}>${escapeHtml(row.target_title)}</option>`;
+      }).join("");
+
+      const row = rows.find((candidate) => reportingTargetKey(candidate) === currentKey) || rows[0];
+      const previous = findPreviousReportingTarget(payload, row);
+      const directClicks = metricNumber(row.website_clicks) + metricNumber(row.maps_clicks) + metricNumber(row.location_clicks) + metricNumber(row.organizer_cta_clicks);
+      const previousDirectClicks = metricNumber(previous.website_clicks) + metricNumber(previous.maps_clicks) + metricNumber(previous.location_clicks) + metricNumber(previous.organizer_cta_clicks);
+      const period = formatPeriod(payload.period);
+      const sourceTitles = row.item_titles?.length ? row.item_titles.slice(0, 3).join(", ") : `${formatMetric(row.item_count)} Inhalt(e)`;
+      const hasSignals = metricNumber(row.total_interactions) > 0;
+
+      report.innerHTML = `
+        <div class="feedbackReportHead">
+          <div>
+            <h3 class="feedbackReportTitle">${escapeHtml(row.target_title)}</h3>
+            <p class="muted small">${escapeHtml(feedbackTypeLabel(row.target_type))} · Zeitraum: ${escapeHtml(period)} · Inhalt: ${escapeHtml(sourceTitles)}</p>
+          </div>
+          <span class="status" data-state="${hasSignals ? "good" : "warn"}"><span class="dot"></span><span>${hasSignals ? "Nutzsignal gemessen" : "noch ohne Signal"}</span></span>
+        </div>
+        <div class="feedbackKpiGrid">
+          <div class="feedbackKpi"><div class="feedbackKpiLabel">Interaktionen gesamt</div><div class="feedbackKpiValue">${formatMetric(row.total_interactions)}</div></div>
+          <div class="feedbackKpi"><div class="feedbackKpiLabel">Detail-Aufrufe</div><div class="feedbackKpiValue">${formatMetric(row.detail_views)}</div></div>
+          <div class="feedbackKpi"><div class="feedbackKpiLabel">Website-Klicks</div><div class="feedbackKpiValue">${formatMetric(row.website_clicks)}</div></div>
+          <div class="feedbackKpi"><div class="feedbackKpiLabel">Route/Maps</div><div class="feedbackKpiValue">${formatMetric(row.maps_clicks)}</div></div>
+        </div>
+        <div class="feedbackText">
+          <p>${hasSignals
+            ? `Nutzer haben diesen Eintrag geöffnet oder eine konkrete Weiterleitung ausgelöst. Direkt erklärbare Klicks: ${formatMetric(directClicks)} (${formatDelta(directClicks, previousDirectClicks)}).`
+            : `Für dieses Ziel liegen im aktuellen Zeitraum noch keine gemessenen Interaktionen vor. Der Bericht ist vorbereitet, sollte aber noch nicht als Akquise-Beleg verwendet werden.`}</p>
+          <p class="muted small">Wichtig: Das sind gemessene Interaktionen auf Bocholt erleben. Es sind keine Besucherzahlen vor Ort, keine Buchungen und keine eindeutigen Personen.</p>
+        </div>
+      `.trim();
+    }
+
+    function initFeedbackReport(payload) {
+      renderFeedbackReport(payload);
+      document.getElementById("feedbackTargetSelect")?.addEventListener("change", (event) => {
+        renderFeedbackReport(payload, event.target.value);
+      });
+    }
+
     function renderReportingTargets(payload) {
       const box = document.getElementById("reportingTargets");
       if (!box) return;
@@ -1075,6 +1326,7 @@ $valueMetrics = $isUnlocked
     currentMetrics = buildMetricModel(extractValueMetrics(valuePayload, "metrics"));
     previousMetrics = buildMetricModel(extractValueMetrics(valuePayload, "previous_metrics"));
     renderLocationValue(valuePayload);
+    initFeedbackReport(valuePayload);
     renderReportingTargets(valuePayload);
     applyMetrics({}, {});
     initTooltips();
