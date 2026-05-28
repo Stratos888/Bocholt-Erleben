@@ -194,6 +194,22 @@ Bis dahin:
 
 ### 3. Ersten Veranstalter-/Location-Feedbackbericht bauen
 
+Status 2026-05-28:
+
+- Interner Location-Feedbackbericht ist im SEO-/Mehrwert-Dashboard auf Staging eingebaut und geprüft.
+- Einbauort: `intern/seo-dashboard/`.
+- Der Bericht nutzt die vorhandenen Reporting-Ziele aus `data/offers.json` und die Messwerte aus `value_metric_daily`.
+- Sichtbar sind pro Reporting-Ziel:
+  - Interaktionen gesamt
+  - Detail-Aufrufe
+  - Website-Klicks
+  - Route/Maps-Klicks
+  - Zeitraum
+  - vorsichtige Einordnung bei fehlenden Signalen
+- Der frühere obere Akquise-Snapshot ist jetzt als `Akquise-Gesamtstatus` einklappbar; die Status-Chips bleiben direkt sichtbar.
+- Bewertung: technische Grundlage für Feedbackbericht und Akquise-Screenshot ist vorbereitet.
+- Erster kleiner Live-Proof liegt für `Biotopwildpark Anholter Schweiz` vor; als belastbaren Akquise-Erfolgsnachweis erst nach längerem Zeitraum mit stabileren Nutzwert-Signalen verwenden.
+
 Ziel:
 
 - screenshot- oder mailfähiger Bericht für einzelne Anbieter/Locations.

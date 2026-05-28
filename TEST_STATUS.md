@@ -1660,3 +1660,43 @@ Bewertung:
 - Keine CSS-, Backend-, Tracking-, Stripe- oder Datenmodelländerung erforderlich.
 <!-- === END BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_INTERNAL_LOCATION_FEEDBACK_REPORT_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand des internen Location-Feedbackberichts; Umfang: SEO-/Mehrwert-Dashboard, Akquise-Snapshot-Kompaktisierung, Reporting-Ziel-Bericht === -->
+## Interner Location-Feedbackbericht – Staging-Proof 2026-05-28
+
+Status: bestanden / vorbereitet.
+
+Geprüfter Scope:
+- internes SEO-/Mehrwert-Dashboard `/intern/seo-dashboard/`
+- kompakter oberer Statusbereich
+- einklappbarer `Akquise-Gesamtstatus`
+- neuer Block `Location-Feedbackbericht`
+- Reporting-Ziel-Auswahl
+- Hauptzahlen und eingeklappte Technikdetails
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- Status-Chips bleiben oben direkt sichtbar:
+  - `Gelb – Akquise prüfen`
+  - `Technik ok`
+  - `Eigenes Tracking ausgeschlossen`
+- Bisherige große Bereiche `Akquise-Snapshot` und `Für Screenshot / Akquise` sind nicht mehr dauerhaft oben sichtbar, sondern unter `Akquise-Gesamtstatus` einklappbar erreichbar.
+- Neuer Block `Location-Feedbackbericht` steht oberhalb der Hauptzahlen.
+- Reporting-Ziel-Auswahl lädt konfigurierte Ziele; geprüft wurde `Biotopwildpark Anholter Schweiz`.
+- Einzelbericht zeigt für `Biotopwildpark Anholter Schweiz`:
+  - Interaktionen gesamt: 2
+  - Detail-Aufrufe: 1
+  - Website-Klicks: 1
+  - Route/Maps: 0
+  - Zeitraum
+  - zugeordneten Inhalt `Anholter Schweiz erleben`
+  - Status `Nutzsignal gemessen`
+- Hauptzahlen bleiben sichtbar und unverändert erreichbar.
+- `Technik, Quellen und Detailwerte` bleibt eingeklappt.
+
+Bewertung:
+- Der interne Feedbackbericht ist als Akquise- und Gesprächsvorbereitung technisch vorbereitet.
+- Der Bericht ist screenshotfähig und verständlicher als die reine KPI-/Technikansicht.
+- Der Bericht liefert jetzt einen ersten kleinen, aber echten Nutzsignal-Proof; für belastbare Akquise-Aussagen bleibt ein längerer Zeitraum mit stabileren Nutzwert-Klicks nötig.
+- Es wurden keine neuen Tracking-Endpunkte, keine neue Datenbanktabelle und kein Anbieterbereich-Umbau eingeführt.
+- Self-Service-Auswertung im Anbieterbereich bleibt ein späterer Schritt nach belastbarer Datenbasis und sauberer Rechte-/Ziel-Zuordnung.
+<!-- === END BLOCK: TEST_STATUS_INTERNAL_LOCATION_FEEDBACK_REPORT_2026_05_28 === -->
