@@ -2723,44 +2723,58 @@ select.content-field__control{
 }
 /* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HIERARCHY_POLISH_V1 | Zweck: stellt im Anbieter-Dashboard klare visuelle Hierarchie her; Umfang: Dashboard-spezifische Typografie, Einreichungsstatus, Tarifzeilen und mobile Verdichtung === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HIERARCHY_POLISH_V1 | Zweck: definiert eine klare lokale Typografie-Hierarchie im Anbieter-Dashboard; Umfang: Dashboard-spezifische Schriftrollen, Statuskacheln, Einreichungsliste, Tarifzeilen und mobile Verdichtung === */
+[data-organizer-page="dashboard"] {
+  --dashboard-title-weight: 680;
+  --dashboard-card-title-weight: 650;
+  --dashboard-text-weight: 400;
+  --dashboard-label-weight: 460;
+  --dashboard-value-weight: 660;
+  --dashboard-action-weight: 620;
+}
+
 [data-organizer-page="dashboard"] .content-hero--panel {
-  padding-block: clamp(1.15rem, 3.2vw, 2rem);
+  padding-block: clamp(1rem, 2.8vw, 1.75rem);
 }
 
 [data-organizer-page="dashboard"] .content-hero h1 {
-  font-weight: 720;
+  font-weight: var(--dashboard-title-weight);
   letter-spacing: -0.035em;
 }
 
 [data-organizer-page="dashboard"] .content-lead {
   color: var(--color-text-secondary);
-  font-weight: 430;
+  font-weight: var(--dashboard-text-weight);
+}
+
+[data-organizer-page="dashboard"] .content-actions .content-cta,
+[data-organizer-page="dashboard"] .content-actions .content-cta--primary {
+  font-weight: var(--dashboard-action-weight);
 }
 
 [data-organizer-page="dashboard"] .content-card--primary h2 {
-  font-weight: 720;
+  font-weight: var(--dashboard-card-title-weight);
   letter-spacing: -0.012em;
 }
 
 [data-organizer-page="dashboard"] #organizer-dashboard-submissions-summary {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: clamp(0.96rem, 2.2vw, 1.04rem);
-  font-weight: 620;
-  line-height: 1.35;
+  font-size: clamp(0.95rem, 2.1vw, 1.02rem);
+  font-weight: 520;
+  line-height: 1.4;
 }
 
 [data-organizer-page="dashboard"] .organizer-submission-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.55rem;
-  margin-top: 0.25rem;
+  margin-top: 0.18rem;
 }
 
 [data-organizer-page="dashboard"] .organizer-submission-summary-item {
   min-width: 0;
-  padding: 0.68rem 0.72rem;
+  padding: 0.66rem 0.72rem;
   border: 1px solid var(--cmp-divider-strong);
   border-radius: 0.9rem;
   background: rgba(255,255,255,0.52);
@@ -2769,8 +2783,8 @@ select.content-field__control{
 [data-organizer-page="dashboard"] .organizer-submission-summary-label {
   display: block;
   color: var(--color-text-secondary);
-  font-size: 0.76rem;
-  font-weight: 560;
+  font-size: 0.74rem;
+  font-weight: var(--dashboard-label-weight);
   line-height: 1.2;
 }
 
@@ -2778,60 +2792,71 @@ select.content-field__control{
   display: block;
   margin-top: 0.18rem;
   color: var(--color-text-primary);
-  font-size: 1.08rem;
-  font-weight: 720;
+  font-size: 1.04rem;
+  font-weight: var(--dashboard-value-weight);
   line-height: 1.1;
 }
 
 [data-organizer-page="dashboard"] #organizer-dashboard-next-step {
   color: var(--color-text-secondary);
-  font-weight: 430;
-  line-height: 1.4;
+  font-size: 0.9rem;
+  font-weight: var(--dashboard-text-weight);
+  line-height: 1.45;
 }
 
 [data-organizer-page="dashboard"] .organizer-submission-row__title {
-  font-weight: 690;
+  font-weight: 610;
   letter-spacing: -0.006em;
 }
 
 [data-organizer-page="dashboard"] .organizer-submission-row__meta {
   color: var(--color-text-secondary);
-  font-weight: 470;
+  font-weight: 420;
 }
 
 [data-organizer-page="dashboard"] .organizer-tariff-section-title {
-  font-weight: 700;
-  letter-spacing: 0.035em;
+  color: var(--color-text-primary);
+  font-size: 0.76rem;
+  font-weight: 620;
+  letter-spacing: 0.045em;
 }
 
 [data-organizer-page="dashboard"] .organizer-tariff-label {
   color: var(--color-text-secondary);
-  font-weight: 590;
+  font-weight: 500;
 }
 
 [data-organizer-page="dashboard"] .organizer-tariff-price {
   color: var(--color-text-primary);
-  font-weight: 720;
+  font-weight: 650;
+}
+
+[data-organizer-page="dashboard"] .organizer-tariff-total-label {
+  font-weight: 600;
+}
+
+[data-organizer-page="dashboard"] .organizer-tariff-total-price {
+  font-weight: 680;
 }
 
 [data-organizer-page="dashboard"] .organizer-tariff-bullet,
 [data-organizer-page="dashboard"] .content-note {
-  font-weight: 430;
+  font-weight: var(--dashboard-text-weight);
 }
 
 @media (max-width: 640px) {
   [data-organizer-page="dashboard"] .content-hero--panel {
-    padding: 1.05rem;
-    border-radius: 1.25rem;
+    padding: 1rem;
+    border-radius: 1.2rem;
   }
 
   [data-organizer-page="dashboard"] .content-hero h1 {
-    font-size: clamp(1.45rem, 7vw, 1.78rem);
+    font-size: clamp(1.42rem, 6.8vw, 1.72rem);
     line-height: 1.05;
   }
 
   [data-organizer-page="dashboard"] .content-lead {
-    font-size: 0.94rem;
+    font-size: 0.93rem;
     line-height: 1.45;
   }
 
@@ -2840,43 +2865,61 @@ select.content-field__control{
   }
 
   [data-organizer-page="dashboard"] .content-card--primary {
-    padding: 1.05rem;
-    gap: 0.72rem;
+    padding: 1rem;
+    gap: 0.7rem;
+  }
+
+  [data-organizer-page="dashboard"] .content-card--primary h2 {
+    font-size: 1rem;
   }
 
   [data-organizer-page="dashboard"] .organizer-submission-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: 0.48rem;
   }
 
   [data-organizer-page="dashboard"] .organizer-submission-summary-item {
-    padding: 0.58rem 0.62rem;
+    padding: 0.56rem 0.62rem;
     border-radius: 0.78rem;
   }
 
   [data-organizer-page="dashboard"] .organizer-submission-summary-value {
-    font-size: 1rem;
+    font-size: 0.98rem;
   }
 
   [data-organizer-page="dashboard"] .organizer-submission-row {
-    min-height: 3.2rem;
+    min-height: 3.15rem;
     padding-block: 0.65rem;
   }
 
+  [data-organizer-page="dashboard"] .organizer-submission-row__title {
+    font-size: 0.95rem;
+    font-weight: 610;
+  }
+
+  [data-organizer-page="dashboard"] .organizer-submission-row__meta {
+    font-size: 0.78rem;
+    font-weight: 420;
+  }
+
   [data-organizer-page="dashboard"] .organizer-tariff-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
     align-items: start;
-    grid-template-columns: minmax(0, 1fr) max-content;
-    gap: 0.65rem;
   }
 
   [data-organizer-page="dashboard"] .organizer-tariff-label {
     overflow-wrap: anywhere;
-    line-height: 1.35;
+    line-height: 1.34;
   }
 
   [data-organizer-page="dashboard"] .organizer-tariff-price {
-    text-align: right;
-    white-space: nowrap;
+    text-align: left;
+    white-space: normal;
+  }
+
+  [data-organizer-page="dashboard"] .organizer-tariff-total {
+    grid-template-columns: minmax(0, 1fr) max-content;
   }
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_HIERARCHY_POLISH_V1 === */
