@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY | Zweck: beschreibt die geschützte Seite als Status- und Veranstalterbereich ohne interne Kontingent-/Systemsprache; Umfang: kompletter Head dieser Datei === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_HEAD_V4_VALUE_CENTER_COPY | Zweck: beschreibt die geschützte Seite als Veranstalterbereich für Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: kompletter Head dieser Datei === -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Status & Veranstalterbereich | Bocholt erleben</title>
+  <title>Veranstalterbereich | Bocholt erleben</title>
   <meta
     name="description"
-    content="Status eigener Einreichungen und Veranstalterbereich bei Bocholt erleben."
+    content="Veranstalterbereich bei Bocholt erleben: Einreichungen, Veröffentlichungsstatus und Mitgliedschaft an einem Ort."
   >
   <meta name="robots" content="noindex, nofollow">
 
@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
   <link rel="stylesheet" href="/css/style.css?v=1">
-  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V3_STATUS_AREA_COPY === -->
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V4_VALUE_CENTER_COPY === -->
 </head>
 
 <body>
@@ -55,11 +55,11 @@
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEADER_WITH_LOGOUT_SLOT_V1 === -->
 
   <main class="page page--organizers" data-organizer-page="dashboard">
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 | Zweck: entfernt den Kicker und hält den statischen Dashboard-Ladezustand konsistent mit Status/Veranstalterbereich; Umfang: statischer Dashboard-Hero === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V5_VALUE_CENTER_COPY | Zweck: hält den statischen Ladezustand konsistent mit Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: statischer Dashboard-Hero === -->
     <header class="content-hero content-hero--panel">
-      <h1 id="organizer-dashboard-title">Wir laden deine Angaben.</h1>
+      <h1 id="organizer-dashboard-title">Veranstalterbereich wird geladen.</h1>
       <p class="content-lead" id="organizer-dashboard-lead">
-        Wir öffnen den Status deiner Einreichung oder deinen Veranstalterbereich.
+        Wir öffnen deine Einreichungen, deinen Veröffentlichungsstatus und deine Mitgliedschaft.
       </p>
       <p class="content-note" id="organizer-dashboard-note" hidden></p>
       <div class="content-actions content-actions--inline">
@@ -68,7 +68,7 @@
         </a>
       </div>
     </header>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V4 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_LOADING_COPY_V5_VALUE_CENTER_COPY === -->
 
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 | Zweck: erklärt den fehlenden Login als notwendigen E-Mail-Zugangslink; Umfang: Auth-Required-Karte === -->
@@ -84,7 +84,7 @@
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_AUTH_REQUIRED_COPY_V2 === -->
 
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 | Zweck: trennt Stammdaten und Mitgliedschaftsübersicht klar, damit Tarifstatus nicht doppelt erscheint; Umfang: beide Summary-Karten === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY | Zweck: benennt Stammdaten und Veröffentlichungsübersicht klarer als Wertzentrum ohne neue Datenlogik; Umfang: beide Summary-Karten === -->
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
         <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
@@ -94,22 +94,22 @@
       </section>
 
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
-        <h2 id="organizer-dashboard-quota-head">Übersicht Mitgliedschaft</h2>
+        <h2 id="organizer-dashboard-quota-head">Tarife & Veröffentlichungen</h2>
         <p id="organizer-quota-period">–</p>
         <p id="organizer-quota-change" hidden>–</p>
         <p id="organizer-quota-summary">–</p>
         <p id="organizer-quota-remaining">–</p>
       </section>
     </div>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V4 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY === -->
 
-    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V3 | Zweck: benennt die Dashboard-Liste als aktuelle Einreichungen und nutzt eine neutrale Containerstruktur statt Navigation; Umfang: statischer Einreichungslisten-Block === -->
+    <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V4_VALUE_CENTER_COPY | Zweck: benennt die Dashboard-Liste als Einreichungen mit Status statt reine Verwaltungsliste; Umfang: statischer Einreichungslisten-Block === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
-      <h2 id="organizer-dashboard-submissions-head">Aktuelle Einreichungen</h2>
+      <h2 id="organizer-dashboard-submissions-head">Einreichungen & Status</h2>
       <div class="content-links" id="organizer-dashboard-submissions-list"></div>
-      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Keine aktuellen Einreichungen gefunden.</p>
+      <p class="content-note" id="organizer-dashboard-submissions-empty" hidden>Noch keine aktuellen Einreichungen vorhanden.</p>
     </section>
-    <!-- === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V3 === -->
+    <!-- === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V4_VALUE_CENTER_COPY === -->
     
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_NAV_COPY_V4 | Zweck: entfernt den redundanten Zugangslink aus dem geöffneten Dashboard und lässt nur den Rückweg zur Auswahl; Umfang: untere Bereich-Navigation im Dashboard === -->
     <nav class="content-links" aria-label="Bereich-Navigation">
@@ -124,9 +124,9 @@
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V4 | Zweck: lädt die aktualisierte Dashboard-Logik für sichtbare Speicherhinweise und robuste Veranstalteränderungen; Umfang: organizer-portal.js Script-Referenz === -->
-  <script src="/js/organizer-portal.js?v=2026-05-11-submission-edit-4" defer></script>
-  <!-- === END BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V4 === -->
+  <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY | Zweck: lädt die aktualisierte Dashboard-Copy für Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: organizer-portal.js Script-Referenz === -->
+  <script src="/js/organizer-portal.js?v=2026-05-28-dashboard-value-copy-1" defer></script>
+  <!-- === END BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY === -->
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>
 </html>

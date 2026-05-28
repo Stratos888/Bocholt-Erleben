@@ -63,6 +63,42 @@ Diese Punkte kommen vor weiterer breiter UI-Polish-Arbeit.
 
 ### 1. Live-Zahlungsfall bewusst vollständig testen
 
+<!-- === BEGIN BLOCK: ROADMAP_LIVE_SINGLE_EVENT_PAYMENT_PROOF_2026_05_27 | Zweck: dokumentiert erledigten P0-Live-Zahlungsbeweis für Einzeltermin; Umfang: Review-first, Stripe-Zahlung, Veröffentlichung, Rücknahme/Cleanup === -->
+
+Status 2026-05-27:
+
+- Live-Zahlungsfall für Einzeltermin wurde vollständig praktisch bewiesen.
+- Getesteter Fall: `Bocholt erleben – Info-Nachmittag für Veranstalter`.
+- Preis/Betrag im Stripe-Checkout: `9,90 €`.
+- Review-first-Flow bestätigt:
+  - Einreichung erzeugt noch keinen direkten Checkout.
+  - Bestätigungsmail nach Einreichung kommt an.
+  - Einreichung erscheint in der Review-Inbox.
+  - Zahlung wird erst nach redaktioneller Vorprüfung freigegeben.
+  - Zahlungslink-Mail kommt an.
+- Stripe-Live-Zahlung erfolgreich abgeschlossen.
+- Erfolgsseite nach Zahlung korrekt angezeigt.
+- Inbox-Status nach Zahlung: bezahlt / veröffentlichungsbereit.
+- Finale Veröffentlichung aus der Inbox erfolgreich.
+- Veröffentlichungsmail kommt an.
+- Event war anschließend im öffentlichen Eventbereich sichtbar.
+- Cleanup ohne manuelle DB-Korrektur bestanden:
+  - Veranstalteränderung an bereits veröffentlichtem Zukunftstermin setzt den Fall zurück in redaktionelle Prüfung.
+  - Öffentliche Sichtbarkeit wird dadurch entfernt.
+  - Eintrag erscheint wieder in der Review-Inbox.
+  - Ablehnung/Abschluss aus der Inbox funktioniert.
+  - Ablehnungsmail kommt an.
+- Der Testtermin wurde nach dem Test wieder aus der öffentlichen Sichtbarkeit entfernt und abgeschlossen.
+
+Bewertung:
+
+- P0 `Live-Zahlungsfall bewusst vollständig testen` ist für den Einzeltermin-Funnel erledigt.
+- Kein Code-Patch und keine direkte DB-Korrektur waren nötig.
+- Für breite Akquise ist der bezahlte Einzeltermin-Kernfluss praktisch belastbar.
+- Mitgliedschafts-/Abo-Live-Test bleibt ein separater Testfall, weil dort Abo-, Billing-Portal- und Periodenlogik zusätzlich betroffen sind.
+
+<!-- === END BLOCK: ROADMAP_LIVE_SINGLE_EVENT_PAYMENT_PROOF_2026_05_27 === -->
+
 Ziel:
 
 - erster echter Live-Zahlungsfall für Event- oder Aktivitätsprodukt
@@ -215,6 +251,16 @@ Akzeptanzkriterien:
 
 ### 5. Review-/Push-Flows gegen stille Ausfälle prüfen
 
+Status 2026-05-27:
+
+- Technischer Zugriffsschutzteil ist in den Deploy-Smoke-Check integriert und für Staging sowie Live/Main bewiesen.
+- Review-Liste und Push-Endpunkte werden nach Deploys automatisch gegen versehentliche öffentliche Öffnung geprüft.
+- Einzeltermin-Flow ist durch den Live-E2E-Test `TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27` inklusive Review-Inbox-Sichtbarkeit bewiesen.
+- Activity-Presence-Flow ist durch die Live-Readiness-Prüfung `TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26` inklusive Live-Inbox-Sichtbarkeit bewiesen.
+- Event-Submissions aus aktiver Mitgliedschaft sind durch die dokumentierten Membership-Reuse-Tests inklusive `review-list.php`- und `/inbox/`-Sichtbarkeit bewiesen.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall, sondern starten den Abo-/Zahlungsflow.
+- Tatsächlicher Push-Versand bleibt optional und ist kein P0-Blocker, solange die Review-Inbox zuverlässig ist.
+
 Ziel:
 
 - Neue Einreichungen erzeugen zuverlässig Review-Arbeit und interne Hinweise.
@@ -225,9 +271,9 @@ Warum:
 
 Akzeptanzkriterien:
 
-- Single-Event-, Membership- und Activity-Presence-Einreichungen erscheinen zuverlässig in der Inbox.
-- Push ist best-effort, aber zentrale Auslöser sind nachvollziehbar.
-- Wenn Push nicht ausgelöst wird, muss die Review-Inbox trotzdem korrekt sein.
+- Einzeltermin-, Activity-Presence- und Event-Submissions aus aktiver Mitgliedschaft erscheinen zuverlässig in der Review-Inbox.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall, sondern starten den Abo-/Zahlungsflow.
+- Push ist best-effort; wenn Push nicht ausgelöst wird, muss die Review-Inbox trotzdem korrekt sein.
 
 ---
 

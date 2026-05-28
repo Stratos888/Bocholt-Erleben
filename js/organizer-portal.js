@@ -540,7 +540,7 @@ function normalizeExternalUrl(value) {
   }
   /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
-  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Meine Einreichung oder Mein Veranstalterbereich und ersetzt öffentliche Kontingent-/Abo-Sprache; Umfang: komplette renderDashboard-Funktion === */
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
@@ -602,7 +602,7 @@ function normalizeExternalUrl(value) {
     const submissionsEmpty = document.getElementById("organizer-dashboard-submissions-empty");
     const dashboardPrimaryCta = document.getElementById("organizer-dashboard-primary-cta");
     const dashboardActions = dashboardPrimaryCta ? dashboardPrimaryCta.parentElement : null;
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V3 | Zweck: entfernt den Dashboard-Kicker, zeigt oben nur den Veranstalternamen und hält den Hero knapp auf Mitgliedschaft und Einreichungen ausgerichtet; Umfang: Kicker-, Titel-, Lead- und Note-Texte in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY | Zweck: richtet den Dashboard-Hero auf Einreichungen, Veröffentlichungsstatus und Mitgliedschaft aus; Umfang: Kicker-, Titel-, Lead- und Note-Texte in renderDashboard === */
     if (kicker) {
       kicker.textContent = "";
       kicker.hidden = true;
@@ -621,8 +621,8 @@ function normalizeExternalUrl(value) {
           : "Status deiner Einreichung.";
       } else {
         lead.textContent = isActivityPlanView
-          ? "Hier siehst du deine Aktivitätspräsenz und letzte Einreichungen."
-          : "Hier siehst du deine Mitgliedschaft und letzte Einreichungen.";
+          ? "Hier siehst du deine Aktivitätspräsenz, Einreichungen und Veröffentlichungsstatus an einem Ort."
+          : "Hier siehst du deine Einreichungen, Veröffentlichungsstatus und Mitgliedschaft an einem Ort.";
       }
     }
 
@@ -635,7 +635,7 @@ function normalizeExternalUrl(value) {
         note.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V3 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_HERO_NOTE_COPY_V4_VALUE_CENTER_COPY === */
 
     if (dashboardPrimaryCta) {
       if (isActivityPlanView) {
@@ -674,9 +674,9 @@ function normalizeExternalUrl(value) {
       }
     }
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 | Zweck: hält Meine Angaben auf Stammdaten begrenzt und verschiebt Mitgliedschaftsstatus vollständig in die Mitgliedschaftsübersicht; Umfang: Account-Karten-Texte in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY | Zweck: benennt die Stammdatenkarte klarer als Kontakt- und Organisationsbereich; Umfang: Account-Karten-Texte in renderDashboard === */
     if (accountHead) {
-      accountHead.textContent = isSingleStatusView ? "Einreichung" : "Meine Angaben";
+      accountHead.textContent = isSingleStatusView ? "Einreichung" : "Kontakt & Organisation";
     }
 
     if (accountName) {
@@ -702,9 +702,9 @@ function normalizeExternalUrl(value) {
         accountPlan.hidden = true;
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V3 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY === */
 
-    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V2 | Zweck: rendert aktive Tarife als ruhige Preistabelle mit Summenlinie und getrennten Leistungs-Bullets statt Fliesstext; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
+    /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY | Zweck: benennt Tarife und Veröffentlichungen verständlicher ohne Kontingent-/Token-Sprache; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
     const tariffRows = activeSubscriptions
       .map((item) => {
         const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
@@ -735,10 +735,10 @@ function normalizeExternalUrl(value) {
 
         if (["starter", "active", "unlimited"].includes(planKey)) {
           if (item?.has_unlimited) {
-            return "Events: unbegrenzt veröffentlichte Termine";
+            return "Veranstaltungen: unbegrenzt veröffentlichte Termine";
           }
 
-          return `Events: ${consumed} von ${included} veröffentlichten Terminen genutzt`;
+          return `Veranstaltungen: ${consumed} von ${included} veröffentlichten Terminen genutzt`;
         }
 
         return "";
@@ -748,7 +748,7 @@ function normalizeExternalUrl(value) {
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
 
     if (quotaHead) {
-      quotaHead.textContent = isSingleStatusView ? "Status" : "Übersicht Tarife";
+      quotaHead.textContent = isSingleStatusView ? "Status" : "Tarife & Veröffentlichungen";
     }
 
     if (quotaPeriod) {
@@ -760,7 +760,7 @@ function normalizeExternalUrl(value) {
           : "Veranstaltung einreichen";
       } else if (tariffRows.length > 0) {
         quotaPeriod.innerHTML = `
-          <span class="organizer-tariff-section-title">Laufende Tarife</span>
+          <span class="organizer-tariff-section-title">Aktive Tarife</span>
           <span class="organizer-tariff-table" role="list">
             ${tariffRows.map((row) => `
               <span class="organizer-tariff-row" role="listitem">
@@ -818,11 +818,11 @@ function normalizeExternalUrl(value) {
         quotaRemaining.textContent = "Gezählt wird erst nach redaktioneller Freigabe.";
       }
     }
-    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V2 === */
+    /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
 
-/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 | Zweck: zeigt aktuelle Einreichungen mit Details und erlaubt Veranstaltern das Ändern noch nicht freigegebener Eventdaten direkt im Dashboard; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
+/* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
-  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Aktuelle Einreichungen";
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen & Status";
 }
 
 if (submissionsList && submissionsEmpty) {
@@ -1068,7 +1068,7 @@ if (submissionsList && submissionsEmpty) {
   submissionsList.innerHTML = "";
   submissionsEmpty.textContent = isSingleStatusView
     ? "Keine Einreichung gefunden."
-    : "Keine aktuellen Einreichungen gefunden.";
+    : "Noch keine aktuellen Einreichungen vorhanden.";
 
   if (!submissions.length) {
     submissionsEmpty.hidden = false;
@@ -1233,9 +1233,9 @@ if (submissionsList && submissionsEmpty) {
     hydrateIcons(submissionsList);
   }
 }
-/* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V1 === */
+/* === END BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY === */
   }
-  /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V1 === */
+  /* === END BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY === */
   /* === BEGIN BLOCK: ORGANIZER_PORTAL_DASHBOARD_HANDLER_LOGOUT_V3 | Zweck: lädt Dashboard-State und zeigt den Header-Abmelden-Button nur bei gültiger Session; Umfang: komplette handleDashboardPage-Funktion === */
   async function handleDashboardPage() {
     const logoutButton = document.getElementById("organizer-dashboard-logout");

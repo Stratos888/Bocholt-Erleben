@@ -34,6 +34,86 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert Review-/Push-Zugriffsschutz und fachliche Inbox-Flow-Einordnung; Umfang: Staging-Proof, Live-Proof, relevante Review-Fälle, bewusste Abgrenzung neuer Mitgliedschafts-Checkouts und offene Push-Versand-Grenzen === -->
+
+# Teststand: Review-/Push-Zugriffsschutz und Inbox-Flow-Einordnung
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Staging und Live
+- Funktion: Review-/Push-Zugriffsschutz, Inbox-Sichtbarkeit relevanter Review-Fälle, stille-Ausfall-Abgrenzung
+- relevante Stände:
+  - Staging: Commit `b858d2d` (`Harden push endpoint smoke checks`)
+  - Live/Main: Build `fb6efe5443b`
+- Ergebnis: bestanden für Zugriffsschutz und fachliche Inbox-Sichtbarkeit der relevanten Review-Fälle
+
+## Ziel der geprüften Funktion
+
+Nach einem STRATO-Deploy soll automatisch sichtbar sein, ob Review- und Push-Endpunkte versehentlich öffentlich erreichbar sind.
+
+Zusätzlich muss für die relevanten Review-Fälle belegt sein, dass Einreichungen nicht still verschwinden, sondern in der Review-Inbox sichtbar werden. Push ist dabei nur ein interner Hinweis, nicht die führende Datenquelle.
+
+## Automatisch geprüfte Endpunkte
+
+Bestanden:
+
+- `/api/submissions/review-list.php` ist ohne Review-Passwort nicht öffentlich erreichbar.
+- `/api/push/config.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/subscribe.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/test.php` ist ohne Berechtigung nicht öffentlich erreichbar.
+- `/api/push/notify-inbox.php` ist ohne Berechtigung bzw. Secret nicht öffentlich erreichbar.
+
+## Belegte Staging-Prüfung
+
+Bestanden mit Commit `b858d2d`:
+
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+- Alle Review-/Push-Zugriffsschutzchecks sind bestanden.
+
+## Belegte Live-/Main-Prüfung
+
+Bestanden mit Build `fb6efe5443b`:
+
+- GitHub-Actions-Schritt `Smoke-check deployed site` läuft grün durch.
+- Alle Review-/Push-Zugriffsschutzchecks sind bestanden.
+
+## Fachliche Inbox-Flow-Belege
+
+Bestanden / bereits dokumentiert:
+
+- Einzeltermin: Der Block `TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27` belegt Live-Einreichung, Review-Inbox-Sichtbarkeit, Zahlungsfreigabe, echte Stripe-Zahlung, Veröffentlichung und Cleanup.
+- Aktivitätspräsenz: Der Block `TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26` belegt Live-Einreichung, Erfolgsseite, Eingangs-Mail und Live-Inbox-Sichtbarkeit als `Aktivitätspräsenz`.
+- Event-Submission aus aktiver Mitgliedschaft: Die dokumentierten Membership-Reuse-Tests belegen, dass eine Formular-Einreichung mit aktiver Mitgliedschaft keinen neuen Stripe Checkout auslöst, in `submissions` landet, von `review-list.php` geliefert und in `/inbox/` mit Badge `Mitgliedschaft` angezeigt wird.
+- Neue Mitgliedschafts-Checkouts sind bewusst kein Review-Inbox-Fall. Sie starten den Abo-/Zahlungsflow; der spätere Review-Fall entsteht erst bei einer Event-Submission aus aktiver Mitgliedschaft.
+
+## Bewertung
+
+Der Roadmap-Punkt `Review-/Push-Flows gegen stille Ausfälle prüfen` ist für P0 erfüllt.
+
+Belegt ist: Die relevanten Review-Fälle erscheinen in der Review-Inbox. Die Review-Inbox ist die führende Arbeitsquelle; Push ist nur ein zusätzlicher interner Hinweis. Ein nicht empfangener Push ist deshalb kein stiller Verlust, solange die Review-Inbox korrekt ist.
+
+## Grenzen des Tests
+
+Nicht durch diesen Stand bewiesen:
+
+- tatsächlicher Push-Versand in Live
+- erzwungener technischer Push-Fehler während einer neuen Submission
+- echte Live-Zahlung für Aktivitätspräsenz nach Zahlungslink
+
+Diese Punkte sind keine Blocker für den stille-Ausfall-Proof. Der tatsächliche Push-Versand bleibt optional, solange die Review-Inbox zuverlässig ist.
+
+## Nächste Prüfschritte
+
+Für Roadmap-Punkt 5 ist kein weiterer P0-Test nötig.
+
+Später optional:
+
+- tatsächlichen Live-Push-Versand prüfen, falls Live-Push aktiv genutzt werden soll
+- echte Live-Zahlung für Aktivitätspräsenz separat testen, wenn der Activity-Abo-Zahlungsbeweis priorisiert wird
+
+<!-- === END BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_DEPLOY_SMOKE_CHECKS_2026_05_27 | Zweck: dokumentiert automatisierte Deploy-Smoke-Checks nach STRATO-Upload für Staging und Live; Umfang: Workflow-Schritt, geprüfte Endpunkte, Proof-Commits und offene Grenzen === -->
 
 # Teststand: Automatisierte Deploy-Smoke-Checks nach STRATO-Upload
@@ -288,6 +368,109 @@ Offen:
 - echter Live-Zahlungsfall als separater P0-Test
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_REPORTING_TARGET_EXPANSION_2026_05_27 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27 | Zweck: dokumentiert vollständigen Live-E2E-Test für Einzeltermin-Zahlung; Umfang: Einreichung, Review, Zahlungsfreigabe, Stripe-Zahlung, Veröffentlichung, Rücknahme/Cleanup === -->
+
+# Teststand: Live-Einzeltermin-Zahlung und Veröffentlichung
+
+## Stand
+
+- Datum: 2026-05-27
+- Umgebung: Live
+- Funktion: Einzeltermin-Funnel / Review-first-Zahlung / Stripe-Live-Zahlung / Veröffentlichung / Cleanup
+- getesteter Titel: `Bocholt erleben – Info-Nachmittag für Veranstalter`
+- getestetes Datum: `14.11.2026`
+- getesteter Betrag: `9,90 €`
+- Referenz aus Mail: `f006f9f1-672b-4a15-a4a3-783501649a69`
+- Ergebnis: bestanden
+
+## Ziel des Tests
+
+Geprüft wurde, ob ein echter Einzeltermin live vollständig durch den bezahlten Funnel laufen kann:
+
+Einreichung → redaktionelle Vorprüfung → Zahlungsfreigabe → Zahlungslink-Mail → Stripe-Zahlung → Erfolgsseite → veröffentlichungsbereit → Veröffentlichung → öffentliche Sichtbarkeit.
+
+Zusätzlich wurde geprüft, ob ein bereits veröffentlichter Zukunftstermin ohne direkte DB-Korrektur wieder aus der öffentlichen Sichtbarkeit genommen und sauber abgeschlossen werden kann.
+
+---
+
+## Bestandene Prüfung
+
+Bestanden:
+
+- Live-Einreichung über den Einzeltermin-Funnel funktioniert.
+- Erfolgsseite nach Einreichung zeigt korrekt:
+  - Veranstaltung wurde zur Prüfung eingereicht.
+  - Zahlung folgt erst nach Prüfung per Zahlungslink.
+- Bestätigungsmail nach Einreichung kommt an.
+- Einreichung erscheint in der Review-Inbox mit Status sinngemäß `Neu eingereicht / Vorprüfung offen`.
+- Button `Zur Zahlung freigeben` funktioniert.
+- Inbox meldet:
+  - Zahlungslink wurde versendet.
+  - Veröffentlichung ist erst nach bestätigter Zahlung möglich.
+- Zahlungslink-Mail kommt an.
+- Stripe-Checkout öffnet live mit:
+  - Produkt/Leistung: Einzeltermin veröffentlichen
+  - Betrag: `9,90 €`
+- Stripe-Zahlung wurde erfolgreich abgeschlossen.
+- Erfolgsseite nach Zahlung zeigt korrekt:
+  - Zahlung wurde abgeschlossen.
+  - Veröffentlichung erfolgt erst nach finaler redaktioneller Freigabe.
+- Inbox zeigt danach Status sinngemäß:
+  - `Bezahlt / veröffentlichungsbereit`
+- Button `Veröffentlichen` funktioniert.
+- Inbox meldet erfolgreiche Veröffentlichung.
+- Veröffentlichungsmail kommt an.
+- Event ist danach im öffentlichen Eventbereich sichtbar.
+
+---
+
+## Bestandener Cleanup-/Rücknahme-Test
+
+Bestanden:
+
+- Der veröffentlichte Testtermin wurde über den Veranstalterbereich nachträglich geändert.
+- Die Änderung führte zur erneuten redaktionellen Prüfung.
+- Der Termin verschwand danach aus der öffentlichen Eventsuche.
+- In der Review-Inbox erschien der Eintrag wieder mit Review-Risiko:
+  - vom Veranstalter nachträglich geändert
+- Ablehnung aus der Review-Inbox funktioniert.
+- Ablehnungsgrund `SONSTIGES` wurde gesetzt.
+- Ablehnungsmail kommt an.
+- Der Testtermin ist damit nicht mehr öffentlich sichtbar und abgeschlossen.
+
+---
+
+## Bewertung
+
+Der P0-Live-Zahlungsfall für Einzeltermine ist praktisch bewiesen.
+
+Belegt ist insbesondere:
+
+- Review-first statt Sofortzahlung funktioniert live.
+- Zahlungsfreigabe per Review funktioniert live.
+- Zahlungslink-Mail funktioniert live.
+- Stripe-Live-Zahlung funktioniert mit korrektem Betrag.
+- Erfolgsseite nach Zahlung funktioniert.
+- Veröffentlichungsbereitschaft nach Zahlung wird korrekt erreicht.
+- Finale Veröffentlichung funktioniert.
+- Öffentliche Sichtbarkeit nach Veröffentlichung funktioniert.
+- Rücknahme aus öffentlicher Sichtbarkeit durch Veranstalteränderung funktioniert ohne manuelle DB-Korrektur.
+- Abschluss/Ablehnung nach Rücknahme funktioniert.
+
+Damit ist der bezahlte Einzeltermin-Kernfluss für spätere Akquise belastbar.
+
+---
+
+## Offene Folgepunkte
+
+Noch separat zu prüfen:
+
+- Mitgliedschafts-/Abo-Live-Test, falls aktive Vermarktung der Mitgliedschaft breiter gestartet wird.
+- `past_due` und echtes Periodenende bleiben gesonderte Stripe-/Billing-Fälle.
+- Test-/Proofstand in Roadmap berücksichtigen, aber keine weitere Codeänderung aus diesem Test ableiten.
+
+<!-- === END BLOCK: TEST_STATUS_LIVE_SINGLE_EVENT_PAYMENT_2026_05_27 === -->
 
 # Teststand: Veranstalter-Funnel + Kuratier-PWA-Review-Bridge
 
@@ -1445,3 +1628,35 @@ Weitere Änderungen nur noch bei:
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
 <!-- === END FILE: TEST_STATUS.md === -->
+
+<!-- === BEGIN BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand für Public-UX-Copy und Anbieterbereich-Wertzentrum; Umfang: reiner Test-/Statusnachweis ohne technische Änderung === -->
+## Public UX & Anbieterbereich-Wertzentrum – Staging-Proof 2026-05-28
+
+Status: bestanden.
+
+Geprüfter Scope:
+- Public-Copy für `/events-veroeffentlichen/`
+- Public-Copy für `/fuer-veranstalter/`
+- Anbieterbereich-Copy für `/fuer-veranstalter/dashboard/`
+
+Geprüfte Commits auf `staging`:
+- `b0b23b0` – Hero-Lead der Veranstalterseite geglättet
+- `036bac0` – Anbieterbereich als Wertzentrum gestärkt
+- `5c0f0a3` – Anbieterbereich-Copy im Dashboard-JS aktualisiert
+
+Staging-Prüfung:
+- Dashboard-HTML lädt aktualisierten Script-Cache-Buster `organizer-portal.js?v=5c0f0a3a6489`.
+- Browserprüfung ohne Cache-Buster erfolgreich.
+- Sichtbar bestätigt:
+  - `Kontakt & Organisation`
+  - `Tarife & Veröffentlichungen`
+  - `Aktive Tarife`
+  - `Einreichungen & Status`
+  - Hero-Lead mit `Einreichungen, Veröffentlichungsstatus und Mitgliedschaft`
+
+Bewertung:
+- Public-UX-Copy-Schritt ist freigabefähig.
+- Anbieterbereich-Wertzentrum v1 ist freigabefähig.
+- Keine CSS-, Backend-, Tracking-, Stripe- oder Datenmodelländerung erforderlich.
+<!-- === END BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 === -->
+
