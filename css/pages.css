@@ -1511,11 +1511,17 @@ select.content-field__control{
 }
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-next-step{
+  margin-block: 0;
+  padding: 0.62rem 0.72rem;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 0.82rem;
+  background: rgba(255,255,255,0.44);
   color: var(--color-text-secondary);
   font-size: 0.88rem;
   font-weight: 400;
   line-height: 1.45;
 }
+
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
@@ -1543,6 +1549,50 @@ select.content-field__control{
   display: grid;
   gap: 3px;
   min-width: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge{
+  flex: 0 0 auto;
+  padding: 0.18rem 0.46rem;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 520;
+  line-height: 1.15;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.58);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--success{
+  border-color: color-mix(in srgb, var(--color-primary) 38%, var(--cmp-divider-strong));
+  color: var(--color-primary-strong);
+  background: color-mix(in srgb, var(--color-primary-muted) 38%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--warning{
+  border-color: color-mix(in srgb, #9a6a00 34%, var(--cmp-divider-strong));
+  color: #795100;
+  background: color-mix(in srgb, #f4cf7a 30%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--danger{
+  border-color: color-mix(in srgb, #a33a2b 34%, var(--cmp-divider-strong));
+  color: #8a2c20;
+  background: color-mix(in srgb, #e8a39a 24%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--neutral{
+  color: var(--color-text-primary);
+  background: rgba(255,255,255,0.72);
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__title{

@@ -24,7 +24,7 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
-  <link rel="stylesheet" href="/css/style.css?v=2026-05-28-dashboard-owner-cleanup-1">
+  <link rel="stylesheet" href="/css/style.css?v=2026-05-28-dashboard-action-badges-1">
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_HEAD_V4_VALUE_CENTER_COPY === -->
 </head>
 
@@ -85,7 +85,7 @@
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_COPY_V4_VALUE_CENTER_COPY | Zweck: benennt die Dashboard-Liste als Einreichungen mit Status statt reine Verwaltungsliste; Umfang: statischer Einreichungslisten-Block === -->
     <section class="content-card content-card--primary" id="organizer-dashboard-submissions-card" aria-labelledby="organizer-dashboard-submissions-head" hidden>
-      <h2 id="organizer-dashboard-submissions-head">Einreichungen & Status</h2>
+      <h2 id="organizer-dashboard-submissions-head">Einreichungen</h2>
       <p id="organizer-dashboard-submissions-summary">Status wird geladen.</p>
       <div class="organizer-submission-summary-grid" id="organizer-dashboard-submissions-overview" role="list"></div>
       <p class="content-note" id="organizer-dashboard-next-step">Nächster Schritt wird geladen.</p>
@@ -96,19 +96,19 @@
 
     <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY | Zweck: benennt Stammdaten und Veröffentlichungsübersicht klarer als Wertzentrum ohne neue Datenlogik; Umfang: beide Summary-Karten === -->
     <div class="content-grid content-grid--2" id="organizer-dashboard-summary" hidden>
-      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
-        <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
-        <p id="organizer-account-name">–</p>
-        <p id="organizer-account-email">–</p>
-        <p id="organizer-account-plan" hidden>–</p>
-      </section>
-
       <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-quota-head">
         <h2 id="organizer-dashboard-quota-head">Tarife & Veröffentlichungen</h2>
         <p id="organizer-quota-period">–</p>
         <p id="organizer-quota-change" hidden>–</p>
         <p id="organizer-quota-summary">–</p>
         <p id="organizer-quota-remaining">–</p>
+      </section>
+
+      <section class="content-card content-card--primary" aria-labelledby="organizer-dashboard-account-head">
+        <h2 id="organizer-dashboard-account-head">Meine Angaben</h2>
+        <p id="organizer-account-name">–</p>
+        <p id="organizer-account-email">–</p>
+        <p id="organizer-account-plan" hidden>–</p>
       </section>
     </div>
     <!-- === END BLOCK: ORGANIZER_DASHBOARD_SUMMARY_HEADINGS_COPY_V5_VALUE_CENTER_COPY === -->
@@ -143,7 +143,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY | Zweck: lädt die aktualisierte Dashboard-Copy für Einreichungen, Veröffentlichungsstatus und Mitgliedschaft; Umfang: organizer-portal.js Script-Referenz === -->
-  <script src="/js/organizer-portal.js?v=2026-05-28-dashboard-hierarchy-1" defer></script>
+  <script src="/js/organizer-portal.js?v=2026-05-28-dashboard-actions-badges-1" defer></script>
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_PORTAL_SCRIPT_CACHE_BUST_V5_VALUE_CENTER_COPY === -->
   <!-- === END BLOCK: ORGANIZER_DASHBOARD_BODY_V2_AREA_SPLIT === -->
 </body>

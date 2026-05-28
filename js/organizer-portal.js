@@ -99,6 +99,35 @@
     return formatStatusLabel(statusKey);
   }
 
+  function formatSubmissionKindLabel(submission) {
+    return safeText(submission?.submission_kind || "event").toLowerCase() === "activity"
+      ? "Aktivität"
+      : "Veranstaltung";
+  }
+
+  function formatSubmissionBadgeLabel(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+
+    if (statusKey === "approved") return "Veröffentlicht";
+    if (statusKey === "rejected") return "Abgelehnt";
+    if (statusKey === "payment_released" || statusKey === "checkout_started") return "Zahlung offen";
+    if (statusKey === "pending_review" || statusKey === "paid" || statusKey === "in_review") return "In Prüfung";
+    if (statusKey === "draft") return "Entwurf";
+
+    return formatStatusLabel(statusKey);
+  }
+
+  function formatSubmissionBadgeTone(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+
+    if (statusKey === "approved") return "success";
+    if (statusKey === "rejected") return "danger";
+    if (statusKey === "payment_released" || statusKey === "checkout_started") return "warning";
+    if (statusKey === "pending_review" || statusKey === "paid" || statusKey === "in_review") return "neutral";
+
+    return "muted";
+  }
+
   function formatDate(value) {
     const text = safeText(value);
     if (!text) return "–";
@@ -701,11 +730,13 @@ function normalizeExternalUrl(value) {
     `).join("");
 
     if (paymentOpenCount > 0) {
-      nextStep.textContent = "Es gibt mindestens eine Einreichung mit offenem Zahlungsschritt.";
+      nextStep.textContent = `Handlungsbedarf: ${formatInteger(paymentOpenCount)} Einreichung${paymentOpenCount === 1 ? "" : "en"} mit offenem Zahlungsschritt.`;
     } else if (reviewCount > 0) {
-      nextStep.textContent = "Einreichungen sind in Prüfung. Du musst aktuell nichts tun.";
+      nextStep.textContent = `Kein Handlungsbedarf: ${formatInteger(reviewCount)} Einreichung${reviewCount === 1 ? "" : "en"} ${reviewCount === 1 ? "ist" : "sind"} in Prüfung.`;
+    } else if (rejectedCount > 0) {
+      nextStep.textContent = "Kein akuter Handlungsbedarf. Abgelehnte Einreichungen bleiben zur Nachverfolgung sichtbar.";
     } else {
-      nextStep.textContent = "Du kannst neue Inhalte einreichen oder bestehende Einreichungen unten prüfen.";
+      nextStep.textContent = "Kein Handlungsbedarf. Du kannst neue Inhalte einreichen oder bestehende Einreichungen unten prüfen.";
     }
   }
   /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
@@ -1036,7 +1067,7 @@ function normalizeExternalUrl(value) {
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
-  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen & Status";
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen";
 }
 
 if (submissionsList && submissionsEmpty) {
@@ -1293,7 +1324,12 @@ if (submissionsList && submissionsEmpty) {
       const titleText = safeText(submission.title) || "Ohne Titel";
       const statusText = formatSubmissionStatusLabel(submission);
       const metaDateText = formatSubmissionMetaDate(submission);
-      const metaText = `${statusText} · ${metaDateText}`;
+      const statusBadgeText = formatSubmissionBadgeLabel(submission);
+      const statusBadgeTone = formatSubmissionBadgeTone(submission);
+      const kindText = formatSubmissionKindLabel(submission);
+      const metaText = metaDateText && metaDateText !== "–"
+        ? `${kindText} · ${metaDateText}`
+        : kindText;
       const statusDescription = formatSubmissionStatusDescription(submission);
       const eventUrl = normalizeExternalUrl(submission.event_url || submission.ticket_url);
       const detailId = `organizer-submission-detail-${index}`;
@@ -1309,7 +1345,10 @@ if (submissionsList && submissionsEmpty) {
 
       row.innerHTML = `
         <span class="content-link__label organizer-submission-row__label">
-          <strong class="organizer-submission-row__title">${escapeHtml(titleText)}</strong>
+          <span class="organizer-submission-row__head">
+            <strong class="organizer-submission-row__title">${escapeHtml(titleText)}</strong>
+            <span class="organizer-submission-status-badge organizer-submission-status-badge--${escapeHtml(statusBadgeTone)}">${escapeHtml(statusBadgeText)}</span>
+          </span>
           <small class="organizer-submission-row__meta">${escapeHtml(metaText)}</small>
         </span>
         <span class="content-link__chevron organizer-submission-row__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
