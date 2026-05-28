@@ -1,6 +1,6 @@
 /* === BEGIN BLOCK: CSS_AGGREGATOR_ACTIVITY_FILTERBAR_ENTERPRISE_CACHE_V3 | Zweck: synchronisiert die zentrale CSS-Import-Kette mit dem finalen Desktop-Activities-Filterbar-Polish; Umfang: nur Cache-Buster der bestehenden CSS-Imports === */
 @import url("/css/base.css?v=2");
-@import url("/css/pages.css?v=2026-05-18-activity-presence-enterprise-final-1");
+@import url("/css/pages.css?v=2026-05-28-dashboard-owner-cleanup-1");
 @import url("/css/components.css?v=2026-05-06-header-hub-1");
 @import url("/css/home.css?v=2026-05-26-activities-desktop-surface-v4");
 @import url("/css/overlays.css?v=2026-05-09-organizer-ui-polish-1");
