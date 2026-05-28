@@ -1628,3 +1628,35 @@ Weitere Änderungen nur noch bei:
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
 <!-- === END FILE: TEST_STATUS.md === -->
+
+<!-- === BEGIN BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand für Public-UX-Copy und Anbieterbereich-Wertzentrum; Umfang: reiner Test-/Statusnachweis ohne technische Änderung === -->
+## Public UX & Anbieterbereich-Wertzentrum – Staging-Proof 2026-05-28
+
+Status: bestanden.
+
+Geprüfter Scope:
+- Public-Copy für `/events-veroeffentlichen/`
+- Public-Copy für `/fuer-veranstalter/`
+- Anbieterbereich-Copy für `/fuer-veranstalter/dashboard/`
+
+Geprüfte Commits auf `staging`:
+- `b0b23b0` – Hero-Lead der Veranstalterseite geglättet
+- `036bac0` – Anbieterbereich als Wertzentrum gestärkt
+- `5c0f0a3` – Anbieterbereich-Copy im Dashboard-JS aktualisiert
+
+Staging-Prüfung:
+- Dashboard-HTML lädt aktualisierten Script-Cache-Buster `organizer-portal.js?v=5c0f0a3a6489`.
+- Browserprüfung ohne Cache-Buster erfolgreich.
+- Sichtbar bestätigt:
+  - `Kontakt & Organisation`
+  - `Tarife & Veröffentlichungen`
+  - `Aktive Tarife`
+  - `Einreichungen & Status`
+  - Hero-Lead mit `Einreichungen, Veröffentlichungsstatus und Mitgliedschaft`
+
+Bewertung:
+- Public-UX-Copy-Schritt ist freigabefähig.
+- Anbieterbereich-Wertzentrum v1 ist freigabefähig.
+- Keine CSS-, Backend-, Tracking-, Stripe- oder Datenmodelländerung erforderlich.
+<!-- === END BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 === -->
+
