@@ -664,9 +664,9 @@ function normalizeExternalUrl(value) {
         ["Status", latestSubmission ? formatStatusLabel(latestSubmission.status) : "–"],
         ["Ort", latestSubmission ? (safeText(latestSubmission.location_name) || "–") : "–"]
       ].map(([label, value]) => `
-        <span class="organizer-tariff-row" role="listitem">
-          <span class="organizer-tariff-label">${escapeHtml(label)}</span>
-          <span class="organizer-tariff-price">${escapeHtml(value)}</span>
+        <span class="organizer-submission-summary-item" role="listitem">
+          <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
+          <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
         </span>
       `).join("");
 
@@ -686,7 +686,7 @@ function normalizeExternalUrl(value) {
     const rejectedCount = submissions.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length;
     const areaLabel = organizerSubmissionAreaLabel(activeSubscriptions, submissions, context?.isActivityPlanView);
 
-    summary.textContent = `${areaLabel}. ${formatInteger(visibleCount)} sichtbar, ${formatInteger(reviewCount)} in Prüfung.`;
+    summary.textContent = `${areaLabel} · ${formatInteger(visibleCount)} sichtbar · ${formatInteger(reviewCount)} in Prüfung`;
 
     overview.innerHTML = [
       ["Sichtbar", formatInteger(visibleCount)],
@@ -694,9 +694,9 @@ function normalizeExternalUrl(value) {
       ["Zahlung offen", formatInteger(paymentOpenCount)],
       ["Abgelehnt", formatInteger(rejectedCount)]
     ].map(([label, value]) => `
-      <span class="organizer-tariff-row" role="listitem">
-        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
-        <span class="organizer-tariff-price">${escapeHtml(value)}</span>
+      <span class="organizer-submission-summary-item" role="listitem">
+        <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
+        <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
       </span>
     `).join("");
 
