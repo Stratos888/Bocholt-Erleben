@@ -903,7 +903,12 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
 
-    renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView);
+    const hasActivityPresencePlan = activeSubscriptions.some((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      return planKey === "activity_basic" || planKey === "activity_plus";
+    });
+
+    renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView || hasActivityPresencePlan);
 
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
