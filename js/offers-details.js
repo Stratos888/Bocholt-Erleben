@@ -23,24 +23,30 @@ const OfferDetailPanel = {
   init() {
     if (this._isInit) return;
 
-    const root = document.getElementById("offer-detail-root");
-    if (!root) return;
+    const existingPanel = document.getElementById("event-detail-panel");
 
-    root.innerHTML = `
-      <div id="event-detail-panel" class="detail-panel hidden" hidden>
-        <div class="detail-panel-overlay"></div>
-        <div class="detail-panel-content">
-          <div class="detail-panel-grabber" aria-hidden="true"></div>
-          <button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
-          <div class="detail-panel-body">
-            <div id="detail-content"></div>
+    if (!existingPanel) {
+      const root = document.getElementById("offer-detail-root");
+      if (!root) return;
+
+      root.innerHTML = `
+        <div id="event-detail-panel" class="detail-panel hidden" hidden>
+          <div class="detail-panel-overlay"></div>
+          <div class="detail-panel-content">
+            <div class="detail-panel-grabber" aria-hidden="true"></div>
+            <button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
+            <div class="detail-panel-body">
+              <div id="detail-content"></div>
+            </div>
           </div>
         </div>
-      </div>
-    `.trim();
+      `.trim();
 
-    if (window.Icons && typeof window.Icons.hydrate === "function") {
-      window.Icons.hydrate(root);
+      if (window.Icons && typeof window.Icons.hydrate === "function") {
+        window.Icons.hydrate(root);
+      }
+    } else if (window.Icons && typeof window.Icons.hydrate === "function") {
+      window.Icons.hydrate(existingPanel);
     }
 
     this.panel = document.getElementById("event-detail-panel");
