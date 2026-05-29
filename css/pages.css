@@ -1194,9 +1194,7 @@ select.content-field__control{
 
 :is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__label,
 .page--publish .publish-explainer-card-link .content-link__label{
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 :is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__chevron,
