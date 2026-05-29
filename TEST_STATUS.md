@@ -34,6 +34,126 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert den Staging-Proof der zentralen Veröffentlichungserklärung und der kontextuellen Hilfelinks; Umfang: Informationsarchitektur, Mobile-/Desktop-UX, Ankerverhalten, Link-Hierarchie, Abgrenzung zu Funnel-/Checkout-Logik === -->
+
+# Teststand: Veröffentlichungserklärung und kontextuelle Hilfelinks
+
+## Stand
+
+- Datum: 2026-05-29
+- Umgebung: Staging
+- Funktion: zentrale Erklärseite `/veroeffentlichung-erklaert/` plus kontextuelle Hilfelinks aus den Veranstalter-/Anbieter-Funnels
+- relevante Staging-Commits:
+  - `faebbe4` — zentrale Erklärseite angelegt
+  - `1584e8f` — Ankerziele der Veröffentlichungserklärung korrigiert
+  - `626584d` — Scroll-Offset für Erklärseiten-Anker korrigiert
+  - `9afede6` — Link-Hierarchie der Veröffentlichungserklärung poliert
+  - `563c130` — Unterstreichung bei Erklärlinks entfernt
+- Ergebnis: bestanden / für den aktuellen Spitzenstand gefreezt
+
+## Ziel der geprüften Funktion
+
+Die bestehenden Funnel-Seiten sollen kurz, mobil-tauglich und handlungsorientiert bleiben.
+
+Tiefe Erklärungen zu Prüfung, Freigabe, Zahlung, Fairness, Aktivitätspräsenz und messbarem Mehrwert werden nicht redundant auf mehrere Funnel-Seiten verteilt, sondern zentral auf `/veroeffentlichung-erklaert/` gebündelt.
+
+## Geprüfte Seiten und Verbindungen
+
+Bestanden:
+
+- `/events-veroeffentlichen/`
+  - Kontextlink `Unsicher, welcher Weg passt? Veröffentlichung einfach erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#welcher-weg-passt`
+- `/fuer-veranstalter/`
+  - Kontextlink `Fragen zu Prüfung, Freigabe und veröffentlichten Terminen? Ablauf kurz erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#zahlung-und-freigabe`
+- `/angebote/sichtbar-werden/`
+  - Kontextlink `Nicht sicher, ob dein Angebot eine Aktivität oder Veranstaltung ist? Unterschied kurz erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#aktivitaet-oder-veranstaltung`
+- `/ueber/`
+  - dezenter Querverweis zur neuen Veröffentlichungserklärung
+- `/veroeffentlichung-erklaert/`
+  - zentrale Erklärung lädt auf Staging
+  - Rückwege zu Veranstaltung, Mitgliedschaft und Aktivitätspräsenz funktionieren
+  - FAQ-/Details-Elemente sind scanbar
+  - Hash-Ziele öffnen passende FAQ-Punkte automatisch
+  - Scroll-Offset hält Zielüberschrift unter dem sticky Header sichtbar
+  - Link-Hierarchie unterscheidet Hilfelinks klar von Haupt-CTAs
+
+## UX-Bewertung
+
+Bestanden:
+
+- Mobile:
+  - Funnel-Seiten bleiben kurz.
+  - Hilfelinks sind sichtbar, aber nicht dominant.
+  - Keine altbackene Unterstreichung bei appartigen Navigationslinks.
+  - Ankerziele landen inhaltlich richtig und mit sichtbarer Zielüberschrift.
+- Desktop:
+  - Erklärseite wirkt ruhig und strukturiert.
+  - obere Rückwege wirken nicht mehr wie dominante CTA-Buttons.
+  - FAQ und Abschlussnavigation sind geordnet.
+- Informationsarchitektur:
+  - Funnel-Seiten erklären nur kurz und verlinken bei Bedarf.
+  - Die neue Seite übernimmt Tiefe und Vertrauen.
+  - Keine Pop-up-/Modal-Lösung nötig.
+  - Keine redundanten FAQ-Blöcke auf mehreren Funnel-Seiten.
+
+## Bewusste Nicht-Prüfung
+
+Nicht betroffen und nicht neu getestet:
+
+- Formularvalidierung
+- Stripe Checkout
+- Webhooks
+- Review-Inbox-Funktionen
+- Magic-Link-Login
+- Anbieter-Dashboard
+- Datenbankstatus
+- Veröffentlichung aus der Inbox
+
+Begründung: Der Workpack hat nur statische Seitenstruktur, Links, CSS-Hierarchie, Sitemap und Erklärinhalt verändert. Funnel-, Backend- und Zahlungslogik wurden nicht angefasst.
+
+## Bewertung
+
+Der Roadmap-Punkt `Veranstalter-Funnel stärker auf belegbaren Mehrwert ausrichten` ist für den aktuellen Stand erfüllt.
+
+Erfüllt sind:
+
+- seriöse lokale Kommunikation
+- keine unbelegten Reichweitenversprechen
+- Mehrwert als Dienstleistung erklärt:
+  - Prüfung
+  - Aufbereitung
+  - Sichtbarkeit
+  - faire Darstellung
+  - vorsichtig eingeordnete messbare Interaktionen
+- bestehende Funnel-Seiten bleiben minimal-invasiv verändert
+- neue zentrale Erklärseite vermeidet Redundanz und mobile Überlänge
+
+## Offene Punkte
+
+Keine offenen Entwicklungsblocker für diesen Workpack.
+
+Später separat möglich, aber nicht Teil dieses Freezes:
+
+- echte Anbieter-/Location-Berichte aus Nutzwertdaten weiter ausbauen
+- monatlichen Wertbericht vorbereiten
+- weitere konkrete Reporting-Ziele ergänzen
+- Live nach Main-Rollout kurz smoke-testen
+
+## Live-Rollout-Hinweise
+
+Nach Merge/Main-Deploy nur Smoke prüfen:
+
+- `/veroeffentlichung-erklaert/` lädt.
+- Kontextlinks aus `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/angebote/sichtbar-werden/` führen zu den passenden Abschnitten.
+- FAQ-Anker öffnen den passenden Punkt.
+- Zielüberschrift bleibt unter dem Header sichtbar.
+- Sitemap enthält `/veroeffentlichung-erklaert/`.
+
+<!-- === END BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert Review-/Push-Zugriffsschutz und fachliche Inbox-Flow-Einordnung; Umfang: Staging-Proof, Live-Proof, relevante Review-Fälle, bewusste Abgrenzung neuer Mitgliedschafts-Checkouts und offene Push-Versand-Grenzen === -->
 
 # Teststand: Review-/Push-Zugriffsschutz und Inbox-Flow-Einordnung

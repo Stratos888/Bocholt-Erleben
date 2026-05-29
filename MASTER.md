@@ -75,6 +75,7 @@ The following workpack is intentionally on hold:
 - `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
 - `/fuer-veranstalter/` is the canonical organizer membership route.
 - `/ueber/` is the canonical trust/explanation page.
+- `/veroeffentlichung-erklaert/` is the canonical central explanation route for publication, review, payment/freigabe, fairness and activity-vs-event distinction.
 - `/info/` is legacy backup/redirect only and is not the current canonical information hub.
 - Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages unless explicitly promoted.
 - Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture.

@@ -317,6 +317,37 @@ Akzeptanzkriterien:
 
 ### 7. Veranstalter-Funnel stärker auf belegbaren Mehrwert ausrichten
 
+<!-- === BEGIN BLOCK: ROADMAP_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert die Umsetzung des P1-Punkts zur stärkeren Mehrwert-Erklärung im Veranstalter-/Anbieter-Funnel; Umfang: zentrale Erklärseite, Kontextlinks, Redundanz- und Funnel-Abgrenzung === -->
+
+Status 2026-05-29:
+
+- Umgesetzt und auf Staging geprüft.
+- Neue zentrale Erklärseite: `/veroeffentlichung-erklaert/`.
+- Bestehende Funnel-Seiten bleiben kurz und handlungsorientiert:
+  - `/events-veroeffentlichen/`
+  - `/fuer-veranstalter/`
+  - `/angebote/sichtbar-werden/`
+- Die bestehenden Seiten wurden nur minimal-invasiv um kontextuelle Hilfelinks ergänzt.
+- Die neue Erklärseite bündelt:
+  - Veröffentlichungswege
+  - Prüfung und Freigabe
+  - Zahlung und veröffentlichte Termine
+  - Veranstaltung vs. Aktivitätspräsenz
+  - Fairness ohne gekaufte Hervorhebung
+  - vorsichtige Einordnung messbarer Interaktionen
+- Ankerziele, FAQ-Öffnung, Scroll-Offset und Link-Hierarchie wurden nach Staging-Prüfung nachgeschärft.
+- Ergebnis: Workpack ist für den aktuellen Spitzenstand gefreezt.
+- Details und getestete Grenzen sind in `TEST_STATUS.md` dokumentiert.
+
+Bewertung:
+
+- P1 Punkt 7 ist für den aktuellen Stand erledigt.
+- Kein weiterer Copy-/UI-Ausbau an den Funnel-Seiten nötig.
+- Keine Formular-, Checkout-, Stripe-, Review- oder Dashboard-Logik wurde verändert.
+- Nächster fachlicher Anschluss bleibt der messbare Nutzennachweis über Bericht/Reporting, nicht weiterer Erklärtext.
+
+<!-- === END BLOCK: ROADMAP_PUBLISH_EXPLAINER_FREEZE_2026_05_29 === -->
+
 Ziel:
 
 - `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/angebote/sichtbar-werden/` erklären klarer, welchen konkreten Nutzen Anbieter bekommen.
