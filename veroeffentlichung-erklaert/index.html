@@ -148,7 +148,7 @@
             </a>
           </div>
         </li>
-        <li id="aktivitaet-oder-veranstaltung">
+        <li id="aktivitaetspraesenz-weg">
           <strong>Aktivitätspräsenz</strong>
           <span>Für dauerhaft verfügbare oder regelmäßig buchbare Angebote, nicht für einzelne Termine.</span>
           <div class="content-actions content-actions--inline">
@@ -192,7 +192,7 @@
         <p class="content-note">Die wichtigsten Details zur Veröffentlichung, ohne die Einreichungsseiten länger zu machen.</p>
       </div>
 
-      <details class="publish-optional-fields" id="zahlung-und-freigabe" open>
+      <details class="publish-optional-fields" id="zahlung-und-freigabe">
         <summary>Zahlung und Freigabe</summary>
         <div class="publish-optional-fields__body">
           <p class="content-note">
@@ -213,7 +213,7 @@
         </div>
       </details>
 
-      <details class="publish-optional-fields">
+      <details class="publish-optional-fields" id="aktivitaet-oder-veranstaltung">
         <summary>Veranstaltung oder Aktivitätspräsenz?</summary>
         <div class="publish-optional-fields__body">
           <p class="content-note">
@@ -272,6 +272,23 @@
     </section>
   </main>
 
+  <!-- === BEGIN BLOCK: PUBLISH_EXPLAINER_HASH_DETAILS_OPEN_V1 | Zweck: öffnet ein verlinktes FAQ-Details-Element automatisch, damit Kontextlinks direkt zur erklärenden Antwort führen; Umfang: nur diese Erklärseite === -->
+  <script>
+    (function () {
+      function openTargetDetails() {
+        var hash = window.location.hash ? window.location.hash.slice(1) : "";
+        var target = hash ? document.getElementById(hash) : null;
+
+        if (target && target.tagName && target.tagName.toLowerCase() === "details") {
+          target.open = true;
+        }
+      }
+
+      window.addEventListener("hashchange", openTargetDetails);
+      document.addEventListener("DOMContentLoaded", openTargetDetails);
+    }());
+  </script>
+  <!-- === END BLOCK: PUBLISH_EXPLAINER_HASH_DETAILS_OPEN_V1 === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
