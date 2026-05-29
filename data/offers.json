@@ -2338,6 +2338,103 @@
           "Wochenende"
         ]
       }
+    },
+    {
+      "id": "proebstingsee-borken-erleben",
+      "title": "Pröbstingsee Borken erleben",
+      "kategorie": "Freizeit & Familie",
+      "location": "Pröbstingsee, Borken-Hoxfeld",
+      "reporting_target": {
+        "type": "location",
+        "id": "proebstingsee-borken",
+        "title": "Pröbstingsee Borken"
+      },
+      "maps_query": "Parkplatz Pröbstinger Allee, 46325 Borken-Hoxfeld",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Der Pröbstingsee ist ein Naherholungsgebiet mit Badestelle, Sandstrand, Spielmöglichkeiten, Rundwegen, Planetenweg und Pröbstinger Busch.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Proebstingsee.php",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Tretboote%20am%20Pr%C3%B6bstingsee%20Borken.jpg",
+      "image_position_x": "50%",
+      "image_position_y": "54%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Tretboote_am_Pr%C3%B6bstingsee_Borken.jpg",
+      "image_author": "Tetzemann",
+      "image_license": "CC0 1.0",
+      "image_credit": "Tetzemann, CC0 1.0, via Wikimedia Commons",
+      "tags": [
+        "Badestelle",
+        "Sandstrand",
+        "Planetenweg",
+        "Pröbstinger Busch"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Spielplatz",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken",
+          "Sport & Bewegung",
+          "Radfahren"
+        ],
+        "features": [
+          "Spielplatz",
+          "Wasser",
+          "Café",
+          "Baden",
+          "Rundweg",
+          "Aussicht"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
+      "duration": "1–4 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig; Baden saisonal",
+      "cardFacts": [
+        "1–4 Std",
+        "Outdoor",
+        "See & Spielplatz"
+      ],
+      "recommendation": {
+        "availability": "seasonal",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous",
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Sport & Bewegung",
+          "Kurz & spontan",
+          "Wochenende",
+          "Café / Einkehr",
+          "Wasser",
+          "Spielplatz",
+          "Baden"
+        ]
+      }
     }
   ]
 }
