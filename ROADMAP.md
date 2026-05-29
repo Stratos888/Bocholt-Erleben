@@ -395,21 +395,353 @@ Nächster aktiver Anschluss:
 
 ## P2 — Nutzerprodukt weiter Richtung Discovery-Portal ausbauen
 
-### 9. `Heute in Bocholt` als eigener Discovery-Workpack
+### 9. `Für dich in Bocholt` – intelligente Premium-Home
 
-Ziel:
+<!-- === BEGIN BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 | Zweck: ersetzt den einfachen Heute-/Discovery-Workpack durch einen Premium-Produktvertrag für eine intelligente Startseite; Umfang: Home-Architektur, Empfehlungsmodell, lokale Personalisierung, Wetter, Datenvorbereitung, Abgrenzungen === -->
 
-- Nutzer finden schneller passende Dinge für konkrete Situationen.
+Status 2026-05-29:
 
-Mögliche Einstiege:
+- Der bisherige Ansatz `Heute in Bocholt` als reiner Discovery-/Filter-Workpack ist zu klein und teilweise redundant zum bestehenden Eventfeed.
+- Die aktuelle mobile Eventansicht enthält bereits Suche, Zeitfilter, Kategorien sowie Gruppen wie `Heute` und `Dieses Wochenende`.
+- Ein zusätzlicher Heute-/Wochenende-Block wäre daher kein Premium-Mehrwert.
+- Der neue Zielzustand ist eine echte intelligente Home: `Für dich in Bocholt`.
 
-- Heute
-- Morgen
-- Wochenende
-- Mit Kindern
-- Draußen
-- Bei Regen
-- kostenlos / günstig
-- Aktivitäten ohne festen Termin
+Produktentscheidung:
 
-Warum:
+- `/` wird perspektivisch zur kompakten Entscheidungsseite `Für dich in Bocholt`.
+- Die bestehende Eventlogik bleibt als eigene Such-/Durchblätterseite erhalten.
+- Die bestehende Aktivitätenseite bleibt als eigene Such-/Durchblätterseite erhalten.
+- Die Home beantwortet nicht primär `Welche Termine gibt es?`, sondern `Was passt heute oder am Wochenende für mich in Bocholt?`
+
+Zielbild:
+
+- Die Startseite kombiniert Events und Aktivitäten in einem gemeinsamen Empfehlungsfeed.
+- Nutzer erhalten schnell konkrete Vorschläge für:
+  - heute
+  - heute Abend
+  - Wochenende
+  - Familie / mit Kindern
+  - draußen
+  - bei Regen
+  - spontan
+- Die ersten sichtbaren mobilen Karten sind die wichtigste Produktfläche.
+- Es wird keine große zusätzliche Modulfläche oberhalb der Inhalte aufgebaut.
+- Die Home soll wie ein lokaler Entscheidungsassistent wirken, nicht wie ein weiterer Kalender.
+
+Neue Seitenrollen:
+
+- `/` = `Für dich in Bocholt`: kompakter Empfehlungsfeed aus Events + Aktivitäten.
+- Eventseite = vollständige Termin-Suche, Filterung und chronologisches Stöbern.
+- Aktivitätenseite = dauerhafte Orte, Ideen und Ausflugsziele suchen und filtern.
+- Veranstalterbereiche bleiben getrennte Anbieterpfade.
+
+Bottom-Navigation-Ziel:
+
+- `Für dich`
+- `Events`
+- `Aktivitäten`
+
+Explizit im Scope:
+
+- neue Home-Logik als Premium-Entscheidungsfeed
+- Events und Aktivitäten gemeinsam normalisieren
+- lokales Interessenprofil ohne Account
+- Merken-Funktion
+- Ausblenden-/`Nicht interessant`-Funktion
+- Wetterkontext für Bocholt
+- Rankinglogik für Empfehlungen
+- kompakte Mobile-UI
+- Entscheidungssignale auf Karten
+- Activity-Fallback, wenn Events dünn sind
+- bestehende Event- und Aktivitätenseiten als Suchseiten erhalten
+
+Explizit nicht im Scope:
+
+- Nutzerkonto
+- Sync zwischen Geräten
+- Mittagstisch
+- Push-Personalisierung
+- komplexe KI-Empfehlungen
+- Geolocation des Nutzers
+- Preis-/Kostenfilter ohne belastbare strukturierte Daten
+- automatische Anbieterberichte
+- Wetterempfehlungen ohne passende Content-Tags
+
+Architekturprinzip:
+
+- Nicht die bestehende Eventseite weiter aufblasen.
+- Stattdessen eine eigene Recommendation-Schicht bauen, die Events, Aktivitäten, Wetter und lokale Präferenzen zusammenführt.
+- Bestehende Seiten bleiben möglichst stabil und werden nicht unnötig regressionsgefährdet.
+- Premium bedeutet hier: ein konsistentes System, nicht mehrere isolierte Zusatzblöcke.
+
+Benötigte technische Bausteine:
+
+- `recommendations.js`
+  - normalisiert Events und Aktivitäten
+  - berechnet Scores
+  - mischt Content
+  - erzeugt Begründungslabels
+  - berücksichtigt lokale Präferenzen
+  - berücksichtigt Wetterkontext
+
+- `user-preferences.js`
+  - speichert Interessen lokal
+  - speichert gemerkte Inhalte
+  - speichert ausgeblendete Inhalte
+  - speichert zuletzt gewählten Modus
+  - kein Account, kein Sync
+
+- `weather-context.js`
+  - lädt oder hält Wetterkontext für Bocholt
+  - bildet einfache Wetterklassen
+  - liefert sicheren Fallback `unknown`
+
+- neue Home-Renderlogik
+  - rendert `Für dich in Bocholt`
+  - rendert Modus-Auswahl
+  - rendert gemischte Empfehlungskarten
+  - verlinkt sauber zu Events und Aktivitäten
+
+Lokales Profil ohne Account:
+
+- Speicherung bevorzugt lokal im Browser.
+- `localStorage` reicht für einfache Einstellungen.
+- `IndexedDB` ist möglich, falls Merkliste/Ausblendungen größer oder strukturierter werden.
+- Keine klassische Cookie-Logik als primärer Personalisierungsspeicher.
+- Nutzerkonto und Geräte-Sync bleiben bewusst späterer Scope.
+
+Lokale Profildaten:
+
+- Interessen:
+  - Familie
+  - Draußen
+  - Kultur
+  - Musik
+  - Essen & Trinken
+  - Sport & Bewegung
+  - Kurz & spontan
+  - Wochenende
+  - Bei Regen
+
+- Gemerkt:
+  - Event-IDs
+  - Activity-IDs
+
+- Ausgeblendet:
+  - Event-IDs
+  - Activity-IDs
+
+- Nutzungskontext:
+  - letzter Modus
+  - bevorzugte Modi
+  - optional zuletzt geklickte Kategorien
+
+Gemeinsames Empfehlungsmodell:
+
+Events und Aktivitäten müssen intern in ein gemeinsames `RecommendationItem` überführt werden.
+
+Pflichtfelder intern:
+
+- `type`: `event` oder `activity`
+- `id`
+- `title`
+- `description`
+- `category`
+- `location`
+- `url`
+- `mapsTarget`
+- `image`
+- `dateContext`
+- `timeContext`
+- `situationTags`
+- `audienceTags`
+- `weatherProfile`
+- `availability`
+- `costLevel`
+- `planningLevel`
+- `recommendationWeight`
+- `reasonLabels`
+- `score`
+
+Benötigte zusätzliche Event-Daten:
+
+- `situation_tags`
+  - `Mit Kindern`
+  - `Draußen`
+  - `Bei Regen`
+  - `Abend`
+  - `Wochenende`
+  - `Spontan`
+
+- `weather_profile`
+  - `indoor`
+  - `outdoor`
+  - `mixed`
+  - `weather_independent`
+  - `rain_sensitive`
+  - `unknown`
+
+- `audience_tags`
+  - `Familie`
+  - `Erwachsene`
+  - `Kultur`
+  - `Musik`
+  - `Sport`
+  - `Essen & Trinken`
+
+- `planning_level`
+  - `spontan`
+  - `planbar`
+  - `ticket_or_registration_check`
+  - `unknown`
+
+- `cost_level`
+  - `free`
+  - `low`
+  - `paid`
+  - `unknown`
+
+- `recommendation_weight`
+  - `high`
+  - `normal`
+  - `fallback`
+
+Benötigte zusätzliche Activity-Daten:
+
+- `availability`
+  - `always`
+  - `opening_hours_check`
+  - `seasonal`
+  - `weather_dependent`
+
+- `weather_profile`
+  - `indoor`
+  - `outdoor`
+  - `mixed`
+  - `rain_ok`
+  - `rain_bad`
+  - `weather_independent`
+  - `unknown`
+
+- `time_profile`
+  - `morning`
+  - `afternoon`
+  - `evening`
+  - `weekend`
+  - `short_spontaneous`
+
+- `cost_level`
+  - `free`
+  - `low`
+  - `paid`
+  - `unknown`
+
+- `recommendation_weight`
+  - `core`
+  - `normal`
+  - `fallback`
+
+Wetterlogik:
+
+- Wetter wird für Bocholt allgemein verwendet, nicht über Nutzer-Geolocation.
+- Wetter ist ein Rankingfaktor, kein Show-Element.
+- Wetter darf Empfehlungen nur beeinflussen, wenn Inhalte passende Wetterprofile haben.
+- Bei fehlenden Wetterdaten muss der Feed sinnvoll ohne Wetter weiterlaufen.
+
+Einfache Wetterklassen:
+
+- `dry`
+- `rain`
+- `hot`
+- `cold`
+- `windy`
+- `unknown`
+
+Rankinglogik:
+
+Höher bewerten:
+
+- passt zu lokalen Interessen
+- findet heute oder bald statt
+- ist noch nicht vorbei
+- passt zum gewählten Modus
+- passt zum Wetter
+- hat klare Location
+- hat klare Uhrzeit oder klare Verfügbarkeit
+- hat guten CTA
+- ist für Familie/Draußen/Regen sauber getaggt
+- ist gemerkt
+- ergänzt den Feed sinnvoll, wenn Events dünn sind
+
+Niedriger bewerten:
+
+- unklare Daten
+- fast vorbei
+- wetterkritisch bei schlechtem Wetter
+- nicht passend zum Modus
+- zu ähnlich zu vorherigen Karten
+- nur schwach belegte Empfehlungstags
+- Activity mit Öffnungszeiten, wenn Verfügbarkeit ungeprüft ist
+
+Ausschließen:
+
+- ausgeblendete Inhalte
+- vergangene Events
+- Events ohne sinnvolle Mindestdaten
+- Empfehlungen, deren Aussage nur geraten wäre
+
+Content-Bewertung:
+
+- Für eine Premium-Home nur mit Events reicht der Content nicht zuverlässig.
+- Für eine Premium-Home mit Events + Aktivitäten ist die Grundlage vorhanden.
+- Activities sind bereits stark genug als Fallback- und Ergänzungslogik.
+- Events brauchen zusätzliche Empfehlungstags.
+- Activities brauchen schärfere Wetter-, Verfügbarkeits- und Empfehlungsprofile.
+- Mittagstisch wird bewusst später verschoben und gehört nicht zu diesem Workpack.
+
+Wichtigster Daten-Gap:
+
+- Events sind bisher eher kalendarisch beschrieben.
+- Activities sind bereits stärker situations- und merkmalsbasiert beschrieben.
+- Für `Für dich in Bocholt` müssen beide Content-Typen in ein gemeinsames Empfehlungsformat gebracht werden.
+
+Akzeptanzkriterien für den späteren Premium-Workpack:
+
+- `/` ist als `Für dich in Bocholt` erkennbar.
+- Events und Aktivitäten erscheinen in einem gemeinsamen Empfehlungsfeed.
+- Bestehende Event- und Aktivitätenseiten bleiben eigenständig nutzbar.
+- Nutzer kann Interessen lokal setzen.
+- Nutzer kann Inhalte merken.
+- Nutzer kann Inhalte ausblenden.
+- Wetterkontext beeinflusst Empfehlungen nur bei belastbaren Content-Tags.
+- Der Feed funktioniert auch ohne Wetterdaten.
+- Der Feed funktioniert auch ohne gespeicherte Interessen.
+- Der Feed wirkt auf Mobile nicht überladen.
+- Die ersten sichtbaren Karten liefern konkreten Entscheidungswert.
+- Anbieter-CTA verdrängt nicht den ersten Nutzerentscheidungsbereich.
+- Keine falschen Personalisierungsversprechen ohne lokale Signale.
+- Keine Preis-/Kostenversprechen ohne strukturierte Daten.
+- Keine Accountpflicht.
+
+Umsetzungsreihenfolge innerhalb dieses Workpacks:
+
+1. Datenvertrag finalisieren.
+2. Event- und Activity-Datenfelder prüfen und ergänzen.
+3. Recommendation-Normalisierung bauen.
+4. Lokales Profilmodul bauen.
+5. Wetterkontextmodul bauen.
+6. Rankinglogik bauen.
+7. Neue Home rendern.
+8. Bottom-Navigation auf `Für dich | Events | Aktivitäten` ausrichten.
+9. Eventseite als eigene Suchseite absichern.
+10. Aktivitätenseite unverändert als Suchseite absichern.
+11. Mobile- und Desktop-Proof.
+12. Tracking-Proof für Recommendation-Klicks, Merken und Ausblenden.
+
+Freeze-Bedingung:
+
+- Der Workpack gilt erst als abgeschlossen, wenn die neue Home nicht nur anders aussieht, sondern einen klar höheren Nutzwert liefert als der bisherige Eventfeed.
+- Maßstab ist: Nutzer erkennt schneller, was heute oder am Wochenende wirklich passt.
+- Kein Release, wenn die Home nur wie ein umsortierter Kalender wirkt.
+
+<!-- === END BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 === -->
