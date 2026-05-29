@@ -1154,6 +1154,21 @@ select.content-field__control{
   margin-top: 9px;
 }
 
+/* === BEGIN BLOCK: PUBLISH_EXPLAINER_ANCHOR_OFFSET_V1 | Zweck: stellt sicher, dass Hash-Links auf der Veröffentlichungserklärung unter dem sticky Header mit sichtbarer Zielüberschrift landen; Umfang: nur Ankerziele der zentralen Erklärseite === */
+.page--publish :is(
+  #welcher-weg-passt,
+  #mitgliedschaft,
+  #automatische-uebernahme,
+  #aktivitaetspraesenz-weg,
+  #ablauf,
+  #faq,
+  #zahlung-und-freigabe,
+  #aktivitaet-oder-veranstaltung
+){
+  scroll-margin-block-start: calc(var(--header-h, 48px) + 28px);
+}
+/* === END BLOCK: PUBLISH_EXPLAINER_ANCHOR_OFFSET_V1 === */
+
 .page--publish .publish-final-actions{
   display: grid;
   gap: 8px;
