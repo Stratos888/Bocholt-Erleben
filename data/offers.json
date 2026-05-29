@@ -2828,6 +2828,557 @@
             "Wasser"
           ]
         }
+      },
+      {
+        "id": "die-berge-hombornquelle-entdecken",
+        "title": "Die Berge & Hombornquelle entdecken",
+        "kategorie": "Natur & Draußen",
+        "location": "Borken/Velen",
+        "maps_query": "Hagenstiege, 46325 Borken-Gemen",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Längere Naturroute durch die Borkener Landschaft „Die Berge“ mit Hombornquelle, Fischteichen, Bocholter Aa, Waldwegen und hügeliger Naturlandschaft. Als Naturschutzgebiet bitte auf den Wegen bleiben.",
+        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
+        "website_label": "Route / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Waldweg%20am%20Fliegerberg.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Waldweg_am_Fliegerberg.jpg",
+        "image_author": "Magnus aus Deventer",
+        "image_license": "Public Domain",
+        "image_credit": "Magnus aus Deventer, Public Domain, via Wikimedia Commons",
+        "tags": [
+          "Hombornquelle",
+          "Die Berge",
+          "13 km",
+          "Naturschutz"
+        ],
+        "filter_tags": [
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Wasser",
+            "Rundweg"
+          ],
+          "effort": [
+            "Halber Tag",
+            "Längerer Ausflug"
+          ]
+        },
+        "duration": "3–4 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "3–4 Std",
+          "Outdoor",
+          "13 km"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Draußen",
+            "Natur",
+            "Sport & Bewegung",
+            "Wochenende",
+            "Wasser"
+          ]
+        }
+      },
+      {
+        "id": "tiergarten-schloss-raesfeld-erleben",
+        "title": "Tiergarten Schloss Raesfeld erleben",
+        "kategorie": "Freizeit & Familie",
+        "location": "Raesfeld",
+        "maps_query": "Naturparkhaus Tiergarten Schloss Raesfeld, Tiergarten 1, 46348 Raesfeld",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Frei zugänglicher historischer Tiergarten am Schloss Raesfeld mit Wald, Wiesen, Wasser, Rundwegen und Naturerlebnisgelände. Gut für Familien, Spaziergänge und ruhige Halbtagesausflüge.",
+        "url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaissance-Tiergarten%20Schloss%20Raesfeld.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
+        "image_author": "Reinhard G. Nießing",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Reinhard G. Nießing, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "Tiergarten",
+          "Schloss Raesfeld",
+          "Naturerlebnisgelände",
+          "Rundwege"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Spielen",
+            "Kultur"
+          ],
+          "features": [
+            "Spielplatz",
+            "Wasser",
+            "Rundweg"
+          ],
+          "effort": [
+            "Spontan",
+            "Halber Tag"
+          ]
+        },
+        "duration": "1–3 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "1–3 Std",
+          "Outdoor",
+          "Wald & Schloss"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous",
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Kurz & spontan",
+            "Wochenende",
+            "Wasser",
+            "Spielplatz"
+          ]
+        }
+      },
+      {
+        "id": "erlebnispfad-klostersee-burlo",
+        "title": "Erlebnispfad Klostersee Burlo",
+        "kategorie": "Freizeit & Familie",
+        "location": "Borken-Burlo",
+        "maps_query": "Sportanlage Vennweg, 46325 Borken-Burlo",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Kurzer Erlebnispfad rund um den Klostersee in Burlo mit Natur, Bewegung, regionaler Geschichte, Vennweg und Kloster Mariengarden. Gut als familienfreundlicher Spaziergang.",
+        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
+        "website_label": "Route / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken%2C%20Burlo%2C%20Kloster%20Mariengarden%20--%202014%20--%202292.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "48%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Burlo,_Kloster_Mariengarden_--_2014_--_2292.jpg",
+        "image_author": "Dietmar Rabich",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "Klostersee",
+          "3,2 km",
+          "Mariengarden",
+          "Erlebnispfad"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wasser",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Spielen",
+            "Natur entdecken",
+            "Kultur"
+          ],
+          "features": [
+            "Wasser",
+            "Rundweg"
+          ],
+          "effort": [
+            "Spontan",
+            "Halber Tag"
+          ]
+        },
+        "duration": "45–90 Min",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "45–90 Min",
+          "Outdoor",
+          "3,2 km"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous",
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Kurz & spontan",
+            "Wochenende",
+            "Wasser"
+          ]
+        }
+      },
+      {
+        "id": "gaengeskes-aalten-entdecken",
+        "title": "Gängeskes Aalten entdecken",
+        "kategorie": "Kultur",
+        "location": "Aalten",
+        "maps_query": "VVV Aalten, Markt 14, 7121 CS Aalten, Niederlande",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Kurzer Spaziergang durch die schmalen historischen Gängeskes von Aalten. Die kleinen Durchgänge erzählen von Dorfgeschichte, alten Wegen und versteckten Verbindungen zwischen Straßen und Gärten.",
+        "url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
+        "website_label": "Website / Infos (NL)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aalten-markt-185389.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "52%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Aalten-markt-185389.jpg",
+        "image_author": "Pim van Tend",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Pim van Tend, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "Aalten",
+          "Gängeskes",
+          "Innenstadt",
+          "Kinderroute"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "Grenzregion / Niederlande"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Kultur",
+            "Spielen"
+          ],
+          "features": [
+            "Rundweg"
+          ],
+          "effort": [
+            "Spontan"
+          ]
+        },
+        "duration": "30–60 Min",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "30–60 Min",
+          "Outdoor",
+          "Aalten"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Kultur",
+            "Kurz & spontan"
+          ]
+        }
+      },
+      {
+        "id": "auesee-wesel-erleben",
+        "title": "Auesee Wesel erleben",
+        "kategorie": "Freizeit & Familie",
+        "location": "Wesel",
+        "maps_query": "Parkplatz Liegewiese Auesee, Wesel",
+        "maps_label": "Zum Parkplatz navigieren",
+        "description": "Großes Freizeit- und Badegewässer mit Badebucht, Liegewiese, Sandstrand und Rundweg. Zugang zum See ist kostenfrei; Parken kann gebührenpflichtig sein. Baden nur im ausgewiesenen Bereich.",
+        "url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sonnenuntergang%20Auesee%20Wesel%203.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Sonnenuntergang_Auesee_Wesel_3.jpg",
+        "image_author": "Kerstin Voß",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Kerstin Voß, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "Badesee",
+          "Sandstrand",
+          "Liegewiese",
+          "Rundweg"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wasser",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Wasser",
+            "Baden",
+            "Rundweg"
+          ],
+          "effort": [
+            "Halber Tag",
+            "Längerer Ausflug"
+          ]
+        },
+        "duration": "1–4 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Frühling bis Herbst; Baden saisonal",
+        "cardFacts": [
+          "1–4 Std",
+          "Outdoor",
+          "Badesee"
+        ],
+        "recommendation": {
+          "availability": "seasonal",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Natur",
+            "Sport & Bewegung",
+            "Wochenende",
+            "Wasser",
+            "Baden"
+          ]
+        }
+      },
+      {
+        "id": "schwarzes-wasser-wesel-entdecken",
+        "title": "Schwarzes Wasser Wesel entdecken",
+        "kategorie": "Natur & Draußen",
+        "location": "Wesel",
+        "maps_query": "Parkplatz Schwarzes Wasser Kanonenberge, Wesel",
+        "maps_label": "Zum Parkplatz navigieren",
+        "description": "Kurzer Naturerlebnisweg rund um den Heideweiher Schwarzes Wasser im Diersfordter Wald. Die Runde ist gut für einen ruhigen Naturspaziergang; als Schutzgebiet bitte auf den Wegen bleiben.",
+        "url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Schwarzes%20Wasser%20Wesel%202.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Schwarzes_Wasser_Wesel_2.jpg",
+        "image_author": "Timo Forchheim = Tzign",
+        "image_license": "Public Domain",
+        "image_credit": "Timo Forchheim = Tzign, Public Domain, via Wikimedia Commons",
+        "tags": [
+          "Heideweiher",
+          "Diersfordter Wald",
+          "2 km",
+          "Naturschutz"
+        ],
+        "filter_tags": [
+          "Wasser",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken"
+          ],
+          "features": [
+            "Wasser",
+            "Rundweg"
+          ],
+          "effort": [
+            "Spontan"
+          ]
+        },
+        "duration": "30–60 Min",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "30–60 Min",
+          "Outdoor",
+          "2 km"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Draußen",
+            "Natur",
+            "Kurz & spontan",
+            "Wasser"
+          ]
+        }
+      },
+      {
+        "id": "witte-venn-ahaus-alstaette-entdecken",
+        "title": "Witte Venn Ahaus-Alstätte entdecken",
+        "kategorie": "Natur & Draußen",
+        "location": "Ahaus-Alstätte",
+        "maps_query": "Haarmühle, Beßlinghook 57, 48683 Ahaus-Alstätte",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Grenzübergreifende Moor- und Auenlandschaft mit Wegen zum Spazieren, Wandern und Radfahren. Die Haarmühle ist ein guter Startpunkt; im Schutzgebiet bitte auf den Wegen bleiben.",
+        "url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Die%20Haarm%C3%BChle%2C%20eine%20Wasserm%C3%BChle%20im%20Ursprung%20aus%20dem%20Jahre%201619%2C%20in%20Ahaus-Alst%C3%A4tte.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Die_Haarm%C3%BChle,_eine_Wasserm%C3%BChle_im_Ursprung_aus_dem_Jahre_1619,_in_Ahaus-Alst%C3%A4tte.jpg",
+        "image_author": "Muehlenbernd",
+        "image_license": "CC BY-SA 3.0",
+        "image_credit": "Muehlenbernd, CC BY-SA 3.0, via Wikimedia Commons",
+        "tags": [
+          "Witte Venn",
+          "Haarmühle",
+          "Moor",
+          "Grenzregion"
+        ],
+        "filter_tags": [
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung",
+            "Grenzregion / Niederlande"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Radfahren",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Wasser",
+            "Rundweg"
+          ],
+          "effort": [
+            "Halber Tag"
+          ]
+        },
+        "duration": "1–3 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "1–3 Std",
+          "Outdoor",
+          "Moor & Grenze"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Draußen",
+            "Natur",
+            "Sport & Bewegung",
+            "Wochenende",
+            "Wasser"
+          ]
+        }
       }
     ]
 }

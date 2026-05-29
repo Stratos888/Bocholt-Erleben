@@ -65,8 +65,10 @@ The following workpack is intentionally on hold:
 
 ### Information architecture
 
-- `/` is the canonical event-discovery home.
-- `/angebote/` is the canonical activities route.
+- `/` remains the current public home until the planned `Heute` recommendation home replaces it.
+- `/events/` is the canonical event search and browsing route.
+- `/aktivitaeten/` is the canonical activities search and browsing route.
+- `/angebote/` remains a legacy/transition route for the activities page until redirect/canonical cleanup is finalized.
 - `/angebote/sichtbar-werden/` is the canonical activity-presence decision page.
 - `/angebote/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
 - `/angebote/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.

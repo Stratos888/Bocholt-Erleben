@@ -275,7 +275,8 @@ def run(args: argparse.Namespace) -> None:
     checks = [
         lambda: check_build_file(base_url, args.expected_build),
         lambda: check_html_page(base_url, "/", "Startseite"),
-        lambda: check_html_page(base_url, "/angebote/", "Angebote-Seite"),
+        lambda: check_html_page(base_url, "/events/", "Events-Suchseite"),
+        lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
         lambda: check_status_api(base_url),
         lambda: check_public_events_api(base_url),
