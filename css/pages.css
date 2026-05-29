@@ -1169,6 +1169,83 @@ select.content-field__control{
 }
 /* === END BLOCK: PUBLISH_EXPLAINER_ANCHOR_OFFSET_V1 === */
 
+/* === BEGIN BLOCK: PUBLISH_EXPLAINER_LINK_HIERARCHY_V1 | Zweck: stuft Erklärseiten- und Kontextlinks visuell klar unter echte Funnel-CTAs, ohne bestehende Tarif-, Formular- oder Checkout-Logik zu verändern; Umfang: nur Veröffentlichungserklärung und explizit markierte Kontextlinks === */
+:is(.page--publish, .page--organizers) .publish-explainer-context-link{
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link,
+.page--publish .publish-explainer-card-link{
+  width: fit-content;
+  min-height: 38px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 5px;
+  color: var(--cmp-link-color);
+  font-size: 0.86rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__label,
+.page--publish .publish-explainer-card-link .content-link__label{
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__chevron,
+.page--publish .publish-explainer-card-link .content-link__chevron{
+  width: 14px;
+  height: 14px;
+  margin-left: 0;
+  opacity: 0.72;
+}
+
+.page--publish .publish-explainer-card-link{
+  margin-top: 2px;
+}
+
+.page--publish .publish-explainer-next-card{
+  gap: 10px;
+}
+
+.page--publish .publish-explainer-next-links{
+  gap: 0;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-explainer-next-links .content-link{
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.93rem;
+  font-weight: 720;
+}
+
+.page--publish .publish-explainer-next-links .content-link + .content-link{
+  border-top: 1px solid var(--cmp-divider-subtle);
+}
+
+@media (hover: hover){
+  :is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link:hover,
+  .page--publish .publish-explainer-card-link:hover,
+  .page--publish .publish-explainer-next-links .content-link:hover{
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+/* === END BLOCK: PUBLISH_EXPLAINER_LINK_HIERARCHY_V1 === */
+
 .page--publish .publish-final-actions{
   display: grid;
   gap: 8px;
