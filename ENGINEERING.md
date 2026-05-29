@@ -333,3 +333,41 @@ failure
 -> validate fail-fast
 
 <!-- END PATCH_WORKFLOW_CORRECTION_V1 -->
+<!-- BEGIN UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
+
+## UI-/Dashboard-Patch-Disziplin
+
+Für größere UI-, Dashboard- oder Strukturpolish-Arbeiten gilt zusätzlich:
+
+1. Keine größeren UI-/Dashboard-Patches auf einem dirty Working Tree.
+   - Wenn bereits uncommitted Änderungen vorhanden sind, zuerst entscheiden:
+     - gezielt finalisieren und prüfen, oder
+     - vollständig zurücksetzen und sauber neu starten.
+   - Keine neuen großen Patches auf halbfertige Zwischenstände stapeln.
+
+2. Vor größeren UI-/Dashboard-Patches zuerst eine Owner-Map erstellen.
+   - Struktur/HTML-Owner
+   - Rendering-/State-Owner
+   - Styling-/CSS-Owner
+   - bestehende Logik, die ersetzt oder ausdrücklich behalten wird
+   - mögliche doppelte Alt-/Neu-Logik identifizieren, bevor gepatcht wird.
+
+3. Große Terminal-Heredocs vermeiden.
+   - Bevorzugt kleine, robuste Script-Patches mit eindeutigen Ankern.
+   - Jeder Script-Patch muss abbrechen, wenn ein Anker fehlt oder mehrdeutig ist.
+   - Lange Copy/Paste-Blöcke nur verwenden, wenn sie wirklich die sicherste Option sind.
+
+4. Korrekturschleifen hart begrenzen.
+   - Wenn nach einem größeren Patch mehr als ein Korrekturpatch nötig wird: stoppen.
+   - Danach Diff prüfen und entscheiden:
+     - konsolidieren, oder
+     - Working Tree zurücksetzen und neu aufbauen.
+   - Nicht weiterflicken.
+
+5. Dashboard-V2-/Layout-Arbeiten als eigenen Workpack behandeln.
+   - Erst Zielzustand und Reihenfolge definieren.
+   - Dann ein kleiner, testbarer Strukturpatch.
+   - Danach maximal ein Polish-Patch.
+   - Erst nach Screenshot-/Smoke-Proof dokumentieren oder committen.
+
+<!-- END UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->

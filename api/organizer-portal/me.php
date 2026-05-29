@@ -474,6 +474,153 @@ function opm_fetch_recent_submissions(PDO $pdo, int $organizerId): array
 }
 /* === END BLOCK: ORGANIZER_PORTAL_FETCH_CURRENT_SUBMISSIONS_V1 === */
 
+/* === BEGIN BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_V1 | Zweck: liefert sicher zugeordnete Nutzwert-Metriken fuer den eingeloggten Anbieter; Umfang: additive Helfer fuer Dashboard-Wertzentrum === */
+function opm_impact_periods(): array
+{
+    $currentEnd = new DateTimeImmutable('today', new DateTimeZone('UTC'));
+    $currentStart = $currentEnd->modify('-27 days');
+    $previousEnd = $currentStart->modify('-1 day');
+    $previousStart = $previousEnd->modify('-27 days');
+
+    return [
+        'current' => [
+            'start' => $currentStart,
+            'end' => $currentEnd,
+        ],
+        'previous' => [
+            'start' => $previousStart,
+            'end' => $previousEnd,
+        ],
+    ];
+}
+
+function opm_organizer_reporting_target_id(int $organizerId): string
+{
+    return 'organizer-' . substr(hash('sha256', 'organizer:' . $organizerId), 0, 16);
+}
+
+function opm_empty_impact_metrics(): array
+{
+    return [
+        'website_clicks' => 0,
+        'maps_clicks' => 0,
+        'location_clicks' => 0,
+        'organizer_cta_clicks' => 0,
+        'detail_views' => 0,
+        'total_interactions' => 0,
+        'item_count' => 0,
+    ];
+}
+
+function opm_value_metrics_table_exists(PDO $pdo): bool
+{
+    $statement = $pdo->query("SHOW TABLES LIKE 'value_metric_daily'");
+    if ($statement === false) {
+        return false;
+    }
+
+    return $statement->fetchColumn() !== false;
+}
+
+function opm_empty_impact_summary(int $organizerId, string $organizationName, string $status = 'ok', string $message = ''): array
+{
+    $periods = opm_impact_periods();
+
+    return [
+        'status' => $status,
+        'generated_at' => gmdate('c'),
+        'period' => [
+            'start_date' => $periods['current']['start']->format('Y-m-d'),
+            'end_date' => $periods['current']['end']->format('Y-m-d'),
+            'days' => 28,
+        ],
+        'previous_period' => [
+            'start_date' => $periods['previous']['start']->format('Y-m-d'),
+            'end_date' => $periods['previous']['end']->format('Y-m-d'),
+            'days' => 28,
+        ],
+        'reporting_target' => [
+            'type' => 'organizer',
+            'id' => opm_organizer_reporting_target_id($organizerId),
+            'title' => $organizationName !== '' ? $organizationName : 'Anbieter',
+        ],
+        'metrics' => opm_empty_impact_metrics(),
+        'previous_metrics' => opm_empty_impact_metrics(),
+        'message' => $message,
+    ];
+}
+
+function opm_fetch_impact_metrics(PDO $pdo, string $targetId, string $startDate, string $endDate): array
+{
+    $statement = $pdo->prepare(<<<'SQL'
+SELECT
+    COALESCE(SUM(CASE WHEN metric_key IN ('event_detail_view', 'activity_detail_view') THEN count_value ELSE 0 END), 0) AS detail_views,
+    COALESCE(SUM(CASE WHEN metric_key = 'website_click' THEN count_value ELSE 0 END), 0) AS website_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'maps_click' THEN count_value ELSE 0 END), 0) AS maps_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'location_click' THEN count_value ELSE 0 END), 0) AS location_clicks,
+    COALESCE(SUM(CASE WHEN metric_key = 'organizer_cta_click' THEN count_value ELSE 0 END), 0) AS organizer_cta_clicks,
+    COALESCE(SUM(count_value), 0) AS total_interactions,
+    COUNT(DISTINCT CASE WHEN entity_type <> '' AND entity_id <> '' THEN CONCAT(entity_type, ':', entity_id) ELSE NULL END) AS item_count
+FROM value_metric_daily
+WHERE metric_date BETWEEN :start_date AND :end_date
+  AND reporting_target_type = 'organizer'
+  AND reporting_target_id = :target_id
+SQL);
+
+    $statement->execute([
+        ':start_date' => $startDate,
+        ':end_date' => $endDate,
+        ':target_id' => $targetId,
+    ]);
+
+    $row = $statement->fetch();
+    if (!is_array($row)) {
+        return opm_empty_impact_metrics();
+    }
+
+    return [
+        'website_clicks' => (int)($row['website_clicks'] ?? 0),
+        'maps_clicks' => (int)($row['maps_clicks'] ?? 0),
+        'location_clicks' => (int)($row['location_clicks'] ?? 0),
+        'organizer_cta_clicks' => (int)($row['organizer_cta_clicks'] ?? 0),
+        'detail_views' => (int)($row['detail_views'] ?? 0),
+        'total_interactions' => (int)($row['total_interactions'] ?? 0),
+        'item_count' => (int)($row['item_count'] ?? 0),
+    ];
+}
+
+function opm_fetch_impact_summary(PDO $pdo, int $organizerId, string $organizationName): array
+{
+    $summary = opm_empty_impact_summary($organizerId, $organizationName);
+
+    if ($organizerId <= 0) {
+        return opm_empty_impact_summary($organizerId, $organizationName, 'not_available', 'Kein Anbieter-Kontext verfügbar.');
+    }
+
+    if (!opm_value_metrics_table_exists($pdo)) {
+        return opm_empty_impact_summary($organizerId, $organizationName, 'not_configured', 'Nutzwert-Messung ist noch nicht initialisiert.');
+    }
+
+    $targetId = (string)$summary['reporting_target']['id'];
+
+    $summary['metrics'] = opm_fetch_impact_metrics(
+        $pdo,
+        $targetId,
+        (string)$summary['period']['start_date'],
+        (string)$summary['period']['end_date']
+    );
+
+    $summary['previous_metrics'] = opm_fetch_impact_metrics(
+        $pdo,
+        $targetId,
+        (string)$summary['previous_period']['start_date'],
+        (string)$summary['previous_period']['end_date']
+    );
+
+    return $summary;
+}
+/* === END BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_V1 === */
+
 try {
     $plainSessionToken = opm_read_session_token_from_cookie();
     $sessionTokenHash = opm_hash_token($plainSessionToken);
@@ -514,6 +661,7 @@ try {
             'quota' => $quotaSummary,
             'quota_by_plan' => $quotaByPlan,
             'billing_summary' => $billingSummary,
+            'impact_summary' => $impactSummary,
             'recent_submissions' => $recentSubmissions,
         ],
     ]);

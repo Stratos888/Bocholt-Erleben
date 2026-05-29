@@ -1660,3 +1660,103 @@ Bewertung:
 - Keine CSS-, Backend-, Tracking-, Stripe- oder Datenmodelländerung erforderlich.
 <!-- === END BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_INTERNAL_LOCATION_FEEDBACK_REPORT_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand des internen Location-Feedbackberichts; Umfang: SEO-/Mehrwert-Dashboard, Akquise-Snapshot-Kompaktisierung, Reporting-Ziel-Bericht === -->
+## Interner Location-Feedbackbericht – Staging-Proof 2026-05-28
+
+Status: bestanden / vorbereitet.
+
+Geprüfter Scope:
+- internes SEO-/Mehrwert-Dashboard `/intern/seo-dashboard/`
+- kompakter oberer Statusbereich
+- einklappbarer `Akquise-Gesamtstatus`
+- neuer Block `Location-Feedbackbericht`
+- Reporting-Ziel-Auswahl
+- Hauptzahlen und eingeklappte Technikdetails
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- Status-Chips bleiben oben direkt sichtbar:
+  - `Gelb – Akquise prüfen`
+  - `Technik ok`
+  - `Eigenes Tracking ausgeschlossen`
+- Bisherige große Bereiche `Akquise-Snapshot` und `Für Screenshot / Akquise` sind nicht mehr dauerhaft oben sichtbar, sondern unter `Akquise-Gesamtstatus` einklappbar erreichbar.
+- Neuer Block `Location-Feedbackbericht` steht oberhalb der Hauptzahlen.
+- Reporting-Ziel-Auswahl lädt konfigurierte Ziele; geprüft wurde `Biotopwildpark Anholter Schweiz`.
+- Einzelbericht zeigt für `Biotopwildpark Anholter Schweiz`:
+  - Interaktionen gesamt: 2
+  - Detail-Aufrufe: 1
+  - Website-Klicks: 1
+  - Route/Maps: 0
+  - Zeitraum
+  - zugeordneten Inhalt `Anholter Schweiz erleben`
+  - Status `Nutzsignal gemessen`
+- Hauptzahlen bleiben sichtbar und unverändert erreichbar.
+- `Technik, Quellen und Detailwerte` bleibt eingeklappt.
+
+Bewertung:
+- Der interne Feedbackbericht ist als Akquise- und Gesprächsvorbereitung technisch vorbereitet.
+- Der Bericht ist screenshotfähig und verständlicher als die reine KPI-/Technikansicht.
+- Der Bericht liefert jetzt einen ersten kleinen, aber echten Nutzsignal-Proof; für belastbare Akquise-Aussagen bleibt ein längerer Zeitraum mit stabileren Nutzwert-Klicks nötig.
+- Es wurden keine neuen Tracking-Endpunkte, keine neue Datenbanktabelle und kein Anbieterbereich-Umbau eingeführt.
+- Self-Service-Auswertung im Anbieterbereich bleibt ein späterer Schritt nach belastbarer Datenbasis und sauberer Rechte-/Ziel-Zuordnung.
+<!-- === END BLOCK: TEST_STATUS_INTERNAL_LOCATION_FEEDBACK_REPORT_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_IMPACT_CARD_HIDE_2026_05_28 | Zweck: dokumentiert den Staging-Proof zur Ausblendung der Wirkungskarte bei Aktivitätstarifen; Umfang: Anbieter-Dashboard, Aktivitätspräsenzen, Wirkungskarte === -->
+## Anbieter-Dashboard – Wirkungskarte bei Aktivitätstarifen ausgeblendet – Staging-Proof 2026-05-28
+
+Status: bestanden.
+
+Geprüfter Scope:
+- Anbieter-Dashboard `/fuer-veranstalter/dashboard/`
+- Account mit `Dauerhaft` plus mehreren `Aktivitätspräsenz Basis`-Tarifen
+- Karte `Meine Wirkung auf Bocholt erleben`
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- `Kontakt & Organisation` bleibt sichtbar.
+- `Tarife & Veröffentlichungen` bleibt sichtbar.
+- `Einreichungen & Status` bleibt sichtbar.
+- Die Karte `Meine Wirkung auf Bocholt erleben` ist bei diesem Activity-/Location-Testaccount nicht mehr sichtbar.
+
+Bewertung:
+- Der Sicherheitsfix verhindert eine irreführende Null-Auswertung für Aktivitätspräsenzen.
+- Die Wirkungskarte bleibt erst dann für Aktivitätsanbieter sinnvoll, wenn Anbieteraccount und Activity-/Location-Reporting-Ziele sauber verknüpft sind.
+- Restbefund: Das Anbieter-Dashboard ist weiterhin strukturell zu unaufgeräumt und sollte als eigener Dashboard-V2-Workpack überarbeitet werden.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_IMPACT_CARD_HIDE_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 | Zweck: dokumentiert den Freeze-Stand des Anbieter-Dashboards nach Struktur-, Owner- und Handlungsorientierungs-Polish; Umfang: User-/Veranstalter-Dashboard auf Staging === -->
+## Anbieter-Dashboard V2 – Übersichtlichkeit und Handlungsorientierung – Staging-Freeze 2026-05-28
+
+Status: bestanden / vorerst gefreezt.
+
+Geprüfter Scope:
+- Anbieter-Dashboard `/fuer-veranstalter/dashboard/`
+- Activity-/Location-Testaccount mit Veranstaltungen und Aktivitätspräsenzen
+- Mobile-Ansicht
+- Desktop-/breite Ansicht
+- Einreichungen, Tarife, Organisation und Rücknavigation
+
+Geprüfter Stand:
+- Dashboard lädt auf Staging.
+- Die frühere Trennung aus `Aktueller Stand` und `Einreichungen & Status` wurde zu einer gemeinsamen Karte `Einreichungen` konsolidiert.
+- Statuswerte sind direkt in der Einreichungskarte integriert:
+  - sichtbar
+  - in Prüfung
+  - Zahlung offen
+  - abgelehnt
+- Ein Handlungsbedarf-/Statushinweis ist sichtbar.
+- Die Einreichungsliste nutzt Status-Badges, unter anderem `Veröffentlicht` und `Abgelehnt`.
+- `Tarife & Veröffentlichungen` steht vor `Kontakt & Organisation`.
+- Die Activity-/Location-Wirkungskarte bleibt ausgeblendet, solange Activity-/Location-Reporting-Ziele nicht sauber mit Anbieteraccounts verknüpft sind.
+- Der CSS-Stand wurde als Owner-Cleanup konsolidiert:
+  - kein zusätzlicher später Override-Block für Dashboard-Hierarchie
+  - Tarifdarstellung bleibt im Tarif-Owner
+  - Einreichungsdarstellung bleibt im Einreichungs-Owner
+  - Summary-/Statusdarstellung liegt beim Einreichungsbereich
+
+Bewertung:
+- Der aktuelle Stand ist aus Nutzersicht deutlich klarer und handlungsorientierter als der Ausgangsstand.
+- Mobile bleibt nutzbar und übersichtlicher, ohne essenzielle Informationen zu entfernen.
+- Desktop ist ruhiger und logischer strukturiert.
+- Weitere Optimierungen am Anbieter-Dashboard werden vorerst zurückgestellt und nur bei konkretem neuem Befund wieder geöffnet.
+<!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 === -->

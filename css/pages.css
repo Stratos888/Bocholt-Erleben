@@ -1154,6 +1154,96 @@ select.content-field__control{
   margin-top: 9px;
 }
 
+/* === BEGIN BLOCK: PUBLISH_EXPLAINER_ANCHOR_OFFSET_V1 | Zweck: stellt sicher, dass Hash-Links auf der Veröffentlichungserklärung unter dem sticky Header mit sichtbarer Zielüberschrift landen; Umfang: nur Ankerziele der zentralen Erklärseite === */
+.page--publish :is(
+  #welcher-weg-passt,
+  #mitgliedschaft,
+  #automatische-uebernahme,
+  #aktivitaetspraesenz-weg,
+  #ablauf,
+  #faq,
+  #zahlung-und-freigabe,
+  #aktivitaet-oder-veranstaltung
+){
+  scroll-margin-block-start: calc(var(--header-h, 48px) + 28px);
+}
+/* === END BLOCK: PUBLISH_EXPLAINER_ANCHOR_OFFSET_V1 === */
+
+/* === BEGIN BLOCK: PUBLISH_EXPLAINER_LINK_HIERARCHY_V1 | Zweck: stuft Erklärseiten- und Kontextlinks visuell klar unter echte Funnel-CTAs, ohne bestehende Tarif-, Formular- oder Checkout-Logik zu verändern; Umfang: nur Veröffentlichungserklärung und explizit markierte Kontextlinks === */
+:is(.page--publish, .page--organizers) .publish-explainer-context-link{
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link,
+.page--publish .publish-explainer-card-link{
+  width: fit-content;
+  min-height: 38px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 5px;
+  color: var(--cmp-link-color);
+  font-size: 0.86rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__label,
+.page--publish .publish-explainer-card-link .content-link__label{
+  text-decoration: none;
+}
+
+:is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link__chevron,
+.page--publish .publish-explainer-card-link .content-link__chevron{
+  width: 14px;
+  height: 14px;
+  margin-left: 0;
+  opacity: 0.72;
+}
+
+.page--publish .publish-explainer-card-link{
+  margin-top: 2px;
+}
+
+.page--publish .publish-explainer-next-card{
+  gap: 10px;
+}
+
+.page--publish .publish-explainer-next-links{
+  gap: 0;
+  border-top: 1px solid var(--cmp-divider-strong);
+}
+
+.page--publish .publish-explainer-next-links .content-link{
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.93rem;
+  font-weight: 720;
+}
+
+.page--publish .publish-explainer-next-links .content-link + .content-link{
+  border-top: 1px solid var(--cmp-divider-subtle);
+}
+
+@media (hover: hover){
+  :is(.page--publish, .page--organizers) .publish-explainer-context-link .content-link:hover,
+  .page--publish .publish-explainer-card-link:hover,
+  .page--publish .publish-explainer-next-links .content-link:hover{
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+/* === END BLOCK: PUBLISH_EXPLAINER_LINK_HIERARCHY_V1 === */
+
 .page--publish .publish-final-actions{
   display: grid;
   gap: 8px;
@@ -1192,6 +1282,7 @@ select.content-field__control{
 .page--organizers .content-hero h1{
   max-width: 26ch;
   font-size: clamp(1.52rem, 6.1vw, 1.86rem);
+  font-weight: 640;
   line-height: 1.04;
   letter-spacing: -0.034em;
   text-wrap: pretty;
@@ -1282,8 +1373,8 @@ select.content-field__control{
 }
 
 .page--organizers[data-organizer-page="dashboard"] .content-card--primary > p:first-of-type{
-  color: var(--color-text-primary);
-  font-weight: 720;
+  color: var(--color-text-secondary);
+  font-weight: 440;
 }
 
 .page--organizers[data-organizer-page="dashboard"] #organizer-quota-remaining:not([hidden]){
@@ -1336,7 +1427,7 @@ select.content-field__control{
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUMMARY_DATA_ROWS_FINAL_V1 | Zweck: macht die Werte in Meine Angaben und Übersicht Mitgliedschaft zu ruhigen, einheitlichen Datenzeilen; Umfang: nur Dashboard-Summary-Karten === */
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-summary .content-card--primary h2{
   color: var(--color-text-primary);
-  font-weight: 760;
+  font-weight: 590;
 }
 
 .page--organizers[data-organizer-page="dashboard"] :is(
@@ -1365,8 +1456,8 @@ select.content-field__control{
   display: block;
   margin: 0 0 8px;
   color: var(--color-text-primary);
-  font-size: 0.86rem;
-  font-weight: 780;
+  font-size: 0.78rem;
+  font-weight: 590;
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
@@ -1387,7 +1478,7 @@ select.content-field__control{
 .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-label{
   min-width: 0;
   color: var(--color-text-secondary);
-  font-weight: 560;
+  font-weight: 420;
   line-height: 1.35;
 }
 
@@ -1395,7 +1486,7 @@ select.content-field__control{
 .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-price{
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
   text-align: right;
   white-space: nowrap;
 }
@@ -1408,7 +1499,7 @@ select.content-field__control{
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total-label{
   color: var(--color-text-primary);
-  font-weight: 780;
+  font-weight: 560;
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-bullets{
@@ -1421,7 +1512,7 @@ select.content-field__control{
   display: block;
   padding-left: 17px;
   color: var(--color-text-secondary);
-  font-weight: 520;
+  font-weight: 400;
   line-height: 1.4;
 }
 
@@ -1447,7 +1538,81 @@ select.content-field__control{
   display: block;
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_TARIFF_TABLE_UI_V1 === */
+@media (max-width: 640px){
+  .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-row{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+    align-items: start;
+  }
+
+  .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-label{
+    overflow-wrap: anywhere;
+  }
+
+  .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-price{
+    text-align: left;
+    white-space: normal;
+  }
+
+  .page--organizers[data-organizer-page="dashboard"] .organizer-tariff-total{
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+}
+
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_INLINE_EDIT_STYLES_V1 | Zweck: gestaltet aufklappbare Einreichungen inklusive direkter Änderungsmaske im Veranstalter-Dashboard; Umfang: komplette Submission-Liste, Detailansicht, Aktionen und Edit-Formular === */
+.page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-summary{
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: clamp(0.93rem, 2vw, 1rem);
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.18rem;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-item{
+  min-width: 0;
+  padding: 0.62rem 0.68rem;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 0.86rem;
+  background: rgba(255,255,255,0.48);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-label{
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 360;
+  line-height: 1.18;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-value{
+  display: block;
+  margin-top: 0.16rem;
+  color: var(--color-text-primary);
+  font-size: 1.02rem;
+  font-weight: 620;
+  line-height: 1.08;
+}
+
+.page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-next-step{
+  margin-block: 0;
+  padding: 0.62rem 0.72rem;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 0.82rem;
+  background: rgba(255,255,255,0.44);
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+
 .page--organizers[data-organizer-page="dashboard"] #organizer-dashboard-submissions-list{
   gap: 0;
 }
@@ -1476,17 +1641,61 @@ select.content-field__control{
   min-width: 0;
 }
 
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge{
+  flex: 0 0 auto;
+  padding: 0.18rem 0.46rem;
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 520;
+  line-height: 1.15;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.58);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--success{
+  border-color: color-mix(in srgb, var(--color-primary) 38%, var(--cmp-divider-strong));
+  color: var(--color-primary-strong);
+  background: color-mix(in srgb, var(--color-primary-muted) 38%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--warning{
+  border-color: color-mix(in srgb, #9a6a00 34%, var(--cmp-divider-strong));
+  color: #795100;
+  background: color-mix(in srgb, #f4cf7a 30%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--danger{
+  border-color: color-mix(in srgb, #a33a2b 34%, var(--cmp-divider-strong));
+  color: #8a2c20;
+  background: color-mix(in srgb, #e8a39a 24%, white);
+}
+
+.page--organizers[data-organizer-page="dashboard"] .organizer-submission-status-badge--neutral{
+  color: var(--color-text-primary);
+  background: rgba(255,255,255,0.72);
+}
+
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__title{
   color: var(--color-text-primary);
   font-size: 0.94rem;
-  font-weight: 720;
+  font-weight: 560;
   line-height: 1.22;
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-row__meta{
   color: var(--color-text-secondary);
   font-size: 0.78rem;
-  font-weight: 520;
+  font-weight: 360;
   line-height: 1.24;
 }
 
@@ -1524,14 +1733,14 @@ select.content-field__control{
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__status span{
   color: var(--color-text-primary);
   font-size: 0.84rem;
-  font-weight: 680;
+  font-weight: 560;
   line-height: 1.28;
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__status small{
   color: var(--color-text-secondary);
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: 360;
   line-height: 1.32;
 }
 
@@ -1542,7 +1751,7 @@ select.content-field__control{
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__edited-note:not([hidden]){
   color: var(--color-text-primary);
-  font-weight: 650;
+  font-weight: 560;
 }
 
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts{
@@ -1560,7 +1769,7 @@ select.content-field__control{
 .page--organizers[data-organizer-page="dashboard"] .organizer-submission-detail__facts dt{
   color: var(--color-text-secondary);
   font-size: 0.76rem;
-  font-weight: 640;
+  font-weight: 420;
   line-height: 1.25;
 }
 
@@ -1569,7 +1778,7 @@ select.content-field__control{
   margin: 0;
   color: var(--color-text-primary);
   font-size: 0.78rem;
-  font-weight: 520;
+  font-weight: 400;
   line-height: 1.25;
 }
 
@@ -1599,7 +1808,7 @@ select.content-field__control{
   color: var(--color-text-primary);
   font: inherit;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 560;
   line-height: 1;
   text-decoration: none;
 }
@@ -1654,6 +1863,21 @@ select.content-field__control{
   color: var(--content-invalid-text);
 }
 /* === END BLOCK: ORGANIZER_DASHBOARD_SUBMISSIONS_INLINE_EDIT_STYLES_V1 === */
+@media (max-width: 640px){
+  .page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.48rem;
+  }
+
+  .page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-item{
+    padding: 0.54rem 0.6rem;
+    border-radius: 0.76rem;
+  }
+
+  .page--organizers[data-organizer-page="dashboard"] .organizer-submission-summary-value{
+    font-size: 0.98rem;
+  }
+}
 
 .page--organizers > nav.content-links:last-child{
   width: min(100%, var(--subpage-body-max));
@@ -2687,8 +2911,6 @@ select.content-field__control{
   display: none;
 }
 /* === END BLOCK: ABOUT_PAGE_RESPONSIVE_WIDE_V7 === */
-
-
 
   /* === BEGIN BLOCK: INFO_PAGE_REFERENCE_WIDE_V11 | Zweck: hält /info/ auf Wide-Desktop strikt im Render-Contract, ohne die rechte Hero-Spalte weiter anwachsen zu lassen; Umfang: nur page--info ab 1280px === */
   .page--info .content-hero--panel{

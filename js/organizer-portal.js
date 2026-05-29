@@ -99,6 +99,35 @@
     return formatStatusLabel(statusKey);
   }
 
+  function formatSubmissionKindLabel(submission) {
+    return safeText(submission?.submission_kind || "event").toLowerCase() === "activity"
+      ? "Aktivität"
+      : "Veranstaltung";
+  }
+
+  function formatSubmissionBadgeLabel(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+
+    if (statusKey === "approved") return "Veröffentlicht";
+    if (statusKey === "rejected") return "Abgelehnt";
+    if (statusKey === "payment_released" || statusKey === "checkout_started") return "Zahlung offen";
+    if (statusKey === "pending_review" || statusKey === "paid" || statusKey === "in_review") return "In Prüfung";
+    if (statusKey === "draft") return "Entwurf";
+
+    return formatStatusLabel(statusKey);
+  }
+
+  function formatSubmissionBadgeTone(submission) {
+    const statusKey = safeText(submission?.status).toLowerCase();
+
+    if (statusKey === "approved") return "success";
+    if (statusKey === "rejected") return "danger";
+    if (statusKey === "payment_released" || statusKey === "checkout_started") return "warning";
+    if (statusKey === "pending_review" || statusKey === "paid" || statusKey === "in_review") return "neutral";
+
+    return "muted";
+  }
+
   function formatDate(value) {
     const text = safeText(value);
     if (!text) return "–";
@@ -118,6 +147,23 @@
     }
 
     return text;
+  }
+
+  function formatInteger(value) {
+    const number = Number.parseInt(value, 10);
+    if (!Number.isFinite(number)) return "0";
+    return new Intl.NumberFormat("de-DE").format(Math.max(0, number));
+  }
+
+  function metricValue(row, key) {
+    return Number.parseInt(row?.[key] ?? 0, 10) || 0;
+  }
+
+  function formatImpactPeriod(period) {
+    const start = formatDate(period?.start_date);
+    const end = formatDate(period?.end_date);
+    if (start === "–" && end === "–") return "Zeitraum: letzte 28 Tage";
+    return `Zeitraum: ${start} – ${end}`;
   }
 
   function formatDateTime(value) {
@@ -540,17 +586,238 @@ function normalizeExternalUrl(value) {
   }
   /* === END BLOCK: ORGANIZER_LOGIN_MAGIC_LINK_FORM_V6 === */
 
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 | Zweck: verdichtet Anbieter-Dashboard-Status und gruppiert wiederholte Tarifzeilen; Umfang: additive Helper vor renderDashboard === */
+  function buildOrganizerTariffRows(activeSubscriptions) {
+    const grouped = new Map();
+
+    (Array.isArray(activeSubscriptions) ? activeSubscriptions : []).forEach((item) => {
+      const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
+      const amount = safeText(item?.monthly_amount_label) || "–";
+      if (!label) return;
+
+      const key = `${label}||${amount}`;
+      const current = grouped.get(key) || { label, amount, count: 0 };
+      current.count += 1;
+      grouped.set(key, current);
+    });
+
+    return Array.from(grouped.values()).map((row) => ({
+      label: row.count > 1 ? `${formatInteger(row.count)} × ${row.label}` : row.label,
+      amount: row.count > 1 ? `${formatInteger(row.count)} × ${row.amount}` : row.amount
+    }));
+  }
+
+  function buildOrganizerIncludedRows(quotaByPlan) {
+    const buckets = {
+      events: { consumed: 0, included: 0, unlimited: false },
+      activities: { consumed: 0, included: 0, unlimited: false }
+    };
+
+    (Array.isArray(quotaByPlan) ? quotaByPlan : []).forEach((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      const bucket = ["activity_basic", "activity_plus"].includes(planKey) ? buckets.activities : buckets.events;
+
+      if (!["starter", "active", "unlimited", "activity_basic", "activity_plus"].includes(planKey)) return;
+
+      bucket.consumed += Number(item?.consumed_total || 0);
+      bucket.included += Number(item?.included_total || 0);
+      bucket.unlimited = bucket.unlimited || Boolean(item?.has_unlimited);
+    });
+
+    const rows = [];
+
+    if (buckets.events.unlimited) {
+      rows.push("Veranstaltungen: unbegrenzt veröffentlichte Termine");
+    } else if (buckets.events.consumed > 0 || buckets.events.included > 0) {
+      rows.push(`Veranstaltungen: ${formatInteger(buckets.events.consumed)} von ${formatInteger(buckets.events.included)} veröffentlichten Terminen genutzt`);
+    }
+
+    if (buckets.activities.unlimited) {
+      rows.push("Aktivitäten: unbegrenzt veröffentlichte Aktivitäten");
+    } else if (buckets.activities.consumed > 0 || buckets.activities.included > 0) {
+      rows.push(`Aktivitäten: ${formatInteger(buckets.activities.consumed)} von ${formatInteger(buckets.activities.included)} veröffentlichten Aktivitäten genutzt`);
+    }
+
+    return rows;
+  }
+
+  function isOrganizerPublishedSubmission(submission) {
+    return safeText(submission?.status).toLowerCase() === "approved";
+  }
+
+  function isOrganizerOpenSubmission(submission) {
+    return new Set(["draft", "checkout_started", "pending_review", "payment_released", "paid", "in_review"]).has(
+      safeText(submission?.status).toLowerCase()
+    );
+  }
+
+  function organizerSubmissionAreaLabel(activeSubscriptions, submissions, isActivityPlanView) {
+    const planKeys = (Array.isArray(activeSubscriptions) ? activeSubscriptions : [])
+      .map((item) => safeText(item?.plan_key).toLowerCase());
+    const hasActivityPlan = planKeys.some((key) => key === "activity_basic" || key === "activity_plus");
+    const hasEventPlan = planKeys.some((key) => key === "starter" || key === "active" || key === "unlimited");
+    const hasActivitySubmission = (Array.isArray(submissions) ? submissions : [])
+      .some((item) => safeText(item?.submission_kind || "event").toLowerCase() === "activity");
+    const hasEventSubmission = (Array.isArray(submissions) ? submissions : [])
+      .some((item) => safeText(item?.submission_kind || "event").toLowerCase() !== "activity");
+
+    if ((hasActivityPlan || hasActivitySubmission || isActivityPlanView) && (hasEventPlan || hasEventSubmission)) {
+      return "Veranstaltungen & Aktivitäten";
+    }
+
+    if (hasActivityPlan || hasActivitySubmission || isActivityPlanView) {
+      return "Aktivitäten";
+    }
+
+    return "Veranstaltungen";
+  }
+
+  function renderOrganizerSubmissionsSummary(context) {
+    const summary = document.getElementById("organizer-dashboard-submissions-summary");
+    const overview = document.getElementById("organizer-dashboard-submissions-overview");
+    const nextStep = document.getElementById("organizer-dashboard-next-step");
+
+    if (!summary || !overview || !nextStep) return;
+
+    const submissions = Array.isArray(context?.submissions) ? context.submissions : [];
+    const activeSubscriptions = Array.isArray(context?.activeSubscriptions) ? context.activeSubscriptions : [];
+    const latestSubmission = context?.latestSubmission || null;
+
+    if (context?.isSingleStatusView) {
+      summary.textContent = latestSubmission
+        ? `${formatStatusLabel(latestSubmission.status)} · ${formatDate(latestSubmission.start_date || latestSubmission.created_at)}`
+        : "Noch keine Einreichung gefunden.";
+
+      overview.innerHTML = [
+        ["Bereich", "Einzeltermin"],
+        ["Status", latestSubmission ? formatStatusLabel(latestSubmission.status) : "–"],
+        ["Ort", latestSubmission ? (safeText(latestSubmission.location_name) || "–") : "–"]
+      ].map(([label, value]) => `
+        <span class="organizer-submission-summary-item" role="listitem">
+          <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
+          <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
+        </span>
+      `).join("");
+
+      nextStep.textContent = "Öffne unten die Einreichung, um Status, Angaben und mögliche Änderungen zu prüfen.";
+      return;
+    }
+
+    const visibleCount = submissions.filter((item) => safeText(item?.status).toLowerCase() === "approved").length;
+    const reviewCount = submissions.filter((item) => {
+      const status = safeText(item?.status).toLowerCase();
+      return status === "pending_review" || status === "paid" || status === "in_review";
+    }).length;
+    const paymentOpenCount = submissions.filter((item) => {
+      const status = safeText(item?.status).toLowerCase();
+      return status === "payment_released" || status === "checkout_started";
+    }).length;
+    const rejectedCount = submissions.filter((item) => safeText(item?.status).toLowerCase() === "rejected").length;
+    const areaLabel = organizerSubmissionAreaLabel(activeSubscriptions, submissions, context?.isActivityPlanView);
+
+    summary.textContent = `${areaLabel} · ${formatInteger(visibleCount)} sichtbar · ${formatInteger(reviewCount)} in Prüfung`;
+
+    overview.innerHTML = [
+      ["Sichtbar", formatInteger(visibleCount)],
+      ["In Prüfung", formatInteger(reviewCount)],
+      ["Zahlung offen", formatInteger(paymentOpenCount)],
+      ["Abgelehnt", formatInteger(rejectedCount)]
+    ].map(([label, value]) => `
+      <span class="organizer-submission-summary-item" role="listitem">
+        <span class="organizer-submission-summary-label">${escapeHtml(label)}</span>
+        <span class="organizer-submission-summary-value">${escapeHtml(value)}</span>
+      </span>
+    `).join("");
+
+    if (paymentOpenCount > 0) {
+      nextStep.textContent = `Handlungsbedarf: ${formatInteger(paymentOpenCount)} Einreichung${paymentOpenCount === 1 ? "" : "en"} mit offenem Zahlungsschritt.`;
+    } else if (reviewCount > 0) {
+      nextStep.textContent = `Kein Handlungsbedarf: ${formatInteger(reviewCount)} Einreichung${reviewCount === 1 ? "" : "en"} ${reviewCount === 1 ? "ist" : "sind"} in Prüfung.`;
+    } else if (rejectedCount > 0) {
+      nextStep.textContent = "Kein akuter Handlungsbedarf. Abgelehnte Einreichungen bleiben zur Nachverfolgung sichtbar.";
+    } else {
+      nextStep.textContent = "Kein Handlungsbedarf. Du kannst neue Inhalte einreichen oder bestehende Einreichungen unten prüfen.";
+    }
+  }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_V2_STRUCTURE_HELPERS_V1 === */
+
+  /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 | Zweck: rendert sichere Anbieter-Nutzwertzahlen als vorsichtiges Wertzentrum; Umfang: additive Helfer vor renderDashboard === */
+  function renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView = false) {
+    const card = document.getElementById("organizer-dashboard-impact-card");
+    const periodNode = document.getElementById("organizer-impact-period");
+    const metricsNode = document.getElementById("organizer-impact-metrics");
+    const noteNode = document.getElementById("organizer-impact-note");
+
+    if (!card || !periodNode || !metricsNode || !noteNode) return;
+
+    if (isSingleStatusView || isActivityPlanView) {
+      card.hidden = true;
+      card.setAttribute("hidden", "");
+      return;
+    }
+
+    const impact = data?.impact_summary || {};
+    const metrics = impact?.metrics || {};
+    const previous = impact?.previous_metrics || {};
+    const total = metricValue(metrics, "total_interactions");
+    const directClicks =
+      metricValue(metrics, "website_clicks") +
+      metricValue(metrics, "maps_clicks") +
+      metricValue(metrics, "location_clicks") +
+      metricValue(metrics, "organizer_cta_clicks");
+    const previousTotal = metricValue(previous, "total_interactions");
+    const totalDelta = total - previousTotal;
+    const deltaLabel = totalDelta > 0
+      ? `+${formatInteger(totalDelta)} gegenüber dem vorherigen Zeitraum`
+      : totalDelta < 0
+        ? `-${formatInteger(Math.abs(totalDelta))} gegenüber dem vorherigen Zeitraum`
+        : "kein Unterschied zum vorherigen Zeitraum";
+
+    card.hidden = false;
+    card.removeAttribute("hidden");
+    periodNode.textContent = formatImpactPeriod(impact?.period);
+
+    metricsNode.innerHTML = [
+      ["Interaktionen gesamt", total],
+      ["Detail-Aufrufe", metricValue(metrics, "detail_views")],
+      ["Website-/Ticket-Klicks", metricValue(metrics, "website_clicks")],
+      ["Route/Maps", metricValue(metrics, "maps_clicks")]
+    ].map(([label, value]) => `
+      <span class="organizer-tariff-row" role="listitem">
+        <span class="organizer-tariff-label">${escapeHtml(label)}</span>
+        <span class="organizer-tariff-price">${escapeHtml(formatInteger(value))}</span>
+      </span>
+    `).join("");
+
+    if (impact?.status === "not_configured" || impact?.status === "not_available") {
+      noteNode.textContent = impact?.message || "Die Nutzwert-Auswertung ist für diesen Bereich noch nicht verfügbar.";
+      return;
+    }
+
+    if (total > 0) {
+      noteNode.textContent = `Nutzer haben deine veröffentlichten Inhalte geöffnet oder weiterführende Links genutzt. Direkt erklärbare Klicks: ${formatInteger(directClicks)}; ${deltaLabel}. Keine Besucherzahlen vor Ort, keine Buchungen, keine eindeutigen Personen.`;
+    } else {
+      noteNode.textContent = "Noch keine Nutzsignale im aktuellen Zeitraum. Die Messung läuft; Werte erscheinen, sobald veröffentlichte Inhalte angesehen oder weiterführende Links genutzt werden.";
+    }
+  }
+  /* === END BLOCK: ORGANIZER_DASHBOARD_IMPACT_RENDERER_V1 === */
+
   /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_AREA_SPLIT_COPY_V2_VALUE_CENTER_COPY | Zweck: rendert dieselbe technische Bereichsroute je nach Datenlage als Einreichungsstatus oder Veranstalter-Wertzentrum ohne neue Datenlogik; Umfang: komplette renderDashboard-Funktion === */
    function renderDashboard(data) {
     const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
     const summaryGrid = document.getElementById("organizer-dashboard-summary");
     const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
+    const impactCard = document.getElementById("organizer-dashboard-impact-card");
 
     if (authRequiredCard) {
       authRequiredCard.hidden = true;
       authRequiredCard.setAttribute("hidden", "");
     }
     if (summaryGrid) summaryGrid.hidden = false;
+    if (impactCard) {
+      impactCard.hidden = true;
+      impactCard.setAttribute("hidden", "");
+    }
     if (submissionsCard) submissionsCard.hidden = false;
 
     const organizer = data?.organizer || {};
@@ -705,45 +972,8 @@ function normalizeExternalUrl(value) {
     /* === END BLOCK: ORGANIZER_DASHBOARD_ACCOUNT_CARD_COPY_V4_VALUE_CENTER_COPY === */
 
     /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY | Zweck: benennt Tarife und Veröffentlichungen verständlicher ohne Kontingent-/Token-Sprache; Umfang: ersetzt komplette Tarif-/Kontingentübersicht in renderDashboard === */
-    const tariffRows = activeSubscriptions
-      .map((item) => {
-        const label = safeText(item?.plan_label) || formatPlanLabel(item?.plan_key);
-        const amount = safeText(item?.monthly_amount_label);
-        if (!label) return null;
-
-        return {
-          label,
-          amount: amount || "–"
-        };
-      })
-      .filter(Boolean);
-
-    const includedRows = quotaByPlan
-      .map((item) => {
-        const planKey = safeText(item?.plan_key).toLowerCase();
-        const isActivityQuota = ["activity_basic", "activity_plus"].includes(planKey);
-        const consumed = Number(item?.consumed_total || 0);
-        const included = Number(item?.included_total || 0);
-
-        if (isActivityQuota) {
-          if (item?.has_unlimited) {
-            return "Aktivitäten: unbegrenzt veröffentlichte Aktivitäten";
-          }
-
-          return `Aktivitäten: ${consumed} von ${included} veröffentlichten Aktivitäten genutzt`;
-        }
-
-        if (["starter", "active", "unlimited"].includes(planKey)) {
-          if (item?.has_unlimited) {
-            return "Veranstaltungen: unbegrenzt veröffentlichte Termine";
-          }
-
-          return `Veranstaltungen: ${consumed} von ${included} veröffentlichten Terminen genutzt`;
-        }
-
-        return "";
-      })
-      .filter(Boolean);
+    const tariffRows = buildOrganizerTariffRows(activeSubscriptions);
+    const includedRows = buildOrganizerIncludedRows(quotaByPlan);
 
     const monthlyTotal = safeText(billingSummary?.monthly_total_label);
 
@@ -820,9 +1050,24 @@ function normalizeExternalUrl(value) {
     }
     /* === END BLOCK: ORGANIZER_DASHBOARD_MULTI_TARIFF_OVERVIEW_V3_VALUE_CENTER_COPY === */
 
+    renderOrganizerSubmissionsSummary({
+      isSingleStatusView,
+      isActivityPlanView,
+      activeSubscriptions,
+      submissions,
+      latestSubmission
+    });
+
+    const hasActivityPresencePlan = activeSubscriptions.some((item) => {
+      const planKey = safeText(item?.plan_key).toLowerCase();
+      return planKey === "activity_basic" || planKey === "activity_plus";
+    });
+
+    renderOrganizerImpactCard(data, isSingleStatusView, isActivityPlanView || hasActivityPresencePlan);
+
 /* === BEGIN BLOCK: ORGANIZER_DASHBOARD_CURRENT_SUBMISSIONS_INLINE_EDIT_V2_VALUE_CENTER_COPY | Zweck: zeigt Einreichungen mit Status, Details und Änderungsmöglichkeit vor Veröffentlichung; Umfang: Überschrift, Empty-State und komplette Rendering-/Edit-Logik der Einreichungsliste in renderDashboard === */
 if (submissionsHead) {
-  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen & Status";
+  submissionsHead.textContent = isSingleStatusView ? "Meine Einreichung" : "Einreichungen";
 }
 
 if (submissionsList && submissionsEmpty) {
@@ -1079,7 +1324,12 @@ if (submissionsList && submissionsEmpty) {
       const titleText = safeText(submission.title) || "Ohne Titel";
       const statusText = formatSubmissionStatusLabel(submission);
       const metaDateText = formatSubmissionMetaDate(submission);
-      const metaText = `${statusText} · ${metaDateText}`;
+      const statusBadgeText = formatSubmissionBadgeLabel(submission);
+      const statusBadgeTone = formatSubmissionBadgeTone(submission);
+      const kindText = formatSubmissionKindLabel(submission);
+      const metaText = metaDateText && metaDateText !== "–"
+        ? `${kindText} · ${metaDateText}`
+        : kindText;
       const statusDescription = formatSubmissionStatusDescription(submission);
       const eventUrl = normalizeExternalUrl(submission.event_url || submission.ticket_url);
       const detailId = `organizer-submission-detail-${index}`;
@@ -1095,7 +1345,10 @@ if (submissionsList && submissionsEmpty) {
 
       row.innerHTML = `
         <span class="content-link__label organizer-submission-row__label">
-          <strong class="organizer-submission-row__title">${escapeHtml(titleText)}</strong>
+          <span class="organizer-submission-row__head">
+            <strong class="organizer-submission-row__title">${escapeHtml(titleText)}</strong>
+            <span class="organizer-submission-status-badge organizer-submission-status-badge--${escapeHtml(statusBadgeTone)}">${escapeHtml(statusBadgeText)}</span>
+          </span>
           <small class="organizer-submission-row__meta">${escapeHtml(metaText)}</small>
         </span>
         <span class="content-link__chevron organizer-submission-row__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
@@ -1248,6 +1501,7 @@ if (submissionsList && submissionsEmpty) {
       const authRequiredCard = document.getElementById("organizer-dashboard-auth-required");
       const summaryGrid = document.getElementById("organizer-dashboard-summary");
       const submissionsCard = document.getElementById("organizer-dashboard-submissions-card");
+      const impactCard = document.getElementById("organizer-dashboard-impact-card");
 
       if (logoutButton) {
         logoutButton.hidden = true;
@@ -1255,6 +1509,7 @@ if (submissionsList && submissionsEmpty) {
       }
 
       if (summaryGrid) summaryGrid.hidden = true;
+      if (impactCard) impactCard.hidden = true;
       if (submissionsCard) submissionsCard.hidden = true;
 
       if (authRequiredCard) {
