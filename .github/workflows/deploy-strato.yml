@@ -511,8 +511,18 @@ jobs:
             echo "❌ GUARD FAILED: deploy/index.html does not contain style.css?v=..."
             exit 1
           fi
-          if ! grep -qE '["'\''( ]/?js/main\.js\?v=' deploy/index.html; then
-            echo "❌ GUARD FAILED: deploy/index.html does not contain main.js?v=..."
+          if ! grep -qE 'today-home\.js\?v=' deploy/index.html; then
+            echo "❌ GUARD FAILED: deploy/index.html does not contain today-home.js?v=..."
+            exit 1
+          fi
+
+          if ! grep -qE 'main\.js\?v=' deploy/events/index.html; then
+            echo "❌ GUARD FAILED: deploy/events/index.html does not contain main.js?v=..."
+            exit 1
+          fi
+
+          if ! grep -qE 'offers-main\.js\?v=' deploy/aktivitaeten/index.html; then
+            echo "❌ GUARD FAILED: deploy/aktivitaeten/index.html does not contain offers-main.js?v=..."
             exit 1
           fi
           if ! grep -qE '["'\''( ]/?(js/)?config\.js\?v=' deploy/index.html; then
