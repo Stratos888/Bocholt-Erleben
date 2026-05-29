@@ -364,18 +364,32 @@ Akzeptanzkriterien:
 
 ### 8. Monatlichen Wertbericht vorbereiten
 
-Ziel:
+<!-- === BEGIN BLOCK: ROADMAP_MONTHLY_VALUE_REPORT_PREPARED_2026_05_29 | Zweck: korrigiert Punkt 8 als vorbereiteten Reporting-/Retention-Baustein; Umfang: Status, Wartepunkt, Abgrenzung zur späteren Automatisierung === -->
 
-- regelmäßiger Bericht pro Anbieter/Location.
+Status 2026-05-29:
 
-Warum:
+- Punkt 8 ist in der aktuell sinnvollen Form vorbereitet und kein aktiver Bau-Block mehr.
+- Der interne `Location-Feedbackbericht` ist im SEO-/Mehrwert-Dashboard `/intern/seo-dashboard/` eingebaut und auf Staging geprüft.
+- Der Bericht ist screenshot- und gesprächsfähig für interne Akquise-/Proof-Vorbereitung.
+- Belastbare Anbieter-/Location-Aussagen brauchen weiter echte organische Daten über einen längeren Zeitraum.
 
-- Retention entsteht nicht nur durch Veröffentlichung, sondern durch wiederholten Nutzennachweis.
+Wartepunkt:
 
-Akzeptanzkriterien:
+- Kurzcheck nach ca. 7 Tagen: prüfen, ob erste echte Zielsignale plausibel einlaufen.
+- Hauptcheck nach ca. 30 Tagen bzw. nach einem vollständigen 28-Tage-Zeitraum: prüfen, ob ein erster Akquise-/Feedbackbericht belastbar ist.
 
-- Bericht kann zunächst manuell oder halbautomatisch erzeugt werden.
-- Automatisierung erst nach stabilem Datenmodell.
+Nicht jetzt bauen:
+
+- keine automatische Monatsmail
+- kein PDF-/Export-System
+- kein neuer Anbieter-Self-Service-Bericht
+- keine neue Datenbanktabelle nur für Reporting
+
+Nächster aktiver Anschluss:
+
+- Da Punkt 8 vorbereitet ist und die Datenbasis nun laufen muss, ist der nächste aktive Produkt-Workpack Punkt 9: `Heute in Bocholt` als Discovery-Einstieg.
+
+<!-- === END BLOCK: ROADMAP_MONTHLY_VALUE_REPORT_PREPARED_2026_05_29 === -->
 
 ---
 
