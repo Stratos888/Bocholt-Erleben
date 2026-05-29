@@ -345,6 +345,7 @@
     ].filter((item) => item.id && item.title);
   }
 
+  /* === BEGIN BLOCK: RECOMMENDATION_REASON_LABELS_WEATHER_AWARE_V1 | Zweck: priorisiert nutzernahe Wetter- und Situationshinweise fuer die Premium-Home; Umfang: ersetzt nur buildReasonLabels(), keine Scoring-/DOM-Aenderung === */
   function buildReasonLabels(item, context) {
     const labels = [];
 
@@ -352,6 +353,22 @@
       const date = parseDateLocal(item.date);
       if (date && isSameDay(date, context.now)) labels.push("Heute");
       if (date && isWeekend(date)) labels.push("Wochenende");
+    }
+
+    if (context.weather === "rain" && hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) {
+      labels.push("Gut bei Regen");
+    }
+
+    if (context.weather === "hot" && hasAny(item.interestTags, ["Baden", "Wasser"])) {
+      labels.push("Gut bei Wärme");
+    }
+
+    if (context.weather === "cold" && hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
+      labels.push("Drinnen möglich");
+    }
+
+    if (context.weather === "windy" && hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
+      labels.push("Eher geschützt");
     }
 
     if (item.type === "activity") {
@@ -362,10 +379,13 @@
 
     if (hasAny(item.interestTags, "Familie")) labels.push("Familie");
     if (hasAny(item.interestTags, "Draußen")) labels.push("Draußen");
-    if (hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) labels.push("Bei Regen möglich");
+    if (context.weather !== "rain" && hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) {
+      labels.push("Bei Regen möglich");
+    }
 
     return unique(labels).slice(0, 3);
   }
+  /* === END BLOCK: RECOMMENDATION_REASON_LABELS_WEATHER_AWARE_V1 === */
 
   function scoreItem(item, rawContext) {
     const context = normalizeContext(rawContext);
@@ -417,6 +437,38 @@
     if (context.weather === "dry" && hasAny(item.interestTags, "Draußen")) {
       score += 8;
     }
+
+    /* === BEGIN BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 | Zweck: nutzt Wetterklassen hot/cold/windy als echten Rankingfaktor fuer Premium-Home; Umfang: erweitert nur scoreItem(), keine DOM-/UI-Aenderung === */
+    if (context.weather === "hot") {
+      if (hasAny(item.interestTags, ["Baden", "Wasser"])) {
+        score += 30;
+      } else if (hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
+        score += 10;
+      } else if (hasAny(item.interestTags, "Draußen")) {
+        score -= 6;
+      }
+    }
+
+    if (context.weather === "cold") {
+      if (hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
+        score += 22;
+      } else if (hasAny(item.interestTags, "Draußen")) {
+        score -= 14;
+      }
+    }
+
+    if (context.weather === "windy") {
+      if (hasAny(item.interestTags, ["Baden", "Wasser"])) {
+        score -= 20;
+      } else if (hasAny(item.interestTags, "Draußen")) {
+        score -= 8;
+      }
+
+      if (hasAny(item.weatherProfile, ["indoor", "weather_independent", "rain_ok"])) {
+        score += 10;
+      }
+    }
+    /* === END BLOCK: RECOMMENDATION_WEATHER_SCORING_HOT_COLD_WINDY_V1 === */
 
     if (item.type === "activity") {
       if (item.availability === "always") score += 6;
