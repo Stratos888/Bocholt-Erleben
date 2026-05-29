@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<link rel="canonical" href="https://bocholt-erleben.de/">   
+<link rel="canonical" href="https://bocholt-erleben.de/">
 <meta charset="UTF-8">
 <!-- === BEGIN BLOCK: PWA ICON + META BASICS (home) ===
 Zweck: Bindet Manifest, Favicon, Apple-Touch-Icon und Basis-PWA-Meta für Home sauber ein.
@@ -42,38 +42,38 @@ Zweck: Optimiert Google-Snippet (Title/Description) sowie Social-/AI-Preview (Op
 Umfang: ersetzt nur den bestehenden SEO-Snippet-Block.
 === -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bocholt erleben – Events & Termine in Bocholt heute</title>
-<meta name="description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
+<title>Heute in Bocholt – Bocholt erleben</title>
+<meta name="description" content="Heute in Bocholt: passende Events und Aktivitäten auf einen Blick – mit Wetter, Interessen und spontanen Ideen für Bocholt und Umgebung.">
 
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Bocholt erleben">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bocholt-erleben.de/">
-<meta property="og:title" content="Bocholt erleben – Events & Termine in Bocholt heute">
-<meta property="og:description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
+<meta property="og:title" content="Heute in Bocholt – Bocholt erleben">
+<meta property="og:description" content="Passende Events und Aktivitäten für heute in Bocholt – kompakt, mobil und nach Situation sortiert.">
 <meta property="og:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Bocholt erleben – Events & Termine in Bocholt heute">
-<meta name="twitter:description" content="Alle Events & Termine in Bocholt: Konzerte, Kultur, Märkte, Partys u. v. m. Übersichtlich, mobil optimiert – mit Infos zur Location.">
+<meta name="twitter:title" content="Heute in Bocholt – Bocholt erleben">
+<meta name="twitter:description" content="Passende Events und Aktivitäten für heute in Bocholt – kompakt, mobil und nach Situation sortiert.">
 <meta name="twitter:image" content="https://bocholt-erleben.de/assets/hero/bocholt-hero-b.jpg">
 <!-- === END BLOCK: SEO SNIPPET (title + meta description + OG/Twitter) === -->
 <!-- === END BLOCK: HOME_HEAD_SOCIAL_PREVIEW_ENRICHMENT_V1 === -->
 
-    
+
         <!-- Custom CSS -->
  <!-- === BEGIN BLOCK: CSS CACHE BUSTING (activity filterbar enterprise polish) ===
 Zweck: erzwingt die aktuelle zentrale CSS-Import-Kette für den finalen Desktop-Hero-/Filterbar-Stand.
 Umfang: ersetzt nur den stylesheet-link.
 === -->
-<link rel="stylesheet" href="/css/style.css?v=2026-05-19-activities-filterbar-enterprise-v1">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-29-today-home-v1">
 <!-- === END BLOCK: CSS CACHE BUSTING (activity filterbar enterprise polish) === -->
 
 
 
 
 </head>
-<body class="is-tabbar-hidden has-bottom-tabbar">
+<body class="page-route-today has-bottom-tabbar">
 
 <!-- === BEGIN BLOCK: HEADER (logo/title + install + publish) ===
 Zweck: Header ohne Overflow-Menü; nur 2 klare Actions. Buttons sollen gleich aussehen.
@@ -113,179 +113,48 @@ Umfang: Ersetzt den kompletten bisherigen HEADER-Block inkl. "Für Locations" Me
 <div id="desktop-section-nav-root"></div>
 <!-- === END BLOCK: DESKTOP_SECTION_NAV_ROOT_SLOT_V1 === -->
 
- <!-- === BEGIN BLOCK: INTRO REMOVED (Search is functional hero) ===
-Zweck: Kein Hero/Intro unter dem Header (Redundanz mit App-Titel + Search Placeholder vermeiden).
-Umfang: Entfernt die <section class="intro"> vollständig.
-=== -->
-<!-- Intro entfernt: Search-Bar übernimmt die Hero-Rolle (Top-App Pattern). -->
-<!-- === END BLOCK: INTRO REMOVED (Search is functional hero) === -->
-
-
-
-    <!-- === BEGIN BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) ===
-    Zweck: Verhindert Layout-Shift durch #loading vor CSS/JS; Loading wird erst per JS sichtbar.
-    Umfang: Ersetzt ausschließlich den bestehenden LOADING INDICATOR Block.
-    === -->
-    <!-- LOADING INDICATOR -->
-    <div id="loading" class="loading-container" style="display:none" role="status" aria-live="polite" aria-busy="true">
-        <div class="loading-spinner" aria-hidden="true"></div>
-        <p>Events werden geladen...</p>
-    </div>
-    <!-- === END BLOCK: GS-01 LOADING HOST (hidden by default, no pre-CSS layout jump) === -->
-
-<!-- === BEGIN BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX | Zweck: entfernt die doppelte Kategorie-Pill, zieht den Hero auf eindeutige Filter-IDs und nutzt für die App-Aktion nur noch das globale semantische Install-Icon; Umfang: ersetzt den kompletten Hero-Markup-Block, Filter-Sheets bleiben funktional unverändert === -->
-<section class="desktop-hero" aria-label="Suche und Einführung">
-  <section class="desktop-entry desktop-hero__copy" aria-label="Einführung">
-    <div class="desktop-entry__inner">
-      <!-- === BEGIN BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
-      <div class="desktop-entry__content">
-        <h1 class="desktop-entry__title">Veranstaltungen in Bocholt</h1>
-        <p class="desktop-entry__text">Alle Events, Märkte und Veranstaltungen in Bocholt aktuell an einem Ort.</p>
+<!-- === BEGIN BLOCK: TODAY_HOME_SHELL_V1 | Zweck: ersetzt die alte Event-Startseite auf / durch die intelligente Heute-Home; Umfang: Today-Hero, Wetterhinweis, lokale Interessensteuerung und gemischter Recommendation-Feed === -->
+<main id="today-root" class="today-page" aria-labelledby="today-title">
+  <section class="today-hero" aria-label="Heute in Bocholt">
+    <div class="today-hero__card">
+      <div class="today-kicker">
+        <span data-ui-icon="sparkles" aria-hidden="true"></span>
+        <span>Dein schneller Blick auf Bocholt</span>
       </div>
-      <!-- === END BLOCK: DESKTOP_HERO_COPY_TEXT_V3 (natural wraps) === -->
+      <h1 id="today-title" class="today-title">Heute in Bocholt</h1>
+      <p class="today-lead">Events, Aktivitäten und spontane Ideen – passend zu Wetter, Tag und deinen Interessen.</p>
+      <div id="today-weather-note" class="today-weather-note" aria-live="polite">
+        <span>Ideen für heute.</span>
+      </div>
     </div>
+
+    <aside class="today-controls" aria-label="Heute anpassen">
+      <div class="today-control-panel">
+        <div class="today-control-group">
+          <div class="today-control-label">Was suchst du?</div>
+          <div class="today-scroll-row" data-today-modes aria-label="Ansicht wählen"></div>
+        </div>
+
+        <div class="today-control-group">
+          <div class="today-control-label">Interessen</div>
+          <div class="today-scroll-row" data-today-interests aria-label="Interessen wählen"></div>
+        </div>
+      </div>
+    </aside>
   </section>
 
-  <div class="top-stack desktop-hero__panel">
-    <div class="desktop-hero__search-row" aria-label="Suche und Filter">
-      <div class="events-filter desktop-hero__search-slot">
-        <label class="desktop-hero__search-field" for="search-filter">
-          <span class="desktop-hero__icon desktop-hero__icon--search" data-ui-icon="search" aria-hidden="true"></span>
-          <input
-            id="search-filter"
-            type="search"
-            placeholder="Events suchen"
-            aria-label="Suche"
-            autocomplete="off"
-            inputmode="search"
-          >
-        </label>
-      </div>
-
-      <!-- === BEGIN BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 | Zweck: hält im Hero genau eine Wann-Pill und genau eine Kategorie-Pill mit expliziten globalen Lucide-Chevrons; Umfang: nur Hero-Filter-Pills === -->
-      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-time-pill" aria-haspopup="dialog" aria-controls="sheet-time">
-        <span class="filter-pill__label">Wann?</span>
-        <span class="filter-pill__value" id="filter-time-value">Alle</span>
-        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </button>
-
-      <button type="button" class="filter-pill desktop-hero__toolbar-pill" id="filter-category-pill" aria-haspopup="dialog" aria-controls="sheet-category">
-        <span class="filter-pill__label">Kategorie</span>
-        <span class="filter-pill__value" id="filter-category-value">Alle</span>
-        <span class="filter-pill__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </button>
-      <!-- === END BLOCK: HERO_FILTER_PILLS_LUCIDE_CHEVRONS_V2 === -->
-
-      <button type="button" class="filter-pill filter-pill--reset" id="filter-reset-pill" aria-label="Filter zurücksetzen" hidden>
-        <span class="filter-pill__reset-icon" data-ui-icon="x" aria-hidden="true"></span>
-      </button>
+  <section class="today-main" aria-label="Vorschläge">
+    <div class="today-section-head">
+      <h2 class="today-section-title">Was passt jetzt?</h2>
+      <div id="today-status" class="today-status" aria-live="polite">Lade Ideen …</div>
     </div>
-
-    <!-- === BEGIN BLOCK: MOBILE_PUBLISH_UTILITY_ROW_REMOVED_V1 | Zweck: entfernt den mobilen Veranstalter-CTA vollständig aus dem Top-Stack; Umfang: kein CTA mehr zwischen Filtern und Feed === -->
-    <!-- intentionally removed: organizer entry now renders dynamically after the first real feed section -->
-    <!-- === END BLOCK: MOBILE_PUBLISH_UTILITY_ROW_REMOVED_V1 === -->
-
-    <div class="desktop-hero__actions" aria-label="Service">
-      <a class="desktop-hero__action desktop-hero__action--publish" href="/events-veroeffentlichen/">
-        <span class="desktop-hero__icon desktop-hero__icon--publish" data-ui-icon="plus" aria-hidden="true"></span>
-        <span>Event einreichen</span>
-      </a>
-
-      <a class="desktop-hero__action desktop-hero__action--info" href="/ueber/">
-        <span class="desktop-hero__icon desktop-hero__icon--info" data-ui-icon="info" aria-hidden="true"></span>
-        <span>Mehr erfahren</span>
-      </a>
-
-      <button
-        type="button"
-        class="desktop-hero__action desktop-hero__action--app"
-        data-pwa-install-trigger
-        aria-label="Als App installieren"
-      >
-        <span class="desktop-hero__icon desktop-hero__icon--app" data-ui-icon="app-install" aria-hidden="true"></span>
-        <span>Als App nutzen</span>
-      </button>
-    </div>
-  </div>
-</section>
-<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V10_ICON_SYSTEM_FIX === -->
-
-<div class="filter-sheet" id="sheet-time" role="dialog" aria-modal="true" aria-label="Zeit auswählen" hidden>
-  <div class="filter-sheet__overlay" data-close-sheet></div>
-  <div class="filter-sheet__card">
-    <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Wann?</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
-    </div>
-    <div class="filter-sheet__body">
-      <button type="button" class="filter-sheet-option is-active" data-time="all">Alle</button>
-      <button type="button" class="filter-sheet-option" data-time="today">Heute</button>
-      <button type="button" class="filter-sheet-option" data-time="week">Diese Woche</button>
-      <button type="button" class="filter-sheet-option" data-time="weekend">Dieses Wochenende</button>
-      <button type="button" class="filter-sheet-option" data-time="nextweek">Nächste Woche</button>
-      <button type="button" class="filter-sheet-option" data-time="later">Später</button>
-<!-- === BEGIN BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 | Zweck: ersetzt alle Text-Chevrons im mobilen Datumsmodul durch globale Lucide-Icons; Umfang: nur Datumsmodul im Zeit-Sheet === -->
-<div class="filter-date-module" data-date-module>
-  <div class="filter-date-module__divider" aria-hidden="true"></div>
-  <button type="button" class="filter-date-trigger" data-date-trigger aria-label="Bestimmtes Datum auswählen" aria-expanded="false">
-    <span class="filter-date-trigger__text" data-date-trigger-text>Datum auswählen</span>
-    <span class="filter-date-trigger__chevron" data-ui-icon="chevron-right" aria-hidden="true"></span>
-  </button>
-  <div class="filter-date-panel" data-date-panel hidden>
-    <div class="filter-date-panel__header">
-      <button type="button" class="filter-date-nav" data-date-nav="prev" aria-label="Vorheriger Monat">
-        <span class="filter-date-nav__icon" data-ui-icon="chevron-left" aria-hidden="true"></span>
-      </button>
-      <div class="filter-date-month-label" data-date-month-label>März 2026</div>
-      <button type="button" class="filter-date-nav" data-date-nav="next" aria-label="Nächster Monat">
-        <span class="filter-date-nav__icon" data-ui-icon="chevron-right" aria-hidden="true"></span>
-      </button>
-    </div>
-    <div class="filter-date-weekdays" aria-hidden="true">
-      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-    </div>
-    <div class="filter-date-grid" data-date-grid></div>
-    <div class="filter-date-actions">
-      <button type="button" class="filter-date-action" data-date-today>Heute</button>
-    </div>
-  </div>
-</div>
-<!-- === END BLOCK: FILTER_TIME_EXACT_DATE_MODULE_LUCIDE_V1 === -->
-    </div>
-  </div>
-</div>
-
-<div class="filter-sheet" id="sheet-category" role="dialog" aria-modal="true" aria-label="Kategorie auswählen" hidden>
-  <div class="filter-sheet__overlay" data-close-sheet></div>
-  <div class="filter-sheet__card">
-    <div class="filter-sheet__header">
-      <div class="filter-sheet__title">Kategorie</div>
-      <button type="button" class="filter-sheet__close" data-close-sheet aria-label="Schließen"><span class="filter-sheet__close-icon" data-ui-icon="x" aria-hidden="true"></span></button>
-    </div>
-    <div class="filter-sheet__body">
-      <button type="button" class="filter-sheet-option is-active" data-category="">Alle</button>
-      <button type="button" class="filter-sheet-option" data-category="Märkte &amp; Feste">Märkte &amp; Feste</button>
-      <button type="button" class="filter-sheet-option" data-category="Kultur &amp; Kunst">Kultur &amp; Kunst</button>
-      <button type="button" class="filter-sheet-option" data-category="Musik &amp; Bühne">Musik &amp; Bühne</button>
-      <button type="button" class="filter-sheet-option" data-category="Kinder &amp; Familie">Kinder &amp; Familie</button>
-      <button type="button" class="filter-sheet-option" data-category="Sport &amp; Bewegung">Sport &amp; Bewegung</button>
-      <button type="button" class="filter-sheet-option" data-category="Natur &amp; Draußen">Natur &amp; Draußen</button>
-      <button type="button" class="filter-sheet-option" data-category="Innenstadt &amp; Leben">Innenstadt &amp; Leben</button>
-    </div>
-  </div>
-</div>
-<!-- === END BLOCK: DESKTOP_HERO_STRUCTURE_V6 === -->
-
-<!-- === BEGIN BLOCK: EVENTS_SECTION_FEED_ONLY_V1 | Zweck: entfernt den Veranstalter-CTA aus dem Feed, damit der Feed nur noch echte Event-Gruppen enthält; Umfang: ersetzt den bisherigen Mobile-Service-Card-Block direkt vor dem Event-Feed === -->
-<section class="events-section">
-  <div id="event-cards" class="event-cards-grid">
-    <!-- Event cards werden hier dynamisch eingefügt -->
-  </div>
-</section>
-<!-- === END BLOCK: EVENTS_SECTION_FEED_ONLY_V1 === -->
+    <div id="today-feed" class="today-feed"></div>
+  </section>
+</main>
+<!-- === END BLOCK: TODAY_HOME_SHELL_V1 === -->
 
 
-   
+
   <!-- === BEGIN BLOCK: OVERLAY ROOT (EVENT DETAIL PANEL) ===
 Zweck: Dediziertes Overlay-Root direkt unter <body>; enthält das Event-Detailpanel.
 Umfang:
@@ -375,41 +244,31 @@ Umfang: Ersetzt den kompletten <template id="locations-modal-template">...</temp
         <p>© 2026 Bocholt erleben</p>
 
         <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">Made with ❤️ for Bocholt</p>
-        
+
 
     <!-- EXTERNAL LIBRARIES -->
     <!-- Alpine.js for reactive UI components -->
-   
+
         <!-- CUSTOM JAVASCRIPT MODULES -->
 <!-- CUSTOM JAVASCRIPT MODULES -->
-<!-- === BEGIN BLOCK: CACHE-BUSTED JS INCLUDES ===
-Zweck: Stabile Lade-Reihenfolge (Config → Icons → UI/Renderer → Filter → Bottom Tab Bar → Main),
-       damit Icons/DetailPanel/Renderer und die mobile Primary-Navigation garantiert verfügbar sind, bevor main.js startet.
-Umfang: Ersetzt nur die Script-Includes der Custom-JS-Module.
-=== -->
-<script src="config.js?v=2026-02-04-1"></script>
+<!-- === BEGIN BLOCK: TODAY_HOME_JS_INCLUDES_V1 | Zweck: lädt auf / nur die Module für die neue Heute-Home inkl. gemeinsamer Detailpanels, Empfehlungen, lokalem Profil und Wetterkontext === -->
+<script src="/config.js?v=2026-02-04-1"></script>
 
-<!-- Icons (Single Source of Truth) -->
-<script src="/js/icons.js?v=2026-05-06-header-access-2"></script>
-
-<!-- UI/Renderer zuerst -->
+<script src="/js/icons.js?v=2026-05-29-today-icons-v1"></script>
 <script src="/js/details.js?v=2026-02-04-1"></script>
-<script src="/js/events.js?v=2026-02-04-1"></script>
+<script src="/js/offers.js?v=2026-02-04-1"></script>
+<script src="/js/offers-details.js?v=2026-05-29-shared-panel-v1"></script>
 
-<!-- Filter muss vor main.js geladen sein -->
-<script src="/js/filter.js?v=2026-02-04-1"></script>
+<script src="/js/recommendations.js?v=2026-05-29-recommendations-v1"></script>
+<script src="/js/user-preferences.js?v=2026-05-29-user-preferences-v1"></script>
+<script src="/js/weather-context.js?v=2026-05-29-weather-context-v1"></script>
 
-<!-- Sonstige Module -->
-<script src="/js/locations.js?v=2026-02-04-1"></script>
 <script src="/js/pwa-install.js?v=2026-02-04-1"></script>
-<script src="/js/seo-schema.js?v=2026-02-04-1"></script>
-<script src="/js/locations-modal.js?v=2026-02-04-1" defer></script>
-<script src="/js/bottom-tabbar.js?v=2026-04-16-1"></script>
+<script src="/js/bottom-tabbar.js?v=2026-05-29-today-nav-v1"></script>
 <script src="/js/feedback.js?v=2026-04-17-1"></script>
 
-<!-- Boot zuletzt -->
-<script src="js/main.js?v=2026-02-04-1"></script>
-<!-- === END BLOCK: CACHE-BUSTED JS INCLUDES === -->
+<script src="/js/today-home.js?v=2026-05-29-today-home-v1"></script>
+<!-- === END BLOCK: TODAY_HOME_JS_INCLUDES_V1 === -->
 
 
 

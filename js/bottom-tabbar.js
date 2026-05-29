@@ -12,12 +12,20 @@
 
   const ITEMS = [
     {
+      key: "today",
+      href: "/",
+      label: "Heute",
+      icon: "sparkles",
+      prefetch: ["/data/events.json", "/data/offers.json"],
+      match: (path) => path === "/"
+    },
+    {
       key: "events",
       href: "/events/",
       label: "Events",
       icon: "calendar-days",
       prefetch: ["/data/events.json"],
-      match: (path) => path === "/" || path === "/events/"
+      match: (path) => path === "/events/"
     },
     {
       key: "activities",
