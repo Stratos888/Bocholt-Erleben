@@ -2435,6 +2435,399 @@
           "Baden"
         ]
       }
-    }
-  ]
+      },
+      {
+        "id": "borkener-tuerme-tour",
+        "title": "Borkener Türme-Tour",
+        "kategorie": "Kultur",
+        "location": "Borken Innenstadt",
+        "maps_query": "Diebesturm, Turmstraße 33, 46325 Borken",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Kurzer Stadtrundgang zu den fünf erhaltenen Borkener Stadttürmen. Die Tour führt durch die Innenstadt, entlang der alten Stadtbefestigung und ist jederzeit von außen möglich.",
+        "url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken%2C%20der%20Kuhmturm%20foto4%202012-03-28%2016.11.JPG",
+        "image_position_x": "50%",
+        "image_position_y": "46%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_der_Kuhmturm_foto4_2012-03-28_16.11.JPG",
+        "image_author": "Michielverbeek",
+        "image_license": "CC BY-SA 3.0",
+        "image_credit": "Michielverbeek, CC BY-SA 3.0, via Wikimedia Commons",
+        "tags": [
+          "Stadttürme",
+          "Innenstadt",
+          "Familienrunde",
+          "Borkener Aa"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Kultur",
+            "Spielen"
+          ],
+          "features": [
+            "Rundweg",
+            "Spielplatz"
+          ],
+          "effort": [
+            "Spontan"
+          ]
+        },
+        "duration": "20–60 Min",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "20–60 Min",
+          "Outdoor",
+          "5 Türme"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Kultur",
+            "Kurz & spontan"
+          ]
+        }
+      },
+      {
+        "id": "naturkulturspaziergang-bocholt-rhede",
+        "title": "Naturkulturspaziergang Bocholt–Rhede",
+        "kategorie": "Natur & Draußen",
+        "location": "Bocholt bis Rhede",
+        "maps_query": "Altes Rathaus, Königstraße 2, 46397 Bocholt",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Acht Kilometer lange Streckenwanderung von Bocholt nach Rhede mit Innenstadtstart, Natur im Bereich Hohenhorster Berge, Feldern, Wiesen und Stadtgeschichte in Rhede.",
+        "url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
+        "website_label": "Route / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rhede%2C%20Schloss%20Rhede%20--%202014%20--%202187.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "48%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Rhede,_Schloss_Rhede_--_2014_--_2187.jpg",
+        "image_author": "Dietmar Rabich",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "8 km",
+          "Streckenwanderung",
+          "Hohenhorster Berge",
+          "Schloss Rhede"
+        ],
+        "filter_tags": [
+          "Wandern & Spazieren",
+          "Wasser"
+        ],
+        "filter": {
+          "situation": [
+            "Draußen"
+          ],
+          "proximity": [
+            "Direkt in Bocholt",
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Kultur",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Wasser",
+            "Aussicht"
+          ],
+          "effort": [
+            "Halber Tag"
+          ]
+        },
+        "duration": "2–3 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "2–3 Std",
+          "Outdoor",
+          "8 km"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Sport & Bewegung",
+            "Wochenende",
+            "Wasser"
+          ]
+        }
+      },
+      {
+        "id": "zeitreise-dingdener-heide",
+        "title": "Zeitreise durch die Dingdener Heide",
+        "kategorie": "Natur & Draußen",
+        "location": "Dingdener/Büngerner Heide",
+        "maps_query": "Parkplatz Klausenhofstraße Ecke Zum Venn, 46499 Hamminkeln-Dingden",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Kurzer LandStreifer-Rundweg durch die Dingdener/Büngerner Heide mit Landschaftsgeschichte, Heideflächen, Waldwegen und Stationen zur Entwicklung der Kulturlandschaft.",
+        "url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
+        "website_label": "Route / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Alte%20Feldweg-Allee%20in%20der%20Dingdener%20Heide.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
+        "image_author": "Börste",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Börste, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "LandStreifer",
+          "5,2 km",
+          "Heide",
+          "Landschaftsgeschichte"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Kultur",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Rundweg"
+          ],
+          "effort": [
+            "Spontan",
+            "Halber Tag"
+          ]
+        },
+        "duration": "1,5 Std",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "1,5 Std",
+          "Outdoor",
+          "5,2 km"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous",
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "core",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Sport & Bewegung",
+            "Kurz & spontan",
+            "Wochenende"
+          ]
+        }
+      },
+      {
+        "id": "sternbusch-gemen-erleben",
+        "title": "Sternbusch & Gemen erleben",
+        "kategorie": "Natur & Draußen",
+        "location": "Borken-Gemen",
+        "maps_query": "Sternbusch Zugang Hagenstiege, 46325 Borken-Gemen",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Natur- und Kulturrunde rund um Gemen mit Sternbusch, ruhigem Wald, Weseker Umland, Bockwindmühle, Quellengrundpark und optionalem Abstecher zur Jugendburg Gemen.",
+        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
+        "website_label": "Route / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Burg%20Gemen%20NRW%20%28Kreis%20Borken%29.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Burg_Gemen_NRW_(Kreis_Borken).jpg",
+        "image_author": "Herbert Horche",
+        "image_license": "CC BY-SA 4.0",
+        "image_credit": "Herbert Horche, CC BY-SA 4.0, via Wikimedia Commons",
+        "tags": [
+          "Sternbusch",
+          "Gemen",
+          "Jugendburg",
+          "Wald"
+        ],
+        "filter_tags": [
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Kultur",
+            "Sport & Bewegung"
+          ],
+          "features": [
+            "Rundweg"
+          ],
+          "effort": [
+            "Halber Tag",
+            "Längerer Ausflug"
+          ]
+        },
+        "duration": "Halber Tag",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Ganzjährig",
+        "cardFacts": [
+          "Halber Tag",
+          "Outdoor",
+          "Wald & Gemen"
+        ],
+        "recommendation": {
+          "availability": "always",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Sport & Bewegung",
+            "Wochenende"
+          ]
+        }
+      },
+      {
+        "id": "quellengrundpark-weseke-entdecken",
+        "title": "Quellengrundpark Weseke entdecken",
+        "kategorie": "Freizeit & Familie",
+        "location": "Borken-Weseke",
+        "maps_query": "Hans-Sachs-Straße, 46325 Borken-Weseke",
+        "maps_label": "Zum Startpunkt navigieren",
+        "description": "Frei zugänglicher Garten- und Museumspark mit Apothekergarten, Geologischem Garten, Holtbachquelle, Heimathaus, Backspeicher und Kneipp-Wassertretanlage. Garten und Kneipp-Angebote sind besonders Mai bis Oktober relevant; Führungen und einzelne Gebäude können terminabhängig sein.",
+        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
+        "website_label": "Website / Infos (DE)",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Eingang%20zum%20Apothekergarten%20Quellengrundpark%20Borken-Weseke.jpg",
+        "image_position_x": "50%",
+        "image_position_y": "50%",
+        "image_source_page": "https://commons.wikimedia.org/wiki/File:Eingang_zum_Apothekergarten_Quellengrundpark_Borken-Weseke.jpg",
+        "image_author": "Tetzemann",
+        "image_license": "CC0 1.0",
+        "image_credit": "Tetzemann, CC0 1.0, via Wikimedia Commons",
+        "tags": [
+          "Apothekergarten",
+          "Geologischer Garten",
+          "Holtbachquelle",
+          "Kneipp"
+        ],
+        "filter_tags": [
+          "Mit Kindern",
+          "Wandern & Spazieren"
+        ],
+        "filter": {
+          "situation": [
+            "Mit Kindern",
+            "Draußen"
+          ],
+          "proximity": [
+            "In der Umgebung"
+          ],
+          "activity_type": [
+            "Spazieren",
+            "Natur entdecken",
+            "Kultur",
+            "Spielen"
+          ],
+          "features": [
+            "Wasser"
+          ],
+          "effort": [
+            "Spontan",
+            "Halber Tag"
+          ]
+        },
+        "duration": "45–90 Min",
+        "mode": "Outdoor",
+        "price": "",
+        "season": "Mai bis Oktober besonders geeignet; Park ganzjährig",
+        "cardFacts": [
+          "45–90 Min",
+          "Outdoor",
+          "Garten & Quelle"
+        ],
+        "recommendation": {
+          "availability": "seasonal",
+          "weather_profile": [
+            "outdoor",
+            "rain_bad"
+          ],
+          "time_profile": [
+            "short_spontaneous",
+            "weekend"
+          ],
+          "cost_level": "unknown",
+          "recommendation_weight": "normal",
+          "interest_tags": [
+            "Familie",
+            "Draußen",
+            "Natur",
+            "Kultur",
+            "Kurz & spontan",
+            "Wochenende",
+            "Wasser"
+          ]
+        }
+      }
+    ]
 }
