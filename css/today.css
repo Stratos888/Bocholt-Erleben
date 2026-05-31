@@ -694,3 +694,147 @@ body.page-route-today footer {
 }
 
 /* === END BLOCK: TODAY_HOME_RUNNING_EVENT_AND_END_POLISH_V1 === */
+
+/* === BEGIN BLOCK: TODAY_HOME_COMPACT_APP_TOP_V1 | Zweck: reduziert den mobilen Hero deutlich und zieht den Nutzinhalt früher in den sichtbaren Bereich; Umfang: nur page-route-today App-Top-/Feed-Rhythmus === */
+
+body.page-route-today .today-page {
+  padding-top: 0.55rem;
+  padding-inline: clamp(0.85rem, 3.2vw, 1.35rem);
+}
+
+body.page-route-today .today-hero {
+  gap: 0.55rem;
+  margin-bottom: 0.45rem;
+}
+
+body.page-route-today .today-hero__card {
+  padding: 0.82rem 0.95rem 0.88rem;
+  border-radius: 1.05rem;
+  box-shadow: 0 10px 26px rgba(64, 48, 26, 0.075);
+}
+
+body.page-route-today .today-kicker {
+  min-height: 1.55rem;
+  margin-bottom: 0.42rem;
+  padding: 0.26rem 0.52rem;
+  font-size: 0.72rem;
+}
+
+body.page-route-today .today-title {
+  max-width: none;
+  font-size: clamp(1.72rem, 7.6vw, 2.55rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+body.page-route-today .today-lead {
+  max-width: 26rem;
+  margin-top: 0.48rem;
+  font-size: clamp(0.88rem, 3.75vw, 0.98rem);
+  line-height: 1.38;
+}
+
+body.page-route-today .today-weather-note {
+  min-height: 2.35rem;
+  margin-top: 0.65rem;
+  padding: 0.44rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  line-height: 1.18;
+}
+
+body.page-route-today .today-weather-note__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+body.page-route-today .today-main {
+  gap: 0.58rem;
+  margin-top: 0.42rem;
+}
+
+body.page-route-today .today-section-head {
+  padding-inline: 0;
+}
+
+body.page-route-today .today-section-title {
+  font-size: clamp(1.13rem, 4.65vw, 1.38rem);
+}
+
+body.page-route-today .today-status {
+  max-width: none;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+body.page-route-today .today-feed {
+  gap: 0.62rem;
+}
+
+body.page-route-today .today-card__media {
+  aspect-ratio: 24 / 9;
+  max-height: 7.2rem;
+}
+
+body.page-route-today .today-card__body {
+  padding: 0.78rem 0.82rem 0.84rem;
+}
+
+body.page-route-today .today-card__topline {
+  gap: 0.45rem;
+}
+
+body.page-route-today .today-card__badge {
+  min-height: 1.42rem;
+  font-size: 0.68rem;
+  padding: 0.32rem 0.48rem;
+}
+
+body.page-route-today .today-card__meta {
+  font-size: 0.84rem;
+  line-height: 1.28;
+}
+
+body.page-route-today .today-card__desc {
+  font-size: 0.9rem;
+  line-height: 1.38;
+}
+
+body.page-route-today .today-more__link {
+  min-height: 3.55rem;
+  padding: 0.7rem 0.86rem;
+}
+
+@media (max-width: 380px) {
+  body.page-route-today .today-title {
+    font-size: 1.62rem;
+  }
+
+  body.page-route-today .today-lead {
+    font-size: 0.86rem;
+  }
+
+  body.page-route-today .today-section-head {
+    gap: 0.55rem;
+  }
+
+  body.page-route-today .today-status {
+    font-size: 0.78rem;
+  }
+}
+
+@media (min-width: 760px) {
+  body.page-route-today .today-hero__card {
+    padding: 1.05rem 1.15rem;
+  }
+
+  body.page-route-today .today-title {
+    font-size: clamp(2.1rem, 4.8vw, 3.15rem);
+  }
+
+  body.page-route-today .today-lead {
+    max-width: 36rem;
+  }
+}
+
+/* === END BLOCK: TODAY_HOME_COMPACT_APP_TOP_V1 === */

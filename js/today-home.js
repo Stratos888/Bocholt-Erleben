@@ -524,7 +524,7 @@
       </section>
     `.trim();
 
-    renderStatus(`${visible.length} ausgewählte Vorschläge`);
+    renderStatus(`${visible.length} Tipps`);
     hydrateIcons(feed);
   }
 
