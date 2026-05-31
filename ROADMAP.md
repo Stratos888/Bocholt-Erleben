@@ -293,6 +293,113 @@ Akzeptanzkriterien:
 
 ---
 
+## P0.5 — Inhaltsqualität, Prüfläufe und kontrolliertes Self-Healing
+
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als späteren Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Auto-Fix-Grenzen === -->
+
+Status 2026-05-31:
+
+- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt.
+- Fachliche Event-Quelle bleibt das Google Sheet; zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API.
+- `data/events.json` bleibt nur ein generiertes Deploy-/Runtime-Artefakt, weil Frontend, SEO-Schema und Service Worker den Feed zur Laufzeit laden.
+- Dadurch ist die bisherige Repo-Verwirrung durch stale Event-JSON reduziert.
+- Der nächste Qualitätsbedarf liegt nicht bei weiterer Discovery allein, sondern bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
+
+Ziel:
+
+- Live sichtbare Events und Aktivitäten werden regelmäßig auf technische und fachliche Auffälligkeiten geprüft.
+- Der Prüflauf unterscheidet klar zwischen sicher automatisch korrigierbaren Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
+- Automatische Korrekturen dürfen nur erfolgen, wenn die Änderung deterministisch belegbar und regressionsarm ist.
+
+Warum:
+
+- Bocholt erleben lebt vom Vertrauen in korrekte lokale Informationen.
+- Neue Inhalte allein reichen nicht, wenn bestehende Events, Aktivitäten, Links, Bilder oder Quellinformationen veralten.
+- Manuelle Vollkontrolle aller Live-Inhalte ist langfristig nicht realistisch.
+- Blinde Auto-Korrekturen wären aber riskanter als ein fehlender Prüflauf.
+
+Scope für den späteren Workstream:
+
+- Events aus dem live generierten Sheet-Feed.
+- Genehmigte öffentliche DB-Events aus `/api/events/public.php`.
+- Aktivitäten aus `data/offers.json`.
+- Quellen-URLs, Event-URLs, Website-Links, Maps-Ziele und Bild-URLs.
+- Prüfbericht für interne Nutzung.
+- Optional später: Audit-Status im internen Dashboard.
+
+Nicht im Scope der ersten Umsetzung:
+
+- Kein automatisches Umschreiben freier Beschreibungstexte.
+- Kein automatisches Löschen von Events nur wegen temporär nicht erreichbarer Quelle.
+- Kein blindes Überschreiben des Google Sheets durch unsichere KI-Auswertung.
+- Kein Anbieterbericht oder öffentliche Qualitätsanzeige.
+
+Empfohlener Prüfrhythmus:
+
+- Events, leichtgewichtig: täglich, Fokus auf die nächsten 14 Tage.
+- Events, tiefer Quellencheck: wöchentlich für den relevanten Zukunftsbestand.
+- Aktivitäten, technischer Check: wöchentlich.
+- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich.
+
+Sichere Auto-Fix-Kandidaten ohne KI:
+
+- abgelaufene Events nicht mehr ausspielen bzw. beim Feed-Build ausschließen.
+- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen.
+- fehlende Pflichtfelder blockieren oder in Review markieren.
+- harte Duplikate nach stabiler ID oder eindeutigem Schlüssel unterdrücken.
+- permanente Redirects protokollieren und später kontrolliert übernehmen.
+- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können.
+
+Nicht sicher ohne KI oder spezialisierten Quellenparser:
+
+- geänderte Uhrzeiten aus freiem Website-Text erkennen.
+- verschobene oder abgesagte Events sicher interpretieren.
+- subtile Ortsänderungen erkennen.
+- mehrere Events auf einer Sammelseite korrekt zuordnen.
+- veraltete Activity-Beschreibungen semantisch bewerten.
+
+Benachrichtigungs- und Reaktionslogik:
+
+- `auto_fixed`: keine Sofortwarnung; Aufnahme in Tages-/Wochenprotokoll.
+- `warning`: im internen Dashboard oder Audit-Report sichtbar machen.
+- `review_needed`: interne Warnung erzeugen; nicht automatisch öffentlich ändern.
+- `critical`: Push/E-Mail oder deutlich sichtbarer interner Hinweis.
+- `source_unreachable`: protokollieren; erst nach Wiederholung oder besonderer Kritikalität eskalieren.
+
+Mögliche technische Bausteine:
+
+- neuer Workflow `content-quality-audit.yml`.
+- neues Script `scripts/content-quality-audit.py` für harte technische Checks.
+- später optional `scripts/content-source-audit.py` für Quellenvergleich.
+- Ergebnisdatei oder Sheet-Tab `Content_Audit`.
+- Google-Sheets-Schreibrechte nur für einen eng begrenzten späteren Auto-Fix-Workflow, nicht für den normalen Deploy.
+
+Akzeptanzkriterien für Phase 1:
+
+- Der Audit läuft unabhängig vom normalen Deploy.
+- Der Audit prüft den echten Live-/Runtime-Bestand, nicht eine stale Repo-Kopie.
+- Der Audit erzeugt einen verständlichen Bericht mit Severity, betroffener Quelle und empfohlener Aktion.
+- Harte technische Fehler sind klar von fachlichen Unsicherheiten getrennt.
+- Kein unsicherer Befund verändert automatisch öffentliche Inhalte.
+
+Akzeptanzkriterien für spätere Auto-Fix-Phase:
+
+- Jede Auto-Korrektur ist nachvollziehbar protokolliert.
+- Auto-Fixes sind auf deterministische Fälle begrenzt.
+- Für Google-Sheet-Änderungen gibt es Schreibschutzlogik, Audit-Log und möglichst eine Rücknahmeoption.
+- KI darf nur als Assistenz für semantische Prüfung eingesetzt werden, nicht als alleiniger Grund für blindes Überschreiben.
+- Bei widersprüchlichen Quellen gewinnt nicht automatisch die externe Quelle; der Fall geht in Review.
+
+Prioritätseinordnung:
+
+- Nicht vor den aktuell laufenden Messwert-/Akquise-Wartepunkten erzwingen.
+- Sinnvoller Anschluss nach stabiler Nutzwertmessung und bevor größere Content-Mengen weiter ausgebaut werden.
+- Phase 1 kann klein und technisch beginnen, ohne die Produktoberfläche zu verändern.
+
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 === -->
+
+---
+
 ## P1 — Veranstalter-Nutzwert sichtbar machen
 
 ### 6. Anbieterbereich vom Verwaltungsbereich zum Wertzentrum ausbauen
