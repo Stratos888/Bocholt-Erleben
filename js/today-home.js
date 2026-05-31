@@ -292,14 +292,48 @@
     }).format(date);
   }
 
+  /* === BEGIN BLOCK: TODAY_EVENT_META_RUNNING_LABELS_V1 | Zweck: laufende Mehrtagesevents auf der Today-Home nicht wie vergangene Startdatum-Events wirken lassen; Umfang: ersetzt nur Event-Meta-Labeling im gemischten Today-Feed === */
+  function formatEventDateLabel(item) {
+    const start = parseLocalDate(item?.date);
+    const end = parseLocalDate(item?.endDate);
+    const today = startOfDay(new Date());
+    const todayTime = today.getTime();
+
+    if (start && end && start.getTime() !== end.getTime()) {
+      const startTime = start.getTime();
+      const endTime = end.getTime();
+
+      if (startTime <= todayTime && todayTime <= endTime) {
+        if (endTime > todayTime) return `Läuft heute · bis ${formatDate(item.endDate)}`;
+        return "Läuft heute";
+      }
+
+      const startLabel = formatDate(item.date);
+      const endLabel = formatDate(item.endDate);
+      return [startLabel, endLabel].filter(Boolean).join(" – ");
+    }
+
+    if (start) {
+      const startTime = start.getTime();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      if (startTime === todayTime) return "Heute";
+      if (startTime === tomorrow.getTime()) return "Morgen";
+    }
+
+    return formatDate(item?.date);
+  }
+
   function buildEventMeta(item) {
     const parts = [];
-    const date = formatDate(item.date);
+    const date = formatEventDateLabel(item);
     if (date) parts.push(date);
     if (item.time) parts.push(item.time);
     if (item.location) parts.push(item.location);
     return parts.join(" · ");
   }
+  /* === END BLOCK: TODAY_EVENT_META_RUNNING_LABELS_V1 === */
 
   function buildActivityMeta(item) {
     const parts = [];
@@ -407,6 +441,7 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
+            ${index === 0 ? `<span class="today-card__badge">Heute passend</span>` : ""}
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}
@@ -489,7 +524,7 @@
       </section>
     `.trim();
 
-    renderStatus(`${visible.length} Vorschläge für heute`);
+    renderStatus(`${visible.length} ausgewählte Vorschläge`);
     hydrateIcons(feed);
   }
 

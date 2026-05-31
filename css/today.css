@@ -487,7 +487,9 @@ body.page-route-today .app-header {
   }
 }
 
-/* === END FILE: css/today.css === */\n\n/* === BEGIN BLOCK: TODAY_HOME_DECISION_PAGE_POLISH_V1 | Zweck: macht die Today-Home kompakter und entscheidungsorientierter; Umfang: blendet Standard-Filterleisten aus, reduziert Hero-/Bilddominanz und ergänzt klare Weiterwege === */
+/* === END FILE: css/today.css === */
+
+/* === BEGIN BLOCK: TODAY_HOME_DECISION_PAGE_POLISH_V1 | Zweck: macht die Today-Home kompakter und entscheidungsorientierter; Umfang: blendet Standard-Filterleisten aus, reduziert Hero-/Bilddominanz und ergänzt klare Weiterwege === */
 
 body.page-route-today .today-page {
   padding-top: 0.75rem;
@@ -624,3 +626,71 @@ body.page-route-today .today-more__hint {
 }
 
 /* === END BLOCK: TODAY_HOME_DECISION_PAGE_POLISH_V1 === */
+
+/* === BEGIN BLOCK: TODAY_HOME_RUNNING_EVENT_AND_END_POLISH_V1 | Zweck: verbessert Today-Home-Verständlichkeit nach V1.1: Empfehlungshinweis, Mehrtagesevent-Wahrnehmung und kompakterer Endbereich; Umfang: nur page-route-today Feinschliff === */
+
+body.page-route-today .today-page {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
+body.page-route-today .today-section-head {
+  align-items: baseline;
+}
+
+body.page-route-today .today-card__topline {
+  align-items: center;
+}
+
+body.page-route-today .today-card__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent, #87683e) 36%, var(--color-border, #ded7c8));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent, #87683e) 10%, white);
+  color: var(--color-text, #261f16);
+  font-size: 0.72rem;
+  font-weight: 820;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 0.38rem 0.55rem;
+  white-space: nowrap;
+}
+
+body.page-route-today .today-card:first-child {
+  border-color: color-mix(in srgb, var(--color-accent, #87683e) 32%, var(--color-border, #ded7c8));
+}
+
+body.page-route-today .today-card__meta {
+  color: color-mix(in srgb, var(--color-text, #261f16) 52%, var(--color-text-muted, #756b5d));
+}
+
+body.page-route-today .today-more {
+  gap: 0.5rem;
+  margin-top: 0;
+  padding-bottom: 0.25rem;
+}
+
+body.page-route-today .today-more__link {
+  min-height: 3.85rem;
+  padding: 0.78rem 0.95rem;
+}
+
+body.page-route-today footer {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  body.page-route-today .today-weather-note {
+    width: 100%;
+  }
+
+  body.page-route-today .today-status {
+    max-width: 9.5rem;
+    text-align: right;
+    white-space: normal;
+    line-height: 1.15;
+  }
+}
+
+/* === END BLOCK: TODAY_HOME_RUNNING_EVENT_AND_END_POLISH_V1 === */
