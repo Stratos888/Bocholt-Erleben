@@ -170,18 +170,114 @@
     };
   }
 
+  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_CURATION_V1 | Zweck: macht die Today-Home zur echten Entscheidungsseite statt zur langen Vorfilterliste; Umfang: entfernt vergangene Events, begrenzt auf wenige Vorschläge, rotiert täglich stabil und erzwingt grobe Vielfalt === */
+  function parseLocalDate(value) {
+    const text = asString(value);
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+    if (!match) return null;
+
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  function startOfDay(value) {
+    const date = value instanceof Date ? value : new Date();
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function stableHash(value) {
+    const text = asString(value);
+    let hash = 2166136261;
+
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    return hash >>> 0;
+  }
+
+  function rotationKey(date) {
+    const base = startOfDay(date || new Date());
+    return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`;
+  }
+
+  function isPastEventItem(item, now) {
+    if (item?.type !== "event") return false;
+
+    const today = startOfDay(now || new Date());
+    const end = parseLocalDate(item.endDate || item.date);
+    const start = parseLocalDate(item.date);
+
+    if (end) return end < today;
+    if (start) return start < today;
+
+    return false;
+  }
+
+  function addDailyRotation(items, context) {
+    const key = rotationKey(context?.now || new Date());
+
+    return (Array.isArray(items) ? items : [])
+      .map((item) => {
+        const baseScore = Number(item?.score);
+        const score = Number.isFinite(baseScore) ? baseScore : 0;
+        const jitter = stableHash(`${key}:${itemKey(item)}`) % 9;
+
+        return {
+          item,
+          sortScore: score + jitter / 10
+        };
+      })
+      .sort((a, b) => b.sortScore - a.sortScore)
+      .map((entry) => entry.item);
+  }
+
+  function curateTodayItems(items, context) {
+    const now = context?.now || new Date();
+    const cleaned = (Array.isArray(items) ? items : [])
+      .filter((item) => item && !isPastEventItem(item, now));
+
+    const rotated = addDailyRotation(cleaned.slice(0, 16), context);
+    const hasEventCandidate = rotated.some((item) => item.type === "event");
+    const maxActivities = hasEventCandidate ? 2 : 3;
+    const maxEvents = 2;
+    const selected = [];
+    const counts = {
+      activity: 0,
+      event: 0
+    };
+
+    for (const item of rotated) {
+      const type = item.type === "event" ? "event" : "activity";
+
+      if (type === "activity" && counts.activity >= maxActivities) continue;
+      if (type === "event" && counts.event >= maxEvents) continue;
+
+      selected.push(item);
+      counts[type] += 1;
+
+      if (selected.length >= 3) break;
+    }
+
+    return selected;
+  }
+
   function buildRecommendations() {
     const api = getRecommendations();
     if (!api?.createRecommendations) return [];
 
-    return api.createRecommendations(
+    const context = createContext();
+    const recommendations = api.createRecommendations(
       {
         events: state.events,
         offers: state.offers
       },
-      createContext()
+      context
     );
+
+    return curateTodayItems(recommendations, context);
   }
+  /* === END BLOCK: TODAY_RECOMMENDATION_CURATION_V1 === */
 
   function formatDate(value) {
     const text = asString(value);
@@ -291,7 +387,6 @@
 
   function renderCard(item, index) {
     const meta = item.type === "activity" ? buildActivityMeta(item) : buildEventMeta(item);
-    const saved = isSaved(item);
     const image = item.type === "activity" ? normalizeUrl(item.image) : "";
     const cardClass = [
       "today-card",
@@ -303,7 +398,7 @@
       <article class="${cardClass}" data-today-card="${escapeHtml(itemKey(item))}" tabindex="0" role="button" aria-label="${escapeHtml(typeLabel(item))} öffnen: ${escapeHtml(item.title)}">
         ${image ? `
           <div class="today-card__media">
-            <img src="${escapeHtml(image)}" alt="" loading="${index < 2 ? "eager" : "lazy"}" decoding="async">
+            <img src="${escapeHtml(image)}" alt="" loading="${index < 1 ? "eager" : "lazy"}" decoding="async">
           </div>
         ` : ""}
         <div class="today-card__body">
@@ -312,14 +407,6 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
-            <div class="today-card__actions">
-              <button type="button" class="today-card__icon-btn${saved ? " is-active" : ""}" data-today-save="${escapeHtml(itemKey(item))}" aria-label="${saved ? "Nicht mehr merken" : "Merken"}">
-                <span data-ui-icon="bookmark" aria-hidden="true"></span>
-              </button>
-              <button type="button" class="today-card__icon-btn" data-today-dismiss="${escapeHtml(itemKey(item))}" aria-label="Ausblenden">
-                <span data-ui-icon="x" aria-hidden="true"></span>
-              </button>
-            </div>
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}
@@ -371,16 +458,16 @@
 
     state.items = buildRecommendations();
 
-    const visible = state.items.slice(0, 18);
+    const visible = state.items;
 
     if (!visible.length) {
       feed.innerHTML = `
         <section class="today-empty" role="status">
           <h2>Gerade nichts Passendes gefunden</h2>
-          <p>Setze Interessen zurück oder schau direkt in Events und Aktivitäten.</p>
+          <p>Events und Aktivitäten sind weiterhin direkt erreichbar.</p>
           <div class="today-empty__actions">
-            <a href="/events/">Events ansehen</a>
-            <a href="/aktivitaeten/">Aktivitäten ansehen</a>
+            <a href="/events/">Alle Events ansehen</a>
+            <a href="/aktivitaeten/">Aktivitäten entdecken</a>
           </div>
         </section>
       `.trim();
@@ -388,9 +475,21 @@
       return;
     }
 
-    feed.innerHTML = visible.map(renderCard).join("");
+    feed.innerHTML = `
+      ${visible.map(renderCard).join("")}
+      <section class="today-more" aria-label="Mehr entdecken">
+        <a class="today-more__link" href="/events/">
+          <span class="today-more__label">Alle Events ansehen</span>
+          <span class="today-more__hint">Termine, Märkte, Kultur und mehr</span>
+        </a>
+        <a class="today-more__link" href="/aktivitaeten/">
+          <span class="today-more__label">Aktivitäten entdecken</span>
+          <span class="today-more__hint">Orte, Natur, Familie und Ausflüge</span>
+        </a>
+      </section>
+    `.trim();
 
-    renderStatus(`${visible.length} Ideen für heute`);
+    renderStatus(`${visible.length} Vorschläge für heute`);
     hydrateIcons(feed);
   }
 
@@ -437,28 +536,6 @@
       if (interestBtn) {
         const interest = asString(interestBtn.getAttribute(INTEREST_ATTR));
         getPreferences()?.toggleInterest?.(interest);
-        renderAll();
-        return;
-      }
-
-      const saveBtn = event.target.closest("[data-today-save]");
-      if (saveBtn) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const item = findItemByKey(saveBtn.getAttribute("data-today-save"));
-        if (item) getPreferences()?.toggleSaved?.(item);
-        renderAll();
-        return;
-      }
-
-      const dismissBtn = event.target.closest("[data-today-dismiss]");
-      if (dismissBtn) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const item = findItemByKey(dismissBtn.getAttribute("data-today-dismiss"));
-        if (item) getPreferences()?.dismissItem?.(item);
         renderAll();
         return;
       }
