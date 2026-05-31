@@ -12,12 +12,12 @@
 
 - Production/staging event data is hybrid.
 - The public event feed consists of:
-  1. Google Sheet / generated `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
+  1. Google Sheet / generated runtime feed `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
   2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
 - Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
-- `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
-- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
-- Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- `data/events.tsv` and `data/events.json` are generated during deploy and must not be maintained or reviewed as repository source files.
+- `data/events.json` must still exist in the deployed runtime because the frontend, SEO schema and service worker load it.
+- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale; the repository copy should not be tracked.
 - Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
 - The Kuratier-Inbox is also hybrid:
   1. Google Sheet / generated Inbox data for KI-/Sheet candidates.

@@ -1,8 +1,8 @@
 # === BEGIN BLOCK: BUILD EVENTS FROM TSV (fail-fast + validation) ===
 # Datei: scripts/build-events-from-tsv.py
 # Zweck:
-# - Quelle: data/events.tsv (copy/paste-freundlich)
-# - Output: data/events.json (Single Source of Truth für die App)
+# - Quelle: data/events.tsv (im Deploy aus dem Google Sheet exportiert)
+# - Output: data/events.json (generiertes Deploy-/Runtime-Artefakt, nicht im Repo pflegen)
 # - Fail-Fast: bricht mit Exit 1 ab, wenn Validierung fehlschlägt
 # - Validierung: Pflichtfelder, eindeutige IDs, Duplikate, Datumsformat, Kategorien, Steuerzeichen
 # - Optional: endDate (YYYY-MM-DD) wird übernommen, wenn vorhanden
