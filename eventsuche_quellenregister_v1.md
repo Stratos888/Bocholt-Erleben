@@ -30,7 +30,7 @@ Wiederholt starke, offizielle oder neutrale Quellen mit hohem PWA-Nutzen und gut
 Regelmäßig brauchbare Quellen, aber mit gemischter Trefferqualität oder geringerer Priorität.
 
 ### RECOVERY
-Quellen oder Seitentypen, die gute Events retten können, obwohl sie nicht immer klassische Event-Detailseiten sind.
+Quellen oder Seitentypen, die gute Events retten können, obwohl sie nicht immer klassische Event-Detailseiten sind. Dazu zählen auch bewusst freigegebene gemeinnützige, soziale oder öffentlich geförderte Familien-/Jugendquellen mit hoher Nutzerrelevanz und geringer realistischer Abo-Zahlungsbereitschaft.
 
 ### DISCOVERY-SEED
 Konkrete bekannte Startquellen für Discovery. Sie sind erlaubt und sinnvoll, aber noch nicht stabil genug für CORE oder RECOVERY.
@@ -376,6 +376,42 @@ Quellen, die strategisch, monetarisierungsseitig oder qualitativ nicht aktiv gen
   - Ausstellungen und Dauerformate nur bei starkem Besuchsanlass
   - kleine Bildungs-/Kursformate zurückstellen
 
+<!-- === BEGIN BLOCK: QUELLE_GEMEINNUETZIGE_FAMILIEN_JUGEND_RECOVERY_V1 | Zweck: freigegebene Low-Monetization-Familienquellen dauerhaft als RECOVERY verankern | Umfang: ergänzt RECOVERY vor DISCOVERY-SEED === -->
+### Gemeinnützige Familien-/Jugendquellen mit geringer Abo-Erwartung
+- Quelle / Muster:
+  - `jugendfarm-mitdir.de/*`
+  - `unser-ferienprogramm.de/bocholt/*`
+  - `kinderschutzbund-bocholt.de/*`
+  - `juboh.de/*`
+  - `bocholt.de/*kulturrucksack*`
+  - `bocholt.de/*stadtbibliothek*`
+  - `jusina.de/*`
+  - `cafe-karton.de/*`
+  - `fabi-bocholt.de/*` nur für öffentliche Sondertermine, nicht als Kurs-Komplettquelle
+- Status: RECOVERY
+- Eventqualität: mittel bis hoch
+- PWA-Nutzen: hoch für Familien, Kinder und Jugendliche
+- Technische Stabilität: gemischt
+- Strategierisiko: niedrig bis mittel
+- Warum:
+  - liefert alltagsnahe Familien-/Kinder-/Jugendtermine mit hohem Nutzwert
+  - realistische Abo-Zahlungsbereitschaft ist bei gemeinnützigen, sozialen oder öffentlich geförderten Quellen eher gering
+  - stärkt den Basisnutzen von Bocholt erleben, ohne kommerzielle Anbieter-/Venue-Monetarisierung direkt zu schwächen
+- Risiken:
+  - viele Angebote sind Kurs-, Betreuungs-, Ferienwochen- oder Anmeldeformate statt echte Events
+  - einzelne Angebote können schnell ausgebucht sein
+  - manche Quellen enthalten viele Serientermine mit begrenztem Breiteninteresse
+  - FABI, JUNGE UNI und ähnliche Anbieter dürfen nicht als Massen-Kursquelle missverstanden werden
+- Einsatzregel:
+  - gezielt prüfen, aber nur starke öffentliche Einzeltermine übernehmen
+  - bevorzugt übernehmen: Tag der offenen Tür, Familientag, Kindertrödelmarkt, öffentliche Feste, kostenlose oder öffentlich geförderte Kinder-/Jugendkultur, besondere Ferienhighlights
+  - nicht übernehmen: normale Öffnungszeiten, Schließtage, reine Betreuungswochen, ausgebuchte Ferienangebote ohne offenen Besuchsanlass, interne Gruppen-/Vereinstermine, normale Kursreihen
+  - bei Ferienprogrammen nur einzelne klar terminierte Highlights übernehmen; keine Massenübernahme aller Slots
+  - `time` nur setzen, wenn eine eindeutige Startzeit der konkreten Instanz belegt ist
+  - bei Anmeldepflicht in der Beschreibung sachlich knapp erwähnen, wenn öffentlich belegbar
+  - bei kommerzielleren Kurs-/Bildungsanbietern streng prüfen, ob der öffentliche Eventnutzen stärker ist als die Anbieter-Promo
+<!-- === END BLOCK: QUELLE_GEMEINNUETZIGE_FAMILIEN_JUGEND_RECOVERY_V1 === -->
+
 ---
 
 ## DISCOVERY-SEED
@@ -611,6 +647,9 @@ behandelt, nicht sofort als CORE.
 
 Ausnahme:
 Wenn eine Quelle aus realer Bestandshistorie bereits mehrfach starke Live-/FINAL-Treffer geliefert hat, darf sie direkt als `CORE-MID` oder `RECOVERY` klassifiziert werden.
+
+Zusatz-Ausnahme:
+Strategisch bewusst freigegebene gemeinnützige, soziale oder öffentlich geförderte Familien-/Jugendquellen mit hoher Nutzerrelevanz und geringer realistischer Abo-Zahlungsbereitschaft dürfen direkt als `RECOVERY` geführt werden, wenn die Einsatzregel des Blocks `Gemeinnützige Familien-/Jugendquellen mit geringer Abo-Erwartung` eingehalten wird.
 
 ---
 

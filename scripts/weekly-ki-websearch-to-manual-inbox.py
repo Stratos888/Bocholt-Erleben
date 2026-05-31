@@ -503,6 +503,18 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
      - `https://www.bocholt.de/veranstaltungskalender/bocholter-weihnachtsmarkt-2026`
    - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
 
+   Ergänzend Bocholt Familien-/Jugend-RECOVERY gezielt prüfen:
+   - `jugendfarm-mitdir.de/*`
+   - `unser-ferienprogramm.de/bocholt/*`
+   - `kinderschutzbund-bocholt.de/*`
+   - `juboh.de/*`
+   - `bocholt.de/*kulturrucksack*`
+   - `bocholt.de/*stadtbibliothek*`
+   - `jusina.de/*`
+   - `cafe-karton.de/*`
+   - `fabi-bocholt.de/*` nur für öffentliche Sondertermine, nicht als Kurs-Komplettquelle
+   - nur starke öffentliche Einzeltermine übernehmen; keine Öffnungszeiten, Schließtage, Betreuungswochen, ausgebuchten Ferienangebote ohne offenen Besuchsanlass, internen Gruppentermine oder normalen Kursreihen
+
 3. Rhede CORE-MID:
    - `rhede.de/regional/veranstaltungen/detail-*`
    - starke öffentliche Stadt-/Kultur-/Innenstadttermine

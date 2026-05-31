@@ -240,6 +240,32 @@ Wenn ein Event primär nur einer potenziellen Kunden-Location Reichweite verscha
 Im Zweifel:
 
 - **weglassen**
+
+<!-- === BEGIN BLOCK: MONETARISIERUNGSSCHUTZ_GEMEINNUETZIGE_FAMILIENQUELLEN_V1 | Zweck: gemeinnützige Familien-/Jugendquellen als strategisch unkritische Recovery-Quellen freigeben | Umfang: ergänzt Monetarisierungsschutz ohne Venue-Schutz aufzuweichen === -->
+### Gemeinnützige / öffentlich geförderte Familien- und Jugendquellen
+Gemeinnützige, soziale, kommunale oder öffentlich geförderte Familien- und Jugendquellen dürfen als bewusst freigegebene **Low-Monetization-Recovery-Quellen** behandelt werden, wenn alle folgenden Punkte erfüllt sind:
+
+1. Die Quelle ist erkennbar gemeinnützig, sozial, kommunal, öffentlich gefördert oder nicht primär kommerziell.
+2. Der konkrete Termin ist öffentlich relevant und für normale Nutzer aus Bocholt bzw. Familien im Suchgebiet nützlich.
+3. Titel, Datum, Ort und Eventcharakter sind belastbar auf einer offiziellen oder gleichwertig event-spezifischen Seite belegt.
+4. Der Termin ist kein bloßer Öffnungszeit-, Betreuungs-, Kurslisten-, Schließtag- oder interner Gruppentermin.
+5. Der Treffer gefährdet keine spätere Abo-/Anbieter-Monetarisierung, weil die realistische Zahlungsbereitschaft gering ist oder der öffentliche Nutzwert überwiegt.
+
+Beispiele für zulässige Formate:
+- Tag der offenen Tür
+- Familienfest / Familientag
+- Kindertrödelmarkt
+- kostenloses oder öffentlich gefördertes Kinder-/Jugendkulturangebot
+- besondere Ferienaktion mit klarer öffentlicher Relevanz
+
+Nicht automatisch übernehmen:
+- normale Öffnungszeiten
+- reine Betreuungsangebote
+- ausgebuchte Ferienwochen ohne offenen Besuchsanlass
+- wiederkehrende Standardkurse ohne besonderen Eventcharakter
+- interne Vereins-/Gruppentermine
+<!-- === END BLOCK: MONETARISIERUNGSSCHUTZ_GEMEINNUETZIGE_FAMILIENQUELLEN_V1 === -->
+
 ## 6. Rechtlich konservative Quellenregel
 Nur Events aufnehmen, wenn die Quelle **rechtlich risikoarm**, **strategisch unkritisch oder ausdrücklich freigegeben** und **für den konkreten Termin belastbar** ist.
 
