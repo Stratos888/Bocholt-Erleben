@@ -163,13 +163,17 @@
     return hours * 60 + minutes;
   }
 
+  /* === BEGIN BLOCK: RECOMMENDATION_EVENT_HAS_PASSED_FIX_V1 | Zweck: korrigiert die Past-Logik fuer kuenftige Events; Umfang: nur Event-Scoring, keine UI-/DOM-Aenderung === */
   function eventHasPassed(item, now) {
     const startDate = parseDateLocal(item.date);
     const endDate = parseDateLocal(item.endDate) || startDate;
 
     if (!startDate) return false;
-    if (diffDays(now, endDate) < 0) return false;
-    if (diffDays(now, endDate) > 0) return true;
+
+    const endOffset = diffDays(now, endDate);
+
+    if (endOffset < 0) return true;
+    if (endOffset > 0) return false;
 
     const startMinutes = parseStartMinutes(item.time);
     if (startMinutes == null) return false;
@@ -178,6 +182,7 @@
 
     return currentMinutes > startMinutes + 180;
   }
+  /* === END BLOCK: RECOMMENDATION_EVENT_HAS_PASSED_FIX_V1 === */
 
   function eventDateScore(item, context) {
     if (item.type !== "event") return 0;
