@@ -36,6 +36,7 @@
     events: [],
     offers: [],
     items: [],
+    eventVisualPools: Object.freeze({}),
     weatherContext: null,
     mode: "for_you"
   };
@@ -104,6 +105,99 @@
     if (Array.isArray(payload?.data?.offers)) return payload.data.offers;
     return [];
   }
+
+  /* === BEGIN BLOCK: TODAY_EVENT_VISUAL_POOL_HELPERS_V1 | Zweck: bereitet ready Event-Visual-Pools fuer Today-Karten vor; Umfang: nur status=ready, stabile Auswahl, keine planned-Assets === */
+  function buildReadyEventVisualPools(payload) {
+    const pools = payload && typeof payload === "object" ? payload.pools : null;
+    const out = Object.create(null);
+
+    if (!pools || typeof pools !== "object") {
+      return Object.freeze(out);
+    }
+
+    Object.entries(pools).forEach(([visualKey, pool]) => {
+      const key = asString(visualKey);
+      const images = Array.isArray(pool?.images) ? pool.images : [];
+
+      const ready = images
+        .filter((image) => image && image.status === "ready")
+        .map((image) => {
+          const src = normalizeUrl(image.src);
+          if (!src) return null;
+
+          return Object.freeze({
+            id: asString(image.id),
+            src,
+            alt: asString(image.alt)
+          });
+        })
+        .filter(Boolean);
+
+      if (key && ready.length) {
+        out[key] = Object.freeze(ready);
+      }
+    });
+
+    return Object.freeze(out);
+  }
+
+  function stableHash(value) {
+    const textValue = asString(value);
+    let hash = 2166136261;
+
+    for (let index = 0; index < textValue.length; index += 1) {
+      hash ^= textValue.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    return hash >>> 0;
+  }
+
+  function eventVisualKey(item) {
+    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
+  }
+
+  function resolveItemImage(item, usedImages) {
+    const ownImage = normalizeUrl(item?.image);
+    if (ownImage) {
+      if (usedImages) usedImages.add(ownImage);
+      return ownImage;
+    }
+
+    if (item?.type !== "event") {
+      return "";
+    }
+
+    const visualKey = eventVisualKey(item);
+    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+
+    if (!Array.isArray(pool) || !pool.length) {
+      return "";
+    }
+
+    const seed = [
+      asString(item.id),
+      asString(item.date),
+      asString(item.endDate),
+      asString(item.title),
+      visualKey
+    ].join("|");
+
+    const start = stableHash(seed) % pool.length;
+
+    for (let offset = 0; offset < pool.length; offset += 1) {
+      const candidate = pool[(start + offset) % pool.length];
+      if (!candidate?.src) continue;
+
+      if (!usedImages || !usedImages.has(candidate.src) || offset === pool.length - 1) {
+        if (usedImages) usedImages.add(candidate.src);
+        return candidate.src;
+      }
+    }
+
+    return "";
+  }
+  /* === END BLOCK: TODAY_EVENT_VISUAL_POOL_HELPERS_V1 === */
 
   function dedupeEvents(events) {
     const seen = new Set();
@@ -419,9 +513,9 @@
     `.trim();
   }
 
-  function renderCard(item, index) {
+  function renderCard(item, index, usedImages) {
     const meta = item.type === "activity" ? buildActivityMeta(item) : buildEventMeta(item);
-    const image = item.type === "activity" ? normalizeUrl(item.image) : "";
+    const image = resolveItemImage(item, usedImages);
     const cardClass = [
       "today-card",
       `today-card--${item.type}`,
@@ -510,8 +604,10 @@
       return;
     }
 
+    const usedImages = new Set();
+
     feed.innerHTML = `
-      ${visible.map(renderCard).join("")}
+      ${visible.map((item, index) => renderCard(item, index, usedImages)).join("")}
       <section class="today-more" aria-label="Mehr entdecken">
         <a class="today-more__link" href="/events/">
           <span class="today-more__label">Alle Events ansehen</span>
@@ -615,10 +711,11 @@
   }
 
   async function loadData() {
-    const [eventPayload, approvedPayload, offerPayload] = await Promise.all([
+    const [eventPayload, approvedPayload, offerPayload, visualPoolPayload] = await Promise.all([
       fetchJsonNoStore("/data/events.json", true),
       fetchJsonNoStore("/api/events/public.php", false),
-      fetchJsonNoStore("/data/offers.json", true)
+      fetchJsonNoStore("/data/offers.json", true),
+      fetchJsonNoStore("/data/event_visual_pool.json", false)
     ]);
 
     state.events = dedupeEvents([
@@ -627,6 +724,7 @@
     ]);
 
     state.offers = extractOffers(offerPayload);
+    state.eventVisualPools = buildReadyEventVisualPools(visualPoolPayload);
   }
 
   async function loadWeather() {
