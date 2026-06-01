@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 EVENT_POOL_PATH = ROOT / "data" / "event_visual_pool.json"
 OFFERS_PATH = ROOT / "data" / "offers.json"
+ACTIVITY_POOL_PATH = ROOT / "data" / "activity_visual_pool.json"
 
 VISUAL_STATUSES = {"ready", "usable", "fallback", "needs_review", "blocked"}
 EVENT_BACKLOG_STATUSES = {"planned"}
@@ -133,6 +134,93 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
     return summary
 
 
+
+def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[str, Any]:
+    summary: dict[str, Any] = {
+        "exists": ACTIVITY_POOL_PATH.exists(),
+        "pool_count": 0,
+        "image_count": 0,
+        "status_counts": Counter(),
+        "ready_count": 0,
+        "fallback_count": 0,
+        "missing_ready_files": 0,
+        "non_webp_ready": 0,
+        "oversized_ready": 0,
+        "missing_ready_alt": 0,
+    }
+
+    if not ACTIVITY_POOL_PATH.exists():
+        warnings.append("activity_visual_pool.json does not exist yet.")
+        return summary
+
+    payload = as_dict(load_json(ACTIVITY_POOL_PATH))
+    pools = as_dict(payload.get("pools"))
+
+    summary["pool_count"] = len(pools)
+
+    if payload.get("owner") != "activity_visual_pool_v1":
+        warnings.append("activity_visual_pool.json owner is not activity_visual_pool_v1.")
+
+    if not pools:
+        errors.append("activity_visual_pool.json has no pools.")
+        return summary
+
+    for visual_key, pool in pools.items():
+        images = as_list(as_dict(pool).get("images"))
+
+        if not images:
+            warnings.append(f"activity pool {visual_key!r} has no images.")
+
+        for image in images:
+            item = as_dict(image)
+            image_id = str(item.get("id") or "").strip()
+            src = str(item.get("src") or "").strip()
+            status = str(item.get("status") or "").strip()
+
+            summary["image_count"] += 1
+            summary["status_counts"][status or "<missing>"] += 1
+
+            if status not in ALL_ALLOWED_STATUSES:
+                errors.append(f"activity visual {visual_key}/{image_id or '<no-id>'} has invalid status {status!r}.")
+
+            if status in {"ready", "fallback"}:
+                if status == "ready":
+                    summary["ready_count"] += 1
+                if status == "fallback":
+                    summary["fallback_count"] += 1
+
+                if not image_id:
+                    errors.append(f"activity visual {visual_key} has {status} image without id.")
+
+                if not src:
+                    errors.append(f"activity visual {visual_key}/{image_id or '<no-id>'} is {status} but has no src.")
+                    continue
+
+                if not src.endswith(".webp"):
+                    summary["non_webp_ready"] += 1
+                    warnings.append(f"activity visual {visual_key}/{image_id} is {status} but not WebP: {src}")
+
+                if not str(item.get("alt") or "").strip():
+                    summary["missing_ready_alt"] += 1
+                    warnings.append(f"activity visual {visual_key}/{image_id} is {status} but has no alt text.")
+
+                asset_path = local_asset_path(src)
+                if asset_path is not None:
+                    if not asset_path.exists():
+                        summary["missing_ready_files"] += 1
+                        errors.append(f"activity visual {visual_key}/{image_id} references missing asset: {src}")
+                    else:
+                        size = asset_path.stat().st_size
+                        if size > CARD_ASSET_MAX_BYTES:
+                            summary["oversized_ready"] += 1
+                            warnings.append(
+                                f"activity visual {visual_key}/{image_id} is large for card use: "
+                                f"{relative(asset_path)} ({round(size / 1024)} KB)"
+                            )
+
+    return summary
+
+
 def audit_activity_visuals(errors: list[str], warnings: list[str]) -> dict[str, Any]:
     payload = load_json(OFFERS_PATH)
     offers = as_list(as_dict(payload).get("offers"))
@@ -243,6 +331,7 @@ def main() -> int:
     warnings: list[str] = []
 
     event_summary = audit_event_visual_pool(errors, warnings)
+    activity_pool_summary = audit_activity_visual_pool(errors, warnings)
     activity_summary = audit_activity_visuals(errors, warnings)
 
     print("=== Premium Visual Contract Audit ===")
@@ -257,6 +346,19 @@ def main() -> int:
     print(f"  ready/fallback oversized: {event_summary['oversized_ready']}")
     print(f"  ready/fallback missing alt: {event_summary['missing_ready_alt']}")
     print_counter("status counts", event_summary["status_counts"])
+
+    print()
+    print("Activity visual pool")
+    print(f"  exists: {activity_pool_summary['exists']}")
+    print(f"  pools: {activity_pool_summary['pool_count']}")
+    print(f"  images: {activity_pool_summary['image_count']}")
+    print(f"  ready: {activity_pool_summary['ready_count']}")
+    print(f"  fallback: {activity_pool_summary['fallback_count']}")
+    print(f"  missing ready/fallback files: {activity_pool_summary['missing_ready_files']}")
+    print(f"  ready/fallback non-WebP: {activity_pool_summary['non_webp_ready']}")
+    print(f"  ready/fallback oversized: {activity_pool_summary['oversized_ready']}")
+    print(f"  ready/fallback missing alt: {activity_pool_summary['missing_ready_alt']}")
+    print_counter("status counts", activity_pool_summary["status_counts"])
 
     print()
     print("Activity visuals")
