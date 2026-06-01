@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import subprocess
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -21,6 +23,8 @@ EVENT_BACKLOG_STATUSES = {"planned"}
 ALL_ALLOWED_STATUSES = VISUAL_STATUSES | EVENT_BACKLOG_STATUSES
 
 CARD_ASSET_MAX_BYTES = 450 * 1024
+CARD_ASSET_RATIO = 16 / 9
+CARD_ASSET_RATIO_TOLERANCE = 0.01
 
 
 def load_json(path: Path) -> Any:
@@ -55,6 +59,31 @@ def relative(path: Path) -> str:
         return str(path)
 
 
+def read_image_dimensions(path: Path) -> tuple[int, int] | None:
+    try:
+        result = subprocess.run(
+            ["file", str(path)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:
+        return None
+
+    match = re.search(r"(\d+)\s*x\s*(\d+)", result.stdout)
+    if not match:
+        return None
+
+    return int(match.group(1)), int(match.group(2))
+
+
+def is_card_ratio(width: int, height: int) -> bool:
+    if height <= 0:
+        return False
+
+    return abs((width / height) - CARD_ASSET_RATIO) <= CARD_ASSET_RATIO_TOLERANCE
+
+
 def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str, Any]:
     payload = as_dict(load_json(EVENT_POOL_PATH))
     pools = as_dict(payload.get("pools"))
@@ -69,6 +98,7 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
         "non_webp_ready": 0,
         "oversized_ready": 0,
         "missing_ready_alt": 0,
+        "non_16_9_ready": 0,
     }
 
     if payload.get("owner") != "event_visual_pool_v1":
@@ -124,6 +154,22 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
                         errors.append(f"event visual {visual_key}/{image_id} references missing asset: {src}")
                     else:
                         size = asset_path.stat().st_size
+
+                        dimensions = read_image_dimensions(asset_path)
+                        if dimensions:
+                            width, height = dimensions
+                            if not is_card_ratio(width, height):
+                                summary["non_16_9_ready"] += 1
+                                warnings.append(
+                                    f"event visual {visual_key}/{image_id} is {status} but not 16:9 card asset: "
+                                    f"{relative(asset_path)} ({width}x{height})"
+                                )
+                        else:
+                            warnings.append(
+                                f"event visual {visual_key}/{image_id} dimensions could not be read: "
+                                f"{relative(asset_path)}"
+                            )
+
                         if size > CARD_ASSET_MAX_BYTES:
                             summary["oversized_ready"] += 1
                             warnings.append(
@@ -147,6 +193,7 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
         "non_webp_ready": 0,
         "oversized_ready": 0,
         "missing_ready_alt": 0,
+        "non_16_9_ready": 0,
     }
 
     if not ACTIVITY_POOL_PATH.exists():
@@ -211,6 +258,22 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
                         errors.append(f"activity visual {visual_key}/{image_id} references missing asset: {src}")
                     else:
                         size = asset_path.stat().st_size
+
+                        dimensions = read_image_dimensions(asset_path)
+                        if dimensions:
+                            width, height = dimensions
+                            if not is_card_ratio(width, height):
+                                summary["non_16_9_ready"] += 1
+                                warnings.append(
+                                    f"activity visual {visual_key}/{image_id} is {status} but not 16:9 card asset: "
+                                    f"{relative(asset_path)} ({width}x{height})"
+                                )
+                        else:
+                            warnings.append(
+                                f"activity visual {visual_key}/{image_id} dimensions could not be read: "
+                                f"{relative(asset_path)}"
+                            )
+
                         if size > CARD_ASSET_MAX_BYTES:
                             summary["oversized_ready"] += 1
                             warnings.append(
@@ -345,6 +408,7 @@ def main() -> int:
     print(f"  ready/fallback non-WebP: {event_summary['non_webp_ready']}")
     print(f"  ready/fallback oversized: {event_summary['oversized_ready']}")
     print(f"  ready/fallback missing alt: {event_summary['missing_ready_alt']}")
+    print(f"  ready/fallback not 16:9: {event_summary['non_16_9_ready']}")
     print_counter("status counts", event_summary["status_counts"])
 
     print()
@@ -358,6 +422,7 @@ def main() -> int:
     print(f"  ready/fallback non-WebP: {activity_pool_summary['non_webp_ready']}")
     print(f"  ready/fallback oversized: {activity_pool_summary['oversized_ready']}")
     print(f"  ready/fallback missing alt: {activity_pool_summary['missing_ready_alt']}")
+    print(f"  ready/fallback not 16:9: {activity_pool_summary['non_16_9_ready']}")
     print_counter("status counts", activity_pool_summary["status_counts"])
 
     print()
