@@ -1,0 +1,990 @@
+{
+  "schema_version": 1,
+  "owner": "event_visual_generation_batches_phase1_v1",
+  "source_contract": {
+    "phase1_plan": "data/event_visual_phase1_plan.tsv",
+    "ai_style_guide": "data/event_visual_ai_style_guide.json"
+  },
+  "generation_defaults": {
+    "aspect_ratio": "4:3",
+    "source_type": "ai_generated",
+    "is_symbolic": true,
+    "is_documentary": false,
+    "final_asset_format": "webp",
+    "max_requests_per_batch": 10,
+    "batch_count": 3,
+    "total_requests": 22,
+    "review_required": true
+  },
+  "batches": [
+    {
+      "batch_id": "phase1_batch_01_local_detail",
+      "batch_order": 1,
+      "theme": "Local-sensitive urban and outdoor detail visuals",
+      "rationale": "First batch for locality-sensitive prompts with strong no-fake-place constraints.",
+      "visual_keys": [
+        "city_festival",
+        "city_walk",
+        "default_city",
+        "outdoor_nature"
+      ],
+      "requests": [
+        {
+          "request_id": "phase1_city_festival_01",
+          "visual_key": "city_festival",
+          "slot": "01",
+          "image_id": "city-festival-01",
+          "planned_src": "/assets/event-visuals/city-festival-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: city_festival. Planned asset path: /assets/event-visuals/city-festival-01.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: urban festive small-town atmosphere through details, planters, temporary setup cues, tables, light decor, paving, facades. Specific slot brief: Bocholter oder ähnlich kleinstädtische Fußgängerzone mit Event-/Fest-Atmosphäre.. Locality requirement: must feel locally plausible and must avoid invented central squares. Anchor style profiles to follow: city_walk_v2, market_food_v3. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability; event-context food imagery instead of pure food styling; market stand materiality; soft anonymous background context; warm but believable editorial look; card-friendly subject layering. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness; gourmet magazine still life; alcohol-centric mood; perfect fantasy market square. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: detail or edge framing instead of a full square; small-town urban materials; subtle event cues. People policy: anonymous or absent. Prompt-specific avoid rules: big fantasy festival plaza; tourism postcard composition; generic big-city street festival. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2",
+              "market_food_v3"
+            ],
+            "recommended_source_type": "own_or_cleared_local_photo",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_explicitly_cleared",
+            "first_action": "Eigene Bocholt-/Innenstadt-Fotos oder gezielt lokale, rechteklare Bilder beschaffen.",
+            "notes": "Für Premium-Wirkung möglichst lokal. Generische Stadtfestbilder nur als Notlösung.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "local plausibility",
+                "event cue subtlety",
+                "no fake-place feel"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_city_festival_02",
+          "visual_key": "city_festival",
+          "slot": "02",
+          "image_id": "city-festival-02",
+          "planned_src": "/assets/event-visuals/city-festival-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: city_festival. Planned asset path: /assets/event-visuals/city-festival-02.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: urban festive small-town atmosphere through details, planters, temporary setup cues, tables, light decor, paving, facades. Specific slot brief: Platz- oder Straßenraum mit Ständen, Dekoration oder Veranstaltungsvorbereitung.. Locality requirement: must feel locally plausible and must avoid invented central squares. Anchor style profiles to follow: city_walk_v2, market_food_v3. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability; event-context food imagery instead of pure food styling; market stand materiality; soft anonymous background context; warm but believable editorial look; card-friendly subject layering. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness; gourmet magazine still life; alcohol-centric mood; perfect fantasy market square. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: detail or edge framing instead of a full square; small-town urban materials; subtle event cues. People policy: anonymous or absent. Prompt-specific avoid rules: big fantasy festival plaza; tourism postcard composition; generic big-city street festival. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2",
+              "market_food_v3"
+            ],
+            "recommended_source_type": "own_or_cleared_local_photo",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_explicitly_cleared",
+            "first_action": "Eigene Bocholt-/Innenstadt-Fotos oder gezielt lokale, rechteklare Bilder beschaffen.",
+            "notes": "Für Premium-Wirkung möglichst lokal. Generische Stadtfestbilder nur als Notlösung.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "local plausibility",
+                "event cue subtlety",
+                "no fake-place feel"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_city_walk_01",
+          "visual_key": "city_walk",
+          "slot": "01",
+          "image_id": "city-walk-01",
+          "planned_src": "/assets/event-visuals/city-walk-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: city_walk. Planned asset path: /assets/event-visuals/city-walk-01.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: paving, facade edge, shopfront detail, bicycle, planting, urban small-town materiality. Specific slot brief: Stadtstraße oder Fußgängerzone mit klarer Perspektive und lokaler Atmosphäre.. Locality requirement: must feel Bocholt-plausible without pretending to be a specific identifiable street. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: detail-first framing; small-town urban plausibility; calm editorial realism. People policy: prefer none; anonymous presence only if extremely subtle. Prompt-specific avoid rules: full fantasy old-town street; postcard town view; half-timber fairy-tale scene. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_photo_or_commons_local_landmark",
+            "must_be_local": "yes",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Bocholt-/Regionsmotive priorisieren: Straße, Turm, Kirche, Promenade, Route.",
+            "notes": "Dieser Pool entscheidet stark über lokale Wiedererkennbarkeit.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "no fake-place claim",
+                "material plausibility",
+                "card-ready composition"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_city_walk_02",
+          "visual_key": "city_walk",
+          "slot": "02",
+          "image_id": "city-walk-02",
+          "planned_src": "/assets/event-visuals/city-walk-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: city_walk. Planned asset path: /assets/event-visuals/city-walk-02.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: paving, facade edge, shopfront detail, bicycle, planting, urban small-town materiality. Specific slot brief: Kirche, Turm oder Architekturdetail als hochwertiger Orientierungspunkt.. Locality requirement: must feel Bocholt-plausible without pretending to be a specific identifiable street. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: detail-first framing; small-town urban plausibility; calm editorial realism. People policy: prefer none; anonymous presence only if extremely subtle. Prompt-specific avoid rules: full fantasy old-town street; postcard town view; half-timber fairy-tale scene. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_photo_or_commons_local_landmark",
+            "must_be_local": "yes",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Bocholt-/Regionsmotive priorisieren: Straße, Turm, Kirche, Promenade, Route.",
+            "notes": "Dieser Pool entscheidet stark über lokale Wiedererkennbarkeit.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "no fake-place claim",
+                "material plausibility",
+                "card-ready composition"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_default_city_01",
+          "visual_key": "default_city",
+          "slot": "01",
+          "image_id": "default-city-01",
+          "planned_src": "/assets/event-visuals/default-city-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: default_city. Planned asset path: /assets/event-visuals/default-city-01.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: neutral city-detail mood with paving, facade, greenery, subtle small-town urban texture. Specific slot brief: Bocholt-/Innenstadt-Detail mit ruhiger, hochwertiger Flächenwirkung.. Locality requirement: must remain locally plausible and visually neutral enough to cover many unclassified events. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: neutral but premium local atmosphere; detail framing; good crop flexibility. People policy: absent or anonymous. Prompt-specific avoid rules: specific false landmark; strong theme bias; empty bureaucratic cityscape. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_brand_visual",
+            "must_be_local": "yes",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_self_created_brand_visual",
+            "first_action": "Hochwertige neutrale Bocholt-/Brand-Visuals erstellen oder fotografieren.",
+            "notes": "Default darf nicht billig wirken, weil er bei unklaren Events sichtbar wird.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "versatility",
+                "local plausibility",
+                "neutral premium atmosphere"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_default_city_02",
+          "visual_key": "default_city",
+          "slot": "02",
+          "image_id": "default-city-02",
+          "planned_src": "/assets/event-visuals/default-city-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: default_city. Planned asset path: /assets/event-visuals/default-city-02.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: neutral city-detail mood with paving, facade, greenery, subtle small-town urban texture. Specific slot brief: Lokale Architektur oder Materialstruktur als neutraler Premium-Fallback.. Locality requirement: must remain locally plausible and visually neutral enough to cover many unclassified events. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: neutral but premium local atmosphere; detail framing; good crop flexibility. People policy: absent or anonymous. Prompt-specific avoid rules: specific false landmark; strong theme bias; empty bureaucratic cityscape. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_brand_visual",
+            "must_be_local": "yes",
+            "can_be_symbolic": "limited",
+            "capture_priority": "very_high",
+            "rights_mode": "own_photo_or_self_created_brand_visual",
+            "first_action": "Hochwertige neutrale Bocholt-/Brand-Visuals erstellen oder fotografieren.",
+            "notes": "Default darf nicht billig wirken, weil er bei unklaren Events sichtbar wird.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "versatility",
+                "local plausibility",
+                "neutral premium atmosphere"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_outdoor_nature_01",
+          "visual_key": "outdoor_nature",
+          "slot": "01",
+          "image_id": "outdoor-nature-01",
+          "planned_src": "/assets/event-visuals/outdoor-nature-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: outdoor_nature. Planned asset path: /assets/event-visuals/outdoor-nature-01.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: park, path, water edge, greenery, quiet outdoor detail with local lowland plausibility. Specific slot brief: Waldweg oder Parkweg mit Tiefe und ruhiger grüner Stimmung.. Locality requirement: should feel regionally plausible and not like mountains, coast or exotic travel imagery. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: regional lowland plausibility; calm outdoor atmosphere; crop-safe composition. People policy: absent or anonymous. Prompt-specific avoid rules: alpine panorama; beach/travel postcard; wild dramatic landscape. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_nature_or_commons_region",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Lokale Natur-/Park-/Wald-/Wassermotive priorisieren.",
+            "notes": "Nicht nach Alpen/Strand/Reise aussehen lassen. Ruhig, grün, regional.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "regional plausibility",
+                "quiet premium mood",
+                "not generic travel imagery"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_outdoor_nature_02",
+          "visual_key": "outdoor_nature",
+          "slot": "02",
+          "image_id": "outdoor-nature-02",
+          "planned_src": "/assets/event-visuals/outdoor-nature-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: outdoor_nature. Planned asset path: /assets/event-visuals/outdoor-nature-02.webp. Image class: local_sensitive_detail. Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims. Subject focus: park, path, water edge, greenery, quiet outdoor detail with local lowland plausibility. Specific slot brief: Wasser-/Aasee-/Ufermotiv oder ruhige Naturlandschaft.. Locality requirement: should feel regionally plausible and not like mountains, coast or exotic travel imagery. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: subtle small-town detail; brick, plaster, paving, greenery, bicycle or street furniture; editorial documentary realism. Must include: regional lowland plausibility; calm outdoor atmosphere; crop-safe composition. People policy: absent or anonymous. Prompt-specific avoid rules: alpine panorama; beach/travel postcard; wild dramatic landscape. Class-specific avoid bias: full postcard townscape; romanticized fantasy old town; tourism brochure angle. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "local_sensitive_detail",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_local_nature_or_commons_region",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Lokale Natur-/Park-/Wald-/Wassermotive priorisieren.",
+            "notes": "Nicht nach Alpen/Strand/Reise aussehen lassen. Ruhig, grün, regional.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "regional plausibility",
+                "quiet premium mood",
+                "not generic travel imagery"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "phase1_batch_02_symbolic_editorial",
+      "batch_order": 2,
+      "theme": "Symbolic editorial making, family and culture visuals",
+      "rationale": "Second batch for symbolic editorial prompts with strong materiality and safety rules.",
+      "visual_keys": [
+        "creative_workshop",
+        "culture_exhibition",
+        "kids_family",
+        "theater_show"
+      ],
+      "requests": [
+        {
+          "request_id": "phase1_creative_workshop_01",
+          "visual_key": "creative_workshop",
+          "slot": "01",
+          "image_id": "creative-workshop-01",
+          "planned_src": "/assets/event-visuals/creative-workshop-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: creative_workshop. Planned asset path: /assets/event-visuals/creative-workshop-01.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: paper, pencils, tools, wood, craft materials, hands-on making context. Specific slot brief: Kreativtisch mit Stiften, Papier und Materialien, hochwertig und nicht chaotisch.. Locality requirement: not required; symbolic making imagery is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: credible workshop or making cue; material richness; quiet premium calm. People policy: partial human presence allowed, no identifiable face required. Prompt-specific avoid rules: sterile atelier perfection; chaotic craft table; recognizable child faces; copyrighted characters or figures. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "self_created_symbolic_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_self_created_material_scene",
+            "first_action": "Material-/Hände-/Werkzeug-Szenen selbst bauen oder rechteklare Detailbilder nutzen.",
+            "notes": "Keine erkennbaren Kinder, keine geschützten Figuren wie Pokémon im Bildfokus.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "workshop authenticity",
+                "no over-arranged design-studio feel",
+                "safe symbolic use"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_creative_workshop_02",
+          "visual_key": "creative_workshop",
+          "slot": "02",
+          "image_id": "creative-workshop-02",
+          "planned_src": "/assets/event-visuals/creative-workshop-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: creative_workshop. Planned asset path: /assets/event-visuals/creative-workshop-02.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: paper, pencils, tools, wood, craft materials, hands-on making context. Specific slot brief: Hände beim Basteln, Malen oder Bauen, ohne erkennbare Personen.. Locality requirement: not required; symbolic making imagery is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: credible workshop or making cue; material richness; quiet premium calm. People policy: partial human presence allowed, no identifiable face required. Prompt-specific avoid rules: sterile atelier perfection; chaotic craft table; recognizable child faces; copyrighted characters or figures. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "self_created_symbolic_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_self_created_material_scene",
+            "first_action": "Material-/Hände-/Werkzeug-Szenen selbst bauen oder rechteklare Detailbilder nutzen.",
+            "notes": "Keine erkennbaren Kinder, keine geschützten Figuren wie Pokémon im Bildfokus.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "workshop authenticity",
+                "no over-arranged design-studio feel",
+                "safe symbolic use"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_creative_workshop_03",
+          "visual_key": "creative_workshop",
+          "slot": "03",
+          "image_id": "creative-workshop-03",
+          "planned_src": "/assets/event-visuals/creative-workshop-03.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: creative_workshop. Planned asset path: /assets/event-visuals/creative-workshop-03.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: paper, pencils, tools, wood, craft materials, hands-on making context. Specific slot brief: Natur-/Bau-Workshop-Motiv mit Holz, Werkzeug oder Nistkasten-Material.. Locality requirement: not required; symbolic making imagery is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: credible workshop or making cue; material richness; quiet premium calm. People policy: partial human presence allowed, no identifiable face required. Prompt-specific avoid rules: sterile atelier perfection; chaotic craft table; recognizable child faces; copyrighted characters or figures. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "self_created_symbolic_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_self_created_material_scene",
+            "first_action": "Material-/Hände-/Werkzeug-Szenen selbst bauen oder rechteklare Detailbilder nutzen.",
+            "notes": "Keine erkennbaren Kinder, keine geschützten Figuren wie Pokémon im Bildfokus.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "workshop authenticity",
+                "no over-arranged design-studio feel",
+                "safe symbolic use"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_culture_exhibition_01",
+          "visual_key": "culture_exhibition",
+          "slot": "01",
+          "image_id": "culture-exhibition-01",
+          "planned_src": "/assets/event-visuals/culture-exhibition-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: culture_exhibition. Planned asset path: /assets/event-visuals/culture-exhibition-01.webp. Image class: hybrid_contextual. Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context. Subject focus: exhibition-space detail, cultural object context, architecture, museum-like material calm. Specific slot brief: Ausstellungs- oder Museumsraum mit ruhiger Perspektive, keine geschützte Kunst prominent.. Locality requirement: prefer plausible local culture or architecture atmosphere without claiming a false venue. Anchor style profiles to follow: city_walk_v2, creative_workshop_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability; credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness; sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: foreground material focus; soft anonymous background context; event/detail balance. Must include: curated cultural atmosphere; material and spatial restraint; soft contextual depth. People policy: absent or anonymous. Prompt-specific avoid rules: famous artwork focus; readable exhibition labels; sterile white-cube emptiness. Class-specific avoid bias: pure still life with no context; fully invented market square; hard commercial styling. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "hybrid_contextual",
+            "anchor_profiles": [
+              "city_walk_v2",
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "own_culture_detail_or_commons_architecture",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Kultur-, Ausstellungs-, Architektur- oder Textil-/Materialdetails beschaffen.",
+            "notes": "Keine geschützten Kunstwerke prominent abbilden.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "quiet premium tone",
+                "no legal-risk artwork focus",
+                "context remains believable"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_culture_exhibition_02",
+          "visual_key": "culture_exhibition",
+          "slot": "02",
+          "image_id": "culture-exhibition-02",
+          "planned_src": "/assets/event-visuals/culture-exhibition-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: culture_exhibition. Planned asset path: /assets/event-visuals/culture-exhibition-02.webp. Image class: hybrid_contextual. Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context. Subject focus: exhibition-space detail, cultural object context, architecture, museum-like material calm. Specific slot brief: Textil-/Handwerks-/Kulturobjekt als atmosphärisches Detail.. Locality requirement: prefer plausible local culture or architecture atmosphere without claiming a false venue. Anchor style profiles to follow: city_walk_v2, creative_workshop_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability; credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness; sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: foreground material focus; soft anonymous background context; event/detail balance. Must include: curated cultural atmosphere; material and spatial restraint; soft contextual depth. People policy: absent or anonymous. Prompt-specific avoid rules: famous artwork focus; readable exhibition labels; sterile white-cube emptiness. Class-specific avoid bias: pure still life with no context; fully invented market square; hard commercial styling. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "hybrid_contextual",
+            "anchor_profiles": [
+              "city_walk_v2",
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "own_culture_detail_or_commons_architecture",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_commons_with_license_attribution",
+            "first_action": "Kultur-, Ausstellungs-, Architektur- oder Textil-/Materialdetails beschaffen.",
+            "notes": "Keine geschützten Kunstwerke prominent abbilden.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "quiet premium tone",
+                "no legal-risk artwork focus",
+                "context remains believable"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_kids_family_01",
+          "visual_key": "kids_family",
+          "slot": "01",
+          "image_id": "kids-family-01",
+          "planned_src": "/assets/event-visuals/kids-family-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: kids_family. Planned asset path: /assets/event-visuals/kids-family-01.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: family-friendly material scenes, play or making cues without showing identifiable children. Specific slot brief: Familien-/Kinderangebot als Material- oder Aktivitätsdetail ohne erkennbare Gesichter.. Locality requirement: not required; symbolic child-safe and family-safe imagery is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: family-safe activity cues; friendly but not childish color restraint; believable materials. People policy: no identifiable children; hands or cropped adults only if necessary. Prompt-specific avoid rules: recognizable child faces; generic smiling stock family; kindergarten chaos; cartoon overload. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "self_created_family_safe_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_no_recognizable_children",
+            "first_action": "Freundliche Detailmotive mit Spiel-/Mitmachmaterial erstellen.",
+            "notes": "Keine erkennbaren Kindergesichter. Familienklischee-Stockfotos vermeiden.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "safety around identity",
+                "symbolic clarity",
+                "warmth without kitsch"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_kids_family_02",
+          "visual_key": "kids_family",
+          "slot": "02",
+          "image_id": "kids-family-02",
+          "planned_src": "/assets/event-visuals/kids-family-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: kids_family. Planned asset path: /assets/event-visuals/kids-family-02.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: family-friendly material scenes, play or making cues without showing identifiable children. Specific slot brief: Spiel-/Mitmachfläche mit Händen, Materialien oder bunten Objekten, ruhig komponiert.. Locality requirement: not required; symbolic child-safe and family-safe imagery is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: family-safe activity cues; friendly but not childish color restraint; believable materials. People policy: no identifiable children; hands or cropped adults only if necessary. Prompt-specific avoid rules: recognizable child faces; generic smiling stock family; kindergarten chaos; cartoon overload. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "self_created_family_safe_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_no_recognizable_children",
+            "first_action": "Freundliche Detailmotive mit Spiel-/Mitmachmaterial erstellen.",
+            "notes": "Keine erkennbaren Kindergesichter. Familienklischee-Stockfotos vermeiden.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "safety around identity",
+                "symbolic clarity",
+                "warmth without kitsch"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_theater_show_01",
+          "visual_key": "theater_show",
+          "slot": "01",
+          "image_id": "theater-show-01",
+          "planned_src": "/assets/event-visuals/theater-show-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: theater_show. Planned asset path: /assets/event-visuals/theater-show-01.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: theater or show cues such as curtain, stage edge, spotlight, script table, microphone. Specific slot brief: Theatervorhang, leere Bühne oder Bühnenlicht mit hochwertiger Atmosphäre.. Locality requirement: not required; symbolic editorial stage image is preferred. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: clear theater/show cue; premium restrained mood; soft believable lighting. People policy: avoid faces; empty or partial-human imagery preferred. Prompt-specific avoid rules: recognizable performers; broadway poster energy; gaudy stage spectacle. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "cleared_symbolic_theater_stage",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_cleared_symbolic_stage_image",
+            "first_action": "Vorhang, leere Bühne, Spotlicht oder Lesungsmotiv ohne Performer nutzen.",
+            "notes": "Keine Bühnenbilder oder Personen ohne Rechte.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "show cue clarity",
+                "not too dark or theatrical-kitsch",
+                "premium editorial calm"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "phase1_batch_03_contextual_activity",
+      "batch_order": 3,
+      "theme": "Contextual market, music and sport visuals",
+      "rationale": "Third batch for contextual activity visuals with foreground-detail focus.",
+      "visual_keys": [
+        "market_food",
+        "music_stage",
+        "sport_active"
+      ],
+      "requests": [
+        {
+          "request_id": "phase1_market_food_01",
+          "visual_key": "market_food",
+          "slot": "01",
+          "image_id": "market-food-01",
+          "planned_src": "/assets/event-visuals/market-food-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: market_food. Planned asset path: /assets/event-visuals/market-food-01.webp. Image class: hybrid_contextual. Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context. Subject focus: market stand, ingredients, simple prepared food, crates, herbs, bread, produce, event stall context. Specific slot brief: Urbaner Streetfood-/Foodtruck-Moment mit warmem Licht und wenig sichtbaren Personen.. Locality requirement: prefer local plausibility, but do not claim a specific place. Anchor style profiles to follow: market_food_v3. Emphasize these anchor strengths: event-context food imagery instead of pure food styling; market stand materiality; soft anonymous background context; warm but believable editorial look; card-friendly subject layering. Do not transfer these anchor weaknesses: gourmet magazine still life; alcohol-centric mood; perfect fantasy market square. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: foreground material focus; soft anonymous background context; event/detail balance. Must include: event or market context stronger than pure still life; foreground food/material detail; soft anonymous small-town background if background is visible; natural slight imperfection. People policy: anonymous background presence allowed. Prompt-specific avoid rules: gourmet magazine styling; alcohol focus; perfect fantasy market square; dominant full street scene. Class-specific avoid bias: pure still life with no context; fully invented market square; hard commercial styling. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "hybrid_contextual",
+            "anchor_profiles": [
+              "market_food_v3"
+            ],
+            "recommended_source_type": "own_local_or_high_quality_symbolic_food_market",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_cleared_stock_without_brands",
+            "first_action": "Markt-/Food-/Stadtfest-Stimmung mit warmem Licht beschaffen.",
+            "notes": "Keine Marken, keine Alkoholzentrierung, keine beliebigen Tellerbilder.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "event-feel versus still-life balance",
+                "background remains unspecific",
+                "market materiality feels believable"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_market_food_02",
+          "visual_key": "market_food",
+          "slot": "02",
+          "image_id": "market-food-02",
+          "planned_src": "/assets/event-visuals/market-food-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: market_food. Planned asset path: /assets/event-visuals/market-food-02.webp. Image class: hybrid_contextual. Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context. Subject focus: market stand, ingredients, simple prepared food, crates, herbs, bread, produce, event stall context. Specific slot brief: Wochenmarkt-/Marktstand mit Obst, Gemüse oder regionalen Produkten, hochwertig und ruhig.. Locality requirement: prefer local plausibility, but do not claim a specific place. Anchor style profiles to follow: market_food_v3. Emphasize these anchor strengths: event-context food imagery instead of pure food styling; market stand materiality; soft anonymous background context; warm but believable editorial look; card-friendly subject layering. Do not transfer these anchor weaknesses: gourmet magazine still life; alcohol-centric mood; perfect fantasy market square. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: foreground material focus; soft anonymous background context; event/detail balance. Must include: event or market context stronger than pure still life; foreground food/material detail; soft anonymous small-town background if background is visible; natural slight imperfection. People policy: anonymous background presence allowed. Prompt-specific avoid rules: gourmet magazine styling; alcohol focus; perfect fantasy market square; dominant full street scene. Class-specific avoid bias: pure still life with no context; fully invented market square; hard commercial styling. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "hybrid_contextual",
+            "anchor_profiles": [
+              "market_food_v3"
+            ],
+            "recommended_source_type": "own_local_or_high_quality_symbolic_food_market",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_cleared_stock_without_brands",
+            "first_action": "Markt-/Food-/Stadtfest-Stimmung mit warmem Licht beschaffen.",
+            "notes": "Keine Marken, keine Alkoholzentrierung, keine beliebigen Tellerbilder.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "event-feel versus still-life balance",
+                "background remains unspecific",
+                "market materiality feels believable"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_market_food_03",
+          "visual_key": "market_food",
+          "slot": "03",
+          "image_id": "market-food-03",
+          "planned_src": "/assets/event-visuals/market-food-03.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: market_food. Planned asset path: /assets/event-visuals/market-food-03.webp. Image class: hybrid_contextual. Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context. Subject focus: market stand, ingredients, simple prepared food, crates, herbs, bread, produce, event stall context. Specific slot brief: Innenstadt-Festivalatmosphäre mit Ständen, Lichtern oder Tischen, keine Markenlogos.. Locality requirement: prefer local plausibility, but do not claim a specific place. Anchor style profiles to follow: market_food_v3. Emphasize these anchor strengths: event-context food imagery instead of pure food styling; market stand materiality; soft anonymous background context; warm but believable editorial look; card-friendly subject layering. Do not transfer these anchor weaknesses: gourmet magazine still life; alcohol-centric mood; perfect fantasy market square. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: foreground material focus; soft anonymous background context; event/detail balance. Must include: event or market context stronger than pure still life; foreground food/material detail; soft anonymous small-town background if background is visible; natural slight imperfection. People policy: anonymous background presence allowed. Prompt-specific avoid rules: gourmet magazine styling; alcohol focus; perfect fantasy market square; dominant full street scene. Class-specific avoid bias: pure still life with no context; fully invented market square; hard commercial styling. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "hybrid_contextual",
+            "anchor_profiles": [
+              "market_food_v3"
+            ],
+            "recommended_source_type": "own_local_or_high_quality_symbolic_food_market",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "high",
+            "rights_mode": "own_photo_or_cleared_stock_without_brands",
+            "first_action": "Markt-/Food-/Stadtfest-Stimmung mit warmem Licht beschaffen.",
+            "notes": "Keine Marken, keine Alkoholzentrierung, keine beliebigen Tellerbilder.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "event-feel versus still-life balance",
+                "background remains unspecific",
+                "market materiality feels believable"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_music_stage_01",
+          "visual_key": "music_stage",
+          "slot": "01",
+          "image_id": "music-stage-01",
+          "planned_src": "/assets/event-visuals/music-stage-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: music_stage. Planned asset path: /assets/event-visuals/music-stage-01.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: small-stage or music-context detail such as microphone, instrument, stage light, movement cue. Specific slot brief: Bühnenlicht mit Mikrofon oder Instrument als klares, ruhiges Hauptmotiv.. Locality requirement: not required; symbolic image is acceptable. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: music or stage context is clearly readable; quiet premium styling; believable materials and lighting. People policy: avoid faces; silhouettes or partial presence only if necessary. Prompt-specific avoid rules: concert poster look; nightclub neon; recognizable performers; logo-heavy equipment. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "cleared_symbolic_stage_or_own_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_cleared_symbolic_stage_image",
+            "first_action": "Bühnenlicht, Mikrofon, Instrument oder Tanzdetail ohne erkennbare Performer nutzen.",
+            "notes": "Keine erkennbaren Künstler, keine Logos, keine Poster.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "symbolic clarity",
+                "premium calm",
+                "no cheap nightlife look"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_music_stage_02",
+          "visual_key": "music_stage",
+          "slot": "02",
+          "image_id": "music-stage-02",
+          "planned_src": "/assets/event-visuals/music-stage-02.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: music_stage. Planned asset path: /assets/event-visuals/music-stage-02.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: small-stage or music-context detail such as microphone, instrument, stage light, movement cue. Specific slot brief: Kleine Live-Musik-Atmosphäre mit Publikum nur anonym/silhouettenhaft.. Locality requirement: not required; symbolic image is acceptable. Anchor style profiles to follow: creative_workshop_v2. Emphasize these anchor strengths: credible making/workshop character; quiet premium craft/material styling; safe partial human presence without identity claim; high material richness; strong symbolic usability. Do not transfer these anchor weaknesses: sterile design atelier look; chaotic craft table; recognizable children or faces. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: music or stage context is clearly readable; quiet premium styling; believable materials and lighting. People policy: avoid faces; silhouettes or partial presence only if necessary. Prompt-specific avoid rules: concert poster look; nightclub neon; recognizable performers; logo-heavy equipment. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "high",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "creative_workshop_v2"
+            ],
+            "recommended_source_type": "cleared_symbolic_stage_or_own_detail",
+            "must_be_local": "no",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_cleared_symbolic_stage_image",
+            "first_action": "Bühnenlicht, Mikrofon, Instrument oder Tanzdetail ohne erkennbare Performer nutzen.",
+            "notes": "Keine erkennbaren Künstler, keine Logos, keine Poster.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "symbolic clarity",
+                "premium calm",
+                "no cheap nightlife look"
+              ]
+            }
+          }
+        },
+        {
+          "request_id": "phase1_sport_active_01",
+          "visual_key": "sport_active",
+          "slot": "01",
+          "image_id": "sport-active-01",
+          "planned_src": "/assets/event-visuals/sport-active-01.webp",
+          "aspect_ratio": "4:3",
+          "prompt": "Create one premium AI-generated symbolic event visual for the \"Bocholt erleben\" PWA. This is a landscape event-card image and must be optimized for a 4:3 crop-safe composition. Visual key: sport_active. Planned asset path: /assets/event-visuals/sport-active-01.webp. Image class: symbolic_editorial. Symbolic premium editorial images where locality is secondary to safe, believable activity representation. Subject focus: movement-supporting detail such as path, shoe, bicycle, route surface, outdoor activity cue. Specific slot brief: Rad-/Routenmotiv mit Weg, Fahrrad-Detail oder Landschaft.. Locality requirement: optional; route or surface plausibility preferred over landmark identity. Anchor style profiles to follow: city_walk_v2. Emphasize these anchor strengths: locally plausible small-town mood; brick, plaster, paving and plant materiality; calm editorial realism; no false concrete place claim; strong card crop suitability. Do not transfer these anchor weaknesses: over-clean perfection; postcard romanticism; too much visual emptiness. Desired visual language: premium editorial photography; believable real-world realism; warm-neutral restrained palette; quiet premium composition; material-rich surfaces; slight lived-in imperfection; calm local small-town atmosphere where relevant. Lighting rules: prefer natural daylight or soft diffused light; allow mild warmth but avoid heavy golden-hour glaze; allow gentle indoor softness for symbolic scenes; avoid extreme cinematic light beams or fantasy haze. Composition rules: landscape image optimized for 4:3 crop safety; clear foreground or midground subject focus; background may be soft but not unrealistically over-blurred; avoid overcrowding and avoid too many micro-details; preserve usable crop for mobile cards. Realism rules: surfaces should feel slightly imperfect and tactile; avoid plastic-looking textures; avoid impossible geometry or suspicious repetition; avoid theme-park prettiness; prefer documentary editorial restraint over visual spectacle. Class-specific prompt bias: symbolic material scene; quiet workshop or activity cues; editorial realism. Must include: clear movement or activity implication; clean but believable outdoor realism; crop-safe focal cue. People policy: avoid faces; body fragments or anonymous silhouettes only if needed. Prompt-specific avoid rules: aggressive sports marketing look; recognizable athletes; brand-centric gear; stadium spectacle. Class-specific avoid bias: sterile studio set; cheap stock posing; chaotic clutter. Global negative rules: no fictional recognizable old-town square; no postcard old-town look; no fairy-tale half-timber fantasy street; no over-perfect golden-hour postcard mood; no cheap stock-photo smile scenes; no exaggerated cinematic bokeh; no surreal AI symmetry; no pristine showroom perfection; no loud festival poster aesthetics; no text in image. Legal safety rules: no readable brands; no readable posters; no readable signs; no copyrighted artwork in focus; no identifiable children; avoid identifiable adults; if present, keep anonymous or partial. Do not include any readable text, logos, posters, signs or copyrighted artwork. Do not create a false concrete Bocholt place claim. The image must feel premium, believable, low in AI-artifice, and suitable for a modern discovery PWA event card.",
+          "metadata": {
+            "phase": 1,
+            "priority": "medium",
+            "image_class": "symbolic_editorial",
+            "anchor_profiles": [
+              "city_walk_v2"
+            ],
+            "recommended_source_type": "own_route_or_symbolic_sport_detail",
+            "must_be_local": "preferred",
+            "can_be_symbolic": "yes",
+            "capture_priority": "medium",
+            "rights_mode": "own_photo_or_cleared_symbolic_sport_image",
+            "first_action": "Radweg, Schuhe, Strecke, Parkweg oder Sportdetail beschaffen.",
+            "notes": "Keine erkennbaren Sportler oder Markenkleidung im Fokus.",
+            "review_gates": {
+              "hard_fail": [
+                "no_false_place_claim",
+                "low_ai_artifice",
+                "legal_safety"
+              ],
+              "soft_review": [
+                "locality_plausibility",
+                "premium_quality",
+                "crop_safety",
+                "anchor_consistency"
+              ],
+              "review_emphasis": [
+                "activity readability",
+                "not too commercial",
+                "outdoor realism"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
