@@ -357,6 +357,19 @@
     return Array.isArray(pool) && pool.length > 0;
   }
 
+  function hasAllowedActivityVisual(item) {
+    if (item?.type !== "activity") return true;
+
+    const quality = asString(
+      item?.imageQuality ||
+      item?.image_quality ||
+      item?.image_status ||
+      item?.visual_status
+    ).toLowerCase();
+
+    return quality !== "needs_review" && quality !== "blocked";
+  }
+
   function compareTodayItems(a, b) {
     const scoreDiff = todayScore(b) - todayScore(a);
     if (scoreDiff) return scoreDiff;
@@ -379,7 +392,7 @@
       .filter((item) => item && !isPastEventItem(item, now));
 
     const activityLane = addDailyRotation(
-      cleaned.filter((item) => item.type !== "event").slice(0, 32),
+      cleaned.filter((item) => item.type !== "event" && hasAllowedActivityVisual(item)).slice(0, 32),
       context
     );
 

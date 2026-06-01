@@ -323,6 +323,7 @@
       mapsTarget: asString(obj.maps_query || obj.maps_label || obj.location),
       image: asString(obj.image),
       visualKey: asString(obj.visual_key || obj.image_visual_key),
+      imageQuality: asString(obj.image_quality || obj.image_status || obj.visual_status),
       date: "",
       endDate: "",
       time: "",
