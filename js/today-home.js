@@ -326,15 +326,34 @@
       .map((entry) => entry.item);
   }
 
+  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V2 | Zweck: erweitert das Kandidatenfenster fuer nahe Events, ohne Events hart zu erzwingen; Umfang: ersetzt nur curateTodayItems(), keine Scoring-/DOM-Aenderung === */
+  function isNearEventCandidate(item, now) {
+    if (item?.type !== "event") return false;
+
+    const today = startOfDay(now || new Date());
+    const start = parseLocalDate(item.date);
+    const end = parseLocalDate(item.endDate || item.date) || start;
+
+    if (!start && !end) return false;
+    if (start && end && start <= today && end >= today) return true;
+
+    const target = start || end;
+    if (!target) return false;
+
+    const daysUntil = Math.round((startOfDay(target).getTime() - today.getTime()) / 86400000);
+
+    return daysUntil >= 0 && daysUntil <= 14;
+  }
+
   function curateTodayItems(items, context) {
     const now = context?.now || new Date();
     const cleaned = (Array.isArray(items) ? items : [])
       .filter((item) => item && !isPastEventItem(item, now));
 
-    const rotated = addDailyRotation(cleaned.slice(0, 16), context);
-    const hasEventCandidate = rotated.some((item) => item.type === "event");
-    const maxActivities = hasEventCandidate ? 2 : 3;
-    const maxEvents = 2;
+    const rotated = addDailyRotation(cleaned.slice(0, 32), context);
+    const hasNearEventCandidate = rotated.some((item) => isNearEventCandidate(item, now));
+    const maxActivities = hasNearEventCandidate ? 2 : 3;
+    const maxEvents = hasNearEventCandidate ? 1 : 0;
     const selected = [];
     const counts = {
       activity: 0,
@@ -344,6 +363,7 @@
     for (const item of rotated) {
       const type = item.type === "event" ? "event" : "activity";
 
+      if (type === "event" && !isNearEventCandidate(item, now)) continue;
       if (type === "activity" && counts.activity >= maxActivities) continue;
       if (type === "event" && counts.event >= maxEvents) continue;
 
@@ -355,6 +375,7 @@
 
     return selected;
   }
+  /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V2 === */
 
   function buildRecommendations() {
     const api = getRecommendations();
