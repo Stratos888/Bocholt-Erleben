@@ -27,6 +27,8 @@ from typing import Dict, List, Tuple
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 
 # === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
 # Datei: scripts/inbox-to-events.py
@@ -298,6 +300,12 @@ def main() -> None:
         else:
             eid = generate_unique_id(title, d, existing_ids)
 
+        category = normalize_event_category(
+            norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", ""))
+        )
+        description = norm(inb.get("description", ""))
+        location = norm(inb.get("location", ""))
+
         source_fields = {
             "id": eid,
             "title": title,
@@ -305,14 +313,17 @@ def main() -> None:
             "endDate": norm(inb.get("endDate", "")),
             "time": norm(inb.get("time", "")),
             "city": norm(inb.get("city", "")),
-            "location": norm(inb.get("location", "")),
+            "location": location,
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
-            "kategorie": normalize_event_category(
-                norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", ""))
-            ),
+            "kategorie": category,
             "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
-
-            "description": norm(inb.get("description", "")),
+            "description": description,
+            "visual_key": normalize_event_visual_key(inb.get("visual_key", "")) or infer_event_visual_key(
+                title=title,
+                description=description,
+                category=category,
+                location=location,
+            ),
         }
 
         row: List[str] = []

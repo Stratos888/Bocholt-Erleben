@@ -24,6 +24,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
 OUT_JSON_PATH = ROOT / "data" / "events.json"
@@ -115,6 +117,7 @@ class EventRow:
     planning_level: str
     cost_level: str
     recommendation_weight: str
+    visual_key: str
 
 
 def fail(msg: str) -> None:
@@ -363,6 +366,12 @@ def main() -> None:
                 planning_level=optional_text(data, "planning_level"),
                 cost_level=optional_text(data, "cost_level"),
                 recommendation_weight=optional_text(data, "recommendation_weight"),
+                visual_key=normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
+                    title=data["title"],
+                    description=data.get("description", ""),
+                    category=cat,
+                    location=data["location"],
+                ),
             )
         )
 
@@ -390,6 +399,8 @@ def main() -> None:
             item["url"] = e.url
         if e.description:
             item["description"] = e.description
+        if e.visual_key:
+            item["visual_key"] = e.visual_key
 
         recommendation = {}
         if e.situation_tags:
