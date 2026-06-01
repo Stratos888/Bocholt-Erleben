@@ -92,3 +92,39 @@ The following workpack is intentionally on hold:
 - Keep page-specific changes minimal until the measurement/reporting and monetization smoke-test gaps are closed.
 
 <!-- === END CANONICAL MASTER FILE === -->
+
+<!-- === BEGIN BLOCK: MASTER_TODAY_HOME_PREMIUM_CONTINUATION_2026_06_01 | Zweck: aktueller Projektstand Today Home + Event Visuals ohne Freeze; Umfang: strategischer Fortsetzungspunkt === -->
+## Aktueller Fortsetzungspunkt – Today Home Premium Completion + Event Visuals
+
+Stand: 2026-06-01, `staging`, HEAD zuletzt geprüft: `9115d43`.
+
+Wichtig: Today Home wird **nicht** als V1 eingefroren. Ziel bleibt eine vollständig premium-fertige Home-/Today-Erfahrung für Mobile und Desktop.
+
+Bereits sauber umgesetzt und auf Staging geprüft:
+- `/` ist als Today-/Home-Einstieg aktiv.
+- Today Home zeigt einen kompakten Empfehlungsbereich „Was passt jetzt?“ mit 3 Tipps.
+- Recommendation-Mix ist fachlich korrigiert:
+  - Events erscheinen auf Today Home nur noch, wenn sie heute starten oder als Mehrtagesevent heute laufen.
+  - Zukünftige Events, z. B. ein Termin am 14.06., erscheinen nicht mehr als Heute-Tipp.
+  - Wenn keine heutigen Events vorhanden sind, zeigt Today Home 3 Aktivitäten.
+- Event-Visual-System ist technisch produktionsnah aufgebaut:
+  - `visual_key` wird für Events genutzt.
+  - `data/event_visual_pool.json` liefert nur `status: ready`-Assets an die UI.
+  - 7 neue bzw. ersetzte Event-Visuals wurden akzeptiert, WebP-komprimiert, committed und auf Staging geprüft.
+  - Staging-Coverage: 62/62 aktuelle Events haben ein ready Event-Visual.
+- Neue/ersetzte ready Assets:
+  - `music-stage-01.webp`
+  - `default-city-02.webp`
+  - `culture-exhibition-01.webp`
+  - `market-food-01.webp`
+  - `sport-active-01.webp`
+  - `creative-workshop-01.webp`
+  - `kids-family-01.webp`
+
+Offen für Premium Completion:
+- Today Home nicht nur funktional, sondern visuell/produktlogisch auf Premium-Endzustand bringen.
+- Mobile und Desktop separat gegen Premium-Anspruch prüfen.
+- Aktivitätsbilder und Eventbilder im echten Home-Kontext konsistent bewerten.
+- Keine weiteren Randpolish-Workpacks ohne konkretes sichtbares Symptom; aber klare Premium-Gaps aktiv bearbeiten.
+- Nach Today Home Premium Completion direkt das Event-Visual-System auf den normalen Events Feed übertragen.
+<!-- === END BLOCK: MASTER_TODAY_HOME_PREMIUM_CONTINUATION_2026_06_01 === -->

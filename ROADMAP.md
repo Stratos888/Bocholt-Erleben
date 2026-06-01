@@ -852,3 +852,52 @@ Freeze-Bedingung:
 - Kein Release, wenn die Home nur wie ein umsortierter Kalender wirkt.
 
 <!-- === END BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_TODAY_HOME_PREMIUM_AND_EVENT_FEED_VISUALS_2026_06_01 | Zweck: nächste Roadmap-Punkte nach Event-Visual-Coverage und Today-Only-Event-Fix; Umfang: Premium Completion statt Freeze === -->
+## Nächster Roadmap-Block – Today Home Premium Completion und Events Feed Visual Integration
+
+Status: offen / nächste priorisierte Arbeit.
+
+### 1. Today Home Premium Completion
+
+Ziel: Die Home-/Today-Seite soll nicht nur V1-tauglich, sondern vollständig premium-fertig werden.
+
+Bereits erledigt:
+- Today Home als zentraler Einstieg auf `/`.
+- 3 kuratierte Tipps statt langer Liste.
+- Activities als Standardempfehlungen.
+- Events nur bei echter Heute-Relevanz.
+- Keine Zukunftsevents mehr auf Today Home.
+- Eventbilder über `visual_key -> event_visual_pool.json -> ready WebP`.
+- Aktuelle Event-Visual-Coverage auf Staging: 62/62 Events.
+
+Noch zu prüfen/verbessern:
+- Mobile-Premiumwirkung im echten Nutzungskontext.
+- Desktop-Premiumwirkung im echten Nutzungskontext.
+- Bild-/Text-/Card-Hierarchie der 3 Empfehlungen.
+- Konsistenz zwischen Activity-Bildern und neuen Event-Visuals.
+- Ob einzelne Activity-Bilder auf Today Home qualitativ gegen die neue Eventbild-Welt abfallen.
+- CTA-Bereich unten: visuelle Wertigkeit, Hierarchie, Abstand und Desktop/Mobile-Balance.
+- Keine Freeze-Entscheidung, bevor diese Premium-Prüfung abgeschlossen ist.
+
+### 2. Direkt danach: Events Feed Visual Integration
+
+Ziel: Das neue Event-Visual-System soll nicht nur auf Today Home, sondern auch im normalen Events Feed genutzt werden.
+
+Geplanter Zielzustand:
+- Eventkarten auf `/events/` nutzen dieselbe Logik wie Today Home:
+  - `visual_key`
+  - `data/event_visual_pool.json`
+  - nur `status: ready`
+  - Fallback auf `default_city`
+- Keine geplanten/non-ready Assets live ausspielen.
+- Kein separater Bildstandard für Today und Events Feed.
+- Mobile- und Desktop-Cards müssen mit Bildern premium wirken.
+- Cropping, Card-Höhen und Text-Bild-Balance im Feed separat prüfen.
+- Event-Detailpanel-Bilder erst danach bewerten; zunächst Fokus auf Feed-Cards.
+
+Priorität:
+1. Today Home Premium Completion abschließen.
+2. Events Feed Visual Integration direkt als nächster Hauptworkstream.
+3. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
+<!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_AND_EVENT_FEED_VISUALS_2026_06_01 === -->

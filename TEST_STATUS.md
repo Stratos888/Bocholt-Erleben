@@ -1880,3 +1880,79 @@ Bewertung:
 - Desktop ist ruhiger und logischer strukturiert.
 - Weitere Optimierungen am Anbieter-Dashboard werden vorerst zurückgestellt und nur bei konkretem neuem Befund wieder geöffnet.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_EVENT_VISUALS_AND_TODAY_ONLY_EVENTS_2026_06_01 | Zweck: belegter Staging-Teststand fuer Event Visual Coverage und Today-Only-Eventlogik; Umfang: technische und visuelle Smoke-Ergebnisse === -->
+## Staging-Teststand – Today Home Event Visuals und Today-Only-Eventlogik – 2026-06-01
+
+Geprüfter Branch/Stand:
+- Branch: `staging`
+- Event-Visual-Commit: `fffaf3d` – `Fuege weitere Event Visual Assets hinzu`
+- Today-Only-Eventlogik: `9115d43` – `Begrenze Today Events auf heutige Termine`
+- `origin/staging` synchron
+- Arbeitsbaum zuletzt sauber
+
+### Event Visual Assets
+
+Neue/ersetzte WebP-Assets:
+- `assets/event-visuals/music-stage-01.webp`
+- `assets/event-visuals/default-city-02.webp`
+- `assets/event-visuals/culture-exhibition-01.webp`
+- `assets/event-visuals/market-food-01.webp`
+- `assets/event-visuals/sport-active-01.webp`
+- `assets/event-visuals/creative-workshop-01.webp`
+- `assets/event-visuals/kids-family-01.webp`
+
+Geprüft:
+- Dateien sind echte WebP-Dateien.
+- Größen nach Komprimierung ca. 67–254 KB.
+- `data/event_visual_pool.json` referenziert alle 7 neuen Assets als `status: ready`.
+- `rights_status`: `ai_generated_symbolic_reviewed`.
+- `review_status`: `accepted_phase1`.
+- `default-city-01` wurde durch `default-city-02` als aktives Default-Bild ersetzt.
+
+Audit-Ergebnisse:
+- `python scripts/audit-event-visual-pool.py`: OK.
+- `python scripts/build-event-visual-asset-backlog.py`: OK, Backlog neu gebaut.
+- `python scripts/audit-event-visual-asset-brief.py`: OK.
+- `python scripts/audit-event-visual-generation-batches.py`: OK.
+- `python scripts/audit-event-visual-ai-style-guide.py`: OK.
+- `node --check js/recommendations.js`: OK.
+- `node --check js/today-home.js`: OK.
+- `git diff --check`: OK.
+
+Staging-Proof:
+- `/data/event_visual_pool.json` liefert HTTP 200.
+- Alle 7 neuen Asset-URLs liefern HTTP 200.
+- Aktuelle Staging-Events: 62.
+- Coverage nach `visual_key`: 62/62 Events haben ein ready Event-Visual.
+
+### Today-Only-Eventlogik
+
+Problem:
+- Auf Today Home erschien ein Event vom 14.06. als Heute-Tipp.
+- Ursache: frühere Event-Spur ließ nahe Zukunftsevents bis 14 Tage zu.
+
+Fix:
+- `TODAY_RECOMMENDATION_EVENT_MIX_V4`
+- Events sind Today-Kandidaten nur noch, wenn:
+  - Startdatum heute ist, oder
+  - das Event als Mehrtagesevent heute läuft.
+- Zukünftige Events werden nicht mehr auf Today Home beigemischt.
+
+Staging-Proof:
+- `https://staging.bocholt-erleben.de/js/today-home.js` liefert:
+  - `TODAY_RECOMMENDATION_EVENT_MIX_V4`
+  - `function isTodayEventCandidate`
+  - keinen alten `TODAY_RECOMMENDATION_EVENT_MIX_V3`
+  - keine alte `isNearEventCandidate`
+  - keine alte 14-Tage-Zukunftslogik
+- Aktuelle Eventdaten ergaben 0 heute-fähige Events.
+- Today Home zeigte danach korrekt 3 Aktivitäten.
+- Das Event vom 14.06. war nicht mehr sichtbar.
+
+Bewertung:
+- Technisch bestanden.
+- Visueller Smoke bestanden.
+- Kein Freeze: Today Home bleibt offen für Premium Completion.
+- Nächster Hauptpunkt nach Today Home Premium Completion: Eventbilder konsistent in den normalen Events Feed übernehmen.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_EVENT_VISUALS_AND_TODAY_ONLY_EVENTS_2026_06_01 === -->
