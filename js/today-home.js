@@ -249,7 +249,7 @@
 
     if (prefs?.toRecommendationContext) {
       return prefs.toRecommendationContext({
-        mode: state.mode || profile.lastMode || "for_you",
+        mode: state.mode || "for_you",
         weather
       });
     }
@@ -507,7 +507,7 @@
       return [tempLabel, "Heute gut für draußen."].filter(Boolean).join(" · ");
     }
 
-    return "Ideen für heute.";
+    return "Drei Ideen für Bocholt – ruhig vorsortiert für heute.";
   }
 
   function typeLabel(item) {
@@ -563,6 +563,7 @@
     const cardClass = [
       "today-card",
       `today-card--${item.type}`,
+      index === 0 ? "today-card--primary" : "",
       image ? "today-card--with-image" : ""
     ].filter(Boolean).join(" ");
 
@@ -579,7 +580,7 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
-            ${index === 0 ? `<span class="today-card__badge">Heute passend</span>` : ""}
+            ${index === 0 ? `<span class="today-card__badge">Top-Tipp</span>` : ""}
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}
@@ -654,12 +655,18 @@
       ${visible.map((item, index) => renderCard(item, index, usedImages)).join("")}
       <section class="today-more" aria-label="Mehr entdecken">
         <a class="today-more__link" href="/events/">
-          <span class="today-more__label">Alle Events ansehen</span>
-          <span class="today-more__hint">Termine, Märkte, Kultur und mehr</span>
+          <span class="today-more__icon" data-ui-icon="calendar-days" aria-hidden="true"></span>
+          <span class="today-more__copy">
+            <span class="today-more__label">Alle Events ansehen</span>
+            <span class="today-more__hint">Termine, Märkte, Kultur und mehr</span>
+          </span>
         </a>
         <a class="today-more__link" href="/aktivitaeten/">
-          <span class="today-more__label">Aktivitäten entdecken</span>
-          <span class="today-more__hint">Orte, Natur, Familie und Ausflüge</span>
+          <span class="today-more__icon" data-ui-icon="compass" aria-hidden="true"></span>
+          <span class="today-more__copy">
+            <span class="today-more__label">Aktivitäten entdecken</span>
+            <span class="today-more__hint">Orte, Natur, Familie und Ausflüge</span>
+          </span>
         </a>
       </section>
     `.trim();
@@ -786,8 +793,7 @@
     const root = document.getElementById(ROOT_ID);
     if (!root) return;
 
-    const profile = getProfile();
-    state.mode = profile.lastMode || "for_you";
+    state.mode = "for_you";
 
     bindEvents(root);
     renderSkeleton();

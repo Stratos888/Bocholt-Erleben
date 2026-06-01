@@ -489,217 +489,12 @@ body.page-route-today .app-header {
 
 /* === END FILE: css/today.css === */
 
-/* === BEGIN BLOCK: TODAY_HOME_DECISION_PAGE_POLISH_V1 | Zweck: macht die Today-Home kompakter und entscheidungsorientierter; Umfang: blendet Standard-Filterleisten aus, reduziert Hero-/Bilddominanz und ergänzt klare Weiterwege === */
+/* === BEGIN BLOCK: TODAY_HOME_PREMIUM_COMPLETION_V1 | Zweck: finalisiert Today Home als kompakte Premium-Entscheidungsseite; Umfang: page-route-today Hero-/Feed-/Card-/CTA-System fuer Mobile und Desktop, ohne Events-/Activities-Feeds oder Detailpanels zu veraendern === */
 
 body.page-route-today .today-page {
-  padding-top: 0.75rem;
-}
-
-body.page-route-today .today-hero {
-  margin-bottom: 0.75rem;
-}
-
-body.page-route-today .today-hero__card {
-  padding: clamp(1rem, 4vw, 1.45rem);
-  border-radius: 1.35rem;
-}
-
-body.page-route-today .today-kicker {
-  margin-bottom: 0.55rem;
-  font-size: 0.76rem;
-}
-
-body.page-route-today .today-title {
-  max-width: 12ch;
-  font-size: clamp(1.95rem, 9vw, 3.4rem);
-  line-height: 0.95;
-}
-
-body.page-route-today .today-lead {
-  margin-top: 0.65rem;
-  font-size: clamp(0.96rem, 4.2vw, 1.08rem);
-  line-height: 1.45;
-}
-
-body.page-route-today .today-weather-note {
-  margin-top: 0.82rem;
-  border-radius: 1.1rem;
-  font-size: 0.88rem;
-  line-height: 1.3;
-}
-
-body.page-route-today .today-controls {
-  display: none;
-}
-
-body.page-route-today .today-main {
-  margin-top: 0.75rem;
-}
-
-body.page-route-today .today-section-title {
-  font-size: clamp(1.22rem, 5vw, 1.52rem);
-}
-
-body.page-route-today .today-status {
-  font-size: 0.82rem;
-}
-
-body.page-route-today .today-feed {
-  gap: 0.7rem;
-}
-
-body.page-route-today .today-card {
-  border-radius: 1.15rem;
-}
-
-body.page-route-today .today-card__media {
-  aspect-ratio: 21 / 9;
-  max-height: 8.5rem;
-}
-
-body.page-route-today .today-card__body {
-  gap: 0.42rem;
-  padding: 0.9rem;
-}
-
-body.page-route-today .today-card__title {
-  font-size: clamp(1.04rem, 4.5vw, 1.18rem);
-}
-
-body.page-route-today .today-card__desc {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-body.page-route-today .today-more {
-  display: grid;
-  gap: 0.62rem;
-  margin-top: 0.2rem;
-  padding-bottom: 0.75rem;
-}
-
-body.page-route-today .today-more__link {
-  display: grid;
-  gap: 0.18rem;
-  min-height: 4.25rem;
-  border: 1px solid color-mix(in srgb, var(--color-border, #ded7c8) 78%, transparent);
-  border-radius: 1.1rem;
-  background: color-mix(in srgb, var(--color-surface, #fffaf0) 94%, white 6%);
-  color: var(--color-text, #261f16);
-  text-decoration: none;
-  padding: 0.9rem 1rem;
-  box-shadow: 0 10px 26px rgba(64, 48, 26, 0.06);
-}
-
-body.page-route-today .today-more__label {
-  font-size: 1rem;
-  font-weight: 820;
-  line-height: 1.1;
-}
-
-body.page-route-today .today-more__hint {
-  color: var(--color-text-muted, #756b5d);
-  font-size: 0.86rem;
-  font-weight: 650;
-  line-height: 1.3;
-}
-
-@media (min-width: 760px) {
-  body.page-route-today .today-hero {
-    grid-template-columns: 1fr;
-  }
-
-  body.page-route-today .today-feed {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  body.page-route-today .today-card--with-image {
-    grid-row: auto;
-  }
-
-  body.page-route-today .today-more {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* === END BLOCK: TODAY_HOME_DECISION_PAGE_POLISH_V1 === */
-
-/* === BEGIN BLOCK: TODAY_HOME_RUNNING_EVENT_AND_END_POLISH_V1 | Zweck: verbessert Today-Home-Verständlichkeit nach V1.1: Empfehlungshinweis, Mehrtagesevent-Wahrnehmung und kompakterer Endbereich; Umfang: nur page-route-today Feinschliff === */
-
-body.page-route-today .today-page {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-}
-
-body.page-route-today .today-section-head {
-  align-items: baseline;
-}
-
-body.page-route-today .today-card__topline {
-  align-items: center;
-}
-
-body.page-route-today .today-card__badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.55rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent, #87683e) 36%, var(--color-border, #ded7c8));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-accent, #87683e) 10%, white);
-  color: var(--color-text, #261f16);
-  font-size: 0.72rem;
-  font-weight: 820;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  padding: 0.38rem 0.55rem;
-  white-space: nowrap;
-}
-
-body.page-route-today .today-card:first-child {
-  border-color: color-mix(in srgb, var(--color-accent, #87683e) 32%, var(--color-border, #ded7c8));
-}
-
-body.page-route-today .today-card__meta {
-  color: color-mix(in srgb, var(--color-text, #261f16) 52%, var(--color-text-muted, #756b5d));
-}
-
-body.page-route-today .today-more {
-  gap: 0.5rem;
-  margin-top: 0;
-  padding-bottom: 0.25rem;
-}
-
-body.page-route-today .today-more__link {
-  min-height: 3.85rem;
-  padding: 0.78rem 0.95rem;
-}
-
-body.page-route-today footer {
-  margin-top: 0.75rem;
-}
-
-@media (max-width: 480px) {
-  body.page-route-today .today-weather-note {
-    width: 100%;
-  }
-
-  body.page-route-today .today-status {
-    max-width: 9.5rem;
-    text-align: right;
-    white-space: normal;
-    line-height: 1.15;
-  }
-}
-
-/* === END BLOCK: TODAY_HOME_RUNNING_EVENT_AND_END_POLISH_V1 === */
-
-/* === BEGIN BLOCK: TODAY_HOME_COMPACT_APP_TOP_V1 | Zweck: reduziert den mobilen Hero deutlich und zieht den Nutzinhalt früher in den sichtbaren Bereich; Umfang: nur page-route-today App-Top-/Feed-Rhythmus === */
-
-body.page-route-today .today-page {
-  padding-top: 0.55rem;
+  padding-top: 0.58rem;
   padding-inline: clamp(0.85rem, 3.2vw, 1.35rem);
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
 body.page-route-today .today-hero {
@@ -708,9 +503,12 @@ body.page-route-today .today-hero {
 }
 
 body.page-route-today .today-hero__card {
-  padding: 0.82rem 0.95rem 0.88rem;
-  border-radius: 1.05rem;
-  box-shadow: 0 10px 26px rgba(64, 48, 26, 0.075);
+  padding: 0.84rem 0.96rem 0.9rem;
+  border-radius: 1.08rem;
+  background:
+    radial-gradient(circle at 90% -20%, rgba(255, 255, 255, 0.9) 0, transparent 9.5rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-surface, #fffaf0) 96%, white 4%), color-mix(in srgb, var(--color-brand-soft, #f3f2e6) 78%, white 22%));
+  box-shadow: 0 10px 28px rgba(64, 48, 26, 0.075);
 }
 
 body.page-route-today .today-kicker {
@@ -736,9 +534,11 @@ body.page-route-today .today-lead {
 
 body.page-route-today .today-weather-note {
   min-height: 2.35rem;
+  width: 100%;
   margin-top: 0.65rem;
   padding: 0.44rem 0.62rem;
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
   font-size: 0.82rem;
   line-height: 1.18;
 }
@@ -748,12 +548,18 @@ body.page-route-today .today-weather-note__icon {
   height: 0.92rem;
 }
 
+body.page-route-today .today-controls {
+  display: none;
+}
+
 body.page-route-today .today-main {
   gap: 0.58rem;
   margin-top: 0.42rem;
 }
 
 body.page-route-today .today-section-head {
+  align-items: baseline;
+  gap: 0.65rem;
   padding-inline: 0;
 }
 
@@ -763,6 +569,7 @@ body.page-route-today .today-section-title {
 
 body.page-route-today .today-status {
   max-width: none;
+  color: color-mix(in srgb, var(--color-text-muted, #756b5d) 88%, var(--color-text, #261f16));
   font-size: 0.82rem;
   white-space: nowrap;
 }
@@ -771,38 +578,144 @@ body.page-route-today .today-feed {
   gap: 0.62rem;
 }
 
+body.page-route-today .today-card {
+  border-radius: 1.16rem;
+  background: color-mix(in srgb, var(--color-surface, #fffaf0) 97%, white 3%);
+  box-shadow: 0 12px 30px rgba(64, 48, 26, 0.07);
+}
+
+body.page-route-today .today-card--primary {
+  border-color: color-mix(in srgb, var(--color-accent, #87683e) 32%, var(--color-border, #ded7c8));
+}
+
 body.page-route-today .today-card__media {
+  position: relative;
+  overflow: hidden;
   aspect-ratio: 24 / 9;
   max-height: 7.2rem;
 }
 
+body.page-route-today .today-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0) 46%, rgba(38, 31, 22, 0.1) 100%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.2), transparent 42%);
+  pointer-events: none;
+}
+
 body.page-route-today .today-card__body {
+  gap: 0.42rem;
   padding: 0.78rem 0.82rem 0.84rem;
 }
 
 body.page-route-today .today-card__topline {
+  align-items: center;
   gap: 0.45rem;
 }
 
 body.page-route-today .today-card__badge {
+  display: inline-flex;
+  align-items: center;
   min-height: 1.42rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent, #87683e) 36%, var(--color-border, #ded7c8));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent, #87683e) 10%, white);
+  color: var(--color-text, #261f16);
   font-size: 0.68rem;
+  font-weight: 820;
+  letter-spacing: 0.01em;
+  line-height: 1;
   padding: 0.32rem 0.48rem;
+  white-space: nowrap;
+}
+
+body.page-route-today .today-card__title {
+  font-size: clamp(1.04rem, 4.5vw, 1.18rem);
 }
 
 body.page-route-today .today-card__meta {
+  color: color-mix(in srgb, var(--color-text, #261f16) 52%, var(--color-text-muted, #756b5d));
   font-size: 0.84rem;
   line-height: 1.28;
 }
 
 body.page-route-today .today-card__desc {
+  display: -webkit-box;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--color-text-soft, #5d554a) 92%, var(--color-text, #261f16));
   font-size: 0.9rem;
   line-height: 1.38;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+body.page-route-today .today-chip {
+  min-height: 1.56rem;
+  padding: 0.36rem 0.52rem;
+  font-size: 0.72rem;
+}
+
+body.page-route-today .today-more {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.05rem;
+  padding-bottom: 0.25rem;
 }
 
 body.page-route-today .today-more__link {
-  min-height: 3.55rem;
-  padding: 0.7rem 0.86rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.68rem;
+  min-height: 3.72rem;
+  border: 1px solid color-mix(in srgb, var(--color-border, #ded7c8) 78%, transparent);
+  border-radius: 1.08rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-surface, #fffaf0) 96%, white 4%), color-mix(in srgb, var(--color-brand-soft, #f3f2e6) 36%, white 64%));
+  color: var(--color-text, #261f16);
+  text-decoration: none;
+  padding: 0.76rem 0.86rem;
+  box-shadow: 0 10px 26px rgba(64, 48, 26, 0.055);
+}
+
+body.page-route-today .today-more__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.12rem;
+  height: 2.12rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-text, #261f16);
+}
+
+body.page-route-today .today-more__icon [data-ui-icon],
+body.page-route-today .today-more__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+body.page-route-today .today-more__copy {
+  display: grid;
+  gap: 0.18rem;
+}
+
+body.page-route-today .today-more__label {
+  font-size: 1rem;
+  font-weight: 820;
+  line-height: 1.1;
+}
+
+body.page-route-today .today-more__hint {
+  color: var(--color-text-muted, #756b5d);
+  font-size: 0.86rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+body.page-route-today footer {
+  margin-top: 0.75rem;
 }
 
 @media (max-width: 380px) {
@@ -824,17 +737,94 @@ body.page-route-today .today-more__link {
 }
 
 @media (min-width: 760px) {
+  body.page-route-today .today-page {
+    padding-top: 1.05rem;
+    padding-inline: clamp(1.25rem, 3.4vw, 2rem);
+  }
+
+  body.page-route-today .today-hero {
+    grid-template-columns: 1fr;
+    margin-bottom: 0.72rem;
+  }
+
   body.page-route-today .today-hero__card {
-    padding: 1.05rem 1.15rem;
+    padding: 1.18rem 1.35rem;
+    border-radius: 1.35rem;
   }
 
   body.page-route-today .today-title {
-    font-size: clamp(2.1rem, 4.8vw, 3.15rem);
+    font-size: clamp(2.18rem, 4.55vw, 3.28rem);
   }
 
   body.page-route-today .today-lead {
-    max-width: 36rem;
+    max-width: 38rem;
+  }
+
+  body.page-route-today .today-weather-note {
+    width: fit-content;
+    max-width: 44rem;
+  }
+
+  body.page-route-today .today-main {
+    gap: 0.72rem;
+  }
+
+  body.page-route-today .today-feed {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0.78rem;
+  }
+
+  body.page-route-today .today-card,
+  body.page-route-today .today-card--with-image {
+    grid-row: auto;
+    min-height: 100%;
+  }
+
+  body.page-route-today .today-card__media {
+    aspect-ratio: 16 / 9;
+    max-height: 9.2rem;
+  }
+
+  body.page-route-today .today-card__body {
+    min-height: 12.4rem;
+    align-content: start;
+    padding: 0.92rem 0.96rem 1rem;
+  }
+
+  body.page-route-today .today-card__title {
+    font-size: clamp(1.08rem, 1.55vw, 1.24rem);
+  }
+
+  body.page-route-today .today-more {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.78rem;
+    margin-top: 0.08rem;
+  }
+
+  body.page-route-today .today-more__link {
+    min-height: 4.15rem;
+    padding: 0.88rem 1rem;
   }
 }
 
-/* === END BLOCK: TODAY_HOME_COMPACT_APP_TOP_V1 === */
+@media (min-width: 1060px) {
+  body.page-route-today .today-page {
+    padding-top: 1.35rem;
+  }
+
+  body.page-route-today .today-hero {
+    margin-bottom: 0.85rem;
+  }
+
+  body.page-route-today .today-hero__card {
+    padding: 1.22rem 1.55rem;
+  }
+
+  body.page-route-today .today-card__media {
+    max-height: 9.6rem;
+  }
+}
+
+/* === END BLOCK: TODAY_HOME_PREMIUM_COMPLETION_V1 === */
