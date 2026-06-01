@@ -1385,7 +1385,20 @@ body.has-bottom-tabbar{
   display: none;
 }
 
+#bottom-tabbar-root::before{
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--btb-reserve) + 18px);
+  background:
+    linear-gradient(180deg, rgba(247,249,244,0) 0%, rgba(247,249,244,0.88) 42%, rgba(247,249,244,0.99) 100%);
+  pointer-events: none;
+}
+
 .bottom-tabbar{
+  position: relative;
   pointer-events: none;
   width: 100%;
   padding:

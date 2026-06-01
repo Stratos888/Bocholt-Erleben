@@ -77,11 +77,11 @@
   --btb-shell-pad: 4px;
   --btb-shell-radius: 18px;
   --btb-shell-border: rgba(24,40,30,0.08);
-  --btb-shell-bg-start: rgba(247,249,244,0.58);
-  --btb-shell-bg-end: rgba(247,249,244,0.84);
+  --btb-shell-bg-start: rgba(247,249,244,0.95);
+  --btb-shell-bg-end: rgba(247,249,244,0.99);
   --btb-shell-shadow:
-    0 6px 18px rgba(10,24,16,0.055),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 10px 30px rgba(10,24,16,0.09),
+    0 1px 0 rgba(255,255,255,0.84) inset;
 
   --btb-item-minh: 50px;
   --btb-item-radius: 14px;
