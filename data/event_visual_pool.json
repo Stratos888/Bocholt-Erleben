@@ -13,10 +13,14 @@
         {
           "id": "market-food-01",
           "src": "/assets/event-visuals/market-food-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "market-food-02",
@@ -135,10 +139,14 @@
         {
           "id": "music-stage-01",
           "src": "/assets/event-visuals/music-stage-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "music-stage-02",
@@ -190,10 +198,14 @@
         {
           "id": "culture-exhibition-01",
           "src": "/assets/event-visuals/culture-exhibition-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kultur- und Ausstellungs-Visual mit ruhigem Galerieraum, Skulpturen, Vitrine und warmer Lichtstimmung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "culture-exhibition-02",
@@ -276,10 +288,14 @@
         {
           "id": "kids-family-01",
           "src": "/assets/event-visuals/kids-family-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "kids-family-02",
@@ -331,10 +347,14 @@
         {
           "id": "creative-workshop-01",
           "src": "/assets/event-visuals/creative-workshop-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "creative-workshop-02",
@@ -386,10 +406,14 @@
         {
           "id": "sport-active-01",
           "src": "/assets/event-visuals/sport-active-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "sport-active-02",
@@ -590,22 +614,26 @@
         {
           "id": "default-city-01",
           "src": "/assets/event-visuals/default-city-01.webp",
-          "status": "ready",
+          "status": "planned",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Neutrales symbolisches Stadt-Visual mit Backstein, heller Fassade, Pflaster, Bank und Stadtgrün.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "replaced_by_default_city_02"
         },
         {
           "id": "default-city-02",
           "src": "/assets/event-visuals/default-city-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadt-Visual mit ruhiger kleinstädtischer Gasse, Pflaster, Backstein, Pflanzen und glaubwürdiger Alltagsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "default-city-03",
