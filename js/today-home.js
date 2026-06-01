@@ -326,8 +326,8 @@
       .map((entry) => entry.item);
   }
 
-  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V3 | Zweck: mischt nahe Events ueber eigene Event-Spur in Today Home ein, statt nur im allgemeinen Activity-dominierten Top-Ranking zu suchen; Umfang: ersetzt nur Event-Mix-Curation, keine Scoring-/DOM-Aenderung === */
-  function isNearEventCandidate(item, now) {
+  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V4 | Zweck: mischt nur tatsaechlich heute laufende Events ueber eine eigene Event-Spur in Today Home ein, damit zukuenftige Termine nicht als Heute-Tipp erscheinen; Umfang: ersetzt nur Event-Mix-Curation, keine DOM-Aenderung === */
+  function isTodayEventCandidate(item, now) {
     if (item?.type !== "event") return false;
 
     const today = startOfDay(now || new Date());
@@ -335,14 +335,14 @@
     const end = parseLocalDate(item.endDate || item.date) || start;
 
     if (!start && !end) return false;
-    if (start && end && start <= today && end >= today) return true;
 
-    const target = start || end;
-    if (!target) return false;
+    const todayTime = today.getTime();
+    const startTime = start ? startOfDay(start).getTime() : null;
+    const endTime = end ? startOfDay(end).getTime() : startTime;
 
-    const daysUntil = Math.round((startOfDay(target).getTime() - today.getTime()) / 86400000);
+    if (startTime === null || endTime === null) return false;
 
-    return daysUntil >= 0 && daysUntil <= 14;
+    return startTime <= todayTime && todayTime <= endTime;
   }
 
   function todayScore(item) {
@@ -384,7 +384,7 @@
     );
 
     const eventLane = addDailyRotation(
-      cleaned.filter((item) => isNearEventCandidate(item, now) && todayScore(item) > 0),
+      cleaned.filter((item) => isTodayEventCandidate(item, now) && todayScore(item) > 0),
       context
     ).sort(compareEventCandidates);
 
@@ -398,7 +398,7 @@
       .sort(compareTodayItems)
       .slice(0, 3);
   }
-  /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V3 === */
+  /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V4 === */
 
   function buildRecommendations() {
     const api = getRecommendations();
