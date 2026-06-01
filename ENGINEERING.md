@@ -269,7 +269,14 @@ For event and activity visuals, the default solution is not manual crop guessing
 Rules:
 
 - Card visuals should be prepared as 16:9 WebP assets for card contexts.
-- Raw large source images, arbitrary external images or unreviewed crops must not be promoted into premium surfaces directly.
+- Preferred visual source hierarchy:
+  1. own/exclusive premium real photo,
+  2. premium real photo explicitly cleared by organizer/rightsholder,
+  3. otherwise legally clean and high-quality photo with documented source, rights basis, license and required credit,
+  4. self-generated symbolic AI premium visual,
+  5. legacy external image only as temporary non-ready source material.
+- If a legally clean premium real photo is not available, the default replacement path is a self-generated symbolic AI premium visual, not manual crop rescue of a weak external image.
+- Raw large source images, arbitrary external images, unclear-license images or unreviewed crops must not be promoted into premium surfaces directly.
 - Visual status values are:
   - `ready`: approved for premium card use.
   - `usable`: acceptable in normal lists, but not automatically approved for Today/Home prominence.
@@ -277,8 +284,8 @@ Rules:
   - `needs_review`: not allowed in prominent surfaces.
   - `blocked`: not allowed.
 - Today/Home and other prominent recommendation surfaces may use only `ready` visuals or deliberately approved `fallback` visuals.
-- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
-- Replace, regenerate, downgrade or exclude weak visuals instead of masking them with layout code.
+- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution, unclear rights or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
+- Replace with a cleared premium photo, regenerate as symbolic AI premium visual, downgrade or exclude weak visuals instead of masking them with layout code.
 - CSS may define the stable rendering frame, aspect ratio and fallback object-position; CSS must not become the quality-control system for individual images.
 - A future visual-audit view should preview assets in real card contexts before they are marked `ready`.
 

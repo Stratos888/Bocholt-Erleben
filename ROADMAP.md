@@ -889,6 +889,9 @@ Ziel: Bildqualität künftig systematisch lösen, damit Event- und Activity-Kart
 
 Verbindliche Richtung:
 - Card-Bilder werden als geprüfte 16:9-WebP-Card-Assets vorbereitet.
+- Quellenhierarchie: eigene/exklusive Premium-Echtfotos, Veranstalter-/Rechteinhaber-Freigaben, sonstige rechtlich einwandfreie Premium-Fotos, danach selbst erzeugte symbolische KI-Premium-Visuals.
+- KI-Premium-Visuals sind der bevorzugte Standard-Fallback, wenn kein rechtlich einwandfreies und qualitativ starkes Echtfoto verfügbar ist.
+- Externe Bestandsbilder ohne saubere Premium-/Rechteprüfung sind Legacy/Übergang, nicht Zielzustand.
 - Statuslogik für Visuals: `ready`, `usable`, `fallback`, `needs_review`, `blocked`.
 - Prominente Flächen wie Today Home nutzen nur `ready` oder bewusst freigegebene `fallback`-Visuals.
 - Schwache Bilder werden ersetzt, zurückgestuft oder ausgeschlossen.
@@ -903,8 +906,10 @@ Verbindliche Richtung:
 Erste Umsetzungsschritte:
 1. Bestehendes Event-Visual-System gegen diesen Contract prüfen.
 2. Minimalmodell für Activity-Visual-Status festlegen.
-3. Today Home darauf vorbereiten, keine `needs_review`/`blocked`-Visuals prominent auszuspielen.
-4. Danach Bild-/Text-Polish für die sichtbaren Today-Karten durchführen.
+3. Activity AI Visual Pool V1 analog zum Event-Visual-Pool vorbereiten.
+4. Für Activities ohne rechtlich einwandfreies Premium-Echtfoto passende symbolische KI-Premium-Visuals planen/erzeugen.
+5. Today Home darauf vorbereiten, keine `needs_review`/`blocked`-Visuals prominent auszuspielen.
+6. Danach Bild-/Text-Polish für die sichtbaren Today-Karten durchführen.
 
 ### 3. Danach: Events Feed Visual Integration
 
