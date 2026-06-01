@@ -1,0 +1,629 @@
+{
+  "schema_version": 1,
+  "owner": "event_visual_pool_v1",
+  "base_path": "/assets/event-visuals/",
+  "selection_rule": "stable_hash(event_id + date + visual_key), later without duplicates per rendered feed",
+  "live_usage": "Only entries with status=ready may be used by UI. Planned slots are documentation and asset backlog only.",
+  "pools": {
+    "market_food": {
+      "label": "Markt, Food & Genuss",
+      "description": "Streetfood, Wochenmarkt, Genuss, Stadtfest mit Essensfokus",
+      "target_count": 7,
+      "images": [
+        {
+          "id": "market-food-01",
+          "src": "/assets/event-visuals/market-food-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-02",
+          "src": "/assets/event-visuals/market-food-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-03",
+          "src": "/assets/event-visuals/market-food-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-04",
+          "src": "/assets/event-visuals/market-food-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-05",
+          "src": "/assets/event-visuals/market-food-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-06",
+          "src": "/assets/event-visuals/market-food-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-food-07",
+          "src": "/assets/event-visuals/market-food-07.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "city_festival": {
+      "label": "Stadtfest & Innenstadtleben",
+      "description": "Feste, Aktionstage, Innenstadtveranstaltungen, offene Stadtmomente",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "city-festival-01",
+          "src": "/assets/event-visuals/city-festival-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-festival-02",
+          "src": "/assets/event-visuals/city-festival-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-festival-03",
+          "src": "/assets/event-visuals/city-festival-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-festival-04",
+          "src": "/assets/event-visuals/city-festival-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-festival-05",
+          "src": "/assets/event-visuals/city-festival-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-festival-06",
+          "src": "/assets/event-visuals/city-festival-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "music_stage": {
+      "label": "Musik & Bühne",
+      "description": "Konzerte, Tanz, Live-Musik, Bühne, K-Pop und musikalische Workshops",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "music-stage-01",
+          "src": "/assets/event-visuals/music-stage-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "music-stage-02",
+          "src": "/assets/event-visuals/music-stage-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "music-stage-03",
+          "src": "/assets/event-visuals/music-stage-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "music-stage-04",
+          "src": "/assets/event-visuals/music-stage-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "music-stage-05",
+          "src": "/assets/event-visuals/music-stage-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "music-stage-06",
+          "src": "/assets/event-visuals/music-stage-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "culture_exhibition": {
+      "label": "Kultur, Ausstellung & Geschichte",
+      "description": "Museum, Ausstellung, Kunst, Geschichte, Führung, Textilwerk",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "culture-exhibition-01",
+          "src": "/assets/event-visuals/culture-exhibition-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "culture-exhibition-02",
+          "src": "/assets/event-visuals/culture-exhibition-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "culture-exhibition-03",
+          "src": "/assets/event-visuals/culture-exhibition-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "culture-exhibition-04",
+          "src": "/assets/event-visuals/culture-exhibition-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "culture-exhibition-05",
+          "src": "/assets/event-visuals/culture-exhibition-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "theater_show": {
+      "label": "Theater, Show & Lesung",
+      "description": "Theater, Comedy, Kabarett, Lesung, Showformate",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "theater-show-01",
+          "src": "/assets/event-visuals/theater-show-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "theater-show-02",
+          "src": "/assets/event-visuals/theater-show-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "theater-show-03",
+          "src": "/assets/event-visuals/theater-show-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "theater-show-04",
+          "src": "/assets/event-visuals/theater-show-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "kids_family": {
+      "label": "Kinder & Familie",
+      "description": "Familienevents, Kinderangebote, Jugend, Mitmachaktionen",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "kids-family-01",
+          "src": "/assets/event-visuals/kids-family-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-family-02",
+          "src": "/assets/event-visuals/kids-family-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-family-03",
+          "src": "/assets/event-visuals/kids-family-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-family-04",
+          "src": "/assets/event-visuals/kids-family-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-family-05",
+          "src": "/assets/event-visuals/kids-family-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-family-06",
+          "src": "/assets/event-visuals/kids-family-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "creative_workshop": {
+      "label": "Kreativ- & Mitmachworkshop",
+      "description": "Basteln, Malen, Bauen, Kurse, Kulturrucksack, kreative Workshops",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "creative-workshop-01",
+          "src": "/assets/event-visuals/creative-workshop-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "creative-workshop-02",
+          "src": "/assets/event-visuals/creative-workshop-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "creative-workshop-03",
+          "src": "/assets/event-visuals/creative-workshop-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "creative-workshop-04",
+          "src": "/assets/event-visuals/creative-workshop-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "creative-workshop-05",
+          "src": "/assets/event-visuals/creative-workshop-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "creative-workshop-06",
+          "src": "/assets/event-visuals/creative-workshop-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "sport_active": {
+      "label": "Sport & Bewegung",
+      "description": "Sportveranstaltungen, Bewegung, Radtouren, Läufe, Fitness",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "sport-active-01",
+          "src": "/assets/event-visuals/sport-active-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "sport-active-02",
+          "src": "/assets/event-visuals/sport-active-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "sport-active-03",
+          "src": "/assets/event-visuals/sport-active-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "sport-active-04",
+          "src": "/assets/event-visuals/sport-active-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "sport-active-05",
+          "src": "/assets/event-visuals/sport-active-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "outdoor_nature": {
+      "label": "Natur & draußen",
+      "description": "Natur, Wald, Park, Venn, Outdoor, Garten, Umwelt",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "outdoor-nature-01",
+          "src": "/assets/event-visuals/outdoor-nature-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "outdoor-nature-02",
+          "src": "/assets/event-visuals/outdoor-nature-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "outdoor-nature-03",
+          "src": "/assets/event-visuals/outdoor-nature-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "outdoor-nature-04",
+          "src": "/assets/event-visuals/outdoor-nature-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "outdoor-nature-05",
+          "src": "/assets/event-visuals/outdoor-nature-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "outdoor-nature-06",
+          "src": "/assets/event-visuals/outdoor-nature-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "city_walk": {
+      "label": "Stadt, Tour & Route",
+      "description": "Stadtführung, Rundgang, Route, Architektur, Türme, Bocholt/Region entdecken",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "city-walk-01",
+          "src": "/assets/event-visuals/city-walk-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-walk-02",
+          "src": "/assets/event-visuals/city-walk-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-walk-03",
+          "src": "/assets/event-visuals/city-walk-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-walk-04",
+          "src": "/assets/event-visuals/city-walk-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-walk-05",
+          "src": "/assets/event-visuals/city-walk-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "city-walk-06",
+          "src": "/assets/event-visuals/city-walk-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "evening_social": {
+      "label": "Abend & sozial",
+      "description": "Quiz, Bar, Afterwork, Abendveranstaltung, lockeres Treffen",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "evening-social-01",
+          "src": "/assets/event-visuals/evening-social-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "evening-social-02",
+          "src": "/assets/event-visuals/evening-social-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "evening-social-03",
+          "src": "/assets/event-visuals/evening-social-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "evening-social-04",
+          "src": "/assets/event-visuals/evening-social-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "default_city": {
+      "label": "Allgemeines Bocholt-Visual",
+      "description": "Neutraler hochwertiger Fallback für unklare Events",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "default-city-01",
+          "src": "/assets/event-visuals/default-city-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "default-city-02",
+          "src": "/assets/event-visuals/default-city-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "default-city-03",
+          "src": "/assets/event-visuals/default-city-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "default-city-04",
+          "src": "/assets/event-visuals/default-city-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "default-city-05",
+          "src": "/assets/event-visuals/default-city-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "default-city-06",
+          "src": "/assets/event-visuals/default-city-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    }
+  }
+}
