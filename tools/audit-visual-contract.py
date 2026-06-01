@@ -5,8 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
-import subprocess
+import struct
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -60,21 +59,67 @@ def relative(path: Path) -> str:
 
 
 def read_image_dimensions(path: Path) -> tuple[int, int] | None:
-    try:
-        result = subprocess.run(
-            ["file", str(path)],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except Exception:
+    data = path.read_bytes()
+
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return struct.unpack(">II", data[16:24])
+
+    if data.startswith(b"\xff\xd8"):
+        pos = 2
+        while pos + 9 < len(data):
+            if data[pos] != 0xFF:
+                pos += 1
+                continue
+
+            marker = data[pos + 1]
+            pos += 2
+
+            if marker in {0xD8, 0xD9}:
+                continue
+
+            if pos + 2 > len(data):
+                return None
+
+            length = int.from_bytes(data[pos:pos + 2], "big")
+            if length < 2 or pos + length > len(data):
+                return None
+
+            if marker in {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}:
+                height = int.from_bytes(data[pos + 3:pos + 5], "big")
+                width = int.from_bytes(data[pos + 5:pos + 7], "big")
+                return width, height
+
+            pos += length
+
         return None
 
-    match = re.search(r"(\d+)\s*x\s*(\d+)", result.stdout)
-    if not match:
-        return None
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        chunk = data[12:16]
 
-    return int(match.group(1)), int(match.group(2))
+        if chunk == b"VP8X":
+            width = 1 + int.from_bytes(data[24:27], "little")
+            height = 1 + int.from_bytes(data[27:30], "little")
+            return width, height
+
+        if chunk == b"VP8 ":
+            start = 20
+            raw = data[start + 6:start + 10]
+            if len(raw) < 4:
+                return None
+            width = int.from_bytes(raw[:2], "little") & 0x3FFF
+            height = int.from_bytes(raw[2:], "little") & 0x3FFF
+            return width, height
+
+        if chunk == b"VP8L":
+            raw = data[21:25]
+            if len(raw) < 4:
+                return None
+            bits = int.from_bytes(raw, "little")
+            width = (bits & 0x3FFF) + 1
+            height = ((bits >> 14) & 0x3FFF) + 1
+            return width, height
+
+    return None
 
 
 def is_card_ratio(width: int, height: int) -> bool:

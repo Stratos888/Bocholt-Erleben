@@ -11,8 +11,8 @@
       "target_count": 7,
       "images": [
         {
-          "id": "market-food-01",
-          "src": "/assets/event-visuals/market-food-01.webp",
+          "id": "market-food-01-16x9",
+          "src": "/assets/event-visuals/market-food-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -20,7 +20,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "market-food-01"
+        },
+        {
+          "id": "market-food-01",
+          "src": "/assets/event-visuals/market-food-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "market-food-01-16x9"
         },
         {
           "id": "market-food-02",
@@ -78,8 +94,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "city-festival-01",
-          "src": "/assets/event-visuals/city-festival-01.webp",
+          "id": "city-festival-01-16x9",
+          "src": "/assets/event-visuals/city-festival-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -87,7 +103,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "city-festival-01"
+        },
+        {
+          "id": "city-festival-01",
+          "src": "/assets/event-visuals/city-festival-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "city-festival-01-16x9"
         },
         {
           "id": "city-festival-02",
@@ -137,8 +169,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "music-stage-01",
-          "src": "/assets/event-visuals/music-stage-01.webp",
+          "id": "music-stage-01-16x9",
+          "src": "/assets/event-visuals/music-stage-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -146,7 +178,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "music-stage-01"
+        },
+        {
+          "id": "music-stage-01",
+          "src": "/assets/event-visuals/music-stage-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "music-stage-01-16x9"
         },
         {
           "id": "music-stage-02",
@@ -196,8 +244,8 @@
       "target_count": 5,
       "images": [
         {
-          "id": "culture-exhibition-01",
-          "src": "/assets/event-visuals/culture-exhibition-01.webp",
+          "id": "culture-exhibition-01-16x9",
+          "src": "/assets/event-visuals/culture-exhibition-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -205,7 +253,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "culture-exhibition-01"
+        },
+        {
+          "id": "culture-exhibition-01",
+          "src": "/assets/event-visuals/culture-exhibition-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kultur- und Ausstellungs-Visual mit ruhigem Galerieraum, Skulpturen, Vitrine und warmer Lichtstimmung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "culture-exhibition-01-16x9"
         },
         {
           "id": "culture-exhibition-02",
@@ -286,8 +350,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "kids-family-01",
-          "src": "/assets/event-visuals/kids-family-01.webp",
+          "id": "kids-family-01-16x9",
+          "src": "/assets/event-visuals/kids-family-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -295,7 +359,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "kids-family-01"
+        },
+        {
+          "id": "kids-family-01",
+          "src": "/assets/event-visuals/kids-family-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "kids-family-01-16x9"
         },
         {
           "id": "kids-family-02",
@@ -345,8 +425,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "creative-workshop-01",
-          "src": "/assets/event-visuals/creative-workshop-01.webp",
+          "id": "creative-workshop-01-16x9",
+          "src": "/assets/event-visuals/creative-workshop-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -354,7 +434,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "creative-workshop-01"
+        },
+        {
+          "id": "creative-workshop-01",
+          "src": "/assets/event-visuals/creative-workshop-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "creative-workshop-01-16x9"
         },
         {
           "id": "creative-workshop-02",
@@ -404,8 +500,8 @@
       "target_count": 5,
       "images": [
         {
-          "id": "sport-active-01",
-          "src": "/assets/event-visuals/sport-active-01.webp",
+          "id": "sport-active-01-16x9",
+          "src": "/assets/event-visuals/sport-active-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -413,7 +509,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "sport-active-01"
+        },
+        {
+          "id": "sport-active-01",
+          "src": "/assets/event-visuals/sport-active-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "sport-active-01-16x9"
         },
         {
           "id": "sport-active-02",
@@ -455,8 +567,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "outdoor-nature-01",
-          "src": "/assets/event-visuals/outdoor-nature-01.webp",
+          "id": "outdoor-nature-01-16x9",
+          "src": "/assets/event-visuals/outdoor-nature-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -464,7 +576,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "outdoor-nature-01"
+        },
+        {
+          "id": "outdoor-nature-01",
+          "src": "/assets/event-visuals/outdoor-nature-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "outdoor-nature-01-16x9"
         },
         {
           "id": "outdoor-nature-02",
@@ -514,8 +642,8 @@
       "target_count": 6,
       "images": [
         {
-          "id": "city-walk-01",
-          "src": "/assets/event-visuals/city-walk-01.webp",
+          "id": "city-walk-01-16x9",
+          "src": "/assets/event-visuals/city-walk-01-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -523,7 +651,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "city-walk-01"
+        },
+        {
+          "id": "city-walk-01",
+          "src": "/assets/event-visuals/city-walk-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadt- und Rundgang-Visual mit Pflaster, Fassaden, Stadtgrün und ruhiger kleinstädtischer Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "city-walk-01-16x9"
         },
         {
           "id": "city-walk-02",
@@ -624,8 +768,8 @@
           "review_status": "replaced_by_default_city_02"
         },
         {
-          "id": "default-city-02",
-          "src": "/assets/event-visuals/default-city-02.webp",
+          "id": "default-city-02-16x9",
+          "src": "/assets/event-visuals/default-city-02-16x9.webp",
           "status": "ready",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
@@ -633,7 +777,23 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_phase1"
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "default-city-02"
+        },
+        {
+          "id": "default-city-02",
+          "src": "/assets/event-visuals/default-city-02.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadt-Visual mit ruhiger kleinstädtischer Gasse, Pflaster, Backstein, Pflanzen und glaubwürdiger Alltagsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "default-city-02-16x9"
         },
         {
           "id": "default-city-03",
