@@ -1,0 +1,610 @@
+{
+  "schema_version": 1,
+  "owner": "event_visual_ai_style_guide_v1",
+  "purpose": "Canonical machine-readable rule contract for AI-generated premium event visuals in Bocholt erleben.",
+  "generation_contract": {
+    "source_type": "ai_generated",
+    "is_symbolic": true,
+    "is_documentary": false,
+    "allow_false_place_claim": false,
+    "preferred_generation_aspect_ratio": "4:3",
+    "final_asset_format": "webp",
+    "card_crop_goal": "landscape_event_card",
+    "default_prompt_mode": "editorial_premium_symbolic"
+  },
+  "approved_pilot_anchors": {
+    "city_walk_v2": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for locally plausible small-town urban detail images.",
+      "applicable_image_classes": [
+        "local_sensitive_detail"
+      ],
+      "strengths": [
+        "locally plausible small-town mood",
+        "brick, plaster, paving and plant materiality",
+        "calm editorial realism",
+        "no false concrete place claim",
+        "strong card crop suitability"
+      ],
+      "avoid_transferring": [
+        "over-clean perfection",
+        "postcard romanticism",
+        "too much visual emptiness"
+      ]
+    },
+    "market_food_v3": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for market/food/event-context visuals.",
+      "applicable_image_classes": [
+        "hybrid_contextual"
+      ],
+      "strengths": [
+        "event-context food imagery instead of pure food styling",
+        "market stand materiality",
+        "soft anonymous background context",
+        "warm but believable editorial look",
+        "card-friendly subject layering"
+      ],
+      "avoid_transferring": [
+        "gourmet magazine still life",
+        "alcohol-centric mood",
+        "perfect fantasy market square"
+      ]
+    },
+    "creative_workshop_v2": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for symbolic editorial workshop and family-safe making visuals.",
+      "applicable_image_classes": [
+        "symbolic_editorial"
+      ],
+      "strengths": [
+        "credible making/workshop character",
+        "quiet premium craft/material styling",
+        "safe partial human presence without identity claim",
+        "high material richness",
+        "strong symbolic usability"
+      ],
+      "avoid_transferring": [
+        "sterile design atelier look",
+        "chaotic craft table",
+        "recognizable children or faces"
+      ]
+    }
+  },
+  "global_style": {
+    "desired_visual_language": [
+      "premium editorial photography",
+      "believable real-world realism",
+      "warm-neutral restrained palette",
+      "quiet premium composition",
+      "material-rich surfaces",
+      "slight lived-in imperfection",
+      "calm local small-town atmosphere where relevant"
+    ],
+    "lighting_rules": [
+      "prefer natural daylight or soft diffused light",
+      "allow mild warmth but avoid heavy golden-hour glaze",
+      "allow gentle indoor softness for symbolic scenes",
+      "avoid extreme cinematic light beams or fantasy haze"
+    ],
+    "composition_rules": [
+      "landscape image optimized for 4:3 crop safety",
+      "clear foreground or midground subject focus",
+      "background may be soft but not unrealistically over-blurred",
+      "avoid overcrowding and avoid too many micro-details",
+      "preserve usable crop for mobile cards"
+    ],
+    "realism_rules": [
+      "surfaces should feel slightly imperfect and tactile",
+      "avoid plastic-looking textures",
+      "avoid impossible geometry or suspicious repetition",
+      "avoid theme-park prettiness",
+      "prefer documentary editorial restraint over visual spectacle"
+    ],
+    "legal_safety_rules": [
+      "no readable brands",
+      "no readable posters",
+      "no readable signs",
+      "no copyrighted artwork in focus",
+      "no identifiable children",
+      "avoid identifiable adults; if present, keep anonymous or partial"
+    ]
+  },
+  "global_negative_rules": [
+    "no fictional recognizable old-town square",
+    "no postcard old-town look",
+    "no fairy-tale half-timber fantasy street",
+    "no over-perfect golden-hour postcard mood",
+    "no cheap stock-photo smile scenes",
+    "no exaggerated cinematic bokeh",
+    "no surreal AI symmetry",
+    "no pristine showroom perfection",
+    "no loud festival poster aesthetics",
+    "no text in image"
+  ],
+  "quality_gate_policy": {
+    "hard_fail_gates": [
+      "no_false_place_claim",
+      "low_ai_artifice",
+      "legal_safety"
+    ],
+    "soft_review_gates": [
+      "locality_plausibility",
+      "premium_quality",
+      "crop_safety",
+      "anchor_consistency"
+    ],
+    "pass_rule": "All hard-fail gates must pass. At least 3 of 4 soft-review gates must pass. Local-sensitive keys must pass locality_plausibility strongly.",
+    "gates": {
+      "locality_plausibility": {
+        "description": "Image feels plausible for Bocholt / Westmuensterland when locality matters.",
+        "pass_requirement": "Materials, scale, planting, paving and facade logic feel locally plausible without naming a specific place.",
+        "failure_signals": [
+          "southern European old town",
+          "mountain village",
+          "fairy-tale half-timber ensemble",
+          "obviously non-local architecture"
+        ]
+      },
+      "no_false_place_claim": {
+        "description": "Image must not imply a specific false Bocholt location.",
+        "pass_requirement": "Use detail-, edge- or atmosphere-oriented framing instead of a clearly invented central place.",
+        "failure_signals": [
+          "invented market square",
+          "full fantasy street vista",
+          "recognizable but false landmark composition"
+        ]
+      },
+      "low_ai_artifice": {
+        "description": "Image should not look obviously AI-generated.",
+        "pass_requirement": "Believable geometry, believable texture, restrained blur, natural object relationships and mild imperfections.",
+        "failure_signals": [
+          "plastic textures",
+          "impossible object joins",
+          "hyper-perfect staging",
+          "overly dreamy light haze",
+          "suspicious repeated patterns"
+        ]
+      },
+      "premium_quality": {
+        "description": "Image must feel worthy of a premium discovery PWA.",
+        "pass_requirement": "Editorial calm, material richness, visual hierarchy and curated atmosphere are clearly present.",
+        "failure_signals": [
+          "cheap stock look",
+          "messy clutter",
+          "flat snapshot feeling",
+          "overly generic filler scene"
+        ]
+      },
+      "crop_safety": {
+        "description": "Image must survive mobile and desktop card crops.",
+        "pass_requirement": "Main subject remains legible in a landscape card crop without depending on edge-only details.",
+        "failure_signals": [
+          "important subject only at the extreme edge",
+          "too much empty space",
+          "tiny hard-to-read focal content"
+        ]
+      },
+      "anchor_consistency": {
+        "description": "Image should align stylistically with one or more approved pilot anchors.",
+        "pass_requirement": "Shares the tonal, material and editorial DNA of the approved anchors.",
+        "failure_signals": [
+          "neon nightlife",
+          "hard commercial food ad look",
+          "sterile catalog shot",
+          "storybook street scene"
+        ]
+      },
+      "legal_safety": {
+        "description": "Image must stay within the content restrictions of the system.",
+        "pass_requirement": "No readable brands, no readable text, no copyrighted art focus, no identifiable children.",
+        "failure_signals": [
+          "brand logos",
+          "visible poster text",
+          "recognizable child face",
+          "recognizable copyrighted artwork"
+        ]
+      }
+    }
+  },
+  "image_classes": {
+    "local_sensitive_detail": {
+      "description": "Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims.",
+      "core_rule": "Use locally plausible detail framing instead of clearly invented streets or squares.",
+      "preferred_anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "prompt_bias": [
+        "subtle small-town detail",
+        "brick, plaster, paving, greenery, bicycle or street furniture",
+        "editorial documentary realism"
+      ],
+      "avoid_bias": [
+        "full postcard townscape",
+        "romanticized fantasy old town",
+        "tourism brochure angle"
+      ]
+    },
+    "hybrid_contextual": {
+      "description": "Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context.",
+      "core_rule": "Foreground detail dominates; background context stays soft, unspecific and believable.",
+      "preferred_anchor_profiles": [
+        "market_food_v3",
+        "city_walk_v2"
+      ],
+      "prompt_bias": [
+        "foreground material focus",
+        "soft anonymous background context",
+        "event/detail balance"
+      ],
+      "avoid_bias": [
+        "pure still life with no context",
+        "fully invented market square",
+        "hard commercial styling"
+      ]
+    },
+    "symbolic_editorial": {
+      "description": "Symbolic premium editorial images where locality is secondary to safe, believable activity representation.",
+      "core_rule": "Prioritize materiality, action cues and premium calm over explicit place identity.",
+      "preferred_anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "prompt_bias": [
+        "symbolic material scene",
+        "quiet workshop or activity cues",
+        "editorial realism"
+      ],
+      "avoid_bias": [
+        "sterile studio set",
+        "cheap stock posing",
+        "chaotic clutter"
+      ]
+    }
+  },
+  "prompt_building_rules": {
+    "global_positive_clauses": [
+      "premium editorial photography",
+      "believable real-world surfaces",
+      "warm-neutral restrained palette",
+      "landscape 4:3 card-friendly composition",
+      "calm, curated and modern atmosphere",
+      "no text in image"
+    ],
+    "global_negative_clauses": [
+      "no fictional recognizable townscape",
+      "no postcard look",
+      "no fairytale street",
+      "no cheap stock photo look",
+      "no overly styled commercial look",
+      "no strong AI-fantasy aesthetic",
+      "no readable signs or logos"
+    ],
+    "class_specific_clauses": {
+      "local_sensitive_detail": [
+        "subtle local small-town detail",
+        "no false concrete place claim",
+        "use edge, material and atmosphere framing"
+      ],
+      "hybrid_contextual": [
+        "foreground detail first, soft contextual background",
+        "suggest event or market context without a fixed invented location"
+      ],
+      "symbolic_editorial": [
+        "credible making or activity context",
+        "high material richness",
+        "avoid sterile or staged catalog feeling"
+      ]
+    }
+  },
+  "visual_key_rules": {
+    "market_food": {
+      "image_class": "hybrid_contextual",
+      "priority": "high",
+      "anchor_profiles": [
+        "market_food_v3"
+      ],
+      "locality_requirement": "prefer local plausibility, but do not claim a specific place",
+      "subject_focus": "market stand, ingredients, simple prepared food, crates, herbs, bread, produce, event stall context",
+      "prompt_must_include": [
+        "event or market context stronger than pure still life",
+        "foreground food/material detail",
+        "soft anonymous small-town background if background is visible",
+        "natural slight imperfection"
+      ],
+      "prompt_avoid": [
+        "gourmet magazine styling",
+        "alcohol focus",
+        "perfect fantasy market square",
+        "dominant full street scene"
+      ],
+      "people_policy": "anonymous background presence allowed",
+      "review_emphasis": [
+        "event-feel versus still-life balance",
+        "background remains unspecific",
+        "market materiality feels believable"
+      ]
+    },
+    "city_festival": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3"
+      ],
+      "locality_requirement": "must feel locally plausible and must avoid invented central squares",
+      "subject_focus": "urban festive small-town atmosphere through details, planters, temporary setup cues, tables, light decor, paving, facades",
+      "prompt_must_include": [
+        "detail or edge framing instead of a full square",
+        "small-town urban materials",
+        "subtle event cues"
+      ],
+      "prompt_avoid": [
+        "big fantasy festival plaza",
+        "tourism postcard composition",
+        "generic big-city street festival"
+      ],
+      "people_policy": "anonymous or absent",
+      "review_emphasis": [
+        "local plausibility",
+        "event cue subtlety",
+        "no fake-place feel"
+      ]
+    },
+    "music_stage": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "not required; symbolic image is acceptable",
+      "subject_focus": "small-stage or music-context detail such as microphone, instrument, stage light, movement cue",
+      "prompt_must_include": [
+        "music or stage context is clearly readable",
+        "quiet premium styling",
+        "believable materials and lighting"
+      ],
+      "prompt_avoid": [
+        "concert poster look",
+        "nightclub neon",
+        "recognizable performers",
+        "logo-heavy equipment"
+      ],
+      "people_policy": "avoid faces; silhouettes or partial presence only if necessary",
+      "review_emphasis": [
+        "symbolic clarity",
+        "premium calm",
+        "no cheap nightlife look"
+      ]
+    },
+    "culture_exhibition": {
+      "image_class": "hybrid_contextual",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "prefer plausible local culture or architecture atmosphere without claiming a false venue",
+      "subject_focus": "exhibition-space detail, cultural object context, architecture, museum-like material calm",
+      "prompt_must_include": [
+        "curated cultural atmosphere",
+        "material and spatial restraint",
+        "soft contextual depth"
+      ],
+      "prompt_avoid": [
+        "famous artwork focus",
+        "readable exhibition labels",
+        "sterile white-cube emptiness"
+      ],
+      "people_policy": "absent or anonymous",
+      "review_emphasis": [
+        "quiet premium tone",
+        "no legal-risk artwork focus",
+        "context remains believable"
+      ]
+    },
+    "theater_show": {
+      "image_class": "symbolic_editorial",
+      "priority": "medium",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "not required; symbolic editorial stage image is preferred",
+      "subject_focus": "theater or show cues such as curtain, stage edge, spotlight, script table, microphone",
+      "prompt_must_include": [
+        "clear theater/show cue",
+        "premium restrained mood",
+        "soft believable lighting"
+      ],
+      "prompt_avoid": [
+        "recognizable performers",
+        "broadway poster energy",
+        "gaudy stage spectacle"
+      ],
+      "people_policy": "avoid faces; empty or partial-human imagery preferred",
+      "review_emphasis": [
+        "show cue clarity",
+        "not too dark or theatrical-kitsch",
+        "premium editorial calm"
+      ]
+    },
+    "kids_family": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "not required; symbolic child-safe and family-safe imagery is preferred",
+      "subject_focus": "family-friendly material scenes, play or making cues without showing identifiable children",
+      "prompt_must_include": [
+        "family-safe activity cues",
+        "friendly but not childish color restraint",
+        "believable materials"
+      ],
+      "prompt_avoid": [
+        "recognizable child faces",
+        "generic smiling stock family",
+        "kindergarten chaos",
+        "cartoon overload"
+      ],
+      "people_policy": "no identifiable children; hands or cropped adults only if necessary",
+      "review_emphasis": [
+        "safety around identity",
+        "symbolic clarity",
+        "warmth without kitsch"
+      ]
+    },
+    "creative_workshop": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "not required; symbolic making imagery is preferred",
+      "subject_focus": "paper, pencils, tools, wood, craft materials, hands-on making context",
+      "prompt_must_include": [
+        "credible workshop or making cue",
+        "material richness",
+        "quiet premium calm"
+      ],
+      "prompt_avoid": [
+        "sterile atelier perfection",
+        "chaotic craft table",
+        "recognizable child faces",
+        "copyrighted characters or figures"
+      ],
+      "people_policy": "partial human presence allowed, no identifiable face required",
+      "review_emphasis": [
+        "workshop authenticity",
+        "no over-arranged design-studio feel",
+        "safe symbolic use"
+      ]
+    },
+    "sport_active": {
+      "image_class": "symbolic_editorial",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "optional; route or surface plausibility preferred over landmark identity",
+      "subject_focus": "movement-supporting detail such as path, shoe, bicycle, route surface, outdoor activity cue",
+      "prompt_must_include": [
+        "clear movement or activity implication",
+        "clean but believable outdoor realism",
+        "crop-safe focal cue"
+      ],
+      "prompt_avoid": [
+        "aggressive sports marketing look",
+        "recognizable athletes",
+        "brand-centric gear",
+        "stadium spectacle"
+      ],
+      "people_policy": "avoid faces; body fragments or anonymous silhouettes only if needed",
+      "review_emphasis": [
+        "activity readability",
+        "not too commercial",
+        "outdoor realism"
+      ]
+    },
+    "outdoor_nature": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "should feel regionally plausible and not like mountains, coast or exotic travel imagery",
+      "subject_focus": "park, path, water edge, greenery, quiet outdoor detail with local lowland plausibility",
+      "prompt_must_include": [
+        "regional lowland plausibility",
+        "calm outdoor atmosphere",
+        "crop-safe composition"
+      ],
+      "prompt_avoid": [
+        "alpine panorama",
+        "beach/travel postcard",
+        "wild dramatic landscape"
+      ],
+      "people_policy": "absent or anonymous",
+      "review_emphasis": [
+        "regional plausibility",
+        "quiet premium mood",
+        "not generic travel imagery"
+      ]
+    },
+    "city_walk": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "must feel Bocholt-plausible without pretending to be a specific identifiable street",
+      "subject_focus": "paving, facade edge, shopfront detail, bicycle, planting, urban small-town materiality",
+      "prompt_must_include": [
+        "detail-first framing",
+        "small-town urban plausibility",
+        "calm editorial realism"
+      ],
+      "prompt_avoid": [
+        "full fantasy old-town street",
+        "postcard town view",
+        "half-timber fairy-tale scene"
+      ],
+      "people_policy": "prefer none; anonymous presence only if extremely subtle",
+      "review_emphasis": [
+        "no fake-place claim",
+        "material plausibility",
+        "card-ready composition"
+      ]
+    },
+    "evening_social": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "market_food_v3"
+      ],
+      "locality_requirement": "not required; symbolic social atmosphere is acceptable",
+      "subject_focus": "warm social table, cafe, quiz-night or meetup cues without alcohol emphasis",
+      "prompt_must_include": [
+        "social warmth",
+        "quiet premium mood",
+        "subtle evening context"
+      ],
+      "prompt_avoid": [
+        "bar-advertising look",
+        "alcohol hero shot",
+        "nightclub neon",
+        "recognizable guests"
+      ],
+      "people_policy": "anonymous presence allowed; no identifiable faces preferred",
+      "review_emphasis": [
+        "social rather than nightlife feel",
+        "warm restraint",
+        "no commercial nightlife look"
+      ]
+    },
+    "default_city": {
+      "image_class": "local_sensitive_detail",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "must remain locally plausible and visually neutral enough to cover many unclassified events",
+      "subject_focus": "neutral city-detail mood with paving, facade, greenery, subtle small-town urban texture",
+      "prompt_must_include": [
+        "neutral but premium local atmosphere",
+        "detail framing",
+        "good crop flexibility"
+      ],
+      "prompt_avoid": [
+        "specific false landmark",
+        "strong theme bias",
+        "empty bureaucratic cityscape"
+      ],
+      "people_policy": "absent or anonymous",
+      "review_emphasis": [
+        "versatility",
+        "local plausibility",
+        "neutral premium atmosphere"
+      ]
+    }
+  }
+}
