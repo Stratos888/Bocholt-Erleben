@@ -326,7 +326,7 @@
       .map((entry) => entry.item);
   }
 
-  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V2 | Zweck: erweitert das Kandidatenfenster fuer nahe Events, ohne Events hart zu erzwingen; Umfang: ersetzt nur curateTodayItems(), keine Scoring-/DOM-Aenderung === */
+  /* === BEGIN BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V3 | Zweck: mischt nahe Events ueber eigene Event-Spur in Today Home ein, statt nur im allgemeinen Activity-dominierten Top-Ranking zu suchen; Umfang: ersetzt nur Event-Mix-Curation, keine Scoring-/DOM-Aenderung === */
   function isNearEventCandidate(item, now) {
     if (item?.type !== "event") return false;
 
@@ -345,37 +345,60 @@
     return daysUntil >= 0 && daysUntil <= 14;
   }
 
+  function todayScore(item) {
+    const score = Number(item?.score);
+    return Number.isFinite(score) ? score : 0;
+  }
+
+  function hasReadyEventVisual(item) {
+    const visualKey = eventVisualKey(item);
+    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+
+    return Array.isArray(pool) && pool.length > 0;
+  }
+
+  function compareTodayItems(a, b) {
+    const scoreDiff = todayScore(b) - todayScore(a);
+    if (scoreDiff) return scoreDiff;
+
+    if (a.type !== b.type) return a.type === "event" ? -1 : 1;
+
+    return String(a.title || "").localeCompare(String(b.title || ""), "de");
+  }
+
+  function compareEventCandidates(a, b) {
+    const visualDiff = Number(hasReadyEventVisual(b)) - Number(hasReadyEventVisual(a));
+    if (visualDiff) return visualDiff;
+
+    return compareTodayItems(a, b);
+  }
+
   function curateTodayItems(items, context) {
     const now = context?.now || new Date();
     const cleaned = (Array.isArray(items) ? items : [])
       .filter((item) => item && !isPastEventItem(item, now));
 
-    const rotated = addDailyRotation(cleaned.slice(0, 32), context);
-    const hasNearEventCandidate = rotated.some((item) => isNearEventCandidate(item, now));
-    const maxActivities = hasNearEventCandidate ? 2 : 3;
-    const maxEvents = hasNearEventCandidate ? 1 : 0;
-    const selected = [];
-    const counts = {
-      activity: 0,
-      event: 0
-    };
+    const activityLane = addDailyRotation(
+      cleaned.filter((item) => item.type !== "event").slice(0, 32),
+      context
+    );
 
-    for (const item of rotated) {
-      const type = item.type === "event" ? "event" : "activity";
+    const eventLane = addDailyRotation(
+      cleaned.filter((item) => isNearEventCandidate(item, now) && todayScore(item) > 0),
+      context
+    ).sort(compareEventCandidates);
 
-      if (type === "event" && !isNearEventCandidate(item, now)) continue;
-      if (type === "activity" && counts.activity >= maxActivities) continue;
-      if (type === "event" && counts.event >= maxEvents) continue;
+    const selectedActivities = activityLane.slice(0, eventLane.length ? 2 : 3);
+    const selectedEvent = eventLane[0] || null;
+    const selected = selectedEvent
+      ? [...selectedActivities, selectedEvent]
+      : selectedActivities;
 
-      selected.push(item);
-      counts[type] += 1;
-
-      if (selected.length >= 3) break;
-    }
-
-    return selected;
+    return selected
+      .sort(compareTodayItems)
+      .slice(0, 3);
   }
-  /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V2 === */
+  /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V3 === */
 
   function buildRecommendations() {
     const api = getRecommendations();
