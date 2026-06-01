@@ -76,10 +76,14 @@
         {
           "id": "city-festival-01",
           "src": "/assets/event-visuals/city-festival-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "city-festival-02",
@@ -429,10 +433,14 @@
         {
           "id": "outdoor-nature-01",
           "src": "/assets/event-visuals/outdoor-nature-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "outdoor-nature-02",
@@ -484,10 +492,14 @@
         {
           "id": "city-walk-01",
           "src": "/assets/event-visuals/city-walk-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadt- und Rundgang-Visual mit Pflaster, Fassaden, Stadtgrün und ruhiger kleinstädtischer Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "city-walk-02",
@@ -578,10 +590,14 @@
         {
           "id": "default-city-01",
           "src": "/assets/event-visuals/default-city-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Neutrales symbolisches Stadt-Visual mit Backstein, heller Fassade, Pflaster, Bank und Stadtgrün.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1"
         },
         {
           "id": "default-city-02",
