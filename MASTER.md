@@ -53,6 +53,18 @@ The following workpack is intentionally on hold:
 - All overlays render in a dedicated overlay root directly under `body`
 - Deploy must fail fast on broken asset references
 
+<!-- === BEGIN BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 | Zweck: verankert die dauerhafte Bild-/Visual-Produktentscheidung; Umfang: Event- und Activity-Card-Bilder, Today Home, Feed-Cards, Premium-Qualitaet === -->
+### Premium visual contract
+
+- Event- und Activity-Card-Bilder werden kuenftig als kuratierte 16:9-WebP-Card-Assets verstanden, nicht als beliebige Rohbilder, die im Layout gerettet werden.
+- Prominente Flaechen wie Today Home duerfen nur `ready`-Visuals oder bewusst freigegebene `fallback`-Visuals nutzen.
+- Schwache Bilder werden ersetzt, zurueckgestuft oder aus prominenten Flaechen ausgeschlossen; sie werden nicht dauerhaft per CSS, Crop-Rateversuchen oder Einzel-Focal-Point-Hotfixes kaschiert.
+- Fuer Visuals gelten die Statuswerte `ready`, `usable`, `fallback`, `needs_review` und `blocked`.
+- CSS liefert den stabilen Rahmen fuer Bildausspielung, ist aber nicht das Rettungssystem fuer ungeeignete Motive, schlechte Ausschnitte oder zu grosse Rohdateien.
+- Perspektivischer Zielzustand ist ein internes Visual-Audit bzw. Vorschau-Raster, das Bilder in echten Card-Kontexten prueft: Today Mobile, Today Desktop, Events Feed, Activities Feed und spaeter Detail-/Hero-Kontexte.
+
+<!-- === END BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 === -->
+
 ### Product governance
 
 - `Produktvertrag.md` is the only canonical source for:
@@ -96,7 +108,7 @@ The following workpack is intentionally on hold:
 <!-- === BEGIN BLOCK: MASTER_TODAY_HOME_PREMIUM_CONTINUATION_2026_06_01 | Zweck: aktueller Projektstand Today Home + Event Visuals ohne Freeze; Umfang: strategischer Fortsetzungspunkt === -->
 ## Aktueller Fortsetzungspunkt – Today Home Premium Completion + Event Visuals
 
-Stand: 2026-06-01, `staging`, HEAD zuletzt geprüft: `9115d43`.
+Stand: 2026-06-01, `staging`, weitergeführt bis `dcebaa0` vor diesem Dokumentationspatch.
 
 Wichtig: Today Home wird **nicht** als V1 eingefroren. Ziel bleibt eine vollständig premium-fertige Home-/Today-Erfahrung für Mobile und Desktop.
 

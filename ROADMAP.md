@@ -853,10 +853,10 @@ Freeze-Bedingung:
 
 <!-- === END BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 === -->
 
-<!-- === BEGIN BLOCK: ROADMAP_TODAY_HOME_PREMIUM_AND_EVENT_FEED_VISUALS_2026_06_01 | Zweck: nächste Roadmap-Punkte nach Event-Visual-Coverage und Today-Only-Event-Fix; Umfang: Premium Completion statt Freeze === -->
-## Nächster Roadmap-Block – Today Home Premium Completion und Events Feed Visual Integration
+<!-- === BEGIN BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 | Zweck: ordnet Today-Home-Abschluss, Premium-Visual-Contract und Events-Feed-Visuals in die richtige Reihenfolge; Umfang: Home, Event-/Activity-Bilder, Feed-Cards, Visual-Audit === -->
+## Nächster Roadmap-Block – Today Home Premium Completion, Visual Contract und Events Feed Visual Integration
 
-Status: offen / nächste priorisierte Arbeit.
+Status: aktiv / nächste priorisierte Arbeit.
 
 ### 1. Today Home Premium Completion
 
@@ -870,34 +870,62 @@ Bereits erledigt:
 - Keine Zukunftsevents mehr auf Today Home.
 - Eventbilder über `visual_key -> event_visual_pool.json -> ready WebP`.
 - Aktuelle Event-Visual-Coverage auf Staging: 62/62 Events.
+- Premium-Layout-Polish wurde auf Staging umgesetzt.
+- Regionalbezug wurde geklärt: `Heute rund um Bocholt`.
+- Bottom-Tabbar wurde wieder als leichtes Glass-/Floating-Dock ausgerichtet, nicht als schwere opake Maske.
 
-Noch zu prüfen/verbessern:
-- Mobile-Premiumwirkung im echten Nutzungskontext.
-- Desktop-Premiumwirkung im echten Nutzungskontext.
-- Bild-/Text-/Card-Hierarchie der 3 Empfehlungen.
-- Konsistenz zwischen Activity-Bildern und neuen Event-Visuals.
-- Ob einzelne Activity-Bilder auf Today Home qualitativ gegen die neue Eventbild-Welt abfallen.
-- CTA-Bereich unten: visuelle Wertigkeit, Hierarchie, Abstand und Desktop/Mobile-Balance.
-- Keine Freeze-Entscheidung, bevor diese Premium-Prüfung abgeschlossen ist.
+Nicht als Layout-Problem weiterführen:
+- Bildqualität einzelner Activity-Karten.
+- Roh wirkende Teasertexte durch harte Textabbrüche.
+- Schwache oder zufällige Motive in prominenten Karten.
 
-### 2. Direkt danach: Events Feed Visual Integration
+Verbleibender Premium-Hebel:
+- Today Home nur mit wirklich geeigneten Visuals und redaktionell sauberen Kurztexten abschließen.
+- Schwache Activity-Bilder wie Stadtwald/Rohr oder zu generische Naturdetails nicht per CSS retten, sondern ersetzen, zurückstufen oder aus Today ausschließen.
+
+### 2. Premium Visual Contract V1
+
+Ziel: Bildqualität künftig systematisch lösen, damit Event- und Activity-Karten nicht dauerhaft über manuelle Crop-/Focal-Point-Versuche repariert werden müssen.
+
+Verbindliche Richtung:
+- Card-Bilder werden als geprüfte 16:9-WebP-Card-Assets vorbereitet.
+- Statuslogik für Visuals: `ready`, `usable`, `fallback`, `needs_review`, `blocked`.
+- Prominente Flächen wie Today Home nutzen nur `ready` oder bewusst freigegebene `fallback`-Visuals.
+- Schwache Bilder werden ersetzt, zurückgestuft oder ausgeschlossen.
+- CSS bleibt Rendering-Rahmen, nicht Rettungssystem.
+- Ein späterer interner Visual-Audit soll echte Card-Kontexte zeigen:
+  - Today Mobile
+  - Today Desktop
+  - Events Feed
+  - Activities Feed
+  - später Detail-/Hero-Kontexte
+
+Erste Umsetzungsschritte:
+1. Bestehendes Event-Visual-System gegen diesen Contract prüfen.
+2. Minimalmodell für Activity-Visual-Status festlegen.
+3. Today Home darauf vorbereiten, keine `needs_review`/`blocked`-Visuals prominent auszuspielen.
+4. Danach Bild-/Text-Polish für die sichtbaren Today-Karten durchführen.
+
+### 3. Danach: Events Feed Visual Integration
 
 Ziel: Das neue Event-Visual-System soll nicht nur auf Today Home, sondern auch im normalen Events Feed genutzt werden.
 
 Geplanter Zielzustand:
-- Eventkarten auf `/events/` nutzen dieselbe Logik wie Today Home:
+- Eventkarten auf `/events/` nutzen dieselbe Visual-Contract-Logik wie Today Home:
   - `visual_key`
   - `data/event_visual_pool.json`
-  - nur `status: ready`
+  - 16:9-WebP-Card-Assets
+  - nur `status: ready` oder bewusst freigegebene Fallbacks
   - Fallback auf `default_city`
 - Keine geplanten/non-ready Assets live ausspielen.
 - Kein separater Bildstandard für Today und Events Feed.
 - Mobile- und Desktop-Cards müssen mit Bildern premium wirken.
-- Cropping, Card-Höhen und Text-Bild-Balance im Feed separat prüfen.
+- Cropping nicht als Einzelbild-Ratespiel lösen, sondern über vorbereitete Card-Assets und Vorschauprüfung.
 - Event-Detailpanel-Bilder erst danach bewerten; zunächst Fokus auf Feed-Cards.
 
 Priorität:
-1. Today Home Premium Completion abschließen.
-2. Events Feed Visual Integration direkt als nächster Hauptworkstream.
-3. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
-<!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_AND_EVENT_FEED_VISUALS_2026_06_01 === -->
+1. Visual Contract V1 dokumentiert und technisch vorbereiten.
+2. Today Home Content-/Visual-Polish abschließen.
+3. Events Feed Visual Integration als nächster Hauptworkstream.
+4. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
+<!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 === -->

@@ -261,6 +261,36 @@ Asset/versioning rules:
 - Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
 
 
+<!-- === BEGIN BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 | Zweck: technische Regeln fuer nachhaltige Premium-Bildausspielung; Umfang: Event-/Activity-Card-Assets, Statuslogik, Cropping-Grenzen, Audit-Pflicht === -->
+## 11.1 PREMIUM VISUAL ASSET CONTRACT
+
+For event and activity visuals, the default solution is not manual crop guessing. The default solution is a prepared, reviewed card asset.
+
+Rules:
+
+- Card visuals should be prepared as 16:9 WebP assets for card contexts.
+- Raw large source images, arbitrary external images or unreviewed crops must not be promoted into premium surfaces directly.
+- Visual status values are:
+  - `ready`: approved for premium card use.
+  - `usable`: acceptable in normal lists, but not automatically approved for Today/Home prominence.
+  - `fallback`: approved symbolic fallback when no better specific visual exists.
+  - `needs_review`: not allowed in prominent surfaces.
+  - `blocked`: not allowed.
+- Today/Home and other prominent recommendation surfaces may use only `ready` visuals or deliberately approved `fallback` visuals.
+- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
+- Replace, regenerate, downgrade or exclude weak visuals instead of masking them with layout code.
+- CSS may define the stable rendering frame, aspect ratio and fallback object-position; CSS must not become the quality-control system for individual images.
+- A future visual-audit view should preview assets in real card contexts before they are marked `ready`.
+
+Implementation guidance:
+
+- Extend existing visual pools or item data only through clear owner files.
+- Keep one shared standard for Today cards and feed cards unless a later proof shows a real context-specific requirement.
+- Prefer generated/prepared card assets over trying to rescue unsuitable source images at runtime.
+- When adding a new visual workpack, include checks for file existence, format, reasonable size, status and visual preview readiness.
+
+<!-- === END BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 === -->
+
 ## 12. DEPRECATED PROMPT FILES
 
 If deprecated prompt files still exist, they are not canonical workflow controllers.
