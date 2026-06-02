@@ -154,7 +154,7 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print("\nOK: Generation-Batches sind konsistent und decken alle 22 Phase-1-Requests ab.")
+    print(f"\nOK: Generation-Batches sind konsistent und decken alle {len(phase1_rows)} Phase-1-Requests ab.")
     return 0
 
 

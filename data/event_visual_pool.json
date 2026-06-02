@@ -1,247 +1,171 @@
 {
-  "schema_version": 1,
-  "owner": "event_visual_pool_v1",
+  "schema_version": 2,
+  "owner": "event_visual_pool_v31",
   "base_path": "/assets/event-visuals/",
-  "selection_rule": "stable_hash(event_id + date + visual_key), later without duplicates per rendered feed",
+  "selection_rule": "stable_hash(event_id + date + visual_key), only status=ready may be used by UI, later without duplicates per rendered feed",
   "live_usage": "Only entries with status=ready may be used by UI. Planned slots are documentation and asset backlog only.",
   "pools": {
-    "market_food": {
-      "label": "Markt, Food & Genuss",
-      "description": "Streetfood, Wochenmarkt, Genuss, Stadtfest mit Essensfokus",
-      "target_count": 7,
+    "textile_machines_industry": {
+      "label": "Textilmaschinen & Industriekultur",
+      "description": "Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+      "target_count": 8,
       "images": [
         {
-          "id": "market-food-01-16x9",
-          "src": "/assets/event-visuals/market-food-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "market-food-01"
-        },
-        {
-          "id": "market-food-01",
-          "src": "/assets/event-visuals/market-food-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "market-food-01-16x9"
-        },
-        {
-          "id": "market-food-02",
-          "src": "/assets/event-visuals/market-food-02.webp",
+          "id": "textile-machines-industry-01",
+          "src": "/assets/event-visuals/textile-machines-industry-01.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "market-food-03",
-          "src": "/assets/event-visuals/market-food-03.webp",
+          "id": "textile-machines-industry-02",
+          "src": "/assets/event-visuals/textile-machines-industry-02.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "market-food-04",
-          "src": "/assets/event-visuals/market-food-04.webp",
+          "id": "textile-machines-industry-03",
+          "src": "/assets/event-visuals/textile-machines-industry-03.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "market-food-05",
-          "src": "/assets/event-visuals/market-food-05.webp",
+          "id": "textile-machines-industry-04",
+          "src": "/assets/event-visuals/textile-machines-industry-04.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "market-food-06",
-          "src": "/assets/event-visuals/market-food-06.webp",
+          "id": "textile-machines-industry-05",
+          "src": "/assets/event-visuals/textile-machines-industry-05.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "market-food-07",
-          "src": "/assets/event-visuals/market-food-07.webp",
+          "id": "textile-machines-industry-06",
+          "src": "/assets/event-visuals/textile-machines-industry-06.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-machines-industry-07",
+          "src": "/assets/event-visuals/textile-machines-industry-07.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-machines-industry-08",
+          "src": "/assets/event-visuals/textile-machines-industry-08.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         }
       ]
     },
-    "city_festival": {
-      "label": "Stadtfest & Innenstadtleben",
-      "description": "Feste, Aktionstage, Innenstadtveranstaltungen, offene Stadtmomente",
-      "target_count": 6,
-      "images": [
-        {
-          "id": "city-festival-01-16x9",
-          "src": "/assets/event-visuals/city-festival-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "city-festival-01"
-        },
-        {
-          "id": "city-festival-01",
-          "src": "/assets/event-visuals/city-festival-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "city-festival-01-16x9"
-        },
-        {
-          "id": "city-festival-02",
-          "src": "/assets/event-visuals/city-festival-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "city-festival-03",
-          "src": "/assets/event-visuals/city-festival-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "city-festival-04",
-          "src": "/assets/event-visuals/city-festival-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "city-festival-05",
-          "src": "/assets/event-visuals/city-festival-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "city-festival-06",
-          "src": "/assets/event-visuals/city-festival-06.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "music_stage": {
-      "label": "Musik & Bühne",
-      "description": "Konzerte, Tanz, Live-Musik, Bühne, K-Pop und musikalische Workshops",
-      "target_count": 6,
-      "images": [
-        {
-          "id": "music-stage-01-16x9",
-          "src": "/assets/event-visuals/music-stage-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "music-stage-01"
-        },
-        {
-          "id": "music-stage-01",
-          "src": "/assets/event-visuals/music-stage-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "music-stage-01-16x9"
-        },
-        {
-          "id": "music-stage-02",
-          "src": "/assets/event-visuals/music-stage-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "music-stage-03",
-          "src": "/assets/event-visuals/music-stage-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "music-stage-04",
-          "src": "/assets/event-visuals/music-stage-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "music-stage-05",
-          "src": "/assets/event-visuals/music-stage-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "music-stage-06",
-          "src": "/assets/event-visuals/music-stage-06.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "culture_exhibition": {
-      "label": "Kultur, Ausstellung & Geschichte",
-      "description": "Museum, Ausstellung, Kunst, Geschichte, Führung, Textilwerk",
+    "textile_exhibition_design": {
+      "label": "Textil, Stoff & Design-Ausstellung",
+      "description": "Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
       "target_count": 5,
+      "images": [
+        {
+          "id": "textile-exhibition-design-01",
+          "src": "/assets/event-visuals/textile-exhibition-design-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-exhibition-design-02",
+          "src": "/assets/event-visuals/textile-exhibition-design-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-exhibition-design-03",
+          "src": "/assets/event-visuals/textile-exhibition-design-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-exhibition-design-04",
+          "src": "/assets/event-visuals/textile-exhibition-design-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "textile-exhibition-design-05",
+          "src": "/assets/event-visuals/textile-exhibition-design-05.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "art_exhibition_gallery": {
+      "label": "Kunst, Galerie & Kreativausstellung",
+      "description": "Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "art-exhibition-gallery-01",
+          "src": "/assets/event-visuals/art-exhibition-gallery-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "art-exhibition-gallery-02",
+          "src": "/assets/event-visuals/art-exhibition-gallery-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "art-exhibition-gallery-03",
+          "src": "/assets/event-visuals/art-exhibition-gallery-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "art-exhibition-gallery-04",
+          "src": "/assets/event-visuals/art-exhibition-gallery-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "local_history_heritage": {
+      "label": "Stadtgeschichte & Kulturerbe",
+      "description": "Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+      "target_count": 6,
       "images": [
         {
           "id": "culture-exhibition-01-16x9",
@@ -255,7 +179,8 @@
           "is_documentary": false,
           "review_status": "accepted_16x9_remaster",
           "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "culture-exhibition-01"
+          "supersedes": "culture-exhibition-01",
+          "legacy_visual_key": "culture_exhibition"
         },
         {
           "id": "culture-exhibition-01",
@@ -269,376 +194,50 @@
           "is_documentary": false,
           "review_status": "accepted_phase1_legacy_non_16_9",
           "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "culture-exhibition-01-16x9"
+          "superseded_by": "culture-exhibition-01-16x9",
+          "legacy_visual_key": "culture_exhibition"
         },
         {
-          "id": "culture-exhibition-02",
-          "src": "/assets/event-visuals/culture-exhibition-02.webp",
+          "id": "local-history-heritage-01",
+          "src": "/assets/event-visuals/local-history-heritage-01.webp",
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "culture_exhibition"
         },
         {
-          "id": "culture-exhibition-03",
-          "src": "/assets/event-visuals/culture-exhibition-03.webp",
+          "id": "local-history-heritage-02",
+          "src": "/assets/event-visuals/local-history-heritage-02.webp",
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "culture_exhibition"
         },
         {
-          "id": "culture-exhibition-04",
-          "src": "/assets/event-visuals/culture-exhibition-04.webp",
+          "id": "local-history-heritage-03",
+          "src": "/assets/event-visuals/local-history-heritage-03.webp",
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "culture_exhibition"
         },
         {
-          "id": "culture-exhibition-05",
-          "src": "/assets/event-visuals/culture-exhibition-05.webp",
+          "id": "local-history-heritage-04",
+          "src": "/assets/event-visuals/local-history-heritage-04.webp",
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "culture_exhibition"
         }
       ]
     },
-    "theater_show": {
-      "label": "Theater, Show & Lesung",
-      "description": "Theater, Comedy, Kabarett, Lesung, Showformate",
-      "target_count": 4,
-      "images": [
-        {
-          "id": "theater-show-01",
-          "src": "/assets/event-visuals/theater-show-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "theater-show-02",
-          "src": "/assets/event-visuals/theater-show-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "theater-show-03",
-          "src": "/assets/event-visuals/theater-show-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "theater-show-04",
-          "src": "/assets/event-visuals/theater-show-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "kids_family": {
-      "label": "Kinder & Familie",
-      "description": "Familienevents, Kinderangebote, Jugend, Mitmachaktionen",
-      "target_count": 6,
-      "images": [
-        {
-          "id": "kids-family-01-16x9",
-          "src": "/assets/event-visuals/kids-family-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "kids-family-01"
-        },
-        {
-          "id": "kids-family-01",
-          "src": "/assets/event-visuals/kids-family-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "kids-family-01-16x9"
-        },
-        {
-          "id": "kids-family-02",
-          "src": "/assets/event-visuals/kids-family-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "kids-family-03",
-          "src": "/assets/event-visuals/kids-family-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "kids-family-04",
-          "src": "/assets/event-visuals/kids-family-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "kids-family-05",
-          "src": "/assets/event-visuals/kids-family-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "kids-family-06",
-          "src": "/assets/event-visuals/kids-family-06.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "creative_workshop": {
-      "label": "Kreativ- & Mitmachworkshop",
-      "description": "Basteln, Malen, Bauen, Kurse, Kulturrucksack, kreative Workshops",
-      "target_count": 6,
-      "images": [
-        {
-          "id": "creative-workshop-01-16x9",
-          "src": "/assets/event-visuals/creative-workshop-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "creative-workshop-01"
-        },
-        {
-          "id": "creative-workshop-01",
-          "src": "/assets/event-visuals/creative-workshop-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "creative-workshop-01-16x9"
-        },
-        {
-          "id": "creative-workshop-02",
-          "src": "/assets/event-visuals/creative-workshop-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "creative-workshop-03",
-          "src": "/assets/event-visuals/creative-workshop-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "creative-workshop-04",
-          "src": "/assets/event-visuals/creative-workshop-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "creative-workshop-05",
-          "src": "/assets/event-visuals/creative-workshop-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "creative-workshop-06",
-          "src": "/assets/event-visuals/creative-workshop-06.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "sport_active": {
-      "label": "Sport & Bewegung",
-      "description": "Sportveranstaltungen, Bewegung, Radtouren, Läufe, Fitness",
-      "target_count": 5,
-      "images": [
-        {
-          "id": "sport-active-01-16x9",
-          "src": "/assets/event-visuals/sport-active-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "sport-active-01"
-        },
-        {
-          "id": "sport-active-01",
-          "src": "/assets/event-visuals/sport-active-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "sport-active-01-16x9"
-        },
-        {
-          "id": "sport-active-02",
-          "src": "/assets/event-visuals/sport-active-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "sport-active-03",
-          "src": "/assets/event-visuals/sport-active-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "sport-active-04",
-          "src": "/assets/event-visuals/sport-active-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "sport-active-05",
-          "src": "/assets/event-visuals/sport-active-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "outdoor_nature": {
-      "label": "Natur & draußen",
-      "description": "Natur, Wald, Park, Venn, Outdoor, Garten, Umwelt",
-      "target_count": 6,
-      "images": [
-        {
-          "id": "outdoor-nature-01-16x9",
-          "src": "/assets/event-visuals/outdoor-nature-01-16x9.webp",
-          "status": "ready",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_16x9_remaster",
-          "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "outdoor-nature-01"
-        },
-        {
-          "id": "outdoor-nature-01",
-          "src": "/assets/event-visuals/outdoor-nature-01.webp",
-          "status": "usable",
-          "source": "ai_generated",
-          "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
-          "source_type": "ai_generated",
-          "is_symbolic": true,
-          "is_documentary": false,
-          "review_status": "accepted_phase1_legacy_non_16_9",
-          "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "outdoor-nature-01-16x9"
-        },
-        {
-          "id": "outdoor-nature-02",
-          "src": "/assets/event-visuals/outdoor-nature-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "outdoor-nature-03",
-          "src": "/assets/event-visuals/outdoor-nature-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "outdoor-nature-04",
-          "src": "/assets/event-visuals/outdoor-nature-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "outdoor-nature-05",
-          "src": "/assets/event-visuals/outdoor-nature-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        },
-        {
-          "id": "outdoor-nature-06",
-          "src": "/assets/event-visuals/outdoor-nature-06.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
-        }
-      ]
-    },
-    "city_walk": {
-      "label": "Stadt, Tour & Route",
-      "description": "Stadtführung, Rundgang, Route, Architektur, Türme, Bocholt/Region entdecken",
+    "city_tour_history": {
+      "label": "Stadtführung & historischer Rundgang",
+      "description": "Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
       "target_count": 6,
       "images": [
         {
@@ -653,7 +252,8 @@
           "is_documentary": false,
           "review_status": "accepted_16x9_remaster",
           "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "city-walk-01"
+          "supersedes": "city-walk-01",
+          "legacy_visual_key": "city_walk"
         },
         {
           "id": "city-walk-01",
@@ -667,84 +267,1420 @@
           "is_documentary": false,
           "review_status": "accepted_phase1_legacy_non_16_9",
           "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "city-walk-01-16x9"
+          "superseded_by": "city-walk-01-16x9",
+          "legacy_visual_key": "city_walk"
         },
         {
-          "id": "city-walk-02",
-          "src": "/assets/event-visuals/city-walk-02.webp",
+          "id": "city-tour-history-01",
+          "src": "/assets/event-visuals/city-tour-history-01.webp",
           "status": "planned",
           "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_walk"
+        },
+        {
+          "id": "city-tour-history-02",
+          "src": "/assets/event-visuals/city-tour-history-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_walk"
+        },
+        {
+          "id": "city-tour-history-03",
+          "src": "/assets/event-visuals/city-tour-history-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_walk"
+        },
+        {
+          "id": "city-tour-history-04",
+          "src": "/assets/event-visuals/city-tour-history-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_walk"
+        },
+        {
+          "id": "city-tour-history-05",
+          "src": "/assets/event-visuals/city-tour-history-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_walk"
+        }
+      ]
+    },
+    "live_music_stage": {
+      "label": "Live-Musik & Bühne",
+      "description": "Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+      "target_count": 7,
+      "images": [
+        {
+          "id": "music-stage-01-16x9",
+          "src": "/assets/event-visuals/music-stage-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "music-stage-01",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "music-stage-01",
+          "src": "/assets/event-visuals/music-stage-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Musik- und Bühnen-Visual mit kleiner Live-Bühne, Instrumenten, warmem Licht und kleinstädtischer Eventatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "music-stage-01-16x9",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "live-music-stage-01",
+          "src": "/assets/event-visuals/live-music-stage-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "live-music-stage-02",
+          "src": "/assets/event-visuals/live-music-stage-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "live-music-stage-03",
+          "src": "/assets/event-visuals/live-music-stage-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "live-music-stage-04",
+          "src": "/assets/event-visuals/live-music-stage-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "live-music-stage-05",
+          "src": "/assets/event-visuals/live-music-stage-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "music_stage"
+        }
+      ]
+    },
+    "classical_music": {
+      "label": "Klassik, Chor & Orgel",
+      "description": "Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "classical-music-01",
+          "src": "/assets/event-visuals/classical-music-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "city-walk-03",
-          "src": "/assets/event-visuals/city-walk-03.webp",
+          "id": "classical-music-02",
+          "src": "/assets/event-visuals/classical-music-02.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "city-walk-04",
-          "src": "/assets/event-visuals/city-walk-04.webp",
+          "id": "classical-music-03",
+          "src": "/assets/event-visuals/classical-music-03.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "city-walk-05",
-          "src": "/assets/event-visuals/city-walk-05.webp",
+          "id": "classical-music-04",
+          "src": "/assets/event-visuals/classical-music-04.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "city-walk-06",
-          "src": "/assets/event-visuals/city-walk-06.webp",
+          "id": "classical-music-05",
+          "src": "/assets/event-visuals/classical-music-05.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         }
       ]
     },
-    "evening_social": {
-      "label": "Abend & sozial",
-      "description": "Quiz, Bar, Afterwork, Abendveranstaltung, lockeres Treffen",
+    "theater_stage": {
+      "label": "Theater & Bühne",
+      "description": "Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "theater-stage-01",
+          "src": "/assets/event-visuals/theater-stage-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "theater_show"
+        },
+        {
+          "id": "theater-stage-02",
+          "src": "/assets/event-visuals/theater-stage-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "theater_show"
+        },
+        {
+          "id": "theater-stage-03",
+          "src": "/assets/event-visuals/theater-stage-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "theater_show"
+        },
+        {
+          "id": "theater-stage-04",
+          "src": "/assets/event-visuals/theater-stage-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "theater_show"
+        },
+        {
+          "id": "theater-stage-05",
+          "src": "/assets/event-visuals/theater-stage-05.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "comedy_cabaret": {
+      "label": "Comedy & Kabarett",
+      "description": "Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
       "target_count": 4,
       "images": [
         {
-          "id": "evening-social-01",
-          "src": "/assets/event-visuals/evening-social-01.webp",
+          "id": "comedy-cabaret-01",
+          "src": "/assets/event-visuals/comedy-cabaret-01.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "evening-social-02",
-          "src": "/assets/event-visuals/evening-social-02.webp",
+          "id": "comedy-cabaret-02",
+          "src": "/assets/event-visuals/comedy-cabaret-02.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "evening-social-03",
-          "src": "/assets/event-visuals/evening-social-03.webp",
+          "id": "comedy-cabaret-03",
+          "src": "/assets/event-visuals/comedy-cabaret-03.webp",
           "status": "planned",
-          "source": "local_curated_pool",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         },
         {
-          "id": "evening-social-04",
-          "src": "/assets/event-visuals/evening-social-04.webp",
+          "id": "comedy-cabaret-04",
+          "src": "/assets/event-visuals/comedy-cabaret-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "film_screening": {
+      "label": "Film & Kino",
+      "description": "Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "film-screening-01",
+          "src": "/assets/event-visuals/film-screening-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "film-screening-02",
+          "src": "/assets/event-visuals/film-screening-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "film-screening-03",
+          "src": "/assets/event-visuals/film-screening-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "literature_reading_talk": {
+      "label": "Lesung, Literatur & Gespräch",
+      "description": "Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "literature-reading-talk-01",
+          "src": "/assets/event-visuals/literature-reading-talk-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "literature-reading-talk-02",
+          "src": "/assets/event-visuals/literature-reading-talk-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "literature-reading-talk-03",
+          "src": "/assets/event-visuals/literature-reading-talk-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "literature-reading-talk-04",
+          "src": "/assets/event-visuals/literature-reading-talk-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "kids_stage_story": {
+      "label": "Kinderbühne & Geschichten",
+      "description": "Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "kids-stage-story-01",
+          "src": "/assets/event-visuals/kids-stage-story-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-stage-story-02",
+          "src": "/assets/event-visuals/kids-stage-story-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-stage-story-03",
+          "src": "/assets/event-visuals/kids-stage-story-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kids-stage-story-04",
+          "src": "/assets/event-visuals/kids-stage-story-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "city_festival_street": {
+      "label": "Stadtfest & Innenstadtaktion",
+      "description": "Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+      "target_count": 7,
+      "images": [
+        {
+          "id": "city-festival-01-16x9",
+          "src": "/assets/event-visuals/city-festival-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "city-festival-01",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-01",
+          "src": "/assets/event-visuals/city-festival-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit Zelt, Lichtern, Stehtischen und kleinstädtischer Innenstadtatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "city-festival-01-16x9",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-street-01",
+          "src": "/assets/event-visuals/city-festival-street-01.webp",
           "status": "planned",
           "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-street-02",
+          "src": "/assets/event-visuals/city-festival-street-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-street-03",
+          "src": "/assets/event-visuals/city-festival-street-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-street-04",
+          "src": "/assets/event-visuals/city-festival-street-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_festival"
+        },
+        {
+          "id": "city-festival-street-05",
+          "src": "/assets/event-visuals/city-festival-street-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "city_festival"
+        }
+      ]
+    },
+    "open_air_festival": {
+      "label": "Open-Air-Festival & Außenbühne",
+      "description": "Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "open-air-festival-01",
+          "src": "/assets/event-visuals/open-air-festival-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "open-air-festival-02",
+          "src": "/assets/event-visuals/open-air-festival-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "open-air-festival-03",
+          "src": "/assets/event-visuals/open-air-festival-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "open-air-festival-04",
+          "src": "/assets/event-visuals/open-air-festival-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "open-air-festival-05",
+          "src": "/assets/event-visuals/open-air-festival-05.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "kirmes_funfair": {
+      "label": "Kirmes & Volksfest",
+      "description": "Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "kirmes-funfair-01",
+          "src": "/assets/event-visuals/kirmes-funfair-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kirmes-funfair-02",
+          "src": "/assets/event-visuals/kirmes-funfair-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kirmes-funfair-03",
+          "src": "/assets/event-visuals/kirmes-funfair-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "kirmes-funfair-04",
+          "src": "/assets/event-visuals/kirmes-funfair-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "parade_festzug": {
+      "label": "Parade, CSD & Festzug",
+      "description": "Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "parade-festzug-01",
+          "src": "/assets/event-visuals/parade-festzug-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "parade-festzug-02",
+          "src": "/assets/event-visuals/parade-festzug-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "parade-festzug-03",
+          "src": "/assets/event-visuals/parade-festzug-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "parade-festzug-04",
+          "src": "/assets/event-visuals/parade-festzug-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "shooting_festival_tradition": {
+      "label": "Schützenfest & Tradition",
+      "description": "Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "shooting-festival-tradition-01",
+          "src": "/assets/event-visuals/shooting-festival-tradition-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "shooting-festival-tradition-02",
+          "src": "/assets/event-visuals/shooting-festival-tradition-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "shooting-festival-tradition-03",
+          "src": "/assets/event-visuals/shooting-festival-tradition-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "market_stalls": {
+      "label": "Märkte & Stände",
+      "description": "Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "market-stalls-01",
+          "src": "/assets/event-visuals/market-stalls-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-stalls-02",
+          "src": "/assets/event-visuals/market-stalls-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-stalls-03",
+          "src": "/assets/event-visuals/market-stalls-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-stalls-04",
+          "src": "/assets/event-visuals/market-stalls-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-stalls-05",
+          "src": "/assets/event-visuals/market-stalls-05.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "market-stalls-06",
+          "src": "/assets/event-visuals/market-stalls-06.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "book_market": {
+      "label": "Bücher- & Boekenmarkt",
+      "description": "Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "book-market-01",
+          "src": "/assets/event-visuals/book-market-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "book-market-02",
+          "src": "/assets/event-visuals/book-market-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "book-market-03",
+          "src": "/assets/event-visuals/book-market-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "food_drink_festival": {
+      "label": "Food, Wein & Genuss",
+      "description": "Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "market-food-01-16x9",
+          "src": "/assets/event-visuals/market-food-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "market-food-01",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "market-food-01",
+          "src": "/assets/event-visuals/market-food-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Markt- und Genuss-Visual mit Brot, Käse, Kräutern, regionalen Produkten und hochwertiger Marktstandatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "market-food-01-16x9",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-01",
+          "src": "/assets/event-visuals/food-drink-festival-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-02",
+          "src": "/assets/event-visuals/food-drink-festival-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-03",
+          "src": "/assets/event-visuals/food-drink-festival-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-04",
+          "src": "/assets/event-visuals/food-drink-festival-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-05",
+          "src": "/assets/event-visuals/food-drink-festival-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "food-drink-festival-06",
+          "src": "/assets/event-visuals/food-drink-festival-06.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "market_food"
+        }
+      ]
+    },
+    "country_fair_rural": {
+      "label": "Country Fair & Landpartie",
+      "description": "Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "country-fair-rural-01",
+          "src": "/assets/event-visuals/country-fair-rural-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "country-fair-rural-02",
+          "src": "/assets/event-visuals/country-fair-rural-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "country-fair-rural-03",
+          "src": "/assets/event-visuals/country-fair-rural-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "family_play_outdoor": {
+      "label": "Familie, Spiel & draußen",
+      "description": "Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+      "target_count": 6,
+      "images": [
+        {
+          "id": "kids-family-01-16x9",
+          "src": "/assets/event-visuals/kids-family-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "kids-family-01",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "kids-family-01",
+          "src": "/assets/event-visuals/kids-family-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Familien- und Kinderangebot-Visual mit Basteltisch, Buntstiften, Holzspielzeug und ruhiger Outdoor-Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "kids-family-01-16x9",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "family-play-outdoor-01",
+          "src": "/assets/event-visuals/family-play-outdoor-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "family-play-outdoor-02",
+          "src": "/assets/event-visuals/family-play-outdoor-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "family-play-outdoor-03",
+          "src": "/assets/event-visuals/family-play-outdoor-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "family-play-outdoor-04",
+          "src": "/assets/event-visuals/family-play-outdoor-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "kids_family"
+        },
+        {
+          "id": "family-play-outdoor-05",
+          "src": "/assets/event-visuals/family-play-outdoor-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "kids_family"
+        }
+      ]
+    },
+    "creative_making_workshop": {
+      "label": "Kreativ- & Mitmachworkshop",
+      "description": "Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "creative-workshop-01-16x9",
+          "src": "/assets/event-visuals/creative-workshop-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "creative-workshop-01",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-workshop-01",
+          "src": "/assets/event-visuals/creative-workshop-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kreativworkshop-Visual mit Arbeitstisch, Stoff, Papier, Pinseln, Schere und handwerklicher Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "creative-workshop-01-16x9",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-making-workshop-01",
+          "src": "/assets/event-visuals/creative-making-workshop-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-making-workshop-02",
+          "src": "/assets/event-visuals/creative-making-workshop-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-making-workshop-03",
+          "src": "/assets/event-visuals/creative-making-workshop-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-making-workshop-04",
+          "src": "/assets/event-visuals/creative-making-workshop-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "creative_workshop"
+        },
+        {
+          "id": "creative-making-workshop-05",
+          "src": "/assets/event-visuals/creative-making-workshop-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "creative_workshop"
+        }
+      ]
+    },
+    "learning_science_workshop": {
+      "label": "Lernen, Wissen & Junge Uni",
+      "description": "Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "learning-science-workshop-01",
+          "src": "/assets/event-visuals/learning-science-workshop-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "learning-science-workshop-02",
+          "src": "/assets/event-visuals/learning-science-workshop-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "learning-science-workshop-03",
+          "src": "/assets/event-visuals/learning-science-workshop-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "learning-science-workshop-04",
+          "src": "/assets/event-visuals/learning-science-workshop-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "dance_music_workshop": {
+      "label": "Tanz-, Musik- & Performance-Workshop",
+      "description": "K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "dance-music-workshop-01",
+          "src": "/assets/event-visuals/dance-music-workshop-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "dance-music-workshop-02",
+          "src": "/assets/event-visuals/dance-music-workshop-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "dance-music-workshop-03",
+          "src": "/assets/event-visuals/dance-music-workshop-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "active_route_tour": {
+      "label": "Aktive Tour & Route",
+      "description": "Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "sport-active-01-16x9",
+          "src": "/assets/event-visuals/sport-active-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "sport-active-01",
+          "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "sport-active-01",
+          "src": "/assets/event-visuals/sport-active-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Sport- und Bewegungs-Visual mit Laufschuhen, Trinkflasche, Fahrrad und lokalem Aktivtreff im Grünen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "sport-active-01-16x9",
+          "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "active-route-tour-01",
+          "src": "/assets/event-visuals/active-route-tour-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "active-route-tour-02",
+          "src": "/assets/event-visuals/active-route-tour-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "active-route-tour-03",
+          "src": "/assets/event-visuals/active-route-tour-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "active-route-tour-04",
+          "src": "/assets/event-visuals/active-route-tour-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "sport_active"
+        }
+      ]
+    },
+    "running_event": {
+      "label": "Laufveranstaltung",
+      "description": "Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "running-event-01",
+          "src": "/assets/event-visuals/running-event-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "running-event-02",
+          "src": "/assets/event-visuals/running-event-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "running-event-03",
+          "src": "/assets/event-visuals/running-event-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "cycling_event": {
+      "label": "Radveranstaltung & Radsport",
+      "description": "Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "cycling-event-01",
+          "src": "/assets/event-visuals/cycling-event-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "cycling-event-02",
+          "src": "/assets/event-visuals/cycling-event-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "cycling-event-03",
+          "src": "/assets/event-visuals/cycling-event-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "indoor_sport_competition": {
+      "label": "Indoor-Sport & Wettbewerb",
+      "description": "Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "indoor-sport-competition-01",
+          "src": "/assets/event-visuals/indoor-sport-competition-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "indoor-sport-competition-02",
+          "src": "/assets/event-visuals/indoor-sport-competition-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "indoor-sport-competition-03",
+          "src": "/assets/event-visuals/indoor-sport-competition-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "nature_learning_wildlife": {
+      "label": "Natur, Tiere & Umweltbildung",
+      "description": "Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+      "target_count": 5,
+      "images": [
+        {
+          "id": "outdoor-nature-01-16x9",
+          "src": "/assets/event-visuals/outdoor-nature-01-16x9.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_16x9_remaster",
+          "card_asset_format": "16:9_webp_1200x675",
+          "supersedes": "outdoor-nature-01",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "outdoor-nature-01",
+          "src": "/assets/event-visuals/outdoor-nature-01.webp",
+          "status": "usable",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Natur-Visual mit ruhigem Weg, Wasserlauf, Ufergrün und regional plausibler Park- oder Waldkante.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_legacy_non_16_9",
+          "legacy_reason": "superseded_by_16x9_card_asset",
+          "superseded_by": "outdoor-nature-01-16x9",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "nature-learning-wildlife-01",
+          "src": "/assets/event-visuals/nature-learning-wildlife-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "nature-learning-wildlife-02",
+          "src": "/assets/event-visuals/nature-learning-wildlife-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "nature-learning-wildlife-03",
+          "src": "/assets/event-visuals/nature-learning-wildlife-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "nature-learning-wildlife-04",
+          "src": "/assets/event-visuals/nature-learning-wildlife-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "nature-learning-wildlife-05",
+          "src": "/assets/event-visuals/nature-learning-wildlife-05.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "outdoor_nature"
+        }
+      ]
+    },
+    "evening_social_party": {
+      "label": "Abend, Tanz & Party",
+      "description": "Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "evening-social-party-01",
+          "src": "/assets/event-visuals/evening-social-party-01.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "evening_social"
+        },
+        {
+          "id": "evening-social-party-02",
+          "src": "/assets/event-visuals/evening-social-party-02.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "evening_social"
+        },
+        {
+          "id": "evening-social-party-03",
+          "src": "/assets/event-visuals/evening-social-party-03.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "evening_social"
+        },
+        {
+          "id": "evening-social-party-04",
+          "src": "/assets/event-visuals/evening-social-party-04.webp",
+          "status": "planned",
+          "source": "local_curated_pool",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": "",
+          "legacy_visual_key": "evening_social"
+        }
+      ]
+    },
+    "business_messe_info": {
+      "label": "Messe, Info & Business",
+      "description": "Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+      "target_count": 4,
+      "images": [
+        {
+          "id": "business-messe-info-01",
+          "src": "/assets/event-visuals/business-messe-info-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "business-messe-info-02",
+          "src": "/assets/event-visuals/business-messe-info-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "business-messe-info-03",
+          "src": "/assets/event-visuals/business-messe-info-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "business-messe-info-04",
+          "src": "/assets/event-visuals/business-messe-info-04.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        }
+      ]
+    },
+    "vehicle_classic": {
+      "label": "Oldtimer & Fahrzeuge",
+      "description": "Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+      "target_count": 3,
+      "images": [
+        {
+          "id": "vehicle-classic-01",
+          "src": "/assets/event-visuals/vehicle-classic-01.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "vehicle-classic-02",
+          "src": "/assets/event-visuals/vehicle-classic-02.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "owned_or_cleared_required_before_ready",
+          "alt": ""
+        },
+        {
+          "id": "vehicle-classic-03",
+          "src": "/assets/event-visuals/vehicle-classic-03.webp",
+          "status": "planned",
+          "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
         }
@@ -752,7 +1688,7 @@
     },
     "default_city": {
       "label": "Allgemeines Bocholt-Visual",
-      "description": "Neutraler hochwertiger Fallback für unklare Events",
+      "description": "Hochwertiger neutraler lokaler Fallback für unklare Events",
       "target_count": 6,
       "images": [
         {
@@ -765,7 +1701,8 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "replaced_by_default_city_02"
+          "review_status": "replaced_by_default_city_02",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-02-16x9",
@@ -779,7 +1716,8 @@
           "is_documentary": false,
           "review_status": "accepted_16x9_remaster",
           "card_asset_format": "16:9_webp_1200x675",
-          "supersedes": "default-city-02"
+          "supersedes": "default-city-02",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-02",
@@ -793,7 +1731,8 @@
           "is_documentary": false,
           "review_status": "accepted_phase1_legacy_non_16_9",
           "legacy_reason": "superseded_by_16x9_card_asset",
-          "superseded_by": "default-city-02-16x9"
+          "superseded_by": "default-city-02-16x9",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-03",
@@ -801,7 +1740,8 @@
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-04",
@@ -809,7 +1749,8 @@
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-05",
@@ -817,7 +1758,8 @@
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "default_city"
         },
         {
           "id": "default-city-06",
@@ -825,7 +1767,8 @@
           "status": "planned",
           "source": "local_curated_pool",
           "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "alt": "",
+          "legacy_visual_key": "default_city"
         }
       ]
     }
