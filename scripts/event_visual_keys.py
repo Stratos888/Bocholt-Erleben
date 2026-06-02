@@ -110,7 +110,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(farm\s*&\s*country\s*fair|country\s*fair|landpartie|landmesse)\b"):
         return "country_fair_rural"
 
-    if match(r"\b(boekenmarkt|büchermarkt|buechermarkt|buchmarkt|antiquariat)\b"):
+    if match(r"\b(boekenmarkt|herfstboekenmarkt|zomerboekenmarkt|büchermarkt|buechermarkt|buchmarkt|antiquariat)\b"):
         return "book_market"
 
     if match(r"\b(weinfest|wijnfeest|wine tasting|street ?food|food ?festival|city food festival|genuss|kulinarik|kulinarisch)\b"):
@@ -132,11 +132,14 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(kunstausstellung|kunstmarkt|vernissage|galerie|kreativausstellung|schloss ringenberg)\b"):
         return "art_exhibition_gallery"
 
+    if match(r"\b(aasee[- ]?festival|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
+        return "open_air_festival"
+
+    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
+        return "city_tour_history"
+
     if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
         return "nature_learning_wildlife"
-
-    if match(r"\b(stadtführung|stadtfuehrung|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
-        return "city_tour_history"
 
     # 3) Bühne, Sprache, Film.
     if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
