@@ -213,6 +213,111 @@ const EventCards = (() => {
   }
   /* === END BLOCK: HTML_ESCAPE (pure helper) === */
 
+  /* === BEGIN BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 | Zweck: normalisiert ready Event-Visuals fuer den normalen /events/ Feed; Umfang: lokaler Pool-State, stabile Auswahl, kein usable/planned Rendering === */
+  let readyVisualPools = Object.freeze(Object.create(null));
+
+  function normalizeLookupKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  function normalizeLocalAssetUrl(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+
+    try {
+      const url = new URL(raw, window.location.href);
+      if (url.origin !== window.location.origin) return "";
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function stableHash(value) {
+    const textValue = String(value || "");
+    let hash = 2166136261;
+
+    for (let index = 0; index < textValue.length; index += 1) {
+      hash ^= textValue.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    return hash >>> 0;
+  }
+
+  function buildReadyVisualPools(payload) {
+    const pools = payload && typeof payload === "object" ? payload.pools : null;
+    const out = Object.create(null);
+
+    if (!pools || typeof pools !== "object") {
+      return Object.freeze(out);
+    }
+
+    Object.entries(pools).forEach(([visualKey, pool]) => {
+      const key = normalizeLookupKey(visualKey);
+      const images = Array.isArray(pool?.images) ? pool.images : [];
+
+      const readyImages = images
+        .filter((image) => image && String(image.status || "").trim() === "ready")
+        .map((image) => {
+          const src = normalizeLocalAssetUrl(image.src);
+          if (!src) return null;
+
+          return Object.freeze({
+            id: String(image.id || "").trim(),
+            src,
+            alt: String(image.alt || "").trim()
+          });
+        })
+        .filter(Boolean);
+
+      if (key && readyImages.length) {
+        out[key] = Object.freeze(readyImages);
+      }
+    });
+
+    return Object.freeze(out);
+  }
+
+  function setVisualPools(payload) {
+    readyVisualPools = buildReadyVisualPools(payload);
+  }
+
+  function getEventVisualKey(event) {
+    return normalizeLookupKey(event?.visual_key || event?.image_visual_key || event?.visualKey || "");
+  }
+
+  function resolveEventVisual(event) {
+    const visualKey = getEventVisualKey(event);
+    const pool = visualKey ? readyVisualPools[visualKey] : null;
+
+    if (!Array.isArray(pool) || pool.length === 0) {
+      return null;
+    }
+
+    const seed = [
+      event?.id,
+      event?.date || event?.datum,
+      event?.endDate,
+      event?.title || event?.eventName,
+      visualKey
+    ]
+      .map((part) => String(part || "").trim())
+      .join("|");
+
+    const selected = pool[stableHash(seed) % pool.length];
+    if (!selected?.src) return null;
+
+    return selected;
+  }
+  /* === END BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 === */
+
   function ensureContainer() {
     if (!container) container = document.getElementById("event-cards");
     return container;
@@ -331,6 +436,11 @@ function createCard(event) {
     return "Bocholt";
   };
   const city = resolveCity(event);
+  const cardVisual = resolveEventVisual(event);
+
+  if (cardVisual) {
+    card.classList.add("event-card--with-media");
+  }
 
   let dateLabel = "";
 
@@ -552,6 +662,24 @@ function createCard(event) {
   if (actions.childNodes.length) body.appendChild(actions);
 
   card.appendChild(badge);
+
+  if (cardVisual) {
+    const media = document.createElement("figure");
+    media.className = "event-card-media";
+
+    const image = document.createElement("img");
+    image.className = "event-card-media__img";
+    image.src = cardVisual.src;
+    image.alt = cardVisual.alt || "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.width = 1200;
+    image.height = 675;
+
+    media.appendChild(image);
+    card.appendChild(media);
+  }
+
   card.appendChild(body);
 
   /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
@@ -933,7 +1061,7 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
     render(events);
   }
 
-  return { render, refresh, renderSkeleton };
+  return { render, refresh, renderSkeleton, setVisualPools };
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS

@@ -1463,6 +1463,77 @@
   /* === END BLOCK: HOME_SHARED_FEED_SURFACE_TOKEN_CONSUMERS_V1 === */
 }
 
+/* === BEGIN BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 | Zweck: zeigt ready 16:9-Event-Visuals im normalen /events/ Feed als Premium-Card-Media; Umfang: nur EventCards mit .event-card--with-media, keine Activity-/Today-Visuals === */
+body.is-tabbar-hidden .event-card.event-card--with-media{
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+  column-gap: 0;
+  align-items: stretch;
+  min-height: 0;
+  padding: 0;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media::before{
+  content: none;
+  display: none;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+
+  justify-self: start;
+  align-self: start;
+
+  background: color-mix(in srgb, white 88%, var(--home-action-bg-start) 12%);
+  box-shadow:
+    inset 0 0 0 1px rgba(24,40,30,0.070),
+    inset 0 1px 0 rgba(255,255,255,0.88),
+    0 8px 20px rgba(12,24,18,0.14);
+}
+
+body.is-tabbar-hidden .event-card-media{
+  grid-column: 1 / -1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  overflow: hidden;
+
+  background: linear-gradient(135deg, var(--home-rail-bg-start), var(--home-rail-bg-end));
+  border-radius: calc(var(--radius-eventcard) - 1px) calc(var(--radius-eventcard) - 1px) 0 0;
+}
+
+body.is-tabbar-hidden .event-card-media__img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
+  grid-column: 1 / -1;
+  padding: 14px 14px 16px;
+}
+
+@media (max-width: 899.98px){
+  body.is-tabbar-hidden .event-card.event-card--with-media{
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
+    top: 10px;
+    left: 10px;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
+    padding: 12px 12px 13px;
+  }
+}
+/* === END BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 === */
+
 /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 | Zweck: stabilisiert auf 900–1024px die adaptive Copy-Surface gegen unterschiedliche Bildhelligkeit, damit Angebote nicht weißer wirkt als Events, ohne Geometrie oder Rail-Contract zu verändern; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
   body.is-tabbar-hidden,
