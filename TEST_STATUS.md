@@ -1956,3 +1956,74 @@ Bewertung:
 - Kein Freeze: Today Home bleibt offen für Premium Completion.
 - Nächster Hauptpunkt nach Today Home Premium Completion: Eventbilder konsistent in den normalen Events Feed übernehmen.
 <!-- === END BLOCK: TEST_STATUS_TODAY_HOME_EVENT_VISUALS_AND_TODAY_ONLY_EVENTS_2026_06_01 === -->
+
+<!-- === BEGIN BLOCK: EVENT_VISUAL_KEYS_V31_STAGING_PROOF_2026_06_02 | Zweck: dokumentiert den getesteten Staging-Proof fuer Event-Visual-Key-System V3.1 und Restzuordnung === -->
+## Event Visual Keys V3.1 – Staging-Proof 2026-06-02
+
+Status: bestanden.
+
+Geprüfter Stand:
+- Branch: `staging`
+- letzter bestätigter Commit: `8b41f06`
+- Commit: `Schaerfe Event Visual Key Restzuordnung nach`
+- bestätigter Staging-Build: `8b41f067a3ca`
+
+Relevante Commit-Kette:
+- `1b7b73f` – Event Visuals in Feed Cards integriert
+- `ad81c00` – Event Visual Keys V3.1 konsolidiert
+- `aa68d8c` – Event Visual Key Inferenz nachgeschärft
+- `8b41f06` – sichere Restzuordnung nachgeschärft
+
+Geprüfte Audits vor V3.1-Commit:
+- `python scripts/audit-event-visual-pool.py` → OK
+- `python scripts/audit-event-visual-asset-brief.py` → OK
+- `python scripts/audit-event-visual-ai-style-guide.py` → OK
+- `python scripts/audit-event-visual-generation-batches.py` → OK mit 24/24 Requests
+- Python-Compile der relevanten Build-/Audit-Skripte → OK
+- `git diff --check` → OK
+
+Geprüfte Vertragsstände:
+- `data/event_visual_pool.json`: 34 / 34 Keys, 156 Zielslots
+- `data/event_visual_asset_brief.json`: 34 / 34 Keys, 156 Slot-Briefs
+- `data/event_visual_ai_style_guide.json`: 34 Visual-Key-Regeln
+- `data/event_visual_phase1_plan.tsv`: 24 fehlende Basis-Visuals
+- `data/event_visual_generation_batches_phase1.json`: 24 Requests in 4 Batches
+- `scripts/audit-event-visual-generation-batches.py`: OK-Text dynamisch auf tatsächliche Request-Anzahl korrigiert
+
+Staging-Deploy-Prüfung:
+- Deploy nach `ad81c00` erfolgreich
+- Deploy nach `aa68d8c` erfolgreich
+- Deploy nach `8b41f06` erfolgreich
+- `https://staging.bocholt-erleben.de/meta/build.txt` lieferte `8b41f067a3ca`
+
+Geprüfte deployte Eventdaten nach finalem Fix:
+- `Bewegte Geschichte - Kostümierte Stadtführungen 2/2` → `city_tour_history`
+- `Aasee-Festival` → `open_air_festival`
+- `Internationale Herfstboekenmarkt` → `book_market`
+
+Weitere geprüfte Inferenzfälle:
+- `Issel unplugged - Stadtturm Open Air...` → `live_music_stage`
+- `K-Pop Power! Sing & Dance Workshop` → `dance_music_workshop`
+- `Textile Revolution – Stoffe für die Zukunft` → `textile_exhibition_design`
+- `20. Sparkassen MünsterlandGiro - Profistart` → `cycling_event`
+- `Führung Lebenselixier Wasser... Pröbstingsee` → `nature_learning_wildlife`
+- `AaltenDagen` → `city_festival_street`
+- `Innenstadtsommer` → `city_festival_street`
+- `Bokeltsen Treff 2026` → `city_festival_street`
+
+Bewertung:
+- V3.1 ist technisch konsistent.
+- Die deployten Staging-Daten verwenden keine alten 12er-Visual-Keys mehr.
+- Die geprüften Restfehler sind korrigiert.
+- Der Stand ist für die nächste Bildproduktionsrunde geeignet.
+
+Offen / nicht Teil dieses Proofs:
+- Noch keine Produktion der 24 fehlenden V3.1-Basis-Visuals.
+- Noch kein finales Mobile-Card-Layout.
+- Noch keine Duplicate-Vermeidungslogik im Feed.
+- Noch kein Production-Deploy dieses Visual-Systems.
+- Scheduled-Workflow-Fehler auf Staging wurden nicht als Teil dieses Proofs gelöst, da sie nicht den erfolgreichen Staging-Deploy betreffen.
+
+Nächster Schritt:
+- 24 fehlende Basis-Visuals aus `data/event_visual_generation_batches_phase1.json` erzeugen und einzeln im Card-Kontext prüfen.
+<!-- === END BLOCK: EVENT_VISUAL_KEYS_V31_STAGING_PROOF_2026_06_02 === -->

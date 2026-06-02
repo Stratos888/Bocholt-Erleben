@@ -161,3 +161,168 @@ Audit:
 3. Activity Visual Pool in Offers integrieren.
 4. Detailpanel- und Hero-Bildlogik separat entscheiden.
 5. Today Home final visuell prüfen.
+
+<!-- === BEGIN BLOCK: EVENT_VISUAL_KEYS_V31_CONTRACT_2026_06_02 | Zweck: dokumentiert den verbindlichen V3.1-Zielzustand fuer Event-Visual-Keys, Bildproduktion und kuenftige Visual-Arbeit === -->
+## Event Visual Keys V3.1 – verbindlicher Zielzustand
+
+Status: umgesetzt auf `staging` und fachlich gegen den aktuellen Staging-Feed nachgeschärft.
+
+Bestätigter Repo-/Deploy-Stand:
+- `1b7b73f` – `Integriere Event Visuals in Feed Cards`
+- `ad81c00` – `Konsolidiere Event Visual Keys V3.1`
+- `aa68d8c` – `Schaerfe Event Visual Key Inferenz nach`
+- `8b41f06` – `Schaerfe Event Visual Key Restzuordnung nach`
+- bestätigter Staging-Build nach letzter Nachschärfung: `8b41f067a3ca`
+
+### Produktentscheidung
+
+Langfristiges Ziel ist ein konsistent voll bebilderter Event-Feed auf Premium-Niveau.
+
+Für Event-Cards gilt:
+- Eventkarten sollen perspektivisch grundsätzlich ein Premium-Visual tragen.
+- Keine dauerhafte Mischlogik „manche Events mit Bild, manche ohne Bild“, weil das wie redaktionelle Gewichtung, fehlende Pflege oder Zufall wirken kann.
+- Mobile-Platzbedarf wird später über ein kompakteres Card-Layout gelöst, nicht über selektives Entfernen von Bildern.
+- Schwache oder generische Bilder dürfen nicht als `ready` markiert werden.
+- `ready` bedeutet: visuell akzeptiert, rechtlich/produktionslogisch sauber, WebP, echtes 16:9, card-tauglich, audit-konform.
+- Planned-Slots werden nie live genutzt.
+- Dopplungslogik im Feed ist ein späteres Quality-Gate vor Production, nicht der erste Staging-Fix.
+
+### Visual-Key-System V3.1
+
+Die frühere 12er-Taxonomie war zu grob. Eine reine 20er-Taxonomie blieb für Kultur, Bühne/Sprache, Sport, Feste sowie Familien-/Workshopformate noch zu unscharf.
+
+V3.1 verwendet 34 kontrollierte Event-Visual-Keys. Diese gelten aktuell als bester Zielzustand:
+- detailliert genug für passendere Premium-Bilder
+- noch regelbasiert und automatisch inferierbar
+- nicht auf einzelne Eventnamen zugeschnitten
+- pflegbar über Bildfamilien und Slot-Briefs
+
+Zentrale Datei:
+- `scripts/event_visual_keys.py`
+
+Vertragsdateien:
+- `data/event_visual_pool.json`
+- `data/event_visual_asset_brief.json`
+- `data/event_visual_ai_style_guide.json`
+- `data/event_visual_phase1_plan.tsv`
+- `data/event_visual_generation_batches_phase1.json`
+
+Audit-Dateien:
+- `scripts/audit-event-visual-pool.py`
+- `scripts/audit-event-visual-asset-brief.py`
+- `scripts/audit-event-visual-ai-style-guide.py`
+- `scripts/audit-event-visual-generation-batches.py`
+
+### V3.1-Key-Familien
+
+Kultur, Museum, Geschichte:
+- `textile_machines_industry`
+- `textile_exhibition_design`
+- `art_exhibition_gallery`
+- `local_history_heritage`
+- `city_tour_history`
+
+Musik, Bühne, Sprache:
+- `live_music_stage`
+- `classical_music`
+- `theater_stage`
+- `comedy_cabaret`
+- `film_screening`
+- `literature_reading_talk`
+- `kids_stage_story`
+
+Feste, Märkte, Stadtleben:
+- `city_festival_street`
+- `open_air_festival`
+- `kirmes_funfair`
+- `parade_festzug`
+- `shooting_festival_tradition`
+- `market_stalls`
+- `book_market`
+- `food_drink_festival`
+- `country_fair_rural`
+
+Kinder, Familie, Lernen, Workshops:
+- `family_play_outdoor`
+- `creative_making_workshop`
+- `learning_science_workshop`
+- `dance_music_workshop`
+
+Sport, Bewegung, Natur:
+- `active_route_tour`
+- `running_event`
+- `cycling_event`
+- `indoor_sport_competition`
+- `nature_learning_wildlife`
+
+Sonstige:
+- `evening_social_party`
+- `business_messe_info`
+- `vehicle_classic`
+- `default_city`
+
+### Inferenzregeln
+
+Für `scripts/event_visual_keys.py` gilt:
+- Starker Eventtyp vor Kategorie.
+- Eventtyp vor Location.
+- Location darf eine klare Eventtyp-Zuordnung nicht überschreiben.
+- TextilWerk als Location darf nicht automatisch `textile_machines_industry` auslösen.
+- Alte Legacy-Keys dürfen nur historisch normalisiert werden; Zielzustand bleibt V3.1.
+- Unsichere Restzuordnungen nicht raten, sondern nur mit Titel/Beschreibung/Quelle patchen.
+
+Nachgeschärfte geprüfte Fälle:
+- `Issel unplugged - Stadtturm Open Air...` → `live_music_stage`
+- `K-Pop Power! Sing & Dance Workshop` → `dance_music_workshop`
+- `Textile Revolution – Stoffe für die Zukunft` → `textile_exhibition_design`
+- `20. Sparkassen MünsterlandGiro - Profistart` → `cycling_event`
+- `Führung Lebenselixier Wasser... Pröbstingsee` → `nature_learning_wildlife`
+- `AaltenDagen` → `city_festival_street`
+- `Bokeltsen Treff 2026` → `city_festival_street`
+- `Bewegte Geschichte - Kostümierte Stadtführungen 2/2` → `city_tour_history`
+- `Aasee-Festival` → `open_air_festival`
+- `Internationale Herfstboekenmarkt` → `book_market`
+
+### Datenprozess
+
+Die gepflegte redaktionelle Quelle ist nicht `data/events.tsv` im Repo.
+
+Aktueller Prozess:
+1. KI-Suche schreibt Kandidaten nach `data/inbox_manual.json`.
+2. Manual Intake schreibt Kandidaten in den Google-Sheet-Tab `Inbox`.
+3. Kuratierte Events gehen in den Google-Sheet-Tab `Events`.
+4. Deploy exportiert den Google-Sheet-Tab `Events` temporär nach `data/events.tsv`.
+5. Daraus wird während des Deploys `data/events.json` gebaut.
+6. Die Website nutzt das deployte `data/events.json`.
+
+Konsequenz:
+- `data/events.tsv` ist technische Zwischenquelle im Deploy, nicht primäre redaktionelle Repo-Quelle.
+- Bei Visual-Key-Problemen zuerst `scripts/build-events-from-tsv.py` und `scripts/event_visual_keys.py` prüfen.
+- Prüfen, ob `kategorie`, `description`, `title` und `location` korrekt in die Inferenz laufen.
+
+### Bildproduktion ab V3.1
+
+Aktueller Vertrag:
+- `data/event_visual_pool.json`: 34 Keys, 156 Zielslots
+- vorhandene Ready-/Usable-Assets wurden migriert
+- Planned-Slots wurden auf V3.1-Dateinamen normalisiert
+- `data/event_visual_phase1_plan.tsv`: 24 fehlende Basis-Visuals
+- `data/event_visual_generation_batches_phase1.json`: 24 Requests in 4 Batches
+
+Nächster fachlicher Schritt:
+- Die 24 fehlenden V3.1-Basis-Visuals aus `data/event_visual_generation_batches_phase1.json` produzieren.
+- Jedes Bild einzeln visuell prüfen.
+- Erst nach Review als `ready` markieren.
+- Danach Staging-Feed erneut visuell im echten Card-Kontext prüfen.
+
+### Staging-/Production-Prüfung
+
+Für Staging immer prüfen:
+- `https://staging.bocholt-erleben.de/meta/build.txt`
+
+Nicht die Production-Domain für Staging-Deploys verwenden.
+
+Bekannte Separierung:
+- Fehlgeschlagene Scheduled Runs wie `Weekly KI Websearch` oder `Inbox → Events` auf `staging` sind nicht automatisch Deploy-Fehler.
+- Diese Workflows sind separat und teils main-gebunden zu bewerten.
+<!-- === END BLOCK: EVENT_VISUAL_KEYS_V31_CONTRACT_2026_06_02 === -->
