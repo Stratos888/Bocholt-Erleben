@@ -116,23 +116,32 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(weinfest|wijnfeest|wine tasting|street ?food|food ?festival|city food festival|genuss|kulinarik|kulinarisch)\b"):
         return "food_drink_festival"
 
-    if match(r"\b(krammarkt|stoffmarkt|flohmarkt|trödelmarkt|troedelmarkt|wochenmarkt|grenzmarkt|marktstände|marktstaende)\b"):
+    if match(r"\b(aaltendagen|innenstadtsommer|bokeltsen treff|verkaufsoffener sonntag)\b"):
+        return "city_festival_street"
+
+    if match(r"\b(krammarkt|stoffmarkt|flohmarkt|trödelmarkt|troedelmarkt|wochenmarkt|grenzmarkt|marktstände|marktstaende|martinsmarkt)\b"):
         return "market_stalls"
 
     # 2) Kultur/Textil: Eventtyp vor Location.
     if match(r"\b(maschinen[- ]?mittwoch|drossel[- ]?donnerstag|spinnerei|weberei|industriekultur|textilmaschinen?)\b"):
         return "textile_machines_industry"
 
-    if match(r"\b(ibena|textile leidenschaft|textilausstellung|textildesign|stoffdesign|behind beauty)\b"):
+    if match(r"\b(ibena|textile leidenschaft|textile revolution|textile vergangenheit|textile zukunft|stoffe für die zukunft|stoffe fuer die zukunft|nachhaltige stoffe|textilausstellung|textildesign|stoffdesign|behind beauty)\b"):
         return "textile_exhibition_design"
 
     if match(r"\b(kunstausstellung|kunstmarkt|vernissage|galerie|kreativausstellung|schloss ringenberg)\b"):
         return "art_exhibition_gallery"
 
-    if match(r"\b(stadtführung|stadtfuehrung|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung)\b"):
+    if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
+        return "nature_learning_wildlife"
+
+    if match(r"\b(stadtführung|stadtfuehrung|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
         return "city_tour_history"
 
     # 3) Bühne, Sprache, Film.
+    if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
+        return "dance_music_workshop"
+
     if match(r"\b(kindertheater|puppenspiel|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl)\b"):
         return "kids_stage_story"
 
@@ -148,16 +157,16 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(orgel|oratorium|chor|chorkonzert|kammermusik|klassik|quartett|quartet|kirchenkonzert|sinfonie)\b"):
         return "classical_music"
 
-    if match(r"\b(theater|schauspiel|bühnenstück|buehnenstueck|bühne|buehne|musical)\b"):
-        return "theater_stage"
-
-    if match(r"\b(konzert|live[- ]?musik|band|tribute|unplugged|dj|open[- ]?air[- ]?konzert)\b"):
-        return "live_music_stage"
-
-    # 4) Feste, Stadtleben, Familie.
     if match(r"\b(aasee[- ]?festival|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
         return "open_air_festival"
 
+    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|band|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
+        return "live_music_stage"
+
+    if match(r"\b(theater|schauspiel|bühnenstück|buehnenstueck|theaterbühne|theaterbuehne|musical)\b"):
+        return "theater_stage"
+
+    # 4) Feste, Stadtleben, Familie.
     if match(r"\b(stadtfest|cityfest|verkaufsoffen|lichtersonntag|aktionstag|innenstadtfest|familienfest|tag der offenen tür|tag der offenen tuer)\b"):
         return "city_festival_street"
 
@@ -178,7 +187,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(citylauf|abendlauf|lauf|marathon|halbmarathon|running)\b"):
         return "running_event"
 
-    if match(r"\b(giro|radrennen|radsport|bike race|fahrradfrühling|fahrradfruehling)\b"):
+    if match(r"\b(münsterlandgiro|muensterlandgiro|profiradsport|giro|radrennen|radsport|bike race|fahrradfrühling|fahrradfruehling)\b"):
         return "cycling_event"
 
     if match(r"\b(darts|fechten|turnier|meisterschaft|hallen(sport)?|wettkampf)\b"):
