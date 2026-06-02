@@ -326,3 +326,238 @@ Bekannte Separierung:
 - Fehlgeschlagene Scheduled Runs wie `Weekly KI Websearch` oder `Inbox → Events` auf `staging` sind nicht automatisch Deploy-Fehler.
 - Diese Workflows sind separat und teils main-gebunden zu bewerten.
 <!-- === END BLOCK: EVENT_VISUAL_KEYS_V31_CONTRACT_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_IMAGE_PROMPTING_REVIEW_LEARNINGS_2026_06_02 | Zweck: dokumentiert die Prompting- und Bewertungsverbesserungen aus dem Event-Visual-Produktionschat; Umfang: Event-Visual-Prompting, Bilderchat, Review-Gates === -->
+## Event Visual Prompting – Produktionslernen 2026-06-02
+
+Status: verbindliche Ergänzung für weitere Event-Visual-Erzeugung.
+
+### Arbeitsmodus
+
+Für Event-Visuals wird weiterhin getrennt gearbeitet:
+
+- Dieser Projektchat liefert nur Prompts, Bewertungen, Statusentscheidungen und Repo-Dokumentation.
+- Die tatsächliche Bildgenerierung findet in einem separaten Bilderchat statt.
+- In diesem Projektchat darf nicht erneut versehentlich direkt ein Bild generiert werden.
+- Pro Schritt wird grundsätzlich ein einzelner Visual-Key bearbeitet.
+- Nach jedem erzeugten Bild wird erst bewertet, dann entschieden:
+  - `ready`
+  - `ready mit Prüfvorbehalt`
+  - `retry`
+  - `nicht ready`
+- Danach folgt erst der nächste Prompt.
+
+### Neue Prompting-Regel: weniger arrangierte Props
+
+Die wichtigste Verbesserung aus dem Produktionslauf:
+
+> Weniger arrangiertes Material ist meist glaubwürdiger. Lieber wenige starke Hinweise plus echter Raum/Situation als viele sauber drapierte Symbolobjekte.
+
+Künftige Prompts sollen deshalb bevorzugen:
+
+- 2–4 glaubwürdige Haupt-Cues statt 6–10 Symbolobjekte.
+- Raum, Oberfläche, Licht, Bewegung und Situation als primäre Erzählträger.
+- Weniger kuratierte Vordergrund-Stillleben.
+- Etwas mehr echte Leere ist akzeptabel, wenn das Bild dadurch natürlicher wirkt.
+- Keine „alle passenden Objekte einmal sauber nebeneinander“-Kompositionen.
+
+Standardformulierung für weitere Prompts:
+
+> Use fewer arranged props. Prefer a more natural, lightly used real-world setup with only a small number of believable objects. Let the room, route, surface, movement and situation do more of the storytelling. Avoid overly curated foreground clusters of symbolic items. A slightly sparse but believable real-world scene is better than an over-arranged symbolic still life.
+
+### Neue Bewertungsregel: Einzelbild + Systemwirkung
+
+Bilder werden nicht nur einzeln bewertet, sondern gegen das Gesamtset:
+
+- Ist der Visual-Key alleine lesbar?
+- Ist das Bild innerhalb des Visual-Systems klar genug von ähnlichen Keys unterscheidbar?
+- Wiederholt es Lichtstimmung, Raumtyp, Kameraperspektive oder Requisitenlogik zu stark?
+- Wirkt es im späteren Feed wie ein eigenständiger Typ oder wie eine Variante eines bereits vorhandenen Bildes?
+
+Konkretes gelerntes Beispiel:
+
+- `theater_stage` darf warm, bühnenhaft und vorhanggetrieben sein.
+- `comedy_cabaret` muss stärker Kleinkunst-/Kulturraumgefühl haben und darf nicht wie Theater plus Mikrofon wirken.
+- `film_screening` soll kühler, dunkler und screen-getrieben sein, nicht wieder warmes Bühnen-/Kleinkunstlicht.
+
+### Harte Ablehnungs-Gates
+
+Ein Bild ist nicht ready, wenn eines dieser Probleme sichtbar ist:
+
+- Objektlogikfehler:
+  - schwebende oder physisch unklare Objekte
+  - falsche Perspektive
+  - unmögliche Kontaktpunkte oder Schatten
+  - falsche technische Funktion
+- Projektions-/Technikfehler:
+  - Beamer zeigt sichtbar in die falsche Richtung
+  - Linse sitzt auf der falschen Seite
+  - Projektionsstrahl ist geometrisch unmöglich
+  - Lichtkegel ist unnatürlich breit, volumetrisch oder showartig
+- Zu starke KI-/Stillleben-Anmutung:
+  - zu viele perfekt arrangierte Symbolobjekte
+  - künstlich kuratierte Vordergrund-Cluster
+  - Produktkatalog-/Stockfoto-Wirkung
+- Rechtliche/visuelle Probleme:
+  - lesbare Schrift
+  - Logos, Marken, Sponsorzeichen
+  - erkennbare Buchcover, Plakate, Kunstwerke oder Figuren
+  - identifizierbare Gesichter
+  - erkennbare Kinder
+- Systemische Wiederholung:
+  - zu ähnliche Lichtstimmung zu bereits akzeptierten Keys
+  - zu ähnliche Bühne/Raum/Komposition bei eigentlich unterschiedlichen Eventtypen
+
+### Strategiewechsel statt Endlosschleife
+
+Wenn ein Motiv in mehreren Iterationen denselben KI-Fehler produziert, wird nicht weiter mikro-optimiert. Stattdessen wird die Bildlogik geändert.
+
+Beispiel `film_screening`:
+
+- Problem: prominent sichtbarer Beamer erzeugte wiederholt falsche Linsen-/Projektionslogik.
+- Lösung: Beamer nicht mehr als Hero-Objekt nutzen.
+- Robuste Bildlogik: blanke Leinwand + Stuhlreihen + kühler Screen-Glow + kleiner Vorführraum; Beamer nur sekundär, angeschnitten, unscharf oder außerhalb des Bildes.
+
+Diese Regel gilt künftig allgemein:
+
+> Wenn ein technisches Objekt wiederholt KI-Fehler verursacht, wird es entdominantisiert oder aus dem sichtbaren Hauptfokus entfernt. Der Visual-Key wird dann über robustere Kontextmerkmale erzählt.
+
+### Motivspezifische Erkenntnisse
+
+#### Schützenfest / Vereinsfest
+
+Nicht ausreichend:
+
+- florale Zeltdeko
+- Hochzeits-/Sommerfest-Anmutung
+- Landpartie-/Blumenausstellungslook
+
+Besser:
+
+- Festzelt-Innenraum
+- lange Bierzeltgarnituren
+- einfache Theke
+- grün-weiße, aber zurückhaltende Vereinsfest-Cues
+- funktional, bodenständig, regional
+
+#### Krammarkt / Marktstände
+
+Nicht ausreichend:
+
+- kuratierte Stoff-/Deko-Märkte
+- Antikmarkt-/Vintage-Stillleben
+- zu einheitliche Pavillonreihen
+- zu perfekte Warenpräsentation
+
+Besser:
+
+- normale non-food Krammarktlogik
+- einfache Klapptische
+- Kunststoffkisten, Kartons, Taschen, Haushaltswaren
+- leicht ungleichmäßige, praktische Marktstruktur
+- nicht schmutzig, aber realer und weniger kuratiert
+
+#### Book Market / Boekenmarkt
+
+Nicht ausreichend:
+
+- sortierte Antiquariats-/Archivoptik
+- Bücher alle ähnlich groß
+- nur schöne Holzkisten
+- leere, kuratierte Marktästhetik
+
+Besser:
+
+- praktische Kunststoffkisten
+- Bananenkartons/Kartons ohne lesbare Markierungen
+- einfache Klapptische
+- unterschiedliche Buchgrößen
+- Bücher stehend, liegend, schräg, gestapelt
+- anonyme Besucher als realer Markt-Kontext
+
+#### Business Messe / Infoabend
+
+Nicht ausreichend:
+
+- sterile weiße Flyerhalter
+- blanke Mappenwand
+- Corporate-Stockfoto
+- Hochglanz-Messebau
+
+Besser:
+
+- real genutzter Infotisch
+- Laptop, Jacke, Stifte, einzelne Unterlagen, Gesprächssituation
+- lokale Halle/Foyer/Kulturraum
+- Menschen anonym als Kontext
+
+#### Dance / Music Workshop
+
+Nicht ausreichend:
+
+- großer arrangierter Prop-Cluster mit Speaker, Flasche, Hoodie, Schuhen, Tambourin, Notizbuch und Papier nebeneinander
+
+Besser:
+
+- weniger Gegenstände
+- mehr Raum, Holzboden, Spiegel, Bewegung
+- anonyme Körperausschnitte
+- echte Workshop-Situation statt Symbolsammlung
+
+#### Learning / Science Workshop
+
+Nicht ausreichend:
+
+- Lupe oder andere Objekte wirken schwebend
+- zu dekoratives Naturkunde-Stillleben
+
+Besser:
+
+- Lupe klar flach auf Tisch/Notizbuch/Tablett
+- wenige plausible Lern-/Naturmaterialien
+- physische Kontaktpunkte und Schatten sauber
+- echte Workshop-Tischsituation
+
+### Statusentscheidungen aus dem Produktionslauf
+
+Accepted / ready oder ready-fähig nach Review:
+
+- `textile-machines-industry-01.webp`
+- `open-air-festival-01.webp`
+- `kirmes-funfair-01.webp`
+- `parade-festzug-01.webp`
+- `shooting-festival-tradition-01.webp` nach zweitem Retry
+- `country-fair-rural-01.webp`
+- `vehicle-classic-01.webp`
+- `textile-exhibition-design-01.webp`
+- `art-exhibition-gallery-01.webp`
+- `market-stalls-01.webp` nach Krammarkt-/Non-Food-Retry
+- `book-market-01.webp` nach Referenzlogik-Retry
+- `business-messe-info-01.webp` mit finaler Textprüfung
+- `classical-music-01.webp` mit finaler Noten-/Textprüfung
+- `theater-stage-01.webp`
+- `comedy-cabaret-01.webp` nach Differenzierungs-Retry
+- `film-screening-01.webp` nach Strategiewechsel ohne dominanten Beamer
+- `literature-reading-talk-01.webp` mit finaler Buchrückenprüfung
+- `kids-stage-story-01.webp` mit finaler Cover-Textprüfung
+- `learning-science-workshop-01.webp` als zweites Vergleichsbild
+- `dance-music-workshop-01.webp` nach reduzierter-Props-Regel
+- `running-event-01.webp`
+
+Noch offen / im nächsten Chat fortsetzen:
+
+- `cycling-event-01.webp` wurde als nächster Prompt geliefert; Bildbewertung steht noch aus.
+- Danach im nächsten Chat mit dem nächsten noch offenen Visual-Key aus `data/event_visual_generation_batches_phase1.json` fortfahren.
+
+### Prüfvorbehalte für finale Asset-Abnahme
+
+Auch bei `ready` gilt vor Pool-Update immer eine finale Asset-Prüfung nach Export auf `1200×675`:
+
+- keine klar lesbare Schrift
+- keine Logos/Marken
+- keine erkennbaren Gesichter
+- keine erkennbaren Kinder
+- keine problematischen Pseudo-Schriften auf Buchrücken, Broschüren, Noten, Covern oder Wandbildern
+- keine auffälligen KI-Objektfehler im finalen Crop
+- keine zu starke Dopplung zu einem bereits akzeptierten Visual
+<!-- === END BLOCK: VISUAL_WORKFLOW_IMAGE_PROMPTING_REVIEW_LEARNINGS_2026_06_02 === -->

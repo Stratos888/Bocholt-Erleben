@@ -2027,3 +2027,67 @@ Offen / nicht Teil dieses Proofs:
 Nächster Schritt:
 - 24 fehlende Basis-Visuals aus `data/event_visual_generation_batches_phase1.json` erzeugen und einzeln im Card-Kontext prüfen.
 <!-- === END BLOCK: EVENT_VISUAL_KEYS_V31_STAGING_PROOF_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_PROMPTING_RUN_2026_06_02 | Zweck: dokumentiert die Prompting- und Bewertungsverbesserungen aus dem Event-Visual-Produktionschat; Umfang: Event-Visual-Prompting, Bilderchat, Review-Gates === -->
+## Event Visual Prompting Run – Bildchat-Vorbereitung – 2026-06-02
+
+Status: Prompting-/Review-Stand dokumentiert; Asset-Integration noch nicht durchgeführt.
+
+Geprüfter Arbeitsstand:
+
+- Branch: `staging`
+- HEAD vor Dokumentationspatch: `491c435`
+- Relevanter Workflow: Event Visual Keys V3.1 / Phase-1-Bildproduktion
+- Bildgenerierung erfolgte separat im Bilderchat; dieser Projektchat bewertete Ergebnisse und lieferte Folgeprompts.
+
+Ergebnis:
+
+- Mehrere Phase-1-Visuals wurden fachlich als `ready` bzw. `ready mit Prüfvorbehalt` bewertet.
+- Mehrere Prompts wurden aufgrund sichtbarer KI-/Realismusprobleme gezielt verschärft.
+- Neue Prompting-/Bewertungsregeln wurden im `VISUAL_WORKFLOW.md` dokumentiert.
+
+Wichtigste gelernte Quality-Gates:
+
+- Einzelbildqualität reicht nicht; Systemwirkung und Abgrenzung zu benachbarten Visual-Keys werden mitgeprüft.
+- Weniger arrangierte Props ist künftig Standardregel.
+- Technische Objektlogik ist hartes Gate, z. B. Beamer-/Projektionsrichtung.
+- Sichtbare KI-Physikfehler wie schwebende Lupen sind harte Retry-Gründe.
+- Wiederholte Fehler werden durch Strategiewechsel gelöst, nicht durch Endlos-Mikro-Prompting.
+- Finale Asset-Abnahme erfolgt erst nach `1200×675`-Exportprüfung auf Text, Logos, Gesichter, Kinder, KI-Artefakte und Crop-Tauglichkeit.
+
+Akzeptierte Visuals aus dem Chatlauf:
+
+- `textile-machines-industry-01.webp`
+- `open-air-festival-01.webp`
+- `kirmes-funfair-01.webp`
+- `parade-festzug-01.webp`
+- `shooting-festival-tradition-01.webp`
+- `country-fair-rural-01.webp`
+- `vehicle-classic-01.webp`
+- `textile-exhibition-design-01.webp`
+- `art-exhibition-gallery-01.webp`
+- `market-stalls-01.webp`
+- `book-market-01.webp`
+- `business-messe-info-01.webp`
+- `classical-music-01.webp`
+- `theater-stage-01.webp`
+- `comedy-cabaret-01.webp`
+- `film-screening-01.webp`
+- `literature-reading-talk-01.webp`
+- `kids-stage-story-01.webp`
+- `learning-science-workshop-01.webp`
+- `dance-music-workshop-01.webp`
+- `running-event-01.webp`
+
+Noch offen:
+
+- `cycling-event-01.webp` wurde als nächster Prompt vorbereitet; die Bildbewertung erfolgt im nächsten Chat.
+- Nach `cycling-event` mit dem nächsten offenen Visual-Key aus `data/event_visual_generation_batches_phase1.json` fortfahren.
+
+Nicht erledigt:
+
+- Keine Assets ins Repo kopiert.
+- Keine WebP-Optimierung durchgeführt.
+- `data/event_visual_pool.json` noch nicht mit neuen `ready`-Assets aktualisiert.
+- Keine finale `1200×675`-Assetprüfung im Repo durchgeführt.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PROMPTING_RUN_2026_06_02 === -->
