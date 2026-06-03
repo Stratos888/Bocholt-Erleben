@@ -149,16 +149,30 @@ Do not mix feature work with unrelated UI polish in the same workpack.
 
 ## 6. PATCH OUTPUT CONTRACT
 
-Preferred output format:
+Default output format:
 
-- Use a unified Git patch when the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
+- Use a unified Git patch whenever the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
 - The user validates first with `git apply --check patch.diff` before applying the patch.
 - The patch must be consolidated, owner-file focused, and free of unrelated edits.
+- After the user has provided the required baseline proof, do not default back to prose-only insertion instructions.
+- Do not provide vague placement instructions such as `append at the end`, `insert after this section`, or `add this block` as the primary patch format when a Git patch is safe.
+- Do not provide long manual copy/paste snippets when a unified Git patch can safely express the same change.
 
 Fallback format:
 
-- Use concrete replace instructions when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
-- Always specify:
+- Use concrete replace instructions only when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
+- The fallback must still be deterministic and copy/paste-safe.
+- Always specify all of the following:
+  - file
+  - exact block to replace, preferably by existing begin/end marker comments
+  - exact BEGIN line or unique BEGIN marker
+  - exact END line or unique END marker
+  - complete replacement block
+- Never split one logical replacement into drifting snippets.
+- Never include nested fenced code blocks inside a copy/paste block.
+- Consolidate overlapping edits into one replacement per file.
+- Do not append drifting snippets.
+- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
 
 Baseline rule for Git patches:
 
@@ -172,17 +186,16 @@ Baseline rule for Git patches:
 - If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
 - In that case, re-check the current repository state and create a new patch from the updated baseline.
 
-Concrete replace instructions must:
-  - file
-  - exact BEGIN line
-  - exact END line
-  - replacement block
-- Consolidate overlapping edits into one replacement per file.
-- Do not append drifting snippets.
-- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
+Assistant response discipline:
+
+- For implementation work, answer with the next concrete action only.
+- When a patch is requested or clearly needed, provide the patch as one terminal-ready Git patch creation block.
+- Do not describe where the user should manually paste code when a safe Git patch is possible.
+- Do not mix patch delivery with broad planning text.
+- If a documentation change is needed, treat documentation files like normal owner files and patch them with the same rules.
+- If the safe patch format is unclear, stop and ask for the missing baseline or affected file content instead of guessing.
 
 ---
-
 ## 7. OWNER-FILE RULE
 
 Patch the owning file first.
