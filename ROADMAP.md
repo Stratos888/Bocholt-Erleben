@@ -934,3 +934,59 @@ Priorität:
 3. Events Feed Visual Integration als nächster Hauptworkstream.
 4. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
 <!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 | Zweck: ordnet die Event-Visual-Arbeit nach Phase-1-Assetintegration; Umfang: Event-Visual-Pool, Bildproduktion, Feed-Duplizierung === -->
+## Event Visuals – Phase-1-Integration und Phase-2-Diversifizierung
+
+Status: nächster aktiver Visual-Workstream nach Integration der Phase-1-Basisassets.
+
+### Abgeschlossen / in Commit vorzubereiten
+
+- 24 Phase-1-Pilotbilder wurden als `1200x675`-WebP erzeugt.
+- Die 24 neuen Assets wurden in `data/event_visual_pool.json` auf `ready` gesetzt.
+- Der Event-Visual-Pool hat jetzt 34 `ready`-Assets.
+- `python scripts/audit-event-visual-pool.py` ist ohne Fehler.
+- `python tools/audit-visual-contract.py` ist ohne Fehler.
+- Roh-PNGs wurden entfernt; nur finale WebP-Card-Assets sollen ins Repo.
+
+### Produktlogik
+
+Ein `ready`-Bild pro Visual Key ist nur Grundabdeckung.
+Der Zielzustand ist ein echter Bildpool pro Visual Key bis zum jeweiligen `target_count`.
+
+Grund:
+- Mehrere Events können denselben `visual_key` haben.
+- Zeitlich nahe Events sollen nicht dasselbe Bild erhalten.
+- Der Feed soll redaktionell und hochwertig wirken, nicht repetitiv.
+- Die UI darf nur geprüfte `ready`-Assets nutzen.
+
+### Nächste Roadmap-Schritte
+
+1. Phase-1-Assetintegration committen und pushen.
+2. Phase-2-Bedarf aus `data/event_visual_pool.json` berechnen:
+   - Bedarf je Key = `target_count - ready_count`
+3. Phase-2-Produktionsplan erzeugen.
+4. Varianten key-by-key im Bildchat produzieren:
+   - Pilotbild als Stilanker
+   - keine Near-Duplicates
+   - kleine kontrollierte Variantenrunden
+5. Neue Varianten nach `1200x675`-WebP-Exportprüfung in den Pool integrieren.
+6. Danach Event-Feed-Duplicate-Logik bewerten:
+   - gleiche Bilder im sichtbaren Feed vermeiden
+   - besonders bei zeitlich nahen Events desselben Visual Keys
+
+### Priorisierung
+
+Zuerst ausbauen:
+- Keys mit hohem `target_count`
+- Keys mit erwartbar häufiger Nutzung
+- Keys mit hoher Sichtbarkeit im normalen Event-Feed
+- Keys, die im Sommer-/Saisonbetrieb geclustert auftreten
+
+Nicht zuerst lösen:
+- Detailpanel-/Hero-Bilder
+- Activity-Visuals
+- neue Layout-Polishes
+- Sonderbilder für einzelne Events
+
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 === -->

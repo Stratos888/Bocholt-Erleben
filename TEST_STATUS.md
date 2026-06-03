@@ -2091,3 +2091,86 @@ Nicht erledigt:
 - `data/event_visual_pool.json` noch nicht mit neuen `ready`-Assets aktualisiert.
 - Keine finale `1200×675`-Assetprüfung im Repo durchgeführt.
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PROMPTING_RUN_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_PHASE1_ASSET_INTEGRATION_2026_06_03 | Zweck: dokumentiert die Integration der 24 Phase-1-Event-Visuals als finale WebP-Card-Assets; Umfang: assets/event-visuals, event_visual_pool.json, Audits === -->
+## Event Visual Phase 1 – Assetintegration – 2026-06-03
+
+Status: lokal bestanden / bereit für Commit.
+
+Geprüfter Stand:
+- Branch: `staging`
+- HEAD vor Assetintegration: `b8ac2a3`
+- Scope: Event Visual Keys V3.1 / Phase-1-Basisvisuals
+
+Durchgeführt:
+- 24 generierte PNG-Rohbilder wurden inventarisiert.
+- 24 Phase-1-Requests aus `data/event_visual_generation_batches_phase1.json` wurden dagegen geprüft.
+- PNGs wurden 1:1 auf die geplanten `planned_src`-Zielnamen gemappt.
+- Alle 24 Zielassets wurden mit `cwebp` als `1200x675`-WebP erzeugt.
+- Die PNG-Rohdateien wurden nach erfolgreicher WebP-Erzeugung entfernt.
+- `data/event_visual_pool.json` wurde für diese 24 Slots von `planned` auf `ready` aktualisiert.
+- Pflichtmetadaten wurden ergänzt:
+  - `src`
+  - `status`
+  - `source`
+  - `source_type`
+  - `rights_status`
+  - `alt`
+  - `is_symbolic`
+  - `is_documentary`
+  - `review_status`
+  - `card_asset_format`
+  - `phase1_request_id`
+
+Erzeugte Phase-1-Assets:
+- `textile-machines-industry-01.webp`
+- `open-air-festival-01.webp`
+- `kirmes-funfair-01.webp`
+- `parade-festzug-01.webp`
+- `shooting-festival-tradition-01.webp`
+- `country-fair-rural-01.webp`
+- `vehicle-classic-01.webp`
+- `textile-exhibition-design-01.webp`
+- `art-exhibition-gallery-01.webp`
+- `market-stalls-01.webp`
+- `book-market-01.webp`
+- `business-messe-info-01.webp`
+- `classical-music-01.webp`
+- `theater-stage-01.webp`
+- `comedy-cabaret-01.webp`
+- `film-screening-01.webp`
+- `literature-reading-talk-01.webp`
+- `kids-stage-story-01.webp`
+- `learning-science-workshop-01.webp`
+- `dance-music-workshop-01.webp`
+- `running-event-01.webp`
+- `cycling-event-01.webp`
+- `indoor-sport-competition-01.webp`
+- `evening-social-party-01.webp`
+
+Audit-Ergebnis:
+- `python scripts/audit-event-visual-pool.py` → OK
+- `python tools/audit-visual-contract.py` → Errors: none
+- `git diff --check` → OK
+
+Pool-Status nach Integration:
+- `ready`: 34
+- `planned`: 122
+- `usable`: 10
+- Phase-1-Ready-Assets: 24
+- fehlende Phase-1-Assets: 0
+
+Bekannte nicht blockierende Warnungen:
+- `event_visual_pool.json owner is not event_visual_pool_v1` ist für den aktuellen V3.1-Owner nicht blockierend.
+- Activity-Visual-Warnungen sind nicht Teil dieses Event-Visual-Workstreams.
+
+Bewertung:
+- Phase-1-Basisabdeckung ist technisch integriert.
+- Jeder der 34 Event-Visual-Keys hat jetzt mindestens ein `ready`-Asset.
+- Der nächste fachliche Schritt ist nicht weitere Basisabdeckung, sondern Phase-2-Pool-Diversifizierung bis `target_count`.
+
+Nächster Schritt:
+- Commit der 24 WebP-Assets, `data/event_visual_pool.json` und dieser Dokumentation.
+- Danach Phase-2-Bedarfsplan aus `target_count - ready_count` erzeugen.
+
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PHASE1_ASSET_INTEGRATION_2026_06_03 === -->

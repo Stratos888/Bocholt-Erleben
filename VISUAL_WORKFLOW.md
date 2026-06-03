@@ -1,7 +1,7 @@
 # Premium Visual Workflow
 
-Stand: 2026-06-01  
-Branch: staging  
+Stand: 2026-06-01
+Branch: staging
 Referenz-Commit: 4874e70 Aktualisiere Event Visuals auf 16-zu-9 Card Assets
 
 ## 1. Aktueller Stand
@@ -561,3 +561,125 @@ Auch bei `ready` gilt vor Pool-Update immer eine finale Asset-Prüfung nach Expo
 - keine auffälligen KI-Objektfehler im finalen Crop
 - keine zu starke Dopplung zu einem bereits akzeptierten Visual
 <!-- === END BLOCK: VISUAL_WORKFLOW_IMAGE_PROMPTING_REVIEW_LEARNINGS_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: EVENT_VISUAL_POOL_DIVERSIFICATION_PHASE2_2026_06_03 | Zweck: definiert die verbindliche Vorgehensweise nach Phase-1-Pilotbildern; Umfang: Event-Visual-Pool, Variantenproduktion, Bildchat, Review-Gates === -->
+## Event Visual Pool Diversification – Phase 2 ab 2026-06-03
+
+Status: verbindlicher Folgeprozess nach der Phase-1-Basisabdeckung.
+
+### Grundentscheidung
+
+Phase 1 erzeugt pro Visual Key ein akzeptiertes Pilotbild.
+Phase 2 füllt die Visual-Key-Pools bis zum jeweiligen `target_count` mit sichtbar unterscheidbaren Varianten auf.
+
+Ein Bild pro Visual Key ist nur Grundabdeckung. Für den produktionsreifen Event-Feed braucht jeder Visual Key mehrere `ready`-Bilder, damit zeitlich nahe Events mit gleichem Visual Key nicht wiederholt dasselbe Bild erhalten.
+
+### Arbeitseinheit
+
+Die Arbeitseinheit bleibt der `visual_key`, nicht das einzelne Event.
+
+Nicht gewünscht:
+- Event-by-Event-Bilder
+- einmalige Sonderbilder für einzelne Termine
+- Megaprompts für sehr viele Varianten ohne Review
+- CSS-Cropping als Bildrettung
+- geplante oder nicht geprüfte Assets live ausspielen
+
+Gewünscht:
+- ein kuratierter Bildpool pro Visual Key
+- mehrere `ready`-Assets je Key
+- stabile Bildsprache innerhalb des Keys
+- klar unterscheidbare Motive innerhalb des Pools
+- spätere No-Duplicate-/Near-Date-Logik im Event-Feed, sobald ausreichend Varianten vorhanden sind
+
+### Pilotbild-Regel
+
+Das akzeptierte `*-01.webp` ist der Stil- und Qualitätsanker des Visual Keys.
+
+Das Pilotbild darf nicht kopiert werden. Es definiert:
+- Qualitätsniveau
+- lokale Plausibilität
+- dokumentarisch-editoriale Bildsprache
+- Anonymitätsstandard
+- Card-Tauglichkeit
+- rechtliche Sicherheitslogik
+
+Neue Varianten müssen dieselbe Bildsprache halten, aber sichtbar andere konkrete Szenen zeigen.
+
+### Varianten-Regel
+
+Zusätzliche Varianten müssen sich sichtbar unterscheiden über mindestens mehrere dieser Achsen:
+
+- Kameradistanz
+- Kamerawinkel
+- Komposition
+- Vordergrund-/Mittelgrund-/Hintergrundstruktur
+- Anzahl und Platzierung anonymer Personen
+- Aktivitätsfokus vs. sozialer Kontext
+- anderer Moment innerhalb desselben Eventtyps
+- andere Raum- oder Ortsdetails
+- andere Lichtstimmung innerhalb derselben Motivlogik
+- ruhiger vs. dynamischer Bildmoment
+
+Near-Duplicates sind nicht `ready`-fähig.
+
+### Batch-Größen
+
+Die Variantenproduktion erfolgt in kleinen kontrollierten Runden:
+
+- `target_count = 3`: Pilot vorhanden → 2 Zusatzvarianten können in einer Runde entstehen.
+- `target_count = 4–5`: Pilot vorhanden → erst 2–3 Zusatzvarianten, Review, dann Rest.
+- `target_count = 6–8`: Pilot vorhanden → erst 3 Zusatzvarianten, Review, dann weitere Variantenrunden.
+
+Ziel ist nicht maximale Geschwindigkeit, sondern ein belastbarer Pool mit echter visueller Spannbreite.
+
+### Bildchat-Prompt-Muster
+
+Für Phase 2 soll der Bildchat pro Visual Key dieses Muster verwenden:
+
+    Use the accepted pilot image for visual key [VISUAL_KEY] as the style and quality anchor.
+    Do not copy the exact composition.
+    Create [X] additional final single images for the same visual key.
+    All images must follow the Bocholt erleben event-card rules:
+    - 16:9 landscape
+    - premium but realistic documentary-local editorial photo style
+    - anonymous people only
+    - no readable text
+    - no logos
+    - no brands
+    - no copyrighted artwork
+    - no identifiable adults or children
+    - suitable as mobile PWA event-card images
+    The new images must be clearly distinguishable from the pilot and from each other.
+    Vary camera distance, camera angle, composition, people placement, activity/social focus, background structure, light mood and moment of action.
+    Create genuine pool variants, not near-duplicates.
+
+Pro Visual Key müssen zusätzlich die spezifischen Motivachsen aus `data/event_visual_asset_brief.json` und `data/event_visual_ai_style_guide.json` berücksichtigt werden.
+
+### Ready-Gate
+
+Ein neues Variantenbild wird erst `ready`, wenn alle Punkte erfüllt sind:
+
+- fachlich akzeptiert
+- klar dem Visual Key zuordenbar
+- sichtbar verschieden von bestehenden `ready`-Bildern desselben Keys
+- als echtes `1200x675`-WebP exportiert
+- in `data/event_visual_pool.json` eingetragen
+- `alt` vorhanden
+- keine lesbaren Texte, Marken, Logos oder Sponsorhinweise
+- keine erkennbaren Kinder
+- keine identifizierbaren Erwachsenen
+- keine harten KI-Artefakte
+- Card-Crop geeignet
+- `tools/audit-visual-contract.py` ohne Fehler
+
+### Reihenfolge nach Phase 1
+
+1. Phase-1-Assets committen.
+2. Phase-2-Bedarf aus `target_count - ready_count` je Visual Key ableiten.
+3. Phase-2-Batches key-by-key erzeugen.
+4. Zuerst häufige und stark belastete Keys auffüllen.
+5. Danach kleinere Keys bis Mindestpool schließen.
+6. Später Event-Feed-Logik ergänzen, damit zeitlich nahe Events desselben Keys nicht dasselbe Bild erhalten.
+
+<!-- === END BLOCK: EVENT_VISUAL_POOL_DIVERSIFICATION_PHASE2_2026_06_03 === -->

@@ -13,10 +13,16 @@
         {
           "id": "textile-machines-industry-01",
           "src": "/assets/event-visuals/textile-machines-industry-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual zu Textilmaschinen, Weberei und Industriekultur mit ruhiger, materialbetonter Innenraumatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_textile_machines_industry_01"
         },
         {
           "id": "textile-machines-industry-02",
@@ -84,10 +90,16 @@
         {
           "id": "textile-exhibition-design-01",
           "src": "/assets/event-visuals/textile-exhibition-design-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Textil-, Stoff- und Designausstellung mit ruhiger Ausstellungs- und Materialatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_textile_exhibition_design_01"
         },
         {
           "id": "textile-exhibition-design-02",
@@ -131,10 +143,16 @@
         {
           "id": "art-exhibition-gallery-01",
           "src": "/assets/event-visuals/art-exhibition-gallery-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Kunst- und Galerieausstellung mit ruhiger, moderner Ausstellungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_art_exhibition_gallery_01"
         },
         {
           "id": "art-exhibition-gallery-02",
@@ -407,10 +425,16 @@
         {
           "id": "classical-music-01",
           "src": "/assets/event-visuals/classical-music-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Klassik, Chor oder Orgelmusik mit ruhiger Konzert- und Innenraumatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_classical_music_01"
         },
         {
           "id": "classical-music-02",
@@ -454,11 +478,17 @@
         {
           "id": "theater-stage-01",
           "src": "/assets/event-visuals/theater-stage-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "theater_show"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Theater und Bühne mit gedämpfter Bühnenatmosphäre und anonymem Aufführungsbezug.",
+          "legacy_visual_key": "theater_show",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_theater_stage_01"
         },
         {
           "id": "theater-stage-02",
@@ -505,10 +535,16 @@
         {
           "id": "comedy-cabaret-01",
           "src": "/assets/event-visuals/comedy-cabaret-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Comedy und Kabarett mit kleiner Bühne, Mikrofon- oder Kleinkunstatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_comedy_cabaret_01"
         },
         {
           "id": "comedy-cabaret-02",
@@ -544,10 +580,16 @@
         {
           "id": "film-screening-01",
           "src": "/assets/event-visuals/film-screening-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Filmvorführung oder Kinoabend mit ruhiger Projektions- und Publikumsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_film_screening_01"
         },
         {
           "id": "film-screening-02",
@@ -575,10 +617,16 @@
         {
           "id": "literature-reading-talk-01",
           "src": "/assets/event-visuals/literature-reading-talk-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Lesung, Literatur und Gespräch mit Büchern, Sitzbereich und ruhiger Veranstaltungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_literature_reading_talk_01"
         },
         {
           "id": "literature-reading-talk-02",
@@ -614,10 +662,16 @@
         {
           "id": "kids-stage-story-01",
           "src": "/assets/event-visuals/kids-stage-story-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Kinderbühne oder Geschichtenprogramm mit spielerischer Bühnenatmosphäre ohne erkennbare Kinder.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_kids_stage_story_01"
         },
         {
           "id": "kids-stage-story-02",
@@ -735,10 +789,16 @@
         {
           "id": "open-air-festival-01",
           "src": "/assets/event-visuals/open-air-festival-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für ein Open-Air-Festival mit Außenbühne, freier Fläche und sommerlicher Veranstaltungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_open_air_festival_01"
         },
         {
           "id": "open-air-festival-02",
@@ -782,10 +842,16 @@
         {
           "id": "kirmes-funfair-01",
           "src": "/assets/event-visuals/kirmes-funfair-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Kirmes und Volksfest mit Fahrgeschäfts- und Lichterstimmung ohne erkennbare Personen im Fokus.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_kirmes_funfair_01"
         },
         {
           "id": "kirmes-funfair-02",
@@ -821,10 +887,16 @@
         {
           "id": "parade-festzug-01",
           "src": "/assets/event-visuals/parade-festzug-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Parade, Festzug und Straßenveranstaltung mit anonymer Bewegung im öffentlichen Raum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_parade_festzug_01"
         },
         {
           "id": "parade-festzug-02",
@@ -860,10 +932,16 @@
         {
           "id": "shooting-festival-tradition-01",
           "src": "/assets/event-visuals/shooting-festival-tradition-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Schützenfest und lokale Tradition mit festlicher, vereinsnaher Atmosphäre ohne erkennbare Personen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_shooting_festival_tradition_01"
         },
         {
           "id": "shooting-festival-tradition-02",
@@ -891,10 +969,16 @@
         {
           "id": "market-stalls-01",
           "src": "/assets/event-visuals/market-stalls-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Marktstände und lokalen Markt mit Ständen, Waren und ruhiger öffentlicher Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_market_stalls_01"
         },
         {
           "id": "market-stalls-02",
@@ -946,10 +1030,16 @@
         {
           "id": "book-market-01",
           "src": "/assets/event-visuals/book-market-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Bücher- oder Boekenmarkt mit Büchertischen und ruhiger Marktstimmung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_book_market_01"
         },
         {
           "id": "book-market-02",
@@ -1068,10 +1158,16 @@
         {
           "id": "country-fair-rural-01",
           "src": "/assets/event-visuals/country-fair-rural-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für eine ländliche Veranstaltung oder Landpartie mit regionaler, ruhiger Außenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_country_fair_rural_01"
         },
         {
           "id": "country-fair-rural-02",
@@ -1263,10 +1359,16 @@
         {
           "id": "learning-science-workshop-01",
           "src": "/assets/event-visuals/learning-science-workshop-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Lern-, Wissenschafts- oder Workshop-Veranstaltung mit ruhiger Experimentier- und Mitmachatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_learning_science_workshop_01"
         },
         {
           "id": "learning-science-workshop-02",
@@ -1302,10 +1404,16 @@
         {
           "id": "dance-music-workshop-01",
           "src": "/assets/event-visuals/dance-music-workshop-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Tanz-, Musik- oder Performance-Workshop mit Bewegung, Probenatmosphäre und anonymen Personen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_dance_music_workshop_01"
         },
         {
           "id": "dance-music-workshop-02",
@@ -1406,10 +1514,16 @@
         {
           "id": "running-event-01",
           "src": "/assets/event-visuals/running-event-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Laufveranstaltung mit anonymer Laufbewegung, Strecke und lokaler Sportatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_running_event_01"
         },
         {
           "id": "running-event-02",
@@ -1437,10 +1551,16 @@
         {
           "id": "cycling-event-01",
           "src": "/assets/event-visuals/cycling-event-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Radveranstaltung oder Radsport mit anonymen Radfahrenden und lokaler Streckenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_cycling_event_01"
         },
         {
           "id": "cycling-event-02",
@@ -1468,10 +1588,16 @@
         {
           "id": "indoor-sport-competition-01",
           "src": "/assets/event-visuals/indoor-sport-competition-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Indoor-Sport und Wettbewerb in einer Sporthalle mit anonymen erwachsenen Sportlerinnen und Sportlern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_indoor_sport_competition_01"
         },
         {
           "id": "indoor-sport-competition-02",
@@ -1581,11 +1707,17 @@
         {
           "id": "evening-social-party-01",
           "src": "/assets/event-visuals/evening-social-party-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "evening_social"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Abendveranstaltung, Tanz oder geselliges Beisammensein mit warmer Innenraumatmosphäre.",
+          "legacy_visual_key": "evening_social",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_evening_social_party_01"
         },
         {
           "id": "evening-social-party-02",
@@ -1624,10 +1756,16 @@
         {
           "id": "business-messe-info-01",
           "src": "/assets/event-visuals/business-messe-info-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Messe, Information und Business-Veranstaltung mit sachlicher lokaler Veranstaltungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_business_messe_info_01"
         },
         {
           "id": "business-messe-info-02",
@@ -1663,10 +1801,16 @@
         {
           "id": "vehicle-classic-01",
           "src": "/assets/event-visuals/vehicle-classic-01.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Oldtimer und klassische Fahrzeuge mit detailreicher Fahrzeug- und Treffenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_phase1_pilot_2026_06_03",
+          "card_asset_format": "16:9_webp_1200x675",
+          "phase1_request_id": "phase1_v31_vehicle_classic_01"
         },
         {
           "id": "vehicle-classic-02",
