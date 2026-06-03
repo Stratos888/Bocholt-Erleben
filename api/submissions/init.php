@@ -257,40 +257,78 @@ function pf_send_submission_received_mail(array $submissionData): void
         return;
     }
 
-    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 | Zweck: unterscheidet Eingangsbestätigung für Einzeltermin und Aktivitaetspraesenz; Umfang: ersetzt Mail-Body und Betreff in pf_send_submission_received_mail === */
+    /* === BEGIN BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_COPY_V1 | Zweck: nutzt Mail-System-Pilotcopy und HTML-Renderer fuer Eingangsbestätigungen; Umfang: ersetzt Mail-Body, Betreff und Versanddaten in pf_send_submission_received_mail === */
     $title = trim((string)($submissionData['title'] ?? ''));
     $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+    $contactName = trim((string)($submissionData['contact_name'] ?? ''));
     $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
+    $subject = $isActivity ? 'Deine Aktivität wird geprüft' : 'Dein Einzeltermin wird geprüft';
+    $mailTitle = $subject;
+    $greeting = $contactName !== '' ? 'Hallo ' . $contactName . ',' : 'Hallo,';
+
+    $intro = $isActivity
+        ? 'Vielen Dank für deine Einreichung. Wir prüfen die Aktivität redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.'
+        : 'Vielen Dank für deine Einreichung. Wir prüfen den Termin redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.';
+
+    $bodyText = $isActivity
+        ? 'Wenn die Aktivität zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für die Aktivitätspräsenz.'
+        : 'Wenn der Termin zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für den Einzeltermin.';
+
+    $noticeTitle = 'Hinweis zur Veröffentlichung';
+    $noticeText = $isActivity
+        ? 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Aktivität erst nach finaler redaktioneller Freigabe.'
+        : 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Veranstaltung erst nach finaler redaktioneller Freigabe.';
+
     $body = implode("\n", [
-        'Hallo,',
+        $greeting,
         '',
-        $isActivity
-            ? 'deine Aktivität wurde bei Bocholt erleben zur Prüfung eingereicht.'
-            : 'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
+        $intro,
         '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
+        $isActivity ? 'Aktivität:' : 'Veranstaltung:',
+        $title !== '' ? $title : 'ohne Titel',
         '',
-        $isActivity
-            ? 'Wir prüfen jetzt, ob die Aktivität grundsätzlich zu Bocholt erleben passt und als eigene Aktivitätskarte sinnvoll ist.'
-            : 'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
-        $isActivity
-            ? 'Wenn die Aktivität grundsätzlich passt, erhältst du anschließend einen Zahlungslink für die Aktivitätspräsenz.'
-            : 'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
-        'Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach redaktioneller Freigabe.',
+        'Referenz:',
+        $reference,
+        '',
+        $bodyText,
+        '',
+        $noticeTitle . ':',
+        $noticeText,
         '',
         'Viele Grüße',
         'Bocholt erleben',
     ]);
 
+    $htmlBody = be_render_system_mail_html([
+        'title' => $mailTitle,
+        'preheader' => $intro,
+        'greeting' => $greeting,
+        'intro' => $intro,
+        'details' => [
+            [
+                'label' => $isActivity ? 'Aktivität' : 'Veranstaltung',
+                'value' => $title !== '' ? $title : 'ohne Titel',
+            ],
+            [
+                'label' => 'Referenz',
+                'value' => $reference,
+            ],
+        ],
+        'body' => $bodyText,
+        'notice_title' => $noticeTitle,
+        'notice_text' => $noticeText,
+    ]);
+
     try {
         be_send_mail(
             $to,
-            $isActivity ? 'Deine Aktivität wurde zur Prüfung eingereicht' : 'Deine Veranstaltung wurde zur Prüfung eingereicht',
-            $body
+            $subject,
+            $body,
+            $contactName !== '' ? $contactName : null,
+            $htmlBody
         );
-    /* === END BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 === */
+    /* === END BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_COPY_V1 === */
     } catch (Throwable $error) {
         error_log('Submission received mail failed: ' . $error->getMessage());
     }
@@ -537,6 +575,7 @@ try {
             'title' => $title,
             'payment_reference_key' => $paymentReferenceKey,
             'submission_kind' => $submissionKind,
+            'contact_name' => $contactName,
         ]);
     }
 

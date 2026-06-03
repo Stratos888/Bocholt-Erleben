@@ -276,6 +276,110 @@ function be_mail_normalize_body(string $body): string
     return implode("\r\n", $lines);
 }
 
+/* === BEGIN BLOCK: MAIL_SYSTEM_RENDERER_V1 | Zweck: rendert zentrale HTML-Systemmails nach MAIL_SYSTEM.md mit Plain-Text-Fallback; Umfang: Mail-HTML-Escaping, Komponentendaten und App-Kartenlayout === */
+function be_mail_escape_html(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function be_mail_paragraph_html(string $text): string
+{
+    $paragraphs = preg_split('/\n{2,}/', trim(str_replace(["\r\n", "\r"], "\n", $text))) ?: [];
+
+    $html = '';
+    foreach ($paragraphs as $paragraph) {
+        $line = nl2br(be_mail_escape_html(trim($paragraph)), false);
+        if ($line !== '') {
+            $html .= '<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#1F2933;">' . $line . '</p>';
+        }
+    }
+
+    return $html;
+}
+
+function be_render_system_mail_html(array $data): string
+{
+    $title = trim((string)($data['title'] ?? ''));
+    $preheader = trim((string)($data['preheader'] ?? $title));
+    $greeting = trim((string)($data['greeting'] ?? 'Hallo,'));
+    $intro = trim((string)($data['intro'] ?? ''));
+    $details = is_array($data['details'] ?? null) ? $data['details'] : [];
+    $body = trim((string)($data['body'] ?? ''));
+    $noticeTitle = trim((string)($data['notice_title'] ?? ''));
+    $noticeText = trim((string)($data['notice_text'] ?? ''));
+    $ctaLabel = trim((string)($data['cta_label'] ?? ''));
+    $ctaUrl = trim((string)($data['cta_url'] ?? ''));
+
+    $detailsHtml = '';
+    if ($details !== []) {
+        $rows = '';
+        foreach ($details as $detail) {
+            if (!is_array($detail)) {
+                continue;
+            }
+
+            $label = trim((string)($detail['label'] ?? ''));
+            $value = trim((string)($detail['value'] ?? ''));
+
+            if ($label === '' && $value === '') {
+                continue;
+            }
+
+            $rows .= '<div style="margin:0 0 14px;">'
+                . '<div style="margin:0 0 4px;font-size:13px;line-height:1.35;font-weight:650;color:#5F6B73;">' . be_mail_escape_html($label) . '</div>'
+                . '<div style="font-size:15px;line-height:1.5;color:#1F2933;">' . be_mail_escape_html($value) . '</div>'
+                . '</div>';
+        }
+
+        if ($rows !== '') {
+            $detailsHtml = '<div style="margin:4px 0 22px;padding:16px 18px;background:#F9FBF6;border:1px solid #E3EBDD;border-radius:14px;">'
+                . $rows
+                . '</div>';
+        }
+    }
+
+    $ctaHtml = '';
+    if ($ctaLabel !== '' && $ctaUrl !== '') {
+        $ctaHtml = '<div style="margin:6px 0 24px;">'
+            . '<a href="' . be_mail_escape_html($ctaUrl) . '" style="display:inline-block;padding:12px 18px;background:#8BCF4A;border-radius:999px;color:#1F2933;font-size:15px;font-weight:650;text-decoration:none;">' . be_mail_escape_html($ctaLabel) . '</a>'
+            . '</div>';
+    }
+
+    $noticeHtml = '';
+    if ($noticeTitle !== '' || $noticeText !== '') {
+        $noticeHtml = '<div style="margin:2px 0 24px;padding:16px 18px;background:#EAF6DB;border-radius:14px;">'
+            . ($noticeTitle !== '' ? '<div style="margin:0 0 6px;font-size:13px;line-height:1.35;font-weight:650;color:#1F2933;">' . be_mail_escape_html($noticeTitle) . '</div>' : '')
+            . ($noticeText !== '' ? '<div style="font-size:14px;line-height:1.55;color:#1F2933;">' . be_mail_escape_html($noticeText) . '</div>' : '')
+            . '</div>';
+    }
+
+    return '<!doctype html>'
+        . '<html lang="de">'
+        . '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' . be_mail_escape_html($title) . '</title></head>'
+        . '<body style="margin:0;padding:0;background:#F9FBF6;font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Arial,sans-serif;color:#1F2933;">'
+        . '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">' . be_mail_escape_html($preheader) . '</div>'
+        . '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;background:#F9FBF6;border-collapse:collapse;">'
+        . '<tr><td align="center" style="padding:28px 16px;">'
+        . '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;max-width:560px;background:#FFFFFF;border:1px solid #E3EBDD;border-radius:20px;border-collapse:separate;">'
+        . '<tr><td style="padding:28px;">'
+        . '<div style="margin:0 0 18px;font-size:13px;line-height:1.35;font-weight:650;color:#5F6B73;">Bocholt erleben</div>'
+        . '<h1 style="margin:0 0 18px;font-size:22px;line-height:1.3;font-weight:700;color:#1F2933;">' . be_mail_escape_html($title) . '</h1>'
+        . '<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#1F2933;">' . be_mail_escape_html($greeting) . '</p>'
+        . be_mail_paragraph_html($intro)
+        . $detailsHtml
+        . be_mail_paragraph_html($body)
+        . $ctaHtml
+        . $noticeHtml
+        . '<p style="margin:0;font-size:15px;line-height:1.6;color:#1F2933;">Viele Grüße<br>Bocholt erleben</p>'
+        . '</td></tr>'
+        . '</table>'
+        . '<div style="max-width:560px;margin:12px auto 0;font-size:12px;line-height:1.45;color:#8A949B;text-align:center;">Diese Nachricht wurde automatisch von Bocholt erleben versendet.</div>'
+        . '</td></tr>'
+        . '</table>'
+        . '</body></html>';
+}
+/* === END BLOCK: MAIL_SYSTEM_RENDERER_V1 === */
+
 function be_smtp_read_response($socket): array
 {
     $lines = [];
@@ -324,7 +428,7 @@ function be_smtp_command($socket, string $command, array $expectedCodes): array
     return be_smtp_expect($socket, $expectedCodes);
 }
 
-function be_send_mail(string $toAddress, string $subject, string $textBody, ?string $toName = null): void
+function be_send_mail(string $toAddress, string $subject, string $textBody, ?string $toName = null, ?string $htmlBody = null): void
 {
     if (!filter_var($toAddress, FILTER_VALIDATE_EMAIL)) {
         throw new RuntimeException('Recipient e-mail address is invalid.');
@@ -387,13 +491,32 @@ function be_send_mail(string $toAddress, string $subject, string $textBody, ?str
             'To: ' . be_mail_format_address($toAddress, $toName),
             'Subject: ' . be_mail_encode_header($subject),
             'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
-            'Content-Transfer-Encoding: 8bit',
         ];
+
+        if ($htmlBody !== null && trim($htmlBody) !== '') {
+            $boundary = 'be-mail-' . bin2hex(random_bytes(16));
+            $headers[] = 'Content-Type: multipart/alternative; boundary="' . $boundary . '"';
+
+            $messageBody = '--' . $boundary
+                . "\r\nContent-Type: text/plain; charset=UTF-8"
+                . "\r\nContent-Transfer-Encoding: 8bit"
+                . "\r\n\r\n"
+                . be_mail_normalize_body($textBody)
+                . "\r\n--" . $boundary
+                . "\r\nContent-Type: text/html; charset=UTF-8"
+                . "\r\nContent-Transfer-Encoding: 8bit"
+                . "\r\n\r\n"
+                . be_mail_normalize_body($htmlBody)
+                . "\r\n--" . $boundary . "--";
+        } else {
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+            $headers[] = 'Content-Transfer-Encoding: 8bit';
+            $messageBody = be_mail_normalize_body($textBody);
+        }
 
         $message = implode("\r\n", $headers)
             . "\r\n\r\n"
-            . be_mail_normalize_body($textBody)
+            . $messageBody
             . "\r\n.";
 
         $written = fwrite($socket, $message . "\r\n");
