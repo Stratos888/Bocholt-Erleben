@@ -905,25 +905,22 @@ Umfang:
 
       const rejectOptions = isActivityPresence ? [
         ["", "Ablehnungsgrund auswählen …"],
-        ["DUBLETTE", "DUBLETTE – Aktivität ist bereits vorhanden oder schon entschieden"],
-        ["KEINE_EIGENSTAENDIGE_AKTIVITAET", "KEINE_EIGENSTAENDIGE_AKTIVITAET – keine sinnvolle eigene Aktivitätskarte"],
-        ["EVENT_STATT_AKTIVITAET", "EVENT_STATT_AKTIVITAET – einzelner Termin statt dauerhafte Aktivität"],
-        ["AUSSERHALB_SCOPE", "AUSSERHALB_SCOPE – außerhalb Radius oder nicht relevant genug"],
-        ["QUELLE_ZU_SCHWACH", "QUELLE_ZU_SCHWACH – Angaben reichen für Prüfung nicht aus"],
-        ["SONSTIGES", "SONSTIGES – nur wenn kein anderer Grund passt"]
+        ["Die Aktivität ist bereits vorhanden oder wurde bereits ausreichend abgedeckt.", "Doppelt / bereits abgedeckt"],
+        ["Die Einreichung ist eher ein einzelner Termin als eine dauerhafte Aktivität.", "Einzeltermin statt Aktivität"],
+        ["Die Aktivität ist nicht öffentlich oder für Besucher nicht klar nutzbar.", "Nicht öffentlich nutzbar"],
+        ["Die Quelle oder die Angaben reichen für eine verlässliche Veröffentlichung nicht aus.", "Quelle / Angaben reichen nicht"],
+        ["Die Aktivität passt räumlich nicht ausreichend zu Bocholt und Umgebung.", "Nicht lokal genug"],
+        ["Die Einreichung ist eher Werbung, Dienstleistung oder Verkauf als eine redaktionelle Aktivität.", "Eher Werbung / Dienstleistung"],
+        ["Die Aktivität ist in dieser Form nicht eigenständig genug für eine eigene Aktivitätskarte oder passt nicht ausreichend zum redaktionellen Fokus von Bocholt erleben.", "Keine eigene Aktivitätskarte"]
       ] : [
         ["", "Ablehnungsgrund auswählen …"],
-        ["DUBLETTE", "DUBLETTE – Event ist bereits vorhanden oder schon entschieden"],
-        ["DATUM_FALSCH", "DATUM_FALSCH – Datum falsch oder nicht sicher belegbar"],
-        ["ZEIT_FALSCH", "ZEIT_FALSCH – Uhrzeit falsch, Zeitspanne falsch oder Zeit nicht belegbar"],
-        ["URL_FALSCH", "URL_FALSCH – URL falsch, 404, falscher Termin oder nicht instanzpassend"],
-        ["QUELLE_ZU_SCHWACH", "QUELLE_ZU_SCHWACH – Quelle zu allgemein, unsicher oder keine echte Detailseite"],
-        ["KEIN_EVENT", "KEIN_EVENT – kein echtes Event, eher Info, Öffnungszeit, Kursliste oder Promo"],
-        ["ZU_NISCHIG", "ZU_NISCHIG – formal korrekt, aber zu wenig Nutzerwert"],
-        ["AUSSERHALB_SCOPE", "AUSSERHALB_SCOPE – außerhalb Radius oder nicht relevant genug"],
-        ["MONETARISIERUNGSSCHUTZ", "MONETARISIERUNGSSCHUTZ – geschützte Venue / direkte Promo potenzieller Kunden"],
-        ["BOT_FEHLER_SONSTIGES", "BOT_FEHLER_SONSTIGES – Bot hat falsch extrahiert oder modelliert"],
-        ["SONSTIGES", "SONSTIGES – nur wenn kein anderer Grund passt"]
+        ["Die Veranstaltung ist bereits vorhanden oder wurde bereits ausreichend abgedeckt.", "Doppelt / bereits abgedeckt"],
+        ["Die Terminangaben sind nicht belastbar genug, zum Beispiel Datum, Uhrzeit, Ort oder Link sind unklar.", "Terminangaben unklar"],
+        ["Die Veranstaltung ist nicht öffentlich oder für Besucher nicht klar zugänglich.", "Nicht öffentlich zugänglich"],
+        ["Die Einreichung ist eher ein Dauerangebot, eine Öffnungszeit, eine Kursübersicht, eine allgemeine Information oder Werbung als ein konkreter Einzeltermin.", "Kein konkreter Einzeltermin"],
+        ["Die Quelle oder die Angaben reichen für eine verlässliche Veröffentlichung nicht aus.", "Quelle / Angaben reichen nicht"],
+        ["Die Veranstaltung passt räumlich nicht ausreichend zu Bocholt und Umgebung.", "Nicht lokal genug"],
+        ["Die Veranstaltung passt in dieser Form nicht ausreichend zum redaktionellen Fokus von Bocholt erleben.", "Redaktionell nicht passend"]
       ];
 
       const rejectOptionsHtml = rejectOptions.map(([value, label]) => {

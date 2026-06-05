@@ -48,10 +48,15 @@ function sr_required_positive_int(array $input, string $key, string $label): int
     return $intValue;
 }
 
-function sr_optional_text(array $input, string $key): ?string
+function sr_required_text(array $input, string $key, string $label): string
 {
     $value = trim((string)($input[$key] ?? ''));
-    return $value === '' ? null : $value;
+
+    if ($value === '') {
+        throw new InvalidArgumentException($label . ' ist erforderlich.');
+    }
+
+    return $value;
 }
 
 function sr_fetch_submission(PDO $pdo, int $submissionId): array
@@ -129,7 +134,7 @@ function sr_send_rejection_mail(array $submission, ?string $reason): void
 try {
     $input = sr_read_json_body();
     $submissionId = sr_required_positive_int($input, 'submission_id', 'submission_id');
-    $reason = sr_optional_text($input, 'reason');
+    $reason = sr_required_text($input, 'reason', 'Ablehnungsgrund');
 
     $pdo = be_db();
     $submission = sr_fetch_submission($pdo, $submissionId);
