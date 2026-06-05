@@ -557,7 +557,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
 
     if ($expiresAt !== '') {
         $details[] = [
-            'label' => 'Gültig bis',
+            'label' => 'Zahlungslink gültig bis',
             'value' => $expiresAt,
         ];
     }
