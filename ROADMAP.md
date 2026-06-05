@@ -989,4 +989,42 @@ Nicht zuerst lösen:
 - neue Layout-Polishes
 - Sonderbilder für einzelne Events
 
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_SUBMOTIFS_2026_06_05 === -->
+## Folgepunkt: Event-Visual-Submotive für generische Visual Keys
+
+Status 2026-06-05:
+
+- Phase-2-Event-Visuals nutzen bei generischen Visual Keys bewusst unterschiedliche Submotive, um monotone Bildpools zu vermeiden.
+- Akuter Anlass: `indoor_sport_competition` darf nicht nur aus Badminton-Motiven bestehen.
+- Akzeptierte Submotive für diesen Key:
+  - bestehendes Motiv: Badminton
+  - `indoor-sport-competition-02`: Handball / Indoor-Teamspiel
+  - `indoor-sport-competition-03`: Volleyball
+- Diese Motive dürfen im generischen Pool bleiben, dürfen später aber nicht beliebig auf sportartspezifische Events gemappt werden.
+
+Ziel:
+
+- Vor finaler Integration der Phase-2-Assets prüfen, ob generische Visual Keys Submotiv- oder Mapping-Hinweise brauchen.
+- Mögliche Feld-/Namenslogik:
+  - `sub_motif`
+  - `sport_type`
+  - `usage_hint`
+  - `mapping_note`
+- Sportartspezifische Events sollen nur dann ein spezifisches Submotiv bekommen, wenn Eventtitel oder Quelle die Sportart eindeutig hergeben.
+- Generische Events ohne konkrete Sportart dürfen weiterhin ein neutrales oder passend breites Indoor-Sport-Motiv nutzen.
+
+Warum:
+
+- Pool-Diversität ist sinnvoll, aber falsche Event-Zuordnung wirkt unprofessionell.
+- Ein Volleyballbild bei einem Handballtermin oder ein Handballbild bei einem Badmintonturnier wäre fachlich falsch.
+- Das Thema betrifft nicht nur Sport, sondern alle generischen Visual Keys mit klar unterscheidbaren Untertypen.
+
+Akzeptanzkriterien:
+
+- Für `indoor_sport_competition` sind Badminton, Handball/Indoor-Teamspiel und Volleyball vor der finalen Pool-Integration unterscheidbar dokumentiert.
+- Die spätere Mapping-/Auswahllogik berücksichtigt Submotive, sobald ein Event eine konkrete Sportart nennt.
+- Der generische Bildpool darf divers bleiben, ohne sportartspezifische Fehlzuordnungen zu erzeugen.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_SUBMOTIFS_2026_06_05 === -->
+
+
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 === -->
