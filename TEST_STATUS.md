@@ -2409,3 +2409,41 @@ Bewertung:
 - Die bestehende Funnel-Grundlogik bleibt erhalten.
 - Der fachliche Nutzen für Today Home folgt später über `activity_opening_hours.json`, `opening-status.js` und kontrollierte Recommendation-Anbindung.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_PREP_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_DONE_2026_06_05 | Zweck: dokumentiert Abschluss des Activity-Opening-Hours-V1-Submission-Workpacks; Umfang: Formular, Backend, DB, Review-API, Review-Inbox === -->
+## Activity Opening Hours V1 – Submission-/Review-Kanal abgeschlossen – 2026-06-05
+
+Status: auf `staging` umgesetzt und per Testeinreichung verifiziert.
+
+Abgeschlossener Umfang:
+- Aktivitätsformular erfasst Zugänglichkeit / Verfügbarkeit.
+- Regelmäßige Öffnungszeiten können strukturiert pro Wochentag erfasst werden.
+- Geschlossene Tage blenden Von/Bis-Felder aus.
+- Kein Wochentag ist standardmäßig geschlossen.
+- Payload sendet `activity_opening` an `api/submissions/init.php`.
+- Backend speichert die Daten in `submissions.activity_opening_json`.
+- Review-API gibt `activity_opening` aus.
+- Review-Inbox zeigt Anbieterangaben unter „Weitere Prüfdaten“ an.
+
+Verifizierter Test:
+- Neue Testeinreichung `Test Öffnungszeiten Payload 2` wurde erstellt.
+- Staging-DB `dbs15596763.submissions.activity_opening_json` war gefüllt.
+- Review-Inbox zeigte:
+  - Zugänglichkeit laut Anbieter
+  - Vom Anbieter angegebene Öffnungszeiten
+  - Feiertage laut Anbieter
+  - Prüfhinweis Öffnungszeiten
+
+Wichtige Einschränkung:
+- Alte Testeinträge vor dem Payload-Fix haben erwartbar `activity_opening_json = NULL`.
+- Für Live gilt weiterhin: Vor Live-Deploy muss die Live-DB die Spalte `activity_opening_json` besitzen.
+
+Aktueller relevanter Commit:
+- `19f040b` – Sende Öffnungszeiten im Aktivitätsformular-Payload
+
+Nicht Teil dieses Workpacks:
+- Öffnungszeiten öffentlicher bestehender Activities auswerten.
+- Today Home anhand echter Öffnungsstatus steuern.
+- Öffnungsstatus öffentlich anzeigen.
+- Daily-/Weekly-Check gegen Anbieterquellen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_DONE_2026_06_05 === -->

@@ -1028,3 +1028,29 @@ Akzeptanzkriterien:
 
 
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 | Zweck: definiert naechsten Workpack fuer oeffentliche Oeffnungsstatus-Auswertung; Umfang: bestehende Activities, Today Home, Recommendation-Logik === -->
+## Nächster Workpack: Öffnungsstatus öffentlich auswerten
+
+Ausgangslage:
+- Neue Anbieter-Einreichungen können strukturierte Öffnungszeiten liefern.
+- Existing Activities in `data/offers.json` haben noch keinen belastbaren öffentlichen Öffnungsstatus.
+- Today Home kann derzeit noch Activities mit `Öffnungszeiten prüfen` als Top-Tipp zeigen.
+
+Ziel:
+- Öffnungsstatus für bestehende Activities sauber modellieren.
+- Today Home darf keine Top-Tipps vergeben, wenn ein Ort wahrscheinlich geschlossen ist oder der Status unklar ist.
+- Anzeige soll zwischen Anbieterangabe, geprüftem Status und unklarem Status unterscheiden.
+
+Mögliche Zielbausteine:
+- `data/activity_opening_hours.json` oder kontrollierte Erweiterung von `data/offers.json`.
+- `js/opening-status.js` als zentraler Auswertungsowner.
+- Anbindung in `js/recommendations.js` und `js/today-home.js`.
+- NRW-Feiertage, Wochenzeiten und Sonderfälle berücksichtigen.
+
+Start im nächsten Chat:
+1. Aktuelle Baseline prüfen.
+2. `data/offers.json`, `js/today-home.js`, `js/recommendations.js` analysieren.
+3. Entscheiden, ob Öffnungszeiten separat oder direkt in Activity-Daten modelliert werden.
+4. Erst danach kleiner, owner-klarer Patch.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 === -->
