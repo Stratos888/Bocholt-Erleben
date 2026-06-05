@@ -100,6 +100,96 @@ Offen:
 <!-- === END BLOCK: TEST_STATUS_PAYMENT_LINK_MAIL_EVENT_2026_06_05 === -->
 
 
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIL_SYSTEM_TOPICS_FREEZE_2026_06_05 | Zweck: dokumentiert den konsolidierten Staging-Abschluss des zentralen Mail-Topic-Systems; Umfang: Eingangs-, Zahlungslink-, Freigabe-, Ablehnungs- und Magic-Link-Mails sowie interner Testendpunkt === -->
+
+# Teststand: Mail-System Topic-Migration – Staging-Freeze
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- geprüfter Stand: `57563b8`
+- Ergebnis: bestanden / Mail-System-Topic-Migration abgeschlossen
+
+## Umgesetzter Scope
+
+Alle produktiven Nutzer-Mails laufen über das zentrale Mail-Topic-System in `api/_bootstrap.php`:
+
+- `submission_received_event`
+- `submission_received_activity`
+- `payment_released_event`
+- `payment_released_activity`
+- `publication_approved_event`
+- `publication_approved_activity`
+- `rejection_event`
+- `rejection_activity`
+- `magic_link_portal`
+
+Die produktiven Versandstellen bleiben fachlich getrennt, nutzen aber zentral gerenderte Maildaten:
+
+- `api/submissions/init.php` → Eingangsbestätigung
+- `api/submissions/release-payment.php` → Zahlungslink
+- `api/submissions/approve.php` → Freigabe
+- `api/submissions/reject.php` → Ablehnung
+- `api/organizer-portal/request-magic-link.php` → Anbieterbereich-Zugangslink
+
+## Geprüft und bestanden
+
+- HTML-Mail-Layout wird zentral gerendert.
+- Plain-Text-Fallback bleibt vorhanden.
+- Persönliche Anrede funktioniert über `contact_name` bzw. Snapshot-Felder, sofern vorhanden.
+- Lesbare öffentliche Referenz wird statt vollständiger UUID angezeigt.
+- Zahlungslink-Mails zeigen `Zahlungslink gültig bis`.
+- Magic-Link-Mail zeigt `Zugangslink gültig bis`.
+- Freigabe-Mails formulieren bewusst `wurde freigegeben` statt `ist sichtbar`, weil tatsächliche Sichtbarkeit von Aktualisierung/Deploy abhängen kann.
+- Aktivitäts-Freigabe-Mail erklärt die Tarifzuordnung über die Freigabe.
+- Ablehnungs-Mails nutzen verpflichtende, mail-taugliche Ablehnungsgründe aus der Inbox.
+- Alte technische Ablehnungs-Codes wie `DUBLETTE`, `DATUM_FALSCH`, `BOT_FEHLER_SONSTIGES` werden nicht mehr als Mailgrund versendet.
+- Interner Testendpunkt `api/mail-topic-test.php` ermöglicht geschützten Topic-Testversand ohne Stripe-, DB- oder Inbox-Statusänderung.
+
+## Sammeltest
+
+Über den internen Mail-Topic-Testendpunkt wurden alle 9 Topics gegen Staging ausgelöst.
+
+Alle Topics lieferten:
+
+- `status: ok`
+- `sent: true`
+- erwarteten Betreff
+
+Getestete Betreffzeilen:
+
+- `Dein Einzeltermin wird geprüft`
+- `Deine Aktivität wird geprüft`
+- `Nächster Schritt: Zahlung für deinen Einzeltermin`
+- `Nächster Schritt: Zahlung für deine Aktivitätspräsenz`
+- `Dein Einzeltermin wurde freigegeben`
+- `Deine Aktivität wurde freigegeben`
+- `Dein Einzeltermin wurde nicht freigegeben`
+- `Deine Aktivität wurde nicht freigegeben`
+- `Dein Zugangslink für Bocholt erleben`
+
+## Qualitäts- und Sicherheitsbewertung
+
+- Keine produktive Mailstelle mit alter Plain-Text-Sonderlogik gefunden.
+- Alte Ablehnungsgrund-Codes wurden aus Inbox/API-Scan entfernt.
+- Alle relevanten PHP-Dateien ohne Syntaxfehler:
+  - `api/_bootstrap.php`
+  - `api/submissions/init.php`
+  - `api/submissions/release-payment.php`
+  - `api/submissions/approve.php`
+  - `api/submissions/reject.php`
+  - `api/organizer-portal/request-magic-link.php`
+  - `api/mail-topic-test.php`
+- Der Testendpunkt ist per Review-Zugang geschützt und verändert keine Datenbank-, Stripe- oder Inbox-Zustände.
+
+## Offene Hinweise
+
+- Review-Passwort rotieren, weil es im Chat sichtbar verwendet wurde.
+- `api/mail-topic-test.php` bleibt vorerst als internes Testwerkzeug bestehen.
+- Später entscheiden, ob der Testendpunkt dauerhaft bleibt oder vor Production-Härtung wieder entfernt wird.
+- Untracked Event-Visual-PNGs unter `assets/event-visuals/` gehören zu einem separaten Visual-Workstream und wurden in diesem Mail-Workstream nicht berührt.
+
+<!-- === END BLOCK: TEST_STATUS_MAIL_SYSTEM_TOPICS_FREEZE_2026_06_05 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert den Staging-Proof der zentralen Veröffentlichungserklärung und der kontextuellen Hilfelinks; Umfang: Informationsarchitektur, Mobile-/Desktop-UX, Ankerverhalten, Link-Hierarchie, Abgrenzung zu Funnel-/Checkout-Logik === -->
 
 # Teststand: Veröffentlichungserklärung und kontextuelle Hilfelinks
