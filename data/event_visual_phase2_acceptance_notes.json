@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "purpose": "Abnahme- und Mapping-Notizen fuer Event Visual Phase 2 vor WebP-Konvertierung und Pool-Integration.",
+  "records": [
+    {
+      "image_id": "book-market-02",
+      "visual_key": "book_market",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/book-market-02.webp",
+      "source_png": null,
+      "sub_motif": "book_market_closeup",
+      "qa_note": "Accepted close-up book crates / book market motif. Final source filename to be assigned during raw-image mapping."
+    },
+    {
+      "image_id": "book-market-03",
+      "visual_key": "book_market",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/book-market-03.webp",
+      "source_png": null,
+      "sub_motif": "book_market_courtyard_context",
+      "qa_note": "Accepted wider courtyard/context book market variant. Final source filename to be assigned during raw-image mapping."
+    },
+    {
+      "image_id": "country-fair-rural-02",
+      "visual_key": "country_fair_rural",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/country-fair-rural-02.webp",
+      "source_png": null,
+      "sub_motif": "outdoor_farm_courtyard_market",
+      "qa_note": "Accepted final retry image with produce, flowers, pumpkins, family presence; children only from behind/non-identifiable."
+    },
+    {
+      "image_id": "country-fair-rural-03",
+      "visual_key": "country_fair_rural",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/country-fair-rural-03.webp",
+      "source_png": null,
+      "sub_motif": "barn_market_documentary",
+      "qa_note": "Accepted final retry image with barn/indoor-outdoor market depth, younger adults, non-identifiable child from behind."
+    },
+    {
+      "image_id": "cycling-event-02",
+      "visual_key": "cycling_event",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/cycling-event-02.webp",
+      "source_png": null,
+      "sub_motif": "community_tour_start_gathering",
+      "qa_note": "Accepted local gathering/start point with practical everyday bikes and mixed casual clothing; check background car/plate details in final QA."
+    },
+    {
+      "image_id": "cycling-event-03",
+      "visual_key": "cycling_event",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/cycling-event-03.webp",
+      "source_png": null,
+      "sub_motif": "rural_tree_lined_route",
+      "qa_note": "Accepted rural recreational cycling route; mostly backs, everyday bikes, good card readability; age mix skews older but plausible."
+    },
+    {
+      "image_id": "dance-music-workshop-02",
+      "visual_key": "dance_music_workshop",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/dance-music-workshop-02.webp",
+      "source_png": null,
+      "sub_motif": "adult_dance_workshop_hall",
+      "qa_note": "Accepted modest adult community/sports-hall dance workshop with instructor and varied adult participants."
+    },
+    {
+      "image_id": "dance-music-workshop-03",
+      "visual_key": "dance_music_workshop",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/dance-music-workshop-03.webp",
+      "source_png": null,
+      "sub_motif": "adult_rhythm_group_workshop",
+      "qa_note": "Accepted warmer documentary workshop atmosphere with mixed-age adult semicircle and subtle audio setup."
+    },
+    {
+      "image_id": "film-screening-02",
+      "visual_key": "film_screening",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/film-screening-02.webp",
+      "source_png": null,
+      "sub_motif": "community_screening_audience",
+      "qa_note": "Accepted modest cultural-room screening with audience from behind, projector table, dim warm light, no recognizable film content."
+    },
+    {
+      "image_id": "film-screening-03",
+      "visual_key": "film_screening",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/film-screening-03.webp",
+      "source_png": null,
+      "sub_motif": "pre_post_screening_social",
+      "qa_note": "Accepted social pre/post-screening atmosphere with blank screen and adult conversation; several adult faces but acceptable."
+    },
+    {
+      "image_id": "indoor-sport-competition-02",
+      "visual_key": "indoor_sport_competition",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/indoor-sport-competition-02.webp",
+      "source_png": null,
+      "sub_motif": "handball_team_ball_sport",
+      "qa_note": "Accepted adult amateur handball / indoor team ball sport. Later mapping must avoid using it for clearly different named sports."
+    },
+    {
+      "image_id": "indoor-sport-competition-03",
+      "visual_key": "indoor_sport_competition",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/indoor-sport-competition-03.webp",
+      "source_png": null,
+      "sub_motif": "volleyball",
+      "qa_note": "Accepted adult amateur volleyball tournament. Later mapping must avoid using it for clearly different named sports."
+    },
+    {
+      "image_id": "running-event-02",
+      "visual_key": "running_event",
+      "status": "accepted_slightly_critical",
+      "target_webp": "assets/event-visuals/running-event-02.webp",
+      "source_png": null,
+      "sub_motif": "adult_start_gathering",
+      "qa_note": "Accepted as sufficient adult/jüngere-Erwachsene start gathering; improved age mix but still somewhat uniform running clothes."
+    },
+    {
+      "image_id": "running-event-03",
+      "visual_key": "running_event",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/running-event-03.webp",
+      "source_png": null,
+      "sub_motif": "family_friendly_route",
+      "qa_note": "Accepted route image with adults and non-identifiable children from behind/distance/blur; local community-run feel."
+    },
+    {
+      "image_id": "shooting-festival-tradition-02",
+      "visual_key": "shooting_festival_tradition",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/shooting-festival-tradition-02.webp",
+      "source_png": null,
+      "sub_motif": "schuetzen_procession_street",
+      "qa_note": "Accepted local Schützen procession/gathering, mostly backs/side views, traditional clothing, no weapon focus."
+    },
+    {
+      "image_id": "shooting-festival-tradition-03",
+      "visual_key": "shooting_festival_tradition",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/shooting-festival-tradition-03.webp",
+      "source_png": null,
+      "sub_motif": "schuetzen_social_gathering",
+      "qa_note": "Accepted social Schützen gathering with flowers, hats, suits, courtyard/tent context; older age skew acceptable."
+    },
+    {
+      "image_id": "vehicle-classic-02",
+      "visual_key": "vehicle_classic",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/vehicle-classic-02.webp",
+      "source_png": null,
+      "sub_motif": "classic_car_city_festival",
+      "qa_note": "Accepted small-town classic-car/oldtimer festival with multiple cars and mixed adult visitors; plates not visibly readable."
+    },
+    {
+      "image_id": "vehicle-classic-03",
+      "visual_key": "vehicle_classic",
+      "status": "accepted",
+      "target_webp": "assets/event-visuals/vehicle-classic-03.webp",
+      "source_png": null,
+      "sub_motif": "mixed_classic_vehicle_meet",
+      "qa_note": "Accepted broader classic-vehicle meet with classic car, tractor, motorcycle/van/community seating; strong motif diversity."
+    }
+  ],
+  "last_updated": "2026-06-05"
+}
