@@ -65,6 +65,41 @@ Offen:
 
 <!-- === END BLOCK: TEST_STATUS_MAIL_SYSTEM_PILOT_2026_06_05 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_PAYMENT_LINK_MAIL_EVENT_2026_06_05 | Zweck: dokumentiert den bestandenen Staging-Test der Zahlungslink-Mail fuer Einzeltermine; Umfang: Topic-Mail, CTA, Fristlabel, Referenz und Prozesskommunikation === -->
+
+# Teststand: Mail-System – Zahlungslink-Mail Einzeltermin
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- relevante Commits:
+  - `4e13863` — Mail-Topics zentralisiert
+  - `5cbcb84` — Zahlungslink-Mails ins Topic-System migriert
+  - `0c055e1` — Zahlungslink-Frist in Mails präzisiert
+- Ergebnis: bestanden / freigegeben
+
+Geprüft und bestanden:
+- Betreff: `Nächster Schritt: Zahlung für deinen Einzeltermin`.
+- Persönliche Anrede funktioniert bei neuen Einreichungen mit `contact_name_snapshot`.
+- Datenbox zeigt Veranstaltung, lesbare Referenz und `Zahlungslink gültig bis`.
+- CTA-Button `Zahlung starten` wird korrekt angezeigt.
+- Die vollständige UUID wird nicht in der Kundenmail angezeigt.
+- Die Mail enthält keine Formulierung mit `grundsätzlich`.
+- Die Mail unterscheidet sich klar von der Eingangsbestätigung und vermittelt Prozessfortschritt.
+- Hinweisbox erklärt: Nach Zahlung wird der Termin final für die Veröffentlichung vorbereitet; sichtbar wird er erst nach redaktioneller Freigabe.
+- Die Mail kündigt an, dass der Nutzer eine weitere E-Mail erhält, sobald der Termin sichtbar ist.
+- Layout bleibt auch in schmaler Outlook-/Webmail-Ansicht nutzbar.
+
+Bewertung:
+- Die Mailkette Eingang → Zahlungslink → Veröffentlichung bleibt aus Nutzersicht nachvollziehbar.
+- Keine zusätzliche Bocholt-erleben-Mail nur für `Zahlung erhalten` vorgesehen, um unnötige Mailmenge zu vermeiden.
+
+Offen:
+- Zahlungslink-Mail Aktivitätspräsenz noch bewusst prüfen.
+- Veröffentlichung-/Live-Mail als nächste relevante Nutzer-Mail migrieren.
+
+<!-- === END BLOCK: TEST_STATUS_PAYMENT_LINK_MAIL_EVENT_2026_06_05 === -->
+
+
 <!-- === BEGIN BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert den Staging-Proof der zentralen Veröffentlichungserklärung und der kontextuellen Hilfelinks; Umfang: Informationsarchitektur, Mobile-/Desktop-UX, Ankerverhalten, Link-Hierarchie, Abgrenzung zu Funnel-/Checkout-Logik === -->
 
 # Teststand: Veröffentlichungserklärung und kontextuelle Hilfelinks
