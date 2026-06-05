@@ -59,6 +59,7 @@ function sap_fetch_submission(PDO $pdo, int $submissionId): array
             requested_model_key,
             payment_kind,
             payment_reference_key,
+            contact_name_snapshot,
             email_snapshot,
             title,
             start_date,
@@ -366,33 +367,24 @@ function sap_send_publication_mail(array $submission): void
         return;
     }
 
-    $title = trim((string)($submission['title'] ?? ''));
-    $reference = trim((string)($submission['payment_reference_key'] ?? ''));
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
 
-    $bodyLines = [
-        'Hallo,',
-        '',
-        $isActivity
-            ? 'deine Aktivität wurde bei Bocholt erleben veröffentlicht.'
-            : 'deine Veranstaltung wurde bei Bocholt erleben veröffentlicht.',
-        '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
-        '',
-        $isActivity
-            ? 'Sie ist nun im öffentlichen Aktivitätenbereich sichtbar.'
-            : 'Sie ist nun im öffentlichen Eventbereich sichtbar.',
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ];
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'publication_approved_activity' : 'publication_approved_event',
+        [
+            'title' => trim((string)($submission['title'] ?? '')),
+            'reference' => trim((string)($submission['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submission['contact_name_snapshot'] ?? '')),
+        ]
+    );
 
     try {
         be_send_mail(
             $email,
-            $isActivity ? 'Deine Aktivität wurde veröffentlicht' : 'Deine Veranstaltung wurde veröffentlicht',
-            implode("\n", $bodyLines)
+            $mail['subject'],
+            $mail['text_body'],
+            $mail['to_name'],
+            $mail['html_body']
         );
     } catch (Throwable $error) {
         error_log('Submission publication mail failed: ' . $error->getMessage());

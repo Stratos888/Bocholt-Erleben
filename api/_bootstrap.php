@@ -496,6 +496,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
     $displayTitle = $title !== '' ? $title : 'ohne Titel';
     $greeting = be_mail_greeting($contactName);
     $noticeTitle = 'Hinweis zur Veröffentlichung';
+    $noticeText = '';
     $ctaLabel = '';
     $ctaUrl = '';
     $extraDetails = [];
@@ -535,6 +536,22 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $noticeText = 'Nach der Zahlung bereiten wir die Aktivität final für die Veröffentlichung vor. Sichtbar wird sie erst nach redaktioneller Freigabe. Erst veröffentlichte Aktivitäten zählen in deinem Tarif. Du erhältst eine weitere E-Mail, sobald deine Aktivität bei Bocholt erleben sichtbar ist.';
             $ctaLabel = 'Zahlung starten';
             $ctaUrl = $paymentUrl;
+            break;
+
+        case 'publication_approved_event':
+            $subject = 'Dein Einzeltermin ist sichtbar';
+            $detailLabel = 'Veranstaltung';
+            $intro = 'Dein Einzeltermin ist jetzt bei Bocholt erleben sichtbar.';
+            $body = 'Damit ist die Veröffentlichung abgeschlossen. Danke für deine Einreichung.';
+            $noticeTitle = '';
+            break;
+
+        case 'publication_approved_activity':
+            $subject = 'Deine Aktivität ist sichtbar';
+            $detailLabel = 'Aktivität';
+            $intro = 'Deine Aktivität ist jetzt bei Bocholt erleben sichtbar.';
+            $body = 'Damit ist die Veröffentlichung abgeschlossen. Ab jetzt zählt die Aktivität in deinem Tarif.';
+            $noticeTitle = '';
             break;
 
         default:
