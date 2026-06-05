@@ -282,6 +282,21 @@ function be_mail_escape_html(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function be_mail_public_reference(string $reference): string
+{
+    $clean = strtolower(trim($reference));
+
+    if ($clean === '') {
+        return '';
+    }
+
+    if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $clean) === 1) {
+        return 'BE-' . strtoupper(substr($clean, 0, 8) . '-' . substr($clean, 9, 4));
+    }
+
+    return trim($reference);
+}
+
 function be_mail_paragraph_html(string $text): string
 {
     $paragraphs = preg_split('/\n{2,}/', trim(str_replace(["\r\n", "\r"], "\n", $text))) ?: [];

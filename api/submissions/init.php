@@ -260,6 +260,7 @@ function pf_send_submission_received_mail(array $submissionData): void
     /* === BEGIN BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_COPY_V1 | Zweck: nutzt Mail-System-Pilotcopy und HTML-Renderer fuer Eingangsbestätigungen; Umfang: ersetzt Mail-Body, Betreff und Versanddaten in pf_send_submission_received_mail === */
     $title = trim((string)($submissionData['title'] ?? ''));
     $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+    $publicReference = be_mail_public_reference($reference);
     $contactName = trim((string)($submissionData['contact_name'] ?? ''));
     $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
@@ -289,7 +290,7 @@ function pf_send_submission_received_mail(array $submissionData): void
         $title !== '' ? $title : 'ohne Titel',
         '',
         'Referenz:',
-        $reference,
+        $publicReference,
         '',
         $bodyText,
         '',
@@ -312,7 +313,7 @@ function pf_send_submission_received_mail(array $submissionData): void
             ],
             [
                 'label' => 'Referenz',
-                'value' => $reference,
+                'value' => $publicReference,
             ],
         ],
         'body' => $bodyText,
