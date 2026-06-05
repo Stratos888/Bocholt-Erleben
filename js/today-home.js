@@ -234,33 +234,110 @@
     return window.BEWeatherContext || null;
   }
 
+  function dateKey(date) {
+    const value = date instanceof Date ? date : new Date();
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+  }
+
+  function addDays(date, days) {
+    const value = date instanceof Date ? date : new Date();
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate() + Number(days || 0));
+  }
+
+  function easterSunday(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+    return new Date(year, month - 1, day);
+  }
+
+  function nrwHolidayMap(year) {
+    const easter = easterSunday(year);
+    const entries = [
+      [new Date(year, 0, 1), "Neujahr"],
+      [addDays(easter, -2), "Karfreitag"],
+      [addDays(easter, 1), "Ostermontag"],
+      [new Date(year, 4, 1), "Tag der Arbeit"],
+      [addDays(easter, 39), "Christi Himmelfahrt"],
+      [addDays(easter, 50), "Pfingstmontag"],
+      [addDays(easter, 60), "Fronleichnam"],
+      [new Date(year, 9, 3), "Tag der Deutschen Einheit"],
+      [new Date(year, 10, 1), "Allerheiligen"],
+      [new Date(year, 11, 25), "1. Weihnachtstag"],
+      [new Date(year, 11, 26), "2. Weihnachtstag"]
+    ];
+
+    return entries.reduce((map, [date, label]) => {
+      map[dateKey(date)] = label;
+      return map;
+    }, Object.create(null));
+  }
+
+  function buildDayContext(now) {
+    const date = now instanceof Date ? now : new Date();
+    const holidayName = nrwHolidayMap(date.getFullYear())[dateKey(date)] || "";
+    const isSunday = date.getDay() === 0;
+
+    return {
+      isHoliday: !!holidayName,
+      holidayName,
+      isSunday,
+      isNonBusinessDay: !!holidayName || isSunday,
+      dayType: holidayName ? "holiday" : isSunday ? "sunday" : "weekday"
+    };
+  }
+
   function getProfile() {
     const prefs = getPreferences();
     return prefs?.getProfile ? prefs.getProfile() : { interests: [], saved: [], dismissed: [], lastMode: "for_you" };
   }
 
   function createContext() {
+    const now = new Date();
     const prefs = getPreferences();
     const weatherApi = getWeather();
     const profile = getProfile();
+    const weatherContext = state.weatherContext || {};
     const weather = weatherApi?.toRecommendationWeather
-      ? weatherApi.toRecommendationWeather(state.weatherContext)
+      ? weatherApi.toRecommendationWeather(weatherContext)
       : "unknown";
+    const dayContext = buildDayContext(now);
+    const extraContext = {
+      mode: state.mode || "for_you",
+      weather,
+      rainRisk: asString(weatherContext.rainRisk || "unknown"),
+      outdoorFit: asString(weatherContext.outdoorFit || "unknown"),
+      showersLikely: weatherContext.showersLikely === true,
+      now
+    };
 
-    if (prefs?.toRecommendationContext) {
-      return prefs.toRecommendationContext({
-        mode: state.mode || "for_you",
-        weather
-      });
-    }
+    const baseContext = prefs?.toRecommendationContext
+      ? prefs.toRecommendationContext(extraContext)
+      : {
+          mode: state.mode || "for_you",
+          interests: profile.interests || [],
+          saved: profile.saved || [],
+          dismissed: profile.dismissed || [],
+          weather,
+          now
+        };
 
     return {
-      mode: state.mode || "for_you",
-      interests: profile.interests || [],
-      saved: profile.saved || [],
-      dismissed: profile.dismissed || [],
-      weather,
-      now: new Date()
+      ...baseContext,
+      ...extraContext,
+      ...dayContext
     };
   }
 
@@ -370,6 +447,52 @@
     return quality !== "needs_review" && quality !== "blocked";
   }
 
+  function arrayIncludes(values, candidates) {
+    const source = Array.isArray(values) ? values : [];
+    const wanted = Array.isArray(candidates) ? candidates : [candidates];
+    return wanted.some((candidate) => source.includes(candidate));
+  }
+
+  function itemSearchText(item) {
+    return [
+      item?.title,
+      item?.description,
+      item?.category,
+      item?.location,
+      item?.url,
+      ...(Array.isArray(item?.interestTags) ? item.interestTags : []),
+      ...(Array.isArray(item?.weatherProfile) ? item.weatherProfile : [])
+    ].map(asString).filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function hasClosureRisk(item) {
+    if (item?.type !== "activity") return false;
+    if (["closed", "limited", "opening_hours_check", "check"].includes(asString(item.holidayPolicy).toLowerCase())) return true;
+    if (item.availability === "opening_hours_check") return true;
+
+    const text = itemSearchText(item);
+    return [
+      "innenstadt",
+      "shopping",
+      "geschäft",
+      "geschaeft",
+      "einzelhandel",
+      "fußgängerzone",
+      "fussgaengerzone",
+      "arkaden",
+      "museum",
+      "ausstellung",
+      "bücherei",
+      "bibliothek"
+    ].some((needle) => text.includes(needle));
+  }
+
+  function isTopTipEligible(item, context) {
+    if (context?.isNonBusinessDay && hasClosureRisk(item)) return false;
+    if (context?.weather === "rain" && item?.type === "activity" && arrayIncludes(item.interestTags, "Draußen") && !arrayIncludes(item.weatherProfile, ["indoor", "weather_independent"])) return false;
+    return true;
+  }
+
   function compareTodayItems(a, b) {
     const scoreDiff = todayScore(b) - todayScore(a);
     if (scoreDiff) return scoreDiff;
@@ -407,9 +530,17 @@
       ? [...selectedActivities, selectedEvent]
       : selectedActivities;
 
-    return selected
+    const sorted = selected
       .sort(compareTodayItems)
       .slice(0, 3);
+
+    const topIndex = sorted.findIndex((item) => isTopTipEligible(item, context));
+    if (topIndex > 0) {
+      const [topItem] = sorted.splice(topIndex, 1);
+      sorted.unshift(topItem);
+    }
+
+    return sorted;
   }
   /* === END BLOCK: TODAY_RECOMMENDATION_EVENT_MIX_V4 === */
 
@@ -486,11 +617,22 @@
   }
   /* === END BLOCK: TODAY_EVENT_META_RUNNING_LABELS_V1 === */
 
-  function buildActivityMeta(item) {
+  function buildActivityMeta(item, context) {
     const parts = [];
+    const dayContext = context || buildDayContext(new Date());
+
     if (item.location) parts.push(item.location);
-    if (item.availability === "always") parts.push("frei planbar");
-    if (item.availability === "opening_hours_check") parts.push("Öffnungszeiten prüfen");
+
+    if (dayContext.isHoliday && hasClosureRisk(item)) {
+      parts.push(`${dayContext.holidayName || "Feiertag"}: Öffnungszeiten prüfen`);
+    } else if (dayContext.isSunday && hasClosureRisk(item)) {
+      parts.push("Sonntag: Öffnungszeiten prüfen");
+    } else if (item.availability === "always") {
+      parts.push("frei planbar");
+    } else if (item.availability === "opening_hours_check") {
+      parts.push("Öffnungszeiten prüfen");
+    }
+
     if (item.availability === "seasonal") parts.push("saisonal");
     return parts.join(" · ");
   }
@@ -499,13 +641,18 @@
     const weather = asString(context?.weather || "unknown");
     const temperature = Number(context?.temperature);
     const tempLabel = Number.isFinite(temperature) ? `${Math.round(temperature)} °C` : "";
+    const summaryLabel = asString(context?.summaryLabel);
+
+    if (summaryLabel) {
+      return [tempLabel, summaryLabel].filter(Boolean).join(" · ");
+    }
 
     if (weather === "hot") {
       return [tempLabel || "Warm heute", "Wasser & Schatten sind gute Ideen."].filter(Boolean).join(" · ");
     }
 
     if (weather === "rain") {
-      return "Regen in Bocholt – drinnen-taugliche Ideen zuerst.";
+      return [tempLabel, "wechselhaft mit Schauern – wetterfest planen."].filter(Boolean).join(" · ");
     }
 
     if (weather === "cold") {
@@ -513,11 +660,11 @@
     }
 
     if (weather === "windy") {
-      return "Windig heute – geschützte Orte passen besser.";
+      return [tempLabel, "windig – geschützte Orte passen besser."].filter(Boolean).join(" · ");
     }
 
     if (weather === "dry") {
-      return [tempLabel, "Heute gut für draußen."].filter(Boolean).join(" · ");
+      return [tempLabel, "heute gut für draußen."].filter(Boolean).join(" · ");
     }
 
     return "Drei Ideen für Bocholt – ruhig vorsortiert für heute.";
@@ -571,8 +718,10 @@
   }
 
   function renderCard(item, index, usedImages) {
-    const meta = item.type === "activity" ? buildActivityMeta(item) : buildEventMeta(item);
+    const context = createContext();
+    const meta = item.type === "activity" ? buildActivityMeta(item, context) : buildEventMeta(item);
     const image = resolveItemImage(item, usedImages);
+    const showTopBadge = index === 0 && isTopTipEligible(item, context);
     const cardClass = [
       "today-card",
       `today-card--${item.type}`,
@@ -593,7 +742,7 @@
               <span data-ui-icon="${escapeHtml(typeIcon(item))}" aria-hidden="true"></span>
               ${escapeHtml(typeLabel(item))}
             </span>
-            ${index === 0 ? `<span class="today-card__badge">Top-Tipp</span>` : ""}
+            ${showTopBadge ? `<span class="today-card__badge">Top-Tipp</span>` : ""}
           </div>
           <h2 class="today-card__title">${escapeHtml(item.title)}</h2>
           ${meta ? `<p class="today-card__meta">${escapeHtml(meta)}</p>` : ""}

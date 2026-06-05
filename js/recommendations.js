@@ -8,7 +8,13 @@
     weather: "unknown",
     saved: [],
     dismissed: [],
-    now: null
+    now: null,
+    rainRisk: "unknown",
+    outdoorFit: "unknown",
+    showersLikely: false,
+    isHoliday: false,
+    isNonBusinessDay: false,
+    holidayName: ""
   });
 
   const MODE_ALIASES = Object.freeze({
@@ -78,6 +84,46 @@
   function readRecommendation(value) {
     const obj = readObject(value);
     return readObject(obj.recommendation);
+  }
+
+  function includesText(value, patterns) {
+    const text = asString(value).toLowerCase();
+    if (!text) return false;
+
+    return asArray(patterns).some((pattern) => text.includes(pattern.toLowerCase()));
+  }
+
+  function itemSearchText(item) {
+    return [
+      item?.title,
+      item?.description,
+      item?.category,
+      item?.location,
+      item?.url,
+      ...(Array.isArray(item?.interestTags) ? item.interestTags : []),
+      ...(Array.isArray(item?.weatherProfile) ? item.weatherProfile : [])
+    ].map(asString).filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function hasClosureRisk(item) {
+    if (item?.type !== "activity") return false;
+    if (["closed", "limited", "opening_hours_check", "check"].includes(asString(item.holidayPolicy).toLowerCase())) return true;
+    if (item.availability === "opening_hours_check") return true;
+
+    return includesText(itemSearchText(item), [
+      "innenstadt",
+      "shopping",
+      "geschäft",
+      "geschaeft",
+      "einzelhandel",
+      "fußgängerzone",
+      "fussgaengerzone",
+      "arkaden",
+      "museum",
+      "ausstellung",
+      "bücherei",
+      "bibliothek"
+    ]);
   }
 
   function readFilterValues(item, group) {
@@ -239,7 +285,13 @@
       weather: asString(input.weather || DEFAULT_CONTEXT.weather) || "unknown",
       saved: asArray(input.saved || DEFAULT_CONTEXT.saved),
       dismissed: asArray(input.dismissed || DEFAULT_CONTEXT.dismissed),
-      now: input.now instanceof Date ? input.now : new Date()
+      now: input.now instanceof Date ? input.now : new Date(),
+      rainRisk: asString(input.rainRisk || DEFAULT_CONTEXT.rainRisk) || DEFAULT_CONTEXT.rainRisk,
+      outdoorFit: asString(input.outdoorFit || DEFAULT_CONTEXT.outdoorFit) || DEFAULT_CONTEXT.outdoorFit,
+      showersLikely: input.showersLikely === true,
+      isHoliday: input.isHoliday === true,
+      isNonBusinessDay: input.isNonBusinessDay === true,
+      holidayName: asString(input.holidayName || DEFAULT_CONTEXT.holidayName)
     };
   }
 
@@ -290,6 +342,7 @@
       timeProfile: [],
       planningLevel: asString(recommendation.planning_level) || "unknown",
       costLevel: asString(recommendation.cost_level) || "unknown",
+      holidayPolicy: asString(recommendation.holiday_policy || recommendation.holidayPolicy),
       recommendationWeight: asString(recommendation.recommendation_weight) || "normal",
       reasonLabels: [],
       raw: obj,
@@ -335,6 +388,7 @@
       timeProfile: asArray(recommendation.time_profile),
       planningLevel: asString(recommendation.planning_level) || "unknown",
       costLevel: asString(recommendation.cost_level) || "unknown",
+      holidayPolicy: asString(recommendation.holiday_policy || recommendation.holidayPolicy),
       recommendationWeight: asString(recommendation.recommendation_weight) || "normal",
       reasonLabels: [],
       raw: obj,
@@ -357,13 +411,22 @@
   function buildReasonLabels(item, context) {
     const labels = [];
 
+    if (context.isHoliday && hasClosureRisk(item)) {
+      labels.push("Feiertag: prüfen");
+    } else if (context.isNonBusinessDay && hasClosureRisk(item)) {
+      labels.push("Öffnungszeiten prüfen");
+    }
+
     if (item.type === "event") {
       const date = parseDateLocal(item.date);
       if (date && isSameDay(date, context.now)) labels.push("Heute");
       if (date && isWeekend(date)) labels.push("Wochenende");
     }
 
-    if (context.weather === "rain" && hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) {
+    if (context.weather === "rain" && (
+      hasAny(item.weatherProfile, ["indoor", "weather_independent"]) ||
+      (hasAny(item.weatherProfile, "rain_ok") && !hasAny(item.interestTags, "Draußen"))
+    )) {
       labels.push("Gut bei Regen");
     }
 
@@ -380,7 +443,7 @@
     }
 
     if (item.type === "activity") {
-      if (item.availability === "always") labels.push("Immer möglich");
+      if (item.availability === "always" && !(context.isNonBusinessDay && hasClosureRisk(item))) labels.push("Immer möglich");
       if (item.availability === "opening_hours_check") labels.push("Öffnungszeiten prüfen");
       if (item.availability === "seasonal") labels.push("Saisonal");
     }
@@ -427,17 +490,21 @@
     }
 
     if (context.mode === "rain") {
-      if (hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) {
+      if (hasAny(item.weatherProfile, ["indoor", "weather_independent"])) {
         score += 34;
-      } else if (hasAny(item.weatherProfile, "rain_bad")) {
+      } else if (hasAny(item.weatherProfile, "rain_ok") && !hasAny(item.interestTags, "Draußen")) {
+        score += 16;
+      } else if (hasAny(item.weatherProfile, "rain_bad") || hasAny(item.interestTags, "Draußen")) {
         score -= 24;
       }
     }
 
     if (context.weather === "rain") {
-      if (hasAny(item.weatherProfile, ["rain_ok", "indoor", "weather_independent"])) {
+      if (hasAny(item.weatherProfile, ["indoor", "weather_independent"])) {
         score += 16;
-      } else if (hasAny(item.weatherProfile, "rain_bad")) {
+      } else if (hasAny(item.weatherProfile, "rain_ok") && !hasAny(item.interestTags, "Draußen")) {
+        score += 8;
+      } else if (hasAny(item.weatherProfile, "rain_bad") || hasAny(item.interestTags, "Draußen")) {
         score -= 18;
       }
     }
@@ -483,6 +550,10 @@
       if (item.availability === "opening_hours_check") score -= 3;
       if (hasAny(item.timeProfile, "short_spontaneous")) score += 7;
       if (context.mode === "weekend" && hasAny(item.timeProfile, "weekend")) score += 14;
+
+      if (context.isNonBusinessDay && hasClosureRisk(item)) {
+        score -= 70;
+      }
     }
 
     if (!item.location) score -= 8;
