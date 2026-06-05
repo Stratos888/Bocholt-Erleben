@@ -34,6 +34,37 @@ Jeder Teststand muss enthalten:
 
 ---
 
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIL_SYSTEM_PILOT_2026_06_05 | Zweck: dokumentiert den bestandenen Staging-Test des Mail-System-Piloten; Umfang: Einzeltermin-Eingangsbestätigung, HTML-Mail, Anrede und Referenzdarstellung === -->
+
+# Teststand: Mail-System Pilot – Einzeltermin-Eingangsbestätigung
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- relevante Commits:
+  - `fbd7b6d` — Mail-System-Contract dokumentiert
+  - `d05dbf8` — Mail-System-Pilot implementiert
+  - `ec1db43` — Ansprechpartner-Feld ergänzt
+  - `ceafedf` — Mail-Referenzen lesbar formatiert
+- Ergebnis: bestanden / Pilot freigegeben
+
+Geprüft und bestanden:
+- HTML-Mail wird korrekt dargestellt.
+- Betreff: `Dein Einzeltermin wird geprüft`.
+- Persönliche Anrede funktioniert über das neue Pflichtfeld `Ansprechperson`.
+- Datenbox zeigt Veranstaltung und lesbare Referenz, z. B. `BE-E50125C5-32A2`.
+- Die vollständige UUID wird nicht mehr in der Kundenmail angezeigt.
+- Die interne UUID bleibt für Stripe, Webhooks, Review und Datenbankzuordnung unverändert.
+- Hinweisbox stellt klar: Veröffentlichung erst nach finaler redaktioneller Freigabe.
+- Keine Formulierung mit `grundsätzlich`.
+- Layout bleibt auch in schmaler Outlook-/Webmail-Ansicht nutzbar.
+
+Offen:
+- Weitere vorgefertigte Mails einzeln nach `MAIL_SYSTEM.md` migrieren.
+- Nächste Mail: Zahlungslink-Mail Einzeltermin.
+- Vor Production-Rollout: kontrollierte Test-Einreichung auf Production prüfen.
+
+<!-- === END BLOCK: TEST_STATUS_MAIL_SYSTEM_PILOT_2026_06_05 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert den Staging-Proof der zentralen Veröffentlichungserklärung und der kontextuellen Hilfelinks; Umfang: Informationsarchitektur, Mobile-/Desktop-UX, Ankerverhalten, Link-Hierarchie, Abgrenzung zu Funnel-/Checkout-Logik === -->
 
 # Teststand: Veröffentlichungserklärung und kontextuelle Hilfelinks
