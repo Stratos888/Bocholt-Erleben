@@ -532,7 +532,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $detailLabel = 'Aktivität';
             $intro = 'Wir haben deine Einreichung geprüft. Die Aktivität passt zu Bocholt erleben und kann in den nächsten Schritt gehen.';
             $body = 'Über den Zahlungslink kannst du die Aktivitätspräsenz jetzt bezahlen.';
-            $noticeText = 'Nach der Zahlung bereiten wir die Aktivität final für die Veröffentlichung vor. Sichtbar wird sie erst nach redaktioneller Freigabe. Du erhältst eine weitere E-Mail, sobald deine Aktivität bei Bocholt erleben sichtbar ist.';
+            $noticeText = 'Nach der Zahlung bereiten wir die Aktivität final für die Veröffentlichung vor. Sichtbar wird sie erst nach redaktioneller Freigabe. Erst veröffentlichte Aktivitäten zählen in deinem Tarif. Du erhältst eine weitere E-Mail, sobald deine Aktivität bei Bocholt erleben sichtbar ist.';
             $ctaLabel = 'Zahlung starten';
             $ctaUrl = $paymentUrl;
             break;
