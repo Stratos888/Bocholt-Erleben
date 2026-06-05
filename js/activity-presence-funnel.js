@@ -283,7 +283,8 @@
       location_public_confirmed: Boolean($("#activity-presence-confirmed", form)?.checked),
       ticket_url: valueOf("#activity-presence-url", form),
       description_text: valueOf("#activity-presence-description", form),
-      notes_text: buildNotes(form)
+      notes_text: buildNotes(form),
+      activity_opening: buildActivityOpening(form)
     };
   }
   /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_V1 | Zweck: liest ?plan=activity_basic/activity_plus aus der URL und waehlt den passenden Tarif im bestehenden Formular vor; Umfang: reine Frontend-Vorauswahl ohne Payload- oder Backend-Aenderung === */
