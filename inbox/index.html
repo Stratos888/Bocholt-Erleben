@@ -1306,16 +1306,27 @@ Umfang:
         }
 
         /* === BEGIN BLOCK: INBOX_DB_TERMINAL_STATUS_ADVANCE_V1 | Zweck: entfernt veröffentlichte/abgelehnte DB-Submissions sofort aus der aktuellen Inbox-Ansicht und vermeidet Bearbeitung bereits terminaler Fälle; Umfang: ersetzt nur Publish- und Reject-Erfolgspfad in writeSubmissionStatus === */
-        await postJson("/api/submissions/approve.php", { submission_id: submissionId });
+        const result = await postJson("/api/submissions/approve.php", { submission_id: submissionId });
+        const data = result?.data || {};
+        const publicationMailStatus = String(data.publication_mail_status || "");
+        const publicationMailError = String(data.publication_mail_error || "");
 
         it.status = "approved";
         it.approved_at = it.approved_at || new Date().toISOString();
 
-        setStatus(
-          isActivityPresenceItem(it)
-            ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
-            : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
-        );
+        const baseMessage = isActivityPresenceItem(it)
+          ? "Aktivitätspräsenz wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet."
+          : "Einreichung wurde veröffentlicht. Die Veröffentlichung wurde dem passenden Tarif zugeordnet.";
+
+        const mailMessage = publicationMailStatus === "sent"
+          ? " Veröffentlichungs-Mail wurde versendet."
+          : publicationMailStatus === "failed"
+            ? ` Veröffentlichungs-Mail konnte nicht versendet werden: ${publicationMailError || "unbekannter Fehler"}.`
+            : publicationMailStatus === "skipped"
+              ? ` Veröffentlichungs-Mail wurde nicht versendet${publicationMailError ? `: ${publicationMailError}` : ""}.`
+              : "";
+
+        setStatus(baseMessage + mailMessage);
         showNext(totalLoaded);
         return;
       }
