@@ -2944,3 +2944,74 @@ select.content-field__control{
   }
 }
 /* === END BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 === */
+
+
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_COMPACT_UI_V1 | Zweck: verdichtet die regelmaessigen Oeffnungszeiten im Aktivitaetspraesenz-Formular; Umfang: nur .page--activity-presence Oeffnungszeitenblock === */
+.page--publish.page--activity-presence .activity-presence-opening-week{
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-day{
+  display: grid;
+  gap: 8px;
+  padding: 10px 0 12px;
+  border-top: 1px solid rgba(31,41,51,.10);
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-day:first-child{
+  border-top: 0;
+  padding-top: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-day__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-closed{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: .86rem;
+  font-weight: 650;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-time-row{
+  display: grid;
+  grid-template-columns: minmax(0, 8.75rem) minmax(0, 8.75rem);
+  gap: 10px;
+  align-items: end;
+  max-width: 19rem;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-time{
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-time .content-field__label{
+  font-size: .78rem;
+  color: var(--color-text-secondary);
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-time .content-field__control[type="time"]{
+  min-height: 42px;
+  width: 100%;
+  padding-inline: 12px;
+}
+
+@media (max-width: 520px){
+  .page--publish.page--activity-presence .activity-presence-opening-time-row{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+}
+/* === END BLOCK: ACTIVITY_PRESENCE_OPENING_COMPACT_UI_V1 === */

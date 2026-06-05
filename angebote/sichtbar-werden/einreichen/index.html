@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-enterprise-final-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-06-05-activity-opening-compact-ui-1">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_HEAD_V1 === -->
 </head>
 <body>
@@ -187,52 +187,122 @@
 
             <div class="activity-presence-opening-week" data-opening-weekly>
               <div class="activity-presence-opening-day" data-opening-day="monday">
-                <span class="content-field__label">Montag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed checked> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Montag geöffnet ab" disabled>
-                <input class="content-field__control" type="time" data-opening-end aria-label="Montag geöffnet bis" disabled>
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Montag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed checked> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Montag geöffnet von" disabled>
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Montag geöffnet bis" disabled>
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="tuesday">
-                <span class="content-field__label">Dienstag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Dienstag geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Dienstag geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Dienstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Dienstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Dienstag geöffnet bis">
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="wednesday">
-                <span class="content-field__label">Mittwoch</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Mittwoch geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Mittwoch geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Mittwoch</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Mittwoch geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Mittwoch geöffnet bis">
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="thursday">
-                <span class="content-field__label">Donnerstag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Donnerstag geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Donnerstag geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Donnerstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Donnerstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Donnerstag geöffnet bis">
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="friday">
-                <span class="content-field__label">Freitag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Freitag geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Freitag geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Freitag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Freitag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Freitag geöffnet bis">
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="saturday">
-                <span class="content-field__label">Samstag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Samstag geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Samstag geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Samstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Samstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Samstag geöffnet bis">
+                  </label>
+                </div>
               </div>
 
               <div class="activity-presence-opening-day" data-opening-day="sunday">
-                <span class="content-field__label">Sonntag</span>
-                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
-                <input class="content-field__control" type="time" data-opening-start aria-label="Sonntag geöffnet ab">
-                <input class="content-field__control" type="time" data-opening-end aria-label="Sonntag geöffnet bis">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Sonntag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Sonntag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Sonntag geöffnet bis">
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -280,7 +350,7 @@
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-<script src="/js/activity-presence-funnel.js?v=2026-05-18-activity-presence-plan-prefill-1" defer></script>
+<script src="/js/activity-presence-funnel.js?v=2026-06-05-activity-opening-compact-ui-1" defer></script>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_BODY_V1 === -->
 </body>
 </html>
