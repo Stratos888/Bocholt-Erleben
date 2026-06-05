@@ -402,6 +402,20 @@ function be_mail_greeting(?string $contactName): string
     return $safeName !== '' ? 'Hallo ' . $safeName . ',' : 'Hallo,';
 }
 
+function be_mail_format_datetime_label(string $value): string
+{
+    $clean = trim($value);
+    if ($clean === '') {
+        return '';
+    }
+
+    try {
+        return (new DateTimeImmutable($clean))->format('d.m.Y, H:i') . ' Uhr';
+    } catch (Throwable $error) {
+        return $clean;
+    }
+}
+
 function be_render_system_mail_text(array $data): string
 {
     $lines = [];
@@ -476,10 +490,15 @@ function be_build_system_mail_topic(string $topic, array $context): array
     $contactName = trim((string)($context['contact_name'] ?? ''));
     $title = trim((string)($context['title'] ?? ''));
     $reference = be_mail_public_reference((string)($context['reference'] ?? ''));
+    $paymentUrl = trim((string)($context['payment_url'] ?? ''));
+    $expiresAt = be_mail_format_datetime_label((string)($context['expires_at'] ?? ''));
 
     $displayTitle = $title !== '' ? $title : 'ohne Titel';
     $greeting = be_mail_greeting($contactName);
     $noticeTitle = 'Hinweis zur Veröffentlichung';
+    $ctaLabel = '';
+    $ctaUrl = '';
+    $extraDetails = [];
 
     switch ($topic) {
         case 'submission_received_event':
@@ -496,6 +515,26 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $intro = 'Vielen Dank für deine Einreichung. Wir prüfen die Aktivität redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.';
             $body = 'Wenn die Aktivität zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für die Aktivitätspräsenz.';
             $noticeText = 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Aktivität erst nach finaler redaktioneller Freigabe.';
+            break;
+
+        case 'payment_released_event':
+            $subject = 'Nächster Schritt: Zahlung für deinen Einzeltermin';
+            $detailLabel = 'Veranstaltung';
+            $intro = 'Wir haben deine Einreichung geprüft. Der Termin passt zu Bocholt erleben und kann in den nächsten Schritt gehen.';
+            $body = 'Über den Zahlungslink kannst du den Einzeltermin jetzt bezahlen.';
+            $noticeText = 'Nach der Zahlung bereiten wir den Termin final für die Veröffentlichung vor. Sichtbar wird die Veranstaltung erst nach redaktioneller Freigabe. Du erhältst eine weitere E-Mail, sobald dein Termin bei Bocholt erleben sichtbar ist.';
+            $ctaLabel = 'Zahlung starten';
+            $ctaUrl = $paymentUrl;
+            break;
+
+        case 'payment_released_activity':
+            $subject = 'Nächster Schritt: Zahlung für deine Aktivitätspräsenz';
+            $detailLabel = 'Aktivität';
+            $intro = 'Wir haben deine Einreichung geprüft. Die Aktivität passt zu Bocholt erleben und kann in den nächsten Schritt gehen.';
+            $body = 'Über den Zahlungslink kannst du die Aktivitätspräsenz jetzt bezahlen.';
+            $noticeText = 'Nach der Zahlung bereiten wir die Aktivität final für die Veröffentlichung vor. Sichtbar wird sie erst nach redaktioneller Freigabe. Du erhältst eine weitere E-Mail, sobald deine Aktivität bei Bocholt erleben sichtbar ist.';
+            $ctaLabel = 'Zahlung starten';
+            $ctaUrl = $paymentUrl;
             break;
 
         default:
@@ -516,6 +555,19 @@ function be_build_system_mail_topic(string $topic, array $context): array
         ];
     }
 
+    if ($expiresAt !== '') {
+        $details[] = [
+            'label' => 'Gültig bis',
+            'value' => $expiresAt,
+        ];
+    }
+
+    foreach ($extraDetails as $detail) {
+        if (is_array($detail)) {
+            $details[] = $detail;
+        }
+    }
+
     $mailData = [
         'title' => $subject,
         'preheader' => $intro,
@@ -523,6 +575,8 @@ function be_build_system_mail_topic(string $topic, array $context): array
         'intro' => $intro,
         'details' => $details,
         'body' => $body,
+        'cta_label' => $ctaLabel,
+        'cta_url' => $ctaUrl,
         'notice_title' => $noticeTitle,
         'notice_text' => $noticeText,
     ];
