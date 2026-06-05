@@ -539,18 +539,18 @@ function be_build_system_mail_topic(string $topic, array $context): array
             break;
 
         case 'publication_approved_event':
-            $subject = 'Dein Einzeltermin ist sichtbar';
+            $subject = 'Dein Einzeltermin wurde freigegeben';
             $detailLabel = 'Veranstaltung';
-            $intro = 'Dein Einzeltermin ist jetzt bei Bocholt erleben sichtbar.';
-            $body = 'Damit ist die Veröffentlichung abgeschlossen. Danke für deine Einreichung.';
+            $intro = 'Dein Einzeltermin wurde final freigegeben. Sobald die Seite aktualisiert ist, wird er bei Bocholt erleben sichtbar.';
+            $body = 'Damit ist die redaktionelle Freigabe abgeschlossen. Danke für deine Einreichung.';
             $noticeTitle = '';
             break;
 
         case 'publication_approved_activity':
-            $subject = 'Deine Aktivität ist sichtbar';
+            $subject = 'Deine Aktivität wurde freigegeben';
             $detailLabel = 'Aktivität';
-            $intro = 'Deine Aktivität ist jetzt bei Bocholt erleben sichtbar.';
-            $body = 'Damit ist die Veröffentlichung abgeschlossen. Ab jetzt zählt die Aktivität in deinem Tarif.';
+            $intro = 'Deine Aktivität wurde final freigegeben. Sobald die Seite aktualisiert ist, wird sie bei Bocholt erleben sichtbar.';
+            $body = 'Damit ist die redaktionelle Freigabe abgeschlossen. Die Aktivität zählt ab Veröffentlichung in deinem Tarif.';
             $noticeTitle = '';
             break;
 
