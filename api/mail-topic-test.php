@@ -47,6 +47,8 @@ try {
         'payment_released_activity',
         'publication_approved_event',
         'publication_approved_activity',
+        'rejection_event',
+        'rejection_activity',
     ];
 
     if (!in_array($topic, $allowedTopics, true)) {
@@ -66,6 +68,10 @@ try {
     if (str_starts_with($topic, 'payment_released_')) {
         $context['payment_url'] = bmt_string($input, 'payment_url', 'https://www.bocholt-erleben.de/zahlung-starten/?token=test');
         $context['expires_at'] = bmt_string($input, 'expires_at', '+14 days');
+    }
+
+    if (str_starts_with($topic, 'rejection_')) {
+        $context['reason'] = bmt_string($input, 'reason', 'Die Einreichung passt in dieser Form leider nicht zu Bocholt erleben.');
     }
 
     $mail = be_build_system_mail_topic($topic, $context);

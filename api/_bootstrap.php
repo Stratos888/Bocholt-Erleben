@@ -490,6 +490,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
     $contactName = trim((string)($context['contact_name'] ?? ''));
     $title = trim((string)($context['title'] ?? ''));
     $reference = be_mail_public_reference((string)($context['reference'] ?? ''));
+    $reason = trim((string)($context['reason'] ?? ''));
     $paymentUrl = trim((string)($context['payment_url'] ?? ''));
     $expiresAt = be_mail_format_datetime_label((string)($context['expires_at'] ?? ''));
 
@@ -552,6 +553,24 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $intro = 'Deine Aktivität wurde final freigegeben. Sobald die Seite aktualisiert ist, wird sie bei Bocholt erleben sichtbar.';
             $body = 'Damit ist die redaktionelle Freigabe abgeschlossen. Die Aktivität ist mit dieser Freigabe deinem Tarif zugeordnet.';
             $noticeTitle = '';
+            break;
+
+        case 'rejection_event':
+            $subject = 'Dein Einzeltermin wurde nicht freigegeben';
+            $detailLabel = 'Veranstaltung';
+            $intro = 'Wir haben deine Einreichung geprüft. Der Einzeltermin kann in dieser Form leider nicht bei Bocholt erleben veröffentlicht werden.';
+            $body = 'Du kannst später gerne einen neuen oder angepassten Termin einreichen, wenn die Angaben oder Rahmenbedingungen passen.';
+            $noticeTitle = $reason !== '' ? 'Hinweis zur Entscheidung' : '';
+            $noticeText = $reason;
+            break;
+
+        case 'rejection_activity':
+            $subject = 'Deine Aktivität wurde nicht freigegeben';
+            $detailLabel = 'Aktivität';
+            $intro = 'Wir haben deine Einreichung geprüft. Die Aktivität kann in dieser Form leider nicht bei Bocholt erleben veröffentlicht werden.';
+            $body = 'Du kannst später gerne eine neue oder angepasste Aktivität einreichen, wenn die Angaben oder Rahmenbedingungen passen.';
+            $noticeTitle = $reason !== '' ? 'Hinweis zur Entscheidung' : '';
+            $noticeText = $reason;
             break;
 
         default:

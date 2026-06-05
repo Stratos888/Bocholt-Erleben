@@ -64,6 +64,7 @@ function sr_fetch_submission(PDO $pdo, int $submissionId): array
             payment_kind,
             intake_origin,
             payment_reference_key,
+            contact_name_snapshot,
             email_snapshot,
             title
          FROM submissions
@@ -98,35 +99,28 @@ function sr_send_rejection_mail(array $submission, ?string $reason): void
         return;
     }
 
-    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_REJECTION_MAIL_COPY_V1 | Zweck: passt Ablehnungs-Mail je nach Submission-Art fuer Event oder Aktivitaet an; Umfang: ersetzt Titel/Referenz/Mail-Intro === */
-    $title = trim((string)($submission['title'] ?? ''));
-    $reference = trim((string)($submission['payment_reference_key'] ?? ''));
+    /* === BEGIN BLOCK: MAIL_SYSTEM_REJECTION_TOPIC_V1 | Zweck: nutzt zentrale Mail-Topics fuer Ablehnungs-Mails von Einzelterminen und Aktivitaeten; Umfang: ersetzt lokale Plain-Text-Mail in sr_send_rejection_mail === */
     $isActivity = trim((string)($submission['submission_kind'] ?? 'event')) === 'activity';
 
-    $bodyLines = [
-        'Hallo,',
-        '',
-        $isActivity
-            ? 'deine Aktivität kann bei Bocholt erleben leider nicht veröffentlicht werden.'
-            : 'deine Veranstaltung kann bei Bocholt erleben leider nicht veröffentlicht werden.',
-        '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
-    ];
-    /* === END BLOCK: ACTIVITY_PRESENCE_REJECTION_MAIL_COPY_V1 === */
-
-    if ($reason !== null && trim($reason) !== '') {
-        $bodyLines[] = '';
-        $bodyLines[] = 'Hinweis:';
-        $bodyLines[] = trim($reason);
-    }
-
-    $bodyLines[] = '';
-    $bodyLines[] = 'Viele Grüße';
-    $bodyLines[] = 'Bocholt erleben';
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'rejection_activity' : 'rejection_event',
+        [
+            'title' => trim((string)($submission['title'] ?? '')),
+            'reference' => trim((string)($submission['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submission['contact_name_snapshot'] ?? '')),
+            'reason' => trim((string)($reason ?? '')),
+        ]
+    );
 
     try {
-        be_send_mail($email, $isActivity ? 'Deine Aktivität wurde nicht veröffentlicht' : 'Deine Veranstaltung wurde nicht veröffentlicht', implode("\n", $bodyLines));
+        be_send_mail(
+            $email,
+            $mail['subject'],
+            $mail['text_body'],
+            $mail['to_name'],
+            $mail['html_body']
+        );
+    /* === END BLOCK: MAIL_SYSTEM_REJECTION_TOPIC_V1 === */
     } catch (Throwable $error) {
         error_log('Submission rejection mail failed: ' . $error->getMessage());
     }
