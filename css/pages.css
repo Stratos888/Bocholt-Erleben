@@ -2951,6 +2951,7 @@ select.content-field__control{
   display: grid;
   gap: 12px;
   margin-top: 12px;
+  align-items: start;
 }
 
 .page--publish.page--activity-presence .activity-presence-opening-day{
@@ -3007,6 +3008,29 @@ select.content-field__control{
   width: 100%;
   padding-inline: 12px;
 }
+
+/* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_CLOSED_COLLAPSE_V1 | Zweck: blendet irrelevante Zeitfelder bei geschlossenen Tagen aus und nutzt auf breiteren Ansichten zwei Tageskarten pro Zeile; Umfang: Erweiterung des bestehenden Activity-Presence-Oeffnungszeitenblocks === */
+.page--publish.page--activity-presence .activity-presence-opening-time-row[hidden]{
+  display: none;
+}
+
+.page--publish.page--activity-presence .activity-presence-opening-day[data-opening-closed="true"]{
+  gap: 0;
+}
+
+@media (min-width: 720px){
+  .page--publish.page--activity-presence .activity-presence-opening-week{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 12px;
+  }
+
+  .page--publish.page--activity-presence .activity-presence-opening-day:nth-child(2){
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+/* === END BLOCK: ACTIVITY_PRESENCE_OPENING_CLOSED_COLLAPSE_V1 === */
 
 @media (max-width: 520px){
   .page--publish.page--activity-presence .activity-presence-opening-time-row{

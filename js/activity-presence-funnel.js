@@ -130,7 +130,12 @@
       const closed = row.querySelector("[data-opening-closed]");
       const start = row.querySelector("[data-opening-start]");
       const end = row.querySelector("[data-opening-end]");
-      const disabled = !isOpeningHours || Boolean(closed?.checked);
+      const timeRow = row.querySelector(".activity-presence-opening-time-row");
+      const isClosed = Boolean(closed?.checked);
+      const disabled = !isOpeningHours || isClosed;
+
+      row.dataset.openingClosed = isClosed ? "true" : "false";
+      if (timeRow) timeRow.hidden = disabled;
 
       if (start) start.disabled = disabled;
       if (end) end.disabled = disabled;
