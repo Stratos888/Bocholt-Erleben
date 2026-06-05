@@ -395,6 +395,147 @@ function be_render_system_mail_html(array $data): string
 }
 /* === END BLOCK: MAIL_SYSTEM_RENDERER_V1 === */
 
+/* === BEGIN BLOCK: MAIL_SYSTEM_TOPIC_LAYER_V1 | Zweck: zentralisiert Betreff, Textbausteine und HTML-/Plain-Text-Erzeugung fuer wiederverwendbare Mail-Topics; Umfang: Topic-Builder fuer erste Einreichungsbestaetigungen === */
+function be_mail_greeting(?string $contactName): string
+{
+    $safeName = trim((string)$contactName);
+    return $safeName !== '' ? 'Hallo ' . $safeName . ',' : 'Hallo,';
+}
+
+function be_render_system_mail_text(array $data): string
+{
+    $lines = [];
+
+    $greeting = trim((string)($data['greeting'] ?? 'Hallo,'));
+    $intro = trim((string)($data['intro'] ?? ''));
+    $details = is_array($data['details'] ?? null) ? $data['details'] : [];
+    $body = trim((string)($data['body'] ?? ''));
+    $noticeTitle = trim((string)($data['notice_title'] ?? ''));
+    $noticeText = trim((string)($data['notice_text'] ?? ''));
+    $ctaLabel = trim((string)($data['cta_label'] ?? ''));
+    $ctaUrl = trim((string)($data['cta_url'] ?? ''));
+
+    $lines[] = $greeting;
+
+    if ($intro !== '') {
+        $lines[] = '';
+        $lines[] = $intro;
+    }
+
+    foreach ($details as $detail) {
+        if (!is_array($detail)) {
+            continue;
+        }
+
+        $label = trim((string)($detail['label'] ?? ''));
+        $value = trim((string)($detail['value'] ?? ''));
+
+        if ($label === '' && $value === '') {
+            continue;
+        }
+
+        $lines[] = '';
+        if ($label !== '') {
+            $lines[] = $label . ':';
+        }
+        if ($value !== '') {
+            $lines[] = $value;
+        }
+    }
+
+    if ($body !== '') {
+        $lines[] = '';
+        $lines[] = $body;
+    }
+
+    if ($ctaLabel !== '' && $ctaUrl !== '') {
+        $lines[] = '';
+        $lines[] = $ctaLabel . ':';
+        $lines[] = $ctaUrl;
+    }
+
+    if ($noticeTitle !== '' || $noticeText !== '') {
+        $lines[] = '';
+        if ($noticeTitle !== '') {
+            $lines[] = $noticeTitle . ':';
+        }
+        if ($noticeText !== '') {
+            $lines[] = $noticeText;
+        }
+    }
+
+    $lines[] = '';
+    $lines[] = 'Viele Grüße';
+    $lines[] = 'Bocholt erleben';
+
+    return implode("\n", $lines);
+}
+
+function be_build_system_mail_topic(string $topic, array $context): array
+{
+    $contactName = trim((string)($context['contact_name'] ?? ''));
+    $title = trim((string)($context['title'] ?? ''));
+    $reference = be_mail_public_reference((string)($context['reference'] ?? ''));
+
+    $displayTitle = $title !== '' ? $title : 'ohne Titel';
+    $greeting = be_mail_greeting($contactName);
+    $noticeTitle = 'Hinweis zur Veröffentlichung';
+
+    switch ($topic) {
+        case 'submission_received_event':
+            $subject = 'Dein Einzeltermin wird geprüft';
+            $detailLabel = 'Veranstaltung';
+            $intro = 'Vielen Dank für deine Einreichung. Wir prüfen den Termin redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.';
+            $body = 'Wenn der Termin zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für den Einzeltermin.';
+            $noticeText = 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Veranstaltung erst nach finaler redaktioneller Freigabe.';
+            break;
+
+        case 'submission_received_activity':
+            $subject = 'Deine Aktivität wird geprüft';
+            $detailLabel = 'Aktivität';
+            $intro = 'Vielen Dank für deine Einreichung. Wir prüfen die Aktivität redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.';
+            $body = 'Wenn die Aktivität zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für die Aktivitätspräsenz.';
+            $noticeText = 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Aktivität erst nach finaler redaktioneller Freigabe.';
+            break;
+
+        default:
+            throw new InvalidArgumentException('Unknown mail topic: ' . $topic);
+    }
+
+    $details = [
+        [
+            'label' => $detailLabel,
+            'value' => $displayTitle,
+        ],
+    ];
+
+    if ($reference !== '') {
+        $details[] = [
+            'label' => 'Referenz',
+            'value' => $reference,
+        ];
+    }
+
+    $mailData = [
+        'title' => $subject,
+        'preheader' => $intro,
+        'greeting' => $greeting,
+        'intro' => $intro,
+        'details' => $details,
+        'body' => $body,
+        'notice_title' => $noticeTitle,
+        'notice_text' => $noticeText,
+    ];
+
+    return [
+        'subject' => $subject,
+        'to_name' => $contactName !== '' ? $contactName : null,
+        'text_body' => be_render_system_mail_text($mailData),
+        'html_body' => be_render_system_mail_html($mailData),
+    ];
+}
+/* === END BLOCK: MAIL_SYSTEM_TOPIC_LAYER_V1 === */
+
 function be_smtp_read_response($socket): array
 {
     $lines = [];

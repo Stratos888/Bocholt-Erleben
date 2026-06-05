@@ -257,79 +257,27 @@ function pf_send_submission_received_mail(array $submissionData): void
         return;
     }
 
-    /* === BEGIN BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_COPY_V1 | Zweck: nutzt Mail-System-Pilotcopy und HTML-Renderer fuer Eingangsbestätigungen; Umfang: ersetzt Mail-Body, Betreff und Versanddaten in pf_send_submission_received_mail === */
-    $title = trim((string)($submissionData['title'] ?? ''));
-    $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
-    $publicReference = be_mail_public_reference($reference);
-    $contactName = trim((string)($submissionData['contact_name'] ?? ''));
+    /* === BEGIN BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_TOPIC_V1 | Zweck: nutzt zentrale Mail-Topics fuer Einzeltermin- und Aktivitaets-Eingangsbestaetigungen; Umfang: ersetzt lokale Betreff-/Text-/HTML-Erzeugung in pf_send_submission_received_mail === */
     $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
-    $subject = $isActivity ? 'Deine Aktivität wird geprüft' : 'Dein Einzeltermin wird geprüft';
-    $mailTitle = $subject;
-    $greeting = $contactName !== '' ? 'Hallo ' . $contactName . ',' : 'Hallo,';
-
-    $intro = $isActivity
-        ? 'Vielen Dank für deine Einreichung. Wir prüfen die Aktivität redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.'
-        : 'Vielen Dank für deine Einreichung. Wir prüfen den Termin redaktionell und achten darauf, dass die Angaben vollständig und verständlich sind.';
-
-    $bodyText = $isActivity
-        ? 'Wenn die Aktivität zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für die Aktivitätspräsenz.'
-        : 'Wenn der Termin zu Bocholt erleben passt, senden wir dir im nächsten Schritt den Zahlungslink für den Einzeltermin.';
-
-    $noticeTitle = 'Hinweis zur Veröffentlichung';
-    $noticeText = $isActivity
-        ? 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Aktivität erst nach finaler redaktioneller Freigabe.'
-        : 'Die Zahlung führt nicht automatisch zur Veröffentlichung. Sichtbar wird die Veranstaltung erst nach finaler redaktioneller Freigabe.';
-
-    $body = implode("\n", [
-        $greeting,
-        '',
-        $intro,
-        '',
-        $isActivity ? 'Aktivität:' : 'Veranstaltung:',
-        $title !== '' ? $title : 'ohne Titel',
-        '',
-        'Referenz:',
-        $publicReference,
-        '',
-        $bodyText,
-        '',
-        $noticeTitle . ':',
-        $noticeText,
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ]);
-
-    $htmlBody = be_render_system_mail_html([
-        'title' => $mailTitle,
-        'preheader' => $intro,
-        'greeting' => $greeting,
-        'intro' => $intro,
-        'details' => [
-            [
-                'label' => $isActivity ? 'Aktivität' : 'Veranstaltung',
-                'value' => $title !== '' ? $title : 'ohne Titel',
-            ],
-            [
-                'label' => 'Referenz',
-                'value' => $publicReference,
-            ],
-        ],
-        'body' => $bodyText,
-        'notice_title' => $noticeTitle,
-        'notice_text' => $noticeText,
-    ]);
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'submission_received_activity' : 'submission_received_event',
+        [
+            'title' => trim((string)($submissionData['title'] ?? '')),
+            'reference' => trim((string)($submissionData['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submissionData['contact_name'] ?? '')),
+        ]
+    );
 
     try {
         be_send_mail(
             $to,
-            $subject,
-            $body,
-            $contactName !== '' ? $contactName : null,
-            $htmlBody
+            $mail['subject'],
+            $mail['text_body'],
+            $mail['to_name'],
+            $mail['html_body']
         );
-    /* === END BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_COPY_V1 === */
+    /* === END BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_TOPIC_V1 === */
     } catch (Throwable $error) {
         error_log('Submission received mail failed: ' . $error->getMessage());
     }
