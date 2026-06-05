@@ -2,6 +2,20 @@
 (function () {
   "use strict";
 
+  /* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_CLIENT_MODEL_V1 | Zweck: definiert Client-Konstanten fuer strukturierte Aktivitaets-Zugaenglichkeit; Umfang: additive Konstanten ohne bestehende Formularlogik zu entfernen === */
+  const OPENING_DAYS = Object.freeze([
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ]);
+
+  const OPENING_TIME_RE = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+  /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_CLIENT_MODEL_V1 === */
+
   function $(selector, root) {
     return (root || document).querySelector(selector);
   }
@@ -9,6 +23,11 @@
   function valueOf(selector, root) {
     const node = $(selector, root);
     return node ? String(node.value || "").trim() : "";
+  }
+
+  function selectedOption(selector, root) {
+    const node = $(selector, root);
+    return node?.selectedOptions?.[0] || null;
   }
 
   function checkedValue(name, root) {
@@ -96,9 +115,103 @@
     ].filter(Boolean).join(", ");
   }
 
+  /* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_PAYLOAD_V1 | Zweck: baut und validiert strukturierte Oeffnungszeitdaten aus dem bestehenden Aktivitaetspraesenz-Formular; Umfang: neue Helfer fuer activity_opening-Payload === */
+  function getAccessType(form) {
+    const option = selectedOption("#activity-presence-duration", form);
+    return option?.dataset?.accessType || "";
+  }
+
+  function syncOpeningFields(form) {
+    const isOpeningHours = getAccessType(form) === "opening_hours";
+    const section = $("#activity-presence-opening-hours", form);
+    if (section) section.hidden = !isOpeningHours;
+
+    (form || document).querySelectorAll("[data-opening-day]").forEach((row) => {
+      const closed = row.querySelector("[data-opening-closed]");
+      const start = row.querySelector("[data-opening-start]");
+      const end = row.querySelector("[data-opening-end]");
+      const disabled = !isOpeningHours || Boolean(closed?.checked);
+
+      if (start) start.disabled = disabled;
+      if (end) end.disabled = disabled;
+    });
+  }
+
+  function buildWeeklyOpening(form) {
+    const weekly = {};
+
+    OPENING_DAYS.forEach((day) => {
+      const row = (form || document).querySelector(`[data-opening-day="${day}"]`);
+      const closed = row?.querySelector("[data-opening-closed]");
+      const start = row?.querySelector("[data-opening-start]");
+      const end = row?.querySelector("[data-opening-end]");
+
+      if (!row || closed?.checked) {
+        weekly[day] = [];
+        return;
+      }
+
+      weekly[day] = [[
+        String(start?.value || "").trim(),
+        String(end?.value || "").trim()
+      ]];
+    });
+
+    return weekly;
+  }
+
+  function buildActivityOpening(form) {
+    const accessType = getAccessType(form) || "check_required";
+    const payload = {
+      access_type: accessType,
+      holiday_policy: valueOf("#activity-presence-holiday-policy", form) || "check"
+    };
+
+    if (accessType === "opening_hours") {
+      payload.weekly = buildWeeklyOpening(form);
+    }
+
+    const notes = valueOf("#activity-presence-notes", form);
+    if (notes) payload.notes = notes;
+
+    const sourceUrl = valueOf("#activity-presence-url", form);
+    if (sourceUrl) payload.source_url = sourceUrl;
+
+    return payload;
+  }
+
+  function isValidOpeningInterval(start, end) {
+    if (!OPENING_TIME_RE.test(start) || !OPENING_TIME_RE.test(end)) return false;
+    return start < end;
+  }
+
+  function validateActivityOpening(form, invalidNodes) {
+    if (getAccessType(form) !== "opening_hours") return;
+
+    let openDayCount = 0;
+
+    (form || document).querySelectorAll("[data-opening-day]").forEach((row) => {
+      const closed = row.querySelector("[data-opening-closed]");
+      const start = row.querySelector("[data-opening-start]");
+      const end = row.querySelector("[data-opening-end]");
+
+      if (closed?.checked) return;
+      openDayCount += 1;
+
+      if (!isValidOpeningInterval(String(start?.value || "").trim(), String(end?.value || "").trim())) {
+        invalidNodes.push(start, end);
+      }
+    });
+
+    if (openDayCount <= 0) {
+      invalidNodes.push($("#activity-presence-duration", form));
+    }
+  }
+  /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_PAYLOAD_V1 === */
+
   function buildNotes(form) {
     const lines = [
-      valueOf("#activity-presence-duration", form) ? `Dauerhaft/regelmäßig buchbar: ${valueOf("#activity-presence-duration", form)}` : "",
+      valueOf("#activity-presence-duration", form) ? `Zugänglichkeit: ${valueOf("#activity-presence-duration", form)}` : "",
       valueOf("#activity-presence-notes", form) ? `Weitere Hinweise: ${valueOf("#activity-presence-notes", form)}` : ""
     ].filter(Boolean);
 
@@ -137,6 +250,8 @@
     if (!confirmNode || !confirmNode.checked) {
       invalidNodes.push(confirmNode);
     }
+
+    validateActivityOpening(form, invalidNodes);
 
     invalidNodes.filter(Boolean).forEach(markInvalid);
 
@@ -193,7 +308,17 @@
     applyPlanFromQuery(form);
     /* === END BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_CALL_V1 === */
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_BINDINGS_V1 | Zweck: synchronisiert die sichtbaren Oeffnungszeitfelder mit der gewaehlen Zugaenglichkeitsart; Umfang: additive Event-Bindings im bestehenden Formular-Setup === */
+    syncOpeningFields(form);
+    $("#activity-presence-duration", form)?.addEventListener("change", () => syncOpeningFields(form));
+    form.querySelectorAll("[data-opening-closed]").forEach((node) => {
+      node.addEventListener("change", () => syncOpeningFields(form));
+    });
+    /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_BINDINGS_V1 === */
+
     submitButton?.addEventListener("click", async () => {
+      syncOpeningFields(form);
+
       if (!validateFunnelForm(form)) {
         setStatus(statusNode, "Bitte fülle die markierten Pflichtfelder aus.", "error");
         return;

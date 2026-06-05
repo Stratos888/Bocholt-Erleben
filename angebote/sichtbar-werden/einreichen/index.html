@@ -166,17 +166,86 @@
           <p class="content-field__hint">Kurz beschreiben, was Nutzer dort machen können.</p>
         </label>
 
-        <label class="content-field content-field--full" for="activity-presence-duration">
-          <span class="content-field__label">Verfügbarkeit *</span>
-          <select class="content-field__control" id="activity-presence-duration" name="duration" required>
-            <option value="">Bitte auswählen</option>
-            <option value="Dauerhaft verfügbar">Dauerhaft verfügbar</option>
-            <option value="Regelmäßig buchbar">Regelmäßig buchbar</option>
-            <option value="Saisonal verfügbar">Saisonal verfügbar</option>
-            <option value="Nach Vereinbarung buchbar">Nach Vereinbarung buchbar</option>
-          </select>
-          <p class="content-field__hint">Details kannst du bei „Weitere Hinweise“ ergänzen.</p>
-        </label>
+          <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_ACCESS_TYPE_FIELD_V1 | Zweck: ersetzt die grobe Verfügbarkeitsauswahl durch eine klare Zugänglichkeitslogik für Aktivitätseinreichungen; Umfang: einzelnes Select-Feld im bestehenden Formular === -->
+          <label class="content-field content-field--full" for="activity-presence-duration">
+            <span class="content-field__label">Zugänglichkeit / Verfügbarkeit *</span>
+            <select class="content-field__control" id="activity-presence-duration" name="duration" required>
+              <option value="">Bitte auswählen</option>
+              <option value="Frei zugänglich / ohne feste Öffnungszeiten" data-access-type="free_access">Frei zugänglich / ohne feste Öffnungszeiten</option>
+              <option value="Regelmäßige Öffnungszeiten" data-access-type="opening_hours">Regelmäßige Öffnungszeiten</option>
+              <option value="Saisonal oder unregelmäßig" data-access-type="seasonal">Saisonal oder unregelmäßig</option>
+              <option value="Nach Vereinbarung / bitte prüfen" data-access-type="appointment">Nach Vereinbarung / bitte prüfen</option>
+            </select>
+            <p class="content-field__hint">Wähle die einfachste passende Angabe. Regelmäßige Zeiten kannst du direkt darunter eintragen.</p>
+          </label>
+          <!-- === END BLOCK: ACTIVITY_PRESENCE_ACCESS_TYPE_FIELD_V1 === -->
+
+          <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_FIELDS_V1 | Zweck: erfasst strukturierte Öffnungszeitdaten für Aktivitätseinreichungen; Umfang: additiver Formularblock unter der Zugänglichkeitsauswahl === -->
+          <div class="content-field content-field--full" id="activity-presence-opening-hours" hidden>
+            <span class="content-field__label">Regelmäßige Öffnungszeiten</span>
+            <p class="content-field__hint">Lass Tage geschlossen, wenn die Aktivität dort nicht regulär zugänglich ist.</p>
+
+            <div class="activity-presence-opening-week" data-opening-weekly>
+              <div class="activity-presence-opening-day" data-opening-day="monday">
+                <span class="content-field__label">Montag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed checked> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Montag geöffnet ab" disabled>
+                <input class="content-field__control" type="time" data-opening-end aria-label="Montag geöffnet bis" disabled>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="tuesday">
+                <span class="content-field__label">Dienstag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Dienstag geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Dienstag geöffnet bis">
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="wednesday">
+                <span class="content-field__label">Mittwoch</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Mittwoch geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Mittwoch geöffnet bis">
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="thursday">
+                <span class="content-field__label">Donnerstag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Donnerstag geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Donnerstag geöffnet bis">
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="friday">
+                <span class="content-field__label">Freitag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Freitag geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Freitag geöffnet bis">
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="saturday">
+                <span class="content-field__label">Samstag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Samstag geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Samstag geöffnet bis">
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="sunday">
+                <span class="content-field__label">Sonntag</span>
+                <label class="content-field__hint"><input type="checkbox" data-opening-closed> geschlossen</label>
+                <input class="content-field__control" type="time" data-opening-start aria-label="Sonntag geöffnet ab">
+                <input class="content-field__control" type="time" data-opening-end aria-label="Sonntag geöffnet bis">
+              </div>
+            </div>
+
+            <label class="content-field content-field--full" for="activity-presence-holiday-policy">
+              <span class="content-field__label">Feiertage</span>
+              <select class="content-field__control" id="activity-presence-holiday-policy" name="holidayPolicy">
+                <option value="check">An Feiertagen bitte prüfen</option>
+                <option value="open_as_usual">Wie regulär geöffnet</option>
+                <option value="closed">An Feiertagen geschlossen</option>
+              </select>
+            </label>
+          </div>
+          <!-- === END BLOCK: ACTIVITY_PRESENCE_OPENING_FIELDS_V1 === -->
 
         <label class="content-field content-field--full" for="activity-presence-notes">
           <span class="content-field__label">Weitere Hinweise</span>

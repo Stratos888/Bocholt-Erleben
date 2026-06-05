@@ -2330,3 +2330,82 @@ Nächster Schritt:
 - Danach Phase-2-Bedarfsplan aus `target_count - ready_count` erzeugen.
 
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PHASE1_ASSET_INTEGRATION_2026_06_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_PREP_2026_06_05 | Zweck: dokumentiert vorbereiteten Livegang fuer strukturierte Oeffnungszeiten bei Aktivitaetspraesenzen; Umfang: Formular, Payload, Backend, Review-API, DB-Migration 007 === -->
+## Activity Opening Hours V1 – Livegang-Vorbereitung – 2026-06-05
+
+Status: vorbereitet, noch nicht deployt.
+
+Scope:
+- Aktivitätspräsenz-Formular unter `/angebote/sichtbar-werden/einreichen/`
+- `js/activity-presence-funnel.js`
+- `api/submissions/init.php`
+- `api/submissions/review-list.php`
+- neue DB-Migration `api/sql/007_activity_opening_json.sql`
+
+Ziel:
+- Anbieter können bei Aktivitätseinreichungen eine einfache Zugänglichkeitslogik angeben.
+- Optionen: frei zugänglich, regelmäßige Öffnungszeiten, saisonal/unregelmäßig, nach Vereinbarung/bitte prüfen.
+- Bei regelmäßigen Öffnungszeiten werden Wochenzeiten und Feiertagslogik strukturiert im Payload übergeben.
+- Das Backend speichert diese Daten in `submissions.activity_opening_json`.
+- Die Review-API gibt die Daten als `activity_opening` wieder aus.
+
+Wichtige Deploy-Abhängigkeit:
+- Vor einem Staging-Deploy dieses Codes muss die **Staging-Datenbank** die Spalte `activity_opening_json` besitzen.
+- Vor einem späteren Live-Deploy muss die **Live-Datenbank** dieselbe Spalte besitzen.
+- Grund: `api/submissions/init.php` schreibt nach dem Deploy in diese Spalte und `api/submissions/review-list.php` liest sie aus.
+- Ohne vorherige DB-Migration können neue Activity-Einreichungen bzw. die Review-Liste fehlschlagen.
+
+Vorbereitete Migration:
+- Datei: `api/sql/007_activity_opening_json.sql`
+- SQL: `ALTER TABLE submissions ADD COLUMN activity_opening_json JSON NULL AFTER notes_text;`
+
+Preflight-SQL auf der jeweiligen Ziel-Datenbank:
+- Für Staging-Test: auf der **Staging-DB** ausführen.
+- Für Livegang: auf der **Live-DB** ausführen.
+- SQL: `SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submissions' AND COLUMN_NAME = 'activity_opening_json';`
+
+Erwartung Preflight:
+- Kein Ergebnis: Migration 007 muss auf dieser Datenbank ausgeführt werden.
+- Ergebnis mit `activity_opening_json`: Migration auf dieser Datenbank nicht erneut ausführen.
+
+Postflight-SQL nach Migration:
+- SQL: `SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submissions' AND COLUMN_NAME = 'activity_opening_json';`
+- Erwartung: `COLUMN_NAME = activity_opening_json`, `DATA_TYPE = json`, `IS_NULLABLE = YES`.
+
+Sichere Reihenfolge für Staging:
+1. Staging-DB per Preflight prüfen.
+2. Falls Spalte fehlt: `api/sql/007_activity_opening_json.sql` auf der Staging-DB ausführen.
+3. Postflight auf Staging-DB prüfen.
+4. Danach Code auf Staging deployen.
+5. Danach Staging-Smoke-Test durchführen.
+
+Sichere Reihenfolge für Live:
+1. Live-DB per Preflight prüfen.
+2. Falls Spalte fehlt: `api/sql/007_activity_opening_json.sql` auf der Live-DB ausführen.
+3. Postflight auf Live-DB prüfen.
+4. Danach erst Merge/Deploy auf Live.
+5. Danach Live-Smoke-Test durchführen.
+
+Minimaler Smoke-Test nach Deploy:
+1. `/angebote/sichtbar-werden/einreichen/?plan=activity_basic` öffnen.
+2. Formular mit `Frei zugänglich / ohne feste Öffnungszeiten` prüfen.
+3. Formular mit `Regelmäßige Öffnungszeiten` prüfen.
+4. Prüfen: Öffnungszeitenblock erscheint nur bei dieser Auswahl.
+5. Prüfen: geschlossene Tage deaktivieren Start-/Endzeit.
+6. Prüfen: mindestens ein geöffneter Tag mit gültigem Zeitfenster wird akzeptiert.
+7. Testeinreichung absenden.
+8. Review-API/Inhouse-Review prüfen: Einreichung erscheint und `activity_opening` ist vorhanden.
+9. Kurz prüfen, dass Event-Einreichungen unverändert erreichbar bleiben.
+
+Bewusste Nicht-Ziele dieses Schritts:
+- Noch keine Auswertung auf Today Home.
+- Noch keine automatische Daily-/Weekly-Prüfung von Öffnungszeiten.
+- Noch kein öffentliches `Heute geöffnet bis ...`.
+- Noch keine Migration vorhandener Activities aus `data/offers.json`.
+
+Bewertung:
+- Der Schritt bereitet den strukturierten Datenkanal für Öffnungszeiten vor.
+- Die bestehende Funnel-Grundlogik bleibt erhalten.
+- Der fachliche Nutzen für Today Home folgt später über `activity_opening_hours.json`, `opening-status.js` und kontrollierte Recommendation-Anbindung.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_PREP_2026_06_05 === -->

@@ -314,6 +314,121 @@ function pf_insert_organizer(PDO $pdo, string $organizationName, ?string $contac
     /* === END FUNCTION: pf_insert_organizer === */
 }
 
+/* === BEGIN BLOCK: ACTIVITY_OPENING_SUBMISSION_V1 | Zweck: validiert strukturierte Oeffnungszeiten fuer Aktivitaetspraesenzen; Umfang: additive Helfer fuer activity_opening_json ohne bestehende Event-/Zahlungslogik zu veraendern === */
+function pf_normalize_activity_opening_time(string $value, string $label): string
+{
+    $normalized = trim($value);
+    if (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $normalized)) {
+        throw new InvalidArgumentException($label . ' muss im Format HH:MM angegeben werden.');
+    }
+
+    return $normalized;
+}
+
+function pf_normalize_activity_opening_weekly($weekly): ?array
+{
+    if ($weekly === null || $weekly === '') {
+        return null;
+    }
+
+    if (!is_array($weekly)) {
+        throw new InvalidArgumentException('Regelmäßige Öffnungszeiten müssen als Wochenstruktur übergeben werden.');
+    }
+
+    $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    $normalized = [];
+
+    foreach ($days as $day) {
+        $intervals = $weekly[$day] ?? [];
+        if ($intervals === null || $intervals === '') {
+            $intervals = [];
+        }
+
+        if (!is_array($intervals)) {
+            throw new InvalidArgumentException('Öffnungszeiten für ' . $day . ' müssen als Liste übergeben werden.');
+        }
+
+        $normalized[$day] = [];
+        foreach ($intervals as $interval) {
+            if (!is_array($interval) || count($interval) < 2) {
+                throw new InvalidArgumentException('Jedes Öffnungszeitfenster braucht Start- und Endzeit.');
+            }
+
+            $start = pf_normalize_activity_opening_time((string)$interval[0], 'Startzeit');
+            $end = pf_normalize_activity_opening_time((string)$interval[1], 'Endzeit');
+
+            if ($start >= $end) {
+                throw new InvalidArgumentException('Die Endzeit muss nach der Startzeit liegen.');
+            }
+
+            $normalized[$day][] = [$start, $end];
+        }
+    }
+
+    return $normalized;
+}
+
+function pf_activity_opening_json_from_input($value, string $submissionKind): ?string
+{
+    if ($submissionKind !== 'activity' || $value === null || $value === '') {
+        return null;
+    }
+
+    if (!is_array($value)) {
+        throw new InvalidArgumentException('Die Öffnungslogik der Aktivität muss strukturiert übergeben werden.');
+    }
+
+    $accessType = trim((string)($value['access_type'] ?? ''));
+    $allowedAccessTypes = ['free_access', 'opening_hours', 'seasonal', 'appointment', 'check_required'];
+
+    if (!in_array($accessType, $allowedAccessTypes, true)) {
+        throw new InvalidArgumentException('Bitte wähle eine gültige Zugänglichkeit für die Aktivität aus.');
+    }
+
+    $holidayPolicy = trim((string)($value['holiday_policy'] ?? 'check'));
+    $allowedHolidayPolicies = ['open_as_usual', 'closed', 'check'];
+
+    if (!in_array($holidayPolicy, $allowedHolidayPolicies, true)) {
+        $holidayPolicy = 'check';
+    }
+
+    $payload = [
+        'access_type' => $accessType,
+        'holiday_policy' => $holidayPolicy,
+    ];
+
+    $weekly = pf_normalize_activity_opening_weekly($value['weekly'] ?? null);
+    if ($weekly !== null) {
+        $payload['weekly'] = $weekly;
+    }
+
+    $notes = pf_nullable_string($value['notes'] ?? null);
+    if ($notes !== null) {
+        $payload['notes'] = $notes;
+    }
+
+    $sourceUrl = pf_nullable_string($value['source_url'] ?? null);
+    if ($sourceUrl !== null) {
+        if (!filter_var($sourceUrl, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException('Die Quelle für Öffnungszeiten muss eine gültige URL sein.');
+        }
+
+        $payload['source_url'] = $sourceUrl;
+    }
+
+    $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded) || $encoded === '') {
+        throw new RuntimeException('Öffnungszeiten konnten nicht gespeichert werden.');
+    }
+
+    if (strlen($encoded) > 12000) {
+        throw new InvalidArgumentException('Die Angaben zu den Öffnungszeiten sind zu lang.');
+    }
+
+    return $encoded;
+}
+/* === END BLOCK: ACTIVITY_OPENING_SUBMISSION_V1 === */
+
 try {
     /* === BEGIN BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 | Zweck: verhindert Veranstalter-Overwrite und erzwingt unveraenderbare Abo-Reuse-Daten serverseitig; Umfang: kompletter try-Hauptblock bis vor Error-Handling === */
     $input = pf_read_json_body();
@@ -346,6 +461,7 @@ try {
     $ticketUrl = pf_nullable_string($input['ticket_url'] ?? null);
     $descriptionText = pf_nullable_string($input['description_text'] ?? null);
     $notesText = pf_nullable_string($input['notes_text'] ?? null);
+    $activityOpeningJson = pf_activity_opening_json_from_input($input['activity_opening'] ?? null, $submissionKind);
 
     /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INPUT_VALIDATION_V1 | Zweck: trennt Event-Pflichtlogik von Aktivitaetspraesenz-Pflichtlogik und setzt passenden Startstatus; Umfang: ersetzt Validierung, paymentKind/intakeOrigin und paymentReferenceKey-Zuweisung === */
     if ($submissionKind === 'activity') {
@@ -466,7 +582,8 @@ try {
             location_public_confirmed,
             ticket_url,
             description_text,
-            notes_text
+            notes_text,
+            activity_opening_json
         ) VALUES (
             :organizer_id,
             :submission_kind,
@@ -487,7 +604,8 @@ try {
             :location_public_confirmed,
             :ticket_url,
             :description_text,
-            :notes_text
+            :notes_text,
+            :activity_opening_json
         )'
     );
 
@@ -512,6 +630,7 @@ try {
         ':ticket_url' => $ticketUrl,
         ':description_text' => $descriptionText,
         ':notes_text' => $notesText,
+        ':activity_opening_json' => $activityOpeningJson,
     ]);
 
     $submissionId = (int)$pdo->lastInsertId();

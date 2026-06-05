@@ -64,6 +64,24 @@ function srl_build_risk_flags(array $row): array
     return $flags;
 }
 
+
+/* === BEGIN BLOCK: ACTIVITY_OPENING_REVIEW_PAYLOAD_V1 | Zweck: gibt strukturierte Oeffnungszeiten fuer Aktivitaetspraesenz-Submissions an die Review-Inbox weiter; Umfang: additive JSON-Dekodierung ohne bestehende Review-Felder zu veraendern === */
+function srl_decode_activity_opening($value): ?array
+{
+    $raw = trim((string)($value ?? ''));
+    if ($raw === '') {
+        return null;
+    }
+
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        return null;
+    }
+
+    return $decoded;
+}
+/* === END BLOCK: ACTIVITY_OPENING_REVIEW_PAYLOAD_V1 === */
+
 try {
     $pdo = be_db();
     $statement = $pdo->prepare(
@@ -88,6 +106,7 @@ try {
             ticket_url,
             description_text,
             notes_text,
+            activity_opening_json,
             payment_released_at,
             payment_start_token_expires_at,
             payment_started_at,
@@ -159,6 +178,7 @@ try {
             'source_url' => $eventUrl,
             'description' => (string)($row['description_text'] ?? ''),
             'notes' => (string)($row['notes_text'] ?? ''),
+            'activity_opening' => srl_decode_activity_opening($row['activity_opening_json'] ?? null),
             'created_at' => (string)($row['created_at'] ?? ''),
             'payment_released_at' => (string)($row['payment_released_at'] ?? ''),
             'payment_start_token_expires_at' => (string)($row['payment_start_token_expires_at'] ?? ''),
