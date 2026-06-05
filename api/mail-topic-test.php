@@ -57,13 +57,18 @@ try {
         throw new InvalidArgumentException('Valid recipient address is required.');
     }
 
-    $mail = be_build_system_mail_topic($topic, [
+    $context = [
         'title' => bmt_string($input, 'title', 'Mail-Topic-Test'),
         'reference' => bmt_string($input, 'reference', '2e179920-e035-42cf-9642-2d32ef67b683'),
         'contact_name' => bmt_string($input, 'contact_name', 'Mathias Stöckert'),
-        'payment_url' => bmt_string($input, 'payment_url', 'https://www.bocholt-erleben.de/zahlung-starten/?token=test'),
-        'expires_at' => bmt_string($input, 'expires_at', '+14 days'),
-    ]);
+    ];
+
+    if (str_starts_with($topic, 'payment_released_')) {
+        $context['payment_url'] = bmt_string($input, 'payment_url', 'https://www.bocholt-erleben.de/zahlung-starten/?token=test');
+        $context['expires_at'] = bmt_string($input, 'expires_at', '+14 days');
+    }
+
+    $mail = be_build_system_mail_topic($topic, $context);
 
     be_send_mail(
         $to,
