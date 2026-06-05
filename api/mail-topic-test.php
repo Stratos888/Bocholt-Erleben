@@ -49,6 +49,7 @@ try {
         'publication_approved_activity',
         'rejection_event',
         'rejection_activity',
+        'magic_link_portal',
     ];
 
     if (!in_array($topic, $allowedTopics, true)) {
@@ -60,10 +61,13 @@ try {
     }
 
     $context = [
-        'title' => bmt_string($input, 'title', 'Mail-Topic-Test'),
-        'reference' => bmt_string($input, 'reference', '2e179920-e035-42cf-9642-2d32ef67b683'),
+        'title' => bmt_string($input, 'title', $topic === 'magic_link_portal' ? 'Anbieterbereich' : 'Mail-Topic-Test'),
         'contact_name' => bmt_string($input, 'contact_name', 'Mathias Stöckert'),
     ];
+
+    if ($topic !== 'magic_link_portal') {
+        $context['reference'] = bmt_string($input, 'reference', '2e179920-e035-42cf-9642-2d32ef67b683');
+    }
 
     if (str_starts_with($topic, 'payment_released_')) {
         $context['payment_url'] = bmt_string($input, 'payment_url', 'https://www.bocholt-erleben.de/zahlung-starten/?token=test');
@@ -72,6 +76,11 @@ try {
 
     if (str_starts_with($topic, 'rejection_')) {
         $context['reason'] = bmt_string($input, 'reason', 'Die Einreichung passt in dieser Form leider nicht zu Bocholt erleben.');
+    }
+
+    if ($topic === 'magic_link_portal') {
+        $context['magic_link_url'] = bmt_string($input, 'magic_link_url', 'https://www.bocholt-erleben.de/fuer-veranstalter/login/?token=test');
+        $context['expires_at'] = bmt_string($input, 'expires_at', '+30 minutes');
     }
 
     $mail = be_build_system_mail_topic($topic, $context);

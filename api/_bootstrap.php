@@ -492,6 +492,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
     $reference = be_mail_public_reference((string)($context['reference'] ?? ''));
     $reason = trim((string)($context['reason'] ?? ''));
     $paymentUrl = trim((string)($context['payment_url'] ?? ''));
+    $magicLinkUrl = trim((string)($context['magic_link_url'] ?? ''));
     $expiresAt = be_mail_format_datetime_label((string)($context['expires_at'] ?? ''));
 
     $displayTitle = $title !== '' ? $title : 'ohne Titel';
@@ -500,6 +501,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
     $noticeText = '';
     $ctaLabel = '';
     $ctaUrl = '';
+    $expiresAtLabel = 'Zahlungslink gültig bis';
     $extraDetails = [];
 
     switch ($topic) {
@@ -573,6 +575,18 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $noticeText = $reason;
             break;
 
+        case 'magic_link_portal':
+            $subject = 'Dein Zugangslink für Bocholt erleben';
+            $detailLabel = 'Bereich';
+            $intro = 'Mit dem folgenden Link kannst du deinen Anbieterbereich bei Bocholt erleben öffnen.';
+            $body = 'Der Link ist zeitlich begrenzt und kann nur für diesen Zugang verwendet werden.';
+            $noticeTitle = 'Sicherheitshinweis';
+            $noticeText = 'Wenn du diesen Link nicht angefordert hast, kannst du diese E-Mail ignorieren.';
+            $ctaLabel = 'Anbieterbereich öffnen';
+            $ctaUrl = $magicLinkUrl;
+            $expiresAtLabel = 'Zugangslink gültig bis';
+            break;
+
         default:
             throw new InvalidArgumentException('Unknown mail topic: ' . $topic);
     }
@@ -593,7 +607,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
 
     if ($expiresAt !== '') {
         $details[] = [
-            'label' => 'Zahlungslink gültig bis',
+            'label' => $expiresAtLabel,
             'value' => $expiresAt,
         ];
     }

@@ -81,28 +81,6 @@ function opml_build_magic_link_url(string $baseUrl, string $token): string
     return $baseUrl . '/fuer-veranstalter/login/?token=' . rawurlencode($token);
 }
 
-function opml_build_mail_subject(): string
-{
-    return 'Dein Zugangslink für Bocholt erleben';
-}
-
-function opml_build_mail_body(string $magicLinkUrl, string $expiresAtUtc): string
-{
-    return implode("\n", [
-        'Hallo,',
-        '',
-        'hier ist dein Zugangslink für Bocholt erleben:',
-        $magicLinkUrl,
-        '',
-        'Der Link ist gültig bis (UTC): ' . $expiresAtUtc,
-        '',
-        'Wenn du diesen Link nicht angefordert hast, kannst du diese E-Mail ignorieren.',
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ]);
-}
-
 try {
     $input = opml_read_json_body();
     $email = opml_normalize_email((string)($input['email'] ?? ''));
@@ -113,6 +91,7 @@ try {
         'SELECT
             id,
             organization_name,
+            contact_name,
             email,
             email_normalized
          FROM organizers
@@ -195,11 +174,19 @@ try {
     $baseUrl = opml_base_url();
     $magicLinkUrl = opml_build_magic_link_url($baseUrl, $token);
 
+    $mail = be_build_system_mail_topic('magic_link_portal', [
+        'title' => 'Anbieterbereich',
+        'contact_name' => trim((string)($organizer['contact_name'] ?? '')),
+        'magic_link_url' => $magicLinkUrl,
+        'expires_at' => $expiresAt,
+    ]);
+
     be_send_mail(
         (string)$organizer['email'],
-        opml_build_mail_subject(),
-        opml_build_mail_body($magicLinkUrl, $expiresAt),
-        (string)$organizer['organization_name']
+        $mail['subject'],
+        $mail['text_body'],
+        $mail['to_name'],
+        $mail['html_body']
     );
 
     $config = be_get_config();
