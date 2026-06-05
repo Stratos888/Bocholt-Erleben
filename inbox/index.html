@@ -849,6 +849,101 @@ Umfang:
       };
     }
     /* === END BLOCK: REVIEW_SUBMISSION_PAYMENT_FLOW_HELPERS_V1 === */
+    /* === BEGIN BLOCK: REVIEW_ACTIVITY_OPENING_DISPLAY_V1 | Zweck: zeigt vom Anbieter angegebene Oeffnungszeiten in der Review-Inbox; Umfang: reine Anzeigehelfer fuer activity_opening ohne Review-Flow zu veraendern === */
+    const ACTIVITY_OPENING_DAYS = Object.freeze([
+      ["monday", "Mo"],
+      ["tuesday", "Di"],
+      ["wednesday", "Mi"],
+      ["thursday", "Do"],
+      ["friday", "Fr"],
+      ["saturday", "Sa"],
+      ["sunday", "So"]
+    ]);
+
+    function getReviewPlainObject(value) {
+      return value && typeof value === "object" && !Array.isArray(value) ? value : null;
+    }
+
+    function formatActivityAccessType(value) {
+      const key = trimValue(value);
+      const labels = {
+        free_access: "Frei zugänglich / ohne feste Öffnungszeiten",
+        opening_hours: "Regelmäßige Öffnungszeiten",
+        seasonal: "Saisonal oder unregelmäßig",
+        appointment: "Nach Vereinbarung / bitte prüfen",
+        check_required: "Bitte prüfen"
+      };
+
+      return labels[key] || key;
+    }
+
+    function formatActivityHolidayPolicy(value) {
+      const key = trimValue(value);
+      const labels = {
+        open_as_usual: "wie regulär geöffnet",
+        closed: "an Feiertagen geschlossen",
+        check: "an Feiertagen bitte prüfen"
+      };
+
+      return labels[key] || key || "an Feiertagen bitte prüfen";
+    }
+
+    function formatActivityOpeningIntervals(intervals) {
+      if (!Array.isArray(intervals) || intervals.length <= 0) {
+        return "geschlossen";
+      }
+
+      return intervals.map((interval) => {
+        if (!Array.isArray(interval) || interval.length < 2) return "";
+        const start = trimValue(interval[0]);
+        const end = trimValue(interval[1]);
+        return start && end ? `${start}–${end}` : "";
+      }).filter(Boolean).join(", ") || "geschlossen";
+    }
+
+    function buildActivityOpeningSummary(opening) {
+      const weekly = getReviewPlainObject(opening && opening.weekly);
+      if (!weekly) return "";
+
+      return ACTIVITY_OPENING_DAYS.map(([key, label]) => {
+        return `${label}: ${formatActivityOpeningIntervals(weekly[key])}`;
+      }).join("; ");
+    }
+
+    function buildActivityOpeningReviewRows(item) {
+      const opening = getReviewPlainObject(item && item.activity_opening);
+      if (!opening) return [];
+
+      const rows = [
+        ["Zugänglichkeit laut Anbieter", formatActivityAccessType(opening.access_type)]
+      ];
+
+      const weeklySummary = buildActivityOpeningSummary(opening);
+      if (weeklySummary) {
+        rows.push(["Vom Anbieter angegebene Öffnungszeiten", weeklySummary]);
+      }
+
+      rows.push(["Feiertage laut Anbieter", formatActivityHolidayPolicy(opening.holiday_policy)]);
+
+      const notes = trimValue(opening.notes);
+      if (notes) {
+        rows.push(["Hinweis des Anbieters zu Öffnungszeiten", notes]);
+      }
+
+      const sourceUrl = trimValue(opening.source_url);
+      if (sourceUrl) {
+        rows.push(["Quelle Öffnungszeiten", sourceUrl]);
+      }
+
+      rows.push([
+        "Prüfhinweis Öffnungszeiten",
+        "Anbieterangabe; offensichtliche Fehler prüfen. Regelmäßige Aktualitätsprüfung folgt später."
+      ]);
+
+      return rows.filter(([, value]) => trimValue(value));
+    }
+    /* === END BLOCK: REVIEW_ACTIVITY_OPENING_DISPLAY_V1 === */
+
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -952,6 +1047,8 @@ Umfang:
         ["Bezahlt am", trimValue(it.paid_at) ? formatGermanDateTime(it.paid_at) : ""]
       ].filter(([, value]) => value);
 
+      const activityOpeningRows = isActivityPresence ? buildActivityOpeningReviewRows(it) : [];
+
       const primaryRows = (isActivityPresence ? [
         ["Anbieter / Ort", placeLine],
         ["Adresse", trimValue(it.location_address)],
@@ -968,6 +1065,7 @@ Umfang:
       const secondaryRows = (isActivityPresence ? [
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
         ["Eingereicht am", submittedAt],
+        ...activityOpeningRows,
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]
       ] : [
