@@ -550,7 +550,7 @@ function be_build_system_mail_topic(string $topic, array $context): array
             $subject = 'Deine Aktivität wurde freigegeben';
             $detailLabel = 'Aktivität';
             $intro = 'Deine Aktivität wurde final freigegeben. Sobald die Seite aktualisiert ist, wird sie bei Bocholt erleben sichtbar.';
-            $body = 'Damit ist die redaktionelle Freigabe abgeschlossen. Die Aktivität zählt ab Veröffentlichung in deinem Tarif.';
+            $body = 'Damit ist die redaktionelle Freigabe abgeschlossen. Die Aktivität ist mit dieser Freigabe deinem Tarif zugeordnet.';
             $noticeTitle = '';
             break;
 
