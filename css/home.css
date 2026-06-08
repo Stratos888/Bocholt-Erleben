@@ -1523,13 +1523,18 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     padding: 0;
   }
 
+  body.is-tabbar-hidden .event-card-media{
+    aspect-ratio: auto;
+    height: clamp(124px, 34vw, 144px);
+  }
+
   body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
-    top: 10px;
-    left: 10px;
+    top: 9px;
+    left: 9px;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
-    padding: 12px 12px 13px;
+    padding: 11px 12px 12px;
   }
 }
 /* === END BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 === */
