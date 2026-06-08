@@ -105,6 +105,7 @@
   }
 
   function isTopTipEligible(item, context) {
+    if (item?.type === "activity" && item.availability === "opening_hours_check") return false;
     if (isNonBusinessDayClosureRisk(item, context)) return false;
     if (!isWeatherTopTipEligible(item, context)) return false;
     return true;
