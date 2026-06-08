@@ -74,6 +74,15 @@
         "Outdoor",
         "See & Strand"
       ],
+      "opening_status": {
+        "type": "seasonal_recommended",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/aasee",
+        "public_label": "Ganzjährig als Freizeitort nutzbar; Baden vor allem im Sommer",
+        "detail_note": "Der Aasee ist als Freizeit- und Spazierziel grundsätzlich ganzjährig nutzbar. Baden, Strandnutzung und Wasserqualität sind saisonal und vor Ort zu prüfen.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -156,6 +165,15 @@
         "Outdoor",
         "Natur"
       ],
+      "opening_status": {
+        "type": "seasonal_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/Burloer-Venn",
+        "public_label": "Rundwanderung nur außerhalb der Brutzeit",
+        "detail_note": "Naturziel mit Schutz- und Brutzeitbezug. Wege- und Betretungsregeln vor Ort beachten; saisonale Einschränkungen sind keine klassischen Tagesöffnungszeiten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1285,6 +1303,15 @@
         "Outdoor",
         "Flamingos"
       ],
+      "opening_status": {
+        "type": "seasonal_recommended",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bszwillbrock.de/de/biologische-station-zwillbrock/tourismus/zu-gast-in-zwillbrock/rund-um-das-zwillbrocker-venn/der-rundwanderweg/",
+        "public_label": "Rundweg ganzjährig zugänglich; Flamingos vor allem im Frühjahr/Sommer",
+        "detail_note": "Der Rundweg ist grundsätzlich frei nutzbar. Der Flamingo-Bezug ist saisonal besonders attraktiv; Natur- und Schutzregeln vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1359,6 +1386,15 @@
         "Outdoor",
         "Moor"
       ],
+      "opening_status": {
+        "type": "seasonal_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.natuurmonumenten.nl/natuurgebieden/korenburgerveen",
+        "public_label": "Nur auf markierten Wegen; Brutzeit-Beschränkungen beachten",
+        "detail_note": "Naturgebiet mit Schutz- und Brutzeitregeln. Nur ausgewiesene Wege nutzen; saisonale Einschränkungen sind keine klassischen Tagesöffnungszeiten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1431,6 +1467,15 @@
         "Outdoor",
         "Moor"
       ],
+      "opening_status": {
+        "type": "seasonal_recommended",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.natuurmonumenten.nl/natuurgebieden/wooldse-veen",
+        "public_label": "Ganzjährig als Naturweg nutzbar; bei Nässe besonders anspruchsvoll",
+        "detail_note": "Naturweg ohne klassische Öffnungszeiten. Saison, Wetter und Bodenverhältnisse beeinflussen die Nutzbarkeit deutlich.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1506,6 +1551,15 @@
         "Outdoor",
         "Wanderroute"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://achterhoekferien.de/grenzenlos-wandelen",
+        "public_label": "Frei zugängliche Wanderroute",
+        "detail_note": "Die Route kann grundsätzlich frei begangen werden. Wetter, Tageslicht und Wegequalität beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1657,6 +1711,15 @@
         "Outdoor",
         "Radroute"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/Radweg-Bocholter-Aa",
+        "public_label": "Frei befahrbarer Radweg",
+        "detail_note": "Der Radweg ist grundsätzlich frei nutzbar. Wetter, Tageslicht und Baustellen-/Umleitungshinweise beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -1883,6 +1946,15 @@
         "Outdoor",
         "Grenzroute"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.wandelnet.nl/noaberpad",
+        "public_label": "Frei zugängliche Fernwanderroute",
+        "detail_note": "Der Noaberpad-Abschnitt ist als Wanderroute grundsätzlich frei zugänglich. Etappenplanung, Wetter, Tageslicht und Wegzustand beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -2122,6 +2194,15 @@
         "Outdoor",
         "Familie"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/Olle-Kerkpatt-Erlebnisweg",
+        "public_label": "Frei zugänglicher Erlebnisweg",
+        "detail_note": "Der Erlebnisweg ist grundsätzlich frei nutzbar. Wetter, Tageslicht und Zustand der Stationen vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -2492,6 +2573,15 @@
         "Outdoor",
         "38 km"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/mountainbiking",
+        "public_label": "Frei nutzbare MTB-Route",
+        "detail_note": "Die MTB-Route ist grundsätzlich frei nutzbar. Wetter, Tageslicht, Streckenzustand und lokale Regeln beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -2583,6 +2673,15 @@
         "Outdoor",
         "See & Spielplatz"
       ],
+      "opening_status": {
+        "type": "seasonal_recommended",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Proebstingsee.php",
+        "public_label": "Ganzjährig als See- und Spazierziel; Wasserangebote saisonal",
+        "detail_note": "Der Pröbstingsee ist als Freizeit- und Spazierziel grundsätzlich nutzbar. Wasser-, Freizeit- und Betreiberangebote sind saisonal bzw. vor Ort zu prüfen.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "seasonal",
         "weather_profile": [
@@ -3390,6 +3489,15 @@
           "Outdoor",
           "Badesee"
         ],
+        "opening_status": {
+          "type": "seasonal_hours",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
+          "public_label": "See ganzjährig; Baden nur saisonal und im ausgewiesenen Bereich",
+          "detail_note": "Badesaison und Badegewässer-Monitoring sind saisonale Nutzungshinweise, keine garantierten Tagesöffnungszeiten. Wasserqualität, Wetter, DLRG und Regeln vor Ort beachten.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "seasonal",
           "weather_profile": [
