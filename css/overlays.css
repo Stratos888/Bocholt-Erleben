@@ -1326,6 +1326,31 @@ Umfang:
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
 }
 
+#event-detail-panel .activity-detail__opening-status{
+  gap: 7px;
+}
+
+#event-detail-panel .activity-detail__opening-details{
+  margin-top: 2px;
+}
+
+#event-detail-panel .activity-detail__opening-summary{
+  cursor: pointer;
+  width: fit-content;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 760;
+  color: rgba(31,41,51,0.62);
+}
+
+#event-detail-panel .activity-detail__opening-note{
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.48;
+  font-weight: 560;
+  color: rgba(31,41,51,0.68);
+}
+
 @media (max-width: 479px){
   #event-detail-panel .activity-detail__meta-list{
     display: grid;

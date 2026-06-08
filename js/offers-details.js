@@ -357,7 +357,12 @@ const OfferDetailPanel = {
     if (!publicLabel && !detailNote) return "";
 
     const noteHtml = detailNote && detailNote !== publicLabel
-      ? `<div class="activity-detail__fact-value">${this.escapeHtml(detailNote)}</div>`
+      ? `
+        <details class="activity-detail__opening-details">
+          <summary class="activity-detail__opening-summary">Hinweise anzeigen</summary>
+          <div class="activity-detail__opening-note">${this.escapeHtml(detailNote)}</div>
+        </details>
+      `
       : "";
 
     return `
