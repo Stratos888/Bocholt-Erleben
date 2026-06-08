@@ -2447,3 +2447,69 @@ Nicht Teil dieses Workpacks:
 - Öffnungsstatus öffentlich anzeigen.
 - Daily-/Weekly-Check gegen Anbieterquellen.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_DONE_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_PUBLIC_STATUS_DONE_2026_06_08 | Zweck: dokumentiert Abschluss der zentralen öffentlichen Öffnungsstatus-Logik; Umfang: Today Home, Recommendations, Top-Tipp-Sperre für ungeprüfte Öffnungszeiten === -->
+## Activity Opening Public Status – abgeschlossen am 2026-06-08
+
+### Ziel
+
+Öffnungsstatus und Schließrisiko für bestehende Activities werden zentral bewertet, damit Today Home keine starken Top-Tipps vergibt, wenn Öffnungszeiten ungeprüft oder der Tageskontext unsicher ist.
+
+### Umgesetzt
+
+- Neuer zentraler Owner `js/opening-status.js`.
+- Öffnungsstatus-/Schließrisiko-Logik aus `js/recommendations.js` und `js/today-home.js` herausgelöst.
+- Zentrale API für:
+  - `hasClosureRisk`
+  - `isTopTipEligible`
+  - Recommendation-Day-Labels
+  - Recommendation-Availability-Labels
+  - Activity-Meta-Labels
+  - Non-Business-Day-Score-Abzug
+- `js/recommendations.js` delegiert Labels und Score-Abzug an `OpeningStatus`.
+- `js/today-home.js` delegiert Top-Tipp-Eignung und Activity-Meta-Labels an `OpeningStatus`.
+- Activities mit `availability = opening_hours_check` können weiterhin empfohlen werden, bekommen aber kein Top-Tipp-Badge mehr.
+- Sonntag-/Feiertag-Schließrisiko wird zentral behandelt.
+- Regenlogik bleibt erhalten: Indoor-/wetterunabhängige Orte können empfohlen werden; ungeprüfte Öffnungszeiten bleiben aber kein Top-Tipp.
+
+### Verifizierte Tests
+
+- `node --check` für:
+  - `js/opening-status.js`
+  - `js/recommendations.js`
+  - `js/today-home.js`
+- Smoke-Test der `OpeningStatus`-API:
+  - `opening_hours_check` ist nicht Top-Tipp-fähig.
+  - frei planbare Indoor-Activities bleiben Top-Tipp-fähig.
+  - Sonntag-/Feiertag-Schließrisiko liefert passende Labels und Score-Abzüge.
+- Realer Recommendation-Test mit `data/offers.json`:
+  - Werktag trocken
+  - Werktag Regen
+  - Sonntag trocken
+  - Feiertag trocken
+- Ergebnis bei Regen:
+  - Indoor-Orte mit `opening_hours_check` bleiben oben, aber `topTip=no`.
+  - Today Home kann dadurch bewusst ohne Top-Tipp-Badge bleiben, statt ungeprüfte Öffnungszeiten als starken Tipp auszuzeichnen.
+
+### Commits
+
+- `0e03a7a` – Zentralisiere Activity-Oeffnungsstatus
+- `4c9a52e` – Zentralisiere Activity-Oeffnungsstatus-Labels
+- `1934307` – Sperre Oeffnungszeiten-Pruefen als Top-Tipp
+
+### Bewusste Grenzen
+
+- Noch keine echten Öffnungszeiten in `data/offers.json` eingetragen.
+- `holiday_policy` fehlt aktuell bei allen 44 Activities.
+- Die aktuelle Bewertung ist vorsichtig und heuristisch.
+- Keine automatische Prüfung konkreter Wochenzeiten.
+- Vor Live-Merge/Live-Deploy weiterhin nötig: Live-DB-Spalte `submissions.activity_opening_json`.
+
+### Nächster sinnvoller Schritt
+
+Gezielte Datenanreicherung statt weiterer Logik-Patches:
+
+1. Zuerst die 9 Activities mit `availability = opening_hours_check` prüfen.
+2. Danach `holiday_policy` bzw. geprüfte Statuswerte in `data/offers.json` ergänzen.
+3. Erst danach echte Wochenöffnungszeiten bzw. präzisere öffentliche Statusanzeige modellieren.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_PUBLIC_STATUS_DONE_2026_06_08 === -->

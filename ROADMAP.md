@@ -1054,3 +1054,43 @@ Start im nächsten Chat:
 3. Entscheiden, ob Öffnungszeiten separat oder direkt in Activity-Daten modelliert werden.
 4. Erst danach kleiner, owner-klarer Patch.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 | Zweck: definiert nächsten Workpack nach zentraler Öffnungsstatus-Logik; Umfang: Datenanreicherung bestehender Activities, holiday_policy, geprüfte Öffnungszeiten === -->
+## Nächster Workpack: Öffnungsstatus-Daten für Activities anreichern
+
+### Ausgangslage
+
+- Die technische Öffnungsstatus-Logik ist zentralisiert.
+- Today Home vergibt keine Top-Tipps mehr für `availability = opening_hours_check`.
+- `data/offers.json` enthält aktuell:
+  - 44 Activities
+  - 22 `always`
+  - 13 `seasonal`
+  - 9 `opening_hours_check`
+  - 44 ohne `holiday_policy`
+
+### Ziel
+
+Die wichtigsten bestehenden Activities sollen belastbarere öffentliche Öffnungsstatus-Daten bekommen, damit Empfehlungen nicht nur heuristisch, sondern fachlich besser abgesichert werden.
+
+### Reihenfolge
+
+1. Nur die 9 `opening_hours_check`-Activities prüfen und priorisieren.
+2. Pro Activity entscheiden:
+   - bleibt `opening_hours_check`
+   - wird zu `verified`
+   - braucht `holiday_policy`
+   - braucht später konkrete Wochenzeiten
+3. `holiday_policy` kontrolliert ergänzen:
+   - `open`
+   - `closed`
+   - `limited`
+   - `check`
+4. Danach Today-Home-Ergebnis erneut gegen Regen/Sonntag/Feiertag testen.
+
+### Nicht jetzt
+
+- Keine breite Massenpflege aller 44 Activities.
+- Keine ungeprüften echten Öffnungszeiten erfinden.
+- Keine neue Daten-Datei einführen, solange `data/offers.json` als Activity-Owner ausreicht.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 === -->
