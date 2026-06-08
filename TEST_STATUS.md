@@ -2588,3 +2588,45 @@ Kein weiterer Daten-Massenpatch. Als nächstes nur gezielte Folgearbeit:
 3. Today-Home-/Recommendation-Verhalten visuell prüfen.
 4. Erst danach kleine, owner-klare Logik- oder UI-Patches.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_DETAILPANEL_DONE_2026_06_08 | Zweck: dokumentiert Abschluss der Activity-Öffnungsstatus-Anzeige im Detailpanel; Umfang: Datenweitergabe, sichtbarer Callout, einklappbare Hinweise === -->
+## Activity Opening Detailpanel – abgeschlossen am 2026-06-08
+
+### Ergebnis
+
+Der geprüfte `opening_status` aus `data/offers.json` wird jetzt im Activity-Detailpanel sichtbar genutzt.
+
+### Umgesetzt
+
+- `js/offers-main.js` reicht `opening_status` und `opening_hours` aus `data/offers.json` in normalisierte Activity-Objekte durch.
+- `js/offers-details.js` zeigt `opening_status.public_label` im Activity-Detailpanel an.
+- `opening_status.detail_note` wird als nativer, ausklappbarer Hinweis angezeigt.
+- Der kurze Öffnungsstatus bleibt sichtbar; lange Hinweise blockieren das Detailpanel nicht mehr dauerhaft.
+- `css/overlays.css` stylt den ausklappbaren Hinweis ruhig und sekundär.
+
+### Validierung
+
+Geprüft wurden exemplarisch:
+
+- `Aasee erleben`
+- `Textilwerk Bocholt`
+- `Bocholter Innenstadt erleben`
+- `Quellengrundpark Weseke entdecken`
+
+Ergebnis:
+
+- Öffnungsstatus erscheint an sinnvoller Stelle nach der Beschreibung.
+- Eingeklappt bleibt der Block kompakt.
+- Ausgeklappt ist der Hinweis lesbar, aber weniger dominant.
+- Merkmale und Aktionen bleiben schneller erreichbar.
+
+### Commits
+
+- `bec9c66` – Reiche Activity Oeffnungsstatus ins Detailpanel durch
+- `8867eb8` – Zeige Activity Oeffnungsstatus im Detailpanel
+- `9d18823` – Mache Activity Oeffnungshinweise ausklappbar
+
+### Bewusste Grenze
+
+Keine weitere Öffnungszeiten-Datenpflege und keine neue Saisonlogik in diesem Workpack.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_DETAILPANEL_DONE_2026_06_08 === -->
