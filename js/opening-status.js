@@ -30,12 +30,24 @@
     ].map(asString).filter(Boolean).join(" ").toLowerCase();
   }
 
+  function readOpeningStatus(item) {
+    return item?.openingStatus && typeof item.openingStatus === "object" ? item.openingStatus : {};
+  }
+
+  function availabilityType(item) {
+    return asString(readOpeningStatus(item).type || item?.availability);
+  }
+
+  function holidayPolicy(item) {
+    return asString(readOpeningStatus(item).holiday_policy || item?.holidayPolicy).toLowerCase();
+  }
+
   function hasClosureRisk(item) {
     if (item?.type !== "activity") return false;
 
-    const holidayPolicy = asString(item.holidayPolicy).toLowerCase();
-    if (["closed", "limited", "opening_hours_check", "check"].includes(holidayPolicy)) return true;
-    if (item.availability === "opening_hours_check") return true;
+    const policy = holidayPolicy(item);
+    if (["closed", "limited", "opening_hours_check", "check"].includes(policy)) return true;
+    if (availabilityType(item) === "opening_hours_check") return true;
 
     const text = itemSearchText(item);
     return [
@@ -75,9 +87,11 @@
     if (item?.type !== "activity") return [];
 
     const labels = [];
-    if (item.availability === "always" && !isNonBusinessDayClosureRisk(item, context)) labels.push("Immer möglich");
-    if (item.availability === "opening_hours_check") labels.push("Öffnungszeiten prüfen");
-    if (item.availability === "seasonal") labels.push("Saisonal");
+    const type = availabilityType(item);
+    if (["always", "free_access"].includes(type) && !isNonBusinessDayClosureRisk(item, context)) labels.push("Immer möglich");
+    if (type === "regular_hours") labels.push("Öffnungszeiten hinterlegt");
+    if (["opening_hours_check", "check_required"].includes(type)) labels.push("Öffnungszeiten prüfen");
+    if (["seasonal", "seasonal_recommended", "seasonal_hours"].includes(type)) labels.push("Saisonal");
     return labels;
   }
 
@@ -89,13 +103,22 @@
       labels.push(`${context.holidayName || "Feiertag"}: Öffnungszeiten prüfen`);
     } else if (context?.isSunday && hasClosureRisk(item)) {
       labels.push("Sonntag: Öffnungszeiten prüfen");
-    } else if (item.availability === "always") {
-      labels.push("frei planbar");
-    } else if (item.availability === "opening_hours_check") {
-      labels.push("Öffnungszeiten prüfen");
-    }
+    } else {
+      const type = availabilityType(item);
+      const publicLabel = asString(readOpeningStatus(item).public_label);
 
-    if (item.availability === "seasonal") labels.push("saisonal");
+      if (publicLabel) {
+        labels.push(publicLabel);
+      } else if (["always", "free_access"].includes(type)) {
+        labels.push("frei planbar");
+      } else if (["regular_hours", "seasonal_hours"].includes(type)) {
+        labels.push("Öffnungszeiten hinterlegt");
+      } else if (["opening_hours_check", "check_required"].includes(type)) {
+        labels.push("Öffnungszeiten prüfen");
+      }
+
+      if (["seasonal", "seasonal_recommended", "seasonal_hours"].includes(type)) labels.push("saisonal");
+    }
     return labels;
   }
 
@@ -105,7 +128,7 @@
   }
 
   function isTopTipEligible(item, context) {
-    if (item?.type === "activity" && item.availability === "opening_hours_check") return false;
+    if (item?.type === "activity" && ["opening_hours_check", "check_required"].includes(availabilityType(item))) return false;
     if (isNonBusinessDayClosureRisk(item, context)) return false;
     if (!isWeatherTopTipEligible(item, context)) return false;
     return true;
