@@ -447,10 +447,6 @@
     return quality !== "needs_review" && quality !== "blocked";
   }
 
-  function hasClosureRisk(item) {
-    return window.OpeningStatus?.hasClosureRisk?.(item) === true;
-  }
-
   function isTopTipEligible(item, context) {
     return window.OpeningStatus?.isTopTipEligible?.(item, context) !== false;
   }
@@ -585,17 +581,10 @@
 
     if (item.location) parts.push(item.location);
 
-    if (dayContext.isHoliday && hasClosureRisk(item)) {
-      parts.push(`${dayContext.holidayName || "Feiertag"}: Öffnungszeiten prüfen`);
-    } else if (dayContext.isSunday && hasClosureRisk(item)) {
-      parts.push("Sonntag: Öffnungszeiten prüfen");
-    } else if (item.availability === "always") {
-      parts.push("frei planbar");
-    } else if (item.availability === "opening_hours_check") {
-      parts.push("Öffnungszeiten prüfen");
-    }
-
-    if (item.availability === "seasonal") parts.push("saisonal");
+    const availabilityLabels = window.OpeningStatus?.buildActivityMetaLabels?.(item, dayContext) || [];
+    availabilityLabels.forEach((label) => {
+      parts.push(label);
+    });
     return parts.join(" · ");
   }
 

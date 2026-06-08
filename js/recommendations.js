@@ -86,10 +86,6 @@
     return readObject(obj.recommendation);
   }
 
-  function hasClosureRisk(item) {
-    return window.OpeningStatus?.hasClosureRisk?.(item) === true;
-  }
-
   function readFilterValues(item, group) {
     const filter = readObject(item?.filter);
     return asArray(filter[group]);
@@ -375,11 +371,9 @@
   function buildReasonLabels(item, context) {
     const labels = [];
 
-    if (context.isHoliday && hasClosureRisk(item)) {
-      labels.push("Feiertag: prüfen");
-    } else if (context.isNonBusinessDay && hasClosureRisk(item)) {
-      labels.push("Öffnungszeiten prüfen");
-    }
+    asArray(window.OpeningStatus?.buildRecommendationDayLabels?.(item, context)).forEach((label) => {
+      labels.push(label);
+    });
 
     if (item.type === "event") {
       const date = parseDateLocal(item.date);
@@ -407,9 +401,9 @@
     }
 
     if (item.type === "activity") {
-      if (item.availability === "always" && !(context.isNonBusinessDay && hasClosureRisk(item))) labels.push("Immer möglich");
-      if (item.availability === "opening_hours_check") labels.push("Öffnungszeiten prüfen");
-      if (item.availability === "seasonal") labels.push("Saisonal");
+      asArray(window.OpeningStatus?.buildRecommendationAvailabilityLabels?.(item, context)).forEach((label) => {
+        labels.push(label);
+      });
     }
 
     if (hasAny(item.interestTags, "Familie")) labels.push("Familie");
@@ -515,9 +509,7 @@
       if (hasAny(item.timeProfile, "short_spontaneous")) score += 7;
       if (context.mode === "weekend" && hasAny(item.timeProfile, "weekend")) score += 14;
 
-      if (context.isNonBusinessDay && hasClosureRisk(item)) {
-        score -= 70;
-      }
+      score += window.OpeningStatus?.nonBusinessDayScoreAdjustment?.(item, context) || 0;
     }
 
     if (!item.location) score -= 8;

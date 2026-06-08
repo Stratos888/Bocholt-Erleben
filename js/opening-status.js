@@ -61,15 +61,62 @@
     return hasAny(item.weatherProfile, ["indoor", "weather_independent"]);
   }
 
+  function isNonBusinessDayClosureRisk(item, context) {
+    return context?.isNonBusinessDay === true && hasClosureRisk(item);
+  }
+
+  function buildRecommendationDayLabels(item, context) {
+    if (context?.isHoliday && hasClosureRisk(item)) return ["Feiertag: prüfen"];
+    if (isNonBusinessDayClosureRisk(item, context)) return ["Öffnungszeiten prüfen"];
+    return [];
+  }
+
+  function buildRecommendationAvailabilityLabels(item, context) {
+    if (item?.type !== "activity") return [];
+
+    const labels = [];
+    if (item.availability === "always" && !isNonBusinessDayClosureRisk(item, context)) labels.push("Immer möglich");
+    if (item.availability === "opening_hours_check") labels.push("Öffnungszeiten prüfen");
+    if (item.availability === "seasonal") labels.push("Saisonal");
+    return labels;
+  }
+
+  function buildActivityMetaLabels(item, context) {
+    if (item?.type !== "activity") return [];
+
+    const labels = [];
+    if (context?.isHoliday && hasClosureRisk(item)) {
+      labels.push(`${context.holidayName || "Feiertag"}: Öffnungszeiten prüfen`);
+    } else if (context?.isSunday && hasClosureRisk(item)) {
+      labels.push("Sonntag: Öffnungszeiten prüfen");
+    } else if (item.availability === "always") {
+      labels.push("frei planbar");
+    } else if (item.availability === "opening_hours_check") {
+      labels.push("Öffnungszeiten prüfen");
+    }
+
+    if (item.availability === "seasonal") labels.push("saisonal");
+    return labels;
+  }
+
+  function nonBusinessDayScoreAdjustment(item, context) {
+    if (item?.type === "activity" && isNonBusinessDayClosureRisk(item, context)) return -70;
+    return 0;
+  }
+
   function isTopTipEligible(item, context) {
-    if (context?.isNonBusinessDay && hasClosureRisk(item)) return false;
+    if (isNonBusinessDayClosureRisk(item, context)) return false;
     if (!isWeatherTopTipEligible(item, context)) return false;
     return true;
   }
 
   window.OpeningStatus = Object.freeze({
     hasClosureRisk,
-    isTopTipEligible
+    isTopTipEligible,
+    buildRecommendationDayLabels,
+    buildRecommendationAvailabilityLabels,
+    buildActivityMetaLabels,
+    nonBusinessDayScoreAdjustment
   });
 })();
 /* === END FILE: js/opening-status.js === */
