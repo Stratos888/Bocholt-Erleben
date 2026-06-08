@@ -1525,8 +1525,8 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-template-columns: 38px minmax(0, 1fr) var(--event-card-thumb-w);
     grid-template-rows: auto auto;
     column-gap: 8px;
-    row-gap: 4px;
-    align-items: start;
+    row-gap: 3px;
+    align-items: center;
 
     min-height: 0;
     padding: 11px;
@@ -1546,7 +1546,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-column: 1;
     grid-row: 1 / span 2;
     justify-self: start;
-    align-self: start;
+    align-self: center;
 
     width: 38px;
     padding: 4px 2px;
@@ -1570,7 +1570,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
 
     grid-column: 2;
     grid-row: 1;
-    align-self: start;
+    align-self: end;
 
     font-size: clamp(0.89rem, 3.7vw, 0.95rem);
     line-height: 1.15;
@@ -1592,13 +1592,13 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 1px;
+    gap: 0;
 
     min-width: 0;
     margin: 0;
 
-    font-size: clamp(0.77rem, 3.15vw, 0.83rem);
-    line-height: 1.22;
+    font-size: clamp(0.77rem, 3.1vw, 0.82rem);
+    line-height: 1.2;
     white-space: normal;
     overflow: visible;
   }
@@ -1635,7 +1635,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     width: var(--event-card-thumb-w);
     height: var(--event-card-thumb-h);
     aspect-ratio: auto;
-    align-self: start;
+    align-self: center;
 
     border-radius: 12px;
   }
