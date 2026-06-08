@@ -27,18 +27,28 @@
         {
           "id": "textile-machines-industry-02",
           "src": "/assets/event-visuals/textile-machines-industry-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile machines industry: Textilmaschine / Industriekultur.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "textile-machines-industry-03",
           "src": "/assets/event-visuals/textile-machines-industry-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile machines industry: Webstuhl/Textilmaschinen-Kontext.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "textile-machines-industry-04",
@@ -104,34 +114,54 @@
         {
           "id": "textile-exhibition-design-02",
           "src": "/assets/event-visuals/textile-exhibition-design-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile exhibition design: Textil-/Designausstellung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "textile-exhibition-design-03",
           "src": "/assets/event-visuals/textile-exhibition-design-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile exhibition design: Textil-/Designausstellung Detail.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "textile-exhibition-design-04",
           "src": "/assets/event-visuals/textile-exhibition-design-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile exhibition design: Textil-/Designausstellung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "textile-exhibition-design-05",
           "src": "/assets/event-visuals/textile-exhibition-design-05.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für textile exhibition design: Textilausstellung mit Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -157,26 +187,54 @@
         {
           "id": "art-exhibition-gallery-02",
           "src": "/assets/event-visuals/art-exhibition-gallery-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für art exhibition gallery: Kunstausstellung/Galerie.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "art-exhibition-gallery-03",
           "src": "/assets/event-visuals/art-exhibition-gallery-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für art exhibition gallery: Galerie-/Ausstellungsraum mit Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "art-exhibition-gallery-04",
           "src": "/assets/event-visuals/art-exhibition-gallery-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für art exhibition gallery: Kunstausstellung mit Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "art-exhibition-gallery-05",
+          "src": "/assets/event-visuals/art-exhibition-gallery-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für art exhibition gallery: ruhige Galerieansicht.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -218,38 +276,71 @@
         {
           "id": "local-history-heritage-01",
           "src": "/assets/event-visuals/local-history-heritage-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "culture_exhibition"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für local history heritage: Handwerk-/Regionalgeschichte-Ausstellung.",
+          "legacy_visual_key": "culture_exhibition",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "local-history-heritage-02",
           "src": "/assets/event-visuals/local-history-heritage-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "culture_exhibition"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für local history heritage: historische Dokumente / Archiv-/Museumstisch.",
+          "legacy_visual_key": "culture_exhibition",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "local-history-heritage-03",
           "src": "/assets/event-visuals/local-history-heritage-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "culture_exhibition"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für local history heritage: historischer Ort mit Besuchergruppe.",
+          "legacy_visual_key": "culture_exhibition",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "local-history-heritage-04",
           "src": "/assets/event-visuals/local-history-heritage-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "culture_exhibition"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für local history heritage: Museumsführung / regionale Geschichte.",
+          "legacy_visual_key": "culture_exhibition",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "local-history-heritage-05",
+          "src": "/assets/event-visuals/local-history-heritage-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für local history heritage: Archiv-/Ausstellungsraum mit historischen Unterlagen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -291,20 +382,30 @@
         {
           "id": "city-tour-history-01",
           "src": "/assets/event-visuals/city-tour-history-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_walk"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für city tour history: historische Stadtführung / Stadtspaziergang.",
+          "legacy_visual_key": "city_walk",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "city-tour-history-02",
           "src": "/assets/event-visuals/city-tour-history-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_walk"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für city tour history: historische Stadtführung / Stadtspaziergang.",
+          "legacy_visual_key": "city_walk",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "city-tour-history-03",
@@ -373,20 +474,30 @@
         {
           "id": "live-music-stage-01",
           "src": "/assets/event-visuals/live-music-stage-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "music_stage"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für live music stage: kleine Outdoor-Bühne bei Abendlicht.",
+          "legacy_visual_key": "music_stage",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "live-music-stage-02",
           "src": "/assets/event-visuals/live-music-stage-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "music_stage"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für live music stage: kleine Live-Bühne.",
+          "legacy_visual_key": "music_stage",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "live-music-stage-03",
@@ -439,26 +550,41 @@
         {
           "id": "classical-music-02",
           "src": "/assets/event-visuals/classical-music-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für classical music: klassische Musik / Kirchenkonzert.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "classical-music-03",
           "src": "/assets/event-visuals/classical-music-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für classical music: Kirchen-/Chorkonzert.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "classical-music-04",
           "src": "/assets/event-visuals/classical-music-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für classical music: klassische Musik / Orgelkontext.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "classical-music-05",
@@ -493,37 +619,70 @@
         {
           "id": "theater-stage-02",
           "src": "/assets/event-visuals/theater-stage-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "theater_show"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für theater stage: Theaterbühne.",
+          "legacy_visual_key": "theater_show",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "theater-stage-03",
           "src": "/assets/event-visuals/theater-stage-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "theater_show"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für theater stage: Theaterbühne / Vorhang.",
+          "legacy_visual_key": "theater_show",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "theater-stage-04",
           "src": "/assets/event-visuals/theater-stage-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "theater_show"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für theater stage: Backstage-/Bühnenrand mit Vorhang.",
+          "legacy_visual_key": "theater_show",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "theater-stage-05",
           "src": "/assets/event-visuals/theater-stage-05.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für theater stage: leere Theaterbühne.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "theater-stage-06",
+          "src": "/assets/event-visuals/theater-stage-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für theater stage: Theaterraum mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -549,26 +708,54 @@
         {
           "id": "comedy-cabaret-02",
           "src": "/assets/event-visuals/comedy-cabaret-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für comedy cabaret: kleine Comedy-/Kabarettbühne.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "comedy-cabaret-03",
           "src": "/assets/event-visuals/comedy-cabaret-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für comedy cabaret: kleine Bühne mit Mikrofon.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "comedy-cabaret-04",
           "src": "/assets/event-visuals/comedy-cabaret-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für comedy cabaret: Kabarett-/Comedyraum mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "comedy-cabaret-05",
+          "src": "/assets/event-visuals/comedy-cabaret-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für comedy cabaret: kleine Bühne mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -606,6 +793,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "film-screening-04",
+          "src": "/assets/event-visuals/film-screening-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für film screening: Filmscreening/Kinoraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "film-screening-05",
+          "src": "/assets/event-visuals/film-screening-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für film screening: Filmvorführung mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "film-screening-06",
+          "src": "/assets/event-visuals/film-screening-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für film screening: Film-/Kulturveranstaltung mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -631,26 +857,54 @@
         {
           "id": "literature-reading-talk-02",
           "src": "/assets/event-visuals/literature-reading-talk-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für literature reading talk: kleines Lese-/Talk-Setting.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "literature-reading-talk-03",
           "src": "/assets/event-visuals/literature-reading-talk-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für literature reading talk: Lesebühne / Talksetting.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "literature-reading-talk-04",
           "src": "/assets/event-visuals/literature-reading-talk-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für literature reading talk: Lesung/Talk mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "literature-reading-talk-05",
+          "src": "/assets/event-visuals/literature-reading-talk-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für literature reading talk: Lesung mit Mikrofon und Buch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -676,26 +930,41 @@
         {
           "id": "kids-stage-story-02",
           "src": "/assets/event-visuals/kids-stage-story-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kids stage story: Puppen-/Kindertheater-Setting.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "kids-stage-story-03",
           "src": "/assets/event-visuals/kids-stage-story-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kids stage story: Puppentheater / Kinderbühne.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "kids-stage-story-04",
           "src": "/assets/event-visuals/kids-stage-story-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kids stage story: kleines Figuren-/Erzähltheater.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -737,29 +1006,44 @@
         {
           "id": "city-festival-street-01",
           "src": "/assets/event-visuals/city-festival-street-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_festival"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für city festival street: bewirtete Innenstadt-/Straßenszene.",
+          "legacy_visual_key": "city_festival",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "city-festival-street-02",
           "src": "/assets/event-visuals/city-festival-street-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_festival"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für city festival street: abendliche Innenstadt-Gastro/Festival-Stimmung.",
+          "legacy_visual_key": "city_festival",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "city-festival-street-03",
           "src": "/assets/event-visuals/city-festival-street-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_festival"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für city festival street: Straßenfest-/Innenstadtdekoration.",
+          "legacy_visual_key": "city_festival",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "city-festival-street-04",
@@ -803,34 +1087,67 @@
         {
           "id": "open-air-festival-02",
           "src": "/assets/event-visuals/open-air-festival-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Bühne im Abendlicht.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "open-air-festival-03",
           "src": "/assets/event-visuals/open-air-festival-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Bühne mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "open-air-festival-04",
           "src": "/assets/event-visuals/open-air-festival-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Bühne ohne enges Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "open-air-festival-05",
           "src": "/assets/event-visuals/open-air-festival-05.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Bühne mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "open-air-festival-06",
+          "src": "/assets/event-visuals/open-air-festival-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Konzert / Stadtplatz.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -856,26 +1173,54 @@
         {
           "id": "kirmes-funfair-02",
           "src": "/assets/event-visuals/kirmes-funfair-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kirmes funfair: Kirmes/Karussell.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "kirmes-funfair-03",
           "src": "/assets/event-visuals/kirmes-funfair-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kirmes funfair: Kirmes-/Jahrmarktstimmung mit Stand.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "kirmes-funfair-04",
           "src": "/assets/event-visuals/kirmes-funfair-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kirmes funfair: Kirmes/Karussell mit Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "kirmes-funfair-05",
+          "src": "/assets/event-visuals/kirmes-funfair-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kirmes funfair: Kirmes/Karussell Abendmotiv.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -901,18 +1246,28 @@
         {
           "id": "parade-festzug-02",
           "src": "/assets/event-visuals/parade-festzug-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für parade festzug: Musikzug / Festumzug.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "parade-festzug-03",
           "src": "/assets/event-visuals/parade-festzug-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für parade festzug: Musikzug / Festumzug Detail.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "parade-festzug-04",
@@ -958,6 +1313,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "shooting-festival-tradition-04",
+          "src": "/assets/event-visuals/shooting-festival-tradition-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für shooting festival tradition: Festzelt/Traditionsveranstaltung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "shooting-festival-tradition-05",
+          "src": "/assets/event-visuals/shooting-festival-tradition-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für shooting festival tradition: Schützen-/Traditionszug.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "shooting-festival-tradition-06",
+          "src": "/assets/event-visuals/shooting-festival-tradition-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für shooting festival tradition: Schützen-/Traditionsgesellschaft.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -983,42 +1377,67 @@
         {
           "id": "market-stalls-02",
           "src": "/assets/event-visuals/market-stalls-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für market stalls: Trödel-/Marktstände.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "market-stalls-03",
           "src": "/assets/event-visuals/market-stalls-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für market stalls: Marktstand / Trödel-Detail.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "market-stalls-04",
           "src": "/assets/event-visuals/market-stalls-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für market stalls: Markt-/Trödelstände im Außenraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "market-stalls-05",
           "src": "/assets/event-visuals/market-stalls-05.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für market stalls: Marktstand mit Waren-Detail.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "market-stalls-06",
           "src": "/assets/event-visuals/market-stalls-06.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für market stalls: Marktstand mit Geschirr-/Trödelwaren.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1056,6 +1475,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "book-market-04",
+          "src": "/assets/event-visuals/book-market-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für book market: Bücher-/Antiquariatsmarkt.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "book-market-05",
+          "src": "/assets/event-visuals/book-market-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für book market: Bücher-/Antiquariatsmarkt Detail.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "book-market-06",
+          "src": "/assets/event-visuals/book-market-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für book market: Bücherstände im Außenraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1097,20 +1555,30 @@
         {
           "id": "food-drink-festival-01",
           "src": "/assets/event-visuals/food-drink-festival-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "market_food"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für food drink festival: Markt-/Food-Tisch mit Lebensmitteln.",
+          "legacy_visual_key": "market_food",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "food-drink-festival-02",
           "src": "/assets/event-visuals/food-drink-festival-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "market_food"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für food drink festival: Food-/Markt-Tisch.",
+          "legacy_visual_key": "market_food",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "food-drink-festival-03",
@@ -1184,6 +1652,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "country-fair-rural-04",
+          "src": "/assets/event-visuals/country-fair-rural-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für country fair rural: ländlicher Markt-/Hof-Fair-Kontext.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "country-fair-rural-05",
+          "src": "/assets/event-visuals/country-fair-rural-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für country fair rural: ländlicher Markt / Hof-Fair.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "country-fair-rural-06",
+          "src": "/assets/event-visuals/country-fair-rural-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für country fair rural: Hof-/Landmarkt mit Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1225,29 +1732,44 @@
         {
           "id": "family-play-outdoor-01",
           "src": "/assets/event-visuals/family-play-outdoor-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "kids_family"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für family play outdoor: Outdoor-Familien-/Spielsetting.",
+          "legacy_visual_key": "kids_family",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "family-play-outdoor-02",
           "src": "/assets/event-visuals/family-play-outdoor-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "kids_family"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für family play outdoor: Outdoor-Spiel-/Bewegungsszene.",
+          "legacy_visual_key": "kids_family",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "family-play-outdoor-03",
           "src": "/assets/event-visuals/family-play-outdoor-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "kids_family"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für family play outdoor: Outdoor-Familien-/Erlebnisort.",
+          "legacy_visual_key": "kids_family",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "family-play-outdoor-04",
@@ -1307,47 +1829,111 @@
         {
           "id": "creative-making-workshop-01",
           "src": "/assets/event-visuals/creative-making-workshop-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "creative_workshop"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Werkstatt-/Kreativtisch.",
+          "legacy_visual_key": "creative_workshop",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "creative-making-workshop-02",
           "src": "/assets/event-visuals/creative-making-workshop-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "creative_workshop"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Kreativ-/Werkstatttisch.",
+          "legacy_visual_key": "creative_workshop",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "creative-making-workshop-03",
           "src": "/assets/event-visuals/creative-making-workshop-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "creative_workshop"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Kreativworkshop mit Gruppe.",
+          "legacy_visual_key": "creative_workshop",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "creative-making-workshop-04",
           "src": "/assets/event-visuals/creative-making-workshop-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "creative_workshop"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Material-/Handarbeitsworkshop.",
+          "legacy_visual_key": "creative_workshop",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "creative-making-workshop-05",
           "src": "/assets/event-visuals/creative-making-workshop-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "creative_workshop"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Handwerk-/Kreativdetail.",
+          "legacy_visual_key": "creative_workshop",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "creative-making-workshop-06",
+          "src": "/assets/event-visuals/creative-making-workshop-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Kreativworkshop mit Gruppe.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "creative-making-workshop-07",
+          "src": "/assets/event-visuals/creative-making-workshop-07.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Workshopraum mit Teilnehmenden.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "creative-making-workshop-08",
+          "src": "/assets/event-visuals/creative-making-workshop-08.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für creative making workshop: Kreativ-/Naturmaterial-Workshop.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1373,10 +1959,15 @@
         {
           "id": "learning-science-workshop-02",
           "src": "/assets/event-visuals/learning-science-workshop-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für learning science workshop: Natur-/Lernworkshop mit Materialien.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "learning-science-workshop-03",
@@ -1430,6 +2021,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "dance-music-workshop-04",
+          "src": "/assets/event-visuals/dance-music-workshop-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für dance music workshop: Tanz-/Bewegungsworkshop.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "dance-music-workshop-05",
+          "src": "/assets/event-visuals/dance-music-workshop-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für dance music workshop: Tanzworkshop Gruppe.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "dance-music-workshop-06",
+          "src": "/assets/event-visuals/dance-music-workshop-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für dance music workshop: Tanzworkshop mit Anleitung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1540,6 +2170,45 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "running-event-04",
+          "src": "/assets/event-visuals/running-event-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für running event: Laufveranstaltung / Strecke.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "running-event-05",
+          "src": "/assets/event-visuals/running-event-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für running event: Laufveranstaltung auf Strecke.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "running-event-06",
+          "src": "/assets/event-visuals/running-event-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für running event: Laufgruppe / Start- oder Treffpunkt.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1577,6 +2246,58 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "cycling-event-04",
+          "src": "/assets/event-visuals/cycling-event-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für cycling event: Radveranstaltung / Strecke.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "cycling-event-05",
+          "src": "/assets/event-visuals/cycling-event-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für cycling event: Radgruppe auf Route.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "cycling-event-06",
+          "src": "/assets/event-visuals/cycling-event-06.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für cycling event: Radgruppe / Event-Treffpunkt.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "cycling-event-07",
+          "src": "/assets/event-visuals/cycling-event-07.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für cycling event: Radgruppe auf Route.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1614,6 +2335,32 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "indoor-sport-competition-04",
+          "src": "/assets/event-visuals/indoor-sport-competition-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für indoor sport competition: Indoor-Team-Ballsport.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
+        },
+        {
+          "id": "indoor-sport-competition-05",
+          "src": "/assets/event-visuals/indoor-sport-competition-05.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für indoor sport competition: Volleyball-/Indoor-Sportturnier.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1655,29 +2402,44 @@
         {
           "id": "nature-learning-wildlife-01",
           "src": "/assets/event-visuals/nature-learning-wildlife-01.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "outdoor_nature"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für nature learning wildlife: Naturführung / Beobachtungsgruppe.",
+          "legacy_visual_key": "outdoor_nature",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "nature-learning-wildlife-02",
           "src": "/assets/event-visuals/nature-learning-wildlife-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "outdoor_nature"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für nature learning wildlife: Naturbeobachtung mit Fernglas.",
+          "legacy_visual_key": "outdoor_nature",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "nature-learning-wildlife-03",
           "src": "/assets/event-visuals/nature-learning-wildlife-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "outdoor_nature"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für nature learning wildlife: Naturlernmaterial / Beobachtung.",
+          "legacy_visual_key": "outdoor_nature",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "nature-learning-wildlife-04",
@@ -1722,29 +2484,44 @@
         {
           "id": "evening-social-party-02",
           "src": "/assets/event-visuals/evening-social-party-02.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "evening_social"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für evening social party: abendliches Social-/Party-Setting.",
+          "legacy_visual_key": "evening_social",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "evening-social-party-03",
           "src": "/assets/event-visuals/evening-social-party-03.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "evening_social"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für evening social party: Tanz-/Partyabend mit Gruppe.",
+          "legacy_visual_key": "evening_social",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "evening-social-party-04",
           "src": "/assets/event-visuals/evening-social-party-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "evening_social"
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für evening social party: abendliche Gesellschaft / Social Event.",
+          "legacy_visual_key": "evening_social",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1770,26 +2547,41 @@
         {
           "id": "business-messe-info-02",
           "src": "/assets/event-visuals/business-messe-info-02.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für business messe info: Info-/Messe-Tisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "business-messe-info-03",
           "src": "/assets/event-visuals/business-messe-info-03.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für business messe info: Beratungs-/Info-Tisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         },
         {
           "id": "business-messe-info-04",
           "src": "/assets/event-visuals/business-messe-info-04.webp",
-          "status": "planned",
-          "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für business messe info: Info-/Messeveranstaltung mit Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
@@ -1827,6 +2619,19 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
+        },
+        {
+          "id": "vehicle-classic-04",
+          "src": "/assets/event-visuals/vehicle-classic-04.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für vehicle classic: Oldtimer-/Klassikfahrzeug.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_visual_inventory_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675"
         }
       ]
     },
