@@ -1519,30 +1519,22 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
 
 @media (max-width: 899.98px){
   body.is-tabbar-hidden .event-card.event-card--with-media{
-    --event-card-thumb-w: clamp(74px, 22vw, 88px);
-    --event-card-thumb-h: clamp(62px, 18vw, 74px);
+    --event-card-thumb-w: clamp(72px, 21vw, 84px);
+    --event-card-thumb-h: clamp(60px, 17vw, 70px);
 
-    grid-template-columns: var(--rail-w, 56px) minmax(0, 1fr) var(--event-card-thumb-w);
+    grid-template-columns: 40px minmax(0, 1fr) var(--event-card-thumb-w);
     grid-template-rows: auto auto;
     column-gap: 10px;
-    row-gap: 5px;
+    row-gap: 3px;
     align-items: center;
 
     min-height: 0;
-    padding: 11px 11px 11px 0;
+    padding: 12px;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media::before{
-    content: "";
-    display: block;
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: var(--rail-w, 56px);
-
-    background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
-    opacity: var(--eventcard-rail-opacity);
-    box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
-    pointer-events: none;
+    content: none;
+    display: none;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
@@ -1553,9 +1545,10 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
 
     grid-column: 1;
     grid-row: 1 / span 2;
-    justify-self: center;
+    justify-self: start;
     align-self: center;
 
+    width: 40px;
     background: linear-gradient(
       180deg,
       color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
@@ -1574,8 +1567,12 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     position: relative;
     z-index: 2;
 
-    grid-column: 2 / 4;
+    grid-column: 2;
     grid-row: 1;
+    align-self: end;
+
+    font-size: clamp(0.92rem, 3.85vw, 0.98rem);
+    line-height: 1.16;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media .event-title .event-category-icon{
@@ -1589,6 +1586,9 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-column: 2;
     grid-row: 2;
     align-self: start;
+
+    font-size: clamp(0.80rem, 3.35vw, 0.86rem);
+    line-height: 1.25;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media .event-card-desc,
@@ -1602,7 +1602,8 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     z-index: 1;
 
     grid-column: 3;
-    grid-row: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
 
     width: var(--event-card-thumb-w);
     height: var(--event-card-thumb-h);
