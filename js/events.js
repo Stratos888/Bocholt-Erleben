@@ -697,7 +697,10 @@ function createCard(event) {
     }
 
     if (window.DetailPanel?.show) {
-      window.DetailPanel.show(event);
+      window.DetailPanel.show({
+        ...event,
+        resolvedVisual: cardVisual
+      });
       return;
     }
 

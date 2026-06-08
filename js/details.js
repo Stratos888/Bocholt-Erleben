@@ -770,6 +770,22 @@ const actions = [
            renderContent(event) {
          const vm = toEventDetailVM(event);
 
+      /* === BEGIN BLOCK: EVENT_DETAIL_READY_VISUAL_VM_V1 | Zweck: übernimmt das bereits von EventCards aufgelöste Ready-Visual ins Detailpanel; Umfang: keine eigene Pool-Logik, nur sichere Normalisierung für renderContent === */
+      const detailVisual = (() => {
+        const visual = event?.resolvedVisual && typeof event.resolvedVisual === "object"
+          ? event.resolvedVisual
+          : null;
+
+        const src = normalizeHttpUrl(visual?.src || "");
+        if (!src) return null;
+
+        return {
+          src,
+          alt: trimOrEmpty(visual?.alt || "")
+        };
+      })();
+      /* === END BLOCK: EVENT_DETAIL_READY_VISUAL_VM_V1 === */
+
       // === BEGIN BLOCK: DATE LABEL (DE, user-friendly) ===
       // Zweck: ISO-Datum (YYYY-MM-DD) für Anzeige hübsch formatieren (de-DE), ohne Datenmodell zu verändern
       const formatDateLabelDE = (iso) => {
@@ -1045,8 +1061,23 @@ const iconSvg = (type, extraClass = "") => {
       };
       /* === END BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 === */
 
+      const detailVisualHtml = detailVisual ? `
+        <figure class="event-detail-media" aria-label="Eventbild">
+          <img
+            class="event-detail-media__img"
+            src="${escapeHtml(detailVisual.src)}"
+            alt="${escapeHtml(detailVisual.alt)}"
+            width="1200"
+            height="675"
+            loading="eager"
+            decoding="async"
+          >
+        </figure>
+      ` : "";
+
       const html = `
         <div class="detail-panel-inner">
+          ${detailVisualHtml}
           <div class="detail-header">
             <div class="detail-title-row">
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>

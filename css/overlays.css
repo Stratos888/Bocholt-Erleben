@@ -1526,6 +1526,37 @@ Umfang:
 /* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
 
+/* === BEGIN BLOCK: EVENT_DETAIL_READY_VISUAL_MEDIA_V1 | Zweck: zeigt das von der Event-Card aufgeloeste Ready-Visual als ruhiges 16:9-Media im Event-Detailpanel; Umfang: nur Event-Detailpanel-Media, keine Activity-Media-Klassen === */
+#event-detail-panel .event-detail-media{
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 var(--space-md);
+  overflow: hidden;
+
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: calc(var(--dp-sheet-radius) - 8px);
+  background: var(--color-surface-muted, #f3f5f0);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
+}
+
+#event-detail-panel .event-detail-media__img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+@media (min-width: 760px){
+  #event-detail-panel .event-detail-media{
+    margin-bottom: var(--space-lg);
+  }
+}
+/* === END BLOCK: EVENT_DETAIL_READY_VISUAL_MEDIA_V1 === */
+
+
 /* === BEGIN BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING | Purpose: align detail meta rows to the same left gutter/grid as the rest of the detail panel without redesign | Scope: detail header, title row, category icon, title, meta rows, hover/active/focus, datetime/location variants === */
 #event-detail-panel .detail-header{
   position: relative;
