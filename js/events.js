@@ -293,9 +293,42 @@ const EventCards = (() => {
     return normalizeLookupKey(event?.visual_key || event?.image_visual_key || event?.visualKey || "");
   }
 
+  const EVENT_CARD_RECENT_VISUAL_WINDOW = 5;
+
   function getVisualUsageKey(visual) {
     const id = String(visual?.id || "").trim();
     return id || String(visual?.src || "").trim();
+  }
+
+  function getVisualKeyUsageSet(visualUsage, visualKey) {
+    if (!visualUsage || !visualKey) {
+      return new Set();
+    }
+
+    if (!(visualUsage[visualKey] instanceof Set)) {
+      visualUsage[visualKey] = new Set();
+    }
+
+    return visualUsage[visualKey];
+  }
+
+  function getRecentVisualUsageKeys(visualUsage) {
+    if (!visualUsage) {
+      return [];
+    }
+
+    if (!Array.isArray(visualUsage.__recentVisuals)) {
+      visualUsage.__recentVisuals = [];
+    }
+
+    return visualUsage.__recentVisuals;
+  }
+
+  function wasVisualRecentlyUsed(visualUsage, visual) {
+    const usageKey = getVisualUsageKey(visual);
+    if (!usageKey) return false;
+
+    return getRecentVisualUsageKeys(visualUsage).includes(usageKey);
   }
 
   function markVisualUsage(visualUsage, visualKey, visual) {
@@ -304,11 +337,27 @@ const EventCards = (() => {
     const usageKey = getVisualUsageKey(visual);
     if (!usageKey) return;
 
-    if (!(visualUsage[visualKey] instanceof Set)) {
-      visualUsage[visualKey] = new Set();
+    getVisualKeyUsageSet(visualUsage, visualKey).add(usageKey);
+
+    const recentVisuals = getRecentVisualUsageKeys(visualUsage);
+    recentVisuals.push(usageKey);
+
+    while (recentVisuals.length > EVENT_CARD_RECENT_VISUAL_WINDOW) {
+      recentVisuals.shift();
+    }
+  }
+
+  function pickEventVisualCandidate(pool, startIndex, predicate) {
+    for (let offset = 0; offset < pool.length; offset += 1) {
+      const candidate = pool[(startIndex + offset) % pool.length];
+      if (!candidate?.src) continue;
+
+      if (predicate(candidate)) {
+        return candidate;
+      }
     }
 
-    visualUsage[visualKey].add(usageKey);
+    return null;
   }
 
   function resolveEventVisual(event, visualUsage = null) {
@@ -338,24 +387,42 @@ const EventCards = (() => {
       return fallback;
     }
 
-    const usedForKey =
-      visualUsage[visualKey] instanceof Set ? visualUsage[visualKey] : new Set();
+    const usedForKey = getVisualKeyUsageSet(visualUsage, visualKey);
 
-    for (let offset = 0; offset < pool.length; offset += 1) {
-      const candidate = pool[(startIndex + offset) % pool.length];
-      if (!candidate?.src) continue;
-
+    const unusedAndNotRecent = pickEventVisualCandidate(pool, startIndex, (candidate) => {
       const usageKey = getVisualUsageKey(candidate);
-      if (usageKey && !usedForKey.has(usageKey)) {
-        markVisualUsage(visualUsage, visualKey, candidate);
-        return candidate;
-      }
+      return usageKey && !usedForKey.has(usageKey) && !wasVisualRecentlyUsed(visualUsage, candidate);
+    });
+
+    if (unusedAndNotRecent) {
+      markVisualUsage(visualUsage, visualKey, unusedAndNotRecent);
+      return unusedAndNotRecent;
+    }
+
+    const notRecent = pickEventVisualCandidate(pool, startIndex, (candidate) =>
+      !wasVisualRecentlyUsed(visualUsage, candidate)
+    );
+
+    if (notRecent) {
+      markVisualUsage(visualUsage, visualKey, notRecent);
+      return notRecent;
+    }
+
+    const unusedForKey = pickEventVisualCandidate(pool, startIndex, (candidate) => {
+      const usageKey = getVisualUsageKey(candidate);
+      return usageKey && !usedForKey.has(usageKey);
+    });
+
+    if (unusedForKey) {
+      markVisualUsage(visualUsage, visualKey, unusedForKey);
+      return unusedForKey;
     }
 
     if (!fallback?.src) return null;
     markVisualUsage(visualUsage, visualKey, fallback);
     return fallback;
   }
+
   /* === END BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 === */
 
   function ensureContainer() {
