@@ -281,6 +281,12 @@ const OffersApp = {
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
       season: String(obj.season || "").trim(),
+      opening_status: obj.opening_status && typeof obj.opening_status === "object"
+        ? obj.opening_status
+        : null,
+      opening_hours: obj.opening_hours && typeof obj.opening_hours === "object"
+        ? obj.opening_hours
+        : null,
       ...(reportingTarget.type && reportingTarget.id && reportingTarget.title
         ? { reporting_target: reportingTarget }
         : {}),
