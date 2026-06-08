@@ -1062,11 +1062,11 @@ const iconSvg = (type, extraClass = "") => {
       /* === END BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 === */
 
       const detailVisualHtml = detailVisual ? `
-        <figure class="event-detail-media" aria-label="Eventbild">
+        <figure class="event-detail-media" aria-hidden="true">
           <img
             class="event-detail-media__img"
             src="${escapeHtml(detailVisual.src)}"
-            alt="${escapeHtml(detailVisual.alt)}"
+            alt=""
             width="1200"
             height="675"
             loading="eager"
