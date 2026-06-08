@@ -12,7 +12,7 @@
 
 - Production/staging event data is hybrid.
 - The public event feed consists of:
-  1. Google Sheet / generated runtime feed `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
+  1. Google Sheets tab `Events` as the editorial source for KI-/Sheet- and manually maintained events. During deploy, this tab is exported to `data/events.tsv` and transformed into the generated runtime feed `/data/events.json`.
   2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
 - Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
 - `data/events.tsv` and `data/events.json` are generated during deploy and must not be maintained or reviewed as repository source files.
