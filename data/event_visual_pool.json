@@ -1044,17 +1044,17 @@
         {
           "id": "book-market-02",
           "src": "/assets/event-visuals/book-market-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
+          "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
         },
         {
           "id": "book-market-03",
           "src": "/assets/event-visuals/book-market-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
+          "rights_status": "ai_generated_symbolic_reviewed",
           "alt": ""
         }
       ]

@@ -7,18 +7,18 @@
       "visual_key": "book_market",
       "status": "accepted",
       "target_webp": "assets/event-visuals/book-market-02.webp",
-      "source_png": null,
+      "source_png": "assets/event-visuals/ChatGPT Image 8. Juni 2026, 08_12_42.png",
       "sub_motif": "book_market_closeup",
-      "qa_note": "Accepted close-up book crates / book market motif. Final source filename to be assigned during raw-image mapping."
+      "qa_note": "Recovered source file integrated on 2026-06-08. Accepted close-up books/crates book-market motif."
     },
     {
       "image_id": "book-market-03",
       "visual_key": "book_market",
       "status": "accepted",
       "target_webp": "assets/event-visuals/book-market-03.webp",
-      "source_png": null,
+      "source_png": "assets/event-visuals/ChatGPT Image 8. Juni 2026, 08_13_17.png",
       "sub_motif": "book_market_courtyard_context",
-      "qa_note": "Accepted wider courtyard/context book market variant. Final source filename to be assigned during raw-image mapping."
+      "qa_note": "Recovered source file integrated on 2026-06-08. Accepted wider courtyard/context book-market variant."
     },
     {
       "image_id": "country-fair-rural-02",
@@ -165,5 +165,5 @@
       "qa_note": "Accepted broader classic-vehicle meet with classic car, tractor, motorcycle/van/community seating; strong motif diversity."
     }
   ],
-  "last_updated": "2026-06-05"
+  "last_updated": "2026-06-08"
 }
