@@ -2513,3 +2513,75 @@ Gezielte Datenanreicherung statt weiterer Logik-Patches:
 2. Danach `holiday_policy` bzw. geprüfte Statuswerte in `data/offers.json` ergänzen.
 3. Erst danach echte Wochenöffnungszeiten bzw. präzisere öffentliche Statusanzeige modellieren.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_PUBLIC_STATUS_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 | Zweck: dokumentiert Abschluss des Activity-Quality-Audit-V1-Datenstands; Umfang: 44 Activities, opening_status-Abdeckung, Needs-Review-Grenzen, finale Integrationstests === -->
+## Activity Quality Audit V1 – Öffnungsstatus-Datenstand abgeschlossen – 2026-06-08
+
+### Ergebnis
+
+Der fachliche Audit der bestehenden Activities wurde vollständig durchgeführt und in `data/offers.json` umgesetzt.
+
+### Umfang
+
+- 44 Activities geprüft.
+- 42 Activities mit `opening_status` ergänzt.
+- 2 Activities bewusst ohne `opening_status`, weil sie fachlich `needs_review` bleiben:
+  - `quellengrundpark-weseke-entdecken`
+  - `erlebnispfad-klostersee-burlo`
+
+### Finale Verteilung
+
+- `free_access`: 24
+- `regular_hours`: 5
+- `seasonal_recommended`: 5
+- `seasonal_hours`: 5
+- `check_required`: 3
+
+### Umgesetzte Commits
+
+- `c720627` – Stelle mobile Eventbilder auf Thumbnails um
+  - Enthält zusätzlich den Batch-1-Opening-Status-Datenstand.
+- `0ec6e18` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 2
+- `023996a` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 3
+- `1b69e55` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 4
+- `c46c9ae` – Korrigiere Feiertagslogik fuer freie Activities
+
+### Technische Validierung
+
+Finale Integration geprüft für:
+
+- Werktag trocken
+- Werktag Regen
+- Sonntag trocken
+- Feiertag trocken
+
+Ergebnis:
+
+- 44 Recommendations werden erzeugt.
+- `check_required` und `opening_hours_check` erhalten keinen Top-Tipp.
+- `holiday_policy = not_applicable` erzeugt keine falsche Öffnungszeiten-Warnung.
+- `holiday_policy = open` erzeugt keine falsche Öffnungszeiten-Warnung.
+- `holiday_policy = check` bleibt für Teilangebote/Innenräume/Führungen prüfhinweisfähig.
+- `data/offers.json` ist valides JSON.
+- Syntaxchecks bestanden:
+  - `js/opening-status.js`
+  - `js/recommendations.js`
+  - `js/today-home.js`
+
+### Bewusste Grenzen
+
+- Keine Massenpflege echter Wochenöffnungszeiten über alle Activities.
+- Keine erfundenen Öffnungszeiten.
+- Saisonale Regeln wie Brutzeit, Badesaison oder Monitoring-Saison sind noch nicht als eigene strukturierte Saisonlogik final modelliert.
+- Detailpanel-/UI-Anzeige der neuen `opening_status.detail_note` ist noch nicht final poliert.
+- Die zwei Needs-Review-Activities bleiben absichtlich offen, bis Quelle/Titel/Activity-Zuschnitt geklärt ist.
+
+### Nächster sinnvoller Schritt
+
+Kein weiterer Daten-Massenpatch. Als nächstes nur gezielte Folgearbeit:
+
+1. Needs-Review-Fälle klären.
+2. Saisonregel-Modell für echte Schutz-/Bade-/Saisonfälle sauber definieren.
+3. UI-/Detailpanel-Anzeige für `opening_status.public_label` und `detail_note` prüfen.
+4. Erst danach kleine, owner-klare Logik- oder UI-Patches.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 === -->

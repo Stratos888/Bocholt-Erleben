@@ -1094,3 +1094,47 @@ Die wichtigsten bestehenden Activities sollen belastbarere öffentliche Öffnung
 - Keine ungeprüften echten Öffnungszeiten erfinden.
 - Keine neue Daten-Datei einführen, solange `data/offers.json` als Activity-Owner ausreicht.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 | Zweck: definiert Folgearbeiten nach abgeschlossenem Activity-Quality-Audit-V1; Umfang: Needs-Review, Saisonregeln, Detailanzeige, keine neue Massenpflege === -->
+## Nächster Workpack: Activity-Öffnungsstatus gezielt verfeinern
+
+### Ausgangslage
+
+- Activity Quality Audit V1 ist abgeschlossen.
+- 42 von 44 Activities haben belastbare `opening_status`-Daten.
+- Zwei Activities bleiben bewusst offen:
+  - `quellengrundpark-weseke-entdecken`
+  - `erlebnispfad-klostersee-burlo`
+- Die Recommendation-Logik liest `opening_status` korrekt.
+- Freie Activities mit `holiday_policy = open` oder `not_applicable` erzeugen keine falschen Sonntag-/Feiertag-Warnungen mehr.
+
+### Ziel
+
+Keine weitere breite Datenpflege. Stattdessen nur gezielte Verbesserung der offenen Grenzfälle und der öffentlichen Darstellung.
+
+### Reihenfolge
+
+1. Needs-Review-Fälle klären:
+   - Quellengrundpark Weseke: belastbare Quelle für Parkzugang/Regeln finden oder Activity zurückstellen.
+   - Erlebnispfad Klostersee Burlo: Titel/Quelle prüfen; ggf. auf offiziellen Rundwanderweg B1 Burlo umschneiden.
+2. Saisonregel-Modell schärfen:
+   - Brutzeit-/Schutzzeitfälle
+   - Bade-/Monitoring-Saison
+   - saisonale Empfehlung ohne echte Öffnungszeit
+3. UI-/Detailanzeige prüfen:
+   - `opening_status.public_label`
+   - `opening_status.detail_note`
+   - keine leeren Öffnungszeitenblöcke bei freien Routen
+4. Today-Home-/Recommendation-Verhalten visuell prüfen:
+   - Werktag
+   - Regen
+   - Sonntag
+   - Feiertag
+
+### Nicht jetzt
+
+- Keine neuen echten Öffnungszeiten erfinden.
+- Keine pauschale Wochenöffnungszeiten-Struktur für freie Routen.
+- Keine weitere breite Activity-Datenpflege ohne konkreten fachlichen Anlass.
+- Keine Vermischung mit Event-Visual- oder Event-Card-Polish.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 === -->
