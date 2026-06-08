@@ -447,50 +447,12 @@
     return quality !== "needs_review" && quality !== "blocked";
   }
 
-  function arrayIncludes(values, candidates) {
-    const source = Array.isArray(values) ? values : [];
-    const wanted = Array.isArray(candidates) ? candidates : [candidates];
-    return wanted.some((candidate) => source.includes(candidate));
-  }
-
-  function itemSearchText(item) {
-    return [
-      item?.title,
-      item?.description,
-      item?.category,
-      item?.location,
-      item?.url,
-      ...(Array.isArray(item?.interestTags) ? item.interestTags : []),
-      ...(Array.isArray(item?.weatherProfile) ? item.weatherProfile : [])
-    ].map(asString).filter(Boolean).join(" ").toLowerCase();
-  }
-
   function hasClosureRisk(item) {
-    if (item?.type !== "activity") return false;
-    if (["closed", "limited", "opening_hours_check", "check"].includes(asString(item.holidayPolicy).toLowerCase())) return true;
-    if (item.availability === "opening_hours_check") return true;
-
-    const text = itemSearchText(item);
-    return [
-      "innenstadt",
-      "shopping",
-      "geschäft",
-      "geschaeft",
-      "einzelhandel",
-      "fußgängerzone",
-      "fussgaengerzone",
-      "arkaden",
-      "museum",
-      "ausstellung",
-      "bücherei",
-      "bibliothek"
-    ].some((needle) => text.includes(needle));
+    return window.OpeningStatus?.hasClosureRisk?.(item) === true;
   }
 
   function isTopTipEligible(item, context) {
-    if (context?.isNonBusinessDay && hasClosureRisk(item)) return false;
-    if (context?.weather === "rain" && item?.type === "activity" && arrayIncludes(item.interestTags, "Draußen") && !arrayIncludes(item.weatherProfile, ["indoor", "weather_independent"])) return false;
-    return true;
+    return window.OpeningStatus?.isTopTipEligible?.(item, context) !== false;
   }
 
   function compareTodayItems(a, b) {
