@@ -1667,7 +1667,7 @@
         "source_url": "https://www.bocholt.de/shopping",
         "public_label": "Innenstadt frei zugänglich; Geschäfte und Gastronomie haben eigene Zeiten",
         "detail_note": "Die Bocholter Innenstadt ist als Stadtraum frei zugänglich. Shopping, Gastronomie, Märkte, Rathaus, Tourist-Info und einzelne Angebote haben eigene Öffnungs- oder Veranstaltungszeiten.",
-        "holiday_policy": "check"
+        "holiday_policy": "not_applicable"
       },
       "recommendation": {
         "availability": "always",
@@ -2099,7 +2099,7 @@
         "source_url": "https://www.bocholt.de/Aasee-und-Stadtwald",
         "public_label": "Stadtwald und Wege frei zugänglich; Teilangebote haben eigene Zeiten",
         "detail_note": "Der Stadtwald ist als Natur- und Spazierbereich grundsätzlich frei zugänglich. Einzelne Freizeit-, Gastronomie- oder Serviceangebote im Umfeld haben eigene Zeiten.",
-        "holiday_policy": "check"
+        "holiday_policy": "not_applicable"
       },
       "recommendation": {
         "availability": "always",
@@ -2788,7 +2788,7 @@
         "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Proebstingsee.php",
         "public_label": "Ganzjährig als See- und Spazierziel; Wasserangebote saisonal",
         "detail_note": "Der Pröbstingsee ist als Freizeit- und Spazierziel grundsätzlich nutzbar. Wasser-, Freizeit- und Betreiberangebote sind saisonal bzw. vor Ort zu prüfen.",
-        "holiday_policy": "check"
+        "holiday_policy": "not_applicable"
       },
       "recommendation": {
         "availability": "seasonal",
@@ -2881,7 +2881,7 @@
           "source_url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
           "public_label": "Außenrundgang jederzeit möglich; Innenzugang vorab prüfen",
           "detail_note": "Die Türme-Tour kann als Außenrundgang jederzeit selbst erlebt werden. Wer in Türme hineinschauen möchte, benötigt eine Führung; der Kuhmturm ist nur mit Zugangscode und zu den Zeiten der Tourist-Information im FARB zugänglich.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "always",
@@ -3146,7 +3146,7 @@
           "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
           "public_label": "Frei zugänglicher Rundwanderweg; Erlebnispunkte teils mit eigenen Zeiten",
           "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Erlebnispunkte, Gastronomie, Innenräume oder Einrichtungen entlang der Route können eigene Zeiten haben.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "always",
@@ -3323,7 +3323,7 @@
           "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
           "public_label": "Frei zugänglicher Rundwanderweg; einzelne Orte vorab prüfen",
           "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Orte, Einkehrmöglichkeiten oder Einrichtungen entlang der Route können eigene Zeiten oder Regeln haben.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "always",
@@ -3596,7 +3596,7 @@
           "source_url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
           "public_label": "Frei zugängliche historische Gassen; Führungen vorab prüfen",
           "detail_note": "Die historischen Gängeskes in Aalten können als Ortsrundgang frei erkundet werden. Geführte Spaziergänge oder Routenbroschüren laufen über VVV bzw. Tourist-Info und können eigene Zeiten, Termine oder Kosten haben.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "always",
@@ -3685,7 +3685,7 @@
           "source_url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
           "public_label": "See ganzjährig; Baden nur saisonal und im ausgewiesenen Bereich",
           "detail_note": "Badesaison und Badegewässer-Monitoring sind saisonale Nutzungshinweise, keine garantierten Tagesöffnungszeiten. Wasserqualität, Wetter, DLRG und Regeln vor Ort beachten.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "seasonal",
@@ -3858,7 +3858,7 @@
           "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
           "public_label": "Ganzjährig als Naturgebiet nutzbar; Heideblüte im Spätsommer besonders lohnend",
           "detail_note": "Das Witte Venn ist grundsätzlich als Naturgebiet erlebbar. Besonders lohnend ist die Heideblüte im Spätsommer; Schutz-, Wege- und Grenzgebietsregeln beachten.",
-          "holiday_policy": "check"
+          "holiday_policy": "not_applicable"
         },
         "recommendation": {
           "availability": "always",
