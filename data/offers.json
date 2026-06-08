@@ -1660,6 +1660,15 @@
         "Indoor & Outdoor",
         "Innenstadt"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/shopping",
+        "public_label": "Innenstadt frei zugänglich; Geschäfte und Gastronomie haben eigene Zeiten",
+        "detail_note": "Die Bocholter Innenstadt ist als Stadtraum frei zugänglich. Shopping, Gastronomie, Märkte, Rathaus, Tourist-Info und einzelne Angebote haben eigene Öffnungs- oder Veranstaltungszeiten.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -1823,6 +1832,15 @@
         "Outdoor",
         "Aa-Promenade"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/kubaai",
+        "public_label": "Frei zugängliche Promenade und Wege am Kubaai",
+        "detail_note": "Die Wege und Promenaden am Kubaai sind grundsätzlich frei zugänglich. Baustellen, Veranstaltungen, Wetter und Tageslicht beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -1897,6 +1915,15 @@
         "Outdoor",
         "Natur"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/Aasee-und-Stadtwald",
+        "public_label": "Frei zugänglich auf ausgewiesenen Wegen",
+        "detail_note": "Die Hohenhorster Berge sind als Naturbereich auf ausgewiesenen Wegen frei erlebbar. Schutz-, Wege- und Rücksichtnahmeregeln vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2065,6 +2092,15 @@
         "Outdoor",
         "Familie"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/Aasee-und-Stadtwald",
+        "public_label": "Stadtwald und Wege frei zugänglich; Teilangebote haben eigene Zeiten",
+        "detail_note": "Der Stadtwald ist als Natur- und Spazierbereich grundsätzlich frei zugänglich. Einzelne Freizeit-, Gastronomie- oder Serviceangebote im Umfeld haben eigene Zeiten.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2144,6 +2180,15 @@
         "Outdoor",
         "Lernort"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bocholt.de/waldlehrpfad",
+        "public_label": "Frei nutzbarer Waldlehrpfad",
+        "detail_note": "Der Waldlehrpfad ist grundsätzlich frei nutzbar. Wetter, Tageslicht und Zustand der Stationen vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2308,6 +2353,15 @@
         "Outdoor",
         "Spielplatz"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://dinxperwick.info/de/suderwicker-maerchenspielplatz-eroeffnet/",
+        "public_label": "Frei zugänglicher Spielplatz",
+        "detail_note": "Der Märchenspielplatz ist als öffentlicher Spielplatz grundsätzlich frei zugänglich. Wetter, Tageslicht und Zustand vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2381,6 +2435,15 @@
         "Outdoor",
         "Park"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://naturpark-hohe-mark.de/ziel/buergerpark-rhede/",
+        "public_label": "Frei zugänglicher Bürgerpark",
+        "detail_note": "Der Bürgerpark Rhede ist als Parkanlage grundsätzlich frei zugänglich. Wetter, Tageslicht und Regeln vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2456,6 +2519,15 @@
         "Outdoor",
         "Kinderroute"
       ],
+      "opening_status": {
+        "type": "check_required",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/wandern/das-mysterium-von-winterswijk",
+        "public_label": "Kinderroute frei im Ort; Start- und Infomaterial vorab prüfen",
+        "detail_note": "Die Route führt frei durch Winterswijk. Für Startpunkt, Infomaterial, Tourist-Info, Aufgaben oder begleitende Angebote sollten aktuelle Hinweise vorab geprüft werden.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2889,6 +2961,15 @@
           "Outdoor",
           "8 km"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
+          "public_label": "Frei zugängliche Streckenwanderung",
+          "detail_note": "Die Strecke kann grundsätzlich frei begangen werden. Wetter, Tageslicht, Wegzustand und Rückwegplanung beachten.",
+          "holiday_policy": "not_applicable"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -2969,6 +3050,15 @@
           "Outdoor",
           "5,2 km"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
+          "public_label": "Frei zugänglicher LandStreifer-Rundweg",
+          "detail_note": "Der Rundweg ist grundsätzlich frei begehbar. Wetter, Tageslicht, Wegzustand und Naturregeln beachten.",
+          "holiday_policy": "not_applicable"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3049,6 +3139,15 @@
           "Outdoor",
           "Wald & Gemen"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
+          "public_label": "Frei zugänglicher Rundwanderweg; Erlebnispunkte teils mit eigenen Zeiten",
+          "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Erlebnispunkte, Gastronomie, Innenräume oder Einrichtungen entlang der Route können eigene Zeiten haben.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3208,6 +3307,15 @@
           "Outdoor",
           "13 km"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
+          "public_label": "Frei zugänglicher Rundwanderweg; einzelne Orte vorab prüfen",
+          "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Orte, Einkehrmöglichkeiten oder Einrichtungen entlang der Route können eigene Zeiten oder Regeln haben.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3289,6 +3397,15 @@
           "Outdoor",
           "Wald & Schloss"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
+          "public_label": "Frei zugänglich und ganzjährig geöffnet",
+          "detail_note": "Der Tiergarten Schloss Raesfeld ist als Park- und Naturbereich frei zugänglich. Veranstaltungen, Gastronomie oder Einrichtungen im Umfeld können eigene Zeiten haben.",
+          "holiday_policy": "open"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3630,6 +3747,15 @@
           "Outdoor",
           "2 km"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
+          "public_label": "Frei zugänglicher Naturerlebnisweg im Naturschutzgebiet",
+          "detail_note": "Das Schwarze Wasser ist als Naturerlebnis auf ausgewiesenen Wegen frei erlebbar. Schutzgebiets-, Wege- und Rücksichtnahmeregeln beachten.",
+          "holiday_policy": "not_applicable"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3707,6 +3833,15 @@
           "Outdoor",
           "Moor & Grenze"
         ],
+        "opening_status": {
+          "type": "seasonal_recommended",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
+          "public_label": "Ganzjährig als Naturgebiet nutzbar; Heideblüte im Spätsommer besonders lohnend",
+          "detail_note": "Das Witte Venn ist grundsätzlich als Naturgebiet erlebbar. Besonders lohnend ist die Heideblüte im Spätsommer; Schutz-, Wege- und Grenzgebietsregeln beachten.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
