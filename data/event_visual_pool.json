@@ -27,15 +27,17 @@
         {
           "id": "textile-machines-industry-02",
           "src": "/assets/event-visuals/textile-machines-industry-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für textile machines industry: Textilmaschine / Industriekultur.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "textile-machines-industry-03",
@@ -382,7 +384,7 @@
         {
           "id": "city-tour-history-01",
           "src": "/assets/event-visuals/city-tour-history-01.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für city tour history: historische Stadtführung / Stadtspaziergang.",
@@ -390,8 +392,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "city-tour-history-02",
@@ -488,7 +492,7 @@
         {
           "id": "live-music-stage-02",
           "src": "/assets/event-visuals/live-music-stage-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für live music stage: kleine Live-Bühne.",
@@ -496,8 +500,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "live-music-stage-03",
@@ -550,15 +556,17 @@
         {
           "id": "classical-music-02",
           "src": "/assets/event-visuals/classical-music-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für classical music: klassische Musik / Kirchenkonzert.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "classical-music-03",
@@ -619,7 +627,7 @@
         {
           "id": "theater-stage-02",
           "src": "/assets/event-visuals/theater-stage-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für theater stage: Theaterbühne.",
@@ -627,8 +635,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "theater-stage-03",
@@ -708,15 +718,17 @@
         {
           "id": "comedy-cabaret-02",
           "src": "/assets/event-visuals/comedy-cabaret-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für comedy cabaret: kleine Comedy-/Kabarettbühne.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "comedy-cabaret-03",
@@ -797,41 +809,47 @@
         {
           "id": "film-screening-04",
           "src": "/assets/event-visuals/film-screening-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für film screening: Filmscreening/Kinoraum.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "film-screening-05",
           "src": "/assets/event-visuals/film-screening-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für film screening: Filmvorführung mit Publikum.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "film-screening-06",
           "src": "/assets/event-visuals/film-screening-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für film screening: Film-/Kulturveranstaltung mit Publikum.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -857,15 +875,17 @@
         {
           "id": "literature-reading-talk-02",
           "src": "/assets/event-visuals/literature-reading-talk-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für literature reading talk: kleines Lese-/Talk-Setting.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "literature-reading-talk-03",
@@ -930,15 +950,17 @@
         {
           "id": "kids-stage-story-02",
           "src": "/assets/event-visuals/kids-stage-story-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für kids stage story: Puppen-/Kindertheater-Setting.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "kids-stage-story-03",
@@ -1020,7 +1042,7 @@
         {
           "id": "city-festival-street-02",
           "src": "/assets/event-visuals/city-festival-street-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für city festival street: abendliche Innenstadt-Gastro/Festival-Stimmung.",
@@ -1028,8 +1050,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "city-festival-street-03",
@@ -1048,20 +1072,60 @@
         {
           "id": "city-festival-street-04",
           "src": "/assets/event-visuals/city-festival-street-04.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_festival"
+          "status": "ready",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit kleiner Innenstadt, Aufenthaltsbereichen und Besucherinnen und Besuchern in kleinstädtischer Atmosphäre.",
+          "legacy_visual_key": "city_festival",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Imported from selected city_festival_street raw source ChatGPT Image 8. Juni 2026, 21_31_06.png on 2026-06-08."
         },
         {
           "id": "city-festival-street-05",
           "src": "/assets/event-visuals/city-festival-street-05.webp",
-          "status": "planned",
-          "source": "local_curated_pool",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": "",
-          "legacy_visual_key": "city_festival"
+          "status": "ready",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit kleiner Innenstadt, Aufenthaltsbereichen und Besucherinnen und Besuchern in kleinstädtischer Atmosphäre.",
+          "legacy_visual_key": "city_festival",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Imported from selected city_festival_street raw source ChatGPT Image 8. Juni 2026, 21_30_55.png on 2026-06-08."
+        },
+        {
+          "id": "city-festival-street-06",
+          "src": "/assets/event-visuals/city-festival-street-06.webp",
+          "status": "ready",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit kleiner Innenstadt, Aufenthaltsbereichen und Besucherinnen und Besuchern in kleinstädtischer Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Imported from selected city_festival_street raw source ChatGPT Image 8. Juni 2026, 21_30_39.png on 2026-06-08."
+        },
+        {
+          "id": "city-festival-street-07",
+          "src": "/assets/event-visuals/city-festival-street-07.webp",
+          "status": "ready",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Stadtfest-Visual mit kleiner Innenstadt, Aufenthaltsbereichen und Besucherinnen und Besuchern in kleinstädtischer Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Imported from selected city_festival_street raw source ChatGPT Image 8. Juni 2026, 21_31_19.png on 2026-06-08."
         }
       ]
     },
@@ -1113,15 +1177,17 @@
         {
           "id": "open-air-festival-04",
           "src": "/assets/event-visuals/open-air-festival-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für open air festival: Open-Air-Bühne ohne enges Publikum.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "open-air-festival-05",
@@ -1173,15 +1239,17 @@
         {
           "id": "kirmes-funfair-02",
           "src": "/assets/event-visuals/kirmes-funfair-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für kirmes funfair: Kirmes/Karussell.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "kirmes-funfair-03",
@@ -1330,28 +1398,32 @@
         {
           "id": "shooting-festival-tradition-05",
           "src": "/assets/event-visuals/shooting-festival-tradition-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für shooting festival tradition: Schützen-/Traditionszug.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "shooting-festival-tradition-06",
           "src": "/assets/event-visuals/shooting-festival-tradition-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für shooting festival tradition: Schützen-/Traditionsgesellschaft.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -1377,15 +1449,17 @@
         {
           "id": "market-stalls-02",
           "src": "/assets/event-visuals/market-stalls-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für market stalls: Trödel-/Marktstände.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "market-stalls-03",
@@ -1479,41 +1553,47 @@
         {
           "id": "book-market-04",
           "src": "/assets/event-visuals/book-market-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für book market: Bücher-/Antiquariatsmarkt.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "book-market-05",
           "src": "/assets/event-visuals/book-market-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für book market: Bücher-/Antiquariatsmarkt Detail.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "book-market-06",
           "src": "/assets/event-visuals/book-market-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für book market: Bücherstände im Außenraum.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -1569,7 +1649,7 @@
         {
           "id": "food-drink-festival-02",
           "src": "/assets/event-visuals/food-drink-festival-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für food drink festival: Food-/Markt-Tisch.",
@@ -1577,8 +1657,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "food-drink-festival-03",
@@ -1669,28 +1751,32 @@
         {
           "id": "country-fair-rural-05",
           "src": "/assets/event-visuals/country-fair-rural-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für country fair rural: ländlicher Markt / Hof-Fair.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "country-fair-rural-06",
           "src": "/assets/event-visuals/country-fair-rural-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für country fair rural: Hof-/Landmarkt mit Besuchern.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -1760,7 +1846,7 @@
         {
           "id": "family-play-outdoor-03",
           "src": "/assets/event-visuals/family-play-outdoor-03.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für family play outdoor: Outdoor-Familien-/Erlebnisort.",
@@ -1768,8 +1854,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "family-play-outdoor-04",
@@ -1843,7 +1931,7 @@
         {
           "id": "creative-making-workshop-02",
           "src": "/assets/event-visuals/creative-making-workshop-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für creative making workshop: Kreativ-/Werkstatttisch.",
@@ -1851,8 +1939,10 @@
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "creative-making-workshop-03",
@@ -1959,31 +2049,59 @@
         {
           "id": "learning-science-workshop-02",
           "src": "/assets/event-visuals/learning-science-workshop-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für learning science workshop: Natur-/Lernworkshop mit Materialien.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "learning-science-workshop-03",
           "src": "/assets/event-visuals/learning-science-workshop-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Workshop-Visual mit Lern- und Experimentieratmosphäre an einem gemeinsamen Arbeitstisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Accepted curated replacement image for the learning_science_workshop pool."
         },
         {
           "id": "learning-science-workshop-04",
           "src": "/assets/event-visuals/learning-science-workshop-04.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
-          "rights_status": "owned_or_cleared_required_before_ready",
-          "alt": ""
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Workshop-Visual mit Lern- und Experimentieratmosphäre an einem gemeinsamen Arbeitstisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Accepted curated replacement image for the learning_science_workshop pool."
+        },
+        {
+          "id": "learning-science-workshop-05",
+          "src": "/assets/event-visuals/learning-science-workshop-05.webp",
+          "status": "ready",
+          "source": "ai_generated_or_cleared_local",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Workshop-Visual mit Lern- und Experimentieratmosphäre an einem gemeinsamen Arbeitstisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_curated_import_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Accepted curated replacement image for the learning_science_workshop pool."
         }
       ]
     },
@@ -2025,41 +2143,47 @@
         {
           "id": "dance-music-workshop-04",
           "src": "/assets/event-visuals/dance-music-workshop-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für dance music workshop: Tanz-/Bewegungsworkshop.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "dance-music-workshop-05",
           "src": "/assets/event-visuals/dance-music-workshop-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für dance music workshop: Tanzworkshop Gruppe.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "dance-music-workshop-06",
           "src": "/assets/event-visuals/dance-music-workshop-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für dance music workshop: Tanzworkshop mit Anleitung.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -2174,41 +2298,47 @@
         {
           "id": "running-event-04",
           "src": "/assets/event-visuals/running-event-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für running event: Laufveranstaltung / Strecke.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "running-event-05",
           "src": "/assets/event-visuals/running-event-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für running event: Laufveranstaltung auf Strecke.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "running-event-06",
           "src": "/assets/event-visuals/running-event-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für running event: Laufgruppe / Start- oder Treffpunkt.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -2250,15 +2380,17 @@
         {
           "id": "cycling-event-04",
           "src": "/assets/event-visuals/cycling-event-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für cycling event: Radveranstaltung / Strecke.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "cycling-event-05",
@@ -2276,28 +2408,32 @@
         {
           "id": "cycling-event-06",
           "src": "/assets/event-visuals/cycling-event-06.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für cycling event: Radgruppe / Event-Treffpunkt.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "cycling-event-07",
           "src": "/assets/event-visuals/cycling-event-07.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für cycling event: Radgruppe auf Route.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -2339,28 +2475,32 @@
         {
           "id": "indoor-sport-competition-04",
           "src": "/assets/event-visuals/indoor-sport-competition-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für indoor sport competition: Indoor-Team-Ballsport.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "indoor-sport-competition-05",
           "src": "/assets/event-visuals/indoor-sport-competition-05.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für indoor sport competition: Volleyball-/Indoor-Sportturnier.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
@@ -2547,15 +2687,17 @@
         {
           "id": "business-messe-info-02",
           "src": "/assets/event-visuals/business-messe-info-02.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für business messe info: Info-/Messe-Tisch.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         },
         {
           "id": "business-messe-info-03",
@@ -2623,15 +2765,17 @@
         {
           "id": "vehicle-classic-04",
           "src": "/assets/event-visuals/vehicle-classic-04.webp",
-          "status": "ready",
+          "status": "blocked",
           "source": "ai_generated",
           "rights_status": "ai_generated_symbolic_reviewed",
           "alt": "Symbolisches Event-Visual für vehicle classic: Oldtimer-/Klassikfahrzeug.",
           "source_type": "ai_generated",
           "is_symbolic": true,
           "is_documentary": false,
-          "review_status": "accepted_visual_inventory_2026_06_08",
-          "card_asset_format": "16:9_webp_1200x675"
+          "review_status": "blocked_near_duplicate_motif_2026_06_08",
+          "card_asset_format": "16:9_webp_1200x675",
+          "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
+          "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
         }
       ]
     },
