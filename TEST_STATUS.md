@@ -2545,6 +2545,8 @@ Der fachliche Audit der bestehenden Activities wurde vollständig durchgeführt 
 - `023996a` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 3
 - `1b69e55` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 4
 - `c46c9ae` – Korrigiere Feiertagslogik fuer freie Activities
+- `11215b2` – Schliesse Activity Opening Needs-Review ab
+- `52370ed` – Entschaerfe Feiertagsrisiko freier Teilangebote
 
 ### Technische Validierung
 
@@ -2561,7 +2563,8 @@ Ergebnis:
 - `check_required` und `opening_hours_check` erhalten keinen Top-Tipp.
 - `holiday_policy = not_applicable` erzeugt keine falsche Öffnungszeiten-Warnung.
 - `holiday_policy = open` erzeugt keine falsche Öffnungszeiten-Warnung.
-- `holiday_policy = check` bleibt für Teilangebote/Innenräume/Führungen prüfhinweisfähig.
+- `holiday_policy = check` bleibt für kernangebot-kritische Öffnungs-/Terminrisiken erhalten.
+- Freie Kernangebote mit prüfpflichtigen Teilangeboten laufen über `holiday_policy = not_applicable`; Hinweise bleiben in `public_label` und `detail_note` sichtbar.
 - `data/offers.json` ist valides JSON.
 - Syntaxchecks bestanden:
   - `js/opening-status.js`
