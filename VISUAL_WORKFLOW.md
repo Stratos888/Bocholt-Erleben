@@ -683,3 +683,108 @@ Ein neues Variantenbild wird erst `ready`, wenn alle Punkte erfüllt sind:
 6. Später Event-Feed-Logik ergänzen, damit zeitlich nahe Events desselben Keys nicht dasselbe Bild erhalten.
 
 <!-- === END BLOCK: EVENT_VISUAL_POOL_DIVERSIFICATION_PHASE2_2026_06_03 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_DIVERSITY_FREEZE_2026_06_08 | Zweck: ergänzt dauerhafte Regeln zu Motiv-Dubletten, Pool-Diversität und Anti-Repeat-Grenzen; Umfang: Event-Visual-Workflow === -->
+## Event Visual Pool Diversity + Duplicate Control – Freeze 2026-06-08
+
+Status: verbindliche Ergänzung für weitere Event-Visual-Integration.
+
+### Grundsatz
+
+Ein brauchbares Bild ist nicht automatisch ein dauerhaftes `ready`-Bild.
+
+Für Event-Cards zählt nicht nur die Einzelbildqualität, sondern auch die Wirkung im Feed:
+
+- Wiederholt sich ein Motiv zu stark?
+- Wirken mehrere unterschiedliche Dateien wie dieselbe Szene?
+- Entsteht direkt oder kurz hintereinander der Eindruck von Bild-Dopplung?
+- Hat ein häufig auftretender `visual_key` genug eigenständige Varianten?
+
+### Status-Semantik für Motiv-Dubletten
+
+`blocked` kann zwei Bedeutungen haben:
+
+1. harte Ablehnung wegen Qualitäts-/Rechts-/Regelproblem,
+2. Ausschluss aus dem `ready`-Pool wegen Near-Duplicate-Motiv.
+
+Für Event-Visuals gilt deshalb:
+
+- Ein geblocktes Bild kann grundsätzlich brauchbar gewesen sein.
+- Bei `blocked_reason: near_duplicate_motif_in_same_visual_key_pool` ist der Grund nicht schlechte Qualität, sondern zu große Ähnlichkeit zu einem anderen `ready`-Bild im selben Visual-Key.
+- Solche Dateien werden nicht gelöscht, sondern nachvollziehbar im Pool behalten.
+- Nur `ready` wird prominent in Feed-Cards genutzt.
+
+### Anti-Repeat-Grenze
+
+Die Feed-Logik kann gleiche Bild-IDs bzw. gleiche Dateien im kurzen Fenster vermeiden.
+
+Sie erkennt aber nicht zuverlässig:
+
+- zwei verschiedene Dateien mit fast identischem Motiv,
+- gleiche Kameraperspektive mit leicht anderer Datei,
+- sehr ähnliche Szene/Lichtstimmung im selben Visual-Key.
+
+Daher bleibt zusätzlich zur UI-Logik ein Pool-Audit nötig.
+
+### Prüfpflicht vor einem Visual-Freeze
+
+Vor einem Freeze des Event-Visual-Pools sind mindestens diese Punkte zu prüfen:
+
+1. Visual Contract Audit:
+   - `python3 tools/audit-visual-contract.py`
+   - Erwartung: `Errors: none`
+2. Event Visual Pool Audit:
+   - `python3 scripts/audit-event-visual-pool.py`
+   - Erwartung: Pool-Struktur konsistent
+3. Ready-Near-Duplicate-Audit:
+   - starke Near-Duplicate-Paare innerhalb desselben `visual_key` müssen `0` sein oder bewusst dokumentiert werden
+4. Sequenzsimulation:
+   - keine gleiche Bildauswahl innerhalb eines kurzen Feed-Fensters
+   - für den aktuellen Freeze wurde ein 6-Card-Fenster geprüft
+5. Asset-Prüfung:
+   - neue Card-Assets müssen WebP sein
+   - Zielmaß: `1200x675`
+   - keine Rohbildordner committen
+
+### Pool-Diversität
+
+Häufige Visual-Keys brauchen mehr Ready-Varianten als seltene Keys.
+
+Besonders kritisch sind:
+
+- `city_festival_street`
+- `live_music_stage`
+- `city_tour_history`
+- `family_play_outdoor`
+- weitere Keys mit dichter Eventfolge im aktuellen Feed
+
+Wenn eine Dublettenbereinigung einen Pool zu klein macht, ist die richtige Reihenfolge:
+
+1. Motiv-Dubletten aus `ready` entfernen.
+2. Poolgröße prüfen.
+3. Gute, eigenständige Ersatzbilder importieren.
+4. Erst danach erneut Sequence- und Near-Duplicate-Audit laufen lassen.
+
+Nicht korrekt:
+
+- pauschal alle ähnlichen Bilder blocken und dadurch häufige Keys unterversorgen,
+- geblockte Dubletten als Qualitätsverlust missverstehen,
+- Rohbilder oder temporäre Importordner ins Repo übernehmen.
+
+### Freeze 2026-06-08
+
+Der Freeze-Stand auf `staging` basiert auf:
+
+- `c9cd092` – Anti-Repeat-Logik in `js/events.js`
+- `3387568` – Motiv-Dubletten-Bereinigung und kuratierte Ersatzbilder
+
+Finale Prüfwerte:
+
+- `ready_items=125`
+- `strong_near_duplicate_pairs=0`
+- `same_selected_image_within_6_card_window=0`
+- neue Ersatzassets: WebP `1200x675`
+- Visual Contract Audit: `Errors: none`
+
+Dieser Stand ist für den aktuellen Staging-Feed vorerst eingefroren.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_DIVERSITY_FREEZE_2026_06_08 === -->

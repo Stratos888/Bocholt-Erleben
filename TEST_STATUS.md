@@ -2630,3 +2630,153 @@ Ergebnis:
 
 Keine weitere Öffnungszeiten-Datenpflege und keine neue Saisonlogik in diesem Workpack.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_DETAILPANEL_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_DUPLICATE_CLEANUP_FREEZE_2026_06_08 | Zweck: dokumentiert Freeze der Eventbild-Motivdubletten-Bereinigung; Umfang: Event-Visual-Pool, Anti-Repeat, Ersatzbilder, Audits === -->
+## Event Visual Duplicate Cleanup + Pool-Diversity Freeze – 2026-06-08
+
+Status: auf `staging` umgesetzt, geprüft und vorerst gefreezt.
+
+### Geprüfter Stand
+
+Branch:
+
+- `staging`
+
+Relevante Commits:
+
+- `78a7b4b` – `Integriere kuratierte Visual Assets`
+- `c9cd092` – `Vermeide kurze Eventbild-Wiederholungen`
+- `3387568` – `Bereinige Eventbild-Motivdubletten`
+
+Finaler bestätigter Stand:
+
+- `HEAD`: `3387568`
+- `origin/staging`: `3387568`
+
+### Umgesetzter Scope
+
+Abgeschlossen wurden zwei zusammengehörige Qualitätsprobleme im Event-Visual-System:
+
+1. Wiederholung gleicher Bilddateien im kurzen Feed-Kontext.
+2. Near-Duplicate-Motive im `ready`-Pool trotz unterschiedlicher Dateien/IDs.
+
+Umgesetzt:
+
+- `js/events.js` wählt Eventbilder nicht mehr rein hashbasiert aus, sondern berücksichtigt:
+  - bereits innerhalb eines `visual_key` verwendete Bilder,
+  - ein kurzes Recent-Fenster,
+  - Fallback-Auswahl bei kleinen Pools.
+- `data/event_visual_pool.json` wurde bereinigt:
+  - starke Near-Duplicate-Motive wurden aus `ready` auf `blocked` gesetzt,
+  - Dateien wurden nicht gelöscht,
+  - `blocked` bedeutet in diesem Kontext: nicht im Feed verwenden, weil Motiv-Dublette.
+- Ersatz-/Ergänzungsbilder wurden kuratiert importiert:
+  - `city-festival-street-04.webp`
+  - `city-festival-street-05.webp`
+  - `city-festival-street-06.webp`
+  - `city-festival-street-07.webp`
+  - `learning-science-workshop-03.webp`
+  - `learning-science-workshop-04.webp`
+  - `learning-science-workshop-05.webp`
+- Alle neuen Assets wurden als WebP-Card-Assets im Format `1200x675` erzeugt und in den Pool als `ready` eingetragen.
+
+### Finaler Pool-Stand
+
+Nach Bereinigung und Ersatzimport:
+
+- Event-Visual-Pools: `34`
+- Event-Visual-Images: `204`
+- `ready`: `125`
+- `blocked`: `39`
+- `planned`: `30`
+- `usable`: `10`
+- `fallback`: `0`
+
+Wichtig:
+
+- `blocked` ist hier kein Qualitätsurteil über grundsätzlich schlechte Bilder.
+- `blocked` wurde für brauchbare, aber zu ähnliche Motivvarianten verwendet.
+- Die geblockten Dateien bleiben nachvollziehbar im Pool erhalten, werden aber nicht im Feed als `ready` genutzt.
+
+### Bestandene Prüfungen
+
+Bestanden:
+
+- `python3 tools/audit-visual-contract.py`
+  - `Errors: none`
+  - missing ready/fallback files: `0`
+  - ready/fallback non-WebP: `0`
+  - ready/fallback oversized: `0`
+  - ready/fallback not 16:9: `0`
+- `python3 scripts/audit-event-visual-pool.py`
+  - Pool-Keys: `34 / 34`
+  - Pool-Struktur konsistent
+- `node --check js/events.js`
+- Dimensionstest der neuen Assets:
+  - alle neuen WebP-Dateien: `1200x675`
+- Ready-Near-Duplicate-Audit:
+  - `ready_items=125`
+  - `strong_near_duplicate_pairs=0`
+- Future-Event-Sequenzsimulation:
+  - `future_events=61`
+  - `same_selected_image_within_6_card_window=0`
+
+### Geprüfte Problemfälle
+
+Die zuvor sichtbaren bzw. erwartbaren Problemgruppen wurden fachlich adressiert:
+
+- Konzert-/Bühnenbilder:
+  - `Marienthaler Abende`
+  - `As Time Goes By`
+  - `live_music_stage`
+- Stadtfest-/Innenstadtbilder:
+  - `AaltenDagen`
+  - `Innenstadtsommer`
+  - `city_festival_street`
+- Learning-/Workshop-Bilder:
+  - `SummerSchool der JUNGE UNI`
+  - `Ökosystem auf Pfosten`
+  - `learning_science_workshop`
+- konkret erkannte Near-Duplicate-Paare wie:
+  - `comedy-cabaret-01` / `comedy-cabaret-02`
+  - `classical-music-01` / `classical-music-02`
+  - `music-stage-01-16x9` / `live-music-stage-02`
+  - `city-festival-01-16x9` / `city-festival-street-02`
+
+### Bekannte nicht blockierende Warnungen
+
+Weiterhin bekannt und nicht Teil dieses Freeze-Scopes:
+
+- `event_visual_pool.json owner is not event_visual_pool_v1`
+- 18 ältere ready Event-Visuals ohne Alt-Text
+- lokale Activity-Bildwarnung für `hilgelo-erleben`
+- Activity-Visual- und Activity-Opening-Hours-Themen sind separate Workstreams.
+
+### Bewertung
+
+Der Event-Feed-Visual-Workpack ist für den aktuellen `staging`-Stand fachlich ausreichend bereinigt und wird vorerst gefreezt.
+
+Der aktuelle Zielzustand ist nicht „maximal viele Bilder“, sondern:
+
+- keine offensichtlichen Motiv-Dubletten im `ready`-Pool,
+- keine gleiche Bildauswahl im kurzen Feed-Fenster,
+- ausreichend Pool-Diversität bei häufig auftretenden Visual-Keys,
+- keine ungeprüften Rohbilder im Repo,
+- keine Änderung am Eventdatenprozess.
+
+### Offene Folgepunkte
+
+Nicht Teil dieses Freezes:
+
+- weitere echte Veranstalter-/Location-Fotos,
+- Detailpanel-/Hero-Bildlogik,
+- vollständiges visuelles Audit aller Cards nach jedem neuen Eventdatenstand,
+- Alt-Text-Schuld älterer Phase-2-Assets,
+- Activity-Visual-System.
+
+Nach einem Staging-Deploy genügt ein visueller Smoke-Test mit hartem Reload für:
+
+- `Marienthaler Abende` / `As Time Goes By`
+- `AaltenDagen` / `Innenstadtsommer`
+- `SummerSchool` / `Ökosystem auf Pfosten`
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_DUPLICATE_CLEANUP_FREEZE_2026_06_08 === -->
