@@ -345,6 +345,31 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_TAGS_ONLY_V8 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_OPENING_STATUS_CALLOUT_V1 | Zweck: zeigt geprüfte Activity-Öffnungsstatus-Hinweise im Detailpanel an; Umfang: ergänzt nur renderOpeningStatus(offer), keine Datenlogik oder CTA-Änderung === */
+  renderOpeningStatus(offer) {
+    const status = offer?.opening_status && typeof offer.opening_status === "object"
+      ? offer.opening_status
+      : {};
+
+    const publicLabel = String(status.public_label || "").trim();
+    const detailNote = String(status.detail_note || "").trim();
+
+    if (!publicLabel && !detailNote) return "";
+
+    const noteHtml = detailNote && detailNote !== publicLabel
+      ? `<div class="activity-detail__fact-value">${this.escapeHtml(detailNote)}</div>`
+      : "";
+
+    return `
+      <section class="activity-detail__fact-callout activity-detail__opening-status" aria-label="Öffnungsstatus">
+        <div class="activity-detail__fact-label">Öffnungsstatus</div>
+        ${publicLabel ? `<div class="activity-detail__fact-value">${this.escapeHtml(publicLabel)}</div>` : ""}
+        ${noteHtml}
+      </section>
+    `.trim();
+  },
+  /* === END BLOCK: ACTIVITIES_DETAIL_OPENING_STATUS_CALLOUT_V1 === */
+
   /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 | Zweck: ergänzt im Activity-Detailpanel sauberes Outbound-Tracking für Maps- und Website-Links, ohne sichtbare UI oder Linkziele zu verändern | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
@@ -424,6 +449,7 @@ const OfferDetailPanel = {
 
         <div class="activity-detail__body">
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
+          ${this.renderOpeningStatus(offer)}
           ${this.renderFacts(offer)}
           <div class="activity-detail__actions">
             <a
