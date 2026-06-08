@@ -293,7 +293,25 @@ const EventCards = (() => {
     return normalizeLookupKey(event?.visual_key || event?.image_visual_key || event?.visualKey || "");
   }
 
-  function resolveEventVisual(event) {
+  function getVisualUsageKey(visual) {
+    const id = String(visual?.id || "").trim();
+    return id || String(visual?.src || "").trim();
+  }
+
+  function markVisualUsage(visualUsage, visualKey, visual) {
+    if (!visualUsage || !visualKey || !visual) return;
+
+    const usageKey = getVisualUsageKey(visual);
+    if (!usageKey) return;
+
+    if (!(visualUsage[visualKey] instanceof Set)) {
+      visualUsage[visualKey] = new Set();
+    }
+
+    visualUsage[visualKey].add(usageKey);
+  }
+
+  function resolveEventVisual(event, visualUsage = null) {
     const visualKey = getEventVisualKey(event);
     const pool = visualKey ? readyVisualPools[visualKey] : null;
 
@@ -311,10 +329,32 @@ const EventCards = (() => {
       .map((part) => String(part || "").trim())
       .join("|");
 
-    const selected = pool[stableHash(seed) % pool.length];
-    if (!selected?.src) return null;
+    const startIndex = stableHash(seed) % pool.length;
+    const fallback = pool[startIndex];
 
-    return selected;
+    if (!visualUsage || pool.length <= 1) {
+      if (!fallback?.src) return null;
+      markVisualUsage(visualUsage, visualKey, fallback);
+      return fallback;
+    }
+
+    const usedForKey =
+      visualUsage[visualKey] instanceof Set ? visualUsage[visualKey] : new Set();
+
+    for (let offset = 0; offset < pool.length; offset += 1) {
+      const candidate = pool[(startIndex + offset) % pool.length];
+      if (!candidate?.src) continue;
+
+      const usageKey = getVisualUsageKey(candidate);
+      if (usageKey && !usedForKey.has(usageKey)) {
+        markVisualUsage(visualUsage, visualKey, candidate);
+        return candidate;
+      }
+    }
+
+    if (!fallback?.src) return null;
+    markVisualUsage(visualUsage, visualKey, fallback);
+    return fallback;
   }
   /* === END BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 === */
 
@@ -323,7 +363,7 @@ const EventCards = (() => {
     return container;
   }
 
-function createCard(event) {
+function createCard(event, visualUsage = null) {
   const card = document.createElement("div");
   card.className = "event-card";
   card.tabIndex = 0;
@@ -436,7 +476,7 @@ function createCard(event) {
     return "Bocholt";
   };
   const city = resolveCity(event);
-  const cardVisual = resolveEventVisual(event);
+  const cardVisual = resolveEventVisual(event, visualUsage);
 
   if (cardVisual) {
     card.classList.add("event-card--with-media");
@@ -760,6 +800,7 @@ function renderList(list) {
     return;
   }
 
+  const visualUsage = Object.create(null);
 /* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 | Zweck: ersetzt den textbasierten Chevron im mobilen Veranstalter-Entry durch ein globales Lucide-SVG; Umfang: ersetzt nur createFeedPublishEntry() === */
 const createFeedPublishEntry = () => {
   const link = document.createElement("a");
@@ -815,7 +856,7 @@ const createFeedPublishEntry = () => {
 
     section.appendChild(createSectionHeader(selectedLabel));
     for (const ev of list) {
-      grid.appendChild(createCard(ev));
+      grid.appendChild(createCard(ev, visualUsage));
     }
     section.appendChild(grid);
 
@@ -963,7 +1004,7 @@ const createFeedPublishEntry = () => {
     section.appendChild(createSectionHeader(bucketLabel[key] || key));
 
     for (const ev of buckets[key]) {
-      grid.appendChild(createCard(ev));
+      grid.appendChild(createCard(ev, visualUsage));
     }
 
     section.appendChild(grid);
