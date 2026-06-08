@@ -2524,18 +2524,18 @@ Der fachliche Audit der bestehenden Activities wurde vollständig durchgeführt 
 ### Umfang
 
 - 44 Activities geprüft.
-- 42 Activities mit `opening_status` ergänzt.
-- 2 Activities bewusst ohne `opening_status`, weil sie fachlich `needs_review` bleiben:
-  - `quellengrundpark-weseke-entdecken`
-  - `erlebnispfad-klostersee-burlo`
+- 44 Activities mit `opening_status` versehen.
+- Die zwei vorherigen Needs-Review-Fälle wurden nach Quellenprüfung gezielt abgeschlossen:
+  - `quellengrundpark-weseke-entdecken` → `check_required`
+  - `erlebnispfad-klostersee-burlo` → `free_access`
 
 ### Finale Verteilung
 
-- `free_access`: 24
+- `free_access`: 25
 - `regular_hours`: 5
 - `seasonal_recommended`: 5
 - `seasonal_hours`: 5
-- `check_required`: 3
+- `check_required`: 4
 
 ### Umgesetzte Commits
 
@@ -2574,14 +2574,14 @@ Ergebnis:
 - Keine erfundenen Öffnungszeiten.
 - Saisonale Regeln wie Brutzeit, Badesaison oder Monitoring-Saison sind noch nicht als eigene strukturierte Saisonlogik final modelliert.
 - Detailpanel-/UI-Anzeige der neuen `opening_status.detail_note` ist noch nicht final poliert.
-- Die zwei Needs-Review-Activities bleiben absichtlich offen, bis Quelle/Titel/Activity-Zuschnitt geklärt ist.
+- Die vorherigen Needs-Review-Activities sind fachlich geklärt; es bleibt keine Activity ohne `opening_status`.
 
 ### Nächster sinnvoller Schritt
 
 Kein weiterer Daten-Massenpatch. Als nächstes nur gezielte Folgearbeit:
 
-1. Needs-Review-Fälle klären.
-2. Saisonregel-Modell für echte Schutz-/Bade-/Saisonfälle sauber definieren.
-3. UI-/Detailpanel-Anzeige für `opening_status.public_label` und `detail_note` prüfen.
+1. Saisonregel-Modell für echte Schutz-/Bade-/Saisonfälle sauber definieren.
+2. UI-/Detailpanel-Anzeige für `opening_status.public_label` und `detail_note` prüfen.
+3. Today-Home-/Recommendation-Verhalten visuell prüfen.
 4. Erst danach kleine, owner-klare Logik- oder UI-Patches.
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 === -->

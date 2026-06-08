@@ -3227,6 +3227,15 @@
           "Outdoor",
           "Garten & Quelle"
         ],
+        "opening_status": {
+          "type": "check_required",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
+          "public_label": "Park- und Gartenbereiche saisonal sinnvoll; Gebäude und Führungen prüfen",
+          "detail_note": "Der Quellengrundpark wird offiziell mit Heimathaus, Geologischem Garten, Apothekergarten, Backspeicher, Ausstellungsscheunen und Kneipp-Wassertretanlage beschrieben. Konkrete Tagesöffnungszeiten sind dort nicht angegeben; Gebäude, Führungen und einzelne Angebote vor Besuch prüfen.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "seasonal",
           "weather_profile": [
@@ -3491,6 +3500,15 @@
           "Outdoor",
           "3,2 km"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
+          "public_label": "Frei planbarer Rundwanderweg ohne klassische Öffnungszeiten",
+          "detail_note": "Die offizielle Quelle beschreibt den Rundwanderweg B1 als Outdoor-Route ab Parkplatz am Vennweg mit Natur, Geschichte, Kloster Mariengarden und optionalem Venn-Abstecher. Für die Route selbst sind keine klassischen Tagesöffnungszeiten hinterlegt; Natur- und Schutzregeln vor Ort beachten.",
+          "holiday_policy": "not_applicable"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [

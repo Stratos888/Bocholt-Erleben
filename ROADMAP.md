@@ -1101,31 +1101,29 @@ Die wichtigsten bestehenden Activities sollen belastbarere öffentliche Öffnung
 ### Ausgangslage
 
 - Activity Quality Audit V1 ist abgeschlossen.
-- 42 von 44 Activities haben belastbare `opening_status`-Daten.
-- Zwei Activities bleiben bewusst offen:
-  - `quellengrundpark-weseke-entdecken`
-  - `erlebnispfad-klostersee-burlo`
+- 44 von 44 Activities haben `opening_status`-Daten.
+- Die zwei vorherigen Grenzfälle wurden gezielt abgeschlossen:
+  - `quellengrundpark-weseke-entdecken` → `check_required`
+  - `erlebnispfad-klostersee-burlo` → `free_access`
 - Die Recommendation-Logik liest `opening_status` korrekt.
 - Freie Activities mit `holiday_policy = open` oder `not_applicable` erzeugen keine falschen Sonntag-/Feiertag-Warnungen mehr.
 
 ### Ziel
 
-Keine weitere breite Datenpflege. Stattdessen nur gezielte Verbesserung der offenen Grenzfälle und der öffentlichen Darstellung.
+Keine weitere breite Datenpflege. Stattdessen nur gezielte Verfeinerung der Saisonlogik und der öffentlichen Darstellung.
 
 ### Reihenfolge
 
-1. Needs-Review-Fälle klären:
-   - Quellengrundpark Weseke: belastbare Quelle für Parkzugang/Regeln finden oder Activity zurückstellen.
-   - Erlebnispfad Klostersee Burlo: Titel/Quelle prüfen; ggf. auf offiziellen Rundwanderweg B1 Burlo umschneiden.
-2. Saisonregel-Modell schärfen:
+1. Saisonregel-Modell schärfen:
    - Brutzeit-/Schutzzeitfälle
    - Bade-/Monitoring-Saison
    - saisonale Empfehlung ohne echte Öffnungszeit
-3. UI-/Detailanzeige prüfen:
+   - saisonale Betreiberöffnung
+2. UI-/Detailanzeige prüfen:
    - `opening_status.public_label`
    - `opening_status.detail_note`
    - keine leeren Öffnungszeitenblöcke bei freien Routen
-4. Today-Home-/Recommendation-Verhalten visuell prüfen:
+3. Today-Home-/Recommendation-Verhalten visuell prüfen:
    - Werktag
    - Regen
    - Sonntag
