@@ -46,6 +46,7 @@
     if (item?.type !== "activity") return false;
 
     const policy = holidayPolicy(item);
+    if (["open", "not_applicable"].includes(policy)) return false;
     if (["closed", "limited", "opening_hours_check", "check"].includes(policy)) return true;
     if (availabilityType(item) === "opening_hours_check") return true;
 
