@@ -1519,22 +1519,67 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
 
 @media (max-width: 899.98px){
   body.is-tabbar-hidden .event-card.event-card--with-media{
-    grid-template-columns: minmax(0, 1fr);
-    padding: 0;
+    --event-card-thumb-w: clamp(84px, 25vw, 100px);
+    --event-card-thumb-h: clamp(74px, 21vw, 88px);
+
+    grid-template-columns: var(--rail-w, 56px) minmax(0, 1fr) var(--event-card-thumb-w);
+    column-gap: 10px;
+    align-items: center;
+
+    min-height: 0;
+    padding: 11px 11px 11px 0;
   }
 
-  body.is-tabbar-hidden .event-card-media{
-    aspect-ratio: auto;
-    height: clamp(124px, 34vw, 144px);
+  body.is-tabbar-hidden .event-card.event-card--with-media::before{
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--rail-w, 56px);
+
+    background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
+    opacity: var(--eventcard-rail-opacity);
+    box-shadow: inset -1px 0 0 rgba(31,41,51,0.035);
+    pointer-events: none;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
-    top: 9px;
-    left: 9px;
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: 1;
+
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.80);
+  }
+
+  body.is-tabbar-hidden .event-card-media{
+    grid-column: 3;
+    grid-row: 1;
+
+    width: var(--event-card-thumb-w);
+    height: var(--event-card-thumb-h);
+    aspect-ratio: auto;
+    align-self: center;
+
+    border-radius: 13px;
   }
 
   body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
-    padding: 11px 12px 12px;
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
   }
 }
 /* === END BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 === */

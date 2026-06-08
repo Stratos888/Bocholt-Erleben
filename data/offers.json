@@ -238,6 +238,15 @@
         "Outdoor",
         "Badesee"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.leisurelands.nl/nl/ontdek-recreatiegebieden-leisurelands/achterhoek/hilgelo/bezoekersinformatie-hilgelo",
+        "public_label": "Täglich von Sonnenaufgang bis Sonnenuntergang zugänglich",
+        "detail_note": "Der Zugang zum Gelände ist kostenlos. Parken ist kostenpflichtig; Bade- und Strandnutzung ist besonders saisonal sinnvoll. Gastronomie und Zusatzangebote können eigene Zeiten haben.",
+        "holiday_policy": "open"
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -316,6 +325,27 @@
         "Indoor",
         "Museum"
       ],
+      "opening_status": {
+        "type": "regular_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://textilwerk.lwl.org/",
+        "public_label": "Di–So 10–18 Uhr geöffnet",
+        "detail_note": "Letzter Einlass 17:30 Uhr. Montags geschlossen, außer an Feiertagen. Winterpause beachten.",
+        "holiday_policy": "limited"
+      },
+      "opening_hours": {
+        "weekly": {
+          "monday": [],
+          "tuesday": [{ "opens": "10:00", "closes": "18:00" }],
+          "wednesday": [{ "opens": "10:00", "closes": "18:00" }],
+          "thursday": [{ "opens": "10:00", "closes": "18:00" }],
+          "friday": [{ "opens": "10:00", "closes": "18:00" }],
+          "saturday": [{ "opens": "10:00", "closes": "18:00" }],
+          "sunday": [{ "opens": "10:00", "closes": "18:00" }]
+        },
+        "notes": "Montags geschlossen, außer an Feiertagen. Letzter Einlass 17:30 Uhr. Winterpause jährlich prüfen."
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -392,6 +422,27 @@
         "Indoor",
         "Museum"
       ],
+      "opening_status": {
+        "type": "regular_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://bocholter-handwerksmuseum.de/",
+        "public_label": "Do 15–18 Uhr, So 14–18 Uhr geöffnet",
+        "detail_note": "Sondertermine sind nach Vereinbarung möglich. Feiertagsöffnungen vor Besuch prüfen.",
+        "holiday_policy": "check"
+      },
+      "opening_hours": {
+        "weekly": {
+          "monday": [],
+          "tuesday": [],
+          "wednesday": [],
+          "thursday": [{ "opens": "15:00", "closes": "18:00" }],
+          "friday": [],
+          "saturday": [],
+          "sunday": [{ "opens": "14:00", "closes": "18:00" }]
+        },
+        "notes": "Sondertermine nach Vereinbarung möglich. Feiertage vor Besuch prüfen."
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -603,6 +654,15 @@
         "Indoor & Outdoor",
         "Bücher"
       ],
+      "opening_status": {
+        "type": "check_required",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.bredevoort.nu/boeken/",
+        "public_label": "Altstadt frei zugänglich; Buchläden und Buchmärkte haben eigene Zeiten",
+        "detail_note": "Für einen Stadtbummel ist Bredevoort frei zugänglich. Wer gezielt Buchläden oder Buchmärkte besuchen möchte, sollte Öffnungszeiten bzw. Termine vorher prüfen.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -680,6 +740,27 @@
         "Indoor",
         "Geschichte"
       ],
+      "opening_status": {
+        "type": "regular_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://nationaalonderduikmuseum.nl/openingstijden-prijzen/",
+        "public_label": "Di–Sa 10–17 Uhr, So 13–17 Uhr geöffnet",
+        "detail_note": "Montags geschlossen, außer an einzelnen Feiertagen. Feiertags- und Jahreswechselregeln beachten.",
+        "holiday_policy": "limited"
+      },
+      "opening_hours": {
+        "weekly": {
+          "monday": [],
+          "tuesday": [{ "opens": "10:00", "closes": "17:00" }],
+          "wednesday": [{ "opens": "10:00", "closes": "17:00" }],
+          "thursday": [{ "opens": "10:00", "closes": "17:00" }],
+          "friday": [{ "opens": "10:00", "closes": "17:00" }],
+          "saturday": [{ "opens": "10:00", "closes": "17:00" }],
+          "sunday": [{ "opens": "13:00", "closes": "17:00" }]
+        },
+        "notes": "Montags geschlossen, außer an einzelnen Feiertagen. Sonderregeln für Ostern, Pfingsten, Weihnachten, Jahreswechsel und Neujahr beachten."
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -832,6 +913,15 @@
         "Outdoor",
         "Schlosspark"
       ],
+      "opening_status": {
+        "type": "seasonal_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.wasserburg-anholt.de/index.php/de/oeffnungszeiten-preise",
+        "public_label": "Landschaftspark täglich saisonal geöffnet; Führungen vorab prüfen",
+        "detail_note": "Park: April–Oktober 09:00–17:00 Uhr letzter Einlass, November–März 09:30–15:30 Uhr letzter Einlass. Führungen/Tickets tagesaktuell im Onlineshop prüfen.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -917,6 +1007,15 @@
         "Outdoor",
         "Wildpark"
       ],
+      "opening_status": {
+        "type": "seasonal_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.wildpark-nrw.de/",
+        "public_label": "Saisonal täglich geöffnet; Winterzeiten beachten",
+        "detail_note": "Sommer: 28. Februar bis Zeitumstellung im Oktober täglich 09:00–18:00 Uhr Einlass. Winter: Mo–Fr 11:00–16:00 Uhr, Sa–So 10:00–16:00 Uhr Einlass. Am 25. Dezember geschlossen.",
+        "holiday_policy": "limited"
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -993,6 +1092,27 @@
         "Indoor",
         "Kunst"
       ],
+      "opening_status": {
+        "type": "regular_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://villamondriaan.nl/en/opening-hours/",
+        "public_label": "Di–So geöffnet; Freitag verkürzt",
+        "detail_note": "Regulär Di–Do 11–17 Uhr, Fr 11–16 Uhr, Sa–So 11–17 Uhr. Feiertage und Umbauwochen vor Besuch prüfen.",
+        "holiday_policy": "limited"
+      },
+      "opening_hours": {
+        "weekly": {
+          "monday": [],
+          "tuesday": [{ "opens": "11:00", "closes": "17:00" }],
+          "wednesday": [{ "opens": "11:00", "closes": "17:00" }],
+          "thursday": [{ "opens": "11:00", "closes": "17:00" }],
+          "friday": [{ "opens": "11:00", "closes": "16:00" }],
+          "saturday": [{ "opens": "11:00", "closes": "17:00" }],
+          "sunday": [{ "opens": "11:00", "closes": "17:00" }]
+        },
+        "notes": "Montags geschlossen. Feiertage, Sondertage und Umbauwochen jährlich prüfen."
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
@@ -1067,6 +1187,27 @@
         "Indoor",
         "Museum"
       ],
+      "opening_status": {
+        "type": "regular_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://museumfabriekwinterswijk.nl/",
+        "public_label": "Di–Fr 13–17 Uhr, Sa 11–17 Uhr geöffnet",
+        "detail_note": "Sonntag und Montag geschlossen. Feiertage vor Besuch prüfen.",
+        "holiday_policy": "check"
+      },
+      "opening_hours": {
+        "weekly": {
+          "monday": [],
+          "tuesday": [{ "opens": "13:00", "closes": "17:00" }],
+          "wednesday": [{ "opens": "13:00", "closes": "17:00" }],
+          "thursday": [{ "opens": "13:00", "closes": "17:00" }],
+          "friday": [{ "opens": "13:00", "closes": "17:00" }],
+          "saturday": [{ "opens": "11:00", "closes": "17:00" }],
+          "sunday": []
+        },
+        "notes": "Sonntag und Montag geschlossen. Feiertage vor Besuch prüfen."
+      },
       "recommendation": {
         "availability": "opening_hours_check",
         "weather_profile": [
