@@ -594,7 +594,7 @@
         {
           "id": "film-screening-02",
           "src": "/assets/event-visuals/film-screening-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -602,7 +602,7 @@
         {
           "id": "film-screening-03",
           "src": "/assets/event-visuals/film-screening-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -946,7 +946,7 @@
         {
           "id": "shooting-festival-tradition-02",
           "src": "/assets/event-visuals/shooting-festival-tradition-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -954,7 +954,7 @@
         {
           "id": "shooting-festival-tradition-03",
           "src": "/assets/event-visuals/shooting-festival-tradition-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1172,7 +1172,7 @@
         {
           "id": "country-fair-rural-02",
           "src": "/assets/event-visuals/country-fair-rural-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1180,7 +1180,7 @@
         {
           "id": "country-fair-rural-03",
           "src": "/assets/event-visuals/country-fair-rural-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1418,7 +1418,7 @@
         {
           "id": "dance-music-workshop-02",
           "src": "/assets/event-visuals/dance-music-workshop-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1426,7 +1426,7 @@
         {
           "id": "dance-music-workshop-03",
           "src": "/assets/event-visuals/dance-music-workshop-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1528,7 +1528,7 @@
         {
           "id": "running-event-02",
           "src": "/assets/event-visuals/running-event-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1536,7 +1536,7 @@
         {
           "id": "running-event-03",
           "src": "/assets/event-visuals/running-event-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1565,7 +1565,7 @@
         {
           "id": "cycling-event-02",
           "src": "/assets/event-visuals/cycling-event-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1573,7 +1573,7 @@
         {
           "id": "cycling-event-03",
           "src": "/assets/event-visuals/cycling-event-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1602,7 +1602,7 @@
         {
           "id": "indoor-sport-competition-02",
           "src": "/assets/event-visuals/indoor-sport-competition-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1610,7 +1610,7 @@
         {
           "id": "indoor-sport-competition-03",
           "src": "/assets/event-visuals/indoor-sport-competition-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1815,7 +1815,7 @@
         {
           "id": "vehicle-classic-02",
           "src": "/assets/event-visuals/vehicle-classic-02.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
@@ -1823,7 +1823,7 @@
         {
           "id": "vehicle-classic-03",
           "src": "/assets/event-visuals/vehicle-classic-03.webp",
-          "status": "planned",
+          "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
