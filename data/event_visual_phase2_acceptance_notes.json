@@ -113,11 +113,11 @@
     {
       "image_id": "running-event-02",
       "visual_key": "running_event",
-      "status": "accepted_slightly_critical",
+      "status": "accepted",
       "target_webp": "assets/event-visuals/running-event-02.webp",
       "source_png": null,
       "sub_motif": "adult_start_gathering",
-      "qa_note": "Accepted as sufficient adult/jüngere-Erwachsene start gathering; improved age mix but still somewhat uniform running clothes."
+      "qa_note": "Slightly critical but accepted as sufficient adult/younger-adult start gathering; improved age mix but still somewhat uniform running clothes."
     },
     {
       "image_id": "running-event-03",
