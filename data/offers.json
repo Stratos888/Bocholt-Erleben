@@ -531,6 +531,15 @@
         "Outdoor",
         "Grenzort"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://dinxperwick.info/de/entlang-der-grenze/",
+        "public_label": "Frei zugänglicher Grenzspaziergang",
+        "detail_note": "Der Grenzort Dinxperlo–Suderwick kann als Spaziergang entlang der Grenze frei erkundet werden. Einzelne Innenräume, Ausstellungen oder Gastronomieangebote entlang der Route haben eigene Zeiten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -601,6 +610,15 @@
         "Outdoor",
         "Park"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://heerlyckheid.com/de/informationen/vestingpark-pfad/",
+        "public_label": "Täglich von Sonnenaufgang bis Sonnenuntergang zugänglich",
+        "detail_note": "Der Vestingpark St. Bernardus ist ein frei begehbarer Park- und Geschichtspfad. Hotel, Brasserie, Terrasse oder Veranstaltungen am Park haben eigene Zeiten.",
+        "holiday_policy": "open"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -852,6 +870,15 @@
         "Outdoor",
         "Schloss"
       ],
+      "opening_status": {
+        "type": "check_required",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.meinschlossringenberg.de/das-schloss/",
+        "public_label": "Schloss von außen erlebbar; Innenräume und Führungen vorab prüfen",
+        "detail_note": "Schloss Ringenberg ist als Schloss- und Kulturort sichtbar erlebbar. Innenräume, Veranstaltungen und Schlossführungen sind termin- bzw. buchungsabhängig; Führungen finden offiziell am 1. Sonntag im Monat oder nach Vereinbarung statt.",
+        "holiday_policy": "check"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2500,6 +2527,15 @@
         "Outdoor",
         "Stadtroute"
       ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/wandern/handwerk-in-winterswijk",
+        "public_label": "Frei zugängliche Stadtroute",
+        "detail_note": "Die Wanderroute führt durch Winterswijk und kann als Außenroute frei begangen werden. Tourist-Info, Gastronomie oder einzelne Gebäude entlang der Route haben eigene Zeiten.",
+        "holiday_policy": "not_applicable"
+      },
       "recommendation": {
         "availability": "always",
         "weather_profile": [
@@ -2766,6 +2802,15 @@
           "Outdoor",
           "5 Türme"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
+          "public_label": "Außenrundgang jederzeit möglich; Innenzugang vorab prüfen",
+          "detail_note": "Die Türme-Tour kann als Außenrundgang jederzeit selbst erlebt werden. Wer in Türme hineinschauen möchte, benötigt eine Führung; der Kuhmturm ist nur mit Zugangscode und zu den Zeiten der Tourist-Information im FARB zugänglich.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
@@ -3409,6 +3454,15 @@
           "Outdoor",
           "Aalten"
         ],
+        "opening_status": {
+          "type": "free_access",
+          "verification": "official_source",
+          "checked_at": "2026-06-08",
+          "source_url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
+          "public_label": "Frei zugängliche historische Gassen; Führungen vorab prüfen",
+          "detail_note": "Die historischen Gängeskes in Aalten können als Ortsrundgang frei erkundet werden. Geführte Spaziergänge oder Routenbroschüren laufen über VVV bzw. Tourist-Info und können eigene Zeiten, Termine oder Kosten haben.",
+          "holiday_policy": "check"
+        },
         "recommendation": {
           "availability": "always",
           "weather_profile": [
