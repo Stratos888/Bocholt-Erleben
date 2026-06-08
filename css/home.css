@@ -1525,8 +1525,8 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-template-columns: 38px minmax(0, 1fr) var(--event-card-thumb-w);
     grid-template-rows: auto auto;
     column-gap: 8px;
-    row-gap: 3px;
-    align-items: center;
+    row-gap: 4px;
+    align-items: start;
 
     min-height: 0;
     padding: 11px;
@@ -1546,7 +1546,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-column: 1;
     grid-row: 1 / span 2;
     justify-self: start;
-    align-self: center;
+    align-self: start;
 
     width: 38px;
     padding: 4px 2px;
@@ -1570,7 +1570,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
 
     grid-column: 2;
     grid-row: 1;
-    align-self: end;
+    align-self: start;
 
     font-size: clamp(0.89rem, 3.7vw, 0.95rem);
     line-height: 1.15;
@@ -1580,6 +1580,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     display: none;
   }
 
+  /* === BEGIN BLOCK: EVENT_FEED_MOBILE_MEDIA_META_STACK_V1 | Zweck: stapelt Uhrzeit und Ort in Media-EventCards zweizeilig und hält Titel, Datum und Thumbnail oben bündig; Umfang: nur mobiler /events/ Feed mit .event-card--with-media === */
   body.is-tabbar-hidden .event-card.event-card--with-media .event-meta{
     position: relative;
     z-index: 2;
@@ -1588,9 +1589,34 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     grid-row: 2;
     align-self: start;
 
-    font-size: clamp(0.78rem, 3.2vw, 0.84rem);
-    line-height: 1.24;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1px;
+
+    min-width: 0;
+    margin: 0;
+
+    font-size: clamp(0.77rem, 3.15vw, 0.83rem);
+    line-height: 1.22;
+    white-space: normal;
+    overflow: visible;
   }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__time,
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__place{
+    display: block;
+    min-width: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__time + .event-meta__place::before{
+    content: none;
+  }
+  /* === END BLOCK: EVENT_FEED_MOBILE_MEDIA_META_STACK_V1 === */
 
   body.is-tabbar-hidden .event-card.event-card--with-media .event-card-desc,
   body.is-tabbar-hidden .event-card.event-card--with-media .event-card-meta-quiet,
@@ -1609,7 +1635,7 @@ body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
     width: var(--event-card-thumb-w);
     height: var(--event-card-thumb-h);
     aspect-ratio: auto;
-    align-self: center;
+    align-self: start;
 
     border-radius: 12px;
   }
