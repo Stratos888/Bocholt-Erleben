@@ -18,6 +18,48 @@ Kanonische Rollen:
 
 ---
 
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 | Zweck: konsolidiert den aktuellen taktischen Fokus nach ZIP-Pruefung; Umfang: naechste Reihenfolge, erledigte Workstreams, bewusste Nicht-Ziele === -->
+## Aktuelle taktische Priorität – Stand 2026-06-09
+
+Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter unten, wenn sie dem aktuellen Stand widersprechen.
+
+### Nächster operativer Punkt
+
+Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+
+Zu prüfen:
+
+1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
+2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
+3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
+4. `Events.visual_key` wird korrekt geschrieben.
+5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
+6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
+
+Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. `staging` darf die echte Google-Sheet-Kette bewusst nicht vollständig ausführen.
+
+### Aktuell gefreezt oder nicht erneut breit öffnen
+
+- Event-Visual-Duplicate-Cleanup: vorerst gefreezt; nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
+- Event-Card Normal State Polish: bleibt gefreezt.
+- Event-Detailpanel: bleibt gefreezt.
+- Activity-Öffnungsstatus-Massenpflege: abgeschlossen; nur noch gezielte Sonderfälle.
+
+### Getrennter Folge-Workstream
+
+Activity-Premium-Visuals bleiben ein eigener Workstream:
+
+- ein exklusives Premium-Hauptbild pro Activity
+- keine Wiederverwendung aus dem Event-Visual-Pool
+- Anchor-Test zuerst abschließen
+- danach Prompt-Kit / Workflow auf v1.0 einfrieren
+- erst danach systematische Massenproduktion und Repo-Integration
+
+### Dokumentationsregel
+
+Wenn neue Chat-Starts oder ZIP-Stände verwendet werden, zuerst diesen aktuellen Prioritätsblock prüfen. Ältere historische Roadmap-Blöcke bleiben als Kontext erhalten, dürfen aber nicht automatisch als aktive nächste Schritte gelesen werden.
+<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 === -->
+
 ## Ausgangslage: Live-Messbasis
 
 Stand: 2026-05-26, Live-Dashboard-Screenshot.
@@ -856,7 +898,7 @@ Freeze-Bedingung:
 <!-- === BEGIN BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 | Zweck: ordnet Today-Home-Abschluss, Premium-Visual-Contract und Events-Feed-Visuals in die richtige Reihenfolge; Umfang: Home, Event-/Activity-Bilder, Feed-Cards, Visual-Audit === -->
 ## Nächster Roadmap-Block – Today Home Premium Completion, Visual Contract und Events Feed Visual Integration
 
-Status: aktiv / nächste priorisierte Arbeit.
+Status: historisch / durch spätere Workpacks überholt. Aktuelle Priorität siehe `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
 
 ### 1. Today Home Premium Completion
 
@@ -938,7 +980,7 @@ Priorität:
 <!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 | Zweck: ordnet die Event-Visual-Arbeit nach Phase-1-Assetintegration; Umfang: Event-Visual-Pool, Bildproduktion, Feed-Duplizierung === -->
 ## Event Visuals – Phase-1-Integration und Phase-2-Diversifizierung
 
-Status: nächster aktiver Visual-Workstream nach Integration der Phase-1-Basisassets.
+Status: historisch / in späteren Workpacks weitergeführt. Event-Visual-Duplicate-Cleanup ist aktuell vorerst gefreezt; aktuelle Priorität siehe `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
 
 ### Abgeschlossen / in Commit vorzubereiten
 
@@ -1032,6 +1074,9 @@ Akzeptanzkriterien:
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 | Zweck: definiert naechsten Workpack fuer oeffentliche Oeffnungsstatus-Auswertung; Umfang: bestehende Activities, Today Home, Recommendation-Logik === -->
 ## Nächster Workpack: Öffnungsstatus öffentlich auswerten
 
+Status 2026-06-09: historisch / umgesetzt; aktuelle Folgearbeit nur noch gezielt, siehe `ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08` und `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
+
+
 Ausgangslage:
 - Neue Anbieter-Einreichungen können strukturierte Öffnungszeiten liefern.
 - Existing Activities in `data/offers.json` haben noch keinen belastbaren öffentlichen Öffnungsstatus.
@@ -1057,6 +1102,9 @@ Start im nächsten Chat:
 
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 | Zweck: definiert nächsten Workpack nach zentraler Öffnungsstatus-Logik; Umfang: Datenanreicherung bestehender Activities, holiday_policy, geprüfte Öffnungszeiten === -->
 ## Nächster Workpack: Öffnungsstatus-Daten für Activities anreichern
+
+Status 2026-06-09: historisch / durch späteren 44-von-44-Activity-Stand überholt; keine erneute breite Massenpflege starten.
+
 
 ### Ausgangslage
 
@@ -1097,6 +1145,9 @@ Die wichtigsten bestehenden Activities sollen belastbarere öffentliche Öffnung
 
 <!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 | Zweck: definiert Folgearbeiten nach abgeschlossenem Activity-Quality-Audit-V1; Umfang: Needs-Review, Saisonregeln, Detailanzeige, keine neue Massenpflege === -->
 ## Nächster Workpack: Activity-Öffnungsstatus gezielt verfeinern
+
+Status 2026-06-09: gültiger Folgepunkt, aber nicht der nächste operative Pipeline-Beweis.
+
 
 ### Ausgangslage
 

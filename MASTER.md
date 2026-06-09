@@ -38,10 +38,13 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-1. Live-Messbasis konsolidieren: vorhandene Live-KPIs nicht mehr als fehlend behandeln, sondern Tracking-Qualität, Ziel-/Item-Zuordnung und auswertbare Veranstalter-/Location-Reports herstellen.
-2. Monetarisierungs-Readiness absichern: echten Live-Zahlungsfall bewusst testen, kritische Smoke-Tests automatisieren und Review-/Push-Flows gegen stille Ausfälle härten.
-3. Veranstalter-Nutzwert sichtbar machen: Anbieterbereich, Akquise-Kommunikation und Feedbackberichte so ausbauen, dass Reichweite, Interesse und konkrete Klicks belegbar werden.
-4. Danach Discovery-Ausbau: „Heute in Bocholt“, Aktivitäten und Orte/Locations.
+Stand: 2026-06-09, ZIP-Snapshot `Bocholt-Erleben-staging - 2026-06-09T145715.875.zip`.
+
+1. Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` live bewerten.
+2. Roadmap und Master-Datei aktuell halten, damit neue Chats nicht an überholten Workpacks ansetzen.
+3. Activity-Premium-Visuals als getrennten Qualitäts-Workstream fortführen; Event-Visual-Duplicate-Cleanup bleibt vorerst gefreezt.
+4. Activity-Öffnungsstatus nur noch gezielt verfeinern, nicht erneut als breite Datenpflege starten.
+5. Reporting-/Monetarisierungs-Readiness bleibt strategisch wichtig, ist aber nicht der nächste operative Pipeline-Beweis.
 
 ---
 
@@ -80,7 +83,7 @@ The following workpack is intentionally on hold:
 
 ### Information architecture
 
-- `/` remains the current public home until the planned `Heute` recommendation home replaces it.
+- `/` is the canonical Today/Home recommendation entry and current public home.
 - `/events/` is the canonical event search and browsing route.
 - `/aktivitaeten/` is the canonical activities search and browsing route.
 - `/angebote/` remains a legacy/transition route for the activities page until redirect/canonical cleanup is finalized.
@@ -103,43 +106,31 @@ The following workpack is intentionally on hold:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- First target: measured organizer value, not another broad visual-polish loop.
-- Keep page-specific changes minimal until the measurement/reporting and monetization smoke-test gaps are closed.
+- First operational proof after this documentation cleanup: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
+- Do not treat a `staging` workflow attempt as the final proof; the real Google-Sheet chain is intentionally guarded for `main`.
+- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom.
+- Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
 
-<!-- === BEGIN BLOCK: MASTER_TODAY_HOME_PREMIUM_CONTINUATION_2026_06_01 | Zweck: aktueller Projektstand Today Home + Event Visuals ohne Freeze; Umfang: strategischer Fortsetzungspunkt === -->
-## Aktueller Fortsetzungspunkt – Today Home Premium Completion + Event Visuals
+<!-- === BEGIN BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 | Zweck: ersetzt veralteten Today-Home-Fortsetzungspunkt durch aktuellen Steuerungsstand; Umfang: KI-Intake, Event-Visual-Freeze, Activity-Visuals, Activity-Opening === -->
+## Aktueller Fortsetzungspunkt – KI-Intake Main-Beweis und getrennte Premium-Visual-Workstreams
 
-Stand: 2026-06-01, `staging`, weitergeführt bis `dcebaa0` vor diesem Dokumentationspatch.
+Stand: 2026-06-09, `staging` ZIP-Snapshot.
 
-Wichtig: Today Home wird **nicht** als V1 eingefroren. Ziel bleibt eine vollständig premium-fertige Home-/Today-Erfahrung für Mobile und Desktop.
+Aktuell verbindlich:
 
-Bereits sauber umgesetzt und auf Staging geprüft:
-- `/` ist als Today-/Home-Einstieg aktiv.
-- Today Home zeigt einen kompakten Empfehlungsbereich „Was passt jetzt?“ mit 3 Tipps.
-- Recommendation-Mix ist fachlich korrigiert:
-  - Events erscheinen auf Today Home nur noch, wenn sie heute starten oder als Mehrtagesevent heute laufen.
-  - Zukünftige Events, z. B. ein Termin am 14.06., erscheinen nicht mehr als Heute-Tipp.
-  - Wenn keine heutigen Events vorhanden sind, zeigt Today Home 3 Aktivitäten.
-- Event-Visual-System ist technisch produktionsnah aufgebaut:
-  - `visual_key` wird für Events genutzt.
-  - `data/event_visual_pool.json` liefert nur `status: ready`-Assets an die UI.
-  - 7 neue bzw. ersetzte Event-Visuals wurden akzeptiert, WebP-komprimiert, committed und auf Staging geprüft.
-  - Staging-Coverage: 62/62 aktuelle Events haben ein ready Event-Visual.
-- Neue/ersetzte ready Assets:
-  - `music-stage-01.webp`
-  - `default-city-02.webp`
-  - `culture-exhibition-01.webp`
-  - `market-food-01.webp`
-  - `sport-active-01.webp`
-  - `creative-workshop-01.webp`
-  - `kids-family-01.webp`
+- Der nächste operative Pipeline-Beweis ist der Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main`.
+- Auf `staging` ist die echte Google-Sheet-Kette bewusst nicht vollständig prüfbar, weil der Workflow per Branch-Guard geschützt ist.
+- Nach dem Suchlauf ist zu prüfen, ob `Inbox.visual_key`, Dropdown, redaktionelle Key-Änderung, `Events.visual_key`, Build und Eventbild-Ausspielung zusammen funktionieren.
+- Event-Visual-Duplicate-Cleanup ist vorerst gefreezt; Folgearbeit dort nur bei konkretem sichtbaren Symptom oder bewusstem neuen Eventdatenstand.
+- Activity-Premium-Visuals sind ein eigener Qualitäts-Workstream mit exklusiven Bildern pro Activity und dürfen nicht mit Event-Visuals vermischt werden.
+- Activity-Opening-Status ist grundsätzlich umgesetzt; Folgearbeit nur noch gezielt an Saisonlogik, Detailtexten und Sonderfällen.
 
-Offen für Premium Completion:
-- Today Home nicht nur funktional, sondern visuell/produktlogisch auf Premium-Endzustand bringen.
-- Mobile und Desktop separat gegen Premium-Anspruch prüfen.
-- Aktivitätsbilder und Eventbilder im echten Home-Kontext konsistent bewerten.
-- Keine weiteren Randpolish-Workpacks ohne konkretes sichtbares Symptom; aber klare Premium-Gaps aktiv bearbeiten.
-- Nach Today Home Premium Completion direkt das Event-Visual-System auf den normalen Events Feed übertragen.
-<!-- === END BLOCK: MASTER_TODAY_HOME_PREMIUM_CONTINUATION_2026_06_01 === -->
+Nicht als nächstes starten:
+
+- kein weiterer breiter Event-Card-Polish ohne konkretes Symptom
+- keine erneute pauschale Activity-Öffnungszeiten-Massenpflege
+- keine KI-Chat-Simulation als Ersatz für den späteren `main`-Beweis
+- keine Vermischung von Roadmap-Konsolidierung, Bildproduktion und App-Logik in einem Patch
+<!-- === END BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 === -->
