@@ -2780,3 +2780,65 @@ Nach einem Staging-Deploy genügt ein visueller Smoke-Test mit hartem Reload fü
 - `AaltenDagen` / `Innenstadtsommer`
 - `SummerSchool` / `Ökosystem auf Pfosten`
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_DUPLICATE_CLEANUP_FREEZE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 | Zweck: dokumentiert bewusste Testgrenze des Manual-KI-Intake-Workflows auf staging; Umfang: Visual-Key-Handoff, Branch-Guard, offener Main-Beweis === -->
+## Manual-KI-Intake / Visual-Key-Handoff – Staging-Testgrenze
+
+Stand: `staging` Commit `ba10f20` (`Finalisiere Visual-Key-Handoff fuer KI-Intake`)
+
+### Umgesetzt und auf staging validiert
+
+Der Visual-Key-Handoff für KI-gefundene Events wurde technisch umgesetzt:
+
+- `manual-ki-intake.yml` schreibt `visual_key` in den Google-Sheet-Tab `Inbox`.
+- `Inbox.visual_key` wird als Google-Sheets-Dropdown aus `data/event_visual_pool.json -> pools` gesetzt.
+- Alte bzw. manuelle KI-JSON-Einträge ohne `visual_key` bekommen deterministisch einen Key über `scripts/event_visual_keys.py`.
+- `scripts/inbox-to-events.py` erzwingt `visual_key` in `Inbox` und `Events`.
+- Redaktionell geänderte `Inbox.visual_key`-Werte werden nach `Events.visual_key` übernommen.
+- Ungültige manuelle Keys brechen beim Übernehmen fail-fast ab, statt still neu inferiert zu werden.
+
+### Bestandene Prüfungen auf staging
+
+Bestanden:
+
+- `git diff --check`
+- `python3 -m py_compile scripts/event_visual_keys.py scripts/inbox-to-events.py scripts/build-events-from-tsv.py scripts/build-inbox-from-tsv.py`
+- `python3 scripts/audit-event-visual-pool.py`
+  - Pool-Keys: `34 / 34`
+  - Pool-Struktur konsistent
+- Lokaler Inferenzbeweis für `data/inbox_manual.json`
+  - `manual_items=9`
+  - `pool_keys=34`
+  - `errors=0`
+- Staging-Deploy:
+  - Workflow: `Deploy to STRATO`
+  - Run: `27205948911`
+  - Ergebnis: `success`
+  - HEAD: `ba10f202fa13b1301408aad0ff7e821fea05a697`
+
+### Bewusste Testgrenze
+
+Der eigentliche Workflow `Manual KI Event Intake` kann auf `staging` bewusst nicht vollständig ausgeführt werden.
+
+Grund:
+
+- `.github/workflows/manual-ki-intake.yml` enthält den Branch-Guard `MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1`.
+- Der Workflow darf nur auf `main` laufen.
+- `staging` soll keine echten KI-Kandidaten in die Live-Google-Sheet-Review-Kette schreiben.
+
+Konsequenz:
+
+- Auf `staging` können Code-, Syntax-, Pool-, Dropdown-Definition- und lokale Inferenzprüfungen durchgeführt werden.
+- Der vollständige Live-Beweis gegen Google Sheets ist erst nach Merge bzw. Run auf `main` möglich.
+- Ein fehlgeschlagener Versuch, den Workflow per `gh workflow run manual-ki-intake.yml --ref staging` zu starten, ist kein fachlicher Fehler des Visual-Key-Handoffs; `staging` ist hierfür bewusst nicht der Zielpfad.
+
+### Offener Main-Beweis
+
+Nach Merge bzw. Ausführung auf `main` ist noch live zu prüfen:
+
+1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
+2. Das Dropdown für `Inbox.visual_key` erscheint mit den erlaubten Keys aus `event_visual_pool.json`.
+3. Ein redaktionell geänderter `visual_key` wird beim Übernehmen nach `Events.visual_key` erhalten.
+4. Der spätere Build übernimmt `Events.visual_key` nach `events.json`.
+5. Deployte Event-Cards erhalten dadurch automatisch ein passendes Eventbild aus dem Visual-Pool.
+<!-- === END BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 === -->
