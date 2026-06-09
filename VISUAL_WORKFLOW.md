@@ -788,3 +788,57 @@ Finale Prüfwerte:
 
 Dieser Stand ist für den aktuellen Staging-Feed vorerst eingefroren.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_DIVERSITY_FREEZE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_PREMIUM_CONTRACT_V1_2026_06_09 | Zweck: definiert den dauerhaften Premium-Prozess fuer exklusive Activity-Bilder; Umfang: Activities, Prompting, Rechts-/Plausibilitaetsregeln === -->
+## Activity Visual Premium Contract V1 – exklusiver Activity-Bildprozess
+
+Status: Prozessvertrag vor Massenproduktion.
+
+### Produktentscheidung
+
+Activity-Bilder werden nicht aus dem Event-Visual-Pool übernommen und nicht zwischen mehreren Activities geteilt.
+
+Zielzustand:
+
+- Jede Activity erhält ein eigenes exklusives Premium-Hauptbild.
+- Dieses Bild darf innerhalb derselben Activity auf Home/Heute, Aktivitätenseite und Detailpanel erscheinen.
+- Dasselbe Bild darf nicht bei Events und nicht bei anderen Activities verwendet werden.
+- `usable` ist kein Endzustand, sondern nur Übergang.
+- Finaler Premium-Status ist `ready`.
+
+### Rechtlich saubere Wiedererkennbarkeit
+
+Activity-Bilder sollen zur jeweiligen Activity passen und sie wiedererkennbar machen, aber rechtlich und produktionslogisch sauber bleiben.
+
+Daher gilt:
+
+- Wiedererkennbarkeit entsteht bevorzugt über Activity-Charakter, Nutzung, Stimmung, Materialien, Landschafts-/Stadttyp und lokale Plausibilität.
+- KI-generierte Activity-Bilder sind standardmäßig symbolisch-activity-spezifisch, nicht dokumentarisch.
+- Ohne eigenes oder eindeutig freigegebenes Referenzmaterial darf kein Bild behaupten, ein exaktes Foto eines konkreten echten Ortes zu sein.
+- Keine Kopie fremder Foto-Kompositionen, Logos, Markenauftritte, Plakate, lesbarer Beschilderung, geschützter Kunstwerke oder anderer Drittmaterialien.
+- Wenn ein konkreter realer Ort dokumentarisch gezeigt werden soll, braucht es eigenes oder belastbar freigegebenes Bildmaterial.
+- Bei Unsicherheit wird nicht `ready` vergeben, sondern `needs_review` oder `blocked`.
+
+Leitsatz:
+
+> Wiedererkennbar durch Activity-Charakter und lokale Plausibilität, nicht durch riskante Kopie eines fremden Fotos oder eine falsche dokumentarische Ortsbehauptung.
+
+### Dauerhafte Arbeitsdateien
+
+- `ACTIVITY_VISUAL_WORKFLOW.md` ist der operative Prozessvertrag für Activity-Bilder.
+- `ACTIVITY_VISUAL_PROMPT_KIT.md` ist der wiederverwendbare Prompt-Baukasten.
+- `VISUAL_WORKFLOW.md` bleibt der strategische Visual-Mastervertrag.
+
+### Anchor-Test vor Massenproduktion
+
+Vor der Produktion aller Activity-Bilder wird das Prompt-Kit an mindestens zwei Anchor-Activities geprüft:
+
+1. `bocholter-innenstadt-erleben`
+2. `stadtwald-bocholt-erleben`
+
+Erst wenn beide Tests stabil Premium-Ergebnisse liefern, wird das Prompt-Kit als `v1.0` eingefroren.
+
+### Nicht-Ziel dieses Blocks
+
+Dieser Block integriert noch keine neuen Bilder und ändert keine Runtime-Logik. Er hält den dauerhaften Prozess fest, bevor die eigentliche Premium-Bildproduktion startet.
+<!-- === END BLOCK: ACTIVITY_VISUAL_PREMIUM_CONTRACT_V1_2026_06_09 === -->
