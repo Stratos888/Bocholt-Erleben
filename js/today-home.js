@@ -11,6 +11,7 @@
     offers: [],
     items: [],
     eventVisualPools: Object.freeze({}),
+    activityVisualPoolsByOfferId: Object.freeze({}),
     weatherContext: null,
     mode: "for_you"
   };
@@ -117,6 +118,47 @@
     return Object.freeze(out);
   }
 
+  /* === BEGIN BLOCK: TODAY_ACTIVITY_VISUAL_POOL_HELPERS_V1 | Zweck: ordnet ready Activity-Premium-Visuals den Today-Home-Activity-Cards zu; Umfang: activity_visual_pool nach primary_offer_ids, offers.image bleibt nur Fallback === */
+  function buildReadyActivityVisualPoolsByOfferId(payload) {
+    const pools = payload && typeof payload === "object" ? payload.pools : null;
+    const out = Object.create(null);
+
+    if (!pools || typeof pools !== "object") {
+      return Object.freeze(out);
+    }
+
+    Object.entries(pools).forEach(([poolKey, pool]) => {
+      const offerIds = Array.isArray(pool?.primary_offer_ids)
+        ? pool.primary_offer_ids.map(asString).filter(Boolean)
+        : [];
+      const images = Array.isArray(pool?.images) ? pool.images : [];
+
+      const ready = images
+        .filter((image) => image && image.status === "ready")
+        .map((image) => {
+          const src = normalizeUrl(image.src);
+          if (!src) return null;
+
+          return Object.freeze({
+            id: asString(image.id),
+            src,
+            alt: asString(image.alt),
+            poolKey: asString(poolKey)
+          });
+        })
+        .filter(Boolean);
+
+      if (!offerIds.length || !ready.length) return;
+
+      offerIds.forEach((offerId) => {
+        out[offerId] = Object.freeze(ready);
+      });
+    });
+
+    return Object.freeze(out);
+  }
+  /* === END BLOCK: TODAY_ACTIVITY_VISUAL_POOL_HELPERS_V1 === */
+
   function stableHash(value) {
     const textValue = asString(value);
     let hash = 2166136261;
@@ -129,38 +171,10 @@
     return hash >>> 0;
   }
 
-  function eventVisualKey(item) {
-    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
-  }
-
-  function resolveItemVisual(item, usedImages) {
-    const ownImage = normalizeUrl(item?.image);
-    if (ownImage) {
-      if (usedImages) usedImages.add(ownImage);
-      return Object.freeze({
-        src: ownImage,
-        alt: asString(item?.imageAlt || item?.image_alt || item?.alt)
-      });
-    }
-
-    if (item?.type !== "event") {
-      return null;
-    }
-
-    const visualKey = eventVisualKey(item);
-    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
-
+  function selectVisualFromPool(pool, seed, usedImages) {
     if (!Array.isArray(pool) || !pool.length) {
       return null;
     }
-
-    const seed = [
-      asString(item.id),
-      asString(item.date),
-      asString(item.endDate),
-      asString(item.title),
-      visualKey
-    ].join("|");
 
     const start = stableHash(seed) % pool.length;
 
@@ -178,6 +192,76 @@
     }
 
     return null;
+  }
+
+  function eventVisualKey(item) {
+    return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
+  }
+
+  function activityVisualPool(item) {
+    if (item?.type !== "activity") return null;
+
+    const offerIds = [
+      item?.id,
+      item?.raw?.id,
+      item?.offer_id,
+      item?.raw?.offer_id
+    ].map(asString).filter(Boolean);
+
+    for (const offerId of offerIds) {
+      const pool = state.activityVisualPoolsByOfferId[offerId];
+      if (Array.isArray(pool) && pool.length) {
+        return pool;
+      }
+    }
+
+    return null;
+  }
+
+  function resolveItemVisual(item, usedImages) {
+    if (item?.type === "activity") {
+      const pool = activityVisualPool(item);
+      const visual = selectVisualFromPool(
+        pool,
+        [
+          asString(item.id),
+          asString(item.raw?.id),
+          asString(item.title),
+          "activity"
+        ].join("|"),
+        usedImages
+      );
+
+      if (visual) return visual;
+    }
+
+    const ownImage = normalizeUrl(item?.image);
+    if (ownImage) {
+      if (usedImages) usedImages.add(ownImage);
+      return Object.freeze({
+        src: ownImage,
+        alt: asString(item?.imageAlt || item?.image_alt || item?.alt)
+      });
+    }
+
+    if (item?.type !== "event") {
+      return null;
+    }
+
+    const visualKey = eventVisualKey(item);
+    const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+
+    return selectVisualFromPool(
+      pool,
+      [
+        asString(item.id),
+        asString(item.date),
+        asString(item.endDate),
+        asString(item.title),
+        visualKey
+      ].join("|"),
+      usedImages
+    );
   }
 
   function resolveItemImage(item, usedImages) {
@@ -987,11 +1071,12 @@
   }
 
   async function loadData() {
-    const [eventPayload, approvedPayload, offerPayload, visualPoolPayload] = await Promise.all([
+    const [eventPayload, approvedPayload, offerPayload, visualPoolPayload, activityVisualPoolPayload] = await Promise.all([
       fetchJsonNoStore("/data/events.json", false),
       fetchJsonNoStore("/api/events/public.php", false),
       fetchJsonNoStore("/data/offers.json", true),
-      fetchJsonNoStore("/data/event_visual_pool.json", false)
+      fetchJsonNoStore("/data/event_visual_pool.json", false),
+      fetchJsonNoStore("/data/activity_visual_pool.json", false)
     ]);
 
     state.events = dedupeEvents([
@@ -1001,6 +1086,7 @@
 
     state.offers = extractOffers(offerPayload);
     state.eventVisualPools = buildReadyEventVisualPools(visualPoolPayload);
+    state.activityVisualPoolsByOfferId = buildReadyActivityVisualPoolsByOfferId(activityVisualPoolPayload);
   }
 
   async function loadWeather() {
