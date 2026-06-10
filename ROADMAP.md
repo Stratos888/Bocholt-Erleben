@@ -1187,3 +1187,45 @@ Keine weitere breite Datenpflege. Stattdessen nur gezielte Verfeinerung der Sais
 - Keine weitere breite Activity-Datenpflege ohne konkreten fachlichen Anlass.
 - Keine Vermischung mit Event-Visual- oder Event-Card-Polish.
 <!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 === -->
+
+
+<!-- === BEGIN BLOCK: ROADMAP_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 | Zweck: oeffnet den Detailpanel-Workstream gezielt als app-weites Premium-Systemelement vor Live; Umfang: Event/Activity/Today-Zusammenspiel, keine Activity-Fotoproduktion === -->
+## Vor Live: Detailpanel als app-weites Premium-Systemelement
+
+Die Today-Home ist funktional releasefaehig, aber Live bleibt gehalten, bis das Detailpanel app-weit Premium-Niveau erreicht.
+
+Ziel ist nicht, Event- und Activity-Detailpanel identisch zu machen. Ziel ist ein konsistentes System:
+
+- gleiche Panel-Chrome,
+- gleiche visuelle Qualitaet,
+- gleiche App-Sprache,
+- unterschiedliche Rollen fuer Events und Activities.
+
+Rollen:
+
+- Event-Detailpanel = Terminentscheidung mit Datum, Ort, Kalender, Teilen, Quelle.
+- Activity-Detailpanel = Ausflugs-/Ortsentscheidung mit Route, Website/Infos, Oeffnungsstatus, Merkmalen.
+- Today-Kontext = schnelle Empfehlung, die in ein vollstaendiges Event- oder Activity-Detail fuehrt.
+
+Primaere Owner:
+
+- `js/details.js` fuer Event-Detailpanel,
+- `js/offers-details.js` fuer Activity-Detailpanel,
+- `css/overlays.css` fuer gemeinsame Panel-, Actionbar-, Safe-Area- und Chrome-Schicht.
+
+Verbindliche Detailplanung:
+
+- `docs/detailpanel-premium-system-contract.md`
+
+Nicht Teil dieses Workstreams:
+
+- neue Activity-Fotos,
+- Today-Ranking,
+- Eventdatenprozess,
+- breite neue Feature-Ideen.
+
+Live-Regel:
+
+- Activity-Fotos duerfen nachgezogen werden.
+- Detailpanel-Struktur, Aktionswert, Tonalitaet und UI-Qualitaet muessen vor Live app-weit konsolidiert sein.
+<!-- === END BLOCK: ROADMAP_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->

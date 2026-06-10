@@ -38,6 +38,25 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
+<!-- === BEGIN BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 | Zweck: setzt den naechsten Live-Blocker nach Today-Home-Release-Proof; Umfang: Detailpanel als app-weites Premium-Systemelement === -->
+### Vor Live: Detailpanel Premium System
+
+Nach dem Today-Home-Release-Proof bleibt Live gehalten, bis das Detailpanel app-weit Premium-Niveau erreicht.
+
+Grundsatz:
+
+- konsistent, aber nicht identisch,
+- Event-Detailpanel fuer Terminentscheidung,
+- Activity-Detailpanel fuer Orts-/Ausflugsentscheidung,
+- Today oeffnet nur in die passende bestehende Detailrolle,
+- Activity-Fotos bleiben separater Nachzug und blockieren diesen Workstream nicht.
+
+Primaere Arbeitsgrundlage:
+
+- `docs/detailpanel-premium-system-contract.md`
+<!-- === END BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->
+
+
 Stand: 2026-06-09, ZIP-Snapshot `Bocholt-Erleben-staging - 2026-06-09T145715.875.zip`.
 
 1. Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` live bewerten.
