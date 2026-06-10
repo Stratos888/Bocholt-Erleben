@@ -1264,16 +1264,16 @@
   box-shadow: none;
 }
 
-/* === BEGIN BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V1 | Zweck: zeigt Activity-Bilder im mobilen Card-Feed als ruhige Thumbnail-Spalte analog zu Eventcards, ohne die bestehende Bildquelle oder Desktop-Geometrie zu ändern | Umfang: ersetzt nur mobile Activity-Card-Shell, Media und Body-Anbindung === */
+/* === BEGIN BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 | Zweck: zeigt Activity-Bilder im mobilen Card-Feed als ruhige Thumbnail-Spalte analog zu Eventcards und entfernt redundante Kategorie-Kicker aus der Card-Hierarchie | Umfang: mobile Activity-Card-Shell, Media, Body-Anbindung und Kicker-Ausblendung === */
 .page--activities .discovery-card--compact{
   --rail-w: 0px;
-  --activity-card-thumb-w: clamp(78px, 24vw, 92px);
-  --activity-card-thumb-h: clamp(64px, 19vw, 74px);
+  --activity-card-thumb-w: clamp(78px, 23vw, 90px);
+  --activity-card-thumb-h: clamp(62px, 18vw, 72px);
   grid-template-columns: minmax(0, 1fr) var(--activity-card-thumb-w);
   column-gap: 10px;
   align-items: center;
-  min-height: calc(var(--activity-card-thumb-h) + 22px);
-  padding: 11px;
+  min-height: calc(var(--activity-card-thumb-h) + 20px);
+  padding: 10px 11px;
   overflow: hidden;
 }
 
@@ -1371,26 +1371,20 @@
   grid-row: 1;
   align-self: center;
   min-width: 0;
-  gap: 4px;
+  gap: 3px;
 }
 
 .page--activities .event-title .activity-card-category-icon{
   display: none;
 }
-/* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V1 === */
+/* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V2 === */
 
 .page--activities .discovery-card--compact .event-title{
   margin: 0;
 }
 
 .page--activities .activity-card-kicker{
-  margin: 0 0 1px;
-  color: rgba(84,100,89,0.78);
-  font-size: 0.68rem;
-  font-weight: 820;
-  line-height: 1.15;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  display: none;
 }
 
 .page--activities .event-title .activity-card-category-icon{
@@ -1941,11 +1935,7 @@ body.has-bottom-tabbar{
   }
 
   .page--activities .activity-card-kicker{
-    margin-bottom: 2px;
-    color: rgba(84,100,89,0.74);
-    font-size: 0.70rem;
-    font-weight: 800;
-    letter-spacing: 0.13em;
+    display: none;
   }
 
   .page--activities .discovery-card--compact .event-title{
