@@ -1551,6 +1551,15 @@ Umfang:
 #event-detail-panel .detail-category-icon{ order: 1; }
 #event-detail-panel .detail-title{ order: 2; }
 
+/* Event-Detail: Titel ist wichtiger als Kategorieicon; Activity nutzt eigene Kategorie-Pill-Klassen. */
+#event-detail-panel .detail-title-row{
+  gap: 0;
+}
+
+#event-detail-panel .detail-category-icon{
+  display: none;
+}
+
 #event-detail-panel .detail-category-icon{
   width: var(--dp-indicator-size);
   height: var(--dp-indicator-size);
