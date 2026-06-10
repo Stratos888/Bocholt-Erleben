@@ -841,4 +841,36 @@ Erst wenn beide Tests stabil Premium-Ergebnisse liefern, wird das Prompt-Kit als
 ### Nicht-Ziel dieses Blocks
 
 Dieser Block integriert noch keine neuen Bilder und ändert keine Runtime-Logik. Er hält den dauerhaften Prozess fest, bevor die eigentliche Premium-Bildproduktion startet.
+
+### Activity-Visual-Sourcing-Gate
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_SOURCING_GATE_V1_2026_06_10 | Zweck: ergänzt den Activity-Premium-Contract um die Vorentscheidung KI-geeignet vs. reales/lizenziertes/freigegebenes Foto erforderlich === -->
+
+Nicht jede Activity ist für symbolische KI-Premiumbilder geeignet.
+
+Vor jeder Activity-Bildproduktion muss eine Sourcing-Strategie festgelegt werden:
+
+- `symbolic_ai_ok`
+- `own_or_licensed_real_photo_required`
+- `official_permission_candidate`
+- `blocked_until_photo_available`
+
+Harte Produktregel:
+
+> Ein schönes, aber objektiv falsches Bild ist nicht premiumfähig.
+
+Symbolische KI-Bilder sind nur zulässig, wenn die Activity über Atmosphäre, Nutzung, Landschafts-/Ortstyp oder allgemeine Aufenthaltsqualität erkennbar wird, ohne eine konkrete falsche Orts-/Objektbehauptung zu erzeugen.
+
+KI-geeignet sind typischerweise atmosphärische Fälle wie Wald-/Naturwege, Seen/Ufer, Rad- und Wanderrouten oder allgemeine Naherholungsorte.
+
+Reale, lizenzierte oder offiziell freigegebene Fotos sind erforderlich, wenn Nutzer erwarten, dass das Bild den konkreten Ort, das konkrete Objekt oder die konkrete Ausstattung wiedererkennbar zeigt. Das gilt besonders für konkrete Spielplätze, Museen, Burgen, Schlösser, markante Gebäude, Innenräume, Kunstwerke, Skulpturen oder spezielle Anlagen.
+
+Fremde Netzbilder dürfen nicht 1:1 nachgebaut werden. Zulässig ist nur abstrakte Inspiration auf Motiv-, Qualitäts- oder Stimmungsniveau mit eigenständiger Komposition.
+
+Wenn keine eigene Aufnahme, keine belastbare Lizenz und keine schriftliche Freigabe verfügbar ist, bleibt die Activity-Bildfreigabe `blocked_until_photo_available`.
+
+Lernfall: `suderwicker-maerchenspielplatz` ist nicht sinnvoll per symbolischer KI als Premium-Endbild lösbar, weil generische KI-Spielplätze eine falsche dokumentarische Ortswirkung erzeugen. Für diese Activity gilt: reales/lizenziertes/freigegebenes Ortsfoto erforderlich; KI nicht als Premium-Ready-Endbild.
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_GATE_V1_2026_06_10 === -->
+
 <!-- === END BLOCK: ACTIVITY_VISUAL_PREMIUM_CONTRACT_V1_2026_06_09 === -->

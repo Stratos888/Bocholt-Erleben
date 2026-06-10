@@ -171,3 +171,39 @@ Nicht Teil dieses Prozessvertrags:
 - Verwendung von Event-Visuals
 - pauschale Übernahme bestehender Remote-Bilder als finaler Premiumstand
 - CSS-Rettung einzelner Bildausschnitte
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_WORKFLOW_SOURCING_GATE_V1_2026_06_10 | Zweck: dokumentiert das verpflichtende Sourcing-Gate vor jeder Activity-Bildproduktion === -->
+
+## Sourcing-Gate vor jeder Activity-Bildproduktion
+
+Vor jedem Prompt und vor jeder Bildgenerierung muss die Activity einer Strategie zugeordnet werden.
+
+| Strategie | Bedeutung | Premium-Endbild möglich? |
+|---|---|---|
+| `symbolic_ai_ok` | Activity kann atmosphärisch, über Nutzung oder allgemeinen Ortstyp ehrlich dargestellt werden. | Ja, nach Review. |
+| `own_or_licensed_real_photo_required` | Konkreter Ort oder konkrete Ausstattung muss real gezeigt werden. | Nur mit eigener Aufnahme oder belastbarer Lizenz. |
+| `official_permission_candidate` | Bildmaterial existiert wahrscheinlich bei Stadt, Betreiber, Verein, Presse oder Rechteinhaber. | Nur mit schriftlicher Freigabe. |
+| `blocked_until_photo_available` | Kein rechtlich und fachlich geeignetes Bild verfügbar. | Nein. Nicht prominent verwenden. |
+
+`symbolic_ai_ok` ist nur zulässig, wenn eine leichte Abstraktion keine falsche Nutzererwartung erzeugt. Das Bild darf atmosphärisch passen, aber nicht so tun, als zeige es einen konkreten realen Ortsausschnitt.
+
+`own_or_licensed_real_photo_required` gilt, wenn die Activity wesentlich an einem konkreten Objekt, einer konkreten Ausstattung oder einer wiedererkennbaren Anlage hängt.
+
+Ein Bild kann nur `ready` werden, wenn es zugleich visuell premiumfähig, rechtlich sauber, inhaltlich passend, exklusiv zugeordnet und frei von falschen dokumentarischen Orts-/Objektbehauptungen ist.
+
+Zulässige Realbildquellen sind eigene Fotos, schriftlich freigegebene Fotos von Stadt/Betreiber/Verein/Presse/Rechteinhaber, offen lizenzierte Bilder mit dokumentierter Lizenz oder direkt lizenzierte Fotografien.
+
+Nicht zulässig sind ungeprüfte Netzbilder, Pressebilder ohne Freigabe, Social-Media-Bilder ohne Freigabe, fremde Fotos als 1:1-KI-Vorlage, Bilder mit erkennbaren Kindern oder dominierenden Privatpersonen ohne Rechteklärung sowie Bilder mit problematischen Logos, Schildern, Kunstwerken oder Marken als Hauptmotiv.
+
+Für jede Activity soll später dokumentiert werden: `activity_id`, `visual_sourcing_strategy`, `reason`, `asset_status`, `source_type`, `rights_status`, `photo_required_reason`, `permission_source` und `review_notes`.
+
+Lernfall:
+
+```text
+suderwicker-maerchenspielplatz
+visual_sourcing_strategy: official_permission_candidate
+fallback_status: blocked_until_photo_available
+reason: konkreter Spielplatz mit spezifischer Ausstattung; KI erzeugt falsche dokumentarische Ortswirkung
+```
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_WORKFLOW_SOURCING_GATE_V1_2026_06_10 === -->

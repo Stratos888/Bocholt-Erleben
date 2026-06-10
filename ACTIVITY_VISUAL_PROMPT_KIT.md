@@ -211,3 +211,53 @@ Dieses Prompt-Kit darf erst als `v1.0` gelten, wenn mindestens zwei Anchor-Activ
 - `stadtwald-bocholt-erleben`
 
 Bis dahin bleibt der Status `v0.1 vor Anchor-Test`.
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_PROMPT_KIT_SOURCING_GATE_V1_2026_06_10 | Zweck: ergänzt das Prompt-Kit um die Vorprüfung, wann überhaupt ein KI-Prompt erstellt werden darf === -->
+
+## Prompt-Gate: Nicht jede Activity bekommt einen KI-Prompt
+
+Vor jedem Activity-Bildprompt muss das Sourcing-Gate geprüft werden.
+
+Ein KI-Bildprompt darf als Premium-Endbild-Prompt nur erstellt werden, wenn die Activity vorher als `symbolic_ai_ok` eingestuft wurde.
+
+Geeignete Prompt-Fälle sind atmosphärische Natur-/Wald-/See-/Uferbilder, regionale Rad-/Wander-/Spazierwege, allgemeine Naherholungsorte und nicht konkret dokumentarische Nutzungsszenen.
+
+Für konkrete Orts-/Objekt-Activities wird kein finaler Premium-KI-Prompt erstellt, wenn das Ergebnis einen realen Ort ersetzen müsste. Stattdessen wird ein Sourcing-Brief erstellt:
+
+```text id="activity-visual-sourcing-brief-template"
+Activity:
+[activity_id]
+
+Visual sourcing strategy:
+official_permission_candidate / own_or_licensed_real_photo_required / blocked_until_photo_available
+
+Required real-world content:
+[Welche konkrete Anlage, Ausstattung oder Perspektive muss real gezeigt werden?]
+
+Preferred source:
+[Stadt / Betreiber / Verein / Fotograf / offene Lizenzquelle]
+
+Premium photo requirements:
+- 16:9-fähig
+- keine erkennbaren Kinder
+- keine dominierenden Privatpersonen
+- keine problematischen Logos/Schilder/Marken
+- keine geschützten Werke als Hauptmotiv
+- ausreichend hell und card-tauglich
+- reale Activity muss erkennbar sein
+
+Fallback:
+Nicht prominent verwenden, bis ein freigegebenes Premiumfoto verfügbar ist.
+```
+
+Anti-Copy-Regel: Rechtlich bedenkliche Netzfotos dürfen nicht als direkte KI-Vorlage verwendet werden. Nicht zulässig sind Prompts wie „baue dieses Foto 1:1 nach“ oder „nutze dieselbe Perspektive, denselben Ausschnitt und dieselbe Komposition“.
+
+Praktische Leitregel:
+
+```text id="activity-visual-sourcing-rule"
+Atmosphärische Activity: KI kann Premium-Endbild liefern.
+Konkrete Orts-/Objekt-Activity: echtes/lizenziertes/freigegebenes Foto erforderlich.
+Schön, aber falsch: nicht premiumfähig.
+```
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_PROMPT_KIT_SOURCING_GATE_V1_2026_06_10 === -->
