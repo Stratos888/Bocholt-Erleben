@@ -876,7 +876,7 @@
 
   async function loadData() {
     const [eventPayload, approvedPayload, offerPayload, visualPoolPayload] = await Promise.all([
-      fetchJsonNoStore("/data/events.json", true),
+      fetchJsonNoStore("/data/events.json", false),
       fetchJsonNoStore("/api/events/public.php", false),
       fetchJsonNoStore("/data/offers.json", true),
       fetchJsonNoStore("/data/event_visual_pool.json", false)
