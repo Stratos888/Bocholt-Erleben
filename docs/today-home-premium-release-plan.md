@@ -136,4 +136,58 @@ Release-Kriterium:
 
 - Today zeigt keine Activity mit `needs_review`-Bild.
 
+## Umsetzungsstatus
+
+Stand: 2026-06-10
+
+- P0.1 erledigt mit Commit `61ebdad`: `data/events.json` wird optional geladen; `data/offers.json` bleibt Pflichtquelle.
+- P0.2 erledigt mit Commit `d004489`: Today-Event-Visuals werden beim Öffnen an das Event-Detailpanel übergeben.
+- P0.5 per Proof bestätigt: `hasAllowedActivityVisual()` schließt `needs_review` und `blocked` aus; aktueller Datenstand `usable: 41`, `needs_review: 3`, `blocked: 0`.
+- Aktuell ausgeschlossene `needs_review`-Activities: `hilgelo-erleben`, `hohenhorster-berge-entdecken`, `stadtwald-bocholt-erleben`.
+
 ## P1 – Premium-Polish vor Release
+
+1. Today-Ranking stärker lokal und divers machen.
+2. Maximal drei Skeleton-Cards im Loading-State zeigen.
+3. `css/today.css` konsolidieren und konkurrierende Blöcke reduzieren.
+4. Today-Farben sauber an den zentralen Token-Vertrag anbinden.
+5. Versteckte Today-Controls entweder entfernen oder finalisieren.
+6. Tote Eventfilter-DOM-Reste aus `index.html` entfernen.
+7. Footer-/HTML-Struktur in `index.html` bereinigen.
+8. SEO/JSON-LD auf die neue Rolle „Bocholt Heute“ aktualisieren.
+9. Social-Preview-Asset prüfen und ggf. optimieren.
+10. Tastaturbedienung und Fokuszustände der Today-Cards prüfen.
+
+## P2 – Nach Release oder späterer Qualitätsausbau
+
+1. Activity-Premium-Bilder final produzieren.
+2. Activity-Visual-Pool wirklich mit den Activity-Daten verdrahten.
+3. Externe Activity-Bilder durch lokale WebP-Assets ersetzen.
+4. Activity-Bildstatus-System konsequent anwenden: `ready`, `usable`, `needs_review`, `blocked`.
+5. Optional echte Personalisierung erst nach UI-/Datenschutz-/Mehrwertklärung aktivieren.
+
+## Abarbeitungsreihenfolge
+
+Empfohlene Reihenfolge:
+
+1. Dokumentation dieses Plans committen.
+2. P0.1 Eventdaten optional laden.
+3. P0.2 Detailpanel-Visual konsistent übergeben.
+4. P0.5 Activity-Needs-Review-Ausschluss per Test/Proof absichern.
+5. P0.4 Event-Visual-Alt-Texte ergänzen.
+6. P0.3 Runtime-Test nach Deploy.
+7. Danach P1-Polish in kleinen, klar getrennten Workpacks.
+
+## Freeze-Regel
+
+Nach Erledigung der P0-Punkte wird die Today-Home funktional eingefroren.
+
+Danach nur noch:
+
+- klar abgegrenzter Premium-Polish,
+- belegte Bugfixes,
+- Activity-Bildnachzug aus dem separaten Premium-Visual-Prozess.
+
+Keine breite Neudiskussion der Seitenrolle ohne neuen Zielvertrag.
+
+<!-- === END BLOCK: TODAY_HOME_PREMIUM_RELEASE_PLAN_2026_06_10 === -->
