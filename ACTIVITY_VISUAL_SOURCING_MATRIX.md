@@ -76,6 +76,7 @@ Harte Regel aus dem Activity-Visual-Sourcing-Gate:
 | 42 | `auesee-wesel-erleben` | Auesee Wesel erleben | `symbolic_ai_ok` | See/Naherholung ist atmosphärisch lösbar. | KI-See-/Ufer-Motiv möglich; keine konkrete falsche Wesel-Perspektive. |
 | 43 | `schwarzes-wasser-wesel-entdecken` | Schwarzes Wasser Wesel entdecken | `symbolic_ai_ok` | Natur-/Wasser-/Schutzgebietsstimmung typologisch darstellbar. | KI-Natursee-/Moorwasser-Motiv möglich. |
 | 44 | `witte-venn-ahaus-alstaette-entdecken` | Witte Venn Ahaus-Alstätte entdecken | `symbolic_ai_ok` | Venn-/Natur-/Grenzlandschaft ist atmosphärisch darstellbar. | KI-Venn-/Heide-/Naturweg-Motiv möglich. |
+| 45 | `b2-tonwerke-route` | B2 Tonwerke-Route | `licensed_or_official_real_photo_required` / `official_permission_candidate` | Konkrete Route mit stark ortsgebundenen Ankern wie Tonwerke/Naturschwimmbad, Rodelberg, Stadtwald, Aa-See und Kubaai; generische KI-Naturbilder wirken sichtbar falsch. | Rechtlich nutzbares echtes Foto aus Netz-/Lizenz-/offizieller Quelle bevorzugen; alternativ Betreiber-/Vereins-/Stadtfreigabe. Kein KI-Endbild. Eigenes Foto nur falls später bewusst gewollt. |
 
 ## Produktionslogik für spätere Chats
 
@@ -93,6 +94,19 @@ Harte Regel aus dem Activity-Visual-Sourcing-Gate:
 - Für konkrete Orts-/Objekt-Activities gezielt Lizenz-/Freigabequellen recherchieren.
 
 <!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_V1_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_LEARNING_B2_TONWERKE_2026_06_10 | Zweck: dokumentiert Sourcing-Entscheidung fuer die B2-Tonwerke-Route === -->
+## Learning: konkrete Routenanker nicht als generische KI-Naturbilder prompten
+
+`b2-tonwerke-route` wurde nach mehreren Bildtests als `licensed_or_official_real_photo_required` / `official_permission_candidate` eingestuft.
+
+Grund:
+Die Route lebt nicht von einer frei ersetzbaren Naturkulisse, sondern von konkreten lokalen Ankern wie Tonwerke/Naturschwimmbad, Rodelberg, Stadtwald, Aa-See und Kubaai. Generische KI-Bilder mit Wald, Sandweg oder Wasserfläche wirken bei dieser Activity sofort falsch oder zu unspezifisch.
+
+Regel:
+Wenn eine Activity aus mehreren konkreten, lokal wiedererkennbaren Stationen besteht und generische KI-Motive die reale Ortswirkung verfehlen, wird kein weiteres KI-Endbild erzeugt. Bevorzugt wird dann ein rechtlich nutzbares echtes Foto aus Netz-/Lizenz-/offizieller Quelle. Falls kein eindeutig nutzbares Bild verfügbar ist, wird eine Betreiber-, Vereins- oder Stadtfreigabe geprüft. Eigene Fotos sind im aktuellen Projektmodus nur fuer die Innenstadt fest eingeplant.
+<!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_LEARNING_B2_TONWERKE_2026_06_10 === -->
+
 
 <!-- === BEGIN BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_LEARNING_DINXPERLO_SUDERWICK_2026_06_10 | Zweck: dokumentiert Korrektur der Sourcing-Entscheidung für innerörtliche Grenz-Activities === -->
 ## Learning: innerörtliche Grenz-Activities nicht generisch prompten
