@@ -142,9 +142,16 @@ Stand: 2026-06-10
 
 - P0.1 erledigt mit Commit `61ebdad`: `data/events.json` wird optional geladen; `data/offers.json` bleibt Pflichtquelle.
 - P0.2 erledigt mit Commit `d004489`: Today-Event-Visuals werden beim Öffnen an das Event-Detailpanel übergeben.
+- P0.3 erledigt mit Commit `4457fc7` auf `staging`: Deploy erfolgreich, Build-Marker `4457fc73a403`, `/data/events.json`, `/data/offers.json`, `/data/event_visual_pool.json` und kritische JS-Assets liefern HTTP 200.
 - P0.4 per Proof bestätigt: `tools/audit-visual-contract.py --strict` meldet `Warnings / known visual debt: none` und `Errors: none`; Zusatzcheck bestätigt keine `ready`-Event-Visuals ohne Alt-Text.
 - P0.5 per Proof bestätigt: `hasAllowedActivityVisual()` schließt `needs_review` und `blocked` aus; aktueller Datenstand `usable: 41`, `needs_review: 3`, `blocked: 0`.
 - Aktuell ausgeschlossene `needs_review`-Activities: `hilgelo-erleben`, `hohenhorster-berge-entdecken`, `stadtwald-bocholt-erleben`.
+- P1.2 erledigt mit Commit `eff425b`: Skeleton-Loading auf maximal drei Karten reduziert.
+- P1.1 erledigt mit Commit `86e9b9b`: lokale und thematische Activity-Auswahl verbessert.
+- P1.5 erledigt mit Commit `1e71440`: versteckte Today-Controls aus DOM, JS und CSS entfernt.
+- P1.6 erledigt mit Commit `09f0fdc`: alte Eventfilter-/Popover-Reste aus der Today-Home entfernt.
+- P1.7 erledigt mit Commit `b3189cd`: Footer-/HTML-Struktur bereinigt.
+- P1.8 erledigt mit Commit `4457fc7`: JSON-LD auf Today-Home-Rolle korrigiert.
 
 ## P1 – Premium-Polish vor Release
 
@@ -178,6 +185,33 @@ Empfohlene Reihenfolge:
 5. P0.4 Event-Visual-Alt-Texte ergänzen.
 6. P0.3 Runtime-Test nach Deploy.
 7. Danach P1-Polish in kleinen, klar getrennten Workpacks.
+
+## Release-Proof 2026-06-10
+
+Bestätigter Staging-Stand:
+
+- Branch: `staging`
+- Commit: `4457fc7` (`Korrigiere Today Home JSON-LD`)
+- Deploy-Run: `Deploy to STRATO` erfolgreich
+- Build-Marker: `4457fc73a403`
+- Runtime-Ziel: `https://staging.bocholt-erleben.de/`
+
+Bestandene Prüfungen:
+
+- lokale JS-Syntaxchecks für Today-/Recommendation-/Opening-/Weather-/Detail-Module bestanden,
+- `python3 tools/audit-visual-contract.py --strict` meldet `Warnings / known visual debt: none` und `Errors: none`,
+- HTTP-Smoke für `/` liefert 200 und die Today-Shell,
+- alte Today-Controls, Eventfilter-Popover und `Veranstaltungen in Bocholt`-JSON-LD-Rest sind nicht mehr im ausgelieferten HTML,
+- `/data/events.json`, `/data/offers.json`, `/data/event_visual_pool.json` und kritische JS-Assets liefern HTTP 200,
+- Browser-Runtime-Probe bestätigt `todayRoot: true`, `cardCount: 3`, geladene Bilder und keine alten Controls/Popover,
+- Detailpanel-Probe bestätigt `panelExists: true`, `panelVisible: true`, `hasContent: true`, `hasImage: true` und sichtbare Actionbar.
+
+Ergebnis:
+
+- P0.3 ist abgeschlossen.
+- P0-Blocker sind für den aktuellen `staging`-Stand erledigt.
+- P1.1, P1.2, P1.5, P1.6, P1.7 und P1.8 sind erledigt.
+- Weitere Arbeit an Today Home soll nur noch als klar abgegrenzter visueller Feinschliff oder belegter Bugfix erfolgen.
 
 ## Freeze-Regel
 

@@ -2869,3 +2869,86 @@ Ergebnis nach erfolgreicher Prüfung:
 - `Errors: none`
 - `Warnings / known visual debt: none`
 <!-- === END BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 | Zweck: dokumentiert Staging-Release-Proof der neuen Today-Home; Umfang: P0/P1-Abschluss, Deploy, HTTP-Smoke, Browser-Runtime, Detailpanel === -->
+## Today Home – Staging Release Proof 2026-06-10
+
+Status: auf `staging` umgesetzt, deployed und per HTTP-/Browser-Runtime-Probe geprüft.
+
+Bestätigter Stand:
+
+- Branch: `staging`
+- Commit: `4457fc7` (`Korrigiere Today Home JSON-LD`)
+- Deploy: `Deploy to STRATO`, Run `27260197568`, Ergebnis `success`
+- Build-Marker: `4457fc73a403`
+- Runtime-Ziel: `https://staging.bocholt-erleben.de/`
+
+Bestandene lokale Prüfungen:
+
+- `node --check` für:
+  - `js/today-home.js`
+  - `js/recommendations.js`
+  - `js/opening-status.js`
+  - `js/weather-context.js`
+  - `js/details.js`
+  - `js/offers-details.js`
+- `python3 tools/audit-visual-contract.py --strict`
+  - `Errors: none`
+  - `Warnings / known visual debt: none`
+- Cleanup-Grep ohne Treffer für:
+  - alte Today-Controls
+  - alte Today-Mode-/Interest-Controls
+  - alte Eventfilter-Popover
+  - alte `FILTER_SHEET_WIRING`-/`DESKTOP FILTER POPOVERS`-Reste
+
+Bestandene HTTP-Runtime-Prüfungen auf Staging:
+
+- `/` liefert HTTP 200.
+- Ausgeliefertes HTML enthält `#today-root`, `#today-weather-note`, `#today-feed` und Today-SEO.
+- Ausgeliefertes HTML enthält keine alten Today-Controls, keine alten Popover und keinen alten JSON-LD-Namen `Veranstaltungen in Bocholt`.
+- `/data/events.json` liefert HTTP 200.
+- `/data/offers.json` liefert HTTP 200.
+- `/data/event_visual_pool.json` liefert HTTP 200.
+- Kritische Today-/Detailpanel-JS-Assets liefern HTTP 200.
+
+Bestandene Browser-Runtime-Prüfung:
+
+- `todayRoot: true`
+- `cardCount: 3`
+- `oldControls: 0`
+- `oldPopovers: 0`
+- alle drei gerenderten Karten haben ein Bild
+- alle drei Kartenbilder waren geladen
+- WeatherNote rendert
+- Status rendert `3 Tipps`
+- keine sichtbaren alten Controls/Popover
+
+Bestandene Detailpanel-Prüfung:
+
+- `panelExists: true`
+- `panelVisible: true`
+- `hasContent: true`
+- `hasImage: true`
+- `actionbarExists: true`
+- Event-Visual wird im Detailpanel übernommen.
+- Actionbar enthält Kalender- und Teilen-Aktion.
+
+Abgeschlossene Workpacks:
+
+- P0.1 Eventdaten optional laden.
+- P0.2 Today-Event-Visual ins Detailpanel übernehmen.
+- P0.3 Runtime-Test mit echter deployter Eventdatei.
+- P0.4 Event-Visual-Audit ohne Warnungen/Fehler.
+- P0.5 Activity-Needs-Review-Ausschluss.
+- P1.1 lokale/diverse Activity-Auswahl.
+- P1.2 maximal drei Skeleton-Cards.
+- P1.5 versteckte Today-Controls entfernt.
+- P1.6 alte Eventfilter-/Popover-Reste entfernt.
+- P1.7 Footer-/HTML-Struktur bereinigt.
+- P1.8 JSON-LD auf Today-Home korrigiert.
+
+Bewertung:
+
+Die neue Today-Home ist für den aktuellen `staging`-Stand funktional releasefähig. Weitere Today-Arbeit soll ab jetzt nur noch als klar abgegrenzter visueller Feinschliff, Accessibility-Prüfung oder belegter Bugfix erfolgen.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 === -->
