@@ -893,7 +893,7 @@
     const feed = document.getElementById(FEED_ID);
     if (!feed) return;
 
-    feed.innerHTML = Array.from({ length: 6 }).map(() => `
+    feed.innerHTML = Array.from({ length: 3 }).map(() => `
       <article class="today-card today-card--skeleton" aria-hidden="true">
         <div class="today-card__body">
           <div class="today-skeleton today-skeleton--small"></div>
