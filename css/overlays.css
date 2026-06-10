@@ -1508,6 +1508,14 @@ Umfang:
     margin-bottom: var(--space-lg);
   }
 }
+@media (max-width: 479px){
+  #event-detail-panel .event-detail-media{
+    aspect-ratio: 16 / 8.4;
+    margin-bottom: 14px;
+    border-radius: 18px;
+  }
+}
+
 /* === END BLOCK: EVENT_DETAIL_READY_VISUAL_MEDIA_V1 === */
 
 
@@ -1517,10 +1525,10 @@ Umfang:
 
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 
-  padding: 0 0 var(--space-md);
-  margin: 0 0 var(--space-md);
+  padding: 0 0 14px;
+  margin: 0 0 14px;
 
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
@@ -1601,7 +1609,7 @@ Umfang:
 
 #event-detail-panel .detail-meta-rows{
   display: grid;
-  gap: 8px;
+  gap: 6px;
 
   min-width: 0;
   margin: 0;
@@ -1616,7 +1624,7 @@ Umfang:
   align-items: center;
   column-gap: 10px;
 
-  padding: 10px 0;
+  padding: 8px 0;
   border-radius: var(--ui-radius-sm);
 
   color: var(--cmp-link-color-muted);
@@ -1832,11 +1840,11 @@ Umfang:
 
 /* === BEGIN BLOCK: DS-02_DETAIL_DESCRIPTION_CLUSTER_MAPPING | Purpose: consolidate description/divider/action spacing to DS-02 content rhythm without redesign | Scope: description, divider, detail-links top spacing, actions spacing === */
 #event-detail-panel .detail-description{
-  margin: 12px 0 0;
-  padding: 0;
+  margin: 10px 0 0;
+  padding: 0 0 8px;
 
   font-size: 14px;
-  line-height: 1.62;
+  line-height: 1.58;
   font-weight: 430;
   letter-spacing: -0.005em;
 
