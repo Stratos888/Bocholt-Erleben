@@ -703,6 +703,20 @@
   /* === END BLOCK: TODAY_HOME_CARD_META_CONTRACT_V1 === */
   /* === END BLOCK: TODAY_EVENT_META_RUNNING_LABELS_V1 === */
 
+  /* === BEGIN BLOCK: TODAY_HOME_COMPACT_ACTIVITY_META_V1 | Zweck: haelt Activity-Card-Meta auf Home kurz und scanbar; Umfang: nur Home-Card-Meta, Detailpanel behaelt vollstaendige Hinweise === */
+  function compactActivityMetaLabel(label) {
+    const text = asString(label)
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!text) return "";
+    if (/jederzeit möglich/i.test(text)) return "jederzeit möglich";
+    if (/ganzjährig/i.test(text) && /nutzbar/i.test(text)) return "ganzjährig nutzbar";
+    if (text.includes(";")) return text.split(";").map((part) => part.trim()).find(Boolean) || "";
+
+    return text;
+  }
+
   function buildActivityMeta(item, context) {
     const parts = [];
     const dayContext = context || buildDayContext(new Date());
@@ -710,11 +724,12 @@
     if (item.location) parts.push(item.location);
 
     const availabilityLabels = window.OpeningStatus?.buildActivityMetaLabels?.(item, dayContext) || [];
-    availabilityLabels.forEach((label) => {
-      parts.push(label);
-    });
+    const compactLabel = availabilityLabels.map(compactActivityMetaLabel).find(Boolean);
+    if (compactLabel) parts.push(compactLabel);
+
     return parts.join(" · ");
   }
+  /* === END BLOCK: TODAY_HOME_COMPACT_ACTIVITY_META_V1 === */
 
   function weatherMessage(context) {
     const weather = asString(context?.weather || "unknown");
