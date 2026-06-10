@@ -2952,3 +2952,27 @@ Bewertung:
 
 Die neue Today-Home ist für den aktuellen `staging`-Stand funktional releasefähig. Weitere Today-Arbeit soll ab jetzt nur noch als klar abgegrenzter visueller Feinschliff, Accessibility-Prüfung oder belegter Bugfix erfolgen.
 <!-- === END BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 | Zweck: dokumentiert Abschluss des Activity-Card-Bild-Polish-Workpacks; Umfang: mobile Activity-Cards, Kategorie-Kicker, Codespaces-Preview-Nutzung === -->
+## Activity Card Images / Mobile Card Polish abgeschlossen
+
+Stand: 2026-06-10
+
+Ergebnis:
+- Activity-Cards zeigen im mobilen Feed jetzt Bilder rechts als Thumbnail.
+- Normale Activity-Cards zeigen keinen Kategorie-Kicker mehr über dem Titel.
+- Die Card-Hierarchie ist dadurch näher an den Eventcards.
+- Die vorhandene Activity-Bildquelle bleibt unverändert; Premiumbilder werden separat nachgezogen.
+- Die Anbieter-CTA-Karte bleibt bewusst als Sonderkarte mit eigenem Kicker bestehen.
+- Codespaces Preview wurde erfolgreich für schnelle UI-Prüfung genutzt und in `ENGINEERING.md` dokumentiert.
+
+Validierung:
+- Lokale Codespaces Preview geprüft.
+- Staging `/aktivitaeten/` mobil geprüft.
+- Darstellung auf Samsung S24 als passend bestätigt.
+- Keine weitere Card-Struktur-Korrektur notwendig.
+
+Relevante Commits:
+- `88d1e12` — Zeige Activitybilder in mobilen Cards
+- `0cd9ab7` — Entferne Kategorie-Kicker aus Activitycards
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 === -->
