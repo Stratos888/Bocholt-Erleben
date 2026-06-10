@@ -480,6 +480,105 @@
     return compareTodayItems(a, b);
   }
 
+  function activityText(item) {
+    const tags = Array.isArray(item?.tags) ? item.tags.join(" ") : "";
+    return [
+      item?.title,
+      item?.description,
+      item?.location,
+      tags
+    ].map(asString).join(" ").toLowerCase();
+  }
+
+  function activityRegionRank(item) {
+    const location = asString(item?.location || item?.city || item?.ort).toLowerCase();
+
+    if (location.includes("bocholt") || location.includes("aasee bocholt")) return 0;
+    if (
+      location.includes("rhede") ||
+      location.includes("borken") ||
+      location.includes("burlo") ||
+      location.includes("isselburg") ||
+      location.includes("anholt") ||
+      location.includes("dinxperlo") ||
+      location.includes("suderwick")
+    ) return 1;
+    if (
+      location.includes("winterswijk") ||
+      location.includes("aalten") ||
+      location.includes("bredevoort") ||
+      location.includes("vreden")
+    ) return 2;
+
+    return 3;
+  }
+
+  function activityRegionBucket(item) {
+    const location = asString(item?.location || item?.city || item?.ort).toLowerCase();
+
+    if (location.includes("bocholt") || location.includes("aasee bocholt")) return "bocholt";
+    if (location.includes("dinxperlo") || location.includes("suderwick")) return "grenze";
+    if (location.includes("winterswijk") || location.includes("aalten") || location.includes("bredevoort")) return "achterhoek";
+    if (location.includes("borken") || location.includes("burlo") || location.includes("vreden") || location.includes("raesfeld") || location.includes("ahaus")) return "kreis-borken";
+    if (location.includes("rhede") || location.includes("isselburg") || location.includes("anholt")) return "nahbereich";
+    if (location.includes("wesel") || location.includes("hamminkeln")) return "niederrhein";
+
+    return "sonstige";
+  }
+
+  function activityThemeBucket(item) {
+    const textValue = activityText(item);
+
+    if (/spielplatz|familie|märchen|tiergarten|zoo|anholter schweiz/.test(textValue)) return "familie";
+    if (/museum|textil|handwerk|villa|mondriaan|schloss|wasserburg|bücherstadt|unterduik|geschichte/.test(textValue)) return "kultur";
+    if (/radweg|wandern|mtb|route|spaziergang|tour|noaberpad|kerkpatt/.test(textValue)) return "route";
+    if (/see|wasser|aasee|venn|veen|auesee|pröbstingsee|klostersee|quelle|flamingo/.test(textValue)) return "natur-wasser";
+    if (/innenstadt|promenade|kubaai|park|vestingpark/.test(textValue)) return "stadt-park";
+
+    return "sonstige";
+  }
+
+  function compareActivityCandidates(a, b) {
+    const regionDiff = activityRegionRank(a) - activityRegionRank(b);
+    if (regionDiff) return regionDiff;
+
+    return compareTodayItems(a, b);
+  }
+
+  function selectDiverseActivities(items, limit) {
+    const candidates = Array.isArray(items) ? items : [];
+    const selected = [];
+    const selectedKeys = new Set();
+    const usedRegions = new Set();
+    const usedThemes = new Set();
+
+    const tryAdd = (item) => {
+      const key = itemKey(item);
+      if (!item || selectedKeys.has(key) || selected.length >= limit) return false;
+
+      selected.push(item);
+      selectedKeys.add(key);
+      usedRegions.add(activityRegionBucket(item));
+      usedThemes.add(activityThemeBucket(item));
+      return true;
+    };
+
+    [
+      (item) => !usedRegions.has(activityRegionBucket(item)) && !usedThemes.has(activityThemeBucket(item)),
+      (item) => !usedThemes.has(activityThemeBucket(item)),
+      (item) => !usedRegions.has(activityRegionBucket(item)),
+      () => true
+    ].forEach((predicate) => {
+      candidates.forEach((item) => {
+        if (selected.length < limit && predicate(item)) {
+          tryAdd(item);
+        }
+      });
+    });
+
+    return selected;
+  }
+
   function curateTodayItems(items, context) {
     const now = context?.now || new Date();
     const cleaned = (Array.isArray(items) ? items : [])
@@ -488,14 +587,14 @@
     const activityLane = addDailyRotation(
       cleaned.filter((item) => item.type !== "event" && hasAllowedActivityVisual(item)).slice(0, 32),
       context
-    );
+    ).sort(compareActivityCandidates);
 
     const eventLane = addDailyRotation(
       cleaned.filter((item) => isTodayEventCandidate(item, now) && todayScore(item) > 0),
       context
     ).sort(compareEventCandidates);
 
-    const selectedActivities = activityLane.slice(0, eventLane.length ? 2 : 3);
+    const selectedActivities = selectDiverseActivities(activityLane, eventLane.length ? 2 : 3);
     const selectedEvent = eventLane[0] || null;
     const selected = selectedEvent
       ? [...selectedActivities, selectedEvent]
