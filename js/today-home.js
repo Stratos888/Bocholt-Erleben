@@ -743,8 +743,11 @@
     return !!(prefs?.isSaved && prefs.isSaved(item));
   }
 
+  /* === BEGIN BLOCK: TODAY_HOME_ACTIVITY_REASON_PILLS_ONLY_V1 | Zweck: verhindert redundante Event-Pills wie "Heute" auf der Today-Home; Umfang: Reason-Pills nur fuer Activities, Event-Zeitkontext bleibt in der Meta-Zeile === */
   function renderReasonLabels(item) {
-    const labels = Array.isArray(item.reasonLabels) ? item.reasonLabels : [];
+    if (item?.type === "event") return "";
+
+    const labels = Array.isArray(item?.reasonLabels) ? item.reasonLabels : [];
     if (!labels.length) return "";
 
     return `
@@ -753,6 +756,7 @@
       </div>
     `.trim();
   }
+  /* === END BLOCK: TODAY_HOME_ACTIVITY_REASON_PILLS_ONLY_V1 === */
 
   function renderCard(item, index, usedImages) {
     const context = createContext();
