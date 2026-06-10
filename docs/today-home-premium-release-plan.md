@@ -142,6 +142,7 @@ Stand: 2026-06-10
 
 - P0.1 erledigt mit Commit `61ebdad`: `data/events.json` wird optional geladen; `data/offers.json` bleibt Pflichtquelle.
 - P0.2 erledigt mit Commit `d004489`: Today-Event-Visuals werden beim Öffnen an das Event-Detailpanel übergeben.
+- P0.4 per Proof bestätigt: `tools/audit-visual-contract.py --strict` meldet `Warnings / known visual debt: none` und `Errors: none`; Zusatzcheck bestätigt keine `ready`-Event-Visuals ohne Alt-Text.
 - P0.5 per Proof bestätigt: `hasAllowedActivityVisual()` schließt `needs_review` und `blocked` aus; aktueller Datenstand `usable: 41`, `needs_review: 3`, `blocked: 0`.
 - Aktuell ausgeschlossene `needs_review`-Activities: `hilgelo-erleben`, `hohenhorster-berge-entdecken`, `stadtwald-bocholt-erleben`.
 
