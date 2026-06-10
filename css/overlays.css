@@ -1363,77 +1363,6 @@ Umfang:
 }
 /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
 
-/* === BEGIN BLOCK: ACTIVITIES_DETAIL_ACTIONS_ENTERPRISE_V1 | Zweck: macht die CTA-Zeile linksgeführt, ikonisch konsistent und klar priorisiert; Umfang: ersetzt nur den Action-Block im Activity-Detailpanel === */
-#event-detail-panel .activity-detail__actions{
-  display: grid;
-  gap: 10px;
-  padding: 6px 0 2px;
-}
-
-#event-detail-panel .activity-detail__action{
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  justify-content: start;
-  gap: 10px;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(23,39,30,0.10);
-  background: rgba(247,248,243,0.96);
-  color: rgba(23,39,30,0.88);
-  text-decoration: none;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 760;
-  line-height: 1.28;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.78),
-    0 8px 18px rgba(14,20,17,0.05);
-}
-
-#event-detail-panel .activity-detail__action--secondary{
-  background: rgba(255,255,255,0.76);
-}
-
-#event-detail-panel .activity-detail__action-icon{
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(23,39,30,0.74);
-}
-
-#event-detail-panel .activity-detail__action-icon > .activity-detail__action-icon-svg{
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-#event-detail-panel .activity-detail__action-label{
-  min-width: 0;
-}
-
-#event-detail-panel .activity-detail__action:focus-visible{
-  outline: 2px solid var(--cmp-focus-ring-neutral);
-  outline-offset: var(--cmp-focus-outline-offset);
-}
-/* === END BLOCK: ACTIVITIES_DETAIL_ACTIONS_ENTERPRISE_V1 === */
-
-@media (max-width: 389px){
-  #event-detail-panel .activity-detail__facts-grid{
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-  #event-detail-panel .activity-detail__fact-row--wide{
-    grid-column: auto;
-  }
-}
-
 @media (max-width: 899px){
   #event-detail-panel .activity-detail__media{
     margin-bottom: 12px;
@@ -2374,6 +2303,12 @@ Umfang:
 }
 
 #detail-actionbar-slot .detail-actionbar-btn svg{
+  width: 20px;
+  height: 20px;
+  opacity: 0.92;
+}
+
+#detail-actionbar-slot .detail-actionbar-btn .activity-detail__actionbar-icon-svg{
   width: 20px;
   height: 20px;
   opacity: 0.92;

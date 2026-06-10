@@ -12,6 +12,7 @@ const OfferDetailPanel = {
   content: null,
   body: null,
   closeBtn: null,
+  actionbarSlot: null,
   _isInit: false,
   _lastFocusEl: null,
 
@@ -39,6 +40,7 @@ const OfferDetailPanel = {
               <div id="detail-content"></div>
             </div>
           </div>
+          <div id="detail-actionbar-slot" class="detail-actionbar" aria-label="Aktionen" hidden></div>
         </div>
       `.trim();
 
@@ -54,8 +56,19 @@ const OfferDetailPanel = {
     this.body = this.panel?.querySelector(".detail-panel-body");
     this.content = document.getElementById("detail-content");
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
+    this.actionbarSlot = this.panel?.querySelector("#detail-actionbar-slot");
 
-    if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
+    if (this.panel && !this.actionbarSlot) {
+      const slot = document.createElement("div");
+      slot.id = "detail-actionbar-slot";
+      slot.className = "detail-actionbar";
+      slot.setAttribute("aria-label", "Aktionen");
+      slot.hidden = true;
+      this.panel.appendChild(slot);
+      this.actionbarSlot = slot;
+    }
+
+    if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn || !this.actionbarSlot) return;
 
     this.overlay.addEventListener("click", (event) => {
       if (event.target === this.overlay) this.hide();
@@ -131,6 +144,10 @@ const OfferDetailPanel = {
       this.panel.classList.add("hidden");
       this.panel.setAttribute("hidden", "");
       this.panel.removeAttribute("data-detail-type");
+      if (this.actionbarSlot) {
+        this.actionbarSlot.innerHTML = "";
+        this.actionbarSlot.hidden = true;
+      }
       if (this.body) this.body.scrollTop = 0;
       if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
         this._lastFocusEl.focus();
@@ -396,10 +413,10 @@ const OfferDetailPanel = {
     const description = String(offer?.description || "").trim();
 
     const mapsIcon = window.Icons?.svg
-      ? window.Icons.svg("compass", { className: "activity-detail__action-icon-svg" })
+      ? window.Icons.svg("compass", { className: "activity-detail__actionbar-icon-svg" })
       : "";
     const websiteIcon = window.Icons?.svg
-      ? window.Icons.svg("external-link", { className: "activity-detail__action-icon-svg" })
+      ? window.Icons.svg("external-link", { className: "activity-detail__actionbar-icon-svg" })
       : "";
 
     const baseOutboundPayload = {
@@ -456,51 +473,75 @@ const OfferDetailPanel = {
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
           ${this.renderOpeningStatus(offer)}
           ${this.renderFacts(offer)}
-          <div class="activity-detail__actions">
-            <a
-              class="activity-detail__action"
-              href="${this.escapeHtml(mapsUrl)}"
-              target="_blank"
-              rel="noopener noreferrer"
-              ${buildOutboundDataAttrs(mapsOutboundPayload)}
-            >
-              <span class="activity-detail__action-icon" aria-hidden="true">${mapsIcon}</span>
-              <span class="activity-detail__action-label">${this.escapeHtml(mapsLabel)}</span>
-            </a>
-            ${websiteUrl ? `
-              <a
-                class="activity-detail__action activity-detail__action--secondary"
-                href="${this.escapeHtml(websiteUrl)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                ${buildOutboundDataAttrs(websiteOutboundPayload)}
-              >
-                <span class="activity-detail__action-icon" aria-hidden="true">${websiteIcon}</span>
-                <span class="activity-detail__action-label">${this.escapeHtml(websiteLabel)}</span>
-              </a>
-            ` : ""}
-          </div>
           ${this.renderImageAttribution(offer)}
         </div>
       </article>
     `.trim();
 
-    this.content.querySelectorAll("a[data-outbound-type]").forEach((link) => {
-      link.addEventListener("click", () => {
-        if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+    const actionbarHtml = [
+      mapsUrl ? `
+        <a
+          class="detail-actionbar-btn is-icon activity-detail__actionbar-btn"
+          href="${this.escapeHtml(mapsUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="${this.escapeHtml(mapsLabel)}"
+          title="Route"
+          data-action="maps"
+          ${buildOutboundDataAttrs(mapsOutboundPayload)}
+        >
+          ${mapsIcon}
+          <span class="detail-sr-only">${this.escapeHtml(mapsLabel)}</span>
+        </a>
+      ` : "",
+      websiteUrl ? `
+        <a
+          class="detail-actionbar-btn is-icon activity-detail__actionbar-btn"
+          href="${this.escapeHtml(websiteUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="${this.escapeHtml(websiteLabel)}"
+          title="Infos"
+          data-action="website"
+          ${buildOutboundDataAttrs(websiteOutboundPayload)}
+        >
+          ${websiteIcon}
+          <span class="detail-sr-only">${this.escapeHtml(websiteLabel)}</span>
+        </a>
+      ` : ""
+    ].filter(Boolean).join("");
 
-        window.BEAnalytics.trackOutboundClick({
-          outboundType: String(link.dataset.outboundType || "").trim(),
-          entityType: String(link.dataset.entityType || "").trim(),
-          entityId: String(link.dataset.entityId || "").trim(),
-          entityTitle: String(link.dataset.entityTitle || "").trim(),
-          reportingTargetType: String(link.dataset.reportingTargetType || "").trim(),
-          reportingTargetId: String(link.dataset.reportingTargetId || "").trim(),
-          reportingTargetTitle: String(link.dataset.reportingTargetTitle || "").trim(),
-          destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+    if (this.actionbarSlot) {
+      if (actionbarHtml) {
+        this.actionbarSlot.innerHTML = actionbarHtml;
+        this.actionbarSlot.hidden = false;
+      } else {
+        this.actionbarSlot.innerHTML = "";
+        this.actionbarSlot.hidden = true;
+      }
+    }
+
+    const bindOutboundTracking = (root) => {
+      root?.querySelectorAll("a[data-outbound-type]").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+
+          window.BEAnalytics.trackOutboundClick({
+            outboundType: String(link.dataset.outboundType || "").trim(),
+            entityType: String(link.dataset.entityType || "").trim(),
+            entityId: String(link.dataset.entityId || "").trim(),
+            entityTitle: String(link.dataset.entityTitle || "").trim(),
+            reportingTargetType: String(link.dataset.reportingTargetType || "").trim(),
+            reportingTargetId: String(link.dataset.reportingTargetId || "").trim(),
+            reportingTargetTitle: String(link.dataset.reportingTargetTitle || "").trim(),
+            destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+          });
         });
       });
-    });
+    };
+
+    bindOutboundTracking(this.content);
+    bindOutboundTracking(this.actionbarSlot);
   }
   /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 === */
   /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 === */
