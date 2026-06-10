@@ -37,7 +37,7 @@ Harte Regel aus dem Activity-Visual-Sourcing-Gate:
 | 3 | `hilgelo-erleben` | Hilgelo erleben | `symbolic_ai_ok` | Freizeitsee/Naherholung ist atmosphärisch lösbar; akzeptierter KI-Kandidat existiert. | Aktuelles KI-Bild als `ready`-Kandidat vormerken; finale Assetintegration später. |
 | 4 | `textilwerk-bocholt-erleben` | Textilwerk Bocholt | `own_or_licensed_real_photo_required` | Konkreter Kultur-/Museumsort; Nutzer erwarten reale Anlage, nicht symbolische Fabrik. | Commons/Lizenz prüfen oder offizielle Freigabe einholen. |
 | 5 | `handwerksmuseum-bocholt-erleben` | Handwerksmuseum Bocholt | `own_or_licensed_real_photo_required` | Konkretes Museum und konkrete Werkstatt-/Gebäudewirkung. | Reales/lizenziertes Foto erforderlich. |
-| 6 | `heelweg-dinxperlo-suderwick-entdecken` | Grenzort Dinxperlo–Suderwick entdecken | `symbolic_ai_ok` | Grenzort-/Straßen-/Spaziergangsatmosphäre ist darstellbar, wenn keine konkrete falsche Straßenansicht behauptet wird. | KI möglich; Motiv allgemein als Grenz-/Dorfspaziergang halten. |
+| 6 | `heelweg-dinxperlo-suderwick-entdecken` | Grenzort Dinxperlo–Suderwick entdecken | `own_or_licensed_real_photo_required` / `official_permission_candidate` | Die Activity lebt vom konkreten innerörtlichen Grenzverlauf zwischen Dinxperlo und Suderwick. Ein generischer KI-Dorfspaziergang wäre fachlich zu ungenau oder falsch. | Echtes eigenes, lizenziertes oder offiziell freigegebenes Foto der Heelweg-/Hellweg-/Grenzstraßen-Situation, Grenzmarkierung oder historischer Grenzobjekte beschaffen. Kein KI-Endbild. |
 | 7 | `vestingpark-st-bernardus-erleben` | Vestingpark St. Bernardus entdecken | `own_or_licensed_real_photo_required` | Konkreter historischer Park/Ort in Bredevoort; generischer Park wäre fachlich schwach. | Lizenzfoto oder offizielle Freigabe suchen. |
 | 8 | `bredevoort-buecherstadt-erleben` | Bredevoort Bücherstadt erleben | `own_or_licensed_real_photo_required` | Konkrete Bücherstadt/Altstadt; KI erzeugt leicht falsche Ortskulisse. | Reales/lizenziertes Ortsfoto oder Freigabe. |
 | 9 | `unterduikmuseum-aalten-entdecken` | Unterduikmuseum Aalten | `own_or_licensed_real_photo_required` | Konkretes Museum mit sensibler historischer Thematik; symbolisches Bild wäre riskant. | Echtes/lizenziertes Foto erforderlich. |
@@ -49,7 +49,7 @@ Harte Regel aus dem Activity-Visual-Sourcing-Gate:
 | 15 | `zwillbrocker-venn-flamingos-entdecken` | Zwillbrocker Venn & Flamingos entdecken | `symbolic_ai_ok` | Venn/Vogelbeobachtung/Flamingos sind atmosphärisch darstellbar; keine exakte Ortsbehauptung nötig. | KI möglich, Tierdarstellung streng auf Plausibilität prüfen. |
 | 16 | `korenburgerveen-entdecken` | Korenburgerveen entdecken | `symbolic_ai_ok` | Moor/Bohlenweg/Wandergebiet typologisch lösbar. | KI-Moor-/Bohlenweg-Motiv möglich. |
 | 17 | `wooldse-veen-entdecken` | Wooldse Veen entdecken | `symbolic_ai_ok` | Hochmoor/Bohlenweg/Grenzlandschaft atmosphärisch darstellbar. | KI möglich; keine exakte Ortsbehauptung. |
-| 18 | `grenzenlos-wandern-dinxperlo-suderwick` | GrenzenLos wandern Dinxperlo–Suderwick | `symbolic_ai_ok` | Wanderroute/Grenzlandschaft kann typologisch dargestellt werden. | KI-Grenz-/Wanderweg-Motiv möglich. |
+| 18 | `grenzenlos-wandern-dinxperlo-suderwick` | GrenzenLos wandern Dinxperlo–Suderwick | `own_or_licensed_real_photo_required` / `official_permission_candidate` | Die Besonderheit ist der innerörtliche Grenzverlauf zwischen Dinxperlo und Suderwick, nicht ein generischer Landschaftsweg. Ein KI-Landschaftsbild wäre fachlich zu ungenau oder falsch. | Echtes eigenes, lizenziertes oder offiziell freigegebenes Foto der Grenzstraße / Heelweg-Hellweg-Situation / Grenzmarkierung / historischen Grenzobjekte beschaffen. Kein KI-Endbild. |
 | 19 | `bocholter-innenstadt-erleben` | Bocholter Innenstadt erleben | `own_or_licensed_real_photo_required` | Innenstadt ist konkret und KI wirkt schnell fake/generisch; echtes Foto geplant. | Eigenes echtes Foto oder rechtlich sauberes Ortsfoto bevorzugen. |
 | 20 | `bocholter-aa-radweg-erleben` | Bocholter-Aa-Radweg | `symbolic_ai_ok` | Radweg/Fluss/Uferweg ist atmosphärisch ehrlich darstellbar. | KI-Radweg entlang kleiner Aa/Grünzug möglich. |
 | 21 | `kubaai-aa-promenade-aktiv-erleben` | Kubaai / Aa-Promenade erleben | `own_or_licensed_real_photo_required` | Konkreter Stadtentwicklungs-/Promenadenort mit markanten Elementen. | Reales/lizenziertes Ortsfoto nötig. |
@@ -93,3 +93,15 @@ Harte Regel aus dem Activity-Visual-Sourcing-Gate:
 - Für konkrete Orts-/Objekt-Activities gezielt Lizenz-/Freigabequellen recherchieren.
 
 <!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_V1_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_LEARNING_DINXPERLO_SUDERWICK_2026_06_10 | Zweck: dokumentiert Korrektur der Sourcing-Entscheidung für innerörtliche Grenz-Activities === -->
+## Learning: innerörtliche Grenz-Activities nicht generisch prompten
+
+`heelweg-dinxperlo-suderwick-entdecken` und `grenzenlos-wandern-dinxperlo-suderwick` wurden nachträglich von `symbolic_ai_ok` auf `own_or_licensed_real_photo_required` / `official_permission_candidate` korrigiert.
+
+Grund:
+Diese Activities leben nicht von einer allgemeinen Grenzlandschaft, sondern von der konkreten innerörtlichen Grenzsituation zwischen Dinxperlo und Suderwick: Grenzstraße, Bordstein-/Straßenkante, Heelweg/Hellweg, gelbe Markierungen, historische Grenzobjekte und Dorfstraßen-Kontext.
+
+Regel:
+Wenn eine Activity durch eine konkrete, lokal außergewöhnliche Ortsstruktur geprägt ist, darf sie nicht als generisches KI-Landschafts- oder Dorfstraßenbild umgesetzt werden. In solchen Fällen ist ein echtes eigenes, lizenziertes oder offiziell freigegebenes Foto erforderlich.
+<!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_MATRIX_LEARNING_DINXPERLO_SUDERWICK_2026_06_10 === -->
