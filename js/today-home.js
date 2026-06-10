@@ -6,32 +6,6 @@
   const FEED_ID = "today-feed";
   const STATUS_ID = "today-status";
   const WEATHER_ID = "today-weather-note";
-  const MODE_ATTR = "data-today-mode";
-  const INTEREST_ATTR = "data-today-interest";
-
-  const MODE_LABELS = Object.freeze({
-    for_you: "Heute",
-    today: "Heute",
-    weekend: "Wochenende",
-    family: "Mit Kindern",
-    outdoor: "Draußen",
-    rain: "Regenplan"
-  });
-
-  const HOME_MODES = Object.freeze(["for_you", "weekend", "family", "outdoor", "rain"]);
-
-  const INTERESTS_VISIBLE = Object.freeze([
-    "Familie",
-    "Draußen",
-    "Bei Regen",
-    "Kultur",
-    "Natur",
-    "Kurz & spontan",
-    "Wasser",
-    "Baden",
-    "Spielplatz"
-  ]);
-
   let state = {
     events: [],
     offers: [],
@@ -825,41 +799,6 @@
     `.trim();
   }
 
-  function renderModeControls() {
-    return HOME_MODES.map((mode) => {
-      const active = mode === state.mode;
-      return `
-        <button type="button" class="today-mode${active ? " is-active" : ""}" ${MODE_ATTR}="${escapeHtml(mode)}" aria-pressed="${active ? "true" : "false"}">
-          ${escapeHtml(MODE_LABELS[mode] || mode)}
-        </button>
-      `.trim();
-    }).join("");
-  }
-
-  function renderInterestControls() {
-    const profile = getProfile();
-    const active = new Set(Array.isArray(profile.interests) ? profile.interests : []);
-
-    return INTERESTS_VISIBLE.map((interest) => {
-      const isActive = active.has(interest);
-      return `
-        <button type="button" class="today-interest${isActive ? " is-active" : ""}" ${INTEREST_ATTR}="${escapeHtml(interest)}" aria-pressed="${isActive ? "true" : "false"}">
-          ${escapeHtml(interest)}
-        </button>
-      `.trim();
-    }).join("");
-  }
-
-  function renderControls() {
-    const modeEl = qs("[data-today-modes]");
-    const interestEl = qs("[data-today-interests]");
-
-    if (modeEl) modeEl.innerHTML = renderModeControls();
-    if (interestEl) interestEl.innerHTML = renderInterestControls();
-
-    hydrateIcons(document.getElementById(ROOT_ID));
-  }
-
   function renderFeed() {
     const feed = document.getElementById(FEED_ID);
     if (!feed) return;
@@ -911,7 +850,6 @@
 
   function renderAll() {
     renderWeatherNote();
-    renderControls();
     renderFeed();
   }
 
@@ -948,23 +886,6 @@
 
   function bindEvents(root) {
     root.addEventListener("click", (event) => {
-      const modeBtn = event.target.closest(`[${MODE_ATTR}]`);
-      if (modeBtn) {
-        const mode = asString(modeBtn.getAttribute(MODE_ATTR)) || "for_you";
-        state.mode = mode;
-        getPreferences()?.setLastMode?.(mode);
-        renderAll();
-        return;
-      }
-
-      const interestBtn = event.target.closest(`[${INTEREST_ATTR}]`);
-      if (interestBtn) {
-        const interest = asString(interestBtn.getAttribute(INTEREST_ATTR));
-        getPreferences()?.toggleInterest?.(interest);
-        renderAll();
-        return;
-      }
-
       const card = event.target.closest("[data-today-card]");
       if (card) {
         openItem(findItemByKey(card.getAttribute("data-today-card")));

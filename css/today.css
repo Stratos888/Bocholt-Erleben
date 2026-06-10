@@ -105,75 +105,11 @@ body.page-route-today .app-header {
   height: 1rem;
 }
 
-.today-controls {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.today-control-group {
-  display: grid;
-  gap: 0.42rem;
-}
-
-.today-control-label {
-  color: var(--color-text-muted, #756b5d);
-  font-size: 0.75rem;
-  font-weight: 820;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.today-scroll-row {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scrollbar-width: none;
-  padding: 0.05rem 0 0.1rem;
-}
-
-.today-scroll-row::-webkit-scrollbar {
-  display: none;
-}
-
-.today-mode,
-.today-interest {
-  flex: 0 0 auto;
-  min-height: 2.35rem;
-  border: 1px solid color-mix(in srgb, var(--color-border, #ded7c8) 82%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-surface, #fffaf0) 92%, white 8%);
-  color: var(--color-text, #261f16);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 740;
-  line-height: 1;
-  padding: 0.68rem 0.9rem;
-  cursor: pointer;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
-}
-
-.today-mode:hover,
-.today-interest:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--color-accent, #87683e) 42%, var(--color-border, #ded7c8));
-}
-
-.today-mode:focus-visible,
-.today-interest:focus-visible,
 .today-card:focus-visible,
 .today-card__icon-btn:focus-visible,
 .today-empty__actions a:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--color-accent, #87683e) 44%, transparent);
   outline-offset: 3px;
-}
-
-.today-mode.is-active,
-.today-interest.is-active {
-  border-color: color-mix(in srgb, var(--color-accent, #87683e) 72%, var(--color-border, #ded7c8));
-  background: color-mix(in srgb, var(--color-accent, #87683e) 14%, var(--color-surface, #fffaf0));
-  box-shadow: 0 10px 26px rgba(64, 48, 26, 0.08);
 }
 
 .today-main {
@@ -434,20 +370,6 @@ body.page-route-today .app-header {
     align-items: stretch;
   }
 
-  .today-controls {
-    align-self: stretch;
-    margin-top: 0;
-  }
-
-  .today-control-panel {
-    height: 100%;
-    border: 1px solid color-mix(in srgb, var(--color-border, #ded7c8) 72%, transparent);
-    border-radius: clamp(1.25rem, 3vw, 2rem);
-    background: color-mix(in srgb, var(--color-surface, #fffaf0) 92%, white 8%);
-    box-shadow: 0 14px 36px rgba(64, 48, 26, 0.07);
-    padding: 1rem;
-  }
-
   .today-feed {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
@@ -478,8 +400,6 @@ body.page-route-today .app-header {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .today-mode,
-  .today-interest,
   .today-card,
   .today-skeleton {
     transition: none;
@@ -546,10 +466,6 @@ body.page-route-today .today-weather-note {
 body.page-route-today .today-weather-note__icon {
   width: 0.92rem;
   height: 0.92rem;
-}
-
-body.page-route-today .today-controls {
-  display: none;
 }
 
 body.page-route-today .today-main {
