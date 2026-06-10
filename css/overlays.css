@@ -1551,15 +1551,6 @@ Umfang:
 #event-detail-panel .detail-category-icon{ order: 1; }
 #event-detail-panel .detail-title{ order: 2; }
 
-/* Event-Detail: Titel ist wichtiger als Kategorieicon; Activity nutzt eigene Kategorie-Pill-Klassen. */
-#event-detail-panel .detail-title-row{
-  gap: 0;
-}
-
-#event-detail-panel .detail-category-icon{
-  display: none;
-}
-
 #event-detail-panel .detail-category-icon{
   width: var(--dp-indicator-size);
   height: var(--dp-indicator-size);
@@ -1595,6 +1586,16 @@ Umfang:
   opacity: 1;
   filter: none;
 }
+
+/* === BEGIN BLOCK: EVENT_DETAIL_TITLE_PRIORITY_V1 | Zweck: gibt dem Event-Detailtitel volle Breite, da das Kategorieicon im Detailpanel keinen ausreichenden Entscheidungswert hat; Umfang: nur Event-Detail, Activity nutzt eigene Kategorie-Pill-Klassen === */
+#event-detail-panel .detail-title-row{
+  gap: 0;
+}
+
+#event-detail-panel .detail-category-icon{
+  display: none;
+}
+/* === END BLOCK: EVENT_DETAIL_TITLE_PRIORITY_V1 === */
 
 #event-detail-panel .detail-title{
   margin: 0;
