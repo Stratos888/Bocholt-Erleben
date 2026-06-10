@@ -507,8 +507,18 @@ body.page-route-today .today-card--primary {
 body.page-route-today .today-card__media {
   position: relative;
   overflow: hidden;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   aspect-ratio: 24 / 9;
   max-height: 7.2rem;
+}
+
+body.page-route-today .today-card__media img {
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
 }
 
 body.page-route-today .today-card__media::after {
