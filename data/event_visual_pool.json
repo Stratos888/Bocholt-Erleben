@@ -796,7 +796,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für eine Filmvorführung mit anonymem Publikum, Projektionsraum und ruhiger Kinoatmosphäre."
         },
         {
           "id": "film-screening-03",
@@ -804,7 +804,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für ein Filmgespräch oder Screening mit erwachsenen Gästen, leerer Leinwand und dezenter Abendstimmung."
         },
         {
           "id": "film-screening-04",
@@ -1372,7 +1372,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für Schützenfest-Tradition mit lokaler Prozession, Vereinskleidung und überwiegend anonymen Personen."
         },
         {
           "id": "shooting-festival-tradition-03",
@@ -1380,7 +1380,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für ein Schützenfest-Treffen mit Blumen, Hüten, Anzügen und geselliger Traditionsatmosphäre."
         },
         {
           "id": "shooting-festival-tradition-04",
@@ -1540,7 +1540,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen Büchermarkt mit Büchertischen, Kisten und ruhiger Stöberatmosphäre."
         },
         {
           "id": "book-market-03",
@@ -1548,7 +1548,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen regionalen Büchermarkt mit Außenständen, Hofkontext und entspannter Marktstimmung."
         },
         {
           "id": "book-market-04",
@@ -1725,7 +1725,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für eine ländliche Veranstaltung mit Hofmarkt, Blumen, Ernteprodukten und familienfreundlicher Außenatmosphäre."
         },
         {
           "id": "country-fair-rural-03",
@@ -1733,7 +1733,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen ländlichen Markt im Scheunen- oder Hofumfeld mit regionaler, dokumentarischer Stimmung."
         },
         {
           "id": "country-fair-rural-04",
@@ -2130,7 +2130,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen Tanz- oder Musikworkshop in einer einfachen Halle mit erwachsenen Teilnehmenden."
         },
         {
           "id": "dance-music-workshop-03",
@@ -2138,7 +2138,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen Rhythmus- oder Bewegungsworkshop mit erwachsener Gruppe und warmer Probenatmosphäre."
         },
         {
           "id": "dance-music-workshop-04",
@@ -2285,7 +2285,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für eine Laufveranstaltung mit erwachsenen Teilnehmenden vor dem Start und lokaler Sportatmosphäre."
         },
         {
           "id": "running-event-03",
@@ -2293,7 +2293,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen familienfreundlichen Lauf auf einer Route mit anonymen Teilnehmenden aus Distanz."
         },
         {
           "id": "running-event-04",
@@ -2367,7 +2367,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für eine lokale Radtour mit Alltagsrädern, Treffpunktstimmung und gemischter erwachsener Gruppe."
         },
         {
           "id": "cycling-event-03",
@@ -2375,7 +2375,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für eine regionale Fahrradtour auf einer flachen, baumgesäumten Strecke mit Freizeitgruppe."
         },
         {
           "id": "cycling-event-04",
@@ -2462,7 +2462,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für einen Amateur-Indoor-Wettkampf in einer Sporthalle mit erwachsenem Teamsport."
         },
         {
           "id": "indoor-sport-competition-03",
@@ -2470,7 +2470,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für ein Volleyballturnier in einer lokalen Sporthalle mit erwachsenen Amateurteams."
         },
         {
           "id": "indoor-sport-competition-04",
@@ -2752,7 +2752,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für ein Oldtimer-Treffen in kleinstädtischer Atmosphäre mit klassischen Autos und erwachsenen Gästen."
         },
         {
           "id": "vehicle-classic-03",
@@ -2760,7 +2760,7 @@
           "status": "ready",
           "source": "ai_generated_or_cleared_local",
           "rights_status": "ai_generated_symbolic_reviewed",
-          "alt": ""
+          "alt": "Symbolisches Event-Visual für ein klassisches Fahrzeugtreffen mit Oldtimer, Traktor, Motorrad und regionaler Besucheratmosphäre."
         },
         {
           "id": "vehicle-classic-04",

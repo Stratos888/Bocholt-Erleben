@@ -20,6 +20,8 @@ ACTIVITY_POOL_PATH = ROOT / "data" / "activity_visual_pool.json"
 VISUAL_STATUSES = {"ready", "usable", "fallback", "needs_review", "blocked"}
 EVENT_BACKLOG_STATUSES = {"planned"}
 ALL_ALLOWED_STATUSES = VISUAL_STATUSES | EVENT_BACKLOG_STATUSES
+PRODUCTION_ACTIVITY_VISUAL_STATUSES = {"ready", "usable", "fallback"}
+EVENT_POOL_ALLOWED_OWNERS = {"event_visual_pool_v1", "event_visual_pool_v31"}
 
 CARD_ASSET_MAX_BYTES = 450 * 1024
 CARD_ASSET_RATIO = 16 / 9
@@ -146,8 +148,12 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
         "non_16_9_ready": 0,
     }
 
-    if payload.get("owner") != "event_visual_pool_v1":
-        warnings.append("event_visual_pool.json owner is not event_visual_pool_v1.")
+    owner = str(payload.get("owner") or "").strip()
+    if owner not in EVENT_POOL_ALLOWED_OWNERS:
+        warnings.append(
+            "event_visual_pool.json owner is not one of "
+            f"{sorted(EVENT_POOL_ALLOWED_OWNERS)}: {owner or '<missing>'}."
+        )
 
     if not pools:
         errors.append("event_visual_pool.json has no pools.")
@@ -396,7 +402,7 @@ def audit_activity_visuals(errors: list[str], warnings: list[str]) -> dict[str, 
             else:
                 if asset_path.suffix.lower() != ".webp":
                     summary["local_non_webp_count"] += 1
-                    if len(local_non_webp_examples) < 12:
+                    if status in PRODUCTION_ACTIVITY_VISUAL_STATUSES and len(local_non_webp_examples) < 12:
                         local_non_webp_examples.append(f"{offer_id}: {relative(asset_path)}")
 
     if missing_status_examples:

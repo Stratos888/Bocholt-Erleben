@@ -2842,3 +2842,30 @@ Nach Merge bzw. Ausführung auf `main` ist noch live zu prüfen:
 4. Der spätere Build übernimmt `Events.visual_key` nach `events.json`.
 5. Deployte Event-Cards erhalten dadurch automatisch ein passendes Eventbild aus dem Visual-Pool.
 <!-- === END BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 | Zweck: dokumentiert Bereinigung der Visual-Audit-Warnungen; Umfang: Event-Alt-Texte, Audit-Owner-Check, Activity-JPG-Einordnung === -->
+## Visual-Audit-Warnungen bereinigt – 2026-06-09
+
+Scope:
+- keine neuen Bilder
+- keine UI-/App-Logik-Änderung
+- kein Event-Visual-Duplicate-Cleanup
+- kein Activity-Premium-Visual-Produktionslauf
+
+Umgesetzt:
+- 18 `ready`-Event-Visuals ohne Alt-Text in `data/event_visual_pool.json` wurden mit generischen, symbolischen Alt-Texten ergänzt.
+- `tools/audit-visual-contract.py` akzeptiert den dokumentierten Event-Pool-Owner `event_visual_pool_v31` zusätzlich zum historischen `event_visual_pool_v1`.
+- Lokale Activity-Bilder werden nur dann als Non-WebP-Warnung gemeldet, wenn sie produktiv verwendbar markiert sind (`ready`, `usable`, `fallback`).
+
+Bewusst geparkt:
+- `hilgelo-erleben` referenziert weiterhin das lokale JPG `/assets/activities/20250704_203925.jpg`, bleibt aber in `data/offers.json` als `image_quality: needs_review` eingeordnet.
+- Die finale Activity-Bildablösung erfolgt im separaten Activity-Premium-Visual-Workstream.
+- Die drei Activity-Einträge mit `needs_review` bleiben fachlich sichtbar im Audit-Summary, sind aber keine Strict-Warnung, solange sie nicht als produktive Premium-Assets freigegeben sind.
+
+Prüfziel:
+- `python3 tools/audit-visual-contract.py --strict` läuft ohne Fehler und ohne Warnungen durch.
+
+Ergebnis nach erfolgreicher Prüfung:
+- `Errors: none`
+- `Warnings / known visual debt: none`
+<!-- === END BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 === -->
