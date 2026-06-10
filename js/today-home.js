@@ -41,6 +41,8 @@
     mode: "for_you"
   };
 
+  const renderedVisualsByItem = new WeakMap();
+
   function qs(selector, root = document) {
     return root.querySelector(selector);
   }
@@ -157,22 +159,25 @@
     return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
   }
 
-  function resolveItemImage(item, usedImages) {
+  function resolveItemVisual(item, usedImages) {
     const ownImage = normalizeUrl(item?.image);
     if (ownImage) {
       if (usedImages) usedImages.add(ownImage);
-      return ownImage;
+      return Object.freeze({
+        src: ownImage,
+        alt: asString(item?.imageAlt || item?.image_alt || item?.alt)
+      });
     }
 
     if (item?.type !== "event") {
-      return "";
+      return null;
     }
 
     const visualKey = eventVisualKey(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
 
     if (!Array.isArray(pool) || !pool.length) {
-      return "";
+      return null;
     }
 
     const seed = [
@@ -191,11 +196,19 @@
 
       if (!usedImages || !usedImages.has(candidate.src) || offset === pool.length - 1) {
         if (usedImages) usedImages.add(candidate.src);
-        return candidate.src;
+        return Object.freeze({
+          src: candidate.src,
+          alt: asString(candidate.alt)
+        });
       }
     }
 
-    return "";
+    return null;
+  }
+
+  function resolveItemImage(item, usedImages) {
+    const visual = resolveItemVisual(item, usedImages);
+    return visual?.src || "";
   }
   /* === END BLOCK: TODAY_EVENT_VISUAL_POOL_HELPERS_V1 === */
 
@@ -671,8 +684,17 @@
   function renderCard(item, index, usedImages) {
     const context = createContext();
     const meta = item.type === "activity" ? buildActivityMeta(item, context) : buildEventMeta(item);
-    const image = resolveItemImage(item, usedImages);
+    const resolvedVisual = resolveItemVisual(item, usedImages);
+    const image = resolvedVisual?.src || "";
     const showTopBadge = index === 0 && isTopTipEligible(item, context);
+
+    if (item && typeof item === "object") {
+      if (resolvedVisual) {
+        renderedVisualsByItem.set(item, resolvedVisual);
+      } else {
+        renderedVisualsByItem.delete(item);
+      }
+    }
     const cardClass = [
       "today-card",
       `today-card--${item.type}`,
@@ -807,7 +829,16 @@
     }
 
     if (item.type === "event" && window.DetailPanel?.show) {
-      window.DetailPanel.show(item.raw || item);
+      const renderedVisual = item && typeof item === "object"
+        ? renderedVisualsByItem.get(item)
+        : null;
+      const resolvedVisual = renderedVisual || resolveItemVisual(item, null);
+      const detailEvent = {
+        ...(item.raw || item),
+        ...(resolvedVisual ? { resolvedVisual } : {})
+      };
+
+      window.DetailPanel.show(detailEvent);
       return;
     }
 
