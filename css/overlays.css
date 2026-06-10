@@ -1530,8 +1530,8 @@ Umfang:
   --dp-meta-icon-col: var(--dp-indicator-size);
 
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
 
   width: 100%;
   min-width: 0;
@@ -1547,6 +1547,7 @@ Umfang:
   width: var(--dp-indicator-size);
   height: var(--dp-indicator-size);
   flex: 0 0 var(--dp-indicator-size);
+  margin-top: 2px;
 
   display: inline-flex;
   align-items: center;
@@ -1588,10 +1589,8 @@ Umfang:
   color: rgba(31,41,51,0.92);
   line-height: 1.18;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
 
   overflow-wrap: break-word;
   word-break: normal;
