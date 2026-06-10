@@ -651,14 +651,56 @@
     return formatDate(item?.date);
   }
 
+  /* === BEGIN BLOCK: TODAY_HOME_CARD_META_CONTRACT_V1 | Zweck: vereinheitlicht Home-Card-Meta als Ort zuerst und knapper Zeit-/Statuskontext; Umfang: nur Event-Card-Meta, Detailpanel behaelt volle Adresse/Zeitdetails === */
+  function normalizeCardPlace(value) {
+    return asString(value)
+      .replace(/\b\d{5}\b/g, "")
+      .replace(/\s+/g, " ")
+      .replace(/^[,·\s]+|[,·\s]+$/g, "")
+      .trim();
+  }
+
+  function compactEventLocation(item) {
+    const explicitPlace = [
+      item?.locationArea,
+      item?.area,
+      item?.district,
+      item?.ortsteil,
+      item?.city,
+      item?.stadt,
+      item?.locationCity
+    ].map(normalizeCardPlace).find(Boolean);
+
+    if (explicitPlace) return explicitPlace;
+
+    const rawLocation = normalizeCardPlace(item?.location || item?.ort || item?.locationName);
+    if (!rawLocation) return "";
+
+    const commaParts = rawLocation.split(",").map(normalizeCardPlace).filter(Boolean);
+    if (commaParts.length > 1) return commaParts[commaParts.length - 1];
+
+    return rawLocation;
+  }
+
+  function compactEventTimeLabel(item) {
+    const date = formatEventDateLabel(item);
+    const time = asString(item?.time);
+
+    if (date && time && !date.includes("·")) return `${date} ${time}`;
+    return [date, time].filter(Boolean).join(" · ");
+  }
+
   function buildEventMeta(item) {
     const parts = [];
-    const date = formatEventDateLabel(item);
-    if (date) parts.push(date);
-    if (item.time) parts.push(item.time);
-    if (item.location) parts.push(item.location);
+    const location = compactEventLocation(item);
+    const timeLabel = compactEventTimeLabel(item);
+
+    if (location) parts.push(location);
+    if (timeLabel) parts.push(timeLabel);
+
     return parts.join(" · ");
   }
+  /* === END BLOCK: TODAY_HOME_CARD_META_CONTRACT_V1 === */
   /* === END BLOCK: TODAY_EVENT_META_RUNNING_LABELS_V1 === */
 
   function buildActivityMeta(item, context) {
