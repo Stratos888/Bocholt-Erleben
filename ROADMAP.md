@@ -58,6 +58,21 @@ Activity-Premium-Visuals bleiben ein eigener Workstream:
 ### Dokumentationsregel
 
 Wenn neue Chat-Starts oder ZIP-Stände verwendet werden, zuerst diesen aktuellen Prioritätsblock prüfen. Ältere historische Roadmap-Blöcke bleiben als Kontext erhalten, dürfen aber nicht automatisch als aktive nächste Schritte gelesen werden.
+
+### Nachgelagerter Prozessverbesserungs-Punkt
+
+KI-/Inbox-Prozess nach dem Main-Merge konsolidieren.
+
+Ziel:
+- `data/inbox_manual.json` nicht mehr als persistenten Repo-Puffer für temporäre Event-Kandidaten verwenden.
+- KI-/Manual-Kandidaten direkt oder über ein temporäres GitHub-Run-Artefakt in die Google-Sheet-Inbox überführen.
+- Import-/Cleanup-Rhythmus vereinheitlichen: wöchentlich passend zur KI-Suche plus manuell auslösbar bei Bedarf.
+- Prüfen, ob `duplikat` als finaler Inbox-Status im Cleanup mit archiviert werden soll.
+
+Bewertung:
+- Kein Blocker für den aktuellen Main-Merge, solange `data/inbox_manual.json` leer ist.
+- Separater Prozess-Härtungsworkpack nach Live-Freigabe.
+
 <!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 === -->
 
 ## Ausgangslage: Live-Messbasis
