@@ -421,3 +421,31 @@ Für größere UI-, Dashboard- oder Strukturpolish-Arbeiten gilt zusätzlich:
    - Erst nach Screenshot-/Smoke-Proof dokumentieren oder committen.
 
 <!-- END UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
+
+<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 | Zweck: dokumentiert schnellen lokalen UI-Preview-Workflow in Codespaces; Umfang: statische PWA-Ansichten, nicht Backend-/Deploy-Validierung === -->
+## Codespaces Preview für schnelle UI-Prüfungen
+
+Für schnelle UI-, CSS- und statische JS-Prüfungen kann in Codespaces ein lokaler Preview-Server genutzt werden. Das spart Zwischen-Deploys auf `staging` und ist besonders geeignet für Card-Layouts, Detailpanel, Header, Bottom-Navigation, responsive Verhalten und Bilddarstellung.
+
+Start im Repo-Root:
+
+    python3 -m http.server 8000 --bind 0.0.0.0 > /tmp/bocholt-preview.log 2>&1 &
+    echo $! > /tmp/bocholt-preview.pid
+
+Danach in Codespaces den Port `8000` über den Reiter `Ports` öffnen. Wichtige lokale Prüfrouten:
+
+- `/`
+- `/events/`
+- `/aktivitaeten/`
+- `/ueber/`
+- `/events-veroeffentlichen/`
+
+Bei PWA-/Browser-Cache-Problemen einen Cache-Buster nutzen, z. B. `?preview=ui-check`.
+
+Stoppen:
+
+    kill "$(cat /tmp/bocholt-preview.pid)"
+    rm -f /tmp/bocholt-preview.pid /tmp/bocholt-preview.log
+
+Grenze: Diese Preview ersetzt keine produktionsnahe Prüfung von STRATO, PHP-Endpunkten, Stripe, Webhooks, Mailversand oder Deploy-spezifischem Verhalten. Für solche Themen bleibt `staging` die maßgebliche Validierungsumgebung. Einzelne lokale Console-Warnungen durch Codespaces-/GitHub-Preview-Redirects oder fehlende generierte Datenexporte sind für reine UI-Prüfungen nicht automatisch blockierend.
+<!-- === END BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 === -->

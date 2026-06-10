@@ -1264,13 +1264,16 @@
   box-shadow: none;
 }
 
+/* === BEGIN BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V1 | Zweck: zeigt Activity-Bilder im mobilen Card-Feed als ruhige Thumbnail-Spalte analog zu Eventcards, ohne die bestehende Bildquelle oder Desktop-Geometrie zu ändern | Umfang: ersetzt nur mobile Activity-Card-Shell, Media und Body-Anbindung === */
 .page--activities .discovery-card--compact{
   --rail-w: 0px;
-  grid-template-columns: minmax(0, 1fr);
-  column-gap: 0;
-  align-items: start;
-  min-height: 96px;
-  padding: 14px;
+  --activity-card-thumb-w: clamp(78px, 24vw, 92px);
+  --activity-card-thumb-h: clamp(64px, 19vw, 74px);
+  grid-template-columns: minmax(0, 1fr) var(--activity-card-thumb-w);
+  column-gap: 10px;
+  align-items: center;
+  min-height: calc(var(--activity-card-thumb-h) + 22px);
+  padding: 11px;
   overflow: hidden;
 }
 
@@ -1280,12 +1283,101 @@
 }
 
 .page--activities .activity-card-media{
+  position: relative;
+  display: block;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  width: var(--activity-card-thumb-w);
+  height: var(--activity-card-thumb-h);
+  aspect-ratio: auto;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(229,237,229,0.96), rgba(213,226,216,0.92));
+  box-shadow:
+    inset 0 0 0 1px rgba(18,34,26,0.06),
+    0 8px 18px rgba(12,22,17,0.07);
+}
+
+.page--activities .activity-card-media::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(12,22,17,0.07) 100%);
+}
+
+.page--activities .activity-card-media__image{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--activity-image-fit, cover);
+  object-position: var(--activity-image-pos-x, 50%) var(--activity-image-pos-y, 50%);
+  background: rgba(232,236,224,0.92);
+}
+
+.page--activities .activity-card-media__badge{
+  display: none;
+}
+
+.page--activities .activity-card-media__scrim{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(18,30,24,0.015) 0%, rgba(18,30,24,0.09) 100%);
+}
+
+.page--activities .activity-card-media__content{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.page--activities .activity-card-media__icon{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(18,34,26,0.78);
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(18,34,26,0.05),
+    0 8px 18px rgba(12,22,17,0.08);
+}
+
+.page--activities .activity-card-media-icon-svg{
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+
+.page--activities .activity-card-media-icon-fallback{
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.page--activities .activity-card-media__label{
   display: none;
 }
 
 .page--activities .discovery-card--compact .event-card-body{
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  min-width: 0;
   gap: 4px;
 }
+
+.page--activities .event-title .activity-card-category-icon{
+  display: none;
+}
+/* === END BLOCK: ACTIVITIES_MOBILE_CARD_MEDIA_PARITY_V1 === */
 
 .page--activities .discovery-card--compact .event-title{
   margin: 0;
