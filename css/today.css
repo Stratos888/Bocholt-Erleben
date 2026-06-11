@@ -961,6 +961,7 @@ body.page-route-today footer {
     margin: 0;
     color: var(--home-copy-contrast);
     font-size: clamp(2.94rem, 2.76rem + 0.82vw, 3.78rem);
+    font-weight: 800;
     line-height: 0.98;
     letter-spacing: -0.056em;
     text-shadow: 0 1px 0 rgba(255,255,255,0.06);
