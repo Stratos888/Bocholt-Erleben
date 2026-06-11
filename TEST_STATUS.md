@@ -3026,6 +3026,65 @@ Bewertung:
 Die neue Today-Home ist für den aktuellen `staging`-Stand funktional releasefähig. Weitere Today-Arbeit soll ab jetzt nur noch als klar abgegrenzter visueller Feinschliff, Accessibility-Prüfung oder belegter Bugfix erfolgen.
 <!-- === END BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_PREMIUM_FREEZE_2026_06_11 | Zweck: dokumentiert die finale visuelle Premium-Abnahme der Today/Home nach Desktop-/Mobile-Preview; Umfang: / Today Home, Desktop-/Mobile-Layout, Hero-Typografie, CTA-Hierarchie, Footer; keine Activity-Bildproduktion === -->
+## Today/Home Premium Freeze – Desktop-/Mobile-Abnahme – 2026-06-11
+
+### Baseline
+
+- Branch: `staging`
+- Abschluss-HEAD: `5c849da` – `Gleiche Today Hero Titelgewicht an`
+- Relevante Vorarbeiten:
+  - `b2cb148` – `Gleiche Today Desktop Shell an Events an`
+  - `b24952f` – `Zentralisiere globalen Footer`
+  - `8ad02da` – `Nutze Activity Visual Pool auf Today Home`
+  - `3c62d7a` – `Strecke Today Card Media auf volle Breite`
+
+### Geprüfte Preview-Zustände
+
+Geprüft per Codespaces Preview, nicht per blindem Staging-Zwischen-Deploy:
+
+- Desktop `/` bei `1440 × 1220`, 100 % Zoom
+- Mobile `/` bei `390 × 844`, 100 % Zoom
+- Ausschnitte:
+  - Header
+  - Hero
+  - Wetterhinweis
+  - Empfehlungsfläche
+  - drei Today-Cards
+  - CTA-Karten
+  - Footer
+  - Bottom-Navigation
+
+### Ergebnis
+
+Today/Home ist visuell und layoutseitig für V1 eingefroren.
+
+Bestanden:
+
+- Header-Konsistenz zu Events/Aktivitäten.
+- Desktop-Hero wirkt als Premium-Top-Shell und nicht mehr wie ein isolierter Sonderfall.
+- Hero-Titelgewicht wurde an Events/Aktivitäten angeglichen.
+- Desktop-Lesefläche ist klar, aber keine harte weiße Box.
+- Übergang Hero → grüne Empfehlungsfläche ist ruhig.
+- Empfehlungs-Cards sind nicht zu schwer.
+- CTA-Karten `Alle Events ansehen` und `Aktivitäten entdecken` sind sichtbar, aber nicht dominanter als die Empfehlungen.
+- Mobile wurde durch Desktop-Polish nicht beschädigt.
+- Zentraler Footer ist auf `/`, `/events/` und `/aktivitaeten/` konsistent.
+
+### Freeze-Entscheidung
+
+- Today/Home V1 gilt als visuell abgeschlossen.
+- Weitere CSS-/Layout-Arbeit an `/` nur noch bei konkretem belegtem Symptom.
+- Keine offenen generischen Polish-Runden mehr für Today/Home.
+
+### Bewusste Nicht-Blocker
+
+- Das sichtbare `Textilwerk Bocholt`-Bild wirkt dunkel/schwer.
+- Das ist kein CSS-/Layout-Blocker.
+- Bildqualität einzelner Activity-Cards gehört in den separaten Activity-Premium-Visual-Workstream.
+- Keine dauerhafte Bildrettung per CSS.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_PREMIUM_FREEZE_2026_06_11 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 | Zweck: dokumentiert Abschluss des Activity-Card-Bild-Polish-Workpacks; Umfang: mobile Activity-Cards, Kategorie-Kicker, Codespaces-Preview-Nutzung === -->
 ## Activity Card Images / Mobile Card Polish abgeschlossen
 

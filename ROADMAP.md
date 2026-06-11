@@ -915,7 +915,7 @@ Freeze-Bedingung:
 
 Status: historisch / durch spätere Workpacks überholt. Aktuelle Priorität siehe `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
 
-### 1. Today Home Premium Completion
+### 1. Today Home Premium Completion – abgeschlossen 2026-06-11
 
 Ziel: Die Home-/Today-Seite soll nicht nur V1-tauglich, sondern vollständig premium-fertig werden.
 
@@ -936,9 +936,10 @@ Nicht als Layout-Problem weiterführen:
 - Roh wirkende Teasertexte durch harte Textabbrüche.
 - Schwache oder zufällige Motive in prominenten Karten.
 
-Verbleibender Premium-Hebel:
-- Today Home nur mit wirklich geeigneten Visuals und redaktionell sauberen Kurztexten abschließen.
-- Schwache Activity-Bilder wie Stadtwald/Rohr oder zu generische Naturdetails nicht per CSS retten, sondern ersetzen, zurückstufen oder aus Today ausschließen.
+Abschlussstand 2026-06-11:
+- Today Home ist layout- und UI-seitig auf Desktop und Mobile abgeschlossen.
+- Weitere Today/Home-CSS-Arbeit nur noch bei konkretem belegtem Symptom.
+- Schwache oder zu dunkle Activity-Bilder bleiben ein separater Activity-Premium-Visual-Workstream und werden nicht per CSS gerettet.
 
 ### 2. Premium Visual Contract V1
 
@@ -987,7 +988,7 @@ Geplanter Zielzustand:
 
 Priorität:
 1. Visual Contract V1 dokumentiert und technisch vorbereiten.
-2. Today Home Content-/Visual-Polish abschließen.
+2. Today Home Content-/Visual-Polish abgeschlossen; weitere Today/Home-Layoutarbeit nur bei belegtem Symptom.
 3. Events Feed Visual Integration als nächster Hauptworkstream.
 4. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
 <!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 === -->
