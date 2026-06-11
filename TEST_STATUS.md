@@ -3049,3 +3049,86 @@ Relevante Commits:
 - `88d1e12` — Zeige Activitybilder in mobilen Cards
 - `0cd9ab7` — Entferne Kategorie-Kicker aus Activitycards
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
+## Activity Visual Phase A – Pool-Integration abgeschlossen (2026-06-11)
+
+### Status
+
+Activity Visual Phase A ist abgeschlossen.
+
+Die geprüften und vorbereiteten Activity-Bilder wurden als lokale 16:9-WebP-Assets integriert und im Activity Visual Pool registriert.
+
+Bestätigter Commit:
+
+- `7a78240` – `Integriere Activity Visual Phase A Assets`
+
+Aktueller bestätigter Staging-Stand nach nachgelagertem Today-Commit:
+
+- `b2cb148` – `Gleiche Today Desktop Shell an Events an`
+
+### Umfang
+
+Integriert wurden:
+
+- 16 neue WebP-Assets unter `assets/activity-visuals/`
+- 16 neue Pool-Einträge in `data/activity_visual_pool.json`
+- keine Änderungen an `data/offers.json`
+- keine Änderungen an `js/offers.js`
+- keine Änderungen an `js/offers-details.js`
+- keine Änderungen an `css/today.css` durch diesen Workstream
+
+### Finaler Audit-Stand
+
+Letzter bestätigter Audit:
+
+- `python3 tools/audit-visual-contract.py --strict`
+
+Ergebnis:
+
+- Activity visual pool:
+  - `exists: True`
+  - `pools: 41`
+  - `images: 41`
+  - `ready: 38`
+  - `fallback: 3`
+  - `missing ready/fallback files: 0`
+  - `ready/fallback non-WebP: 0`
+  - `ready/fallback oversized: 0`
+  - `ready/fallback missing alt: 0`
+  - `ready/fallback not 16:9: 0`
+- Activity visuals:
+  - `offers: 44`
+  - `explicit images: 44`
+  - `visual keys: 0`
+- `Warnings / known visual debt: none`
+- `Errors: none`
+
+### Einordnung
+
+Die Asset- und Pool-Basis ist damit technisch sauber.
+
+Die öffentlichen Activity-Flächen nutzen die neuen Poolbilder noch nicht vollständig, weil die Offer-Daten weiterhin explizite Bilder verwenden und noch keine `visual_key`-Zuordnung gesetzt ist.
+
+Das ist bewusst offen und gehört in Phase B.
+
+### Offener nächster Schritt
+
+Activity Visual Phase B:
+
+- `data/offers.json` mit passenden `visual_key`-Werten ausstatten
+- `js/offers.js` so umstellen, dass der Activity Visual Pool Vorrang vor `offer.image` hat
+- `js/offers-details.js` auf dieselbe Bildauflösung bringen
+- `offer.image` nur noch als Fallback verwenden
+- danach Audit, Syntaxchecks und UI-Smoke-Test auf `/aktivitaeten/`
+
+### Weiterhin nicht final premium
+
+| Activity-ID | Status | Maßnahme |
+|---|---|---|
+| `suderwicker-maerchenspielplatz` | `own_photo_required` | echtes Foto ohne erkennbare Kinder/Personen beschaffen |
+| `waldlehrpfad-am-vossenpand` | `request_permission` | Stadt Bocholt/ESB um Freigabe für besseres personenfreies Galeriebild bitten |
+| `handwerksmuseum-bocholt-erleben` | `request_permission` | Handwerksmuseum/Stadt Bocholt um hochauflösendes Innen-/Werkstattbild bitten |
+| `das-mysterium-von-winterswijk` | `request_permission` | 100% Winterswijk/Tourismus Winterswijk um offizielles Routenmotiv bitten |
+| `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
