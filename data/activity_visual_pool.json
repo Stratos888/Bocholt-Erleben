@@ -623,6 +623,470 @@
           "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
         }
       ]
+    },
+    "bocholter_innenstadt_erleben": {
+      "label": "bocholter-innenstadt-erleben",
+      "description": "Rathaus/Markt als Innenstadtmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bocholter-innenstadt-erleben"
+      ],
+      "images": [
+        {
+          "id": "bocholter-innenstadt-erleben-01",
+          "src": "/assets/activity-visuals/bocholter-innenstadt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Belebter Marktplatz vor dem historischen Rathaus in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 3.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2013_bocholt_rathaus_markt.JPG",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Rathaus/Markt als Innenstadtmotiv."
+        }
+      ]
+    },
+    "erlebnispfad_klostersee_burlo": {
+      "label": "erlebnispfad-klostersee-burlo",
+      "description": "Echter Klostersee.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "erlebnispfad-klostersee-burlo"
+      ],
+      "images": [
+        {
+          "id": "erlebnispfad-klostersee-burlo-01",
+          "src": "/assets/activity-visuals/erlebnispfad-klostersee-burlo-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Großer Blick über den Klostersee in Burlo mit Ufer und angrenzender Landschaft.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Günter Seggebäing",
+          "license": "CC BY-SA 3.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:20140720_115339_Klostersee_Burlo,_Borken_(DSC04592).jpg",
+          "credit": "Günter Seggebäing / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Echter Klostersee."
+        }
+      ]
+    },
+    "heelweg_dinxperlo_suderwick_entdecken": {
+      "label": "heelweg-dinxperlo-suderwick-entdecken",
+      "description": "Echtes Grenzortmotiv für Heelweg/Dinxperlo-Suderwick.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "heelweg-dinxperlo-suderwick-entdecken"
+      ],
+      "images": [
+        {
+          "id": "heelweg-dinxperlo-suderwick-entdecken-01",
+          "src": "/assets/activity-visuals/heelweg-dinxperlo-suderwick-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Grenzstraße zwischen Suderwick und Dinxperlo mit Ortsschildern und Straßenraum.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2021-03-24_Dinxperlo_Suderwick_03.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Echtes Grenzortmotiv für Heelweg/Dinxperlo-Suderwick."
+        }
+      ]
+    },
+    "grenzenlos_wandern_dinxperlo_suderwick": {
+      "label": "grenzenlos-wandern-dinxperlo-suderwick",
+      "description": "Aktuell bestverfügbar, aber nicht Premium-Endstand wegen sichtbarer Marke/Schilder.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "grenzenlos-wandern-dinxperlo-suderwick"
+      ],
+      "images": [
+        {
+          "id": "grenzenlos-wandern-dinxperlo-suderwick-01",
+          "src": "/assets/activity-visuals/grenzenlos-wandern-dinxperlo-suderwick-16x9.webp",
+          "status": "fallback",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Grenzbereich zwischen Suderwick und Dinxperlo mit Straßenraum und Grenzbezug.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "fallback_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2021_Dinxperlo_Suderwick_border_02.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Aktuell bestverfügbar, aber nicht Premium-Endstand wegen sichtbarer Marke/Schilder."
+        }
+      ]
+    },
+    "unterduikmuseum_aalten_entdecken": {
+      "label": "unterduikmuseum-aalten-entdecken",
+      "description": "Aktuelles echtes Museumsmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "unterduikmuseum-aalten-entdecken"
+      ],
+      "images": [
+        {
+          "id": "unterduikmuseum-aalten-entdecken-01",
+          "src": "/assets/activity-visuals/unterduikmuseum-aalten-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Historischer Innenraum im Nationaal Onderduikmuseum in Aalten.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2025-02-11_Nationaal_Onderduikmuseum_ZvD_101.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Aktuelles echtes Museumsmotiv."
+        }
+      ]
+    },
+    "textilwerk_bocholt_erleben": {
+      "label": "textilwerk-bocholt-erleben",
+      "description": "Starkes reales Textilwerk-/Spinnereimotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "textilwerk-bocholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "textilwerk-bocholt-erleben-01",
+          "src": "/assets/activity-visuals/textilwerk-bocholt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Industriearchitektur und Außenbereich des TextilWerks in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2025-04-22_LWL-Museum_Textilwerk_Spinnerei_59.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Starkes reales Textilwerk-/Spinnereimotiv."
+        }
+      ]
+    },
+    "museumfabriek_winterswijk_erleben": {
+      "label": "museumfabriek-winterswijk-erleben",
+      "description": "16:9-nahes Museumsbild.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "museumfabriek-winterswijk-erleben"
+      ],
+      "images": [
+        {
+          "id": "museumfabriek-winterswijk-erleben-01",
+          "src": "/assets/activity-visuals/museumfabriek-winterswijk-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Ausstellungsraum in der Museumfabriek Winterswijk.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2026-03-17_MuseumFabriek_Winterswijk_23.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "16:9-nahes Museumsbild."
+        }
+      ]
+    },
+    "erlebnisweg_olle_kerkpatt": {
+      "label": "erlebnisweg-olle-kerkpatt",
+      "description": "Themenbezogener Fallback; Nutzungskontext beachten.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "erlebnisweg-olle-kerkpatt"
+      ],
+      "images": [
+        {
+          "id": "erlebnisweg-olle-kerkpatt-01",
+          "src": "/assets/activity-visuals/erlebnisweg-olle-kerkpatt-16x9.webp",
+          "status": "fallback",
+          "source": "presse_service",
+          "rights_status": "contextual_publication_with_credit",
+          "alt": "Landschaftlicher Weg bei Barlo mit Blick Richtung Dorf und Kirche.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "fallback_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Stadt Bocholt / Presse-Service",
+          "license": "Veröffentlichung mit Fotonachweis im thematischen Zusammenhang",
+          "source_page": "https://www.presse-service.de/medienarchiv.aspx?medien_id=303633",
+          "credit": "Stadt Bocholt / Presse-Service",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Themenbezogener Fallback; Nutzungskontext beachten."
+        }
+      ]
+    },
+    "gaengeskes_aalten_entdecken": {
+      "label": "gaengeskes-aalten-entdecken",
+      "description": "Aaltener Gassen-/Straßenmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "gaengeskes-aalten-entdecken"
+      ],
+      "images": [
+        {
+          "id": "gaengeskes-aalten-entdecken-01",
+          "src": "/assets/activity-visuals/gaengeskes-aalten-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "public_domain",
+          "alt": "Historische Straße in Aalten mit typischer kleinstädtischer Bebauung.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Arch",
+          "license": "Public Domain",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Aalten-Dijkstraat_010.JPG",
+          "credit": "Arch / Wikimedia Commons / Public Domain",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Aaltener Gassen-/Straßenmotiv."
+        }
+      ]
+    },
+    "quellengrundpark_weseke_entdecken": {
+      "label": "quellengrundpark-weseke-entdecken",
+      "description": "Apothekergarten-/Parkpanorama.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "quellengrundpark-weseke-entdecken"
+      ],
+      "images": [
+        {
+          "id": "quellengrundpark-weseke-entdecken-01",
+          "src": "/assets/activity-visuals/quellengrundpark-weseke-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc0_no_attribution_required",
+          "alt": "Apothekergarten im Quellengrundpark in Weseke.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Wikimedia Commons",
+          "license": "CC0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Apothekergarten_Quellengrundpark_Borken-Weseke.jpg",
+          "credit": "Wikimedia Commons / CC0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Apothekergarten-/Parkpanorama."
+        }
+      ]
+    },
+    "kubaai_aa_promenade_aktiv_erleben": {
+      "label": "kubaai-aa-promenade-aktiv-erleben",
+      "description": "Kubaai-/TextilWerk-Umfeld.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "kubaai-aa-promenade-aktiv-erleben"
+      ],
+      "images": [
+        {
+          "id": "kubaai-aa-promenade-aktiv-erleben-01",
+          "src": "/assets/activity-visuals/kubaai-aa-promenade-aktiv-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Backsteinarchitektur am Kubaai- und TextilWerk-Umfeld in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ingo G. Krasenbrink",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bocholt_TextilWerk_Kubaai_4.jpg",
+          "credit": "Ingo G. Krasenbrink / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Kubaai-/TextilWerk-Umfeld."
+        }
+      ]
+    },
+    "sternbusch_gemen_erleben": {
+      "label": "sternbusch-gemen-erleben",
+      "description": "Starkes reales Burg-Gemen-Motiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "sternbusch-gemen-erleben"
+      ],
+      "images": [
+        {
+          "id": "sternbusch-gemen-erleben-01",
+          "src": "/assets/activity-visuals/sternbusch-gemen-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Blick auf das Wasserschloss Gemen mit Wassergraben und Park.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Wasserschloss_Gemen_--_2014_--_2251.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Starkes reales Burg-Gemen-Motiv."
+        }
+      ]
+    },
+    "bredevoort_buecherstadt_erleben": {
+      "label": "bredevoort-buecherstadt-erleben",
+      "description": "Passendes Bücherstadt-/Antiquariat-Motiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bredevoort-buecherstadt-erleben"
+      ],
+      "images": [
+        {
+          "id": "bredevoort-buecherstadt-erleben-01",
+          "src": "/assets/activity-visuals/bredevoort-buecherstadt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Antiquariat in Bredevoort mit außen sichtbaren Büchern.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bredevoort_(NL),_Antiquariat_an_der_Landstraat_--_2016_--_4151.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Passendes Bücherstadt-/Antiquariat-Motiv."
+        }
+      ]
+    },
+    "vestingpark_st_bernardus_erleben": {
+      "label": "vestingpark-st-bernardus-erleben",
+      "description": "Reales Park-/Grachtmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "vestingpark-st-bernardus-erleben"
+      ],
+      "images": [
+        {
+          "id": "vestingpark-st-bernardus-erleben-01",
+          "src": "/assets/activity-visuals/vestingpark-st-bernardus-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Parklandschaft mit Wasser und Pavillon im Vestingpark St. Bernardus.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bredevoort_(NL),_Gro%C3%9Fe_Gracht_und_Laube_im_Vestingpark_Sint_Bernardus_--_2016_--_4147.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Reales Park-/Grachtmotiv."
+        }
+      ]
+    },
+    "handwerk_in_winterswijk": {
+      "label": "handwerk-in-winterswijk",
+      "description": "Winterswijk-Handwerk-/Industriekulturmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "handwerk-in-winterswijk"
+      ],
+      "images": [
+        {
+          "id": "handwerk-in-winterswijk-01",
+          "src": "/assets/activity-visuals/handwerk-in-winterswijk-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Erhaltenes Fabriktor als Motiv der Winterswijker Handwerks- und Industriegeschichte.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Rijksdienst voor het Cultureel Erfgoed / Wikimedia Commons",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Deels_bewaard_gebleven_fabriekspoort_-_Winterswijk_-_20527932_-_RCE.jpg",
+          "credit": "Rijksdienst voor het Cultureel Erfgoed / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Winterswijk-Handwerk-/Industriekulturmotiv."
+        }
+      ]
+    },
+    "wasserburg_anholt_erleben": {
+      "label": "wasserburg-anholt-erleben",
+      "description": "Starkes hochauflösendes Wasserburgmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "wasserburg-anholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "wasserburg-anholt-erleben-01",
+          "src": "/assets/activity-visuals/wasserburg-anholt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Wasserburg Anholt mit Spiegelung im Wasser und historischer Schlossansicht.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Worldfootage",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Wasserburg_Anholt_P1740796.jpg",
+          "credit": "Worldfootage / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Starkes hochauflösendes Wasserburgmotiv."
+        }
+      ]
     }
   }
 }
