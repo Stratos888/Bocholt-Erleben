@@ -1903,6 +1903,79 @@ Weitere Änderungen nur noch bei:
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26 === -->
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PREMIUM_ASSET_INTEGRATION_2026_06_11 | Zweck: dokumentiert den geprüften Stand der Activity-Premiumbild-Assetintegration; Umfang: Activity Visual Pool, finale WebP-Assets, B2-Tonwerke-Fallback, offene Frontend-Verdrahtung === -->
+## Activity Visual Premium Asset Integration – Staging-Stand 2026-06-11
+
+Status: Asset-Integration abgeschlossen, Frontend-/Offer-Verdrahtung noch offen.
+
+### Gesicherte Commits
+
+- `ed2fcc6` – Ergaenze B2 Tonwerke Fallback Visual
+- `1603c84` – Ordne falsch abgelegte Activity Visuals den Event Visuals zu
+- `91125bd` – Integriere akzeptierte Activity Visuals
+- `1b7f2ee` – Dokumentiere Codespaces Quota Fallback
+
+### Ergebnis
+
+Der Activity-Visual-Pool enthält jetzt 25 Pools mit 25 Bildern:
+
+- 24 akzeptierte KI-generierte Activity-Premiumbilder mit Status `ready`
+- 1 rechtlich nutzbarer echter Foto-Fallback mit Status `fallback` für `b2-tonwerke-route`
+- keine fehlenden Ready-/Fallback-Dateien
+- keine Ready-/Fallback-Non-WebP-Dateien
+- keine übergroßen Ready-/Fallback-Dateien
+- keine fehlenden Alt-Texte
+- keine 16:9-Verletzungen
+- Visual-Audit: `Errors: none`
+
+### Integrierte ready-Activity-Bilder
+
+- `100-schloesser-route-ab-bocholt`
+- `aasee-erleben`
+- `auesee-wesel-erleben`
+- `b1-mosse-route`
+- `bocholter-aa-radweg-erleben`
+- `burloer-venn-entdecken`
+- `die-berge-hombornquelle-entdecken`
+- `flamingoroute-ab-bocholt`
+- `hilgelo-erleben`
+- `hohe-mark-radroute-ab-bocholt`
+- `hohenhorster-berge-entdecken`
+- `korenburgerveen-entdecken`
+- `mtb-route-winterswijk`
+- `naturkulturspaziergang-bocholt-rhede`
+- `niederrhein-route-ab-bocholt`
+- `noaberpad-ab-bocholt`
+- `proebstingsee-borken-erleben`
+- `schmuggelroute`
+- `schwarzes-wasser-wesel-entdecken`
+- `stadtwald-bocholt-erleben`
+- `witte-venn-ahaus-alstaette-entdecken`
+- `wooldse-veen-entdecken`
+- `zeitreise-dingdener-heide`
+- `zwillbrocker-venn-flamingos-entdecken`
+
+### Fallback-Bild
+
+`b2-tonwerke-route` nutzt vorerst einen rechtlich nutzbaren Wikimedia-Commons-Foto-Fallback von Dietmar Rabich unter CC BY-SA 4.0.
+
+Wichtige Folgepflicht:
+Bei öffentlicher Nutzung muss der Bildnachweis bzw. die Lizenzangabe sauber berücksichtigt werden. Der aktuelle Stand ist technisch als Fallback integriert, aber kein Premium-Endbild. Ein besseres Betreiber-/Stadt-/Vereinsfoto bleibt später bevorzugt.
+
+### Bewusste Nicht-Übernahmen
+
+Der zusätzliche Schlossrouten-Versuch aus der Inbox wurde nicht importiert, weil der spätere Schloss-/Gräften-Ausschnitt für `100-schloesser-route-ab-bocholt` stärker und eindeutiger war.
+
+Temporäre Inbox-Dateien und Contactsheets wurden nicht committed.
+
+### Offener nächster Workstream
+
+Die Assets sind im `data/activity_visual_pool.json` vorhanden. Die öffentlichen Activities nutzen laut Audit weiterhin `explicit images` und noch keine `visual_keys`.
+
+Nächster sinnvoller Schritt:
+Activity-Frontend-/Datenmapping so umstellen, dass die Activities ihre neuen Pool-Bilder tatsächlich nutzen. Dabei B2-Tonwerke als `fallback` behandeln und nicht als vollwertiges Premium-Ready-Bild verkaufen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PREMIUM_ASSET_INTEGRATION_2026_06_11 === -->
+
 <!-- === END FILE: TEST_STATUS.md === -->
 
 <!-- === BEGIN BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand für Public-UX-Copy und Anbieterbereich-Wertzentrum; Umfang: reiner Test-/Statusnachweis ohne technische Änderung === -->
