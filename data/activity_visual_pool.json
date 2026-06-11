@@ -47,6 +47,582 @@
           "note": "Rechtlich nutzbarer Fallback fuer b2-tonwerke-route; kein Premium-Endbild. Besseres Betreiber-/Stadtfoto spaeter bevorzugt."
         }
       ]
+    },
+    "hilgelo_erleben": {
+      "label": "hilgelo-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer hilgelo-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hilgelo-erleben"
+      ],
+      "images": [
+        {
+          "id": "hilgelo-erleben-01",
+          "src": "/assets/activity-visuals/hilgelo-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ruhiger Freizeitsee mit kleinem Steg, Sandufer und grünem Uferbereich.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "hohenhorster_berge_entdecken": {
+      "label": "hohenhorster-berge-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer hohenhorster-berge-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hohenhorster-berge-entdecken"
+      ],
+      "images": [
+        {
+          "id": "hohenhorster-berge-entdecken-01",
+          "src": "/assets/activity-visuals/hohenhorster-berge-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Sandiger Weg durch lichte Heide- und Waldlandschaft der Hohenhorster Berge.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "bocholter_aa_radweg_erleben": {
+      "label": "bocholter-aa-radweg-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer bocholter-aa-radweg-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bocholter-aa-radweg-erleben"
+      ],
+      "images": [
+        {
+          "id": "bocholter-aa-radweg-erleben-01",
+          "src": "/assets/activity-visuals/bocholter-aa-radweg-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Radweg entlang eines ruhigen Flusslaufs mit grünen Ufern.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "burloer_venn_entdecken": {
+      "label": "burloer-venn-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer burloer-venn-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "burloer-venn-entdecken"
+      ],
+      "images": [
+        {
+          "id": "burloer-venn-entdecken-01",
+          "src": "/assets/activity-visuals/burloer-venn-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Feuchtgebiet mit schmalem Weg, Wasserflächen und Vennvegetation.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "aasee_erleben": {
+      "label": "aasee-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer aasee-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "aasee-erleben"
+      ],
+      "images": [
+        {
+          "id": "aasee-erleben-01",
+          "src": "/assets/activity-visuals/aasee-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ruhiger See mit Uferweg, Wiese und Baumgürtel.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "korenburgerveen_entdecken": {
+      "label": "korenburgerveen-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer korenburgerveen-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "korenburgerveen-entdecken"
+      ],
+      "images": [
+        {
+          "id": "korenburgerveen-entdecken-01",
+          "src": "/assets/activity-visuals/korenburgerveen-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Bohlenweg durch nasses Moor- und Venngebiet.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "zwillbrocker_venn_flamingos_entdecken": {
+      "label": "zwillbrocker-venn-flamingos-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer zwillbrocker-venn-flamingos-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "zwillbrocker-venn-flamingos-entdecken"
+      ],
+      "images": [
+        {
+          "id": "zwillbrocker-venn-flamingos-entdecken-01",
+          "src": "/assets/activity-visuals/zwillbrocker-venn-flamingos-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Venngewässer mit Flamingos in weiter Beobachtungsdistanz.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "wooldse_veen_entdecken": {
+      "label": "wooldse-veen-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer wooldse-veen-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "wooldse-veen-entdecken"
+      ],
+      "images": [
+        {
+          "id": "wooldse-veen-entdecken-01",
+          "src": "/assets/activity-visuals/wooldse-veen-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Schmaler Plankenweg durch stilles Moor- und Grenzvenn.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "noaberpad_ab_bocholt": {
+      "label": "noaberpad-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer noaberpad-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "noaberpad-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "noaberpad-ab-bocholt-01",
+          "src": "/assets/activity-visuals/noaberpad-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Schmaler Wanderpfad entlang eines kleinen Bachlaufs im Wald.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "mtb_route_winterswijk": {
+      "label": "mtb-route-winterswijk",
+      "description": "Exklusives Activity-Hauptbild fuer mtb-route-winterswijk.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "mtb-route-winterswijk"
+      ],
+      "images": [
+        {
+          "id": "mtb-route-winterswijk-01",
+          "src": "/assets/activity-visuals/mtb-route-winterswijk-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Mountainbike-Strecke als schmaler Waldtrail mit dezenter Wegmarkierung.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "hohe_mark_radroute_ab_bocholt": {
+      "label": "hohe-mark-radroute-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer hohe-mark-radroute-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hohe-mark-radroute-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "hohe-mark-radroute-ab-bocholt-01",
+          "src": "/assets/activity-visuals/hohe-mark-radroute-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Zwei Radfahrende auf ruhigem Weg durch grüne Parklandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "proebstingsee_borken_erleben": {
+      "label": "proebstingsee-borken-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer proebstingsee-borken-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "proebstingsee-borken-erleben"
+      ],
+      "images": [
+        {
+          "id": "proebstingsee-borken-erleben-01",
+          "src": "/assets/activity-visuals/proebstingsee-borken-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Freizeitsee mit Sandufer, Liegewiese und ruhiger Wasserfläche.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "100_schloesser_route_ab_bocholt": {
+      "label": "100-schloesser-route-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer 100-schloesser-route-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "100-schloesser-route-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "100-schloesser-route-ab-bocholt-01",
+          "src": "/assets/activity-visuals/100-schloesser-route-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Historisches Wasserschloss mit Gräfte und grüner Parklandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "zeitreise_dingdener_heide": {
+      "label": "zeitreise-dingdener-heide",
+      "description": "Exklusives Activity-Hauptbild fuer zeitreise-dingdener-heide.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "zeitreise-dingdener-heide"
+      ],
+      "images": [
+        {
+          "id": "zeitreise-dingdener-heide-01",
+          "src": "/assets/activity-visuals/zeitreise-dingdener-heide-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Heide- und Feuchtheidelandschaft mit sandigem Pfad und weitem Blick.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "die_berge_hombornquelle_entdecken": {
+      "label": "die-berge-hombornquelle-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer die-berge-hombornquelle-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "die-berge-hombornquelle-entdecken"
+      ],
+      "images": [
+        {
+          "id": "die-berge-hombornquelle-entdecken-01",
+          "src": "/assets/activity-visuals/die-berge-hombornquelle-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Sandige Hügel- und Heidelandschaft mit lockerem Waldsaum.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "schwarzes_wasser_wesel_entdecken": {
+      "label": "schwarzes-wasser-wesel-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer schwarzes-wasser-wesel-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "schwarzes-wasser-wesel-entdecken"
+      ],
+      "images": [
+        {
+          "id": "schwarzes-wasser-wesel-entdecken-01",
+          "src": "/assets/activity-visuals/schwarzes-wasser-wesel-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Dunkler Heideweiher im Wald mit sandigem Ufer und Kiefern.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "flamingoroute_ab_bocholt": {
+      "label": "flamingoroute-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer flamingoroute-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "flamingoroute-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "flamingoroute-ab-bocholt-01",
+          "src": "/assets/activity-visuals/flamingoroute-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Radroute durch grüne Feuchtgebiets- und Vennlandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "niederrhein_route_ab_bocholt": {
+      "label": "niederrhein-route-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer niederrhein-route-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "niederrhein-route-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "niederrhein-route-ab-bocholt-01",
+          "src": "/assets/activity-visuals/niederrhein-route-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Flacher Niederrhein-Radweg entlang von Wiesen, Wasser und Baumreihen.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "witte_venn_ahaus_alstaette_entdecken": {
+      "label": "witte-venn-ahaus-alstaette-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer witte-venn-ahaus-alstaette-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "witte-venn-ahaus-alstaette-entdecken"
+      ],
+      "images": [
+        {
+          "id": "witte-venn-ahaus-alstaette-entdecken-01",
+          "src": "/assets/activity-visuals/witte-venn-ahaus-alstaette-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Grenzvenn mit Heide, Wollgras, Moorwasser und lockerem Waldsaum.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "schmuggelroute": {
+      "label": "schmuggelroute",
+      "description": "Exklusives Activity-Hauptbild fuer schmuggelroute.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "schmuggelroute"
+      ],
+      "images": [
+        {
+          "id": "schmuggelroute-01",
+          "src": "/assets/activity-visuals/schmuggelroute-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ländlicher Grenzweg mit Hecken, Feldern und sandigem Wegverlauf.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "b1_mosse_route": {
+      "label": "b1-mosse-route",
+      "description": "Exklusives Activity-Hauptbild fuer b1-mosse-route.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "b1-mosse-route"
+      ],
+      "images": [
+        {
+          "id": "b1-mosse-route-01",
+          "src": "/assets/activity-visuals/b1-mosse-route-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Bocholter Wasserlauf mit Uferweg, Backsteinmauern und Industriekultur-Anmutung.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "auesee_wesel_erleben": {
+      "label": "auesee-wesel-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer auesee-wesel-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "auesee-wesel-erleben"
+      ],
+      "images": [
+        {
+          "id": "auesee-wesel-erleben-01",
+          "src": "/assets/activity-visuals/auesee-wesel-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Großer Freizeitsee mit Sandstrand, Liegewiese und grünem Baumgürtel.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "stadtwald_bocholt_erleben": {
+      "label": "stadtwald-bocholt-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer stadtwald-bocholt-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "stadtwald-bocholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "stadtwald-bocholt-erleben-01",
+          "src": "/assets/activity-visuals/stadtwald-bocholt-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ruhiger Waldweg im Stadtwald Bocholt mit dichter grüner Vegetation.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
+    },
+    "naturkulturspaziergang_bocholt_rhede": {
+      "label": "naturkulturspaziergang-bocholt-rhede",
+      "description": "Exklusives Activity-Hauptbild fuer naturkulturspaziergang-bocholt-rhede.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "naturkulturspaziergang-bocholt-rhede"
+      ],
+      "images": [
+        {
+          "id": "naturkulturspaziergang-bocholt-rhede-01",
+          "src": "/assets/activity-visuals/naturkulturspaziergang-bocholt-rhede-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Natur- und Kulturroute mit weitem Landschaftsblick, Weg und historischem Maueranker.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "note": "Im Activity Visual Anchor Test akzeptiertes exklusives Activity-Bild."
+        }
+      ]
     }
   }
 }
