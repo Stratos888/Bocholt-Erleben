@@ -549,6 +549,35 @@
           "note": ""
         }
       ]
+    },
+    "b2_tonwerke_route": {
+      "label": "B2 Tonwerke-Route",
+      "description": "Rechtlich nutzbarer echter Foto-Fallback fuer die B2-Route mit Tonwerke-/Freizeitzentrum-Bezug.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "b2-tonwerke-route"
+      ],
+      "images": [
+        {
+          "id": "b2-tonwerke-route-01",
+          "src": "/assets/activity-visuals/b2-tonwerke-route-01.webp",
+          "status": "fallback",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Luftbild des Freizeitzentrums Tonwerke in Bocholt mit Wasserfläche, Liegewiese und Freizeitbereich.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "review_status": "fallback_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bocholt,_Freizeitzentrum_Tonwerke_--_2014_--_2151.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "note": "Rechtlich nutzbarer Fallback fuer b2-tonwerke-route; kein Premium-Endbild. Besseres Betreiber-/Stadtfoto spaeter bevorzugt."
+        }
+      ]
     }
   }
 }
