@@ -510,3 +510,37 @@ Stoppen:
 
 Grenze: Diese Preview ersetzt keine produktionsnahe Prüfung von STRATO, PHP-Endpunkten, Stripe, Webhooks, Mailversand oder Deploy-spezifischem Verhalten. Für solche Themen bleibt `staging` die maßgebliche Validierungsumgebung. Einzelne lokale Console-Warnungen durch Codespaces-/GitHub-Preview-Redirects oder fehlende generierte Datenexporte sind für reine UI-Prüfungen nicht automatisch blockierend.
 <!-- === END BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 === -->
+
+<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 | Zweck: begrenzt Codespaces-Verbrauch und definiert sicheren Fallback bei ausgeschöpftem Kontingent; Umfang: Machine-Type, parallele Codespaces, Webeditor-/Local-Git-Fallback === -->
+## Codespaces Cost Discipline und Quota-Fallback
+
+Codespaces ist die bevorzugte Ausführungsumgebung für Repo-Patches, lokale Preview, Checks, Commit und Push. Codespaces ist nicht als dauerhafte Denk-, Planungs- oder Parallel-Chat-Umgebung zu behandeln.
+
+### Standardregeln
+
+- Für dieses Projekt ist `2-core` der Standard-Maschinentyp.
+- `4-core` oder größer darf nur genutzt werden, wenn ein konkreter schwerer Arbeitsschritt dies rechtfertigt, z. B. große Bildkonvertierungen, ungewöhnlich langsame Voll-Audits oder ein späterer echter Build-Prozess.
+- Pro Repo soll normalerweise maximal ein aktiver Codespace genutzt werden.
+- Mehrere parallele Chats dürfen nicht gleichzeitig konkurrierende Repo-Patches gegen denselben Branch liefern.
+- Analyse, Planung, ZIP-Review, Bildprompt-Arbeit und längere UI-Bewertung sollen möglichst ohne laufenden Codespace stattfinden.
+- Nach abgeschlossenem Commit/Push oder längerer Pause soll der Codespace gestoppt werden oder durch einen kurzen Idle-Timeout auslaufen.
+
+### Quota-Fallback ohne Codespaces
+
+Wenn das Codespaces-Kontingent ausgeschöpft ist oder Codespaces bewusst nicht genutzt werden soll, darf auf einen reduzierten Fallback-Workflow gewechselt werden.
+
+Zulässige Fallback-Wege:
+
+- GitHub-Webeditor für kleine, klar begrenzte Änderungen.
+- Lokales Git auf dem Nutzer-PC, wenn verfügbar.
+- ZIP-only Analyse durch ChatGPT mit anschließenden manuellen Ersetzungspatches.
+
+Fallback-Einschränkungen:
+
+- Keine großen UI-/CSS-Polish-Patches ohne lokale oder staging-nahe Sichtprüfung.
+- Keine breit gestreuten Multi-Datei-Änderungen ohne aktuelle sichtbare Baseline.
+- Keine unsicheren Snippet-Ergänzungen.
+- Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
+- Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
+- Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
+<!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
