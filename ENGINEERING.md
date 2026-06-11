@@ -2,10 +2,69 @@
 
 <!-- === BEGIN CANONICAL ENGINEERING FILE: Hard implementation rules only === -->
 
+<!-- === BEGIN BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 | Zweck: macht die Engineering-Regeln fuer ChatGPT als ausfuehrende KI sofort anwendbar; Umfang: Start-Gates, Mode-Router, Preview-vor-Deploy, Dirty-Tree-Disziplin === -->
+## 0. CHATGPT EXECUTION ROUTER
+
+These rules are optimized for ChatGPT executing project work. Apply this router before any patch, command sequence, commit, or deploy recommendation.
+
+### 0.1 Start gate for every work item
+
+Before starting implementation work:
+
+1. Establish the current baseline:
+   - In Codespaces/repo work: use `git status --short`, current branch and current `HEAD`.
+   - In ZIP-only review work: use the uploaded ZIP as the visible baseline.
+   - If both exist, the user's current Codespaces/repo output overrides an older ZIP.
+2. If the working tree is dirty:
+   - Do not start a new workpack.
+   - First classify the existing changes as:
+     - current work to continue,
+     - unrelated WIP to stash,
+     - changes to commit,
+     - changes to discard.
+3. Choose exactly one primary working mode:
+   - UI/CSS/static JS polish → Mode A.
+   - New route/content hub → Mode B.
+   - Feature/logic/data/backend → Mode C.
+4. Identify owner files before patching.
+5. Prefer one small, sustainable next step over broad patch bundles.
+
+### 0.2 Validation router
+
+Use the cheapest reliable validation environment for the task:
+
+- UI/CSS/static JS visual polish:
+  - Use Codespaces Preview on port `8000` before commit/push whenever the change can be validated locally.
+  - Do not use staging deploy as the first visual feedback loop.
+  - Staging remains useful after commit/push or when service worker/build/runtime behavior must be validated.
+- Backend/PHP/API/DB/Stripe/mail/STRATO/deploy behavior:
+  - Validate with the relevant lint, smoke, API, database or staging checks.
+  - Codespaces static preview is not sufficient.
+- Data/Sheet/Event pipeline work:
+  - Verify the source of truth first.
+  - Do not treat generated repo artifacts as editorial truth.
+- Visual asset quality work:
+  - Use pool/audit/asset contracts first.
+  - Do not permanently fix weak individual images with ad-hoc CSS.
+
+### 0.3 Commit and deploy discipline
+
+For UI polish:
+
+1. Patch locally.
+2. Run syntax/diff checks.
+3. Preview locally via Codespaces when applicable.
+4. Only then commit.
+5. Push/deploy only after local validation or when deploy-specific validation is required.
+
+Never stack a new patch on unrelated uncommitted WIP.
+<!-- === END BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 === -->
+
 ## 1. SOURCE OF TRUTH
 
-- The uploaded ZIP is the canonical working baseline for each chat.
-- If the user says manual edits were made or a patch was not applied, the current file content becomes the new truth.
+- In Codespaces/repo workflows, the current branch, current `HEAD`, and visible file contents are the canonical working baseline.
+- In ZIP-only analysis workflows, the uploaded ZIP is the canonical visible baseline.
+- If the user provides newer terminal output, file excerpts, screenshots, or confirms manual edits, that newer evidence overrides older ZIP contents.
 - Never patch without visible current code for the affected file(s).
 
 ### Data source rule
@@ -77,17 +136,19 @@ Preferred input:
 
 Execution loop:
 
-1. define page contract:
+1. Check baseline and dirty working tree first.
+2. Define page contract:
    - Goal
    - Freeze
    - Target State
    - Acceptance Criteria
-2. define only 3 main gaps
-3. deliver 1 consolidated main patch
-4. deliver at most 1 polish patch
-5. freeze the page
+3. Identify owner files and define only 3 main gaps.
+4. Deliver 1 consolidated main patch.
+5. Validate locally with Codespaces Preview on port `8000` before commit/push whenever the change is UI/CSS/static JS and does not require backend/deploy behavior.
+6. Deliver at most 1 polish patch.
+7. Freeze the page.
 
-Do not drift into open-ended visual iteration loops.
+Do not drift into open-ended visual iteration loops. Do not use staging deploy as the first visual feedback loop for changes that can be checked in Codespaces Preview.
 
 ### MODE B — NEW ROUTE / CONTENT HUB
 
