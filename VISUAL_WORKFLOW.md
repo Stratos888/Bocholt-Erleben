@@ -874,3 +874,156 @@ Lernfall: `suderwicker-maerchenspielplatz` ist nicht sinnvoll per symbolischer K
 <!-- === END BLOCK: ACTIVITY_VISUAL_SOURCING_GATE_V1_2026_06_10 === -->
 
 <!-- === END BLOCK: ACTIVITY_VISUAL_PREMIUM_CONTRACT_V1_2026_06_09 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CONTRACT_2026_06_12 | Zweck: dauerhafter Vertrag fuer motivgenaue Eventbilder; Umfang: Event-Visual-Key, Visual-Motif, Gap-Backlog, Fallback-Regeln === -->
+## Event Visual Motif Fit Contract – Freeze 2026-06-12
+
+Status: verbindlicher Zielvertrag für die nächste Event-Visual-Ausbaustufe.
+
+### Grundprinzip
+
+Ein Eventbild gilt erst dann als premiumtauglich, wenn es nicht nur zur groben Kategorie, sondern auch zum konkreten Eventtyp passt.
+
+Der vorhandene `visual_key` bleibt die stabile grobe Bildfamilie. Für konkrete Untertypen wird zusätzlich `visual_motif` eingeführt.
+
+### Datenmodell
+
+#### `visual_key`
+
+Grobe Bildfamilie.
+
+Beispiele:
+- `indoor_sport_competition`
+- `classical_music`
+- `literature_reading_talk`
+- `city_festival_street`
+
+#### `visual_motif`
+
+Konkretes Motiv innerhalb eines `visual_key`.
+
+Beispiele:
+- `fencing`
+- `darts`
+- `handball`
+- `volleyball`
+- `choir`
+- `organ_concert`
+- `poetry_slam`
+
+Regeln:
+- Lowercase snake_case.
+- Nur setzen, wenn Titel, Beschreibung, Quelle oder redaktionelle Prüfung das Motiv klar tragen.
+- Unsichere Motive nicht erraten.
+- Ein fehlendes Motivbild ist ein Backlog-Fall, kein Grund für ein fachlich falsches Bild.
+
+#### `visual_asset_status`
+
+Empfohlene Zielwerte:
+- `ok`: passendes Motivbild ist vorhanden.
+- `needs_asset`: konkretes Motiv erkannt, aber kein passendes `ready`-Bild vorhanden.
+- `review`: Motiv oder Bildauswahl ist unsicher und muss redaktionell geprüft werden.
+
+### Pool-Regel
+
+`data/event_visual_pool.json` darf weiterhin nach `visual_key` organisiert bleiben.
+
+Bilder können zusätzlich `visual_motif` tragen.
+
+Beispiel:
+- Pool: `indoor_sport_competition`
+- Bild: `indoor-sport-competition-fencing-01`
+- `visual_motif`: `fencing`
+
+Generische Bilder innerhalb eines Keys sollen als neutral erkennbar bleiben, z. B.:
+- `visual_motif`: `neutral_indoor_sport`
+
+### Auswahlregel
+
+Bei Events mit eindeutigem `visual_motif` gilt:
+
+1. Exaktes `ready`-Bild mit gleichem `visual_key` und gleichem `visual_motif` bevorzugen.
+2. Wenn kein exaktes Motivbild existiert, nur ein neutrales generisches Bild desselben `visual_key` verwenden, wenn es fachlich nicht irreführend ist.
+3. Kein anderes spezifisches Unter-Motiv verwenden.
+4. Wenn kein sicherer Fallback vorhanden ist, `needs_asset` oder `review` ausgeben.
+
+### Harte Negativregel
+
+Diese Zuordnungen sind unzulässig:
+
+- Fechten → Handballbild
+- Fechten → Volleyballbild
+- Fechten → Badmintonbild
+- Darts → Hallenballsportbild
+- Chor → beliebiges Instrumentalbild
+- konkrete Sportart → andere konkrete Sportart
+- konkreter Eventtyp → sichtbar anderes konkretes Motiv
+
+### Gap-Backlog
+
+Wenn ein konkretes Motiv erkannt wird, aber kein passendes Bild vorhanden ist, muss der Fall sichtbar werden.
+
+Zieldatei:
+- `data/event_visual_gap_backlog.tsv`
+
+Ziel:
+- KI-/Inbox-Suche deckt Bildlücken auf.
+- Fehlende Motivbilder werden als Arbeitsaufgabe sichtbar.
+- Neue Bilder werden gezielt für reale Lücken generiert.
+
+Empfohlene Spalten:
+- `status`
+- `priority`
+- `event_title`
+- `event_date`
+- `visual_key`
+- `visual_motif`
+- `problem`
+- `recommended_action`
+- `source_url`
+- `notes`
+
+### Start-Scope
+
+Der erste Umsetzungsbereich ist `indoor_sport_competition`, weil hier die größte Gefahr fachlich falscher Bilder besteht.
+
+Erste Motive:
+- `neutral_indoor_sport`
+- `badminton`
+- `handball`
+- `volleyball`
+- `table_tennis`
+- `darts`
+- `fencing`
+
+Spätere Kandidaten:
+- `classical_music`
+- `literature_reading_talk`
+- `kids_stage_story`
+- `business_messe_info`
+
+### Redaktionsregel
+
+Lieber ein sichtbarer Gap als ein falsches Premiumbild.
+
+Ein fehlendes Bild ist kurzfristig akzeptabel, wenn es als Aufgabe sichtbar wird. Ein sichtbar falsches Bild beschädigt dagegen die wahrgenommene Qualität der Plattform.
+
+### Implementierungsreihenfolge
+
+1. Dokumentierter Vertrag.
+2. Motiv-Taxonomie für `indoor_sport_competition`.
+3. Pool-Metadaten für vorhandene Bilder ergänzen.
+4. Inferenzlogik um `visual_motif` erweitern.
+5. Gap-Backlog erzeugen.
+6. Resolver/Fallback-Regeln härten.
+7. Fehlende Bilder gezielt generieren und integrieren.
+8. Audit um Motiv-Fit-Prüfungen ergänzen.
+
+### Akzeptanzkriterien
+
+- Konkrete Eventtypen bekommen kein falsches spezifisches Unter-Motiv.
+- Fehlende Motivbilder landen im Backlog.
+- Generische Fallbacks sind nur erlaubt, wenn sie fachlich neutral bleiben.
+- `visual_key` bleibt stabil.
+- `visual_motif` wird schrittweise ergänzt, ohne das bestehende System unnötig aufzublähen.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CONTRACT_2026_06_12 === -->

@@ -1245,3 +1245,157 @@ Live-Regel:
 - Activity-Fotos duerfen nachgezogen werden.
 - Detailpanel-Struktur, Aktionswert, Tonalitaet und UI-Qualitaet muessen vor Live app-weit konsolidiert sein.
 <!-- === END BLOCK: ROADMAP_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_ROADMAP_2026_06_12 | Zweck: definiert den naechsten nachhaltigen Workpack fuer motivgenaue Eventbilder; Umfang: Event-Visuals, KI-Intake, Gap-Backlog === -->
+## Nächster Workpack: Event-Visual-Motiv-Fit
+
+Status 2026-06-12: geplant / noch nicht umgesetzt.
+
+### Ausgangslage
+
+Das Event-Visual-System ist technisch tragfähig, aber inhaltlich für manche Eventarten noch zu grob.
+
+Aktuell reicht ein `visual_key` wie `indoor_sport_competition` für die grobe Bildfamilie. Für Premium-Qualität reicht das nicht immer, weil konkrete Events dadurch fachlich falsche Motive bekommen können.
+
+Beispiel:
+- Ein Fecht-Event darf kein Handball-, Volleyball- oder Badmintonbild bekommen.
+- Ein Darts-Event darf kein generisches Hallenballsportbild bekommen.
+- Ein Chor-Event darf nicht automatisch ein beliebiges Klassik-/Instrumentalmotiv bekommen.
+
+### Zielzustand
+
+Events sollen nicht nur eine passende Bildkategorie haben, sondern ein motivisch passendes Bild.
+
+Dafür wird das bestehende Visual-Key-System nicht ersetzt, sondern erweitert:
+
+1. `visual_key`
+   - grobe Bildfamilie
+   - Beispiel: `indoor_sport_competition`
+
+2. `visual_motif`
+   - konkreter Untertyp / konkretes Motiv
+   - Beispiel: `fencing`, `darts`, `handball`, `volleyball`, `choir`, `organ_concert`
+
+3. `visual_asset_status`
+   - redaktioneller/technischer Status, ob ein passendes Motivbild vorhanden ist
+   - Zielwerte z. B. `ok`, `needs_asset`, `review`
+
+### Grundsatz
+
+Wenn ein Event einen konkreten Eventtyp eindeutig nennt, darf die Bildauswahl nicht auf ein falsches spezifisches Unter-Motiv ausweichen.
+
+Erlaubt:
+- exaktes Motivbild
+- bewusst neutrales generisches Bild, falls fachlich vertretbar
+- Gap-/Backlog-Eintrag, wenn ein Premiumbild fehlt
+
+Nicht erlaubt:
+- Fechten → Handballbild
+- Darts → Volleyballbild
+- Chor → beliebiges Instrumentalbild
+- konkrete Eventart → sichtbar falsches Bild nur wegen gleichem grobem `visual_key`
+
+### Roadmap
+
+#### Phase 1: Systemvertrag dokumentieren
+
+- `VISUAL_WORKFLOW.md` um den dauerhaften Motiv-Fit-Vertrag ergänzen.
+- `ROADMAP.md` hält diesen Workpack als nächsten strukturellen Event-Visual-Verbesserungspunkt fest.
+- Keine UI-/Renderer-Änderung in diesem Dokumentationsschritt.
+
+#### Phase 2: Motiv-Taxonomie klein starten
+
+Zuerst nur generische Keys mit hohem Fehlzuordnungsrisiko modellieren.
+
+Start-Key:
+- `indoor_sport_competition`
+
+Erste sinnvolle Motive:
+- `neutral_indoor_sport`
+- `badminton`
+- `handball`
+- `volleyball`
+- `table_tennis`
+- `darts`
+- `fencing`
+
+Später prüfen:
+- `classical_music`
+- `literature_reading_talk`
+- `kids_stage_story`
+- `business_messe_info`
+- weitere generische Keys mit klar unterscheidbaren Untertypen
+
+#### Phase 3: Pool-Metadaten erweitern
+
+`data/event_visual_pool.json` soll bei passenden Bildern zusätzlich ein konkretes Motiv führen.
+
+Beispiel:
+- `visual_key`: `indoor_sport_competition`
+- `visual_motif`: `fencing`
+
+Bestehende Bilder ohne konkreten Untertyp bleiben zulässig, müssen aber als generisch oder neutral erkennbar sein.
+
+#### Phase 4: Event-Zuordnung erweitern
+
+Die bestehende Event-Visual-Zuordnung soll künftig neben `visual_key` auch `visual_motif` ableiten, wenn Titel/Beschreibung/Quelle eindeutig genug sind.
+
+Beispiele:
+- „Fechten“, „Fechtturnier“, „Degen“, „Florett“ → `visual_motif: fencing`
+- „Darts“ → `visual_motif: darts`
+- „Volleyball“ → `visual_motif: volleyball`
+- „Handball“ → `visual_motif: handball`
+- „Chor“, „Chorkonzert“ → `visual_motif: choir`
+
+Unsichere Fälle nicht raten, sondern `review` oder neutrales Motiv verwenden.
+
+#### Phase 5: Gap-Backlog einführen
+
+Wenn ein Event ein konkretes Motiv braucht, aber kein passendes `ready`-Bild existiert, soll daraus ein sichtbarer Arbeitsauftrag entstehen.
+
+Zieldatei:
+- `data/event_visual_gap_backlog.tsv`
+
+Mögliche Spalten:
+- `status`
+- `priority`
+- `event_title`
+- `event_date`
+- `visual_key`
+- `visual_motif`
+- `problem`
+- `recommended_action`
+- `source_url`
+- `notes`
+
+Ziel:
+- Die KI-/Inbox-Suche darf fehlende Motivbilder nicht still überdecken.
+- Fehlende Bilder werden als konkrete Nachgenerierungsaufgabe sichtbar.
+
+#### Phase 6: Auswahl- und Fallback-Regeln härten
+
+Die UI-/Resolver-Logik soll später so erweitert werden:
+
+1. Exaktes `visual_motif` suchen.
+2. Falls nicht vorhanden: neutrales Bild desselben `visual_key` nur verwenden, wenn es fachlich nicht falsch wirkt.
+3. Falls kein sicherer Fallback vorhanden: Gap markieren statt falsches spezifisches Bild nutzen.
+
+#### Phase 7: Gezielt nachgenerieren
+
+Erst nach Gap-Report neue Bilder erzeugen.
+
+Priorität:
+1. bald sichtbare Events
+2. häufig wiederkehrende Eventtypen
+3. Eventtypen mit hohem Falschbild-Risiko
+4. stark sichtbare Kategorien im Feed
+
+### Akzeptanzkriterien
+
+- Ein Event mit eindeutigem konkretem Motiv bekommt kein fachlich falsches spezifisches Bild mehr.
+- `visual_key` bleibt als grobe Familie erhalten.
+- `visual_motif` ergänzt die konkrete Motivschicht.
+- Fehlende Motivbilder werden sichtbar als Backlog-Aufgabe erfasst.
+- Die Nachgenerierung erfolgt gezielt nach tatsächlichen Lücken statt pauschal pro Kategorie.
+- Bestehende Visual-Audits bleiben gültig und werden später um Motiv-Fit-Prüfungen ergänzt.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_ROADMAP_2026_06_12 === -->
