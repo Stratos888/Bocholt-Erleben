@@ -122,8 +122,16 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(krammarkt|stoffmarkt|flohmarkt|trödelmarkt|troedelmarkt|wochenmarkt|grenzmarkt|marktstände|marktstaende|martinsmarkt)\b"):
         return "market_stalls"
 
-    # 2) Sehr starke Bühnen-, Musik- und Sprachformate vor Textil-/Museums-Location.
+    # 2) Sehr starke Bühnen-, Kunst-, Festival-, Musik- und Sprachformate vor Textil-/Museums-Location.
     # Beispiel: Lachnacht im TextilWerk bleibt Comedy, nicht Textilmaschinen.
+    # Beispiel: Kunstmarkt mit Live-Musik bleibt Kunstmarkt, nicht Live-Musik.
+    if match(r"\b(kunstausstellung|kunstmarkt|cityart|vernissage|galerie|kreativausstellung|schloss ringenberg)\b"):
+        return "art_exhibition_gallery"
+
+    # Festival-/Open-Air-Gesamtformate vor Einzelkonzert-Regeln.
+    if match(r"\b(aasee[- ]?festival|open air am marktplatz|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
+        return "open_air_festival"
+
     if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
         return "dance_music_workshop"
 
@@ -148,12 +156,12 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):
         return "theater_stage"
 
-    # 3) Kultur/Textil: Eventtyp vor Location.
-    if match(r"\b(maschinen[- ]?mittwoch|drossel[- ]?donnerstag|spinnerei|weberei|industriekultur|textilmaschinen?)\b"):
-        return "textile_machines_industry"
-
+    # 3) Kultur/Textil: konkreter Ausstellungstyp vor TextilWerk-/Spinnerei-Location.
     if match(r"\b(ibena|textile leidenschaft|textile revolution|textile vergangenheit|textile zukunft|stoffe für die zukunft|stoffe fuer die zukunft|nachhaltige stoffe|textilausstellung|textildesign|stoffdesign|behind beauty)\b"):
         return "textile_exhibition_design"
+
+    if match(r"\b(maschinen[- ]?mittwoch|drossel[- ]?donnerstag|spinnerei|weberei|industriekultur|textilmaschinen?)\b"):
+        return "textile_machines_industry"
 
     if match(r"\b(kunstausstellung|kunstmarkt|vernissage|galerie|kreativausstellung|schloss ringenberg)\b"):
         return "art_exhibition_gallery"
