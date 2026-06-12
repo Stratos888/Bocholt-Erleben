@@ -24,6 +24,21 @@ Zielzustand:
 - Das Detailpanel passt sichtbar zu Header, Bottom-Navigation, Cards, Icons, Typografie, Actions und ruhiger Premium-Hierarchie der gesamten App.
 - Activity-Fotos werden separat nachgezogen und blockieren diesen Detailpanel-Workstream nicht.
 
+## Plattform-Policy Mobile vs. Desktop
+
+Verbindliche Produktentscheidung ab 2026-06-12:
+
+- Mobile: Alle relevanten Einstiege nutzen Detailpanels als Entscheidungs- und Aktionsflaeche.
+- Desktop: Cards enthalten bereits die wichtigsten Informationen; Detailpanels sind dort nicht noetig.
+- Desktop-Klicks fuehren direkt outbound bzw. zum primaeren Ziel.
+- Detailpanel-Patches duerfen keine Desktop-Panel-Einfuehrung erzwingen.
+
+Daraus folgt fuer diesen Workstream:
+
+- Event- und Activity-Detailpanels muessen mobil systemisch konsistent und robust sein.
+- Desktop bleibt eine Card-first- und Direct-Outbound-Erfahrung.
+- Today darf mobil Event- und Activity-Detailpanels wiederverwenden, aber keine eigene dritte Panel-Logik einfuehren.
+
 ## Systemprinzip
 
 Konsistent bedeutet nicht identisch.
