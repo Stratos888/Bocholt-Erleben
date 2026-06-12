@@ -3192,6 +3192,142 @@ Activity Visual Phase B:
 | `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
 
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_B_PUBLIC_USAGE_2026_06_12 | Zweck: dokumentiert Abschluss der oeffentlichen Activity-Visual-Pool-Nutzung; Umfang: data/offers.json visual_key-Mapping, zentraler Resolver, Pool-Load, Card-/Detailpanel-Smoke, Restbilder === -->
+## Activity Visual Phase B – Public Usage / Pool Mapping abgeschlossen (2026-06-12)
+
+### Status
+
+Activity Visual Phase B ist auf `staging` implementiert, getestet und gepusht.
+
+Bestätigter Commit:
+
+- `988b437` – `Nutze Activity Visual Pool auf Activity-Seite`
+
+### Umgesetzter Scope
+
+Geändert wurden ausschließlich:
+
+- `data/offers.json`
+- `js/offers.js`
+- `js/offers-main.js`
+
+Nicht geändert wurden:
+
+- `js/offers-details.js`
+- `css/today.css`
+- Today/Home-Layout
+- Event-Visual-System
+
+### Technischer Zielzustand
+
+Die öffentlichen Activity-Flächen nutzen jetzt den Activity Visual Pool vorrangig über `visual_key`.
+
+Die zentrale Bildauflösung läuft über:
+
+- `window.OfferVisuals.resolveImageData(offer)`
+
+Priorität der Bildauflösung:
+
+1. Activity Visual Pool über `visual_key`
+2. `offer.image` als Fallback
+3. generisches Fallbackbild als letzte Stufe
+
+`js/offers-details.js` musste nicht geändert werden, weil das Activity-Detailpanel bereits dieselbe zentrale Resolver-Funktion nutzt.
+
+### Mapping-Ergebnis
+
+`data/offers.json` enthält jetzt 34 `visual_key`-Zuordnungen.
+
+Bewusst ohne Pool-Key bleiben 10 Activities, weil aktuell kein passender Pool-Eintrag existiert:
+
+- `handwerksmuseum-bocholt-erleben`
+- `schloss-ringenberg-erleben`
+- `anholter-schweiz-erleben`
+- `villa-mondriaan-winterswijk-erleben`
+- `waldlehrpfad-am-vossenpand`
+- `suderwicker-maerchenspielplatz`
+- `buergerpark-rhede`
+- `das-mysterium-von-winterswijk`
+- `borkener-tuerme-tour`
+- `tiergarten-schloss-raesfeld-erleben`
+
+### Validierung
+
+Bestandene technische Checks:
+
+- `git diff --check -- data/offers.json js/offers.js js/offers-main.js`
+- `node --check js/offers.js`
+- `node --check js/offers-main.js`
+- `node --check js/offers-details.js`
+- `python3 tools/audit-visual-contract.py --strict`
+
+Audit-Ergebnis:
+
+- Activity visual pool:
+  - `pools: 41`
+  - `images: 41`
+  - `ready: 38`
+  - `fallback: 3`
+  - `missing ready/fallback files: 0`
+  - `ready/fallback non-WebP: 0`
+  - `ready/fallback oversized: 0`
+  - `ready/fallback missing alt: 0`
+  - `ready/fallback not 16:9: 0`
+- Activity visuals:
+  - `offers: 44`
+  - `explicit images: 44`
+  - `visual keys: 34`
+  - `missing visual status: 0`
+  - `needs_review/blocked with image: 3`
+- `Warnings / known visual debt: none`
+- `Errors: none`
+
+Zusätzliche Datenkonsistenzprüfung:
+
+- `resolved_pool_images: 34`
+- `fallback_offers: 10`
+- `duplicate_pool_src: 0`
+- `errors: 0`
+
+Runtime-Resolver-Smoke:
+
+- Pool-Activities lösen auf `/assets/activity-visuals/...` auf.
+- `ready` und `fallback` werden korrekt erkannt.
+- Fallback-Activities ohne `visual_key` fallen stabil auf `offer.image` zurück.
+- `resolver_errors: 0`
+
+UI-Smoke auf `/aktivitaeten/`:
+
+- Cards geprüft für:
+  - `textilwerk-bocholt-erleben`
+  - `bocholter-innenstadt-erleben`
+  - `wasserburg-anholt-erleben`
+  - `grenzenlos-wandern-dinxperlo-suderwick`
+  - `erlebnisweg-olle-kerkpatt`
+  - `suderwicker-maerchenspielplatz`
+- Ergebnis: alle Test-Cards gefunden, alle mit Bild.
+- Detailpanel-Smoke: alle 6 Detailpanel-Bilder gefunden.
+- Card und Detailpanel nutzen dieselbe Resolver-Logik.
+
+### Weiterhin nicht final premium
+
+Diese Restbilder bleiben bewusst offen und werden nicht per CSS kaschiert:
+
+| Activity-ID | Status | Maßnahme |
+|---|---|---|
+| `suderwicker-maerchenspielplatz` | `own_photo_required` | echtes Foto ohne erkennbare Kinder/Personen beschaffen |
+| `waldlehrpfad-am-vossenpand` | `request_permission` | Stadt Bocholt/ESB um Freigabe für besseres personenfreies Galeriebild bitten |
+| `handwerksmuseum-bocholt-erleben` | `request_permission` | Handwerksmuseum/Stadt Bocholt um hochauflösendes Innen-/Werkstattbild bitten |
+| `das-mysterium-von-winterswijk` | `request_permission` | 100% Winterswijk/Tourismus Winterswijk um offizielles Routenmotiv bitten |
+| `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
+
+### Abschlussbewertung
+
+Activity Visual Phase B ist abgeschlossen.
+
+Die Activity-Bilder sind öffentlich sauber über den Activity Visual Pool verdrahtet. Restbilder bleiben als transparenter Visual-Debt bestehen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_B_PUBLIC_USAGE_2026_06_12 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 | Zweck: dokumentiert Abschluss des Detailpanel-Premium-System-Blocks nach Mobile-Shell-Haertung und Desktop-Direct-Policy; Umfang: mobile Event-/Activity-Detailpanels, Today/Home Desktop Direct-Outbound, keine Parallelchat-Dateien === -->
 ## Detailpanel Premium System – abgeschlossen am 2026-06-12
 
