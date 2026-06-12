@@ -3366,3 +3366,41 @@ Vom Nutzer bestaetigt:
 - Keine Today/Home-Layoutaenderung nach dem Premium-Freeze.
 - Keine Bearbeitung der Parallelchat-Dateien `data/offers.json`, `js/offers-main.js`, `js/offers.js`.
 <!-- === END BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 === -->
+
+<!-- BEGIN TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
+
+## Activity Realfoto Visuals – Abschluss 2026-06-12
+
+Status: abgeschlossen und auf `staging` gepusht.
+
+Commits:
+- `c7b3699` – Dokumentiere Activity Visual Bildentscheidungen
+- `52b1bc1` – Integriere Activity Realfoto Visuals
+
+Umgesetzt:
+- 16 geprüfte Activity-Realfotos als lokale WebP-Assets integriert bzw. bestehende Activity-Visuals ersetzt.
+- 8 neue lokale Activity-WebPs ergänzt.
+- 8 bestehende Activity-WebPs durch bessere Realfoto-Versionen ersetzt.
+- `data/activity_visual_pool.json` erweitert/aktualisiert.
+- `data/offers.json` um fehlende `visual_key`-Mappings ergänzt.
+- Lizenz-/Quellenentscheidungen kanonisch in `data/activity_visual_source_decisions.tsv` festgehalten.
+- Rohdateien/Arbeitsdateien wurden nicht committed.
+
+Audit nach Umsetzung:
+- Event visuals: OK
+- Activity visual pool: 48 Pools, 48 Images, 44 `ready`, 4 `fallback`
+- Activity offers: 44 Offers, 41 Visual Keys
+- Missing files: 0
+- Non-WebP ready/fallback: 0
+- Missing alt: 0
+- 16:9 violations: 0
+- Errors: none
+
+Bewusste Restfälle:
+- `buergerpark-rhede`: gutes offizielles Stadt-Rhede-Bild vorhanden, aber Freigabe nötig.
+- `waldlehrpfad-am-vossenpand`: offizielles Bocholt-/Pressebildmaterial vorhanden, aber Nutzungsbasis/Freigabe noch zu klären.
+- `suderwicker-maerchenspielplatz`: vorerst parken bzw. später ggf. in Sonderkategorie Spielplätze aufnehmen.
+- `handwerksmuseum-bocholt-erleben` und `grenzenlos-wandern-dinxperlo-suderwick`: aktuell als `fallback`/Übergang bewusst akzeptiert.
+
+<!-- END TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
+
