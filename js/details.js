@@ -780,6 +780,7 @@ const actions = [
         if (!src) return null;
 
         return {
+          ...visual,
           src,
           alt: trimOrEmpty(visual?.alt || "")
         };
@@ -1075,6 +1076,15 @@ const iconSvg = (type, extraClass = "") => {
         </figure>
       ` : "";
 
+      const detailVisualAttributionHtml = detailVisual && window.ImageAttribution?.renderDetailAttribution
+        ? window.ImageAttribution.renderDetailAttribution(detailVisual, {
+            entityType: "event",
+            entityId: String(event?.id || "").trim(),
+            entityTitle: String(vm.title || "").trim(),
+            imageId: String(detailVisual.id || "").trim()
+          })
+        : "";
+
       const html = `
         <div class="detail-panel-inner">
           ${detailVisualHtml}
@@ -1122,6 +1132,8 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
             </div>
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
+
+          ${detailVisualAttributionHtml}
 
           ${(showWebsite || showSource) ? `
             <div class="detail-links" aria-label="Links">

@@ -277,6 +277,7 @@ def run(args: argparse.Namespace) -> None:
         lambda: check_html_page(base_url, "/", "Startseite"),
         lambda: check_html_page(base_url, "/events/", "Events-Suchseite"),
         lambda: check_html_page(base_url, "/aktivitaeten/", "Aktivitäten-Seite"),
+        lambda: check_html_page(base_url, "/bildnachweise/", "Bildnachweise-Seite"),
         lambda: check_html_page(base_url, "/events-veroeffentlichen/einreichen/", "Event-Einreichen-Seite"),
         lambda: check_status_api(base_url),
         lambda: check_public_events_api(base_url),

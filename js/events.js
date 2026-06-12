@@ -272,7 +272,24 @@ const EventCards = (() => {
           return Object.freeze({
             id: String(image.id || "").trim(),
             src,
-            alt: String(image.alt || "").trim()
+            alt: String(image.alt || "").trim(),
+            status: String(image.status || "").trim(),
+            source: String(image.source || "").trim(),
+            sourceType: String(image.source_type || image.sourceType || "").trim(),
+            rightsStatus: String(image.rights_status || image.rightsStatus || "").trim(),
+            reviewStatus: String(image.review_status || image.reviewStatus || "").trim(),
+            author: String(image.author || "").trim(),
+            license: String(image.license || "").trim(),
+            licenseUrl: String(image.license_url || image.licenseUrl || "").trim(),
+            sourceTitle: String(image.source_title || image.sourceTitle || "").trim(),
+            sourcePage: String(image.source_page || image.sourcePage || image.source_url || image.sourceUrl || "").trim(),
+            downloadUrl: String(image.download_url || image.downloadUrl || "").trim(),
+            credit: String(image.credit || image.attribution || "").trim(),
+            modifications: String(image.modifications || "").trim(),
+            isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
+            isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
+            publicNote: String(image.public_note || image.publicNote || "").trim(),
+            note: String(image.note || "").trim()
           });
         })
         .filter(Boolean);

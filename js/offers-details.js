@@ -545,67 +545,14 @@ const OfferDetailPanel = {
           note: ""
         };
 
-    const sourceUrl = window.OfferVisuals?.normalizeHttpUrl
-      ? window.OfferVisuals.normalizeHttpUrl(imageData.sourcePage)
-      : String(imageData.sourcePage || "").trim();
-    const author = String(imageData.author || "").trim();
-    const license = String(imageData.license || "").trim();
-    const credit = String(imageData.credit || "").trim();
-    const note = window.OfferVisuals?.buildSymbolicDetailLabel
-      ? window.OfferVisuals.buildSymbolicDetailLabel(imageData)
-      : (imageData.isSymbolic ? "Symbolbild" : "");
-    const showCredit = credit && (!author || !license);
-    const infoIcon = window.Icons?.svg
-      ? window.Icons.svg("info", { className: "activity-detail__media-attribution-icon-svg" })
-      : "";
+    if (!window.ImageAttribution?.renderDetailAttribution) return "";
 
-    if (!note && !author && !license && !showCredit && !sourceUrl) return "";
-
-    return `
-      <details class="activity-detail__media-attribution">
-        <summary class="activity-detail__media-attribution-toggle">
-          <span class="activity-detail__media-attribution-toggle-main">
-            <span class="activity-detail__media-attribution-icon" aria-hidden="true">${infoIcon}</span>
-            <span>Bildnachweis</span>
-          </span>
-          <span class="activity-detail__media-attribution-toggle-secondary">Details</span>
-        </summary>
-        <div class="activity-detail__media-attribution-panel">
-          ${note ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Hinweis</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(note)}</div>
-            </div>
-          ` : ""}
-          ${author ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Urheber</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(author)}</div>
-            </div>
-          ` : ""}
-          ${license ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Lizenz</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(license)}</div>
-            </div>
-          ` : ""}
-          ${showCredit ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Nachweis</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(credit)}</div>
-            </div>
-          ` : ""}
-          ${sourceUrl ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Quelle</div>
-              <div class="activity-detail__media-attribution-value">
-                <a class="activity-detail__media-attribution-link" href="${this.escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Original / Quelle öffnen</a>
-              </div>
-            </div>
-          ` : ""}
-        </div>
-      </details>
-    `.trim();
+    return window.ImageAttribution.renderDetailAttribution(imageData, {
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim(),
+      imageId: String(imageData?.id || "").trim()
+    });
   },
   /* === END BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 === */
 

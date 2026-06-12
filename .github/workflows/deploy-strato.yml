@@ -451,6 +451,7 @@ jobs:
             grep -q '<loc>https://bocholt-erleben.de/events-veroeffentlichen/anbindung/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/fuer-veranstalter/</loc>' deploy/sitemap.xml
             grep -q '<loc>https://bocholt-erleben.de/ueber/</loc>' deploy/sitemap.xml
+            grep -q '<loc>https://bocholt-erleben.de/bildnachweise/</loc>' deploy/sitemap.xml
           fi
 
           test -s deploy/robots.txt

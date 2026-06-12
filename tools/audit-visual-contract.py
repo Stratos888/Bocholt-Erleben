@@ -138,6 +138,61 @@ def is_card_ratio(width: int, height: int) -> bool:
     return abs((width / height) - CARD_ASSET_RATIO) <= CARD_ASSET_RATIO_TOLERANCE
 
 
+def text_value(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def is_generated_visual(item: dict[str, Any]) -> bool:
+    haystack = " ".join(
+        text_value(item.get(key)).lower()
+        for key in ("source", "source_type", "rights_status", "review_status")
+    )
+    return "generated" in haystack or "ai_generated" in haystack
+
+
+def is_attribution_required_visual(item: dict[str, Any]) -> bool:
+    haystack = " ".join(
+        text_value(item.get(key)).lower()
+        for key in ("source", "source_type", "rights_status", "license", "source_page", "credit")
+    )
+    return any(token in haystack for token in ("wikimedia", "commons", "cc by", "cc0", "attribution_required", "licensed_real_photo"))
+
+
+def audit_public_attribution_fields(
+    *,
+    kind: str,
+    visual_key: str,
+    image_id: str,
+    item: dict[str, Any],
+    errors: list[str],
+) -> bool:
+    label = f"{kind} visual {visual_key}/{image_id or '<no-id>'}"
+
+    if is_attribution_required_visual(item):
+        missing = [
+            field
+            for field in ("author", "license", "source_page", "credit", "modifications")
+            if not text_value(item.get(field))
+        ]
+
+        if missing:
+            errors.append(f"{label} requires public attribution metadata but misses: {', '.join(missing)}.")
+            return False
+
+    if is_generated_visual(item):
+        missing: list[str] = []
+        if not (text_value(item.get("source_type")) or text_value(item.get("source"))):
+            missing.append("source/source_type")
+        if not text_value(item.get("rights_status")):
+            missing.append("rights_status")
+
+        if missing:
+            errors.append(f"{label} is generated/symbolic but misses transparency metadata: {', '.join(missing)}.")
+            return False
+
+    return True
+
+
 def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str, Any]:
     payload = as_dict(load_json(EVENT_POOL_PATH))
     pools = as_dict(payload.get("pools"))
@@ -152,6 +207,7 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
         "non_webp_ready": 0,
         "oversized_ready": 0,
         "missing_ready_alt": 0,
+        "missing_attribution_metadata": 0,
         "non_16_9_ready": 0,
     }
 
@@ -205,6 +261,15 @@ def audit_event_visual_pool(errors: list[str], warnings: list[str]) -> dict[str,
                     summary["missing_ready_alt"] += 1
                     warnings.append(f"event visual {visual_key}/{image_id} is {status} but has no alt text.")
 
+                if not audit_public_attribution_fields(
+                    kind="event",
+                    visual_key=str(visual_key),
+                    image_id=image_id,
+                    item=item,
+                    errors=errors,
+                ):
+                    summary["missing_attribution_metadata"] += 1
+
                 asset_path = local_asset_path(src)
                 if asset_path is not None:
                     if not asset_path.exists():
@@ -251,6 +316,7 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
         "non_webp_ready": 0,
         "oversized_ready": 0,
         "missing_ready_alt": 0,
+        "missing_attribution_metadata": 0,
         "non_16_9_ready": 0,
     }
 
@@ -339,6 +405,15 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
                 if not str(item.get("alt") or "").strip():
                     summary["missing_ready_alt"] += 1
                     warnings.append(f"activity visual {visual_key}/{image_id} is {status} but has no alt text.")
+
+                if not audit_public_attribution_fields(
+                    kind="activity",
+                    visual_key=str(visual_key),
+                    image_id=image_id,
+                    item=item,
+                    errors=errors,
+                ):
+                    summary["missing_attribution_metadata"] += 1
 
                 asset_path = local_asset_path(src)
                 if asset_path is not None:
@@ -497,6 +572,7 @@ def main() -> int:
     print(f"  ready/fallback non-WebP: {event_summary['non_webp_ready']}")
     print(f"  ready/fallback oversized: {event_summary['oversized_ready']}")
     print(f"  ready/fallback missing alt: {event_summary['missing_ready_alt']}")
+    print(f"  ready/fallback missing attribution metadata: {event_summary['missing_attribution_metadata']}")
     print(f"  ready/fallback not 16:9: {event_summary['non_16_9_ready']}")
     print_counter("status counts", event_summary["status_counts"])
 
@@ -511,6 +587,7 @@ def main() -> int:
     print(f"  ready/fallback non-WebP: {activity_pool_summary['non_webp_ready']}")
     print(f"  ready/fallback oversized: {activity_pool_summary['oversized_ready']}")
     print(f"  ready/fallback missing alt: {activity_pool_summary['missing_ready_alt']}")
+    print(f"  ready/fallback missing attribution metadata: {activity_pool_summary['missing_attribution_metadata']}")
     print(f"  ready/fallback not 16:9: {activity_pool_summary['non_16_9_ready']}")
     print_counter("status counts", activity_pool_summary["status_counts"])
 

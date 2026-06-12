@@ -7,6 +7,8 @@
     "<p>",
     '  <button type="button" class="footer-link" data-feedback-open="global">Feedback</button>',
     '  <span aria-hidden="true"> · </span>',
+    '  <a href="/bildnachweise/">Bildnachweise</a>',
+    '  <span aria-hidden="true"> · </span>',
     '  <a href="/impressum/">Impressum</a>',
     '  <span aria-hidden="true"> · </span>',
     '  <a href="/datenschutz/">Datenschutz</a>',

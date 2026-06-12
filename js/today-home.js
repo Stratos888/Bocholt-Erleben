@@ -215,7 +215,24 @@
           return Object.freeze({
             id: asString(image.id),
             src,
-            alt: asString(image.alt)
+            alt: asString(image.alt),
+            status: asString(image.status),
+            source: asString(image.source),
+            sourceType: asString(image.source_type || image.sourceType),
+            rightsStatus: asString(image.rights_status || image.rightsStatus),
+            reviewStatus: asString(image.review_status || image.reviewStatus),
+            author: asString(image.author),
+            license: asString(image.license),
+            licenseUrl: asString(image.license_url || image.licenseUrl),
+            sourceTitle: asString(image.source_title || image.sourceTitle),
+            sourcePage: asString(image.source_page || image.sourcePage || image.source_url || image.sourceUrl),
+            downloadUrl: asString(image.download_url || image.downloadUrl),
+            credit: asString(image.credit || image.attribution),
+            modifications: asString(image.modifications),
+            isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
+            isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
+            publicNote: asString(image.public_note || image.publicNote),
+            note: asString(image.note)
           });
         })
         .filter(Boolean);
@@ -253,7 +270,24 @@
             id: asString(image.id),
             src,
             alt: asString(image.alt),
-            poolKey: asString(poolKey)
+            poolKey: asString(poolKey),
+            status: asString(image.status),
+            source: asString(image.source),
+            sourceType: asString(image.source_type || image.sourceType),
+            rightsStatus: asString(image.rights_status || image.rightsStatus),
+            reviewStatus: asString(image.review_status || image.reviewStatus),
+            author: asString(image.author),
+            license: asString(image.license),
+            licenseUrl: asString(image.license_url || image.licenseUrl),
+            sourceTitle: asString(image.source_title || image.sourceTitle),
+            sourcePage: asString(image.source_page || image.sourcePage || image.source_url || image.sourceUrl),
+            downloadUrl: asString(image.download_url || image.downloadUrl),
+            credit: asString(image.credit || image.attribution),
+            modifications: asString(image.modifications),
+            isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
+            isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
+            publicNote: asString(image.public_note || image.publicNote),
+            note: asString(image.note)
           });
         })
         .filter(Boolean);
@@ -295,6 +329,7 @@
       if (!usedImages || !usedImages.has(candidate.src) || offset === pool.length - 1) {
         if (usedImages) usedImages.add(candidate.src);
         return Object.freeze({
+          ...candidate,
           src: candidate.src,
           alt: asString(candidate.alt)
         });

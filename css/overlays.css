@@ -983,21 +983,22 @@ Umfang:
   line-height: 1;
 }
 
-#event-detail-panel .activity-detail__media-attribution{
+/* === BEGIN BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V1 | Zweck: zentraler Bildnachweis-Baustein fuer Event- und Activity-Detailpanel; Umfang: ersetzt activity-spezifische Attribution-Styles durch neutrale .image-attribution-Klassen === */
+#event-detail-panel .image-attribution--detail{
   margin: 18px 0 0;
   border-top: 1px solid rgba(24,40,31,0.09);
   padding-top: 14px;
 }
 
-#event-detail-panel .activity-detail__media-attribution > summary{
+#event-detail-panel .image-attribution--detail > summary{
   list-style: none;
 }
 
-#event-detail-panel .activity-detail__media-attribution > summary::-webkit-details-marker{
+#event-detail-panel .image-attribution--detail > summary::-webkit-details-marker{
   display: none;
 }
 
-#event-detail-panel .activity-detail__media-attribution-toggle{
+#event-detail-panel .image-attribution__toggle{
   position: relative;
   display: flex;
   align-items: center;
@@ -1012,7 +1013,7 @@ Umfang:
   line-height: 1.35;
 }
 
-#event-detail-panel .activity-detail__media-attribution-toggle::after{
+#event-detail-panel .image-attribution__toggle::after{
   content: "";
   position: absolute;
   right: 2px;
@@ -1025,18 +1026,18 @@ Umfang:
   transition: transform 180ms ease;
 }
 
-#event-detail-panel .activity-detail__media-attribution[open] .activity-detail__media-attribution-toggle::after{
+#event-detail-panel .image-attribution--detail[open] .image-attribution__toggle::after{
   transform: translateY(-30%) rotate(225deg);
 }
 
-#event-detail-panel .activity-detail__media-attribution-toggle-main{
+#event-detail-panel .image-attribution__toggle-main{
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
-#event-detail-panel .activity-detail__media-attribution-icon{
+#event-detail-panel .image-attribution__icon{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1046,20 +1047,23 @@ Umfang:
   flex: 0 0 auto;
 }
 
-#event-detail-panel .activity-detail__media-attribution-icon-svg{
+#event-detail-panel .image-attribution__icon-svg{
   width: 16px;
   height: 16px;
   stroke-width: 1.9;
 }
 
-#event-detail-panel .activity-detail__media-attribution-toggle-secondary{
+#event-detail-panel .image-attribution__toggle-secondary{
+  min-width: 0;
   color: rgba(96,109,101,0.72);
   font-size: 0.76rem;
   font-weight: 650;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#event-detail-panel .activity-detail__media-attribution-panel{
+#event-detail-panel .image-attribution__panel{
   margin-top: 10px;
   padding: 14px;
   border-radius: 16px;
@@ -1067,18 +1071,18 @@ Umfang:
   box-shadow: inset 0 0 0 1px rgba(24,40,31,0.06);
 }
 
-#event-detail-panel .activity-detail__media-attribution-row{
+#event-detail-panel .image-attribution__row{
   display: grid;
   grid-template-columns: minmax(74px, 92px) minmax(0, 1fr);
   gap: 10px;
   align-items: start;
 }
 
-#event-detail-panel .activity-detail__media-attribution-row + .activity-detail__media-attribution-row{
+#event-detail-panel .image-attribution__row + .image-attribution__row{
   margin-top: 10px;
 }
 
-#event-detail-panel .activity-detail__media-attribution-key{
+#event-detail-panel .image-attribution__key{
   color: rgba(90,103,95,0.86);
   font-size: 0.72rem;
   font-weight: 800;
@@ -1086,24 +1090,25 @@ Umfang:
   text-transform: uppercase;
 }
 
-#event-detail-panel .activity-detail__media-attribution-value{
+#event-detail-panel .image-attribution__value{
   min-width: 0;
   color: rgba(42,55,47,0.84);
   font-size: 0.8rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
-#event-detail-panel .activity-detail__media-attribution-link{
+#event-detail-panel .image-attribution__link{
   color: rgba(38,86,62,0.9);
   font-weight: 700;
   text-decoration: none;
 }
 
-#event-detail-panel .activity-detail__media-attribution-link:hover,
-#event-detail-panel .activity-detail__media-attribution-link:focus-visible{
+#event-detail-panel .image-attribution__link:hover,
+#event-detail-panel .image-attribution__link:focus-visible{
   text-decoration: underline;
 }
-/* === END BLOCK: ACTIVITIES_DETAIL_MEDIA_ATTRIBUTION_ENTERPRISE_UI_V1 === */
+/* === END BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V1 === */
 
 #event-detail-panel .activity-detail__media--fallback{
   display: grid;
