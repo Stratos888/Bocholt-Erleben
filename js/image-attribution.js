@@ -79,6 +79,8 @@
   }
 
   function isGenerated(meta) {
+    if (meta.isAiGenerated) return true;
+
     const haystack = [
       meta.source,
       meta.sourceType,
@@ -112,9 +114,27 @@
   }
 
   function attributionLabel(meta) {
-    if (isGenerated(meta)) return "Internes Symbolbild";
+    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
+    if (meta.isSymbolic) return "Symbolbild";
     if (isLicensedRealPhoto(meta)) return "Realfoto";
     return "Bildnachweis";
+  }
+
+  function badgeLabel(input) {
+    const meta = normalize(input);
+    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
+    if (meta.isSymbolic) return "Symbolbild";
+    return "";
+  }
+
+  function detailSummaryText(meta) {
+    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
+    if (meta.isSymbolic) return "Symbolbild";
+
+    const parts = ["Realfoto"];
+    if (meta.author) parts.push(meta.author);
+    if (meta.license) parts.push(meta.license);
+    return parts.join(" · ");
   }
 
   function normalize(input, options = {}) {
@@ -145,6 +165,7 @@
       publicNote: firstValue(source.publicNote, source.public_note, options.publicNote),
       note: firstValue(source.note, options.note),
       isSymbolic: normalizeBool(firstValue(source.isSymbolic, source.is_symbolic, options.isSymbolic)),
+      isAiGenerated: normalizeBool(firstValue(source.isAiGenerated, source.is_ai_generated, options.isAiGenerated, options.is_ai_generated)),
       isDocumentary: normalizeBool(firstValue(source.isDocumentary, source.is_documentary, options.isDocumentary)),
       relatedIds: Array.isArray(options.relatedIds) ? options.relatedIds.map(asString).filter(Boolean) : []
     };
@@ -258,7 +279,12 @@
       : "";
 
     const summaryText = attributionLabel(meta);
-    const rows = renderRows(meta, { ...options, includeFullLink: true });
+    const detailText = detailSummaryText(meta);
+    const fullLink = renderInternalLink(
+      fullCreditHref(meta, options),
+      "Vollständiger Nachweis",
+      "image-attribution__link image-attribution__full-link"
+    );
 
     return `
       <details class="image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}">
@@ -269,8 +295,9 @@
           </span>
           <span class="image-attribution__toggle-secondary">${escapeHtml(summaryText)}</span>
         </summary>
-        <div class="image-attribution__panel">
-          ${rows}
+        <div class="image-attribution__panel image-attribution__panel--compact">
+          <span class="image-attribution__compact-text">${escapeHtml(detailText)}</span>
+          ${fullLink}
         </div>
       </details>
     `.trim();
@@ -312,6 +339,9 @@
     fullCreditHref,
     renderDetailAttribution,
     renderCreditCard,
+    attributionLabel,
+    badgeLabel,
+    detailSummaryText,
     escapeHtml,
     slugify
   });

@@ -801,6 +801,17 @@ function createCard(event, visualUsage = null) {
     image.height = 675;
 
     media.appendChild(image);
+
+    const visualBadge = window.ImageAttribution?.badgeLabel
+      ? window.ImageAttribution.badgeLabel(cardVisual)
+      : "";
+    if (visualBadge) {
+      const badgeEl = document.createElement("span");
+      badgeEl.className = "event-card-media__badge";
+      badgeEl.textContent = visualBadge;
+      media.appendChild(badgeEl);
+    }
+
     card.appendChild(media);
   }
 

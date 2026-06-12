@@ -1108,6 +1108,82 @@ Umfang:
 #event-detail-panel .image-attribution__link:focus-visible{
   text-decoration: underline;
 }
+
+
+#event-detail-panel .image-attribution__panel--compact{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+}
+
+#event-detail-panel .image-attribution__compact-text{
+  min-width: 0;
+  color: rgba(42,55,47,0.82);
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#event-detail-panel .image-attribution__panel--compact .image-attribution__full-link{
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.event-card-media,
+.today-card__media,
+#event-detail-panel .event-detail-media{
+  position: relative;
+}
+
+.event-card-media__badge,
+.today-card__media-badge,
+#event-detail-panel .event-detail-media__badge{
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  max-width: calc(100% - 24px);
+  min-height: 26px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,250,0.88);
+  color: rgba(45,58,49,0.86);
+  box-shadow:
+    0 6px 16px rgba(14,24,18,0.12),
+    inset 0 0 0 1px rgba(24,40,31,0.08);
+  backdrop-filter: blur(10px);
+  font-size: 0.72rem;
+  font-weight: 820;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+#event-detail-panel .event-detail-media__badge{
+  left: 14px;
+  bottom: 14px;
+}
+
+@media (max-width: 520px){
+  #event-detail-panel .image-attribution__panel--compact{
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  #event-detail-panel .image-attribution__compact-text{
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
 /* === END BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V1 === */
 
 #event-detail-panel .activity-detail__media--fallback{
