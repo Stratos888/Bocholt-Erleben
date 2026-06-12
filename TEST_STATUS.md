@@ -2,6 +2,48 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_IMAGE_MATERIAL_FORM_V1_2026_06_12 | Zweck: dokumentiert Abschluss der Bildmaterial-Abfrage fuer Kunden-Aktivitaeten inklusive Live-DB-Vorbereitung === -->
+## Kunden-Aktivitäten: Bildmaterial-Abfrage V1 abgeschlossen (2026-06-12)
+
+Status: umgesetzt, auf `staging` deployed und visuell geprüft.
+
+Relevante Commits:
+- `cd37051` – `Ergaenze Bildmaterial-Abfrage fuer Aktivitaeten`
+- `220c6ac` – `Praezisiere Bildmaterial-Option im Aktivitaetsformular`
+- `51b0d0b` – `Verbessere Bildmaterial Hinweise im Aktivitaetsformular`
+
+Umgesetzter Zielzustand:
+- Das Activity-Einreichungsformular fragt Bildmaterial optional ab.
+- Es gibt weiterhin keinen Datei-Upload, keinen Storage und keine Medienverwaltung im Formular.
+- Kunden können angeben, ob Bildmaterial vorhanden ist.
+- Bei vorhandenem Bildmaterial wählen Kunden die Bereitstellungsart:
+  - Downloadlink / Cloud-Ordner / Pressemappe
+  - Website-Galerie mit passenden Bildern
+  - Bilder später per E-Mail
+  - Sonstiges
+- Die Hinweise im Textfeld wechseln dynamisch je Bereitstellungsart.
+- Die Bildrechte-Bestätigung ist nur erforderlich, wenn eigenes/verlinktes/später zugesendetes Bildmaterial angegeben wird.
+- Die Angaben werden strukturiert in `submissions.activity_image_json` gespeichert.
+- Die Inbox zeigt die Bildmaterial-Angaben in den Prüfdaten an.
+- Die redaktionelle Bildhoheit bleibt bei Bocholt erleben: Kunden können Material anbieten, aber Bocholt erleben entscheidet, welches Bild veröffentlicht wird.
+
+Datenbankstand:
+- Staging-DB: `submissions.activity_image_json` vorhanden.
+- Live-DB: `submissions.activity_opening_json` wurde geprüft; `submissions.activity_image_json` wurde als additive nullable JSON-Spalte vorbereitet.
+- Migration im Repo: `api/sql/008_activity_image_json.sql`.
+
+Smoke-Status:
+- Formular lässt sich mit der Option „Nein, Bocholt erleben darf ein passendes Bild zur Verfügung stellen“ absenden.
+- Einreichung landet in der Inbox.
+- Inbox erkennt den redaktionellen Bildstatus korrekt.
+- Dropdown-Wording und dynamische Platzhalter wurden auf Staging geprüft.
+
+Abschluss:
+- Kein weiterer Code-Patch für diesen Workstream offen.
+- Kein Upload-Workpack in V1; ein echter Datei-Upload bleibt bewusst späterer separater Scope.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_IMAGE_MATERIAL_FORM_V1_2026_06_12 === -->
+
 ## Rolle dieses Dokuments
 
 Dieses Dokument hält fest, welche Funktionen im Projekt „Bocholt erleben“ auf welchem Stand praktisch geprüft wurden.
