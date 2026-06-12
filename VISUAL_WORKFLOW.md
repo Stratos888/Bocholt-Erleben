@@ -1008,6 +1008,18 @@ Lieber ein sichtbarer Gap als ein falsches Premiumbild.
 
 Ein fehlendes Bild ist kurzfristig akzeptabel, wenn es als Aufgabe sichtbar wird. Ein sichtbar falsches Bild beschädigt dagegen die wahrgenommene Qualität der Plattform.
 
+### Produktions-Tracking vor Integration
+
+Akzeptierte oder ausgewählte KI-Bildkandidaten, die noch nicht als WebP-Dateien im Repo integriert sind, werden in `data/event_visual_phase2_acceptance_notes.json` festgehalten. Diese Datei ist der Zwischenstand zwischen Bildproduktion und finaler Pool-Integration.
+
+Regeln:
+- `data/event_visual_pool.json` wird erst aktualisiert, wenn die WebP-Dateien wirklich unter `assets/event-visuals/` liegen.
+- `data/event_visual_gap_backlog.tsv` bleibt ein generierter Bedarf-/Gap-Abgleich und wird nicht als manueller Produktionsnotizzettel verwendet.
+- Für neue Kandidaten müssen `visual_key` und kanonisches `visual_motif` aus `scripts/event_visual_motifs.py` gesetzt werden.
+- `production_status=downloaded_confirmed` bedeutet: Der Download wurde im Produktionschat explizit bestätigt.
+- `production_status=selected_pending_confirmation` bedeutet: Das Bild wurde empfohlen, aber der Download ist noch nicht eindeutig bestätigt.
+- Vor jedem neuen größeren Produktionsblock wird der Stand gegen die kanonische Motivliste und die bereits vorhandenen `ready`-Assets abgeglichen.
+
 ### Implementierungsreihenfolge
 
 1. Dokumentierter Vertrag.
