@@ -1,0 +1,3 @@
+status	priority	event_title	event_date	visual_key	visual_motif	problem	recommended_action	source_url	notes
+open	high	Wijfeest Aalten 2026	2026-06-12	food_drink_festival	wine_festival	Motiv erkannt, aber kein passendes ready-Bild im Event-Visual-Pool.	Motivbild generieren oder vorhandenes Bild explizit diesem Motiv zuordnen.	https://www.aalten.nl/	Quelle: data/events.json; Treffer in ausgewerteten Quellen: 1
+open	medium	Historische Stadtführung	2026-06-12	city_tour_history	costumed_history_tour	Motiv erkannt, aber kein passendes ready-Bild im Event-Visual-Pool.	Motivbild generieren oder vorhandenes Bild explizit diesem Motiv zuordnen.	https://www.bocholt.de/	Quelle: data/events.json; Treffer in ausgewerteten Quellen: 1

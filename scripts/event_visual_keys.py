@@ -122,7 +122,33 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(krammarkt|stoffmarkt|flohmarkt|trödelmarkt|troedelmarkt|wochenmarkt|grenzmarkt|marktstände|marktstaende|martinsmarkt)\b"):
         return "market_stalls"
 
-    # 2) Kultur/Textil: Eventtyp vor Location.
+    # 2) Sehr starke Bühnen-, Musik- und Sprachformate vor Textil-/Museums-Location.
+    # Beispiel: Lachnacht im TextilWerk bleibt Comedy, nicht Textilmaschinen.
+    if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
+        return "dance_music_workshop"
+
+    if match(r"\b(kindertheater|puppenspiel|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl)\b"):
+        return "kids_stage_story"
+
+    if match(r"\b(comedy|kabarett|lachnacht|stand[- ]?up|kleinkunst)\b"):
+        return "comedy_cabaret"
+
+    if match(r"\b(film|kino|open[- ]?air[- ]?kino|kinoabend|filmabend|dokufilm)\b"):
+        return "film_screening"
+
+    if match(r"\b(lesung|literatur|autorengespräch|autorengespraech|gedichte|poetry|poesie)\b"):
+        return "literature_reading_talk"
+
+    if match(r"\b(orgel|oratorium|chor|chorkonzert|kammermusik|klassik|quartett|quartet|kirchenkonzert|sinfonie)\b"):
+        return "classical_music"
+
+    if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|band|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
+        return "live_music_stage"
+
+    if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):
+        return "theater_stage"
+
+    # 3) Kultur/Textil: Eventtyp vor Location.
     if match(r"\b(maschinen[- ]?mittwoch|drossel[- ]?donnerstag|spinnerei|weberei|industriekultur|textilmaschinen?)\b"):
         return "textile_machines_industry"
 
@@ -166,7 +192,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(konzert|open[- ]?air[- ]?konzert|live[- ]?musik|band|tribute|unplugged|dj|pop|rock|musikschulfest)\b"):
         return "live_music_stage"
 
-    if match(r"\b(theater|schauspiel|bühnenstück|buehnenstueck|theaterbühne|theaterbuehne|musical)\b"):
+    if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):
         return "theater_stage"
 
     # 4) Feste, Stadtleben, Familie.
@@ -190,7 +216,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(citylauf|abendlauf|lauf|marathon|halbmarathon|running)\b"):
         return "running_event"
 
-    if match(r"\b(münsterlandgiro|muensterlandgiro|profiradsport|giro|radrennen|radsport|bike race|fahrradfrühling|fahrradfruehling)\b"):
+    if match(r"\b(münsterlandgiro|muensterlandgiro|profiradsport|giro|radrennen|radsport|bike race|fahrrad[- ]?frühling|fahrrad[- ]?fruehling)\b"):
         return "cycling_event"
 
     if match(r"\b(darts|fechten|turnier|meisterschaft|hallen(sport)?|wettkampf)\b"):
