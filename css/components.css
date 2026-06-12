@@ -1762,6 +1762,11 @@ body.has-bottom-tabbar{
   }
 
   .page--activities .discovery-card--compact{
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    row-gap: 0;
+    column-gap: 0;
+    align-items: stretch;
     min-height: 100%;
     padding: 0;
     border-radius: 24px;
@@ -1793,15 +1798,22 @@ body.has-bottom-tabbar{
     outline-offset: 3px;
   }
 
-  /* === BEGIN BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_WITH_SYMBOLIC_BADGE_V3 | Zweck: ergänzt im Desktop-Activity-Feed eine ruhige Symbolbild-Badge direkt im Bild, ohne die bestehende Card-Geometrie zu verändern; Umfang: ersetzt nur den Desktop-Media-/Image-Block im Activity-Bereich === */
+  /* === BEGIN BLOCK: ACTIVITIES_DESKTOP_CARD_MEDIA_GEOMETRY_V4 | Zweck: setzt die mobile Thumbnail-Geometrie auf Desktop vollständig zurück und stellt die große 16:9-Bildfläche analog zum Event-Feed wieder her; Umfang: nur Desktop-Media-/Image-Block im Activity-Bereich === */
   .page--activities .activity-card-media{
     position: relative;
     display: block;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: stretch;
+    align-self: stretch;
     width: 100%;
+    height: auto;
     aspect-ratio: 16 / 9;
+    border-radius: 24px 24px 0 0;
     border-bottom: 1px solid rgba(18,34,26,0.055);
     overflow: hidden;
     background: linear-gradient(135deg, rgba(229,237,229,0.96), rgba(213,226,216,0.92));
+    box-shadow: none;
   }
 
   .page--activities .activity-card-media::after{
@@ -1845,7 +1857,7 @@ body.has-bottom-tabbar{
     line-height: 1;
     letter-spacing: 0.02em;
   }
-  /* === END BLOCK: ACTIVITIES_MEDIA_AND_SKELETON_PARITY_WITH_SYMBOLIC_BADGE_V3 === */
+  /* === END BLOCK: ACTIVITIES_DESKTOP_CARD_MEDIA_GEOMETRY_V4 === */
 
   .page--activities .activity-card-media__scrim{
     position: absolute;
@@ -1930,6 +1942,10 @@ body.has-bottom-tabbar{
   }
 
   .page--activities .discovery-card--compact .event-card-body{
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: stretch;
+    min-width: 0;
     gap: 8px;
     padding: 16px 18px 18px;
   }
