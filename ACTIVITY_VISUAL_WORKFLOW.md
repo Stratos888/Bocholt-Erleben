@@ -207,3 +207,30 @@ reason: konkreter Spielplatz mit spezifischer Ausstattung; KI erzeugt falsche do
 ```
 
 <!-- === END BLOCK: ACTIVITY_VISUAL_WORKFLOW_SOURCING_GATE_V1_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_TRANSPARENCY_CONTRACT_V1_2026_06_12 | Zweck: dokumentiert die dauerhafte Kennzeichnungslogik fuer KI-generierte und symbolische Activity-Bilder === -->
+
+## Transparenzvertrag fuer Symbolbilder und KI-Bilder
+
+Activity-Bilder duerfen Nutzer nicht darueber taeuschen, ob sie ein dokumentarisches Foto eines konkreten Ortes zeigen. Der EU AI Act enthaelt Transparenzpflichten fuer bestimmte KI-generierte bzw. manipulierte Inhalte, insbesondere Deepfakes und bestimmte KI-generierte Veroeffentlichungen von oeffentlichem Interesse. Fuer `Bocholt erleben` gilt deshalb bewusst ein strengerer Produktstandard als das jeweils sicher zwingende rechtliche Minimum.
+
+Verbindliche UI-Logik:
+
+| Bildtyp | Card-Badge | Detailpanel / Bildnachweis | Datenvertrag |
+|---|---|---|---|
+| echtes dokumentarisches Foto der konkreten Activity mit sauberer Rechtebasis | keine Symbolbild-Badge | Urheber/Lizenz/Quelle, falls relevant | `source_type` real/licensed, `is_symbolic=false`, `is_documentary=true`, `is_ai_generated=false` |
+| echtes Foto, aber nur stellvertretend/generisch | `Symbolbild` | `Symbolbild` plus Urheber/Lizenz/Quelle | `is_symbolic=true`, `is_documentary=false`, `is_ai_generated=false` |
+| KI-generiertes Activity-Bild | `Symbolbild` | `KI-generiertes Symbolbild` | `source_type=generated_activity_visual`, `is_symbolic=true`, `is_documentary=false`, `is_ai_generated=true` |
+
+Die Card-Badge bleibt absichtlich kurz (`Symbolbild`), damit Feed-Cards nicht ueberladen werden. Die praezisere KI-Transparenz gehoert in das Detailpanel bzw. den Bildnachweis (`KI-generiertes Symbolbild`).
+
+`public_note` ist nur fuer bewusst oeffentliche Bildhinweise erlaubt. Interne Review-, QA-, Anchor-Test- oder Produktionsnotizen duerfen nie in oeffentliche JSON-Felder gelangen und duerfen nicht in Cards oder Detailpanels gerendert werden. Interne Notizen gehoeren in separate Review-Dokumentation, nicht in den live verwendeten Activity-Visual-Pool.
+
+Audit-Regel:
+
+- `note` ist im oeffentlichen Activity-Visual-Pool verboten.
+- KI-generierte Activity-Bilder muessen `is_ai_generated=true`, `is_symbolic=true` und `is_documentary=false` tragen.
+- KI-generierte Activity-Bilder duerfen nicht als dokumentarische Ortsaufnahme erscheinen oder so beschrieben werden.
+- Wenn eine Activity ein dokumentarisches Bild braucht, ist KI kein finaler Premium-Ersatz; dann gilt das Sourcing-Gate.
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_TRANSPARENCY_CONTRACT_V1_2026_06_12 === -->

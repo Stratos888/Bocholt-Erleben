@@ -261,3 +261,34 @@ Schön, aber falsch: nicht premiumfähig.
 ```
 
 <!-- === END BLOCK: ACTIVITY_VISUAL_PROMPT_KIT_SOURCING_GATE_V1_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ACTIVITY_VISUAL_PROMPT_KIT_METADATA_TRANSPARENCY_V1_2026_06_12 | Zweck: fixiert die Metadaten- und Label-Regeln fuer KI-generierte Activity-Assets nach der Bildauswahl === -->
+
+## Metadaten nach KI-Bildauswahl
+
+Wenn ein KI-generiertes Activity-Bild akzeptiert und als Card-Asset exportiert wird, muss der Pool-Eintrag diese Metadaten tragen:
+
+- `source=chatgpt_generated`
+- `rights_status=generated_project_asset`
+- `source_type=generated_activity_visual`
+- `is_symbolic=true`
+- `is_documentary=false`
+- `is_ai_generated=true`
+
+Kein Prompt und kein Review darf das Ergebnis als echtes dokumentarisches Foto eines konkreten Ortes beschreiben, sofern keine eigene oder belastbar freigegebene reale Referenz verwendet wurde.
+
+Oeffentliche Kennzeichnung:
+
+- Card: `Symbolbild`
+- Detailpanel / Bildnachweis: `KI-generiertes Symbolbild`
+
+Nicht in den Pool schreiben:
+
+- interne Review-Kommentare
+- Anchor-Test-Notizen
+- Produktionsentscheidungen
+- Prompt-Fails oder QA-Hinweise
+
+Solche Informationen gehoeren in Review-/Workflow-Dokumentation. Im oeffentlichen Pool ist dafuer nur `public_note` erlaubt, und auch nur, wenn der Text bewusst in der UI erscheinen soll.
+
+<!-- === END BLOCK: ACTIVITY_VISUAL_PROMPT_KIT_METADATA_TRANSPARENCY_V1_2026_06_12 === -->
