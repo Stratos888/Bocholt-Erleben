@@ -57,6 +57,63 @@ const OfferVisuals = (() => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
   }
+  function normalizePoolKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[äÄ]/g, "ae")
+      .replace(/[öÖ]/g, "oe")
+      .replace(/[üÜ]/g, "ue")
+      .replace(/[ß]/g, "ss")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  const ACTIVITY_VISUAL_POOL_STATUSES = new Set(["ready", "fallback"]);
+  let activityVisualPool = Object.freeze({ pools: Object.freeze({}) });
+
+  function setActivityVisualPool(data) {
+    const pools = data && typeof data === "object" && data.pools && typeof data.pools === "object"
+      ? data.pools
+      : {};
+    activityVisualPool = Object.freeze({ pools });
+  }
+
+  function getUsablePoolImage(poolEntry) {
+    const images = Array.isArray(poolEntry?.images) ? poolEntry.images : [];
+    return images.find((image) => {
+      const status = String(image?.status || "").trim().toLowerCase();
+      const src = String(image?.src || "").trim();
+      return src && ACTIVITY_VISUAL_POOL_STATUSES.has(status);
+    }) || null;
+  }
+
+  function resolvePoolImageData(offer) {
+    const explicitKey = normalizePoolKey(offer?.visual_key || offer?.image_visual_key || "");
+    if (!explicitKey) return null;
+
+    const poolEntry = activityVisualPool.pools?.[explicitKey];
+    const poolImage = getUsablePoolImage(poolEntry);
+    if (!poolImage) return null;
+
+    return {
+      url: normalizeHttpUrl(poolImage.src),
+      positionX: String(poolImage.position_x || poolImage.positionX || "50%").trim() || "50%",
+      positionY: String(poolImage.position_y || poolImage.positionY || "50%").trim() || "50%",
+      fit: String(poolImage.fit || "cover").trim() || "cover",
+      sourcePage: String(poolImage.source_page || poolImage.sourcePage || "").trim(),
+      author: String(poolImage.author || "").trim(),
+      license: String(poolImage.license || "").trim(),
+      credit: String(poolImage.credit || "").trim(),
+      isSymbolic: normalizeBoolean(poolImage.is_symbolic),
+      isDocumentary: normalizeBoolean(poolImage.is_documentary),
+      status: String(poolImage.status || "").trim(),
+      visualKey: explicitKey,
+      alt: String(poolImage.alt || poolEntry?.label || "").trim(),
+      note: String(poolImage.note || "").trim()
+    };
+  }
+
 
   const GENERIC_ACTIVITY_IMAGES = Object.freeze({
     "park-green": {
@@ -195,6 +252,9 @@ const OfferVisuals = (() => {
   }
 
   function resolveImageData(offer) {
+    const poolImage = resolvePoolImageData(offer);
+    if (poolImage?.url) return poolImage;
+
     const explicitUrl = normalizeHttpUrl(offer?.image);
     if (explicitUrl) {
       return {
@@ -207,6 +267,10 @@ const OfferVisuals = (() => {
         license: String(offer?.image_license || "").trim(),
         credit: String(offer?.image_credit || "").trim(),
         isSymbolic: normalizeBoolean(offer?.image_is_symbolic),
+        isDocumentary: false,
+        status: "offer_image",
+        visualKey: "",
+        alt: "",
         note: String(offer?.image_note || "").trim()
       };
     }
@@ -225,6 +289,10 @@ const OfferVisuals = (() => {
         license: genericImage.license || "",
         credit: genericImage.credit || "",
         isSymbolic: true,
+        isDocumentary: false,
+        status: "generic_fallback",
+        visualKey: genericKey,
+        alt: "",
         note: genericImage.note || "Symbolbild"
       };
     }
@@ -239,6 +307,10 @@ const OfferVisuals = (() => {
       license: "",
       credit: "",
       isSymbolic: false,
+      isDocumentary: false,
+      status: "",
+      visualKey: "",
+      alt: "",
       note: ""
     };
   }
@@ -477,6 +549,7 @@ function getCategoryPresentation(category) {
   return {
     escapeHtml,
     normalizeHttpUrl,
+    setActivityVisualPool,
     resolveImageData,
     slugify,
     getCategoryPresentation,
@@ -607,13 +680,16 @@ const OfferCards = (() => {
     const title = String(offer?.title || "").trim();
     const location = String(offer?.location || "").trim();
     const note = String(imageData?.note || "").trim();
+    const alt = String(imageData?.alt || "").trim();
 
     if (imageData?.isSymbolic) {
+      if (alt) return alt;
       if (title && location) return `Symbolbild für ${title} – ${location}`;
       if (title) return `Symbolbild für ${title}`;
       return "Symbolbild für Aktivität in Bocholt und Umgebung";
     }
 
+    if (alt) return alt;
     if (title && location) return `${title} – ${location}`;
     if (title) return title;
     if (location) return `Aktivität in ${location}`;

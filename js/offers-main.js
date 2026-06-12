@@ -89,6 +89,21 @@ const OffersApp = {
       }
 
       const data = await response.json();
+
+      try {
+        const visualPoolResponse = await fetch("/data/activity_visual_pool.json", { cache: "no-store" });
+        if (visualPoolResponse.ok) {
+          const visualPoolData = await visualPoolResponse.json();
+          if (typeof window.OfferVisuals?.setActivityVisualPool === "function") {
+            window.OfferVisuals.setActivityVisualPool(visualPoolData);
+          }
+        } else {
+          console.warn(`activity_visual_pool.json load failed: ${visualPoolResponse.status} ${visualPoolResponse.statusText}`);
+        }
+      } catch (visualPoolError) {
+        console.warn("Activity visual pool unavailable; falling back to offer.image.", visualPoolError);
+      }
+
       const rawOffers = Array.isArray(data) ? data : (Array.isArray(data?.offers) ? data.offers : []);
 
       this.offers = rawOffers
