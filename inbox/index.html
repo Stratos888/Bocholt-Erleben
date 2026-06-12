@@ -944,6 +944,58 @@ Umfang:
     }
     /* === END BLOCK: REVIEW_ACTIVITY_OPENING_DISPLAY_V1 === */
 
+    /* === BEGIN BLOCK: REVIEW_ACTIVITY_IMAGE_DISPLAY_V1 | Zweck: zeigt Bildmaterial-Angaben aus Aktivitaetspraesenz-Einreichungen in der Review-Inbox; Umfang: reine Anzeigehelfer ohne Aktionslogik === */
+    function formatActivityImageAvailability(value) {
+      const key = trimValue(value);
+      const labels = {
+        yes: "Bildmaterial vorhanden",
+        no: "Bocholt erleben soll sich kümmern",
+        unsure: "Unsicher"
+      };
+
+      return labels[key] || key;
+    }
+
+    function formatActivityImageMethod(value) {
+      const key = trimValue(value);
+      const labels = {
+        download_link: "Downloadlink / Cloud-Ordner / Pressemappe",
+        website_gallery: "Website-Galerie",
+        email_later: "Bilder folgen per E-Mail",
+        other: "Sonstiger Hinweis"
+      };
+
+      return labels[key] || key;
+    }
+
+    function formatActivityImageReviewStatus(value) {
+      const key = trimValue(value);
+      const labels = {
+        customer_material_available: "Kundenmaterial prüfen",
+        editorial_image_needed: "Redaktionelles Bild vorbereiten",
+        image_clarification_needed: "Bildfrage klären"
+      };
+
+      return labels[key] || key;
+    }
+
+    function buildActivityImageReviewRows(item) {
+      const image = getReviewPlainObject(item && item.activity_image);
+      if (!image) return [];
+
+      const rows = [
+        ["Bildmaterial laut Anbieter", formatActivityImageAvailability(image.availability)],
+        ["Bereitstellung", formatActivityImageMethod(image.method)],
+        ["Bildlink", trimValue(image.url)],
+        ["Hinweis zum Bildmaterial", trimValue(image.notes)],
+        ["Bildrechte bestätigt", image.rights_confirmed === true ? "ja" : "nein / nicht erforderlich"],
+        ["Bild-Prüfstatus", formatActivityImageReviewStatus(image.review_status)]
+      ];
+
+      return rows.filter(([, value]) => trimValue(value));
+    }
+    /* === END BLOCK: REVIEW_ACTIVITY_IMAGE_DISPLAY_V1 === */
+
     function renderCurrent(totalCount) {
       refreshLock();
 
@@ -1048,6 +1100,7 @@ Umfang:
       ].filter(([, value]) => value);
 
       const activityOpeningRows = isActivityPresence ? buildActivityOpeningReviewRows(it) : [];
+      const activityImageRows = isActivityPresence ? buildActivityImageReviewRows(it) : [];
 
       const primaryRows = (isActivityPresence ? [
         ["Anbieter / Ort", placeLine],
@@ -1065,6 +1118,7 @@ Umfang:
       const secondaryRows = (isActivityPresence ? [
         ["Ortsfreigabe", it.review_source === "submission_db" ? (it.location_public_confirmed ? "bestätigt" : "nicht bestätigt") : ""],
         ["Eingereicht am", submittedAt],
+        ...activityImageRows,
         ...activityOpeningRows,
         ["Prüfhinweis", curationNote],
         ["Dubletten-/Importhinweis", dedupeHint]

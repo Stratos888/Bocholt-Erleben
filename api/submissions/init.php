@@ -429,6 +429,96 @@ function pf_activity_opening_json_from_input($value, string $submissionKind): ?s
 }
 /* === END BLOCK: ACTIVITY_OPENING_SUBMISSION_V1 === */
 
+/* === BEGIN BLOCK: ACTIVITY_IMAGE_MATERIAL_SUBMISSION_V1 | Zweck: validiert optionale Bildmaterial-Angaben fuer Aktivitaetspraesenzen ohne Datei-Upload; Umfang: additive JSON-Normalisierung fuer submissions.activity_image_json === */
+function pf_validate_activity_image_url(?string $url): ?string
+{
+    if ($url === null) {
+        return null;
+    }
+
+    if (strlen($url) > 2048 || !filter_var($url, FILTER_VALIDATE_URL)) {
+        throw new InvalidArgumentException('Der Link zum Bildmaterial muss eine gültige URL sein.');
+    }
+
+    return $url;
+}
+
+function pf_activity_image_json_from_input($value, string $submissionKind): ?string
+{
+    if ($submissionKind !== 'activity') {
+        return null;
+    }
+
+    if (!is_array($value)) {
+        throw new InvalidArgumentException('Bitte gib an, ob Bildmaterial zur Aktivität vorhanden ist.');
+    }
+
+    $availability = trim((string)($value['availability'] ?? ''));
+    $allowedAvailability = ['yes', 'no', 'unsure'];
+    if (!in_array($availability, $allowedAvailability, true)) {
+        throw new InvalidArgumentException('Bitte gib an, ob Bildmaterial zur Aktivität vorhanden ist.');
+    }
+
+    $payload = [
+        'availability' => $availability,
+        'rights_confirmed' => pf_boolish_to_int($value['rights_confirmed'] ?? null) === 1,
+    ];
+
+    if ($availability === 'yes') {
+        $method = trim((string)($value['method'] ?? ''));
+        $allowedMethods = ['download_link', 'website_gallery', 'email_later', 'other'];
+        if (!in_array($method, $allowedMethods, true)) {
+            throw new InvalidArgumentException('Bitte wähle aus, wie das Bildmaterial bereitgestellt wird.');
+        }
+
+        if ($payload['rights_confirmed'] !== true) {
+            throw new InvalidArgumentException('Bitte bestätige die Bildrechte für das bereitgestellte Bildmaterial.');
+        }
+
+        $payload['method'] = $method;
+
+        $imageUrl = pf_validate_activity_image_url(pf_nullable_string($value['url'] ?? null));
+        if (in_array($method, ['download_link', 'website_gallery'], true) && $imageUrl === null) {
+            throw new InvalidArgumentException('Bitte trage den Link zum Bildmaterial ein.');
+        }
+
+        if ($imageUrl !== null) {
+            $payload['url'] = $imageUrl;
+        }
+
+        $notes = pf_nullable_string($value['notes'] ?? null);
+        if ($method === 'other' && $notes === null) {
+            throw new InvalidArgumentException('Bitte ergänze einen kurzen Hinweis zum Bildmaterial.');
+        }
+
+        if ($notes !== null) {
+            if (strlen($notes) > 2000) {
+                throw new InvalidArgumentException('Der Hinweis zum Bildmaterial ist zu lang.');
+            }
+
+            $payload['notes'] = $notes;
+        }
+    }
+
+    $payload['review_status'] = match ($availability) {
+        'yes' => 'customer_material_available',
+        'no' => 'editorial_image_needed',
+        default => 'image_clarification_needed',
+    };
+
+    $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded) || $encoded === '') {
+        throw new RuntimeException('Bildmaterial-Angaben konnten nicht gespeichert werden.');
+    }
+
+    if (strlen($encoded) > 6000) {
+        throw new InvalidArgumentException('Die Angaben zum Bildmaterial sind zu lang.');
+    }
+
+    return $encoded;
+}
+/* === END BLOCK: ACTIVITY_IMAGE_MATERIAL_SUBMISSION_V1 === */
+
 try {
     /* === BEGIN BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 | Zweck: verhindert Veranstalter-Overwrite und erzwingt unveraenderbare Abo-Reuse-Daten serverseitig; Umfang: kompletter try-Hauptblock bis vor Error-Handling === */
     $input = pf_read_json_body();
@@ -462,6 +552,7 @@ try {
     $descriptionText = pf_nullable_string($input['description_text'] ?? null);
     $notesText = pf_nullable_string($input['notes_text'] ?? null);
     $activityOpeningJson = pf_activity_opening_json_from_input($input['activity_opening'] ?? null, $submissionKind);
+    $activityImageJson = pf_activity_image_json_from_input($input['activity_image'] ?? null, $submissionKind);
 
     /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INPUT_VALIDATION_V1 | Zweck: trennt Event-Pflichtlogik von Aktivitaetspraesenz-Pflichtlogik und setzt passenden Startstatus; Umfang: ersetzt Validierung, paymentKind/intakeOrigin und paymentReferenceKey-Zuweisung === */
     if ($submissionKind === 'activity') {
@@ -583,7 +674,8 @@ try {
             ticket_url,
             description_text,
             notes_text,
-            activity_opening_json
+            activity_opening_json,
+            activity_image_json
         ) VALUES (
             :organizer_id,
             :submission_kind,
@@ -605,7 +697,8 @@ try {
             :ticket_url,
             :description_text,
             :notes_text,
-            :activity_opening_json
+            :activity_opening_json,
+            :activity_image_json
         )'
     );
 
@@ -631,6 +724,7 @@ try {
         ':description_text' => $descriptionText,
         ':notes_text' => $notesText,
         ':activity_opening_json' => $activityOpeningJson,
+        ':activity_image_json' => $activityImageJson,
     ]);
 
     $submissionId = (int)$pdo->lastInsertId();

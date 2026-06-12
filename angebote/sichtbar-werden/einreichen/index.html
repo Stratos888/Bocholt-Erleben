@@ -317,6 +317,54 @@
           </div>
           <!-- === END BLOCK: ACTIVITY_PRESENCE_OPENING_FIELDS_V1 === -->
 
+        <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_FIELDS_V1 | Zweck: fragt optionales Bildmaterial ohne Datei-Upload ab; Umfang: additiver Formularblock vor den allgemeinen Hinweisen === -->
+        <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
+          <h3>Bildmaterial</h3>
+        </div>
+
+        <label class="content-field content-field--full" for="activity-presence-image-availability">
+          <span class="content-field__label">Bildmaterial für die Aktivität vorhanden? *</span>
+          <select class="content-field__control" id="activity-presence-image-availability" name="imageAvailability" required aria-controls="activity-presence-image-details">
+            <option value="">Bitte auswählen</option>
+            <option value="yes">Ja, passendes Bildmaterial ist vorhanden</option>
+            <option value="no">Nein, bitte Bocholt erleben kümmert sich um ein passendes Bild</option>
+            <option value="unsure">Unsicher</option>
+          </select>
+          <p class="content-field__hint">Ein Bild ist nicht zwingend nötig. Wir entscheiden redaktionell, welches Bild zur Plattform passt.</p>
+        </label>
+
+        <div class="content-field content-field--full" id="activity-presence-image-details" hidden>
+          <label class="content-field" for="activity-presence-image-method">
+            <span class="content-field__label">Wie möchtest du das Bildmaterial bereitstellen? *</span>
+            <select class="content-field__control" id="activity-presence-image-method" name="imageMethod">
+              <option value="">Bitte auswählen</option>
+              <option value="download_link">Downloadlink / Cloud-Ordner / Pressemappe</option>
+              <option value="website_gallery">Website-Galerie mit passenden Bildern</option>
+              <option value="email_later">Ich sende Bilder später per E-Mail</option>
+              <option value="other">Sonstiger Hinweis</option>
+            </select>
+          </label>
+
+          <label class="content-field" for="activity-presence-image-url" data-image-url-field hidden>
+            <span class="content-field__label">Link zum Bildmaterial *</span>
+            <input class="content-field__control" id="activity-presence-image-url" name="imageUrl" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="content-field" for="activity-presence-image-notes">
+            <span class="content-field__label">Hinweis zum Bildmaterial</span>
+            <textarea class="content-field__control" id="activity-presence-image-notes" name="imageNotes" rows="3" placeholder="Optional: Welche Bilder sind geeignet, was soll nicht verwendet werden?"></textarea>
+          </label>
+
+          <label class="content-field content-field--checkbox" for="activity-presence-image-rights-confirmed">
+            <span class="content-field__label">Bildrechte *</span>
+            <span class="content-field__hint">
+              <input id="activity-presence-image-rights-confirmed" name="imageRightsConfirmed" type="checkbox">
+              Ich bestätige, dass ich berechtigt bin, das bereitgestellte, verlinkte oder später zugesendete Bildmaterial zur Prüfung und möglichen Veröffentlichung auf Bocholt erleben bereitzustellen.
+            </span>
+          </label>
+        </div>
+        <!-- === END BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_FIELDS_V1 === -->
+
         <label class="content-field content-field--full" for="activity-presence-notes">
           <span class="content-field__label">Weitere Hinweise</span>
           <textarea class="content-field__control" id="activity-presence-notes" name="notes" rows="3"></textarea>
@@ -350,7 +398,7 @@
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-<script src="/js/activity-presence-funnel.js?v=2026-06-05-activity-opening-payload-2" defer></script>
+<script src="/js/activity-presence-funnel.js?v=2026-06-12-activity-image-material-1" defer></script>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_BODY_V1 === -->
 </body>
 </html>

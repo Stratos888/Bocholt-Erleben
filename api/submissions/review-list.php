@@ -66,7 +66,7 @@ function srl_build_risk_flags(array $row): array
 
 
 /* === BEGIN BLOCK: ACTIVITY_OPENING_REVIEW_PAYLOAD_V1 | Zweck: gibt strukturierte Oeffnungszeiten fuer Aktivitaetspraesenz-Submissions an die Review-Inbox weiter; Umfang: additive JSON-Dekodierung ohne bestehende Review-Felder zu veraendern === */
-function srl_decode_activity_opening($value): ?array
+function srl_decode_json_object_or_null($value): ?array
 {
     $raw = trim((string)($value ?? ''));
     if ($raw === '') {
@@ -79,6 +79,16 @@ function srl_decode_activity_opening($value): ?array
     }
 
     return $decoded;
+}
+
+function srl_decode_activity_opening($value): ?array
+{
+    return srl_decode_json_object_or_null($value);
+}
+
+function srl_decode_activity_image($value): ?array
+{
+    return srl_decode_json_object_or_null($value);
 }
 /* === END BLOCK: ACTIVITY_OPENING_REVIEW_PAYLOAD_V1 === */
 
@@ -107,6 +117,7 @@ try {
             description_text,
             notes_text,
             activity_opening_json,
+            activity_image_json,
             payment_released_at,
             payment_start_token_expires_at,
             payment_started_at,
@@ -179,6 +190,7 @@ try {
             'description' => (string)($row['description_text'] ?? ''),
             'notes' => (string)($row['notes_text'] ?? ''),
             'activity_opening' => srl_decode_activity_opening($row['activity_opening_json'] ?? null),
+            'activity_image' => srl_decode_activity_image($row['activity_image_json'] ?? null),
             'created_at' => (string)($row['created_at'] ?? ''),
             'payment_released_at' => (string)($row['payment_released_at'] ?? ''),
             'payment_start_token_expires_at' => (string)($row['payment_start_token_expires_at'] ?? ''),

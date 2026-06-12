@@ -214,6 +214,114 @@
   }
   /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_PAYLOAD_V1 === */
 
+  /* === BEGIN BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_PAYLOAD_V1 | Zweck: steuert die optionale Bildmaterial-Abfrage ohne Datei-Upload; Umfang: additive Helfer fuer Anzeige, Validierung und Payload === */
+  const IMAGE_METHODS_REQUIRING_URL = Object.freeze(["download_link", "website_gallery"]);
+
+  function getImageAvailability(form) {
+    return valueOf("#activity-presence-image-availability", form);
+  }
+
+  function getImageMethod(form) {
+    return valueOf("#activity-presence-image-method", form);
+  }
+
+  function imageMethodRequiresUrl(method) {
+    return IMAGE_METHODS_REQUIRING_URL.includes(method);
+  }
+
+  function syncImageFields(form) {
+    const availability = getImageAvailability(form);
+    const hasImageMaterial = availability === "yes";
+    const details = $("#activity-presence-image-details", form);
+    const methodNode = $("#activity-presence-image-method", form);
+    const urlField = form?.querySelector("[data-image-url-field]");
+    const urlNode = $("#activity-presence-image-url", form);
+    const notesNode = $("#activity-presence-image-notes", form);
+    const rightsNode = $("#activity-presence-image-rights-confirmed", form);
+    const method = getImageMethod(form);
+    const needsUrl = hasImageMaterial && imageMethodRequiresUrl(method);
+
+    if (details) details.hidden = !hasImageMaterial;
+    if (urlField) urlField.hidden = !needsUrl;
+
+    if (methodNode) {
+      methodNode.disabled = !hasImageMaterial;
+      if (!hasImageMaterial) methodNode.value = "";
+    }
+
+    if (urlNode) {
+      urlNode.disabled = !needsUrl;
+      if (!needsUrl) urlNode.value = "";
+    }
+
+    if (notesNode) {
+      notesNode.disabled = !hasImageMaterial;
+      if (!hasImageMaterial) notesNode.value = "";
+    }
+
+    if (rightsNode) {
+      rightsNode.disabled = !hasImageMaterial;
+      if (!hasImageMaterial) rightsNode.checked = false;
+    }
+  }
+
+  function validateActivityImage(form, invalidNodes) {
+    const availabilityNode = $("#activity-presence-image-availability", form);
+    const availability = getImageAvailability(form);
+
+    if (!["yes", "no", "unsure"].includes(availability)) {
+      invalidNodes.push(availabilityNode);
+      return;
+    }
+
+    if (availability !== "yes") return;
+
+    const methodNode = $("#activity-presence-image-method", form);
+    const method = getImageMethod(form);
+    const allowedMethods = ["download_link", "website_gallery", "email_later", "other"];
+    if (!allowedMethods.includes(method)) {
+      invalidNodes.push(methodNode);
+    }
+
+    if (imageMethodRequiresUrl(method)) {
+      const urlNode = $("#activity-presence-image-url", form);
+      if (!urlNode || !String(urlNode.value || "").trim() || !urlNode.checkValidity()) {
+        invalidNodes.push(urlNode);
+      }
+    }
+
+    if (method === "other" && !valueOf("#activity-presence-image-notes", form)) {
+      invalidNodes.push($("#activity-presence-image-notes", form));
+    }
+
+    const rightsNode = $("#activity-presence-image-rights-confirmed", form);
+    if (!rightsNode || !rightsNode.checked) {
+      invalidNodes.push(rightsNode);
+    }
+  }
+
+  function buildActivityImage(form) {
+    const availability = getImageAvailability(form) || "unsure";
+    const payload = {
+      availability,
+      rights_confirmed: Boolean($("#activity-presence-image-rights-confirmed", form)?.checked)
+    };
+
+    if (availability === "yes") {
+      const method = getImageMethod(form);
+      if (method) payload.method = method;
+
+      const imageUrl = valueOf("#activity-presence-image-url", form);
+      if (imageUrl) payload.url = imageUrl;
+
+      const notes = valueOf("#activity-presence-image-notes", form);
+      if (notes) payload.notes = notes;
+    }
+
+    return payload;
+  }
+  /* === END BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_PAYLOAD_V1 === */
+
   function buildNotes(form) {
     const lines = [
       valueOf("#activity-presence-duration", form) ? `Zugänglichkeit: ${valueOf("#activity-presence-duration", form)}` : "",
@@ -235,7 +343,8 @@
       "#activity-presence-zip",
       "#activity-presence-city",
       "#activity-presence-description",
-      "#activity-presence-duration"
+      "#activity-presence-duration",
+      "#activity-presence-image-availability"
     ];
 
     const invalidNodes = [];
@@ -257,6 +366,7 @@
     }
 
     validateActivityOpening(form, invalidNodes);
+    validateActivityImage(form, invalidNodes);
 
     invalidNodes.filter(Boolean).forEach(markInvalid);
 
@@ -284,7 +394,8 @@
       ticket_url: valueOf("#activity-presence-url", form),
       description_text: valueOf("#activity-presence-description", form),
       notes_text: buildNotes(form),
-      activity_opening: buildActivityOpening(form)
+      activity_opening: buildActivityOpening(form),
+      activity_image: buildActivityImage(form)
     };
   }
   /* === BEGIN BLOCK: ACTIVITY_PRESENCE_PLAN_QUERY_PREFILL_V1 | Zweck: liest ?plan=activity_basic/activity_plus aus der URL und waehlt den passenden Tarif im bestehenden Formular vor; Umfang: reine Frontend-Vorauswahl ohne Payload- oder Backend-Aenderung === */
@@ -322,8 +433,15 @@
     });
     /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_BINDINGS_V1 === */
 
+    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_BINDINGS_V1 | Zweck: bindet die optionale Bildmaterial-Abfrage an den bestehenden Formular-Init; Umfang: additive Change-Listener ohne Upload-Handling === */
+    syncImageFields(form);
+    $("#activity-presence-image-availability", form)?.addEventListener("change", () => syncImageFields(form));
+    $("#activity-presence-image-method", form)?.addEventListener("change", () => syncImageFields(form));
+    /* === END BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_BINDINGS_V1 === */
+
     submitButton?.addEventListener("click", async () => {
       syncOpeningFields(form);
+      syncImageFields(form);
 
       if (!validateFunnelForm(form)) {
         setStatus(statusNode, "Bitte fülle die markierten Pflichtfelder aus.", "error");
