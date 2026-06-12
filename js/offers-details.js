@@ -493,14 +493,16 @@ const OfferDetailPanel = {
           author: String(offer?.image_author || "").trim(),
           license: String(offer?.image_license || "").trim(),
           credit: String(offer?.image_credit || "").trim(),
+          sourceType: "",
           isSymbolic: false,
+          isAiGenerated: false,
           note: ""
         };
 
     if (imageData.url) {
-      const symbolicLabel = imageData.isSymbolic
-        ? (String(imageData.note || "").trim() || "Symbolbild")
-        : "";
+      const symbolicLabel = window.OfferVisuals?.buildSymbolicCardLabel
+        ? window.OfferVisuals.buildSymbolicCardLabel(imageData)
+        : (imageData.isSymbolic ? "Symbolbild" : "");
 
       return `
         <div class="activity-detail__media-shell">
@@ -537,7 +539,9 @@ const OfferDetailPanel = {
           author: String(offer?.image_author || "").trim(),
           license: String(offer?.image_license || "").trim(),
           credit: String(offer?.image_credit || "").trim(),
+          sourceType: "",
           isSymbolic: false,
+          isAiGenerated: false,
           note: ""
         };
 
@@ -547,7 +551,9 @@ const OfferDetailPanel = {
     const author = String(imageData.author || "").trim();
     const license = String(imageData.license || "").trim();
     const credit = String(imageData.credit || "").trim();
-    const note = imageData.isSymbolic ? (String(imageData.note || "").trim() || "Symbolbild") : "";
+    const note = window.OfferVisuals?.buildSymbolicDetailLabel
+      ? window.OfferVisuals.buildSymbolicDetailLabel(imageData)
+      : (imageData.isSymbolic ? "Symbolbild" : "");
     const showCredit = credit && (!author || !license);
     const infoIcon = window.Icons?.svg
       ? window.Icons.svg("info", { className: "activity-detail__media-attribution-icon-svg" })

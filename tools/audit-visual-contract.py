@@ -20,6 +20,7 @@ ACTIVITY_POOL_PATH = ROOT / "data" / "activity_visual_pool.json"
 VISUAL_STATUSES = {"ready", "usable", "fallback", "needs_review", "blocked"}
 EVENT_BACKLOG_STATUSES = {"planned"}
 ALL_ALLOWED_STATUSES = VISUAL_STATUSES | EVENT_BACKLOG_STATUSES
+AI_ACTIVITY_SOURCE_TYPES = {"generated_activity_visual", "ai_generated", "ai_generated_symbolic_premium_visual"}
 PRODUCTION_ACTIVITY_VISUAL_STATUSES = {"ready", "usable", "fallback"}
 EVENT_POOL_ALLOWED_OWNERS = {"event_visual_pool_v1", "event_visual_pool_v31"}
 
@@ -44,6 +45,12 @@ def as_list(value: Any) -> list[Any]:
 
 def as_dict(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def as_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value or "").strip().lower() in {"true", "1", "yes", "ja"}
 
 
 def local_asset_path(src: str) -> Path | None:
@@ -275,10 +282,35 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
             src = str(item.get("src") or "").strip()
             status = str(item.get("status") or "").strip()
 
+            source_type = str(item.get("source_type") or "").strip().lower()
+            is_symbolic = as_bool(item.get("is_symbolic"))
+            is_documentary = as_bool(item.get("is_documentary"))
+            is_ai_generated = as_bool(item.get("is_ai_generated"))
+
             if "note" in item:
                 errors.append(
                     f"activity visual {visual_key}/{image_id or '<no-id>'} contains public JSON field 'note'; "
                     "use 'public_note' only for intentional public copy and keep internal QA notes outside public data."
+                )
+
+            if "is_ai_generated" not in item:
+                errors.append(
+                    f"activity visual {visual_key}/{image_id or '<no-id>'} has no explicit is_ai_generated flag."
+                )
+
+            if source_type in AI_ACTIVITY_SOURCE_TYPES and not is_ai_generated:
+                errors.append(
+                    f"activity visual {visual_key}/{image_id or '<no-id>'} has AI source_type but is_ai_generated is not true."
+                )
+
+            if is_ai_generated and not is_symbolic:
+                errors.append(
+                    f"activity visual {visual_key}/{image_id or '<no-id>'} is AI-generated but not marked is_symbolic=true."
+                )
+
+            if is_ai_generated and is_documentary:
+                errors.append(
+                    f"activity visual {visual_key}/{image_id or '<no-id>'} is AI-generated but marked is_documentary=true."
                 )
 
             summary["image_count"] += 1

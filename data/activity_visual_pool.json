@@ -37,6 +37,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "fallback_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -65,6 +66,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -88,6 +90,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -111,6 +114,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -134,6 +138,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Günter Seggebäing / Watzmann",
@@ -165,6 +170,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Odna",
@@ -196,6 +202,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -227,6 +234,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "EvaVOR",
@@ -258,6 +266,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Günter Seggebäing",
@@ -289,6 +298,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -312,6 +322,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -335,6 +346,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -358,6 +370,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Tetzemann",
@@ -389,6 +402,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -412,6 +426,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Börste",
@@ -443,6 +458,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -466,6 +482,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Mason Richter",
@@ -497,6 +514,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -520,6 +538,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -543,6 +562,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -566,6 +586,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -589,6 +610,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -612,6 +634,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -635,6 +658,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -658,6 +682,7 @@
           "source_type": "generated_activity_visual",
           "is_symbolic": true,
           "is_documentary": false,
+          "is_ai_generated": true,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675"
         }
@@ -681,6 +706,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -709,6 +735,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Günter Seggebäing",
@@ -737,6 +764,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -765,6 +793,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "fallback_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -796,6 +825,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -824,6 +854,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -852,6 +883,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -880,6 +912,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "fallback_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Stadt Bocholt / Presse-Service",
@@ -908,6 +941,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Arch",
@@ -936,6 +970,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Wikimedia Commons",
@@ -964,6 +999,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ingo G. Krasenbrink",
@@ -992,6 +1028,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -1020,6 +1057,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -1048,6 +1086,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -1076,6 +1115,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Rijksdienst voor het Cultureel Erfgoed / Wikimedia Commons",
@@ -1104,6 +1144,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_11",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Worldfootage",
@@ -1132,6 +1173,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko",
@@ -1163,6 +1205,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Sir Gawain",
@@ -1194,6 +1237,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Reinhard G. Nießing",
@@ -1225,6 +1269,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Dietmar Rabich",
@@ -1256,6 +1301,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Michielverbeek",
@@ -1287,6 +1333,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "ready_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Ziko van Dijk",
@@ -1318,6 +1365,7 @@
           "source_type": "licensed_real_photo",
           "is_symbolic": false,
           "is_documentary": true,
+          "is_ai_generated": false,
           "review_status": "fallback_accepted_2026_06_12",
           "card_asset_format": "16:9_webp_1200x675",
           "author": "Stahlkocher",

@@ -46,6 +46,22 @@ const OfferVisuals = (() => {
     return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
   }
 
+  function isAiGeneratedSourceType(value) {
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "generated_activity_visual"
+      || normalized === "ai_generated"
+      || normalized === "ai_generated_symbolic_premium_visual";
+  }
+
+  function buildSymbolicCardLabel(imageData) {
+    return imageData?.isSymbolic ? "Symbolbild" : "";
+  }
+
+  function buildSymbolicDetailLabel(imageData) {
+    if (!imageData?.isSymbolic) return "";
+    return imageData?.isAiGenerated ? "KI-generiertes Symbolbild" : "Symbolbild";
+  }
+
   function normalizeLookupKey(value) {
     return String(value || "")
       .trim()
@@ -96,6 +112,9 @@ const OfferVisuals = (() => {
     const poolImage = getUsablePoolImage(poolEntry);
     if (!poolImage) return null;
 
+    const sourceType = String(poolImage.source_type || "").trim();
+    const isAiGenerated = normalizeBoolean(poolImage.is_ai_generated) || isAiGeneratedSourceType(sourceType);
+
     return {
       url: normalizeHttpUrl(poolImage.src),
       positionX: String(poolImage.position_x || poolImage.positionX || "50%").trim() || "50%",
@@ -105,8 +124,10 @@ const OfferVisuals = (() => {
       author: String(poolImage.author || "").trim(),
       license: String(poolImage.license || "").trim(),
       credit: String(poolImage.credit || "").trim(),
+      sourceType,
       isSymbolic: normalizeBoolean(poolImage.is_symbolic),
       isDocumentary: normalizeBoolean(poolImage.is_documentary),
+      isAiGenerated,
       status: String(poolImage.status || "").trim(),
       visualKey: explicitKey,
       alt: String(poolImage.alt || poolEntry?.label || "").trim(),
@@ -258,6 +279,9 @@ const OfferVisuals = (() => {
 
     const explicitUrl = normalizeHttpUrl(offer?.image);
     if (explicitUrl) {
+      const sourceType = String(offer?.image_source_type || "").trim();
+      const isAiGenerated = normalizeBoolean(offer?.image_is_ai_generated) || isAiGeneratedSourceType(sourceType);
+
       return {
         url: explicitUrl,
         positionX: String(offer?.image_position_x || "50%").trim() || "50%",
@@ -267,8 +291,10 @@ const OfferVisuals = (() => {
         author: String(offer?.image_author || "").trim(),
         license: String(offer?.image_license || "").trim(),
         credit: String(offer?.image_credit || "").trim(),
+        sourceType,
         isSymbolic: normalizeBoolean(offer?.image_is_symbolic),
         isDocumentary: false,
+        isAiGenerated,
         status: "offer_image",
         visualKey: "",
         alt: "",
@@ -289,8 +315,10 @@ const OfferVisuals = (() => {
         author: genericImage.author || "",
         license: genericImage.license || "",
         credit: genericImage.credit || "",
+        sourceType: "licensed_symbolic_fallback_photo",
         isSymbolic: true,
         isDocumentary: false,
+        isAiGenerated: false,
         status: "generic_fallback",
         visualKey: genericKey,
         alt: "",
@@ -307,8 +335,10 @@ const OfferVisuals = (() => {
       author: "",
       license: "",
       credit: "",
+      sourceType: "",
       isSymbolic: false,
       isDocumentary: false,
+      isAiGenerated: false,
       status: "",
       visualKey: "",
       alt: "",
@@ -552,6 +582,8 @@ function getCategoryPresentation(category) {
     normalizeHttpUrl,
     setActivityVisualPool,
     resolveImageData,
+    buildSymbolicCardLabel,
+    buildSymbolicDetailLabel,
     slugify,
     getCategoryPresentation,
     buildMetaLine,
@@ -710,9 +742,7 @@ const OfferCards = (() => {
     if (imageUrl) {
       ensureImageOriginHints(imageUrl);
       const { loading, fetchPriority } = getImageLoadingProfile(index);
-      const symbolicLabel = imageData.isSymbolic
-        ? OfferVisuals.escapeHtml(String(imageData.note || "").trim() || "Symbolbild")
-        : "";
+      const symbolicLabel = OfferVisuals.escapeHtml(OfferVisuals.buildSymbolicCardLabel(imageData));
       const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
 
       return `
