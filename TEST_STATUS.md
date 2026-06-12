@@ -3403,4 +3403,3 @@ Bewusste Restfälle:
 - `handwerksmuseum-bocholt-erleben` und `grenzenlos-wandern-dinxperlo-suderwick`: aktuell als `fallback`/Übergang bewusst akzeptiert.
 
 <!-- END TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
-
