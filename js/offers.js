@@ -110,7 +110,8 @@ const OfferVisuals = (() => {
       status: String(poolImage.status || "").trim(),
       visualKey: explicitKey,
       alt: String(poolImage.alt || poolEntry?.label || "").trim(),
-      note: String(poolImage.note || "").trim()
+      // Internal audit notes are not public copy; only public_note may be rendered.
+      note: String(poolImage.public_note || "").trim()
     };
   }
 

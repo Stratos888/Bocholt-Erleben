@@ -275,6 +275,12 @@ def audit_activity_visual_pool(errors: list[str], warnings: list[str]) -> dict[s
             src = str(item.get("src") or "").strip()
             status = str(item.get("status") or "").strip()
 
+            if "note" in item:
+                errors.append(
+                    f"activity visual {visual_key}/{image_id or '<no-id>'} contains public JSON field 'note'; "
+                    "use 'public_note' only for intentional public copy and keep internal QA notes outside public data."
+                )
+
             summary["image_count"] += 1
             summary["status_counts"][status or "<missing>"] += 1
 
