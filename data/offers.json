@@ -120,7 +120,7 @@
       "description": "Das Burloer Venn ist ein Moorgebiet nahe der Grenze mit Rundweg.",
       "url": "https://www.bocholt.de/Burloer-Venn",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331%20Burlo-Vardingholter%20Venn%2C%20Borken%20%2800892%29.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331_Entenschlatt_im_Burloer_Venn%2C_Borken_%2800877%29.jpg",
       "visual_key": "burloer_venn_entdecken",
       "image_quality": "usable",
       "image_position_x": "58%",
@@ -359,12 +359,42 @@
       "opening_hours": {
         "weekly": {
           "monday": [],
-          "tuesday": [{ "opens": "10:00", "closes": "18:00" }],
-          "wednesday": [{ "opens": "10:00", "closes": "18:00" }],
-          "thursday": [{ "opens": "10:00", "closes": "18:00" }],
-          "friday": [{ "opens": "10:00", "closes": "18:00" }],
-          "saturday": [{ "opens": "10:00", "closes": "18:00" }],
-          "sunday": [{ "opens": "10:00", "closes": "18:00" }]
+          "tuesday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ],
+          "friday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ],
+          "sunday": [
+            {
+              "opens": "10:00",
+              "closes": "18:00"
+            }
+          ]
         },
         "notes": "Montags geschlossen, außer an Feiertagen. Letzter Einlass 17:30 Uhr. Winterpause jährlich prüfen."
       },
@@ -404,7 +434,8 @@
       "description": "Das Handwerksmuseum in Bocholt zeigt historische Berufe und Werkstätten.",
       "url": "https://bocholter-handwerksmuseum.de/museum/",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Handwerksmuseum%20Bocholt.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Handwerksmuseum_Bocholt.jpg",
+      "visual_key": "handwerksmuseum_bocholt_erleben",
       "image_quality": "usable",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -458,10 +489,20 @@
           "monday": [],
           "tuesday": [],
           "wednesday": [],
-          "thursday": [{ "opens": "15:00", "closes": "18:00" }],
+          "thursday": [
+            {
+              "opens": "15:00",
+              "closes": "18:00"
+            }
+          ],
           "friday": [],
           "saturday": [],
-          "sunday": [{ "opens": "14:00", "closes": "18:00" }]
+          "sunday": [
+            {
+              "opens": "14:00",
+              "closes": "18:00"
+            }
+          ]
         },
         "notes": "Sondertermine nach Vereinbarung möglich. Feiertage vor Besuch prüfen."
       },
@@ -796,12 +837,42 @@
       "opening_hours": {
         "weekly": {
           "monday": [],
-          "tuesday": [{ "opens": "10:00", "closes": "17:00" }],
-          "wednesday": [{ "opens": "10:00", "closes": "17:00" }],
-          "thursday": [{ "opens": "10:00", "closes": "17:00" }],
-          "friday": [{ "opens": "10:00", "closes": "17:00" }],
-          "saturday": [{ "opens": "10:00", "closes": "17:00" }],
-          "sunday": [{ "opens": "13:00", "closes": "17:00" }]
+          "tuesday": [
+            {
+              "opens": "10:00",
+              "closes": "17:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "10:00",
+              "closes": "17:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "10:00",
+              "closes": "17:00"
+            }
+          ],
+          "friday": [
+            {
+              "opens": "10:00",
+              "closes": "17:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "10:00",
+              "closes": "17:00"
+            }
+          ],
+          "sunday": [
+            {
+              "opens": "13:00",
+              "closes": "17:00"
+            }
+          ]
         },
         "notes": "Montags geschlossen, außer an einzelnen Feiertagen. Sonderregeln für Ostern, Pfingsten, Weihnachten, Jahreswechsel und Neujahr beachten."
       },
@@ -839,7 +910,8 @@
       "description": "Schloss Ringenberg ist ein Wasserschloss und Kulturort in Hamminkeln-Ringenberg.",
       "url": "https://www.meinschlossringenberg.de/das-schloss/",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Hamminkeln-Ringenberg-Schloss_Ringenberg_01.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/SchlossRingenberg04.jpg",
+      "visual_key": "schloss_ringenberg_erleben",
       "image_quality": "usable",
       "image_position_x": "50%",
       "image_position_y": "54%",
@@ -1013,7 +1085,8 @@
       "description": "Die Anholter Schweiz ist ein Biotopwildpark mit Wegen und Tiergehegen.",
       "url": "https://www.wildpark-nrw.de/",
       "website_label": "Website / Infos (DE)",
-      "image": "https://www.wildpark-nrw.de/wp-content/uploads/2024/12/impressionen6-495x400.webp",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/20200722_Anholter_Schweiz_04.jpg",
+      "visual_key": "anholter_schweiz_erleben",
       "image_quality": "usable",
       "image_position_x": "50%",
       "image_position_y": "52%",
@@ -1106,7 +1179,8 @@
       "description": "Die Villa Mondriaan ist ein Museum zu den frühen Jahren Piet Mondriaans mit wechselnden Ausstellungen in Winterswijk.",
       "url": "https://villamondriaan.nl/de/",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Villa%20Mondriaan.jpeg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/2013-05-18_villa_mondrian.JPG",
+      "visual_key": "villa_mondriaan_winterswijk_erleben",
       "image_quality": "usable",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -1158,12 +1232,42 @@
       "opening_hours": {
         "weekly": {
           "monday": [],
-          "tuesday": [{ "opens": "11:00", "closes": "17:00" }],
-          "wednesday": [{ "opens": "11:00", "closes": "17:00" }],
-          "thursday": [{ "opens": "11:00", "closes": "17:00" }],
-          "friday": [{ "opens": "11:00", "closes": "16:00" }],
-          "saturday": [{ "opens": "11:00", "closes": "17:00" }],
-          "sunday": [{ "opens": "11:00", "closes": "17:00" }]
+          "tuesday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ],
+          "friday": [
+            {
+              "opens": "11:00",
+              "closes": "16:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ],
+          "sunday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ]
         },
         "notes": "Montags geschlossen. Feiertage, Sondertage und Umbauwochen jährlich prüfen."
       },
@@ -1254,11 +1358,36 @@
       "opening_hours": {
         "weekly": {
           "monday": [],
-          "tuesday": [{ "opens": "13:00", "closes": "17:00" }],
-          "wednesday": [{ "opens": "13:00", "closes": "17:00" }],
-          "thursday": [{ "opens": "13:00", "closes": "17:00" }],
-          "friday": [{ "opens": "13:00", "closes": "17:00" }],
-          "saturday": [{ "opens": "11:00", "closes": "17:00" }],
+          "tuesday": [
+            {
+              "opens": "13:00",
+              "closes": "17:00"
+            }
+          ],
+          "wednesday": [
+            {
+              "opens": "13:00",
+              "closes": "17:00"
+            }
+          ],
+          "thursday": [
+            {
+              "opens": "13:00",
+              "closes": "17:00"
+            }
+          ],
+          "friday": [
+            {
+              "opens": "13:00",
+              "closes": "17:00"
+            }
+          ],
+          "saturday": [
+            {
+              "opens": "11:00",
+              "closes": "17:00"
+            }
+          ],
           "sunday": []
         },
         "notes": "Sonntag und Montag geschlossen. Feiertage vor Besuch prüfen."
@@ -1292,7 +1421,7 @@
       "description": "Das Zwillbrocker Venn bietet einen Rundweg mit Aussichtskanzeln sowie Vogelbeobachtung und Flamingos.",
       "url": "https://www.bszwillbrock.de/de/biologische-station-zwillbrock/tourismus/zu-gast-in-zwillbrock/rund-um-das-zwillbrocker-venn/der-rundwanderweg/",
       "website_label": "Route / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Mixed%20flamingo%20group%2C%20Zwillbrocker%20Venn%2C%20Vreden%2C%20Kreis%20Borken%2C%20NRW%2C%20Germany.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Mixed_flamingo_group,_Zwillbrocker_Venn,_Vreden,_Kreis_Borken,_NRW,_Germany.jpg",
       "visual_key": "zwillbrocker_venn_flamingos_entdecken",
       "image_quality": "usable",
       "image_position_x": "50%",
@@ -1381,7 +1510,7 @@
       "description": "Das Korenburgerveen ist ein Moorgebiet bei Winterswijk mit markierten Wanderwegen und Bohlenabschnitten.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/naturgebiete/korenburgerveen",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk%20%28NL%29%2C%20Korenburgerveen%20--%202014%20--%203076.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk_(NL),_Korenburgerveen_--_2014_--_3080.jpg",
       "visual_key": "korenburgerveen_entdecken",
       "image_quality": "usable",
       "image_position_x": "50%",
@@ -1462,7 +1591,7 @@
       "description": "Das Wooldse Veen ist ein Hochmoorgebiet mit Bohlenweg und Grenzpfählen.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/natur-in-winterswijk/naturgebiete/wooldse-veen",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bohlenweg%20im%20Wooldse%20Veen.JPG",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Bohlenweg_im_Wooldse_Veen.JPG",
       "visual_key": "wooldse_veen_entdecken",
       "image_quality": "usable",
       "image_position_x": "50%",
@@ -1546,7 +1675,7 @@
       "description": "Die GrenzenLos-Route führt als längere Wanderung durch das Grenzgebiet von Dinxperlo und Suderwick.",
       "url": "https://achterhoekferien.de/grenzenlos-wandelen",
       "website_label": "Route / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Welinkbos.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/2019-03-29_Heelweg_Hellweg_18.jpg",
       "visual_key": "grenzenlos_wandern_dinxperlo_suderwick",
       "image_quality": "usable",
       "image_position_x": "50%",
@@ -2494,7 +2623,8 @@
       "description": "Die digitale Kinderroute „Das Mysterium von Winterswijk“ führt mit Onno der Eule durch Winterswijk.",
       "url": "https://www.100prozentwinterswijk.de/sehenswertes-aktivitaten/aktivitaten/wandern/das-mysterium-von-winterswijk",
       "website_label": "Route / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk%2C_kerktoren_van_de_Jacobskerk_RM39053_vanaf_het_Vrijheidspark_IMG_2598_2022-07-18_17.51.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk,_kerktoren_van_de_Jacobskerk_RM39053_vanaf_het_Vrijheidspark_IMG_2598_2022-07-18_17.51.jpg",
+      "visual_key": "das_mysterium_von_winterswijk",
       "image_quality": "usable",
       "image_position_x": "50%",
       "image_position_y": "50%",
@@ -2747,7 +2877,7 @@
       "description": "Der Pröbstingsee ist ein Naherholungsgebiet mit Badestelle, Sandstrand, Spielmöglichkeiten, Rundwegen, Planetenweg und Pröbstinger Busch.",
       "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Proebstingsee.php",
       "website_label": "Website / Infos (DE)",
-      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Tretboote%20am%20Pr%C3%B6bstingsee%20Borken.jpg",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Tretboote_am_Pr%C3%B6bstingsee_Borken.jpg",
       "visual_key": "proebstingsee_borken_erleben",
       "image_quality": "usable",
       "image_position_x": "50%",
@@ -2839,1080 +2969,1082 @@
           "Baden"
         ]
       }
-      },
-      {
-        "id": "borkener-tuerme-tour",
-        "title": "Borkener Türme-Tour",
-        "kategorie": "Kultur",
-        "location": "Borken Innenstadt",
-        "maps_query": "Diebesturm, Turmstraße 33, 46325 Borken",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Kurzer Stadtrundgang zu den fünf erhaltenen Borkener Stadttürmen. Die Tour führt durch die Innenstadt, entlang der alten Stadtbefestigung und ist jederzeit von außen möglich.",
-        "url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken%2C%20der%20Kuhmturm%20foto4%202012-03-28%2016.11.JPG",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "46%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_der_Kuhmturm_foto4_2012-03-28_16.11.JPG",
-        "image_author": "Michielverbeek",
-        "image_license": "CC BY-SA 3.0",
-        "image_credit": "Michielverbeek, CC BY-SA 3.0, via Wikimedia Commons",
-        "tags": [
-          "Stadttürme",
-          "Innenstadt",
-          "Familienrunde",
-          "Borkener Aa"
-        ],
-        "filter_tags": [
+    },
+    {
+      "id": "borkener-tuerme-tour",
+      "title": "Borkener Türme-Tour",
+      "kategorie": "Kultur",
+      "location": "Borken Innenstadt",
+      "maps_query": "Diebesturm, Turmstraße 33, 46325 Borken",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Kurzer Stadtrundgang zu den fünf erhaltenen Borkener Stadttürmen. Die Tour führt durch die Innenstadt, entlang der alten Stadtbefestigung und ist jederzeit von außen möglich.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken,_Kuhmturm_--_2014_--_2271.jpg",
+      "visual_key": "borkener_tuerme_tour",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "46%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_der_Kuhmturm_foto4_2012-03-28_16.11.JPG",
+      "image_author": "Michielverbeek",
+      "image_license": "CC BY-SA 3.0",
+      "image_credit": "Michielverbeek, CC BY-SA 3.0, via Wikimedia Commons",
+      "tags": [
+        "Stadttürme",
+        "Innenstadt",
+        "Familienrunde",
+        "Borkener Aa"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
           "Mit Kindern",
-          "Wandern & Spazieren"
+          "Draußen"
         ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Kultur",
-            "Spielen"
-          ],
-          "features": [
-            "Rundweg",
-            "Spielplatz"
-          ],
-          "effort": [
-            "Spontan"
-          ]
-        },
-        "duration": "20–60 Min",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "20–60 Min",
-          "Outdoor",
-          "5 Türme"
+        "proximity": [
+          "In der Umgebung"
         ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
-          "public_label": "Außenrundgang jederzeit möglich; Innenzugang vorab prüfen",
-          "detail_note": "Die Türme-Tour kann als Außenrundgang jederzeit selbst erlebt werden. Wer in Türme hineinschauen möchte, benötigt eine Führung; der Kuhmturm ist nur mit Zugangscode und zu den Zeiten der Tourist-Information im FARB zugänglich.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Kultur",
-            "Kurz & spontan"
-          ]
-        }
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Spielen"
+        ],
+        "features": [
+          "Rundweg",
+          "Spielplatz"
+        ],
+        "effort": [
+          "Spontan"
+        ]
       },
-      {
-        "id": "naturkulturspaziergang-bocholt-rhede",
-        "title": "Naturkulturspaziergang Bocholt–Rhede",
-        "kategorie": "Natur & Draußen",
-        "location": "Bocholt bis Rhede",
-        "maps_query": "Altes Rathaus, Königstraße 2, 46397 Bocholt",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Acht Kilometer lange Streckenwanderung von Bocholt nach Rhede mit Innenstadtstart, Natur im Bereich Hohenhorster Berge, Feldern, Wiesen und Stadtgeschichte in Rhede.",
-        "url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
-        "website_label": "Route / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rhede%2C%20Schloss%20Rhede%20--%202014%20--%202187.jpg",
-        "visual_key": "naturkulturspaziergang_bocholt_rhede",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "48%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Rhede,_Schloss_Rhede_--_2014_--_2187.jpg",
-        "image_author": "Dietmar Rabich",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "8 km",
-          "Streckenwanderung",
-          "Hohenhorster Berge",
-          "Schloss Rhede"
-        ],
-        "filter_tags": [
-          "Wandern & Spazieren",
-          "Wasser"
-        ],
-        "filter": {
-          "situation": [
-            "Draußen"
-          ],
-          "proximity": [
-            "Direkt in Bocholt",
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Kultur",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Wasser",
-            "Aussicht"
-          ],
-          "effort": [
-            "Halber Tag"
-          ]
-        },
-        "duration": "2–3 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "2–3 Std",
-          "Outdoor",
-          "8 km"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
-          "public_label": "Frei zugängliche Streckenwanderung",
-          "detail_note": "Die Strecke kann grundsätzlich frei begangen werden. Wetter, Tageslicht, Wegzustand und Rückwegplanung beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Sport & Bewegung",
-            "Wochenende",
-            "Wasser"
-          ]
-        }
+      "duration": "20–60 Min",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "20–60 Min",
+        "Outdoor",
+        "5 Türme"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Freizeit-Kultur-Stadtmarketing/Projekte/projekt-tuermetour.php",
+        "public_label": "Außenrundgang jederzeit möglich; Innenzugang vorab prüfen",
+        "detail_note": "Die Türme-Tour kann als Außenrundgang jederzeit selbst erlebt werden. Wer in Türme hineinschauen möchte, benötigt eine Führung; der Kuhmturm ist nur mit Zugangscode und zu den Zeiten der Tourist-Information im FARB zugänglich.",
+        "holiday_policy": "not_applicable"
       },
-      {
-        "id": "zeitreise-dingdener-heide",
-        "title": "Zeitreise durch die Dingdener Heide",
-        "kategorie": "Natur & Draußen",
-        "location": "Dingdener/Büngerner Heide",
-        "maps_query": "Parkplatz Klausenhofstraße Ecke Zum Venn, 46499 Hamminkeln-Dingden",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Kurzer LandStreifer-Rundweg durch die Dingdener/Büngerner Heide mit Landschaftsgeschichte, Heideflächen, Waldwegen und Stationen zur Entwicklung der Kulturlandschaft.",
-        "url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
-        "website_label": "Route / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Alte%20Feldweg-Allee%20in%20der%20Dingdener%20Heide.jpg",
-        "visual_key": "zeitreise_dingdener_heide",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
-        "image_author": "Börste",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Börste, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "LandStreifer",
-          "5,2 km",
-          "Heide",
-          "Landschaftsgeschichte"
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
         ],
-        "filter_tags": [
-          "Mit Kindern",
-          "Wandern & Spazieren"
+        "time_profile": [
+          "short_spontaneous"
         ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Kultur",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Rundweg"
-          ],
-          "effort": [
-            "Spontan",
-            "Halber Tag"
-          ]
-        },
-        "duration": "1,5 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "1,5 Std",
-          "Outdoor",
-          "5,2 km"
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Kultur",
+          "Kurz & spontan"
+        ]
+      }
+    },
+    {
+      "id": "naturkulturspaziergang-bocholt-rhede",
+      "title": "Naturkulturspaziergang Bocholt–Rhede",
+      "kategorie": "Natur & Draußen",
+      "location": "Bocholt bis Rhede",
+      "maps_query": "Altes Rathaus, Königstraße 2, 46397 Bocholt",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Acht Kilometer lange Streckenwanderung von Bocholt nach Rhede mit Innenstadtstart, Natur im Bereich Hohenhorster Berge, Feldern, Wiesen und Stadtgeschichte in Rhede.",
+      "url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
+      "website_label": "Route / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Rhede%2C%20Schloss%20Rhede%20--%202014%20--%202187.jpg",
+      "visual_key": "naturkulturspaziergang_bocholt_rhede",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "48%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Rhede,_Schloss_Rhede_--_2014_--_2187.jpg",
+      "image_author": "Dietmar Rabich",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "8 km",
+        "Streckenwanderung",
+        "Hohenhorster Berge",
+        "Schloss Rhede"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren",
+        "Wasser"
+      ],
+      "filter": {
+        "situation": [
+          "Draußen"
         ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
-          "public_label": "Frei zugänglicher LandStreifer-Rundweg",
-          "detail_note": "Der Rundweg ist grundsätzlich frei begehbar. Wetter, Tageslicht, Wegzustand und Naturregeln beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous",
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Sport & Bewegung",
-            "Kurz & spontan",
-            "Wochenende"
-          ]
-        }
-      },
-      {
-        "id": "sternbusch-gemen-erleben",
-        "title": "Sternbusch & Gemen erleben",
-        "kategorie": "Natur & Draußen",
-        "location": "Borken-Gemen",
-        "maps_query": "Sternbusch Zugang Hagenstiege, 46325 Borken-Gemen",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Natur- und Kulturrunde rund um Gemen mit Sternbusch, ruhigem Wald, Weseker Umland, Bockwindmühle, Quellengrundpark und optionalem Abstecher zur Jugendburg Gemen.",
-        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
-        "website_label": "Route / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Burg%20Gemen%20NRW%20%28Kreis%20Borken%29.jpg",
-        "visual_key": "sternbusch_gemen_erleben",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Burg_Gemen_NRW_(Kreis_Borken).jpg",
-        "image_author": "Herbert Horche",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Herbert Horche, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "Sternbusch",
-          "Gemen",
-          "Jugendburg",
-          "Wald"
+        "proximity": [
+          "Direkt in Bocholt",
+          "In der Umgebung"
         ],
-        "filter_tags": [
-          "Wandern & Spazieren"
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Kultur",
+          "Sport & Bewegung"
         ],
-        "filter": {
-          "situation": [
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Kultur",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Rundweg"
-          ],
-          "effort": [
-            "Halber Tag",
-            "Längerer Ausflug"
-          ]
-        },
-        "duration": "Halber Tag",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "Halber Tag",
-          "Outdoor",
-          "Wald & Gemen"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
-          "public_label": "Frei zugänglicher Rundwanderweg; Erlebnispunkte teils mit eigenen Zeiten",
-          "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Erlebnispunkte, Gastronomie, Innenräume oder Einrichtungen entlang der Route können eigene Zeiten haben.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Sport & Bewegung",
-            "Wochenende"
-          ]
-        }
-      },
-      {
-        "id": "quellengrundpark-weseke-entdecken",
-        "title": "Quellengrundpark Weseke entdecken",
-        "kategorie": "Freizeit & Familie",
-        "location": "Borken-Weseke",
-        "maps_query": "Hans-Sachs-Straße, 46325 Borken-Weseke",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Frei zugänglicher Garten- und Museumspark mit Apothekergarten, Geologischem Garten, Holtbachquelle, Heimathaus, Backspeicher und Kneipp-Wassertretanlage. Garten und Kneipp-Angebote sind besonders Mai bis Oktober relevant; Führungen und einzelne Gebäude können terminabhängig sein.",
-        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Eingang%20zum%20Apothekergarten%20Quellengrundpark%20Borken-Weseke.jpg",
-        "visual_key": "quellengrundpark_weseke_entdecken",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Eingang_zum_Apothekergarten_Quellengrundpark_Borken-Weseke.jpg",
-        "image_author": "Tetzemann",
-        "image_license": "CC0 1.0",
-        "image_credit": "Tetzemann, CC0 1.0, via Wikimedia Commons",
-        "tags": [
-          "Apothekergarten",
-          "Geologischer Garten",
-          "Holtbachquelle",
-          "Kneipp"
-        ],
-        "filter_tags": [
-          "Mit Kindern",
-          "Wandern & Spazieren"
-        ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Kultur",
-            "Spielen"
-          ],
-          "features": [
-            "Wasser"
-          ],
-          "effort": [
-            "Spontan",
-            "Halber Tag"
-          ]
-        },
-        "duration": "45–90 Min",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Mai bis Oktober besonders geeignet; Park ganzjährig",
-        "cardFacts": [
-          "45–90 Min",
-          "Outdoor",
-          "Garten & Quelle"
-        ],
-        "opening_status": {
-          "type": "check_required",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
-          "public_label": "Park- und Gartenbereiche saisonal sinnvoll; Gebäude und Führungen prüfen",
-          "detail_note": "Der Quellengrundpark wird offiziell mit Heimathaus, Geologischem Garten, Apothekergarten, Backspeicher, Ausstellungsscheunen und Kneipp-Wassertretanlage beschrieben. Konkrete Tagesöffnungszeiten sind dort nicht angegeben; Gebäude, Führungen und einzelne Angebote vor Besuch prüfen.",
-          "holiday_policy": "check"
-        },
-        "recommendation": {
-          "availability": "seasonal",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous",
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Kurz & spontan",
-            "Wochenende",
-            "Wasser"
-          ]
-        }
-      },
-      {
-        "id": "die-berge-hombornquelle-entdecken",
-        "title": "Die Berge & Hombornquelle entdecken",
-        "kategorie": "Natur & Draußen",
-        "location": "Borken/Velen",
-        "maps_query": "Hagenstiege, 46325 Borken-Gemen",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Längere Naturroute durch die Borkener Landschaft „Die Berge“ mit Hombornquelle, Fischteichen, Bocholter Aa, Waldwegen und hügeliger Naturlandschaft. Als Naturschutzgebiet bitte auf den Wegen bleiben.",
-        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
-        "website_label": "Route / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Waldweg%20am%20Fliegerberg.jpg",
-        "visual_key": "die_berge_hombornquelle_entdecken",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Waldweg_am_Fliegerberg.jpg",
-        "image_author": "Magnus aus Deventer",
-        "image_license": "Public Domain",
-        "image_credit": "Magnus aus Deventer, Public Domain, via Wikimedia Commons",
-        "tags": [
-          "Hombornquelle",
-          "Die Berge",
-          "13 km",
-          "Naturschutz"
-        ],
-        "filter_tags": [
-          "Wandern & Spazieren"
-        ],
-        "filter": {
-          "situation": [
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Wasser",
-            "Rundweg"
-          ],
-          "effort": [
-            "Halber Tag",
-            "Längerer Ausflug"
-          ]
-        },
-        "duration": "3–4 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "3–4 Std",
-          "Outdoor",
-          "13 km"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
-          "public_label": "Frei zugänglicher Rundwanderweg; einzelne Orte vorab prüfen",
-          "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Orte, Einkehrmöglichkeiten oder Einrichtungen entlang der Route können eigene Zeiten oder Regeln haben.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Draußen",
-            "Natur",
-            "Sport & Bewegung",
-            "Wochenende",
-            "Wasser"
-          ]
-        }
-      },
-      {
-        "id": "tiergarten-schloss-raesfeld-erleben",
-        "title": "Tiergarten Schloss Raesfeld erleben",
-        "kategorie": "Freizeit & Familie",
-        "location": "Raesfeld",
-        "maps_query": "Naturparkhaus Tiergarten Schloss Raesfeld, Tiergarten 1, 46348 Raesfeld",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Frei zugänglicher historischer Tiergarten am Schloss Raesfeld mit Wald, Wiesen, Wasser, Rundwegen und Naturerlebnisgelände. Gut für Familien, Spaziergänge und ruhige Halbtagesausflüge.",
-        "url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaissance-Tiergarten%20Schloss%20Raesfeld.jpg",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
-        "image_author": "Reinhard G. Nießing",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Reinhard G. Nießing, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "Tiergarten",
-          "Schloss Raesfeld",
-          "Naturerlebnisgelände",
-          "Rundwege"
-        ],
-        "filter_tags": [
-          "Mit Kindern",
-          "Wandern & Spazieren"
-        ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Spielen",
-            "Kultur"
-          ],
-          "features": [
-            "Spielplatz",
-            "Wasser",
-            "Rundweg"
-          ],
-          "effort": [
-            "Spontan",
-            "Halber Tag"
-          ]
-        },
-        "duration": "1–3 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "1–3 Std",
-          "Outdoor",
-          "Wald & Schloss"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
-          "public_label": "Frei zugänglich und ganzjährig geöffnet",
-          "detail_note": "Der Tiergarten Schloss Raesfeld ist als Park- und Naturbereich frei zugänglich. Veranstaltungen, Gastronomie oder Einrichtungen im Umfeld können eigene Zeiten haben.",
-          "holiday_policy": "open"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous",
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Kurz & spontan",
-            "Wochenende",
-            "Wasser",
-            "Spielplatz"
-          ]
-        }
-      },
-      {
-        "id": "erlebnispfad-klostersee-burlo",
-        "title": "Erlebnispfad Klostersee Burlo",
-        "kategorie": "Freizeit & Familie",
-        "location": "Borken-Burlo",
-        "maps_query": "Sportanlage Vennweg, 46325 Borken-Burlo",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Kurzer Erlebnispfad rund um den Klostersee in Burlo mit Natur, Bewegung, regionaler Geschichte, Vennweg und Kloster Mariengarden. Gut als familienfreundlicher Spaziergang.",
-        "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
-        "website_label": "Route / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken%2C%20Burlo%2C%20Kloster%20Mariengarden%20--%202014%20--%202292.jpg",
-        "visual_key": "erlebnispfad_klostersee_burlo",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "48%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Burlo,_Kloster_Mariengarden_--_2014_--_2292.jpg",
-        "image_author": "Dietmar Rabich",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "Klostersee",
-          "3,2 km",
-          "Mariengarden",
-          "Erlebnispfad"
-        ],
-        "filter_tags": [
-          "Mit Kindern",
+        "features": [
           "Wasser",
-          "Wandern & Spazieren"
+          "Aussicht"
         ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Spielen",
-            "Natur entdecken",
-            "Kultur"
-          ],
-          "features": [
-            "Wasser",
-            "Rundweg"
-          ],
-          "effort": [
-            "Spontan",
-            "Halber Tag"
-          ]
-        },
-        "duration": "45–90 Min",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "45–90 Min",
-          "Outdoor",
-          "3,2 km"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
-          "public_label": "Frei planbarer Rundwanderweg ohne klassische Öffnungszeiten",
-          "detail_note": "Die offizielle Quelle beschreibt den Rundwanderweg B1 als Outdoor-Route ab Parkplatz am Vennweg mit Natur, Geschichte, Kloster Mariengarden und optionalem Venn-Abstecher. Für die Route selbst sind keine klassischen Tagesöffnungszeiten hinterlegt; Natur- und Schutzregeln vor Ort beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous",
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Natur",
-            "Kultur",
-            "Kurz & spontan",
-            "Wochenende",
-            "Wasser"
-          ]
-        }
+        "effort": [
+          "Halber Tag"
+        ]
       },
-      {
-        "id": "gaengeskes-aalten-entdecken",
-        "title": "Gängeskes Aalten entdecken",
-        "kategorie": "Kultur",
-        "location": "Aalten",
-        "maps_query": "VVV Aalten, Markt 14, 7121 CS Aalten, Niederlande",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Kurzer Spaziergang durch die schmalen historischen Gängeskes von Aalten. Die kleinen Durchgänge erzählen von Dorfgeschichte, alten Wegen und versteckten Verbindungen zwischen Straßen und Gärten.",
-        "url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
-        "website_label": "Website / Infos (NL)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aalten-markt-185389.jpg",
-        "visual_key": "gaengeskes_aalten_entdecken",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "52%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Aalten-markt-185389.jpg",
-        "image_author": "Pim van Tend",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Pim van Tend, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "Aalten",
-          "Gängeskes",
-          "Innenstadt",
-          "Kinderroute"
+      "duration": "2–3 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "2–3 Std",
+        "Outdoor",
+        "8 km"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://naturpark-hohe-mark.de/ziel/natur-kulturspaziergang-von-bocholt-nach-rhede/",
+        "public_label": "Frei zugängliche Streckenwanderung",
+        "detail_note": "Die Strecke kann grundsätzlich frei begangen werden. Wetter, Tageslicht, Wegzustand und Rückwegplanung beachten.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
         ],
-        "filter_tags": [
+        "time_profile": [
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Sport & Bewegung",
+          "Wochenende",
+          "Wasser"
+        ]
+      }
+    },
+    {
+      "id": "zeitreise-dingdener-heide",
+      "title": "Zeitreise durch die Dingdener Heide",
+      "kategorie": "Natur & Draußen",
+      "location": "Dingdener/Büngerner Heide",
+      "maps_query": "Parkplatz Klausenhofstraße Ecke Zum Venn, 46499 Hamminkeln-Dingden",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Kurzer LandStreifer-Rundweg durch die Dingdener/Büngerner Heide mit Landschaftsgeschichte, Heideflächen, Waldwegen und Stationen zur Entwicklung der Kulturlandschaft.",
+      "url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
+      "website_label": "Route / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
+      "visual_key": "zeitreise_dingdener_heide",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
+      "image_author": "Börste",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Börste, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "LandStreifer",
+        "5,2 km",
+        "Heide",
+        "Landschaftsgeschichte"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
           "Mit Kindern",
-          "Wandern & Spazieren"
+          "Draußen"
         ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "Grenzregion / Niederlande"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Kultur",
-            "Spielen"
-          ],
-          "features": [
-            "Rundweg"
-          ],
-          "effort": [
-            "Spontan"
-          ]
-        },
-        "duration": "30–60 Min",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "30–60 Min",
-          "Outdoor",
-          "Aalten"
+        "proximity": [
+          "In der Umgebung"
         ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
-          "public_label": "Frei zugängliche historische Gassen; Führungen vorab prüfen",
-          "detail_note": "Die historischen Gängeskes in Aalten können als Ortsrundgang frei erkundet werden. Geführte Spaziergänge oder Routenbroschüren laufen über VVV bzw. Tourist-Info und können eigene Zeiten, Termine oder Kosten haben.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Kultur",
-            "Kurz & spontan"
-          ]
-        }
-      },
-      {
-        "id": "auesee-wesel-erleben",
-        "title": "Auesee Wesel erleben",
-        "kategorie": "Freizeit & Familie",
-        "location": "Wesel",
-        "maps_query": "Parkplatz Liegewiese Auesee, Wesel",
-        "maps_label": "Zum Parkplatz navigieren",
-        "description": "Großes Freizeit- und Badegewässer mit Badebucht, Liegewiese, Sandstrand und Rundweg. Zugang zum See ist kostenfrei; Parken kann gebührenpflichtig sein. Baden nur im ausgewiesenen Bereich.",
-        "url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sonnenuntergang%20Auesee%20Wesel%203.jpg",
-        "visual_key": "auesee_wesel_erleben",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Sonnenuntergang_Auesee_Wesel_3.jpg",
-        "image_author": "Kerstin Voß",
-        "image_license": "CC BY-SA 4.0",
-        "image_credit": "Kerstin Voß, CC BY-SA 4.0, via Wikimedia Commons",
-        "tags": [
-          "Badesee",
-          "Sandstrand",
-          "Liegewiese",
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Kultur",
+          "Sport & Bewegung"
+        ],
+        "features": [
           "Rundweg"
         ],
-        "filter_tags": [
-          "Mit Kindern",
-          "Wasser",
-          "Wandern & Spazieren"
-        ],
-        "filter": {
-          "situation": [
-            "Mit Kindern",
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Wasser",
-            "Baden",
-            "Rundweg"
-          ],
-          "effort": [
-            "Halber Tag",
-            "Längerer Ausflug"
-          ]
-        },
-        "duration": "1–4 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Frühling bis Herbst; Baden saisonal",
-        "cardFacts": [
-          "1–4 Std",
-          "Outdoor",
-          "Badesee"
-        ],
-        "opening_status": {
-          "type": "seasonal_hours",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
-          "public_label": "See ganzjährig; Baden nur saisonal und im ausgewiesenen Bereich",
-          "detail_note": "Badesaison und Badegewässer-Monitoring sind saisonale Nutzungshinweise, keine garantierten Tagesöffnungszeiten. Wasserqualität, Wetter, DLRG und Regeln vor Ort beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "seasonal",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "core",
-          "interest_tags": [
-            "Familie",
-            "Draußen",
-            "Natur",
-            "Sport & Bewegung",
-            "Wochenende",
-            "Wasser",
-            "Baden"
-          ]
-        }
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
       },
-      {
-        "id": "schwarzes-wasser-wesel-entdecken",
-        "title": "Schwarzes Wasser Wesel entdecken",
-        "kategorie": "Natur & Draußen",
-        "location": "Wesel",
-        "maps_query": "Parkplatz Schwarzes Wasser Kanonenberge, Wesel",
-        "maps_label": "Zum Parkplatz navigieren",
-        "description": "Kurzer Naturerlebnisweg rund um den Heideweiher Schwarzes Wasser im Diersfordter Wald. Die Runde ist gut für einen ruhigen Naturspaziergang; als Schutzgebiet bitte auf den Wegen bleiben.",
-        "url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Schwarzes%20Wasser%20Wesel%202.jpg",
-        "visual_key": "schwarzes_wasser_wesel_entdecken",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Schwarzes_Wasser_Wesel_2.jpg",
-        "image_author": "Timo Forchheim = Tzign",
-        "image_license": "Public Domain",
-        "image_credit": "Timo Forchheim = Tzign, Public Domain, via Wikimedia Commons",
-        "tags": [
-          "Heideweiher",
-          "Diersfordter Wald",
-          "2 km",
-          "Naturschutz"
-        ],
-        "filter_tags": [
-          "Wasser",
-          "Wandern & Spazieren"
-        ],
-        "filter": {
-          "situation": [
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken"
-          ],
-          "features": [
-            "Wasser",
-            "Rundweg"
-          ],
-          "effort": [
-            "Spontan"
-          ]
-        },
-        "duration": "30–60 Min",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "30–60 Min",
-          "Outdoor",
-          "2 km"
-        ],
-        "opening_status": {
-          "type": "free_access",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
-          "public_label": "Frei zugänglicher Naturerlebnisweg im Naturschutzgebiet",
-          "detail_note": "Das Schwarze Wasser ist als Naturerlebnis auf ausgewiesenen Wegen frei erlebbar. Schutzgebiets-, Wege- und Rücksichtnahmeregeln beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "short_spontaneous"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Draußen",
-            "Natur",
-            "Kurz & spontan",
-            "Wasser"
-          ]
-        }
+      "duration": "1,5 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "1,5 Std",
+        "Outdoor",
+        "5,2 km"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.hohe-mark-steig.de/landstreifer/landstreifer-zeitreise/",
+        "public_label": "Frei zugänglicher LandStreifer-Rundweg",
+        "detail_note": "Der Rundweg ist grundsätzlich frei begehbar. Wetter, Tageslicht, Wegzustand und Naturregeln beachten.",
+        "holiday_policy": "not_applicable"
       },
-      {
-        "id": "witte-venn-ahaus-alstaette-entdecken",
-        "title": "Witte Venn Ahaus-Alstätte entdecken",
-        "kategorie": "Natur & Draußen",
-        "location": "Ahaus-Alstätte",
-        "maps_query": "Haarmühle, Beßlinghook 57, 48683 Ahaus-Alstätte",
-        "maps_label": "Zum Startpunkt navigieren",
-        "description": "Grenzübergreifende Moor- und Auenlandschaft mit Wegen zum Spazieren, Wandern und Radfahren. Die Haarmühle ist ein guter Startpunkt; im Schutzgebiet bitte auf den Wegen bleiben.",
-        "url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
-        "website_label": "Website / Infos (DE)",
-        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Die%20Haarm%C3%BChle%2C%20eine%20Wasserm%C3%BChle%20im%20Ursprung%20aus%20dem%20Jahre%201619%2C%20in%20Ahaus-Alst%C3%A4tte.jpg",
-        "visual_key": "witte_venn_ahaus_alstaette_entdecken",
-        "image_quality": "usable",
-        "image_position_x": "50%",
-        "image_position_y": "50%",
-        "image_source_page": "https://commons.wikimedia.org/wiki/File:Die_Haarm%C3%BChle,_eine_Wasserm%C3%BChle_im_Ursprung_aus_dem_Jahre_1619,_in_Ahaus-Alst%C3%A4tte.jpg",
-        "image_author": "Muehlenbernd",
-        "image_license": "CC BY-SA 3.0",
-        "image_credit": "Muehlenbernd, CC BY-SA 3.0, via Wikimedia Commons",
-        "tags": [
-          "Witte Venn",
-          "Haarmühle",
-          "Moor",
-          "Grenzregion"
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
         ],
-        "filter_tags": [
-          "Wandern & Spazieren"
+        "time_profile": [
+          "short_spontaneous",
+          "weekend"
         ],
-        "filter": {
-          "situation": [
-            "Draußen"
-          ],
-          "proximity": [
-            "In der Umgebung",
-            "Grenzregion / Niederlande"
-          ],
-          "activity_type": [
-            "Spazieren",
-            "Natur entdecken",
-            "Radfahren",
-            "Sport & Bewegung"
-          ],
-          "features": [
-            "Wasser",
-            "Rundweg"
-          ],
-          "effort": [
-            "Halber Tag"
-          ]
-        },
-        "duration": "1–3 Std",
-        "mode": "Outdoor",
-        "price": "",
-        "season": "Ganzjährig",
-        "cardFacts": [
-          "1–3 Std",
-          "Outdoor",
-          "Moor & Grenze"
-        ],
-        "opening_status": {
-          "type": "seasonal_recommended",
-          "verification": "official_source",
-          "checked_at": "2026-06-08",
-          "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
-          "public_label": "Ganzjährig als Naturgebiet nutzbar; Heideblüte im Spätsommer besonders lohnend",
-          "detail_note": "Das Witte Venn ist grundsätzlich als Naturgebiet erlebbar. Besonders lohnend ist die Heideblüte im Spätsommer; Schutz-, Wege- und Grenzgebietsregeln beachten.",
-          "holiday_policy": "not_applicable"
-        },
-        "recommendation": {
-          "availability": "always",
-          "weather_profile": [
-            "outdoor",
-            "rain_bad"
-          ],
-          "time_profile": [
-            "weekend"
-          ],
-          "cost_level": "unknown",
-          "recommendation_weight": "normal",
-          "interest_tags": [
-            "Draußen",
-            "Natur",
-            "Sport & Bewegung",
-            "Wochenende",
-            "Wasser"
-          ]
-        }
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Sport & Bewegung",
+          "Kurz & spontan",
+          "Wochenende"
+        ]
       }
-    ]
+    },
+    {
+      "id": "sternbusch-gemen-erleben",
+      "title": "Sternbusch & Gemen erleben",
+      "kategorie": "Natur & Draußen",
+      "location": "Borken-Gemen",
+      "maps_query": "Sternbusch Zugang Hagenstiege, 46325 Borken-Gemen",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Natur- und Kulturrunde rund um Gemen mit Sternbusch, ruhigem Wald, Weseker Umland, Bockwindmühle, Quellengrundpark und optionalem Abstecher zur Jugendburg Gemen.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
+      "website_label": "Route / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Burg%20Gemen%20NRW%20%28Kreis%20Borken%29.jpg",
+      "visual_key": "sternbusch_gemen_erleben",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Burg_Gemen_NRW_(Kreis_Borken).jpg",
+      "image_author": "Herbert Horche",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Herbert Horche, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "Sternbusch",
+        "Gemen",
+        "Jugendburg",
+        "Wald"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Kultur",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
+      "duration": "Halber Tag",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "Halber Tag",
+        "Outdoor",
+        "Wald & Gemen"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/G1-Vom-Sternbusch-zur-Muehle.php",
+        "public_label": "Frei zugänglicher Rundwanderweg; Erlebnispunkte teils mit eigenen Zeiten",
+        "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Erlebnispunkte, Gastronomie, Innenräume oder Einrichtungen entlang der Route können eigene Zeiten haben.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Sport & Bewegung",
+          "Wochenende"
+        ]
+      }
+    },
+    {
+      "id": "quellengrundpark-weseke-entdecken",
+      "title": "Quellengrundpark Weseke entdecken",
+      "kategorie": "Freizeit & Familie",
+      "location": "Borken-Weseke",
+      "maps_query": "Hans-Sachs-Straße, 46325 Borken-Weseke",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Frei zugänglicher Garten- und Museumspark mit Apothekergarten, Geologischem Garten, Holtbachquelle, Heimathaus, Backspeicher und Kneipp-Wassertretanlage. Garten und Kneipp-Angebote sind besonders Mai bis Oktober relevant; Führungen und einzelne Gebäude können terminabhängig sein.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Eingang%20zum%20Apothekergarten%20Quellengrundpark%20Borken-Weseke.jpg",
+      "visual_key": "quellengrundpark_weseke_entdecken",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Eingang_zum_Apothekergarten_Quellengrundpark_Borken-Weseke.jpg",
+      "image_author": "Tetzemann",
+      "image_license": "CC0 1.0",
+      "image_credit": "Tetzemann, CC0 1.0, via Wikimedia Commons",
+      "tags": [
+        "Apothekergarten",
+        "Geologischer Garten",
+        "Holtbachquelle",
+        "Kneipp"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Kultur",
+          "Spielen"
+        ],
+        "features": [
+          "Wasser"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
+      "duration": "45–90 Min",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Mai bis Oktober besonders geeignet; Park ganzjährig",
+      "cardFacts": [
+        "45–90 Min",
+        "Outdoor",
+        "Garten & Quelle"
+      ],
+      "opening_status": {
+        "type": "check_required",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Sehenswuerdigkeiten/Heimathaeuser.php",
+        "public_label": "Park- und Gartenbereiche saisonal sinnvoll; Gebäude und Führungen prüfen",
+        "detail_note": "Der Quellengrundpark wird offiziell mit Heimathaus, Geologischem Garten, Apothekergarten, Backspeicher, Ausstellungsscheunen und Kneipp-Wassertretanlage beschrieben. Konkrete Tagesöffnungszeiten sind dort nicht angegeben; Gebäude, Führungen und einzelne Angebote vor Besuch prüfen.",
+        "holiday_policy": "check"
+      },
+      "recommendation": {
+        "availability": "seasonal",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous",
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Kurz & spontan",
+          "Wochenende",
+          "Wasser"
+        ]
+      }
+    },
+    {
+      "id": "die-berge-hombornquelle-entdecken",
+      "title": "Die Berge & Hombornquelle entdecken",
+      "kategorie": "Natur & Draußen",
+      "location": "Borken/Velen",
+      "maps_query": "Hagenstiege, 46325 Borken-Gemen",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Längere Naturroute durch die Borkener Landschaft „Die Berge“ mit Hombornquelle, Fischteichen, Bocholter Aa, Waldwegen und hügeliger Naturlandschaft. Als Naturschutzgebiet bitte auf den Wegen bleiben.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
+      "website_label": "Route / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Waldweg%20am%20Fliegerberg.jpg",
+      "visual_key": "die_berge_hombornquelle_entdecken",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Waldweg_am_Fliegerberg.jpg",
+      "image_author": "Magnus aus Deventer",
+      "image_license": "Public Domain",
+      "image_credit": "Magnus aus Deventer, Public Domain, via Wikimedia Commons",
+      "tags": [
+        "Hombornquelle",
+        "Die Berge",
+        "13 km",
+        "Naturschutz"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
+      "duration": "3–4 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "3–4 Std",
+        "Outdoor",
+        "13 km"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B2-Die-Berge.php",
+        "public_label": "Frei zugänglicher Rundwanderweg; einzelne Orte vorab prüfen",
+        "detail_note": "Der Rundwanderweg ist grundsätzlich frei begehbar. Einzelne Orte, Einkehrmöglichkeiten oder Einrichtungen entlang der Route können eigene Zeiten oder Regeln haben.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Draußen",
+          "Natur",
+          "Sport & Bewegung",
+          "Wochenende",
+          "Wasser"
+        ]
+      }
+    },
+    {
+      "id": "tiergarten-schloss-raesfeld-erleben",
+      "title": "Tiergarten Schloss Raesfeld erleben",
+      "kategorie": "Freizeit & Familie",
+      "location": "Raesfeld",
+      "maps_query": "Naturparkhaus Tiergarten Schloss Raesfeld, Tiergarten 1, 46348 Raesfeld",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Frei zugänglicher historischer Tiergarten am Schloss Raesfeld mit Wald, Wiesen, Wasser, Rundwegen und Naturerlebnisgelände. Gut für Familien, Spaziergänge und ruhige Halbtagesausflüge.",
+      "url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
+      "visual_key": "tiergarten_schloss_raesfeld_erleben",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
+      "image_author": "Reinhard G. Nießing",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Reinhard G. Nießing, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "Tiergarten",
+        "Schloss Raesfeld",
+        "Naturerlebnisgelände",
+        "Rundwege"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Spielen",
+          "Kultur"
+        ],
+        "features": [
+          "Spielplatz",
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
+      "duration": "1–3 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "1–3 Std",
+        "Outdoor",
+        "Wald & Schloss"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://naturpark-hohe-mark.de/ziel/tiergarten-schloss-raesfeld/",
+        "public_label": "Frei zugänglich und ganzjährig geöffnet",
+        "detail_note": "Der Tiergarten Schloss Raesfeld ist als Park- und Naturbereich frei zugänglich. Veranstaltungen, Gastronomie oder Einrichtungen im Umfeld können eigene Zeiten haben.",
+        "holiday_policy": "open"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous",
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Kurz & spontan",
+          "Wochenende",
+          "Wasser",
+          "Spielplatz"
+        ]
+      }
+    },
+    {
+      "id": "erlebnispfad-klostersee-burlo",
+      "title": "Erlebnispfad Klostersee Burlo",
+      "kategorie": "Freizeit & Familie",
+      "location": "Borken-Burlo",
+      "maps_query": "Sportanlage Vennweg, 46325 Borken-Burlo",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Kurzer Erlebnispfad rund um den Klostersee in Burlo mit Natur, Bewegung, regionaler Geschichte, Vennweg und Kloster Mariengarden. Gut als familienfreundlicher Spaziergang.",
+      "url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
+      "website_label": "Route / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken%2C%20Burlo%2C%20Kloster%20Mariengarden%20--%202014%20--%202292.jpg",
+      "visual_key": "erlebnispfad_klostersee_burlo",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "48%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Burlo,_Kloster_Mariengarden_--_2014_--_2292.jpg",
+      "image_author": "Dietmar Rabich",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "Klostersee",
+        "3,2 km",
+        "Mariengarden",
+        "Erlebnispfad"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Spielen",
+          "Natur entdecken",
+          "Kultur"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan",
+          "Halber Tag"
+        ]
+      },
+      "duration": "45–90 Min",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "45–90 Min",
+        "Outdoor",
+        "3,2 km"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.borken.de/de/kultur-tourismus/Tourismus/Rundwanderwege/B1-Heimathaus-Kloster-und-Venn-Burlo.php",
+        "public_label": "Frei planbarer Rundwanderweg ohne klassische Öffnungszeiten",
+        "detail_note": "Die offizielle Quelle beschreibt den Rundwanderweg B1 als Outdoor-Route ab Parkplatz am Vennweg mit Natur, Geschichte, Kloster Mariengarden und optionalem Venn-Abstecher. Für die Route selbst sind keine klassischen Tagesöffnungszeiten hinterlegt; Natur- und Schutzregeln vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous",
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Kultur",
+          "Kurz & spontan",
+          "Wochenende",
+          "Wasser"
+        ]
+      }
+    },
+    {
+      "id": "gaengeskes-aalten-entdecken",
+      "title": "Gängeskes Aalten entdecken",
+      "kategorie": "Kultur",
+      "location": "Aalten",
+      "maps_query": "VVV Aalten, Markt 14, 7121 CS Aalten, Niederlande",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Kurzer Spaziergang durch die schmalen historischen Gängeskes von Aalten. Die kleinen Durchgänge erzählen von Dorfgeschichte, alten Wegen und versteckten Verbindungen zwischen Straßen und Gärten.",
+      "url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
+      "website_label": "Website / Infos (NL)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Aalten-markt-185389.jpg",
+      "visual_key": "gaengeskes_aalten_entdecken",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "52%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Aalten-markt-185389.jpg",
+      "image_author": "Pim van Tend",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Pim van Tend, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "Aalten",
+        "Gängeskes",
+        "Innenstadt",
+        "Kinderroute"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Kultur",
+          "Spielen"
+        ],
+        "features": [
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
+      "duration": "30–60 Min",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "30–60 Min",
+        "Outdoor",
+        "Aalten"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://achterhoek.nl/G%C3%A4ngeskes-Aalten",
+        "public_label": "Frei zugängliche historische Gassen; Führungen vorab prüfen",
+        "detail_note": "Die historischen Gängeskes in Aalten können als Ortsrundgang frei erkundet werden. Geführte Spaziergänge oder Routenbroschüren laufen über VVV bzw. Tourist-Info und können eigene Zeiten, Termine oder Kosten haben.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Kultur",
+          "Kurz & spontan"
+        ]
+      }
+    },
+    {
+      "id": "auesee-wesel-erleben",
+      "title": "Auesee Wesel erleben",
+      "kategorie": "Freizeit & Familie",
+      "location": "Wesel",
+      "maps_query": "Parkplatz Liegewiese Auesee, Wesel",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Großes Freizeit- und Badegewässer mit Badebucht, Liegewiese, Sandstrand und Rundweg. Zugang zum See ist kostenfrei; Parken kann gebührenpflichtig sein. Baden nur im ausgewiesenen Bereich.",
+      "url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Sonnenuntergang%20Auesee%20Wesel%203.jpg",
+      "visual_key": "auesee_wesel_erleben",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Sonnenuntergang_Auesee_Wesel_3.jpg",
+      "image_author": "Kerstin Voß",
+      "image_license": "CC BY-SA 4.0",
+      "image_credit": "Kerstin Voß, CC BY-SA 4.0, via Wikimedia Commons",
+      "tags": [
+        "Badesee",
+        "Sandstrand",
+        "Liegewiese",
+        "Rundweg"
+      ],
+      "filter_tags": [
+        "Mit Kindern",
+        "Wasser",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Mit Kindern",
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Wasser",
+          "Baden",
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag",
+          "Längerer Ausflug"
+        ]
+      },
+      "duration": "1–4 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Frühling bis Herbst; Baden saisonal",
+      "cardFacts": [
+        "1–4 Std",
+        "Outdoor",
+        "Badesee"
+      ],
+      "opening_status": {
+        "type": "seasonal_hours",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.wesel-tourismus.de/wesel-entdecken/natur-freizeit/freizeit-am-wasser/auesee",
+        "public_label": "See ganzjährig; Baden nur saisonal und im ausgewiesenen Bereich",
+        "detail_note": "Badesaison und Badegewässer-Monitoring sind saisonale Nutzungshinweise, keine garantierten Tagesöffnungszeiten. Wasserqualität, Wetter, DLRG und Regeln vor Ort beachten.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "seasonal",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "core",
+        "interest_tags": [
+          "Familie",
+          "Draußen",
+          "Natur",
+          "Sport & Bewegung",
+          "Wochenende",
+          "Wasser",
+          "Baden"
+        ]
+      }
+    },
+    {
+      "id": "schwarzes-wasser-wesel-entdecken",
+      "title": "Schwarzes Wasser Wesel entdecken",
+      "kategorie": "Natur & Draußen",
+      "location": "Wesel",
+      "maps_query": "Parkplatz Schwarzes Wasser Kanonenberge, Wesel",
+      "maps_label": "Zum Parkplatz navigieren",
+      "description": "Kurzer Naturerlebnisweg rund um den Heideweiher Schwarzes Wasser im Diersfordter Wald. Die Runde ist gut für einen ruhigen Naturspaziergang; als Schutzgebiet bitte auf den Wegen bleiben.",
+      "url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Naturschutzgebiet_Schwarzes_Wasser.jpg",
+      "visual_key": "schwarzes_wasser_wesel_entdecken",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Schwarzes_Wasser_Wesel_2.jpg",
+      "image_author": "Timo Forchheim = Tzign",
+      "image_license": "Public Domain",
+      "image_credit": "Timo Forchheim = Tzign, Public Domain, via Wikimedia Commons",
+      "tags": [
+        "Heideweiher",
+        "Diersfordter Wald",
+        "2 km",
+        "Naturschutz"
+      ],
+      "filter_tags": [
+        "Wasser",
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Spontan"
+        ]
+      },
+      "duration": "30–60 Min",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "30–60 Min",
+        "Outdoor",
+        "2 km"
+      ],
+      "opening_status": {
+        "type": "free_access",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://naturpark-hohe-mark.de/ziel/stadt-wesel/",
+        "public_label": "Frei zugänglicher Naturerlebnisweg im Naturschutzgebiet",
+        "detail_note": "Das Schwarze Wasser ist als Naturerlebnis auf ausgewiesenen Wegen frei erlebbar. Schutzgebiets-, Wege- und Rücksichtnahmeregeln beachten.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "short_spontaneous"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Draußen",
+          "Natur",
+          "Kurz & spontan",
+          "Wasser"
+        ]
+      }
+    },
+    {
+      "id": "witte-venn-ahaus-alstaette-entdecken",
+      "title": "Witte Venn Ahaus-Alstätte entdecken",
+      "kategorie": "Natur & Draußen",
+      "location": "Ahaus-Alstätte",
+      "maps_query": "Haarmühle, Beßlinghook 57, 48683 Ahaus-Alstätte",
+      "maps_label": "Zum Startpunkt navigieren",
+      "description": "Grenzübergreifende Moor- und Auenlandschaft mit Wegen zum Spazieren, Wandern und Radfahren. Die Haarmühle ist ein guter Startpunkt; im Schutzgebiet bitte auf den Wegen bleiben.",
+      "url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
+      "website_label": "Website / Infos (DE)",
+      "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Die%20Haarm%C3%BChle%2C%20eine%20Wasserm%C3%BChle%20im%20Ursprung%20aus%20dem%20Jahre%201619%2C%20in%20Ahaus-Alst%C3%A4tte.jpg",
+      "visual_key": "witte_venn_ahaus_alstaette_entdecken",
+      "image_quality": "usable",
+      "image_position_x": "50%",
+      "image_position_y": "50%",
+      "image_source_page": "https://commons.wikimedia.org/wiki/File:Die_Haarm%C3%BChle,_eine_Wasserm%C3%BChle_im_Ursprung_aus_dem_Jahre_1619,_in_Ahaus-Alst%C3%A4tte.jpg",
+      "image_author": "Muehlenbernd",
+      "image_license": "CC BY-SA 3.0",
+      "image_credit": "Muehlenbernd, CC BY-SA 3.0, via Wikimedia Commons",
+      "tags": [
+        "Witte Venn",
+        "Haarmühle",
+        "Moor",
+        "Grenzregion"
+      ],
+      "filter_tags": [
+        "Wandern & Spazieren"
+      ],
+      "filter": {
+        "situation": [
+          "Draußen"
+        ],
+        "proximity": [
+          "In der Umgebung",
+          "Grenzregion / Niederlande"
+        ],
+        "activity_type": [
+          "Spazieren",
+          "Natur entdecken",
+          "Radfahren",
+          "Sport & Bewegung"
+        ],
+        "features": [
+          "Wasser",
+          "Rundweg"
+        ],
+        "effort": [
+          "Halber Tag"
+        ]
+      },
+      "duration": "1–3 Std",
+      "mode": "Outdoor",
+      "price": "",
+      "season": "Ganzjährig",
+      "cardFacts": [
+        "1–3 Std",
+        "Outdoor",
+        "Moor & Grenze"
+      ],
+      "opening_status": {
+        "type": "seasonal_recommended",
+        "verification": "official_source",
+        "checked_at": "2026-06-08",
+        "source_url": "https://www.muensterland.com/tourismus/themen/erlebnis-region-muensterland/naturerlebnis/witte-venn/",
+        "public_label": "Ganzjährig als Naturgebiet nutzbar; Heideblüte im Spätsommer besonders lohnend",
+        "detail_note": "Das Witte Venn ist grundsätzlich als Naturgebiet erlebbar. Besonders lohnend ist die Heideblüte im Spätsommer; Schutz-, Wege- und Grenzgebietsregeln beachten.",
+        "holiday_policy": "not_applicable"
+      },
+      "recommendation": {
+        "availability": "always",
+        "weather_profile": [
+          "outdoor",
+          "rain_bad"
+        ],
+        "time_profile": [
+          "weekend"
+        ],
+        "cost_level": "unknown",
+        "recommendation_weight": "normal",
+        "interest_tags": [
+          "Draußen",
+          "Natur",
+          "Sport & Bewegung",
+          "Wochenende",
+          "Wasser"
+        ]
+      }
+    }
+  ]
 }
