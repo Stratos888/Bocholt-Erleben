@@ -55,6 +55,116 @@
     }
   }
 
+  /* === BEGIN BLOCK: TODAY_HOME_DESKTOP_DIRECT_TARGETS_V1 | Zweck: setzt die geklaerte Detailpanel-Policy um: Mobile nutzt Detailpanels, Desktop oeffnet Cards direkt outbound bzw. zum primaeren Ziel; Umfang: nur Today-Home Click-Routing === */
+  function isDesktopViewport() {
+    return window.matchMedia("(min-width: 900px)").matches;
+  }
+
+  function normalizeHttpUrl(raw) {
+    const value = asString(raw);
+    if (!value) return "";
+
+    try {
+      return new URL(value).href;
+    } catch (_) {
+      try {
+        return new URL(`https://${value}`).href;
+      } catch (_) {
+        return "";
+      }
+    }
+  }
+
+  function buildMapsUrl(raw) {
+    const query = asString(raw);
+    if (!query) return "";
+
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  }
+
+  function desktopPrimaryUrl(item) {
+    const source = item?.raw || item || {};
+
+    if (item?.type === "event") {
+      return normalizeHttpUrl(
+        item?.url ||
+        source.url ||
+        source.link ||
+        source.website ||
+        source.sourceUrl ||
+        source.source_url ||
+        ""
+      );
+    }
+
+    if (item?.type === "activity") {
+      return normalizeHttpUrl(
+        item?.url ||
+        source.url ||
+        source.website ||
+        source.website_url ||
+        source.booking_url ||
+        ""
+      );
+    }
+
+    return normalizeHttpUrl(item?.url || source.url || "");
+  }
+
+  function desktopFallbackTarget(item) {
+    const source = item?.raw || item || {};
+
+    if (item?.type === "activity") {
+      return buildMapsUrl(
+        item?.mapsTarget ||
+        source.maps_query ||
+        source.maps_label ||
+        source.address ||
+        source.location ||
+        item?.location ||
+        item?.title ||
+        ""
+      );
+    }
+
+    if (item?.type === "event") {
+      return buildMapsUrl(
+        item?.mapsTarget ||
+        source.location ||
+        source.ort ||
+        source.locationName ||
+        item?.location ||
+        ""
+      );
+    }
+
+    return "";
+  }
+
+  function openDesktopTarget(item) {
+    const primaryUrl = desktopPrimaryUrl(item);
+    const targetUrl = primaryUrl || desktopFallbackTarget(item);
+    if (!targetUrl) return false;
+
+    try {
+      if (window.BEAnalytics?.trackOutboundClick) {
+        window.BEAnalytics.trackOutboundClick({
+          outboundType: primaryUrl ? "website" : "maps",
+          entityType: item?.type || "today_card",
+          entityId: asString(item?.id || item?.raw?.id),
+          entityTitle: asString(item?.title || item?.raw?.title),
+          destinationUrl: targetUrl
+        });
+      }
+
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+  /* === END BLOCK: TODAY_HOME_DESKTOP_DIRECT_TARGETS_V1 === */
+
   async function fetchJsonNoStore(url, required) {
     try {
       const response = await fetch(url, { cache: "no-store" });
@@ -1004,6 +1114,11 @@
 
   function openItem(item) {
     if (!item) return;
+
+    if (isDesktopViewport()) {
+      openDesktopTarget(item);
+      return;
+    }
 
     if (item.type === "activity" && window.OfferDetailPanel?.show) {
       window.OfferDetailPanel.show(item.raw || item);
