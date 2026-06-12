@@ -216,6 +216,17 @@
 
   /* === BEGIN BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_PAYLOAD_V1 | Zweck: steuert die optionale Bildmaterial-Abfrage ohne Datei-Upload; Umfang: additive Helfer fuer Anzeige, Validierung und Payload === */
   const IMAGE_METHODS_REQUIRING_URL = Object.freeze(["download_link", "website_gallery"]);
+  const DEFAULT_IMAGE_NOTES_PLACEHOLDER = "Optional: Welche Bilder sollen bevorzugt verwendet werden? Gibt es Motive, die wir vermeiden sollen?";
+  const IMAGE_NOTES_PLACEHOLDERS = Object.freeze({
+    download_link: DEFAULT_IMAGE_NOTES_PLACEHOLDER,
+    website_gallery: "Optional: Welche Bilder aus der Galerie passen besonders gut?",
+    email_later: "Optional: Welche Bilder sendest du später? Gibt es etwas, das wir beachten sollen?",
+    other: "Bitte kurz beschreiben, wie wir an das Bildmaterial kommen oder was wir beachten sollen."
+  });
+
+  function getImageNotesPlaceholder(method) {
+    return IMAGE_NOTES_PLACEHOLDERS[method] || DEFAULT_IMAGE_NOTES_PLACEHOLDER;
+  }
 
   function getImageAvailability(form) {
     return valueOf("#activity-presence-image-availability", form);
@@ -256,6 +267,7 @@
 
     if (notesNode) {
       notesNode.disabled = !hasImageMaterial;
+      notesNode.placeholder = getImageNotesPlaceholder(hasImageMaterial ? method : "");
       if (!hasImageMaterial) notesNode.value = "";
     }
 
