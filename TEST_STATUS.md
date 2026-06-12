@@ -3191,3 +3191,42 @@ Activity Visual Phase B:
 | `das-mysterium-von-winterswijk` | `request_permission` | 100% Winterswijk/Tourismus Winterswijk um offizielles Routenmotiv bitten |
 | `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 | Zweck: dokumentiert Abschluss des Detailpanel-Premium-System-Blocks nach Mobile-Shell-Haertung und Desktop-Direct-Policy; Umfang: mobile Event-/Activity-Detailpanels, Today/Home Desktop Direct-Outbound, keine Parallelchat-Dateien === -->
+## Detailpanel Premium System – abgeschlossen am 2026-06-12
+
+Der Detailpanel-Live-Blocker wurde auf `staging` funktional abgeschlossen.
+
+### Zielentscheidung
+
+- Mobile nutzt Detailpanels als Entscheidungs- und Aktionsflaeche.
+- Desktop bleibt Card-first: Cards enthalten die wichtigsten Informationen, Klicks fuehren direkt outbound bzw. zum primaeren Ziel.
+- Today/Home nutzt mobil die bestehenden Event-/Activity-Detailpanels und fuehrt auf Desktop nicht mehr in das geteilte Detailpanel.
+
+### Umgesetzter Scope
+
+- `89bb32b` – `Haerte mobiles Activity Detailpanel`
+  - Activity-Detailpanel mobil technisch gehaertet.
+  - Fokus-/ARIA-/Back-/Scroll-/Drag-Shell an das robuste Event-Detailpanel angenaehert.
+  - Detailpanel-Systemvertrag um Mobile-/Desktop-Policy ergaenzt.
+
+- `8239d92` – `Oeffne Today Desktop Cards direkt`
+  - Today/Home Desktop-Cards oeffnen direkt outbound bzw. das primaere Ziel.
+  - Mobile Today/Home bleibt bei Event-/Activity-Detailpanels.
+
+### Gepruefter Stand
+
+Vom Nutzer bestaetigt:
+
+- Mobile `/aktivitaeten/`: Activity-Detailpanel funktioniert.
+- Mobile `/`: Event- und Activity-Detailpanel funktionieren.
+- Mobile `/events/`: Event-Detailpanel funktioniert weiter.
+- Desktop `/`: Home-Cards oeffnen wie gewuenscht direkt outbound bzw. zum Ziel, kein Detailpanel.
+
+### Nicht Teil dieses Scopes
+
+- Keine Activity-Bildproduktion.
+- Keine Event-/Activity-Feed-Card-Polishrunde.
+- Keine Today/Home-Layoutaenderung nach dem Premium-Freeze.
+- Keine Bearbeitung der Parallelchat-Dateien `data/offers.json`, `js/offers-main.js`, `js/offers.js`.
+<!-- === END BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 === -->
