@@ -459,6 +459,20 @@
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": "",
           "legacy_visual_key": "city_walk"
+        },
+        {
+          "id": "motif-fit-costumed-history-tour-01",
+          "src": "/assets/event-visuals/motif-fit-costumed-history-tour-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Visual für eine kostümierte historische Stadtführung mit kleiner Besuchergruppe in historischer Stadtkulisse.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "costumed_history_tour"
         }
       ]
     },
@@ -556,6 +570,20 @@
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": "",
           "legacy_visual_key": "music_stage"
+        },
+        {
+          "id": "motif-fit-local-band-concert-01",
+          "src": "/assets/event-visuals/motif-fit-local-band-concert-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Konzert-Visual mit lokaler Band auf kleiner Bühne und Publikum in regionaler Veranstaltungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "local_band_concert"
         }
       ]
     },
@@ -726,6 +754,34 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_theater_stage"
+        },
+        {
+          "id": "motif-fit-theater-play-01",
+          "src": "/assets/event-visuals/motif-fit-theater-play-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Theater-Visual mit kleiner Bühne, Schauspielszene und Publikum in gedämpfter Innenraumatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "theater_play"
+        },
+        {
+          "id": "motif-fit-theater-play-02",
+          "src": "/assets/event-visuals/motif-fit-theater-play-02.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Theaterstück-Visual mit Dialogszene auf kleiner Bühne und zurückhaltender Bühnenbeleuchtung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "theater_play"
         }
       ]
     },
@@ -805,6 +861,34 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_comedy_stage"
+        },
+        {
+          "id": "motif-fit-cabaret-stage-01",
+          "src": "/assets/event-visuals/motif-fit-cabaret-stage-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Kabarett-Visual mit kleiner Bühne, Publikum und zurückhaltender Kleinkunstatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "cabaret_stage"
+        },
+        {
+          "id": "motif-fit-cabaret-stage-02",
+          "src": "/assets/event-visuals/motif-fit-cabaret-stage-02.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Comedy- und Kabarett-Visual mit Stand-up-Bühne, Publikum und kleinem Veranstaltungsraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "cabaret_stage"
         }
       ]
     },
@@ -1181,6 +1265,20 @@
           "card_asset_format": "16:9_webp_1200x675",
           "note": "Imported from selected city_festival_street raw source ChatGPT Image 8. Juni 2026, 21_31_19.png on 2026-06-08.",
           "visual_motif": "neutral_city_festival"
+        },
+        {
+          "id": "motif-fit-shopping-sunday-01",
+          "src": "/assets/event-visuals/motif-fit-shopping-sunday-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Innenstadt-Visual für verkaufsoffenen Sonntag mit Besucherinnen und Besuchern in einer kleinstädtischen Einkaufsstraße.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "shopping_sunday"
         }
       ]
     },
@@ -1588,6 +1686,34 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_market_stalls"
+        },
+        {
+          "id": "motif-fit-flea-market-01",
+          "src": "/assets/event-visuals/motif-fit-flea-market-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Flohmarkt-Visual mit Trödelständen, Gebrauchtwaren und ruhiger Marktbesucher-Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "flea_market"
+        },
+        {
+          "id": "motif-fit-flea-market-02",
+          "src": "/assets/event-visuals/motif-fit-flea-market-02.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Trödelmarkt-Visual mit Marktständen, Besucherinnen und Besuchern sowie kleinstädtischer Außenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "flea_market"
         }
       ]
     },
@@ -1779,6 +1905,20 @@
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": "",
           "legacy_visual_key": "market_food"
+        },
+        {
+          "id": "motif-fit-wine-festival-01",
+          "src": "/assets/event-visuals/motif-fit-wine-festival-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Weinfest-Visual mit abendlicher Außengastronomie, Weinstand und regionaler Festatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_motif_fit_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "wine_festival"
         }
       ]
     },
