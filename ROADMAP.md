@@ -1399,3 +1399,144 @@ Priorität:
 - Die Nachgenerierung erfolgt gezielt nach tatsächlichen Lücken statt pauschal pro Kategorie.
 - Bestehende Visual-Audits bleiben gültig und werden später um Motiv-Fit-Prüfungen ergänzt.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_ROADMAP_2026_06_12 === -->
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_SHEET_REVIEW_2026_06_15 | Zweck: konsolidiert den Sheet-Abgleich fuer Event-Visual-Motive und definiert die nachhaltige Abarbeitungsreihenfolge; Umfang: Events-Sheet, Visual-Motif-Taxonomie, Gap-Backlog, Runtime-Resolver, Asset-Integration === -->
+## Event-Visual-Motiv-Fit – Sheet-Abgleich und Sanierungsroadmap 2026-06-15
+
+Status: Analyse- und Sanierungsroadmap. Keine automatische Bildproduktion und keine Asset-Integration ohne nachgelagerten, belegten Patch.
+
+### Geprüfte Grundlage
+
+- Geprüfter Repo-Stand: aktuelle Staging-ZIP `Bocholt-Erleben-staging (60).zip`.
+- Geprüfter Eventdatenstand: Google-Sheet-Export Tab `Events`, identisch mit `data/events.tsv` in der ZIP.
+- Umfang des Sheet-Exports: 172 Rohzeilen inkl. 1 komplett leerer Zeile im manuellen Export.
+- `data/event_visual_gap_backlog.tsv` in der ZIP ist bereits gegen diesen Sheet-Stand aufgebaut und enthält 45 gruppierte Motiv-Gaps.
+- Prioritätsverteilung des aktuellen Gap-Backlogs: 5 `high`, 40 `medium`.
+- `data/events.json` ist nicht die redaktionelle Quelle und darf für solche Aussagen nur als frisch erzeugtes Deploy-Artefakt genutzt werden.
+
+### Validierter Prozessstand
+
+Richtig und beizubehalten:
+
+1. `visual_key` bleibt die stabile grobe Bildfamilie.
+2. `visual_motif` ist die konkrete Motivschicht innerhalb eines Keys.
+3. `data/event_visual_gap_backlog.tsv` ist der richtige Ort fuer fehlende Motivbilder.
+4. `data/event_visual_phase2_acceptance_notes.json` ist der richtige Zwischenstand fuer akzeptierte, aber noch nicht integrierte Kandidaten.
+5. Neue Bilder werden nur aus echtem Gap, konkretem Eventbedarf oder bewusstem strategischem Poolausbau erzeugt.
+6. Das Google Sheet Tab `Events` ist die kanonische Eventquelle; lokale JSON-Artefakte sind nicht belastbar, wenn sie nicht frisch erzeugt wurden.
+
+Nicht fertig bzw. zu korrigieren:
+
+1. Der Gap-Backlog muss standardisiert mit dem aktuellen Sheet-/TSV-Stand laufen. Aktuell ist `scripts/build-event-visual-gap-backlog.py` zwar vorhanden, aber der Deploy-Workflow baut den Gap-Backlog nicht als festen Nachlauf.
+2. Der manuelle TSV-Export kann komplett leere Zeilen enthalten. Der Deploy-Exporter filtert leere Zeilen, `scripts/build-events-from-tsv.py` scheitert lokal aber an einer leeren Zeile. Lokales Script und Deploy-Exporter muessen hier gleich robust sein.
+3. `scripts/build-events-from-tsv.py` schreibt aktuell `visual_key`, aber kein `visual_motif` und keinen `visual_asset_status` in `data/events.json`.
+4. Die Runtime-Resolver in `js/events.js` und `js/today-home.js` wählen Eventbilder aktuell nach `visual_key`, nicht nach `visual_motif`. Dadurch kann ein spezifisches Event weiterhin ein anderes spezifisches Bild derselben groben Familie bekommen.
+5. `buildReadyVisualPools()` und der Today-Resolver übernehmen `visual_motif` aus `data/event_visual_pool.json` noch nicht in den JS-Poolzustand.
+6. Die aktuelle Motiv-Taxonomie ist brauchbar, aber die Inferenzregeln brauchen noch Härtung gegen zusammengesetzte deutsche Begriffe, englische Eventtitel und falsch priorisierte Kategorie-/Location-Fallbacks.
+
+### Aktueller Gap-Stand aus dem Sheet
+
+High-Gaps:
+
+- `business_messe_info / health_career_fair` – Beispiel: `Gesundheitsberufemesse`
+- `food_drink_festival / wine_festival` – Beispiele: `Wijnfeest Aalten 2026`, `30. Bocholter Weinfest`
+- `indoor_sport_competition / darts` – Beispiel: `Borkener Darts Trophy`
+- `indoor_sport_competition / fencing` – Beispiel: `17. International Fencing Camp Bocholt`
+- `market_stalls / fabric_market` – Beispiel: `Stoffmarkt Bocholt`
+
+Bereits im Produktionszwischenstand belegte Kandidaten fuer aktuelle Gaps:
+
+- `food_drink_festival / wine_festival` – akzeptiert und Download bestätigt.
+- `city_tour_history / costumed_history_tour` – akzeptiert und Download bestätigt.
+- `market_stalls / flea_market` – akzeptiert und Download bestätigt.
+- `city_festival_street / shopping_sunday` – akzeptiert und Download bestätigt.
+- `comedy_cabaret / cabaret_stage` – akzeptiert und Download bestätigt.
+- `theater_stage / theater_play` – akzeptiert und Download bestätigt.
+- `live_music_stage / local_band_concert` – mindestens ein Kandidat akzeptiert und Download bestätigt.
+- `open_air_festival / market_square_open_air` – ausgewählt, Downloadbestätigung im Repo-Stand noch offen.
+- `business_messe_info / info_evening` – ausgewählt, Downloadbestätigung im Repo-Stand noch offen.
+
+Wichtig: Lokal heruntergeladene Bilder, die nicht in `data/event_visual_phase2_acceptance_notes.json` oder als Source-Datei im Repo dokumentiert sind, gelten nicht als belastbarer Repo-Stand. Sie duerfen erst bei der Integration als konkrete Dateien/Motive verifiziert werden.
+
+### Bekannte Taxonomie-/Inferenzprobleme aus dem Sheet-Abgleich
+
+Diese Punkte sind keine Bildproduktionsaufgaben, sondern Regel-/Datenqualitätsaufgaben:
+
+- `Rosenmontagszug` muss zu `parade_festzug / carnival_parade`, nicht zu `market_stalls / neutral_market_stalls`.
+- `Filmvorführung ...` muss zu `film_screening`, zusammengesetzte Begriffe wie `Filmvorführung` duerfen nicht am Wortgrenzen-Regex scheitern.
+- `Fahrradtour mit Guide` und `Segwaytouren` muessen bei eindeutigem Titel zu `active_route_tour / guided_bike_tour` bzw. `active_route_tour / segway_tour`; Kategorie `Natur & Draußen` darf diese starken Titelmarker nicht überschreiben.
+- Naturbezogene Führungen wie `Lebenselixier Wasser - der Pröbstingsee...` duerfen nicht allein wegen `Führung` zu `city_tour_history` werden, wenn Natur-/See-Kontext klar dominiert.
+- `Bocholt Blüht mit großem Oldtimerfestival` muss wegen `Oldtimerfestival` zu `vehicle_classic / classic_car_meet` oder einem bewusst definierten Stadtfest+Oldtimer-Fall, nicht zu generischen Marktständen.
+- Business-/Wirtschaftsformate wie `Markterschließung Niederlande` brauchen einen besseren Key/Motif-Pfad als `creative_making_workshop`, z. B. `business_messe_info` mit neuem oder bestehendem Motiv.
+- Familien-/interkulturelle Stadtfeste wie `Internationales Familienfest...` und `Weltkindertagsfest / Eröffnung der Interkulturellen Woche` sollen auf `city_festival_street / children_intercultural_festival` geprüft werden.
+- Englische Titelmarker muessen robust bleiben, z. B. `fencing` auch ohne deutsche Beschreibung.
+
+### Nachhaltige Abarbeitungsreihenfolge
+
+#### P0 – Datenbasis und Gap-Ermittlung stabilisieren
+
+1. Leere Zeilen in `scripts/build-events-from-tsv.py` genauso ignorieren wie im Deploy-Exporter.
+2. `scripts/build-event-visual-gap-backlog.py` standardisiert gegen den frischen Sheet-TSV-Stand laufen lassen, vorzugsweise `data/events.tsv` als Defaultquelle oder als klar dokumentierter Pflichtparameter.
+3. Deploy-/CI-Entscheidung treffen: Gap-Backlog nur manuell erzeugen oder nach Sheet-Export automatisch als Report/Artefakt mitlaufen lassen.
+4. Nach jedem Sheet-Abgleich immer Quelle und Stand nennen: Sheet-Export, Deploy-Artefakt oder lokaler Snapshot.
+
+#### P1 – Key-/Motif-Inferenz härten
+
+1. Zusammengesetzte Begriffe und englische Marker ergänzen: `Rosenmontagszug`, `Filmvorführung`, `Oldtimerfestival`, `Segwaytour(en)`, `fencing`.
+2. Starke Titelmarker vor Kategorie-/Location-Fallbacks priorisieren.
+3. Naturführung, Stadtführung, aktive Tour und Fahrrad-/Segwaytour klarer voneinander trennen.
+4. Business-/Messe-/Info-/Workshop-Fälle sauber von Kreativworkshops trennen.
+5. Nach jeder Regeländerung den aktuellen Sheet-Export erneut klassifizieren und nur echte Verbesserungen committen.
+
+#### P2 – Eventdaten um Motivstatus erweitern
+
+1. `scripts/build-events-from-tsv.py` soll neben `visual_key` auch `visual_motif` und optional `visual_asset_status` erzeugen.
+2. Unsichere Fälle muessen `review` bleiben, nicht geraten werden.
+3. Das erzeugte `data/events.json` wird dadurch runtime-fähig fuer motivgenaue Bildauswahl.
+
+#### P3 – Runtime-Resolver motivfähig machen
+
+1. `js/events.js` und `js/today-home.js` muessen `visual_motif` aus Eventdaten lesen.
+2. Ready-Pools muessen `visual_motif` aus `data/event_visual_pool.json` in den JS-Zustand übernehmen.
+3. Auswahlregel:
+   - exaktes `visual_key + visual_motif` bevorzugen,
+   - sonst neutrales Fallback-Motiv desselben Keys,
+   - niemals anderes spezifisches Motiv desselben Keys.
+4. Wenn kein sicherer Fallback vorhanden ist, soll kein fachlich falsches spezifisches Bild erzwungen werden.
+
+#### P4 – Vorhandene Kandidaten integrieren
+
+1. Nur Kandidaten integrieren, deren Source-Dateien vorliegen und deren Motiv eindeutig dokumentiert ist.
+2. Zuerst High-Gaps und bereits akzeptierte Kandidaten schließen.
+3. Integration immer mit WebP-Konvertierung, `data/event_visual_pool.json`-Update, Bildnachweis-/Attributionsprüfung und Audit.
+4. Nach Integration Gap-Backlog neu bauen; erledigte Motive duerfen nicht mehr als offen erscheinen.
+
+#### P5 – Neue Bilder nur aus priorisiertem Backlog erzeugen
+
+1. Kein Batch aus reiner Vollständigkeitslogik der Taxonomie.
+2. Neue Bildproduktion nur fuer offene Backlog-Motive oder bewusst dokumentierten strategischen Poolausbau.
+3. Batches klein halten und nach jedem Batch Kandidaten in `data/event_visual_phase2_acceptance_notes.json` nachtragen.
+4. High-Gaps vor Medium-Gaps, häufige Motive vor Einzelfällen, Falschbild-Risiko vor reiner Vielfalt.
+
+#### P6 – Audit und Abschlusskriterien
+
+1. Audit ergänzen, der erkennt, ob spezifische Events ein anderes spezifisches Motivbild erhalten könnten.
+2. Audit ergänzen, der fehlende `visual_motif` bei Events mit eindeutigem Motiv meldet.
+3. Abschluss erst, wenn aktueller Sheet-Export, Gap-Backlog, Runtime-Resolver und Poolzustand konsistent sind.
+4. Danach in `TEST_STATUS.md` einen belegten Abschlussstand dokumentieren.
+
+### Nicht-Ziele
+
+- Kein vollständiges Bildarchiv fuer jede theoretische Unterkategorie erzwingen.
+- Keine manuelle Pflege von `data/event_visual_gap_backlog.tsv` als Produktionsnotizzettel.
+- Keine Integration von Bildern ohne Source-Datei, Motivmapping und Audit.
+- Keine weitere Bildproduktion, solange Daten-/Resolver-Prozess nicht stabil ist oder kein priorisierter Gap vorliegt.
+
+### Akzeptanzkriterien fuer diesen Workstream
+
+- Der aktuelle Sheet-Export kann lokal und im Deploy konsistent verarbeitet werden.
+- `Borkener Darts Trophy` wird als `indoor_sport_competition / darts` erkannt.
+- `17. International Fencing Camp Bocholt` wird als `indoor_sport_competition / fencing` erkannt.
+- Die bekannten Fehlklassifikationen aus dieser Roadmap sind korrigiert oder bewusst als Review-Fall dokumentiert.
+- Eventkarten wählen keine falschen spezifischen Unter-Motive mehr.
+- Der Gap-Backlog ist nach Integration der passenden Bilder nachvollziehbar kleiner und bleibt aus dem Sheet reproduzierbar.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_SHEET_REVIEW_2026_06_15 === -->
