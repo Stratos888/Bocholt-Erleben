@@ -1031,6 +1031,56 @@ Für Event-Visual-Gaps gilt die Sheet-first-Regel:
 
 Vor jeder Aussage wie „es gibt keine offenen Event-Visual-Gaps“ muss daher klar sein, welcher Eventdatenstand geprüft wurde.
 
+### Event-Visual-Matrix-Arbeitszyklus
+
+Die Event-Visual-Matrix ist das zentrale generierte Steuerartefakt für Motivbedarf, Kandidatenstand, Produktionspriorität und Integrationsstatus.
+
+Ziel-Datei:
+
+- `data/event_visual_motif_matrix.tsv`
+
+Ziel-Script:
+
+- `scripts/build-event-visual-motif-matrix.py`
+
+Die Matrix wird nicht manuell gepflegt. Sie wird aus diesen Quellen generiert:
+
+1. aktueller Sheet-Export `data/events.tsv`,
+2. kanonische Taxonomie aus `scripts/event_visual_motifs.py`,
+3. integrierte Ready-Bilder aus `data/event_visual_pool.json`,
+4. akzeptierte oder ausgewählte Kandidaten aus `data/event_visual_phase2_acceptance_notes.json`.
+
+Die Matrix muss pro `visual_key` / `visual_motif` mindestens ableiten:
+
+- ob das Motiv im aktuellen Sheet gebraucht wird,
+- konkrete Beispiel-Events,
+- ob ein `ready`-Bild vorhanden ist,
+- ob ein akzeptierter Kandidat vorhanden ist,
+- ob ein echter Gap besteht,
+- welche nächste Aktion gilt.
+
+Zulässige abgeleitete Aktionsstände:
+
+- `ready`: passendes integriertes Bild vorhanden, keine Aktion.
+- `candidate_to_integrate`: aktueller Bedarf und akzeptierter Kandidat vorhanden, Integration vorbereiten.
+- `gap_to_produce`: aktueller Bedarf, aber kein Ready-Bild und kein Kandidat vorhanden.
+- `review_rules`: Eventbedarf vorhanden, aber Zuordnung oder Inferenz ist unsicher bzw. wahrscheinlich falsch.
+- `parked_candidate`: Kandidat existiert, aber aktuell kein echter Bedarf.
+- `not_needed`: Taxonomie-Motiv existiert, aber aktueller Sheet-Stand benötigt es nicht.
+
+Arbeitsregeln:
+
+1. Vor jeder neuen Bildproduktion wird die Matrix aus dem aktuellen Sheet-Stand neu gebaut.
+2. Ein Bildprompt darf nur aus `gap_to_produce` entstehen oder aus bewusst dokumentiertem strategischem Poolausbau.
+3. Nach jedem bewerteten Batch mit akzeptierten Bildern wird `data/event_visual_phase2_acceptance_notes.json` aktualisiert und die Matrix neu gebaut.
+4. Nach jeder Asset-Integration werden `data/event_visual_pool.json`, Matrix und Gap-Backlog neu gebaut.
+5. Maximal ein akzeptierter Bildbatch darf ohne Repo-Checkpoint im Chat verbleiben. Mehrere akzeptierte Batches ohne Repo-Stand sind nicht zulässig.
+6. Wenn Matrix, Kandidatenlog und Pool nicht aktualisiert und committed sind, gilt der Stand nicht als belastbar erledigt.
+
+Die Matrix ersetzt nicht die Taxonomie. Sie ist der aktuelle Arbeitsstand aus Taxonomie, Sheet-Bedarf, Pool und Kandidatenlog.
+
+Die Matrix ersetzt nicht den Gap-Backlog. Der Gap-Backlog bleibt die fokussierte Liste offener Motivlücken; die Matrix ist die umfassendere Steuerliste inklusive `ready`, Kandidaten, geparkten Motiven und Nicht-Bedarf.
+
 ### Bedarfsquelle vor neuer Bildproduktion
 
 Ein kanonisches `visual_motif` ohne `ready`-Bild ist allein noch kein Produktionsauftrag.
