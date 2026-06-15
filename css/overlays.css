@@ -3343,3 +3343,70 @@ body.is-feedback-open{
 /* === END BLOCK: FEEDBACK_WIDGET_SYSTEM_V1 === */
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS === */
+
+/* === BEGIN BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V1 | Zweck: entschaerft den Desktop-Bildnachweiszugang auf Cards; Umfang: nur visuelle Darstellung/Hover/Fokus der bestehenden .image-credit-access--desktop === */
+@media (min-width: 761px){
+  .image-credit-access--desktop,
+  .image-credit-access--desktop:visited{
+    width: 28px;
+    height: 28px;
+    color: rgba(31, 41, 51, 0.68);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(31, 41, 51, 0.14);
+    box-shadow: 0 4px 12px rgba(31, 41, 51, 0.10);
+    opacity: 0.72;
+    transform: none;
+    backdrop-filter: blur(8px) saturate(1.02);
+    -webkit-backdrop-filter: blur(8px) saturate(1.02);
+  }
+
+  .image-credit-access--desktop .image-credit-access__icon,
+  .image-credit-access--desktop .image-credit-access__icon-svg,
+  .image-credit-access--desktop svg{
+    width: 15px;
+    height: 15px;
+    color: currentColor;
+    stroke: currentColor;
+  }
+
+  .image-credit-access--desktop svg [stroke],
+  .image-credit-access--desktop svg path,
+  .image-credit-access--desktop svg circle,
+  .image-credit-access--desktop svg rect,
+  .image-credit-access--desktop svg line,
+  .image-credit-access--desktop svg polyline,
+  .image-credit-access--desktop svg polygon{
+    stroke: currentColor;
+  }
+
+  .image-credit-access--desktop:hover,
+  .image-credit-access--desktop:focus-visible{
+    color: rgba(31, 41, 51, 0.82);
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(31, 41, 51, 0.20);
+    box-shadow: 0 6px 16px rgba(31, 41, 51, 0.13);
+    opacity: 0.88;
+    transform: none;
+  }
+
+  .image-credit-access--desktop:active{
+    color: rgba(31, 41, 51, 0.78);
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(31, 41, 51, 0.18);
+    box-shadow: 0 4px 12px rgba(31, 41, 51, 0.10);
+    opacity: 0.84;
+    transform: none;
+  }
+
+  .image-credit-access--desktop:focus-visible{
+    outline: 2px solid rgba(31, 41, 51, 0.34);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 760px){
+  .image-credit-access--desktop{
+    display: none !important;
+  }
+}
+/* === END BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V1 === */
