@@ -1062,10 +1062,6 @@ const iconSvg = (type, extraClass = "") => {
       };
       /* === END BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 === */
 
-      const detailVisualBadge = detailVisual && window.ImageAttribution?.badgeLabel
-        ? window.ImageAttribution.badgeLabel(detailVisual)
-        : "";
-
       const detailVisualHtml = detailVisual ? `
         <figure class="event-detail-media" aria-hidden="true">
           <img
@@ -1077,7 +1073,6 @@ const iconSvg = (type, extraClass = "") => {
             loading="eager"
             decoding="async"
           >
-          ${detailVisualBadge ? `<span class="event-detail-media__badge">${escapeHtml(detailVisualBadge)}</span>` : ""}
         </figure>
       ` : "";
 

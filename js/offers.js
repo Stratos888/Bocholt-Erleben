@@ -738,6 +738,18 @@ const OfferCards = (() => {
     return "Aktivität in Bocholt und Umgebung";
   }
 
+  function renderDesktopCreditLink(offer, imageData) {
+    if (!window.ImageAttribution?.renderCreditAccessLink || !imageData?.url) return "";
+
+    return window.ImageAttribution.renderCreditAccessLink(imageData, {
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim(),
+      imageId: String(imageData?.id || "").trim(),
+      label: "Bildnachweis"
+    });
+  }
+
   function renderMedia(offer, visual, index) {
     const imageData = OfferVisuals.resolveImageData(offer);
     const imageUrl = imageData.url;
@@ -751,6 +763,7 @@ const OfferCards = (() => {
       ensureImageOriginHints(imageUrl);
       const { loading, fetchPriority } = getImageLoadingProfile(index);
       const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
+      const creditLink = renderDesktopCreditLink(offer, imageData);
 
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}">
@@ -764,6 +777,7 @@ const OfferCards = (() => {
   referrerpolicy="no-referrer"
   style="--activity-image-pos-x:${OfferVisuals.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(imageData.fit || "cover")};"
 >
+          ${creditLink}
         </div>
       `.trim();
     }
@@ -866,8 +880,16 @@ const OfferCards = (() => {
       openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     };
 
-    article.addEventListener("click", open);
+    article.addEventListener("click", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) {
+        event.stopPropagation();
+        return;
+      }
+
+      open(event);
+    });
     article.addEventListener("keydown", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       open(event);
     });

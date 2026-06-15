@@ -268,6 +268,30 @@
     ].filter(Boolean).join("\n");
   }
 
+  function renderCreditAccessLink(input, options = {}) {
+    const meta = normalize(input, options);
+    if (!hasRenderableData(meta)) return "";
+
+    const href = fullCreditHref(meta, options);
+    const label = asString(options.label) || "Bildnachweis";
+    const title = asString(options.title) || "Bildnachweis öffnen";
+    const className = asString(options.className) || "image-credit-access image-credit-access--desktop";
+    const iconHtml = window.Icons?.svg
+      ? window.Icons.svg("info", { className: "image-credit-access__icon-svg" })
+      : "i";
+    const accessibleLabel = [title, detailSummaryText(meta), meta.entityTitle]
+      .map(asString)
+      .filter(Boolean)
+      .join(" – ");
+
+    return `
+      <a class="${escapeHtml(className)}" href="${escapeHtml(href)}" aria-label="${escapeHtml(accessibleLabel)}" title="${escapeHtml(title)}" data-image-credit-access>
+        <span class="image-credit-access__icon" aria-hidden="true">${iconHtml}</span>
+        <span class="image-credit-access__label">${escapeHtml(label)}</span>
+      </a>
+    `.trim();
+  }
+
   function renderDetailAttribution(input, options = {}) {
     const meta = normalize(input, options);
     if (!hasRenderableData(meta)) return "";
@@ -309,7 +333,7 @@
     ` : "";
 
     return `
-      <article class="image-credit-card" id="${escapeHtml(id)}">
+      <article class="image-credit-card" id="${escapeHtml(id)}" tabindex="-1">
         ${aliases.map((alias) => `<span class="image-credit-anchor" id="${escapeHtml(alias)}"></span>`).join("")}
         ${image}
         <div class="image-credit-card__body">
@@ -330,6 +354,7 @@
     anchorId,
     fullCreditHref,
     renderDetailAttribution,
+    renderCreditAccessLink,
     renderCreditCard,
     attributionLabel,
     badgeLabel,

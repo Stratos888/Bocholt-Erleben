@@ -802,6 +802,24 @@ function createCard(event, visualUsage = null) {
 
     media.appendChild(image);
 
+    if (window.ImageAttribution?.renderCreditAccessLink) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = window.ImageAttribution.renderCreditAccessLink(cardVisual, {
+        entityType: "event",
+        entityId: String(event?.id || "").trim(),
+        entityTitle: titleText,
+        imageId: String(cardVisual.id || "").trim(),
+        label: "Bildnachweis"
+      });
+      const creditLink = wrapper.firstElementChild;
+      if (creditLink) {
+        creditLink.addEventListener("click", (clickEvent) => {
+          clickEvent.stopPropagation();
+        });
+        media.appendChild(creditLink);
+      }
+    }
+
     card.appendChild(media);
   }
 
@@ -836,10 +854,16 @@ function createCard(event, visualUsage = null) {
   /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
 
   card.addEventListener("click", (e) => {
+    if (e.target.closest("[data-image-credit-access]")) {
+      e.stopPropagation();
+      return;
+    }
+
     openCard(e);
   });
 
   card.addEventListener("keydown", (e) => {
+    if (e.target.closest("[data-image-credit-access]")) return;
     if (e.key !== "Enter" && e.key !== " ") return;
     openCard(e);
   });

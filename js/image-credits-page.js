@@ -191,16 +191,45 @@
     `.trim()).join("\n");
   }
 
-  function highlightHashTarget() {
+  function hashTargetCard() {
     const rawHash = decodeURIComponent(window.location.hash || "").replace(/^#/, "");
-    if (!rawHash) return;
+    if (!rawHash) return null;
 
     const target = document.getElementById(rawHash);
-    const card = target?.closest?.(".image-credit-card") || target;
-    if (!card) return;
+    return target?.closest?.(".image-credit-card") || target || null;
+  }
+
+  function focusTarget(card) {
+    if (!card || typeof card.focus !== "function") return;
+
+    try {
+      card.focus({ preventScroll: true });
+    } catch (_) {
+      card.focus();
+    }
+  }
+
+  function revealHashTarget(options = {}) {
+    const card = hashTargetCard();
+    if (!card) return false;
 
     card.classList.add("is-targeted");
+    card.scrollIntoView({
+      block: options.block || "center",
+      behavior: options.behavior || "auto"
+    });
+    focusTarget(card);
     setTimeout(() => card.classList.remove("is-targeted"), 3200);
+    return true;
+  }
+
+  function revealHashTargetAfterRender(options = {}) {
+    if (!window.location.hash) return;
+
+    requestAnimationFrame(() => {
+      if (revealHashTarget(options)) return;
+      setTimeout(() => revealHashTarget(options), 140);
+    });
   }
 
   async function init() {
@@ -231,7 +260,7 @@
 
       if (status) status.textContent = `${entries.length} Bildnachweise geladen.`;
       if (window.Icons?.hydrate) window.Icons.hydrate(root);
-      highlightHashTarget();
+      revealHashTargetAfterRender({ block: "center", behavior: "auto" });
     } catch (error) {
       root.innerHTML = `
         <section class="content-card image-credits-error" role="alert">
@@ -245,7 +274,7 @@
     }
   }
 
-  window.addEventListener("hashchange", highlightHashTarget);
+  window.addEventListener("hashchange", () => revealHashTargetAfterRender({ block: "center", behavior: "smooth" }));
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

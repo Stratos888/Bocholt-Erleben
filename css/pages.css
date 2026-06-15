@@ -2347,6 +2347,124 @@ select.content-field__control{
     gap: 4px;
   }
 }
+
+@media (max-width: 640px){
+  .page--image-credits{
+    --subpage-stack-gap: 14px;
+    padding-top: 10px;
+  }
+
+  .page--image-credits .content-hero--panel{
+    padding: 18px 18px 17px;
+    border-radius: 20px;
+  }
+
+  .image-credits-hero-layout{
+    gap: 14px;
+  }
+
+  .image-credits-hero-copy{
+    gap: 10px;
+  }
+
+  .page--image-credits .content-lead{
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .image-credits-status{
+    min-height: 28px;
+    margin-top: 2px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+
+  .image-credits-hero-card{
+    gap: 9px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .image-credits-hero-card__list{
+    gap: 7px;
+    font-size: 0.86rem;
+  }
+
+  .image-credits-intro-card{
+    padding: 14px;
+  }
+
+  .image-credits-intro-card h2{
+    font-size: 0.98rem;
+  }
+
+  .image-credits-intro-card p{
+    font-size: 0.88rem;
+    line-height: 1.42;
+  }
+
+  .image-credits-root{
+    gap: 18px;
+  }
+
+  .image-credits-nav{
+    gap: 8px;
+  }
+
+  .image-credits-nav__link{
+    min-height: 46px;
+    padding: 10px 12px;
+    border-radius: 15px;
+    font-size: 0.88rem;
+  }
+
+  .image-credits-section{
+    gap: 12px;
+    scroll-margin-top: 78px;
+  }
+
+  .image-credits-section__header h2{
+    font-size: 1.16rem;
+  }
+
+  .image-credits-section__header p{
+    font-size: 0.86rem;
+    line-height: 1.42;
+  }
+
+  .image-credit-card{
+    border-radius: 18px;
+    scroll-margin-top: 78px;
+  }
+
+  .image-credit-card__body{
+    gap: 9px;
+    padding: 13px;
+  }
+
+  .image-credit-card h2{
+    font-size: 0.98rem;
+  }
+
+  .image-attribution--card .image-attribution__panel{
+    gap: 9px;
+  }
+
+  .image-attribution--card .image-attribution__row{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .image-attribution--card .image-attribution__key{
+    font-size: 0.67rem;
+  }
+
+  .image-attribution--card .image-attribution__value{
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+}
+
 @media (min-width: 760px){
   .page--publish.page--activity-presence .activity-presence-tariff-list.publish-model-list{
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3053,7 +3171,7 @@ select.content-field__control{
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_COMPACT_UI_V1 === */
 
-/* === BEGIN BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V2 | Zweck: bringt /bildnachweise/ optisch auf Subpage-Premiumniveau mit Hero-Layout, ruhiger Hinweisbox, kompakter Navigation und hochwertigen Nachweiskarten === */
+/* === BEGIN BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V3 | Zweck: bringt /bildnachweise/ optisch auf Subpage-Premiumniveau mit Hero-Layout, ruhiger Hinweisbox, kompakter Navigation und hochwertigen Nachweiskarten === */
 .page--image-credits .content-hero{
   width: 100%;
   gap: 0;
@@ -3241,7 +3359,8 @@ select.content-field__control{
   border-radius: 22px;
   background: rgba(255,255,255,0.88);
   box-shadow: 0 14px 34px rgba(31,41,51,0.05), 0 1px 0 rgba(255,255,255,0.82) inset;
-  scroll-margin-top: 88px;
+  scroll-margin-top: 92px;
+  outline: none;
 }
 
 .image-credit-card.is-targeted{
@@ -3341,6 +3460,124 @@ select.content-field__control{
   text-decoration: underline;
 }
 
+
+@media (max-width: 640px){
+  .page--image-credits{
+    --subpage-stack-gap: 14px;
+    padding-top: 10px;
+  }
+
+  .page--image-credits .content-hero--panel{
+    padding: 18px 18px 17px;
+    border-radius: 20px;
+  }
+
+  .image-credits-hero-layout{
+    gap: 14px;
+  }
+
+  .image-credits-hero-copy{
+    gap: 10px;
+  }
+
+  .page--image-credits .content-lead{
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .image-credits-status{
+    min-height: 28px;
+    margin-top: 2px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+
+  .image-credits-hero-card{
+    gap: 9px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .image-credits-hero-card__list{
+    gap: 7px;
+    font-size: 0.86rem;
+  }
+
+  .image-credits-intro-card{
+    padding: 14px;
+  }
+
+  .image-credits-intro-card h2{
+    font-size: 0.98rem;
+  }
+
+  .image-credits-intro-card p{
+    font-size: 0.88rem;
+    line-height: 1.42;
+  }
+
+  .image-credits-root{
+    gap: 18px;
+  }
+
+  .image-credits-nav{
+    gap: 8px;
+  }
+
+  .image-credits-nav__link{
+    min-height: 46px;
+    padding: 10px 12px;
+    border-radius: 15px;
+    font-size: 0.88rem;
+  }
+
+  .image-credits-section{
+    gap: 12px;
+    scroll-margin-top: 78px;
+  }
+
+  .image-credits-section__header h2{
+    font-size: 1.16rem;
+  }
+
+  .image-credits-section__header p{
+    font-size: 0.86rem;
+    line-height: 1.42;
+  }
+
+  .image-credit-card{
+    border-radius: 18px;
+    scroll-margin-top: 78px;
+  }
+
+  .image-credit-card__body{
+    gap: 9px;
+    padding: 13px;
+  }
+
+  .image-credit-card h2{
+    font-size: 0.98rem;
+  }
+
+  .image-attribution--card .image-attribution__panel{
+    gap: 9px;
+  }
+
+  .image-attribution--card .image-attribution__row{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .image-attribution--card .image-attribution__key{
+    font-size: 0.67rem;
+  }
+
+  .image-attribution--card .image-attribution__value{
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+}
+
 @media (min-width: 760px){
   .image-credits-hero-layout{
     grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
@@ -3364,4 +3601,4 @@ select.content-field__control{
     padding: 18px 18px 17px;
   }
 }
-/* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V2 === */
+/* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V3 === */

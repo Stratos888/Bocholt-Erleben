@@ -500,10 +500,6 @@ const OfferDetailPanel = {
         };
 
     if (imageData.url) {
-      const symbolicLabel = window.OfferVisuals?.buildSymbolicCardLabel
-        ? window.OfferVisuals.buildSymbolicCardLabel(imageData)
-        : (imageData.isSymbolic ? "Symbolbild" : "");
-
       return `
         <div class="activity-detail__media-shell">
           <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
@@ -516,9 +512,6 @@ const OfferDetailPanel = {
               referrerpolicy="no-referrer"
               style="--activity-image-pos-x:${this.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${this.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${this.escapeHtml(imageData.fit || "cover")};"
             >
-            ${symbolicLabel ? `
-              <span class="activity-detail__media-badge">${this.escapeHtml(symbolicLabel)}</span>
-            ` : ""}
           </div>
         </div>
       `.trim();

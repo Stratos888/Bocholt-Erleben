@@ -963,26 +963,6 @@ Umfang:
   background: rgba(232,236,224,0.92);
 }
 
-#event-detail-panel .activity-detail__media-badge{
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(244,246,239,0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 0 0 1px rgba(23,39,30,0.08), 0 6px 18px rgba(12,22,17,0.08);
-  color: rgba(38,50,42,0.82);
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
 /* === BEGIN BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V2 | Zweck: macht den Bildnachweis im Detailpanel zu einer kompakten Direktzeile ohne Accordion und entfernt Card-Badge-Dominanz; Umfang: zentraler Bildnachweis-Baustein plus Detailbild-Badge === */
 #event-detail-panel .image-attribution--detail{
   display: grid;
@@ -1069,29 +1049,76 @@ Umfang:
   position: relative;
 }
 
+.image-credit-access{
+  display: none;
+}
+
+#event-detail-panel .activity-detail__media-badge,
 #event-detail-panel .event-detail-media__badge{
-  position: absolute;
-  left: 14px;
-  bottom: 14px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  max-width: calc(100% - 28px);
-  min-height: 26px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: rgba(255,255,250,0.88);
-  color: rgba(45,58,49,0.84);
-  box-shadow:
-    0 6px 16px rgba(14,24,18,0.12),
-    inset 0 0 0 1px rgba(24,40,31,0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-size: 0.72rem;
-  font-weight: 780;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  pointer-events: none;
+  display: none;
+}
+
+@media (min-width: 900px){
+  .image-credit-access--desktop{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(28,43,33,0.10);
+    border-radius: 999px;
+    background: rgba(255,255,250,0.78);
+    color: rgba(35,57,43,0.74);
+    box-shadow: 0 8px 20px rgba(14,24,18,0.10), 0 1px 0 rgba(255,255,255,0.86) inset;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    opacity: 0.86;
+    transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+  }
+
+  .image-credit-access__icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 0.78rem;
+    font-weight: 820;
+    line-height: 1;
+  }
+
+  .image-credit-access__icon-svg{
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+
+  .image-credit-access__label{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .image-credit-access--desktop:hover,
+  .image-credit-access--desktop:focus-visible{
+    opacity: 1;
+    transform: translateY(-1px);
+    background: rgba(255,255,250,0.94);
+    color: rgba(35,80,56,0.94);
+  }
+
+  .image-credit-access--desktop:focus-visible{
+    outline: 2px solid color-mix(in srgb, var(--color-primary) 55%, white);
+    outline-offset: 3px;
+  }
 }
 
 @media (max-width: 520px){

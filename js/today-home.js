@@ -1044,11 +1044,24 @@
   }
   /* === END BLOCK: TODAY_HOME_ACTIVITY_REASON_PILLS_ONLY_V1 === */
 
+  function renderDesktopCreditLink(item, resolvedVisual) {
+    if (!resolvedVisual || !window.ImageAttribution?.renderCreditAccessLink) return "";
+
+    return window.ImageAttribution.renderCreditAccessLink(resolvedVisual, {
+      entityType: item?.type === "activity" ? "activity" : "event",
+      entityId: asString(item?.id || item?.raw?.id),
+      entityTitle: asString(item?.title || item?.raw?.title),
+      imageId: asString(resolvedVisual?.id),
+      label: "Bildnachweis"
+    });
+  }
+
   function renderCard(item, index, usedImages) {
     const context = createContext();
     const meta = item.type === "activity" ? buildActivityMeta(item, context) : buildEventMeta(item);
     const resolvedVisual = resolveItemVisual(item, usedImages);
     const image = resolvedVisual?.src || "";
+    const creditLink = renderDesktopCreditLink(item, resolvedVisual);
     const showTopBadge = index === 0 && isTopTipEligible(item, context);
 
     if (item && typeof item === "object") {
@@ -1070,6 +1083,7 @@
         ${image ? `
           <div class="today-card__media">
             <img src="${escapeHtml(image)}" alt="" loading="${index < 1 ? "eager" : "lazy"}" decoding="async">
+            ${creditLink}
           </div>
         ` : ""}
         <div class="today-card__body">
@@ -1181,6 +1195,11 @@
 
   function bindEvents(root) {
     root.addEventListener("click", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) {
+        event.stopPropagation();
+        return;
+      }
+
       const card = event.target.closest("[data-today-card]");
       if (card) {
         openItem(findItemByKey(card.getAttribute("data-today-card")));
@@ -1188,6 +1207,7 @@
     });
 
     root.addEventListener("keydown", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) return;
       if (event.key !== "Enter" && event.key !== " ") return;
 
       const card = event.target.closest("[data-today-card]");
