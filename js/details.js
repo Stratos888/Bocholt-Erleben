@@ -1084,6 +1084,7 @@ const iconSvg = (type, extraClass = "") => {
             imageId: String(detailVisual.id || "").trim()
           })
         : "";
+      const hasTrustLinks = Boolean(detailVisualAttributionHtml || showWebsite || showSource);
 
       const html = `
         <div class="detail-panel-inner">
@@ -1133,10 +1134,10 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
 
-          ${detailVisualAttributionHtml}
+          ${hasTrustLinks ? `
+            <div class="detail-links detail-links--trust" aria-label="Quellen und Nachweise">
+              ${detailVisualAttributionHtml}
 
-          ${(showWebsite || showSource) ? `
-            <div class="detail-links" aria-label="Links">
               ${showWebsite ? `
                 <a
                   class="detail-link"
@@ -1159,9 +1160,9 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                   rel="noopener"
                   ${buildOutboundDataAttrs(sourceOutboundPayload)}
                 >
-                  <span class="detail-link-label">Quelle</span>
+                  <span class="detail-link-label">Eventquelle</span>
                   <span class="detail-link-value">${escapeHtml(sourceHostLabel)}</span>
-                  <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
+                  <span class="detail-link-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
                 </a>
               ` : ""}
             </div>

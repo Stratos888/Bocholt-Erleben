@@ -296,9 +296,6 @@
     const meta = normalize(input, options);
     if (!hasRenderableData(meta)) return "";
 
-    const imageIcon = window.Icons?.svg
-      ? window.Icons.svg("image", { className: "image-attribution__icon-svg" })
-      : "";
     const chevronIcon = window.Icons?.svg
       ? window.Icons.svg("chevron-right", { className: "image-attribution__chevron-svg" })
       : "›";
@@ -311,14 +308,10 @@
       .join(" – ");
 
     return `
-      <a class="image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}" href="${escapeHtml(linkHref)}" aria-label="${escapeHtml(accessibleLabel)}">
-        <span class="image-attribution__main">
-          <span class="image-attribution__icon" aria-hidden="true">${imageIcon}</span>
-          <span class="image-attribution__label">Bildnachweis</span>
-          <span class="image-attribution__separator" aria-hidden="true">·</span>
-          <span class="image-attribution__compact-text">${escapeHtml(summaryText)}</span>
-        </span>
-        <span class="image-attribution__chevron" aria-hidden="true">${chevronIcon}</span>
+      <a class="detail-link image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}" href="${escapeHtml(linkHref)}" aria-label="${escapeHtml(accessibleLabel)}">
+        <span class="detail-link-label image-attribution__label">Bildnachweis</span>
+        <span class="detail-link-value image-attribution__compact-text">${escapeHtml(summaryText)}</span>
+        <span class="detail-link-ext image-attribution__chevron" aria-hidden="true">${chevronIcon}</span>
       </a>
     `.trim();
   }

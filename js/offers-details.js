@@ -540,12 +540,16 @@ const OfferDetailPanel = {
 
     if (!window.ImageAttribution?.renderDetailAttribution) return "";
 
-    return window.ImageAttribution.renderDetailAttribution(imageData, {
+    const attributionHtml = window.ImageAttribution.renderDetailAttribution(imageData, {
       entityType: "activity",
       entityId: String(offer?.id || "").trim(),
       entityTitle: String(offer?.title || "").trim(),
       imageId: String(imageData?.id || "").trim()
     });
+
+    return attributionHtml
+      ? `<div class="detail-links detail-links--trust" aria-label="Quellen und Nachweise">${attributionHtml}</div>`
+      : "";
   },
   /* === END BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 === */
 
