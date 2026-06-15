@@ -2437,6 +2437,13 @@ select.content-field__control{
     scroll-margin-top: 78px;
   }
 
+  .image-credit-card__target-label{
+    top: 9px;
+    right: 9px;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+  }
+
   .image-credit-card__body{
     gap: 9px;
     padding: 13px;
@@ -3370,6 +3377,27 @@ select.content-field__control{
     0 1px 0 rgba(255,255,255,0.82) inset;
 }
 
+.image-credit-card__target-label{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: none;
+  padding: 6px 9px;
+  border: 1px solid rgba(31,41,51,0.08);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary-muted) 80%, white);
+  color: color-mix(in srgb, var(--color-text-primary) 82%, var(--color-primary));
+  box-shadow: 0 8px 18px rgba(31,41,51,0.08), 0 1px 0 rgba(255,255,255,0.82) inset;
+  font-size: 0.72rem;
+  font-weight: 840;
+  letter-spacing: 0.02em;
+}
+
+.image-credit-card.is-targeted .image-credit-card__target-label{
+  display: inline-flex;
+}
+
 .image-credit-anchor{
   position: absolute;
   top: -96px;
@@ -3548,6 +3576,13 @@ select.content-field__control{
   .image-credit-card{
     border-radius: 18px;
     scroll-margin-top: 78px;
+  }
+
+  .image-credit-card__target-label{
+    top: 9px;
+    right: 9px;
+    padding: 5px 8px;
+    font-size: 0.68rem;
   }
 
   .image-credit-card__body{

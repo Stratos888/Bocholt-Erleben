@@ -277,8 +277,8 @@
     const title = asString(options.title) || "Bildnachweis öffnen";
     const className = asString(options.className) || "image-credit-access image-credit-access--desktop";
     const iconHtml = window.Icons?.svg
-      ? window.Icons.svg("info", { className: "image-credit-access__icon-svg" })
-      : "i";
+      ? window.Icons.svg("image", { className: "image-credit-access__icon-svg" })
+      : "▧";
     const accessibleLabel = [title, detailSummaryText(meta), meta.entityTitle]
       .map(asString)
       .filter(Boolean)
@@ -296,25 +296,29 @@
     const meta = normalize(input, options);
     if (!hasRenderableData(meta)) return "";
 
-    const infoIcon = window.Icons?.svg
-      ? window.Icons.svg("info", { className: "image-attribution__icon-svg" })
+    const imageIcon = window.Icons?.svg
+      ? window.Icons.svg("image", { className: "image-attribution__icon-svg" })
       : "";
+    const chevronIcon = window.Icons?.svg
+      ? window.Icons.svg("chevron-right", { className: "image-attribution__chevron-svg" })
+      : "›";
 
     const summaryText = detailSummaryText(meta) || attributionLabel(meta);
     const linkHref = fullCreditHref(meta, options);
-    const accessibleLabel = ["Vollständiger Bildnachweis", summaryText, meta.entityTitle]
+    const accessibleLabel = ["Bildnachweis öffnen", summaryText, meta.entityTitle]
       .map(asString)
       .filter(Boolean)
       .join(" – ");
 
     return `
       <a class="image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}" href="${escapeHtml(linkHref)}" aria-label="${escapeHtml(accessibleLabel)}">
-        <span class="image-attribution__toggle-main">
-          <span class="image-attribution__icon" aria-hidden="true">${infoIcon}</span>
-          <span>Bildhinweis</span>
+        <span class="image-attribution__main">
+          <span class="image-attribution__icon" aria-hidden="true">${imageIcon}</span>
+          <span class="image-attribution__label">Bildnachweis</span>
+          <span class="image-attribution__separator" aria-hidden="true">·</span>
+          <span class="image-attribution__compact-text">${escapeHtml(summaryText)}</span>
         </span>
-        <span class="image-attribution__compact-text">${escapeHtml(summaryText)}</span>
-        <span class="image-attribution__link image-attribution__full-link">Vollständiger Nachweis</span>
+        <span class="image-attribution__chevron" aria-hidden="true">${chevronIcon}</span>
       </a>
     `.trim();
   }
@@ -335,6 +339,7 @@
     return `
       <article class="image-credit-card" id="${escapeHtml(id)}" tabindex="-1">
         ${aliases.map((alias) => `<span class="image-credit-anchor" id="${escapeHtml(alias)}"></span>`).join("")}
+        <span class="image-credit-card__target-label" aria-hidden="true">Aufgerufener Nachweis</span>
         ${image}
         <div class="image-credit-card__body">
           <p class="image-credit-card__kicker">${escapeHtml(groupLabel)} · ${escapeHtml(attributionLabel(meta))}</p>

@@ -963,28 +963,29 @@ Umfang:
   background: rgba(232,236,224,0.92);
 }
 
-/* === BEGIN BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V2 | Zweck: macht den Bildnachweis im Detailpanel zu einer kompakten Direktzeile ohne Accordion und entfernt Card-Badge-Dominanz; Umfang: zentraler Bildnachweis-Baustein plus Detailbild-Badge === */
+/* === BEGIN BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V3 | Zweck: reduziert Bildnachweis im Detailpanel auf eine einzige klickbare Standardzeile und entschaerft den Desktop-Card-Nachweiszugang | Umfang: zentraler Detailpanel-Link, dezenter Desktop-Card-Link, Detailbild-Badge-Ausblendung === */
 #event-detail-panel .image-attribution--detail{
-  display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
 
-  margin: 18px 0 0;
-  padding: 13px 0 0;
+  margin: 17px 0 0;
+  padding: 12px 0;
   border-top: 1px solid rgba(24,40,31,0.09);
+  border-bottom: 1px solid rgba(24,40,31,0.07);
 
-  color: rgba(58,72,63,0.78);
+  color: rgba(54,69,60,0.82);
   text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: 0.86rem;
+  font-weight: 760;
+  line-height: 1.3;
   -webkit-tap-highlight-color: transparent;
 }
 
 #event-detail-panel .image-attribution--detail:hover,
 #event-detail-panel .image-attribution--detail:focus-visible{
-  color: rgba(38,86,62,0.95);
+  color: rgba(38,86,62,0.96);
   text-decoration: none;
 }
 
@@ -994,53 +995,54 @@ Umfang:
   border-radius: 14px;
 }
 
-#event-detail-panel .image-attribution__toggle-main{
+#event-detail-panel .image-attribution__main{
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
-  color: rgba(58,72,63,0.82);
 }
 
-#event-detail-panel .image-attribution__icon{
+#event-detail-panel .image-attribution__icon,
+#event-detail-panel .image-attribution__chevron{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: rgba(60,83,69,0.82);
+  width: 17px;
+  height: 17px;
+  color: rgba(60,83,69,0.76);
   flex: 0 0 auto;
 }
 
-#event-detail-panel .image-attribution__icon-svg{
-  width: 16px;
-  height: 16px;
+#event-detail-panel .image-attribution__icon-svg,
+#event-detail-panel .image-attribution__chevron-svg{
+  width: 17px;
+  height: 17px;
   stroke-width: 1.9;
+}
+
+#event-detail-panel .image-attribution__label{
+  color: rgba(54,69,60,0.86);
+  white-space: nowrap;
+}
+
+#event-detail-panel .image-attribution__separator{
+  color: rgba(96,109,101,0.45);
+  font-weight: 760;
 }
 
 #event-detail-panel .image-attribution__compact-text{
   min-width: 0;
-  justify-self: end;
-  color: rgba(96,109,101,0.72);
-  font-size: 0.78rem;
-  font-weight: 680;
+  color: rgba(96,109,101,0.76);
+  font-size: 0.8rem;
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#event-detail-panel .image-attribution__link{
-  color: rgba(38,86,62,0.92);
-  font-size: 0.8rem;
-  font-weight: 760;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-#event-detail-panel .image-attribution--detail:hover .image-attribution__link,
-#event-detail-panel .image-attribution--detail:focus-visible .image-attribution__link{
-  text-decoration: underline;
-  text-underline-offset: 3px;
+#event-detail-panel .image-attribution--detail:hover .image-attribution__compact-text,
+#event-detail-panel .image-attribution--detail:focus-visible .image-attribution__compact-text{
+  color: rgba(38,86,62,0.84);
 }
 
 .event-card-media,
@@ -1061,41 +1063,39 @@ Umfang:
 @media (min-width: 900px){
   .image-credit-access--desktop{
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 9px;
+    right: 9px;
     z-index: 5;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid rgba(28,43,33,0.10);
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(28,43,33,0.08);
     border-radius: 999px;
-    background: rgba(255,255,250,0.78);
-    color: rgba(35,57,43,0.74);
-    box-shadow: 0 8px 20px rgba(14,24,18,0.10), 0 1px 0 rgba(255,255,255,0.86) inset;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: rgba(255,255,250,0.62);
+    color: rgba(35,57,43,0.58);
+    box-shadow: 0 4px 12px rgba(14,24,18,0.08), 0 1px 0 rgba(255,255,255,0.72) inset;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     text-decoration: none;
-    opacity: 0.86;
-    transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+    opacity: 0.72;
+    transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease, color 160ms ease;
   }
 
   .image-credit-access__icon{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
-    font-size: 0.78rem;
-    font-weight: 820;
+    width: 15px;
+    height: 15px;
     line-height: 1;
   }
 
   .image-credit-access__icon-svg{
-    width: 16px;
-    height: 16px;
-    stroke-width: 2;
+    width: 15px;
+    height: 15px;
+    stroke-width: 1.85;
   }
 
   .image-credit-access__label{
@@ -1111,8 +1111,8 @@ Umfang:
   .image-credit-access--desktop:focus-visible{
     opacity: 1;
     transform: translateY(-1px);
-    background: rgba(255,255,250,0.94);
-    color: rgba(35,80,56,0.94);
+    background: rgba(255,255,250,0.9);
+    color: rgba(35,80,56,0.88);
   }
 
   .image-credit-access--desktop:focus-visible{
@@ -1123,23 +1123,20 @@ Umfang:
 
 @media (max-width: 520px){
   #event-detail-panel .image-attribution--detail{
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 4px;
+    gap: 10px;
+    padding: 11px 0;
+    font-size: 0.84rem;
+  }
+
+  #event-detail-panel .image-attribution__main{
+    gap: 6px;
   }
 
   #event-detail-panel .image-attribution__compact-text{
-    grid-column: 1 / 2;
-    justify-self: start;
-    font-size: 0.76rem;
-  }
-
-  #event-detail-panel .image-attribution__full-link{
-    grid-column: 2 / 3;
-    grid-row: 1 / 3;
-    align-self: center;
+    font-size: 0.78rem;
   }
 }
-/* === END BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V2 === */
+/* === END BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V3 === */
 
 #event-detail-panel .activity-detail__media--fallback{
   display: grid;
