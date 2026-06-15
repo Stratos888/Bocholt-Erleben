@@ -93,6 +93,34 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
+        },
+        {
+          "id": "motif-gap-spinning-mill-01",
+          "src": "/assets/event-visuals/motif-gap-spinning-mill-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für historische Spinnerei-Führung mit Spinnmaschinen und Besuchergruppe in regionaler Industriekultur-Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "spinning_mill"
+        },
+        {
+          "id": "motif-gap-weaving-mill-01",
+          "src": "/assets/event-visuals/motif-gap-weaving-mill-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für historische Weberei-Führung mit Webstuhl, Maschinen und Besuchergruppe in regionaler Industriekultur-Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "weaving_mill"
         }
       ]
     },
@@ -1714,6 +1742,20 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "flea_market"
+        },
+        {
+          "id": "motif-gap-fabric-market-01",
+          "src": "/assets/event-visuals/motif-gap-fabric-market-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Stoffmarkt mit Stoffrollen, Marktständen und Besucherinnen in kleinstädtischer Außenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "fabric_market"
         }
       ]
     },
@@ -2759,6 +2801,34 @@
           "card_asset_format": "16:9_webp_1200x675",
           "blocked_reason": "near_duplicate_motif_in_same_visual_key_pool",
           "note": "Blocked from ready pool because it is a near-duplicate motif of another ready image in the same visual key."
+        },
+        {
+          "id": "motif-gap-darts-01",
+          "src": "/assets/event-visuals/motif-gap-darts-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Dartturnier mit Spieler an der Abwurflinie und Zuschauergruppe im Vereinsraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "darts"
+        },
+        {
+          "id": "motif-gap-fencing-01",
+          "src": "/assets/event-visuals/motif-gap-fencing-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für regionalen Fechtwettbewerb in einer Sporthalle mit zwei Fechtenden auf der Planche.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "fencing"
         }
       ]
     },
@@ -2994,6 +3064,20 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_info_fair"
+        },
+        {
+          "id": "motif-gap-health-career-fair-01",
+          "src": "/assets/event-visuals/motif-gap-health-career-fair-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Gesundheitsberufemesse mit Beratungssituation an Messestand in einer regionalen Veranstaltungshalle.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_01_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "health_career_fair"
         }
       ]
     },
