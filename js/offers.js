@@ -750,7 +750,6 @@ const OfferCards = (() => {
     if (imageUrl) {
       ensureImageOriginHints(imageUrl);
       const { loading, fetchPriority } = getImageLoadingProfile(index);
-      const symbolicLabel = OfferVisuals.escapeHtml(OfferVisuals.buildSymbolicCardLabel(imageData));
       const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
 
       return `
@@ -765,7 +764,6 @@ const OfferCards = (() => {
   referrerpolicy="no-referrer"
   style="--activity-image-pos-x:${OfferVisuals.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(imageData.fit || "cover")};"
 >
-          ${symbolicLabel ? `<span class="activity-card-media__badge">${symbolicLabel}</span>` : ""}
         </div>
       `.trim();
     }

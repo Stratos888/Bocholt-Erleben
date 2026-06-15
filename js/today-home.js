@@ -1049,9 +1049,6 @@
     const meta = item.type === "activity" ? buildActivityMeta(item, context) : buildEventMeta(item);
     const resolvedVisual = resolveItemVisual(item, usedImages);
     const image = resolvedVisual?.src || "";
-    const visualBadge = resolvedVisual && window.ImageAttribution?.badgeLabel
-      ? window.ImageAttribution.badgeLabel(resolvedVisual)
-      : "";
     const showTopBadge = index === 0 && isTopTipEligible(item, context);
 
     if (item && typeof item === "object") {
@@ -1073,7 +1070,6 @@
         ${image ? `
           <div class="today-card__media">
             <img src="${escapeHtml(image)}" alt="" loading="${index < 1 ? "eager" : "lazy"}" decoding="async">
-            ${visualBadge ? `<span class="today-card__media-badge">${escapeHtml(visualBadge)}</span>` : ""}
           </div>
         ` : ""}
         <div class="today-card__body">

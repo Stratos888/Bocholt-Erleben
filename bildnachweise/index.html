@@ -17,7 +17,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/css/style.css?v=2026-06-12-image-attribution-v2">
+  <link rel="stylesheet" href="/css/style.css?v=2026-06-12-image-attribution-v3">
   <!-- === END BLOCK: IMAGE_CREDITS_HEAD_V1 === -->
 </head>
 
@@ -36,20 +36,33 @@
 
   <main class="page page--image-credits">
     <header class="content-hero content-hero--panel">
-      <h1>Bildnachweise</h1>
-      <p class="content-lead">
-        Hier findest du die Quellen, Urheber, Lizenzen und Bearbeitungshinweise zu Bildern und Visuals,
-        die auf Bocholt erleben verwendet werden.
-      </p>
-      <p class="image-credits-status" data-image-credits-status role="status">Bildnachweise werden vorbereitet …</p>
+      <div class="image-credits-hero-layout">
+        <div class="image-credits-hero-copy">
+          <h1>Bildnachweise</h1>
+          <p class="content-lead">
+            Quellen, Urheber, Lizenzen und Bearbeitungshinweise zu Bildern und Visuals,
+            die auf Bocholt erleben verwendet werden.
+          </p>
+          <p class="image-credits-status" data-image-credits-status role="status">Bildnachweise werden vorbereitet …</p>
+        </div>
+
+        <aside class="image-credits-hero-card" aria-labelledby="image-credits-hero-card-title">
+          <p class="image-credits-hero-card__eyebrow" id="image-credits-hero-card-title">Transparenz</p>
+          <ul class="image-credits-hero-card__list">
+            <li>Realfotos mit Lizenz oder Freigabe</li>
+            <li>Symbolbilder für redaktionelle Event-Visuals</li>
+            <li>Bearbeitungshinweise bei Zuschnitt oder Konvertierung</li>
+          </ul>
+        </aside>
+      </div>
     </header>
 
-    <section class="content-card" aria-labelledby="image-credits-how">
-      <h2 id="image-credits-how">Hinweis zur Nutzung</h2>
+    <section class="content-card image-credits-intro-card" aria-labelledby="image-credits-how">
+      <h2 id="image-credits-how">So werden Bildquellen ausgewiesen</h2>
       <p>
-        Einige Bilder sind dokumentarische Realfotos mit Lizenz- oder Freigabeangaben. Andere Event-Visuals sind
-        bewusst als Symbolbilder eingesetzt. Bei zugeschnittenen oder konvertierten Bildern ist die Bearbeitung im
-        jeweiligen Nachweis angegeben.
+        Dokumentarische Fotos werden mit Quelle, Urheber, Lizenz und Bearbeitungshinweis geführt. Interne
+        Projektvisuals werden als Symbolbilder eingeordnet und sind nicht als dokumentarische Aufnahme eines
+        konkreten Moments zu verstehen.
       </p>
     </section>
 
@@ -60,10 +73,10 @@
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
-  <script src="/js/site-footer.js?v=2026-06-12-image-attribution-v2" defer></script>
+  <script src="/js/site-footer.js?v=2026-06-12-image-attribution-v3" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-  <script src="/js/image-attribution.js?v=2026-06-12-image-attribution-v2" defer></script>
-  <script src="/js/image-credits-page.js?v=2026-06-12-image-attribution-v2" defer></script>
+  <script src="/js/image-attribution.js?v=2026-06-12-image-attribution-v3" defer></script>
+  <script src="/js/image-credits-page.js?v=2026-06-12-image-attribution-v3" defer></script>
   <!-- === END BLOCK: IMAGE_CREDITS_PAGE_V1 === -->
 </body>
 </html>

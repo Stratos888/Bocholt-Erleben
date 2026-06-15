@@ -107,14 +107,14 @@
     const explicit = firstValue(meta.publicNote, meta.note);
     if (explicit) return explicit;
 
-    if (meta.isSymbolic && isGenerated(meta)) return "Symbolbild / KI-generiertes Visual";
+    if (meta.isSymbolic && isGenerated(meta)) return "Symbolbild / KI-generiertes Projektvisual";
     if (meta.isSymbolic) return "Symbolbild";
-    if (isGenerated(meta)) return "KI-generiertes Visual";
+    if (isGenerated(meta)) return "KI-generiertes Projektvisual";
     return "";
   }
 
   function attributionLabel(meta) {
-    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
+    if (isGenerated(meta)) return "KI-generiertes Projektvisual";
     if (meta.isSymbolic) return "Symbolbild";
     if (isLicensedRealPhoto(meta)) return "Realfoto";
     return "Bildnachweis";
@@ -122,14 +122,12 @@
 
   function badgeLabel(input) {
     const meta = normalize(input);
-    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
-    if (meta.isSymbolic) return "Symbolbild";
+    if (isGenerated(meta) || meta.isSymbolic) return "Symbolbild";
     return "";
   }
 
   function detailSummaryText(meta) {
-    if (isGenerated(meta)) return "KI-generiertes Symbolbild";
-    if (meta.isSymbolic) return "Symbolbild";
+    if (isGenerated(meta) || meta.isSymbolic) return "Symbolbild";
 
     const parts = ["Realfoto"];
     if (meta.author) parts.push(meta.author);
@@ -248,7 +246,7 @@
 
     const sourceLabel = meta.sourcePage
       ? renderExternalLink(meta.sourcePage, meta.sourceTitle || "Original / Quelle öffnen", "image-attribution__link")
-      : (meta.sourceTitle ? escapeHtml(meta.sourceTitle) : (isGenerated(meta) ? "Intern generiertes Projektvisual" : ""));
+      : (meta.sourceTitle ? escapeHtml(meta.sourceTitle) : (isGenerated(meta) ? "Intern erzeugtes Projektvisual" : ""));
 
     const downloadLabel = meta.downloadUrl && options.includeDownload
       ? renderExternalLink(meta.downloadUrl, "Datei öffnen", "image-attribution__link")
@@ -278,28 +276,22 @@
       ? window.Icons.svg("info", { className: "image-attribution__icon-svg" })
       : "";
 
-    const summaryText = attributionLabel(meta);
-    const detailText = detailSummaryText(meta);
-    const fullLink = renderInternalLink(
-      fullCreditHref(meta, options),
-      "Vollständiger Nachweis",
-      "image-attribution__link image-attribution__full-link"
-    );
+    const summaryText = detailSummaryText(meta) || attributionLabel(meta);
+    const linkHref = fullCreditHref(meta, options);
+    const accessibleLabel = ["Vollständiger Bildnachweis", summaryText, meta.entityTitle]
+      .map(asString)
+      .filter(Boolean)
+      .join(" – ");
 
     return `
-      <details class="image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}">
-        <summary class="image-attribution__toggle">
-          <span class="image-attribution__toggle-main">
-            <span class="image-attribution__icon" aria-hidden="true">${infoIcon}</span>
-            <span>Bildnachweis</span>
-          </span>
-          <span class="image-attribution__toggle-secondary">${escapeHtml(summaryText)}</span>
-        </summary>
-        <div class="image-attribution__panel image-attribution__panel--compact">
-          <span class="image-attribution__compact-text">${escapeHtml(detailText)}</span>
-          ${fullLink}
-        </div>
-      </details>
+      <a class="image-attribution image-attribution--detail" data-image-attribution="${escapeHtml(meta.entityType || "visual")}" href="${escapeHtml(linkHref)}" aria-label="${escapeHtml(accessibleLabel)}">
+        <span class="image-attribution__toggle-main">
+          <span class="image-attribution__icon" aria-hidden="true">${infoIcon}</span>
+          <span>Bildhinweis</span>
+        </span>
+        <span class="image-attribution__compact-text">${escapeHtml(summaryText)}</span>
+        <span class="image-attribution__link image-attribution__full-link">Vollständiger Nachweis</span>
+      </a>
     `.trim();
   }
 

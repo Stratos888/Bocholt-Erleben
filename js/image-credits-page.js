@@ -147,12 +147,12 @@
       {
         id: "activityImages",
         title: "Aktivitätsbilder",
-        description: "Realfotos und freigegebene Activity-Visuals, die in Karten und Detailansichten verwendet werden."
+        description: "Realfotos und freigegebene Visuals, die für Aktivitäten in Karten und Detailansichten verwendet werden."
       },
       {
         id: "eventSymbolic",
         title: "Eventbilder und Symbolbilder",
-        description: "Geprüfte Event-Visuals. Viele Eventbilder sind bewusst symbolische, intern erzeugte Visuals und keine dokumentarischen Fotos."
+        description: "Geprüfte Event-Visuals. Viele Eventbilder sind bewusst Symbolbilder und keine dokumentarischen Aufnahmen eines konkreten Termins."
       }
     ];
 

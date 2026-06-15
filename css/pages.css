@@ -1,7 +1,7 @@
 /* === BEGIN BLOCK: SUBPAGE_REFERENCE_SYSTEM_V3 | Zweck: konsolidiert das gemeinsame Subpage-System in wiederverwendbare Hero-/CTA-/Grid-Bausteine, übernimmt die /info/-Referenz-DNA appweit und hält spätere Änderungen zentral; Umfang: ersetzt die komplette pages.css === */
 
 /* PAGE FAMILY --------------------------------------------------------- */
-:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers){
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers, .page--image-credits){
   --subpage-rail-max: 1128px;
   --subpage-hero-max: 760px;
   --subpage-body-max: 760px;
@@ -39,6 +39,19 @@
   --subpage-hero-gap: 14px;
 }
 /* === END BLOCK: INFO_HUB_RAIL_V2 === */
+
+/* === BEGIN BLOCK: IMAGE_CREDITS_RAIL_CONTRACT_V1 | Zweck: bindet /bildnachweise/ sichtbar in das konsolidierte Subpage-System ein und gibt der Nachweisseite eine breite, ruhige Desktop-Rail === */
+.page--image-credits{
+  --subpage-rail-max: 1180px;
+  --subpage-hero-max: 1088px;
+  --subpage-body-max: 1088px;
+  --subpage-stack-gap: 22px;
+  --subpage-card-gap: 13px;
+  --subpage-card-pad-x: 18px;
+  --subpage-card-pad-y: 18px;
+  --subpage-hero-gap: 14px;
+}
+/* === END BLOCK: IMAGE_CREDITS_RAIL_CONTRACT_V1 === */
 
 /* === BEGIN BLOCK: SUBPAGE_MOBILE_INSET_CALIBRATION_V4 | Zweck: kalibriert auf Mobile den optischen Innenraum der Content-Unterseiten näher an die Home-Eventcards, ohne Desktop-Werte oder Legal-Achsenlogik zu verändern; Umfang: ersetzt den bisherigen gemeinsamen about/publish/legal-Basisblock außerhalb der Desktop-Breakpoints === */
 .page--about,
@@ -79,7 +92,7 @@
 }
 /* === END BLOCK: SUBPAGE_MOBILE_INSET_CALIBRATION_V4 === */
 
-:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers) > *{
+:is(.page--info, .page--about, .page--publish, .page--imprint, .page--privacy, .page--organizers, .page--image-credits) > *{
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -3040,25 +3053,104 @@ select.content-field__control{
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_OPENING_COMPACT_UI_V1 === */
 
-/* === BEGIN BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V1 | Zweck: gestaltet /bildnachweise/ als ruhige, verlinkbare Nachweis-Seite fuer Activity- und Event-Visuals; Umfang: nur page--image-credits und neutrale Image-Credit-Card-Klassen === */
+/* === BEGIN BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V2 | Zweck: bringt /bildnachweise/ optisch auf Subpage-Premiumniveau mit Hero-Layout, ruhiger Hinweisbox, kompakter Navigation und hochwertigen Nachweiskarten === */
 .page--image-credits .content-hero{
-  gap: 10px;
+  width: 100%;
+  gap: 0;
 }
 
+.image-credits-hero-layout{
+  display: grid;
+  gap: 18px;
+}
+
+.image-credits-hero-copy{
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+
 .page--image-credits .content-lead{
-  max-width: 760px;
+  max-width: 720px;
 }
 
 .image-credits-status{
-  margin: 10px 0 0;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 30px;
+  margin: 4px 0 0;
+  padding: 6px 11px;
+  border: 1px solid rgba(31,41,51,0.07);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.68);
   color: var(--color-text-muted);
-  font-size: 0.88rem;
-  line-height: 1.4;
+  font-size: 0.82rem;
+  font-weight: 680;
+  line-height: 1.35;
+}
+
+.image-credits-hero-card{
+  display: grid;
+  gap: 11px;
+  align-self: stretch;
+  padding: 15px;
+  border: 1px solid rgba(31,41,51,0.07);
+  border-radius: 20px;
+  background: color-mix(in srgb, white 84%, var(--color-primary-muted));
+  box-shadow: 0 10px 22px rgba(31,41,51,0.038), 0 1px 0 rgba(255,255,255,0.78) inset;
+}
+
+.image-credits-hero-card__eyebrow{
+  margin: 0;
+  color: color-mix(in srgb, var(--color-primary) 62%, var(--color-text-primary));
+  font-size: 0.73rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.image-credits-hero-card__list{
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.image-credits-hero-card__list li{
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.image-credits-hero-card__list li::before{
+  content: "";
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.55em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 58%, var(--color-text-primary));
+}
+
+.image-credits-intro-card{
+  justify-self: stretch;
+  width: 100%;
+}
+
+.image-credits-intro-card p{
+  max-width: 78ch;
 }
 
 .image-credits-root{
   display: grid;
-  gap: 22px;
+  gap: 26px;
+  width: 100%;
 }
 
 .image-credits-nav{
@@ -3071,32 +3163,32 @@ select.content-field__control{
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  min-height: 48px;
-  padding: 12px 14px;
+  min-height: 54px;
+  padding: 13px 15px;
 
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 16px;
+  border: 1px solid rgba(31,41,51,0.075);
+  border-radius: 18px;
   background: rgba(255,255,255,0.86);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.72) inset;
+  box-shadow: 0 10px 22px rgba(31,41,51,0.035), 0 1px 0 rgba(255,255,255,0.76) inset;
 
   color: var(--color-text-primary);
   text-decoration: none;
   font-size: 0.92rem;
-  font-weight: 760;
+  font-weight: 780;
 }
 
 .image-credits-nav__link span:last-child{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 30px;
-  height: 24px;
-  padding: 0 8px;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 9px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-primary-muted) 72%, white);
   color: color-mix(in srgb, var(--color-text-primary) 84%, var(--color-primary));
   font-size: 0.78rem;
-  font-weight: 820;
+  font-weight: 840;
 }
 
 @media (hover: hover){
@@ -3108,7 +3200,7 @@ select.content-field__control{
 
 .image-credits-section{
   display: grid;
-  gap: 14px;
+  gap: 15px;
   scroll-margin-top: 86px;
 }
 
@@ -3120,15 +3212,17 @@ select.content-field__control{
 .image-credits-section__header h2{
   margin: 0;
   color: var(--color-text-primary);
-  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
-  line-height: 1.14;
+  font-size: clamp(1.25rem, 2.4vw, 1.58rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
 }
 
 .image-credits-section__header p{
+  max-width: 76ch;
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.94rem;
-  line-height: 1.45;
+  line-height: 1.48;
 }
 
 .image-credits-list{
@@ -3143,10 +3237,10 @@ select.content-field__control{
   gap: 0;
   overflow: hidden;
 
-  border: 1px solid rgba(31,41,51,0.09);
-  border-radius: 20px;
-  background: rgba(255,255,255,0.90);
-  box-shadow: 0 14px 34px rgba(31,41,51,0.055), 0 1px 0 rgba(255,255,255,0.82) inset;
+  border: 1px solid rgba(31,41,51,0.082);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.88);
+  box-shadow: 0 14px 34px rgba(31,41,51,0.05), 0 1px 0 rgba(255,255,255,0.82) inset;
   scroll-margin-top: 88px;
 }
 
@@ -3191,9 +3285,9 @@ select.content-field__control{
 .image-credit-card__kicker{
   margin: 0;
   color: rgba(95,107,115,0.86);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 820;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -3215,16 +3309,16 @@ select.content-field__control{
 
 .image-attribution--card .image-attribution__row{
   display: grid;
-  grid-template-columns: minmax(84px, 112px) minmax(0, 1fr);
+  grid-template-columns: minmax(82px, 112px) minmax(0, 1fr);
   gap: 10px;
   align-items: start;
 }
 
 .image-attribution--card .image-attribution__key{
   color: rgba(95,107,115,0.86);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 820;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
 }
 
@@ -3248,12 +3342,17 @@ select.content-field__control{
 }
 
 @media (min-width: 760px){
+  .image-credits-hero-layout{
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    align-items: end;
+  }
+
   .image-credits-nav{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .image-credit-card{
-    grid-template-columns: minmax(220px, 32%) minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 31%) minmax(0, 1fr);
   }
 
   .image-credit-card__media{
@@ -3265,4 +3364,4 @@ select.content-field__control{
     padding: 18px 18px 17px;
   }
 }
-/* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V1 === */
+/* === END BLOCK: IMAGE_CREDITS_PAGE_PREMIUM_V2 === */
