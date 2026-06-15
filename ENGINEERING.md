@@ -544,3 +544,18 @@ Fallback-Einschränkungen:
 - Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
 - Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
 <!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
+
+## Eventdaten-Quelle: Sheet-first
+
+Redaktionelle Events haben eine feste Quellenhierarchie:
+
+1. Kanonische Bearbeitungsquelle ist das Google Sheet, Tab `Events`.
+2. `data/events.tsv` und `data/events.json` sind erzeugte Artefakte aus dem Deploy-/Export-Prozess.
+3. Ein lokales `data/events.json` im Repo oder Codespace ist nur dann belastbar, wenn es unmittelbar aus dem aktuellen Sheet exportiert bzw. im Deploy neu erzeugt wurde.
+4. `/api/events/public.php` ist eine zusätzliche Quelle für freigegebene DB-/Veranstalter-Events, aber nicht die Quelle für redaktionelle Sheet-Events.
+
+Konsequenz:
+- Bei Fragen wie „welche Events sind aktuell sichtbar?“ oder „welche Event-Visual-Gaps existieren?“ darf nicht blind vom lokalen `data/events.json` ausgegangen werden.
+- Vor datenabhängigen Analysen muss geklärt werden, ob die Analyse auf frischem Sheet-Export, Deploy-Artefakt oder nur lokalem Repo-Snapshot basiert.
+- `data/events.json` ist Website-Feed und Build-Artefakt, nicht redaktionelle Source of Truth.
+

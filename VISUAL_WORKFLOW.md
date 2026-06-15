@@ -1020,6 +1020,17 @@ Regeln:
 - `production_status=selected_pending_confirmation` bedeutet: Das Bild wurde empfohlen, aber der Download ist noch nicht eindeutig bestätigt.
 - Vor jedem neuen größeren Produktionsblock wird der Stand gegen die kanonische Motivliste und die bereits vorhandenen `ready`-Assets abgeglichen.
 
+### Eventdatenquelle für Gap-Backlog
+
+Für Event-Visual-Gaps gilt die Sheet-first-Regel:
+
+- Kanonische Quelle für redaktionelle Events ist das Google Sheet, Tab `Events`.
+- `data/events.json` ist nur ein generiertes Feed-Artefakt und lokal nur belastbar, wenn es frisch aus dem Sheet exportiert oder im Deploy erzeugt wurde.
+- `/api/events/public.php` ergänzt freigegebene DB-/Veranstalter-Events, ersetzt aber nicht den Sheet-Eventbestand.
+- `scripts/build-event-visual-gap-backlog.py` ist nur dann als aktueller Gap-Nachweis belastbar, wenn seine Eingabedaten dem aktuellen Sheet-/Deploy-Stand entsprechen.
+
+Vor jeder Aussage wie „es gibt keine offenen Event-Visual-Gaps“ muss daher klar sein, welcher Eventdatenstand geprüft wurde.
+
 ### Bedarfsquelle vor neuer Bildproduktion
 
 Ein kanonisches `visual_motif` ohne `ready`-Bild ist allein noch kein Produktionsauftrag.
