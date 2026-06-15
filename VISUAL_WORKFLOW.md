@@ -1020,6 +1020,24 @@ Regeln:
 - `production_status=selected_pending_confirmation` bedeutet: Das Bild wurde empfohlen, aber der Download ist noch nicht eindeutig bestätigt.
 - Vor jedem neuen größeren Produktionsblock wird der Stand gegen die kanonische Motivliste und die bereits vorhandenen `ready`-Assets abgeglichen.
 
+### Bedarfsquelle vor neuer Bildproduktion
+
+Ein kanonisches `visual_motif` ohne `ready`-Bild ist allein noch kein Produktionsauftrag.
+
+Vor jedem neuen Bild-Batch muss die Bedarfsquelle explizit benannt werden:
+
+1. offener Eintrag in `data/event_visual_gap_backlog.tsv`,
+2. konkret belegter Eventbedarf aus aktuellen Eventdaten,
+3. bewusst entschiedener strategischer Poolausbau.
+
+Wenn keine dieser drei Quellen vorliegt, wird kein neuer Batch-Prompt erstellt. In diesem Fall werden vorhandene Kandidaten höchstens als Reserve bzw. strategischer Pool-Kandidat dokumentiert, aber nicht als aktuelle Pflichtproduktion behandelt.
+
+Wichtig:
+- `scripts/event_visual_motifs.py` definiert das erlaubte Vokabular, aber keine Produktionspriorität.
+- `data/event_visual_pool.json` zeigt den aktuellen Asset-Stand, aber keine automatische To-do-Liste.
+- `data/event_visual_gap_backlog.tsv` ist die primäre Quelle für echte aktuelle Motivlücken.
+- Vor jedem Prompt muss klar gesagt werden, ob es sich um Pflichtbedarf oder strategischen Vorrat handelt.
+
 ### Implementierungsreihenfolge
 
 1. Dokumentierter Vertrag.
