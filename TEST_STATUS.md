@@ -3592,3 +3592,42 @@ Lokaler Prüfbefund:
 - JS Syntaxcheck: `node --check js/events.js` und `node --check js/today-home.js` bestanden.
 - Premium Visual Contract Audit: bestanden (`Errors: none`).
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 | Zweck: finaler Abschlussnachweis fuer Event-Visual-Motif-Fit nach Deploy und Frontend-QA; Umfang: technischer Smoke, Motiv-Fit-Stichprobe, datenbasierte Vollpruefung, Main-Freigabe === -->
+## Event Visual Motif-Fit – final abgeschlossen auf Staging (2026-06-18)
+
+Status: abgeschlossen für den aktuellen Sheet-/Staging-Stand.
+
+Durchgeführter Abschlussnachweis:
+- Finaler motivgenauer Resolver wurde auf `staging` deployed.
+- Deploy war grün.
+- Technischer Frontend-Smoke auf `/events/` bestanden:
+  - keine weißen Bildflächen,
+  - keine leeren Bilder,
+  - keine kaputten Event-Visuals.
+- Sichtbare Motiv-Fit-Stichprobe bestanden:
+  - `Auf dem Holzweg – Klumpenführung durch Rhede` → historisch/thematische Führung,
+  - `Sagensafari` → geführte Orts-/Geschichtstour,
+  - `Das schönste Ei der Welt` → Puppentheater/Kinderbühne,
+  - `Quartierfest im Klostergarten` → Quartiers-/Nachbarschaftsfest,
+  - `Living History im Textilwerk` → Museum/Geschichte/Textilwerk-Kontext,
+  - `Weltkindertagsfest` → Familien-/Kinderfest,
+  - `Rosenbergfestival` → Stadtteil-/Quartiersfest,
+  - `CityArt` → Kunstmarkt/Kunststände,
+  - `Martinsmarkt` → saisonaler Markt,
+  - `Lichtersonntag` → Innenstadt/Shopping/verkaufsoffener Sonntag,
+  - `Gesundheitsberufemesse` → Gesundheits-/Berufsmesse,
+  - `Vereinsmesse` → Vereins-/Infomesse.
+- Datenbasierte Vollprüfung für veröffentlichte/zukünftige Events bestanden:
+  - exakte `visual_motif`-Treffer,
+  - keine fehlenden Bilder,
+  - keine offenen Produktions-/Review-Gaps.
+
+Abschlussbewertung:
+- Event-Visual-Produktion, Motiv-Fit, Regelhärtung und motivgenauer Resolver sind für den aktuellen Stand abgeschlossen.
+- Keine weitere Bildproduktion und kein weiterer Patch aus diesem Arbeitsblock nötig.
+- Weitere Arbeit nur bei neuem Sheet-Bedarf oder konkret sichtbarem falschem Einzelfall.
+
+Main-Freigabe:
+- Dieser Arbeitsblock kann Richtung `main`, sofern `staging` keine anderen unfertigen Änderungen enthält.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 === -->

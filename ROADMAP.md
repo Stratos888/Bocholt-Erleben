@@ -1598,3 +1598,26 @@ Der finale Abschlusskandidat schließt die Runtime-Lücke zwischen Matrix/Pool u
 
 Nach Upload/Deploy genügt ein gezielter Sicht-Smoke mit sichtbaren Zukunftsevents. Weitere Arbeit nur bei konkretem sichtbarem Einzelfund.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 | Zweck: markiert Event-Visual-Motif-Fit als abgeschlossenen Workstream; Umfang: naechster Schritt main nur bei staging-Releasefaehigkeit === -->
+## Event Visual Motif-Fit – Workstream abgeschlossen (2026-06-18)
+
+Der Event-Visual-Motif-Fit-Workstream ist für den aktuellen Sheet-/Staging-Stand abgeschlossen.
+
+Abgeschlossen:
+- Event-Visual Gap Batch 02.
+- Finaler Restbatch.
+- Motiv-Regelhärtung.
+- Motivgenauer Frontend-Resolver.
+- Staging-Deploy.
+- Technischer Smoke.
+- Sichtbare Motiv-Fit-Stichprobe.
+- Datenbasierte Vollprüfung.
+
+Es gibt für diesen Arbeitsblock keine offenen Produktions-, Integrations- oder Review-Gaps.
+
+Nächster Schritt:
+- Kein weiterer Event-Visual-Patch.
+- `staging → main` nur dann, wenn `staging` insgesamt releasefähig ist und keine anderen unfertigen Änderungen enthält.
+- Nach Main-Deploy reicht ein kurzer Live-Smoke auf `/events/`.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 === -->

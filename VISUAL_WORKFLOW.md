@@ -1213,3 +1213,24 @@ Beispiele:
 - `darts` darf nicht als Volleyball-/Handballbild erscheinen.
 - `puppet_theater` darf nicht als allgemeines Familienbild erscheinen.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CLOSURE_RULE_2026_06_18 | Zweck: fixiert Abschlussregel fuer Event-Visual-Motif-Fit nach motivgenauem Resolver; Umfang: Wiederaufnahme nur bei neuem Bedarf oder konkretem sichtbarem Fehler === -->
+### Abschlussregel: Event Visual Motif-Fit
+
+Der Event-Visual-Motif-Fit gilt für den aktuellen Sheet-/Staging-Stand als abgeschlossen.
+
+Arbeitsblock nicht erneut öffnen für:
+- theoretische Vorratsproduktion aller möglichen Unterkategorien,
+- rein ästhetische Varianten ohne konkreten Fehlfall,
+- generische Bilddiversifizierung ohne belegten Bedarf.
+
+Arbeitsblock nur erneut öffnen bei:
+- neuem Sheet-Event mit offenem Matrix-/Backlog-Gap,
+- fehlendem oder kaputtem Bild,
+- konkret sichtbarer fachlicher Fehlzuordnung,
+- bewusster strategischer Poolausbau-Entscheidung.
+
+Verbindlicher Abschlussstand:
+- Frontend wählt Event-Visuals motivgenau über `visual_motif`.
+- Fallbacks dienen nur der technischen Robustheit, nicht als primäre Bildlogik.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CLOSURE_RULE_2026_06_18 === -->
