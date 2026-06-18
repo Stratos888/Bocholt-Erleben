@@ -449,9 +449,48 @@
       "production_status": "selected_pending_confirmation",
       "source_png": null,
       "workflow_area": "motif_fit_production"
+    },
+    {
+      "image_id": "motif-gap-info-evening-01",
+      "visual_key": "business_messe_info",
+      "visual_motif": "info_evening",
+      "sub_motif": "info_evening",
+      "batch_id": "event_visual_final_restbatch_2026_06_18",
+      "target_webp": "assets/event-visuals/motif-gap-info-evening-01.webp",
+      "qa_note": "Accepted final restbatch image for Infoabend / Kindertagespflege: clear adult information-evening presentation scene, no children, no readable text.",
+      "status": "accepted",
+      "production_status": "downloaded_confirmed",
+      "source_png": null,
+      "workflow_area": "motif_gap_closure"
+    },
+    {
+      "image_id": "motif-gap-market-square-open-air-01",
+      "visual_key": "open_air_festival",
+      "visual_motif": "market_square_open_air",
+      "sub_motif": "market_square_open_air",
+      "batch_id": "event_visual_final_restbatch_2026_06_18",
+      "target_webp": "assets/event-visuals/motif-gap-market-square-open-air-01.webp",
+      "qa_note": "Accepted final restbatch image for Kulturtage / OPEN AIR am Marktplatz: local market-square open-air stage with audience, suitable as symbolic regional event visual.",
+      "status": "accepted",
+      "production_status": "downloaded_confirmed",
+      "source_png": null,
+      "workflow_area": "motif_gap_closure"
+    },
+    {
+      "image_id": "motif-gap-open-house-city-services-01",
+      "visual_key": "city_festival_street",
+      "visual_motif": "open_house_city_services",
+      "sub_motif": "open_house_city_services",
+      "batch_id": "event_visual_final_restbatch_2026_06_18",
+      "target_webp": "assets/event-visuals/motif-gap-open-house-city-services-01.webp",
+      "qa_note": "Accepted final restbatch image for Tag der offenen Tuer / Stadtservices: open information tables, adult visitors and practical civic open-house atmosphere.",
+      "status": "accepted",
+      "production_status": "downloaded_confirmed",
+      "source_png": null,
+      "workflow_area": "motif_gap_closure"
     }
   ],
-  "last_updated": "2026-06-12",
+  "last_updated": "2026-06-18",
   "tracking_rule": "Diese Datei trackt nur produzierte/ausgewaehlte Kandidaten vor Asset-Integration. data/event_visual_pool.json wird erst aktualisiert, wenn die WebP-Dateien wirklich im Repo liegen.",
   "status_semantics": {
     "accepted": "Kandidat ist fachlich/visuell angenommen; production_status zeigt, ob der Download explizit bestaetigt ist.",

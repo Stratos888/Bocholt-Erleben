@@ -1475,6 +1475,20 @@
           "review_status": "accepted_gap_batch_02_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "district_festival"
+        },
+        {
+          "id": "motif-gap-open-house-city-services-01",
+          "src": "/assets/event-visuals/motif-gap-open-house-city-services-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokalen Tag der offenen Tür mit Informationsständen, Gesprächen und erwachsenem Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_final_restbatch_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "open_house_city_services"
         }
       ]
     },
@@ -1582,6 +1596,20 @@
           "review_status": "accepted_gap_batch_02_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "lake_festival"
+        },
+        {
+          "id": "motif-gap-market-square-open-air-01",
+          "src": "/assets/event-visuals/motif-gap-market-square-open-air-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Marktplatz-Open-Air mit kleiner Bühne, Publikum und kleinstädtischer Abendatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_final_restbatch_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "market_square_open_air"
         }
       ]
     },
@@ -3484,6 +3512,20 @@
           "review_status": "accepted_gap_batch_02_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "business_fair"
+        },
+        {
+          "id": "motif-gap-info-evening-01",
+          "src": "/assets/event-visuals/motif-gap-info-evening-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokalen Infoabend mit Vortrag, erwachsenem Publikum und ruhiger kommunaler Beratungsatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_final_restbatch_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "info_evening"
         }
       ]
     },
