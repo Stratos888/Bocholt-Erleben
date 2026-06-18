@@ -1118,3 +1118,34 @@ Wichtig:
 - `visual_key` bleibt stabil.
 - `visual_motif` wird schrittweise ergänzt, ohne das bestehende System unnötig aufzublähen.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_CONTRACT_2026_06_12 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_CLOSURE_2026_06_18 | Zweck: dokumentiert Abschluss der aktuellen Event-Visual-Motiv-Gaps nach finalem Restbatch; Umfang: Matrix-Zielstand, Produktionsgrenze, Regelentscheidung === -->
+## Event Visual Motif-Fit – Abschluss aktueller Sheet-Gaps (2026-06-18)
+
+Status nach finalem Restbatch: commit-/deployfertig.
+
+Abgeschlossen wurde nicht jede theoretische Unterkategorie der Taxonomie, sondern der aktuelle aus dem Sheet belegte Bedarf.
+
+Umgesetzter Restscope:
+- `business_messe_info / info_evening` mit `motif-gap-info-evening-01`.
+- `open_air_festival / market_square_open_air` mit `motif-gap-market-square-open-air-01`.
+- `city_festival_street / open_house_city_services` mit `motif-gap-open-house-city-services-01`.
+
+Regelentscheidung:
+- `open_house_city_services` ist kein dauerhafter Review-Fall mehr.
+- Das Motiv ist als spezifisches Motiv unter `city_festival_street` zulässig, wenn es um Tag-der-offenen-Tür-/Stadtservice-/Info-Stand-Kontexte geht.
+
+Zielstand nach Anwendung dieses Pakets:
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- `ready: 69`
+- `parked_candidate: 4`
+- `not_needed: 27`
+- Gap-Backlog aus aktuellem Sheet-Export: `0` offene Zeilen
+
+Arbeitsgrenze:
+- Keine weitere Event-Visual-Produktion aus reiner Vollständigkeitslogik.
+- Neue Bildproduktion nur bei neuem Sheet-Bedarf, offenem Gap-Backlog oder bewusst entschiedenem strategischem Poolausbau.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_CLOSURE_2026_06_18 === -->
+

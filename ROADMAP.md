@@ -75,6 +75,28 @@ Bewertung:
 
 <!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 === -->
 
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 | Zweck: schliesst den aktiven Event-Visual-Motiv-Fit-Produktionsblock fuer aktuellen Sheet-Stand; Umfang: Reststatus und naechste Arbeit nur bei neuem Bedarf === -->
+## Event Visual Motif-Fit – aktuelle Sheet-Gaps geschlossen (2026-06-18)
+
+Der aktive Event-Visual-Motiv-Fit-Produktionsblock ist nach Anwendung des finalen Restbatchs fuer den aktuellen Sheet-Stand abgeschlossen.
+
+Ergebnis:
+- Keine offenen `gap_to_produce`-Motive.
+- Keine offenen `candidate_to_integrate`-Motive.
+- Keine offenen `review_rules`-Motive.
+- Der Gap-Backlog ist aus dem aktuellen Sheet-Export leer reproduzierbar.
+
+Wichtig:
+- Das ist kein Auftrag, jede theoretische Visual-Subcategory mit Vorratsbildern zu füllen.
+- `parked_candidate` und `not_needed` bleiben normale Matrix-Zustände und sind kein Produktionsblocker.
+- Event-Visual-Produktion wird erst wieder geöffnet, wenn neuer Sheet-Bedarf, ein neuer Backlog-Eintrag oder eine bewusste strategische Poolentscheidung vorliegt.
+
+Nächste Arbeit nach diesem Block:
+- Nur Deploy-/Sicht-Smoke nach Upload des Pakets prüfen.
+- Danach wieder zum übergeordneten KI-/Inbox-/Main-Merge-Prozess zurückkehren.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 === -->
+
+
 ## Ausgangslage: Live-Messbasis
 
 Stand: 2026-05-26, Live-Dashboard-Screenshot.

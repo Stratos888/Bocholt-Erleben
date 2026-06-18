@@ -2,6 +2,45 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 | Zweck: dokumentiert den lokal geprueften Abschluss der aktuellen Event-Visual-Motiv-Gaps; Umfang: finaler Restbatch, Matrix, Gap-Backlog, Audit === -->
+## Event Visual Motif-Fit – finaler Restbatch lokal geprüft (2026-06-18)
+
+Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+
+Basis:
+- Aktueller `staging`-ZIP-Stand nach Event Visual Gap Batch 02.
+- Batch 02 war bereits deployed und per Sichtprüfung ohne fehlende Bildflächen geprüft.
+- Finaler Restbatch wurde lokal auf diesen Stand angewendet.
+
+Neu ergänzt:
+- `motif-gap-info-evening-01.webp`
+- `motif-gap-market-square-open-air-01.webp`
+- `motif-gap-open-house-city-services-01.webp`
+
+Regel-/Datenänderungen:
+- `open_house_city_services` wurde von `review` auf `specific` gesetzt.
+- `data/event_visual_pool.json` wurde um die 3 Ready-Assets ergänzt.
+- `data/event_visual_phase2_acceptance_notes.json` dokumentiert die Abnahme.
+- `data/event_visual_motif_matrix.tsv` wurde aus dem aktuellen Sheet-Export neu gebaut.
+- `data/event_visual_gap_backlog.tsv` wurde aus dem aktuellen Sheet-Export neu gebaut.
+
+Lokaler Prüfbefund nach Anwendung:
+- `ready: 69`
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- `parked_candidate: 4`
+- `not_needed: 27`
+- Gap-Backlog: `0` offene Zeilen
+- Premium Visual Contract Audit: bestanden, keine Errors.
+
+Abschlussbewertung:
+- Für den aktuellen Sheet-Stand sind alle notwendigen Event-Visual-Motive mit Ready-Bildern abgedeckt.
+- Es wurden nicht alle theoretischen Visual-Subcategories auf Vorrat produziert; das bleibt bewusst Nicht-Ziel.
+- Neue Event-Visual-Produktion nur bei neuem Sheet-Bedarf, neuem Gap-Backlog oder bewusster strategischer Poolentscheidung.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 === -->
+
+
 
 <!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_IMAGE_MATERIAL_FORM_V1_2026_06_12 | Zweck: dokumentiert Abschluss der Bildmaterial-Abfrage fuer Kunden-Aktivitaeten inklusive Live-DB-Vorbereitung === -->
 ## Kunden-Aktivitäten: Bildmaterial-Abfrage V1 abgeschlossen (2026-06-12)
