@@ -264,7 +264,7 @@ def infer_event_visual_motif(
 
     if key == "local_history_heritage":
         if _match(hay, r"\b(living history|in szene gesetzt)\b"):
-            return "living_history"
+            return "museum_history_exhibition"
         if _match(hay, r"\b(ausstellung|museum|farb|archiv|historisch|geschichte)\b"):
             return "museum_history_exhibition"
 
@@ -311,14 +311,16 @@ def infer_event_visual_motif(
             return "poetry_performance"
         if _match(hay, r"\b(lesung|autor|buchvorstellung|gedichte)\b"):
             return "author_reading"
+        if _match(hay, r"\b(kanaren|sieben auf einen streich)\b"):
+            return "neutral_reading_talk"
         if _match(hay, r"\b(vortrag|talk|gespr(ä|ae)ch|info)\b"):
-            return "lecture_talk"
+            return "neutral_reading_talk"
 
     if key == "kids_stage_story":
-        if _match(hay, r"\b(puppenspiel|puppentheater|pettersson|figurentheater)\b"):
+        if _match(hay, r"\b(puppenspieltage|puppenspiel|puppentheater|pettersson|figurentheater|ei der welt)\b"):
             return "puppet_theater"
-        if _match(hay, r"\b(vorlese|geschichte|geschichten|m(ä|ae)rchen|b(ä|ae)ren|ei der welt)\b"):
-            return "children_story_reading"
+        if _match(hay, r"\b(vorlese|geschichte|geschichten|m(ä|ae)rchen|b(ä|ae)ren|bären[- ]?geschichten|baeren[- ]?geschichten)\b"):
+            return "neutral_kids_stage"
 
     if key == "city_festival_street":
         if _match(hay, r"\b(verkaufsoffener sonntag|maiensonntag|lichtersonntag|sonntagsshopping)\b"):
@@ -337,8 +339,8 @@ def infer_event_visual_motif(
             return "market_square_open_air"
 
     if key == "parade_festzug":
-        if _match(hay, r"\b(rosenmontag|karneval|karnevalszug)\b"):
-            return "carnival_parade"
+        if _match(hay, r"\b(rosenmontagszug|rosenmontag|karneval|karnevalszug)\b"):
+            return "neutral_parade"
         if _match(hay, r"\b(csd|pride)\b"):
             return "csd_pride_parade"
 
@@ -381,8 +383,8 @@ def infer_event_visual_motif(
             return "ecology_workshop"
 
     if key == "active_route_tour":
-        if _match(hay, r"\b(segway)\b"):
-            return "segway_tour"
+        if _match(hay, r"\b(segway(?:tour(?:en)?)?)\b"):
+            return "neutral_active_tour"
         if _match(hay, r"\b(fahrradtour|radtour|rad[- ]?tour|bike tour)\b"):
             return "guided_bike_tour"
         if _match(hay, r"\b(wanderung|wandern|spaziergang|walk|sagensafari)\b"):
@@ -415,13 +417,13 @@ def infer_event_visual_motif(
             return "orchid_plant_tour"
         if _match(hay, r"\b(anholter schweiz|tierpark|wildpark)\b"):
             return "animal_park_family"
-        if _match(hay, r"\b(naturf(ü|ue)hrung|naturtour|sagensafari|wandert|wanderung)\b"):
+        if _match(hay, r"\b(naturf(ü|ue)hrung|naturtour|sagensafari|wandert|wanderung|wasser|pr(ö|oe)bstingsee)\b"):
             return "walking_nature_tour"
 
     if key == "business_messe_info":
         if _match(hay, r"\b(gesundheitsberufemesse|gesundheitsberufe|pflegeberufe)\b"):
             return "health_career_fair"
-        if _match(hay, r"\b(unternehmermesse|business|unternehmen|gr(ü|ue)ndung|netzwerk)\b"):
+        if _match(hay, r"\b(markterschließung|markterschliessung|unternehmermesse|business|unternehmen|gr(ü|ue)ndung|netzwerk)\b"):
             return "business_fair"
         if _match(hay, r"\b(vereinsmesse|verein|vereine)\b"):
             return "association_fair"

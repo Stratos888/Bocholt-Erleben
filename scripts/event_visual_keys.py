@@ -95,13 +95,13 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
         return any(re.search(pattern, haystack, flags=re.IGNORECASE) for pattern in patterns)
 
     # 1) Sehr starke, eindeutige Eventtypen zuerst.
-    if match(r"\b(oldtimer|classic cars?|veteranenfahrzeug|fahrzeugtreffen|autoschau)\b"):
+    if match(r"\b(oldtimer(?:festival|treffen)?|classic cars?|veteranenfahrzeug|fahrzeugtreffen|autoschau)\b"):
         return "vehicle_classic"
 
-    if match(r"\b(schützenfest|schuetzenfest|thronball|vogelschießen|vogelschiessen|schützenverein|schuetzenverein)\b"):
+    if match(r"\b([a-zäöüß]*schützenfest|[a-zäöüß]*schuetzenfest|thronball|vogelschießen|vogelschiessen|schützenverein|schuetzenverein)\b"):
         return "shooting_festival_tradition"
 
-    if match(r"\b(rosenmontag|karnevalszug|karnevalsumzug|festzug|umzug|parade|csd)\b"):
+    if match(r"\b(rosenmontagszug|rosenmontag|karnevalszug|karnevalsumzug|festzug|umzug|parade|csd)\b"):
         return "parade_festzug"
 
     if match(r"\b(kirmes|jahrmarkt|funfair|fahrgeschäft|fahrgeschaeft|riesenrad|autoscooter)\b"):
@@ -116,7 +116,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(weinfest|wijnfeest|wine tasting|street ?food|food ?festival|city food festival|genuss|kulinarik|kulinarisch)\b"):
         return "food_drink_festival"
 
-    if match(r"\b(aaltendagen|innenstadtsommer|bokeltsen treff|verkaufsoffener sonntag)\b"):
+    if match(r"\b(aaltendagen|innenstadtsommer|bokeltsen treff|verkaufsoffener sonntag|quartierfest|stadtteilfest)\b"):
         return "city_festival_street"
 
     if match(r"\b(krammarkt|stoffmarkt|flohmarkt|trödelmarkt|troedelmarkt|wochenmarkt|grenzmarkt|marktstände|marktstaende|martinsmarkt)\b"):
@@ -135,13 +135,13 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
         return "dance_music_workshop"
 
-    if match(r"\b(kindertheater|puppenspiel|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl)\b"):
+    if match(r"\b(kindertheater|puppenspieltage|puppenspiel|puppentheater|figurentheater|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl|bären[- ]?geschichten|baeren[- ]?geschichten|ei der welt)\b"):
         return "kids_stage_story"
 
     if match(r"\b(comedy|kabarett|lachnacht|stand[- ]?up|kleinkunst)\b"):
         return "comedy_cabaret"
 
-    if match(r"\b(film|kino|open[- ]?air[- ]?kino|kinoabend|filmabend|dokufilm)\b"):
+    if match(r"\b(filmvorführung|filmvorfuehrung|film|kino|open[- ]?air[- ]?kino|kinoabend|filmabend|dokufilm)\b"):
         return "film_screening"
 
     if match(r"\b(lesung|literatur|autorengespräch|autorengespraech|gedichte|poetry|poesie)\b"):
@@ -156,6 +156,9 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(theater|theaterabend|schauspiel|schauspielabend|bühnenstück|buehnenstueck|bühnenfassung|buehnenfassung|theaterbühne|theaterbuehne|komödie|komoedie|musical)\b"):
         return "theater_stage"
 
+    if match(r"\b(living history|in szene gesetzt)\b"):
+        return "local_history_heritage"
+
     # 3) Kultur/Textil: konkreter Ausstellungstyp vor TextilWerk-/Spinnerei-Location.
     if match(r"\b(ibena|textile leidenschaft|textile revolution|textile vergangenheit|textile zukunft|stoffe für die zukunft|stoffe fuer die zukunft|nachhaltige stoffe|textilausstellung|textildesign|stoffdesign|behind beauty)\b"):
         return "textile_exhibition_design"
@@ -169,23 +172,26 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(aasee[- ]?festival|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
         return "open_air_festival"
 
-    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
-        return "city_tour_history"
+    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang|tour)\b"):
+        return "active_route_tour"
 
     if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
         return "nature_learning_wildlife"
+
+    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
+        return "city_tour_history"
 
     # 3) Bühne, Sprache, Film.
     if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
         return "dance_music_workshop"
 
-    if match(r"\b(kindertheater|puppenspiel|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl)\b"):
+    if match(r"\b(kindertheater|puppenspieltage|puppenspiel|puppentheater|figurentheater|kinderoper|vorlese(stunde|zeit)|märchenerzäh|maerchenerzaehl|bären[- ]?geschichten|baeren[- ]?geschichten|ei der welt)\b"):
         return "kids_stage_story"
 
     if match(r"\b(comedy|kabarett|lachnacht|stand[- ]?up|kleinkunst)\b"):
         return "comedy_cabaret"
 
-    if match(r"\b(film|kino|open[- ]?air[- ]?kino|kinoabend|filmabend|dokufilm)\b"):
+    if match(r"\b(filmvorführung|filmvorfuehrung|film|kino|open[- ]?air[- ]?kino|kinoabend|filmabend|dokufilm)\b"):
         return "film_screening"
 
     if match(r"\b(lesung|literatur|autorengespräch|autorengespraech|gedichte|poetry|poesie)\b"):
@@ -217,6 +223,9 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(junge uni|wissenschaft|ökosystem|oekosystem|experiment|forsch(er|en)|lernwerkstatt)\b"):
         return "learning_science_workshop"
 
+    if match(r"\b(markterschließung|markterschliessung|unternehmen|netzwerk|gründung|gruendung|infoabend|informationsabend|gesundheitsberufemesse|berufsmesse)\b"):
+        return "business_messe_info"
+
     if match(r"\b(workshop|escape game|pokemon|pokémon|bastel|kreativ|malen|zeichnen|handwerk|nähen|naehen|töpfer|toepfer|maker)\b"):
         return "creative_making_workshop"
 
@@ -230,7 +239,7 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(darts|fechten|turnier|meisterschaft|hallen(sport)?|wettkampf)\b"):
         return "indoor_sport_competition"
 
-    if match(r"\b(fahrradtour|radtour|segway|wanderung|wandern|spaziergang|tour)\b"):
+    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang|tour)\b"):
         return "active_route_tour"
 
     if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
@@ -242,6 +251,12 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
 
     if match(r"\b(messe|berufsmesse|unternehmermesse|infoabend|informationsabend|gesundheitsberufemesse|netzwerkabend|gründung|gruendung)\b"):
         return "business_messe_info"
+
+    if match(r"\b(kanaren|sieben auf einen streich|reisebericht|fotoshow|vortrag)\b"):
+        return "literature_reading_talk"
+
+    if match(r"\b(living history|in szene gesetzt)\b"):
+        return "local_history_heritage"
 
     if match(r"\b(archiv|farb|stadtgeschichte|heimat|historisch|geschichte|museum)\b"):
         return "local_history_heritage"
