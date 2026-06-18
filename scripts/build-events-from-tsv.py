@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
 from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -118,6 +119,7 @@ class EventRow:
     cost_level: str
     recommendation_weight: str
     visual_key: str
+    visual_motif: str
 
 
 def fail(msg: str) -> None:
@@ -238,7 +240,10 @@ def read_tsv(path: Path) -> List[Dict[str, str]]:
             fail("TSV hat keine Headerzeile.")
         rows: List[Dict[str, str]] = []
         for row in reader:
-            rows.append({k: (v if v is not None else "") for k, v in row.items()})
+            normalized = {k: (v if v is not None else "") for k, v in row.items()}
+            if not any(normalize_text(value) for value in normalized.values()):
+                continue
+            rows.append(normalized)
         return rows
 
 
@@ -348,6 +353,20 @@ def main() -> None:
             )
         seen_fingerprints.add(fp)
 
+        visual_key = normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
+            title=data["title"],
+            description=data.get("description", ""),
+            category=cat,
+            location=data["location"],
+        )
+        visual_motif = normalize_event_visual_motif(data.get("visual_motif", ""), visual_key) or infer_event_visual_motif(
+            title=data["title"],
+            description=data.get("description", ""),
+            category=cat,
+            location=data["location"],
+            visual_key=visual_key,
+        )
+
         events.append(
             EventRow(
                 id=ev_id,
@@ -366,12 +385,8 @@ def main() -> None:
                 planning_level=optional_text(data, "planning_level"),
                 cost_level=optional_text(data, "cost_level"),
                 recommendation_weight=optional_text(data, "recommendation_weight"),
-                visual_key=normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
-                    title=data["title"],
-                    description=data.get("description", ""),
-                    category=cat,
-                    location=data["location"],
-                ),
+                visual_key=visual_key,
+                visual_motif=visual_motif,
             )
         )
 
@@ -401,6 +416,8 @@ def main() -> None:
             item["description"] = e.description
         if e.visual_key:
             item["visual_key"] = e.visual_key
+        if e.visual_motif:
+            item["visual_motif"] = e.visual_motif
 
         recommendation = {}
         if e.situation_tags:

@@ -214,10 +214,14 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
         return "theater_stage"
 
     # 4) Feste, Stadtleben, Familie.
-    if match(r"\b(stadtfest|cityfest|verkaufsoffen|lichtersonntag|aktionstag|innenstadtfest|familienfest|tag der offenen tür|tag der offenen tuer)\b"):
+    # Familien-/Kinderfeste zuerst, damit Weltkindertagsfest nicht als leeres Stadtfestbild endet.
+    if match(r"\b(weltkindertag(?:sfest)?|kinderfest|familienfest|familienprogramm|spielfest|jugendfarm|ostereiersuche|wasserspaß|wasserspass)\b"):
+        return "family_play_outdoor"
+
+    if match(r"\b(stadtfest|cityfest|verkaufsoffen|lichtersonntag|aktionstag|innenstadtfest|tag der offenen tür|tag der offenen tuer)\b"):
         return "city_festival_street"
 
-    if match(r"\b(kindertrödel|kinderflohmarkt|kinderfest|ostereiersuche|jugendfarm|familienprogramm|wasserspaß|wasserspass|spielfest)\b"):
+    if match(r"\b(kindertrödel|kinderflohmarkt)\b"):
         return "family_play_outdoor"
 
     # 5) Workshops, Lernen, Mitmachen.
