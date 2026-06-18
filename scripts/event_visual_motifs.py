@@ -271,8 +271,10 @@ def infer_event_visual_motif(
     if key == "city_tour_history":
         if _match(hay, r"\b(anno 1900|kiepenkerl|klumpenf(ü|ue)hrung|nachtw(ä|ae)chter|kost(ü|ue)m)\b"):
             return "costumed_history_tour"
-        if _match(hay, r"\b(dichter|literarisch|poesie|literatur)\b"):
+        if _match(hay, r"\b(dichter|literarisch|poesie|literatur)\\b"):
             return "literary_walk"
+        if _match(hay, r"\b(sagensafari|sagenf(ü|ue)hrung|sagenhafte|themenf(ü|ue)hrung|szenische stadtf(ü|ue)hrung)\b"):
+            return "neutral_guided_city_tour"
 
     if key == "live_music_stage":
         if _match(hay, r"\b(tribute|coverband|floyd|floydbox|coltplay|abba|rocking stones)\b"):
@@ -387,7 +389,7 @@ def infer_event_visual_motif(
             return "neutral_active_tour"
         if _match(hay, r"\b(fahrradtour|radtour|rad[- ]?tour|bike tour)\b"):
             return "guided_bike_tour"
-        if _match(hay, r"\b(wanderung|wandern|spaziergang|walk|sagensafari)\b"):
+        if _match(hay, r"\b(wanderung|wandern|spaziergang|walk)\b"):
             return "guided_walk"
 
     if key == "cycling_event":

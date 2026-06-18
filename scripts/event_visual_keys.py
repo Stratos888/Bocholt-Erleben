@@ -172,14 +172,18 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(aasee[- ]?festival|open[- ]?air[- ]?festival|festivalgelände|festivalgelaende|kulturtage)\b"):
         return "open_air_festival"
 
-    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang|tour)\b"):
+    # Sichtbarer Motiv-Fit: Führungen/Touren sind nicht automatisch Aktivtouren.
+    # Historische, thematische und sagenbezogene Orts-/Stadtführungen müssen vor Aktiv-/Natur-Regeln greifen.
+    # Generische Begriffe wie "Tour" oder "Rundgang" reichen allein nicht.
+    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung|themenführung|themenfuehrung|sagensafari|sagenführung|sagenfuehrung|sagenhafte|dichter[- ]?rundgang|historische führung|historische fuehrung|szenische stadtführung|szenische stadtfuehrung|kostümierte stadtführung|kostuemierte stadtfuehrung)\b"):
+        return "city_tour_history"
+
+    # Echte Aktivtouren bleiben Aktivtouren, auch wenn die Kategorie "Natur & Draußen" ist.
+    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang)\b"):
         return "active_route_tour"
 
     if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
         return "nature_learning_wildlife"
-
-    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|rundgang|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung)\b"):
-        return "city_tour_history"
 
     # 3) Bühne, Sprache, Film.
     if match(r"\b(k[- ]?pop|sing ?& ?dance|dance workshop|tanzworkshop|musikworkshop|dance camp)\b"):
@@ -239,7 +243,10 @@ def infer_event_visual_key(title: object = "", description: object = "", categor
     if match(r"\b(darts|fechten|turnier|meisterschaft|hallen(sport)?|wettkampf)\b"):
         return "indoor_sport_competition"
 
-    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang|tour)\b"):
+    if match(r"\b(stadtführung|stadtfuehrung|stadtführungen|stadtfuehrungen|nachtwächter|nachtwaechter|kiepenkerl|promenadenführung|promenadenfuehrung|klumpenführung|klumpenfuehrung|themenführung|themenfuehrung|sagensafari|sagenführung|sagenfuehrung|sagenhafte|dichter[- ]?rundgang|historische führung|historische fuehrung|szenische stadtführung|szenische stadtfuehrung|kostümierte stadtführung|kostuemierte stadtfuehrung)\b"):
+        return "city_tour_history"
+
+    if match(r"\b(fahrradtour|radtour|rad[- ]?tour|segway(?:tour(?:en)?)?|wanderung|wandern|spaziergang)\b"):
         return "active_route_tour"
 
     if match(r"\b(fledermaus|naturführung|naturfuehrung|wildlife|wildpark|wasser|pröbstingsee|proebstingsee|aasee|garten|natur|umwelt)\b"):
