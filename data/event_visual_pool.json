@@ -277,6 +277,34 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_art_exhibition"
+        },
+        {
+          "id": "motif-gap-art-market-01",
+          "src": "/assets/event-visuals/motif-gap-art-market-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokalen Kunstmarkt mit Kunstständen, Besucherinnen und Besuchern und regionaler Kreativatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "art_market"
+        },
+        {
+          "id": "motif-gap-creative-exhibition-01",
+          "src": "/assets/event-visuals/motif-gap-creative-exhibition-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokale Kreativausstellung mit handgemachten Arbeiten, Ausstellungsflächen und erwachsenen Besucherinnen und Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "creative_exhibition"
         }
       ]
     },
@@ -390,6 +418,20 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_local_history"
+        },
+        {
+          "id": "motif-gap-museum-history-exhibition-01",
+          "src": "/assets/event-visuals/motif-gap-museum-history-exhibition-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für regionale Geschichts- oder Museumsausstellung mit Exponaten und Besucherinnen und Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "museum_history_exhibition"
         }
       ]
     },
@@ -501,6 +543,20 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "costumed_history_tour"
+        },
+        {
+          "id": "motif-gap-literary-walk-01",
+          "src": "/assets/event-visuals/motif-gap-literary-walk-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für literarischen Rundgang mit Guide und kleiner Erwachsenengruppe in regionalem Stadtraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "literary_walk"
         }
       ]
     },
@@ -612,6 +668,48 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "local_band_concert"
+        },
+        {
+          "id": "motif-gap-tribute-band-01",
+          "src": "/assets/event-visuals/motif-gap-tribute-band-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Tribute-Band-Konzert mit Bühne, Band und Publikum in regionaler Abendatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "tribute_band"
+        },
+        {
+          "id": "motif-gap-open-air-concert-01",
+          "src": "/assets/event-visuals/motif-gap-open-air-concert-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Open-Air-Konzert mit kleiner Bühne, Publikum und regionaler Abendatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "open_air_concert"
+        },
+        {
+          "id": "motif-gap-music-school-fest-01",
+          "src": "/assets/event-visuals/motif-gap-music-school-fest-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Musikschulfest mit kleiner Bühne, musikalischem Auftritt und Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "music_school_fest"
         }
       ]
     },
@@ -685,6 +783,34 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
+        },
+        {
+          "id": "motif-gap-chamber-music-01",
+          "src": "/assets/event-visuals/motif-gap-chamber-music-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Kammermusik in kleinem Kulturraum mit Ensemble und sitzendem Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "chamber_music"
+        },
+        {
+          "id": "motif-gap-oratorio-01",
+          "src": "/assets/event-visuals/motif-gap-oratorio-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Oratorium oder Choraufführung mit Chor, Dirigent und Publikum in sakralem oder kulturellem Raum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "oratorio"
         }
       ]
     },
@@ -917,6 +1043,20 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "cabaret_stage"
+        },
+        {
+          "id": "motif-gap-standup-comedy-01",
+          "src": "/assets/event-visuals/motif-gap-standup-comedy-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Stand-up-Comedy oder Solo-Kabarett mit kleiner Bühne und sitzendem Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "standup_comedy"
         }
       ]
     },
@@ -1081,6 +1221,20 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_reading_talk"
+        },
+        {
+          "id": "motif-gap-poetry-performance-01",
+          "src": "/assets/event-visuals/motif-gap-poetry-performance-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Lyrik-Performance oder poetische Lesung mit Vortragssituation und sitzendem Publikum in kleinem Kulturraum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "poetry_performance"
         }
       ]
     },
@@ -1307,6 +1461,20 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "shopping_sunday"
+        },
+        {
+          "id": "motif-gap-district-festival-01",
+          "src": "/assets/event-visuals/motif-gap-district-festival-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Stadtteil- oder Nachbarschaftsfest mit lokaler Gemeinschaftsatmosphäre und kleinen Ständen.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "district_festival"
         }
       ]
     },
@@ -1400,6 +1568,20 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_open_air"
+        },
+        {
+          "id": "motif-gap-lake-festival-01",
+          "src": "/assets/event-visuals/motif-gap-lake-festival-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Seefest mit Wasserbezug, Besuchergruppe und entspannter Open-Air-Atmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "lake_festival"
         }
       ]
     },
@@ -1537,6 +1719,20 @@
           "source": "ai_generated_or_cleared_local",
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": ""
+        },
+        {
+          "id": "motif-gap-csd-pride-parade-01",
+          "src": "/assets/event-visuals/motif-gap-csd-pride-parade-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für kleinen regionalen CSD- oder Pride-Walk mit Gruppe und Regenbogen-Elementen in Kleinstadtstraße.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "csd_pride_parade"
         }
       ]
     },
@@ -1756,6 +1952,34 @@
           "review_status": "accepted_gap_batch_01_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "fabric_market"
+        },
+        {
+          "id": "motif-gap-krammarkt-general-01",
+          "src": "/assets/event-visuals/motif-gap-krammarkt-general-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für allgemeinen Krammarkt mit gemischten Warenständen und Besucherinnen und Besuchern im Kleinstadtumfeld.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "krammarkt_general"
+        },
+        {
+          "id": "motif-gap-seasonal-martinsmarkt-01",
+          "src": "/assets/event-visuals/motif-gap-seasonal-martinsmarkt-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für herbstlichen Martinsmarkt mit Marktständen, warmem Licht und regionaler Abendstimmung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "seasonal_martinsmarkt"
         }
       ]
     },
@@ -1961,6 +2185,20 @@
           "review_status": "accepted_motif_fit_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "wine_festival"
+        },
+        {
+          "id": "motif-gap-street-food-festival-01",
+          "src": "/assets/event-visuals/motif-gap-street-food-festival-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für regionales Street-Food-Festival mit Foodständen, Wartenden und lockerer Außenatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "street_food_festival"
         }
       ]
     },
@@ -2305,6 +2543,48 @@
           "review_status": "accepted_visual_inventory_2026_06_08",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "neutral_creative_workshop"
+        },
+        {
+          "id": "motif-gap-craft-workshop-01",
+          "src": "/assets/event-visuals/motif-gap-craft-workshop-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Erwachsenen-Handwerksworkshop mit Arbeitsmaterialien und gemeinsamer kreativer Tätigkeit.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "craft_workshop"
+        },
+        {
+          "id": "motif-gap-escape-game-01",
+          "src": "/assets/event-visuals/motif-gap-escape-game-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokales Escape-Game oder Rätsel-Event mit Erwachsenengruppe am Spieltisch.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "escape_game"
+        },
+        {
+          "id": "motif-gap-game-day-01",
+          "src": "/assets/event-visuals/motif-gap-game-day-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokalen Brettspiel- oder Spieletag mit Erwachsenen an Spieltischen und generischem Spielmaterial.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "game_day"
         }
       ]
     },
@@ -2387,6 +2667,34 @@
           "card_asset_format": "16:9_webp_1200x675",
           "note": "Accepted curated replacement image for the learning_science_workshop pool.",
           "visual_motif": "neutral_learning_workshop"
+        },
+        {
+          "id": "motif-gap-ecology-workshop-01",
+          "src": "/assets/event-visuals/motif-gap-ecology-workshop-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Ökologie-Workshop mit Naturmaterialien, Arbeitsgruppe und regionaler Lernatmosphäre.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "ecology_workshop"
+        },
+        {
+          "id": "motif-gap-science-school-01",
+          "src": "/assets/event-visuals/motif-gap-science-school-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokale Science-School oder Lernwerkstatt mit jungen Erwachsenen und einfachen Experimentiermaterialien.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "science_school"
         }
       ]
     },
@@ -2547,6 +2855,34 @@
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": "",
           "legacy_visual_key": "sport_active"
+        },
+        {
+          "id": "motif-gap-guided-bike-tour-01",
+          "src": "/assets/event-visuals/motif-gap-guided-bike-tour-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für geführte Fahrradtour mit Erwachsenengruppe auf flacher regionaler Route.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "guided_bike_tour"
+        },
+        {
+          "id": "motif-gap-guided-walk-01",
+          "src": "/assets/event-visuals/motif-gap-guided-walk-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für geführten lokalen Spaziergang mit kleiner Erwachsenengruppe und Guide in regionalem Umfeld.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "guided_walk"
         }
       ]
     },
@@ -2931,6 +3267,48 @@
           "rights_status": "owned_or_cleared_required_before_ready",
           "alt": "",
           "legacy_visual_key": "outdoor_nature"
+        },
+        {
+          "id": "motif-gap-walking-nature-tour-01",
+          "src": "/assets/event-visuals/motif-gap-walking-nature-tour-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für geführte Naturwanderung mit kleiner Erwachsenengruppe in niederrheinisch-münsterländischer Landschaft.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "walking_nature_tour"
+        },
+        {
+          "id": "motif-gap-animal-park-family-01",
+          "src": "/assets/event-visuals/motif-gap-animal-park-family-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für Tierpark- oder Wildparkbesuch mit Besuchergruppe und Tieren in naturnaher Anlage.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "animal_park_family"
+        },
+        {
+          "id": "motif-gap-wildlife-bats-01",
+          "src": "/assets/event-visuals/motif-gap-wildlife-bats-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für abendliche Fledermausführung mit Guide und kleiner Erwachsenengruppe in Naturumgebung.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "wildlife_bats"
         }
       ]
     },
@@ -3078,6 +3456,34 @@
           "review_status": "accepted_gap_batch_01_2026_06",
           "card_asset_format": "16:9_webp_1200x675",
           "visual_motif": "health_career_fair"
+        },
+        {
+          "id": "motif-gap-association-fair-01",
+          "src": "/assets/event-visuals/motif-gap-association-fair-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für lokale Vereinsmesse mit Infotischen, Gesprächen und erwachsenen Besucherinnen und Besuchern.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "association_fair"
+        },
+        {
+          "id": "motif-gap-business-fair-01",
+          "src": "/assets/event-visuals/motif-gap-business-fair-01.webp",
+          "status": "ready",
+          "source": "ai_generated",
+          "rights_status": "ai_generated_symbolic_reviewed",
+          "alt": "Symbolisches Event-Visual für regionale Unternehmermesse mit neutralen Messeständen, Gesprächen und gemischtem erwachsenen Publikum.",
+          "source_type": "ai_generated",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "review_status": "accepted_gap_batch_02_2026_06",
+          "card_asset_format": "16:9_webp_1200x675",
+          "visual_motif": "business_fair"
         }
       ]
     },
