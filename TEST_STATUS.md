@@ -2,6 +2,58 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: dokumentiert fachliche Motiv-Fit-QA nach technischer Bildabdeckung; Umfang: Regelkorrekturen, Matrix-/Backlog-Zielstand, keine neue Bildproduktion === -->
+## Event Visual Motif-Fit-QA – Regelpaket lokal geprüft (2026-06-18)
+
+Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+
+Ausgangslage:
+- Finaler Restbatch war deployed.
+- Sicht-Smoke zeigte keine weißen/leeren Bildflächen.
+- Technische Asset-Abdeckung war damit erfüllt, aber der fachliche Motiv-Fit war noch nicht abschließend belegt.
+
+Korrekturtyp:
+- Keine neuen Bilder.
+- Keine Pool-Erweiterung.
+- Nur deterministische Regelhärtung in `scripts/event_visual_keys.py` und `scripts/event_visual_motifs.py`.
+- Matrix und Gap-Backlog wurden danach gegen den aktuellen Sheet-Export neu gebaut.
+
+Repräsentative korrigierte Fälle:
+
+| Event/Typ | Vorher | Nachher |
+|---|---|---|
+| Rosenmontagszug | `market_stalls / neutral_market_stalls` | `parade_festzug / neutral_parade` |
+| Fahrradtour mit Guide | `nature_learning_wildlife / neutral_nature_learning` | `active_route_tour / guided_bike_tour` |
+| Segwaytouren | `nature_learning_wildlife / neutral_nature_learning` | `active_route_tour / neutral_active_tour` |
+| Bocholter Puppenspieltage | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / puppet_theater` |
+| Das schönste Ei der Welt | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / puppet_theater` |
+| Für Kinder: Ein Abend voller Bären-Geschichten | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / neutral_kids_stage` |
+| Quartierfest im Klostergarten | `market_stalls / neutral_market_stalls` | `city_festival_street / district_festival` |
+| KANAREN - Sieben auf einen Streich | `local_history_heritage / neutral_local_history` | `literature_reading_talk / neutral_reading_talk` |
+| In Szene gesetzt - Living History im LWL-Museum Textilwerk | `textile_machines_industry / weaving_mill` | `local_history_heritage / museum_history_exhibition` |
+| Filmvorführung … Un secret | `local_history_heritage / neutral_local_history` | `film_screening / film_screening` |
+| Familienschützenfest | `city_festival_street / neutral_city_festival` | `shooting_festival_tradition / shooting_festival_tradition` |
+| Markterschließung Niederlande | `creative_making_workshop / neutral_creative_workshop` | `business_messe_info / business_fair` |
+| Bocholt Blüht mit großem Oldtimerfestival | `market_stalls / neutral_market_stalls` | `vehicle_classic / classic_car_meet` |
+| Führung Lebenselixier Wasser / Pröbstingsee | `city_tour_history / neutral_guided_city_tour` | `nature_learning_wildlife / walking_nature_tour` |
+
+Lokaler Prüfbefund nach Regelpaket:
+- `ready: 70`
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- `parked_candidate: 4`
+- `not_needed: 26`
+- Gap-Backlog: `0` offene Zeilen
+- Premium Visual Contract Audit: bestanden, keine Errors.
+
+Bewertung:
+- Es bleibt keine technische Bildlücke.
+- Die bekannten fachlichen Fehlzuordnungen aus der Motiv-Fit-QA wurden auf vorhandene passendere Ready-Pools umgebogen.
+- Die Änderung produziert keine neuen Gaps und keinen neuen Bildbedarf.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
+
+
 <!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 | Zweck: dokumentiert den lokal geprueften Abschluss der aktuellen Event-Visual-Motiv-Gaps; Umfang: finaler Restbatch, Matrix, Gap-Backlog, Audit === -->
 ## Event Visual Motif-Fit – finaler Restbatch lokal geprüft (2026-06-18)
 

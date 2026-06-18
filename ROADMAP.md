@@ -1562,3 +1562,18 @@ Diese Punkte sind keine Bildproduktionsaufgaben, sondern Regel-/Datenqualitätsa
 - Eventkarten wählen keine falschen spezifischen Unter-Motive mehr.
 - Der Gap-Backlog ist nach Integration der passenden Bilder nachvollziehbar kleiner und bleibt aus dem Sheet reproduzierbar.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_SHEET_REVIEW_2026_06_15 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: markiert Motiv-Fit-QA-Regelhaertung als Abschlussblock vor Freeze; Umfang: keine neue Bildproduktion, nur Mapping-Haertung === -->
+## Event Visual Motif-Fit-QA – Regelhärtung abgeschlossen (2026-06-18)
+
+Der technische Event-Visual-Abschluss wurde um eine fachliche Motiv-Fit-QA ergänzt.
+
+Ergebnis des Pakets:
+- Bekannte Fehlzuordnungen werden deterministisch auf passendere vorhandene Ready-Motive gelenkt.
+- Es entsteht kein neuer Bildproduktionsbedarf.
+- Matrix und Gap-Backlog bleiben frei von Produktions-/Review-Gaps.
+
+Nach Upload und grünem Deploy ist nur noch ein kurzer Sicht-Smoke auf `/events/` nötig.
+Wenn dabei keine fachlich falschen Bildzuordnungen mehr auffallen, kann der Event-Visual-Motif-Fit-Workstream für den aktuellen Sheet-Stand eingefroren werden.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
+
