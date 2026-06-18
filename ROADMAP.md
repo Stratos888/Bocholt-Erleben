@@ -1587,3 +1587,14 @@ Status nach Anwendung:
 - Keine offenen Matrix-/Backlog-Gaps.
 - Weitere Arbeit nur bei konkretem sichtbarem Einzelfund, nicht aus theoretischer Vollständigkeitslogik.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_VISIBLE_MOTIF_FIT_FINAL_RULE_SWEEP_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 | Zweck: markiert motivgenauen Event-Visual-Resolver als finalen Abschlusskandidaten; Umfang: keine neue Bildproduktion, nur Sicht-Smoke nach Deploy === -->
+## Event Visual Motif-Fit – motivgenauer Resolver abgeschlossen (2026-06-18)
+
+Der finale Abschlusskandidat schließt die Runtime-Lücke zwischen Matrix/Pool und Frontend:
+- `visual_motif` wird in die generierten Eventdaten übernommen.
+- Events- und Today-Frontend wählen motivgenau.
+- Keine neue Bildproduktion.
+
+Nach Upload/Deploy genügt ein gezielter Sicht-Smoke mit sichtbaren Zukunftsevents. Weitere Arbeit nur bei konkretem sichtbarem Einzelfund.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->

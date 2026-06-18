@@ -3567,3 +3567,28 @@ Prüfstand:
 - Gap-Backlog neu gebaut.
 - Premium Visual Contract Audit bestanden (`Errors: none`).
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_FINAL_VISIBLE_RULE_SWEEP_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 | Zweck: dokumentiert finale motivgenaue Runtime-Bildauswahl; Umfang: events.json visual_motif, Frontend-Resolver, Matrix/Backlog/Audit === -->
+## Event Visual Motif-Fit – finaler motivgenauer Resolver (2026-06-18)
+
+Auslöser:
+- Nach technischer Bildabdeckung blieben fachlich schwache Treffer möglich, weil Runtime/Frontend nur `visual_key`, aber nicht `visual_motif` nutzten.
+- Dadurch konnte innerhalb eines groben Pools ein anderes spezifisches Motiv gewählt werden, z. B. Markt allgemein statt Martinsmarkt oder Indoor-Sport allgemein statt Darts/Fechten.
+
+Korrektur:
+- `scripts/build-events-from-tsv.py` schreibt zusätzlich `visual_motif` in das generierte `data/events.json`.
+- `js/events.js` und `js/today-home.js` wählen zuerst Bilder mit exakt gleichem `visual_motif`.
+- Wenn kein exaktes Motivbild existiert, wird ein neutrales/fallbackfähiges Bild aus demselben `visual_key` bevorzugt.
+- Andere spezifische Motive desselben Pools werden nicht mehr als erster Fallback bevorzugt.
+
+Zusätzliche Regelhärtung:
+- `Weltkindertagsfest`/Kinder-/Familienfest-Kontexte fallen auf `family_play_outdoor`, statt als leeres Stadtfestbild zu erscheinen.
+- Historische/thematische Führungen bleiben von Aktivtouren getrennt.
+
+Lokaler Prüfbefund:
+- Matrix: {'not_needed': 26, 'parked_candidate': 4, 'ready': 70}
+- Gap-Backlog: 0 offene Zeilen
+- Resolver-Abdeckung generierter Events: {'exact': 57}
+- JS Syntaxcheck: `node --check js/events.js` und `node --check js/today-home.js` bestanden.
+- Premium Visual Contract Audit: bestanden (`Errors: none`).
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->

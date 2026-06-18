@@ -1197,3 +1197,19 @@ Verbindliche Reihenfolge:
 Belegfall:
 - `Auf dem Holzweg – Klumpenführung durch Rhede` darf kein Aktiv-/Sportbild erhalten.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_FINAL_RULE_HIERARCHY_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 | Zweck: fixiert motivgenauen Runtime-Resolver als verbindliche Event-Visual-Invariante; Umfang: visual_key + visual_motif + Fallback-Reihenfolge === -->
+### Event-Visual-Invariante: Runtime nutzt `visual_key` und `visual_motif`
+
+Verbindlich:
+1. Eventdaten aus dem Sheet erhalten im Build `visual_key` und `visual_motif`.
+2. Frontend-Resolver suchen zuerst exakt passende Bilder mit gleichem `visual_motif`.
+3. Fehlt ein exaktes Motivbild, wird ein neutrales/fallbackfähiges Bild aus demselben `visual_key` bevorzugt.
+4. Ein anderes spezifisches Motiv derselben Pool-Familie ist kein bevorzugter Erstfallback.
+5. Neue Bildproduktion ist erst nötig, wenn Matrix/Backlog trotz dieser Resolverlogik einen echten Gap zeigt.
+
+Beispiele:
+- `seasonal_martinsmarkt` darf nicht als Flohmarktbild erscheinen.
+- `darts` darf nicht als Volleyball-/Handballbild erscheinen.
+- `puppet_theater` darf nicht als allgemeines Familienbild erscheinen.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
