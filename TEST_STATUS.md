@@ -3536,3 +3536,34 @@ Bewusste Restfälle:
 - `handwerksmuseum-bocholt-erleben` und `grenzenlos-wandern-dinxperlo-suderwick`: aktuell als `fallback`/Übergang bewusst akzeptiert.
 
 <!-- END TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_FINAL_VISIBLE_RULE_SWEEP_2026_06_18 | Zweck: dokumentiert konsolidierten Regelabschluss nach Frontend-Sichtfund; Umfang: Fuehrung/Tour, sichtbare Zukunftsevents, keine neuen Bilder === -->
+## Event Visual Motif-Fit – finaler sichtbarer Regel-Sweep (2026-06-18)
+
+Auslöser:
+- Frontend-Sichtprüfung fand bei `Auf dem Holzweg – Klumpenführung durch Rhede` ein fachlich falsches Aktiv-/Sportbild.
+- Ursache war keine fehlende Datei, sondern eine zu breite Tour-/Führungslogik.
+
+Korrekturprinzip:
+- Harte Eventtypen und konkrete Formate bleiben vorrangig.
+- Historische/thematische Führungen werden vor Aktiv-/Naturtouren bewertet.
+- Generische Begriffe wie `Tour` oder `Rundgang` entscheiden allein nichts mehr.
+- Echte Aktivformate wie Fahrradtour und Segway bleiben `active_route_tour`.
+- Natur-/Wasser-/Wildlife-Kontexte bleiben `nature_learning_wildlife`.
+
+Lokal geprüfte Leitfälle:
+- `Auf dem Holzweg – Klumpenführung durch Rhede` → `city_tour_history / costumed_history_tour`
+- `Sagensafari` → `city_tour_history / neutral_guided_city_tour`
+- `Fahrradtour mit Guide` → `active_route_tour / guided_bike_tour`
+- `Segwaytouren` → `active_route_tour / neutral_active_tour`
+- `Führung Lebenselixier Wasser - der Pröbstingsee...` → `nature_learning_wildlife / walking_nature_tour`
+- `Das schönste Ei der Welt` → `kids_stage_story / puppet_theater`
+- `Quartierfest im Klostergarten` → `city_festival_street / district_festival`
+- `Living History im Textilwerk` → `local_history_heritage / museum_history_exhibition`
+
+Prüfstand:
+- Keine neuen Bilder.
+- Matrix neu gebaut.
+- Gap-Backlog neu gebaut.
+- Premium Visual Contract Audit bestanden (`Errors: none`).
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_FINAL_VISIBLE_RULE_SWEEP_2026_06_18 === -->

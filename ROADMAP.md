@@ -1577,3 +1577,13 @@ Nach Upload und grünem Deploy ist nur noch ein kurzer Sicht-Smoke auf `/events/
 Wenn dabei keine fachlich falschen Bildzuordnungen mehr auffallen, kann der Event-Visual-Motif-Fit-Workstream für den aktuellen Sheet-Stand eingefroren werden.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
 
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_VISIBLE_MOTIF_FIT_FINAL_RULE_SWEEP_2026_06_18 | Zweck: vermerkt Abschluss des Regel-Sweeps ohne neue Bildproduktion; Umfang: naechste Arbeit nur noch bei sichtbarem Einzelfund === -->
+## Event Visual Motif-Fit – finaler sichtbarer Regel-Sweep (2026-06-18)
+
+Der nachgelagerte Regel-Sweep korrigiert die sichtbare Fehlzuordnung von thematischen/historischen Führungen als Aktivtour.
+
+Status nach Anwendung:
+- Keine neue Bildproduktion.
+- Keine offenen Matrix-/Backlog-Gaps.
+- Weitere Arbeit nur bei konkretem sichtbarem Einzelfund, nicht aus theoretischer Vollständigkeitslogik.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_VISIBLE_MOTIF_FIT_FINAL_RULE_SWEEP_2026_06_18 === -->

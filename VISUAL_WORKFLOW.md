@@ -1149,3 +1149,51 @@ Arbeitsgrenze:
 - Neue Bildproduktion nur bei neuem Sheet-Bedarf, offenem Gap-Backlog oder bewusst entschiedenem strategischem Poolausbau.
 <!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_CLOSURE_2026_06_18 === -->
 
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: ergaenzt den Abschlussprozess um fachliche Motiv-Fit-QA nach Asset-Abdeckung; Umfang: Regelhärtung ohne neue Bildproduktion === -->
+## Event Visual Motif-Fit-QA – Regelhärtung nach Asset-Abdeckung (2026-06-18)
+
+Nach der technischen Abdeckung (`gap_to_produce: 0`, keine fehlenden Bilder) ist zusätzlich eine fachliche Motiv-Fit-QA erforderlich.
+
+Prüfziel:
+- Nicht nur belegen, dass ein Bild vorhanden ist.
+- Belegen, dass der aus Titel/Beschreibung/Kategorie/Ort abgeleitete `visual_key` und `visual_motif` zum Eventtyp passen.
+
+Regelpaket 2026-06-18:
+- Stark eindeutige zusammengesetzte Begriffe ohne harte Wortgrenzen behandeln, z. B. `Rosenmontagszug`, `Familienschützenfest`, `Oldtimerfestival`, `Puppenspieltage`, `Filmvorführung`, `Segwaytouren`.
+- Tour-/Bewegungsformate vor generischer Natur-Kategorie priorisieren, wenn der Eventtyp klar `Fahrradtour`, `Radtour`, `Segwaytour`, `Spaziergang` oder `Wanderung` ist.
+- Business-/Info-Kontexte wie `Markterschließung Niederlande` vor generischer Workshop-Logik behandeln.
+- Travel-/Vortragsformate wie `KANAREN - Sieben auf einen Streich` als Talk-/Lesungsnahes Motiv statt allgemeiner Lokalgeschichte behandeln.
+- `Living History` im Textilwerk als lokales Geschichts-/Museumsformat statt Maschinenmotiv behandeln.
+
+Wichtig:
+- Diese QA erzeugt keine neuen Bilder, solange ein fachlich passender Ready-Fallback vorhanden ist.
+- Spezifische theoretische Motive ohne Ready-Bild werden nicht automatisch aktiviert, wenn ein neutraler Ready-Fallback fachlich ausreichend ist.
+- Nach jeder Regelhärtung müssen Matrix und Gap-Backlog neu gebaut werden.
+
+Zielstand dieses Regelpakets:
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- Gap-Backlog: `0` offene Zeilen
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_FINAL_RULE_HIERARCHY_2026_06_18 | Zweck: fixiert finale Regelhierarchie nach sichtbarer Motiv-Fit-QA; Umfang: Format-vor-Ort, Fuehrung-vs-Tour, Kategorie-Fallback === -->
+### Event-Visual-Regelhierarchie nach sichtbarer Motiv-Fit-QA
+
+Verbindliche Reihenfolge:
+1. Harte Eventtypen zuerst: Kirmes, Schützenfest, Parade/CSD, Darts/Fechten, Oldtimer, Markt-/Buch-/Food-Formate.
+2. Konkretes Format schlägt Ort: Comedy im TextilWerk bleibt Comedy; Film im Museum bleibt Film; Open-Air am Marktplatz bleibt Open-Air.
+3. Führungen werden differenziert:
+   - Historisch/thematisch/sagenbezogen → `city_tour_history`.
+   - Echte Aktivformate wie Fahrradtour, Segway, Wanderung, Spaziergang → `active_route_tour`.
+   - Natur-/Wasser-/Wildlife-Kontext → `nature_learning_wildlife`.
+   - Generische Begriffe wie `Tour` oder `Rundgang` sind keine ausreichenden Trigger.
+4. Kinder/Familie ist kein pauschales Outdoor-Bild:
+   - Puppenspiel/Kindertheater/Vorlesen → `kids_stage_story`.
+   - Spiel-/Escape-/Bastel-/Workshopformate → `creative_making_workshop`.
+   - Wissenschaft/Ökosystem/Junge Uni → `learning_science_workshop`.
+5. Kategorie und Ort sind Fallbacks und dürfen klare Titel-/Beschreibungssignale nicht überschreiben.
+
+Belegfall:
+- `Auf dem Holzweg – Klumpenführung durch Rhede` darf kein Aktiv-/Sportbild erhalten.
+<!-- === END BLOCK: VISUAL_WORKFLOW_EVENT_VISUAL_FINAL_RULE_HIERARCHY_2026_06_18 === -->
