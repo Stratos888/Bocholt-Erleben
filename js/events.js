@@ -289,7 +289,9 @@ const EventCards = (() => {
             isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
             isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
             publicNote: String(image.public_note || image.publicNote || "").trim(),
-            note: String(image.note || "").trim()
+            note: String(image.note || "").trim(),
+            visualMotif: normalizeLookupKey(image.visual_motif || image.visualMotif || ""),
+            visualMotifRole: normalizeLookupKey(image.visual_motif_role || image.visualMotifRole || "")
           });
         })
         .filter(Boolean);
@@ -306,8 +308,70 @@ const EventCards = (() => {
     readyVisualPools = buildReadyVisualPools(payload);
   }
 
+  const EVENT_VISUAL_FALLBACK_MOTIFS = new Set([
+    "book_market",
+    "classic_car_meet",
+    "country_fair_rural",
+    "cycling_event",
+    "dance_workshop",
+    "default_city",
+    "evening_social_party",
+    "film_screening",
+    "kirmes_funfair",
+    "neutral_active_tour",
+    "neutral_art_exhibition",
+    "neutral_city_festival",
+    "neutral_classical_concert",
+    "neutral_comedy_stage",
+    "neutral_creative_workshop",
+    "neutral_family_play_outdoor",
+    "neutral_food_festival",
+    "neutral_guided_city_tour",
+    "neutral_indoor_sport",
+    "neutral_info_fair",
+    "neutral_kids_stage",
+    "neutral_learning_workshop",
+    "neutral_live_stage",
+    "neutral_local_history",
+    "neutral_market_stalls",
+    "neutral_nature_learning",
+    "neutral_open_air",
+    "neutral_parade",
+    "neutral_reading_talk",
+    "neutral_textile_machines",
+    "neutral_theater_stage",
+    "running_event",
+    "shooting_festival_tradition",
+    "textile_exhibition_design"
+  ]);
+
   function getEventVisualKey(event) {
     return normalizeLookupKey(event?.visual_key || event?.image_visual_key || event?.visualKey || "");
+  }
+
+  function getEventVisualMotif(event) {
+    return normalizeLookupKey(event?.visual_motif || event?.image_visual_motif || event?.visualMotif || "");
+  }
+
+  function isFallbackVisualCandidate(visual) {
+    const motif = normalizeLookupKey(visual?.visualMotif || visual?.visual_motif || "");
+    if (!motif) return true;
+
+    const role = normalizeLookupKey(visual?.visualMotifRole || visual?.visual_motif_role || "");
+    return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
+  }
+
+  function resolveEventVisualCandidatePool(pool, visualMotif) {
+    if (!Array.isArray(pool) || !pool.length) return [];
+
+    const motif = normalizeLookupKey(visualMotif);
+    if (motif) {
+      const exact = pool.filter((candidate) => normalizeLookupKey(candidate?.visualMotif) === motif);
+      if (exact.length) return exact;
+    }
+
+    const neutral = pool.filter(isFallbackVisualCandidate);
+    return neutral.length ? neutral : pool;
   }
 
   const EVENT_CARD_RECENT_VISUAL_WINDOW = 5;
@@ -379,64 +443,68 @@ const EventCards = (() => {
 
   function resolveEventVisual(event, visualUsage = null) {
     const visualKey = getEventVisualKey(event);
+    const visualMotif = getEventVisualMotif(event);
     const pool = visualKey ? readyVisualPools[visualKey] : null;
+    const candidatePool = resolveEventVisualCandidatePool(pool, visualMotif);
 
-    if (!Array.isArray(pool) || pool.length === 0) {
+    if (!Array.isArray(candidatePool) || candidatePool.length === 0) {
       return null;
     }
 
+    const usageScope = visualMotif ? `${visualKey}:${visualMotif}` : visualKey;
     const seed = [
       event?.id,
       event?.date || event?.datum,
       event?.endDate,
       event?.title || event?.eventName,
-      visualKey
+      visualKey,
+      visualMotif
     ]
       .map((part) => String(part || "").trim())
       .join("|");
 
-    const startIndex = stableHash(seed) % pool.length;
-    const fallback = pool[startIndex];
+    const startIndex = stableHash(seed) % candidatePool.length;
+    const fallback = candidatePool[startIndex];
 
-    if (!visualUsage || pool.length <= 1) {
+    if (!visualUsage || candidatePool.length <= 1) {
       if (!fallback?.src) return null;
-      markVisualUsage(visualUsage, visualKey, fallback);
+      markVisualUsage(visualUsage, usageScope, fallback);
       return fallback;
     }
 
-    const usedForKey = getVisualKeyUsageSet(visualUsage, visualKey);
+    const usedForKey = getVisualKeyUsageSet(visualUsage, usageScope);
 
-    const unusedAndNotRecent = pickEventVisualCandidate(pool, startIndex, (candidate) => {
+    const unusedAndNotRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
       const usageKey = getVisualUsageKey(candidate);
       return usageKey && !usedForKey.has(usageKey) && !wasVisualRecentlyUsed(visualUsage, candidate);
     });
 
     if (unusedAndNotRecent) {
-      markVisualUsage(visualUsage, visualKey, unusedAndNotRecent);
+      markVisualUsage(visualUsage, usageScope, unusedAndNotRecent);
       return unusedAndNotRecent;
     }
 
-    const notRecent = pickEventVisualCandidate(pool, startIndex, (candidate) =>
+    const notRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) =>
       !wasVisualRecentlyUsed(visualUsage, candidate)
     );
 
     if (notRecent) {
-      markVisualUsage(visualUsage, visualKey, notRecent);
+      markVisualUsage(visualUsage, usageScope, notRecent);
       return notRecent;
     }
 
-    const unusedForKey = pickEventVisualCandidate(pool, startIndex, (candidate) => {
+    const unusedForKey = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
       const usageKey = getVisualUsageKey(candidate);
       return usageKey && !usedForKey.has(usageKey);
     });
 
     if (unusedForKey) {
-      markVisualUsage(visualUsage, visualKey, unusedForKey);
+      markVisualUsage(visualUsage, usageScope, unusedForKey);
       return unusedForKey;
     }
 
     if (!fallback?.src) return null;
-    markVisualUsage(visualUsage, visualKey, fallback);
+    markVisualUsage(visualUsage, usageScope, fallback);
     return fallback;
   }
 

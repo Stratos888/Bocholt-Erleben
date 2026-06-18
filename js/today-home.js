@@ -232,7 +232,9 @@
             isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
             isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
             publicNote: asString(image.public_note || image.publicNote),
-            note: asString(image.note)
+            note: asString(image.note),
+            visualMotif: asString(image.visual_motif || image.visualMotif),
+            visualMotifRole: asString(image.visual_motif_role || image.visualMotifRole)
           });
         })
         .filter(Boolean);
@@ -339,8 +341,70 @@
     return null;
   }
 
+  const EVENT_VISUAL_FALLBACK_MOTIFS = new Set([
+    "book_market",
+    "classic_car_meet",
+    "country_fair_rural",
+    "cycling_event",
+    "dance_workshop",
+    "default_city",
+    "evening_social_party",
+    "film_screening",
+    "kirmes_funfair",
+    "neutral_active_tour",
+    "neutral_art_exhibition",
+    "neutral_city_festival",
+    "neutral_classical_concert",
+    "neutral_comedy_stage",
+    "neutral_creative_workshop",
+    "neutral_family_play_outdoor",
+    "neutral_food_festival",
+    "neutral_guided_city_tour",
+    "neutral_indoor_sport",
+    "neutral_info_fair",
+    "neutral_kids_stage",
+    "neutral_learning_workshop",
+    "neutral_live_stage",
+    "neutral_local_history",
+    "neutral_market_stalls",
+    "neutral_nature_learning",
+    "neutral_open_air",
+    "neutral_parade",
+    "neutral_reading_talk",
+    "neutral_textile_machines",
+    "neutral_theater_stage",
+    "running_event",
+    "shooting_festival_tradition",
+    "textile_exhibition_design"
+  ]);
+
   function eventVisualKey(item) {
     return asString(item?.visualKey || item?.visual_key || item?.image_visual_key);
+  }
+
+  function eventVisualMotif(item) {
+    return asString(item?.visualMotif || item?.visual_motif || item?.image_visual_motif);
+  }
+
+  function isFallbackEventVisual(visual) {
+    const motif = asString(visual?.visualMotif || visual?.visual_motif);
+    if (!motif) return true;
+
+    const role = asString(visual?.visualMotifRole || visual?.visual_motif_role);
+    return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
+  }
+
+  function eventVisualCandidatePool(pool, visualMotif) {
+    if (!Array.isArray(pool) || !pool.length) return [];
+
+    const motif = asString(visualMotif);
+    if (motif) {
+      const exact = pool.filter((candidate) => asString(candidate?.visualMotif) === motif);
+      if (exact.length) return exact;
+    }
+
+    const neutral = pool.filter(isFallbackEventVisual);
+    return neutral.length ? neutral : pool;
   }
 
   function activityVisualPool(item) {
@@ -394,16 +458,19 @@
     }
 
     const visualKey = eventVisualKey(item);
+    const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
 
     return selectVisualFromPool(
-      pool,
+      candidatePool,
       [
         asString(item.id),
         asString(item.date),
         asString(item.endDate),
         asString(item.title),
-        visualKey
+        visualKey,
+        visualMotif
       ].join("|"),
       usedImages
     );
@@ -645,9 +712,11 @@
 
   function hasReadyEventVisual(item) {
     const visualKey = eventVisualKey(item);
+    const visualMotif = eventVisualMotif(item);
     const pool = visualKey ? state.eventVisualPools[visualKey] : null;
+    const candidatePool = eventVisualCandidatePool(pool, visualMotif);
 
-    return Array.isArray(pool) && pool.length > 0;
+    return Array.isArray(candidatePool) && candidatePool.length > 0;
   }
 
   function hasAllowedActivityVisual(item) {
