@@ -81,7 +81,7 @@ EVENT_VISUAL_MOTIF_RULES: Dict[str, Dict[str, Dict[str, str]]] = {
         "shopping_sunday": {"role": "specific", "label": "verkaufsoffener Sonntag"},
         "district_festival": {"role": "specific", "label": "Quartiers-/Stadtteilfest"},
         "children_intercultural_festival": {"role": "specific", "label": "Kinder-/interkulturelles Fest"},
-        "open_house_city_services": {"role": "review", "label": "Tag der offenen Tuer / Stadtservices"},
+        "open_house_city_services": {"role": "specific", "label": "Tag der offenen Tuer / Stadtservices"},
     },
     "open_air_festival": {
         "neutral_open_air": {"role": "fallback", "label": "Open-Air-Festival allgemein"},
