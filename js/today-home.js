@@ -1031,8 +1031,15 @@
 
   function weatherMessage(context) {
     const weather = asString(context?.weather || "unknown");
-    const temperature = Number(context?.temperature);
-    const tempLabel = Number.isFinite(temperature) ? `${Math.round(temperature)} °C` : "";
+    const currentTemperature = Number(context?.temperature);
+    const maxTemperature = Number(context?.forecast?.maxTemperature);
+    const hasCurrentTemperature = Number.isFinite(currentTemperature);
+    const hasMaxTemperature = Number.isFinite(maxTemperature);
+    const tempLabel = weather === "hot" && hasMaxTemperature && (!hasCurrentTemperature || Math.round(maxTemperature) > Math.round(currentTemperature))
+      ? `bis ${Math.round(maxTemperature)} °C`
+      : hasCurrentTemperature
+        ? `${Math.round(currentTemperature)} °C`
+        : "";
     const summaryLabel = asString(context?.summaryLabel);
 
     if (summaryLabel) {
@@ -1040,26 +1047,26 @@
     }
 
     if (weather === "hot") {
-      return [tempLabel || "Warm heute", "Wasser & Schatten sind gute Ideen."].filter(Boolean).join(" · ");
+      return [tempLabel || "Warm heute", "ideal für Wasser & Schatten"].filter(Boolean).join(" · ");
     }
 
     if (weather === "rain") {
-      return [tempLabel, "wechselhaft mit Schauern – wetterfest planen."].filter(Boolean).join(" · ");
+      return [tempLabel, "wechselhaft mit Schauern – wetterfest planen"].filter(Boolean).join(" · ");
     }
 
     if (weather === "cold") {
-      return [tempLabel || "Kühl heute", "kurz oder drinnen passt besser."].filter(Boolean).join(" · ");
+      return [tempLabel || "Kühl heute", "kurz oder drinnen passt besser"].filter(Boolean).join(" · ");
     }
 
     if (weather === "windy") {
-      return [tempLabel, "windig – geschützte Orte passen besser."].filter(Boolean).join(" · ");
+      return [tempLabel, "geschützte Orte passen besser"].filter(Boolean).join(" · ");
     }
 
     if (weather === "dry") {
-      return [tempLabel, "heute gut für draußen."].filter(Boolean).join(" · ");
+      return [tempLabel, "ideal für draußen"].filter(Boolean).join(" · ");
     }
 
-    return "Drei Ideen für Bocholt – ruhig vorsortiert für heute.";
+    return "Drei Ideen für Bocholt – ruhig vorsortiert für heute";
   }
 
   function typeLabel(item) {
