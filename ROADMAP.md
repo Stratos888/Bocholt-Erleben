@@ -18,14 +18,29 @@ Kanonische Rollen:
 
 ---
 
-<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 | Zweck: konsolidiert den aktuellen taktischen Fokus nach ZIP-Pruefung; Umfang: naechste Reihenfolge, erledigte Workstreams, bewusste Nicht-Ziele === -->
-## Aktuelle taktische Priorität – Stand 2026-06-09
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 | Zweck: konsolidiert den aktuellen taktischen Fokus nach Main-Merge und Live-Smoke; Umfang: naechster Beweis, Freeze-Grenzen und nachgelagerte Prozesshaertung === -->
+## Aktuelle taktische Priorität – Stand 2026-06-19
 
 Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter unten, wenn sie dem aktuellen Stand widersprechen.
+
+### Abgeschlossen seit letztem Prioritätsblock
+
+- `staging` wurde erfolgreich nach `main` gemerged.
+- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
+- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Merge behoben.
+- Event-Visual-Motif-Fit ist für den aktuellen Sheet-Stand abgeschlossen:
+  - keine offenen `gap_to_produce`-Motive
+  - keine offenen `candidate_to_integrate`-Motive
+  - keine offenen `review_rules`-Motive
+  - leerer Gap-Backlog für den geprüften Stand
 
 ### Nächster operativer Punkt
 
 Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+
+Geplanter Kontrollzeitpunkt:
+
+- Dienstag, 2026-06-23, 11:00 Uhr.
 
 Zu prüfen:
 
@@ -36,32 +51,29 @@ Zu prüfen:
 5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
 6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
 
-Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. `staging` darf die echte Google-Sheet-Kette bewusst nicht vollständig ausführen.
+Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. Der vollständige Beweis muss auf `main` gegen die echte Google-Sheet-Kette erfolgen.
 
 ### Aktuell gefreezt oder nicht erneut breit öffnen
 
-- Event-Visual-Duplicate-Cleanup: vorerst gefreezt; nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
-- Event-Card Normal State Polish: bleibt gefreezt.
-- Event-Detailpanel: bleibt gefreezt.
-- Activity-Öffnungsstatus-Massenpflege: abgeschlossen; nur noch gezielte Sonderfälle.
+- Kein neuer breiter UI-/Feature-Workpack bis nach dem KI-/Inbox-Handoff-Beweis.
+- Event-Visual-Produktion nur bei neuem Sheet-Bedarf, neuem Gap-Backlog oder bewusster strategischer Poolentscheidung.
+- Event-Visual-Duplicate-Cleanup nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
+- Event-Card Normal State Polish bleibt gefreezt.
+- Event-Detailpanel bleibt gefreezt.
+- Activity-Öffnungsstatus-Massenpflege bleibt abgeschlossen; nur gezielte Sonderfälle.
 
 ### Getrennter Folge-Workstream
 
-Activity-Premium-Visuals bleiben ein eigener Workstream:
+Activity-Premium-Visuals bleiben ein eigener Qualitäts-Workstream:
 
 - ein exklusives Premium-Hauptbild pro Activity
 - keine Wiederverwendung aus dem Event-Visual-Pool
-- Anchor-Test zuerst abschließen
-- danach Prompt-Kit / Workflow auf v1.0 einfrieren
-- erst danach systematische Massenproduktion und Repo-Integration
-
-### Dokumentationsregel
-
-Wenn neue Chat-Starts oder ZIP-Stände verwendet werden, zuerst diesen aktuellen Prioritätsblock prüfen. Ältere historische Roadmap-Blöcke bleiben als Kontext erhalten, dürfen aber nicht automatisch als aktive nächste Schritte gelesen werden.
+- zuerst gezielte Bildrecherche/-bewertung
+- danach nur geprüfte, rechtlich saubere und qualitativ bessere Kandidaten integrieren
 
 ### Nachgelagerter Prozessverbesserungs-Punkt
 
-KI-/Inbox-Prozess nach dem Main-Merge konsolidieren.
+KI-/Inbox-Prozess erst nach dem Main-Handoff-Beweis konsolidieren.
 
 Ziel:
 - `data/inbox_manual.json` nicht mehr als persistenten Repo-Puffer für temporäre Event-Kandidaten verwenden.
@@ -70,10 +82,10 @@ Ziel:
 - Prüfen, ob `duplikat` als finaler Inbox-Status im Cleanup mit archiviert werden soll.
 
 Bewertung:
-- Kein Blocker für den aktuellen Main-Merge, solange `data/inbox_manual.json` leer ist.
-- Separater Prozess-Härtungsworkpack nach Live-Freigabe.
+- Kein aktueller Blocker für Main/Live.
+- Separater Prozess-Härtungsworkpack nach dem echten KI-/Inbox-Handoff-Beweis.
 
-<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 === -->
+<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_19 === -->
 
 <!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 | Zweck: schliesst den aktiven Event-Visual-Motiv-Fit-Produktionsblock fuer aktuellen Sheet-Stand; Umfang: Reststatus und naechste Arbeit nur bei neuem Bedarf === -->
 ## Event Visual Motif-Fit – aktuelle Sheet-Gaps geschlossen (2026-06-18)
@@ -92,8 +104,8 @@ Wichtig:
 - Event-Visual-Produktion wird erst wieder geöffnet, wenn neuer Sheet-Bedarf, ein neuer Backlog-Eintrag oder eine bewusste strategische Poolentscheidung vorliegt.
 
 Nächste Arbeit nach diesem Block:
-- Nur Deploy-/Sicht-Smoke nach Upload des Pakets prüfen.
-- Danach wieder zum übergeordneten KI-/Inbox-/Main-Merge-Prozess zurückkehren.
+- Main-Merge und Live-Smoke sind abgeschlossen.
+- Danach wieder zum übergeordneten KI-/Inbox-Handoff-Beweis zurückkehren.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 === -->
 
 

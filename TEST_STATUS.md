@@ -2,10 +2,39 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIN_MERGE_LIVE_SMOKE_2026_06_19 | Zweck: dokumentiert erfolgreichen Main-Merge, Live-Smoke und nachgezogenen Today-Card-Alignment-Fix; Umfang: Abschlussanker vor KI-Suchlauf-Handoff-Test === -->
+## Main-Merge / Live-Smoke – bestanden (2026-06-19)
+
+Status: abgeschlossen.
+
+Belegt:
+
+- `staging` wurde erfolgreich nach `main` gemerged.
+- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
+- Die öffentlichen Kernbereiche laden ohne gemeldeten Blocker:
+  - `/`
+  - `/events/`
+  - `/aktivitaeten/`
+  - `/bildnachweise/`
+- Der nach dem Merge sichtbare Desktop-Alignment-Fehler in den drei Today-Cards wurde behoben.
+- Die Textbereiche der Today-Cards beginnen nach dem Bild wieder konsistent auf gleicher Höhe.
+- Der Event-Visual-Motif-Fit-Stand ist auf `main` ausgerollt; aus dem aktuellen Matrix-/Backlog-Stand ergeben sich keine offenen Bildproduktionsgaps.
+
+Bewertung:
+
+- Main/Live gilt für den aktuellen Stand als stabil.
+- Es gibt keinen bekannten UI- oder Visual-Blocker, der vor dem nächsten Roadmap-Beweis erneut geöffnet werden muss.
+- Nächster operativer Test bleibt der automatische KI-Suchlauf bzw. Visual-Key-Handoff auf `main`.
+
+Nächster Kontrollpunkt:
+
+- Dienstag, 2026-06-23, 11:00 Uhr: KI-Suchlauf / Inbox / `visual_key` / Events-Build / Live-Bildausspielung prüfen.
+<!-- === END BLOCK: TEST_STATUS_MAIN_MERGE_LIVE_SMOKE_2026_06_19 === -->
+
 <!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: dokumentiert fachliche Motiv-Fit-QA nach technischer Bildabdeckung; Umfang: Regelkorrekturen, Matrix-/Backlog-Zielstand, keine neue Bildproduktion === -->
 ## Event Visual Motif-Fit-QA – Regelpaket lokal geprüft (2026-06-18)
 
-Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+Status: auf `main` ausgerollt; Main-/Live-Smoke am 2026-06-19 ohne sichtbaren Blocker bestätigt.
 
 Ausgangslage:
 - Finaler Restbatch war deployed.
@@ -57,7 +86,7 @@ Bewertung:
 <!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 | Zweck: dokumentiert den lokal geprueften Abschluss der aktuellen Event-Visual-Motiv-Gaps; Umfang: finaler Restbatch, Matrix, Gap-Backlog, Audit === -->
 ## Event Visual Motif-Fit – finaler Restbatch lokal geprüft (2026-06-18)
 
-Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+Status: auf `main` ausgerollt; Main-/Live-Smoke am 2026-06-19 ohne sichtbaren Blocker bestätigt.
 
 Basis:
 - Aktueller `staging`-ZIP-Stand nach Event Visual Gap Batch 02.
