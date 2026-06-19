@@ -113,9 +113,9 @@ Bis zu diesem Beweis nicht starten:
 - `/events/` is the canonical event search and browsing route.
 - `/aktivitaeten/` is the canonical activities search and browsing route.
 - `/angebote/` is a legacy redirect to `/aktivitaeten/` and must not contain independent activities content.
-- `/angebote/sichtbar-werden/` is the canonical activity-presence decision page.
-- `/angebote/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
-- `/angebote/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
+- `/aktivitaeten/sichtbar-werden/` is the canonical activity-presence decision page.
+- `/aktivitaeten/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
+- `/aktivitaeten/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
 - `/events-veroeffentlichen/` is the canonical organizer funnel overview.
 - `/events-veroeffentlichen/einreichen/` is the canonical single-event submission route.
 - `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
