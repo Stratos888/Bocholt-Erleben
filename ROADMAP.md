@@ -1633,3 +1633,27 @@ Nächster Schritt:
 - `staging → main` nur dann, wenn `staging` insgesamt releasefähig ist und keine anderen unfertigen Änderungen enthält.
 - Nach Main-Deploy reicht ein kurzer Live-Smoke auf `/events/`.
 <!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 === -->
+<!-- === BEGIN BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 | Zweck: markiert Reporting-Hardening als technisch live bewiesen und grenzt den weiteren organischen Datenlauf fuer Akquise ab; Umfang: Status, naechste Wartepunkte, keine neue Codearbeit === -->
+## Reporting-/Tracking-Hardening – technisch live bewiesen (2026-06-19)
+
+Status:
+- Technischer Workpack abgeschlossen.
+- Live-Beweis nach Main-Merge bestanden.
+
+Belegt:
+- `impact_summary` im Anbieterportal wird serverseitig befüllt.
+- Die neue Aktivitäts-Funnel-Route `/aktivitaeten/sichtbar-werden/` wird live als `organizer_cta_click` gezählt.
+- Today-Desktop-Klicks reichen vorhandene Reporting-Ziele an das Nutzwerttracking weiter.
+- Dashboard-Nachweis am 2026-06-19:
+  - `Nutzwert-Klicks` stieg von 75 auf 76.
+  - `Veranstalter-CTA` stieg von 3 auf 4.
+
+Bewertung:
+- Keine weitere technische Reporting-Härtung aus diesem Prüfstand nötig.
+- Testklicks bleiben reine Funktionsbeweise und dürfen nicht als Akquise-Erfolgsdaten verwendet werden.
+- Für Verkaufs-/Akquise-Aussagen zählt erst ein längerer organischer Datenlauf.
+
+Nächster sinnvoller Wartepunkt:
+- Nach einem vollständigen 28-Tage-/30-Tage-Zeitraum prüfen, ob genug organische Website-, Route-/Maps-, Detail- und CTA-Signale für einen ersten belastbaren Feedbackbericht vorliegen.
+- Bis dahin keine neuen Reporting-Features bauen, sondern Datenqualität beobachten.
+<!-- === END BLOCK: ROADMAP_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->

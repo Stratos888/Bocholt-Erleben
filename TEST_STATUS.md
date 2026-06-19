@@ -3660,3 +3660,40 @@ Abschlussbewertung:
 Main-Freigabe:
 - Dieser Arbeitsblock kann Richtung `main`, sofern `staging` keine anderen unfertigen Änderungen enthält.
 <!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 | Zweck: dokumentiert den Live-Beweis nach Reporting-Hardening, Aktivitaeten-Funnel-Migration und Main-Merge; Umfang: Anbieter-CTA, Nutzwert-Klicks, Dashboard-Nachweis, Abgrenzung Testklicks === -->
+## Reporting-/Tracking-Hardening – Live-Beweis nach Main-Merge (2026-06-19)
+
+Status: bestanden.
+
+Kontext:
+- Der Staging-Stand mit Aktivitäts-Funnel-Migration, Footer-Konsistenz und Reporting-Hardening wurde nach `main` gemerged und ist live.
+- Geprüft wurde die echte Live-Kette über UI-Klick und internes SEO-/Mehrwert-Dashboard.
+
+Belegter Live-Test:
+- Vor dem Test im Dashboard:
+  - `Nutzwert-Klicks`: 75
+  - `Veranstalter-CTA`: 3
+  - Eigenes Tracking war ausgeschlossen.
+- Live geöffnet:
+  - `/aktivitaeten/sichtbar-werden/`
+- Nach dem Test im Dashboard:
+  - `Nutzwert-Klicks`: 76
+  - `Veranstalter-CTA`: 4
+  - Eigenes Tracking war während des Nachweises aktiv.
+
+Bewertung:
+- Die neue Route `/aktivitaeten/sichtbar-werden/` wird live als Anbieter-/Veranstalter-CTA erfasst.
+- Der Klick landet messbar im internen Nutzwert-/Mehrwert-Dashboard.
+- Der Reporting-Hardening-Workpack ist technisch abgeschlossen.
+- Der Test ist ein Funktionsbeweis, kein Akquise-Erfolgsbeleg.
+
+Wichtige Abgrenzung:
+- Eigene Testklicks dürfen nicht als organische Nutzersignale oder Anbietermehrwert verkauft werden.
+- Nach dem Beweistest sollte eigenes Tracking wieder ausgeschlossen werden.
+- Für echte Akquise-Aussagen bleibt ein längerer organischer Datenlauf nötig.
+
+Offen nach diesem Nachweis:
+- 28-Tage-/30-Tage-Auswertung organischer Nutzwertsignale.
+- Spätere Bewertung, ob ein screenshot- oder mailfähiger Feedbackbericht belastbar ist.
+- Keine weitere technische Reporting-Härtung aus diesem Befund nötig.
+<!-- === END BLOCK: TEST_STATUS_REPORTING_HARDENING_LIVE_PROOF_2026_06_19 === -->
