@@ -141,6 +141,7 @@
     return "";
   }
 
+  /* === BEGIN BLOCK: TODAY_HOME_REPORTING_TARGET_ANALYTICS_V1 | Zweck: gibt bei Today-Desktop-Direktklicks vorhandene Reporting-Ziele an das Nutzwerttracking weiter; Umfang: ersetzt nur openDesktopTarget(item) === */
   function openDesktopTarget(item) {
     const primaryUrl = desktopPrimaryUrl(item);
     const targetUrl = primaryUrl || desktopFallbackTarget(item);
@@ -148,12 +149,17 @@
 
     try {
       if (window.BEAnalytics?.trackOutboundClick) {
+        const reportingTargetPayload = window.BEAnalytics?.buildReportingTargetPayload
+          ? window.BEAnalytics.buildReportingTargetPayload(item?.raw || item || {})
+          : {};
+
         window.BEAnalytics.trackOutboundClick({
           outboundType: primaryUrl ? "website" : "maps",
           entityType: item?.type || "today_card",
           entityId: asString(item?.id || item?.raw?.id),
           entityTitle: asString(item?.title || item?.raw?.title),
-          destinationUrl: targetUrl
+          destinationUrl: targetUrl,
+          ...reportingTargetPayload
         });
       }
 
@@ -163,6 +169,7 @@
       return false;
     }
   }
+  /* === END BLOCK: TODAY_HOME_REPORTING_TARGET_ANALYTICS_V1 === */
   /* === END BLOCK: TODAY_HOME_DESKTOP_DIRECT_TARGETS_V1 === */
 
   async function fetchJsonNoStore(url, required) {

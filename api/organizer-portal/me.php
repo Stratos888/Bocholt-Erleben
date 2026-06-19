@@ -638,6 +638,9 @@ try {
     $quotaByPlan = opm_fetch_quota_summary_by_plan($pdo, $organizerId);
     $billingSummary = opm_build_billing_summary($activeSubscriptions);
     /* === END BLOCK: ORGANIZER_PORTAL_MULTI_TARIFF_PAYLOAD_V1 === */
+    /* === BEGIN BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_PAYLOAD_V1 | Zweck: befüllt das vorhandene impact_summary-Feld im Anbieterportal mit sicheren aggregierten Nutzwertdaten; Umfang: ergänzt nur den Response-Aufbau vor recent_submissions === */
+    $impactSummary = opm_fetch_impact_summary($pdo, $organizerId, (string)$sessionRow['organization_name']);
+    /* === END BLOCK: ORGANIZER_PORTAL_IMPACT_SUMMARY_PAYLOAD_V1 === */
     $recentSubmissions = opm_fetch_recent_submissions($pdo, $organizerId);
 
     be_json_response(200, [
