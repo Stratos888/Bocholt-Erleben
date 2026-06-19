@@ -38,32 +38,39 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-<!-- === BEGIN BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 | Zweck: setzt den naechsten Live-Blocker nach Today-Home-Release-Proof; Umfang: Detailpanel als app-weites Premium-Systemelement === -->
-### Vor Live: Detailpanel Premium System
+<!-- === BEGIN BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 | Zweck: setzt den aktuellen Projektsteuerungsstand nach Main-Merge und Live-Smoke; Umfang: naechster operativer Beweis und bewusste Nicht-Ziele === -->
+### Nach Main-Merge: KI-/Inbox-Visual-Key-Handoff beweisen
 
-Nach dem Today-Home-Release-Proof bleibt Live gehalten, bis das Detailpanel app-weit Premium-Niveau erreicht.
+Stand: 2026-06-19.
 
-Grundsatz:
+Aktueller Zustand:
 
-- konsistent, aber nicht identisch,
-- Event-Detailpanel fuer Terminentscheidung,
-- Activity-Detailpanel fuer Orts-/Ausflugsentscheidung,
-- Today oeffnet nur in die passende bestehende Detailrolle,
-- Activity-Fotos bleiben separater Nachzug und blockieren diesen Workstream nicht.
+- `staging` wurde erfolgreich nach `main` gemerged.
+- Der Live-Bereich wurde manuell geprüft und wirkt stabil.
+- Der Desktop-Alignment-Fehler der drei Today-Cards wurde nach dem Main-Merge behoben und live kontrolliert.
+- Der Event-Visual-Motif-Fit-Block ist für den aktuellen Sheet-Stand abgeschlossen; es gibt keine offenen `gap_to_produce`-, `candidate_to_integrate`- oder `review_rules`-Motive.
 
-Primaere Arbeitsgrundlage:
+Nächster operativer Beweis:
 
-- `docs/detailpanel-premium-system-contract.md`
-<!-- === END BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->
+- Den nächsten automatischen KI-Suchlauf auf `main` bzw. den nächsten tatsächlichen Manual-KI-Intake-Lauf prüfen.
+- Geplanter Kontrollzeitpunkt: Dienstag, 2026-06-23, 11:00 Uhr.
 
+Zu prüfen:
 
-Stand: 2026-06-09, ZIP-Snapshot `Bocholt-Erleben-staging - 2026-06-09T145715.875.zip`.
+1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
+2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
+3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
+4. `Events.visual_key` wird korrekt geschrieben.
+5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
+6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
 
-1. Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` live bewerten.
-2. Roadmap und Master-Datei aktuell halten, damit neue Chats nicht an überholten Workpacks ansetzen.
-3. Activity-Premium-Visuals als getrennten Qualitäts-Workstream fortführen; Event-Visual-Duplicate-Cleanup bleibt vorerst gefreezt.
-4. Activity-Öffnungsstatus nur noch gezielt verfeinern, nicht erneut als breite Datenpflege starten.
-5. Reporting-/Monetarisierungs-Readiness bleibt strategisch wichtig, ist aber nicht der nächste operative Pipeline-Beweis.
+Bis zu diesem Beweis nicht starten:
+
+- kein neuer breiter UI-/Feature-Workpack,
+- kein erneuter Event-Visual-Produktionslauf ohne neuen Sheet-Bedarf,
+- keine pauschale Activity-Öffnungsstatus-Massenpflege,
+- keine Prozesshärtung des KI-/Inbox-Flows vor dem echten Main-Beweis.
+<!-- === END BLOCK: MASTER_POST_MAIN_MERGE_2026_06_19 === -->
 
 ---
 
@@ -125,8 +132,8 @@ Stand: 2026-06-09, ZIP-Snapshot `Bocholt-Erleben-staging - 2026-06-09T145715.875
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- First operational proof after this documentation cleanup: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
-- Do not treat a `staging` workflow attempt as the final proof; the real Google-Sheet chain is intentionally guarded for `main`.
+- First operational proof after the successful Main merge and Live smoke: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
+- Do not treat a `staging` workflow attempt or chat simulation as the final proof; the real Google-Sheet chain must be verified on `main`.
 - Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom.
 - Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
