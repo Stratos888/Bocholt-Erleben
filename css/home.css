@@ -324,11 +324,14 @@
     cursor: pointer;
   }
 
+  /* === BEGIN BLOCK: EVENT_CARD_ACTION_LINK_PREMIUM_V1 | Zweck: entfernt den letzten klassischen Hover-Unterstrich auf Desktop-Card-Actions und nutzt eine leise Text-Action-Anhebung === */
   .event-card-action:hover{
     color: color-mix(in srgb, var(--home-copy-contrast) 94%, rgba(36,54,40,0.96) 6%);
-    text-decoration: underline;
-    text-underline-offset: 0.14em;
+    text-decoration: none;
+    background: color-mix(in srgb, var(--color-primary-muted) 30%, transparent);
+    box-shadow: inset 0 -0.12em 0 color-mix(in srgb, var(--color-primary) 34%, rgba(24,40,30,0.10));
   }
+  /* === END BLOCK: EVENT_CARD_ACTION_LINK_PREMIUM_V1 === */
 
   .event-card-action:focus-visible{
     outline: 2px solid var(--cmp-focus-ring-brand);
