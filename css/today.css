@@ -1339,3 +1339,48 @@ body.page-route-today footer {
 }
 
 /* === END BLOCK: TODAY_HOME_DESKTOP_VISUAL_ALIGNMENT_V5 === */
+
+/* === BEGIN BLOCK: TODAY_DESKTOP_PREMIUM_SHELL_CONTRACT_V1 | Zweck: gleicht Today Desktop an den gemeinsamen Premium-Desktop-Rail von Events und Aktivitaeten an; Umfang: nur Desktop >=900px, kompaktere Hero-Buehne, Lead raus, gleiche Content-Breite; keine Mobile-, Card-Bild- oder Recommendation-Logik === */
+@media (min-width: 900px){
+  body.page-route-today{
+    --desktop-shell-max: 1128px;
+    --desktop-shell-pad-x: 32px;
+  }
+
+  body.page-route-today .today-hero,
+  body.page-route-today .today-main{
+    width: min(calc(100% - clamp(48px, 5vw, 64px)), var(--desktop-shell-max));
+    max-width: none;
+  }
+
+  body.page-route-today .today-hero{
+    min-height: 374px;
+  }
+
+  body.page-route-today .today-lead{
+    display: none;
+  }
+
+  body.page-route-today .today-hero__card{
+    gap: 11px;
+  }
+
+  body.page-route-today .today-weather-note{
+    margin-top: 5px;
+  }
+
+  body.page-route-today .today-main{
+    margin-top: 8px;
+    padding: 16px var(--desktop-shell-pad-x) 32px;
+    border-radius: 22px 22px 0 0;
+  }
+}
+
+@media (min-width: 1024px){
+  body.page-route-today .today-hero{
+    min-height: 374px;
+    padding-bottom: 14px;
+    grid-template-rows: clamp(152px, 15.8vw, 176px) auto;
+  }
+}
+/* === END BLOCK: TODAY_DESKTOP_PREMIUM_SHELL_CONTRACT_V1 === */
