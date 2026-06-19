@@ -80,6 +80,11 @@ jobs:
           from googleapiclient.discovery import build
 
           ROOT = Path.cwd()
+          # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 | Zweck: nutzt zentrale Event-Visual-Key-Logik auch im Sheet-Handoff; Umfang: ergänzt nur Importpfad und Import ===
+          sys.path.insert(0, str(ROOT / "scripts"))
+
+          from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+          # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HELPER_IMPORT_V1 ===
           MANUAL_JSON_PATH = ROOT / "data" / "inbox_manual.json"
 
           INBOX_COLUMNS = [
@@ -99,6 +104,7 @@ jobs:
               "match_score",
               "matched_event_id",
               "notes",
+              "visual_key",
               "created_at",
           ]
 
@@ -204,6 +210,56 @@ jobs:
           if missing_columns:
               fail(f"Inbox-Header unvollständig. Fehlende Spalten: {missing_columns}")
 
+          # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_DROPDOWN_V1 | Zweck: macht KI-Bildzuordnung in der Inbox sichtbar, auswählbar und fehlerarm editierbar; Umfang: setzt Google-Sheets-Dropdown aus data/event_visual_pool.json für Inbox.visual_key ===
+          pool_path = ROOT / "data" / "event_visual_pool.json"
+          try:
+              pool_data = json.loads(pool_path.read_text(encoding="utf-8"))
+          except Exception as e:
+              fail(f"Event-Visual-Pool ist ungültig oder nicht lesbar: {e}")
+
+          visual_key_options = sorted((pool_data.get("pools") or {}).keys())
+          if not visual_key_options:
+              fail("Event-Visual-Pool enthält keine auswählbaren Keys unter 'pools'.")
+
+          sheet_meta = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+          inbox_sheet_id = None
+          for sheet in sheet_meta.get("sheets", []):
+              props = sheet.get("properties", {})
+              if props.get("title") == "Inbox":
+                  inbox_sheet_id = props.get("sheetId")
+                  break
+          if inbox_sheet_id is None:
+              fail("Inbox-Tab wurde in der Sheet-Metadatenabfrage nicht gefunden.")
+
+          visual_key_col_index = header.index("visual_key")
+          service.spreadsheets().batchUpdate(
+              spreadsheetId=sheet_id,
+              body={
+                  "requests": [
+                      {
+                          "setDataValidation": {
+                              "range": {
+                                  "sheetId": inbox_sheet_id,
+                                  "startRowIndex": 1,
+                                  "startColumnIndex": visual_key_col_index,
+                                  "endColumnIndex": visual_key_col_index + 1,
+                              },
+                              "rule": {
+                                  "condition": {
+                                      "type": "ONE_OF_LIST",
+                                      "values": [{"userEnteredValue": key} for key in visual_key_options],
+                                  },
+                                  "strict": True,
+                                  "showCustomUi": True,
+                              },
+                          }
+                      }
+                  ]
+              },
+          ).execute()
+          info(f"visual_key-Dropdown in Inbox gesetzt: {len(visual_key_options)} Optionen")
+          # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_DROPDOWN_V1 ===
+
           existing_rows = []
           for r in values[1:]:
               row = [(r[i].strip() if i < len(r) and r[i] is not None else "") for i in range(len(header))]
@@ -262,6 +318,14 @@ jobs:
               normalized["created_at"] = norm(normalized.get("created_at", "")) or created_at
               normalized["url"] = canonical_url(normalized.get("url", ""))
               normalized["source_url"] = canonical_url(normalized.get("source_url", "")) or normalized["url"]
+              # === BEGIN BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 | Zweck: garantiert Visual-Key beim Append in die Sheet-Inbox; Umfang: normalisiert vorhandenen Key oder inferiert deterministisch aus Eventdaten ===
+              normalized["visual_key"] = normalize_event_visual_key(normalized.get("visual_key", "")) or infer_event_visual_key(
+                  title=normalized.get("title", ""),
+                  description=normalized.get("description", ""),
+                  category=normalized.get("kategorie_suggestion", ""),
+                  location=normalized.get("location", ""),
+              )
+              # === END BLOCK: MANUAL_INTAKE_VISUAL_KEY_HANDOFF_V1 ===
               # === END BLOCK: MANUAL_INTAKE_NORMALIZE_STATUS_CREATED_AT_V1 ===
 
               missing_required = [k for k in REQUIRED_JSON_KEYS if not norm(normalized.get(k, ""))]

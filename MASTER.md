@@ -38,10 +38,32 @@ The following workpack is intentionally on hold:
 
 ## CURRENT FOCUS
 
-1. Live-Messbasis konsolidieren: vorhandene Live-KPIs nicht mehr als fehlend behandeln, sondern Tracking-Qualität, Ziel-/Item-Zuordnung und auswertbare Veranstalter-/Location-Reports herstellen.
-2. Monetarisierungs-Readiness absichern: echten Live-Zahlungsfall bewusst testen, kritische Smoke-Tests automatisieren und Review-/Push-Flows gegen stille Ausfälle härten.
-3. Veranstalter-Nutzwert sichtbar machen: Anbieterbereich, Akquise-Kommunikation und Feedbackberichte so ausbauen, dass Reichweite, Interesse und konkrete Klicks belegbar werden.
-4. Danach Discovery-Ausbau: „Heute in Bocholt“, Aktivitäten und Orte/Locations.
+<!-- === BEGIN BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 | Zweck: setzt den naechsten Live-Blocker nach Today-Home-Release-Proof; Umfang: Detailpanel als app-weites Premium-Systemelement === -->
+### Vor Live: Detailpanel Premium System
+
+Nach dem Today-Home-Release-Proof bleibt Live gehalten, bis das Detailpanel app-weit Premium-Niveau erreicht.
+
+Grundsatz:
+
+- konsistent, aber nicht identisch,
+- Event-Detailpanel fuer Terminentscheidung,
+- Activity-Detailpanel fuer Orts-/Ausflugsentscheidung,
+- Today oeffnet nur in die passende bestehende Detailrolle,
+- Activity-Fotos bleiben separater Nachzug und blockieren diesen Workstream nicht.
+
+Primaere Arbeitsgrundlage:
+
+- `docs/detailpanel-premium-system-contract.md`
+<!-- === END BLOCK: MASTER_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->
+
+
+Stand: 2026-06-09, ZIP-Snapshot `Bocholt-Erleben-staging - 2026-06-09T145715.875.zip`.
+
+1. Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` live bewerten.
+2. Roadmap und Master-Datei aktuell halten, damit neue Chats nicht an überholten Workpacks ansetzen.
+3. Activity-Premium-Visuals als getrennten Qualitäts-Workstream fortführen; Event-Visual-Duplicate-Cleanup bleibt vorerst gefreezt.
+4. Activity-Öffnungsstatus nur noch gezielt verfeinern, nicht erneut als breite Datenpflege starten.
+5. Reporting-/Monetarisierungs-Readiness bleibt strategisch wichtig, ist aber nicht der nächste operative Pipeline-Beweis.
 
 ---
 
@@ -52,6 +74,21 @@ The following workpack is intentionally on hold:
 - Existing design tokens must be reused before new tokens are added
 - All overlays render in a dedicated overlay root directly under `body`
 - Deploy must fail fast on broken asset references
+
+<!-- === BEGIN BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 | Zweck: verankert die dauerhafte Bild-/Visual-Produktentscheidung; Umfang: Event- und Activity-Card-Bilder, Today Home, Feed-Cards, Premium-Qualitaet === -->
+### Premium visual contract
+
+- Event- und Activity-Card-Bilder werden kuenftig als kuratierte 16:9-WebP-Card-Assets verstanden, nicht als beliebige Rohbilder, die im Layout gerettet werden.
+- Bevorzugte Quellenhierarchie: eigene/exklusive Premium-Echtfotos, vom Veranstalter bzw. Rechteinhaber freigegebene Premium-Echtfotos, sonstige rechtlich einwandfreie und qualitativ starke Fotos, danach selbst erzeugte symbolische KI-Premium-Visuals.
+- Rechtlich einwandfrei bedeutet: Quelle, Lizenz/Rechtebasis, Urheber-/Credit-Angaben und ggf. Nutzungserlaubnis sind belegbar; unklare, nur scheinbar freie oder nicht sauber zuordenbare Bilder gelten nicht als `ready`.
+- Wenn kein rechtlich einwandfreies Premium-Echtfoto verfuegbar ist, ist ein selbst erzeugtes symbolisches KI-Premium-Visual der bevorzugte Standard-Fallback.
+- Prominente Flaechen wie Today Home duerfen nur `ready`-Visuals oder bewusst freigegebene `fallback`-Visuals nutzen.
+- Schwache Bilder werden ersetzt, zurueckgestuft oder aus prominenten Flaechen ausgeschlossen; sie werden nicht dauerhaft per CSS, Crop-Rateversuchen oder Einzel-Focal-Point-Hotfixes kaschiert.
+- Fuer Visuals gelten die Statuswerte `ready`, `usable`, `fallback`, `needs_review` und `blocked`.
+- CSS liefert den stabilen Rahmen fuer Bildausspielung, ist aber nicht das Rettungssystem fuer ungeeignete Motive, schlechte Ausschnitte oder zu grosse Rohdateien.
+- Perspektivischer Zielzustand ist ein internes Visual-Audit bzw. Vorschau-Raster, das Bilder in echten Card-Kontexten prueft: Today Mobile, Today Desktop, Events Feed, Activities Feed und spaeter Detail-/Hero-Kontexte.
+
+<!-- === END BLOCK: MASTER_PREMIUM_VISUAL_CONTRACT_2026_06_01 === -->
 
 ### Product governance
 
@@ -65,8 +102,10 @@ The following workpack is intentionally on hold:
 
 ### Information architecture
 
-- `/` is the canonical event-discovery home.
-- `/angebote/` is the canonical activities route.
+- `/` is the canonical Today/Home recommendation entry and current public home.
+- `/events/` is the canonical event search and browsing route.
+- `/aktivitaeten/` is the canonical activities search and browsing route.
+- `/angebote/` remains a legacy/transition route for the activities page until redirect/canonical cleanup is finalized.
 - `/angebote/sichtbar-werden/` is the canonical activity-presence decision page.
 - `/angebote/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
 - `/angebote/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
@@ -75,6 +114,7 @@ The following workpack is intentionally on hold:
 - `/events-veroeffentlichen/anbindung/` is the canonical automatic-takeover request route.
 - `/fuer-veranstalter/` is the canonical organizer membership route.
 - `/ueber/` is the canonical trust/explanation page.
+- `/veroeffentlichung-erklaert/` is the canonical central explanation route for publication, review, payment/freigabe, fairness and activity-vs-event distinction.
 - `/info/` is legacy backup/redirect only and is not the current canonical information hub.
 - Success, cancellation, login, dashboard and inbox routes are functional routes, not public SEO landing pages unless explicitly promoted.
 - Legacy routes or older pages may still temporarily exist in the repo during migration, but repo presence alone is not canonical information architecture.
@@ -85,7 +125,31 @@ The following workpack is intentionally on hold:
 ## NEXT WORKPACK
 
 - Work from `ROADMAP.md` as the tactical prioritized backlog.
-- First target: measured organizer value, not another broad visual-polish loop.
-- Keep page-specific changes minimal until the measurement/reporting and monetization smoke-test gaps are closed.
+- First operational proof after this documentation cleanup: evaluate the next automatic `main` search run for Manual-KI-Intake / Visual-Key-Handoff.
+- Do not treat a `staging` workflow attempt as the final proof; the real Google-Sheet chain is intentionally guarded for `main`.
+- Activity-Premium-Visuals continue as a separate workstream and must not reopen the frozen Event-Visual-Duplicate-Cleanup without a concrete symptom.
+- Keep page-specific changes minimal unless a current roadmap block names a concrete owner and acceptance proof.
 
 <!-- === END CANONICAL MASTER FILE === -->
+
+<!-- === BEGIN BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 | Zweck: ersetzt veralteten Today-Home-Fortsetzungspunkt durch aktuellen Steuerungsstand; Umfang: KI-Intake, Event-Visual-Freeze, Activity-Visuals, Activity-Opening === -->
+## Aktueller Fortsetzungspunkt – KI-Intake Main-Beweis und getrennte Premium-Visual-Workstreams
+
+Stand: 2026-06-09, `staging` ZIP-Snapshot.
+
+Aktuell verbindlich:
+
+- Der nächste operative Pipeline-Beweis ist der Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main`.
+- Auf `staging` ist die echte Google-Sheet-Kette bewusst nicht vollständig prüfbar, weil der Workflow per Branch-Guard geschützt ist.
+- Nach dem Suchlauf ist zu prüfen, ob `Inbox.visual_key`, Dropdown, redaktionelle Key-Änderung, `Events.visual_key`, Build und Eventbild-Ausspielung zusammen funktionieren.
+- Event-Visual-Duplicate-Cleanup ist vorerst gefreezt; Folgearbeit dort nur bei konkretem sichtbaren Symptom oder bewusstem neuen Eventdatenstand.
+- Activity-Premium-Visuals sind ein eigener Qualitäts-Workstream mit exklusiven Bildern pro Activity und dürfen nicht mit Event-Visuals vermischt werden.
+- Activity-Opening-Status ist grundsätzlich umgesetzt; Folgearbeit nur noch gezielt an Saisonlogik, Detailtexten und Sonderfällen.
+
+Nicht als nächstes starten:
+
+- kein weiterer breiter Event-Card-Polish ohne konkretes Symptom
+- keine erneute pauschale Activity-Öffnungszeiten-Massenpflege
+- keine KI-Chat-Simulation als Ersatz für den späteren `main`-Beweis
+- keine Vermischung von Roadmap-Konsolidierung, Bildproduktion und App-Logik in einem Patch
+<!-- === END BLOCK: MASTER_CURRENT_PROJECT_CONTINUATION_2026_06_09 === -->

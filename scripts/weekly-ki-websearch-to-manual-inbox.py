@@ -28,6 +28,8 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from openai import OpenAI
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 
 # === BEGIN BLOCK: CONFIG ===
 # Datei: scripts/weekly-ki-websearch-to-manual-inbox.py
@@ -503,6 +505,18 @@ Du musst vor der finalen Ausgabe gedanklich und per Websuche prüfen, ob aus die
      - `https://www.bocholt.de/veranstaltungskalender/bocholter-weihnachtsmarkt-2026`
    - nur übernehmen, wenn konkreter Eventblock mit Titel, Datum, Ort und Besucherfokus belastbar ist
 
+   Ergänzend Bocholt Familien-/Jugend-RECOVERY gezielt prüfen:
+   - `jugendfarm-mitdir.de/*`
+   - `unser-ferienprogramm.de/bocholt/*`
+   - `kinderschutzbund-bocholt.de/*`
+   - `juboh.de/*`
+   - `bocholt.de/*kulturrucksack*`
+   - `bocholt.de/*stadtbibliothek*`
+   - `jusina.de/*`
+   - `cafe-karton.de/*`
+   - `fabi-bocholt.de/*` nur für öffentliche Sondertermine, nicht als Kurs-Komplettquelle
+   - nur starke öffentliche Einzeltermine übernehmen; keine Öffnungszeiten, Schließtage, Betreuungswochen, ausgebuchten Ferienangebote ohne offenen Besuchsanlass, internen Gruppentermine oder normalen Kursreihen
+
 3. Rhede CORE-MID:
    - `rhede.de/regional/veranstaltungen/detail-*`
    - starke öffentliche Stadt-/Kultur-/Innenstadttermine
@@ -934,6 +948,7 @@ CANDIDATE_OUTPUT_FIELDS = [
     "source_name",
     "source_url",
     "notes",
+    "visual_key",
 ]
 
 
@@ -1045,6 +1060,13 @@ def normalize_candidate(item: Dict[str, Any]) -> Dict[str, str]:
 
     if not out.get("notes"):
         out["notes"] = "manual chat search v3"
+
+    out["visual_key"] = normalize_event_visual_key(out.get("visual_key", "")) or infer_event_visual_key(
+        title=out.get("title", ""),
+        description=out.get("description", ""),
+        category=out.get("kategorie_suggestion", ""),
+        location=out.get("location", ""),
+    )
 
     return {field: out.get(field, "") for field in CANDIDATE_OUTPUT_FIELDS}
 

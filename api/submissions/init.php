@@ -257,40 +257,27 @@ function pf_send_submission_received_mail(array $submissionData): void
         return;
     }
 
-    /* === BEGIN BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 | Zweck: unterscheidet Eingangsbestätigung für Einzeltermin und Aktivitaetspraesenz; Umfang: ersetzt Mail-Body und Betreff in pf_send_submission_received_mail === */
-    $title = trim((string)($submissionData['title'] ?? ''));
-    $reference = trim((string)($submissionData['payment_reference_key'] ?? ''));
+    /* === BEGIN BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_TOPIC_V1 | Zweck: nutzt zentrale Mail-Topics fuer Einzeltermin- und Aktivitaets-Eingangsbestaetigungen; Umfang: ersetzt lokale Betreff-/Text-/HTML-Erzeugung in pf_send_submission_received_mail === */
     $isActivity = trim((string)($submissionData['submission_kind'] ?? 'event')) === 'activity';
 
-    $body = implode("\n", [
-        'Hallo,',
-        '',
-        $isActivity
-            ? 'deine Aktivität wurde bei Bocholt erleben zur Prüfung eingereicht.'
-            : 'deine Veranstaltung wurde bei Bocholt erleben zur Prüfung eingereicht.',
-        '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
-        '',
-        $isActivity
-            ? 'Wir prüfen jetzt, ob die Aktivität grundsätzlich zu Bocholt erleben passt und als eigene Aktivitätskarte sinnvoll ist.'
-            : 'Wir prüfen jetzt, ob der Termin grundsätzlich zu Bocholt erleben passt.',
-        $isActivity
-            ? 'Wenn die Aktivität grundsätzlich passt, erhältst du anschließend einen Zahlungslink für die Aktivitätspräsenz.'
-            : 'Wenn die Veranstaltung grundsätzlich passt, erhältst du anschließend einen Zahlungslink für den Einzeltermin.',
-        'Die Zahlung bedeutet noch keine automatische Veröffentlichung. Die Veröffentlichung erfolgt erst nach redaktioneller Freigabe.',
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ]);
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'submission_received_activity' : 'submission_received_event',
+        [
+            'title' => trim((string)($submissionData['title'] ?? '')),
+            'reference' => trim((string)($submissionData['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submissionData['contact_name'] ?? '')),
+        ]
+    );
 
     try {
         be_send_mail(
             $to,
-            $isActivity ? 'Deine Aktivität wurde zur Prüfung eingereicht' : 'Deine Veranstaltung wurde zur Prüfung eingereicht',
-            $body
+            $mail['subject'],
+            $mail['text_body'],
+            $mail['to_name'],
+            $mail['html_body']
         );
-    /* === END BLOCK: ACTIVITY_PRESENCE_RECEIVED_MAIL_COPY_V1 === */
+    /* === END BLOCK: MAIL_SYSTEM_RECEIVED_MAIL_TOPIC_V1 === */
     } catch (Throwable $error) {
         error_log('Submission received mail failed: ' . $error->getMessage());
     }
@@ -327,6 +314,211 @@ function pf_insert_organizer(PDO $pdo, string $organizationName, ?string $contac
     /* === END FUNCTION: pf_insert_organizer === */
 }
 
+/* === BEGIN BLOCK: ACTIVITY_OPENING_SUBMISSION_V1 | Zweck: validiert strukturierte Oeffnungszeiten fuer Aktivitaetspraesenzen; Umfang: additive Helfer fuer activity_opening_json ohne bestehende Event-/Zahlungslogik zu veraendern === */
+function pf_normalize_activity_opening_time(string $value, string $label): string
+{
+    $normalized = trim($value);
+    if (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $normalized)) {
+        throw new InvalidArgumentException($label . ' muss im Format HH:MM angegeben werden.');
+    }
+
+    return $normalized;
+}
+
+function pf_normalize_activity_opening_weekly($weekly): ?array
+{
+    if ($weekly === null || $weekly === '') {
+        return null;
+    }
+
+    if (!is_array($weekly)) {
+        throw new InvalidArgumentException('Regelmäßige Öffnungszeiten müssen als Wochenstruktur übergeben werden.');
+    }
+
+    $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    $normalized = [];
+
+    foreach ($days as $day) {
+        $intervals = $weekly[$day] ?? [];
+        if ($intervals === null || $intervals === '') {
+            $intervals = [];
+        }
+
+        if (!is_array($intervals)) {
+            throw new InvalidArgumentException('Öffnungszeiten für ' . $day . ' müssen als Liste übergeben werden.');
+        }
+
+        $normalized[$day] = [];
+        foreach ($intervals as $interval) {
+            if (!is_array($interval) || count($interval) < 2) {
+                throw new InvalidArgumentException('Jedes Öffnungszeitfenster braucht Start- und Endzeit.');
+            }
+
+            $start = pf_normalize_activity_opening_time((string)$interval[0], 'Startzeit');
+            $end = pf_normalize_activity_opening_time((string)$interval[1], 'Endzeit');
+
+            if ($start >= $end) {
+                throw new InvalidArgumentException('Die Endzeit muss nach der Startzeit liegen.');
+            }
+
+            $normalized[$day][] = [$start, $end];
+        }
+    }
+
+    return $normalized;
+}
+
+function pf_activity_opening_json_from_input($value, string $submissionKind): ?string
+{
+    if ($submissionKind !== 'activity' || $value === null || $value === '') {
+        return null;
+    }
+
+    if (!is_array($value)) {
+        throw new InvalidArgumentException('Die Öffnungslogik der Aktivität muss strukturiert übergeben werden.');
+    }
+
+    $accessType = trim((string)($value['access_type'] ?? ''));
+    $allowedAccessTypes = ['free_access', 'opening_hours', 'seasonal', 'appointment', 'check_required'];
+
+    if (!in_array($accessType, $allowedAccessTypes, true)) {
+        throw new InvalidArgumentException('Bitte wähle eine gültige Zugänglichkeit für die Aktivität aus.');
+    }
+
+    $holidayPolicy = trim((string)($value['holiday_policy'] ?? 'check'));
+    $allowedHolidayPolicies = ['open_as_usual', 'closed', 'check'];
+
+    if (!in_array($holidayPolicy, $allowedHolidayPolicies, true)) {
+        $holidayPolicy = 'check';
+    }
+
+    $payload = [
+        'access_type' => $accessType,
+        'holiday_policy' => $holidayPolicy,
+    ];
+
+    $weekly = pf_normalize_activity_opening_weekly($value['weekly'] ?? null);
+    if ($weekly !== null) {
+        $payload['weekly'] = $weekly;
+    }
+
+    $notes = pf_nullable_string($value['notes'] ?? null);
+    if ($notes !== null) {
+        $payload['notes'] = $notes;
+    }
+
+    $sourceUrl = pf_nullable_string($value['source_url'] ?? null);
+    if ($sourceUrl !== null) {
+        if (!filter_var($sourceUrl, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException('Die Quelle für Öffnungszeiten muss eine gültige URL sein.');
+        }
+
+        $payload['source_url'] = $sourceUrl;
+    }
+
+    $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded) || $encoded === '') {
+        throw new RuntimeException('Öffnungszeiten konnten nicht gespeichert werden.');
+    }
+
+    if (strlen($encoded) > 12000) {
+        throw new InvalidArgumentException('Die Angaben zu den Öffnungszeiten sind zu lang.');
+    }
+
+    return $encoded;
+}
+/* === END BLOCK: ACTIVITY_OPENING_SUBMISSION_V1 === */
+
+/* === BEGIN BLOCK: ACTIVITY_IMAGE_MATERIAL_SUBMISSION_V1 | Zweck: validiert optionale Bildmaterial-Angaben fuer Aktivitaetspraesenzen ohne Datei-Upload; Umfang: additive JSON-Normalisierung fuer submissions.activity_image_json === */
+function pf_validate_activity_image_url(?string $url): ?string
+{
+    if ($url === null) {
+        return null;
+    }
+
+    if (strlen($url) > 2048 || !filter_var($url, FILTER_VALIDATE_URL)) {
+        throw new InvalidArgumentException('Der Link zum Bildmaterial muss eine gültige URL sein.');
+    }
+
+    return $url;
+}
+
+function pf_activity_image_json_from_input($value, string $submissionKind): ?string
+{
+    if ($submissionKind !== 'activity') {
+        return null;
+    }
+
+    if (!is_array($value)) {
+        throw new InvalidArgumentException('Bitte gib an, ob Bildmaterial zur Aktivität vorhanden ist.');
+    }
+
+    $availability = trim((string)($value['availability'] ?? ''));
+    $allowedAvailability = ['yes', 'no', 'unsure'];
+    if (!in_array($availability, $allowedAvailability, true)) {
+        throw new InvalidArgumentException('Bitte gib an, ob Bildmaterial zur Aktivität vorhanden ist.');
+    }
+
+    $payload = [
+        'availability' => $availability,
+        'rights_confirmed' => pf_boolish_to_int($value['rights_confirmed'] ?? null) === 1,
+    ];
+
+    if ($availability === 'yes') {
+        $method = trim((string)($value['method'] ?? ''));
+        $allowedMethods = ['download_link', 'website_gallery', 'email_later', 'other'];
+        if (!in_array($method, $allowedMethods, true)) {
+            throw new InvalidArgumentException('Bitte wähle aus, wie das Bildmaterial bereitgestellt wird.');
+        }
+
+        if ($payload['rights_confirmed'] !== true) {
+            throw new InvalidArgumentException('Bitte bestätige die Bildrechte für das bereitgestellte Bildmaterial.');
+        }
+
+        $payload['method'] = $method;
+
+        $imageUrl = pf_validate_activity_image_url(pf_nullable_string($value['url'] ?? null));
+        if (in_array($method, ['download_link', 'website_gallery'], true) && $imageUrl === null) {
+            throw new InvalidArgumentException('Bitte trage den Link zum Bildmaterial ein.');
+        }
+
+        if ($imageUrl !== null) {
+            $payload['url'] = $imageUrl;
+        }
+
+        $notes = pf_nullable_string($value['notes'] ?? null);
+        if ($method === 'other' && $notes === null) {
+            throw new InvalidArgumentException('Bitte ergänze einen kurzen Hinweis zum Bildmaterial.');
+        }
+
+        if ($notes !== null) {
+            if (strlen($notes) > 2000) {
+                throw new InvalidArgumentException('Der Hinweis zum Bildmaterial ist zu lang.');
+            }
+
+            $payload['notes'] = $notes;
+        }
+    }
+
+    $payload['review_status'] = match ($availability) {
+        'yes' => 'customer_material_available',
+        'no' => 'editorial_image_needed',
+        default => 'image_clarification_needed',
+    };
+
+    $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded) || $encoded === '') {
+        throw new RuntimeException('Bildmaterial-Angaben konnten nicht gespeichert werden.');
+    }
+
+    if (strlen($encoded) > 6000) {
+        throw new InvalidArgumentException('Die Angaben zum Bildmaterial sind zu lang.');
+    }
+
+    return $encoded;
+}
+/* === END BLOCK: ACTIVITY_IMAGE_MATERIAL_SUBMISSION_V1 === */
+
 try {
     /* === BEGIN BLOCK: PUBLISH_SUBMISSION_INIT_IDENTITY_GUARD_V2 | Zweck: verhindert Veranstalter-Overwrite und erzwingt unveraenderbare Abo-Reuse-Daten serverseitig; Umfang: kompletter try-Hauptblock bis vor Error-Handling === */
     $input = pf_read_json_body();
@@ -359,6 +551,8 @@ try {
     $ticketUrl = pf_nullable_string($input['ticket_url'] ?? null);
     $descriptionText = pf_nullable_string($input['description_text'] ?? null);
     $notesText = pf_nullable_string($input['notes_text'] ?? null);
+    $activityOpeningJson = pf_activity_opening_json_from_input($input['activity_opening'] ?? null, $submissionKind);
+    $activityImageJson = pf_activity_image_json_from_input($input['activity_image'] ?? null, $submissionKind);
 
     /* === BEGIN BLOCK: ACTIVITY_PRESENCE_INPUT_VALIDATION_V1 | Zweck: trennt Event-Pflichtlogik von Aktivitaetspraesenz-Pflichtlogik und setzt passenden Startstatus; Umfang: ersetzt Validierung, paymentKind/intakeOrigin und paymentReferenceKey-Zuweisung === */
     if ($submissionKind === 'activity') {
@@ -479,7 +673,9 @@ try {
             location_public_confirmed,
             ticket_url,
             description_text,
-            notes_text
+            notes_text,
+            activity_opening_json,
+            activity_image_json
         ) VALUES (
             :organizer_id,
             :submission_kind,
@@ -500,7 +696,9 @@ try {
             :location_public_confirmed,
             :ticket_url,
             :description_text,
-            :notes_text
+            :notes_text,
+            :activity_opening_json,
+            :activity_image_json
         )'
     );
 
@@ -525,6 +723,8 @@ try {
         ':ticket_url' => $ticketUrl,
         ':description_text' => $descriptionText,
         ':notes_text' => $notesText,
+        ':activity_opening_json' => $activityOpeningJson,
+        ':activity_image_json' => $activityImageJson,
     ]);
 
     $submissionId = (int)$pdo->lastInsertId();
@@ -537,6 +737,7 @@ try {
             'title' => $title,
             'payment_reference_key' => $paymentReferenceKey,
             'submission_kind' => $submissionKind,
+            'contact_name' => $contactName,
         ]);
     }
 

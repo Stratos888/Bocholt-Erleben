@@ -25,6 +25,7 @@
 
 const App = {
     events: [],
+    eventVisualPool: null,
 
     /**
      * App starten
@@ -137,15 +138,21 @@ Umfang: Ersetzt nur diesen Loading-Start-Block.
                 return out;
             };
 
-            const [sheetPayload, approvedSubmissionPayload] = await Promise.all([
+            const [sheetPayload, approvedSubmissionPayload, eventVisualPoolPayload] = await Promise.all([
                 fetchJsonNoStore("/data/events.json", true),
-                fetchJsonNoStore("/api/events/public.php", false)
+                fetchJsonNoStore("/api/events/public.php", false),
+                fetchJsonNoStore("/data/event_visual_pool.json", false)
             ]);
 
             const sheetEvents = extractEvents(sheetPayload).map(normalizeEvent);
             const approvedSubmissionEvents = extractEvents(approvedSubmissionPayload).map(normalizeEvent);
 
             this.events = dedupeMergedEvents([...sheetEvents, ...approvedSubmissionEvents]);
+            this.eventVisualPool = eventVisualPoolPayload;
+
+            if (typeof EventCards !== "undefined" && typeof EventCards.setVisualPools === "function") {
+                EventCards.setVisualPools(eventVisualPoolPayload);
+            }
             /* === END BLOCK: EVENTS_FETCH_MERGE_STATIC_AND_APPROVED_SUBMISSIONS_V1 === */
 
 

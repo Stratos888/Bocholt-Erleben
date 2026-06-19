@@ -18,6 +18,85 @@ Kanonische Rollen:
 
 ---
 
+<!-- === BEGIN BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 | Zweck: konsolidiert den aktuellen taktischen Fokus nach ZIP-Pruefung; Umfang: naechste Reihenfolge, erledigte Workstreams, bewusste Nicht-Ziele === -->
+## Aktuelle taktische Priorität – Stand 2026-06-09
+
+Dieser Block überschreibt ältere "nächster Workpack"-Formulierungen weiter unten, wenn sie dem aktuellen Stand widersprechen.
+
+### Nächster operativer Punkt
+
+Manual-KI-Intake / Visual-Key-Handoff nach dem nächsten automatischen Suchlauf auf `main` bewerten.
+
+Zu prüfen:
+
+1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
+2. Das Dropdown für `Inbox.visual_key` enthält die erlaubten Keys aus `data/event_visual_pool.json`.
+3. Ein redaktionell geänderter `visual_key` bleibt beim Übernehmen erhalten.
+4. `Events.visual_key` wird korrekt geschrieben.
+5. Der spätere Build übernimmt den Key in die deployten Eventdaten.
+6. Event-Cards erhalten dadurch automatisch passende Bilder aus dem Event-Visual-Pool.
+
+Wichtig: Eine Chat-Simulation oder ein `staging`-Workflow-Lauf ersetzt diesen Beweis nicht. `staging` darf die echte Google-Sheet-Kette bewusst nicht vollständig ausführen.
+
+### Aktuell gefreezt oder nicht erneut breit öffnen
+
+- Event-Visual-Duplicate-Cleanup: vorerst gefreezt; nur bei konkretem sichtbaren Symptom oder neuem Eventdatenstand öffnen.
+- Event-Card Normal State Polish: bleibt gefreezt.
+- Event-Detailpanel: bleibt gefreezt.
+- Activity-Öffnungsstatus-Massenpflege: abgeschlossen; nur noch gezielte Sonderfälle.
+
+### Getrennter Folge-Workstream
+
+Activity-Premium-Visuals bleiben ein eigener Workstream:
+
+- ein exklusives Premium-Hauptbild pro Activity
+- keine Wiederverwendung aus dem Event-Visual-Pool
+- Anchor-Test zuerst abschließen
+- danach Prompt-Kit / Workflow auf v1.0 einfrieren
+- erst danach systematische Massenproduktion und Repo-Integration
+
+### Dokumentationsregel
+
+Wenn neue Chat-Starts oder ZIP-Stände verwendet werden, zuerst diesen aktuellen Prioritätsblock prüfen. Ältere historische Roadmap-Blöcke bleiben als Kontext erhalten, dürfen aber nicht automatisch als aktive nächste Schritte gelesen werden.
+
+### Nachgelagerter Prozessverbesserungs-Punkt
+
+KI-/Inbox-Prozess nach dem Main-Merge konsolidieren.
+
+Ziel:
+- `data/inbox_manual.json` nicht mehr als persistenten Repo-Puffer für temporäre Event-Kandidaten verwenden.
+- KI-/Manual-Kandidaten direkt oder über ein temporäres GitHub-Run-Artefakt in die Google-Sheet-Inbox überführen.
+- Import-/Cleanup-Rhythmus vereinheitlichen: wöchentlich passend zur KI-Suche plus manuell auslösbar bei Bedarf.
+- Prüfen, ob `duplikat` als finaler Inbox-Status im Cleanup mit archiviert werden soll.
+
+Bewertung:
+- Kein Blocker für den aktuellen Main-Merge, solange `data/inbox_manual.json` leer ist.
+- Separater Prozess-Härtungsworkpack nach Live-Freigabe.
+
+<!-- === END BLOCK: ROADMAP_CURRENT_PRIORITY_2026_06_09 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 | Zweck: schliesst den aktiven Event-Visual-Motiv-Fit-Produktionsblock fuer aktuellen Sheet-Stand; Umfang: Reststatus und naechste Arbeit nur bei neuem Bedarf === -->
+## Event Visual Motif-Fit – aktuelle Sheet-Gaps geschlossen (2026-06-18)
+
+Der aktive Event-Visual-Motiv-Fit-Produktionsblock ist nach Anwendung des finalen Restbatchs fuer den aktuellen Sheet-Stand abgeschlossen.
+
+Ergebnis:
+- Keine offenen `gap_to_produce`-Motive.
+- Keine offenen `candidate_to_integrate`-Motive.
+- Keine offenen `review_rules`-Motive.
+- Der Gap-Backlog ist aus dem aktuellen Sheet-Export leer reproduzierbar.
+
+Wichtig:
+- Das ist kein Auftrag, jede theoretische Visual-Subcategory mit Vorratsbildern zu füllen.
+- `parked_candidate` und `not_needed` bleiben normale Matrix-Zustände und sind kein Produktionsblocker.
+- Event-Visual-Produktion wird erst wieder geöffnet, wenn neuer Sheet-Bedarf, ein neuer Backlog-Eintrag oder eine bewusste strategische Poolentscheidung vorliegt.
+
+Nächste Arbeit nach diesem Block:
+- Nur Deploy-/Sicht-Smoke nach Upload des Pakets prüfen.
+- Danach wieder zum übergeordneten KI-/Inbox-/Main-Merge-Prozess zurückkehren.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_GAPS_CLOSED_2026_06_18 === -->
+
+
 ## Ausgangslage: Live-Messbasis
 
 Stand: 2026-05-26, Live-Dashboard-Screenshot.
@@ -293,6 +372,113 @@ Akzeptanzkriterien:
 
 ---
 
+## P0.5 — Inhaltsqualität, Prüfläufe und kontrolliertes Self-Healing
+
+<!-- === BEGIN BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 | Zweck: nimmt regelmäßige Live-Content-Prüfung, Warnlogik und sichere automatische Korrekturen als späteren Workstream auf; Umfang: Events aus Google Sheet/DB, Activities aus offers.json, Audit-Reports, Auto-Fix-Grenzen === -->
+
+Status 2026-05-31:
+
+- Der generierte Event-Feed `data/events.json` wurde aus dem Repository entfernt.
+- Fachliche Event-Quelle bleibt das Google Sheet; zugelassene Veranstalter-Einreichungen kommen zusätzlich aus der DB/API.
+- `data/events.json` bleibt nur ein generiertes Deploy-/Runtime-Artefakt, weil Frontend, SEO-Schema und Service Worker den Feed zur Laufzeit laden.
+- Dadurch ist die bisherige Repo-Verwirrung durch stale Event-JSON reduziert.
+- Der nächste Qualitätsbedarf liegt nicht bei weiterer Discovery allein, sondern bei regelmäßiger Prüfung bereits live sichtbarer Inhalte.
+
+Ziel:
+
+- Live sichtbare Events und Aktivitäten werden regelmäßig auf technische und fachliche Auffälligkeiten geprüft.
+- Der Prüflauf unterscheidet klar zwischen sicher automatisch korrigierbaren Fällen und Fällen, die eine Warnung bzw. redaktionelle Prüfung brauchen.
+- Automatische Korrekturen dürfen nur erfolgen, wenn die Änderung deterministisch belegbar und regressionsarm ist.
+
+Warum:
+
+- Bocholt erleben lebt vom Vertrauen in korrekte lokale Informationen.
+- Neue Inhalte allein reichen nicht, wenn bestehende Events, Aktivitäten, Links, Bilder oder Quellinformationen veralten.
+- Manuelle Vollkontrolle aller Live-Inhalte ist langfristig nicht realistisch.
+- Blinde Auto-Korrekturen wären aber riskanter als ein fehlender Prüflauf.
+
+Scope für den späteren Workstream:
+
+- Events aus dem live generierten Sheet-Feed.
+- Genehmigte öffentliche DB-Events aus `/api/events/public.php`.
+- Aktivitäten aus `data/offers.json`.
+- Quellen-URLs, Event-URLs, Website-Links, Maps-Ziele und Bild-URLs.
+- Prüfbericht für interne Nutzung.
+- Optional später: Audit-Status im internen Dashboard.
+
+Nicht im Scope der ersten Umsetzung:
+
+- Kein automatisches Umschreiben freier Beschreibungstexte.
+- Kein automatisches Löschen von Events nur wegen temporär nicht erreichbarer Quelle.
+- Kein blindes Überschreiben des Google Sheets durch unsichere KI-Auswertung.
+- Kein Anbieterbericht oder öffentliche Qualitätsanzeige.
+
+Empfohlener Prüfrhythmus:
+
+- Events, leichtgewichtig: täglich, Fokus auf die nächsten 14 Tage.
+- Events, tiefer Quellencheck: wöchentlich für den relevanten Zukunftsbestand.
+- Aktivitäten, technischer Check: wöchentlich.
+- Aktivitäten, tiefer Plausibilitäts-/Quellencheck: monatlich.
+
+Sichere Auto-Fix-Kandidaten ohne KI:
+
+- abgelaufene Events nicht mehr ausspielen bzw. beim Feed-Build ausschließen.
+- kaputte Bild-URLs durch vorhandene Fallback-Logik abfangen.
+- fehlende Pflichtfelder blockieren oder in Review markieren.
+- harte Duplikate nach stabiler ID oder eindeutigem Schlüssel unterdrücken.
+- permanente Redirects protokollieren und später kontrolliert übernehmen.
+- strukturierte Quelldaten übernehmen, wenn JSON-LD, ICS oder API-Daten eindeutig demselben Event zugeordnet werden können.
+
+Nicht sicher ohne KI oder spezialisierten Quellenparser:
+
+- geänderte Uhrzeiten aus freiem Website-Text erkennen.
+- verschobene oder abgesagte Events sicher interpretieren.
+- subtile Ortsänderungen erkennen.
+- mehrere Events auf einer Sammelseite korrekt zuordnen.
+- veraltete Activity-Beschreibungen semantisch bewerten.
+
+Benachrichtigungs- und Reaktionslogik:
+
+- `auto_fixed`: keine Sofortwarnung; Aufnahme in Tages-/Wochenprotokoll.
+- `warning`: im internen Dashboard oder Audit-Report sichtbar machen.
+- `review_needed`: interne Warnung erzeugen; nicht automatisch öffentlich ändern.
+- `critical`: Push/E-Mail oder deutlich sichtbarer interner Hinweis.
+- `source_unreachable`: protokollieren; erst nach Wiederholung oder besonderer Kritikalität eskalieren.
+
+Mögliche technische Bausteine:
+
+- neuer Workflow `content-quality-audit.yml`.
+- neues Script `scripts/content-quality-audit.py` für harte technische Checks.
+- später optional `scripts/content-source-audit.py` für Quellenvergleich.
+- Ergebnisdatei oder Sheet-Tab `Content_Audit`.
+- Google-Sheets-Schreibrechte nur für einen eng begrenzten späteren Auto-Fix-Workflow, nicht für den normalen Deploy.
+
+Akzeptanzkriterien für Phase 1:
+
+- Der Audit läuft unabhängig vom normalen Deploy.
+- Der Audit prüft den echten Live-/Runtime-Bestand, nicht eine stale Repo-Kopie.
+- Der Audit erzeugt einen verständlichen Bericht mit Severity, betroffener Quelle und empfohlener Aktion.
+- Harte technische Fehler sind klar von fachlichen Unsicherheiten getrennt.
+- Kein unsicherer Befund verändert automatisch öffentliche Inhalte.
+
+Akzeptanzkriterien für spätere Auto-Fix-Phase:
+
+- Jede Auto-Korrektur ist nachvollziehbar protokolliert.
+- Auto-Fixes sind auf deterministische Fälle begrenzt.
+- Für Google-Sheet-Änderungen gibt es Schreibschutzlogik, Audit-Log und möglichst eine Rücknahmeoption.
+- KI darf nur als Assistenz für semantische Prüfung eingesetzt werden, nicht als alleiniger Grund für blindes Überschreiben.
+- Bei widersprüchlichen Quellen gewinnt nicht automatisch die externe Quelle; der Fall geht in Review.
+
+Prioritätseinordnung:
+
+- Nicht vor den aktuell laufenden Messwert-/Akquise-Wartepunkten erzwingen.
+- Sinnvoller Anschluss nach stabiler Nutzwertmessung und bevor größere Content-Mengen weiter ausgebaut werden.
+- Phase 1 kann klein und technisch beginnen, ohne die Produktoberfläche zu verändern.
+
+<!-- === END BLOCK: ROADMAP_CONTENT_QUALITY_SELF_HEALING_V1_2026_05_31 === -->
+
+---
+
 ## P1 — Veranstalter-Nutzwert sichtbar machen
 
 ### 6. Anbieterbereich vom Verwaltungsbereich zum Wertzentrum ausbauen
@@ -317,6 +503,37 @@ Akzeptanzkriterien:
 
 ### 7. Veranstalter-Funnel stärker auf belegbaren Mehrwert ausrichten
 
+<!-- === BEGIN BLOCK: ROADMAP_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert die Umsetzung des P1-Punkts zur stärkeren Mehrwert-Erklärung im Veranstalter-/Anbieter-Funnel; Umfang: zentrale Erklärseite, Kontextlinks, Redundanz- und Funnel-Abgrenzung === -->
+
+Status 2026-05-29:
+
+- Umgesetzt und auf Staging geprüft.
+- Neue zentrale Erklärseite: `/veroeffentlichung-erklaert/`.
+- Bestehende Funnel-Seiten bleiben kurz und handlungsorientiert:
+  - `/events-veroeffentlichen/`
+  - `/fuer-veranstalter/`
+  - `/angebote/sichtbar-werden/`
+- Die bestehenden Seiten wurden nur minimal-invasiv um kontextuelle Hilfelinks ergänzt.
+- Die neue Erklärseite bündelt:
+  - Veröffentlichungswege
+  - Prüfung und Freigabe
+  - Zahlung und veröffentlichte Termine
+  - Veranstaltung vs. Aktivitätspräsenz
+  - Fairness ohne gekaufte Hervorhebung
+  - vorsichtige Einordnung messbarer Interaktionen
+- Ankerziele, FAQ-Öffnung, Scroll-Offset und Link-Hierarchie wurden nach Staging-Prüfung nachgeschärft.
+- Ergebnis: Workpack ist für den aktuellen Spitzenstand gefreezt.
+- Details und getestete Grenzen sind in `TEST_STATUS.md` dokumentiert.
+
+Bewertung:
+
+- P1 Punkt 7 ist für den aktuellen Stand erledigt.
+- Kein weiterer Copy-/UI-Ausbau an den Funnel-Seiten nötig.
+- Keine Formular-, Checkout-, Stripe-, Review- oder Dashboard-Logik wurde verändert.
+- Nächster fachlicher Anschluss bleibt der messbare Nutzennachweis über Bericht/Reporting, nicht weiterer Erklärtext.
+
+<!-- === END BLOCK: ROADMAP_PUBLISH_EXPLAINER_FREEZE_2026_05_29 === -->
+
 Ziel:
 
 - `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/angebote/sichtbar-werden/` erklären klarer, welchen konkreten Nutzen Anbieter bekommen.
@@ -333,38 +550,1074 @@ Akzeptanzkriterien:
 
 ### 8. Monatlichen Wertbericht vorbereiten
 
-Ziel:
+<!-- === BEGIN BLOCK: ROADMAP_MONTHLY_VALUE_REPORT_PREPARED_2026_05_29 | Zweck: korrigiert Punkt 8 als vorbereiteten Reporting-/Retention-Baustein; Umfang: Status, Wartepunkt, Abgrenzung zur späteren Automatisierung === -->
 
-- regelmäßiger Bericht pro Anbieter/Location.
+Status 2026-05-29:
 
-Warum:
+- Punkt 8 ist in der aktuell sinnvollen Form vorbereitet und kein aktiver Bau-Block mehr.
+- Der interne `Location-Feedbackbericht` ist im SEO-/Mehrwert-Dashboard `/intern/seo-dashboard/` eingebaut und auf Staging geprüft.
+- Der Bericht ist screenshot- und gesprächsfähig für interne Akquise-/Proof-Vorbereitung.
+- Belastbare Anbieter-/Location-Aussagen brauchen weiter echte organische Daten über einen längeren Zeitraum.
 
-- Retention entsteht nicht nur durch Veröffentlichung, sondern durch wiederholten Nutzennachweis.
+Wartepunkt:
 
-Akzeptanzkriterien:
+- Kurzcheck nach ca. 7 Tagen: prüfen, ob erste echte Zielsignale plausibel einlaufen.
+- Hauptcheck nach ca. 30 Tagen bzw. nach einem vollständigen 28-Tage-Zeitraum: prüfen, ob ein erster Akquise-/Feedbackbericht belastbar ist.
 
-- Bericht kann zunächst manuell oder halbautomatisch erzeugt werden.
-- Automatisierung erst nach stabilem Datenmodell.
+Nicht jetzt bauen:
+
+- keine automatische Monatsmail
+- kein PDF-/Export-System
+- kein neuer Anbieter-Self-Service-Bericht
+- keine neue Datenbanktabelle nur für Reporting
+
+Nächster aktiver Anschluss:
+
+- Da Punkt 8 vorbereitet ist und die Datenbasis nun laufen muss, ist der nächste aktive Produkt-Workpack Punkt 9: `Heute in Bocholt` als Discovery-Einstieg.
+
+<!-- === END BLOCK: ROADMAP_MONTHLY_VALUE_REPORT_PREPARED_2026_05_29 === -->
 
 ---
 
 ## P2 — Nutzerprodukt weiter Richtung Discovery-Portal ausbauen
 
-### 9. `Heute in Bocholt` als eigener Discovery-Workpack
+### 9. `Für dich in Bocholt` – intelligente Premium-Home
+
+<!-- === BEGIN BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 | Zweck: ersetzt den einfachen Heute-/Discovery-Workpack durch einen Premium-Produktvertrag für eine intelligente Startseite; Umfang: Home-Architektur, Empfehlungsmodell, lokale Personalisierung, Wetter, Datenvorbereitung, Abgrenzungen === -->
+
+Status 2026-05-29:
+
+- Der bisherige Ansatz `Heute in Bocholt` als reiner Discovery-/Filter-Workpack ist zu klein und teilweise redundant zum bestehenden Eventfeed.
+- Die aktuelle mobile Eventansicht enthält bereits Suche, Zeitfilter, Kategorien sowie Gruppen wie `Heute` und `Dieses Wochenende`.
+- Ein zusätzlicher Heute-/Wochenende-Block wäre daher kein Premium-Mehrwert.
+- Der neue Zielzustand ist eine echte intelligente Home: `Für dich in Bocholt`.
+
+Produktentscheidung:
+
+- `/` wird perspektivisch zur kompakten Entscheidungsseite `Für dich in Bocholt`.
+- Die bestehende Eventlogik bleibt als eigene Such-/Durchblätterseite erhalten.
+- Die bestehende Aktivitätenseite bleibt als eigene Such-/Durchblätterseite erhalten.
+- Die Home beantwortet nicht primär `Welche Termine gibt es?`, sondern `Was passt heute oder am Wochenende für mich in Bocholt?`
+
+Zielbild:
+
+- Die Startseite kombiniert Events und Aktivitäten in einem gemeinsamen Empfehlungsfeed.
+- Nutzer erhalten schnell konkrete Vorschläge für:
+  - heute
+  - heute Abend
+  - Wochenende
+  - Familie / mit Kindern
+  - draußen
+  - bei Regen
+  - spontan
+- Die ersten sichtbaren mobilen Karten sind die wichtigste Produktfläche.
+- Es wird keine große zusätzliche Modulfläche oberhalb der Inhalte aufgebaut.
+- Die Home soll wie ein lokaler Entscheidungsassistent wirken, nicht wie ein weiterer Kalender.
+
+Neue Seitenrollen:
+
+- `/` = `Für dich in Bocholt`: kompakter Empfehlungsfeed aus Events + Aktivitäten.
+- Eventseite = vollständige Termin-Suche, Filterung und chronologisches Stöbern.
+- Aktivitätenseite = dauerhafte Orte, Ideen und Ausflugsziele suchen und filtern.
+- Veranstalterbereiche bleiben getrennte Anbieterpfade.
+
+Bottom-Navigation-Ziel:
+
+- `Für dich`
+- `Events`
+- `Aktivitäten`
+
+Explizit im Scope:
+
+- neue Home-Logik als Premium-Entscheidungsfeed
+- Events und Aktivitäten gemeinsam normalisieren
+- lokales Interessenprofil ohne Account
+- Merken-Funktion
+- Ausblenden-/`Nicht interessant`-Funktion
+- Wetterkontext für Bocholt
+- Rankinglogik für Empfehlungen
+- kompakte Mobile-UI
+- Entscheidungssignale auf Karten
+- Activity-Fallback, wenn Events dünn sind
+- bestehende Event- und Aktivitätenseiten als Suchseiten erhalten
+
+Explizit nicht im Scope:
+
+- Nutzerkonto
+- Sync zwischen Geräten
+- Mittagstisch
+- Push-Personalisierung
+- komplexe KI-Empfehlungen
+- Geolocation des Nutzers
+- Preis-/Kostenfilter ohne belastbare strukturierte Daten
+- automatische Anbieterberichte
+- Wetterempfehlungen ohne passende Content-Tags
+
+Architekturprinzip:
+
+- Nicht die bestehende Eventseite weiter aufblasen.
+- Stattdessen eine eigene Recommendation-Schicht bauen, die Events, Aktivitäten, Wetter und lokale Präferenzen zusammenführt.
+- Bestehende Seiten bleiben möglichst stabil und werden nicht unnötig regressionsgefährdet.
+- Premium bedeutet hier: ein konsistentes System, nicht mehrere isolierte Zusatzblöcke.
+
+Benötigte technische Bausteine:
+
+- `recommendations.js`
+  - normalisiert Events und Aktivitäten
+  - berechnet Scores
+  - mischt Content
+  - erzeugt Begründungslabels
+  - berücksichtigt lokale Präferenzen
+  - berücksichtigt Wetterkontext
+
+- `user-preferences.js`
+  - speichert Interessen lokal
+  - speichert gemerkte Inhalte
+  - speichert ausgeblendete Inhalte
+  - speichert zuletzt gewählten Modus
+  - kein Account, kein Sync
+
+- `weather-context.js`
+  - lädt oder hält Wetterkontext für Bocholt
+  - bildet einfache Wetterklassen
+  - liefert sicheren Fallback `unknown`
+
+- neue Home-Renderlogik
+  - rendert `Für dich in Bocholt`
+  - rendert Modus-Auswahl
+  - rendert gemischte Empfehlungskarten
+  - verlinkt sauber zu Events und Aktivitäten
+
+Lokales Profil ohne Account:
+
+- Speicherung bevorzugt lokal im Browser.
+- `localStorage` reicht für einfache Einstellungen.
+- `IndexedDB` ist möglich, falls Merkliste/Ausblendungen größer oder strukturierter werden.
+- Keine klassische Cookie-Logik als primärer Personalisierungsspeicher.
+- Nutzerkonto und Geräte-Sync bleiben bewusst späterer Scope.
+
+Lokale Profildaten:
+
+- Interessen:
+  - Familie
+  - Draußen
+  - Kultur
+  - Musik
+  - Essen & Trinken
+  - Sport & Bewegung
+  - Kurz & spontan
+  - Wochenende
+  - Bei Regen
+
+- Gemerkt:
+  - Event-IDs
+  - Activity-IDs
+
+- Ausgeblendet:
+  - Event-IDs
+  - Activity-IDs
+
+- Nutzungskontext:
+  - letzter Modus
+  - bevorzugte Modi
+  - optional zuletzt geklickte Kategorien
+
+Gemeinsames Empfehlungsmodell:
+
+Events und Aktivitäten müssen intern in ein gemeinsames `RecommendationItem` überführt werden.
+
+Pflichtfelder intern:
+
+- `type`: `event` oder `activity`
+- `id`
+- `title`
+- `description`
+- `category`
+- `location`
+- `url`
+- `mapsTarget`
+- `image`
+- `dateContext`
+- `timeContext`
+- `situationTags`
+- `audienceTags`
+- `weatherProfile`
+- `availability`
+- `costLevel`
+- `planningLevel`
+- `recommendationWeight`
+- `reasonLabels`
+- `score`
+
+Benötigte zusätzliche Event-Daten:
+
+- `situation_tags`
+  - `Mit Kindern`
+  - `Draußen`
+  - `Bei Regen`
+  - `Abend`
+  - `Wochenende`
+  - `Spontan`
+
+- `weather_profile`
+  - `indoor`
+  - `outdoor`
+  - `mixed`
+  - `weather_independent`
+  - `rain_sensitive`
+  - `unknown`
+
+- `audience_tags`
+  - `Familie`
+  - `Erwachsene`
+  - `Kultur`
+  - `Musik`
+  - `Sport`
+  - `Essen & Trinken`
+
+- `planning_level`
+  - `spontan`
+  - `planbar`
+  - `ticket_or_registration_check`
+  - `unknown`
+
+- `cost_level`
+  - `free`
+  - `low`
+  - `paid`
+  - `unknown`
+
+- `recommendation_weight`
+  - `high`
+  - `normal`
+  - `fallback`
+
+Benötigte zusätzliche Activity-Daten:
+
+- `availability`
+  - `always`
+  - `opening_hours_check`
+  - `seasonal`
+  - `weather_dependent`
+
+- `weather_profile`
+  - `indoor`
+  - `outdoor`
+  - `mixed`
+  - `rain_ok`
+  - `rain_bad`
+  - `weather_independent`
+  - `unknown`
+
+- `time_profile`
+  - `morning`
+  - `afternoon`
+  - `evening`
+  - `weekend`
+  - `short_spontaneous`
+
+- `cost_level`
+  - `free`
+  - `low`
+  - `paid`
+  - `unknown`
+
+- `recommendation_weight`
+  - `core`
+  - `normal`
+  - `fallback`
+
+Wetterlogik:
+
+- Wetter wird für Bocholt allgemein verwendet, nicht über Nutzer-Geolocation.
+- Wetter ist ein Rankingfaktor, kein Show-Element.
+- Wetter darf Empfehlungen nur beeinflussen, wenn Inhalte passende Wetterprofile haben.
+- Bei fehlenden Wetterdaten muss der Feed sinnvoll ohne Wetter weiterlaufen.
+
+Einfache Wetterklassen:
+
+- `dry`
+- `rain`
+- `hot`
+- `cold`
+- `windy`
+- `unknown`
+
+Rankinglogik:
+
+Höher bewerten:
+
+- passt zu lokalen Interessen
+- findet heute oder bald statt
+- ist noch nicht vorbei
+- passt zum gewählten Modus
+- passt zum Wetter
+- hat klare Location
+- hat klare Uhrzeit oder klare Verfügbarkeit
+- hat guten CTA
+- ist für Familie/Draußen/Regen sauber getaggt
+- ist gemerkt
+- ergänzt den Feed sinnvoll, wenn Events dünn sind
+
+Niedriger bewerten:
+
+- unklare Daten
+- fast vorbei
+- wetterkritisch bei schlechtem Wetter
+- nicht passend zum Modus
+- zu ähnlich zu vorherigen Karten
+- nur schwach belegte Empfehlungstags
+- Activity mit Öffnungszeiten, wenn Verfügbarkeit ungeprüft ist
+
+Ausschließen:
+
+- ausgeblendete Inhalte
+- vergangene Events
+- Events ohne sinnvolle Mindestdaten
+- Empfehlungen, deren Aussage nur geraten wäre
+
+Content-Bewertung:
+
+- Für eine Premium-Home nur mit Events reicht der Content nicht zuverlässig.
+- Für eine Premium-Home mit Events + Aktivitäten ist die Grundlage vorhanden.
+- Activities sind bereits stark genug als Fallback- und Ergänzungslogik.
+- Events brauchen zusätzliche Empfehlungstags.
+- Activities brauchen schärfere Wetter-, Verfügbarkeits- und Empfehlungsprofile.
+- Mittagstisch wird bewusst später verschoben und gehört nicht zu diesem Workpack.
+
+Wichtigster Daten-Gap:
+
+- Events sind bisher eher kalendarisch beschrieben.
+- Activities sind bereits stärker situations- und merkmalsbasiert beschrieben.
+- Für `Für dich in Bocholt` müssen beide Content-Typen in ein gemeinsames Empfehlungsformat gebracht werden.
+
+Akzeptanzkriterien für den späteren Premium-Workpack:
+
+- `/` ist als `Für dich in Bocholt` erkennbar.
+- Events und Aktivitäten erscheinen in einem gemeinsamen Empfehlungsfeed.
+- Bestehende Event- und Aktivitätenseiten bleiben eigenständig nutzbar.
+- Nutzer kann Interessen lokal setzen.
+- Nutzer kann Inhalte merken.
+- Nutzer kann Inhalte ausblenden.
+- Wetterkontext beeinflusst Empfehlungen nur bei belastbaren Content-Tags.
+- Der Feed funktioniert auch ohne Wetterdaten.
+- Der Feed funktioniert auch ohne gespeicherte Interessen.
+- Der Feed wirkt auf Mobile nicht überladen.
+- Die ersten sichtbaren Karten liefern konkreten Entscheidungswert.
+- Anbieter-CTA verdrängt nicht den ersten Nutzerentscheidungsbereich.
+- Keine falschen Personalisierungsversprechen ohne lokale Signale.
+- Keine Preis-/Kostenversprechen ohne strukturierte Daten.
+- Keine Accountpflicht.
+
+Umsetzungsreihenfolge innerhalb dieses Workpacks:
+
+1. Datenvertrag finalisieren.
+2. Event- und Activity-Datenfelder prüfen und ergänzen.
+3. Recommendation-Normalisierung bauen.
+4. Lokales Profilmodul bauen.
+5. Wetterkontextmodul bauen.
+6. Rankinglogik bauen.
+7. Neue Home rendern.
+8. Bottom-Navigation auf `Für dich | Events | Aktivitäten` ausrichten.
+9. Eventseite als eigene Suchseite absichern.
+10. Aktivitätenseite unverändert als Suchseite absichern.
+11. Mobile- und Desktop-Proof.
+12. Tracking-Proof für Recommendation-Klicks, Merken und Ausblenden.
+
+Freeze-Bedingung:
+
+- Der Workpack gilt erst als abgeschlossen, wenn die neue Home nicht nur anders aussieht, sondern einen klar höheren Nutzwert liefert als der bisherige Eventfeed.
+- Maßstab ist: Nutzer erkennt schneller, was heute oder am Wochenende wirklich passt.
+- Kein Release, wenn die Home nur wie ein umsortierter Kalender wirkt.
+
+<!-- === END BLOCK: ROADMAP_FOR_YOU_BOCHOLT_PREMIUM_HOME_2026_05_29 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 | Zweck: ordnet Today-Home-Abschluss, Premium-Visual-Contract und Events-Feed-Visuals in die richtige Reihenfolge; Umfang: Home, Event-/Activity-Bilder, Feed-Cards, Visual-Audit === -->
+## Nächster Roadmap-Block – Today Home Premium Completion, Visual Contract und Events Feed Visual Integration
+
+Status: historisch / durch spätere Workpacks überholt. Aktuelle Priorität siehe `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
+
+### 1. Today Home Premium Completion – abgeschlossen 2026-06-11
+
+Ziel: Die Home-/Today-Seite soll nicht nur V1-tauglich, sondern vollständig premium-fertig werden.
+
+Bereits erledigt:
+- Today Home als zentraler Einstieg auf `/`.
+- 3 kuratierte Tipps statt langer Liste.
+- Activities als Standardempfehlungen.
+- Events nur bei echter Heute-Relevanz.
+- Keine Zukunftsevents mehr auf Today Home.
+- Eventbilder über `visual_key -> event_visual_pool.json -> ready WebP`.
+- Aktuelle Event-Visual-Coverage auf Staging: 62/62 Events.
+- Premium-Layout-Polish wurde auf Staging umgesetzt.
+- Regionalbezug wurde geklärt: `Heute rund um Bocholt`.
+- Bottom-Tabbar wurde wieder als leichtes Glass-/Floating-Dock ausgerichtet, nicht als schwere opake Maske.
+
+Nicht als Layout-Problem weiterführen:
+- Bildqualität einzelner Activity-Karten.
+- Roh wirkende Teasertexte durch harte Textabbrüche.
+- Schwache oder zufällige Motive in prominenten Karten.
+
+Abschlussstand 2026-06-11:
+- Today Home ist layout- und UI-seitig auf Desktop und Mobile abgeschlossen.
+- Weitere Today/Home-CSS-Arbeit nur noch bei konkretem belegtem Symptom.
+- Schwache oder zu dunkle Activity-Bilder bleiben ein separater Activity-Premium-Visual-Workstream und werden nicht per CSS gerettet.
+
+### 2. Premium Visual Contract V1
+
+Ziel: Bildqualität künftig systematisch lösen, damit Event- und Activity-Karten nicht dauerhaft über manuelle Crop-/Focal-Point-Versuche repariert werden müssen.
+
+Verbindliche Richtung:
+- Card-Bilder werden als geprüfte 16:9-WebP-Card-Assets vorbereitet.
+- Quellenhierarchie: eigene/exklusive Premium-Echtfotos, Veranstalter-/Rechteinhaber-Freigaben, sonstige rechtlich einwandfreie Premium-Fotos, danach selbst erzeugte symbolische KI-Premium-Visuals.
+- KI-Premium-Visuals sind der bevorzugte Standard-Fallback, wenn kein rechtlich einwandfreies und qualitativ starkes Echtfoto verfügbar ist.
+- Externe Bestandsbilder ohne saubere Premium-/Rechteprüfung sind Legacy/Übergang, nicht Zielzustand.
+- Statuslogik für Visuals: `ready`, `usable`, `fallback`, `needs_review`, `blocked`.
+- Prominente Flächen wie Today Home nutzen nur `ready` oder bewusst freigegebene `fallback`-Visuals.
+- Schwache Bilder werden ersetzt, zurückgestuft oder ausgeschlossen.
+- CSS bleibt Rendering-Rahmen, nicht Rettungssystem.
+- Ein späterer interner Visual-Audit soll echte Card-Kontexte zeigen:
+  - Today Mobile
+  - Today Desktop
+  - Events Feed
+  - Activities Feed
+  - später Detail-/Hero-Kontexte
+
+Erste Umsetzungsschritte:
+1. Bestehendes Event-Visual-System gegen diesen Contract prüfen.
+2. Minimalmodell für Activity-Visual-Status festlegen.
+3. Activity AI Visual Pool V1 analog zum Event-Visual-Pool vorbereiten.
+4. Für Activities ohne rechtlich einwandfreies Premium-Echtfoto passende symbolische KI-Premium-Visuals planen/erzeugen.
+5. Today Home darauf vorbereiten, keine `needs_review`/`blocked`-Visuals prominent auszuspielen.
+6. Danach Bild-/Text-Polish für die sichtbaren Today-Karten durchführen.
+
+### 3. Danach: Events Feed Visual Integration
+
+Ziel: Das neue Event-Visual-System soll nicht nur auf Today Home, sondern auch im normalen Events Feed genutzt werden.
+
+Geplanter Zielzustand:
+- Eventkarten auf `/events/` nutzen dieselbe Visual-Contract-Logik wie Today Home:
+  - `visual_key`
+  - `data/event_visual_pool.json`
+  - 16:9-WebP-Card-Assets
+  - nur `status: ready` oder bewusst freigegebene Fallbacks
+  - Fallback auf `default_city`
+- Keine geplanten/non-ready Assets live ausspielen.
+- Kein separater Bildstandard für Today und Events Feed.
+- Mobile- und Desktop-Cards müssen mit Bildern premium wirken.
+- Cropping nicht als Einzelbild-Ratespiel lösen, sondern über vorbereitete Card-Assets und Vorschauprüfung.
+- Event-Detailpanel-Bilder erst danach bewerten; zunächst Fokus auf Feed-Cards.
+
+Priorität:
+1. Visual Contract V1 dokumentiert und technisch vorbereiten.
+2. Today Home Content-/Visual-Polish abgeschlossen; weitere Today/Home-Layoutarbeit nur bei belegtem Symptom.
+3. Events Feed Visual Integration als nächster Hauptworkstream.
+4. Danach ggf. Detailpanel-/Hero-Bildlogik separat entscheiden.
+<!-- === END BLOCK: ROADMAP_TODAY_HOME_PREMIUM_VISUAL_CONTRACT_AND_EVENT_FEED_2026_06_01 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 | Zweck: ordnet die Event-Visual-Arbeit nach Phase-1-Assetintegration; Umfang: Event-Visual-Pool, Bildproduktion, Feed-Duplizierung === -->
+## Event Visuals – Phase-1-Integration und Phase-2-Diversifizierung
+
+Status: historisch / in späteren Workpacks weitergeführt. Event-Visual-Duplicate-Cleanup ist aktuell vorerst gefreezt; aktuelle Priorität siehe `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
+
+### Abgeschlossen / in Commit vorzubereiten
+
+- 24 Phase-1-Pilotbilder wurden als `1200x675`-WebP erzeugt.
+- Die 24 neuen Assets wurden in `data/event_visual_pool.json` auf `ready` gesetzt.
+- Der Event-Visual-Pool hat jetzt 34 `ready`-Assets.
+- `python scripts/audit-event-visual-pool.py` ist ohne Fehler.
+- `python tools/audit-visual-contract.py` ist ohne Fehler.
+- Roh-PNGs wurden entfernt; nur finale WebP-Card-Assets sollen ins Repo.
+
+### Produktlogik
+
+Ein `ready`-Bild pro Visual Key ist nur Grundabdeckung.
+Der Zielzustand ist ein echter Bildpool pro Visual Key bis zum jeweiligen `target_count`.
+
+Grund:
+- Mehrere Events können denselben `visual_key` haben.
+- Zeitlich nahe Events sollen nicht dasselbe Bild erhalten.
+- Der Feed soll redaktionell und hochwertig wirken, nicht repetitiv.
+- Die UI darf nur geprüfte `ready`-Assets nutzen.
+
+### Nächste Roadmap-Schritte
+
+1. Phase-1-Assetintegration committen und pushen.
+2. Phase-2-Bedarf aus `data/event_visual_pool.json` berechnen:
+   - Bedarf je Key = `target_count - ready_count`
+3. Phase-2-Produktionsplan erzeugen.
+4. Varianten key-by-key im Bildchat produzieren:
+   - Pilotbild als Stilanker
+   - keine Near-Duplicates
+   - kleine kontrollierte Variantenrunden
+5. Neue Varianten nach `1200x675`-WebP-Exportprüfung in den Pool integrieren.
+6. Danach Event-Feed-Duplicate-Logik bewerten:
+   - gleiche Bilder im sichtbaren Feed vermeiden
+   - besonders bei zeitlich nahen Events desselben Visual Keys
+
+### Priorisierung
+
+Zuerst ausbauen:
+- Keys mit hohem `target_count`
+- Keys mit erwartbar häufiger Nutzung
+- Keys mit hoher Sichtbarkeit im normalen Event-Feed
+- Keys, die im Sommer-/Saisonbetrieb geclustert auftreten
+
+Nicht zuerst lösen:
+- Detailpanel-/Hero-Bilder
+- Activity-Visuals
+- neue Layout-Polishes
+- Sonderbilder für einzelne Events
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_SUBMOTIFS_2026_06_05 === -->
+## Folgepunkt: Event-Visual-Submotive für generische Visual Keys
+
+Status 2026-06-05:
+
+- Phase-2-Event-Visuals nutzen bei generischen Visual Keys bewusst unterschiedliche Submotive, um monotone Bildpools zu vermeiden.
+- Akuter Anlass: `indoor_sport_competition` darf nicht nur aus Badminton-Motiven bestehen.
+- Akzeptierte Submotive für diesen Key:
+  - bestehendes Motiv: Badminton
+  - `indoor-sport-competition-02`: Handball / Indoor-Teamspiel
+  - `indoor-sport-competition-03`: Volleyball
+- Diese Motive dürfen im generischen Pool bleiben, dürfen später aber nicht beliebig auf sportartspezifische Events gemappt werden.
 
 Ziel:
 
-- Nutzer finden schneller passende Dinge für konkrete Situationen.
-
-Mögliche Einstiege:
-
-- Heute
-- Morgen
-- Wochenende
-- Mit Kindern
-- Draußen
-- Bei Regen
-- kostenlos / günstig
-- Aktivitäten ohne festen Termin
+- Vor finaler Integration der Phase-2-Assets prüfen, ob generische Visual Keys Submotiv- oder Mapping-Hinweise brauchen.
+- Mögliche Feld-/Namenslogik:
+  - `sub_motif`
+  - `sport_type`
+  - `usage_hint`
+  - `mapping_note`
+- Sportartspezifische Events sollen nur dann ein spezifisches Submotiv bekommen, wenn Eventtitel oder Quelle die Sportart eindeutig hergeben.
+- Generische Events ohne konkrete Sportart dürfen weiterhin ein neutrales oder passend breites Indoor-Sport-Motiv nutzen.
 
 Warum:
+
+- Pool-Diversität ist sinnvoll, aber falsche Event-Zuordnung wirkt unprofessionell.
+- Ein Volleyballbild bei einem Handballtermin oder ein Handballbild bei einem Badmintonturnier wäre fachlich falsch.
+- Das Thema betrifft nicht nur Sport, sondern alle generischen Visual Keys mit klar unterscheidbaren Untertypen.
+
+Akzeptanzkriterien:
+
+- Für `indoor_sport_competition` sind Badminton, Handball/Indoor-Teamspiel und Volleyball vor der finalen Pool-Integration unterscheidbar dokumentiert.
+- Die spätere Mapping-/Auswahllogik berücksichtigt Submotive, sobald ein Event eine konkrete Sportart nennt.
+- Der generische Bildpool darf divers bleiben, ohne sportartspezifische Fehlzuordnungen zu erzeugen.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_SUBMOTIFS_2026_06_05 === -->
+
+
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_PHASE1_INTEGRATION_AND_PHASE2_DIVERSIFICATION_2026_06_03 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 | Zweck: definiert naechsten Workpack fuer oeffentliche Oeffnungsstatus-Auswertung; Umfang: bestehende Activities, Today Home, Recommendation-Logik === -->
+## Nächster Workpack: Öffnungsstatus öffentlich auswerten
+
+Status 2026-06-09: historisch / umgesetzt; aktuelle Folgearbeit nur noch gezielt, siehe `ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08` und `ROADMAP_CURRENT_PRIORITY_2026_06_09`.
+
+
+Ausgangslage:
+- Neue Anbieter-Einreichungen können strukturierte Öffnungszeiten liefern.
+- Existing Activities in `data/offers.json` haben noch keinen belastbaren öffentlichen Öffnungsstatus.
+- Today Home kann derzeit noch Activities mit `Öffnungszeiten prüfen` als Top-Tipp zeigen.
+
+Ziel:
+- Öffnungsstatus für bestehende Activities sauber modellieren.
+- Today Home darf keine Top-Tipps vergeben, wenn ein Ort wahrscheinlich geschlossen ist oder der Status unklar ist.
+- Anzeige soll zwischen Anbieterangabe, geprüftem Status und unklarem Status unterscheiden.
+
+Mögliche Zielbausteine:
+- `data/activity_opening_hours.json` oder kontrollierte Erweiterung von `data/offers.json`.
+- `js/opening-status.js` als zentraler Auswertungsowner.
+- Anbindung in `js/recommendations.js` und `js/today-home.js`.
+- NRW-Feiertage, Wochenzeiten und Sonderfälle berücksichtigen.
+
+Start im nächsten Chat:
+1. Aktuelle Baseline prüfen.
+2. `data/offers.json`, `js/today-home.js`, `js/recommendations.js` analysieren.
+3. Entscheiden, ob Öffnungszeiten separat oder direkt in Activity-Daten modelliert werden.
+4. Erst danach kleiner, owner-klarer Patch.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_PUBLIC_STATUS_NEXT_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 | Zweck: definiert nächsten Workpack nach zentraler Öffnungsstatus-Logik; Umfang: Datenanreicherung bestehender Activities, holiday_policy, geprüfte Öffnungszeiten === -->
+## Nächster Workpack: Öffnungsstatus-Daten für Activities anreichern
+
+Status 2026-06-09: historisch / durch späteren 44-von-44-Activity-Stand überholt; keine erneute breite Massenpflege starten.
+
+
+### Ausgangslage
+
+- Die technische Öffnungsstatus-Logik ist zentralisiert.
+- Today Home vergibt keine Top-Tipps mehr für `availability = opening_hours_check`.
+- `data/offers.json` enthält aktuell:
+  - 44 Activities
+  - 22 `always`
+  - 13 `seasonal`
+  - 9 `opening_hours_check`
+  - 44 ohne `holiday_policy`
+
+### Ziel
+
+Die wichtigsten bestehenden Activities sollen belastbarere öffentliche Öffnungsstatus-Daten bekommen, damit Empfehlungen nicht nur heuristisch, sondern fachlich besser abgesichert werden.
+
+### Reihenfolge
+
+1. Nur die 9 `opening_hours_check`-Activities prüfen und priorisieren.
+2. Pro Activity entscheiden:
+   - bleibt `opening_hours_check`
+   - wird zu `verified`
+   - braucht `holiday_policy`
+   - braucht später konkrete Wochenzeiten
+3. `holiday_policy` kontrolliert ergänzen:
+   - `open`
+   - `closed`
+   - `limited`
+   - `check`
+4. Danach Today-Home-Ergebnis erneut gegen Regen/Sonntag/Feiertag testen.
+
+### Nicht jetzt
+
+- Keine breite Massenpflege aller 44 Activities.
+- Keine ungeprüften echten Öffnungszeiten erfinden.
+- Keine neue Daten-Datei einführen, solange `data/offers.json` als Activity-Owner ausreicht.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_DATA_ENRICHMENT_NEXT_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 | Zweck: definiert Folgearbeiten nach abgeschlossenem Activity-Quality-Audit-V1; Umfang: Needs-Review, Saisonregeln, Detailanzeige, keine neue Massenpflege === -->
+## Nächster Workpack: Activity-Öffnungsstatus gezielt verfeinern
+
+Status 2026-06-09: gültiger Folgepunkt, aber nicht der nächste operative Pipeline-Beweis.
+
+
+### Ausgangslage
+
+- Activity Quality Audit V1 ist abgeschlossen.
+- 44 von 44 Activities haben `opening_status`-Daten.
+- Die zwei vorherigen Grenzfälle wurden gezielt abgeschlossen:
+  - `quellengrundpark-weseke-entdecken` → `check_required`
+  - `erlebnispfad-klostersee-burlo` → `free_access`
+- Die Recommendation-Logik liest `opening_status` korrekt.
+- Freie Activities mit `holiday_policy = open` oder `not_applicable` erzeugen keine falschen Sonntag-/Feiertag-Warnungen mehr.
+
+### Ziel
+
+Keine weitere breite Datenpflege. Stattdessen nur gezielte Verfeinerung der Saisonlogik und der öffentlichen Darstellung.
+
+### Reihenfolge
+
+1. Saisonregel-Modell schärfen:
+   - Brutzeit-/Schutzzeitfälle
+   - Bade-/Monitoring-Saison
+   - saisonale Empfehlung ohne echte Öffnungszeit
+   - saisonale Betreiberöffnung
+2. UI-/Detailanzeige prüfen:
+   - `opening_status.public_label`
+   - `opening_status.detail_note`
+   - keine leeren Öffnungszeitenblöcke bei freien Routen
+3. Today-Home-/Recommendation-Verhalten visuell prüfen:
+   - Werktag
+   - Regen
+   - Sonntag
+   - Feiertag
+
+### Nicht jetzt
+
+- Keine neuen echten Öffnungszeiten erfinden.
+- Keine pauschale Wochenöffnungszeiten-Struktur für freie Routen.
+- Keine weitere breite Activity-Datenpflege ohne konkreten fachlichen Anlass.
+- Keine Vermischung mit Event-Visual- oder Event-Card-Polish.
+<!-- === END BLOCK: ROADMAP_ACTIVITY_OPENING_FOLLOWUP_NEXT_2026_06_08 === -->
+
+
+<!-- === BEGIN BLOCK: ROADMAP_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 | Zweck: oeffnet den Detailpanel-Workstream gezielt als app-weites Premium-Systemelement vor Live; Umfang: Event/Activity/Today-Zusammenspiel, keine Activity-Fotoproduktion === -->
+## Vor Live: Detailpanel als app-weites Premium-Systemelement
+
+Die Today-Home ist funktional releasefaehig, aber Live bleibt gehalten, bis das Detailpanel app-weit Premium-Niveau erreicht.
+
+Ziel ist nicht, Event- und Activity-Detailpanel identisch zu machen. Ziel ist ein konsistentes System:
+
+- gleiche Panel-Chrome,
+- gleiche visuelle Qualitaet,
+- gleiche App-Sprache,
+- unterschiedliche Rollen fuer Events und Activities.
+
+Rollen:
+
+- Event-Detailpanel = Terminentscheidung mit Datum, Ort, Kalender, Teilen, Quelle.
+- Activity-Detailpanel = Ausflugs-/Ortsentscheidung mit Route, Website/Infos, Oeffnungsstatus, Merkmalen.
+- Today-Kontext = schnelle Empfehlung, die in ein vollstaendiges Event- oder Activity-Detail fuehrt.
+
+Primaere Owner:
+
+- `js/details.js` fuer Event-Detailpanel,
+- `js/offers-details.js` fuer Activity-Detailpanel,
+- `css/overlays.css` fuer gemeinsame Panel-, Actionbar-, Safe-Area- und Chrome-Schicht.
+
+Verbindliche Detailplanung:
+
+- `docs/detailpanel-premium-system-contract.md`
+
+Nicht Teil dieses Workstreams:
+
+- neue Activity-Fotos,
+- Today-Ranking,
+- Eventdatenprozess,
+- breite neue Feature-Ideen.
+
+Live-Regel:
+
+- Activity-Fotos duerfen nachgezogen werden.
+- Detailpanel-Struktur, Aktionswert, Tonalitaet und UI-Qualitaet muessen vor Live app-weit konsolidiert sein.
+<!-- === END BLOCK: ROADMAP_DETAILPANEL_PREMIUM_BEFORE_LIVE_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_ROADMAP_2026_06_12 | Zweck: definiert den naechsten nachhaltigen Workpack fuer motivgenaue Eventbilder; Umfang: Event-Visuals, KI-Intake, Gap-Backlog === -->
+## Nächster Workpack: Event-Visual-Motiv-Fit
+
+Status 2026-06-12: geplant / noch nicht umgesetzt.
+
+### Ausgangslage
+
+Das Event-Visual-System ist technisch tragfähig, aber inhaltlich für manche Eventarten noch zu grob.
+
+Aktuell reicht ein `visual_key` wie `indoor_sport_competition` für die grobe Bildfamilie. Für Premium-Qualität reicht das nicht immer, weil konkrete Events dadurch fachlich falsche Motive bekommen können.
+
+Beispiel:
+- Ein Fecht-Event darf kein Handball-, Volleyball- oder Badmintonbild bekommen.
+- Ein Darts-Event darf kein generisches Hallenballsportbild bekommen.
+- Ein Chor-Event darf nicht automatisch ein beliebiges Klassik-/Instrumentalmotiv bekommen.
+
+### Zielzustand
+
+Events sollen nicht nur eine passende Bildkategorie haben, sondern ein motivisch passendes Bild.
+
+Dafür wird das bestehende Visual-Key-System nicht ersetzt, sondern erweitert:
+
+1. `visual_key`
+   - grobe Bildfamilie
+   - Beispiel: `indoor_sport_competition`
+
+2. `visual_motif`
+   - konkreter Untertyp / konkretes Motiv
+   - Beispiel: `fencing`, `darts`, `handball`, `volleyball`, `choir`, `organ_concert`
+
+3. `visual_asset_status`
+   - redaktioneller/technischer Status, ob ein passendes Motivbild vorhanden ist
+   - Zielwerte z. B. `ok`, `needs_asset`, `review`
+
+### Grundsatz
+
+Wenn ein Event einen konkreten Eventtyp eindeutig nennt, darf die Bildauswahl nicht auf ein falsches spezifisches Unter-Motiv ausweichen.
+
+Erlaubt:
+- exaktes Motivbild
+- bewusst neutrales generisches Bild, falls fachlich vertretbar
+- Gap-/Backlog-Eintrag, wenn ein Premiumbild fehlt
+
+Nicht erlaubt:
+- Fechten → Handballbild
+- Darts → Volleyballbild
+- Chor → beliebiges Instrumentalbild
+- konkrete Eventart → sichtbar falsches Bild nur wegen gleichem grobem `visual_key`
+
+### Roadmap
+
+#### Phase 1: Systemvertrag dokumentieren
+
+- `VISUAL_WORKFLOW.md` um den dauerhaften Motiv-Fit-Vertrag ergänzen.
+- `ROADMAP.md` hält diesen Workpack als nächsten strukturellen Event-Visual-Verbesserungspunkt fest.
+- Keine UI-/Renderer-Änderung in diesem Dokumentationsschritt.
+
+#### Phase 2: Motiv-Taxonomie klein starten
+
+Zuerst nur generische Keys mit hohem Fehlzuordnungsrisiko modellieren.
+
+Start-Key:
+- `indoor_sport_competition`
+
+Erste sinnvolle Motive:
+- `neutral_indoor_sport`
+- `badminton`
+- `handball`
+- `volleyball`
+- `table_tennis`
+- `darts`
+- `fencing`
+
+Später prüfen:
+- `classical_music`
+- `literature_reading_talk`
+- `kids_stage_story`
+- `business_messe_info`
+- weitere generische Keys mit klar unterscheidbaren Untertypen
+
+#### Phase 3: Pool-Metadaten erweitern
+
+`data/event_visual_pool.json` soll bei passenden Bildern zusätzlich ein konkretes Motiv führen.
+
+Beispiel:
+- `visual_key`: `indoor_sport_competition`
+- `visual_motif`: `fencing`
+
+Bestehende Bilder ohne konkreten Untertyp bleiben zulässig, müssen aber als generisch oder neutral erkennbar sein.
+
+#### Phase 4: Event-Zuordnung erweitern
+
+Die bestehende Event-Visual-Zuordnung soll künftig neben `visual_key` auch `visual_motif` ableiten, wenn Titel/Beschreibung/Quelle eindeutig genug sind.
+
+Beispiele:
+- „Fechten“, „Fechtturnier“, „Degen“, „Florett“ → `visual_motif: fencing`
+- „Darts“ → `visual_motif: darts`
+- „Volleyball“ → `visual_motif: volleyball`
+- „Handball“ → `visual_motif: handball`
+- „Chor“, „Chorkonzert“ → `visual_motif: choir`
+
+Unsichere Fälle nicht raten, sondern `review` oder neutrales Motiv verwenden.
+
+#### Phase 5: Gap-Backlog einführen
+
+Wenn ein Event ein konkretes Motiv braucht, aber kein passendes `ready`-Bild existiert, soll daraus ein sichtbarer Arbeitsauftrag entstehen.
+
+Zieldatei:
+- `data/event_visual_gap_backlog.tsv`
+
+Mögliche Spalten:
+- `status`
+- `priority`
+- `event_title`
+- `event_date`
+- `visual_key`
+- `visual_motif`
+- `problem`
+- `recommended_action`
+- `source_url`
+- `notes`
+
+Ziel:
+- Die KI-/Inbox-Suche darf fehlende Motivbilder nicht still überdecken.
+- Fehlende Bilder werden als konkrete Nachgenerierungsaufgabe sichtbar.
+
+#### Phase 6: Auswahl- und Fallback-Regeln härten
+
+Die UI-/Resolver-Logik soll später so erweitert werden:
+
+1. Exaktes `visual_motif` suchen.
+2. Falls nicht vorhanden: neutrales Bild desselben `visual_key` nur verwenden, wenn es fachlich nicht falsch wirkt.
+3. Falls kein sicherer Fallback vorhanden: Gap markieren statt falsches spezifisches Bild nutzen.
+
+#### Phase 7: Gezielt nachgenerieren
+
+Erst nach Gap-Report neue Bilder erzeugen.
+
+Priorität:
+1. bald sichtbare Events
+2. häufig wiederkehrende Eventtypen
+3. Eventtypen mit hohem Falschbild-Risiko
+4. stark sichtbare Kategorien im Feed
+
+### Akzeptanzkriterien
+
+- Ein Event mit eindeutigem konkretem Motiv bekommt kein fachlich falsches spezifisches Bild mehr.
+- `visual_key` bleibt als grobe Familie erhalten.
+- `visual_motif` ergänzt die konkrete Motivschicht.
+- Fehlende Motivbilder werden sichtbar als Backlog-Aufgabe erfasst.
+- Die Nachgenerierung erfolgt gezielt nach tatsächlichen Lücken statt pauschal pro Kategorie.
+- Bestehende Visual-Audits bleiben gültig und werden später um Motiv-Fit-Prüfungen ergänzt.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_ROADMAP_2026_06_12 === -->
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_SHEET_REVIEW_2026_06_15 | Zweck: konsolidiert den Sheet-Abgleich fuer Event-Visual-Motive und definiert die nachhaltige Abarbeitungsreihenfolge; Umfang: Events-Sheet, Visual-Motif-Taxonomie, Gap-Backlog, Runtime-Resolver, Asset-Integration === -->
+## Event-Visual-Motiv-Fit – Sheet-Abgleich und Sanierungsroadmap 2026-06-15
+
+Status: Analyse- und Sanierungsroadmap. Keine automatische Bildproduktion und keine Asset-Integration ohne nachgelagerten, belegten Patch.
+
+### Geprüfte Grundlage
+
+- Geprüfter Repo-Stand: aktuelle Staging-ZIP `Bocholt-Erleben-staging (60).zip`.
+- Geprüfter Eventdatenstand: Google-Sheet-Export Tab `Events`, identisch mit `data/events.tsv` in der ZIP.
+- Umfang des Sheet-Exports: 172 Rohzeilen inkl. 1 komplett leerer Zeile im manuellen Export.
+- `data/event_visual_gap_backlog.tsv` in der ZIP ist bereits gegen diesen Sheet-Stand aufgebaut und enthält 45 gruppierte Motiv-Gaps.
+- Prioritätsverteilung des aktuellen Gap-Backlogs: 5 `high`, 40 `medium`.
+- `data/events.json` ist nicht die redaktionelle Quelle und darf für solche Aussagen nur als frisch erzeugtes Deploy-Artefakt genutzt werden.
+
+### Validierter Prozessstand
+
+Richtig und beizubehalten:
+
+1. `visual_key` bleibt die stabile grobe Bildfamilie.
+2. `visual_motif` ist die konkrete Motivschicht innerhalb eines Keys.
+3. `data/event_visual_gap_backlog.tsv` ist der richtige Ort fuer fehlende Motivbilder.
+4. `data/event_visual_phase2_acceptance_notes.json` ist der richtige Zwischenstand fuer akzeptierte, aber noch nicht integrierte Kandidaten.
+5. Neue Bilder werden nur aus echtem Gap, konkretem Eventbedarf oder bewusstem strategischem Poolausbau erzeugt.
+6. Das Google Sheet Tab `Events` ist die kanonische Eventquelle; lokale JSON-Artefakte sind nicht belastbar, wenn sie nicht frisch erzeugt wurden.
+
+Nicht fertig bzw. zu korrigieren:
+
+1. Der Gap-Backlog muss standardisiert mit dem aktuellen Sheet-/TSV-Stand laufen. Aktuell ist `scripts/build-event-visual-gap-backlog.py` zwar vorhanden, aber der Deploy-Workflow baut den Gap-Backlog nicht als festen Nachlauf.
+2. Der manuelle TSV-Export kann komplett leere Zeilen enthalten. Der Deploy-Exporter filtert leere Zeilen, `scripts/build-events-from-tsv.py` scheitert lokal aber an einer leeren Zeile. Lokales Script und Deploy-Exporter muessen hier gleich robust sein.
+3. `scripts/build-events-from-tsv.py` schreibt aktuell `visual_key`, aber kein `visual_motif` und keinen `visual_asset_status` in `data/events.json`.
+4. Die Runtime-Resolver in `js/events.js` und `js/today-home.js` wählen Eventbilder aktuell nach `visual_key`, nicht nach `visual_motif`. Dadurch kann ein spezifisches Event weiterhin ein anderes spezifisches Bild derselben groben Familie bekommen.
+5. `buildReadyVisualPools()` und der Today-Resolver übernehmen `visual_motif` aus `data/event_visual_pool.json` noch nicht in den JS-Poolzustand.
+6. Die aktuelle Motiv-Taxonomie ist brauchbar, aber die Inferenzregeln brauchen noch Härtung gegen zusammengesetzte deutsche Begriffe, englische Eventtitel und falsch priorisierte Kategorie-/Location-Fallbacks.
+
+### Aktueller Gap-Stand aus dem Sheet
+
+High-Gaps:
+
+- `business_messe_info / health_career_fair` – Beispiel: `Gesundheitsberufemesse`
+- `food_drink_festival / wine_festival` – Beispiele: `Wijnfeest Aalten 2026`, `30. Bocholter Weinfest`
+- `indoor_sport_competition / darts` – Beispiel: `Borkener Darts Trophy`
+- `indoor_sport_competition / fencing` – Beispiel: `17. International Fencing Camp Bocholt`
+- `market_stalls / fabric_market` – Beispiel: `Stoffmarkt Bocholt`
+
+Bereits im Produktionszwischenstand belegte Kandidaten fuer aktuelle Gaps:
+
+- `food_drink_festival / wine_festival` – akzeptiert und Download bestätigt.
+- `city_tour_history / costumed_history_tour` – akzeptiert und Download bestätigt.
+- `market_stalls / flea_market` – akzeptiert und Download bestätigt.
+- `city_festival_street / shopping_sunday` – akzeptiert und Download bestätigt.
+- `comedy_cabaret / cabaret_stage` – akzeptiert und Download bestätigt.
+- `theater_stage / theater_play` – akzeptiert und Download bestätigt.
+- `live_music_stage / local_band_concert` – mindestens ein Kandidat akzeptiert und Download bestätigt.
+- `open_air_festival / market_square_open_air` – ausgewählt, Downloadbestätigung im Repo-Stand noch offen.
+- `business_messe_info / info_evening` – ausgewählt, Downloadbestätigung im Repo-Stand noch offen.
+
+Wichtig: Lokal heruntergeladene Bilder, die nicht in `data/event_visual_phase2_acceptance_notes.json` oder als Source-Datei im Repo dokumentiert sind, gelten nicht als belastbarer Repo-Stand. Sie duerfen erst bei der Integration als konkrete Dateien/Motive verifiziert werden.
+
+### Bekannte Taxonomie-/Inferenzprobleme aus dem Sheet-Abgleich
+
+Diese Punkte sind keine Bildproduktionsaufgaben, sondern Regel-/Datenqualitätsaufgaben:
+
+- `Rosenmontagszug` muss zu `parade_festzug / carnival_parade`, nicht zu `market_stalls / neutral_market_stalls`.
+- `Filmvorführung ...` muss zu `film_screening`, zusammengesetzte Begriffe wie `Filmvorführung` duerfen nicht am Wortgrenzen-Regex scheitern.
+- `Fahrradtour mit Guide` und `Segwaytouren` muessen bei eindeutigem Titel zu `active_route_tour / guided_bike_tour` bzw. `active_route_tour / segway_tour`; Kategorie `Natur & Draußen` darf diese starken Titelmarker nicht überschreiben.
+- Naturbezogene Führungen wie `Lebenselixier Wasser - der Pröbstingsee...` duerfen nicht allein wegen `Führung` zu `city_tour_history` werden, wenn Natur-/See-Kontext klar dominiert.
+- `Bocholt Blüht mit großem Oldtimerfestival` muss wegen `Oldtimerfestival` zu `vehicle_classic / classic_car_meet` oder einem bewusst definierten Stadtfest+Oldtimer-Fall, nicht zu generischen Marktständen.
+- Business-/Wirtschaftsformate wie `Markterschließung Niederlande` brauchen einen besseren Key/Motif-Pfad als `creative_making_workshop`, z. B. `business_messe_info` mit neuem oder bestehendem Motiv.
+- Familien-/interkulturelle Stadtfeste wie `Internationales Familienfest...` und `Weltkindertagsfest / Eröffnung der Interkulturellen Woche` sollen auf `city_festival_street / children_intercultural_festival` geprüft werden.
+- Englische Titelmarker muessen robust bleiben, z. B. `fencing` auch ohne deutsche Beschreibung.
+
+### Nachhaltige Abarbeitungsreihenfolge
+
+#### P0 – Datenbasis und Gap-Ermittlung stabilisieren
+
+1. Leere Zeilen in `scripts/build-events-from-tsv.py` genauso ignorieren wie im Deploy-Exporter.
+2. `scripts/build-event-visual-gap-backlog.py` standardisiert gegen den frischen Sheet-TSV-Stand laufen lassen, vorzugsweise `data/events.tsv` als Defaultquelle oder als klar dokumentierter Pflichtparameter.
+3. Deploy-/CI-Entscheidung treffen: Gap-Backlog nur manuell erzeugen oder nach Sheet-Export automatisch als Report/Artefakt mitlaufen lassen.
+4. Nach jedem Sheet-Abgleich immer Quelle und Stand nennen: Sheet-Export, Deploy-Artefakt oder lokaler Snapshot.
+
+#### P1 – Key-/Motif-Inferenz härten
+
+1. Zusammengesetzte Begriffe und englische Marker ergänzen: `Rosenmontagszug`, `Filmvorführung`, `Oldtimerfestival`, `Segwaytour(en)`, `fencing`.
+2. Starke Titelmarker vor Kategorie-/Location-Fallbacks priorisieren.
+3. Naturführung, Stadtführung, aktive Tour und Fahrrad-/Segwaytour klarer voneinander trennen.
+4. Business-/Messe-/Info-/Workshop-Fälle sauber von Kreativworkshops trennen.
+5. Nach jeder Regeländerung den aktuellen Sheet-Export erneut klassifizieren und nur echte Verbesserungen committen.
+
+#### P2 – Eventdaten um Motivstatus erweitern
+
+1. `scripts/build-events-from-tsv.py` soll neben `visual_key` auch `visual_motif` und optional `visual_asset_status` erzeugen.
+2. Unsichere Fälle muessen `review` bleiben, nicht geraten werden.
+3. Das erzeugte `data/events.json` wird dadurch runtime-fähig fuer motivgenaue Bildauswahl.
+
+#### P3 – Runtime-Resolver motivfähig machen
+
+1. `js/events.js` und `js/today-home.js` muessen `visual_motif` aus Eventdaten lesen.
+2. Ready-Pools muessen `visual_motif` aus `data/event_visual_pool.json` in den JS-Zustand übernehmen.
+3. Auswahlregel:
+   - exaktes `visual_key + visual_motif` bevorzugen,
+   - sonst neutrales Fallback-Motiv desselben Keys,
+   - niemals anderes spezifisches Motiv desselben Keys.
+4. Wenn kein sicherer Fallback vorhanden ist, soll kein fachlich falsches spezifisches Bild erzwungen werden.
+
+#### P4 – Vorhandene Kandidaten integrieren
+
+1. Nur Kandidaten integrieren, deren Source-Dateien vorliegen und deren Motiv eindeutig dokumentiert ist.
+2. Zuerst High-Gaps und bereits akzeptierte Kandidaten schließen.
+3. Integration immer mit WebP-Konvertierung, `data/event_visual_pool.json`-Update, Bildnachweis-/Attributionsprüfung und Audit.
+4. Nach Integration Gap-Backlog neu bauen; erledigte Motive duerfen nicht mehr als offen erscheinen.
+
+#### P5 – Neue Bilder nur aus priorisiertem Backlog erzeugen
+
+1. Kein Batch aus reiner Vollständigkeitslogik der Taxonomie.
+2. Neue Bildproduktion nur fuer offene Backlog-Motive oder bewusst dokumentierten strategischen Poolausbau.
+3. Batches klein halten und nach jedem Batch Kandidaten in `data/event_visual_phase2_acceptance_notes.json` nachtragen.
+4. High-Gaps vor Medium-Gaps, häufige Motive vor Einzelfällen, Falschbild-Risiko vor reiner Vielfalt.
+
+#### P6 – Audit und Abschlusskriterien
+
+1. Audit ergänzen, der erkennt, ob spezifische Events ein anderes spezifisches Motivbild erhalten könnten.
+2. Audit ergänzen, der fehlende `visual_motif` bei Events mit eindeutigem Motiv meldet.
+3. Abschluss erst, wenn aktueller Sheet-Export, Gap-Backlog, Runtime-Resolver und Poolzustand konsistent sind.
+4. Danach in `TEST_STATUS.md` einen belegten Abschlussstand dokumentieren.
+
+### Nicht-Ziele
+
+- Kein vollständiges Bildarchiv fuer jede theoretische Unterkategorie erzwingen.
+- Keine manuelle Pflege von `data/event_visual_gap_backlog.tsv` als Produktionsnotizzettel.
+- Keine Integration von Bildern ohne Source-Datei, Motivmapping und Audit.
+- Keine weitere Bildproduktion, solange Daten-/Resolver-Prozess nicht stabil ist oder kein priorisierter Gap vorliegt.
+
+### Akzeptanzkriterien fuer diesen Workstream
+
+- Der aktuelle Sheet-Export kann lokal und im Deploy konsistent verarbeitet werden.
+- `Borkener Darts Trophy` wird als `indoor_sport_competition / darts` erkannt.
+- `17. International Fencing Camp Bocholt` wird als `indoor_sport_competition / fencing` erkannt.
+- Die bekannten Fehlklassifikationen aus dieser Roadmap sind korrigiert oder bewusst als Review-Fall dokumentiert.
+- Eventkarten wählen keine falschen spezifischen Unter-Motive mehr.
+- Der Gap-Backlog ist nach Integration der passenden Bilder nachvollziehbar kleiner und bleibt aus dem Sheet reproduzierbar.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_SHEET_REVIEW_2026_06_15 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: markiert Motiv-Fit-QA-Regelhaertung als Abschlussblock vor Freeze; Umfang: keine neue Bildproduktion, nur Mapping-Haertung === -->
+## Event Visual Motif-Fit-QA – Regelhärtung abgeschlossen (2026-06-18)
+
+Der technische Event-Visual-Abschluss wurde um eine fachliche Motiv-Fit-QA ergänzt.
+
+Ergebnis des Pakets:
+- Bekannte Fehlzuordnungen werden deterministisch auf passendere vorhandene Ready-Motive gelenkt.
+- Es entsteht kein neuer Bildproduktionsbedarf.
+- Matrix und Gap-Backlog bleiben frei von Produktions-/Review-Gaps.
+
+Nach Upload und grünem Deploy ist nur noch ein kurzer Sicht-Smoke auf `/events/` nötig.
+Wenn dabei keine fachlich falschen Bildzuordnungen mehr auffallen, kann der Event-Visual-Motif-Fit-Workstream für den aktuellen Sheet-Stand eingefroren werden.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_VISIBLE_MOTIF_FIT_FINAL_RULE_SWEEP_2026_06_18 | Zweck: vermerkt Abschluss des Regel-Sweeps ohne neue Bildproduktion; Umfang: naechste Arbeit nur noch bei sichtbarem Einzelfund === -->
+## Event Visual Motif-Fit – finaler sichtbarer Regel-Sweep (2026-06-18)
+
+Der nachgelagerte Regel-Sweep korrigiert die sichtbare Fehlzuordnung von thematischen/historischen Führungen als Aktivtour.
+
+Status nach Anwendung:
+- Keine neue Bildproduktion.
+- Keine offenen Matrix-/Backlog-Gaps.
+- Weitere Arbeit nur bei konkretem sichtbarem Einzelfund, nicht aus theoretischer Vollständigkeitslogik.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_VISIBLE_MOTIF_FIT_FINAL_RULE_SWEEP_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 | Zweck: markiert motivgenauen Event-Visual-Resolver als finalen Abschlusskandidaten; Umfang: keine neue Bildproduktion, nur Sicht-Smoke nach Deploy === -->
+## Event Visual Motif-Fit – motivgenauer Resolver abgeschlossen (2026-06-18)
+
+Der finale Abschlusskandidat schließt die Runtime-Lücke zwischen Matrix/Pool und Frontend:
+- `visual_motif` wird in die generierten Eventdaten übernommen.
+- Events- und Today-Frontend wählen motivgenau.
+- Keine neue Bildproduktion.
+
+Nach Upload/Deploy genügt ein gezielter Sicht-Smoke mit sichtbaren Zukunftsevents. Weitere Arbeit nur bei konkretem sichtbarem Einzelfund.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 | Zweck: markiert Event-Visual-Motif-Fit als abgeschlossenen Workstream; Umfang: naechster Schritt main nur bei staging-Releasefaehigkeit === -->
+## Event Visual Motif-Fit – Workstream abgeschlossen (2026-06-18)
+
+Der Event-Visual-Motif-Fit-Workstream ist für den aktuellen Sheet-/Staging-Stand abgeschlossen.
+
+Abgeschlossen:
+- Event-Visual Gap Batch 02.
+- Finaler Restbatch.
+- Motiv-Regelhärtung.
+- Motivgenauer Frontend-Resolver.
+- Staging-Deploy.
+- Technischer Smoke.
+- Sichtbare Motiv-Fit-Stichprobe.
+- Datenbasierte Vollprüfung.
+
+Es gibt für diesen Arbeitsblock keine offenen Produktions-, Integrations- oder Review-Gaps.
+
+Nächster Schritt:
+- Kein weiterer Event-Visual-Patch.
+- `staging → main` nur dann, wenn `staging` insgesamt releasefähig ist und keine anderen unfertigen Änderungen enthält.
+- Nach Main-Deploy reicht ein kurzer Live-Smoke auf `/events/`.
+<!-- === END BLOCK: ROADMAP_EVENT_VISUAL_MOTIF_FIT_CLOSED_2026_06_18 === -->

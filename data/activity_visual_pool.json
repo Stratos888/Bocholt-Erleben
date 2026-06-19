@@ -1,0 +1,1384 @@
+{
+  "schema_version": 1,
+  "owner": "activity_visual_pool_v1",
+  "base_path": "/assets/activity-visuals/",
+  "selection_rule": "stable_hash(offer_id + visual_key), later without duplicates per rendered feed",
+  "live_usage": "Only entries with status=ready or deliberately approved fallback may be used by premium UI surfaces. Planned slots are production backlog only.",
+  "source_hierarchy": [
+    "own_or_exclusive_premium_real_photo",
+    "organizer_or_rightsholder_cleared_premium_real_photo",
+    "legally_clean_high_quality_photo_with_documented_rights",
+    "ai_generated_symbolic_premium_visual",
+    "legacy_external_image_temporary_only"
+  ],
+  "visual_rules": [
+    "AI visuals must be symbolic and must not claim to document a real place or real event.",
+    "No readable logos, posters, brands or third-party artwork.",
+    "No recognizable children.",
+    "Main subject must be safe for 16:9 card crops.",
+    "Weak raw images should be replaced or downgraded, not rescued through CSS crop hotfixes."
+  ],
+  "pools": {
+    "b2_tonwerke_route": {
+      "label": "B2 Tonwerke-Route",
+      "description": "Rechtlich nutzbarer echter Foto-Fallback fuer die B2-Route mit Tonwerke-/Freizeitzentrum-Bezug.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "b2-tonwerke-route"
+      ],
+      "images": [
+        {
+          "id": "b2-tonwerke-route-01",
+          "src": "/assets/activity-visuals/b2-tonwerke-route-01.webp",
+          "status": "fallback",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Luftbild des Freizeitzentrums Tonwerke in Bocholt mit Wasserfläche, Liegewiese und Freizeitbereich.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "fallback_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bocholt,_Freizeitzentrum_Tonwerke_--_2014_--_2151.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "hilgelo_erleben": {
+      "label": "hilgelo-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer hilgelo-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hilgelo-erleben"
+      ],
+      "images": [
+        {
+          "id": "hilgelo-erleben-01",
+          "src": "/assets/activity-visuals/hilgelo-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ruhiger Freizeitsee mit kleinem Steg, Sandufer und grünem Uferbereich.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "hohenhorster_berge_entdecken": {
+      "label": "hohenhorster-berge-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer hohenhorster-berge-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hohenhorster-berge-entdecken"
+      ],
+      "images": [
+        {
+          "id": "hohenhorster-berge-entdecken-01",
+          "src": "/assets/activity-visuals/hohenhorster-berge-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Sandiger Weg durch lichte Heide- und Waldlandschaft der Hohenhorster Berge.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "bocholter_aa_radweg_erleben": {
+      "label": "bocholter-aa-radweg-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer bocholter-aa-radweg-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bocholter-aa-radweg-erleben"
+      ],
+      "images": [
+        {
+          "id": "bocholter-aa-radweg-erleben-01",
+          "src": "/assets/activity-visuals/bocholter-aa-radweg-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Radweg entlang eines ruhigen Flusslaufs mit grünen Ufern.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "burloer_venn_entdecken": {
+      "label": "burloer-venn-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer burloer-venn-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "burloer-venn-entdecken"
+      ],
+      "images": [
+        {
+          "id": "burloer-venn-entdecken-01",
+          "src": "/assets/activity-visuals/burloer-venn-entdecken-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Moor- und Wasserfläche im Burloer Venn.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Günter Seggebäing / Watzmann",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "source_title": "20190331 Entenschlatt im Burloer Venn, Borken (00877).jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:20190331_Entenschlatt_im_Burloer_Venn,_Borken_(00877).jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/20190331_Entenschlatt_im_Burloer_Venn%2C_Borken_%2800877%29.jpg",
+          "credit": "Günter Seggebäing / Watzmann / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "aasee_erleben": {
+      "label": "aasee-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer aasee-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "aasee-erleben"
+      ],
+      "images": [
+        {
+          "id": "aasee-erleben-01",
+          "src": "/assets/activity-visuals/aasee-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Strand- und Uferbereich am Aasee Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Odna",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "source_title": "Aasee Bocholt - Strand.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Aasee_Bocholt_-_Strand.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Aasee_Bocholt_-_Strand.jpg",
+          "credit": "Odna / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "korenburgerveen_entdecken": {
+      "label": "korenburgerveen-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer korenburgerveen-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "korenburgerveen-entdecken"
+      ],
+      "images": [
+        {
+          "id": "korenburgerveen-entdecken-01",
+          "src": "/assets/activity-visuals/korenburgerveen-entdecken-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Naturlandschaft im Korenburgerveen bei Winterswijk.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Winterswijk (NL), Korenburgerveen -- 2014 -- 3080.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Winterswijk_(NL),_Korenburgerveen_--_2014_--_3080.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk_(NL),_Korenburgerveen_--_2014_--_3080.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "zwillbrocker_venn_flamingos_entdecken": {
+      "label": "zwillbrocker-venn-flamingos-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer zwillbrocker-venn-flamingos-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "zwillbrocker-venn-flamingos-entdecken"
+      ],
+      "images": [
+        {
+          "id": "zwillbrocker-venn-flamingos-entdecken-01",
+          "src": "/assets/activity-visuals/zwillbrocker-venn-flamingos-entdecken-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Flamingos im Zwillbrocker Venn.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "EvaVOR",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Mixed flamingo group, Zwillbrocker Venn, Vreden, Kreis Borken, NRW, Germany.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Mixed_flamingo_group,_Zwillbrocker_Venn,_Vreden,_Kreis_Borken,_NRW,_Germany.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Mixed_flamingo_group,_Zwillbrocker_Venn,_Vreden,_Kreis_Borken,_NRW,_Germany.jpg",
+          "credit": "EvaVOR / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "wooldse_veen_entdecken": {
+      "label": "wooldse-veen-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer wooldse-veen-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "wooldse-veen-entdecken"
+      ],
+      "images": [
+        {
+          "id": "wooldse-veen-entdecken-01",
+          "src": "/assets/activity-visuals/wooldse-veen-entdecken-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Bohlenweg durch das Wooldse Veen.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Günter Seggebäing",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "source_title": "Bohlenweg im Wooldse Veen.JPG",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bohlenweg_im_Wooldse_Veen.JPG",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Bohlenweg_im_Wooldse_Veen.JPG",
+          "credit": "Günter Seggebäing / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "noaberpad_ab_bocholt": {
+      "label": "noaberpad-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer noaberpad-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "noaberpad-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "noaberpad-ab-bocholt-01",
+          "src": "/assets/activity-visuals/noaberpad-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Schmaler Wanderpfad entlang eines kleinen Bachlaufs im Wald.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "mtb_route_winterswijk": {
+      "label": "mtb-route-winterswijk",
+      "description": "Exklusives Activity-Hauptbild fuer mtb-route-winterswijk.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "mtb-route-winterswijk"
+      ],
+      "images": [
+        {
+          "id": "mtb-route-winterswijk-01",
+          "src": "/assets/activity-visuals/mtb-route-winterswijk-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Mountainbike-Strecke als schmaler Waldtrail mit dezenter Wegmarkierung.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "hohe_mark_radroute_ab_bocholt": {
+      "label": "hohe-mark-radroute-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer hohe-mark-radroute-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "hohe-mark-radroute-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "hohe-mark-radroute-ab-bocholt-01",
+          "src": "/assets/activity-visuals/hohe-mark-radroute-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Zwei Radfahrende auf ruhigem Weg durch grüne Parklandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "proebstingsee_borken_erleben": {
+      "label": "proebstingsee-borken-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer proebstingsee-borken-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "proebstingsee-borken-erleben"
+      ],
+      "images": [
+        {
+          "id": "proebstingsee-borken-erleben-01",
+          "src": "/assets/activity-visuals/proebstingsee-borken-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc0_public_domain",
+          "alt": "Tretboote am Pröbstingsee in Borken.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Tetzemann",
+          "license": "CC0 1.0 / Public Domain",
+          "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "source_title": "Tretboote am Pröbstingsee Borken.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Tretboote_am_Pr%C3%B6bstingsee_Borken.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tretboote_am_Pr%C3%B6bstingsee_Borken.jpg",
+          "credit": "Tetzemann / Wikimedia Commons / CC0 1.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "100_schloesser_route_ab_bocholt": {
+      "label": "100-schloesser-route-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer 100-schloesser-route-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "100-schloesser-route-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "100-schloesser-route-ab-bocholt-01",
+          "src": "/assets/activity-visuals/100-schloesser-route-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Historisches Wasserschloss mit Gräfte und grüner Parklandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "zeitreise_dingdener_heide": {
+      "label": "zeitreise-dingdener-heide",
+      "description": "Exklusives Activity-Hauptbild fuer zeitreise-dingdener-heide.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "zeitreise-dingdener-heide"
+      ],
+      "images": [
+        {
+          "id": "zeitreise-dingdener-heide-01",
+          "src": "/assets/activity-visuals/zeitreise-dingdener-heide-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Alter Feldweg mit Baumallee in der Dingdener Heide.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Börste",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Alte Feldweg-Allee in der Dingdener Heide.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Alte_Feldweg-Allee_in_der_Dingdener_Heide.jpg",
+          "credit": "Börste / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "die_berge_hombornquelle_entdecken": {
+      "label": "die-berge-hombornquelle-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer die-berge-hombornquelle-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "die-berge-hombornquelle-entdecken"
+      ],
+      "images": [
+        {
+          "id": "die-berge-hombornquelle-entdecken-01",
+          "src": "/assets/activity-visuals/die-berge-hombornquelle-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Sandige Hügel- und Heidelandschaft mit lockerem Waldsaum.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "schwarzes_wasser_wesel_entdecken": {
+      "label": "schwarzes-wasser-wesel-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer schwarzes-wasser-wesel-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "schwarzes-wasser-wesel-entdecken"
+      ],
+      "images": [
+        {
+          "id": "schwarzes-wasser-wesel-entdecken-01",
+          "src": "/assets/activity-visuals/schwarzes-wasser-wesel-entdecken-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Ruhige Wasserfläche im Naturschutzgebiet Schwarzes Wasser.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Mason Richter",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Naturschutzgebiet Schwarzes Wasser.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Naturschutzgebiet_Schwarzes_Wasser.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Naturschutzgebiet_Schwarzes_Wasser.jpg",
+          "credit": "Mason Richter / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "flamingoroute_ab_bocholt": {
+      "label": "flamingoroute-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer flamingoroute-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "flamingoroute-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "flamingoroute-ab-bocholt-01",
+          "src": "/assets/activity-visuals/flamingoroute-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Radroute durch grüne Feuchtgebiets- und Vennlandschaft.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "niederrhein_route_ab_bocholt": {
+      "label": "niederrhein-route-ab-bocholt",
+      "description": "Exklusives Activity-Hauptbild fuer niederrhein-route-ab-bocholt.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "niederrhein-route-ab-bocholt"
+      ],
+      "images": [
+        {
+          "id": "niederrhein-route-ab-bocholt-01",
+          "src": "/assets/activity-visuals/niederrhein-route-ab-bocholt-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Flacher Niederrhein-Radweg entlang von Wiesen, Wasser und Baumreihen.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "witte_venn_ahaus_alstaette_entdecken": {
+      "label": "witte-venn-ahaus-alstaette-entdecken",
+      "description": "Exklusives Activity-Hauptbild fuer witte-venn-ahaus-alstaette-entdecken.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "witte-venn-ahaus-alstaette-entdecken"
+      ],
+      "images": [
+        {
+          "id": "witte-venn-ahaus-alstaette-entdecken-01",
+          "src": "/assets/activity-visuals/witte-venn-ahaus-alstaette-entdecken-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Grenzvenn mit Heide, Wollgras, Moorwasser und lockerem Waldsaum.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "schmuggelroute": {
+      "label": "schmuggelroute",
+      "description": "Exklusives Activity-Hauptbild fuer schmuggelroute.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "schmuggelroute"
+      ],
+      "images": [
+        {
+          "id": "schmuggelroute-01",
+          "src": "/assets/activity-visuals/schmuggelroute-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ländlicher Grenzweg mit Hecken, Feldern und sandigem Wegverlauf.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "b1_mosse_route": {
+      "label": "b1-mosse-route",
+      "description": "Exklusives Activity-Hauptbild fuer b1-mosse-route.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "b1-mosse-route"
+      ],
+      "images": [
+        {
+          "id": "b1-mosse-route-01",
+          "src": "/assets/activity-visuals/b1-mosse-route-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Bocholter Wasserlauf mit Uferweg, Backsteinmauern und Industriekultur-Anmutung.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "auesee_wesel_erleben": {
+      "label": "auesee-wesel-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer auesee-wesel-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "auesee-wesel-erleben"
+      ],
+      "images": [
+        {
+          "id": "auesee-wesel-erleben-01",
+          "src": "/assets/activity-visuals/auesee-wesel-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Großer Freizeitsee mit Sandstrand, Liegewiese und grünem Baumgürtel.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "stadtwald_bocholt_erleben": {
+      "label": "stadtwald-bocholt-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer stadtwald-bocholt-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "stadtwald-bocholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "stadtwald-bocholt-erleben-01",
+          "src": "/assets/activity-visuals/stadtwald-bocholt-erleben-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Ruhiger Waldweg im Stadtwald Bocholt mit dichter grüner Vegetation.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "naturkulturspaziergang_bocholt_rhede": {
+      "label": "naturkulturspaziergang-bocholt-rhede",
+      "description": "Exklusives Activity-Hauptbild fuer naturkulturspaziergang-bocholt-rhede.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "naturkulturspaziergang-bocholt-rhede"
+      ],
+      "images": [
+        {
+          "id": "naturkulturspaziergang-bocholt-rhede-01",
+          "src": "/assets/activity-visuals/naturkulturspaziergang-bocholt-rhede-01.webp",
+          "status": "ready",
+          "source": "chatgpt_generated",
+          "rights_status": "generated_project_asset",
+          "alt": "Natur- und Kulturroute mit weitem Landschaftsblick, Weg und historischem Maueranker.",
+          "source_type": "generated_activity_visual",
+          "is_symbolic": true,
+          "is_documentary": false,
+          "is_ai_generated": true,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675"
+        }
+      ]
+    },
+    "bocholter_innenstadt_erleben": {
+      "label": "bocholter-innenstadt-erleben",
+      "description": "Rathaus/Markt als Innenstadtmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bocholter-innenstadt-erleben"
+      ],
+      "images": [
+        {
+          "id": "bocholter-innenstadt-erleben-01",
+          "src": "/assets/activity-visuals/bocholter-innenstadt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Belebter Marktplatz vor dem historischen Rathaus in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 3.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2013_bocholt_rathaus_markt.JPG",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "erlebnispfad_klostersee_burlo": {
+      "label": "erlebnispfad-klostersee-burlo",
+      "description": "Echter Klostersee.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "erlebnispfad-klostersee-burlo"
+      ],
+      "images": [
+        {
+          "id": "erlebnispfad-klostersee-burlo-01",
+          "src": "/assets/activity-visuals/erlebnispfad-klostersee-burlo-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Großer Blick über den Klostersee in Burlo mit Ufer und angrenzender Landschaft.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Günter Seggebäing",
+          "license": "CC BY-SA 3.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:20140720_115339_Klostersee_Burlo,_Borken_(DSC04592).jpg",
+          "credit": "Günter Seggebäing / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "heelweg_dinxperlo_suderwick_entdecken": {
+      "label": "heelweg-dinxperlo-suderwick-entdecken",
+      "description": "Echtes Grenzortmotiv für Heelweg/Dinxperlo-Suderwick.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "heelweg-dinxperlo-suderwick-entdecken"
+      ],
+      "images": [
+        {
+          "id": "heelweg-dinxperlo-suderwick-entdecken-01",
+          "src": "/assets/activity-visuals/heelweg-dinxperlo-suderwick-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Grenzstraße zwischen Suderwick und Dinxperlo mit Ortsschildern und Straßenraum.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2021-03-24_Dinxperlo_Suderwick_03.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "grenzenlos_wandern_dinxperlo_suderwick": {
+      "label": "grenzenlos-wandern-dinxperlo-suderwick",
+      "description": "Uebergangsbild fuer GrenzenLos wandern Dinxperlo-Suderwick; echtes Grenzraum-Motiv, aber noch kein Premium-Endstand.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "grenzenlos-wandern-dinxperlo-suderwick"
+      ],
+      "images": [
+        {
+          "id": "grenzenlos-wandern-dinxperlo-suderwick-01",
+          "src": "/assets/activity-visuals/grenzenlos-wandern-dinxperlo-suderwick-01.webp",
+          "status": "fallback",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Grenzraum zwischen Dinxperlo und Suderwick am Heelweg.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "fallback_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "2019-03-29 Heelweg Hellweg 18.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2019-03-29_Heelweg_Hellweg_18.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/2019-03-29_Heelweg_Hellweg_18.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "unterduikmuseum_aalten_entdecken": {
+      "label": "unterduikmuseum-aalten-entdecken",
+      "description": "Aktuelles echtes Museumsmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "unterduikmuseum-aalten-entdecken"
+      ],
+      "images": [
+        {
+          "id": "unterduikmuseum-aalten-entdecken-01",
+          "src": "/assets/activity-visuals/unterduikmuseum-aalten-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Historischer Innenraum im Nationaal Onderduikmuseum in Aalten.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2025-02-11_Nationaal_Onderduikmuseum_ZvD_101.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "textilwerk_bocholt_erleben": {
+      "label": "textilwerk-bocholt-erleben",
+      "description": "Starkes reales Textilwerk-/Spinnereimotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "textilwerk-bocholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "textilwerk-bocholt-erleben-01",
+          "src": "/assets/activity-visuals/textilwerk-bocholt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Industriearchitektur und Außenbereich des TextilWerks in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2025-04-22_LWL-Museum_Textilwerk_Spinnerei_59.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "museumfabriek_winterswijk_erleben": {
+      "label": "museumfabriek-winterswijk-erleben",
+      "description": "16:9-nahes Museumsbild.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "museumfabriek-winterswijk-erleben"
+      ],
+      "images": [
+        {
+          "id": "museumfabriek-winterswijk-erleben-01",
+          "src": "/assets/activity-visuals/museumfabriek-winterswijk-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Ausstellungsraum in der Museumfabriek Winterswijk.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2026-03-17_MuseumFabriek_Winterswijk_23.jpg",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "erlebnisweg_olle_kerkpatt": {
+      "label": "erlebnisweg-olle-kerkpatt",
+      "description": "Themenbezogener Fallback; Nutzungskontext beachten.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "erlebnisweg-olle-kerkpatt"
+      ],
+      "images": [
+        {
+          "id": "erlebnisweg-olle-kerkpatt-01",
+          "src": "/assets/activity-visuals/erlebnisweg-olle-kerkpatt-16x9.webp",
+          "status": "fallback",
+          "source": "presse_service",
+          "rights_status": "contextual_publication_with_credit",
+          "alt": "Landschaftlicher Weg bei Barlo mit Blick Richtung Dorf und Kirche.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "fallback_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Stadt Bocholt / Presse-Service",
+          "license": "Veröffentlichung mit Fotonachweis im thematischen Zusammenhang",
+          "source_page": "https://www.presse-service.de/medienarchiv.aspx?medien_id=303633",
+          "credit": "Stadt Bocholt / Presse-Service",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "gaengeskes_aalten_entdecken": {
+      "label": "gaengeskes-aalten-entdecken",
+      "description": "Aaltener Gassen-/Straßenmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "gaengeskes-aalten-entdecken"
+      ],
+      "images": [
+        {
+          "id": "gaengeskes-aalten-entdecken-01",
+          "src": "/assets/activity-visuals/gaengeskes-aalten-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "public_domain",
+          "alt": "Historische Straße in Aalten mit typischer kleinstädtischer Bebauung.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Arch",
+          "license": "Public Domain",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Aalten-Dijkstraat_010.JPG",
+          "credit": "Arch / Wikimedia Commons / Public Domain",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "quellengrundpark_weseke_entdecken": {
+      "label": "quellengrundpark-weseke-entdecken",
+      "description": "Apothekergarten-/Parkpanorama.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "quellengrundpark-weseke-entdecken"
+      ],
+      "images": [
+        {
+          "id": "quellengrundpark-weseke-entdecken-01",
+          "src": "/assets/activity-visuals/quellengrundpark-weseke-entdecken-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc0_no_attribution_required",
+          "alt": "Apothekergarten im Quellengrundpark in Weseke.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Wikimedia Commons",
+          "license": "CC0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Apothekergarten_Quellengrundpark_Borken-Weseke.jpg",
+          "credit": "Wikimedia Commons / CC0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "kubaai_aa_promenade_aktiv_erleben": {
+      "label": "kubaai-aa-promenade-aktiv-erleben",
+      "description": "Kubaai-/TextilWerk-Umfeld.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "kubaai-aa-promenade-aktiv-erleben"
+      ],
+      "images": [
+        {
+          "id": "kubaai-aa-promenade-aktiv-erleben-01",
+          "src": "/assets/activity-visuals/kubaai-aa-promenade-aktiv-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Backsteinarchitektur am Kubaai- und TextilWerk-Umfeld in Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ingo G. Krasenbrink",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bocholt_TextilWerk_Kubaai_4.jpg",
+          "credit": "Ingo G. Krasenbrink / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "sternbusch_gemen_erleben": {
+      "label": "sternbusch-gemen-erleben",
+      "description": "Starkes reales Burg-Gemen-Motiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "sternbusch-gemen-erleben"
+      ],
+      "images": [
+        {
+          "id": "sternbusch-gemen-erleben-01",
+          "src": "/assets/activity-visuals/sternbusch-gemen-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Blick auf das Wasserschloss Gemen mit Wassergraben und Park.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Wasserschloss_Gemen_--_2014_--_2251.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "bredevoort_buecherstadt_erleben": {
+      "label": "bredevoort-buecherstadt-erleben",
+      "description": "Passendes Bücherstadt-/Antiquariat-Motiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "bredevoort-buecherstadt-erleben"
+      ],
+      "images": [
+        {
+          "id": "bredevoort-buecherstadt-erleben-01",
+          "src": "/assets/activity-visuals/bredevoort-buecherstadt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Antiquariat in Bredevoort mit außen sichtbaren Büchern.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bredevoort_(NL),_Antiquariat_an_der_Landstraat_--_2016_--_4151.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "vestingpark_st_bernardus_erleben": {
+      "label": "vestingpark-st-bernardus-erleben",
+      "description": "Reales Park-/Grachtmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "vestingpark-st-bernardus-erleben"
+      ],
+      "images": [
+        {
+          "id": "vestingpark-st-bernardus-erleben-01",
+          "src": "/assets/activity-visuals/vestingpark-st-bernardus-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Parklandschaft mit Wasser und Pavillon im Vestingpark St. Bernardus.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Bredevoort_(NL),_Gro%C3%9Fe_Gracht_und_Laube_im_Vestingpark_Sint_Bernardus_--_2016_--_4147.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "handwerk_in_winterswijk": {
+      "label": "handwerk-in-winterswijk",
+      "description": "Winterswijk-Handwerk-/Industriekulturmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "handwerk-in-winterswijk"
+      ],
+      "images": [
+        {
+          "id": "handwerk-in-winterswijk-01",
+          "src": "/assets/activity-visuals/handwerk-in-winterswijk-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Erhaltenes Fabriktor als Motiv der Winterswijker Handwerks- und Industriegeschichte.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Rijksdienst voor het Cultureel Erfgoed / Wikimedia Commons",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Deels_bewaard_gebleven_fabriekspoort_-_Winterswijk_-_20527932_-_RCE.jpg",
+          "credit": "Rijksdienst voor het Cultureel Erfgoed / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "wasserburg_anholt_erleben": {
+      "label": "wasserburg-anholt-erleben",
+      "description": "Starkes hochauflösendes Wasserburgmotiv.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "wasserburg-anholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "wasserburg-anholt-erleben-01",
+          "src": "/assets/activity-visuals/wasserburg-anholt-erleben-16x9.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Wasserburg Anholt mit Spiegelung im Wasser und historischer Schlossansicht.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_11",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Worldfootage",
+          "license": "CC BY-SA 4.0",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Wasserburg_Anholt_P1740796.jpg",
+          "credit": "Worldfootage / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "anholter_schweiz_erleben": {
+      "label": "anholter-schweiz-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer anholter-schweiz-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "anholter-schweiz-erleben"
+      ],
+      "images": [
+        {
+          "id": "anholter-schweiz-erleben-01",
+          "src": "/assets/activity-visuals/anholter-schweiz-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Natur- und Wasserlandschaft in der Anholter Schweiz.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "20200722 Anholter Schweiz 04.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:20200722_Anholter_Schweiz_04.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/20200722_Anholter_Schweiz_04.jpg",
+          "credit": "Ziko / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "schloss_ringenberg_erleben": {
+      "label": "schloss-ringenberg-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer schloss-ringenberg-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "schloss-ringenberg-erleben"
+      ],
+      "images": [
+        {
+          "id": "schloss-ringenberg-erleben-01",
+          "src": "/assets/activity-visuals/schloss-ringenberg-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_2_0_de_attribution_required",
+          "alt": "Schloss Ringenberg mit historischem Gebäudeflügel.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Sir Gawain",
+          "license": "CC BY-SA 2.0 DE",
+          "license_url": "https://creativecommons.org/licenses/by-sa/2.0/de/deed.de",
+          "source_title": "SchlossRingenberg04.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:SchlossRingenberg04.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/SchlossRingenberg04.jpg",
+          "credit": "Sir Gawain / Wikimedia Commons / CC BY-SA 2.0 DE",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "tiergarten_schloss_raesfeld_erleben": {
+      "label": "tiergarten-schloss-raesfeld-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer tiergarten-schloss-raesfeld-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "tiergarten-schloss-raesfeld-erleben"
+      ],
+      "images": [
+        {
+          "id": "tiergarten-schloss-raesfeld-erleben-01",
+          "src": "/assets/activity-visuals/tiergarten-schloss-raesfeld-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Historischer Tiergarten am Schloss Raesfeld mit Wasserachse.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Reinhard G. Nießing",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Renaissance-Tiergarten Schloss Raesfeld.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaissance-Tiergarten_Schloss_Raesfeld.jpg",
+          "credit": "Reinhard G. Nießing / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "borkener_tuerme_tour": {
+      "label": "borkener-tuerme-tour",
+      "description": "Exklusives Activity-Hauptbild fuer borkener-tuerme-tour.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "borkener-tuerme-tour"
+      ],
+      "images": [
+        {
+          "id": "borkener-tuerme-tour-01",
+          "src": "/assets/activity-visuals/borkener-tuerme-tour-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Historischer Turm in Borken als Ziel der Türme-Tour.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Dietmar Rabich",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Borken, Kuhmturm -- 2014 -- 2271.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Borken,_Kuhmturm_--_2014_--_2271.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Borken,_Kuhmturm_--_2014_--_2271.jpg",
+          "credit": "Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "das_mysterium_von_winterswijk": {
+      "label": "das-mysterium-von-winterswijk",
+      "description": "Exklusives Activity-Hauptbild fuer das-mysterium-von-winterswijk.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "das-mysterium-von-winterswijk"
+      ],
+      "images": [
+        {
+          "id": "das-mysterium-von-winterswijk-01",
+          "src": "/assets/activity-visuals/das-mysterium-von-winterswijk-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_4_0_attribution_required",
+          "alt": "Blick vom Vrijheidspark auf die Jacobskerk in Winterswijk.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Michielverbeek",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "source_title": "Winterswijk, kerktoren van de Jacobskerk RM39053 vanaf het Vrijheidspark IMG 2598 2022-07-18 17.51.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Winterswijk,_kerktoren_van_de_Jacobskerk_RM39053_vanaf_het_Vrijheidspark_IMG_2598_2022-07-18_17.51.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Winterswijk,_kerktoren_van_de_Jacobskerk_RM39053_vanaf_het_Vrijheidspark_IMG_2598_2022-07-18_17.51.jpg",
+          "credit": "Michielverbeek / Wikimedia Commons / CC BY-SA 4.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "villa_mondriaan_winterswijk_erleben": {
+      "label": "villa-mondriaan-winterswijk-erleben",
+      "description": "Exklusives Activity-Hauptbild fuer villa-mondriaan-winterswijk-erleben.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "villa-mondriaan-winterswijk-erleben"
+      ],
+      "images": [
+        {
+          "id": "villa-mondriaan-winterswijk-erleben-01",
+          "src": "/assets/activity-visuals/villa-mondriaan-winterswijk-erleben-01.webp",
+          "status": "ready",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Außenansicht der Villa Mondriaan in Winterswijk.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "ready_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Ziko van Dijk",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "source_title": "2013-05-18 villa mondrian.JPG",
+          "source_page": "https://commons.wikimedia.org/wiki/File:2013-05-18_villa_mondrian.JPG",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/2013-05-18_villa_mondrian.JPG",
+          "credit": "Ziko van Dijk / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP."
+        }
+      ]
+    },
+    "handwerksmuseum_bocholt_erleben": {
+      "label": "handwerksmuseum-bocholt-erleben",
+      "description": "Uebergangsbild fuer das Handwerksmuseum Bocholt; echtes lokales Motiv, aber noch kein Premium-Endstand.",
+      "target_count": 1,
+      "primary_offer_ids": [
+        "handwerksmuseum-bocholt-erleben"
+      ],
+      "images": [
+        {
+          "id": "handwerksmuseum-bocholt-erleben-01",
+          "src": "/assets/activity-visuals/handwerksmuseum-bocholt-erleben-01.webp",
+          "status": "fallback",
+          "source": "wikimedia_commons",
+          "rights_status": "cc_by_sa_3_0_attribution_required",
+          "alt": "Außenansicht des Handwerksmuseums Bocholt.",
+          "source_type": "licensed_real_photo",
+          "is_symbolic": false,
+          "is_documentary": true,
+          "is_ai_generated": false,
+          "review_status": "fallback_accepted_2026_06_12",
+          "card_asset_format": "16:9_webp_1200x675",
+          "author": "Stahlkocher",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "source_title": "Handwerksmuseum Bocholt.jpg",
+          "source_page": "https://commons.wikimedia.org/wiki/File:Handwerksmuseum_Bocholt.jpg",
+          "download_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Handwerksmuseum_Bocholt.jpg",
+          "credit": "Stahlkocher / Wikimedia Commons / CC BY-SA 3.0",
+          "modifications": "16:9 crop, resized to 1200x675, converted to WebP.",
+          "license_note": "Commons lists multiple licensing options; project uses CC BY-SA 3.0 attribution path."
+        }
+      ]
+    }
+  }
+}

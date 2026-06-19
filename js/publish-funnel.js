@@ -240,7 +240,7 @@ function applyPlanPresetFromUrl() {
     return {
       plan: safeText(byId("publish-standard-plan")?.value),
       organization: safeText(byId("publish-standard-organization")?.value),
-      contact: "",
+      contact: safeText(byId("publish-standard-contact")?.value),
       email: safeText(byId("publish-standard-email")?.value),
       eventLink: safeText(byId("publish-standard-event-link")?.value),
       title: safeText(byId("publish-standard-title")?.value),
@@ -555,6 +555,7 @@ function buildAutomationSummary(context) {
     const invalidIds = [];
 
     if (!hasValue(context.organization)) invalidIds.push("publish-standard-organization");
+    if (!hasValue(context.contact)) invalidIds.push("publish-standard-contact");
     if (!hasValue(context.email) || (emailControl && !emailControl.validity.valid)) invalidIds.push("publish-standard-email");
     if (!hasValue(context.title)) invalidIds.push("publish-standard-title");
     if (!hasValue(context.date)) invalidIds.push("publish-standard-date");

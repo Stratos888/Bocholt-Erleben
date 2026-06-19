@@ -2,6 +2,139 @@
 
 # TEST STATUS — BOCHOLT ERLEBEN
 
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 | Zweck: dokumentiert fachliche Motiv-Fit-QA nach technischer Bildabdeckung; Umfang: Regelkorrekturen, Matrix-/Backlog-Zielstand, keine neue Bildproduktion === -->
+## Event Visual Motif-Fit-QA – Regelpaket lokal geprüft (2026-06-18)
+
+Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+
+Ausgangslage:
+- Finaler Restbatch war deployed.
+- Sicht-Smoke zeigte keine weißen/leeren Bildflächen.
+- Technische Asset-Abdeckung war damit erfüllt, aber der fachliche Motiv-Fit war noch nicht abschließend belegt.
+
+Korrekturtyp:
+- Keine neuen Bilder.
+- Keine Pool-Erweiterung.
+- Nur deterministische Regelhärtung in `scripts/event_visual_keys.py` und `scripts/event_visual_motifs.py`.
+- Matrix und Gap-Backlog wurden danach gegen den aktuellen Sheet-Export neu gebaut.
+
+Repräsentative korrigierte Fälle:
+
+| Event/Typ | Vorher | Nachher |
+|---|---|---|
+| Rosenmontagszug | `market_stalls / neutral_market_stalls` | `parade_festzug / neutral_parade` |
+| Fahrradtour mit Guide | `nature_learning_wildlife / neutral_nature_learning` | `active_route_tour / guided_bike_tour` |
+| Segwaytouren | `nature_learning_wildlife / neutral_nature_learning` | `active_route_tour / neutral_active_tour` |
+| Bocholter Puppenspieltage | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / puppet_theater` |
+| Das schönste Ei der Welt | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / puppet_theater` |
+| Für Kinder: Ein Abend voller Bären-Geschichten | `family_play_outdoor / neutral_family_play_outdoor` | `kids_stage_story / neutral_kids_stage` |
+| Quartierfest im Klostergarten | `market_stalls / neutral_market_stalls` | `city_festival_street / district_festival` |
+| KANAREN - Sieben auf einen Streich | `local_history_heritage / neutral_local_history` | `literature_reading_talk / neutral_reading_talk` |
+| In Szene gesetzt - Living History im LWL-Museum Textilwerk | `textile_machines_industry / weaving_mill` | `local_history_heritage / museum_history_exhibition` |
+| Filmvorführung … Un secret | `local_history_heritage / neutral_local_history` | `film_screening / film_screening` |
+| Familienschützenfest | `city_festival_street / neutral_city_festival` | `shooting_festival_tradition / shooting_festival_tradition` |
+| Markterschließung Niederlande | `creative_making_workshop / neutral_creative_workshop` | `business_messe_info / business_fair` |
+| Bocholt Blüht mit großem Oldtimerfestival | `market_stalls / neutral_market_stalls` | `vehicle_classic / classic_car_meet` |
+| Führung Lebenselixier Wasser / Pröbstingsee | `city_tour_history / neutral_guided_city_tour` | `nature_learning_wildlife / walking_nature_tour` |
+
+Lokaler Prüfbefund nach Regelpaket:
+- `ready: 70`
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- `parked_candidate: 4`
+- `not_needed: 26`
+- Gap-Backlog: `0` offene Zeilen
+- Premium Visual Contract Audit: bestanden, keine Errors.
+
+Bewertung:
+- Es bleibt keine technische Bildlücke.
+- Die bekannten fachlichen Fehlzuordnungen aus der Motiv-Fit-QA wurden auf vorhandene passendere Ready-Pools umgebogen.
+- Die Änderung produziert keine neuen Gaps und keinen neuen Bildbedarf.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_QA_RULEPATCH_2026_06_18 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 | Zweck: dokumentiert den lokal geprueften Abschluss der aktuellen Event-Visual-Motiv-Gaps; Umfang: finaler Restbatch, Matrix, Gap-Backlog, Audit === -->
+## Event Visual Motif-Fit – finaler Restbatch lokal geprüft (2026-06-18)
+
+Status: commit-/deployfertig; Sicht-Smoke nach GitHub-Upload/Deploy noch auszuführen.
+
+Basis:
+- Aktueller `staging`-ZIP-Stand nach Event Visual Gap Batch 02.
+- Batch 02 war bereits deployed und per Sichtprüfung ohne fehlende Bildflächen geprüft.
+- Finaler Restbatch wurde lokal auf diesen Stand angewendet.
+
+Neu ergänzt:
+- `motif-gap-info-evening-01.webp`
+- `motif-gap-market-square-open-air-01.webp`
+- `motif-gap-open-house-city-services-01.webp`
+
+Regel-/Datenänderungen:
+- `open_house_city_services` wurde von `review` auf `specific` gesetzt.
+- `data/event_visual_pool.json` wurde um die 3 Ready-Assets ergänzt.
+- `data/event_visual_phase2_acceptance_notes.json` dokumentiert die Abnahme.
+- `data/event_visual_motif_matrix.tsv` wurde aus dem aktuellen Sheet-Export neu gebaut.
+- `data/event_visual_gap_backlog.tsv` wurde aus dem aktuellen Sheet-Export neu gebaut.
+
+Lokaler Prüfbefund nach Anwendung:
+- `ready: 69`
+- `gap_to_produce: 0`
+- `candidate_to_integrate: 0`
+- `review_rules: 0`
+- `parked_candidate: 4`
+- `not_needed: 27`
+- Gap-Backlog: `0` offene Zeilen
+- Premium Visual Contract Audit: bestanden, keine Errors.
+
+Abschlussbewertung:
+- Für den aktuellen Sheet-Stand sind alle notwendigen Event-Visual-Motive mit Ready-Bildern abgedeckt.
+- Es wurden nicht alle theoretischen Visual-Subcategories auf Vorrat produziert; das bleibt bewusst Nicht-Ziel.
+- Neue Event-Visual-Produktion nur bei neuem Sheet-Bedarf, neuem Gap-Backlog oder bewusster strategischer Poolentscheidung.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FINAL_RESTBATCH_2026_06_18 === -->
+
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_IMAGE_MATERIAL_FORM_V1_2026_06_12 | Zweck: dokumentiert Abschluss der Bildmaterial-Abfrage fuer Kunden-Aktivitaeten inklusive Live-DB-Vorbereitung === -->
+## Kunden-Aktivitäten: Bildmaterial-Abfrage V1 abgeschlossen (2026-06-12)
+
+Status: umgesetzt, auf `staging` deployed und visuell geprüft.
+
+Relevante Commits:
+- `cd37051` – `Ergaenze Bildmaterial-Abfrage fuer Aktivitaeten`
+- `220c6ac` – `Praezisiere Bildmaterial-Option im Aktivitaetsformular`
+- `51b0d0b` – `Verbessere Bildmaterial Hinweise im Aktivitaetsformular`
+
+Umgesetzter Zielzustand:
+- Das Activity-Einreichungsformular fragt Bildmaterial optional ab.
+- Es gibt weiterhin keinen Datei-Upload, keinen Storage und keine Medienverwaltung im Formular.
+- Kunden können angeben, ob Bildmaterial vorhanden ist.
+- Bei vorhandenem Bildmaterial wählen Kunden die Bereitstellungsart:
+  - Downloadlink / Cloud-Ordner / Pressemappe
+  - Website-Galerie mit passenden Bildern
+  - Bilder später per E-Mail
+  - Sonstiges
+- Die Hinweise im Textfeld wechseln dynamisch je Bereitstellungsart.
+- Die Bildrechte-Bestätigung ist nur erforderlich, wenn eigenes/verlinktes/später zugesendetes Bildmaterial angegeben wird.
+- Die Angaben werden strukturiert in `submissions.activity_image_json` gespeichert.
+- Die Inbox zeigt die Bildmaterial-Angaben in den Prüfdaten an.
+- Die redaktionelle Bildhoheit bleibt bei Bocholt erleben: Kunden können Material anbieten, aber Bocholt erleben entscheidet, welches Bild veröffentlicht wird.
+
+Datenbankstand:
+- Staging-DB: `submissions.activity_image_json` vorhanden.
+- Live-DB: `submissions.activity_opening_json` wurde geprüft; `submissions.activity_image_json` wurde als additive nullable JSON-Spalte vorbereitet.
+- Migration im Repo: `api/sql/008_activity_image_json.sql`.
+
+Smoke-Status:
+- Formular lässt sich mit der Option „Nein, Bocholt erleben darf ein passendes Bild zur Verfügung stellen“ absenden.
+- Einreichung landet in der Inbox.
+- Inbox erkennt den redaktionellen Bildstatus korrekt.
+- Dropdown-Wording und dynamische Platzhalter wurden auf Staging geprüft.
+
+Abschluss:
+- Kein weiterer Code-Patch für diesen Workstream offen.
+- Kein Upload-Workpack in V1; ein echter Datei-Upload bleibt bewusst späterer separater Scope.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_IMAGE_MATERIAL_FORM_V1_2026_06_12 === -->
+
 ## Rolle dieses Dokuments
 
 Dieses Dokument hält fest, welche Funktionen im Projekt „Bocholt erleben“ auf welchem Stand praktisch geprüft wurden.
@@ -33,6 +166,282 @@ Jeder Teststand muss enthalten:
 - Live-Rollout-Hinweise
 
 ---
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIL_SYSTEM_PILOT_2026_06_05 | Zweck: dokumentiert den bestandenen Staging-Test des Mail-System-Piloten; Umfang: Einzeltermin-Eingangsbestätigung, HTML-Mail, Anrede und Referenzdarstellung === -->
+
+# Teststand: Mail-System Pilot – Einzeltermin-Eingangsbestätigung
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- relevante Commits:
+  - `fbd7b6d` — Mail-System-Contract dokumentiert
+  - `d05dbf8` — Mail-System-Pilot implementiert
+  - `ec1db43` — Ansprechpartner-Feld ergänzt
+  - `ceafedf` — Mail-Referenzen lesbar formatiert
+- Ergebnis: bestanden / Pilot freigegeben
+
+Geprüft und bestanden:
+- HTML-Mail wird korrekt dargestellt.
+- Betreff: `Dein Einzeltermin wird geprüft`.
+- Persönliche Anrede funktioniert über das neue Pflichtfeld `Ansprechperson`.
+- Datenbox zeigt Veranstaltung und lesbare Referenz, z. B. `BE-E50125C5-32A2`.
+- Die vollständige UUID wird nicht mehr in der Kundenmail angezeigt.
+- Die interne UUID bleibt für Stripe, Webhooks, Review und Datenbankzuordnung unverändert.
+- Hinweisbox stellt klar: Veröffentlichung erst nach finaler redaktioneller Freigabe.
+- Keine Formulierung mit `grundsätzlich`.
+- Layout bleibt auch in schmaler Outlook-/Webmail-Ansicht nutzbar.
+
+Offen:
+- Weitere vorgefertigte Mails einzeln nach `MAIL_SYSTEM.md` migrieren.
+- Nächste Mail: Zahlungslink-Mail Einzeltermin.
+- Vor Production-Rollout: kontrollierte Test-Einreichung auf Production prüfen.
+
+<!-- === END BLOCK: TEST_STATUS_MAIL_SYSTEM_PILOT_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_PAYMENT_LINK_MAIL_EVENT_2026_06_05 | Zweck: dokumentiert den bestandenen Staging-Test der Zahlungslink-Mail fuer Einzeltermine; Umfang: Topic-Mail, CTA, Fristlabel, Referenz und Prozesskommunikation === -->
+
+# Teststand: Mail-System – Zahlungslink-Mail Einzeltermin
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- relevante Commits:
+  - `4e13863` — Mail-Topics zentralisiert
+  - `5cbcb84` — Zahlungslink-Mails ins Topic-System migriert
+  - `0c055e1` — Zahlungslink-Frist in Mails präzisiert
+- Ergebnis: bestanden / freigegeben
+
+Geprüft und bestanden:
+- Betreff: `Nächster Schritt: Zahlung für deinen Einzeltermin`.
+- Persönliche Anrede funktioniert bei neuen Einreichungen mit `contact_name_snapshot`.
+- Datenbox zeigt Veranstaltung, lesbare Referenz und `Zahlungslink gültig bis`.
+- CTA-Button `Zahlung starten` wird korrekt angezeigt.
+- Die vollständige UUID wird nicht in der Kundenmail angezeigt.
+- Die Mail enthält keine Formulierung mit `grundsätzlich`.
+- Die Mail unterscheidet sich klar von der Eingangsbestätigung und vermittelt Prozessfortschritt.
+- Hinweisbox erklärt: Nach Zahlung wird der Termin final für die Veröffentlichung vorbereitet; sichtbar wird er erst nach redaktioneller Freigabe.
+- Die Mail kündigt an, dass der Nutzer eine weitere E-Mail erhält, sobald der Termin sichtbar ist.
+- Layout bleibt auch in schmaler Outlook-/Webmail-Ansicht nutzbar.
+
+Bewertung:
+- Die Mailkette Eingang → Zahlungslink → Veröffentlichung bleibt aus Nutzersicht nachvollziehbar.
+- Keine zusätzliche Bocholt-erleben-Mail nur für `Zahlung erhalten` vorgesehen, um unnötige Mailmenge zu vermeiden.
+
+Offen:
+- Zahlungslink-Mail Aktivitätspräsenz noch bewusst prüfen.
+- Veröffentlichung-/Live-Mail als nächste relevante Nutzer-Mail migrieren.
+
+<!-- === END BLOCK: TEST_STATUS_PAYMENT_LINK_MAIL_EVENT_2026_06_05 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MAIL_SYSTEM_TOPICS_FREEZE_2026_06_05 | Zweck: dokumentiert den konsolidierten Staging-Abschluss des zentralen Mail-Topic-Systems; Umfang: Eingangs-, Zahlungslink-, Freigabe-, Ablehnungs- und Magic-Link-Mails sowie interner Testendpunkt === -->
+
+# Teststand: Mail-System Topic-Migration – Staging-Freeze
+
+- Datum: 2026-06-05
+- Umgebung: Staging
+- geprüfter Stand: `57563b8`
+- Ergebnis: bestanden / Mail-System-Topic-Migration abgeschlossen
+
+## Umgesetzter Scope
+
+Alle produktiven Nutzer-Mails laufen über das zentrale Mail-Topic-System in `api/_bootstrap.php`:
+
+- `submission_received_event`
+- `submission_received_activity`
+- `payment_released_event`
+- `payment_released_activity`
+- `publication_approved_event`
+- `publication_approved_activity`
+- `rejection_event`
+- `rejection_activity`
+- `magic_link_portal`
+
+Die produktiven Versandstellen bleiben fachlich getrennt, nutzen aber zentral gerenderte Maildaten:
+
+- `api/submissions/init.php` → Eingangsbestätigung
+- `api/submissions/release-payment.php` → Zahlungslink
+- `api/submissions/approve.php` → Freigabe
+- `api/submissions/reject.php` → Ablehnung
+- `api/organizer-portal/request-magic-link.php` → Anbieterbereich-Zugangslink
+
+## Geprüft und bestanden
+
+- HTML-Mail-Layout wird zentral gerendert.
+- Plain-Text-Fallback bleibt vorhanden.
+- Persönliche Anrede funktioniert über `contact_name` bzw. Snapshot-Felder, sofern vorhanden.
+- Lesbare öffentliche Referenz wird statt vollständiger UUID angezeigt.
+- Zahlungslink-Mails zeigen `Zahlungslink gültig bis`.
+- Magic-Link-Mail zeigt `Zugangslink gültig bis`.
+- Freigabe-Mails formulieren bewusst `wurde freigegeben` statt `ist sichtbar`, weil tatsächliche Sichtbarkeit von Aktualisierung/Deploy abhängen kann.
+- Aktivitäts-Freigabe-Mail erklärt die Tarifzuordnung über die Freigabe.
+- Ablehnungs-Mails nutzen verpflichtende, mail-taugliche Ablehnungsgründe aus der Inbox.
+- Alte technische Ablehnungs-Codes wie `DUBLETTE`, `DATUM_FALSCH`, `BOT_FEHLER_SONSTIGES` werden nicht mehr als Mailgrund versendet.
+- Interner Testendpunkt `api/mail-topic-test.php` ermöglicht geschützten Topic-Testversand ohne Stripe-, DB- oder Inbox-Statusänderung.
+
+## Sammeltest
+
+Über den internen Mail-Topic-Testendpunkt wurden alle 9 Topics gegen Staging ausgelöst.
+
+Alle Topics lieferten:
+
+- `status: ok`
+- `sent: true`
+- erwarteten Betreff
+
+Getestete Betreffzeilen:
+
+- `Dein Einzeltermin wird geprüft`
+- `Deine Aktivität wird geprüft`
+- `Nächster Schritt: Zahlung für deinen Einzeltermin`
+- `Nächster Schritt: Zahlung für deine Aktivitätspräsenz`
+- `Dein Einzeltermin wurde freigegeben`
+- `Deine Aktivität wurde freigegeben`
+- `Dein Einzeltermin wurde nicht freigegeben`
+- `Deine Aktivität wurde nicht freigegeben`
+- `Dein Zugangslink für Bocholt erleben`
+
+## Qualitäts- und Sicherheitsbewertung
+
+- Keine produktive Mailstelle mit alter Plain-Text-Sonderlogik gefunden.
+- Alte Ablehnungsgrund-Codes wurden aus Inbox/API-Scan entfernt.
+- Alle relevanten PHP-Dateien ohne Syntaxfehler:
+  - `api/_bootstrap.php`
+  - `api/submissions/init.php`
+  - `api/submissions/release-payment.php`
+  - `api/submissions/approve.php`
+  - `api/submissions/reject.php`
+  - `api/organizer-portal/request-magic-link.php`
+  - `api/mail-topic-test.php`
+- Der Testendpunkt ist per Review-Zugang geschützt und verändert keine Datenbank-, Stripe- oder Inbox-Zustände.
+
+## Offene Hinweise
+
+- Review-Passwort rotieren, weil es im Chat sichtbar verwendet wurde.
+- `api/mail-topic-test.php` bleibt vorerst als internes Testwerkzeug bestehen.
+- Später entscheiden, ob der Testendpunkt dauerhaft bleibt oder vor Production-Härtung wieder entfernt wird.
+- Untracked Event-Visual-PNGs unter `assets/event-visuals/` gehören zu einem separaten Visual-Workstream und wurden in diesem Mail-Workstream nicht berührt.
+
+<!-- === END BLOCK: TEST_STATUS_MAIL_SYSTEM_TOPICS_FREEZE_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 | Zweck: dokumentiert den Staging-Proof der zentralen Veröffentlichungserklärung und der kontextuellen Hilfelinks; Umfang: Informationsarchitektur, Mobile-/Desktop-UX, Ankerverhalten, Link-Hierarchie, Abgrenzung zu Funnel-/Checkout-Logik === -->
+
+# Teststand: Veröffentlichungserklärung und kontextuelle Hilfelinks
+
+## Stand
+
+- Datum: 2026-05-29
+- Umgebung: Staging
+- Funktion: zentrale Erklärseite `/veroeffentlichung-erklaert/` plus kontextuelle Hilfelinks aus den Veranstalter-/Anbieter-Funnels
+- relevante Staging-Commits:
+  - `faebbe4` — zentrale Erklärseite angelegt
+  - `1584e8f` — Ankerziele der Veröffentlichungserklärung korrigiert
+  - `626584d` — Scroll-Offset für Erklärseiten-Anker korrigiert
+  - `9afede6` — Link-Hierarchie der Veröffentlichungserklärung poliert
+  - `563c130` — Unterstreichung bei Erklärlinks entfernt
+- Ergebnis: bestanden / für den aktuellen Spitzenstand gefreezt
+
+## Ziel der geprüften Funktion
+
+Die bestehenden Funnel-Seiten sollen kurz, mobil-tauglich und handlungsorientiert bleiben.
+
+Tiefe Erklärungen zu Prüfung, Freigabe, Zahlung, Fairness, Aktivitätspräsenz und messbarem Mehrwert werden nicht redundant auf mehrere Funnel-Seiten verteilt, sondern zentral auf `/veroeffentlichung-erklaert/` gebündelt.
+
+## Geprüfte Seiten und Verbindungen
+
+Bestanden:
+
+- `/events-veroeffentlichen/`
+  - Kontextlink `Unsicher, welcher Weg passt? Veröffentlichung einfach erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#welcher-weg-passt`
+- `/fuer-veranstalter/`
+  - Kontextlink `Fragen zu Prüfung, Freigabe und veröffentlichten Terminen? Ablauf kurz erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#zahlung-und-freigabe`
+- `/angebote/sichtbar-werden/`
+  - Kontextlink `Nicht sicher, ob dein Angebot eine Aktivität oder Veranstaltung ist? Unterschied kurz erklärt`
+  - Ziel: `/veroeffentlichung-erklaert/#aktivitaet-oder-veranstaltung`
+- `/ueber/`
+  - dezenter Querverweis zur neuen Veröffentlichungserklärung
+- `/veroeffentlichung-erklaert/`
+  - zentrale Erklärung lädt auf Staging
+  - Rückwege zu Veranstaltung, Mitgliedschaft und Aktivitätspräsenz funktionieren
+  - FAQ-/Details-Elemente sind scanbar
+  - Hash-Ziele öffnen passende FAQ-Punkte automatisch
+  - Scroll-Offset hält Zielüberschrift unter dem sticky Header sichtbar
+  - Link-Hierarchie unterscheidet Hilfelinks klar von Haupt-CTAs
+
+## UX-Bewertung
+
+Bestanden:
+
+- Mobile:
+  - Funnel-Seiten bleiben kurz.
+  - Hilfelinks sind sichtbar, aber nicht dominant.
+  - Keine altbackene Unterstreichung bei appartigen Navigationslinks.
+  - Ankerziele landen inhaltlich richtig und mit sichtbarer Zielüberschrift.
+- Desktop:
+  - Erklärseite wirkt ruhig und strukturiert.
+  - obere Rückwege wirken nicht mehr wie dominante CTA-Buttons.
+  - FAQ und Abschlussnavigation sind geordnet.
+- Informationsarchitektur:
+  - Funnel-Seiten erklären nur kurz und verlinken bei Bedarf.
+  - Die neue Seite übernimmt Tiefe und Vertrauen.
+  - Keine Pop-up-/Modal-Lösung nötig.
+  - Keine redundanten FAQ-Blöcke auf mehreren Funnel-Seiten.
+
+## Bewusste Nicht-Prüfung
+
+Nicht betroffen und nicht neu getestet:
+
+- Formularvalidierung
+- Stripe Checkout
+- Webhooks
+- Review-Inbox-Funktionen
+- Magic-Link-Login
+- Anbieter-Dashboard
+- Datenbankstatus
+- Veröffentlichung aus der Inbox
+
+Begründung: Der Workpack hat nur statische Seitenstruktur, Links, CSS-Hierarchie, Sitemap und Erklärinhalt verändert. Funnel-, Backend- und Zahlungslogik wurden nicht angefasst.
+
+## Bewertung
+
+Der Roadmap-Punkt `Veranstalter-Funnel stärker auf belegbaren Mehrwert ausrichten` ist für den aktuellen Stand erfüllt.
+
+Erfüllt sind:
+
+- seriöse lokale Kommunikation
+- keine unbelegten Reichweitenversprechen
+- Mehrwert als Dienstleistung erklärt:
+  - Prüfung
+  - Aufbereitung
+  - Sichtbarkeit
+  - faire Darstellung
+  - vorsichtig eingeordnete messbare Interaktionen
+- bestehende Funnel-Seiten bleiben minimal-invasiv verändert
+- neue zentrale Erklärseite vermeidet Redundanz und mobile Überlänge
+
+## Offene Punkte
+
+Keine offenen Entwicklungsblocker für diesen Workpack.
+
+Später separat möglich, aber nicht Teil dieses Freezes:
+
+- echte Anbieter-/Location-Berichte aus Nutzwertdaten weiter ausbauen
+- monatlichen Wertbericht vorbereiten
+- weitere konkrete Reporting-Ziele ergänzen
+- Live nach Main-Rollout kurz smoke-testen
+
+## Live-Rollout-Hinweise
+
+Nach Merge/Main-Deploy nur Smoke prüfen:
+
+- `/veroeffentlichung-erklaert/` lädt.
+- Kontextlinks aus `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/angebote/sichtbar-werden/` führen zu den passenden Abschnitten.
+- FAQ-Anker öffnen den passenden Punkt.
+- Zielüberschrift bleibt unter dem Header sichtbar.
+- Sitemap enthält `/veroeffentlichung-erklaert/`.
+
+<!-- === END BLOCK: TEST_STATUS_PUBLISH_EXPLAINER_FREEZE_2026_05_29 === -->
 
 <!-- === BEGIN BLOCK: TEST_STATUS_REVIEW_PUSH_SMOKE_PROOF_2026_05_27 | Zweck: dokumentiert Review-/Push-Zugriffsschutz und fachliche Inbox-Flow-Einordnung; Umfang: Staging-Proof, Live-Proof, relevante Review-Fälle, bewusste Abgrenzung neuer Mitgliedschafts-Checkouts und offene Push-Versand-Grenzen === -->
 
@@ -1627,6 +2036,79 @@ Weitere Änderungen nur noch bei:
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_LIVE_READINESS_2026_05_26 === -->
 
 <!-- === END BLOCK: TEST_STATUS_ACTIVITY_PRESENCE_FUNNEL_E2E_2026_05_18 === -->
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PREMIUM_ASSET_INTEGRATION_2026_06_11 | Zweck: dokumentiert den geprüften Stand der Activity-Premiumbild-Assetintegration; Umfang: Activity Visual Pool, finale WebP-Assets, B2-Tonwerke-Fallback, offene Frontend-Verdrahtung === -->
+## Activity Visual Premium Asset Integration – Staging-Stand 2026-06-11
+
+Status: Asset-Integration abgeschlossen, Frontend-/Offer-Verdrahtung noch offen.
+
+### Gesicherte Commits
+
+- `ed2fcc6` – Ergaenze B2 Tonwerke Fallback Visual
+- `1603c84` – Ordne falsch abgelegte Activity Visuals den Event Visuals zu
+- `91125bd` – Integriere akzeptierte Activity Visuals
+- `1b7f2ee` – Dokumentiere Codespaces Quota Fallback
+
+### Ergebnis
+
+Der Activity-Visual-Pool enthält jetzt 25 Pools mit 25 Bildern:
+
+- 24 akzeptierte KI-generierte Activity-Premiumbilder mit Status `ready`
+- 1 rechtlich nutzbarer echter Foto-Fallback mit Status `fallback` für `b2-tonwerke-route`
+- keine fehlenden Ready-/Fallback-Dateien
+- keine Ready-/Fallback-Non-WebP-Dateien
+- keine übergroßen Ready-/Fallback-Dateien
+- keine fehlenden Alt-Texte
+- keine 16:9-Verletzungen
+- Visual-Audit: `Errors: none`
+
+### Integrierte ready-Activity-Bilder
+
+- `100-schloesser-route-ab-bocholt`
+- `aasee-erleben`
+- `auesee-wesel-erleben`
+- `b1-mosse-route`
+- `bocholter-aa-radweg-erleben`
+- `burloer-venn-entdecken`
+- `die-berge-hombornquelle-entdecken`
+- `flamingoroute-ab-bocholt`
+- `hilgelo-erleben`
+- `hohe-mark-radroute-ab-bocholt`
+- `hohenhorster-berge-entdecken`
+- `korenburgerveen-entdecken`
+- `mtb-route-winterswijk`
+- `naturkulturspaziergang-bocholt-rhede`
+- `niederrhein-route-ab-bocholt`
+- `noaberpad-ab-bocholt`
+- `proebstingsee-borken-erleben`
+- `schmuggelroute`
+- `schwarzes-wasser-wesel-entdecken`
+- `stadtwald-bocholt-erleben`
+- `witte-venn-ahaus-alstaette-entdecken`
+- `wooldse-veen-entdecken`
+- `zeitreise-dingdener-heide`
+- `zwillbrocker-venn-flamingos-entdecken`
+
+### Fallback-Bild
+
+`b2-tonwerke-route` nutzt vorerst einen rechtlich nutzbaren Wikimedia-Commons-Foto-Fallback von Dietmar Rabich unter CC BY-SA 4.0.
+
+Wichtige Folgepflicht:
+Bei öffentlicher Nutzung muss der Bildnachweis bzw. die Lizenzangabe sauber berücksichtigt werden. Der aktuelle Stand ist technisch als Fallback integriert, aber kein Premium-Endbild. Ein besseres Betreiber-/Stadt-/Vereinsfoto bleibt später bevorzugt.
+
+### Bewusste Nicht-Übernahmen
+
+Der zusätzliche Schlossrouten-Versuch aus der Inbox wurde nicht importiert, weil der spätere Schloss-/Gräften-Ausschnitt für `100-schloesser-route-ab-bocholt` stärker und eindeutiger war.
+
+Temporäre Inbox-Dateien und Contactsheets wurden nicht committed.
+
+### Offener nächster Workstream
+
+Die Assets sind im `data/activity_visual_pool.json` vorhanden. Die öffentlichen Activities nutzen laut Audit weiterhin `explicit images` und noch keine `visual_keys`.
+
+Nächster sinnvoller Schritt:
+Activity-Frontend-/Datenmapping so umstellen, dass die Activities ihre neuen Pool-Bilder tatsächlich nutzen. Dabei B2-Tonwerke als `fallback` behandeln und nicht als vollwertiges Premium-Ready-Bild verkaufen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PREMIUM_ASSET_INTEGRATION_2026_06_11 === -->
+
 <!-- === END FILE: TEST_STATUS.md === -->
 
 <!-- === BEGIN BLOCK: PUBLIC_UX_DASHBOARD_VALUE_CENTER_STAGING_PROOF_2026_05_28 | Zweck: dokumentiert den geprüften Staging-Stand für Public-UX-Copy und Anbieterbereich-Wertzentrum; Umfang: reiner Test-/Statusnachweis ohne technische Änderung === -->
@@ -1760,3 +2242,1392 @@ Bewertung:
 - Desktop ist ruhiger und logischer strukturiert.
 - Weitere Optimierungen am Anbieter-Dashboard werden vorerst zurückgestellt und nur bei konkretem neuem Befund wieder geöffnet.
 <!-- === END BLOCK: TEST_STATUS_ORGANIZER_DASHBOARD_V2_FREEZE_2026_05_28 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_EVENT_VISUALS_AND_TODAY_ONLY_EVENTS_2026_06_01 | Zweck: belegter Staging-Teststand fuer Event Visual Coverage und Today-Only-Eventlogik; Umfang: technische und visuelle Smoke-Ergebnisse === -->
+## Staging-Teststand – Today Home Event Visuals und Today-Only-Eventlogik – 2026-06-01
+
+Geprüfter Branch/Stand:
+- Branch: `staging`
+- Event-Visual-Commit: `fffaf3d` – `Fuege weitere Event Visual Assets hinzu`
+- Today-Only-Eventlogik: `9115d43` – `Begrenze Today Events auf heutige Termine`
+- `origin/staging` synchron
+- Arbeitsbaum zuletzt sauber
+
+### Event Visual Assets
+
+Neue/ersetzte WebP-Assets:
+- `assets/event-visuals/music-stage-01.webp`
+- `assets/event-visuals/default-city-02.webp`
+- `assets/event-visuals/culture-exhibition-01.webp`
+- `assets/event-visuals/market-food-01.webp`
+- `assets/event-visuals/sport-active-01.webp`
+- `assets/event-visuals/creative-workshop-01.webp`
+- `assets/event-visuals/kids-family-01.webp`
+
+Geprüft:
+- Dateien sind echte WebP-Dateien.
+- Größen nach Komprimierung ca. 67–254 KB.
+- `data/event_visual_pool.json` referenziert alle 7 neuen Assets als `status: ready`.
+- `rights_status`: `ai_generated_symbolic_reviewed`.
+- `review_status`: `accepted_phase1`.
+- `default-city-01` wurde durch `default-city-02` als aktives Default-Bild ersetzt.
+
+Audit-Ergebnisse:
+- `python scripts/audit-event-visual-pool.py`: OK.
+- `python scripts/build-event-visual-asset-backlog.py`: OK, Backlog neu gebaut.
+- `python scripts/audit-event-visual-asset-brief.py`: OK.
+- `python scripts/audit-event-visual-generation-batches.py`: OK.
+- `python scripts/audit-event-visual-ai-style-guide.py`: OK.
+- `node --check js/recommendations.js`: OK.
+- `node --check js/today-home.js`: OK.
+- `git diff --check`: OK.
+
+Staging-Proof:
+- `/data/event_visual_pool.json` liefert HTTP 200.
+- Alle 7 neuen Asset-URLs liefern HTTP 200.
+- Aktuelle Staging-Events: 62.
+- Coverage nach `visual_key`: 62/62 Events haben ein ready Event-Visual.
+
+### Today-Only-Eventlogik
+
+Problem:
+- Auf Today Home erschien ein Event vom 14.06. als Heute-Tipp.
+- Ursache: frühere Event-Spur ließ nahe Zukunftsevents bis 14 Tage zu.
+
+Fix:
+- `TODAY_RECOMMENDATION_EVENT_MIX_V4`
+- Events sind Today-Kandidaten nur noch, wenn:
+  - Startdatum heute ist, oder
+  - das Event als Mehrtagesevent heute läuft.
+- Zukünftige Events werden nicht mehr auf Today Home beigemischt.
+
+Staging-Proof:
+- `https://staging.bocholt-erleben.de/js/today-home.js` liefert:
+  - `TODAY_RECOMMENDATION_EVENT_MIX_V4`
+  - `function isTodayEventCandidate`
+  - keinen alten `TODAY_RECOMMENDATION_EVENT_MIX_V3`
+  - keine alte `isNearEventCandidate`
+  - keine alte 14-Tage-Zukunftslogik
+- Aktuelle Eventdaten ergaben 0 heute-fähige Events.
+- Today Home zeigte danach korrekt 3 Aktivitäten.
+- Das Event vom 14.06. war nicht mehr sichtbar.
+
+Bewertung:
+- Technisch bestanden.
+- Visueller Smoke bestanden.
+- Kein Freeze: Today Home bleibt offen für Premium Completion.
+- Nächster Hauptpunkt nach Today Home Premium Completion: Eventbilder konsistent in den normalen Events Feed übernehmen.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_EVENT_VISUALS_AND_TODAY_ONLY_EVENTS_2026_06_01 === -->
+
+<!-- === BEGIN BLOCK: EVENT_VISUAL_KEYS_V31_STAGING_PROOF_2026_06_02 | Zweck: dokumentiert den getesteten Staging-Proof fuer Event-Visual-Key-System V3.1 und Restzuordnung === -->
+## Event Visual Keys V3.1 – Staging-Proof 2026-06-02
+
+Status: bestanden.
+
+Geprüfter Stand:
+- Branch: `staging`
+- letzter bestätigter Commit: `8b41f06`
+- Commit: `Schaerfe Event Visual Key Restzuordnung nach`
+- bestätigter Staging-Build: `8b41f067a3ca`
+
+Relevante Commit-Kette:
+- `1b7b73f` – Event Visuals in Feed Cards integriert
+- `ad81c00` – Event Visual Keys V3.1 konsolidiert
+- `aa68d8c` – Event Visual Key Inferenz nachgeschärft
+- `8b41f06` – sichere Restzuordnung nachgeschärft
+
+Geprüfte Audits vor V3.1-Commit:
+- `python scripts/audit-event-visual-pool.py` → OK
+- `python scripts/audit-event-visual-asset-brief.py` → OK
+- `python scripts/audit-event-visual-ai-style-guide.py` → OK
+- `python scripts/audit-event-visual-generation-batches.py` → OK mit 24/24 Requests
+- Python-Compile der relevanten Build-/Audit-Skripte → OK
+- `git diff --check` → OK
+
+Geprüfte Vertragsstände:
+- `data/event_visual_pool.json`: 34 / 34 Keys, 156 Zielslots
+- `data/event_visual_asset_brief.json`: 34 / 34 Keys, 156 Slot-Briefs
+- `data/event_visual_ai_style_guide.json`: 34 Visual-Key-Regeln
+- `data/event_visual_phase1_plan.tsv`: 24 fehlende Basis-Visuals
+- `data/event_visual_generation_batches_phase1.json`: 24 Requests in 4 Batches
+- `scripts/audit-event-visual-generation-batches.py`: OK-Text dynamisch auf tatsächliche Request-Anzahl korrigiert
+
+Staging-Deploy-Prüfung:
+- Deploy nach `ad81c00` erfolgreich
+- Deploy nach `aa68d8c` erfolgreich
+- Deploy nach `8b41f06` erfolgreich
+- `https://staging.bocholt-erleben.de/meta/build.txt` lieferte `8b41f067a3ca`
+
+Geprüfte deployte Eventdaten nach finalem Fix:
+- `Bewegte Geschichte - Kostümierte Stadtführungen 2/2` → `city_tour_history`
+- `Aasee-Festival` → `open_air_festival`
+- `Internationale Herfstboekenmarkt` → `book_market`
+
+Weitere geprüfte Inferenzfälle:
+- `Issel unplugged - Stadtturm Open Air...` → `live_music_stage`
+- `K-Pop Power! Sing & Dance Workshop` → `dance_music_workshop`
+- `Textile Revolution – Stoffe für die Zukunft` → `textile_exhibition_design`
+- `20. Sparkassen MünsterlandGiro - Profistart` → `cycling_event`
+- `Führung Lebenselixier Wasser... Pröbstingsee` → `nature_learning_wildlife`
+- `AaltenDagen` → `city_festival_street`
+- `Innenstadtsommer` → `city_festival_street`
+- `Bokeltsen Treff 2026` → `city_festival_street`
+
+Bewertung:
+- V3.1 ist technisch konsistent.
+- Die deployten Staging-Daten verwenden keine alten 12er-Visual-Keys mehr.
+- Die geprüften Restfehler sind korrigiert.
+- Der Stand ist für die nächste Bildproduktionsrunde geeignet.
+
+Offen / nicht Teil dieses Proofs:
+- Noch keine Produktion der 24 fehlenden V3.1-Basis-Visuals.
+- Noch kein finales Mobile-Card-Layout.
+- Noch keine Duplicate-Vermeidungslogik im Feed.
+- Noch kein Production-Deploy dieses Visual-Systems.
+- Scheduled-Workflow-Fehler auf Staging wurden nicht als Teil dieses Proofs gelöst, da sie nicht den erfolgreichen Staging-Deploy betreffen.
+
+Nächster Schritt:
+- 24 fehlende Basis-Visuals aus `data/event_visual_generation_batches_phase1.json` erzeugen und einzeln im Card-Kontext prüfen.
+<!-- === END BLOCK: EVENT_VISUAL_KEYS_V31_STAGING_PROOF_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_PROMPTING_RUN_2026_06_02 | Zweck: dokumentiert die Prompting- und Bewertungsverbesserungen aus dem Event-Visual-Produktionschat; Umfang: Event-Visual-Prompting, Bilderchat, Review-Gates === -->
+## Event Visual Prompting Run – Bildchat-Vorbereitung – 2026-06-02
+
+Status: Prompting-/Review-Stand dokumentiert; Asset-Integration noch nicht durchgeführt.
+
+Geprüfter Arbeitsstand:
+
+- Branch: `staging`
+- HEAD vor Dokumentationspatch: `491c435`
+- Relevanter Workflow: Event Visual Keys V3.1 / Phase-1-Bildproduktion
+- Bildgenerierung erfolgte separat im Bilderchat; dieser Projektchat bewertete Ergebnisse und lieferte Folgeprompts.
+
+Ergebnis:
+
+- Mehrere Phase-1-Visuals wurden fachlich als `ready` bzw. `ready mit Prüfvorbehalt` bewertet.
+- Mehrere Prompts wurden aufgrund sichtbarer KI-/Realismusprobleme gezielt verschärft.
+- Neue Prompting-/Bewertungsregeln wurden im `VISUAL_WORKFLOW.md` dokumentiert.
+
+Wichtigste gelernte Quality-Gates:
+
+- Einzelbildqualität reicht nicht; Systemwirkung und Abgrenzung zu benachbarten Visual-Keys werden mitgeprüft.
+- Weniger arrangierte Props ist künftig Standardregel.
+- Technische Objektlogik ist hartes Gate, z. B. Beamer-/Projektionsrichtung.
+- Sichtbare KI-Physikfehler wie schwebende Lupen sind harte Retry-Gründe.
+- Wiederholte Fehler werden durch Strategiewechsel gelöst, nicht durch Endlos-Mikro-Prompting.
+- Finale Asset-Abnahme erfolgt erst nach `1200×675`-Exportprüfung auf Text, Logos, Gesichter, Kinder, KI-Artefakte und Crop-Tauglichkeit.
+
+Akzeptierte Visuals aus dem Chatlauf:
+
+- `textile-machines-industry-01.webp`
+- `open-air-festival-01.webp`
+- `kirmes-funfair-01.webp`
+- `parade-festzug-01.webp`
+- `shooting-festival-tradition-01.webp`
+- `country-fair-rural-01.webp`
+- `vehicle-classic-01.webp`
+- `textile-exhibition-design-01.webp`
+- `art-exhibition-gallery-01.webp`
+- `market-stalls-01.webp`
+- `book-market-01.webp`
+- `business-messe-info-01.webp`
+- `classical-music-01.webp`
+- `theater-stage-01.webp`
+- `comedy-cabaret-01.webp`
+- `film-screening-01.webp`
+- `literature-reading-talk-01.webp`
+- `kids-stage-story-01.webp`
+- `learning-science-workshop-01.webp`
+- `dance-music-workshop-01.webp`
+- `running-event-01.webp`
+
+Noch offen:
+
+- `cycling-event-01.webp` wurde als nächster Prompt vorbereitet; die Bildbewertung erfolgt im nächsten Chat.
+- Nach `cycling-event` mit dem nächsten offenen Visual-Key aus `data/event_visual_generation_batches_phase1.json` fortfahren.
+
+Nicht erledigt:
+
+- Keine Assets ins Repo kopiert.
+- Keine WebP-Optimierung durchgeführt.
+- `data/event_visual_pool.json` noch nicht mit neuen `ready`-Assets aktualisiert.
+- Keine finale `1200×675`-Assetprüfung im Repo durchgeführt.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PROMPTING_RUN_2026_06_02 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_PHASE1_ASSET_INTEGRATION_2026_06_03 | Zweck: dokumentiert die Integration der 24 Phase-1-Event-Visuals als finale WebP-Card-Assets; Umfang: assets/event-visuals, event_visual_pool.json, Audits === -->
+## Event Visual Phase 1 – Assetintegration – 2026-06-03
+
+Status: lokal bestanden / bereit für Commit.
+
+Geprüfter Stand:
+- Branch: `staging`
+- HEAD vor Assetintegration: `b8ac2a3`
+- Scope: Event Visual Keys V3.1 / Phase-1-Basisvisuals
+
+Durchgeführt:
+- 24 generierte PNG-Rohbilder wurden inventarisiert.
+- 24 Phase-1-Requests aus `data/event_visual_generation_batches_phase1.json` wurden dagegen geprüft.
+- PNGs wurden 1:1 auf die geplanten `planned_src`-Zielnamen gemappt.
+- Alle 24 Zielassets wurden mit `cwebp` als `1200x675`-WebP erzeugt.
+- Die PNG-Rohdateien wurden nach erfolgreicher WebP-Erzeugung entfernt.
+- `data/event_visual_pool.json` wurde für diese 24 Slots von `planned` auf `ready` aktualisiert.
+- Pflichtmetadaten wurden ergänzt:
+  - `src`
+  - `status`
+  - `source`
+  - `source_type`
+  - `rights_status`
+  - `alt`
+  - `is_symbolic`
+  - `is_documentary`
+  - `review_status`
+  - `card_asset_format`
+  - `phase1_request_id`
+
+Erzeugte Phase-1-Assets:
+- `textile-machines-industry-01.webp`
+- `open-air-festival-01.webp`
+- `kirmes-funfair-01.webp`
+- `parade-festzug-01.webp`
+- `shooting-festival-tradition-01.webp`
+- `country-fair-rural-01.webp`
+- `vehicle-classic-01.webp`
+- `textile-exhibition-design-01.webp`
+- `art-exhibition-gallery-01.webp`
+- `market-stalls-01.webp`
+- `book-market-01.webp`
+- `business-messe-info-01.webp`
+- `classical-music-01.webp`
+- `theater-stage-01.webp`
+- `comedy-cabaret-01.webp`
+- `film-screening-01.webp`
+- `literature-reading-talk-01.webp`
+- `kids-stage-story-01.webp`
+- `learning-science-workshop-01.webp`
+- `dance-music-workshop-01.webp`
+- `running-event-01.webp`
+- `cycling-event-01.webp`
+- `indoor-sport-competition-01.webp`
+- `evening-social-party-01.webp`
+
+Audit-Ergebnis:
+- `python scripts/audit-event-visual-pool.py` → OK
+- `python tools/audit-visual-contract.py` → Errors: none
+- `git diff --check` → OK
+
+Pool-Status nach Integration:
+- `ready`: 34
+- `planned`: 122
+- `usable`: 10
+- Phase-1-Ready-Assets: 24
+- fehlende Phase-1-Assets: 0
+
+Bekannte nicht blockierende Warnungen:
+- `event_visual_pool.json owner is not event_visual_pool_v1` ist für den aktuellen V3.1-Owner nicht blockierend.
+- Activity-Visual-Warnungen sind nicht Teil dieses Event-Visual-Workstreams.
+
+Bewertung:
+- Phase-1-Basisabdeckung ist technisch integriert.
+- Jeder der 34 Event-Visual-Keys hat jetzt mindestens ein `ready`-Asset.
+- Der nächste fachliche Schritt ist nicht weitere Basisabdeckung, sondern Phase-2-Pool-Diversifizierung bis `target_count`.
+
+Nächster Schritt:
+- Commit der 24 WebP-Assets, `data/event_visual_pool.json` und dieser Dokumentation.
+- Danach Phase-2-Bedarfsplan aus `target_count - ready_count` erzeugen.
+
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_PHASE1_ASSET_INTEGRATION_2026_06_03 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_PREP_2026_06_05 | Zweck: dokumentiert vorbereiteten Livegang fuer strukturierte Oeffnungszeiten bei Aktivitaetspraesenzen; Umfang: Formular, Payload, Backend, Review-API, DB-Migration 007 === -->
+## Activity Opening Hours V1 – Livegang-Vorbereitung – 2026-06-05
+
+Status: vorbereitet, noch nicht deployt.
+
+Scope:
+- Aktivitätspräsenz-Formular unter `/angebote/sichtbar-werden/einreichen/`
+- `js/activity-presence-funnel.js`
+- `api/submissions/init.php`
+- `api/submissions/review-list.php`
+- neue DB-Migration `api/sql/007_activity_opening_json.sql`
+
+Ziel:
+- Anbieter können bei Aktivitätseinreichungen eine einfache Zugänglichkeitslogik angeben.
+- Optionen: frei zugänglich, regelmäßige Öffnungszeiten, saisonal/unregelmäßig, nach Vereinbarung/bitte prüfen.
+- Bei regelmäßigen Öffnungszeiten werden Wochenzeiten und Feiertagslogik strukturiert im Payload übergeben.
+- Das Backend speichert diese Daten in `submissions.activity_opening_json`.
+- Die Review-API gibt die Daten als `activity_opening` wieder aus.
+
+Wichtige Deploy-Abhängigkeit:
+- Vor einem Staging-Deploy dieses Codes muss die **Staging-Datenbank** die Spalte `activity_opening_json` besitzen.
+- Vor einem späteren Live-Deploy muss die **Live-Datenbank** dieselbe Spalte besitzen.
+- Grund: `api/submissions/init.php` schreibt nach dem Deploy in diese Spalte und `api/submissions/review-list.php` liest sie aus.
+- Ohne vorherige DB-Migration können neue Activity-Einreichungen bzw. die Review-Liste fehlschlagen.
+
+Vorbereitete Migration:
+- Datei: `api/sql/007_activity_opening_json.sql`
+- SQL: `ALTER TABLE submissions ADD COLUMN activity_opening_json JSON NULL AFTER notes_text;`
+
+Preflight-SQL auf der jeweiligen Ziel-Datenbank:
+- Für Staging-Test: auf der **Staging-DB** ausführen.
+- Für Livegang: auf der **Live-DB** ausführen.
+- SQL: `SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submissions' AND COLUMN_NAME = 'activity_opening_json';`
+
+Erwartung Preflight:
+- Kein Ergebnis: Migration 007 muss auf dieser Datenbank ausgeführt werden.
+- Ergebnis mit `activity_opening_json`: Migration auf dieser Datenbank nicht erneut ausführen.
+
+Postflight-SQL nach Migration:
+- SQL: `SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submissions' AND COLUMN_NAME = 'activity_opening_json';`
+- Erwartung: `COLUMN_NAME = activity_opening_json`, `DATA_TYPE = json`, `IS_NULLABLE = YES`.
+
+Sichere Reihenfolge für Staging:
+1. Staging-DB per Preflight prüfen.
+2. Falls Spalte fehlt: `api/sql/007_activity_opening_json.sql` auf der Staging-DB ausführen.
+3. Postflight auf Staging-DB prüfen.
+4. Danach Code auf Staging deployen.
+5. Danach Staging-Smoke-Test durchführen.
+
+Sichere Reihenfolge für Live:
+1. Live-DB per Preflight prüfen.
+2. Falls Spalte fehlt: `api/sql/007_activity_opening_json.sql` auf der Live-DB ausführen.
+3. Postflight auf Live-DB prüfen.
+4. Danach erst Merge/Deploy auf Live.
+5. Danach Live-Smoke-Test durchführen.
+
+Minimaler Smoke-Test nach Deploy:
+1. `/angebote/sichtbar-werden/einreichen/?plan=activity_basic` öffnen.
+2. Formular mit `Frei zugänglich / ohne feste Öffnungszeiten` prüfen.
+3. Formular mit `Regelmäßige Öffnungszeiten` prüfen.
+4. Prüfen: Öffnungszeitenblock erscheint nur bei dieser Auswahl.
+5. Prüfen: geschlossene Tage deaktivieren Start-/Endzeit.
+6. Prüfen: mindestens ein geöffneter Tag mit gültigem Zeitfenster wird akzeptiert.
+7. Testeinreichung absenden.
+8. Review-API/Inhouse-Review prüfen: Einreichung erscheint und `activity_opening` ist vorhanden.
+9. Kurz prüfen, dass Event-Einreichungen unverändert erreichbar bleiben.
+
+Bewusste Nicht-Ziele dieses Schritts:
+- Noch keine Auswertung auf Today Home.
+- Noch keine automatische Daily-/Weekly-Prüfung von Öffnungszeiten.
+- Noch kein öffentliches `Heute geöffnet bis ...`.
+- Noch keine Migration vorhandener Activities aus `data/offers.json`.
+
+Bewertung:
+- Der Schritt bereitet den strukturierten Datenkanal für Öffnungszeiten vor.
+- Die bestehende Funnel-Grundlogik bleibt erhalten.
+- Der fachliche Nutzen für Today Home folgt später über `activity_opening_hours.json`, `opening-status.js` und kontrollierte Recommendation-Anbindung.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_PREP_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_DONE_2026_06_05 | Zweck: dokumentiert Abschluss des Activity-Opening-Hours-V1-Submission-Workpacks; Umfang: Formular, Backend, DB, Review-API, Review-Inbox === -->
+## Activity Opening Hours V1 – Submission-/Review-Kanal abgeschlossen – 2026-06-05
+
+Status: auf `staging` umgesetzt und per Testeinreichung verifiziert.
+
+Abgeschlossener Umfang:
+- Aktivitätsformular erfasst Zugänglichkeit / Verfügbarkeit.
+- Regelmäßige Öffnungszeiten können strukturiert pro Wochentag erfasst werden.
+- Geschlossene Tage blenden Von/Bis-Felder aus.
+- Kein Wochentag ist standardmäßig geschlossen.
+- Payload sendet `activity_opening` an `api/submissions/init.php`.
+- Backend speichert die Daten in `submissions.activity_opening_json`.
+- Review-API gibt `activity_opening` aus.
+- Review-Inbox zeigt Anbieterangaben unter „Weitere Prüfdaten“ an.
+
+Verifizierter Test:
+- Neue Testeinreichung `Test Öffnungszeiten Payload 2` wurde erstellt.
+- Staging-DB `dbs15596763.submissions.activity_opening_json` war gefüllt.
+- Review-Inbox zeigte:
+  - Zugänglichkeit laut Anbieter
+  - Vom Anbieter angegebene Öffnungszeiten
+  - Feiertage laut Anbieter
+  - Prüfhinweis Öffnungszeiten
+
+Wichtige Einschränkung:
+- Alte Testeinträge vor dem Payload-Fix haben erwartbar `activity_opening_json = NULL`.
+- Für Live gilt weiterhin: Vor Live-Deploy muss die Live-DB die Spalte `activity_opening_json` besitzen.
+
+Aktueller relevanter Commit:
+- `19f040b` – Sende Öffnungszeiten im Aktivitätsformular-Payload
+
+Nicht Teil dieses Workpacks:
+- Öffnungszeiten öffentlicher bestehender Activities auswerten.
+- Today Home anhand echter Öffnungsstatus steuern.
+- Öffnungsstatus öffentlich anzeigen.
+- Daily-/Weekly-Check gegen Anbieterquellen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_HOURS_V1_DONE_2026_06_05 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_PUBLIC_STATUS_DONE_2026_06_08 | Zweck: dokumentiert Abschluss der zentralen öffentlichen Öffnungsstatus-Logik; Umfang: Today Home, Recommendations, Top-Tipp-Sperre für ungeprüfte Öffnungszeiten === -->
+## Activity Opening Public Status – abgeschlossen am 2026-06-08
+
+### Ziel
+
+Öffnungsstatus und Schließrisiko für bestehende Activities werden zentral bewertet, damit Today Home keine starken Top-Tipps vergibt, wenn Öffnungszeiten ungeprüft oder der Tageskontext unsicher ist.
+
+### Umgesetzt
+
+- Neuer zentraler Owner `js/opening-status.js`.
+- Öffnungsstatus-/Schließrisiko-Logik aus `js/recommendations.js` und `js/today-home.js` herausgelöst.
+- Zentrale API für:
+  - `hasClosureRisk`
+  - `isTopTipEligible`
+  - Recommendation-Day-Labels
+  - Recommendation-Availability-Labels
+  - Activity-Meta-Labels
+  - Non-Business-Day-Score-Abzug
+- `js/recommendations.js` delegiert Labels und Score-Abzug an `OpeningStatus`.
+- `js/today-home.js` delegiert Top-Tipp-Eignung und Activity-Meta-Labels an `OpeningStatus`.
+- Activities mit `availability = opening_hours_check` können weiterhin empfohlen werden, bekommen aber kein Top-Tipp-Badge mehr.
+- Sonntag-/Feiertag-Schließrisiko wird zentral behandelt.
+- Regenlogik bleibt erhalten: Indoor-/wetterunabhängige Orte können empfohlen werden; ungeprüfte Öffnungszeiten bleiben aber kein Top-Tipp.
+
+### Verifizierte Tests
+
+- `node --check` für:
+  - `js/opening-status.js`
+  - `js/recommendations.js`
+  - `js/today-home.js`
+- Smoke-Test der `OpeningStatus`-API:
+  - `opening_hours_check` ist nicht Top-Tipp-fähig.
+  - frei planbare Indoor-Activities bleiben Top-Tipp-fähig.
+  - Sonntag-/Feiertag-Schließrisiko liefert passende Labels und Score-Abzüge.
+- Realer Recommendation-Test mit `data/offers.json`:
+  - Werktag trocken
+  - Werktag Regen
+  - Sonntag trocken
+  - Feiertag trocken
+- Ergebnis bei Regen:
+  - Indoor-Orte mit `opening_hours_check` bleiben oben, aber `topTip=no`.
+  - Today Home kann dadurch bewusst ohne Top-Tipp-Badge bleiben, statt ungeprüfte Öffnungszeiten als starken Tipp auszuzeichnen.
+
+### Commits
+
+- `0e03a7a` – Zentralisiere Activity-Oeffnungsstatus
+- `4c9a52e` – Zentralisiere Activity-Oeffnungsstatus-Labels
+- `1934307` – Sperre Oeffnungszeiten-Pruefen als Top-Tipp
+
+### Bewusste Grenzen
+
+- Noch keine echten Öffnungszeiten in `data/offers.json` eingetragen.
+- `holiday_policy` fehlt aktuell bei allen 44 Activities.
+- Die aktuelle Bewertung ist vorsichtig und heuristisch.
+- Keine automatische Prüfung konkreter Wochenzeiten.
+- Vor Live-Merge/Live-Deploy weiterhin nötig: Live-DB-Spalte `submissions.activity_opening_json`.
+
+### Nächster sinnvoller Schritt
+
+Gezielte Datenanreicherung statt weiterer Logik-Patches:
+
+1. Zuerst die 9 Activities mit `availability = opening_hours_check` prüfen.
+2. Danach `holiday_policy` bzw. geprüfte Statuswerte in `data/offers.json` ergänzen.
+3. Erst danach echte Wochenöffnungszeiten bzw. präzisere öffentliche Statusanzeige modellieren.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_PUBLIC_STATUS_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 | Zweck: dokumentiert Abschluss des Activity-Quality-Audit-V1-Datenstands; Umfang: 44 Activities, opening_status-Abdeckung, Needs-Review-Grenzen, finale Integrationstests === -->
+## Activity Quality Audit V1 – Öffnungsstatus-Datenstand abgeschlossen – 2026-06-08
+
+### Ergebnis
+
+Der fachliche Audit der bestehenden Activities wurde vollständig durchgeführt und in `data/offers.json` umgesetzt.
+
+### Umfang
+
+- 44 Activities geprüft.
+- 44 Activities mit `opening_status` versehen.
+- Die zwei vorherigen Needs-Review-Fälle wurden nach Quellenprüfung gezielt abgeschlossen:
+  - `quellengrundpark-weseke-entdecken` → `check_required`
+  - `erlebnispfad-klostersee-burlo` → `free_access`
+
+### Finale Verteilung
+
+- `free_access`: 25
+- `regular_hours`: 5
+- `seasonal_recommended`: 5
+- `seasonal_hours`: 5
+- `check_required`: 4
+
+### Umgesetzte Commits
+
+- `c720627` – Stelle mobile Eventbilder auf Thumbnails um
+  - Enthält zusätzlich den Batch-1-Opening-Status-Datenstand.
+- `0ec6e18` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 2
+- `023996a` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 3
+- `1b69e55` – Ergaenze Oeffnungsstatus fuer Activity Audit Batch 4
+- `c46c9ae` – Korrigiere Feiertagslogik fuer freie Activities
+- `11215b2` – Schliesse Activity Opening Needs-Review ab
+- `52370ed` – Entschaerfe Feiertagsrisiko freier Teilangebote
+
+### Technische Validierung
+
+Finale Integration geprüft für:
+
+- Werktag trocken
+- Werktag Regen
+- Sonntag trocken
+- Feiertag trocken
+
+Ergebnis:
+
+- 44 Recommendations werden erzeugt.
+- `check_required` und `opening_hours_check` erhalten keinen Top-Tipp.
+- `holiday_policy = not_applicable` erzeugt keine falsche Öffnungszeiten-Warnung.
+- `holiday_policy = open` erzeugt keine falsche Öffnungszeiten-Warnung.
+- `holiday_policy = check` bleibt für kernangebot-kritische Öffnungs-/Terminrisiken erhalten.
+- Freie Kernangebote mit prüfpflichtigen Teilangeboten laufen über `holiday_policy = not_applicable`; Hinweise bleiben in `public_label` und `detail_note` sichtbar.
+- `data/offers.json` ist valides JSON.
+- Syntaxchecks bestanden:
+  - `js/opening-status.js`
+  - `js/recommendations.js`
+  - `js/today-home.js`
+
+### Bewusste Grenzen
+
+- Keine Massenpflege echter Wochenöffnungszeiten über alle Activities.
+- Keine erfundenen Öffnungszeiten.
+- Saisonale Regeln wie Brutzeit, Badesaison oder Monitoring-Saison sind noch nicht als eigene strukturierte Saisonlogik final modelliert.
+- Detailpanel-/UI-Anzeige der neuen `opening_status.detail_note` ist noch nicht final poliert.
+- Die vorherigen Needs-Review-Activities sind fachlich geklärt; es bleibt keine Activity ohne `opening_status`.
+
+### Nächster sinnvoller Schritt
+
+Kein weiterer Daten-Massenpatch. Als nächstes nur gezielte Folgearbeit:
+
+1. Saisonregel-Modell für echte Schutz-/Bade-/Saisonfälle sauber definieren.
+2. UI-/Detailpanel-Anzeige für `opening_status.public_label` und `detail_note` prüfen.
+3. Today-Home-/Recommendation-Verhalten visuell prüfen.
+4. Erst danach kleine, owner-klare Logik- oder UI-Patches.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_QUALITY_AUDIT_V1_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_OPENING_DETAILPANEL_DONE_2026_06_08 | Zweck: dokumentiert Abschluss der Activity-Öffnungsstatus-Anzeige im Detailpanel; Umfang: Datenweitergabe, sichtbarer Callout, einklappbare Hinweise === -->
+## Activity Opening Detailpanel – abgeschlossen am 2026-06-08
+
+### Ergebnis
+
+Der geprüfte `opening_status` aus `data/offers.json` wird jetzt im Activity-Detailpanel sichtbar genutzt.
+
+### Umgesetzt
+
+- `js/offers-main.js` reicht `opening_status` und `opening_hours` aus `data/offers.json` in normalisierte Activity-Objekte durch.
+- `js/offers-details.js` zeigt `opening_status.public_label` im Activity-Detailpanel an.
+- `opening_status.detail_note` wird als nativer, ausklappbarer Hinweis angezeigt.
+- Der kurze Öffnungsstatus bleibt sichtbar; lange Hinweise blockieren das Detailpanel nicht mehr dauerhaft.
+- `css/overlays.css` stylt den ausklappbaren Hinweis ruhig und sekundär.
+
+### Validierung
+
+Geprüft wurden exemplarisch:
+
+- `Aasee erleben`
+- `Textilwerk Bocholt`
+- `Bocholter Innenstadt erleben`
+- `Quellengrundpark Weseke entdecken`
+
+Ergebnis:
+
+- Öffnungsstatus erscheint an sinnvoller Stelle nach der Beschreibung.
+- Eingeklappt bleibt der Block kompakt.
+- Ausgeklappt ist der Hinweis lesbar, aber weniger dominant.
+- Merkmale und Aktionen bleiben schneller erreichbar.
+
+### Commits
+
+- `bec9c66` – Reiche Activity Oeffnungsstatus ins Detailpanel durch
+- `8867eb8` – Zeige Activity Oeffnungsstatus im Detailpanel
+- `9d18823` – Mache Activity Oeffnungshinweise ausklappbar
+
+### Bewusste Grenze
+
+Keine weitere Öffnungszeiten-Datenpflege und keine neue Saisonlogik in diesem Workpack.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_OPENING_DETAILPANEL_DONE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_DUPLICATE_CLEANUP_FREEZE_2026_06_08 | Zweck: dokumentiert Freeze der Eventbild-Motivdubletten-Bereinigung; Umfang: Event-Visual-Pool, Anti-Repeat, Ersatzbilder, Audits === -->
+## Event Visual Duplicate Cleanup + Pool-Diversity Freeze – 2026-06-08
+
+Status: auf `staging` umgesetzt, geprüft und vorerst gefreezt.
+
+### Geprüfter Stand
+
+Branch:
+
+- `staging`
+
+Relevante Commits:
+
+- `78a7b4b` – `Integriere kuratierte Visual Assets`
+- `c9cd092` – `Vermeide kurze Eventbild-Wiederholungen`
+- `3387568` – `Bereinige Eventbild-Motivdubletten`
+
+Finaler bestätigter Stand:
+
+- `HEAD`: `3387568`
+- `origin/staging`: `3387568`
+
+### Umgesetzter Scope
+
+Abgeschlossen wurden zwei zusammengehörige Qualitätsprobleme im Event-Visual-System:
+
+1. Wiederholung gleicher Bilddateien im kurzen Feed-Kontext.
+2. Near-Duplicate-Motive im `ready`-Pool trotz unterschiedlicher Dateien/IDs.
+
+Umgesetzt:
+
+- `js/events.js` wählt Eventbilder nicht mehr rein hashbasiert aus, sondern berücksichtigt:
+  - bereits innerhalb eines `visual_key` verwendete Bilder,
+  - ein kurzes Recent-Fenster,
+  - Fallback-Auswahl bei kleinen Pools.
+- `data/event_visual_pool.json` wurde bereinigt:
+  - starke Near-Duplicate-Motive wurden aus `ready` auf `blocked` gesetzt,
+  - Dateien wurden nicht gelöscht,
+  - `blocked` bedeutet in diesem Kontext: nicht im Feed verwenden, weil Motiv-Dublette.
+- Ersatz-/Ergänzungsbilder wurden kuratiert importiert:
+  - `city-festival-street-04.webp`
+  - `city-festival-street-05.webp`
+  - `city-festival-street-06.webp`
+  - `city-festival-street-07.webp`
+  - `learning-science-workshop-03.webp`
+  - `learning-science-workshop-04.webp`
+  - `learning-science-workshop-05.webp`
+- Alle neuen Assets wurden als WebP-Card-Assets im Format `1200x675` erzeugt und in den Pool als `ready` eingetragen.
+
+### Finaler Pool-Stand
+
+Nach Bereinigung und Ersatzimport:
+
+- Event-Visual-Pools: `34`
+- Event-Visual-Images: `204`
+- `ready`: `125`
+- `blocked`: `39`
+- `planned`: `30`
+- `usable`: `10`
+- `fallback`: `0`
+
+Wichtig:
+
+- `blocked` ist hier kein Qualitätsurteil über grundsätzlich schlechte Bilder.
+- `blocked` wurde für brauchbare, aber zu ähnliche Motivvarianten verwendet.
+- Die geblockten Dateien bleiben nachvollziehbar im Pool erhalten, werden aber nicht im Feed als `ready` genutzt.
+
+### Bestandene Prüfungen
+
+Bestanden:
+
+- `python3 tools/audit-visual-contract.py`
+  - `Errors: none`
+  - missing ready/fallback files: `0`
+  - ready/fallback non-WebP: `0`
+  - ready/fallback oversized: `0`
+  - ready/fallback not 16:9: `0`
+- `python3 scripts/audit-event-visual-pool.py`
+  - Pool-Keys: `34 / 34`
+  - Pool-Struktur konsistent
+- `node --check js/events.js`
+- Dimensionstest der neuen Assets:
+  - alle neuen WebP-Dateien: `1200x675`
+- Ready-Near-Duplicate-Audit:
+  - `ready_items=125`
+  - `strong_near_duplicate_pairs=0`
+- Future-Event-Sequenzsimulation:
+  - `future_events=61`
+  - `same_selected_image_within_6_card_window=0`
+
+### Geprüfte Problemfälle
+
+Die zuvor sichtbaren bzw. erwartbaren Problemgruppen wurden fachlich adressiert:
+
+- Konzert-/Bühnenbilder:
+  - `Marienthaler Abende`
+  - `As Time Goes By`
+  - `live_music_stage`
+- Stadtfest-/Innenstadtbilder:
+  - `AaltenDagen`
+  - `Innenstadtsommer`
+  - `city_festival_street`
+- Learning-/Workshop-Bilder:
+  - `SummerSchool der JUNGE UNI`
+  - `Ökosystem auf Pfosten`
+  - `learning_science_workshop`
+- konkret erkannte Near-Duplicate-Paare wie:
+  - `comedy-cabaret-01` / `comedy-cabaret-02`
+  - `classical-music-01` / `classical-music-02`
+  - `music-stage-01-16x9` / `live-music-stage-02`
+  - `city-festival-01-16x9` / `city-festival-street-02`
+
+### Bekannte nicht blockierende Warnungen
+
+Weiterhin bekannt und nicht Teil dieses Freeze-Scopes:
+
+- `event_visual_pool.json owner is not event_visual_pool_v1`
+- 18 ältere ready Event-Visuals ohne Alt-Text
+- lokale Activity-Bildwarnung für `hilgelo-erleben`
+- Activity-Visual- und Activity-Opening-Hours-Themen sind separate Workstreams.
+
+### Bewertung
+
+Der Event-Feed-Visual-Workpack ist für den aktuellen `staging`-Stand fachlich ausreichend bereinigt und wird vorerst gefreezt.
+
+Der aktuelle Zielzustand ist nicht „maximal viele Bilder“, sondern:
+
+- keine offensichtlichen Motiv-Dubletten im `ready`-Pool,
+- keine gleiche Bildauswahl im kurzen Feed-Fenster,
+- ausreichend Pool-Diversität bei häufig auftretenden Visual-Keys,
+- keine ungeprüften Rohbilder im Repo,
+- keine Änderung am Eventdatenprozess.
+
+### Offene Folgepunkte
+
+Nicht Teil dieses Freezes:
+
+- weitere echte Veranstalter-/Location-Fotos,
+- Detailpanel-/Hero-Bildlogik,
+- vollständiges visuelles Audit aller Cards nach jedem neuen Eventdatenstand,
+- Alt-Text-Schuld älterer Phase-2-Assets,
+- Activity-Visual-System.
+
+Nach einem Staging-Deploy genügt ein visueller Smoke-Test mit hartem Reload für:
+
+- `Marienthaler Abende` / `As Time Goes By`
+- `AaltenDagen` / `Innenstadtsommer`
+- `SummerSchool` / `Ökosystem auf Pfosten`
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_DUPLICATE_CLEANUP_FREEZE_2026_06_08 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 | Zweck: dokumentiert bewusste Testgrenze des Manual-KI-Intake-Workflows auf staging; Umfang: Visual-Key-Handoff, Branch-Guard, offener Main-Beweis === -->
+## Manual-KI-Intake / Visual-Key-Handoff – Staging-Testgrenze
+
+Stand: `staging` Commit `ba10f20` (`Finalisiere Visual-Key-Handoff fuer KI-Intake`)
+
+### Umgesetzt und auf staging validiert
+
+Der Visual-Key-Handoff für KI-gefundene Events wurde technisch umgesetzt:
+
+- `manual-ki-intake.yml` schreibt `visual_key` in den Google-Sheet-Tab `Inbox`.
+- `Inbox.visual_key` wird als Google-Sheets-Dropdown aus `data/event_visual_pool.json -> pools` gesetzt.
+- Alte bzw. manuelle KI-JSON-Einträge ohne `visual_key` bekommen deterministisch einen Key über `scripts/event_visual_keys.py`.
+- `scripts/inbox-to-events.py` erzwingt `visual_key` in `Inbox` und `Events`.
+- Redaktionell geänderte `Inbox.visual_key`-Werte werden nach `Events.visual_key` übernommen.
+- Ungültige manuelle Keys brechen beim Übernehmen fail-fast ab, statt still neu inferiert zu werden.
+
+### Bestandene Prüfungen auf staging
+
+Bestanden:
+
+- `git diff --check`
+- `python3 -m py_compile scripts/event_visual_keys.py scripts/inbox-to-events.py scripts/build-events-from-tsv.py scripts/build-inbox-from-tsv.py`
+- `python3 scripts/audit-event-visual-pool.py`
+  - Pool-Keys: `34 / 34`
+  - Pool-Struktur konsistent
+- Lokaler Inferenzbeweis für `data/inbox_manual.json`
+  - `manual_items=9`
+  - `pool_keys=34`
+  - `errors=0`
+- Staging-Deploy:
+  - Workflow: `Deploy to STRATO`
+  - Run: `27205948911`
+  - Ergebnis: `success`
+  - HEAD: `ba10f202fa13b1301408aad0ff7e821fea05a697`
+
+### Bewusste Testgrenze
+
+Der eigentliche Workflow `Manual KI Event Intake` kann auf `staging` bewusst nicht vollständig ausgeführt werden.
+
+Grund:
+
+- `.github/workflows/manual-ki-intake.yml` enthält den Branch-Guard `MANUAL_KI_INTAKE_PRODUCTION_BRANCH_GUARD_V1`.
+- Der Workflow darf nur auf `main` laufen.
+- `staging` soll keine echten KI-Kandidaten in die Live-Google-Sheet-Review-Kette schreiben.
+
+Konsequenz:
+
+- Auf `staging` können Code-, Syntax-, Pool-, Dropdown-Definition- und lokale Inferenzprüfungen durchgeführt werden.
+- Der vollständige Live-Beweis gegen Google Sheets ist erst nach Merge bzw. Run auf `main` möglich.
+- Ein fehlgeschlagener Versuch, den Workflow per `gh workflow run manual-ki-intake.yml --ref staging` zu starten, ist kein fachlicher Fehler des Visual-Key-Handoffs; `staging` ist hierfür bewusst nicht der Zielpfad.
+
+### Offener Main-Beweis
+
+Nach Merge bzw. Ausführung auf `main` ist noch live zu prüfen:
+
+1. `Inbox.visual_key` wird im Google Sheet mit dem KI-Vorschlag befüllt.
+2. Das Dropdown für `Inbox.visual_key` erscheint mit den erlaubten Keys aus `event_visual_pool.json`.
+3. Ein redaktionell geänderter `visual_key` wird beim Übernehmen nach `Events.visual_key` erhalten.
+4. Der spätere Build übernimmt `Events.visual_key` nach `events.json`.
+5. Deployte Event-Cards erhalten dadurch automatisch ein passendes Eventbild aus dem Visual-Pool.
+<!-- === END BLOCK: TEST_STATUS_MANUAL_KI_INTAKE_STAGING_LIMIT_2026_06_09 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 | Zweck: dokumentiert Bereinigung der Visual-Audit-Warnungen; Umfang: Event-Alt-Texte, Audit-Owner-Check, Activity-JPG-Einordnung === -->
+## Visual-Audit-Warnungen bereinigt – 2026-06-09
+
+Scope:
+- keine neuen Bilder
+- keine UI-/App-Logik-Änderung
+- kein Event-Visual-Duplicate-Cleanup
+- kein Activity-Premium-Visual-Produktionslauf
+
+Umgesetzt:
+- 18 `ready`-Event-Visuals ohne Alt-Text in `data/event_visual_pool.json` wurden mit generischen, symbolischen Alt-Texten ergänzt.
+- `tools/audit-visual-contract.py` akzeptiert den dokumentierten Event-Pool-Owner `event_visual_pool_v31` zusätzlich zum historischen `event_visual_pool_v1`.
+- Lokale Activity-Bilder werden nur dann als Non-WebP-Warnung gemeldet, wenn sie produktiv verwendbar markiert sind (`ready`, `usable`, `fallback`).
+
+Bewusst geparkt:
+- `hilgelo-erleben` referenziert weiterhin das lokale JPG `/assets/activities/20250704_203925.jpg`, bleibt aber in `data/offers.json` als `image_quality: needs_review` eingeordnet.
+- Die finale Activity-Bildablösung erfolgt im separaten Activity-Premium-Visual-Workstream.
+- Die drei Activity-Einträge mit `needs_review` bleiben fachlich sichtbar im Audit-Summary, sind aber keine Strict-Warnung, solange sie nicht als produktive Premium-Assets freigegeben sind.
+
+Prüfziel:
+- `python3 tools/audit-visual-contract.py --strict` läuft ohne Fehler und ohne Warnungen durch.
+
+Ergebnis nach erfolgreicher Prüfung:
+- `Errors: none`
+- `Warnings / known visual debt: none`
+<!-- === END BLOCK: TEST_STATUS_VISUAL_AUDIT_WARNINGS_CLEANUP_2026_06_09 === -->
+
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 | Zweck: dokumentiert Staging-Release-Proof der neuen Today-Home; Umfang: P0/P1-Abschluss, Deploy, HTTP-Smoke, Browser-Runtime, Detailpanel === -->
+## Today Home – Staging Release Proof 2026-06-10
+
+Status: auf `staging` umgesetzt, deployed und per HTTP-/Browser-Runtime-Probe geprüft.
+
+Bestätigter Stand:
+
+- Branch: `staging`
+- Commit: `4457fc7` (`Korrigiere Today Home JSON-LD`)
+- Deploy: `Deploy to STRATO`, Run `27260197568`, Ergebnis `success`
+- Build-Marker: `4457fc73a403`
+- Runtime-Ziel: `https://staging.bocholt-erleben.de/`
+
+Bestandene lokale Prüfungen:
+
+- `node --check` für:
+  - `js/today-home.js`
+  - `js/recommendations.js`
+  - `js/opening-status.js`
+  - `js/weather-context.js`
+  - `js/details.js`
+  - `js/offers-details.js`
+- `python3 tools/audit-visual-contract.py --strict`
+  - `Errors: none`
+  - `Warnings / known visual debt: none`
+- Cleanup-Grep ohne Treffer für:
+  - alte Today-Controls
+  - alte Today-Mode-/Interest-Controls
+  - alte Eventfilter-Popover
+  - alte `FILTER_SHEET_WIRING`-/`DESKTOP FILTER POPOVERS`-Reste
+
+Bestandene HTTP-Runtime-Prüfungen auf Staging:
+
+- `/` liefert HTTP 200.
+- Ausgeliefertes HTML enthält `#today-root`, `#today-weather-note`, `#today-feed` und Today-SEO.
+- Ausgeliefertes HTML enthält keine alten Today-Controls, keine alten Popover und keinen alten JSON-LD-Namen `Veranstaltungen in Bocholt`.
+- `/data/events.json` liefert HTTP 200.
+- `/data/offers.json` liefert HTTP 200.
+- `/data/event_visual_pool.json` liefert HTTP 200.
+- Kritische Today-/Detailpanel-JS-Assets liefern HTTP 200.
+
+Bestandene Browser-Runtime-Prüfung:
+
+- `todayRoot: true`
+- `cardCount: 3`
+- `oldControls: 0`
+- `oldPopovers: 0`
+- alle drei gerenderten Karten haben ein Bild
+- alle drei Kartenbilder waren geladen
+- WeatherNote rendert
+- Status rendert `3 Tipps`
+- keine sichtbaren alten Controls/Popover
+
+Bestandene Detailpanel-Prüfung:
+
+- `panelExists: true`
+- `panelVisible: true`
+- `hasContent: true`
+- `hasImage: true`
+- `actionbarExists: true`
+- Event-Visual wird im Detailpanel übernommen.
+- Actionbar enthält Kalender- und Teilen-Aktion.
+
+Abgeschlossene Workpacks:
+
+- P0.1 Eventdaten optional laden.
+- P0.2 Today-Event-Visual ins Detailpanel übernehmen.
+- P0.3 Runtime-Test mit echter deployter Eventdatei.
+- P0.4 Event-Visual-Audit ohne Warnungen/Fehler.
+- P0.5 Activity-Needs-Review-Ausschluss.
+- P1.1 lokale/diverse Activity-Auswahl.
+- P1.2 maximal drei Skeleton-Cards.
+- P1.5 versteckte Today-Controls entfernt.
+- P1.6 alte Eventfilter-/Popover-Reste entfernt.
+- P1.7 Footer-/HTML-Struktur bereinigt.
+- P1.8 JSON-LD auf Today-Home korrigiert.
+
+Bewertung:
+
+Die neue Today-Home ist für den aktuellen `staging`-Stand funktional releasefähig. Weitere Today-Arbeit soll ab jetzt nur noch als klar abgegrenzter visueller Feinschliff, Accessibility-Prüfung oder belegter Bugfix erfolgen.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_RELEASE_PROOF_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_TODAY_HOME_PREMIUM_FREEZE_2026_06_11 | Zweck: dokumentiert die finale visuelle Premium-Abnahme der Today/Home nach Desktop-/Mobile-Preview; Umfang: / Today Home, Desktop-/Mobile-Layout, Hero-Typografie, CTA-Hierarchie, Footer; keine Activity-Bildproduktion === -->
+## Today/Home Premium Freeze – Desktop-/Mobile-Abnahme – 2026-06-11
+
+### Baseline
+
+- Branch: `staging`
+- Abschluss-HEAD: `5c849da` – `Gleiche Today Hero Titelgewicht an`
+- Relevante Vorarbeiten:
+  - `b2cb148` – `Gleiche Today Desktop Shell an Events an`
+  - `b24952f` – `Zentralisiere globalen Footer`
+  - `8ad02da` – `Nutze Activity Visual Pool auf Today Home`
+  - `3c62d7a` – `Strecke Today Card Media auf volle Breite`
+
+### Geprüfte Preview-Zustände
+
+Geprüft per Codespaces Preview, nicht per blindem Staging-Zwischen-Deploy:
+
+- Desktop `/` bei `1440 × 1220`, 100 % Zoom
+- Mobile `/` bei `390 × 844`, 100 % Zoom
+- Ausschnitte:
+  - Header
+  - Hero
+  - Wetterhinweis
+  - Empfehlungsfläche
+  - drei Today-Cards
+  - CTA-Karten
+  - Footer
+  - Bottom-Navigation
+
+### Ergebnis
+
+Today/Home ist visuell und layoutseitig für V1 eingefroren.
+
+Bestanden:
+
+- Header-Konsistenz zu Events/Aktivitäten.
+- Desktop-Hero wirkt als Premium-Top-Shell und nicht mehr wie ein isolierter Sonderfall.
+- Hero-Titelgewicht wurde an Events/Aktivitäten angeglichen.
+- Desktop-Lesefläche ist klar, aber keine harte weiße Box.
+- Übergang Hero → grüne Empfehlungsfläche ist ruhig.
+- Empfehlungs-Cards sind nicht zu schwer.
+- CTA-Karten `Alle Events ansehen` und `Aktivitäten entdecken` sind sichtbar, aber nicht dominanter als die Empfehlungen.
+- Mobile wurde durch Desktop-Polish nicht beschädigt.
+- Zentraler Footer ist auf `/`, `/events/` und `/aktivitaeten/` konsistent.
+
+### Freeze-Entscheidung
+
+- Today/Home V1 gilt als visuell abgeschlossen.
+- Weitere CSS-/Layout-Arbeit an `/` nur noch bei konkretem belegtem Symptom.
+- Keine offenen generischen Polish-Runden mehr für Today/Home.
+
+### Bewusste Nicht-Blocker
+
+- Das sichtbare `Textilwerk Bocholt`-Bild wirkt dunkel/schwer.
+- Das ist kein CSS-/Layout-Blocker.
+- Bildqualität einzelner Activity-Cards gehört in den separaten Activity-Premium-Visual-Workstream.
+- Keine dauerhafte Bildrettung per CSS.
+<!-- === END BLOCK: TEST_STATUS_TODAY_HOME_PREMIUM_FREEZE_2026_06_11 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 | Zweck: dokumentiert Abschluss des Activity-Card-Bild-Polish-Workpacks; Umfang: mobile Activity-Cards, Kategorie-Kicker, Codespaces-Preview-Nutzung === -->
+## Activity Card Images / Mobile Card Polish abgeschlossen
+
+Stand: 2026-06-10
+
+Ergebnis:
+- Activity-Cards zeigen im mobilen Feed jetzt Bilder rechts als Thumbnail.
+- Normale Activity-Cards zeigen keinen Kategorie-Kicker mehr über dem Titel.
+- Die Card-Hierarchie ist dadurch näher an den Eventcards.
+- Die vorhandene Activity-Bildquelle bleibt unverändert; Premiumbilder werden separat nachgezogen.
+- Die Anbieter-CTA-Karte bleibt bewusst als Sonderkarte mit eigenem Kicker bestehen.
+- Codespaces Preview wurde erfolgreich für schnelle UI-Prüfung genutzt und in `ENGINEERING.md` dokumentiert.
+
+Validierung:
+- Lokale Codespaces Preview geprüft.
+- Staging `/aktivitaeten/` mobil geprüft.
+- Darstellung auf Samsung S24 als passend bestätigt.
+- Keine weitere Card-Struktur-Korrektur notwendig.
+
+Relevante Commits:
+- `88d1e12` — Zeige Activitybilder in mobilen Cards
+- `0cd9ab7` — Entferne Kategorie-Kicker aus Activitycards
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_CARD_IMAGES_POLISH_DONE_2026_06_10 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
+## Activity Visual Phase A – Pool-Integration abgeschlossen (2026-06-11)
+
+### Status
+
+Activity Visual Phase A ist abgeschlossen.
+
+Die geprüften und vorbereiteten Activity-Bilder wurden als lokale 16:9-WebP-Assets integriert und im Activity Visual Pool registriert.
+
+Bestätigter Commit:
+
+- `7a78240` – `Integriere Activity Visual Phase A Assets`
+
+Aktueller bestätigter Staging-Stand nach nachgelagertem Today-Commit:
+
+- `b2cb148` – `Gleiche Today Desktop Shell an Events an`
+
+### Umfang
+
+Integriert wurden:
+
+- 16 neue WebP-Assets unter `assets/activity-visuals/`
+- 16 neue Pool-Einträge in `data/activity_visual_pool.json`
+- keine Änderungen an `data/offers.json`
+- keine Änderungen an `js/offers.js`
+- keine Änderungen an `js/offers-details.js`
+- keine Änderungen an `css/today.css` durch diesen Workstream
+
+### Finaler Audit-Stand
+
+Letzter bestätigter Audit:
+
+- `python3 tools/audit-visual-contract.py --strict`
+
+Ergebnis:
+
+- Activity visual pool:
+  - `exists: True`
+  - `pools: 41`
+  - `images: 41`
+  - `ready: 38`
+  - `fallback: 3`
+  - `missing ready/fallback files: 0`
+  - `ready/fallback non-WebP: 0`
+  - `ready/fallback oversized: 0`
+  - `ready/fallback missing alt: 0`
+  - `ready/fallback not 16:9: 0`
+- Activity visuals:
+  - `offers: 44`
+  - `explicit images: 44`
+  - `visual keys: 0`
+- `Warnings / known visual debt: none`
+- `Errors: none`
+
+### Einordnung
+
+Die Asset- und Pool-Basis ist damit technisch sauber.
+
+Die öffentlichen Activity-Flächen nutzen die neuen Poolbilder noch nicht vollständig, weil die Offer-Daten weiterhin explizite Bilder verwenden und noch keine `visual_key`-Zuordnung gesetzt ist.
+
+Das ist bewusst offen und gehört in Phase B.
+
+### Offener nächster Schritt
+
+Activity Visual Phase B:
+
+- `data/offers.json` mit passenden `visual_key`-Werten ausstatten
+- `js/offers.js` so umstellen, dass der Activity Visual Pool Vorrang vor `offer.image` hat
+- `js/offers-details.js` auf dieselbe Bildauflösung bringen
+- `offer.image` nur noch als Fallback verwenden
+- danach Audit, Syntaxchecks und UI-Smoke-Test auf `/aktivitaeten/`
+
+### Weiterhin nicht final premium
+
+| Activity-ID | Status | Maßnahme |
+|---|---|---|
+| `suderwicker-maerchenspielplatz` | `own_photo_required` | echtes Foto ohne erkennbare Kinder/Personen beschaffen |
+| `waldlehrpfad-am-vossenpand` | `request_permission` | Stadt Bocholt/ESB um Freigabe für besseres personenfreies Galeriebild bitten |
+| `handwerksmuseum-bocholt-erleben` | `request_permission` | Handwerksmuseum/Stadt Bocholt um hochauflösendes Innen-/Werkstattbild bitten |
+| `das-mysterium-von-winterswijk` | `request_permission` | 100% Winterswijk/Tourismus Winterswijk um offizielles Routenmotiv bitten |
+| `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_A_POOL_INTEGRATION_2026_06_11 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_B_PUBLIC_USAGE_2026_06_12 | Zweck: dokumentiert Abschluss der oeffentlichen Activity-Visual-Pool-Nutzung; Umfang: data/offers.json visual_key-Mapping, zentraler Resolver, Pool-Load, Card-/Detailpanel-Smoke, Restbilder === -->
+## Activity Visual Phase B – Public Usage / Pool Mapping abgeschlossen (2026-06-12)
+
+### Status
+
+Activity Visual Phase B ist auf `staging` implementiert, getestet und gepusht.
+
+Bestätigter Commit:
+
+- `988b437` – `Nutze Activity Visual Pool auf Activity-Seite`
+
+### Umgesetzter Scope
+
+Geändert wurden ausschließlich:
+
+- `data/offers.json`
+- `js/offers.js`
+- `js/offers-main.js`
+
+Nicht geändert wurden:
+
+- `js/offers-details.js`
+- `css/today.css`
+- Today/Home-Layout
+- Event-Visual-System
+
+### Technischer Zielzustand
+
+Die öffentlichen Activity-Flächen nutzen jetzt den Activity Visual Pool vorrangig über `visual_key`.
+
+Die zentrale Bildauflösung läuft über:
+
+- `window.OfferVisuals.resolveImageData(offer)`
+
+Priorität der Bildauflösung:
+
+1. Activity Visual Pool über `visual_key`
+2. `offer.image` als Fallback
+3. generisches Fallbackbild als letzte Stufe
+
+`js/offers-details.js` musste nicht geändert werden, weil das Activity-Detailpanel bereits dieselbe zentrale Resolver-Funktion nutzt.
+
+### Mapping-Ergebnis
+
+`data/offers.json` enthält jetzt 34 `visual_key`-Zuordnungen.
+
+Bewusst ohne Pool-Key bleiben 10 Activities, weil aktuell kein passender Pool-Eintrag existiert:
+
+- `handwerksmuseum-bocholt-erleben`
+- `schloss-ringenberg-erleben`
+- `anholter-schweiz-erleben`
+- `villa-mondriaan-winterswijk-erleben`
+- `waldlehrpfad-am-vossenpand`
+- `suderwicker-maerchenspielplatz`
+- `buergerpark-rhede`
+- `das-mysterium-von-winterswijk`
+- `borkener-tuerme-tour`
+- `tiergarten-schloss-raesfeld-erleben`
+
+### Validierung
+
+Bestandene technische Checks:
+
+- `git diff --check -- data/offers.json js/offers.js js/offers-main.js`
+- `node --check js/offers.js`
+- `node --check js/offers-main.js`
+- `node --check js/offers-details.js`
+- `python3 tools/audit-visual-contract.py --strict`
+
+Audit-Ergebnis:
+
+- Activity visual pool:
+  - `pools: 41`
+  - `images: 41`
+  - `ready: 38`
+  - `fallback: 3`
+  - `missing ready/fallback files: 0`
+  - `ready/fallback non-WebP: 0`
+  - `ready/fallback oversized: 0`
+  - `ready/fallback missing alt: 0`
+  - `ready/fallback not 16:9: 0`
+- Activity visuals:
+  - `offers: 44`
+  - `explicit images: 44`
+  - `visual keys: 34`
+  - `missing visual status: 0`
+  - `needs_review/blocked with image: 3`
+- `Warnings / known visual debt: none`
+- `Errors: none`
+
+Zusätzliche Datenkonsistenzprüfung:
+
+- `resolved_pool_images: 34`
+- `fallback_offers: 10`
+- `duplicate_pool_src: 0`
+- `errors: 0`
+
+Runtime-Resolver-Smoke:
+
+- Pool-Activities lösen auf `/assets/activity-visuals/...` auf.
+- `ready` und `fallback` werden korrekt erkannt.
+- Fallback-Activities ohne `visual_key` fallen stabil auf `offer.image` zurück.
+- `resolver_errors: 0`
+
+UI-Smoke auf `/aktivitaeten/`:
+
+- Cards geprüft für:
+  - `textilwerk-bocholt-erleben`
+  - `bocholter-innenstadt-erleben`
+  - `wasserburg-anholt-erleben`
+  - `grenzenlos-wandern-dinxperlo-suderwick`
+  - `erlebnisweg-olle-kerkpatt`
+  - `suderwicker-maerchenspielplatz`
+- Ergebnis: alle Test-Cards gefunden, alle mit Bild.
+- Detailpanel-Smoke: alle 6 Detailpanel-Bilder gefunden.
+- Card und Detailpanel nutzen dieselbe Resolver-Logik.
+
+### Weiterhin nicht final premium
+
+Diese Restbilder bleiben bewusst offen und werden nicht per CSS kaschiert:
+
+| Activity-ID | Status | Maßnahme |
+|---|---|---|
+| `suderwicker-maerchenspielplatz` | `own_photo_required` | echtes Foto ohne erkennbare Kinder/Personen beschaffen |
+| `waldlehrpfad-am-vossenpand` | `request_permission` | Stadt Bocholt/ESB um Freigabe für besseres personenfreies Galeriebild bitten |
+| `handwerksmuseum-bocholt-erleben` | `request_permission` | Handwerksmuseum/Stadt Bocholt um hochauflösendes Innen-/Werkstattbild bitten |
+| `das-mysterium-von-winterswijk` | `request_permission` | 100% Winterswijk/Tourismus Winterswijk um offizielles Routenmotiv bitten |
+| `grenzenlos-wandern-dinxperlo-suderwick` | `fallback_needs_better_real_photo` | später besseres echtes Grenzroute-Foto ohne dominante Marke/Schilder beschaffen |
+
+### Abschlussbewertung
+
+Activity Visual Phase B ist abgeschlossen.
+
+Die Activity-Bilder sind öffentlich sauber über den Activity Visual Pool verdrahtet. Restbilder bleiben als transparenter Visual-Debt bestehen.
+<!-- === END BLOCK: TEST_STATUS_ACTIVITY_VISUAL_PHASE_B_PUBLIC_USAGE_2026_06_12 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 | Zweck: dokumentiert Abschluss des Detailpanel-Premium-System-Blocks nach Mobile-Shell-Haertung und Desktop-Direct-Policy; Umfang: mobile Event-/Activity-Detailpanels, Today/Home Desktop Direct-Outbound, keine Parallelchat-Dateien === -->
+## Detailpanel Premium System – abgeschlossen am 2026-06-12
+
+Der Detailpanel-Live-Blocker wurde auf `staging` funktional abgeschlossen.
+
+### Zielentscheidung
+
+- Mobile nutzt Detailpanels als Entscheidungs- und Aktionsflaeche.
+- Desktop bleibt Card-first: Cards enthalten die wichtigsten Informationen, Klicks fuehren direkt outbound bzw. zum primaeren Ziel.
+- Today/Home nutzt mobil die bestehenden Event-/Activity-Detailpanels und fuehrt auf Desktop nicht mehr in das geteilte Detailpanel.
+
+### Umgesetzter Scope
+
+- `89bb32b` – `Haerte mobiles Activity Detailpanel`
+  - Activity-Detailpanel mobil technisch gehaertet.
+  - Fokus-/ARIA-/Back-/Scroll-/Drag-Shell an das robuste Event-Detailpanel angenaehert.
+  - Detailpanel-Systemvertrag um Mobile-/Desktop-Policy ergaenzt.
+
+- `8239d92` – `Oeffne Today Desktop Cards direkt`
+  - Today/Home Desktop-Cards oeffnen direkt outbound bzw. das primaere Ziel.
+  - Mobile Today/Home bleibt bei Event-/Activity-Detailpanels.
+
+### Gepruefter Stand
+
+Vom Nutzer bestaetigt:
+
+- Mobile `/aktivitaeten/`: Activity-Detailpanel funktioniert.
+- Mobile `/`: Event- und Activity-Detailpanel funktionieren.
+- Mobile `/events/`: Event-Detailpanel funktioniert weiter.
+- Desktop `/`: Home-Cards oeffnen wie gewuenscht direkt outbound bzw. zum Ziel, kein Detailpanel.
+
+### Nicht Teil dieses Scopes
+
+- Keine Activity-Bildproduktion.
+- Keine Event-/Activity-Feed-Card-Polishrunde.
+- Keine Today/Home-Layoutaenderung nach dem Premium-Freeze.
+- Keine Bearbeitung der Parallelchat-Dateien `data/offers.json`, `js/offers-main.js`, `js/offers.js`.
+<!-- === END BLOCK: TEST_STATUS_DETAILPANEL_PREMIUM_SYSTEM_DONE_2026_06_12 === -->
+
+<!-- BEGIN TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
+
+## Activity Realfoto Visuals – Abschluss 2026-06-12
+
+Status: abgeschlossen und auf `staging` gepusht.
+
+Commits:
+- `c7b3699` – Dokumentiere Activity Visual Bildentscheidungen
+- `52b1bc1` – Integriere Activity Realfoto Visuals
+
+Umgesetzt:
+- 16 geprüfte Activity-Realfotos als lokale WebP-Assets integriert bzw. bestehende Activity-Visuals ersetzt.
+- 8 neue lokale Activity-WebPs ergänzt.
+- 8 bestehende Activity-WebPs durch bessere Realfoto-Versionen ersetzt.
+- `data/activity_visual_pool.json` erweitert/aktualisiert.
+- `data/offers.json` um fehlende `visual_key`-Mappings ergänzt.
+- Lizenz-/Quellenentscheidungen kanonisch in `data/activity_visual_source_decisions.tsv` festgehalten.
+- Rohdateien/Arbeitsdateien wurden nicht committed.
+
+Audit nach Umsetzung:
+- Event visuals: OK
+- Activity visual pool: 48 Pools, 48 Images, 44 `ready`, 4 `fallback`
+- Activity offers: 44 Offers, 41 Visual Keys
+- Missing files: 0
+- Non-WebP ready/fallback: 0
+- Missing alt: 0
+- 16:9 violations: 0
+- Errors: none
+
+Bewusste Restfälle:
+- `buergerpark-rhede`: gutes offizielles Stadt-Rhede-Bild vorhanden, aber Freigabe nötig.
+- `waldlehrpfad-am-vossenpand`: offizielles Bocholt-/Pressebildmaterial vorhanden, aber Nutzungsbasis/Freigabe noch zu klären.
+- `suderwicker-maerchenspielplatz`: vorerst parken bzw. später ggf. in Sonderkategorie Spielplätze aufnehmen.
+- `handwerksmuseum-bocholt-erleben` und `grenzenlos-wandern-dinxperlo-suderwick`: aktuell als `fallback`/Übergang bewusst akzeptiert.
+
+<!-- END TEST_STATUS_ACTIVITY_REALFOTO_VISUALS_DONE_2026_06_12 -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_FINAL_VISIBLE_RULE_SWEEP_2026_06_18 | Zweck: dokumentiert konsolidierten Regelabschluss nach Frontend-Sichtfund; Umfang: Fuehrung/Tour, sichtbare Zukunftsevents, keine neuen Bilder === -->
+## Event Visual Motif-Fit – finaler sichtbarer Regel-Sweep (2026-06-18)
+
+Auslöser:
+- Frontend-Sichtprüfung fand bei `Auf dem Holzweg – Klumpenführung durch Rhede` ein fachlich falsches Aktiv-/Sportbild.
+- Ursache war keine fehlende Datei, sondern eine zu breite Tour-/Führungslogik.
+
+Korrekturprinzip:
+- Harte Eventtypen und konkrete Formate bleiben vorrangig.
+- Historische/thematische Führungen werden vor Aktiv-/Naturtouren bewertet.
+- Generische Begriffe wie `Tour` oder `Rundgang` entscheiden allein nichts mehr.
+- Echte Aktivformate wie Fahrradtour und Segway bleiben `active_route_tour`.
+- Natur-/Wasser-/Wildlife-Kontexte bleiben `nature_learning_wildlife`.
+
+Lokal geprüfte Leitfälle:
+- `Auf dem Holzweg – Klumpenführung durch Rhede` → `city_tour_history / costumed_history_tour`
+- `Sagensafari` → `city_tour_history / neutral_guided_city_tour`
+- `Fahrradtour mit Guide` → `active_route_tour / guided_bike_tour`
+- `Segwaytouren` → `active_route_tour / neutral_active_tour`
+- `Führung Lebenselixier Wasser - der Pröbstingsee...` → `nature_learning_wildlife / walking_nature_tour`
+- `Das schönste Ei der Welt` → `kids_stage_story / puppet_theater`
+- `Quartierfest im Klostergarten` → `city_festival_street / district_festival`
+- `Living History im Textilwerk` → `local_history_heritage / museum_history_exhibition`
+
+Prüfstand:
+- Keine neuen Bilder.
+- Matrix neu gebaut.
+- Gap-Backlog neu gebaut.
+- Premium Visual Contract Audit bestanden (`Errors: none`).
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_FINAL_VISIBLE_RULE_SWEEP_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 | Zweck: dokumentiert finale motivgenaue Runtime-Bildauswahl; Umfang: events.json visual_motif, Frontend-Resolver, Matrix/Backlog/Audit === -->
+## Event Visual Motif-Fit – finaler motivgenauer Resolver (2026-06-18)
+
+Auslöser:
+- Nach technischer Bildabdeckung blieben fachlich schwache Treffer möglich, weil Runtime/Frontend nur `visual_key`, aber nicht `visual_motif` nutzten.
+- Dadurch konnte innerhalb eines groben Pools ein anderes spezifisches Motiv gewählt werden, z. B. Markt allgemein statt Martinsmarkt oder Indoor-Sport allgemein statt Darts/Fechten.
+
+Korrektur:
+- `scripts/build-events-from-tsv.py` schreibt zusätzlich `visual_motif` in das generierte `data/events.json`.
+- `js/events.js` und `js/today-home.js` wählen zuerst Bilder mit exakt gleichem `visual_motif`.
+- Wenn kein exaktes Motivbild existiert, wird ein neutrales/fallbackfähiges Bild aus demselben `visual_key` bevorzugt.
+- Andere spezifische Motive desselben Pools werden nicht mehr als erster Fallback bevorzugt.
+
+Zusätzliche Regelhärtung:
+- `Weltkindertagsfest`/Kinder-/Familienfest-Kontexte fallen auf `family_play_outdoor`, statt als leeres Stadtfestbild zu erscheinen.
+- Historische/thematische Führungen bleiben von Aktivtouren getrennt.
+
+Lokaler Prüfbefund:
+- Matrix: {'not_needed': 26, 'parked_candidate': 4, 'ready': 70}
+- Gap-Backlog: 0 offene Zeilen
+- Resolver-Abdeckung generierter Events: {'exact': 57}
+- JS Syntaxcheck: `node --check js/events.js` und `node --check js/today-home.js` bestanden.
+- Premium Visual Contract Audit: bestanden (`Errors: none`).
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_RESOLVER_FINAL_2026_06_18 === -->
+
+<!-- === BEGIN BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 | Zweck: finaler Abschlussnachweis fuer Event-Visual-Motif-Fit nach Deploy und Frontend-QA; Umfang: technischer Smoke, Motiv-Fit-Stichprobe, datenbasierte Vollpruefung, Main-Freigabe === -->
+## Event Visual Motif-Fit – final abgeschlossen auf Staging (2026-06-18)
+
+Status: abgeschlossen für den aktuellen Sheet-/Staging-Stand.
+
+Durchgeführter Abschlussnachweis:
+- Finaler motivgenauer Resolver wurde auf `staging` deployed.
+- Deploy war grün.
+- Technischer Frontend-Smoke auf `/events/` bestanden:
+  - keine weißen Bildflächen,
+  - keine leeren Bilder,
+  - keine kaputten Event-Visuals.
+- Sichtbare Motiv-Fit-Stichprobe bestanden:
+  - `Auf dem Holzweg – Klumpenführung durch Rhede` → historisch/thematische Führung,
+  - `Sagensafari` → geführte Orts-/Geschichtstour,
+  - `Das schönste Ei der Welt` → Puppentheater/Kinderbühne,
+  - `Quartierfest im Klostergarten` → Quartiers-/Nachbarschaftsfest,
+  - `Living History im Textilwerk` → Museum/Geschichte/Textilwerk-Kontext,
+  - `Weltkindertagsfest` → Familien-/Kinderfest,
+  - `Rosenbergfestival` → Stadtteil-/Quartiersfest,
+  - `CityArt` → Kunstmarkt/Kunststände,
+  - `Martinsmarkt` → saisonaler Markt,
+  - `Lichtersonntag` → Innenstadt/Shopping/verkaufsoffener Sonntag,
+  - `Gesundheitsberufemesse` → Gesundheits-/Berufsmesse,
+  - `Vereinsmesse` → Vereins-/Infomesse.
+- Datenbasierte Vollprüfung für veröffentlichte/zukünftige Events bestanden:
+  - exakte `visual_motif`-Treffer,
+  - keine fehlenden Bilder,
+  - keine offenen Produktions-/Review-Gaps.
+
+Abschlussbewertung:
+- Event-Visual-Produktion, Motiv-Fit, Regelhärtung und motivgenauer Resolver sind für den aktuellen Stand abgeschlossen.
+- Keine weitere Bildproduktion und kein weiterer Patch aus diesem Arbeitsblock nötig.
+- Weitere Arbeit nur bei neuem Sheet-Bedarf oder konkret sichtbarem falschem Einzelfall.
+
+Main-Freigabe:
+- Dieser Arbeitsblock kann Richtung `main`, sofern `staging` keine anderen unfertigen Änderungen enthält.
+<!-- === END BLOCK: TEST_STATUS_EVENT_VISUAL_MOTIF_FIT_FINAL_CLOSURE_2026_06_18 === -->

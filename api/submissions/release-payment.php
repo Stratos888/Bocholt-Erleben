@@ -193,36 +193,26 @@ function srp_send_payment_release_mail(array $submission, string $paymentUrl, st
         throw new InvalidArgumentException('Submission hat keine gültige E-Mail-Adresse.');
     }
 
-    $title = trim((string)($submission['title'] ?? ''));
-    $reference = trim((string)($submission['payment_reference_key'] ?? ''));
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
 
-    $body = implode("\n", [
-        'Hallo,',
-        '',
-        $isActivity
-            ? 'deine Einreichung für eine Aktivitätspräsenz bei Bocholt erleben ist grundsätzlich geeignet.'
-            : 'deine Veranstaltung wurde grundsätzlich für Bocholt erleben vorgeprüft.',
-        '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
-        '',
-        $isActivity
-            ? 'Du kannst die Aktivitätspräsenz jetzt über diesen Link bezahlen:'
-            : 'Du kannst den Einzeltermin jetzt über diesen Link bezahlen:',
-        $paymentUrl,
-        '',
-        'Der Zahlungslink ist gültig bis: ' . $expiresAt,
-        '',
-        $isActivity
-            ? 'Wichtig: Die Zahlung bedeutet noch keine automatische Veröffentlichung. Nach der Zahlung bereiten wir die Aktivität redaktionell auf und prüfen sie final vor der Veröffentlichung. Die Belegung im Tarif zählt erst ab Veröffentlichung.'
-            : 'Wichtig: Die Zahlung bedeutet noch keine automatische Veröffentlichung. Nach der Zahlung prüfen wir die Einreichung final und veröffentlichen sie erst nach redaktioneller Freigabe.',
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ]);
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'payment_released_activity' : 'payment_released_event',
+        [
+            'title' => trim((string)($submission['title'] ?? '')),
+            'reference' => trim((string)($submission['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submission['contact_name_snapshot'] ?? '')),
+            'payment_url' => $paymentUrl,
+            'expires_at' => $expiresAt,
+        ]
+    );
 
-    be_send_mail($email, $isActivity ? 'Zahlung für deine Aktivitätspräsenz starten' : 'Zahlung für deine Veranstaltung starten', $body);
+    be_send_mail(
+        $email,
+        $mail['subject'],
+        $mail['text_body'],
+        $mail['to_name'],
+        $mail['html_body']
+    );
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_PAYMENT_RELEASE_MAIL_V1 === */
 

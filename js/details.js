@@ -770,6 +770,23 @@ const actions = [
            renderContent(event) {
          const vm = toEventDetailVM(event);
 
+      /* === BEGIN BLOCK: EVENT_DETAIL_READY_VISUAL_VM_V1 | Zweck: übernimmt das bereits von EventCards aufgelöste Ready-Visual ins Detailpanel; Umfang: keine eigene Pool-Logik, nur sichere Normalisierung für renderContent === */
+      const detailVisual = (() => {
+        const visual = event?.resolvedVisual && typeof event.resolvedVisual === "object"
+          ? event.resolvedVisual
+          : null;
+
+        const src = normalizeHttpUrl(visual?.src || "");
+        if (!src) return null;
+
+        return {
+          ...visual,
+          src,
+          alt: trimOrEmpty(visual?.alt || "")
+        };
+      })();
+      /* === END BLOCK: EVENT_DETAIL_READY_VISUAL_VM_V1 === */
+
       // === BEGIN BLOCK: DATE LABEL (DE, user-friendly) ===
       // Zweck: ISO-Datum (YYYY-MM-DD) für Anzeige hübsch formatieren (de-DE), ohne Datenmodell zu verändern
       const formatDateLabelDE = (iso) => {
@@ -1045,8 +1062,33 @@ const iconSvg = (type, extraClass = "") => {
       };
       /* === END BLOCK: DETAIL_OUTBOUND_ANALYTICS_PAYLOADS_V1 === */
 
+      const detailVisualHtml = detailVisual ? `
+        <figure class="event-detail-media" aria-hidden="true">
+          <img
+            class="event-detail-media__img"
+            src="${escapeHtml(detailVisual.src)}"
+            alt=""
+            width="1200"
+            height="675"
+            loading="eager"
+            decoding="async"
+          >
+        </figure>
+      ` : "";
+
+      const detailVisualAttributionHtml = detailVisual && window.ImageAttribution?.renderDetailAttribution
+        ? window.ImageAttribution.renderDetailAttribution(detailVisual, {
+            entityType: "event",
+            entityId: String(event?.id || "").trim(),
+            entityTitle: String(vm.title || "").trim(),
+            imageId: String(detailVisual.id || "").trim()
+          })
+        : "";
+      const hasTrustLinks = Boolean(detailVisualAttributionHtml || showWebsite || showSource);
+
       const html = `
         <div class="detail-panel-inner">
+          ${detailVisualHtml}
           <div class="detail-header">
             <div class="detail-title-row">
               <h2 class="detail-title">${escapeHtml(vm.title)}</h2>
@@ -1092,8 +1134,10 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
 
           ${vm.desc ? `<div class="detail-description">${escapeHtml(vm.desc)}</div>` : ""}
 
-          ${(showWebsite || showSource) ? `
-            <div class="detail-links" aria-label="Links">
+          ${hasTrustLinks ? `
+            <div class="detail-links detail-links--trust" aria-label="Quellen und Nachweise">
+              ${detailVisualAttributionHtml}
+
               ${showWebsite ? `
                 <a
                   class="detail-link"
@@ -1116,9 +1160,9 @@ ${vm.icon ? `<span class="detail-category-icon" aria-hidden="true">${iconSvg(vm.
                   rel="noopener"
                   ${buildOutboundDataAttrs(sourceOutboundPayload)}
                 >
-                  <span class="detail-link-label">Quelle</span>
+                  <span class="detail-link-label">Eventquelle</span>
                   <span class="detail-link-value">${escapeHtml(sourceHostLabel)}</span>
-                  <span class="detail-meta-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
+                  <span class="detail-link-ext" aria-hidden="true">${iconSvg("external", "is-ext")}</span>
                 </a>
               ` : ""}
             </div>

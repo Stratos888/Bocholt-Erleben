@@ -59,6 +59,7 @@ function sap_fetch_submission(PDO $pdo, int $submissionId): array
             requested_model_key,
             payment_kind,
             payment_reference_key,
+            contact_name_snapshot,
             email_snapshot,
             title,
             start_date,
@@ -359,43 +360,50 @@ function sap_mark_submission_approved(PDO $pdo, int $submissionId): void
 }
 /* === BEGIN BLOCK: SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 | Zweck: informiert Einreicher nach finaler Veröffentlichung; Umfang: Mail-Helfer für approve.php === */
 /* === BEGIN BLOCK: ACTIVITY_PRESENCE_APPROVAL_PUBLICATION_MAIL_V1 | Zweck: informiert Einreicher nach finaler Veröffentlichung passend fuer Event oder Aktivitaet; Umfang: ersetzt SUBMISSION_APPROVAL_PUBLICATION_MAIL_V1 === */
-function sap_send_publication_mail(array $submission): void
+function sap_send_publication_mail(array $submission): array
 {
     $email = trim((string)($submission['email_snapshot'] ?? ''));
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return;
+        return [
+            'status' => 'skipped',
+            'sent' => false,
+            'error' => 'missing_or_invalid_recipient',
+        ];
     }
 
-    $title = trim((string)($submission['title'] ?? ''));
-    $reference = trim((string)($submission['payment_reference_key'] ?? ''));
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
 
-    $bodyLines = [
-        'Hallo,',
-        '',
-        $isActivity
-            ? 'deine Aktivität wurde bei Bocholt erleben veröffentlicht.'
-            : 'deine Veranstaltung wurde bei Bocholt erleben veröffentlicht.',
-        '',
-        ($isActivity ? 'Aktivität: ' : 'Veranstaltung: ') . ($title !== '' ? $title : 'ohne Titel'),
-        'Referenz: ' . $reference,
-        '',
-        $isActivity
-            ? 'Sie ist nun im öffentlichen Aktivitätenbereich sichtbar.'
-            : 'Sie ist nun im öffentlichen Eventbereich sichtbar.',
-        '',
-        'Viele Grüße',
-        'Bocholt erleben',
-    ];
+    $mail = be_build_system_mail_topic(
+        $isActivity ? 'publication_approved_activity' : 'publication_approved_event',
+        [
+            'title' => trim((string)($submission['title'] ?? '')),
+            'reference' => trim((string)($submission['payment_reference_key'] ?? '')),
+            'contact_name' => trim((string)($submission['contact_name_snapshot'] ?? '')),
+        ]
+    );
 
     try {
         be_send_mail(
             $email,
-            $isActivity ? 'Deine Aktivität wurde veröffentlicht' : 'Deine Veranstaltung wurde veröffentlicht',
-            implode("\n", $bodyLines)
+            $mail['subject'],
+            $mail['text_body'],
+            $mail['to_name'],
+            $mail['html_body']
         );
+
+        return [
+            'status' => 'sent',
+            'sent' => true,
+            'error' => null,
+        ];
     } catch (Throwable $error) {
         error_log('Submission publication mail failed: ' . $error->getMessage());
+
+        return [
+            'status' => 'failed',
+            'sent' => false,
+            'error' => $error->getMessage(),
+        ];
     }
 }
 /* === END BLOCK: ACTIVITY_PRESENCE_APPROVAL_PUBLICATION_MAIL_V1 === */
@@ -465,8 +473,14 @@ try {
 
         $pdo->commit();
 
+        $publicationMail = [
+            'status' => 'skipped',
+            'sent' => false,
+            'error' => $wasAlreadyApproved ? 'already_approved' : null,
+        ];
+
         if (!$wasAlreadyApproved) {
-            sap_send_publication_mail($submission);
+            $publicationMail = sap_send_publication_mail($submission);
         }
 
         be_json_response(200, [
@@ -478,6 +492,9 @@ try {
                 'idempotent' => true,
                 'quota' => $quotaSummary,
                 'public_feed' => '/api/events/public.php',
+                'publication_mail_status' => $publicationMail['status'],
+                'publication_mail_sent' => $publicationMail['sent'],
+                'publication_mail_error' => $publicationMail['error'],
             ],
         ]);
     }
@@ -496,8 +513,14 @@ try {
 
     $pdo->commit();
 
+    $publicationMail = [
+        'status' => 'skipped',
+        'sent' => false,
+        'error' => $wasAlreadyApproved ? 'already_approved' : null,
+    ];
+
     if (!$wasAlreadyApproved) {
-        sap_send_publication_mail($submission);
+        $publicationMail = sap_send_publication_mail($submission);
     }
     /* === END BLOCK: SUBMISSION_APPROVAL_REAPPROVE_EXISTING_CONSUMPTION_V2 === */
 
@@ -510,6 +533,9 @@ try {
             'consumption_id' => $consumptionId,
             'quota' => $quotaSummary,
             'public_feed' => '/api/events/public.php',
+            'publication_mail_status' => $publicationMail['status'],
+            'publication_mail_sent' => $publicationMail['sent'],
+            'publication_mail_error' => $publicationMail['error'],
         ],
     ]);
 } catch (InvalidArgumentException $error) {

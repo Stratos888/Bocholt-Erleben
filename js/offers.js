@@ -46,6 +46,22 @@ const OfferVisuals = (() => {
     return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "ja";
   }
 
+  function isAiGeneratedSourceType(value) {
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "generated_activity_visual"
+      || normalized === "ai_generated"
+      || normalized === "ai_generated_symbolic_premium_visual";
+  }
+
+  function buildSymbolicCardLabel(imageData) {
+    return imageData?.isSymbolic ? "Symbolbild" : "";
+  }
+
+  function buildSymbolicDetailLabel(imageData) {
+    if (!imageData?.isSymbolic) return "";
+    return imageData?.isAiGenerated ? "KI-generiertes Symbolbild" : "Symbolbild";
+  }
+
   function normalizeLookupKey(value) {
     return String(value || "")
       .trim()
@@ -57,6 +73,77 @@ const OfferVisuals = (() => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
   }
+  function normalizePoolKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[äÄ]/g, "ae")
+      .replace(/[öÖ]/g, "oe")
+      .replace(/[üÜ]/g, "ue")
+      .replace(/[ß]/g, "ss")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  const ACTIVITY_VISUAL_POOL_STATUSES = new Set(["ready", "fallback"]);
+  let activityVisualPool = Object.freeze({ pools: Object.freeze({}) });
+
+  function setActivityVisualPool(data) {
+    const pools = data && typeof data === "object" && data.pools && typeof data.pools === "object"
+      ? data.pools
+      : {};
+    activityVisualPool = Object.freeze({ pools });
+  }
+
+  function getUsablePoolImage(poolEntry) {
+    const images = Array.isArray(poolEntry?.images) ? poolEntry.images : [];
+    return images.find((image) => {
+      const status = String(image?.status || "").trim().toLowerCase();
+      const src = String(image?.src || "").trim();
+      return src && ACTIVITY_VISUAL_POOL_STATUSES.has(status);
+    }) || null;
+  }
+
+  function resolvePoolImageData(offer) {
+    const explicitKey = normalizePoolKey(offer?.visual_key || offer?.image_visual_key || "");
+    if (!explicitKey) return null;
+
+    const poolEntry = activityVisualPool.pools?.[explicitKey];
+    const poolImage = getUsablePoolImage(poolEntry);
+    if (!poolImage) return null;
+
+    const sourceType = String(poolImage.source_type || "").trim();
+    const isAiGenerated = normalizeBoolean(poolImage.is_ai_generated) || isAiGeneratedSourceType(sourceType);
+
+    return {
+      url: normalizeHttpUrl(poolImage.src),
+      positionX: String(poolImage.position_x || poolImage.positionX || "50%").trim() || "50%",
+      positionY: String(poolImage.position_y || poolImage.positionY || "50%").trim() || "50%",
+      fit: String(poolImage.fit || "cover").trim() || "cover",
+      id: String(poolImage.id || "").trim(),
+      sourcePage: String(poolImage.source_page || poolImage.sourcePage || "").trim(),
+      sourceTitle: String(poolImage.source_title || poolImage.sourceTitle || "").trim(),
+      downloadUrl: String(poolImage.download_url || poolImage.downloadUrl || "").trim(),
+      author: String(poolImage.author || "").trim(),
+      license: String(poolImage.license || "").trim(),
+      licenseUrl: String(poolImage.license_url || poolImage.licenseUrl || "").trim(),
+      credit: String(poolImage.credit || "").trim(),
+      modifications: String(poolImage.modifications || "").trim(),
+      source: String(poolImage.source || "").trim(),
+      sourceType,
+      rightsStatus: String(poolImage.rights_status || poolImage.rightsStatus || "").trim(),
+      reviewStatus: String(poolImage.review_status || poolImage.reviewStatus || "").trim(),
+      isSymbolic: normalizeBoolean(poolImage.is_symbolic),
+      isDocumentary: normalizeBoolean(poolImage.is_documentary),
+      isAiGenerated,
+      status: String(poolImage.status || "").trim(),
+      visualKey: explicitKey,
+      alt: String(poolImage.alt || poolEntry?.label || "").trim(),
+      // Internal audit notes are not public copy; only public_note may be rendered.
+      note: String(poolImage.public_note || "").trim()
+    };
+  }
+
 
   const GENERIC_ACTIVITY_IMAGES = Object.freeze({
     "park-green": {
@@ -195,8 +282,14 @@ const OfferVisuals = (() => {
   }
 
   function resolveImageData(offer) {
+    const poolImage = resolvePoolImageData(offer);
+    if (poolImage?.url) return poolImage;
+
     const explicitUrl = normalizeHttpUrl(offer?.image);
     if (explicitUrl) {
+      const sourceType = String(offer?.image_source_type || "").trim();
+      const isAiGenerated = normalizeBoolean(offer?.image_is_ai_generated) || isAiGeneratedSourceType(sourceType);
+
       return {
         url: explicitUrl,
         positionX: String(offer?.image_position_x || "50%").trim() || "50%",
@@ -206,7 +299,13 @@ const OfferVisuals = (() => {
         author: String(offer?.image_author || "").trim(),
         license: String(offer?.image_license || "").trim(),
         credit: String(offer?.image_credit || "").trim(),
+        sourceType,
         isSymbolic: normalizeBoolean(offer?.image_is_symbolic),
+        isDocumentary: false,
+        isAiGenerated,
+        status: "offer_image",
+        visualKey: "",
+        alt: "",
         note: String(offer?.image_note || "").trim()
       };
     }
@@ -224,7 +323,13 @@ const OfferVisuals = (() => {
         author: genericImage.author || "",
         license: genericImage.license || "",
         credit: genericImage.credit || "",
+        sourceType: "licensed_symbolic_fallback_photo",
         isSymbolic: true,
+        isDocumentary: false,
+        isAiGenerated: false,
+        status: "generic_fallback",
+        visualKey: genericKey,
+        alt: "",
         note: genericImage.note || "Symbolbild"
       };
     }
@@ -238,7 +343,13 @@ const OfferVisuals = (() => {
       author: "",
       license: "",
       credit: "",
+      sourceType: "",
       isSymbolic: false,
+      isDocumentary: false,
+      isAiGenerated: false,
+      status: "",
+      visualKey: "",
+      alt: "",
       note: ""
     };
   }
@@ -477,7 +588,10 @@ function getCategoryPresentation(category) {
   return {
     escapeHtml,
     normalizeHttpUrl,
+    setActivityVisualPool,
     resolveImageData,
+    buildSymbolicCardLabel,
+    buildSymbolicDetailLabel,
     slugify,
     getCategoryPresentation,
     buildMetaLine,
@@ -607,18 +721,33 @@ const OfferCards = (() => {
     const title = String(offer?.title || "").trim();
     const location = String(offer?.location || "").trim();
     const note = String(imageData?.note || "").trim();
+    const alt = String(imageData?.alt || "").trim();
 
     if (imageData?.isSymbolic) {
+      if (alt) return alt;
       if (title && location) return `Symbolbild für ${title} – ${location}`;
       if (title) return `Symbolbild für ${title}`;
       return "Symbolbild für Aktivität in Bocholt und Umgebung";
     }
 
+    if (alt) return alt;
     if (title && location) return `${title} – ${location}`;
     if (title) return title;
     if (location) return `Aktivität in ${location}`;
     if (note) return note;
     return "Aktivität in Bocholt und Umgebung";
+  }
+
+  function renderDesktopCreditLink(offer, imageData) {
+    if (!window.ImageAttribution?.renderCreditAccessLink || !imageData?.url) return "";
+
+    return window.ImageAttribution.renderCreditAccessLink(imageData, {
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim(),
+      imageId: String(imageData?.id || "").trim(),
+      label: "Bildnachweis"
+    });
   }
 
   function renderMedia(offer, visual, index) {
@@ -633,10 +762,8 @@ const OfferCards = (() => {
     if (imageUrl) {
       ensureImageOriginHints(imageUrl);
       const { loading, fetchPriority } = getImageLoadingProfile(index);
-      const symbolicLabel = imageData.isSymbolic
-        ? OfferVisuals.escapeHtml(String(imageData.note || "").trim() || "Symbolbild")
-        : "";
       const imageAlt = OfferVisuals.escapeHtml(buildActivityImageAltText(offer, imageData));
+      const creditLink = renderDesktopCreditLink(offer, imageData);
 
       return `
         <div class="activity-card-media activity-card-media--image activity-card-media--${modifier}">
@@ -650,7 +777,7 @@ const OfferCards = (() => {
   referrerpolicy="no-referrer"
   style="--activity-image-pos-x:${OfferVisuals.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${OfferVisuals.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${OfferVisuals.escapeHtml(imageData.fit || "cover")};"
 >
-          ${symbolicLabel ? `<span class="activity-card-media__badge">${symbolicLabel}</span>` : ""}
+          ${creditLink}
         </div>
       `.trim();
     }
@@ -753,8 +880,16 @@ const OfferCards = (() => {
       openPrimaryDesktopTarget(primaryUrl, primaryOutboundPayload);
     };
 
-    article.addEventListener("click", open);
+    article.addEventListener("click", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) {
+        event.stopPropagation();
+        return;
+      }
+
+      open(event);
+    });
     article.addEventListener("keydown", (event) => {
+      if (event.target.closest("[data-image-credit-access]")) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       open(event);
     });

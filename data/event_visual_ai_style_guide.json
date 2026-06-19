@@ -1,0 +1,1199 @@
+{
+  "schema_version": 2,
+  "owner": "event_visual_ai_style_guide_v31",
+  "purpose": "Canonical machine-readable rule contract for AI-generated premium event visuals in Bocholt erleben.",
+  "generation_contract": {
+    "source_type": "ai_generated",
+    "is_symbolic": true,
+    "is_documentary": false,
+    "allow_false_place_claim": false,
+    "preferred_generation_aspect_ratio": "16:9",
+    "final_asset_format": "webp_1200x675",
+    "card_crop_goal": "landscape_event_card",
+    "default_prompt_mode": "editorial_premium_symbolic"
+  },
+  "approved_pilot_anchors": {
+    "city_walk_v2": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for locally plausible small-town urban detail images.",
+      "applicable_image_classes": [
+        "local_sensitive_detail"
+      ],
+      "strengths": [
+        "locally plausible small-town mood",
+        "brick, plaster, paving and plant materiality",
+        "calm editorial realism",
+        "no false concrete place claim",
+        "strong card crop suitability"
+      ],
+      "avoid_transferring": [
+        "over-clean perfection",
+        "postcard romanticism",
+        "too much visual emptiness"
+      ]
+    },
+    "market_food_v3": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for market/food/event-context visuals.",
+      "applicable_image_classes": [
+        "hybrid_contextual"
+      ],
+      "strengths": [
+        "event-context food imagery instead of pure food styling",
+        "market stand materiality",
+        "soft anonymous background context",
+        "warm but believable editorial look",
+        "card-friendly subject layering"
+      ],
+      "avoid_transferring": [
+        "gourmet magazine still life",
+        "alcohol-centric mood",
+        "perfect fantasy market square"
+      ]
+    },
+    "creative_workshop_v2": {
+      "accepted_as_style_anchor": true,
+      "role": "Primary style anchor for symbolic editorial workshop and family-safe making visuals.",
+      "applicable_image_classes": [
+        "symbolic_editorial"
+      ],
+      "strengths": [
+        "credible making/workshop character",
+        "quiet premium craft/material styling",
+        "safe partial human presence without identity claim",
+        "high material richness",
+        "strong symbolic usability"
+      ],
+      "avoid_transferring": [
+        "sterile design atelier look",
+        "chaotic craft table",
+        "recognizable children or faces"
+      ]
+    }
+  },
+  "global_style": {
+    "desired_visual_language": [
+      "premium editorial photography",
+      "believable real-world realism",
+      "warm-neutral restrained palette",
+      "quiet premium composition",
+      "material-rich surfaces",
+      "slight lived-in imperfection",
+      "calm local small-town atmosphere where relevant"
+    ],
+    "lighting_rules": [
+      "prefer natural daylight or soft diffused light",
+      "allow mild warmth but avoid heavy golden-hour glaze",
+      "allow gentle indoor softness for symbolic scenes",
+      "avoid extreme cinematic light beams or fantasy haze"
+    ],
+    "composition_rules": [
+      "landscape image optimized for 4:3 crop safety",
+      "clear foreground or midground subject focus",
+      "background may be soft but not unrealistically over-blurred",
+      "avoid overcrowding and avoid too many micro-details",
+      "preserve usable crop for mobile cards"
+    ],
+    "realism_rules": [
+      "surfaces should feel slightly imperfect and tactile",
+      "avoid plastic-looking textures",
+      "avoid impossible geometry or suspicious repetition",
+      "avoid theme-park prettiness",
+      "prefer documentary editorial restraint over visual spectacle"
+    ],
+    "legal_safety_rules": [
+      "no readable brands",
+      "no readable posters",
+      "no readable signs",
+      "no copyrighted artwork in focus",
+      "no identifiable children",
+      "avoid identifiable adults; if present, keep anonymous or partial"
+    ]
+  },
+  "global_negative_rules": [
+    "no fictional recognizable old-town square",
+    "no postcard old-town look",
+    "no fairy-tale half-timber fantasy street",
+    "no over-perfect golden-hour postcard mood",
+    "no cheap stock-photo smile scenes",
+    "no exaggerated cinematic bokeh",
+    "no surreal AI symmetry",
+    "no pristine showroom perfection",
+    "no loud festival poster aesthetics",
+    "no text in image"
+  ],
+  "quality_gate_policy": {
+    "hard_fail_gates": [
+      "no_false_place_claim",
+      "low_ai_artifice",
+      "legal_safety"
+    ],
+    "soft_review_gates": [
+      "locality_plausibility",
+      "premium_quality",
+      "crop_safety",
+      "anchor_consistency"
+    ],
+    "pass_rule": "All hard-fail gates must pass. At least 3 of 4 soft-review gates must pass. Local-sensitive keys must pass locality_plausibility strongly.",
+    "gates": {
+      "locality_plausibility": {
+        "description": "Image feels plausible for Bocholt / Westmuensterland when locality matters.",
+        "pass_requirement": "Materials, scale, planting, paving and facade logic feel locally plausible without naming a specific place.",
+        "failure_signals": [
+          "southern European old town",
+          "mountain village",
+          "fairy-tale half-timber ensemble",
+          "obviously non-local architecture"
+        ]
+      },
+      "no_false_place_claim": {
+        "description": "Image must not imply a specific false Bocholt location.",
+        "pass_requirement": "Use detail-, edge- or atmosphere-oriented framing instead of a clearly invented central place.",
+        "failure_signals": [
+          "invented market square",
+          "full fantasy street vista",
+          "recognizable but false landmark composition"
+        ]
+      },
+      "low_ai_artifice": {
+        "description": "Image should not look obviously AI-generated.",
+        "pass_requirement": "Believable geometry, believable texture, restrained blur, natural object relationships and mild imperfections.",
+        "failure_signals": [
+          "plastic textures",
+          "impossible object joins",
+          "hyper-perfect staging",
+          "overly dreamy light haze",
+          "suspicious repeated patterns"
+        ]
+      },
+      "premium_quality": {
+        "description": "Image must feel worthy of a premium discovery PWA.",
+        "pass_requirement": "Editorial calm, material richness, visual hierarchy and curated atmosphere are clearly present.",
+        "failure_signals": [
+          "cheap stock look",
+          "messy clutter",
+          "flat snapshot feeling",
+          "overly generic filler scene"
+        ]
+      },
+      "crop_safety": {
+        "description": "Image must survive mobile and desktop card crops.",
+        "pass_requirement": "Main subject remains legible in a landscape card crop without depending on edge-only details.",
+        "failure_signals": [
+          "important subject only at the extreme edge",
+          "too much empty space",
+          "tiny hard-to-read focal content"
+        ]
+      },
+      "anchor_consistency": {
+        "description": "Image should align stylistically with one or more approved pilot anchors.",
+        "pass_requirement": "Shares the tonal, material and editorial DNA of the approved anchors.",
+        "failure_signals": [
+          "neon nightlife",
+          "hard commercial food ad look",
+          "sterile catalog shot",
+          "storybook street scene"
+        ]
+      },
+      "legal_safety": {
+        "description": "Image must stay within the content restrictions of the system.",
+        "pass_requirement": "No readable brands, no readable text, no copyrighted art focus, no identifiable children.",
+        "failure_signals": [
+          "brand logos",
+          "visible poster text",
+          "recognizable child face",
+          "recognizable copyrighted artwork"
+        ]
+      }
+    }
+  },
+  "image_classes": {
+    "local_sensitive_detail": {
+      "description": "Locally plausible detail or atmosphere imagery for visual keys where users may notice fake place claims.",
+      "core_rule": "Use locally plausible detail framing instead of clearly invented streets or squares.",
+      "preferred_anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "prompt_bias": [
+        "subtle small-town detail",
+        "brick, plaster, paving, greenery, bicycle or street furniture",
+        "editorial documentary realism"
+      ],
+      "avoid_bias": [
+        "full postcard townscape",
+        "romanticized fantasy old town",
+        "tourism brochure angle"
+      ]
+    },
+    "hybrid_contextual": {
+      "description": "Contextual symbolic imagery with some local atmosphere, but primary focus on activity, material or event context.",
+      "core_rule": "Foreground detail dominates; background context stays soft, unspecific and believable.",
+      "preferred_anchor_profiles": [
+        "market_food_v3",
+        "city_walk_v2"
+      ],
+      "prompt_bias": [
+        "foreground material focus",
+        "soft anonymous background context",
+        "event/detail balance"
+      ],
+      "avoid_bias": [
+        "pure still life with no context",
+        "fully invented market square",
+        "hard commercial styling"
+      ]
+    },
+    "symbolic_editorial": {
+      "description": "Symbolic premium editorial images where locality is secondary to safe, believable activity representation.",
+      "core_rule": "Prioritize materiality, action cues and premium calm over explicit place identity.",
+      "preferred_anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "prompt_bias": [
+        "symbolic material scene",
+        "quiet workshop or activity cues",
+        "editorial realism"
+      ],
+      "avoid_bias": [
+        "sterile studio set",
+        "cheap stock posing",
+        "chaotic clutter"
+      ]
+    }
+  },
+  "prompt_building_rules": {
+    "global_positive_clauses": [
+      "premium editorial photography",
+      "believable real-world surfaces",
+      "warm-neutral restrained palette",
+      "landscape 4:3 card-friendly composition",
+      "calm, curated and modern atmosphere",
+      "no text in image"
+    ],
+    "global_negative_clauses": [
+      "no fictional recognizable townscape",
+      "no postcard look",
+      "no fairytale street",
+      "no cheap stock photo look",
+      "no overly styled commercial look",
+      "no strong AI-fantasy aesthetic",
+      "no readable signs or logos"
+    ],
+    "class_specific_clauses": {
+      "local_sensitive_detail": [
+        "subtle local small-town detail",
+        "no false concrete place claim",
+        "use edge, material and atmosphere framing"
+      ],
+      "hybrid_contextual": [
+        "foreground detail first, soft contextual background",
+        "suggest event or market context without a fixed invented location"
+      ],
+      "symbolic_editorial": [
+        "credible making or activity context",
+        "high material richness",
+        "avoid sterile or staged catalog feeling"
+      ]
+    }
+  },
+  "visual_key_rules": {
+    "textile_machines_industry": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+      "prompt_must_include": [
+        "Maschinen-/Weberei-/Spinnerei-Bezug",
+        "TextilWerk- oder Industriekultur-Anmutung",
+        "starke Materialität"
+      ],
+      "prompt_avoid": [
+        "Theater- oder Konzertbild nur wegen Location",
+        "sterile Technikaufnahme",
+        "erkennbare Personen im Fokus"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key textile_machines_industry eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "textile_exhibition_design": {
+      "image_class": "hybrid_contextual",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+      "prompt_must_include": [
+        "Stoffe oder textile Objekte",
+        "Ausstellungs- oder Designcharakter",
+        "ruhige Premium-Komposition"
+      ],
+      "prompt_avoid": [
+        "beliebige Deko",
+        "geschützte Kunst prominent",
+        "Modekatalog-Look"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key textile_exhibition_design eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "art_exhibition_gallery": {
+      "image_class": "hybrid_contextual",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+      "prompt_must_include": [
+        "Galerie- oder Ausstellungssituation",
+        "Kunst-/Kreativbezug",
+        "keine geschützten Werke im Fokus"
+      ],
+      "prompt_avoid": [
+        "lesbare Labels",
+        "berühmte Kunstwerke",
+        "sterile leere Wand"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key art_exhibition_gallery eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "local_history_heritage": {
+      "image_class": "hybrid_contextual",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+      "prompt_must_include": [
+        "Archiv-/Museums-/Stadtgeschichtsbezug",
+        "lokale oder historische Materialität",
+        "ruhige Entdeckungsatmosphäre"
+      ],
+      "prompt_avoid": [
+        "falsche konkrete Bocholt-Behauptung",
+        "Amtsblattoptik",
+        "unlesbare Dokumentenwand"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key local_history_heritage eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "city_tour_history": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+      "prompt_must_include": [
+        "Stadtraum oder Architekturdetail",
+        "Rundgang-/Führungsgefühl",
+        "Bocholt-/Regionsplausibilität"
+      ],
+      "prompt_avoid": [
+        "Postkartenkitsch",
+        "Fantasy-Altstadt",
+        "falsche Sehenswürdigkeit"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key city_tour_history eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "live_music_stage": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+      "prompt_must_include": [
+        "Bühne, Mikrofon, Instrument oder Licht",
+        "Live-Musik-Kontext",
+        "keine erkennbaren Künstler"
+      ],
+      "prompt_avoid": [
+        "Disco-/Clubklischee",
+        "Bandlogos",
+        "Festivalposter"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key live_music_stage eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "classical_music": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+      "prompt_must_include": [
+        "Orgel, Chor, Noten, Kirche oder Kammermusikbezug",
+        "ruhige Konzertatmosphäre",
+        "hochwertiges Licht"
+      ],
+      "prompt_avoid": [
+        "Rockbühne",
+        "laute Partyoptik",
+        "erkennbare Musiker im Fokus"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key classical_music eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "theater_stage": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+      "prompt_must_include": [
+        "Vorhang, Bühne, Licht oder Schauspielkontext",
+        "Theateratmosphäre",
+        "keine konkreten Inszenierungsrechte"
+      ],
+      "prompt_avoid": [
+        "Comedy-Mikrofon als Hauptmotiv",
+        "erkennbare Schauspieler",
+        "Plakatoptik"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key theater_stage eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "comedy_cabaret": {
+      "image_class": "symbolic_editorial",
+      "priority": "medium",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+      "prompt_must_include": [
+        "Mikrofon, kleine Bühne oder Kabarettkontext",
+        "abendliche Kleinkunststimmung",
+        "keine Person im Fokus"
+      ],
+      "prompt_avoid": [
+        "Theaterdrama",
+        "billige Partyoptik",
+        "lesbare Programmplakate"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key comedy_cabaret eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "film_screening": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+      "prompt_must_include": [
+        "Leinwand, Projektion, Kinosaal oder Filmabendkontext",
+        "keine Filmrechte im Bild",
+        "ruhiges Licht"
+      ],
+      "prompt_avoid": [
+        "erkennbare Filmszenen",
+        "Poster",
+        "Netflix-/Markenlogos"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key film_screening eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "literature_reading_talk": {
+      "image_class": "symbolic_editorial",
+      "priority": "medium",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+      "prompt_must_include": [
+        "Bücher, Lesepult, Mikrofon oder Gesprächssituation",
+        "ruhige Kulturatmosphäre",
+        "keine lesbaren Buchcover"
+      ],
+      "prompt_avoid": [
+        "beliebiges Bücherregal",
+        "erkennbare Autor:innen",
+        "Textwände"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key literature_reading_talk eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "kids_stage_story": {
+      "image_class": "symbolic_editorial",
+      "priority": "medium",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+      "prompt_must_include": [
+        "Puppenspiel-/Kinderbühnen-/Vorlese-Kontext",
+        "kindgerecht ohne kindisch zu wirken",
+        "keine erkennbaren Kinder"
+      ],
+      "prompt_avoid": [
+        "Kinderfaces",
+        "Cartoon-/Spielzeuglizenzfiguren",
+        "chaotische Kitaoptik"
+      ],
+      "people_policy": "Keine erkennbaren Kinder; Personen höchstens anonym, angeschnitten oder als Hände/Details.",
+      "review_emphasis": [
+        "Bild muss den Visual Key kids_stage_story eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "city_festival_street": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+      "prompt_must_include": [
+        "Innenstadt-/Straßen-/Stadtfestgefühl",
+        "breite Card-Wirkung",
+        "lokal plausible Materialien"
+      ],
+      "prompt_avoid": [
+        "Großstadt-Skyline",
+        "Kirmes-Fahrgeschäfte",
+        "lesbare Plakate"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key city_festival_street eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "open_air_festival": {
+      "image_class": "local_sensitive_detail",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+      "prompt_must_include": [
+        "Außenbühne, Gelände, Licht oder Festivalatmosphäre",
+        "Weite und Luftigkeit",
+        "keine erkennbaren Acts"
+      ],
+      "prompt_avoid": [
+        "reines Konzertdetail ohne Festivalgefühl",
+        "Massenszenen",
+        "Markenbühnen"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key open_air_festival eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "kirmes_funfair": {
+      "image_class": "local_sensitive_detail",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+      "prompt_must_include": [
+        "Kirmes-/Fahrgeschäft-/Lichterbezug",
+        "Volksfestatmosphäre",
+        "keine dominante Menschenmenge"
+      ],
+      "prompt_avoid": [
+        "überdrehtes Neon",
+        "billiger Rummel-Look",
+        "lesbare Schaustellerlogos"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key kirmes_funfair eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "parade_festzug": {
+      "image_class": "local_sensitive_detail",
+      "priority": "low",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+      "prompt_must_include": [
+        "Umzug-/Parade-/Straßenbewegung",
+        "Stadtraumgefühl",
+        "anonyme oder keine Personen"
+      ],
+      "prompt_avoid": [
+        "erkennbare Einzelpersonen",
+        "politische Plakate im Fokus",
+        "chaotische Menschenmenge"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key parade_festzug eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "shooting_festival_tradition": {
+      "image_class": "local_sensitive_detail",
+      "priority": "low",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+      "prompt_must_include": [
+        "Festzelt-, Vereins- oder Traditionsbezug",
+        "Schützenfest-Anmutung ohne Uniformfokus",
+        "regionale Plausibilität"
+      ],
+      "prompt_avoid": [
+        "Waffenfokus",
+        "erkennbare Vereinslogos",
+        "Alkoholfokus"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key shooting_festival_tradition eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "market_stalls": {
+      "image_class": "hybrid_contextual",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+      "prompt_must_include": [
+        "Stände, Waren, Tische oder Marktstruktur",
+        "Material- und Warenbezug",
+        "keine Marken"
+      ],
+      "prompt_avoid": [
+        "Food-Fokus",
+        "Buchmarkt-Fokus",
+        "überfüllte Verkaufsfläche"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key market_stalls eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "book_market": {
+      "image_class": "hybrid_contextual",
+      "priority": "low",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+      "prompt_must_include": [
+        "Bücher, Kisten, Tische oder Papierdetails",
+        "Buchmarktgefühl",
+        "keine lesbaren Cover im Fokus"
+      ],
+      "prompt_avoid": [
+        "Bibliothek statt Markt",
+        "urheberrechtlich erkennbare Cover",
+        "chaotische Stapel"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key book_market eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "food_drink_festival": {
+      "image_class": "hybrid_contextual",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+      "prompt_must_include": [
+        "Food-/Wein-/Genussbezug",
+        "Event- oder Standkontext",
+        "hochwertig statt Restaurantteller"
+      ],
+      "prompt_avoid": [
+        "Alkoholfokus",
+        "beliebige Tellerbilder",
+        "Fast-Food-Klischees"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key food_drink_festival eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "country_fair_rural": {
+      "image_class": "local_sensitive_detail",
+      "priority": "low",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+      "prompt_must_include": [
+        "Landpartie-/Country-Fair-/Hof- oder Parkatmosphäre",
+        "natürliche Materialien",
+        "ruhige Weite"
+      ],
+      "prompt_avoid": [
+        "Agrar-Maschinenmesse",
+        "Western-Klischee",
+        "Tiernahaufnahme ohne Kontext"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key country_fair_rural eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "family_play_outdoor": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+      "prompt_must_include": [
+        "Spiel-/Familien-/Outdoorbezug",
+        "Mitmach- oder Freizeitgefühl",
+        "keine erkennbaren Kinder"
+      ],
+      "prompt_avoid": [
+        "Kindergesichter",
+        "billige Spielplatz-Stockoptik",
+        "chaotische Farben"
+      ],
+      "people_policy": "Keine erkennbaren Kinder; Personen höchstens anonym, angeschnitten oder als Hände/Details.",
+      "review_emphasis": [
+        "Bild muss den Visual Key family_play_outdoor eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "creative_making_workshop": {
+      "image_class": "symbolic_editorial",
+      "priority": "high",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+      "prompt_must_include": [
+        "Materialien, Hände, Basteln, Handwerk oder Making",
+        "Workshopgefühl",
+        "keine Lizenzfiguren"
+      ],
+      "prompt_avoid": [
+        "Pokémon-/Markenfiguren",
+        "Kinderfaces",
+        "steriler Designatelier-Look"
+      ],
+      "people_policy": "Keine erkennbaren Kinder; Personen höchstens anonym, angeschnitten oder als Hände/Details.",
+      "review_emphasis": [
+        "Bild muss den Visual Key creative_making_workshop eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "learning_science_workshop": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+      "prompt_must_include": [
+        "Experiment-, Lern- oder Wissensbezug",
+        "Junge-Uni-/Workshopatmosphäre",
+        "Material oder Objektfokus"
+      ],
+      "prompt_avoid": [
+        "Labor-Klischee",
+        "Schulbuchoptik",
+        "erkennbare Kinder"
+      ],
+      "people_policy": "Keine erkennbaren Kinder; Personen höchstens anonym, angeschnitten oder als Hände/Details.",
+      "review_emphasis": [
+        "Bild muss den Visual Key learning_science_workshop eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "dance_music_workshop": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+      "prompt_must_include": [
+        "Tanz-, Musik- oder Performance-Kontext",
+        "Bewegungsgefühl ohne Gesichter",
+        "Workshop statt Konzert"
+      ],
+      "prompt_avoid": [
+        "TikTok-/Popstar-Klischee",
+        "erkennbare Jugendliche",
+        "Logo-/Posterbezug"
+      ],
+      "people_policy": "Keine erkennbaren Kinder; Personen höchstens anonym, angeschnitten oder als Hände/Details.",
+      "review_emphasis": [
+        "Bild muss den Visual Key dance_music_workshop eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "active_route_tour": {
+      "image_class": "local_sensitive_detail",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+      "prompt_must_include": [
+        "Route, Weg, Fahrrad, Segway oder Spaziergang",
+        "geführte Bewegung",
+        "regional plausible Umgebung"
+      ],
+      "prompt_avoid": [
+        "Sportwettkampf",
+        "Alpen-/Reisebild",
+        "Fahrzeugwerbung"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key active_route_tour eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "running_event": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+      "prompt_must_include": [
+        "Laufstrecke, Start/Ziel oder Laufschuh-/Bewegungsdetail",
+        "Eventkontext",
+        "keine erkennbaren Läufer"
+      ],
+      "prompt_avoid": [
+        "Fitnessstudio",
+        "Markenschuhe im Fokus",
+        "Massenszene"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key running_event eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "cycling_event": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+      "prompt_must_include": [
+        "Fahrrad-, Radrennen- oder Tourkontext",
+        "Bewegungsrichtung",
+        "hochwertige Oberflächen"
+      ],
+      "prompt_avoid": [
+        "Produktwerbung",
+        "Mountainbike-Alpenbild",
+        "erkennbare Fahrer"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key cycling_event eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "indoor_sport_competition": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+      "prompt_must_include": [
+        "Darts-, Fecht-, Hallensport- oder Turnierbezug",
+        "Wettkampfatmosphäre",
+        "keine identifizierbaren Sportler"
+      ],
+      "prompt_avoid": [
+        "Stadionbild",
+        "Fitnesskurs",
+        "Vereinslogos"
+      ],
+      "people_policy": "Keine erkennbaren Performer, Sportler oder Einzelpersonen; anonyme Silhouetten oder Details bevorzugen.",
+      "review_emphasis": [
+        "Bild muss den Visual Key indoor_sport_competition eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "nature_learning_wildlife": {
+      "image_class": "local_sensitive_detail",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+      "prompt_must_include": [
+        "Natur-, Tier-, Wasser-, Garten- oder Umweltbildungsbezug",
+        "regionale Plausibilität",
+        "ruhige Tiefe"
+      ],
+      "prompt_avoid": [
+        "Alpen/Strand",
+        "dramatische Wildnis",
+        "Tier-Makro ohne Eventbezug"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key nature_learning_wildlife eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "evening_social_party": {
+      "image_class": "symbolic_editorial",
+      "priority": "low",
+      "anchor_profiles": [
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Symbolisches Premiumbild ist zulässig; keine konkrete Orts- oder Eventdokumentation behaupten.",
+      "subject_focus": "Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+      "prompt_must_include": [
+        "Tanz-, Abend-, Bar- oder Treffpunktatmosphäre",
+        "warmes Licht",
+        "keine Alkoholzentrierung"
+      ],
+      "prompt_avoid": [
+        "Nachtclub-Neon",
+        "betrunkene Menschen",
+        "Marken/Flaschen im Fokus"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key evening_social_party eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "business_messe_info": {
+      "image_class": "hybrid_contextual",
+      "priority": "medium",
+      "anchor_profiles": [
+        "city_walk_v2",
+        "market_food_v3",
+        "creative_workshop_v2"
+      ],
+      "locality_requirement": "Kontext darf symbolisch sein, soll aber lokal/regional plausibel wirken und keine falsche konkrete Location behaupten.",
+      "subject_focus": "Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+      "prompt_must_include": [
+        "Messe-, Infoabend- oder Businesskontext",
+        "Tische, Materialien oder Raumstruktur",
+        "sachliche Premiumwirkung"
+      ],
+      "prompt_avoid": [
+        "Corporate-Stockfoto",
+        "lesbare Rollups",
+        "Handshake-Klischee"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key business_messe_info eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "vehicle_classic": {
+      "image_class": "local_sensitive_detail",
+      "priority": "low",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+      "prompt_must_include": [
+        "Oldtimer-, Chrom-, Fahrzeug- oder Karosseriedetail",
+        "Treffen-/Ausstellungskontext",
+        "keine Kennzeichen"
+      ],
+      "prompt_avoid": [
+        "moderne Autowerbung",
+        "erkennbare Kennzeichen",
+        "Tuning-Klischee"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key vehicle_classic eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    },
+    "default_city": {
+      "image_class": "local_sensitive_detail",
+      "priority": "high",
+      "anchor_profiles": [
+        "city_walk_v2"
+      ],
+      "locality_requirement": "Lokale oder regional plausible Atmosphäre bevorzugen; keine falsche konkrete Bocholt-Ortsbehauptung erzeugen.",
+      "subject_focus": "Hochwertiger neutraler lokaler Fallback für unklare Events",
+      "prompt_must_include": [
+        "Bocholt-/Innenstadt- oder regionale Stadtanmutung",
+        "breite Nutzbarkeit",
+        "Premium-Fallback ohne Beliebigkeit"
+      ],
+      "prompt_avoid": [
+        "beliebige Stockstadt",
+        "falsche Landmarke",
+        "graue Amtsblattoptik"
+      ],
+      "people_policy": "Personen vermeiden oder nur anonym/angeschnitten zeigen; keine identifizierbaren Gesichter.",
+      "review_emphasis": [
+        "Bild muss den Visual Key default_city eindeutig bedienen.",
+        "Premium-Editorial-Look ohne KI-Artefakte.",
+        "16:9-Card-Komposition mit ruhigem Fokus.",
+        "Keine lesbaren Marken, Plakate, Schilder oder urheberrechtlich geschützten Werke im Fokus."
+      ]
+    }
+  }
+}

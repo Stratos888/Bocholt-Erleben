@@ -12,66 +12,295 @@ const OfferDetailPanel = {
   content: null,
   body: null,
   closeBtn: null,
+  actionbarSlot: null,
   _isInit: false,
   _lastFocusEl: null,
+  _savedScrollY: 0,
+  _savedBodyOverflow: null,
+  _savedBodyPosition: null,
+  _savedBodyTop: null,
+  _savedBodyLeft: null,
+  _savedBodyRight: null,
+  _savedBodyWidth: null,
+  _scrollLockActive: false,
+  _onKeyDown: null,
+  _onPopState: null,
+  _onOverlayClick: null,
+  _onCloseClick: null,
+  dragHit: null,
+  sheet: null,
+  _drag: {
+    startY: 0,
+    dy: 0,
+    dragging: false
+  },
 
   isDesktopViewport() {
     return window.matchMedia("(min-width: 900px)").matches;
   },
 
-  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 | Zweck: mountet das Activity-Detailpanel sauber, hydriert das Close-Icon direkt nach dem Insert und lässt die Listener innerhalb von init() | Umfang: ersetzt die gesamte init()-Methode === */
+  /* === BEGIN BLOCK: OFFER_DETAIL_PANEL_MOBILE_SHELL_PARITY_V1 | Zweck: haertet das Activity-Detailpanel als mobiles System-Overlay mit A11y-, Scroll-, Back- und Drag-Paritaet zum Event-Detailpanel; Umfang: ersetzt die gesamte init()-Methode === */
   init() {
     if (this._isInit) return;
 
-    const root = document.getElementById("offer-detail-root");
-    if (!root) return;
+    const existingPanel = document.getElementById("event-detail-panel");
 
-    root.innerHTML = `
-      <div id="event-detail-panel" class="detail-panel hidden" hidden>
-        <div class="detail-panel-overlay"></div>
-        <div class="detail-panel-content">
-          <div class="detail-panel-grabber" aria-hidden="true"></div>
-          <button class="detail-panel-close" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
-          <div class="detail-panel-body">
-            <div id="detail-content"></div>
+    if (!existingPanel) {
+      const root = document.getElementById("offer-detail-root");
+      if (!root) return;
+
+      root.innerHTML = `
+        <div id="event-detail-panel" class="detail-panel hidden" hidden>
+          <div class="detail-panel-overlay"></div>
+          <div class="detail-panel-content">
+            <div class="detail-panel-header">
+              <div class="detail-panel-handle" aria-hidden="true"></div>
+              <button class="detail-panel-close" type="button" aria-label="Schließen"><span class="detail-panel-close__icon" data-ui-icon="x" aria-hidden="true"></span></button>
+            </div>
+            <div class="detail-panel-body">
+              <div id="detail-content"></div>
+            </div>
           </div>
+          <div id="detail-actionbar-slot" class="detail-actionbar" aria-label="Aktionen" hidden></div>
         </div>
-      </div>
-    `.trim();
+      `.trim();
 
-    if (window.Icons && typeof window.Icons.hydrate === "function") {
-      window.Icons.hydrate(root);
+      if (window.Icons && typeof window.Icons.hydrate === "function") {
+        window.Icons.hydrate(root);
+      }
+    } else if (window.Icons && typeof window.Icons.hydrate === "function") {
+      window.Icons.hydrate(existingPanel);
     }
 
     this.panel = document.getElementById("event-detail-panel");
     this.overlay = this.panel?.querySelector(".detail-panel-overlay");
+    this.sheet = this.panel?.querySelector(".detail-panel-content");
     this.body = this.panel?.querySelector(".detail-panel-body");
     this.content = document.getElementById("detail-content");
     this.closeBtn = this.panel?.querySelector(".detail-panel-close");
+    this.actionbarSlot = this.panel?.querySelector("#detail-actionbar-slot");
 
-    if (!this.panel || !this.overlay || !this.body || !this.content || !this.closeBtn) return;
+    if (this.panel && !this.actionbarSlot) {
+      const slot = document.createElement("div");
+      slot.id = "detail-actionbar-slot";
+      slot.className = "detail-actionbar";
+      slot.setAttribute("aria-label", "Aktionen");
+      slot.hidden = true;
+      this.panel.appendChild(slot);
+      this.actionbarSlot = slot;
+    }
 
-    this.overlay.addEventListener("click", (event) => {
-      if (event.target === this.overlay) this.hide();
-    });
+    if (!this.panel || !this.overlay || !this.sheet || !this.body || !this.content || !this.closeBtn || !this.actionbarSlot) return;
 
-    this.closeBtn.addEventListener("click", (event) => {
+    this.panel.setAttribute("role", "dialog");
+    this.panel.setAttribute("aria-modal", "true");
+    this.panel.setAttribute("aria-hidden", "true");
+    if (!this.sheet.hasAttribute("tabindex")) this.sheet.setAttribute("tabindex", "-1");
+    this.closeBtn.setAttribute("aria-label", "Schließen");
+
+    this.dragHit = this.sheet.querySelector(".detail-panel-drag-hit");
+    if (!this.dragHit) {
+      this.dragHit = document.createElement("div");
+      this.dragHit.className = "detail-panel-drag-hit";
+      this.sheet.appendChild(this.dragHit);
+    }
+
+    this._onOverlayClick = (event) => {
+      if (event.target !== this.overlay || !this.isActivityPanelOpen()) return;
       event.preventDefault();
+      event.stopImmediatePropagation();
       this.hide();
-    });
+    };
+    this.overlay.addEventListener("click", this._onOverlayClick, true);
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && this.panel.classList.contains("active")) {
+    this._onCloseClick = (event) => {
+      if (!this.isActivityPanelOpen()) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.hide();
+    };
+    this.closeBtn.addEventListener("click", this._onCloseClick, true);
+
+    this._onKeyDown = (event) => {
+      if (!this.isActivityPanelOpen()) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         this.hide();
+        return;
       }
-    });
+
+      if (event.key !== "Tab") return;
+
+      event.stopImmediatePropagation();
+      this.trapFocus(event);
+    };
+    document.addEventListener("keydown", this._onKeyDown, true);
+
+    this._onPopState = (event) => {
+      if (!this.isActivityPanelOpen()) return;
+      event.stopImmediatePropagation();
+      this._hideNow();
+    };
+    window.addEventListener("popstate", this._onPopState, true);
+
+    if (this.dragHit) {
+      this.dragHit.addEventListener("pointerdown", (event) => this._onDragStart(event), true);
+      this.dragHit.addEventListener("pointermove", (event) => this._onDragMove(event), { passive: false, capture: true });
+      this.dragHit.addEventListener("pointerup", (event) => this._onDragEnd(event), true);
+      this.dragHit.addEventListener("pointercancel", (event) => this._onDragEnd(event), true);
+    }
 
     this._isInit = true;
   },
-  /* === END BLOCK: OFFER_DETAIL_PANEL_INIT_ICON_HYDRATE_V2 === */
+  /* === END BLOCK: OFFER_DETAIL_PANEL_MOBILE_SHELL_PARITY_V1 === */
 
 
-  /* === BEGIN BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V1 | Zweck: zählt geöffnete Activity-Detailpanels anonym für das interne Mehrwert-Dashboard; Umfang: ersetzt den Start von show(offer) bis nach renderContent(offer) === */
+  isActivityPanelOpen() {
+    return Boolean(
+      this.panel &&
+      this.panel.classList.contains("active") &&
+      this.panel.getAttribute("data-detail-type") === "activity"
+    );
+  },
+
+  setDragY(px) {
+    if (!this.sheet) return;
+    this.sheet.style.setProperty("--dp-drag-y", `${px}px`);
+  },
+
+  getHalfSnap() {
+    try {
+      if (window.CSS && typeof window.CSS.supports === "function" && window.CSS.supports("height: 1dvh")) {
+        return "40dvh";
+      }
+    } catch (_) {}
+    return "40vh";
+  },
+
+  setBase(value) {
+    if (!this.sheet) return;
+    this.sheet.style.setProperty("--dp-base-y", value);
+  },
+
+  getFocusableElements() {
+    if (!this.panel) return [];
+
+    const selectors = [
+      'a[href]',
+      'area[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      'summary',
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]'
+    ].join(",");
+
+    return Array.from(this.panel.querySelectorAll(selectors)).filter((element) => {
+      if (!(element instanceof HTMLElement)) return false;
+      if (element.hasAttribute("disabled")) return false;
+      if (element.getAttribute("aria-hidden") === "true") return false;
+
+      const style = window.getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+
+      const rects = element.getClientRects();
+      return rects && rects.length > 0;
+    });
+  },
+
+  trapFocus(event) {
+    const focusables = this.getFocusableElements();
+    if (!focusables.length) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if (!(active instanceof HTMLElement) || !this.panel.contains(active)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+      return;
+    }
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus({ preventScroll: true });
+      return;
+    }
+
+    if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
+    }
+  },
+
+  lockScroll() {
+    if (this._scrollLockActive) return;
+
+    this._scrollLockActive = true;
+    this._savedScrollY = window.scrollY || 0;
+    this._savedBodyOverflow = document.body.style.overflow || "";
+    this._savedBodyPosition = document.body.style.position || "";
+    this._savedBodyTop = document.body.style.top || "";
+    this._savedBodyLeft = document.body.style.left || "";
+    this._savedBodyRight = document.body.style.right || "";
+    this._savedBodyWidth = document.body.style.width || "";
+
+    document.documentElement.classList.add("is-panel-open");
+    document.body.classList.add("is-panel-open");
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${this._savedScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+  },
+
+  unlockScroll() {
+    if (!this._scrollLockActive) return;
+
+    document.documentElement.classList.remove("is-panel-open");
+    document.body.classList.remove("is-panel-open");
+
+    document.body.style.overflow = this._savedBodyOverflow || "";
+    document.body.style.position = this._savedBodyPosition || "";
+    document.body.style.top = this._savedBodyTop || "";
+    document.body.style.left = this._savedBodyLeft || "";
+    document.body.style.right = this._savedBodyRight || "";
+    document.body.style.width = this._savedBodyWidth || "";
+
+    const y = Number(this._savedScrollY || 0);
+    this._savedScrollY = 0;
+    this._savedBodyOverflow = null;
+    this._savedBodyPosition = null;
+    this._savedBodyTop = null;
+    this._savedBodyLeft = null;
+    this._savedBodyRight = null;
+    this._savedBodyWidth = null;
+    this._scrollLockActive = false;
+
+    window.scrollTo(0, y);
+  },
+
+  focusCloseButton() {
+    const focusClose = () => {
+      try { this.closeBtn?.focus({ preventScroll: true }); } catch (_) {}
+    };
+
+    this.panel?.addEventListener("transitionend", focusClose, { once: true });
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (this.isActivityPanelOpen()) focusClose();
+      }, 0);
+    });
+  },
+
+  /* === BEGIN BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V2 | Zweck: oeffnet Activity-Detailpanels nur mobil als robuste Bottom-Sheet-Shell und laesst Desktop bewusst outbound; Umfang: ersetzt show(offer), hide() und ergaenzt Lifecycle-Helper === */
   show(offer) {
     const primaryUrl = window.OfferVisuals?.normalizeHttpUrl
       ? window.OfferVisuals.normalizeHttpUrl(offer?.url)
@@ -83,7 +312,7 @@ const OfferDetailPanel = {
     }
 
     if (!this._isInit) this.init();
-    if (!this.panel || !this.content || !this.body) return;
+    if (!this.panel || !this.content || !this.body || !this.sheet) return;
 
     this._lastFocusEl =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -101,36 +330,112 @@ const OfferDetailPanel = {
           : {})
       });
     }
-    /* === END BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V1 === */
+
+    this.setDragY(0);
+    this.setBase(this.getHalfSnap());
+
     this.panel.classList.remove("hidden");
     this.panel.removeAttribute("hidden");
+    this.panel.classList.add("active");
+    this.panel.setAttribute("aria-hidden", "false");
     this.body.scrollTop = 0;
 
-    requestAnimationFrame(() => {
-      this.panel.classList.add("active");
-      document.documentElement.classList.add("is-panel-open");
-      document.body.classList.add("is-panel-open");
-      this.closeBtn.focus();
-    });
+    this.lockScroll();
+
+    if (!history.state?.detailOpen) {
+      history.pushState({ ...(history.state || {}), detailOpen: true, detailType: "activity" }, "");
+    }
+
+    this.focusCloseButton();
   },
 
   hide() {
+    if (history.state?.detailOpen && history.state?.detailType === "activity") {
+      history.back();
+      return;
+    }
+
+    this._hideNow();
+  },
+
+  _hideNow() {
     if (!this.panel) return;
 
-    this.panel.classList.remove("active");
-    document.documentElement.classList.remove("is-panel-open");
-    document.body.classList.remove("is-panel-open");
+    if (this.panel.contains(document.activeElement)) {
+      try { document.activeElement.blur(); } catch (_) {}
+    }
 
-    window.setTimeout(() => {
-      this.panel.classList.add("hidden");
-      this.panel.setAttribute("hidden", "");
-      this.panel.removeAttribute("data-detail-type");
-      if (this.body) this.body.scrollTop = 0;
-      if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
-        this._lastFocusEl.focus();
-      }
-    }, 280);
+    this.panel.setAttribute("aria-hidden", "true");
+    this.panel.classList.remove("active");
+    this.panel.classList.add("hidden");
+    this.panel.setAttribute("hidden", "");
+    this.panel.removeAttribute("data-detail-type");
+
+    if (this.actionbarSlot) {
+      this.actionbarSlot.innerHTML = "";
+      this.actionbarSlot.hidden = true;
+    }
+
+    if (this.body) this.body.scrollTop = 0;
+    this.setDragY(0);
+    this.setBase("100%");
+    this.unlockScroll();
+
+    if (this._lastFocusEl && typeof this._lastFocusEl.focus === "function") {
+      try { this._lastFocusEl.focus({ preventScroll: true }); } catch (_) {}
+    }
+    this._lastFocusEl = null;
   },
+
+  _onDragStart(event) {
+    if (!this.isActivityPanelOpen() || !this.sheet || !this.body) return;
+    if (this.body.scrollTop > 0) return;
+
+    event.stopImmediatePropagation();
+
+    this._drag.startY = event.clientY;
+    this._drag.dy = 0;
+    this._drag.dragging = true;
+
+    this.sheet.classList.add("is-dragging");
+    this.setDragY(0);
+
+    try { this.dragHit?.setPointerCapture(event.pointerId); } catch (_) {}
+  },
+
+  _onDragMove(event) {
+    if (!this._drag.dragging || !this.sheet) return;
+
+    event.stopImmediatePropagation();
+
+    this._drag.dy = event.clientY - this._drag.startY;
+    const clamped = Math.max(0, Math.min(this._drag.dy, 360));
+    this.setDragY(clamped);
+
+    event.preventDefault();
+  },
+
+  _onDragEnd(event) {
+    if (!this._drag.dragging || !this.sheet) return;
+
+    event.stopImmediatePropagation();
+
+    const moved = this._drag.dy;
+    this._drag.dragging = false;
+    this._drag.dy = 0;
+
+    this.sheet.classList.remove("is-dragging");
+
+    if (moved > 90) {
+      this.setDragY(0);
+      this.hide();
+      return;
+    }
+
+    this.setDragY(0);
+    this.setBase(this.getHalfSnap());
+  },
+  /* === END BLOCK: ACTIVITY_DETAIL_VIEW_VALUE_METRIC_V2 === */
 
   escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (ch) => {
@@ -188,15 +493,13 @@ const OfferDetailPanel = {
           author: String(offer?.image_author || "").trim(),
           license: String(offer?.image_license || "").trim(),
           credit: String(offer?.image_credit || "").trim(),
+          sourceType: "",
           isSymbolic: false,
+          isAiGenerated: false,
           note: ""
         };
 
     if (imageData.url) {
-      const symbolicLabel = imageData.isSymbolic
-        ? (String(imageData.note || "").trim() || "Symbolbild")
-        : "";
-
       return `
         <div class="activity-detail__media-shell">
           <div class="activity-detail__media activity-detail__media--image activity-detail__media--${visual.modifier}">
@@ -209,9 +512,6 @@ const OfferDetailPanel = {
               referrerpolicy="no-referrer"
               style="--activity-image-pos-x:${this.escapeHtml(imageData.positionX || "50%")}; --activity-image-pos-y:${this.escapeHtml(imageData.positionY || "50%")}; --activity-image-fit:${this.escapeHtml(imageData.fit || "cover")};"
             >
-            ${symbolicLabel ? `
-              <span class="activity-detail__media-badge">${this.escapeHtml(symbolicLabel)}</span>
-            ` : ""}
           </div>
         </div>
       `.trim();
@@ -232,69 +532,24 @@ const OfferDetailPanel = {
           author: String(offer?.image_author || "").trim(),
           license: String(offer?.image_license || "").trim(),
           credit: String(offer?.image_credit || "").trim(),
+          sourceType: "",
           isSymbolic: false,
+          isAiGenerated: false,
           note: ""
         };
 
-    const sourceUrl = window.OfferVisuals?.normalizeHttpUrl
-      ? window.OfferVisuals.normalizeHttpUrl(imageData.sourcePage)
-      : String(imageData.sourcePage || "").trim();
-    const author = String(imageData.author || "").trim();
-    const license = String(imageData.license || "").trim();
-    const credit = String(imageData.credit || "").trim();
-    const note = imageData.isSymbolic ? (String(imageData.note || "").trim() || "Symbolbild") : "";
-    const showCredit = credit && (!author || !license);
-    const infoIcon = window.Icons?.svg
-      ? window.Icons.svg("info", { className: "activity-detail__media-attribution-icon-svg" })
+    if (!window.ImageAttribution?.renderDetailAttribution) return "";
+
+    const attributionHtml = window.ImageAttribution.renderDetailAttribution(imageData, {
+      entityType: "activity",
+      entityId: String(offer?.id || "").trim(),
+      entityTitle: String(offer?.title || "").trim(),
+      imageId: String(imageData?.id || "").trim()
+    });
+
+    return attributionHtml
+      ? `<div class="detail-links detail-links--trust" aria-label="Quellen und Nachweise">${attributionHtml}</div>`
       : "";
-
-    if (!note && !author && !license && !showCredit && !sourceUrl) return "";
-
-    return `
-      <details class="activity-detail__media-attribution">
-        <summary class="activity-detail__media-attribution-toggle">
-          <span class="activity-detail__media-attribution-toggle-main">
-            <span class="activity-detail__media-attribution-icon" aria-hidden="true">${infoIcon}</span>
-            <span>Bildnachweis</span>
-          </span>
-          <span class="activity-detail__media-attribution-toggle-secondary">Details</span>
-        </summary>
-        <div class="activity-detail__media-attribution-panel">
-          ${note ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Hinweis</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(note)}</div>
-            </div>
-          ` : ""}
-          ${author ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Urheber</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(author)}</div>
-            </div>
-          ` : ""}
-          ${license ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Lizenz</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(license)}</div>
-            </div>
-          ` : ""}
-          ${showCredit ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Nachweis</div>
-              <div class="activity-detail__media-attribution-value">${this.escapeHtml(credit)}</div>
-            </div>
-          ` : ""}
-          ${sourceUrl ? `
-            <div class="activity-detail__media-attribution-row">
-              <div class="activity-detail__media-attribution-key">Quelle</div>
-              <div class="activity-detail__media-attribution-value">
-                <a class="activity-detail__media-attribution-link" href="${this.escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Original / Quelle öffnen</a>
-              </div>
-            </div>
-          ` : ""}
-        </div>
-      </details>
-    `.trim();
   },
   /* === END BLOCK: OFFERS_DETAIL_MEDIA_AND_ATTRIBUTION_ENTERPRISE_V1 === */
 
@@ -339,6 +594,36 @@ const OfferDetailPanel = {
   },
   /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_TAGS_ONLY_V8 === */
 
+  /* === BEGIN BLOCK: ACTIVITIES_DETAIL_OPENING_STATUS_CALLOUT_V1 | Zweck: zeigt geprüfte Activity-Öffnungsstatus-Hinweise im Detailpanel an; Umfang: ergänzt nur renderOpeningStatus(offer), keine Datenlogik oder CTA-Änderung === */
+  renderOpeningStatus(offer) {
+    const status = offer?.opening_status && typeof offer.opening_status === "object"
+      ? offer.opening_status
+      : {};
+
+    const publicLabel = String(status.public_label || "").trim();
+    const detailNote = String(status.detail_note || "").trim();
+
+    if (!publicLabel && !detailNote) return "";
+
+    const noteHtml = detailNote && detailNote !== publicLabel
+      ? `
+        <details class="activity-detail__opening-details">
+          <summary class="activity-detail__opening-summary">Hinweise anzeigen</summary>
+          <div class="activity-detail__opening-note">${this.escapeHtml(detailNote)}</div>
+        </details>
+      `
+      : "";
+
+    return `
+      <section class="activity-detail__fact-callout activity-detail__opening-status" aria-label="Öffnungsstatus">
+        <div class="activity-detail__fact-label">Öffnungsstatus</div>
+        ${publicLabel ? `<div class="activity-detail__fact-value">${this.escapeHtml(publicLabel)}</div>` : ""}
+        ${noteHtml}
+      </section>
+    `.trim();
+  },
+  /* === END BLOCK: ACTIVITIES_DETAIL_OPENING_STATUS_CALLOUT_V1 === */
+
   /* === BEGIN BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 | Zweck: ergänzt im Activity-Detailpanel sauberes Outbound-Tracking für Maps- und Website-Links, ohne sichtbare UI oder Linkziele zu verändern | Umfang: ersetzt nur renderContent(offer) in js/offers-details.js === */
   renderContent(offer) {
     const mapsUrl = this.buildMapsUrl(offer);
@@ -360,10 +645,10 @@ const OfferDetailPanel = {
     const description = String(offer?.description || "").trim();
 
     const mapsIcon = window.Icons?.svg
-      ? window.Icons.svg("compass", { className: "activity-detail__action-icon-svg" })
+      ? window.Icons.svg("compass", { className: "activity-detail__actionbar-icon-svg" })
       : "";
     const websiteIcon = window.Icons?.svg
-      ? window.Icons.svg("external-link", { className: "activity-detail__action-icon-svg" })
+      ? window.Icons.svg("external-link", { className: "activity-detail__actionbar-icon-svg" })
       : "";
 
     const baseOutboundPayload = {
@@ -418,52 +703,77 @@ const OfferDetailPanel = {
 
         <div class="activity-detail__body">
           ${description ? `<p class="activity-detail__description">${this.escapeHtml(description)}</p>` : ""}
+          ${this.renderOpeningStatus(offer)}
           ${this.renderFacts(offer)}
-          <div class="activity-detail__actions">
-            <a
-              class="activity-detail__action"
-              href="${this.escapeHtml(mapsUrl)}"
-              target="_blank"
-              rel="noopener noreferrer"
-              ${buildOutboundDataAttrs(mapsOutboundPayload)}
-            >
-              <span class="activity-detail__action-icon" aria-hidden="true">${mapsIcon}</span>
-              <span class="activity-detail__action-label">${this.escapeHtml(mapsLabel)}</span>
-            </a>
-            ${websiteUrl ? `
-              <a
-                class="activity-detail__action activity-detail__action--secondary"
-                href="${this.escapeHtml(websiteUrl)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                ${buildOutboundDataAttrs(websiteOutboundPayload)}
-              >
-                <span class="activity-detail__action-icon" aria-hidden="true">${websiteIcon}</span>
-                <span class="activity-detail__action-label">${this.escapeHtml(websiteLabel)}</span>
-              </a>
-            ` : ""}
-          </div>
           ${this.renderImageAttribution(offer)}
         </div>
       </article>
     `.trim();
 
-    this.content.querySelectorAll("a[data-outbound-type]").forEach((link) => {
-      link.addEventListener("click", () => {
-        if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+    const actionbarHtml = [
+      mapsUrl ? `
+        <a
+          class="detail-actionbar-btn is-icon activity-detail__actionbar-btn"
+          href="${this.escapeHtml(mapsUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="${this.escapeHtml(mapsLabel)}"
+          title="Route"
+          data-action="maps"
+          ${buildOutboundDataAttrs(mapsOutboundPayload)}
+        >
+          ${mapsIcon}
+          <span class="detail-sr-only">${this.escapeHtml(mapsLabel)}</span>
+        </a>
+      ` : "",
+      websiteUrl ? `
+        <a
+          class="detail-actionbar-btn is-icon activity-detail__actionbar-btn"
+          href="${this.escapeHtml(websiteUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="${this.escapeHtml(websiteLabel)}"
+          title="Infos"
+          data-action="website"
+          ${buildOutboundDataAttrs(websiteOutboundPayload)}
+        >
+          ${websiteIcon}
+          <span class="detail-sr-only">${this.escapeHtml(websiteLabel)}</span>
+        </a>
+      ` : ""
+    ].filter(Boolean).join("");
 
-        window.BEAnalytics.trackOutboundClick({
-          outboundType: String(link.dataset.outboundType || "").trim(),
-          entityType: String(link.dataset.entityType || "").trim(),
-          entityId: String(link.dataset.entityId || "").trim(),
-          entityTitle: String(link.dataset.entityTitle || "").trim(),
-          reportingTargetType: String(link.dataset.reportingTargetType || "").trim(),
-          reportingTargetId: String(link.dataset.reportingTargetId || "").trim(),
-          reportingTargetTitle: String(link.dataset.reportingTargetTitle || "").trim(),
-          destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+    if (this.actionbarSlot) {
+      if (actionbarHtml) {
+        this.actionbarSlot.innerHTML = actionbarHtml;
+        this.actionbarSlot.hidden = false;
+      } else {
+        this.actionbarSlot.innerHTML = "";
+        this.actionbarSlot.hidden = true;
+      }
+    }
+
+    const bindOutboundTracking = (root) => {
+      root?.querySelectorAll("a[data-outbound-type]").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (!window.BEAnalytics || typeof window.BEAnalytics.trackOutboundClick !== "function") return;
+
+          window.BEAnalytics.trackOutboundClick({
+            outboundType: String(link.dataset.outboundType || "").trim(),
+            entityType: String(link.dataset.entityType || "").trim(),
+            entityId: String(link.dataset.entityId || "").trim(),
+            entityTitle: String(link.dataset.entityTitle || "").trim(),
+            reportingTargetType: String(link.dataset.reportingTargetType || "").trim(),
+            reportingTargetId: String(link.dataset.reportingTargetId || "").trim(),
+            reportingTargetTitle: String(link.dataset.reportingTargetTitle || "").trim(),
+            destinationUrl: String(link.dataset.destinationUrl || link.href || "").trim()
+          });
         });
       });
-    });
+    };
+
+    bindOutboundTracking(this.content);
+    bindOutboundTracking(this.actionbarSlot);
   }
   /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_OUTBOUND_ANALYTICS_V3 === */
   /* === END BLOCK: ACTIVITIES_DETAIL_CONTENT_WITH_SEASONAL_META_V2 === */

@@ -37,7 +37,7 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-enterprise-final-1">
+<link rel="stylesheet" href="/css/style.css?v=2026-06-05-activity-opening-payload-2">
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_HEAD_V1 === -->
 </head>
 <body>
@@ -166,17 +166,204 @@
           <p class="content-field__hint">Kurz beschreiben, was Nutzer dort machen können.</p>
         </label>
 
-        <label class="content-field content-field--full" for="activity-presence-duration">
-          <span class="content-field__label">Verfügbarkeit *</span>
-          <select class="content-field__control" id="activity-presence-duration" name="duration" required>
+          <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_ACCESS_TYPE_FIELD_V1 | Zweck: ersetzt die grobe Verfügbarkeitsauswahl durch eine klare Zugänglichkeitslogik für Aktivitätseinreichungen; Umfang: einzelnes Select-Feld im bestehenden Formular === -->
+          <label class="content-field content-field--full" for="activity-presence-duration">
+            <span class="content-field__label">Zugänglichkeit / Verfügbarkeit *</span>
+            <select class="content-field__control" id="activity-presence-duration" name="duration" required>
+              <option value="">Bitte auswählen</option>
+              <option value="Frei zugänglich / ohne feste Öffnungszeiten" data-access-type="free_access">Frei zugänglich / ohne feste Öffnungszeiten</option>
+              <option value="Regelmäßige Öffnungszeiten" data-access-type="opening_hours">Regelmäßige Öffnungszeiten</option>
+              <option value="Saisonal oder unregelmäßig" data-access-type="seasonal">Saisonal oder unregelmäßig</option>
+              <option value="Nach Vereinbarung / bitte prüfen" data-access-type="appointment">Nach Vereinbarung / bitte prüfen</option>
+            </select>
+            <p class="content-field__hint">Wähle die einfachste passende Angabe. Regelmäßige Zeiten kannst du direkt darunter eintragen.</p>
+          </label>
+          <!-- === END BLOCK: ACTIVITY_PRESENCE_ACCESS_TYPE_FIELD_V1 === -->
+
+          <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_OPENING_FIELDS_V1 | Zweck: erfasst strukturierte Öffnungszeitdaten für Aktivitätseinreichungen; Umfang: additiver Formularblock unter der Zugänglichkeitsauswahl === -->
+          <div class="content-field content-field--full" id="activity-presence-opening-hours" hidden>
+            <span class="content-field__label">Regelmäßige Öffnungszeiten</span>
+            <p class="content-field__hint">Lass Tage geschlossen, wenn die Aktivität dort nicht regulär zugänglich ist.</p>
+
+            <div class="activity-presence-opening-week" data-opening-weekly>
+              <div class="activity-presence-opening-day" data-opening-day="monday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Montag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Montag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Montag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="tuesday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Dienstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Dienstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Dienstag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="wednesday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Mittwoch</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Mittwoch geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Mittwoch geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="thursday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Donnerstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Donnerstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Donnerstag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="friday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Freitag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Freitag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Freitag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="saturday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Samstag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Samstag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Samstag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+
+              <div class="activity-presence-opening-day" data-opening-day="sunday">
+                <div class="activity-presence-opening-day__head">
+                  <span class="content-field__label">Sonntag</span>
+                  <label class="activity-presence-opening-closed"><input type="checkbox" data-opening-closed> geschlossen</label>
+                </div>
+                <div class="activity-presence-opening-time-row">
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Von</span>
+                    <input class="content-field__control" type="time" data-opening-start aria-label="Sonntag geöffnet von">
+                  </label>
+                  <label class="activity-presence-opening-time">
+                    <span class="content-field__label">Bis</span>
+                    <input class="content-field__control" type="time" data-opening-end aria-label="Sonntag geöffnet bis">
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <label class="content-field content-field--full" for="activity-presence-holiday-policy">
+              <span class="content-field__label">Feiertage</span>
+              <select class="content-field__control" id="activity-presence-holiday-policy" name="holidayPolicy">
+                <option value="check">An Feiertagen bitte prüfen</option>
+                <option value="open_as_usual">Wie regulär geöffnet</option>
+                <option value="closed">An Feiertagen geschlossen</option>
+              </select>
+            </label>
+          </div>
+          <!-- === END BLOCK: ACTIVITY_PRESENCE_OPENING_FIELDS_V1 === -->
+
+        <!-- === BEGIN BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_FIELDS_V1 | Zweck: fragt optionales Bildmaterial ohne Datei-Upload ab; Umfang: additiver Formularblock vor den allgemeinen Hinweisen === -->
+        <div class="content-form-section-head content-form-section-head--form content-field--full activity-presence-compact-section-head">
+          <h3>Bildmaterial</h3>
+        </div>
+
+        <label class="content-field content-field--full" for="activity-presence-image-availability">
+          <span class="content-field__label">Bildmaterial für die Aktivität vorhanden? *</span>
+          <select class="content-field__control" id="activity-presence-image-availability" name="imageAvailability" required aria-controls="activity-presence-image-details">
             <option value="">Bitte auswählen</option>
-            <option value="Dauerhaft verfügbar">Dauerhaft verfügbar</option>
-            <option value="Regelmäßig buchbar">Regelmäßig buchbar</option>
-            <option value="Saisonal verfügbar">Saisonal verfügbar</option>
-            <option value="Nach Vereinbarung buchbar">Nach Vereinbarung buchbar</option>
+            <option value="yes">Ja, passendes Bildmaterial ist vorhanden</option>
+            <option value="no">Nein, Bocholt erleben darf ein passendes Bild zur Verfügung stellen</option>
+            <option value="unsure">Unsicher</option>
           </select>
-          <p class="content-field__hint">Details kannst du bei „Weitere Hinweise“ ergänzen.</p>
+          <p class="content-field__hint">Ein Bild ist nicht zwingend nötig. Wir entscheiden redaktionell, welches Bild zur Plattform passt.</p>
         </label>
+
+        <div class="content-field content-field--full" id="activity-presence-image-details" hidden>
+          <label class="content-field" for="activity-presence-image-method">
+            <span class="content-field__label">Wie möchtest du das Bildmaterial bereitstellen? *</span>
+            <select class="content-field__control" id="activity-presence-image-method" name="imageMethod">
+              <option value="">Bitte auswählen</option>
+              <option value="download_link">Downloadlink / Cloud-Ordner / Pressemappe</option>
+              <option value="website_gallery">Website-Galerie mit passenden Bildern</option>
+              <option value="email_later">Ich sende Bilder später per E-Mail</option>
+              <option value="other">Sonstiges</option>
+            </select>
+          </label>
+
+          <label class="content-field" for="activity-presence-image-url" data-image-url-field hidden>
+            <span class="content-field__label">Link zum Bildmaterial *</span>
+            <input class="content-field__control" id="activity-presence-image-url" name="imageUrl" type="url" inputmode="url" placeholder="https://...">
+          </label>
+
+          <label class="content-field" for="activity-presence-image-notes">
+            <span class="content-field__label">Hinweis zum Bildmaterial</span>
+            <textarea class="content-field__control" id="activity-presence-image-notes" name="imageNotes" rows="3" placeholder="Optional: Welche Bilder sollen bevorzugt verwendet werden? Gibt es Motive, die wir vermeiden sollen?"></textarea>
+          </label>
+
+          <label class="content-field content-field--checkbox" for="activity-presence-image-rights-confirmed">
+            <span class="content-field__label">Bildrechte *</span>
+            <span class="content-field__hint">
+              <input id="activity-presence-image-rights-confirmed" name="imageRightsConfirmed" type="checkbox">
+              Ich bestätige, dass ich berechtigt bin, das bereitgestellte, verlinkte oder später zugesendete Bildmaterial zur Prüfung und möglichen Veröffentlichung auf Bocholt erleben bereitzustellen.
+            </span>
+          </label>
+        </div>
+        <!-- === END BLOCK: ACTIVITY_PRESENCE_IMAGE_MATERIAL_FIELDS_V1 === -->
 
         <label class="content-field content-field--full" for="activity-presence-notes">
           <span class="content-field__label">Weitere Hinweise</span>
@@ -211,7 +398,7 @@
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
 <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
-<script src="/js/activity-presence-funnel.js?v=2026-05-18-activity-presence-plan-prefill-1" defer></script>
+<script src="/js/activity-presence-funnel.js?v=2026-06-12-activity-image-material-2" defer></script>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_BODY_V1 === -->
 </body>
 </html>

@@ -1,0 +1,1735 @@
+{
+  "schema_version": 2,
+  "owner": "event_visual_asset_brief_v31",
+  "purpose": "Defines curated V3.1 asset requirements for the local event visual pool before any images are marked ready.",
+  "global_rules": {
+    "quality_goal": "Premium local PWA look, not generic stock-feed look.",
+    "rights_rule": "Only owned, self-created, explicitly cleared, or safely reusable assets may become ready.",
+    "people_policy": "Avoid recognizable people by default; never use recognizable children without explicit cleared rights.",
+    "brand_policy": "Avoid readable third-party logos, posters, license plates, tickets, trademarks, and copyrighted artwork.",
+    "locality_rule": "Prefer Bocholt/region/local atmosphere where possible. If not possible, use timeless, non-specific mood imagery.",
+    "composition_rule": "Images must work in 16:9 card crops on mobile and desktop. Prefer clear focal point, calm background, no tiny text.",
+    "premium_rule": "No cheap clipart, no AI-looking artifacts, no random food/people clichés, no overloaded collage visuals.",
+    "fallback_rule": "If no strong image exists for a slot, leave it planned. Do not mark weak assets ready."
+  },
+  "visual_keys": {
+    "textile_machines_industry": {
+      "label": "Textilmaschinen & Industriekultur",
+      "priority": "high",
+      "mood": "industriell, lokal, haptisch, ruhig hochwertig",
+      "local_context": "Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Maschinen-/Weberei-/Spinnerei-Bezug",
+        "TextilWerk- oder Industriekultur-Anmutung",
+        "starke Materialität"
+      ],
+      "avoid": [
+        "Theater- oder Konzertbild nur wegen Location",
+        "sterile Technikaufnahme",
+        "erkennbare Personen im Fokus"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Textilmaschinen & Industriekultur: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Textilmaschinen & Industriekultur: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Textilmaschinen & Industriekultur: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Textilmaschinen & Industriekultur: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Textilmaschinen & Industriekultur: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Textilmaschinen & Industriekultur: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 7,
+          "id_suffix": "07",
+          "brief": "Textilmaschinen & Industriekultur: Saison- und wetterrobuste Variante, die auch außerhalb eines konkreten Einzeltermins plausibel wirkt. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        },
+        {
+          "slot": 8,
+          "id_suffix": "08",
+          "brief": "Textilmaschinen & Industriekultur: Premium-Reservevariante mit eigenständiger Komposition, damit Feed-Wiederholungen reduziert werden. Inhaltlicher Fokus: Spinnerei, Weberei, Maschinen, TextilWerk-Führungen und Industriekultur",
+          "status": "needed"
+        }
+      ]
+    },
+    "textile_exhibition_design": {
+      "label": "Textil, Stoff & Design-Ausstellung",
+      "priority": "medium",
+      "mood": "kuratiert, textil, materialreich, ruhig",
+      "local_context": "Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Stoffe oder textile Objekte",
+        "Ausstellungs- oder Designcharakter",
+        "ruhige Premium-Komposition"
+      ],
+      "avoid": [
+        "beliebige Deko",
+        "geschützte Kunst prominent",
+        "Modekatalog-Look"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Textil, Stoff & Design-Ausstellung: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Textil, Stoff & Design-Ausstellung: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Textil, Stoff & Design-Ausstellung: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Textil, Stoff & Design-Ausstellung: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Textil, Stoff & Design-Ausstellung: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Textile Ausstellungen, Stoffe, Design, Materialität und kuratierte Textilobjekte",
+          "status": "needed"
+        }
+      ]
+    },
+    "art_exhibition_gallery": {
+      "label": "Kunst, Galerie & Kreativausstellung",
+      "priority": "medium",
+      "mood": "künstlerisch, ruhig, kuratiert, hochwertig",
+      "local_context": "Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Galerie- oder Ausstellungssituation",
+        "Kunst-/Kreativbezug",
+        "keine geschützten Werke im Fokus"
+      ],
+      "avoid": [
+        "lesbare Labels",
+        "berühmte Kunstwerke",
+        "sterile leere Wand"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Kunst, Galerie & Kreativausstellung: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Kunst, Galerie & Kreativausstellung: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Kunst, Galerie & Kreativausstellung: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Kunst, Galerie & Kreativausstellung: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Kunstausstellungen, Galerieatmosphäre, Kreativausstellungen und Kunstmärkte",
+          "status": "needed"
+        }
+      ]
+    },
+    "local_history_heritage": {
+      "label": "Stadtgeschichte & Kulturerbe",
+      "priority": "medium",
+      "mood": "historisch, lokal, seriös, warm",
+      "local_context": "Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Archiv-/Museums-/Stadtgeschichtsbezug",
+        "lokale oder historische Materialität",
+        "ruhige Entdeckungsatmosphäre"
+      ],
+      "avoid": [
+        "falsche konkrete Bocholt-Behauptung",
+        "Amtsblattoptik",
+        "unlesbare Dokumentenwand"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Stadtgeschichte & Kulturerbe: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Stadtgeschichte & Kulturerbe: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Stadtgeschichte & Kulturerbe: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Stadtgeschichte & Kulturerbe: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Stadtgeschichte & Kulturerbe: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Stadtgeschichte & Kulturerbe: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Archiv, FARB, Heimat, historische Ausstellungen, lokale Geschichte und Museumsräume",
+          "status": "needed"
+        }
+      ]
+    },
+    "city_tour_history": {
+      "label": "Stadtführung & historischer Rundgang",
+      "priority": "high",
+      "mood": "lokal, entdeckend, städtisch, orientierend",
+      "local_context": "Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Stadtraum oder Architekturdetail",
+        "Rundgang-/Führungsgefühl",
+        "Bocholt-/Regionsplausibilität"
+      ],
+      "avoid": [
+        "Postkartenkitsch",
+        "Fantasy-Altstadt",
+        "falsche Sehenswürdigkeit"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Stadtführung & historischer Rundgang: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Stadtführung & historischer Rundgang: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Stadtführung & historischer Rundgang: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Stadtführung & historischer Rundgang: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Stadtführung & historischer Rundgang: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Stadtführung & historischer Rundgang: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Stadtführungen, Rundgänge, Kiepenkerl, Nachtwächter und lokale Entdeckung",
+          "status": "needed"
+        }
+      ]
+    },
+    "live_music_stage": {
+      "label": "Live-Musik & Bühne",
+      "priority": "high",
+      "mood": "musikalisch, warm, hochwertig, lebendig",
+      "local_context": "Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Bühne, Mikrofon, Instrument oder Licht",
+        "Live-Musik-Kontext",
+        "keine erkennbaren Künstler"
+      ],
+      "avoid": [
+        "Disco-/Clubklischee",
+        "Bandlogos",
+        "Festivalposter"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Live-Musik & Bühne: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Live-Musik & Bühne: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Live-Musik & Bühne: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Live-Musik & Bühne: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Live-Musik & Bühne: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Live-Musik & Bühne: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 7,
+          "id_suffix": "07",
+          "brief": "Live-Musik & Bühne: Saison- und wetterrobuste Variante, die auch außerhalb eines konkreten Einzeltermins plausibel wirkt. Inhaltlicher Fokus: Band, Open-Air-Konzert, Mikrofon, Bühnenlicht, Live-Musik und Konzertatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "classical_music": {
+      "label": "Klassik, Chor & Orgel",
+      "priority": "high",
+      "mood": "klassisch, ruhig, konzentriert, feierlich",
+      "local_context": "Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Orgel, Chor, Noten, Kirche oder Kammermusikbezug",
+        "ruhige Konzertatmosphäre",
+        "hochwertiges Licht"
+      ],
+      "avoid": [
+        "Rockbühne",
+        "laute Partyoptik",
+        "erkennbare Musiker im Fokus"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Klassik, Chor & Orgel: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Klassik, Chor & Orgel: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Klassik, Chor & Orgel: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Klassik, Chor & Orgel: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Klassik, Chor & Orgel: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Orgel, Chor, Kammermusik, Kirche, Noten und ruhige Konzertatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "theater_stage": {
+      "label": "Theater & Bühne",
+      "priority": "high",
+      "mood": "szenisch, warm, bühnenhaft, ruhig dramatisch",
+      "local_context": "Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Vorhang, Bühne, Licht oder Schauspielkontext",
+        "Theateratmosphäre",
+        "keine konkreten Inszenierungsrechte"
+      ],
+      "avoid": [
+        "Comedy-Mikrofon als Hauptmotiv",
+        "erkennbare Schauspieler",
+        "Plakatoptik"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Theater & Bühne: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Theater & Bühne: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Theater & Bühne: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Theater & Bühne: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Theater & Bühne: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Theaterbühne, Vorhang, Schauspiel, Bühnenraum und szenische Atmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "comedy_cabaret": {
+      "label": "Comedy & Kabarett",
+      "priority": "medium",
+      "mood": "kleinkünstlerisch, abendlich, pointiert, hochwertig",
+      "local_context": "Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Mikrofon, kleine Bühne oder Kabarettkontext",
+        "abendliche Kleinkunststimmung",
+        "keine Person im Fokus"
+      ],
+      "avoid": [
+        "Theaterdrama",
+        "billige Partyoptik",
+        "lesbare Programmplakate"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Comedy & Kabarett: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Comedy & Kabarett: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Comedy & Kabarett: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Comedy & Kabarett: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Kleinkunst, Stand-up, Kabarett, Mikrofon und kleine Bühnenatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "film_screening": {
+      "label": "Film & Kino",
+      "priority": "low",
+      "mood": "ruhig, dunkel, cineastisch, hochwertig",
+      "local_context": "Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Leinwand, Projektion, Kinosaal oder Filmabendkontext",
+        "keine Filmrechte im Bild",
+        "ruhiges Licht"
+      ],
+      "avoid": [
+        "erkennbare Filmszenen",
+        "Poster",
+        "Netflix-/Markenlogos"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Film & Kino: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Film & Kino: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Film & Kino: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Leinwand, Kinosaal, Filmabend und ruhige Vorführatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "literature_reading_talk": {
+      "label": "Lesung, Literatur & Gespräch",
+      "priority": "medium",
+      "mood": "literarisch, ruhig, warm, konzentriert",
+      "local_context": "Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Bücher, Lesepult, Mikrofon oder Gesprächssituation",
+        "ruhige Kulturatmosphäre",
+        "keine lesbaren Buchcover"
+      ],
+      "avoid": [
+        "beliebiges Bücherregal",
+        "erkennbare Autor:innen",
+        "Textwände"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Lesung, Literatur & Gespräch: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Lesung, Literatur & Gespräch: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Lesung, Literatur & Gespräch: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Lesung, Literatur & Gespräch: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Bücher, Lesung, Vortrag, Mikrofon, Gespräch und Literaturatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "kids_stage_story": {
+      "label": "Kinderbühne & Geschichten",
+      "priority": "medium",
+      "mood": "familienfreundlich, erzählerisch, warm, sicher",
+      "local_context": "Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Puppenspiel-/Kinderbühnen-/Vorlese-Kontext",
+        "kindgerecht ohne kindisch zu wirken",
+        "keine erkennbaren Kinder"
+      ],
+      "avoid": [
+        "Kinderfaces",
+        "Cartoon-/Spielzeuglizenzfiguren",
+        "chaotische Kitaoptik"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Kinderbühne & Geschichten: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Kinderbühne & Geschichten: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Kinderbühne & Geschichten: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Kinderbühne & Geschichten: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Kindertheater, Puppenspiel, Kinderoper, Vorlesen und Story-Formate ohne erkennbare Kinder",
+          "status": "needed"
+        }
+      ]
+    },
+    "city_festival_street": {
+      "label": "Stadtfest & Innenstadtaktion",
+      "priority": "high",
+      "mood": "offen, lokal, freundlich, städtisch",
+      "local_context": "Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Innenstadt-/Straßen-/Stadtfestgefühl",
+        "breite Card-Wirkung",
+        "lokal plausible Materialien"
+      ],
+      "avoid": [
+        "Großstadt-Skyline",
+        "Kirmes-Fahrgeschäfte",
+        "lesbare Plakate"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Stadtfest & Innenstadtaktion: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Stadtfest & Innenstadtaktion: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Stadtfest & Innenstadtaktion: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Stadtfest & Innenstadtaktion: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Stadtfest & Innenstadtaktion: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Stadtfest & Innenstadtaktion: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        },
+        {
+          "slot": 7,
+          "id_suffix": "07",
+          "brief": "Stadtfest & Innenstadtaktion: Saison- und wetterrobuste Variante, die auch außerhalb eines konkreten Einzeltermins plausibel wirkt. Inhaltlicher Fokus: Innenstadtaktion, Stadtfest, Lichtersonntag, verkaufsoffene Sonntage und offene Stadtmomente",
+          "status": "needed"
+        }
+      ]
+    },
+    "open_air_festival": {
+      "label": "Open-Air-Festival & Außenbühne",
+      "priority": "medium",
+      "mood": "sommerlich, offen, festivalartig, hochwertig",
+      "local_context": "Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Außenbühne, Gelände, Licht oder Festivalatmosphäre",
+        "Weite und Luftigkeit",
+        "keine erkennbaren Acts"
+      ],
+      "avoid": [
+        "reines Konzertdetail ohne Festivalgefühl",
+        "Massenszenen",
+        "Markenbühnen"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Open-Air-Festival & Außenbühne: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Open-Air-Festival & Außenbühne: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Open-Air-Festival & Außenbühne: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Open-Air-Festival & Außenbühne: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Open-Air-Festival & Außenbühne: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Aasee-Festival, Kulturtage, Festivalgelände, Außenbühnen und große sommerliche Eventstimmung",
+          "status": "needed"
+        }
+      ]
+    },
+    "kirmes_funfair": {
+      "label": "Kirmes & Volksfest",
+      "priority": "medium",
+      "mood": "leuchtend, volksfestlich, aber kontrolliert hochwertig",
+      "local_context": "Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Kirmes-/Fahrgeschäft-/Lichterbezug",
+        "Volksfestatmosphäre",
+        "keine dominante Menschenmenge"
+      ],
+      "avoid": [
+        "überdrehtes Neon",
+        "billiger Rummel-Look",
+        "lesbare Schaustellerlogos"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Kirmes & Volksfest: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Kirmes & Volksfest: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Kirmes & Volksfest: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Kirmes & Volksfest: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Kirmes, Fahrgeschäfte, Lichter, Volksfest und Rummelatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "parade_festzug": {
+      "label": "Parade, CSD & Festzug",
+      "priority": "low",
+      "mood": "öffentlich, bewegt, städtisch, festlich",
+      "local_context": "Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Umzug-/Parade-/Straßenbewegung",
+        "Stadtraumgefühl",
+        "anonyme oder keine Personen"
+      ],
+      "avoid": [
+        "erkennbare Einzelpersonen",
+        "politische Plakate im Fokus",
+        "chaotische Menschenmenge"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Parade, CSD & Festzug: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Parade, CSD & Festzug: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Parade, CSD & Festzug: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Parade, CSD & Festzug: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Rosenmontagszug, CSD, Umzug, Festzug und öffentliche Bewegung im Stadtraum",
+          "status": "needed"
+        }
+      ]
+    },
+    "shooting_festival_tradition": {
+      "label": "Schützenfest & Tradition",
+      "priority": "low",
+      "mood": "traditionell, festlich, lokal, ruhig",
+      "local_context": "Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Festzelt-, Vereins- oder Traditionsbezug",
+        "Schützenfest-Anmutung ohne Uniformfokus",
+        "regionale Plausibilität"
+      ],
+      "avoid": [
+        "Waffenfokus",
+        "erkennbare Vereinslogos",
+        "Alkoholfokus"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Schützenfest & Tradition: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Schützenfest & Tradition: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Schützenfest & Tradition: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Schützenfest, Festzelt, Vereins- und Traditionsfest ohne erkennbare Personen im Fokus",
+          "status": "needed"
+        }
+      ]
+    },
+    "market_stalls": {
+      "label": "Märkte & Stände",
+      "priority": "high",
+      "mood": "städtisch, handlich, marktartig, lebendig ruhig",
+      "local_context": "Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Stände, Waren, Tische oder Marktstruktur",
+        "Material- und Warenbezug",
+        "keine Marken"
+      ],
+      "avoid": [
+        "Food-Fokus",
+        "Buchmarkt-Fokus",
+        "überfüllte Verkaufsfläche"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Märkte & Stände: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Märkte & Stände: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Märkte & Stände: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Märkte & Stände: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Märkte & Stände: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Märkte & Stände: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Krammarkt, Stoffmarkt, Wochenmarkt, Flohmarkt, Grenzmarkt und Stand-/Warenwelten",
+          "status": "needed"
+        }
+      ]
+    },
+    "book_market": {
+      "label": "Bücher- & Boekenmarkt",
+      "priority": "low",
+      "mood": "papiernah, ruhig, antiquarisch, hochwertig",
+      "local_context": "Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Bücher, Kisten, Tische oder Papierdetails",
+        "Buchmarktgefühl",
+        "keine lesbaren Cover im Fokus"
+      ],
+      "avoid": [
+        "Bibliothek statt Markt",
+        "urheberrechtlich erkennbare Cover",
+        "chaotische Stapel"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Bücher- & Boekenmarkt: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Bücher- & Boekenmarkt: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Bücher- & Boekenmarkt: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Bücherstände, Antiquariat, Papier, Buchkisten und ruhige Marktstimmung",
+          "status": "needed"
+        }
+      ]
+    },
+    "food_drink_festival": {
+      "label": "Food, Wein & Genuss",
+      "priority": "high",
+      "mood": "warm, genussvoll, lokal, appetitlich",
+      "local_context": "Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Food-/Wein-/Genussbezug",
+        "Event- oder Standkontext",
+        "hochwertig statt Restaurantteller"
+      ],
+      "avoid": [
+        "Alkoholfokus",
+        "beliebige Tellerbilder",
+        "Fast-Food-Klischees"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Food, Wein & Genuss: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Food, Wein & Genuss: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Food, Wein & Genuss: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Food, Wein & Genuss: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Food, Wein & Genuss: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Food, Wein & Genuss: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Food Festival, Weinfest, Genussstände, regionale Produkte und kulinarische Eventatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "country_fair_rural": {
+      "label": "Country Fair & Landpartie",
+      "priority": "low",
+      "mood": "ländlich, offen, regional, hochwertig",
+      "local_context": "Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Landpartie-/Country-Fair-/Hof- oder Parkatmosphäre",
+        "natürliche Materialien",
+        "ruhige Weite"
+      ],
+      "avoid": [
+        "Agrar-Maschinenmesse",
+        "Western-Klischee",
+        "Tiernahaufnahme ohne Kontext"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Country Fair & Landpartie: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Country Fair & Landpartie: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Country Fair & Landpartie: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Ländliche Messe, Farm & Country Fair, Landpartie, Hof-/Parkatmosphäre und regionale Ausstellung",
+          "status": "needed"
+        }
+      ]
+    },
+    "family_play_outdoor": {
+      "label": "Familie, Spiel & draußen",
+      "priority": "high",
+      "mood": "freundlich, hell, sicher, lebendig ruhig",
+      "local_context": "Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Spiel-/Familien-/Outdoorbezug",
+        "Mitmach- oder Freizeitgefühl",
+        "keine erkennbaren Kinder"
+      ],
+      "avoid": [
+        "Kindergesichter",
+        "billige Spielplatz-Stockoptik",
+        "chaotische Farben"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Familie, Spiel & draußen: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Familie, Spiel & draußen: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Familie, Spiel & draußen: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Familie, Spiel & draußen: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Familie, Spiel & draußen: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Familie, Spiel & draußen: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Familienfest, Jugendfarm, Ostereiersuche, Spiel- und Mitmachflächen ohne erkennbare Kinder",
+          "status": "needed"
+        }
+      ]
+    },
+    "creative_making_workshop": {
+      "label": "Kreativ- & Mitmachworkshop",
+      "priority": "high",
+      "mood": "kreativ, haptisch, ruhig, konzentriert",
+      "local_context": "Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Materialien, Hände, Basteln, Handwerk oder Making",
+        "Workshopgefühl",
+        "keine Lizenzfiguren"
+      ],
+      "avoid": [
+        "Pokémon-/Markenfiguren",
+        "Kinderfaces",
+        "steriler Designatelier-Look"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Kreativ- & Mitmachworkshop: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Kreativ- & Mitmachworkshop: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Kreativ- & Mitmachworkshop: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Kreativ- & Mitmachworkshop: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Kreativ- & Mitmachworkshop: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Basteln, Pokémon-/Escape-/Handwerksformate, Materialien, Hände und Making-Situationen",
+          "status": "needed"
+        }
+      ]
+    },
+    "learning_science_workshop": {
+      "label": "Lernen, Wissen & Junge Uni",
+      "priority": "low",
+      "mood": "lernend, neugierig, ruhig, sachlich hochwertig",
+      "local_context": "Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Experiment-, Lern- oder Wissensbezug",
+        "Junge-Uni-/Workshopatmosphäre",
+        "Material oder Objektfokus"
+      ],
+      "avoid": [
+        "Labor-Klischee",
+        "Schulbuchoptik",
+        "erkennbare Kinder"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Lernen, Wissen & Junge Uni: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Lernen, Wissen & Junge Uni: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Lernen, Wissen & Junge Uni: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Lernen, Wissen & Junge Uni: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Junge Uni, Ökosystem, Wissenschaft, Lernen, Experimente und Wissensformate",
+          "status": "needed"
+        }
+      ]
+    },
+    "dance_music_workshop": {
+      "label": "Tanz-, Musik- & Performance-Workshop",
+      "priority": "low",
+      "mood": "beweglich, jung, musikalisch, aber ruhig kontrolliert",
+      "local_context": "K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Tanz-, Musik- oder Performance-Kontext",
+        "Bewegungsgefühl ohne Gesichter",
+        "Workshop statt Konzert"
+      ],
+      "avoid": [
+        "TikTok-/Popstar-Klischee",
+        "erkennbare Jugendliche",
+        "Logo-/Posterbezug"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Tanz-, Musik- & Performance-Workshop: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Tanz-, Musik- & Performance-Workshop: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Tanz-, Musik- & Performance-Workshop: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: K-Pop, Sing & Dance, Musikschule, Bewegung, Jugendperformance und Workshopatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "active_route_tour": {
+      "label": "Aktive Tour & Route",
+      "priority": "medium",
+      "mood": "aktiv, draußen, orientierend, ruhig",
+      "local_context": "Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Route, Weg, Fahrrad, Segway oder Spaziergang",
+        "geführte Bewegung",
+        "regional plausible Umgebung"
+      ],
+      "avoid": [
+        "Sportwettkampf",
+        "Alpen-/Reisebild",
+        "Fahrzeugwerbung"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Aktive Tour & Route: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Aktive Tour & Route: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Aktive Tour & Route: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Aktive Tour & Route: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Aktive Tour & Route: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Fahrradtour, Segway, Wanderung, Spaziergang, geführte Bewegung und Routenatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "running_event": {
+      "label": "Laufveranstaltung",
+      "priority": "low",
+      "mood": "sportlich, dynamisch, klar, hochwertig",
+      "local_context": "Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Laufstrecke, Start/Ziel oder Laufschuh-/Bewegungsdetail",
+        "Eventkontext",
+        "keine erkennbaren Läufer"
+      ],
+      "avoid": [
+        "Fitnessstudio",
+        "Markenschuhe im Fokus",
+        "Massenszene"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Laufveranstaltung: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Laufveranstaltung: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Laufveranstaltung: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Citylauf, Abendlauf, Start/Ziel, Laufstrecke und sportliche Bewegung",
+          "status": "needed"
+        }
+      ]
+    },
+    "cycling_event": {
+      "label": "Radveranstaltung & Radsport",
+      "priority": "low",
+      "mood": "sportlich, mobil, regional, klar",
+      "local_context": "Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Fahrrad-, Radrennen- oder Tourkontext",
+        "Bewegungsrichtung",
+        "hochwertige Oberflächen"
+      ],
+      "avoid": [
+        "Produktwerbung",
+        "Mountainbike-Alpenbild",
+        "erkennbare Fahrer"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Radveranstaltung & Radsport: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Radveranstaltung & Radsport: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Radveranstaltung & Radsport: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Giro, Radsport, Fahrrad-Frühling, Fahrraddetails und Radveranstaltung",
+          "status": "needed"
+        }
+      ]
+    },
+    "indoor_sport_competition": {
+      "label": "Indoor-Sport & Wettbewerb",
+      "priority": "low",
+      "mood": "konzentriert, sportlich, indoor, wettbewerblich",
+      "local_context": "Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Darts-, Fecht-, Hallensport- oder Turnierbezug",
+        "Wettkampfatmosphäre",
+        "keine identifizierbaren Sportler"
+      ],
+      "avoid": [
+        "Stadionbild",
+        "Fitnesskurs",
+        "Vereinslogos"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Indoor-Sport & Wettbewerb: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Indoor-Sport & Wettbewerb: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Indoor-Sport & Wettbewerb: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Darts, Fechten, Hallensport, Turnier und sportlicher Wettbewerb",
+          "status": "needed"
+        }
+      ]
+    },
+    "nature_learning_wildlife": {
+      "label": "Natur, Tiere & Umweltbildung",
+      "priority": "medium",
+      "mood": "grün, ruhig, naturbezogen, lernend",
+      "local_context": "Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Natur-, Tier-, Wasser-, Garten- oder Umweltbildungsbezug",
+        "regionale Plausibilität",
+        "ruhige Tiefe"
+      ],
+      "avoid": [
+        "Alpen/Strand",
+        "dramatische Wildnis",
+        "Tier-Makro ohne Eventbezug"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Natur, Tiere & Umweltbildung: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Natur, Tiere & Umweltbildung: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Natur, Tiere & Umweltbildung: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Natur, Tiere & Umweltbildung: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Natur, Tiere & Umweltbildung: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Fledermaus, Naturführung, Wasser, Wildpark, Garten, Umwelt und Naturlernen",
+          "status": "needed"
+        }
+      ]
+    },
+    "evening_social_party": {
+      "label": "Abend, Tanz & Party",
+      "priority": "low",
+      "mood": "abendlich, sozial, warm, aber nicht billig",
+      "local_context": "Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Tanz-, Abend-, Bar- oder Treffpunktatmosphäre",
+        "warmes Licht",
+        "keine Alkoholzentrierung"
+      ],
+      "avoid": [
+        "Nachtclub-Neon",
+        "betrunkene Menschen",
+        "Marken/Flaschen im Fokus"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Abend, Tanz & Party: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Abend, Tanz & Party: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Abend, Tanz & Party: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Abend, Tanz & Party: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Tanz in den Mai, Karibische Nacht, Party, Abendtreff und soziale Abendatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "business_messe_info": {
+      "label": "Messe, Info & Business",
+      "priority": "medium",
+      "mood": "professionell, informativ, ruhig, vertrauenswürdig",
+      "local_context": "Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Messe-, Infoabend- oder Businesskontext",
+        "Tische, Materialien oder Raumstruktur",
+        "sachliche Premiumwirkung"
+      ],
+      "avoid": [
+        "Corporate-Stockfoto",
+        "lesbare Rollups",
+        "Handshake-Klischee"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Messe, Info & Business: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Messe, Info & Business: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Messe, Info & Business: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Messe, Info & Business: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Berufsmesse, Unternehmermesse, Infoabend, öffentliche Informationsformate und neutrale Messesituation",
+          "status": "needed"
+        }
+      ]
+    },
+    "vehicle_classic": {
+      "label": "Oldtimer & Fahrzeuge",
+      "priority": "low",
+      "mood": "klassisch, detailreich, hochwertig, technisch",
+      "local_context": "Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Oldtimer-, Chrom-, Fahrzeug- oder Karosseriedetail",
+        "Treffen-/Ausstellungskontext",
+        "keine Kennzeichen"
+      ],
+      "avoid": [
+        "moderne Autowerbung",
+        "erkennbare Kennzeichen",
+        "Tuning-Klischee"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Oldtimer & Fahrzeuge: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Oldtimer & Fahrzeuge: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Oldtimer & Fahrzeuge: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Oldtimer, Chrom, Fahrzeugdetails, Classic-Treffen und hochwertige Automobilatmosphäre",
+          "status": "needed"
+        }
+      ]
+    },
+    "default_city": {
+      "label": "Allgemeines Bocholt-Visual",
+      "priority": "high",
+      "mood": "neutral, lokal, ruhig, hochwertig",
+      "local_context": "Hochwertiger neutraler lokaler Fallback für unklare Events",
+      "preferred_sources": [
+        "eigene Fotos",
+        "explizit freigegebene lokale Fotos",
+        "selbst erzeugte symbolische KI-Premium-Visuals"
+      ],
+      "must_have": [
+        "Bocholt-/Innenstadt- oder regionale Stadtanmutung",
+        "breite Nutzbarkeit",
+        "Premium-Fallback ohne Beliebigkeit"
+      ],
+      "avoid": [
+        "beliebige Stockstadt",
+        "falsche Landmarke",
+        "graue Amtsblattoptik"
+      ],
+      "slot_briefs": [
+        {
+          "slot": 1,
+          "id_suffix": "01",
+          "brief": "Allgemeines Bocholt-Visual: Breites, card-taugliches Hauptmotiv mit klarer Bildwelt und ruhiger Premium-Komposition. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        },
+        {
+          "slot": 2,
+          "id_suffix": "02",
+          "brief": "Allgemeines Bocholt-Visual: Detailorientierte Variante mit Materialität, Vordergrundfokus und weichem Kontext im Hintergrund. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        },
+        {
+          "slot": 3,
+          "id_suffix": "03",
+          "brief": "Allgemeines Bocholt-Visual: Atmosphärische Kontextvariante mit lokaler oder regional plausibler Umgebung, ohne konkrete falsche Ortsbehauptung. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        },
+        {
+          "slot": 4,
+          "id_suffix": "04",
+          "brief": "Allgemeines Bocholt-Visual: Ruhige Fallback-Variante mit stärkerer Flächenwirkung, geeignet für viele Events dieses Visual Keys. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        },
+        {
+          "slot": 5,
+          "id_suffix": "05",
+          "brief": "Allgemeines Bocholt-Visual: Lebendigere Variante mit Eventgefühl, aber ohne erkennbare Personen, Logos, Plakate oder lesbare Schrift. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        },
+        {
+          "slot": 6,
+          "id_suffix": "06",
+          "brief": "Allgemeines Bocholt-Visual: Nahbare Editorial-Variante mit glaubwürdigen Oberflächen, natürlichem Licht und nicht überladener Szene. Inhaltlicher Fokus: Hochwertiger neutraler lokaler Fallback für unklare Events",
+          "status": "needed"
+        }
+      ]
+    }
+  }
+}

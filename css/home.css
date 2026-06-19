@@ -324,11 +324,14 @@
     cursor: pointer;
   }
 
+  /* === BEGIN BLOCK: EVENT_CARD_ACTION_LINK_PREMIUM_V1 | Zweck: entfernt den letzten klassischen Hover-Unterstrich auf Desktop-Card-Actions und nutzt eine leise Text-Action-Anhebung === */
   .event-card-action:hover{
     color: color-mix(in srgb, var(--home-copy-contrast) 94%, rgba(36,54,40,0.96) 6%);
-    text-decoration: underline;
-    text-underline-offset: 0.14em;
+    text-decoration: none;
+    background: color-mix(in srgb, var(--color-primary-muted) 30%, transparent);
+    box-shadow: inset 0 -0.12em 0 color-mix(in srgb, var(--color-primary) 34%, rgba(24,40,30,0.10));
   }
+  /* === END BLOCK: EVENT_CARD_ACTION_LINK_PREMIUM_V1 === */
 
   .event-card-action:focus-visible{
     outline: 2px solid var(--cmp-focus-ring-brand);
@@ -1462,6 +1465,185 @@
   }
   /* === END BLOCK: HOME_SHARED_FEED_SURFACE_TOKEN_CONSUMERS_V1 === */
 }
+
+/* === BEGIN BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 | Zweck: zeigt ready 16:9-Event-Visuals im normalen /events/ Feed als Premium-Card-Media; Umfang: nur EventCards mit .event-card--with-media, keine Activity-/Today-Visuals === */
+body.is-tabbar-hidden .event-card.event-card--with-media{
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+  column-gap: 0;
+  align-items: stretch;
+  min-height: 0;
+  padding: 0;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media::before{
+  content: none;
+  display: none;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+
+  justify-self: start;
+  align-self: start;
+
+  background: color-mix(in srgb, white 88%, var(--home-action-bg-start) 12%);
+  box-shadow:
+    inset 0 0 0 1px rgba(24,40,30,0.070),
+    inset 0 1px 0 rgba(255,255,255,0.88),
+    0 8px 20px rgba(12,24,18,0.14);
+}
+
+body.is-tabbar-hidden .event-card-media{
+  grid-column: 1 / -1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  overflow: hidden;
+
+  background: linear-gradient(135deg, var(--home-rail-bg-start), var(--home-rail-bg-end));
+  border-radius: calc(var(--radius-eventcard) - 1px) calc(var(--radius-eventcard) - 1px) 0 0;
+}
+
+body.is-tabbar-hidden .event-card-media__img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
+  grid-column: 1 / -1;
+  padding: 14px 14px 16px;
+}
+
+@media (max-width: 899.98px){
+  body.is-tabbar-hidden .event-card.event-card--with-media{
+    --event-card-thumb-w: clamp(66px, 19vw, 76px);
+    --event-card-thumb-h: clamp(58px, 16vw, 66px);
+
+    grid-template-columns: 38px minmax(0, 1fr) var(--event-card-thumb-w);
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    row-gap: 3px;
+    align-items: center;
+
+    min-height: 0;
+    padding: 11px;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media::before{
+    content: none;
+    display: none;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media > .event-date-badge{
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: 1;
+
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    justify-self: start;
+    align-self: center;
+
+    width: 38px;
+    padding: 4px 2px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, white 52%, var(--color-primary-muted)) 0%,
+      color-mix(in srgb, white 68%, var(--color-primary-muted)) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(24,40,30,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.80);
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media > .event-card-body{
+    display: contents;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-title{
+    position: relative;
+    z-index: 2;
+
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+
+    font-size: clamp(0.89rem, 3.7vw, 0.95rem);
+    line-height: 1.15;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-title .event-category-icon{
+    display: none;
+  }
+
+  /* === BEGIN BLOCK: EVENT_FEED_MOBILE_MEDIA_META_STACK_V1 | Zweck: stapelt Uhrzeit und Ort in Media-EventCards zweizeilig und hält Titel, Datum und Thumbnail oben bündig; Umfang: nur mobiler /events/ Feed mit .event-card--with-media === */
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta{
+    position: relative;
+    z-index: 2;
+
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+
+    min-width: 0;
+    margin: 0;
+
+    font-size: clamp(0.77rem, 3.1vw, 0.82rem);
+    line-height: 1.2;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__time,
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__place{
+    display: block;
+    min-width: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-meta__time + .event-meta__place::before{
+    content: none;
+  }
+  /* === END BLOCK: EVENT_FEED_MOBILE_MEDIA_META_STACK_V1 === */
+
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-card-desc,
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-card-meta-quiet,
+  body.is-tabbar-hidden .event-card.event-card--with-media .event-card-actions{
+    display: none;
+  }
+
+  body.is-tabbar-hidden .event-card-media{
+    position: relative;
+    z-index: 1;
+
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    justify-self: end;
+
+    width: var(--event-card-thumb-w);
+    height: var(--event-card-thumb-h);
+    aspect-ratio: auto;
+    align-self: center;
+
+    border-radius: 12px;
+  }
+}
+/* === END BLOCK: EVENT_FEED_READY_VISUAL_CARD_MEDIA_V1 === */
 
 /* === BEGIN BLOCK: DESKTOP_TOP_SHELL_NARROW_READABILITY_AND_RESET_V5 | Zweck: stabilisiert auf 900–1024px die adaptive Copy-Surface gegen unterschiedliche Bildhelligkeit, damit Angebote nicht weißer wirkt als Events, ohne Geometrie oder Rail-Contract zu verändern; Umfang: nur 900–1024px innerhalb des Desktop-Top-Shell-Owners === */
 @media (min-width: 900px) and (max-width: 1024px){
@@ -4385,3 +4567,168 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
+
+/* === BEGIN BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V3 | Zweck: korrigiert den Desktop-Premium-Rail messbar: Hero bleibt breit genug, sichtbare Feed-/Grid-Surfaces laufen nicht mehr breiter als Card-/Control-Achse; Umfang: nur Desktop >=900px fuer Events und Aktivitaeten, V2 wird ersetzt, keine Mobile-, Daten-, Bild- oder Detailpanel-Logik === */
+@media (min-width: 900px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1224px;
+    --desktop-feed-surface-max: 1152px;
+    --desktop-shell-pad-x: 36px;
+    --desktop-feed-pad-x: 0px;
+    --desktop-copy-surface-max: 35rem;
+    --desktop-copy-max: 30rem;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    width: min(calc(100% - clamp(72px, 7vw, 112px)), var(--desktop-shell-max));
+    max-width: none;
+    min-height: 356px;
+    padding-top: 16px;
+    padding-bottom: 10px;
+  }
+
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section,
+  body.page-route-activities .activity-finder-card{
+    width: min(calc(100% - clamp(72px, 7vw, 112px)), var(--desktop-feed-surface-max));
+    max-width: none;
+  }
+
+  body.is-tabbar-hidden .events-section,
+  body.page-route-activities .events-section{
+    margin-top: 10px;
+    padding: 18px var(--desktop-feed-pad-x) 36px;
+    border-radius: 22px 22px 0 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,245,226,0.30) 0%,
+        rgba(231,238,213,0.16) 48px,
+        rgba(231,238,213,0.050) 112px,
+        rgba(231,238,213,0.00) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-rail-bg-start) 72%, rgba(247,249,244,0.92) 28%) 0%,
+        color-mix(in srgb, var(--home-rail-bg-end) 76%, rgba(247,249,244,0.88) 24%) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 62%, rgba(247,249,244,0.96) 38%) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.34),
+      inset 0 12px 20px rgba(247,249,242,0.055);
+  }
+
+  body.is-tabbar-hidden .event-cards-grid,
+  body.page-route-activities .event-cards-grid{
+    gap: clamp(28px, 2.2vw, 36px);
+  }
+
+  body.page-route-activities .page--activities{
+    gap: 0;
+  }
+
+  body.page-route-activities .activity-finder-card{
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding: 12px 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(18,34,26,0.070);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(250,252,247,0.90) 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.82) inset,
+      0 9px 22px rgba(17,32,20,0.026);
+  }
+
+  body.page-route-activities .activity-finder-card__head{
+    padding-inline: 0;
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    padding-inline: 0;
+  }
+
+  body.page-route-activities .events-section.activity-feed-section{
+    margin-top: 10px;
+    padding: 18px var(--desktop-feed-pad-x) 40px;
+    border-radius: 22px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,245,226,0.32) 0%,
+        rgba(231,238,213,0.18) 54px,
+        rgba(231,238,213,0.055) 132px,
+        rgba(231,238,213,0.00) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-rail-bg-start) 70%, rgba(247,249,244,0.92) 30%) 0%,
+        color-mix(in srgb, var(--home-rail-bg-end) 74%, rgba(247,249,244,0.88) 26%) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 60%, rgba(247,249,244,0.96) 40%) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.36),
+      inset 0 12px 22px rgba(247,249,242,0.060);
+  }
+}
+
+@media (min-width: 1280px){
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card:only-child){
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media{
+    display: grid;
+    grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr);
+    min-height: 304px;
+  }
+
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media > .event-card-media{
+    grid-column: 1;
+    grid-row: 1 / -1;
+    height: 100%;
+    min-height: 304px;
+    aspect-ratio: auto;
+    border-radius: calc(var(--radius-eventcard) - 1px) 0 0 calc(var(--radius-eventcard) - 1px);
+  }
+
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media > .event-card-body{
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    align-content: center;
+    padding: 28px 32px 28px 30px;
+    gap: 11px;
+  }
+
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-title{
+    font-size: clamp(1.28rem, 1.02rem + 0.46vw, 1.52rem);
+    line-height: 1.15;
+  }
+
+  body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-card-desc{
+    -webkit-line-clamp: 4;
+    font-size: 1rem;
+    line-height: 1.48;
+  }
+}
+
+@media (min-width: 1600px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1224px;
+    --desktop-feed-surface-max: 1152px;
+    --desktop-shell-pad-x: 36px;
+    --desktop-feed-pad-x: 0px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 356px;
+    padding-top: 16px;
+    padding-bottom: 10px;
+  }
+}
+/* === END BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V3 === */

@@ -77,11 +77,11 @@
   --btb-shell-pad: 4px;
   --btb-shell-radius: 18px;
   --btb-shell-border: rgba(24,40,30,0.08);
-  --btb-shell-bg-start: rgba(247,249,244,0.58);
-  --btb-shell-bg-end: rgba(247,249,244,0.84);
+  --btb-shell-bg-start: rgba(247,249,244,0.62);
+  --btb-shell-bg-end: rgba(247,249,244,0.86);
   --btb-shell-shadow:
-    0 6px 18px rgba(10,24,16,0.055),
-    0 1px 0 rgba(255,255,255,0.72) inset;
+    0 8px 24px rgba(10,24,16,0.07),
+    0 1px 0 rgba(255,255,255,0.78) inset;
 
   --btb-item-minh: 50px;
   --btb-item-radius: 14px;
@@ -352,6 +352,18 @@
   --cmp-link-underline-color: currentColor;
   --cmp-link-focus-ring: var(--ui-focus-ring-neutral);
 
+  /* === BEGIN BLOCK: PREMIUM_LINK_CONTRACT_TOKENS_V1 | Zweck: definiert die leise Link-DNA fuer Fliesstext, Footer und juristische Nebenlinks, ohne Button-, Card-, Header- oder Detailpanel-Komponenten umzudeuten === */
+  --cmp-inline-link-color: color-mix(in srgb, var(--color-text-primary) 86%, var(--brand-green-700) 14%);
+  --cmp-inline-link-color-hover: color-mix(in srgb, var(--color-text-primary) 78%, var(--brand-green-700) 22%);
+  --cmp-inline-link-rule: color-mix(in srgb, var(--color-primary) 42%, rgba(24,40,30,0.18));
+  --cmp-inline-link-rule-hover: color-mix(in srgb, var(--color-primary) 62%, rgba(24,40,30,0.12));
+  --cmp-inline-link-bg-hover: color-mix(in srgb, var(--color-primary-muted) 46%, transparent);
+  --cmp-footer-link-color: rgba(24,40,30,0.72);
+  --cmp-footer-link-color-hover: var(--color-text-primary);
+  --cmp-footer-link-bg-hover: rgba(255,255,255,0.58);
+  --cmp-footer-link-border-hover: rgba(24,40,30,0.08);
+  /* === END BLOCK: PREMIUM_LINK_CONTRACT_TOKENS_V1 === */
+
   /* DS-02 component mapping prep: inputs / choices */
   --cmp-input-minh: var(--ui-control-h);
   --cmp-input-pad-x: var(--ui-control-pad-x);
@@ -473,14 +485,45 @@ body{
 }
 
 
-/* GLOBAL LINKS + PAGE TYPO + CTA BASE (UX polish) */
-a{
-  color: var(--color-primary);
+/* === BEGIN BLOCK: PREMIUM_LINK_CONTRACT_BASE_V1 | Zweck: ersetzt den alten gruenen Browser-Link-Look durch ein ruhiges Premium-Link-System; Umfang: nur unklassifizierte Fliesstextlinks, Komponentenlinks bleiben bei ihren Owner-Regeln === */
+:where(a:not([class])){
+  color: var(--cmp-inline-link-color);
+  font-weight: 680;
   text-decoration: none;
-  text-underline-offset: 3px;
+  border-radius: 0.24em;
+  box-shadow: inset 0 -0.08em 0 var(--cmp-inline-link-rule);
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
 }
-a:hover{ text-decoration: underline; }
-a:visited{ color: var(--color-primary); }
+
+:where(a:not([class]):visited){
+  color: var(--cmp-inline-link-color);
+}
+
+@media (hover: hover){
+  :where(a:not([class]):hover){
+    color: var(--cmp-inline-link-color-hover);
+    text-decoration: none;
+    background: var(--cmp-inline-link-bg-hover);
+    box-shadow: inset 0 -0.22em 0 var(--cmp-inline-link-rule-hover);
+  }
+}
+
+:where(a:not([class]):active){
+  color: var(--cmp-inline-link-color-hover);
+  background: color-mix(in srgb, var(--color-primary-muted) 62%, transparent);
+}
+
+:where(a:not([class]):focus-visible){
+  outline: 2px solid var(--cmp-link-focus-ring);
+  outline-offset: 3px;
+  box-shadow:
+    inset 0 -0.16em 0 var(--cmp-inline-link-rule-hover),
+    0 0 0 3px rgba(255,255,255,0.72);
+}
+/* === END BLOCK: PREMIUM_LINK_CONTRACT_BASE_V1 === */
 
 /* PAGE LAYOUT CONTRACT (top-app readability) */
 .page{
@@ -554,6 +597,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* BOTTOM TAB BAR (marker fix; keep CSS valid) */
 
+/* === BEGIN BLOCK: PREMIUM_FOOTER_LINK_CONTRACT_V1 | Zweck: macht Footer-Legal-Links zu ruhigen App-Actions statt klassischen gruen unterstrichenen Weblinks; Umfang: kompletter globaler Footer-Link- und Footer-Basisblock === */
 footer {
   margin-top: 20px;
   padding: 28px 20px 34px;
@@ -577,16 +621,74 @@ footer p {
 
 footer p + p {
   margin-top: 10px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem 0.22rem;
 }
 
-footer a {
-  color: var(--color-text-primary);
+footer p + p > span[aria-hidden="true"]{
+  color: rgba(85,101,91,0.58);
+  line-height: 1;
+}
+
+footer a,
+footer .footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 30px;
+  padding: 0 0.42rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+
+  color: var(--cmp-footer-link-color);
+  background: transparent;
+  box-shadow: none;
+
+  font: inherit;
+  font-weight: 650;
+  line-height: 1.1;
   text-decoration: none;
+
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
-footer a:hover {
-  text-decoration: underline;
+footer a:visited{
+  color: var(--cmp-footer-link-color);
 }
+
+footer .footer-link {
+  appearance: none;
+}
+
+@media (hover: hover){
+  footer a:hover,
+  footer .footer-link:hover {
+    color: var(--cmp-footer-link-color-hover);
+    background: var(--cmp-footer-link-bg-hover);
+    border-color: var(--cmp-footer-link-border-hover);
+    text-decoration: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.68) inset;
+  }
+}
+
+footer a:focus-visible,
+footer .footer-link:focus-visible{
+  outline: 2px solid var(--cmp-link-focus-ring);
+  outline-offset: 2px;
+}
+/* === END BLOCK: PREMIUM_FOOTER_LINK_CONTRACT_V1 === */
 
 @media (min-width: 900px) {
   footer {

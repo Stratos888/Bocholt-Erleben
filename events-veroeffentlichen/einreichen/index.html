@@ -84,7 +84,7 @@
         <div class="publish-hero-copy">
           <h1>Einzeltermin zur Prüfung einreichen</h1>
           <p class="content-lead">
-            Trage alle notwendigen Angaben ein. Wir prüfen zuerst, ob die Veranstaltung grundsätzlich passt. Erst danach erhältst du einen Zahlungslink.
+            Trage alle notwendigen Angaben ein. Wir prüfen zuerst, ob die Veranstaltung zu Bocholt erleben passt. Erst danach erhältst du einen Zahlungslink.
           </p>
         </div>
       </div>
@@ -104,9 +104,16 @@
         <div class="content-form-grid">
     <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FORM_INTRO_V7 === -->
 
+          <!-- === BEGIN BLOCK: PUBLISH_SINGLE_EVENT_CONTACT_FIELDS_V1 | Zweck: ergänzt die persönliche Ansprechperson für konsistente Mail-Anrede und Veranstalterkommunikation; Umfang: Organisation, Ansprechperson und E-Mail im Einzeltermin-Formular === -->
           <label class="content-field" for="publish-standard-organization">
             <span class="content-field__label">Veranstalter / Organisation *</span>
             <input class="content-field__control" id="publish-standard-organization" name="organization" type="text" autocomplete="organization" required>
+          </label>
+
+          <label class="content-field" for="publish-standard-contact">
+            <span class="content-field__label">Ansprechperson *</span>
+            <input class="content-field__control" id="publish-standard-contact" name="contact" type="text" autocomplete="name" required>
+            <p class="content-field__hint">Für persönliche Rückfragen und Statusmails zu deiner Einreichung.</p>
           </label>
 
           <label class="content-field" for="publish-standard-email">
@@ -114,6 +121,7 @@
             <input class="content-field__control" id="publish-standard-email" name="email" type="email" inputmode="email" autocomplete="email" required>
             <p class="content-field__hint">Für Rückfragen, Zahlungsbestätigung und späteren Zugriff auf deine Einreichung.</p>
           </label>
+          <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_CONTACT_FIELDS_V1 === -->
 
           <label class="content-field" for="publish-standard-title">
             <span class="content-field__label">Titel der Veranstaltung *</span>
@@ -190,7 +198,7 @@
               Zur Prüfung einreichen
             </button>
             <p class="content-note">
-              Nach der Einreichung prüfen wir die Veranstaltung zuerst. Wenn sie grundsätzlich passt, erhältst du per E-Mail einen Zahlungslink für den Einzeltermin.
+              Nach der Einreichung prüfen wir die Veranstaltung zuerst. Wenn sie zu Bocholt erleben passt, erhältst du per E-Mail einen Zahlungslink für den Einzeltermin.
             </p>
           </div>
           <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_FINAL_ACTION_COPY_V4_REVIEW_BEFORE_PAYMENT === -->
@@ -202,7 +210,7 @@
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === BEGIN BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V5_REVIEW_BEFORE_PAYMENT | Zweck: Cache-Busting nach Umstellung auf Einreichung vor Zahlung; Umfang: genau eine Script-Zeile === -->
-  <script src="/js/publish-funnel.js?v=2026-05-12-review-before-payment-1" defer></script>
+  <script src="/js/publish-funnel.js?v=2026-06-05-single-contact-1" defer></script>
   <!-- === END BLOCK: PUBLISH_FUNNEL_SCRIPT_VERSION_BUMP_V5_REVIEW_BEFORE_PAYMENT === -->
   <!-- === END BLOCK: PUBLISH_SINGLE_EVENT_BODY_V3 === -->
 </body>

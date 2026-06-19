@@ -23,6 +23,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "inbox.tsv"
@@ -60,6 +62,7 @@ class InboxItem:
     match_score: str
     matched_event_id: str
     notes: str
+    visual_key: str
     created_at: str
 # === END BLOCK: INBOX ITEM DATACLASS (incl. row_number for writeback) ===
 
@@ -228,6 +231,12 @@ def main() -> None:
                 match_score=data.get("match_score", ""),
                 matched_event_id=data.get("matched_event_id", ""),
                 notes=data.get("notes", ""),
+                visual_key=normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
+                    title=data.get("title", ""),
+                    description=data.get("description", ""),
+                    category=data.get("kategorie_suggestion", ""),
+                    location=data.get("location", ""),
+                ),
                 created_at=data.get("created_at", ""),
             )
         )
@@ -285,6 +294,8 @@ def main() -> None:
             obj["matched_event_id"] = it.matched_event_id
         if it.notes:
             obj["notes"] = it.notes
+        if it.visual_key:
+            obj["visual_key"] = it.visual_key
 
         out.append(obj)
 

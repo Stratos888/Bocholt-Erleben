@@ -1,8 +1,8 @@
 # === BEGIN BLOCK: BUILD EVENTS FROM TSV (fail-fast + validation) ===
 # Datei: scripts/build-events-from-tsv.py
 # Zweck:
-# - Quelle: data/events.tsv (copy/paste-freundlich)
-# - Output: data/events.json (Single Source of Truth für die App)
+# - Quelle: data/events.tsv (im Deploy aus dem Google Sheet exportiert)
+# - Output: data/events.json (generiertes Deploy-/Runtime-Artefakt, nicht im Repo pflegen)
 # - Fail-Fast: bricht mit Exit 1 ab, wenn Validierung fehlschlägt
 # - Validierung: Pflichtfelder, eindeutige IDs, Duplikate, Datumsformat, Kategorien, Steuerzeichen
 # - Optional: endDate (YYYY-MM-DD) wird übernommen, wenn vorhanden
@@ -23,6 +23,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+from event_visual_motifs import infer_event_visual_motif, normalize_event_visual_motif
 
 ROOT = Path(__file__).resolve().parents[1]
 TSV_PATH = ROOT / "data" / "events.tsv"
@@ -109,6 +112,14 @@ class EventRow:
     kategorie: str
     url: str
     description: str
+    situation_tags: List[str]
+    weather_profile: List[str]
+    audience_tags: List[str]
+    planning_level: str
+    cost_level: str
+    recommendation_weight: str
+    visual_key: str
+    visual_motif: str
 
 
 def fail(msg: str) -> None:
@@ -153,6 +164,45 @@ def normalize_category(raw: str) -> str:
     return r  # wird später gegen Canonical geprüft (fail-fast)
 
 
+# === BEGIN BLOCK: EVENT_RECOMMENDATION_OPTIONAL_FIELDS_V1 | Zweck: optionale Recommendation-Spalten aus dem Events-Sheet additiv in events.json übernehmen; Umfang: Normalisierung ohne neue Pflichtfelder ===
+RECOMMENDATION_LIST_FIELDS = {
+    "situation_tags",
+    "weather_profile",
+    "audience_tags",
+}
+
+RECOMMENDATION_STRING_FIELDS = {
+    "planning_level",
+    "cost_level",
+    "recommendation_weight",
+}
+
+
+def normalize_list_field(raw: str) -> List[str]:
+    value = normalize_text(raw)
+    if not value:
+        return []
+
+    parts = re.split(r"[,;|]", value)
+    out: List[str] = []
+
+    for part in parts:
+        item = normalize_text(part)
+        if item and item not in out:
+            out.append(item)
+
+    return out
+
+
+def optional_text(data: Dict[str, str], key: str) -> str:
+    return normalize_text(data.get(key, ""))
+
+
+def optional_list(data: Dict[str, str], key: str) -> List[str]:
+    return normalize_list_field(data.get(key, ""))
+# === END BLOCK: EVENT_RECOMMENDATION_OPTIONAL_FIELDS_V1 ===
+
+
 def validate_date(iso: str, rowno: int) -> None:
     if not RE_DATE.match(iso):
         fail(f"Zeile {rowno}: date muss YYYY-MM-DD sein, erhalten: {iso!r}")
@@ -190,7 +240,10 @@ def read_tsv(path: Path) -> List[Dict[str, str]]:
             fail("TSV hat keine Headerzeile.")
         rows: List[Dict[str, str]] = []
         for row in reader:
-            rows.append({k: (v if v is not None else "") for k, v in row.items()})
+            normalized = {k: (v if v is not None else "") for k, v in row.items()}
+            if not any(normalize_text(value) for value in normalized.values()):
+                continue
+            rows.append(normalized)
         return rows
 
 
@@ -300,6 +353,20 @@ def main() -> None:
             )
         seen_fingerprints.add(fp)
 
+        visual_key = normalize_event_visual_key(data.get("visual_key", "")) or infer_event_visual_key(
+            title=data["title"],
+            description=data.get("description", ""),
+            category=cat,
+            location=data["location"],
+        )
+        visual_motif = normalize_event_visual_motif(data.get("visual_motif", ""), visual_key) or infer_event_visual_motif(
+            title=data["title"],
+            description=data.get("description", ""),
+            category=cat,
+            location=data["location"],
+            visual_key=visual_key,
+        )
+
         events.append(
             EventRow(
                 id=ev_id,
@@ -312,6 +379,14 @@ def main() -> None:
                 kategorie=cat,
                 url=data.get("url", ""),
                 description=data.get("description", ""),
+                situation_tags=optional_list(data, "situation_tags"),
+                weather_profile=optional_list(data, "weather_profile"),
+                audience_tags=optional_list(data, "audience_tags"),
+                planning_level=optional_text(data, "planning_level"),
+                cost_level=optional_text(data, "cost_level"),
+                recommendation_weight=optional_text(data, "recommendation_weight"),
+                visual_key=visual_key,
+                visual_motif=visual_motif,
             )
         )
 
@@ -339,6 +414,28 @@ def main() -> None:
             item["url"] = e.url
         if e.description:
             item["description"] = e.description
+        if e.visual_key:
+            item["visual_key"] = e.visual_key
+        if e.visual_motif:
+            item["visual_motif"] = e.visual_motif
+
+        recommendation = {}
+        if e.situation_tags:
+            recommendation["situation_tags"] = e.situation_tags
+        if e.weather_profile:
+            recommendation["weather_profile"] = e.weather_profile
+        if e.audience_tags:
+            recommendation["audience_tags"] = e.audience_tags
+        if e.planning_level:
+            recommendation["planning_level"] = e.planning_level
+        if e.cost_level:
+            recommendation["cost_level"] = e.cost_level
+        if e.recommendation_weight:
+            recommendation["recommendation_weight"] = e.recommendation_weight
+
+        if recommendation:
+            item["recommendation"] = recommendation
+
         out.append(item)
 
     OUT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)

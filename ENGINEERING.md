@@ -2,22 +2,81 @@
 
 <!-- === BEGIN CANONICAL ENGINEERING FILE: Hard implementation rules only === -->
 
+<!-- === BEGIN BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 | Zweck: macht die Engineering-Regeln fuer ChatGPT als ausfuehrende KI sofort anwendbar; Umfang: Start-Gates, Mode-Router, Preview-vor-Deploy, Dirty-Tree-Disziplin === -->
+## 0. CHATGPT EXECUTION ROUTER
+
+These rules are optimized for ChatGPT executing project work. Apply this router before any patch, command sequence, commit, or deploy recommendation.
+
+### 0.1 Start gate for every work item
+
+Before starting implementation work:
+
+1. Establish the current baseline:
+   - In Codespaces/repo work: use `git status --short`, current branch and current `HEAD`.
+   - In ZIP-only review work: use the uploaded ZIP as the visible baseline.
+   - If both exist, the user's current Codespaces/repo output overrides an older ZIP.
+2. If the working tree is dirty:
+   - Do not start a new workpack.
+   - First classify the existing changes as:
+     - current work to continue,
+     - unrelated WIP to stash,
+     - changes to commit,
+     - changes to discard.
+3. Choose exactly one primary working mode:
+   - UI/CSS/static JS polish → Mode A.
+   - New route/content hub → Mode B.
+   - Feature/logic/data/backend → Mode C.
+4. Identify owner files before patching.
+5. Prefer one small, sustainable next step over broad patch bundles.
+
+### 0.2 Validation router
+
+Use the cheapest reliable validation environment for the task:
+
+- UI/CSS/static JS visual polish:
+  - Use Codespaces Preview on port `8000` before commit/push whenever the change can be validated locally.
+  - Do not use staging deploy as the first visual feedback loop.
+  - Staging remains useful after commit/push or when service worker/build/runtime behavior must be validated.
+- Backend/PHP/API/DB/Stripe/mail/STRATO/deploy behavior:
+  - Validate with the relevant lint, smoke, API, database or staging checks.
+  - Codespaces static preview is not sufficient.
+- Data/Sheet/Event pipeline work:
+  - Verify the source of truth first.
+  - Do not treat generated repo artifacts as editorial truth.
+- Visual asset quality work:
+  - Use pool/audit/asset contracts first.
+  - Do not permanently fix weak individual images with ad-hoc CSS.
+
+### 0.3 Commit and deploy discipline
+
+For UI polish:
+
+1. Patch locally.
+2. Run syntax/diff checks.
+3. Preview locally via Codespaces when applicable.
+4. Only then commit.
+5. Push/deploy only after local validation or when deploy-specific validation is required.
+
+Never stack a new patch on unrelated uncommitted WIP.
+<!-- === END BLOCK: ENGINEERING_CHATGPT_EXECUTION_ROUTER_V1 === -->
+
 ## 1. SOURCE OF TRUTH
 
-- The uploaded ZIP is the canonical working baseline for each chat.
-- If the user says manual edits were made or a patch was not applied, the current file content becomes the new truth.
+- In Codespaces/repo workflows, the current branch, current `HEAD`, and visible file contents are the canonical working baseline.
+- In ZIP-only analysis workflows, the uploaded ZIP is the canonical visible baseline.
+- If the user provides newer terminal output, file excerpts, screenshots, or confirms manual edits, that newer evidence overrides older ZIP contents.
 - Never patch without visible current code for the affected file(s).
 
 ### Data source rule
 
 - Production/staging event data is hybrid.
 - The public event feed consists of:
-  1. Google Sheet / generated `data/events.json` for editorial, KI-/Sheet- and manually maintained events.
+  1. Google Sheets tab `Events` as the editorial source for KI-/Sheet- and manually maintained events. During deploy, this tab is exported to `data/events.tsv` and transformed into the generated runtime feed `/data/events.json`.
   2. Approved DB submissions from `/api/events/public.php` for organizer submissions after final review approval.
 - Organizer submissions are not written back into the Google Sheet as part of the V1 publishing flow.
-- `data/events.json` and `data/inbox.json` remain deploy artifacts for the sheet-based paths.
-- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale.
-- Treat `data/events.json` as a runtime artifact unless the current deploy output itself is being inspected.
+- `data/events.tsv` and `data/events.json` are generated during deploy and must not be maintained or reviewed as repository source files.
+- `data/events.json` must still exist in the deployed runtime because the frontend, SEO schema and service worker load it.
+- A stale repository/ZIP copy of `data/events.json` is not proof that live/staging event data is stale; the repository copy should not be tracked.
 - Treat `data/search-metrics.json` as a runtime/deploy artifact as well. A local ZIP value such as `not_configured` does not invalidate a live dashboard proof; live measurement state must be judged from the deployed live dashboard/export, not from stale repository artifacts.
 - The Kuratier-Inbox is also hybrid:
   1. Google Sheet / generated Inbox data for KI-/Sheet candidates.
@@ -77,17 +136,19 @@ Preferred input:
 
 Execution loop:
 
-1. define page contract:
+1. Check baseline and dirty working tree first.
+2. Define page contract:
    - Goal
    - Freeze
    - Target State
    - Acceptance Criteria
-2. define only 3 main gaps
-3. deliver 1 consolidated main patch
-4. deliver at most 1 polish patch
-5. freeze the page
+3. Identify owner files and define only 3 main gaps.
+4. Deliver 1 consolidated main patch.
+5. Validate locally with Codespaces Preview on port `8000` before commit/push whenever the change is UI/CSS/static JS and does not require backend/deploy behavior.
+6. Deliver at most 1 polish patch.
+7. Freeze the page.
 
-Do not drift into open-ended visual iteration loops.
+Do not drift into open-ended visual iteration loops. Do not use staging deploy as the first visual feedback loop for changes that can be checked in Codespaces Preview.
 
 ### MODE B — NEW ROUTE / CONTENT HUB
 
@@ -149,16 +210,30 @@ Do not mix feature work with unrelated UI polish in the same workpack.
 
 ## 6. PATCH OUTPUT CONTRACT
 
-Preferred output format:
+Default output format:
 
-- Use a unified Git patch when the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
+- Use a unified Git patch whenever the current ZIP/repo baseline is visible and the change can be applied safely with `git apply`.
 - The user validates first with `git apply --check patch.diff` before applying the patch.
 - The patch must be consolidated, owner-file focused, and free of unrelated edits.
+- After the user has provided the required baseline proof, do not default back to prose-only insertion instructions.
+- Do not provide vague placement instructions such as `append at the end`, `insert after this section`, or `add this block` as the primary patch format when a Git patch is safe.
+- Do not provide long manual copy/paste snippets when a unified Git patch can safely express the same change.
 
 Fallback format:
 
-- Use concrete replace instructions when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
-- Always specify:
+- Use concrete replace instructions only when a Git patch would be unsafe, too ambiguous, or when the affected file has diverged from the visible baseline.
+- The fallback must still be deterministic and copy/paste-safe.
+- Always specify all of the following:
+  - file
+  - exact block to replace, preferably by existing begin/end marker comments
+  - exact BEGIN line or unique BEGIN marker
+  - exact END line or unique END marker
+  - complete replacement block
+- Never split one logical replacement into drifting snippets.
+- Never include nested fenced code blocks inside a copy/paste block.
+- Consolidate overlapping edits into one replacement per file.
+- Do not append drifting snippets.
+- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
 
 Baseline rule for Git patches:
 
@@ -172,17 +247,16 @@ Baseline rule for Git patches:
 - If `git apply --check patch.diff` fails, the patch must not be applied or manually repaired.
 - In that case, re-check the current repository state and create a new patch from the updated baseline.
 
-Concrete replace instructions must:
-  - file
-  - exact BEGIN line
-  - exact END line
-  - replacement block
-- Consolidate overlapping edits into one replacement per file.
-- Do not append drifting snippets.
-- When inserting or replacing code blocks, use clear begin/end marker comments where technically appropriate.
+Assistant response discipline:
+
+- For implementation work, answer with the next concrete action only.
+- When a patch is requested or clearly needed, provide the patch as one terminal-ready Git patch creation block.
+- Do not describe where the user should manually paste code when a safe Git patch is possible.
+- Do not mix patch delivery with broad planning text.
+- If a documentation change is needed, treat documentation files like normal owner files and patch them with the same rules.
+- If the safe patch format is unclear, stop and ask for the missing baseline or affected file content instead of guessing.
 
 ---
-
 ## 7. OWNER-FILE RULE
 
 Patch the owning file first.
@@ -260,6 +334,43 @@ Asset/versioning rules:
 - The deploy workflow replaces existing `?v=...` asset references with the generated `BUILD_ID`.
 - Only touch asset references manually when a new asset is introduced, an asset is renamed, or a script/link tag is missing completely.
 
+
+<!-- === BEGIN BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 | Zweck: technische Regeln fuer nachhaltige Premium-Bildausspielung; Umfang: Event-/Activity-Card-Assets, Statuslogik, Cropping-Grenzen, Audit-Pflicht === -->
+## 11.1 PREMIUM VISUAL ASSET CONTRACT
+
+For event and activity visuals, the default solution is not manual crop guessing. The default solution is a prepared, reviewed card asset.
+
+Rules:
+
+- Card visuals should be prepared as 16:9 WebP assets for card contexts.
+- Preferred visual source hierarchy:
+  1. own/exclusive premium real photo,
+  2. premium real photo explicitly cleared by organizer/rightsholder,
+  3. otherwise legally clean and high-quality photo with documented source, rights basis, license and required credit,
+  4. self-generated symbolic AI premium visual,
+  5. legacy external image only as temporary non-ready source material.
+- If a legally clean premium real photo is not available, the default replacement path is a self-generated symbolic AI premium visual, not manual crop rescue of a weak external image.
+- Raw large source images, arbitrary external images, unclear-license images or unreviewed crops must not be promoted into premium surfaces directly.
+- Visual status values are:
+  - `ready`: approved for premium card use.
+  - `usable`: acceptable in normal lists, but not automatically approved for Today/Home prominence.
+  - `fallback`: approved symbolic fallback when no better specific visual exists.
+  - `needs_review`: not allowed in prominent surfaces.
+  - `blocked`: not allowed.
+- Today/Home and other prominent recommendation surfaces may use only `ready` visuals or deliberately approved `fallback` visuals.
+- If a visual looks weak because of subject, crop, clutter, pipes, signs, harsh shadows, poor resolution, unclear rights or inconsistent style, do not solve it as a permanent CSS/object-position hotfix.
+- Replace with a cleared premium photo, regenerate as symbolic AI premium visual, downgrade or exclude weak visuals instead of masking them with layout code.
+- CSS may define the stable rendering frame, aspect ratio and fallback object-position; CSS must not become the quality-control system for individual images.
+- A future visual-audit view should preview assets in real card contexts before they are marked `ready`.
+
+Implementation guidance:
+
+- Extend existing visual pools or item data only through clear owner files.
+- Keep one shared standard for Today cards and feed cards unless a later proof shows a real context-specific requirement.
+- Prefer generated/prepared card assets over trying to rescue unsuitable source images at runtime.
+- When adding a new visual workpack, include checks for file existence, format, reasonable size, status and visual preview readiness.
+
+<!-- === END BLOCK: ENGINEERING_PREMIUM_VISUAL_ASSET_CONTRACT_2026_06_01 === -->
 
 ## 12. DEPRECATED PROMPT FILES
 
@@ -371,3 +482,80 @@ Für größere UI-, Dashboard- oder Strukturpolish-Arbeiten gilt zusätzlich:
    - Erst nach Screenshot-/Smoke-Proof dokumentieren oder committen.
 
 <!-- END UI_DASHBOARD_PATCH_DISCIPLINE_V1 -->
+
+<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 | Zweck: dokumentiert schnellen lokalen UI-Preview-Workflow in Codespaces; Umfang: statische PWA-Ansichten, nicht Backend-/Deploy-Validierung === -->
+## Codespaces Preview für schnelle UI-Prüfungen
+
+Für schnelle UI-, CSS- und statische JS-Prüfungen kann in Codespaces ein lokaler Preview-Server genutzt werden. Das spart Zwischen-Deploys auf `staging` und ist besonders geeignet für Card-Layouts, Detailpanel, Header, Bottom-Navigation, responsive Verhalten und Bilddarstellung.
+
+Start im Repo-Root:
+
+    python3 -m http.server 8000 --bind 0.0.0.0 > /tmp/bocholt-preview.log 2>&1 &
+    echo $! > /tmp/bocholt-preview.pid
+
+Danach in Codespaces den Port `8000` über den Reiter `Ports` öffnen. Wichtige lokale Prüfrouten:
+
+- `/`
+- `/events/`
+- `/aktivitaeten/`
+- `/ueber/`
+- `/events-veroeffentlichen/`
+
+Bei PWA-/Browser-Cache-Problemen einen Cache-Buster nutzen, z. B. `?preview=ui-check`.
+
+Stoppen:
+
+    kill "$(cat /tmp/bocholt-preview.pid)"
+    rm -f /tmp/bocholt-preview.pid /tmp/bocholt-preview.log
+
+Grenze: Diese Preview ersetzt keine produktionsnahe Prüfung von STRATO, PHP-Endpunkten, Stripe, Webhooks, Mailversand oder Deploy-spezifischem Verhalten. Für solche Themen bleibt `staging` die maßgebliche Validierungsumgebung. Einzelne lokale Console-Warnungen durch Codespaces-/GitHub-Preview-Redirects oder fehlende generierte Datenexporte sind für reine UI-Prüfungen nicht automatisch blockierend.
+<!-- === END BLOCK: ENGINEERING_CODESPACES_PREVIEW_WORKFLOW_V1 === -->
+
+<!-- === BEGIN BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 | Zweck: begrenzt Codespaces-Verbrauch und definiert sicheren Fallback bei ausgeschöpftem Kontingent; Umfang: Machine-Type, parallele Codespaces, Webeditor-/Local-Git-Fallback === -->
+## Codespaces Cost Discipline und Quota-Fallback
+
+Codespaces ist die bevorzugte Ausführungsumgebung für Repo-Patches, lokale Preview, Checks, Commit und Push. Codespaces ist nicht als dauerhafte Denk-, Planungs- oder Parallel-Chat-Umgebung zu behandeln.
+
+### Standardregeln
+
+- Für dieses Projekt ist `2-core` der Standard-Maschinentyp.
+- `4-core` oder größer darf nur genutzt werden, wenn ein konkreter schwerer Arbeitsschritt dies rechtfertigt, z. B. große Bildkonvertierungen, ungewöhnlich langsame Voll-Audits oder ein späterer echter Build-Prozess.
+- Pro Repo soll normalerweise maximal ein aktiver Codespace genutzt werden.
+- Mehrere parallele Chats dürfen nicht gleichzeitig konkurrierende Repo-Patches gegen denselben Branch liefern.
+- Analyse, Planung, ZIP-Review, Bildprompt-Arbeit und längere UI-Bewertung sollen möglichst ohne laufenden Codespace stattfinden.
+- Nach abgeschlossenem Commit/Push oder längerer Pause soll der Codespace gestoppt werden oder durch einen kurzen Idle-Timeout auslaufen.
+
+### Quota-Fallback ohne Codespaces
+
+Wenn das Codespaces-Kontingent ausgeschöpft ist oder Codespaces bewusst nicht genutzt werden soll, darf auf einen reduzierten Fallback-Workflow gewechselt werden.
+
+Zulässige Fallback-Wege:
+
+- GitHub-Webeditor für kleine, klar begrenzte Änderungen.
+- Lokales Git auf dem Nutzer-PC, wenn verfügbar.
+- ZIP-only Analyse durch ChatGPT mit anschließenden manuellen Ersetzungspatches.
+
+Fallback-Einschränkungen:
+
+- Keine großen UI-/CSS-Polish-Patches ohne lokale oder staging-nahe Sichtprüfung.
+- Keine breit gestreuten Multi-Datei-Änderungen ohne aktuelle sichtbare Baseline.
+- Keine unsicheren Snippet-Ergänzungen.
+- Bevorzugt werden konkrete Block-Ersetzungen mit eindeutigem BEGIN-/END-Marker oder vollständige kleine Dateiänderungen.
+- Nach manueller Änderung muss der Nutzer im GitHub-Diff prüfen, ob ausschließlich die beabsichtigten Dateien und Blöcke geändert wurden.
+- Wenn ein sicherer Git-Patch-Check nicht möglich ist, muss der Patch kleiner und deterministischer sein als im normalen Codespaces-Workflow.
+<!-- === END BLOCK: ENGINEERING_CODESPACES_COST_AND_FALLBACK_V1 === -->
+
+## Eventdaten-Quelle: Sheet-first
+
+Redaktionelle Events haben eine feste Quellenhierarchie:
+
+1. Kanonische Bearbeitungsquelle ist das Google Sheet, Tab `Events`.
+2. `data/events.tsv` und `data/events.json` sind erzeugte Artefakte aus dem Deploy-/Export-Prozess.
+3. Ein lokales `data/events.json` im Repo oder Codespace ist nur dann belastbar, wenn es unmittelbar aus dem aktuellen Sheet exportiert bzw. im Deploy neu erzeugt wurde.
+4. `/api/events/public.php` ist eine zusätzliche Quelle für freigegebene DB-/Veranstalter-Events, aber nicht die Quelle für redaktionelle Sheet-Events.
+
+Konsequenz:
+- Bei Fragen wie „welche Events sind aktuell sichtbar?“ oder „welche Event-Visual-Gaps existieren?“ darf nicht blind vom lokalen `data/events.json` ausgegangen werden.
+- Vor datenabhängigen Analysen muss geklärt werden, ob die Analyse auf frischem Sheet-Export, Deploy-Artefakt oder nur lokalem Repo-Snapshot basiert.
+- `data/events.json` ist Website-Feed und Build-Artefakt, nicht redaktionelle Source of Truth.
+

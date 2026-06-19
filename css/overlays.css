@@ -963,147 +963,117 @@ Umfang:
   background: rgba(232,236,224,0.92);
 }
 
-#event-detail-panel .activity-detail__media-badge{
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(244,246,239,0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 0 0 1px rgba(23,39,30,0.08), 0 6px 18px rgba(12,22,17,0.08);
-  color: rgba(38,50,42,0.82);
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-#event-detail-panel .activity-detail__media-attribution{
-  margin: 18px 0 0;
-  border-top: 1px solid rgba(24,40,31,0.09);
-  padding-top: 14px;
-}
-
-#event-detail-panel .activity-detail__media-attribution > summary{
-  list-style: none;
-}
-
-#event-detail-panel .activity-detail__media-attribution > summary::-webkit-details-marker{
-  display: none;
-}
-
-#event-detail-panel .activity-detail__media-attribution-toggle{
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin: 0;
-  padding: 0 18px 0 0;
-  color: rgba(58,72,63,0.78);
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-#event-detail-panel .activity-detail__media-attribution-toggle::after{
-  content: "";
-  position: absolute;
-  right: 2px;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  border-right: 1.5px solid rgba(58,72,63,0.6);
-  border-bottom: 1.5px solid rgba(58,72,63,0.6);
-  transform: translateY(-60%) rotate(45deg);
-  transition: transform 180ms ease;
-}
-
-#event-detail-panel .activity-detail__media-attribution[open] .activity-detail__media-attribution-toggle::after{
-  transform: translateY(-30%) rotate(225deg);
-}
-
-#event-detail-panel .activity-detail__media-attribution-toggle-main{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-#event-detail-panel .activity-detail__media-attribution-icon{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: rgba(60,83,69,0.82);
-  flex: 0 0 auto;
-}
-
-#event-detail-panel .activity-detail__media-attribution-icon-svg{
-  width: 16px;
-  height: 16px;
-  stroke-width: 1.9;
-}
-
-#event-detail-panel .activity-detail__media-attribution-toggle-secondary{
-  color: rgba(96,109,101,0.72);
-  font-size: 0.76rem;
-  font-weight: 650;
-  white-space: nowrap;
-}
-
-#event-detail-panel .activity-detail__media-attribution-panel{
-  margin-top: 10px;
-  padding: 14px;
-  border-radius: 16px;
-  background: rgba(246,247,242,0.82);
-  box-shadow: inset 0 0 0 1px rgba(24,40,31,0.06);
-}
-
-#event-detail-panel .activity-detail__media-attribution-row{
-  display: grid;
-  grid-template-columns: minmax(74px, 92px) minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-
-#event-detail-panel .activity-detail__media-attribution-row + .activity-detail__media-attribution-row{
-  margin-top: 10px;
-}
-
-#event-detail-panel .activity-detail__media-attribution-key{
-  color: rgba(90,103,95,0.86);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-#event-detail-panel .activity-detail__media-attribution-value{
-  min-width: 0;
-  color: rgba(42,55,47,0.84);
-  font-size: 0.8rem;
-  line-height: 1.45;
-}
-
-#event-detail-panel .activity-detail__media-attribution-link{
-  color: rgba(38,86,62,0.9);
-  font-weight: 700;
+/* === BEGIN BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V4 | Zweck: fuehrt Bildnachweis und Eventquelle im Detailpanel als einheitliche Quellenzeilen und entschaerft den Desktop-Card-Nachweiszugang weiter; Umfang: Detailpanel-Zeilen, Desktop-Card-Link, Detailbild-Badge-Ausblendung === */
+#event-detail-panel .image-attribution--detail{
+  color: var(--cmp-link-color);
   text-decoration: none;
 }
 
-#event-detail-panel .activity-detail__media-attribution-link:hover,
-#event-detail-panel .activity-detail__media-attribution-link:focus-visible{
-  text-decoration: underline;
+#event-detail-panel .detail-links--trust .image-attribution--detail{
+  margin: 0;
+  border: 0;
 }
-/* === END BLOCK: ACTIVITIES_DETAIL_MEDIA_ATTRIBUTION_ENTERPRISE_UI_V1 === */
+
+#event-detail-panel .image-attribution__label{
+  white-space: nowrap;
+}
+
+#event-detail-panel .image-attribution__compact-text{
+  color: var(--cmp-link-color);
+}
+
+#event-detail-panel .image-attribution__chevron{
+  color: var(--cmp-link-color-muted);
+}
+
+#event-detail-panel .image-attribution__chevron-svg{
+  width: 100%;
+  height: 100%;
+  stroke-width: var(--ui-icon-stroke-sm);
+}
+
+.event-card-media,
+.today-card__media,
+#event-detail-panel .event-detail-media{
+  position: relative;
+}
+
+.image-credit-access{
+  display: none;
+}
+
+#event-detail-panel .activity-detail__media-badge,
+#event-detail-panel .event-detail-media__badge{
+  display: none;
+}
+
+@media (min-width: 900px){
+  .image-credit-access--desktop{
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(28,43,33,0.06);
+    border-radius: 999px;
+    background: rgba(255,255,250,0.46);
+    color: rgba(35,57,43,0.40);
+    box-shadow: 0 3px 9px rgba(14,24,18,0.05), 0 1px 0 rgba(255,255,255,0.62) inset;
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+    text-decoration: none;
+    opacity: 0.58;
+    transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease, color 160ms ease;
+  }
+
+  .image-credit-access__icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 13px;
+    height: 13px;
+    line-height: 1;
+  }
+
+  .image-credit-access__icon-svg{
+    width: 13px;
+    height: 13px;
+    stroke-width: 1.75;
+  }
+
+  .image-credit-access__label{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .image-credit-access--desktop:hover,
+  .image-credit-access--desktop:focus-visible{
+    opacity: 0.96;
+    transform: translateY(-1px);
+    background: rgba(255,255,250,0.86);
+    color: rgba(35,80,56,0.82);
+  }
+
+  .image-credit-access--desktop:focus-visible{
+    outline: 2px solid color-mix(in srgb, var(--color-primary) 55%, white);
+    outline-offset: 3px;
+  }
+}
+
+@media (max-width: 520px){
+  #event-detail-panel .image-attribution--detail{
+    font-size: 0.84rem;
+  }
+}
+/* === END BLOCK: DETAIL_IMAGE_ATTRIBUTION_SYSTEM_UI_V4 === */
 
 #event-detail-panel .activity-detail__media--fallback{
   display: grid;
@@ -1326,6 +1296,31 @@ Umfang:
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
 }
 
+#event-detail-panel .activity-detail__opening-status{
+  gap: 7px;
+}
+
+#event-detail-panel .activity-detail__opening-details{
+  margin-top: 2px;
+}
+
+#event-detail-panel .activity-detail__opening-summary{
+  cursor: pointer;
+  width: fit-content;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 760;
+  color: rgba(31,41,51,0.62);
+}
+
+#event-detail-panel .activity-detail__opening-note{
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.48;
+  font-weight: 560;
+  color: rgba(31,41,51,0.68);
+}
+
 @media (max-width: 479px){
   #event-detail-panel .activity-detail__meta-list{
     display: grid;
@@ -1337,77 +1332,6 @@ Umfang:
   }
 }
 /* === END BLOCK: ACTIVITIES_DETAIL_FACTS_EDITORIAL_V3 === */
-
-/* === BEGIN BLOCK: ACTIVITIES_DETAIL_ACTIONS_ENTERPRISE_V1 | Zweck: macht die CTA-Zeile linksgeführt, ikonisch konsistent und klar priorisiert; Umfang: ersetzt nur den Action-Block im Activity-Detailpanel === */
-#event-detail-panel .activity-detail__actions{
-  display: grid;
-  gap: 10px;
-  padding: 6px 0 2px;
-}
-
-#event-detail-panel .activity-detail__action{
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  justify-content: start;
-  gap: 10px;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(23,39,30,0.10);
-  background: rgba(247,248,243,0.96);
-  color: rgba(23,39,30,0.88);
-  text-decoration: none;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 760;
-  line-height: 1.28;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.78),
-    0 8px 18px rgba(14,20,17,0.05);
-}
-
-#event-detail-panel .activity-detail__action--secondary{
-  background: rgba(255,255,255,0.76);
-}
-
-#event-detail-panel .activity-detail__action-icon{
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(23,39,30,0.74);
-}
-
-#event-detail-panel .activity-detail__action-icon > .activity-detail__action-icon-svg{
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-#event-detail-panel .activity-detail__action-label{
-  min-width: 0;
-}
-
-#event-detail-panel .activity-detail__action:focus-visible{
-  outline: 2px solid var(--cmp-focus-ring-neutral);
-  outline-offset: var(--cmp-focus-outline-offset);
-}
-/* === END BLOCK: ACTIVITIES_DETAIL_ACTIONS_ENTERPRISE_V1 === */
-
-@media (max-width: 389px){
-  #event-detail-panel .activity-detail__facts-grid{
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-  #event-detail-panel .activity-detail__fact-row--wide{
-    grid-column: auto;
-  }
-}
 
 @media (max-width: 899px){
   #event-detail-panel .activity-detail__media{
@@ -1526,16 +1450,55 @@ Umfang:
 /* === END BLOCK: DS-02_DETAIL_LINK_CLUSTER_MAPPING === */
 
 
+/* === BEGIN BLOCK: EVENT_DETAIL_READY_VISUAL_MEDIA_V1 | Zweck: zeigt das von der Event-Card aufgeloeste Ready-Visual als ruhiges 16:9-Media im Event-Detailpanel; Umfang: nur Event-Detailpanel-Media, keine Activity-Media-Klassen === */
+#event-detail-panel .event-detail-media{
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 var(--space-md);
+  overflow: hidden;
+
+  border: 1px solid var(--cmp-divider-strong);
+  border-radius: calc(var(--dp-sheet-radius) - 8px);
+  background: var(--color-surface-muted, #f3f5f0);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
+}
+
+#event-detail-panel .event-detail-media__img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+@media (min-width: 760px){
+  #event-detail-panel .event-detail-media{
+    margin-bottom: var(--space-lg);
+  }
+}
+@media (max-width: 479px){
+  #event-detail-panel .event-detail-media{
+    aspect-ratio: 16 / 8.4;
+    margin-bottom: 14px;
+    border-radius: 18px;
+  }
+}
+
+/* === END BLOCK: EVENT_DETAIL_READY_VISUAL_MEDIA_V1 === */
+
+
 /* === BEGIN BLOCK: DS-02_DETAIL_HEADER_META_CLUSTER_MAPPING | Purpose: align detail meta rows to the same left gutter/grid as the rest of the detail panel without redesign | Scope: detail header, title row, category icon, title, meta rows, hover/active/focus, datetime/location variants === */
 #event-detail-panel .detail-header{
   position: relative;
 
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 
-  padding: 0 0 var(--space-md);
-  margin: 0 0 var(--space-md);
+  padding: 0 0 14px;
+  margin: 0 0 14px;
 
   border-bottom: 1px solid var(--cmp-divider-strong);
 }
@@ -1545,8 +1508,8 @@ Umfang:
   --dp-meta-icon-col: var(--dp-indicator-size);
 
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
 
   width: 100%;
   min-width: 0;
@@ -1562,6 +1525,7 @@ Umfang:
   width: var(--dp-indicator-size);
   height: var(--dp-indicator-size);
   flex: 0 0 var(--dp-indicator-size);
+  margin-top: 2px;
 
   display: inline-flex;
   align-items: center;
@@ -1593,6 +1557,16 @@ Umfang:
   filter: none;
 }
 
+/* === BEGIN BLOCK: EVENT_DETAIL_TITLE_PRIORITY_V1 | Zweck: gibt dem Event-Detailtitel volle Breite, da das Kategorieicon im Detailpanel keinen ausreichenden Entscheidungswert hat; Umfang: nur Event-Detail, Activity nutzt eigene Kategorie-Pill-Klassen === */
+#event-detail-panel .detail-title-row{
+  gap: 0;
+}
+
+#event-detail-panel .detail-category-icon{
+  display: none;
+}
+/* === END BLOCK: EVENT_DETAIL_TITLE_PRIORITY_V1 === */
+
 #event-detail-panel .detail-title{
   margin: 0;
   min-width: 0;
@@ -1603,10 +1577,8 @@ Umfang:
   color: rgba(31,41,51,0.92);
   line-height: 1.18;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
 
   overflow-wrap: break-word;
   word-break: normal;
@@ -1617,7 +1589,7 @@ Umfang:
 
 #event-detail-panel .detail-meta-rows{
   display: grid;
-  gap: 8px;
+  gap: 6px;
 
   min-width: 0;
   margin: 0;
@@ -1632,7 +1604,7 @@ Umfang:
   align-items: center;
   column-gap: 10px;
 
-  padding: 10px 0;
+  padding: 8px 0;
   border-radius: var(--ui-radius-sm);
 
   color: var(--cmp-link-color-muted);
@@ -1848,11 +1820,11 @@ Umfang:
 
 /* === BEGIN BLOCK: DS-02_DETAIL_DESCRIPTION_CLUSTER_MAPPING | Purpose: consolidate description/divider/action spacing to DS-02 content rhythm without redesign | Scope: description, divider, detail-links top spacing, actions spacing === */
 #event-detail-panel .detail-description{
-  margin: 12px 0 0;
-  padding: 0;
+  margin: 10px 0 0;
+  padding: 0 0 8px;
 
   font-size: 14px;
-  line-height: 1.62;
+  line-height: 1.58;
   font-weight: 430;
   letter-spacing: -0.005em;
 
@@ -2318,6 +2290,12 @@ Umfang:
 }
 
 #detail-actionbar-slot .detail-actionbar-btn svg{
+  width: 20px;
+  height: 20px;
+  opacity: 0.92;
+}
+
+#detail-actionbar-slot .detail-actionbar-btn .activity-detail__actionbar-icon-svg{
   width: 20px;
   height: 20px;
   opacity: 0.92;
@@ -3088,11 +3066,23 @@ body.is-feedback-open{
   line-height: 1.45;
 }
 
+/* === BEGIN BLOCK: FEEDBACK_INLINE_LINK_PREMIUM_V1 | Zweck: ersetzt die unterstrichenen Feedback-Modal-Textlinks durch denselben leisen Inline-Link-Look wie im restlichen Projekt === */
 .feedback-form__privacy a{
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
+  color: var(--cmp-inline-link-color);
+  font-weight: 680;
+  text-decoration: none;
+  border-radius: 0.24em;
+  box-shadow: inset 0 -0.08em 0 var(--cmp-inline-link-rule);
 }
+
+@media (hover: hover){
+  .feedback-form__privacy a:hover{
+    color: var(--cmp-inline-link-color-hover);
+    background: var(--cmp-inline-link-bg-hover);
+    box-shadow: inset 0 -0.22em 0 var(--cmp-inline-link-rule-hover);
+  }
+}
+/* === END BLOCK: FEEDBACK_INLINE_LINK_PREMIUM_V1 === */
 
 /* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren modal-internen Success-State mit Lucide-Erfolgsicon, ruhiger Positivfläche und reduzierter Nach-Aktion-Komplexität; Umfang: ersetzt Status-/Action-Bereich des Feedback-Formulars in css/overlays.css === */
 .feedback-form__status{
@@ -3168,7 +3158,17 @@ body.is-feedback-open{
 
 .feedback-form__status.is-error a{
   color: inherit;
-  text-decoration: underline;
+  font-weight: 760;
+  text-decoration: none;
+  border-radius: 0.24em;
+  box-shadow: inset 0 -0.08em 0 currentColor;
+}
+
+@media (hover: hover){
+  .feedback-form__status.is-error a:hover{
+    background: rgba(141,31,31,0.08);
+    box-shadow: inset 0 -0.22em 0 rgba(141,31,31,0.34);
+  }
 }
 
 .feedback-form__status.is-neutral{
@@ -3365,3 +3365,70 @@ body.is-feedback-open{
 /* === END BLOCK: FEEDBACK_WIDGET_SYSTEM_V1 === */
 
 /* === END BLOCK: LEGACY_FINAL_CONSOLIDATION_TO_OVERLAYS === */
+
+/* === BEGIN BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V2 | Zweck: macht den Desktop-Bildnachweiszugang auf Cards deutlich leiser, ohne Hover/Fokus und mobile Ausblendung zu verlieren; Umfang: nur .image-credit-access--desktop ab 761px === */
+@media (min-width: 761px){
+  .image-credit-access--desktop,
+  .image-credit-access--desktop:visited{
+    width: 26px;
+    height: 26px;
+    color: rgba(31, 41, 51, 0.58);
+    background: rgba(255, 255, 255, 0.46);
+    border: 1px solid rgba(31, 41, 51, 0.10);
+    box-shadow: 0 3px 9px rgba(31, 41, 51, 0.060);
+    opacity: 0.48;
+    transform: none;
+    backdrop-filter: blur(8px) saturate(1.01);
+    -webkit-backdrop-filter: blur(8px) saturate(1.01);
+  }
+
+  .image-credit-access--desktop .image-credit-access__icon,
+  .image-credit-access--desktop .image-credit-access__icon-svg,
+  .image-credit-access--desktop svg{
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+    stroke: currentColor;
+  }
+
+  .image-credit-access--desktop svg [stroke],
+  .image-credit-access--desktop svg path,
+  .image-credit-access--desktop svg circle,
+  .image-credit-access--desktop svg rect,
+  .image-credit-access--desktop svg line,
+  .image-credit-access--desktop svg polyline,
+  .image-credit-access--desktop svg polygon{
+    stroke: currentColor;
+  }
+
+  .image-credit-access--desktop:hover,
+  .image-credit-access--desktop:focus-visible{
+    color: rgba(31, 41, 51, 0.82);
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(31, 41, 51, 0.20);
+    box-shadow: 0 6px 16px rgba(31, 41, 51, 0.13);
+    opacity: 0.88;
+    transform: none;
+  }
+
+  .image-credit-access--desktop:active{
+    color: rgba(31, 41, 51, 0.78);
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(31, 41, 51, 0.18);
+    box-shadow: 0 4px 12px rgba(31, 41, 51, 0.10);
+    opacity: 0.84;
+    transform: none;
+  }
+
+  .image-credit-access--desktop:focus-visible{
+    outline: 2px solid rgba(31, 41, 51, 0.34);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 760px){
+  .image-credit-access--desktop{
+    display: none !important;
+  }
+}
+/* === END BLOCK: DESKTOP_IMAGE_CREDIT_ACCESS_MONOCHROME_POLISH_V2 === */

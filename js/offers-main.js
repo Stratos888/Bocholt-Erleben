@@ -89,6 +89,21 @@ const OffersApp = {
       }
 
       const data = await response.json();
+
+      try {
+        const visualPoolResponse = await fetch("/data/activity_visual_pool.json", { cache: "no-store" });
+        if (visualPoolResponse.ok) {
+          const visualPoolData = await visualPoolResponse.json();
+          if (typeof window.OfferVisuals?.setActivityVisualPool === "function") {
+            window.OfferVisuals.setActivityVisualPool(visualPoolData);
+          }
+        } else {
+          console.warn(`activity_visual_pool.json load failed: ${visualPoolResponse.status} ${visualPoolResponse.statusText}`);
+        }
+      } catch (visualPoolError) {
+        console.warn("Activity visual pool unavailable; falling back to offer.image.", visualPoolError);
+      }
+
       const rawOffers = Array.isArray(data) ? data : (Array.isArray(data?.offers) ? data.offers : []);
 
       this.offers = rawOffers
@@ -274,13 +289,21 @@ const OffersApp = {
       image_author: String(obj.image_author || "").trim(),
       image_license: String(obj.image_license || "").trim(),
       image_credit: String(obj.image_credit || "").trim(),
+      image_source_type: String(obj.image_source_type || "").trim(),
       visual_key: String(obj.visual_key || obj.image_visual_key || "").trim(),
       image_is_symbolic: this.normalizeBoolean(obj.image_is_symbolic),
+      image_is_ai_generated: this.normalizeBoolean(obj.image_is_ai_generated),
       image_note: String(obj.image_note || "").trim(),
       duration: String(obj.duration || "").trim(),
       mode: String(obj.mode || "").trim(),
       price: String(obj.price || "").trim(),
       season: String(obj.season || "").trim(),
+      opening_status: obj.opening_status && typeof obj.opening_status === "object"
+        ? obj.opening_status
+        : null,
+      opening_hours: obj.opening_hours && typeof obj.opening_hours === "object"
+        ? obj.opening_hours
+        : null,
       ...(reportingTarget.type && reportingTarget.id && reportingTarget.title
         ? { reporting_target: reportingTarget }
         : {}),

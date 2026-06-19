@@ -213,12 +213,309 @@ const EventCards = (() => {
   }
   /* === END BLOCK: HTML_ESCAPE (pure helper) === */
 
+  /* === BEGIN BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 | Zweck: normalisiert ready Event-Visuals fuer den normalen /events/ Feed; Umfang: lokaler Pool-State, stabile Auswahl, kein usable/planned Rendering === */
+  let readyVisualPools = Object.freeze(Object.create(null));
+
+  function normalizeLookupKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  function normalizeLocalAssetUrl(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+
+    try {
+      const url = new URL(raw, window.location.href);
+      if (url.origin !== window.location.origin) return "";
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function stableHash(value) {
+    const textValue = String(value || "");
+    let hash = 2166136261;
+
+    for (let index = 0; index < textValue.length; index += 1) {
+      hash ^= textValue.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    return hash >>> 0;
+  }
+
+  function buildReadyVisualPools(payload) {
+    const pools = payload && typeof payload === "object" ? payload.pools : null;
+    const out = Object.create(null);
+
+    if (!pools || typeof pools !== "object") {
+      return Object.freeze(out);
+    }
+
+    Object.entries(pools).forEach(([visualKey, pool]) => {
+      const key = normalizeLookupKey(visualKey);
+      const images = Array.isArray(pool?.images) ? pool.images : [];
+
+      const readyImages = images
+        .filter((image) => image && String(image.status || "").trim() === "ready")
+        .map((image) => {
+          const src = normalizeLocalAssetUrl(image.src);
+          if (!src) return null;
+
+          return Object.freeze({
+            id: String(image.id || "").trim(),
+            src,
+            alt: String(image.alt || "").trim(),
+            status: String(image.status || "").trim(),
+            source: String(image.source || "").trim(),
+            sourceType: String(image.source_type || image.sourceType || "").trim(),
+            rightsStatus: String(image.rights_status || image.rightsStatus || "").trim(),
+            reviewStatus: String(image.review_status || image.reviewStatus || "").trim(),
+            author: String(image.author || "").trim(),
+            license: String(image.license || "").trim(),
+            licenseUrl: String(image.license_url || image.licenseUrl || "").trim(),
+            sourceTitle: String(image.source_title || image.sourceTitle || "").trim(),
+            sourcePage: String(image.source_page || image.sourcePage || image.source_url || image.sourceUrl || "").trim(),
+            downloadUrl: String(image.download_url || image.downloadUrl || "").trim(),
+            credit: String(image.credit || image.attribution || "").trim(),
+            modifications: String(image.modifications || "").trim(),
+            isSymbolic: Boolean(image.is_symbolic || image.isSymbolic),
+            isDocumentary: Boolean(image.is_documentary || image.isDocumentary),
+            publicNote: String(image.public_note || image.publicNote || "").trim(),
+            note: String(image.note || "").trim(),
+            visualMotif: normalizeLookupKey(image.visual_motif || image.visualMotif || ""),
+            visualMotifRole: normalizeLookupKey(image.visual_motif_role || image.visualMotifRole || "")
+          });
+        })
+        .filter(Boolean);
+
+      if (key && readyImages.length) {
+        out[key] = Object.freeze(readyImages);
+      }
+    });
+
+    return Object.freeze(out);
+  }
+
+  function setVisualPools(payload) {
+    readyVisualPools = buildReadyVisualPools(payload);
+  }
+
+  const EVENT_VISUAL_FALLBACK_MOTIFS = new Set([
+    "book_market",
+    "classic_car_meet",
+    "country_fair_rural",
+    "cycling_event",
+    "dance_workshop",
+    "default_city",
+    "evening_social_party",
+    "film_screening",
+    "kirmes_funfair",
+    "neutral_active_tour",
+    "neutral_art_exhibition",
+    "neutral_city_festival",
+    "neutral_classical_concert",
+    "neutral_comedy_stage",
+    "neutral_creative_workshop",
+    "neutral_family_play_outdoor",
+    "neutral_food_festival",
+    "neutral_guided_city_tour",
+    "neutral_indoor_sport",
+    "neutral_info_fair",
+    "neutral_kids_stage",
+    "neutral_learning_workshop",
+    "neutral_live_stage",
+    "neutral_local_history",
+    "neutral_market_stalls",
+    "neutral_nature_learning",
+    "neutral_open_air",
+    "neutral_parade",
+    "neutral_reading_talk",
+    "neutral_textile_machines",
+    "neutral_theater_stage",
+    "running_event",
+    "shooting_festival_tradition",
+    "textile_exhibition_design"
+  ]);
+
+  function getEventVisualKey(event) {
+    return normalizeLookupKey(event?.visual_key || event?.image_visual_key || event?.visualKey || "");
+  }
+
+  function getEventVisualMotif(event) {
+    return normalizeLookupKey(event?.visual_motif || event?.image_visual_motif || event?.visualMotif || "");
+  }
+
+  function isFallbackVisualCandidate(visual) {
+    const motif = normalizeLookupKey(visual?.visualMotif || visual?.visual_motif || "");
+    if (!motif) return true;
+
+    const role = normalizeLookupKey(visual?.visualMotifRole || visual?.visual_motif_role || "");
+    return role === "fallback" || EVENT_VISUAL_FALLBACK_MOTIFS.has(motif);
+  }
+
+  function resolveEventVisualCandidatePool(pool, visualMotif) {
+    if (!Array.isArray(pool) || !pool.length) return [];
+
+    const motif = normalizeLookupKey(visualMotif);
+    if (motif) {
+      const exact = pool.filter((candidate) => normalizeLookupKey(candidate?.visualMotif) === motif);
+      if (exact.length) return exact;
+    }
+
+    const neutral = pool.filter(isFallbackVisualCandidate);
+    return neutral.length ? neutral : pool;
+  }
+
+  const EVENT_CARD_RECENT_VISUAL_WINDOW = 5;
+
+  function getVisualUsageKey(visual) {
+    const id = String(visual?.id || "").trim();
+    return id || String(visual?.src || "").trim();
+  }
+
+  function getVisualKeyUsageSet(visualUsage, visualKey) {
+    if (!visualUsage || !visualKey) {
+      return new Set();
+    }
+
+    if (!(visualUsage[visualKey] instanceof Set)) {
+      visualUsage[visualKey] = new Set();
+    }
+
+    return visualUsage[visualKey];
+  }
+
+  function getRecentVisualUsageKeys(visualUsage) {
+    if (!visualUsage) {
+      return [];
+    }
+
+    if (!Array.isArray(visualUsage.__recentVisuals)) {
+      visualUsage.__recentVisuals = [];
+    }
+
+    return visualUsage.__recentVisuals;
+  }
+
+  function wasVisualRecentlyUsed(visualUsage, visual) {
+    const usageKey = getVisualUsageKey(visual);
+    if (!usageKey) return false;
+
+    return getRecentVisualUsageKeys(visualUsage).includes(usageKey);
+  }
+
+  function markVisualUsage(visualUsage, visualKey, visual) {
+    if (!visualUsage || !visualKey || !visual) return;
+
+    const usageKey = getVisualUsageKey(visual);
+    if (!usageKey) return;
+
+    getVisualKeyUsageSet(visualUsage, visualKey).add(usageKey);
+
+    const recentVisuals = getRecentVisualUsageKeys(visualUsage);
+    recentVisuals.push(usageKey);
+
+    while (recentVisuals.length > EVENT_CARD_RECENT_VISUAL_WINDOW) {
+      recentVisuals.shift();
+    }
+  }
+
+  function pickEventVisualCandidate(pool, startIndex, predicate) {
+    for (let offset = 0; offset < pool.length; offset += 1) {
+      const candidate = pool[(startIndex + offset) % pool.length];
+      if (!candidate?.src) continue;
+
+      if (predicate(candidate)) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  function resolveEventVisual(event, visualUsage = null) {
+    const visualKey = getEventVisualKey(event);
+    const visualMotif = getEventVisualMotif(event);
+    const pool = visualKey ? readyVisualPools[visualKey] : null;
+    const candidatePool = resolveEventVisualCandidatePool(pool, visualMotif);
+
+    if (!Array.isArray(candidatePool) || candidatePool.length === 0) {
+      return null;
+    }
+
+    const usageScope = visualMotif ? `${visualKey}:${visualMotif}` : visualKey;
+    const seed = [
+      event?.id,
+      event?.date || event?.datum,
+      event?.endDate,
+      event?.title || event?.eventName,
+      visualKey,
+      visualMotif
+    ]
+      .map((part) => String(part || "").trim())
+      .join("|");
+
+    const startIndex = stableHash(seed) % candidatePool.length;
+    const fallback = candidatePool[startIndex];
+
+    if (!visualUsage || candidatePool.length <= 1) {
+      if (!fallback?.src) return null;
+      markVisualUsage(visualUsage, usageScope, fallback);
+      return fallback;
+    }
+
+    const usedForKey = getVisualKeyUsageSet(visualUsage, usageScope);
+
+    const unusedAndNotRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
+      const usageKey = getVisualUsageKey(candidate);
+      return usageKey && !usedForKey.has(usageKey) && !wasVisualRecentlyUsed(visualUsage, candidate);
+    });
+
+    if (unusedAndNotRecent) {
+      markVisualUsage(visualUsage, usageScope, unusedAndNotRecent);
+      return unusedAndNotRecent;
+    }
+
+    const notRecent = pickEventVisualCandidate(candidatePool, startIndex, (candidate) =>
+      !wasVisualRecentlyUsed(visualUsage, candidate)
+    );
+
+    if (notRecent) {
+      markVisualUsage(visualUsage, usageScope, notRecent);
+      return notRecent;
+    }
+
+    const unusedForKey = pickEventVisualCandidate(candidatePool, startIndex, (candidate) => {
+      const usageKey = getVisualUsageKey(candidate);
+      return usageKey && !usedForKey.has(usageKey);
+    });
+
+    if (unusedForKey) {
+      markVisualUsage(visualUsage, usageScope, unusedForKey);
+      return unusedForKey;
+    }
+
+    if (!fallback?.src) return null;
+    markVisualUsage(visualUsage, usageScope, fallback);
+    return fallback;
+  }
+
+  /* === END BLOCK: EVENT_CARD_READY_VISUAL_POOL_V1 === */
+
   function ensureContainer() {
     if (!container) container = document.getElementById("event-cards");
     return container;
   }
 
-function createCard(event) {
+function createCard(event, visualUsage = null) {
   const card = document.createElement("div");
   card.className = "event-card";
   card.tabIndex = 0;
@@ -331,6 +628,11 @@ function createCard(event) {
     return "Bocholt";
   };
   const city = resolveCity(event);
+  const cardVisual = resolveEventVisual(event, visualUsage);
+
+  if (cardVisual) {
+    card.classList.add("event-card--with-media");
+  }
 
   let dateLabel = "";
 
@@ -552,6 +854,43 @@ function createCard(event) {
   if (actions.childNodes.length) body.appendChild(actions);
 
   card.appendChild(badge);
+
+  if (cardVisual) {
+    const media = document.createElement("figure");
+    media.className = "event-card-media";
+
+    const image = document.createElement("img");
+    image.className = "event-card-media__img";
+    image.src = cardVisual.src;
+    image.alt = cardVisual.alt || "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.width = 1200;
+    image.height = 675;
+
+    media.appendChild(image);
+
+    if (window.ImageAttribution?.renderCreditAccessLink) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = window.ImageAttribution.renderCreditAccessLink(cardVisual, {
+        entityType: "event",
+        entityId: String(event?.id || "").trim(),
+        entityTitle: titleText,
+        imageId: String(cardVisual.id || "").trim(),
+        label: "Bildnachweis"
+      });
+      const creditLink = wrapper.firstElementChild;
+      if (creditLink) {
+        creditLink.addEventListener("click", (clickEvent) => {
+          clickEvent.stopPropagation();
+        });
+        media.appendChild(creditLink);
+      }
+    }
+
+    card.appendChild(media);
+  }
+
   card.appendChild(body);
 
   /* === BEGIN BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 | Purpose: behebt den Syntaxfehler in openCard und erhält das gewünschte Verhalten bei Event-Cards: Desktop öffnet extern, Mobile nutzt das Detailpanel | Scope: ersetzt nur openCard innerhalb createCard === */
@@ -569,7 +908,10 @@ function createCard(event) {
     }
 
     if (window.DetailPanel?.show) {
-      window.DetailPanel.show(event);
+      window.DetailPanel.show({
+        ...event,
+        resolvedVisual: cardVisual
+      });
       return;
     }
 
@@ -580,10 +922,16 @@ function createCard(event) {
   /* === END BLOCK: DESKTOP_NO_DETAILPANEL_FALLBACK_V3 === */
 
   card.addEventListener("click", (e) => {
+    if (e.target.closest("[data-image-credit-access]")) {
+      e.stopPropagation();
+      return;
+    }
+
     openCard(e);
   });
 
   card.addEventListener("keydown", (e) => {
+    if (e.target.closest("[data-image-credit-access]")) return;
     if (e.key !== "Enter" && e.key !== " ") return;
     openCard(e);
   });
@@ -629,6 +977,7 @@ function renderList(list) {
     return;
   }
 
+  const visualUsage = Object.create(null);
 /* === BEGIN BLOCK: FEED_PUBLISH_ENTRY_LUCIDE_CHEVRON_V1 | Zweck: ersetzt den textbasierten Chevron im mobilen Veranstalter-Entry durch ein globales Lucide-SVG; Umfang: ersetzt nur createFeedPublishEntry() === */
 const createFeedPublishEntry = () => {
   const link = document.createElement("a");
@@ -684,7 +1033,7 @@ const createFeedPublishEntry = () => {
 
     section.appendChild(createSectionHeader(selectedLabel));
     for (const ev of list) {
-      grid.appendChild(createCard(ev));
+      grid.appendChild(createCard(ev, visualUsage));
     }
     section.appendChild(grid);
 
@@ -832,7 +1181,7 @@ const createFeedPublishEntry = () => {
     section.appendChild(createSectionHeader(bucketLabel[key] || key));
 
     for (const ev of buckets[key]) {
-      grid.appendChild(createCard(ev));
+      grid.appendChild(createCard(ev, visualUsage));
     }
 
     section.appendChild(grid);
@@ -933,7 +1282,7 @@ Umfang: Fügt renderSkeleton(count) hinzu (Rendering-only).
     render(events);
   }
 
-  return { render, refresh, renderSkeleton };
+  return { render, refresh, renderSkeleton, setVisualPools };
 })();
 /* === END BLOCK: EVENT_CARDS MODULE (render-only, no implicit this) === */
 // END: EVENT_CARDS

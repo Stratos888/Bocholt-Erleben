@@ -1,0 +1,9 @@
+# === BEGIN BLOCK: GENERATED_EVENT_FEED_ARTIFACTS_V1 | Zweck: verhindert, dass aus Google Sheet generierte Event-Artefakte als Repo-Quelle verwechselt werden ===
+data/events.tsv
+data/events.json
+# === END BLOCK: GENERATED_EVENT_FEED_ARTIFACTS_V1 ===
+
+# === BEGIN BLOCK: PYTHON_CACHE_IGNORE_V1 | Zweck: ignoriert lokalen Python-Testcache aus py_compile und Skriptlaeufen ===
+__pycache__/
+*.py[cod]
+# === END BLOCK: PYTHON_CACHE_IGNORE_V1 ===

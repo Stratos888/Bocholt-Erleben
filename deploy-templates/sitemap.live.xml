@@ -5,7 +5,10 @@
     <loc>https://bocholt-erleben.de/</loc>
   </url>
   <url>
-    <loc>https://bocholt-erleben.de/angebote/</loc>
+    <loc>https://bocholt-erleben.de/events/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/aktivitaeten/</loc>
   </url>
   <url>
     <loc>https://bocholt-erleben.de/angebote/sichtbar-werden/</loc>
@@ -27,6 +30,9 @@
   </url>
   <url>
     <loc>https://bocholt-erleben.de/ueber/</loc>
+  </url>
+  <url>
+    <loc>https://bocholt-erleben.de/bildnachweise/</loc>
   </url>
   <url>
     <loc>https://bocholt-erleben.de/impressum/</loc>

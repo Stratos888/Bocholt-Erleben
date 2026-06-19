@@ -27,6 +27,8 @@ from typing import Dict, List, Tuple
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
+from event_visual_keys import infer_event_visual_key, normalize_event_visual_key
+
 
 # === BEGIN BLOCK: SHEET TAB CONFIG (ENV override, test-safe) ===
 # Datei: scripts/inbox-to-events.py
@@ -273,6 +275,13 @@ def main() -> None:
     if "title" not in inbox_header or "date" not in inbox_header:
         fail("Inbox: Spalten 'title' und/oder 'date' fehlen.")
 
+    # === BEGIN BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_COLUMN_CONTRACT_V1 | Zweck: verhindert stillen Verlust redaktionell geänderter Event-Bildzuordnungen; Umfang: erzwingt visual_key in Inbox- und Events-Tab vor Import ===
+    if "visual_key" not in inbox_header:
+        fail("Inbox: Spalte 'visual_key' fehlt. KI-Bildzuordnung muss vor Review sichtbar und redaktionell änderbar sein.")
+    if "visual_key" not in events_header:
+        fail("Events: Spalte 'visual_key' fehlt. Geänderte Inbox-Bildzuordnungen würden sonst beim Übernehmen verloren gehen.")
+    # === END BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_COLUMN_CONTRACT_V1 ===
+
     existing_ids = build_existing_ids(events_rows)
     existing_fp_to_id = build_existing_fingerprint_map(events_rows)
     existing_fps = set(existing_fp_to_id.keys())
@@ -298,6 +307,25 @@ def main() -> None:
         else:
             eid = generate_unique_id(title, d, existing_ids)
 
+        category = normalize_event_category(
+            norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", ""))
+        )
+        description = norm(inb.get("description", ""))
+        location = norm(inb.get("location", ""))
+
+        # === BEGIN BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 | Zweck: macht redaktionell geänderte Bildzuordnung verbindlich und verhindert stilles Re-Inferieren bei Tippfehlern; Umfang: validiert Inbox.visual_key vor Events-Übernahme ===
+        raw_visual_key = norm(inb.get("visual_key", ""))
+        normalized_visual_key = normalize_event_visual_key(raw_visual_key)
+        if raw_visual_key and not normalized_visual_key:
+            fail(f"Inbox: ungültiger visual_key für '{title}': {raw_visual_key}")
+        final_visual_key = normalized_visual_key or infer_event_visual_key(
+            title=title,
+            description=description,
+            category=category,
+            location=location,
+        )
+        # === END BLOCK: INBOX_TO_EVENTS_VISUAL_KEY_EDITOR_VALIDATION_V1 ===
+
         source_fields = {
             "id": eid,
             "title": title,
@@ -305,14 +333,12 @@ def main() -> None:
             "endDate": norm(inb.get("endDate", "")),
             "time": norm(inb.get("time", "")),
             "city": norm(inb.get("city", "")),
-            "location": norm(inb.get("location", "")),
+            "location": location,
             # Einige Sheets heißen "kategorie" im Events-Tab, Inbox hat "kategorie_suggestion"
-            "kategorie": normalize_event_category(
-                norm(inb.get("kategorie", "")) or norm(inb.get("kategorie_suggestion", ""))
-            ),
+            "kategorie": category,
             "url": norm(inb.get("url", "")) or norm(inb.get("source_url", "")),
-
-            "description": norm(inb.get("description", "")),
+            "description": description,
+            "visual_key": final_visual_key,
         }
 
         row: List[str] = []
