@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_HEAD_V3 | Zweck: Zustandsfaehige Erfolgsseite fuer Aktivitaetseinreichung und Zahlung; Umfang: kompletter Head === -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F3F2E6">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/icon-32.png">
+<link rel="stylesheet" href="/css/style.css?v=2026-05-18-activity-presence-enterprise-final-1">
+<title>Aktivität eingereicht – Bocholt erleben</title>
+<!-- === END BLOCK: ACTIVITY_SUCCESS_HEAD_V3 === -->
+</head>
+<body>
+<!-- === BEGIN BLOCK: ACTIVITY_SUCCESS_BODY_ENTERPRISE_FINAL_V3 | Zweck: finalisiert die Erfolgsseite der Aktivitaetspraesenz mit klarer Statussprache, passenden CTAs und konsistentem Pruefungs-/Zahlungs-/Aufbereitungsfluss; Umfang: kompletter Body-Inhaltsblock === -->
+<header class="app-header">
+  <a class="header-left subpage-brand-link" href="/" aria-label="Zur Startseite">
+    <img src="/icons/app/icon-192.png" alt="Bocholt erleben Logo" class="app-logo">
+    <span class="app-title">Bocholt erleben</span>
+  </a>
+</header>
+
+<main class="page page--publish page--activity-presence">
+  <header class="content-hero content-hero--panel">
+    <p class="content-kicker">Aktivitätspräsenz</p>
+    <h1 id="activity-success-title">Aktivität eingereicht</h1>
+    <p class="content-lead" id="activity-success-lead">Wir prüfen jetzt, ob die Aktivität zu Bocholt erleben passt.</p>
+    <p class="content-note" id="activity-success-note">Wenn sie passt, erhältst du per E-Mail einen Zahlungslink. Es wurde noch keine Zahlung gestartet.</p>
+    <div class="content-actions content-actions--inline">
+      <a class="content-cta content-cta--primary" id="activity-success-primary-cta" href="/aktivitaeten/">Zur Aktivitätenseite</a>
+      <a class="content-cta content-cta--secondary" id="activity-success-secondary-cta" href="/aktivitaeten/sichtbar-werden/">Weitere Aktivität einreichen</a>
+    </div>
+  </header>
+
+  <section class="content-card content-card--primary" aria-labelledby="activity-success-next-steps-title">
+    <h2 id="activity-success-next-steps-title">Nächste Schritte</h2>
+    <div id="activity-success-steps">
+      <p>1. Wir prüfen die Aktivität redaktionell vor.</p>
+      <p>2. Bei Freigabe erhältst du einen Zahlungslink.</p>
+      <p>3. Nach Zahlung folgen Aufbereitung und Veröffentlichung.</p>
+    </div>
+  </section>
+</main>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
+  <footer data-site-footer></footer>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
+
+<script src="/config.js?v=2026-02-04-1"></script>
+<script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+<script>
+  /* === BEGIN BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V3 | Zweck: setzt Status-Texte und fuehrt Anbieterbereich-CTAs mit E-Mail-Kontext in den passenden Account; Umfang: kompletter zustandsabhaengiger Text-Switch === */
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const flow = String(params.get("flow") || "").trim().toLowerCase();
+    const hasSession = Boolean(String(params.get("session_id") || "").trim());
+    const email = String(params.get("email") || "").trim();
+
+    const title = document.getElementById("activity-success-title");
+    const lead = document.getElementById("activity-success-lead");
+    const note = document.getElementById("activity-success-note");
+    const primaryCta = document.getElementById("activity-success-primary-cta");
+    const secondaryCta = document.getElementById("activity-success-secondary-cta");
+    const steps = document.getElementById("activity-success-steps");
+
+    function buildProviderLoginUrl() {
+      if (!email) return "/fuer-veranstalter/login/";
+      return "/fuer-veranstalter/login/?email=" + encodeURIComponent(email);
+    }
+
+    function setPrimaryCta(label, href) {
+      if (!primaryCta) return;
+      primaryCta.textContent = label;
+      primaryCta.href = href;
+    }
+
+    function setSecondaryCta(label, href) {
+      if (!secondaryCta) return;
+      secondaryCta.textContent = label;
+      secondaryCta.href = href;
+    }
+
+    if (flow === "submitted") {
+      document.title = "Aktivität eingereicht | Bocholt erleben";
+      return;
+    }
+
+    if (flow === "existing-subscription") {
+      if (title) title.textContent = "Aktivität eingereicht";
+      if (lead) lead.textContent = "Diese Einreichung läuft über deine aktive Aktivitätspräsenz. Es ist keine neue Zahlung nötig.";
+      if (note) note.textContent = "Wir prüfen die Aktivität und bereiten sie redaktionell auf. Sie zählt erst nach Veröffentlichung im aktuellen Zeitraum.";
+      if (steps) {
+        steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Aktivitätspräsenz.</p><p>2. Wir prüfen die Aktivität und bereiten die Angaben redaktionell auf.</p><p>3. Nach Freigabe wird die Aktivität veröffentlicht.</p>";
+      }
+      setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
+      setSecondaryCta("Zur Aktivitätenseite", "/aktivitaeten/");
+      document.title = "Aktivität eingereicht | Bocholt erleben";
+      return;
+    }
+
+    if (hasSession) {
+      if (title) title.textContent = "Zahlung erhalten";
+      if (lead) lead.textContent = "Die Zahlung wurde bestätigt. Wir bereiten die Aktivität redaktionell auf.";
+      if (note) note.textContent = "Die Aktivität zählt erst nach Veröffentlichung in deinem Tarif. Den Status findest du im Anbieterbereich.";
+      if (steps) {
+        steps.innerHTML = "<p>1. Die Zahlung wurde bestätigt.</p><p>2. Redaktionelle Aufbereitung und finale Prüfung.</p><p>3. Veröffentlichung nach Freigabe.</p>";
+      }
+      setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
+      setSecondaryCta("Zur Aktivitätenseite", "/aktivitaeten/");
+      document.title = "Zahlung erhalten | Bocholt erleben";
+    }
+  })();
+  /* === END BLOCK: ACTIVITY_SUCCESS_FLOW_SWITCH_ENTERPRISE_FINAL_V3 === */
+</script>
+<!-- === END BLOCK: ACTIVITY_SUCCESS_BODY_ENTERPRISE_FINAL_V3 === -->
+</body>
+</html>

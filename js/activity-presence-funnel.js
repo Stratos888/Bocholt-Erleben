@@ -466,7 +466,7 @@
       try {
         const result = await postJson("/api/submissions/init.php", buildFunnelPayload(form));
         const submissionRef = result?.data?.payment_reference_key || "";
-        const targetUrl = new URL("/angebote/sichtbar-werden/erfolg/", window.location.origin);
+        const targetUrl = new URL("/aktivitaeten/sichtbar-werden/erfolg/", window.location.origin);
         targetUrl.searchParams.set("flow", "submitted");
         if (submissionRef) {
           targetUrl.searchParams.set("submission_ref", submissionRef);

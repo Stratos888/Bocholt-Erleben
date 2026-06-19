@@ -287,9 +287,9 @@ Für dauerhaft verfügbare oder regelmäßig buchbare Angebote. Zahlung erst nac
 Der Aktivitäten-Funnel besteht aus drei öffentlichen Routen:
 
 Route	Rolle
-/angebote/sichtbar-werden/	Entscheidungsseite
-/angebote/sichtbar-werden/einreichen/	Formularseite
-/angebote/sichtbar-werden/erfolg/	Erfolgs- und Statusseite
+/aktivitaeten/sichtbar-werden/	Entscheidungsseite
+/aktivitaeten/sichtbar-werden/einreichen/	Formularseite
+/aktivitaeten/sichtbar-werden/erfolg/	Erfolgs- und Statusseite
 
 Die Entscheidungsseite beantwortet:
 
@@ -1153,9 +1153,9 @@ Der Aktivitäts-Funnel ist verbindlich schlank, mobil und an der Event-Funnel-DN
 
 Kanonische Routen:
 
-1. `/angebote/sichtbar-werden/` = Entscheidungsseite
-2. `/angebote/sichtbar-werden/einreichen/` = Formularseite
-3. `/angebote/sichtbar-werden/erfolg/` = Erfolgs-/Statusseite
+1. `/aktivitaeten/sichtbar-werden/` = Entscheidungsseite
+2. `/aktivitaeten/sichtbar-werden/einreichen/` = Formularseite
+3. `/aktivitaeten/sichtbar-werden/erfolg/` = Erfolgs-/Statusseite
 
 Verbindliche Reihenfolge Entscheidungsseite:
 

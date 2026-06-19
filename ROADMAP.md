@@ -524,7 +524,7 @@ Status 2026-05-29:
 - Bestehende Funnel-Seiten bleiben kurz und handlungsorientiert:
   - `/events-veroeffentlichen/`
   - `/fuer-veranstalter/`
-  - `/angebote/sichtbar-werden/`
+  - `/aktivitaeten/sichtbar-werden/`
 - Die bestehenden Seiten wurden nur minimal-invasiv um kontextuelle Hilfelinks ergänzt.
 - Die neue Erklärseite bündelt:
   - Veröffentlichungswege
@@ -548,7 +548,7 @@ Bewertung:
 
 Ziel:
 
-- `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/angebote/sichtbar-werden/` erklären klarer, welchen konkreten Nutzen Anbieter bekommen.
+- `/events-veroeffentlichen/`, `/fuer-veranstalter/` und `/aktivitaeten/sichtbar-werden/` erklären klarer, welchen konkreten Nutzen Anbieter bekommen.
 
 Warum:
 

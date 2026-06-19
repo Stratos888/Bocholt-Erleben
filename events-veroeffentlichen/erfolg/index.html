@@ -98,10 +98,18 @@
       </div>
     </section>
   </main>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
+  <footer data-site-footer></footer>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
   <!-- === END BLOCK: PUBLISH_SUCCESS_ROUTE_STATEFUL_V4_EVENT_SUBMITTED_COPY === -->
 
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <script>
     /* === BEGIN BLOCK: PUBLISH_SUCCESS_FLOW_SWITCH_V5_REVIEW_BEFORE_PAYMENT | Zweck: unterscheidet eingereichte Einzeltermine, bezahlte Einzeltermine und bestehende Mitgliedschaften; Umfang: kompletter zustandsabhängiger Text-Switch auf /events-veroeffentlichen/erfolg/ === */

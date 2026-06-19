@@ -313,7 +313,9 @@ function isOrganizerCtaHref(href) {
     if (url.origin !== window.location.origin) return false;
 
     const path = url.pathname.replace(/\/+$/, "/");
-    return path.startsWith("/events-veroeffentlichen/") || path.startsWith("/fuer-veranstalter/");
+    return path.startsWith("/events-veroeffentlichen/") ||
+      path.startsWith("/fuer-veranstalter/") ||
+      path.startsWith("/aktivitaeten/sichtbar-werden/");
   } catch (_) {
     return false;
   }

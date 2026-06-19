@@ -906,7 +906,7 @@ function normalizeExternalUrl(value) {
 
     if (dashboardPrimaryCta) {
       if (isActivityPlanView) {
-        dashboardPrimaryCta.href = "/angebote/sichtbar-werden/";
+        dashboardPrimaryCta.href = "/aktivitaeten/sichtbar-werden/";
         dashboardPrimaryCta.textContent = "Weitere Aktivität einreichen";
       } else {
         const prefilledPlan = ["starter", "active", "unlimited"].includes(effectivePlanKey)
