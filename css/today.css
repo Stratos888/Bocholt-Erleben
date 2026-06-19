@@ -644,13 +644,62 @@ body.page-route-today footer {
   margin-top: 0.75rem;
 }
 
+/* === BEGIN BLOCK: TODAY_HOME_PHONE_PREMIUM_COMPACT_V2 | Zweck: verdichtet nur die Phone-Home-Hero-Flaeche fuer den Go-Live-Premium-Startscreen; Umfang: Phone <=759px, Kicker/Lead ausblenden, Hero-/Wetter-/Section-Rhythmus kompakter, keine Card-Bildhoehen-, Tablet- oder Desktop-Aenderung === */
+@media (max-width: 759.98px) {
+  body.page-route-today .today-page {
+    padding-top: 0.46rem;
+  }
+
+  body.page-route-today .today-hero {
+    gap: 0.42rem;
+    margin-bottom: 0.3rem;
+  }
+
+  body.page-route-today .today-hero__card {
+    padding: 0.78rem 0.92rem 0.82rem;
+    border-radius: 1.02rem;
+  }
+
+  body.page-route-today .today-kicker,
+  body.page-route-today .today-lead {
+    display: none;
+  }
+
+  body.page-route-today .today-title {
+    font-size: clamp(1.82rem, 7.9vw, 2.42rem);
+    line-height: 0.97;
+    letter-spacing: -0.058em;
+  }
+
+  body.page-route-today .today-weather-note {
+    width: fit-content;
+    min-height: 2.1rem;
+    margin-top: 0.56rem;
+    padding: 0.38rem 0.62rem;
+    font-size: 0.81rem;
+    line-height: 1.14;
+  }
+
+  body.page-route-today .today-weather-note__icon {
+    width: 0.88rem;
+    height: 0.88rem;
+  }
+
+  body.page-route-today .today-main {
+    gap: 0.52rem;
+    margin-top: 0.32rem;
+  }
+
+  body.page-route-today .today-section-head {
+    gap: 0.55rem;
+    padding-inline: 0.02rem;
+  }
+}
+/* === END BLOCK: TODAY_HOME_PHONE_PREMIUM_COMPACT_V2 === */
+
 @media (max-width: 380px) {
   body.page-route-today .today-title {
     font-size: 1.62rem;
-  }
-
-  body.page-route-today .today-lead {
-    font-size: 0.86rem;
   }
 
   body.page-route-today .today-section-head {
