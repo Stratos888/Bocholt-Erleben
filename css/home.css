@@ -4568,12 +4568,14 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
 /* === END BLOCK: ACTIVITIES_HERO_FILTER_OWNER_V10 === */
 /* === END BLOCK: HOME_CSS_STEP_4 === */
 
-/* === BEGIN BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V1 | Zweck: finalisiert den gemeinsamen Desktop-Layoutvertrag fuer Today, Events und Aktivitaeten vor Main; Umfang: nur Desktop >=900px, gemeinsame Rail-Breite, kompaktere Hero-Buehne, sichtbarer Feed-Verbund und Single-Event-Featured-Row; keine Mobile-, Daten-, Bild- oder Detailpanel-Aenderung === */
+/* === BEGIN BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V2 | Zweck: setzt einen sichtbaren, gemeinsamen Desktop-Premium-Rail fuer Events und Aktivitaeten; Umfang: nur Desktop >=900px, breitere Content-Achse, kompaktere Hero-Buehne, klarere Feed-Surface, Activity-Filter/Grid-Verbund und Single-Event-Featured-Row; keine Mobile-, Daten-, Bild- oder Detailpanel-Aenderung === */
 @media (min-width: 900px){
   body.is-tabbar-hidden,
   body.page-route-activities{
-    --desktop-shell-max: 1128px;
-    --desktop-shell-pad-x: 32px;
+    --desktop-shell-max: 1224px;
+    --desktop-shell-pad-x: 36px;
+    --desktop-copy-surface-max: 35rem;
+    --desktop-copy-max: 30rem;
   }
 
   body.is-tabbar-hidden .desktop-hero,
@@ -4581,46 +4583,92 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section,
   body.page-route-activities .activity-finder-card{
-    width: min(calc(100% - clamp(48px, 5vw, 64px)), var(--desktop-shell-max));
+    width: min(calc(100% - clamp(72px, 7vw, 112px)), var(--desktop-shell-max));
     max-width: none;
   }
 
   body.is-tabbar-hidden .desktop-hero,
   body.page-route-activities .desktop-hero{
-    min-height: 386px;
+    min-height: 360px;
+    padding-top: 16px;
+    padding-bottom: 10px;
   }
 
   body.is-tabbar-hidden .events-section,
   body.page-route-activities .events-section{
-    margin-top: 8px;
-    padding: 16px var(--desktop-shell-pad-x) 32px;
-    border-radius: 22px 22px 0 0;
-  }
-
-  body.page-route-activities .activity-finder-card{
-    margin-top: 8px;
-    margin-bottom: 0;
-  }
-
-  body.page-route-activities .events-section.activity-feed-section{
-    margin-top: 8px;
-    padding-top: 16px;
+    margin-top: 10px;
+    padding: 22px var(--desktop-shell-pad-x) 38px;
+    border-radius: 26px 26px 0 0;
     background:
       linear-gradient(
         180deg,
-        rgba(239,243,231,0.30) 0%,
-        rgba(233,237,220,0.10) 42px,
-        rgba(233,237,220,0.00) 90px
+        rgba(239,245,226,0.58) 0%,
+        rgba(231,238,213,0.34) 56px,
+        rgba(231,238,213,0.10) 124px,
+        rgba(231,238,213,0.00) 100%
       ),
       linear-gradient(
         180deg,
-        color-mix(in srgb, var(--home-rail-bg-start) 94%, rgba(247,249,244,0.76) 6%) 0%,
-        var(--home-rail-bg-end) 62%,
-        color-mix(in srgb, var(--home-rail-bg-end) 88%, rgba(219,226,203,0.988) 12%) 100%
+        color-mix(in srgb, var(--home-rail-bg-start) 92%, rgba(247,249,244,0.92) 8%) 0%,
+        var(--home-rail-bg-end) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 84%, rgba(219,226,203,0.988) 16%) 100%
       );
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.32),
-      inset 0 10px 18px rgba(247,249,242,0.055);
+      inset 0 1px 0 rgba(255,255,255,0.52),
+      inset 0 18px 26px rgba(247,249,242,0.11);
+  }
+
+  body.is-tabbar-hidden .event-cards-grid,
+  body.page-route-activities .event-cards-grid{
+    gap: clamp(28px, 2.2vw, 36px);
+  }
+
+  body.page-route-activities .page--activities{
+    gap: 0;
+  }
+
+  body.page-route-activities .activity-finder-card{
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding: 12px 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(18,34,26,0.070);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(250,252,247,0.90) 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.82) inset,
+      0 9px 22px rgba(17,32,20,0.026);
+  }
+
+  body.page-route-activities .activity-finder-card__head{
+    padding-inline: 0;
+  }
+
+  body.page-route-activities .activity-finder-card__controls{
+    padding-inline: 0;
+  }
+
+  body.page-route-activities .events-section.activity-feed-section{
+    margin-top: 10px;
+    padding: 24px var(--desktop-shell-pad-x) 44px;
+    border-radius: 26px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(239,245,226,0.66) 0%,
+        rgba(231,238,213,0.42) 64px,
+        rgba(231,238,213,0.16) 150px,
+        rgba(231,238,213,0.00) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--home-rail-bg-start) 91%, rgba(247,249,244,0.92) 9%) 0%,
+        var(--home-rail-bg-end) 58%,
+        color-mix(in srgb, var(--home-rail-bg-end) 83%, rgba(219,226,203,0.988) 17%) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.54),
+      inset 0 18px 28px rgba(247,249,242,0.12);
   }
 }
 
@@ -4632,14 +4680,14 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
   body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media{
     display: grid;
     grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr);
-    min-height: 286px;
+    min-height: 304px;
   }
 
   body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) > .event-card.event-card--with-media > .event-card-media{
     grid-column: 1;
     grid-row: 1 / -1;
     height: 100%;
-    min-height: 286px;
+    min-height: 304px;
     aspect-ratio: auto;
     border-radius: calc(var(--radius-eventcard) - 1px) 0 0 calc(var(--radius-eventcard) - 1px);
   }
@@ -4649,19 +4697,34 @@ body.page-route-activities .activity-finder-card .activity-finder__advanced .act
     grid-row: 1;
     align-self: stretch;
     align-content: center;
-    padding: 24px 26px 24px 24px;
-    gap: 10px;
+    padding: 28px 32px 28px 30px;
+    gap: 11px;
   }
 
   body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-title{
-    font-size: clamp(1.22rem, 0.98rem + 0.42vw, 1.42rem);
-    line-height: 1.16;
+    font-size: clamp(1.28rem, 1.02rem + 0.46vw, 1.52rem);
+    line-height: 1.15;
   }
 
   body.is-tabbar-hidden .events-feed-group__grid:has(> .event-card.event-card--with-media:only-child) .event-card-desc{
     -webkit-line-clamp: 4;
-    font-size: 0.98rem;
+    font-size: 1rem;
     line-height: 1.48;
   }
 }
-/* === END BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V1 === */
+
+@media (min-width: 1600px){
+  body.is-tabbar-hidden,
+  body.page-route-activities{
+    --desktop-shell-max: 1224px;
+    --desktop-shell-pad-x: 36px;
+  }
+
+  body.is-tabbar-hidden .desktop-hero,
+  body.page-route-activities .desktop-hero{
+    min-height: 360px;
+    padding-top: 16px;
+    padding-bottom: 10px;
+  }
+}
+/* === END BLOCK: DESKTOP_PREMIUM_SHELL_CONTRACT_V2 === */
