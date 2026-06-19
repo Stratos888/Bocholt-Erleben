@@ -112,7 +112,7 @@ Bis zu diesem Beweis nicht starten:
 - `/` is the canonical Today/Home recommendation entry and current public home.
 - `/events/` is the canonical event search and browsing route.
 - `/aktivitaeten/` is the canonical activities search and browsing route.
-- `/angebote/` remains a legacy/transition route for the activities page until redirect/canonical cleanup is finalized.
+- `/angebote/` is a legacy redirect to `/aktivitaeten/` and must not contain independent activities content.
 - `/angebote/sichtbar-werden/` is the canonical activity-presence decision page.
 - `/angebote/sichtbar-werden/einreichen/` is the canonical activity-presence submission page.
 - `/angebote/sichtbar-werden/erfolg/` is the canonical activity-presence success/status page.
