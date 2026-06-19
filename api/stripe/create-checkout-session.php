@@ -321,7 +321,7 @@ function scs_build_success_url(string $baseUrl, array $submission): string
 {
     $paymentReferenceKey = (string)$submission['payment_reference_key'];
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
-    $path = $isActivity ? '/angebote/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
+    $path = $isActivity ? '/aktivitaeten/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
     $emailPart = $isActivity ? scs_activity_email_query_part($submission) : '';
 
     return rtrim($baseUrl, '/') . $path . '?submission_ref=' . rawurlencode($paymentReferenceKey) . '&session_id={CHECKOUT_SESSION_ID}' . $emailPart;
@@ -333,7 +333,7 @@ function scs_build_cancel_url(string $baseUrl, array $submission): string
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
 
     if ($isActivity) {
-        return rtrim($baseUrl, '/') . '/angebote/sichtbar-werden/?cancelled=1&submission_ref=' . rawurlencode($paymentReferenceKey) . scs_activity_email_query_part($submission);
+        return rtrim($baseUrl, '/') . '/aktivitaeten/sichtbar-werden/?cancelled=1&submission_ref=' . rawurlencode($paymentReferenceKey) . scs_activity_email_query_part($submission);
     }
 
     return rtrim($baseUrl, '/') . '/events-veroeffentlichen/abgebrochen/?submission_ref=' . rawurlencode($paymentReferenceKey);
@@ -511,7 +511,7 @@ function scs_build_existing_subscription_redirect_url(string $baseUrl, array $su
     /* === BEGIN BLOCK: ACTIVITY_PRESENCE_EXISTING_SUBSCRIPTION_REDIRECT_EMAIL_V1 | Zweck: fuehrt bestehende Aktivitaetspraesenz-Rueckspruenge mit E-Mail-Kontext in den passenden Anbieterbereich; Umfang: ersetzt nur den Existing-Subscription-Redirect-Builder === */
     $paymentReferenceKey = (string)$submission['payment_reference_key'];
     $isActivity = (string)($submission['submission_kind'] ?? 'event') === 'activity';
-    $path = $isActivity ? '/angebote/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
+    $path = $isActivity ? '/aktivitaeten/sichtbar-werden/erfolg/' : '/events-veroeffentlichen/erfolg/';
     $emailPart = $isActivity ? scs_activity_email_query_part($submission) : '';
 
     return rtrim($baseUrl, '/') . $path . '?submission_ref=' . rawurlencode($paymentReferenceKey) . '&flow=existing-subscription' . $emailPart;

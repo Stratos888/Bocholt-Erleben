@@ -954,7 +954,7 @@ const OfferCards = (() => {
   function createActivityPresenceEntry() {
     const link = document.createElement("a");
     link.className = "feed-publish-entry activity-presence-feed-entry";
-    link.href = "/angebote/sichtbar-werden/";
+    link.href = "/aktivitaeten/sichtbar-werden/";
     link.setAttribute("aria-label", "Für Anbieter – als Aktivität sichtbar werden");
 
     const label = document.createElement("span");
