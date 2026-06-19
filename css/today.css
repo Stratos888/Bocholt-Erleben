@@ -1,11 +1,8 @@
 /* === BEGIN FILE: css/today.css | Zweck: eigener CSS-Owner fuer die neue Heute-/Recommendation-Home; Umfang: page-route-today, Hero, Wetterhinweis, Interessensteuerung und gemischte Recommendation-Cards ohne Eingriff in Events-/Activities-Suchseiten === */
 
 body.page-route-today {
-  background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--color-brand-soft, #f3f2e6) 82%, white 18%) 0, transparent 34rem),
-    linear-gradient(180deg, var(--color-page-bg, #f7f3ea) 0%, var(--color-surface-subtle, #fbfaf5) 100%);
+  background: var(--color-background);
 }
-
 body.page-route-today .app-header {
   position: sticky;
   top: 0;
