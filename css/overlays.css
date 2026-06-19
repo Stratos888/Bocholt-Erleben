@@ -3066,11 +3066,23 @@ body.is-feedback-open{
   line-height: 1.45;
 }
 
+/* === BEGIN BLOCK: FEEDBACK_INLINE_LINK_PREMIUM_V1 | Zweck: ersetzt die unterstrichenen Feedback-Modal-Textlinks durch denselben leisen Inline-Link-Look wie im restlichen Projekt === */
 .feedback-form__privacy a{
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
+  color: var(--cmp-inline-link-color);
+  font-weight: 680;
+  text-decoration: none;
+  border-radius: 0.24em;
+  box-shadow: inset 0 -0.08em 0 var(--cmp-inline-link-rule);
 }
+
+@media (hover: hover){
+  .feedback-form__privacy a:hover{
+    color: var(--cmp-inline-link-color-hover);
+    background: var(--cmp-inline-link-bg-hover);
+    box-shadow: inset 0 -0.22em 0 var(--cmp-inline-link-rule-hover);
+  }
+}
+/* === END BLOCK: FEEDBACK_INLINE_LINK_PREMIUM_V1 === */
 
 /* === BEGIN BLOCK: FEEDBACK_SUCCESS_STATE_POLISH_V1 | Zweck: ersetzt die kleine Success-Zeile durch einen klaren modal-internen Success-State mit Lucide-Erfolgsicon, ruhiger Positivfläche und reduzierter Nach-Aktion-Komplexität; Umfang: ersetzt Status-/Action-Bereich des Feedback-Formulars in css/overlays.css === */
 .feedback-form__status{
@@ -3146,7 +3158,17 @@ body.is-feedback-open{
 
 .feedback-form__status.is-error a{
   color: inherit;
-  text-decoration: underline;
+  font-weight: 760;
+  text-decoration: none;
+  border-radius: 0.24em;
+  box-shadow: inset 0 -0.08em 0 currentColor;
+}
+
+@media (hover: hover){
+  .feedback-form__status.is-error a:hover{
+    background: rgba(141,31,31,0.08);
+    box-shadow: inset 0 -0.22em 0 rgba(141,31,31,0.34);
+  }
 }
 
 .feedback-form__status.is-neutral{
