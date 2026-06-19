@@ -35,7 +35,6 @@
       prefetch: ["/data/offers.json"],
       match: (path) =>
         path === "/angebote/" ||
-        path.startsWith("/angebote/") ||
         path === "/aktivitaeten/" ||
         path.startsWith("/aktivitaeten/")
     }
