@@ -147,6 +147,7 @@ body.page-route-today .app-header {
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
+  align-content: start;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-border, #ded7c8) 78%, transparent);
   border-radius: 1.25rem;
@@ -154,6 +155,10 @@ body.page-route-today .app-header {
   box-shadow: 0 12px 30px rgba(64, 48, 26, 0.07);
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.today-card--with-image {
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .today-card:hover {
@@ -176,6 +181,9 @@ body.page-route-today .app-header {
 
 .today-card__body {
   display: grid;
+  align-self: stretch;
+  align-content: start;
+  min-width: 0;
   gap: 0.48rem;
   padding: 0.95rem;
 }
