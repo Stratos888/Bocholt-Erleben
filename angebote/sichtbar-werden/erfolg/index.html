@@ -28,7 +28,7 @@
     <p class="content-lead" id="activity-success-lead">Wir prüfen jetzt, ob die Aktivität zu Bocholt erleben passt.</p>
     <p class="content-note" id="activity-success-note">Wenn sie passt, erhältst du per E-Mail einen Zahlungslink. Es wurde noch keine Zahlung gestartet.</p>
     <div class="content-actions content-actions--inline">
-      <a class="content-cta content-cta--primary" id="activity-success-primary-cta" href="/angebote/">Zur Aktivitätenseite</a>
+      <a class="content-cta content-cta--primary" id="activity-success-primary-cta" href="/aktivitaeten/">Zur Aktivitätenseite</a>
       <a class="content-cta content-cta--secondary" id="activity-success-secondary-cta" href="/angebote/sichtbar-werden/">Weitere Aktivität einreichen</a>
     </div>
   </header>
@@ -90,7 +90,7 @@
         steps.innerHTML = "<p>1. Die Einreichung läuft über deine aktive Aktivitätspräsenz.</p><p>2. Wir prüfen die Aktivität und bereiten die Angaben redaktionell auf.</p><p>3. Nach Freigabe wird die Aktivität veröffentlicht.</p>";
       }
       setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
-      setSecondaryCta("Zur Aktivitätenseite", "/angebote/");
+      setSecondaryCta("Zur Aktivitätenseite", "/aktivitaeten/");
       document.title = "Aktivität eingereicht | Bocholt erleben";
       return;
     }
@@ -103,7 +103,7 @@
         steps.innerHTML = "<p>1. Die Zahlung wurde bestätigt.</p><p>2. Redaktionelle Aufbereitung und finale Prüfung.</p><p>3. Veröffentlichung nach Freigabe.</p>";
       }
       setPrimaryCta("Anbieterbereich öffnen", buildProviderLoginUrl());
-      setSecondaryCta("Zur Aktivitätenseite", "/angebote/");
+      setSecondaryCta("Zur Aktivitätenseite", "/aktivitaeten/");
       document.title = "Zahlung erhalten | Bocholt erleben";
     }
   })();
