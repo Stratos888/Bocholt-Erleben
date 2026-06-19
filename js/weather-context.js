@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "bocholt_erleben.weather_context.v2";
+const STORAGE_KEY = "bocholt_erleben.weather_context.v3";
   const CACHE_TTL_MS = 30 * 60 * 1000;
 
   const BOCHOLT = Object.freeze({
@@ -159,12 +159,16 @@
 
     const rainRowsToday = futureToday.filter((row) => isRainCode(row.weatherCode) || row.precipitation > 0.2 || row.precipitationProbability >= 45);
     const rainRowsNearTerm = nearTerm.filter((row) => isRainCode(row.weatherCode) || row.precipitation > 0.2 || row.precipitationProbability >= 45);
+    const temperatureValuesToday = futureToday
+      .map((row) => asNumber(row.temperature, null))
+      .filter((temperature) => Number.isFinite(temperature));
 
     const maxRainProbability = futureToday.reduce((max, row) => Math.max(max, asNumber(row.precipitationProbability, 0)), 0);
     const nearTermRainProbability = nearTerm.reduce((max, row) => Math.max(max, asNumber(row.precipitationProbability, 0)), 0);
     const rainAmountToday = futureToday.reduce((sum, row) => sum + asNumber(row.precipitation, 0), 0);
     const rainAmountNearTerm = nearTerm.reduce((sum, row) => sum + asNumber(row.precipitation, 0), 0);
     const maxWindSpeed = relevant.reduce((max, row) => Math.max(max, asNumber(row.windSpeed, 0)), 0);
+    const maxTemperature = temperatureValuesToday.length ? Math.round(Math.max(...temperatureValuesToday)) : null;
 
     const showersLikely = rainRowsNearTerm.length >= 1 || rainRowsToday.length >= 3 || maxRainProbability >= 55 || rainAmountToday >= 1.5;
     const rainRisk = showersLikely
@@ -180,20 +184,24 @@
       nearTermRainProbability,
       rainAmountToday: Math.round(rainAmountToday * 10) / 10,
       rainAmountNearTerm: Math.round(rainAmountNearTerm * 10) / 10,
-      maxWindSpeed: Math.round(maxWindSpeed)
+      maxWindSpeed: Math.round(maxWindSpeed),
+      maxTemperature
     };
   }
 
   function classifyForecastWeather(current, forecast) {
     const currentClass = classifyCurrentWeather(current);
     const temperature = asNumber(current?.temperature_2m, null);
+    const maxTemperature = asNumber(forecast?.maxTemperature, null);
+    const isHotToday = currentClass === "hot" || (maxTemperature != null && maxTemperature >= 28);
 
-    if (currentClass === "rain" || forecast.showersLikely) {
+    if (currentClass === "rain" || forecast.rainRisk === "near_term") {
       return "rain";
     }
 
     if (currentClass === "cold") return "cold";
-    if (currentClass === "hot") return "hot";
+    if (isHotToday) return "hot";
+    if (forecast.showersLikely) return "rain";
     if (currentClass === "windy" || forecast.maxWindSpeed >= 35) return "windy";
     if (temperature == null && !forecast.rainHoursToday) return "unknown";
 
@@ -203,17 +211,17 @@
   function buildOutdoorSummary(weatherClass, forecast) {
     if (weatherClass === "rain") {
       if (forecast.rainRisk === "near_term") {
-        return "wechselhaft mit Schauern – wetterfest planen.";
+        return "wechselhaft mit Schauern – wetterfest planen";
       }
-      return "später Schauer möglich – draußen nur mit Plan B.";
+      return "später Schauer möglich – draußen mit Plan B";
     }
 
-    if (weatherClass === "hot") return "Wasser & Schatten sind gute Ideen.";
-    if (weatherClass === "cold") return "kurz oder drinnen passt besser.";
-    if (weatherClass === "windy") return "windig – geschützte Orte passen besser.";
-    if (weatherClass === "dry") return "heute gut für draußen.";
+    if (weatherClass === "hot") return "ideal für Wasser & Schatten";
+    if (weatherClass === "cold") return "kurz oder drinnen passt besser";
+    if (weatherClass === "windy") return "geschützte Orte passen besser";
+    if (weatherClass === "dry") return "ideal für draußen";
 
-    return "ruhig vorsortiert für heute.";
+    return "ruhig vorsortiert für heute";
   }
 
   function buildContext(payload, source) {
