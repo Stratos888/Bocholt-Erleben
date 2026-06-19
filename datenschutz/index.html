@@ -127,10 +127,18 @@
       <p>Stand: Januar 2026</p>
     </section>
   </main>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
+  <footer data-site-footer></footer>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
   <!-- === END BLOCK: PRIVACY_PAGE_SUBPAGE_ALIGNMENT_V2 === -->
   <!-- === BEGIN BLOCK: PRIVACY_PAGE_GLOBAL_RUNTIME_V1 | Zweck: lädt die globale Runtime für Config, Icons und Feedback auch auf dieser Unterseite; Umfang: Script-Includes direkt vor </body> und Bereinigung des doppelten body-Endtags === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <!-- === END BLOCK: PRIVACY_PAGE_GLOBAL_RUNTIME_V1 === -->
 </body>

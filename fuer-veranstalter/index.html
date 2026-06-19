@@ -147,10 +147,18 @@
       </section>
     </section>
   </main>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
+  <footer data-site-footer></footer>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
   <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_MAIN_TARIFF_COPY_V12_HERO_LEAD_COPY === -->
   <!-- === BEGIN BLOCK: ORGANIZER_MEMBERSHIP_FEEDBACK_SCRIPT_WIRING_V1 | Zweck: lädt Feedback und Konfiguration konsistent wie auf den übrigen Veranstalter-/Payment-Seiten; Umfang: Script-Imports am Ende von /fuer-veranstalter/ === -->
   <script src="/config.js?v=2026-02-04-1"></script>
   <script src="/js/icons.js?v=2026-02-04-1" defer></script>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
   <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
   <script src="/js/organizer-membership.js?v=2026-05-08-membership-wording-1" defer></script>
   <!-- === END BLOCK: ORGANIZER_MEMBERSHIP_FEEDBACK_SCRIPT_WIRING_V1 === -->

@@ -393,11 +393,19 @@
     </form>
   </section>
 </main>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 | Zweck: ergänzt den zentral gerenderten Site-Footer auf öffentlichen Unterseiten; Umfang: Footer-Slot direkt nach dem Hauptinhalt === -->
+  <footer data-site-footer></footer>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_SLOT_V1 === -->
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_PAGE_ENTERPRISE_FINAL_V4 === -->
 
 <script src="/config.js?v=2026-02-04-1"></script>
 <script src="/js/icons.js?v=2026-05-06-header-access-2" defer></script>
-<script src="/js/feedback.js?v=2026-04-17-1" defer></script>
+
+  <!-- === BEGIN BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 | Zweck: lädt den zentralen Footer-Renderer für öffentliche Unterseiten; Umfang: site-footer.js Script-Include === -->
+  <script src="/js/site-footer.js?v=2026-06-15-image-attribution-v7" defer></script>
+  <!-- === END BLOCK: PUBLIC_SITE_FOOTER_RUNTIME_V1 === -->
+  <script src="/js/feedback.js?v=2026-04-17-1" defer></script>
 <script src="/js/activity-presence-funnel.js?v=2026-06-12-activity-image-material-2" defer></script>
 <!-- === END BLOCK: ACTIVITY_PRESENCE_SUBMIT_BODY_V1 === -->
 </body>
